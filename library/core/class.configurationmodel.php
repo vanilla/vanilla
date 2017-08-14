@@ -35,41 +35,41 @@ class Gdn_ConfigurationModel {
     /**
      * @var string A collection of Field => Values that will NOT be validated and WILL be
      * saved as long as validation succeeds. You can add to this collection with
-     * $this->ForceSetting();
+     * $this->forceSetting();
      */
-    private $_ForceSettings = array();
+    private $_ForceSettings = [];
 
     /**
      * Class constructor. Defines the related database table name.
      *
      * @param string $ConfigurationArrayName The name of the configuration array that is being manipulated.
-     * @param object $Validation
+     * @param object $validation
      */
-    public function __construct($Validation) {
+    public function __construct($validation) {
         $this->Name = 'Configuration';
-        $this->Data = array();
-        $this->Validation = $Validation;
+        $this->Data = [];
+        $this->Validation = $validation;
     }
 
     /**
      * Allows the user to declare which values are being manipulated in the
      * $this->Name configuration array.
      *
-     * @param mixed $FieldName The name of the field (or array of field names) to ensure.
+     * @param mixed $fieldName The name of the field (or array of field names) to ensure.
      */
-    public function setField($FieldName) {
-        $Config = Gdn::factory(Gdn::AliasConfig);
-        if (is_array($FieldName) === false) {
-            $FieldName = array($FieldName);
+    public function setField($fieldName) {
+        $config = Gdn::factory(Gdn::AliasConfig);
+        if (is_array($fieldName) === false) {
+            $fieldName = [$fieldName];
         }
 
-        foreach ($FieldName as $Index => $Value) {
-            if (is_numeric($Index)) {
-                $NameKey = $Value;
-                $Default = '';
+        foreach ($fieldName as $index => $value) {
+            if (is_numeric($index)) {
+                $nameKey = $value;
+                $default = '';
             } else {
-                $NameKey = $Index;
-                $Default = $Value;
+                $nameKey = $index;
+                $default = $value;
             }
             /*
             if ($this->Name != 'Configuration')
@@ -78,7 +78,7 @@ class Gdn_ConfigurationModel {
                $Name = $this->Name.'.'.$NameKey;
             */
 
-            $this->Data[$NameKey] = $Config->get($NameKey, $Default);
+            $this->Data[$nameKey] = $config->get($nameKey, $default);
         }
     }
 
@@ -86,64 +86,64 @@ class Gdn_ConfigurationModel {
      * Adds a new Setting => Value pair that will NOT be validated and WILL be
      * saved to the configuration array.
      *
-     * @param mixed $FieldName The name of the field (or array of field names) to save.
-     * @param mixed $FieldValue The value of FieldName to be saved.
+     * @param mixed $fieldName The name of the field (or array of field names) to save.
+     * @param mixed $fieldValue The value of FieldName to be saved.
      */
-    public function forceSetting($FieldName, $FieldValue) {
-        $this->_ForceSettings[$FieldName] = $FieldValue;
+    public function forceSetting($fieldName, $fieldValue) {
+        $this->_ForceSettings[$fieldName] = $fieldValue;
     }
 
     /**
      * Takes an associative array and munges it's keys together with a dot
      * delimiter. For example:
-     *  $Array['Database']['Host'] = 'dbhost';
+     *  $array['Database']['Host'] = 'dbhost';
      *  ... becomes ...
-     *  $Array['Database.Host'] = 'dbhost';
+     *  $array['Database.Host'] = 'dbhost';
      *
-     * @param array $Array The array to be normalized.
+     * @param array $array The array to be normalized.
      */
-    private function normalizeArray($Array) {
-        $Return = array();
-        foreach ($Array as $Key => $Value) {
-            if (is_array($Value) === true && array_key_exists(0, $Value) === false) {
-                foreach ($Value as $k => $v) {
-                    $Return[$Key.'.'.$k] = $v;
+    private function normalizeArray($array) {
+        $return = [];
+        foreach ($array as $key => $value) {
+            if (is_array($value) === true && array_key_exists(0, $value) === false) {
+                foreach ($value as $k => $v) {
+                    $return[$key.'.'.$k] = $v;
                 }
             } else {
-                $Return[$Key] = $Value;
+                $return[$key] = $value;
             }
         }
-        return $Return;
+        return $return;
     }
 
     /**
      * Takes a set of form data ($Form->_PostValues), validates them, and
      * inserts or updates them to the configuration file.
      *
-     * @param array $FormPostValues An associative array of $Field => $Value pairs that represent data posted
+     * @param array $formPostValues An associative array of $Field => $Value pairs that represent data posted
      * from the form in the $_POST or $_GET collection.
      */
-    public function save($FormPostValues, $Live = false) {
+    public function save($formPostValues, $live = false) {
         // Fudge your way through the schema application. This will allow me to
         // force the validation object to expect the fieldnames contained in
         // $this->Data.
         $this->Validation->setSchema($this->Data);
         // Validate the form posted values
-        if ($this->Validation->validate($FormPostValues)) {
+        if ($this->Validation->validate($formPostValues)) {
             // Merge the validation fields and the forced settings into a single array
-            $Settings = $this->Validation->validationFields();
+            $settings = $this->Validation->validationFields();
             if (is_array($this->_ForceSettings)) {
-                $Settings = mergeArrays($Settings, $this->_ForceSettings);
+                $settings = mergeArrays($settings, $this->_ForceSettings);
             }
 
-            $SaveResults = saveToConfig($Settings);
+            $saveResults = saveToConfig($settings);
 
             // If the Live flag is true, set these in memory too
-            if ($SaveResults && $Live) {
-                Gdn::config()->set($Settings, true);
+            if ($saveResults && $live) {
+                Gdn::config()->set($settings, true);
             }
 
-            return $SaveResults;
+            return $saveResults;
         } else {
             return false;
         }
@@ -153,17 +153,17 @@ class Gdn_ConfigurationModel {
      * A convenience method to check that the form-posted data is valid; just
      * in case you don't want to jump directly to the save if the data *is* valid.
      *
-     * @param string $FormPostValues
+     * @param string $formPostValues
      * @return bool
      */
-    public function validate($FormPostValues) {
+    public function validate($formPostValues) {
         $this->Validation->setSchema($this->Data);
         // Validate the form posted values
-        return $this->Validation->validate($FormPostValues);
+        return $this->Validation->validate($formPostValues);
     }
 
     /**
-     * Returns the $this->Validation->ValidationResults() array.
+     * Returns the $this->Validation->validationResults() array.
      */
     public function validationResults() {
         return $this->Validation->results();

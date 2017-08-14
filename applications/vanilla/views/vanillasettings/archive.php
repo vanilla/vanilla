@@ -14,14 +14,14 @@ echo $this->Form->errors();
         </div>
         <div class="input-wrap">
             <?php
-            echo $this->Form->Calendar('Vanilla.Archive.Date', ['placeholder' => t('YYYY-mm-dd')]);
+            echo $this->Form->calendar('Vanilla.Archive.Date', ['placeholder' => t('YYYY-mm-dd')]);
             ?>
         </div>
     </li>
     <li class="form-group">
         <div class="input-wrap no-label">
             <?php
-            echo $this->Form->CheckBox('Vanilla.Archive.Exclude', 'Exclude archived discussions from the discussions list');
+            echo $this->Form->checkBox('Vanilla.Archive.Exclude', 'Exclude archived discussions from the discussions list');
             ?>
         </div>
     </li>

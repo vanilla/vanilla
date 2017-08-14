@@ -63,7 +63,6 @@ class AltTest extends \PHPUnit\Framework\TestCase {
                 'Conversations' => 'conversations',
             ],
             'EnabledPlugins' => [
-                'HtmLawed' => true,
                 'vanillicon' => true,
                 'Facebook' => true,
                 'Twitter' => true,

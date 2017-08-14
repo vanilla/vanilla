@@ -4,12 +4,13 @@
         width: 500px;
     }
 
-    thead td {
+    table.PreferenceGroup th {
         vertical-align: bottom;
         text-align: center;
     }
 
     table.PreferenceGroup thead .TopHeading {
+        text-align: center;
         border-bottom: none;
     }
 
@@ -17,7 +18,7 @@
         border-top: none;
     }
 
-    td.PrefCheckBox {
+    th.PrefCheckBox, td.PrefCheckBox {
         width: 50px;
         text-align: center;
     }
@@ -40,20 +41,34 @@
         $this->fireEvent("BeforePreferencesRender");
 
         foreach ($this->data('PreferenceGroups') as $PreferenceGroup => $Preferences) {
-            echo wrap(t($PreferenceGroup == 'Notifications' ? 'General' : $PreferenceGroup), 'h2');
+            if ($PreferenceGroup == 'Notifications') {
+                $Header = t('General');
+            } else {
+                $Header = t($PreferenceGroup);
+            }
             ?>
+            <h2><?php echo $Header; ?></h2>
             <table class="PreferenceGroup">
                 <thead>
                 <tr>
+                    <th id="<?php echo $Header; ?>NotificationHeader" scope="col" style="text-align:left">
+                        <?php echo t('Notification'); ?>
+                    </th>
                     <?php
-                    echo wrap(t('Notification'), 'td', array('style' => 'text-align: left'));
-
                     $PreferenceTypes = $this->data("PreferenceTypes.{$PreferenceGroup}");
                     foreach ($PreferenceTypes as $PreferenceType) {
                         if ($PreferenceType === 'Email' && c('Garden.Email.Disabled')) {
                             continue;
                         }
-                        echo wrap(t($PreferenceType), 'td', array('class' => 'PrefCheckBox'));
+                        echo wrap(
+                            t($PreferenceType),
+                            'th',
+                            [
+                                'id' => "{$Header}{$PreferenceType}Header",
+                                'class' => 'PrefCheckBox',
+                                'scope' => 'col'
+                            ]
+                        );
                     }
                     ?>
                 </tr>
@@ -81,7 +96,14 @@
                         } else {
                             // Everything's fine, show checkbox.
                             $checkbox = $this->Form->checkBox($NotificationType.'.'.$Event, '', ['value' => '1']);
-                            $ColumnsMarkup .= wrap($checkbox, 'td', ['class' => 'PrefCheckBox']);
+                            $ColumnsMarkup .= wrap(
+                                $checkbox,
+                                'td',
+                                [
+                                    'class' => 'PrefCheckBox',
+                                    'headers' => "{$Header}{$NotificationType}Header"
+                                ]
+                            );
                             // Set flag so that line is printed.
                             $RowHasConfigValues = true;
                         }
@@ -95,7 +117,14 @@
                             $Description = $Description[0];
                         }
                         echo '<tr>';
-                        echo wrap($Description, 'td', ['class' => 'Description']);
+                        echo wrap(
+                            $Description,
+                            'td',
+                            [
+                                'class' => 'Description',
+                                'headers' => "{$Header}NotificationHeader"
+                            ]
+                        );
                         echo $ColumnsMarkup;
                         echo '</tr>';
                     }

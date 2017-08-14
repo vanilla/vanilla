@@ -59,7 +59,7 @@ foreach ($this->data('Conversations') as $Conversation) {
             }
             if ($Subject = val('Subject', $Conversation)) {
                 if ($Names) {
-                    echo Bullet(' ');
+                    echo bullet(' ');
                 }
                 echo '<span class="Subject">'.anchor(htmlspecialchars($Subject), $Url).'</span>';
             }
@@ -71,7 +71,7 @@ foreach ($this->data('Conversations') as $Conversation) {
                 <?php
                 $this->fireEvent('BeforeConversationMeta');
 
-                echo ' <span class="MItem CountMessages">'.sprintf(Plural($Conversation->CountMessages, '%s message', '%s messages'), $Conversation->CountMessages).'</span> ';
+                echo ' <span class="MItem CountMessages">'.sprintf(plural($Conversation->CountMessages, '%s message', '%s messages'), $Conversation->CountMessages).'</span> ';
 
                 if ($Conversation->CountNewMessages > 0) {
                     echo ' <strong class="HasNew"> '.plural($Conversation->CountNewMessages, '%s new', '%s new').'</strong> ';

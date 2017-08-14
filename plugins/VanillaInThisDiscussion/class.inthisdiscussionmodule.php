@@ -18,31 +18,31 @@ class InThisDiscussionModule extends Gdn_Module {
     /**
      *
      *
-     * @param string $Sender
+     * @param string $sender
      */
-    public function __construct($Sender = '') {
+    public function __construct($sender = '') {
         $this->_UserData = false;
-        parent::__construct($Sender);
+        parent::__construct($sender);
     }
 
     /**
      *
      *
-     * @param $DiscussionID
-     * @param int $Limit
+     * @param $discussionID
+     * @param int $limit
      * @throws Exception
      */
-    public function getData($DiscussionID, $Limit = 50) {
-        $SQL = Gdn::sql();
-        $this->_UserData = $SQL
+    public function getData($discussionID, $limit = 50) {
+        $sQL = Gdn::sql();
+        $this->_UserData = $sQL
             ->select('u.UserID, u.Name, u.Photo')
             ->select('c.DateInserted', 'max', 'DateLastActive')
             ->from('User u')
             ->join('Comment c', 'u.UserID = c.InsertUserID')
-            ->where('c.DiscussionID', $DiscussionID)
+            ->where('c.DiscussionID', $discussionID)
             ->groupBy('u.UserID, u.Name, u.Photo')
             ->orderBy('c.DateInserted', 'desc')
-            ->limit($Limit)
+            ->limit($limit)
             ->get();
     }
 
@@ -65,20 +65,20 @@ class InThisDiscussionModule extends Gdn_Module {
             return '';
         }
 
-        $String = '';
+        $string = '';
         ob_start();
         ?>
         <div class="Box BoxInThisDiscussion">
             <?php echo panelHeading(t('In this Discussion')); ?>
             <ul class="PanelInfo PanelInThisDiscussion">
-                <?php foreach ($this->_UserData->Result() as $User) :
+                <?php foreach ($this->_UserData->result() as $user) :
 ?>
                     <li>
                         <?php
                         echo anchor(
-                            wrap(wrap(Gdn_Format::date($User->DateLastActive, 'html')), 'span', array('class' => 'Aside')).' '.
-                            wrap(wrap(val('Name', $User), 'span', array('class' => 'Username')), 'span'),
-                            userUrl($User)
+                            wrap(wrap(Gdn_Format::date($user->DateLastActive, 'html')), 'span', ['class' => 'Aside']).' '.
+                            wrap(wrap(val('Name', $user), 'span', ['class' => 'Username']), 'span'),
+                            userUrl($user)
                         )
                         ?>
                     </li>
@@ -87,7 +87,7 @@ endforeach; ?>
             </ul>
         </div>
         <?php
-        $String = ob_get_clean();
-        return $String;
+        $string = ob_get_clean();
+        return $string;
     }
 }

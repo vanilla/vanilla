@@ -87,7 +87,7 @@ if (!function_exists('array_column')) {
             }
         }
 
-        $resultArray = array();
+        $resultArray = [];
 
         foreach ($paramsInput as $row) {
             $key = $value = null;
@@ -221,7 +221,7 @@ if (!function_exists('http_build_url')) {
     /**
      * Takes an associative array in the layout of parse_url, and constructs a URL from it.
      *
-     * @param mixed $url Part(s) of a URL in form of a string or associative array like parse_url() returns.
+     * @param mixed $url part(s) of a URL in form of a string or associative array like parse_url() returns.
      * @param mixed $parts Same as the first argument.
      * @param int $flags A bit mask of binary or'ed HTTP_URL constants (Optional)HTTP_URL_REPLACE is the default.
      * @param array &$new_url If set, it will be filled with the parts of the composed url like parse_url() would return.
@@ -230,8 +230,8 @@ if (!function_exists('http_build_url')) {
      * @see https://github.com/fuel/core/blob/974281dde67345ca8d7cfa27bcf4aa55c984d48e/base.php#L248
      * @see http://stackoverflow.com/questions/7751679/php-http-build-url-and-pecl-install/7753154#comment11239561_7753154
      */
-    function http_build_url($url, $parts = array(), $flags = HTTP_URL_REPLACE, &$new_url = false) {
-        $keys = array('user', 'pass', 'port', 'path', 'query', 'fragment');
+    function http_build_url($url, $parts = [], $flags = HTTP_URL_REPLACE, &$new_url = false) {
+        $keys = ['user', 'pass', 'port', 'path', 'query', 'fragment'];
 
         // HTTP_URL_STRIP_ALL becomes all the HTTP_URL_STRIP_Xs
         if ($flags & HTTP_URL_STRIP_ALL) {
@@ -346,21 +346,21 @@ if (!function_exists('parse_ini_string')) {
     /**
      * The parse_ini_string function is not supported until PHP 5.3.0, and we currently support PHP 5.2.0.
      *
-     * @param string $Ini The INI string to parse.
+     * @param string $ini The INI string to parse.
      * @return array Returns the array representation of the INI string.
      */
-    function parse_ini_string($Ini) {
-        $Lines = explode("\n", $Ini);
-        $Result = array();
-        foreach ($Lines as $Line) {
-            $Parts = explode('=', $Line, 2);
-            if (count($Parts) == 1) {
-                $Result[trim($Parts[0])] = '';
-            } elseif (count($Parts) >= 2) {
-                $Result[trim($Parts[0])] = trim($Parts[1]);
+    function parse_ini_string($ini) {
+        $lines = explode("\n", $ini);
+        $result = [];
+        foreach ($lines as $line) {
+            $parts = explode('=', $line, 2);
+            if (count($parts) == 1) {
+                $result[trim($parts[0])] = '';
+            } elseif (count($parts) >= 2) {
+                $result[trim($parts[0])] = trim($parts[1]);
             }
         }
-        return $Result;
+        return $result;
     }
 }
 
@@ -385,11 +385,11 @@ if (!function_exists('paths')) {
         if (is_array($paths)) {
             $mungedPath = implode($delimiter, $paths);
             $mungedPath = str_replace(
-                array($delimiter.$delimiter.$delimiter, $delimiter.$delimiter),
-                array($delimiter, $delimiter),
+                [$delimiter.$delimiter.$delimiter, $delimiter.$delimiter],
+                [$delimiter, $delimiter],
                 $mungedPath
             );
-            return str_replace(array('http:/', 'https:/'), array('http://', 'https://'), $mungedPath);
+            return str_replace(['http:/', 'https:/'], ['http://', 'https://'], $mungedPath);
         } else {
             return $paths;
         }
@@ -423,7 +423,7 @@ if (!function_exists('valr')) {
     /**
      * Return the value from an associative array or an object.
      *
-     * This function differs from GetValue() in that $Key can be a string consisting of dot notation that will be used
+     * This function differs from getValue() in that $Key can be a string consisting of dot notation that will be used
      * to recursively traverse the collection.
      *
      * @param string $key The key or property name of the value.
@@ -477,7 +477,7 @@ function setvalr($key, &$collection, $value = null) {
 
             if (is_array($selection)) {
                 if (!isset($selection[$subSelector])) {
-                    $selection[$subSelector] = array();
+                    $selection[$subSelector] = [];
                 }
                 $selection = &$selection[$subSelector];
             } elseif (is_object($selection)) {

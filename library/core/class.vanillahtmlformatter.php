@@ -1,18 +1,15 @@
 <?php
 /**
- * HtmLawed Plugin.
- *
  * @copyright 2009-2017 Vanilla Forums Inc.
  * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
- * @package HtmLawed
  */
 
-use Garden\Container\Container;
+use \Garden\EventManager;
 
 /**
- * Class HTMLawedPlugin
+ * Class VanillaHtmlFormatter
  */
-class HtmLawedPlugin extends Gdn_Plugin {
+class VanillaHtmlFormatter {
 
     /** @var array Classes users may have in their content. */
     protected $allowedClasses = [
@@ -129,6 +126,9 @@ class HtmLawedPlugin extends Gdn_Plugin {
         'ul'
     ];
 
+    /** @var array Extra allowed classes. */
+    protected $extraAllowedClasses = [];
+
     /**
      * Filter provided HTML through htmlLawed and return the result.
      *
@@ -152,12 +152,20 @@ class HtmLawedPlugin extends Gdn_Plugin {
             'css_expression' => 1,
             'deny_attribute' => $attributes,
             'direct_list_nest' => 1,
-            'elements' => '*-applet-form-input-textarea-iframe-script-style-embed-object-select-option-button-fieldset-optgroup-legend',
+            'elements' => '*-applet-button-embed-fieldset-form-iframe-input-legend-link-object-optgroup-option-script-select-style-textarea',
             'keep_bad' => 0,
             'schemes' => 'classid:clsid; href: aim, feed, file, ftp, gopher, http, https, irc, mailto, news, nntp, sftp, ssh, telnet; style: nil; *:file, http, https', // clsid allowed in class
             'unique_ids' => 1,
             'valid_xhtml' => 0
         ];
+
+        // If we don't allow URL embeds, don't allow HTML media embeds, either.
+        if (c('Garden.Format.DisableUrlEmbeds')) {
+            if (!array_key_exists('elements', $config) || !is_string($config['elements'])) {
+                $config['elements'] = '';
+            }
+            $config['elements'] .= '-audio-video';
+        }
 
         // Turn embedded videos into simple links (legacy workaround)
         $html = Gdn_Format::unembedContent($html);
@@ -208,9 +216,21 @@ class HtmLawedPlugin extends Gdn_Plugin {
     }
 
     /**
-     * No setup.
+     * Add extra allowed classes.
+     *
+     * @param array $extraAllowedClasses
      */
-    public function setup() {
+    public function addExtraAllowedClasses($extraAllowedClasses) {
+        $this->extraAllowedClasses = array_unique(array_merge($this->extraAllowedClasses, $extraAllowedClasses));
+    }
+
+    /**
+     * Get the currently defined extra allowed classes.
+     *
+     * @return array Extra allowed classes
+     */
+    public function getExtraAllowedClasses() {
+        return $this->extraAllowedClasses;
     }
 
     /**
@@ -222,7 +242,7 @@ class HtmLawedPlugin extends Gdn_Plugin {
         static $spec;
         if ($spec === null) {
             $spec = [];
-            $allowedClasses = implode('|', $this->allowedClasses);
+            $allowedClasses = implode('|', array_merge($this->allowedClasses, $this->extraAllowedClasses));
             foreach ($this->classedElements as $tag) {
                 if (!array_key_exists($tag, $spec) || !is_array($spec[$tag])) {
                     $spec[$tag] = [];
@@ -235,25 +255,4 @@ class HtmLawedPlugin extends Gdn_Plugin {
         }
         return $spec;
     }
-
-    /**
-     * Install the formatter to the container.
-     *
-     * @param Container $dic The container to initialize.
-     */
-    public function container_init_handler(Container $dic) {
-        $dic->rule('HtmlFormatter')
-            ->setClass(__CLASS__)
-            ->setShared(true);
-    }
 }
-
-if (!function_exists('FormatRssCustom')) :
-    /**
-     * @param string $html
-     * @return string Returns the filtered RSS.
-     */
-    function formatRssHtmlCustom($html) {
-        return Htmlawed::filterRSS($html);
-    }
-endif;

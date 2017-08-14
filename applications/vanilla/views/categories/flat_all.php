@@ -8,8 +8,8 @@
 <h1 class="H HomepageTitle"><?php echo $this->data('Title'); ?></h1>
 
 <?php
-    if ($description = $this->Description()) {
-        echo wrap($description, 'div', array('class' => 'P PageDescription'));
+    if ($description = $this->description()) {
+        echo wrap($description, 'div', ['class' => 'P PageDescription']);
     }
     $this->fireEvent('AfterPageTitle');
 

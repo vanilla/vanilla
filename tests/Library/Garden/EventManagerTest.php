@@ -358,7 +358,7 @@ class EventManagerTest extends \PHPUnit\Framework\TestCase {
      * Test the old EventArguments kludge.
      */
 //    public function testEventArgumentsKludge() {
-//        $em = new EventManager();
+//        $em = new eventManager();
 //
 //        $events = [];
 //        $em->bind(EventManager::EVENT_META, $this->makeMetaHandler($events));
@@ -409,7 +409,7 @@ class EventManagerTest extends \PHPUnit\Framework\TestCase {
                         throw new \Exception("Missing path for $pluginClass.");
                     }
 
-                    // Kludge: Check for the UserPhoto() function.
+                    // Kludge: Check for the userPhoto() function.
                     $fileContents = file_get_contents($path);
                     if (preg_match('`function userPhoto`i', $fileContents) && !$includeRedefines) {
                         continue;

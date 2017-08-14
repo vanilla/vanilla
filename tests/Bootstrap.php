@@ -14,6 +14,7 @@ use Interop\Container\ContainerInterface;
 use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerInterface;
 use Vanilla\Addon;
+use Vanilla\AddonManager;
 use Vanilla\InjectableInterface;
 
 /**
@@ -41,8 +42,11 @@ class Bootstrap {
      *
      * @param Container $container The container to bootstrap.
      */
-    public function run(Container $container) {
+    public function run(Container $container, $addons = false) {
         $this->initialize($container);
+        if ($addons) {
+            $this->initializeAddons($container);
+        }
         $this->setGlobals($container);
     }
 
@@ -56,6 +60,7 @@ class Bootstrap {
         Gdn::setContainer($container);
 
         $container
+            ->setInstance('@baseUrl', $this->getBaseUrl())
             ->setInstance(Container::class, $container)
 
             ->rule(ContainerInterface::class)
@@ -80,7 +85,7 @@ class Bootstrap {
             ->addAlias('Config')
 
             // AddonManager
-            ->rule(\Vanilla\AddonManager::class)
+            ->rule(AddonManager::class)
             ->setShared(true)
             ->setConstructorArgs([
                 [
@@ -146,8 +151,15 @@ class Bootstrap {
             ->addAlias('MySQLDriver')
             ->addAlias(Gdn::AliasSqlDriver)
 
-            ->rule(Gdn::AliasLocale)
-            ->setClass(\VanillaTests\Fixtures\Locale::class)
+            // Locale
+            ->rule(\Gdn_Locale::class)
+            ->setShared(true)
+            ->setConstructorArgs([new Reference(['Gdn_Configuration', 'Garden.Locale'])])
+            ->addAlias(Gdn::AliasLocale)
+
+            ->rule('Identity')
+            ->setClass('Gdn_CookieIdentity')
+            ->setShared(true)
 
             ->rule(\Gdn_Session::class)
             ->setShared(true)
@@ -182,6 +194,78 @@ class Bootstrap {
         ;
     }
 
+    private function initializeAddons(Container $dic) {
+        // Run through the bootstrap with dependencies.
+        $dic->call(function (
+            Container $dic,
+            \Gdn_Configuration $config,
+            AddonManager $addonManager,
+            \Garden\EventManager $eventManager
+        ) {
+
+            // Load installation-specific configuration so that we know what apps are enabled.
+            $config->load($config->defaultPath(), 'Configuration', true);
+
+
+            /**
+             * Extension Managers
+             *
+             * Now load the Addon, Application, Theme and Plugin managers into the Factory, and
+             * process the application-specific configuration defaults.
+             */
+
+            // Start the addons, plugins, and applications.
+            $addonManager->startAddonsByKey($config->get('EnabledPlugins'), Addon::TYPE_ADDON);
+            $addonManager->startAddonsByKey($config->get('EnabledApplications'), Addon::TYPE_ADDON);
+            $addonManager->startAddonsByKey(array_keys($config->get('EnabledLocales', [])), Addon::TYPE_LOCALE);
+
+//            $currentTheme = c('Garden.Theme', Gdn_ThemeManager::DEFAULT_DESKTOP_THEME);
+//            if (isMobile()) {
+//                $currentTheme = c('Garden.MobileTheme', Gdn_ThemeManager::DEFAULT_MOBILE_THEME);
+//            }
+//            $addonManager->startAddonsByKey([$currentTheme], Addon::TYPE_THEME);
+
+            // Load the configurations for enabled addons.
+            foreach ($addonManager->getEnabled() as $addon) {
+                /* @var Addon $addon */
+                if ($configPath = $addon->getSpecial('config')) {
+                    $config->load($addon->path($configPath));
+                }
+            }
+
+            // Re-apply loaded user settings.
+            $config->overlayDynamic();
+
+            /**
+             * Extension Startup
+             *
+             * Allow installed addons to execute startup and bootstrap procedures that they may have, here.
+             */
+
+            // Bootstrapping.
+            foreach ($addonManager->getEnabled() as $addon) {
+                /* @var Addon $addon */
+                if ($bootstrapPath = $addon->getSpecial('bootstrap')) {
+                    $bootstrapPath = $addon->path($bootstrapPath);
+                    include $bootstrapPath;
+                }
+            }
+
+            // Plugins startup
+            $addonManager->bindAllEvents($eventManager);
+
+            if ($eventManager->hasHandler('gdn_pluginManager_afterStart')) {
+                $eventManager->fire('gdn_pluginManager_afterStart', $dic->get(\Gdn_PluginManager::class));
+            }
+
+            // Now that all of the events have been bound, fire an event that allows plugins to modify the container.
+            $eventManager->fire('container_init', $dic);
+
+            // Start Authenticators
+            $dic->get('Authenticator')->startAuthenticator();
+        });
+    }
+
     /**
      * Set the global variables that have dependencies.
      *
@@ -207,6 +291,13 @@ class Bootstrap {
      * @param Container $container The container to clean up.
      */
     public static function cleanup(Container $container) {
+        if ($container->hasInstance(AddonManager::class)) {
+            /* @var AddonManager $addonManager */
+
+            $addonManager = $container->get(AddonManager::class);
+            $addonManager->unregisterAutoloader();
+        }
+
         $container->clearInstances();
 
         if ($GLOBALS['dic'] === $container) {

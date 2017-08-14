@@ -23,9 +23,9 @@ $this->fireEvent('AfterRolesInfo'); ?>
         <span id="private-community-toggle">
             <?php
             if (c('Garden.PrivateCommunity', false)) {
-                echo wrap(anchor('<div class="toggle-well"></div><div class="toggle-slider"></div>', 'settings/privatecommunity/false','Hijack'), 'span', array('class' => "toggle-wrap toggle-wrap-on"));
+                echo wrap(anchor('<div class="toggle-well"></div><div class="toggle-slider"></div>', 'settings/privatecommunity/false','Hijack'), 'span', ['class' => "toggle-wrap toggle-wrap-on"]);
             } else {
-                echo wrap(anchor('<div class="toggle-well"></div><div class="toggle-slider"></div>', 'settings/privatecommunity/true', 'Hijack'), 'span', array('class' => "toggle-wrap toggle-wrap-off"));
+                echo wrap(anchor('<div class="toggle-well"></div><div class="toggle-slider"></div>', 'settings/privatecommunity/true', 'Hijack'), 'span', ['class' => "toggle-wrap toggle-wrap-off"]);
             }
             ?>
         </span>

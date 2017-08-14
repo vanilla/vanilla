@@ -5,7 +5,7 @@
 <h1><?php echo t("Sign In") ?></h1>
 <div class="Box">
     <?php
-    echo $this->Form->open(array('Action' => url('/entry/handshake/'.$this->HandshakeScheme), 'id' => 'Form_User_Handshake'));
+    echo $this->Form->open(['Action' => url('/entry/handshake/'.$this->HandshakeScheme), 'id' => 'Form_User_Handshake']);
     echo $this->Form->errors();
     ?>
     <div class="Info"><?php
@@ -22,17 +22,17 @@
         <li>
             <?php
             echo $this->Form->label('Username', 'NewName');
-            echo $this->Form->Textbox('NewName');
+            echo $this->Form->textbox('NewName');
             ?>
         </li>
         <li>
             <?php
             echo $this->Form->label('Email', 'NewEmail');
-            echo $this->Form->Textbox('NewEmail');
+            echo $this->Form->textbox('NewEmail');
             ?>
         </li>
         <li class="Buttons">
-            <?php echo $this->Form->button('Create New Account', array('Name' => 'User/NewAccount')); ?>
+            <?php echo $this->Form->button('Create New Account', ['Name' => 'User/NewAccount']); ?>
         </li>
     </ul>
     <ul class="LinkAccount">
@@ -46,11 +46,11 @@
         <li>
             <?php
             echo $this->Form->label('Password', 'SignInPassword');
-            echo $this->Form->Input('SignInPassword', 'password');
+            echo $this->Form->input('SignInPassword', 'password');
             ?>
         </li>
         <li class="Buttons">
-            <?php echo $this->Form->button('Link Existing Account', array('Name' => 'User/LinkAccount')); ?>
+            <?php echo $this->Form->button('Link Existing Account', ['Name' => 'User/LinkAccount']); ?>
         </li>
     </ul>
     <?php

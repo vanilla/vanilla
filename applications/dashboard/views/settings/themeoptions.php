@@ -38,16 +38,16 @@ echo $this->Form->errors();
             <div class="image-wrap">
                 <?php
                 // Look for a screenshot for for the style.
-                $Screenshot = SafeGlob(PATH_THEMES.DS.$this->data('ThemeFolder').DS.'design'.DS.ChangeBasename('screenshot.*', $Basename), array('gif', 'jpg', 'png'));
+                $Screenshot = safeGlob(PATH_THEMES.DS.$this->data('ThemeFolder').DS.'design'.DS.changeBasename('screenshot.*', $Basename), ['gif', 'jpg', 'png']);
                 if (is_array($Screenshot) && count($Screenshot) > 0) {
                     $Screenshot = basename($Screenshot[0]);
                 } else {
                     $Screenshot = 'images'.DS.'theme-placeholder.svg';
                 }
-                echo img('/themes/'.$this->data('ThemeFolder').'/design/'.$Screenshot, array('class' => 'label-selector-image', 'alt' => t($Key), 'width' => '160')); ?>
+                echo img('/themes/'.$this->data('ThemeFolder').'/design/'.$Screenshot, ['class' => 'label-selector-image', 'alt' => t($Key), 'width' => '160']); ?>
                 <div class="overlay">
                     <div class="buttons">
-                        <?php echo anchor(t('Select'), '?style='.urlencode($Key), 'js-select-theme btn btn-overlay Hijack', array('Key' => $Key)) ?>
+                        <?php echo anchor(t('Select'), '?style='.urlencode($Key), 'js-select-theme btn btn-overlay Hijack', ['Key' => $Key]) ?>
                     </div>
                     <div class="selected">
                         <?php echo dashboardSymbol('checkmark'); ?>
@@ -84,11 +84,11 @@ echo $this->Form->errors();
             <div class="input-wrap">
             <?php switch (strtolower(val('Type', $Options, 'textarea'))) {
                 case 'textbox':
-                    echo $this->Form->textBox($this->Form->EscapeString('Text_'.$Code));
+                    echo $this->Form->textBox($this->Form->escapeString('Text_'.$Code));
                     break;
                 case 'textarea':
                 default:
-                    echo $this->Form->textBox($this->Form->EscapeString('Text_'.$Code), array('MultiLine' => TRUE));
+                    echo $this->Form->textBox($this->Form->escapeString('Text_'.$Code), ['MultiLine' => TRUE]);
                     break;
             } ?>
             </div>

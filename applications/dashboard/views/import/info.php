@@ -12,7 +12,7 @@ if ($CurrentStep < 1) {
 Please review the information below and click <b>Start Import</b> to begin the import.'),
     '</div>';
 } else {
-    $Steps = val('Steps', $this->Data, array());
+    $Steps = val('Steps', $this->Data, []);
     if (count($Steps) > 0 && !array_key_exists($CurrentStep, $Steps)) {
         // The import is complete.
         $Complete = TRUE;

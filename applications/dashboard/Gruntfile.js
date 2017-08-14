@@ -183,10 +183,15 @@ module.exports = function (grunt) {
 
     autoprefixer: {
       dist: {
-        src: ['design/admin.css', 'design/style.css']
-      }
-      , options: {
-        map: true
+        src: ['design/admin.css', 'design/style.css'],
+        options: {
+          map: true,
+          browsers: [
+            "ie > 8",
+            "last 6 iOS versions",
+            "last 10 versions"
+          ]
+        }
       }
     },
 

@@ -51,54 +51,54 @@ if (!class_exists('HeadModule', false)) {
         /**
          *
          *
-         * @param string $Sender
+         * @param string $sender
          */
-        public function __construct($Sender = '') {
-            $this->_Tags = array();
-            $this->_Strings = array();
+        public function __construct($sender = '') {
+            $this->_Tags = [];
+            $this->_Strings = [];
             $this->_Title = '';
             $this->_Subtitle = '';
             $this->_TitleDivider = ' — ';
-            parent::__construct($Sender);
+            parent::__construct($sender);
         }
 
         /**
          * Adds a "link" tag to the head containing a reference to a stylesheet.
          *
-         * @param string $HRef Location of the stylesheet relative to the web root (if an absolute path with http:// is provided, it will use the HRef as provided). ie. /themes/default/css/layout.css or http://url.com/layout.css
-         * @param string $Media Type media for the stylesheet. ie. "screen", "print", etc.
-         * @param bool $AddVersion Whether to append version number as query string.
-         * @param array $Options Additional properties to pass to AddTag, e.g. 'ie' => 'lt IE 7';
+         * @param string $hRef Location of the stylesheet relative to the web root (if an absolute path with http:// is provided, it will use the HRef as provided). ie. /themes/default/css/layout.css or http://url.com/layout.css
+         * @param string $media Type media for the stylesheet. ie. "screen", "print", etc.
+         * @param bool $addVersion Whether to append version number as query string.
+         * @param array $options Additional properties to pass to AddTag, e.g. 'ie' => 'lt IE 7';
          */
-        public function addCss($HRef, $Media = '', $AddVersion = true, $Options = null) {
-            $Properties = array(
+        public function addCss($hRef, $media = '', $addVersion = true, $options = null) {
+            $properties = [
                 'rel' => 'stylesheet',
-                'href' => Asset($HRef, false, $AddVersion),
-                'media' => $Media);
+                'href' => asset($hRef, false, $addVersion),
+                'media' => $media];
 
             // Use same underscore convention as AddScript
-            if (is_array($Options)) {
-                foreach ($Options as $Key => $Value) {
-                    $Properties['_'.strtolower($Key)] = $Value;
+            if (is_array($options)) {
+                foreach ($options as $key => $value) {
+                    $properties['_'.strtolower($key)] = $value;
                 }
             }
 
-            $this->addTag('link', $Properties);
+            $this->addTag('link', $properties);
         }
 
         /**
          *
          *
-         * @param $HRef
-         * @param $Title
+         * @param $hRef
+         * @param $title
          */
-        public function addRss($HRef, $Title) {
-            $this->addTag('link', array(
+        public function addRss($hRef, $title) {
+            $this->addTag('link', [
                 'rel' => 'alternate',
                 'type' => 'application/rss+xml',
-                'title' => Gdn_Format::text($Title),
-                'href' => Asset($HRef)
-            ));
+                'title' => Gdn_Format::text($title),
+                'href' => asset($hRef)
+            ]);
         }
 
         /**
@@ -108,68 +108,68 @@ if (!class_exists('HeadModule', false)) {
          * @param array An associative array of property => value pairs to be placed in the tag.
          * @param string an index to give the tag for later manipulation.
          */
-        public function addTag($Tag, $Properties, $Content = null, $Index = null) {
-            $Tag = array_merge(array(self::TAG_KEY => strtolower($Tag)), array_change_key_case($Properties));
-            if ($Content) {
-                $Tag[self::CONTENT_KEY] = $Content;
+        public function addTag($tag, $properties, $content = null, $index = null) {
+            $tag = array_merge([self::TAG_KEY => strtolower($tag)], array_change_key_case($properties));
+            if ($content) {
+                $tag[self::CONTENT_KEY] = $content;
             }
-            if (!array_key_exists(self::SORT_KEY, $Tag)) {
-                $Tag[self::SORT_KEY] = count($this->_Tags);
+            if (!array_key_exists(self::SORT_KEY, $tag)) {
+                $tag[self::SORT_KEY] = count($this->_Tags);
             }
 
-            if ($Index !== null) {
-                $this->_Tags[$Index] = $Tag;
+            if ($index !== null) {
+                $this->_Tags[$index] = $tag;
             }
 
             // Make sure this item has not already been added.
-            if (!in_array($Tag, $this->_Tags)) {
-                $this->_Tags[] = $Tag;
+            if (!in_array($tag, $this->_Tags)) {
+                $this->_Tags[] = $tag;
             }
         }
 
         /**
          * Adds a "script" tag to the head.
          *
-         * @param string $Src The location of the script relative to the web root. ie. "/js/jquery.js"
-         * @param string $Type The type of script being added. ie. "text/javascript"
-         * @param bool $AddVersion Whether to append version number as query string.
-         * @param mixed $Options Additional options to add to the tag. The following values are accepted:
+         * @param string $src The location of the script relative to the web root. ie. "/js/jquery.js"
+         * @param string $type The type of script being added. ie. "text/javascript"
+         * @param bool $addVersion Whether to append version number as query string.
+         * @param mixed $options Additional options to add to the tag. The following values are accepted:
          *  - numeric: This will be the script's sort.
          *  - string: This will hint the script (inline will inline the file in the page.
          *  - array: An array of options (ex. sort, hint, version).
          *
          */
-        public function addScript($Src, $Type = 'text/javascript', $AddVersion = true, $Options = array()) {
-            if (is_numeric($Options)) {
-                $Options = array('sort' => $Options);
-            } elseif (is_string($Options)) {
-                $Options = array('hint' => $Options);
-            } elseif (!is_array($Options)) {
-                $Options = array();
+        public function addScript($src, $type = 'text/javascript', $addVersion = true, $options = []) {
+            if (is_numeric($options)) {
+                $options = ['sort' => $options];
+            } elseif (is_string($options)) {
+                $options = ['hint' => $options];
+            } elseif (!is_array($options)) {
+                $options = [];
             }
 
-            if (is_array($AddVersion)) {
-                $Options = $AddVersion;
-                $AddVersion = true;
+            if (is_array($addVersion)) {
+                $options = $addVersion;
+                $addVersion = true;
             }
 
-            $Attributes = array();
-            if ($Src) {
-                $Attributes['src'] = asset($Src, false, $AddVersion);
+            $attributes = [];
+            if ($src) {
+                $attributes['src'] = asset($src, false, $addVersion);
             }
-            if ($Type !== 'text/javascript') {
+            if ($type !== 'text/javascript') {
                 // Not needed in HTML5
-                $Attributes['type'] = $Type;
+                $attributes['type'] = $type;
             }
-            if (isset($Options['defer'])) {
-                $Attributes['defer'] = $Options['defer'];
-            }
-
-            foreach ($Options as $Key => $Value) {
-                $Attributes['_'.strtolower($Key)] = $Value;
+            if (isset($options['defer'])) {
+                $attributes['defer'] = $options['defer'];
             }
 
-            $this->addTag('script', $Attributes);
+            foreach ($options as $key => $value) {
+                $attributes['_'.strtolower($key)] = $value;
+            }
+
+            $this->addTag('script', $attributes);
         }
 
         /**
@@ -177,8 +177,8 @@ if (!class_exists('HeadModule', false)) {
          *
          * @param string The string to be inserted.
          */
-        public function addString($String) {
-            $this->_Strings[] = $String;
+        public function addString($string) {
+            $this->_Strings[] = $string;
         }
 
         /**
@@ -194,44 +194,44 @@ if (!class_exists('HeadModule', false)) {
          * Removes any added stylesheets from the head.
          */
         public function clearCSS() {
-            $this->ClearTag('link', array('rel' => 'stylesheet'));
+            $this->clearTag('link', ['rel' => 'stylesheet']);
         }
 
         /**
          * Removes any script include tags from the head.
          */
         public function clearScripts() {
-            $this->ClearTag('script');
+            $this->clearTag('script');
         }
 
         /**
-         * Removes any tags with the specified $Tag, $Property, and $Value.
+         * Removes any tags with the specified $tag, $property, and $value.
          *
-         * Only $Tag is required.
+         * Only $tag is required.
          *
          * @param string The name of the tag to remove from the head.  ie. "link"
          * @param string Any property to search for in the tag.
          *    - If this is an array then it will be treated as a query of attribute/value pairs to match against.
          * @param string Any value to search for in the specified property.
          */
-        public function clearTag($Tag, $Property = '', $Value = '') {
-            $Tag = strtolower($Tag);
-            if (is_array($Property)) {
-                $Query = array_change_key_case($Property);
-            } elseif ($Property)
-                $Query = array(strtolower($Property) => $Value);
+        public function clearTag($tag, $property = '', $value = '') {
+            $tag = strtolower($tag);
+            if (is_array($property)) {
+                $query = array_change_key_case($property);
+            } elseif ($property)
+                $query = [strtolower($property) => $value];
             else {
-                $Query = false;
+                $query = false;
             }
 
-            foreach ($this->_Tags as $Index => $Collection) {
-                $TagName = $Collection[self::TAG_KEY];
+            foreach ($this->_Tags as $index => $collection) {
+                $tagName = $collection[self::TAG_KEY];
 
-                if ($TagName == $Tag) {
+                if ($tagName == $tag) {
                     // If no property is specified and the tag is found, remove it directly.
                     // Otherwise remove it only if all specified property/value pairs match.
-                    if (!$Query || count(array_intersect_assoc($Query, $Collection)) == count($Query)) {
-                        unset($this->_Tags[$Index]);
+                    if (!$query || count(array_intersect_assoc($query, $collection)) == count($query)) {
+                        unset($this->_Tags[$index]);
                     }
                 }
             }
@@ -247,23 +247,23 @@ if (!class_exists('HeadModule', false)) {
         /**
          * Return all Tags of the specified type (or all tags).
          */
-        public function getTags($RequestedType = '') {
+        public function getTags($requestedType = '') {
             // Make sure that css loads before js (for jquery)
-            usort($this->_Tags, array('HeadModule', 'TagCmp')); // "link" comes before "script"
+            usort($this->_Tags, ['HeadModule', 'TagCmp']); // "link" comes before "script"
 
-            if ($RequestedType == '') {
+            if ($requestedType == '') {
                 return $this->_Tags;
             }
 
             // Loop through each tag.
-            $Tags = array();
-            foreach ($this->_Tags as $Index => $Attributes) {
-                $TagType = $Attributes[self::TAG_KEY];
-                if ($TagType == $RequestedType) {
-                    $Tags[] = $Attributes;
+            $tags = [];
+            foreach ($this->_Tags as $index => $attributes) {
+                $tagType = $attributes[self::TAG_KEY];
+                if ($tagType == $requestedType) {
+                    $tags[] = $attributes;
                 }
             }
-            return $Tags;
+            return $tags;
         }
 
         /**
@@ -271,14 +271,14 @@ if (!class_exists('HeadModule', false)) {
          *
          * @param string The location of the fav icon relative to the web root. ie. /themes/default/images/layout.css
          */
-        public function setFavIcon($HRef) {
+        public function setFavIcon($hRef) {
             if (!$this->_FavIconSet) {
                 $this->_FavIconSet = true;
                 $this->addTag(
                     'link',
                     [
                         'rel' => 'shortcut icon',
-                        'href' => $HRef,
+                        'href' => $hRef,
                         'type' => 'image/x-icon'
                     ],
                     null,
@@ -326,11 +326,11 @@ if (!class_exists('HeadModule', false)) {
         /**
          * Gets or sets the tags collection.
          *
-         * @param array $Value .
+         * @param array $value .
          */
-        public function tags($Value = null) {
-            if ($Value != null) {
-                $this->_Tags = $Value;
+        public function tags($value = null) {
+            if ($value != null) {
+                $this->_Tags = $value;
             }
             return $this->_Tags;
         }
@@ -338,20 +338,20 @@ if (!class_exists('HeadModule', false)) {
         /**
          * Gets/sets the modules title.
          *
-         * @param string $Title
-         * @param bool $NoSubtitle
+         * @param string $title
+         * @param bool $noSubtitle
          * @return mixed|string
          */
-        public function title($Title = '', $NoSubtitle = false) {
-            if ($Title != '') {
+        public function title($title = '', $noSubtitle = false) {
+            if ($title != '') {
                 // Apply $Title to $this->_Title and to $this->_Sender.
-                $this->_Title = $Title;
-                $this->_Sender->title($Title);
+                $this->_Title = $title;
+                $this->_Sender->title($title);
             } elseif ($this->_Title == '') {
                 // Get Title from $this->_Sender if not supplied.
                 $this->_Title = valr('Data.Title', $this->_Sender, '');
             }
-            if ($NoSubtitle) {
+            if ($noSubtitle) {
                 return $this->_Title;
             } else {
                 if ($this->_Subtitle == '') {
@@ -392,28 +392,28 @@ if (!class_exists('HeadModule', false)) {
         /**
          *
          *
-         * @param $A
-         * @param $B
+         * @param $a
+         * @param $b
          * @return int
          */
-        public static function tagCmp($A, $B) {
-            if ($A[self::TAG_KEY] == 'title') {
+        public static function tagCmp($a, $b) {
+            if ($a[self::TAG_KEY] == 'title') {
                 return -1;
             }
-            if ($B[self::TAG_KEY] == 'title') {
+            if ($b[self::TAG_KEY] == 'title') {
                 return 1;
             }
-            $Cmp = strcasecmp($A[self::TAG_KEY], $B[self::TAG_KEY]);
-            if ($Cmp == 0) {
-                $SortA = val(self::SORT_KEY, $A, 0);
-                $SortB = val(self::SORT_KEY, $B, 0);
-                if ($SortA < $SortB) {
-                    $Cmp = -1;
-                } elseif ($SortA > $SortB)
-                    $Cmp = 1;
+            $cmp = strcasecmp($a[self::TAG_KEY], $b[self::TAG_KEY]);
+            if ($cmp == 0) {
+                $sortA = val(self::SORT_KEY, $a, 0);
+                $sortB = val(self::SORT_KEY, $b, 0);
+                if ($sortA < $sortB) {
+                    $cmp = -1;
+                } elseif ($sortA > $sortB)
+                    $cmp = 1;
             }
 
-            return $Cmp;
+            return $cmp;
         }
 
         /**
@@ -422,65 +422,65 @@ if (!class_exists('HeadModule', false)) {
         public function toString() {
             // Add the canonical Url if necessary.
             if (method_exists($this->_Sender, 'CanonicalUrl') && !c('Garden.Modules.NoCanonicalUrl', false)) {
-                $CanonicalUrl = $this->_Sender->canonicalUrl();
+                $canonicalUrl = $this->_Sender->canonicalUrl();
 
-                if (!isUrl($CanonicalUrl)) {
-                    $CanonicalUrl = Gdn::router()->ReverseRoute($CanonicalUrl);
+                if (!isUrl($canonicalUrl)) {
+                    $canonicalUrl = Gdn::router()->reverseRoute($canonicalUrl);
                 }
 
-                $this->_Sender->canonicalUrl($CanonicalUrl);
+                $this->_Sender->canonicalUrl($canonicalUrl);
 //            $CurrentUrl = url('', true);
 //            if ($CurrentUrl != $CanonicalUrl) {
-                $this->addTag('link', array('rel' => 'canonical', 'href' => $CanonicalUrl));
+                $this->addTag('link', ['rel' => 'canonical', 'href' => $canonicalUrl]);
 //            }
             }
 
             // Include facebook open-graph meta information.
-            if ($FbAppID = c('Plugins.Facebook.ApplicationID')) {
-                $this->addTag('meta', array('property' => 'fb:app_id', 'content' => $FbAppID));
+            if ($fbAppID = c('Plugins.Facebook.ApplicationID')) {
+                $this->addTag('meta', ['property' => 'fb:app_id', 'content' => $fbAppID]);
             }
 
-            $SiteName = c('Garden.Title', '');
-            if ($SiteName != '') {
-                $this->addTag('meta', array('property' => 'og:site_name', 'content' => $SiteName));
+            $siteName = c('Garden.Title', '');
+            if ($siteName != '') {
+                $this->addTag('meta', ['property' => 'og:site_name', 'content' => $siteName]);
             }
 
-            $Title = htmlEntityDecode(Gdn_Format::text($this->title('', true)));
-            if ($Title != '') {
-                $this->addTag('meta', array('name' => 'twitter:title', 'property' => 'og:title', 'content' => $Title));
+            $title = htmlEntityDecode(Gdn_Format::text($this->title('', true)));
+            if ($title != '') {
+                $this->addTag('meta', ['name' => 'twitter:title', 'property' => 'og:title', 'content' => $title]);
             }
 
-            if (isset($CanonicalUrl)) {
-                $this->addTag('meta', array('property' => 'og:url', 'content' => $CanonicalUrl));
+            if (isset($canonicalUrl)) {
+                $this->addTag('meta', ['property' => 'og:url', 'content' => $canonicalUrl]);
             }
 
-            if ($Description = trim(Gdn_Format::reduceWhiteSpaces($this->_Sender->Description()))) {
-                $this->addTag('meta', array('name' => 'description', 'property' => 'og:description', 'content' => $Description));
+            if ($description = trim(Gdn_Format::reduceWhiteSpaces($this->_Sender->description()))) {
+                $this->addTag('meta', ['name' => 'description', 'property' => 'og:description', 'content' => $description]);
             }
 
             $hasRelevantImage = false;
 
             // Default to the site logo if there were no images provided by the controller.
-            if (count($this->_Sender->Image()) == 0) {
-                $Logo = c('Garden.ShareImage', c('Garden.Logo', ''));
-                if ($Logo != '') {
+            if (count($this->_Sender->image()) == 0) {
+                $logo = c('Garden.ShareImage', c('Garden.Logo', ''));
+                if ($logo != '') {
                     // Fix the logo path.
-                    if (stringBeginsWith($Logo, 'uploads/')) {
-                        $Logo = substr($Logo, strlen('uploads/'));
+                    if (stringBeginsWith($logo, 'uploads/')) {
+                        $logo = substr($logo, strlen('uploads/'));
                     }
 
-                    $Logo = Gdn_Upload::url($Logo);
-                    $this->addTag('meta', array('property' => 'og:image', 'content' => $Logo));
+                    $logo = Gdn_Upload::url($logo);
+                    $this->addTag('meta', ['property' => 'og:image', 'content' => $logo]);
                 }
             } else {
-                foreach ($this->_Sender->Image() as $Img) {
-                    $this->addTag('meta', array('name' => 'twitter:image', 'property' => 'og:image', 'content' => $Img));
+                foreach ($this->_Sender->image() as $img) {
+                    $this->addTag('meta', ['name' => 'twitter:image', 'property' => 'og:image', 'content' => $img]);
                     $hasRelevantImage = true;
                 }
             }
 
             // For the moment at least, only discussions are supported.
-            if ($Title && val('DiscussionID', $this->_Sender)) {
+            if ($title && val('DiscussionID', $this->_Sender)) {
                 if ($hasRelevantImage) {
                     $twitterCardType = 'summary_large_image';
                 } else {
@@ -488,47 +488,47 @@ if (!class_exists('HeadModule', false)) {
                 }
 
                 // Let's force a description for the image card since it makes sense to see a card with only an image and a title.
-                if (!$Description && $twitterCardType === 'summary_large_image') {
-                    $Description = '...';
+                if (!$description && $twitterCardType === 'summary_large_image') {
+                    $description = '...';
                 }
 
                 // Card && Title && Description are required
-                if ($twitterCardType && $Description) {
-                    $this->addTag('meta', array('name' => 'twitter:description', 'content' => $Description));
-                    $this->addTag('meta', array('name' => 'twitter:card', 'content' => $twitterCardType));
+                if ($twitterCardType && $description) {
+                    $this->addTag('meta', ['name' => 'twitter:description', 'content' => $description]);
+                    $this->addTag('meta', ['name' => 'twitter:card', 'content' => $twitterCardType]);
                 }
             }
 
             $this->fireEvent('BeforeToString');
 
-            $Tags = $this->_Tags;
+            $tags = $this->_Tags;
 
             // Make sure that css loads before js (for jquery)
-            usort($this->_Tags, array('HeadModule', 'TagCmp')); // "link" comes before "script"
+            usort($this->_Tags, ['HeadModule', 'TagCmp']); // "link" comes before "script"
 
-            $Tags2 = $this->_Tags;
+            $tags2 = $this->_Tags;
 
             // Start with the title.
-            $Head = '<title>'.Gdn_Format::text($this->title())."</title>\n";
+            $head = '<title>'.Gdn_Format::text($this->title())."</title>\n";
 
-            $TagStrings = array();
+            $tagStrings = [];
             // Loop through each tag.
-            foreach ($this->_Tags as $Index => $Attributes) {
-                $Tag = $Attributes[self::TAG_KEY];
+            foreach ($this->_Tags as $index => $attributes) {
+                $tag = $attributes[self::TAG_KEY];
 
                 // Inline the content of the tag, if necessary.
-                if (val('_hint', $Attributes) == 'inline') {
-                    $Path = val('_path', $Attributes);
-                    if ($Path && !stringBeginsWith($Path, 'http')) {
-                        $Attributes[self::CONTENT_KEY] = file_get_contents($Path);
+                if (val('_hint', $attributes) == 'inline') {
+                    $path = val('_path', $attributes);
+                    if ($path && !stringBeginsWith($path, 'http')) {
+                        $attributes[self::CONTENT_KEY] = file_get_contents($path);
 
-                        if (isset($Attributes['src'])) {
-                            $Attributes['_src'] = $Attributes['src'];
-                            unset($Attributes['src']);
+                        if (isset($attributes['src'])) {
+                            $attributes['_src'] = $attributes['src'];
+                            unset($attributes['src']);
                         }
-                        if (isset($Attributes['href'])) {
-                            $Attributes['_href'] = $Attributes['href'];
-                            unset($Attributes['href']);
+                        if (isset($attributes['href'])) {
+                            $attributes['_href'] = $attributes['href'];
+                            unset($attributes['href']);
                         }
                     }
                 }
@@ -536,59 +536,59 @@ if (!class_exists('HeadModule', false)) {
                 // If we set an IE conditional AND a "Not IE" condition, we will need to make a second pass.
                 do {
                     // Reset tag string
-                    $TagString = '';
+                    $tagString = '';
 
                     // IE conditional? Validates condition.
-                    $IESpecific = (isset($Attributes['_ie']) && preg_match('/((l|g)t(e)? )?IE [0-9\.]/', $Attributes['_ie']));
+                    $iESpecific = (isset($attributes['_ie']) && preg_match('/((l|g)t(e)? )?IE [0-9\.]/', $attributes['_ie']));
 
                     // Only allow $NotIE if we're not doing a conditional this loop.
-                    $NotIE = (!$IESpecific && isset($Attributes['_notie']));
+                    $notIE = (!$iESpecific && isset($attributes['_notie']));
 
                     // Open IE conditional tag
-                    if ($IESpecific) {
-                        $TagString .= '<!--[if '.$Attributes['_ie'].']>';
+                    if ($iESpecific) {
+                        $tagString .= '<!--[if '.$attributes['_ie'].']>';
                     }
-                    if ($NotIE) {
-                        $TagString .= '<!--[if !IE]> -->';
+                    if ($notIE) {
+                        $tagString .= '<!--[if !IE]> -->';
                     }
 
                     // Build tag
-                    $TagString .= '  <'.$Tag.Attribute($Attributes, '_');
-                    if (array_key_exists(self::CONTENT_KEY, $Attributes)) {
-                        $TagString .= '>'.$Attributes[self::CONTENT_KEY].'</'.$Tag.'>';
-                    } elseif ($Tag == 'script') {
-                        $TagString .= '></script>';
+                    $tagString .= '  <'.$tag.attribute($attributes, '_');
+                    if (array_key_exists(self::CONTENT_KEY, $attributes)) {
+                        $tagString .= '>'.$attributes[self::CONTENT_KEY].'</'.$tag.'>';
+                    } elseif ($tag == 'script') {
+                        $tagString .= '></script>';
                     } else {
-                        $TagString .= ' />';
+                        $tagString .= ' />';
                     }
 
                     // Close IE conditional tag
-                    if ($IESpecific) {
-                        $TagString .= '<![endif]-->';
+                    if ($iESpecific) {
+                        $tagString .= '<![endif]-->';
                     }
-                    if ($NotIE) {
-                        $TagString .= '<!-- <![endif]-->';
+                    if ($notIE) {
+                        $tagString .= '<!-- <![endif]-->';
                     }
 
                     // Cleanup (prevent infinite loop)
-                    if ($IESpecific) {
-                        unset($Attributes['_ie']);
+                    if ($iESpecific) {
+                        unset($attributes['_ie']);
                     }
 
-                    $TagStrings[] = $TagString;
+                    $tagStrings[] = $tagString;
 
-                } while ($IESpecific && isset($Attributes['_notie'])); // We need a second pass
+                } while ($iESpecific && isset($attributes['_notie'])); // We need a second pass
 
             } //endforeach
 
-            $Head .= implode("\n", array_unique($TagStrings));
+            $head .= implode("\n", array_unique($tagStrings));
 
-            foreach ($this->_Strings as $String) {
-                $Head .= $String;
-                $Head .= "\n";
+            foreach ($this->_Strings as $string) {
+                $head .= $string;
+                $head .= "\n";
             }
 
-            return $Head;
+            return $head;
         }
     }
 }

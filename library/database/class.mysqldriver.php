@@ -25,107 +25,107 @@ class Gdn_MySQLDriver extends Gdn_SQLDriver {
     /**
      *
      *
-     * @param $String
+     * @param $string
      * @return string
      */
-    public function backtick($String) {
-        return '`'.trim($String, '`').'`';
+    public function backtick($string) {
+        return '`'.trim($string, '`').'`';
     }
 
     /**
      * Takes a string of SQL and adds backticks if necessary.
      *
-     * @param string|array $String The string (or array of strings) of SQL to be escaped.
-     * @param boolean $FirstWordOnly Should the function only escape the first word?\
+     * @param string|array $string The string (or array of strings) of SQL to be escaped.
+     * @param boolean $firstWordOnly Should the function only escape the first word?\
      */
-    public function escapeSql($String, $FirstWordOnly = false) {
-        if (is_array($String)) {
-            $EscapedArray = array();
+    public function escapeSql($string, $firstWordOnly = false) {
+        if (is_array($string)) {
+            $escapedArray = [];
 
-            foreach ($String as $k => $v) {
-                $EscapedArray[$this->escapeSql($k)] = $this->escapeSql($v, $FirstWordOnly);
+            foreach ($string as $k => $v) {
+                $escapedArray[$this->escapeSql($k)] = $this->escapeSql($v, $firstWordOnly);
             }
 
-            return $EscapedArray;
+            return $escapedArray;
         }
         // echo '<div>STRING: '.$String.'</div>';
 
         // This function may get "item1 item2" as a string, and so
         // we may need "`item1` `item2`" and not "`item1 item2`"
-        if (ctype_alnum($String) === false) {
-            if (strpos($String, '.') !== false) {
-                $MungedAliases = implode('.', array_keys($this->_AliasMap)).'.';
-                $TableName = substr($String, 0, strpos($String, '.') + 1);
+        if (ctype_alnum($string) === false) {
+            if (strpos($string, '.') !== false) {
+                $mungedAliases = implode('.', array_keys($this->_AliasMap)).'.';
+                $tableName = substr($string, 0, strpos($string, '.') + 1);
                 //echo '<div>STRING: '.$String.'</div>';
                 //echo '<div>TABLENAME: '.$TableName.'</div>';
                 //echo '<div>ALIASES: '.$MungedAliases.'</div>';
                 // If the "TableName" isn't found in the alias list and it is a valid table name, apply the database prefix to it
-                $String = (strpos($MungedAliases, $TableName) !== false || strpos($TableName, "'") !== false) ? $String : $this->Database->DatabasePrefix.$String;
+                $string = (strpos($mungedAliases, $tableName) !== false || strpos($tableName, "'") !== false) ? $string : $this->Database->DatabasePrefix.$string;
                 //echo '<div>RESULT: '.$String.'</div>';
 
             }
 
             // This function may get "field >= 1", and need it to return "`field` >= 1"
-            $LeftBound = ($FirstWordOnly === true) ? '' : '|\s|\(';
+            $leftBound = ($firstWordOnly === true) ? '' : '|\s|\(';
 
-            $String = preg_replace('/(^'.$LeftBound.')([\w-]+?)(\s|\)|$)/iS', '$1`$2`$3', $String);
+            $string = preg_replace('/(^'.$leftBound.')([\w-]+?)(\s|\)|$)/iS', '$1`$2`$3', $string);
             //echo '<div>STRING: '.$String.'</div>';
 
         } else {
-            return "`{$String}`";
+            return "`{$string}`";
         }
 
-        $Exceptions = array('as', '/', '-', '%', '+', '*');
+        $exceptions = ['as', '/', '-', '%', '+', '*'];
 
-        foreach ($Exceptions as $Exception) {
-            if (stristr($String, " `{$Exception}` ") !== false) {
-                $String = preg_replace('/ `('.preg_quote($Exception).')` /i', ' $1 ', $String);
+        foreach ($exceptions as $exception) {
+            if (stristr($string, " `{$exception}` ") !== false) {
+                $string = preg_replace('/ `('.preg_quote($exception).')` /i', ' $1 ', $string);
             }
         }
-        return $String;
+        return $string;
     }
 
     /**
      *
      *
-     * @param string $RefExpr
+     * @param string $refExpr
      * @return string
      */
-    public function escapeIdentifier($RefExpr) {
+    public function escapeIdentifier($refExpr) {
         // The MySql back tick syntax is the default escape sequence so nothing needs to be done.
-        return $RefExpr;
+        return $refExpr;
     }
 
     /**
-     * Returns a platform-specific query to fetch column data from $Table.
+     * Returns a platform-specific query to fetch column data from $table.
      *
-     * @param string $Table The name of the table to fetch column data from.
+     * @param string $table The name of the table to fetch column data from.
      */
-    public function fetchColumnSql($Table) {
-        if ($Table[0] != '`' && !StringBeginsWith($Table, $this->Database->DatabasePrefix)) {
-            $Table = $this->Database->DatabasePrefix.$Table;
+    public function fetchColumnSql($table) {
+        if ($table[0] != '`' && !stringBeginsWith($table, $this->Database->DatabasePrefix)) {
+            $table = $this->Database->DatabasePrefix.$table;
         }
 
-        return "show columns from ".$this->formatTableName($Table);
+        return "show columns from ".$this->formatTableName($table);
     }
 
     /**
      * Returns a platform-specific query to fetch table names.
-     * @param mixed $LimitToPrefix Whether or not to limit the search to tables with the database prefix or a specific table name. The following types can be given for this parameter:
+     * @param mixed $limitToPrefix Whether or not to limit the search to tables with the database prefix or a specific table name. The following types can be given for this parameter:
      *  - <b>TRUE</b>: The search will be limited to the database prefix.
      *  - <b>FALSE</b>: All tables will be fetched. Default.
      *  - <b>string</b>: The search will be limited to a like clause. The ':_' will be replaced with the database prefix.
      */
-    public function fetchTableSql($LimitToPrefix = false) {
-        $Sql = "show tables";
+    public function fetchTableSql($limitToPrefix = false) {
+        $sql = "show tables";
 
-        if (is_bool($LimitToPrefix) && $LimitToPrefix && $this->Database->DatabasePrefix != '') {
-            $Sql .= " like ".$this->Database->connection()->quote($this->Database->DatabasePrefix.'%');
-        } elseif (is_string($LimitToPrefix) && $LimitToPrefix)
-            $Sql .= " like ".$this->Database->connection()->quote(str_replace(':_', $this->Database->DatabasePrefix, $LimitToPrefix));
+        if (is_bool($limitToPrefix) && $limitToPrefix && $this->Database->DatabasePrefix != '') {
+            $sql .= " like ".$this->Database->connection()->quote($this->Database->DatabasePrefix.'%');
+        } elseif (is_string($limitToPrefix) && $limitToPrefix)
+            $sql .= " like ".$this->Database->connection()->quote(str_replace(':_', $this->Database->DatabasePrefix, $limitToPrefix));
 
-        return $Sql;
-        echo "<pre>$Sql</pre>";
+        return $sql;
+        echo "<pre>$sql</pre>";
     }
 
     /**
@@ -133,56 +133,56 @@ class Gdn_MySQLDriver extends Gdn_SQLDriver {
      * table. The returned array of objects contains the following properties:
      * Name, PrimaryKey, Type, AllowNull, Default, Length, Enum.
      *
-     * @param string $Table The name of the table to get schema data for.
+     * @param string $table The name of the table to get schema data for.
      */
-    public function fetchTableSchema($Table) {
+    public function fetchTableSchema($table) {
         // Format the table name.
-        $Table = $this->escapeSql($this->Database->DatabasePrefix.$Table);
-        $DataSet = $this->query($this->fetchColumnSql($Table));
-        $Schema = array();
+        $table = $this->escapeSql($this->Database->DatabasePrefix.$table);
+        $dataSet = $this->query($this->fetchColumnSql($table));
+        $schema = [];
 
-        foreach ($DataSet->result() as $Field) {
-            $Type = $Field->Type;
-            $Unsigned = stripos($Type, 'unsigned') !== false;
-            $Length = '';
-            $Precision = '';
-            $Parentheses = strpos($Type, '(');
-            $Enum = '';
+        foreach ($dataSet->result() as $field) {
+            $type = $field->Type;
+            $unsigned = stripos($type, 'unsigned') !== false;
+            $length = '';
+            $precision = '';
+            $parentheses = strpos($type, '(');
+            $enum = '';
 
-            if ($Parentheses !== false) {
-                $LengthParts = explode(',', substr($Type, $Parentheses + 1, -1));
-                $Type = substr($Type, 0, $Parentheses);
+            if ($parentheses !== false) {
+                $lengthParts = explode(',', substr($type, $parentheses + 1, -1));
+                $type = substr($type, 0, $parentheses);
 
-                if (strcasecmp($Type, 'enum') == 0) {
-                    $Enum = array();
-                    foreach ($LengthParts as $Value) {
-                        $Enum[] = trim($Value, "'");
+                if (strcasecmp($type, 'enum') == 0) {
+                    $enum = [];
+                    foreach ($lengthParts as $value) {
+                        $enum[] = trim($value, "'");
                     }
                 } else {
-                    $Length = trim($LengthParts[0]);
-                    if (count($LengthParts) > 1) {
-                        $Precision = trim($LengthParts[1]);
+                    $length = trim($lengthParts[0]);
+                    if (count($lengthParts) > 1) {
+                        $precision = trim($lengthParts[1]);
                     }
                 }
             }
 
-            $Object = new stdClass();
-            $Object->Name = $Field->Field;
-            $Object->PrimaryKey = ($Field->Key == 'PRI' ? true : false);
-            $Object->Type = $Type;
+            $object = new stdClass();
+            $object->Name = $field->Field;
+            $object->PrimaryKey = ($field->Key == 'PRI' ? true : false);
+            $object->Type = $type;
             //$Object->Type2 = $Field->Type;
-            $Object->Unsigned = $Unsigned;
-            $Object->AllowNull = ($Field->Null == 'YES');
-            $Object->Default = $Field->Default;
-            $Object->Length = $Length;
-            $Object->Precision = $Precision;
-            $Object->Enum = $Enum;
-            $Object->KeyType = null; // give placeholder so it can be defined again.
-            $Object->AutoIncrement = strpos($Field->Extra, 'auto_increment') === false ? false : true;
-            $Schema[$Field->Field] = $Object;
+            $object->Unsigned = $unsigned;
+            $object->AllowNull = ($field->Null == 'YES');
+            $object->Default = $field->Default;
+            $object->Length = $length;
+            $object->Precision = $precision;
+            $object->Enum = $enum;
+            $object->KeyType = null; // give placeholder so it can be defined again.
+            $object->AutoIncrement = strpos($field->Extra, 'auto_increment') === false ? false : true;
+            $schema[$field->Field] = $object;
         }
 
-        return $Schema;
+        return $schema;
     }
 
     /**
@@ -196,147 +196,147 @@ class Gdn_MySQLDriver extends Gdn_SQLDriver {
      * Takes a table name and makes sure it is formatted for this database
      * engine.
      *
-     * @param string $Table The name of the table name to format.
+     * @param string $table The name of the table name to format.
      */
-    public function formatTableName($Table) {
+    public function formatTableName($table) {
 
-        if (strpos($Table, '.') !== false) {
-            if (preg_match('/^([^\s]+)\s+(?:as\s+)?`?([^`]+)`?$/', $Table, $Matches)) {
-                $DatabaseTable = '`'.str_replace('.', '`.`', $Matches[1]).'`';
-                $Table = str_replace($Matches[1], $DatabaseTable, $Table);
+        if (strpos($table, '.') !== false) {
+            if (preg_match('/^([^\s]+)\s+(?:as\s+)?`?([^`]+)`?$/', $table, $matches)) {
+                $databaseTable = '`'.str_replace('.', '`.`', $matches[1]).'`';
+                $table = str_replace($matches[1], $databaseTable, $table);
             } else {
-                $Table = '`'.str_replace('.', '`.`', $Table).'`';
+                $table = '`'.str_replace('.', '`.`', $table).'`';
             }
         }
-        return $Table;
+        return $table;
     }
 
     /**
      * Returns a delete statement for the specified table and the supplied
      * conditions.
      *
-     * @param string $TableName The name of the table to delete from.
-     * @param array $Wheres An array of where conditions.
+     * @param string $tableName The name of the table to delete from.
+     * @param array $wheres An array of where conditions.
      */
-    public function getDelete($TableName, $Wheres = array(), $Limit = 0) {
-        $Conditions = '';
-        $Joins = '';
-        $DeleteFrom = '';
-        $LimitSql = '';
+    public function getDelete($tableName, $wheres = [], $limit = 0) {
+        $conditions = '';
+        $joins = '';
+        $deleteFrom = '';
+        $limitSql = '';
 
         if (count($this->_Joins) > 0) {
-            $Joins .= "\n";
-            $Joins .= implode("\n", $this->_Joins);
+            $joins .= "\n";
+            $joins .= implode("\n", $this->_Joins);
 
 
-            $DeleteFroms = array();
-            foreach ($this->_Froms as $From) {
-                $Parts = preg_split('`\s`', trim($From));
-                if (count($Parts) > 1) {
-                    $DeleteFroms[] = $Parts[1].'.*';
+            $deleteFroms = [];
+            foreach ($this->_Froms as $from) {
+                $parts = preg_split('`\s`', trim($from));
+                if (count($parts) > 1) {
+                    $deleteFroms[] = $parts[1].'.*';
                 } else {
-                    $DeleteFroms[] = $Parts[0].'.*';
+                    $deleteFroms[] = $parts[0].'.*';
                 }
             }
-            $DeleteFrom = implode(', ', $DeleteFroms);
-        } elseif ($Limit > 0) {
-            $LimitSql = "\nlimit ".((int)$Limit);
+            $deleteFrom = implode(', ', $deleteFroms);
+        } elseif ($limit > 0) {
+            $limitSql = "\nlimit ".((int)$limit);
         }
 
-        if (count($Wheres) > 0) {
-            $Conditions = "\nwhere ";
-            $Conditions .= implode("\n", $Wheres);
+        if (count($wheres) > 0) {
+            $conditions = "\nwhere ";
+            $conditions .= implode("\n", $wheres);
 
             // Close any where groups that were left open.
             $this->_endQuery();
         }
 
-        return "delete $DeleteFrom from ".$TableName.$Joins.$Conditions.$LimitSql;
+        return "delete $deleteFrom from ".$tableName.$joins.$conditions.$limitSql;
     }
 
     /**
-     * Returns an insert statement for the specified $Table with the provided $Data.
+     * Returns an insert statement for the specified $table with the provided $data.
      *
-     * @param string $Table The name of the table to insert data into.
-     * @param array $Data An associative array of FieldName => Value pairs that should be inserted,
+     * @param string $table The name of the table to insert data into.
+     * @param array $data An associative array of FieldName => Value pairs that should be inserted,
      * or an array of FieldName values that should have values inserted from
-     * $Select.
-     * @param string $Select A select query that will fill the FieldNames specified in $Data.
+     * $select.
+     * @param string $select A select query that will fill the FieldNames specified in $data.
      */
-    public function getInsert($Table, $Data, $Select = '') {
-        if (!is_array($Data)) {
-            trigger_error(ErrorMessage('The data provided is not in a proper format (Array).', 'MySQLDriver', 'GetInsert'), E_USER_ERROR);
+    public function getInsert($table, $data, $select = '') {
+        if (!is_array($data)) {
+            trigger_error(errorMessage('The data provided is not in a proper format (Array).', 'MySQLDriver', 'GetInsert'), E_USER_ERROR);
         }
 
         if ($this->options('Replace')) {
-            $Sql = 'replace ';
+            $sql = 'replace ';
         } else {
-            $Sql = 'insert '.($this->options('Ignore') ? 'ignore ' : '');
+            $sql = 'insert '.($this->options('Ignore') ? 'ignore ' : '');
         }
 
-        $Sql .= $this->formatTableName($Table).' ';
-        if ($Select != '') {
-            $Sql .= "\n(".implode(', ', $Data).') '
-                ."\n".$Select;
+        $sql .= $this->formatTableName($table).' ';
+        if ($select != '') {
+            $sql .= "\n(".implode(', ', $data).') '
+                ."\n".$select;
         } else {
-            if (array_key_exists(0, $Data)) {
+            if (array_key_exists(0, $data)) {
                 // This is a big insert with a bunch of rows.
-                $Keys = array_keys($Data[0]);
-                $Keys = array_map(array($this, 'Backtick'), $Keys);
-                $Sql .= "\n(".implode(', ', $Keys).') '
+                $keys = array_keys($data[0]);
+                $keys = array_map([$this, 'Backtick'], $keys);
+                $sql .= "\n(".implode(', ', $keys).') '
                     ."\nvalues ";
 
                 // Append each insert statement.
-                for ($i = 0; $i < count($Data); $i++) {
+                for ($i = 0; $i < count($data); $i++) {
                     if ($i > 0) {
-                        $Sql .= ', ';
+                        $sql .= ', ';
                     }
-                    $Sql .= "\n('".implode('\', \'', array_values($Data[$i])).'\')';
+                    $sql .= "\n('".implode('\', \'', array_values($data[$i])).'\')';
                 }
             } else {
-                $Keys = array_keys($Data);
-                $Keys = array_map(array($this, 'Backtick'), $Keys);
-                $Sql .= "\n(".implode(', ', $Keys).') '
-                    ."\nvalues (".implode(', ', array_values($Data)).')';
+                $keys = array_keys($data);
+                $keys = array_map([$this, 'Backtick'], $keys);
+                $sql .= "\n(".implode(', ', $keys).') '
+                    ."\nvalues (".implode(', ', array_values($data)).')';
             }
         }
-        return $Sql;
+        return $sql;
     }
 
     /**
      * Adds a limit clause to the provided query for this database engine.
      *
-     * @param string $Query The SQL string to which the limit statement should be appended.
-     * @param int $Limit The number of records to limit the query to.
-     * @param int $Offset The number of records to offset the query from.
+     * @param string $query The SQL string to which the limit statement should be appended.
+     * @param int $limit The number of records to limit the query to.
+     * @param int $offset The number of records to offset the query from.
      */
-    public function getLimit($Query, $Limit, $Offset) {
-        $Offset = $Offset == 0 ? '' : $Offset.', ';
-        return $Query."limit ".$Offset.$Limit;
+    public function getLimit($query, $limit, $offset) {
+        $offset = $offset == 0 ? '' : $offset.', ';
+        return $query."limit ".$offset.$limit;
     }
 
     /**
-     * Returns an update statement for the specified table with the provided $Data.
+     * Returns an update statement for the specified table with the provided $data.
      *
-     * @param array $Tables The name of the table to updated data in.
-     * @param array $Data An associative array of FieldName => Value pairs that should be inserted $Table.
-     * @param mixed $Where A where clause (or array containing multiple where clauses) to be applied
+     * @param array $tables The name of the table to updated data in.
+     * @param array $data An associative array of FieldName => Value pairs that should be inserted $Table.
+     * @param mixed $where A where clause (or array containing multiple where clauses) to be applied
      * to the where portion of the update statement.
      * @param array $orderBy A collection of order by statements.
      * @param int $limit The number of records to limit the query to.
      * @return string
      */
-    public function getUpdate($Tables, $Data, $Where, $orderBy = null, $limit = null) {
-        if (!is_array($Data)) {
+    public function getUpdate($tables, $data, $where, $orderBy = null, $limit = null) {
+        if (!is_array($data)) {
             trigger_error(errorMessage('The data provided is not in a proper format (Array).', 'MySQLDriver', '_GetUpdate'), E_USER_ERROR);
         }
 
-        $Sets = array();
-        foreach ($Data as $Field => $Value) {
-            $Sets[] = $Field." = ".$Value;
+        $sets = [];
+        foreach ($data as $field => $value) {
+            $sets[] = $field." = ".$value;
         }
 
-        $sql = 'update '.($this->options('Ignore') ? 'ignore ' : '').$this->_fromTables($Tables);
+        $sql = 'update '.($this->options('Ignore') ? 'ignore ' : '').$this->_fromTables($tables);
 
         if (count($this->_Joins) > 0) {
             $sql .= "\n";
@@ -344,17 +344,17 @@ class Gdn_MySQLDriver extends Gdn_SQLDriver {
             $sql .= implode("\n", $this->_Joins);
         }
 
-        $sql .= "\nset ".implode(",\n ", $Sets);
-        if (is_array($Where) && count($Where) > 0) {
-            $sql .= "\nwhere ".implode("\n ", $Where);
+        $sql .= "\nset ".implode(",\n ", $sets);
+        if (is_array($where) && count($where) > 0) {
+            $sql .= "\nwhere ".implode("\n ", $where);
 
             // Close any where groups that were left open.
             for ($i = 0; $i < $this->_OpenWhereGroupCount; ++$i) {
                 $sql .= ')';
             }
             $this->_OpenWhereGroupCount = 0;
-        } elseif (is_string($Where) && !stringIsNullOrEmpty($Where)) {
-            $sql .= ' where '.$Where;
+        } elseif (is_string($where) && !stringIsNullOrEmpty($where)) {
+            $sql .= ' where '.$where;
         }
 
         if (is_array($orderBy) && count($orderBy) > 0) {
@@ -374,46 +374,46 @@ class Gdn_MySQLDriver extends Gdn_SQLDriver {
      *
      * @param string The name of the table to updated data in.
      */
-    public function getTruncate($Table) {
-        return 'truncate '.$this->formatTableName($Table);
+    public function getTruncate($table) {
+        return 'truncate '.$this->formatTableName($table);
     }
 
     /**
      * Allows the specification of a case statement in the select list.
      *
-     * @param string $Field The field being examined in the case statement.
-     * @param array $Options The options and results in an associative array. A blank key will be the
+     * @param string $field The field being examined in the case statement.
+     * @param array $options The options and results in an associative array. A blank key will be the
      * final "else" option of the case statement. eg.
      * array('null' => 1, '' => 0) results in "when null then 1 else 0".
-     * @param string $Alias The alias to give a column name.
+     * @param string $alias The alias to give a column name.
      */
-    public function selectCase($Field, $Options, $Alias) {
-        $CaseOptions = '';
-        foreach ($Options as $Key => $Val) {
-            if ($Key == '') {
-                $CaseOptions .= ' else '.$Val;
+    public function selectCase($field, $options, $alias) {
+        $caseOptions = '';
+        foreach ($options as $key => $val) {
+            if ($key == '') {
+                $caseOptions .= ' else '.$val;
             } else {
-                $CaseOptions .= ' when '.$Key.' then '.$Val;
+                $caseOptions .= ' when '.$key.' then '.$val;
             }
         }
-        $this->_Selects[] = array('Field' => $Field, 'Function' => '', 'Alias' => $Alias, 'CaseOptions' => $CaseOptions);
+        $this->_Selects[] = ['Field' => $field, 'Function' => '', 'Alias' => $alias, 'CaseOptions' => $caseOptions];
         return $this;
     }
 
     /**
      * Sets the character encoding for this database engine.
      *
-     * @param string $Encoding
-     * @todo $Encoding needs a description.
+     * @param string $encoding
+     * @todo $encoding needs a description.
      */
-    public function setEncoding($Encoding) {
-        if ($Encoding != '' && $Encoding !== false) {
+    public function setEncoding($encoding) {
+        if ($encoding != '' && $encoding !== false) {
             // Make sure to pass through any named parameters from queries defined before the connection was opened.
-            $SavedNamedParameters = $this->_NamedParameters;
-            $this->_NamedParameters = array();
-            $this->_NamedParameters[':encoding'] = $Encoding;
+            $savedNamedParameters = $this->_NamedParameters;
+            $this->_NamedParameters = [];
+            $this->_NamedParameters[':encoding'] = $encoding;
             $this->query('set names :encoding');
-            $this->_NamedParameters = $SavedNamedParameters;
+            $this->_NamedParameters = $savedNamedParameters;
         }
     }
 }

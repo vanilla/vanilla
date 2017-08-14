@@ -31,13 +31,13 @@
             <li><?php
                 $RoleModel = new RoleModel();
                 echo $this->Form->label('Default User Role', 'DefaultUserRole');
-                echo $this->Form->DropDown(
+                echo $this->Form->dropDown(
                     'DefaultUserRole',
                     $RoleModel->get(),
-                    array(
+                    [
                         'TextField' => 'Name',
                         'ValueField' => 'RoleID'
-                    )
+                    ]
                 );
                 ?></li>
         </ul>

@@ -18,7 +18,7 @@ echo heading(t('Manage Messages'), t('Add Message'), 'dashboard/message/add', 'j
         <tbody>
         <?php
         foreach ($this->MessageData->result() as $Message) {
-            $Message = $this->MessageModel->DefineLocation($Message);
+            $Message = $this->MessageModel->defineLocation($Message);
             ?>
             <tr id="<?php
             echo $Message->MessageID;
@@ -32,7 +32,7 @@ echo heading(t('Manage Messages'), t('Add Message'), 'dashboard/message/add', 'j
 
                     if (val('CategoryID', $Message) && $Category = CategoryModel::categories($Message->CategoryID)) {
                         echo '<div>'.
-                            anchor($Category['Name'], CategoryUrl($Category));
+                            anchor($Category['Name'], categoryUrl($Category));
 
                         if (val('IncludeSubcategories', $Message)) {
                             echo ' '.t('and subcategories');
@@ -82,9 +82,9 @@ echo heading(t('Manage Messages'), t('Add Message'), 'dashboard/message/add', 'j
                         <div id="toggle-<?php echo $messageID = val('MessageID', $Message); ?>">
                             <?php
                             if ($Message->Enabled == '1') {
-                                echo wrap(anchor('<div class="toggle-well"></div><div class="toggle-slider"></div>', '/dashboard/message/disable/'.$messageID, 'Hijack'), 'span', array('class' => "toggle-wrap toggle-wrap-on"));
+                                echo wrap(anchor('<div class="toggle-well"></div><div class="toggle-slider"></div>', '/dashboard/message/disable/'.$messageID, 'Hijack'), 'span', ['class' => "toggle-wrap toggle-wrap-on"]);
                             } else {
-                                echo wrap(anchor('<div class="toggle-well"></div><div class="toggle-slider"></div>', '/dashboard/message/enable/'.$messageID, 'Hijack'), 'span', array('class' => "toggle-wrap toggle-wrap-off"));
+                                echo wrap(anchor('<div class="toggle-well"></div><div class="toggle-slider"></div>', '/dashboard/message/enable/'.$messageID, 'Hijack'), 'span', ['class' => "toggle-wrap toggle-wrap-off"]);
                             }
                             ?>
                         </div>

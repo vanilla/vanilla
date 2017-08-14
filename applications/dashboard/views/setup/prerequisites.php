@@ -4,7 +4,7 @@ echo $this->Form->open();
 ?>
     <div class="Title">
         <h1>
-            <?php echo img('applications/dashboard/design/images/vanilla_logo.png', array('alt' => 'Vanilla')); ?>
+            <?php echo img('applications/dashboard/design/images/vanilla_logo.png', ['alt' => 'Vanilla']); ?>
             <p><?php echo sprintf(t('Version %s Installer'), APPLICATION_VERSION); ?></p>
         </h1>
     </div>

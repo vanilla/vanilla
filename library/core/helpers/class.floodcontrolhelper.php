@@ -15,10 +15,11 @@ class FloodControlHelper {
      * @param \Vanilla\FloodControlTrait $instance
      * @param string $configScope Scope under with the configurations are sets ('Vanilla', 'Conversations').
      * @param string $type Type of record that will be used to configure to trait.
+     * @param bool $skipAdmins Whether to skip flood control for admins/moderators or not. Default is true.
      *
      * @return \Vanilla\CacheInterface
      */
-    public static function configure($instance, $configScope, $type) {
+    public static function configure($instance, $configScope, $type, $skipAdmins = true) {
         $session = Gdn::session();
 
         // The CheckSpam and SpamCheck attributes are deprecated and should be removed in 2018.
@@ -33,13 +34,15 @@ class FloodControlHelper {
 
         if (!Gdn::session()->isValid()) {
             $instance->setFloodControlEnabled(false);
-        } elseif ($session->User->Admin || $session->checkPermission('Garden.Moderation.Manage')) {
+
+        // Let's deactivate flood control if the user is an admin :)
+        } elseif ($skipAdmins && ($session->User->Admin || $session->checkPermission('Garden.Moderation.Manage'))) {
             $instance->setFloodControlEnabled(false);
         }
 
-        // Let's deactivate flood control if the user is an admin :)
+        // Return early since flood control is not enabled.
         if (!$instance->isFloodControlEnabled()) {
-            return new UserAttributeCacheAdapter(Gdn::session(), Gdn::userModel());
+            return new UserAttributeCacheAdapter($session, Gdn::userModel());
         }
 
         if (c('Cache.Enabled')) {

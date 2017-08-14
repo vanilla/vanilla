@@ -10,7 +10,7 @@ if ($addonType === 'applications') {
         t('ApplicationHelp'),
         '<code>'.PATH_APPLICATIONS.'</code>'
     );
-    $getMore = wrap(Anchor(t('Get More Applications').' <span class="icon icon-external-link"></span>', $addonUrl), 'li');
+    $getMore = wrap(anchor(t('Get More Applications').' <span class="icon icon-external-link"></span>', $addonUrl), 'li');
     $availableAddons = $this->AvailableApplications;
     $enabledAddons = $this->EnabledApplications;
 
@@ -21,7 +21,7 @@ if ($addonType === 'applications') {
         t('LocaleHelp', 'Locales allow you to support other languages on your site. Once a locale has been added to your %s folder, you can enable or disable it here.'),
         '<code>'.PATH_ROOT.'/locales</code>'
     );
-    $getMore = wrap(Anchor(t('Get More Locales').' <span class="icon icon-external-link"></span>', $addonUrl), 'li');
+    $getMore = wrap(anchor(t('Get More Locales').' <span class="icon icon-external-link"></span>', $addonUrl), 'li');
     $availableAddons = $this->data('AvailableLocales');
     $enabledAddons = $this->data('EnabledLocales');
     $this->Filter = 'all';
@@ -32,8 +32,8 @@ if ($addonType === 'applications') {
     $pathHelp = sprintf(
         t('PluginHelp'),
         '<code>'.PATH_PLUGINS.'</code>'
-    ). '<br/><br/>' . Anchor(t('Addon Documentation'), 'http://docs.vanillaforums.com/help/addons/', '', ["target" => "_blank"]);
-    $getMore = wrap(Anchor(t('Get More Plugins').' <span class="icon icon-external-link"></span>', $addonUrl), 'li');
+    ). '<br/><br/>' . anchor(t('Addon Documentation'), 'http://docs.vanillaforums.com/help/addons/', '', ["target" => "_blank"]);
+    $getMore = wrap(anchor(t('Get More Plugins').' <span class="icon icon-external-link"></span>', $addonUrl), 'li');
     $availableAddons = $this->AvailablePlugins;
     $enabledAddons = $this->EnabledPlugins;
 }

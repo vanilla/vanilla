@@ -24,16 +24,16 @@ class AddPeopleModule extends Gdn_Module {
 
     /**
      *
-     * @param Gdn_Controller $Sender
+     * @param Gdn_Controller $sender
      * @throws Exception
      */
-    public function __construct($Sender = null) {
-        if (property_exists($Sender, 'Conversation')) {
-            $this->Conversation = $Sender->Conversation;
+    public function __construct($sender = null) {
+        if (property_exists($sender, 'Conversation')) {
+            $this->Conversation = $sender->Conversation;
         }
 
         // Allowed to use this module?
-        $this->AddUserAllowed = $Sender->ConversationModel->addUserAllowed($this->Conversation->ConversationID);
+        $this->AddUserAllowed = $sender->ConversationModel->addUserAllowed($this->Conversation->ConversationID);
 
         $this->Form = Gdn::factory('Form', 'AddPeople');
         // If the form was posted back, check for people to add to the conversation
@@ -43,24 +43,35 @@ class AddPeopleModule extends Gdn_Module {
                 throw permissionException();
             }
 
-            $NewRecipientUserIDs = array();
-            $NewRecipients = explode(',', $this->Form->getFormValue('AddPeople', ''));
-            $UserModel = Gdn::factory("UserModel");
-            foreach ($NewRecipients as $Name) {
-                if (trim($Name) != '') {
-                    $User = $UserModel->getByUsername(trim($Name));
-                    if (is_object($User)) {
-                        $NewRecipientUserIDs[] = $User->UserID;
+            $newRecipientUserIDs = [];
+            $newRecipients = explode(',', $this->Form->getFormValue('AddPeople', ''));
+            $userModel = Gdn::factory("UserModel");
+            foreach ($newRecipients as $name) {
+                if (trim($name) != '') {
+                    $user = $userModel->getByUsername(trim($name));
+                    if (is_object($user)) {
+                        $newRecipientUserIDs[] = $user->UserID;
                     }
                 }
             }
-            $Sender->ConversationModel->addUserToConversation($this->Conversation->ConversationID, $NewRecipientUserIDs);
 
-            $Sender->informMessage(t('Your changes were saved.'));
-            $Sender->RedirectUrl = url('/messages/'.$this->Conversation->ConversationID);
+            if ($sender->ConversationModel->addUserToConversation($this->Conversation->ConversationID, $newRecipientUserIDs)) {
+                $sender->informMessage(t('Your changes were saved.'));
+            } else {
+                $maxRecipients = ConversationModel::getMaxRecipients();
+                $sender->informMessage(sprintf(
+                    plural(
+                        $maxRecipients,
+                        "You are limited to %s recipient.",
+                        "You are limited to %s recipients."
+                    ),
+                    $maxRecipients
+                ));
+            }
+            $sender->setRedirectTo('/messages/'.$this->Conversation->ConversationID, false);
         }
-        $this->_ApplicationFolder = $Sender->Application;
-        $this->_ThemeFolder = $Sender->Theme;
+        $this->_ApplicationFolder = $sender->Application;
+        $this->_ThemeFolder = $sender->Theme;
     }
 
     /**
@@ -79,10 +90,10 @@ class AddPeopleModule extends Gdn_Module {
      */
     public function toString() {
         // Simplify our permission logic
-        $ConversationExists = (is_object($this->Conversation) && $this->Conversation->ConversationID > 0);
-        $CanAddUsers = ($this->AddUserAllowed && checkPermission('Conversations.Conversations.Add'));
+        $conversationExists = (is_object($this->Conversation) && $this->Conversation->ConversationID > 0);
+        $canAddUsers = ($this->AddUserAllowed && checkPermission('Conversations.Conversations.Add'));
 
-        if ($ConversationExists && $CanAddUsers) {
+        if ($conversationExists && $canAddUsers) {
             return parent::toString();
         }
 

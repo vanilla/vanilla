@@ -10,7 +10,7 @@
         <li class="form-group">
             <?php echo $this->Form->labelWrap('Category to Use', 'Plugins.Flagging.CategoryID'); ?>
             <div class="input-wrap">
-                <?php echo $this->Form->CategoryDropDown('Plugins.Flagging.CategoryID', array('Value' => c('Plugins.Flagging.CategoryID'))); ?>
+                <?php echo $this->Form->categoryDropDown('Plugins.Flagging.CategoryID', ['Value' => c('Plugins.Flagging.CategoryID')]); ?>
             </div>
         </li>
         <li class="form-group">

@@ -168,10 +168,15 @@ class AddonModel implements LoggerAwareInterface {
 
         $this->addonManager->startAddon($addon);
         $this->runSetup($addon);
+        $this->enableInConfig($addon, true, $options);
         if ($pluginClass = $addon->getPluginClass()) {
             $this->events->bindClass($pluginClass, $addon->getPriority());
+
+            // Fire some main events on the plugin.
+            if (!$wasEnabled) {
+                $this->callBootstrapEvents($pluginClass);
+            }
         }
-        $this->enableInConfig($addon, true, $options);
 
         if (!$wasEnabled) {
             $this->logger->info(
@@ -179,6 +184,19 @@ class AddonModel implements LoggerAwareInterface {
                 ['event' => 'addon_enabled', 'addonKey' => $addon->getKey(), 'addonType' => $addon->getType()]
             );
         }
+    }
+
+    /**
+     * Call the bootstrap style events on a plugin.
+     *
+     * This method is used when a plugin is enabled so that it can do what it can initialize after the bootstrap has happened.
+     *
+     * @param string $pluginClass The name of the plugin class.
+     */
+    private function callBootstrapEvents($pluginClass) {
+        $instance = $this->container->get($pluginClass);
+
+        $this->events->fireClass($instance, 'container_init', $this->container);
     }
 
     /**
@@ -284,7 +302,7 @@ class AddonModel implements LoggerAwareInterface {
                 if ($addon->getInfoValue('oldType') === 'application') {
                     $this->config->saveToConfig(
                         'EnabledApplications.'.$addon->getRawKey(),
-                        $enabled ? trim($addon->getSubdir(), '/') : null,
+                        $enabled ? trim(basename($addon->getSubdir()), '/') : null,
                         ['RemoveEmpty' => true]
                     );
                 } else {

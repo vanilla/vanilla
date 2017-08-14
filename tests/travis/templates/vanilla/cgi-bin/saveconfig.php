@@ -154,7 +154,7 @@ class SimpleConfig {
     /**
      * Return the value from an associative array or an object.
      *
-     * This function differs from GetValue() in that $Key can be a string consisting of dot notation that will be used
+     * This function differs from getValue() in that $Key can be a string consisting of dot notation that will be used
      * to recursively traverse the collection.
      *
      * @param string $key The key or property name of the value.
@@ -207,7 +207,7 @@ class SimpleConfig {
 
                 if (is_array($selection)) {
                     if (!isset($selection[$subSelector])) {
-                        $selection[$subSelector] = array();
+                        $selection[$subSelector] = [];
                     }
                     $selection = &$selection[$subSelector];
                 } elseif (is_object($selection)) {

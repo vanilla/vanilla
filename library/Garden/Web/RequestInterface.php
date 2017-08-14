@@ -31,9 +31,9 @@ interface RequestInterface {
      *
      * @param string $header The name of the header.
      * @param mixed $default The default value if the header does not exist.
-     * @return mixed Returns the header value or {@link $default}.
+     * @return string Returns the header value or an empty string.
      */
-    public function getHeader($header, $default = null);
+    public function getHeader($header);
 
     /**
      * Checks if a header exists by the given case-insensitive name.

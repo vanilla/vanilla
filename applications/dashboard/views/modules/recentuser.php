@@ -6,7 +6,7 @@
         <?php
         $Data = $this->_Sender->RecentUserData;
         foreach ($Data->result() as $User) {
-            $Visitor = UserBuilder($User);
+            $Visitor = userBuilder($User);
             echo userPhoto($Visitor);
         }
         ?>

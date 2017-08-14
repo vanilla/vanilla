@@ -24,7 +24,7 @@ abstract class Gdn_Cache {
     protected $cacheType;
 
     /** @var array Memory copy of store containers. */
-    protected static $stores = array();
+    protected static $stores = [];
 
     /** Allows items to be internally compressed/decompressed. */
     const FEATURE_COMPRESS = 'f_compress';
@@ -111,19 +111,19 @@ abstract class Gdn_Cache {
     const CACHE_SHARD_AUTO_SIZE = 100000;
 
     /**  @var array Local in-memory cache of fetched data. This prevents duplicate gets to memcache. */
-    protected static $localCache = array();
+    protected static $localCache = [];
 
     /** @var bool  */
     public static $trace = true;
 
     /** @var array  */
-    public static $trackGet = array();
+    public static $trackGet = [];
 
     /** @var int  */
     public static $trackGets = 0;
 
     /** @var array  */
-    public static $trackSet = array();
+    public static $trackSet = [];
 
     /** @var int  */
     public static $trackSets = 0;
@@ -135,8 +135,8 @@ abstract class Gdn_Cache {
      *
      */
     public function __construct() {
-        $this->containers = array();
-        $this->features = array();
+        $this->containers = [];
+        $this->features = [];
     }
 
     /**
@@ -144,31 +144,31 @@ abstract class Gdn_Cache {
      *
      * @return Gdn_Cache
      */
-    public static function initialize($ForceEnable = false, $ForceMethod = false) {
-        $AllowCaching = self::activeEnabled($ForceEnable);
-        $ActiveCache = Gdn_Cache::activeCache();
+    public static function initialize($forceEnable = false, $forceMethod = false) {
+        $allowCaching = self::activeEnabled($forceEnable);
+        $activeCache = Gdn_Cache::activeCache();
 
-        if ($ForceMethod !== false) {
-            $ActiveCache = $ForceMethod;
+        if ($forceMethod !== false) {
+            $activeCache = $forceMethod;
         }
-        $ActiveCacheClass = 'Gdn_'.ucfirst($ActiveCache);
+        $activeCacheClass = 'Gdn_'.ucfirst($activeCache);
 
-        if (!$AllowCaching || !$ActiveCache || !class_exists($ActiveCacheClass)) {
-            $CacheObject = new Gdn_Dirtycache();
+        if (!$allowCaching || !$activeCache || !class_exists($activeCacheClass)) {
+            $cacheObject = new Gdn_Dirtycache();
         } else {
-            $CacheObject = new $ActiveCacheClass();
+            $cacheObject = new $activeCacheClass();
         }
 
         // Null caches should not acount as enabled.
-        if (!$ForceEnable && $CacheObject->type() === Gdn_Cache::CACHE_TYPE_NULL) {
-            SaveToConfig('Cache.Enabled', false, false);
+        if (!$forceEnable && $cacheObject->type() === Gdn_Cache::CACHE_TYPE_NULL) {
+            saveToConfig('Cache.Enabled', false, false);
         }
 
-        if (method_exists($CacheObject, 'Autorun')) {
-            $CacheObject->autorun();
+        if (method_exists($cacheObject, 'Autorun')) {
+            $cacheObject->autorun();
         }
 
-        return $CacheObject;
+        return $cacheObject;
     }
 
     /**
@@ -188,12 +188,12 @@ abstract class Gdn_Cache {
          */
 
         if (defined('CACHE_METHOD_OVERRIDE')) {
-            $ActiveCache = CACHE_METHOD_OVERRIDE;
+            $activeCache = CACHE_METHOD_OVERRIDE;
         } else {
-            $ActiveCache = c('Cache.Method', false);
+            $activeCache = c('Cache.Method', false);
         }
 
-        return $ActiveCache;
+        return $activeCache;
     }
 
     /**
@@ -201,20 +201,20 @@ abstract class Gdn_Cache {
      *
      * Return whether or not the current cache method is enabled.
      *
-     * @param type $ForceEnable
+     * @param type $forceEnable
      * @return bool status of active cache
      */
-    public static function activeEnabled($ForceEnable = false) {
-        $AllowCaching = false;
+    public static function activeEnabled($forceEnable = false) {
+        $allowCaching = false;
 
         if (defined('CACHE_ENABLED_OVERRIDE')) {
-            $AllowCaching |= CACHE_ENABLED_OVERRIDE;
+            $allowCaching |= CACHE_ENABLED_OVERRIDE;
         }
 
-        $AllowCaching |= c('Cache.Enabled', false);
-        $AllowCaching |= $ForceEnable;
+        $allowCaching |= c('Cache.Enabled', false);
+        $allowCaching |= $forceEnable;
 
-        return (bool)$AllowCaching;
+        return (bool)$allowCaching;
     }
 
     /**
@@ -222,19 +222,19 @@ abstract class Gdn_Cache {
      *
      * For FileCache, the folder. For Memcache, the server(s).
      *
-     * @param type $ForceMethod
+     * @param type $forceMethod
      * @return mixed Active Store Location
      */
-    public static function activeStore($ForceMethod = null) {
+    public static function activeStore($forceMethod = null) {
         // Get the active cache name
-        $ActiveCache = self::activeCache();
-        if (!is_null($ForceMethod)) {
-            $ActiveCache = $ForceMethod;
+        $activeCache = self::activeCache();
+        if (!is_null($forceMethod)) {
+            $activeCache = $forceMethod;
         }
-        $ActiveCache = ucfirst($ActiveCache);
+        $activeCache = ucfirst($activeCache);
 
         // Overrides
-        if (defined('CACHE_STORE_OVERRIDE') && defined('CACHE_METHOD_OVERRIDE') && CACHE_METHOD_OVERRIDE == $ActiveCache) {
+        if (defined('CACHE_STORE_OVERRIDE') && defined('CACHE_METHOD_OVERRIDE') && CACHE_METHOD_OVERRIDE == $activeCache) {
             return unserialize(CACHE_STORE_OVERRIDE);
         }
 
@@ -244,86 +244,86 @@ abstract class Gdn_Cache {
             $apc = true;
         }
 
-        $LocalStore = null;
-        $ActiveStore = null;
-        $ActiveStoreKey = "Cache.{$ActiveCache}.Store";
+        $localStore = null;
+        $activeStore = null;
+        $activeStoreKey = "Cache.{$activeCache}.Store";
 
         // Check memory
-        if (is_null($LocalStore)) {
-            if (array_key_exists($ActiveCache, Gdn_Cache::$stores)) {
-                $LocalStore = Gdn_Cache::$stores[$ActiveCache];
+        if (is_null($localStore)) {
+            if (array_key_exists($activeCache, Gdn_Cache::$stores)) {
+                $localStore = Gdn_Cache::$stores[$activeCache];
             }
         }
 
         // Check APC cache
-        if (is_null($LocalStore) && $apc) {
-            $LocalStore = apc_fetch($ActiveStoreKey);
-            if ($LocalStore) {
-                Gdn_Cache::$stores[$ActiveCache] = $LocalStore;
+        if (is_null($localStore) && $apc) {
+            $localStore = apc_fetch($activeStoreKey);
+            if ($localStore) {
+                Gdn_Cache::$stores[$activeCache] = $localStore;
             }
         }
 
-        if (is_array($LocalStore)) {
+        if (is_array($localStore)) {
             // Convert to ActiveStore format (with 'Active' key)
-            $Save = false;
-            $ActiveStore = array();
-            foreach ($LocalStore as $StoreServerName => &$StoreServer) {
-                $IsDelayed = &$StoreServer['Delay'];
-                $IsActive = &$StoreServer['Active'];
+            $save = false;
+            $activeStore = [];
+            foreach ($localStore as $storeServerName => &$storeServer) {
+                $isDelayed = &$storeServer['Delay'];
+                $isActive = &$storeServer['Active'];
 
-                if (is_numeric($IsDelayed)) {
-                    if ($IsDelayed < time()) {
-                        $IsActive = true;
-                        $IsDelayed = false;
-                        $StoreServer['Fails'] = 0;
-                        $Save = true;
+                if (is_numeric($isDelayed)) {
+                    if ($isDelayed < time()) {
+                        $isActive = true;
+                        $isDelayed = false;
+                        $storeServer['Fails'] = 0;
+                        $save = true;
                     } else {
-                        if ($IsActive) {
-                            $IsActive = false;
-                            $Save = true;
+                        if ($isActive) {
+                            $isActive = false;
+                            $save = true;
                         }
                     }
                 }
 
                 // Add active servers to ActiveStore array
-                if ($IsActive) {
-                    $ActiveStore[] = $StoreServer['Server'];
+                if ($isActive) {
+                    $activeStore[] = $storeServer['Server'];
                 }
             }
 
         }
 
         // No local copy, get from config
-        if (is_null($ActiveStore)) {
-            $ActiveStore = c($ActiveStoreKey, false);
+        if (is_null($activeStore)) {
+            $activeStore = c($activeStoreKey, false);
 
             // Convert to LocalStore format
-            $LocalStore = array();
-            $ActiveStore = (array)$ActiveStore;
-            foreach ($ActiveStore as $StoreServer) {
-                $StoreServerName = md5($StoreServer);
-                $LocalStore[$StoreServerName] = array(
-                    'Server' => $StoreServer,
+            $localStore = [];
+            $activeStore = (array)$activeStore;
+            foreach ($activeStore as $storeServer) {
+                $storeServerName = md5($storeServer);
+                $localStore[$storeServerName] = [
+                    'Server' => $storeServer,
                     'Active' => true,
                     'Delay' => false,
                     'Fails' => 0
-                );
+                ];
             }
 
-            $Save = true;
+            $save = true;
         }
 
-        if ($Save) {
+        if ($save) {
             // Save to memory
-            Gdn_Cache::$stores[$ActiveCache] = $LocalStore;
+            Gdn_Cache::$stores[$activeCache] = $localStore;
 
             // Save back to APC for later
             if ($apc) {
-                apc_store($ActiveStoreKey, $LocalStore, Gdn_Cache::APC_CACHE_DURATION);
+                apc_store($activeStoreKey, $localStore, Gdn_Cache::APC_CACHE_DURATION);
             }
         }
 
-        return $ActiveStore;
+        return $activeStore;
     }
 
     /**
@@ -403,21 +403,21 @@ abstract class Gdn_Cache {
      *
      * This fails if the item already exists in the cache.
      *
-     * @param string $Key Cache key used for storage
-     * @param mixed $Value Value to be cached
-     * @param array $Options
+     * @param string $key Cache key used for storage
+     * @param mixed $value Value to be cached
+     * @param array $options
      * @return boolean true on success or false on failure.
      */
-    abstract public function add($Key, $Value, $Options = array());
+    abstract public function add($key, $value, $options = []);
 
-    public function stripKey($Key, $Options) {
-        $UsePrefix = !val(Gdn_Cache::FEATURE_NOPREFIX, $Options, false);
-        $ForcePrefix = val(Gdn_Cache::FEATURE_FORCEPREFIX, $Options, null);
+    public function stripKey($key, $options) {
+        $usePrefix = !val(Gdn_Cache::FEATURE_NOPREFIX, $options, false);
+        $forcePrefix = val(Gdn_Cache::FEATURE_FORCEPREFIX, $options, null);
 
-        if ($UsePrefix) {
-            $Key = substr($Key, strlen($this->getPrefix($ForcePrefix)) + 1);
+        if ($usePrefix) {
+            $key = substr($key, strlen($this->getPrefix($forcePrefix)) + 1);
         }
-        return $Key;
+        return $key;
 
     }
 
@@ -426,9 +426,9 @@ abstract class Gdn_Cache {
      *
      * This works regardless of whether the item already exists in the cache.
      *
-     * @param string $Key Cache key used for storage.
-     * @param mixed $Value Value to be cached.
-     * @param array $Options An array of cache feature constants.
+     * @param string $key Cache key used for storage.
+     * @param mixed $value Value to be cached.
+     * @param array $options An array of cache feature constants.
      *   - FEATURE_COMPRESS: Allows items to be internally compressed/decompressed (bool).
      *   - FEATURE_EXPIRY: Allows items to autoexpire (seconds).
      *   - FEATURE_NOPREFIX: Allows disabling usage of key prefix (bool).
@@ -436,7 +436,7 @@ abstract class Gdn_Cache {
      *   - FEATURE_FALLBACK: Allows querying DB for missing keys, or firing a callback (see Gdn_Cache->Fallback).
      * @return boolean true on success or false on failure.
      */
-    abstract public function store($Key, $Value, $Options = array());
+    abstract public function store($key, $value, $options = []);
 
     /**
      * Check if a value exists in the cache.
@@ -444,7 +444,7 @@ abstract class Gdn_Cache {
      * @param string $Key Cache key used for storage.
      * @return array array(key => value) for existing key or false if not found.
      */
-    abstract public function exists($Key);
+    abstract public function exists($key);
 
     /**
      * Retrieve a key's value from the cache.
@@ -453,7 +453,7 @@ abstract class Gdn_Cache {
      * @param array $Options
      * @return mixed key value or false on failure or not found.
      */
-    abstract public function get($Key, $Options = array());
+    abstract public function get($key, $options = []);
 
     /**
      * Remove a key/value pair from the cache.
@@ -462,7 +462,7 @@ abstract class Gdn_Cache {
      * @param array $Options
      * @return boolean true on success or false on failure.
      */
-    abstract public function remove($Key, $Options = array());
+    abstract public function remove($key, $options = []);
 
     /**
      * Replace an existing key's value with the provided value.
@@ -474,7 +474,7 @@ abstract class Gdn_Cache {
      * @param array $Options
      * @return boolean true on success or false on failure.
      */
-    abstract public function replace($Key, $Value, $Options = array());
+    abstract public function replace($key, $value, $options = []);
 
     /**
      * Increment the value of the provided key by {@link $Amount}.
@@ -486,7 +486,7 @@ abstract class Gdn_Cache {
      * @param int $Amount Amount to shift value up.
      * @return int new value or false on failure.
      */
-    abstract public function increment($Key, $Amount = 1, $Options = array());
+    abstract public function increment($key, $amount = 1, $options = []);
 
     /**
      * Decrement the value of the provided key by {@link $Amount}.
@@ -498,7 +498,7 @@ abstract class Gdn_Cache {
      * @param int $Amount Amount to shift value down.
      * @return int new value or false on failure.
      */
-    abstract public function decrement($Key, $Amount = 1, $Options = array());
+    abstract public function decrement($key, $amount = 1, $options = []);
 
     /**
      * Add a container to the cache pool.
@@ -512,15 +512,15 @@ abstract class Gdn_Cache {
      *  - CONTAINER_CALLBACK: optional (default null). callback to execute if container fails to open/connect.
      * @return boolean true on success or false on failure.
      */
-    abstract public function addContainer($Options);
+    abstract public function addContainer($options);
 
     /**
      * Invalidate all items in the cache.
      *
-     * Gdn_Cache::Flush() invalidates all existing cache items immediately.
+     * Gdn_Cache::flush() invalidates all existing cache items immediately.
      * After invalidation none of the items will be returned in response to a
      * retrieval command (unless it's stored again under the same key after
-     * Gdn_Cache::Flush() has invalidated the items).
+     * Gdn_Cache::flush() has invalidated the items).
      *
      * @return boolean true on success of false on failure.
      */
@@ -533,149 +533,149 @@ abstract class Gdn_Cache {
      * @param array $Options
      * @return mixed
      */
-    protected function fallback($Key, $Options) {
-        $Fallback = val(Gdn_Cache::FEATURE_FALLBACK, $Options, null);
-        if (is_null($Fallback)) {
+    protected function fallback($key, $options) {
+        $fallback = val(Gdn_Cache::FEATURE_FALLBACK, $options, null);
+        if (is_null($fallback)) {
             return Gdn_Cache::CACHEOP_FAILURE;
         }
 
-        $FallbackType = array_shift($Fallback);
-        switch ($FallbackType) {
+        $fallbackType = array_shift($fallback);
+        switch ($fallbackType) {
             case 'query':
-                $QueryFallbackField = array_shift($Fallback);
-                $QueryFallbackCode = array_shift($Fallback);
-                $FallbackResult = Gdn::database()->query($QueryFallbackCode);
-                if ($FallbackResult->numRows()) {
-                    if (!is_null($QueryFallbackField)) {
-                        $FallbackResult = val($QueryFallbackField, $FallbackResult->firstRow(DATASET_TYPE_ARRAY));
+                $queryFallbackField = array_shift($fallback);
+                $queryFallbackCode = array_shift($fallback);
+                $fallbackResult = Gdn::database()->query($queryFallbackCode);
+                if ($fallbackResult->numRows()) {
+                    if (!is_null($queryFallbackField)) {
+                        $fallbackResult = val($queryFallbackField, $fallbackResult->firstRow(DATASET_TYPE_ARRAY));
                     } else {
-                        $FallbackResult = $FallbackResult->resultArray();
+                        $fallbackResult = $fallbackResult->resultArray();
                     }
                 }
                 break;
             case 'callback':
-                $CallbackFallbackMethod = array_shift($Fallback);
-                $CallbackFallbackArgs = $Fallback;
-                $FallbackResult = call_user_func_array($CallbackFallbackMethod, $CallbackFallbackArgs);
+                $callbackFallbackMethod = array_shift($fallback);
+                $callbackFallbackArgs = $fallback;
+                $fallbackResult = call_user_func_array($callbackFallbackMethod, $callbackFallbackArgs);
                 break;
         }
-        Gdn::cache()->store($Key, $FallbackResult);
-        return $FallbackResult;
+        Gdn::cache()->store($key, $fallbackResult);
+        return $fallbackResult;
     }
 
-    public function getPrefix($ForcePrefix = null, $WithRevision = true) {
-        static $ConfigPrefix = false;
+    public function getPrefix($forcePrefix = null, $withRevision = true) {
+        static $configPrefix = false;
 
         // Allow overriding the prefix
-        if (!is_null($ForcePrefix)) {
-            return $ForcePrefix;
+        if (!is_null($forcePrefix)) {
+            return $forcePrefix;
         }
 
         // Keep searching for the prefix until it is defined
-        if ($ConfigPrefix === false) {
+        if ($configPrefix === false) {
             // Allow vfcom-infrastructure to set the prefix automatically
             if (defined('FORCE_CACHE_PREFIX')) {
-                $ConfigPrefix = FORCE_CACHE_PREFIX;
+                $configPrefix = FORCE_CACHE_PREFIX;
             }
 
-            if ($ConfigPrefix === false) {
-                $ConfigPrefix = c('Cache.Prefix', false);
+            if ($configPrefix === false) {
+                $configPrefix = c('Cache.Prefix', false);
             }
         }
 
         // Lookup Revision if we have a prefix.
-        $RevisionNumber = false;
-        if ($WithRevision && $ConfigPrefix !== false) {
-            $CacheRevision = $this->getRevision($ConfigPrefix);
-            if (!is_null($CacheRevision)) {
-                $RevisionNumber = $CacheRevision;
+        $revisionNumber = false;
+        if ($withRevision && $configPrefix !== false) {
+            $cacheRevision = $this->getRevision($configPrefix);
+            if (!is_null($cacheRevision)) {
+                $revisionNumber = $cacheRevision;
             }
         }
 
-        $Response = $ConfigPrefix;
-        if ($WithRevision && $RevisionNumber !== false && $ConfigPrefix !== false) {
-            $Response .= ".rev{$RevisionNumber}";
+        $response = $configPrefix;
+        if ($withRevision && $revisionNumber !== false && $configPrefix !== false) {
+            $response .= ".rev{$revisionNumber}";
         }
 
-        return ($ConfigPrefix === false) ? null : $Response;
+        return ($configPrefix === false) ? null : $response;
     }
 
-    public function getRevision($ForcePrefix = null, $Force = false) {
-        static $CacheRevision = false;
+    public function getRevision($forcePrefix = null, $force = false) {
+        static $cacheRevision = false;
 
-        if ($CacheRevision === false || $Force) {
-            $ConfigPrefix = $ForcePrefix;
-            if (is_null($ConfigPrefix)) {
-                $ConfigPrefix = $this->getPrefix(null, false);
+        if ($cacheRevision === false || $force) {
+            $configPrefix = $forcePrefix;
+            if (is_null($configPrefix)) {
+                $configPrefix = $this->getPrefix(null, false);
             }
 
-            $CacheRevisionKey = "{$ConfigPrefix}.Revision";
-            $CacheRevision = $this->get($CacheRevisionKey, array(
+            $cacheRevisionKey = "{$configPrefix}.Revision";
+            $cacheRevision = $this->get($cacheRevisionKey, [
                 Gdn_Cache::FEATURE_NOPREFIX => true
-            ));
+            ]);
 
-            if ($CacheRevision === Gdn_Cache::CACHEOP_FAILURE) {
-                $CacheRevision = 1;
+            if ($cacheRevision === Gdn_Cache::CACHEOP_FAILURE) {
+                $cacheRevision = 1;
             }
         }
 
-        return $CacheRevision;
+        return $cacheRevision;
     }
 
     public function incrementRevision() {
-        $CachePrefix = $this->getPrefix(null, false);
-        if ($CachePrefix === false) {
+        $cachePrefix = $this->getPrefix(null, false);
+        if ($cachePrefix === false) {
             return false;
         }
 
-        $CacheRevisionKey = "{$CachePrefix}.Revision";
-        $Incremented = $this->increment($CacheRevisionKey, 1, array(
+        $cacheRevisionKey = "{$cachePrefix}.Revision";
+        $incremented = $this->increment($cacheRevisionKey, 1, [
             Gdn_Cache::FEATURE_NOPREFIX => true
-        ));
+        ]);
 
-        if (!$Incremented) {
-            return $this->store($CacheRevisionKey, 2, array(
+        if (!$incremented) {
+            return $this->store($cacheRevisionKey, 2, [
                 Gdn_Cache::FEATURE_NOPREFIX => true
-            ));
+            ]);
         }
 
         return true;
     }
 
-    public function makeKey($Key, $Options) {
-        $UsePrefix = !val(Gdn_Cache::FEATURE_NOPREFIX, $Options, false);
-        $ForcePrefix = val(Gdn_Cache::FEATURE_FORCEPREFIX, $Options, null);
+    public function makeKey($key, $options) {
+        $usePrefix = !val(Gdn_Cache::FEATURE_NOPREFIX, $options, false);
+        $forcePrefix = val(Gdn_Cache::FEATURE_FORCEPREFIX, $options, null);
 
-        $Prefix = '';
-        if ($UsePrefix) {
-            $Prefix = $this->getPrefix($ForcePrefix).'!';
+        $prefix = '';
+        if ($usePrefix) {
+            $prefix = $this->getPrefix($forcePrefix).'!';
         }
 
-        if (is_array($Key)) {
-            $Result = array();
-            foreach ($Key as $i => $v) {
-                $Result[$i] = $Prefix.$v;
+        if (is_array($key)) {
+            $result = [];
+            foreach ($key as $i => $v) {
+                $result[$i] = $prefix.$v;
             }
         } else {
-            $Result = $Prefix.$Key;
+            $result = $prefix.$key;
         }
 
         // Make sure key is valid: no control characters or whitespace and no more than 250 characters.
         // See https://github.com/memcached/memcached/blob/master/doc/protocol.txt
-        $Result = trim($Result);
+        $result = trim($result);
         if (unicodeRegexSupport()) {
             // No whitespace or control characters.
-            $Result = preg_replace('/[\p{Z}\p{C}]+/u', '-', $Result);
+            $result = preg_replace('/[\p{Z}\p{C}]+/u', '-', $result);
         } else {
             // No whitespace.
-            $Result = preg_replace('/\s+/', '-', $Result);
+            $result = preg_replace('/\s+/', '-', $result);
         }
 
-        if (strlen($Result) > 250) {
-            $Result = substr($Result, 0, 250);
+        if (strlen($result) > 250) {
+            $result = substr($result, 0, 250);
         }
 
-        return $Result;
+        return $result;
     }
 
     /*
@@ -687,20 +687,20 @@ abstract class Gdn_Cache {
      * @param string|integer $Option The option key to retrieve
      * @return mixed The value associated with the given option key
      */
-    public function option($Option = null, $Default = null) {
-        static $ActiveOptions = null;
+    public function option($option = null, $default = null) {
+        static $activeOptions = null;
 
-        if (is_null($ActiveOptions)) {
-            $ActiveCacheShortName = ucfirst($this->activeCache());
-            $OptionKey = "Cache.{$ActiveCacheShortName}.Option";
-            $ActiveOptions = c($OptionKey, array());
+        if (is_null($activeOptions)) {
+            $activeCacheShortName = ucfirst($this->activeCache());
+            $optionKey = "Cache.{$activeCacheShortName}.Option";
+            $activeOptions = c($optionKey, []);
         }
 
-        if (is_null($Option)) {
-            return $ActiveOptions;
+        if (is_null($option)) {
+            return $activeOptions;
         }
 
-        return val($Option, $ActiveOptions, $Default);
+        return val($option, $activeOptions, $default);
     }
 
     /*
@@ -712,24 +712,24 @@ abstract class Gdn_Cache {
      * @param string|integer $Key The config key to retrieve
      * @return mixed The value associated with the given config key
      */
-    public function config($Key = null, $Default = null) {
-        static $ActiveConfig = null;
+    public function config($key = null, $default = null) {
+        static $activeConfig = null;
 
-        if (is_null($ActiveConfig)) {
-            $ActiveCacheShortName = ucfirst($this->activeCache());
-            $ConfigKey = "Cache.{$ActiveCacheShortName}.Config";
-            $ActiveConfig = c($ConfigKey, array());
+        if (is_null($activeConfig)) {
+            $activeCacheShortName = ucfirst($this->activeCache());
+            $configKey = "Cache.{$activeCacheShortName}.Config";
+            $activeConfig = c($configKey, []);
         }
 
-        if (is_null($Key)) {
-            return $ActiveConfig;
+        if (is_null($key)) {
+            return $activeConfig;
         }
 
-        if (!array_key_exists($Key, $ActiveConfig)) {
-            return $Default;
+        if (!array_key_exists($key, $activeConfig)) {
+            return $default;
         }
 
-        return val($Key, $ActiveConfig, $Default);
+        return val($key, $activeConfig, $default);
     }
 
     /**
@@ -759,7 +759,7 @@ abstract class Gdn_Cache {
         }
 
         if (!is_array($key)) {
-            $key = array($key => $value);
+            $key = [$key => $value];
         }
         self::$localCache = array_merge(self::$localCache, $key);
     }
@@ -768,7 +768,7 @@ abstract class Gdn_Cache {
      * Clear local cache (process memory cache).
      */
     protected static function localClear() {
-        self::$localCache = array();
+        self::$localCache = [];
     }
 
     /**
@@ -778,32 +778,32 @@ abstract class Gdn_Cache {
      *  FEATURE_TIMEOUT: this cache can timeout while reading / writing
      *  FEATURE_EXPIRY: this cache can expire keys
      *
-     * @param int $Feature One of the feature constants.
-     * @param mixed $Meta An optional data to return when calling HasFeature. default true.
+     * @param int $feature One of the feature constants.
+     * @param mixed $meta An optional data to return when calling HasFeature. default true.
      */
-    public function registerFeature($Feature, $Meta = true) {
-        $this->features[$Feature] = $Meta;
+    public function registerFeature($feature, $meta = true) {
+        $this->features[$feature] = $meta;
     }
 
     /**
      * Remove feature flag from this cache, for the specific feature.
      *
-     * @param int $Feature One of the feature constants.
+     * @param int $feature One of the feature constants.
      */
-    public function unregisterFeature($Feature) {
-        if (isset($this->features[$Feature])) {
-            unset($this->features[$Feature]);
+    public function unregisterFeature($feature) {
+        if (isset($this->features[$feature])) {
+            unset($this->features[$feature]);
         }
     }
 
     /**
      * Check whether this cache supports the specified feature.
      *
-     * @param int $Feature One of the feature constants.
-     * @return mixed $Meta returns the meta data supplied during RegisterFeature().
+     * @param int $feature One of the feature constants.
+     * @return mixed $Meta returns the meta data supplied during registerFeature().
      */
-    public function hasFeature($Feature) {
-        return isset($this->features[$Feature]) ? $this->features[$Feature] : Gdn_Cache::CACHEOP_FAILURE;
+    public function hasFeature($feature) {
+        return isset($this->features[$feature]) ? $this->features[$feature] : Gdn_Cache::CACHEOP_FAILURE;
     }
 
     /**
@@ -815,9 +815,9 @@ abstract class Gdn_Cache {
         return true;
     }
 
-    protected function failure($Message) {
+    protected function failure($message) {
         if (debug()) {
-            throw new Exception($Message);
+            throw new Exception($message);
         } else {
             return Gdn_Cache::CACHEOP_FAILURE;
         }

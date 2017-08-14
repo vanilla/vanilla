@@ -6,7 +6,7 @@
         $Data = $this->ActivityData;
         foreach ($Data->result() as $Activity) {
             $PhotoAnchor = anchor(
-                img($Activity['Photo'], array('class' => 'ProfilePhotoSmall')),
+                img($Activity['Photo'], ['class' => 'ProfilePhotoSmall']),
                 $Activity['PhotoUrl'], 'Photo');
 
             echo '<li class="Activity '.$Activity['ActivityType'].'">';

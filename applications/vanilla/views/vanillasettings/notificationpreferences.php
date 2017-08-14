@@ -12,18 +12,33 @@ $span = (c('Garden.Email.Disabled')) ? '1' : '2';
     ?>
 </div>
 <table class="PreferenceGroup">
+    <colgroup></colgroup>
+    <colgroup span="2"></colgroup>
+    <colgroup span="2"></colgroup>
     <thead>
     <tr>
-        <td style="border: none;">&nbsp;</td>
-        <td class="TopHeading" colspan="<?php echo $span; ?>"><?php echo t('Discussions'); ?></td>
-        <td class="TopHeading" colspan="<?php echo $span; ?>"><?php echo t('Comments'); ?></td>
+        <th scope="col" style="border: none;">&nbsp;</th>
+        <th id="DiscussionsNotificationHeader" class="TopHeading" colspan="<?php echo $span; ?>" scope="col">
+            <?php echo t('Discussions'); ?>
+        </th>
+        <th id="CommentsNotificationHeader" class="TopHeading" colspan="<?php echo $span; ?>" scope="col">
+            <?php echo t('Comments'); ?>
+        </th>
     </tr>
     <tr>
-        <td style="text-align: left;"><?php echo t('Category'); ?></td>
-        <td class="PrefCheckBox BottomHeading<?php echo $emailClass; ?>"><?php echo t('Email'); ?></td>
-        <td class="PrefCheckBox BottomHeading"><?php echo t('Popup'); ?></td>
-        <td class="PrefCheckBox BottomHeading<?php echo $emailClass; ?>"><?php echo t('Email'); ?></td>
-        <td class="PrefCheckBox BottomHeading"><?php echo t('Popup'); ?></td>
+        <th id="CategoryNotificationHeader" scope="col" style="text-align: left;"><?php echo t('Category'); ?></th>
+        <th id="EmailDiscussionsHeader" class="PrefCheckBox BottomHeading<?php echo $emailClass; ?>" scope="col">
+            <?php echo t('Email'); ?>
+        </th>
+        <th id="PopupDiscussionsHeader" class="PrefCheckBox BottomHeading" scope="col">
+            <?php echo t('Popup'); ?>
+        </th>
+        <th id="EmailCommentsHeader" class="PrefCheckBox BottomHeading<?php echo $emailClass; ?>" scope="col">
+            <?php echo t('Email'); ?>
+        </th>
+        <th id="PopupCommentsHeader" class="PrefCheckBox BottomHeading" scope="col">
+            <?php echo t('Popup'); ?>
+        </th>
     </tr>
     </thead>
     <tbody>
@@ -43,11 +58,21 @@ $span = (c('Garden.Email.Disabled')) ? '1' : '2';
             </tr>
         <?php else: ?>
             <tr>
-                <td class="<?php echo "Depth_{$Category['Depth']}"; ?>"><?php echo $Category['Name']; ?></td>
-                <td class="PrefCheckBox<?php echo $emailClass; ?>"><?php echo Gdn::controller()->Form->checkBox("Email.NewDiscussion.{$CategoryID}", '', array('value' => 1)); ?></td>
-                <td class="PrefCheckBox"><?php echo Gdn::controller()->Form->checkBox("Popup.NewDiscussion.{$CategoryID}", '', array('value' => 1)); ?></td>
-                <td class="PrefCheckBox<?php echo $emailClass; ?>"><?php echo Gdn::controller()->Form->checkBox("Email.NewComment.{$CategoryID}", '', array('value' => 1)); ?></td>
-                <td class="PrefCheckBox"><?php echo Gdn::controller()->Form->checkBox("Popup.NewComment.{$CategoryID}", '', array('value' => 1)); ?></td>
+                <td class="<?php echo "Depth_{$Category['Depth']}"; ?>" headers="CategoryNotificationHeader">
+                    <?php echo $Category['Name']; ?>
+                </td>
+                <td class="PrefCheckBox<?php echo $emailClass; ?>" headers="DiscussionsNotificationHeader EmailDiscussionsHeader">
+                    <?php echo Gdn::controller()->Form->checkBox("Email.NewDiscussion.{$CategoryID}", '', ['value' => 1]); ?>
+                </td>
+                <td class="PrefCheckBox" headers="DiscussionsNotificationHeader PopupDiscussionsHeader">
+                    <?php echo Gdn::controller()->Form->checkBox("Popup.NewDiscussion.{$CategoryID}", '', ['value' => 1]); ?>
+                </td>
+                <td class="PrefCheckBox<?php echo $emailClass; ?>" headers="CommentsNotificationHeader EmailCommentsHeader">
+                    <?php echo Gdn::controller()->Form->checkBox("Email.NewComment.{$CategoryID}", '', ['value' => 1]); ?>
+                </td>
+                <td class="PrefCheckBox" headers="CommentsNotificationHeader EmailCommentsHeader">
+                    <?php echo Gdn::controller()->Form->checkBox("Popup.NewComment.{$CategoryID}", '', ['value' => 1]); ?>
+                </td>
             </tr>
         <?php
         endif;

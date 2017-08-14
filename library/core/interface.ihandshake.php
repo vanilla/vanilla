@@ -18,7 +18,7 @@ interface Gdn_IHandshake {
      *
      * In VanillaConnect and ProxyConnect, this function retrieves the temporary handshake data
      * stored in the authenticator's cookie. This information is used as a parameter when calling
-     * the Get____FromHandshake() methods described below.
+     * the get____FromHandshake() methods described below.
      */
     public function getHandshake();
 

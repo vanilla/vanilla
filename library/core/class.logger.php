@@ -211,7 +211,7 @@ class Logger {
      * @param string $message The message.
      * @param array $context The message data.
      */
-    public static function event($event, $level, $message, $context = array()) {
+    public static function event($event, $level, $message, $context = []) {
         $context['event'] = $event;
         static::log($level, $message, $context);
     }
@@ -226,7 +226,7 @@ class Logger {
      * @return int Returns the numeric log level or `-1` if the level is invalid.
      */
     public static function levelPriority($level) {
-        static $priorities = array(
+        static $priorities = [
             Logger::DEBUG => LOG_DEBUG,
             Logger::INFO => LOG_INFO,
             Logger::NOTICE => LOG_NOTICE,
@@ -235,7 +235,7 @@ class Logger {
             Logger::CRITICAL => LOG_CRIT,
             Logger::ALERT => LOG_ALERT,
             Logger::EMERGENCY => LOG_EMERG
-        );
+        ];
 
         if (empty($level)) {
             return LOG_DEBUG;
@@ -259,7 +259,7 @@ class Logger {
      * @param string $message The log message format.
      * @param array $context Additional information to pass to the event.
      */
-    public static function logAccess($event, $level, $message, $context = array()) {
+    public static function logAccess($event, $level, $message, $context = []) {
         // Throttle the log access to 1 event every 5 minutes.
         if (Gdn::cache()->activeEnabled()) {
             $userID = Gdn::session()->UserID;
@@ -267,7 +267,7 @@ class Logger {
             $key = "log:$event:$userID:$path";
             if (Gdn::cache()->get($key) === false) {
                 self::event($event, $level, $message, $context);
-                Gdn::cache()->store($key, time(), array(Gdn_Cache::FEATURE_EXPIRY => 300));
+                Gdn::cache()->store($key, time(), [Gdn_Cache::FEATURE_EXPIRY => 300]);
             }
         }
     }
@@ -282,17 +282,17 @@ class Logger {
      * @param string $message The message format.
      * @param array $context The message data.
      */
-    public static function log($level, $message, $context = array()) {
+    public static function log($level, $message, $context = []) {
         // Add default fields to the context if they don't exist.
-        $defaults = array(
+        $defaults = [
             'userid' => Gdn::session()->UserID,
             'username' => val("Name", Gdn::session()->User, 'anonymous'),
             'ip' => Gdn::request()->ipAddress(),
             'timestamp' => time(),
             'method' => Gdn::request()->requestMethod(),
-            'domain' => rtrim(Url('/', true), '/'),
+            'domain' => rtrim(url('/', true), '/'),
             'path' => Gdn::request()->path()
-        );
+        ];
         $context = $context + $defaults;
         static::getLogger()->log($level, $message, $context);
     }

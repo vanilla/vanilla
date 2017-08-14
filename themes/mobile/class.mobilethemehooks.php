@@ -22,10 +22,10 @@ class MobileThemeHooks implements Gdn_IPlugin {
     /**
      * Remove plugins that are not mobile friendly!
      */
-    public function gdn_dispatcher_afterAnalyzeRequest_handler($Sender) {
+    public function gdn_dispatcher_afterAnalyzeRequest_handler($sender) {
         // Remove plugins so they don't mess up layout or functionality.
-        $inPublicDashboard = ($Sender->application() == 'dashboard' && in_array($Sender->controller(), array('Activity', 'Profile', 'Search')));
-        if (in_array($Sender->application(), array('vanilla', 'conversations')) || $inPublicDashboard) {
+        $inPublicDashboard = ($sender->application() == 'dashboard' && in_array($sender->controller(), ['Activity', 'Profile', 'Search']));
+        if (in_array($sender->application(), ['vanilla', 'conversations']) || $inPublicDashboard) {
             Gdn::pluginManager()->removeMobileUnfriendlyPlugins();
         }
         saveToConfig('Garden.Format.EmbedSize', '240x135', false);
@@ -34,10 +34,10 @@ class MobileThemeHooks implements Gdn_IPlugin {
     /**
      * Add mobile meta info. Add script to hide iPhone browser bar on pageload.
      */
-    public function base_render_before($Sender) {
-        if (isMobile() && is_object($Sender->Head)) {
-            $Sender->Head->addTag('meta', array('name' => 'viewport', 'content' => "width=device-width,minimum-scale=1.0,maximum-scale=1.0"));
-            $Sender->Head->addString('
+    public function base_render_before($sender) {
+        if (isMobile() && is_object($sender->Head)) {
+            $sender->Head->addTag('meta', ['name' => 'viewport', 'content' => "width=device-width,minimum-scale=1.0,maximum-scale=1.0"]);
+            $sender->Head->addString('
 <script>
    // If not looking for a specific comment, hide the address bar in iphone
    var hash = window.location.href.split("#")[1];
@@ -53,71 +53,71 @@ class MobileThemeHooks implements Gdn_IPlugin {
     /**
      * Add button, remove options, increase click area on discussions list.
      */
-    public function categoriesController_render_before($Sender) {
-        $Sender->ShowOptions = false;
+    public function categoriesController_render_before($sender) {
+        $sender->ShowOptions = false;
         saveToConfig('Vanilla.AdminCheckboxes.Use', false, false);
-        $this->addButton($Sender, 'Discussion');
-        $this->discussionsClickable($Sender);
+        $this->addButton($sender, 'Discussion');
+        $this->discussionsClickable($sender);
     }
 
     /**
      * Add button, remove options, increase click area on discussions list.
      */
-    public function discussionsController_render_before($Sender) {
-        $Sender->ShowOptions = false;
+    public function discussionsController_render_before($sender) {
+        $sender->ShowOptions = false;
         saveToConfig('Vanilla.AdminCheckboxes.Use', false, false);
-        $this->addButton($Sender, 'Discussion');
-        $this->discussionsClickable($Sender);
+        $this->addButton($sender, 'Discussion');
+        $this->discussionsClickable($sender);
     }
 
     /**
      * Add New Discussion button.
      */
-    public function discussionController_render_before($Sender) {
-        $this->addButton($Sender, 'Discussion');
+    public function discussionController_render_before($sender) {
+        $this->addButton($sender, 'Discussion');
     }
 
     /**
      * Add New Discussion button.
      */
-    public function draftsController_render_before($Sender) {
-        $this->addButton($Sender, 'Discussion');
+    public function draftsController_render_before($sender) {
+        $this->addButton($sender, 'Discussion');
     }
 
     /**
      * Add New Conversation button.
      */
-    public function messagesController_render_before($Sender) {
-        $this->addButton($Sender, 'Conversation');
+    public function messagesController_render_before($sender) {
+        $this->addButton($sender, 'Conversation');
     }
 
     /**
      * Add New Discussion button.
      */
-    public function postController_render_before($Sender) {
-        $this->addButton($Sender, 'Discussion');
+    public function postController_render_before($sender) {
+        $this->addButton($sender, 'Discussion');
     }
 
     /**
      * Add a button to the navbar.
      */
-    private function addButton($Sender, $ButtonType) {
-        if (is_object($Sender->Menu)) {
-            if ($ButtonType == 'Discussion') {
-                $Sender->Menu->addLink(
+    private function addButton($sender, $buttonType) {
+        if (is_object($sender->Menu)) {
+            if ($buttonType == 'Discussion') {
+                $sender->Menu->addLink(
                     'NewDiscussion',
-                    img('themes/mobile/design/images/new.png', array('alt' => t('New Discussion'))),
-                    '/post/discussion'.(array_key_exists('CategoryID', $Sender->Data) ? '/'.$Sender->Data['CategoryID'] : ''),
-                    array('Garden.SignIn.Allow'),
-                    array('class' => 'NewDiscussion')
+                    img('themes/mobile/design/images/new.png', ['alt' => t('New Discussion')]),
+                    '/post/discussion'.(array_key_exists('CategoryID', $sender->Data) ? '/'.$sender->Data['CategoryID'] : ''),
+                    ['Garden.SignIn.Allow'],
+                    ['class' => 'NewDiscussion']
                 );
-            } elseif ($ButtonType == 'Conversation')
-                $Sender->Menu->addLink(
+            } elseif ($buttonType == 'Conversation')
+                $sender->Menu->addLink(
                     'NewConversation',
-                    img('themes/mobile/design/images/new.png', array('alt' => t('New Conversation'))),
+                    img('themes/mobile/design/images/new.png', ['alt' => t('New Conversation')]),
                     '/messages/add',
                     '',
-                    array('class' => 'NewConversation')
+                    ['class' => 'NewConversation']
                 );
         }
     }
@@ -125,10 +125,10 @@ class MobileThemeHooks implements Gdn_IPlugin {
     /**
      * Increases clickable area on a discussions list.
      */
-    private function discussionsClickable($Sender) {
+    private function discussionsClickable($sender) {
         // Make sure that discussion clicks (anywhere in a discussion row) take the user to the discussion.
-        if (property_exists($Sender, 'Head') && is_object($Sender->Head)) {
-            $Sender->Head->addString('
+        if (property_exists($sender, 'Head') && is_object($sender->Head)) {
+            $sender->Head->addString('
 <script>
    jQuery(document).ready(function($) {
       $("ul.DataList li.Item").click(function() {
@@ -144,8 +144,8 @@ class MobileThemeHooks implements Gdn_IPlugin {
     /**
      * Add the user photo before the user Info on the profile page.
      */
-    public function profileController_beforeUserInfo_handler($Sender) {
-        $UserPhoto = new UserPhotoModule();
-        echo $UserPhoto->toString();
+    public function profileController_beforeUserInfo_handler($sender) {
+        $userPhoto = new UserPhotoModule();
+        echo $userPhoto->toString();
     }
 }

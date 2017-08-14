@@ -1,7 +1,7 @@
 <?php if (!defined('APPLICATION')) exit(); ?>
     <h1><?php echo t('Send a Test Email'); ?></h1>
 <?php
-echo $this->Form->open(array('enctype' => 'multipart/form-data'));
+echo $this->Form->open(['enctype' => 'multipart/form-data']);
 echo $this->Form->errors(); ?>
 <div class="form-group">
     <div class="label-wrap">

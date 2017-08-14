@@ -40,61 +40,61 @@ class Gdn_PasswordAuthenticator extends Gdn_Authenticator {
      * This method returns 0 if the username/password combination were not found, or -1 if the user does not
      * have permission to sign in.
      *
-     * @param string $Email The email address (or unique username) assigned to the user in the database.
-     * @param string $Password The password assigned to the user in the database.
+     * @param string $email The email address (or unique username) assigned to the user in the database.
+     * @param string $password The password assigned to the user in the database.
      * @return int The UserID of the authenticated user or 0 if one isn't found.
      */
-    public function authenticate($Email = '', $Password = '') {
-        if (!$Email || !$Password) {
+    public function authenticate($email = '', $password = '') {
+        if (!$email || !$password) {
             // We werent given parameters, check if they exist in our DataSource
             if ($this->currentStep() != Gdn_Authenticator::MODE_VALIDATE) {
                 return Gdn_Authenticator::AUTH_INSUFFICIENT;
             }
 
             // Get the values from the DataSource
-            $Email = $this->GetValue('Email');
-            $Password = $this->GetValue('Password');
-            $PersistentSession = $this->GetValue('RememberMe');
-            $ClientHour = $this->GetValue('ClientHour');
+            $email = $this->getValue('Email');
+            $password = $this->getValue('Password');
+            $persistentSession = $this->getValue('RememberMe');
+            $clientHour = $this->getValue('ClientHour');
         } else {
-            $PersistentSession = false;
-            $ClientHour = 0;
+            $persistentSession = false;
+            $clientHour = 0;
         }
 
-        $UserID = 0;
+        $userID = 0;
 
         // Retrieve matching username/password values
-        $UserModel = Gdn::Authenticator()->GetUserModel();
-        $UserData = $UserModel->ValidateCredentials($Email, 0, $Password);
-        if ($UserData !== false) {
+        $userModel = Gdn::authenticator()->getUserModel();
+        $userData = $userModel->validateCredentials($email, 0, $password);
+        if ($userData !== false) {
             // Get ID
-            $UserID = $UserData->UserID;
+            $userID = $userData->UserID;
 
             // Get Sign-in permission
-            $SignInPermission = $UserData->Admin ? true : false;
-            if ($SignInPermission === false && !$UserData->Banned) {
-                $PermissionModel = Gdn::Authenticator()->GetPermissionModel();
-                foreach ($PermissionModel->GetUserPermissions($UserID) as $Permissions) {
-                    $SignInPermission |= val('Garden.SignIn.Allow', $Permissions, false);
+            $signInPermission = $userData->Admin ? true : false;
+            if ($signInPermission === false && !$userData->Banned) {
+                $permissionModel = Gdn::authenticator()->getPermissionModel();
+                foreach ($permissionModel->getUserPermissions($userID) as $permissions) {
+                    $signInPermission |= val('Garden.SignIn.Allow', $permissions, false);
                 }
             }
 
             // Update users Information
-            $UserID = $SignInPermission ? $UserID : -1;
-            if ($UserID > 0) {
+            $userID = $signInPermission ? $userID : -1;
+            if ($userID > 0) {
                 // Create the session cookie
-                $this->setIdentity($UserID, $PersistentSession);
+                $this->setIdentity($userID, $persistentSession);
 
                 // Update some information about the user...
-                $UserModel->UpdateVisit($UserID, $ClientHour);
+                $userModel->updateVisit($userID, $clientHour);
 
-                Gdn::Authenticator()->Trigger(Gdn_Authenticator::AUTH_SUCCESS);
-                $this->FireEvent('Authenticated');
+                Gdn::authenticator()->trigger(Gdn_Authenticator::AUTH_SUCCESS);
+                $this->fireEvent('Authenticated');
             } else {
-                Gdn::Authenticator()->Trigger(Gdn_Authenticator::AUTH_DENIED);
+                Gdn::authenticator()->trigger(Gdn_Authenticator::AUTH_DENIED);
             }
         }
-        return $UserID;
+        return $userID;
     }
 
     /**
@@ -104,7 +104,7 @@ class Gdn_PasswordAuthenticator extends Gdn_Authenticator {
      */
     public function currentStep() {
         // Was data submitted through the form already?
-        if (is_object($this->_DataSource) && ($this->_DataSource == $this || $this->_DataSource->IsPostBack() === true)) {
+        if (is_object($this->_DataSource) && ($this->_DataSource == $this || $this->_DataSource->isPostBack() === true)) {
             return $this->_checkHookedFields();
         }
 
@@ -149,7 +149,7 @@ class Gdn_PasswordAuthenticator extends Gdn_Authenticator {
         // Do nothing.
     }
 
-    public function getURL($URLType) {
+    public function getURL($uRLType) {
         // We aren't overriding anything
         return false;
     }

@@ -36,9 +36,9 @@ class Gdn_Format {
     public static $MentionsUrlFormat = '/profile/{name}';
 
     /** @var array  */
-    protected static $SanitizedFormats = array(
+    protected static $SanitizedFormats = [
         'html', 'bbcode', 'wysiwyg', 'text', 'textex', 'markdown'
-    );
+    ];
 
     /**
      * @var EventManager
@@ -63,106 +63,106 @@ class Gdn_Format {
      *  %8$s = route & routecode
      *  %9$s = gender suffix (some languages require this).
      *
-     * @param object $Activity An object representation of the activity being formatted.
-     * @param int $ProfileUserID If looking at a user profile, this is the UserID of the profile we are
+     * @param object $activity An object representation of the activity being formatted.
+     * @param int $profileUserID If looking at a user profile, this is the UserID of the profile we are
      *  looking at.
      * @return string
      */
-    public static function activityHeadline($Activity, $ProfileUserID = '', $ViewingUserID = '') {
-        $Activity = (object)$Activity;
-        if ($ViewingUserID == '') {
-            $Session = Gdn::session();
-            $ViewingUserID = $Session->isValid() ? $Session->UserID : -1;
+    public static function activityHeadline($activity, $profileUserID = '', $viewingUserID = '') {
+        $activity = (object)$activity;
+        if ($viewingUserID == '') {
+            $session = Gdn::session();
+            $viewingUserID = $session->isValid() ? $session->UserID : -1;
         }
 
-        $GenderSuffixCode = 'First';
-        $GenderSuffixGender = $Activity->ActivityGender;
+        $genderSuffixCode = 'First';
+        $genderSuffixGender = $activity->ActivityGender;
 
-        if ($ViewingUserID == $Activity->ActivityUserID) {
-            $ActivityName = $ActivityNameP = T('You');
+        if ($viewingUserID == $activity->ActivityUserID) {
+            $activityName = $activityNameP = t('You');
         } else {
-            $ActivityName = $Activity->ActivityName;
-            $ActivityNameP = FormatPossessive($ActivityName);
-            $GenderSuffixCode = 'Third';
+            $activityName = $activity->ActivityName;
+            $activityNameP = formatPossessive($activityName);
+            $genderSuffixCode = 'Third';
         }
 
-        if ($ProfileUserID != $Activity->ActivityUserID) {
+        if ($profileUserID != $activity->ActivityUserID) {
             // If we're not looking at the activity user's profile, link the name
-            $ActivityNameD = urlencode($Activity->ActivityName);
-            $ActivityName = Anchor($ActivityName, UserUrl($Activity, 'Activity'));
-            $ActivityNameP = Anchor($ActivityNameP, UserUrl($Activity, 'Activity'));
-            $GenderSuffixCode = 'Third';
+            $activityNameD = urlencode($activity->ActivityName);
+            $activityName = anchor($activityName, userUrl($activity, 'Activity'));
+            $activityNameP = anchor($activityNameP, userUrl($activity, 'Activity'));
+            $genderSuffixCode = 'Third';
         }
 
-        $Gender = t('their'); //TODO: this isn't preferable but I don't know a better option
-        $Gender2 = t('they'); //TODO: this isn't preferable either
-        if ($Activity->ActivityGender == 'm') {
-            $Gender = t('his');
-            $Gender2 = t('he');
-        } elseif ($Activity->ActivityGender == 'f') {
-            $Gender = t('her');
-            $Gender2 = t('she');
+        $gender = t('their'); //TODO: this isn't preferable but I don't know a better option
+        $gender2 = t('they'); //TODO: this isn't preferable either
+        if ($activity->ActivityGender == 'm') {
+            $gender = t('his');
+            $gender2 = t('he');
+        } elseif ($activity->ActivityGender == 'f') {
+            $gender = t('her');
+            $gender2 = t('she');
         }
 
-        if ($ViewingUserID == $Activity->RegardingUserID || ($Activity->RegardingUserID == '' && $Activity->ActivityUserID == $ViewingUserID)) {
-            $Gender = $Gender2 = t('your');
+        if ($viewingUserID == $activity->RegardingUserID || ($activity->RegardingUserID == '' && $activity->ActivityUserID == $viewingUserID)) {
+            $gender = $gender2 = t('your');
         }
 
-        $IsYou = false;
-        if ($ViewingUserID == $Activity->RegardingUserID) {
-            $IsYou = true;
-            $RegardingName = t('you');
-            $RegardingNameP = t('your');
-            $GenderSuffixGender = $Activity->RegardingGender;
+        $isYou = false;
+        if ($viewingUserID == $activity->RegardingUserID) {
+            $isYou = true;
+            $regardingName = t('you');
+            $regardingNameP = t('your');
+            $genderSuffixGender = $activity->RegardingGender;
         } else {
-            $RegardingName = $Activity->RegardingName == '' ? T('somebody') : $Activity->RegardingName;
-            $RegardingNameP = formatPossessive($RegardingName);
+            $regardingName = $activity->RegardingName == '' ? t('somebody') : $activity->RegardingName;
+            $regardingNameP = formatPossessive($regardingName);
 
-            if ($Activity->ActivityUserID != $ViewingUserID) {
-                $GenderSuffixCode = 'Third';
+            if ($activity->ActivityUserID != $viewingUserID) {
+                $genderSuffixCode = 'Third';
             }
         }
-        $RegardingWall = '';
-        $RegardingWallLink = '';
+        $regardingWall = '';
+        $regardingWallLink = '';
 
-        if ($Activity->ActivityUserID == $Activity->RegardingUserID) {
+        if ($activity->ActivityUserID == $activity->RegardingUserID) {
             // If the activityuser and regardinguser are the same, use the $Gender Ref as the RegardingName
-            $RegardingName = $RegardingProfile = $Gender;
-            $RegardingNameP = $RegardingProfileP = $Gender;
-        } elseif ($Activity->RegardingUserID > 0 && $ProfileUserID != $Activity->RegardingUserID) {
+            $regardingName = $regardingProfile = $gender;
+            $regardingNameP = $regardingProfileP = $gender;
+        } elseif ($activity->RegardingUserID > 0 && $profileUserID != $activity->RegardingUserID) {
             // If there is a regarding user and we're not looking at his/her profile, link the name.
-            $RegardingNameD = urlencode($Activity->RegardingName);
-            if (!$IsYou) {
-                $RegardingName = anchor($RegardingName, userUrl($Activity, 'Regarding'));
-                $RegardingNameP = anchor($RegardingNameP, userUrl($Activity, 'Regarding'));
-                $GenderSuffixCode = 'Third';
-                $GenderSuffixGender = $Activity->RegardingGender;
+            $regardingNameD = urlencode($activity->RegardingName);
+            if (!$isYou) {
+                $regardingName = anchor($regardingName, userUrl($activity, 'Regarding'));
+                $regardingNameP = anchor($regardingNameP, userUrl($activity, 'Regarding'));
+                $genderSuffixCode = 'Third';
+                $genderSuffixGender = $activity->RegardingGender;
             }
-            $RegardingWallActivityPath = userUrl($Activity, 'Regarding');
-            $RegardingWallLink = url($RegardingWallActivityPath);
-            $RegardingWall = anchor(T('wall'), $RegardingWallActivityPath);
+            $regardingWallActivityPath = userUrl($activity, 'Regarding');
+            $regardingWallLink = url($regardingWallActivityPath);
+            $regardingWall = anchor(t('wall'), $regardingWallActivityPath);
         }
-        if ($RegardingWall == '') {
-            $RegardingWall = t('wall');
+        if ($regardingWall == '') {
+            $regardingWall = t('wall');
         }
 
-        if ($Activity->Route == '') {
-            $ActivityRouteLink = '';
-            if ($Activity->RouteCode) {
-                $Route = t($Activity->RouteCode);
+        if ($activity->Route == '') {
+            $activityRouteLink = '';
+            if ($activity->RouteCode) {
+                $route = t($activity->RouteCode);
             } else {
-                $Route = '';
+                $route = '';
             }
         } else {
-            $ActivityRouteLink = url($Activity->Route);
-            $Route = anchor(T($Activity->RouteCode), $Activity->Route);
+            $activityRouteLink = url($activity->Route);
+            $route = anchor(t($activity->RouteCode), $activity->Route);
         }
 
         // Translate the gender suffix.
-        $GenderSuffixCode = "GenderSuffix.$GenderSuffixCode.$GenderSuffixGender";
-        $GenderSuffix = t($GenderSuffixCode, '');
-        if ($GenderSuffix == $GenderSuffixCode) {
-            $GenderSuffix = ''; // in case translate doesn't support empty strings.
+        $genderSuffixCode = "GenderSuffix.$genderSuffixCode.$genderSuffixGender";
+        $genderSuffix = t($genderSuffixCode, '');
+        if ($genderSuffix == $genderSuffixCode) {
+            $genderSuffix = ''; // in case translate doesn't support empty strings.
         }
         /*
           Debug:
@@ -177,72 +177,72 @@ class Gdn_Format {
         .'/'.$GenderSuffix.($GenderSuffixCode)
         */
 
-        $FullHeadline = t("Activity.{$Activity->ActivityType}.FullHeadline", t($Activity->FullHeadline));
-        $ProfileHeadline = t("Activity.{$Activity->ActivityType}.ProfileHeadline", t($Activity->ProfileHeadline));
-        $MessageFormat = ($ProfileUserID == $Activity->ActivityUserID || $ProfileUserID == '' || !$ProfileHeadline ? $FullHeadline : $ProfileHeadline);
+        $fullHeadline = t("Activity.{$activity->ActivityType}.FullHeadline", t($activity->FullHeadline));
+        $profileHeadline = t("Activity.{$activity->ActivityType}.ProfileHeadline", t($activity->ProfileHeadline));
+        $messageFormat = ($profileUserID == $activity->ActivityUserID || $profileUserID == '' || !$profileHeadline ? $fullHeadline : $profileHeadline);
 
-        return sprintf($MessageFormat, $ActivityName, $ActivityNameP, $RegardingName, $RegardingNameP, $RegardingWall, $Gender, $Gender2, $Route, $GenderSuffix, $RegardingWallLink, $ActivityRouteLink);
+        return sprintf($messageFormat, $activityName, $activityNameP, $regardingName, $regardingNameP, $regardingWall, $gender, $gender2, $route, $genderSuffix, $regardingWallLink, $activityRouteLink);
     }
 
     /**
      * Removes all non-alpha-numeric characters (except for _ and -) from
      *
-     * @param string $Mixed An object, array, or string to be formatted.
+     * @param string $mixed An object, array, or string to be formatted.
      * @return string
      */
-    public static function alphaNumeric($Mixed) {
-        if (!is_string($Mixed)) {
-            return self::to($Mixed, 'ForAlphaNumeric');
+    public static function alphaNumeric($mixed) {
+        if (!is_string($mixed)) {
+            return self::to($mixed, 'ForAlphaNumeric');
         } else {
-            return preg_replace('/([^\w-])/', '', $Mixed);
+            return preg_replace('/([^\w-])/', '', $mixed);
         }
     }
 
     /**
      *
      * @deprecated 9 Nov 2016
-     * @param array $Array
+     * @param array $array
      * @return string
      */
-    public static function arrayAsAttributes($Array) {
+    public static function arrayAsAttributes($array) {
         deprecated('arrayAsAttributes');
-        $Return = '';
-        foreach ($Array as $Property => $Value) {
-            $Return .= ' '.$Property.'="'.$Value.'"';
+        $return = '';
+        foreach ($array as $property => $value) {
+            $return .= ' '.$property.'="'.$value.'"';
         }
-        return $Return;
+        return $return;
     }
 
     /**
      * Takes an object and convert's it's properties => values to an associative
-     * array of $Array[Property] => Value sets.
+     * array of $array[Property] => Value sets.
      *
-     * @param array $Array An array to be converted to object.
+     * @param array $array An array to be converted to object.
      * @return stdClass
      */
-    public static function arrayAsObject($Array) {
-        if (!is_array($Array)) {
-            return $Array;
+    public static function arrayAsObject($array) {
+        if (!is_array($array)) {
+            return $array;
         }
 
-        $Return = new stdClass();
-        foreach ($Array as $Property => $Value) {
-            $Return->$Property = $Value;
+        $return = new stdClass();
+        foreach ($array as $property => $value) {
+            $return->$property = $value;
         }
-        return $Return;
+        return $return;
     }
 
     /**
      * Formats a string so that it can be saved to a PHP file in double-quotes of an array value assignment.
      *
      * @example from garden/library/core/class.locale.php:
-     *  $FileContents[] = "\$LocaleSources['".$SafeLocaleName."'][] = '".$Format->ArrayValueForPhp($LocaleSources[$i])."';";
+     *  $FileContents[] = "\$LocaleSources['".$SafeLocaleName."'][] = '".$Format->arrayValueForPhp($LocaleSources[$i])."';";
      *
      * @param string The string to be formatted.
      * @return string
      */
-    public static function arrayValueForPhp($String) {
-        return str_replace('\\', '\\', html_entity_decode($String, ENT_QUOTES));
+    public static function arrayValueForPhp($string) {
+        return str_replace('\\', '\\', html_entity_decode($string, ENT_QUOTES));
         // $String = str_replace('\\', '\\', html_entity_decode($String, ENT_QUOTES));
         // return str_replace(array("'", "\n", "\r"), array('\\\'', '\\\n', '\\\r'), $String);
     }
@@ -250,115 +250,116 @@ class Gdn_Format {
     /**
      * Takes a mixed variable, filters unsafe things, renders BBCode and returns it.
      *
-     * @param mixed $Mixed An object, array, or string to be formatted.
+     * @param mixed $mixed An object, array, or string to be formatted.
      * @return string
      */
-    public static function auto($Mixed) {
-        $Formatter = c('Garden.InputFormatter');
-        if (!method_exists('Gdn_Format', $Formatter)) {
-            return $Mixed;
+    public static function auto($mixed) {
+        $formatter = c('Garden.InputFormatter');
+        if (!method_exists('Gdn_Format', $formatter)) {
+            return $mixed;
         }
 
-        return Gdn_Format::$Formatter($Mixed);
+        return Gdn_Format::$formatter($mixed);
     }
 
     /**
      * Format BBCode into HTML.
      *
-     * @param mixed $Mixed An object, array, or string to be formatted.
+     * @param mixed $mixed An object, array, or string to be formatted.
      * @return string Sanitized HTML.
      */
-    public static function bbCode($Mixed) {
-        if (!is_string($Mixed)) {
-            return self::to($Mixed, 'BBCode');
+    public static function bbCode($mixed) {
+        if (!is_string($mixed)) {
+            return self::to($mixed, 'BBCode');
         } else {
             // See if there is a custom BBCode formatter.
-            $BBCodeFormatter = Gdn::factory('BBCodeFormatter');
-            if (is_object($BBCodeFormatter)) {
+            $bBCodeFormatter = Gdn::factory('BBCodeFormatter');
+            if (is_object($bBCodeFormatter)) {
                 // Standard BBCode parsing.
-                $Mixed = $BBCodeFormatter->format($Mixed);
+                $mixed = $bBCodeFormatter->format($mixed);
 
                 // Always filter after basic parsing.
                 // Add htmLawed-compatible specification updates.
                 $options = [
+                    'codeBlockEntities' => false,
                     'spec' => [
                         'span' => [
                             'style' => ['match' => '/^(color:(#[a-f\d]{3}[a-f\d]{3}?|[a-z]+))?;?$/i']
                         ]
                     ]
                 ];
-                $Sanitized = Gdn_Format::htmlFilter($Mixed, $options);
+                $sanitized = Gdn_Format::htmlFilter($mixed, $options);
 
                 // Vanilla magic parsing.
-                $Sanitized = Gdn_Format::processHTML($Sanitized);
+                $sanitized = Gdn_Format::processHTML($sanitized);
 
-                return $Sanitized;
+                return $sanitized;
             }
 
             // Fallback to minimalist BBCode parsing.
             try {
-                $Mixed2 = $Mixed;
+                $mixed2 = $mixed;
                 // Deal with edge cases / pre-processing.
-                $Mixed2 = str_replace("\r\n", "\n", $Mixed2);
-                $Mixed2 = preg_replace_callback(
+                $mixed2 = str_replace("\r\n", "\n", $mixed2);
+                $mixed2 = preg_replace_callback(
                     "#\[noparse\](.*?)\[/noparse\]#si",
                     function($m) {
-                        return str_replace(array('[',']',':', "\n"), array('&#91;','&#93;','&#58;', "<br />"), htmlspecialchars($m[1]));
+                        return str_replace(['[',']',':', "\n"], ['&#91;','&#93;','&#58;', "<br />"], htmlspecialchars($m[1]));
                     },
-                    $Mixed2
+                    $mixed2
                 );
-                $Mixed2 = str_ireplace(array("[php]", "[mysql]", "[css]"), "[code]", $Mixed2);
-                $Mixed2 = str_ireplace(array("[/php]", "[/mysql]", "[/css]"), "[/code]", $Mixed2);
-                $Mixed2 = preg_replace_callback(
+                $mixed2 = str_ireplace(["[php]", "[mysql]", "[css]"], "[code]", $mixed2);
+                $mixed2 = str_ireplace(["[/php]", "[/mysql]", "[/css]"], "[/code]", $mixed2);
+                $mixed2 = preg_replace_callback(
                     "#\\n?\[code\](.*?)\[/code\]\\n?#si",
                     function($m) {
                         $str = htmlspecialchars(trim($m[1], "\n"));
-                        return '<pre>'.str_replace(array('[',']',':', "\n"), array('&#91;','&#93;','&#58;', "<br />"), $str).'</pre>';
+                        return '<pre>'.str_replace(['[',']',':', "\n"], ['&#91;','&#93;','&#58;', "<br />"], $str).'</pre>';
                     },
-                    $Mixed2
+                    $mixed2
                 );
-                $Mixed2 = str_replace("\n", "<br />", $Mixed2);
+                $mixed2 = str_replace("\n", "<br />", $mixed2);
 
                 // Basic BBCode tags.
-                $Mixed2 = preg_replace("#\[b\](.*?)\[/b\]#si", '<b>\\1</b>', $Mixed2);
-                $Mixed2 = preg_replace("#\[i\](.*?)\[/i\]#si", '<i>\\1</i>', $Mixed2);
-                $Mixed2 = preg_replace("#\[u\](.*?)\[/u\]#si", '<u>\\1</u>', $Mixed2);
-                $Mixed2 = preg_replace("#\[s\](.*?)\[/s\]#si", '<s>\\1</s>', $Mixed2);
-                $Mixed2 = preg_replace("#\[strike\](.*?)\[/strike\]#si", '<s>\\1</s>', $Mixed2);
-                $Mixed2 = preg_replace("#\[quote=[\"']?([^\]]+)(;[\d]+)?[\"']?\](.*?)\[/quote\]#si", '<blockquote class="Quote" rel="\\1"><div class="QuoteAuthor">'.sprintf(T('%s said:'), '\\1').'</div><div class="QuoteText">\\3</div></blockquote>', $Mixed2);
-                $Mixed2 = preg_replace("#\[quote\](.*?)\[/quote\]#si", '<blockquote class="Quote"><div class="QuoteText">\\1</div></blockquote>', $Mixed2);
-                $Mixed2 = preg_replace("#\[cite\](.*?)\[/cite\]#si", '<blockquote class="Quote">\\1</blockquote>', $Mixed2);
-                $Mixed2 = preg_replace("#\[hide\](.*?)\[/hide\]#si", '\\1', $Mixed2);
-                $Mixed2 = preg_replace("#\[url\]((https?|ftp):\/\/.*?)\[/url\]#si", '<a rel="nofollow" href="\\1">\\1</a>', $Mixed2);
-                $Mixed2 = preg_replace("#\[url\](.*?)\[/url\]#si", '\\1', $Mixed2);
-                $Mixed2 = preg_replace("#\[url=[\"']?((https?|ftp):\/\/.*?)[\"']?\](.*?)\[/url\]#si", '<a rel="nofollow" href="\\1">\\3</a>', $Mixed2);
-                $Mixed2 = preg_replace("#\[url=[\"']?(.*?)[\"']?\](.*?)\[/url\]#si", '\\2', $Mixed2);
-                $Mixed2 = preg_replace("#\[img\]((https?|ftp):\/\/.*?)\[/img\]#si", '<img src="\\1" border="0" />', $Mixed2);
-                $Mixed2 = preg_replace("#\[img\](.*?)\[/img\]#si", '\\1', $Mixed2);
-                $Mixed2 = preg_replace("#\[img=[\"']?((https?|ftp):\/\/.*?)[\"']?\](.*?)\[/img\]#si", '<img src=\\1" border="0" alt="\\3" />', $Mixed2);
-                $Mixed2 = preg_replace("#\[img=[\"']?(.*?)[\"']?\](.*?)\[/img\]#si", '\\2', $Mixed2);
-                $Mixed2 = preg_replace("#\[thread\]([\d]+)\[/thread\]#si", '<a href="/discussion/\\1">/discussion/\\1</a>', $Mixed2);
-                $Mixed2 = preg_replace("#\[thread=[\"']?([\d]+)[\"']?\](.*?)\[/thread\]#si", '<a href="/discussion/\\1">\\2</a>', $Mixed2);
-                $Mixed2 = preg_replace("#\[post\]([\d]+)\[/post\]#si", '<a href="/discussion/comment/\\1#Comment_\\1">/discussion/comment/\\1</a>', $Mixed2);
-                $Mixed2 = preg_replace("#\[post=[\"']?([\d]+)[\"']?\](.*?)\[/post\]#si", '<a href="/discussion/comment/\\1#Comment_\\1">\\2</a>', $Mixed2);
-                $Mixed2 = preg_replace("#\[size=[\"']?(.*?)[\"']?\]#si", '<font size="\\1">', $Mixed2);
-                $Mixed2 = preg_replace("#\[font=[\"']?(.*?)[\"']?\]#si", '<font face="\\1">', $Mixed2);
-                $Mixed2 = preg_replace("#\[color=[\"']?(.*?)[\"']?\]#si", '<font color="\\1">', $Mixed2);
-                $Mixed2 = str_ireplace(array("[/size]", "[/font]", "[/color]"), "</font>", $Mixed2);
-                $Mixed2 = str_ireplace(array('[indent]', '[/indent]'), array('<div class="Indent">', '</div>'), $Mixed2);
-                $Mixed2 = str_ireplace(array("[left]", "[/left]"), '', $Mixed2);
-                $Mixed2 = preg_replace_callback("#\[list\](.*?)\[/list\]#si", array('Gdn_Format', 'ListCallback'), $Mixed2);
+                $mixed2 = preg_replace("#\[b\](.*?)\[/b\]#si", '<b>\\1</b>', $mixed2);
+                $mixed2 = preg_replace("#\[i\](.*?)\[/i\]#si", '<i>\\1</i>', $mixed2);
+                $mixed2 = preg_replace("#\[u\](.*?)\[/u\]#si", '<u>\\1</u>', $mixed2);
+                $mixed2 = preg_replace("#\[s\](.*?)\[/s\]#si", '<s>\\1</s>', $mixed2);
+                $mixed2 = preg_replace("#\[strike\](.*?)\[/strike\]#si", '<s>\\1</s>', $mixed2);
+                $mixed2 = preg_replace("#\[quote=[\"']?([^\]]+)(;[\d]+)?[\"']?\](.*?)\[/quote\]#si", '<blockquote class="Quote" rel="\\1"><div class="QuoteAuthor">'.sprintf(t('%s said:'), '\\1').'</div><div class="QuoteText">\\3</div></blockquote>', $mixed2);
+                $mixed2 = preg_replace("#\[quote\](.*?)\[/quote\]#si", '<blockquote class="Quote"><div class="QuoteText">\\1</div></blockquote>', $mixed2);
+                $mixed2 = preg_replace("#\[cite\](.*?)\[/cite\]#si", '<blockquote class="Quote">\\1</blockquote>', $mixed2);
+                $mixed2 = preg_replace("#\[hide\](.*?)\[/hide\]#si", '\\1', $mixed2);
+                $mixed2 = preg_replace("#\[url\]((https?|ftp):\/\/.*?)\[/url\]#si", '<a rel="nofollow" href="\\1">\\1</a>', $mixed2);
+                $mixed2 = preg_replace("#\[url\](.*?)\[/url\]#si", '\\1', $mixed2);
+                $mixed2 = preg_replace("#\[url=[\"']?((https?|ftp):\/\/.*?)[\"']?\](.*?)\[/url\]#si", '<a rel="nofollow" href="\\1">\\3</a>', $mixed2);
+                $mixed2 = preg_replace("#\[url=[\"']?(.*?)[\"']?\](.*?)\[/url\]#si", '\\2', $mixed2);
+                $mixed2 = preg_replace("#\[img\]((https?|ftp):\/\/.*?)\[/img\]#si", '<img src="\\1" border="0" />', $mixed2);
+                $mixed2 = preg_replace("#\[img\](.*?)\[/img\]#si", '\\1', $mixed2);
+                $mixed2 = preg_replace("#\[img=[\"']?((https?|ftp):\/\/.*?)[\"']?\](.*?)\[/img\]#si", '<img src=\\1" border="0" alt="\\3" />', $mixed2);
+                $mixed2 = preg_replace("#\[img=[\"']?(.*?)[\"']?\](.*?)\[/img\]#si", '\\2', $mixed2);
+                $mixed2 = preg_replace("#\[thread\]([\d]+)\[/thread\]#si", '<a href="/discussion/\\1">/discussion/\\1</a>', $mixed2);
+                $mixed2 = preg_replace("#\[thread=[\"']?([\d]+)[\"']?\](.*?)\[/thread\]#si", '<a href="/discussion/\\1">\\2</a>', $mixed2);
+                $mixed2 = preg_replace("#\[post\]([\d]+)\[/post\]#si", '<a href="/discussion/comment/\\1#Comment_\\1">/discussion/comment/\\1</a>', $mixed2);
+                $mixed2 = preg_replace("#\[post=[\"']?([\d]+)[\"']?\](.*?)\[/post\]#si", '<a href="/discussion/comment/\\1#Comment_\\1">\\2</a>', $mixed2);
+                $mixed2 = preg_replace("#\[size=[\"']?(.*?)[\"']?\]#si", '<font size="\\1">', $mixed2);
+                $mixed2 = preg_replace("#\[font=[\"']?(.*?)[\"']?\]#si", '<font face="\\1">', $mixed2);
+                $mixed2 = preg_replace("#\[color=[\"']?(.*?)[\"']?\]#si", '<font color="\\1">', $mixed2);
+                $mixed2 = str_ireplace(["[/size]", "[/font]", "[/color]"], "</font>", $mixed2);
+                $mixed2 = str_ireplace(['[indent]', '[/indent]'], ['<div class="Indent">', '</div>'], $mixed2);
+                $mixed2 = str_ireplace(["[left]", "[/left]"], '', $mixed2);
+                $mixed2 = preg_replace_callback("#\[list\](.*?)\[/list\]#si", ['Gdn_Format', 'ListCallback'], $mixed2);
 
                 // Always filter after basic parsing.
-                $Sanitized = Gdn_Format::htmlFilter($Mixed2);
+                $sanitized = Gdn_Format::htmlFilter($mixed2);
 
                 // Vanilla magic parsing.
-                $Sanitized = Gdn_Format::processHTML($Sanitized);
+                $sanitized = Gdn_Format::processHTML($sanitized);
 
-                return $Sanitized;
+                return $sanitized;
 
-            } catch (Exception $Ex) {
-                return self::display($Mixed);
+            } catch (Exception $ex) {
+                return self::display($mixed);
             }
         }
     }
@@ -366,75 +367,75 @@ class Gdn_Format {
     /**
      * Format a number by putting K/M/B suffix after it when appropriate.
      *
-     * @param mixed $Number The number to format. If a number isn't passed then it is returned as is.
+     * @param mixed $number The number to format. If a number isn't passed then it is returned as is.
      * @return string The formatted number.
      * @todo Make this locale aware.
      */
-    public static function bigNumber($Number, $Format = '') {
-        if (!is_numeric($Number)) {
-            return $Number;
+    public static function bigNumber($number, $format = '') {
+        if (!is_numeric($number)) {
+            return $number;
         }
 
-        $Negative = false;
-        $WorkingNumber = $Number;
-        if ($Number < 0) {
-            $Negative = true;
-            $WorkingNumber = $Number - ($Number * 2);
+        $negative = false;
+        $workingNumber = $number;
+        if ($number < 0) {
+            $negative = true;
+            $workingNumber = $number - ($number * 2);
         }
 
-        if ($WorkingNumber >= 1000000000) {
-            $Number2 = $WorkingNumber / 1000000000;
-            $Suffix = "B";
-        } elseif ($WorkingNumber >= 1000000) {
-            $Number2 = $WorkingNumber / 1000000;
-            $Suffix = "M";
-        } elseif ($WorkingNumber >= 1000) {
-            $Number2 = $WorkingNumber / 1000;
-            $Suffix = "K";
+        if ($workingNumber >= 1000000000) {
+            $number2 = $workingNumber / 1000000000;
+            $suffix = "B";
+        } elseif ($workingNumber >= 1000000) {
+            $number2 = $workingNumber / 1000000;
+            $suffix = "M";
+        } elseif ($workingNumber >= 1000) {
+            $number2 = $workingNumber / 1000;
+            $suffix = "K";
         } else {
-            $Number2 = $Number;
+            $number2 = $number;
         }
 
-        if ($Negative) {
-            $Number2 = $Number2 - ($Number2 * 2);
+        if ($negative) {
+            $number2 = $number2 - ($number2 * 2);
         }
 
-        if (isset($Suffix)) {
-            $Result = number_format($Number2, 1);
-            if (substr($Result, -2) == '.0') {
-                $Result = substr($Result, 0, -2);
+        if (isset($suffix)) {
+            $result = number_format($number2, 1);
+            if (substr($result, -2) == '.0') {
+                $result = substr($result, 0, -2);
             }
 
-            $Result .= $Suffix;
+            $result .= $suffix;
         } else {
-            $Result = $Number;
+            $result = $number;
         }
 
-        if ($Format == 'html') {
-            $Result = wrap($Result, 'span', array('title' => number_format($Number)));
+        if ($format == 'html') {
+            $result = wrap($result, 'span', ['title' => number_format($number)]);
         }
 
-        return $Result;
+        return $result;
     }
 
     /**
      * Format a number as if it's a number of bytes by adding the appropriate B/K/M/G/T suffix.
      *
-     * @param int $Bytes The bytes to format.
-     * @param int $Precision The number of decimal places to return.
+     * @param int $bytes The bytes to format.
+     * @param int $precision The number of decimal places to return.
      * @return string The formatted bytes.
      */
-    public static function bytes($Bytes, $Precision = 2) {
-        $Units = array('B', 'K', 'M', 'G', 'T');
-        $Bytes = max($Bytes, 0);
-        $Pow = floor(($Bytes ? log($Bytes) : 0) / log(1024));
-        $Pow = min($Pow, count($Units) - 1);
-        $Bytes /= pow(1024, $Pow);
-        return round($Bytes, $Precision).$Units[$Pow];
+    public static function bytes($bytes, $precision = 2) {
+        $units = ['B', 'K', 'M', 'G', 'T'];
+        $bytes = max($bytes, 0);
+        $pow = floor(($bytes ? log($bytes) : 0) / log(1024));
+        $pow = min($pow, count($units) - 1);
+        $bytes /= pow(1024, $pow);
+        return round($bytes, $precision).$units[$pow];
     }
 
     /** @var array Unicode to ascii conversion table. */
-    protected static $_CleanChars = array(
+    protected static $_CleanChars = [
         '-' => ' ', '_' => ' ', '&lt;' => '', '&gt;' => '', '&#039;' => '', '&amp;' => '',
         '&quot;' => '', 'À' => 'A', 'Á' => 'A', 'Â' => 'A', 'Ã' => 'A', 'Ä' => 'Ae',
         '&Auml;' => 'A', 'Å' => 'A', 'Ā' => 'A', 'Ą' => 'A', 'Ă' => 'A', 'Æ' => 'Ae',
@@ -481,22 +482,22 @@ class Gdn_Format {
 		'у' => 'u', 'ф' => 'f', 'х' => 'h', 'ц' => 'c', 'ч' => 'ch', 'ш' => 'sh',
 		'щ' => 'sch', 'ъ' => '', 'ы' => 'y', 'ь' => '', 'э' => 'e', 'є' => 'ye',
 		'ю' => 'yu', 'я' => 'ya', 'ї' => 'yi'
-    );
+    ];
 
     /**
      * Convert certain unicode characters into their ascii equivalents.
      *
-     * @param mixed $Mixed The text to clean.
+     * @param mixed $mixed The text to clean.
      * @return string
      */
-    public static function clean($Mixed) {
-        if (!is_string($Mixed)) {
-            return self::to($Mixed, 'Clean');
+    public static function clean($mixed) {
+        if (!is_string($mixed)) {
+            return self::to($mixed, 'Clean');
         }
-        $Mixed = strtr($Mixed, self::$_CleanChars);
-        $Mixed = preg_replace('/[^A-Za-z0-9 ]/', '', urldecode($Mixed));
-        $Mixed = preg_replace('/ +/', '-', trim($Mixed));
-        return strtolower($Mixed);
+        $mixed = strtr($mixed, self::$_CleanChars);
+        $mixed = preg_replace('/[^A-Za-z0-9 ]/', '', urldecode($mixed));
+        $mixed = preg_replace('/ +/', '-', trim($mixed));
+        return strtolower($mixed);
     }
 
 
@@ -506,177 +507,177 @@ class Gdn_Format {
      * For instructions on how the format string works:
      * @link http://us.php.net/manual/en/function.strftime.php
      *
-     * @param string $Timestamp A timestamp or string in Mysql DateTime format. ie. YYYY-MM-DD HH:MM:SS
-     * @param string $Format The format string to use. Defaults to the application's default format.
+     * @param string $timestamp A timestamp or string in Mysql DateTime format. ie. YYYY-MM-DD HH:MM:SS
+     * @param string $format The format string to use. Defaults to the application's default format.
      * @return string
      */
-    public static function date($Timestamp = '', $Format = '') {
-        static $GuestHourOffset;
+    public static function date($timestamp = '', $format = '') {
+        static $guestHourOffset;
 
         // Was a mysqldatetime passed?
-        if ($Timestamp !== null && !is_numeric($Timestamp)) {
-            $Timestamp = self::toTimestamp($Timestamp);
+        if ($timestamp !== null && !is_numeric($timestamp)) {
+            $timestamp = self::toTimestamp($timestamp);
         }
 
-        if (function_exists('FormatDateCustom') && (!$Format || strcasecmp($Format, 'html') == 0)) {
-            if (!$Timestamp) {
-                $Timestamp = time();
+        if (function_exists('FormatDateCustom') && (!$format || strcasecmp($format, 'html') == 0)) {
+            if (!$timestamp) {
+                $timestamp = time();
             }
 
-            return formatDateCustom($Timestamp, $Format);
+            return formatDateCustom($timestamp, $format);
         }
 
-        if ($Timestamp === null) {
-            return T('Null Date', '-');
+        if ($timestamp === null) {
+            return t('Null Date', '-');
         }
 
-        if (!$Timestamp) {
-            $Timestamp = time(); // return '&#160;'; Apr 22, 2009 - found a bug where "Draft Saved At X" returned a nbsp here instead of the formatted current time.
-        }        $GmTimestamp = $Timestamp;
+        if (!$timestamp) {
+            $timestamp = time(); // return '&#160;'; Apr 22, 2009 - found a bug where "Draft Saved At X" returned a nbsp here instead of the formatted current time.
+        }        $gmTimestamp = $timestamp;
 
-        $Now = time();
+        $now = time();
 
         // Alter the timestamp based on the user's hour offset
-        $Session = Gdn::session();
-        $HourOffset = 0;
+        $session = Gdn::session();
+        $hourOffset = 0;
 
-        if ($Session->UserID > 0) {
-            $HourOffset = $Session->User->HourOffset;
+        if ($session->UserID > 0) {
+            $hourOffset = $session->User->HourOffset;
         } elseif (class_exists('DateTimeZone')) {
-            if (!isset($GuestHourOffset)) {
-                $GuestTimeZone = c('Garden.GuestTimeZone');
-                if ($GuestTimeZone) {
+            if (!isset($guestHourOffset)) {
+                $guestTimeZone = c('Garden.GuestTimeZone');
+                if ($guestTimeZone) {
                     try {
-                        $TimeZone = new DateTimeZone($GuestTimeZone);
-                        $Offset = $TimeZone->getOffset(new DateTime('now', new DateTimeZone('UTC')));
-                        $GuestHourOffset = floor($Offset / 3600);
-                    } catch (Exception $Ex) {
-                        $GuestHourOffset = 0;
+                        $timeZone = new DateTimeZone($guestTimeZone);
+                        $offset = $timeZone->getOffset(new DateTime('now', new DateTimeZone('UTC')));
+                        $guestHourOffset = floor($offset / 3600);
+                    } catch (Exception $ex) {
+                        $guestHourOffset = 0;
                         // Do nothing, but don't set the timezone.
-                        logException($Ex);
+                        logException($ex);
                     }
                 }
             }
-            $HourOffset = $GuestHourOffset;
+            $hourOffset = $guestHourOffset;
         }
 
-        if ($HourOffset <> 0) {
-            $SecondsOffset = $HourOffset * 3600;
-            $Timestamp += $SecondsOffset;
-            $Now += $SecondsOffset;
+        if ($hourOffset <> 0) {
+            $secondsOffset = $hourOffset * 3600;
+            $timestamp += $secondsOffset;
+            $now += $secondsOffset;
         }
 
-        $Html = false;
-        if (strcasecmp($Format, 'html') == 0) {
-            $Format = '';
-            $Html = true;
+        $html = false;
+        if (strcasecmp($format, 'html') == 0) {
+            $format = '';
+            $html = true;
         }
 
-        if ($Format == '') {
+        if ($format == '') {
             // If the timestamp was during the current day
-            if (date('Y m d', $Timestamp) == date('Y m d', $Now)) {
+            if (date('Y m d', $timestamp) == date('Y m d', $now)) {
                 // Use the time format
-                $Format = t('Date.DefaultTimeFormat', '%l:%M%p');
-            } elseif (date('Y', $Timestamp) == date('Y', $Now)) {
+                $format = t('Date.DefaultTimeFormat', '%l:%M%p');
+            } elseif (date('Y', $timestamp) == date('Y', $now)) {
                 // If the timestamp is the same year, show the month and date
-                $Format = t('Date.DefaultDayFormat', '%B %e');
-            } elseif (date('Y', $Timestamp) != date('Y', $Now)) {
+                $format = t('Date.DefaultDayFormat', '%B %e');
+            } elseif (date('Y', $timestamp) != date('Y', $now)) {
                 // If the timestamp is not the same year, just show the year
-                $Format = t('Date.DefaultYearFormat', '%B %Y');
+                $format = t('Date.DefaultYearFormat', '%B %Y');
             } else {
                 // Otherwise, use the date format
-                $Format = t('Date.DefaultFormat', '%B %e, %Y');
+                $format = t('Date.DefaultFormat', '%B %e, %Y');
             }
         }
 
-        $FullFormat = t('Date.DefaultDateTimeFormat', '%c');
+        $fullFormat = t('Date.DefaultDateTimeFormat', '%c');
 
         // Emulate %l and %e for Windows.
-        if (strpos($Format, '%l') !== false) {
-            $Format = str_replace('%l', ltrim(strftime('%I', $Timestamp), '0'), $Format);
+        if (strpos($format, '%l') !== false) {
+            $format = str_replace('%l', ltrim(strftime('%I', $timestamp), '0'), $format);
         }
-        if (strpos($Format, '%e') !== false) {
-            $Format = str_replace('%e', ltrim(strftime('%d', $Timestamp), '0'), $Format);
+        if (strpos($format, '%e') !== false) {
+            $format = str_replace('%e', ltrim(strftime('%d', $timestamp), '0'), $format);
         }
 
-        $Result = strftime($Format, $Timestamp);
+        $result = strftime($format, $timestamp);
 
-        if ($Html) {
-            $Result = wrap($Result, 'time', array('title' => strftime($FullFormat, $Timestamp), 'datetime' => gmdate('c', $GmTimestamp)));
+        if ($html) {
+            $result = wrap($result, 'time', ['title' => strftime($fullFormat, $timestamp), 'datetime' => gmdate('c', $gmTimestamp)]);
         }
-        return $Result;
+        return $result;
     }
 
     /**
      * Formats a MySql datetime or a unix timestamp for display in the system.
      *
-     * @param int $Timestamp
-     * @param string $Format
+     * @param int $timestamp
+     * @param string $format
      * @since 2.1
      */
-    public static function dateFull($Timestamp, $Format = '') {
-        if ($Timestamp === null) {
+    public static function dateFull($timestamp, $format = '') {
+        if ($timestamp === null) {
             return t('Null Date', '-');
         }
 
         // Was a mysqldatetime passed?
-        if (!is_numeric($Timestamp)) {
-            $Timestamp = self::toTimestamp($Timestamp);
+        if (!is_numeric($timestamp)) {
+            $timestamp = self::toTimestamp($timestamp);
         }
 
-        if (!$Timestamp) {
-            $Timestamp = time(); // return '&#160;'; Apr 22, 2009 - found a bug where "Draft Saved At X" returned a nbsp here instead of the formatted current time.
-        }        $GmTimestamp = $Timestamp;
+        if (!$timestamp) {
+            $timestamp = time(); // return '&#160;'; Apr 22, 2009 - found a bug where "Draft Saved At X" returned a nbsp here instead of the formatted current time.
+        }        $gmTimestamp = $timestamp;
 
-        $Now = time();
+        $now = time();
 
         // Alter the timestamp based on the user's hour offset
-        $Session = Gdn::session();
-        if ($Session->UserID > 0) {
-            $SecondsOffset = ($Session->User->HourOffset * 3600);
-            $Timestamp += $SecondsOffset;
-            $Now += $SecondsOffset;
+        $session = Gdn::session();
+        if ($session->UserID > 0) {
+            $secondsOffset = ($session->User->HourOffset * 3600);
+            $timestamp += $secondsOffset;
+            $now += $secondsOffset;
         }
 
-        $Html = false;
-        if (strcasecmp($Format, 'html') == 0) {
-            $Format = '';
-            $Html = true;
+        $html = false;
+        if (strcasecmp($format, 'html') == 0) {
+            $format = '';
+            $html = true;
         }
 
-        $FullFormat = t('Date.DefaultDateTimeFormat', '%c');
+        $fullFormat = t('Date.DefaultDateTimeFormat', '%c');
 
         // Emulate %l and %e for Windows.
-        if (strpos($FullFormat, '%l') !== false) {
-            $FullFormat = str_replace('%l', ltrim(strftime('%I', $Timestamp), '0'), $FullFormat);
+        if (strpos($fullFormat, '%l') !== false) {
+            $fullFormat = str_replace('%l', ltrim(strftime('%I', $timestamp), '0'), $fullFormat);
         }
-        if (strpos($FullFormat, '%e') !== false) {
-            $FullFormat = str_replace('%e', ltrim(strftime('%d', $Timestamp), '0'), $FullFormat);
+        if (strpos($fullFormat, '%e') !== false) {
+            $fullFormat = str_replace('%e', ltrim(strftime('%d', $timestamp), '0'), $fullFormat);
         }
 
-        $Result = strftime($FullFormat, $Timestamp);
+        $result = strftime($fullFormat, $timestamp);
 
-        if ($Html) {
-            $Result = wrap($Result, 'time', array('title' => strftime($FullFormat, $Timestamp), 'datetime' => gmdate('c', $GmTimestamp)));
+        if ($html) {
+            $result = wrap($result, 'time', ['title' => strftime($fullFormat, $timestamp), 'datetime' => gmdate('c', $gmTimestamp)]);
         }
-        return $Result;
+        return $result;
     }
 
     /**
      * Format a string from of "Deleted" content (comment, message, etc).
      *
-     * @param mixed $Mixed An object, array, or string to be formatted.
+     * @param mixed $mixed An object, array, or string to be formatted.
      * @return string
      */
-    public static function deleted($Mixed) {
-        if (!is_string($Mixed)) {
-            return self::to($Mixed, 'Deleted');
+    public static function deleted($mixed) {
+        if (!is_string($mixed)) {
+            return self::to($mixed, 'Deleted');
         } else {
-            $Formatter = Gdn::factory('HtmlFormatter');
-            if (is_null($Formatter)) {
-                return Gdn_Format::display($Mixed);
+            $formatter = Gdn::factory('HtmlFormatter');
+            if (is_null($formatter)) {
+                return Gdn_Format::display($mixed);
             } else {
-                return $Formatter->format(Wrap($Mixed, 'div', ' class="Deleted"'));
+                return $formatter->format(wrap($mixed, 'div', ' class="Deleted"'));
             }
         }
     }
@@ -698,62 +699,62 @@ class Gdn_Format {
     /**
      * Takes a mixed variable, formats it for display on the screen, and returns it.
      *
-     * @param mixed $Mixed An object, array, or string to be formatted.
+     * @param mixed $mixed An object, array, or string to be formatted.
      * @return string
      */
-    public static function display($Mixed) {
-        if (!is_string($Mixed)) {
-            return self::to($Mixed, 'Display');
+    public static function display($mixed) {
+        if (!is_string($mixed)) {
+            return self::to($mixed, 'Display');
         } else {
-            $Mixed = htmlspecialchars($Mixed, ENT_QUOTES, 'UTF-8');
-            $Mixed = str_replace(array("&quot;", "&amp;"), array('"', '&'), $Mixed);
-            $Mixed = Gdn_Format::processHTML($Mixed);
+            $mixed = htmlspecialchars($mixed, ENT_QUOTES, 'UTF-8');
+            $mixed = str_replace(["&quot;", "&amp;"], ['"', '&'], $mixed);
+            $mixed = Gdn_Format::processHTML($mixed);
 
 
-            return $Mixed;
+            return $mixed;
         }
     }
 
     /**
      * Formats an email address in a non-scrapable format.
      *
-     * @param string $Email
+     * @param string $email
      * @return string
      */
-    public static function email($Email) {
-        $Max = max(3, floor(strlen($Email) / 2));
-        $Chunks = str_split($Email, mt_rand(3, $Max));
-        $Chunks = array_map('htmlentities', $Chunks);
+    public static function email($email) {
+        $max = max(3, floor(strlen($email) / 2));
+        $chunks = str_split($email, mt_rand(3, $max));
+        $chunks = array_map('htmlentities', $chunks);
 
-        $St = mt_rand(0, 1);
-        $End = count($Chunks) - mt_rand(1, 4);
+        $st = mt_rand(0, 1);
+        $end = count($chunks) - mt_rand(1, 4);
 
-        $Result = '';
-        foreach ($Chunks as $i => $Chunk) {
-            if ($i >= $St && $i <= $End) {
-                $Result .= '<span style="display:inline;display:none">'.str_rot13($Chunk).'</span>';
+        $result = '';
+        foreach ($chunks as $i => $chunk) {
+            if ($i >= $st && $i <= $end) {
+                $result .= '<span style="display:inline;display:none">'.str_rot13($chunk).'</span>';
             }
 
-            $Result .= '<span style="display:none;display:inline">'.$Chunk.'</span>';
+            $result .= '<span style="display:none;display:inline">'.$chunk.'</span>';
         }
 
-        return '<span class="Email">'.$Result.'</span>';
+        return '<span class="Email">'.$result.'</span>';
     }
 
     /**
      * Takes a mixed variable, formats it for display in a form, and returns it.
      *
-     * @param mixed $Mixed An object, array, or string to be formatted.
+     * @param mixed $mixed An object, array, or string to be formatted.
      * @return string
      */
-    public static function form($Mixed) {
-        if (!is_string($Mixed)) {
-            return self::to($Mixed, 'Form');
+    public static function form($mixed) {
+        if (!is_string($mixed)) {
+            return self::to($mixed, 'Form');
         } else {
             if (c('Garden.Format.ReplaceNewlines', true)) {
-                return nl2br(htmlspecialchars($Mixed, ENT_QUOTES, 'UTF-8'));
+                return nl2br(htmlspecialchars($mixed, ENT_QUOTES, 'UTF-8'));
             } else {
-                return htmlspecialchars($Mixed, ENT_QUOTES, 'UTF-8');
+                return htmlspecialchars($mixed, ENT_QUOTES, 'UTF-8');
             }
         }
     }
@@ -763,18 +764,18 @@ class Gdn_Format {
      *
      * Credit goes to: http://byteinn.com/res/426/Fuzzy_Time_function/
      *
-     * @param int optional $Timestamp, otherwise time() is used
+     * @param int optional $timestamp, otherwise time() is used
      * @return string
      */
-    public static function fuzzyTime($Timestamp = null, $MorePrecise = false) {
-        if (is_null($Timestamp)) {
-            $Timestamp = time();
-        } elseif (!is_numeric($Timestamp))
-            $Timestamp = self::toTimestamp($Timestamp);
+    public static function fuzzyTime($timestamp = null, $morePrecise = false) {
+        if (is_null($timestamp)) {
+            $timestamp = time();
+        } elseif (!is_numeric($timestamp))
+            $timestamp = self::toTimestamp($timestamp);
 
-        $time = $Timestamp;
+        $time = $timestamp;
 
-        $NOW = time();
+        $nOW = time();
         if (!defined('ONE_MINUTE')) {
             define('ONE_MINUTE', 60);
         }
@@ -794,25 +795,25 @@ class Gdn_Format {
             define('ONE_YEAR', ONE_MONTH * 12);
         }
 
-        $SecondsAgo = $NOW - $time;
+        $secondsAgo = $nOW - $time;
 
         // sod = start of day :)
         $sod = mktime(0, 0, 0, date('m', $time), date('d', $time), date('Y', $time));
-        $sod_now = mktime(0, 0, 0, date('m', $NOW), date('d', $NOW), date('Y', $NOW));
+        $sod_now = mktime(0, 0, 0, date('m', $nOW), date('d', $nOW), date('Y', $nOW));
 
         // Used to convert numbers to strings
-        $convert = array(0 => t('a'), 1 => t('a'), 2 => t('two'), 3 => t('three'), 4 => t('four'), 5 => t('five'), 6 => t('six'), 7 => t('seven'), 8 => t('eight'), 9 => t('nine'), 10 => t('ten'), 11 => t('eleven'));
+        $convert = [0 => t('a'), 1 => t('a'), 2 => t('two'), 3 => t('three'), 4 => t('four'), 5 => t('five'), 6 => t('six'), 7 => t('seven'), 8 => t('eight'), 9 => t('nine'), 10 => t('ten'), 11 => t('eleven')];
 
         // Today
         if ($sod_now == $sod) {
-            if ($time > $NOW - (ONE_MINUTE * 3)) {
+            if ($time > $nOW - (ONE_MINUTE * 3)) {
                 return t('just now');
-            } elseif ($time > $NOW - (ONE_MINUTE * 7)) {
+            } elseif ($time > $nOW - (ONE_MINUTE * 7)) {
                 return t('a few minutes ago');
-            } elseif ($time > $NOW - (ONE_HOUR)) {
-                if ($MorePrecise) {
-                    $MinutesAgo = ceil($SecondsAgo / 60);
-                    return sprintf(t('%s minutes ago'), $MinutesAgo);
+            } elseif ($time > $nOW - (ONE_HOUR)) {
+                if ($morePrecise) {
+                    $minutesAgo = ceil($secondsAgo / 60);
+                    return sprintf(t('%s minutes ago'), $minutesAgo);
                 }
                 return t('less than an hour ago');
             }
@@ -879,108 +880,108 @@ class Gdn_Format {
      *
      * Does "magic" formatting of links, mentions, link embeds, emoji, & linebreaks.
      *
-     * @param mixed $Mixed An object, array, or string to be formatted.
+     * @param mixed $mixed An object, array, or string to be formatted.
      * @return string Sanitized HTML.
      */
-    public static function html($Mixed) {
-        if (!is_string($Mixed)) {
-            return self::to($Mixed, 'Html');
+    public static function html($mixed) {
+        if (!is_string($mixed)) {
+            return self::to($mixed, 'Html');
         } else {
 
             // Always filter - in this case, no basic parsing is needed because we're already in HTML.
-            $Sanitized = Gdn_Format::htmlFilter($Mixed);
+            $sanitized = Gdn_Format::htmlFilter($mixed);
 
             // Fix newlines in code blocks.
             if (c('Garden.Format.ReplaceNewlines', true)) {
-                $Sanitized = preg_replace("/(?!<code[^>]*?>)(\015\012|\012|\015)(?![^<]*?<\/code>)/", "<br />", $Sanitized);
-                $Sanitized = fixNl2Br($Sanitized);
+                $sanitized = preg_replace("/(?!<code[^>]*?>)(\015\012|\012|\015)(?![^<]*?<\/code>)/", "<br />", $sanitized);
+                $sanitized = fixNl2Br($sanitized);
             }
 
             // Vanilla magic parsing.
-            $Sanitized = Gdn_Format::processHTML($Sanitized);
+            $sanitized = Gdn_Format::processHTML($sanitized);
 
-            return $Sanitized;
+            return $sanitized;
         }
     }
 
     /**
      * Takes a mixed variable, filters unsafe HTML and returns it.
      *
-     * Use this instead of Gdn_Format::Html() when you do not want magic formatting.
+     * Use this instead of Gdn_Format::html() when you do not want magic formatting.
      *
-     * @param mixed $Mixed An object, array, or string to be formatted.
+     * @param mixed $mixed An object, array, or string to be formatted.
      * @param array $options An array of filter options. These will also be passed through to the formatter.
      *              - codeBlockEntities: Encode the contents of code blocks? Defaults to true.
      * @return string Sanitized HTML.
      */
-    public static function htmlFilter($Mixed, $options = []) {
-        if (!is_string($Mixed)) {
-            return self::to($Mixed, 'HtmlFilter');
+    public static function htmlFilter($mixed, $options = []) {
+        if (!is_string($mixed)) {
+            return self::to($mixed, 'HtmlFilter');
         } else {
-            if (self::isHtml($Mixed)) {
+            if (self::isHtml($mixed)) {
                 // Purify HTML with our formatter.
-                $Formatter = Gdn::factory('HtmlFormatter');
-                if (is_null($Formatter)) {
+                $formatter = Gdn::factory('HtmlFormatter');
+                if (is_null($formatter)) {
                     // If there is no HtmlFormatter then make sure that script injections won't work.
-                    return self::display($Mixed);
+                    return self::display($mixed);
                 }
 
                 // Allow the code tag to keep all enclosed HTML encoded.
                 $codeBlockEntities = val('codeBlockEntities', $options, true);
                 if ($codeBlockEntities) {
-                    $Mixed = preg_replace_callback('`<code([^>]*)>(.+?)<\/code>`si', function ($Matches) {
-                        $Result = "<code{$Matches[1]}>" .
-                            htmlspecialchars($Matches[2]) .
+                    $mixed = preg_replace_callback('`<code([^>]*)>(.+?)<\/code>`si', function ($matches) {
+                        $result = "<code{$matches[1]}>" .
+                            htmlspecialchars($matches[2]) .
                             '</code>';
-                        return $Result;
-                    }, $Mixed);
+                        return $result;
+                    }, $mixed);
                 }
 
                 // Do HTML filtering before our special changes.
-                $Result = $Formatter->format($Mixed, $options);
+                $result = $formatter->format($mixed, $options);
             } else {
                 // The text does not contain HTML and does not have to be purified.
                 // This is an optimization because purifying is very slow and memory intense.
-                $Result = htmlspecialchars($Mixed, ENT_NOQUOTES, 'UTF-8');
+                $result = htmlspecialchars($mixed, ENT_NOQUOTES, 'UTF-8');
             }
 
-            return $Result;
+            return $result;
         }
     }
 
     /**
      * Format an encoded string of image properties as HTML.
      *
-     * @param string $Body a encoded array of image properties (Image, Thumbnail, Caption)
+     * @param string $body a encoded array of image properties (Image, Thumbnail, Caption)
      * @return string HTML
      */
-    public static function image($Body) {
-        if (is_string($Body)) {
-            $Image = dbdecode($Body);
+    public static function image($body) {
+        if (is_string($body)) {
+            $image = dbdecode($body);
 
-            if (!$Image) {
-                return Gdn_Format::html($Body);
+            if (!$image) {
+                return Gdn_Format::html($body);
             }
         }
 
-        $Url = val('Image', $Image);
-        $Caption = Gdn_Format::plainText(val('Caption', $Image));
+        $url = val('Image', $image);
+        $caption = Gdn_Format::plainText(val('Caption', $image));
         return '<div class="ImageWrap">'
             .'<div class="Image">'
-            .img($Url, array('alt' => $Caption, 'title' => $Caption))
+            .img($url, ['alt' => $caption, 'title' => $caption])
             .'</div>'
-            .'<div class="Caption">'.$Caption.'</div>'
+            .'<div class="Caption">'.$caption.'</div>'
             .'</div>';
     }
 
     /**
      * Detect HTML for the purposes of doing advanced filtering.
      *
-     * @param $Text
+     * @param $text
      * @return bool
      */
-    protected static function isHtml($Text) {
-        return strpos($Text, '<') !== false || (bool)preg_match('/&#?[a-z0-9]{1,10};/i', $Text);
+    protected static function isHtml($text) {
+        return strpos($text, '<') !== false || (bool)preg_match('/&#?[a-z0-9]{1,10};/i', $text);
     }
 
     /**
@@ -1055,63 +1056,63 @@ class Gdn_Format {
     /**
      * Format a string as plain text.
      *
-     * @param string $Body The text to format.
-     * @param string $Format The current format of the text.
+     * @param string $body The text to format.
+     * @param string $format The current format of the text.
      * @param bool $collapse Treat a group of closing block tags as one when replacing with newlines.
      * @return string Sanitized HTML.
      * @since 2.1
      */
-    public static function plainText($Body, $Format = 'Html', $collapse = false) {
-        $Result = Gdn_Format::to($Body, $Format);
-        $Result = Gdn_Format::replaceSpoilers($Result);
+    public static function plainText($body, $format = 'Html', $collapse = false) {
+        $result = Gdn_Format::to($body, $format);
+        $result = Gdn_Format::replaceSpoilers($result);
 
-        if ($Format != 'Text') {
+        if ($format != 'Text') {
             // Remove returns and then replace html return tags with returns.
-            $Result = str_replace(array("\n", "\r"), ' ', $Result);
-            $Result = preg_replace('`<br\s*/?>`', "\n", $Result);
+            $result = str_replace(["\n", "\r"], ' ', $result);
+            $result = preg_replace('`<br\s*/?>`', "\n", $result);
 
             // Fix lists.
-            $Result = Gdn_Format::replaceListItems($Result);
+            $result = Gdn_Format::replaceListItems($result);
 
-            $AllBlocks = '(?:div|table|dl|pre|blockquote|address|p|h[1-6]|section|article|aside|hgroup|header|footer|nav|figure|figcaption|details|menu|summary)';
-            $pattern = "</{$AllBlocks}>";
+            $allBlocks = '(?:div|table|dl|pre|blockquote|address|p|h[1-6]|section|article|aside|hgroup|header|footer|nav|figure|figcaption|details|menu|summary)';
+            $pattern = "</{$allBlocks}>";
             if ($collapse) {
                 $pattern = "((\s+)?{$pattern})+";
             }
-            $Result = preg_replace("`{$pattern}`", "\n\n", $Result);
+            $result = preg_replace("`{$pattern}`", "\n\n", $result);
 
             // TODO: Fix hard returns within pre blocks.
 
-            $Result = strip_tags($Result);
+            $result = strip_tags($result);
         }
 
-        $Result = trim(html_entity_decode($Result, ENT_QUOTES, 'UTF-8'));
+        $result = trim(html_entity_decode($result, ENT_QUOTES, 'UTF-8'));
 
         // Always filter after basic parsing.
-        $Sanitized = Gdn_Format::htmlFilter($Result);
+        $sanitized = Gdn_Format::htmlFilter($result);
 
         // No magic `processHTML()` for plain text.
 
-        return $Sanitized;
+        return $sanitized;
     }
 
     /**
      * Format some text in a way suitable for passing into an rss/atom feed.
      *
      * @since 2.1
-     * @param string $Text The text to format.
-     * @param string $Format The current format of the text.
+     * @param string $text The text to format.
+     * @param string $format The current format of the text.
      * @return string
      */
-    public static function rssHtml($Text, $Format = 'Html') {
-        if (!in_array($Text, array('Html', 'Raw'))) {
-            $Text = Gdn_Format::to($Text, $Format);
+    public static function rssHtml($text, $format = 'Html') {
+        if (!in_array($text, ['Html', 'Raw'])) {
+            $text = Gdn_Format::to($text, $format);
         }
 
         if (function_exists('FormatRssHtmlCustom')) {
-            return FormatRssHtmlCustom($Text);
+            return formatRssHtmlCustom($text);
         } else {
-            return Gdn_Format::html($Text);
+            return Gdn_Format::html($text);
         }
     }
 
@@ -1196,15 +1197,100 @@ class Gdn_Format {
             return self::to($mixed, 'Links');
         }
 
+        $linksCallback = function($matches) {
+            static $inTag = 0;
+            static $inAnchor = false;
+
+            $inOut = $matches[1];
+            $tag = strtolower($matches[2]);
+
+            if ($inOut == '<') {
+                $inTag++;
+                if ($tag == 'a') {
+                    $inAnchor = true;
+                }
+            } elseif ($inOut == '</') {
+                $inTag++;
+                if ($tag == 'a') {
+                    $inAnchor = false;
+                }
+            } elseif ($matches[3]) {
+                $inTag--;
+            }
+
+            if (c('Garden.Format.WarnLeaving', false) && isset($matches[4]) && $inAnchor) {
+                // This is a the href url value in an anchor tag.
+                $url = $matches[4];
+                $domain = parse_url($url, PHP_URL_HOST);
+                if (!isTrustedDomain($domain)) {
+                    return url('/home/leaving?target='.urlencode($url)).'" class="Popup';
+                }
+            }
+
+            if (!isset($matches[4]) || $inTag || $inAnchor) {
+                return $matches[0];
+            }
+            // We are not in a tag and what we matched starts with //
+            if (preg_match('#^//#', $matches[4])) {
+                return $matches[0];
+            }
+
+            $url = $matches[4];
+
+            $embeddedResult = self::embedReplacement($url);
+            if ($embeddedResult !== '') {
+                return $embeddedResult;
+            }
+
+            // Unformatted links
+            if (!self::$FormatLinks) {
+                return $url;
+            }
+
+            // Strip punctuation off of the end of the url.
+            $punc = '';
+
+            // Special case where &nbsp; is right after an url and is not part of it!
+            // This can happen in WYSIWYG format if the url is the last text of the body.
+            while (stringEndsWith($url, '&nbsp;')) {
+                $url = substr($url, 0, -6);
+                $punc .= '&nbsp;';
+            }
+
+            if (preg_match('`^(.+)([.?,;:])$`', $url, $matches)) {
+                $url = $matches[1];
+                $punc = $matches[2].$punc;
+            }
+
+            // Get human-readable text from url.
+            $text = $url;
+            if (strpos($text, '%') !== false) {
+                $text = rawurldecode($text);
+                $text = htmlspecialchars($text, ENT_QUOTES, 'UTF-8');
+            }
+
+            $nofollow = (self::$DisplayNoFollow) ? ' rel="nofollow"' : '';
+
+            if (c('Garden.Format.WarnLeaving', false)) {
+                // This is a plaintext url we're converting into an anchor.
+                $domain = parse_url($url, PHP_URL_HOST);
+                if (!isTrustedDomain($domain)) {
+                    return '<a href="'.url('/home/leaving?target='.urlencode($url)).'" class="Popup">'.$text.'</a>'.$punc;
+                }
+            }
+
+            return '<a href="'.$url.'"'.$nofollow.'>'.$text.'</a>'.$punc;
+        };
+
         if (unicodeRegexSupport()) {
-            $regex = "`(?:(</?)([!a-z]+))|(/?\s*>)|((?:https?|ftp)://[@\p{L}\p{N}\x21\x23-\x27\x2a-\x2e\x3a\x3b\/\x3f-\x7a\x7e\x3d]+)`iu";
+            $regex = "`(?:(</?)([!a-z]+))|(/?\s*>)|((?:(?:https?|ftp):)?//[@\p{L}\p{N}\x21\x23-\x27\x2a-\x2e\x3a\x3b\/\x3f-\x7a\x7e\x3d]+)`iu";
         } else {
-            $regex = "`(?:(</?)([!a-z]+))|(/?\s*>)|((?:https?|ftp)://[@a-z0-9\x21\x23-\x27\x2a-\x2e\x3a\x3b\/\x3f-\x7a\x7e\x3d]+)`i";
+            $regex = "`(?:(</?)([!a-z]+))|(/?\s*>)|((?:(?:https?|ftp):)?//[@a-z0-9\x21\x23-\x27\x2a-\x2e\x3a\x3b\/\x3f-\x7a\x7e\x3d]+)`i";
         }
 
         $mixed = Gdn_Format::replaceButProtectCodeBlocks(
             $regex,
-            ['Gdn_Format', 'linksCallback'],
+            $linksCallback,
             $mixed,
             true
         );
@@ -1223,27 +1309,27 @@ class Gdn_Format {
      * This is not an HTML filter; it enables old YouTube videos to theoretically work,
      * it doesn't effectively block YouTube iframes or objects.
      *
-     * @param mixed $Mixed
+     * @param mixed $mixed
      * @return HTML string
      */
-    public static function unembedContent($Mixed) {
-        if (!is_string($Mixed)) {
-            return self::to($Mixed, 'UnembedContent');
+    public static function unembedContent($mixed) {
+        if (!is_string($mixed)) {
+            return self::to($mixed, 'UnembedContent');
         } else {
             if (c('Garden.Format.YouTube')) {
-                $Mixed = preg_replace('`<iframe.*src="https?://.*youtube\.com/embed/([a-z0-9_-]*)".*</iframe>`i', "\nhttps://www.youtube.com/watch?v=$1\n", $Mixed);
-                $Mixed = preg_replace('`<object.*value="https?://.*youtube\.com/v/([a-z0-9_-]*)[^"]*".*</object>`i', "\nhttps://www.youtube.com/watch?v=$1\n", $Mixed);
+                $mixed = preg_replace('`<iframe.*src="https?://.*youtube\.com/embed/([a-z0-9_-]*)".*</iframe>`i', "\nhttps://www.youtube.com/watch?v=$1\n", $mixed);
+                $mixed = preg_replace('`<object.*value="https?://.*youtube\.com/v/([a-z0-9_-]*)[^"]*".*</object>`i', "\nhttps://www.youtube.com/watch?v=$1\n", $mixed);
             }
             if (c('Garden.Format.Vimeo')) {
-                $Mixed = preg_replace('`<iframe.*src="((https?)://.*vimeo\.com/video/([0-9]*))".*</iframe>`i', "\n$2://vimeo.com/$3\n", $Mixed);
-                $Mixed = preg_replace('`<object.*value="((https?)://.*vimeo\.com.*clip_id=([0-9]*)[^"]*)".*</object>`i', "\n$2://vimeo.com/$3\n", $Mixed);
+                $mixed = preg_replace('`<iframe.*src="((https?)://.*vimeo\.com/video/([0-9]*))".*</iframe>`i', "\n$2://vimeo.com/$3\n", $mixed);
+                $mixed = preg_replace('`<object.*value="((https?)://.*vimeo\.com.*clip_id=([0-9]*)[^"]*)".*</object>`i', "\n$2://vimeo.com/$3\n", $mixed);
             }
             if (c('Garden.Format.Getty', true)) {
-                $Mixed = preg_replace('`<iframe.*src="(https?:)?//embed\.gettyimages\.com/embed/([\w=?&+-]*)" width="([\d]*)" height="([\d]*)".*</iframe>`i', "\nhttp://embed.gettyimages.com/$2/$3/$4\n", $Mixed);
+                $mixed = preg_replace('`<iframe.*src="(https?:)?//embed\.gettyimages\.com/embed/([\w=?&+-]*)" width="([\d]*)" height="([\d]*)".*</iframe>`i', "\nhttp://embed.gettyimages.com/$2/$3/$4\n", $mixed);
             }
         }
 
-        return $Mixed;
+        return $mixed;
     }
 
     /**
@@ -1393,13 +1479,13 @@ EOT;
             case 'Vimeo':
                 $id = $matches[1];
                 return <<<EOT
-<iframe src="//player.vimeo.com/video/{$id}" width="{$width}" height="{$height}" frameborder="0" webkitallowfullscreen mozallowfullscreen allowfullscreen></iframe>
+<iframe src="https://player.vimeo.com/video/{$id}" width="{$width}" height="{$height}" frameborder="0" webkitallowfullscreen mozallowfullscreen allowfullscreen></iframe>
 EOT;
                 break;
 
             case 'Gifv':
                 $id = $matches[1];
-                $modernBrowser = T('Your browser does not support HTML5 video!');
+                $modernBrowser = t('Your browser does not support HTML5 video!');
                 return <<<EOT
 <div class="imgur-gifv VideoWrap">
 <video poster="https://i.imgur.com/{$id}h.jpg" preload="auto" autoplay="autoplay" muted="muted" loop="loop">
@@ -1420,7 +1506,7 @@ EOT;
             case 'Vine':
                 return <<<EOT
 <div class="vine-video VideoWrap">
-   <iframe class="vine-embed" src="//vine.co/v/{$matches[1]}/embed/simple" width="320" height="320" frameborder="0"></iframe><script async src="//platform.vine.co/static/scripts/embed.js" charset="utf-8"></script>
+   <iframe class="vine-embed" src="https://vine.co/v/{$matches[1]}/embed/simple" width="320" height="320" frameborder="0"></iframe><script async src="https://platform.vine.co/static/scripts/embed.js" charset="utf-8"></script>
 </div>
 EOT;
                 break;
@@ -1428,32 +1514,32 @@ EOT;
             case 'Instagram':
                 return <<<EOT
 <div class="instagram-video VideoWrap">
-   <iframe src="//instagram.com/p/{$matches[1]}/embed/" width="412" height="510" frameborder="0" scrolling="no" allowtransparency="true"></iframe>
+   <iframe src="https://instagram.com/p/{$matches[1]}/embed/" width="412" height="510" frameborder="0" scrolling="no" allowtransparency="true"></iframe>
 </div>
 EOT;
                 break;
 
             case 'Pinterest':
                 return <<<EOT
-<a data-pin-do="embedPin" href="//pinterest.com/pin/{$matches[1]}/" class="pintrest-pin" rel="nofollow"></a>
+<a data-pin-do="embedPin" href="https://pinterest.com/pin/{$matches[1]}/" class="pintrest-pin" rel="nofollow"></a>
 EOT;
                 break;
 
             case 'Getty':
                 return <<<EOT
-<iframe src="//embed.gettyimages.com/embed/{$matches[1]}" width="{$matches[2]}" height="{$matches[3]}" frameborder="0" scrolling="no"></iframe>
+<iframe src="https://embed.gettyimages.com/embed/{$matches[1]}" width="{$matches[2]}" height="{$matches[3]}" frameborder="0" scrolling="no"></iframe>
 EOT;
                 break;
 
             case 'Twitch':
                 return <<<EOT
-<iframe src="http://player.twitch.tv/?channel={$matches[1]}&autoplay=false" height="360" width="640" frameborder="0" scrolling="no" autoplay="false" allowfullscreen="true"></iframe>
+<iframe src="https://player.twitch.tv/?channel={$matches[1]}&autoplay=false" height="360" width="640" frameborder="0" scrolling="no" autoplay="false" allowfullscreen="true"></iframe>
 EOT;
                 break;
 
             case 'Hitbox':
                 return <<<EOT
-<iframe src="http://hitbox.tv/#!/embed/{$matches[1]}" height="360" width="640" frameborder="0" scrolling="no" allowfullscreen></iframe>
+<iframe src="https://hitbox.tv/#!/embed/{$matches[1]}" height="360" width="640" frameborder="0" scrolling="no" allowfullscreen></iframe>
 EOT;
                 break;
 
@@ -1474,7 +1560,7 @@ EOT;
                 }
 
                 return <<<EOT
-<script charset="ISO-8859-1" src="//fast.wistia.com/assets/external/E-v1.js" async></script><div class="wistia_responsive_padding" style="padding:56.25% 0 0 0;position:relative;"><div class="wistia_responsive_wrapper" style="height:100%;left:0;position:absolute;top:0;width:100%;"><div class="{$wistiaClass}" style="height:100%;width:100%">&nbsp;</div></div></div>
+<script charset="ISO-8859-1" src="https://fast.wistia.com/assets/external/E-v1.js" async></script><div class="wistia_responsive_padding" style="padding:56.25% 0 0 0;position:relative;"><div class="wistia_responsive_wrapper" style="height:100%;left:0;position:absolute;top:0;width:100%;"><div class="{$wistiaClass}" style="height:100%;width:100%">&nbsp;</div></div></div>
 EOT;
         }
 
@@ -1484,10 +1570,12 @@ EOT;
     /**
      * Replaces text or anchor urls with either their embed code, or sanitized and wrapped in an anchor.
      *
+     * @deprecated
      * @param $matches
-     * @return string The anchor or embed code for the url.
+     * @return string|void The anchor or embed code for the url.
      */
     public static function linksCallback($matches) {
+        deprecated('Gdn_Format::linksCallback');
         static $inTag = 0;
         static $inAnchor = false;
 
@@ -1587,19 +1675,19 @@ EOT;
     /**
      * Formats BBCode list items.
      *
-     * @param array $Matches
+     * @param array $matches
      * @return string
      */
-    protected static function listCallback($Matches) {
-        $Content = explode("[*]", $Matches[1]);
-        $Result = '';
-        foreach ($Content as $Item) {
-            if (trim($Item) != '') {
-                $Result .= '<li>'.$Item.'</li>';
+    protected static function listCallback($matches) {
+        $content = explode("[*]", $matches[1]);
+        $result = '';
+        foreach ($content as $item) {
+            if (trim($item) != '') {
+                $result .= '<li>'.$item.'</li>';
             }
         }
-        $Result = '<ul>'.$Result.'</ul>';
-        return $Result;
+        $result = '<ul>'.$result.'</ul>';
+        return $result;
     }
 
     /**
@@ -1608,47 +1696,47 @@ EOT;
      * @return array array(Width, Height)
      */
     public static function getEmbedSize() {
-        $Sizes = array(
-            'tiny' => array(400, 225),
-            'small' => array(560, 340),
-            'normal' => array(640, 385),
-            'big' => array(853, 505),
-            'huge' => array(1280, 745));
-        $Size = Gdn::config('Garden.Format.EmbedSize', 'normal');
+        $sizes = [
+            'tiny' => [400, 225],
+            'small' => [560, 340],
+            'normal' => [640, 385],
+            'big' => [853, 505],
+            'huge' => [1280, 745]];
+        $size = Gdn::config('Garden.Format.EmbedSize', 'normal');
 
         // We allow custom sizes <Width>x<Height>
-        if (!isset($Sizes[$Size])) {
-            if (strpos($Size, 'x')) {
-                list($Width, $Height) = explode('x', $Size);
-                $Width = intval($Width);
-                $Height = intval($Height);
+        if (!isset($sizes[$size])) {
+            if (strpos($size, 'x')) {
+                list($width, $height) = explode('x', $size);
+                $width = intval($width);
+                $height = intval($height);
 
                 // Dimensions are too small, or 0
-                if ($Width < 30 or $Height < 30) {
-                    $Size = 'normal';
+                if ($width < 30 or $height < 30) {
+                    $size = 'normal';
                 }
             } else {
-                $Size = 'normal';
+                $size = 'normal';
             }
         }
-        if (isset($Sizes[$Size])) {
-            list($Width, $Height) = $Sizes[$Size];
+        if (isset($sizes[$size])) {
+            list($width, $height) = $sizes[$size];
         }
-        return array($Width, $Height);
+        return [$width, $height];
     }
 
     /**
      * Format a string using Markdown syntax.
      *
-     * @param mixed $Mixed An object, array, or string to be formatted.
-     * @param boolean $Flavored Optional. Parse with Vanilla-flavored settings? Default true.
+     * @param mixed $mixed An object, array, or string to be formatted.
+     * @param boolean $flavored Optional. Parse with Vanilla-flavored settings? Default true.
      * @return string Sanitized HTML.
      */
-    public static function markdown($Mixed, $Flavored = true) {
-        if (!is_string($Mixed)) {
-            return self::to($Mixed, 'Markdown');
+    public static function markdown($mixed, $flavored = true) {
+        if (!is_string($mixed)) {
+            return self::to($mixed, 'Markdown');
         } else {
-            $Markdown = new MarkdownVanilla();
+            $markdown = new MarkdownVanilla();
 
             /**
              * By default, code blocks have their contents run through htmlspecialchars. Gdn_Format::htmlFilter
@@ -1656,24 +1744,24 @@ EOT;
              * contents. The block will still be passed through htmlspecialchars, further down in Gdn_Format::htmlFilter.
              */
             $codeCallback = function($block) { return $block; };
-            $Markdown->code_block_content_func = $codeCallback;
-            $Markdown->code_span_content_func = $codeCallback;
+            $markdown->code_block_content_func = $codeCallback;
+            $markdown->code_span_content_func = $codeCallback;
 
             // Vanilla-flavored Markdown.
-            if ($Flavored) {
-                $Markdown->addAllFlavor();
+            if ($flavored) {
+                $markdown->addAllFlavor();
             }
 
             // Markdown parsing.
-            $Mixed = $Markdown->transform($Mixed);
+            $mixed = $markdown->transform($mixed);
 
             // Always filter after basic parsing.
-            $Sanitized = Gdn_Format::htmlFilter($Mixed);
+            $sanitized = Gdn_Format::htmlFilter($mixed);
 
             // Vanilla magic parsing.
-            $Sanitized = Gdn_Format::processHTML($Sanitized);
+            $sanitized = Gdn_Format::processHTML($sanitized);
 
-            return $Sanitized;
+            return $sanitized;
         }
     }
 
@@ -1783,7 +1871,7 @@ EOT;
             }
 
             if ($mention) {
-                $parts[$i] = anchor('@'.$mention, str_replace('{name}', rawurlencode($mention), self::$MentionsUrlFormat)).$suffix;
+                $parts[$i] = anchor('@'.$mention, url(str_replace('{name}', rawurlencode($mention), self::$MentionsUrlFormat), true)).$suffix;
             } else {
                 $parts[$i] = '@' . $parts[$i];
             }
@@ -1795,54 +1883,54 @@ EOT;
     /**
      * Handle mentions formatting.
      *
-     * @param $Mixed
+     * @param $mixed
      * @return mixed|string
      */
-    public static function mentions($Mixed) {
-        if (!is_string($Mixed)) {
-            return self::to($Mixed, 'Mentions');
+    public static function mentions($mixed) {
+        if (!is_string($mixed)) {
+            return self::to($mixed, 'Mentions');
         } else {
             // Check for a custom formatter.
-            $Formatter = Gdn::factory('MentionsFormatter');
-            if (is_object($Formatter)) {
-                return $Formatter->formatMentions($Mixed);
+            $formatter = Gdn::factory('MentionsFormatter');
+            if (is_object($formatter)) {
+                return $formatter->formatMentions($mixed);
             }
 
             // Handle @mentions.
             if (c('Garden.Format.Mentions')) {
                 // Only format mentions that are not already in anchor tags or code tags.
-                $Mixed = self::tagContent($Mixed, 'Gdn_Format::formatMentionsCallback');
+                $mixed = self::tagContent($mixed, 'Gdn_Format::formatMentionsCallback');
             }
 
             // Handle #hashtag searches
             if (c('Garden.Format.Hashtags')) {
-                $Mixed = Gdn_Format::replaceButProtectCodeBlocks(
+                $mixed = Gdn_Format::replaceButProtectCodeBlocks(
                     '/(^|[\s,\.>])\#([\w\-]+)(?=[\s,\.!?<]|$)/i',
-                    '\1'.anchor('#\2', '/search?Search=%23\2&Mode=like').'\3',
-                    $Mixed
+                    '\1'.anchor('#\2', url('/search?Search=%23\2&Mode=like', true)).'\3',
+                    $mixed
                 );
             }
 
             // Handle "/me does x" action statements
             if (c('Garden.Format.MeActions')) {
-                $Mixed = Gdn_Format::replaceButProtectCodeBlocks(
+                $mixed = Gdn_Format::replaceButProtectCodeBlocks(
                     '/(^|[\n])(\/me)(\s[^(\n)]+)/i',
-                    '\1'.wrap(wrap('\2', 'span', array('class' => 'MeActionName')).'\3', 'span', array('class' => 'AuthorAction')),
-                    $Mixed
+                    '\1'.wrap(wrap('\2', 'span', ['class' => 'MeActionName']).'\3', 'span', ['class' => 'AuthorAction']),
+                    $mixed
                 );
             }
 
-            return $Mixed;
+            return $mixed;
         }
     }
 
    /**
     * Reduces multiple whitespaces including line breaks and tabs to one single space character.
     *
-    * @param string $String The string which should be optimized
+    * @param string $string The string which should be optimized
     */
-    public static function reduceWhiteSpaces($String) {
-        return trim(preg_replace('/\s+/', ' ', $String));
+    public static function reduceWhiteSpaces($string) {
+        return trim(preg_replace('/\s+/', ' ', $string));
     }
 
     /**
@@ -1851,44 +1939,44 @@ EOT;
      * The three parameters are identical to the ones you'd pass
      * preg_replace.
      *
-     * @param mixed $Search The value being searched for, just like in
+     * @param mixed $search The value being searched for, just like in
      *              preg_replace or preg_replace_callback.
-     * @param mixed $Replace The replacement value, just like in
+     * @param mixed $replace The replacement value, just like in
      *              preg_replace or preg_replace_callback.
-     * @param mixed $Subject The string being searched.
-     * @param bool $IsCallback If true, do preg_replace_callback. Do
+     * @param mixed $subject The string being searched.
+     * @param bool $isCallback If true, do preg_replace_callback. Do
      *             preg_replace otherwise.
      * @return string
      */
-    public static function replaceButProtectCodeBlocks($Search, $Replace, $Subject, $IsCallback = false) {
+    public static function replaceButProtectCodeBlocks($search, $replace, $subject, $isCallback = false) {
         // Take the code blocks out, replace with a hash of the string, and
         // keep track of what substring got replaced with what hash.
-        $CodeBlockContents = array();
-        $CodeBlockHashes = array();
-        $Subject = preg_replace_callback(
+        $codeBlockContents = [];
+        $codeBlockHashes = [];
+        $subject = preg_replace_callback(
             '/<code.*?>.*?<\/code>/is',
-            function ($Matches) use (&$CodeBlockContents, &$CodeBlockHashes) {
+            function ($matches) use (&$codeBlockContents, &$codeBlockHashes) {
                 // Surrounded by whitespace to try to prevent the characters
                 // from being picked up by $Pattern.
-                $ReplacementString = ' '.sha1($Matches[0]).' ';
-                $CodeBlockContents[] = $Matches[0];
-                $CodeBlockHashes[] = $ReplacementString;
-                return $ReplacementString;
+                $replacementString = ' '.sha1($matches[0]).' ';
+                $codeBlockContents[] = $matches[0];
+                $codeBlockHashes[] = $replacementString;
+                return $replacementString;
             },
-            $Subject
+            $subject
         );
 
         // Do the requested replacement.
-        if ($IsCallback) {
-            $Subject = preg_replace_callback($Search, $Replace, $Subject);
+        if ($isCallback) {
+            $subject = preg_replace_callback($search, $replace, $subject);
         } else {
-            $Subject = preg_replace($Search, $Replace, $Subject);
+            $subject = preg_replace($search, $replace, $subject);
         }
 
         // Put back the code blocks.
-        $Subject = str_replace($CodeBlockHashes, $CodeBlockContents, $Subject);
+        $subject = str_replace($codeBlockHashes, $codeBlockContents, $subject);
 
-        return $Subject;
+        return $subject;
     }
 
     /**
@@ -1897,16 +1985,16 @@ EOT;
      * This format should only be used when administrators have access.
      *
      * @deprecated 9 Nov 2016
-     * @param string|object|array $Mixed The data to format.
+     * @param string|object|array $mixed The data to format.
      * @return string
      */
-    public static function raw($Mixed) {
+    public static function raw($mixed) {
         deprecated('raw', 'wysiwyg');
-        if (!is_string($Mixed)) {
-            return self::to($Mixed, 'Raw');
+        if (!is_string($mixed)) {
+            return self::to($mixed, 'Raw');
         } else {
             // Deprecate raw formatting. It's too dangeous.
-            return self::wysiwyg($Mixed);
+            return self::wysiwyg($mixed);
         }
     }
 
@@ -1914,73 +2002,73 @@ EOT;
      * Takes an object and converts its properties => values to an associative
      * array of $Array[Property] => Value sets.
      *
-     * @param object $Object The object to be converted to an array.
+     * @param object $object The object to be converted to an array.
      * @return unknown
-     * @todo could be just "return (array) $Object;"?
+     * @todo could be just "return (array) $object;"?
      */
-    public static function objectAsArray($Object) {
-        if (!is_object($Object)) {
-            return $Object;
+    public static function objectAsArray($object) {
+        if (!is_object($object)) {
+            return $object;
         }
 
-        $Return = array();
-        foreach (get_object_vars($Object) as $Property => $Value) {
-            $Return[$Property] = $Value;
+        $return = [];
+        foreach (get_object_vars($object) as $property => $value) {
+            $return[$property] = $value;
         }
-        return $Return;
+        return $return;
     }
 
     /**
      * Formats seconds in a human-readable way (ie. 45 seconds, 15 minutes, 2 hours, 4 days, 2 months, etc).
      *
-     * @param int $Seconds
+     * @param int $seconds
      * @return string
      */
-    public static function seconds($Seconds) {
-        if (!is_numeric($Seconds)) {
-            $Seconds = abs(time() - self::toTimestamp($Seconds));
+    public static function seconds($seconds) {
+        if (!is_numeric($seconds)) {
+            $seconds = abs(time() - self::toTimestamp($seconds));
         }
 
-        $Minutes = round($Seconds / 60);
-        $Hours = round($Seconds / 3600);
-        $Days = round($Seconds / 86400);
-        $Weeks = round($Seconds / 604800);
-        $Months = round($Seconds / 2629743.83);
-        $Years = round($Seconds / 31556926);
+        $minutes = round($seconds / 60);
+        $hours = round($seconds / 3600);
+        $days = round($seconds / 86400);
+        $weeks = round($seconds / 604800);
+        $months = round($seconds / 2629743.83);
+        $years = round($seconds / 31556926);
 
-        if ($Seconds < 60) {
-            return sprintf(Plural($Seconds, '%s second', '%s seconds'), $Seconds);
-        } elseif ($Minutes < 60)
-            return sprintf(Plural($Minutes, '%s minute', '%s minutes'), $Minutes);
-        elseif ($Hours < 24)
-            return sprintf(Plural($Hours, '%s hour', '%s hours'), $Hours);
-        elseif ($Days < 7)
-            return sprintf(Plural($Days, '%s day', '%s days'), $Days);
-        elseif ($Weeks < 4)
-            return sprintf(Plural($Weeks, '%s week', '%s weeks'), $Weeks);
-        elseif ($Months < 12)
-            return sprintf(Plural($Months, '%s month', '%s months'), $Months);
+        if ($seconds < 60) {
+            return sprintf(plural($seconds, '%s second', '%s seconds'), $seconds);
+        } elseif ($minutes < 60)
+            return sprintf(plural($minutes, '%s minute', '%s minutes'), $minutes);
+        elseif ($hours < 24)
+            return sprintf(plural($hours, '%s hour', '%s hours'), $hours);
+        elseif ($days < 7)
+            return sprintf(plural($days, '%s day', '%s days'), $days);
+        elseif ($weeks < 4)
+            return sprintf(plural($weeks, '%s week', '%s weeks'), $weeks);
+        elseif ($months < 12)
+            return sprintf(plural($months, '%s month', '%s months'), $months);
         else {
-            return sprintf(Plural($Years, '%s year', '%s years'), $Years);
+            return sprintf(plural($years, '%s year', '%s years'), $years);
         }
     }
 
     /**
      * Takes any variable and serializes it.
      *
-     * @param mixed $Mixed An object, array, or string to be serialized.
+     * @param mixed $mixed An object, array, or string to be serialized.
      * @return string The serialized version of the string.
      */
-    public static function serialize($Mixed) {
-        if (is_array($Mixed) || is_object($Mixed)
-            || (is_string($Mixed) && (substr_compare('a:', $Mixed, 0, 2) !== 0  && substr_compare('O:', $Mixed, 0, 2) !== 0
-                    && substr_compare('arr:', $Mixed, 0, 4) !== 0 && substr_compare('obj:', $Mixed, 0, 4) !== 0))
+    public static function serialize($mixed) {
+        if (is_array($mixed) || is_object($mixed)
+            || (is_string($mixed) && (substr_compare('a:', $mixed, 0, 2) !== 0  && substr_compare('O:', $mixed, 0, 2) !== 0
+                    && substr_compare('arr:', $mixed, 0, 4) !== 0 && substr_compare('obj:', $mixed, 0, 4) !== 0))
         ) {
-            $Result = serialize($Mixed);
+            $result = serialize($mixed);
         } else {
-            $Result = $Mixed;
+            $result = $mixed;
         }
-        return $Result;
+        return $result;
     }
 
     /**
@@ -2015,113 +2103,113 @@ EOT;
     /**
      * Process as plain text + our magic formatting.
      *
-     * @param string $Str
+     * @param string $str
      * @return string Sanitized HTML.
      * @since 2.1
      */
-    public static function textEx($Str) {
+    public static function textEx($str) {
         // Basic text parsing.
-        $Str = self::text($Str);
+        $str = self::text($str);
 
         // Always filter after basic parsing.
-        $Sanitized = Gdn_Format::htmlFilter($Str);
+        $sanitized = Gdn_Format::htmlFilter($str);
 
         // Vanilla magic parsing. (this is the "Ex"tra)
-        $Sanitized = Gdn_Format::processHTML($Sanitized);
+        $sanitized = Gdn_Format::processHTML($sanitized);
 
-        return $Sanitized;
+        return $sanitized;
     }
 
     /**
      * Takes a mixed variable, formats it in the specified format type, and returns it.
      *
-     * @param mixed $Mixed An object, array, or string to be formatted.
-     * @param string $FormatMethod The method with which the variable should be formatted.
+     * @param mixed $mixed An object, array, or string to be formatted.
+     * @param string $formatMethod The method with which the variable should be formatted.
      * @return mixed
      */
-    public static function to($Mixed, $FormatMethod) {
+    public static function to($mixed, $formatMethod) {
         // Process $Mixed based on its type.
-        if (is_string($Mixed)) {
-            if (in_array(strtolower($FormatMethod), self::$SanitizedFormats) && method_exists('Gdn_Format', $FormatMethod)) {
-                $Mixed = self::$FormatMethod($Mixed);
-            } elseif (function_exists('format'.$FormatMethod)) {
-                deprecated('format'.$FormatMethod, 'gdn_formatter_'.$FormatMethod, '2015-10-26');
-                $FormatMethod = 'format'.$FormatMethod;
-                $Mixed = $FormatMethod($Mixed);
-            } elseif (function_exists('gdn_formatter_'.$FormatMethod)) {
-                $FormatMethod = 'gdn_formatter_'.$FormatMethod;
-                $Mixed = $FormatMethod($Mixed);
-            } elseif ($Formatter = Gdn::factory($FormatMethod.'Formatter')) {
-                $Mixed = $Formatter->format($Mixed);
+        if (is_string($mixed)) {
+            if (in_array(strtolower($formatMethod), self::$SanitizedFormats) && method_exists('Gdn_Format', $formatMethod)) {
+                $mixed = self::$formatMethod($mixed);
+            } elseif (function_exists('format'.$formatMethod)) {
+                deprecated('format'.$formatMethod, 'gdn_formatter_'.$formatMethod, '2015-10-26');
+                $formatMethod = 'format'.$formatMethod;
+                $mixed = $formatMethod($mixed);
+            } elseif (function_exists('gdn_formatter_'.$formatMethod)) {
+                $formatMethod = 'gdn_formatter_'.$formatMethod;
+                $mixed = $formatMethod($mixed);
+            } elseif ($formatter = Gdn::factory($formatMethod.'Formatter')) {
+                $mixed = $formatter->format($mixed);
             } else {
-                $Mixed = Gdn_Format::text($Mixed);
+                $mixed = Gdn_Format::text($mixed);
             }
-        } elseif (is_array($Mixed)) {
-            foreach ($Mixed as $Key => $Val) {
-                $Mixed[$Key] = self::to($Val, $FormatMethod);
+        } elseif (is_array($mixed)) {
+            foreach ($mixed as $key => $val) {
+                $mixed[$key] = self::to($val, $formatMethod);
             }
-        } elseif (is_object($Mixed)) {
-            foreach (get_object_vars($Mixed) as $Prop => $Val) {
-                $Mixed->$Prop = self::to($Val, $FormatMethod);
+        } elseif (is_object($mixed)) {
+            foreach (get_object_vars($mixed) as $prop => $val) {
+                $mixed->$prop = self::to($val, $formatMethod);
             }
         }
-        return $Mixed;
+        return $mixed;
     }
 
     /**
      * Format a timestamp or the current time to go into the database.
      *
-     * @param int $Timestamp
+     * @param int $timestamp
      * @return string The formatted date.
      */
-    public static function toDate($Timestamp = '') {
-        if ($Timestamp == '') {
-            $Timestamp = time();
-        } elseif (!is_numeric($Timestamp)) {
-            $Timestamp = self::toTimestamp($Timestamp);
+    public static function toDate($timestamp = '') {
+        if ($timestamp == '') {
+            $timestamp = time();
+        } elseif (!is_numeric($timestamp)) {
+            $timestamp = self::toTimestamp($timestamp);
         }
 
-        return date('Y-m-d', $Timestamp);
+        return date('Y-m-d', $timestamp);
     }
 
     /**
      * Format a timestamp or the current time to go into the database.
      *
-     * @param int $Timestamp
+     * @param int $timestamp
      * @return string The formatted date and time.
      */
-    public static function toDateTime($Timestamp = '') {
-        if ($Timestamp == '') {
-            $Timestamp = time();
+    public static function toDateTime($timestamp = '') {
+        if ($timestamp == '') {
+            $timestamp = time();
         }
-        return date('Y-m-d H:i:s', $Timestamp);
+        return date('Y-m-d H:i:s', $timestamp);
     }
 
     /**
      * Convert a datetime to a timestamp.
      *
-     * @param string $DateTime The Mysql-formatted datetime to convert to a timestamp. Should be in one
+     * @param string $dateTime The Mysql-formatted datetime to convert to a timestamp. Should be in one
      * of the following formats: YYYY-MM-DD or YYYY-MM-DD HH:MM:SS.
      * @return string|bool Returns FALSE upon failure.
      */
-    public static function toTimestamp($DateTime = '') {
-        if ($DateTime === '0000-00-00 00:00:00') {
+    public static function toTimestamp($dateTime = '') {
+        if ($dateTime === '0000-00-00 00:00:00') {
             return false;
-        } elseif (($TestTime = strtotime($DateTime)) !== false) {
-            return $TestTime;
-        } elseif (preg_match('/^(\d{4})-(\d{1,2})-(\d{1,2})(?:\s{1}(\d{1,2}):(\d{1,2})(?::(\d{1,2}))?)?$/', $DateTime, $Matches)) {
-            $Year = $Matches[1];
-            $Month = $Matches[2];
-            $Day = $Matches[3];
-            $Hour = val(4, $Matches, 0);
-            $Minute = val(5, $Matches, 0);
-            $Second = val(6, $Matches, 0);
-            return mktime($Hour, $Minute, $Second, $Month, $Day, $Year);
-        } elseif (preg_match('/^(\d{4})-(\d{1,2})-(\d{1,2})$/', $DateTime, $Matches)) {
-            $Year = $Matches[1];
-            $Month = $Matches[2];
-            $Day = $Matches[3];
-            return mktime(0, 0, 0, $Month, $Day, $Year);
+        } elseif (($testTime = strtotime($dateTime)) !== false) {
+            return $testTime;
+        } elseif (preg_match('/^(\d{4})-(\d{1,2})-(\d{1,2})(?:\s{1}(\d{1,2}):(\d{1,2})(?::(\d{1,2}))?)?$/', $dateTime, $matches)) {
+            $year = $matches[1];
+            $month = $matches[2];
+            $day = $matches[3];
+            $hour = val(4, $matches, 0);
+            $minute = val(5, $matches, 0);
+            $second = val(6, $matches, 0);
+            return mktime($hour, $minute, $second, $month, $day, $year);
+        } elseif (preg_match('/^(\d{4})-(\d{1,2})-(\d{1,2})$/', $dateTime, $matches)) {
+            $year = $matches[1];
+            $month = $matches[2];
+            $day = $matches[3];
+            return mktime(0, 0, 0, $month, $day, $year);
         } else {
             return false;
         }
@@ -2130,43 +2218,43 @@ EOT;
     /**
      * Formats a timestamp to the current user's timezone.
      *
-     * @param int $Timestamp The timestamp in gmt.
+     * @param int $timestamp The timestamp in gmt.
      * @return int The timestamp according to the user's timezone.
      */
-    public static function toTimezone($Timestamp) {
-        static $GuestHourOffset;
-        $Now = time();
+    public static function toTimezone($timestamp) {
+        static $guestHourOffset;
+        $now = time();
 
         // Alter the timestamp based on the user's hour offset
-        $Session = Gdn::session();
-        $HourOffset = 0;
+        $session = Gdn::session();
+        $hourOffset = 0;
 
-        if ($Session->UserID > 0) {
-            $HourOffset = $Session->User->HourOffset;
+        if ($session->UserID > 0) {
+            $hourOffset = $session->User->HourOffset;
         } elseif (class_exists('DateTimeZone')) {
-            if (!isset($GuestHourOffset)) {
-                $GuestTimeZone = c('Garden.GuestTimeZone');
-                if ($GuestTimeZone) {
+            if (!isset($guestHourOffset)) {
+                $guestTimeZone = c('Garden.GuestTimeZone');
+                if ($guestTimeZone) {
                     try {
-                        $TimeZone = new DateTimeZone($GuestTimeZone);
-                        $Offset = $TimeZone->getOffset(new DateTime('now', new DateTimeZone('UTC')));
-                        $GuestHourOffset = floor($Offset / 3600);
-                    } catch (Exception $Ex) {
-                        $GuestHourOffset = 0;
-                        logException($Ex);
+                        $timeZone = new DateTimeZone($guestTimeZone);
+                        $offset = $timeZone->getOffset(new DateTime('now', new DateTimeZone('UTC')));
+                        $guestHourOffset = floor($offset / 3600);
+                    } catch (Exception $ex) {
+                        $guestHourOffset = 0;
+                        logException($ex);
                     }
                 }
             }
-            $HourOffset = $GuestHourOffset;
+            $hourOffset = $guestHourOffset;
         }
 
-        if ($HourOffset <> 0) {
-            $SecondsOffset = $HourOffset * 3600;
-            $Timestamp += $SecondsOffset;
-            $Now += $SecondsOffset;
+        if ($hourOffset <> 0) {
+            $secondsOffset = $hourOffset * 3600;
+            $timestamp += $secondsOffset;
+            $now += $secondsOffset;
         }
 
-        return $Timestamp;
+        return $timestamp;
     }
 
     /**
@@ -2181,143 +2269,143 @@ EOT;
         $timespan -= 60 * ($minutes = (int)floor($timespan / 60));
         $seconds = $timespan;
 
-        $Result = sprintf('%02d:%02d:%02d', $hours, $minutes, $seconds);
-        return $Result;
+        $result = sprintf('%02d:%02d:%02d', $hours, $minutes, $seconds);
+        return $result;
     }
 
     /** @var array  */
-    protected static $_UrlTranslations = array('–' => '-', '—' => '-', 'À' => 'A', 'Á' => 'A', 'Â' => 'A', 'Ã' => 'A', 'Ä' => 'Ae', 'Ä' => 'A', 'Å' => 'A', 'Ā' => 'A', 'Ą' => 'A', 'Ă' => 'A', 'Æ' => 'Ae', 'Ç' => 'C', 'Ć' => 'C', 'Č' => 'C', 'Ĉ' => 'C', 'Ċ' => 'C', 'Ď' => 'D', 'Đ' => 'D', 'Ð' => 'D', 'È' => 'E', 'É' => 'E', 'Ê' => 'E', 'Ë' => 'E', 'Ē' => 'E', 'Ě' => 'E', 'Ĕ' => 'E', 'Ė' => 'E', 'Ĝ' => 'G', 'Ğ' => 'G', 'Ġ' => 'G', 'Ģ' => 'G', 'Ĥ' => 'H', 'Ħ' => 'H', 'Ì' => 'I', 'Í' => 'I', 'Î' => 'I', 'Ï' => 'I', 'Ī' => 'I', 'Ĩ' => 'I', 'Ĭ' => 'I', 'Į' => 'I', 'İ' => 'I', 'Ĳ' => 'IJ', 'Ĵ' => 'J', 'Ķ' => 'K', 'Ł' => 'K', 'Ľ' => 'K', 'Ĺ' => 'K', 'Ļ' => 'K', 'Ŀ' => 'K', 'Ñ' => 'N', 'Ń' => 'N', 'Ň' => 'N', 'Ņ' => 'N', 'Ŋ' => 'N', 'Ò' => 'O', 'Ó' => 'O', 'Ô' => 'O', 'Õ' => 'O', 'Ö' => 'Oe', 'Ö' => 'Oe', 'Ō' => 'O', 'Ő' => 'O', 'Ŏ' => 'O', 'Œ' => 'OE', 'Ŕ' => 'R', 'Ŗ' => 'R', 'Ś' => 'S', 'Š' => 'S', 'Ş' => 'S', 'Ŝ' => 'S', 'Ť' => 'T', 'Ţ' => 'T', 'Ŧ' => 'T', 'Ț' => 'T', 'Ù' => 'U', 'Ú' => 'U', 'Û' => 'U', 'Ü' => 'Ue', 'Ū' => 'U', 'Ü' => 'Ue', 'Ů' => 'U', 'Ű' => 'U', 'Ŭ' => 'U', 'Ũ' => 'U', 'Ų' => 'U', 'Ŵ' => 'W', 'Ý' => 'Y', 'Ŷ' => 'Y', 'Ÿ' => 'Y', 'Ź' => 'Z', 'Ž' => 'Z', 'Ż' => 'Z', 'Þ' => 'T', 'à' => 'a', 'á' => 'a', 'â' => 'a', 'ã' => 'a', 'ä' => 'ae', 'ä' => 'ae', 'å' => 'a', 'ā' => 'a', 'ą' => 'a', 'ă' => 'a', 'æ' => 'ae', 'ç' => 'c', 'ć' => 'c', 'č' => 'c', 'ĉ' => 'c', 'ċ' => 'c', 'ď' => 'd', 'đ' => 'd', 'ð' => 'd', 'è' => 'e', 'é' => 'e', 'ê' => 'e', 'ë' => 'e', 'ē' => 'e', 'ę' => 'e', 'ě' => 'e', 'ĕ' => 'e', 'ė' => 'e', 'ƒ' => 'f', 'ĝ' => 'g', 'ğ' => 'g', 'ġ' => 'g', 'ģ' => 'g', 'ĥ' => 'h', 'ħ' => 'h', 'ì' => 'i', 'í' => 'i', 'î' => 'i', 'ï' => 'i', 'ī' => 'i', 'ĩ' => 'i', 'ĭ' => 'i', 'į' => 'i', 'ı' => 'i', 'ĳ' => 'ij', 'ĵ' => 'j', 'ķ' => 'k', 'ĸ' => 'k', 'ł' => 'l', 'ľ' => 'l', 'ĺ' => 'l', 'ļ' => 'l', 'ŀ' => 'l', 'ñ' => 'n', 'ń' => 'n', 'ň' => 'n', 'ņ' => 'n', 'ŉ' => 'n', 'ŋ' => 'n', 'ò' => 'o', 'ó' => 'o', 'ô' => 'o', 'õ' => 'o', 'ö' => 'oe', 'ö' => 'oe', 'ø' => 'o', 'ō' => 'o', 'ő' => 'o', 'ŏ' => 'o', 'œ' => 'oe', 'ŕ' => 'r', 'ř' => 'r', 'ŗ' => 'r', 'š' => 's', 'ù' => 'u', 'ú' => 'u', 'û' => 'u', 'ü' => 'ue', 'ū' => 'u', 'ü' => 'ue', 'ů' => 'u', 'ű' => 'u', 'ŭ' => 'u', 'ũ' => 'u', 'ų' => 'u', 'ŵ' => 'w', 'ý' => 'y', 'ÿ' => 'y', 'ŷ' => 'y', 'ž' => 'z', 'ż' => 'z', 'ź' => 'z', 'þ' => 't', 'ß' => 'ss', 'ſ' => 'ss', 'А' => 'A', 'Б' => 'B', 'В' => 'V', 'Г' => 'G', 'Д' => 'D', 'Е' => 'E', 'Ё' => 'YO', 'Ж' => 'ZH', 'З' => 'Z', 'И' => 'I', 'И' => 'I', 'І' => 'I', 'Й' => 'Y', 'К' => 'K', 'Л' => 'L', 'М' => 'M', 'Н' => 'N', 'О' => 'O', 'П' => 'P', 'Р' => 'R', 'С' => 'S', 'ș' => 's', 'ț' => 't', 'Ț' => 'T', 'Т' => 'T', 'У' => 'U', 'Ф' => 'F', 'Х' => 'H', 'Ц' => 'C', 'Ч' => 'CH', 'Ш' => 'SH', 'Щ' => 'SCH', 'Ъ' => '', 'Ы' => 'Y', 'Ь' => '', 'Э' => 'E', 'Ю' => 'YU', 'Я' => 'YA', 'Є' => 'YE', 'Ї' => 'YI', 'а' => 'a', 'б' => 'b', 'в' => 'v', 'г' => 'g', 'д' => 'd', 'е' => 'e', 'ё' => 'yo', 'ж' => 'zh', 'з' => 'z', 'и' => 'i', 'і' => 'i', 'й' => 'y', 'к' => 'k', 'л' => 'l', 'м' => 'm', 'н' => 'n', 'о' => 'o', 'п' => 'p', 'р' => 'r', 'с' => 's', 'т' => 't', 'у' => 'u', 'ф' => 'f', 'х' => 'h', 'ц' => 'c', 'ч' => 'ch', 'ш' => 'sh', 'щ' => 'sch', 'ъ' => '', 'ы' => 'y', 'ь' => '', 'э' => 'e', 'ю' => 'yu', 'я' => 'ya', 'є' => 'ye', 'ї' => 'yi');
+    protected static $_UrlTranslations = ['–' => '-', '—' => '-', 'À' => 'A', 'Á' => 'A', 'Â' => 'A', 'Ã' => 'A', 'Ä' => 'Ae', 'Ä' => 'A', 'Å' => 'A', 'Ā' => 'A', 'Ą' => 'A', 'Ă' => 'A', 'Æ' => 'Ae', 'Ç' => 'C', 'Ć' => 'C', 'Č' => 'C', 'Ĉ' => 'C', 'Ċ' => 'C', 'Ď' => 'D', 'Đ' => 'D', 'Ð' => 'D', 'È' => 'E', 'É' => 'E', 'Ê' => 'E', 'Ë' => 'E', 'Ē' => 'E', 'Ě' => 'E', 'Ĕ' => 'E', 'Ė' => 'E', 'Ĝ' => 'G', 'Ğ' => 'G', 'Ġ' => 'G', 'Ģ' => 'G', 'Ĥ' => 'H', 'Ħ' => 'H', 'Ì' => 'I', 'Í' => 'I', 'Î' => 'I', 'Ï' => 'I', 'Ī' => 'I', 'Ĩ' => 'I', 'Ĭ' => 'I', 'Į' => 'I', 'İ' => 'I', 'Ĳ' => 'IJ', 'Ĵ' => 'J', 'Ķ' => 'K', 'Ł' => 'K', 'Ľ' => 'K', 'Ĺ' => 'K', 'Ļ' => 'K', 'Ŀ' => 'K', 'Ñ' => 'N', 'Ń' => 'N', 'Ň' => 'N', 'Ņ' => 'N', 'Ŋ' => 'N', 'Ò' => 'O', 'Ó' => 'O', 'Ô' => 'O', 'Õ' => 'O', 'Ö' => 'Oe', 'Ö' => 'Oe', 'Ō' => 'O', 'Ő' => 'O', 'Ŏ' => 'O', 'Œ' => 'OE', 'Ŕ' => 'R', 'Ŗ' => 'R', 'Ś' => 'S', 'Š' => 'S', 'Ş' => 'S', 'Ŝ' => 'S', 'Ť' => 'T', 'Ţ' => 'T', 'Ŧ' => 'T', 'Ț' => 'T', 'Ù' => 'U', 'Ú' => 'U', 'Û' => 'U', 'Ü' => 'Ue', 'Ū' => 'U', 'Ü' => 'Ue', 'Ů' => 'U', 'Ű' => 'U', 'Ŭ' => 'U', 'Ũ' => 'U', 'Ų' => 'U', 'Ŵ' => 'W', 'Ý' => 'Y', 'Ŷ' => 'Y', 'Ÿ' => 'Y', 'Ź' => 'Z', 'Ž' => 'Z', 'Ż' => 'Z', 'Þ' => 'T', 'à' => 'a', 'á' => 'a', 'â' => 'a', 'ã' => 'a', 'ä' => 'ae', 'ä' => 'ae', 'å' => 'a', 'ā' => 'a', 'ą' => 'a', 'ă' => 'a', 'æ' => 'ae', 'ç' => 'c', 'ć' => 'c', 'č' => 'c', 'ĉ' => 'c', 'ċ' => 'c', 'ď' => 'd', 'đ' => 'd', 'ð' => 'd', 'è' => 'e', 'é' => 'e', 'ê' => 'e', 'ë' => 'e', 'ē' => 'e', 'ę' => 'e', 'ě' => 'e', 'ĕ' => 'e', 'ė' => 'e', 'ƒ' => 'f', 'ĝ' => 'g', 'ğ' => 'g', 'ġ' => 'g', 'ģ' => 'g', 'ĥ' => 'h', 'ħ' => 'h', 'ì' => 'i', 'í' => 'i', 'î' => 'i', 'ï' => 'i', 'ī' => 'i', 'ĩ' => 'i', 'ĭ' => 'i', 'į' => 'i', 'ı' => 'i', 'ĳ' => 'ij', 'ĵ' => 'j', 'ķ' => 'k', 'ĸ' => 'k', 'ł' => 'l', 'ľ' => 'l', 'ĺ' => 'l', 'ļ' => 'l', 'ŀ' => 'l', 'ñ' => 'n', 'ń' => 'n', 'ň' => 'n', 'ņ' => 'n', 'ŉ' => 'n', 'ŋ' => 'n', 'ò' => 'o', 'ó' => 'o', 'ô' => 'o', 'õ' => 'o', 'ö' => 'oe', 'ö' => 'oe', 'ø' => 'o', 'ō' => 'o', 'ő' => 'o', 'ŏ' => 'o', 'œ' => 'oe', 'ŕ' => 'r', 'ř' => 'r', 'ŗ' => 'r', 'š' => 's', 'ù' => 'u', 'ú' => 'u', 'û' => 'u', 'ü' => 'ue', 'ū' => 'u', 'ü' => 'ue', 'ů' => 'u', 'ű' => 'u', 'ŭ' => 'u', 'ũ' => 'u', 'ų' => 'u', 'ŵ' => 'w', 'ý' => 'y', 'ÿ' => 'y', 'ŷ' => 'y', 'ž' => 'z', 'ż' => 'z', 'ź' => 'z', 'þ' => 't', 'ß' => 'ss', 'ſ' => 'ss', 'А' => 'A', 'Б' => 'B', 'В' => 'V', 'Г' => 'G', 'Д' => 'D', 'Е' => 'E', 'Ё' => 'YO', 'Ж' => 'ZH', 'З' => 'Z', 'И' => 'I', 'И' => 'I', 'І' => 'I', 'Й' => 'Y', 'К' => 'K', 'Л' => 'L', 'М' => 'M', 'Н' => 'N', 'О' => 'O', 'П' => 'P', 'Р' => 'R', 'С' => 'S', 'ș' => 's', 'ț' => 't', 'Ț' => 'T', 'Т' => 'T', 'У' => 'U', 'Ф' => 'F', 'Х' => 'H', 'Ц' => 'C', 'Ч' => 'CH', 'Ш' => 'SH', 'Щ' => 'SCH', 'Ъ' => '', 'Ы' => 'Y', 'Ь' => '', 'Э' => 'E', 'Ю' => 'YU', 'Я' => 'YA', 'Є' => 'YE', 'Ї' => 'YI', 'а' => 'a', 'б' => 'b', 'в' => 'v', 'г' => 'g', 'д' => 'd', 'е' => 'e', 'ё' => 'yo', 'ж' => 'zh', 'з' => 'z', 'и' => 'i', 'і' => 'i', 'й' => 'y', 'к' => 'k', 'л' => 'l', 'м' => 'm', 'н' => 'n', 'о' => 'o', 'п' => 'p', 'р' => 'r', 'с' => 's', 'т' => 't', 'у' => 'u', 'ф' => 'f', 'х' => 'h', 'ц' => 'c', 'ч' => 'ch', 'ш' => 'sh', 'щ' => 'sch', 'ъ' => '', 'ы' => 'y', 'ь' => '', 'э' => 'e', 'ю' => 'yu', 'я' => 'ya', 'є' => 'ye', 'ї' => 'yi'];
 
     /**
      * Creates URL codes containing only lowercase Roman letters, digits, and hyphens.
      *
-     * @param mixed $Mixed An object, array, or string to be formatted.
+     * @param mixed $mixed An object, array, or string to be formatted.
      * @return string
      */
-    public static function url($Mixed) {
-        if (!is_string($Mixed)) {
-            return self::to($Mixed, 'Url');
+    public static function url($mixed) {
+        if (!is_string($mixed)) {
+            return self::to($mixed, 'Url');
         }
 
         // Preliminary decoding
-        $Mixed = strip_tags(html_entity_decode($Mixed, ENT_COMPAT, 'UTF-8'));
-        $Mixed = strtr($Mixed, self::$_UrlTranslations);
-        $Mixed = preg_replace('`[\']`', '', $Mixed);
+        $mixed = strip_tags(html_entity_decode($mixed, ENT_COMPAT, 'UTF-8'));
+        $mixed = strtr($mixed, self::$_UrlTranslations);
+        $mixed = preg_replace('`[\']`', '', $mixed);
 
         // Convert punctuation, symbols, and spaces to hyphens
         if (unicodeRegexSupport()) {
-            $Mixed = preg_replace('`[\pP\pS\s]`u', '-', $Mixed);
+            $mixed = preg_replace('`[\pP\pS\s]`u', '-', $mixed);
         } else {
-            $Mixed = preg_replace('`[\W_]`', '-', $Mixed);
+            $mixed = preg_replace('`[\W_]`', '-', $mixed);
         }
 
         // Lowercase, no trailing or repeat hyphens
-        $Mixed = preg_replace('`-+`', '-', strtolower($Mixed));
-        $Mixed = trim($Mixed, '-');
+        $mixed = preg_replace('`-+`', '-', strtolower($mixed));
+        $mixed = trim($mixed, '-');
 
-        return rawurlencode($Mixed);
+        return rawurlencode($mixed);
     }
 
     /**
      * Takes a serialized variable and unserializes it back into its original state.
      *
-     * @param string $SerializedString A json or php serialized string to be unserialized.
+     * @param string $serializedString A json or php serialized string to be unserialized.
      * @return mixed
      */
-    public static function unserialize($SerializedString) {
-        $Result = $SerializedString;
+    public static function unserialize($serializedString) {
+        $result = $serializedString;
 
-        if (is_string($SerializedString)) {
-            if (substr_compare('a:', $SerializedString, 0, 2) === 0 || substr_compare('O:', $SerializedString, 0, 2) === 0) {
-                $Result = unserialize($SerializedString);
-            } elseif (substr_compare('obj:', $SerializedString, 0, 4) === 0) {
-                $Result = json_decode(substr($SerializedString, 4), false);
-            } elseif (substr_compare('arr:', $SerializedString, 0, 4) === 0) {
-                $Result = json_decode(substr($SerializedString, 4), true);
+        if (is_string($serializedString)) {
+            if (substr_compare('a:', $serializedString, 0, 2) === 0 || substr_compare('O:', $serializedString, 0, 2) === 0) {
+                $result = unserialize($serializedString);
+            } elseif (substr_compare('obj:', $serializedString, 0, 4) === 0) {
+                $result = json_decode(substr($serializedString, 4), false);
+            } elseif (substr_compare('arr:', $serializedString, 0, 4) === 0) {
+                $result = json_decode(substr($serializedString, 4), true);
             }
         }
-        return $Result;
+        return $result;
     }
 
     /**
      *
      *
-     * @param $PlaceholderString
-     * @param $ReplaceWith
+     * @param $placeholderString
+     * @param $replaceWith
      * @return mixed
      */
-    public static function vanillaSprintf($PlaceholderString, $ReplaceWith) {
+    public static function vanillaSprintf($placeholderString, $replaceWith) {
         // Set replacement array inside callback
-        Gdn_Format::vanillaSprintfCallback(null, $ReplaceWith);
+        Gdn_Format::vanillaSprintfCallback(null, $replaceWith);
 
-        $FinalString = preg_replace_callback('/({([a-z0-9_:]+)})/i', array('Gdn_Format', 'VanillaSprintfCallback'), $PlaceholderString);
+        $finalString = preg_replace_callback('/({([a-z0-9_:]+)})/i', ['Gdn_Format', 'VanillaSprintfCallback'], $placeholderString);
 
         // Cleanup replacement list
-        Gdn_Format::vanillaSprintfCallback(null, array());
+        Gdn_Format::vanillaSprintfCallback(null, []);
 
-        return $FinalString;
+        return $finalString;
     }
 
     /**
      *
      *
-     * @param $Match
-     * @param bool $InternalReplacementList
+     * @param $match
+     * @param bool $internalReplacementList
      * @return mixed
      */
-    protected static function vanillaSprintfCallback($Match, $InternalReplacementList = false) {
-        static $InternalReplacement = array();
+    protected static function vanillaSprintfCallback($match, $internalReplacementList = false) {
+        static $internalReplacement = [];
 
-        if (is_array($InternalReplacementList)) {
-            $InternalReplacement = $InternalReplacementList;
+        if (is_array($internalReplacementList)) {
+            $internalReplacement = $internalReplacementList;
         } else {
-            $MatchStr = $Match[2];
-            $Format = (count($SplitMatch = explode(':', $MatchStr)) > 1) ? $SplitMatch[1] : false;
+            $matchStr = $match[2];
+            $format = (count($splitMatch = explode(':', $matchStr)) > 1) ? $splitMatch[1] : false;
 
-            if (array_key_exists($MatchStr, $InternalReplacement)) {
-                if ($Format) {
+            if (array_key_exists($matchStr, $internalReplacement)) {
+                if ($format) {
                     // TODO: Apply format
                 }
-                return $InternalReplacement[$MatchStr];
+                return $internalReplacement[$matchStr];
             }
 
-            return $Match[1];
+            return $match[1];
         }
     }
 
     /**
      * Format text from WYSIWYG editor input.
      *
-     * @param $Mixed
+     * @param $mixed
      * @return mixed|string
      */
-    public static function wysiwyg($Mixed) {
-        static $CustomFormatter;
-        if (!isset($CustomFormatter)) {
-            $CustomFormatter = c('Garden.Format.WysiwygFunction', false);
+    public static function wysiwyg($mixed) {
+        static $customFormatter;
+        if (!isset($customFormatter)) {
+            $customFormatter = c('Garden.Format.WysiwygFunction', false);
         }
 
-        if (!is_string($Mixed)) {
-            return self::to($Mixed, 'Wysiwyg');
-        } elseif (is_callable($CustomFormatter)) {
-            return $CustomFormatter($Mixed);
+        if (!is_string($mixed)) {
+            return self::to($mixed, 'Wysiwyg');
+        } elseif (is_callable($customFormatter)) {
+            return $customFormatter($mixed);
         } else {
             // The text contains html and must be purified.
-            $Formatter = Gdn::factory('HtmlFormatter');
-            if (is_null($Formatter)) {
+            $formatter = Gdn::factory('HtmlFormatter');
+            if (is_null($formatter)) {
                 // If there is no HtmlFormatter then make sure that script injections won't work.
-                return self::display($Mixed);
+                return self::display($mixed);
             }
 
             // Always filter after basic parsing.
             // Wysiwyg is already formatted HTML. Don't try to doubly encode its code blocks.
             $filterOptions = ['codeBlockEntities' => false];
-            $Sanitized = Gdn_Format::htmlFilter($Mixed, $filterOptions);
+            $sanitized = Gdn_Format::htmlFilter($mixed, $filterOptions);
 
             // Vanilla magic formatting.
-            $Sanitized = Gdn_Format::processHTML($Sanitized);
+            $sanitized = Gdn_Format::processHTML($sanitized);
 
-            return $Sanitized;
+            return $sanitized;
         }
     }
 }

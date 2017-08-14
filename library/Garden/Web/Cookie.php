@@ -65,11 +65,19 @@ class Cookie {
     /**
      * Calculate a cookie's expiration time.
      *
-     * @param int $expire
+     * @param int $expire Target expiration value.
+     * @param int|null $timestamp If calculating a relative expiry, use this timestamp as the offset.
      * @return int
      */
-    public function calculateExpiry($expire) {
-        $result = $expire > self::EXPIRE_THRESHOLD ? $expire : time() + $expire;
+    public function calculateExpiry($expire, $timestamp = null) {
+        if ($expire > self::EXPIRE_THRESHOLD) {
+            $result = $expire;
+        } else {
+            if ($timestamp === null || filter_var($timestamp, FILTER_VALIDATE_INT) === false) {
+                $timestamp = time();
+            }
+            $result = $timestamp + $expire;
+        }
         return $result;
     }
 

@@ -3,7 +3,7 @@ echo heading(t('Universal Forum Embed Code'), '', '', [], '/embed/forum');
 ?>
 <div class="padded"><?php echo t('To embed your Vanilla forum into your web site, use the following code.'); ?></div>
 
-<pre id="universal-code">&lt;script type="text/javascript" src="<?php echo Asset('js/embed.js', true); ?>">&lt;/script>
+<pre id="universal-code">&lt;script type="text/javascript" src="<?php echo asset('js/embed.js', true); ?>">&lt;/script>
 &lt;noscript>
     Please enable JavaScript to view the
     &lt;a href="http://vanillaforums.com/?ref_noscript">

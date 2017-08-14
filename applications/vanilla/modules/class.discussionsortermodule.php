@@ -19,21 +19,21 @@ class DiscussionSorterModule extends Gdn_Module {
     /** @string Current sort field user preference. */
     var $SortFieldSelected;
 
-    public function __construct($Sender) {
+    public function __construct($sender) {
         deprecated('DiscussionSorterModule', 'DiscussionSortFilterModule', 'March 2016');
 
-        parent::__construct($Sender, 'Vanilla');
+        parent::__construct($sender, 'Vanilla');
 
         $this->Visible = false;
 
         // Default options
-        $this->SortOptions = array(
+        $this->SortOptions = [
             'd.DateLastComment' => t('SortOptionLastComment', 'by Last Comment'),
             'd.DateInserted' => t('SortOptionStartDate', 'by Start Date')
-        );
+        ];
 
         // Get sort option selected
-        $this->SortFieldSelected = Gdn::session()->GetPreference('Discussions.SortField', 'd.DateLastComment');
+        $this->SortFieldSelected = Gdn::session()->getPreference('Discussions.SortField', 'd.DateLastComment');
     }
 
     public function assetTarget() {
@@ -42,7 +42,7 @@ class DiscussionSorterModule extends Gdn_Module {
 
     public function toString() {
         if (Gdn::session()->isValid()) {
-            return parent::ToString();
+            return parent::toString();
         }
     }
 }

@@ -119,7 +119,7 @@ class DiscussionsSortFilterModule extends Gdn_Module {
      * @return array An array of sorts consisting of the name, url, rel and cssClass of each sort item.
      */
     protected function getSortData() {
-        $sortData = array();
+        $sortData = [];
         foreach($this->sorts as $sort) {
             // Check to see if there's a category restriction.
             if ($categories = val('categories', $sort)) {

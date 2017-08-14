@@ -40,7 +40,7 @@ if (!function_exists('ValidateRegex')) {
      * @return bool Returns true if the value validates or false otherwise.
      */
     function validateRegex($value, $regex) {
-        return (filter_var($value, FILTER_VALIDATE_REGEXP, array('options' => array('regexp' => $regex))) !== false);
+        return (filter_var($value, FILTER_VALIDATE_REGEXP, ['options' => ['regexp' => $regex]]) !== false);
     }
 }
 
@@ -111,11 +111,11 @@ if (!function_exists('ValidateMeAction')) {
      * @return bool|string Returns true if the value is valid or an error message otherwise.
      */
     function validateMeAction($value) {
-        $Matched = preg_match('`^/me .*`i', $value);
-        if ($Matched) {
-            $HasPermission = Gdn::Session()->CheckPermission('Vanilla.Comments.Me');
-            if (!$HasPermission) {
-                return T('ErrorPermission');
+        $matched = preg_match('`^/me .*`i', $value);
+        if ($matched) {
+            $hasPermission = Gdn::session()->checkPermission('Vanilla.Comments.Me');
+            if (!$hasPermission) {
+                return t('ErrorPermission');
             }
         }
         return true;
@@ -131,8 +131,8 @@ if (!function_exists('validateNoLinks')) {
      * @since 2.1
      */
     function validateNoLinks($value) {
-        $Matched = preg_match('`https?://`i', $value);
-        return !$Matched;
+        $matched = preg_match('`https?://`i', $value);
+        return !$matched;
     }
 }
 
@@ -168,19 +168,19 @@ if (!function_exists('validateConnection')) {
      * @deprecated
      */
     function validateConnection($value, $field, $data) {
-        $DatabaseHost = val('Database.Host', $data, '~~Invalid~~');
-        $DatabaseName = val('Database.Name', $data, '~~Invalid~~');
-        $DatabaseUser = val('Database.User', $data, '~~Invalid~~');
-        $DatabasePassword = val('Database.Password', $data, '~~Invalid~~');
-        $ConnectionString = getConnectionString($DatabaseName, $DatabaseHost);
+        $databaseHost = val('Database.Host', $data, '~~Invalid~~');
+        $databaseName = val('Database.Name', $data, '~~Invalid~~');
+        $databaseUser = val('Database.User', $data, '~~Invalid~~');
+        $databasePassword = val('Database.Password', $data, '~~Invalid~~');
+        $connectionString = getConnectionString($databaseName, $databaseHost);
         try {
-            $Connection = new PDO(
-                $ConnectionString,
-                $DatabaseUser,
-                $DatabasePassword
+            $connection = new PDO(
+                $connectionString,
+                $databaseUser,
+                $databasePassword
             );
-        } catch (PDOException $Exception) {
-            return sprintf(T('ValidateConnection'), strip_tags($Exception->getMessage()));
+        } catch (PDOException $exception) {
+            return sprintf(t('ValidateConnection'), strip_tags($exception->getMessage()));
         }
         return true;
     }
@@ -196,11 +196,11 @@ if (!function_exists('validateOldPassword')) {
      * @return bool Returns true if the value validates or false otherwise.
      */
     function validateOldPassword($value, $field, $data) {
-        $OldPassword = val('OldPassword', $data, '');
-        $Session = Gdn::Session();
-        $UserModel = new UserModel();
-        $UserID = $Session->UserID;
-        return (bool)$UserModel->validateCredentials('', $UserID, $OldPassword);
+        $oldPassword = val('OldPassword', $data, '');
+        $session = Gdn::session();
+        $userModel = new UserModel();
+        $userID = $session->UserID;
+        return (bool)$userModel->validateCredentials('', $userID, $oldPassword);
     }
 }
 
@@ -244,21 +244,21 @@ if (!function_exists('validateUsernameRegex')) {
      * @return string Returns a regular expression without enclosing delimiters.
      */
     function validateUsernameRegex() {
-        static $ValidateUsernameRegex;
+        static $validateUsernameRegex;
 
-        if (is_null($ValidateUsernameRegex)) {
+        if (is_null($validateUsernameRegex)) {
             // Set our default ValidationRegex based on Unicode support.
             // Unicode includes Numbers, Letters, Marks, & Connector punctuation.
-            $DefaultPattern = (unicodeRegexSupport()) ? '\p{N}\p{L}\p{M}\p{Pc}' : '\w';
+            $defaultPattern = (unicodeRegexSupport()) ? '\p{N}\p{L}\p{M}\p{Pc}' : '\w';
 
-            $ValidateUsernameRegex = sprintf(
+            $validateUsernameRegex = sprintf(
                 "[%s]%s",
-                c("Garden.User.ValidationRegex", $DefaultPattern),
+                c("Garden.User.ValidationRegex", $defaultPattern),
                 c("Garden.User.ValidationLength", "{3,20}")
             );
         }
 
-        return $ValidateUsernameRegex;
+        return $validateUsernameRegex;
     }
 }
 
@@ -270,11 +270,11 @@ if (!function_exists('validateUsername')) {
      * @return bool Returns true if the value validates or false otherwise.
      */
     function validateUsername($value) {
-        $ValidateUsernameRegex = ValidateUsernameRegex();
+        $validateUsernameRegex = validateUsernameRegex();
 
-        return ValidateRegex(
+        return validateRegex(
             $value,
-            "/^({$ValidateUsernameRegex})?$/siu"
+            "/^({$validateUsernameRegex})?$/siu"
         );
     }
 }
@@ -336,16 +336,16 @@ if (!function_exists('validateDate')) {
         if (empty($value)) {
             return true; // blank dates validated through required.
         } else {
-            $Matches = array();
-            if (preg_match('/^(\d{4})-(\d{2})-(\d{2})(?:\s{1}(\d{2}):(\d{2})(?::(\d{2}))?)?$/', $value, $Matches)) {
-                $Year = $Matches[1];
-                $Month = $Matches[2];
-                $Day = $Matches[3];
-                $Hour = val(4, $Matches, 0);
-                $Minutes = val(5, $Matches, 0);
-                $Seconds = val(6, $Matches, 0);
+            $matches = [];
+            if (preg_match('/^(\d{4})-(\d{2})-(\d{2})(?:\s{1}(\d{2}):(\d{2})(?::(\d{2}))?)?$/', $value, $matches)) {
+                $year = $matches[1];
+                $month = $matches[2];
+                $day = $matches[3];
+                $hour = val(4, $matches, 0);
+                $minutes = val(5, $matches, 0);
+                $seconds = val(6, $matches, 0);
 
-                return checkdate($Month, $Day, $Year) && $Hour < 24 && $Minutes < 61 && $Seconds < 61;
+                return checkdate($month, $day, $year) && $hour < 24 && $minutes < 61 && $seconds < 61;
             }
         }
 
@@ -363,24 +363,24 @@ if (!function_exists('validateMinimumAge')) {
      * @return bool|string Returns true if the value is valid or an error message otherwise.
      */
     function validateMinimumAge($value) {
-        $MinimumAge = c('Garden.Validate.MinimumAge', 13);
+        $minimumAge = c('Garden.Validate.MinimumAge', 13);
         // Dates should be in YYYY-MM-DD format
         if (preg_match("/^[\d]{4}-{1}[\d]{2}-{1}[\d]{2}$/", $value) == 1) {
-            $Year = intval(substr($value, 0, 4));
-            $Month = intval(substr($value, 5, 2));
-            $Day = intval(substr($value, 8));
-            $CurrentDay = date('j');
-            $CurrentMonth = date('n');
-            $CurrentYear = date('Y');
+            $year = intval(substr($value, 0, 4));
+            $month = intval(substr($value, 5, 2));
+            $day = intval(substr($value, 8));
+            $currentDay = date('j');
+            $currentMonth = date('n');
+            $currentYear = date('Y');
             // The minimum age for joining is 13 years before now.
-            if ($Year + $MinimumAge < $CurrentYear
-                || ($Year + $MinimumAge == $CurrentYear && $Month < $CurrentMonth)
-                || ($Year + $MinimumAge == $CurrentYear && $Month == $CurrentMonth && $Day <= $CurrentDay)
+            if ($year + $minimumAge < $currentYear
+                || ($year + $minimumAge == $currentYear && $month < $currentMonth)
+                || ($year + $minimumAge == $currentYear && $month == $currentMonth && $day <= $currentDay)
             ) {
                 return true;
             }
         }
-        return T('ValidateMinimumAge', 'You must be at least '.$MinimumAge.' years old to proceed.');
+        return t('ValidateMinimumAge', 'You must be at least '.$minimumAge.' years old to proceed.');
     }
 }
 
@@ -395,9 +395,9 @@ if (!function_exists('validateInteger')) {
         if (!$value || (is_string($value) && !trim($value))) {
             return true;
         }
-        $Integer = intval($value);
-        $String = strval($Integer);
-        return $String == $value;
+        $integer = intval($value);
+        $string = strval($integer);
+        return $string == $value;
     }
 }
 
@@ -409,8 +409,8 @@ if (!function_exists('validateBoolean')) {
      * @return bool Returns true if the value validates or false otherwise.
      */
     function validateBoolean($value) {
-        $String = strval($value);
-        return in_array($String, array('1', '0', 'true', 'false', '')) ? true : false;
+        $string = strval($value);
+        return in_array($string, ['1', '0', 'true', 'false', '']) ? true : false;
     }
 }
 
@@ -485,15 +485,15 @@ if (!function_exists('validateLength')) {
      */
     function validateLength($value, $field) {
         if (function_exists('mb_strlen')) {
-            $Diff = mb_strlen($value, 'UTF-8') - $field->Length;
+            $diff = mb_strlen($value, 'UTF-8') - $field->Length;
         } else {
-            $Diff = strlen($value) - $field->Length;
+            $diff = strlen($value) - $field->Length;
         }
 
-        if ($Diff <= 0) {
+        if ($diff <= 0) {
             return true;
         } else {
-            return sprintf(T('ValidateLength'), T($field->Name), $Diff);
+            return sprintf(t('ValidateLength'), t($field->Name), $diff);
         }
     }
 }
@@ -514,13 +514,13 @@ if (!function_exists('validateEnum')) {
 
 if (!function_exists('validateFormat')) {
     /**
-     * Check that a value is a correct format for {@link Gdn_Format::To()}.
+     * Check that a value is a correct format for {@link Gdn_Format::to()}.
      *
      * @param mixed $value The value to validate.
      * @return bool Returns true of the value is valid or false otherwise.
      */
     function validateFormat($value) {
-        return strcasecmp($value, 'Raw') != 0 || Gdn::Session()->CheckPermission('Garden.Settings.Manage');
+        return strcasecmp($value, 'Raw') != 0 || Gdn::session()->checkPermission('Garden.Settings.Manage');
     }
 }
 
@@ -550,11 +550,11 @@ if (!function_exists('validatePermissionFormat')) {
             $value = explode(',', $value);
         }
 
-        $PermissionCount = count($value);
-        for ($i = 0; $i < $PermissionCount; ++$i) {
+        $permissionCount = count($value);
+        for ($i = 0; $i < $permissionCount; ++$i) {
             if (count(explode('.', $value[$i])) < 3) {
                 return sprintf(
-                    T('The following permission did not meet the permission naming requirements and could not be added: %s'),
+                    t('The following permission did not meet the permission naming requirements and could not be added: %s'),
                     $value[$i]
                 );
             }
@@ -579,8 +579,8 @@ if (!function_exists('validateMatch')) {
      * @deprecated
      */
     function validateMatch($value, $field, $data) {
-        $MatchValue = val($field->Name.'Match', $data);
-        return $value == $MatchValue ? true : false;
+        $matchValue = val($field->Name.'Match', $data);
+        return $value == $matchValue ? true : false;
     }
 }
 
@@ -590,27 +590,29 @@ if (!function_exists('validateMinTextLength')) {
      *
      * @param mixed $value The value to validate.
      * @param object $field The field meta information.
-     * @param array $Post The full posted data.
+     * @param array $post The full posted data.
      * @return bool|string Returns true if teh value is valid or an error string otherwise.
      */
-    function validateMinTextLength($value, $field, $Post) {
-        if (isset($Post['Format'])) {
-            $value = Gdn_Format::To($value, $Post['Format']);
+    function validateMinTextLength($value, $field, $post) {
+        if (isset($post['Format'])) {
+            $value = Gdn_Format::to($value, $post['Format']);
         }
 
         $value = html_entity_decode(trim(strip_tags($value)));
-        $MinLength = GetValue('MinLength', $field, 0);
+        $minLength = getValue('MinLength', $field, 0);
 
         if (function_exists('mb_strlen')) {
-            $Diff = $MinLength - mb_strlen($value, 'UTF-8');
+            $diff = $minLength - mb_strlen($value, 'UTF-8');
         } else {
-            $Diff = $MinLength - strlen($value);
+            $diff = $minLength - strlen($value);
         }
 
-        if ($Diff <= 0) {
+        if ($diff <= 0) {
             return true;
+        } else if ($diff == 1) {
+            return sprintf(t('ValidateMinLengthSingular'), t($field->Name), $diff);
         } else {
-            return sprintf(T('ValidateMinLength'), T($field->Name), $Diff);
+            return sprintf(t('ValidateMinLengthPlural'), t($field->Name), $diff);
         }
     }
 }
@@ -625,9 +627,9 @@ if (!function_exists('validateStrength')) {
      * @return bool Returns true if the value represents a strong enough password or false otherwise.
      */
     function validateStrength($value, $field, $data) {
-        $UsernameValue = GetValue('Name', $data);
-        $PScore = PasswordStrength($value, $UsernameValue);
-        return $PScore['Pass'] ? true : false;
+        $usernameValue = getValue('Name', $data);
+        $pScore = passwordStrength($value, $usernameValue);
+        return $pScore['Pass'] ? true : false;
     }
 }
 
@@ -643,10 +645,10 @@ if (!function_exists('validateVersion')) {
             return true;
         }
 
-        if (preg_match('`(?:\d+\.)*\d+\s*([a-z]*)\d*`i', $value, $Matches)) {
+        if (preg_match('`(?:\d+\.)*\d+\s*([a-z]*)\d*`i', $value, $matches)) {
             // Get the version word out of the matches and validate it.
-            $Word = $Matches[1];
-            if (!in_array(trim($Word), array('', 'dev', 'alpha', 'a', 'beta', 'b', 'RC', 'rc', '#', 'pl', 'p'))) {
+            $word = $matches[1];
+            if (!in_array(trim($word), ['', 'dev', 'alpha', 'a', 'beta', 'b', 'RC', 'rc', '#', 'pl', 'p'])) {
                 return false;
             }
             return true;
@@ -667,8 +669,8 @@ if (!function_exists('validatePhoneNA')) {
         if ($value == '') {
             return true; // Do not require by default.
         }
-        $Valid = validateRegex($value, '/^(?:\+?1[-. ]?)?\(?([0-9]{3})\)?[-. ]?([0-9]{3})[-. ]?([0-9]{4})$/');
-        return ($Valid) ? $Valid : T('ValidatePhone', 'Phone number is invalid.');
+        $valid = validateRegex($value, '/^(?:\+?1[-. ]?)?\(?([0-9]{3})\)?[-. ]?([0-9]{3})[-. ]?([0-9]{4})$/');
+        return ($valid) ? $valid : t('ValidatePhone', 'Phone number is invalid.');
     }
 }
 
@@ -683,8 +685,8 @@ if (!function_exists('validatePhoneInt')) {
         if ($value == '') {
             return true; // Do not require by default.
         }
-        $Valid = validateRegex($value, '/^\+(?:[0-9] ?){6,14}[0-9]$/');
-        return ($Valid) ? $Valid : T('ValidatePhone', 'Phone number is invalid.');
+        $valid = validateRegex($value, '/^\+(?:[0-9] ?){6,14}[0-9]$/');
+        return ($valid) ? $valid : t('ValidatePhone', 'Phone number is invalid.');
     }
 }
 
@@ -699,8 +701,8 @@ if (!function_exists('validateUrl')) {
         if (empty($value)) {
             return true;
         }
-        $Valid = (bool)filter_var($value, FILTER_VALIDATE_URL);
-        return $Valid;
+        $valid = (bool)filter_var($value, FILTER_VALIDATE_URL);
+        return $valid;
     }
 }
 
@@ -715,7 +717,7 @@ if (!function_exists('validateZipCode')) {
         if ($value == '') {
             return true; // Do not require by default.
         }
-        $Valid = validateRegex($value, '/^([0-9]{5})(-[0-9]{4})?$/');
-        return ($Valid) ? $Valid : T('ValidateZipCode', 'Zip code is invalid.');
+        $valid = validateRegex($value, '/^([0-9]{5})(-[0-9]{4})?$/');
+        return ($valid) ? $valid : t('ValidateZipCode', 'Zip code is invalid.');
     }
 }

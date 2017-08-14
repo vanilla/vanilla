@@ -23,7 +23,7 @@ $Session = Gdn::session();
                             }
                         });
                     </script>
-                    <?php printf(t('AttemptingSignOut', 'You are attempting to sign out. Are you sure you want to %s?'), anchor(t('sign out'), SignOutUrl($this->data('Target')).'&override='.$this->data('Override', '0'), '', array('id' => 'SignoutLink'))); ?>
+                    <?php printf(t('AttemptingSignOut', 'You are attempting to sign out. Are you sure you want to %s?'), anchor(t('sign out'), signOutUrl($this->data('Target')).'&override='.$this->data('Override', '0'), '', ['id' => 'SignoutLink'])); ?>
                 </p>
             <?php } else { ?>
                 <p><?php echo t('SignedOut', 'You are signed out.'); ?></p>

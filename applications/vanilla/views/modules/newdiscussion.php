@@ -4,7 +4,7 @@ echo '<div class="BoxButtons BoxNewDiscussion">';
 $Css = 'Button Primary Action NewDiscussion';
 $Css .= strpos($this->CssClass, 'Big') !== FALSE ? ' BigButton' : '';
 
-echo ButtonGroup($this->Buttons, $Css, $this->DefaultButton);
+echo buttonGroup($this->Buttons, $Css, $this->DefaultButton);
 Gdn::controller()->fireEvent('AfterNewDiscussionButton');
 
 echo '</div>';

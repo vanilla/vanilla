@@ -234,16 +234,20 @@ class CommentsApiController extends AbstractApiController {
                 'maximum' => 100
             ],
             'insertUserID:i?' => 'Filter by author.',
-            'after:dt?' => 'Get only comments after this date.',
+            'after:dt?' => 'Limit to comments after this date.',
             'expand:b?' => [
                 'description' => 'Expand associated records.',
                 'default' => false
-            ],
-            'lookup:s?' => 'The field used to lookup comments.'
+            ]
         ], 'in')->requireOneOf(['discussionID', 'insertUserID'])->setDescription('List comments.');
         $out = $this->schema([':a' => $this->commentSchema()], 'out');
 
         $query = $in->validate($query);
+
+        $after = isset($query['after']) ? $query['after'] : null;
+        if ($after instanceof DateTimeImmutable) {
+            $after = $after->format(DateTime::ATOM);
+        }
 
         // Lookup by discussion or by user?
         if (array_key_exists('discussionID', $query)) {
@@ -258,8 +262,8 @@ class CommentsApiController extends AbstractApiController {
                 $where['InsertUserID'] = $query['insertUserID'];
             }
 
-            if (isset($query['after'])) {
-                $where['DateInserted >'] = $query['after'];
+            if ($after !== null) {
+                $where['DateInserted >'] = $after;
             }
 
             $rows = $this->commentModel->getWhere(
@@ -273,7 +277,10 @@ class CommentsApiController extends AbstractApiController {
             $rows = $this->commentModel->getByUser2(
                 $query['insertUserID'],
                 $query['limit'],
-                $query['offset']
+                $query['offset'],
+                false,
+                $after,
+                'asc'
             )->resultArray();
         }
 

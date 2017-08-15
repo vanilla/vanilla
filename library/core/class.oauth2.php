@@ -510,15 +510,18 @@ class Gdn_OAuth2 extends Gdn_Plugin {
      * Create a controller to handle entry request.
      *
      * @param Gdn_Controller $sender.
-     * @param $code string Retrieved from the response of the authentication provider, used to fetch an authentication token.
-     * @param $state string Values passed by us and returned in the response of the authentication provider.
+     * @param string $code Retrieved from the response of the authentication provider, used to fetch an authentication token.
+     * @param string $state Values passed by us and returned in the response of the authentication provider.
      *
      * @throws Exception.
      * @throws Gdn_UserException.
      */
-    public function entryEndpoint($sender, $code, $state) {
+    public function entryEndpoint($sender, $code, $state = '') {
         if ($error = $sender->Request->get('error')) {
             throw new Gdn_UserException($error);
+        }
+        if (empty($code)) {
+            throw new Gdn_UserException('The code parameter is either not set or empty.');
         }
 
         Gdn::session()->stash($this->getProviderKey()); // remove any stashed provider data.

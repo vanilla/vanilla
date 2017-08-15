@@ -1,5 +1,5 @@
 <?php if (!defined('APPLICATION')) exit();
-
+$confirmationSupported = $this->data('ConfirmationSupported');
 helpAsset(sprintf(t('About %s'), t('Registration')), t('Change the way that new users register with the site.'));
 helpAsset(t('Need More Help?'), anchor(t("Video tutorial on user registration"), 'settings/tutorials/user-registration'))
 ?>
@@ -13,7 +13,12 @@ echo $this->Form->errors(); ?>
         t('Email addresses are disabled.', 'Email addresses are disabled. You can only add an email address if you are an administrator.').
         '</div>';
 } ?>
-<div class="form-group">
+<?php if (!$confirmationSupported) {
+    echo '<div class="alert alert-warning padded-top">'.
+        t('No unconfirmed role available for email confirmation.', 'The site needs a role with default type "unconfirmed" to use email confirmation. Please add one to enable this setting.').
+        '</div>';
+} ?>
+<div class="form-group<?php echo !$confirmationSupported ? ' foggy' : ''; ?>">
     <?php
     $label = t('Confirm email addresses', 'Require users to confirm their email addresses (recommended)');
     echo $this->Form->toggle('Garden.Registration.ConfirmEmail', $label);

@@ -1532,6 +1532,13 @@ class SettingsController extends DashboardController {
         ];
         $configurationModel->setField($registrationOptions);
 
+        $roleModel = new RoleModel();
+        $unconfirmedCount = $roleModel
+            ->getByType(RoleModel::TYPE_UNCONFIRMED)
+            ->count();
+        $this->setData('ConfirmationSupported', $unconfirmedCount > 0);
+        unset($roleModel, $unconfirmedCount);
+
         $this->EventArguments['Validation'] = &$validation;
         $this->EventArguments['Configuration'] = &$configurationModel;
         $this->fireEvent('Registration');
@@ -1550,6 +1557,10 @@ class SettingsController extends DashboardController {
             $invitationCounts = $this->Form->getValue('InvitationCount');
             $this->ExistingRoleInvitations = arrayCombine($invitationRoleIDs, $invitationCounts);
             $configurationModel->forceSetting('Garden.Registration.InviteRoles', $this->ExistingRoleInvitations);
+
+            if ($this->data('ConfirmationSupported') === false && $this->Form->getValue('Garden.Registration.ConfirmEmail')) {
+                $this->Form->addError('A role with default type "unconfirmed" is required to use email confirmation.');
+            }
 
             // Event hook
             $this->EventArguments['ConfigurationModel'] = &$configurationModel;

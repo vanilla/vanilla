@@ -16,7 +16,7 @@
         <ul class="DataList CategoryList">
             <?php
             foreach ($this->data('Categories') as $category) {
-                writeListItem($category);
+                writeListItem($category, 1);
             }
             ?>
         </ul>

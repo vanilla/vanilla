@@ -24,17 +24,17 @@
 
     <?php
 
-    echo '<div class="P">', $this->Form->Radio('Reason', 'Spamming', array('Value' => 'Spam')), '</div>';
-    echo '<div class="P">', $this->Form->Radio('Reason', 'Abusive Behavior', array('Value' => 'Abuse')), '</div>';
+    echo '<div class="P">', $this->Form->radio('Reason', 'Spamming', ['Value' => 'Spam']), '</div>';
+    echo '<div class="P">', $this->Form->radio('Reason', 'Abusive Behavior', ['Value' => 'Abuse']), '</div>';
     echo '<div class="P">',
-    $this->Form->Radio('Reason', 'Other', array('Value' => 'Other')),
+    $this->Form->radio('Reason', 'Other', ['Value' => 'Other']),
     '<div class="TextBoxWrapper">',
-    $this->Form->textBox('ReasonText', array('MultiLine' => TRUE)),
+    $this->Form->textBox('ReasonText', ['MultiLine' => TRUE]),
     '</div>',
     '</div>';
 
     if ($this->data('_MayDeleteContent'))
-        echo '<div class="P">', $this->Form->CheckBox('DeleteContent', t("Also delete this user's content.")), '</div>';
+        echo '<div class="P">', $this->Form->checkBox('DeleteContent', t("Also delete this user's content.")), '</div>';
 
     ?>
 

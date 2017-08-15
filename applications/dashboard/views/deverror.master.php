@@ -5,7 +5,7 @@
     <title>Fatal Error</title>
     <?php
     if ($CssPath !== FALSE)
-        echo '<link rel="stylesheet" type="text/css" href="', Asset($CssPath), '" />';
+        echo '<link rel="stylesheet" type="text/css" href="', asset($CssPath), '" />';
     ?>
 </head>
 <body>
@@ -68,8 +68,8 @@
         // Dump queries if present.
         $Database = Gdn::database();
         if (!is_null($Database) && method_exists($Database, 'Queries')) {
-            $Queries = $Database->Queries();
-            $QueryTimes = $Database->QueryTimes();
+            $Queries = $Database->queries();
+            $QueryTimes = $Database->queryTimes();
             if (count($Queries) > 0) {
                 echo '<h3><strong>Queries:</strong></h3>
                <div class="PreContainer">';
@@ -95,10 +95,10 @@
             echo '<h3><strong>Variables in local scope:</strong></h3>
             <div class="PreContainer">';
             $Odd = FALSE;
-            CleanErrorArguments($Arguments);
+            cleanErrorArguments($Arguments);
             foreach ($Arguments as $Key => $Value) {
                 // Don't echo the configuration array as it contains sensitive information
-                if (!in_array($Key, array('Config', 'Configuration'))) {
+                if (!in_array($Key, ['Config', 'Configuration'])) {
                     echo '<pre'.($Odd === FALSE ? '' : ' class="Odd"').'><strong>['.$Key.']</strong> ';
                     echo htmlentities(var_export($Value, true), ENT_COMPAT, 'UTF-8');
                     echo "</pre>\r\n";

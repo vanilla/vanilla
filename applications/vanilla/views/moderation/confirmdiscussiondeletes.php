@@ -29,8 +29,8 @@ if ($CountNotAllowed > 0) {
 echo '<p><strong>'.t('Are you sure you wish to continue?').'</strong></p>';
 
 echo '<div class="Buttons Buttons-Confirm">',
-$this->Form->button('OK', array('class' => 'Button Primary')),
-$this->Form->button('Cancel', array('type' => 'button', 'class' => 'Button Close')),
+$this->Form->button('OK', ['class' => 'Button Primary']),
+$this->Form->button('Cancel', ['type' => 'button', 'class' => 'Button Close']),
 '</div>';
 
 echo $this->Form->close();

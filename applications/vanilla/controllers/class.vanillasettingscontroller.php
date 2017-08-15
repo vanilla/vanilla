@@ -14,7 +14,7 @@
 class VanillaSettingsController extends Gdn_Controller {
 
     /** @var array Models to include. */
-    public $Uses = array('Database', 'Form', 'CategoryModel');
+    public $Uses = ['Database', 'Form', 'CategoryModel'];
 
     /** @var CategoryModel */
     public $CategoryModel;
@@ -41,9 +41,9 @@ class VanillaSettingsController extends Gdn_Controller {
         $this->permission('Garden.Settings.Manage');
 
         // Load up config options we'll be setting
-        $Validation = new Gdn_Validation();
-        $ConfigurationModel = new Gdn_ConfigurationModel($Validation);
-        $ConfigurationModel->setField(array(
+        $validation = new Gdn_Validation();
+        $configurationModel = new Gdn_ConfigurationModel($validation);
+        $configurationModel->setField([
             'Vanilla.Categories.MaxDisplayDepth',
             'Vanilla.Discussions.PerPage',
             'Vanilla.Comments.PerPage',
@@ -53,36 +53,36 @@ class VanillaSettingsController extends Gdn_Controller {
             'Vanilla.Comment.MaxLength',
             'Vanilla.Comment.MinLength',
             'Garden.Format.DisableUrlEmbeds',
-        ));
+        ]);
 
         // Set the model on the form.
-        $this->Form->setModel($ConfigurationModel);
+        $this->Form->setModel($configurationModel);
 
         // If seeing the form for the first time...
         if ($this->Form->authenticatedPostBack() === false) {
 
 
             // Apply the config settings to the form.
-            $this->Form->setData($ConfigurationModel->Data);
+            $this->Form->setData($configurationModel->Data);
         } else {
             // This is a "reverse" field on the form. Disabling URL embeds is associated with a toggle that enables them.
             $disableUrlEmbeds = $this->Form->getFormValue('Garden.Format.DisableUrlEmbeds', true);
             $this->Form->setFormValue('Garden.Format.DisableUrlEmbeds', !$disableUrlEmbeds);
 
             // Define some validation rules for the fields being saved
-            $ConfigurationModel->Validation->applyRule('Vanilla.Categories.MaxDisplayDepth', 'Required');
-            $ConfigurationModel->Validation->applyRule('Vanilla.Categories.MaxDisplayDepth', 'Integer');
-            $ConfigurationModel->Validation->applyRule('Vanilla.Discussions.PerPage', 'Required');
-            $ConfigurationModel->Validation->applyRule('Vanilla.Discussions.PerPage', 'Integer');
-            $ConfigurationModel->Validation->applyRule('Vanilla.Comments.PerPage', 'Required');
-            $ConfigurationModel->Validation->applyRule('Vanilla.Comments.PerPage', 'Integer');
-            $ConfigurationModel->Validation->applyRule('Garden.EditContentTimeout', 'Integer');
-            $ConfigurationModel->Validation->applyRule('Vanilla.Comment.MaxLength', 'Required');
-            $ConfigurationModel->Validation->applyRule('Vanilla.Comment.MaxLength', 'Integer');
+            $configurationModel->Validation->applyRule('Vanilla.Categories.MaxDisplayDepth', 'Required');
+            $configurationModel->Validation->applyRule('Vanilla.Categories.MaxDisplayDepth', 'Integer');
+            $configurationModel->Validation->applyRule('Vanilla.Discussions.PerPage', 'Required');
+            $configurationModel->Validation->applyRule('Vanilla.Discussions.PerPage', 'Integer');
+            $configurationModel->Validation->applyRule('Vanilla.Comments.PerPage', 'Required');
+            $configurationModel->Validation->applyRule('Vanilla.Comments.PerPage', 'Integer');
+            $configurationModel->Validation->applyRule('Garden.EditContentTimeout', 'Integer');
+            $configurationModel->Validation->applyRule('Vanilla.Comment.MaxLength', 'Required');
+            $configurationModel->Validation->applyRule('Vanilla.Comment.MaxLength', 'Integer');
 
             // Save new settings
-            $Saved = $this->Form->save();
-            if ($Saved !== false) {
+            $saved = $this->Form->save();
+            if ($saved !== false) {
                 $this->informMessage(t("Your changes have been saved."));
             }
         }
@@ -112,36 +112,36 @@ class VanillaSettingsController extends Gdn_Controller {
         $this->permission('Garden.Settings.Manage');
 
         // Load up config options we'll be setting
-        $Validation = new Gdn_Validation();
-        $ConfigurationModel = new Gdn_ConfigurationModel($Validation);
-        $ConfigurationModel->setField(array(
+        $validation = new Gdn_Validation();
+        $configurationModel = new Gdn_ConfigurationModel($validation);
+        $configurationModel->setField([
             'Vanilla.Archive.Date',
             'Vanilla.Archive.Exclude'
-        ));
+        ]);
 
         // Set the model on the form.
-        $this->Form->setModel($ConfigurationModel);
+        $this->Form->setModel($configurationModel);
 
         // If seeing the form for the first time...
         if ($this->Form->authenticatedPostBack() === false) {
-            $this->Form->setData($ConfigurationModel->Data);
+            $this->Form->setData($configurationModel->Data);
         } else {
             // Define some validation rules for the fields being saved
-            $ConfigurationModel->Validation->applyRule('Vanilla.Archive.Date', 'Date');
+            $configurationModel->Validation->applyRule('Vanilla.Archive.Date', 'Date');
 
             // Grab old config values to check for an update.
-            $ArchiveDateBak = Gdn::config('Vanilla.Archive.Date');
-            $ArchiveExcludeBak = (bool)Gdn::config('Vanilla.Archive.Exclude');
+            $archiveDateBak = Gdn::config('Vanilla.Archive.Date');
+            $archiveExcludeBak = (bool)Gdn::config('Vanilla.Archive.Exclude');
 
             // Save new settings
-            $Saved = $this->Form->save();
-            if ($Saved !== false) {
-                $ArchiveDate = Gdn::config('Vanilla.Archive.Date');
-                $ArchiveExclude = (bool)Gdn::config('Vanilla.Archive.Exclude');
+            $saved = $this->Form->save();
+            if ($saved !== false) {
+                $archiveDate = Gdn::config('Vanilla.Archive.Date');
+                $archiveExclude = (bool)Gdn::config('Vanilla.Archive.Exclude');
 
-                if ($ArchiveExclude != $ArchiveExcludeBak || ($ArchiveExclude && $ArchiveDate != $ArchiveDateBak)) {
-                    $DiscussionModel = new DiscussionModel();
-                    $DiscussionModel->UpdateDiscussionCount('All');
+                if ($archiveExclude != $archiveExcludeBak || ($archiveExclude && $archiveDate != $archiveDateBak)) {
+                    $discussionModel = new DiscussionModel();
+                    $discussionModel->updateDiscussionCount('All');
                 }
                 $this->informMessage(t("Your changes have been saved."));
             }
@@ -183,7 +183,7 @@ class VanillaSettingsController extends Gdn_Controller {
         $this->addJsFile('jquery.autosize.min.js');
         $this->addJsFile('global.js');
 
-        if (in_array($this->ControllerName, array('profilecontroller', 'activitycontroller'))) {
+        if (in_array($this->ControllerName, ['profilecontroller', 'activitycontroller'])) {
             $this->addCssFile('style.css');
             $this->addCssFile('vanillicon.css', 'static');
         } else {
@@ -229,10 +229,10 @@ class VanillaSettingsController extends Gdn_Controller {
         $this->setHighlightRoute('vanilla/settings/floodcontrol');
 
         // Check to see if Conversation is enabled.
-        $IsConversationsEnabled = Gdn::addonManager()->isEnabled('Conversations', \Vanilla\Addon::TYPE_ADDON);
-        $this->setData('IsConversationsEnabled', $IsConversationsEnabled);
+        $isConversationsEnabled = Gdn::addonManager()->isEnabled('Conversations', \Vanilla\Addon::TYPE_ADDON);
+        $this->setData('IsConversationsEnabled', $isConversationsEnabled);
 
-        $ConfigurationFields = array(
+        $configurationFields = [
             'Vanilla.Discussion.SpamCount',
             'Vanilla.Discussion.SpamTime',
             'Vanilla.Discussion.SpamLock',
@@ -245,76 +245,76 @@ class VanillaSettingsController extends Gdn_Controller {
             'Vanilla.ActivityComment.SpamCount',
             'Vanilla.ActivityComment.SpamTime',
             'Vanilla.ActivityComment.SpamLock',
-        );
-        if ($IsConversationsEnabled) {
-            $ConfigurationFields = array_merge(
-                $ConfigurationFields,
-                array(
+        ];
+        if ($isConversationsEnabled) {
+            $configurationFields = array_merge(
+                $configurationFields,
+                [
                     'Conversations.Conversation.SpamCount',
                     'Conversations.Conversation.SpamTime',
                     'Conversations.Conversation.SpamLock',
                     'Conversations.ConversationMessage.SpamCount',
                     'Conversations.ConversationMessage.SpamTime',
                     'Conversations.ConversationMessage.SpamLock'
-                )
+                ]
             );
         }
         // Load up config options we'll be setting
-        $Validation = new Gdn_Validation();
-        $ConfigurationModel = new Gdn_ConfigurationModel($Validation);
-        $ConfigurationModel->setField($ConfigurationFields);
+        $validation = new Gdn_Validation();
+        $configurationModel = new Gdn_ConfigurationModel($validation);
+        $configurationModel->setField($configurationFields);
 
         // Set the model on the form.
-        $this->Form->setModel($ConfigurationModel);
+        $this->Form->setModel($configurationModel);
 
         // If seeing the form for the first time...
         if ($this->Form->authenticatedPostBack() === false) {
             // Apply the config settings to the form.
-            $this->Form->setData($ConfigurationModel->Data);
+            $this->Form->setData($configurationModel->Data);
         } else {
             // Define some validation rules for the fields being saved
-            $ConfigurationModel->Validation->applyRule('Vanilla.Discussion.SpamCount', 'Required');
-            $ConfigurationModel->Validation->applyRule('Vanilla.Discussion.SpamCount', 'Integer');
-            $ConfigurationModel->Validation->applyRule('Vanilla.Discussion.SpamTime', 'Required');
-            $ConfigurationModel->Validation->applyRule('Vanilla.Discussion.SpamTime', 'Integer');
-            $ConfigurationModel->Validation->applyRule('Vanilla.Discussion.SpamLock', 'Required');
-            $ConfigurationModel->Validation->applyRule('Vanilla.Discussion.SpamLock', 'Integer');
+            $configurationModel->Validation->applyRule('Vanilla.Discussion.SpamCount', 'Required');
+            $configurationModel->Validation->applyRule('Vanilla.Discussion.SpamCount', 'Integer');
+            $configurationModel->Validation->applyRule('Vanilla.Discussion.SpamTime', 'Required');
+            $configurationModel->Validation->applyRule('Vanilla.Discussion.SpamTime', 'Integer');
+            $configurationModel->Validation->applyRule('Vanilla.Discussion.SpamLock', 'Required');
+            $configurationModel->Validation->applyRule('Vanilla.Discussion.SpamLock', 'Integer');
 
-            $ConfigurationModel->Validation->applyRule('Vanilla.Comment.SpamCount', 'Required');
-            $ConfigurationModel->Validation->applyRule('Vanilla.Comment.SpamCount', 'Integer');
-            $ConfigurationModel->Validation->applyRule('Vanilla.Comment.SpamTime', 'Required');
-            $ConfigurationModel->Validation->applyRule('Vanilla.Comment.SpamTime', 'Integer');
-            $ConfigurationModel->Validation->applyRule('Vanilla.Comment.SpamLock', 'Required');
-            $ConfigurationModel->Validation->applyRule('Vanilla.Comment.SpamLock', 'Integer');
+            $configurationModel->Validation->applyRule('Vanilla.Comment.SpamCount', 'Required');
+            $configurationModel->Validation->applyRule('Vanilla.Comment.SpamCount', 'Integer');
+            $configurationModel->Validation->applyRule('Vanilla.Comment.SpamTime', 'Required');
+            $configurationModel->Validation->applyRule('Vanilla.Comment.SpamTime', 'Integer');
+            $configurationModel->Validation->applyRule('Vanilla.Comment.SpamLock', 'Required');
+            $configurationModel->Validation->applyRule('Vanilla.Comment.SpamLock', 'Integer');
 
-            $ConfigurationModel->Validation->applyRule('Vanilla.Activity.SpamCount', 'Required');
-            $ConfigurationModel->Validation->applyRule('Vanilla.Activity.SpamCount', 'Integer');
-            $ConfigurationModel->Validation->applyRule('Vanilla.Activity.SpamTime', 'Required');
-            $ConfigurationModel->Validation->applyRule('Vanilla.Activity.SpamTime', 'Integer');
-            $ConfigurationModel->Validation->applyRule('Vanilla.Activity.SpamLock', 'Required');
-            $ConfigurationModel->Validation->applyRule('Vanilla.Activity.SpamLock', 'Integer');
+            $configurationModel->Validation->applyRule('Vanilla.Activity.SpamCount', 'Required');
+            $configurationModel->Validation->applyRule('Vanilla.Activity.SpamCount', 'Integer');
+            $configurationModel->Validation->applyRule('Vanilla.Activity.SpamTime', 'Required');
+            $configurationModel->Validation->applyRule('Vanilla.Activity.SpamTime', 'Integer');
+            $configurationModel->Validation->applyRule('Vanilla.Activity.SpamLock', 'Required');
+            $configurationModel->Validation->applyRule('Vanilla.Activity.SpamLock', 'Integer');
 
-            $ConfigurationModel->Validation->applyRule('Vanilla.ActivityComment.SpamCount', 'Required');
-            $ConfigurationModel->Validation->applyRule('Vanilla.ActivityComment.SpamCount', 'Integer');
-            $ConfigurationModel->Validation->applyRule('Vanilla.ActivityComment.SpamTime', 'Required');
-            $ConfigurationModel->Validation->applyRule('Vanilla.ActivityComment.SpamTime', 'Integer');
-            $ConfigurationModel->Validation->applyRule('Vanilla.ActivityComment.SpamLock', 'Required');
-            $ConfigurationModel->Validation->applyRule('Vanilla.ActivityComment.SpamLock', 'Integer');
+            $configurationModel->Validation->applyRule('Vanilla.ActivityComment.SpamCount', 'Required');
+            $configurationModel->Validation->applyRule('Vanilla.ActivityComment.SpamCount', 'Integer');
+            $configurationModel->Validation->applyRule('Vanilla.ActivityComment.SpamTime', 'Required');
+            $configurationModel->Validation->applyRule('Vanilla.ActivityComment.SpamTime', 'Integer');
+            $configurationModel->Validation->applyRule('Vanilla.ActivityComment.SpamLock', 'Required');
+            $configurationModel->Validation->applyRule('Vanilla.ActivityComment.SpamLock', 'Integer');
 
-            if ($IsConversationsEnabled) {
-                $ConfigurationModel->Validation->applyRule('Conversations.Conversation.SpamCount', 'Required');
-                $ConfigurationModel->Validation->applyRule('Conversations.Conversation.SpamCount', 'Integer');
-                $ConfigurationModel->Validation->applyRule('Conversations.Conversation.SpamTime', 'Required');
-                $ConfigurationModel->Validation->applyRule('Conversations.Conversation.SpamTime', 'Integer');
-                $ConfigurationModel->Validation->applyRule('Conversations.Conversation.SpamLock', 'Required');
-                $ConfigurationModel->Validation->applyRule('Conversations.Conversation.SpamLock', 'Integer');
+            if ($isConversationsEnabled) {
+                $configurationModel->Validation->applyRule('Conversations.Conversation.SpamCount', 'Required');
+                $configurationModel->Validation->applyRule('Conversations.Conversation.SpamCount', 'Integer');
+                $configurationModel->Validation->applyRule('Conversations.Conversation.SpamTime', 'Required');
+                $configurationModel->Validation->applyRule('Conversations.Conversation.SpamTime', 'Integer');
+                $configurationModel->Validation->applyRule('Conversations.Conversation.SpamLock', 'Required');
+                $configurationModel->Validation->applyRule('Conversations.Conversation.SpamLock', 'Integer');
 
-                $ConfigurationModel->Validation->applyRule('Conversations.ConversationMessage.SpamCount', 'Required');
-                $ConfigurationModel->Validation->applyRule('Conversations.ConversationMessage.SpamCount', 'Integer');
-                $ConfigurationModel->Validation->applyRule('Conversations.ConversationMessage.SpamTime', 'Required');
-                $ConfigurationModel->Validation->applyRule('Conversations.ConversationMessage.SpamTime', 'Integer');
-                $ConfigurationModel->Validation->applyRule('Conversations.ConversationMessage.SpamLock', 'Required');
-                $ConfigurationModel->Validation->applyRule('Conversations.ConversationMessage.SpamLock', 'Integer');
+                $configurationModel->Validation->applyRule('Conversations.ConversationMessage.SpamCount', 'Required');
+                $configurationModel->Validation->applyRule('Conversations.ConversationMessage.SpamCount', 'Integer');
+                $configurationModel->Validation->applyRule('Conversations.ConversationMessage.SpamTime', 'Required');
+                $configurationModel->Validation->applyRule('Conversations.ConversationMessage.SpamTime', 'Integer');
+                $configurationModel->Validation->applyRule('Conversations.ConversationMessage.SpamLock', 'Required');
+                $configurationModel->Validation->applyRule('Conversations.ConversationMessage.SpamLock', 'Integer');
             }
 
             if ($this->Form->save() !== false) {
@@ -353,7 +353,7 @@ class VanillaSettingsController extends Gdn_Controller {
 
         $this->fireAs('SettingsController');
         $this->fireEvent('AddEditCategory');
-        $this->setupDiscussionTypes(array());
+        $this->setupDiscussionTypes([]);
 
         $displayAsOptions = CategoryModel::getDisplayAsOptions();
 
@@ -415,7 +415,7 @@ class VanillaSettingsController extends Gdn_Controller {
         }
 
         // Get all of the currently selected role/permission combinations for this junction.
-        $Permissions = $PermissionModel->getJunctionPermissions(array('JunctionID' => isset($CategoryID) ? $CategoryID : 0), 'Category');
+        $Permissions = $PermissionModel->getJunctionPermissions(['JunctionID' => isset($CategoryID) ? $CategoryID : 0], 'Category');
         $Permissions = $PermissionModel->unpivotPermissions($Permissions, true);
 
         if ($this->deliveryType() == DELIVERY_TYPE_ALL) {
@@ -468,9 +468,9 @@ class VanillaSettingsController extends Gdn_Controller {
      * @since 2.0.0
      * @access public
      *
-     * @param int|bool $CategoryID Unique ID of the category to be deleted.
+     * @param int|bool $categoryID Unique ID of the category to be deleted.
      */
-    public function deleteCategory($CategoryID = false) {
+    public function deleteCategory($categoryID = false) {
         // Check permission
         $this->permission(['Garden.Community.Manage', 'Garden.Settings.Manage'], false);
 
@@ -480,7 +480,7 @@ class VanillaSettingsController extends Gdn_Controller {
         $this->setHighlightRoute('vanilla/settings/categories');
 
         // Get category data
-        $this->Category = $this->CategoryModel->getID($CategoryID);
+        $this->Category = $this->CategoryModel->getID($categoryID);
 
         // Block deleting special categories.
         if (!val('CanDelete', $this->Category, true)) {
@@ -491,12 +491,12 @@ class VanillaSettingsController extends Gdn_Controller {
             $this->Form->addError('The specified category could not be found.');
         } else {
             // Make sure the form knows which item we are deleting.
-            $this->Form->addHidden('CategoryID', $CategoryID);
+            $this->Form->addHidden('CategoryID', $categoryID);
 
             // Get a list of categories other than this one that can act as a replacement
             $this->OtherCategories = $this->CategoryModel->getWhere(
                 [
-                    'CategoryID <>' => $CategoryID,
+                    'CategoryID <>' => $categoryID,
                     'AllowDiscussions' => $this->Category->AllowDiscussions, // Don't allow a category with discussion to be the replacement for one without discussions (or vice versa)
                     'CategoryID >' => 0
                 ],
@@ -504,11 +504,11 @@ class VanillaSettingsController extends Gdn_Controller {
             );
 
             // Get the list of sub-categories
-            $subcategories = $this->CategoryModel->getSubtree($CategoryID, false);
+            $subcategories = $this->CategoryModel->getSubtree($categoryID, false);
             $this->setData('Subcategories', $subcategories);
             // Number of discussions contained in the subcategories
             $discussionModel = new DiscussionModel();
-            $categoryIDs = array_merge([$CategoryID], array_column($subcategories, 'CategoryID'));
+            $categoryIDs = array_merge([$categoryID], array_column($subcategories, 'CategoryID'));
             $this->setData('DiscussionsCount', $discussionModel->getCountForCategory($categoryIDs));
 
             if ($this->Form->authenticatedPostBack()) {
@@ -563,16 +563,16 @@ class VanillaSettingsController extends Gdn_Controller {
      * @since 2.1
      * @access public
      *
-     * @param String $CategoryID Unique ID of the category to have its photo deleted.
+     * @param String $categoryID Unique ID of the category to have its photo deleted.
      */
-    public function deleteCategoryPhoto($CategoryID = '') {
+    public function deleteCategoryPhoto($categoryID = '') {
         // Check permission
         $this->permission(['Garden.Community.Manage', 'Garden.Settings.Manage'], false);
 
-        if ($CategoryID && Gdn::request()->isAuthenticatedPostBack(true)) {
+        if ($categoryID && Gdn::request()->isAuthenticatedPostBack(true)) {
             // Do removal, set message
-            $CategoryModel = new CategoryModel();
-            $CategoryModel->setField($CategoryID, 'Photo', null);
+            $categoryModel = new CategoryModel();
+            $categoryModel->setField($categoryID, 'Photo', null);
             $this->informMessage(t('Category photo was successfully deleted.'));
         }
         $this->render('blank', 'utility', 'dashboard');
@@ -581,25 +581,25 @@ class VanillaSettingsController extends Gdn_Controller {
     /**
      *
      *
-     * @param $Category
+     * @param $category
      */
-    protected function setupDiscussionTypes($Category) {
-        $DiscussionTypes = DiscussionModel::DiscussionTypes();
-        $this->setData('DiscussionTypes', $DiscussionTypes);
+    protected function setupDiscussionTypes($category) {
+        $discussionTypes = DiscussionModel::discussionTypes();
+        $this->setData('DiscussionTypes', $discussionTypes);
 
         if (!$this->Form->isPostBack()) {
-            $PCatID = val('PermissionCategoryID', $Category, -1);
-            if ($PCatID == val('CategoryID', $Category)) {
-                $PCat = $Category;
+            $pCatID = val('PermissionCategoryID', $category, -1);
+            if ($pCatID == val('CategoryID', $category)) {
+                $pCat = $category;
             } else {
-                $PCat = CategoryModel::categories($PCatID);
+                $pCat = CategoryModel::categories($pCatID);
             }
-            $AllowedTypes = val('AllowedDiscussionTypes', $PCat);
-            if (empty($AllowedTypes)) {
-                $AllowedTypes = array_keys($DiscussionTypes);
+            $allowedTypes = val('AllowedDiscussionTypes', $pCat);
+            if (empty($allowedTypes)) {
+                $allowedTypes = array_keys($discussionTypes);
             }
 
-            $this->Form->setValue("AllowedDiscussionTypes", $AllowedTypes);
+            $this->Form->setValue("AllowedDiscussionTypes", $allowedTypes);
         }
     }
 
@@ -607,26 +607,26 @@ class VanillaSettingsController extends Gdn_Controller {
      * Editing a category.
      *
      * @since 2.0.0
-     * @param int|string $CategoryID Unique ID of the category to be updated.
+     * @param int|string $categoryID Unique ID of the category to be updated.
      * @throws Exception when category cannot be found.
      */
-    public function editCategory($CategoryID = '') {
+    public function editCategory($categoryID = '') {
         // Check permission
         $this->permission(['Garden.Community.Manage', 'Garden.Settings.Manage'], false);
 
         // Set up models
-        $RoleModel = new RoleModel();
-        $PermissionModel = Gdn::permissionModel();
+        $roleModel = new RoleModel();
+        $permissionModel = Gdn::permissionModel();
         $this->Form->setModel($this->CategoryModel);
 
-        if (!$CategoryID && $this->Form->authenticatedPostBack()) {
-            if ($ID = $this->Form->getFormValue('CategoryID')) {
-                $CategoryID = $ID;
+        if (!$categoryID && $this->Form->authenticatedPostBack()) {
+            if ($iD = $this->Form->getFormValue('CategoryID')) {
+                $categoryID = $iD;
             }
         }
 
         // Get category data
-        $this->Category = CategoryModel::categories($CategoryID);
+        $this->Category = CategoryModel::categories($categoryID);
         if (!$this->Category) {
             throw notFoundException('Category');
         }
@@ -652,30 +652,30 @@ class VanillaSettingsController extends Gdn_Controller {
         $this->setHighlightRoute('vanilla/settings/categories');
 
         // Make sure the form knows which item we are editing.
-        $this->Form->addHidden('CategoryID', $CategoryID);
-        $this->setData('CategoryID', $CategoryID);
+        $this->Form->addHidden('CategoryID', $categoryID);
+        $this->setData('CategoryID', $categoryID);
 
         // Load all roles with editable permissions
-        $this->RoleArray = $RoleModel->getArray();
+        $this->RoleArray = $roleModel->getArray();
 
         $this->fireAs('SettingsController');
         $this->fireEvent('AddEditCategory');
 
         if ($this->Form->authenticatedPostBack()) {
             $this->setupDiscussionTypes($this->Category);
-            $Upload = new Gdn_Upload();
-            $TmpImage = $Upload->validateUpload('Photo_New', false);
-            if ($TmpImage) {
+            $upload = new Gdn_Upload();
+            $tmpImage = $upload->validateUpload('Photo_New', false);
+            if ($tmpImage) {
                 // Generate the target image name
-                $TargetImage = $Upload->generateTargetName(PATH_UPLOADS);
-                $ImageBaseName = pathinfo($TargetImage, PATHINFO_BASENAME);
+                $targetImage = $upload->generateTargetName(PATH_UPLOADS);
+                $imageBaseName = pathinfo($targetImage, PATHINFO_BASENAME);
 
                 // Save the uploaded image
-                $Parts = $Upload->saveAs(
-                    $TmpImage,
-                    $ImageBaseName
+                $parts = $upload->saveAs(
+                    $tmpImage,
+                    $imageBaseName
                 );
-                $this->Form->setFormValue('Photo', $Parts['SaveName']);
+                $this->Form->setFormValue('Photo', $parts['SaveName']);
             }
             $this->Form->setFormValue('CustomPoints', (bool)$this->Form->getFormValue('CustomPoints'));
 
@@ -695,15 +695,15 @@ class VanillaSettingsController extends Gdn_Controller {
             }
 
             if ($this->Form->save()) {
-                $Category = CategoryModel::categories($CategoryID);
-                $this->setData('Category', $Category);
+                $category = CategoryModel::categories($categoryID);
+                $this->setData('Category', $category);
 
                 if ($this->deliveryType() == DELIVERY_TYPE_ALL) {
                     $destination = $this->categoryPageByParent($parentCategory);
                     redirectTo($destination);
                 } elseif ($this->deliveryType() === DELIVERY_TYPE_DATA && method_exists($this, 'getCategory')) {
                     $this->Data = [];
-                    $this->getCategory($CategoryID);
+                    $this->getCategory($categoryID);
                     return;
                 }
             }
@@ -714,11 +714,11 @@ class VanillaSettingsController extends Gdn_Controller {
         }
 
         // Get all of the currently selected role/permission combinations for this junction.
-        $Permissions = $PermissionModel->getJunctionPermissions(array('JunctionID' => $CategoryID), 'Category', '', array('AddDefaults' => !$this->Category->CustomPermissions));
-        $Permissions = $PermissionModel->unpivotPermissions($Permissions, true);
+        $permissions = $permissionModel->getJunctionPermissions(['JunctionID' => $categoryID], 'Category', '', ['AddDefaults' => !$this->Category->CustomPermissions]);
+        $permissions = $permissionModel->unpivotPermissions($permissions, true);
 
         if ($this->deliveryType() == DELIVERY_TYPE_ALL) {
-            $this->setData('PermissionData', $Permissions, true);
+            $this->setData('PermissionData', $permissions, true);
         }
 
         // Render default view
@@ -858,40 +858,40 @@ class VanillaSettingsController extends Gdn_Controller {
         $this->title(t('Categories'));
 
         // Get category data
-        $CategoryData = $this->CategoryModel->getAll('TreeLeft');
+        $categoryData = $this->CategoryModel->getAll('TreeLeft');
 
         // Set CanDelete per-category so we can override later if we want.
         $canDelete = checkPermission(['Garden.Community.Manage', 'Garden.Settings.Manage']);
-        array_walk($CategoryData->result(), function(&$value) use ($canDelete) {
+        array_walk($categoryData->result(), function(&$value) use ($canDelete) {
             setvalr('CanDelete', $value, $canDelete);
         });
 
-        $this->setData('CategoryData', $CategoryData, true);
+        $this->setData('CategoryData', $categoryData, true);
 
         // Setup & save forms
-        $Validation = new Gdn_Validation();
-        $ConfigurationModel = new Gdn_ConfigurationModel($Validation);
-        $ConfigurationModel->setField(array(
+        $validation = new Gdn_Validation();
+        $configurationModel = new Gdn_ConfigurationModel($validation);
+        $configurationModel->setField([
             'Vanilla.Categories.MaxDisplayDepth',
             'Vanilla.Categories.DoHeadings',
             'Vanilla.Categories.HideModule'
-        ));
+        ]);
 
         // Set the model on the form.
-        $this->Form->setModel($ConfigurationModel);
+        $this->Form->setModel($configurationModel);
 
         // Define MaxDepthOptions
-        $DepthData = array();
-        $DepthData['2'] = sprintf(t('more than %s deep'), plural(1, '%s level', '%s levels'));
-        $DepthData['3'] = sprintf(t('more than %s deep'), plural(2, '%s level', '%s levels'));
-        $DepthData['4'] = sprintf(t('more than %s deep'), plural(3, '%s level', '%s levels'));
-        $DepthData['0'] = t('never');
-        $this->setData('MaxDepthData', $DepthData);
+        $depthData = [];
+        $depthData['2'] = sprintf(t('more than %s deep'), plural(1, '%s level', '%s levels'));
+        $depthData['3'] = sprintf(t('more than %s deep'), plural(2, '%s level', '%s levels'));
+        $depthData['4'] = sprintf(t('more than %s deep'), plural(3, '%s level', '%s levels'));
+        $depthData['0'] = t('never');
+        $this->setData('MaxDepthData', $depthData);
 
         // If seeing the form for the first time...
         if ($this->Form->authenticatedPostBack() === false) {
             // Apply the config settings to the form.
-            $this->Form->setData($ConfigurationModel->Data);
+            $this->Form->setData($configurationModel->Data);
         } else {
             if ($this->Form->save() !== false) {
                 CategoryModel::clearCache();
@@ -1007,10 +1007,10 @@ class VanillaSettingsController extends Gdn_Controller {
 
         // Set delivery type to true/false
         if (Gdn::request()->isAuthenticatedPostBack()) {
-            $TreeArray = val('TreeArray', $_POST);
-            $Saves = $this->CategoryModel->SaveTree($TreeArray);
+            $treeArray = val('TreeArray', $_POST);
+            $saves = $this->CategoryModel->saveTree($treeArray);
             $this->setData('Result', true);
-            $this->setData('Saves', $Saves);
+            $this->setData('Saves', $saves);
         }
 
         // Renders true/false rather than template

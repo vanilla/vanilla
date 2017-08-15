@@ -16,7 +16,7 @@ if (sizeof($this->data('Discussions'))) {
             <div class="ItemContent">
                 <div class="Message"><?php
                     echo '<h2>'.anchor(Gdn_Format::text($discussion->Name), $permalink).'</h2>';
-                    echo SliceString(Gdn_Format::plainText($discussion->Body, $discussion->Format), 250);
+                    echo sliceString(Gdn_Format::plainText($discussion->Body, $discussion->Format), 250);
                     ?></div>
                 <div class="Meta">
                 <span class="MItem"><?php echo t('Posted in', 'in').' '; ?>

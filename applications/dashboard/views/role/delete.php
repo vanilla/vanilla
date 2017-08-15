@@ -21,14 +21,14 @@ echo $this->Form->errors();
                 <div class="info"><?php echo t('Choose a role that orphaned users will be assigned to.'); ?></div>
             </div>
             <div class="input-wrap">
-                <?php  echo $this->Form->DropDown(
+                <?php  echo $this->Form->dropDown(
                     'ReplacementRoleID',
                     $this->ReplacementRoles,
-                    array(
+                    [
                         'ValueField' => 'RoleID',
                         'TextField' => 'Name',
                         'IncludeNull' => true
-                    ));
+                    ]);
                 ?>
             </div>
         </li>

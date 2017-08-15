@@ -3,19 +3,19 @@
     <language><?php echo Gdn::config('Garden.Locale', 'en-US'); ?></language>
     <atom:link href="<?php echo htmlspecialchars(url($this->SelfUrl, true)); ?>" rel="self" type="application/rss+xml"/>
 <?php
-$Activities = $this->data('Activities', array());
+$Activities = $this->data('Activities', []);
 foreach ($Activities as $Activity) {
-    $Author = UserBuilder($Activity, 'Activity');
+    $Author = userBuilder($Activity, 'Activity');
     ?>
     <item>
         <title><?php echo Gdn_Format::text(val('Headline', $Activity)); ?></title>
         <link><?php echo url(userUrl($Author, '', 'activity'), true); ?></link>
-        <pubDate><?php echo date('r', Gdn_Format::ToTimeStamp(val('DateUpdated', $Activity))); ?></pubDate>
+        <pubDate><?php echo date('r', Gdn_Format::toTimeStamp(val('DateUpdated', $Activity))); ?></pubDate>
         <dc:creator><?php echo Gdn_Format::text($Author->Name); ?></dc:creator>
         <guid
-            isPermaLink="false"><?php echo val('ActivityID', $Activity).'@'.Url(userUrl($Author, '', 'activity')); ?></guid>
+            isPermaLink="false"><?php echo val('ActivityID', $Activity).'@'.url(userUrl($Author, '', 'activity')); ?></guid>
         <?php if ($Story = val('Story', $Activity)) : ?>
-            <description><![CDATA[<?php echo Gdn_Format::RssHtml($Story, val('Format', $Activity)); ?>]]>
+            <description><![CDATA[<?php echo Gdn_Format::rssHtml($Story, val('Format', $Activity)); ?>]]>
             </description>
         <?php endif; ?>
     </item>

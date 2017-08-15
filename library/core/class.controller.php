@@ -52,7 +52,7 @@ class Gdn_Controller extends Gdn_Pluggable {
     public $CssClass;
 
     /** @var array The data that a controller method has built up from models and other calculations. */
-    public $Data = array();
+    public $Data = [];
 
     /** @var HeadModule The Head module that this controller should use to add CSS files. */
     public $Head;
@@ -125,7 +125,7 @@ class Gdn_Controller extends Gdn_Pluggable {
      * @var string The message to be displayed on the screen by ajax'd forms after the form
      * is successfully saved.
      *
-     * @deprecated since 2.0.18; $this->ErrorMessage() and $this->InformMessage()
+     * @deprecated since 2.0.18; $this->errorMessage() and $this->informMessage()
      * are to be used going forward.
      */
     public $StatusMessage;
@@ -211,11 +211,11 @@ class Gdn_Controller extends Gdn_Pluggable {
     public function __construct() {
         $this->Application = '';
         $this->ApplicationFolder = '';
-        $this->Assets = array();
+        $this->Assets = [];
         $this->CssClass = '';
-        $this->Data = array();
+        $this->Data = [];
         $this->Head = Gdn::factory('Dummy');
-        $this->internalMethods = array(
+        $this->internalMethods = [
             'addasset', 'addbreadcrumb', 'addcssfile', 'adddefinition', 'addinternalmethod', 'addjsfile', 'addmodule',
             'allowjsonp', 'canonicalurl', 'clearcssfiles', 'clearjsfiles', 'contenttype', 'cssfiles', 'data',
             'definitionlist', 'deliverymethod', 'deliverytype', 'description', 'errormessages', 'fetchview',
@@ -223,7 +223,7 @@ class Gdn_Controller extends Gdn_Pluggable {
             'informmessage', 'intitialize', 'isinternal', 'jsfiles', 'json', 'jsontarget', 'masterview', 'pagename',
             'permission', 'removecssfile', 'render', 'xrender', 'renderasset', 'renderdata', 'renderexception', 'rendermaster',
             'sendheaders', 'setdata', 'setformsaved', 'setheader', 'setjson', 'setlastmodified', 'statuscode', 'title'
-        );
+        ];
         $this->MasterView = '';
         $this->ModuleSortContainer = '';
         $this->OriginalRequestMethod = '';
@@ -233,32 +233,32 @@ class Gdn_Controller extends Gdn_Pluggable {
         $this->Request = null;
         $this->SelfUrl = '';
         $this->SyndicationMethod = SYNDICATION_NONE;
-        $this->Theme = Theme();
-        $this->ThemeOptions = Gdn::config('Garden.ThemeOptions', array());
+        $this->Theme = theme();
+        $this->ThemeOptions = Gdn::config('Garden.ThemeOptions', []);
         $this->View = '';
-        $this->_CssFiles = array();
-        $this->_JsFiles = array();
-        $this->_Definitions = array();
+        $this->_CssFiles = [];
+        $this->_JsFiles = [];
+        $this->_Definitions = [];
         $this->_DeliveryMethod = DELIVERY_METHOD_XHTML;
         $this->_DeliveryType = DELIVERY_TYPE_ALL;
         $this->_FormSaved = '';
-        $this->_Json = array();
-        $this->_Headers = array(
+        $this->_Json = [];
+        $this->_Headers = [
             'X-Garden-Version' => APPLICATION.' '.APPLICATION_VERSION,
             'Content-Type' => Gdn::config('Garden.ContentType', '').'; charset=utf-8' // PROPERLY ENCODE THE CONTENT
 //         'Last-Modified' => gmdate('D, d M Y H:i:s') . ' GMT', // PREVENT PAGE CACHING: always modified (this can be overridden by specific controllers)
-        );
+        ];
 
         if (Gdn::session()->isValid()) {
-            $this->_Headers = array_merge($this->_Headers, array(
+            $this->_Headers = array_merge($this->_Headers, [
                 'Cache-Control' => 'private, no-cache, max-age=0, must-revalidate', // PREVENT PAGE CACHING: HTTP/1.1
                 'Expires' => 'Sat, 01 Jan 2000 00:00:00 GMT', // Make sure the client always checks at the server before using it's cached copy.
                 'Pragma' => 'no-cache', // PREVENT PAGE CACHING: HTTP/1.0
-            ));
+            ]);
         }
 
         $this->_ErrorMessages = '';
-        $this->_InformMessages = array();
+        $this->_InformMessages = [];
         $this->StatusMessage = '';
 
         parent::__construct();
@@ -268,54 +268,54 @@ class Gdn_Controller extends Gdn_Pluggable {
     /**
      * Add a breadcrumb to the list.
      *
-     * @param string $Name Translation code
-     * @param string $Link Optional. Hyperlink this breadcrumb somewhere.
-     * @param string $Position Optional. Where in the list to add it? 'front', 'back'
+     * @param string $name Translation code
+     * @param string $link Optional. Hyperlink this breadcrumb somewhere.
+     * @param string $position Optional. Where in the list to add it? 'front', 'back'
      */
-    public function addBreadcrumb($Name, $Link = null, $Position = 'back') {
-        $Breadcrumb = array(
-            'Name' => T($Name),
-            'Url' => $Link
-        );
+    public function addBreadcrumb($name, $link = null, $position = 'back') {
+        $breadcrumb = [
+            'Name' => t($name),
+            'Url' => $link
+        ];
 
-        $Breadcrumbs = $this->data('Breadcrumbs', array());
-        switch ($Position) {
+        $breadcrumbs = $this->data('Breadcrumbs', []);
+        switch ($position) {
             case 'back':
-                $Breadcrumbs = array_merge($Breadcrumbs, array($Breadcrumb));
+                $breadcrumbs = array_merge($breadcrumbs, [$breadcrumb]);
                 break;
             case 'front':
-                $Breadcrumbs = array_merge(array($Breadcrumb), $Breadcrumbs);
+                $breadcrumbs = array_merge([$breadcrumb], $breadcrumbs);
                 break;
         }
-        $this->setData('Breadcrumbs', $Breadcrumbs);
+        $this->setData('Breadcrumbs', $breadcrumbs);
     }
 
     /**
      * Adds as asset (string) to the $this->Assets collection.
      *
-     * The assets will later be added to the view if their $AssetName is called by
-     * $this->RenderAsset($AssetName) within the view.
+     * The assets will later be added to the view if their $assetName is called by
+     * $this->renderAsset($assetName) within the view.
      *
-     * @param string $AssetContainer The name of the asset container to add $Asset to.
-     * @param mixed $Asset The asset to be rendered in the view. This can be one of:
+     * @param string $assetContainer The name of the asset container to add $asset to.
+     * @param mixed $asset The asset to be rendered in the view. This can be one of:
      * - <b>string</b>: The string will be rendered.
-     * - </b>Gdn_IModule</b>: Gdn_IModule::Render() will be called.
-     * @param string $AssetName The name of the asset being added. This can be
+     * - </b>Gdn_IModule</b>: Gdn_IModule::render() will be called.
+     * @param string $assetName The name of the asset being added. This can be
      * used later to sort assets before rendering.
      */
-    public function addAsset($AssetContainer, $Asset, $AssetName = '') {
-        if (is_object($AssetName)) {
+    public function addAsset($assetContainer, $asset, $assetName = '') {
+        if (is_object($assetName)) {
             return false;
-        } elseif ($AssetName == '') {
-            $this->Assets[$AssetContainer][] = $Asset;
+        } elseif ($assetName == '') {
+            $this->Assets[$assetContainer][] = $asset;
         } else {
-            if (isset($this->Assets[$AssetContainer][$AssetName])) {
-                if (!is_string($Asset)) {
-                    $Asset = $Asset->toString();
+            if (isset($this->Assets[$assetContainer][$assetName])) {
+                if (!is_string($asset)) {
+                    $asset = $asset->toString();
                 }
-                $this->Assets[$AssetContainer][$AssetName] .= $Asset;
+                $this->Assets[$assetContainer][$assetName] .= $asset;
             } else {
-                $this->Assets[$AssetContainer][$AssetName] = $Asset;
+                $this->Assets[$assetContainer][$assetName] = $asset;
             }
         }
     }
@@ -323,26 +323,26 @@ class Gdn_Controller extends Gdn_Pluggable {
     /**
      * Adds a CSS file to search for in the theme folder(s).
      *
-     * @param string $FileName The CSS file to search for.
-     * @param string $AppFolder The application folder that should contain the CSS file. Default is to
+     * @param string $fileName The CSS file to search for.
+     * @param string $appFolder The application folder that should contain the CSS file. Default is to
      * use the application folder that this controller belongs to.
-     *  - If you specify plugins/PluginName as $AppFolder then you can contain a CSS file in a plugin's design folder.
+     *  - If you specify plugins/PluginName as $appFolder then you can contain a CSS file in a plugin's design folder.
      */
-    public function addCssFile($FileName, $AppFolder = '', $Options = null) {
-        $this->_CssFiles[] = array('FileName' => $FileName, 'AppFolder' => $AppFolder, 'Options' => $Options);
+    public function addCssFile($fileName, $appFolder = '', $options = null) {
+        $this->_CssFiles[] = ['FileName' => $fileName, 'AppFolder' => $appFolder, 'Options' => $options];
     }
 
     /**
      * Adds a key-value pair to the definition collection for JavaScript.
      *
-     * @param string $Term
-     * @param string $Definition
+     * @param string $term
+     * @param string $definition
      */
-    public function addDefinition($Term, $Definition = null) {
-        if (!is_null($Definition)) {
-            $this->_Definitions[$Term] = $Definition;
+    public function addDefinition($term, $definition = null) {
+        if (!is_null($definition)) {
+            $this->_Definitions[$term] = $definition;
         }
-        return val($Term, $this->_Definitions);
+        return val($term, $this->_Definitions);
     }
 
     /**
@@ -357,23 +357,23 @@ class Gdn_Controller extends Gdn_Pluggable {
     /**
      * Adds a JS file to search for in the application or global js folder(s).
      *
-     * @param string $FileName The js file to search for.
-     * @param string $AppFolder The application folder that should contain the JS file. Default is to use the application folder that this controller belongs to.
+     * @param string $fileName The js file to search for.
+     * @param string $appFolder The application folder that should contain the JS file. Default is to use the application folder that this controller belongs to.
      */
-    public function addJsFile($FileName, $AppFolder = '', $Options = null) {
-        $JsInfo = array('FileName' => $FileName, 'AppFolder' => $AppFolder, 'Options' => $Options);
+    public function addJsFile($fileName, $appFolder = '', $options = null) {
+        $jsInfo = ['FileName' => $fileName, 'AppFolder' => $appFolder, 'Options' => $options];
 
-        if (StringBeginsWith($AppFolder, 'plugins/')) {
-            $Name = stringBeginsWith($AppFolder, 'plugins/', true, true);
-            $Info = Gdn::pluginManager()->getPluginInfo($Name, Gdn_PluginManager::ACCESS_PLUGINNAME);
-            if ($Info) {
-                $JsInfo['Version'] = val('Version', $Info);
+        if (stringBeginsWith($appFolder, 'plugins/')) {
+            $name = stringBeginsWith($appFolder, 'plugins/', true, true);
+            $info = Gdn::pluginManager()->getPluginInfo($name, Gdn_PluginManager::ACCESS_PLUGINNAME);
+            if ($info) {
+                $jsInfo['Version'] = val('Version', $info);
             }
         } else {
-            $JsInfo['Version'] = APPLICATION_VERSION;
+            $jsInfo['Version'] = APPLICATION_VERSION;
         }
 
-        $this->_JsFiles[] = $JsInfo;
+        $this->_JsFiles[] = $jsInfo;
     }
 
     /**
@@ -382,33 +382,33 @@ class Gdn_Controller extends Gdn_Pluggable {
      * If no asset target is defined, it will use the asset target defined by the
      * module's AssetTarget method.
      *
-     * @param mixed $Module A module or the name of a module to add to the page.
-     * @param string $AssetTarget
+     * @param mixed $module A module or the name of a module to add to the page.
+     * @param string $assetTarget
      */
-    public function addModule($Module, $AssetTarget = '') {
+    public function addModule($module, $assetTarget = '') {
         $this->fireEvent('BeforeAddModule');
-        $AssetModule = $Module;
+        $assetModule = $module;
 
-        if (!is_object($AssetModule)) {
-            if (property_exists($this, $Module) && is_object($this->$Module)) {
-                $AssetModule = $this->$Module;
+        if (!is_object($assetModule)) {
+            if (property_exists($this, $module) && is_object($this->$module)) {
+                $assetModule = $this->$module;
             } else {
-                $ModuleClassExists = class_exists($Module);
+                $moduleClassExists = class_exists($module);
 
-                if ($ModuleClassExists) {
+                if ($moduleClassExists) {
                     // Make sure that the class implements Gdn_IModule
-                    $ReflectionClass = new ReflectionClass($Module);
-                    if ($ReflectionClass->implementsInterface("Gdn_IModule")) {
-                        $AssetModule = new $Module($this);
+                    $reflectionClass = new ReflectionClass($module);
+                    if ($reflectionClass->implementsInterface("Gdn_IModule")) {
+                        $assetModule = new $module($this);
                     }
                 }
             }
         }
 
-        if (is_object($AssetModule)) {
-            $AssetTarget = ($AssetTarget == '' ? $AssetModule->assetTarget() : $AssetTarget);
-            // echo '<div>adding: '.get_class($AssetModule).' ('.(property_exists($AssetModule, 'HtmlId') ? $AssetModule->HtmlId : '').') to '.$AssetTarget.' <textarea>'.$AssetModule->ToString().'</textarea></div>';
-            $this->addAsset($AssetTarget, $AssetModule, $AssetModule->name());
+        if (is_object($assetModule)) {
+            $assetTarget = ($assetTarget == '' ? $assetModule->assetTarget() : $assetTarget);
+            // echo '<div>adding: '.get_class($AssetModule).' ('.(property_exists($AssetModule, 'HtmlId') ? $AssetModule->HtmlId : '').') to '.$AssetTarget.' <textarea>'.$AssetModule->toString().'</textarea></div>';
+            $this->addAsset($assetTarget, $assetModule, $assetModule->name());
         }
 
         $this->fireEvent('AfterAddModule');
@@ -417,14 +417,14 @@ class Gdn_Controller extends Gdn_Pluggable {
     /**
      *
      *
-     * @param null $Value
+     * @param null $value
      * @return mixed|null
      */
-    public function allowJSONP($Value = null) {
+    public function allowJSONP($value = null) {
         static $_Value;
 
-        if (isset($Value)) {
-            $_Value = $Value;
+        if (isset($value)) {
+            $_Value = $value;
         }
 
         if (isset($_Value)) {
@@ -437,43 +437,43 @@ class Gdn_Controller extends Gdn_Pluggable {
     /**
      *
      *
-     * @param null $Value
+     * @param null $value
      * @return null|string
      */
-    public function canonicalUrl($Value = null) {
-        if ($Value === null) {
+    public function canonicalUrl($value = null) {
+        if ($value === null) {
             if ($this->_CanonicalUrl) {
                 return $this->_CanonicalUrl;
             } else {
-                $Parts = array();
+                $parts = [];
 
-                $Controller = strtolower(stringEndsWith($this->ControllerName, 'Controller', true, true));
+                $controller = strtolower(stringEndsWith($this->ControllerName, 'Controller', true, true));
 
-                if ($Controller == 'settings') {
-                    $Parts[] = strtolower($this->ApplicationFolder);
+                if ($controller == 'settings') {
+                    $parts[] = strtolower($this->ApplicationFolder);
                 }
 
-                if ($Controller != 'root') {
-                    $Parts[] = $Controller;
+                if ($controller != 'root') {
+                    $parts[] = $controller;
                 }
 
                 if (strcasecmp($this->RequestMethod, 'index') != 0) {
-                    $Parts[] = strtolower($this->RequestMethod);
+                    $parts[] = strtolower($this->RequestMethod);
                 }
 
                 // The default canonical url is the fully-qualified url.
                 if (is_array($this->RequestArgs)) {
-                    $Parts = array_merge($Parts, $this->RequestArgs);
+                    $parts = array_merge($parts, $this->RequestArgs);
                 } elseif (is_string($this->RequestArgs))
-                    $Parts = trim($this->RequestArgs, '/');
+                    $parts = trim($this->RequestArgs, '/');
 
-                $Path = implode('/', $Parts);
-                $Result = Url($Path, true);
-                return $Result;
+                $path = implode('/', $parts);
+                $result = url($path, true);
+                return $result;
             }
         } else {
-            $this->_CanonicalUrl = $Value;
-            return $Value;
+            $this->_CanonicalUrl = $value;
+            return $value;
         }
     }
 
@@ -481,23 +481,23 @@ class Gdn_Controller extends Gdn_Pluggable {
      *
      */
     public function clearCssFiles() {
-        $this->_CssFiles = array();
+        $this->_CssFiles = [];
     }
 
     /**
      * Clear all js files from the collection.
      */
     public function clearJsFiles() {
-        $this->_JsFiles = array();
+        $this->_JsFiles = [];
     }
 
     /**
      *
      *
-     * @param $ContentType
+     * @param $contentType
      */
-    public function contentType($ContentType) {
-        $this->setHeader("Content-Type", $ContentType);
+    public function contentType($contentType) {
+        $this->setHeader("Content-Type", $contentType);
     }
 
     /**
@@ -512,14 +512,14 @@ class Gdn_Controller extends Gdn_Pluggable {
     /**
      * Get a value out of the controller's data array.
      *
-     * @param string $Path The path to the data.
-     * @param mixed $Default The default value if the data array doesn't contain the path.
+     * @param string $path The path to the data.
+     * @param mixed $default The default value if the data array doesn't contain the path.
      * @return mixed
-     * @see GetValueR()
+     * @see getValueR()
      */
-    public function data($Path, $Default = '') {
-        $Result = valr($Path, $this->Data, $Default);
-        return $Result;
+    public function data($path, $default = '') {
+        $result = valr($path, $this->Data, $default);
+        return $result;
     }
 
     /**
@@ -529,17 +529,17 @@ class Gdn_Controller extends Gdn_Pluggable {
      * @return string Returns a string containing the `<script>` tag of the definitions. .
      */
     public function definitionList($wrap = true) {
-        $Session = Gdn::session();
+        $session = Gdn::session();
         if (!array_key_exists('TransportError', $this->_Definitions)) {
-            $this->_Definitions['TransportError'] = T('Transport error: %s', 'A fatal error occurred while processing the request.<br />The server returned the following response: %s');
+            $this->_Definitions['TransportError'] = t('Transport error: %s', 'A fatal error occurred while processing the request.<br />The server returned the following response: %s');
         }
 
         if (!array_key_exists('TransientKey', $this->_Definitions)) {
-            $this->_Definitions['TransientKey'] = $Session->transientKey();
+            $this->_Definitions['TransientKey'] = $session->transientKey();
         }
 
         if (!array_key_exists('WebRoot', $this->_Definitions)) {
-            $this->_Definitions['WebRoot'] = combinePaths(array(Gdn::request()->domain(), Gdn::request()->webRoot()), '/');
+            $this->_Definitions['WebRoot'] = combinePaths([Gdn::request()->domain(), Gdn::request()->webRoot()], '/');
         }
 
         if (!array_key_exists('UrlFormat', $this->_Definitions)) {
@@ -565,21 +565,21 @@ class Gdn_Controller extends Gdn_Pluggable {
                     (isset($this->ReflectArgs['sender']) && $this->ReflectArgs['sender'] instanceof Gdn_Pluggable)
                 )
             ) {
-                $ReflectArgs = array_slice($this->ReflectArgs, 1);
+                $reflectArgs = array_slice($this->ReflectArgs, 1);
             } else {
-                $ReflectArgs = $this->ReflectArgs;
+                $reflectArgs = $this->ReflectArgs;
             }
 
-            $this->_Definitions['ResolvedArgs'] = $ReflectArgs;
+            $this->_Definitions['ResolvedArgs'] = $reflectArgs;
         }
 
         if (!array_key_exists('SignedIn', $this->_Definitions)) {
             if (Gdn::session()->checkPermission('Garden.Moderation.Manage')) {
-                $SignedIn = 2;
+                $signedIn = 2;
             } else {
-                $SignedIn = (int)Gdn::session()->isValid();
+                $signedIn = (int)Gdn::session()->isValid();
             }
-            $this->_Definitions['SignedIn'] = $SignedIn;
+            $this->_Definitions['SignedIn'] = $signedIn;
         }
 
         if (Gdn::session()->isValid()) {
@@ -621,17 +621,17 @@ class Gdn_Controller extends Gdn_Pluggable {
     }
 
     /**
-     * Returns the requested delivery type of the controller if $Default is not
+     * Returns the requested delivery type of the controller if $default is not
      * provided. Sets and returns the delivery type otherwise.
      *
-     * @param string $Default One of the DELIVERY_TYPE_* constants.
+     * @param string $default One of the DELIVERY_TYPE_* constants.
      */
-    public function deliveryType($Default = '') {
-        if ($Default) {
+    public function deliveryType($default = '') {
+        if ($default) {
             // Make sure we only set a defined delivery type.
             // Use constants' name pattern instead of a strict whitelist for forwards-compatibility.
-            if (defined('DELIVERY_TYPE_'.$Default)) {
-                $this->_DeliveryType = $Default;
+            if (defined('DELIVERY_TYPE_'.$default)) {
+                $this->_DeliveryType = $default;
             }
         }
 
@@ -639,14 +639,14 @@ class Gdn_Controller extends Gdn_Pluggable {
     }
 
     /**
-     * Returns the requested delivery method of the controller if $Default is not
+     * Returns the requested delivery method of the controller if $default is not
      * provided. Sets and returns the delivery method otherwise.
      *
-     * @param string $Default One of the DELIVERY_METHOD_* constants.
+     * @param string $default One of the DELIVERY_METHOD_* constants.
      */
-    public function deliveryMethod($Default = '') {
-        if ($Default != '') {
-            $this->_DeliveryMethod = $Default;
+    public function deliveryMethod($default = '') {
+        if ($default != '') {
+            $this->_DeliveryMethod = $default;
         }
 
         return $this->_DeliveryMethod;
@@ -655,16 +655,16 @@ class Gdn_Controller extends Gdn_Pluggable {
     /**
      *
      *
-     * @param bool $Value
-     * @param bool $PlainText
+     * @param bool $value
+     * @param bool $plainText
      * @return mixed
      */
-    public function description($Value = false, $PlainText = false) {
-        if ($Value != false) {
-            if ($PlainText) {
-                $Value = Gdn_Format::plainText($Value);
+    public function description($value = false, $plainText = false) {
+        if ($value != false) {
+            if ($plainText) {
+                $value = Gdn_Format::plainText($value);
             }
-            $this->setData('_Description', $Value);
+            $this->setData('_Description', $value);
         }
         return $this->data('_Description');
     }
@@ -674,10 +674,10 @@ class Gdn_Controller extends Gdn_Pluggable {
      *
      * @since 2.0.18
      *
-     * @param string $Messages The html of the errors to be display.
+     * @param string $messages The html of the errors to be display.
      */
-    public function errorMessage($Messages) {
-        $this->_ErrorMessages = $Messages;
+    public function errorMessage($messages) {
+        $this->_ErrorMessages = $messages;
     }
 
     /**
@@ -715,137 +715,137 @@ class Gdn_Controller extends Gdn_Pluggable {
      * Fetches the location of a view into a string and returns it. Returns
      * false on failure.
      *
-     * @param string $View The name of the view to fetch. If not specified, it will use the value
+     * @param string $view The name of the view to fetch. If not specified, it will use the value
      * of $this->View. If $this->View is not specified, it will use the value
      * of $this->RequestMethod (which is defined by the dispatcher class).
-     * @param bool|string $ControllerName The name of the controller that owns the view if it is not $this.
+     * @param bool|string $controllerName The name of the controller that owns the view if it is not $this.
      *  - If the controller name is FALSE then the name of the current controller will be used.
      *  - If the controller name is an empty string then the view will be looked for in the base views folder.
-     * @param bool|string $ApplicationFolder The name of the application folder that contains the requested controller if it is not $this->ApplicationFolder.
-     * @param bool $ThrowError Whether to throw an error.
+     * @param bool|string $applicationFolder The name of the application folder that contains the requested controller if it is not $this->ApplicationFolder.
+     * @param bool $throwError Whether to throw an error.
      * @param bool $useController Whether to attach a controller to the view location. Some plugins have views that should not be looked up in a controller's view directory.
      * @return string The resolved location of the view.
      * @throws Exception
      */
-    public function fetchViewLocation($View = '', $ControllerName = false, $ApplicationFolder = false, $ThrowError = true, $useController = true) {
+    public function fetchViewLocation($view = '', $controllerName = false, $applicationFolder = false, $throwError = true, $useController = true) {
         // Accept an explicitly defined view, or look to the method that was called on this controller
-        if ($View == '') {
-            $View = $this->View;
+        if ($view == '') {
+            $view = $this->View;
         }
 
-        if ($View == '') {
-            $View = $this->RequestMethod;
+        if ($view == '') {
+            $view = $this->RequestMethod;
         }
 
-        if ($ControllerName === false) {
-            $ControllerName = $this->ControllerName;
+        if ($controllerName === false) {
+            $controllerName = $this->ControllerName;
         }
 
-        if (StringEndsWith($ControllerName, 'controller', true)) {
-            $ControllerName = substr($ControllerName, 0, -10);
+        if (stringEndsWith($controllerName, 'controller', true)) {
+            $controllerName = substr($controllerName, 0, -10);
         }
 
-        if (strtolower(substr($ControllerName, 0, 4)) == 'gdn_') {
-            $ControllerName = substr($ControllerName, 4);
+        if (strtolower(substr($controllerName, 0, 4)) == 'gdn_') {
+            $controllerName = substr($controllerName, 4);
         }
 
-        if (!$ApplicationFolder) {
-            $ApplicationFolder = $this->ApplicationFolder;
+        if (!$applicationFolder) {
+            $applicationFolder = $this->ApplicationFolder;
         }
 
         //$ApplicationFolder = strtolower($ApplicationFolder);
-        $ControllerName = strtolower($ControllerName);
-        if (strpos($View, DS) === false) { // keep explicit paths as they are.
-            $View = strtolower($View);
+        $controllerName = strtolower($controllerName);
+        if (strpos($view, DS) === false) { // keep explicit paths as they are.
+            $view = strtolower($view);
         }
 
         // If this is a syndication request, append the method to the view
         if ($this->SyndicationMethod == SYNDICATION_ATOM) {
-            $View .= '_atom';
+            $view .= '_atom';
         } elseif ($this->SyndicationMethod == SYNDICATION_RSS) {
-            $View .= '_rss';
+            $view .= '_rss';
         }
 
-        $LocationName = concatSep('/', strtolower($ApplicationFolder), $ControllerName, $View);
-        $ViewPath = val($LocationName, $this->_ViewLocations, false);
-        if ($ViewPath === false) {
+        $locationName = concatSep('/', strtolower($applicationFolder), $controllerName, $view);
+        $viewPath = val($locationName, $this->_ViewLocations, false);
+        if ($viewPath === false) {
             // Define the search paths differently depending on whether or not we are in a plugin or application.
-            $ApplicationFolder = trim($ApplicationFolder, '/');
-            if (stringBeginsWith($ApplicationFolder, 'plugins/')) {
-                $KeyExplode = explode('/', $ApplicationFolder);
-                $PluginName = array_pop($KeyExplode);
-                $PluginInfo = Gdn::pluginManager()->getPluginInfo($PluginName);
+            $applicationFolder = trim($applicationFolder, '/');
+            if (stringBeginsWith($applicationFolder, 'plugins/')) {
+                $keyExplode = explode('/', $applicationFolder);
+                $pluginName = array_pop($keyExplode);
+                $pluginInfo = Gdn::pluginManager()->getPluginInfo($pluginName);
 
-                $BasePath = val('SearchPath', $PluginInfo);
-                $ApplicationFolder = val('Folder', $PluginInfo);
+                $basePath = val('SearchPath', $pluginInfo);
+                $applicationFolder = val('Folder', $pluginInfo);
             } else {
-                $BasePath = PATH_APPLICATIONS;
-                $ApplicationFolder = strtolower($ApplicationFolder);
+                $basePath = PATH_APPLICATIONS;
+                $applicationFolder = strtolower($applicationFolder);
             }
 
-            $SubPaths = array();
+            $subPaths = [];
             // Define the subpath for the view.
             // The $ControllerName used to default to '' instead of FALSE.
             // This extra search is added for backwards-compatibility.
-            if (strlen($ControllerName) > 0 && $useController) {
-                $SubPaths[] = "views/$ControllerName/$View";
+            if (strlen($controllerName) > 0 && $useController) {
+                $subPaths[] = "views/$controllerName/$view";
             } else {
-                $SubPaths[] = "views/$View";
+                $subPaths[] = "views/$view";
 
                 if ($useController) {
-                    $SubPaths[] = 'views/'.stringEndsWith($this->ControllerName, 'Controller', true, true)."/$View";
+                    $subPaths[] = 'views/'.stringEndsWith($this->ControllerName, 'Controller', true, true)."/$view";
                 }
             }
 
             // Views come from one of four places:
-            $ViewPaths = array();
+            $viewPaths = [];
 
             // 1. An explicitly defined path to a view
-            if (strpos($View, DS) !== false && stringBeginsWith($View, PATH_ROOT)) {
-                $ViewPaths[] = $View;
+            if (strpos($view, DS) !== false && stringBeginsWith($view, PATH_ROOT)) {
+                $viewPaths[] = $view;
             }
 
             if ($this->Theme) {
                 // 2. Application-specific theme view. eg. /path/to/application/themes/theme_name/app_name/views/controller_name/
-                foreach ($SubPaths as $SubPath) {
-                    $ViewPaths[] = PATH_THEMES."/{$this->Theme}/$ApplicationFolder/$SubPath.*";
-                    // $ViewPaths[] = CombinePaths(array(PATH_THEMES, $this->Theme, $ApplicationFolder, 'views', $ControllerName, $View . '.*'));
+                foreach ($subPaths as $subPath) {
+                    $viewPaths[] = PATH_THEMES."/{$this->Theme}/$applicationFolder/$subPath.*";
+                    // $ViewPaths[] = combinePaths(array(PATH_THEMES, $this->Theme, $ApplicationFolder, 'views', $ControllerName, $View . '.*'));
                 }
 
                 // 3. Garden-wide theme view. eg. /path/to/application/themes/theme_name/views/controller_name/
-                foreach ($SubPaths as $SubPath) {
-                    $ViewPaths[] = PATH_THEMES."/{$this->Theme}/$SubPath.*";
-                    //$ViewPaths[] = CombinePaths(array(PATH_THEMES, $this->Theme, 'views', $ControllerName, $View . '.*'));
+                foreach ($subPaths as $subPath) {
+                    $viewPaths[] = PATH_THEMES."/{$this->Theme}/$subPath.*";
+                    //$ViewPaths[] = combinePaths(array(PATH_THEMES, $this->Theme, 'views', $ControllerName, $View . '.*'));
                 }
             }
 
             // 4. Application/plugin default. eg. /path/to/application/app_name/views/controller_name/
-            foreach ($SubPaths as $SubPath) {
-                $ViewPaths[] = "$BasePath/$ApplicationFolder/$SubPath.*";
-                //$ViewPaths[] = CombinePaths(array(PATH_APPLICATIONS, $ApplicationFolder, 'views', $ControllerName, $View . '.*'));
+            foreach ($subPaths as $subPath) {
+                $viewPaths[] = "$basePath/$applicationFolder/$subPath.*";
+                //$ViewPaths[] = combinePaths(array(PATH_APPLICATIONS, $ApplicationFolder, 'views', $ControllerName, $View . '.*'));
             }
 
             // Find the first file that matches the path.
-            $ViewPath = false;
-            foreach ($ViewPaths as $Glob) {
-                $Paths = safeGlob($Glob);
-                if (is_array($Paths) && count($Paths) > 0) {
-                    $ViewPath = $Paths[0];
+            $viewPath = false;
+            foreach ($viewPaths as $glob) {
+                $paths = safeGlob($glob);
+                if (is_array($paths) && count($paths) > 0) {
+                    $viewPath = $paths[0];
                     break;
                 }
             }
-            //$ViewPath = Gdn_FileSystem::Exists($ViewPaths);
+            //$ViewPath = Gdn_FileSystem::exists($ViewPaths);
 
-            $this->_ViewLocations[$LocationName] = $ViewPath;
+            $this->_ViewLocations[$locationName] = $viewPath;
         }
         // echo '<div>['.$LocationName.'] RETURNS ['.$ViewPath.']</div>';
-        if ($ViewPath === false && $ThrowError) {
-            Gdn::dispatcher()->passData('ViewPaths', $ViewPaths);
-            throw NotFoundException('View');
-//         trigger_error(ErrorMessage("Could not find a '$View' view for the '$ControllerName' controller in the '$ApplicationFolder' application.", $this->ClassName, 'FetchViewLocation'), E_USER_ERROR);
+        if ($viewPath === false && $throwError) {
+            Gdn::dispatcher()->passData('ViewPaths', $viewPaths);
+            throw notFoundException('View');
+//         trigger_error(errorMessage("Could not find a '$View' view for the '$ControllerName' controller in the '$ApplicationFolder' application.", $this->ClassName, 'FetchViewLocation'), E_USER_ERROR);
         }
 
-        return $ViewPath;
+        return $viewPath;
     }
 
     /**
@@ -883,7 +883,7 @@ class Gdn_Controller extends Gdn_Pluggable {
 
         // Get all the assets for this AssetContainer
         $thisAssets = $this->Assets[$assetName];
-        $assets = array();
+        $assets = [];
 
         if (isset($moduleSort) && is_array($moduleSort)) {
             // There is a specified sort so sort by it.
@@ -896,8 +896,8 @@ class Gdn_Controller extends Gdn_Pluggable {
         }
 
         // Pick up any leftover assets that werent explicitly sorted
-        foreach ($thisAssets as $name => $Asset) {
-            $assets[] = $Asset;
+        foreach ($thisAssets as $name => $asset) {
+            $assets[] = $asset;
         }
 
         if (count($assets) == 0) {
@@ -929,7 +929,7 @@ class Gdn_Controller extends Gdn_Pluggable {
 
             // Find the class and instantiate an instance..
             if (Gdn::factoryExists($Property)) {
-                $this->$Property = Gdn::Factory($Property);
+                $this->$Property = Gdn::factory($Property);
             }
             if (Gdn::factoryExists($Class)) {
                 // Instantiate from the factory.
@@ -962,25 +962,25 @@ class Gdn_Controller extends Gdn_Pluggable {
      * Allows images to be specified for the page, to be used by the head module
      * to add facebook open graph information.
      *
-     * @param mixed $Img An image or array of image urls.
+     * @param mixed $img An image or array of image urls.
      * @return array The array of image urls.
      */
-    public function image($Img = false) {
-        if ($Img) {
-            if (!is_array($Img)) {
-                $Img = array($Img);
+    public function image($img = false) {
+        if ($img) {
+            if (!is_array($img)) {
+                $img = [$img];
             }
 
-            $CurrentImages = $this->data('_Images');
-            if (!is_array($CurrentImages)) {
-                $this->setData('_Images', $Img);
+            $currentImages = $this->data('_Images');
+            if (!is_array($currentImages)) {
+                $this->setData('_Images', $img);
             } else {
-                $Images = array_unique(array_merge($CurrentImages, $Img));
-                $this->setData('_Images', $Images);
+                $images = array_unique(array_merge($currentImages, $img));
+                $this->setData('_Images', $images);
             }
         }
-        $Images = $this->data('_Images');
-        return is_array($Images) ? $Images : array();
+        $images = $this->data('_Images');
+        return is_array($images) ? $images : [];
     }
 
     /**
@@ -988,21 +988,21 @@ class Gdn_Controller extends Gdn_Pluggable {
      *
      * @since 2.0.18
      *
-     * @param string $Message The message to be displayed.
-     * @param mixed $Options An array of options for the message. If not an array, it is assumed to be a string of CSS classes to apply to the message.
+     * @param string $message The message to be displayed.
+     * @param mixed $options An array of options for the message. If not an array, it is assumed to be a string of CSS classes to apply to the message.
      */
-    public function informMessage($Message, $Options = array('CssClass' => 'Dismissable AutoDismiss')) {
+    public function informMessage($message, $options = ['CssClass' => 'Dismissable AutoDismiss']) {
         // If $Options isn't an array of options, accept it as a string of css classes to be assigned to the message.
-        if (!is_array($Options)) {
-            $Options = array('CssClass' => $Options);
+        if (!is_array($options)) {
+            $options = ['CssClass' => $options];
         }
 
-        if (!$Message && !array_key_exists('id', $Options)) {
+        if (!$message && !array_key_exists('id', $options)) {
             return;
         }
 
-        $Options['Message'] = $Message;
-        $this->_InformMessages[] = $Options;
+        $options['Message'] = $message;
+        $this->_InformMessages[] = $options;
     }
 
     /**
@@ -1012,14 +1012,14 @@ class Gdn_Controller extends Gdn_Pluggable {
      * controller to do things like loading script and CSS into the head.
      */
     public function initialize() {
-        if (in_array($this->SyndicationMethod, array(SYNDICATION_ATOM, SYNDICATION_RSS))) {
+        if (in_array($this->SyndicationMethod, [SYNDICATION_ATOM, SYNDICATION_RSS])) {
             $this->_Headers['Content-Type'] = 'text/xml; charset=utf-8';
         }
 
         if (is_object($this->Menu)) {
             $this->Menu->Sort = Gdn::config('Garden.Menu.Sort');
         }
-        $this->FireEvent('Initialize');
+        $this->fireEvent('Initialize');
     }
 
     /**
@@ -1046,31 +1046,31 @@ class Gdn_Controller extends Gdn_Pluggable {
      * If JSON is going to be sent to the client, this method allows you to add
      * extra values to the JSON array.
      *
-     * @param string $Key The name of the array key to add.
-     * @param mixed $Value The value to be added. If null, then it won't be set.
+     * @param string $key The name of the array key to add.
+     * @param mixed $value The value to be added. If null, then it won't be set.
      * @return mixed The value at the key.
      */
-    public function json($Key, $Value = null) {
-        if (!is_null($Value)) {
-            $this->_Json[$Key] = $Value;
+    public function json($key, $value = null) {
+        if (!is_null($value)) {
+            $this->_Json[$key] = $value;
         }
-        return val($Key, $this->_Json, null);
+        return val($key, $this->_Json, null);
     }
 
     /**
      *
      *
-     * @param $Target
-     * @param $Data
-     * @param string $Type
+     * @param $target
+     * @param $data
+     * @param string $type
      */
-    public function jsonTarget($Target, $Data, $Type = 'Html') {
-        $Item = array('Target' => $Target, 'Data' => $Data, 'Type' => $Type);
+    public function jsonTarget($target, $data, $type = 'Html') {
+        $item = ['Target' => $target, 'Data' => $data, 'Type' => $type];
 
         if (!array_key_exists('Targets', $this->_Json)) {
-            $this->_Json['Targets'] = array($Item);
+            $this->_Json['Targets'] = [$item];
         } else {
-            $this->_Json['Targets'][] = $Item;
+            $this->_Json['Targets'][] = $item;
         }
     }
 
@@ -1096,27 +1096,27 @@ class Gdn_Controller extends Gdn_Pluggable {
      * Gets or sets the name of the page for the controller.
      * The page name is meant to be a friendly name suitable to be consumed by developers.
      *
-     * @param string|NULL $Value A new value to set.
+     * @param string|NULL $value A new value to set.
      */
-    public function pageName($Value = null) {
-        if ($Value !== null) {
-            $this->_PageName = $Value;
-            return $Value;
+    public function pageName($value = null) {
+        if ($value !== null) {
+            $this->_PageName = $value;
+            return $value;
         }
 
         if ($this->_PageName === null) {
             if ($this->ControllerName) {
-                $Name = $this->ControllerName;
+                $name = $this->ControllerName;
             } else {
-                $Name = get_class($this);
+                $name = get_class($this);
             }
-            $Name = strtolower($Name);
+            $name = strtolower($name);
 
-            if (StringEndsWith($Name, 'controller', false)) {
-                $Name = substr($Name, 0, -strlen('controller'));
+            if (stringEndsWith($name, 'controller', false)) {
+                $name = substr($name, 0, -strlen('controller'));
             }
 
-            return $Name;
+            return $name;
         } else {
             return $this->_PageName;
         }
@@ -1125,33 +1125,33 @@ class Gdn_Controller extends Gdn_Pluggable {
     /**
      * Checks that the user has the specified permissions. If the user does not, they are redirected to the DefaultPermission route.
      *
-     * @param mixed $Permission A permission or array of permission names required to access this resource.
-     * @param bool $FullMatch If $Permission is an array, $FullMatch indicates if all permissions specified are required. If false, the user only needs one of the specified permissions.
-     * @param string $JunctionTable The name of the junction table for a junction permission.
-     * @param int $JunctionID The ID of the junction permission.
+     * @param mixed $permission A permission or array of permission names required to access this resource.
+     * @param bool $fullMatch If $permission is an array, $fullMatch indicates if all permissions specified are required. If false, the user only needs one of the specified permissions.
+     * @param string $junctionTable The name of the junction table for a junction permission.
+     * @param int $junctionID The ID of the junction permission.
      */
-    public function permission($Permission, $FullMatch = true, $JunctionTable = '', $JunctionID = '') {
-        $Session = Gdn::session();
+    public function permission($permission, $fullMatch = true, $junctionTable = '', $junctionID = '') {
+        $session = Gdn::session();
 
-        if (!$Session->checkPermission($Permission, $FullMatch, $JunctionTable, $JunctionID)) {
+        if (!$session->checkPermission($permission, $fullMatch, $junctionTable, $junctionID)) {
             Logger::logAccess(
                 'security_denied',
                 Logger::NOTICE,
                 '{username} was denied access to {path}.',
-                array(
-                    'permission' => $Permission,
-                )
+                [
+                    'permission' => $permission,
+                ]
             );
 
-            if (!$Session->isValid() && $this->deliveryType() == DELIVERY_TYPE_ALL) {
+            if (!$session->isValid() && $this->deliveryType() == DELIVERY_TYPE_ALL) {
                 redirectTo('/entry/signin?Target='.urlencode($this->Request->pathAndQuery()));
             } else {
                 Gdn::dispatcher()->dispatch('DefaultPermission');
                 exit();
             }
         } else {
-            $Required = array_intersect((array)$Permission, array('Garden.Settings.Manage', 'Garden.Moderation.Manage'));
-            if (!empty($Required)) {
+            $required = array_intersect((array)$permission, ['Garden.Settings.Manage', 'Garden.Moderation.Manage']);
+            if (!empty($required)) {
                 Logger::logAccess('security_access', Logger::INFO, "{username} accessed {path}.");
             }
         }
@@ -1160,12 +1160,12 @@ class Gdn_Controller extends Gdn_Pluggable {
     /**
      * Removes a CSS file from the collection.
      *
-     * @param string $FileName The CSS file to search for.
+     * @param string $fileName The CSS file to search for.
      */
-    public function removeCssFile($FileName) {
-        foreach ($this->_CssFiles as $Key => $FileInfo) {
-            if ($FileInfo['FileName'] == $FileName) {
-                unset($this->_CssFiles[$Key]);
+    public function removeCssFile($fileName) {
+        foreach ($this->_CssFiles as $key => $fileInfo) {
+            if ($fileInfo['FileName'] == $fileName) {
+                unset($this->_CssFiles[$key]);
                 return;
             }
         }
@@ -1174,12 +1174,12 @@ class Gdn_Controller extends Gdn_Pluggable {
     /**
      * Removes a JS file from the collection.
      *
-     * @param string $FileName The JS file to search for.
+     * @param string $fileName The JS file to search for.
      */
-    public function removeJsFile($FileName) {
-        foreach ($this->_JsFiles as $Key => $FileInfo) {
-            if ($FileInfo['FileName'] == $FileName) {
-                unset($this->_JsFiles[$Key]);
+    public function removeJsFile($fileName) {
+        foreach ($this->_JsFiles as $key => $fileInfo) {
+            if ($fileInfo['FileName'] == $fileName) {
+                unset($this->_JsFiles[$key]);
                 return;
             }
         }
@@ -1189,12 +1189,12 @@ class Gdn_Controller extends Gdn_Pluggable {
      * Defines & retrieves the view and master view. Renders all content within
      * them to the screen.
      *
-     * @param string $View
-     * @param string $ControllerName
-     * @param string $ApplicationFolder
-     * @param string $AssetName The name of the asset container that the content should be rendered in.
+     * @param string $view
+     * @param string $controllerName
+     * @param string $applicationFolder
+     * @param string $assetName The name of the asset container that the content should be rendered in.
      */
-    public function xRender($View = '', $ControllerName = false, $ApplicationFolder = false, $AssetName = 'Content') {
+    public function xRender($view = '', $controllerName = false, $applicationFolder = false, $assetName = 'Content') {
         // Remove the deliver type and method from the query string so they don't corrupt calls to Url.
         $this->Request->setValueOn(Gdn_Request::INPUT_GET, 'DeliveryType', null);
         $this->Request->setValueOn(Gdn_Request::INPUT_GET, 'DeliveryMethod', null);
@@ -1235,32 +1235,32 @@ class Gdn_Controller extends Gdn_Pluggable {
         }
 
         // Define the view
-        if (!in_array($this->_DeliveryType, array(DELIVERY_TYPE_BOOL, DELIVERY_TYPE_DATA))) {
-            $View = $this->fetchView($View, $ControllerName, $ApplicationFolder);
+        if (!in_array($this->_DeliveryType, [DELIVERY_TYPE_BOOL, DELIVERY_TYPE_DATA])) {
+            $view = $this->fetchView($view, $controllerName, $applicationFolder);
             // Add the view to the asset container if necessary
             if ($this->_DeliveryType != DELIVERY_TYPE_VIEW) {
-                $this->addAsset($AssetName, $View, 'Content');
+                $this->addAsset($assetName, $view, 'Content');
             }
         }
 
         // Redefine the view as the entire asset contents if necessary
         if ($this->_DeliveryType == DELIVERY_TYPE_ASSET) {
-            $View = $this->getAsset($AssetName);
+            $view = $this->getAsset($assetName);
         } elseif ($this->_DeliveryType == DELIVERY_TYPE_BOOL) {
             // Or as a boolean if necessary
-            $View = true;
+            $view = true;
             if (property_exists($this, 'Form') && is_object($this->Form)) {
-                $View = $this->Form->errorCount() > 0 ? false : true;
+                $view = $this->Form->errorCount() > 0 ? false : true;
             }
         }
 
         if ($this->_DeliveryType == DELIVERY_TYPE_MESSAGE && $this->Form) {
-            $View = $this->Form->errors();
+            $view = $this->Form->errors();
         }
 
         if ($this->_DeliveryType == DELIVERY_TYPE_DATA) {
-            $ExitRender = $this->renderData();
-            if ($ExitRender) {
+            $exitRender = $this->renderData();
+            if ($exitRender) {
                 return;
             }
         }
@@ -1275,7 +1275,7 @@ class Gdn_Controller extends Gdn_Pluggable {
 
             $this->setJson('FormSaved', $this->_FormSaved);
             $this->setJson('DeliveryType', $this->_DeliveryType);
-            $this->setJson('Data', ($View instanceof Gdn_IModule) ? $View->toString() : $View);
+            $this->setJson('Data', ($view instanceof Gdn_IModule) ? $view->toString() : $view);
             $this->setJson('InformMessages', $this->_InformMessages);
             $this->setJson('ErrorMessages', $this->_ErrorMessages);
             if ($this->redirectTo !== null) {
@@ -1317,15 +1317,15 @@ class Gdn_Controller extends Gdn_Pluggable {
 
             // Render
             if ($this->_DeliveryType == DELIVERY_TYPE_BOOL) {
-                echo $View ? 'TRUE' : 'FALSE';
+                echo $view ? 'TRUE' : 'FALSE';
             } elseif ($this->_DeliveryType == DELIVERY_TYPE_ALL) {
                 // Render
                 $this->renderMaster();
             } else {
-                if ($View instanceof Gdn_IModule) {
-                    $View->render();
+                if ($view instanceof Gdn_IModule) {
+                    $view->render();
                 } else {
-                    echo $View;
+                    echo $view;
                 }
             }
         }
@@ -1350,27 +1350,27 @@ class Gdn_Controller extends Gdn_Pluggable {
     }
 
     /**
-     * Searches $this->Assets for a key with $AssetName and renders all items
+     * Searches $this->Assets for a key with $assetName and renders all items
      * within that array element to the screen. Note that any element in
      * $this->Assets can contain an array of elements itself. This way numerous
      * assets can be rendered one after another in one place.
      *
-     * @param string $AssetName The name of the asset to be rendered (the key related to the asset in
+     * @param string $assetName The name of the asset to be rendered (the key related to the asset in
      * the $this->Assets associative array).
      */
-    public function renderAsset($AssetName) {
-        $Asset = $this->getAsset($AssetName);
+    public function renderAsset($assetName) {
+        $asset = $this->getAsset($assetName);
 
-        $this->EventArguments['AssetName'] = $AssetName;
+        $this->EventArguments['AssetName'] = $assetName;
         $this->fireEvent('BeforeRenderAsset');
 
         //$LengthBefore = ob_get_length();
 
-        if (is_string($Asset)) {
-            echo $Asset;
+        if (is_string($asset)) {
+            echo $asset;
         } else {
-            $Asset->AssetName = $AssetName;
-            $Asset->render();
+            $asset->AssetName = $assetName;
+            $asset->render();
         }
 
         $this->fireEvent('AfterRenderAsset');
@@ -1385,11 +1385,11 @@ class Gdn_Controller extends Gdn_Pluggable {
      */
     public function renderData($Data = null) {
         if ($Data === null) {
-            $Data = array();
+            $Data = [];
 
             // Remove standard and "protected" data from the top level.
             foreach ($this->Data as $Key => $Value) {
-                if ($Key && in_array($Key, array('Title', 'Breadcrumbs'))) {
+                if ($Key && in_array($Key, ['Title', 'Breadcrumbs'])) {
                     continue;
                 }
                 if (isset($Key[0]) && $Key[0] === '_') {
@@ -1410,7 +1410,7 @@ class Gdn_Controller extends Gdn_Pluggable {
         $CleanOutut = c('Api.Clean', true);
         if ($CleanOutut) {
             // Remove values that should not be transmitted via api
-            $Remove = array('Password', 'HashMethod', 'TransientKey', 'Permissions', 'Attributes', 'AccessToken');
+            $Remove = ['Password', 'HashMethod', 'TransientKey', 'Permissions', 'Attributes', 'AccessToken'];
 
             // Remove PersonalInfo values for unprivileged requests.
             if (!Gdn::session()->checkPermission('Garden.Moderation.Manage')) {
@@ -1446,7 +1446,7 @@ class Gdn_Controller extends Gdn_Pluggable {
         if (debug() && $Trace = trace()) {
             // Clear passwords from the trace.
             array_walk_recursive($Trace, function (&$Value, $Key) {
-                if (in_array(strtolower($Key), array('password'))) {
+                if (in_array(strtolower($Key), ['password'])) {
                     $Value = '***';
                 }
             });
@@ -1477,7 +1477,7 @@ class Gdn_Controller extends Gdn_Pluggable {
 
         // Add schemes to to urls.
         if (!c('Garden.AllowSSL') || c('Garden.ForceSSL')) {
-            $r = array_walk_recursive($Data, array('Gdn_Controller', '_FixUrlScheme'), Gdn::request()->scheme());
+            $r = array_walk_recursive($Data, ['Gdn_Controller', '_FixUrlScheme'], Gdn::request()->scheme());
         }
 
         if (ob_get_level()) {
@@ -1516,64 +1516,64 @@ class Gdn_Controller extends Gdn_Pluggable {
     /**
      *
      *
-     * @param $Value
-     * @param $Key
-     * @param $Scheme
+     * @param $value
+     * @param $key
+     * @param $scheme
      */
-    protected static function _fixUrlScheme(&$Value, $Key, $Scheme) {
-        if (!is_string($Value)) {
+    protected static function _fixUrlScheme(&$value, $key, $scheme) {
+        if (!is_string($value)) {
             return;
         }
 
-        if (substr($Value, 0, 2) == '//' && substr($Key, -3) == 'Url') {
-            $Value = $Scheme.':'.$Value;
+        if (substr($value, 0, 2) == '//' && substr($key, -3) == 'Url') {
+            $value = $scheme.':'.$value;
         }
     }
 
     /**
      * A simple default method for rendering xml.
      *
-     * @param mixed $Data The data to render. This is usually $this->Data.
-     * @param string $Node The name of the root node.
-     * @param string $Indent The indent before the data for layout that is easier to read.
+     * @param mixed $data The data to render. This is usually $this->Data.
+     * @param string $node The name of the root node.
+     * @param string $indent The indent before the data for layout that is easier to read.
      */
-    protected function _renderXml($Data, $Node = 'Data', $Indent = '') {
+    protected function _renderXml($data, $node = 'Data', $indent = '') {
         // Handle numeric arrays.
-        if (is_numeric($Node)) {
-            $Node = 'Item';
+        if (is_numeric($node)) {
+            $node = 'Item';
         }
 
-        if (!$Node) {
+        if (!$node) {
             return;
         }
 
-        echo "$Indent<$Node>";
+        echo "$indent<$node>";
 
-        if (is_scalar($Data)) {
-            echo htmlspecialchars($Data);
+        if (is_scalar($data)) {
+            echo htmlspecialchars($data);
         } else {
-            $Data = (array)$Data;
-            if (count($Data) > 0) {
-                foreach ($Data as $Key => $Value) {
+            $data = (array)$data;
+            if (count($data) > 0) {
+                foreach ($data as $key => $value) {
                     echo "\n";
-                    $this->_renderXml($Value, $Key, $Indent.' ');
+                    $this->_renderXml($value, $key, $indent.' ');
                 }
                 echo "\n";
             }
         }
-        echo "</$Node>";
+        echo "</$node>";
     }
 
     /**
      * Render an exception as the sole output.
      *
-     * @param Exception $Ex The exception to render.
+     * @param Exception $ex The exception to render.
      */
-    public function renderException($Ex) {
+    public function renderException($ex) {
         if ($this->deliveryMethod() == DELIVERY_METHOD_XHTML) {
             try {
                 // Pick our route.
-                switch ($Ex->getCode()) {
+                switch ($ex->getCode()) {
                     case 401:
                         $route = 'DefaultPermission';
                         break;
@@ -1585,28 +1585,28 @@ class Gdn_Controller extends Gdn_Pluggable {
                 }
 
                 // Redispatch to our error handler.
-                if (is_a($Ex, 'Gdn_UserException')) {
+                if (is_a($ex, 'Gdn_UserException')) {
                     // UserExceptions provide more info.
                     Gdn::dispatcher()
-                        ->passData('Code', $Ex->getCode())
-                        ->passData('Exception', $Ex->getMessage())
-                        ->passData('Message', $Ex->getMessage())
-                        ->passData('Trace', $Ex->getTraceAsString())
+                        ->passData('Code', $ex->getCode())
+                        ->passData('Exception', $ex->getMessage())
+                        ->passData('Message', $ex->getMessage())
+                        ->passData('Trace', $ex->getTraceAsString())
                         ->passData('Url', url())
-                        ->passData('Breadcrumbs', $this->Data('Breadcrumbs', array()))
+                        ->passData('Breadcrumbs', $this->data('Breadcrumbs', []))
                         ->dispatch($route);
-                } elseif (in_array($Ex->getCode(), array(401, 404))) {
+                } elseif (in_array($ex->getCode(), [401, 404])) {
                     // Default forbidden & not found codes.
                     Gdn::dispatcher()
-                        ->passData('Message', $Ex->getMessage())
+                        ->passData('Message', $ex->getMessage())
                         ->passData('Url', url())
                         ->dispatch($route);
                 } else {
                     // I dunno! Barf.
-                    Gdn_ExceptionHandler($Ex);
+                    gdn_ExceptionHandler($ex);
                 }
-            } catch (Exception $Ex2) {
-                Gdn_ExceptionHandler($Ex);
+            } catch (Exception $ex2) {
+                gdn_ExceptionHandler($ex);
             }
             return;
         }
@@ -1615,25 +1615,25 @@ class Gdn_Controller extends Gdn_Pluggable {
         $this->finalize();
         $this->sendHeaders();
 
-        $Code = $Ex->getCode();
-        $Data = array('Code' => $Code, 'Exception' => $Ex->getMessage(), 'Class' => get_class($Ex));
+        $code = $ex->getCode();
+        $data = ['Code' => $code, 'Exception' => $ex->getMessage(), 'Class' => get_class($ex)];
 
         if (debug()) {
-            if ($Trace = trace()) {
+            if ($trace = trace()) {
                 // Clear passwords from the trace.
-                array_walk_recursive($Trace, function (&$Value, $Key) {
-                    if (in_array(strtolower($Key), array('password'))) {
-                        $Value = '***';
+                array_walk_recursive($trace, function (&$value, $key) {
+                    if (in_array(strtolower($key), ['password'])) {
+                        $value = '***';
                     }
                 });
-                $Data['Trace'] = $Trace;
+                $data['Trace'] = $trace;
             }
 
-            if (!is_a($Ex, 'Gdn_UserException')) {
-                $Data['StackTrace'] = $Ex->getTraceAsString();
+            if (!is_a($ex, 'Gdn_UserException')) {
+                $data['StackTrace'] = $ex->getTraceAsString();
             }
 
-            $Data['Data'] = $this->Data;
+            $data['Data'] = $this->Data;
         }
 
         // Try cleaning out any notices or errors.
@@ -1641,8 +1641,8 @@ class Gdn_Controller extends Gdn_Pluggable {
             ob_clean();
         }
 
-        if ($Code >= 400 && $Code <= 505) {
-            safeHeader("HTTP/1.0 $Code", true, $Code);
+        if ($code >= 400 && $code <= 505) {
+            safeHeader("HTTP/1.0 $code", true, $code);
         } else {
             safeHeader('HTTP/1.0 500', true, 500);
         }
@@ -1650,27 +1650,27 @@ class Gdn_Controller extends Gdn_Pluggable {
 
         switch ($this->deliveryMethod()) {
             case DELIVERY_METHOD_JSON:
-                if (($Callback = $this->Request->getValueFrom(Gdn_Request::INPUT_GET, 'callback', false)) && $this->allowJSONP()) {
+                if (($callback = $this->Request->getValueFrom(Gdn_Request::INPUT_GET, 'callback', false)) && $this->allowJSONP()) {
                     safeHeader('Content-Type: application/javascript; charset=utf-8', true);
                     // This is a jsonp request.
-                    exit($Callback.'('.json_encode($Data, JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT).');');
+                    exit($callback.'('.json_encode($data, JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT).');');
                 } else {
                     safeHeader('Content-Type: application/json; charset=utf-8', true);
                     // This is a regular json request.
-                    exit(json_encode($Data, JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT));
+                    exit(json_encode($data, JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT));
                 }
                 break;
 //         case DELIVERY_METHOD_XHTML:
-//            Gdn_ExceptionHandler($Ex);
+//            gdn_ExceptionHandler($Ex);
 //            break;
             case DELIVERY_METHOD_XML:
                 safeHeader('Content-Type: text/xml; charset=utf-8', true);
-                array_map('htmlspecialchars', $Data);
-                exit("<Exception><Code>{$Data['Code']}</Code><Class>{$Data['Class']}</Class><Message>{$Data['Exception']}</Message></Exception>");
+                array_map('htmlspecialchars', $data);
+                exit("<Exception><Code>{$data['Code']}</Code><Class>{$data['Class']}</Class><Message>{$data['Exception']}</Message></Exception>");
                 break;
             default:
                 safeHeader('Content-Type: text/plain; charset=utf-8', true);
-                exit($Ex->getMessage());
+                exit($ex->getMessage());
         }
     }
 
@@ -1679,7 +1679,7 @@ class Gdn_Controller extends Gdn_Pluggable {
      */
     public function renderMaster() {
         // Build the master view if necessary
-        if (in_array($this->_DeliveryType, array(DELIVERY_TYPE_ALL))) {
+        if (in_array($this->_DeliveryType, [DELIVERY_TYPE_ALL])) {
             $this->MasterView = $this->masterView();
 
             // Only get css & ui components if this is NOT a syndication request
@@ -1697,7 +1697,7 @@ class Gdn_Controller extends Gdn_Pluggable {
                 foreach ($this->_CssFiles as $CssInfo) {
                     $CssFile = $CssInfo['FileName'];
                     if (!array_key_exists('Options', $CssInfo) || !is_array($CssInfo['Options'])) {
-                        $CssInfo['Options'] = array();
+                        $CssInfo['Options'] = [];
                     }
                     $Options = &$CssInfo['Options'];
 
@@ -1714,7 +1714,7 @@ class Gdn_Controller extends Gdn_Pluggable {
 
                     $AppFolder = $CssInfo['AppFolder'];
                     $LookupFolder = !empty($AppFolder) ? $AppFolder : $this->ApplicationFolder;
-                    $Search = AssetModel::CssPath($CssFile, $LookupFolder, $ThemeType);
+                    $Search = AssetModel::cssPath($CssFile, $LookupFolder, $ThemeType);
                     if (!$Search) {
                         continue;
                     }
@@ -1722,7 +1722,7 @@ class Gdn_Controller extends Gdn_Pluggable {
                     list($Path, $UrlPath) = $Search;
 
                     if (isUrl($Path)) {
-                        $this->Head->AddCss($Path, 'all', val('AddVersion', $Options, true), $Options);
+                        $this->Head->addCss($Path, 'all', val('AddVersion', $Options, true), $Options);
                         continue;
 
                     } else {
@@ -1751,12 +1751,12 @@ class Gdn_Controller extends Gdn_Pluggable {
                 $this->EventArguments['Cdns'] = &$Cdns;
                 $this->fireEvent('AfterJsCdns');
 
-                $this->Head->addScript('', 'text/javascript', false, array('content' => $this->definitionList(false)));
+                $this->Head->addScript('', 'text/javascript', false, ['content' => $this->definitionList(false)]);
 
                 foreach ($this->_JsFiles as $Index => $JsInfo) {
                     $JsFile = $JsInfo['FileName'];
                     if (!is_array($JsInfo['Options'])) {
-                        $JsInfo['Options'] = array();
+                        $JsInfo['Options'] = [];
                     }
                     $Options = &$JsInfo['Options'];
 
@@ -1766,7 +1766,7 @@ class Gdn_Controller extends Gdn_Pluggable {
 
                     $AppFolder = $JsInfo['AppFolder'];
                     $LookupFolder = !empty($AppFolder) ? $AppFolder : $this->ApplicationFolder;
-                    $Search = AssetModel::JsPath($JsFile, $LookupFolder, $ThemeType);
+                    $Search = AssetModel::jsPath($JsFile, $LookupFolder, $ThemeType);
                     if (!$Search) {
                         continue;
                     }
@@ -1808,23 +1808,23 @@ class Gdn_Controller extends Gdn_Pluggable {
         }
 
         // Master views come from one of four places:
-        $MasterViewPaths = array();
+        $MasterViewPaths = [];
 
         if (strpos($this->MasterView, '/') !== false) {
-            $MasterViewPaths[] = combinePaths(array(PATH_ROOT, str_replace('/', DS, $this->MasterView).'.master*'));
+            $MasterViewPaths[] = combinePaths([PATH_ROOT, str_replace('/', DS, $this->MasterView).'.master*']);
         } else {
             if ($this->Theme) {
                 // 1. Application-specific theme view. eg. root/themes/theme_name/app_name/views/
-                $MasterViewPaths[] = combinePaths(array(PATH_THEMES, $this->Theme, $this->ApplicationFolder, 'views', $this->MasterView.'.master*'));
+                $MasterViewPaths[] = combinePaths([PATH_THEMES, $this->Theme, $this->ApplicationFolder, 'views', $this->MasterView.'.master*']);
                 // 2. Garden-wide theme view. eg. /path/to/application/themes/theme_name/views/
-                $MasterViewPaths[] = combinePaths(array(PATH_THEMES, $this->Theme, 'views', $this->MasterView.'.master*'));
+                $MasterViewPaths[] = combinePaths([PATH_THEMES, $this->Theme, 'views', $this->MasterView.'.master*']);
             }
             // 3. Plugin default. eg. root/plugin_name/views/
-            $MasterViewPaths[] = combinePaths(array(PATH_ROOT, $this->ApplicationFolder, 'views', $this->MasterView.'.master*'));
+            $MasterViewPaths[] = combinePaths([PATH_ROOT, $this->ApplicationFolder, 'views', $this->MasterView.'.master*']);
             // 4. Application default. eg. root/app_name/views/
-            $MasterViewPaths[] = combinePaths(array(PATH_APPLICATIONS, $this->ApplicationFolder, 'views', $this->MasterView.'.master*'));
+            $MasterViewPaths[] = combinePaths([PATH_APPLICATIONS, $this->ApplicationFolder, 'views', $this->MasterView.'.master*']);
             // 5. Garden default. eg. root/dashboard/views/
-            $MasterViewPaths[] = combinePaths(array(PATH_APPLICATIONS, 'dashboard', 'views', $this->MasterView.'.master*'));
+            $MasterViewPaths[] = combinePaths([PATH_APPLICATIONS, 'dashboard', 'views', $this->MasterView.'.master*']);
         }
 
         // Find the first file that matches the path.
@@ -1869,31 +1869,31 @@ class Gdn_Controller extends Gdn_Pluggable {
     }
 
     /**
-     * Sends all headers in $this->_Headers (defined with $this->SetHeader()) to the browser.
+     * Sends all headers in $this->_Headers (defined with $this->setHeader()) to the browser.
      */
     public function sendHeaders() {
         // TODO: ALWAYS RENDER OR REDIRECT FROM THE CONTROLLER OR HEADERS WILL NOT BE SENT!! PUT THIS IN DOCS!!!
-        foreach ($this->_Headers as $Name => $Value) {
-            if ($Name != 'Status') {
-                safeHeader($Name.': '.$Value, true);
+        foreach ($this->_Headers as $name => $value) {
+            if ($name != 'Status') {
+                safeHeader($name.': '.$value, true);
             } else {
-                $Code = array_shift($Shift = explode(' ', $Value));
-                safeHeader($Name.': '.$Value, true, $Code);
+                $code = array_shift($shift = explode(' ', $value));
+                safeHeader($name.': '.$value, true, $code);
             }
         }
         // Empty the collection after sending
-        $this->_Headers = array();
+        $this->_Headers = [];
     }
 
     /**
      * Allows the adding of page header information that will be delivered to
      * the browser before rendering.
      *
-     * @param string $Name The name of the header to send to the browser.
-     * @param string $Value The value of the header to send to the browser.
+     * @param string $name The name of the header to send to the browser.
+     * @param string $value The value of the header to send to the browser.
      */
-    public function setHeader($Name, $Value) {
-        $this->_Headers[$Name] = $Value;
+    public function setHeader($name, $value) {
+        $this->_Headers[$name] = $value;
     }
 
     /**
@@ -1934,13 +1934,13 @@ class Gdn_Controller extends Gdn_Pluggable {
     /**
      * Set $this->_FormSaved for JSON Renders.
      *
-     * @param bool $Saved Whether form data was successfully saved.
+     * @param bool $saved Whether form data was successfully saved.
      */
-    public function setFormSaved($Saved = true) {
-        if ($Saved === '') { // Allow reset
+    public function setFormSaved($saved = true) {
+        if ($saved === '') { // Allow reset
             $this->_FormSaved = '';
         } else { // Force true/false
-            $this->_FormSaved = ($Saved) ? true : false;
+            $this->_FormSaved = ($saved) ? true : false;
         }
     }
 
@@ -1951,23 +1951,23 @@ class Gdn_Controller extends Gdn_Pluggable {
      * browser and stop all execution. Otherwise it sets the Last-Modified
      * header for this page and continues processing.
      *
-     * @param string $LastModifiedDate A unix timestamp representing the date that the current page was last
+     * @param string $lastModifiedDate A unix timestamp representing the date that the current page was last
      *  modified.
      */
-    public function setLastModified($LastModifiedDate) {
-        $GMD = gmdate('D, d M Y H:i:s', $LastModifiedDate).' GMT';
-        $this->setHeader('Etag', '"'.$GMD.'"');
-        $this->setHeader('Last-Modified', $GMD);
-        $IncomingHeaders = getallheaders();
-        if (isset($IncomingHeaders['If-Modified-Since'])
-            && isset ($IncomingHeaders['If-None-Match'])
+    public function setLastModified($lastModifiedDate) {
+        $gMD = gmdate('D, d M Y H:i:s', $lastModifiedDate).' GMT';
+        $this->setHeader('Etag', '"'.$gMD.'"');
+        $this->setHeader('Last-Modified', $gMD);
+        $incomingHeaders = getallheaders();
+        if (isset($incomingHeaders['If-Modified-Since'])
+            && isset ($incomingHeaders['If-None-Match'])
         ) {
-            $IfNoneMatch = $IncomingHeaders['If-None-Match'];
-            $IfModifiedSince = $IncomingHeaders['If-Modified-Since'];
-            if ($GMD == $IfNoneMatch && $IfModifiedSince == $GMD) {
-                $Database = Gdn::database();
-                if (!is_null($Database)) {
-                    $Database->closeConnection();
+            $ifNoneMatch = $incomingHeaders['If-None-Match'];
+            $ifModifiedSince = $incomingHeaders['If-Modified-Since'];
+            if ($gMD == $ifNoneMatch && $ifModifiedSince == $gMD) {
+                $database = Gdn::database();
+                if (!is_null($database)) {
+                    $database->closeConnection();
                 }
 
                 $this->setHeader('Content-Length', '0');
@@ -1982,181 +1982,181 @@ class Gdn_Controller extends Gdn_Pluggable {
      * If JSON is going to be sent to the client, this method allows you to add
      * extra values to the JSON array.
      *
-     * @param string $Key The name of the array key to add.
-     * @param string $Value The value to be added. If empty, nothing will be added.
+     * @param string $key The name of the array key to add.
+     * @param string $value The value to be added. If empty, nothing will be added.
      */
-    public function setJson($Key, $Value = '') {
-        $this->_Json[$Key] = $Value;
+    public function setJson($key, $value = '') {
+        $this->_Json[$key] = $value;
     }
 
     /**
      *
      *
-     * @param $StatusCode
-     * @param null $Message
-     * @param bool $SetHeader
+     * @param $statusCode
+     * @param null $message
+     * @param bool $setHeader
      * @return null|string
      */
-    public function statusCode($StatusCode, $Message = null, $SetHeader = true) {
-        if (is_null($Message)) {
-            $Message = self::getStatusMessage($StatusCode);
+    public function statusCode($statusCode, $message = null, $setHeader = true) {
+        if (is_null($message)) {
+            $message = self::getStatusMessage($statusCode);
         }
 
-        if ($SetHeader) {
-            $this->setHeader('Status', "{$StatusCode} {$Message}");
+        if ($setHeader) {
+            $this->setHeader('Status', "{$statusCode} {$message}");
         }
-        return $Message;
+        return $message;
     }
 
     /**
      *
      *
-     * @param $StatusCode
+     * @param $statusCode
      * @return string
      */
-    public static function getStatusMessage($StatusCode) {
-        switch ($StatusCode) {
+    public static function getStatusMessage($statusCode) {
+        switch ($statusCode) {
             case 100:
-                $Message = 'Continue';
+                $message = 'Continue';
                 break;
             case 101:
-                $Message = 'Switching Protocols';
+                $message = 'Switching Protocols';
                 break;
 
             case 200:
-                $Message = 'OK';
+                $message = 'OK';
                 break;
             case 201:
-                $Message = 'Created';
+                $message = 'Created';
                 break;
             case 202:
-                $Message = 'Accepted';
+                $message = 'Accepted';
                 break;
             case 203:
-                $Message = 'Non-Authoritative Information';
+                $message = 'Non-Authoritative Information';
                 break;
             case 204:
-                $Message = 'No Content';
+                $message = 'No Content';
                 break;
             case 205:
-                $Message = 'Reset Content';
+                $message = 'Reset Content';
                 break;
 
             case 300:
-                $Message = 'Multiple Choices';
+                $message = 'Multiple Choices';
                 break;
             case 301:
-                $Message = 'Moved Permanently';
+                $message = 'Moved Permanently';
                 break;
             case 302:
-                $Message = 'Found';
+                $message = 'Found';
                 break;
             case 303:
-                $Message = 'See Other';
+                $message = 'See Other';
                 break;
             case 304:
-                $Message = 'Not Modified';
+                $message = 'Not Modified';
                 break;
             case 305:
-                $Message = 'Use Proxy';
+                $message = 'Use Proxy';
                 break;
             case 307:
-                $Message = 'Temporary Redirect';
+                $message = 'Temporary Redirect';
                 break;
 
             case 400:
-                $Message = 'Bad Request';
+                $message = 'Bad Request';
                 break;
             case 401:
-                $Message = 'Not Authorized';
+                $message = 'Not Authorized';
                 break;
             case 402:
-                $Message = 'Payment Required';
+                $message = 'Payment Required';
                 break;
             case 403:
-                $Message = 'Forbidden';
+                $message = 'Forbidden';
                 break;
             case 404:
-                $Message = 'Not Found';
+                $message = 'Not Found';
                 break;
             case 405:
-                $Message = 'Method Not Allowed';
+                $message = 'Method Not Allowed';
                 break;
             case 406:
-                $Message = 'Not Acceptable';
+                $message = 'Not Acceptable';
                 break;
             case 407:
-                $Message = 'Proxy Authentication Required';
+                $message = 'Proxy Authentication Required';
                 break;
             case 408:
-                $Message = 'Request Timeout';
+                $message = 'Request Timeout';
                 break;
             case 409:
-                $Message = 'Conflict';
+                $message = 'Conflict';
                 break;
             case 410:
-                $Message = 'Gone';
+                $message = 'Gone';
                 break;
             case 411:
-                $Message = 'Length Required';
+                $message = 'Length Required';
                 break;
             case 412:
-                $Message = 'Precondition Failed';
+                $message = 'Precondition Failed';
                 break;
             case 413:
-                $Message = 'Request Entity Too Large';
+                $message = 'Request Entity Too Large';
                 break;
             case 414:
-                $Message = 'Request-URI Too Long';
+                $message = 'Request-URI Too Long';
                 break;
             case 415:
-                $Message = 'Unsupported Media Type';
+                $message = 'Unsupported Media Type';
                 break;
             case 416:
-                $Message = 'Requested Range Not Satisfiable';
+                $message = 'Requested Range Not Satisfiable';
                 break;
             case 417:
-                $Message = 'Expectation Failed';
+                $message = 'Expectation Failed';
                 break;
 
             case 500:
-                $Message = 'Internal Server Error';
+                $message = 'Internal Server Error';
                 break;
             case 501:
-                $Message = 'Not Implemented';
+                $message = 'Not Implemented';
                 break;
             case 502:
-                $Message = 'Bad Gateway';
+                $message = 'Bad Gateway';
                 break;
             case 503:
-                $Message = 'Service Unavailable';
+                $message = 'Service Unavailable';
                 break;
             case 504:
-                $Message = 'Gateway Timeout';
+                $message = 'Gateway Timeout';
                 break;
             case 505:
-                $Message = 'HTTP Version Not Supported';
+                $message = 'HTTP Version Not Supported';
                 break;
 
             default:
-                $Message = 'Unknown';
+                $message = 'Unknown';
                 break;
         }
-        return $Message;
+        return $message;
     }
 
     /**
      * If this object has a "Head" object as a property, this will set it's Title value.
      *
-     * @param string $Title The value to pass to $this->Head->Title().
+     * @param string $title The value to pass to $this->Head->title().
      */
-    public function title($Title = null, $Subtitle = null) {
-        if (!is_null($Title)) {
-            $this->setData('Title', $Title);
+    public function title($title = null, $subtitle = null) {
+        if (!is_null($title)) {
+            $this->setData('Title', $title);
         }
 
-        if (!is_null($Subtitle)) {
-            $this->setData('_Subtitle', $Subtitle);
+        if (!is_null($subtitle)) {
+            $this->setData('_Subtitle', $subtitle);
         }
 
         return $this->data('Title');

@@ -17,7 +17,7 @@ class UtilityController extends DashboardController {
     const MAINTENANCE_AUTO = 2;
 
     /** @var array Models to automatically instantiate. */
-    public $Uses = array('Form');
+    public $Uses = ['Form'];
 
     /** @var  Gdn_Form $Form */
     public $Form;
@@ -27,14 +27,14 @@ class UtilityController extends DashboardController {
      * Typically, HTTP headers in the $_SERVER array will be prefixed with
      * `HTTP_` or `X_`. These are not so we list them here for later reference.
      */
-    protected static $specialHeaders = array(
+    protected static $specialHeaders = [
         'CONTENT_TYPE',
         'CONTENT_LENGTH',
         'PHP_AUTH_USER',
         'PHP_AUTH_PW',
         'PHP_AUTH_DIGEST',
         'AUTH_TYPE'
-    );
+    ];
 
     /**
      * Runs before every call to this controller.
@@ -57,27 +57,27 @@ class UtilityController extends DashboardController {
         $this->permission('Garden.Settings.Manage');
 
         if (Gdn::request()->isAuthenticatedPostBack()) {
-            $TableID = Gdn::request()->Post('TableID');
-            if ($TableID) {
-                $Rows = Gdn::request()->Post($TableID);
-                if (is_array($Rows)) {
-                    $Table = str_replace(array('Table', '`'), '', $TableID);
-                    $ModelName = $Table.'Model';
-                    if (class_exists($ModelName)) {
-                        $TableModel = new $ModelName();
+            $tableID = Gdn::request()->post('TableID');
+            if ($tableID) {
+                $rows = Gdn::request()->post($tableID);
+                if (is_array($rows)) {
+                    $table = str_replace(['Table', '`'], '', $tableID);
+                    $modelName = $table.'Model';
+                    if (class_exists($modelName)) {
+                        $tableModel = new $modelName();
                     } else {
-                        $TableModel = new Gdn_Model($Table);
+                        $tableModel = new Gdn_Model($table);
                     }
 
-                    foreach ($Rows as $Sort => $ID) {
-                        if (strpos($ID, '_') !== false) {
-                            list(, $ID) = explode('_', $ID, 2);
+                    foreach ($rows as $sort => $iD) {
+                        if (strpos($iD, '_') !== false) {
+                            list(, $iD) = explode('_', $iD, 2);
                         }
-                        if (!$ID) {
+                        if (!$iD) {
                             continue;
                         }
 
-                        $TableModel->setField($ID, 'Sort', $Sort);
+                        $tableModel->setField($iD, 'Sort', $sort);
                     }
                     $this->setData('Result', true);
                 }
@@ -92,19 +92,19 @@ class UtilityController extends DashboardController {
      * user table: Preferences and Attributes.
      *
      * The method expects "Name" & "Value" to be in the $_POST collection. This method always
-     * saves to the row of the user id performing this action (ie. $Session->UserID). The
+     * saves to the row of the user id performing this action (ie. $session->UserID). The
      * type of property column being saved should be specified in the url:
      * i.e. /dashboard/utility/set/preference/name/value/transientKey
      * or /dashboard/utility/set/attribute/name/value/transientKey
      *
      * @since 2.0.0
      * @access public
-     * @param string $UserPropertyColumn The type of value being saved: preference or attribute.
-     * @param string $Name The name of the property being saved.
-     * @param string $Value The value of the property being saved.
-     * @param string $TransientKey A unique transient key to authenticate that the user intended to perform this action.
+     * @param string $userPropertyColumn The type of value being saved: preference or attribute.
+     * @param string $name The name of the property being saved.
+     * @param string $value The value of the property being saved.
+     * @param string $transientKey A unique transient key to authenticate that the user intended to perform this action.
      */
-    public function set($UserPropertyColumn = '', $Name = '', $Value = '', $TransientKey = '') {
+    public function set($userPropertyColumn = '', $name = '', $value = '', $transientKey = '') {
         deprecated('set', '', 'February 2017');
 
         $whiteList = [];
@@ -119,35 +119,35 @@ class UtilityController extends DashboardController {
         }
 
         $this->_DeliveryType = DELIVERY_TYPE_BOOL;
-        $Session = Gdn::session();
-        $Success = false;
+        $session = Gdn::session();
+        $success = false;
 
         // Get index of whitelisted name
-        $index = array_search(strtolower($Name), array_map('strtolower', $whiteList));
+        $index = array_search(strtolower($name), array_map('strtolower', $whiteList));
 
         if (!empty($whiteList) && $index !== false) {
 
             // Force name to have casing present in whitelist
-            $Name = $whiteList[$index];
+            $name = $whiteList[$index];
 
             // Force value
-            if ($Value != '1') {
-                $Value = '0';
+            if ($value != '1') {
+                $value = '0';
             }
 
-            if (in_array($UserPropertyColumn, array('preference', 'attribute'))
-                && $Name != ''
-                && $Value != ''
-                && $Session->UserID > 0
-                && $Session->validateTransientKey($TransientKey)
+            if (in_array($userPropertyColumn, ['preference', 'attribute'])
+                && $name != ''
+                && $value != ''
+                && $session->UserID > 0
+                && $session->validateTransientKey($transientKey)
             ) {
-                $UserModel = Gdn::factory("UserModel");
-                $Method = $UserPropertyColumn == 'preference' ? 'SavePreference' : 'SaveAttribute';
-                $Success = $UserModel->$Method($Session->UserID, $Name, $Value) ? 'TRUE' : 'FALSE';
+                $userModel = Gdn::factory("UserModel");
+                $method = $userPropertyColumn == 'preference' ? 'SavePreference' : 'SaveAttribute';
+                $success = $userModel->$method($session->UserID, $name, $value) ? 'TRUE' : 'FALSE';
             }
         }
 
-        if (!$Success) {
+        if (!$success) {
             $this->Form->addError('ErrorBool');
         }
 
@@ -250,50 +250,50 @@ class UtilityController extends DashboardController {
     public function update() {
         // Check for permission or flood control.
         // These settings are loaded/saved to the database because we don't want the config file storing non/config information.
-        $Now = time();
-        $LastTime = 0;
-        $Count = 0;
+        $now = time();
+        $lastTime = 0;
+        $count = 0;
 
         try {
-            $LastTime = Gdn::get('Garden.Update.LastTimestamp', 0);
-        } catch (Exception $Ex) {
+            $lastTime = Gdn::get('Garden.Update.LastTimestamp', 0);
+        } catch (Exception $ex) {
             // We don't have a GDN_UserMeta table yet. Sit quietly and one will appear.
         }
 
-        if ($LastTime + (60 * 60 * 24) > $Now) {
+        if ($lastTime + (60 * 60 * 24) > $now) {
             // Check for flood control.
             try {
-                $Count = Gdn::get('Garden.Update.Count', 0) + 1;
-            } catch (Exception $Ex) {
+                $count = Gdn::get('Garden.Update.Count', 0) + 1;
+            } catch (Exception $ex) {
                 // Once more we sit, watching the breath.
             }
-            if ($Count > 5) {
+            if ($count > 5) {
                 if (!Gdn::session()->checkPermission('Garden.Settings.Manage')) {
                     // We are only allowing an update of 5 times every 24 hours.
                     throw permissionException();
                 }
             }
         } else {
-            $Count = 1;
+            $count = 1;
         }
 
         try {
-            Gdn::set('Garden.Update.LastTimestamp', $Now);
-            Gdn::set('Garden.Update.Count', $Count);
-        } catch (Exception $Ex) {
+            Gdn::set('Garden.Update.LastTimestamp', $now);
+            Gdn::set('Garden.Update.Count', $count);
+        } catch (Exception $ex) {
             // What is a GDN_UserMeta table, really? Suffering.
         }
 
         try {
             // Run the structure.
-            $UpdateModel = new UpdateModel();
-            $UpdateModel->runStructure();
+            $updateModel = new UpdateModel();
+            $updateModel->runStructure();
             $this->setData('Success', true);
-        } catch (Exception $Ex) {
+        } catch (Exception $ex) {
             $this->setData('Success', false);
-            $this->setData('Error', $Ex->getMessage());
-            if (Debug()) {
-                throw $Ex;
+            $this->setData('Error', $ex->getMessage());
+            if (debug()) {
+                throw $ex;
             }
         }
 
@@ -301,8 +301,8 @@ class UtilityController extends DashboardController {
             saveToConfig('Garden.Version', APPLICATION_VERSION);
         }
 
-        if ($Target = $this->Request->get('Target')) {
-            redirectTo($Target);
+        if ($target = $this->Request->get('Target')) {
+            redirectTo($target);
         }
 
         $this->fireEvent('AfterUpdate');
@@ -446,18 +446,18 @@ class UtilityController extends DashboardController {
      * @since 2.0.0
      * @access public
      * @param string $ClientDate Client-reported datetime.
-     * @param string $TransientKey Security token.
+     * @param string $transientKey Security token.
      */
-    public function setClientHour($ClientHour = '', $TransientKey = '') {
+    public function setClientHour($clientHour = '', $transientKey = '') {
         $this->_DeliveryType = DELIVERY_TYPE_BOOL;
-        $Success = false;
+        $success = false;
 
-        if (is_numeric($ClientHour) && $ClientHour >= 0 && $ClientHour < 24) {
-            $HourOffset = $ClientHour - date('G', time());
+        if (is_numeric($clientHour) && $clientHour >= 0 && $clientHour < 24) {
+            $hourOffset = $clientHour - date('G', time());
 
-            if (Gdn::session()->isValid() && Gdn::session()->validateTransientKey($TransientKey)) {
-                Gdn::userModel()->setField(Gdn::session()->UserID, 'HourOffset', $HourOffset);
-                $Success = true;
+            if (Gdn::session()->isValid() && Gdn::session()->validateTransientKey($transientKey)) {
+                Gdn::userModel()->setField(Gdn::session()->UserID, 'HourOffset', $hourOffset);
+                $success = true;
             }
         }
 
@@ -470,18 +470,18 @@ class UtilityController extends DashboardController {
      * @throws Exception
      */
     public function setHourOffset() {
-        $Form = new Gdn_Form();
+        $form = new Gdn_Form();
 
-        if ($Form->authenticatedPostBack()) {
+        if ($form->authenticatedPostBack()) {
             if (!Gdn::session()->isValid()) {
                 throw permissionException('Garden.SignIn.Allow');
             }
 
-            $HourOffset = $Form->getFormValue('HourOffset');
-            Gdn::userModel()->setField(Gdn::session()->UserID, 'HourOffset', $HourOffset);
+            $hourOffset = $form->getFormValue('HourOffset');
+            Gdn::userModel()->setField(Gdn::session()->UserID, 'HourOffset', $hourOffset);
 
             // If we receive a time zone, only accept it if we can verify it as a valid identifier.
-            $timeZone = $Form->getFormValue('TimeZone');
+            $timeZone = $form->getFormValue('TimeZone');
             if (!empty($timeZone)) {
                 try {
                     $tz = new DateTimeZone($timeZone);
@@ -503,7 +503,7 @@ class UtilityController extends DashboardController {
                 try {
                     $tz = new DateTimeZone($currentTimeZone);
                     $currentHourOffset = $tz->getOffset(new DateTime()) / 3600;
-                    if ($currentHourOffset != $HourOffset) {
+                    if ($currentHourOffset != $hourOffset) {
                         // Clear out the current timezone or else it will override the browser's offset.
                         Gdn::userModel()->saveAttribute(
                             Gdn::session()->UserID,
@@ -523,12 +523,12 @@ class UtilityController extends DashboardController {
             }
 
             $this->setData('Result', true);
-            $this->setData('HourOffset', $HourOffset);
+            $this->setData('HourOffset', $hourOffset);
             $this->setData('TimeZone', $timeZone);
 
             $time = time();
             $this->setData('UTCDateTime', gmdate('r', $time));
-            $this->setData('UserDateTime', gmdate('r', $time + $HourOffset * 3600));
+            $this->setData('UserDateTime', gmdate('r', $time + $hourOffset * 3600));
         } else {
             throw forbiddenException('GET');
         }
@@ -546,16 +546,16 @@ class UtilityController extends DashboardController {
      * @param string $FeedFormat How we want it (valid formats are 'normal' or 'sexy'. OK, not really).
      */
     public function getFeed($type = 'news', $length = 5, $feedFormat = 'normal') {
-        $validTypes = array(
+        $validTypes = [
             'releases',
             'help',
             'news',
             'cloud'
-        );
-        $validFormats = array(
+        ];
+        $validFormats = [
             'extended',
             'normal'
-        );
+        ];
 
         $length = is_numeric($length) && $length <= 50 ? $length : 5;
 
@@ -575,14 +575,14 @@ class UtilityController extends DashboardController {
     /**
      * Return some meta information about any page on the internet in JSON format.
      */
-    public function fetchPageInfo($Url = '') {
-        $PageInfo = fetchPageInfo($Url);
+    public function fetchPageInfo($url = '') {
+        $pageInfo = fetchPageInfo($url);
 
-        if (!empty($PageInfo['Exception'])) {
-            throw new Gdn_UserException($PageInfo['Exception'], 400);
+        if (!empty($pageInfo['Exception'])) {
+            throw new Gdn_UserException($pageInfo['Exception'], 400);
         }
 
-        $this->setData('PageInfo', $PageInfo);
+        $this->setData('PageInfo', $pageInfo);
         $this->MasterView = 'default';
         $this->removeCssFile('admin.css');
         $this->addCssFile('style.css');

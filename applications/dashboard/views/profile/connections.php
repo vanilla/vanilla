@@ -46,7 +46,7 @@
 
     <p>
         <?php
-        echo Gdn_Format::Markdown(t('Connect your profile to social networks.', "Connect your profile to social networks to be notified of activity here and share your activity with your friends and followers."));
+        echo Gdn_Format::markdown(t('Connect your profile to social networks.', "Connect your profile to social networks to be notified of activity here and share your activity with your friends and followers."));
         ?>
     </p>
 </div>
@@ -54,7 +54,7 @@
 <ul class="DataList DataList-Connections">
     <?php
     foreach ($this->data('Connections') as $Key => $Row) {
-        WriteConnection($Row);
+        writeConnection($Row);
     }
     ?>
 </ul>

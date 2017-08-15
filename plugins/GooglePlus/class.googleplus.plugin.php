@@ -13,10 +13,10 @@
 class GooglePlusPlugin extends Gdn_Plugin {
 
     /** Authentication Provider key. */
-    const ProviderKey = 'GooglePlus';
+    const PROVIDER_KEY = 'GooglePlus';
 
     /** Google's URL. */
-    const APIUrl = 'https://www.googleapis.com/oauth2/v1';
+    const API_URL = 'https://www.googleapis.com/oauth2/v1';
 
     /** @var string */
     protected $_AccessToken = null;
@@ -24,20 +24,20 @@ class GooglePlusPlugin extends Gdn_Plugin {
     /**
      * Get current access token.
      *
-     * @param bool $NewValue
+     * @param bool $newValue
      * @return bool|mixed|null
      */
-    public function accessToken($NewValue = false) {
+    public function accessToken($newValue = false) {
         if (!$this->isConfigured()) {
             return false;
         }
 
-        if ($NewValue !== false) {
-            $this->_AccessToken = $NewValue;
+        if ($newValue !== false) {
+            $this->_AccessToken = $newValue;
         }
 
         if ($this->_AccessToken === null) {
-            $this->_AccessToken = valr(self::ProviderKey.'.AccessToken', Gdn::session()->User->Attributes);
+            $this->_AccessToken = valr(self::PROVIDER_KEY.'.AccessToken', Gdn::session()->User->Attributes);
         }
 
         return $this->_AccessToken;
@@ -46,69 +46,69 @@ class GooglePlusPlugin extends Gdn_Plugin {
     /**
      * Send request to the Twitter API.
      *
-     * @param string $Path
-     * @param array $Post
+     * @param string $path
+     * @param array $post
      *
      * @return mixed
      * @throws Gdn_UserException
      */
-    public function api($Path, $Post = array()) {
-        $Url = self::APIUrl.'/'.ltrim($Path, '/');
-        if (strpos($Url, '?') === false) {
-            $Url .= '?';
+    public function api($path, $post = []) {
+        $url = self::API_URL.'/'.ltrim($path, '/');
+        if (strpos($url, '?') === false) {
+            $url .= '?';
         } else {
-            $Url .= '&';
+            $url .= '&';
         }
-        $Url .= 'access_token='.urlencode($this->accessToken());
+        $url .= 'access_token='.urlencode($this->accessToken());
 
-        $Result = $this->Curl($Url, empty($Post) ? 'GET' : 'POST', $Post);
-        return $Result;
+        $result = $this->curl($url, empty($post) ? 'GET' : 'POST', $post);
+        return $result;
     }
 
     /**
      * Retrieve where to send the user for authorization.
      *
-     * @param array $State
+     * @param array $state
      *
      * @return string
      */
-    public function authorizeUri($State = array()) {
-        $Url = 'https://accounts.google.com/o/oauth2/auth';
-        $Get = array(
+    public function authorizeUri($state = []) {
+        $url = 'https://accounts.google.com/o/oauth2/auth';
+        $get = [
             'response_type' => 'code',
             'client_id' => c('Plugins.GooglePlus.ClientID'),
             'redirect_uri' => url('/entry/googleplus', true),
             'scope' => 'https://www.googleapis.com/auth/userinfo.profile https://www.googleapis.com/auth/userinfo.email'
-        );
+        ];
 
-        if (is_array($State)) {
-            $Get['state'] = http_build_query($State);
+        if (is_array($state)) {
+            $get['state'] = http_build_query($state);
         }
 
-        return $Url.'?'.http_build_query($Get);
+        return $url.'?'.http_build_query($get);
     }
 
     /**
      * Get an access token from Google.
      *
-     * @param $Code
+     * @param $code
      *
      * @return mixed
      * @throws Gdn_UserException
      */
-    public function getAccessToken($Code) {
-        $Url = 'https://accounts.google.com/o/oauth2/token';
-        $Post = array(
-            'code' => $Code,
+    public function getAccessToken($code) {
+        $url = 'https://accounts.google.com/o/oauth2/token';
+        $post = [
+            'code' => $code,
             'client_id' => c('Plugins.GooglePlus.ClientID'),
             'client_secret' => c('Plugins.GooglePlus.Secret'),
             'redirect_uri' => url('/entry/googleplus', true),
             'grant_type' => 'authorization_code'
-        );
+        ];
 
-        $Data = self::curl($Url, 'POST', $Post);
-        $AccessToken = $Data['access_token'];
-        return $AccessToken;
+        $data = self::curl($url, 'POST', $post);
+        $accessToken = $data['access_token'];
+        return $accessToken;
     }
 
     /**
@@ -117,8 +117,8 @@ class GooglePlusPlugin extends Gdn_Plugin {
      * @return bool
      */
     public function isConfigured() {
-        $Result = c('Plugins.GooglePlus.ClientID') && c('Plugins.GooglePlus.Secret');
-        return $Result;
+        $result = c('Plugins.GooglePlus.ClientID') && c('Plugins.GooglePlus.Secret');
+        return $result;
     }
 
     /**
@@ -151,45 +151,45 @@ class GooglePlusPlugin extends Gdn_Plugin {
     /**
      * Send a cURL request.
      *
-     * @param $Url
-     * @param string $Method
-     * @param array $Data
+     * @param $url
+     * @param string $method
+     * @param array $data
      * @return mixed
      * @throws Gdn_UserException
      */
-    public static function curl($Url, $Method = 'GET', $Data = array()) {
+    public static function curl($url, $method = 'GET', $data = []) {
         $ch = curl_init();
         curl_setopt($ch, CURLOPT_HEADER, false);
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
         curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
-        curl_setopt($ch, CURLOPT_URL, $Url);
+        curl_setopt($ch, CURLOPT_URL, $url);
 
-        if ($Method == 'POST') {
+        if ($method == 'POST') {
             curl_setopt($ch, CURLOPT_POST, true);
-            curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query($Data));
-            trace("  POST $Url");
+            curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query($data));
+            trace("  POST $url");
         } else {
-            trace("  GET  $Url");
+            trace("  GET  $url");
         }
 
-        $Response = curl_exec($ch);
+        $response = curl_exec($ch);
 
-        $HttpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-        $ContentType = curl_getinfo($ch, CURLINFO_CONTENT_TYPE);
+        $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+        $contentType = curl_getinfo($ch, CURLINFO_CONTENT_TYPE);
         curl_close($ch);
 
-        $Result = @json_decode($Response, true);
-        if (!$Result) {
-            $Result = $Response;
+        $result = @json_decode($response, true);
+        if (!$result) {
+            $result = $response;
         }
 
-        if ($HttpCode != 200) {
-            $Error = val('error', $Result, $Response);
+        if ($httpCode != 200) {
+            $error = val('error', $result, $response);
 
-            throw new Gdn_UserException($Error, $HttpCode);
+            throw new Gdn_UserException($error, $httpCode);
         }
 
-        return $Result;
+        return $result;
     }
 
     /**
@@ -206,26 +206,26 @@ class GooglePlusPlugin extends Gdn_Plugin {
      * @return string
      */
     public function signInButton($type = 'button') {
-        $Target = Gdn::request()->post('Target', Gdn::request()->get('Target', url('', '/')));
-        $Url = $this->authorizeUri(array('target' => $Target));
+        $target = Gdn::request()->post('Target', Gdn::request()->get('Target', url('', '/')));
+        $url = $this->authorizeUri(['target' => $target]);
 
-        $Result = socialSignInButton('Google', $Url, $type, array('rel' => 'nofollow'));
-        return $Result;
+        $result = socialSignInButton('Google', $url, $type, ['rel' => 'nofollow']);
+        return $result;
     }
 
     /**
      * Run on utility/update.
      */
     public function structure() {
-        if (Gdn::sql()->getWhere('UserAuthenticationProvider', array('AuthenticationSchemeAlias' => 'Google+'))->firstRow()) {
-            Gdn::sql()->put('UserAuthenticationProvider', array('AuthenticationSchemeAlias' => self::ProviderKey), array('AuthenticationSchemeAlias' => 'Google+'));
+        if (Gdn::sql()->getWhere('UserAuthenticationProvider', ['AuthenticationSchemeAlias' => 'Google+'])->firstRow()) {
+            Gdn::sql()->put('UserAuthenticationProvider', ['AuthenticationSchemeAlias' => self::PROVIDER_KEY], ['AuthenticationSchemeAlias' => 'Google+']);
         }
 
         // Save the google+ provider type.
         Gdn::sql()->replace(
             'UserAuthenticationProvider',
-            array('AuthenticationSchemeAlias' => self::ProviderKey, 'URL' => '', 'AssociationSecret' => '', 'AssociationHashMethod' => '...'),
-            array('AuthenticationKey' => self::ProviderKey),
+            ['AuthenticationSchemeAlias' => self::PROVIDER_KEY, 'URL' => '', 'AssociationSecret' => '', 'AssociationHashMethod' => '...'],
+            ['AuthenticationKey' => self::PROVIDER_KEY],
             true
         );
     }
@@ -244,84 +244,84 @@ class GooglePlusPlugin extends Gdn_Plugin {
             $target = Gdn::request()->post('Target', Gdn::request()->get('Target', url('', '/')));
         }
 
-        $provider['SignInUrlFinal'] = $this->authorizeUri(array('target' => $target));
+        $provider['SignInUrlFinal'] = $this->authorizeUri(['target' => $target]);
     }
 
     /**
      * Add 'Google+' option to the row.
      *
-     * @param Gdn_Controller $Sender
-     * @param array $Args
+     * @param Gdn_Controller $sender
+     * @param array $args
      */
-    public function base_AfterReactions_handler($Sender, $Args) {
+    public function base_afterReactions_handler($sender, $args) {
         if (!$this->socialReactions()) {
             return;
         }
         echo Gdn_Theme::bulletItem('Share');
-        $Url = url("post/googleplus/{$Args['RecordType']}?id={$Args['RecordID']}", true);
-        $CssClass = 'ReactButton PopupWindow';
+        $url = url("post/googleplus/{$args['RecordType']}?id={$args['RecordID']}", true);
+        $cssClass = 'ReactButton PopupWindow';
 
-        echo ' '.anchor(sprite('ReactGooglePlus', 'ReactSprite', t('Share on Google+')), $Url, $CssClass).' ';
+        echo ' '.anchor(sprite('ReactGooglePlus', 'ReactSprite', t('Share on Google+')), $url, $cssClass).' ';
     }
 
     /**
      * Generic SSO hook into Vanilla for authorizing via Google+ and pass user info.
      *
-     * @param EntryController $Sender
-     * @param array $Args
+     * @param EntryController $sender
+     * @param array $args
      */
-    public function base_connectData_handler($Sender, $Args) {
-        if (val(0, $Args) != 'googleplus') {
+    public function base_connectData_handler($sender, $args) {
+        if (val(0, $args) != 'googleplus') {
             return;
         }
 
         // Grab the google plus profile from the session staff.
-        $GooglePlus = Gdn::session()->stash(self::ProviderKey, '', false);
-        $AccessToken = val('AccessToken', $GooglePlus);
-        $Profile = val('Profile', $GooglePlus);
+        $googlePlus = Gdn::session()->stash(self::PROVIDER_KEY, '', false);
+        $accessToken = val('AccessToken', $googlePlus);
+        $profile = val('Profile', $googlePlus);
 
         // This isn't a trusted connection. Don't allow it to automatically connect a user account.
         saveToConfig('Garden.Registration.AutoConnect', false, false);
 
-        $Form = $Sender->Form;
-        $Form->setFormValue('UniqueID', val('id', $Profile));
-        $Form->setFormValue('Provider', self::ProviderKey);
-        $Form->setFormValue('ProviderName', 'Google+');
-        $Form->setFormValue('FullName', val('name', $Profile));
-        $Form->setFormValue('Email', val('email', $Profile));
+        $form = $sender->Form;
+        $form->setFormValue('UniqueID', val('id', $profile));
+        $form->setFormValue('Provider', self::PROVIDER_KEY);
+        $form->setFormValue('ProviderName', 'Google+');
+        $form->setFormValue('FullName', val('name', $profile));
+        $form->setFormValue('Email', val('email', $profile));
         if (c('Plugins.GooglePlus.UseAvatars', true)) {
-            $Form->setFormValue('Photo', val('picture', $Profile));
+            $form->setFormValue('Photo', val('picture', $profile));
         }
 
         if (c('Plugins.GooglePlus.UseFullNames')) {
-            $Form->setFormValue('Name', val('name', $Profile));
-            saveToConfig(array(
+            $form->setFormValue('Name', val('name', $profile));
+            saveToConfig([
                 'Garden.User.ValidationRegex' => UserModel::USERNAME_REGEX_MIN,
                 'Garden.User.ValidationLength' => '{3,50}',
                 'Garden.Registration.NameUnique' => false
-            ), '', false);
+            ], '', false);
         }
 
         // Save some original data in the attributes of the connection for later API calls.
-        $Attributes = array();
-        $Attributes[self::ProviderKey] = array(
-            'AccessToken' => $AccessToken,
-            'Profile' => $Profile
-        );
-        $Form->setFormValue('Attributes', $Attributes);
-        $Sender->setData('Verified', true);
+        $attributes = [];
+        $attributes[self::PROVIDER_KEY] = [
+            'AccessToken' => $accessToken,
+            'Profile' => $profile
+        ];
+        $form->setFormValue('Attributes', $attributes);
+        $sender->setData('Verified', true);
 
-        $this->EventArguments['Form'] = $Form;
+        $this->EventArguments['Form'] = $form;
         $this->fireEvent('AfterConnectData');
     }
 
     /**
      * Add Google+ option to MeModule.
      *
-     * @param Gdn_Controller $Sender
-     * @param array $Args
+     * @param Gdn_Controller $sender
+     * @param array $args
      */
-    public function base_signInIcons_handler($Sender, $Args) {
+    public function base_signInIcons_handler($sender, $args) {
         if (!$this->isDefault()) {
             echo ' '.$this->signInButton('icon').' ';
         }
@@ -330,10 +330,10 @@ class GooglePlusPlugin extends Gdn_Plugin {
     /**
      * Add Google+ option to GuestModule.
      *
-     * @param Gdn_Controller $Sender
-     * @param array $Args
+     * @param Gdn_Controller $sender
+     * @param array $args
      */
-    public function base_beforeSignInButton_handler($Sender, $Args) {
+    public function base_beforeSignInButton_handler($sender, $args) {
         if (!$this->isConfigured()) {
             return;
         }
@@ -345,89 +345,89 @@ class GooglePlusPlugin extends Gdn_Plugin {
     /**
      * Add Google+ to the list of available providers.
      *
-     * @param Gdn_Controller $Sender
-     * @param array $Args
+     * @param Gdn_Controller $sender
+     * @param array $args
      */
-    public function base_getConnections_handler($Sender, $Args) {
-        $GPlus = valr('User.Attributes.'.self::ProviderKey, $Args);
-        $Profile = valr('User.Attributes.'.self::ProviderKey.'.Profile', $Args);
+    public function base_getConnections_handler($sender, $args) {
+        $gPlus = valr('User.Attributes.'.self::PROVIDER_KEY, $args);
+        $profile = valr('User.Attributes.'.self::PROVIDER_KEY.'.Profile', $args);
 
-        $Sender->Data['Connections'][self::ProviderKey] = array(
+        $sender->Data['Connections'][self::PROVIDER_KEY] = [
             'Icon' => $this->getWebResource('icon.png'),
             'Name' => 'Google+',
-            'ProviderKey' => self::ProviderKey,
-            'ConnectUrl' => $this->authorizeUri(array('r' => 'profile', 'uid' => Gdn::session()->UserID)),
-            'Profile' => array(
-                'Name' => val('name', $Profile),
-                'Photo' => val('picture', $Profile)
-            )
-        );
+            'ProviderKey' => self::PROVIDER_KEY,
+            'ConnectUrl' => $this->authorizeUri(['r' => 'profile', 'uid' => Gdn::session()->UserID]),
+            'Profile' => [
+                'Name' => val('name', $profile),
+                'Photo' => val('picture', $profile)
+            ]
+        ];
 
-        trace(val('AccessToken', $GPlus), 'google+ access token');
+        trace(val('AccessToken', $gPlus), 'google+ access token');
     }
 
     /**
      * Endpoint for authenticating with Google+.
      *
-     * @param EntryController $Sender
-     * @param string|bool $Code
-     * @param string|bool $State
+     * @param EntryController $sender
+     * @param string|bool $code
+     * @param string|bool $state
      *
      * @throws Gdn_UserException
      */
-    public function entryController_googlePlus_create($Sender, $Code = false, $State = false) {
-        if ($Error = $Sender->Request->get('error')) {
-            throw new Gdn_UserException($Error);
+    public function entryController_googlePlus_create($sender, $code = false, $state = false) {
+        if ($error = $sender->Request->get('error')) {
+            throw new Gdn_UserException($error);
         }
 
         // Get an access token.
-        Gdn::session()->stash(self::ProviderKey); // remove any old google plus.
-        $AccessToken = $this->getAccessToken($Code);
-        $this->accessToken($AccessToken);
+        Gdn::session()->stash(self::PROVIDER_KEY); // remove any old google plus.
+        $accessToken = $this->getAccessToken($code);
+        $this->accessToken($accessToken);
 
         // Get the user's information.
-        $Profile = $this->api('/userinfo');
+        $profile = $this->api('/userinfo');
 
-        if ($State) {
-            parse_str($State, $State);
+        if ($state) {
+            parse_str($state, $state);
         } else {
-            $State = array('r' => 'entry', 'uid' => null);
+            $state = ['r' => 'entry', 'uid' => null];
         }
 
-        switch ($State['r']) {
+        switch ($state['r']) {
             case 'profile':
                 // This is a connect request from the user's profile.
 
-                $User = Gdn::userModel()->getID($State['uid']);
-                if (!$User) {
+                $user = Gdn::userModel()->getID($state['uid']);
+                if (!$user) {
                     throw notFoundException('User');
                 }
                 // Save the authentication.
-                Gdn::userModel()->saveAuthentication(array(
-                    'UserID' => $User->UserID,
-                    'Provider' => self::ProviderKey,
-                    'UniqueID' => $Profile['id']));
+                Gdn::userModel()->saveAuthentication([
+                    'UserID' => $user->UserID,
+                    'Provider' => self::PROVIDER_KEY,
+                    'UniqueID' => $profile['id']]);
 
                 // Save the information as attributes.
-                $Attributes = array(
-                    'AccessToken' => $AccessToken,
-                    'Profile' => $Profile
-                );
-                Gdn::userModel()->saveAttribute($User->UserID, self::ProviderKey, $Attributes);
+                $attributes = [
+                    'AccessToken' => $accessToken,
+                    'Profile' => $profile
+                ];
+                Gdn::userModel()->saveAttribute($user->UserID, self::PROVIDER_KEY, $attributes);
 
-                $this->EventArguments['Provider'] = self::ProviderKey;
-                $this->EventArguments['User'] = $Sender->User;
+                $this->EventArguments['Provider'] = self::PROVIDER_KEY;
+                $this->EventArguments['User'] = $sender->User;
                 $this->fireEvent('AfterConnection');
 
-                redirectTo(userUrl($User, '', 'connections'));
+                redirectTo(userUrl($user, '', 'connections'));
                 break;
             case 'entry':
             default:
                 // This is an sso request, we need to redispatch to /entry/connect/googleplus
-                Gdn::session()->stash(self::ProviderKey, array('AccessToken' => $AccessToken, 'Profile' => $Profile));
+                Gdn::session()->stash(self::PROVIDER_KEY, ['AccessToken' => $accessToken, 'Profile' => $profile]);
                 $url = '/entry/connect/googleplus';
 
-                if ($target = val('target', $State)) {
+                if ($target = val('target', $state)) {
                     $url .= '?Target='.urlencode($target);
                 }
                 redirectTo($url);
@@ -438,40 +438,40 @@ class GooglePlusPlugin extends Gdn_Plugin {
     /**
      * Add Google+ as option to the normal signin page.
      *
-     * @param Gdn_Controller $Sender
-     * @param array $Args
+     * @param Gdn_Controller $sender
+     * @param array $args
      */
-    public function entryController_signIn_handler($Sender, $Args) {
+    public function entryController_signIn_handler($sender, $args) {
         if (!$this->isConfigured()) {
             return;
         }
 
-        if (isset($Sender->Data['Methods'])) {
-            $Url = $this->authorizeUri();
+        if (isset($sender->Data['Methods'])) {
+            $url = $this->authorizeUri();
 
             // Add the Google method to the controller.
-            $Method = array(
+            $method = [
                 'Name' => 'Google',
                 'SignInHtml' => $this->signInButton() //SocialSigninButton('Google', $Url, 'button', array('class' => 'js-extern', 'rel' => 'nofollow'))
-            );
+            ];
 
-            $Sender->Data['Methods'][] = $Method;
+            $sender->Data['Methods'][] = $method;
         }
     }
 
     /**
      * Override the sign in if Google+ is the default signin method.
      *
-     * @param EntryController $Sender
-     * @param array $Args
+     * @param EntryController $sender
+     * @param array $args
      */
-    public function entryController_overrideSignIn_handler($Sender, $Args) {
-        if (valr('DefaultProvider.AuthenticationKey', $Args) !== self::ProviderKey || !$this->isConfigured()) {
+    public function entryController_overrideSignIn_handler($sender, $args) {
+        if (valr('DefaultProvider.AuthenticationKey', $args) !== self::PROVIDER_KEY || !$this->isConfigured()) {
             return;
         }
 
-        $Url = $this->authorizeUri(array('target' => $Args['Target']));
-        $Args['DefaultProvider']['SignInUrl'] = $Url;
+        $url = $this->authorizeUri(['target' => $args['Target']]);
+        $args['DefaultProvider']['SignInUrl'] = $url;
     }
 
     /**
@@ -479,54 +479,54 @@ class GooglePlusPlugin extends Gdn_Plugin {
      *
      * I'm sure someone out there does this. Somewhere. Probably alone.
      *
-     * @param PostController $Sender
-     * @param type $RecordType
-     * @param type $ID
+     * @param PostController $sender
+     * @param type $recordType
+     * @param type $iD
      * @throws type
      */
-    public function postController_googlePlus_create($Sender, $RecordType, $ID) {
-        $Row = GetRecord($RecordType, $ID);
-        if ($Row) {
-            $Message = SliceParagraph(Gdn_Format::plainText($Row['Body'], $Row['Format']), 160);
+    public function postController_googlePlus_create($sender, $recordType, $iD) {
+        $row = getRecord($recordType, $iD);
+        if ($row) {
+            $message = sliceParagraph(Gdn_Format::plainText($row['Body'], $row['Format']), 160);
 
-            $Get = array(
-                'url' => $Row['ShareUrl']
-            );
+            $get = [
+                'url' => $row['ShareUrl']
+            ];
 
-            $Url = 'https://plus.google.com/share?'.http_build_query($Get);
-            redirectTo($Url, 302, false);
+            $url = 'https://plus.google.com/share?'.http_build_query($get);
+            redirectTo($url, 302, false);
         }
 
-        $Sender->render('Blank', 'Utility', 'Dashboard');
+        $sender->render('Blank', 'Utility', 'Dashboard');
     }
 
     /**
      * Endpoint to comnfigure this addon.
      *
-     * @param $Sender
-     * @param $Args
+     * @param $sender
+     * @param $args
      */
-    public function socialController_googlePlus_create($Sender, $Args) {
-        $Sender->permission('Garden.Settings.Manage');
+    public function socialController_googlePlus_create($sender, $args) {
+        $sender->permission('Garden.Settings.Manage');
 
-        $Conf = new ConfigurationModule($Sender);
-        $Conf->initialize(array(
-            'Plugins.GooglePlus.ClientID' => array('LabelCode' => 'Client ID'),
-            'Plugins.GooglePlus.Secret' => array('LabelCode' => 'Client secret'),
-            'Plugins.GooglePlus.SocialReactions' => array('Control' => 'checkbox', 'Default' => true),
-            'Plugins.GooglePlus.SocialSharing' => array('Control' => 'checkbox', 'Default' => true),
-            'Plugins.GooglePlus.UseAvatars' => array('Control' => 'checkbox', 'Default' => true),
-            'Plugins.GooglePlus.Default' => array('Control' => 'checkbox', 'LabelCode' => 'Make this connection your default signin method.')
-        ));
+        $conf = new ConfigurationModule($sender);
+        $conf->initialize([
+            'Plugins.GooglePlus.ClientID' => ['LabelCode' => 'Client ID'],
+            'Plugins.GooglePlus.Secret' => ['LabelCode' => 'Client secret'],
+            'Plugins.GooglePlus.SocialReactions' => ['Control' => 'checkbox', 'Default' => true],
+            'Plugins.GooglePlus.SocialSharing' => ['Control' => 'checkbox', 'Default' => true],
+            'Plugins.GooglePlus.UseAvatars' => ['Control' => 'checkbox', 'Default' => true],
+            'Plugins.GooglePlus.Default' => ['Control' => 'checkbox', 'LabelCode' => 'Make this connection your default signin method.']
+        ]);
 
         if (Gdn::request()->isAuthenticatedPostBack()) {
-            $Model = new Gdn_AuthenticationProviderModel();
-            $Model->save(array('AuthenticationKey' => self::ProviderKey, 'IsDefault' => c('Plugins.GooglePlus.Default')));
+            $model = new Gdn_AuthenticationProviderModel();
+            $model->save(['AuthenticationKey' => self::PROVIDER_KEY, 'IsDefault' => c('Plugins.GooglePlus.Default')]);
         }
 
-        $Sender->setHighlightRoute('dashboard/social');
-        $Sender->setData('Title', sprintf(t('%s Settings'), 'Google+'));
-        $Sender->ConfigurationModule = $Conf;
-        $Sender->render('Settings', '', 'plugins/GooglePlus');
+        $sender->setHighlightRoute('dashboard/social');
+        $sender->setData('Title', sprintf(t('%s Settings'), 'Google+'));
+        $sender->ConfigurationModule = $conf;
+        $sender->render('Settings', '', 'plugins/GooglePlus');
     }
 }

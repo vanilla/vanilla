@@ -16,8 +16,8 @@ class ClearHistoryModule extends Gdn_Module {
     /** @var int */
     protected $ConversationID;
 
-    public function conversationID($ConversationID) {
-        $this->ConversationID = $ConversationID;
+    public function conversationID($conversationID) {
+        $this->ConversationID = $conversationID;
     }
 
     public function assetTarget() {

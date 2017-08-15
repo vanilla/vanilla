@@ -15,81 +15,81 @@ class SplitMergePlugin extends Gdn_Plugin {
     /**
      * Add "split" action link.
      *
-     * @param Gdn_Controller $Sender
+     * @param Gdn_Controller $sender
      */
-    public function base_beforeCheckComments_handler($Sender) {
-        $ActionMessage = &$Sender->EventArguments['ActionMessage'];
-        $Discussion = $Sender->EventArguments['Discussion'];
-        if (Gdn::session()->checkPermission('Vanilla.Discussions.Edit', true, 'Category', $Discussion->PermissionCategoryID)) {
-            $ActionMessage .= ' '.anchor(t('Split'), 'moderation/splitcomments/'.$Discussion->DiscussionID.'/', 'Split Popup');
+    public function base_beforeCheckComments_handler($sender) {
+        $actionMessage = &$sender->EventArguments['ActionMessage'];
+        $discussion = $sender->EventArguments['Discussion'];
+        if (Gdn::session()->checkPermission('Vanilla.Discussions.Edit', true, 'Category', $discussion->PermissionCategoryID)) {
+            $actionMessage .= ' '.anchor(t('Split'), 'moderation/splitcomments/'.$discussion->DiscussionID.'/', 'Split Popup');
         }
     }
 
     /**
      * Add "merge" action link.
      *
-     * @param Gdn_Controller $Sender
+     * @param Gdn_Controller $sender
      */
-    public function base_beforeCheckDiscussions_handler($Sender) {
-        $ActionMessage = &$Sender->EventArguments['ActionMessage'];
+    public function base_beforeCheckDiscussions_handler($sender) {
+        $actionMessage = &$sender->EventArguments['ActionMessage'];
         if (Gdn::session()->checkPermission('Vanilla.Discussions.Edit', true, 'Category', 'any')) {
-            $ActionMessage .= ' '.anchor(t('Merge'), 'moderation/mergediscussions/', 'Merge Popup');
+            $actionMessage .= ' '.anchor(t('Merge'), 'moderation/mergediscussions/', 'Merge Popup');
         }
     }
 
     /**
      * Add a method to the ModerationController to handle splitting comments out to a new discussion.
      *
-     * @param moderationController $Sender
+     * @param moderationController $sender
      */
-    public function moderationController_splitComments_create($Sender) {
-        $Session = Gdn::session();
-        $Sender->Form = new Gdn_Form();
-        $Sender->title(t('Split Comments'));
-        $Sender->Category = false;
+    public function moderationController_splitComments_create($sender) {
+        $session = Gdn::session();
+        $sender->Form = new Gdn_Form();
+        $sender->title(t('Split Comments'));
+        $sender->Category = false;
 
-        $DiscussionID = val('0', $Sender->RequestArgs, '');
-        if (!is_numeric($DiscussionID)) {
+        $discussionID = val('0', $sender->RequestArgs, '');
+        if (!is_numeric($discussionID)) {
             return;
         }
 
-        $DiscussionModel = new DiscussionModel();
-        $Discussion = $DiscussionModel->getID($DiscussionID);
-        if (!$Discussion) {
+        $discussionModel = new DiscussionModel();
+        $discussion = $discussionModel->getID($discussionID);
+        if (!$discussion) {
             return;
         }
 
         // Verify that the user has permission to perform the split
-        $Sender->permission('Vanilla.Discussions.Edit', true, 'Category', $Discussion->PermissionCategoryID);
+        $sender->permission('Vanilla.Discussions.Edit', true, 'Category', $discussion->PermissionCategoryID);
 
-        $CheckedComments = Gdn::userModel()->getAttribute($Session->User->UserID, 'CheckedComments', array());
-        if (!is_array($CheckedComments)) {
-            $CheckedComments = array();
+        $checkedComments = Gdn::userModel()->getAttribute($session->User->UserID, 'CheckedComments', []);
+        if (!is_array($checkedComments)) {
+            $checkedComments = [];
         }
 
-        $CommentIDs = array();
-        foreach ($CheckedComments as $DiscID => $Comments) {
-            foreach ($Comments as $Comment) {
-                if ($DiscID == $DiscussionID) {
-                    $CommentIDs[] = str_replace('Comment_', '', $Comment);
+        $commentIDs = [];
+        foreach ($checkedComments as $discID => $comments) {
+            foreach ($comments as $comment) {
+                if ($discID == $discussionID) {
+                    $commentIDs[] = str_replace('Comment_', '', $comment);
                 }
             }
         }
 
         // Load category data.
-        $Sender->ShowCategorySelector = (bool)c('Vanilla.Categories.Use');
-        $CountCheckedComments = count($CommentIDs);
-        $Sender->setData('CountCheckedComments', $CountCheckedComments);
+        $sender->ShowCategorySelector = (bool)c('Vanilla.Categories.Use');
+        $countCheckedComments = count($commentIDs);
+        $sender->setData('CountCheckedComments', $countCheckedComments);
         // Perform the split
-        if ($Sender->Form->authenticatedPostBack()) {
+        if ($sender->Form->authenticatedPostBack()) {
             // Create a new discussion record
-            $Data = $Sender->Form->formValues();
-            $Data['Body'] = sprintf(t('This discussion was created from comments split from: %s.'), anchor(Gdn_Format::text($Discussion->Name), 'discussion/'.$Discussion->DiscussionID.'/'.Gdn_Format::url($Discussion->Name).'/'));
-            $Data['Format'] = 'Html';
-            $Data['Type'] = 'Discussion';
+            $data = $sender->Form->formValues();
+            $data['Body'] = sprintf(t('This discussion was created from comments split from: %s.'), anchor(Gdn_Format::text($discussion->Name), 'discussion/'.$discussion->DiscussionID.'/'.Gdn_Format::url($discussion->Name).'/'));
+            $data['Format'] = 'Html';
+            $data['Type'] = 'Discussion';
 
             // Use the System user as the author.
-            $Data['InsertUserID'] = Gdn::userModel()->getSystemUserID();
+            $data['InsertUserID'] = Gdn::userModel()->getSystemUserID();
 
             // Pass a forced input formatter around this exception.
             if (c('Garden.ForceInputFormatter')) {
@@ -97,42 +97,42 @@ class SplitMergePlugin extends Gdn_Plugin {
                 saveToConfig('Garden.InputFormatter', 'Html', false);
             }
 
-            $NewDiscussionID = $DiscussionModel->save($Data);
+            $newDiscussionID = $discussionModel->save($data);
 
             // Reset the input formatter
             if (c('Garden.ForceInputFormatter')) {
                 saveToConfig('Garden.InputFormatter', $inputFormat, false);
             }
 
-            $Sender->Form->setValidationResults($DiscussionModel->validationResults());
+            $sender->Form->setValidationResults($discussionModel->validationResults());
 
-            if ($Sender->Form->errorCount() == 0 && $NewDiscussionID > 0) {
+            if ($sender->Form->errorCount() == 0 && $newDiscussionID > 0) {
                 // Re-assign the comments to the new discussion record
-                $DiscussionModel->SQL
+                $discussionModel->SQL
                     ->update('Comment')
-                    ->set('DiscussionID', $NewDiscussionID)
-                    ->whereIn('CommentID', $CommentIDs)
+                    ->set('DiscussionID', $newDiscussionID)
+                    ->whereIn('CommentID', $commentIDs)
                     ->put();
 
                 // Update counts on both discussions
-                $CommentModel = new CommentModel();
-                $CommentModel->updateCommentCount($DiscussionID);
-//            $CommentModel->UpdateUserCommentCounts($DiscussionID);
-                $CommentModel->updateCommentCount($NewDiscussionID);
-                $CommentModel->removePageCache($DiscussionID, 1);
+                $commentModel = new CommentModel();
+                $commentModel->updateCommentCount($discussionID);
+//            $CommentModel->updateUserCommentCounts($DiscussionID);
+                $commentModel->updateCommentCount($newDiscussionID);
+                $commentModel->removePageCache($discussionID, 1);
 
 
                 // Clear selections
-                unset($CheckedComments[$DiscussionID]);
-                Gdn::userModel()->saveAttribute($Session->UserID, 'CheckedComments', $CheckedComments);
-                ModerationController::informCheckedComments($Sender);
-                $Sender->setRedirectTo('discussion/'.$NewDiscussionID.'/'.Gdn_Format::url($Data['Name']));
+                unset($checkedComments[$discussionID]);
+                Gdn::userModel()->saveAttribute($session->UserID, 'CheckedComments', $checkedComments);
+                ModerationController::informCheckedComments($sender);
+                $sender->setRedirectTo('discussion/'.$newDiscussionID.'/'.Gdn_Format::url($data['Name']));
             }
         } else {
-            $Sender->Form->setValue('CategoryID', val('CategoryID', $Discussion));
+            $sender->Form->setValue('CategoryID', val('CategoryID', $discussion));
         }
 
-        $Sender->render($Sender->fetchViewLocation('splitcomments', '', 'plugins/SplitMerge'));
+        $sender->render($sender->fetchViewLocation('splitcomments', '', 'plugins/SplitMerge'));
     }
 
     /**
@@ -148,9 +148,9 @@ class SplitMergePlugin extends Gdn_Plugin {
         $Sender->title(t('Merge Discussions'));
 
         $DiscussionModel = new DiscussionModel();
-        $CheckedDiscussions = Gdn::userModel()->getAttribute($Session->User->UserID, 'CheckedDiscussions', array());
+        $CheckedDiscussions = Gdn::userModel()->getAttribute($Session->User->UserID, 'CheckedDiscussions', []);
         if (!is_array($CheckedDiscussions)) {
-            $CheckedDiscussions = array();
+            $CheckedDiscussions = [];
         }
 
         $DiscussionIDs = $CheckedDiscussions;
@@ -213,7 +213,7 @@ class SplitMergePlugin extends Gdn_Plugin {
                     }
 
                     // Create a comment out of the discussion.
-                    $Comment = arrayTranslate($Discussion, array('Body', 'Format', 'DateInserted', 'InsertUserID', 'InsertIPAddress', 'DateUpdated', 'UpdateUserID', 'UpdateIPAddress', 'Attributes', 'Spam', 'Likes', 'Abuse'));
+                    $Comment = arrayTranslate($Discussion, ['Body', 'Format', 'DateInserted', 'InsertUserID', 'InsertIPAddress', 'DateUpdated', 'UpdateUserID', 'UpdateIPAddress', 'Attributes', 'Spam', 'Likes', 'Abuse']);
                     $Comment['DiscussionID'] = $MergeDiscussionID;
 
                     $CommentModel->Validation->results(true);
@@ -226,12 +226,12 @@ class SplitMergePlugin extends Gdn_Plugin {
 
                         if ($RedirectLink) {
                             // The discussion needs to be changed to a moved link.
-                            $RedirectDiscussion = array(
-                                'Name' => SliceString(sprintf(t('Merged: %s'), $Discussion['Name']), $MaxNameLength),
+                            $RedirectDiscussion = [
+                                'Name' => sliceString(sprintf(t('Merged: %s'), $Discussion['Name']), $MaxNameLength),
                                 'Type' => 'redirect',
-                                'Body' => formatString(t('This discussion has been <a href="{url,html}">merged</a>.'), array('url' => DiscussionUrl($MergeDiscussion))),
+                                'Body' => formatString(t('This discussion has been <a href="{url,html}">merged</a>.'), ['url' => discussionUrl($MergeDiscussion)]),
                                 'Format' => 'Html'
-                            );
+                            ];
                             $DiscussionModel->setField($Discussion['DiscussionID'], $RedirectDiscussion);
                             $CommentModel->updateCommentCount($Discussion['DiscussionID']);
                             $CommentModel->removePageCache($Discussion['DiscussionID']);

@@ -28,7 +28,7 @@ trait SiteTestTrait {
     /**
      * @var array The addons to install.
      */
-    protected static $addons = ['vanilla', 'conversations', 'stubcontent', 'Htmlawed'];
+    protected static $addons = ['vanilla', 'conversations', 'stubcontent'];
 
     /**
      * Create the container for the site.

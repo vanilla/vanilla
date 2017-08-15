@@ -162,20 +162,20 @@ class AccessTokenModel extends Gdn_Model {
     /**
      * {@inheritdoc}
      */
-    public function update($Fields, $Where = false, $Limit = false) {
-        $this->encodeRow($Fields);
-        return parent::update($Fields, $Where, $Limit);
+    public function update($fields, $where = false, $limit = false) {
+        $this->encodeRow($fields);
+        return parent::update($fields, $where, $limit);
     }
 
     /**
      * {@inheritdoc}
      */
-    public function setField($RowID, $Property, $Value = false) {
-        if (!is_array($Property)) {
-            $Property = array($Property => $Value);
+    public function setField($rowID, $property, $value = false) {
+        if (!is_array($property)) {
+            $property = [$property => $value];
         }
-        $this->encodeRow($Property);
-        parent::setField($RowID, $Property);
+        $this->encodeRow($property);
+        parent::setField($rowID, $property);
     }
 
     /**
@@ -367,8 +367,8 @@ class AccessTokenModel extends Gdn_Model {
     /**
      * {@inheritdoc}
      */
-    public function getWhere($Where = false, $OrderFields = '', $OrderDirection = 'asc', $Limit = false, $Offset = false) {
-        $result = parent::getWhere($Where, $OrderFields, $OrderDirection, $Limit, $Offset);
+    public function getWhere($where = false, $orderFields = '', $orderDirection = 'asc', $limit = false, $offset = false) {
+        $result = parent::getWhere($where, $orderFields, $orderDirection, $limit, $offset);
         array_walk($result->result(), [$this, 'decodeRow']);
 
         return $result;

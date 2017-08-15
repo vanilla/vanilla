@@ -168,9 +168,9 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
         return $this->ControllerMethod;
     }
 
-    public function controllerArguments($Value = null) {
-        if ($Value !== null) {
-            $this->controllerMethodArgs = $Value;
+    public function controllerArguments($value = null) {
+        if ($value !== null) {
+            $this->controllerMethodArgs = $value;
         }
         return $this->controllerMethodArgs;
     }
@@ -190,20 +190,20 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
      * This method analyzes a request and figures out which controller and method it maps to. It also instantiates the
      * controller and calls the method.
      *
-     * @param string|Gdn_Request|null $ImportRequest The request to dispatch. This can be a string URL or a Gdn_Request object,
-     * @param bool $Permanent Whether or not to set {@link Gdn::request()} with the dispatched request.
+     * @param string|Gdn_Request|null $importRequest The request to dispatch. This can be a string URL or a Gdn_Request object,
+     * @param bool $permanent Whether or not to set {@link Gdn::request()} with the dispatched request.
      */
-    public function dispatch($ImportRequest = null, $Permanent = true) {
+    public function dispatch($importRequest = null, $permanent = true) {
 
-        if ($ImportRequest && is_string($ImportRequest)) {
-            $ImportRequest = Gdn_Request::create()->fromEnvironment()->withURI($ImportRequest);
+        if ($importRequest && is_string($importRequest)) {
+            $importRequest = Gdn_Request::create()->fromEnvironment()->withURI($importRequest);
         }
 
-        if (is_a($ImportRequest, 'Gdn_Request') && $Permanent) {
-            Gdn::request($ImportRequest);
+        if (is_a($importRequest, 'Gdn_Request') && $permanent) {
+            Gdn::request($importRequest);
         }
 
-        $request = is_a($ImportRequest, 'Gdn_Request') ? $ImportRequest : Gdn::request();
+        $request = is_a($importRequest, 'Gdn_Request') ? $importRequest : Gdn::request();
 
         $this->EventArguments['Request'] = $request;
 
@@ -229,7 +229,7 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
             if ($this->deliveryType === DELIVERY_TYPE_DATA) {
                 safeHeader('HTTP/1.0 401 Unauthorized', true, 401);
                 safeHeader('Content-Type: application/json; charset=utf-8', true);
-                echo json_encode(array('Code' => '401', 'Exception' => t('You must sign in.')));
+                echo json_encode(['Code' => '401', 'Exception' => t('You must sign in.')]);
             } else {
                 redirectTo('/entry/signin?Target='.urlencode($request->pathAndQuery()));
             }
@@ -369,10 +369,10 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
             // No controller was found, fire a not found event.
             // TODO: Move this outside this method.
             $this->EventArguments['Handled'] = false;
-            $Handled =& $this->EventArguments['Handled'];
+            $handled =& $this->EventArguments['Handled'];
             $this->fireEvent('NotFound');
 
-            if (!$Handled) {
+            if (!$handled) {
                 safeHeader("HTTP/1.1 404 Not Found");
                 return $this
                     ->passData('Reason', 'controller_notfound')
@@ -400,14 +400,14 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
     /**
      *
      *
-     * @param string $EnabledApplications
+     * @param string $enabledApplications
      * @deprecated
      */
-    public function enabledApplicationFolders($EnabledApplications = '') {
+    public function enabledApplicationFolders($enabledApplications = '') {
         deprecated('Gdn_Dispatcher->enabledApplicationFolders()');
-        if ($EnabledApplications != '' && count($this->enabledApplicationFolders) == 0) {
-            $this->enabledApplications = $EnabledApplications;
-            $this->enabledApplicationFolders = array_values($EnabledApplications);
+        if ($enabledApplications != '' && count($this->enabledApplicationFolders) == 0) {
+            $this->enabledApplications = $enabledApplications;
+            $this->enabledApplicationFolders = array_values($enabledApplications);
         }
         return $this->enabledApplicationFolders ?: [];
     }
@@ -535,7 +535,7 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
         }
 
         if (strpos($folder, 'plugins/') === 0) {
-            $plugin = StringBeginsWith($folder, 'plugins/', false, true);
+            $plugin = stringBeginsWith($folder, 'plugins/', false, true);
 
             if (array_key_exists($plugin, $this->addonManager->getEnabled())) {
                 return $plugin;
@@ -554,36 +554,36 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
     /**
      * Allows the passing of a string to the controller's asset collection.
      *
-     * @param string $AssetName The name of the asset collection to add the string to.
-     * @param mixed $Asset The string asset to be added. The asset can be one of two things.
+     * @param string $assetName The name of the asset collection to add the string to.
+     * @param mixed $asset The string asset to be added. The asset can be one of two things.
      * - <b>string</b>: The string will be rendered to the page.
-     * - <b>Gdn_IModule</b>: The Gdn_IModule::Render() method will be called when the asset is rendered.
+     * - <b>Gdn_IModule</b>: The Gdn_IModule::render() method will be called when the asset is rendered.
      */
-    public function passAsset($AssetName, $Asset) {
-        $this->controllerAssets[$AssetName][] = $Asset;
+    public function passAsset($assetName, $asset) {
+        $this->controllerAssets[$assetName][] = $asset;
         return $this;
     }
 
     /**
      *
      *
-     * @param $Name
-     * @param $Value
+     * @param $name
+     * @param $value
      * @return $this
      */
-    public function passData($Name, $Value) {
-        $this->controllerData[$Name] = $Value;
+    public function passData($name, $value) {
+        $this->controllerData[$name] = $value;
         return $this;
     }
 
     /**
      * Allows the passing of any variable to the controller as a property.
      *
-     * @param string $Name The name of the property to assign the variable to.
-     * @param mixed $Mixed The variable to be passed as a property of the controller.
+     * @param string $name The name of the property to assign the variable to.
+     * @param mixed $mixed The variable to be passed as a property of the controller.
      */
-    public function passProperty($Name, $Mixed) {
-        $this->controllerProperties[$Name] = $Mixed;
+    public function passProperty($name, $mixed) {
+        $this->controllerProperties[$name] = $mixed;
         return $this;
     }
 
@@ -607,14 +607,14 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
 
         $blockExceptions = $this->getBlockExceptions();
 
-        $PathRequest = $request->path();
-        foreach ($blockExceptions as $BlockException => $BlockLevel) {
-            if (preg_match($BlockException, $PathRequest)) {
+        $pathRequest = $request->path();
+        foreach ($blockExceptions as $blockException => $blockLevel) {
+            if (preg_match($blockException, $pathRequest)) {
                 Logger::debug(
                     "Dispatcher block: {blockException}, {blockLevel}",
-                    ['blockException' => $BlockException, 'blockLevel' => $BlockLevel]
+                    ['blockException' => $blockException, 'blockLevel' => $blockLevel]
                 );
-                return $BlockLevel;
+                return $blockLevel;
             }
         }
 
@@ -655,7 +655,7 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
      * @param Gdn_Request $request The request to rewrite.
      */
     private function rewriteRequest($request) {
-        $pathAndQuery = $request->PathAndQuery();
+        $pathAndQuery = $request->pathAndQuery();
         $matchRoute = Gdn::router()->matchRoute($pathAndQuery);
 
         // We have a route. Take action.
@@ -700,10 +700,10 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
 
                 case 'Test':
                     decho($matchRoute, 'Route');
-                    decho(array(
+                    decho([
                         'Path' => $request->path(),
                         'Get' => $request->get()
-                    ), 'Request');
+                    ], 'Request');
                     die();
             }
         } elseif (in_array($request->path(), ['', '/'])) {
@@ -800,8 +800,8 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
 
             // Augment the arguments to the plugin with the sender and these arguments.
             // The named sender and args keys are an old legacy format before plugins could override controller methods properly.
-            $InputArgs = array_merge([$controller], $pathArgs, ['sender' => $controller, 'args' => $pathArgs]);
-            $args = reflectArgs($callback, $InputArgs, $reflectionArguments);
+            $inputArgs = array_merge([$controller], $pathArgs, ['sender' => $controller, 'args' => $pathArgs]);
+            $args = reflectArgs($callback, $inputArgs, $reflectionArguments);
         } else {
             $callback = [$controller, $controllerMethod];
             $args = reflectArgs($callback, $pathArgs, $reflectionArguments);
@@ -838,9 +838,9 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
 
         // Pass along any assets
         if (is_array($this->controllerAssets)) {
-            foreach ($this->controllerAssets as $AssetName => $Assets) {
-                foreach ($Assets as $Asset) {
-                    $controller->addAsset($AssetName, $Asset);
+            foreach ($this->controllerAssets as $assetName => $assets) {
+                foreach ($assets as $asset) {
+                    $controller->addAsset($assetName, $asset);
                 }
             }
         }
@@ -849,8 +849,8 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
         $controller->getImports();
 
         // Pass along any objects
-        foreach ($this->controllerProperties as $Name => $Mixed) {
-            $controller->$Name = $Mixed;
+        foreach ($this->controllerProperties as $name => $mixed) {
+            $controller->$name = $mixed;
         }
 
         // Pass along any data.
@@ -882,7 +882,7 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
         // Kludge for controllers that modify the dispatcher.
         $pathArgs = $this->controllerArguments();
         if (!empty($this->ControllerMethod)) {
-            array_unshift($pathArgs, Gdn::Dispatcher()->ControllerMethod);
+            array_unshift($pathArgs, Gdn::dispatcher()->ControllerMethod);
         }
         $routeArgs['pathArgs'] = $pathArgs;
         // End kluge.

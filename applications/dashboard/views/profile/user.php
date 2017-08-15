@@ -6,10 +6,10 @@ $Session = Gdn::session();
         echo htmlspecialchars($this->User->Name);
 
         echo '<span class="Gloss">';
-        Gdn_Theme::BulletRow();
+        Gdn_Theme::bulletRow();
         if ($this->User->Title) {
-            echo Gdn_Theme::BulletItem('Title');
-            echo ' '.Bullet().' '.Wrap(htmlspecialchars($this->User->Title), 'span', array('class' => 'User-Title'));
+            echo Gdn_Theme::bulletItem('Title');
+            echo ' '.bullet().' '.wrap(htmlspecialchars($this->User->Title), 'span', ['class' => 'User-Title']);
         }
 
         $this->fireEvent('UsernameMeta');
@@ -21,17 +21,17 @@ $Session = Gdn::session();
     }
 
     if ($this->User->About != '') {
-        echo '<div id="Status" itemprop="description">'.Wrap(Gdn_Format::Display($this->User->About));
+        echo '<div id="Status" itemprop="description">'.wrap(Gdn_Format::display($this->User->About));
         if ($this->User->About != '' && ($Session->UserID == $this->User->UserID || $Session->checkPermission('Garden.Users.Edit')))
             echo ' - '.anchor(t('clear'), '/profile/clear/'.$this->User->UserID, 'Hijack');
 
         echo '</div>';
     }
 
-    echo Gdn_Theme::Module('UserBanModule', array('UserID' => $this->User->UserID));
+    echo Gdn_Theme::module('UserBanModule', ['UserID' => $this->User->UserID]);
 
     $this->fireEvent('BeforeUserInfo');
-    echo Gdn_Theme::Module('UserInfoModule');
+    echo Gdn_Theme::module('UserInfoModule');
     $this->fireEvent('AfterUserInfo');
     ?>
 </div>

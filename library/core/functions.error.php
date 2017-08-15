@@ -19,15 +19,15 @@ class Gdn_ErrorException extends ErrorException {
     /**
      *
      *
-     * @param string $Message
-     * @param int $ErrorNumber
-     * @param int $File
-     * @param string $Line
-     * @param int $Context
+     * @param string $message
+     * @param int $errorNumber
+     * @param int $file
+     * @param string $line
+     * @param int $context
      */
-    public function __construct($Message, $ErrorNumber, $File, $Line, $Context) {
-        parent::__construct($Message, $ErrorNumber, 0, $File, $Line);
-        $this->_Context = $Context;
+    public function __construct($message, $errorNumber, $file, $line, $context) {
+        parent::__construct($message, $errorNumber, 0, $file, $line);
+        $this->_Context = $context;
     }
 
     /**
@@ -51,7 +51,7 @@ class Gdn_ErrorException extends ErrorException {
  * @return bool|void
  * @throws Gdn_ErrorException
  */
-function Gdn_ErrorHandler($errorNumber, $message, $file, $line, $arguments) {
+function gdn_ErrorHandler($errorNumber, $message, $file, $line, $arguments) {
     $errorReporting = error_reporting();
 
     // Don't do anything for @supressed errors.
@@ -89,7 +89,7 @@ function Gdn_ErrorHandler($errorNumber, $message, $file, $line, $arguments) {
  *
  * @param Exception $Exception The exception that was thrown.
  */
-function Gdn_ExceptionHandler($Exception) {
+function gdn_ExceptionHandler($Exception) {
     try {
         // Attempt to log the exception as early as possible
         if ($Exception instanceof \ErrorException) {
@@ -141,10 +141,10 @@ function Gdn_ExceptionHandler($Exception) {
         } elseif ($MessageCount == 3) {
             list($SenderMessage, $SenderObject, $SenderMethod) = $MessageInfo;
         } elseif (function_exists('GetValueR')) {
-            $IsError = (GetValueR('0.function', $SenderTrace) == 'Gdn_ErrorHandler'); // not exception
+            $IsError = (getValueR('0.function', $SenderTrace) == 'Gdn_ErrorHandler'); // not exception
             $N = ($IsError) ? '1' : '0';
-            $SenderMethod = GetValueR($N.'.function', $SenderTrace, $SenderMethod);
-            $SenderObject = GetValueR($N.'.class', $SenderTrace, $SenderObject);
+            $SenderMethod = getValueR($N.'.function', $SenderTrace, $SenderMethod);
+            $SenderObject = getValueR($N.'.class', $SenderTrace, $SenderObject);
         }
 
         $SenderMessage = htmlspecialchars($SenderMessage);
@@ -197,8 +197,8 @@ function Gdn_ExceptionHandler($Exception) {
 
             // If this error was encountered during an ajax request, don't bother gettting the css or theme files
             if ($DeliveryType == DELIVERY_TYPE_ALL) {
-                $CssPaths = array(); // Potential places where the css can be found in the filesystem.
-                $MasterViewPaths = array();
+                $CssPaths = []; // Potential places where the css can be found in the filesystem.
+                $MasterViewPaths = [];
                 $MasterViewName = 'error.master.php';
                 $MasterViewCss = 'error.css';
 
@@ -241,8 +241,8 @@ function Gdn_ExceptionHandler($Exception) {
                 }
                 if ($CssPath !== false) {
                     $CssPath = str_replace(
-                        array(PATH_ROOT, DS),
-                        array('', '/'),
+                        [PATH_ROOT, DS],
+                        ['', '/'],
                         $CssPath
                     );
                     $CssPath = ($WebRoot == '' ? '' : '/'.$WebRoot).$CssPath;
@@ -288,7 +288,7 @@ function Gdn_ExceptionHandler($Exception) {
                     }
 
                     echo '> '.str_pad($i + 1, $Padding, " ", STR_PAD_LEFT), ': ',
-                        str_replace(array("\n", "\r"), array('', ''), htmlspecialchars($ErrorLines[$i])), "\n";
+                        str_replace(["\n", "\r"], ['', ''], htmlspecialchars($ErrorLines[$i])), "\n";
                 }
             }
 
@@ -384,8 +384,8 @@ if (!function_exists('errorMessage')) {
      * @param string The name of the method that encountered the error.
      * @param string Any additional information that could be useful to debuggers.
      */
-    function errorMessage($Message, $SenderObject, $SenderMethod, $Code = '') {
-        return $Message.'|'.$SenderObject.'|'.$SenderMethod.'|'.$Code;
+    function errorMessage($message, $senderObject, $senderMethod, $code = '') {
+        return $message.'|'.$senderObject.'|'.$senderMethod.'|'.$code;
     }
 }
 
@@ -588,19 +588,19 @@ if (!function_exists('logException')) {
     /**
      * Log an exception.
      *
-     * @param Exception $Ex
+     * @param Exception $ex
      */
-    function logException($Ex) {
+    function logException($ex) {
         if (!class_exists('Gdn', false)) {
             return;
         }
 
-        if ($Ex instanceof Gdn_UserException) {
+        if ($ex instanceof Gdn_UserException) {
             return;
         }
 
         // Attempt to log the exception in the PHP logs
-        errorLog(formatException($Ex));
+        errorLog(formatException($ex));
     }
 }
 
@@ -616,22 +616,22 @@ if (!function_exists('logMessage')) {
      * @param string The error message.
      * @param string Any additional information that could be useful to debuggers.
      */
-    function logMessage($File, $Line, $Object, $Method, $Message, $Code = '') {
+    function logMessage($file, $line, $object, $method, $message, $code = '') {
         if (!class_exists('Gdn', false)) {
             return;
         }
 
         // Prepare the log message
-        $Log = "[Garden] $File, $Line, $Object.$Method()";
-        if ($Message <> '') {
-            $Log .= ", $Message";
+        $log = "[Garden] $file, $line, $object.$method()";
+        if ($message <> '') {
+            $log .= ", $message";
         }
-        if ($Code <> '') {
-            $Log .= ", $Code";
+        if ($code <> '') {
+            $log .= ", $code";
         }
 
         // Attempt to log the message in the PHP logs
-        errorLog($Log);
+        errorLog($log);
     }
 }
 
@@ -639,26 +639,26 @@ if (!function_exists('boop')) {
     /**
      * Logs a message or print_r()'s an array to the screen.
      *
-     * @param mixed $Message The object or string to log to the screen
-     * @param optional $Arguments A list of arguments to log to the screen as if from a function call
+     * @param mixed $message The object or string to log to the screen
+     * @param optional $arguments A list of arguments to log to the screen as if from a function call
      */
-    function boop($Message, $Arguments = array(), $Vardump = false) {
+    function boop($message, $arguments = [], $vardump = false) {
         if (!defined('BOOP') || !BOOP) {
             return;
         }
 
-        if (is_array($Message) || is_object($Message) || $Vardump === true) {
-            if ($Vardump) {
-                var_dump($Message);
+        if (is_array($message) || is_object($message) || $vardump === true) {
+            if ($vardump) {
+                var_dump($message);
             } else {
-                print_r($Message);
+                print_r($message);
             }
         } else {
-            echo $Message;
+            echo $message;
         }
 
-        if (!is_null($Arguments) && sizeof($Arguments)) {
-            echo " (".implode(', ', $Arguments).")";
+        if (!is_null($arguments) && sizeof($arguments)) {
+            echo " (".implode(', ', $arguments).")";
         }
 
         echo "\n";
@@ -669,22 +669,22 @@ if (!function_exists('cleanErrorArguments')) {
     /**
      *
      *
-     * @param $Var
-     * @param array $BlackList
+     * @param $var
+     * @param array $blackList
      */
-    function cleanErrorArguments(&$Var, $BlackList = array('configuration', 'config', 'database', 'password')) {
-        if (is_array($Var)) {
-            foreach ($Var as $Key => $Value) {
-                if (in_array(strtolower($Key), $BlackList)) {
-                    $Var[$Key] = 'SECURITY';
+    function cleanErrorArguments(&$var, $blackList = ['configuration', 'config', 'database', 'password']) {
+        if (is_array($var)) {
+            foreach ($var as $key => $value) {
+                if (in_array(strtolower($key), $blackList)) {
+                    $var[$key] = 'SECURITY';
                 } else {
-                    if (is_object($Value)) {
-                        $Value = Gdn_Format::objectAsArray($Value);
-                        $Var[$Key] = $Value;
+                    if (is_object($value)) {
+                        $value = Gdn_Format::objectAsArray($value);
+                        $var[$key] = $value;
                     }
 
-                    if (is_array($Value)) {
-                        cleanErrorArguments($Var[$Key], $BlackList);
+                    if (is_array($value)) {
+                        cleanErrorArguments($var[$key], $blackList);
                     }
                 }
             }
@@ -708,33 +708,33 @@ function setHandlers() {
  * @param string $Code The translation code of the type of object that wasn't found.
  * @return Exception
  */
-function notFoundException($RecordType = 'Page') {
+function notFoundException($recordType = 'Page') {
     Gdn::dispatcher()
-        ->passData('RecordType', $RecordType)
-        ->passData('Description', sprintf(T('The %s you were looking for could not be found.'), T(strtolower($RecordType))));
-    return new Gdn_UserException(sprintf(T('%s not found.'), T($RecordType)), 404);
+        ->passData('RecordType', $recordType)
+        ->passData('Description', sprintf(t('The %s you were looking for could not be found.'), t(strtolower($recordType))));
+    return new Gdn_UserException(sprintf(t('%s not found.'), t($recordType)), 404);
 }
 
 /**
  * Create a new permission exception. This is a convenience function that will create an exception with a standard message.
  *
- * @param string|null $Permission The name of the permission that was required.
+ * @param string|null $permission The name of the permission that was required.
  * @return Exception
  */
-function permissionException($Permission = null) {
-    if (!$Permission) {
-        $Message = t('PermissionErrorMessage', "You don't have permission to do that.");
-    } elseif ($Permission == 'Banned')
-        $Message = t("You've been banned.");
-    elseif (stringBeginsWith($Permission, '@'))
-        $Message = stringBeginsWith($Permission, '@', true, true);
+function permissionException($permission = null) {
+    if (!$permission) {
+        $message = t('PermissionErrorMessage', "You don't have permission to do that.");
+    } elseif ($permission == 'Banned')
+        $message = t("You've been banned.");
+    elseif (stringBeginsWith($permission, '@'))
+        $message = stringBeginsWith($permission, '@', true, true);
     else {
-        $Message = t(
-            "PermissionRequired.$Permission",
-            sprintf(t('You need the %s permission to do that.'), $Permission)
+        $message = t(
+            "PermissionRequired.$permission",
+            sprintf(t('You need the %s permission to do that.'), $permission)
         );
     }
-    return new Gdn_UserException($Message, 403);
+    return new Gdn_UserException($message, 403);
 }
 
 /**
@@ -743,13 +743,13 @@ function permissionException($Permission = null) {
  * @param string|null $Permission The name of the permission that was required.
  * @return Exception
  */
-function forbiddenException($Resource = null) {
-    if (!$Resource) {
-        $Message = t('ForbiddenErrorMessage', "You are not allowed to do that.");
-    } elseif (stringBeginsWith($Resource, '@'))
-        $Message = stringBeginsWith($Resource, '@', true, true);
+function forbiddenException($resource = null) {
+    if (!$resource) {
+        $message = t('ForbiddenErrorMessage', "You are not allowed to do that.");
+    } elseif (stringBeginsWith($resource, '@'))
+        $message = stringBeginsWith($resource, '@', true, true);
     else {
-        $Message = sprintf(t('You are not allowed to %s.'), $Resource);
+        $message = sprintf(t('You are not allowed to %s.'), $resource);
     }
-    return new Gdn_UserException($Message, 403);
+    return new Gdn_UserException($message, 403);
 }

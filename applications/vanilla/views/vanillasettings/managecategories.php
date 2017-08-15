@@ -17,10 +17,10 @@ helpAsset(t('Need More Help?'), $links);
         if (c('Vanilla.Categories.Use')) {
             echo anchor(t('Add Category'), 'vanilla/settings/addcategory', 'SmallButton');
             if (checkPermission('Garden.Settings.Manage')) {
-                echo wrap(Anchor(t("Don't use Categories"), 'vanilla/settings/enablecategories?enabled=0', 'SmallButton Hijack'));
+                echo wrap(anchor(t("Don't use Categories"), 'vanilla/settings/enablecategories?enabled=0', 'SmallButton Hijack'));
             }
         } elseif (checkPermission('Garden.Settings.Manage')) {
-            echo anchor(t('Use Categories'), 'vanilla/settings/enablecategories?enabled=1'.Gdn::session()->TransientKey(), 'SmallButton Hijack');
+            echo anchor(t('Use Categories'), 'vanilla/settings/enablecategories?enabled=1'.Gdn::session()->transientKey(), 'SmallButton Hijack');
         }
         ?></div>
 <?php
@@ -45,12 +45,12 @@ if (c('Vanilla.Categories.Use')) {
     echo $this->Form->errors();
     echo '<div class="Info">'
         .t('Configure how nested categories are displayed to users.')
-        .Wrap(sprintf(
+        .wrap(sprintf(
             t('Vanilla.Categories.MaxDisplayDepth', 'Place nested categories in a comma-delimited list when they are %1$s'),
-            $this->Form->DropDown('Vanilla.Categories.MaxDisplayDepth', val('MaxDepthData', $this->Data))
+            $this->Form->dropDown('Vanilla.Categories.MaxDisplayDepth', val('MaxDepthData', $this->Data))
         ), 'div')
-        .Wrap($this->Form->CheckBox('Vanilla.Categories.DoHeadings', 'Display root categories as headings.'), 'div')
-        .Wrap($this->Form->CheckBox('Vanilla.Categories.HideModule', 'Do not display the categories in the side panel.'), 'div')
+        .wrap($this->Form->checkBox('Vanilla.Categories.DoHeadings', 'Display root categories as headings.'), 'div')
+        .wrap($this->Form->checkBox('Vanilla.Categories.HideModule', 'Do not display the categories in the side panel.'), 'div')
         .'</div>'
         .'<div class="Buttons Wrap">'
         .$this->Form->button('Save')
@@ -59,7 +59,7 @@ if (c('Vanilla.Categories.Use')) {
 
     echo wrap(t('Organize Categories'), 'h1')
         .'<ol class="Sortable">';
-    $Right = array(); // Start with an empty $Right stack
+    $Right = []; // Start with an empty $Right stack
     $LastRight = 0;
     $OpenCount = 0;
     $Loop = 0;
@@ -96,7 +96,7 @@ if (c('Vanilla.Categories.Use')) {
             $CategoryUrl = categoryUrl($Category);
 
             if ($Category->Photo) {
-                $Photo = img(Gdn_Upload::url($Category->Photo), array('class' => 'CategoryPhoto'));
+                $Photo = img(Gdn_Upload::url($Category->Photo), ['class' => 'CategoryPhoto']);
             } else {
                 $Photo = '';
             }
@@ -108,7 +108,7 @@ if (c('Vanilla.Categories.Use')) {
                      '.$Photo.'
                      <strong>'.htmlspecialchars($Category->Name).'</strong>
                      '.anchor(htmlspecialchars(rawurldecode($CategoryUrl)), $CategoryUrl).'
-                     '.Wrap($Category->Description, 'blockquote').'
+                     '.wrap($Category->Description, 'blockquote').'
                      './*Wrap("ID: {$Category->CategoryID}, PermID: {$Category->PermissionCategoryID}", 'div').*/
                 '
                   </td>

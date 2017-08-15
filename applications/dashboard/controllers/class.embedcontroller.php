@@ -14,7 +14,7 @@
 class EmbedController extends DashboardController {
 
     /** @var array Models to include. */
-    public $Uses = array('Database', 'Form');
+    public $Uses = ['Database', 'Form'];
 
     /**
      * Default method.
@@ -37,25 +37,25 @@ class EmbedController extends DashboardController {
      * @since 2.0.18
      * @access public
      */
-    public function comments($Toggle = '', $TransientKey = '') {
-        $this->settings($Toggle, $TransientKey);
+    public function comments($toggle = '', $transientKey = '') {
+        $this->settings($toggle, $transientKey);
     }
 
     /**
      * Embed the entire forum.
      *
-     * @param string $Toggle
-     * @param string $TransientKey
+     * @param string $toggle
+     * @param string $transientKey
      */
-    public function forum($Toggle = '', $TransientKey = '') {
+    public function forum($toggle = '', $transientKey = '') {
         $this->permission('Garden.Settings.Manage');
 
         try {
-            if ($this->toggle($Toggle, $TransientKey)) {
+            if ($this->toggle($toggle, $transientKey)) {
                 redirectTo('embed/forum');
             }
-        } catch (Gdn_UserException $Ex) {
-            $this->Form->addError($Ex);
+        } catch (Gdn_UserException $ex) {
+            $this->Form->addError($ex);
         }
 
         $this->setHighlightRoute('embed/forum');
@@ -66,14 +66,14 @@ class EmbedController extends DashboardController {
     /**
      * Options page.
      *
-     * @param string $Toggle
-     * @param string $TransientKey
+     * @param string $toggle
+     * @param string $transientKey
      */
-    public function advanced($Toggle = '', $TransientKey = '') {
-        $this->settings($Toggle, $TransientKey);
+    public function advanced($toggle = '', $transientKey = '') {
+        $this->settings($toggle, $transientKey);
     }
 
-    public function settings($Toggle = '', $TransientKey = '') {
+    public function settings($toggle = '', $transientKey = '') {
         $this->permission('Garden.Settings.Manage');
 
 //        try {
@@ -87,10 +87,10 @@ class EmbedController extends DashboardController {
         $this->setHighlightRoute('embed/forum');
         $this->Form = new Gdn_Form();
 
-        $Validation = new Gdn_Validation();
-        $ConfigurationModel = new Gdn_ConfigurationModel($Validation);
-        $ConfigurationModel->setField(
-            array(
+        $validation = new Gdn_Validation();
+        $configurationModel = new Gdn_ConfigurationModel($validation);
+        $configurationModel->setField(
+            [
                 'Garden.Embed.RemoteUrl',
                 'Garden.Embed.ForceDashboard',
                 'Garden.Embed.ForceForum',
@@ -99,17 +99,17 @@ class EmbedController extends DashboardController {
                 'Garden.Embed.CommentsPerPage',
                 'Garden.Embed.SortComments',
                 'Garden.Embed.PageToForum'
-            )
+            ]
         );
 
-        $this->Form->setModel($ConfigurationModel);
+        $this->Form->setModel($configurationModel);
         if ($this->Form->authenticatedPostBack()) {
             if ($this->Form->save() !== false) {
                 $this->informMessage(t("Your settings have been saved."));
             }
         } else {
             // Apply the config settings to the form.
-            $this->Form->setData($ConfigurationModel->Data);
+            $this->Form->setData($configurationModel->Data);
         }
 
         $this->title(t('Embed Settings'));
@@ -131,19 +131,19 @@ class EmbedController extends DashboardController {
     /**
      * Handle toggling this version of embedding on and off. Take care of disabling the other version of embed (the old plugin).
      *
-     * @param string $Toggle
-     * @param string $TransientKey
+     * @param string $toggle
+     * @param string $transientKey
      * @return boolean
      * @throws Gdn_UserException
      */
-    private function toggle($Toggle = '', $TransientKey = '') {
-        if (in_array($Toggle, array('enable', 'disable')) && Gdn::session()->validateTransientKey($TransientKey)) {
-            if ($Toggle == 'enable' && Gdn::addonManager()->isEnabled('embedvanilla', \Vanilla\Addon::TYPE_ADDON)) {
+    private function toggle($toggle = '', $transientKey = '') {
+        if (in_array($toggle, ['enable', 'disable']) && Gdn::session()->validateTransientKey($transientKey)) {
+            if ($toggle == 'enable' && Gdn::addonManager()->isEnabled('embedvanilla', \Vanilla\Addon::TYPE_ADDON)) {
                 throw new Gdn_UserException('You must disable the "Embed Vanilla" plugin before continuing.');
             }
 
             // Do the toggle
-            saveToConfig('Garden.Embed.Allow', $Toggle == 'enable' ? true : false);
+            saveToConfig('Garden.Embed.Allow', $toggle == 'enable' ? true : false);
             return true;
         }
         return false;

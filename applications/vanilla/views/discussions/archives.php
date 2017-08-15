@@ -24,13 +24,13 @@ if (c('Vanilla.Discussions.Layout') == 'table'):
         <table class="DataTable DiscussionsTable">
             <thead>
             <?php
-            WriteDiscussionHeading();
+            writeDiscussionHeading();
             ?>
             </thead>
             <tbody>
             <?php
             foreach ($this->DiscussionData->result() as $Discussion) {
-                WriteDiscussionRow($Discussion, $this, Gdn::session(), false);
+                writeDiscussionRow($Discussion, $this, Gdn::session(), false);
             }
             ?>
             </tbody>

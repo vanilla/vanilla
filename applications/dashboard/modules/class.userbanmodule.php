@@ -41,7 +41,7 @@ class UserBanModule extends GDN_Module {
 
         $banned = val('Banned', $user);
         $bits = BanModel::explodeBans($banned);
-        $reasons = array();
+        $reasons = [];
 
         foreach ($bits as $bit) {
             if (($bit & $this->ExcludeBans) === 0) {
@@ -86,7 +86,7 @@ class UserBanModule extends GDN_Module {
         if (empty($this->Data['Reasons'])) {
             return '';
         } else {
-            return parent::ToString();
+            return parent::toString();
         }
     }
 }

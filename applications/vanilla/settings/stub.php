@@ -2,7 +2,7 @@
 /**
  * Vanilla stub content for a new forum.
  *
- * Called by VanillaHooks::Setup() to insert stub content upon enabling app.
+ * Called by VanillaHooks::setup() to insert stub content upon enabling app.
  *
  * @copyright 2009-2017 Vanilla Forums Inc.
  * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
@@ -21,16 +21,16 @@ if ($Row) {
 $WallBody = "Ping! An activity post is a public way to talk at someone. When you update your status here, it posts it on your activity feed.";
 
 // Prep content meta data
-$SystemUserID = Gdn::userModel()->GetSystemUserID();
+$SystemUserID = Gdn::userModel()->getSystemUserID();
 $TargetUserID = Gdn::session()->UserID;
 $Now = Gdn_Format::toDateTime();
-$CategoryID = val('CategoryID', CategoryModel::DefaultCategory());
+$CategoryID = val('CategoryID', CategoryModel::defaultCategory());
 
 // Get wall post type ID
-$WallCommentTypeID = $SQL->getWhere('ActivityType', array('Name' => 'WallPost'))->value('ActivityTypeID');
+$WallCommentTypeID = $SQL->getWhere('ActivityType', ['Name' => 'WallPost'])->value('ActivityTypeID');
 
 // Insert first wall post
-$SQL->insert('Activity', array(
+$SQL->insert('Activity', [
     'Story' => t('StubWallBody', $WallBody),
     'Format' => 'Html',
     'HeadlineFormat' => '{RegardingUserID,you} &rarr; {ActivityUserID,you}',
@@ -41,4 +41,4 @@ $SQL->insert('Activity', array(
     'InsertUserID' => $SystemUserID,
     'DateInserted' => $Now,
     'DateUpdated' => $Now
-));
+]);

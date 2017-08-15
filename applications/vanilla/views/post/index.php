@@ -7,9 +7,9 @@ foreach ($Forms as $Form) {
     $Code = val('Name', $Form);
     $Active = strtolower($Code) == strtolower($this->data('CurrentFormName'));
     if ($Active)
-        $FormToggleMenu->CurrentLabelCode($Code);
+        $FormToggleMenu->currentLabelCode($Code);
 
-    $FormToggleMenu->AddLabel(val('Label', $Form), $Code);
+    $FormToggleMenu->addLabel(val('Label', $Form), $Code);
 }
 echo $FormToggleMenu->toString();
 
@@ -19,7 +19,7 @@ foreach ($Forms as $Form) {
     $Active = strtolower($Name) == strtolower($this->data('CurrentFormName'));
     $Url = val('Url', $Form);
     echo '<div class="Toggle-'.$Name.($Active ? ' Active' : '').' FormWrap">';
-    // echo ProxyRequest(url($Url.'?DeliveryType=VIEW', true));
-    echo '<div class="Popin" rel="'.Url($Url.'?DeliveryType=VIEW', true).'"></div>';
+    // echo proxyRequest(url($Url.'?DeliveryType=VIEW', true));
+    echo '<div class="Popin" rel="'.url($Url.'?DeliveryType=VIEW', true).'"></div>';
     echo '</div>';
 }

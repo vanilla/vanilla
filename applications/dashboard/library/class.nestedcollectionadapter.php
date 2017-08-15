@@ -51,7 +51,7 @@ class NestedCollectionAdapter {
      * @param array $attributes
      * @return $this|void
      */
-    public function addItem($group, $text, $permission = false, $attributes = array()) {
+    public function addItem($group, $text, $permission = false, $attributes = []) {
         if ($permission === false) {
             $permission = true;
         }
@@ -72,21 +72,21 @@ class NestedCollectionAdapter {
     /**
      *
      *
-     * @param $Group
-     * @param $Text
+     * @param $group
+     * @param $text
      */
-    public function removeLink($Group, $Text) {
+    public function removeLink($group, $text) {
     }
 
     /**
      * Removes all links from a specific group.
      */
-    public function removeLinks($Group) {
+    public function removeLinks($group) {
     }
 
     /**
      * Removes an entire group of links, and the group itself, from the menu.
      */
-    public function removeGroup($Group) {
+    public function removeGroup($group) {
     }
 }

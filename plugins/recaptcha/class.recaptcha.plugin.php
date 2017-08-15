@@ -87,10 +87,10 @@ class RecaptchaPlugin extends Gdn_Plugin {
      */
     public function validateCaptcha($captchaText) {
         $api = new Garden\Http\HttpClient('https://www.google.com/recaptcha/api');
-        $data = array(
+        $data = [
             'secret' => $this->getPrivateKey(),
             'response' => $captchaText
-        );
+        ];
         $response = $api->get('/siteverify', $data);
 
         if ($response->isSuccessful()) {
@@ -98,8 +98,8 @@ class RecaptchaPlugin extends Gdn_Plugin {
             $errorCodes = val('error_codes', $result);
             if ($result && val('success', $result)) {
                 return true;
-            } else if (!empty($errorCodes) && $errorCodes != array('invalid-input-response')) {
-                throw new Exception(formatString(t('No response from reCAPTCHA.').' {ErrorCodes}', array('ErrorCodes' => join(', ', $errorCodes))));
+            } else if (!empty($errorCodes) && $errorCodes != ['invalid-input-response']) {
+                throw new Exception(formatString(t('No response from reCAPTCHA.').' {ErrorCodes}', ['ErrorCodes' => join(', ', $errorCodes)]));
             }
         } else {
             throw new Exception(t('No response from reCAPTCHA.'));
@@ -211,7 +211,7 @@ class RecaptchaPlugin extends Gdn_Plugin {
 
         $scriptSrc = 'https://www.google.com/recaptcha/api.js?hl='.$language;
 
-        $attributes = array('class' => 'g-recaptcha', 'data-sitekey' => $this->getPublicKey(), 'data-theme' => c('Recaptcha.Theme', 'light'));
+        $attributes = ['class' => 'g-recaptcha', 'data-sitekey' => $this->getPublicKey(), 'data-theme' => c('Recaptcha.Theme', 'light')];
 
         // see https://developers.google.com/recaptcha/docs/display for details
         $this->EventArguments['Attributes'] = &$attributes;

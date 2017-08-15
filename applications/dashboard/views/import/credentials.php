@@ -1,6 +1,6 @@
 <?php if (!defined('APPLICATION')) exit();
 
-echo $this->Form->open(array('enctype' => 'multipart/form-data'));
+echo $this->Form->open(['enctype' => 'multipart/form-data']);
 ?>
     <ul>
         <li>

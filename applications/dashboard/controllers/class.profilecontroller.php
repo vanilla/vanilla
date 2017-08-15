@@ -16,7 +16,7 @@ class ProfileController extends Gdn_Controller {
     const AVATAR_FOLDER = 'userpics';
 
     /** @var array Models to automatically instantiate. */
-    public $Uses = array('Form', 'UserModel');
+    public $Uses = ['Form', 'UserModel'];
 
     /** @var object User data to use in building profile. */
     public $User;
@@ -60,7 +60,7 @@ class ProfileController extends Gdn_Controller {
         $this->_TabController = 'ProfileController';
         $this->_TabApplication = 'Dashboard';
         $this->CurrentTab = 'Activity';
-        $this->ProfileTabs = array();
+        $this->ProfileTabs = [];
         $this->editMode(true);
         parent::__construct();
     }
@@ -102,7 +102,7 @@ class ProfileController extends Gdn_Controller {
             $this->setHeader('Cache-Control', 'private, no-cache, no-store, max-age=0, must-revalidate');
         }
 
-        $this->setData('Breadcrumbs', array());
+        $this->setData('Breadcrumbs', []);
         $this->CanEditPhotos = Gdn::session()->checkRankedPermission(c('Garden.Profile.EditPhotos', true)) || Gdn::session()->checkPermission('Garden.Users.Edit');
     }
 
@@ -111,60 +111,60 @@ class ProfileController extends Gdn_Controller {
      *
      * @since 2.0.0
      * @access public
-     * @param mixed $UserReference Unique identifier, possible ID or username.
-     * @param string $Username Username.
-     * @param int $UserID Unique ID.
-     * @param int $Offset How many to skip (for paging).
+     * @param mixed $userReference Unique identifier, possible ID or username.
+     * @param string $username Username.
+     * @param int $userID Unique ID.
+     * @param int $offset How many to skip (for paging).
      */
-    public function activity($UserReference = '', $Username = '', $UserID = '', $Page = '') {
+    public function activity($userReference = '', $username = '', $userID = '', $page = '') {
         $this->permission('Garden.Profiles.View');
         $this->editMode(false);
 
         // Object setup
-        $Session = Gdn::session();
+        $session = Gdn::session();
         $this->ActivityModel = new ActivityModel();
 
         // Calculate offset.
-        list($Offset, $Limit) = offsetLimit($Page, 30);
+        list($offset, $limit) = offsetLimit($page, 30);
 
         // Get user, tab, and comment
-        $this->getUserInfo($UserReference, $Username, $UserID);
-        $UserID = $this->User->UserID;
-        $Username = $this->User->Name;
+        $this->getUserInfo($userReference, $username, $userID);
+        $userID = $this->User->UserID;
+        $username = $this->User->Name;
 
         $this->_setBreadcrumbs(t('Activity'), userUrl($this->User, '', 'activity'));
 
         $this->setTabView('Activity');
-        $Comment = $this->Form->getFormValue('Comment');
+        $comment = $this->Form->getFormValue('Comment');
 
         // Load data to display
         $this->ProfileUserID = $this->User->UserID;
-        $Limit = 30;
+        $limit = 30;
 
-        $NotifyUserIDs = array(ActivityModel::NOTIFY_PUBLIC);
+        $notifyUserIDs = [ActivityModel::NOTIFY_PUBLIC];
         if (Gdn::session()->checkPermission('Garden.Moderation.Manage')) {
-            $NotifyUserIDs[] = ActivityModel::NOTIFY_MODS;
+            $notifyUserIDs[] = ActivityModel::NOTIFY_MODS;
         }
 
-        $Activities = $this->ActivityModel->getWhere(
-            array('ActivityUserID' => $UserID, 'NotifyUserID' => $NotifyUserIDs),
+        $activities = $this->ActivityModel->getWhere(
+            ['ActivityUserID' => $userID, 'NotifyUserID' => $notifyUserIDs],
             '',
             '',
-            $Limit,
-            $Offset
+            $limit,
+            $offset
         )->resultArray();
-        $this->ActivityModel->joinComments($Activities);
-        $this->setData('Activities', $Activities);
-        if (count($Activities) > 0) {
-            $LastActivity = reset($Activities);
-            $LastModifiedDate = Gdn_Format::toTimestamp($this->User->DateUpdated);
-            $LastActivityDate = Gdn_Format::toTimestamp($LastActivity['DateInserted']);
-            if ($LastModifiedDate < $LastActivityDate) {
-                $LastModifiedDate = $LastActivityDate;
+        $this->ActivityModel->joinComments($activities);
+        $this->setData('Activities', $activities);
+        if (count($activities) > 0) {
+            $lastActivity = reset($activities);
+            $lastModifiedDate = Gdn_Format::toTimestamp($this->User->DateUpdated);
+            $lastActivityDate = Gdn_Format::toTimestamp($lastActivity['DateInserted']);
+            if ($lastModifiedDate < $lastActivityDate) {
+                $lastModifiedDate = $lastActivityDate;
             }
 
             // Make sure to only query this page if the user has no new activity since the requesting browser last saw it.
-            $this->SetLastModified($LastModifiedDate);
+            $this->setLastModified($lastModifiedDate);
         }
 
         // Set the canonical Url.
@@ -182,21 +182,21 @@ class ProfileController extends Gdn_Controller {
      *
      * @since 2.0.0
      * @access public
-     * @param mixed $UserID
+     * @param mixed $userID
      */
-    public function clear($UserID = '') {
+    public function clear($userID = '') {
         if (!Gdn::request()->isAuthenticatedPostBack(true)) {
             throw new Exception('Requires POST', 405);
         }
 
-        $UserID = is_numeric($UserID) ? $UserID : 0;
-        $Session = Gdn::session();
-        if ($UserID != $Session->UserID && !$Session->checkPermission('Garden.Moderation.Manage')) {
+        $userID = is_numeric($userID) ? $userID : 0;
+        $session = Gdn::session();
+        if ($userID != $session->UserID && !$session->checkPermission('Garden.Moderation.Manage')) {
             throw permissionException('Garden.Moderation.Manage');
         }
 
-        if ($UserID > 0) {
-            $this->UserModel->saveAbout($UserID, '');
+        if ($userID > 0) {
+            $this->UserModel->saveAbout($userID, '');
         }
 
         if ($this->deliveryType() == DELIVERY_TYPE_ALL) {
@@ -224,13 +224,13 @@ class ProfileController extends Gdn_Controller {
         $Providers = $PModel->getProviders();
 
         $this->setData('_Providers', $Providers);
-        $this->setData('Connections', array());
+        $this->setData('Connections', []);
         $this->EventArguments['User'] = $this->User;
         $this->fireEvent('GetConnections');
 
         // Add some connection information.
         foreach ($this->Data['Connections'] as &$Row) {
-            $Provider = val($Row['ProviderKey'], $Providers, array());
+            $Provider = val($Row['ProviderKey'], $Providers, []);
 
             touchValue('Connected', $Row, !is_null(val('UniqueID', $Provider, null)));
         }
@@ -242,48 +242,48 @@ class ProfileController extends Gdn_Controller {
     }
 
     /**
-     * Generic way to get count via UserModel->ProfileCount().
+     * Generic way to get count via UserModel->profileCount().
      *
      * @since 2.0.?
      * @access public
-     * @param string $Column Name of column to count for this user.
-     * @param int $UserID Defaults to current session.
+     * @param string $column Name of column to count for this user.
+     * @param int $userID Defaults to current session.
      */
-    public function count($Column, $UserID = false) {
-        $Column = 'Count'.ucfirst($Column);
-        if (!$UserID) {
-            $UserID = Gdn::session()->UserID;
+    public function count($column, $userID = false) {
+        $column = 'Count'.ucfirst($column);
+        if (!$userID) {
+            $userID = Gdn::session()->UserID;
         }
 
-        if ($UserID !== Gdn::session()->UserID) {
+        if ($userID !== Gdn::session()->UserID) {
             $this->permission('Garden.Settings.Manage');
         }
 
-        $Count = $this->UserModel->profileCount($UserID, $Column);
-        $this->setData($Column, $Count);
-        $this->setData('_Value', $Count);
+        $count = $this->UserModel->profileCount($userID, $column);
+        $this->setData($column, $count);
+        $this->setData('_Value', $count);
         $this->setData('_CssClass', 'Count');
         $this->render('Value', 'Utility');
     }
 
     /**
      * Delete an invitation that has already been accepted.
-     * @param int $InvitationID
+     * @param int $invitationID
      * @throws Exception The inviation was not found or the user doesn't have permission to remove it.
      */
-    public function deleteInvitation($InvitationID) {
+    public function deleteInvitation($invitationID) {
         $this->permission('Garden.SignIn.Allow');
 
         if (!$this->Form->authenticatedPostBack()) {
             throw forbiddenException('GET');
         }
 
-        $InvitationModel = new InvitationModel();
+        $invitationModel = new InvitationModel();
 
-        $InvitationModel->delete($InvitationID);
+        $invitationModel->delete($invitationID);
         $this->informMessage(t('The invitation was removed successfully.'));
 
-        $this->jsonTarget(".js-invitation[data-id=\"{$InvitationID}\"]", '', 'SlideUp');
+        $this->jsonTarget(".js-invitation[data-id=\"{$invitationID}\"]", '', 'SlideUp');
 
         $this->render('Blank', 'Utility');
     }
@@ -307,7 +307,7 @@ class ProfileController extends Gdn_Controller {
         // First try and delete the authentication the fast way.
         Gdn::sql()->delete(
             'UserAuthentication',
-            array('UserID' => $this->User->UserID, 'ProviderKey' => $Provider)
+            ['UserID' => $this->User->UserID, 'ProviderKey' => $Provider]
         );
 
         // Delete the profile information.
@@ -321,7 +321,7 @@ class ProfileController extends Gdn_Controller {
             $Providers = $PModel->getProviders();
 
             $this->setData('_Providers', $Providers);
-            $this->setData('Connections', array());
+            $this->setData('Connections', []);
             $this->fireEvent('GetConnections');
 
             // Send back the connection button.
@@ -342,56 +342,56 @@ class ProfileController extends Gdn_Controller {
      *
      * @since 2.0.0
      * @access public
-     * @param mixed $UserReference Username or User ID.
+     * @param mixed $userReference Username or User ID.
      */
-    public function edit($UserReference = '', $Username = '', $UserID = '') {
+    public function edit($userReference = '', $username = '', $userID = '') {
         $this->permission('Garden.SignIn.Allow');
-        $this->getUserInfo($UserReference, $Username, $UserID, true);
-        $UserID = valr('User.UserID', $this);
-        $Settings = array();
+        $this->getUserInfo($userReference, $username, $userID, true);
+        $userID = valr('User.UserID', $this);
+        $settings = [];
 
         // Set up form
-        $User = Gdn::userModel()->getID($UserID, DATASET_TYPE_ARRAY);
+        $user = Gdn::userModel()->getID($userID, DATASET_TYPE_ARRAY);
         $this->Form->setModel(Gdn::userModel());
-        $this->Form->setData($User);
+        $this->Form->setData($user);
 
         // Decide if they have ability to edit the username
-        $CanEditUsername = (bool)c("Garden.Profile.EditUsernames") || Gdn::session()->checkPermission('Garden.Users.Edit');
-        $this->setData('_CanEditUsername', $CanEditUsername);
+        $canEditUsername = (bool)c("Garden.Profile.EditUsernames") || Gdn::session()->checkPermission('Garden.Users.Edit');
+        $this->setData('_CanEditUsername', $canEditUsername);
 
         // Decide if they have ability to edit the email
-        $EmailEnabled = (bool)c('Garden.Profile.EditEmails', true) && !UserModel::noEmail();
-        $CanEditEmail = ($EmailEnabled && $UserID == Gdn::session()->UserID) || checkPermission('Garden.Users.Edit');
-        $this->setData('_CanEditEmail', $CanEditEmail);
+        $emailEnabled = (bool)c('Garden.Profile.EditEmails', true) && !UserModel::noEmail();
+        $canEditEmail = ($emailEnabled && $userID == Gdn::session()->UserID) || checkPermission('Garden.Users.Edit');
+        $this->setData('_CanEditEmail', $canEditEmail);
 
         // Decide if they have ability to confirm users
-        $Confirmed = (bool)valr('User.Confirmed', $this);
-        $CanConfirmEmail = (UserModel::requireConfirmEmail() && checkPermission('Garden.Users.Edit'));
-        $this->setData('_CanConfirmEmail', $CanConfirmEmail);
-        $this->setData('_EmailConfirmed', $Confirmed);
-        $this->Form->setValue('ConfirmEmail', (int)$Confirmed);
+        $confirmed = (bool)valr('User.Confirmed', $this);
+        $canConfirmEmail = (UserModel::requireConfirmEmail() && checkPermission('Garden.Users.Edit'));
+        $this->setData('_CanConfirmEmail', $canConfirmEmail);
+        $this->setData('_EmailConfirmed', $confirmed);
+        $this->Form->setValue('ConfirmEmail', (int)$confirmed);
 
         // Decide if we can *see* email
-        $this->setData('_CanViewPersonalInfo', Gdn::session()->UserID == val('UserID', $User) || checkPermission('Garden.PersonalInfo.View') || checkPermission('Garden.Users.Edit'));
+        $this->setData('_CanViewPersonalInfo', Gdn::session()->UserID == val('UserID', $user) || checkPermission('Garden.PersonalInfo.View') || checkPermission('Garden.Users.Edit'));
 
         // Define gender dropdown options
-        $this->GenderOptions = array(
+        $this->GenderOptions = [
             'u' => t('Unspecified'),
             'm' => t('Male'),
             'f' => t('Female')
-        );
+        ];
 
         $this->fireEvent('BeforeEdit');
 
         // If seeing the form for the first time...
         if ($this->Form->authenticatedPostBack(true)) {
-            $this->Form->setFormValue('UserID', $UserID);
+            $this->Form->setFormValue('UserID', $userID);
 
-            if (!$CanEditUsername) {
-                $this->Form->setFormValue("Name", $User['Name']);
+            if (!$canEditUsername) {
+                $this->Form->setFormValue("Name", $user['Name']);
             } else {
-                $UsernameError = t('UsernameError', 'Username can only contain letters, numbers, underscores, and must be between 3 and 20 characters long.');
-                Gdn::userModel()->Validation->applyRule('Name', 'Username', $UsernameError);
+                $usernameError = t('UsernameError', 'Username can only contain letters, numbers, underscores, and must be between 3 and 20 characters long.');
+                Gdn::userModel()->Validation->applyRule('Name', 'Username', $usernameError);
             }
 
             // API
@@ -401,41 +401,41 @@ class ProfileController extends Gdn_Controller {
 
                 // Role change
 
-                $RequestedRoles = $this->Form->getFormValue('RoleID', null);
-                if (!is_null($RequestedRoles)) {
-                    $RoleModel = new RoleModel();
-                    $AllRoles = $RoleModel->getArray();
+                $requestedRoles = $this->Form->getFormValue('RoleID', null);
+                if (!is_null($requestedRoles)) {
+                    $roleModel = new RoleModel();
+                    $allRoles = $roleModel->getArray();
 
-                    if (!is_array($RequestedRoles)) {
-                        $RequestedRoles = is_numeric($RequestedRoles) ? array($RequestedRoles) : array();
+                    if (!is_array($requestedRoles)) {
+                        $requestedRoles = is_numeric($requestedRoles) ? [$requestedRoles] : [];
                     }
 
-                    $RequestedRoles = array_flip($RequestedRoles);
-                    $UserNewRoles = array_intersect_key($AllRoles, $RequestedRoles);
+                    $requestedRoles = array_flip($requestedRoles);
+                    $userNewRoles = array_intersect_key($allRoles, $requestedRoles);
 
                     // Put the data back into the forum object as if the user had submitted
                     // this themselves
-                    $this->Form->setFormValue('RoleID', array_keys($UserNewRoles));
+                    $this->Form->setFormValue('RoleID', array_keys($userNewRoles));
 
                     // Allow saving roles
-                    $Settings['SaveRoles'] = true;
+                    $settings['SaveRoles'] = true;
 
                 }
 
                 // Password change
 
-                $NewPassword = $this->Form->getFormValue('Password', null);
-                if (!is_null($NewPassword)) {
+                $newPassword = $this->Form->getFormValue('Password', null);
+                if (!is_null($newPassword)) {
                 }
             }
 
             // Allow mods to confirm emails
             $this->Form->removeFormValue('Confirmed');
-            $Confirmation = $this->Form->getFormValue('ConfirmEmail', null);
-            $Confirmation = !is_null($Confirmation) ? (bool)$Confirmation : null;
+            $confirmation = $this->Form->getFormValue('ConfirmEmail', null);
+            $confirmation = !is_null($confirmation) ? (bool)$confirmation : null;
 
-            if ($CanConfirmEmail && is_bool($Confirmation)) {
-                $this->Form->setFormValue('Confirmed', (int)$Confirmation);
+            if ($canConfirmEmail && is_bool($confirmation)) {
+                $this->Form->setFormValue('Confirmed', (int)$confirmation);
             }
 
             // Don't allow non-mods to set an explicit photo.
@@ -449,15 +449,15 @@ class ProfileController extends Gdn_Controller {
                 }
             }
 
-            if ($this->Form->save($Settings) !== false) {
-                $User = Gdn::userModel()->getID($UserID, DATASET_TYPE_ARRAY);
-                $this->setData('Profile', $User);
+            if ($this->Form->save($settings) !== false) {
+                $user = Gdn::userModel()->getID($userID, DATASET_TYPE_ARRAY);
+                $this->setData('Profile', $user);
 
                 $this->informMessage(sprite('Check', 'InformSprite').t('Your changes have been saved.'), 'Dismissable AutoDismiss HasSprite');
             }
 
-            if (!$CanEditEmail) {
-                $this->Form->setFormValue("Email", $User['Email']);
+            if (!$canEditEmail) {
+                $this->Form->setFormValue("Email", $user['Email']);
             }
 
         }
@@ -474,23 +474,23 @@ class ProfileController extends Gdn_Controller {
      *
      * @since 2.0.0
      * @access public
-     * @param mixed $User Unique identifier, possible ID or username.
-     * @param string $Username .
-     * @param int $UserID Unique ID.
+     * @param mixed $user Unique identifier, possible ID or username.
+     * @param string $username .
+     * @param int $userID Unique ID.
      */
-    public function index($User = '', $Username = '', $UserID = '', $Page = false) {
+    public function index($user = '', $username = '', $userID = '', $page = false) {
         $this->editMode(false);
-        $this->getUserInfo($User, $Username, $UserID);
+        $this->getUserInfo($user, $username, $userID);
 
 
         if ($this->User->Admin == 2 && $this->Head) {
             // Don't index internal accounts. This is in part to prevent vendors from getting endless Google alerts.
-            $this->Head->addTag('meta', array('name' => 'robots', 'content' => 'noindex'));
-            $this->Head->addTag('meta', array('name' => 'googlebot', 'content' => 'noindex'));
+            $this->Head->addTag('meta', ['name' => 'robots', 'content' => 'noindex']);
+            $this->Head->addTag('meta', ['name' => 'googlebot', 'content' => 'noindex']);
         }
 
         if (c('Garden.Profile.ShowActivities', true)) {
-            return $this->activity($User, $Username, $UserID, $Page);
+            return $this->activity($user, $username, $userID, $page);
         } elseif ($this->_DeliveryType == DELIVERY_TYPE_ALL) {
             redirectTo(userUrl($this->User, '', 'discussions'));
         }
@@ -505,17 +505,17 @@ class ProfileController extends Gdn_Controller {
      * @since 2.0.0
      * @access public
      */
-    public function invitations($UserReference = '', $Username = '', $UserID = '') {
+    public function invitations($userReference = '', $username = '', $userID = '') {
         $this->permission('Garden.SignIn.Allow');
         $this->editMode(false);
-        $this->getUserInfo($UserReference, $Username, $UserID, $this->Form->authenticatedPostBack());
+        $this->getUserInfo($userReference, $username, $userID, $this->Form->authenticatedPostBack());
         $this->setTabView('Invitations');
 
-        $InvitationModel = new InvitationModel();
-        $this->Form->setModel($InvitationModel);
+        $invitationModel = new InvitationModel();
+        $this->Form->setModel($invitationModel);
         if ($this->Form->authenticatedPostBack()) {
             // Remove insecure invitation data.
-            $this->Form->removeFormValue(array('Name', 'DateExpires', 'RoleIDs'));
+            $this->Form->removeFormValue(['Name', 'DateExpires', 'RoleIDs']);
 
             // Send the invitation
             if ($this->Form->save($this->UserModel)) {
@@ -523,9 +523,9 @@ class ProfileController extends Gdn_Controller {
                 $this->Form->clearInputs();
             }
         }
-        $Session = Gdn::session();
-        $this->InvitationCount = $this->UserModel->getInvitationCount($Session->UserID);
-        $this->InvitationData = $InvitationModel->getByUserID($Session->UserID);
+        $session = Gdn::session();
+        $this->InvitationCount = $this->UserModel->getInvitationCount($session->UserID);
+        $this->InvitationData = $invitationModel->getByUserID($session->UserID);
 
         $this->render();
     }
@@ -541,7 +541,14 @@ class ProfileController extends Gdn_Controller {
      * - 1: Unset the force cookie and use the user agent to determine the theme.
      */
     public function noMobile($type = 'desktop') {
-        if (!Gdn::request()->isAuthenticatedPostBack(true)) {
+        // Only validate CSRF token for authenticated users because guests do not get the transient key cookie.
+        if (Gdn::session()->isValid()) {
+            $valid = Gdn::request()->isAuthenticatedPostBack(true);
+        } else {
+            $valid = Gdn::request()->isPostBack();
+        }
+
+        if (!$valid) {
             throw new Exception('Requires POST', 405);
         }
 
@@ -550,17 +557,17 @@ class ProfileController extends Gdn_Controller {
         if ($type == '1') {
             Gdn_CookieIdentity::deleteCookie('X-UA-Device-Force');
         } else {
-            if (in_array($type, array('mobile', 'desktop', 'tablet', 'app'))) {
+            if (in_array($type, ['mobile', 'desktop', 'tablet', 'app'])) {
                 $type = $type;
             } else {
                 $type = 'desktop';
             }
 
             // Set 48-hour "no mobile" cookie
-            $Expiration = time() + 172800;
-            $Path = c('Garden.Cookie.Path');
-            $Domain = c('Garden.Cookie.Domain');
-            safeCookie('X-UA-Device-Force', $type, $Expiration, $Path, $Domain);
+            $expiration = time() + 172800;
+            $path = c('Garden.Cookie.Path');
+            $domain = c('Garden.Cookie.Domain');
+            safeCookie('X-UA-Device-Force', $type, $expiration, $path, $domain);
         }
 
         $this->setRedirectTo('/');
@@ -572,41 +579,41 @@ class ProfileController extends Gdn_Controller {
      *
      * @since 2.0.0
      * @access public
-     * @param int $Page Number to skip (paging).
+     * @param int $page Number to skip (paging).
      */
-    public function notifications($Page = false) {
+    public function notifications($page = false) {
         $this->permission('Garden.SignIn.Allow');
         $this->editMode(false);
 
-        list($Offset, $Limit) = offsetLimit($Page, 30);
+        list($offset, $limit) = offsetLimit($page, 30);
 
         $this->getUserInfo();
         $this->_setBreadcrumbs(t('Notifications'), '/profile/notifications');
 
-        $this->SetTabView('Notifications');
-        $Session = Gdn::session();
+        $this->setTabView('Notifications');
+        $session = Gdn::session();
 
         $this->ActivityModel = new ActivityModel();
 
         // Drop notification count back to zero.
-        $this->ActivityModel->MarkRead($Session->UserID);
+        $this->ActivityModel->markRead($session->UserID);
 
         // Get notifications data.
-        $Activities = $this->ActivityModel->getNotifications($Session->UserID, $Offset, $Limit)->resultArray();
-        $this->ActivityModel->joinComments($Activities);
-        $this->setData('Activities', $Activities);
-        unset($Activities);
-        //$TotalRecords = $this->ActivityModel->GetCountNotifications($Session->UserID);
+        $activities = $this->ActivityModel->getNotifications($session->UserID, $offset, $limit)->resultArray();
+        $this->ActivityModel->joinComments($activities);
+        $this->setData('Activities', $activities);
+        unset($activities);
+        //$TotalRecords = $this->ActivityModel->getCountNotifications($Session->UserID);
 
         // Build a pager
-        $PagerFactory = new Gdn_PagerFactory();
-        $this->Pager = $PagerFactory->GetPager('MorePager', $this);
+        $pagerFactory = new Gdn_PagerFactory();
+        $this->Pager = $pagerFactory->getPager('MorePager', $this);
         $this->Pager->MoreCode = 'More';
         $this->Pager->LessCode = 'Newer Notifications';
         $this->Pager->ClientID = 'Pager';
         $this->Pager->configure(
-            $Offset,
-            $Limit,
+            $offset,
+            $limit,
             false,
             'profile/notifications/%1$s/'
         );
@@ -614,7 +621,7 @@ class ProfileController extends Gdn_Controller {
         if ($this->_DeliveryType != DELIVERY_TYPE_ALL) {
             $this->setJson('LessRow', $this->Pager->toString('less'));
             $this->setJson('MoreRow', $this->Pager->toString('more'));
-            if ($Offset > 0) {
+            if ($offset > 0) {
                 $this->View = 'activities';
                 $this->ControllerName = 'Activity';
             }
@@ -625,14 +632,14 @@ class ProfileController extends Gdn_Controller {
     public function notificationsPopin() {
         $this->permission('Garden.SignIn.Allow');
 
-        $Where = array(
+        $where = [
             'NotifyUserID' => Gdn::session()->UserID,
             'DateUpdated >=' => Gdn_Format::toDateTime(strtotime('-2 weeks'))
-        );
+        ];
 
         $this->ActivityModel = new ActivityModel();
-        $Activities = $this->ActivityModel->getWhere($Where, '', '', 5, 0)->resultArray();
-        $this->setData('Activities', $Activities);
+        $activities = $this->ActivityModel->getWhere($where, '', '', 5, 0)->resultArray();
+        $this->setData('Activities', $activities);
         $this->ActivityModel->markRead(Gdn::session()->UserID);
 
         $this->setData('Title', t('Notifications'));
@@ -671,7 +678,7 @@ class ProfileController extends Gdn_Controller {
         if ($this->Form->authenticatedPostBack() === true) {
             $this->Form->setFormValue('UserID', $this->User->UserID);
             $this->UserModel->defineSchema();
-//         $this->UserModel->Validation->AddValidationField('OldPassword', $this->Form->formValues());
+//         $this->UserModel->Validation->addValidationField('OldPassword', $this->Form->formValues());
 
             // No password may have been set if they have only signed in with a connect plugin
             if (!$this->User->HashMethod || $this->User->HashMethod == "Vanilla") {
@@ -685,7 +692,9 @@ class ProfileController extends Gdn_Controller {
 
             if ($this->Form->save()) {
                 $this->informMessage(sprite('Check', 'InformSprite').t('Your password has been changed.'), 'Dismissable AutoDismiss HasSprite');
+
                 $this->Form->clearInputs();
+
                 Logger::event(
                     'password_change',
                     Logger::INFO,
@@ -696,7 +705,7 @@ class ProfileController extends Gdn_Controller {
                     'password_change_failure',
                     Logger::INFO,
                     '{InsertName} failed to change password.',
-                    array('Error' => $this->Form->errorString())
+                    ['Error' => $this->Form->errorString()]
                 );
             }
         }
@@ -726,7 +735,7 @@ class ProfileController extends Gdn_Controller {
         }
 
         // Permission checks
-        $this->permission(array('Garden.Profiles.Edit', 'Moderation.Profiles.Edit', 'Garden.ProfilePicture.Edit'), false);
+        $this->permission(['Garden.Profiles.Edit', 'Moderation.Profiles.Edit', 'Garden.ProfilePicture.Edit'], false);
         $session = Gdn::session();
         if (!$session->isValid()) {
             $this->Form->addError('You must be authenticated in order to use this form.');
@@ -783,16 +792,16 @@ class ProfileController extends Gdn_Controller {
             $newAvatar = false;
             if ($tmpAvatar = $upload->validateUpload('Avatar', false)) {
                 // New upload
-                $thumbOptions = array('Crop' => true, 'SaveGif' => c('Garden.Thumbnail.SaveGif'));
+                $thumbOptions = ['Crop' => true, 'SaveGif' => c('Garden.Thumbnail.SaveGif')];
                 $newAvatar = $this->saveAvatars($tmpAvatar, $thumbOptions, $upload);
             } else if ($avatar && $crop && $crop->isCropped()) {
                 // New thumbnail
                 $tmpAvatar = $source;
-                $thumbOptions = array('Crop' => true,
+                $thumbOptions = ['Crop' => true,
                     'SourceX' => $crop->getCropXValue(),
                     'SourceY' => $crop->getCropYValue(),
                     'SourceWidth' => $crop->getCropWidth(),
-                    'SourceHeight' => $crop->getCropHeight());
+                    'SourceHeight' => $crop->getCropHeight()];
                 $newAvatar = $this->saveAvatars($tmpAvatar, $thumbOptions);
             }
             if ($this->Form->errorCount() == 0) {
@@ -882,7 +891,7 @@ class ProfileController extends Gdn_Controller {
                 self::AVATAR_FOLDER."/$subdir/p$imageBaseName",
                 c('Garden.Profile.MaxHeight'),
                 c('Garden.Profile.MaxWidth'),
-                array('SaveGif' => c('Garden.Thumbnail.SaveGif'))
+                ['SaveGif' => c('Garden.Thumbnail.SaveGif')]
             );
 
             $thumbnailSize = c('Garden.Thumbnail.Size');
@@ -903,7 +912,7 @@ class ProfileController extends Gdn_Controller {
         $bak = $this->User->Photo;
 
         $userPhoto = sprintf($parts['SaveFormat'], self::AVATAR_FOLDER."/$subdir/$imageBaseName");
-        if (!$this->UserModel->save(array('UserID' => $this->User->UserID, 'Photo' => $userPhoto), array('CheckExisting' => true))) {
+        if (!$this->UserModel->save(['UserID' => $this->User->UserID, 'Photo' => $userPhoto], ['CheckExisting' => true])) {
             $this->Form->setValidationResults($this->UserModel->validationResults());
         } else {
             $this->User->Photo = $userPhoto;
@@ -917,19 +926,19 @@ class ProfileController extends Gdn_Controller {
     /**
      * Gets or sets a user's preference. This method is meant for ajax calls.
      * @since 2.1
-     * @param string $Key The name of the preference.
+     * @param string $key The name of the preference.
      */
-    public function preference($Key = false) {
+    public function preference($key = false) {
         $this->permission('Garden.SignIn.Allow');
 
         if ($this->Form->authenticatedPostBack()) {
-            $Data = $this->Form->formValues();
-            Gdn::userModel()->SavePreference(Gdn::session()->UserID, $Data);
+            $data = $this->Form->formValues();
+            Gdn::userModel()->savePreference(Gdn::session()->UserID, $data);
         } else {
-            $User = Gdn::userModel()->getID(Gdn::session()->UserID, DATASET_TYPE_ARRAY);
-            $Pref = valr($Key, $User['Preferences'], null);
+            $user = Gdn::userModel()->getID(Gdn::session()->UserID, DATASET_TYPE_ARRAY);
+            $pref = valr($key, $user['Preferences'], null);
 
-            $this->setData($Key, $Pref);
+            $this->setData($key, $pref);
         }
 
         $this->render('Blank', 'Utility');
@@ -940,102 +949,102 @@ class ProfileController extends Gdn_Controller {
      *
      * @since 2.0.0
      * @access public
-     * @param mixed $UserReference Unique identifier, possibly username or ID.
-     * @param string $Username .
-     * @param int $UserID Unique identifier.
+     * @param mixed $userReference Unique identifier, possibly username or ID.
+     * @param string $username .
+     * @param int $userID Unique identifier.
      */
-    public function preferences($UserReference = '', $Username = '', $UserID = '') {
+    public function preferences($userReference = '', $username = '', $userID = '') {
         $this->addJsFile('profile.js');
-        $Session = Gdn::session();
+        $session = Gdn::session();
         $this->permission('Garden.SignIn.Allow');
 
         // Get user data
-        $this->getUserInfo($UserReference, $Username, $UserID, true);
-        $UserPrefs = dbdecode($this->User->Preferences);
-        if ($this->User->UserID != $Session->UserID) {
-            $this->permission(array('Garden.Users.Edit', 'Moderation.Profiles.Edit'), false);
+        $this->getUserInfo($userReference, $username, $userID, true);
+        $userPrefs = dbdecode($this->User->Preferences);
+        if ($this->User->UserID != $session->UserID) {
+            $this->permission(['Garden.Users.Edit', 'Moderation.Profiles.Edit'], false);
         }
 
-        if (!is_array($UserPrefs)) {
-            $UserPrefs = array();
+        if (!is_array($userPrefs)) {
+            $userPrefs = [];
         }
-        $MetaPrefs = UserModel::GetMeta($this->User->UserID, 'Preferences.%', 'Preferences.');
+        $metaPrefs = UserModel::getMeta($this->User->UserID, 'Preferences.%', 'Preferences.');
 
         // Define the preferences to be managed
-        $Notifications = array();
+        $notifications = [];
 
         if (c('Garden.Profile.ShowActivities', true)) {
-            $Notifications = array(
+            $notifications = [
                 'Email.WallComment' => t('Notify me when people write on my wall.'),
                 'Email.ActivityComment' => t('Notify me when people reply to my wall comments.'),
                 'Popup.WallComment' => t('Notify me when people write on my wall.'),
                 'Popup.ActivityComment' => t('Notify me when people reply to my wall comments.')
-            );
+            ];
         }
 
-        $this->Preferences = array('Notifications' => $Notifications);
+        $this->Preferences = ['Notifications' => $notifications];
 
         // Allow email notification of applicants (if they have permission & are using approval registration)
         if (checkPermission('Garden.Users.Approve') && c('Garden.Registration.Method') == 'Approval') {
-            $this->Preferences['Notifications']['Email.Applicant'] = array(t('NotifyApplicant', 'Notify me when anyone applies for membership.'), 'Meta');
+            $this->Preferences['Notifications']['Email.Applicant'] = [t('NotifyApplicant', 'Notify me when anyone applies for membership.'), 'Meta'];
         }
 
         $this->fireEvent('AfterPreferencesDefined');
 
         // Loop through the preferences looking for duplicates, and merge into a single row
-        $this->PreferenceGroups = array();
-        $this->PreferenceTypes = array();
-        foreach ($this->Preferences as $PreferenceGroup => $Preferences) {
-            $this->PreferenceGroups[$PreferenceGroup] = array();
-            $this->PreferenceTypes[$PreferenceGroup] = array();
-            foreach ($Preferences as $Name => $Description) {
-                $Location = 'Prefs';
-                if (is_array($Description)) {
-                    list($Description, $Location) = $Description;
+        $this->PreferenceGroups = [];
+        $this->PreferenceTypes = [];
+        foreach ($this->Preferences as $preferenceGroup => $preferences) {
+            $this->PreferenceGroups[$preferenceGroup] = [];
+            $this->PreferenceTypes[$preferenceGroup] = [];
+            foreach ($preferences as $name => $description) {
+                $location = 'Prefs';
+                if (is_array($description)) {
+                    list($description, $location) = $description;
                 }
 
-                $NameParts = explode('.', $Name);
-                $PrefType = val('0', $NameParts);
-                $SubName = val('1', $NameParts);
-                if ($SubName != false) {
+                $nameParts = explode('.', $name);
+                $prefType = val('0', $nameParts);
+                $subName = val('1', $nameParts);
+                if ($subName != false) {
                     // Save an array of all the different types for this group
-                    if (!in_array($PrefType, $this->PreferenceTypes[$PreferenceGroup])) {
-                        $this->PreferenceTypes[$PreferenceGroup][] = $PrefType;
+                    if (!in_array($prefType, $this->PreferenceTypes[$preferenceGroup])) {
+                        $this->PreferenceTypes[$preferenceGroup][] = $prefType;
                     }
 
                     // Store all the different subnames for the group
-                    if (!array_key_exists($SubName, $this->PreferenceGroups[$PreferenceGroup])) {
-                        $this->PreferenceGroups[$PreferenceGroup][$SubName] = array($Name);
+                    if (!array_key_exists($subName, $this->PreferenceGroups[$preferenceGroup])) {
+                        $this->PreferenceGroups[$preferenceGroup][$subName] = [$name];
                     } else {
-                        $this->PreferenceGroups[$PreferenceGroup][$SubName][] = $Name;
+                        $this->PreferenceGroups[$preferenceGroup][$subName][] = $name;
                     }
                 } else {
-                    $this->PreferenceGroups[$PreferenceGroup][$Name] = array($Name);
+                    $this->PreferenceGroups[$preferenceGroup][$name] = [$name];
                 }
             }
         }
 
         // Loop the preferences, setting defaults from the configuration.
-        $CurrentPrefs = array();
-        foreach ($this->Preferences as $PrefGroup => $Prefs) {
-            foreach ($Prefs as $Pref => $Desc) {
-                $Location = 'Prefs';
-                if (is_array($Desc)) {
-                    list($Desc, $Location) = $Desc;
+        $currentPrefs = [];
+        foreach ($this->Preferences as $prefGroup => $prefs) {
+            foreach ($prefs as $pref => $desc) {
+                $location = 'Prefs';
+                if (is_array($desc)) {
+                    list($desc, $location) = $desc;
                 }
 
-                if ($Location == 'Meta') {
-                    $CurrentPrefs[$Pref] = val($Pref, $MetaPrefs, false);
+                if ($location == 'Meta') {
+                    $currentPrefs[$pref] = val($pref, $metaPrefs, false);
                 } else {
-                    $CurrentPrefs[$Pref] = val($Pref, $UserPrefs, c('Preferences.'.$Pref, '0'));
+                    $currentPrefs[$pref] = val($pref, $userPrefs, c('Preferences.'.$pref, '0'));
                 }
 
-                unset($MetaPrefs[$Pref]);
+                unset($metaPrefs[$pref]);
             }
         }
-        $CurrentPrefs = array_merge($CurrentPrefs, $MetaPrefs);
-        $CurrentPrefs = array_map('intval', $CurrentPrefs);
-        $this->setData('Preferences', $CurrentPrefs);
+        $currentPrefs = array_merge($currentPrefs, $metaPrefs);
+        $currentPrefs = array_map('intval', $currentPrefs);
+        $this->setData('Preferences', $currentPrefs);
 
         if (UserModel::noEmail()) {
             $this->PreferenceGroups = self::_removeEmailPreferences($this->PreferenceGroups);
@@ -1049,44 +1058,44 @@ class ProfileController extends Gdn_Controller {
 
         if ($this->Form->authenticatedPostBack()) {
             // Get, assign, and save the preferences.
-            $NewMetaPrefs = array();
-            foreach ($this->Preferences as $PrefGroup => $Prefs) {
-                foreach ($Prefs as $Pref => $Desc) {
-                    $Location = 'Prefs';
-                    if (is_array($Desc)) {
-                        list($Desc, $Location) = $Desc;
+            $newMetaPrefs = [];
+            foreach ($this->Preferences as $prefGroup => $prefs) {
+                foreach ($prefs as $pref => $desc) {
+                    $location = 'Prefs';
+                    if (is_array($desc)) {
+                        list($desc, $location) = $desc;
                     }
 
-                    $Value = $this->Form->getValue($Pref, null);
-                    if (is_null($Value)) {
+                    $value = $this->Form->getValue($pref, null);
+                    if (is_null($value)) {
                         continue;
                     }
 
-                    if ($Location == 'Meta') {
-                        $NewMetaPrefs[$Pref] = $Value ? $Value : null;
-                        if ($Value) {
-                            $UserPrefs[$Pref] = $Value; // dup for notifications code.
+                    if ($location == 'Meta') {
+                        $newMetaPrefs[$pref] = $value ? $value : null;
+                        if ($value) {
+                            $userPrefs[$pref] = $value; // dup for notifications code.
                         }
                     } else {
-                        if (!$CurrentPrefs[$Pref] && !$Value) {
-                            unset($UserPrefs[$Pref]); // save some space
+                        if (!$currentPrefs[$pref] && !$value) {
+                            unset($userPrefs[$pref]); // save some space
                         } else {
-                            $UserPrefs[$Pref] = $Value;
+                            $userPrefs[$pref] = $value;
                         }
                     }
                 }
             }
 
-            $this->UserModel->savePreference($this->User->UserID, $UserPrefs);
-            UserModel::setMeta($this->User->UserID, $NewMetaPrefs, 'Preferences.');
+            $this->UserModel->savePreference($this->User->UserID, $userPrefs);
+            UserModel::setMeta($this->User->UserID, $newMetaPrefs, 'Preferences.');
 
-            $this->setData('Preferences', array_merge($this->data('Preferences', array()), $UserPrefs, $NewMetaPrefs));
+            $this->setData('Preferences', array_merge($this->data('Preferences', []), $userPrefs, $newMetaPrefs));
 
             if (count($this->Form->errors() == 0)) {
                 $this->informMessage(sprite('Check', 'InformSprite').t('Your preferences have been saved.'), 'Dismissable AutoDismiss HasSprite');
             }
         } else {
-            $this->Form->setData($CurrentPrefs);
+            $this->Form->setData($currentPrefs);
         }
 
         $this->title(t('Notification Preferences'));
@@ -1094,23 +1103,23 @@ class ProfileController extends Gdn_Controller {
         $this->render();
     }
 
-    protected static function _removeEmailPreferences($Data) {
-        $Data = array_filter($Data, array('ProfileController', '_RemoveEmailFilter'));
+    protected static function _removeEmailPreferences($data) {
+        $data = array_filter($data, ['ProfileController', '_RemoveEmailFilter']);
 
-        $Result = array();
-        foreach ($Data as $K => $V) {
-            if (is_array($V)) {
-                $Result[$K] = self::_removeEmailPreferences($V);
+        $result = [];
+        foreach ($data as $k => $v) {
+            if (is_array($v)) {
+                $result[$k] = self::_removeEmailPreferences($v);
             } else {
-                $Result[$K] = $V;
+                $result[$k] = $v;
             }
         }
 
-        return $Result;
+        return $result;
     }
 
-    protected static function _removeEmailFilter($Value) {
-        if (is_string($Value) && strpos($Value, 'Email') !== false) {
+    protected static function _removeEmailFilter($value) {
+        if (is_string($value) && strpos($value, 'Email') !== false) {
             return false;
         }
         return true;
@@ -1121,23 +1130,23 @@ class ProfileController extends Gdn_Controller {
      *
      * @since 2.0.0
      * @access public
-     * @param mixed $UserReference Unique identifier, possibly username or ID.
-     * @param string $Username .
+     * @param mixed $userReference Unique identifier, possibly username or ID.
+     * @param string $username .
      * @param string $tk Security token.
      */
-    public function removePicture($UserReference = '', $Username = '', $tk = '', $deliveryType = '') {
+    public function removePicture($userReference = '', $username = '', $tk = '', $deliveryType = '') {
         $this->permission('Garden.SignIn.Allow');
-        $Session = Gdn::session();
-        if (!$Session->isValid()) {
+        $session = Gdn::session();
+        if (!$session->isValid()) {
             $this->Form->addError('You must be authenticated in order to use this form.');
         }
 
         // Get user data & another permission check.
-        $this->getUserInfo($UserReference, $Username, '', true);
+        $this->getUserInfo($userReference, $username, '', true);
 
-        if ($Session->validateTransientKey($tk) && is_object($this->User)) {
-            $HasRemovePermission = checkPermission('Garden.Users.Edit') || checkPermission('Moderation.Profiles.Edit');
-            if ($this->User->UserID == $Session->UserID || $HasRemovePermission) {
+        if ($session->validateTransientKey($tk) && is_object($this->User)) {
+            $hasRemovePermission = checkPermission('Garden.Users.Edit') || checkPermission('Moderation.Profiles.Edit');
+            if ($this->User->UserID == $session->UserID || $hasRemovePermission) {
                 // Do removal, set message, redirect
                 Gdn::userModel()->removePicture($this->User->UserID);
                 $this->informMessage(t('Your picture has been removed.'));
@@ -1157,20 +1166,20 @@ class ProfileController extends Gdn_Controller {
      *
      * @since 2.0.0
      * @access public
-     * @param int $InvitationID Unique identifier.
+     * @param int $invitationID Unique identifier.
      */
-    public function sendInvite($InvitationID = '') {
+    public function sendInvite($invitationID = '') {
         if (!$this->Form->authenticatedPostBack()) {
             throw forbiddenException('GET');
         }
 
         $this->permission('Garden.SignIn.Allow');
-        $InvitationModel = new InvitationModel();
-        $Session = Gdn::session();
+        $invitationModel = new InvitationModel();
+        $session = Gdn::session();
 
         try {
-            $Email = new Gdn_Email();
-            $InvitationModel->send($InvitationID, $Email);
+            $email = new Gdn_Email();
+            $invitationModel->send($invitationID, $email);
         } catch (Exception $ex) {
             $this->Form->addError(strip_tags($ex->getMessage()));
         }
@@ -1183,22 +1192,22 @@ class ProfileController extends Gdn_Controller {
         $this->invitations();
     }
 
-    public function _setBreadcrumbs($Name = null, $Url = null) {
+    public function _setBreadcrumbs($name = null, $url = null) {
         // Add the root link.
         if (val('UserID', $this->User) == Gdn::session()->UserID) {
-            $Root = array('Name' => t('Profile'), 'Url' => '/profile');
-            $Breadcrumb = array('Name' => $Name, 'Url' => $Url);
+            $root = ['Name' => t('Profile'), 'Url' => '/profile'];
+            $breadcrumb = ['Name' => $name, 'Url' => $url];
         } else {
-            $NameUnique = c('Garden.Registration.NameUnique');
+            $nameUnique = c('Garden.Registration.NameUnique');
 
-            $Root = array('Name' => val('Name', $this->User), 'Url' => userUrl($this->User));
-            $Breadcrumb = array('Name' => $Name, 'Url' => $Url.'/'.($NameUnique ? '' : val('UserID', $this->User).'/').rawurlencode(val('Name', $this->User)));
+            $root = ['Name' => val('Name', $this->User), 'Url' => userUrl($this->User)];
+            $breadcrumb = ['Name' => $name, 'Url' => $url.'/'.($nameUnique ? '' : val('UserID', $this->User).'/').rawurlencode(val('Name', $this->User))];
         }
 
-        $this->Data['Breadcrumbs'][] = $Root;
+        $this->Data['Breadcrumbs'][] = $root;
 
-        if ($Name && !stringBeginsWith($Root['Url'], $Url)) {
-            $this->Data['Breadcrumbs'][] = array('Name' => $Name, 'Url' => $Url);
+        if ($name && !stringBeginsWith($root['Url'], $url)) {
+            $this->Data['Breadcrumbs'][] = ['Name' => $name, 'Url' => $url];
         }
     }
 
@@ -1207,34 +1216,34 @@ class ProfileController extends Gdn_Controller {
      *
      * @since 2.0.0
      * @access public
-     * @param mixed $UserReference Unique identifier, possible username or ID.
-     * @param string $Username .
+     * @param mixed $userReference Unique identifier, possible username or ID.
+     * @param string $username .
      */
-    public function thumbnail($UserReference = '', $Username = '') {
-        $this->picture($UserReference, $Username);
+    public function thumbnail($userReference = '', $username = '') {
+        $this->picture($userReference, $username);
     }
 
     /**
      * Revoke an invitation.
      *
      * @since 2.0.0
-     * @param int $InvitationID Unique identifier.
+     * @param int $invitationID Unique identifier.
      * @throws Exception Throws an exception when the invitation isn't found or the user doesn't have permission to delete it.
      */
-    public function uninvite($InvitationID) {
+    public function uninvite($invitationID) {
         $this->permission('Garden.SignIn.Allow');
 
         if (!$this->Form->authenticatedPostBack()) {
             throw forbiddenException('GET');
         }
 
-        $InvitationModel = new InvitationModel();
-        $Session = Gdn::session();
+        $invitationModel = new InvitationModel();
+        $session = Gdn::session();
         try {
-            $Valid = $InvitationModel->delete($InvitationID, $this->UserModel);
-            if ($Valid) {
+            $valid = $invitationModel->delete($invitationID, $this->UserModel);
+            if ($valid) {
                 $this->informMessage(t('The invitation was removed successfully.'));
-                $this->jsonTarget(".js-invitation[data-id=\"{$InvitationID}\"]", '', 'SlideUp');
+                $this->jsonTarget(".js-invitation[data-id=\"{$invitationID}\"]", '', 'SlideUp');
             }
         } catch (Exception $ex) {
             $this->Form->addError(strip_tags($ex->getMessage()));
@@ -1254,28 +1263,28 @@ class ProfileController extends Gdn_Controller {
      *
      * @since 2.0.0
      * @access public
-     * @param mixed $TabName Tab name (or array of tab names) to add to the profile tab collection.
-     * @param string $TabUrl URL the tab should point to.
-     * @param string $CssClass Class property to apply to tab.
-     * @param string $TabHtml Overrides tab's HTML.
+     * @param mixed $tabName Tab name (or array of tab names) to add to the profile tab collection.
+     * @param string $tabUrl URL the tab should point to.
+     * @param string $cssClass Class property to apply to tab.
+     * @param string $tabHtml Overrides tab's HTML.
      */
-    public function addProfileTab($TabName, $TabUrl = '', $CssClass = '', $TabHtml = '') {
-        if (!is_array($TabName)) {
-            if ($TabHtml == '') {
-                $TabHtml = $TabName;
+    public function addProfileTab($tabName, $tabUrl = '', $cssClass = '', $tabHtml = '') {
+        if (!is_array($tabName)) {
+            if ($tabHtml == '') {
+                $tabHtml = $tabName;
             }
 
-            $TabName = array($TabName => array('TabUrl' => $TabUrl, 'CssClass' => $CssClass, 'TabHtml' => $TabHtml));
+            $tabName = [$tabName => ['TabUrl' => $tabUrl, 'CssClass' => $cssClass, 'TabHtml' => $tabHtml]];
         }
 
-        foreach ($TabName as $Name => $TabInfo) {
-            $Url = val('TabUrl', $TabInfo, '');
-            if ($Url == '') {
-                $TabInfo['TabUrl'] = userUrl($this->User, '', strtolower($Name));
+        foreach ($tabName as $name => $tabInfo) {
+            $url = val('TabUrl', $tabInfo, '');
+            if ($url == '') {
+                $tabInfo['TabUrl'] = userUrl($this->User, '', strtolower($name));
             }
 
-            $this->ProfileTabs[$Name] = $TabInfo;
-            $this->_ProfileTabs[$Name] = $TabInfo; // Backwards Compatibility
+            $this->ProfileTabs[$name] = $tabInfo;
+            $this->_ProfileTabs[$name] = $tabInfo; // Backwards Compatibility
         }
     }
 
@@ -1284,9 +1293,9 @@ class ProfileController extends Gdn_Controller {
      *
      * @since 2.0.0
      * @access public
-     * @param string $CurrentUrl Path to highlight.
+     * @param string $currentUrl Path to highlight.
      */
-    public function addSideMenu($CurrentUrl = '') {
+    public function addSideMenu($currentUrl = '') {
         if (!$this->User) {
             return;
         }
@@ -1296,13 +1305,13 @@ class ProfileController extends Gdn_Controller {
 
         // Show edit menu if in edit mode
         // Show profile pic & filter menu otherwise
-        $SideMenu = new SideMenuModule($this);
-        $this->EventArguments['SideMenu'] = &$SideMenu; // Doing this out here for backwards compatibility.
+        $sideMenu = new SideMenuModule($this);
+        $this->EventArguments['SideMenu'] = &$sideMenu; // Doing this out here for backwards compatibility.
         if ($this->EditMode) {
             $this->addModule('UserBoxModule');
-            $this->buildEditMenu($SideMenu, $CurrentUrl);
+            $this->buildEditMenu($sideMenu, $currentUrl);
             $this->fireEvent('AfterAddSideMenu');
-            $this->addModule($SideMenu, 'Panel');
+            $this->addModule($sideMenu, 'Panel');
         } else {
             // Make sure the userphoto module gets added to the page
             $this->addModule('UserPhotoModule');
@@ -1314,45 +1323,45 @@ class ProfileController extends Gdn_Controller {
     }
 
     /**
-     * @param SideMenuModule $Module
-     * @param string $CurrentUrl
+     * @param SideMenuModule $module
+     * @param string $currentUrl
      */
-    public function buildEditMenu(&$Module, $CurrentUrl = '') {
+    public function buildEditMenu(&$module, $currentUrl = '') {
         if (!$this->User) {
             return;
         }
 
-        $Module->HtmlId = 'UserOptions';
-        $Module->AutoLinkGroups = false;
-        $Session = Gdn::session();
-        $ViewingUserID = $Session->UserID;
-        $Module->addItem('Options', '', false, array('class' => 'SideMenu'));
+        $module->HtmlId = 'UserOptions';
+        $module->AutoLinkGroups = false;
+        $session = Gdn::session();
+        $viewingUserID = $session->UserID;
+        $module->addItem('Options', '', false, ['class' => 'SideMenu']);
 
         // Check that we have the necessary tools to allow image uploading
-        $AllowImages = $this->CanEditPhotos && Gdn_UploadImage::canUploadImages();
+        $allowImages = $this->CanEditPhotos && Gdn_UploadImage::canUploadImages();
 
         // Is the photo hosted remotely?
-        $RemotePhoto = isUrl($this->User->Photo);
+        $remotePhoto = isUrl($this->User->Photo);
 
-        if ($this->User->UserID != $ViewingUserID) {
+        if ($this->User->UserID != $viewingUserID) {
             // Include user js files for people with edit users permissions
             if (checkPermission('Garden.Users.Edit') || checkPermission('Moderation.Profiles.Edit')) {
 //              $this->addJsFile('jquery.gardenmorepager.js');
                 $this->addJsFile('user.js');
             }
-            $Module->addLink('Options', sprite('SpProfile').' '.t('Edit Profile'), userUrl($this->User, '', 'edit'), array('Garden.Users.Edit', 'Moderation.Profiles.Edit'), array('class' => 'Popup EditAccountLink'));
-            $Module->addLink('Options', sprite('SpProfile').' '.t('Edit Account'), '/user/edit/'.$this->User->UserID, 'Garden.Users.Edit', array('class' => 'Popup EditAccountLink'));
-            $Module->addLink('Options', sprite('SpDelete').' '.t('Delete Account'), '/user/delete/'.$this->User->UserID, 'Garden.Users.Delete', array('class' => 'Popup DeleteAccountLink'));
-            $Module->addLink('Options', sprite('SpPreferences').' '.t('Edit Preferences'), userUrl($this->User, '', 'preferences'), array('Garden.Users.Edit', 'Moderation.Profiles.Edit'), array('class' => 'Popup PreferencesLink'));
+            $module->addLink('Options', sprite('SpProfile').' '.t('Edit Profile'), userUrl($this->User, '', 'edit'), ['Garden.Users.Edit', 'Moderation.Profiles.Edit'], ['class' => 'Popup EditAccountLink']);
+            $module->addLink('Options', sprite('SpProfile').' '.t('Edit Account'), '/user/edit/'.$this->User->UserID, 'Garden.Users.Edit', ['class' => 'Popup EditAccountLink']);
+            $module->addLink('Options', sprite('SpDelete').' '.t('Delete Account'), '/user/delete/'.$this->User->UserID, 'Garden.Users.Delete', ['class' => 'Popup DeleteAccountLink']);
+            $module->addLink('Options', sprite('SpPreferences').' '.t('Edit Preferences'), userUrl($this->User, '', 'preferences'), ['Garden.Users.Edit', 'Moderation.Profiles.Edit'], ['class' => 'Popup PreferencesLink']);
 
             // Add profile options for everyone
-            $Module->addLink('Options', sprite('SpPicture').' '.t('Change Picture'), userUrl($this->User, '', 'picture'), array('Garden.Users.Edit', 'Moderation.Profiles.Edit'), array('class' => 'PictureLink'));
-            if ($this->User->Photo != '' && $AllowImages && !$RemotePhoto) {
-                $Module->addLink('Options', sprite('SpThumbnail').' '.t('Edit Thumbnail'), userUrl($this->User, '', 'thumbnail'), array('Garden.Users.Edit', 'Moderation.Profiles.Edit'), array('class' => 'ThumbnailLink'));
+            $module->addLink('Options', sprite('SpPicture').' '.t('Change Picture'), userUrl($this->User, '', 'picture'), ['Garden.Users.Edit', 'Moderation.Profiles.Edit'], ['class' => 'PictureLink']);
+            if ($this->User->Photo != '' && $allowImages && !$remotePhoto) {
+                $module->addLink('Options', sprite('SpThumbnail').' '.t('Edit Thumbnail'), userUrl($this->User, '', 'thumbnail'), ['Garden.Users.Edit', 'Moderation.Profiles.Edit'], ['class' => 'ThumbnailLink']);
             }
         } else {
             if (hasEditProfile($this->User->UserID)) {
-                $Module->addLink('Options', sprite('SpEdit').' '.t('Edit Profile'), '/profile/edit', false, array('class' => 'Popup EditAccountLink'));
+                $module->addLink('Options', sprite('SpEdit').' '.t('Edit Profile'), '/profile/edit', false, ['class' => 'Popup EditAccountLink']);
             }
 
             // Add profile options for the profile owner
@@ -1366,25 +1375,25 @@ class ProfileController extends Gdn_Controller {
             // external app.
             if (c('Garden.UserAccount.AllowEdit') && c('Garden.Registration.Method') != 'Connect') {
                 // No password may have been set if they have only signed in with a connect plugin
-                $PasswordLabel = t('Change My Password');
+                $passwordLabel = t('Change My Password');
                 if ($this->User->HashMethod && $this->User->HashMethod != "Vanilla") {
-                    $PasswordLabel = t('Set A Password');
+                    $passwordLabel = t('Set A Password');
                 }
-                $Module->addLink('Options', sprite('SpPassword').' '.$PasswordLabel, '/profile/password', false, array('class' => 'Popup PasswordLink'));
+                $module->addLink('Options', sprite('SpPassword').' '.$passwordLabel, '/profile/password', false, ['class' => 'Popup PasswordLink']);
             }
 
-            $Module->addLink('Options', sprite('SpPreferences').' '.t('Notification Preferences'), userUrl($this->User, '', 'preferences'), false, array('class' => 'Popup PreferencesLink'));
-            if ($AllowImages) {
-                $Module->addLink('Options', sprite('SpPicture').' '.t('Change My Picture'), '/profile/picture', array('Garden.Profiles.Edit', 'Garden.ProfilePicture.Edit'), array('class' => 'PictureLink'));
+            $module->addLink('Options', sprite('SpPreferences').' '.t('Notification Preferences'), userUrl($this->User, '', 'preferences'), false, ['class' => 'Popup PreferencesLink']);
+            if ($allowImages) {
+                $module->addLink('Options', sprite('SpPicture').' '.t('Change My Picture'), '/profile/picture', ['Garden.Profiles.Edit', 'Garden.ProfilePicture.Edit'], ['class' => 'PictureLink']);
             }
         }
 
-        if ($this->User->UserID == $ViewingUserID || $Session->checkPermission('Garden.Users.Edit')) {
-            $this->setData('Connections', array());
+        if ($this->User->UserID == $viewingUserID || $session->checkPermission('Garden.Users.Edit')) {
+            $this->setData('Connections', []);
             $this->EventArguments['User'] = $this->User;
             $this->fireEvent('GetConnections');
             if (count($this->data('Connections')) > 0) {
-                $Module->addLink('Options', sprite('SpConnection').' '.t('Social'), '/profile/connections', 'Garden.SignIn.Allow', array('class' => 'link-social'));
+                $module->addLink('Options', sprite('SpConnection').' '.t('Social'), '/profile/connections', 'Garden.SignIn.Allow', ['class' => 'link-social']);
             }
         }
     }
@@ -1404,7 +1413,7 @@ class ProfileController extends Gdn_Controller {
             throw new Exception(t('Cannot build profile information if user is not defined.'));
         }
 
-        $Session = Gdn::session();
+        $session = Gdn::session();
         if (strpos($this->CssClass, 'Profile') === false) {
             $this->CssClass .= ' Profile';
         }
@@ -1419,26 +1428,26 @@ class ProfileController extends Gdn_Controller {
             $this->addJsFile('activity.js');
 
             // Build activity URL
-            $ActivityUrl = 'profile/activity/';
-            if ($this->User->UserID != $Session->UserID) {
-                $ActivityUrl = userUrl($this->User, '', 'activity');
+            $activityUrl = 'profile/activity/';
+            if ($this->User->UserID != $session->UserID) {
+                $activityUrl = userUrl($this->User, '', 'activity');
             }
 
             // Show activity?
             if (c('Garden.Profile.ShowActivities', true)) {
-                $this->addProfileTab(t('Activity'), $ActivityUrl, 'Activity', sprite('SpActivity').' '.t('Activity'));
+                $this->addProfileTab(t('Activity'), $activityUrl, 'Activity', sprite('SpActivity').' '.t('Activity'));
             }
 
             // Show notifications?
-            if ($this->User->UserID == $Session->UserID) {
-                $Notifications = t('Notifications');
-                $NotificationsHtml = sprite('SpNotifications').' '.$Notifications;
-                $CountNotifications = $Session->User->CountNotifications;
-                if (is_numeric($CountNotifications) && $CountNotifications > 0) {
-                    $NotificationsHtml .= ' <span class="Aside"><span class="Count">'.$CountNotifications.'</span></span>';
+            if ($this->User->UserID == $session->UserID) {
+                $notifications = t('Notifications');
+                $notificationsHtml = sprite('SpNotifications').' '.$notifications;
+                $countNotifications = $session->User->CountNotifications;
+                if (is_numeric($countNotifications) && $countNotifications > 0) {
+                    $notificationsHtml .= ' <span class="Aside"><span class="Count">'.$countNotifications.'</span></span>';
                 }
 
-                $this->addProfileTab($Notifications, 'profile/notifications', 'Notifications', $NotificationsHtml);
+                $this->addProfileTab($notifications, 'profile/notifications', 'Notifications', $notificationsHtml);
             }
 
             // Show invitations?
@@ -1457,33 +1466,33 @@ class ProfileController extends Gdn_Controller {
      *
      * @since 2.0.?
      * @access public
-     * @param int $UserID Unique ID.
+     * @param int $userID Unique ID.
      */
-    public function get($UserID = false) {
-        if (!$UserID) {
-            $UserID = Gdn::session()->UserID;
+    public function get($userID = false) {
+        if (!$userID) {
+            $userID = Gdn::session()->UserID;
         }
 
-        if (($UserID != Gdn::session()->UserID || !Gdn::session()->UserID) && !checkPermission('Garden.Users.Edit')) {
+        if (($userID != Gdn::session()->UserID || !Gdn::session()->UserID) && !checkPermission('Garden.Users.Edit')) {
             throw new Exception(t('You do not have permission to view other profiles.'), 401);
         }
 
-        $UserModel = new UserModel();
+        $userModel = new UserModel();
 
         // Get the user.
-        $User = $UserModel->getID($UserID, DATASET_TYPE_ARRAY);
-        if (!$User) {
+        $user = $userModel->getID($userID, DATASET_TYPE_ARRAY);
+        if (!$user) {
             throw notFoundException('User');
         }
 
-        $PhotoUrl = $User['Photo'];
-        if ($PhotoUrl && strpos($PhotoUrl, '//') == false) {
-            $PhotoUrl = url('/uploads/'.changeBasename($PhotoUrl, 'n%s'), true);
+        $photoUrl = $user['Photo'];
+        if ($photoUrl && strpos($photoUrl, '//') == false) {
+            $photoUrl = url('/uploads/'.changeBasename($photoUrl, 'n%s'), true);
         }
-        $User['Photo'] = $PhotoUrl;
+        $user['Photo'] = $photoUrl;
 
         // Remove unwanted fields.
-        $this->Data = arrayTranslate($User, array('UserID', 'Name', 'Email', 'Photo'));
+        $this->Data = arrayTranslate($user, ['UserID', 'Name', 'Email', 'Photo']);
 
         $this->render();
     }
@@ -1494,12 +1503,12 @@ class ProfileController extends Gdn_Controller {
      * @since 2.0.0
      * @access public
      * @param mixed $User Unique identifier, possibly username or ID.
-     * @param string $Username .
-     * @param int $UserID Unique ID.
-     * @param bool $CheckPermissions Whether or not to check user permissions.
+     * @param string $username .
+     * @param int $userID Unique ID.
+     * @param bool $checkPermissions Whether or not to check user permissions.
      * @return bool Always true.
      */
-    public function getUserInfo($UserReference = '', $Username = '', $UserID = '', $CheckPermissions = false) {
+    public function getUserInfo($userReference = '', $username = '', $userID = '', $checkPermissions = false) {
         if ($this->_UserInfoRetrieved) {
             return;
         }
@@ -1509,22 +1518,22 @@ class ProfileController extends Gdn_Controller {
         }
 
         // If a UserID was provided as a querystring parameter, use it over anything else:
-        if ($UserID) {
-            $UserReference = $UserID;
-            $Username = 'Unknown'; // Fill this with a value so the $UserReference is assumed to be an integer/userid.
+        if ($userID) {
+            $userReference = $userID;
+            $username = 'Unknown'; // Fill this with a value so the $UserReference is assumed to be an integer/userid.
         }
 
-        $this->Roles = array();
-        if ($UserReference == '') {
-            if ($Username) {
-                $this->User = $this->UserModel->getByUsername($Username);
+        $this->Roles = [];
+        if ($userReference == '') {
+            if ($username) {
+                $this->User = $this->UserModel->getByUsername($username);
             } else {
                 $this->User = $this->UserModel->getID(Gdn::session()->UserID);
             }
-        } elseif (is_numeric($UserReference) && $Username != '') {
-            $this->User = $this->UserModel->getID($UserReference);
+        } elseif (is_numeric($userReference) && $username != '') {
+            $this->User = $this->UserModel->getID($userReference);
         } else {
-            $this->User = $this->UserModel->getByUsername($UserReference);
+            $this->User = $this->UserModel->getByUsername($userReference);
         }
 
         $this->fireEvent('UserLoaded');
@@ -1546,13 +1555,13 @@ class ProfileController extends Gdn_Controller {
 
             $this->setData('Profile', $this->User);
             $this->setData('UserRoles', $this->Roles);
-            if ($CssClass = val('_CssClass', $this->User)) {
-                $this->CssClass .= ' '.$CssClass;
+            if ($cssClass = val('_CssClass', $this->User)) {
+                $this->CssClass .= ' '.$cssClass;
             }
         }
 
-        if ($CheckPermissions && Gdn::session()->UserID != $this->User->UserID) {
-            $this->permission(array('Garden.Users.Edit', 'Moderation.Profiles.Edit'), false);
+        if ($checkPermissions && Gdn::session()->UserID != $this->User->UserID) {
+            $this->permission(['Garden.Users.Edit', 'Moderation.Profiles.Edit'], false);
         }
 
         $this->addSideMenu();
@@ -1565,55 +1574,55 @@ class ProfileController extends Gdn_Controller {
      *
      * @since 2.0.0
      * @access public
-     * @param mixed $UserReference Unique identifier, possibly username or ID.
-     * @param string $UserID Unique ID.
+     * @param mixed $userReference Unique identifier, possibly username or ID.
+     * @param string $userID Unique ID.
      * @return string Relative URL path.
      */
-    public function profileUrl($UserReference = null, $UserID = null) {
+    public function profileUrl($userReference = null, $userID = null) {
         if (!property_exists($this, 'User')) {
             $this->getUserInfo();
         }
 
-        if ($UserReference === null) {
-            $UserReference = $this->User->Name;
+        if ($userReference === null) {
+            $userReference = $this->User->Name;
         }
-        if ($UserID === null) {
-            $UserID = $this->User->UserID;
+        if ($userID === null) {
+            $userID = $this->User->UserID;
         }
 
-        $UserReferenceEnc = rawurlencode($UserReference);
-        if ($UserReferenceEnc == $UserReference) {
-            return $UserReferenceEnc;
+        $userReferenceEnc = rawurlencode($userReference);
+        if ($userReferenceEnc == $userReference) {
+            return $userReferenceEnc;
         } else {
-            return "$UserID/$UserReferenceEnc";
+            return "$userID/$userReferenceEnc";
         }
     }
 
     /**
      *
      *
-     * @param string|int|null $UserReference
-     * @param int|null $UserID
+     * @param string|int|null $userReference
+     * @param int|null $userID
      * @return string
      * @throws Exception
      */
-    public function getProfileUrl($UserReference = null, $UserID = null) {
+    public function getProfileUrl($userReference = null, $userID = null) {
         if (!property_exists($this, 'User')) {
             $this->getUserInfo();
         }
 
-        if ($UserReference === null) {
-            $UserReference = $this->User->Name;
+        if ($userReference === null) {
+            $userReference = $this->User->Name;
         }
-        if ($UserID === null) {
-            $UserID = $this->User->UserID;
+        if ($userID === null) {
+            $userID = $this->User->UserID;
         }
 
-        $UserReferenceEnc = rawurlencode($UserReference);
-        if ($UserReferenceEnc == $UserReference) {
-            return $UserReferenceEnc;
+        $userReferenceEnc = rawurlencode($userReference);
+        if ($userReferenceEnc == $userReference) {
+            return $userReferenceEnc;
         } else {
-            return "$UserID/$UserReferenceEnc";
+            return "$userID/$userReferenceEnc";
         }
     }
 
@@ -1622,40 +1631,40 @@ class ProfileController extends Gdn_Controller {
      *
      * @since 2.0.0
      * @access public
-     * @param string $CurrentTab Name of tab to highlight.
-     * @param string $View View name. Defaults to index.
-     * @param string $Controller Controller name. Defaults to Profile.
-     * @param string $Application Application name. Defaults to Dashboard.
+     * @param string $currentTab Name of tab to highlight.
+     * @param string $view View name. Defaults to index.
+     * @param string $controller Controller name. Defaults to Profile.
+     * @param string $application Application name. Defaults to Dashboard.
      */
-    public function setTabView($CurrentTab, $View = '', $Controller = 'Profile', $Application = 'Dashboard') {
+    public function setTabView($currentTab, $view = '', $controller = 'Profile', $application = 'Dashboard') {
         $this->buildProfile();
-        if ($View == '') {
-            $View = $CurrentTab;
+        if ($view == '') {
+            $view = $currentTab;
         }
 
         if ($this->_DeliveryType == DELIVERY_TYPE_ALL && $this->SyndicationMethod == SYNDICATION_NONE) {
             $this->addDefinition('DefaultAbout', t('Write something about yourself...'));
             $this->View = 'index';
-            $this->_TabView = $View;
-            $this->_TabController = $Controller;
-            $this->_TabApplication = $Application;
+            $this->_TabView = $view;
+            $this->_TabController = $controller;
+            $this->_TabApplication = $application;
         } else {
-            $this->View = $View;
-            $this->ControllerName = $Controller;
-            $this->ApplicationFolder = $Application;
+            $this->View = $view;
+            $this->ControllerName = $controller;
+            $this->ApplicationFolder = $application;
         }
-        $this->CurrentTab = t($CurrentTab);
+        $this->CurrentTab = t($currentTab);
         $this->_CurrentTab = $this->CurrentTab; // Backwards Compat
     }
 
-    public function editMode($Switch) {
+    public function editMode($switch) {
 
-        $this->EditMode = $Switch;
+        $this->EditMode = $switch;
         if (!$this->EditMode && strpos($this->CssClass, 'EditMode') !== false) {
             $this->CssClass = str_replace('EditMode', '', $this->CssClass);
         }
 
-        if ($Switch) {
+        if ($switch) {
             Gdn_Theme::section('EditProfile');
         } else {
             Gdn_Theme::section('EditProfile', 'remove');
@@ -1666,9 +1675,9 @@ class ProfileController extends Gdn_Controller {
      * Fetch multiple users
      *
      * Note: API only
-     * @param type $UserID
+     * @param type $userID
      */
-    public function multi($UserID) {
+    public function multi($userID) {
         $this->permission('Garden.Settings.Manage');
         $this->deliveryMethod(DELIVERY_METHOD_JSON);
         $this->deliveryType(DELIVERY_TYPE_DATA);
@@ -1676,16 +1685,16 @@ class ProfileController extends Gdn_Controller {
         // Get rid of Reactions busybody data
         unset($this->Data['Counts']);
 
-        $UserID = (array)$UserID;
-        $Users = Gdn::userModel()->getIDs($UserID);
+        $userID = (array)$userID;
+        $users = Gdn::userModel()->getIDs($userID);
 
-        $AllowedFields = array('UserID', 'Name', 'Title', 'Location', 'About', 'Email', 'Gender', 'CountVisits', 'CountInvitations', 'CountNotifications', 'Admin', 'Verified', 'Banned', 'Deleted', 'CountDiscussions', 'CountComments', 'CountBookmarks', 'CountBadges', 'Points', 'Punished', 'RankID', 'PhotoUrl', 'Online', 'LastOnlineDate');
-        $AllowedFields = array_fill_keys($AllowedFields, null);
-        foreach ($Users as &$User) {
-            $User = array_intersect_key($User, $AllowedFields);
+        $allowedFields = ['UserID', 'Name', 'Title', 'Location', 'About', 'Email', 'Gender', 'CountVisits', 'CountInvitations', 'CountNotifications', 'Admin', 'Verified', 'Banned', 'Deleted', 'CountDiscussions', 'CountComments', 'CountBookmarks', 'CountBadges', 'Points', 'Punished', 'RankID', 'PhotoUrl', 'Online', 'LastOnlineDate'];
+        $allowedFields = array_fill_keys($allowedFields, null);
+        foreach ($users as &$user) {
+            $user = array_intersect_key($user, $allowedFields);
         }
-        $Users = array_values($Users);
-        $this->setData('Users', $Users);
+        $users = array_values($users);
+        $this->setData('Users', $users);
 
         $this->render();
     }

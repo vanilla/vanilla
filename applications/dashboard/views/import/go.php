@@ -8,7 +8,7 @@
 echo $this->Form->errors();
 
 $CurrentStep = val('CurrentStep', $this->Data, 0);
-$Steps = val('Steps', $this->Data, array());
+$Steps = val('Steps', $this->Data, []);
 $Complete = FALSE;
 
 if ($CurrentStep > 0 && !array_key_exists($CurrentStep, $Steps)) {
@@ -47,15 +47,15 @@ if ($CurrentStep > 0 && !array_key_exists($CurrentStep, $Steps)) {
             /**
              * Add spaces to a camel case word by putting a space before every capital letter.
              */
-            function _SpacifyCamelCase($Str) {
-                $Result = '';
-                for ($i = 0; $i < strlen($Str); $i++) {
-                    $c = substr($Str, $i, 1);
-                    if ($Result && strtoupper($c) === $c && strtoupper($Str[$i - 1]) != $Str[$i - 1])
-                        $Result .= ' ';
-                    $Result .= $c;
+            function _SpacifyCamelCase($str) {
+                $result = '';
+                for ($i = 0; $i < strlen($str); $i++) {
+                    $c = substr($str, $i, 1);
+                    if ($result && strtoupper($c) === $c && strtoupper($str[$i - 1]) != $str[$i - 1])
+                        $result .= ' ';
+                    $result .= $c;
                 }
-                return $Result;
+                return $result;
             }
 
             ?>

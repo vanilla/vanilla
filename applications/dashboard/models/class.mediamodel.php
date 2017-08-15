@@ -19,30 +19,30 @@ class MediaModel extends Gdn_Model {
     /**
      * Get a media row by ID.
      *
-     * @param int $MediaID The ID of the media entry.
-     * @param string $DatasetType The format of the result dataset.
-     * @param array $Options options to pass to the database.
+     * @param int $mediaID The ID of the media entry.
+     * @param string $datasetType The format of the result dataset.
+     * @param array $options options to pass to the database.
      * @return array|object|false Returns the media row or **false** if it isn't found.
      */
-    public function getID($MediaID, $DatasetType = false, $Options = []) {
+    public function getID($mediaID, $datasetType = false, $options = []) {
         $this->fireEvent('BeforeGetID');
-        return parent::getID($MediaID, $DatasetType, $Options);
+        return parent::getID($mediaID, $datasetType, $options);
     }
 
     /**
      * Assing an attachment to another record.
      *
-     * @param $ForeignID
-     * @param $ForeignTable
-     * @param $NewForeignID
-     * @param $NewForeignTable
+     * @param $foreignID
+     * @param $foreignTable
+     * @param $newForeignID
+     * @param $newForeignTable
      * @return Gdn_Dataset
      */
-    public function reassign($ForeignID, $ForeignTable, $NewForeignID, $NewForeignTable) {
+    public function reassign($foreignID, $foreignTable, $newForeignID, $newForeignTable) {
         $this->fireEvent('BeforeReassign');
         return $this->update(
-            ['ForeignID' => $NewForeignID, 'ForeignTable' => $NewForeignTable],
-            ['ForeignID' => $ForeignID, 'ForeignTable' => $ForeignTable]
+            ['ForeignID' => $newForeignID, 'ForeignTable' => $newForeignTable],
+            ['ForeignID' => $foreignID, 'ForeignTable' => $foreignTable]
         );
     }
 
@@ -114,34 +114,34 @@ class MediaModel extends Gdn_Model {
      *
      * @deprecated
      *
-     * @param $Media
-     * @param $Options
+     * @param $media
+     * @param $options
      * @return bool|Gdn_DataSet|object|string|void
      */
-    private function deprecatedDelete($Media, $Options) {
-        if (is_bool($Options)) {
-            $DeleteFile = $Options;
+    private function deprecatedDelete($media, $options) {
+        if (is_bool($options)) {
+            $deleteFile = $options;
         } else {
-            $lcOptions = array_change_key_case($Options, CASE_LOWER);
-            $DeleteFile = val('delete', $lcOptions, true);
+            $lcOptions = array_change_key_case($options, CASE_LOWER);
+            $deleteFile = val('delete', $lcOptions, true);
         }
 
-        $MediaID = false;
-        if (is_a($Media, 'stdClass')) {
-            $Media = (array)$Media;
+        $mediaID = false;
+        if (is_a($media, 'stdClass')) {
+            $media = (array)$media;
         }
 
-        if (is_numeric($Media)) {
-            $MediaID = $Media;
+        if (is_numeric($media)) {
+            $mediaID = $media;
         }
-        elseif (array_key_exists('MediaID', $Media)) {
-            $MediaID = $Media['MediaID'];
+        elseif (array_key_exists('MediaID', $media)) {
+            $mediaID = $media['MediaID'];
         }
 
-        if ($MediaID) {
-            return $this->delete(['MediaID' => $MediaID], ['deleteFile' => $DeleteFile]);
+        if ($mediaID) {
+            return $this->delete(['MediaID' => $mediaID], ['deleteFile' => $deleteFile]);
         } else {
-            return $this->SQL->delete($this->Name, $Media);
+            return $this->SQL->delete($this->Name, $media);
         }
     }
 
@@ -150,12 +150,12 @@ class MediaModel extends Gdn_Model {
      *
      * @deprecated
      *
-     * @param $ParentTable
-     * @param $ParentID
+     * @param $parentTable
+     * @param $parentID
      */
-    public function deleteParent($ParentTable, $ParentID) {
+    public function deleteParent($parentTable, $parentID) {
         deprecated(__METHOD__.'($ParentTable, $ParentID)', 'deleteUsingParent($recordType, $recordID)');
-        $this->deleteUsingParent($ParentTable, $ParentID);
+        $this->deleteUsingParent($parentTable, $parentID);
     }
 
     /**

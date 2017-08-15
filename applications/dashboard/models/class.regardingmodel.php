@@ -23,60 +23,60 @@ class RegardingModel extends Gdn_Model {
     /**
      *
      *
-     * @param mixed $RegardingID
+     * @param mixed $regardingID
      * @return array|bool|stdClass
      */
-    public function getID($RegardingID) {
-        $Regarding = $this->getWhere(array('RegardingID' => $RegardingID))->firstRow();
-        return $Regarding;
+    public function getID($regardingID) {
+        $regarding = $this->getWhere(['RegardingID' => $regardingID])->firstRow();
+        return $regarding;
     }
 
     /**
      *
      *
-     * @param string|unknown_type $ForeignType
-     * @param string|unknown_type $ForeignID
+     * @param string|unknown_type $foreignType
+     * @param string|unknown_type $foreignID
      * @return array|bool|stdClass
      */
-    public function get($ForeignType, $ForeignID) {
-        return $this->getWhere(array(
-            'ForeignType' => $ForeignType,
-            'ForeignID' => $ForeignID
-        ))->firstRow(DATASET_TYPE_ARRAY);
+    public function get($foreignType, $foreignID) {
+        return $this->getWhere([
+            'ForeignType' => $foreignType,
+            'ForeignID' => $foreignID
+        ])->firstRow(DATASET_TYPE_ARRAY);
     }
 
     /**
      *
      *
-     * @param $Type
-     * @param $ForeignType
-     * @param $ForeignID
+     * @param $type
+     * @param $foreignType
+     * @param $foreignID
      * @return array|bool|stdClass
      */
-    public function getRelated($Type, $ForeignType, $ForeignID) {
-        return $this->getWhere(array(
-            'Type' => $Type,
-            'ForeignType' => $ForeignType,
-            'ForeignID' => $ForeignID
-        ))->firstRow(DATASET_TYPE_ARRAY);
+    public function getRelated($type, $foreignType, $foreignID) {
+        return $this->getWhere([
+            'Type' => $type,
+            'ForeignType' => $foreignType,
+            'ForeignID' => $foreignID
+        ])->firstRow(DATASET_TYPE_ARRAY);
     }
 
     /**
      *
      *
-     * @param $ForeignType
-     * @param array $ForeignIDs
+     * @param $foreignType
+     * @param array $foreignIDs
      * @return Gdn_DataSet
      */
-    public function getAll($ForeignType, $ForeignIDs = array()) {
-        if (count($ForeignIDs) == 0) {
-            return new Gdn_DataSet(array());
+    public function getAll($foreignType, $foreignIDs = []) {
+        if (count($foreignIDs) == 0) {
+            return new Gdn_DataSet([]);
         }
 
         return Gdn::sql()->select('*')
             ->from('Regarding')
-            ->where('ForeignType', $ForeignType)
-            ->whereIn('ForeignID', $ForeignIDs)
+            ->where('ForeignType', $foreignType)
+            ->whereIn('ForeignID', $foreignIDs)
             ->get();
     }
 }

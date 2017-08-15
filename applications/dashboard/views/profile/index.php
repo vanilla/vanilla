@@ -3,7 +3,7 @@
     <?php
     include($this->fetchViewLocation('user'));
     // include($this->fetchViewLocation('tabs'));
-    echo Gdn_Theme::Module('ProfileFilterModule');
+    echo Gdn_Theme::module('ProfileFilterModule');
     echo $this->fetchView($this->_TabView, $this->_TabController, $this->_TabApplication);
     ?>
 </div>

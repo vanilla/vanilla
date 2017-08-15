@@ -7,7 +7,7 @@ if (count($this->data('Activities'))) {
     echo '<ul class="DataList Activities Notifications">';
     include($this->fetchViewLocation('activities', 'activity', 'dashboard'));
     echo '</ul>';
-    echo PagerModule::write(array('CurrentRecords' => count($this->data('Activities'))));
+    echo PagerModule::write(['CurrentRecords' => count($this->data('Activities'))]);
 } else {
     ?>
     <div class="Empty"><?php echo t('Notifications will appear here.', t('You do not have any notifications yet.')); ?></div>

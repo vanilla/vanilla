@@ -9,21 +9,21 @@
 /**
  * Writes a pocket to the page
  *
- * @param array $Params The parameters passed into the function.
+ * @param array $params The parameters passed into the function.
  * The parameters that can be passed to this function are as follows.
  * - <b>name</b>: The name of the pocket.
- * @param Smarty $Smarty The smarty object rendering the template.
+ * @param Smarty $smarty The smarty object rendering the template.
  * @return string The pocket string.
  */
-function smarty_function_pocket($Params, $Smarty) {
+function smarty_function_pocket($params, $smarty) {
     if (!class_exists('PocketsPlugin')) {
         return '';
     }
 
-    $Name = val('name', $Params);
-    unset($Params['name']);
+    $name = val('name', $params);
+    unset($params['name']);
 
-    $Result = PocketsPlugin::pocketString($Name, $Params);
+    $result = PocketsPlugin::pocketString($name, $params);
 
-	return $Result;
+	return $result;
 }

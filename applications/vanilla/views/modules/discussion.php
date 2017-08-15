@@ -10,4 +10,4 @@ if (!function_exists('WriteModuleDiscussion')) {
     require_once Gdn::controller()->fetchViewLocation('helper_functions', 'Discussions', 'Vanilla');
 }
 
-WriteModuleDiscussion($Discussion, $this->Prefix);
+writeModuleDiscussion($Discussion, $this->Prefix);

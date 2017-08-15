@@ -9,7 +9,7 @@ helpAsset(t('Need More Help?'), $links);
 echo heading(t('Import'));
 echo '<div class="padded">'
     .sprintf(t('Garden.Import.Description', 'Use this page to import data from another forum that was exported using Vanilla Porter. For more information <a href="%s">see our importing documentation</a>.'), 'http://docs.vanillaforums.com/developers/importing/')
-    .Wrap(t('You can place files in your /uploads folder.', 'If your file is too
+    .wrap(t('You can place files in your /uploads folder.', 'If your file is too
 		large to upload directly to this page you can place it in your /uploads
 		folder. Make sure the filename begins with the word <b>export</b> and ends
 		with one of <b>.txt, .gz</b>.'), 'p')
@@ -26,7 +26,7 @@ If you are importing a very large file (ex. over 200,000 comments) you might wan
     <?php echo t('Garden.Import.Overwrite.Description', 'Warning: All data in this forum will be overwritten.'); ?>
 </div>
 <?php
-echo $this->Form->open(array('enctype' => 'multipart/form-data'));
+echo $this->Form->open(['enctype' => 'multipart/form-data']);
 echo $this->Form->errors();
 ?>
 <ul>
@@ -36,7 +36,7 @@ echo $this->Form->errors();
             <?php
             foreach ($this->data('ImportPaths') as $Path => $Text) {
                 echo '<div>',
-                $this->Form->Radio('PathSelect', $Text, array('value' => $Path)),
+                $this->Form->radio('PathSelect', $Text, ['value' => $Path]),
                 '</div>';
             }
             ?>
@@ -74,7 +74,7 @@ echo $this->Form->errors();
         <li class="form-group">
             <?php echo $this->Form->labelWrap('Generate import SQL only', 'GenerateSQL'); ?>
             <div class="input-wrap">
-                <?php echo $this->Form->CheckBox('GenerateSQL'); ?>
+                <?php echo $this->Form->checkBox('GenerateSQL'); ?>
             </div>
         </li>
     </ul>

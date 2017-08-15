@@ -3,7 +3,7 @@ echo heading(t('Vanilla Plugin for WordPress'), '', '', [], '/embed/forum');
 ?>
 <div class="media media-addon">
     <div class="media-left">
-        <?php echo wrap(img('applications/dashboard/design/images/vanilla-wordpress.png', array('class' => 'PluginIcon')), 'div', ['class' => 'media-image-wrap']); ?>
+        <?php echo wrap(img('applications/dashboard/design/images/vanilla-wordpress.png', ['class' => 'PluginIcon']), 'div', ['class' => 'media-image-wrap']); ?>
     </div>
     <div class="media-body">
         <div class="media-heading"><div class="media-title"><?php echo t('Vanilla Plugin for WordPress'); ?></div>

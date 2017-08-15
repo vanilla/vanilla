@@ -258,6 +258,9 @@ class RequestTest extends \PHPUnit\Framework\TestCase {
     }
 
     public function testUrlEquivalence() {
+        // Simulate that rewrite is ON
+        $_SERVER['X_REWRITE'] = 1;
+
         $req = new Gdn_Request();
 
         $req->setScheme('http');

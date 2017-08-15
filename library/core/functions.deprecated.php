@@ -9,25 +9,25 @@ if (!function_exists('addActivity')) {
     /**
      * A convenience function that allows adding to the activity table with a single line.
      *
-     * @param int $ActivityUserID The user committing the activity.
-     * @param string $ActivityType The type of activity.
-     * @param string $Story The story section of the activity.
-     * @param string $RegardingUserID The user the activity is being performed on.
-     * @param string $Route The path of the data the activity is for.
-     * @param string $SendEmail Whether or not to send an email with the activity.
+     * @param int $activityUserID The user committing the activity.
+     * @param string $activityType The type of activity.
+     * @param string $story The story section of the activity.
+     * @param string $regardingUserID The user the activity is being performed on.
+     * @param string $route The path of the data the activity is for.
+     * @param string $sendEmail Whether or not to send an email with the activity.
      * @return int The ID of the new activity or zero on error.
      * @deprecated
      */
     function addActivity(
-        $ActivityUserID,
-        $ActivityType,
-        $Story = '',
-        $RegardingUserID = '',
-        $Route = '',
-        $SendEmail = ''
+        $activityUserID,
+        $activityType,
+        $story = '',
+        $regardingUserID = '',
+        $route = '',
+        $sendEmail = ''
     ) {
-        $ActivityModel = new ActivityModel();
-        return $ActivityModel->Add($ActivityUserID, $ActivityType, $Story, $RegardingUserID, '', $Route, $SendEmail);
+        $activityModel = new ActivityModel();
+        return $activityModel->add($activityUserID, $activityType, $story, $regardingUserID, '', $route, $sendEmail);
     }
 }
 
@@ -35,31 +35,31 @@ if (!function_exists('arrayInArray')) {
     /**
      * Check to see if an array contains another array.
      *
-     * Searches {@link $Haystack} array for items in {@link $Needle} array. If FullMatch is true,
+     * Searches {@link $haystack} array for items in {@link $needle} array. If FullMatch is true,
      * all items in Needle must also be in Haystack. If FullMatch is false, only
      * one-or-more items in Needle must be in Haystack.
      *
-     * @param array $Needle The array containing items to match to Haystack.
-     * @param array $Haystack The array to search in for Needle items.
-     * @param bool $FullMatch Should all items in Needle be found in Haystack to return true?
+     * @param array $needle The array containing items to match to Haystack.
+     * @param array $haystack The array to search in for Needle items.
+     * @param bool $fullMatch Should all items in Needle be found in Haystack to return true?
      * @deprecated
      */
-    function arrayInArray($Needle, $Haystack, $FullMatch = true) {
-        $Count = count($Needle);
-        $Return = $FullMatch ? true : false;
-        for ($i = 0; $i < $Count; ++$i) {
-            if ($FullMatch === true) {
-                if (in_array($Needle[$i], $Haystack) === false) {
-                    $Return = false;
+    function arrayInArray($needle, $haystack, $fullMatch = true) {
+        $count = count($needle);
+        $return = $fullMatch ? true : false;
+        for ($i = 0; $i < $count; ++$i) {
+            if ($fullMatch === true) {
+                if (in_array($needle[$i], $haystack) === false) {
+                    $return = false;
                 }
             } else {
-                if (in_array($Needle[$i], $Haystack) === true) {
-                    $Return = true;
+                if (in_array($needle[$i], $haystack) === true) {
+                    $return = true;
                     break;
                 }
             }
         }
-        return $Return;
+        return $return;
     }
 }
 
@@ -83,12 +83,12 @@ if (!function_exists('arrayValuesToKeys')) {
     /**
      * Take an array's values and apply them to a new array as both the keys and values.
      *
-     * @param array $Array The array to combine.
+     * @param array $array The array to combine.
      * @deprecated
      * @see array_combine()
      */
-    function arrayValuesToKeys($Array) {
-        return array_combine(array_values($Array), $Array);
+    function arrayValuesToKeys($array) {
+        return array_combine(array_values($array), $array);
     }
 }
 
@@ -96,38 +96,38 @@ if (!function_exists('checkRequirements')) {
     /**
      * Check an addon's requirements.
      *
-     * @param string $ItemName The name of the item checking requirements.
-     * @param array $RequiredItems An array of requirements.
-     * @param array $EnabledItems An array of currently enabled items to check against.
+     * @param string $itemName The name of the item checking requirements.
+     * @param array $requiredItems An array of requirements.
+     * @param array $enabledItems An array of currently enabled items to check against.
      * @throws Gdn_UserException Throws an exception if there are missing requirements.
      * @deprecated
      */
-    function checkRequirements($ItemName, $RequiredItems, $EnabledItems) {
+    function checkRequirements($itemName, $requiredItems, $enabledItems) {
         deprecated('checkRequirements()', 'AddonManager');
 
         // 1. Make sure that $RequiredItems are present
-        if (is_array($RequiredItems)) {
-            $MissingRequirements = array();
+        if (is_array($requiredItems)) {
+            $missingRequirements = [];
 
-            foreach ($RequiredItems as $RequiredItemName => $RequiredVersion) {
-                if (!array_key_exists($RequiredItemName, $EnabledItems)) {
-                    $MissingRequirements[] = "$RequiredItemName $RequiredVersion";
-                } elseif ($RequiredVersion && $RequiredVersion != '*') { // * means any version
+            foreach ($requiredItems as $requiredItemName => $requiredVersion) {
+                if (!array_key_exists($requiredItemName, $enabledItems)) {
+                    $missingRequirements[] = "$requiredItemName $requiredVersion";
+                } elseif ($requiredVersion && $requiredVersion != '*') { // * means any version
                     // If the item exists and is enabled, check the version
-                    $EnabledVersion = val('Version', val($RequiredItemName, $EnabledItems, array()), '');
+                    $enabledVersion = val('Version', val($requiredItemName, $enabledItems, []), '');
                     // Compare the versions.
-                    if (version_compare($EnabledVersion, $RequiredVersion, '<')) {
-                        $MissingRequirements[] = "$RequiredItemName $RequiredVersion";
+                    if (version_compare($enabledVersion, $requiredVersion, '<')) {
+                        $missingRequirements[] = "$requiredItemName $requiredVersion";
                     }
                 }
             }
-            if (count($MissingRequirements) > 0) {
-                $Msg = sprintf(
+            if (count($missingRequirements) > 0) {
+                $msg = sprintf(
                     "%s is missing the following requirement(s): %s.",
-                    $ItemName,
-                    implode(', ', $MissingRequirements)
+                    $itemName,
+                    implode(', ', $missingRequirements)
                 );
-                throw new Gdn_UserException($Msg);
+                throw new Gdn_UserException($msg);
             }
         }
     }
@@ -140,13 +140,13 @@ if (!function_exists('compareHashDigest')) {
      * This snippet prevents HMAC Timing attacks (http://codahale.com/a-lesson-in-timing-attacks/).
      * Thanks to Eric Karulf (ekarulf @ github) for this fix.
      *
-     * @param string $Digest1 The first digest to compare.
-     * @param string $Digest2 The second digest to compare.
+     * @param string $digest1 The first digest to compare.
+     * @param string $digest2 The second digest to compare.
      * @return bool Returns true if the digests match or false otherwise.
      */
-    function compareHashDigest($Digest1, $Digest2) {
+    function compareHashDigest($digest1, $digest2) {
         deprecated('compareHashDigest', 'hash_equals');
-        return hash_equals($Digest1, $Digest2);
+        return hash_equals($digest1, $digest2);
     }
 }
 
@@ -154,39 +154,39 @@ if (!function_exists('ConsolidateArrayValuesByKey')) {
     /**
      * Return the values from a single column in the input array.
      *
-     * Take an array of associative arrays (ie. a dataset array), a $Key, and
+     * Take an array of associative arrays (ie. a dataset array), a $key, and
      * merges all of the values for that key into a single array, returning it.
      *
-     * @param array $Array The input array.
-     * @param string|int $Key The key to consolidate by.
-     * @param string|int $ValueKey An optional secondary key to use take the values for.
-     * @param mixed $DefaultValue The value to use if there is no {@link $ValueKey} in the array.
+     * @param array $array The input array.
+     * @param string|int $key The key to consolidate by.
+     * @param string|int $valueKey An optional secondary key to use take the values for.
+     * @param mixed $defaultValue The value to use if there is no {@link $valueKey} in the array.
      * @deprecated Use {@link array_column()} instead.
      */
-    function consolidateArrayValuesByKey($Array, $Key, $ValueKey = '', $DefaultValue = null) {
+    function consolidateArrayValuesByKey($array, $key, $valueKey = '', $defaultValue = null) {
         deprecated(__FUNCTION__, 'array_column');
 
-        $Return = array();
-        foreach ($Array as $Index => $AssociativeArray) {
-            if (is_object($AssociativeArray)) {
-                if ($ValueKey === '') {
-                    $Return[] = $AssociativeArray->$Key;
-                } elseif (property_exists($AssociativeArray, $ValueKey)) {
-                    $Return[$AssociativeArray->$Key] = $AssociativeArray->$ValueKey;
+        $return = [];
+        foreach ($array as $index => $associativeArray) {
+            if (is_object($associativeArray)) {
+                if ($valueKey === '') {
+                    $return[] = $associativeArray->$key;
+                } elseif (property_exists($associativeArray, $valueKey)) {
+                    $return[$associativeArray->$key] = $associativeArray->$valueKey;
                 } else {
-                    $Return[$AssociativeArray->$Key] = $DefaultValue;
+                    $return[$associativeArray->$key] = $defaultValue;
                 }
-            } elseif (is_array($AssociativeArray) && array_key_exists($Key, $AssociativeArray)) {
-                if ($ValueKey === '') {
-                    $Return[] = $AssociativeArray[$Key];
-                } elseif (array_key_exists($ValueKey, $AssociativeArray)) {
-                    $Return[$AssociativeArray[$Key]] = $AssociativeArray[$ValueKey];
+            } elseif (is_array($associativeArray) && array_key_exists($key, $associativeArray)) {
+                if ($valueKey === '') {
+                    $return[] = $associativeArray[$key];
+                } elseif (array_key_exists($valueKey, $associativeArray)) {
+                    $return[$associativeArray[$key]] = $associativeArray[$valueKey];
                 } else {
-                    $Return[$AssociativeArray[$Key]] = $DefaultValue;
+                    $return[$associativeArray[$key]] = $defaultValue;
                 }
             }
         }
-        return $Return;
+        return $return;
     }
 }
 
@@ -194,24 +194,24 @@ if (!function_exists('cTo')) {
     /**
      * Set a value in an deep array.
      *
-     * @param array &$Data The array to set.
-     * @param string $Name A dot separated set of keys to set.
-     * @param mixed $Value The value to set.
+     * @param array &$data The array to set.
+     * @param string $name A dot separated set of keys to set.
+     * @param mixed $value The value to set.
      * @deprecated Use {@link setvalr()}.
      */
-    function cTo(&$Data, $Name, $Value) {
-        $Name = explode('.', $Name);
-        $LastKey = array_pop($Name);
-        $Current =& $Data;
+    function cTo(&$data, $name, $value) {
+        $name = explode('.', $name);
+        $lastKey = array_pop($name);
+        $current =& $data;
 
-        foreach ($Name as $Key) {
-            if (!isset($Current[$Key])) {
-                $Current[$Key] = array();
+        foreach ($name as $key) {
+            if (!isset($current[$key])) {
+                $current[$key] = [];
             }
 
-            $Current =& $Current[$Key];
+            $current =& $current[$key];
         }
-        $Current[$LastKey] = $Value;
+        $current[$lastKey] = $value;
     }
 }
 
@@ -226,8 +226,8 @@ if (!function_exists('forceSSL')) {
      */
     function forceSSL() {
         if (c('Garden.AllowSSL')) {
-            if (Gdn::Request()->Scheme() != 'https') {
-                redirectTo(Gdn::Request()->Url('', true, true));
+            if (Gdn::request()->scheme() != 'https') {
+                redirectTo(Gdn::request()->url('', true, true));
             }
         }
     }
@@ -243,8 +243,8 @@ if (!function_exists('forceNoSSL')) {
      * @deprecated
      */
     function forceNoSSL() {
-        if (Gdn::Request()->Scheme() != 'http') {
-            redirectTo(Gdn::Request()->Url('', true, false));
+        if (Gdn::request()->scheme() != 'http') {
+            redirectTo(Gdn::request()->url('', true, false));
         }
     }
 }
@@ -262,21 +262,21 @@ if (!function_exists('formatArrayAssignment')) {
         if (is_array($value)) {
             // If $Value doesn't contain a key of "0" OR it does and it's value IS
             // an array, this should be treated as an associative array.
-            $IsAssociativeArray = array_key_exists(0, $value) === false || is_array($value[0]) === true ? true : false;
-            if ($IsAssociativeArray === true) {
+            $isAssociativeArray = array_key_exists(0, $value) === false || is_array($value[0]) === true ? true : false;
+            if ($isAssociativeArray === true) {
                 foreach ($value as $k => $v) {
                     formatArrayAssignment($array, $prefix."['$k']", $v);
                 }
             } else {
                 // If $Value is not an associative array, just write it like a simple array definition.
-                $FormattedValue = array_map(array('Gdn_Format', 'ArrayValueForPhp'), $value);
-                $array[] = $prefix .= " = array('".implode("', '", $FormattedValue)."');";
+                $formattedValue = array_map(['Gdn_Format', 'ArrayValueForPhp'], $value);
+                $array[] = $prefix .= " = array('".implode("', '", $formattedValue)."');";
             }
         } elseif (is_int($value)) {
             $array[] = $prefix .= ' = '.$value.';';
         } elseif (is_bool($value)) {
             $array[] = $prefix .= ' = '.($value ? 'true' : 'false').';';
-        } elseif (in_array($value, array('true', 'false'))) {
+        } elseif (in_array($value, ['true', 'false'])) {
             $array[] = $prefix .= ' = '.($value == 'true' ? 'true' : 'false').';';
         } else {
             $array[] = $prefix .= ' = '.var_export($value, true).';';
@@ -297,16 +297,16 @@ if (!function_exists('formatDottedAssignment')) {
         if (is_array($value)) {
             // If $Value doesn't contain a key of "0" OR it does and it's value IS
             // an array, this should be treated as an associative array.
-            $IsAssociativeArray = array_key_exists(0, $value) === false || is_array($value[0]) === true ? true : false;
-            if ($IsAssociativeArray === true) {
+            $isAssociativeArray = array_key_exists(0, $value) === false || is_array($value[0]) === true ? true : false;
+            if ($isAssociativeArray === true) {
                 foreach ($value as $k => $v) {
                     formatDottedAssignment($array, "{$prefix}.{$k}", $v);
                 }
             } else {
                 // If $Value is not an associative array, just write it like a simple array definition.
-                $FormattedValue = array_map(array('Gdn_Format', 'ArrayValueForPhp'), $value);
+                $formattedValue = array_map(['Gdn_Format', 'ArrayValueForPhp'], $value);
                 $prefix .= "']";
-                $array[] = $prefix .= " = array('".implode("', '", $FormattedValue)."');";
+                $array[] = $prefix .= " = array('".implode("', '", $formattedValue)."');";
             }
         } else {
             $prefix .= "']";
@@ -314,7 +314,7 @@ if (!function_exists('formatDottedAssignment')) {
                 $array[] = $prefix .= ' = '.$value.';';
             } elseif (is_bool($value)) {
                 $array[] = $prefix .= ' = '.($value ? 'true' : 'false').';';
-            } elseif (in_array($value, array('true', 'false'))) {
+            } elseif (in_array($value, ['true', 'false'])) {
                 $array[] = $prefix .= ' = '.($value == 'true' ? 'true' : 'false').';';
             } else {
                 $array[] = $prefix .= ' = '.var_export($value, true).';';
@@ -325,25 +325,25 @@ if (!function_exists('formatDottedAssignment')) {
 
 if (!function_exists('getIncomingValue')) {
     /**
-     * Grab {@link $FieldName} from either the GET or POST collections.
+     * Grab {@link $fieldName} from either the GET or POST collections.
      *
      * This function checks $_POST first.
      *
-     * @param string $FieldName The key of the field to get.
-     * @param mixed $Default The value to return if the field is not found.
-     * @return mixed Returns the value of the field or {@link $Default}.
+     * @param string $fieldName The key of the field to get.
+     * @param mixed $default The value to return if the field is not found.
+     * @return mixed Returns the value of the field or {@link $default}.
      *
-     * @deprecated Use the various methods on {@link Gdn::Request()}.
+     * @deprecated Use the various methods on {@link Gdn::request()}.
      */
-    function getIncomingValue($FieldName, $Default = false) {
-        if (array_key_exists($FieldName, $_POST) === true) {
-            $Result = filter_input(INPUT_POST, $FieldName, FILTER_SANITIZE_STRING); //FILTER_REQUIRE_ARRAY);
-        } elseif (array_key_exists($FieldName, $_GET) === true) {
-            $Result = filter_input(INPUT_GET, $FieldName, FILTER_SANITIZE_STRING); //, FILTER_REQUIRE_ARRAY);
+    function getIncomingValue($fieldName, $default = false) {
+        if (array_key_exists($fieldName, $_POST) === true) {
+            $result = filter_input(INPUT_POST, $fieldName, FILTER_SANITIZE_STRING); //FILTER_REQUIRE_ARRAY);
+        } elseif (array_key_exists($fieldName, $_GET) === true) {
+            $result = filter_input(INPUT_GET, $fieldName, FILTER_SANITIZE_STRING); //, FILTER_REQUIRE_ARRAY);
         } else {
-            $Result = $Default;
+            $result = $default;
         }
-        return $Result;
+        return $result;
     }
 }
 
@@ -351,30 +351,30 @@ if (!function_exists('getObject')) {
     /**
      * Get a value off of an object.
      *
-     * @param string $Property The name of the property on the object.
-     * @param object $Object The object that contains the value.
-     * @param mixed $Default The default to return if the object doesn't contain the property.
+     * @param string $property The name of the property on the object.
+     * @param object $object The object that contains the value.
+     * @param mixed $default The default to return if the object doesn't contain the property.
      * @return mixed
      * @deprecated getObject() is deprecated. Use val() instead.
      */
-    function getObject($Property, $Object, $Default) {
+    function getObject($property, $object, $default) {
         trigger_error('GetObject() is deprecated. Use GetValue() instead.', E_USER_DEPRECATED);
-        $Result = val($Property, $Object, $Default);
-        return $Result;
+        $result = val($property, $object, $default);
+        return $result;
     }
 }
 
 if (!function_exists('getPostValue')) {
     /**
-     * Return the value for $FieldName from the $_POST collection.
+     * Return the value for $fieldName from the $_POST collection.
      *
-     * @param string $FieldName The key of the field to get.
-     * @param mixed $Default The value to return if the field is not found.
-     * @return mixed Returns the value of the field or {@link $Default}.
+     * @param string $fieldName The key of the field to get.
+     * @param mixed $default The value to return if the field is not found.
+     * @return mixed Returns the value of the field or {@link $default}.
      * @deprecated
      */
-    function getPostValue($FieldName, $Default = false) {
-        return array_key_exists($FieldName, $_POST) ? $_POST[$FieldName] : $Default;
+    function getPostValue($fieldName, $default = false) {
+        return array_key_exists($fieldName, $_POST) ? $_POST[$fieldName] : $default;
     }
 }
 
@@ -390,20 +390,20 @@ if (!function_exists('getValue')) {
      * @deprecated Deprecated since 2.2. Use {@link val()} instead.
      */
     function getValue($key, &$collection, $default = false, $remove = false) {
-        $Result = $default;
+        $result = $default;
         if (is_array($collection) && array_key_exists($key, $collection)) {
-            $Result = $collection[$key];
+            $result = $collection[$key];
             if ($remove) {
                 unset($collection[$key]);
             }
         } elseif (is_object($collection) && property_exists($collection, $key)) {
-            $Result = $collection->$key;
+            $result = $collection->$key;
             if ($remove) {
                 unset($collection->$key);
             }
         }
 
-        return $Result;
+        return $result;
     }
 }
 
@@ -411,26 +411,26 @@ if (!function_exists('mergeArrays')) {
     /**
      * Merge two associative arrays into a single array.
      *
-     * @param array &$Dominant The "dominant" array, who's values will be chosen over those of the subservient.
-     * @param array $Subservient The "subservient" array, who's values will be disregarded over those of the dominant.
+     * @param array &$dominant The "dominant" array, who's values will be chosen over those of the subservient.
+     * @param array $subservient The "subservient" array, who's values will be disregarded over those of the dominant.
      * @deprecated Use {@link array_merge_recursive()}
      */
-    function mergeArrays(&$Dominant, $Subservient) {
-        foreach ($Subservient as $Key => $Value) {
-            if (!array_key_exists($Key, $Dominant)) {
+    function mergeArrays(&$dominant, $subservient) {
+        foreach ($subservient as $key => $value) {
+            if (!array_key_exists($key, $dominant)) {
                 // Add the key from the subservient array if it doesn't exist in the
                 // dominant array.
-                $Dominant[$Key] = $Value;
+                $dominant[$key] = $value;
             } else {
                 // If the key already exists in the dominant array, only continue if
                 // both values are also arrays - because we don't want to overwrite
                 // values in the dominant array with ones from the subservient array.
-                if (is_array($Dominant[$Key]) && is_array($Value)) {
-                    $Dominant[$Key] = MergeArrays($Dominant[$Key], $Value);
+                if (is_array($dominant[$key]) && is_array($value)) {
+                    $dominant[$key] = mergeArrays($dominant[$key], $value);
                 }
             }
         }
-        return $Dominant;
+        return $dominant;
     }
 }
 
@@ -494,44 +494,44 @@ if (!function_exists('prepareArray')) {
     /**
      * Makes sure that the key in question exists and is of the specified type, by default also an array.
      *
-     * @param string $Key Key to prepare.
-     * @param array &$Array Array to prepare.
-     * @param string $PrepareType Optional.
+     * @param string $key Key to prepare.
+     * @param array &$array Array to prepare.
+     * @param string $prepareType Optional.
      * @deprecated
      */
-    function prepareArray($Key, &$Array, $PrepareType = 'array') {
-        if (!array_key_exists($Key, $Array)) {
-            $Array[$Key] = null;
+    function prepareArray($key, &$array, $prepareType = 'array') {
+        if (!array_key_exists($key, $array)) {
+            $array[$key] = null;
         }
 
-        switch ($PrepareType) {
+        switch ($prepareType) {
             case 'array':
-                if (!is_array($Array[$Key])) {
-                    $Array[$Key] = array();
+                if (!is_array($array[$key])) {
+                    $array[$key] = [];
                 }
                 break;
 
             case 'integer':
-                if (!is_integer($Array[$Key])) {
-                    $Array[$Key] = 0;
+                if (!is_integer($array[$key])) {
+                    $array[$key] = 0;
                 }
                 break;
 
             case 'float':
-                if (!is_float($Array[$Key])) {
-                    $Array[$Key] = 0.0;
+                if (!is_float($array[$key])) {
+                    $array[$key] = 0.0;
                 }
                 break;
 
             case 'null':
-                if (!is_null($Array[$Key])) {
-                    $Array[$Key] = null;
+                if (!is_null($array[$key])) {
+                    $array[$key] = null;
                 }
                 break;
 
             case 'string':
-                if (!is_string($Array[$Key])) {
-                    $Array[$Key] = '';
+                if (!is_string($array[$key])) {
+                    $array[$key] = '';
                 }
                 break;
         }
@@ -542,32 +542,32 @@ if (!function_exists('redirect')) {
     /**
      * Redirect to another URL.
      *
-     * This function wraps {@link $Destination} in the {@link url()} function.
+     * This function wraps {@link $destination} in the {@link url()} function.
      *
      * @deprecated
-     * @param string|false $Destination The destination of the redirect.
+     * @param string|false $destination The destination of the redirect.
      * Pass a falsey value to redirect to the current URL.
-     * @param int|null $StatusCode The status of the redirect. This defaults to 302.
+     * @param int|null $statusCode The status of the redirect. This defaults to 302.
      */
-    function redirect($Destination = false, $StatusCode = null) {
+    function redirect($destination = false, $statusCode = null) {
         deprecated(__FUNCTION__, 'redirectTo');
 
-        if (!$Destination) {
-            $Destination = '';
+        if (!$destination) {
+            $destination = '';
         }
 
         // Close any db connections before exit
-        $Database = Gdn::Database();
-        if ($Database instanceof Gdn_Database) {
-            $Database->CloseConnection();
+        $database = Gdn::database();
+        if ($database instanceof Gdn_Database) {
+            $database->closeConnection();
         }
         // Clear out any previously sent content
         @ob_end_clean();
 
         // assign status code
-        $SendCode = (is_null($StatusCode)) ? 302 : $StatusCode;
+        $sendCode = (is_null($statusCode)) ? 302 : $statusCode;
         // re-assign the location header
-        safeHeader("Location: ".Url($Destination), true, $SendCode);
+        safeHeader("Location: ".url($destination), true, $sendCode);
         // Exit
         exit();
     }
@@ -585,16 +585,16 @@ if (!function_exists('redirectUrl')) {
         deprecated(__FUNCTION__, 'redirectTo');
 
         if (!$url) {
-            $url = Url('', true);
+            $url = url('', true);
         }
 
         // Close any db connections before exit
-        $Database = Gdn::Database();
-        $Database->CloseConnection();
+        $database = Gdn::database();
+        $database->closeConnection();
         // Clear out any previously sent content
         @ob_end_clean();
 
-        if (!in_array($code, array(301, 302))) {
+        if (!in_array($code, [301, 302])) {
             $code = 302;
         }
 
@@ -609,24 +609,24 @@ if (!function_exists('removeKeyFromArray')) {
     /**
      * Remove a value from an array at a certain key.
      *
-     * @param array $Array The input array.
-     * @param string|int $Key The key to remove.
-     * @return mixed Returns a copy of {@link $Array} with the key removed.
+     * @param array $array The input array.
+     * @param string|int $key The key to remove.
+     * @return mixed Returns a copy of {@link $array} with the key removed.
      * @deprecated Use unset() instead.
      */
-    function removeKeyFromArray($Array, $Key) {
-        if (!is_array($Key)) {
-            $Key = array($Key);
+    function removeKeyFromArray($array, $key) {
+        if (!is_array($key)) {
+            $key = [$key];
         }
 
-        $Count = count($Key);
-        for ($i = 0; $i < $Count; $i++) {
-            $KeyIndex = array_keys(array_keys($Array), $Key[$i]);
-            if (count($KeyIndex) > 0) {
-                array_splice($Array, $KeyIndex[0], 1);
+        $count = count($key);
+        for ($i = 0; $i < $count; $i++) {
+            $keyIndex = array_keys(array_keys($array), $key[$i]);
+            if (count($keyIndex) > 0) {
+                array_splice($array, $keyIndex[0], 1);
             }
         }
-        return $Array;
+        return $array;
     }
 }
 
@@ -634,13 +634,13 @@ if (!function_exists('removeQuoteSlashes')) {
     /**
      * Remove the slashes from escaped quotes in a string.
      *
-     * @param string $String The input string.
-     * @return string Returns a copy of {@link $String} with the slashes removed.
+     * @param string $string The input string.
+     * @return string Returns a copy of {@link $string} with the slashes removed.
      * @deprecated
      */
-    function removeQuoteSlashes($String) {
+    function removeQuoteSlashes($string) {
         deprecated('removeQuoteSlashes()');
-        return str_replace("\\\"", '"', $String);
+        return str_replace("\\\"", '"', $string);
     }
 }
 
@@ -648,15 +648,15 @@ if (!function_exists('removeValueFromArray')) {
     /**
      * Remove a value from an array.
      *
-     * @param array &$Array The input array.
-     * @param mixed $Value The value to search for and remove.
+     * @param array &$array The input array.
+     * @param mixed $value The value to search for and remove.
      * @deprecated
      */
-    function removeValueFromArray(&$Array, $Value) {
+    function removeValueFromArray(&$array, $value) {
         deprecated('removeValueFromArray()');
-        foreach ($Array as $key => $val) {
-            if ($val == $Value) {
-                unset($Array[$key]);
+        foreach ($array as $key => $val) {
+            if ($val == $value) {
+                unset($array[$key]);
                 break;
             }
         }
@@ -667,32 +667,32 @@ if (!function_exists('safeParseStr')) {
     /**
      * An alternate implementation of {@link parse_str()}.
      *
-     * @param string $Str The query string to parse.
-     * @param array &$Output The array of results.
-     * @param array|null $Original Do not use.
+     * @param string $str The query string to parse.
+     * @param array &$output The array of results.
+     * @param array|null $original Do not use.
      * @deprecated
      * @see parse_str()
      */
-    function safeParseStr($Str, &$Output, $Original = null) {
-        $Exploded = explode('&', $Str);
-        $Output = array();
-        if (is_array($Original)) {
-            $FirstValue = reset($Original);
-            $FirstKey = key($Original);
-            unset($Original[$FirstKey]);
+    function safeParseStr($str, &$output, $original = null) {
+        $exploded = explode('&', $str);
+        $output = [];
+        if (is_array($original)) {
+            $firstValue = reset($original);
+            $firstKey = key($original);
+            unset($original[$firstKey]);
         }
-        foreach ($Exploded as $Parameter) {
-            $Parts = explode('=', $Parameter);
-            $Key = $Parts[0];
-            $Value = count($Parts) > 1 ? $Parts[1] : '';
+        foreach ($exploded as $parameter) {
+            $parts = explode('=', $parameter);
+            $key = $parts[0];
+            $value = count($parts) > 1 ? $parts[1] : '';
 
-            if (!is_null($Original)) {
-                $Output[$Key] = $FirstValue;
-                $Output = array_merge($Output, $Original);
+            if (!is_null($original)) {
+                $output[$key] = $firstValue;
+                $output = array_merge($output, $original);
                 break;
             }
 
-            $Output[$Key] = $Value;
+            $output[$key] = $value;
         }
     }
 }
@@ -702,36 +702,36 @@ if (!function_exists('safeRedirect')) {
      * Redirect, but only to a safe domain.
      *
      * @deprecated
-     * @param string $Destination Where to redirect.
-     * @param int $StatusCode The status of the redirect. Defaults to 302.
+     * @param string $destination Where to redirect.
+     * @param int $statusCode The status of the redirect. Defaults to 302.
      */
-    function safeRedirect($Destination = false, $StatusCode = null) {
+    function safeRedirect($destination = false, $statusCode = null) {
         deprecated(__FUNCTION__, 'redirectTo');
 
-        if (!$Destination) {
-            $Destination = Url('', true);
+        if (!$destination) {
+            $destination = url('', true);
         } else {
-            $Destination = Url($Destination, true);
+            $destination = url($destination, true);
         }
 
-        $trustedDomains = TrustedDomains();
+        $trustedDomains = trustedDomains();
         $isTrustedDomain = false;
 
         foreach ($trustedDomains as $trustedDomain) {
-            if (urlMatch($trustedDomain, $Destination)) {
+            if (urlMatch($trustedDomain, $destination)) {
                 $isTrustedDomain = true;
                 break;
             }
         }
 
         if ($isTrustedDomain) {
-            redirectTo($Destination, $StatusCode, false);
+            redirectTo($destination, $statusCode, false);
         } else {
             Logger::notice('Redirect to untrusted domain: {url}.', [
-                'url' => $Destination
+                'url' => $destination
             ]);
 
-            redirectTo("/home/leaving?Target=".urlencode($Destination));
+            redirectTo("/home/leaving?Target=".urlencode($destination));
         }
     }
 }
@@ -741,17 +741,17 @@ if (!function_exists('trueStripSlashes')) {
         /**
          * @deprecated
          */
-        function trueStripSlashes($String) {
+        function trueStripSlashes($string) {
             deprecated('trueStripSlashes()');
-            return stripslashes($String);
+            return stripslashes($string);
         }
     } else {
         /**
          * @deprecated
          */
-        function trueStripSlashes($String) {
+        function trueStripSlashes($string) {
             deprecated('trueStripSlashes()');
-            return $String;
+            return $string;
         }
     }
 }
@@ -760,66 +760,66 @@ if (!function_exists('viewLocation')) {
     /**
      * Get the path of a view.
      *
-     * @param string $View The name of the view.
-     * @param string $Controller The name of the controller invoking the view or blank.
-     * @param string $Folder The application folder or plugins/plugin folder.
+     * @param string $view The name of the view.
+     * @param string $controller The name of the controller invoking the view or blank.
+     * @param string $folder The application folder or plugins/plugin folder.
      * @return string|false The path to the view or false if it wasn't found.
      * @deprecated
      */
-    function viewLocation($View, $Controller, $Folder) {
+    function viewLocation($view, $controller, $folder) {
         deprecated('viewLocation()');
-        $Paths = array();
+        $paths = [];
 
-        if (strpos($View, '/') !== false) {
+        if (strpos($view, '/') !== false) {
             // This is a path to the view from the root.
-            $Paths[] = $View;
+            $paths[] = $view;
         } else {
-            $View = strtolower($View);
-            $Controller = strtolower(StringEndsWith($Controller, 'Controller', true, true));
-            if ($Controller) {
-                $Controller = '/'.$Controller;
+            $view = strtolower($view);
+            $controller = strtolower(stringEndsWith($controller, 'Controller', true, true));
+            if ($controller) {
+                $controller = '/'.$controller;
             }
 
-            $Extensions = array('tpl', 'php');
+            $extensions = ['tpl', 'php'];
 
             // 1. First we check the theme.
-            if (Gdn::Controller() && $Theme = Gdn::Controller()->Theme) {
-                foreach ($Extensions as $Ext) {
-                    $Paths[] = PATH_THEMES."/{$Theme}/views{$Controller}/$View.$Ext";
+            if (Gdn::controller() && $theme = Gdn::controller()->Theme) {
+                foreach ($extensions as $ext) {
+                    $paths[] = PATH_THEMES."/{$theme}/views{$controller}/$view.$ext";
                 }
             }
 
             // 2. Then we check the application/plugin.
-            if (StringBeginsWith($Folder, 'plugins/')) {
+            if (stringBeginsWith($folder, 'plugins/')) {
                 // This is a plugin view.
-                foreach ($Extensions as $Ext) {
-                    $Paths[] = PATH_ROOT."/{$Folder}/views{$Controller}/$View.$Ext";
+                foreach ($extensions as $ext) {
+                    $paths[] = PATH_ROOT."/{$folder}/views{$controller}/$view.$ext";
                 }
             } else {
                 // This is an application view.
-                $Folder = strtolower($Folder);
-                foreach ($Extensions as $Ext) {
-                    $Paths[] = PATH_APPLICATIONS."/{$Folder}/views{$Controller}/$View.$Ext";
+                $folder = strtolower($folder);
+                foreach ($extensions as $ext) {
+                    $paths[] = PATH_APPLICATIONS."/{$folder}/views{$controller}/$view.$ext";
                 }
 
-                if ($Folder != 'dashboard' && StringEndsWith($View, '.master')) {
+                if ($folder != 'dashboard' && stringEndsWith($view, '.master')) {
                     // This is a master view that can always fall back to the dashboard.
-                    foreach ($Extensions as $Ext) {
-                        $Paths[] = PATH_APPLICATIONS."/dashboard/views{$Controller}/$View.$Ext";
+                    foreach ($extensions as $ext) {
+                        $paths[] = PATH_APPLICATIONS."/dashboard/views{$controller}/$view.$ext";
                     }
                 }
             }
         }
 
         // Now let's search the paths for the view.
-        foreach ($Paths as $Path) {
-            if (file_exists($Path)) {
-                return $Path;
+        foreach ($paths as $path) {
+            if (file_exists($path)) {
+                return $path;
             }
         }
 
-        Trace(array('view' => $View, 'controller' => $Controller, 'folder' => $Folder), 'View');
-        Trace($Paths, 'ViewLocation()');
+        trace(['view' => $view, 'controller' => $controller, 'folder' => $folder], 'View');
+        trace($paths, 'ViewLocation()');
 
         return false;
     }

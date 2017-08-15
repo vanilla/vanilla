@@ -14,7 +14,7 @@
 class SocialController extends DashboardController {
 
     /** @var array Models to automatically instantiate. */
-    public $Uses = array('Form', 'Database');
+    public $Uses = ['Form', 'Database'];
 
     /**
      * Runs before every call to this controller.
@@ -39,8 +39,8 @@ class SocialController extends DashboardController {
         $this->title("Social Connect Addons");
         $this->setHighlightRoute('/social/manage');
 
-        $Connections = $this->getConnections();
-        $this->setData('Connections', $Connections);
+        $connections = $this->getConnections();
+        $this->setData('Connections', $connections);
 
         $this->render();
     }

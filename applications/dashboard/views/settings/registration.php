@@ -15,7 +15,7 @@ echo $this->Form->errors(); ?>
 } ?>
 <?php if (!$confirmationSupported) {
     echo '<div class="alert alert-warning padded-top">'.
-        t('No unconfirmed role available for email confirmation.', 'The site needs an unconfirmed role to use email confirmation. Please add an unconfirmed role to enable this setting.').
+        t('No unconfirmed role available for email confirmation.', 'The site needs a role with default type "unconfirmed" to use email confirmation. Please add one to enable this setting.').
         '</div>';
 } ?>
 <div class="form-group<?php echo !$confirmationSupported ? ' foggy' : ''; ?>">

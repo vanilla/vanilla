@@ -1592,7 +1592,7 @@ class SettingsController extends DashboardController {
             $ConfigurationModel->forceSetting('Garden.Registration.InviteRoles', $this->ExistingRoleInvitations);
 
             if ($this->data('ConfirmationSupported') === false && $this->Form->getValue('Garden.Registration.ConfirmEmail')) {
-                $this->Form->addError('One unconfirmed role is required for email confirmation.');
+                $this->Form->addError('A role with default type "unconfirmed" is required to use email confirmation.');
             }
 
             // Event hook

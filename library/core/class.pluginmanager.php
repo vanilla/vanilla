@@ -67,6 +67,11 @@ class Gdn_PluginManager extends Gdn_Pluggable implements ContainerInterface {
     private $addonManager;
 
     /**
+     * @var ContainerInterface
+     */
+    private $container;
+
+    /**
      * @var EventManager
      */
     private $eventManager;
@@ -75,12 +80,13 @@ class Gdn_PluginManager extends Gdn_Pluggable implements ContainerInterface {
      * Initialize a new instance of the {@link Gdn_PluginManager} class.
      *
      * @param AddonManager $addonManager The addon manager that manages all of the addons.
+     * @param ContainerInterface $container The DI container.
      * @param EventManager $eventManager The event manager that handles all plugin events.
      */
-    public function __construct(AddonManager $addonManager = null, EventManager $eventManager = null) {
+    public function __construct(AddonManager $addonManager = null, ContainerInterface $container, EventManager $eventManager = null) {
         parent::__construct();
         $this->addonManager = $addonManager;
-
+        $this->container = $container;
         $this->eventManager = $eventManager ?: new EventManager($this);
     }
 
@@ -1239,7 +1245,7 @@ class Gdn_PluginManager extends Gdn_Pluggable implements ContainerInterface {
         $pluginClass = $addon->getPluginClass();
 
         if ($callback && !empty($pluginClass) && class_exists($pluginClass)) {
-            $plugin = new $pluginClass();
+            $plugin = $this->container->get($pluginClass);
             if (method_exists($plugin, 'setAddon')) {
                 $plugin->setAddon($addon);
             }

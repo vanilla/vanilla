@@ -842,8 +842,12 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
     private function createController($controllerName, $request, &$routeArgs) {
         /* @var Gdn_Controller $controller */
         $controller = $this->container->get($controllerName);
+
         // Allow classes to have a dependency on Gdn_Controller.
-        $this->container->setInstance('Gdn_Controller', $controller);
+        // It is possible that the controller does not inherit Gdn_Controller :(
+        if (is_a($controller, Gdn_Controller::class)) {
+            $this->container->setInstance(Gdn_Controller::class, $controller);
+        }
         Gdn::controller($controller);
 
         $this->EventArguments['Controller'] =& $controller;

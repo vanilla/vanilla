@@ -38,7 +38,7 @@ if (!$CancelUrl) {
 
     echo '<div class="P">';
     echo $this->Form->label('Discussion Title', 'Name');
-    echo wrap($this->Form->textBox('Name', ['maxlength' => 100, 'class' => 'InputBox BigInput']), 'div', ['class' => 'TextBoxWrapper']);
+    echo wrap($this->Form->textBox('Name', ['maxlength' => 100, 'class' => 'InputBox BigInput', 'spellcheck' => 'true']), 'div', ['class' => 'TextBoxWrapper']);
     echo '</div>';
 
     $this->fireEvent('BeforeBodyInput');

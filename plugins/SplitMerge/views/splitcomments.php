@@ -23,7 +23,7 @@ echo wrap(sprintf(
                 <?php
                 echo '<p><div class="Category">';
                 echo $this->Form->label('Category', 'CategoryID'), ' ';
-                echo $this->Form->CategoryDropDown();
+                echo $this->Form->categoryDropDown();
                 echo '</div></p>';
                 ?>
             </li>

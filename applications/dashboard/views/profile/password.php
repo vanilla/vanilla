@@ -11,20 +11,20 @@
             // No password may have been set if they have only signed in with a connect plugin
             if (!$this->User->HashMethod || $this->User->HashMethod == "Vanilla") {
                 echo $this->Form->label('Old Password', 'OldPassword');
-                echo $this->Form->Input('OldPassword', 'password');
+                echo $this->Form->input('OldPassword', 'password');
             }
             ?>
         </li>
         <li>
             <?php
             echo $this->Form->label('New Password', 'Password');
-            echo $this->Form->Input('Password', 'password', ['Strength' => TRUE]);
+            echo $this->Form->input('Password', 'password', ['Strength' => TRUE]);
             ?>
         </li>
         <li>
             <?php
             echo $this->Form->label('Confirm Password', 'PasswordMatch');
-            echo $this->Form->Input('PasswordMatch', 'password');
+            echo $this->Form->input('PasswordMatch', 'password');
             ?>
         </li>
     </ul>

@@ -1,6 +1,6 @@
 <?php if (!defined('APPLICATION')) exit();
 // Check that we have the necessary tools to allow image uploading
-$allowImages = Gdn_UploadImage::CanUploadImages();
+$allowImages = Gdn_UploadImage::canUploadImages();
 echo '<div class="change-picture">';
 echo '<h1 class="H">'.$this->title().'</h1>';
 echo $this->Form->open(['enctype' => 'multipart/form-data', 'class' => 'js-change-picture-form']);
@@ -19,7 +19,7 @@ if ($this->data('crop') && $allowImages) {
 <?php
 echo $this->Form->input('Avatar', 'file', ['class' => 'js-new-avatar-upload Hidden']);
 if ($this->data('crop')) {
-    echo anchor(t('Remove Picture'), userUrl($this->User, '', 'removepicture').'?tk='.Gdn::session()->TransientKey().'&deliveryType='.$this->deliveryType(), 'Button Danger PopConfirm change-picture-remove');
+    echo anchor(t('Remove Picture'), userUrl($this->User, '', 'removepicture').'?tk='.Gdn::session()->transientKey().'&deliveryType='.$this->deliveryType(), 'Button Danger PopConfirm change-picture-remove');
 }
 ?>
 <?php

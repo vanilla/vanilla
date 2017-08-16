@@ -47,51 +47,51 @@ class Gdn_Condition {
     /**
      * Convert the condition values in a given string to a conditions array.
      *
-     * This method is the opposite as Gdn_Condition::ToString().
+     * This method is the opposite as Gdn_Condition::toString().
      *
-     * @param string $String
-     * @return array A conditions array suitable to be passed to Gdn_Condition::Test().
+     * @param string $string
+     * @return array A conditions array suitable to be passed to Gdn_Condition::test().
      * @see Gdn_Condition::toString().
      */
-    public static function fromString($String) {
-        $Result = [];
+    public static function fromString($string) {
+        $result = [];
 
         // Each condition is delimited by a newline.
-        $Conditions = explode("\n", $String);
-        foreach ($Conditions as $ConditionString) {
+        $conditions = explode("\n", $string);
+        foreach ($conditions as $conditionString) {
             // Each part of the condition is delimited by a comma.
-            $Condition = explode(',', $ConditionString, 3);
-            $Result[] = array_map('trim', $Condition);
+            $condition = explode(',', $conditionString, 3);
+            $result[] = array_map('trim', $condition);
         }
-        return $Result;
+        return $result;
     }
 
     /**
      * Test an array of conditions. This method only returns if every condition in the array is true.
      *
-     * @param array $Conditions And array of conditions where each condition is itself an array with the following items:
+     * @param array $conditions And array of conditions where each condition is itself an array with the following items:
      *  - 0: The type of condition. See the constants in Gdn_Condition for more information.
      *  - 1: The field to look at.
      *  - 2: The expression to test against (optional).
      * @return bool
      */
-    public static function test($Conditions) {
-        if (!is_array($Conditions)) {
+    public static function test($conditions) {
+        if (!is_array($conditions)) {
             return false;
         }
 
-        foreach ($Conditions as $Condition) {
-            if (!is_array($Condition) || count($Condition) < 2) {
+        foreach ($conditions as $condition) {
+            if (!is_array($condition) || count($condition) < 2) {
                 continue;
             }
 
-            $Expr = isset($Condition[2]) ? $Condition[2] : null;
+            $expr = isset($condition[2]) ? $condition[2] : null;
 
-            $Test = Gdn_Condition::testOne($Condition[0], $Condition[1], $Expr);
-            if (!$Test && self::$compareType == self::COMPARE_AND) {
+            $test = Gdn_Condition::testOne($condition[0], $condition[1], $expr);
+            if (!$test && self::$compareType == self::COMPARE_AND) {
                 return false;
             }
-            if ($Test && self::$compareType == self::COMPARE_OR) {
+            if ($test && self::$compareType == self::COMPARE_OR) {
                 return true;
             }
         }
@@ -105,50 +105,50 @@ class Gdn_Condition {
     /**
      * Test an individual condition.
      *
-     * @param string $Type One of the types in this condition.
-     * @param string $Field The field to test against.
-     * @param string $Expr The expression to test with.
+     * @param string $type One of the types in this condition.
+     * @param string $field The field to test against.
+     * @param string $expr The expression to test with.
      * @return bool
      */
-    public static function testOne($Type, $Field, $Expr = null) {
-        switch (strtolower($Type)) {
+    public static function testOne($type, $field, $expr = null) {
+        switch (strtolower($type)) {
             case PERMISSION:
                 // Check to see if the user has the given permission.
-                $Result = Gdn::session()->checkPermission($Field);
-                if ($Expr === false) {
-                    return !$Result;
+                $result = Gdn::session()->checkPermission($field);
+                if ($expr === false) {
+                    return !$result;
                 }
-                return $Result;
+                return $result;
             case REQUEST:
                 // See if the field is a specific value.
-                switch (strtolower($Field)) {
+                switch (strtolower($field)) {
                     case 'path':
-                        $Value = Gdn::request()->path();
+                        $value = Gdn::request()->path();
                         break;
                     default:
                         // See if the field is targetting a specific part of the request.
-                        $Fields = explode('.', $Field, 2);
-                        if (count($Fields) >= 2) {
-                            $Value = Gdn::request()->getValueFrom($Fields[0], $Fields[1], null);
+                        $fields = explode('.', $field, 2);
+                        if (count($fields) >= 2) {
+                            $value = Gdn::request()->getValueFrom($fields[0], $fields[1], null);
                         } else {
-                            $Value = Gdn::request()->getValue($Field, null);
+                            $value = Gdn::request()->getValue($field, null);
                         }
                         break;
                 }
 
-                $Result = Gdn_Condition::testValue($Value, $Expr);
-                return $Result;
+                $result = Gdn_Condition::testValue($value, $expr);
+                return $result;
             case ROLE:
                 // See if the user is in the given role.
-                $RoleModel = new RoleModel();
-                $Roles = $RoleModel->getByUserID(Gdn::session()->UserID)->resultArray();
-                foreach ($Roles as $Role) {
-                    if (is_numeric($Expr)) {
-                        $Result = $Expr == val('RoleID', $Role);
+                $roleModel = new RoleModel();
+                $roles = $roleModel->getByUserID(Gdn::session()->UserID)->resultArray();
+                foreach ($roles as $role) {
+                    if (is_numeric($expr)) {
+                        $result = $expr == val('RoleID', $role);
                     } else {
-                        $Result = Gdn_Condition::testValue(val('Name', $Role), $Expr);
+                        $result = Gdn_Condition::testValue(val('Name', $role), $expr);
                     }
-                    if ($Result) {
+                    if ($result) {
                         return true;
                     }
                 }
@@ -160,48 +160,48 @@ class Gdn_Condition {
     /**
      * Test a value against an expression.
      *
-     * @param mixed $Value The value to test.
-     * @param string $Expr The expression to test against. The expression can have the following properties.
+     * @param mixed $value The value to test.
+     * @param string $expr The expression to test against. The expression can have the following properties.
      *  - <b>Enclosed in backticks (`..`): A preg_match() is performed.
-     *  - <b>Otherwise</b>: A simple $Value == $Expr is tested.
+     *  - <b>Otherwise</b>: A simple $value == $expr is tested.
      */
-    public static function testValue($Value, $Expr) {
-        if (!is_string($Expr)) {
+    public static function testValue($value, $expr) {
+        if (!is_string($expr)) {
             return false;
         }
 
-        if (stelen($Expr) > 1 && $Expr[0] === '`' && $Expr[strlen($Expr) - 1] == '`') {
-            $Result = preg_match($Expr, $Value);
+        if (stelen($expr) > 1 && $expr[0] === '`' && $expr[strlen($expr) - 1] == '`') {
+            $result = preg_match($expr, $value);
         } else {
-            $Result = $Value == $Expr;
+            $result = $value == $expr;
         }
-        return $Result;
+        return $result;
     }
 
     /**
      * Convert an array of conditions to a string.
      *
-     * @param array $Conditions An array of conditions. Each condition is itself an array.
+     * @param array $conditions An array of conditions. Each condition is itself an array.
      * @return string
      * @see Gdn_Condition::test()
      */
-    public static function toString($Conditions) {
-        $Result = '';
+    public static function toString($conditions) {
+        $result = '';
 
-        foreach ($Conditions as $Condition) {
-            if (!is_array($Condition) || count($Condition) < 2) {
+        foreach ($conditions as $condition) {
+            if (!is_array($condition) || count($condition) < 2) {
                 continue; // skip ill-formatted conditions.
             }
 
-            if (strlen($Result) > 0) {
-                $Result .= "\n";
+            if (strlen($result) > 0) {
+                $result .= "\n";
             }
 
-            $Result .= "{$Condition[0]},{$Condition[1]}";
-            if (count($Condition) >= 3) {
-                $Result .= $Condition[2];
+            $result .= "{$condition[0]},{$condition[1]}";
+            if (count($condition) >= 3) {
+                $result .= $condition[2];
             }
         }
-        return $Result;
+        return $result;
     }
 }

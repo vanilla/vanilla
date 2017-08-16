@@ -15,8 +15,8 @@
     if (Gdn::cache()->activeEnabled()) {
         echo '<h3>Cache Information</h3>';
         echo '<pre>';
-        echo '<b>Cache Revision</b>: '.Gdn::cache()->GetRevision()."\n";
-        echo '<b>Permissions Revision</b>: '.Gdn::userModel()->GetPermissionsIncrement()."\n";
+        echo '<b>Cache Revision</b>: '.Gdn::cache()->getRevision()."\n";
+        echo '<b>Permissions Revision</b>: '.Gdn::userModel()->getPermissionsIncrement()."\n";
 
         if (property_exists('Gdn_Cache', 'GetCount')) {
             echo '<b>Cache Gets</b>: '.sprintf('%s in %ss', Gdn_Cache::$GetCount, Gdn_Cache::$GetTime);
@@ -74,15 +74,15 @@
 
     if (!is_null($Database)) {
         $String = '';
-        $Queries = $Database->Queries();
-        $String .= '<h3>'.count($Queries).' queries in '.$Database->ExecutionTime().'s</h3>';
+        $Queries = $Database->queries();
+        $String .= '<h3>'.count($Queries).' queries in '.$Database->executionTime().'s</h3>';
         foreach ($Queries as $Key => $QueryInfo) {
             $Query = $QueryInfo['Sql'];
             // this is a bit of a kludge. I found that the regex below would mess up when there were incremented named parameters. Ie. it would replace :Param before :Param0, which ended up with some values like "'4'0".
             if (isset($QueryInfo['Parameters']) && is_array($QueryInfo['Parameters'])) {
                 $tmp = $QueryInfo['Parameters'];
 
-                $Query = $SQL->ApplyParameters($Query, $tmp);
+                $Query = $SQL->applyParameters($Query, $tmp);
             }
             $String .= $QueryInfo['Method']
                 .' <small>'.$QueryInfo['connection'].'</small>'
@@ -94,13 +94,13 @@
     }
 
     global $Start;
-    echo '<h3>Page completed in '.round(Now() - $_SERVER['REQUEST_TIME'], 4).'s</h3>';
+    echo '<h3>Page completed in '.round(now() - $_SERVER['REQUEST_TIME'], 4).'s</h3>';
     ?>
 
     <h3>Controller Data</h3>
 <pre>
 <?php
-echo DebuggerPlugin::FormatData(Gdn::controller()->Data);
+echo DebuggerPlugin::formatData(Gdn::controller()->Data);
 ?>
 </pre>
 

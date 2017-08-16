@@ -8,4 +8,4 @@ if (!function_exists('WriteActivityComment'))
     include($this->fetchViewLocation('helper_functions', 'activity'));
 
 if ($this->data('Comment'))
-    WriteActivityComment($this->data('Comment'), $this, $Session);
+    writeActivityComment($this->data('Comment'), $this, $Session);

@@ -9,6 +9,7 @@ namespace VanillaTests\APIv2;
 
 
 abstract class AbstractResourceTest extends AbstractAPIv2Test {
+
     /**
      * The number of rows create when testing index endpoints.
      */
@@ -18,18 +19,25 @@ abstract class AbstractResourceTest extends AbstractAPIv2Test {
      * @var string The resource route.
      */
     protected $baseUrl = '/resources';
+
+    /** @var array Fields to be checked with get/<id>/edit */
+    protected $editFields = ['name', 'body', 'format'];
+
     /**
      * @var string The singular name of the resource.
      */
     protected $singular = '';
+
     /**
      * @var array A record that can be posted to the endpoint.
      */
     protected $record = ['body' => 'Hello world!', 'format' => 'markdown'];
+
     /**
      * @var string[] An array of field names that are okay to send to patch endpoints.
      */
     protected $patchFields;
+
     /**
      * @var string The name of the primary key of the resource.
      */
@@ -55,7 +63,7 @@ abstract class AbstractResourceTest extends AbstractAPIv2Test {
         }
 
         if ($this->patchFields === null) {
-            $this->patchFields = array_keys($this->record);
+            $this->patchFields = array_keys($this->record());
         }
     }
 
@@ -79,12 +87,16 @@ abstract class AbstractResourceTest extends AbstractAPIv2Test {
     /**
      * Test POST /resource.
      *
+     * @param array|null $record Fields for a new record.
+     * @param array $extra Additional fields to send along with the POST request.
      * @return array Returns the new record.
      */
-    public function testPost() {
+    public function testPost($record = null, array $extra = []) {
+        $record = $record === null ? $this->record() : $record;
+        $post = $record + $extra;
         $result = $this->api()->post(
             $this->baseUrl,
-            $this->record
+            $post
         );
 
         $this->assertEquals(201, $result->getStatusCode());
@@ -93,7 +105,7 @@ abstract class AbstractResourceTest extends AbstractAPIv2Test {
         $this->assertTrue(is_int($body[$this->pk]));
         $this->assertTrue($body[$this->pk] > 0);
 
-        $this->assertRowsEqual($this->record, $body, true);
+        $this->assertRowsEqual($record, $body, true);
 
         return $body;
     }
@@ -146,16 +158,24 @@ abstract class AbstractResourceTest extends AbstractAPIv2Test {
 
     /**
      * Test GET /resource/<id>/edit.
+     *
+     * @param array|null $record A record to use for comparison.
+     * @return array
      */
-    public function testGetEdit() {
-        $row = $this->testPost();
+    public function testGetEdit($record = null) {
+        if ($record === null) {
+            $record = $this->record();
+            $row = $this->testPost();
+        } else {
+            $row = $record;
+        }
 
         $r = $this->api()->get(
             "{$this->baseUrl}/{$row[$this->pk]}/edit"
         );
 
         $this->assertEquals(200, $r->getStatusCode());
-        $this->assertRowsEqual(arrayTranslate($this->record, ['name', 'body', 'format']), $r->getBody());
+        $this->assertRowsEqual(arrayTranslate($record, $this->editFields), $r->getBody());
         $this->assertCamelCase($r->getBody());
 
         return $r->getBody();
@@ -173,18 +193,31 @@ abstract class AbstractResourceTest extends AbstractAPIv2Test {
         $dt = new \DateTimeImmutable();
         foreach ($this->patchFields as $key) {
             $value = $row[$key];
-            if (in_array($key, ['name', 'body'])) {
+            if (in_array($key, ['name', 'body', 'description'])) {
                 $value .= ' '.$dt->format(\DateTime::RSS);
-            } elseif ($key === 'format') {
-                $value = $value === 'markdown' ? 'text' : 'markdown';
             } elseif (stripos($key, 'id') === strlen($key) - 2) {
                 $value++;
+            } else {
+                switch ($key) {
+                    case 'format':
+                        $value = $value === 'markdown' ? 'text' : 'markdown';
+                        break;
+                }
             }
 
             $newRow[$key] = $value;
         }
 
         return $newRow;
+    }
+
+    /**
+     * Grab values for inserting a new record.
+     *
+     * @return array
+     */
+    public function record() {
+        return $this->record;
     }
 
     /**

@@ -9,7 +9,7 @@ echo '<?xml version="1.0" encoding="utf-8"?>'; ?>
     <title>Something has gone wrong.</title>
     <?php
     if ($CssPath !== FALSE)
-        echo '<link rel="stylesheet" type="text/css" href="', Asset($CssPath), '" />';
+        echo '<link rel="stylesheet" type="text/css" href="', asset($CssPath), '" />';
     ?>
 </head>
 <body>

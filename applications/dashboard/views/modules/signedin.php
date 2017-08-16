@@ -24,7 +24,7 @@ if ($Session->isValid() && c('Garden.Modules.ShowSignedInModule')) {
             <?php if ($Session->checkPermission('Garden.Settings.Manage')) { ?>
                 <li><?php echo anchor(t('Dashboard'), '/dashboard/settings'); ?></li>
             <?php } ?>
-            <li><?php echo anchor(t('Sign Out'), SignOutUrl()); ?></li>
+            <li><?php echo anchor(t('Sign Out'), signOutUrl()); ?></li>
         </ul>
     </div>
 <?php

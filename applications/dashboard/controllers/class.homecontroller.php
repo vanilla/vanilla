@@ -58,9 +58,9 @@ class HomeController extends Gdn_Controller {
 
         $this->setData('_NoMessages', true);
 
-        $Code = $this->data('Code', 400);
+        $code = $this->data('Code', 400);
         $this->clearNavigationPreferences();
-        safeheader("HTTP/1.0 $Code ".Gdn_Controller::GetStatusMessage($Code), true, $Code);
+        safeheader("HTTP/1.0 $code ".Gdn_Controller::getStatusMessage($code), true, $code);
         Gdn_Theme::section('Error');
 
         $this->render();
@@ -94,7 +94,7 @@ class HomeController extends Gdn_Controller {
             safeHeader("HTTP/1.0 404", true, 404);
             $this->render();
         } else {
-            $this->RenderException(NotFoundException());
+            $this->renderException(notFoundException());
         }
     }
 
@@ -234,7 +234,7 @@ class HomeController extends Gdn_Controller {
             safeHeader("HTTP/1.0 401", true, 401);
             $this->render();
         } else {
-            $this->RenderException(permissionException());
+            $this->renderException(permissionException());
         }
     }
 }

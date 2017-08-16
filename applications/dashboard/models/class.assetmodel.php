@@ -193,7 +193,7 @@ class AssetModel extends Gdn_Model {
         }
 
         // 3. Check the theme.
-        $theme = Gdn::ThemeManager()->ThemeFromType($themeType);
+        $theme = Gdn::themeManager()->themeFromType($themeType);
         if ($theme) {
             $path = "/$theme/design/$filename";
             $paths[] = [PATH_THEMES.$path, "/themes{$path}"];

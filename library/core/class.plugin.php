@@ -152,19 +152,19 @@ abstract class Gdn_Plugin extends Gdn_Pluggable implements Gdn_IPlugin {
     }
 
     /**
-     * Converts view files to Render() paths.
+     * Converts view files to render() paths.
      *
      * This method takes a simple filename and, assuming it is located inside <plugin>/views/,
-     * converts it into a path that is suitable for $Sender->Render().
+     * converts it into a path that is suitable for $Sender->render().
      *
-     * @param string $ViewName The name of the view file, including extension.
+     * @param string $viewName The name of the view file, including extension.
      * @return string Returns the path to the view file, relative to the document root.
      * @deprecated This method is not themeable and thus not advisable.
      */
-    public function getView($ViewName) {
+    public function getView($viewName) {
         deprecated('Gdn_Plugin->getView()');
-        $PluginDirectory = implode(DS, [$this->getPluginFolder(true), 'views']);
-        return $PluginDirectory.DS.$ViewName;
+        $pluginDirectory = implode(DS, [$this->getPluginFolder(true), 'views']);
+        return $pluginDirectory.DS.$viewName;
     }
 
     /**
@@ -182,7 +182,7 @@ abstract class Gdn_Plugin extends Gdn_Pluggable implements Gdn_IPlugin {
     }
 
     /**
-     * Implementation of {@link Gdn_IPlugin::Setup()}.
+     * Implementation of {@link Gdn_IPlugin::setup()}.
      */
     public function setup() {
         // Do nothing...
@@ -210,33 +210,33 @@ abstract class Gdn_Plugin extends Gdn_Pluggable implements Gdn_IPlugin {
      */
     protected function getUserMeta($userID, $key, $default = null, $autoUnfold = false) {
         $metaKey = $this->makeMetaKey($key);
-        $R = $this->userMetaModel()->getUserMeta($userID, $metaKey, $default);
+        $r = $this->userMetaModel()->getUserMeta($userID, $metaKey, $default);
         if ($autoUnfold) {
-            $R = val($metaKey, $R, $default);
+            $r = val($metaKey, $r, $default);
         }
-        return $R;
+        return $r;
     }
 
     /**
      * Sets UserMeta data to the UserMeta table
      *
-     * This method takes a UserID, Key, and Value, and attempts to set $Key = $Value for $UserID.
-     * $Key can be an SQL wildcard, thereby allowing multiple variations of a $Key to be set. $UserID
-     * can be an array, thereby allowing multiple users' $Keys to be set to the same $Value.
+     * This method takes a UserID, Key, and Value, and attempts to set $key = $value for $userID.
+     * $key can be an SQL wildcard, thereby allowing multiple variations of a $key to be set. $userID
+     * can be an array, thereby allowing multiple users' $keys to be set to the same $value.
      *
-     * ++ Before any queries are run, $Key is converted to its fully qualified format (Plugin.<PluginName> prepended)
+     * ++ Before any queries are run, $key is converted to its fully qualified format (Plugin.<PluginName> prepended)
      * ++ to prevent collisions in the meta table when multiple plugins have similar key names.
      *
-     * If $Value == NULL, the matching row(s) are deleted instead of updated.
+     * If $value == NULL, the matching row(s) are deleted instead of updated.
      *
-     * @param $UserID int UserID or array of UserIDs
-     * @param $Key string relative user key
-     * @param $Value mixed optional value to set, null to delete
+     * @param $userID int UserID or array of UserIDs
+     * @param $key string relative user key
+     * @param $value mixed optional value to set, null to delete
      * @return void
      */
-    protected function setUserMeta($UserID, $Key, $Value = null) {
-        $MetaKey = $this->makeMetaKey($Key);
-        $this->userMetaModel()->setUserMeta($UserID, $MetaKey, $Value);
+    protected function setUserMeta($userID, $key, $value = null) {
+        $metaKey = $this->makeMetaKey($key);
+        $this->userMetaModel()->setUserMeta($userID, $metaKey, $value);
     }
 
     /**
@@ -247,13 +247,13 @@ abstract class Gdn_Plugin extends Gdn_Pluggable implements Gdn_IPlugin {
      * @param $UserMetaKey string fully qualified meta key
      * @return string relative meta key
      */
-    protected function trimMetaKey($FullyQualifiedUserKey) {
-        $Key = explode('.', $FullyQualifiedUserKey);
-        if ($Key[0] == 'Plugin' && sizeof($Key) >= 3) {
-            return implode('.', array_slice($Key, 2));
+    protected function trimMetaKey($fullyQualifiedUserKey) {
+        $key = explode('.', $fullyQualifiedUserKey);
+        if ($key[0] == 'Plugin' && sizeof($key) >= 3) {
+            return implode('.', array_slice($key, 2));
         }
 
-        return $FullyQualifiedUserKey;
+        return $fullyQualifiedUserKey;
     }
 
     /**
@@ -288,68 +288,68 @@ abstract class Gdn_Plugin extends Gdn_Pluggable implements Gdn_IPlugin {
         $sender->setHighlightRoute('plugin/'.$pluginIndex);
         $sender->setData('Description', $this->getPluginKey('Description'));
 
-        $CSSFile = $this->getResource('css/'.strtolower($pluginIndex).'.css', false, false);
-        if (file_exists($CSSFile)) {
-            $sender->addCssFile($CSSFile);
+        $cSSFile = $this->getResource('css/'.strtolower($pluginIndex).'.css', false, false);
+        if (file_exists($cSSFile)) {
+            $sender->addCssFile($cSSFile);
         }
 
-        $ViewFile = $sender->fetchViewLocation(
+        $viewFile = $sender->fetchViewLocation(
             strtolower($pluginIndex),
             '',
             'plugins/'.$pluginIndex
         );
-        $sender->render($ViewFile);
+        $sender->render($viewFile);
     }
 
     /**
      * Automatically handle the toggle effect.
      *
-     * @param object $Sender Reference to the invoking controller
-     * @param mixed $Redirect
+     * @param object $sender Reference to the invoking controller
+     * @param mixed $redirect
      * @deprecated
      * @todo Remove this.
      */
-    public function autoToggle($Sender, $Redirect = null) {
+    public function autoToggle($sender, $redirect = null) {
         deprecated('Gdn_Plugin->autoToggle()');
-        $PluginName = $this->getPluginIndex();
-        $EnabledKey = "Plugins.{$PluginName}.Enabled";
-        $CurrentConfig = c($EnabledKey, false);
-        $PassedKey = val(1, $Sender->RequestArgs);
+        $pluginName = $this->getPluginIndex();
+        $enabledKey = "Plugins.{$pluginName}.Enabled";
+        $currentConfig = c($enabledKey, false);
+        $passedKey = val(1, $sender->RequestArgs);
 
-        if ($Sender->Form->authenticatedPostBack() || Gdn::session()->validateTransientKey($PassedKey)) {
-            $CurrentConfig = !$CurrentConfig;
-            SaveToConfig($EnabledKey, $CurrentConfig);
+        if ($sender->Form->authenticatedPostBack() || Gdn::session()->validateTransientKey($passedKey)) {
+            $currentConfig = !$currentConfig;
+            saveToConfig($enabledKey, $currentConfig);
         }
 
-        if ($Sender->Form->authenticatedPostBack()) {
-            $this->controller_index($Sender);
+        if ($sender->Form->authenticatedPostBack()) {
+            $this->controller_index($sender);
         } else {
-            if ($Redirect === false) {
-                return $CurrentConfig;
+            if ($redirect === false) {
+                return $currentConfig;
             }
-            if (is_null($Redirect)) {
-                redirectTo('plugin/'.strtolower($PluginName));
+            if (is_null($redirect)) {
+                redirectTo('plugin/'.strtolower($pluginName));
             } else {
-                redirectTo($Redirect);
+                redirectTo($redirect);
             }
         }
-        return $CurrentConfig;
+        return $currentConfig;
     }
 
     /**
      *
      *
-     * @param null $Path
+     * @param null $path
      * @return null|string
      * @todo Remove this.
      */
-    public function autoTogglePath($Path = null) {
+    public function autoTogglePath($path = null) {
         deprecated('Gdn_Plugin->autoTogglePath()');
-        if (is_null($Path)) {
-            $PluginName = $this->getPluginIndex();
-            $Path = '/dashboard/plugin/'.strtolower($PluginName).'/toggle/'.Gdn::session()->transientKey();
+        if (is_null($path)) {
+            $pluginName = $this->getPluginIndex();
+            $path = '/dashboard/plugin/'.strtolower($pluginName).'/toggle/'.Gdn::session()->transientKey();
         }
-        return $Path;
+        return $path;
     }
 
     /**
@@ -361,41 +361,41 @@ abstract class Gdn_Plugin extends Gdn_Pluggable implements Gdn_IPlugin {
      * @return boolean Status of plugin's 2nd level activation
      */
     public function isEnabled() {
-        $PluginName = $this->GetPluginIndex();
-        $EnabledKey = "Plugins.{$PluginName}.Enabled";
-        return (bool)c($EnabledKey, false);
+        $pluginName = $this->getPluginIndex();
+        $enabledKey = "Plugins.{$pluginName}.Enabled";
+        return (bool)c($enabledKey, false);
     }
 
     /**
      *
      *
-     * @param $Sender
-     * @param array $RequestArgs
+     * @param $sender
+     * @param array $requestArgs
      * @return mixed
      * @throws Exception
      */
-    public function dispatch($Sender, $RequestArgs = []) {
-        $this->Sender = $Sender;
-        $Sender->Form = new Gdn_Form();
+    public function dispatch($sender, $requestArgs = []) {
+        $this->Sender = $sender;
+        $sender->Form = new Gdn_Form();
 
-        $ControllerMethod = 'Controller_Index';
-        if (is_array($RequestArgs) && sizeof($Sender->RequestArgs)) {
-            list($MethodName) = $Sender->RequestArgs;
+        $controllerMethod = 'Controller_Index';
+        if (is_array($requestArgs) && sizeof($sender->RequestArgs)) {
+            list($methodName) = $sender->RequestArgs;
             // Account for suffix
-            $MethodName = array_shift($Trash = explode('.', $MethodName));
-            $TestControllerMethod = 'Controller_'.$MethodName;
-            if (method_exists($this, $TestControllerMethod)) {
-                $ControllerMethod = $TestControllerMethod;
-                array_shift($RequestArgs);
+            $methodName = array_shift($trash = explode('.', $methodName));
+            $testControllerMethod = 'Controller_'.$methodName;
+            if (method_exists($this, $testControllerMethod)) {
+                $controllerMethod = $testControllerMethod;
+                array_shift($requestArgs);
             }
         }
 
-        if (method_exists($this, $ControllerMethod)) {
-            $Sender->Plugin = $this;
-            return call_user_func([$this, $ControllerMethod], $Sender, $RequestArgs);
+        if (method_exists($this, $controllerMethod)) {
+            $sender->Plugin = $this;
+            return call_user_func([$this, $controllerMethod], $sender, $requestArgs);
         } else {
-            $PluginName = get_class($this);
-            throw NotFoundException("@{$PluginName}->{$ControllerMethod}()");
+            $pluginName = get_class($this);
+            throw notFoundException("@{$pluginName}->{$controllerMethod}()");
         }
     }
 
@@ -403,7 +403,7 @@ abstract class Gdn_Plugin extends Gdn_Pluggable implements Gdn_IPlugin {
      * Passthru render request to sender.
      *
      * This render method automatically adds the correct ApplicationFolder parameter
-     * so that $Sender->Render() will first check the plugin's views/ folder.
+     * so that $Sender->render() will first check the plugin's views/ folder.
      *
      * @param string $view The name of the view to render.
      */

@@ -3,14 +3,14 @@ $Session = Gdn::session();
 include_once $this->fetchViewLocation('helper_functions', 'discussions', 'vanilla');
 
 echo '<h1 class="H HomepageTitle">'.
-    AdminCheck(NULL, ['', ' ']).
+    adminCheck(NULL, ['', ' ']).
     $this->data('Title').
     '</h1>';
 
-if ($Description = $this->Description()) {
+if ($Description = $this->description()) {
     echo wrap($Description, 'div', ['class' => 'P PageDescription']);
 }
-// echo Gdn_Theme::Module('DiscussionFilterModule');
+// echo Gdn_Theme::module('DiscussionFilterModule');
 
 if ($this->DiscussionData->numRows() > 0 || (isset($this->AnnounceData) && is_object($this->AnnounceData) && $this->AnnounceData->numRows() > 0)) {
     ?>

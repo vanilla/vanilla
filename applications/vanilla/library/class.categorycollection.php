@@ -122,6 +122,7 @@ class CategoryCollection {
         $this->categories = [];
         $this->categorySlugs = [];
         $this->cache->increment(self::$CACHE_CATEGORY.'inc', 1, [Gdn_Cache::FEATURE_INITIAL => 1]);
+        $this->cacheInc = null;
     }
 
     /**
@@ -179,7 +180,8 @@ class CategoryCollection {
             if (isset($this->categories[$id])) {
                 return $this->categories[$id];
             } else {
-                $category = $this->cache->get($this->cacheKey(self::$CACHE_CATEGORY, $id));
+                $cacheKey = $this->cacheKey(self::$CACHE_CATEGORY, $id);
+                $category = $this->cache->get($cacheKey);
 
                 if (!empty($category)) {
                     $this->calculateDynamic($category);

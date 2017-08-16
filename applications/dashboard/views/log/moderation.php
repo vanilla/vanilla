@@ -18,7 +18,7 @@ echo heading($this->data('Title'));
     <div class="search toolbar-main"><?php
         if (c('Vanilla.Categories.Use')) {
             echo '<div class="input-wrap input-wrap-multiple">';
-            echo $this->Form->CategoryDropDown('CategoryID', [
+            echo $this->Form->categoryDropDown('CategoryID', [
                     'Value' => val('ModerationCategoryID', $this->Data),
                     'IncludeNull' => t('Show all categories')]
             );

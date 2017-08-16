@@ -4,6 +4,8 @@
  * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
  */
 
+use \Garden\EventManager;
+
 /**
  * Class VanillaHtmlFormatter
  */
@@ -124,6 +126,9 @@ class VanillaHtmlFormatter {
         'ul'
     ];
 
+    /** @var array Extra allowed classes. */
+    protected $extraAllowedClasses = [];
+
     /**
      * Filter provided HTML through htmlLawed and return the result.
      *
@@ -211,6 +216,24 @@ class VanillaHtmlFormatter {
     }
 
     /**
+     * Add extra allowed classes.
+     *
+     * @param array $extraAllowedClasses
+     */
+    public function addExtraAllowedClasses($extraAllowedClasses) {
+        $this->extraAllowedClasses = array_unique(array_merge($this->extraAllowedClasses, $extraAllowedClasses));
+    }
+
+    /**
+     * Get the currently defined extra allowed classes.
+     *
+     * @return array Extra allowed classes
+     */
+    public function getExtraAllowedClasses() {
+        return $this->extraAllowedClasses;
+    }
+
+    /**
      * Grab the default htmLawed spec.
      *
      * @return array
@@ -219,7 +242,7 @@ class VanillaHtmlFormatter {
         static $spec;
         if ($spec === null) {
             $spec = [];
-            $allowedClasses = implode('|', $this->allowedClasses);
+            $allowedClasses = implode('|', array_merge($this->allowedClasses, $this->extraAllowedClasses));
             foreach ($this->classedElements as $tag) {
                 if (!array_key_exists($tag, $spec) || !is_array($spec[$tag])) {
                     $spec[$tag] = [];

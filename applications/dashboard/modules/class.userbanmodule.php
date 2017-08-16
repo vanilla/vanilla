@@ -86,7 +86,7 @@ class UserBanModule extends GDN_Module {
         if (empty($this->Data['Reasons'])) {
             return '';
         } else {
-            return parent::ToString();
+            return parent::toString();
         }
     }
 }

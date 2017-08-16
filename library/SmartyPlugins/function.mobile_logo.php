@@ -9,11 +9,11 @@
 /**
  * Writes the site logo to the page.
  *
- * @param array $Params The parameters passed into the function. This currently takes no parameters.
- * @param Smarty $Smarty The smarty object rendering the template.
+ * @param array $params The parameters passed into the function. This currently takes no parameters.
+ * @param Smarty $smarty The smarty object rendering the template.
  * @return string The url.
  */
-function smarty_function_mobile_logo($Params, &$Smarty) {
-    $Result = Gdn_Theme::mobileLogo('Title');
-	return $Result;
+function smarty_function_mobile_logo($params, &$smarty) {
+    $result = Gdn_Theme::mobileLogo('Title');
+	return $result;
 }

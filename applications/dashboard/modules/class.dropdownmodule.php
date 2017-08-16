@@ -31,7 +31,7 @@
  *
  * Here is an example menu creation:
  *
- * $dropdown = new DropdownModule('my-dropdown');
+ * $dropdown = new dropdownModule('my-dropdown');
  * $dropdown->setTrigger('A New Name')
  * ->addLink('Link 1', '#') // automatically creates key: item1
  * ->addDivider() // automatically creates key: item2

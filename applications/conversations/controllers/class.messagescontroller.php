@@ -123,7 +123,7 @@ class MessagesController extends ConversationsController {
                             'RecipientUserID' => [
                                 sprintf(
                                     '"%s" is an unknown username.',
-                                    $recipient
+                                    htmlspecialchars($recipient)
                                 )
                             ]
                         ]

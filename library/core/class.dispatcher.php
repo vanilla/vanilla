@@ -10,6 +10,7 @@
  * @package Core
  * @since 2.0
  */
+use Garden\Container\Container;
 use Garden\Web\Dispatcher;
 use Vanilla\Addon;
 use Vanilla\AddonManager;
@@ -103,16 +104,26 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
      */
     private $addonManager;
 
+    /**
+     * @var Container
+     */
+    private $container;
+
     /** @var bool */
     private $isHomepage;
 
     /**
-     * Class constructor.
+     * Gdn_Dispatcher constructor.
+     *
+     * @param AddonManager $addonManager
+     * @param Container $container
+     * @param Dispatcher $dispatcher
      */
-    public function __construct(AddonManager $addonManager = null, Dispatcher $dispatcher = null) {
+    public function __construct(AddonManager $addonManager, Container $container, Dispatcher $dispatcher) {
         parent::__construct();
         $this->addonManager = $addonManager;
-        $this->dispatcher = $dispatcher ?: new Dispatcher();
+        $this->container = $container;
+        $this->dispatcher = $dispatcher;
         $this->reset();
     }
 
@@ -830,7 +841,13 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
      */
     private function createController($controllerName, $request, &$routeArgs) {
         /* @var Gdn_Controller $controller */
-        $controller = new $controllerName();
+        $controller = $this->container->get($controllerName);
+
+        // Allow classes to have a dependency on Gdn_Controller.
+        // It is possible that the controller does not inherit Gdn_Controller :(
+        if (is_a($controller, Gdn_Controller::class)) {
+            $this->container->setInstance(Gdn_Controller::class, $controller);
+        }
         Gdn::controller($controller);
 
         $this->EventArguments['Controller'] =& $controller;

@@ -21,7 +21,7 @@ foreach ($this->DraftData->resultArray() as $Draft) {
     <li class="Item Draft">
         <div
             class="Options"><?php
-                echo anchor(t('Draft.Delete', 'Delete'), $deleteUrl, 'Delete'); ?></div>
+                echo anchor(t('Draft.Delete', '&times;'), $deleteUrl, 'Delete'); ?></div>
         <div class="ItemContent">
             <?php echo anchor(Gdn_Format::text(val('Name', $Draft), false), $editUrl, 'Title DraftLink'); ?>
             <?php if ($excerpt) : ?>

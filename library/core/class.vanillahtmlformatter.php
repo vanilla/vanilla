@@ -1,18 +1,15 @@
 <?php
 /**
- * HtmLawed Plugin.
- *
  * @copyright 2009-2017 Vanilla Forums Inc.
  * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
- * @package HtmLawed
  */
 
-use Garden\Container\Container;
+use \Garden\EventManager;
 
 /**
- * Class HTMLawedPlugin
+ * Class VanillaHtmlFormatter
  */
-class HtmLawedPlugin extends Gdn_Plugin {
+class VanillaHtmlFormatter {
 
     /** @var array Classes users may have in their content. */
     protected $allowedClasses = [
@@ -129,6 +126,9 @@ class HtmLawedPlugin extends Gdn_Plugin {
         'ul'
     ];
 
+    /** @var array Extra allowed classes. */
+    protected $extraAllowedClasses = [];
+
     /**
      * Filter provided HTML through htmlLawed and return the result.
      *
@@ -216,9 +216,21 @@ class HtmLawedPlugin extends Gdn_Plugin {
     }
 
     /**
-     * No setup.
+     * Add extra allowed classes.
+     *
+     * @param array $extraAllowedClasses
      */
-    public function setup() {
+    public function addExtraAllowedClasses($extraAllowedClasses) {
+        $this->extraAllowedClasses = array_unique(array_merge($this->extraAllowedClasses, $extraAllowedClasses));
+    }
+
+    /**
+     * Get the currently defined extra allowed classes.
+     *
+     * @return array Extra allowed classes
+     */
+    public function getExtraAllowedClasses() {
+        return $this->extraAllowedClasses;
     }
 
     /**
@@ -230,7 +242,7 @@ class HtmLawedPlugin extends Gdn_Plugin {
         static $spec;
         if ($spec === null) {
             $spec = [];
-            $allowedClasses = implode('|', $this->allowedClasses);
+            $allowedClasses = implode('|', array_merge($this->allowedClasses, $this->extraAllowedClasses));
             foreach ($this->classedElements as $tag) {
                 if (!array_key_exists($tag, $spec) || !is_array($spec[$tag])) {
                     $spec[$tag] = [];
@@ -243,25 +255,4 @@ class HtmLawedPlugin extends Gdn_Plugin {
         }
         return $spec;
     }
-
-    /**
-     * Install the formatter to the container.
-     *
-     * @param Container $dic The container to initialize.
-     */
-    public function container_init_handler(Container $dic) {
-        $dic->rule('HtmlFormatter')
-            ->setClass(__CLASS__)
-            ->setShared(true);
-    }
 }
-
-if (!function_exists('FormatRssCustom')) :
-    /**
-     * @param string $html
-     * @return string Returns the filtered RSS.
-     */
-    function formatRssHtmlCustom($html) {
-        return Htmlawed::filterRSS($html);
-    }
-endif;

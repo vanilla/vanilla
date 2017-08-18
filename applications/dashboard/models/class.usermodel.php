@@ -3502,8 +3502,9 @@ class UserModel extends Gdn_Model {
                 'Permissions' => null,
                 'Attributes' => dbencode([
                     'State' => 'Deleted',
+                    // We cannot keep emails until we have a method to purge deleted users.
+                    // See https://github.com/vanilla/vanilla/pull/5808 for more details.
                     'OriginalName' => $userData['Name'],
-                    'OriginalEmail' => $userData['Email'],
                     'DeletedBy' => Gdn::session()->UserID,
                 ]),
                 'DateSetInvitations' => null,

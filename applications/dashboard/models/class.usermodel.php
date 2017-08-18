@@ -48,7 +48,7 @@ class UserModel extends Gdn_Model {
 
     /** Timeout for SSO */
     const SSO_TIMEOUT = 1200;
-    
+
     /** @var */
     public $SessionColumns;
 
@@ -1257,7 +1257,8 @@ class UserModel extends Gdn_Model {
     /**
      * Get users by role.
      *
-     * @param int|string $role The ID or name of the role.
+     * @param int|string|array $role The ID(s) or name of the role.
+
      * @return Gdn_DataSet Returns the users with the given role.
      */
     public function getByRole($role) {

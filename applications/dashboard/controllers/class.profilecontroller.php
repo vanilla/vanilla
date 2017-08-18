@@ -969,6 +969,32 @@ class ProfileController extends Gdn_Controller {
             $userPrefs = [];
         }
         $metaPrefs = UserModel::getMeta($this->User->UserID, 'Preferences.%', 'Preferences.');
+        $queueNotificationsPrefs = [];
+
+        // Moderation Notifications Preferences
+        if (checkPermission(['Garden.Settings.Manage', 'Garden.Moderation.Manage', 'Moderation.ModerationQueue.Manage'])) {
+            $queueNotificationsPrefs = UserModel::getMeta($this->User->UserID, 'QueueNotifications.%', 'QueueNotifications.');
+
+            $intervalUnits = [
+                'minute' => t('minute(s)'),
+                'hour' => t('hour(s)'),
+                'day' => t('day(s)'),
+            ];
+
+            $this->setData('QueueNotifications.IntervalUnits', $intervalUnits);
+
+            $queueNotifications = [];
+            foreach (['Moderation', 'Spam'] as $queue) {
+                $queueNotifications[$queue] = [
+                    'Name' => t("$queue Queue"),
+                    'Enabled' => val("$queue.Enabled", $queueNotificationsPrefs),
+                    'IntervalAmount' => val("$queue.IntervalAmount", $queueNotificationsPrefs, 1),
+                    'IntervalUnit' => val("$queue.IntervalUnit", $queueNotificationsPrefs, 'day'),
+                ];
+            }
+
+            $this->setData('QueueNotifications.Data', $queueNotifications);
+        }
 
         // Define the preferences to be managed
         $notifications = [];
@@ -1044,6 +1070,7 @@ class ProfileController extends Gdn_Controller {
         }
         $currentPrefs = array_merge($currentPrefs, $metaPrefs);
         $currentPrefs = array_map('intval', $currentPrefs);
+        $currentPrefs = array_merge($currentPrefs, $queueNotificationsPrefs);
         $this->setData('Preferences', $currentPrefs);
 
         if (UserModel::noEmail()) {
@@ -1086,12 +1113,46 @@ class ProfileController extends Gdn_Controller {
                 }
             }
 
-            $this->UserModel->savePreference($this->User->UserID, $userPrefs);
-            UserModel::setMeta($this->User->UserID, $newMetaPrefs, 'Preferences.');
+            if (isset($queueNotifications)) {
+                foreach ($queueNotifications as $id => $settings) {
+                    $name = null;
+                    foreach ($settings as $key => $defaultValue) {
+                        if ($key === 'Name') {
+                            $name = $defaultValue;
+                            continue;
+                        }
 
-            $this->setData('Preferences', array_merge($this->data('Preferences', []), $userPrefs, $newMetaPrefs));
+                        $preferenceKey = "$id.$key";
+                        $postedValue = $this->Form->getValue($preferenceKey, null);
+                        if ($postedValue != $defaultValue) {
 
-            if (count($this->Form->errors() == 0)) {
+                            switch($key) {
+                                case 'IntervalAmount':
+                                    if ($this->Form->validateRule($preferenceKey, 'function:ValidateInteger')) {
+                                        if ($postedValue <= 0) {
+                                            $this->Form->addError(sprintf(t('%s must be greater than 0.'), t('The minimum delay')), $preferenceKey);
+                                        }
+                                    }
+
+                                    break;
+                                case 'IntervalUnit':
+                                    $this->Form->validateRule($preferenceKey, 'regex:/^('.implode('|', array_keys($intervalUnits)).')$/');
+                                    break;
+                            }
+
+                            $newQueueNotificationsPrefs[$preferenceKey] = $postedValue;
+                        }
+                    }
+                }
+            }
+
+            if ($this->Form->errorCount() == 0) {
+                $this->UserModel->savePreference($this->User->UserID, $userPrefs);
+                UserModel::setMeta($this->User->UserID, $newMetaPrefs, 'Preferences.');
+                UserModel::setMeta($this->User->UserID, $newQueueNotificationsPrefs, 'QueueNotifications.');
+
+                $this->setData('Preferences', array_merge($this->data('Preferences', []), $userPrefs, $newMetaPrefs));
+
                 $this->informMessage(sprite('Check', 'InformSprite').t('Your preferences have been saved.'), 'Dismissable AutoDismiss HasSprite');
             }
         } else {

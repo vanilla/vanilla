@@ -159,7 +159,16 @@ class ActivityModel extends Gdn_Model {
 
         $row['Url'] = externalUrl($row['Route']);
 
-        if ($row['HeadlineFormat']) {
+        /**
+         * Dealing with Headline formats in different languages
+         *
+         * If HeadlineFormatCode has been saved to the Data field of the activity translate it.
+         * If not send out the already translated HeadlineFormat saved in the row.
+         * And for backwards backwards compatibility, user the Headline from the ActivityType table
+         */
+        if (!empty($data['HeadlineFormatCode'])) {
+            $row['Headline'] = formatString(t($data['HeadlineFormatCode'], $row['HeadlineFormat']), $row);
+        } elseif ($row['HeadlineFormat']) {
             $row['Headline'] = formatString($row['HeadlineFormat'], $row);
         } else {
             $row['Headline'] = Gdn_Format::activityHeadline($row);

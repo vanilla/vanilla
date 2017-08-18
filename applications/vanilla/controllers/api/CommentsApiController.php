@@ -99,7 +99,6 @@ class CommentsApiController extends AbstractApiController {
      * Delete a comment.
      *
      * @param int $id The ID of the comment.
-     * @return array
      */
     public function delete($id) {
         $this->permission('Garden.SignIn.Allow');
@@ -113,8 +112,6 @@ class CommentsApiController extends AbstractApiController {
             $this->discussionModel->categoryPermission('Vanilla.Comments.Delete', $discussion['CategoryID']);
         }
         $this->commentModel->deleteID($id);
-
-        return null;
     }
 
     /**
@@ -168,7 +165,7 @@ class CommentsApiController extends AbstractApiController {
             $this->discussionModel->categoryPermission('Vanilla.Discussions.View', $discussion['CategoryID']);
         }
 
-        $this->massageRow($comment);
+        $this->prepareRow($comment);
         $this->userModel->expandUsers($comment, ['InsertUserID']);
         $result = $out->validate($comment);
         return $result;
@@ -223,7 +220,7 @@ class CommentsApiController extends AbstractApiController {
         $this->permission();
 
         $in = $this->schema([
-            'discussionID:i' => 'The discussion ID.',
+            'discussionID:i?' => 'The discussion ID.',
             'page:i?' => [
                 'description' => 'Page number.',
                 'default' => 1,
@@ -236,39 +233,62 @@ class CommentsApiController extends AbstractApiController {
                 'minimum' => 1,
                 'maximum' => 100
             ],
-            'after:dt?' => 'Get only comments after this date.',
+            'insertUserID:i?' => 'Filter by author.',
+            'after:dt?' => 'Limit to comments after this date.',
             'expand:b?' => [
                 'description' => 'Expand associated records.',
                 'default' => false
             ]
-        ], 'in')->setDescription('List comments.');
+        ], 'in')->requireOneOf(['discussionID', 'insertUserID'])->setDescription('List comments.');
         $out = $this->schema([':a' => $this->commentSchema()], 'out');
 
         $query = $in->validate($query);
-        $discussion = $this->discussionByID($query['discussionID']);
-        list($offset, $limit) = offsetLimit("p{$query['page']}", $query['limit']);
-        $this->discussionModel->categoryPermission('Vanilla.Discussions.View', $discussion['CategoryID']);
 
-        // Build up the where clause.
-        $where = ['discussionID' => $query['discussionID'], 'joinUsers' => false];
-
-        if (isset($query['after'])) {
-            $where['dateInserted >'] = $query['after'];
+        $after = isset($query['after']) ? $query['after'] : null;
+        if ($after instanceof DateTimeImmutable) {
+            $after = $after->format(DateTime::ATOM);
         }
 
-        $rows = $this->commentModel->getWhere(
-            $where,
-            'DateInserted',
-            'asc',
-            $limit,
-            $offset
-        )->resultArray();
+        // Lookup by discussion or by user?
+        if (array_key_exists('discussionID', $query)) {
+            $discussion = $this->discussionByID($query['discussionID']);
+            list($offset, $limit) = offsetLimit("p{$query['page']}", $query['limit']);
+            $this->discussionModel->categoryPermission('Vanilla.Discussions.View', $discussion['CategoryID']);
+
+            // Build up the where clause.
+            $where = ['DiscussionID' => $query['discussionID'], 'joinUsers' => false];
+
+            if (isset($query['insertUserID'])) {
+                $where['InsertUserID'] = $query['insertUserID'];
+            }
+
+            if ($after !== null) {
+                $where['DateInserted >'] = $after;
+            }
+
+            $rows = $this->commentModel->getWhere(
+                $where,
+                'DateInserted',
+                'asc',
+                $limit,
+                $offset
+            )->resultArray();
+        } else {
+            $rows = $this->commentModel->getByUser2(
+                $query['insertUserID'],
+                $query['limit'],
+                $query['offset'],
+                false,
+                $after,
+                'asc'
+            )->resultArray();
+        }
 
         if ($query['expand']) {
             $this->userModel->expandUsers($rows, ['InsertUserID']);
         }
         foreach ($rows as &$currentRow) {
-            $this->massageRow($currentRow);
+            $this->prepareRow($currentRow);
         }
 
         $result = $out->validate($rows);
@@ -280,7 +300,7 @@ class CommentsApiController extends AbstractApiController {
      *
      * @param array $row
      */
-    public function massageRow(array &$row) {
+    public function prepareRow(array &$row) {
         $this->formatField($row, 'Body', $row['Format']);
         $row['Url'] = commentUrl($row);
 
@@ -304,25 +324,25 @@ class CommentsApiController extends AbstractApiController {
         $out = $this->commentSchema('out');
 
         $body = $in->validate($body, true);
-        $data = $this->caseScheme->convertArrayKeys($body);
-        $data['CommentID'] = $id;
+        $commentData = $this->caseScheme->convertArrayKeys($body);
+        $commentData['CommentID'] = $id;
         $row = $this->commentByID($id);
         if ($row['InsertUserID'] !== $this->getSession()->UserID) {
             $discussion = $this->discussionByID($row['DiscussionID']);
             $this->discussionModel->categoryPermission('Vanilla.Comments.Edit', $discussion['CategoryID']);
         }
-        if (array_key_exists('DiscussionID', $data) && $row['DiscussionID'] !== $data['DiscussionID']) {
-            $discussion = $this->discussionByID($data['DiscussionID']);
+        if (array_key_exists('DiscussionID', $commentData) && $row['DiscussionID'] !== $commentData['DiscussionID']) {
+            $discussion = $this->discussionByID($commentData['DiscussionID']);
             $this->discussionModel->categoryPermission('Vanilla.Comments.Add', $discussion['CategoryID']);
         }
         // Body is a required field in CommentModel::save.
-        if (!array_key_exists('Body', $data)) {
-            $data['Body'] = $row['Body'];
+        if (!array_key_exists('Body', $commentData)) {
+            $commentData['Body'] = $row['Body'];
         }
-        $this->commentModel->save($data);
+        $this->commentModel->save($commentData);
         $row = $this->commentByID($id);
         $this->userModel->expandUsers($row, ['InsertUserID']);
-        $this->massageRow($row);
+        $this->prepareRow($row);
 
         $result = $out->validate($row);
         return $result;
@@ -342,15 +362,15 @@ class CommentsApiController extends AbstractApiController {
         $out = $this->commentSchema('out');
 
         $body = $in->validate($body);
-        $data = $this->caseScheme->convertArrayKeys($body);
-        $discussion = $this->discussionByID($data['DiscussionID']);
+        $commentData = $this->caseScheme->convertArrayKeys($body);
+        $discussion = $this->discussionByID($commentData['DiscussionID']);
         $this->discussionModel->categoryPermission('Vanilla.Comments.Add', $discussion['CategoryID']);
-        $id = $this->commentModel->save($data);
+        $id = $this->commentModel->save($commentData);
         if (!$id) {
             throw new ServerException('Unable to insert comment.', 500);
         }
         $row = $this->commentByID($id);
-        $this->massageRow($row);
+        $this->prepareRow($row);
         $this->userModel->expandUsers($row, ['InsertUserID']);
 
         $result = $out->validate($row);

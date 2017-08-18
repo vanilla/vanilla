@@ -22,15 +22,15 @@
                                 sprintf(t('by %s'), userAnchor($Row)).
                                 '</span>';
 
-                            echo Bullet(' ');
+                            echo bullet(' ');
                             echo ' <span class="MItem-DateInserted">'.
                                 Gdn_Format::date($Row['DateInserted'], 'html').
                                 '</span> ';
 
 
                             if (isset($Row['Breadcrumbs'])) {
-                                echo Bullet(' ');
-                                echo ' <span class="MItem-Location">'.Gdn_Theme::Breadcrumbs($Row['Breadcrumbs'], false).'</span> ';
+                                echo bullet(' ');
+                                echo ' <span class="MItem-Location">'.Gdn_Theme::breadcrumbs($Row['Breadcrumbs'], false).'</span> ';
                             }
 
                             if (isset($Row['Notes'])) {
@@ -66,7 +66,7 @@
 
                         if (($Count) > 1) {
                             $url = $this->data('SearchUrl').'&discussionid='.urlencode($Row['DiscussionID']).'#search-results';
-                            echo '<div>'.anchor(Plural($Count, '%s result', '%s results'), $url).'</div>';
+                            echo '<div>'.anchor(plural($Count, '%s result', '%s results'), $url).'</div>';
                         }
                         ?>
                     </div>

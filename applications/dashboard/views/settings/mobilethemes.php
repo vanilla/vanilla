@@ -111,7 +111,7 @@ helpAsset(t('About Theme Preview'), t('Not getting what you expect when you prev
             echo '<div class="Alert alert">';
             echo url(
                 sprintf(t('%1$s version %2$s is available.'), $this->data('EnabledThemeName'), $NewVersion),
-                CombinePaths([$AddonUrl, 'find', urlencode($this->data('EnabledThemeName'))], '/')
+                combinePaths([$AddonUrl, 'find', urlencode($this->data('EnabledThemeName'))], '/')
             );
             echo '</div>';
         }
@@ -163,8 +163,8 @@ helpAsset(t('About Theme Preview'), t('Not getting what you expect when you prev
 
 
             $PreviewImageHtml = ($PreviewUrl !== FALSE)
-                ? anchor(Img($PreviewUrl, ['alt' => $ScreenName, 'class' => 'label-selector-image']), $PreviewUrl, '', ['class' => 'theme-image mfp-image'])
-                : anchor(Img('/themes/mobile/mobile.png', ['alt' => $ScreenName, 'class' => 'label-selector-image']), $PreviewUrl, '', ['class' => 'theme-image mfp-image']);
+                ? anchor(img($PreviewUrl, ['alt' => $ScreenName, 'class' => 'label-selector-image']), $PreviewUrl, '', ['class' => 'theme-image mfp-image'])
+                : anchor(img('/themes/mobile/mobile.png', ['alt' => $ScreenName, 'class' => 'label-selector-image']), $PreviewUrl, '', ['class' => 'theme-image mfp-image']);
 
             $DescriptionHtml = ($Description)
                 ? '<em class="theme-description">'.$Description.'</em>'
@@ -189,7 +189,7 @@ helpAsset(t('About Theme Preview'), t('Not getting what you expect when you prev
                                 <?php echo anchor(dashboardSymbol('expand', 'icon-16'), 'dashboard/settings/themeinfo/'.$ThemeName, 'js-modal', ['data-css-class' => 'modal-center modal-md', 'data-modal-type' => 'noheader']); ?>
                             </div>
                             <div class="buttons">
-                                <?php echo anchor(t('Apply'), 'dashboard/settings/mobilethemes/'.$ThemeName.'/'.$Session->TransientKey(), 'EnableAddon EnableTheme btn btn-overlay', ['target' => '_top']);
+                                <?php echo anchor(t('Apply'), 'dashboard/settings/mobilethemes/'.$ThemeName.'/'.$Session->transientKey(), 'EnableAddon EnableTheme btn btn-overlay', ['target' => '_top']);
                                 if ($allowPreview) {
                                     echo anchor(t('Preview'), 'dashboard/settings/previewtheme/'.$ThemeName, 'btn btn-overlay js-preview-addon');
                                 }

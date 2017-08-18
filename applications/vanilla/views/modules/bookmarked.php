@@ -11,7 +11,7 @@ $Bookmarks = $this->data('Bookmarks');
         <ul id="<?php echo $this->ListID; ?>" class="PanelInfo PanelDiscussions DataList">
             <?php
             foreach ($Bookmarks->result() as $Discussion) {
-                WriteModuleDiscussion($Discussion);
+                writeModuleDiscussion($Discussion);
             }
             if ($Bookmarks->numRows() == $this->Limit) {
                 ?>

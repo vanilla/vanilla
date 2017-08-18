@@ -1285,27 +1285,30 @@
             // iOS keyboard does not push content up initially,
             // thus blocking the actual content. Typing (spaces, newlines) also
             // jump the page up, so keep it in view.
-            if (window.parent.location != window.location
-                && (/ipad|iphone|ipod/i).test(navigator.userAgent)) {
+            if (window.parent.location != window.location && (/ipad|iphone|ipod/i).test(navigator.userAgent)) {
 
                 var contentEditable = $(editor.composer.iframe).contents().find('body');
                 contentEditable.attr('autocorrect', 'off');
                 contentEditable.attr('autocapitalize', 'off');
 
-                var iOSscrollFrame = $(window.parent.document).find('#vanilla-iframe').contents();
-                var iOSscrollTo = $(iOSscrollFrame).find('#' + editor.config.toolbar).closest('form').find('.Buttons');
+                try {
+                    var iOSscrollFrame = $(window.parent.document).find('#vanilla-iframe').contents();
+                    var iOSscrollTo = $(iOSscrollFrame).find('#' + editor.config.toolbar).closest('form').find('.Buttons');
 
-                contentEditable.on('keydown keyup', function(e) {
-                    Vanilla.scrollTo(iOSscrollTo);
-                    editor.focus();
-                });
-
-                editor.on('focus', function() {
-                    //var postButton = $('#'+editor.config.toolbar).parents('form').find('.CommentButton');
-                    setTimeout(function() {
+                    contentEditable.on('keydown keyup', function(e) {
                         Vanilla.scrollTo(iOSscrollTo);
-                    }, 1);
-                });
+                        editor.focus();
+                    });
+
+                    editor.on('focus', function() {
+                        //var postButton = $('#'+editor.config.toolbar).parents('form').find('.CommentButton');
+                        setTimeout(function() {
+                            Vanilla.scrollTo(iOSscrollTo);
+                        }, 1);
+                    });
+                } catch (e) {
+                    // "window.parent unsupported for iFrames in your browser"
+                }
             }
         }
 

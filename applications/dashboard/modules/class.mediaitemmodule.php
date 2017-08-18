@@ -415,7 +415,7 @@ class MediaItemModule extends Gdn_Module {
      */
     public function addButton($text, $url, $attributes) {
         if (is_string($attributes)) {
-            $attr['class'] = $attributes;
+            $attr = ['class' => $attributes];
         } elseif (is_array($attributes)) {
             $attr = $attributes;
         } else {

@@ -1,34 +1,34 @@
 <?php if (!defined('APPLICATION')) exit();
 
 if (!function_exists('WriteModuleDiscussion')):
-    function writeModuleDiscussion($Discussion, $Px = 'Bookmark', $showPhotos = false) {
+    function writeModuleDiscussion($discussion, $px = 'Bookmark', $showPhotos = false) {
         ?>
-        <li id="<?php echo "{$Px}_{$Discussion->DiscussionID}"; ?>" class="<?php echo CssClass($Discussion); ?>">
+        <li id="<?php echo "{$px}_{$discussion->DiscussionID}"; ?>" class="<?php echo cssClass($discussion); ?>">
             <?php if ($showPhotos) :
-                $firstUser = userBuilder($Discussion, 'First');
+                $firstUser = userBuilder($discussion, 'First');
                 echo userPhoto($firstUser, ['LinkClass' => 'IndexPhoto']);
             endif; ?>
    <span class="Options">
       <?php
-      //      echo OptionsList($Discussion);
-      echo BookmarkButton($Discussion);
+      //      echo optionsList($Discussion);
+      echo bookmarkButton($discussion);
       ?>
    </span>
 
             <div class="Title"><?php
-                echo anchor(Gdn_Format::text($Discussion->Name, false), DiscussionUrl($Discussion).($Discussion->CountCommentWatch > 0 ? '#Item_'.$Discussion->CountCommentWatch : ''), 'DiscussionLink');
+                echo anchor(Gdn_Format::text($discussion->Name, false), discussionUrl($discussion).($discussion->CountCommentWatch > 0 ? '#Item_'.$discussion->CountCommentWatch : ''), 'DiscussionLink');
                 ?></div>
             <div class="Meta DiscussionsModuleMeta">
                 <?php
-                $Last = new stdClass();
-                $Last->UserID = $Discussion->LastUserID;
-                $Last->Name = $Discussion->LastName;
+                $last = new stdClass();
+                $last->UserID = $discussion->LastUserID;
+                $last->Name = $discussion->LastName;
 
-                echo NewComments($Discussion);
+                echo newComments($discussion);
 
-                $translation = pluralTranslate($Discussion->CountComments, '%s comment html', '%s comments html', t('%s comment'), t('%s comments'));
-                echo '<span class="MItem">'.Gdn_Format::date($Discussion->LastDate, 'html').UserAnchor($Last).'</span>';
-                echo '<span class="MItem CountComments Hidden">'.sprintf($translation, $Discussion->CountComments).'</span>';
+                $translation = pluralTranslate($discussion->CountComments, '%s comment html', '%s comments html', t('%s comment'), t('%s comments'));
+                echo '<span class="MItem">'.Gdn_Format::date($discussion->LastDate, 'html').userAnchor($last).'</span>';
+                echo '<span class="MItem CountComments Hidden">'.sprintf($translation, $discussion->CountComments).'</span>';
                 ?>
             </div>
         </li>
@@ -38,63 +38,63 @@ endif;
 
 if (!function_exists('WritePromotedContent')):
     /**
-     * Generates html output of $Content array
+     * Generates html output of $content array
      *
-     * @param array|object $Content
-     * @param PromotedContentModule $Sender
+     * @param array|object $content
+     * @param PromotedContentModule $sender
      */
-    function writePromotedContent($Content, $Sender) {
-        static $UserPhotoFirst = NULL;
-        if ($UserPhotoFirst === null)
-            $UserPhotoFirst = c('Vanilla.Comment.UserPhotoFirst', true);
+    function writePromotedContent($content, $sender) {
+        static $userPhotoFirst = NULL;
+        if ($userPhotoFirst === null)
+            $userPhotoFirst = c('Vanilla.Comment.UserPhotoFirst', true);
 
-        $ContentType = val('RecordType', $Content);
-        $ContentID = val("{$ContentType}ID", $Content);
-        $Author = val('Author', $Content);
-        $ContentURL = val('Url', $Content);
-        $Sender->EventArguments['Content'] = &$Content;
-        $Sender->EventArguments['ContentUrl'] = &$ContentURL;
+        $contentType = val('RecordType', $content);
+        $contentID = val("{$contentType}ID", $content);
+        $author = val('Author', $content);
+        $contentURL = val('Url', $content);
+        $sender->EventArguments['Content'] = &$content;
+        $sender->EventArguments['ContentUrl'] = &$contentURL;
         ?>
-        <div id="<?php echo "Promoted_{$ContentType}_{$ContentID}"; ?>" class="<?php echo CssClass($Content); ?>">
+        <div id="<?php echo "Promoted_{$contentType}_{$contentID}"; ?>" class="<?php echo cssClass($content); ?>">
             <div class="AuthorWrap">
          <span class="Author">
             <?php
-            if ($UserPhotoFirst) {
-                echo userPhoto($Author);
-                echo userAnchor($Author, 'Username');
+            if ($userPhotoFirst) {
+                echo userPhoto($author);
+                echo userAnchor($author, 'Username');
             } else {
-                echo userAnchor($Author, 'Username');
-                echo userPhoto($Author);
+                echo userAnchor($author, 'Username');
+                echo userPhoto($author);
             }
-            $Sender->fireEvent('AuthorPhoto');
+            $sender->fireEvent('AuthorPhoto');
             ?>
          </span>
          <span class="AuthorInfo">
             <?php
-            echo ' '.WrapIf(htmlspecialchars(val('Title', $Author)), 'span', ['class' => 'MItem AuthorTitle']);
-            echo ' '.WrapIf(htmlspecialchars(val('Location', $Author)), 'span', ['class' => 'MItem AuthorLocation']);
-            $Sender->fireEvent('AuthorInfo');
+            echo ' '.wrapIf(htmlspecialchars(val('Title', $author)), 'span', ['class' => 'MItem AuthorTitle']);
+            echo ' '.wrapIf(htmlspecialchars(val('Location', $author)), 'span', ['class' => 'MItem AuthorLocation']);
+            $sender->fireEvent('AuthorInfo');
             ?>
          </span>
             </div>
             <div class="Meta CommentMeta CommentInfo">
          <span class="MItem DateCreated">
-            <?php echo anchor(Gdn_Format::date($Content['DateInserted'], 'html'), $ContentURL, 'Permalink', ['rel' => 'nofollow']); ?>
+            <?php echo anchor(Gdn_Format::date($content['DateInserted'], 'html'), $contentURL, 'Permalink', ['rel' => 'nofollow']); ?>
          </span>
                 <?php
                 // Include source if one was set
-                if ($Source = val('Source', $Content))
-                    echo wrap(sprintf(t('via %s'), t($Source.' Source', $Source)), 'span', ['class' => 'MItem Source']);
+                if ($source = val('Source', $content))
+                    echo wrap(sprintf(t('via %s'), t($source.' Source', $source)), 'span', ['class' => 'MItem Source']);
 
-                $Sender->fireEvent('ContentInfo');
+                $sender->fireEvent('ContentInfo');
                 ?>
             </div>
             <div
-                class="Title"><?php echo anchor(Gdn_Format::text(sliceString($Content['Name'], $Sender->TitleLimit), false), $ContentURL, 'DiscussionLink'); ?></div>
+                class="Title"><?php echo anchor(Gdn_Format::text(sliceString($content['Name'], $sender->TitleLimit), false), $contentURL, 'DiscussionLink'); ?></div>
             <div class="Body">
                 <?php
-                echo anchor(htmlspecialchars(sliceString(Gdn_Format::plainText($Content['Body'], $Content['Format']), $Sender->BodyLimit)), $ContentURL, 'BodyLink');
-                $Sender->fireEvent('AfterPromotedBody'); // separate event to account for less space.
+                echo anchor(htmlspecialchars(sliceString(Gdn_Format::plainText($content['Body'], $content['Format']), $sender->BodyLimit)), $contentURL, 'BodyLink');
+                $sender->fireEvent('AfterPromotedBody'); // separate event to account for less space.
                 ?>
             </div>
         </div>

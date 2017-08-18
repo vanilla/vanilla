@@ -9,36 +9,36 @@
 /**
  * A placeholder for future menu items.
  *
- * @param array $Params The parameters passed into the function.
- * @param Smarty $Smarty The smarty object rendering the template.
+ * @param array $params The parameters passed into the function.
+ * @param Smarty $smarty The smarty object rendering the template.
  * @return string
  */
-function smarty_function_custom_menu($Params, &$Smarty) {
-    $Controller = Gdn::controller();
-    if (is_object($Menu = val('Menu', $Controller))) {
-        $Format = val('format', $Params, wrap('<a href="%url" class="%class">%text</a>', val('wrap', $Params, 'li')));
-        $Result = '';
-        foreach ($Menu->Items as $Group) {
-            foreach ($Group as $Item) {
+function smarty_function_custom_menu($params, &$smarty) {
+    $controller = Gdn::controller();
+    if (is_object($menu = val('Menu', $controller))) {
+        $format = val('format', $params, wrap('<a href="%url" class="%class">%text</a>', val('wrap', $params, 'li')));
+        $result = '';
+        foreach ($menu->Items as $group) {
+            foreach ($group as $item) {
                 // Make sure the item is a custom item.
-                if (valr('Attributes.Standard', $Item)) {
+                if (valr('Attributes.Standard', $item)) {
                     continue;
                 }
 
                 // Make sure the user has permission for the item.
-                if ($Permission = val('Permission', $Item)) {
-                    if (!Gdn::session()->checkPermission($Permission)) {
+                if ($permission = val('Permission', $item)) {
+                    if (!Gdn::session()->checkPermission($permission)) {
                         continue;
                     }
                 }
 
-                if (($Url = val('Url', $Item)) && ($Text = val('Text', $Item))) {
-                    $Attributes = val('Attributes', $Item);
-                    $Result .= Gdn_Theme::link($Url, $Text, $Format, $Attributes)."\r\n";
+                if (($url = val('Url', $item)) && ($text = val('Text', $item))) {
+                    $attributes = val('Attributes', $item);
+                    $result .= Gdn_Theme::link($url, $text, $format, $attributes)."\r\n";
                 }
             }
         }
-        return $Result;
+        return $result;
     }
     return '';
 }

@@ -20,34 +20,34 @@ class GettingStartedPlugin extends Gdn_Plugin {
     /**
      * Adds a "My Forums" menu option to the dashboard area.
      */
-    public function settingsController_render_before($Sender) {
+    public function settingsController_render_before($sender) {
         // Have they visited their dashboard?
-        if (strtolower($Sender->RequestMethod) != 'index') {
+        if (strtolower($sender->RequestMethod) != 'index') {
             $this->saveStep('Plugins.GettingStarted.Dashboard');
         }
 
         // Save the action if editing registration settings
-        if (strcasecmp($Sender->RequestMethod, 'registration') == 0 && $Sender->Form->authenticatedPostBack() === true) {
+        if (strcasecmp($sender->RequestMethod, 'registration') == 0 && $sender->Form->authenticatedPostBack() === true) {
             $this->saveStep('Plugins.GettingStarted.Registration');
         }
 
         // Save the action if they reviewed plugins
-        if (strcasecmp($Sender->RequestMethod, 'plugins') == 0) {
+        if (strcasecmp($sender->RequestMethod, 'plugins') == 0) {
             $this->saveStep('Plugins.GettingStarted.Plugins');
         }
 
         // Save the action if they reviewed plugins
-        if (strcasecmp($Sender->RequestMethod, 'managecategories') == 0) {
+        if (strcasecmp($sender->RequestMethod, 'managecategories') == 0) {
             $this->saveStep('Plugins.GettingStarted.Categories');
         }
 
         // Add messages & their css on dashboard
-        if (strcasecmp($Sender->RequestMethod, 'index') == 0) {
-            $Sender->addCssFile('getting-started.css', 'plugins/GettingStarted');
+        if (strcasecmp($sender->RequestMethod, 'index') == 0) {
+            $sender->addCssFile('getting-started.css', 'plugins/GettingStarted');
 
-            $Session = Gdn::session();
-            $WelcomeMessage = '<div class="GettingStarted">'
-                .anchor('&times;', '/dashboard/plugin/dismissgettingstarted/'.$Session->transientKey(), 'Dismiss')
+            $session = Gdn::session();
+            $welcomeMessage = '<div class="GettingStarted">'
+                .anchor('&times;', '/dashboard/plugin/dismissgettingstarted/'.$session->transientKey(), 'Dismiss')
                 ."<h1>".t("Here's how to get started:")."</h1>"
                 .'<ul>
         <li class="One'.(c('Plugins.GettingStarted.Dashboard', '0') == '1' ? ' Done' : '').'">
@@ -94,7 +94,7 @@ class GettingStartedPlugin extends Gdn_Plugin {
       </li>
    </ul>
 </div>';
-            $Sender->addAsset('Messages', $WelcomeMessage, 'WelcomeMessage');
+            $sender->addAsset('Messages', $welcomeMessage, 'WelcomeMessage');
         }
     }
 
@@ -103,12 +103,12 @@ class GettingStartedPlugin extends Gdn_Plugin {
      *
      * 1. If the user edits the registration settings.
      *
-     * @param $Step
+     * @param $step
      * @throws Exception
      */
-    public function saveStep($Step) {
-        if (Gdn::config($Step, '') != '1') {
-            saveToConfig($Step, '1');
+    public function saveStep($step) {
+        if (Gdn::config($step, '') != '1') {
+            saveToConfig($step, '1');
         }
 
         // If all of the steps are now completed, disable this plugin
@@ -125,10 +125,10 @@ class GettingStartedPlugin extends Gdn_Plugin {
     /**
      * If the user posts back any forms to their profile, they've completed step 4: profile customization.
      *
-     * @param $Sender
+     * @param $sender
      */
-    public function profileController_render_before($Sender) {
-        if (property_exists($Sender, 'Form') && $Sender->Form->authenticatedPostBack() === true) {
+    public function profileController_render_before($sender) {
+        if (property_exists($sender, 'Form') && $sender->Form->authenticatedPostBack() === true) {
             $this->saveStep('Plugins.GettingStarted.Profile');
         }
     }
@@ -136,10 +136,10 @@ class GettingStartedPlugin extends Gdn_Plugin {
     /**
      * If the user starts a discussion, they've completed step 5: profile customization.
      *
-     * @param $Sender
+     * @param $sender
      */
-    public function postController_render_before($Sender) {
-        if (strcasecmp($Sender->RequestMethod, 'discussion') == 0 && $Sender->Form->authenticatedPostBack() === true) {
+    public function postController_render_before($sender) {
+        if (strcasecmp($sender->RequestMethod, 'discussion') == 0 && $sender->Form->authenticatedPostBack() === true) {
             $this->saveStep('Plugins.GettingStarted.Discussion');
         }
     }
@@ -147,10 +147,10 @@ class GettingStartedPlugin extends Gdn_Plugin {
     /**
      *
      *
-     * @param $Sender
+     * @param $sender
      * @throws Exception
      */
-    public function pluginController_dismissGettingStarted_create($Sender) {
+    public function pluginController_dismissGettingStarted_create($sender) {
         Gdn::pluginManager()->disablePlugin('GettingStarted');
         echo 'TRUE';
     }

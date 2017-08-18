@@ -52,12 +52,12 @@ class VanillaStatsPlugin extends Gdn_Plugin {
     /**
      * Override the default dashboard page with the new stats one.
      *
-     * @param Gdn_Dispatcher $Sender
+     * @param Gdn_Dispatcher $sender
      */
-    public function gdn_dispatcher_beforeDispatch_handler($Sender) {
-        $Enabled = c('Garden.Analytics.Enabled', true);
+    public function gdn_dispatcher_beforeDispatch_handler($sender) {
+        $enabled = c('Garden.Analytics.Enabled', true);
 
-        if ($Enabled) {
+        if ($enabled) {
             Gdn::pluginManager()->registerNewMethod('VanillaStatsPlugin', 'StatsDashboard', 'SettingsController', 'home');
         }
     }
@@ -65,37 +65,37 @@ class VanillaStatsPlugin extends Gdn_Plugin {
     /**
      *
      *
-     * @param $JsonResponse
-     * @param $RawResponse
+     * @param $jsonResponse
+     * @param $rawResponse
      */
-    public function securityTokenCallback($JsonResponse, $RawResponse) {
-        $SecurityToken = val('SecurityToken', $JsonResponse, null);
-        if (!is_null($SecurityToken)) {
-            $this->securityToken($SecurityToken);
+    public function securityTokenCallback($jsonResponse, $rawResponse) {
+        $securityToken = val('SecurityToken', $jsonResponse, null);
+        if (!is_null($securityToken)) {
+            $this->securityToken($securityToken);
         }
     }
 
     /**
      * Get the security token.
      *
-     * @param null|string $SetSecurityToken
+     * @param null|string $setSecurityToken
      * @return string
      */
-    protected function securityToken($SetSecurityToken = null) {
-        static $SecurityToken = null;
+    protected function securityToken($setSecurityToken = null) {
+        static $securityToken = null;
 
-        if (!is_null($SetSecurityToken)) {
-            $SecurityToken = $SetSecurityToken;
+        if (!is_null($setSecurityToken)) {
+            $securityToken = $setSecurityToken;
         }
 
-        if (is_null($SecurityToken)) {
-            $Request = ['VanillaID' => $this->VanillaID];
-            Gdn::statistics()->basicParameters($Request);
-            Gdn::statistics()->analytics('graph/getsecuritytoken.json', $Request, [
+        if (is_null($securityToken)) {
+            $request = ['VanillaID' => $this->VanillaID];
+            Gdn::statistics()->basicParameters($request);
+            Gdn::statistics()->analytics('graph/getsecuritytoken.json', $request, [
                 'Success' => [$this, 'SecurityTokenCallback']
             ]);
         }
-        return $SecurityToken;
+        return $securityToken;
     }
 
     /**
@@ -153,21 +153,21 @@ class VanillaStatsPlugin extends Gdn_Plugin {
      * A view containing most active discussions & users during a specific time
      * period. This gets ajaxed into the dashboard homepage as date ranges are defined.
      *
-     * @param SettingsController $Sender
+     * @param SettingsController $sender
      */
-    public function settingsController_dashboardSummaries_create($Sender) {
-        $DiscussionData = [];
-        $UserData = [];
+    public function settingsController_dashboardSummaries_create($sender) {
+        $discussionData = [];
+        $userData = [];
 
         if ($this->dashboardSummariesEnabled) {
             $range = Gdn::request()->getValue('range');
             $range['to'] = date(MYSQL_DATE_FORMAT, strtotime($range['to']));
             $range['from'] = date(MYSQL_DATE_FORMAT, strtotime($range['from']));
 
-            $UserModel = new UserModel();
+            $userModel = new UserModel();
 
             // Load the most active discussions during this date range
-            $DiscussionData = $UserModel->SQL
+            $discussionData = $userModel->SQL
                 ->select('d.DiscussionID, d.Name, d.CountBookmarks, d.CountViews, d.CountComments, d.CategoryID, d.DateInserted')
                 ->from('Discussion d')
                 ->where('d.DateLastComment >=', $range['from'])
@@ -192,11 +192,11 @@ class VanillaStatsPlugin extends Gdn_Plugin {
                     $fromDate,
                     $toDate
                 );
-                $Sender->setData('UserRangeWarning', $userRangeWarning);
+                $sender->setData('UserRangeWarning', $userRangeWarning);
             }
 
             // Load the most active users during the date range.
-            $UserData = $UserModel->SQL
+            $userData = $userModel->SQL
                 ->select('InsertUserID as UserID')
                 ->select('CommentID', 'count', 'CountComments')
                 ->from('Comment')
@@ -208,24 +208,24 @@ class VanillaStatsPlugin extends Gdn_Plugin {
                 ->get();
         }
 
-        $Sender->setData('DiscussionData', $DiscussionData);
-        $Sender->setData('UserData', $UserData);
+        $sender->setData('DiscussionData', $discussionData);
+        $sender->setData('UserData', $userData);
 
         // Load javascript & css, check permissions, and load side menu for this page.
-        $Sender->addJsFile('settings.js');
-        $Sender->title(t('Dashboard Summaries'));
+        $sender->addJsFile('settings.js');
+        $sender->title(t('Dashboard Summaries'));
 
-        $Sender->RequiredAdminPermissions = [
+        $sender->RequiredAdminPermissions = [
             'Garden.Settings.View',
             'Garden.Settings.Manage',
             'Garden.Community.Manage',
         ];
 
-        $Sender->fireEvent('DefineAdminPermissions');
-        $Sender->permission($Sender->RequiredAdminPermissions, '', false);
-        $Sender->setHighlightRoute('dashboard/settings');
+        $sender->fireEvent('DefineAdminPermissions');
+        $sender->permission($sender->RequiredAdminPermissions, '', false);
+        $sender->setHighlightRoute('dashboard/settings');
 
         // Render the custom dashboard view
-        $Sender->render('dashboardsummaries', '', 'plugins/VanillaStats');
+        $sender->render('dashboardsummaries', '', 'plugins/VanillaStats');
     }
 }

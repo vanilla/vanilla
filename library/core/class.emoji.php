@@ -96,7 +96,7 @@ class Emoji {
      *
      */
     protected function __construct() {
-        $this->assetPath = asset('/resources/emoji', '//');
+        $this->assetPath = asset('/resources/emoji', true);
 
         // Initialize the canonical list. (emoji)
         $this->emoji = [
@@ -263,12 +263,12 @@ class Emoji {
             foreach ($emojis as $name => $data) {
                 $emoji[] = [
                     "name" => "".$name."",
-                    "url" => Asset($emojiAssetPath.'/'.$data)
+                    "url" => asset($emojiAssetPath.'/'.$data, true)
                 ];
             }
 
             $emoji = [
-                'assetPath' => Asset($this->getAssetPath()),
+                'assetPath' => asset($this->getAssetPath(), true),
                 'format' => $this->getFormat(),
                 'emoji' => $this->getEmoji()
             ];
@@ -482,7 +482,7 @@ class Emoji {
         $filename = basename($emoji_path);
         $ext = '.'.pathinfo($filename, PATHINFO_EXTENSION);
         $basename = basename($filename, $ext);
-        $src = asset($emoji_path);
+        $src = asset($emoji_path, true);
 
         $attributes = [$src, $emoji_name, $src, $emoji_name, $dir, $filename, $basename, $ext];
         $attributes = array_map('htmlspecialchars', $attributes);
@@ -571,15 +571,15 @@ class Emoji {
      * Thanks to punbb 1.3.5 (GPL License) for function, which was largely
      * inspired from their do_smilies function.
      *
-     * @param string $Text The actual user-submitted post
+     * @param string $text The actual user-submitted post
      * @return string Return the emoji-formatted post
      */
-    public function translateToHtml($Text) {
+    public function translateToHtml($text) {
         if (!$this->enabled) {
-            return $Text;
+            return $text;
         }
 
-        $Text = ' '.$Text.' ';
+        $text = ' '.$text.' ';
 
         // First, translate all aliases. Canonical emoji will get translated
         // out of a loop.
@@ -589,11 +589,11 @@ class Emoji {
         foreach ($emojiAliasList as $emojiAlias => $emojiCanonical) {
             $emojiFilePath = $this->getEmojiPath($emojiCanonical);
 
-            if (strpos($Text, htmlentities($emojiAlias)) !== false) {
-                $Text = Gdn_Format::ReplaceButProtectCodeBlocks(
+            if (strpos($text, htmlentities($emojiAlias)) !== false) {
+                $text = Gdn_Format::replaceButProtectCodeBlocks(
                     '`(?<=[>\s]|(&nbsp;))'.preg_quote(htmlentities($emojiAlias), '`').'(?=\W)`m',
                     $this->img($emojiFilePath, $emojiAlias),
-                    $Text
+                    $text
                 );
             }
         }
@@ -603,7 +603,7 @@ class Emoji {
         $rdelim = preg_quote($this->rdelim, '`');
         $emoji = $this;
 
-        $Text = Gdn_Format::replaceButProtectCodeBlocks("`({$ldelim}\S+?{$rdelim})`i", function ($m) use ($emoji) {
+        $text = Gdn_Format::replaceButProtectCodeBlocks("`({$ldelim}\S+?{$rdelim})`i", function ($m) use ($emoji) {
             $emoji_name = trim($m[1], ':');
             $emoji_path = $emoji->getEmojiPath($emoji_name);
             if ($emoji_path) {
@@ -611,9 +611,9 @@ class Emoji {
             } else {
                 return $m[0];
             }
-        }, $Text, true);
+        }, $text, true);
 
-        return substr($Text, 1, -1);
+        return substr($text, 1, -1);
     }
 
     /**

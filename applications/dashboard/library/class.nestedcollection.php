@@ -223,7 +223,7 @@ trait NestedCollection {
      * @throws Exception
      */
     public function addDivider($key = '', $cssClass = '', $sort = []) {
-        $divider['key'] = $key;
+        $divider = ['key' => $key];
         if ($sort) {
             $divider['sort'] = $sort;
         }

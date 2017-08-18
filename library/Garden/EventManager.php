@@ -107,12 +107,12 @@ class EventManager {
      * public function eventName_handler($arg1, $arg2, ...) { ... }
      *
      * // Add/override a method called with Event::callUserFuncArray().
-     * public function ClassName_methodName($sender, $arg1, $arg2) { ... }
-     * public function ClassName_methodName_create($sender, $arg1, $arg2) { ... } // deprecated
+     * public function className_methodName($sender, $arg1, $arg2) { ... }
+     * public function className_methodName_create($sender, $arg1, $arg2) { ... } // deprecated
      *
      * // Call the handler before or after a method called with Event::callUserFuncArray().
-     * public function ClassName_methodName_before($sender, $arg1, $arg2) { ... }
-     * public function ClassName_methodName_after($sender, $arg1, $arg2) { ... }
+     * public function className_methodName_before($sender, $arg1, $arg2) { ... }
+     * public function className_methodName_after($sender, $arg1, $arg2) { ... }
      * ```
      *
      * @param mixed $class The class name or an object instance.

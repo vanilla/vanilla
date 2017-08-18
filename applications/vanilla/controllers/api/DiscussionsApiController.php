@@ -51,7 +51,6 @@ class DiscussionsApiController extends AbstractApiController {
      * Delete a discussion.
      *
      * @param int $id The ID of the discussion.
-     * @return array
      */
     public function delete($id) {
         $this->permission('Garden.SignIn.Allow');
@@ -64,8 +63,6 @@ class DiscussionsApiController extends AbstractApiController {
             $this->discussionModel->categoryPermission('Vanilla.Discussions.Delete', $row['CategoryID']);
         }
         $this->discussionModel->deleteID($id);
-
-        return null;
     }
 
     /**
@@ -126,7 +123,7 @@ class DiscussionsApiController extends AbstractApiController {
             'dateInserted:dt' => 'When the discussion was created.',
             'insertUserID:i' => 'The user that created the discussion.',
             'insertUser?' => $this->getUserFragmentSchema(),
-            'bookmarked:b' => 'Whether or no tthe discussion is bookmarked by the current user.',
+            'bookmarked:b' => 'Whether or no the discussion is bookmarked by the current user.',
             'announce:b' => 'Whether or not the discussion has been announced (pinned).',
             'closed:b' => 'Whether the discussion is closed or open.',
             'sink:b' => 'Whether or not the discussion has been sunk.',
@@ -155,14 +152,14 @@ class DiscussionsApiController extends AbstractApiController {
 
         $this->discussionModel->categoryPermission('Vanilla.Discussions.View', $row['CategoryID']);
 
-        $this->massageRow($row);
+        $this->prepareRow($row);
         $this->userModel->expandUsers($row, ['InsertUserID']);
 
         $result = $out->validate($row);
         return $result;
     }
 
-    public function massageRow(&$row) {
+    public function prepareRow(&$row) {
         $row['Announce'] = (bool)$row['Announce'];
         $row['Bookmarked'] = (bool)$row['Bookmarked'];
         $row['Url'] = discussionUrl($row);
@@ -256,7 +253,7 @@ class DiscussionsApiController extends AbstractApiController {
             $this->userModel->expandUsers($rows, ['InsertUserID']);
         }
         foreach ($rows as &$currentRow) {
-            $this->massageRow($currentRow);
+            $this->prepareRow($currentRow);
         }
 
         $result = $out->validate($rows, true);
@@ -280,19 +277,19 @@ class DiscussionsApiController extends AbstractApiController {
         $body = $in->validate($body, true);
 
         $row = $this->discussionByID($id);
-        $data = $this->caseScheme->convertArrayKeys($body);
-        $data['DiscussionID'] = $id;
+        $discussionData = $this->caseScheme->convertArrayKeys($body);
+        $discussionData['DiscussionID'] = $id;
         if ($row['InsertUserID'] !== $this->getSession()->UserID) {
             $this->discussionModel->categoryPermission('Vanilla.Discussions.Edit', $row['CategoryID']);
         }
-        if (array_key_exists('CategoryID', $data) && $row['CategoryID'] !== $data['CategoryID']) {
-            $this->discussionModel->categoryPermission('Vanilla.Discussions.Add', $data['CategoryID']);
+        if (array_key_exists('CategoryID', $discussionData) && $row['CategoryID'] !== $discussionData['CategoryID']) {
+            $this->discussionModel->categoryPermission('Vanilla.Discussions.Add', $discussionData['CategoryID']);
         }
 
-        $this->discussionModel->save($data);
+        $this->discussionModel->save($discussionData);
 
         $result = $this->discussionByID($id);
-        $this->massageRow($result);
+        $this->prepareRow($result);
         return $out->validate($result);
     }
 
@@ -312,8 +309,8 @@ class DiscussionsApiController extends AbstractApiController {
         $body = $in->validate($body);
         $this->discussionModel->categoryPermission('Vanilla.Discussions.Add', $body['categoryID']);
 
-        $data = $this->caseScheme->convertArrayKeys($body);
-        $id = $this->discussionModel->save($data);
+        $discussionData = $this->caseScheme->convertArrayKeys($body);
+        $id = $this->discussionModel->save($discussionData);
 
         if (!$id) {
             throw new ServerException('Unable to insert discussion.', 500);
@@ -321,7 +318,7 @@ class DiscussionsApiController extends AbstractApiController {
 
         $row = $this->discussionByID($id);
         $this->userModel->expandUsers($row, ['InsertUserID']);
-        $this->massageRow($row);
+        $this->prepareRow($row);
         $result = $out->validate($row);
         return new Data($result, 201);
     }

@@ -9,21 +9,21 @@
 /**
  * Includes a file in template. Handy for adding html files to tpl files
  *
- * @param array $Params The parameters passed into the function.
+ * @param array $params The parameters passed into the function.
  * The parameters that can be passed to this function are as follows.
  * - <b>name</b>: The name of the file.
- * @param Smarty $Smarty The smarty object rendering the template.
+ * @param Smarty $smarty The smarty object rendering the template.
  * @return string The rendered asset.
  */
-function smarty_function_include_file($Params, &$Smarty) {
-    $Name = ltrim(val('name', $Params), '/');
-    if (strpos($Name, '..') !== false) {
+function smarty_function_include_file($params, &$smarty) {
+    $name = ltrim(val('name', $params), '/');
+    if (strpos($name, '..') !== false) {
         return '<!-- Error, moving up directory path not allowed -->';
     }
-    if (isUrl($Name)) {
+    if (isUrl($name)) {
         return '<!-- Error, urls are not allowed -->';
     }
-    $filename = rtrim($Smarty->getTemplateDir(), '/').'/'.$Name;
+    $filename = rtrim($smarty->getTemplateDir(), '/').'/'.$name;
     if (!file_exists($filename)) {
         return '<!-- Error, file does not exist -->';
     }

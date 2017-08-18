@@ -23,7 +23,7 @@ helpAsset(sprintf(t('About %s'), t('Categories')), t('Categories are used to org
         <div id="UrlCode" class="input-wrap category-url-code">
             <?php
             echo '<div class="category-url">';
-            echo Gdn::request()->Url('categories', true);
+            echo Gdn::request()->url('categories', true);
             echo '/';
             echo wrap(htmlspecialchars($form->getValue('UrlCode')));
             echo '</div>';
@@ -53,7 +53,7 @@ helpAsset(sprintf(t('About %s'), t('Categories')), t('Categories are used to org
     <?php echo $form->imageUploadPreview(
         'Photo', t('Photo'), '', 'vanilla/settings/deletecategoryphoto/'.$this->Category->CategoryID
     ); ?>
-    <?php echo $form->Simple(
+    <?php echo $form->simple(
         $this->data('_ExtendedFields', []));
     ?>
     <li class="form-group">
@@ -90,17 +90,17 @@ if (count($this->data('DiscussionTypes')) > 1) {
     echo '</div>';
     echo '<div class="checkbox-list input-wrap">';
     foreach ($this->data('DiscussionTypes') as $Type => $Row) {
-        echo $form->CheckBox("AllowedDiscussionTypes[]", val('Plural', $Row, $Type), ['value' => $Type]);
+        echo $form->checkBox("AllowedDiscussionTypes[]", val('Plural', $Row, $Type), ['value' => $Type]);
     }
     echo '</div>';
     echo '</div>';
 }
 
-echo $form->Simple(
+echo $form->simple(
     $this->data('_PermissionFields', []),
     ['Wrap' => ['<div class="form-group">', '</div>'], 'ItemWrap' => ['<div class="input-wrap">', '</div>']]);
 
 echo '<div class="padded">'.sprintf(t('%s: %s'), t('Check all permissions that apply for each role'), '').'</div>';
-echo $form->CheckBoxGridGroups($this->PermissionData, 'Permission');
+echo $form->checkBoxGridGroups($this->PermissionData, 'Permission');
 echo '</div>';
 echo $form->close('Save');

@@ -1,6 +1,6 @@
 <?php if (!defined('APPLICATION')) exit(); ?>
 <h1><?php echo t('Dashboard Home'); ?></h1>
-<?php $this->RenderAsset('Messages');
+<?php $this->renderAsset('Messages');
 
 $leaderboard = new TableSummaryModule(t('Active Users'));
 $leaderboard->addColumn('users', t('Name'), [], TableSummaryModule::MAIN_CSS_CLASS)

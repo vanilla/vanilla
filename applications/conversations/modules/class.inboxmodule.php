@@ -27,12 +27,12 @@ class InboxModule extends Gdn_Module {
 
     public function getData() {
         // Fetch from model.
-        $Model = new ConversationModel();
-        $Result = $Model->getInbox($this->UserID, $this->Limit, 0);
+        $model = new ConversationModel();
+        $result = $model->getInbox($this->UserID, $this->Limit, 0);
 
         // Join in the participants.
-        $Model->joinParticipants($Result);
-        $this->setData('Conversations', $Result);
+        $model->joinParticipants($result);
+        $this->setData('Conversations', $result);
     }
 
     public function toString() {

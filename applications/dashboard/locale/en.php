@@ -14,8 +14,8 @@ if (!function_exists('FormatPossessive')) {
      * @param string The word to format.
      * @return string
      */
-    function formatPossessive($Word) {
-        return substr($Word, -1) == 's' ? $Word."'" : $Word."'s";
+    function formatPossessive($word) {
+        return substr($word, -1) == 's' ? $word."'" : $word."'s";
     }
 }
 

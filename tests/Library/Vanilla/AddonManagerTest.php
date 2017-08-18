@@ -192,7 +192,7 @@ class AddonManagerTest extends \PHPUnit\Framework\TestCase {
         $this->assertArrayHasKey($classKey, $classes);
 
         $subpath = reset($classes[$classKey])['path'];
-        // Kludge: Check for the UserPhoto() function.
+        // Kludge: Check for the userPhoto() function.
         $fileContents = file_get_contents($addon->path($subpath));
         if (preg_match('`function userPhoto`i', $fileContents)) {
             $this->markTestSkipped("We can't test classes that redeclare userPhoto().");

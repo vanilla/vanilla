@@ -13,7 +13,7 @@
 class TwitterPlugin extends Gdn_Plugin {
 
     /** Authentication provider key. */
-    const ProviderKey = 'Twitter';
+    const PROVIDER_KEY = 'Twitter';
 
     /** @var string Twitter's URL. */
     public static $BaseApiUrl = 'https://api.twitter.com/1.1/';
@@ -27,29 +27,29 @@ class TwitterPlugin extends Gdn_Plugin {
     /**
      * Gets/sets the current oauth access token.
      *
-     * @param string $Token
-     * @param string $Secret
+     * @param string $token
+     * @param string $secret
      *
      * @return OAuthToken
      */
-    public function accessToken($Token = null, $Secret = null) {
+    public function accessToken($token = null, $secret = null) {
         if (!$this->isConfigured()) {
             return false;
         }
 
-        if (is_object($Token)) {
-            $this->_AccessToken = $Token;
+        if (is_object($token)) {
+            $this->_AccessToken = $token;
         }
-        if ($Token !== null && $Secret !== null) {
-            $this->_AccessToken = new OAuthToken($Token, $Secret);
+        if ($token !== null && $secret !== null) {
+            $this->_AccessToken = new OAuthToken($token, $secret);
         } elseif ($this->_AccessToken == null) {
-            if ($Token) {
-                $this->_AccessToken = $this->getOAuthToken($Token);
+            if ($token) {
+                $this->_AccessToken = $this->getOAuthToken($token);
             } elseif (Gdn::session()->User) {
-                $AccessToken = valr(self::ProviderKey.'.AccessToken', Gdn::session()->User->Attributes);
+                $accessToken = valr(self::PROVIDER_KEY.'.AccessToken', Gdn::session()->User->Attributes);
 
-                if (is_array($AccessToken)) {
-                    $this->_AccessToken = new OAuthToken($AccessToken[0], $AccessToken[1]);
+                if (is_array($accessToken)) {
+                    $this->_AccessToken = new OAuthToken($accessToken[0], $accessToken[1]);
                 }
             }
         }
@@ -59,61 +59,61 @@ class TwitterPlugin extends Gdn_Plugin {
     /**
      * Retreieve the URL to start an auth request.
      *
-     * @param bool $Popup
+     * @param bool $popup
      *
      * @return string
      */
-    protected function _authorizeHref($Popup = false) {
-        $Url = url('/entry/twauthorize', true);
-        $UrlParts = explode('?', $Url);
+    protected function _authorizeHref($popup = false) {
+        $url = url('/entry/twauthorize', true);
+        $urlParts = explode('?', $url);
 
-        parse_str(val(1, $UrlParts, ''), $Query);
-        $Path = Gdn::request()->path();
+        parse_str(val(1, $urlParts, ''), $query);
+        $path = Gdn::request()->path();
 
-        $Target = val('Target', $_GET, $Path ? $Path : '/');
-        if (ltrim($Target, '/') == 'entry/signin') {
-            $Target = '/';
+        $target = val('Target', $_GET, $path ? $path : '/');
+        if (ltrim($target, '/') == 'entry/signin') {
+            $target = '/';
         }
-        $Query['Target'] = $Target;
+        $query['Target'] = $target;
 
-        if ($Popup) {
-            $Query['display'] = 'popup';
+        if ($popup) {
+            $query['display'] = 'popup';
         }
-        $Result = $UrlParts[0].'?'.http_build_query($Query);
+        $result = $urlParts[0].'?'.http_build_query($query);
 
-        return $Result;
+        return $result;
     }
 
     /**
      * Add Twitter option to the normal signin page.
      *
-     * @param Gdn_Controller $Sender
+     * @param Gdn_Controller $sender
      */
-    public function entryController_signIn_handler($Sender, $Args) {
-        if (isset($Sender->Data['Methods'])) {
+    public function entryController_signIn_handler($sender, $args) {
+        if (isset($sender->Data['Methods'])) {
             if (!$this->socialSignIn()) {
                 return;
             }
 
-            $Url = $this->_authorizeHref();
+            $url = $this->_authorizeHref();
 
             // Add the twitter method to the controller.
-            $TwMethod = [
+            $twMethod = [
                 'Name' => 'Twitter',
-                'SignInHtml' => socialSigninButton('Twitter', $Url, 'button', ['class' => 'js-extern'])
+                'SignInHtml' => socialSigninButton('Twitter', $url, 'button', ['class' => 'js-extern'])
             ];
 
-            $Sender->Data['Methods'][] = $TwMethod;
+            $sender->Data['Methods'][] = $twMethod;
         }
     }
 
     /**
      * Add Twitter signin to MeModule.
      *
-     * @param Gdn_Controller $Sender
-     * @param array $Args
+     * @param Gdn_Controller $sender
+     * @param array $args
      */
-    public function base_signInIcons_handler($Sender, $Args) {
+    public function base_signInIcons_handler($sender, $args) {
         if (!$this->socialSignIn()) {
             return;
         }
@@ -124,10 +124,10 @@ class TwitterPlugin extends Gdn_Plugin {
     /**
      * Add Twitter signin to GuestModule.
      *
-     * @param Gdn_Controller $Sender
-     * @param array $Args
+     * @param Gdn_Controller $sender
+     * @param array $args
      */
-    public function base_BeforeSignInButton_handler($Sender, $Args) {
+    public function base_beforeSignInButton_handler($sender, $args) {
         if (!$this->socialSignIn()) {
             return;
         }
@@ -138,75 +138,75 @@ class TwitterPlugin extends Gdn_Plugin {
     /**
      * Add Twitter signin to mobile theme.
      *
-     * @param Gdn_Controller $Sender
+     * @param Gdn_Controller $sender
      */
-    public function base_beforeSignInLink_handler($Sender) {
+    public function base_beforeSignInLink_handler($sender) {
         if (!$this->socialSignIn()) {
             return;
         }
 
         if (!Gdn::session()->isValid()) {
-            echo "\n".Wrap($this->_getButton(), 'li', ['class' => 'Connect TwitterConnect']);
+            echo "\n".wrap($this->_getButton(), 'li', ['class' => 'Connect TwitterConnect']);
         }
     }
 
     /**
      * Add an option to share a discussion via Twitter manually.
      *
-     * @param Gdn_Controller $Sender
-     * @param array $Args
+     * @param Gdn_Controller $sender
+     * @param array $args
      */
-    public function base_discussionFormOptions_handler($Sender, $Args) {
+    public function base_discussionFormOptions_handler($sender, $args) {
         if (!$this->socialSharing() || !$this->accessToken()) {
             return;
         }
 
-        $Options =& $Args['Options'];
-        $Options .= ' <li>'.
-            $Sender->Form->checkBox('ShareTwitter', '@'.Sprite('ReactTwitter', 'ReactSprite'), ['value' => '1', 'title' => sprintf(t('Share to %s.'), 'Twitter')]).
+        $options =& $args['Options'];
+        $options .= ' <li>'.
+            $sender->Form->checkBox('ShareTwitter', '@'.sprite('ReactTwitter', 'ReactSprite'), ['value' => '1', 'title' => sprintf(t('Share to %s.'), 'Twitter')]).
             '</li> ';
     }
 
     /**
      * Add option to share a comment via Twitter as you make it.
      *
-     * @param discussionController $Sender
-     * @param array $Args
+     * @param discussionController $sender
+     * @param array $args
      */
-    public function discussionController_afterBodyField_handler($Sender, $Args) {
+    public function discussionController_afterBodyField_handler($sender, $args) {
         if (!$this->socialSharing() || !$this->accessToken()) {
             return;
         }
 
         echo ' '.
-            $Sender->Form->checkBox('ShareTwitter', '@'.Sprite('ReactTwitter', 'ReactSprite'), ['value' => '1', 'title' => sprintf(t('Share to %s.'), 'Twitter')]).
+            $sender->Form->checkBox('ShareTwitter', '@'.sprite('ReactTwitter', 'ReactSprite'), ['value' => '1', 'title' => sprintf(t('Share to %s.'), 'Twitter')]).
             ' ';
     }
 
     /**
      * Share the discussion you just started to Twitter if you chose to.
      *
-     * @param discussionModel $Sender
-     * @param array $Args
+     * @param discussionModel $sender
+     * @param array $args
      *
      * @throws Gdn_UserException
      */
-    public function discussionModel_afterSaveDiscussion_handler($Sender, $Args) {
+    public function discussionModel_afterSaveDiscussion_handler($sender, $args) {
         if (!$this->socialSharing() || !$this->accessToken()) {
             return;
         }
 
-        $Share = valr('FormPostValues.ShareTwitter', $Args);
+        $share = valr('FormPostValues.ShareTwitter', $args);
 
-        if ($Share && $this->accessToken()) {
-            $Row = $Args['Fields'];
-            $Url = discussionUrl($Row, '', true);
-            $Message = sliceTwitter(Gdn_Format::plainText($Row['Body'], $Row['Format'])).' '.$Url;
+        if ($share && $this->accessToken()) {
+            $row = $args['Fields'];
+            $url = discussionUrl($row, '', true);
+            $message = sliceTwitter(Gdn_Format::plainText($row['Body'], $row['Format'])).' '.$url;
 
-            $R = $this->api(
+            $r = $this->api(
                 '/statuses/update.json',
                 [
-                'status' => $Message
+                'status' => $message
                 ],
                 'POST'
             );
@@ -216,34 +216,34 @@ class TwitterPlugin extends Gdn_Plugin {
     /**
      * Share the comment you just made to Twitter if you chose to.
      *
-     * @param commentModel $Sender
-     * @param array $Args
+     * @param commentModel $sender
+     * @param array $args
      *
      * @throws Gdn_UserException
      */
-    public function commentModel_afterSaveComment_handler($Sender, $Args) {
+    public function commentModel_afterSaveComment_handler($sender, $args) {
         if (!$this->socialSharing() || !$this->accessToken()) {
             return;
         }
 
-        $Share = valr('FormPostValues.ShareTwitter', $Args);
+        $share = valr('FormPostValues.ShareTwitter', $args);
 
-        if ($Share && $this->accessToken()) {
-            $Row = $Args['FormPostValues'];
+        if ($share && $this->accessToken()) {
+            $row = $args['FormPostValues'];
 
-            $DiscussionModel = new DiscussionModel();
-            $Discussion = $DiscussionModel->getID(val('DiscussionID', $Row));
-            if (!$Discussion) {
+            $discussionModel = new DiscussionModel();
+            $discussion = $discussionModel->getID(val('DiscussionID', $row));
+            if (!$discussion) {
                 return;
             }
 
-            $Url = DiscussionUrl($Discussion, '', true);
-            $Message = SliceTwitter(Gdn_Format::plainText($Row['Body'], $Row['Format'])).' '.$Url;
+            $url = discussionUrl($discussion, '', true);
+            $message = sliceTwitter(Gdn_Format::plainText($row['Body'], $row['Format'])).' '.$url;
 
-            $R = $this->API(
+            $r = $this->aPI(
                 '/statuses/update.json',
                 [
-                'status' => $Message
+                'status' => $message
                 ],
                 'POST'
             );
@@ -256,58 +256,58 @@ class TwitterPlugin extends Gdn_Plugin {
      * @return string
      */
     private function _getButton() {
-        $Url = $this->_authorizeHref();
+        $url = $this->_authorizeHref();
 
-        return socialSigninButton('Twitter', $Url, 'icon', ['class' => 'js-extern', 'rel' => 'nofollow']);
+        return socialSigninButton('Twitter', $url, 'icon', ['class' => 'js-extern', 'rel' => 'nofollow']);
     }
 
     /**
      * Authorize the current user against Twitter's OAuth.
      *
-     * @param bool $Query
+     * @param bool $query
      */
-    public function authorize($Query = false) {
+    public function authorize($query = false) {
         // Acquire the request token.
-        $Consumer = new OAuthConsumer(c('Plugins.Twitter.ConsumerKey'), c('Plugins.Twitter.Secret'));
-        $RedirectUri = $this->redirectUri();
-        if ($Query) {
-            $RedirectUri .= (strpos($RedirectUri, '?') === false ? '?' : '&').$Query;
+        $consumer = new OAuthConsumer(c('Plugins.Twitter.ConsumerKey'), c('Plugins.Twitter.Secret'));
+        $redirectUri = $this->redirectUri();
+        if ($query) {
+            $redirectUri .= (strpos($redirectUri, '?') === false ? '?' : '&').$query;
         }
 
-        $Params = ['oauth_callback' => $RedirectUri];
+        $params = ['oauth_callback' => $redirectUri];
 
-        $Url = 'https://api.twitter.com/oauth/request_token';
-        $Request = OAuthRequest::from_consumer_and_token($Consumer, null, 'POST', $Url, $Params);
-        $SignatureMethod = new OAuthSignatureMethod_HMAC_SHA1();
-        $Request->sign_request($SignatureMethod, $Consumer, null);
+        $url = 'https://api.twitter.com/oauth/request_token';
+        $request = OAuthRequest::from_consumer_and_token($consumer, null, 'POST', $url, $params);
+        $signatureMethod = new OAuthSignatureMethod_HMAC_SHA1();
+        $request->sign_request($signatureMethod, $consumer, null);
 
-        $Curl = $this->_Curl($Request, $Params);
-        $Response = curl_exec($Curl);
-        if ($Response === false) {
-            $Response = curl_error($Curl);
+        $curl = $this->_Curl($request, $params);
+        $response = curl_exec($curl);
+        if ($response === false) {
+            $response = curl_error($curl);
         }
 
-        $HttpCode = curl_getinfo($Curl, CURLINFO_HTTP_CODE);
-        curl_close($Curl);
+        $httpCode = curl_getinfo($curl, CURLINFO_HTTP_CODE);
+        curl_close($curl);
 
-        if ($HttpCode == '200') {
+        if ($httpCode == '200') {
             // Parse the reponse.
-            $Data = OAuthUtil::parse_parameters($Response);
+            $data = OAuthUtil::parse_parameters($response);
 
-            if (!isset($Data['oauth_token']) || !isset($Data['oauth_token_secret'])) {
-                $Response = t('The response was not in the correct format.');
+            if (!isset($data['oauth_token']) || !isset($data['oauth_token_secret'])) {
+                $response = t('The response was not in the correct format.');
             } else {
                 // Save the token for later reference.
-                $this->setOAuthToken($Data['oauth_token'], $Data['oauth_token_secret'], 'request');
+                $this->setOAuthToken($data['oauth_token'], $data['oauth_token_secret'], 'request');
 
                 // Redirect to twitter's authorization page.
-                $Url = "https://api.twitter.com/oauth/authenticate?oauth_token={$Data['oauth_token']}";
-                redirectTo($Url, 302, false);
+                $url = "https://api.twitter.com/oauth/authenticate?oauth_token={$data['oauth_token']}";
+                redirectTo($url, 302, false);
             }
         }
 
         // There was an error. Echo the error.
-        echo $Response;
+        echo $response;
     }
 
     /**
@@ -315,310 +315,314 @@ class TwitterPlugin extends Gdn_Plugin {
      *
      * See, because it's Twitter...
      *
-     * @param $Sender
-     * @param string $Dir
+     * @param $sender
+     * @param string $dir
      */
-    public function entryController_twauthorize_create($Sender, $Dir = '') {
-        $Query = arrayTranslate($Sender->Request->get(), ['display', 'Target']);
-        $Query = http_build_query($Query);
+    public function entryController_twauthorize_create($sender, $dir = '') {
+        $query = arrayTranslate($sender->Request->get(), ['display', 'Target']);
+        $query = http_build_query($query);
 
-        if ($Dir == 'profile') {
+        if ($dir == 'profile') {
             // This is a profile connection.
             $this->redirectUri(self::profileConnecUrl());
         }
 
-        $this->authorize($Query);
+        $this->authorize($query);
     }
 
     /**
      * Post to Twitter.
      *
-     * @param PostController $Sender
-     * @param string $RecordType
-     * @param int $ID
+     * @param PostController $sender
+     * @param string $recordType
+     * @param int $iD
      *
      * @throws Gdn_UserException
      */
-    public function postController_twitter_create($Sender, $RecordType, $ID) {
+    public function postController_twitter_create($sender, $recordType, $iD) {
         if (!$this->socialReactions()) {
             throw permissionException();
         }
 
-        $Row = GetRecord($RecordType, $ID, true);
-        if ($Row) {
+        $row = getRecord($recordType, $iD, true);
+        if ($row) {
             // Grab the tweet message.
-            switch (strtolower($RecordType)) {
+            switch (strtolower($recordType)) {
                 case 'discussion':
-                    $Message = Gdn_Format::plainText($Row['Name'], 'Text');
+                    $message = Gdn_Format::plainText($row['Name'], 'Text');
                     break;
                 case 'comment':
                 default:
-                    $Message = Gdn_Format::plainText($Row['Body'], $Row['Format']);
+                    $message = Gdn_Format::plainText($row['Body'], $row['Format']);
             }
 
             // WHY ARE WE REPEATING THE `sliceTwitter()` FUNCTION BELOW?
             // Dammit, fellas, ima hang y'uns out to DRY.
-            $Elips = '...';
-            $Message = preg_replace('`\s+`', ' ', $Message);
+            $elips = '...';
+            $message = preg_replace('`\s+`', ' ', $message);
 
-            $Max = 140;
-            $LinkLen = 22;
-            $Max -= $LinkLen;
+            $max = 140;
+            $linkLen = 22;
+            $max -= $linkLen;
 
-            $Message = SliceParagraph($Message, $Max);
-            if (strlen($Message) > $Max) {
-                $Message = substr($Message, 0, $Max - strlen($Elips)).$Elips;
+            $message = sliceParagraph($message, $max);
+            if (strlen($message) > $max) {
+                $message = substr($message, 0, $max - strlen($elips)).$elips;
             }
 
             if ($this->accessToken()) {
-                Gdn::controller()->setData('Message', $Message);
+                Gdn::controller()->setData('Message', $message);
 
-                $Message .= ' '.$Row['ShareUrl'];
-                $R = $this->api(
+                $message .= ' '.$row['ShareUrl'];
+                $r = $this->api(
                     '/statuses/update.json',
                     [
-                    'status' => $Message
+                    'status' => $message
                     ],
                     'POST'
                 );
 
-                $Sender->setJson('R', $R);
-                $Sender->informMessage(t('Thanks for sharing!'));
+                $sender->setJson('R', $r);
+                $sender->informMessage(t('Thanks for sharing!'));
             } else {
-                $Get = [
-                    'text' => $Message,
-                    'url' => $Row['ShareUrl']
+                $get = [
+                    'text' => $message,
+                    'url' => $row['ShareUrl']
                 ];
-                $Url = "https://twitter.com/share?".http_build_query($Get);
-                redirectTo($Url, 302, false);
+                $url = "https://twitter.com/share?".http_build_query($get);
+                redirectTo($url, 302, false);
             }
         }
 
-        $Sender->render('Blank', 'Utility', 'Dashboard');
+        $sender->render('Blank', 'Utility', 'Dashboard');
     }
 
     /**
      * Endpoint to connect to Twitter via user profile.
      *
-     * @param ProfileController $Sender
-     * @param mixed $UserReference
-     * @param string $Username
+     * @param ProfileController $sender
+     * @param mixed $userReference
+     * @param string $username
      * @param string $oauth_token
      * @param string $oauth_verifier
      */
-    public function profileController_twitterConnect_create($Sender, $UserReference = '', $Username = '', $oauth_token = '', $oauth_verifier = '') {
-        $Sender->permission('Garden.SignIn.Allow');
+    public function profileController_twitterConnect_create($sender, $userReference = '', $username = '', $oauth_token = '', $oauth_verifier = '') {
+        $sender->permission('Garden.SignIn.Allow');
 
-        $Sender->getUserInfo($UserReference, $Username, '', true);
+        $sender->getUserInfo($userReference, $username, '', true);
 
-        $Sender->_setBreadcrumbs(t('Connections'), '/profile/connections');
+        $sender->_setBreadcrumbs(t('Connections'), '/profile/connections');
 
         // Get the access token.
         trace('GetAccessToken()');
-        $AccessToken = $this->getAccessToken($oauth_token, $oauth_verifier);
-        $this->accessToken($AccessToken);
+        $accessToken = $this->getAccessToken($oauth_token, $oauth_verifier);
+        $this->accessToken($accessToken);
 
         // Get the profile.
         trace('GetProfile()');
-        $Profile = $this->getProfile();
+        $profile = $this->getProfile();
 
         // Save the authentication.
         Gdn::userModel()->saveAuthentication([
-            'UserID' => $Sender->User->UserID,
-            'Provider' => self::ProviderKey,
-            'UniqueID' => $Profile['id']]);
+            'UserID' => $sender->User->UserID,
+            'Provider' => self::PROVIDER_KEY,
+            'UniqueID' => $profile['id']]);
 
         // Save the information as attributes.
-        $Attributes = [
-            'AccessToken' => [$AccessToken->key, $AccessToken->secret],
-            'Profile' => $Profile
+        $attributes = [
+            'AccessToken' => [$accessToken->key, $accessToken->secret],
+            'Profile' => $profile
         ];
-        Gdn::userModel()->saveAttribute($Sender->User->UserID, self::ProviderKey, $Attributes);
+        Gdn::userModel()->saveAttribute($sender->User->UserID, self::PROVIDER_KEY, $attributes);
 
-        $this->EventArguments['Provider'] = self::ProviderKey;
-        $this->EventArguments['User'] = $Sender->User;
+        $this->EventArguments['Provider'] = self::PROVIDER_KEY;
+        $this->EventArguments['User'] = $sender->User;
         $this->fireEvent('AfterConnection');
 
-        redirectTo(userUrl($Sender->User, '', 'connections'));
+        redirectTo(userUrl($sender->User, '', 'connections'));
     }
 
     /**
      * Get an access token from Twitter.
      *
-     * @param string $RequestToken
-     * @param string $Verifier
+     * @param string $requestToken
+     * @param string $verifier
      *
      * @return string OAuthToken
      * @throws Gdn_UserException
      */
-    public function getAccessToken($RequestToken, $Verifier) {
-        if ((!$RequestToken || !$Verifier) && Gdn::request()->get('denied')) {
+    public function getAccessToken($requestToken, $verifier) {
+        if ((!$requestToken || !$verifier) && Gdn::request()->get('denied')) {
             throw new Gdn_UserException(t('Looks like you denied our request.'), 401);
         }
 
         // Get the request secret.
-        $RequestToken = $this->getOAuthToken($RequestToken);
-
-        $Consumer = new OAuthConsumer(c('Plugins.Twitter.ConsumerKey'), c('Plugins.Twitter.Secret'));
-
-        $Url = 'https://api.twitter.com/oauth/access_token';
-        $Params = [
-            'oauth_verifier' => $Verifier //GetValue('oauth_verifier', $_GET)
-        ];
-        $Request = OAuthRequest::from_consumer_and_token($Consumer, $RequestToken, 'POST', $Url, $Params);
-
-        $SignatureMethod = new OAuthSignatureMethod_HMAC_SHA1();
-        $Request->sign_request($SignatureMethod, $Consumer, $RequestToken);
-        $Post = $Request->to_postdata();
-
-        $Curl = $this->_curl($Request);
-        $Response = curl_exec($Curl);
-        if ($Response === false) {
-            $Response = curl_error($Curl);
+        $requestToken = $this->getOAuthToken($requestToken);
+        if (!$requestToken) {
+            throw new Gdn_UserException('Token was not found or is invalid for the current action.');
         }
-        $HttpCode = curl_getinfo($Curl, CURLINFO_HTTP_CODE);
-        curl_close($Curl);
 
-        if ($HttpCode == '200') {
-            $Data = OAuthUtil::parse_parameters($Response);
+        $consumer = new OAuthConsumer(c('Plugins.Twitter.ConsumerKey'), c('Plugins.Twitter.Secret'));
 
-            $AccessToken = new OAuthToken(val('oauth_token', $Data), val('oauth_token_secret', $Data));
+        $url = 'https://api.twitter.com/oauth/access_token';
+        $params = [
+            'oauth_verifier' => $verifier //GetValue('oauth_verifier', $_GET)
+        ];
+        $request = OAuthRequest::from_consumer_and_token($consumer, $requestToken, 'POST', $url, $params);
+
+        $signatureMethod = new OAuthSignatureMethod_HMAC_SHA1();
+        $request->sign_request($signatureMethod, $consumer, $requestToken);
+        $post = $request->to_postdata();
+
+        $curl = $this->_curl($request);
+        $response = curl_exec($curl);
+        if ($response === false) {
+            $response = curl_error($curl);
+        }
+        $httpCode = curl_getinfo($curl, CURLINFO_HTTP_CODE);
+        curl_close($curl);
+
+        if ($httpCode == '200') {
+            $data = OAuthUtil::parse_parameters($response);
+
+            $accessToken = new OAuthToken(val('oauth_token', $data), val('oauth_token_secret', $data));
 
             // Delete the request token.
-            $this->deleteOAuthToken($RequestToken);
+            $this->deleteOAuthToken($requestToken);
 
         } else {
             // There was some sort of error.
-            throw new Gdn_UserException('There was an error authenticating with twitter. '.$Response, $HttpCode);
+            throw new Gdn_UserException('There was an error authenticating with twitter. '.$response, $httpCode);
         }
 
-        return $AccessToken;
+        return $accessToken;
     }
 
     /**
      * Generic SSO hook into Vanilla for authorization and data transfer.
      *
-     * @param Gdn_Controller $Sender
-     * @param array $Args
+     * @param Gdn_Controller $sender
+     * @param array $args
      */
-    public function base_connectData_handler($Sender, $Args) {
-        if (val(0, $Args) != 'twitter') {
+    public function base_connectData_handler($sender, $args) {
+        if (val(0, $args) != 'twitter') {
             return;
         }
 
-        $Form = $Sender->Form; //new Gdn_Form();
+        /** @var Gdn_Form $form */
+        $form = $sender->Form;
 
-        $RequestToken = val('oauth_token', $_GET);
-        $AccessToken = $Form->getFormValue('AccessToken');
+        $requestToken = val('oauth_token', $_GET);
+        $accessToken = $form->getFormValue('AccessToken');
 
-        if ($AccessToken) {
-            $AccessToken = $this->getOAuthToken($AccessToken);
-            $this->accessToken($AccessToken);
+        if ($accessToken) {
+            $accessToken = $this->getOAuthToken($accessToken);
+            $this->accessToken($accessToken);
         }
 
         // Get the access token.
-        if ($RequestToken && !$AccessToken) {
+        if ($requestToken && !$accessToken) {
             // Get the request secret.
-            $RequestToken = $this->getOAuthToken($RequestToken);
+            $requestToken = $this->getOAuthToken($requestToken);
 
-            $Consumer = new OAuthConsumer(c('Plugins.Twitter.ConsumerKey'), c('Plugins.Twitter.Secret'));
+            $consumer = new OAuthConsumer(c('Plugins.Twitter.ConsumerKey'), c('Plugins.Twitter.Secret'));
 
-            $Url = 'https://api.twitter.com/oauth/access_token';
-            $Params = [
+            $url = 'https://api.twitter.com/oauth/access_token';
+            $params = [
                 'oauth_verifier' => val('oauth_verifier', $_GET)
             ];
-            $Request = OAuthRequest::from_consumer_and_token($Consumer, $RequestToken, 'POST', $Url, $Params);
+            $request = OAuthRequest::from_consumer_and_token($consumer, $requestToken, 'POST', $url, $params);
 
-            $SignatureMethod = new OAuthSignatureMethod_HMAC_SHA1();
-            $Request->sign_request($SignatureMethod, $Consumer, $RequestToken);
-            $Post = $Request->to_postdata();
+            $signatureMethod = new OAuthSignatureMethod_HMAC_SHA1();
+            $request->sign_request($signatureMethod, $consumer, $requestToken);
+            $post = $request->to_postdata();
 
-            $Curl = $this->_Curl($Request);
-            $Response = curl_exec($Curl);
-            if ($Response === false) {
-                $Response = curl_error($Curl);
+            $curl = $this->_Curl($request);
+            $response = curl_exec($curl);
+            if ($response === false) {
+                $response = curl_error($curl);
             }
-            $HttpCode = curl_getinfo($Curl, CURLINFO_HTTP_CODE);
-            curl_close($Curl);
+            $httpCode = curl_getinfo($curl, CURLINFO_HTTP_CODE);
+            curl_close($curl);
 
-            if ($HttpCode == '200') {
-                $Data = OAuthUtil::parse_parameters($Response);
+            if ($httpCode == '200') {
+                $data = OAuthUtil::parse_parameters($response);
 
-                $AccessToken = new OAuthToken(val('oauth_token', $Data), val('oauth_token_secret', $Data));
+                $accessToken = new OAuthToken(val('oauth_token', $data), val('oauth_token_secret', $data));
 
                 // Save the access token to the database.
-                $this->setOAuthToken($AccessToken->key, $AccessToken->secret, 'access');
-                $this->accessToken($AccessToken->key, $AccessToken->secret);
+                $this->setOAuthToken($accessToken->key, $accessToken->secret, 'access');
+                $this->accessToken($accessToken->key, $accessToken->secret);
 
                 // Delete the request token.
-                $this->deleteOAuthToken($RequestToken);
+                $this->deleteOAuthToken($requestToken);
 
             } else {
                 // There was some sort of error.
                 throw new Exception('There was an error authenticating with twitter.', 400);
             }
 
-            $NewToken = true;
+            $newToken = true;
         }
 
         // Get the profile.
         try {
-            $Profile = $this->getProfile($AccessToken);
-        } catch (Exception $Ex) {
-            if (!isset($NewToken)) {
+            $profile = $this->getProfile($accessToken);
+        } catch (Exception $ex) {
+            if (!isset($newToken)) {
                 // There was an error getting the profile, which probably means the saved access token is no longer valid. Try and reauthorize.
-                if ($Sender->deliveryType() == DELIVERY_TYPE_ALL) {
+                if ($sender->deliveryType() == DELIVERY_TYPE_ALL) {
                     redirectTo($this->_AuthorizeHref(), 302, false);
                 } else {
-                    $Sender->setHeader('Content-type', 'application/json');
-                    $Sender->deliveryMethod(DELIVERY_METHOD_JSON);
-                    $Sender->setRedirectTo($this->_authorizeHref(), false);
+                    $sender->setHeader('Content-type', 'application/json');
+                    $sender->deliveryMethod(DELIVERY_METHOD_JSON);
+                    $sender->setRedirectTo($this->_authorizeHref(), false);
                 }
             } else {
-                throw $Ex;
+                throw $ex;
             }
         }
 
         // This isn't a trusted connection. Don't allow it to automatically connect a user account.
         saveToConfig('Garden.Registration.AutoConnect', false, false);
 
-        $ID = val('id', $Profile);
-        $Form->setFormValue('UniqueID', $ID);
-        $Form->setFormValue('Provider', self::ProviderKey);
-        $Form->setFormValue('ProviderName', 'Twitter');
-        $Form->setValue('ConnectName', val('screen_name', $Profile));
-        $Form->setFormValue('Name', val('screen_name', $Profile));
-        $Form->setFormValue('FullName', val('name', $Profile));
-        $Form->setFormValue('Photo', val('profile_image_url_https', $Profile));
-        $Form->addHidden('AccessToken', $AccessToken->key);
+        $iD = val('id', $profile);
+        $form->setFormValue('UniqueID', $iD);
+        $form->setFormValue('Provider', self::PROVIDER_KEY);
+        $form->setFormValue('ProviderName', 'Twitter');
+        $form->setValue('ConnectName', val('screen_name', $profile));
+        $form->setFormValue('Name', val('screen_name', $profile));
+        $form->setFormValue('FullName', val('name', $profile));
+        $form->setFormValue('Photo', val('profile_image_url_https', $profile));
+        $form->addHidden('AccessToken', $accessToken->key);
 
         // Save some original data in the attributes of the connection for later API calls.
-        $Attributes = [self::ProviderKey => [
-            'AccessToken' => [$AccessToken->key, $AccessToken->secret],
-            'Profile' => $Profile
+        $attributes = [self::PROVIDER_KEY => [
+            'AccessToken' => [$accessToken->key, $accessToken->secret],
+            'Profile' => $profile
         ]];
-        $Form->setFormValue('Attributes', $Attributes);
+        $form->setFormValue('Attributes', $attributes);
 
-        $Sender->setData('Verified', true);
+        $sender->setData('Verified', true);
     }
 
     /**
      * Make Twitter available as an SSO provider.
      *
-     * @param $Sender
-     * @param $Args
+     * @param $sender
+     * @param $args
      */
-    public function base_getConnections_handler($Sender, $Args) {
-        $Profile = valr('User.Attributes.'.self::ProviderKey.'.Profile', $Args);
+    public function base_getConnections_handler($sender, $args) {
+        $profile = valr('User.Attributes.'.self::PROVIDER_KEY.'.Profile', $args);
 
-        $Sender->Data["Connections"][self::ProviderKey] = [
+        $sender->Data["Connections"][self::PROVIDER_KEY] = [
             'Icon' => $this->getWebResource('icon.png', '/'),
             'Name' => 'Twitter',
-            'ProviderKey' => self::ProviderKey,
+            'ProviderKey' => self::PROVIDER_KEY,
             'ConnectUrl' => '/entry/twauthorize/profile',
             'Profile' => [
-                'Name' => '@'.GetValue('screen_name', $Profile),
-                'Photo' => val('profile_image_url_https', $Profile)
+                'Name' => '@'.getValue('screen_name', $profile),
+                'Photo' => val('profile_image_url_https', $profile)
             ]
         ];
     }
@@ -626,58 +630,58 @@ class TwitterPlugin extends Gdn_Plugin {
     /**
      * Make an API request to Twitter.
      *
-     * @param string $Url
-     * @param array|null $Params
-     * @param string $Method GET or POST.
+     * @param string $url
+     * @param array|null $params
+     * @param string $method GET or POST.
      *
      * @return mixed Response from the API.
      * @throws Gdn_UserException
      */
-    public function api($Url, $Params = null, $Method = 'GET') {
-        if (strpos($Url, '//') === false) {
-            $Url = self::$BaseApiUrl.trim($Url, '/');
+    public function api($url, $params = null, $method = 'GET') {
+        if (strpos($url, '//') === false) {
+            $url = self::$BaseApiUrl.trim($url, '/');
         }
-        $Consumer = new OAuthConsumer(c('Plugins.Twitter.ConsumerKey'), c('Plugins.Twitter.Secret'));
+        $consumer = new OAuthConsumer(c('Plugins.Twitter.ConsumerKey'), c('Plugins.Twitter.Secret'));
 
-        if ($Method == 'POST') {
-            $Post = $Params;
+        if ($method == 'POST') {
+            $post = $params;
         } else {
-            $Post = null;
+            $post = null;
         }
 
-        $AccessToken = $this->accessToken();
-        $Request = OAuthRequest::from_consumer_and_token($Consumer, $AccessToken, $Method, $Url, $Params);
+        $accessToken = $this->accessToken();
+        $request = OAuthRequest::from_consumer_and_token($consumer, $accessToken, $method, $url, $params);
 
-        $SignatureMethod = new OAuthSignatureMethod_HMAC_SHA1();
-        $Request->sign_request($SignatureMethod, $Consumer, $AccessToken);
+        $signatureMethod = new OAuthSignatureMethod_HMAC_SHA1();
+        $request->sign_request($signatureMethod, $consumer, $accessToken);
 
-        $Curl = $this->_curl($Request, $Post);
-        curl_setopt($Curl, CURLINFO_HEADER_OUT, true);
+        $curl = $this->_curl($request, $post);
+        curl_setopt($curl, CURLINFO_HEADER_OUT, true);
 
-        $Response = curl_exec($Curl);
-        $HttpCode = curl_getinfo($Curl, CURLINFO_HTTP_CODE);
+        $response = curl_exec($curl);
+        $httpCode = curl_getinfo($curl, CURLINFO_HTTP_CODE);
 
-        if ($Response == false) {
-            $Response = curl_error($Curl);
+        if ($response == false) {
+            $response = curl_error($curl);
         }
 
-        trace(curl_getinfo($Curl, CURLINFO_HEADER_OUT));
-        trace($Response, 'Response');
+        trace(curl_getinfo($curl, CURLINFO_HEADER_OUT));
+        trace($response, 'Response');
 
-        curl_close($Curl);
+        curl_close($curl);
 
-        Gdn::controller()->setJson('Response', $Response);
+        Gdn::controller()->setJson('Response', $response);
 
-        if (strpos($Url, '.json') !== false) {
-            $Result = @json_decode($Response, true) or $Response;
+        if (strpos($url, '.json') !== false) {
+            $result = @json_decode($response, true) or $response;
         } else {
-            $Result = $Response;
+            $result = $response;
         }
 
-        if ($HttpCode == '200') {
-            return $Result;
+        if ($httpCode == '200') {
+            return $result;
         } else {
-            throw new Gdn_UserException(valr('errors.0.message', $Result, $Response), $HttpCode);
+            throw new Gdn_UserException(valr('errors.0.message', $result, $response), $httpCode);
         }
     }
 
@@ -688,8 +692,8 @@ class TwitterPlugin extends Gdn_Plugin {
      * @throws Gdn_UserException
      */
     public function getProfile() {
-        $Profile = $this->api('/account/verify_credentials.json', ['include_entities' => '0', 'skip_status' => '1']);
-        return $Profile;
+        $profile = $this->api('/account/verify_credentials.json', ['include_entities' => '0', 'skip_status' => '1']);
+        return $profile;
     }
 
     /**
@@ -703,11 +707,22 @@ class TwitterPlugin extends Gdn_Plugin {
         $result = null;
         $row = $uatModel->getWhere([
             'Token' => $token,
-            'ProviderKey' => self::ProviderKey
+            'ProviderKey' => self::PROVIDER_KEY
         ])->firstRow(DATASET_TYPE_ARRAY);
 
         if ($row) {
-            $result = new OAuthToken($row['Token'], $row['TokenSecret']);
+            $canUseToken = false;
+            if (!empty($row['ForeignUserKey'])) {
+                if (Gdn::session()->isValid() && $row['ForeignUserKey'] == Gdn::session()->UserID) {
+                    $canUseToken = true;
+                }
+            } else {
+                $canUseToken = true;
+            }
+
+            if ($canUseToken) {
+                $result = new OAuthToken($row['Token'], $row['TokenSecret']);
+            }
         }
         return $result;
     }
@@ -718,8 +733,8 @@ class TwitterPlugin extends Gdn_Plugin {
      * @return bool
      */
     public function isConfigured() {
-        $Result = c('Plugins.Twitter.ConsumerKey') && c('Plugins.Twitter.Secret');
-        return $Result;
+        $result = c('Plugins.Twitter.ConsumerKey') && c('Plugins.Twitter.Secret');
+        return $result;
     }
 
     /**
@@ -769,12 +784,13 @@ class TwitterPlugin extends Gdn_Plugin {
         $set = [
             'TokenSecret' => $secret,
             'TokenType' => $type,
+            'ForeignUserKey' => Gdn::session()->isValid() ? Gdn::session()->UserID : 0,
             'Authorized' => 0,
             'Lifetime' => 60 * 5
         ];
         $where = [
             'Token' => $token,
-            'ProviderKey' => self::ProviderKey
+            'ProviderKey' => self::PROVIDER_KEY
         ];
         $row = $uatModel->getWhere($where, '', '', 1)->firstRow();
 
@@ -799,30 +815,30 @@ class TwitterPlugin extends Gdn_Plugin {
 
         $uatModel->delete([
             'Token' => $token,
-            'ProviderKey' => self::ProviderKey
+            'ProviderKey' => self::PROVIDER_KEY
         ]);
     }
 
     /**
      * Configure a cURL request.
      *
-     * @param OAuthRequest $Request
-     * @param $Post Deprecated
+     * @param OAuthRequest $request
+     * @param $post Deprecated
      */
-    protected function _curl($Request, $Post = null) {
-        $C = curl_init();
-        curl_setopt($C, CURLOPT_RETURNTRANSFER, true);
-        curl_setopt($C, CURLOPT_SSL_VERIFYPEER, false);
-        switch ($Request->get_normalized_http_method()) {
+    protected function _curl($request, $post = null) {
+        $c = curl_init();
+        curl_setopt($c, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($c, CURLOPT_SSL_VERIFYPEER, false);
+        switch ($request->get_normalized_http_method()) {
             case 'POST':
-                curl_setopt($C, CURLOPT_URL, $Request->get_normalized_http_url());
-                curl_setopt($C, CURLOPT_POST, true);
-                curl_setopt($C, CURLOPT_POSTFIELDS, $Request->to_postdata());
+                curl_setopt($c, CURLOPT_URL, $request->get_normalized_http_url());
+                curl_setopt($c, CURLOPT_POST, true);
+                curl_setopt($c, CURLOPT_POSTFIELDS, $request->to_postdata());
                 break;
             default:
-                curl_setopt($C, CURLOPT_URL, $Request->to_url());
+                curl_setopt($c, CURLOPT_URL, $request->to_url());
         }
-        return $C;
+        return $c;
     }
 
     /**
@@ -837,15 +853,15 @@ class TwitterPlugin extends Gdn_Plugin {
     /**
      * Where to redirect a user after authorization.
      *
-     * @param null $NewValue
+     * @param null $newValue
      * @return null|string
      */
-    public function redirectUri($NewValue = null) {
-        if ($NewValue !== null) {
-            $this->_RedirectUri = $NewValue;
+    public function redirectUri($newValue = null) {
+        if ($newValue !== null) {
+            $this->_RedirectUri = $newValue;
         } elseif ($this->_RedirectUri === null) {
-            $RedirectUri = url('/entry/connect/twitter', true);
-            $this->_RedirectUri = $RedirectUri;
+            $redirectUri = url('/entry/connect/twitter', true);
+            $this->_RedirectUri = $redirectUri;
         }
 
         return $this->_RedirectUri;
@@ -854,67 +870,67 @@ class TwitterPlugin extends Gdn_Plugin {
     /**
      * Add 'Twitter' option to the reactions row for users.
      *
-     * @param Gdn_Controller $Sender
-     * @param array $Args
+     * @param Gdn_Controller $sender
+     * @param array $args
      */
-    public function base_AfterReactions_handler($Sender, $Args) {
+    public function base_afterReactions_handler($sender, $args) {
         if (!$this->socialReactions()) {
             return;
         }
 
         echo Gdn_Theme::bulletItem('Share');
-        $this->addReactButton($Sender, $Args);
+        $this->addReactButton($sender, $args);
     }
 
     /**
      * Output Quote link for sharing on Twitter.
      *
-     * @param Gdn_Controller $Sender
-     * @param array $Args
+     * @param Gdn_Controller $sender
+     * @param array $args
      */
-    protected function addReactButton($Sender, $Args) {
+    protected function addReactButton($sender, $args) {
         if ($this->accessToken()) {
-            $Url = url("post/twitter/{$Args['RecordType']}?id={$Args['RecordID']}", true);
-            $CssClass = 'ReactButton Hijack';
+            $url = url("post/twitter/{$args['RecordType']}?id={$args['RecordID']}", true);
+            $cssClass = 'ReactButton Hijack';
         } else {
-            $Url = url("post/twitter/{$Args['RecordType']}?id={$Args['RecordID']}", true);
-            $CssClass = 'ReactButton PopupWindow';
+            $url = url("post/twitter/{$args['RecordType']}?id={$args['RecordID']}", true);
+            $cssClass = 'ReactButton PopupWindow';
         }
 
-        echo anchor(sprite('ReactTwitter', 'Sprite ReactSprite', t('Share on Twitter')), $Url, $CssClass);
+        echo anchor(sprite('ReactTwitter', 'Sprite ReactSprite', t('Share on Twitter')), $url, $cssClass);
     }
 
     /**
      * Endpoint for configuring this addon.
      *
-     * @param socialController $Sender
-     * @param array $Args
+     * @param socialController $sender
+     * @param array $args
      */
-    public function socialController_twitter_create($Sender, $Args) {
-        $Sender->permission('Garden.Settings.Manage');
-        if ($Sender->Form->authenticatedPostBack()) {
-            $Settings = [
-                'Plugins.Twitter.ConsumerKey' => trim($Sender->Form->getFormValue('ConsumerKey')),
-                'Plugins.Twitter.Secret' => trim($Sender->Form->getFormValue('Secret')),
-                'Plugins.Twitter.SocialSignIn' => $Sender->Form->getFormValue('SocialSignIn'),
-                'Plugins.Twitter.SocialReactions' => $Sender->Form->getFormValue('SocialReactions'),
-                'Plugins.Twitter.SocialSharing' => $Sender->Form->getFormValue('SocialSharing')
+    public function socialController_twitter_create($sender, $args) {
+        $sender->permission('Garden.Settings.Manage');
+        if ($sender->Form->authenticatedPostBack()) {
+            $settings = [
+                'Plugins.Twitter.ConsumerKey' => trim($sender->Form->getFormValue('ConsumerKey')),
+                'Plugins.Twitter.Secret' => trim($sender->Form->getFormValue('Secret')),
+                'Plugins.Twitter.SocialSignIn' => $sender->Form->getFormValue('SocialSignIn'),
+                'Plugins.Twitter.SocialReactions' => $sender->Form->getFormValue('SocialReactions'),
+                'Plugins.Twitter.SocialSharing' => $sender->Form->getFormValue('SocialSharing')
             ];
 
-            saveToConfig($Settings);
-            $Sender->informMessage(t("Your settings have been saved."));
+            saveToConfig($settings);
+            $sender->informMessage(t("Your settings have been saved."));
 
         } else {
-            $Sender->Form->setValue('ConsumerKey', c('Plugins.Twitter.ConsumerKey'));
-            $Sender->Form->setValue('Secret', c('Plugins.Twitter.Secret'));
-            $Sender->Form->setValue('SocialSignIn', $this->SocialSignIn());
-            $Sender->Form->setValue('SocialReactions', $this->SocialReactions());
-            $Sender->Form->setValue('SocialSharing', $this->SocialSharing());
+            $sender->Form->setValue('ConsumerKey', c('Plugins.Twitter.ConsumerKey'));
+            $sender->Form->setValue('Secret', c('Plugins.Twitter.Secret'));
+            $sender->Form->setValue('SocialSignIn', $this->socialSignIn());
+            $sender->Form->setValue('SocialReactions', $this->socialReactions());
+            $sender->Form->setValue('SocialSharing', $this->socialSharing());
         }
 
-        $Sender->setHighlightRoute('dashboard/social');
-        $Sender->setData('Title', t('Twitter Settings'));
-        $Sender->render('Settings', '', 'plugins/Twitter');
+        $sender->setHighlightRoute('dashboard/social');
+        $sender->setData('Title', t('Twitter Settings'));
+        $sender->render('Settings', '', 'plugins/Twitter');
     }
 
     /**
@@ -939,7 +955,7 @@ class TwitterPlugin extends Gdn_Plugin {
         Gdn::sql()->replace(
             'UserAuthenticationProvider',
             ['AuthenticationSchemeAlias' => 'twitter', 'URL' => '...', 'AssociationSecret' => '...', 'AssociationHashMethod' => '...'],
-            ['AuthenticationKey' => self::ProviderKey],
+            ['AuthenticationKey' => self::PROVIDER_KEY],
             true
         );
     }
@@ -948,22 +964,22 @@ class TwitterPlugin extends Gdn_Plugin {
 /**
  * Truncate a message to appropriate Twitter length.
  *
- * @param string $Str Input message to be truncated.
+ * @param string $str Input message to be truncated.
  * @return string Resulting message.
  */
-function sliceTwitter($Str) {
+function sliceTwitter($str) {
 
-    $Elips = '...';
-    $Str = preg_replace('`\s+`', ' ', $Str);
+    $elips = '...';
+    $str = preg_replace('`\s+`', ' ', $str);
 
-    $Max = 140;
-    $LinkLen = 22;
-    $Max -= $LinkLen;
+    $max = 140;
+    $linkLen = 22;
+    $max -= $linkLen;
 
-    $Str = sliceParagraph($Str, $Max);
-    if (strlen($Str) > $Max) {
-        $Str = substr($Str, 0, $Max - strlen($Elips)).$Elips;
+    $str = sliceParagraph($str, $max);
+    if (strlen($str) > $max) {
+        $str = substr($str, 0, $max - strlen($elips)).$elips;
     }
 
-    return $Str;
+    return $str;
 }

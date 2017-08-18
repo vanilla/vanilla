@@ -17,10 +17,10 @@ class Gdn_UserException extends Exception {
     /**
      * Constructs the Gdn_ApplicationException.
      *
-     * @param string $Message A user readable message for the exception.
-     * @param Exception $Previous The previous exception used for exception chaining.
+     * @param string $message A user readable message for the exception.
+     * @param Exception $previous The previous exception used for exception chaining.
      */
-    public function __construct($Message, $Code = 400, $Previous = null) {
-        parent::__construct($Message, (int)$Code, $Previous);
+    public function __construct($message, $code = 400, $previous = null) {
+        parent::__construct($message, (int)$code, $previous);
     }
 }

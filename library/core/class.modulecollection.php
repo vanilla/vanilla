@@ -23,33 +23,33 @@ class Gdn_ModuleCollection extends Gdn_Module {
      * @throws Exception
      */
     public function render() {
-        $RenderedCount = 0;
-        foreach ($this->Items as $Item) {
+        $renderedCount = 0;
+        foreach ($this->Items as $item) {
             $this->EventArguments['AssetName'] = $this->AssetName;
 
-            if (is_string($Item)) {
-                if (!empty($Item)) {
-                    if ($RenderedCount > 0) {
+            if (is_string($item)) {
+                if (!empty($item)) {
+                    if ($renderedCount > 0) {
                         $this->fireEvent('BetweenRenderAsset');
                     }
 
-                    echo $Item;
-                    $RenderedCount++;
+                    echo $item;
+                    $renderedCount++;
                 }
-            } elseif ($Item instanceof Gdn_IModule) {
-                if (!GetValue('Visible', $Item, true)) {
+            } elseif ($item instanceof Gdn_IModule) {
+                if (!getValue('Visible', $item, true)) {
                     continue;
                 }
 
-                $LengthBefore = ob_get_length();
-                $Item->render();
-                $LengthAfter = ob_get_length();
+                $lengthBefore = ob_get_length();
+                $item->render();
+                $lengthAfter = ob_get_length();
 
-                if ($LengthBefore !== false && $LengthAfter > $LengthBefore) {
-                    if ($RenderedCount > 0) {
+                if ($lengthBefore !== false && $lengthAfter > $lengthBefore) {
+                    if ($renderedCount > 0) {
                         $this->fireEvent('BetweenRenderAsset');
                     }
-                    $RenderedCount++;
+                    $renderedCount++;
                 }
             } else {
                 throw new Exception();

@@ -9,54 +9,54 @@
 /**
  * Renders an asset from the controller.
  *
- * @param array $Params The parameters passed into the function.
+ * @param array $params The parameters passed into the function.
  * The parameters that can be passed to this function are as follows.
  * - <b>name</b>: The name of the asset.
  * - <b>tag</b>: The type of tag to wrap the asset in.
  * - <b>id</b>: The id of the tag if different than the name.
- * @param object $Smarty Smarty The smarty object rendering the template.
+ * @param object $smarty Smarty The smarty object rendering the template.
  * @return string The rendered asset.
  */
-function smarty_function_asset($Params, &$Smarty) {
-    $Name = val('name', $Params);
-	$Tag = val('tag', $Params, '');
-	$Id = val('id', $Params, $Name);
+function smarty_function_asset($params, &$smarty) {
+    $name = val('name', $params);
+	$tag = val('tag', $params, '');
+	$id = val('id', $params, $name);
 
-	$Class = val('class', $Params, '');
-	if ($Class != '') {
-		$Class = ' class="'.$Class.'"';
+	$class = val('class', $params, '');
+	if ($class != '') {
+		$class = ' class="'.$class.'"';
     }
 	
-	$Controller = Gdn::controller();
-    $Controller->EventArguments['AssetName'] = $Name;
+	$controller = Gdn::controller();
+    $controller->EventArguments['AssetName'] = $name;
    
-    $Result = '';
+    $result = '';
 
     ob_start();
-    $Controller->fireEvent('BeforeRenderAsset');
-    $Result .= ob_get_clean();
+    $controller->fireEvent('BeforeRenderAsset');
+    $result .= ob_get_clean();
 
-    $Asset = $Controller->getAsset($Name);
+    $asset = $controller->getAsset($name);
    
-    if (is_object($Asset)) {
-        $Asset->AssetName = $Name;
+    if (is_object($asset)) {
+        $asset->AssetName = $name;
       
-        if (val('Visible', $Asset, true)) {
-            $Asset = $Asset->toString();
+        if (val('Visible', $asset, true)) {
+            $asset = $asset->toString();
         } else {
-            $Asset = '';
+            $asset = '';
         }
     }
 
-    if (!empty($Tag)) {
-        $Result .= '<' . $Tag . ' id="' . $Id . '"'.$Class.'>' . $Asset . '</' . $Tag . '>';
+    if (!empty($tag)) {
+        $result .= '<' . $tag . ' id="' . $id . '"'.$class.'>' . $asset . '</' . $tag . '>';
     } else {
-        $Result .= $Asset;
+        $result .= $asset;
     }
    
     ob_start();
-    $Controller->fireEvent('AfterRenderAsset');
-    $Result .= ob_get_clean();
+    $controller->fireEvent('AfterRenderAsset');
+    $result .= ob_get_clean();
 
-    return $Result;
+    return $result;
 }

@@ -45,7 +45,7 @@ class Gdn_DataSet implements IteratorAggregate, Countable, JsonSerializable {
     /**
      * @var PDOStatement Contains a PDOStatement object returned by a PDO query. FALSE by default.
      * This property is assigned by the database driver object when a query is
-     * executed in $Database->Query().
+     * executed in $Database->query().
      */
     private $_PDOStatement;
 
@@ -55,16 +55,16 @@ class Gdn_DataSet implements IteratorAggregate, Countable, JsonSerializable {
     /**
      *
      */
-    public function __construct($Result = null, $DataSetType = null) {
+    public function __construct($result = null, $dataSetType = null) {
         // Set defaults
         $this->Connection = null;
         $this->_Cursor = -1;
         $this->_PDOStatement = null;
-        $this->_Result = $Result;
-        if ($DataSetType !== null) {
-            $this->_DatasetType = $DataSetType;
-        } elseif ($Result) {
-            $firstElement = reset($Result);
+        $this->_Result = $result;
+        if ($dataSetType !== null) {
+            $this->_DatasetType = $dataSetType;
+        } elseif ($result) {
+            $firstElement = reset($result);
             if (is_array($firstElement)) {
                 $this->_DatasetType = DATASET_TYPE_ARRAY;
             }
@@ -98,39 +98,39 @@ class Gdn_DataSet implements IteratorAggregate, Countable, JsonSerializable {
     /**
      * Moves the dataset's internal cursor pointer to the specified RowIndex.
      *
-     * @param int $RowIndex The index to seek in the result resource.
+     * @param int $rowIndex The index to seek in the result resource.
      */
-    public function dataSeek($RowIndex = 0) {
-        $this->_Cursor = $RowIndex;
+    public function dataSeek($rowIndex = 0) {
+        $this->_Cursor = $rowIndex;
     }
 
     /**
      *
      *
-     * @param bool $DatasetType
+     * @param bool $datasetType
      * @return $this|intDetermines|string
      */
-    public function datasetType($DatasetType = false) {
-        if ($DatasetType !== false) {
+    public function datasetType($datasetType = false) {
+        if ($datasetType !== false) {
             // Make sure the type isn't changed if the result is already fetched.
-            if (!is_null($this->_Result) && $DatasetType != $this->_DatasetType) {
+            if (!is_null($this->_Result) && $datasetType != $this->_DatasetType) {
                 // Loop through the dataset and switch the types.
-                $Count = count($this->_Result);
-                foreach ($this->_Result as $Index => &$Row) {
-                    switch ($DatasetType) {
+                $count = count($this->_Result);
+                foreach ($this->_Result as $index => &$row) {
+                    switch ($datasetType) {
                         case DATASET_TYPE_ARRAY:
-                            $Row = (array)$Row;
+                            $row = (array)$row;
                             //$this->_Result[$Index] = (array)$this->_Result[$Index];
                             break;
                         case DATASET_TYPE_OBJECT:
-                            $Row = (object)$Row;
+                            $row = (object)$row;
                             //$this->_Result[$Index] = (object)$this->_Result[$Index];
                             break;
                     }
                 }
             }
 
-            $this->_DatasetType = $DatasetType;
+            $this->_DatasetType = $datasetType;
             return $this;
         } else {
             return $this->_DatasetType;
@@ -140,31 +140,31 @@ class Gdn_DataSet implements IteratorAggregate, Countable, JsonSerializable {
     /**
      *
      *
-     * @param string $Name
+     * @param string $name
      */
-    public function expandAttributes($Name = 'Attributes') {
-        $Result =& $this->result();
+    public function expandAttributes($name = 'Attributes') {
+        $result =& $this->result();
 
-        foreach ($Result as &$Row) {
-            if (is_object($Row)) {
-                if (is_string($Row->$Name)) {
-                    $Attributes = dbdecode($Row->$Name);
+        foreach ($result as &$row) {
+            if (is_object($row)) {
+                if (is_string($row->$name)) {
+                    $attributes = dbdecode($row->$name);
 
-                    if (is_array($Attributes)) {
-                        foreach ($Attributes as $N => $V) {
-                            $Row->$N = $V;
+                    if (is_array($attributes)) {
+                        foreach ($attributes as $n => $v) {
+                            $row->$n = $v;
                         }
                     }
-                    unset($Row->$Name);
+                    unset($row->$name);
                 }
             } else {
-                if (is_string($Row[$Name])) {
-                    $Attributes = dbdecode($Row[$Name]);
+                if (is_string($row[$name])) {
+                    $attributes = dbdecode($row[$name]);
 
-                    if (is_array($Attributes)) {
-                        $Row = array_merge($Row, $Attributes);
+                    if (is_array($attributes)) {
+                        $row = array_merge($row, $attributes);
                     }
-                    unset($Row[$Name]);
+                    unset($row[$name]);
                 }
             }
         }
@@ -173,29 +173,29 @@ class Gdn_DataSet implements IteratorAggregate, Countable, JsonSerializable {
     /**
      * Fetches all rows from the PDOStatement object into the resultset.
      *
-     * @param string $DatasetType The format in which the result should be returned: object or array.
+     * @param string $datasetType The format in which the result should be returned: object or array.
      * It will fill a different array depending on which type is specified.
      */
-    protected function _fetchAllRows($DatasetType = false) {
+    protected function _fetchAllRows($datasetType = false) {
         if (!is_null($this->_Result)) {
             return;
         }
 
-        if ($DatasetType) {
-            $this->_DatasetType = $DatasetType;
+        if ($datasetType) {
+            $this->_DatasetType = $datasetType;
         }
 
-        $Result = [];
+        $result = [];
         if (is_null($this->_PDOStatement)) {
-            $this->_Result = $Result;
+            $this->_Result = $result;
             return;
         }
 
         // Calling fetchAll on insert/update/delete queries will raise an error!
         if (preg_match('/^(insert|update|delete)/', trim(strtolower($this->_PDOStatement->queryString))) !== 1) {
-            $Result = $this->_PDOStatement->fetchAll($this->_DatasetType == DATASET_TYPE_ARRAY ? PDO::FETCH_ASSOC : PDO::FETCH_OBJ);
+            $result = $this->_PDOStatement->fetchAll($this->_DatasetType == DATASET_TYPE_ARRAY ? PDO::FETCH_ASSOC : PDO::FETCH_OBJ);
         } else {
-            $this->_Result = $Result;
+            $this->_Result = $result;
         }
 
 //		$this->_PDOStatement->setFetchMode($this->_DatasetType == DATASET_TYPE_ARRAY ? PDO::FETCH_ASSOC : PDO::FETCH_OBJ);
@@ -204,34 +204,34 @@ class Gdn_DataSet implements IteratorAggregate, Countable, JsonSerializable {
 //		}
 
         $this->freePDOStatement(true);
-        $this->_Result = $Result;
+        $this->_Result = $result;
     }
 
     /**
      * Returns the first row or FALSE if there are no rows to return.
      *
-     * @param string $DatasetType The format in which the result should be returned: object or array.
-     * @return bool|array|stdClass False when empty result set, object or array depending on $DatasetType.
+     * @param string $datasetType The format in which the result should be returned: object or array.
+     * @return bool|array|stdClass False when empty result set, object or array depending on $datasetType.
      */
-    public function &firstRow($DatasetType = false) {
-        $Result = &$this->result($DatasetType);
-        if (count($Result) == 0) {
+    public function &firstRow($datasetType = false) {
+        $result = &$this->result($datasetType);
+        if (count($result) == 0) {
             return $this->_EOF;
         }
 
-        return $Result[0];
+        return $result[0];
     }
 
     /**
      * Format the resultset with the given method.
      *
-     * @param string $FormatMethod The method to use with Gdn_Format::To().
+     * @param string $formatMethod The method to use with Gdn_Format::to().
      * @return Gdn_Dataset $this pointer for chaining.
      */
-    public function format($FormatMethod) {
-        $Result = &$this->result();
-        foreach ($Result as $Index => $Value) {
-            $Result[$Index] = Gdn_Format::to($Value, $FormatMethod);
+    public function format($formatMethod) {
+        $result = &$this->result();
+        foreach ($result as $index => $value) {
+            $result[$index] = Gdn_Format::to($value, $formatMethod);
         }
         return $this;
     }
@@ -239,15 +239,15 @@ class Gdn_DataSet implements IteratorAggregate, Countable, JsonSerializable {
     /**
      * Free's the result resource referenced by $this->_PDOStatement.
      *
-     * @param bool $DestroyPDOStatement
+     * @param bool $destroyPDOStatement
      */
-    public function freePDOStatement($DestroyPDOStatement = true) {
+    public function freePDOStatement($destroyPDOStatement = true) {
         try {
             if (is_object($this->_PDOStatement)) {
                 $this->_PDOStatement->closeCursor();
             }
 
-            if ($DestroyPDOStatement) {
+            if ($destroyPDOStatement) {
                 $this->_PDOStatement = null;
             }
         } catch (Exception $ex) {
@@ -265,48 +265,48 @@ class Gdn_DataSet implements IteratorAggregate, Countable, JsonSerializable {
     /**
      * Index a result array.
      *
-     * @param array|Traversable $Data The array to index. It is formatted similar to the array returned by Gdn_DataSet::Result().
-     * @param string|array $Columns The name of the column to index on or an array of columns to index on.
-     * @param array $Options An array of options for the method.
+     * @param array|Traversable $data The array to index. It is formatted similar to the array returned by Gdn_DataSet::result().
+     * @param string|array $columns The name of the column to index on or an array of columns to index on.
+     * @param array $options An array of options for the method.
      *  - <b>Sep</b>: The string to seperate index columns by. Default '|'.
      *  - <b>Unique</b>: Whether or not the results are unique.
      *   - <b>true</b> (default): The index is unique.
      *   - <b>false</b>: The index is not unique and each indexed row will be an array or arrays.
      * @return array
      */
-    public static function index($Data, $Columns, $Options = []) {
-        $Columns = (array)$Columns;
-        $Result = [];
-        $Options = array_change_key_case($Options);
+    public static function index($data, $columns, $options = []) {
+        $columns = (array)$columns;
+        $result = [];
+        $options = array_change_key_case($options);
 
-        if (is_string($Options)) {
-            $Options = ['sep' => $Options];
+        if (is_string($options)) {
+            $options = ['sep' => $options];
         }
 
-        $Sep = val('sep', $Options, '|');
-        $Unique = val('unique', $Options, true);
+        $sep = val('sep', $options, '|');
+        $unique = val('unique', $options, true);
 
-        foreach ($Data as $Row) {
-            $IndexValues = [];
-            foreach ($Columns as $Column) {
-                $IndexValues[] = val($Column, $Row);
+        foreach ($data as $row) {
+            $indexValues = [];
+            foreach ($columns as $column) {
+                $indexValues[] = val($column, $row);
             }
-            $Index = implode($Sep, $IndexValues);
+            $index = implode($sep, $indexValues);
 
-            if ($Unique) {
-                $Result[$Index] = $Row;
+            if ($unique) {
+                $result[$index] = $row;
             } else {
-                $Result[$Index][] = $Row;
+                $result[$index][] = $row;
             }
         }
-        return $Result;
+        return $result;
     }
 
     /**
      *
      *
-     * @param array $Data
-     * @param array $Columns The columns/table information for the join. Depending on the argument's index it will be interpreted differently.
+     * @param array $data
+     * @param array $columns The columns/table information for the join. Depending on the argument's index it will be interpreted differently.
      *  - <b>numeric</b>: This column will come be added to the resulting join. The value can be either a string or a two element array where the second element specifies an alias.
      *  - <b>alias</b>: The alias of the child table in the query.
      *  - <b>child</b>: The name of the child column.
@@ -314,161 +314,161 @@ class Gdn_DataSet implements IteratorAggregate, Countable, JsonSerializable {
      *  - <b>parent</b>: The name of the parent column.
      *  - <b>table</b>: The name of the child table in the join.
      *  - <b>prefix</b>: The name of the prefix to give the columns. Can't be used with <b>column</b>.
-     * @param array $Options An array of extra options.
+     * @param array $options An array of extra options.
      *  - <b>sql</b>: A Gdn_SQLDriver with the child query.
      *  - <b>type</b>: The join type, either JOIN_INNER, JOIN_LEFT. This defaults to JOIN_LEFT.
      */
-    public static function join(&$Data, $Columns, $Options = []) {
-        $Options = array_change_key_case($Options);
+    public static function join(&$data, $columns, $options = []) {
+        $options = array_change_key_case($options);
 
-        $Sql = Gdn::sql(); //GetValue('sql', $Options, Gdn::SQL());
-        $ResultColumns = [];
+        $sql = Gdn::sql(); //GetValue('sql', $Options, Gdn::sql());
+        $resultColumns = [];
 
         // Grab the columns.
-        foreach ($Columns as $Index => $Name) {
-            if (is_numeric($Index)) {
+        foreach ($columns as $index => $name) {
+            if (is_numeric($index)) {
                 // This is a column being selected.
-                if (is_array($Name)) {
-                    $Column = $Name[0];
-                    $ColumnAlias = $Name[1];
+                if (is_array($name)) {
+                    $column = $name[0];
+                    $columnAlias = $name[1];
                 } else {
-                    $Column = $Name;
-                    $ColumnAlias = '';
+                    $column = $name;
+                    $columnAlias = '';
                 }
 
-                if (($Pos = strpos($Column, '.')) !== false) {
-                    $Sql->select($Column, '', $ColumnAlias);
-                    $Column = substr($Column, $Pos + 1);
+                if (($pos = strpos($column, '.')) !== false) {
+                    $sql->select($column, '', $columnAlias);
+                    $column = substr($column, $pos + 1);
                 } else {
-                    $Sql->select(isset($TableAlias) ? $TableAlias.'.'.$Column : $Column, '', $ColumnAlias);
+                    $sql->select(isset($tableAlias) ? $tableAlias.'.'.$column : $column, '', $columnAlias);
                 }
-                if ($ColumnAlias) {
-                    $ResultColumns[] = $ColumnAlias;
+                if ($columnAlias) {
+                    $resultColumns[] = $columnAlias;
                 } else {
-                    $ResultColumns[] = $Column;
+                    $resultColumns[] = $column;
                 }
             } else {
-                switch (strtolower($Index)) {
+                switch (strtolower($index)) {
                     case 'alias':
-                        $TableAlias = $Name;
+                        $tableAlias = $name;
                         break;
                     case 'child':
-                        $ChildColumn = $Name;
+                        $childColumn = $name;
                         break;
                     case 'column':
-                        $JoinColumn = $Name;
+                        $joinColumn = $name;
                         break;
                     case 'parent':
-                        $ParentColumn = $Name;
+                        $parentColumn = $name;
                         break;
                     case 'prefix':
-                        $ColumnPrefix = $Name;
+                        $columnPrefix = $name;
                         break;
                     case 'table':
-                        $Table = $Name;
+                        $table = $name;
                         break;
                     case 'type':
                         // The type shouldn't be here, but handle it.
-                        $Options['Type'] = $Name;
+                        $options['Type'] = $name;
                         break;
                     default:
-                        throw new Exception("Gdn_DataSet::Join(): Unknown column option '$Index'.");
+                        throw new Exception("Gdn_DataSet::Join(): Unknown column option '$index'.");
                 }
             }
         }
 
-        if (!isset($TableAlias)) {
-            if (isset($Table)) {
-                $TableAlias = 'c';
+        if (!isset($tableAlias)) {
+            if (isset($table)) {
+                $tableAlias = 'c';
             } else {
-                $TableAlias = 'c';
+                $tableAlias = 'c';
             }
         }
 
-        if (!isset($ParentColumn)) {
-            if (isset($ChildColumn)) {
-                $ParentColumn = $ChildColumn;
-            } elseif (isset($Table))
-                $ParentColumn = $Table.'ID';
+        if (!isset($parentColumn)) {
+            if (isset($childColumn)) {
+                $parentColumn = $childColumn;
+            } elseif (isset($table))
+                $parentColumn = $table.'ID';
             else {
-                throw Exception("Gdn_DataSet::Join(): Missing 'parent' argument'.");
+                throw exception("Gdn_DataSet::Join(): Missing 'parent' argument'.");
             }
         }
 
         // Figure out some options if they weren't specified.
-        if (!isset($ChildColumn)) {
-            if (isset($ParentColumn)) {
-                $ChildColumn = $ParentColumn;
-            } elseif (isset($Table))
-                $ChildColumn = $Table.'ID';
+        if (!isset($childColumn)) {
+            if (isset($parentColumn)) {
+                $childColumn = $parentColumn;
+            } elseif (isset($table))
+                $childColumn = $table.'ID';
             else {
-                throw Exception("Gdn_DataSet::Join(): Missing 'child' argument'.");
+                throw exception("Gdn_DataSet::Join(): Missing 'child' argument'.");
             }
         }
 
-        if (!isset($ColumnPrefix) && !isset($JoinColumn)) {
-            $ColumnPrefix = stringEndsWith($ParentColumn, 'ID', true, true);
+        if (!isset($columnPrefix) && !isset($joinColumn)) {
+            $columnPrefix = stringEndsWith($parentColumn, 'ID', true, true);
         }
 
-        $JoinType = strtolower(val('Type', $Options, self::JOIN_LEFT));
+        $joinType = strtolower(val('Type', $options, self::JOIN_LEFT));
 
         // Start augmenting the sql for the join.
-        if (isset($Table)) {
-            $Sql->from("$Table $TableAlias");
+        if (isset($table)) {
+            $sql->from("$table $tableAlias");
         }
-        $Sql->select("$TableAlias.$ChildColumn");
+        $sql->select("$tableAlias.$childColumn");
 
         // Get the IDs to generate an in clause with.
-        $IDs = [];
-        foreach ($Data as $Row) {
-            $Value = val($ParentColumn, $Row);
-            if ($Value) {
-                $IDs[$Value] = true;
+        $iDs = [];
+        foreach ($data as $row) {
+            $value = val($parentColumn, $row);
+            if ($value) {
+                $iDs[$value] = true;
             }
         }
 
-        $IDs = array_keys($IDs);
-        $Sql->whereIn($ChildColumn, $IDs);
+        $iDs = array_keys($iDs);
+        $sql->whereIn($childColumn, $iDs);
 
-        $ChildData = $Sql->get()->resultArray();
-        $ChildData = self::index($ChildData, $ChildColumn, ['unique' => GetValue('unique', $Options, isset($ColumnPrefix))]);
+        $childData = $sql->get()->resultArray();
+        $childData = self::index($childData, $childColumn, ['unique' => getValue('unique', $options, isset($columnPrefix))]);
 
-        $NotFound = [];
+        $notFound = [];
 
         // Join the data in.
-        foreach ($Data as $Index => &$Row) {
-            $ParentID = val($ParentColumn, $Row);
-            if (isset($ChildData[$ParentID])) {
-                $ChildRow = $ChildData[$ParentID];
+        foreach ($data as $index => &$row) {
+            $parentID = val($parentColumn, $row);
+            if (isset($childData[$parentID])) {
+                $childRow = $childData[$parentID];
 
-                if (isset($ColumnPrefix)) {
+                if (isset($columnPrefix)) {
                     // Add the data to the columns.
-                    foreach ($ChildRow as $Name => $Value) {
-                        setValue($ColumnPrefix.$Name, $Row, $Value);
+                    foreach ($childRow as $name => $value) {
+                        setValue($columnPrefix.$name, $row, $value);
                     }
                 } else {
                     // Add the result data.
-                    setValue($JoinColumn, $Row, $ChildRow);
+                    setValue($joinColumn, $row, $childRow);
                 }
             } else {
-                if ($JoinType == self::JOIN_LEFT) {
-                    if (isset($ColumnPrefix)) {
-                        foreach ($ResultColumns as $Name) {
-                            setValue($ColumnPrefix.$Name, $Row, null);
+                if ($joinType == self::JOIN_LEFT) {
+                    if (isset($columnPrefix)) {
+                        foreach ($resultColumns as $name) {
+                            setValue($columnPrefix.$name, $row, null);
                         }
                     } else {
-                        setValue($JoinColumn, $Row, []);
+                        setValue($joinColumn, $row, []);
                     }
                 } else {
-                    $NotFound[] = $Index;
+                    $notFound[] = $index;
                 }
             }
         }
 
         // Remove inner join rows.
-        if ($JoinType == self::JOIN_INNER) {
-            foreach ($NotFound as $Index) {
-                unset($Data[$Index]);
+        if ($joinType == self::JOIN_INNER) {
+            foreach ($notFound as $index) {
+                unset($data[$index]);
             }
         }
     }
@@ -476,28 +476,28 @@ class Gdn_DataSet implements IteratorAggregate, Countable, JsonSerializable {
     /**
      * Returns the last row in the or FALSE if there are no rows to return.
      *
-     * @param string $DatasetType The format in which the result should be returned: object or array.
+     * @param string $datasetType The format in which the result should be returned: object or array.
      */
-    public function &lastRow($DatasetType = false) {
-        $Result = &$this->result($DatasetType);
-        if (count($Result) == 0) {
+    public function &lastRow($datasetType = false) {
+        $result = &$this->result($datasetType);
+        if (count($result) == 0) {
             return $this->_EOF;
         }
 
-        return $Result[count($Result) - 1];
+        return $result[count($result) - 1];
     }
 
     /**
      * Returns the next row or FALSE if there are no more rows.
      *
-     * @param string $DatasetType The format in which the result should be returned: object or array.
+     * @param string $datasetType The format in which the result should be returned: object or array.
      */
-    public function &nextRow($DatasetType = false) {
-        $Result = &$this->result($DatasetType);
+    public function &nextRow($datasetType = false) {
+        $result = &$this->result($datasetType);
         ++$this->_Cursor;
 
-        if (isset($Result[$this->_Cursor])) {
-            return $Result[$this->_Cursor];
+        if (isset($result[$this->_Cursor])) {
+            return $result[$this->_Cursor];
         }
         return $this->_EOF;
     }
@@ -506,30 +506,30 @@ class Gdn_DataSet implements IteratorAggregate, Countable, JsonSerializable {
      * Returns the number of fields in the DataSet.
      */
     public function numFields() {
-        $Result = is_object($this->_PDOStatement) ? $this->_PDOStatement->columnCount() : 0;
-        return $Result;
+        $result = is_object($this->_PDOStatement) ? $this->_PDOStatement->columnCount() : 0;
+        return $result;
     }
 
     /**
      * Returns the number of rows in the DataSet.
      *
-     * @param string $DatasetType The format in which the result should be returned: object or array.
+     * @param string $datasetType The format in which the result should be returned: object or array.
      */
-    public function numRows($DatasetType = false) {
-        $Result = count($this->result($DatasetType));
-        return $Result;
+    public function numRows($datasetType = false) {
+        $result = count($this->result($datasetType));
+        return $result;
     }
 
     /**
      * Returns the previous row in the requested format.
      *
-     * @param string $DatasetType The format in which the result should be returned: object or array.
+     * @param string $datasetType The format in which the result should be returned: object or array.
      */
-    public function &previousRow($DatasetType = false) {
-        $Result = &$this->result($DatasetType);
+    public function &previousRow($datasetType = false) {
+        $result = &$this->result($datasetType);
         --$this->_Cursor;
-        if (isset($Result[$this->_Cursor])) {
-            return $Result[$this->_Cursor];
+        if (isset($result[$this->_Cursor])) {
+            return $result[$this->_Cursor];
         }
         return $this->_EOF;
     }
@@ -537,13 +537,13 @@ class Gdn_DataSet implements IteratorAggregate, Countable, JsonSerializable {
     /**
      * Returns an array of data as the specified result type: object or array.
      *
-     * @param string $DatasetType The format in which to return a row: object or array. The following values are supported.
+     * @param string $datasetType The format in which to return a row: object or array. The following values are supported.
      *  - <b>DATASET_TYPE_ARRAY</b>: An array of associative arrays.
      *  - <b>DATASET_TYPE_OBJECT</b>: An array of standard objects.
      *  - <b>FALSE</b>: The current value of the DatasetType property will be used.
      */
-    public function &result($DatasetType = false) {
-        $this->datasetType($DatasetType);
+    public function &result($datasetType = false) {
+        $this->datasetType($datasetType);
         if (is_null($this->_Result)) {
             $this->_fetchAllRows();
         }
@@ -564,20 +564,20 @@ class Gdn_DataSet implements IteratorAggregate, Countable, JsonSerializable {
     /**
      * Returns an array of objects containing the ResultSet data.
      */
-    public function resultObject($FormatType = '') {
+    public function resultObject($formatType = '') {
         return $this->result(DATASET_TYPE_OBJECT);
     }
 
     /**
      * Returns the requested row index as the requested row type.
      *
-     * @param int $RowIndex The row to return from the result set. It is zero-based.
+     * @param int $rowIndex The row to return from the result set. It is zero-based.
      * @return mixed The row at the given index or FALSE if there is no row at the index.
      */
-    public function &row($RowIndex) {
-        $Result = &$this->result();
-        if (isset($Result[$RowIndex])) {
-            return $Result[$RowIndex];
+    public function &row($rowIndex) {
+        $result = &$this->result();
+        if (isset($result[$rowIndex])) {
+            return $result[$rowIndex];
         }
         return $this->_EOF;
     }
@@ -586,14 +586,14 @@ class Gdn_DataSet implements IteratorAggregate, Countable, JsonSerializable {
      * Allows you to fill this object's result set with a foreign data set in
      * the form of an array of associative arrays (or objects).
      *
-     * @param array $Resultset The array of arrays or objects that represent the data to be traversed.
+     * @param array $resultset The array of arrays or objects that represent the data to be traversed.
      */
-    public function importDataset($Resultset) {
-        if (is_array($Resultset)) {
-            if (array_key_exists(0, $Resultset)) {
-                $FirstRow = $Resultset[0];
+    public function importDataset($resultset) {
+        if (is_array($resultset)) {
+            if (array_key_exists(0, $resultset)) {
+                $firstRow = $resultset[0];
 
-                if (is_array($FirstRow)) {
+                if (is_array($firstRow)) {
                     $this->_DatasetType = DATASET_TYPE_ARRAY;
                 } else {
                     $this->_DatasetType = DATASET_TYPE_OBJECT;
@@ -602,52 +602,52 @@ class Gdn_DataSet implements IteratorAggregate, Countable, JsonSerializable {
 
             $this->_Cursor = -1;
             $this->_PDOStatement = null;
-            $this->_Result = $Resultset;
+            $this->_Result = $resultset;
         }
     }
 
     /**
      * Assigns the pdostatement object to this object.
      *
-     * @param PDOStatement $PDOStatement The PDO Statement Object being assigned.
+     * @param PDOStatement $pDOStatement The PDO Statement Object being assigned.
      */
-    public function PDOStatement(&$PDOStatement = false) {
-        if ($PDOStatement === false) {
+    public function pDOStatement(&$pDOStatement = false) {
+        if ($pDOStatement === false) {
             return $this->_PDOStatement;
         } else {
-            $this->_PDOStatement = $PDOStatement;
+            $this->_PDOStatement = $pDOStatement;
         }
     }
 
     /**
      * Unserialize the fields in the dataset.
      *
-     * @param array $Fields
+     * @param array $fields
      * @since 2.1
      */
-    public function unserialize($Fields = ['Attributes', 'Data']) {
-        $Result =& $this->result();
-        $First = true;
+    public function unserialize($fields = ['Attributes', 'Data']) {
+        $result =& $this->result();
+        $first = true;
 
-        foreach ($Result as &$Row) {
-            if ($First) {
+        foreach ($result as &$row) {
+            if ($first) {
                 // Check which fields are in the dataset.
-                foreach ($Fields as $Index => $Field) {
-                    if (val($Field, $Row, false) === false) {
-                        unset($Fields[$Index]);
+                foreach ($fields as $index => $field) {
+                    if (val($field, $row, false) === false) {
+                        unset($fields[$index]);
                     }
                 }
-                $First = false;
+                $first = false;
             }
 
-            foreach ($Fields as $Field) {
-                if (is_object($Row)) {
-                    if (is_string($Row->$Field)) {
-                        $Row->$Field = dbdecode($Row->$Field);
+            foreach ($fields as $field) {
+                if (is_object($row)) {
+                    if (is_string($row->$field)) {
+                        $row->$field = dbdecode($row->$field);
                     }
                 } else {
-                    if (is_string($Row[$Field])) {
-                        $Row[$Field] = dbdecode($Row[$Field]);
+                    if (is_string($row[$field])) {
+                        $row[$field] = dbdecode($row[$field]);
                     }
                 }
             }
@@ -657,35 +657,35 @@ class Gdn_DataSet implements IteratorAggregate, Countable, JsonSerializable {
     /**
      * Advances to the next row and returns the value from a column.
      *
-     * @param string $ColumnName The name of the column to get the value from.
-     * @param string $DefaultValue The value to return if there is no data.
-     * @return mixed The value from the column or $DefaultValue.
+     * @param string $columnName The name of the column to get the value from.
+     * @param string $defaultValue The value to return if there is no data.
+     * @return mixed The value from the column or $defaultValue.
      */
-    public function value($ColumnName, $DefaultValue = null) {
-        if ($Row = $this->nextRow()) {
-            if (is_array($ColumnName)) {
-                $Result = [];
-                foreach ($ColumnName as $Name => $Default) {
-                    if (is_object($Row) && property_exists($Row, $Name)) {
-                        return $Row->$Name;
-                    } elseif (is_array($Row) && array_key_exists($Name, $Row))
-                        return $Row[$Name];
+    public function value($columnName, $defaultValue = null) {
+        if ($row = $this->nextRow()) {
+            if (is_array($columnName)) {
+                $result = [];
+                foreach ($columnName as $name => $default) {
+                    if (is_object($row) && property_exists($row, $name)) {
+                        return $row->$name;
+                    } elseif (is_array($row) && array_key_exists($name, $row))
+                        return $row[$name];
                     else {
-                        $Result[] = $Default;
+                        $result[] = $default;
                     }
                 }
-                return $Result;
+                return $result;
             } else {
-                if (is_object($Row) && property_exists($Row, $ColumnName)) {
-                    return $Row->$ColumnName;
-                } elseif (is_array($Row) && array_key_exists($ColumnName, $Row))
-                    return $Row[$ColumnName];
+                if (is_object($row) && property_exists($row, $columnName)) {
+                    return $row->$columnName;
+                } elseif (is_array($row) && array_key_exists($columnName, $row))
+                    return $row[$columnName];
             }
         }
-        if (is_array($ColumnName)) {
-            return array_values($ColumnName);
+        if (is_array($columnName)) {
+            return array_values($columnName);
         }
-        return $DefaultValue;
+        return $defaultValue;
     }
 
     /**

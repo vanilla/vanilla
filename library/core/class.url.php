@@ -18,19 +18,19 @@ class Gdn_Url {
      * Returns the path to the application's dispatcher. Optionally with the domain prepended.
      *  ie. http://domain.com/[web_root]/index.php?/request
      *
-     * @param boolean $WithDomain Should it include the domain with the WebRoot? Default is FALSE.
+     * @param boolean $withDomain Should it include the domain with the WebRoot? Default is FALSE.
      * @return string
      */
-    public static function webRoot($WithDomain = false) {
-        $WebRoot = Gdn::request()->webRoot();
+    public static function webRoot($withDomain = false) {
+        $webRoot = Gdn::request()->webRoot();
 
-        if ($WithDomain) {
-            $Result = Gdn::request()->domain().'/'.$WebRoot;
+        if ($withDomain) {
+            $result = Gdn::request()->domain().'/'.$webRoot;
         } else {
-            $Result = $WebRoot;
+            $result = $webRoot;
         }
 
-        return $Result;
+        return $result;
     }
 
     /**
@@ -68,16 +68,16 @@ class Gdn_Url {
      * Returns the Request part of the current url. ie. "/controller/action/" in
      * "http://localhost/garden/index.php?/controller/action/".
      *
-     * @param boolean $WithWebRoot
-     * @param boolean $WithDomain
-     * @param boolean $RemoveSyndication
+     * @param boolean $withWebRoot
+     * @param boolean $withDomain
+     * @param boolean $removeSyndication
      * @return string
      */
-    public static function request($WithWebRoot = false, $WithDomain = false, $RemoveSyndication = false) {
-        $Result = Gdn::request()->path();
-        if ($WithWebRoot) {
-            $Result = self::webRoot($WithDomain).'/'.$Result;
+    public static function request($withWebRoot = false, $withDomain = false, $removeSyndication = false) {
+        $result = Gdn::request()->path();
+        if ($withWebRoot) {
+            $result = self::webRoot($withDomain).'/'.$result;
         }
-        return $Result;
+        return $result;
     }
 }

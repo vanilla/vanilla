@@ -3,7 +3,7 @@
 $format = strtolower($this->data('_EditorInputFormat'));
 $html_toolbar = ''; // for regular text
 
-$css_ismobile_class = (IsMobile())
+$css_ismobile_class = (isMobile())
    ? 'editor-mobile'
    : 'editor-desktop';
 
@@ -163,5 +163,3 @@ $html_toolbar .= '<div class="editor-upload-attention">'.t('Drop image/file').'<
 
 // Generate output for view
 echo $html_toolbar;
-
-?>

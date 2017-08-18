@@ -61,6 +61,7 @@ function categoryFilterBox(array $options = []) {
  */
 function writeCategoryItem($category, $allowSorting = true) {
     $categoryID = $category['CategoryID'];
+    $parentCategoryID = $category['ParentCategoryID'];
     $handle = $allowSorting ? '<div class="js-nestable-handle nestable-handle"></div>' : '';
     $icon = $allowSorting ? '<div class="btn btn-icon plank-icon">'.symbol('handle', t('Drag')).'</div>' : '';
     $categoryName = htmlspecialchars($category['Name']);
@@ -70,7 +71,7 @@ function writeCategoryItem($category, $allowSorting = true) {
         $categoryName = anchor($categoryName, $url);
     }
     ?>
-    <li class="js-nestable-item js-category-item nestable-item" data-id="<?php echo $categoryID; ?>">
+    <li class="js-nestable-item js-category-item nestable-item" data-category-id="<?php echo $categoryID; ?>" data-parent-category-id="<?php echo $parentCategoryID; ?>">
         <?php echo $handle; ?>
         <div class="nestable-content plank">
             <?php echo $icon; ?>

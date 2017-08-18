@@ -31,7 +31,7 @@ $discussionBoard->addColumn('discussion', t('Title'), ['class' => 'column-xs'], 
     ->addColumn('count-views', t('Views'), ['class' => 'column-xs']);
 
 foreach ($this->Data['DiscussionData'] as $discussion) {
-    $discussionBlock = new MediaItemModule(htmlspecialchars($discussion->Name), DiscussionUrl($discussion), '', 'div');
+    $discussionBlock = new MediaItemModule(htmlspecialchars($discussion->Name), discussionUrl($discussion), '', 'div');
     $discussionBlock->setView('media-sm')
         ->addMeta(Gdn_Format::date($discussion->DateInserted, 'html'));
     $discussionBoard->addRow([
@@ -43,4 +43,3 @@ foreach ($this->Data['DiscussionData'] as $discussion) {
 }
 
 echo $discussionBoard;
-?>

@@ -20,7 +20,7 @@ include $this->fetchViewLocation('helper_functions');
             $RecordLabel = valr('Data.Type', $Row);
             if (!$RecordLabel)
                 $RecordLabel = $Row['RecordType'];
-            $RecordLabel = Gdn_Form::LabelCode($RecordLabel);
+            $RecordLabel = Gdn_Form::labelCode($RecordLabel);
             $user = userBuilder($Row, 'Insert');
             $user = Gdn::userModel()->getByUsername(val('Name', $user));
             $viewPersonalInfo = gdn::session()->checkPermission('Garden.PersonalInfo.View');
@@ -28,7 +28,7 @@ include $this->fetchViewLocation('helper_functions');
             $userBlock = new MediaItemModule(val('Name', $user), userUrl($user));
             $userBlock->setView('media-sm')
                 ->setImage(userPhotoUrl($user))
-                ->addMetaIf($viewPersonalInfo, Gdn_Format::Email($user->Email));
+                ->addMetaIf($viewPersonalInfo, Gdn_Format::email($user->Email));
 
             $Url = FALSE;
             if (in_array($Row['Operation'], ['Edit', 'Moderate'])) {
@@ -55,17 +55,17 @@ include $this->fetchViewLocation('helper_functions');
                 </td>
                 <td class="content-cell">
                     <?php
-                    echo '<div class="post-content Expander">', $this->FormatContent($Row), '</div>';
+                    echo '<div class="post-content Expander">', $this->formatContent($Row), '</div>';
 
                     // Write the other record counts.
 
-                    echo OtherRecordsMeta($Row['Data']);
+                    echo otherRecordsMeta($Row['Data']);
 
                     echo '<div class="Meta-Container">';
                     if ($Row['CountGroup'] > 1) {
                         echo ' <span class="info">',
                             '<span class="Meta-Label">'.t('Reported').'</span> ',
-                        wrap(Plural($Row['CountGroup'], '%s time', '%s times'), 'span', 'Meta-Value'),
+                        wrap(plural($Row['CountGroup'], '%s time', '%s times'), 'span', 'Meta-Value'),
                         '</span> ';
                     }
 
@@ -75,7 +75,7 @@ include $this->fetchViewLocation('helper_functions');
                         foreach ($CustomMeta as $Key => $Value) {
                             echo ' <span class="Meta">',
                                 '<span class="Meta-Label">'.t($Key).'</span> ',
-                            wrap(Gdn_Format::Html($Value), 'span', ['class' => 'Meta-Value']),
+                            wrap(Gdn_Format::html($Value), 'span', ['class' => 'Meta-Value']),
                             '</span>';
                         }
                     }

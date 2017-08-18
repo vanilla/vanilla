@@ -5,15 +5,15 @@
 </div>
 <div class="FilterMenu">
     <?php
-    $FormAction = $this->Plugin->AutoTogglePath();
+    $FormAction = $this->Plugin->autoTogglePath();
     echo $this->Form->open([
         'action' => url($FormAction),
         'jsaction' => $FormAction
     ]);
     echo $this->Form->errors();
 
-    $PluginName = $this->Plugin->GetPluginKey('Name');
-    $ButtonName = t($this->Plugin->IsEnabled() ? "Disable {$PluginName}" : "Enable {$PluginName}");
+    $PluginName = $this->Plugin->getPluginKey('Name');
+    $ButtonName = t($this->Plugin->isEnabled() ? "Disable {$PluginName}" : "Enable {$PluginName}");
 
     echo $this->Form->close($ButtonName, '', ['class' => 'SmallButton']);
     ?>

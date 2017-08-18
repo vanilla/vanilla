@@ -23,7 +23,7 @@ if (Gdn::config('Garden.Profile.ShowAbout')) {
             <?php
             if ($this->User->Email && ($this->User->ShowEmail || $Session->checkPermission('Garden.PersonalInfo.View'))) {
                 echo '<dt class="Email">'.t('Email').'</dt>
-         <dd class="Email" itemprop="email">'.Gdn_Format::Email($this->User->Email).'</dd>';
+         <dd class="Email" itemprop="email">'.Gdn_Format::email($this->User->Email).'</dd>';
             }
             ?>
             <dt class="Joined"><?php echo t('Joined'); ?></dt>
@@ -35,7 +35,7 @@ if (Gdn::config('Garden.Profile.ShowAbout')) {
             <dt class="Roles"><?php echo t('Roles'); ?></dt>
             <dd class="Roles"><?php
                 if (Gdn::session()->checkPermission('Garden.Moderation.Manage')) {
-                    echo UserVerified($this->User).', ';
+                    echo userVerified($this->User).', ';
                 }
 
                 if (empty($this->Roles))
@@ -53,12 +53,12 @@ if (Gdn::config('Garden.Profile.ShowAbout')) {
             if ($Session->checkPermission('Garden.PersonalInfo.View')): ?>
                 <dt class="IP"><?php echo t('Register IP'); ?></dt>
                 <dd class="IP"><?php
-                    $IP = IPAnchor($this->User->InsertIPAddress);
+                    $IP = iPAnchor($this->User->InsertIPAddress);
                     echo $IP ? $IP : t('n/a');
                     ?></dd>
                 <dt class="IP"><?php echo t('Last IP'); ?></dt>
                 <dd class="IP"><?php
-                    $IP = IPAnchor($this->User->LastIPAddress);
+                    $IP = iPAnchor($this->User->LastIPAddress);
                     echo $IP ? $IP : t('n/a');
                     ?></dd>
             <?php
@@ -68,7 +68,7 @@ if (Gdn::config('Garden.Profile.ShowAbout')) {
                 $Inviter = Gdn::userModel()->getID($this->User->InviteUserID);
                 if ($Inviter) {
                     echo '<dt class="Invited">'.t('Invited by').'</dt>
-            <dd class="Invited">'.UserAnchor($Inviter).'</dd>';
+            <dd class="Invited">'.userAnchor($Inviter).'</dd>';
                 }
             }
             $this->fireEvent('OnBasicInfo');

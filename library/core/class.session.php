@@ -532,37 +532,13 @@ class Gdn_Session {
      * @return string
      */
     public function ensureTransientKey() {
-        $cookieString = getAppCookie('tk');
-        $reset = false;
+        $transientKey = $this->loadTransientKey();
 
-        if ($cookieString === null) {
-            $reset = true;
-        } else {
-            $cookie = $this->decodeTKCookie($cookieString);
-            if ($cookie === false) {
-                $reset = true;
-            } else {
-                $payload = $this->generateTKPayload(
-                    $cookie['TransientKey'],
-                    $cookie['UserID'],
-                    $cookie['Timestamp']
-                );
-
-                $userInvalid = ($cookie['UserID'] != $this->UserID);
-                $signatureInvalid = $this->generateTKSignature($payload) !== $cookie['Signature'];
-                if ($userInvalid || $signatureInvalid) {
-                    $reset = true;
-                } elseif ($this->transientKey() !== $cookie['TransientKey']) {
-                    $this->transientKey($cookie['TransientKey'], false);
-                }
-            }
+        if ($transientKey === false) {
+            $transientKey = $this->transientKey(betterRandomString(16, 'Aa0'));
         }
 
-        if ($reset) {
-            return $this->transientKey(betterRandomString(16, 'Aa0'));
-        } else {
-            return $this->transientKey();
-        }
+        return $transientKey;
     }
 
     /**
@@ -588,6 +564,36 @@ class Gdn_Session {
             'Timestamp' => $elements[2],
             'Signature' => $elements[3]
         ];
+    }
+
+    /**
+     * Load the transient key from the user's cookie into the TK property.
+     *
+     * @return bool|string
+     */
+    public function loadTransientKey() {
+        $cookieString = getAppCookie('tk');
+        $result = false;
+
+        if ($cookieString !== null) {
+            $cookie = $this->decodeTKCookie($cookieString);
+            if ($cookie !== false) {
+                $payload = $this->generateTKPayload(
+                    $cookie['TransientKey'],
+                    $cookie['UserID'],
+                    $cookie['Timestamp']
+                );
+
+                $userValid = ($cookie['UserID'] == $this->UserID);
+                $signatureValid = $this->generateTKSignature($payload) == $cookie['Signature'];
+                $currentTKInvalid = $this->transientKey() != $cookie['TransientKey'];
+                if ($userValid && $signatureValid && $currentTKInvalid) {
+                    $result = $this->transientKey($cookie['TransientKey'], false);
+                }
+            }
+        }
+
+        return $result;
     }
 
     /**

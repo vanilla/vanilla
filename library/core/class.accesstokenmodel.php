@@ -24,7 +24,7 @@ class AccessTokenModel extends Gdn_Model {
      */
     public function __construct($secret = '') {
         parent::__construct('AccessToken');
-        $this->PrimaryKey = 'Token';
+        $this->PrimaryKey = 'AccessTokenID';
         $this->secret = $secret ?: c('Garden.Cookie.Salt');
 
         $this->setPruneAfter('1 day')
@@ -92,6 +92,30 @@ class AccessTokenModel extends Gdn_Model {
                 $row[$field] = empty($row[$field]) ? null : json_encode($row[$field], JSON_UNESCAPED_SLASHES);
             }
         }
+    }
+
+    /**
+     * Get an access token by its numeric ID.
+     *
+     * @param int $accessTokenID
+     * @param string $datasetType
+     * @param array $options
+     * @return array|bool
+     */
+    public function getID($accessTokenID, $datasetType = DATASET_TYPE_ARRAY, $options = []) {
+        $row = $this->getWhere(['AccessTokenID' => $accessTokenID])->firstRow($datasetType);
+        return $row;
+    }
+
+    /**
+     * Fetch an access token row using the token.
+     *
+     * @param mixed $token
+     * @return array|bool
+     */
+    public function getToken($token) {
+        $row = $this->getWhere(['Token' => $token])->firstRow(DATASET_TYPE_ARRAY);
+        return $row;
     }
 
     /**
@@ -251,7 +275,7 @@ class AccessTokenModel extends Gdn_Model {
 
         $token = $this->trim($accessToken);
 
-        $row = $this->getID($token, DATASET_TYPE_ARRAY);
+        $row = $this->getToken($token);
 
         if (!$row) {
             return $this->tokenError('Access token not found.', 401, $throw);
@@ -406,5 +430,28 @@ class AccessTokenModel extends Gdn_Model {
      */
     private static function base64urlDecode($str) {
         return base64_decode(strtr($str, '-_', '+/'));
+    }
+
+    /**
+     * Save an attribute on an access token row.
+     *
+     * @param int $accessTokenID
+     * @param string $key
+     * @param mixed $value
+     * @return array|bool
+     */
+    public function setAttribute($accessTokenID, $key, $value) {
+        $row = $this->getID($accessTokenID, DATASET_TYPE_ARRAY);
+        $result = false;
+        if ($row) {
+            $attributes = array_key_exists('Attributes', $row) ? $row['Attributes'] : [];
+            $attributes[$key] = $value;
+            $this->update(
+                ['Attributes' => $attributes],
+                ['AccessTokenID' => $accessTokenID],
+            1);
+            $result = $this->getID($accessTokenID);
+        }
+        return $result;
     }
 }

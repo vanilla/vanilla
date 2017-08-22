@@ -267,10 +267,20 @@ $Construct->table('UserAuthenticationToken')
     ->column('Lifetime', 'int', false)
     ->set($Explicit, $Drop);
 
+if ($captureOnly === false && $Construct->table('AccessToken')->columnExists('AccessTokenID') === false) {
+    $accessTokenTable = $SQL->prefixTable('AccessToken');
+    try {
+        $SQL->query("alter table {$accessTokenTable} drop primary key");
+    } catch (Exception $e) {
+        // Primary key doesn't exist. Nothing to do here.
+    }
+    $SQL->query("alter table {$accessTokenTable} add AccessTokenID int not null auto_increment primary key first");
+}
+
 $Construct
     ->table('AccessToken')
     ->primaryKey('AccessTokenID')
-    ->column('Token', 'varchar(100)', false, 'index')
+    ->column('Token', 'varchar(100)', false, 'unique')
     ->column('UserID', 'int', false, 'index')
     ->column('Type', 'varchar(20)', false, 'index')
     ->column('Scope', 'text', true)

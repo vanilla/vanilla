@@ -9,7 +9,7 @@
     <ul>
         <li>
             <?php
-            echo $this->Form->label('Enter your email address or username', 'Email');
+            echo $this->Form->label('Enter your Email address or username', 'Email');
             echo $this->Form->textBox('Email', ['autofocus' => 'autofocus']);
             ?>
         </li>

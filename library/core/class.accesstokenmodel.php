@@ -64,13 +64,22 @@ class AccessTokenModel extends Gdn_Model {
     /**
      * Revoke an already issued token.
      *
-     * @param string $token The token or access token to revoke.
+     * @param string|int $token The token, access or numeric ID token to revoke.
      * @return bool Returns true if the token was revoked or false otherwise.
      */
     public function revoke($token) {
-        $token = $this->trim($token);
+        $id = false;
+        if (filter_var($token, FILTER_VALIDATE_INT)) {
+            $id = $token;
+        } else {
+            $token = $this->trim($token);
+            $row = $this->getToken($token);
+            if ($row) {
+                $id = $row['AccessTokenID'];
+            }
+        }
 
-        $this->setField($token, [
+        $this->setField($id, [
             'DateExpires' => Gdn_Format::toDateTime(strtotime('-1 hour')),
             'Attributes' => ['revoked' => true]
         ]);

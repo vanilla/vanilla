@@ -58,6 +58,48 @@ class TokensApiController extends AbstractApiController {
     }
 
     /**
+     * Given a token row, determine if it is active.
+     *
+     * @param int|string|array $token Full token row.
+     * @return bool
+     */
+    public function isActiveToken($token) {
+        if (is_array($token)) {
+            $row = $token;
+        } elseif (filter_var($token, FILTER_VALIDATE_INT)) {
+            $row = $this->accessTokenModel->getID($token);
+        } elseif (is_string($token)) {
+            $row = $this->accessTokenModel->getToken($token);
+        } else {
+            $row = false;
+        }
+
+        if (!is_array($row)) {
+            return false;
+        }
+
+        if (array_key_exists('Attributes', $row)) {
+            $attributes = $row['Attributes'];
+            if (is_array($attributes)) {
+                // Skip if this token has been revoked.
+                if (array_key_exists('revoked', $row['Attributes']) && $row['Attributes']['revoked']) {
+                    return false;
+                }
+            }
+        } else {
+            return false;
+        }
+
+        // Skip if this token is expired.
+        $expiry = strtotime($row['DateExpires']);
+        if (time() > $expiry) {
+            return false;
+        }
+
+        return true;
+    }
+
+    /**
      * Get a schema representing all available token fields.
      *
      * @return Schema
@@ -71,21 +113,6 @@ class TokensApiController extends AbstractApiController {
             ], 'token');
         }
         return $this->fullSchema;
-    }
-
-    /**
-     * Get a schema for outputting sensitive token information.
-     */
-    public function sensitiveSchema() {
-        if (!isset($this->sensitiveSchema)) {
-            $this->sensitiveSchema = $this->schema([
-                'accessTokenID',
-                'name',
-                'accessToken:s' => 'A signed version of the token.',
-                'dateInserted'
-            ])->add($this->fullSchema());
-        }
-        return $this->sensitiveSchema;
     }
 
     /**
@@ -108,6 +135,9 @@ class TokensApiController extends AbstractApiController {
         $query = $in->validate($query);
         $this->validateTransientKey($query['transientKey']);
         $row = $this->token($id);
+        if ($this->isActiveToken($row) === false) {
+            throw new NotFoundException('Access Token');
+        }
         $this->prepareRow($row);
 
         $result = $out->validate($row);
@@ -148,26 +178,17 @@ class TokensApiController extends AbstractApiController {
         ], 'out')->setDescription('Get a list of authentication token IDs for the current user.');
 
         $rows = $this->accessTokenModel->getWhere(['UserID' => $this->session->UserID])->resultArray();
-        array_walk($rows, [$this, 'prepareRow']);
-        $validTokens = [];
+        $activeTokens = [];
         foreach ($rows as $token) {
-            $attributes = $token['Attributes'];
-            if (is_array($attributes)) {
-                // Skip if this token has been revoked.
-                if (array_key_exists('revoked', $token['Attributes']) && $token['Attributes']['revoked']) {
-                    continue;
-                }
-            }
-
-            // Skip if this token is expired.
-            $expiry = strtotime($token['DateExpires']);
-            if (time() > $expiry) {
+            if ($this->isActiveToken($token) === false) {
                 continue;
             }
-            $validTokens[] = $token;
+            $activeTokens[] = $token;
         }
+        unset($token);
+        array_walk($activeTokens, [$this, 'prepareRow']);
 
-        $result = $out->validate($validTokens);
+        $result = $out->validate($activeTokens);
         return $result;
     }
 
@@ -224,6 +245,21 @@ class TokensApiController extends AbstractApiController {
         if (array_key_exists('Token', $row) && is_string($row['Token'])) {
             $row['AccessToken'] = $this->accessTokenModel->signToken($row['Token']);
         }
+    }
+
+    /**
+     * Get a schema for outputting sensitive token information.
+     */
+    public function sensitiveSchema() {
+        if (!isset($this->sensitiveSchema)) {
+            $this->sensitiveSchema = $this->schema([
+                'accessTokenID',
+                'name',
+                'accessToken:s' => 'A signed version of the token.',
+                'dateInserted'
+            ])->add($this->fullSchema());
+        }
+        return $this->sensitiveSchema;
     }
 
     /**

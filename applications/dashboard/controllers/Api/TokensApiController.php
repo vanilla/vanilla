@@ -46,8 +46,6 @@ class TokensApiController extends AbstractApiController {
      * @throws ClientException if current user isn't authorized to delete the token.
      */
     public function delete($id) {
-        $this->permission('');
-
         $this->schema($this->idSchema(),'in')->setDescription('Revoke an authentication token.');
         $out = $this->schema([], 'out');
 
@@ -98,7 +96,7 @@ class TokensApiController extends AbstractApiController {
      * @return array
      */
     public function get_reveal($id, array $query) {
-        $this->permission('');
+        $this->permission('Garden.Tokens.Add');
 
         $in = $this->schema([
             'id',
@@ -137,7 +135,7 @@ class TokensApiController extends AbstractApiController {
      * @return array
      */
     public function index() {
-        $this->permission('');
+        $this->permission('Garden.Tokens.Add');
 
         $in = $this->schema([], 'in');
         $out = $this->schema([
@@ -179,7 +177,7 @@ class TokensApiController extends AbstractApiController {
      * @return mixed
      */
     public function post(array $body) {
-        $this->permission();
+        $this->permission('Garden.Tokens.Add');
 
         $in = $this->schema([
             'name:s' => 'A name indicating what the access token will be used for.',

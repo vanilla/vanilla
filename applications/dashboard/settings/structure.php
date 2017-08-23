@@ -352,7 +352,8 @@ $PermissionModel->define([
     'Garden.Moderation.Manage',
     'Garden.PersonalInfo.View' => 'Garden.Moderation.Manage',
     'Garden.AdvancedNotifications.Allow',
-    'Garden.Community.Manage' => 'Garden.Settings.Manage'
+    'Garden.Community.Manage' => 'Garden.Settings.Manage',
+    'Garden.Tokens.Add' => 'Garden.Settings.Manage'
 ]);
 
 $PermissionModel->undefine([

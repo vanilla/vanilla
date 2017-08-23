@@ -312,7 +312,7 @@ class AuthenticateApiController extends AbstractApiController {
         $saveRoles = $syncRoles && array_key_exists('roles', $ssoUserInfo);
         if ($saveRoles) {
             if (!empty($ssoUserInfo['roles'])) {
-                $roles = RoleModel::getByName($roles);
+                $roles = RoleModel::getByName($ssoUserInfo['roles']);
                 $roleIDs = array_keys($roles);
             }
 

@@ -61,6 +61,8 @@ abstract class Controller implements InjectableInterface {
      * When passing several permissions to check the user can have any of the permissions. If you want to force several
      * permissions then make several calls to this method.
      *
+     * @throws \Exception
+     *
      * @param string|array $permission The permissions you are requiring.
      * @param int|null $id The ID of the record we are checking the permission of.
      */

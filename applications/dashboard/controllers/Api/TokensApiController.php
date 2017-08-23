@@ -138,12 +138,13 @@ class TokensApiController extends AbstractApiController {
         $this->permission('Garden.Tokens.Add');
 
         $in = $this->schema([], 'in');
+        // Full access token details are not available in the index. Use GET on a single ID for sensitive information.
         $out = $this->schema([
             ':a' => $this->schema([
                 'accessTokenID',
                 'name',
                 'dateInserted'
-            ])->add($this->sensitiveSchema())
+            ])->add($this->fullSchema())
         ], 'out')->setDescription('Get a list of authentication token IDs for the current user.');
 
         $rows = $this->accessTokenModel->getWhere(['UserID' => $this->session->UserID])->resultArray();

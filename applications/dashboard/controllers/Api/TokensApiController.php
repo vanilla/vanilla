@@ -5,10 +5,8 @@
  */
 
 use Garden\Schema\Schema;
-use Garden\Web\Data;
 use Garden\Web\Exception\ClientException;
 use Garden\Web\Exception\NotFoundException;
-use Vanilla\Utility\CapitalCaseScheme;
 
 /**
  * API Controller for the `/tokens` resource.
@@ -61,9 +59,12 @@ class TokensApiController extends AbstractApiController {
      * Given a token row, determine if it is active.
      *
      * @param int|string|array $token Full token row.
+     * @param bool $throw Should relevant exceptions be thrown on an error?
+     * @throws ClientException if the token has been revoked.
+     * @throws ClientException if the token has expired.
      * @return bool
      */
-    public function isActiveToken($token) {
+    public function isActiveToken($token, $throw = false) {
         if (is_array($token)) {
             $row = $token;
         } elseif (filter_var($token, FILTER_VALIDATE_INT)) {
@@ -83,6 +84,9 @@ class TokensApiController extends AbstractApiController {
             if (is_array($attributes)) {
                 // Skip if this token has been revoked.
                 if (array_key_exists('revoked', $row['Attributes']) && $row['Attributes']['revoked']) {
+                    if ($throw) {
+                        throw new ClientException('Token revoked.', 410);
+                    }
                     return false;
                 }
             }
@@ -93,6 +97,9 @@ class TokensApiController extends AbstractApiController {
         // Skip if this token is expired.
         $expiry = strtotime($row['DateExpires']);
         if (time() > $expiry) {
+            if ($throw) {
+                throw new ClientException('Token expired.', 410);
+            }
             return false;
         }
 
@@ -135,10 +142,14 @@ class TokensApiController extends AbstractApiController {
         $query['id'] = $id;
         $query = $in->validate($query);
         $this->validateTransientKey($query['transientKey']);
+
         $row = $this->token($id);
-        if ($this->isActiveToken($row) === false) {
-            throw new NotFoundException('Access Token');
+        if ($row['UserID'] != $this->session->UserID) {
+            if ($this->session->checkPermission('Garden.Settings.Manage') === false) {
+                throw new NotFoundException('Access Token');
+            }
         }
+        $this->isActiveToken($row, true);
         $this->prepareRow($row);
 
         $result = $out->validate($row);

@@ -95,7 +95,7 @@ class TokensApiController extends AbstractApiController {
      * @param array $query
      * @return array
      */
-    public function get_reveal($id, array $query) {
+    public function get($id, array $query) {
         $this->permission('Garden.Tokens.Add');
 
         $in = $this->schema([

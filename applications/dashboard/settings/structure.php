@@ -285,6 +285,7 @@ $Construct
     ->column('Type', 'varchar(20)', false, 'index')
     ->column('Scope', 'text', true)
     ->column('DateInserted', 'timestamp', false)
+    ->column('InsertUserID', 'int', true)
     ->column('InsertIPAddress', 'ipaddress', false)
     ->column('DateExpires', 'timestamp', false)
     ->column('Attributes', 'text', true)

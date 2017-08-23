@@ -134,7 +134,7 @@ class TokensApiController extends AbstractApiController {
     }
 
     /**
-     * List all tokens for the current user.
+     * List active tokens for the current user.
      *
      * @return array
      */
@@ -152,8 +152,25 @@ class TokensApiController extends AbstractApiController {
 
         $rows = $this->accessTokenModel->getWhere(['UserID' => $this->session->UserID])->resultArray();
         array_walk($rows, [$this, 'prepareRow']);
+        $validTokens = [];
+        foreach ($rows as $token) {
+            $attributes = $token['Attributes'];
+            if (is_array($attributes)) {
+                // Skip if this token has been revoked.
+                if (array_key_exists('revoked', $token['Attributes']) && $token['Attributes']['revoked']) {
+                    continue;
+                }
+            }
 
-        $result = $out->validate($rows);
+            // Skip if this token is expired.
+            $expiry = strtotime($token['DateExpires']);
+            if (time() > $expiry) {
+                continue;
+            }
+            $validTokens[] = $token;
+        }
+
+        $result = $out->validate($validTokens);
         return $result;
     }
 
@@ -185,7 +202,7 @@ class TokensApiController extends AbstractApiController {
         $token = $this->accessTokenModel->trim($accessToken);
         $row = $this->accessTokenModel->getToken($token);
         $accessTokenID = $row['AccessTokenID'];
-        $row = $this->accessTokenModel->setAttribute($accessTokenID, 'Name', $body['name']);
+        $row = $this->accessTokenModel->setAttribute($accessTokenID, 'name', $body['name']);
 
         // Serve up the result.
         $this->prepareRow($row);
@@ -201,8 +218,8 @@ class TokensApiController extends AbstractApiController {
     public function prepareRow(array &$row) {
         $name = null;
         if (array_key_exists('Attributes', $row)) {
-            if (array_key_exists('Name', $row['Attributes']) && is_string($row['Attributes']['Name'])) {
-                $name = $row['Attributes']['Name'];
+            if (array_key_exists('name', $row['Attributes']) && is_string($row['Attributes']['name'])) {
+                $name = $row['Attributes']['name'];
             }
         }
         $row['Name'] = $name;

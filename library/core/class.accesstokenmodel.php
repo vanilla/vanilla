@@ -80,9 +80,9 @@ class AccessTokenModel extends Gdn_Model {
         }
 
         $this->setField($id, [
-            'DateExpires' => Gdn_Format::toDateTime(strtotime('-1 hour')),
-            'Attributes' => ['revoked' => true]
+            'DateExpires' => Gdn_Format::toDateTime(strtotime('-1 hour'))
         ]);
+        $this->setAttribute($id, 'revoked', true);
         return $this->Database->LastInfo['RowCount'] > 0;
     }
 

@@ -52,10 +52,8 @@ class TokensApiController extends AbstractApiController {
         $out = $this->schema([], 'out');
 
         $row = $this->token($id);
-        $isOwnToken = $row['UserID'] == $this->session->UserID;
-        $isAdmin = $this->session->checkPermission('Garden.Settings.Manage');
-        if (!$isOwnToken && !$isAdmin) {
-            throw new ClientException('You do not have permission to revoke this token.', 401);
+        if ($row['UserID'] != $this->session->UserID) {
+            $this->permission('Garden.Settings.Manage');
         }
 
         $this->accessTokenModel->revoke($id);

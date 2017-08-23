@@ -27,7 +27,7 @@ abstract class Controller implements InjectableInterface {
     /**
      * @var SessionInterface
      */
-    private $session;
+    protected $session;
 
     /**
      * @var EventManager

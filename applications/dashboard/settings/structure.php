@@ -267,7 +267,7 @@ $Construct->table('UserAuthenticationToken')
     ->column('Lifetime', 'int', false)
     ->set($Explicit, $Drop);
 
-if ($captureOnly === false && $Construct->table('AccessToken')->columnExists('AccessTokenID') === false) {
+if ($captureOnly === false && $Construct->tableExists('AccessToken') && $Construct->table('AccessToken')->columnExists('AccessTokenID') === false) {
     $accessTokenTable = $SQL->prefixTable('AccessToken');
     try {
         $SQL->query("alter table {$accessTokenTable} drop primary key");

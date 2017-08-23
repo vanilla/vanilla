@@ -7,7 +7,7 @@
 use Garden\Schema\Schema;
 use Garden\Web\Data;
 use Garden\Web\Exception\ClientException;
-use Garden\Web\Exception\ServerException;
+use Garden\Web\Exception\NotFoundException;
 use Vanilla\Utility\CapitalCaseScheme;
 
 /**
@@ -21,18 +21,140 @@ class TokensApiController extends AbstractApiController {
     /** @var AccessTokenModel */
     private $accessTokenModel;
 
-    /** @var Gdn_Session */
-    private $session;
+    /** @var Schema */
+    private $fullSchema;
+
+    /** @var Schema */
+    private $idSchema;
+
+    /** @var Schema */
+    private $sensitiveSchema;
 
     /**
      * TokensApiController constructor.
      *
      * @param AccessTokenModel $accessTokenModel
-     * @param Gdn_Session $session
      */
-    public function __construct(AccessTokenModel $accessTokenModel, Gdn_Session $session) {
+    public function __construct(AccessTokenModel $accessTokenModel) {
         $this->accessTokenModel = $accessTokenModel;
-        $this->session = $session;
+    }
+
+    /**
+     * Revoke an access token.
+     *
+     * @param int $id
+     * @throws ClientException if current user isn't authorized to delete the token.
+     */
+    public function delete($id) {
+        $this->permission('');
+
+        $this->schema($this->idSchema(),'in')->setDescription('Revoke an authentication token.');
+        $out = $this->schema([], 'out');
+
+        $row = $this->token($id);
+        $isOwnToken = $row['UserID'] == $this->session->UserID;
+        $isAdmin = $this->session->checkPermission('Garden.Settings.Manage');
+        if (!$isOwnToken && !$isAdmin) {
+            throw new ClientException('You do not have permission to revoke this token.', 401);
+        }
+
+        $this->accessTokenModel->revoke($id);
+    }
+
+    /**
+     * Get a schema representing all available token fields.
+     *
+     * @return Schema
+     */
+    public function fullSchema() {
+        if (!isset($this->fullSchema)) {
+            $this->fullSchema = $this->schema([
+                'accessTokenID:i' => 'The unique numeric ID.',
+                'name:s|n' => 'A user-specified label.',
+                'dateInserted:dt' => 'When the token was generated.'
+            ], 'token');
+        }
+        return $this->fullSchema;
+    }
+
+    /**
+     * Get a schema for outputting sensitive token information.
+     */
+    public function sensitiveSchema() {
+        if (!isset($this->sensitiveSchema)) {
+            $this->sensitiveSchema = $this->schema([
+                'accessTokenID',
+                'name',
+                'accessToken:s' => 'A signed version of the token.',
+                'dateInserted'
+            ])->add($this->fullSchema());
+        }
+        return $this->sensitiveSchema;
+    }
+
+    /**
+     * Get a signed copy of a token.
+     *
+     * @param int $id
+     * @param array $query
+     * @return array
+     */
+    public function get_reveal($id, array $query) {
+        $this->permission('');
+
+        $in = $this->schema([
+            'id',
+            'transientKey:s' => 'A valid CSRF token for the current user.'
+        ], 'in')->add($this->idSchema())->setDescription('Reveal a usable authentication token.');
+        $out = $this->schema($this->sensitiveSchema(), 'out');
+
+        $query['id'] = $id;
+        $query = $in->validate($query);
+        $this->validateTransientKey($query['transientKey']);
+        $row = $this->token($id);
+        $this->prepareRow($row);
+
+        $result = $out->validate($row);
+        return $result;
+    }
+
+    /**
+     * Get an ID-only schema for token records.
+     *
+     * @return Schema
+     */
+    public function idSchema() {
+        if (!isset($this->idSchema)) {
+            $this->idSchema = $this->schema(
+                ['id:i' => 'The numeric ID of a token.'],
+                'tokenID'
+            );
+        }
+        return $this->idSchema;
+    }
+
+    /**
+     * List all tokens for the current user.
+     *
+     * @return array
+     */
+    public function index() {
+        $this->permission('');
+
+        $in = $this->schema([], 'in');
+        $out = $this->schema([
+            ':a' => $this->schema([
+                'accessTokenID',
+                'name',
+                'dateInserted'
+            ])->add($this->sensitiveSchema())
+        ], 'out')->setDescription('Get a list of authentication token IDs for the current user.');
+
+        $rows = $this->accessTokenModel->getWhere(['UserID' => $this->session->UserID])->resultArray();
+        array_walk($rows, [$this, 'prepareRow']);
+
+        $result = $out->validate($rows);
+        return $result;
     }
 
     /**
@@ -47,16 +169,11 @@ class TokensApiController extends AbstractApiController {
         $in = $this->schema([
             'name:s' => 'A name indicating what the access token will be used for.',
             'transientKey:s' => 'A valid CSRF token for the current user.'
-        ], 'in');
-        $out = $this->schema([
-            'accessTokenID:i',
-            'name:s',
-            'accessToken:s',
-            'dateInserted:dt'
-        ], 'out');
+        ], 'in')->setDescription('Issue a new authentication token for the current user.');
+        $out = $this->schema($this->sensitiveSchema(), 'out');
 
         $body = $in->validate($body);
-        $this->validateTK($body['transientKey']);
+        $this->validateTransientKey($body['transientKey']);
 
         // Issue the new token.
         $accessToken = $this->accessTokenModel->issue(
@@ -81,24 +198,42 @@ class TokensApiController extends AbstractApiController {
      *
      * @param array $row
      */
-    public function prepareRow(&$row) {
+    public function prepareRow(array &$row) {
+        $name = null;
         if (array_key_exists('Attributes', $row)) {
             if (array_key_exists('Name', $row['Attributes']) && is_string($row['Attributes']['Name'])) {
-                $row['Name'] = $row['Attributes']['Name'];
+                $name = $row['Attributes']['Name'];
             }
         }
+        $row['Name'] = $name;
+
         if (array_key_exists('Token', $row) && is_string($row['Token'])) {
             $row['AccessToken'] = $this->accessTokenModel->signToken($row['Token']);
         }
     }
 
     /**
+     * Get an access token by its numeric ID.
+     *
+     * @param int $accessTokenID
+     * @throws NotFoundException when the token cannot be located by its ID.
+     * @return array
+     */
+    protected function token($accessTokenID) {
+        $row = $this->accessTokenModel->getID($accessTokenID);
+        if (!$row) {
+            throw new NotFoundException('Access Token');
+        }
+        return $row;
+    }
+
+    /**
      * Validate the transient key for the current request.
      *
-     * @param $transientKey
+     * @param string $transientKey
      * @throws ClientException
      */
-    public function validateTK($transientKey) {
+    public function validateTransientKey($transientKey) {
         if ($this->session->transientKey() === false) {
             $this->session->loadTransientKey();
         }

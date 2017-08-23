@@ -120,6 +120,7 @@ class TokensApiController extends AbstractApiController {
      *
      * @param int $id
      * @param array $query
+     * @throws NotFoundException if this is not an active token.
      * @return array
      */
     public function get($id, array $query) {

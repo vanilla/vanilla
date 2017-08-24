@@ -50,11 +50,11 @@ class TokensApiController extends AbstractApiController {
      * @throws ClientException if current user isn't authorized to delete the token.
      */
     public function delete($id) {
-        $this->schema($this->idSchema(),'in')->setDescription('Revoke an authentication token.');
+        $this->schema($this->idSchema(),'in')->setDescription('Revoke an access token.');
         $out = $this->schema([], 'out');
 
         $row = $this->token($id);
-        if ($row['UserID'] != $this->session->UserID) {
+        if ($row['UserID'] != $this->getSession()->UserID) {
             $this->permission('Garden.Settings.Manage');
         }
 
@@ -142,7 +142,7 @@ class TokensApiController extends AbstractApiController {
         $in = $this->schema([
             'id',
             'transientKey:s' => 'A valid CSRF token for the current user.'
-        ], 'in')->add($this->idSchema())->setDescription('Reveal a usable authentication token.');
+        ], 'in')->add($this->idSchema())->setDescription('Reveal a usable access token.');
         $out = $this->schema($this->sensitiveSchema(), 'out');
 
         $query['id'] = $id;
@@ -150,8 +150,8 @@ class TokensApiController extends AbstractApiController {
         $this->validateTransientKey($query['transientKey']);
 
         $row = $this->token($id);
-        if ($row['UserID'] != $this->session->UserID) {
-            if ($this->session->checkPermission('Garden.Settings.Manage') === false) {
+        if ($row['UserID'] != $this->getSession()->UserID) {
+            if ($this->getSession()->checkPermission('Garden.Settings.Manage') === false) {
                 throw new NotFoundException('Access Token');
             }
         }
@@ -193,10 +193,10 @@ class TokensApiController extends AbstractApiController {
                 'name',
                 'dateInserted'
             ])->add($this->fullSchema())
-        ], 'out')->setDescription('Get a list of authentication token IDs for the current user.');
+        ], 'out')->setDescription('Get a list of access token IDs for the current user.');
 
         $rows = $this->accessTokenModel->getWhere([
-            'UserID' => $this->session->UserID,
+            'UserID' => $this->getSession()->UserID,
             'Type' => self::TOKEN_TYPE
         ], '', 'asc', self::RESPONSE_LIMIT)->resultArray();
         $activeTokens = [];
@@ -214,7 +214,7 @@ class TokensApiController extends AbstractApiController {
     }
 
     /**
-     * Issue a new transient key for the current user.
+     * Issue a new access token for the current user.
      *
      * @param array $body
      * @return mixed
@@ -225,7 +225,7 @@ class TokensApiController extends AbstractApiController {
         $in = $this->schema([
             'name:s' => 'A name indicating what the access token will be used for.',
             'transientKey:s' => 'A valid CSRF token for the current user.'
-        ], 'in')->setDescription('Issue a new authentication token for the current user.');
+        ], 'in')->setDescription('Issue a new access token for the current user.');
         $out = $this->schema($this->sensitiveSchema(), 'out');
 
         $body = $in->validate($body);
@@ -233,7 +233,7 @@ class TokensApiController extends AbstractApiController {
 
         // Issue the new token.
         $accessToken = $this->accessTokenModel->issue(
-            $this->session->UserID,
+            $this->getSession()->UserID,
             self::DEFAULT_EXPIRY,
             self::TOKEN_TYPE
         );
@@ -305,11 +305,11 @@ class TokensApiController extends AbstractApiController {
      * @throws ClientException
      */
     public function validateTransientKey($transientKey) {
-        if ($this->session->transientKey() === false) {
-            $this->session->loadTransientKey();
+        if ($this->getSession()->transientKey() === false) {
+            $this->getSession()->loadTransientKey();
         }
 
-        if ($this->session->transientKey() != $transientKey) {
+        if ($this->getSession()->transientKey() != $transientKey) {
             throw new ClientException('Invalid transient key.', 401);
         }
     }

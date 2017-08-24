@@ -14,7 +14,13 @@ use Garden\Web\Exception\NotFoundException;
 class TokensApiController extends AbstractApiController {
 
     /** Default expiry for issued tokens. */
-    const DEFAULT_EXPIRY = '1 month';
+    const DEFAULT_EXPIRY = '10 years';
+
+    /** The maximum number of tokens in a response. */
+    const RESPONSE_LIMIT = 200;
+
+    /** Default token type. */
+    const TOKEN_TYPE = 'personal';
 
     /** @var AccessTokenModel */
     private $accessTokenModel;
@@ -189,7 +195,13 @@ class TokensApiController extends AbstractApiController {
             ])->add($this->fullSchema())
         ], 'out')->setDescription('Get a list of authentication token IDs for the current user.');
 
-        $rows = $this->accessTokenModel->getWhere(['UserID' => $this->session->UserID])->resultArray();
+        $rows = $this->accessTokenModel->getWhere([
+            'UserID' => $this->session->UserID,
+            'Type' => self::TOKEN_TYPE,
+            '',
+            'asc',
+            self::RESPONSE_LIMIT
+        ])->resultArray();
         $activeTokens = [];
         foreach ($rows as $token) {
             if ($this->isActiveToken($token) === false) {
@@ -226,7 +238,7 @@ class TokensApiController extends AbstractApiController {
         $accessToken = $this->accessTokenModel->issue(
             $this->session->UserID,
             self::DEFAULT_EXPIRY,
-            'personal'
+            self::TOKEN_TYPE
         );
         $this->validateModel($this->accessTokenModel);
         $token = $this->accessTokenModel->trim($accessToken);

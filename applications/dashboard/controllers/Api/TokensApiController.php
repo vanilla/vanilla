@@ -197,11 +197,8 @@ class TokensApiController extends AbstractApiController {
 
         $rows = $this->accessTokenModel->getWhere([
             'UserID' => $this->session->UserID,
-            'Type' => self::TOKEN_TYPE,
-            '',
-            'asc',
-            self::RESPONSE_LIMIT
-        ])->resultArray();
+            'Type' => self::TOKEN_TYPE
+        ], '', 'asc', self::RESPONSE_LIMIT)->resultArray();
         $activeTokens = [];
         foreach ($rows as $token) {
             if ($this->isActiveToken($token) === false) {

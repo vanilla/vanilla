@@ -3086,7 +3086,7 @@ class DiscussionModel extends Gdn_Model {
      */
     public static function addFilterSet($setKey, $setName = '', $categoryIDs = []) {
         if (!$setName) {
-            $setName = sprintf(t('All %s'), t('Discussions'));
+            $setName = t('All Discussions');
         }
         self::$allowedFilters[$setKey]['key'] = $setKey;
         self::$allowedFilters[$setKey]['name'] = $setName;

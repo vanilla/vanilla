@@ -100,6 +100,44 @@ class AuthenticateApiController extends AbstractApiController {
     }
 
     /**
+     * Unlink a user from the specified authenticator.
+     * If no user is specified it will unlink the current user.
+     *
+     * @throws Exception
+     *
+     * @param $authenticator
+     * @param string $authenticatorID
+     * @param array $query The query string as an array.
+     */
+    public function delete($authenticator, $authenticatorID = '', array $query) {
+        $in = $this->schema([
+            'authenticator:s' => 'The authenticator that will be used.',
+            'authenticatorID:s?' => 'Authenticator instance\'s identifier.',
+            'userID:i?' => 'UserID to unlink authenticator from.',
+        ])->setDescription('Authenticate a user using a specific authenticator.');
+        $out = $this->schema([], 'out');
+
+        $in->validate($query, true);
+
+        if (isset($query['UserID'])) {
+            $this->permission('Garden.Users.Edit');
+            $userID = $query['UserID'];
+        } else {
+            $this->permission('Garden.SignIn.Allow');
+            $userID = $this->getSession()->UserID;
+        }
+
+        $authenticatorInstance = $this->getSSOAuthenticator($authenticator, $authenticatorID);
+
+        $data = [];
+        $this->userModel->getDelete(
+            'UserAuthentication',
+            ['UserID' => $userID, 'ProviderKey' => $authenticatorInstance->getID()],
+            $data
+        );
+    }
+
+    /**
      * Try to find a user matching the provided SSOUserInfo.
      * Email has priority over Name if both are allowed.
      *
@@ -141,35 +179,20 @@ class AuthenticateApiController extends AbstractApiController {
     }
 
     /**
-     * Authenticate a user using the specified authenticator.
+     * Get an SSOAuthenticator
      *
-     * @throws Exception If the authentication process fails
-     * @throws NotFoundException If the $authenticatorType is not found.
-     * @param string $authenticator
-     * @param string $authenticatorID
-     * @param array $query The query string as an array.
-     * @return array
+     * @throws Exception
+     *
+     * @param $authenticatorType
+     * @param $authenticatorID
+     * @return SSOAuthenticator
      */
-    public function post($authenticator, $authenticatorID = '', array $query) {
-        $in = $this->schema([
-            'authenticator:s' => 'The authenticator that will be used.',
-            'authenticatorID:s?' => 'Authenticator instance\'s identifier',
-            'startSession:b?' => 'If set to true the session will be started if the authentication succeed',
-        ])->setDescription('Authenticate a user using a specific authenticator.');
-        $out = $this->schema(Schema::parse([
-            'userID:i?' => 'Identifier of the authenticated user.',
-            'authenticationStep:s?' => 'Tells whether the user is now authenticated or if additional step(s) are required.',
-            'sessionID:s?' => 'Identifier used to do subsequent call to the api for the current authentication process.'
-                .'to this endpoint if the authentication was not a success.',
-        ]), 'out');
-
-        $in->validate($query, true);
-
-        if (empty($authenticator)) {
+    private function getSSOAuthenticator($authenticatorType, $authenticatorID) {
+        if (empty($authenticatorType)) {
             throw new NotFoundException();
         }
 
-        $authenticatorClassName = $authenticator.'Authenticator';
+        $authenticatorClassName = $authenticatorType.'Authenticator';
         $authenticatorClasses = $this->addonManager->findClasses("*/$authenticatorClassName");
 
         if (empty($authenticatorClasses)) {
@@ -187,14 +210,42 @@ class AuthenticateApiController extends AbstractApiController {
         }
 
         /** @var SSOAuthenticator $authenticatorInstance */
-        $authenticatorInstance = null;
-        if (class_exists($authenticatorClassName)) {
-            if (!empty($authenticatorID)) {
-                $authenticatorInstance = $this->container->getArgs($authenticatorClassName, [$authenticatorID]);
-            } else {
-                $authenticatorInstance = $this->container->get($authenticatorClassName);
-            }
+        if (!empty($authenticatorID)) {
+            $authenticatorInstance = $this->container->getArgs($authenticatorClassName, [$authenticatorID]);
+        } else {
+            $authenticatorInstance = $this->container->get($authenticatorClassName);
         }
+
+        return $authenticatorInstance;
+    }
+
+    /**
+     * Authenticate a user using the specified authenticator.
+     *
+     * @throws Exception If the authentication process fails
+     * @throws NotFoundException If the $authenticatorType is not found.
+     *
+     * @param string $authenticator
+     * @param string $authenticatorID
+     * @param array $query The query string as an array.
+     * @return array
+     */
+    public function post($authenticator, $authenticatorID = '', array $query) {
+        $in = $this->schema([
+            'authenticator:s' => 'The authenticator that will be used.',
+            'authenticatorID:s?' => 'Authenticator instance\'s identifier.',
+            'startSession:b?' => 'If set to true the session will be started if the authentication succeed.',
+        ])->setDescription('Authenticate a user using a specific authenticator.');
+        $out = $this->schema(Schema::parse([
+            'userID:i?' => 'Identifier of the authenticated user.',
+            'authenticationStep:s?' => 'Tells whether the user is now authenticated or if additional step(s) are required.',
+            'sessionID:s?' => 'Identifier used to do subsequent call to the api for the current authentication process.'
+                .'to this endpoint if the authentication was not a success.',
+        ]), 'out');
+
+        $in->validate($query, true);
+
+        $authenticatorInstance = $this->getSSOAuthenticator($authenticator, $authenticatorID);
 
         // The authenticator should throw an appropriate error message on error.
         $ssoUserInfo = $authenticatorInstance->sso($this->request);

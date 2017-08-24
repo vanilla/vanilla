@@ -261,7 +261,7 @@ class TokensApiController extends AbstractApiController {
                 $name = $row['Attributes']['name'];
             }
         }
-        $row['Name'] = $name;
+        $row['Name'] = $name ?: t('Personal Access Token');
 
         if (array_key_exists('Token', $row) && is_string($row['Token'])) {
             $row['AccessToken'] = $this->accessTokenModel->signToken($row['Token']);

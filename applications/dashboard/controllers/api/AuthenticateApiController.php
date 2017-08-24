@@ -8,29 +8,20 @@ use Garden\Web\Exception\ClientException;
 use Garden\Web\Exception\NotFoundException;
 use Garden\Web\Exception\ServerException;
 use Garden\Web\RequestInterface;
-use Interop\Container\ContainerInterface;
-use Vanilla\AddonManager;
 use Vanilla\Models\SSOModel;
 use Vanilla\Models\SSOUserInfo;
 use Vanilla\Utility\CapitalCaseScheme;
-use Vanilla\SSOAuthenticator;
 
 /**
  * API Controller for the `/authenticate` resource.
  */
 class AuthenticateApiController extends AbstractApiController {
 
-    /** @var AddonManager */
-    private $addonManager;
-
     /** @var CapitalCaseScheme */
     private $caseScheme;
 
     /** @var Gdn_Configuration */
     private $config;
-
-    /** @var Container */
-    private $container;
 
     /** @var RequestInterface */
     private $request;
@@ -44,25 +35,19 @@ class AuthenticateApiController extends AbstractApiController {
     /**
      * AuthenticationController constructor.
      *
-     * @param AddonManager $addonManager
      * @param Gdn_Configuration $config
-     * @param ContainerInterface $container
      * @param RequestInterface $request
      * @param SSOModel $ssoModel
      * @param UserModel $userModel
      */
     public function __construct(
-        AddonManager $addonManager,
-        ContainerInterface $container,
         Gdn_Configuration $config,
         RequestInterface $request,
         SSOModel $ssoModel,
         UserModel $userModel
     ) {
-        $this->addonManager = $addonManager;
         $this->caseScheme = new CapitalCaseScheme();
         $this->config = $config;
-        $this->container = $container;
         $this->request = $request;
         $this->ssoModel = $ssoModel;
         $this->userModel = $userModel;
@@ -127,7 +112,7 @@ class AuthenticateApiController extends AbstractApiController {
             $userID = $this->getSession()->UserID;
         }
 
-        $authenticatorInstance = $this->getSSOAuthenticator($authenticator, $authenticatorID);
+        $authenticatorInstance = $this->ssoModel->getSSOAuthenticator($authenticator, $authenticatorID);
 
         $data = [];
         $this->userModel->getDelete(
@@ -179,47 +164,6 @@ class AuthenticateApiController extends AbstractApiController {
     }
 
     /**
-     * Get an SSOAuthenticator
-     *
-     * @throws Exception
-     *
-     * @param $authenticatorType
-     * @param $authenticatorID
-     * @return SSOAuthenticator
-     */
-    private function getSSOAuthenticator($authenticatorType, $authenticatorID) {
-        if (empty($authenticatorType)) {
-            throw new NotFoundException();
-        }
-
-        $authenticatorClassName = $authenticatorType.'Authenticator';
-        $authenticatorClasses = $this->addonManager->findClasses("*/$authenticatorClassName");
-
-        if (empty($authenticatorClasses)) {
-            throw new NotFoundException($authenticatorClasses);
-        }
-
-        // Throw an exception if there are multiple authenticators with that type.
-        // We are not handling authenticators with the same name in different namespaces for now.
-        if (count($authenticatorClasses) > 1) {
-            throw new ServerException(
-                "Multiple class named \"$authenticatorClasses\" have been found.",
-                500,
-                ['classes' => $authenticatorClasses]
-            );
-        }
-
-        /** @var SSOAuthenticator $authenticatorInstance */
-        if (!empty($authenticatorID)) {
-            $authenticatorInstance = $this->container->getArgs($authenticatorClassName, [$authenticatorID]);
-        } else {
-            $authenticatorInstance = $this->container->get($authenticatorClassName);
-        }
-
-        return $authenticatorInstance;
-    }
-
-    /**
      * Authenticate a user using the specified authenticator.
      *
      * @throws Exception If the authentication process fails
@@ -245,7 +189,7 @@ class AuthenticateApiController extends AbstractApiController {
 
         $in->validate($query, true);
 
-        $authenticatorInstance = $this->getSSOAuthenticator($authenticator, $authenticatorID);
+        $authenticatorInstance = $this->ssoModel->getSSOAuthenticator($authenticator, $authenticatorID);
 
         // The authenticator should throw an appropriate error message on error.
         $ssoUserInfo = $authenticatorInstance->sso($this->request);
@@ -291,7 +235,7 @@ class AuthenticateApiController extends AbstractApiController {
 
         if ($user) {
             if ($authenticatorInstance->isTrusted()) {
-                if (!$this->syncUser($syncUser, $syncRoles, $user, $ssoUserInfo)) {
+                if (!$this->syncUser($ssoUserInfo, $user, $syncUser, $syncRoles)) {
                     throw new ServerException(
                         "User synchronization failed",
                         500,
@@ -333,15 +277,15 @@ class AuthenticateApiController extends AbstractApiController {
     }
 
     /**
-     * Synchronize the user using the provided data.
+     * Synchronize a user using the provided data.
      *
+     * @param SSOUserInfo $ssoUserInfo SSO provided user data.
+     * @param array $user Current user's data.
      * @param bool $syncUser Synchronize the user's data.
      * @param bool $syncRoles Synchronize the user's roles.
-     * @param array $user Current user's data.
-     * @param SSOUserInfo $ssoUserInfo SSO provided user data.
      * @return bool If the synchronisation was a success ot not.
      */
-    private function syncUser($syncUser, $syncRoles, $user, SSOUserInfo $ssoUserInfo) {
+    private function syncUser(SSOUserInfo $ssoUserInfo, $user, $syncUser, $syncRoles) {
         if (!$syncUser && !$syncRoles) {
             return true;
         }
@@ -363,13 +307,13 @@ class AuthenticateApiController extends AbstractApiController {
         $saveRoles = $syncRoles && array_key_exists('roles', $ssoUserInfo);
         if ($saveRoles) {
             if (!empty($ssoUserInfo['roles'])) {
-                $roles = RoleModel::getByName($ssoUserInfo['roles']);
+                $roles = \RoleModel::getByName($ssoUserInfo['roles']);
                 $roleIDs = array_keys($roles);
             }
 
             // Ensure user has at least one role.
             if (empty($roleIDs)) {
-                $roleIDs = $this->UserModel->newUserRoleIDs();
+                $roleIDs = $this->userModel->newUserRoleIDs();
             }
 
             $userInfo['RoleID'] = $roleIDs;

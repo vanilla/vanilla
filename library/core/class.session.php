@@ -717,35 +717,32 @@ class Gdn_Session {
         if ($name == '') {
             return;
         }
-
-        // Create a fresh copy of the Sql object to avoid pollution.
-        $sql = clone Gdn::sql();
-        $sql->reset();
+        $sessionModel = new SessionModel();
 
         // Grab the user's session.
-        $session = $this->getStashSession($sql, $value);
+        $session = $this->getStashSession($sessionModel, $value);
         if (!$session) {
             return;
         }
 
         // Stash or unstash the value depending on inputs.
         if ($value != '') {
-            $session->Attributes[$name] = $value;
+            $session['Attributes'][$name] = $value;
         } else {
-            $value = val($name, $session->Attributes);
+            $value = val($name, $session['Attributes']);
             if ($unsetOnRetrieve) {
-                unset($session->Attributes[$name]);
+                unset($session['Attributes'][$name]);
             }
         }
         // Update the attributes.
-        $sql->put(
-            'Session',
+        $sessionModel->update(
             [
                 'DateUpdated' => Gdn_Format::toDateTime(),
-                'Attributes' => dbencode($session->Attributes)
+                'Attributes' => $session['Attributes'],
             ],
-            ['SessionID' => $session->SessionID]
+            ['SessionID' => $session['SessionID']]
         );
+
         return $value;
     }
 
@@ -755,12 +752,12 @@ class Gdn_Session {
      * This is a stop-gap solution until full session management for users &
      * guests can be implemented.
      *
-     * @param Gdn_SQLDriver $sql          Local clone of the sql driver.
-     * @param string        $valueToStash The value of the stash to set.
+     * @param SessionModel $sessionModel
+     * @param string $valueToStash The value of the stash to set.
      *
-     * @return bool|Gdn_DataSet Current session.
+     * @return bool|array Current session.
      */
-    private function getStashSession($sql, $valueToStash) {
+    private function getStashSession($sessionModel, $valueToStash) {
         $cookieName = c('Garden.Cookie.Name', 'Vanilla');
         $name = $cookieName.'-sid';
 
@@ -772,35 +769,21 @@ class Gdn_Session {
             return false;
         }
 
-        $session = $sql
-            ->select()
-            ->from('Session')
-            ->where('SessionID', $sessionID)
-            ->get()
-            ->firstRow();
+        $session = $sessionModel->getID($sessionID, DATASET_TYPE_ARRAY);
 
         if (!$session) {
             $sessionID = betterRandomString(32);
-            $transientKey = substr(md5(mt_rand()), 0, 11).'!';
-            // Save the session information to the database.
-            $sql->insert(
-                'Session',
-                [
-                    'SessionID' => $sessionID,
-                    'UserID' => Gdn::session()->UserID,
-                    'TransientKey' => $transientKey,
-                    'DateInserted' => Gdn_Format::toDateTime(),
-                    'DateUpdated' => Gdn_Format::toDateTime()
-                ]
-            );
-            trace("Inserting session stash $sessionID");
 
-            $session = $sql
-                ->select()
-                ->from('Session')
-                ->where('SessionID', $sessionID)
-                ->get()
-                ->firstRow();
+            $session = [
+                'SessionID' => $sessionID,
+                'UserID' => Gdn::session()->UserID,
+                'DateInserted' => Gdn_Format::toDateTime(),
+                'Attributes' => [],
+            ];
+
+            // Save the session information to the database.
+            $sessionModel->insert($session);
+            trace("Inserting session stash $sessionID");
 
             // Save a session cookie.
             $path = c('Garden.Cookie.Path', '/');
@@ -816,10 +799,6 @@ class Gdn_Session {
 
             safeCookie($name, $sessionID, $expire, $path, $domain);
             $_COOKIE[$name] = $sessionID;
-        }
-        $session->Attributes = dbdecode($session->Attributes);
-        if (!$session->Attributes) {
-            $session->Attributes = [];
         }
 
         return $session;

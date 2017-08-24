@@ -291,8 +291,8 @@ $Construct->table('Session')
     ->column('SessionID', 'char(32)', false, 'primary')
     ->column('UserID', 'int', 0)
     ->column('DateInserted', 'datetime', false)
-    ->column('DateUpdated', 'datetime', false)
-    ->column('TransientKey', 'varchar(12)', false)
+    ->column('DateUpdated', 'datetime', null)
+    ->column('DateExpire', 'datetime', null, 'index')
     ->column('Attributes', 'text', null)
     ->set($Explicit, $Drop);
 

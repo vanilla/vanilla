@@ -103,7 +103,7 @@
 
             var displayAs = $(this).data('displayas');
             var $item = $(this).closest('.js-category-item');
-            var categoryID = $item.data('id');
+            var categoryID = $item.data('categoryId');
 
             var setUI = function ($item, displayAs) {
                 displayAs = displayAs.toLowerCase();

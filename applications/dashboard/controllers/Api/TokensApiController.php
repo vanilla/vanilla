@@ -5,6 +5,7 @@
  */
 
 use Garden\Schema\Schema;
+use Garden\Web\Data;
 use Garden\Web\Exception\ClientException;
 use Garden\Web\Exception\NotFoundException;
 
@@ -246,7 +247,7 @@ class TokensApiController extends AbstractApiController {
         // Serve up the result.
         $this->prepareRow($row);
         $result = $out->validate($row);
-        return $result;
+        return new Data($result, 201);
     }
 
     /**

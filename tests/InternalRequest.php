@@ -98,7 +98,19 @@ class InternalRequest extends HttpRequest implements RequestInterface {
     public function send() {
         $this->container->setInstance(\Gdn_Request::class, $this->convertToLegacyRequest());
 
+        $cookieStash = $_COOKIE;
+        $cookies = [];
+        if ($rawCookies = $this->getHeader('Cookie')) {
+            $rawCookies = explode(';', $rawCookies);
+            array_walk($rawCookies, 'trim');
+            foreach ($rawCookies as $cookie) {
+                list($key, $val) = explode('=', $cookie);
+                $cookies[$key] = rawurldecode($val);
+            }
+        }
+        $_COOKIE = $cookies;
         $data = $this->dispatcher->dispatch($this);
+        $_COOKIE = $cookieStash;
 
         $response = new HttpResponse($data->getStatus(), $data->getHeaders(), '');
         $response->setBody($data->getData());

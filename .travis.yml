@@ -13,9 +13,8 @@ sudo: false
 
 matrix:
   allow_failures:
-    - php: 
-      - 7.2
-      - hhvm
+    - php: 7.2
+    - php: hhvm
   fast_finish: true
 
 cache:

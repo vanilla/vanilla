@@ -6,6 +6,7 @@
 
 use Garden\Schema\Schema;
 use Garden\Web\Data;
+use Garden\Web\Exception\ClientException;
 use Garden\Web\Exception\NotFoundException;
 use Garden\Web\Exception\ServerException;
 use Vanilla\Utility\CapitalCaseScheme;
@@ -75,12 +76,13 @@ class CategoriesApiController extends AbstractApiController {
      * Lookup a single category by its numeric ID or its URL code.
      *
      * @param int|string $id The category ID or URL code.
+     * @param bool $throw Throw an exception if the category cannot be found.
      * @throws NotFoundException if the category cannot be found.
      * @return array
      */
-    public function category($id) {
+    public function category($id, $throw = true) {
         $category = CategoryModel::categories($id);
-        if (empty($category)) {
+        if (empty($category) && $throw) {
             throw new NotFoundException('Category');
         }
         return $category;
@@ -288,18 +290,6 @@ class CategoriesApiController extends AbstractApiController {
     }
 
     /**
-     * Prepare data for output.
-     *
-     * @param array $row
-     */
-    public function prepareRow(array &$row) {
-        if ($row['ParentCategoryID'] <= 0) {
-            $row['ParentCategoryID'] = null;
-        }
-        $row['Description'] = $row['Description'] ?: '';
-    }
-
-    /**
      * Update a category.
      *
      * @param int $id The ID of the category.
@@ -351,6 +341,70 @@ class CategoriesApiController extends AbstractApiController {
         $this->prepareRow($row);
         $result = $out->validate($row);
         return new Data($result, 201);
+    }
+
+    /**
+     * Prepare data for output.
+     *
+     * @param array $row
+     */
+    public function prepareRow(array &$row) {
+        if ($row['ParentCategoryID'] <= 0) {
+            $row['ParentCategoryID'] = null;
+        }
+        $row['Description'] = $row['Description'] ?: '';
+    }
+
+    /**
+     * Move a category under a new parent.
+     *
+     * @param int $id The ID of the category.
+     * @param array $body The request body.
+     * @throws NotFoundException if unable to find the category.
+     * @throws ClientException if the parent and category are the same.
+     * @throws ClientException if the parent category ID is invalid.
+     * @throws ClientException if the target parent category does not exist.
+     * @throws ClientException if trying to move a category under one of its own children.
+     * @return array
+     */
+    public function put_parentCategoryID($id, array $body) {
+        $this->permission(['Garden.Community.Manage', 'Garden.Settings.Manage']);
+
+        $in = $this
+            ->schema(['parentCategoryID:i' => 'New parent for the category.'], 'in')
+            ->setDescription('Move a category.');
+        $out = $this->schema(['parentCategoryID:i' => 'The current parent category ID.'], 'out');
+
+        $body = $in->validate($body);
+        $parentCategoryID = intval($body['parentCategoryID']);
+
+        if ($id == $parentCategoryID) {
+            throw new ClientException('A category cannot be the parent of itself.');
+        }
+
+        if ($parentCategoryID < 1 && $parentCategoryID !== -1) {
+            throw new ClientException('parentCategoryID must be -1 or greater than zero.');
+        }
+
+        $parentCategory = $this->category($parentCategoryID, false);
+        if (!is_array($parentCategory)) {
+            throw new ClientException('The new parent category could not be found.');
+        }
+
+        // Make sure the category exists.
+        $this->category($id);
+
+        $childTree = CategoryModel::flattenTree($this->categoryModel->getChildTree($id));
+        $children = array_column($childTree, 'CategoryID');
+        if (in_array($parentCategoryID, $children)) {
+            throw new ClientException('Cannot move a category under one of its own children.');
+        }
+
+        $this->categoryModel->setField($id, 'ParentCategoryID', $parentCategoryID);
+        $this->categoryModel->rebuildTree();
+
+        $result = $this->category($id);
+        return $out->validate($result);
     }
 
     /**

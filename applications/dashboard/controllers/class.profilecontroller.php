@@ -1224,6 +1224,117 @@ class ProfileController extends Gdn_Controller {
     }
 
     /**
+     * Edit user's preferences (mostly notification settings).
+     *
+     * @param mixed $userReference Unique identifier, possibly username or ID.
+     * @param string $username .
+     * @param int $userID Unique identifier.
+     */
+    public function tokens($userReference = '', $username = '', $userID = '') {
+        $this->addJsFile('profile.js');
+        $this->permission('Garden.SignIn.Allow');
+
+        // Get user data
+        $this->getUserInfo($userReference, $username, $userID, true);
+
+        /* @var TokensApiController $tokenApi */
+        $tokenApi = Gdn::getContainer()->get(TokensApiController::class);
+        $tokens = $tokenApi->index();
+
+        $this->title(t('Personal Access Tokens'));
+        $this->_setBreadcrumbs($this->data('Title'), $this->canonicalUrl());
+        $this->setData('Tokens', $tokens);
+        $this->render();
+    }
+
+    public function token($userReference = '', $username = '', $userID = '') {
+        $this->addJsFile('profile.js');
+        $this->permission('Garden.SignIn.Allow');
+
+        // Get user data
+        $this->getUserInfo($userReference, $username, $userID, true);
+
+        /* @var TokensApiController $tokenApi */
+        $tokenApi = Gdn::getContainer()->get(TokensApiController::class);
+
+        if ($this->Form->authenticatedPostBack(true)) {
+            try {
+                $token = $tokenApi->post([
+                    'name' => $this->Form->getFormValue('Name'),
+                    'transientKey' => $this->Form->getFormValue('TransientKey')
+                ]);
+
+                $this->jsonTarget(".DataList-Tokens", $this->revealTokenRow($token), 'Prepend');
+
+            } catch (\Garden\Schema\ValidationException $ex) {
+                $this->Form->addError($ex);
+            }
+        }
+
+        $this->title(t('Add Token'));
+        $this->_setBreadcrumbs($this->data('Title'), $this->canonicalUrl());
+        $this->render();
+    }
+
+    public function tokenReveal($accessTokenID) {
+        $this->permission('Garden.SignIn.Allow');
+
+        /* @var TokensApiController $tokenApi */
+        $tokenApi = Gdn::getContainer()->get(TokensApiController::class);
+
+        if ($this->Form->authenticatedPostBack(true)) {
+            try {
+                $token = $tokenApi->get($accessTokenID, [
+                    'transientKey' => $this->Form->getFormValue('TransientKey')
+                ]);
+
+                $this->jsonTarget("#Token_{$token['accessTokenID']}", $this->revealTokenRow($token), 'ReplaceWith');
+
+
+            } catch (\Garden\Schema\ValidationException $ex) {
+                $this->Form->addError($ex);
+            }
+        }
+
+        $this->render('Blank', 'Utility', 'Dashboard');
+    }
+
+    public function tokenDelete($accessTokenID) {
+        $this->permission('Garden.SignIn.Allow');
+
+        /* @var TokensApiController $tokenApi */
+        $tokenApi = Gdn::getContainer()->get(TokensApiController::class);
+
+        if ($this->Form->authenticatedPostBack(true)) {
+            try {
+                $tokenApi->delete($accessTokenID);
+
+                $this->jsonTarget("#Token_{$accessTokenID}", '', 'SlideUp');
+
+
+            } catch (\Garden\Schema\ValidationException $ex) {
+                $this->Form->addError($ex);
+            }
+        }
+
+        $this->render('token-delete', 'Profile', 'Dashboard');
+    }
+
+
+    private function revealTokenRow($token) {
+        $deleteUrl = url('/profile/tokenDelete?accessTokenID='.$token['accessTokenID']);
+        $deleteStr = t('Delete');
+
+
+        return <<<EOT
+<li id="Token_{$token['accessTokenID']}" class="Item Item-Token">{$token['accessToken']}<div class="Meta Options">
+    <a href="$deleteUrl" class="OptionsLink Popup">{$deleteStr}</a>
+</div>
+</li>
+EOT;
+    }
+
+    /**
      * Revoke an invitation.
      *
      * @since 2.0.0
@@ -1396,6 +1507,8 @@ class ProfileController extends Gdn_Controller {
                 $module->addLink('Options', sprite('SpConnection').' '.t('Social'), '/profile/connections', 'Garden.SignIn.Allow', ['class' => 'link-social']);
             }
         }
+
+        $module->addLink('Options', t('Access Tokens'), '/profile/tokens', 'Garden.Tokens.Add', ['class' => 'link-tokens']);
     }
 
     /**

@@ -104,6 +104,9 @@ class InternalRequest extends HttpRequest implements RequestInterface {
             $rawCookies = explode(';', $rawCookies);
             array_walk($rawCookies, 'trim');
             foreach ($rawCookies as $cookie) {
+                if (strpos($cookie, '=') === false) {
+                    continue;
+                }
                 list($key, $val) = explode('=', $cookie);
                 $cookies[$key] = rawurldecode($val);
             }

@@ -46,6 +46,21 @@ class InternalClient extends HttpClient {
     }
 
     /**
+     * Add the transient key cookie header to an array of headers.
+     *
+     * @param array $headers
+     */
+    public function addTransientKeyHeader(array &$headers) {
+        /** @var \Gdn_Configuration $config */
+        $config = $session = $this->container->get(\Gdn_Configuration::class);
+        $name = $config->get('Garden.Cookie.Name').'-tk';
+        $value = rawurlencode($this->transientKeySigned);
+        $cookies = array_key_exists('Cookie', $headers) ? rtrim($headers['Cookie'], '; ').'; ' : '';
+        $cookies .= "$name=$value;";
+        $headers['Cookie'] = $cookies;
+    }
+
+    /**
      * {@inheritdoc}
      */
     public function createRequest($method, $uri, $body, array $headers = [], array $options = []) {
@@ -53,13 +68,8 @@ class InternalClient extends HttpClient {
             $uri = $this->baseUrl.'/'.ltrim($uri, '/');
         }
 
-        /** @var \Gdn_Configuration $config */
-        $config = $session = $this->container->get(\Gdn_Configuration::class);
         $headers = array_replace($this->defaultHeaders, $headers);
         $options = array_replace($this->defaultOptions, $options);
-
-        $tkCookie = $config->get('Garden.Cookie.Name')."-tk={$this->transientKeySigned}";
-        $headers['Cookie'] = array_key_exists('Cookie', $headers) ? $headers['Cookie']."; $tkCookie" : $tkCookie;
 
         $request = $this->container->getArgs(InternalRequest::class, [$method, $uri, $body, $headers, $options]);
         return $request;
@@ -75,6 +85,7 @@ class InternalClient extends HttpClient {
      * @return HttpResponse Returns the {@link HttpResponse} object from the call.
      */
     public function getWithTransientKey($uri, array $query = [], array $headers = [], $options = []) {
+        $this->addTransientKeyHeader($headers);
         $query['TransientKey'] = $this->getTransientKey();
         $result = $this->get($uri, $query, $headers, $options);
         return $result;
@@ -125,6 +136,7 @@ class InternalClient extends HttpClient {
      * @return HttpResponse Returns the {@link HttpResponse} object from the call.
      */
     public function postWithTransientKey($uri, array $body = [], array $headers = [], $options = []) {
+        $this->addTransientKeyHeader($headers);
         $body['TransientKey'] = $this->getTransientKey();
         $result = $this->post($uri, $body, $headers, $options);
         return $result;

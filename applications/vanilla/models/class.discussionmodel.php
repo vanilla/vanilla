@@ -530,11 +530,12 @@ class DiscussionModel extends Gdn_Model {
      * @param array|false $where The where condition of the get.
      * @param bool|false|int $limit The number of discussion to return.
      * @param int|false $offset The offset within the total set.
+     * @param bool $expand Expand relevant related records (e.g. category, users).
      * @return Gdn_DataSet Returns a <a href='psi_element://Gdn_DataSet'>Gdn_DataSet</a> of discussions.
      * of discussions.
      */
-    public function getWhereRecent($where = [], $limit = false, $offset = false) {
-        $result = $this->getWhere($where, '', '', $limit, $offset);
+    public function getWhereRecent($where = [], $limit = false, $offset = false, $expand = true) {
+        $result = $this->getWhere($where, '', '', $limit, $offset, $expand);
         return $result;
     }
 
@@ -640,9 +641,10 @@ class DiscussionModel extends Gdn_Model {
      * @param string $orderDirection The order, either **asc** or **desc**.
      * @param int|false $limit The number of discussion to return.
      * @param int|false $offset The offset within the total set.
+     * @param bool $expand Expand relevant related records (e.g. category, users).
      * @return Gdn_DataSet Returns a {@link Gdn_DataSet} of discussions.
      */
-    public function getWhere($where = false, $orderFields = '', $orderDirection = '', $limit = false, $offset = false) {
+    public function getWhere($where = false, $orderFields = '', $orderDirection = '', $limit = false, $offset = false, $expand = true) {
         // Add backwards compatibility for the old way getWhere() was called.
         if (is_numeric($orderFields)) {
             deprecated('DiscussionModel->getWhere($where, $limit, ...)', 'DiscussionModel->getWhereRecent()');
@@ -759,9 +761,11 @@ class DiscussionModel extends Gdn_Model {
             $this->removeAnnouncements($data);
         }
 
-        // Join in the users.
-        Gdn::userModel()->joinUsers($data, ['FirstUserID', 'LastUserID']);
-        CategoryModel::joinCategories($data);
+        // Join in users and categories.
+        if ($expand) {
+            Gdn::userModel()->joinUsers($data, ['FirstUserID', 'LastUserID']);
+            CategoryModel::joinCategories($data);
+        }
 
         if (c('Vanilla.Views.Denormalize', false)) {
             $this->addDenormalizedViews($data);

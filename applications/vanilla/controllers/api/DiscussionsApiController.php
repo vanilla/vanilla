@@ -248,7 +248,7 @@ class DiscussionsApiController extends AbstractApiController {
         if (array_key_exists('categoryID', $where)) {
             $this->discussionModel->categoryPermission('Vanilla.Discussions.View', $where['categoryID']);
         }
-        $rows = $this->discussionModel->getWhereRecent($where, $limit, $offset)->resultArray();
+        $rows = $this->discussionModel->getWhereRecent($where, $limit, $offset, false)->resultArray();
         if (!empty($query['expand'])) {
             $this->userModel->expandUsers($rows, ['InsertUserID']);
         }

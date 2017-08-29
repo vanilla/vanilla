@@ -604,7 +604,7 @@ class Gdn_Session {
      * @param int|null $timestamp
      * @return string
      */
-    protected function generateTKPayload($tk, $userID = null, $timestamp = null) {
+    public function generateTKPayload($tk, $userID = null, $timestamp = null) {
         $userID = $userID ?: $this->UserID;
 
         $timestamp = $timestamp ?: time();
@@ -618,7 +618,7 @@ class Gdn_Session {
      * @param string $payload
      * @return string
      */
-    protected function generateTKSignature($payload) {
+    public function generateTKSignature($payload) {
         return hash_hmac(c('Garden.Cookie.HashMethod'), $payload, c('Garden.Cookie.Salt'));
     }
 

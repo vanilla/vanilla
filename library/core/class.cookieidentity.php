@@ -81,7 +81,7 @@ class Gdn_CookieIdentity {
         $this->CookieHashMethod = val('HashMethod', $config, $defaultConfig['HashMethod']);
         $this->CookieSalt = val('Salt', $config, $defaultConfig['Salt']);
         $this->VolatileMarker = $this->CookieName.'-Volatile';
-        $this->PersistExpiry = val('PersisExpiry', $config, $defaultConfig['PersistExpiry']);
+        $this->PersistExpiry = val('PersistExpiry', $config, $defaultConfig['PersistExpiry']);
         $this->SessionExpiry = val('SessionExpiry', $config, $defaultConfig['SessionExpiry']);
     }
 

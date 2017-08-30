@@ -1262,7 +1262,7 @@ class ProfileController extends Gdn_Controller {
                 $token = $tokenApi->post([
                     'name' => $this->Form->getFormValue('Name'),
                     'transientKey' => $this->Form->getFormValue('TransientKey')
-                ]);
+                ])->getData();
 
                 $this->jsonTarget(".DataList-Tokens", $this->revealTokenRow($token), 'Prepend');
 

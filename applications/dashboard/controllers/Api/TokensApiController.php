@@ -257,7 +257,7 @@ class TokensApiController extends AbstractApiController {
      */
     public function prepareRow(array &$row) {
         $name = null;
-        if (array_key_exists('Attributes', $row)) {
+        if (array_key_exists('Attributes', $row) && is_array($row['Attributes'])) {
             if (array_key_exists('name', $row['Attributes']) && is_string($row['Attributes']['name'])) {
                 $name = $row['Attributes']['name'];
             }

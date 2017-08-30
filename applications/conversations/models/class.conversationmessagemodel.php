@@ -361,6 +361,10 @@ class ConversationMessageModel extends ConversationsModel {
                 if ($session->UserID == $notifyUserID) {
                     continue; // don't notify self.
                 }
+                /**
+                 * Wherever we are saving the activity, add the raw code as HeadlineFormatCode in the data array
+                 * so that we can translate it in sub-communities that use other languages.
+                 */
                 // Notify the users of the new message.
                 $activity = [
                     'ActivityType' => 'ConversationMessage',
@@ -372,10 +376,15 @@ class ConversationMessageModel extends ConversationsModel {
                     'Story' => $body,
                     'Format' => val('Format', $fields, c('Garden.InputFormatter')),
                     'Route' => "/messages/{$conversationID}#{$messageID}",
+                    'Data' => [
+                        'HeadlineFormatCode' => 'HeadlineFormat.ConversationMessage'
+                    ]
                 ];
 
                 if (c('Conversations.Subjects.Visible') && $subject) {
                     $activity['HeadlineFormat'] = $subject;
+                    //Since particularly in conversations, users can overwrite the subject, don't user HeadlineFormatCode.
+                    unset($activity['HeadlineFormatCode']);
                 }
                 $activityModel->queue($activity, 'ConversationMessage');
             }

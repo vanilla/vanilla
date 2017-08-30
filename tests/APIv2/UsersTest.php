@@ -90,6 +90,29 @@ class UsersTest extends AbstractResourceTest {
     }
 
     /**
+     * Test PATCH /users/<id> with a full record overwrite.
+     */
+    public function testPatchFull() {
+        $row = $this->testGetEdit();
+        $newRow = $this->modifyRow($row);
+
+        $r = $this->api()->patch(
+            "{$this->baseUrl}/{$row[$this->pk]}",
+            $newRow
+        );
+
+        $this->assertEquals(200, $r->getStatusCode());
+
+        // Setting a photo requires the "photo" field, but output schemas use "photoUrl" as a URL to the actual photo. Account for that.
+        $newRow['photoUrl'] = $newRow['photo'];
+        unset($newRow['photo']);
+
+        $this->assertRowsEqual($newRow, $r->getBody(), true);
+
+        return $r->getBody();
+    }
+
+    /**
      * {@inheritdoc}
      */
     public function testPost($record = null, array $extra = []) {

@@ -123,7 +123,10 @@ class VanillaHtmlFormatter {
         'pre',
         'span',
         'strong',
-        'ul'
+        'ul',
+        'table',
+        'tr',
+        'td'
     ];
 
     /** @var array Extra allowed classes. */

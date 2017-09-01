@@ -1062,6 +1062,22 @@ class DiscussionModel extends Gdn_Model {
             $discussion->LastDate = $discussion->DateInserted;
         }
 
+        // Translate Announce to Pinned.
+        $pinned = false;
+        $pinLocation = null;
+        if (property_exists($discussion, 'Announce') && $discussion->Announce > 0) {
+            $pinned = true;
+            switch (intval($discussion->Announce)) {
+                case 1:
+                    $pinLocation = 'discussions';
+                    break;
+                case 2:
+                    $pinLocation = 'category';
+            }
+        }
+        $discussion->pinned = $pinned;
+        $discussion->pinLocation = $pinLocation;
+
         $this->EventArguments['Discussion'] = &$discussion;
         $this->fireEvent('SetCalculatedFields');
     }

@@ -238,14 +238,14 @@ class ConversationMessageModel extends ConversationsModel {
             $this->fireEvent('AfterSave');
 
             // Get the new message count for the conversation.
-            $sQLR = $this->SQL
+            $result = $this->SQL
                 ->select('MessageID', 'count', 'CountMessages')
                 ->select('MessageID', 'max', 'LastMessageID')
                 ->from('ConversationMessage')
                 ->where('ConversationID', $conversationID)
                 ->get()->firstRow(DATASET_TYPE_ARRAY);
-            if (sizeof($sQLR)) {
-                list($countMessages, $lastMessageID) = array_values($sQLR);
+            if (sizeof($result)) {
+                list($countMessages, $lastMessageID) = array_values($result);
             } else {
                 return;
             }
@@ -259,8 +259,11 @@ class ConversationMessageModel extends ConversationsModel {
                 ->set('LastMessageID', $lastMessageID)
                 ->set('UpdateUserID', Gdn::session()->UserID)
                 ->set('DateUpdated', $dateUpdated)
-                ->where('ConversationID', $conversationID)
-                ->put();
+                ->where('ConversationID', $conversationID);
+            if ($countMessages == 1) {
+                $this->SQL->set('FirstMessageID', $lastMessageID);
+            }
+            $this->SQL->put();
 
             // Update the last message of the users that were previously up-to-date on their read messages.
             $this->SQL
@@ -284,10 +287,12 @@ class ConversationMessageModel extends ConversationsModel {
                 ->put();
 
             // Update the sending user.
-            $this->SQL
-                ->update('UserConversation uc')
-                ->set('uc.CountReadMessages', $countMessages)
-                ->set('Deleted', 0)
+            $this->SQL->update('UserConversation uc')
+                ->set('uc.CountReadMessages', $countMessages);
+            if ($countMessages == 1) {
+                $this->SQL->set('uc.LastMessageID', $messageID);
+            }
+            $this->SQL->set('Deleted', 0)
                 ->set('uc.DateConversationUpdated', $dateUpdated)
                 ->where('ConversationID', $conversationID)
                 ->where('UserID', $session->UserID)
@@ -356,30 +361,7 @@ class ConversationMessageModel extends ConversationsModel {
             $this->EventArguments['Subject'] = &$subject;
             $this->fireEvent('AfterAdd');
 
-            $activityModel = new ActivityModel();
-            foreach ($notifyUserIDs as $notifyUserID) {
-                if ($session->UserID == $notifyUserID) {
-                    continue; // don't notify self.
-                }
-                // Notify the users of the new message.
-                $activity = [
-                    'ActivityType' => 'ConversationMessage',
-                    'ActivityUserID' => val('InsertUserID', $fields),
-                    'NotifyUserID' => $notifyUserID,
-                    'HeadlineFormat' => t('HeadlineFormat.ConversationMessage', '{ActivityUserID,user} sent you a <a href="{Url,html}">message</a>'),
-                    'RecordType' => 'Conversation',
-                    'RecordID' => $conversationID,
-                    'Story' => $body,
-                    'Format' => val('Format', $fields, c('Garden.InputFormatter')),
-                    'Route' => "/messages/{$conversationID}#{$messageID}",
-                ];
-
-                if (c('Conversations.Subjects.Visible') && $subject) {
-                    $activity['HeadlineFormat'] = $subject;
-                }
-                $activityModel->queue($activity, 'ConversationMessage');
-            }
-            $activityModel->saveQueue();
+            $this->notifyUsers($conversation, $message, $notifyUserIDs);
         }
         return $messageID;
     }

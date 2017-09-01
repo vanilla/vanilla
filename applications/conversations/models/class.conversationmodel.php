@@ -344,27 +344,27 @@ class ConversationModel extends ConversationsModel {
     /**
      *
      *
-     * @param $data
+     * @param array $data
      * @param int $max
      */
     public function joinParticipants(&$data, $max = 5) {
         // Loop through the data and find the conversations with >= $Max participants.
-        $iDs = [];
+        $ids = [];
         foreach ($data as $row) {
             if ($row['CountParticipants'] <= $max) {
-                $iDs[] = $row['ConversationID'];
+                $ids[] = $row['ConversationID'];
             }
         }
 
         $users = $this->SQL
             ->select('*')
             ->from('UserConversation uc')
-            ->whereIn('uc.ConversationID', $iDs)
+            ->whereIn('uc.ConversationID', $ids)
             ->get()->resultArray();
+
         Gdn::userModel()->joinUsers($users, ['UserID']);
 
         $users = Gdn_DataSet::index($users, ['ConversationID'], ['Unique' => false]);
-
 
         foreach ($data as &$row) {
             $conversationID = $row['ConversationID'];
@@ -498,20 +498,25 @@ class ConversationModel extends ConversationsModel {
      * Save conversation from form submission.
      *
      * @param array $formPostValues Values submitted via form.
-     * @param array $settings Not used.
+     * @param array $settings
+     *   - ConversationOnly If set, no message will be created.
      * @return int Unique ID of conversation created or updated.
      */
     public function save($formPostValues, $settings = []) {
-        if ($settings instanceof ConversationMessageModel) {
-            deprecated('ConversationModel->save(array, ConversationMessageModel)');
-            $messageModel = $settings;
-        } else {
-            $messageModel = ConversationMessageModel::instance();
+        $createMessage = empty($settings['ConversationOnly']);
+
+        if ($createMessage) {
+            if ($settings instanceof ConversationMessageModel) {
+                deprecated('ConversationModel->save(array, ConversationMessageModel)');
+                $messageModel = $settings;
+            } else {
+                $messageModel = ConversationMessageModel::instance();
+            }
+            $messageModel->defineSchema();
         }
 
         // Define the primary key in this model's table.
         $this->defineSchema();
-        $messageModel->defineSchema();
 
         $this->EventArguments['FormPostValues'] = $formPostValues;
         $this->fireEvent('BeforeSaveValidation');
@@ -533,9 +538,12 @@ class ConversationModel extends ConversationsModel {
             $formPostValues['Format'] = c('Garden.InputFormatter');
         }
 
-        // Add & apply any extra validation rules:
-        $this->Validation->applyRule('Body', 'Required');
-        $messageModel->Validation->applyRule('Body', 'Required');
+        if ($createMessage) {
+            // Add & apply any extra validation rules:
+            $this->Validation->applyRule('Body', 'Required');
+            $messageModel->Validation->applyRule('Body', 'Required');
+        }
+
         // Make sure that there is at least one recipient
         $this->Validation->addRule('OneOrMoreArrayItemRequired', 'function:ValidateOneOrMoreArrayItemRequired');
         $this->Validation->applyRule('RecipientUserID', 'OneOrMoreArrayItemRequired');
@@ -544,14 +552,20 @@ class ConversationModel extends ConversationsModel {
         $this->addInsertFields($formPostValues);
         $this->addUpdateFields($formPostValues);
 
+        $conversationValid = $this->validate($formPostValues);
+
+        if ($conversationValid && $createMessage) {
+            $isValidMessageModel = $messageModel->validate($formPostValues);
+        } else {
+            $isValidMessageModel = $conversationValid;
+        }
+
         // Validate the form posted values
         $conversationID = false;
-        if ($this->validate($formPostValues)
-            && $messageModel->validate($formPostValues)
-            && !$this->checkUserSpamming(Gdn::session()->UserID, $this->floodGate)
-        ) {
-            $fields = $this->Validation->validationFields(); // All fields on the form that relate to the schema
+        if ($conversationValid && $isValidMessageModel
+            && !$this->checkUserSpamming(Gdn::session()->UserID, $this->floodGate)) {
 
+            $fields = $this->Validation->validationFields(); // All fields on the form that relate to the schema
 
             // Define the recipients, and make sure that the sender is in the list
             $recipientUserIDs = val('RecipientUserID', $fields, 0);
@@ -567,84 +581,82 @@ class ConversationModel extends ConversationsModel {
             $conversationID = $this->SQL->insert($this->Name, $fields);
             $formPostValues['ConversationID'] = $conversationID;
 
-            // Notify the message model that it's being called as a direct result
-            // of a new conversation being created. As of now, this is being used
-            // so that spam checks between new conversations and conversation
-            // messages each have a separate counter. Without this, a new
-            // conversation will cause itself AND the message model spam counter
-            // to increment by 1.
-            $messageID = $messageModel->save($formPostValues, null, [
-                'NewConversation' => true
-            ]);
+            if ($createMessage) {
+                // Notify the message model that it's being called as a direct result
+                // of a new conversation being created. As of now, this is being used
+                // so that spam checks between new conversations and conversation
+                // messages each have a separate counter. Without this, a new
+                // conversation will cause itself AND the message model spam counter
+                // to increment by 1.
+                $messageID = $messageModel->save($formPostValues, null, [
+                    'NewConversation' => true
+                ]);
 
-            $this->SQL
-                ->update('Conversation')
-                ->set('FirstMessageID', $messageID)
-                ->where('ConversationID', $conversationID)
-                ->put();
+                $this->SQL->update('Conversation')
+                    ->set('FirstMessageID', $messageID)
+                    ->where('ConversationID', $conversationID)
+                    ->put();
+            }
 
-            // Now that the message & conversation have been inserted, insert all of the recipients
+            // Now that the conversation (and potentially the message) have been inserted, insert all of the recipients
             foreach ($recipientUserIDs as $userID) {
                 $countReadMessages = $userID == $formPostValues['InsertUserID'] ? 1 : 0;
-                $this->SQL->options('Ignore', true)->insert('UserConversation', [
+
+                $recipientData = [
                     'UserID' => $userID,
                     'ConversationID' => $conversationID,
                     'LastMessageID' => $messageID,
-                    'CountReadMessages' => $countReadMessages,
-                    'DateConversationUpdated' => $formPostValues['DateUpdated']
-                ]);
+                    'CountReadMessages' => $countReadMessages
+                ];
+
+                if (!$createMessage) {
+                    unset($recipientData['LastMessageID'], $recipientData['CountReadMessages']);
+                }
+
+                $this->SQL->options('Ignore', true)->insert('UserConversation', $recipientData);
             }
 
-            // And update the CountUnreadConversations count on each user related to the discussion.
-            $this->updateUserUnreadCount(array_diff($recipientUserIDs, [$formPostValues['InsertUserID']]));
+            if ($createMessage) {
+                // And update the CountUnreadConversations count on each user related to the discussion.
+                $this->updateUserUnreadCount(array_diff($recipientUserIDs, [$formPostValues['InsertUserID']]));
+            }
+
             $this->updateParticipantCount($conversationID);
 
             $body = val('Body', $formPostValues, '');
             $subject = val('Subject', $fields, '');
 
+
             $this->EventArguments['Recipients'] = $recipientUserIDs;
             $conversation = $this->getID($conversationID);
             $this->EventArguments['Conversation'] = $conversation;
-            $message = $messageModel->getID($messageID, DATASET_TYPE_ARRAY);
-            $this->EventArguments['Message'] = $message;
-            $this->EventArguments['Body'] = &$body;
             $this->EventArguments['Subject'] = &$subject;
+            if ($createMessage) {
+                $message = $messageModel->getID($messageID, DATASET_TYPE_ARRAY);
+                $this->EventArguments['Message'] = $message;
+                $this->EventArguments['Body'] = &$body;
+            }
             $this->fireEvent('AfterAdd');
 
-            // Add notifications (this isn't done by the conversationmessagemodule
-            // because the conversation has not yet been created at the time they are
-            // inserted)
-            $unreadData = $this->SQL
-                ->select('uc.UserID')
-                ->from('UserConversation uc')
-                ->where('uc.ConversationID', $conversationID)// hopefully coax this index.
-                ->where('uc.UserID <>', $formPostValues['InsertUserID'])
-                ->get();
+            $conversation = (array)$conversation;
 
-            $activity = [
-                'ActivityType' => 'ConversationMessage',
-                'ActivityUserID' => $formPostValues['InsertUserID'],
-                'HeadlineFormat' => t('HeadlineFormat.ConversationMessage', '{ActivityUserID,User} sent you a <a href="{Url,html}">message</a>'),
-                'RecordType' => 'Conversation',
-                'RecordID' => $conversationID,
-                'Story' => $body,
-                'ActionText' => t('Reply'),
-                'Format' => val('Format', $formPostValues, c('Garden.InputFormatter')),
-                'Route' => "/messages/$conversationID#Message_$messageID"
-            ];
+            // Add notifications
+            if ($createMessage) {
 
-            if ($subject) {
-                $activity['Story'] = sprintf(t('Re: %s'), $subject).'<br>'.$body;
+                $unreadData = $this->SQL
+                    ->select('uc.UserID')
+                    ->from('UserConversation uc')
+                    ->where('uc.ConversationID', $conversation['ConversationID'])// hopefully coax this index.
+                    ->where('uc.UserID <>', $conversation['InsertUserID'])
+                    ->get()
+                    ->result(DATASET_TYPE_ARRAY);
+
+                $notifyUserIDs = array_column($unreadData, 'UserID');
+
+                $this->notifyUsers($conversation, $message, $notifyUserIDs);
             }
 
-            $activityModel = new ActivityModel();
-            foreach ($unreadData->result() as $user) {
-                $activity['NotifyUserID'] = $user->UserID;
-                $activityModel->queue($activity, 'ConversationMessage');
-            }
-            $activityModel->saveQueue();
-
-        } else {
+        } else if ($createMessage) {
             // Make sure that all of the validation results from both validations are present for view by the form
             foreach ($messageModel->validationResults() as $fieldName => $results) {
                 foreach ($results as $result) {
@@ -790,7 +802,7 @@ class ConversationModel extends ConversationsModel {
             ->from('Conversation')
             ->where('ConversationID', $conversationID)
             ->get()
-            ->firstRow();
+            ->firstRow(DATASET_TYPE_ARRAY);
 
         $this->EventArguments['ConversationID'] = $conversationID;
         $this->EventArguments['UserIDs'] = &$userID;
@@ -804,9 +816,9 @@ class ConversationModel extends ConversationsModel {
                 $this->SQL->insert('UserConversation', [
                     'UserID' => $newUserID,
                     'ConversationID' => $conversationID,
-                    'LastMessageID' => $conversationData->LastMessageID,
+                    'LastMessageID' => $conversationData['LastMessageID'],
                     'CountReadMessages' => 0,
-                    'DateConversationUpdated' => $conversationData->DateUpdated
+                    'DateConversationUpdated' => $conversationData['DateUpdated']
                 ]);
             } elseif ($oldContributorData[$newUserID]->Deleted) {
                 $addedUserIDs[] = $newUserID;
@@ -833,7 +845,9 @@ class ConversationModel extends ConversationsModel {
             }
             $activityModel->saveQueue();
 
-            $this->updateUserUnreadCount($addedUserIDs);
+            if ($conversationData['CountMessages'] != 0) {
+                $this->updateUserUnreadCount($addedUserIDs);
+            }
             $this->updateParticipantCount($conversationID);
         }
 

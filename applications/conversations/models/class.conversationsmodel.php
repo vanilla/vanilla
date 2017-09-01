@@ -94,4 +94,44 @@ abstract class ConversationsModel extends Gdn_Model {
         $conversationMembers = $this->getConversationMembers($conversationID);
         return (in_array($userID, $conversationMembers));
     }
+
+    /**
+     * Notify users when a new message is created.
+     *
+     * @param array|object $conversation
+     * @param array|object $message
+     * @param array $notifyUserIDs
+     */
+    protected function notifyUsers($conversation, $message, $notifyUserIDs) {
+        $conversation = (array)$conversation;
+        $message = (array)$message;
+
+        $activity = [
+            'ActivityType' => 'ConversationMessage',
+            'ActivityUserID' => $message['InsertUserID'],
+            'HeadlineFormat' => t('HeadlineFormat.ConversationMessage', '{ActivityUserID,User} sent you a <a href="{Url,html}">message</a>'),
+            'RecordType' => 'Conversation',
+            'RecordID' => $conversation['ConversationID'],
+            'Story' => $message['Body'],
+            'ActionText' => t('Reply'),
+            'Format' => val('Format', $message, c('Garden.InputFormatter')),
+            'Route' => "/messages/{$conversation['ConversationID']}#Message_{$message['MessageID']}"
+        ];
+
+        $subject = val('subject', $conversation);
+        if ($subject) {
+            $activity['Story'] = sprintf(t('Re: %s'), $subject).'<br>'.$body;
+        }
+
+        $activityModel = new ActivityModel();
+        foreach ($notifyUserIDs as $userID) {
+            if ($message['InsertUserID'] == $notifyUserID) {
+                continue; // Don't notify self.
+            }
+
+            $activity['NotifyUserID'] = $userID;
+            $activityModel->queue($activity, 'ConversationMessage');
+        }
+        $activityModel->saveQueue();
+    }
 }

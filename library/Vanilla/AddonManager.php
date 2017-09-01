@@ -84,7 +84,7 @@ class AddonManager {
      *
      * @param null|string $cacheDir The path to the cache.
      */
-    public function __construct(array $scanDirs, $cacheDir = null) {
+    public function __construct(array $scanDirs = [], $cacheDir = null) {
         $r = true;
         if ($cacheDir !== null) {
             $this->setCacheDir($cacheDir);

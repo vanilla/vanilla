@@ -108,7 +108,7 @@ abstract class ConversationsModel extends Gdn_Model {
 
         $activity = [
             'ActivityType' => 'ConversationMessage',
-            'ActivityUserID' => $conversation['InsertUserID'],
+            'ActivityUserID' => $message['InsertUserID'],
             'HeadlineFormat' => t('HeadlineFormat.ConversationMessage', '{ActivityUserID,User} sent you a <a href="{Url,html}">message</a>'),
             'RecordType' => 'Conversation',
             'RecordID' => $conversation['ConversationID'],

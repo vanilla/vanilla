@@ -599,7 +599,7 @@ class Gdn_Request implements RequestInterface {
             return false;
         }
 
-        $transientKey = Gdn::request()->post('TransientKey', false);
+        $transientKey = $this->post('TransientKey', $this->post('transientKey', false));
         $result = Gdn::session()->validateTransientKey($transientKey, false);
 
         if (!$result && $throw) {

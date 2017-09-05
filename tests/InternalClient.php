@@ -84,10 +84,6 @@ class InternalClient extends HttpClient {
     public function setUserID($userID) {
         $this->userID = $userID;
 
-        /* @var \Gdn_Session $session */
-        $session = $this->container->get(\Gdn_Session::class);
-        $session->start($userID, false, false);
-
         return $this;
     }
 }

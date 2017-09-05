@@ -16,6 +16,7 @@ class SessionModel extends Gdn_Model {
     public function __construct() {
         parent::__construct('Session');
         $this->setPruneField('DateExpire');
+        $this->setPruneAfter('45 minutes');
     }
 
     /**
@@ -24,6 +25,22 @@ class SessionModel extends Gdn_Model {
     public function insert($fields) {
         $this->prune();
 
+        if (!isset($fields['DateInserted'])) {
+            $fields['DateInserted'] = date(MYSQL_DATE_FORMAT);
+        }
+
         return parent::insert($fields);
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function update($fields, $where = false, $limit = false) {
+
+        if (!isset($fields['DateUpdated'])) {
+            $fields['DateUpdated'] = date(MYSQL_DATE_FORMAT);
+        }
+
+        parent::update($fields, $where, $limit);
     }
 }

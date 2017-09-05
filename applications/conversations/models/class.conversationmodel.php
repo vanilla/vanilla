@@ -146,6 +146,7 @@ class ConversationModel extends ConversationsModel {
      * @param int $userID The user looking at the conversations.
      * @param int $offset Number to skip.
      * @param int $limit Maximum to return.
+     * @return Gdn_DataSet
      */
     public function get2($userID, $offset = 0, $limit = 0) {
         if ($limit <= 0) {
@@ -260,7 +261,7 @@ class ConversationModel extends ConversationsModel {
      * @param int $conversationID Unique ID of conversation.
      * @param string $datasetType The format of the resulting conversation.
      * @param array $options Options to modify the get. Currently supports `viewingUserID`.
-     * @return array|stdClass Returns a conversation.
+     * @return array|stdClass|false Returns a conversation or false on failure.
      */
     public function getID($conversationID, $datasetType = false, $options = []) {
         if (is_numeric($datasetType)) {
@@ -275,23 +276,26 @@ class ConversationModel extends ConversationsModel {
         // Get the conversation.
         $conversation = $this->getWhere(['ConversationID' => $conversationID])->firstRow(DATASET_TYPE_ARRAY);
 
-        if ($viewingUserID) {
-            $data = $this->SQL->getWhere(
-                'UserConversation',
-                ['ConversationID' => $conversationID, 'UserID' => $viewingUserID]
-            )
-                ->firstRow(DATASET_TYPE_ARRAY);
+        if ($conversation) {
+            if ($viewingUserID) {
+                $data = $this->SQL->getWhere(
+                    'UserConversation',
+                    ['ConversationID' => $conversationID, 'UserID' => $viewingUserID]
+                )->firstRow(DATASET_TYPE_ARRAY);
 
-            // Convert the array.
-            $userConversation = arrayTranslate($data, ['LastMessageID', 'CountReadMessages', 'DateLastViewed', 'Bookmarked']);
-            $userConversation['CountNewMessages'] = $conversation['CountMessages'] - $data['CountReadMessages'];
-        } else {
-            $userConversation = ['CountNewMessages' => 0, 'CountReadMessages' => $conversation['CountMessages'], 'DateLastViewed' => $conversation['DateUpdated']];
+                // Convert the array.
+                $userConversation = arrayTranslate($data, ['LastMessageID', 'CountReadMessages', 'DateLastViewed', 'Bookmarked']);
+                $userConversation['CountNewMessages'] = $conversation['CountMessages'] - $data['CountReadMessages'];
+            } else {
+                $userConversation = ['CountNewMessages' => 0, 'CountReadMessages' => $conversation['CountMessages'], 'DateLastViewed' => $conversation['DateUpdated']];
+            }
+            $conversation = array_merge($conversation, $userConversation);
+
+            if ($datasetType === DATASET_TYPE_OBJECT) {
+                $conversation = (object)$conversation;
+            }
         }
-        $conversation = array_merge($conversation, $userConversation);
-        if ($datasetType === DATASET_TYPE_OBJECT) {
-            $conversation = (object)$conversation;
-        }
+
         return $conversation;
     }
 
@@ -775,19 +779,19 @@ class ConversationModel extends ConversationsModel {
      * @access public
      *
      * @param int $conversationID Unique ID of conversation effected.
-     * @param int $userID Unique ID of current user.
+     * @param int $userIDs Unique ID of current user.
      * @return True if the operation was a success, false if the maximum number of recipients was busted.
      *
      */
-    public function addUserToConversation($conversationID, $userID) {
-        if (!is_array($userID)) {
-            $userID = [$userID];
+    public function addUserToConversation($conversationID, $userIDs) {
+        if (!is_array($userIDs)) {
+            $userIDs = [$userIDs];
         }
 
         // First define the current users in the conversation
         $oldContributorData = $this->getRecipients($conversationID);
         $maxRecipients = self::getMaxRecipients();
-        if ($maxRecipients && (count($oldContributorData) + count($userID) > $maxRecipients + 1)) {
+        if ($maxRecipients && (count($oldContributorData) + count($userIDs) > $maxRecipients + 1)) {
             return false;
         }
 
@@ -805,12 +809,12 @@ class ConversationModel extends ConversationsModel {
             ->firstRow(DATASET_TYPE_ARRAY);
 
         $this->EventArguments['ConversationID'] = $conversationID;
-        $this->EventArguments['UserIDs'] = &$userID;
+        $this->EventArguments['UserIDs'] = &$userIDs;
         $this->EventArguments['OldContributorData'] = $oldContributorData;
         $this->fireEvent('beforeAddUser');
 
         // Add the user(s) if they are not already in the conversation
-        foreach ($userID as $newUserID) {
+        foreach ($userIDs as $newUserID) {
             if (!array_key_exists($newUserID, $oldContributorData)) {
                 $addedUserIDs[] = $newUserID;
                 $this->SQL->insert('UserConversation', [

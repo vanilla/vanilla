@@ -460,7 +460,7 @@ class AssetModel extends Gdn_Model {
         $result = ['php'];
         foreach ($knownExts as $ext) {
             $handler = "ViewHandler.$ext";
-            if (Gdn::factory()->exists($handler)) {
+            if (Gdn::factoryExists($handler)) {
                 $result[] = $ext;
             }
         }

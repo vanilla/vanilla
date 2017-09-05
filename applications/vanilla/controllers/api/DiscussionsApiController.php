@@ -69,7 +69,6 @@ class DiscussionsApiController extends AbstractApiController {
                 'minimum' => 1,
                 'maximum' => 100
             ],
-            'insertUserID:i?' => 'Filter by author.',
             'expand:b?' => 'Expand associated records.'
         ], 'in');
         $out = $this->schema([':a' => $this->discussionSchema()], 'out');

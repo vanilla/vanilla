@@ -287,7 +287,15 @@ if (c('Garden.SSO.SynchRoles')) {
     );
 }
 
-$Construct->table('Session')
+
+$Construct->table('Session');
+
+$transientKeyExists = $Construct->columnExists('TransientKey');
+if ($transientKeyExists) {
+    $Construct->dropColumn('TransientKey');
+}
+
+$Construct
     ->column('SessionID', 'char(32)', false, 'primary')
     ->column('UserID', 'int', 0)
     ->column('DateInserted', 'datetime', false)

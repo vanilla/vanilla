@@ -48,6 +48,48 @@ class DiscussionsApiController extends AbstractApiController {
     }
 
     /**
+     * Get a list of the current user's bookmarked discussions.
+     *
+     * @param array $query The request query.
+     * @return array
+     */
+    public function get_bookmarked(array $query) {
+        $this->permission('Garden.SignIn.Allow');
+
+        $in = $this->schema([
+            'page:i?' => [
+                'description' => 'Page number.',
+                'default' => 1,
+                'minimum' => 1,
+                'maximum' => $this->discussionModel->getMaxPages()
+            ],
+            'limit:i?' => [
+                'description' => 'The number of items per page.',
+                'default' => $this->discussionModel->getDefaultLimit(),
+                'minimum' => 1,
+                'maximum' => 100
+            ],
+            'insertUserID:i?' => 'Filter by author.',
+            'expand:b?' => 'Expand associated records.'
+        ], 'in');
+        $out = $this->schema([':a' => $this->discussionSchema()], 'out');
+
+        $query = $in->validate($query);
+        list($offset, $limit) = offsetLimit("p{$query['page']}", $query['limit']);
+
+        $rows = $this->discussionModel->get($offset, $limit, [
+            'w.Bookmarked' => 1,
+            'w.UserID' => $this->getSession()->UserID
+        ])->resultArray();
+        if (!empty($query['expand'])) {
+            $this->userModel->expandUsers($rows, ['InsertUserID']);
+        }
+
+        $result = $out->validate($rows);
+        return $result;
+    }
+
+    /**
      * Delete a discussion.
      *
      * @param int $id The ID of the discussion.

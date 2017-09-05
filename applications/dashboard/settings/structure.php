@@ -891,6 +891,11 @@ if (c('Garden.Registration.CaptchaPublicKey')) {
     removeFromConfig('Garden.Registration.CaptchaPublicKey');
 }
 
+// Remove Charset from inf.
+if (c('Database.CharacterEncoding')) {
+    removeFromConfig('Database.CharacterEncoding');
+}
+
 // Make sure the smarty folders exist.
 touchFolder(PATH_CACHE.'/Smarty/cache');
 touchFolder(PATH_CACHE.'/Smarty/compile');

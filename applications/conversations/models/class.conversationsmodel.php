@@ -64,19 +64,26 @@ abstract class ConversationsModel extends Gdn_Model {
      * Get all the members of a conversation from the $conversationID.
      *
      * @param int $conversationID The conversation ID.
+     * @param bool $idsOnly The returns only the userIDs or everything from UserConversation.
+     * @param bool $limit
+     * @param bool $offset
      *
      * @return array Array of user IDs.
      */
-    public function getConversationMembers($conversationID) {
+    public function getConversationMembers($conversationID, $idsOnly = true, $limit = false, $offset = false) {
         $conversationMembers = [];
 
         $userConversation = new Gdn_Model('UserConversation');
         $userMembers = $userConversation->getWhere([
             'ConversationID' => $conversationID
-        ])->resultArray();
+        ], 'UserID', 'asc', $limit, $offset)->resultArray();
 
         if (is_array($userMembers) && count($userMembers)) {
-            $conversationMembers = array_column($userMembers, 'UserID');
+            if ($idsOnly) {
+                $conversationMembers = array_column($userMembers, 'UserID');
+            } else {
+                $conversationMembers = Gdn_DataSet::index($userMembers, 'UserID');
+            }
         }
 
         return $conversationMembers;

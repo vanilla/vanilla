@@ -894,6 +894,7 @@ if (c('Garden.Registration.CaptchaPublicKey')) {
 // Remove Charset from inf.
 if (c('Database.CharacterEncoding')) {
     removeFromConfig('Database.CharacterEncoding');
+    removeFromConfig('Database.ExtendedProperties.Collate');
 }
 
 // Make sure the smarty folders exist.

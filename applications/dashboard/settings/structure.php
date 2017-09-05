@@ -892,7 +892,7 @@ if (c('Garden.Registration.CaptchaPublicKey')) {
 }
 
 // Remove Charset from inf.
-if (c('Database.CharacterEncoding')) {
+if (c('Database.CharacterEncoding') !== 'utf8mb4') {
     removeFromConfig('Database.CharacterEncoding');
     removeFromConfig('Database.ExtendedProperties.Collate');
 }

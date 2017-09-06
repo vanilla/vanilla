@@ -35,9 +35,9 @@ class MessagesTest extends AbstractResourceTest {
         $usersAPIController = static::container()->get('UsersAPIController');
 
         $user = $usersAPIController->post([
-            'name' => "MessagesUser$id",
-            'email' => "MessagesUser$id@example.com",
-            'password' => "$%#$&ADSFBNYI*&WBV$id",
+            'name' => "MessagesUser1",
+            'email' => "MessagesUser1@example.com",
+            'password' => "$%#$&ADSFBNYI*&WBV1",
         ]);
         self::$userID = $user['userID'];
 

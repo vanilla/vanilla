@@ -311,7 +311,7 @@ class CategoriesApiController extends AbstractApiController {
         $this->permission('Garden.Settings.Manage');
 
         $in = $this->categoryPostSchema('in', ['description'])->setDescription('Update a category.');
-        $out = $this->schemaWithParent('out');
+        $out = $this->schemaWithParent(false, 'out');
 
         $body = $in->validate($body, true);
         // If a row associated with this ID cannot be found, a "not found" exception will be thrown.
@@ -376,7 +376,7 @@ class CategoriesApiController extends AbstractApiController {
      * @param bool $expand
      * @return Schema
      */
-    public function schemaWithParent($expand = false) {
+    public function schemaWithParent($expand = false, $type = '') {
         $attributes = ['parentCategoryID:i|n' => 'Parent category ID.'];
         if ($expand) {
             $attributes['parent:o?'] = Schema::parse(['categoryID', 'name', 'urlCode', 'url'])
@@ -384,6 +384,6 @@ class CategoriesApiController extends AbstractApiController {
         }
         $schema = $this->fullSchema();
         $result = $schema->merge(Schema::parse($attributes));
-        return $result;
+        return $this->schema($result, $type);
     }
 }

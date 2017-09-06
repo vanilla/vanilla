@@ -779,7 +779,7 @@ class ConversationModel extends ConversationsModel {
      * @access public
      *
      * @param int $conversationID Unique ID of conversation effected.
-     * @param int $userIDs Unique ID of current user.
+     * @param int|array $userIDs Unique ID of the user(s).
      * @return True if the operation was a success, false if the maximum number of recipients was busted.
      *
      */

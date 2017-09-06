@@ -107,8 +107,8 @@ class ConversationsTest extends AbstractAPIv2Test {
         $rows = $result->getBody();
         $this->assertGreaterThan($nbsInsert, count($rows));
         // The index should be a proper indexed array.
-        for ($i = 0; $i < count($dbRows); $i++) {
-            $this->assertArrayHasKey($i, $dbRows);
+        for ($i = 0; $i < count($rows); $i++) {
+            $this->assertArrayHasKey($i, $rows);
         }
     }
 

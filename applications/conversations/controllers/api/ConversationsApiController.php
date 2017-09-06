@@ -246,7 +246,8 @@ class ConversationsApiController extends AbstractApiController {
             ]
         ], 'out');
 
-        $query = $in->validate($query, true);
+        $query = $this->filterValues($query);
+        $query = $in->validate($query);
 
         $this->conversationByID($id);
 

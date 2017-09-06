@@ -62,6 +62,10 @@ trait SiteTestTrait {
         ]);
 
         self::$siteInfo = $result;
+
+        /* @var \Gdn_Session $session */
+        $session = $dic->get(\Gdn_Session::class);
+        $session->start(self::$siteInfo['adminUserID'], false, false);
     }
 
     /**

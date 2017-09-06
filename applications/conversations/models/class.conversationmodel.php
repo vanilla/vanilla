@@ -608,13 +608,12 @@ class ConversationModel extends ConversationsModel {
 
                 $recipientData = [
                     'UserID' => $userID,
-                    'ConversationID' => $conversationID,
-                    'LastMessageID' => $messageID,
-                    'CountReadMessages' => $countReadMessages
+                    'ConversationID' => $conversationID
                 ];
 
-                if (!$createMessage) {
-                    unset($recipientData['LastMessageID'], $recipientData['CountReadMessages']);
+                if ($createMessage) {
+                    $recipientData['LastMessageID'] = $messageID;
+                    $recipientData['CountReadMessages'] = $countReadMessages;
                 }
 
                 $this->SQL->options('Ignore', true)->insert('UserConversation', $recipientData);

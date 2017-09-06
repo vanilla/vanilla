@@ -139,7 +139,7 @@ class CommentsApiController extends AbstractApiController {
             'commentID:i' => 'The ID of the comment.',
             'discussionID:i' => 'The ID of the discussion.',
             'body:s' => 'The body of the comment.',
-            'format:s' => 'The output format of the comment.',
+            'format:s' => 'The input format of the comment.',
             'dateInserted:dt' => 'When the comment was created.',
             'insertUserID:i' => 'The user that created the comment.',
             'insertUser?' => $this->getUserFragmentSchema(),

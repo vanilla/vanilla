@@ -36,7 +36,6 @@ class SessionModel extends Gdn_Model {
      * @inheritdoc
      */
     public function update($fields, $where = false, $limit = false) {
-
         if (!isset($fields['DateUpdated'])) {
             $fields['DateUpdated'] = date(MYSQL_DATE_FORMAT);
         }

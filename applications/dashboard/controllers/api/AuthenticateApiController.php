@@ -17,6 +17,8 @@ use Vanilla\Utility\CapitalCaseScheme;
  */
 class AuthenticateApiController extends AbstractApiController {
 
+    const SESSION_ID_EXPIRATION = 1200; // 20 minutes
+
     /** @var CapitalCaseScheme */
     private $caseScheme;
 
@@ -25,6 +27,9 @@ class AuthenticateApiController extends AbstractApiController {
 
     /** @var RequestInterface */
     private $request;
+
+    /** @var SessionModel */
+    private $sessionModel;
 
     /** @var SSOModel */
     private $ssoModel;
@@ -37,18 +42,21 @@ class AuthenticateApiController extends AbstractApiController {
      *
      * @param Gdn_Configuration $config
      * @param RequestInterface $request
+     * @param SessionModel $sessionModel
      * @param SSOModel $ssoModel
      * @param UserModel $userModel
      */
     public function __construct(
         Gdn_Configuration $config,
         RequestInterface $request,
+        SessionModel $sessionModel,
         SSOModel $ssoModel,
         UserModel $userModel
     ) {
         $this->caseScheme = new CapitalCaseScheme();
         $this->config = $config;
         $this->request = $request;
+        $this->sessionModel = $sessionModel;
         $this->ssoModel = $ssoModel;
         $this->userModel = $userModel;
     }
@@ -79,7 +87,13 @@ class AuthenticateApiController extends AbstractApiController {
      */
     private function createSession($data) {
         $sessionID = betterRandomString(32, 'aA0');
-        // TODO: Use the new SessionModel to insert an entry in the SessionTable.
+
+        $this->sessionModel->insert([
+            'SessionID' => $sessionID,
+            'UserID' => $this->getSession()->UserID,
+            'DateExpire' => date(MYSQL_DATE_FORMAT, time() + self::SESSION_ID_EXPIRATION),
+            'Attributes' => $data,
+        ]);
 
         return $sessionID;
     }
@@ -178,13 +192,12 @@ class AuthenticateApiController extends AbstractApiController {
         $in = $this->schema([
             'authenticator:s' => 'The authenticator that will be used.',
             'authenticatorID:s?' => 'Authenticator instance\'s identifier.',
-            'startSession:b?' => 'If set to true the session will be started if the authentication succeed.',
         ])->setDescription('Authenticate a user using a specific authenticator.');
         $out = $this->schema(Schema::parse([
             'userID:i?' => 'Identifier of the authenticated user.',
             'authenticationStep:s?' => 'Tells whether the user is now authenticated or if additional step(s) are required.',
             'sessionID:s?' => 'Identifier used to do subsequent call to the api for the current authentication process.'
-                .'to this endpoint if the authentication was not a success.',
+                .' Returned if the authentication was not a success.',
         ]), 'out');
 
         $in->validate($query, true);
@@ -192,7 +205,7 @@ class AuthenticateApiController extends AbstractApiController {
         $authenticatorInstance = $this->ssoModel->getSSOAuthenticator($authenticator, $authenticatorID);
 
         // The authenticator should throw an appropriate error message on error.
-        $ssoUserInfo = $authenticatorInstance->sso($this->request);
+        $ssoUserInfo = $authenticatorInstance->authenticate($this->request);
 
         if (!$ssoUserInfo) {
             throw new Exception("Unknown error while authenticating with $authenticatorType.");
@@ -265,9 +278,7 @@ class AuthenticateApiController extends AbstractApiController {
         }
 
         if ($response['authenticationStep'] === 'authenticated') {
-            if (!empty($query['startSession'])) {
-                $this->getSession()->start($response['userID']);
-            }
+            $this->getSession()->start($response['userID']);
         } else {
             // Store all the information needed for the next authentication step.
             $response['sessionID'] = $this->createSession($sessionData);

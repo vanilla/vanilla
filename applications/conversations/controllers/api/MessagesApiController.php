@@ -21,6 +21,9 @@ class MessagesApiController extends AbstractApiController {
     /** @var CapitalCaseScheme */
     private $caseScheme;
 
+    /** @var Gdn_Configuration */
+    private $config;
+
     /** @var ConversationMessageModel */
     private $conversationMessageModel;
 
@@ -33,16 +36,19 @@ class MessagesApiController extends AbstractApiController {
     /**
      * MessagesApiController constructor.
      *
+     * @param Gdn_Configuration $config
      * @param ConversationMessageModel $conversationMessageModel
      * @param ConversationModel $conversationModel
      * @param UserModel $userModel
      */
     public function __construct(
+        Gdn_Configuration $config,
         ConversationModel $conversationModel,
         ConversationMessageModel $conversationMessageModel,
         UserModel $userModel
     ) {
         $this->caseScheme = new CapitalCaseScheme();
+        $this->config = $config;
         $this->conversationMessageModel = $conversationMessageModel;
         $this->conversationModel = $conversationModel;
         $this->userModel = $userModel;
@@ -54,7 +60,7 @@ class MessagesApiController extends AbstractApiController {
      * @throw Exception
      */
     private function checkModerationPermission() {
-        if (!c('Conversations.Moderation.Allow', false)) {
+        if (!$this->config->get('Conversations.Moderation.Allow', false)) {
             throw permissionException();
         }
         $this->permission('Conversations.Moderation.Manage');
@@ -88,7 +94,7 @@ class MessagesApiController extends AbstractApiController {
 //     * @throws MethodNotAllowedException if Conversations.Moderation.Allow !== true.
 //     */
 //    public function delete($id) {
-//        if (!c('Conversations.Moderation.Allow', false)) {
+//        if (!$this->config->get('Conversations.Moderation.Allow', false)) {
 //            throw new MethodNotAllowedException();
 //        }
 //
@@ -176,7 +182,7 @@ class MessagesApiController extends AbstractApiController {
                 ],
                 'limit:i?' => [
                     'description' => 'The number of items per page.',
-                    'default' => c('Conversations.Messages.PerPage', 50),
+                    'default' => $this->config->get('Conversations.Messages.PerPage', 50),
                     'minimum' => 1,
                     'maximum' => 100
                 ],

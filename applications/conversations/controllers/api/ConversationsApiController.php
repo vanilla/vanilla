@@ -19,6 +19,9 @@ class ConversationsApiController extends AbstractApiController {
     /** @var CapitalCaseScheme */
     private $caseScheme;
 
+    /** @var Gdn_Configuration */
+    private $config;
+
     /** @var ConversationModel */
     private $conversationModel;
 
@@ -28,11 +31,17 @@ class ConversationsApiController extends AbstractApiController {
     /**
      * ConversationsApiController constructor.
      *
+     * @param Gdn_Configuration $config
      * @param ConversationModel $conversationModel
      * @param UserModel $userModel
      */
-    public function __construct(ConversationModel $conversationModel, UserModel $userModel) {
+    public function __construct(
+        Gdn_Configuration $config,
+        ConversationModel $conversationModel,
+        UserModel $userModel
+    ) {
         $this->caseScheme = new CapitalCaseScheme();
+        $this->config = $config;
         $this->conversationModel = $conversationModel;
         $this->userModel = $userModel;
     }
@@ -43,7 +52,7 @@ class ConversationsApiController extends AbstractApiController {
      * @throw Exception
      */
     private function checkModerationPermission() {
-        if (!c('ConversationMessages.Moderation.Allow', false)) {
+        if (!$this->config->get('ConversationMessages.Moderation.Allow', false)) {
             throw permissionException();
         }
         $this->permission('ConversationMessages.Moderation.Manage');
@@ -84,7 +93,7 @@ class ConversationsApiController extends AbstractApiController {
 //     * @throws MethodNotAllowedException if Conversations.Moderation.Allow !== true.
 //     */
 //    public function delete($id) {
-//        if (!c('Conversations.Moderation.Allow', false)) {
+//        if (!$this->config->get('Conversations.Moderation.Allow', false)) {
 //            throw new MethodNotAllowedException();
 //        }
 //
@@ -137,19 +146,19 @@ class ConversationsApiController extends AbstractApiController {
         ];
 
         // We unset to preserve the order of the parameters.
-        if (!c('Conversations.Subjects.Visible', false)) {
+        if (!$this->config->get('Conversations.Subjects.Visible', false)) {
             unset($schemaDefinition['name:s?']);
         }
 
-        static $schemaInitialized = false;
-        if (!$schemaInitialized) {
-            $schemaInitialized = true;
-            $schema = $this->schema($schemaDefinition, 'Conversations');
-        } else {
-            $schema = Schema::parse($schemaDefinition);
+        static $fullSchema;
+        if ($fullSchema === null) {
+            $fullSchema = Schema::parse($schemaDefinition);
+
+            // Trigger schema event for swagger.
+            $this->schema($fullSchema, 'Conversations');
         }
 
-        return $schema;
+        return $fullSchema;
     }
 
     /**
@@ -272,7 +281,7 @@ class ConversationsApiController extends AbstractApiController {
                 ],
                 'limit:i?' => [
                     'description' => 'The number of items per page.',
-                    'default' => c('Conversations.Conversations.PerPage', 50),
+                    'default' => $this->config->get('Conversations.Conversations.PerPage', 50),
                     'minimum' => 1,
                     'maximum' => 100
                 ],
@@ -391,7 +400,7 @@ class ConversationsApiController extends AbstractApiController {
                 ],
                 'name' => null,
             ];
-            if (!c('Conversations.Subjects.Visible', false)) {
+            if (!$this->config->get('Conversations.Subjects.Visible', false)) {
                 unset($inSchema['name']);
             }
 

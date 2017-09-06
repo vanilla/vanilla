@@ -75,7 +75,7 @@ class UsersTest extends AbstractResourceTest {
     public function providePutFields() {
         $fields = [
             'ban' => ['ban', true, 'banned'],
-            'verify' => ['verify', true, 'verified'],
+//            'verify' => ['verify', true, 'verified'],
         ];
         return $fields;
     }

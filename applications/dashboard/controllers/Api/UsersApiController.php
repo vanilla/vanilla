@@ -292,22 +292,22 @@ class UsersApiController extends AbstractApiController {
      * @throws NotFoundException if unable to find the user.
      * @return array
      */
-    public function put_verify($id, array $body) {
-        $this->permission('Garden.Users.Edit');
-
-        $in = $this
-            ->schema(['verified:b' => 'Pass true to flag as verified or false for unverified.'], 'in')
-            ->setDescription('Verify a user.');
-        $out = $this->schema(['verified:b' => 'The current verified value.'], 'out');
-
-        $row = $this->userByID($id);
-        $body = $in->validate($body);
-        $verify = intval($body['verified']);
-        $this->userModel->setField($id, 'Verified', $verify);
-
-        $result = $this->userByID($id);
-        return $out->validate($result);
-    }
+//    public function put_verify($id, array $body) {
+//        $this->permission('Garden.Users.Edit');
+//
+//        $in = $this
+//            ->schema(['verified:b' => 'Pass true to flag as verified or false for unverified.'], 'in')
+//            ->setDescription('Verify a user.');
+//        $out = $this->schema(['verified:b' => 'The current verified value.'], 'out');
+//
+//        $row = $this->userByID($id);
+//        $body = $in->validate($body);
+//        $verify = intval($body['verified']);
+//        $this->userModel->setField($id, 'Verified', $verify);
+//
+//        $result = $this->userByID($id);
+//        return $out->validate($result);
+//    }
 
     /**
      * Get a user by its numeric ID.

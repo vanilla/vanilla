@@ -132,7 +132,7 @@ abstract class ConversationsModel extends Gdn_Model {
 
         $activityModel = new ActivityModel();
         foreach ($notifyUserIDs as $userID) {
-            if ($message['InsertUserID'] == $notifyUserID) {
+            if ($message['InsertUserID'] == $userID) {
                 continue; // Don't notify self.
             }
 

@@ -135,32 +135,32 @@ class ConversationsApiController extends AbstractApiController {
      * @return Schema
      */
     private function fullSchema() {
-        $schemaDefinition = [
-            'conversationID:i' => 'The ID of the conversation.',
-            'name:s?' => 'The name of the conversation.',
-            'dateInserted:dt' => 'When the conversation was created.',
-            'insertUserID:i' => 'The user that created the conversation.',
-            'insertUser:o?' => $this->getUserFragmentSchema(),
-            'countParticipants:i' => 'The number of participants on the conversation.',
-            'countMessages:i' => 'The number of messages on the conversation.',
-            'countReadMessages:n|i?' => 'The number of unread messages by the current user on the conversation.',
-            'dateLastViewed:n|dt?' => 'When the conversation was last viewed by the current user.',
-        ];
+        /** @var Schema $schema */
+        static $schema;
 
-        // We unset to preserve the order of the parameters.
-        if (!$this->config->get('Conversations.Subjects.Visible', false)) {
-            unset($schemaDefinition['name:s?']);
+        if ($schema === null) {
+            $schemaDefinition = [
+                'conversationID:i' => 'The ID of the conversation.',
+                'name:s?' => 'The name of the conversation.',
+                'dateInserted:dt' => 'When the conversation was created.',
+                'insertUserID:i' => 'The user that created the conversation.',
+                'insertUser:o?' => $this->getUserFragmentSchema(),
+                'countParticipants:i' => 'The number of participants on the conversation.',
+                'countMessages:i' => 'The number of messages on the conversation.',
+                'countReadMessages:n|i?' => 'The number of unread messages by the current user on the conversation.',
+                'dateLastViewed:n|dt?' => 'When the conversation was last viewed by the current user.',
+            ];
+
+            // We unset to preserve the order of the parameters.
+            if (!$this->config->get('Conversations.Subjects.Visible', false)) {
+                unset($schemaDefinition['name:s?']);
+            }
+
+            // Name this schema so that it can be read by swagger.
+            $schema = $this->schema($schemaDefinition, 'Conversation');
         }
 
-        static $fullSchema;
-        if ($fullSchema === null) {
-            $fullSchema = Schema::parse($schemaDefinition);
-
-            // Trigger schema event for swagger.
-            $this->schema($fullSchema, 'Conversations');
-        }
-
-        return $fullSchema;
+        return $schema;
     }
 
     /**

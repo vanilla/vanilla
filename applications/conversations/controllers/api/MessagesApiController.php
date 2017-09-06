@@ -115,21 +115,19 @@ class MessagesApiController extends AbstractApiController {
      * @return Schema
      */
     private function fullSchema() {
-        $schemaDefinition = [
-            'messageID:i' => 'The ID of the message.',
-            'conversationID:i' => 'The ID of the conversation.',
-            'body:s' => 'The body of the message.',
-            'insertUserID:i' => 'The user that created the message.',
-            'insertUser?' => $this->getUserFragmentSchema(),
-            'dateInserted:dt' => 'When the message was created.',
-        ];
+        /** @var Schema $schema */
+        static $schema;
 
-        static $schemaInitialized = false;
-        if (!$schemaInitialized) {
-            $schemaInitialized = true;
-            $schema = $this->schema($schemaDefinition, 'Messages');
-        } else {
-            $schema = Schema::parse($schemaDefinition);
+        if ($schema === null) {
+            // Name this schema so that it can be read by swagger.
+            $schema = $this->schema([
+                'messageID:i' => 'The ID of the message.',
+                'conversationID:i' => 'The ID of the conversation.',
+                'body:s' => 'The body of the message.',
+                'insertUserID:i' => 'The user that created the message.',
+                'insertUser?' => $this->getUserFragmentSchema(),
+                'dateInserted:dt' => 'When the message was created.',
+            ], 'Message');
         }
 
         return $schema;

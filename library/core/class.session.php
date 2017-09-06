@@ -658,7 +658,7 @@ class Gdn_Session {
         if (!isset($return)) {
             // Checking the postback here is a kludge, but is absolutely necessary until we can test the ValidatePostBack more.
             $return = ($forceValid && Gdn::request()->isPostBack()) ||
-                (hash_equals($this->_TransientKey, $foreignKey) && $this->_TransientKey !== false);
+                (hash_equals($this->_TransientKey, $foreignKey) && !empty($this->_TransientKey));
         }
         if (!$return && $forceValid !== true) {
             if (Gdn::session()->User) {

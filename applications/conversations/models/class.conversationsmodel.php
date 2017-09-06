@@ -68,7 +68,7 @@ abstract class ConversationsModel extends Gdn_Model {
      * @param bool $limit
      * @param bool $offset
      *
-     * @return array Array of user IDs.
+     * @return array Array of users or userIDs depending on $idsOnly's value.
      */
     public function getConversationMembers($conversationID, $idsOnly = true, $limit = false, $offset = false) {
         $conversationMembers = [];

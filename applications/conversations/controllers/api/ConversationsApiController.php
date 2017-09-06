@@ -104,6 +104,8 @@ class ConversationsApiController extends AbstractApiController {
 //
 //        $this->conversationByID($id);
 //        $this->conversationModel->deleteID($id);
+//
+//        return new Data([], 204);
 //    }
 
 

@@ -105,6 +105,8 @@ class MessagesApiController extends AbstractApiController {
 //
 //        $this->messageByID($id);
 //        $this->conversationMessagesModel->deleteID($id);
+//
+//        return new Data([], 204);
 //    }
 
     /**

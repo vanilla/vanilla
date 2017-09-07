@@ -159,6 +159,11 @@ class UsersApiController extends AbstractApiController {
         ]);
 
         $in = $this->schema([
+            'userID:a?' => [
+                'description' => 'One or more user IDs to lookup.',
+                'items' => ['type' => 'integer'],
+                'style' => 'form'
+            ],
             'page:i?' => [
                 'description' => 'Page number.',
                 'default' => 1,
@@ -175,7 +180,16 @@ class UsersApiController extends AbstractApiController {
 
         $query = $in->validate($query);
         list($offset, $limit) = offsetLimit("p{$query['page']}", $query['limit']);
-        $rows = $this->userModel->search('', '', '', $limit, $offset)->resultArray();
+        $filter = '';
+
+        if (!empty($query['userID'])) {
+            $filter = ['UserID' => $query['userID']];
+        }
+
+        $rows = $this->userModel->search($filter, '', '', $limit, $offset)->resultArray();
+        foreach ($rows as &$row) {
+            $this->prepareRow($row);
+        }
 
         $result = $out->validate($rows);
         return $result;

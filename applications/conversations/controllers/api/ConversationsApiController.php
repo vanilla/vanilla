@@ -194,7 +194,7 @@ class ConversationsApiController extends AbstractApiController {
 
         $this->userModel->expandUsers($conversation, ['InsertUserID']);
 
-        $conversation = $this->normalizeConversation($conversation);
+        $this->prepareRow($conversation);
 
         return $out->validate($conversation);
     }
@@ -436,17 +436,14 @@ class ConversationsApiController extends AbstractApiController {
     }
 
     /**
-     * Normalize conversation for output.
+     * Prepare conversation for output.
      *
      * @param array $conversation
-     * @return array The normalized conversation.
      */
-    private function normalizeConversation(array $conversation) {
+    private function prepareRow(array &$conversation) {
         if (array_key_exists('subject', $conversation)) {
             $conversation['name'] = $conversation['subject'];
             unset($conversation['subject']);
         }
-
-        return $conversation;
     }
 }

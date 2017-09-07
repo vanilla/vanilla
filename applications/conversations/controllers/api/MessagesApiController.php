@@ -161,7 +161,7 @@ class MessagesApiController extends AbstractApiController {
 
         $this->userModel->expandUsers($message, ['InsertUserID']);
 
-        $message = $this->normalizeMessage($message);
+        $message = $this->prepareRow($message);
         return $out->validate($message);
     }
 
@@ -242,7 +242,7 @@ class MessagesApiController extends AbstractApiController {
         }
 
         array_walk($messages, function(&$message) {
-            $message = $this->normalizeMessage($message);
+            $this->prepareRow($message);
         });
 
         return $out->validate($messages, true);
@@ -265,15 +265,12 @@ class MessagesApiController extends AbstractApiController {
     }
 
     /**
-     * Normalize message for output.
+     * Prepare message for output.
      *
      * @param array $message
-     * @return array The normalized message.
      */
-    private function normalizeMessage(array $message) {
-        $formattedMessage = $message;
+    private function prepareRow(array &$message) {
         $this->formatField($formattedMessage, 'Body', $message['Format']);
-        return $formattedMessage;
     }
 
 //
@@ -340,7 +337,7 @@ class MessagesApiController extends AbstractApiController {
         }
 
         $message = $this->messageByID($messageID);
-        $message = $this->normalizeMessage($message);
+        $this->prepareRow($message);
         return new Data(
             $out->validate($message),
             201

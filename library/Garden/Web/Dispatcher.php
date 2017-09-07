@@ -78,6 +78,13 @@ class Dispatcher {
                     // Hold the action in case another route succeeds.
                     $ex = $action;
                 } elseif ($action !== null) {
+                    // KLUDGE: Check for CSRF here because we can only do a global check for new dispatches.
+                    // Once we can test properly then a route can be added that checks for CSRF on all requests.
+                    if ($request->getMethod() === 'POST' && $request instanceof \Gdn_Request) {
+                        /* @var \Gdn_Request $request */
+                        $request->isAuthenticatedPostBack(true);
+                    }
+
                     try {
                         ob_start();
                         $actionResponse = $action();

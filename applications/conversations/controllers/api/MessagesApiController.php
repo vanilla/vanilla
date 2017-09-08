@@ -159,7 +159,7 @@ class MessagesApiController extends AbstractApiController {
 
         $this->userModel->expandUsers($message, ['InsertUserID']);
 
-        $message = $this->prepareRow($message);
+        $this->prepareRow($message);
         return $out->validate($message);
     }
 

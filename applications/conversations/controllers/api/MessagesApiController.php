@@ -105,8 +105,6 @@ class MessagesApiController extends AbstractApiController {
 //
 //        $this->messageByID($id);
 //        $this->conversationMessagesModel->deleteID($id);
-//
-//        return new Data([], 204);
 //    }
 
     /**
@@ -284,7 +282,6 @@ class MessagesApiController extends AbstractApiController {
 //     * @param array $body The request body.
 //     * @throws NotFoundException If the message was not found.
 //     * @throws ServerException If the message could not be updated.
-//     * @return Data
 //     */
 //    public function patch($id, array $body) {
 //        $this->permission('Conversations.Conversations.Add');

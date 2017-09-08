@@ -104,8 +104,6 @@ class ConversationsApiController extends AbstractApiController {
 //
 //        $this->conversationByID($id);
 //        $this->conversationModel->deleteID($id);
-//
-//        return new Data([], 204);
 //    }
 
 
@@ -114,7 +112,6 @@ class ConversationsApiController extends AbstractApiController {
      *
      * @param int $id The ID of the conversation.
      * @throws NotFoundException if the conversation could not be found.
-     * @return Data
      */
     public function delete_leave($id) {
         $this->permission('Garden.SignIn.Allow');
@@ -125,8 +122,6 @@ class ConversationsApiController extends AbstractApiController {
         $this->conversationByID($id);
 
         $this->conversationModel->clear($id, $this->getSession()->UserID);
-
-        return new Data([], 204);
     }
 
     /**
@@ -168,7 +163,7 @@ class ConversationsApiController extends AbstractApiController {
      *
      * @param int $id The ID of the conversation.
      * @throws NotFoundException if the conversation could not be found.
-     * @return Data
+     * @return array
      */
     public function get($id) {
         $this->permission('Conversations.Conversations.Add');
@@ -205,7 +200,7 @@ class ConversationsApiController extends AbstractApiController {
      * @param int $id The ID of the conversation.
      * @param array $query The query string.
      * @throws NotFoundException if the conversation could not be found.
-     * @return Data
+     * @return array
      */
     public function get_participants($id, array $query) {
         $this->permission('Conversations.Conversations.Add');
@@ -313,7 +308,7 @@ class ConversationsApiController extends AbstractApiController {
             $this->userModel->expandUsers($conversations, ['InsertUserID']);
         }
 
-        return $out->validate($conversations, true);
+        return $out->validate($conversations);
     }
 
     /**

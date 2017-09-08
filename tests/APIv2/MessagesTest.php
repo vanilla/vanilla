@@ -71,45 +71,51 @@ class MessagesTest extends AbstractResourceTest {
         return $indexUrl;
     }
 
- /**
+    /**
      * {@inheritdoc}
+     * @requires function MessagesApiController::delete
      */
     public function testDelete() {
-        $this->markTestSkipped('MessageAPIController does not support delete yet.');
+        $this->fail(__METHOD__.' needs to be implemented');
     }
 
     /**
      * {@inheritdoc}
+     * @requires function MessagesApiController::patch
      */
     public function testGetEdit($record = null) {
-        $this->markTestSkipped('MessageAPIController does not support patch yet.');
+        $this->fail(__METHOD__.' needs to be implemented');
     }
 
     /**
      * {@inheritdoc}
+     * @requires function MessagesApiController::patch
      */
     public function testGetEditFields() {
-        $this->markTestSkipped('MessageAPIController does not support patch yet.');
+        $this->fail(__METHOD__.' needs to be implemented');
     }
 
     /**
      * {@inheritdoc}
+     * @requires function MessagesApiController::patch
      */
     public function testPatch() {
-        $this->markTestSkipped('MessageAPIController does not support patch yet.');
+        $this->fail(__METHOD__.' needs to be implemented');
     }
 
     /**
      * {@inheritdoc}
+     * @requires function MessagesApiController::patch
      */
     public function testPatchSparse($field = null) {
-        $this->markTestSkipped('MessageAPIController does not support patch yet.');
+        $this->fail(__METHOD__.' needs to be implemented');
     }
 
     /**
      * {@inheritdoc}
+     * @requires function MessagesApiController::patch
      */
     public function testPatchFull() {
-        $this->markTestSkipped('MessageAPIController does not support patch yet.');
+        $this->fail(__METHOD__.' needs to be implemented');
     }
 }

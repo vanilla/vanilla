@@ -112,6 +112,12 @@ class ConversationsTest extends AbstractAPIv2Test {
         }
     }
 
+    /**
+     * @requires function ConversationAPIController::delete
+     */
+    public function testDelete() {
+        $this->fail(__METHOD__.' needs to be implemented');
+    }
 
     /**
      * Test DELETE /conversations/<id>/leave.

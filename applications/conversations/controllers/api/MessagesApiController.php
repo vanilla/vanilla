@@ -263,7 +263,7 @@ class MessagesApiController extends AbstractApiController {
      *
      * @param array $message
      */
-    private function prepareRow(array &$message) {
+    public function prepareRow(array &$message) {
         $this->formatField($message, 'Body', $message['Format']);
     }
 

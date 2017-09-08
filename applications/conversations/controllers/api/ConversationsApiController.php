@@ -428,7 +428,7 @@ class ConversationsApiController extends AbstractApiController {
      * @param array $input
      * @return array The normalized input.
      */
-    private function normalizeInput(array $input) {
+    public function normalizeInput(array $input) {
         if (array_key_exists('name', $input)) {
             $input['subject'] = $input['name'];
             unset($input['name']);
@@ -446,7 +446,7 @@ class ConversationsApiController extends AbstractApiController {
      *
      * @param array $conversation
      */
-    private function prepareRow(array &$conversation) {
+    public function prepareRow(array &$conversation) {
         if (array_key_exists('subject', $conversation)) {
             $conversation['name'] = $conversation['subject'];
             unset($conversation['subject']);

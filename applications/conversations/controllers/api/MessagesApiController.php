@@ -239,7 +239,7 @@ class MessagesApiController extends AbstractApiController {
             $this->prepareRow($message);
         });
 
-        return $out->validate($messages, true);
+        return $out->validate($messages);
     }
 
     /**

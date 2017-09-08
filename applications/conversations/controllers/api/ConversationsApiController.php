@@ -52,10 +52,10 @@ class ConversationsApiController extends AbstractApiController {
      * @throw Exception
      */
     private function checkModerationPermission() {
-        if (!$this->config->get('ConversationMessages.Moderation.Allow', false)) {
+        if (!$this->config->get('Conversations.Moderation.Allow', false)) {
             throw permissionException();
         }
-        $this->permission('ConversationMessages.Moderation.Manage');
+        $this->permission('Conversations.Moderation.Manage');
     }
 
     /**
@@ -271,8 +271,9 @@ class ConversationsApiController extends AbstractApiController {
         $this->permission('Conversations.Conversations.Add');
 
         $in = $this->schema([
-                'participantID:i?' => 'Filter by specified participating user instead of by current user.',
-                'page:i?' => [
+            'insertUserID:i?' => 'Filter by author. (Has no effect if participantID is used)',
+            'participantID:i?' => 'Filter by participating user.',
+            'page:i?' => [
                     'description' => 'Page number.',
                     'default' => 1,
                     'minimum' => 1,
@@ -285,24 +286,34 @@ class ConversationsApiController extends AbstractApiController {
                 ],
                 'expand:b?' => 'Expand associated records.'
             ], 'in')
+            ->requireOneOf(['insertUserID', 'participantID'])
             ->setDescription('List user conversations.');
         $out = $this->schema([':a' => $this->fullSchema()], 'out');
 
         $query = $this->filterValues($query);
         $query = $in->validate($query);
 
+        list($offset, $limit) = offsetLimit("p{$query['page']}", $query['limit']);
+
         if (!empty($query['participantID'])) {
             if ($query['participantID'] !== $this->getSession()->UserID) {
                 $this->checkModerationPermission();
             }
-            $userID = $query['participantID'];
-        } else {
-            $userID = $this->getSession()->UserID;
+
+            $conversations = $this->conversationModel->get2($query['participantID'], $offset, $limit)->resultArray();
+        } else if (!empty($query['insertUserID'])) {
+            if ($query['insertUserID'] !== $this->getSession()->UserID) {
+                $this->checkModerationPermission();
+            }
+
+            $conversations = $this->conversationModel->getWhere(
+                ['InsertUserID' => $query['insertUserID']],
+                'DateInserted',
+                'Desc',
+                $limit,
+                $offset
+            )->resultArray();
         }
-
-        list($offset, $limit) = offsetLimit("p{$query['page']}", $query['limit']);
-
-        $conversations = $this->conversationModel->get2($userID, $offset, $limit)->resultArray();
 
         if (!empty($query['expand'])) {
             $this->userModel->expandUsers($conversations, ['InsertUserID']);

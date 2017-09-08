@@ -139,6 +139,8 @@ class Dispatcher {
         } elseif ($raw instanceof \Exception) {
             $data = $raw instanceof \JsonSerializable ? $raw->jsonSerialize() : ['message' => $raw->getMessage(), 'status' => $raw->getCode()];
             $result = new Data($data, $raw->getCode());
+            // Provide stack trace as meta information.
+            $result->setMeta('error_trace', $raw->getTraceAsString());
         } elseif ($raw instanceof \JsonSerializable) {
             $result = new Data((array)$raw->jsonSerialize());
         } elseif (!empty($ob)) {

@@ -100,7 +100,10 @@ class InternalRequest extends HttpRequest implements RequestInterface {
 
         $data = $this->dispatcher->dispatch($this);
 
-        $response = new HttpResponse($data->getStatus(), $data->getHeaders(), '');
+        $response = new HttpResponse(
+            $data->getStatus(),
+            array_merge($data->getHeaders(), ['X-Data-Meta', json_encode($data->getMetaArray())])
+        );
         $response->setBody($data->getData());
 
         return $response;

@@ -62,6 +62,11 @@ class InternalClient extends HttpClient {
                 $message .= ' '.implode(' ', array_column($body['errors'], 'message'));
             }
 
+            $dataMeta = json_decode($response->getHeader('X-Data-Meta'), true);
+            if (!empty($dataMeta['error_trace'])) {
+                $message .= "\n".$dataMeta['error_trace'];
+            }
+
             throw new \Exception($message, $response->getStatusCode());
         }
     }

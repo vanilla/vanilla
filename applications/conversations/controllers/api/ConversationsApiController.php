@@ -378,6 +378,7 @@ class ConversationsApiController extends AbstractApiController {
         $in = $this->postSchema('in')->setDescription('Add participants to a conversation.');
         $this->schema([], 'out');
 
+        // Not found exception thrown if the conversation does not exist.
         $this->conversationByID($id);
 
         $body = $in->validate($body);
@@ -387,7 +388,10 @@ class ConversationsApiController extends AbstractApiController {
             throw new ServerException('Unable to add participants.', 500);
         }
 
-        return new Data([], 201);
+        // Fetch up to date conversation.
+        $conversation = $this->conversationByID($id);
+
+        return new Data($conversation, 201);
     }
 
     /**

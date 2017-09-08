@@ -198,7 +198,9 @@ class ConversationsTest extends AbstractAPIv2Test {
 
         $this->assertEquals(201, $result->getStatusCode());
 
-        $conversation['countParticipants'] += 2;
+        $updatedConversation = $result->getBody();
+
+        $this->assertEquals($conversation['countParticipants'] + 2, $updatedConversation['countParticipants']);
 
         return $conversation;
     }

@@ -101,7 +101,7 @@ class ConversationsTest extends AbstractAPIv2Test {
             $rows[] = $this->testPost();
         }
 
-        $result = $this->api()->get($this->baseUrl);
+        $result = $this->api()->get($this->baseUrl, ['insertUserID' => $this->api()->getUserID()]);
         $this->assertEquals(200, $result->getStatusCode());
 
         $rows = $result->getBody();

@@ -173,9 +173,8 @@ class MessagesApiController extends AbstractApiController {
         $this->permission('Conversations.Conversations.Add');
 
         $in = $this->schema([
-                'conversationID:i?'=> 'Filter messages by conversation.',
-                'insertUserID:i?' => 'Filter messages by specified user. '.
-                    'Use in conjunction with conversationID to have all messages of a conversation that were created by a specific user.',
+                'conversationID:i?'=> 'Filter by conversation.',
+                'insertUserID:i?' => 'Filter by author.',
                 'page:i?' => [
                     'description' => 'Page number.',
                     'default' => 1,
@@ -189,43 +188,40 @@ class MessagesApiController extends AbstractApiController {
                 ],
                 'expand:b?' => 'Expand associated records.'
             ], 'in')
-            ->setDescription('List user messages. By default, get the messages list of the current users.');
+            ->requireOneOf(['conversationID', 'insertUserID'])
+            ->setDescription('List user messages.');
         $out = $this->schema([':a' => $this->fullSchema()], 'out');
 
         $query = $this->filterValues($query);
         $query = $in->validate($query);
 
         $where = [];
+        $requireModerationPermission = false;
 
-        $filterByInsertUserID = !empty($query['insertUserID']);
-        if ($filterByInsertUserID) {
-            $missMatchUser = $query['insertUserID'] !== $this->getSession()->UserID;
+        if (!empty($query['insertUserID'])) {
+            if ($query['insertUserID'] !== $this->getSession()->UserID) {
+                $requireModerationPermission = true;
+            }
             $userID = $query['insertUserID'];
             $where['InsertUserID'] = $userID;
-        } else {
-            $userID = $this->getSession()->UserID;
         }
 
-        $filterByConversation = !empty($query['conversationID']);
-        if ($filterByConversation) {
+        if (!empty($query['conversationID'])) {
             $this->conversationByID($query['conversationID']);
 
-            $isInConversation = $this->conversationModel->inConversation($query['conversationID'], $userID);
+            $isInConversation = $this->conversationModel->inConversation($query['conversationID'], $this->getSession()->UserID);
+            if (!$isInConversation) {
+                $requireModerationPermission = true;
+            }
 
             $where['ConversationID'] = $query['conversationID'];
         }
 
-        if (($filterByInsertUserID && $missMatchUser) || ($filterByConversation && !$isInConversation)) {
+        if ($requireModerationPermission) {
             $this->checkModerationPermission();
         }
 
         list($offset, $limit) = offsetLimit("p{$query['page']}", $query['limit']);
-
-        // Make sure that we filter at least by the current user.
-        // If we are to add other filtering options make sure that his still make sense.
-        if (empty($where)) {
-            $where['InsertUserID'] = $userID;
-        }
 
         $messages = $this->conversationMessageModel->getWhere(
             $where,

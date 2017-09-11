@@ -34,4 +34,16 @@ class DiscussionsTest extends AbstractResourceTest {
         ];
         return $fields;
     }
+
+    /**
+     * Verify a bookmarked discussion shows up under /discussions/bookmarked.
+     */
+    public function testBookmarked() {
+        $row = $this->testPost();
+        $rowID = $row['discussionID'];
+        $this->api()->put("{$this->baseUrl}/{$row[$this->pk]}/bookmark", ['bookmarked' => 1]);
+        $bookmarked = $this->api()->get("{$this->baseUrl}/bookmarked")->getBody();
+        $discussionIDs = array_column($bookmarked, 'discussionID');
+        $this->assertContains($rowID, $discussionIDs);
+    }
 }

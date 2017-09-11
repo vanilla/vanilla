@@ -78,9 +78,9 @@ class UsersApiController extends AbstractApiController {
                 'minLength' => 0,
                 'description' => 'URL to the user photo.'
             ],
-            'confirmed:b' => 'Is the user confirmed?',
+            'emailConfirmed:b' => 'Has the email address for this user been confirmed?',
             'showEmail:b' => 'Is the email address visible to other users?',
-            'verified:b' => 'Has the user been verified?',
+            'bypassSpam:b' => 'Should submissions from this user bypass SPAM checks?',
             'banned:i' => 'Is the user banned?',
             'roles:a?' => $this->schema([
                 'roleID:i' => 'ID of the role.',
@@ -126,7 +126,7 @@ class UsersApiController extends AbstractApiController {
         $this->permission('Garden.Users.Edit');
 
         $in = $this->idParamSchema()->setDescription('Get a user for editing.');
-        $out = $this->schema(Schema::parse(['userID', 'name', 'email', 'photo'])->add($this->fullSchema()), 'out');
+        $out = $this->schema(Schema::parse(['userID', 'name', 'email', 'photo', 'emailConfirmed', 'bypassSpam'])->add($this->fullSchema()), 'out');
 
         $row = $this->userByID($id);
 
@@ -182,6 +182,7 @@ class UsersApiController extends AbstractApiController {
         list($offset, $limit) = offsetLimit("p{$query['page']}", $query['limit']);
         $rows = $this->userModel->search('', '', '', $limit, $offset)->resultArray();
         foreach ($rows as &$row) {
+            $this->userModel->setCalculatedFields($row);
             $this->prepareRow($row);
         }
 
@@ -347,7 +348,13 @@ class UsersApiController extends AbstractApiController {
             $schema = Schema::parse([
                 'roleID:a' => 'Roles to set on the user.'
             ])->add($this->fullSchema(), true);
-            $fields = ['name', 'email', 'photo?'];
+            $fields = [
+                'name',
+                'email',
+                'photo?',
+                'emailConfirmed' => ['default' => true],
+                'bypassSpam' => ['default' => false]
+            ];
             $this->userPostSchema = $this->schema(
                 Schema::parse(array_merge($fields, $extra))->add($schema),
                 'UserPost'
@@ -364,8 +371,8 @@ class UsersApiController extends AbstractApiController {
      */
     public function userSchema($type = '') {
         if ($this->userSchema === null) {
-            $schema = Schema::parse(['userID', 'name', 'email', 'photoUrl', 'confirmed',
-                'showEmail', 'verified', 'banned', 'roles?']);
+            $schema = Schema::parse(['userID', 'name', 'email', 'photoUrl', 'emailConfirmed',
+                'showEmail', 'bypassSpam', 'banned', 'roles?']);
             $schema = $schema->add($this->fullSchema());
             $this->userSchema = $this->schema($schema, 'User');
         }

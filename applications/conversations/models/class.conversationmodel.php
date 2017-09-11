@@ -608,7 +608,8 @@ class ConversationModel extends ConversationsModel {
 
                 $recipientData = [
                     'UserID' => $userID,
-                    'ConversationID' => $conversationID
+                    'ConversationID' => $conversationID,
+                    'DateConversationUpdated' => $formPostValues['DateUpdated']
                 ];
 
                 if ($createMessage) {

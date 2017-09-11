@@ -45,7 +45,7 @@ class MessagesTest extends AbstractResourceTest {
         $conversationsAPiController = static::container()->get('ConversationsAPiController');
 
         $conversation = $conversationsAPiController->post([
-            'participantIDs' => [self::$userID]
+            'participantUserIDs' => [self::$userID]
         ]);
         self::$conversationID = $conversation['conversationID'];
 

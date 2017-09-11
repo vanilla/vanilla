@@ -71,12 +71,12 @@ class UsersApiController extends AbstractApiController {
             'photo:s' => [
                 'allowNull' => true,
                 'minLength' => 0,
-                'description' => 'Photo of the user.'
+                'description' => 'Raw photo field value from the user record.'
             ],
             'photoUrl:s' => [
                 'allowNull' => true,
                 'minLength' => 0,
-                'description' => 'Url to the user photo.'
+                'description' => 'URL to the user photo.'
             ],
             'confirmed:b' => 'Is the user confirmed?',
             'showEmail:b' => 'Is the email address visible to other users?',

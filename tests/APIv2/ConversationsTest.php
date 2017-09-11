@@ -80,7 +80,7 @@ class ConversationsTest extends AbstractAPIv2Test {
 
         $this->assertEquals(200, $result->getStatusCode());
 
-        $participants = $result->getBody()['participants'];
+        $participants = $result->getBody();
 
         $this->assertTrue(is_array($participants));
         $this->assertEquals($expectedCountParticipant, count($participants));
@@ -143,7 +143,7 @@ class ConversationsTest extends AbstractAPIv2Test {
             'userID' => $this->api()->getUserID(),
             'deleted' => true,
         ];
-        $participants = $participantsResult->getBody()['participants'];
+        $participants = $participantsResult->getBody();
 
         $this->assertTrue(is_array($participants));
         $this->assertRowsEqual($expectedFirstParticipant, $participants[0]);
@@ -156,7 +156,7 @@ class ConversationsTest extends AbstractAPIv2Test {
      */
     public function testPost() {
         $postData = [
-            'participantIDs' => array_slice(self::$userIDs, 0, 2)
+            'participantUserIDs' => array_slice(self::$userIDs, 0, 2)
         ];
         $expectedResult = [
             'insertUserID' => $this->api()->getUserID(),
@@ -189,7 +189,7 @@ class ConversationsTest extends AbstractAPIv2Test {
         $conversation = $this->testPost();
 
         $postData = [
-            'participantIDs' => array_slice(self::$userIDs, 2)
+            'participantUserIDs' => array_slice(self::$userIDs, 2)
         ];
         $result = $this->api()->post(
             "{$this->baseUrl}/{$conversation[$this->pk]}/participants",

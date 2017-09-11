@@ -222,13 +222,13 @@ class ConversationsApiController extends AbstractApiController {
             'expand:b?' => 'Expand associated records.',
         ], 'in')->setDescription('Get participants of a conversation.');
         $out = $this->schema([
-            'participants:a' => [
+            ':a' => [
                 'items' => [
                     'type'  => 'object',
                     'properties' => [
                         'userID' => [
                             'type' => 'integer',
-                            'description' => 'The ID of the participant.',
+                            'description' => 'The userID of the participant.',
                         ],
                         'user' => $this->getUserFragmentSchema(),
                         'deleted' => [
@@ -250,12 +250,10 @@ class ConversationsApiController extends AbstractApiController {
 
         $conversationMembers = $this->conversationModel->getConversationMembers($id, false, $limit, $offset);
 
-        $data = [
-            'participants' => array_values($conversationMembers),
-        ];
+        $data = array_values($conversationMembers);
 
         if (!empty($query['expand'])) {
-            $this->userModel->expandUsers($data['participants'], ['UserID']);
+            $this->userModel->expandUsers($data, ['UserID']);
         }
 
         return $out->validate($data);
@@ -271,8 +269,8 @@ class ConversationsApiController extends AbstractApiController {
         $this->permission('Conversations.Conversations.Add');
 
         $in = $this->schema([
-            'insertUserID:i?' => 'Filter by author. (Has no effect if participantID is used)',
-            'participantID:i?' => 'Filter by participating user.',
+            'insertUserID:i?' => 'Filter by author. (Has no effect if participantUserID is used)',
+            'participantUserID:i?' => 'Filter by participating user.',
             'page:i?' => [
                     'description' => 'Page number.',
                     'default' => 1,
@@ -286,7 +284,7 @@ class ConversationsApiController extends AbstractApiController {
                 ],
                 'expand:b?' => 'Expand associated records.'
             ], 'in')
-            ->requireOneOf(['insertUserID', 'participantID'])
+            ->requireOneOf(['insertUserID', 'participantUserID'])
             ->setDescription('List user conversations.');
         $out = $this->schema([':a' => $this->fullSchema()], 'out');
 
@@ -295,12 +293,12 @@ class ConversationsApiController extends AbstractApiController {
 
         list($offset, $limit) = offsetLimit("p{$query['page']}", $query['limit']);
 
-        if (!empty($query['participantID'])) {
-            if ($query['participantID'] !== $this->getSession()->UserID) {
+        if (!empty($query['participantUserID'])) {
+            if ($query['participantUserID'] !== $this->getSession()->UserID) {
                 $this->checkModerationPermission();
             }
 
-            $conversations = $this->conversationModel->get2($query['participantID'], $offset, $limit)->resultArray();
+            $conversations = $this->conversationModel->get2($query['participantUserID'], $offset, $limit)->resultArray();
         } else if (!empty($query['insertUserID'])) {
             if ($query['insertUserID'] !== $this->getSession()->UserID) {
                 $this->checkModerationPermission();
@@ -383,7 +381,7 @@ class ConversationsApiController extends AbstractApiController {
 
         $body = $in->validate($body);
 
-        $success = $this->conversationModel->addUserToConversation($id, $body['participantIDs']);
+        $success = $this->conversationModel->addUserToConversation($id, $body['participantUserIDs']);
         if (!$success) {
             throw new ServerException('Unable to add participants.', 500);
         }
@@ -408,7 +406,7 @@ class ConversationsApiController extends AbstractApiController {
 
         if ($postSchema === null) {
             $inSchema = [
-                'participantIDs:a' => [
+                'participantUserIDs:a' => [
                     'items' => [
                         'type'  => 'integer',
                     ],
@@ -440,9 +438,9 @@ class ConversationsApiController extends AbstractApiController {
             $input['subject'] = $input['name'];
             unset($input['name']);
         }
-        if (array_key_exists('participantIDs', $input)) {
-            $input['recipientUserID'] = $input['participantIDs'];
-            unset($input['participantIDs']);
+        if (array_key_exists('participantUserIDs', $input)) {
+            $input['recipientUserID'] = $input['participantUserIDs'];
+            unset($input['participantUserIDs']);
         }
 
         return $input;

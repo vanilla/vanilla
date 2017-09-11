@@ -44,7 +44,6 @@ class DiscussionsTest extends AbstractResourceTest {
         $this->api()->put("{$this->baseUrl}/{$row[$this->pk]}/bookmark", ['bookmarked' => 1]);
         $bookmarked = $this->api()->get("{$this->baseUrl}/bookmarked")->getBody();
         $discussionIDs = array_column($bookmarked, 'discussionID');
-        print_r($discussionIDs);
         $this->assertContains($rowID, $discussionIDs);
     }
 }

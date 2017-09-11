@@ -71,7 +71,12 @@ class UsersApiController extends AbstractApiController {
             'photo:s' => [
                 'allowNull' => true,
                 'minLength' => 0,
-                'description' => 'Photo of the user.'
+                'description' => 'Raw photo field value from the user record.'
+            ],
+            'photoUrl:s' => [
+                'allowNull' => true,
+                'minLength' => 0,
+                'description' => 'URL to the user photo.'
             ],
             'confirmed:b' => 'Is the user confirmed?',
             'showEmail:b' => 'Is the email address visible to other users?',
@@ -176,6 +181,9 @@ class UsersApiController extends AbstractApiController {
         $query = $in->validate($query);
         list($offset, $limit) = offsetLimit("p{$query['page']}", $query['limit']);
         $rows = $this->userModel->search('', '', '', $limit, $offset)->resultArray();
+        foreach ($rows as &$row) {
+            $this->prepareRow($row);
+        }
 
         $result = $out->validate($rows);
         return $result;
@@ -193,7 +201,9 @@ class UsersApiController extends AbstractApiController {
             $row['roles'] = $roles;
         }
         if (array_key_exists('Photo', $row)) {
-            $row['Photo'] = userPhotoUrl($row);
+            $photo = userPhotoUrl($row);
+            $row['Photo'] = $photo;
+            $row['PhotoUrl'] = $photo;
         }
     }
 
@@ -218,6 +228,7 @@ class UsersApiController extends AbstractApiController {
         $userData['UserID'] = $id;
         $this->userModel->save($userData);
         $row = $this->userByID($id);
+        $this->prepareRow($row);
 
         $result = $out->validate($row);
         return $result;
@@ -353,7 +364,7 @@ class UsersApiController extends AbstractApiController {
      */
     public function userSchema($type = '') {
         if ($this->userSchema === null) {
-            $schema = Schema::parse(['userID', 'name', 'email', 'photo', 'confirmed',
+            $schema = Schema::parse(['userID', 'name', 'email', 'photoUrl', 'confirmed',
                 'showEmail', 'verified', 'banned', 'roles?']);
             $schema = $schema->add($this->fullSchema());
             $this->userSchema = $this->schema($schema, 'User');

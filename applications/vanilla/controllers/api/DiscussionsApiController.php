@@ -83,6 +83,9 @@ class DiscussionsApiController extends AbstractApiController {
         if (!empty($query['expand'])) {
             $this->userModel->expandUsers($rows, ['InsertUserID']);
         }
+        foreach ($rows as &$currentRow) {
+            $this->prepareRow($currentRow);
+        }
 
         $result = $out->validate($rows);
         return $result;

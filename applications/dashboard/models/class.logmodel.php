@@ -43,10 +43,28 @@ class LogModel extends Gdn_Pluggable {
         $models['Comment'] = new CommentModel();
 
         foreach ($logs as $log) {
-            if (in_array($log['Operation'], ['Spam', 'Moderate']) && array_key_exists($log['RecordType'], $models)) {
-                // Also delete the record.
-                $model = $models[$log['RecordType']];
-                $model->deleteID($log['RecordID'], ['Log' => false]);
+            $recordType = $log['RecordType'];
+            if (in_array($log['Operation'], ['Spam', 'Moderate']) && array_key_exists($recordType, $models)) {
+                /** @var Gdn_Model $model */
+                $model = $models[$recordType];
+                $recordID = $log['RecordID'];
+                $deleteRecord = true;
+
+                // Determine if the original record, if still available, should be deleted too.
+                $record = $model->getID($recordID, DATASET_TYPE_ARRAY);
+                if ($record) {
+                    switch ($recordType) {
+                        case 'Discussion':
+                            if ($record['CountComments'] >= DiscussionModel::DELETE_COMMENT_THRESHOLD) {
+                                $deleteRecord = false;
+                            }
+                            break;
+                    }
+                }
+
+                if ($deleteRecord) {
+                    $model->deleteID($recordID, ['Log' => false]);
+                }
             }
         }
 

@@ -166,10 +166,10 @@ class SpamModel extends Gdn_Pluggable {
                 $row = $model->getID($id, DATASET_TYPE_ARRAY);
 
                 /**
-                 * If our discussion has more than three comments, it might be worth saving.  Hold off on deleting and
-                 * just flag it.  If we have between 0 and 3 comments, save them along with the discussion.
+                 * If our discussion meets or exceeds our comment threshold, just flag it for review. Otherwise, save
+                 * it and its comments in the log for review and delete the original record.
                  */
-                if ($row['CountComments'] > 3) {
+                if ($row['CountComments'] >= DiscussionModel::DELETE_COMMENT_THRESHOLD) {
                     $deleteRow = false;
                 } elseif ($row['CountComments'] > 0) {
                     $comments = Gdn::database()->sql()->getWhere(

@@ -261,13 +261,20 @@ class DiscussionsApiController extends AbstractApiController {
 
         $pinned = array_key_exists('pinned', $query) ? $query['pinned'] : null;
         if ($pinned === true) {
+            if (array_key_exists('categoryID', $where)) {
+                $where['d.CategoryID'] = $where['categoryID'];
+            }
             $rows = $this->discussionModel->getAnnouncements($where, $offset, $limit)->resultArray();
         } elseif ($pinned === false) {
             $rows = $this->discussionModel->getWhereRecent($where, $limit, $offset)->resultArray();
         } else {
             $pinOrder = array_key_exists('pinOrder', $query) ? $query['pinOrder'] : null;
             if ($pinOrder == 'first') {
+                if (array_key_exists('categoryID', $where)) {
+                    $where['d.CategoryID'] = $where['categoryID'];
+                }
                 $announcements = $this->discussionModel->getAnnouncements($where, $offset, $limit)->resultArray();
+                unset($where['d.CategoryID']);
                 $discussions = $this->discussionModel->getWhereRecent($where, $limit, $offset)->resultArray();
                 $rows = array_merge($announcements, $discussions);
             } else {

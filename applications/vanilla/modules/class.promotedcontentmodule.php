@@ -42,6 +42,9 @@ class PromotedContentModule extends Gdn_Module {
     /** @var integer How often should we encapsulate content in groups. Groups of: n. */
     public $Group = 3;
 
+    /** @var bool Whether or not to hide module if no results are found. */
+    public $ShowIfNoResults = true;
+
     /** @var integer How many chars of Title to return. */
     public $TitleLimit = 0;
 
@@ -58,6 +61,7 @@ class PromotedContentModule extends Gdn_Module {
         'ContentType',
         'Limit',
         'Group',
+        'ShowIfNoResults',
         'TitleLimit',
         'BodyLimit',
         'Expiry'
@@ -108,6 +112,7 @@ class PromotedContentModule extends Gdn_Module {
         $validation->applyRule('bodylimit', 'Integer');
         $validation->applyRule('titlelimit', 'Integer');
         $validation->applyRule('group', 'Integer');
+        $validation->applyRule('showIfNoResults', 'Boolean');
 
         // Validate selection.
         $validation->applyRule('selection', 'String');

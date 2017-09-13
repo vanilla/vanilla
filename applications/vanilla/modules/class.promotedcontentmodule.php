@@ -96,6 +96,10 @@ class PromotedContentModule extends Gdn_Module {
         }
     }
 
+    public function setShowIfNoResults($val) {
+        $this->ShowIfNoResults = filter_var($val, FILTER_VALIDATE_BOOLEAN);
+    }
+
     /**
      * Validate data to be used as class properties.
      *
@@ -138,7 +142,7 @@ class PromotedContentModule extends Gdn_Module {
      */
     public function getData() {
         $this->setData('Content', false);
-        $this->setData('ShowIfNoResults', filter_var($this->ShowIfNoResults, FILTER_VALIDATE_BOOLEAN));
+        $this->setData('ShowIfNoResults', $this->ShowIfNoResults);
         $selectorMethod = 'SelectBy'.ucfirst($this->Selector);
         if (method_exists($this, $selectorMethod)) {
             $this->setData('Content', call_user_func([$this, $selectorMethod], $this->Selection));

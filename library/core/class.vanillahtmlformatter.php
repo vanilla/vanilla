@@ -129,7 +129,10 @@ class VanillaHtmlFormatter {
         'tr',
         'th',
         'td',
-        'tfoot'
+        'tfoot',
+        'caption',
+        'col',
+        'colgroup'
     ];
 
     /** @var array Extra allowed classes. */

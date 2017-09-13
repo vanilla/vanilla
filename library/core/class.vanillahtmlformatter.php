@@ -123,7 +123,17 @@ class VanillaHtmlFormatter {
         'pre',
         'span',
         'strong',
-        'ul'
+        'ul',
+        'table',
+        'thead',
+        'tbody',
+        'tr',
+        'th',
+        'td',
+        'tfoot',
+        'caption',
+        'col',
+        'colgroup'
     ];
 
     /** @var array Extra allowed classes. */

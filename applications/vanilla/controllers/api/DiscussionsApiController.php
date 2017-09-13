@@ -125,7 +125,7 @@ class DiscussionsApiController extends AbstractApiController {
             'insertUser?' => $this->getUserFragmentSchema(),
             'bookmarked:b' => 'Whether or no the discussion is bookmarked by the current user.',
             'announce:b' => 'Whether or not the discussion has been announced (pinned).',
-            'pinned:b|n' => 'Whether or not the discussion has been pinned.',
+            'pinned:b?' => 'Whether or not the discussion has been pinned.',
             'pinLocation:s|n' => [
                 'enum' => ['category', 'discussions'],
                 'description' => 'The location for the discussion, if pinned.'
@@ -227,10 +227,7 @@ class DiscussionsApiController extends AbstractApiController {
 
         $in = $this->schema([
             'categoryID:i?' => 'Filter by a category.',
-            'pinned:b|n' => [
-                'default' => null,
-                'description' => 'Whether or not to include pinned discussions. If true, only return pinned discussions.'
-            ],
+            'pinned:b?' => 'Whether or not to include pinned discussions. If true, only return pinned discussions.',
             'pinOrder:s?' => [
                 'enum' => ['first', 'mixed'],
                 'description' => 'If including pinned posts, in what order should they be integrated?'
@@ -262,7 +259,7 @@ class DiscussionsApiController extends AbstractApiController {
             $this->discussionModel->categoryPermission('Vanilla.Discussions.View', $where['categoryID']);
         }
 
-        $pinned = $query['pinned'];
+        $pinned = array_key_exists('pinned', $query) ? $query['pinned'] : null;
         if ($pinned === true) {
             $rows = $this->discussionModel->getAnnouncements($where, $offset, $limit)->resultArray();
         } elseif ($pinned === false) {

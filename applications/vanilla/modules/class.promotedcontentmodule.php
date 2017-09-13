@@ -61,7 +61,6 @@ class PromotedContentModule extends Gdn_Module {
         'ContentType',
         'Limit',
         'Group',
-        'ShowIfNoResults',
         'TitleLimit',
         'BodyLimit',
         'Expiry'
@@ -112,7 +111,6 @@ class PromotedContentModule extends Gdn_Module {
         $validation->applyRule('bodylimit', 'Integer');
         $validation->applyRule('titlelimit', 'Integer');
         $validation->applyRule('group', 'Integer');
-        $validation->applyRule('showIfNoResults', 'Boolean');
 
         // Validate selection.
         $validation->applyRule('selection', 'String');
@@ -130,6 +128,7 @@ class PromotedContentModule extends Gdn_Module {
             $validation->addValidationResult('contenttype', 'Invalid contenttype.');
         }
 
+        // Results
         $result = $validation->validate($parameters);
         return ($result === true) ? true : $validation->resultsText();
     }
@@ -139,6 +138,7 @@ class PromotedContentModule extends Gdn_Module {
      */
     public function getData() {
         $this->setData('Content', false);
+        $this->setData('ShowIfNoResults', filter_var($this->ShowIfNoResults, FILTER_VALIDATE_BOOLEAN));
         $selectorMethod = 'SelectBy'.ucfirst($this->Selector);
         if (method_exists($this, $selectorMethod)) {
             $this->setData('Content', call_user_func([$this, $selectorMethod], $this->Selection));

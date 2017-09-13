@@ -1,12 +1,14 @@
 <?php if (!defined('APPLICATION')) exit();
 require_once Gdn::controller()->fetchViewLocation('helper_functions', 'modules', 'vanilla');
 $Content = $this->data('Content');
+
 $ShowIfNoResults = $this->data('ShowIfNoResults');
-$ContentItems = sizeof($Content);
+
+$ContentItems = is_array($Content) ? sizeof($Content) : 0;
+
 if ($ContentItems != 0 || $ShowIfNoResults):
     ?>
     <div class="Box BoxPromoted">
-        <?php echo $ShowIfNoResults == true; ?>
         <?php echo panelHeading(t('Promoted Content')); ?>
         <div class="PanelInfo DataList">
             <?php

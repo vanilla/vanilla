@@ -126,6 +126,7 @@ class VanillaHtmlFormatter {
         'ul',
         'table',
         'thead',
+        'tbody',
         'tr',
         'th',
         'td',

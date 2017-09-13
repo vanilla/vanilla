@@ -125,8 +125,11 @@ class VanillaHtmlFormatter {
         'strong',
         'ul',
         'table',
+        'thead',
         'tr',
-        'td'
+        'th',
+        'td',
+        'tfoot'
     ];
 
     /** @var array Extra allowed classes. */

@@ -126,7 +126,17 @@ class HtmLawedPlugin extends Gdn_Plugin {
         'pre',
         'span',
         'strong',
-        'ul'
+        'ul',
+        'table',
+        'thead',
+        'tbody',
+        'tr',
+        'th',
+        'td',
+        'tfoot',
+        'caption',
+        'col',
+        'colgroup'
     ];
 
     /**

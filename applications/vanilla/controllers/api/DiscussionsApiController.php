@@ -227,10 +227,10 @@ class DiscussionsApiController extends AbstractApiController {
 
         $in = $this->schema([
             'categoryID:i?' => 'Filter by a category.',
-            'pinned:b?' => 'Whether or not to include pinned discussions. If true, only return pinned discussions.',
+            'pinned:b?' => 'Whether or not to include pinned discussions. If true, only return pinned discussions. Discussions pinned in specific categories are not included unless the categoryID parameter is used.',
             'pinOrder:s?' => [
                 'enum' => ['first', 'mixed'],
-                'description' => 'If including pinned posts, in what order should they be integrated?'
+                'description' => 'If including pinned posts, in what order should they be integrated? Not compatible with the pinned parameter.'
             ],
             'page:i?' => [
                 'description' => 'Page number.',

@@ -1069,7 +1069,7 @@ class DiscussionModel extends Gdn_Model {
             $pinned = true;
             switch (intval($discussion->Announce)) {
                 case 1:
-                    $pinLocation = 'discussions';
+                    $pinLocation = 'recent';
                     break;
                 case 2:
                     $pinLocation = 'category';
@@ -1133,11 +1133,22 @@ class DiscussionModel extends Gdn_Model {
         $this->SQL->select('d.DiscussionID')
             ->from('Discussion d');
 
-        if (!is_array($categoryID) && ($categoryID > 0 || $groupID > 0)) {
-            $this->SQL->where('d.Announce >', '0');
-        } else {
-            $this->SQL->where('d.Announce', 1);
+        $announceOverride = false;
+        $whereFields = array_keys($wheres);
+        foreach ($whereFields as $field) {
+            if (stringBeginsWith($field, 'd.Announce')) {
+                $announceOverride = true;
+                break;
+            }
         }
+        if (!$announceOverride) {
+            if (!is_array($categoryID) && ($categoryID > 0 || $groupID > 0)) {
+                $this->SQL->where('d.Announce >', '0');
+            } else {
+                $this->SQL->where('d.Announce', 1);
+            }
+        }
+
         if ($groupID > 0) {
             $this->SQL->where('d.GroupID', $groupID);
         } elseif (is_array($categoryID)) {

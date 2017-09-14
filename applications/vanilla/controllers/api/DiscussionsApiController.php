@@ -127,7 +127,7 @@ class DiscussionsApiController extends AbstractApiController {
             'announce:b' => 'Whether or not the discussion has been announced (pinned).',
             'pinned:b?' => 'Whether or not the discussion has been pinned.',
             'pinLocation:s|n' => [
-                'enum' => ['category', 'discussions'],
+                'enum' => ['category', 'recent'],
                 'description' => 'The location for the discussion, if pinned.'
             ],
             'closed:b' => 'Whether the discussion is closed or open.',
@@ -227,10 +227,11 @@ class DiscussionsApiController extends AbstractApiController {
 
         $in = $this->schema([
             'categoryID:i?' => 'Filter by a category.',
-            'pinned:b?' => 'Whether or not to include pinned discussions. If true, only return pinned discussions. Discussions pinned in specific categories are not included unless the categoryID parameter is used.',
+            'pinned:b?' => 'Whether or not to include pinned discussions. If true, only return pinned discussions. Cannot be used with the pinOrder parameter.',
             'pinOrder:s?' => [
+                'default' => 'first',
+                'description' => 'If including pinned posts, in what order should they be integrated? Cannot be used with the pinned parameter.',
                 'enum' => ['first', 'mixed'],
-                'description' => 'If including pinned posts, in what order should they be integrated? Not compatible with the pinned parameter.'
             ],
             'page:i?' => [
                 'description' => 'Page number.',
@@ -261,10 +262,8 @@ class DiscussionsApiController extends AbstractApiController {
 
         $pinned = array_key_exists('pinned', $query) ? $query['pinned'] : null;
         if ($pinned === true) {
-            if (array_key_exists('categoryID', $where)) {
-                $where['d.CategoryID'] = $where['categoryID'];
-            }
-            $rows = $this->discussionModel->getAnnouncements($where, $offset, $limit)->resultArray();
+            $announceWhere = array_merge($where, ['d.Announce >' => '0']);
+            $rows = $this->discussionModel->getAnnouncements($announceWhere, $offset, $limit)->resultArray();
         } elseif ($pinned === false) {
             $rows = $this->discussionModel->getWhereRecent($where, $limit, $offset)->resultArray();
         } else {
@@ -274,7 +273,6 @@ class DiscussionsApiController extends AbstractApiController {
                     $where['d.CategoryID'] = $where['categoryID'];
                 }
                 $announcements = $this->discussionModel->getAnnouncements($where, $offset, $limit)->resultArray();
-                unset($where['d.CategoryID']);
                 $discussions = $this->discussionModel->getWhereRecent($where, $limit, $offset)->resultArray();
                 $rows = array_merge($announcements, $discussions);
             } else {

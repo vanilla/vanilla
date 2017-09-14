@@ -133,7 +133,8 @@ class DiscussionsApiController extends AbstractApiController {
     public function discussionPostSchema($type = '') {
         if ($this->discussionPostSchema === null) {
             $this->discussionPostSchema = $this->schema(
-                Schema::parse(['name', 'body', 'format', 'categoryID', 'closed?', 'sink?'])->add($this->fullSchema()),
+                Schema::parse(
+                    ['name', 'body', 'format', 'categoryID', 'closed?', 'sink?', 'pinned?', 'pinLocation?'])->add($this->fullSchema()),
                 'DiscussionPost'
             );
         }
@@ -168,7 +169,6 @@ class DiscussionsApiController extends AbstractApiController {
             'insertUserID:i' => 'The user that created the discussion.',
             'insertUser?' => $this->getUserFragmentSchema(),
             'bookmarked:b' => 'Whether or no the discussion is bookmarked by the current user.',
-            'announce:b' => 'Whether or not the discussion has been announced (pinned).',
             'pinned:b?' => 'Whether or not the discussion has been pinned.',
             'pinLocation:s|n' => [
                 'enum' => ['category', 'recent'],
@@ -231,7 +231,7 @@ class DiscussionsApiController extends AbstractApiController {
         $this->permission('Garden.SignIn.Allow');
 
         $in = $this->idParamSchema()->setDescription('Get a discussion for editing.');
-        $out = $this->schema(Schema::parse(['discussionID', 'name', 'body', 'format', 'categoryID'])->add($this->fullSchema()), 'out');
+        $out = $this->schema(Schema::parse(['discussionID', 'name', 'body', 'format', 'categoryID', 'sink', 'closed', 'pinned', 'pinLocation'])->add($this->fullSchema()), 'out');
 
         $row = $this->discussionByID($id);
         $row['Url'] = discussionUrl($row);

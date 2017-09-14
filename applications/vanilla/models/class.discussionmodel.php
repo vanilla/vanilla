@@ -1977,6 +1977,26 @@ class DiscussionModel extends Gdn_Model {
             $this->addUpdateFields($formPostValues);
         }
 
+        // Pinned-to-Announce translation
+        $isPinned = val('Pinned', $formPostValues, null);
+        if ($isPinned !== null) {
+            $announce = 0;
+            $isPinned = filter_var($isPinned, FILTER_VALIDATE_BOOLEAN);
+            if ($isPinned) {
+                $pinLocation = strtolower(val('PinLocation', $formPostValues, 'category'));
+                switch ($pinLocation) {
+                    case 'recent':
+                        $announce = 1;
+                        break;
+                    default:
+                        $announce = 2;
+                }
+
+            }
+            $formPostValues['Announce'] = $announce;
+            unset($announce);
+        }
+
         // Set checkbox values to zero if they were unchecked
         if (val('Announce', $formPostValues, '') === false) {
             $formPostValues['Announce'] = 0;

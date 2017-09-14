@@ -366,6 +366,7 @@ class DiscussionsApiController extends AbstractApiController {
         }
 
         $this->fieldPermission($body, 'closed', 'Vanilla.Discussions.Close', $categoryID);
+        $this->fieldPermission($body, 'pinned', 'Vanilla.Discussions.Announce', $categoryID);
         $this->fieldPermission($body, 'sink', 'Vanilla.Discussions.Sink', $categoryID);
 
         $this->discussionModel->save($discussionData);
@@ -392,6 +393,7 @@ class DiscussionsApiController extends AbstractApiController {
         $categoryID = $body['categoryID'];
         $this->discussionModel->categoryPermission('Vanilla.Discussions.Add', $categoryID);
         $this->fieldPermission($body, 'closed', 'Vanilla.Discussions.Close', $categoryID);
+        $this->fieldPermission($body, 'pinned', 'Vanilla.Discussions.Announce', $categoryID);
         $this->fieldPermission($body, 'sink', 'Vanilla.Discussions.Sink', $categoryID);
 
         $discussionData = $this->caseScheme->convertArrayKeys($body);

@@ -169,6 +169,11 @@ class DiscussionsApiController extends AbstractApiController {
             'insertUser?' => $this->getUserFragmentSchema(),
             'bookmarked:b' => 'Whether or no the discussion is bookmarked by the current user.',
             'announce:b' => 'Whether or not the discussion has been announced (pinned).',
+            'pinned:b?' => 'Whether or not the discussion has been pinned.',
+            'pinLocation:s|n' => [
+                'enum' => ['category', 'recent'],
+                'description' => 'The location for the discussion, if pinned. "category" are pinned to their own category. "recent" are pinned to the recent discussions list, as well as their own category.'
+            ],
             'closed:b' => 'Whether the discussion is closed or open.',
             'sink:b' => 'Whether or not the discussion has been sunk.',
             'countComments:i' => 'The number of comments on the discussion.',
@@ -266,6 +271,12 @@ class DiscussionsApiController extends AbstractApiController {
 
         $in = $this->schema([
             'categoryID:i?' => 'Filter by a category.',
+            'pinned:b?' => 'Whether or not to include pinned discussions. If true, only return pinned discussions. Cannot be used with the pinOrder parameter.',
+            'pinOrder:s?' => [
+                'default' => 'first',
+                'description' => 'If including pinned posts, in what order should they be integrated? When "first", discussions pinned to a specific category will only be affected if the discussion\'s category is passed as the categoryID parameter. Cannot be used with the pinned parameter.',
+                'enum' => ['first', 'mixed'],
+            ],
             'page:i?' => [
                 'description' => 'Page number.',
                 'default' => 1,
@@ -285,14 +296,36 @@ class DiscussionsApiController extends AbstractApiController {
 
         $query = $this->filterValues($query);
         $query = $in->validate($query);
+
         $where = array_intersect_key($query, array_flip(['categoryID', 'insertUserID']));
-        $where['Announce'] = 'all';
+        if (array_key_exists('categoryID', $where)) {
+            $where['d.CategoryID'] = $where['categoryID'];
+        }
+
         list($offset, $limit) = offsetLimit("p{$query['page']}", $query['limit']);
 
         if (array_key_exists('categoryID', $where)) {
             $this->discussionModel->categoryPermission('Vanilla.Discussions.View', $where['categoryID']);
         }
-        $rows = $this->discussionModel->getWhereRecent($where, $limit, $offset)->resultArray();
+
+        $pinned = array_key_exists('pinned', $query) ? $query['pinned'] : null;
+        if ($pinned === true) {
+            $announceWhere = array_merge($where, ['d.Announce >' => '0']);
+            $rows = $this->discussionModel->getAnnouncements($announceWhere, $offset, $limit)->resultArray();
+        } elseif ($pinned === false) {
+            $rows = $this->discussionModel->getWhereRecent($where, $limit, $offset)->resultArray();
+        } else {
+            $pinOrder = array_key_exists('pinOrder', $query) ? $query['pinOrder'] : null;
+            if ($pinOrder == 'first') {
+                $announcements = $this->discussionModel->getAnnouncements($where, $offset, $limit)->resultArray();
+                $discussions = $this->discussionModel->getWhereRecent($where, $limit, $offset)->resultArray();
+                $rows = array_merge($announcements, $discussions);
+            } else {
+                $where['Announce'] = 'all';
+                $rows = $this->discussionModel->getWhereRecent($where, $limit, $offset)->resultArray();
+            }
+        }
+
         if (!empty($query['expand'])) {
             $this->userModel->expandUsers($rows, ['InsertUserID']);
         }

@@ -62,4 +62,18 @@ abstract class AbstractApiController extends \Vanilla\Web\Controller {
     public function options($path) {
         return '';
     }
+
+    /**
+     * Verify current user permission, if a particular field is in a data array.
+     *
+     * @param array $data The data array (e.g. request body fields).
+     * @param string $field The protected field name.
+     * @param string|array $permission A required permissions.
+     * @param int|null $id The ID of the record we are checking the permission of (e.g. category ID).
+     */
+    public function fieldPermission(array $data, $field, $permission, $id = null) {
+        if (array_key_exists($field, $data)) {
+            $this->permission($permission, $id);
+        }
+    }
 }

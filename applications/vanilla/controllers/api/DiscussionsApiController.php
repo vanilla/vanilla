@@ -133,7 +133,7 @@ class DiscussionsApiController extends AbstractApiController {
     public function discussionPostSchema($type = '') {
         if ($this->discussionPostSchema === null) {
             $this->discussionPostSchema = $this->schema(
-                Schema::parse(['name', 'body', 'format', 'categoryID'])->add($this->fullSchema()),
+                Schema::parse(['name', 'body', 'format', 'categoryID', 'closed?', 'sink?'])->add($this->fullSchema()),
                 'DiscussionPost'
             );
         }
@@ -356,12 +356,17 @@ class DiscussionsApiController extends AbstractApiController {
         $row = $this->discussionByID($id);
         $discussionData = $this->caseScheme->convertArrayKeys($body);
         $discussionData['DiscussionID'] = $id;
+        $categoryID = $row['CategoryID'];
         if ($row['InsertUserID'] !== $this->getSession()->UserID) {
-            $this->discussionModel->categoryPermission('Vanilla.Discussions.Edit', $row['CategoryID']);
+            $this->discussionModel->categoryPermission('Vanilla.Discussions.Edit', $categoryID);
         }
-        if (array_key_exists('CategoryID', $discussionData) && $row['CategoryID'] !== $discussionData['CategoryID']) {
+        if (array_key_exists('CategoryID', $discussionData) && $categoryID !== $discussionData['CategoryID']) {
             $this->discussionModel->categoryPermission('Vanilla.Discussions.Add', $discussionData['CategoryID']);
+            $categoryID = $discussionData['CategoryID'];
         }
+
+        $this->fieldPermission($body, 'closed', 'Vanilla.Discussions.Close', $categoryID);
+        $this->fieldPermission($body, 'sink', 'Vanilla.Discussions.Sink', $categoryID);
 
         $this->discussionModel->save($discussionData);
 
@@ -384,7 +389,10 @@ class DiscussionsApiController extends AbstractApiController {
         $out = $this->schema($this->discussionSchema(), 'out');
 
         $body = $in->validate($body);
-        $this->discussionModel->categoryPermission('Vanilla.Discussions.Add', $body['categoryID']);
+        $categoryID = $body['categoryID'];
+        $this->discussionModel->categoryPermission('Vanilla.Discussions.Add', $categoryID);
+        $this->fieldPermission($body, 'closed', 'Vanilla.Discussions.Close', $categoryID);
+        $this->fieldPermission($body, 'sink', 'Vanilla.Discussions.Sink', $categoryID);
 
         $discussionData = $this->caseScheme->convertArrayKeys($body);
         $id = $this->discussionModel->save($discussionData);
@@ -398,33 +406,6 @@ class DiscussionsApiController extends AbstractApiController {
         $this->prepareRow($row);
         $result = $out->validate($row);
         return new Data($result, 201);
-    }
-
-    /**
-     * Announce a discussion.
-     *
-     * @param int $id The ID of the discussion.
-     * @param array $body The request body.
-     * @throws NotFoundException if unable to find the discussion.
-     * @return array
-     */
-    public function put_announce($id, array $body) {
-        $this->permission('Garden.SignIn.Allow');
-
-        $in = $this
-            ->schema(['announce:b' => 'Pass true to announce or false to unannounce.'], 'in')
-            ->setDescription('Announce a discussion.');
-        $out = $this->schema(['announce:b' => 'The current announce value.'], 'out');
-
-        $row = $this->discussionByID($id);
-        $this->discussionModel->categoryPermission('Vanilla.Discussions.Announce', $row['CategoryID']);
-
-        $body = $in->validate($body);
-        $announce = intval($body['announce']);
-        $this->discussionModel->setField($row['DiscussionID'], 'Announce', $announce);
-
-        $result = $this->discussionByID($id);
-        return $out->validate($result);
     }
 
     /**
@@ -449,57 +430,6 @@ class DiscussionsApiController extends AbstractApiController {
         $this->discussionModel->bookmark($id, $this->getSession()->UserID, $bookmarked);
 
         $result = $this->discussionByID($id);
-        return $out->validate($result);
-    }
-
-    /**
-     * Close a discussion.
-     *
-     * @param int $id The ID of the discussion.
-     * @param array $body The request body.
-     * @return array
-     */
-    public function put_close($id, array $body) {
-        $this->permission('Garden.SignIn.Allow');
-
-        $in = $this
-            ->schema(['closed:b' => 'Pass true to close or false to open.'], 'in')->setDescription('Close a discussion.');
-        $out = $this->schema(['closed:b' => 'The current close value.'], 'out');
-
-        $row = $this->discussionByID($id);
-        $this->discussionModel->categoryPermission('Vanilla.Discussions.Close', $row['CategoryID']);
-
-        $body = $in->validate($body);
-        $closed = intval($body['closed']);
-        $this->discussionModel->setField($row['DiscussionID'], 'Closed', $closed);
-
-        $result = $this->discussionByID($id);
-        return $out->validate($result);
-    }
-
-    /**
-     * Sink a discussion.
-     *
-     * @param int $id The ID of the discussion.
-     * @param array $body The request body.
-     * @return array
-     */
-    public function put_sink($id, array $body) {
-        $this->permission('Garden.SignIn.Allow');
-
-        $in = $this
-            ->schema(['sink:b' => 'Pass true to sink or false to unsink.'], 'in')->setDescription('Sink a discussion.');
-        $out = $this->schema(['sink:b' => 'The current sink value.'], 'out');
-
-        $row = $this->discussionByID($id);
-        $this->discussionModel->categoryPermission('Vanilla.Discussions.Sink', $row['CategoryID']);
-
-        $body = $in->validate($body);
-        $sink = intval($body['sink']);
-        $this->discussionModel->setField($row['DiscussionID'], 'Sink', $sink);
-
-        $result = $this->discussionByID($id);
-        $this->userModel->expandUsers($result, ['InsertUserID']);
         return $out->validate($result);
     }
 }

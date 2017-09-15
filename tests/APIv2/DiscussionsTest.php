@@ -19,7 +19,27 @@ class DiscussionsTest extends AbstractResourceTest {
         $this->baseUrl = '/discussions';
         $this->record += ['categoryID' => 1, 'name' => __CLASS__];
 
+        $this->patchFields = ['body', 'categoryID', 'closed', 'format', 'name', 'pinLocation', 'pinned', 'sink'];
+
         parent::__construct($name, $data, $dataName);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function modifyRow(array $row) {
+        $row = parent::modifyRow($row);
+
+        $row['closed'] = !$row['closed'];
+        $row['pinned'] = !$row['pinned'];
+        if ($row['pinned']) {
+            $row['pinLocation'] = $row['pinLocation'] == 'category' ? 'recent' : 'category';
+        } else {
+            $row['pinLocation'] = null;
+        }
+        $row['sink'] = !$row['sink'];
+
+        return $row;
     }
 
     /**
@@ -27,10 +47,7 @@ class DiscussionsTest extends AbstractResourceTest {
      */
     public function providePutFields() {
         $fields = [
-            'announce' => ['announce', true],
             'bookmark' => ['bookmark', true, 'bookmarked'],
-            'close' => ['close', true, 'closed'],
-            'sink' => ['sink', true]
         ];
         return $fields;
     }
@@ -45,5 +62,20 @@ class DiscussionsTest extends AbstractResourceTest {
         $bookmarked = $this->api()->get("{$this->baseUrl}/bookmarked")->getBody();
         $discussionIDs = array_column($bookmarked, 'discussionID');
         $this->assertContains($rowID, $discussionIDs);
+    }
+
+    /**
+     * Test PATCH /discussions/<id> with a a single field update.
+     *
+     * @param string $field The name of the field to patch.
+     * @dataProvider providePatchFields
+     */
+    public function testPatchSparse($field) {
+        // pinLocation doesn't do anything on its own, it requires pinned. It's not a good candidate for a single-field sparse PATCH.
+        if ($field == 'pinLocation') {
+            $this->markTestSkipped('pinLocation cannot be used alone in PATCH.');
+        }
+
+        parent::testPatchSparse($field);
     }
 }

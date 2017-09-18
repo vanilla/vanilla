@@ -901,11 +901,6 @@ if (c('Database.CharacterEncoding') !== 'utf8mb4') {
 touchFolder(PATH_CACHE.'/Smarty/cache');
 touchFolder(PATH_CACHE.'/Smarty/compile');
 
-// Lock the current database character Encoding
-saveToConfig('Database.CharacterEncoding', c('Database.CharacterEncoding'));
-saveToConfig('Database.ExtendedProperties.Collate', c('Database.ExtendedProperties.Collate'));
-
-
 // For Touch Icon
 if (c('Plugins.TouchIcon.Uploaded')) {
     saveToConfig('Garden.TouchIcon', 'TouchIcon/apple-touch-icon.png');

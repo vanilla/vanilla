@@ -227,6 +227,7 @@ class UsersApiController extends AbstractApiController {
         $userData = $this->caseScheme->convertArrayKeys($body);
         $userData['UserID'] = $id;
         $this->userModel->save($userData);
+        $this->validateModel($this->userModel);
         $row = $this->userByID($id);
         $this->prepareRow($row);
 
@@ -258,6 +259,7 @@ class UsersApiController extends AbstractApiController {
             'SaveRoles' => true
         ];
         $id = $this->userModel->save($userData, $settings);
+        $this->validateModel($this->userModel);
 
         if (!$id) {
             throw new ServerException('Unable to add user.', 500);

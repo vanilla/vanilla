@@ -36,10 +36,10 @@ class InternalRequest extends HttpRequest implements RequestInterface {
     /**
      * {@inheritdoc}
      */
-    public function getHeaderLine($name, $default = '') {
+    public function getHeaderLine($name) {
         $value = $this->getHeaderLines($name);
         if (empty($value)) {
-            $value = $default;
+            $value = '';
         } else {
             $value = implode(',', $value);
         }

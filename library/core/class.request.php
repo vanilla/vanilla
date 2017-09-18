@@ -357,10 +357,10 @@ class Gdn_Request implements RequestInterface {
     /**
      * {@inheritdoc}
      */
-    public function getHeaderLine($name, $default = '') {
+    public function getHeaderLine($name) {
         $value = $this->getHeader($name);
         if (empty($value)) {
-            $value = $default;
+            $value = '';
         } elseif (is_array($value)) {
             $value = implode(',', $value);
         }

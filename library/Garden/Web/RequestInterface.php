@@ -45,10 +45,9 @@ interface RequestInterface {
      * Get a header's value(s) as a string.
      *
      * @param string $name The name of the header.
-     * @param string $default
      * @return string A header's value(s). Multiple values are returned as a CSV string.
      */
-    public function getHeaderLine($name, $default = '');
+    public function getHeaderLine($name);
 
     /**
      * Checks if a header exists by the given case-insensitive name.

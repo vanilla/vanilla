@@ -370,6 +370,7 @@ class DiscussionsApiController extends AbstractApiController {
         $this->fieldPermission($body, 'sink', 'Vanilla.Discussions.Sink', $categoryID);
 
         $this->discussionModel->save($discussionData);
+        $this->validateModel($this->discussionModel);
 
         $result = $this->discussionByID($id);
         $this->prepareRow($result);
@@ -398,6 +399,7 @@ class DiscussionsApiController extends AbstractApiController {
 
         $discussionData = $this->caseScheme->convertArrayKeys($body);
         $id = $this->discussionModel->save($discussionData);
+        $this->validateModel($this->discussionModel);
 
         if (!$id) {
             throw new ServerException('Unable to insert discussion.', 500);

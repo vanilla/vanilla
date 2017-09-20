@@ -341,6 +341,7 @@ class CategoriesApiController extends AbstractApiController {
 
         $categoryData = $this->caseScheme->convertArrayKeys($body);
         $id = $this->categoryModel->save($categoryData);
+        $this->validateModel($this->categoryModel);
 
         if (!$id) {
             throw new ServerException('Unable to add category.', 500);

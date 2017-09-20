@@ -340,6 +340,7 @@ class CommentsApiController extends AbstractApiController {
             $commentData['Body'] = $row['Body'];
         }
         $this->commentModel->save($commentData);
+        $this->validateModel($this->commentModel);
         $row = $this->commentByID($id);
         $this->userModel->expandUsers($row, ['InsertUserID']);
         $this->prepareRow($row);
@@ -366,6 +367,7 @@ class CommentsApiController extends AbstractApiController {
         $discussion = $this->discussionByID($commentData['DiscussionID']);
         $this->discussionModel->categoryPermission('Vanilla.Comments.Add', $discussion['CategoryID']);
         $id = $this->commentModel->save($commentData);
+        $this->validateModel($this->commentModel);
         if (!$id) {
             throw new ServerException('Unable to insert comment.', 500);
         }

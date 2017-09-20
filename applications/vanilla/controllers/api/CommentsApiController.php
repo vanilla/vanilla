@@ -249,14 +249,14 @@ class CommentsApiController extends AbstractApiController {
             $after = $after->format(DateTime::ATOM);
         }
 
+        list($offset, $limit) = offsetLimit("p{$query['page']}", $query['limit']);
+
         // Lookup by discussion or by user?
         if (array_key_exists('discussionID', $query)) {
             $discussion = $this->discussionByID($query['discussionID']);
-            list($offset, $limit) = offsetLimit("p{$query['page']}", $query['limit']);
             $this->discussionModel->categoryPermission('Vanilla.Discussions.View', $discussion['CategoryID']);
 
-            // Build up the where clause.
-            $where = ['DiscussionID' => $query['discussionID'], 'joinUsers' => false];
+            $where = [];
 
             if (isset($query['insertUserID'])) {
                 $where['InsertUserID'] = $query['insertUserID'];
@@ -266,18 +266,17 @@ class CommentsApiController extends AbstractApiController {
                 $where['DateInserted >'] = $after;
             }
 
-            $rows = $this->commentModel->getWhere(
-                $where,
-                'DateInserted',
-                'asc',
+            $rows = $this->commentModel->getByDiscussion(
+                $query['discussionID'],
                 $limit,
-                $offset
+                $offset,
+                $where
             )->resultArray();
         } else {
             $rows = $this->commentModel->getByUser2(
                 $query['insertUserID'],
-                $query['limit'],
-                $query['offset'],
+                $limit,
+                $offset,
                 false,
                 $after,
                 'asc'

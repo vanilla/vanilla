@@ -126,6 +126,7 @@ class CategoriesApiController extends AbstractApiController {
                 'minLength' => 0,
                 'allowNull' => true
             ],
+            'parentCategoryID:i' => 'Parent category ID.',
             'urlCode:s' => 'The URL code of the category.',
             'url:s' => 'The URL to the category.',
             'countDiscussions:i' => 'Total discussions in the category.',
@@ -299,7 +300,10 @@ class CategoriesApiController extends AbstractApiController {
     public function patch($id, array $body) {
         $this->permission('Garden.Settings.Manage');
 
-        $in = $this->categoryPostSchema('in', ['description'])->setDescription('Update a category.');
+        $in = $this->categoryPostSchema('in', [
+            'description',
+            'parentCategoryID' => 'Parent category ID. Changing a category\'s parent will rebuild the category tree.'
+        ])->setDescription('Update a category.');
         $out = $this->schemaWithParent(false, 'out');
 
         $body = $in->validate($body, true);

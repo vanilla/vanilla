@@ -76,13 +76,12 @@ class CategoriesApiController extends AbstractApiController {
      * Lookup a single category by its numeric ID or its URL code.
      *
      * @param int|string $id The category ID or URL code.
-     * @param bool $throw Throw an exception if the category cannot be found.
      * @throws NotFoundException if the category cannot be found.
      * @return array
      */
-    public function category($id, $throw = true) {
+    public function category($id) {
         $category = CategoryModel::categories($id);
-        if (empty($category) && $throw) {
+        if (empty($category)) {
             throw new NotFoundException('Category');
         }
         return $category;
@@ -306,10 +305,18 @@ class CategoriesApiController extends AbstractApiController {
         $body = $in->validate($body, true);
         // If a row associated with this ID cannot be found, a "not found" exception will be thrown.
         $this->category($id);
-        $categoryData = $this->caseScheme->convertArrayKeys($body);
-        $this->categoryModel->setField($id, $categoryData);
-        $row = $this->category($id);
 
+        if (array_key_exists('parentCategoryID', $body)) {
+            $this->updateParent($id, $body['parentCategoryID']);
+            unset($body['parentCategoryID']);
+        }
+
+        if (!empty($body)) {
+            $categoryData = $this->caseScheme->convertArrayKeys($body);
+            $this->categoryModel->setField($id, $categoryData);
+        }
+
+        $row = $this->category($id);
         $result = $out->validate($row);
         return $result;
     }
@@ -358,27 +365,18 @@ class CategoriesApiController extends AbstractApiController {
     /**
      * Move a category under a new parent.
      *
-     * @param int $id The ID of the category.
-     * @param array $body The request body.
+     * @param int $categoryID The ID of the category.
+     * @param int $parentCategoryID The new parent category ID.
+     * @param bool $rebuildTree Should the tree be rebuilt after moving?
      * @throws NotFoundException if unable to find the category.
      * @throws ClientException if the parent and category are the same.
      * @throws ClientException if the parent category ID is invalid.
      * @throws ClientException if the target parent category does not exist.
      * @throws ClientException if trying to move a category under one of its own children.
-     * @return array
+     * @return array The updated category row.
      */
-    public function put_parentCategoryID($id, array $body) {
-        $this->permission(['Garden.Community.Manage', 'Garden.Settings.Manage']);
-
-        $in = $this
-            ->schema(['parentCategoryID:i' => 'New parent for the category.'], 'in')
-            ->setDescription('Move a category.');
-        $out = $this->schema(['parentCategoryID:i' => 'The current parent category ID.'], 'out');
-
-        $body = $in->validate($body);
-        $parentCategoryID = intval($body['parentCategoryID']);
-
-        if ($id == $parentCategoryID) {
+    private function updateParent($categoryID, $parentCategoryID, $rebuildTree = true) {
+        if ($categoryID == $parentCategoryID) {
             throw new ClientException('A category cannot be the parent of itself.');
         }
 
@@ -386,25 +384,30 @@ class CategoriesApiController extends AbstractApiController {
             throw new ClientException('parentCategoryID must be -1 or greater than zero.');
         }
 
-        $parentCategory = $this->category($parentCategoryID, false);
-        if (!is_array($parentCategory)) {
+        // Make sure the parent exists.
+        try {
+            $this->category($parentCategoryID);
+        } catch (Exception $e) {
             throw new ClientException('The new parent category could not be found.');
         }
 
         // Make sure the category exists.
-        $this->category($id);
+        $this->category($categoryID);
 
-        $childTree = CategoryModel::flattenTree($this->categoryModel->getChildTree($id));
+        $childTree = CategoryModel::flattenTree($this->categoryModel->getChildTree($categoryID));
         $children = array_column($childTree, 'CategoryID');
         if (in_array($parentCategoryID, $children)) {
             throw new ClientException('Cannot move a category under one of its own children.');
         }
 
-        $this->categoryModel->setField($id, 'ParentCategoryID', $parentCategoryID);
-        $this->categoryModel->rebuildTree();
+        $this->categoryModel->setField($categoryID, 'ParentCategoryID', $parentCategoryID);
 
-        $result = $this->category($id);
-        return $out->validate($result);
+        if ($rebuildTree) {
+            $this->categoryModel->rebuildTree();
+        }
+
+        $result = $this->category($categoryID);
+        return $result;
     }
 
     /**

@@ -36,6 +36,19 @@ class InternalRequest extends HttpRequest implements RequestInterface {
     /**
      * {@inheritdoc}
      */
+    public function getHeaderLine($name) {
+        $value = $this->getHeaderLines($name);
+        if (empty($value)) {
+            $value = '';
+        } else {
+            $value = implode(',', $value);
+        }
+        return $value;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function getHost() {
         return parse_url($this->getUrl(), PHP_URL_HOST);
     }

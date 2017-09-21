@@ -67,6 +67,9 @@ class Gdn_Request implements RequestInterface {
     /** HTTP request method. */
     const METHOD_OPTIONS = 'OPTIONS';
 
+    /** Special cases in $_SERVER that are also considered headers. */
+    const SPECIAL_HEADERS = ['CONTENT_TYPE', 'CONTENT_LENGTH', 'PHP_AUTH_USER', 'PHP_AUTH_PW', 'PHP_AUTH_DIGEST', 'AUTH_TYPE'];
+
     /** @var bool Whether or not _ParseRequest has been called yet. */
     protected $_HaveParsedRequest = false;
 
@@ -240,6 +243,25 @@ class Gdn_Request implements RequestInterface {
     }
 
     /**
+     * Convert a header key from HTTP_HEADER_NAME format to Header-Name.
+     *
+     * @param string $key A header key.
+     * @return string The formatted header key.
+     */
+    private function formatHeaderKey($key) {
+        $key = $this->headerKey($key);
+        if (substr($key, 0, 5) == 'HTTP_') {
+            $key = substr($key, 5);
+        }
+        $key = strtolower($key);
+        $key = str_replace('_', '-', $key);
+        $key = preg_replace_callback('/(?<=^|\-)[a-z]/', function ($m) {
+            return strtoupper($m[0]);
+        }, $key);
+        return $key;
+    }
+
+    /**
      * Chainable lazy Environment Bootstrap
      *
      * Convenience method allowing quick setup of the default request state... from the current environment.
@@ -326,20 +348,45 @@ class Gdn_Request implements RequestInterface {
     }
 
     /**
-     * Get a header value.
-     *
-     * @param string $header The name of the header.
-     * @return string Returns the header value or an empty string.
+     * {@inheritdoc}
      */
     public function getHeader($header) {
         return $this->getValueFrom(self::INPUT_SERVER, $this->headerKey($header), '');
     }
 
     /**
-     * Checks if a header exists by the given case-insensitive name.
-     *
-     * @param string $header Case-insensitive header name.
-     * @return bool Returns **true** if the header exists or **false** otherwise.
+     * {@inheritdoc}
+     */
+    public function getHeaderLine($name) {
+        $value = $this->getHeader($name);
+        if (empty($value)) {
+            $value = '';
+        } elseif (is_array($value)) {
+            $value = implode(',', $value);
+        }
+        return $value;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getHeaders() {
+        $server = $this->getRequestArguments(self::INPUT_SERVER);
+
+        $headers = [];
+        foreach ($server as $name => $val) {
+            if (substr($name, 0, 5) != 'HTTP_' && !in_array($name, self::SPECIAL_HEADERS)) {
+                continue;
+            }
+
+            $name = $this->formatHeaderKey($name);
+            $headers[$name] = $val;
+        }
+        return $headers;
+    }
+
+    /**
+     * {@inheritdoc}
      */
     public function hasHeader($header) {
         return !empty($this->getHeader($header));
@@ -353,7 +400,7 @@ class Gdn_Request implements RequestInterface {
      */
     private function headerKey($name) {
         $key = strtoupper(str_replace('-', '_', $name));
-        if ($key !== 'CONTENT_TYPE') {
+        if (substr($key, 0, 5) != 'HTTP_' && !in_array($key, self::SPECIAL_HEADERS)) {
             $key = 'HTTP_'.$key;
         }
         return $key;

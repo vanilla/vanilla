@@ -129,6 +129,7 @@ class CategoriesApiController extends AbstractApiController {
             'parentCategoryID:i' => 'Parent category ID.',
             'urlCode:s' => 'The URL code of the category.',
             'url:s' => 'The URL to the category.',
+            'countCategories:i' => 'Total number of child categories.',
             'countDiscussions:i' => 'Total discussions in the category.',
             'countComments:i' => 'Total comments in the category.',
             'countAllDiscussions:i' => 'Total of all discussions in a category and its children.',
@@ -408,6 +409,7 @@ class CategoriesApiController extends AbstractApiController {
 
         if ($rebuildTree) {
             $this->categoryModel->rebuildTree();
+            $this->categoryModel->recalculateTree();
         }
 
         $result = $this->category($categoryID);

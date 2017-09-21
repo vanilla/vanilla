@@ -6,7 +6,6 @@
 
 namespace Vanilla\Models;
 
-//use Interop\Container\ContainerInterface;
 use Gdn_Configuration;
 use Gdn_Session;
 use UserModel;
@@ -27,10 +26,6 @@ class SSOModel {
     /** @var CapitalCaseScheme */
     private $capitalCaseScheme;
 
-//    /** @var Container */
-//    private $container;
-
-
     /** @var  \Gdn_Session */
     private $session;
 
@@ -42,21 +37,18 @@ class SSOModel {
      *
      * @param AddonManager $addonManager
      * @param Gdn_Configuration $config
-//     * @param ContainerInterface $container
      * @param Gdn_Session $session
      * @param UserModel $userModel
      */
     public function __construct(
         AddonManager $addonManager,
         Gdn_Configuration $config,
-//        ContainerInterface $container,
         Gdn_Session $session,
         UserModel $userModel
     ) {
         $this->addonManager = $addonManager;
         $this->capitalCaseScheme = new CapitalCaseScheme();
         $this->config = $config;
-//        $this->container = $container;
         $this->session = $session;
         $this->userModel = $userModel;
     }
@@ -128,6 +120,12 @@ class SSOModel {
         return $this->userModel->getWhere()->resultArray();
     }
 
+    /**
+     * Do an authentication using the provided SSOInfo.
+     *
+     * @param SSOInfo $ssoInfo
+     * @return array|false The authenticated user info or false.
+     */
     public function sso(SSOInfo $ssoInfo) {
         // Will throw a proper exception.
         $ssoInfo->validate();
@@ -181,6 +179,8 @@ class SSOModel {
                     );
                 }
             }
+        } else {
+            $user = false;
         }
 
         return $user;

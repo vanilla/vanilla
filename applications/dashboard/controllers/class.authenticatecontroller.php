@@ -70,10 +70,18 @@ class AuthenticateController extends Gdn_Controller {
         $this->userModel = $userModel;
     }
 
+    /**
+     * Get the controller's form.
+     *
+     * @return Gdn_Form
+     */
     public function getForm() {
         return $this->form;
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function initialize() {
         // Set up head
         $this->Head = new HeadModule($this);
@@ -95,6 +103,13 @@ class AuthenticateController extends Gdn_Controller {
         parent::initialize();
     }
 
+    /**
+     * Do an authentication using the specified authenticator.
+     *
+     * @param string $authenticator The authenticator's name.
+     * @param string $authenticatorID The authenticator's instance ID.
+     * @throws Exception
+     */
     public function index($authenticator, $authenticatorID = '') {
         try {
             $response = $this->authenticateApiController->get_auth($authenticator, $authenticatorID);
@@ -119,7 +134,9 @@ class AuthenticateController extends Gdn_Controller {
     }
 
     /**
-     * @param $authSessionID
+     * Create a connection between a provider and a vanilla user.
+     *
+     * @param $authSessionID The authentication session ID.
      * @throws Gdn_UserException
      */
     public function connectUser($authSessionID) {

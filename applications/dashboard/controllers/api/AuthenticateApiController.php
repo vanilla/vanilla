@@ -31,9 +31,6 @@ class AuthenticateApiController extends AbstractApiController {
     /** @var CamelCaseScheme */
     private $camelCaseScheme;
 
-//    /** @var CapitalCaseScheme */
-//    private $capitalCaseScheme;
-
     /** @var Gdn_Configuration */
     private $config;
 
@@ -74,7 +71,6 @@ class AuthenticateApiController extends AbstractApiController {
     ) {
         $this->addonManager = $addonManager;
         $this->camelCaseScheme = new CamelCaseScheme();
-//        $this->capitalCaseScheme = new CapitalCaseScheme();
         $this->config = $config;
         $this->container = $container;
         $this->request = $request;
@@ -106,11 +102,11 @@ class AuthenticateApiController extends AbstractApiController {
      * Unlink a user from the specified authenticator.
      * If no user is specified it will unlink the current user.
      *
-     * @throws Exception
      *
-     * @param $authenticator
+     * @param string $authenticator
      * @param string $authenticatorID
      * @param array $query The query string as an array.
+     * @throws Exception
      */
     public function delete($authenticator, $authenticatorID = '', array $query) {
         $in = $this->schema([
@@ -140,6 +136,11 @@ class AuthenticateApiController extends AbstractApiController {
         );
     }
 
+    /**
+     * Delete a session.
+     *
+     * @param string $authSessionID
+     */
     public function delete_session($authSessionID) {
         $this->schema([
             'authSessionID:s' => 'Identifier of the authentication session.',
@@ -163,6 +164,14 @@ class AuthenticateApiController extends AbstractApiController {
         return $this->post_auth($authenticator, $authenticatorID);
     }
 
+    /**
+     * Get a session.
+     *
+     * @param string $authSessionID
+     * @param array $query
+     * @return array
+     * @throws Exception
+     */
     public function get_session($authSessionID, array $query) {
         $this->schema([
             'authSessionID:s' => 'Identifier of the authentication session.',
@@ -210,13 +219,13 @@ class AuthenticateApiController extends AbstractApiController {
     }
 
     /**
-     * Get an Authenticator
+     * Get an authenticator.
      *
-     * @throws Exception
-     *
-     * @param $authenticatorType
-     * @param $authenticatorID
+     * @param string $authenticatorType
+     * @param string $authenticatorID
      * @return Authenticator
+     * @throws NotFoundException
+     * @throws ServerException
      */
     public function getAuthenticator($authenticatorType, $authenticatorID) {
         if (empty($authenticatorType)) {
@@ -258,11 +267,10 @@ class AuthenticateApiController extends AbstractApiController {
     /**
      * Authenticate a user using the specified authenticator.
      *
-     * @throws Exception If the authentication process fails
-     * @throws NotFoundException If the $authenticatorType is not found.
-     *
      * @param string $authenticator
      * @param string $authenticatorID
+     * @throws Exception If the authentication process fails
+     * @throws NotFoundException If the $authenticatorType is not found.
      * @return array
      */
     public function post_auth($authenticator, $authenticatorID = '') {
@@ -343,7 +351,7 @@ class AuthenticateApiController extends AbstractApiController {
     }
 
     /**
-     *
+     * Get the SSOInfo schema.
      *
      * @return Schema
      */

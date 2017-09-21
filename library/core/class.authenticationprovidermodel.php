@@ -165,7 +165,7 @@ class Gdn_AuthenticationProviderModel extends Gdn_Model {
 
 
     /**
-     *
+     * Get a list of providers by (read type) scheme.
      *
      * @param $authenticationSchemeAlias
      * @return array

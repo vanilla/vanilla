@@ -20,7 +20,7 @@ class UsersTest extends AbstractResourceTest {
     protected $editFields = ['email', 'name'];
 
     /** {@inheritdoc} */
-    protected $patchFields = ['name', 'email', 'photo'];
+    protected $patchFields = ['name', 'email', 'photo', 'emailConfirmed', 'bypassSpam'];
 
     /**
      * {@inheritdoc}
@@ -63,6 +63,10 @@ class UsersTest extends AbstractResourceTest {
                 case 'photo':
                     $hash = md5(microtime());
                     $value = "https://vanillicon.com/v2/{$hash}.svg";
+                    break;
+                case 'emailConfirmed':
+                case 'bypassSpam':
+                    $value = !$value;
             }
             $row[$key] = $value;
         }
@@ -117,7 +121,12 @@ class UsersTest extends AbstractResourceTest {
      */
     public function testPost($record = null, array $extra = []) {
         $record = $this->record();
-        $result = parent::testPost($record, ['password' => 'vanilla']);
+        $fields = [
+            'bypassSpam' => true,
+            'emailConfirmed' => false,
+            'password' => 'vanilla'
+        ];
+        $result = parent::testPost($record, $fields);
         return $result;
     }
 }

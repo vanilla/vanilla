@@ -82,6 +82,26 @@ class Request implements RequestInterface {
     }
 
     /**
+     * {@inheritdoc}
+     */
+    public function getHeaderLine($name) {
+        $value = $this->getHeader($name);
+        if (empty($value)) {
+            $value = '';
+        } elseif (is_array($value)) {
+            $value = implode(',', $value);
+        }
+        return $value;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getHeaders() {
+        return $this->headers;
+    }
+
+    /**
      * Checks if a header exists by the given case-insensitive name.
      *
      * @param string $header Case-insensitive header name.

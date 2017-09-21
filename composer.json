@@ -42,6 +42,9 @@
         "vanilla/nbbc": "~2.1",
         "vanilla/garden-schema": "^1.4.2"
     },
+    "require-dev": {
+        "phpunit/phpunit": "~5.0"
+    },
     "provide": {
         "ext-gd": "*"
     },

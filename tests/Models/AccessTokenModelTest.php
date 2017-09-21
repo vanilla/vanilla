@@ -103,7 +103,9 @@ class AccessTokenModelTest extends \PHPUnit_Framework_TestCase {
         $model = new AccessTokenModel('sss');
         $token = $model->issue(1);
         $model->verify($token, true);
-        $model->deleteID($model->trim($token));
+        $row = $model->getToken($model->trim($token));
+        $id = $row['AccessTokenID'];
+        $model->deleteID($id);
         $model->verify($token, true);
     }
 }

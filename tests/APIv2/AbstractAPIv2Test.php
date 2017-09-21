@@ -27,6 +27,7 @@ abstract class AbstractAPIv2Test extends \PHPUnit_Framework_TestCase {
 
         $this->api = static::container()->getArgs(InternalClient::class, [static::container()->get('@baseUrl').'/api/v2']);
         $this->api->setUserID(self::$siteInfo['adminUserID']);
+        $this->api->setTransientKey(md5(now()));
     }
 
     /**

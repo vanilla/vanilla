@@ -27,6 +27,9 @@ class DiscussionModel extends Gdn_Model {
     /** @var string The filter key for clearing-type filters. */
     const EMPTY_FILTER_KEY = 'none';
 
+    /** Max comments on a discussion before it cannot be auto-deleted by SPAM or moderation actions. */
+    const DELETE_COMMENT_THRESHOLD = 10;
+
     /** @var array|bool */
     private static $categoryPermissions = null;
 
@@ -1062,6 +1065,22 @@ class DiscussionModel extends Gdn_Model {
             $discussion->LastDate = $discussion->DateInserted;
         }
 
+        // Translate Announce to Pinned.
+        $pinned = false;
+        $pinLocation = null;
+        if (property_exists($discussion, 'Announce') && $discussion->Announce > 0) {
+            $pinned = true;
+            switch (intval($discussion->Announce)) {
+                case 1:
+                    $pinLocation = 'recent';
+                    break;
+                case 2:
+                    $pinLocation = 'category';
+            }
+        }
+        $discussion->pinned = $pinned;
+        $discussion->pinLocation = $pinLocation;
+
         $this->EventArguments['Discussion'] = &$discussion;
         $this->fireEvent('SetCalculatedFields');
     }
@@ -1117,11 +1136,22 @@ class DiscussionModel extends Gdn_Model {
         $this->SQL->select('d.DiscussionID')
             ->from('Discussion d');
 
-        if (!is_array($categoryID) && ($categoryID > 0 || $groupID > 0)) {
-            $this->SQL->where('d.Announce >', '0');
-        } else {
-            $this->SQL->where('d.Announce', 1);
+        $announceOverride = false;
+        $whereFields = array_keys($wheres);
+        foreach ($whereFields as $field) {
+            if (stringBeginsWith($field, 'd.Announce')) {
+                $announceOverride = true;
+                break;
+            }
         }
+        if (!$announceOverride) {
+            if (!is_array($categoryID) && ($categoryID > 0 || $groupID > 0)) {
+                $this->SQL->where('d.Announce >', '0');
+            } else {
+                $this->SQL->where('d.Announce', 1);
+            }
+        }
+
         if ($groupID > 0) {
             $this->SQL->where('d.GroupID', $groupID);
         } elseif (is_array($categoryID)) {
@@ -1948,6 +1978,26 @@ class DiscussionModel extends Gdn_Model {
         } else {
             // Add the update fields.
             $this->addUpdateFields($formPostValues);
+        }
+
+        // Pinned-to-Announce translation
+        $isPinned = val('Pinned', $formPostValues, null);
+        if ($isPinned !== null) {
+            $announce = 0;
+            $isPinned = filter_var($isPinned, FILTER_VALIDATE_BOOLEAN);
+            if ($isPinned) {
+                $pinLocation = strtolower(val('PinLocation', $formPostValues, 'category'));
+                switch ($pinLocation) {
+                    case 'recent':
+                        $announce = 1;
+                        break;
+                    default:
+                        $announce = 2;
+                }
+
+            }
+            $formPostValues['Announce'] = $announce;
+            unset($announce);
         }
 
         // Set checkbox values to zero if they were unchecked

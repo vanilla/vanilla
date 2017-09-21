@@ -48,7 +48,7 @@ class UserModel extends Gdn_Model {
 
     /** Timeout for SSO */
     const SSO_TIMEOUT = 1200;
-    
+
     /** @var */
     public $SessionColumns;
 
@@ -2051,10 +2051,14 @@ class UserModel extends Gdn_Model {
 
         if (array_key_exists('Confirmed', $formPostValues)) {
             $formPostValues['Confirmed'] = forceBool($formPostValues['Confirmed'], '0', '1', '0');
+        } elseif (array_key_exists('EmailConfirmed', $formPostValues)) {
+            $formPostValues['Confirmed'] = forceBool($formPostValues['EmailConfirmed'], '1', '1', '0');
         }
 
         if (array_key_exists('Verified', $formPostValues)) {
             $formPostValues['Verified'] = forceBool($formPostValues['Verified'], '0', '1', '0');
+        } elseif (array_key_exists('BypassSpam', $formPostValues)) {
+            $formPostValues['Verified'] = forceBool($formPostValues['BypassSpam'], '0', '1', '0');
         }
 
         // Do not allowing setting this via general save.
@@ -2858,6 +2862,8 @@ class UserModel extends Gdn_Model {
      *
      * @param array $formPostValues
      * @param array $options
+     *  - ValidateSpam
+     *  - CheckCaptcha
      * @return int UserID.
      */
     public function insertForApproval($formPostValues, $options = []) {
@@ -2884,11 +2890,14 @@ class UserModel extends Gdn_Model {
         $this->addInsertFields($formPostValues);
 
         if ($this->validate($formPostValues, true)) {
-            // Check for spam.
-            $spam = SpamModel::isSpam('Registration', $formPostValues);
-            if ($spam) {
-                $this->Validation->addValidationResult('Spam', 'You are not allowed to register at this time.');
-                return;
+
+            if (val('ValidateSpam', $options, true)) {
+                // Check for spam.
+                $spam = SpamModel::isSpam('Registration', $formPostValues);
+                if ($spam) {
+                    $this->Validation->addValidationResult('Spam', 'You are not allowed to register at this time.');
+                    return;
+                }
             }
 
             $fields = $this->Validation->validationFields(); // All fields on the form that need to be validated (including non-schema field rules defined above)
@@ -3518,12 +3527,15 @@ class UserModel extends Gdn_Model {
 
         $this->deleteContent($userID, $options, $content);
 
+        $userData = $this->getID($userID, DATASET_TYPE_ARRAY);
+
         // Remove the user's information
         $this->SQL->update('User')
             ->set([
                 'Name' => t('[Deleted User]'),
                 'Photo' => null,
                 'Password' => randomString('10'),
+                'HashMethod' => 'Random',
                 'About' => '',
                 'Email' => 'user_'.$userID.'@deleted.invalid',
                 'ShowEmail' => '0',
@@ -3535,7 +3547,13 @@ class UserModel extends Gdn_Model {
                 'DiscoveryText' => '',
                 'Preferences' => null,
                 'Permissions' => null,
-                'Attributes' => dbencode(['State' => 'Deleted']),
+                'Attributes' => dbencode([
+                    'State' => 'Deleted',
+                    // We cannot keep emails until we have a method to purge deleted users.
+                    // See https://github.com/vanilla/vanilla/pull/5808 for more details.
+                    'OriginalName' => $userData['Name'],
+                    'DeletedBy' => Gdn::session()->UserID,
+                ]),
                 'DateSetInvitations' => null,
                 'DateOfBirth' => null,
                 'DateUpdated' => Gdn_Format::toDateTime(),
@@ -3964,6 +3982,15 @@ class UserModel extends Gdn_Model {
             }
 
             setValue('PhotoUrl', $user, $photoUrl);
+        }
+
+        $confirmed = val('Confirmed', $user, null);
+        if ($confirmed !== null) {
+            setValue('EmailConfirmed', $user, $confirmed);
+        }
+        $verified = val('Verified', $user, null);
+        if ($verified !== null) {
+            setValue('BypassSpam', $user, $verified);
         }
 
         // We store IPs in the UserIP table. To avoid unnecessary queries, the full list is not built here. Shim for BC.

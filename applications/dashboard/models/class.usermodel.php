@@ -2512,7 +2512,7 @@ class UserModel extends Gdn_Model {
 
         if (is_array($filter)) {
             $where = $filter;
-            $keywords = $where['Keywords'];
+            $keywords = val('Keywords', $filter, '');
             $optimize = val('Optimize', $filter);
             unset($where['Keywords'], $where['Optimize']);
         } else {
@@ -2529,7 +2529,7 @@ class UserModel extends Gdn_Model {
         } elseif (preg_match('/^\d+$/', $keywords)) {
             $numericQuery = $keywords;
             $keywords = '';
-        } else {
+        } elseif (!empty($keywords)) {
             // Check to see if the search exactly matches a role name.
             $roleID = $this->SQL->getWhere('Role', ['Name' => $keywords])->value('RoleID');
         }

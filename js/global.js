@@ -1009,7 +1009,7 @@ jQuery(document).ready(function($) {
 
                 // If the message is dismissable, add a close button
                 if (css.indexOf('Dismissable') > 0)
-                    message = '<a class="Close"><span>&times;</span></a>' + message;
+                    message = '<a href="#" onclick="return false;" tabindex="0" class="Close"><span>&times;</span></a>' + message;
 
                 message = '<div class="InformMessage">' + message + '</div>';
                 // Insert any transient keys into the message (prevents csrf attacks in follow-on action urls).

@@ -139,7 +139,7 @@ class CommentsApiController extends AbstractApiController {
             'commentID:i' => 'The ID of the comment.',
             'discussionID:i' => 'The ID of the discussion.',
             'body:s' => 'The body of the comment.',
-            'format:s' => 'The output format of the comment.',
+            'format:s' => 'The input format of the comment.',
             'dateInserted:dt' => 'When the comment was created.',
             'insertUserID:i' => 'The user that created the comment.',
             'insertUser?' => $this->getUserFragmentSchema(),
@@ -249,14 +249,14 @@ class CommentsApiController extends AbstractApiController {
             $after = $after->format(DateTime::ATOM);
         }
 
+        list($offset, $limit) = offsetLimit("p{$query['page']}", $query['limit']);
+
         // Lookup by discussion or by user?
         if (array_key_exists('discussionID', $query)) {
             $discussion = $this->discussionByID($query['discussionID']);
-            list($offset, $limit) = offsetLimit("p{$query['page']}", $query['limit']);
             $this->discussionModel->categoryPermission('Vanilla.Discussions.View', $discussion['CategoryID']);
 
-            // Build up the where clause.
-            $where = ['DiscussionID' => $query['discussionID'], 'joinUsers' => false];
+            $where = [];
 
             if (isset($query['insertUserID'])) {
                 $where['InsertUserID'] = $query['insertUserID'];
@@ -266,18 +266,17 @@ class CommentsApiController extends AbstractApiController {
                 $where['DateInserted >'] = $after;
             }
 
-            $rows = $this->commentModel->getWhere(
-                $where,
-                'DateInserted',
-                'asc',
+            $rows = $this->commentModel->getByDiscussion(
+                $query['discussionID'],
                 $limit,
-                $offset
+                $offset,
+                $where
             )->resultArray();
         } else {
             $rows = $this->commentModel->getByUser2(
                 $query['insertUserID'],
-                $query['limit'],
-                $query['offset'],
+                $limit,
+                $offset,
                 false,
                 $after,
                 'asc'
@@ -340,6 +339,7 @@ class CommentsApiController extends AbstractApiController {
             $commentData['Body'] = $row['Body'];
         }
         $this->commentModel->save($commentData);
+        $this->validateModel($this->commentModel);
         $row = $this->commentByID($id);
         $this->userModel->expandUsers($row, ['InsertUserID']);
         $this->prepareRow($row);
@@ -366,6 +366,7 @@ class CommentsApiController extends AbstractApiController {
         $discussion = $this->discussionByID($commentData['DiscussionID']);
         $this->discussionModel->categoryPermission('Vanilla.Comments.Add', $discussion['CategoryID']);
         $id = $this->commentModel->save($commentData);
+        $this->validateModel($this->commentModel);
         if (!$id) {
             throw new ServerException('Unable to insert comment.', 500);
         }

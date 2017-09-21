@@ -512,8 +512,6 @@ class Gdn_Format {
      * @return string
      */
     public static function date($timestamp = '', $format = '') {
-        static $guestHourOffset;
-
         // Was a mysqldatetime passed?
         if ($timestamp !== null && !is_numeric($timestamp)) {
             $timestamp = self::toTimestamp($timestamp);
@@ -537,29 +535,8 @@ class Gdn_Format {
 
         $now = time();
 
-        // Alter the timestamp based on the user's hour offset
-        $session = Gdn::session();
-        $hourOffset = 0;
-
-        if ($session->UserID > 0) {
-            $hourOffset = $session->User->HourOffset;
-        } elseif (class_exists('DateTimeZone')) {
-            if (!isset($guestHourOffset)) {
-                $guestTimeZone = c('Garden.GuestTimeZone');
-                if ($guestTimeZone) {
-                    try {
-                        $timeZone = new DateTimeZone($guestTimeZone);
-                        $offset = $timeZone->getOffset(new DateTime('now', new DateTimeZone('UTC')));
-                        $guestHourOffset = floor($offset / 3600);
-                    } catch (Exception $ex) {
-                        $guestHourOffset = 0;
-                        // Do nothing, but don't set the timezone.
-                        logException($ex);
-                    }
-                }
-            }
-            $hourOffset = $guestHourOffset;
-        }
+        // Alter the timestamp based on the user's hour offset.
+        $hourOffset = Gdn::session()->hourOffset();
 
         if ($hourOffset <> 0) {
             $secondsOffset = $hourOffset * 3600;
@@ -2222,36 +2199,11 @@ EOT;
      * @return int The timestamp according to the user's timezone.
      */
     public static function toTimezone($timestamp) {
-        static $guestHourOffset;
-        $now = time();
-
-        // Alter the timestamp based on the user's hour offset
-        $session = Gdn::session();
-        $hourOffset = 0;
-
-        if ($session->UserID > 0) {
-            $hourOffset = $session->User->HourOffset;
-        } elseif (class_exists('DateTimeZone')) {
-            if (!isset($guestHourOffset)) {
-                $guestTimeZone = c('Garden.GuestTimeZone');
-                if ($guestTimeZone) {
-                    try {
-                        $timeZone = new DateTimeZone($guestTimeZone);
-                        $offset = $timeZone->getOffset(new DateTime('now', new DateTimeZone('UTC')));
-                        $guestHourOffset = floor($offset / 3600);
-                    } catch (Exception $ex) {
-                        $guestHourOffset = 0;
-                        logException($ex);
-                    }
-                }
-            }
-            $hourOffset = $guestHourOffset;
-        }
+        // Alter the timestamp based on the user's hour offset.
+        $hourOffset = Gdn::session()->hourOffset();
 
         if ($hourOffset <> 0) {
-            $secondsOffset = $hourOffset * 3600;
-            $timestamp += $secondsOffset;
-            $now += $secondsOffset;
+            $timestamp += $hourOffset * 3600;
         }
 
         return $timestamp;

@@ -11,7 +11,7 @@ namespace Garden\Web;
 /**
  * Represents the data in a web response.
  */
-class Data implements \JsonSerializable {
+class Data implements \JsonSerializable, \ArrayAccess {
     private $data;
 
     private $meta;
@@ -270,5 +270,49 @@ class Data implements \JsonSerializable {
         } else {
             echo json_encode($this, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_PARTIAL_OUTPUT_ON_ERROR);
         }
+    }
+
+    /**
+     * Whether a offset exists.
+     *
+     * @param mixed $offset An offset to check for.
+     * @return boolean true on success or false on failure.
+     * The return value will be casted to boolean if non-boolean was returned.
+     * @link http://php.net/manual/en/arrayaccess.offsetexists.php
+     */
+    public function offsetExists($offset) {
+        return isset($this->data[$offset]);
+    }
+
+    /**
+     * Offset to retrieve.
+     *
+     * @param mixed $offset The offset to retrieve.
+     * @return mixed Can return all value types.
+     * @link http://php.net/manual/en/arrayaccess.offsetget.php
+     */
+    public function offsetGet($offset) {
+        return $this->getDataItem($offset);
+    }
+
+    /**
+     * Offset to set.
+     *
+     * @param mixed $offset The offset to assign the value to.
+     * @param mixed $value The value to set.
+     * @link http://php.net/manual/en/arrayaccess.offsetset.php
+     */
+    public function offsetSet($offset, $value) {
+        $this->setDataItem($offset, $value);
+    }
+
+    /**
+     * Offset to unset.
+     *
+     * @param mixed $offset The offset to unset.
+     * @link http://php.net/manual/en/arrayaccess.offsetunset.php
+     */
+    public function offsetUnset($offset) {
+        unset($this->data[$offset]);
     }
 }

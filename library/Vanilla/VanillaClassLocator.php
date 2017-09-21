@@ -21,12 +21,36 @@ class VanillaClassLocator extends ClassLocator {
     private $eventManager;
 
     /**
+     * @var AddonManager
+     */
+    private $addonManager;
+
+    /**
      * VanillaClassLocator constructor.
      *
-     * @param EventManager $eventManager
+     * @param EventManager $eventManager The event manager used to find methods added via event handlers.
+     * @param AddonManager $addonManager The addon manager used to find classes with wildcard matches.
      */
-    public function __construct(EventManager $eventManager) {
+    public function __construct(EventManager $eventManager, AddonManager $addonManager) {
         $this->eventManager = $eventManager;
+        $this->addonManager = $addonManager;
+    }
+
+    /**
+     * @inheritdoc
+     *
+     * This version of **findClass** accepts glob style wildcards.
+     */
+    public function findClass($name) {
+        $classes = $this->addonManager->findClasses($name);
+
+        if (empty($classes)) {
+            return parent::findClass($name);
+        } elseif (count($classes) > 1) {
+            trigger_error(sprintf("There were %s classes found in %s for search: %s", count($classes), __CLASS__, $name));
+        }
+        return reset($classes);
+
     }
 
     /**

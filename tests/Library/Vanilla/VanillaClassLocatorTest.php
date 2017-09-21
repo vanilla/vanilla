@@ -6,9 +6,12 @@
 
 namespace VanillaTests\Library\Vanilla;
 
+use Deeply\Nested\Namespaced\Fixture\NamespacedPlugin;
 use Garden\Container\Container;
 use Interop\Container\ContainerInterface;
 use Garden\EventManager;
+use Vanilla\Addon;
+use Vanilla\AddonManager;
 use VanillaTests\Fixtures\BasicEventHandlers;
 use Vanilla\VanillaClassLocator;
 use VanillaTests\Fixtures\SomeController;
@@ -32,5 +35,21 @@ class VanillaClassLocatorTest extends ClassLocatorTest {
         list($object, $method) = $handler;
         $this->assertSame($container->get(BasicEventHandlers::class), $object);
         $this->assertSame(strtolower('someController_someEndpoint_method'), strtolower($method));
+    }
+
+    public function testFindClassWithWildcard() {
+        $addonManager = new AddonManager([
+            Addon::TYPE_ADDON => '/tests/fixtures/plugins',
+        ], PATH_ROOT.'/tests/cache/'.EventManager::classBasename(__CLASS__));
+        $addonManager->startAddonsByKey('namespaced-plugin', Addon::TYPE_ADDON);
+
+        $classLocator = new VanillaClassLocator(new EventManager(), $addonManager);
+
+        $className = $classLocator->findClass('*\\NamespacedPlugin');
+        $this->assertEquals(NamespacedPlugin::class, $className);
+
+        // The class locator should still locate regular classes.
+        $myClassName = $classLocator->findClass(__CLASS__);
+        $this->assertEquals(__CLASS__, $myClassName);
     }
 }

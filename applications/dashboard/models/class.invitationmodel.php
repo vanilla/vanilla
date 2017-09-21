@@ -49,15 +49,20 @@ class InvitationModel extends Gdn_Model {
      * @param string $invitationID
      * @param int $limit
      * @param int $offset
+     * @param bool $joinUsers
      * @return Gdn_DataSet
      * @throws Exception
      */
-    public function getByUserID($userID, $invitationID = '', $limit = 50, $offset = 0) {
+    public function getByUserID($userID, $invitationID = '', $limit = 50, $offset = 0, $joinUsers = true) {
         $this->SQL->select('i.*')
-            ->select('u.Name', '', 'AcceptedName')
-            ->from('Invitation i')
-            ->join('User u', 'i.AcceptedUserID = u.UserID', 'left')
-            ->where('i.InsertUserID', $userID)
+            ->from('Invitation i');
+
+        if ($joinUsers) {
+            $this->SQL->select('u.Name', '', 'AcceptedName')
+                ->join('User u', 'i.AcceptedUserID = u.UserID', 'left');
+        }
+
+        $this->SQL->where('i.InsertUserID', $userID)
             ->orderBy('i.DateInserted', 'desc')
             ->limit($limit, $offset);
 
@@ -73,16 +78,16 @@ class InvitationModel extends Gdn_Model {
      *
      *
      * @param array $formPostValues
-     * @param array|bool $userModel
-     * @param array $options
-     * @return bool
+     * @param array|bool $settings
      * @throws Exception
+     * @return bool|array
      */
-    public function save($formPostValues, $userModel, $options = []) {
+    public function save($formPostValues, $settings = false) {
         $session = Gdn::session();
         $userID = $session->UserID;
-        $sendEmail = val('SendEmail', $options, true);
-        $resend = val('Resend', $options, false);
+        $sendEmail = val('SendEmail', $settings, true);
+        $resend = val('Resend', $settings, false);
+        $returnRow = val('ReturnRow', $settings, false);
 
         // Define the primary key in this model's table.
         $this->defineSchema();
@@ -103,6 +108,7 @@ class InvitationModel extends Gdn_Model {
 
         // Validate the form posted values
         if ($this->validate($formPostValues, true) === true) {
+            $userModel = Gdn::userModel();
             $fields = $this->Validation->validationFields(); // All fields on the form that need to be validated
             $email = val('Email', $fields, '');
 
@@ -158,7 +164,12 @@ class InvitationModel extends Gdn_Model {
                     return false;
                 }
             }
-            return true;
+
+            if ($returnRow) {
+                return (array)$this->getByInvitationID($invitationID);
+            } else {
+                return true;
+            }
         }
         return false;
     }
@@ -205,18 +216,27 @@ class InvitationModel extends Gdn_Model {
     }
 
     /**
-     *
-     *
-     * @param string|unknown_type $invitationID
-     * @return bool
-     * @throws Exception
+     * {@inheritdoc}
      */
-    public function delete($invitationID) {
+    public function delete($where = [], $options = []) {
+        if (is_numeric($where)) {
+            deprecated('InvitationModel->delete(int)', 'InvitationModel->deleteID(int)');
+            $result = $this->deleteID($where, $options);
+            return $result;
+        }
+
+        parent::delete($where, $options);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function deleteID($id, $options = []) {
         $session = Gdn::session();
         $userID = $session->UserID;
 
         // Validate that this user can delete this invitation:
-        $invitation = $this->getID($invitationID, DATASET_TYPE_ARRAY);
+        $invitation = $this->getID($id, DATASET_TYPE_ARRAY);
 
         // Does the invitation exist?
         if (!$invitation) {
@@ -229,14 +249,14 @@ class InvitationModel extends Gdn_Model {
         }
 
         // Delete it.
-        $this->SQL->delete($this->Name, ['InvitationID' => $invitationID]);
+        $result = $this->SQL->delete($this->Name, ['InvitationID' => $id]);
 
         // Add the invitation back onto the user's account if the invitation has not been accepted.
-        if (!$invitation->AcceptedUserID) {
+        if ($result && !$invitation->AcceptedUserID) {
             Gdn::userModel()->increaseInviteCount($userID);
         }
 
-        return true;
+        return $result;
     }
 
     /**

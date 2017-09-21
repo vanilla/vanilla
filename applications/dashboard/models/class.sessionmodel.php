@@ -42,4 +42,23 @@ class SessionModel extends Gdn_Model {
 
         parent::update($fields, $where, $limit);
     }
+
+    /**
+     * Tells whether a session is expired or not.
+     *
+     * @param array|string $session Session object or SessionID
+     * @return bool
+     */
+    public function isExpired($session) {
+        if (is_string($session)) {
+            $session = $this->getID($session, DATASET_TYPE_ARRAY);
+        }
+
+        $time = strtotime($session['DateExpire']);
+        if ($time && $time < time()) {
+            return true;
+        }
+
+        return false;
+    }
 }

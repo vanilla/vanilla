@@ -1,10 +1,11 @@
 <?php
 /**
+ * @author Alexandre (DaazKu) Chouinard <alexandre.c@vanillaforums.com>
  * @copyright 2009-2017 Vanilla Forums Inc.
  * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
  */
 
-namespace Vanilla;
+namespace Vanilla\Authenticator;
 
 use Garden\Web\RequestInterface;
 
@@ -23,10 +24,15 @@ abstract class Authenticator {
     /**
      * Authenticator constructor.
      *
+     * @throws \Exception
      * @param string $authenticatorID
      */
     public function __construct($authenticatorID) {
         $this->authenticatorID = $authenticatorID;
+
+        if (array_pop(explode('\\', static::class)) !== $this->getNameImpl(static::class).'Authenticator') {
+            throw new \Exception('Authenticator class name must end with Authenticator');
+        }
     }
 
     /**
@@ -45,5 +51,24 @@ abstract class Authenticator {
      */
     public final function getID() {
         return $this->authenticatorID;
+    }
+
+    /**
+     * Default getName implementation.
+     *
+     * @return string
+     */
+    private function getNameImpl() {
+        // return Name from "{Name}Authenticator"
+        return (string)substr(array_pop(explode('\\', static::class)), 0, -strlen('Authenticator'));
+    }
+
+    /**
+     * Getter of the authenticator's Name.
+     *
+     * @return string
+     */
+    public function getName() {
+        return $this->getNameImpl();
     }
 }

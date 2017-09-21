@@ -163,6 +163,26 @@ class Gdn_AuthenticationProviderModel extends Gdn_Model {
         return false;
     }
 
+
+    /**
+     *
+     *
+     * @param $authenticationSchemeAlias
+     * @return array
+     */
+    public function getProvidersByScheme($authenticationSchemeAlias) {
+        $providers = $this->SQL
+            ->select('uap.*')
+            ->from('UserAuthenticationProvider uap')
+            ->where('uap.AuthenticationSchemeAlias', $authenticationSchemeAlias)
+            ->get()
+            ->resultArray();
+
+        self::calculate($providers);
+
+        return $providers;
+    }
+
     /**
      *
      *

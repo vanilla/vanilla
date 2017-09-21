@@ -4,12 +4,18 @@
  * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
  */
 
+use Garden\Schema\Schema;
 use Garden\Web\Exception\ClientException;
 use Garden\Web\Exception\NotFoundException;
 use Garden\Web\Exception\ServerException;
 use Garden\Web\RequestInterface;
+use Interop\Container\ContainerInterface;
+use Vanilla\AddonManager;
+use Vanilla\Authenticator\Authenticator;
+use Vanilla\Authenticator\SSOAuthenticator;
 use Vanilla\Models\SSOModel;
-use Vanilla\Models\SSOUserInfo;
+use Vanilla\Models\SSOInfo;
+use Vanilla\Utility\CamelCaseScheme;
 use Vanilla\Utility\CapitalCaseScheme;
 
 /**
@@ -19,11 +25,20 @@ class AuthenticateApiController extends AbstractApiController {
 
     const SESSION_ID_EXPIRATION = 1200; // 20 minutes
 
-    /** @var CapitalCaseScheme */
-    private $caseScheme;
+    /** @var AddonManager */
+    private $addonManager;
+
+    /** @var CamelCaseScheme */
+    private $camelCaseScheme;
+
+//    /** @var CapitalCaseScheme */
+//    private $capitalCaseScheme;
 
     /** @var Gdn_Configuration */
     private $config;
+
+    /** @var ContainerInterface */
+    private $container;
 
     /** @var RequestInterface */
     private $request;
@@ -40,43 +55,32 @@ class AuthenticateApiController extends AbstractApiController {
     /**
      * AuthenticationController constructor.
      *
+     * @param AddonManager $addonManager
      * @param Gdn_Configuration $config
+     * @param ContainerInterface $container,
      * @param RequestInterface $request
      * @param SessionModel $sessionModel
      * @param SSOModel $ssoModel
      * @param UserModel $userModel
      */
     public function __construct(
+        AddonManager $addonManager,
         Gdn_Configuration $config,
+        ContainerInterface $container,
         RequestInterface $request,
         SessionModel $sessionModel,
         SSOModel $ssoModel,
         UserModel $userModel
     ) {
-        $this->caseScheme = new CapitalCaseScheme();
+        $this->addonManager = $addonManager;
+        $this->camelCaseScheme = new CamelCaseScheme();
+//        $this->capitalCaseScheme = new CapitalCaseScheme();
         $this->config = $config;
+        $this->container = $container;
         $this->request = $request;
         $this->sessionModel = $sessionModel;
         $this->ssoModel = $ssoModel;
         $this->userModel = $userModel;
-    }
-
-    /**
-     * Automatically makes a link in Gdn_UserAuthentication using the email address.
-     *
-     * @param SSOUserInfo $ssoUserInfo
-     * @return array|bool User data if found or false otherwise.
-     */
-    private function autoConnect(SSOUserInfo $ssoUserInfo) {
-        $userData = $this->userModel->getWhere(['Email' => $ssoUserInfo['email']])->firstRow(DATASET_TYPE_ARRAY);
-        if ($userData !== false) {
-            $this->userModel->saveAuthentication([
-                'UserID' => $userData['UserID'],
-                'Provider' => $ssoUserInfo['authenticatorID'],
-                'UniqueID' => $ssoUserInfo['uniqueID']
-            ]);
-        }
-        return $userData;
     }
 
     /**
@@ -114,7 +118,7 @@ class AuthenticateApiController extends AbstractApiController {
             'authenticatorID:s?' => 'Authenticator instance\'s identifier.',
             'userID:i?' => 'UserID to unlink authenticator from.',
         ])->setDescription('Authenticate a user using a specific authenticator.');
-        $out = $this->schema([], 'out');
+        $this->schema([], 'out');
 
         $in->validate($query, true);
 
@@ -126,7 +130,7 @@ class AuthenticateApiController extends AbstractApiController {
             $userID = $this->getSession()->UserID;
         }
 
-        $authenticatorInstance = $this->ssoModel->getSSOAuthenticator($authenticator, $authenticatorID);
+        $authenticatorInstance = $this->getSSOAuthenticator($authenticator, $authenticatorID);
 
         $data = [];
         $this->userModel->getDelete(
@@ -136,31 +140,13 @@ class AuthenticateApiController extends AbstractApiController {
         );
     }
 
-    /**
-     * Try to find a user matching the provided SSOUserInfo.
-     * Email has priority over Name if both are allowed.
-     *
-     * @param SSOUserInfo $ssoUserInfo SSO provided user's information.
-     * @param string $findByEmail Try to find the user by Email.
-     * @param string $findByName Try to find the user by Name.
-     * @return array UserID that matches the SSOUserInfo.
-     */
-    private function findMatchingUsers(SSOUserInfo $ssoUserInfo, $findByEmail, $findByName) {
-        if (!$findByEmail && !$findByName) {
-            return [];
-        }
+    public function delete_session($authSessionID) {
+        $this->schema([
+            'authSessionID:s' => 'Identifier of the authentication session.',
+        ], 'in')->setDescription('Delete an authenticate session.');
+        $this->schema([], 'out');
 
-        $this->userModel->SQL->select(['UserID','Name','Email','Photo']);
-
-        if ($findByEmail) {
-            $this->userModel->SQL->orWhere(['Email' => $ssoUserInfo['email']]);
-        }
-        if ($findByName) {
-            $this->userModel->SQL->orWhere(['Name' => $ssoUserInfo['name']]);
-        }
-
-        $users = $this->userModel->getWhere()->resultArray();
-        return Gdn_DataSet::index($users, 'UserID');
+        $this->sessionModel->deleteID($authSessionID);
     }
 
     /**
@@ -173,8 +159,100 @@ class AuthenticateApiController extends AbstractApiController {
      * @param string $authenticatorID
      * @return array
      */
-    public function get($authenticator, $authenticatorID = '') {
-        return $this->post($authenticator, $authenticatorID);
+    public function get_auth($authenticator, $authenticatorID = '') {
+        return $this->post_auth($authenticator, $authenticatorID);
+    }
+
+    public function get_session($authSessionID, array $query) {
+        $this->schema([
+            'authSessionID:s' => 'Identifier of the authentication session.',
+        ], 'in');
+        $in = $this->schema([
+            'expand:b?' => 'Expand associated records.',
+        ], 'in')->setDescription('Get the content of an authentication session.');
+        $out = $this->schema([
+            'authSessionID:s' => 'Identifier of the authentication session.',
+            'dateInserted:dt' => 'When the session was created.',
+            'dateExpire:dt' => 'When the session expires.',
+            'attributes' => Schema::parse([
+                'ssoInfo:o' => $this->ssoInfoSchema(), // This should do a sparse validation
+                'connectuser:o?' => Schema::parse([
+                    'existingUsers:a' => Schema::parse([
+                        'userID:i' => 'The userID of the participant.',
+                        'user:o?' => $this->getUserFragmentSchema(),
+                    ])->setDescription('User that matches the SSOInfo and can be used to connect the user.'),
+                ])->setDescription('Information needed for the "connectuser" step.'),
+            ]),
+        ], 'out');
+
+        $query = $in->validate($query);
+
+        $sessionData = $this->sessionModel->getID($authSessionID, DATASET_TYPE_ARRAY);
+        if ($this->sessionModel->isExpired($sessionData)) {
+            throw new Exception('The session has expired.');
+        }
+
+        if (!empty($query['expand']) && isset($sessionData['Attributes']['connectuser']['existingUsers'])) {
+            $this->userModel->expandUsers($sessionData['Attributes']['connectuser']['existingUsers'], ['UserID']);
+        }
+
+        $sessionData['authSessionID'] = $sessionData['SessionID'];
+
+        $cleanedSessionData = $out->validate($sessionData);
+
+        // We need to add back extra information that were stripped during the clean process.
+        if (isset($cleanedSessionData['attributes']['ssoInfo']['extraInfo'])) {
+            $extraInfo = $this->camelCaseScheme->convertArrayKeys($sessionData['Attributes']['ssoInfo']['extraInfo']);
+            $cleanedSessionData['attributes']['ssoInfo']['extraInfo'] += $extraInfo;
+        }
+
+        return $cleanedSessionData;
+    }
+
+    /**
+     * Get an Authenticator
+     *
+     * @throws Exception
+     *
+     * @param $authenticatorType
+     * @param $authenticatorID
+     * @return Authenticator
+     */
+    public function getAuthenticator($authenticatorType, $authenticatorID) {
+        if (empty($authenticatorType)) {
+            throw new NotFoundException();
+        }
+
+        $authenticatorClassName = $authenticatorType.'Authenticator';
+        $authenticatorClasses = $this->addonManager->findClasses("*\\$authenticatorClassName");
+
+        if (empty($authenticatorClasses)) {
+            throw new NotFoundException($authenticatorClassName);
+        }
+
+        // Throw an exception if there are multiple authenticators with that type.
+        // We are not handling authenticators with the same name in different namespaces for now.
+        if (count($authenticatorClasses) > 1) {
+            throw new ServerException(
+                "Multiple class named \"$authenticatorClasses\" have been found.",
+                500,
+                ['classes' => $authenticatorClasses]
+            );
+        }
+
+        $fqnAuthenticationClass = $authenticatorClasses[0];
+
+        if (!is_a($fqnAuthenticationClass, Authenticator::class, true)) {
+            throw new ServerException(
+                "\"$fqnAuthenticationClass\" is not an ".Authenticator::class,
+                500
+            );
+        }
+
+        /** @var Authenticator $authenticatorInstance */
+        $authenticatorInstance = $this->container->getArgs($fqnAuthenticationClass, [$authenticatorID]);
+
+        return $authenticatorInstance;
     }
 
     /**
@@ -185,30 +263,37 @@ class AuthenticateApiController extends AbstractApiController {
      *
      * @param string $authenticator
      * @param string $authenticatorID
-     * @param array $query The query string as an array.
      * @return array
      */
-    public function post($authenticator, $authenticatorID = '', array $query) {
-        $in = $this->schema([
+    public function post_auth($authenticator, $authenticatorID = '') {
+        $this->schema([
             'authenticator:s' => 'The authenticator that will be used.',
             'authenticatorID:s?' => 'Authenticator instance\'s identifier.',
         ])->setDescription('Authenticate a user using a specific authenticator.');
         $out = $this->schema(Schema::parse([
+            'authenticationStep:s' => 'Tells whether the user is now authenticated or if additional step(s) are required.',
             'userID:i?' => 'Identifier of the authenticated user.',
-            'authenticationStep:s?' => 'Tells whether the user is now authenticated or if additional step(s) are required.',
-            'sessionID:s?' => 'Identifier used to do subsequent call to the api for the current authentication process.'
-                .' Returned if the authentication was not a success.',
+            'authSessionID:s?' => 'Identifier of the authentication session. Returned if more steps are required to complete the authentication.',
         ]), 'out');
 
-        $in->validate($query, true);
+        if ($this->getSession()->isValid()) {
+            throw new ClientException("Cannot authenticate while already logged in.", 403);
+        }
 
-        $authenticatorInstance = $this->ssoModel->getSSOAuthenticator($authenticator, $authenticatorID);
+        $authenticatorInstance = $this->getAuthenticator($authenticator, $authenticatorID);
 
-        // The authenticator should throw an appropriate error message on error.
-        $ssoUserInfo = $authenticatorInstance->authenticate($this->request);
+        if (is_a($authenticatorInstance, SSOAuthenticator::class)) {
 
-        if (!$ssoUserInfo) {
-            throw new Exception("Unknown error while authenticating with $authenticatorType.");
+            /** @var SSOAuthenticator $authenticatorInstance */
+            $ssoInfo = $authenticatorInstance->authenticate($this->request);
+
+            if (!$ssoInfo) {
+                throw new ServerException("Unknown error while authenticating with $authenticatorType.", 500);
+            }
+
+            $user = $this->ssoModel->sso($ssoInfo, false);
+        } else {
+            throw new ServerException(get_class($authenticatorInstance).' is not a supported authenticator yet.', 500);
         }
 
         // Allows registration without an email address.
@@ -223,49 +308,21 @@ class AuthenticateApiController extends AbstractApiController {
         // Allows SSO connections to link a VanillaUser to a ForeignUser.
         $allowConnect = $this->config->get('Garden.Registration.AllowConnect', true);
 
-        // Will automatically try to link users using the provided Email address if the Provider is "Trusted".
-        $autoConnect = $allowConnect && $emailUnique && $this->config->get('Garden.Registration.AutoConnect', false);
-
-        // Synchronize user's data.
-        $syncUser = $this->config->get('Garden.Registration.ConnectSynchronize', true);
-
-        // Synchronize user's roles only on registration.
-        $syncRolesOnlyRegistration = $this->config->get('Garden.SSO.SyncRolesOnRegistrationOnly', false);
-
-        // Synchronize user's roles.
-        $syncRoles = !$syncRolesOnlyRegistration && $this->config->get('Garden.SSO.SyncRoles', false);
-
-        $user = $this->ssoModel->sso($ssoUserInfo);
-
-        // Let's try to find a matching user.
-        if (!$user && $autoConnect) {
-            $user = $this->autoConnect($ssoUserInfo);
-        }
-
         $sessionData = [
-            'ssoUserInfo' => $ssoUserInfo,
+            'ssoInfo' => $ssoInfo,
         ];
 
         if ($user) {
-            if ($authenticatorInstance->isTrusted()) {
-                if (!$this->syncUser($ssoUserInfo, $user, $syncUser, $syncRoles)) {
-                    throw new ServerException(
-                        "User synchronization failed",
-                        500,
-                        [
-                            'validationResults' => $this->userModel->validationResults()
-                        ]
-                    );
-                }
-            }
-            $response = array_merge(['authenticationStep' => 'authenticated'], $user);
+            $response = array_merge(['authenticationStep' => 'authenticated'], $this->camelCaseScheme->convertArrayKeys($user));
         } else {
             // We could not authenticate or autoconnect but it may be possible to do a manual connect.
             // If that is the case we should state so in the response.
             if ($allowConnect && ($emailUnique || $nameUnique)) {
-                $existingUsers = $this->findMatchingUsers($ssoUserInfo, $emailUnique, $nameUnique);
-                if (!empty($existingUsers)) {
-                    $sessionData['existingUsers'] = $existingUsers;
+                $existingUserIDs = $this->ssoModel->findMatchingUserIDs($ssoInfo, $emailUnique, $nameUnique);
+                if (!empty($existingUserIDs)) {
+                    $sessionData['connectuser'] = [
+                        'existingUsers' => $existingUserIDs,
+                    ];
                     $response = [
                         'authenticationStep' => 'connectuser',
                     ];
@@ -277,71 +334,42 @@ class AuthenticateApiController extends AbstractApiController {
             throw new ClientException('Authentication failed.');
         }
 
-        if ($response['authenticationStep'] === 'authenticated') {
-            $this->getSession()->start($response['userID']);
-        } else {
+        if ($response['authenticationStep'] === 'connectuser') {
             // Store all the information needed for the next authentication step.
-            $response['sessionID'] = $this->createSession($sessionData);
+            $response['authSessionID'] = $this->createSession($sessionData);
         }
 
         return $out->validate($response);
     }
 
     /**
-     * Synchronize a user using the provided data.
      *
-     * @param SSOUserInfo $ssoUserInfo SSO provided user data.
-     * @param array $user Current user's data.
-     * @param bool $syncUser Synchronize the user's data.
-     * @param bool $syncRoles Synchronize the user's roles.
-     * @return bool If the synchronisation was a success ot not.
+     *
+     * @return Schema
      */
-    private function syncUser(SSOUserInfo $ssoUserInfo, $user, $syncUser, $syncRoles) {
-        if (!$syncUser && !$syncRoles) {
-            return true;
+    public function ssoInfoSchema() {
+        static $ssoInfoSchema;
+
+        if ($ssoInfoSchema === null) {
+            $ssoInfoSchema = $this->schema([
+                'authenticatorName:s' => 'Name of the authenticator that was used to create this object.',
+                'authenticatorID:s' => 'ID of the authenticator instance that was used to create this object.',
+                'authenticatorIsTrusted:b' => 'If the authenticator is trusted to sync user\'s information.',
+                'uniqueID:s' => 'Unique ID of the user supplied by the provider.',
+                'extraInfo?' => Schema::parse([
+                        'email:s?' => 'Email of the user.',
+                        'name:s?' => 'Name of the user.',
+                        'roles:a?' => [
+                            'description' => 'One or more role name.',
+                            'items' => ['type' => 'string'],
+                            'style' => 'form',
+                        ],
+                        '...:s?' => 'Any other information.',
+                    ])
+                    ->setDescription('Any extra information returned by the provider. Usually name, email and possibly roles.')
+            ], 'SSOInfo')->setDescription('SSOAuthenticator\'s supplied information.');
         }
 
-        $userInfo = [
-            'UserID' => $user['UserID']
-        ];
-
-        if ($syncUser) {
-            $userInfo = array_merge($this->caseScheme->convertArrayKeys($ssoUserInfo), $userInfo);
-
-            // Don't overwrite the user photo if the user uploaded a new one.
-            $photo = val('Photo', $user);
-            if (!val('Photo', $userInfo) || ($photo && !isUrl($photo))) {
-                unset($userInfo['Photo']);
-            }
-        }
-
-        $saveRoles = $syncRoles && array_key_exists('roles', $ssoUserInfo);
-        if ($saveRoles) {
-            if (!empty($ssoUserInfo['roles'])) {
-                $roles = \RoleModel::getByName($ssoUserInfo['roles']);
-                $roleIDs = array_keys($roles);
-            }
-
-            // Ensure user has at least one role.
-            if (empty($roleIDs)) {
-                $roleIDs = $this->userModel->newUserRoleIDs();
-            }
-
-            $userInfo['RoleID'] = $roleIDs;
-        }
-
-        $userID = $this->userModel->save($userInfo, [
-            'NoConfirmEmail' => true,
-            'FixUnique' => true,
-            'SaveRoles' => $saveRoles,
-        ]);
-
-        /*
-         * TODO: Add a replacement event for AfterConnectSave.
-         * It was added 8 months ago so it is safe to assume that the only usage of it is the CategoryRoles plugin.
-         * https://github.com/vanilla/vanilla/commit/1d9ae17652213d888bbd07cac0f682959ca326b9
-         */
-
-        return $userID !== false;
+        return $ssoInfoSchema;
     }
 }

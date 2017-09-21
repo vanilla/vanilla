@@ -48,7 +48,7 @@ class UserModel extends Gdn_Model {
 
     /** Timeout for SSO */
     const SSO_TIMEOUT = 1200;
-    
+
     /** @var */
     public $SessionColumns;
 
@@ -3518,12 +3518,15 @@ class UserModel extends Gdn_Model {
 
         $this->deleteContent($userID, $options, $content);
 
+        $userData = $this->getID($userID, DATASET_TYPE_ARRAY);
+
         // Remove the user's information
         $this->SQL->update('User')
             ->set([
                 'Name' => t('[Deleted User]'),
                 'Photo' => null,
                 'Password' => randomString('10'),
+                'HashMethod' => 'Random',
                 'About' => '',
                 'Email' => 'user_'.$userID.'@deleted.invalid',
                 'ShowEmail' => '0',
@@ -3535,7 +3538,13 @@ class UserModel extends Gdn_Model {
                 'DiscoveryText' => '',
                 'Preferences' => null,
                 'Permissions' => null,
-                'Attributes' => dbencode(['State' => 'Deleted']),
+                'Attributes' => dbencode([
+                    'State' => 'Deleted',
+                    // We cannot keep emails until we have a method to purge deleted users.
+                    // See https://github.com/vanilla/vanilla/pull/5808 for more details.
+                    'OriginalName' => $userData['Name'],
+                    'DeletedBy' => Gdn::session()->UserID,
+                ]),
                 'DateSetInvitations' => null,
                 'DateOfBirth' => null,
                 'DateUpdated' => Gdn_Format::toDateTime(),

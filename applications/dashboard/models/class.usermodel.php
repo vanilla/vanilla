@@ -1064,24 +1064,35 @@ class UserModel extends Gdn_Model {
         reset($rows);
         $single = is_string(key($rows));
 
-        $users = [];
+        $userIDs = [];
+
+        $extractUserIDs = function(array $row) use ($columns, &$userIDs) {
+            foreach ($columns as $key) {
+                if (array_key_exists($key, $row)) {
+                    $id = $row[$key];
+                    $userIDs[$id] = true;
+                }
+            }
+        };
+
+        // Fetch the users we'll be injecting into the rows.
+        if ($single) {
+            $extractUserIDs($rows);
+        } else {
+            foreach ($rows as $row) {
+                $extractUserIDs($row);
+            }
+        }
+        $users = !empty($userIDs) ? $this->getIDs(array_keys($userIDs)) : [];
+
         $populate = function(array &$row) use ($users, $columns) {
             foreach ($columns as $key) {
                 $destination = stringEndsWith($key, 'ID', true, true);
                 $id = val($key, $row);
                 $user = null;
                 if (is_numeric($id)) {
-                    // Keep a running collection of queried users. Non-existing users are null.
-                    if (!array_key_exists($id, $users)) {
-                        $user = $this->getID($id, DATASET_TYPE_ARRAY);
-                        if (!$user) {
-                            $user = null;
-                        }
-                        $users[$id] = $user;
-                    }
-
                     // Massage the data, before injecting it into the results.
-                    $user = $users[$id];
+                    $user = array_key_exists($id, $users) ? $users[$id] : false;
                     if ($user) {
                         // Make sure all user records have a valid photo.
                         $photo = val('Photo', $user);

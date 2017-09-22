@@ -41,7 +41,8 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
         '/^entry(\/.*)?$/' => self::BLOCK_PERMISSION,
         '/^user\/usernameavailable(\/.*)?$/' => self::BLOCK_PERMISSION,
         '/^user\/emailavailable(\/.*)?$/' => self::BLOCK_PERMISSION,
-        '/^home\/termsofservice(\/.*)?$/' => self::BLOCK_PERMISSION
+        '/^home\/termsofservice(\/.*)?$/' => self::BLOCK_PERMISSION,
+        '/^api\/v\d+\/applications$/' => self::BLOCK_NEVER,
     ];
 
     /** @var string The name of the controller to be dispatched. */

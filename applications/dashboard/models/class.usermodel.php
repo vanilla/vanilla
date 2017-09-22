@@ -4941,4 +4941,34 @@ class UserModel extends Gdn_Model {
 
         return $result;
     }
+
+    /**
+     * Do the registration values indicate SPAM?
+     *
+     * @param array $formPostValues
+     * @throws Gdn_UserException if the values trigger a positive SPAM match.
+     * @return bool
+     */
+    public function isRegistrationSpam(array $formPostValues) {
+        $result = (bool)SpamModel::isSpam('Registration', $formPostValues, ['Log' => false]);
+        return $result;
+    }
+
+    /**
+     * Validate the strength of a user's password.
+     *
+     * @param string $password A password to test.
+     * @param string $username The name of the user. Used to verify the password doesn't contain this value.
+     * @throws Gdn_UserException if the password is too weak.
+     * @return bool
+     */
+    public function validatePasswordStrength($password, $username) {
+        $strength = passwordStrength($password, $username);
+        $result = (bool)$strength['Pass'];
+
+        if ($result === false) {
+            throw new Gdn_UserException('The password is too weak.');
+        }
+        return $result;
+    }
 }

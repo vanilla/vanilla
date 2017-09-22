@@ -49,18 +49,16 @@ class ApplicationsApiController extends AbstractApiController {
 
         if ($fullSchema === null) {
             $fullSchema = Schema::parse([
-                'userID:i' => '',
-                'email:s' => '',
-                'name:s' => '',
-                'discoveryText:s' => '',
+                'userID:i' => 'Unique user ID associated with the application.',
+                'email:s' => 'Email address associated with the application.',
+                'name:s' => 'Username on the application.',
+                'discoveryText:s' => 'Reason why you want to join.',
                 'status:s' => [
-                    'description' => '',
+                    'description' => 'Current status of the application.',
                     'enum' => ['approved', 'declined', 'pending']
                 ],
-                'insertIPAddress:s' => '',
-                'dateInserted:dt' => '',
-                'updateIPAddress:s|n' => '',
-                'dateUpdated:dt|n' => ''
+                'insertIPAddress:s' => 'IP address of the user who created the application.',
+                'dateInserted:dt' => 'When the application was created.'
             ]);
         }
 
@@ -156,9 +154,10 @@ class ApplicationsApiController extends AbstractApiController {
     }
 
     /**
-     * Create a new registration application.
+     * Submit a user application.
      *
      * @param array $body
+     * @throws ClientException if the terms of service flag is false.
      * @throws ServerException if a valid user ID is not returned when creating the applicant record.
      * @return Data
      */
@@ -176,6 +175,12 @@ class ApplicationsApiController extends AbstractApiController {
 
         $body = $in->validate($body);
         $userData = $this->caseScheme->convertArrayKeys($body);
+
+        if ($userData['TermsOfService'] === false) {
+            throw new ClientException('You must agree to the terms of service.');
+        }
+        $this->userModel->validatePasswordStrength($userData['Password'], $userData['Name']);
+
         $userID = $this->userModel->register($userData);
         $this->validateModel($this->userModel);
 

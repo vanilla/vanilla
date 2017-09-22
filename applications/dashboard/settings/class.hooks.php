@@ -659,7 +659,10 @@ class DashboardHooks extends Gdn_Plugin {
         $path = Gdn::request()->getPath();
         $writeMethods = ['DELETE', 'PATCH', 'POST', 'PUT'];
         if (stringBeginsWith($path, '/api/') && in_array(Gdn::request()->getMethod(), $writeMethods)) {
-            $tokenWriteExceptions = ['`^/api/v\d+/applications$`'];
+            $tokenWriteExceptions = [
+                '`^/api/v\d+/applications$`',
+                '`^/api/v\d+/users/register`'
+            ];
             foreach ($tokenWriteExceptions as $exception) {
                 if (preg_match($exception, $path)) {
                     Gdn::session()->validateTransientKey(true);

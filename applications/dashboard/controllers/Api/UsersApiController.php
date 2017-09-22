@@ -5,7 +5,9 @@
  */
 
 use Garden\Schema\Schema;
+use \Garden\Schema\ValidationException;
 use Garden\Web\Data;
+use Garden\Web\Exception\ClientException;
 use Garden\Web\Exception\NotFoundException;
 use Garden\Web\Exception\ServerException;
 use Vanilla\Utility\CapitalCaseScheme;
@@ -17,6 +19,9 @@ class UsersApiController extends AbstractApiController {
 
     /** @var CapitalCaseScheme */
     private $caseScheme;
+
+    /** @var Gdn_Configuration */
+    private $configuration;
 
     /** @var Schema */
     private $idParamSchema;
@@ -35,9 +40,10 @@ class UsersApiController extends AbstractApiController {
      *
      * @param UserModel $userModel
      */
-    public function __construct(UserModel $userModel) {
+    public function __construct(UserModel $userModel, Gdn_Configuration $configuration, CapitalCaseScheme $caseScheme) {
+        $this->caseScheme = $caseScheme;
+        $this->configuration = $configuration;
         $this->userModel = $userModel;
-        $this->caseScheme = new CapitalCaseScheme();
     }
 
     /**
@@ -282,6 +288,72 @@ class UsersApiController extends AbstractApiController {
 
         $result = $out->validate($row);
         return new Data($result, 201);
+    }
+
+    /**
+     * Submit a new user registration.
+     *
+     * @param array $body The request body.
+     * @throws ClientException if terms of service field is false.
+     * @throws ServerException if an unknown error was encountered when creating the user.
+     * @throws ValidationException if the registration is flagged as SPAM, but no discoveryText was provided.
+     * @return Data
+     */
+    public function post_register(array $body) {
+        $this->permission(true);
+
+        $registrationMethod = $this->configuration->get('Garden.Registration.Method');
+        $registrationMethod = strtolower($registrationMethod);
+
+        $userData = $this->caseScheme->convertArrayKeys($body);
+
+        $inputProperties = [
+            'email:s' => 'An email address for this user.',
+            'name:s' => 'The username.',
+            'password:s' => 'A password for this user.',
+            'termsOfService:b' => 'Were the terms of use accepted?'
+        ];
+        if ($registrationMethod === 'invitation') {
+            $inputProperties['invitationCode:s'] = 'An invitation code for registering on the site.';
+        } elseif ($this->userModel->isRegistrationSpam($userData)) {
+            $inputProperties['discoveryText:s'] = 'Why does the user wish to join?';
+        }
+
+        $in = $this->schema($inputProperties, 'in')->setDescription('Submit a new user registration.');
+        $out = $this->schema(['userID', 'name', 'email'], 'out')->add($this->fullSchema());
+
+        $body = $in->validate($body);
+
+        if ($userData['TermsOfService'] === false) {
+            throw new ClientException('You must agree to the terms of service.');
+        }
+        $this->userModel->validatePasswordStrength($userData['Password'], $userData['Name']);
+
+        switch ($registrationMethod) {
+            case 'invitation':
+                $userID = $this->userModel->insertForInvite($userData);
+                break;
+            case 'basic':
+            case 'captcha':
+                $userID = $this->userModel->insertForBasic($userData);
+                break;
+            default:
+                throw new ClientException('Unsupported registration method.');
+        }
+        $this->validateModel($this->userModel);
+
+        if (!$userID) {
+            throw new ServerException('An unknown error occurred while attempting to create the user.', 500);
+        } elseif ($userID === UserModel::REDIRECT_APPROVE) {
+            // A registration has been flagged for approval. Indicate the request has been accepted, but a user hasn't necessarily been created.
+            $result = new Data([], 202);
+        } else {
+            $row = $this->userByID($userID);
+            $result = $out->validate($row);
+            $result = new Data($result, 201);
+        }
+
+        return $result;
     }
 
     /**

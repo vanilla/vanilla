@@ -1327,21 +1327,29 @@ class UserModel extends Gdn_Model {
     /**
      * Returns all users in the applicant role.
      *
+     * @param int|bool $limit
+     * @param int|bool $offset
      * @return Gdn_DataSet Returns a data set of the users who are applicants.
      */
-    public function getApplicants() {
+    public function getApplicants($limit = false, $offset = false) {
         $applicantRoleIDs = RoleModel::getDefaultRoles(RoleModel::TYPE_APPLICANT);
 
         if (empty($applicantRoleIDs)) {
             return new Gdn_DataSet();
         }
 
-        return $this->SQL->select('u.*')
+        $this->SQL->select('u.*')
             ->from('User u')
             ->join('UserRole ur', 'u.UserID = ur.UserID')
             ->where('ur.RoleID', $applicantRoleIDs)
-            ->orderBy('DateInserted', 'desc')
-            ->get();
+            ->orderBy('DateInserted', 'desc');
+
+        if ($limit) {
+            $this->SQL->limit($limit, $offset);
+        }
+
+        $result = $this->SQL->get();
+        return $result;
     }
 
     /**
@@ -3416,26 +3424,11 @@ class UserModel extends Gdn_Model {
      * Approve a membership applicant.
      *
      * @param int $userID
-     * @param string $email
      * @return bool
      * @throws Exception
      */
-    public function approve($userID, $email) {
-        $applicantRoleIDs = RoleModel::getDefaultRoles(RoleModel::TYPE_APPLICANT);
-
-        // Make sure the $UserID is an applicant
-        $roleData = $this->getRoles($userID);
-        if ($roleData->numRows() == 0) {
-            throw new Exception(t('ErrorRecordNotFound'));
-        } else {
-            $appRoles = $roleData->result(DATASET_TYPE_ARRAY);
-            $applicantFound = false;
-            foreach ($appRoles as $appRole) {
-                if (in_array(val('RoleID', $appRole), $applicantRoleIDs)) {
-                    $applicantFound = true;
-                }
-            }
-        }
+    public function approve($userID) {
+        $applicantFound = $this->isApplicant($userID);
 
         if ($applicantFound) {
             // Retrieve the default role(s) for new users
@@ -4920,5 +4913,32 @@ class UserModel extends Gdn_Model {
         if ($resetSectionPreference) {
             $this->savePreference($userID, 'DashboardNav.DashboardLandingPage', '');
         }
+    }
+
+    /**
+     * @param int $userID
+     * @throws Exception
+     * @return bool
+     */
+    public function isApplicant($userID) {
+        $result = false;
+
+        $applicantRoleIDs = RoleModel::getDefaultRoles(RoleModel::TYPE_APPLICANT);
+
+        // Make sure the user is an applicant.
+        $roleData = $this->getRoles($userID);
+        if ($roleData->numRows() == 0) {
+            throw new Exception(t('ErrorRecordNotFound'));
+        } else {
+            $appRoles = $roleData->result(DATASET_TYPE_ARRAY);
+            foreach ($appRoles as $appRole) {
+                if (in_array(val('RoleID', $appRole), $applicantRoleIDs)) {
+                    $result = true;
+                    break;
+                }
+            }
+        }
+
+        return $result;
     }
 }

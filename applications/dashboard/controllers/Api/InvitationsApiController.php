@@ -6,6 +6,7 @@
 
 use Garden\Schema\Schema;
 use Garden\Web\Data;
+use Garden\Web\Exception\ClientException;
 use Garden\Web\Exception\NotFoundException;
 use Vanilla\Utility\CapitalCaseScheme;
 
@@ -27,10 +28,17 @@ class InvitationsApiController extends AbstractApiController {
      * InvitationsApiController constructor.
      *
      * @param CapitalCaseScheme $caseScheme
+     * @param Gdn_Configuration $configuration
      * @param InvitationModel $invitationModel
      * @param UserModel $userModel
+     * @throws ClientException if the site is not configured for user invitations.
      */
-    public function __construct(CapitalCaseScheme $caseScheme,InvitationModel $invitationModel, UserModel $userModel) {
+    public function __construct(CapitalCaseScheme $caseScheme, GDN_Configuration $configuration, InvitationModel $invitationModel, UserModel $userModel) {
+        $registrationMethod = strtolower($configuration->get('Garden.Registration.Method'));
+        if ($registrationMethod !== 'invitation') {
+            throw new ClientException('The site is not configured for the invitation registration method.');
+        }
+
         $this->caseScheme = $caseScheme;
         $this->invitationModel = $invitationModel;
         $this->userModel = $userModel;
@@ -47,7 +55,7 @@ class InvitationsApiController extends AbstractApiController {
         $in = $this->idParamSchema()->setDescription('Delete an invitation.');
         $out = $this->schema([], 'out');
 
-        $row = $this->invitation($id);
+        $row = $this->invitationByID($id);
 
         if ($row['InserUserID'] !== $this->getSession()->UserID) {
             $this->permission('Garden.Moderation.Manage');
@@ -157,7 +165,7 @@ class InvitationsApiController extends AbstractApiController {
      * @throws NotFoundException if the invitation could not be found.
      * @return array
      */
-    public function invitation($id) {
+    public function invitationByID($id) {
         $row = $this->invitationModel->getID($id, DATASET_TYPE_ARRAY);
         if (!$row) {
             throw new NotFoundException('Invitation');

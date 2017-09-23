@@ -300,7 +300,7 @@ class UsersApiController extends AbstractApiController {
      * @return Data
      */
     public function post_register(array $body) {
-        $this->permission(true);
+        $this->permission();
 
         $registrationMethod = $this->configuration->get('Garden.Registration.Method');
         $registrationMethod = strtolower($registrationMethod);

@@ -57,7 +57,7 @@ class InvitationsApiController extends AbstractApiController {
 
         $row = $this->invitationByID($id);
 
-        if ($row['InserUserID'] !== $this->getSession()->UserID) {
+        if ($row['InsertUserID'] !== $this->getSession()->UserID) {
             $this->permission('Garden.Moderation.Manage');
         }
 

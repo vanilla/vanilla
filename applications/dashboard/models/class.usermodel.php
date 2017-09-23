@@ -3657,7 +3657,7 @@ class UserModel extends Gdn_Model {
         }
 
         if ($applicantFound) {
-            $this->delete($userID);
+            $this->deleteID($userID);
         }
         return true;
     }

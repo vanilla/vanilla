@@ -252,7 +252,7 @@ class InvitationModel extends Gdn_Model {
         $result = $this->SQL->delete($this->Name, ['InvitationID' => $id]);
 
         // Add the invitation back onto the user's account if the invitation has not been accepted.
-        if ($result && !$invitation->AcceptedUserID) {
+        if ($result && !$invitation['AcceptedUserID']) {
             Gdn::userModel()->increaseInviteCount($userID);
         }
 

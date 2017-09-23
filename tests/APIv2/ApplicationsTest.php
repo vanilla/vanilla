@@ -41,7 +41,11 @@ class ApplicationsTest extends AbstractResourceTest {
      */
     public static function setupBeforeClass() {
         parent::setupBeforeClass();
-        static::container()->get('Config')->set('Garden.Registration.Method', 'Approval');
+        /** @var \Gdn_Configuration $configuration */
+        $configuration = static::container()->get('Config');
+        $configuration->set('Garden.Registration.Method', 'Approval');
+        $configuration->set('Garden.Registration.ConfirmEmail', false);
+        $configuration->set('Garden.Registration.SkipCaptcha', true);
     }
 
     /**

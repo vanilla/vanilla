@@ -19,6 +19,11 @@ class EbiBridge {
      */
     private $ebi;
 
+    /**
+     * EbiBridge constructor.
+     *
+     * @param Ebi $ebi The templating engine that will fetch and render the templates.
+     */
     public function __construct(Ebi $ebi) {
         // Add custom components.
         $ebi->defineComponent('asset', function ($props) use ($ebi) {

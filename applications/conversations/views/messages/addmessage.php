@@ -29,9 +29,9 @@ $this->fireEvent('BeforeMessageForm');
                     echo $this->Form->open(['id' => 'Form_ConversationMessage', 'action' => url('/messages/addmessage/')]);
                     echo $this->Form->errors();
                     //               echo wrap($this->Form->textBox('Body', array('MultiLine' => true, 'class' => 'TextBox')), 'div', array('class' => 'TextBoxWrapper'));
-                    echo $this->Form->bodyBox('Body', ['Table' => 'ConversationMessage', 'FileUpload' => true, 'tabindex' => 1]);
+                    echo $this->Form->bodyBox('Body', ['Table' => 'ConversationMessage', 'FileUpload' => true]);
                     echo '<div class="Buttons">',
-                    $this->Form->button('Send Message', ['class' => 'Button Primary', 'tabindex' => 1]),
+                    $this->Form->button('Send Message', ['class' => 'Button Primary']),
                     '</div>';
                     echo $this->Form->close();
                     ?>

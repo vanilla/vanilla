@@ -2007,6 +2007,17 @@ class EntryController extends Gdn_Controller {
     }
 
     /**
+     * Get the the redirect URL.
+     *
+     * @deprecated 2017-06-29
+     * @return string
+     */
+    public function redirectTo() {
+        deprecated(__FUNCTION__, 'target');
+        return $this->getTargetRoute();
+    }
+
+    /**
      * Go to requested target() or the default controller if none was set.
      *
      * @access public

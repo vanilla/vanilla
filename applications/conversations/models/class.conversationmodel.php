@@ -507,7 +507,7 @@ class ConversationModel extends ConversationsModel {
      * @return int Unique ID of conversation created or updated.
      */
     public function save($formPostValues, $settings = []) {
-        $createMessage = empty($settings['ConversationOnly']);
+        $createMessage = (bool) val('ConversationOnly', $settings);
 
         if ($createMessage) {
             if ($settings instanceof ConversationMessageModel) {

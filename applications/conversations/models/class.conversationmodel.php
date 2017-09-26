@@ -507,10 +507,11 @@ class ConversationModel extends ConversationsModel {
      * @return int Unique ID of conversation created or updated.
      */
     public function save($formPostValues, $settings = []) {
-        $createMessage = empty($settings['ConversationOnly']);
+        $deprecated = $settings instanceof ConversationMessageModel;
+        $createMessage =  $deprecated || empty($settings['ConversationOnly']);
 
         if ($createMessage) {
-            if ($settings instanceof ConversationMessageModel) {
+            if ($deprecated) {
                 deprecated('ConversationModel->save(array, ConversationMessageModel)');
                 $messageModel = $settings;
             } else {

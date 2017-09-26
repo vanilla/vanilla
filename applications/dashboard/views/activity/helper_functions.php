@@ -10,7 +10,7 @@ function writeActivity($activity, $sender, $session) {
 
     if ($activity->Photo) {
         $photoAnchor = anchor(
-            img($activity->Photo, ['class' => 'ProfilePhoto ProfilePhotoMedium']),
+            img($activity->Photo, ['class' => 'ProfilePhoto ProfilePhotoMedium', 'aria-hidden' => 'true']),
             $activity->PhotoUrl, 'PhotoWrap');
     }
 

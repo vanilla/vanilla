@@ -78,6 +78,14 @@ class Gdn_CookieIdentity {
         $this->CookieName = val('Name', $config, $defaultConfig['Name']);
         $this->CookiePath = val('Path', $config, $defaultConfig['Path']);
         $this->CookieDomain = val('Domain', $config, $defaultConfig['Domain']);
+
+        // If the domain being set is completely incompatible with the current domain then make the domain work.
+        $currentHost = Gdn::request()->host();
+        if (!stringEndsWith($currentHost, trim($this->CookieDomain, '.'))) {
+            $this->CookieDomain = '';
+            trigger_error('Config "Garden.Cookie.Domain" is incompatible with the current host.', E_USER_WARNING);
+        }
+
         $this->CookieHashMethod = val('HashMethod', $config, $defaultConfig['HashMethod']);
         $this->CookieSalt = val('Salt', $config, $defaultConfig['Salt']);
         $this->VolatileMarker = $this->CookieName.'-Volatile';

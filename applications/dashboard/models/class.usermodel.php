@@ -225,7 +225,7 @@ class UserModel extends Gdn_Model {
      *
      * @param mixed $User The user to check.
      * @param mixed $Permission The permission (or array of permissions) to check.
-     * @param array $Options Not used.
+     * @param array $Options
      * @return boolean
      */
     public function checkPermission($User, $Permission, $Options = []) {
@@ -251,7 +251,9 @@ class UserModel extends Gdn_Model {
             $permissions = $this->getPermissions($User->UserID);
         }
 
-        return $permissions->has($Permission);
+        $id = val('ForeignID', $Options, null);
+
+        return $permissions->has($Permission, $id);
     }
 
     /**

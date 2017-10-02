@@ -567,16 +567,10 @@ class VanillaHooks implements Gdn_IPlugin {
      * @return bool Whether user has permission.
      */
     public function userModel_getCategoryViewPermission_create($sender) {
-        static $permissionModel = null;
-
         $userID = val(0, $sender->EventArguments, '');
         $categoryID = val(1, $sender->EventArguments, '');
         $permission = val(2, $sender->EventArguments, 'Vanilla.Discussions.View');
         if ($userID && $categoryID) {
-            if ($permissionModel === null) {
-                $permissionModel = new PermissionModel();
-            }
-
             $category = CategoryModel::categories($categoryID);
             if ($category) {
                 $permissionCategoryID = $category['PermissionCategoryID'];
@@ -584,12 +578,12 @@ class VanillaHooks implements Gdn_IPlugin {
                 $permissionCategoryID = -1;
             }
 
-            $result = $permissionModel->getUserPermissions($userID, $permission, 'Category', 'PermissionCategoryID', 'CategoryID', $permissionCategoryID);
-            return (val($permission, val(0, $result), false)) ? true : false;
+            $options = ['ForeignID' => $permissionCategoryID];
+            $result = Gdn::userModel()->checkPermission($userID, $permission, $options);
+            return $result;
         }
         return false;
     }
-
 
     /**
      * Add CSS assets to front end.

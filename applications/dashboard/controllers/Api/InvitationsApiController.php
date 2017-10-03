@@ -93,6 +93,31 @@ class InvitationsApiController extends AbstractApiController {
     }
 
     /**
+     * Get a single invitation.
+     *
+     * @param int $id The ID of the invitation.
+     * @return array
+     */
+    public function get($id) {
+        $this->permission('Garden.SignIn.Allow');
+
+        $in = $this->idParamSchema()->setDescription('Get an invitation.');
+        $out = $this->schema($this->fullSchema(), 'out');
+
+        $row = $this->invitationByID($id);
+
+        if ($row['InsertUserID'] !== $this->getSession()->UserID) {
+            $this->permission('Garden.Moderation.Manage');
+        }
+
+        $this->prepareRow($row);
+        $this->userModel->expandUsers($row, ['AcceptedUserID']);
+
+        $result = $out->validate($row);
+        return $result;
+    }
+
+    /**
      * Get an ID-only invitation record schema.
      *
      * @param string $type The type of schema.

@@ -46,14 +46,6 @@ class InvitationsTest extends AbstractResourceTest {
 
     /**
      * {@inheritdoc}
-     * @requires function InvitationsApiController::get
-     */
-    public function testGet() {
-        $this->fail(__METHOD__.' needs to be implemented.');
-    }
-
-    /**
-     * {@inheritdoc}
      * @requires function InvitationsApiController::get_edit
      */
     public function testGetEdit($record = null) {

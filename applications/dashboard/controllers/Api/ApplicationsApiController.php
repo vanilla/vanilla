@@ -116,6 +116,7 @@ class ApplicationsApiController extends AbstractApiController {
     public function patch($id, array $body) {
         $this->permission('Garden.Users.Approve');
 
+        $this->schema(['id' => 'The application ID'], 'in');
         $in = $this->schema([
             'status:s' => [
                 'description' => 'Current status of the application.',

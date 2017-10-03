@@ -722,7 +722,7 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
             $defaultController = Gdn::router()->getRoute('DefaultController');
             $originalGet = $request->get();
             $request->pathAndQuery($defaultController['Destination']);
-            if (is_array($originalGet) && !empty($originalGet)) {
+            if (is_array($originalGet) && count($originalGet) > 0) {
                 $request->setQuery(array_merge($request->get(), $originalGet));
             }
         }

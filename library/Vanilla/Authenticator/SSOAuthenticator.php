@@ -13,7 +13,7 @@ use Vanilla\Models\SSOInfo;
 abstract class SSOAuthenticator extends Authenticator {
     /**
      * Tells whether the data returned by this authenticator is authoritative or not.
-     * Only trusted authenticators will results in user's data being synchronized.
+     * User info/roles can only be synchronized by trusted authenticators.
      *
      * @var bool
      */
@@ -66,7 +66,7 @@ abstract class SSOAuthenticator extends Authenticator {
     public abstract function signOutURL();
 
     /**
-     * Core implementation of the authenticate() function.
+     * Core implementation of the validateAuthentication() function.
      *
      * @throw Exception Reason why the authentication failed.
      * @param RequestInterface $request
@@ -75,15 +75,16 @@ abstract class SSOAuthenticator extends Authenticator {
     protected abstract function sso(RequestInterface $request);
 
     /**
-     * Authenticate an user by using the request's data.
+     * Validate an authentication by using the request's data.
      *
      * @throw Exception Reason why the authentication failed.
      * @param RequestInterface $request
      * @return SSOInfo The user's information.
      */
-    public final function authenticate(RequestInterface $request) {
+    public final function validateAuthentication(RequestInterface $request) {
         $ssoInfo = $this->sso($request);
 
+        // Make sure that the following fields are filled.
         $ssoInfo['authenticatorID'] = $this->getID();
         $ssoInfo['authenticatorName'] = $this->getName();
         $ssoInfo['authenticatorIsTrusted'] = $this->isTrusted();

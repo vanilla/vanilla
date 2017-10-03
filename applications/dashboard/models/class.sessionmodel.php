@@ -54,6 +54,10 @@ class SessionModel extends Gdn_Model {
             $session = $this->getID($session, DATASET_TYPE_ARRAY);
         }
 
+        if (!is_array($session)) {
+            return true;
+        }
+
         $time = strtotime($session['DateExpire']);
         if ($time && $time < time()) {
             return true;

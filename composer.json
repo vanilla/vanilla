@@ -23,7 +23,7 @@
     ],
     "repositories": [{
       "type": "git",
-      "url": "git@github.com:vanilla/vanilla-connect.git"
+      "url": "git@github.com:vanilla/vanilla-connect-php.git"
     }],
     "require": {
         "php": ">=5.6.0",

@@ -36,13 +36,13 @@ abstract class Authenticator {
     }
 
     /**
-     * Authenticate an user by using the request's data.
+     * Validate an authentication by using the request's data.
      *
      * @throw Exception Reason why the authentication failed.
      * @param RequestInterface $request
      * @return array The user's information.
      */
-    public abstract function authenticate(RequestInterface $request);
+    public abstract function validateAuthentication(RequestInterface $request);
 
     /**
      * Getter of the authenticator's ID.

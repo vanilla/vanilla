@@ -123,11 +123,11 @@ class AuthenticateController extends Gdn_Controller {
         }
 
         if ($response['authenticationStep'] === 'authenticated') {
-            redirectTo(val('Target', $this->request->getQuery(), '/'));
+            redirectTo(val('target', $this->request->getQuery(), '/'));
         } else {
-            $target = val('Target', $this->request->getQuery());
+            $target = val('target', $this->request->getQuery());
             if ($target) {
-                $target = '&Target='.$target;
+                $target = '&target='.$target;
             }
             redirectTo("/authenticate/connectuser?authSessionID={$response['authSessionID']}{$target}");
         }
@@ -141,12 +141,12 @@ class AuthenticateController extends Gdn_Controller {
      */
     public function connectUser($authSessionID) {
         $session = $this->authenticateApiController->get_session($authSessionID, ['expand' => true]);
-        if (!isset($session['attributes']['connectuser'])) {
+        if (!isset($session['attributes']['linkuser'])) {
             throw new Gdn_UserException('Invalid session.');
         }
 
-        if (isset($session['attributes']['connectuser']['existingUsers'])) {
-            $this->setData('existingUsers', $session['attributes']['connectuser']['existingUsers']);
+        if (isset($session['attributes']['linkuser']['existingUsers'])) {
+            $this->setData('existingUsers', $session['attributes']['linkuser']['existingUsers']);
         }
 
         $ssoInfo = new SSOInfo($session['attributes']['ssoInfo']);
@@ -160,9 +160,9 @@ class AuthenticateController extends Gdn_Controller {
             if ($this->form->errorCount() === 0) {
                 $connectOption = $this->form->getFormValue('connectOption');
                 if ($connectOption === 'linkuser') {
-                    $connectUserID = $this->getLinkedUserID();
+                    $connectUserID = $this->linkUser($authSessionID);
                 } else if ($connectOption === 'createuser') {
-                    $connectUserID = $this->createUser();
+                    $connectUserID = $this->createUser($ssoInfo);
                 } else {
                     $this->form->addError(t('Invalid connectOption.'));
                 }
@@ -171,12 +171,6 @@ class AuthenticateController extends Gdn_Controller {
                 $ssoInfo['connectOption'] = $connectOption;
 
                 if ($connectUserID) {
-                    $this->userModel->saveAuthentication([
-                        'UserID' => $connectUserID,
-                        'Provider' => $ssoInfo['authenticatorID'],
-                        'UniqueID' => $ssoInfo['uniqueID']
-                    ]);
-
                     // This will effectively sync the user info / roles if there is a need for it.
                     $connectSuccess = (bool)$this->ssoModel->sso($ssoInfo);
                 } else {
@@ -190,8 +184,6 @@ class AuthenticateController extends Gdn_Controller {
         }
 
         if ($connectSuccess) {
-            $this->authenticateApiController->delete_session($authSessionID);
-
             redirectTo(val('Target', $this->request->getQuery(), '/'));
         }
 
@@ -201,63 +193,54 @@ class AuthenticateController extends Gdn_Controller {
     /**
      * Validate "linkuser" connect form fields.
      *
+     * @param string $authSessionID
      * @return int|false
      */
-    private function getLinkedUserID() {
+    private function linkUser($authSessionID) {
         $this->form->validateRule('linkUserID', 'ValidateRequired');
         $this->form->validateRule('linkUserID', 'ValidateInteger');
-
         $this->form->validateRule('linkUserPassword', 'ValidateRequired', t('Password is required'));
 
-        $user = false;
+        $userID = false;
+
+        $body = [];
         if ($this->form->errorCount() === 0) {
+            $body['password'] = $this->form->getFormValue('linkUserPassword');
+
             $linkUserID = $this->form->getFormValue('linkUserID');
 
-            $userResults = [];
             if ($linkUserID === '-1') {
                 $this->form->validateRule('linkUserName', 'ValidateRequired', t('Username is required.'));
                 $this->form->validateRule('linkUserEmail', 'ValidateRequired', t('Email is required'));
 
                 if ($this->form->errorCount() === 0) {
-                    $userResults = $this->userModel->getWhere([
-                        'Name' => $this->form->getFormValue('linkUserName'),
-                        'Email' => $this->form->getFormValue('linkUserEmail'),
-                    ])->resultArray();
+                    $body['name'] = $this->form->getFormValue('linkUserName');
+                    $body['email'] = $this->form->getFormValue('linkUserEmail');
                 }
             } else {
-                $userResults = $this->userModel->getIDs([$linkUserID]);
-            }
-
-            if (count($userResults) > 1) {
-                $this->form->addError('More than one user has the same Email and Name combination.');
-            } else if (count($userResults) === 0) {
-                $this->form->addError('No user was found with the supplied information.');
-            } else {
-                $user = array_pop($userResults);
+                $body['userID'] = $this->form->getFormValue('linkUserID');
             }
         }
 
-        $linkValid = false;
-        if ($user) {
-            $this->form->validateRule('linkUserPassword', 'ValidateRequired', t('Password is required.'));
-
-            if ($this->form->errorCount() === 0) {
-                $password = $this->form->getFormValue('linkUserPassword');
-                $passwordHash = new Gdn_PasswordHash();
-
-                $linkValid = $passwordHash->checkPassword($password, $user['Password'], $user['HashMethod']);
+        if (!empty($body)) {
+            try {
+                $userFragment = $this->authenticateApiController->post_linkUser($authSessionID, $body);
+                $userID = $userFragment['UserID'];
+            } catch(Exception $e) {
+                $this->form->addError($e->getMessage());
             }
         }
 
-        return $linkValid ? $user['UserID'] : false;
+        return $userID;
     }
 
     /**
      * Create a new user using the "createuser" connect form fields.
      *
+     * @param SSOInfo $ssoInfo
      * @return int|false
      */
-    private function createUser() {
+    private function createUser(SSOInfo $ssoInfo) {
         $userID = false;
 
         $this->form->validateRule('createUserName', 'ValidateRequired', t('Username is required.'));
@@ -266,20 +249,22 @@ class AuthenticateController extends Gdn_Controller {
         $this->form->validateRule('createUserEmail', 'ValidateEmail', t('Email is invalid.'));
 
         if ($this->form->errorCount() === 0) {
-            $user = [];
-            $user['Name'] = $this->form->getFormValue('createUserName');
-            $user['Email'] = $this->form->getFormValue('createUserEmail');
-            $user['Password'] = randomString(16); // Required field.
-            $user['HashMethod'] = 'Random';
-            $createdUserID = $this->userModel->register($user, [
-                'CheckCaptcha' => false,
-                'NoConfirmEmail' => true,
-            ]);
+            $ssoInfo['Name'] = $this->form->getFormValue('createUserName');
+            $ssoInfo['Email'] = $this->form->getFormValue('createUserEmail');
+            $user = $this->ssoModel->createUser($ssoInfo);
 
-            if ($createdUserID) {
-                $userID = $createdUserID;
+            if ($user) {
+                $userID = $user['UserID'];
+
+                $this->userModel->saveAuthentication([
+                    'UserID' => $userID,
+                    'Provider' => $ssoInfo['authenticatorID'],
+                    'UniqueID' => $ssoInfo['uniqueID']
+                ]);
+                // Clean the session.
+                $this->authenticateApiController->delete_session($authSessionID);
             } else {
-                $this->form->setValidationResults($this->userModel->validationResults());
+                $this->form->setValidationResults($this->ssoModel->getValidationResults());
             }
         }
 

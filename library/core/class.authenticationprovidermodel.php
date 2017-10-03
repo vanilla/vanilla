@@ -178,7 +178,9 @@ class Gdn_AuthenticationProviderModel extends Gdn_Model {
             ->get()
             ->resultArray();
 
-        self::calculate($providers);
+        foreach($providers as &$provider) {
+            self::calculate($provider);
+        }
 
         return $providers;
     }

@@ -54,26 +54,39 @@ class SSOModel {
     }
 
     /**
-     * Automatically makes a link in Gdn_UserAuthentication using the email address.
+     * Create a user from the supplied SSOInfo.
      *
      * @param SSOInfo $ssoInfo
-     * @return array|bool User data if found or false otherwise.
+     * @return array|false The user of false on failure.
      */
-    private function autoConnect(SSOInfo $ssoInfo) {
-        $email = $ssoInfo->getExtraInfo('email', null);
-        if (!isset($email)) {
+    public function createUser(SSOInfo $ssoInfo) {
+        $email = $ssoInfo->getExtraInfo('email');
+        $name = $ssoInfo->getExtraInfo('name');
+
+        if (!$email && !$name) {
             return false;
         }
 
-        $userData = $this->userModel->getWhere(['Email' => $email])->firstRow(DATASET_TYPE_ARRAY);
-        if ($userData !== false) {
-            $this->userModel->saveAuthentication([
-                'UserID' => $userData['UserID'],
-                'Provider' => $ssoInfo['authenticatorID'],
-                'UniqueID' => $ssoInfo['uniqueID']
-            ]);
+        $userInfo = [
+            'Name' => $name,
+            'Email' => $email,
+            'Password' => randomString('32', 'Aa0!'),
+            'HashMethod' => 'Random',
+        ];
+
+        $userID = $this->userModel->register($userInfo, [
+            'CheckCaptcha' => false,
+            'FixUnique' => false,
+            'NoConfirmEmail' => true,
+            'ValidateEmail' => false,
+        ]);
+
+        $user = false;
+        if ($userID) {
+            $user = $this->userModel->getID($userID, DATASET_TYPE_ARRAY);
         }
-        return $userData;
+
+        return $user;
     }
 
     /**
@@ -121,16 +134,50 @@ class SSOModel {
     }
 
     /**
+     * Get a user.
+     *
+     * @param SSOInfo $ssoInfo
+     * @return array|false
+     */
+    public function getUser(SSOInfo $ssoInfo) {
+        // Will throw a proper exception.
+        $ssoInfo->validate();
+
+        return $this->userModel->getAuthentication($ssoInfo['uniqueID'], $ssoInfo['authenticatorID']);
+    }
+
+    /**
+     * Get a user by the provided SSOInfo's email.
+     *
+     * @param SSOInfo $ssoInfo
+     * @return array|bool User data if found or false otherwise.
+     */
+    private function getUserByEmail(SSOInfo $ssoInfo) {
+        $email = $ssoInfo->getExtraInfo('email', null);
+        if (!isset($email)) {
+            return false;
+        }
+
+        return $this->userModel->getWhere(['Email' => $email])->firstRow(DATASET_TYPE_ARRAY);
+    }
+
+    /**
+     * Get the validation results from the last operation.
+     *
+     * @return array
+     */
+    public function getValidationResults() {
+        return $this->userModel->validationResults();
+    }
+
+    /**
      * Do an authentication using the provided SSOInfo.
      *
      * @param SSOInfo $ssoInfo
      * @return array|false The authenticated user info or false.
      */
     public function sso(SSOInfo $ssoInfo) {
-        // Will throw a proper exception.
-        $ssoInfo->validate();
-
-        $user = $this->userModel->getAuthentication($ssoInfo['uniqueID'], $ssoInfo['authenticatorID']);
+        $user = $this->getUser($ssoInfo);
 
         if (!$user) {
             // Allows registration without an email address.
@@ -143,11 +190,37 @@ class SSOModel {
             $allowConnect = $this->config->get('Garden.Registration.AllowConnect', true);
 
             // Will automatically try to link users using the provided Email address if the Provider is "Trusted".
-            $autoConnect = $allowConnect && $emailUnique && $this->config->get('Garden.Registration.AutoConnect', false);
+            $autoConnect = $ssoInfo['authenticatorIsTrusted']
+                && $allowConnect
+                && $emailUnique
+                && $this->config->get('Garden.Registration.AutoConnect', false);
 
             // Let's try to find a matching user.
             if ($autoConnect) {
-                $user = $this->autoConnect($ssoInfo);
+                $user = $this->getUserByEmail($ssoInfo);
+
+                // Make sure that the user isn't already linked to another ID.
+                if ($user) {
+                    $result = $this->userModel->getAuthenticationByUser($user['UserID'], $ssoInfo['authenticatorID']);
+                    if ($result) {
+                        // TODO: We should probably add some sort of warning about this.
+                        $user = false;
+                    }
+                }
+            }
+
+            // Try to create a new user since none are matching.
+            if (!$user) {
+                $user = $this->createUser($ssoInfo);
+            }
+
+            // Yay!
+            if ($user !== false) {
+                $this->userModel->saveAuthentication([
+                    'UserID' => $user['UserID'],
+                    'Provider' => $ssoInfo['authenticatorID'],
+                    'UniqueID' => $ssoInfo['uniqueID']
+                ]);
             }
         }
 

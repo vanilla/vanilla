@@ -5,6 +5,7 @@
  */
 
 use Garden\Schema\Schema;
+use Garden\Schema\ValidationField;
 use Garden\Web\Exception\ClientException;
 use Garden\Web\Exception\NotFoundException;
 use Garden\Web\Exception\ServerException;
@@ -14,12 +15,10 @@ use Vanilla\AddonManager;
 use Vanilla\Authenticator\Authenticator;
 use Vanilla\Authenticator\SSOAuthenticator;
 use Vanilla\Models\SSOModel;
-use Vanilla\Models\SSOInfo;
 use Vanilla\Utility\CamelCaseScheme;
-use Vanilla\Utility\CapitalCaseScheme;
 
 /**
- * API Controller for the `/authenticate` resource.
+ * API Controller for the `/validateAuthentication` resource.
  */
 class AuthenticateApiController extends AbstractApiController {
 
@@ -109,14 +108,16 @@ class AuthenticateApiController extends AbstractApiController {
      * @throws Exception
      */
     public function delete($authenticator, $authenticatorID = '', array $query) {
-        $in = $this->schema([
+        $this->permission();
+
+        $this->schema([
             'authenticator:s' => 'The authenticator that will be used.',
             'authenticatorID:s?' => 'Authenticator instance\'s identifier.',
             'userID:i?' => 'UserID to unlink authenticator from.',
-        ])->setDescription('Authenticate a user using a specific authenticator.');
+        ], 'in')->setDescription('Delete the link between an authenticator and a user.');
         $this->schema([], 'out');
 
-        $in->validate($query, true);
+        $in->validate($query);
 
         if (isset($query['UserID'])) {
             $this->permission('Garden.Users.Edit');
@@ -142,26 +143,50 @@ class AuthenticateApiController extends AbstractApiController {
      * @param string $authSessionID
      */
     public function delete_session($authSessionID) {
+        $this->permission();
+
         $this->schema([
             'authSessionID:s' => 'Identifier of the authentication session.',
-        ], 'in')->setDescription('Delete an authenticate session.');
+        ], 'in')->setDescription('Delete an validateAuthentication session.');
         $this->schema([], 'out');
 
         $this->sessionModel->deleteID($authSessionID);
     }
 
     /**
-     * Authenticate a user using the specified authenticator.
-     * We allow get requests because some authenticators need that.
+     * Tell if a user is linked to an authenticator or not.
      *
-     * @throws Exception If the authentication process fails
-     * @throws NotFoundException If the $authenticatorType is not found.
      * @param string $authenticator
      * @param string $authenticatorID
-     * @return array
+     * @param array $query
+     * @return bool
      */
-    public function get_auth($authenticator, $authenticatorID = '') {
-        return $this->post_auth($authenticator, $authenticatorID);
+    public function get($authenticator, $authenticatorID = '', array $query) {
+        $this->permission();
+
+        $this->schema([
+            'authenticator:s' => 'The authenticator that will be used.',
+            'authenticatorID:s?' => 'Authenticator instance\'s identifier.',
+        ], 'in');
+        $in = $this->schema([
+            'userID:i?' => 'UserID of the user to check against the authenticator. Defaults to the current user.',
+        ])->setDescription('Tells whether the user is linked to the authenticator or not.');
+        $out = $this->schema([':b' => 'Whether the user is linked to the authenticator or not.'], 'out');
+
+        $in->validate($query);
+
+        if (isset($query['UserID'])) {
+            $this->permission('Garden.Users.Edit');
+            $userID = $query['UserID'];
+        } else {
+            $this->permission('Garden.SignIn.Allow');
+            $userID = $this->getSession()->UserID;
+        }
+
+        $authenticatorInstance = $this->getSSOAuthenticator($authenticator, $authenticatorID);
+
+
+        return $out->validate((bool)$this->userModel->getAuthenticationByUser($userID, $authenticatorInstance->getID()));
     }
 
     /**
@@ -173,6 +198,8 @@ class AuthenticateApiController extends AbstractApiController {
      * @throws Exception
      */
     public function get_session($authSessionID, array $query) {
+        $this->permission();
+
         $this->schema([
             'authSessionID:s' => 'Identifier of the authentication session.',
         ], 'in');
@@ -185,12 +212,12 @@ class AuthenticateApiController extends AbstractApiController {
             'dateExpire:dt' => 'When the session expires.',
             'attributes' => Schema::parse([
                 'ssoInfo:o' => $this->ssoInfoSchema(), // This should do a sparse validation
-                'connectuser:o?' => Schema::parse([
+                'linkuser:o?' => Schema::parse([
                     'existingUsers:a' => Schema::parse([
                         'userID:i' => 'The userID of the participant.',
                         'user:o?' => $this->getUserFragmentSchema(),
                     ])->setDescription('User that matches the SSOInfo and can be used to connect the user.'),
-                ])->setDescription('Information needed for the "connectuser" step.'),
+                ])->setDescription('Information needed for the "linkuser" step.'),
             ]),
         ], 'out');
 
@@ -201,8 +228,8 @@ class AuthenticateApiController extends AbstractApiController {
             throw new Exception('The session has expired.');
         }
 
-        if (!empty($query['expand']) && isset($sessionData['Attributes']['connectuser']['existingUsers'])) {
-            $this->userModel->expandUsers($sessionData['Attributes']['connectuser']['existingUsers'], ['UserID']);
+        if (!empty($query['expand']) && isset($sessionData['Attributes']['linkuser']['existingUsers'])) {
+            $this->userModel->expandUsers($sessionData['Attributes']['linkuser']['existingUsers'], ['UserID']);
         }
 
         $sessionData['authSessionID'] = $sessionData['SessionID'];
@@ -267,14 +294,15 @@ class AuthenticateApiController extends AbstractApiController {
     /**
      * Authenticate a user using the specified authenticator.
      *
-     * @param string $authenticator
-     * @param string $authenticatorID
+     * @param array $body
      * @throws Exception If the authentication process fails
      * @throws NotFoundException If the $authenticatorType is not found.
      * @return array
      */
-    public function post_auth($authenticator, $authenticatorID = '') {
-        $this->schema([
+    public function post(array $body) {
+        $this->permission();
+
+        $in = $this->schema([
             'authenticator:s' => 'The authenticator that will be used.',
             'authenticatorID:s?' => 'Authenticator instance\'s identifier.',
         ])->setDescription('Authenticate a user using a specific authenticator.');
@@ -284,8 +312,13 @@ class AuthenticateApiController extends AbstractApiController {
             'authSessionID:s?' => 'Identifier of the authentication session. Returned if more steps are required to complete the authentication.',
         ]), 'out');
 
+        $in->validate($body);
+
+        $authenticator = $body['authenticator'];
+        $authenticatorID = isset($body['authenticatorID']) ? $body['authenticatorID'] : null;
+
         if ($this->getSession()->isValid()) {
-            throw new ClientException("Cannot authenticate while already logged in.", 403);
+            throw new ClientException("Cannot validateAuthentication while already logged in.", 403);
         }
 
         $authenticatorInstance = $this->getAuthenticator($authenticator, $authenticatorID);
@@ -293,7 +326,7 @@ class AuthenticateApiController extends AbstractApiController {
         if (is_a($authenticatorInstance, SSOAuthenticator::class)) {
 
             /** @var SSOAuthenticator $authenticatorInstance */
-            $ssoInfo = $authenticatorInstance->authenticate($this->request);
+            $ssoInfo = $authenticatorInstance->validateAuthentication($this->request);
 
             if (!$ssoInfo) {
                 throw new ServerException("Unknown error while authenticating with $authenticatorType.", 500);
@@ -322,32 +355,108 @@ class AuthenticateApiController extends AbstractApiController {
 
         if ($user) {
             $response = array_merge(['authenticationStep' => 'authenticated'], $this->camelCaseScheme->convertArrayKeys($user));
+        // We could not validateAuthentication or autoconnect so they will need to do a manual connect.
         } else {
-            // We could not authenticate or autoconnect but it may be possible to do a manual connect.
-            // If that is the case we should state so in the response.
-            if ($allowConnect && ($emailUnique || $nameUnique)) {
+            if ($allowConnect) {
                 $existingUserIDs = $this->ssoModel->findMatchingUserIDs($ssoInfo, $emailUnique, $nameUnique);
                 if (!empty($existingUserIDs)) {
-                    $sessionData['connectuser'] = [
+                    $sessionData['linkuser'] = [
                         'existingUsers' => $existingUserIDs,
-                    ];
-                    $response = [
-                        'authenticationStep' => 'connectuser',
                     ];
                 }
             }
+            $response = [
+                'authenticationStep' => 'linkuser',
+            ];
         }
 
-        if (!isset($response)) {
-            throw new ClientException('Authentication failed.');
-        }
-
-        if ($response['authenticationStep'] === 'connectuser') {
+        if ($response['authenticationStep'] === 'linkuser') {
             // Store all the information needed for the next authentication step.
             $response['authSessionID'] = $this->createSession($sessionData);
         }
 
         return $out->validate($response);
+    }
+
+    public function post_linkUser(array $body) {
+        $this->permission();
+
+        // Custom validator
+        $validator = function ($data, ValidationField $field) {
+            $hasPassword = !empty($data['password']);
+
+            if ($hasPassword) {
+                $valid = !empty($data['userID']);
+            }
+            if (!$valid && $hasPassword) {
+                $valid = !empty($data['name']) && !empty($data['email']);
+            }
+
+            if (!$valid) {
+                $field->addError('missingField', [
+                    'messageCode' => 'You must specify either userID + password or name + email + password.',
+                    'required' => true,
+                ]);
+            }
+
+            return $valid;
+        };
+
+        $in = $this->schema([
+                'authSessionID:s' => 'Identifier of the authentication session.',
+                'userID:i?' => 'Identifier of the user.',
+                'name:s?' => 'User name.',
+                'email:s?' => 'User email.',
+                'password:s?' => 'Password of the user.',
+            ], 'in')
+            ->addValidator('', $validator)
+            ->setDescription('Link a user to an authenticator using the authSessionID and some other information. Required: userID + password or name + email + password.');
+        $out = $this->schema($this->getUserFragmentSchema(), 'out');
+
+        $in->validate($body);
+
+        $sessionData = $this->sessionModel->getID($body['authSessionID'], DATASET_TYPE_ARRAY);
+        if ($this->sessionModel->isExpired($sessionData)) {
+            throw new Exception('The session has expired.');
+        }
+
+        if (!empty($body['userID'])) {
+            $userID = $body['userID'];
+        } else {
+            $this->userModel->SQL->select('UserID');
+            $userResults = $this->userModel->getWhere([
+                'Name' => $body['name'],
+                'Email' => $body['email'],
+            ])->resultArray();
+
+            if (count($userResults) > 1) {
+                throw new ClientException('More than one user has the same Email and Name combination');
+            } else if (count($userResults) === 0) {
+                throw new ClientException('No user was found with the supplied information.');
+            }
+
+            $userID = $userResults[0]['UserID'];
+        }
+
+        $tmp = ['UserID' => $userID];
+        $this->userModel->expandUsers($tmp, ['UserID']);
+        $user = $tmp['User'];
+
+        $passwordHash = new Gdn_PasswordHash();
+        $linkValid = $passwordHash->checkPassword($body['password'], $user['Password'], $user['HashMethod']);
+        if (!$linkValid) {
+            throw new ClientException('The user\'s information does not validate.');
+        }
+
+        $this->userModel->saveAuthentication([
+            'UserID' => $user['UserID'],
+            'Provider' => $sessionData['Attributes']['ssoInfo']['authenticatorID'],
+            'UniqueID' => $sessionData['Attributes']['ssoInfo']['uniqueID'],
+        ]);
+        // Clean the session.
+        $this->sessionModel->deleteID($sessionData['SessionID']);
+
+        return $out->validate($user);
     }
 
     /**

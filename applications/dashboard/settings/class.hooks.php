@@ -654,22 +654,6 @@ class DashboardHooks extends Gdn_Plugin {
             }
         }
         $this->checkAccessToken();
-
-        // KLUDGE: Allow some API endpoints to avoid requiring an access token/transient key on write operations.
-        $path = Gdn::request()->getPath();
-        $writeMethods = ['DELETE', 'PATCH', 'POST', 'PUT'];
-        if (stringBeginsWith($path, '/api/') && in_array(Gdn::request()->getMethod(), $writeMethods)) {
-            $tokenWriteExceptions = [
-                '`^/api/v\d+/applications$`',
-                '`^/api/v\d+/users/register`'
-            ];
-            foreach ($tokenWriteExceptions as $exception) {
-                if (preg_match($exception, $path)) {
-                    Gdn::session()->validateTransientKey(true);
-                    break;
-                }
-            }
-        }
     }
 
     /**

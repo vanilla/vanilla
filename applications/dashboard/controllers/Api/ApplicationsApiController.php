@@ -163,7 +163,7 @@ class ApplicationsApiController extends AbstractApiController {
      * @return Data
      */
     public function post(array $body) {
-        $this->permission();
+        $this->permission(\Vanilla\Permissions::BAN_CSRF);
 
         $in = $this->schema([
             'email:s' => 'The email address for the user.',

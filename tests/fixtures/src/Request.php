@@ -57,6 +57,10 @@ class Request implements RequestInterface {
         return $this->body;
     }
 
+    public function getScheme() {
+        return 'http';
+    }
+
     /**
      * Get the hostname of the request.
      *

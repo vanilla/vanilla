@@ -117,6 +117,11 @@ class Gdn_Form extends Gdn_Pluggable {
     private $_IDCollection = [];
 
     /**
+     * @var array An array of ID counters so that we don't have ID clashes.
+     */
+    private static $idCounters = [];
+
+    /**
      * Constructor
      *
      * @param string $tableName
@@ -576,7 +581,7 @@ class Gdn_Form extends Gdn_Pluggable {
                 } elseif ($selected) {
                     $return .= ' selected="selected"'; // only allow selection if NOT disabled
                 }
-              
+
                 $name = htmlspecialchars(val('Name', $category, 'Blank Category Name'));
                 if ($depth > 1) {
                     $name = str_repeat('&#160;', 4 * ($depth - 1)).$name;
@@ -3156,12 +3161,18 @@ PASSWORDMETER;
      */
     protected function _idAttribute($fieldName, $attributes) {
         // ID from attributes overrides the default.
-        $iD = arrayValueI('id', $attributes, false);
-        if (!$iD) {
-            $iD = $this->escapeID($fieldName);
+        $id = arrayValueI('id', $attributes, false);
+        if (!$id) {
+            $id = $this->escapeID($fieldName);
         }
 
-        return ' id="'.htmlspecialchars($iD).'"';
+        if (isset(self::$idCounters[$id])) {
+            $id .= self::$idCounters[$id]++;
+        } else {
+            self::$idCounters[$id] = 1;
+        }
+
+        return ' id="'.htmlspecialchars($id).'"';
     }
 
     /**

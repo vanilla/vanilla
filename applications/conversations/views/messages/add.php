@@ -30,12 +30,12 @@
     }
 
     echo '<div class="P">';
-    echo $this->Form->bodyBox('Body', ['Table' => 'ConversationMessage', 'FileUpload' => true, 'tabindex' => 1]);
+    echo $this->Form->bodyBox('Body', ['Table' => 'ConversationMessage', 'FileUpload' => true]);
     //      echo wrap($this->Form->textBox('Body', array('MultiLine' => TRUE)), 'div', array('class' => 'TextBoxWrapper'));
     echo '</div>';
 
     echo '<div class="Buttons">';
-    echo $this->Form->button('Start Conversation', ['class' => 'Button Primary DiscussionButton', 'tabindex' => 1]);
+    echo $this->Form->button('Start Conversation', ['class' => 'Button Primary DiscussionButton']);
     echo anchor(t('Cancel'), '/messages/inbox', 'Button Cancel');
     echo '</div>';
 

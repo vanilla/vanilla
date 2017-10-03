@@ -119,7 +119,7 @@ class ApplicationsApiController extends AbstractApiController {
         $in = $this->schema([
             'status:s' => [
                 'description' => 'Current status of the application.',
-                'enum' => ['approved', 'declined', 'pending']
+                'enum' => ['approved', 'declined']
             ]
         ], 'in')->setDescription('Modify a user application.');
         $out = $this->schema($this->fullSchema(), 'out');
@@ -168,19 +168,15 @@ class ApplicationsApiController extends AbstractApiController {
             'email:s' => 'The email address for the user.',
             'name:s' => 'A username for the user.',
             'password:s' => 'A password for the user.',
-            'discoveryText:s' => 'Why does the user wish to join?',
-            'termsOfService:b' => 'Were the terms of use accepted?'
+            'discoveryText:s' => 'Why does the user wish to join?'
         ], 'in')->setDescription('Submit a user application.');
         $out = $this->schema($this->fullSchema(), 'out');
 
         $body = $in->validate($body);
+
+        $this->userModel->validatePasswordStrength($body['password'], $body['name']);
+
         $userData = $this->caseScheme->convertArrayKeys($body);
-
-        if ($userData['TermsOfService'] === false) {
-            throw new ClientException('You must agree to the terms of service.');
-        }
-        $this->userModel->validatePasswordStrength($userData['Password'], $userData['Name']);
-
         $userID = $this->userModel->register($userData);
         $this->validateModel($this->userModel);
 

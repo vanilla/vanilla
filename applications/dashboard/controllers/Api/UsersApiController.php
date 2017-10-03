@@ -39,9 +39,10 @@ class UsersApiController extends AbstractApiController {
      * UsersApiController constructor.
      *
      * @param UserModel $userModel
+     * @param Gdn_Configuration $configuration
      */
-    public function __construct(UserModel $userModel, Gdn_Configuration $configuration, CapitalCaseScheme $caseScheme) {
-        $this->caseScheme = $caseScheme;
+    public function __construct(UserModel $userModel, Gdn_Configuration $configuration) {
+        $this->caseScheme = new CapitalCaseScheme();
         $this->configuration = $configuration;
         $this->userModel = $userModel;
     }
@@ -311,12 +312,14 @@ class UsersApiController extends AbstractApiController {
             'email:s' => 'An email address for this user.',
             'name:s' => 'The username.',
             'password:s' => 'A password for this user.',
-            'termsOfService:b' => 'Were the terms of use accepted?'
+            'discoveryText:s?' => 'Why does the user wish to join? Only used when the registration is flagged as SPAM (response code: 202).'
         ];
         if ($registrationMethod === 'invitation') {
             $inputProperties['invitationCode:s'] = 'An invitation code for registering on the site.';
         } elseif ($this->userModel->isRegistrationSpam($userData)) {
-            $inputProperties['discoveryText:s'] = 'Why does the user wish to join?';
+            // SPAM detected. Require a reason to join.
+            $inputProperties['discoveryText:s'] = $inputProperties['discoveryText:s?'];
+            unset($inputProperties['discoveryText:s?']);
         }
 
         $in = $this->schema($inputProperties, 'in')->setDescription('Submit a new user registration.');
@@ -324,9 +327,6 @@ class UsersApiController extends AbstractApiController {
 
         $body = $in->validate($body);
 
-        if ($userData['TermsOfService'] === false) {
-            throw new ClientException('You must agree to the terms of service.');
-        }
         $this->userModel->validatePasswordStrength($userData['Password'], $userData['Name']);
 
         switch ($registrationMethod) {

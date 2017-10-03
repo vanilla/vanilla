@@ -131,10 +131,10 @@ class InvitationsApiController extends AbstractApiController {
                 'maximum' => 100
             ],
             'expand:b?' => 'Expand associated records.'
-        ], 'in')->setDescription('Get a list of invitations for the current user.');
+        ], 'in')->setDescription('Get a list of invitations sent by the current user.');
         $out = $this->schema([
             ':a' => $this->fullSchema()
-        ]);
+        ], 'out');
 
         $query = $in->validate($query);
         list($offset, $limit) = offsetLimit("p{$query['page']}", $query['limit']);

@@ -249,7 +249,17 @@ class InvitationModel extends Gdn_Model {
         }
 
         // Delete it.
-        $result = $this->SQL->delete($this->Name, ['InvitationID' => $id]);
+        $result = true;
+        $this->SQL->delete($this->Name, ['InvitationID' => $id]);
+        if (array_key_exists('RowCount', $this->SQL->Database->LastInfo)) {
+            // Try to verify we actually did something.
+            if ($this->SQL->Database->LastInfo['RowCount'] == 0) {
+                $result = false;
+            }
+        } elseif (!$result) {
+            // If our result was falsy, make it official.
+            $result = false;
+        }
 
         // Add the invitation back onto the user's account if the invitation has not been accepted.
         if ($result && !$invitation['AcceptedUserID']) {

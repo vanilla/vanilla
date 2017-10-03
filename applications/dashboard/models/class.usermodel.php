@@ -3424,10 +3424,15 @@ class UserModel extends Gdn_Model {
      * Approve a membership applicant.
      *
      * @param int $userID
+     * @param string|null $email Deprecated.
      * @return bool
      * @throws Exception
      */
-    public function approve($userID) {
+    public function approve($userID, $email = null) {
+        if ($email !== null) {
+            deprecated('Using the $email parameter of UserModel::approve.');
+        }
+
         $applicantFound = $this->isApplicant($userID);
 
         if ($applicantFound) {
@@ -4927,11 +4932,10 @@ class UserModel extends Gdn_Model {
 
         // Make sure the user is an applicant.
         $roleData = $this->getRoles($userID);
-        if ($roleData->numRows() == 0) {
+        if (count($roleData) == 0) {
             throw new Exception(t('ErrorRecordNotFound'));
         } else {
-            $appRoles = $roleData->result(DATASET_TYPE_ARRAY);
-            foreach ($appRoles as $appRole) {
+            foreach ($roleData as $appRole) {
                 if (in_array(val('RoleID', $appRole), $applicantRoleIDs)) {
                     $result = true;
                     break;

@@ -85,6 +85,7 @@ class InvitationsApiController extends AbstractApiController {
                 'dateInserted:dt' => 'When the invitation was created.',
                 'acceptedUser:o|n?' => $this->getUserFragmentSchema(),
                 'acceptedUserID:i|n' => 'User who accepted the invitation.',
+                'dateAccepted:dt|n' => 'When the invitation was accepted.',
                 'dateExpires:dt|n' => 'When the expiration is set to expire.'
             ]);
         }

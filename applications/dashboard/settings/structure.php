@@ -385,6 +385,7 @@ $Construct->table('Invitation')
     ->column('InsertUserID', 'int', true, 'index.userdate')
     ->column('DateInserted', 'datetime', false, 'index.userdate')
     ->column('AcceptedUserID', 'int', true)
+    ->column('DateAccepted', 'datetime', true)
     ->column('DateExpires', 'datetime', true)
     ->set($Explicit, $Drop);
 

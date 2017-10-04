@@ -2855,6 +2855,7 @@ class UserModel extends Gdn_Model {
             $this->SQL
                 ->update('Invitation')
                 ->set('AcceptedUserID', $userID)
+                ->set('DateAccepted', Gdn_Format::toDateTime())
                 ->where('InvitationID', $invitation->InvitationID)
                 ->put();
 

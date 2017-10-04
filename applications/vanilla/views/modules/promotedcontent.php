@@ -6,7 +6,7 @@ $ShowIfNoResults = $this->data('ShowIfNoResults');
 
 $ContentItems = is_array($Content) ? sizeof($Content) : 0;
 
-if ($ContentItems != 0 || $ShowIfNoResults):
+if (!empty($Content) || $this->ShowIfNoResults):
     ?>
     <div class="Box BoxPromoted">
         <?php echo panelHeading(t('Promoted Content')); ?>

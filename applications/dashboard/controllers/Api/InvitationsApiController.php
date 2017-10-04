@@ -220,7 +220,7 @@ class InvitationsApiController extends AbstractApiController {
         $this->prepareRow($row);
 
         $result = $out->validate($row);
-        return new Data($result, 201);
+        return $result;
     }
 
     /**

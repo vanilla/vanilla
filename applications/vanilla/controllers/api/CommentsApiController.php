@@ -5,7 +5,6 @@
  */
 
 use Garden\Schema\Schema;
-use Garden\Web\Data;
 use Garden\Web\Exception\NotFoundException;
 use Garden\Web\Exception\ServerException;
 use Vanilla\Utility\CapitalCaseScheme;
@@ -353,7 +352,7 @@ class CommentsApiController extends AbstractApiController {
      *
      * @param array $body The request body.
      * @throws ServerException if the comment could not be created.
-     * @return Data
+     * @return array
      */
     public function post(array $body) {
         $this->permission('Garden.SignIn.Allow');
@@ -375,6 +374,6 @@ class CommentsApiController extends AbstractApiController {
         $this->userModel->expandUsers($row, ['InsertUserID']);
 
         $result = $out->validate($row);
-        return new Data($result, 201);
+        return $result;
     }
 }

@@ -6,7 +6,6 @@
  */
 
 use Garden\Schema\Schema;
-use Garden\Web\Data;
 use Garden\Web\Exception\NotFoundException;
 use Garden\Web\Exception\ServerException;
 use Vanilla\Utility\CapitalCaseScheme;
@@ -334,7 +333,7 @@ class ConversationsApiController extends AbstractApiController {
      *
      * @param array $body The request body.
      * @throws ServerException If the conversation could not be created.
-     * @return Data
+     * @return array
      */
     public function post(array $body) {
         $this->permission('Conversations.Conversations.Add');
@@ -353,10 +352,7 @@ class ConversationsApiController extends AbstractApiController {
         }
 
         $conversation = $this->conversationByID($conversationID, $this->getSession()->UserID);
-        return new Data(
-            $out->validate($conversation),
-            201
-        );
+        return $out->validate($conversation);
     }
 
     /**
@@ -366,7 +362,7 @@ class ConversationsApiController extends AbstractApiController {
      * @param array $body The request body.
      * @throws NotFoundException if the conversation could not be found.
      * @throws ServerException If the participants could not be added.
-     * @return Data
+     * @return array
      */
     public function post_participants($id, array $body) {
         $this->permission('Conversations.Conversations.Add');
@@ -389,10 +385,7 @@ class ConversationsApiController extends AbstractApiController {
         // Fetch up to date conversation.
         $conversation = $this->conversationByID($id);
 
-        return new Data(
-            $out->validate($conversation),
-            201
-        );
+        return $out->validate($conversation);
     }
 
     /**

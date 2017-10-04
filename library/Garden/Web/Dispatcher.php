@@ -14,7 +14,7 @@ use Vanilla\Permissions;
 class Dispatcher {
 
     /**
-     * @var Route[]
+     * @var array
      */
     private $routes;
 
@@ -118,6 +118,22 @@ class Dispatcher {
                 $response = $this->makeResponse(new NotFoundException($request->getPath()));
                 // This is temporary. Only use internally.
                 $response->setMeta('noMatch', true);
+            }
+        } else {
+            if ($response->getMeta('status', null) === null) {
+                switch ($request->getMethod()) {
+                    case 'GET':
+                    case 'PATCH':
+                    case 'PUT':
+                        $response->setStatus(200);
+                        break;
+                    case 'POST':
+                        $response->setStatus(201);
+                        break;
+                    case 'DELETE':
+                        $response->setStatus(204);
+                        break;
+                }
             }
         }
 

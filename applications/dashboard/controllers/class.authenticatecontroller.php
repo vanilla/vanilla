@@ -110,16 +110,17 @@ class AuthenticateController extends Gdn_Controller {
      * @param string $authenticatorID The authenticator's instance ID.
      * @throws Exception
      */
-    public function index($authenticator, $authenticatorID = '') {
+    public function index($authenticator = '', $authenticatorID = '') {
         try {
-            $response = $this->authenticateApiController->get_auth($authenticator, $authenticatorID);
+            $response = $this->authenticateApiController->post([
+                'authenticator' => $authenticator,
+                'authenticatorID' => $authenticatorID,
+            ]);
         } catch(Exception $e) {
             if (debug()) {
                 throw $e;
             }
-            // Render errors
-            $this->setData('exception', $e);
-            $this->render();
+            throw notFoundException();
         }
 
         if ($response['authenticationStep'] === 'authenticated') {

@@ -185,7 +185,7 @@ class VanillaConnectPlugin extends Gdn_Plugin {
             return '';
         }
 
-        // Redirect to /validateAuthentication/vanillaconnect which will redirect to the proper URL with the JWT.
+        // Redirect to /authenticate/vanillaconnect which will redirect to the proper URL with the JWT.
         $signInUrl = url('/entry/vanillaconnect/signin/'.rawurlencode($provider['AuthenticationKey'])).'?target='.rawurlencode($this->request->getPath());
         $registerUrl = url('/entry/vanillaconnect/register/'.rawurlencode($provider['AuthenticationKey'])).'?target='.rawurlencode($this->request->getPath());
 

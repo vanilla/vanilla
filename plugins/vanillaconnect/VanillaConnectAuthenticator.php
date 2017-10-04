@@ -132,7 +132,7 @@ class VanillaConnectAuthenticator extends SSOAuthenticator {
      * @return string
      */
     private function getRedirectURL($providerURL) {
-        $url = $this->request->getScheme().'://'.$this->request->getHost().'/validateAuthentication/'.$this->getName().'/'.rawurlencode($this->getID());
+        $url = $this->request->getScheme().'://'.$this->request->getHost().'/authenticate/'.$this->getName().'/'.rawurlencode($this->getID());
 
         $target = false;
         $query = [];

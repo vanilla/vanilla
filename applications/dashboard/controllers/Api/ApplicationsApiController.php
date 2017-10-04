@@ -12,12 +12,15 @@ use Garden\Web\Exception\ServerException;
 use Vanilla\Utility\CapitalCaseScheme;
 
 /**
- * API Controller for managing user applications.
+ * API Controller for managing applications.
  */
 class ApplicationsApiController extends AbstractApiController {
 
     /** @var CapitalCaseScheme */
     private $caseScheme;
+
+    /** @var Schema */
+    private $idParamSchema;
 
     /** @var UserModel */
     private $userModel;
@@ -28,7 +31,7 @@ class ApplicationsApiController extends AbstractApiController {
      * @param CapitalCaseScheme $caseScheme
      * @param Gdn_Configuration $configuration
      * @param UserModel $userModel
-     * @throws ClientException if the site is not configured for user applications.
+     * @throws ClientException if the registration method on the site is not approval.
      */
     public function __construct(CapitalCaseScheme $caseScheme, Gdn_Configuration $configuration, UserModel $userModel) {
         $registrationMethod = strtolower($configuration->get('Garden.Registration.Method'));
@@ -37,6 +40,28 @@ class ApplicationsApiController extends AbstractApiController {
         }
         $this->caseScheme = $caseScheme;
         $this->userModel = $userModel;
+    }
+
+    /**
+     * Delete an application. For now, this will decline the user's application.
+     *
+     * @param int $id The ID of the application.
+     * @throws ClientException if the application has been approved.
+     */
+    public function delete($id) {
+        $this->permission('Garden.Users.Approve');
+
+        $in = $this->idParamSchema()->setDescription('Delete an application.');
+        $out = $this->schema([], 'out');
+
+        $row = $this->userByID($id);
+        $this->prepareRow($row);
+
+        if ($this->userModel->isApplicant($id) === false) {
+            throw new ClientException('The application specified is already an active user.');
+        }
+
+        $this->userModel->decline($id);
     }
 
     /**
@@ -49,7 +74,7 @@ class ApplicationsApiController extends AbstractApiController {
 
         if ($fullSchema === null) {
             $fullSchema = Schema::parse([
-                'userID:i' => 'Unique user ID associated with the application.',
+                'applicationID:i' => 'Unique ID associated with the application.',
                 'email:s' => 'Email address associated with the application.',
                 'name:s' => 'Username on the application.',
                 'discoveryText:s' => 'Reason why you want to join.',
@@ -63,6 +88,42 @@ class ApplicationsApiController extends AbstractApiController {
         }
 
         return $fullSchema;
+    }
+
+    /**
+     * Get a single application.
+     *
+     * @param int $id The ID of the application.
+     * @throws NotFoundException if the application could not be found.
+     * @return array
+     */
+    public function get($id) {
+        $this->permission('Garden.Users.Approve');
+
+        $in = $this->idParamSchema()->setDescription('Get an application.');
+        $out = $this->schema($this->fullSchema(), 'out');
+
+        $row = $this->userByID($id);
+        $this->prepareRow($row);
+
+        $result = $out->validate($row);
+        return $result;
+    }
+
+    /**
+     * Get an ID-only application record schema.
+     *
+     * @param string $type The type of schema.
+     * @return Schema Returns a schema object.
+     */
+    public function idParamSchema($type = 'in') {
+        if ($this->idParamSchema === null) {
+            $this->idParamSchema = $this->schema(
+                Schema::parse(['id:i' => 'The application ID.']),
+                $type
+            );
+        }
+        return $this->schema($this->idParamSchema, $type);
     }
 
     /**
@@ -86,7 +147,7 @@ class ApplicationsApiController extends AbstractApiController {
                 'minimum' => 1,
                 'maximum' => 100
             ]
-        ], 'in')->setDescription('Get a list of current user applications.');
+        ], 'in')->setDescription('Get a list of current applications.');
         $out = $this->schema(
             [':a' => $this->fullSchema()],
             'out'
@@ -116,13 +177,13 @@ class ApplicationsApiController extends AbstractApiController {
     public function patch($id, array $body) {
         $this->permission('Garden.Users.Approve');
 
-        $this->schema(['id' => 'The application ID'], 'in');
+        $this->idParamSchema('in');
         $in = $this->schema([
             'status:s' => [
                 'description' => 'Current status of the application.',
                 'enum' => ['approved', 'declined']
             ]
-        ], 'in')->setDescription('Modify a user application.');
+        ], 'in')->setDescription('Modify an application.');
         $out = $this->schema($this->fullSchema(), 'out');
 
         $row = $this->userByID($id);
@@ -155,7 +216,7 @@ class ApplicationsApiController extends AbstractApiController {
     }
 
     /**
-     * Submit a user application.
+     * Submit an application.
      *
      * @param array $body
      * @throws ClientException if the terms of service flag is false.
@@ -170,7 +231,7 @@ class ApplicationsApiController extends AbstractApiController {
             'name:s' => 'A username for the user.',
             'password:s' => 'A password for the user.',
             'discoveryText:s' => 'Why does the user wish to join?'
-        ], 'in')->setDescription('Submit a user application.');
+        ], 'in')->setDescription('Submit an application.');
         $out = $this->schema($this->fullSchema(), 'out');
 
         $body = $in->validate($body);
@@ -186,8 +247,8 @@ class ApplicationsApiController extends AbstractApiController {
         } else {
             throw new ServerException('An unknown error occurred while attempting to create the application.', 500);
         }
-
         $this->prepareRow($row);
+
         $result = $out->validate($row);
         return new Data($result, 201);
     }
@@ -198,11 +259,13 @@ class ApplicationsApiController extends AbstractApiController {
      * @param array $row
      */
     public function prepareRow(array &$row) {
-        $row['status'] = 'pending';
+        $row['ApplicationID'] = $row['UserID'];
+        unset($row['UserID']);
+        $row['Status'] = 'pending';
     }
 
     /**
-     * Get a user application by its numeric ID.
+     * Get an application by its numeric ID.
      *
      * @param int $id The user ID.
      * @throws NotFoundException if the user could not be found.

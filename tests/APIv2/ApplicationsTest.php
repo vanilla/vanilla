@@ -17,7 +17,7 @@ class ApplicationsTest extends AbstractResourceTest {
     public function __construct($name = null, array $data = [], $dataName = '') {
         $this->baseUrl = '/applications';
         $this->patchFields = ['status'];
-        $this->pk = 'userID';
+        $this->pk = 'applicationID';
 
         parent::__construct($name, $data, $dataName);
     }
@@ -100,22 +100,6 @@ class ApplicationsTest extends AbstractResourceTest {
             "{$this->baseUrl}/{$row[$this->pk]}",
             ['status' => 'declined']
         );
-    }
-
-    /**
-     * {@inheritdoc}
-     * @requires function ApplicationsApiController::delete
-     */
-    public function testDelete() {
-        $this->fail(__METHOD__.' needs to be implemented.');
-    }
-
-    /**
-     * {@inheritdoc}
-     * @requires function ApplicationsApiController::get
-     */
-    public function testGet() {
-        $this->fail(__METHOD__.' needs to be implemented.');
     }
 
     /**

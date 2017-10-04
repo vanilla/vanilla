@@ -18,7 +18,7 @@ use Vanilla\Models\SSOModel;
 use Vanilla\Utility\CamelCaseScheme;
 
 /**
- * API Controller for the `/validateAuthentication` resource.
+ * API Controller for the `/authenticate` resource.
  */
 class AuthenticateApiController extends AbstractApiController {
 
@@ -147,7 +147,7 @@ class AuthenticateApiController extends AbstractApiController {
 
         $this->schema([
             'authSessionID:s' => 'Identifier of the authentication session.',
-        ], 'in')->setDescription('Delete an validateAuthentication session.');
+        ], 'in')->setDescription('Delete an authentication session.');
         $this->schema([], 'out');
 
         $this->sessionModel->deleteID($authSessionID);
@@ -318,7 +318,7 @@ class AuthenticateApiController extends AbstractApiController {
         $authenticatorID = isset($body['authenticatorID']) ? $body['authenticatorID'] : null;
 
         if ($this->getSession()->isValid()) {
-            throw new ClientException("Cannot validateAuthentication while already logged in.", 403);
+            throw new ClientException("Cannot authenticate while already logged in.", 403);
         }
 
         $authenticatorInstance = $this->getAuthenticator($authenticator, $authenticatorID);
@@ -355,7 +355,7 @@ class AuthenticateApiController extends AbstractApiController {
 
         if ($user) {
             $response = array_merge(['authenticationStep' => 'authenticated'], $this->camelCaseScheme->convertArrayKeys($user));
-        // We could not validateAuthentication or autoconnect so they will need to do a manual connect.
+        // We could not authenticate or autoconnect so they will need to do a manual connect.
         } else {
             if ($allowConnect) {
                 $existingUserIDs = $this->ssoModel->findMatchingUserIDs($ssoInfo, $emailUnique, $nameUnique);

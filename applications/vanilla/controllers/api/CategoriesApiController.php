@@ -5,7 +5,6 @@
  */
 
 use Garden\Schema\Schema;
-use Garden\Web\Data;
 use Garden\Web\Exception\ClientException;
 use Garden\Web\Exception\NotFoundException;
 use Garden\Web\Exception\ServerException;
@@ -331,7 +330,7 @@ class CategoriesApiController extends AbstractApiController {
      *
      * @param array $body The request body.
      * @throws ServerException if the category could not be created.
-     * @return Data
+     * @return array
      */
     public function post(array $body) {
         $this->permission('Garden.Settings.Manage');
@@ -352,7 +351,7 @@ class CategoriesApiController extends AbstractApiController {
         $row = $this->category($id);
         $this->prepareRow($row);
         $result = $out->validate($row);
-        return new Data($result, 201);
+        return $result;
     }
 
     /**

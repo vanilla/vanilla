@@ -8,6 +8,7 @@
 namespace Vanilla\VanillaConnect;
 
 use Gdn_AuthenticationProviderModel;
+use Gdn_Configuration;
 use EntryController;
 use Logger;
 use Garden\Web\Exception\NotFoundException;
@@ -24,6 +25,11 @@ class VanillaConnectPlugin extends Gdn_Plugin {
      * @var Gdn_AuthenticationProviderModel
      */
     private $authProviderModel;
+
+    /**
+     * @var Gdn_Configuration
+     */
+    private $config;
 
     /**
      * @var UserAuthenticationNonceModel
@@ -54,6 +60,7 @@ class VanillaConnectPlugin extends Gdn_Plugin {
      * VanillaConnectPlugin constructor.
      *
      * @param Gdn_AuthenticationProviderModel $authProviderModel
+     * @param Gdn_Configuration $config
      * @param RequestInterface $request
      * @param Gdn_Session $session
      * @param SSOModel $ssoModel
@@ -62,6 +69,7 @@ class VanillaConnectPlugin extends Gdn_Plugin {
      */
     public function __construct(
         Gdn_AuthenticationProviderModel $authProviderModel,
+        Gdn_Configuration $config,
         UserAuthenticationNonceModel $nonceModel,
         RequestInterface $request,
         Gdn_Session $session,
@@ -71,6 +79,7 @@ class VanillaConnectPlugin extends Gdn_Plugin {
         parent::__construct();
 
         $this->authProviderModel = $authProviderModel;
+        $this->config = $config;
         $this->nonceModel = $nonceModel;
         $this->request = $request;
         $this->session = $session;
@@ -130,6 +139,34 @@ class VanillaConnectPlugin extends Gdn_Plugin {
     }
 
     /**
+     * Make the signIn button work when a VanillaConnect provider is set as the default.
+     *
+     * @param $sender
+     * @param $args
+     */
+    public function entryController_overrideSignIn_handler($sender, $args) {
+        if ($args['DefaultProvider']['AuthenticationSchemeAlias'] !== VanillaConnect::NAME) {
+            return;
+        }
+
+        $this->entryController_vanillaConnect_create(null, 'signin', $args['DefaultProvider']['AuthenticationKey']);
+    }
+
+    /**
+     * Allow user to be logged in when hitting the /sso endpoint.
+     *
+     * @param $sender
+     * @param $args
+     */
+    public function rootController_sso_handler($sender, $args) {
+        if ($args['DefaultProvider']['AuthenticationSchemeAlias'] !== VanillaConnect::NAME) {
+            return;
+        }
+
+        $this->entryController_vanillaConnect_create(null, 'signin', $args['DefaultProvider']['AuthenticationKey']);
+    }
+
+    /**
      * Put SignIn buttons in the guest box.
      */
     public function base_beforeSignInButton_handler() {
@@ -182,6 +219,8 @@ class VanillaConnectPlugin extends Gdn_Plugin {
      */
     private function connectButton($provider, $options = []) {
         if ($provider['IsDefault']) {
+            // Make sure that we don't use the SignIn popup that does a post request which is incompatible with redirects.
+            $this->config->saveToConfig('Garden.SignIn.Popup', false, false);
             return '';
         }
 

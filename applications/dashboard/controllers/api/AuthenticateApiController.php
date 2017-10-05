@@ -307,7 +307,10 @@ class AuthenticateApiController extends AbstractApiController {
             'authenticatorID:s?' => 'Authenticator instance\'s identifier.',
         ])->setDescription('Authenticate a user using a specific authenticator.');
         $out = $this->schema(Schema::parse([
-            'authenticationStep:s' => 'Tells whether the user is now authenticated or if additional step(s) are required.',
+            'authenticationStep:s' => [
+                'description' => 'Tells whether the user is now authenticated or if additional step(s) are required.',
+                'enum' => ['authenticated', 'linkUser'],
+            ],
             'userID:i?' => 'Identifier of the authenticated user.',
             'authSessionID:s?' => 'Identifier of the authentication session. Returned if more steps are required to complete the authentication.',
         ]), 'out');
@@ -360,17 +363,17 @@ class AuthenticateApiController extends AbstractApiController {
             if ($allowConnect) {
                 $existingUserIDs = $this->ssoModel->findMatchingUserIDs($ssoInfo, $emailUnique, $nameUnique);
                 if (!empty($existingUserIDs)) {
-                    $sessionData['linkuser'] = [
+                    $sessionData['linkUser'] = [
                         'existingUsers' => $existingUserIDs,
                     ];
                 }
             }
             $response = [
-                'authenticationStep' => 'linkuser',
+                'authenticationStep' => 'linkUser',
             ];
         }
 
-        if ($response['authenticationStep'] === 'linkuser') {
+        if ($response['authenticationStep'] === 'linkUser') {
             // Store all the information needed for the next authentication step.
             $response['authSessionID'] = $this->createSession($sessionData);
         }

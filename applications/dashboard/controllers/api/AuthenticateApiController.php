@@ -127,7 +127,7 @@ class AuthenticateApiController extends AbstractApiController {
             $userID = $this->getSession()->UserID;
         }
 
-        $authenticatorInstance = $this->getSSOAuthenticator($authenticator, $authenticatorID);
+        $authenticatorInstance = $this->getAuthenticator($authenticator, $authenticatorID);
 
         $data = [];
         $this->userModel->getDelete(
@@ -183,7 +183,7 @@ class AuthenticateApiController extends AbstractApiController {
             $userID = $this->getSession()->UserID;
         }
 
-        $authenticatorInstance = $this->getSSOAuthenticator($authenticator, $authenticatorID);
+        $authenticatorInstance = $this->getAuthenticator($authenticator, $authenticatorID);
 
 
         return $out->validate((bool)$this->userModel->getAuthenticationByUser($userID, $authenticatorInstance->getID()));

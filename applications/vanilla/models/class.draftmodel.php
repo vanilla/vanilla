@@ -85,7 +85,7 @@ class DraftModel extends Gdn_Model {
      * @param int $draftID Unique ID of draft to get data for.
      * @param string|false $dataSetType The format of the data.
      * @param array $options Not used.
-     * @return object SQL results.
+     * @return array|object SQL results.
      */
     public function getID($draftID, $dataSetType = false, $options = []) {
         $dataSetType = $dataSetType ?: DATASET_TYPE_OBJECT;

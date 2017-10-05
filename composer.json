@@ -45,7 +45,7 @@
         "vanilla/legacy-oauth": "~1.0",
         "vanilla/legacy-passwords": "~1.0",
         "vanilla/nbbc": "~2.1",
-        "vanilla/vanilla-connect": "dev-feature/initial"
+        "vanilla/vanilla-connect": "dev-master"
     },
     "require-dev": {
         "phpunit/phpunit": "~5.0"

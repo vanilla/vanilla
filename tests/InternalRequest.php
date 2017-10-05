@@ -56,6 +56,13 @@ class InternalRequest extends HttpRequest implements RequestInterface {
     /**
      * {@inheritdoc}
      */
+    public function getScheme() {
+        return parse_url($this->url, PHP_URL_SCHEME);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function getRoot() {
         $root = trim(parse_url($this->container->get('@baseUrl'), PHP_URL_PATH), '/');
         $root = $root ? "/$root" : '';

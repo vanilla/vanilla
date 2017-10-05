@@ -42,11 +42,6 @@ class SSOInfo implements \ArrayAccess {
     public $authenticatorIsTrusted;
 
     /**
-     * @var array
-     */
-    public $extraInfo = [];
-
-    /**
      * Maps to "GDN_UserAuthentication.ForeignUserKey"
      *
      * @var string
@@ -60,29 +55,26 @@ class SSOInfo implements \ArrayAccess {
      * @throws \Exception If a non associative array is passed to the constructor.
      */
     public function __construct(array $associativeArray = []) {
-        if (array_key_exists($associativeArray[0])) {
+        if (array_key_exists(0, $associativeArray)) {
             throw new \Exception(__CLASS__.' can only be initialized with an associative array.');
         }
 
         foreach($associativeArray as $name => $value) {
             $this->$name = $value;
         }
-
-        if (!is_array($this->extraInfo)) {
-            $this->extraInfo = [];
-        }
     }
 
     /**
-     * Getter fro any extra information given by an SSOAuthenticator.
+     * Getter with default value.
+     * Deprecate when we can use the coalesce operator.
      *
      * @param $name
      * @param $default
      * @return mixed The extra information or the default if not found.
      */
-    public function getExtraInfo($name, $default = null) {
-        if (array_key_exists($name, $this->extraInfo)) {
-            return $this->extraInfo[$name];
+    public function coalesce($name, $default = null) {
+        if (property_exists($this, $name)) {
+            return $this->$name;
         }
 
         return $default;

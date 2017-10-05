@@ -236,10 +236,10 @@ class AuthenticateApiController extends AbstractApiController {
 
         $cleanedSessionData = $out->validate($sessionData);
 
-        // We need to add back extra information that were stripped during the clean process.
-        if (isset($cleanedSessionData['attributes']['ssoInfo']['extraInfo'])) {
-            $extraInfo = $this->camelCaseScheme->convertArrayKeys($sessionData['Attributes']['ssoInfo']['extraInfo']);
-            $cleanedSessionData['attributes']['ssoInfo']['extraInfo'] += $extraInfo;
+        // We need to add back the ssoInfo since it was cleaned and we want to preserve any extra information.
+        if (isset($cleanedSessionData['attributes']['ssoInfo'])) {
+            $ssoInfo = $this->camelCaseScheme->convertArrayKeys($sessionData['Attributes']['ssoInfo']);
+            $cleanedSessionData['attributes']['ssoInfo'] = $ssoInfo;
         }
 
         return $cleanedSessionData;
@@ -473,17 +473,14 @@ class AuthenticateApiController extends AbstractApiController {
                 'authenticatorID:s' => 'ID of the authenticator instance that was used to create this object.',
                 'authenticatorIsTrusted:b' => 'If the authenticator is trusted to sync user\'s information.',
                 'uniqueID:s' => 'Unique ID of the user supplied by the provider.',
-                'extraInfo?' => Schema::parse([
-                        'email:s?' => 'Email of the user.',
-                        'name:s?' => 'Name of the user.',
-                        'roles:a?' => [
-                            'description' => 'One or more role name.',
-                            'items' => ['type' => 'string'],
-                            'style' => 'form',
-                        ],
-                        '...:s?' => 'Any other information.',
-                    ])
-                    ->setDescription('Any extra information returned by the provider. Usually name, email and possibly roles.')
+                'email:s?' => 'Email of the user.',
+                'name:s?' => 'Name of the user.',
+                'roles:a?' => [
+                    'description' => 'One or more role name.',
+                    'items' => ['type' => 'string'],
+                    'style' => 'form',
+                ],
+                '...:s?' => 'Any other information.',
             ], 'SSOInfo')->setDescription('SSOAuthenticator\'s supplied information.');
         }
 

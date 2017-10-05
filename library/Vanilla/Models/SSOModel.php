@@ -60,8 +60,8 @@ class SSOModel {
      * @return array|false The user of false on failure.
      */
     public function createUser(SSOInfo $ssoInfo) {
-        $email = $ssoInfo->getExtraInfo('email');
-        $name = $ssoInfo->getExtraInfo('name');
+        $email = $ssoInfo->coalesce('email');
+        $name = $ssoInfo->coalesce('name');
 
         if (!$email && !$name) {
             return false;
@@ -103,8 +103,8 @@ class SSOModel {
             return [];
         }
 
-        $email = $ssoInfo->getExtraInfo('email');
-        $name = $ssoInfo->getExtraInfo('name');
+        $email = $ssoInfo->coalesce('email');
+        $name = $ssoInfo->coalesce('name');
         if (!$email && !$name) {
             return [];
         }
@@ -153,7 +153,7 @@ class SSOModel {
      * @return array|bool User data if found or false otherwise.
      */
     private function getUserByEmail(SSOInfo $ssoInfo) {
-        $email = $ssoInfo->getExtraInfo('email', null);
+        $email = $ssoInfo->coalesce('email', null);
         if (!isset($email)) {
             return false;
         }

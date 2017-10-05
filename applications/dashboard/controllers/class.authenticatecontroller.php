@@ -180,8 +180,8 @@ class AuthenticateController extends Gdn_Controller {
             }
 
         } else {
-            $this->form->setValue('name', $ssoInfo['name']);
-            $this->form->setValue('email', $ssoInfo['email']);
+            $this->form->setValue('createUserName', $ssoInfo->coalesce('name'));
+            $this->form->setValue('createUserEmail', $ssoInfo->coalesce('email'));
         }
 
         if ($connectSuccess) {
@@ -250,8 +250,8 @@ class AuthenticateController extends Gdn_Controller {
         $this->form->validateRule('createUserEmail', 'ValidateEmail', t('Email is invalid.'));
 
         if ($this->form->errorCount() === 0) {
-            $ssoInfo['Name'] = $this->form->getFormValue('createUserName');
-            $ssoInfo['Email'] = $this->form->getFormValue('createUserEmail');
+            $ssoInfo['name'] = $this->form->getFormValue('createUserName');
+            $ssoInfo['email'] = $this->form->getFormValue('createUserEmail');
             $user = $this->ssoModel->createUser($ssoInfo);
 
             if ($user) {

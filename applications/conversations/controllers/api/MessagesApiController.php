@@ -307,7 +307,7 @@ class MessagesApiController extends AbstractApiController {
      * @throws NotFoundException If the conversation was not found.
      * @throws ClientException If trying to add message to conversation you are not a participant of.
      * @throws ServerException If the message could not be created.
-     * @return Data
+     * @return array
      */
     public function post(array $body) {
         $this->permission('Conversations.Conversations.Add');
@@ -331,10 +331,7 @@ class MessagesApiController extends AbstractApiController {
 
         $message = $this->messageByID($messageID);
         $this->prepareRow($message);
-        return new Data(
-            $out->validate($message),
-            201
-        );
+        return $out->validate($message);
     }
 
     /**

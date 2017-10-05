@@ -88,9 +88,18 @@ class VanillaConnectPlugin extends Gdn_Plugin {
     }
 
     /**
+     * Disable Garden.SignIn.Popup is one connection is set as Default.
      * Authenticate a user using the JWT supplied from the query parameter "vc_sso".
      */
     public function gdn_dispatcher_appStartup_handler() {
+        if (!$this->session->isValid()) {
+            $defaultProvider = $this->authProviderModel->getDefault();
+            if ($defaultProvider && $defaultProvider['AuthenticationSchemeAlias'] === VanillaConnect::NAME) {
+                // Make sure that we don't use the SignIn popup that does a post request which is incompatible with redirects.
+                $this->config->saveToConfig('Garden.SignIn.Popup', false, false);
+            }
+        }
+
         $query = $this->request->getQuery();
 
         $jwt = !empty($query['vc_sso']) ? $query['vc_sso'] : null;
@@ -219,8 +228,6 @@ class VanillaConnectPlugin extends Gdn_Plugin {
      */
     private function connectButton($provider, $options = []) {
         if ($provider['IsDefault']) {
-            // Make sure that we don't use the SignIn popup that does a post request which is incompatible with redirects.
-            $this->config->saveToConfig('Garden.SignIn.Popup', false, false);
             return '';
         }
 

@@ -85,21 +85,17 @@ class VanillaConnectAuthenticator extends SSOAuthenticator {
      * @return SSOInfo
      */
     private function claimToSSOInfo($claim) {
-        $ssoInfoData = [
-            'uniqueID' => $claim['id'],
-        ];
+        $claim['uniqueID'] = $claim['id'];
 
         foreach (array_keys(VanillaConnect::JWT_RESPONSE_CLAIM_TEMPLATE) as $key) {
             unset($claim[$key]);
         }
 
-        $ssoInfoData['extraInfo'] = $claim;
+        $claim['authenticatorID'] = $this->getID();
+        $claim['authenticatorName'] = $this->getName();
+        $claim['authenticatorIsTrusted'] = $this->isTrusted();
 
-        $ssoInfoData['authenticatorID'] = $this->getID();
-        $ssoInfoData['authenticatorName'] = $this->getName();
-        $ssoInfoData['authenticatorIsTrusted'] = $this->isTrusted();
-
-        $ssoInfo = new SSOInfo($ssoInfoData);
+        $ssoInfo = new SSOInfo($claim);
         $ssoInfo->validate();
 
         return $ssoInfo;
@@ -135,13 +131,13 @@ class VanillaConnectAuthenticator extends SSOAuthenticator {
         $url = $this->request->getScheme().'://'.$this->request->getHost().'/authenticate/'.$this->getName().'/'.rawurlencode($this->getID());
 
         $target = false;
-        $query = [];
-        parse_str(parse_url($providerURL, PHP_URL_QUERY), $query);
-        $query = array_change_key_case($query, CASE_LOWER);
+        $providerQuery = [];
+        parse_str(parse_url($providerURL, PHP_URL_QUERY), $providerQuery);
+        $providerQuery = array_change_key_case($providerQuery, CASE_LOWER);
 
         // If a target is set on the provider URL let's use that.
-        if (!empty($query['target'])) {
-            $target = $query['target'];
+        if (!empty($providerQuery['target'])) {
+            $target = $providerQuery['target'];
         } else {
             $query = $this->request->getQuery();
             $query = array_change_key_case($query, CASE_LOWER);

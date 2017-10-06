@@ -9,7 +9,7 @@ namespace VanillaTests;
 
 use Garden\Container\Container;
 use Garden\Container\Reference;
-use \Garden\Web\RequestInterface;
+use Garden\Web\RequestInterface;
 use Gdn;
 use Interop\Container\ContainerInterface;
 use Psr\Log\LoggerAwareInterface;

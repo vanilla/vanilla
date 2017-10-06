@@ -113,15 +113,17 @@ class AuthenticateApiController extends AbstractApiController {
         $this->schema([
             'authenticator:s' => 'The authenticator that will be used.',
             'authenticatorID:s?' => 'Authenticator instance\'s identifier.',
+        ]);
+        $in = $this->schema([
             'userID:i?' => 'UserID to unlink authenticator from.',
         ], 'in')->setDescription('Delete the link between an authenticator and a user.');
         $this->schema([], 'out');
 
         $in->validate($query);
 
-        if (isset($query['UserID'])) {
+        if (isset($query['userID']) && $this->getSession()->UserID !== $query['userID']) {
             $this->permission('Garden.Users.Edit');
-            $userID = $query['UserID'];
+            $userID = $query['userID'];
         } else {
             $this->permission('Garden.SignIn.Allow');
             $userID = $this->getSession()->UserID;

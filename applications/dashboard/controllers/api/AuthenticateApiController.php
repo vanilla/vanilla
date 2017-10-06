@@ -214,12 +214,12 @@ class AuthenticateApiController extends AbstractApiController {
             'dateExpire:dt' => 'When the session expires.',
             'attributes' => Schema::parse([
                 'ssoInfo:o' => $this->ssoInfoSchema(), // This should do a sparse validation
-                'linkuser:o?' => Schema::parse([
+                'linkUser:o?' => Schema::parse([
                     'existingUsers:a' => Schema::parse([
                         'userID:i' => 'The userID of the participant.',
                         'user:o?' => $this->getUserFragmentSchema(),
                     ])->setDescription('User that matches the SSOInfo and can be used to connect the user.'),
-                ])->setDescription('Information needed for the "linkuser" step.'),
+                ])->setDescription('Information needed for the "linkUser" step.'),
             ]),
         ], 'out');
 
@@ -230,8 +230,8 @@ class AuthenticateApiController extends AbstractApiController {
             throw new Exception('The session has expired.');
         }
 
-        if (!empty($query['expand']) && isset($sessionData['Attributes']['linkuser']['existingUsers'])) {
-            $this->userModel->expandUsers($sessionData['Attributes']['linkuser']['existingUsers'], ['UserID']);
+        if (!empty($query['expand']) && isset($sessionData['Attributes']['linkUser']['existingUsers'])) {
+            $this->userModel->expandUsers($sessionData['Attributes']['linkUser']['existingUsers'], ['UserID']);
         }
 
         $sessionData['authSessionID'] = $sessionData['SessionID'];

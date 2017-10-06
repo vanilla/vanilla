@@ -292,25 +292,28 @@ abstract class AbstractResourceTest extends AbstractAPIv2Test {
      * @return array Returns the fetched data.
      */
     public function testIndex() {
+        $indexUrl = $this->indexUrl();
+        $originalIndex = $this->api()->get($indexUrl);
+        $this->assertEquals(200, $originalIndex->getStatusCode());
+
         // Insert a few rows.
         $rows = [];
         for ($i = 0; $i < static::INDEX_ROWS; $i++) {
             $rows[] = $this->testPost();
         }
 
-        $indexUrl = $this->indexUrl();
-        $r = $this->api()->get($indexUrl);
-        $this->assertEquals(200, $r->getStatusCode());
+        $newIndex = $this->api()->get($indexUrl);
 
-        $dbRows = $r->getBody();
-        $this->assertGreaterThan(self::INDEX_ROWS, count($dbRows));
+        $originalRows = $originalIndex->getBody();
+        $newRows = $newIndex->getBody();
+        $this->assertEquals(count($originalRows)+self::INDEX_ROWS, count($newRows));
         // The index should be a proper indexed array.
-        for ($i = 0; $i < count($dbRows); $i++) {
-            $this->assertArrayHasKey($i, $dbRows);
+        for ($i = 0; $i < count($newRows); $i++) {
+            $this->assertArrayHasKey($i, $newRows);
         }
 
         // There's not much we can really test here so just return and let subclasses do some more assertions.
-        return [$rows, $dbRows];
+        return [$rows, $newRows];
     }
 
     /**

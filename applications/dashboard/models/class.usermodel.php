@@ -1329,21 +1329,29 @@ class UserModel extends Gdn_Model {
     /**
      * Returns all users in the applicant role.
      *
+     * @param int|bool $limit
+     * @param int|bool $offset
      * @return Gdn_DataSet Returns a data set of the users who are applicants.
      */
-    public function getApplicants() {
+    public function getApplicants($limit = false, $offset = false) {
         $applicantRoleIDs = RoleModel::getDefaultRoles(RoleModel::TYPE_APPLICANT);
 
         if (empty($applicantRoleIDs)) {
             return new Gdn_DataSet();
         }
 
-        return $this->SQL->select('u.*')
+        $this->SQL->select('u.*')
             ->from('User u')
             ->join('UserRole ur', 'u.UserID = ur.UserID')
             ->where('ur.RoleID', $applicantRoleIDs)
-            ->orderBy('DateInserted', 'desc')
-            ->get();
+            ->orderBy('DateInserted', 'desc');
+
+        if ($limit) {
+            $this->SQL->limit($limit, $offset);
+        }
+
+        $result = $this->SQL->get();
+        return $result;
     }
 
     /**
@@ -3419,26 +3427,16 @@ class UserModel extends Gdn_Model {
      * Approve a membership applicant.
      *
      * @param int $userID
-     * @param string $email
+     * @param string|null $email Deprecated.
      * @return bool
      * @throws Exception
      */
-    public function approve($userID, $email) {
-        $applicantRoleIDs = RoleModel::getDefaultRoles(RoleModel::TYPE_APPLICANT);
-
-        // Make sure the $UserID is an applicant
-        $roleData = $this->getRoles($userID);
-        if ($roleData->numRows() == 0) {
-            throw new Exception(t('ErrorRecordNotFound'));
-        } else {
-            $appRoles = $roleData->result(DATASET_TYPE_ARRAY);
-            $applicantFound = false;
-            foreach ($appRoles as $appRole) {
-                if (in_array(val('RoleID', $appRole), $applicantRoleIDs)) {
-                    $applicantFound = true;
-                }
-            }
+    public function approve($userID, $email = null) {
+        if ($email !== null) {
+            deprecated('Using the $email parameter of UserModel::approve.');
         }
+
+        $applicantFound = $this->isApplicant($userID);
 
         if ($applicantFound) {
             // Retrieve the default role(s) for new users
@@ -3667,7 +3665,7 @@ class UserModel extends Gdn_Model {
         }
 
         if ($applicantFound) {
-            $this->delete($userID);
+            $this->deleteID($userID);
         }
         return true;
     }
@@ -4923,5 +4921,61 @@ class UserModel extends Gdn_Model {
         if ($resetSectionPreference) {
             $this->savePreference($userID, 'DashboardNav.DashboardLandingPage', '');
         }
+    }
+
+    /**
+     * @param int $userID
+     * @throws Exception
+     * @return bool
+     */
+    public function isApplicant($userID) {
+        $result = false;
+
+        $applicantRoleIDs = RoleModel::getDefaultRoles(RoleModel::TYPE_APPLICANT);
+
+        // Make sure the user is an applicant.
+        $roleData = $this->getRoles($userID);
+        if (count($roleData) == 0) {
+            throw new Exception(t('ErrorRecordNotFound'));
+        } else {
+            foreach ($roleData as $appRole) {
+                if (in_array(val('RoleID', $appRole), $applicantRoleIDs)) {
+                    $result = true;
+                    break;
+                }
+            }
+        }
+
+        return $result;
+    }
+
+    /**
+     * Do the registration values indicate SPAM?
+     *
+     * @param array $formPostValues
+     * @throws Gdn_UserException if the values trigger a positive SPAM match.
+     * @return bool
+     */
+    public function isRegistrationSpam(array $formPostValues) {
+        $result = (bool)SpamModel::isSpam('Registration', $formPostValues, ['Log' => false]);
+        return $result;
+    }
+
+    /**
+     * Validate the strength of a user's password.
+     *
+     * @param string $password A password to test.
+     * @param string $username The name of the user. Used to verify the password doesn't contain this value.
+     * @throws Gdn_UserException if the password is too weak.
+     * @return bool
+     */
+    public function validatePasswordStrength($password, $username) {
+        $strength = passwordStrength($password, $username);
+        $result = (bool)$strength['Pass'];
+
+        if ($result === false) {
+            throw new Gdn_UserException('The password is too weak.');
+        }
+        return $result;
     }
 }

@@ -337,7 +337,10 @@ if (!function_exists('getDiscussionOptionsDropdown')):
         $canDelete = CategoryModel::checkPermission($categoryID, 'Vanilla.Discussions.Delete');
         $canMove = $canEdit && $session->checkPermission('Garden.Moderation.Manage');
         $canRefetch = $canEdit && valr('Attributes.ForeignUrl', $discussion);
-        $canDismiss = c('Vanilla.Discussions.Dismiss', 1) && $discussion->Announce == '1' && $discussion->Dismissed != '1' && $session->isValid();
+        $canDismiss = c('Vanilla.Discussions.Dismiss', 1)
+            && $discussion->Announce
+            && !$discussion->Dismissed
+            && $session->isValid();
         $canTag = c('Tagging.Discussions.Enabled') && checkPermission('Vanilla.Tagging.Add') && in_array(strtolower($sender->ControllerName), ['discussionscontroller', 'categoriescontroller']) ;
 
         if ($canEdit && $timeLeft) {

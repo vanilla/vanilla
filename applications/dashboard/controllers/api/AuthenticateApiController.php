@@ -101,7 +101,6 @@ class AuthenticateApiController extends AbstractApiController {
      * Unlink a user from the specified authenticator.
      * If no user is specified it will unlink the current user.
      *
-     *
      * @param string $authenticator
      * @param string $authenticatorID
      * @param array $query The query string as an array.

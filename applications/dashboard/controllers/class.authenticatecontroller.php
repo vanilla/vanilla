@@ -163,7 +163,7 @@ class AuthenticateController extends Gdn_Controller {
                 if ($connectOption === 'linkuser') {
                     $connectUserID = $this->linkUser($authSessionID);
                 } else if ($connectOption === 'createuser') {
-                    $connectUserID = $this->createUser($ssoInfo);
+                    $connectUserID = $this->createUser($ssoInfo, $authSessionID);
                 } else {
                     $this->form->addError(t('Invalid connectOption.'));
                 }
@@ -239,9 +239,10 @@ class AuthenticateController extends Gdn_Controller {
      * Create a new user using the "createuser" connect form fields.
      *
      * @param SSOInfo $ssoInfo
+     * @param string $authSessionID
      * @return int|false
      */
-    private function createUser(SSOInfo $ssoInfo) {
+    private function createUser(SSOInfo $ssoInfo, $authSessionID) {
         $userID = false;
 
         $this->form->validateRule('createUserName', 'ValidateRequired', t('Username is required.'));
@@ -263,7 +264,7 @@ class AuthenticateController extends Gdn_Controller {
                     'UniqueID' => $ssoInfo['uniqueID']
                 ]);
                 // Clean the session.
-                $this->authenticateApiController->delete_session($authSessionID);
+                $this->sessionModel->deleteID($authSessionID);
             } else {
                 $this->form->setValidationResults($this->ssoModel->getValidationResults());
             }

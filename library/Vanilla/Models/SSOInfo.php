@@ -21,30 +21,22 @@ class SSOInfo implements \ArrayAccess {
     use ArrayAccessTrait;
 
     /**
-     * Maps to "GDN_UserAuthenticationProvider.AuthenticationSchemeAlias"
-     *
-     * @var string
+     * @var string Maps to "GDN_UserAuthenticationProvider.AuthenticationSchemeAlias"
      */
     public $authenticatorName;
 
     /**
-     * Maps to "GDN_UserAuthenticationProvider.ProviderKey"
-     *
-     * @var string
+     * @var string Maps to "GDN_UserAuthenticationProvider.ProviderKey"
      */
     public $authenticatorID;
 
     /**
-     * Whether the authenticator can sync Roles or User info.
-     *
-     * @var bool
+     * @var bool Whether the authenticator can sync Roles or User info.
      */
     public $authenticatorIsTrusted;
 
     /**
-     * Maps to "GDN_UserAuthentication.ForeignUserKey"
-     *
-     * @var string
+     * @var string Maps to "GDN_UserAuthentication.ForeignUserKey"
      */
     public $uniqueID;
 
@@ -68,8 +60,8 @@ class SSOInfo implements \ArrayAccess {
      * Getter with default value.
      * Deprecate when we can use the coalesce operator.
      *
-     * @param $name
-     * @param $default
+     * @param string $name
+     * @param mixed $default
      * @return mixed The extra information or the default if not found.
      */
     public function coalesce($name, $default = null) {
@@ -83,16 +75,21 @@ class SSOInfo implements \ArrayAccess {
     /**
      * Validate this object.
      *
-     * @throw \Exception If the validation fails.
+     * @throws \Exception If the validation fails.
      */
     public function validate() {
         $required = ['authenticatorName', 'authenticatorID', 'authenticatorIsTrusted', 'uniqueID'];
 
+        $invalidProperties = [];
         foreach ($required as $name) {
             // Empty is used on purpose here. Nothing should be of empty value in there.
             if (empty($this->$name)) {
-                throw new \Exception("SSOInfo's '$name' is required.");
+                $invalidProperties[] = $name;
             }
+        }
+
+        if (count($invalidProperties)) {
+            throw new \Exception("SSOInfo is invalid. The following properties are not set or empty: ".impode(',', $invalidProperties));
         }
     }
 

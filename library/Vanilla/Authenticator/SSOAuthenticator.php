@@ -68,7 +68,8 @@ abstract class SSOAuthenticator extends Authenticator {
     /**
      * Core implementation of the validateAuthentication() function.
      *
-     * @throw Exception Reason why the authentication failed.
+     * @throws Exception Reason why the authentication failed.
+     *
      * @param RequestInterface $request
      * @return SSOInfo The user's information.
      */
@@ -77,7 +78,7 @@ abstract class SSOAuthenticator extends Authenticator {
     /**
      * Validate an authentication by using the request's data.
      *
-     * @throw Exception Reason why the authentication failed.
+     * @throws Exception Reason why the authentication failed.
      * @param RequestInterface $request
      * @return SSOInfo The user's information.
      */

@@ -38,7 +38,7 @@ abstract class Authenticator {
     /**
      * Validate an authentication by using the request's data.
      *
-     * @throw Exception Reason why the authentication failed.
+     * @throws Exception Reason why the authentication failed.
      * @param RequestInterface $request
      * @return array The user's information.
      */

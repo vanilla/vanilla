@@ -70,7 +70,7 @@ class SSOModel {
         $userInfo = [
             'Name' => $name,
             'Email' => $email,
-            'Password' => randomString('32', 'Aa0!'),
+            'Password' => betterRandomString('32', 'Aa0!'),
             'HashMethod' => 'Random',
         ];
 

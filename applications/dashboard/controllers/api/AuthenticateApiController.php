@@ -172,7 +172,7 @@ class AuthenticateApiController extends AbstractApiController {
         $in = $this->schema([
             'userID:i?' => 'UserID of the user to check against the authenticator. Defaults to the current user.',
         ])->setDescription('Tells whether the user is linked to the authenticator or not.');
-        $out = $this->schema([':b' => 'Whether the user is linked to the authenticator or not.'], 'out');
+        $out = $this->schema(['linked:b' => 'Whether the user is linked to the authenticator or not.'], 'out');
 
         $in->validate($query);
 
@@ -395,6 +395,15 @@ class AuthenticateApiController extends AbstractApiController {
         return $out->validate($response);
     }
 
+    /**
+     * Link a user to an authenticator using an authSessionID.
+     *
+     * @throws ClientException
+     * @throws Exception
+     *
+     * @param array $body
+     * @return array
+     */
     public function post_linkUser(array $body) {
         $this->permission();
 
@@ -462,7 +471,7 @@ class AuthenticateApiController extends AbstractApiController {
         $passwordHash = new Gdn_PasswordHash();
         $linkValid = $passwordHash->checkPassword($body['password'], $user['Password'], $user['HashMethod']);
         if (!$linkValid) {
-            throw new ClientException('The user\'s information does not validate.');
+            throw new ClientException('The password verification failed.');
         }
 
         $this->userModel->saveAuthentication([

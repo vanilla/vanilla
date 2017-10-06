@@ -254,12 +254,26 @@ class AuthenticateApiController extends AbstractApiController {
      * @throws NotFoundException
      * @throws ServerException
      */
-    public function getAuthenticator($authenticatorType, $authenticatorID) {
+    private function getAuthenticator($authenticatorType, $authenticatorID) {
         if (empty($authenticatorType)) {
             throw new NotFoundException();
         }
 
         $authenticatorClassName = $authenticatorType.'Authenticator';
+
+        /** @var Authenticator $authenticatorInstance */
+        $authenticatorInstance = null;
+
+        // Check if the container can find the authenticator.
+        try {
+            $authenticatorInstance = $this->container->getArgs($authenticatorClassName, [$authenticatorID]);
+        } catch (Exception $e) {}
+
+        if ($authenticatorInstance) {
+            return;
+        }
+
+        // Use the addonManager to find the class.
         $authenticatorClasses = $this->addonManager->findClasses("*\\$authenticatorClassName");
 
         if (empty($authenticatorClasses)) {
@@ -285,7 +299,6 @@ class AuthenticateApiController extends AbstractApiController {
             );
         }
 
-        /** @var Authenticator $authenticatorInstance */
         $authenticatorInstance = $this->container->getArgs($fqnAuthenticationClass, [$authenticatorID]);
 
         return $authenticatorInstance;

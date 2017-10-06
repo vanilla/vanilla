@@ -186,7 +186,6 @@ class AuthenticateApiController extends AbstractApiController {
 
         $authenticatorInstance = $this->getAuthenticator($authenticator, $authenticatorID);
 
-
         return $out->validate((bool)$this->userModel->getAuthenticationByUser($userID, $authenticatorInstance->getID()));
     }
 

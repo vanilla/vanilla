@@ -27,7 +27,7 @@ abstract class AbstractAPIv2Test extends \PHPUnit_Framework_TestCase {
     /**
      * Whether to start a session on setUp() or not.
      *
-     * @param $enabled
+     * @param bool $enabled
      */
     protected function startSessionOnSetup($enabled) {
         $this->startSessionOnSetup = $enabled;

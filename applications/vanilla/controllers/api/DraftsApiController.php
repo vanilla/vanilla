@@ -64,7 +64,7 @@ class DraftsApiController extends AbstractApiController {
      */
     public function draftByID($id) {
         $row = $this->draftModel->getID($id, DATASET_TYPE_ARRAY);
-        if (!$row || $row['Deleted'] > 0) {
+        if (!$row) {
             throw new NotFoundException('Draft');
         }
         return $row;
@@ -84,7 +84,7 @@ class DraftsApiController extends AbstractApiController {
                 Schema::parse(
                     ['recordType', 'parentRecordID?', 'attributes']
                 )->add($this->fullSchema()),
-                'DiscussionPost'
+                'DraftPost'
             );
         }
 
@@ -145,6 +145,28 @@ class DraftsApiController extends AbstractApiController {
 
         $in = $this->idParamSchema('in')->setDescription('Get a draft.');
         $out = $this->schema($this->fullSchema(), 'out');
+
+        $row = $this->draftByID($id);
+        if ($row['InsertUserID'] !== $this->getSession()->UserID) {
+            $this->permission('Garden.Moderation.Manage');
+        }
+        $this->prepareRow($row);
+
+        $result = $out->validate($row);
+        return $result;
+    }
+
+    /**
+     * Get a draft for editing.
+     *
+     * @param int $id The unique ID of the draft.
+     * @return array
+     */
+    public function get_edit($id) {
+        $this->permission('Garden.SignIn.Allow');
+
+        $in = $this->idParamSchema('in')->setDescription('Get a draft for editing.');
+        $out = $this->schema(['draftID', 'parentRecordID', 'attributes'], 'out')->add($this->fullSchema());
 
         $row = $this->draftByID($id);
         if ($row['InsertUserID'] !== $this->getSession()->UserID) {
@@ -241,7 +263,7 @@ class DraftsApiController extends AbstractApiController {
         $this->permission('Garden.SignIn.Allow');
 
         $in = $this->draftPostSchema('in')->setDescription('Update a draft.');
-        $out = $this->schema($this->fullSchema(), 'out');
+        $out = $this->schema(['draftID', 'parentRecordID', 'attributes'], 'out')->add($this->fullSchema());
 
         $row = $this->draftByID($id);
         if ($row['InsertUserID'] !== $this->getSession()->UserID) {
@@ -249,15 +271,16 @@ class DraftsApiController extends AbstractApiController {
         }
 
         $body = $in->validate($body, true);
-        $draftData = $this->translateRequest($body);
+        $recordType = !empty('DiscussionID') ? 'comment' : 'discussion';
+        $draftData = $this->translateRequest($body, $recordType);
         $draftData['DraftID'] = $id;
         $this->draftModel->save($draftData);
         $this->validateModel($this->draftModel);
 
-        $row = $this->draftByID($id);
-        $this->prepareRow($row);
+        $updatedRow = $this->draftByID($id);
+        $this->prepareRow($updatedRow);
 
-        $result = $out->validate($row);
+        $result = $out->validate($updatedRow);
         return $result;
     }
 
@@ -298,9 +321,15 @@ class DraftsApiController extends AbstractApiController {
      * Translate a request to this endpoint into a format compatible for saving with DraftModel.
      *
      * @param array $body
+     * @param string $recordType
      * @return array
      */
-    private function translateRequest(array $body) {
+    private function translateRequest(array $body, $recordType = null) {
+        // If the record type is not explicitly defined by the parameters, try to extract it from $body.
+        if ($recordType === null && array_key_exists('recordType', $body)) {
+            $recordType = $body['recordType'];
+        }
+
         if (array_key_exists('attributes', $body)) {
             $columns = ['announce', 'body', 'categoryID', 'closed', 'format', 'name', 'sink', 'tags'];
             $attributes = array_intersect_key($body['attributes'], array_flip($columns));
@@ -316,14 +345,14 @@ class DraftsApiController extends AbstractApiController {
             }
         }
 
-        if (array_key_exists('recordType', $body)) {
-            switch ($body['recordType']) {
-                case 'comment':
-                    if (array_key_exists('parentRecordID', $body)) {
-                        $body['DiscussionID'] = $body['parentRecordID'];
-                    }
-                    break;
-            }
+        switch ($recordType) {
+            case 'comment':
+                if (array_key_exists('parentRecordID', $body)) {
+                    $body['DiscussionID'] = $body['parentRecordID'];
+                }
+                break;
+            case 'discussion':
+                $body['DiscussionID'] = null;
         }
         unset($body['recordType'], $body['parentRecordID']);
 

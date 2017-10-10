@@ -12,7 +12,7 @@ if (count($Discussions) < 2) {
 
     $DefaultDiscussionID = $Discussions[0]['DiscussionID'];
     $RadioData = array_column($Discussions, 'Name', 'DiscussionID');
-    array_map('htmlspecialchars', $RadioData);
+    $RadioData = array_map('htmlspecialchars', $RadioData);
     echo '<ul><li>';
     echo $this->Form->radioList('MergeDiscussionID', $RadioData, ['ValueField' => 'DiscussionID', 'TextField' => 'Name', 'Default' => $DefaultDiscussionID]);
     echo '</li></ul>';

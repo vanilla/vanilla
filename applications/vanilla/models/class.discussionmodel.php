@@ -27,6 +27,9 @@ class DiscussionModel extends Gdn_Model {
     /** @var string The filter key for clearing-type filters. */
     const EMPTY_FILTER_KEY = 'none';
 
+    /** Max comments on a discussion before it cannot be auto-deleted by SPAM or moderation actions. */
+    const DELETE_COMMENT_THRESHOLD = 10;
+
     /** @var array|bool */
     private static $categoryPermissions = null;
 
@@ -530,11 +533,12 @@ class DiscussionModel extends Gdn_Model {
      * @param array|false $where The where condition of the get.
      * @param bool|false|int $limit The number of discussion to return.
      * @param int|false $offset The offset within the total set.
+     * @param bool $expand Expand relevant related records (e.g. category, users).
      * @return Gdn_DataSet Returns a <a href='psi_element://Gdn_DataSet'>Gdn_DataSet</a> of discussions.
      * of discussions.
      */
-    public function getWhereRecent($where = [], $limit = false, $offset = false) {
-        $result = $this->getWhere($where, '', '', $limit, $offset);
+    public function getWhereRecent($where = [], $limit = false, $offset = false, $expand = true) {
+        $result = $this->getWhere($where, '', '', $limit, $offset, $expand);
         return $result;
     }
 
@@ -640,9 +644,10 @@ class DiscussionModel extends Gdn_Model {
      * @param string $orderDirection The order, either **asc** or **desc**.
      * @param int|false $limit The number of discussion to return.
      * @param int|false $offset The offset within the total set.
+     * @param bool $expand Expand relevant related records (e.g. category, users).
      * @return Gdn_DataSet Returns a {@link Gdn_DataSet} of discussions.
      */
-    public function getWhere($where = false, $orderFields = '', $orderDirection = '', $limit = false, $offset = false) {
+    public function getWhere($where = false, $orderFields = '', $orderDirection = '', $limit = false, $offset = false, $expand = true) {
         // Add backwards compatibility for the old way getWhere() was called.
         if (is_numeric($orderFields)) {
             deprecated('DiscussionModel->getWhere($where, $limit, ...)', 'DiscussionModel->getWhereRecent()');
@@ -759,9 +764,11 @@ class DiscussionModel extends Gdn_Model {
             $this->removeAnnouncements($data);
         }
 
-        // Join in the users.
-        Gdn::userModel()->joinUsers($data, ['FirstUserID', 'LastUserID']);
-        CategoryModel::joinCategories($data);
+        // Join in users and categories.
+        if ($expand) {
+            Gdn::userModel()->joinUsers($data, ['FirstUserID', 'LastUserID']);
+            CategoryModel::joinCategories($data);
+        }
 
         if (c('Vanilla.Views.Denormalize', false)) {
             $this->addDenormalizedViews($data);
@@ -1062,6 +1069,22 @@ class DiscussionModel extends Gdn_Model {
             $discussion->LastDate = $discussion->DateInserted;
         }
 
+        // Translate Announce to Pinned.
+        $pinned = false;
+        $pinLocation = null;
+        if (property_exists($discussion, 'Announce') && $discussion->Announce > 0) {
+            $pinned = true;
+            switch (intval($discussion->Announce)) {
+                case 1:
+                    $pinLocation = 'recent';
+                    break;
+                case 2:
+                    $pinLocation = 'category';
+            }
+        }
+        $discussion->pinned = $pinned;
+        $discussion->pinLocation = $pinLocation;
+
         $this->EventArguments['Discussion'] = &$discussion;
         $this->fireEvent('SetCalculatedFields');
     }
@@ -1117,11 +1140,22 @@ class DiscussionModel extends Gdn_Model {
         $this->SQL->select('d.DiscussionID')
             ->from('Discussion d');
 
-        if (!is_array($categoryID) && ($categoryID > 0 || $groupID > 0)) {
-            $this->SQL->where('d.Announce >', '0');
-        } else {
-            $this->SQL->where('d.Announce', 1);
+        $announceOverride = false;
+        $whereFields = array_keys($wheres);
+        foreach ($whereFields as $field) {
+            if (stringBeginsWith($field, 'd.Announce')) {
+                $announceOverride = true;
+                break;
+            }
         }
+        if (!$announceOverride) {
+            if (!is_array($categoryID) && ($categoryID > 0 || $groupID > 0)) {
+                $this->SQL->where('d.Announce >', '0');
+            } else {
+                $this->SQL->where('d.Announce', 1);
+            }
+        }
+
         if ($groupID > 0) {
             $this->SQL->where('d.GroupID', $groupID);
         } elseif (is_array($categoryID)) {
@@ -1948,6 +1982,26 @@ class DiscussionModel extends Gdn_Model {
         } else {
             // Add the update fields.
             $this->addUpdateFields($formPostValues);
+        }
+
+        // Pinned-to-Announce translation
+        $isPinned = val('Pinned', $formPostValues, null);
+        if ($isPinned !== null) {
+            $announce = 0;
+            $isPinned = filter_var($isPinned, FILTER_VALIDATE_BOOLEAN);
+            if ($isPinned) {
+                $pinLocation = strtolower(val('PinLocation', $formPostValues, 'category'));
+                switch ($pinLocation) {
+                    case 'recent':
+                        $announce = 1;
+                        break;
+                    default:
+                        $announce = 2;
+                }
+
+            }
+            $formPostValues['Announce'] = $announce;
+            unset($announce);
         }
 
         // Set checkbox values to zero if they were unchecked
@@ -3086,7 +3140,7 @@ class DiscussionModel extends Gdn_Model {
      */
     public static function addFilterSet($setKey, $setName = '', $categoryIDs = []) {
         if (!$setName) {
-            $setName = sprintf(t('All %s'), t('Discussions'));
+            $setName = t('All Discussions');
         }
         self::$allowedFilters[$setKey]['key'] = $setKey;
         self::$allowedFilters[$setKey]['name'] = $setName;

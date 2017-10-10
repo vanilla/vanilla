@@ -23,7 +23,7 @@ trait SiteTestTrait {
     /**
      * @var array
      */
-    private static $siteInfo;
+    protected static $siteInfo;
 
     /**
      * @var array The addons to install.
@@ -60,6 +60,9 @@ trait SiteTestTrait {
             'site' => ['title' => EventManager::classBasename(get_called_class())],
             'addons' => static::$addons
         ]);
+
+        // Start Authenticators
+        $dic->get('Authenticator')->startAuthenticator();
 
         self::$siteInfo = $result;
     }

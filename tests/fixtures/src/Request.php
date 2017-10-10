@@ -57,6 +57,10 @@ class Request implements RequestInterface {
         return $this->body;
     }
 
+    public function getScheme() {
+        return 'http';
+    }
+
     /**
      * Get the hostname of the request.
      *
@@ -79,6 +83,26 @@ class Request implements RequestInterface {
      */
     public function getHeader($header, $default = null) {
         return isset($this->headers[$header]) ? $this->headers[$header] : $default;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getHeaderLine($name) {
+        $value = $this->getHeader($name);
+        if (empty($value)) {
+            $value = '';
+        } elseif (is_array($value)) {
+            $value = implode(',', $value);
+        }
+        return $value;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getHeaders() {
+        return $this->headers;
     }
 
     /**

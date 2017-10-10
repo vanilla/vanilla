@@ -1231,7 +1231,7 @@ class Gdn_Controller extends Gdn_Pluggable {
 
         // Make sure to clear out the content asset collection if this is a syndication request
         if ($this->SyndicationMethod !== SYNDICATION_NONE) {
-            $this->Assets['Content'] = '';
+            $this->Assets['Content'] = [];
         }
 
         // Define the view

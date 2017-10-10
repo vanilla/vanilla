@@ -61,23 +61,29 @@ abstract class ConversationsModel extends Gdn_Model {
     }
 
     /**
-     * Get all the members of a conversation from the $conversationID.
+     * Get all the members (deleted or no) of a conversation from the $conversationID.
      *
      * @param int $conversationID The conversation ID.
+     * @param bool $idsOnly The returns only the userIDs or everything from UserConversation.
+     * @param bool $limit
+     * @param bool $offset
      *
-     * @return array Array of user IDs.
+     * @return array Array of users or userIDs depending on $idsOnly's value.
      */
-    public function getConversationMembers($conversationID) {
+    public function getConversationMembers($conversationID, $idsOnly = true, $limit = false, $offset = false) {
         $conversationMembers = [];
 
         $userConversation = new Gdn_Model('UserConversation');
         $userMembers = $userConversation->getWhere([
-            'ConversationID' => $conversationID,
-            'Deleted' => false,
-        ])->resultArray();
+            'ConversationID' => $conversationID
+        ], 'UserID', 'asc', $limit, $offset)->resultArray();
 
         if (is_array($userMembers) && count($userMembers)) {
-            $conversationMembers = array_column($userMembers, 'UserID');
+            if ($idsOnly) {
+                $conversationMembers = array_column($userMembers, 'UserID');
+            } else {
+                $conversationMembers = Gdn_DataSet::index($userMembers, 'UserID');
+            }
         }
 
         return $conversationMembers;
@@ -94,5 +100,45 @@ abstract class ConversationsModel extends Gdn_Model {
     public function validConversationMember($conversationID, $userID) {
         $conversationMembers = $this->getConversationMembers($conversationID);
         return (in_array($userID, $conversationMembers));
+    }
+
+    /**
+     * Notify users when a new message is created.
+     *
+     * @param array|object $conversation
+     * @param array|object $message
+     * @param array $notifyUserIDs
+     */
+    protected function notifyUsers($conversation, $message, $notifyUserIDs) {
+        $conversation = (array)$conversation;
+        $message = (array)$message;
+
+        $activity = [
+            'ActivityType' => 'ConversationMessage',
+            'ActivityUserID' => $message['InsertUserID'],
+            'HeadlineFormat' => t('HeadlineFormat.ConversationMessage', '{ActivityUserID,User} sent you a <a href="{Url,html}">message</a>'),
+            'RecordType' => 'Conversation',
+            'RecordID' => $conversation['ConversationID'],
+            'Story' => $message['Body'],
+            'ActionText' => t('Reply'),
+            'Format' => val('Format', $message, c('Garden.InputFormatter')),
+            'Route' => "/messages/{$conversation['ConversationID']}#Message_{$message['MessageID']}"
+        ];
+
+        $subject = val('subject', $conversation);
+        if ($subject) {
+            $activity['Story'] = sprintf(t('Re: %s'), $subject).'<br>'.$body;
+        }
+
+        $activityModel = new ActivityModel();
+        foreach ($notifyUserIDs as $userID) {
+            if ($message['InsertUserID'] == $userID) {
+                continue; // Don't notify self.
+            }
+
+            $activity['NotifyUserID'] = $userID;
+            $activityModel->queue($activity, 'ConversationMessage');
+        }
+        $activityModel->saveQueue();
     }
 }

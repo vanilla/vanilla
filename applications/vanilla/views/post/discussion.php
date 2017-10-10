@@ -24,6 +24,10 @@ if (!$CancelUrl) {
         if ($this->Context) {
             $options['Context'] = $this->Context;
         }
+        $discussionType = property_exists($this, 'Type') ? $this->Type : $this->data('Type');
+        if ($discussionType) {
+            $options['DiscussionType'] = $discussionType;
+        }
         echo '<div class="P">';
         echo '<div class="Category">';
         echo $this->Form->label('Category', 'CategoryID'), ' ';
@@ -40,7 +44,7 @@ if (!$CancelUrl) {
     $this->fireEvent('BeforeBodyInput');
 
     echo '<div class="P">';
-    echo $this->Form->bodyBox('Body', ['Table' => 'Discussion', 'FileUpload' => true, 'tabindex' => 1]);
+    echo $this->Form->bodyBox('Body', ['Table' => 'Discussion', 'FileUpload' => true]);
     echo '</div>';
 
     $Options = '';
@@ -62,7 +66,7 @@ if (!$CancelUrl) {
 
     echo '<div class="Buttons">';
     $this->fireEvent('BeforeFormButtons');
-    echo $this->Form->button((property_exists($this, 'Discussion')) ? 'Save' : 'Post Discussion', ['class' => 'Button Primary DiscussionButton', 'tabindex' => 1]);
+    echo $this->Form->button((property_exists($this, 'Discussion')) ? 'Save' : 'Post Discussion', ['class' => 'Button Primary DiscussionButton']);
     if (!property_exists($this, 'Discussion') || !is_object($this->Discussion) || (property_exists($this, 'Draft') && is_object($this->Draft))) {
         echo $this->Form->button('Save Draft', ['class' => 'Button DraftButton']);
     }

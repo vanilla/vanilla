@@ -36,8 +36,28 @@ class InternalRequest extends HttpRequest implements RequestInterface {
     /**
      * {@inheritdoc}
      */
+    public function getHeaderLine($name) {
+        $value = $this->getHeaderLines($name);
+        if (empty($value)) {
+            $value = '';
+        } else {
+            $value = implode(',', $value);
+        }
+        return $value;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function getHost() {
         return parse_url($this->getUrl(), PHP_URL_HOST);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getScheme() {
+        return parse_url($this->url, PHP_URL_SCHEME);
     }
 
     /**
@@ -98,9 +118,27 @@ class InternalRequest extends HttpRequest implements RequestInterface {
     public function send() {
         $this->container->setInstance(\Gdn_Request::class, $this->convertToLegacyRequest());
 
+        $cookieStash = $_COOKIE;
+        $cookies = [];
+        if ($rawCookies = $this->getHeader('Cookie')) {
+            $rawCookies = explode(';', $rawCookies);
+            array_walk($rawCookies, 'trim');
+            foreach ($rawCookies as $cookie) {
+                if (strpos($cookie, '=') === false) {
+                    continue;
+                }
+                list($key, $val) = explode('=', $cookie);
+                $cookies[$key] = rawurldecode($val);
+            }
+        }
+        $_COOKIE = $cookies;
         $data = $this->dispatcher->dispatch($this);
+        $_COOKIE = $cookieStash;
 
-        $response = new HttpResponse($data->getStatus(), $data->getHeaders(), '');
+        $response = new HttpResponse(
+            $data->getStatus(),
+            array_merge($data->getHeaders(), ['X-Data-Meta', json_encode($data->getMetaArray())])
+        );
         $response->setBody($data->getData());
 
         return $response;

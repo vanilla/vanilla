@@ -5,7 +5,6 @@
  */
 
 use Garden\Schema\Schema;
-use Garden\Web\Data;
 use Garden\Web\Exception\NotFoundException;
 use Garden\Web\Exception\ServerException;
 use Vanilla\Utility\CapitalCaseScheme;
@@ -139,7 +138,7 @@ class CommentsApiController extends AbstractApiController {
             'commentID:i' => 'The ID of the comment.',
             'discussionID:i' => 'The ID of the discussion.',
             'body:s' => 'The body of the comment.',
-            'format:s' => 'The output format of the comment.',
+            'format:s' => 'The input format of the comment.',
             'dateInserted:dt' => 'When the comment was created.',
             'insertUserID:i' => 'The user that created the comment.',
             'insertUser?' => $this->getUserFragmentSchema(),
@@ -220,7 +219,7 @@ class CommentsApiController extends AbstractApiController {
         $this->permission();
 
         $in = $this->schema([
-            'discussionID:i' => 'The discussion ID.',
+            'discussionID:i?' => 'The discussion ID.',
             'page:i?' => [
                 'description' => 'Page number.',
                 'default' => 1,
@@ -233,33 +232,55 @@ class CommentsApiController extends AbstractApiController {
                 'minimum' => 1,
                 'maximum' => 100
             ],
-            'after:dt?' => 'Get only comments after this date.',
+            'insertUserID:i?' => 'Filter by author.',
+            'after:dt?' => 'Limit to comments after this date.',
             'expand:b?' => [
                 'description' => 'Expand associated records.',
                 'default' => false
             ]
-        ], 'in')->setDescription('List comments.');
+        ], 'in')->requireOneOf(['discussionID', 'insertUserID'])->setDescription('List comments.');
         $out = $this->schema([':a' => $this->commentSchema()], 'out');
 
         $query = $in->validate($query);
-        $discussion = $this->discussionByID($query['discussionID']);
-        list($offset, $limit) = offsetLimit("p{$query['page']}", $query['limit']);
-        $this->discussionModel->categoryPermission('Vanilla.Discussions.View', $discussion['CategoryID']);
 
-        // Build up the where clause.
-        $where = ['discussionID' => $query['discussionID'], 'joinUsers' => false];
-
-        if (isset($query['after'])) {
-            $where['dateInserted >'] = $query['after'];
+        $after = isset($query['after']) ? $query['after'] : null;
+        if ($after instanceof DateTimeImmutable) {
+            $after = $after->format(DateTime::ATOM);
         }
 
-        $rows = $this->commentModel->getWhere(
-            $where,
-            'DateInserted',
-            'asc',
-            $limit,
-            $offset
-        )->resultArray();
+        list($offset, $limit) = offsetLimit("p{$query['page']}", $query['limit']);
+
+        // Lookup by discussion or by user?
+        if (array_key_exists('discussionID', $query)) {
+            $discussion = $this->discussionByID($query['discussionID']);
+            $this->discussionModel->categoryPermission('Vanilla.Discussions.View', $discussion['CategoryID']);
+
+            $where = [];
+
+            if (isset($query['insertUserID'])) {
+                $where['InsertUserID'] = $query['insertUserID'];
+            }
+
+            if ($after !== null) {
+                $where['DateInserted >'] = $after;
+            }
+
+            $rows = $this->commentModel->getByDiscussion(
+                $query['discussionID'],
+                $limit,
+                $offset,
+                $where
+            )->resultArray();
+        } else {
+            $rows = $this->commentModel->getByUser2(
+                $query['insertUserID'],
+                $limit,
+                $offset,
+                false,
+                $after,
+                'asc'
+            )->resultArray();
+        }
 
         if ($query['expand']) {
             $this->userModel->expandUsers($rows, ['InsertUserID']);
@@ -317,6 +338,7 @@ class CommentsApiController extends AbstractApiController {
             $commentData['Body'] = $row['Body'];
         }
         $this->commentModel->save($commentData);
+        $this->validateModel($this->commentModel);
         $row = $this->commentByID($id);
         $this->userModel->expandUsers($row, ['InsertUserID']);
         $this->prepareRow($row);
@@ -330,7 +352,7 @@ class CommentsApiController extends AbstractApiController {
      *
      * @param array $body The request body.
      * @throws ServerException if the comment could not be created.
-     * @return Data
+     * @return array
      */
     public function post(array $body) {
         $this->permission('Garden.SignIn.Allow');
@@ -343,6 +365,7 @@ class CommentsApiController extends AbstractApiController {
         $discussion = $this->discussionByID($commentData['DiscussionID']);
         $this->discussionModel->categoryPermission('Vanilla.Comments.Add', $discussion['CategoryID']);
         $id = $this->commentModel->save($commentData);
+        $this->validateModel($this->commentModel);
         if (!$id) {
             throw new ServerException('Unable to insert comment.', 500);
         }
@@ -351,6 +374,6 @@ class CommentsApiController extends AbstractApiController {
         $this->userModel->expandUsers($row, ['InsertUserID']);
 
         $result = $out->validate($row);
-        return new Data($result, 201);
+        return $result;
     }
 }

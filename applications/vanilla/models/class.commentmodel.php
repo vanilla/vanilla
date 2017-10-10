@@ -247,31 +247,43 @@ class CommentModel extends Gdn_Model {
      * @param int $discussionID Which discussion to get comment from.
      * @param int $limit Max number to get.
      * @param int $offset Number to skip.
+     * @param array $where Additional conditions to pass when querying comments.
      * @return Gdn_DataSet Returns a list of comments.
      */
-    public function getByDiscussion($discussionID, $limit, $offset = 0) {
+    public function getByDiscussion($discussionID, $limit, $offset = 0, array $where = []) {
         $this->commentQuery(true, false);
         $this->EventArguments['DiscussionID'] =& $discussionID;
         $this->EventArguments['Limit'] =& $limit;
         $this->EventArguments['Offset'] =& $offset;
+        $this->EventArguments['Where'] =& $where;
         $this->fireEvent('BeforeGet');
 
         $page = pageNumber($offset, $limit);
         $pageWhere = $this->pageWhere($discussionID, $page, $limit);
 
-        if ($pageWhere) {
+        if (empty($where) && $pageWhere) {
             $this->SQL
                 ->where('c.DiscussionID', $discussionID);
 
             $this->SQL->where($pageWhere)->limit($limit + 10);
             $this->orderBy($this->SQL);
         } else {
-            // Do an inner-query to force late-loading of comments.
+            // Use a subquery to force late-loading of comments. This optimizes pagination.
             $sql2 = clone $this->SQL;
             $sql2->reset();
+
+            // Using a subquery isn't compatible with Vanilla's named parameter implementation. Manually escape conditions.
+            $where = array_merge($where, ['c.DiscussionID' => $discussionID]);
+            foreach ($where as $field => &$value) {
+                if (filter_var($value, FILTER_VALIDATE_INT)) {
+                    continue;
+                }
+                $value = Gdn::database()->connection()->quote($value);
+            }
+
             $sql2->select('CommentID')
                 ->from('Comment c')
-                ->where('c.DiscussionID', $discussionID, true, false)
+                ->where($where, null, true, false)
                 ->limit($limit, $offset);
             $this->orderBy($sql2);
             $select = $sql2->getSelect();
@@ -281,8 +293,6 @@ class CommentModel extends Gdn_Model {
 
             $this->SQL->join("($select) c2", "c.CommentID = c2.CommentID");
             $this->SQL->Database->DatabasePrefix = $px;
-
-//         $this->SQL->limit($Limit, $Offset);
         }
 
         $this->where($this->SQL);
@@ -351,10 +361,12 @@ class CommentModel extends Gdn_Model {
      * @param int $userID Which user to get comments for.
      * @param int $limit Max number to get.
      * @param int $offset Number to skip.
-     * @param int $lastCommentID A hint for quicker paging.
+     * @param int|bool $lastCommentID A hint for quicker paging.
+     * @param string|null $after Only pull comments following this date.
+     * @param string $order Order comments ascending (asc) or descending (desc) by ID.
      * @return Gdn_DataSet SQL results.
      */
-    public function getByUser2($userID, $limit, $offset, $lastCommentID = false) {
+    public function getByUser2($userID, $limit, $offset, $lastCommentID = false, $after = null, $order = 'desc') {
         $perms = DiscussionModel::categoryPermissions();
 
         if (is_array($perms) && empty($perms)) {
@@ -371,7 +383,11 @@ class CommentModel extends Gdn_Model {
             ->join('Comment c2', 'c.CommentID = c2.CommentID')
             ->join('Discussion d', 'c2.DiscussionID = d.DiscussionID')
             ->where('c.InsertUserID', $userID)
-            ->orderBy('c.CommentID', 'desc');
+            ->orderBy('c.CommentID', $order);
+
+        if ($after) {
+            $this->SQL->where('c.DateInserted >', $after);
+        }
 
         if ($lastCommentID) {
             // The last comment id from the last page was given and can be used as a hint to speed up the query.

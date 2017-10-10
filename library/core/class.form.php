@@ -117,6 +117,11 @@ class Gdn_Form extends Gdn_Pluggable {
     private $_IDCollection = [];
 
     /**
+     * @var array An array of ID counters so that we don't have ID clashes.
+     */
+    private static $idCounters = [];
+
+    /**
      * Constructor
      *
      * @param string $tableName
@@ -483,11 +488,10 @@ class Gdn_Form extends Gdn_Pluggable {
             );
         }
 
-        // Respect category permissions (remove categories that the user shouldn't see).
+        // Remove categories the user shouldn't see.
         $safeCategoryData = [];
+        $discussionType = val('DiscussionType', $options);
         foreach ($categoryData as $categoryID => $category) {
-            $name = $category['Name'];
-
             if ($value != $categoryID) {
                 if ($category['CategoryID'] <= 0 || !$category['PermsDiscussionsView']) {
                     continue;
@@ -496,17 +500,25 @@ class Gdn_Form extends Gdn_Pluggable {
                 if ($category['Archived']) {
                     continue;
                 }
+
+                // Filter out categories that don't allow our discussion type, if specified
+                if ($discussionType) {
+                    $permissionCategory = CategoryModel::permissionCategory($Category);
+                    $allowedDiscussionTypes = CategoryModel::allowedDiscussionTypes($permissionCategory, $Category);
+                    if (!array_key_exists($discussionType, $allowedDiscussionTypes)) {
+                        continue;
+                    }
+                }
             }
 
             $safeCategoryData[$categoryID] = $category;
         }
+        unset($discussionType, $permissionCategory, $allowedDiscussionTypes);
 
         unset($options['Filter'], $options['PermFilter'], $options['Context'], $options['CategoryData']);
 
         if (!isset($options['class'])) {
             $options['class'] = $this->getStyle('dropdown');
-        } else {
-            $options['class'] = $this->translateClasses($options['class']);
         }
 
         // Opening select tag
@@ -569,10 +581,10 @@ class Gdn_Form extends Gdn_Pluggable {
                 } elseif ($selected) {
                     $return .= ' selected="selected"'; // only allow selection if NOT disabled
                 }
+
                 $name = htmlspecialchars(val('Name', $category, 'Blank Category Name'));
                 if ($depth > 1) {
                     $name = str_repeat('&#160;', 4 * ($depth - 1)).$name;
-//               $Name = str_replace(' ', '&#160;', $Name);
                 }
 
                 $return .= '>'.$name."</option>\n";
@@ -3149,12 +3161,18 @@ PASSWORDMETER;
      */
     protected function _idAttribute($fieldName, $attributes) {
         // ID from attributes overrides the default.
-        $iD = arrayValueI('id', $attributes, false);
-        if (!$iD) {
-            $iD = $this->escapeID($fieldName);
+        $id = arrayValueI('id', $attributes, false);
+        if (!$id) {
+            $id = $this->escapeID($fieldName);
         }
 
-        return ' id="'.htmlspecialchars($iD).'"';
+        if (isset(self::$idCounters[$id])) {
+            $id .= self::$idCounters[$id]++;
+        } else {
+            self::$idCounters[$id] = 1;
+        }
+
+        return ' id="'.htmlspecialchars($id).'"';
     }
 
     /**

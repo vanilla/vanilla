@@ -48,7 +48,7 @@ class UserModel extends Gdn_Model {
 
     /** Timeout for SSO */
     const SSO_TIMEOUT = 1200;
-    
+
     /** @var */
     public $SessionColumns;
 
@@ -235,7 +235,7 @@ class UserModel extends Gdn_Model {
      *
      * @param mixed $user The user to check.
      * @param mixed $permission The permission (or array of permissions) to check.
-     * @param array $options Not used.
+     * @param array $options
      * @return boolean
      */
     public function checkPermission($user, $permission, $options = []) {
@@ -261,7 +261,9 @@ class UserModel extends Gdn_Model {
             $permissions = $this->getPermissions($user->UserID);
         }
 
-        return $permissions->has($permission);
+        $id = val('ForeignID', $options, null);
+
+        return $permissions->has($permission, $id);
     }
 
     /**
@@ -1064,24 +1066,35 @@ class UserModel extends Gdn_Model {
         reset($rows);
         $single = is_string(key($rows));
 
-        $users = [];
+        $userIDs = [];
+
+        $extractUserIDs = function(array $row) use ($columns, &$userIDs) {
+            foreach ($columns as $key) {
+                if (array_key_exists($key, $row)) {
+                    $id = $row[$key];
+                    $userIDs[$id] = true;
+                }
+            }
+        };
+
+        // Fetch the users we'll be injecting into the rows.
+        if ($single) {
+            $extractUserIDs($rows);
+        } else {
+            foreach ($rows as $row) {
+                $extractUserIDs($row);
+            }
+        }
+        $users = !empty($userIDs) ? $this->getIDs(array_keys($userIDs)) : [];
+
         $populate = function(array &$row) use ($users, $columns) {
             foreach ($columns as $key) {
                 $destination = stringEndsWith($key, 'ID', true, true);
                 $id = val($key, $row);
                 $user = null;
                 if (is_numeric($id)) {
-                    // Keep a running collection of queried users. Non-existing users are null.
-                    if (!array_key_exists($id, $users)) {
-                        $user = $this->getID($id, DATASET_TYPE_ARRAY);
-                        if (!$user) {
-                            $user = null;
-                        }
-                        $users[$id] = $user;
-                    }
-
                     // Massage the data, before injecting it into the results.
-                    $user = $users[$id];
+                    $user = array_key_exists($id, $users) ? $users[$id] : false;
                     if ($user) {
                         // Make sure all user records have a valid photo.
                         $photo = val('Photo', $user);
@@ -1316,21 +1329,29 @@ class UserModel extends Gdn_Model {
     /**
      * Returns all users in the applicant role.
      *
+     * @param int|bool $limit
+     * @param int|bool $offset
      * @return Gdn_DataSet Returns a data set of the users who are applicants.
      */
-    public function getApplicants() {
+    public function getApplicants($limit = false, $offset = false) {
         $applicantRoleIDs = RoleModel::getDefaultRoles(RoleModel::TYPE_APPLICANT);
 
         if (empty($applicantRoleIDs)) {
             return new Gdn_DataSet();
         }
 
-        return $this->SQL->select('u.*')
+        $this->SQL->select('u.*')
             ->from('User u')
             ->join('UserRole ur', 'u.UserID = ur.UserID')
             ->where('ur.RoleID', $applicantRoleIDs)
-            ->orderBy('DateInserted', 'desc')
-            ->get();
+            ->orderBy('DateInserted', 'desc');
+
+        if ($limit) {
+            $this->SQL->limit($limit, $offset);
+        }
+
+        $result = $this->SQL->get();
+        return $result;
     }
 
     /**
@@ -2051,10 +2072,14 @@ class UserModel extends Gdn_Model {
 
         if (array_key_exists('Confirmed', $formPostValues)) {
             $formPostValues['Confirmed'] = forceBool($formPostValues['Confirmed'], '0', '1', '0');
+        } elseif (array_key_exists('EmailConfirmed', $formPostValues)) {
+            $formPostValues['Confirmed'] = forceBool($formPostValues['EmailConfirmed'], '1', '1', '0');
         }
 
         if (array_key_exists('Verified', $formPostValues)) {
             $formPostValues['Verified'] = forceBool($formPostValues['Verified'], '0', '1', '0');
+        } elseif (array_key_exists('BypassSpam', $formPostValues)) {
+            $formPostValues['Verified'] = forceBool($formPostValues['BypassSpam'], '0', '1', '0');
         }
 
         // Do not allowing setting this via general save.
@@ -2497,7 +2522,7 @@ class UserModel extends Gdn_Model {
 
         if (is_array($filter)) {
             $where = $filter;
-            $keywords = $where['Keywords'];
+            $keywords = val('Keywords', $filter, '');
             $optimize = val('Optimize', $filter);
             unset($where['Keywords'], $where['Optimize']);
         } else {
@@ -2514,7 +2539,7 @@ class UserModel extends Gdn_Model {
         } elseif (preg_match('/^\d+$/', $keywords)) {
             $numericQuery = $keywords;
             $keywords = '';
-        } else {
+        } elseif (!empty($keywords)) {
             // Check to see if the search exactly matches a role name.
             $roleID = $this->SQL->getWhere('Role', ['Name' => $keywords])->value('RoleID');
         }
@@ -2832,6 +2857,7 @@ class UserModel extends Gdn_Model {
             $this->SQL
                 ->update('Invitation')
                 ->set('AcceptedUserID', $userID)
+                ->set('DateAccepted', Gdn_Format::toDateTime())
                 ->where('InvitationID', $invitation->InvitationID)
                 ->put();
 
@@ -2858,6 +2884,8 @@ class UserModel extends Gdn_Model {
      *
      * @param array $formPostValues
      * @param array $options
+     *  - ValidateSpam
+     *  - CheckCaptcha
      * @return int UserID.
      */
     public function insertForApproval($formPostValues, $options = []) {
@@ -2884,11 +2912,14 @@ class UserModel extends Gdn_Model {
         $this->addInsertFields($formPostValues);
 
         if ($this->validate($formPostValues, true)) {
-            // Check for spam.
-            $spam = SpamModel::isSpam('Registration', $formPostValues);
-            if ($spam) {
-                $this->Validation->addValidationResult('Spam', 'You are not allowed to register at this time.');
-                return;
+
+            if (val('ValidateSpam', $options, true)) {
+                // Check for spam.
+                $spam = SpamModel::isSpam('Registration', $formPostValues);
+                if ($spam) {
+                    $this->Validation->addValidationResult('Spam', 'You are not allowed to register at this time.');
+                    return;
+                }
             }
 
             $fields = $this->Validation->validationFields(); // All fields on the form that need to be validated (including non-schema field rules defined above)
@@ -3396,26 +3427,16 @@ class UserModel extends Gdn_Model {
      * Approve a membership applicant.
      *
      * @param int $userID
-     * @param string $email
+     * @param string|null $email Deprecated.
      * @return bool
      * @throws Exception
      */
-    public function approve($userID, $email) {
-        $applicantRoleIDs = RoleModel::getDefaultRoles(RoleModel::TYPE_APPLICANT);
-
-        // Make sure the $UserID is an applicant
-        $roleData = $this->getRoles($userID);
-        if ($roleData->numRows() == 0) {
-            throw new Exception(t('ErrorRecordNotFound'));
-        } else {
-            $appRoles = $roleData->result(DATASET_TYPE_ARRAY);
-            $applicantFound = false;
-            foreach ($appRoles as $appRole) {
-                if (in_array(val('RoleID', $appRole), $applicantRoleIDs)) {
-                    $applicantFound = true;
-                }
-            }
+    public function approve($userID, $email = null) {
+        if ($email !== null) {
+            deprecated('Using the $email parameter of UserModel::approve.');
         }
+
+        $applicantFound = $this->isApplicant($userID);
 
         if ($applicantFound) {
             // Retrieve the default role(s) for new users
@@ -3518,12 +3539,15 @@ class UserModel extends Gdn_Model {
 
         $this->deleteContent($userID, $options, $content);
 
+        $userData = $this->getID($userID, DATASET_TYPE_ARRAY);
+
         // Remove the user's information
         $this->SQL->update('User')
             ->set([
                 'Name' => t('[Deleted User]'),
                 'Photo' => null,
                 'Password' => randomString('10'),
+                'HashMethod' => 'Random',
                 'About' => '',
                 'Email' => 'user_'.$userID.'@deleted.invalid',
                 'ShowEmail' => '0',
@@ -3535,7 +3559,13 @@ class UserModel extends Gdn_Model {
                 'DiscoveryText' => '',
                 'Preferences' => null,
                 'Permissions' => null,
-                'Attributes' => dbencode(['State' => 'Deleted']),
+                'Attributes' => dbencode([
+                    'State' => 'Deleted',
+                    // We cannot keep emails until we have a method to purge deleted users.
+                    // See https://github.com/vanilla/vanilla/pull/5808 for more details.
+                    'OriginalName' => $userData['Name'],
+                    'DeletedBy' => Gdn::session()->UserID,
+                ]),
                 'DateSetInvitations' => null,
                 'DateOfBirth' => null,
                 'DateUpdated' => Gdn_Format::toDateTime(),
@@ -3635,7 +3665,7 @@ class UserModel extends Gdn_Model {
         }
 
         if ($applicantFound) {
-            $this->delete($userID);
+            $this->deleteID($userID);
         }
         return true;
     }
@@ -3964,6 +3994,15 @@ class UserModel extends Gdn_Model {
             }
 
             setValue('PhotoUrl', $user, $photoUrl);
+        }
+
+        $confirmed = val('Confirmed', $user, null);
+        if ($confirmed !== null) {
+            setValue('EmailConfirmed', $user, $confirmed);
+        }
+        $verified = val('Verified', $user, null);
+        if ($verified !== null) {
+            setValue('BypassSpam', $user, $verified);
         }
 
         // We store IPs in the UserIP table. To avoid unnecessary queries, the full list is not built here. Shim for BC.
@@ -4882,5 +4921,61 @@ class UserModel extends Gdn_Model {
         if ($resetSectionPreference) {
             $this->savePreference($userID, 'DashboardNav.DashboardLandingPage', '');
         }
+    }
+
+    /**
+     * @param int $userID
+     * @throws Exception
+     * @return bool
+     */
+    public function isApplicant($userID) {
+        $result = false;
+
+        $applicantRoleIDs = RoleModel::getDefaultRoles(RoleModel::TYPE_APPLICANT);
+
+        // Make sure the user is an applicant.
+        $roleData = $this->getRoles($userID);
+        if (count($roleData) == 0) {
+            throw new Exception(t('ErrorRecordNotFound'));
+        } else {
+            foreach ($roleData as $appRole) {
+                if (in_array(val('RoleID', $appRole), $applicantRoleIDs)) {
+                    $result = true;
+                    break;
+                }
+            }
+        }
+
+        return $result;
+    }
+
+    /**
+     * Do the registration values indicate SPAM?
+     *
+     * @param array $formPostValues
+     * @throws Gdn_UserException if the values trigger a positive SPAM match.
+     * @return bool
+     */
+    public function isRegistrationSpam(array $formPostValues) {
+        $result = (bool)SpamModel::isSpam('Registration', $formPostValues, ['Log' => false]);
+        return $result;
+    }
+
+    /**
+     * Validate the strength of a user's password.
+     *
+     * @param string $password A password to test.
+     * @param string $username The name of the user. Used to verify the password doesn't contain this value.
+     * @throws Gdn_UserException if the password is too weak.
+     * @return bool
+     */
+    public function validatePasswordStrength($password, $username) {
+        $strength = passwordStrength($password, $username);
+        $result = (bool)$strength['Pass'];
+
+        if ($result === false) {
+            throw new Gdn_UserException('The password is too weak.');
+        }
+        return $result;
     }
 }

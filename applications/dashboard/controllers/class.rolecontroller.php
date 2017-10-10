@@ -16,6 +16,9 @@ class RoleController extends DashboardController {
     /** @var bool Should categories be hidden when editing a role? */
     private $hideCategoryPermissions;
 
+    /** @var Gdn_Form */
+    public $Form;
+
     /** @var array Models to automatically instantiate. */
     public $Uses = ['Database', 'Form', 'RoleModel'];
 
@@ -114,6 +117,7 @@ class RoleController extends DashboardController {
     /**
      * Edit a role.
      *
+     * @param int|bool $RoleID
      * @since 2.0.0
      * @access public
      */
@@ -185,15 +189,25 @@ class RoleController extends DashboardController {
                     return;
                 }
 
-                $this->informMessage(t('Your changes have been saved.'));
-                $this->setRedirectTo('dashboard/role');
-                // Reload the permission data.
-                $this->setData('PermissionData', $permissionModel->getPermissionsEdit(
+                $permissionData = $permissionModel->getPermissionsEdit(
                     $roleID,
                     $limitToSuffix,
                     $this->hideCategoryPermissions === false
-                ), true);
+                );
+
+                $this->informMessage(t('Your changes have been saved.'));
+                $this->setRedirectTo('dashboard/role');
+            } else {
+                $overrides = $this->Form->getFormValue('Permission');
+                $permissionData = $permissionModel->getPermissionsEdit(
+                    $roleID,
+                    $limitToSuffix,
+                    $this->hideCategoryPermissions === false,
+                    $overrides
+                );
             }
+            // Reload the permission data.
+            $this->setData('PermissionData', $permissionData, true);
         }
 
         $this->setData('_Types', $this->RoleModel->getDefaultTypes(true));

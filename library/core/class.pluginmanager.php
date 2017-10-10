@@ -72,6 +72,14 @@ class Gdn_PluginManager extends Gdn_Pluggable implements ContainerInterface {
     private $eventManager;
 
     /**
+     * Whether we use the proper DI container or the Gdn_PluginManager as the container.
+     * See https://github.com/vanilla/vanilla/pull/5859 for more details.
+     *
+     * @var bool.
+     */
+    private $hasProperContainer = false;
+
+    /**
      * Initialize a new instance of the {@link Gdn_PluginManager} class.
      *
      * @param AddonManager $addonManager The addon manager that manages all of the addons.
@@ -80,8 +88,8 @@ class Gdn_PluginManager extends Gdn_Pluggable implements ContainerInterface {
     public function __construct(AddonManager $addonManager = null, EventManager $eventManager = null) {
         parent::__construct();
         $this->addonManager = $addonManager;
-
         $this->eventManager = $eventManager ?: new EventManager($this);
+        $this->hasProperContainer = $eventManager !== null;
     }
 
     /**
@@ -614,10 +622,14 @@ class Gdn_PluginManager extends Gdn_Pluggable implements ContainerInterface {
         }
 
         if (!isset($this->instances[$className])) {
-            if ($sender === null) {
-                $object = new $className();
+            if ($this->hasProperContainer) {
+                $object = $this->eventManager->getContainer()->get($className);
             } else {
-                $object = new $className($sender);
+                if ($sender === null) {
+                    $object = new $className();
+                } else {
+                    $object = new $className($sender);
+                }
             }
             if (method_exists($object, 'setAddon')) {
                 $object->setAddon($addon);
@@ -1239,7 +1251,7 @@ class Gdn_PluginManager extends Gdn_Pluggable implements ContainerInterface {
         $pluginClass = $addon->getPluginClass();
 
         if ($callback && !empty($pluginClass) && class_exists($pluginClass)) {
-            $plugin = new $pluginClass();
+            $plugin = $this->eventManager->getContainer()->get($pluginClass);
             if (method_exists($plugin, 'setAddon')) {
                 $plugin->setAddon($addon);
             }

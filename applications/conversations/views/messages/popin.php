@@ -45,7 +45,7 @@
         <?php endforeach; ?>
         <li class="Item Center">
             <?php
-            echo anchor(sprintf(t('All %s'), t('Messages')), '/messages/inbox');
+            echo anchor(t('All Messages'), '/messages/inbox');
             ?>
         </li>
     <?php else: ?>

@@ -9,6 +9,7 @@ namespace VanillaTests;
 
 use Garden\Container\Container;
 use Garden\Container\Reference;
+use Garden\Web\RequestInterface;
 use Gdn;
 use Interop\Container\ContainerInterface;
 use Psr\Log\LoggerAwareInterface;
@@ -131,6 +132,7 @@ class Bootstrap {
             ->rule(\Gdn_Request::class)
             ->setShared(true)
             ->addAlias('Request')
+            ->addAlias(RequestInterface::class)
 
             // Database.
             ->rule('Gdn_Database')

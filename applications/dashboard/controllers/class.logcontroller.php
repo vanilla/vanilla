@@ -302,7 +302,7 @@ class LogController extends DashboardController {
         Gdn_Theme::section('Dashboard');
         $this->addJsFile('log.js');
         $this->addJsFile('jquery.expander.js');
-        $this->addJsFile('jquery-ui.js');
+        $this->addJsFile('jquery-ui.min.js');
         $this->addJsFile('jquery.popup.js');
     }
 

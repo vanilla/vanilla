@@ -10,6 +10,7 @@
  * @package Core
  * @since 2.0
  */
+use Garden\Container\Container;
 use Garden\Web\Dispatcher;
 use Vanilla\Addon;
 use Vanilla\AddonManager;
@@ -40,7 +41,8 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
         '/^entry(\/.*)?$/' => self::BLOCK_PERMISSION,
         '/^user\/usernameavailable(\/.*)?$/' => self::BLOCK_PERMISSION,
         '/^user\/emailavailable(\/.*)?$/' => self::BLOCK_PERMISSION,
-        '/^home\/termsofservice(\/.*)?$/' => self::BLOCK_PERMISSION
+        '/^home\/termsofservice(\/.*)?$/' => self::BLOCK_PERMISSION,
+        '/^api\/v\d+\/applications$/' => self::BLOCK_NEVER,
     ];
 
     /** @var string The name of the controller to be dispatched. */
@@ -103,16 +105,26 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
      */
     private $addonManager;
 
+    /**
+     * @var Container
+     */
+    private $container;
+
     /** @var bool */
     private $isHomepage;
 
     /**
-     * Class constructor.
+     * Gdn_Dispatcher constructor.
+     *
+     * @param AddonManager $addonManager
+     * @param Container $container
+     * @param Dispatcher $dispatcher
      */
-    public function __construct(AddonManager $addonManager = null, Dispatcher $dispatcher = null) {
+    public function __construct(AddonManager $addonManager, Container $container, Dispatcher $dispatcher) {
         parent::__construct();
         $this->addonManager = $addonManager;
-        $this->dispatcher = $dispatcher ?: new Dispatcher();
+        $this->container = $container;
+        $this->dispatcher = $dispatcher;
         $this->reset();
     }
 
@@ -709,7 +721,11 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
         } elseif (in_array($request->path(), ['', '/'])) {
             $this->isHomepage = true;
             $defaultController = Gdn::router()->getRoute('DefaultController');
+            $originalGet = $request->get();
             $request->pathAndQuery($defaultController['Destination']);
+            if (is_array($originalGet) && count($originalGet) > 0) {
+                $request->setQuery(array_merge($request->get(), $originalGet));
+            }
         }
 
         return $request;
@@ -830,7 +846,13 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
      */
     private function createController($controllerName, $request, &$routeArgs) {
         /* @var Gdn_Controller $controller */
-        $controller = new $controllerName();
+        $controller = $this->container->get($controllerName);
+
+        // Allow classes to have a dependency on Gdn_Controller.
+        // It is possible that the controller does not inherit Gdn_Controller :(
+        if (is_a($controller, Gdn_Controller::class)) {
+            $this->container->setInstance(Gdn_Controller::class, $controller);
+        }
         Gdn::controller($controller);
 
         $this->EventArguments['Controller'] =& $controller;

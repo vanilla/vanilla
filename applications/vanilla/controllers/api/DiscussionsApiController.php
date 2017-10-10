@@ -6,7 +6,6 @@
  */
 
 use Garden\Schema\Schema;
-use Garden\Web\Data;
 use Garden\Web\Exception\NotFoundException;
 use Garden\Web\Exception\ServerException;
 use Vanilla\Utility\CapitalCaseScheme;
@@ -45,6 +44,50 @@ class DiscussionsApiController extends AbstractApiController {
         $this->userModel = $userModel;
 
         $this->caseScheme = new CapitalCaseScheme();
+    }
+
+    /**
+     * Get a list of the current user's bookmarked discussions.
+     *
+     * @param array $query The request query.
+     * @return array
+     */
+    public function get_bookmarked(array $query) {
+        $this->permission('Garden.SignIn.Allow');
+
+        $in = $this->schema([
+            'page:i?' => [
+                'description' => 'Page number.',
+                'default' => 1,
+                'minimum' => 1,
+                'maximum' => $this->discussionModel->getMaxPages()
+            ],
+            'limit:i?' => [
+                'description' => 'The number of items per page.',
+                'default' => $this->discussionModel->getDefaultLimit(),
+                'minimum' => 1,
+                'maximum' => 100
+            ],
+            'expand:b?' => 'Expand associated records.'
+        ], 'in');
+        $out = $this->schema([':a' => $this->discussionSchema()], 'out');
+
+        $query = $in->validate($query);
+        list($offset, $limit) = offsetLimit("p{$query['page']}", $query['limit']);
+
+        $rows = $this->discussionModel->get($offset, $limit, [
+            'w.Bookmarked' => 1,
+            'w.UserID' => $this->getSession()->UserID
+        ])->resultArray();
+        if (!empty($query['expand'])) {
+            $this->userModel->expandUsers($rows, ['InsertUserID']);
+        }
+        foreach ($rows as &$currentRow) {
+            $this->prepareRow($currentRow);
+        }
+
+        $result = $out->validate($rows);
+        return $result;
     }
 
     /**
@@ -89,7 +132,8 @@ class DiscussionsApiController extends AbstractApiController {
     public function discussionPostSchema($type = '') {
         if ($this->discussionPostSchema === null) {
             $this->discussionPostSchema = $this->schema(
-                Schema::parse(['name', 'body', 'format', 'categoryID'])->add($this->fullSchema()),
+                Schema::parse(
+                    ['name', 'body', 'format', 'categoryID', 'closed?', 'sink?', 'pinned?', 'pinLocation?'])->add($this->fullSchema()),
                 'DiscussionPost'
             );
         }
@@ -124,7 +168,11 @@ class DiscussionsApiController extends AbstractApiController {
             'insertUserID:i' => 'The user that created the discussion.',
             'insertUser?' => $this->getUserFragmentSchema(),
             'bookmarked:b' => 'Whether or no the discussion is bookmarked by the current user.',
-            'announce:b' => 'Whether or not the discussion has been announced (pinned).',
+            'pinned:b?' => 'Whether or not the discussion has been pinned.',
+            'pinLocation:s|n' => [
+                'enum' => ['category', 'recent'],
+                'description' => 'The location for the discussion, if pinned. "category" are pinned to their own category. "recent" are pinned to the recent discussions list, as well as their own category.'
+            ],
             'closed:b' => 'Whether the discussion is closed or open.',
             'sink:b' => 'Whether or not the discussion has been sunk.',
             'countComments:i' => 'The number of comments on the discussion.',
@@ -182,7 +230,7 @@ class DiscussionsApiController extends AbstractApiController {
         $this->permission('Garden.SignIn.Allow');
 
         $in = $this->idParamSchema()->setDescription('Get a discussion for editing.');
-        $out = $this->schema(Schema::parse(['discussionID', 'name', 'body', 'format', 'categoryID'])->add($this->fullSchema()), 'out');
+        $out = $this->schema(Schema::parse(['discussionID', 'name', 'body', 'format', 'categoryID', 'sink', 'closed', 'pinned', 'pinLocation'])->add($this->fullSchema()), 'out');
 
         $row = $this->discussionByID($id);
         $row['Url'] = discussionUrl($row);
@@ -222,6 +270,12 @@ class DiscussionsApiController extends AbstractApiController {
 
         $in = $this->schema([
             'categoryID:i?' => 'Filter by a category.',
+            'pinned:b?' => 'Whether or not to include pinned discussions. If true, only return pinned discussions. Cannot be used with the pinOrder parameter.',
+            'pinOrder:s?' => [
+                'default' => 'first',
+                'description' => 'If including pinned posts, in what order should they be integrated? When "first", discussions pinned to a specific category will only be affected if the discussion\'s category is passed as the categoryID parameter. Cannot be used with the pinned parameter.',
+                'enum' => ['first', 'mixed'],
+            ],
             'page:i?' => [
                 'description' => 'Page number.',
                 'default' => 1,
@@ -241,14 +295,36 @@ class DiscussionsApiController extends AbstractApiController {
 
         $query = $this->filterValues($query);
         $query = $in->validate($query);
+
         $where = array_intersect_key($query, array_flip(['categoryID', 'insertUserID']));
-        $where['Announce'] = 'all';
+        if (array_key_exists('categoryID', $where)) {
+            $where['d.CategoryID'] = $where['categoryID'];
+        }
+
         list($offset, $limit) = offsetLimit("p{$query['page']}", $query['limit']);
 
         if (array_key_exists('categoryID', $where)) {
             $this->discussionModel->categoryPermission('Vanilla.Discussions.View', $where['categoryID']);
         }
-        $rows = $this->discussionModel->getWhereRecent($where, $limit, $offset)->resultArray();
+
+        $pinned = array_key_exists('pinned', $query) ? $query['pinned'] : null;
+        if ($pinned === true) {
+            $announceWhere = array_merge($where, ['d.Announce >' => '0']);
+            $rows = $this->discussionModel->getAnnouncements($announceWhere, $offset, $limit)->resultArray();
+        } elseif ($pinned === false) {
+            $rows = $this->discussionModel->getWhereRecent($where, $limit, $offset, false)->resultArray();
+        } else {
+            $pinOrder = array_key_exists('pinOrder', $query) ? $query['pinOrder'] : null;
+            if ($pinOrder == 'first') {
+                $announcements = $this->discussionModel->getAnnouncements($where, $offset, $limit)->resultArray();
+                $discussions = $this->discussionModel->getWhereRecent($where, $limit, $offset, false)->resultArray();
+                $rows = array_merge($announcements, $discussions);
+            } else {
+                $where['Announce'] = 'all';
+                $rows = $this->discussionModel->getWhereRecent($where, $limit, $offset, false)->resultArray();
+            }
+        }
+
         if (!empty($query['expand'])) {
             $this->userModel->expandUsers($rows, ['InsertUserID']);
         }
@@ -279,14 +355,21 @@ class DiscussionsApiController extends AbstractApiController {
         $row = $this->discussionByID($id);
         $discussionData = $this->caseScheme->convertArrayKeys($body);
         $discussionData['DiscussionID'] = $id;
+        $categoryID = $row['CategoryID'];
         if ($row['InsertUserID'] !== $this->getSession()->UserID) {
-            $this->discussionModel->categoryPermission('Vanilla.Discussions.Edit', $row['CategoryID']);
+            $this->discussionModel->categoryPermission('Vanilla.Discussions.Edit', $categoryID);
         }
-        if (array_key_exists('CategoryID', $discussionData) && $row['CategoryID'] !== $discussionData['CategoryID']) {
+        if (array_key_exists('CategoryID', $discussionData) && $categoryID !== $discussionData['CategoryID']) {
             $this->discussionModel->categoryPermission('Vanilla.Discussions.Add', $discussionData['CategoryID']);
+            $categoryID = $discussionData['CategoryID'];
         }
 
+        $this->fieldPermission($body, 'closed', 'Vanilla.Discussions.Close', $categoryID);
+        $this->fieldPermission($body, 'pinned', 'Vanilla.Discussions.Announce', $categoryID);
+        $this->fieldPermission($body, 'sink', 'Vanilla.Discussions.Sink', $categoryID);
+
         $this->discussionModel->save($discussionData);
+        $this->validateModel($this->discussionModel);
 
         $result = $this->discussionByID($id);
         $this->prepareRow($result);
@@ -298,7 +381,7 @@ class DiscussionsApiController extends AbstractApiController {
      *
      * @param array $body The request body.
      * @throws ServerException if the discussion could not be created.
-     * @return Data
+     * @return array
      */
     public function post(array $body) {
         $this->permission('Garden.SignIn.Allow');
@@ -307,10 +390,15 @@ class DiscussionsApiController extends AbstractApiController {
         $out = $this->schema($this->discussionSchema(), 'out');
 
         $body = $in->validate($body);
-        $this->discussionModel->categoryPermission('Vanilla.Discussions.Add', $body['categoryID']);
+        $categoryID = $body['categoryID'];
+        $this->discussionModel->categoryPermission('Vanilla.Discussions.Add', $categoryID);
+        $this->fieldPermission($body, 'closed', 'Vanilla.Discussions.Close', $categoryID);
+        $this->fieldPermission($body, 'pinned', 'Vanilla.Discussions.Announce', $categoryID);
+        $this->fieldPermission($body, 'sink', 'Vanilla.Discussions.Sink', $categoryID);
 
         $discussionData = $this->caseScheme->convertArrayKeys($body);
         $id = $this->discussionModel->save($discussionData);
+        $this->validateModel($this->discussionModel);
 
         if (!$id) {
             throw new ServerException('Unable to insert discussion.', 500);
@@ -320,34 +408,7 @@ class DiscussionsApiController extends AbstractApiController {
         $this->userModel->expandUsers($row, ['InsertUserID']);
         $this->prepareRow($row);
         $result = $out->validate($row);
-        return new Data($result, 201);
-    }
-
-    /**
-     * Announce a discussion.
-     *
-     * @param int $id The ID of the discussion.
-     * @param array $body The request body.
-     * @throws NotFoundException if unable to find the discussion.
-     * @return array
-     */
-    public function put_announce($id, array $body) {
-        $this->permission('Garden.SignIn.Allow');
-
-        $in = $this
-            ->schema(['announce:b' => 'Pass true to announce or false to unannounce.'], 'in')
-            ->setDescription('Announce a discussion.');
-        $out = $this->schema(['announce:b' => 'The current announce value.'], 'out');
-
-        $row = $this->discussionByID($id);
-        $this->discussionModel->categoryPermission('Vanilla.Discussions.Announce', $row['CategoryID']);
-
-        $body = $in->validate($body);
-        $announce = intval($body['announce']);
-        $this->discussionModel->setField($row['DiscussionID'], 'Announce', $announce);
-
-        $result = $this->discussionByID($id);
-        return $out->validate($result);
+        return $result;
     }
 
     /**
@@ -372,57 +433,6 @@ class DiscussionsApiController extends AbstractApiController {
         $this->discussionModel->bookmark($id, $this->getSession()->UserID, $bookmarked);
 
         $result = $this->discussionByID($id);
-        return $out->validate($result);
-    }
-
-    /**
-     * Close a discussion.
-     *
-     * @param int $id The ID of the discussion.
-     * @param array $body The request body.
-     * @return array
-     */
-    public function put_close($id, array $body) {
-        $this->permission('Garden.SignIn.Allow');
-
-        $in = $this
-            ->schema(['closed:b' => 'Pass true to close or false to open.'], 'in')->setDescription('Close a discussion.');
-        $out = $this->schema(['closed:b' => 'The current close value.'], 'out');
-
-        $row = $this->discussionByID($id);
-        $this->discussionModel->categoryPermission('Vanilla.Discussions.Close', $row['CategoryID']);
-
-        $body = $in->validate($body);
-        $closed = intval($body['closed']);
-        $this->discussionModel->setField($row['DiscussionID'], 'Closed', $closed);
-
-        $result = $this->discussionByID($id);
-        return $out->validate($result);
-    }
-
-    /**
-     * Sink a discussion.
-     *
-     * @param int $id The ID of the discussion.
-     * @param array $body The request body.
-     * @return array
-     */
-    public function put_sink($id, array $body) {
-        $this->permission('Garden.SignIn.Allow');
-
-        $in = $this
-            ->schema(['sink:b' => 'Pass true to sink or false to unsink.'], 'in')->setDescription('Sink a discussion.');
-        $out = $this->schema(['sink:b' => 'The current sink value.'], 'out');
-
-        $row = $this->discussionByID($id);
-        $this->discussionModel->categoryPermission('Vanilla.Discussions.Sink', $row['CategoryID']);
-
-        $body = $in->validate($body);
-        $sink = intval($body['sink']);
-        $this->discussionModel->setField($row['DiscussionID'], 'Sink', $sink);
-
-        $result = $this->discussionByID($id);
-        $this->userModel->expandUsers($result, ['InsertUserID']);
         return $out->validate($result);
     }
 }

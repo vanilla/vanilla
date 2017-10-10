@@ -74,6 +74,79 @@ class RequestTest extends \PHPUnit\Framework\TestCase {
         $this->assertSame('http://localhost:8080/root-dir/path/to/resource.json?foo=bar', $request->getUrl());
     }
 
+    public function testGetHeaders() {
+        $server = [
+            'CONTENT_TYPE' => 'application/json',
+            'HTTP_HOST' => 'localhost',
+            'HTTP_CACHE_CONTROL' => 'no-cache'
+        ];
+        $expectedHeaders = [
+            'Content-Type' => 'application/json',
+            'Host' => 'localhost',
+            'Cache-Control' => 'no-cache'
+        ];
+
+        $request = new Gdn_Request();
+        $request->setRequestArguments(Gdn_Request::INPUT_SERVER, $server);
+
+        $this->assertEquals($expectedHeaders, $request->getHeaders());
+    }
+
+    public function testGetHeader() {
+        $server = [
+            'CONTENT_TYPE' => 'application/json',
+            'HTTP_CACHE_CONTROL' => 'no-cache',
+        ];
+
+        $request = new Gdn_Request();
+        $request->setRequestArguments(Gdn_Request::INPUT_SERVER, $server);
+
+        $this->assertEquals('application/json', $request->getHeader('CONTENT_TYPE'));
+        $this->assertEquals('application/json', $request->getHeader('Content-Type'));
+        $this->assertEquals('application/json', $request->getHeader('content-type'));
+
+        $this->assertEquals('no-cache', $request->getHeader('HTTP_CACHE_CONTROL'));
+        $this->assertEquals('no-cache', $request->getHeader('CACHE_CONTROL'));
+        $this->assertEquals('no-cache', $request->getHeader('Cache-Control'));
+        $this->assertEquals('no-cache', $request->getHeader('cache-control'));
+    }
+
+    public function testGetHeaderLine() {
+        $server = [
+            'CONTENT_LENGTH' => '',
+            'CONTENT_TYPE' => 'application/json',
+            'HTTP_ACCEPT' => ['application/json', 'application/xml']
+        ];
+
+        $request = new Gdn_Request();
+        $request->setRequestArguments(Gdn_Request::INPUT_SERVER, $server);
+
+        $this->assertEquals('', $request->getHeaderLine('Content-Length'));
+        $this->assertEquals('application/json', $request->getHeaderLine('Content-Type'));
+        $this->assertEquals('application/json,application/xml', $request->getHeaderLine('Accept'));
+    }
+
+    public function testHasHeader() {
+        $server = [
+            'CONTENT_TYPE' => 'application/json',
+            'HTTP_CACHE_CONTROL' => 'no-cache',
+        ];
+
+        $request = new Gdn_Request();
+        $request->setRequestArguments(Gdn_Request::INPUT_SERVER, $server);
+
+        $this->assertTrue($request->hasHeader('CONTENT_TYPE'));
+        $this->assertTrue($request->hasHeader('Content-Type'));
+        $this->assertTrue($request->hasHeader('content-type'));
+
+        $this->assertTrue($request->hasHeader('HTTP_CACHE_CONTROL'));
+        $this->assertTrue($request->hasHeader('CACHE_CONTROL'));
+        $this->assertTrue($request->hasHeader('Cache-Control'));
+        $this->assertTrue($request->hasHeader('cache-control'));
+
+        $this->assertFalse($request->hasHeader('Auth'));
+    }
+
     public function testHostEquivalence() {
         $req = new Gdn_Request();
 

@@ -67,6 +67,7 @@ composer-local.json
 .settings
 .buildpath
 .idea/*
+.vscode
 /nbproject/
 /vendor/
 node_modules/

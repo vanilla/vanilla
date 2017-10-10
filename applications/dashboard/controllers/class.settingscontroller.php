@@ -697,44 +697,11 @@ class SettingsController extends DashboardController {
 
     /**
      *
-     *
+     * @deprecated
      * @throws Exception
      */
     public function configuration() {
-        $this->permission('Garden.Settings.Manage');
-        $this->deliveryMethod(DELIVERY_METHOD_JSON);
-        $this->deliveryType(DELIVERY_TYPE_DATA);
-
-        $transientKey = Gdn::request()->get('TransientKey');
-        if (Gdn::session()->validateTransientKey($transientKey) === false) {
-            throw new Gdn_UserException(t('Invalid CSRF token.', 'Invalid CSRF token. Please try again.'), 403);
-        }
-
-        $ConfigData = [
-            'Title' => c('Garden.Title'),
-            'Domain' => c('Garden.Domain'),
-            'Cookie' => c('Garden.Cookie'),
-            'Theme' => c('Garden.Theme'),
-            'Analytics' => [
-                'InstallationID' => c('Garden.InstallationID'),
-                'InstallationSecret' => c('Garden.InstallationSecret')
-            ]
-        ];
-
-        $Config = Gdn_Configuration::format($ConfigData, [
-            'FormatStyle' => 'Dotted',
-            'WrapPHP' => false,
-            'SafePHP' => false,
-            'Headings' => false,
-            'ByLine' => false,
-        ]);
-
-        $Configuration = [];
-        eval($Config);
-
-        $this->setData('Configuration', $Configuration);
-
-        $this->render();
+        deprecated('settingsController->configuration()');
     }
 
     /**
@@ -1565,6 +1532,13 @@ class SettingsController extends DashboardController {
         ];
         $configurationModel->setField($registrationOptions);
 
+        $roleModel = new RoleModel();
+        $unconfirmedCount = $roleModel
+            ->getByType(RoleModel::TYPE_UNCONFIRMED)
+            ->count();
+        $this->setData('ConfirmationSupported', $unconfirmedCount > 0);
+        unset($roleModel, $unconfirmedCount);
+
         $this->EventArguments['Validation'] = &$validation;
         $this->EventArguments['Configuration'] = &$configurationModel;
         $this->fireEvent('Registration');
@@ -1583,6 +1557,10 @@ class SettingsController extends DashboardController {
             $invitationCounts = $this->Form->getValue('InvitationCount');
             $this->ExistingRoleInvitations = arrayCombine($invitationRoleIDs, $invitationCounts);
             $configurationModel->forceSetting('Garden.Registration.InviteRoles', $this->ExistingRoleInvitations);
+
+            if ($this->data('ConfirmationSupported') === false && $this->Form->getValue('Garden.Registration.ConfirmEmail')) {
+                $this->Form->addError('A role with default type "unconfirmed" is required to use email confirmation.');
+            }
 
             // Event hook
             $this->EventArguments['ConfigurationModel'] = &$configurationModel;

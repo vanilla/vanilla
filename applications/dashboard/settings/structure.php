@@ -267,12 +267,25 @@ $Construct->table('UserAuthenticationToken')
     ->column('Lifetime', 'int', false)
     ->set($Explicit, $Drop);
 
-$Construct->table('AccessToken')
-    ->column('Token', 'varchar(100)', false, 'primary')
+if ($captureOnly === false && $Construct->tableExists('AccessToken') && $Construct->table('AccessToken')->columnExists('AccessTokenID') === false) {
+    $accessTokenTable = $SQL->prefixTable('AccessToken');
+    try {
+        $SQL->query("alter table {$accessTokenTable} drop primary key");
+    } catch (Exception $e) {
+        // Primary key doesn't exist. Nothing to do here.
+    }
+    $SQL->query("alter table {$accessTokenTable} add AccessTokenID int not null auto_increment primary key first");
+}
+
+$Construct
+    ->table('AccessToken')
+    ->primaryKey('AccessTokenID')
+    ->column('Token', 'varchar(100)', false, 'unique')
     ->column('UserID', 'int', false, 'index')
     ->column('Type', 'varchar(20)', false, 'index')
     ->column('Scope', 'text', true)
     ->column('DateInserted', 'timestamp', false)
+    ->column('InsertUserID', 'int', true)
     ->column('InsertIPAddress', 'ipaddress', false)
     ->column('DateExpires', 'timestamp', false)
     ->column('Attributes', 'text', true)
@@ -287,12 +300,20 @@ if (c('Garden.SSO.SynchRoles')) {
     );
 }
 
-$Construct->table('Session')
+
+$Construct->table('Session');
+
+$transientKeyExists = $Construct->columnExists('TransientKey');
+if ($transientKeyExists) {
+    $Construct->dropColumn('TransientKey');
+}
+
+$Construct
     ->column('SessionID', 'char(32)', false, 'primary')
     ->column('UserID', 'int', 0)
     ->column('DateInserted', 'datetime', false)
-    ->column('DateUpdated', 'datetime', false)
-    ->column('TransientKey', 'varchar(12)', false)
+    ->column('DateUpdated', 'datetime', null)
+    ->column('DateExpire', 'datetime', null, 'index')
     ->column('Attributes', 'text', null)
     ->set($Explicit, $Drop);
 
@@ -340,7 +361,8 @@ $PermissionModel->define([
     'Garden.Moderation.Manage',
     'Garden.PersonalInfo.View' => 'Garden.Moderation.Manage',
     'Garden.AdvancedNotifications.Allow',
-    'Garden.Community.Manage' => 'Garden.Settings.Manage'
+    'Garden.Community.Manage' => 'Garden.Settings.Manage',
+    'Garden.Tokens.Add' => 'Garden.Settings.Manage'
 ]);
 
 $PermissionModel->undefine([
@@ -363,6 +385,7 @@ $Construct->table('Invitation')
     ->column('InsertUserID', 'int', true, 'index.userdate')
     ->column('DateInserted', 'datetime', false, 'index.userdate')
     ->column('AcceptedUserID', 'int', true)
+    ->column('DateAccepted', 'datetime', true)
     ->column('DateExpires', 'datetime', true)
     ->set($Explicit, $Drop);
 
@@ -894,11 +917,6 @@ if (c('Garden.Registration.CaptchaPublicKey')) {
 // Make sure the smarty folders exist.
 touchFolder(PATH_CACHE.'/Smarty/cache');
 touchFolder(PATH_CACHE.'/Smarty/compile');
-
-// Lock the current database character Encoding
-saveToConfig('Database.CharacterEncoding', c('Database.CharacterEncoding'));
-saveToConfig('Database.ExtendedProperties.Collate', c('Database.ExtendedProperties.Collate'));
-
 
 // For Touch Icon
 if (c('Plugins.TouchIcon.Uploaded')) {

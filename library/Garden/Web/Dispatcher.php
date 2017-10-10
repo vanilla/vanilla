@@ -9,11 +9,12 @@ namespace Garden\Web;
 
 use Garden\Web\Exception\NotFoundException;
 use Garden\Web\Exception\Pass;
+use Vanilla\Permissions;
 
 class Dispatcher {
 
     /**
-     * @var Route[]
+     * @var array
      */
     private $routes;
 
@@ -78,6 +79,20 @@ class Dispatcher {
                     // Hold the action in case another route succeeds.
                     $ex = $action;
                 } elseif ($action !== null) {
+                    // KLUDGE: Check for CSRF here because we can only do a global check for new dispatches.
+                    // Once we can test properly then a route can be added that checks for CSRF on all requests.
+                    if ($request->getMethod() === 'POST' && $request instanceof \Gdn_Request) {
+                        /* @var \Gdn_Request $request */
+                        try {
+                            $request->isAuthenticatedPostBack(true);
+                        } catch (\Exception $ex) {
+                            \Gdn::session()->getPermissions()->addBan(
+                                Permissions::BAN_CSRF,
+                                ['msg' => t('Invalid CSRF token.', 'Invalid CSRF token. Please try again.'), 'code' => 403]
+                            );
+                        }
+                    }
+
                     try {
                         ob_start();
                         $actionResponse = $action();
@@ -103,6 +118,22 @@ class Dispatcher {
                 $response = $this->makeResponse(new NotFoundException($request->getPath()));
                 // This is temporary. Only use internally.
                 $response->setMeta('noMatch', true);
+            }
+        } else {
+            if ($response->getMeta('status', null) === null) {
+                switch ($request->getMethod()) {
+                    case 'GET':
+                    case 'PATCH':
+                    case 'PUT':
+                        $response->setStatus(200);
+                        break;
+                    case 'POST':
+                        $response->setStatus(201);
+                        break;
+                    case 'DELETE':
+                        $response->setStatus(204);
+                        break;
+                }
             }
         }
 
@@ -139,6 +170,8 @@ class Dispatcher {
         } elseif ($raw instanceof \Exception) {
             $data = $raw instanceof \JsonSerializable ? $raw->jsonSerialize() : ['message' => $raw->getMessage(), 'status' => $raw->getCode()];
             $result = new Data($data, $raw->getCode());
+            // Provide stack trace as meta information.
+            $result->setMeta('error_trace', $raw->getTraceAsString());
         } elseif ($raw instanceof \JsonSerializable) {
             $result = new Data((array)$raw->jsonSerialize());
         } elseif (!empty($ob)) {

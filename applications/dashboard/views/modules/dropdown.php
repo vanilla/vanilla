@@ -3,7 +3,6 @@
 $dropdown = $this;
 $trigger = $dropdown->getTrigger();
 ?>
-
 <span class="ToggleFlyout <?php echo $dropdown->getCssClass(); ?>">
     <?php if (val('type', $trigger) === 'button') : ?>
     <span class="Button-Options">

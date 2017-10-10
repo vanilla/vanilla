@@ -24,10 +24,12 @@ function writeActivity($Activity, $Sender, $Session) {
     $Excerpt = $Activity->Story;
     if ($Format) {
         $Excerpt = Gdn_Format::to($Excerpt, $Format);
+    } else {
+        $Excerpt = htmlspecialchars($Activity->Story);
     }
 
     if ($Activity->NotifyUserID > 0 || !in_array($ActivityType, array('WallComment', 'WallPost', 'AboutUpdate'))) {
-        $Title = '<div class="Title">'.GetValue('Headline', $Activity).'</div>';
+        $Title = '<div class="Title">'.htmlspecialchars(val('Headline', $Activity)).'</div>';
     } else if ($ActivityType == 'WallPost') {
         $RegardingUser = UserBuilder($Activity, 'Regarding');
         $PhotoAnchor = userPhoto($RegardingUser);

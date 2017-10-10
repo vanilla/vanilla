@@ -5230,7 +5230,7 @@ input + .ReactSprite {
   border: 0;
 }
 
-.sr-only-important {
+.u-srcOnly {
   position: absolute !important;
   width: 1px !important;
   height: 1px !important;

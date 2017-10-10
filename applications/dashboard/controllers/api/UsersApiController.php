@@ -136,7 +136,6 @@ class UsersApiController extends AbstractApiController {
 
         $row = $this->userByID($id);
 
-
         $result = $out->validate($row);
         return $result;
     }

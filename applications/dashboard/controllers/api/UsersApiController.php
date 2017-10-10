@@ -118,7 +118,6 @@ class UsersApiController extends AbstractApiController {
         $this->prepareRow($row);
 
         $result = $out->validate($row);
-        $this->prepareRow($result);
         return $result;
     }
 
@@ -136,6 +135,7 @@ class UsersApiController extends AbstractApiController {
         $out = $this->schema(Schema::parse(['userID', 'name', 'email', 'photo', 'emailConfirmed', 'bypassSpam'])->add($this->fullSchema()), 'out');
 
         $row = $this->userByID($id);
+
 
         $result = $out->validate($row);
         return $result;
@@ -224,6 +224,14 @@ class UsersApiController extends AbstractApiController {
             $row['Photo'] = $photo;
             $row['PhotoUrl'] = $photo;
         }
+        if (array_key_exists('Verified', $row)) {
+            $row['bypassSpam'] = $row['Verified'];
+            unset($row['Verified']);
+        }
+        if (array_key_exists('Confirmed', $row)) {
+            $row['emailConfirmed'] = $row['Confirmed'];
+            unset($row['Confirmed']);
+        }
     }
 
     /**
@@ -243,6 +251,7 @@ class UsersApiController extends AbstractApiController {
         $body = $in->validate($body, true);
         // If a row associated with this ID cannot be found, a "not found" exception will be thrown.
         $this->userByID($id);
+        $body = $this->translateRequest($body);
         $userData = $this->caseScheme->convertArrayKeys($body);
         $userData['UserID'] = $id;
         $this->userModel->save($userData);
@@ -269,6 +278,7 @@ class UsersApiController extends AbstractApiController {
 
         $body = $in->validate($body);
 
+        $body = $this->translateRequest($body);
         $userData = $this->caseScheme->convertArrayKeys($body);
         if (!array_key_exists('RoleID', $userData)) {
             $userData['RoleID'] = RoleModel::getDefaultRoles(RoleModel::TYPE_MEMBER);
@@ -325,7 +335,7 @@ class UsersApiController extends AbstractApiController {
         $in = $this->schema($inputProperties, 'in')->setDescription('Submit a new user registration.');
         $out = $this->schema(['userID', 'name', 'email'], 'out')->add($this->fullSchema());
 
-        $body = $in->validate($body);
+        $in->validate($body);
 
         $this->userModel->validatePasswordStrength($userData['Password'], $userData['Name']);
 
@@ -405,6 +415,23 @@ class UsersApiController extends AbstractApiController {
 //        $result = $this->userByID($id);
 //        return $out->validate($result);
 //    }
+
+    /**
+     * Translate a request to this endpoint into a format compatible for saving with the model.
+     *
+     * @param array $body
+     * @return array
+     */
+    private function translateRequest(array $body) {
+        if (array_key_exists('bypassSpam', $body)) {
+            $body['verified'] = $body['bypassSpam'];
+        }
+        if (array_key_exists('emailConfirmed', $body)) {
+            $body['confirmed'] = $body['emailConfirmed'];
+        }
+
+        return $body;
+    }
 
     /**
      * Get a user by its numeric ID.

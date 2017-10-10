@@ -1513,7 +1513,7 @@ if (!function_exists('sprite')) {
     function sprite($name, $type = 'Sprite', $text = false) {
         $sprite = '<span aria-hidden="true" class="'.$type.' '.$name.'"></span>';
         if ($text) {
-            $sprite .= '<span class="sr-only-important">'.$text.'</span>';
+            $sprite .= '<span class="sr-only">'.$text.'</span>';
         }
 
         return $sprite;

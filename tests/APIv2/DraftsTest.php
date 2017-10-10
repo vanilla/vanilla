@@ -64,17 +64,17 @@ class DraftsTest extends AbstractResourceTest {
     public function testPostDiscussion() {
         $data = [
             'recordType' => 'discussion',
+            'parentRecordID' => 1,
             'attributes' => [
-                'announce' => true,
+                'announce' => 1,
                 'body' => 'Hello world.',
-                'categoryID' => 1,
-                'closed' => true,
+                'closed' => 1,
                 'format' => 'Markdown',
                 'name' => 'Discussion Draft',
-                'sink' => false,
-                'tags' => ['interesting', 'helpful']
+                'sink' => 0,
+                'tags' => 'interesting,helpful'
             ]
         ];
-        $row = parent::testPost($data);
+        parent::testPost($data);
     }
 }

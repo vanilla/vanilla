@@ -15,13 +15,10 @@ use Vanilla\Utility\CamelCaseScheme;
 class DraftsApiController extends AbstractApiController {
 
     /** @var CapitalCaseScheme */
-    private $caseScheme;
+    private $capitalCaseScheme;
 
     /** @var DraftModel */
     private $draftModel;
-
-    /** @var Schema */
-    private $idParamSchema;
 
     /** @var CamelCaseScheme */
     private $translateCaseScheme;
@@ -33,7 +30,7 @@ class DraftsApiController extends AbstractApiController {
      */
     public function __construct(DraftModel $draftModel) {
         $this->draftModel = $draftModel;
-        $this->caseScheme = new CapitalCaseScheme();
+        $this->capitalCaseScheme = new CapitalCaseScheme();
         $this->translateCaseScheme = new CamelCaseScheme();
     }
 
@@ -107,23 +104,7 @@ class DraftsApiController extends AbstractApiController {
                     'enum' => ['comment', 'discussion']
                 ],
                 'parentRecordID:i|n' => 'The unique ID of the intended parent to this record.',
-                'attributes:o' => [
-                    'description' => 'A free-form object containing all custom data for this draft.',
-                    'properties' => [
-                        'announce:b?' => 'If the record is a discussion, should it be announced when posted?',
-                        'body:s' => 'The body content of a post draft.',
-                        'closed:b?' => 'If the record is a discussion, should it be closed when posted?',
-                        'categoryID:i?' => 'The category ID of a discussion.',
-                        'name:s?' => 'The title of a discussion.',
-                        'sink:b?' => 'If the record is a discussion, should it be sunk when posted?',
-                        'tags:a?' => [
-                            'description' => 'Tags to apply to a discussion.',
-                            'items' => ['type' => 'string'],
-                            'style' => 'form'
-                        ],
-                        'format:s?' => 'The format of the post.'
-                    ]
-                ],
+                'attributes:o' => 'A free-form object containing all custom data for this draft.',
                 'insertUserID:i' => 'The unique ID of the user who created this draft.',
                 'dateInserted:dt' => 'When the draft was created.',
                 'updateUserID:i|n' => 'The unique ID of the user who updated this draft.',
@@ -185,13 +166,16 @@ class DraftsApiController extends AbstractApiController {
      * @return Schema Returns a schema object.
      */
     public function idParamSchema($type = 'in') {
-        if ($this->idParamSchema === null) {
-            $this->idParamSchema = $this->schema(
+        static $schema;
+
+        if (!isset($schema)) {
+            $schema = $this->schema(
                 Schema::parse(['id:i' => 'The draft ID.']),
                 $type
             );
         }
-        return $this->schema($this->idParamSchema, $type);
+
+        return $this->schema($schema, $type);
     }
 
     /**
@@ -205,10 +189,13 @@ class DraftsApiController extends AbstractApiController {
 
         $in = $this->schema([
             'recordType:s?' => [
-                'description' => 'Limit the drafts to this record type.',
+                'description' => 'Filter drafts by record type.',
                 'enum' => ['comment', 'discussion']
             ],
-            'parentRecordID:i?' => 'Filter by the unique ID of the parent for a draft. Used with recordType.',
+            'parentRecordID:i|n?' => [
+                'description' => 'Filter by the unique ID of the parent for a draft. Used with recordType.',
+                'default' => null
+            ],
             'page:i?' => [
                 'description' => 'Page number.',
                 'default' => 1,
@@ -229,13 +216,16 @@ class DraftsApiController extends AbstractApiController {
         if (array_key_exists('recordType', $query)) {
             switch ($query['recordType']) {
                 case 'comment':
-                    if (array_key_exists('parentRecordID', $query) && !empty($query['parentRecordID'])) {
+                    if ($query['parentRecordID'] !== null) {
                         $where['DiscussionID'] = $query['parentRecordID'];
                     } else {
                         $where['DiscussionID >'] = 0;
                     }
                     break;
                 case 'discussion':
+                    if ($query['parentRecordID'] !== null) {
+                        $where['CategoryID'] = $query['parentRecordID'];
+                    }
                     $where['DiscussionID'] = null;
                     break;
             }
@@ -262,6 +252,7 @@ class DraftsApiController extends AbstractApiController {
     public function patch($id, array $body) {
         $this->permission('Garden.SignIn.Allow');
 
+        $this->idParamSchema();
         $in = $this->draftPostSchema('in')->setDescription('Update a draft.');
         $out = $this->schema(['draftID', 'parentRecordID', 'attributes'], 'out')->add($this->fullSchema());
 
@@ -271,7 +262,7 @@ class DraftsApiController extends AbstractApiController {
         }
 
         $body = $in->validate($body, true);
-        $recordType = !empty('DiscussionID') ? 'comment' : 'discussion';
+        $recordType = !empty($row['DiscussionID']) ? 'comment' : 'discussion';
         $draftData = $this->translateRequest($body, $recordType);
         $draftData['DraftID'] = $id;
         $this->draftModel->save($draftData);
@@ -352,11 +343,14 @@ class DraftsApiController extends AbstractApiController {
                 }
                 break;
             case 'discussion':
+                if (array_key_exists('parentRecordID', $body)) {
+                    $body['CategoryID'] = $body['parentRecordID'];
+                }
                 $body['DiscussionID'] = null;
         }
         unset($body['recordType'], $body['parentRecordID']);
 
-        $result = $this->caseScheme->convertArrayKeys($body);
+        $result = $this->capitalCaseScheme->convertArrayKeys($body);
         return $result;
     }
 
@@ -369,13 +363,16 @@ class DraftsApiController extends AbstractApiController {
     private function translateRow(array $row) {
         $parentRecordID = null;
 
-        $commentAttributes = ['Body', 'DiscussionID', 'Format'];
-        $discussionAttributes = ['Announce', 'Body', 'CategoryID', 'Closed', 'Format', 'Name', 'Sink', 'Tags'];
+        $commentAttributes = ['Body', 'Format'];
+        $discussionAttributes = ['Announce', 'Body', 'Closed', 'Format', 'Name', 'Sink', 'Tags'];
         if (array_key_exists('DiscussionID', $row) && !empty($row['DiscussionID'])) {
             $row['RecordType'] = 'comment';
             $parentRecordID = $row['DiscussionID'];
             $attributes = $commentAttributes;
         } else {
+            if (array_key_exists('CategoryID', $row) && !empty($row['CategoryID'])) {
+                $parentRecordID = $row['CategoryID'];
+            }
             $row['RecordType'] = 'discussion';
             $attributes = $discussionAttributes;
         }

@@ -37,7 +37,7 @@ if ($Session->isValid()):
     $CNotifications = is_numeric($CountNotifications) && $CountNotifications > 0 ? '<span class="Alert NotificationsAlert">'.$CountNotifications.'</span>' : '';
 
     echo '<span class="ToggleFlyout" rel="/profile/notificationspopin">';
-    echo anchor(sprite('SpNotifications', 'Sprite Sprite16', t('Globe')).$CNotifications, userUrl($User), 'MeButton FlyoutButton js-clear-notifications', ['title' => t('Notifications'), 'tabindex' => 0]);
+    echo anchor(sprite('SpNotifications', 'Sprite Sprite16', t('Globe')).$CNotifications, userUrl($User), 'MeButton FlyoutButton js-clear-notifications', ['title' => t('Notifications'), 'tabindex' => '0']);
     echo sprite('SpFlyoutHandle', 'Arrow');
     echo '<div class="Flyout FlyoutMenu"></div></span>';
 
@@ -46,7 +46,7 @@ if ($Session->isValid()):
         $CountInbox = val('CountUnreadConversations', Gdn::session()->User);
         $CInbox = is_numeric($CountInbox) && $CountInbox > 0 ? ' <span class="Alert">'.$CountInbox.'</span>' : '';
         echo '<span class="ToggleFlyout" rel="/messages/popin">';
-        echo anchor(sprite('SpInbox', 'Sprite Sprite16', t('Envelope')).wrap(t('Inbox'), 'em').$CInbox, '/messages/all', 'MeButton FlyoutButton', ['title' => t('Inbox'), 'tabindex' => 0]);
+        echo anchor(sprite('SpInbox', 'Sprite Sprite16', t('Envelope')).wrap(t('Inbox'), 'em').$CInbox, '/messages/all', 'MeButton FlyoutButton', ['title' => t('Inbox'), 'tabindex' => '0']);
         echo sprite('SpFlyoutHandle', 'Arrow');
         echo '<div class="Flyout FlyoutMenu"></div></span>';
     }
@@ -54,7 +54,7 @@ if ($Session->isValid()):
     // Bookmarks
     if (Gdn::addonManager()->lookupAddon('Vanilla')) {
         echo '<span class="ToggleFlyout" rel="/discussions/bookmarkedpopin">';
-        echo anchor(sprite('SpBookmarks', 'Sprite Sprite16', t('Star')), '/discussions/bookmarked', 'MeButton FlyoutButton', ['title' => t('Bookmarks'), 'tabindex' => 0]);
+        echo anchor(sprite('SpBookmarks', 'Sprite Sprite16', t('Star')), '/discussions/bookmarked', 'MeButton FlyoutButton', ['title' => t('Bookmarks'), 'tabindex' => '0']);
         echo sprite('SpFlyoutHandle', 'Arrow');
         echo '<div class="Flyout FlyoutMenu"></div></span>';
     }

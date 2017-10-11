@@ -43,6 +43,28 @@
         gdn.meta[key] = value;
     };
 
+    gdn.hasAttribute = function(element, attributeName) {
+        var attr = $(element).attr(attributeName);
+        return (typeof attr !== typeof undefined && attr !== false);
+    };
+
+    gdn.accessibleFlyoutsInit = function accessibleFlyouts($ToggleFlyout) {
+
+        $ToggleFlyout.find('.FlyoutButton').each(function accessibleFlyoutButtonInit(){
+            $(this)
+                .attr('tabindex', '0')
+                .attr('role', 'button')
+                .attr('aria-haspopup', 'true')
+                .attr('aria-expanded', 'false');
+        });
+
+        $ToggleFlyout.find('.Flyout').each(function accessibleFlyoutInit(){
+            $(this)
+                .attr('aria-hidden', 'true')
+                .attr('role', 'group');
+        });
+    };
+
     var keyString = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=";
 
     // See http://ecmanaut.blogspot.de/2006/07/encoding-decoding-utf8-in-javascript.html
@@ -787,6 +809,13 @@ jQuery(document).ready(function($) {
         return false;
     });
     var lastOpen = null;
+
+
+    $('.ToggleFlyout').each(function(){
+        gdn.accessibleFlyoutsInit($(this));
+    });
+
+
     $(document).delegate('.ToggleFlyout', 'click', function(e) {
 
         var $flyout = $('.Flyout', this);

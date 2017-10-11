@@ -99,7 +99,7 @@ class PromotedContentModule extends Gdn_Module {
     /**
      * Set ShowIfNoResults
      *
-     * @param mixed $val
+     * @param bool $val
      */
     public function setShowIfNoResults($val) {
         $this->ShowIfNoResults = filter_var($val, FILTER_VALIDATE_BOOLEAN);
@@ -145,7 +145,7 @@ class PromotedContentModule extends Gdn_Module {
     /**
      * Get ShowIfNoResults
      *
-     * @return boolean
+     * @return bool
      */
     public function getShowIfNoResults() {
         return $this->ShowIfNoResults;

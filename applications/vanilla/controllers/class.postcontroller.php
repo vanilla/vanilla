@@ -238,6 +238,10 @@ class PostController extends VanillaController {
             $this->deliveryType(Gdn::request()->getValue('DeliveryType', $this->_DeliveryType));
             if ($DraftID == 0) {
                 $DraftID = $this->Form->getFormValue('DraftID', 0);
+            } else {
+                if ($DraftID != $FormValues['DraftID']) {
+                    throw new Exception('DraftID mismatch.');
+                }
             }
 
             $Draft = $this->Form->buttonExists('Save_Draft') ? true : false;

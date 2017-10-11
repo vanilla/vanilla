@@ -43,7 +43,7 @@ class PromotedContentModule extends Gdn_Module {
     public $Group = 3;
 
     /** @var bool Whether or not to hide module if no results are found. */
-    public $ShowIfNoResults = true;
+    private $ShowIfNoResults = true;
 
     /** @var integer How many chars of Title to return. */
     public $TitleLimit = 0;
@@ -96,6 +96,11 @@ class PromotedContentModule extends Gdn_Module {
         }
     }
 
+    /**
+     * Set ShowIfNoResults
+     *
+     * @param mixed $val
+     */
     public function setShowIfNoResults($val) {
         $this->ShowIfNoResults = filter_var($val, FILTER_VALIDATE_BOOLEAN);
     }
@@ -136,6 +141,16 @@ class PromotedContentModule extends Gdn_Module {
         $result = $validation->validate($parameters);
         return ($result === true) ? true : $validation->resultsText();
     }
+
+    /**
+     * Get ShowIfNoResults
+     *
+     * @return boolean
+     */
+    public function getShowIfNoResults() {
+        return $this->ShowIfNoResults;
+    }
+
 
     /**
      * Get data based on class properties.

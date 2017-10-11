@@ -2,11 +2,7 @@
 require_once Gdn::controller()->fetchViewLocation('helper_functions', 'modules', 'vanilla');
 $Content = $this->data('Content');
 
-$ShowIfNoResults = $this->data('ShowIfNoResults');
-
-$ContentItems = is_array($Content) ? sizeof($Content) : 0;
-
-if (!empty($Content) || $this->ShowIfNoResults):
+if (!empty($Content) || $this->getShowIfNoResults()) :
     ?>
     <div class="Box BoxPromoted">
         <?php echo panelHeading(t('Promoted Content')); ?>

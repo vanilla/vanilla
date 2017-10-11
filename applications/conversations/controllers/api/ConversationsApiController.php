@@ -207,6 +207,11 @@ class ConversationsApiController extends AbstractApiController {
         $this->idParamSchema();
 
         $in = $this->schema([
+            'status:s' => [
+                'description' => 'Filter by participant status.',
+                'enum' => ['all', 'participating', 'deleted'],
+                'default' => 'participating'
+            ],
             'page:i?' => [
                 'description' => 'Page number.',
                 'default' => 1,
@@ -230,9 +235,10 @@ class ConversationsApiController extends AbstractApiController {
                             'description' => 'The userID of the participant.',
                         ],
                         'user' => $this->getUserFragmentSchema(),
-                        'deleted' => [
-                            'type' => 'boolean',
-                            'description' => 'True if the user left the conversation.',
+                        'status' => [
+                            'description' => 'Participation status of the user.',
+                            'type' => 'string',
+                            'enum' => ['participating', 'deleted']
                         ],
                     ],
                 ],
@@ -247,9 +253,20 @@ class ConversationsApiController extends AbstractApiController {
 
         list($offset, $limit) = offsetLimit("p{$query['page']}", $query['limit']);
 
-        $conversationMembers = $this->conversationModel->getConversationMembers($id, false, $limit, $offset);
+        $active = null;
+        $status = $query['status'];
+        if ($status == 'deleted') {
+            $active = false;
+        } elseif ($status == 'participating') {
+            $active = true;
+        }
 
+        $conversationMembers = $this->conversationModel->getConversationMembers($id, false, $limit, $offset, $active);
         $data = array_values($conversationMembers);
+
+        foreach ($data as &$row) {
+            $this->translateParticipantStatus($row);
+        }
 
         if (!empty($query['expand'])) {
             $this->userModel->expandUsers($data, ['UserID']);
@@ -448,6 +465,19 @@ class ConversationsApiController extends AbstractApiController {
         if (array_key_exists('subject', $conversation)) {
             $conversation['name'] = $conversation['subject'];
             unset($conversation['subject']);
+        }
+    }
+
+    /**
+     * Translate a row's Deleted field to a Status value.
+     *
+     * @param array $row
+     */
+    private function translateParticipantStatus(array &$row) {
+        if ($row['Deleted'] == 0) {
+            $row['Status'] = 'participating';
+        } else {
+            $row['Status'] = 'deleted';
         }
     }
 }

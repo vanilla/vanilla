@@ -37,7 +37,7 @@ if ($Session->isValid()):
     $CNotifications = is_numeric($CountNotifications) && $CountNotifications > 0 ? '<span class="Alert NotificationsAlert">'.$CountNotifications.'</span>' : '';
 
     echo '<span class="ToggleFlyout" rel="/profile/notificationspopin">';
-    echo anchor(sprite('SpNotifications', 'Sprite Sprite16', t('Notifications')).$CNotifications, userUrl($User), 'MeButton FlyoutButton js-clear-notifications', ['title' => t('Notifications'), 'tabindex' => '0', "role" => "button", "aria-haspopup" => true]);
+    echo anchor(sprite('SpNotifications', 'Sprite Sprite16', t('Notifications')).$CNotifications, userUrl($User), 'MeButton FlyoutButton js-clear-notifications', ['title' => t('Notifications'), 'tabindex' => '0', "role" => "button", "aria-haspopup" => "true"]);
     echo sprite('SpFlyoutHandle', 'Arrow');
     echo '<div class="Flyout FlyoutMenu"></div></span>';
 
@@ -46,7 +46,7 @@ if ($Session->isValid()):
         $CountInbox = val('CountUnreadConversations', Gdn::session()->User);
         $CInbox = is_numeric($CountInbox) && $CountInbox > 0 ? ' <span class="Alert">'.$CountInbox.'</span>' : '';
         echo '<span class="ToggleFlyout" rel="/messages/popin">';
-        echo anchor(sprite('SpInbox', 'Sprite Sprite16', t('Inbox')).$CInbox, '/messages/all', 'MeButton FlyoutButton', ['title' => t('Inbox'), 'tabindex' => '0', "role" => "button", "aria-haspopup" => true]);
+        echo anchor(sprite('SpInbox', 'Sprite Sprite16', t('Inbox')).$CInbox, '/messages/all', 'MeButton FlyoutButton', ['title' => t('Inbox'), 'tabindex' => '0', "role" => "button", "aria-haspopup" => "true"]);
         echo sprite('SpFlyoutHandle', 'Arrow');
         echo '<div class="Flyout FlyoutMenu"></div></span>';
     }
@@ -54,7 +54,7 @@ if ($Session->isValid()):
     // Bookmarks
     if (Gdn::addonManager()->lookupAddon('Vanilla')) {
         echo '<span class="ToggleFlyout" rel="/discussions/bookmarkedpopin">';
-        echo anchor(sprite('SpBookmarks', 'Sprite Sprite16', t('Bookmarks')), '/discussions/bookmarked', 'MeButton FlyoutButton', ['title' => t('Bookmarks'), 'tabindex' => '0', "role" => "button", "aria-haspopup" => true]);
+        echo anchor(sprite('SpBookmarks', 'Sprite Sprite16', t('Bookmarks')), '/discussions/bookmarked', 'MeButton FlyoutButton', ['title' => t('Bookmarks'), 'tabindex' => '0', "role" => "button", "aria-haspopup" => "true"]);
         echo sprite('SpFlyoutHandle', 'Arrow');
         echo '<div class="Flyout FlyoutMenu"></div></span>';
     }
@@ -64,7 +64,7 @@ if ($Session->isValid()):
     $dropdown->setData('DashboardCount', $DashboardCount);
     $triggerTitle = t('Account Options');
     $triggerIcon = sprite('SpOptions', 'Sprite Sprite16', $triggerTitle);
-    $dropdown->setTrigger('', 'anchor', 'MeButton FlyoutButton', $triggerIcon, '/profile/edit', ['title' => $triggerTitle, 'tabindex' => '0', "role" => "button", "aria-haspopup" => true]);
+    $dropdown->setTrigger('', 'anchor', 'MeButton FlyoutButton', $triggerIcon, '/profile/edit', ['title' => $triggerTitle, 'tabindex' => '0', "role" => "button", "aria-haspopup" => "true"]);
     $editModifiers['listItemCssClasses'] = ['EditProfileWrap', 'link-editprofile'];
     $preferencesModifiers['listItemCssClasses'] = ['EditProfileWrap', 'link-preferences'];
 

@@ -142,14 +142,15 @@ class ConversationsTest extends AbstractAPIv2Test {
         $this->assertEquals(204, $result->getStatusCode());
 
         $participantsResult = $this->api()->get(
-            "{$this->baseUrl}/{$conversation[$this->pk]}/participants"
+            "{$this->baseUrl}/{$conversation[$this->pk]}/participants",
+            ['status' => 'all']
         );
 
         $this->assertEquals(200, $participantsResult->getStatusCode());
 
         $expectedFirstParticipant = [
             'userID' => $this->api()->getUserID(),
-            'deleted' => true,
+            'status' => 'deleted',
         ];
         $participants = $participantsResult->getBody();
 

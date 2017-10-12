@@ -207,7 +207,7 @@ class ConversationsApiController extends AbstractApiController {
         $this->idParamSchema();
 
         $in = $this->schema([
-            'status:s' => [
+            'status:s?' => [
                 'description' => 'Filter by participant status.',
                 'enum' => ['all', 'participating', 'deleted'],
                 'default' => 'participating'

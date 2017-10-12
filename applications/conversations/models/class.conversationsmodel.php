@@ -79,7 +79,7 @@ abstract class ConversationsModel extends Gdn_Model {
         if ($active === true) {
             $where['Deleted'] = 0;
         } elseif ($active === false) {
-            $where['Deleted >'] = 0;
+            $where['Deleted'] = 1;
         }
         $userMembers = $userConversation->getWhere($where, 'UserID', 'asc', $limit, $offset)->resultArray();
 

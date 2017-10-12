@@ -7,6 +7,8 @@
 
 namespace Garden\Web;
 
+use Garden\MetaTrait;
+
 /**
  * Represents a callback that has been routed from a {@link Request}.
  *
@@ -14,15 +16,11 @@ namespace Garden\Web;
  * to infer additional information for more complex dispatchers.
  */
 class Action {
+    use MetaTrait;
 
     private $callback;
 
     private $args;
-
-    /**
-     * @var array Meta information about the action.
-     */
-    private $meta;
 
     /**
      * Create an new instance of an {@link Action}.
@@ -81,28 +79,5 @@ class Action {
     public function __invoke() {
         $result = call_user_func_array($this->callback, $this->args);
         return $result;
-    }
-
-    /**
-     * Get the a meta value.
-     *
-     * @param string $name The name of the meta value.
-     * @param mixed $default The value to return if there is no meta value.
-     * @return mixed Returns a meta value or **null** if one does not exist.
-     */
-    public function getMeta($name, $default = null) {
-        return isset($this->meta[$name]) ? $this->meta[$name] : $default;
-    }
-
-    /**
-     * Set a meta value.
-     *
-     * @param string $name The meta key to set.
-     * @param mixed $value The meta value to set.
-     * @return $this
-     */
-    public function setMeta($name, $value) {
-        $this->meta[$name] = $value;
-        return $this;
     }
 }

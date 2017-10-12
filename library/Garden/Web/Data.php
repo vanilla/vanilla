@@ -7,14 +7,15 @@
 
 namespace Garden\Web;
 
+use Garden\MetaTrait;
 
 /**
  * Represents the data in a web response.
  */
 class Data implements \JsonSerializable, \ArrayAccess {
-    private $data;
+    use MetaTrait;
 
-    private $meta;
+    private $data;
 
     /**
      * Create a {@link Data} instance representing the data in a web response.
@@ -104,49 +105,6 @@ class Data implements \JsonSerializable, \ArrayAccess {
      */
     public function setStatus($status) {
         return $this->setMeta('status', $status);
-    }
-
-    /**
-     * Get a single item from the meta array.
-     *
-     * @param string $name The key to get from.
-     * @param mixed $default The default value if no item at the key exists.
-     * @return mixed Returns the meta value.
-     */
-    public function getMeta($name, $default = null) {
-        return isset($this->meta[$name]) ? $this->meta[$name] : $default;
-    }
-
-    /**
-     * Set a single item to the meta array.
-     *
-     * @param string $name The key to set.
-     * @param mixed $value The new value.
-     * @return $this
-     */
-    public function setMeta($name, $value) {
-        $this->meta[$name] = $value;
-        return $this;
-    }
-
-    /**
-     * Get the entire meta array.
-     *
-     * @return array Returns the meta.
-     */
-    public function getMetaArray() {
-        return $this->meta;
-    }
-
-    /**
-     * Set the entire meta array.
-     *
-     * @param array $meta The new meta array.
-     * @return $this
-     */
-    public function setMetaArray(array $meta) {
-        $this->meta = $meta;
-        return $this;
     }
 
     /**

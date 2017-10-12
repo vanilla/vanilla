@@ -96,6 +96,11 @@ class ResourceRoute extends Route {
         // Now look for a method.
         $controller = $this->createInstance($controllerClass);
         $result = $this->findAction($controller, $request, $pathArgs);
+
+        $result->setMeta('resource', $controllerSlug);
+        $result->setMeta('method', $request->getMethod());
+        $result->setMeta('action', $result->getCallback()[1]);
+
         return $result;
     }
 

@@ -85,7 +85,7 @@ class DraftModel extends Gdn_Model {
      * @param int $draftID Unique ID of draft to get data for.
      * @param string|false $dataSetType The format of the data.
      * @param array $options Not used.
-     * @return object SQL results.
+     * @return array|object SQL results.
      */
     public function getID($draftID, $dataSetType = false, $options = []) {
         $dataSetType = $dataSetType ?: DATASET_TYPE_OBJECT;
@@ -138,12 +138,14 @@ class DraftModel extends Gdn_Model {
         // Define the primary key in this model's table.
         $this->defineSchema();
 
-        // Add & apply any extra validation rules:
-        $this->Validation->applyRule('Body', 'Required');
-        $maxCommentLength = Gdn::config('Vanilla.Comment.MaxLength');
-        if (is_numeric($maxCommentLength) && $maxCommentLength > 0) {
-            $this->Validation->setSchemaProperty('Body', 'Length', $maxCommentLength);
-            $this->Validation->applyRule('Body', 'Length');
+        if (array_key_exists('Body', $formPostValues)) {
+            // Add & apply any extra validation rules:
+            $this->Validation->applyRule('Body', 'Required');
+            $maxCommentLength = Gdn::config('Vanilla.Comment.MaxLength');
+            if (is_numeric($maxCommentLength) && $maxCommentLength > 0) {
+                $this->Validation->setSchemaProperty('Body', 'Length', $maxCommentLength);
+                $this->Validation->applyRule('Body', 'Length');
+            }
         }
 
         // Get the DraftID from the form so we know if we are inserting or updating.
@@ -155,7 +157,7 @@ class DraftModel extends Gdn_Model {
         }
 
         // Remove the discussionid from the form value collection if it's empty
-        if (array_key_exists('DiscussionID', $formPostValues) && $formPostValues['DiscussionID'] == '') {
+        if (array_key_exists('DiscussionID', $formPostValues) && $formPostValues['DiscussionID'] === '') {
             unset($formPostValues['DiscussionID']);
         }
 
@@ -253,7 +255,7 @@ class DraftModel extends Gdn_Model {
      */
     public function updateUser($userID) {
         // Retrieve a draft count
-        $countDrafts = $this->getCount($userID);
+        $countDrafts = $this->getCountByUser($userID);
 
         // Update CountDrafts column of user table fot this user
         Gdn::userModel()->setField($userID, 'CountDrafts', $countDrafts);

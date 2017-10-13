@@ -365,6 +365,7 @@
             $('.editor-dropdown .editor-action')
                 .off('click.dd')
                 .on('click.dd', function(e) {
+
                     var parentEl = $(e.target).closest('.editor-dropdown');
 
                     // Again, tackling with clash from multiple codebases.
@@ -399,11 +400,20 @@
                             }
                         }
                     }
+
+                    gdn.setFlyoutAttributes(parentEl);
+
+                }).on('keypress', function(e){
+                    var key = e.keyCode || e.which;
+                    if (key == 13) {
+                        $(this).trigger('click.dd');
+                    }
                 });
 
             // Handle Enter key
             $('.editor-dropdown').find('.InputBox').on('keydown', function(e) {
-                if (e.which == 13) {
+                var key = e.keyCode || e.which;
+                if (key === 13 || key === 32) {
                     // Cancel enter key submissions on these values.
                     if (this.value == ''
                         || this.value == 'http://'

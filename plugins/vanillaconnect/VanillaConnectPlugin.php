@@ -326,6 +326,9 @@ class VanillaConnectPlugin extends Gdn_Plugin {
             $form->validateRule('AuthenticationKey', 'regex:`^[a-z0-9_-]+$`i', t('The client id must contain only letters, numbers and dashes.'));
             $form->validateRule('AssociationSecret', 'ValidateRequired', sprintf(t('%s is required.'), t('Secret')));
             $form->validateRule('SignInUrl', 'ValidateRequired', sprintf(t('%s is required.'), t('Sign In URL')));
+            $form->validateRule('SignInUrl', 'ValidateUrl');
+            $form->validateRule('RegisterUrl', 'ValidateUrl');
+            $form->validateRule('SignOutUrl', 'ValidateUrl');
 
             $form->setFormValue('AuthenticationSchemeAlias', VanillaConnect::NAME);
 
@@ -335,6 +338,7 @@ class VanillaConnectPlugin extends Gdn_Plugin {
         } else {
             if ($clientID) {
                 $provider = $this->authProviderModel->getID($clientID, DATASET_TYPE_ARRAY);
+                $provider['Trusted'] = valr('Attributes.Trusted', $provider, false);
             } else {
                 $provider = [];
             }

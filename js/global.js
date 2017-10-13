@@ -48,15 +48,24 @@
         return (typeof attr !== typeof undefined && attr !== false);
     };
 
+    gdn.setFlyoutAttributes = function ($wrapper) {
+        isOpen = $wrapper.hasClass('Open');
+        $handle = $wrapper.find('.FlyoutButton, .Handle');
+        $flyout = $wrapper.find('.Flyout, .Dropdown');
+
+        gdn.accessibleFlyoutHandle($handle, isOpen);
+        gdn.accessibleFlyout($flyout, isOpen);
+    };
+
     gdn.accessibleFlyoutHandle = function ($handle, isOpen) {
         $handle.attr('aria-expanded', isOpen.toString());
     };
 
     gdn.accessibleFlyout = function ($flyout, isOpen) {
-        $flyout.attr('aria-hidden', !isOpen.toString());
+        $flyout.attr('aria-hidden', (!isOpen).toString());
     };
 
-    gdn.accessibleFlyoutsInit = function accessibleFlyouts($context) {
+    gdn.accessibleFlyoutsInit = function ($context) {
         $context.each(function(){
 
             console.log("hit: ", this);
@@ -766,7 +775,7 @@ jQuery(document).ready(function($) {
     var hijackClick = function(e) {
         var $elem = $(this);
         var $parent = $(this).closest('.Item');
-        var $flyout = $elem.closest('.ToggleFlyout');
+        var $toggleFlyout = $elem.closest('.ToggleFlyout');
         var href = $elem.attr('href');
         var progressClass = $elem.hasClass('Bookmark') ? 'Bookmarking' : 'InProgress';
 
@@ -788,7 +797,9 @@ jQuery(document).ready(function($) {
                 $elem.attr('href', href);
 
                 // If we are in a flyout, close it.
-                $flyout.removeClass('Open').find('.Flyout').hide();
+                $toggleFlyout.removeClass('Open').find('.Flyout').hide();
+                gdn.setFlyoutAttributes($toggleFlyout);
+
             },
             error: function(xhr) {
                 gdn.informError(xhr);
@@ -818,13 +829,22 @@ jQuery(document).ready(function($) {
         var buttonGroup = $(this).closest('.ButtonGroup');
         if (buttonGroup.hasClass('Open')) {
             // Close
-            $('.ButtonGroup').removeClass('Open');
+            $('.ButtonGroup').each(function(){
+                $(this).removeClass('Open');
+                gdn.setFlyoutAttributes($(this));
+            });
+
         } else {
             // Close all other open button groups
-            $('.ButtonGroup').removeClass('Open');
+            $('.ButtonGroup').each(function(){
+                $(this).removeClass('Open');
+                gdn.setFlyoutAttributes($(this));
+            });
+
             // Open this one
             buttonGroup.addClass('Open');
         }
+        gdn.setFlyoutAttributes(buttonGroup);
         return false;
     });
     var lastOpen = null;
@@ -836,7 +856,7 @@ jQuery(document).ready(function($) {
 
 
     $(document).delegate('.ToggleFlyout', 'click', function(e) {
-
+        var $toggleFlyout = $(this);
         var $flyout = $('.Flyout', this);
         var isHandle = false;
 
@@ -871,14 +891,17 @@ jQuery(document).ready(function($) {
             if (lastOpen !== null) {
                 $('.Flyout', lastOpen).hide();
                 $(lastOpen).removeClass('Open').closest('.Item').removeClass('Open');
+                gdn.setFlyoutAttributes($toggleFlyout);
             }
 
             $(this).addClass('Open').closest('.Item').addClass('Open');
             $flyout.show();
             lastOpen = this;
+            gdn.setFlyoutAttributes($toggleFlyout);
         } else {
             $flyout.hide();
             $(this).removeClass('Open').closest('.Item').removeClass('Open');
+            gdn.setFlyoutAttributes($toggleFlyout);
         }
 
         if (isHandle)
@@ -892,6 +915,7 @@ jQuery(document).ready(function($) {
 
         $('.ToggleFlyout').removeClass('Open').closest('.Item').removeClass('Open');
         $('.Flyout').hide();
+        gdn.setFlyoutAttributes($(this).closest('.ToggleFlyout'));
     });
 
     $(document).delegate(document, 'click', function() {
@@ -899,7 +923,11 @@ jQuery(document).ready(function($) {
             $('.Flyout', lastOpen).hide();
             $(lastOpen).removeClass('Open').closest('.Item').removeClass('Open');
         }
-        $('.ButtonGroup').removeClass('Open');
+
+        $('.ButtonGroup').each(function(){
+            $(this).removeClass('Open');
+            gdn.setFlyoutAttributes($(this));
+        });
     });
 
     // Add a spinner onclick of buttons with this class

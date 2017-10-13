@@ -131,7 +131,7 @@ class VanillaConnectPlugin extends Gdn_Plugin {
             }
         } catch (\Exception $e) {
             Logger::log(Logger::ERROR, 'vanillaconnect_pushsso_error', [
-                'endpoint' => $endPoint,
+                'endpoint' => $this->request->getPath(),
                 'errorCode' => $e->getCode(),
                 'errorMessage' => $e->getMessage(),
                 'validationResults' => $this->ssoModel->getValidationResults(),

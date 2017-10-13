@@ -227,19 +227,24 @@ class SSOModel {
         if ($user) {
             $this->session->start($user['UserID']);
 
-            if ($ssoInfo['authenticatorIsTrusted']) {
-                // Synchronize user's info.
-                $syncInfo = $this->config->get('Garden.Registration.ConnectSynchronize', true);
+            // Allow user's synchronization
+            $syncInfo = $this->config->get('Garden.Registration.ConnectSynchronize', true);
 
-                // Synchronize user's roles only on registration.
-                $syncRolesOnlyRegistration = $this->config->get('Garden.SSO.SyncRolesOnRegistrationOnly', false);
+            if ($syncInfo) {
+                // Synchronize user's roles.
+                $syncRoles = $this->config->get('Garden.SSO.SyncRoles', false);
 
-                // This coupling sucks but I feel like that's the best way to accommodate the config!
-                if ($syncRolesOnlyRegistration && val('connectOption', $ssoInfo) !== 'createuser') {
-                    $syncRoles = false;
-                } else {
-                    // Synchronize user's roles.
-                    $syncRoles = $this->config->get('Garden.SSO.SyncRoles', false);
+                // Override $syncRoles if the authenticator is trusted.
+                if ($ssoInfo['authenticatorIsTrusted']) {
+                    // Synchronize user's roles only on registration.
+                    $syncRolesOnlyRegistration = $this->config->get('Garden.SSO.SyncRolesOnRegistrationOnly', false);
+
+                    // This coupling (connectOption put in $ssoInfo) sucks but I feel like that's the best way to accommodate the config!
+                    if ($syncRolesOnlyRegistration && val('connectOption', $ssoInfo) !== 'createuser') {
+                        $syncRoles = false;
+                    } else {
+                        $syncRoles = true;
+                    }
                 }
 
                 if (!$this->syncUser($ssoInfo, $user, $syncInfo, $syncRoles)) {

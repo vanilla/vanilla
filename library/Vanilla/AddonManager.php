@@ -218,7 +218,7 @@ class AddonManager {
         if ($searchAll === false) {
             foreach ($this->autoloadClasses as $classKey => $classesEntry) {
                 foreach($classesEntry as $namespace => $classData) {
-                    if ($fn($namespace.$classData['className'])) {
+                    if ($fn($namespace.$classKey)) {
                         $result[] = $namespace.$classData['className'];
                     }
                 }

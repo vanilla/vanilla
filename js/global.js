@@ -68,21 +68,17 @@
     gdn.accessibleFlyoutsInit = function ($context) {
         $context.each(function(){
 
-            console.log("hit: ", this);
-
-            $context.find('.FlyoutButton, .Handle').each(function accessibleFlyoutButtonInit(){
+            $context.find('.FlyoutButton, .Handle, .editor-action').each(function accessibleFlyoutButtonInit(){
                 $(this)
                     .attr('tabindex', '0')
                     .attr('role', 'button')
                     .attr('aria-haspopup', 'true');
 
                 gdn.accessibleFlyoutHandle($(this), false);
-                $(this).attr('data-init-from', "global_68");
             });
 
-            $context.find('.Flyout, .Dropdown').each(function accessibleFlyoutInit(){
+            $context.find('.Flyout, .Dropdown').each(function (){
                 gdn.accessibleFlyout($(this), false);
-                $(this).attr('data-init-from', "global_73");
 
                 $(this).find('a').each(function() {
                     $(this).attr('tabindex', '0');
@@ -848,12 +844,6 @@ jQuery(document).ready(function($) {
         return false;
     });
     var lastOpen = null;
-
-
-    $('.ToggleFlyout').each(function(){
-        gdn.accessibleFlyoutsInit($(this));
-    });
-
 
     $(document).delegate('.ToggleFlyout', 'click', function(e) {
         var $toggleFlyout = $(this);
@@ -2119,7 +2109,14 @@ jQuery(document).ready(function($) {
         });
     }
 
-    gdn.accessibleFlyoutsInit($('.ButtonGroup, .ToggleFlyout'));
+    $('.ToggleFlyout, .editor-dropdown, .ButtonGroup').each(function(){
+        gdn.accessibleFlyoutsInit($(this));
+        $('.editor-action:not(".editor-dropdown")').each(function(){
+            $(this)
+                .attr('tabindex', '0')
+                .attr('role', 'button');
+        });
+    });
 
     $(document).trigger('contentLoad');
 });

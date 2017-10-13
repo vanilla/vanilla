@@ -22,6 +22,11 @@ use Vanilla\Models\SSOData;
 class VanillaConnectAuthenticator extends SSOAuthenticator {
 
     /**
+     * @var RequestInterface
+     */
+    private $request;
+
+    /**
      * @var array
      */
     private $providerData;

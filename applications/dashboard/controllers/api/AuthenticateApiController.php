@@ -211,12 +211,12 @@ class AuthenticateApiController extends AbstractApiController {
             'dateInserted:dt' => 'When the session was created.',
             'dateExpire:dt' => 'When the session expires.',
             'attributes' => Schema::parse([
-                'ssoInfo:o' => $this->ssoInfoSchema(), // This should do a sparse validation
+                'ssoData:o' => $this->ssoDataSchema(), // This should do a sparse validation
                 'linkUser:o?' => Schema::parse([
                     'existingUsers:a' => Schema::parse([
                         'userID:i' => 'The userID of the participant.',
                         'user:o?' => $this->getUserFragmentSchema(),
-                    ])->setDescription('User that matches the SSOInfo and can be used to connect the user.'),
+                    ])->setDescription('User that matches the SSOData and can be used to connect the user.'),
                 ])->setDescription('Information needed for the "linkUser" step.'),
             ]),
         ], 'out');
@@ -236,10 +236,10 @@ class AuthenticateApiController extends AbstractApiController {
 
         $cleanedSessionData = $out->validate($sessionData);
 
-        // We need to add back the ssoInfo since it was cleaned and we want to preserve any extra information.
-        if (isset($cleanedSessionData['attributes']['ssoInfo'])) {
-            $ssoInfo = $this->camelCaseScheme->convertArrayKeys($sessionData['Attributes']['ssoInfo']);
-            $cleanedSessionData['attributes']['ssoInfo'] = $ssoInfo;
+        // We need to add back the ssoData since it was cleaned and we want to preserve any extra information.
+        if (isset($cleanedSessionData['attributes']['ssoData'])) {
+            $ssoData = $this->camelCaseScheme->convertArrayKeys($sessionData['Attributes']['ssoData']);
+            $cleanedSessionData['attributes']['ssoData'] = $ssoData;
         }
 
         return $cleanedSessionData;
@@ -342,13 +342,13 @@ class AuthenticateApiController extends AbstractApiController {
         if (is_a($authenticatorInstance, SSOAuthenticator::class)) {
 
             /** @var SSOAuthenticator $authenticatorInstance */
-            $ssoInfo = $authenticatorInstance->validateAuthentication($this->request);
+            $ssoData = $authenticatorInstance->validateAuthentication($this->request);
 
-            if (!$ssoInfo) {
+            if (!$ssoData) {
                 throw new ServerException("Unknown error while authenticating with $authenticatorType.", 500);
             }
 
-            $user = $this->ssoModel->sso($ssoInfo, false);
+            $user = $this->ssoModel->sso($ssoData, false);
         } else {
             throw new ServerException(get_class($authenticatorInstance).' is not a supported authenticator yet.', 500);
         }
@@ -366,7 +366,7 @@ class AuthenticateApiController extends AbstractApiController {
         $allowConnect = $this->config->get('Garden.Registration.AllowConnect', true);
 
         $sessionData = [
-            'ssoInfo' => $ssoInfo,
+            'ssoData' => $ssoData,
         ];
 
         if ($user) {
@@ -374,7 +374,7 @@ class AuthenticateApiController extends AbstractApiController {
         // We could not authenticate or autoconnect so they will need to do a manual connect.
         } else {
             if ($allowConnect) {
-                $existingUserIDs = $this->ssoModel->findMatchingUserIDs($ssoInfo, $emailUnique, $nameUnique);
+                $existingUserIDs = $this->ssoModel->findMatchingUserIDs($ssoData, $emailUnique, $nameUnique);
                 if (!empty($existingUserIDs)) {
                     $sessionData['linkUser'] = [
                         'existingUsers' => $existingUserIDs,
@@ -475,8 +475,8 @@ class AuthenticateApiController extends AbstractApiController {
 
         $this->userModel->saveAuthentication([
             'UserID' => $user['UserID'],
-            'Provider' => $sessionData['Attributes']['ssoInfo']['authenticatorID'],
-            'UniqueID' => $sessionData['Attributes']['ssoInfo']['uniqueID'],
+            'Provider' => $sessionData['Attributes']['ssoData']['authenticatorID'],
+            'UniqueID' => $sessionData['Attributes']['ssoData']['uniqueID'],
         ]);
         // Clean the session.
         $this->sessionModel->deleteID($sessionData['SessionID']);
@@ -485,15 +485,15 @@ class AuthenticateApiController extends AbstractApiController {
     }
 
     /**
-     * Get the SSOInfo schema.
+     * Get the SSOData schema.
      *
      * @return Schema
      */
-    public function ssoInfoSchema() {
-        static $ssoInfoSchema;
+    public function ssoDataSchema() {
+        static $ssoDataSchema;
 
-        if ($ssoInfoSchema === null) {
-            $ssoInfoSchema = $this->schema([
+        if ($ssoDataSchema === null) {
+            $ssoDataSchema = $this->schema([
                 'authenticatorName:s' => 'Name of the authenticator that was used to create this object.',
                 'authenticatorID:s' => 'ID of the authenticator instance that was used to create this object.',
                 'authenticatorIsTrusted:b' => 'If the authenticator is trusted to sync user\'s information.',
@@ -506,9 +506,9 @@ class AuthenticateApiController extends AbstractApiController {
                     'style' => 'form',
                 ],
                 '...:s?' => 'Any other information.',
-            ], 'SSOInfo')->setDescription('SSOAuthenticator\'s supplied information.');
+            ], 'SSOData')->setDescription('SSOAuthenticator\'s supplied information.');
         }
 
-        return $ssoInfoSchema;
+        return $ssoDataSchema;
     }
 }

@@ -1,12 +1,12 @@
 <?php if (!defined('APPLICATION')) { exit; }
 
-use \Vanilla\Models\SSOInfo;
+use \Vanilla\Models\SSOData;
 /** @var $this AuthenticateController */
 
 $form = $this->getForm();
 
-/** @var SSOInfo $ssoInfo */
-$ssoInfo = $this->data('ssoInfo');
+/** @var SSOData $ssoData */
+$ssoData = $this->data('ssoData');
 
 $existingUsers = $this->data('existingUsers');
 
@@ -37,7 +37,7 @@ $getMeBox = function($user, $isChecked) use ($form) {
 };
 ?>
 <div class="connectBox">
-    <h1><?php printf(t('%s Connect'), $ssoInfo['authenticatorName']); ?></h1>
+    <h1><?php printf(t('%s Connect'), $ssoData['authenticatorName']); ?></h1>
     <div>
 <?php
         echo $form->open();

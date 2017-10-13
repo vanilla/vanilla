@@ -10,14 +10,14 @@ namespace Vanilla\Models;
 use Vanilla\ArrayAccessTrait;
 
 /**
- * Class SSOInfo
+ * Class SSOData
  *
  * This is a data object containing information returned by an SSOAuthenticator.
  * Adding methods to this object probably means that you are doing something wrong.
  *
  * @package Vanilla\Models
  */
-class SSOInfo implements \ArrayAccess {
+class SSOData implements \ArrayAccess {
     use ArrayAccessTrait;
 
     /**
@@ -41,7 +41,7 @@ class SSOInfo implements \ArrayAccess {
     public $uniqueID;
 
     /**
-     * SSOInfo constructor.
+     * SSOData constructor.
      *
      * @param array $associativeArray
      * @throws \Exception If a non associative array is passed to the constructor.
@@ -89,7 +89,7 @@ class SSOInfo implements \ArrayAccess {
         }
 
         if (count($invalidProperties)) {
-            throw new \Exception("SSOInfo is invalid. The following properties are not set or empty: ".impode(',', $invalidProperties));
+            throw new \Exception("SSOData is invalid. The following properties are not set or empty: ".impode(',', $invalidProperties));
         }
     }
 

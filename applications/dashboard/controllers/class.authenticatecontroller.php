@@ -7,7 +7,7 @@
 
 use Garden\Web\RequestInterface;
 use Vanilla\Models\SSOModel;
-use Vanilla\Models\SSOInfo;
+use Vanilla\Models\SSOData;
 
 /**
  * Create /authenticate endpoint.
@@ -150,8 +150,8 @@ class AuthenticateController extends Gdn_Controller {
             $this->setData('existingUsers', $session['attributes']['linkuser']['existingUsers']);
         }
 
-        $ssoInfo = new SSOInfo($session['attributes']['ssoInfo']);
-        $this->setData('ssoInfo', $ssoInfo);
+        $ssoData = new SSOData($session['attributes']['ssoData']);
+        $this->setData('ssoData', $ssoData);
 
         $connectSuccess = false;
         if ($this->form->isPostBack()) {
@@ -163,25 +163,25 @@ class AuthenticateController extends Gdn_Controller {
                 if ($connectOption === 'linkuser') {
                     $connectUserID = $this->linkUser($authSessionID);
                 } else if ($connectOption === 'createuser') {
-                    $connectUserID = $this->createUser($ssoInfo, $authSessionID);
+                    $connectUserID = $this->createUser($ssoData, $authSessionID);
                 } else {
                     $this->form->addError(t('Invalid connectOption.'));
                 }
 
                 // Set connect option so that the SSOModel knows how to properly sync the user's roles.
-                $ssoInfo['connectOption'] = $connectOption;
+                $ssoData['connectOption'] = $connectOption;
 
                 if ($connectUserID) {
                     // This will effectively sync the user info / roles if there is a need for it.
-                    $connectSuccess = (bool)$this->ssoModel->sso($ssoInfo);
+                    $connectSuccess = (bool)$this->ssoModel->sso($ssoData);
                 } else {
                     $this->form->addError(t('Unable to connect user.'));
                 }
             }
 
         } else {
-            $this->form->setValue('createUserName', $ssoInfo->coalesce('name'));
-            $this->form->setValue('createUserEmail', $ssoInfo->coalesce('email'));
+            $this->form->setValue('createUserName', $ssoData->coalesce('name'));
+            $this->form->setValue('createUserEmail', $ssoData->coalesce('email'));
         }
 
         if ($connectSuccess) {
@@ -238,11 +238,11 @@ class AuthenticateController extends Gdn_Controller {
     /**
      * Create a new user using the "createuser" connect form fields.
      *
-     * @param SSOInfo $ssoInfo
+     * @param SSOData $ssoData
      * @param string $authSessionID
      * @return int|false
      */
-    private function createUser(SSOInfo $ssoInfo, $authSessionID) {
+    private function createUser(SSOData $ssoData, $authSessionID) {
         $userID = false;
 
         $this->form->validateRule('createUserName', 'ValidateRequired', t('Username is required.'));
@@ -251,17 +251,17 @@ class AuthenticateController extends Gdn_Controller {
         $this->form->validateRule('createUserEmail', 'ValidateEmail', t('Email is invalid.'));
 
         if ($this->form->errorCount() === 0) {
-            $ssoInfo['name'] = $this->form->getFormValue('createUserName');
-            $ssoInfo['email'] = $this->form->getFormValue('createUserEmail');
-            $user = $this->ssoModel->createUser($ssoInfo);
+            $ssoData['name'] = $this->form->getFormValue('createUserName');
+            $ssoData['email'] = $this->form->getFormValue('createUserEmail');
+            $user = $this->ssoModel->createUser($ssoData);
 
             if ($user) {
                 $userID = $user['UserID'];
 
                 $this->userModel->saveAuthentication([
                     'UserID' => $userID,
-                    'Provider' => $ssoInfo['authenticatorID'],
-                    'UniqueID' => $ssoInfo['uniqueID']
+                    'Provider' => $ssoData['authenticatorID'],
+                    'UniqueID' => $ssoData['uniqueID']
                 ]);
                 // Clean the session.
                 $this->sessionModel->deleteID($authSessionID);

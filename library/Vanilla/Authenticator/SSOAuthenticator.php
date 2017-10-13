@@ -8,7 +8,7 @@
 namespace Vanilla\Authenticator;
 
 use Garden\Web\RequestInterface;
-use Vanilla\Models\SSOInfo;
+use Vanilla\Models\SSOData;
 
 abstract class SSOAuthenticator extends Authenticator {
     /**
@@ -71,7 +71,7 @@ abstract class SSOAuthenticator extends Authenticator {
      * @throws Exception Reason why the authentication failed.
      *
      * @param RequestInterface $request
-     * @return SSOInfo The user's information.
+     * @return SSOData The user's information.
      */
     protected abstract function sso(RequestInterface $request);
 
@@ -80,18 +80,18 @@ abstract class SSOAuthenticator extends Authenticator {
      *
      * @throws Exception Reason why the authentication failed.
      * @param RequestInterface $request
-     * @return SSOInfo The user's information.
+     * @return SSOData The user's information.
      */
     public final function validateAuthentication(RequestInterface $request) {
-        $ssoInfo = $this->sso($request);
+        $ssoData = $this->sso($request);
 
         // Make sure that the following fields are filled.
-        $ssoInfo['authenticatorID'] = $this->getID();
-        $ssoInfo['authenticatorName'] = $this->getName();
-        $ssoInfo['authenticatorIsTrusted'] = $this->isTrusted();
+        $ssoData['authenticatorID'] = $this->getID();
+        $ssoData['authenticatorName'] = $this->getName();
+        $ssoData['authenticatorIsTrusted'] = $this->isTrusted();
 
-        $ssoInfo->validate();
+        $ssoData->validate();
 
-        return $ssoInfo;
+        return $ssoData;
     }
 }

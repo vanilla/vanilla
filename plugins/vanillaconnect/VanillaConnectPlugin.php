@@ -116,13 +116,13 @@ class VanillaConnectPlugin extends Gdn_Plugin {
                 $this->request,
                 $this->nonceModel
             );
-            $ssoInfo = $vanillaConnectAuthenticator->validatePushSSOAuthentication($jwt);
+            $ssoData = $vanillaConnectAuthenticator->validatePushSSOAuthentication($jwt);
 
             $currentUserID = $this->session->UserID;
 
             saveToConfig('Garden.Registration.SendConnectEmail', false, false);
 
-            if ($this->ssoModel->sso($ssoInfo)) {
+            if ($this->ssoModel->sso($ssoData)) {
                 if ($this->session->UserID != $currentUserID) {
                     $this->userModel->fireEvent('AfterSignIn');
                 }

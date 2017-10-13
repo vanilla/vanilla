@@ -12,7 +12,7 @@ use Garden\Web\RequestInterface;
 use Gdn_AuthenticationProviderModel;
 use UserAuthenticationNonceModel;
 use Vanilla\Authenticator\SSOAuthenticator;
-use Vanilla\Models\SSOInfo;
+use Vanilla\Models\SSOData;
 
 /**
  * Class VanillaConnectAuthenticator
@@ -79,12 +79,12 @@ class VanillaConnectAuthenticator extends SSOAuthenticator {
     }
 
     /**
-     * Transform a claim to a SSOInfo object.
+     * Transform a claim to a SSOData object.
      *
      * @param $claim
-     * @return SSOInfo
+     * @return SSOData
      */
-    private function claimToSSOInfo($claim) {
+    private function claimToSSOData($claim) {
         $claim['uniqueID'] = $claim['id'];
 
         foreach (array_keys(VanillaConnect::JWT_RESPONSE_CLAIM_TEMPLATE) as $key) {
@@ -95,10 +95,10 @@ class VanillaConnectAuthenticator extends SSOAuthenticator {
         $claim['authenticatorName'] = $this->getName();
         $claim['authenticatorIsTrusted'] = $this->isTrusted();
 
-        $ssoInfo = new SSOInfo($claim);
-        $ssoInfo->validate();
+        $ssoData = new SSOData($claim);
+        $ssoData->validate();
 
-        return $ssoInfo;
+        return $ssoData;
     }
 
     /**
@@ -200,7 +200,7 @@ class VanillaConnectAuthenticator extends SSOAuthenticator {
         $this->validateNonce($claim['nonce']);
         $this->consumeNonce($claim['nonce']);
 
-        return $this->claimToSSOInfo($claim);
+        return $this->claimToSSOData($claim);
     }
 
     /**
@@ -227,7 +227,7 @@ class VanillaConnectAuthenticator extends SSOAuthenticator {
      * @throws Exception
      *
      * @param string $jwt JSON Web Token
-     * @return SSOInfo
+     * @return SSOData
      */
     public function validatePushSSOAuthentication($jwt) {
         if (!$this->vanillaConnect->validateResponse($jwt, $claim)) {
@@ -243,7 +243,7 @@ class VanillaConnectAuthenticator extends SSOAuthenticator {
 
         $this->validateReverseNonce($claim['nonce']);
 
-        return $this->claimToSSOInfo($claim);
+        return $this->claimToSSOData($claim);
     }
 
     /**

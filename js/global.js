@@ -49,8 +49,8 @@
     };
 
     gdn.setFlyoutAttributes = function ($wrapper) {
-        isOpen = $wrapper.hasClass('Open');
-        $handle = $wrapper.find('.FlyoutButton, .Handle');
+        isOpen = $wrapper.hasClass('Open') || $wrapper.hasClass('.wysihtml5-command-dialog-opened') || $wrapper.hasClass('.editor-dropdown-open');
+        $handle = $wrapper.find('.FlyoutButton, .Handle, .editor-action:not(.editor-action-separator)');
         $flyout = $wrapper.find('.Flyout, .Dropdown');
 
         gdn.accessibleFlyoutHandle($handle, isOpen);
@@ -68,7 +68,7 @@
     gdn.accessibleFlyoutsInit = function ($context) {
         $context.each(function(){
 
-            $context.find('.FlyoutButton, .Handle, .editor-action').each(function accessibleFlyoutButtonInit(){
+            $context.find('.FlyoutButton, .Handle, .editor-dropdown:not(.editor-action-separator)').each(function (){
                 $(this)
                     .attr('tabindex', '0')
                     .attr('role', 'button')
@@ -2111,7 +2111,7 @@ jQuery(document).ready(function($) {
 
     $('.ToggleFlyout, .editor-dropdown, .ButtonGroup').each(function(){
         gdn.accessibleFlyoutsInit($(this));
-        $('.editor-action:not(".editor-dropdown")').each(function(){
+        $('.editor-action:not(".editor-dropdown"):not(".editor-action-separator")').each(function(){
             $(this)
                 .attr('tabindex', '0')
                 .attr('role', 'button');

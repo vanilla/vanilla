@@ -48,22 +48,41 @@
         return (typeof attr !== typeof undefined && attr !== false);
     };
 
-    gdn.accessibleFlyoutsInit = function accessibleFlyouts($ToggleFlyout) {
+    gdn.accessibleFlyoutHandle = function ($handle, isOpen) {
+        $handle.attr('aria-expanded', isOpen.toString());
+    };
 
-        $ToggleFlyout.find('.FlyoutButton').each(function accessibleFlyoutButtonInit(){
-            $(this)
-                .attr('tabindex', '0')
-                .attr('role', 'button')
-                .attr('aria-haspopup', 'true')
-                .attr('aria-expanded', 'false');
-        });
+    gdn.accessibleFlyout = function ($flyout, isOpen) {
+        $flyout.attr('aria-hidden', !isOpen.toString());
+    };
 
-        $ToggleFlyout.find('.Flyout').each(function accessibleFlyoutInit(){
-            $(this)
-                .attr('aria-hidden', 'true')
-                .attr('role', 'group');
+    gdn.accessibleFlyoutsInit = function accessibleFlyouts($context) {
+        $context.each(function(){
+
+            console.log("hit: ", this);
+
+            $context.find('.FlyoutButton, .Handle').each(function accessibleFlyoutButtonInit(){
+                $(this)
+                    .attr('tabindex', '0')
+                    .attr('role', 'button')
+                    .attr('aria-haspopup', 'true');
+
+                gdn.accessibleFlyoutHandle($(this), false);
+                $(this).attr('data-init-from', "global_68");
+            });
+
+            $context.find('.Flyout, .Dropdown').each(function accessibleFlyoutInit(){
+                gdn.accessibleFlyout($(this), false);
+                $(this).attr('data-init-from', "global_73");
+
+                $(this).find('a').each(function() {
+                    $(this).attr('tabindex', '0');
+                });
+            });
         });
     };
+
+
 
     var keyString = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=";
 
@@ -2071,6 +2090,8 @@ jQuery(document).ready(function($) {
             }
         });
     }
+
+    gdn.accessibleFlyoutsInit($('.ButtonGroup, .ToggleFlyout'));
 
     $(document).trigger('contentLoad');
 });

@@ -49,9 +49,9 @@
     };
 
     gdn.setFlyoutAttributes = function ($wrapper) {
-        isOpen = $wrapper.hasClass('Open') || $wrapper.hasClass('.wysihtml5-command-dialog-opened') || $wrapper.hasClass('.editor-dropdown-open');
         $handle = $wrapper.find('.FlyoutButton, .Handle, .editor-action:not(.editor-action-separator)');
         $flyout = $wrapper.find('.Flyout, .Dropdown');
+        isOpen = $flyout.is(':visible');
 
         gdn.accessibleFlyoutHandle($handle, isOpen);
         gdn.accessibleFlyout($flyout, isOpen);

@@ -237,6 +237,7 @@ class UsersApiController extends AbstractApiController {
     public function patch($id, array $body) {
         $this->permission('Garden.Users.Edit');
 
+        $this->idParamSchema('in');
         $in = $this->userPostSchema('in')->setDescription('Update a user.');
         $out = $this->userSchema('out');
 
@@ -367,6 +368,7 @@ class UsersApiController extends AbstractApiController {
     public function put_ban($id, array $body) {
         $this->permission('Garden.Users.Edit');
 
+        $this->idParamSchema('in');
         $in = $this
             ->schema(['banned:b' => 'Pass true to ban or false to unban.'], 'in')
             ->setDescription('Ban a user.');

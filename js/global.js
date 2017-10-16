@@ -778,25 +778,26 @@ jQuery(document).ready(function($) {
 
     // Activate ToggleFlyout and ButtonGroup menus
     $(document).delegate('.ButtonGroup > .Handle', 'click', function() {
-        var buttonGroup = $(this).closest('.ButtonGroup');
-        if (buttonGroup.hasClass('Open')) {
+        var $buttonGroup = $(this).closest('.ButtonGroup');
+        if ($buttonGroup.hasClass('Open')) {
             // Close
             $('.ButtonGroup').each(function(){
                 $(this).removeClass('Open');
-                gdn.setFlyoutAttributes($(this));
+                $(this).setFlyoutAttributes();
             });
 
         } else {
             // Close all other open button groups
             $('.ButtonGroup').each(function(){
                 $(this).removeClass('Open');
-                gdn.setFlyoutAttributes($(this));
+                $(this).setFlyoutAttributes();
             });
 
             // Open this one
-            buttonGroup.addClass('Open');
+            $buttonGroup
+                .addClass('Open')
+                .setFlyoutAttributes();
         }
-        gdn.setFlyoutAttributes(buttonGroup);
         return false;
     });
     var lastOpen = null;
@@ -837,17 +838,17 @@ jQuery(document).ready(function($) {
             if (lastOpen !== null) {
                 $('.Flyout', lastOpen).hide();
                 $(lastOpen).removeClass('Open').closest('.Item').removeClass('Open');
-                gdn.setFlyoutAttributes($toggleFlyout);
+                $toggleFlyout.setFlyoutAttributes();
             }
 
             $(this).addClass('Open').closest('.Item').addClass('Open');
             $flyout.show();
             lastOpen = this;
-            gdn.setFlyoutAttributes($toggleFlyout);
+            $toggleFlyout.setFlyoutAttributes();
         } else {
             $flyout.hide();
             $(this).removeClass('Open').closest('.Item').removeClass('Open');
-            gdn.setFlyoutAttributes($toggleFlyout);
+            $toggleFlyout.setFlyoutAttributes();
         }
 
         if (isHandle)
@@ -861,7 +862,7 @@ jQuery(document).ready(function($) {
 
         $('.ToggleFlyout').removeClass('Open').closest('.Item').removeClass('Open');
         $('.Flyout').hide();
-        gdn.setFlyoutAttributes($(this).closest('.ToggleFlyout'));
+        $(this).closest('.ToggleFlyout').setFlyoutAttributes();
     });
 
     $(document).delegate(document, 'click', function() {
@@ -872,7 +873,7 @@ jQuery(document).ready(function($) {
 
         $('.ButtonGroup').each(function(){
             $(this).removeClass('Open');
-            gdn.setFlyoutAttributes($(this));
+            $(this).setFlyoutAttributes();
         });
     });
 

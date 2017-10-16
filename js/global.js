@@ -2185,11 +2185,6 @@ jQuery.fn.extend({
     }
 });
 
-
-
-
-
-
 $(document).on("contentLoad", function(e) {
     // Setup AJAX filtering for flat category module.
     // Find each flat category module container, if any.

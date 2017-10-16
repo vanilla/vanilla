@@ -779,19 +779,23 @@ jQuery(document).ready(function($) {
     // Activate ToggleFlyout and ButtonGroup menus
     $(document).delegate('.ButtonGroup > .Handle', 'click', function() {
         var $buttonGroup = $(this).closest('.ButtonGroup');
-        // Close
-        $('.ButtonGroup')
-            .removeClass('Open')
-            .setFlyoutAttributes();
-
         if (!$buttonGroup.hasClass('Open')) {
+            $('.ButtonGroup')
+                .removeClass('Open')
+                .setFlyoutAttributes();
+            
             // Open this one
             $buttonGroup
                 .addClass('Open')
                 .setFlyoutAttributes();
+        } else {
+            $('.ButtonGroup')
+                .removeClass('Open')
+                .setFlyoutAttributes();
         }
         return false;
     });
+
     var lastOpen = null;
 
     $(document).delegate('.ToggleFlyout', 'click', function(e) {

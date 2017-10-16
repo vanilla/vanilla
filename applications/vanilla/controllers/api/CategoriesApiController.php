@@ -300,6 +300,7 @@ class CategoriesApiController extends AbstractApiController {
     public function patch($id, array $body) {
         $this->permission('Garden.Settings.Manage');
 
+        $this->idParamSchema('in');
         $in = $this->categoryPostSchema('in', [
             'description',
             'parentCategoryID' => 'Parent category ID. Changing a category\'s parent will rebuild the category tree.'

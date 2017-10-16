@@ -195,6 +195,7 @@ class RolesApiController extends AbstractApiController {
     public function patch($id, array $body) {
         $this->permission('Garden.Settings.Manage');
 
+        $this->idParamSchema('in');
         $in = $this->rolePostSchema('in')->setDescription('Update a role.');
         $out = $this->roleSchema('out');
 

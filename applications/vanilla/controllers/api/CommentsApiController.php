@@ -318,6 +318,7 @@ class CommentsApiController extends AbstractApiController {
     public function patch($id, array $body) {
         $this->permission('Garden.SignIn.Allow');
 
+        $this->idParamSchema('in');
         $in = $this->commentPostSchema('in')->setDescription('Update a comment.');
         $out = $this->commentSchema('out');
 

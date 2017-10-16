@@ -779,20 +779,12 @@ jQuery(document).ready(function($) {
     // Activate ToggleFlyout and ButtonGroup menus
     $(document).delegate('.ButtonGroup > .Handle', 'click', function() {
         var $buttonGroup = $(this).closest('.ButtonGroup');
-        if ($buttonGroup.hasClass('Open')) {
-            // Close
-            $('.ButtonGroup').each(function(){
-                $(this).removeClass('Open');
-                $(this).setFlyoutAttributes();
-            });
+        // Close
+        $('.ButtonGroup')
+            .removeClass('Open')
+            .setFlyoutAttributes();
 
-        } else {
-            // Close all other open button groups
-            $('.ButtonGroup').each(function(){
-                $(this).removeClass('Open');
-                $(this).setFlyoutAttributes();
-            });
-
+        if (!$buttonGroup.hasClass('Open')) {
             // Open this one
             $buttonGroup
                 .addClass('Open')
@@ -871,10 +863,9 @@ jQuery(document).ready(function($) {
             $(lastOpen).removeClass('Open').closest('.Item').removeClass('Open');
         }
 
-        $('.ButtonGroup').each(function(){
-            $(this).removeClass('Open');
-            $(this).setFlyoutAttributes();
-        });
+        $('.ButtonGroup')
+            .removeClass('Open')
+            .setFlyoutAttributes();
     });
 
     // Add a spinner onclick of buttons with this class
@@ -2148,13 +2139,14 @@ jQuery.fn.extend({
     },
 
     setFlyoutAttributes: function () {
-        var $wrapper = $(this);
-        var $handle = $wrapper.find('.FlyoutButton, .Handle, .editor-action:not(.editor-action-separator)');
-        var $flyout = $wrapper.find('.Flyout, .Dropdown');
-        var isOpen = $flyout.is(':visible');
+        $(this).each(function(){
+            var $handle = $(this).find('.FlyoutButton, .Handle, .editor-action:not(.editor-action-separator)');
+            var $flyout = $(this).find('.Flyout, .Dropdown');
+            var isOpen = $flyout.is(':visible');
 
-        $handle.accessibleFlyoutHandle(isOpen);
-        $flyout.accessibleFlyout(isOpen);
+            $handle.accessibleFlyoutHandle(isOpen);
+            $flyout.accessibleFlyout(isOpen);
+        });
     },
 
     accessibleFlyoutsInit: function () {

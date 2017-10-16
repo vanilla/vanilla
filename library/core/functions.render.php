@@ -339,7 +339,7 @@ if (!function_exists('buttonGroup')) {
             // Strip "Button" or "NavButton" off the group class.
             echo '<div class="ButtonGroup Multi '.str_replace(['NavButton', 'Button'], ['', ''], $cssClass).'">';
             echo anchor($text, $url, $buttonClass);
-            
+
             echo '<ul class="Dropdown MenuItems">';
             foreach ($links as $link) {
                 echo wrap(anchor($link['Text'], $link['Url'], val('CssClass', $link, '')), 'li');

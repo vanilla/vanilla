@@ -23,7 +23,7 @@ trait SiteTestTrait {
     /**
      * @var array
      */
-    private static $siteInfo;
+    protected static $siteInfo;
 
     /**
      * @var array The addons to install.
@@ -61,11 +61,10 @@ trait SiteTestTrait {
             'addons' => static::$addons
         ]);
 
-        self::$siteInfo = $result;
+        // Start Authenticators
+        $dic->get('Authenticator')->startAuthenticator();
 
-        /* @var \Gdn_Session $session */
-        $session = $dic->get(\Gdn_Session::class);
-        $session->start(self::$siteInfo['adminUserID'], false, false);
+        self::$siteInfo = $result;
     }
 
     /**

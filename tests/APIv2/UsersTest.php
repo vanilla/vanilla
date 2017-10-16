@@ -50,6 +50,27 @@ class UsersTest extends AbstractResourceTest {
     }
 
     /**
+     * Provide fields for registration tests.
+     *
+     * @param array $extra
+     * @return array
+     */
+    private function registrationFields(array $extra = []) {
+        static $inc = 0;
+
+        $name = 'vanilla-'.$inc++;
+        $fields = [
+            'email' => "{$name}@example.com",
+            'name' => $name,
+            'password' => 'vanilla123',
+            'termsOfService' => 1
+        ];
+        $fields = array_merge($fields, $extra);
+
+        return $fields;
+    }
+
+    /**
      * {@inheritdoc}
      */
     protected function modifyRow(array $row) {
@@ -128,5 +149,49 @@ class UsersTest extends AbstractResourceTest {
         ];
         $result = parent::testPost($record, $fields);
         return $result;
+    }
+
+    /**
+     * Basic registration.
+     */
+    public function testRegisterBasic() {
+        /** @var \Gdn_Configuration $configuration */
+        $configuration = static::container()->get('Config');
+        $configuration->set('Garden.Registration.Method', 'Basic');
+        $configuration->set('Garden.Registration.ConfirmEmail', false);
+        $configuration->set('Garden.Registration.SkipCaptcha', true);
+
+        $fields = $this->registrationFields();
+        $this->verifyRegistration($fields);
+    }
+
+    /**
+     * Register with an invitation code.
+     */
+    public function testRegisterInvitation() {
+        /** @var \Gdn_Configuration $configuration */
+        $configuration = static::container()->get('Config');
+        $configuration->set('Garden.Registration.Method', 'Invitation');
+        $configuration->set('Garden.Registration.ConfirmEmail', false);
+        $configuration->set('Garden.Registration.SkipCaptcha', true);
+
+        $fields = $this->registrationFields();
+        $invitation = $this->api()->post('/invitations', ['email' => $fields['email']])->getBody();
+        $fields['invitationCode'] = $invitation['code'];
+        $this->verifyRegistration($fields);
+    }
+
+    /**
+     * Perform a registration and verify the result.
+     *
+     * @param array $fields
+     */
+    private function verifyRegistration(array $fields) {
+        $registration = $this->api()->post('/users/register', $fields)->getBody();
+        $user = $this->api()->get("/users/{$registration[$this->pk]}")->getBody();
+        $registeredUser = array_intersect_key($registration, $user);
+        ksort($registration);
+        ksort($registeredUser);
+        $this->assertEquals($registration, $registeredUser);
     }
 }

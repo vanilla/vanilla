@@ -1511,7 +1511,7 @@ if (!function_exists('sprite')) {
      * @return string
      */
     function sprite($name, $type = 'Sprite', $text = false) {
-        $sprite = '<span class="'.$type.' '.$name.'"></span>';
+        $sprite = '<span aria-hidden="true" class="'.$type.' '.$name.'"></span>';
         if ($text) {
             $sprite .= '<span class="sr-only">'.$text.'</span>';
         }

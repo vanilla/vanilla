@@ -309,8 +309,10 @@ if (!function_exists('attribute')) {
             $exclude = $valueOrExclude;
         }
         foreach ($name as $attribute => $val) {
-            if (empty($val) || ($exclude && stringBeginsWith($attribute, $exclude))) {
-                continue;
+            if($attribute != "tabindex") {
+                if ((empty($val)) || ($exclude && stringBeginsWith($attribute, $exclude))) {
+                    continue;
+                }
             }
             if (is_array($val) && strpos($attribute, 'data-') === 0) {
                 $val = json_encode($val);

@@ -20,14 +20,32 @@ abstract class AbstractAPIv2Test extends \PHPUnit_Framework_TestCase {
     private $api;
 
     /**
+     * @var bool Set to false before setUp() to skip the session->start();
+     */
+    private $startSessionOnSetup = true;
+
+    /**
+     * Whether to start a session on setUp() or not.
+     *
+     * @param bool $enabled
+     */
+    protected function startSessionOnSetup($enabled) {
+        $this->startSessionOnSetup = $enabled;
+    }
+
+    /**
      * Create a fresh API client for the test.
      */
     public function setUp() {
         parent::setUp();
 
         $this->api = static::container()->getArgs(InternalClient::class, [static::container()->get('@baseUrl').'/api/v2']);
-        $this->api->setUserID(self::$siteInfo['adminUserID']);
-        $this->api->setTransientKey(md5(now()));
+
+        if ($this->startSessionOnSetup) {
+            $this->api->setUserID(self::$siteInfo['adminUserID']);
+            $this->api->setTransientKey(md5(now()));
+        }
+
     }
 
     /**

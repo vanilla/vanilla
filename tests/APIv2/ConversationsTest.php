@@ -26,6 +26,12 @@ class ConversationsTest extends AbstractAPIv2Test {
     public static function setupBeforeClass() {
         parent::setupBeforeClass();
 
+        /**
+         * @var \Gdn_Session $session
+         */
+        $session = self::container()->get(\Gdn_Session::class);
+        $session->start(self::$siteInfo['adminUserID'], false, false);
+
         /** @var \UsersApiController $usersAPIController */
         $usersAPIController = static::container()->get('UsersAPIController');
 
@@ -42,6 +48,8 @@ class ConversationsTest extends AbstractAPIv2Test {
         /** @var \Gdn_Configuration $config */
         $config = static::container()->get('Config');
         $config->set('Garden.Email.Disabled', true, true, false);
+
+        $session->end();
     }
 
     /**

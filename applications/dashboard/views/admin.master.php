@@ -31,7 +31,7 @@ $roleTitles = implode(', ', $roleTitlesArray);
     $userBlock = new MediaItemModule(val('Name', $user), userUrl($user), $roleTitles, '', ['class' => 'card-block']);
     $userBlock->setView('media-sm')
         ->setImage(userPhotoUrl($user))
-        ->addButton(t('My Profile').' '.dashboardSymbol('external-link', 'icon-11 icon-text'), userUrl($user),
+        ->addButton(t('My Profile').' '.dashboardSymbol('external-link', 'icon-11 icon-text'), url(userUrl($user)),
         ['class' => 'btn btn-sm-rounded btn-secondary padded-top']);
     echo $userBlock;
     ?>

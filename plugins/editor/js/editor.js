@@ -345,7 +345,7 @@
             $('.editor-dropdown').each(function(i, el) {
                 $(el).removeClass('editor-dropdown-open');
                 $(el).find('.wysihtml5-command-dialog-opened').removeClass('wysihtml5-command-dialog-opened');
-                gdn.setFlyoutAttributes($(this));
+                $(this).setFlyoutAttributes();
             });
         };
 
@@ -367,7 +367,7 @@
                 .off('click.dd')
                 .on('click.dd', function(e) {
 
-                    var parentEl = $(e.target).closest('.editor-dropdown');
+                    var $parentEl = $(e.target).closest('.editor-dropdown');
 
                     // Again, tackling with clash from multiple codebases.
                     $('.editor-insert-dialog').each(function(i, el) {
@@ -376,12 +376,12 @@
                         }, 0);
                     });
 
-                    if (parentEl.hasClass('editor-dropdown') && parentEl.hasClass('editor-dropdown-open')) {
-                        parentEl.removeClass('editor-dropdown-open');
-                        //$(parentEl).find('.wysihtml5-command-dialog-opened').removeClass('wysihtml5-command-dialog-opened');
+                    if ($parentEl.hasClass('editor-dropdown') && $parentEl.hasClass('editor-dropdown-open')) {
+                        $parentEl.removeClass('editor-dropdown-open');
+                        //$($parentEl).find('.wysihtml5-command-dialog-opened').removeClass('wysihtml5-command-dialog-opened');
                     } else {
                         // clear other opened dropdowns before opening this one
-                        $(parentEl).parent('.editor').find('.editor-dropdown-open').each(function(i, el) {
+                        $($parentEl).parent('.editor').find('.editor-dropdown-open').each(function(i, el) {
                             $(el).removeClass('editor-dropdown-open');
                             $(el).find('.wysihtml5-command-dialog-opened').removeClass('wysihtml5-command-dialog-opened');
                         });
@@ -390,22 +390,22 @@
                         // to HTML code view, then do not allow dropdowns. CSS pointer-
                         // events should have taken care of this, but JS still fires the
                         // event regardless, so disable them here as well.
-                        if (!parentEl.hasClass('wysihtml5-commands-disabled')) {
-                            parentEl.addClass('editor-dropdown-open');
+                        if (!$parentEl.hasClass('wysihtml5-commands-disabled')) {
+                            $parentEl.addClass('editor-dropdown-open');
 
                             // if has input, focus and move caret to end of text
-                            var inputBox = parentEl.find('.InputBox');
+                            var inputBox = $parentEl.find('.InputBox');
                             if (inputBox.length) {
                                 editorSelectAllInput(inputBox[0]);
                             }
                         }
                     }
 
-                    gdn.setFlyoutAttributes($(parentEl));
+                    $parentEl.setFlyoutAttributes();
 
                 }).on('keypress', function(e){
                     var key = e.keyCode || e.which;
-                    if (key == 13) {
+                    if (key == 13 || key == 32) {
                         $(this).trigger('click.dd');
                     }
                 });
@@ -448,7 +448,7 @@
                     $('.editor-dropdown').each(function(i, el) {
                         $(el).removeClass('editor-dropdown-open');
                         $(el).find('.wysihtml5-command-dialog-opened').removeClass('wysihtml5-command-dialog-opened');
-                        gdn.setFlyoutAttributes($(el));
+                        $(el).setFlyoutAttributes();
                     });
                 });
         };
@@ -1283,7 +1283,7 @@
                     // Now clear input and close dropdown
                     var $dropDown = $(this).closest('.editor-dropdown-open');
                     $dropDown.removeClass('editor-dropdown-open');
-                    gdn.setFlyoutAttributes($dropDown);
+                    $dropDown.setFlyoutAttributes();
                     $(this).val('');
 
                 }

@@ -43,44 +43,7 @@
         gdn.meta[key] = value;
     };
 
-    gdn.accessibleFlyoutHandle = function ($handle, isOpen) {
-        $handle.attr('aria-expanded', isOpen.toString());
-    };
 
-    gdn.accessibleFlyout = function ($flyout, isOpen) {
-        $flyout.attr('aria-hidden', (!isOpen).toString());
-    };
-
-    gdn.setFlyoutAttributes = function ($wrapper) {
-        $handle = $wrapper.find('.FlyoutButton, .Handle, .editor-action:not(.editor-action-separator)');
-        $flyout = $wrapper.find('.Flyout, .Dropdown');
-        isOpen = $flyout.is(':visible');
-
-        gdn.accessibleFlyoutHandle($handle, isOpen);
-        gdn.accessibleFlyout($flyout, isOpen);
-    };
-
-    gdn.accessibleFlyoutsInit = function ($context) {
-        $context.each(function(){
-
-            $context.find('.FlyoutButton, .Handle, .editor-action:not(.editor-action-separator)').each(function (){
-                $(this)
-                    .attr('tabindex', '0')
-                    .attr('role', 'button')
-                    .attr('aria-haspopup', 'true');
-
-                gdn.accessibleFlyoutHandle($(this), false);
-            });
-
-            $context.find('.Flyout, .Dropdown').each(function (){
-                gdn.accessibleFlyout($(this), false);
-
-                $(this).find('a').each(function() {
-                    $(this).attr('tabindex', '0');
-                });
-            });
-        });
-    };
 
 
 
@@ -788,9 +751,11 @@ jQuery(document).ready(function($) {
                 $elem.attr('href', href);
 
                 // If we are in a flyout, close it.
-                $toggleFlyout.removeClass('Open').find('.Flyout').hide();
-                gdn.setFlyoutAttributes($toggleFlyout);
-
+                $toggleFlyout
+                    .removeClass('Open')
+                    .find('.Flyout')
+                    .hide()
+                    .setFlyoutAttributes();
             },
             error: function(xhr) {
                 gdn.informError(xhr);
@@ -2104,10 +2069,6 @@ jQuery(document).ready(function($) {
         });
     }
 
-    $('.ToggleFlyout, .editor-dropdown, .ButtonGroup').each(function(){
-        gdn.accessibleFlyoutsInit($(this));
-    });
-
     $(document).trigger('contentLoad');
 });
 
@@ -2167,20 +2128,70 @@ if (typeof String.prototype.trim !== 'function') {
     };
 }
 
-// jQuery UI .effect() replacement using CSS classes.
-jQuery.fn.effect = function(name) {
-    var that = this;
-    name = name + '-effect';
+jQuery.fn.extend({
+    // jQuery UI .effect() replacement using CSS classes.
+    effect: function(name) {
+        alert('effect');
+        var that = this;
+        name = name + '-effect';
 
-    return this
-        .addClass(name)
-        .one('animationend webkitAnimationEnd', function () {
-            that.removeClass(name);
+        return this
+            .addClass(name)
+            .one('animationend webkitAnimationEnd', function () {
+                that.removeClass(name);
+            });
+    },
+
+    accessibleFlyoutHandle: function (isOpen) {
+        $(this).attr('aria-expanded', isOpen.toString());
+    },
+
+    accessibleFlyout: function (isOpen) {
+        $(this).attr('aria-hidden', (!isOpen).toString());
+    },
+
+    setFlyoutAttributes: function () {
+        var $wrapper = $(this);
+        var $handle = $wrapper.find('.FlyoutButton, .Handle, .editor-action:not(.editor-action-separator)');
+        var $flyout = $wrapper.find('.Flyout, .Dropdown');
+        var isOpen = $flyout.is(':visible');
+
+        $handle.accessibleFlyoutHandle(isOpen);
+        $flyout.accessibleFlyout(isOpen);
+    },
+
+    accessibleFlyoutsInit: function () {
+        var $context = $(this);
+
+        $context.each(function(){
+
+            $context.find('.FlyoutButton, .Handle, .editor-action:not(.editor-action-separator)').each(function (){
+                $(this)
+                    .attr('tabindex', '0')
+                    .attr('role', 'button')
+                    .attr('aria-haspopup', 'true');
+
+                $(this).accessibleFlyoutHandle(false);
+            });
+
+            $context.find('.Flyout, .Dropdown').each(function (){
+                $(this).accessibleFlyout(false);
+
+                $(this).find('a').each(function() {
+                    $(this).attr('tabindex', '0');
+                });
+            });
         });
-};
+    }
+});
 
-// Setup AJAX filtering for flat category module.
+
+
+
+
+
 $(document).on("contentLoad", function(e) {
+    // Setup AJAX filtering for flat category module.
     // Find each flat category module container, if any.
     $(".BoxFlatCategory", e.target).each(function(index, value){
         // Setup the constants we'll need to perform the lookup for this module instance.
@@ -2216,4 +2227,7 @@ $(document).on("contentLoad", function(e) {
             )
         });
     });
+
+    // Set up accessible flyouts
+    $('.ToggleFlyout, .editor-dropdown, .ButtonGroup').accessibleFlyoutsInit();
 });

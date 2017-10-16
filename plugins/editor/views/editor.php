@@ -8,14 +8,28 @@ $css_ismobile_class = (isMobile())
    : 'editor-desktop';
 
 $html_toolbar = '<div class="editor editor-format-'.$format.' '.$css_ismobile_class.'">';
-$html_arrow_down = '<span class="icon icon-caret-down"></span>';
+$html_arrow_down = '<span class="icon icon-caret-down" aria-hidden="true"></span>';
 $editor_file_input_name = $this->data('_editorFileInputName');
 
 foreach ($this->data('_EditorToolbar') as $button) {
+   $screenReaderMarkup = '<span class="sr-only">' . $button['attr']['title'] . '</span>';
 
    // If the type is not an array, it's a regular button (type==button)
    if (!is_array($button['type'])) {
-      $html_toolbar .= wrap('', 'span', $button['attr']);
+
+        $buttonMarkup = '';
+
+
+        if($button['type'] == 'separator') {
+           $button['attr']['aria-hidden'] = "true";
+           $button['attr']['role'] = "presentation";
+        } else {
+           $button['attr']['tabindex'] = "0";
+           $button['attr']['role'] = "button";
+           $buttonMarkup = $screenReaderMarkup;
+        }
+
+        $html_toolbar .= wrap($buttonMarkup, 'span', $button['attr'] );
    } else {
       // Else this button has dropdown options, so generate them
       $html_button_dropdown_options = '';
@@ -40,11 +54,13 @@ foreach ($this->data('_EditorToolbar') as $button) {
          }
       }
 
+
+
       switch ($button['action']) {
 
          case 'link':
             $html_toolbar .= wrap(
-               wrap($html_arrow_down, 'span', $button['attr']).''.
+               wrap($html_arrow_down . $screenReaderMarkup, 'span', $button['attr']).''.
                '<div class="editor-insert-dialog Flyout MenuItems" data-wysihtml5-dialog="createLink">
                      <input class="InputBox editor-input-url" data-wysihtml5-dialog-field="href" value="http://" />
                       <div class="MenuButtons">
@@ -57,7 +73,7 @@ foreach ($this->data('_EditorToolbar') as $button) {
 
          case 'image':
             $html_toolbar .= wrap(
-               wrap($html_arrow_down, 'span', $button['attr']).''.
+               wrap($html_arrow_down . $screenReaderMarkup, 'span', $button['attr']).''.
                '<div class="editor-insert-dialog Flyout MenuItems editor-file-image editor-insert-image" data-wysihtml5-dialog="insertImage">
                       <div class="drop-section image-input" title="'.t('Paste the URL of an image to quickly embed it.').'">
                         <input class="InputBox editor-input-image" placeholder="'.t('Image URL').'" />
@@ -69,7 +85,7 @@ foreach ($this->data('_EditorToolbar') as $button) {
          case 'fileupload':
             $accept = $this->data('Accept', '');
             $html_toolbar .= wrap(
-                wrap($html_arrow_down, 'span', $button['attr']).''.
+                wrap($html_arrow_down . $screenReaderMarkup, 'span', $button['attr']).''.
                 '<div class="editor-insert-dialog Flyout MenuItems editor-file-image">
                      <div class="file-title">'.t('Attach a file').' 
                         <span class="js-can-drop info">'.t('you can also drag-and-drop').'</span>
@@ -85,7 +101,7 @@ foreach ($this->data('_EditorToolbar') as $button) {
          case 'imageupload':
             $accept = $this->data('AcceptImage', '');
             $html_toolbar .= wrap(
-                wrap($html_arrow_down, 'span', $button['attr']).''.
+                wrap($html_arrow_down . $screenReaderMarkup, 'span', $button['attr']).''.
                 '<div class="editor-insert-dialog Flyout MenuItems editor-file-image">
                      <div class="file-title">'.t('Insert an image').' 
                         <span class="js-can-drop info">'.t('you can also drag-and-drop').'</span>
@@ -109,7 +125,7 @@ foreach ($this->data('_EditorToolbar') as $button) {
             $textColorOptions = '';
             if (isset($colorType['text'])) {
                foreach ($colorType['text'] as $textColor) {
-                  $textColorOptions .= wrap('', $textColor['html_tag'], $textColor['attr']);
+                  $textColorOptions .= wrap($screenReaderMarkup, $textColor['html_tag'], $textColor['attr']);
                }
 
                if ($textColorOptions) {
@@ -120,7 +136,7 @@ foreach ($this->data('_EditorToolbar') as $button) {
             $highlightColorOptions = '';
             if (isset($colorType['highlight'])) {
                foreach ($colorType['highlight'] as $highlightColor) {
-                  $highlightColorOptions .= wrap('', $highlightColor['html_tag'], $highlightColor['attr']);
+                  $highlightColorOptions .= wrap($screenReaderMarkup, $highlightColor['html_tag'], $highlightColor['attr']);
                }
 
                if ($highlightColorOptions) {
@@ -135,7 +151,7 @@ foreach ($this->data('_EditorToolbar') as $button) {
             $colorOptions = $textColorOptions.$highlightColorOptions;
 
             $html_toolbar .= wrap(
-               wrap($html_arrow_down, 'span', $button['attr']).''.
+               wrap($html_arrow_down . $screenReaderMarkup, 'span', $button['attr']).''.
                wrap($colorOptions, 'div', ['class' => 'editor-insert-dialog Flyout MenuItems', 'data-wysihtml5-dialog' => ''])
                , 'div', ['class' => "editor-dropdown editor-dropdown-color $cssHasHighlight"]
             );
@@ -144,7 +160,7 @@ foreach ($this->data('_EditorToolbar') as $button) {
          // All other dropdowns (color, format, emoji)
          default:
             $html_toolbar .= wrap(
-               wrap($html_arrow_down, 'span', $button['attr']).''.
+               wrap($html_arrow_down . $screenReaderMarkup, 'span', $button['attr']).''.
                wrap($html_button_dropdown_options, 'div', ['class' => 'editor-insert-dialog Flyout MenuItems', 'data-wysihtml5-dialog' => ''])
                , 'div', ['class' => 'editor-dropdown editor-dropdown-default editor-action-'.$button['action']]);
             break;

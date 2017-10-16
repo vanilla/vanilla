@@ -309,14 +309,14 @@ if (!function_exists('attribute')) {
             $exclude = $valueOrExclude;
         }
         foreach ($name as $attribute => $val) {
-            if (empty($val) || ($exclude && stringBeginsWith($attribute, $exclude))) {
+            if ((empty($val) && $attribute != 'tabindex') || ($exclude && stringBeginsWith($attribute, $exclude))) {
                 continue;
             }
             if (is_array($val) && strpos($attribute, 'data-') === 0) {
                 $val = json_encode($val);
 
             }
-            if ($val != '' && $attribute != 'Standard') {
+            if (($val != '' || $attribute == 'tabindex') && $attribute != 'Standard') {
                 $return .= ' '.$attribute.'="'.htmlspecialchars($val, ENT_COMPAT, 'UTF-8').'"';
             }
         }

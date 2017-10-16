@@ -63,7 +63,7 @@
     gdn.accessibleFlyoutsInit = function ($context) {
         $context.each(function(){
 
-            $context.find('.FlyoutButton, .Handle, .editor-dropdown:not(.editor-action-separator)').each(function (){
+            $context.find('.FlyoutButton, .Handle, .editor-action:not(.editor-action-separator)').each(function (){
                 $(this)
                     .attr('tabindex', '0')
                     .attr('role', 'button')
@@ -2106,11 +2106,6 @@ jQuery(document).ready(function($) {
 
     $('.ToggleFlyout, .editor-dropdown, .ButtonGroup').each(function(){
         gdn.accessibleFlyoutsInit($(this));
-        $('.editor-action:not(".editor-dropdown"):not(".editor-action-separator")').each(function(){
-            $(this)
-                .attr('tabindex', '0')
-                .attr('role', 'button');
-        });
     });
 
     $(document).trigger('contentLoad');

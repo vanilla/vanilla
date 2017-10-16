@@ -725,23 +725,30 @@ class Gdn_OAuth2 extends Gdn_Plugin {
     public function getProfile() {
         $provider = $this->provider();
         $uri = $this->requireVal('ProfileUrl', $provider, 'provider');
-        $defaultParams = [
-            'access_token' => $this->accessToken()
-        ];
+        $defaultParams = [];
+        $defaultOptions = [];
 
-        // Either send the Access Token in the GET request or as an Authorization header, depending on the client workflow.
+        // Send the Access Token as an Authorization header, depending on the client workflow.
         if (val('BearerToken', $provider)) {
-            $defaultParams = [];
-            $profileRequestOptions = array_merge($this->getProfileRequestOptions(), ['Authorization-Header-Message' => 'Bearer '.$this->accessToken()]);
-        } else {
-            $profileRequestOptions = $this->getProfileRequestOptions();
+            $defaultOptions = [
+                'Authorization-Header-Message' => 'Bearer '.$this->accessToken()
+            ];
         }
 
+        // Merge with any other Header options being set by child classes.
+        $requestOptions = array_filter(array_merge($defaultOptions, $this->getProfileRequestOptions()));
+
+        // Send the Access Token is a Get parameter, depending on the client workflow.
+        if (!val('BearerToken', $provider)) {
+            $defaultParams = [
+                'access_token' => $this->accessToken()
+            ];
+        }
         // Merge any inherited parameters and remove any empty parameters before sending them in the request.
         $requestParams = array_filter(array_merge($defaultParams, $this->requestProfileParams));
 
         // Request the profile from the Authentication Provider
-        $rawProfile = $this->api($uri, 'GET', $requestParams, $profileRequestOptions);
+        $rawProfile = $this->api($uri, 'GET', $requestParams, $requestOptions);
 
         // Translate the keys of the profile sent to match the keys we are looking for.
         $profile = $this->translateProfileResults($rawProfile);

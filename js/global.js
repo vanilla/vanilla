@@ -43,9 +43,12 @@
         gdn.meta[key] = value;
     };
 
-    gdn.hasAttribute = function(element, attributeName) {
-        var attr = $(element).attr(attributeName);
-        return (typeof attr !== typeof undefined && attr !== false);
+    gdn.accessibleFlyoutHandle = function ($handle, isOpen) {
+        $handle.attr('aria-expanded', isOpen.toString());
+    };
+
+    gdn.accessibleFlyout = function ($flyout, isOpen) {
+        $flyout.attr('aria-hidden', (!isOpen).toString());
     };
 
     gdn.setFlyoutAttributes = function ($wrapper) {
@@ -55,14 +58,6 @@
 
         gdn.accessibleFlyoutHandle($handle, isOpen);
         gdn.accessibleFlyout($flyout, isOpen);
-    };
-
-    gdn.accessibleFlyoutHandle = function ($handle, isOpen) {
-        $handle.attr('aria-expanded', isOpen.toString());
-    };
-
-    gdn.accessibleFlyout = function ($flyout, isOpen) {
-        $flyout.attr('aria-hidden', (!isOpen).toString());
     };
 
     gdn.accessibleFlyoutsInit = function ($context) {

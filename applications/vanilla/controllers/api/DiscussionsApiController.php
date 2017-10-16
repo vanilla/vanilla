@@ -347,6 +347,7 @@ class DiscussionsApiController extends AbstractApiController {
     public function patch($id, array $body) {
         $this->permission('Garden.SignIn.Allow');
 
+        $this->idParamSchema('in');
         $in = $this->discussionPostSchema('in')->setDescription('Update a discussion.');
         $out = $this->schema($this->discussionSchema(), 'out');
 
@@ -421,6 +422,7 @@ class DiscussionsApiController extends AbstractApiController {
     public function put_bookmark($id, array $body) {
         $this->permission('Garden.SignIn.Allow');
 
+        $this->idParamSchema('in');
         $in = $this
             ->schema(['bookmarked:b' => 'Pass true to bookmark or false to remove bookmark.'], 'in')
             ->setDescription('Bookmark a discussion.');

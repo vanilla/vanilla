@@ -308,14 +308,17 @@ if (!function_exists('attribute')) {
         } else {
             $exclude = $valueOrExclude;
         }
+      
         foreach ($name as $attribute => $val) {
             if ((empty($val) && !in_array($val, [0, '0'], true)) || ($exclude && stringBeginsWith($attribute, $exclude))) {
                 continue;
             }
+          
             if (is_array($val) && strpos($attribute, 'data-') === 0) {
                 $val = json_encode($val);
 
             }
+          
             if ($val != '' && $attribute != 'Standard') {
                 $return .= ' '.$attribute.'="'.htmlspecialchars($val, ENT_COMPAT, 'UTF-8').'"';
             }

@@ -42,6 +42,9 @@ class PromotedContentModule extends Gdn_Module {
     /** @var integer How often should we encapsulate content in groups. Groups of: n. */
     public $Group = 3;
 
+    /** @var bool Whether or not to hide module if no results are found. */
+    private $ShowIfNoResults = true;
+
     /** @var integer How many chars of Title to return. */
     public $TitleLimit = 0;
 
@@ -94,6 +97,15 @@ class PromotedContentModule extends Gdn_Module {
     }
 
     /**
+     * Set ShowIfNoResults
+     *
+     * @param bool $val
+     */
+    public function setShowIfNoResults($val) {
+        $this->ShowIfNoResults = filter_var($val, FILTER_VALIDATE_BOOLEAN);
+    }
+
+    /**
      * Validate data to be used as class properties.
      *
      * @param array $parameters .
@@ -125,9 +137,20 @@ class PromotedContentModule extends Gdn_Module {
             $validation->addValidationResult('contenttype', 'Invalid contenttype.');
         }
 
+        // Results
         $result = $validation->validate($parameters);
         return ($result === true) ? true : $validation->resultsText();
     }
+
+    /**
+     * Get ShowIfNoResults
+     *
+     * @return bool
+     */
+    public function getShowIfNoResults() {
+        return $this->ShowIfNoResults;
+    }
+
 
     /**
      * Get data based on class properties.

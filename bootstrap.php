@@ -44,10 +44,6 @@ $dic->setInstance('Garden\Container\Container', $dic)
     ->setShared(true)
     ->addAlias('Config')
 
-    // Controller
-    // Set in Gdn_Dispatcher
-    // $this->container->setInstance('Gdn_Controller', $controller);
-
     // AddonManager
     ->rule(Vanilla\AddonManager::class)
     ->setShared(true)

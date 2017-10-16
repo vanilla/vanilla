@@ -43,10 +43,6 @@
         gdn.meta[key] = value;
     };
 
-
-
-
-
     var keyString = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=";
 
     // See http://ecmanaut.blogspot.de/2006/07/encoding-decoding-utf8-in-javascript.html

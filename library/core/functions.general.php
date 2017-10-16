@@ -309,7 +309,7 @@ if (!function_exists('attribute')) {
             $exclude = $valueOrExclude;
         }
         foreach ($name as $attribute => $val) {
-            if ((empty($val) && $val !== '0') || ($exclude && stringBeginsWith($attribute, $exclude))) {
+            if ((empty($val) && !in_array($val, [0, '0'], true)) || ($exclude && stringBeginsWith($attribute, $exclude))) {
                 continue;
             }
             if (is_array($val) && strpos($attribute, 'data-') === 0) {

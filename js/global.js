@@ -2123,7 +2123,6 @@ if (typeof String.prototype.trim !== 'function') {
 jQuery.fn.extend({
     // jQuery UI .effect() replacement using CSS classes.
     effect: function(name) {
-        alert('effect');
         var that = this;
         name = name + '-effect';
 

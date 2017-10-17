@@ -379,7 +379,8 @@ class Gdn_OAuth2 extends Gdn_Plugin {
             'AssociationSecret' =>  ['LabelCode' => 'Secret', 'Description' => 'Secret provided by the authentication provider.'],
             'AuthorizeUrl' =>  ['LabelCode' => 'Authorize Url', 'Description' => 'URL where users sign-in with the authentication provider.'],
             'TokenUrl' => ['LabelCode' => 'Token Url', 'Description' => 'Endpoint to retrieve the authorization token for a user.'],
-            'ProfileUrl' => ['LabelCode' => 'Profile Url', 'Description' => 'Endpoint to retrieve a user\'s profile.']
+            'ProfileUrl' => ['LabelCode' => 'Profile Url', 'Description' => 'Endpoint to retrieve a user\'s profile.'],
+            'BearerToken' => ['LabelCode' => 'Authorization Code in Header', 'Description' => 'When requesting the profile, pass the access token in the HTTP header. i.e Authorization: Bearer [accesstoken]', 'Control' => 'checkbox']
         ];
 
         $formFields = $formFields + $this->getSettingsFormFields();
@@ -724,15 +725,30 @@ class Gdn_OAuth2 extends Gdn_Plugin {
     public function getProfile() {
         $provider = $this->provider();
         $uri = $this->requireVal('ProfileUrl', $provider, 'provider');
-        $defaultParams = [
-            'access_token' => $this->accessToken()
-        ];
+        $defaultParams = [];
+        $defaultOptions = [];
 
+        // Send the Access Token as an Authorization header, depending on the client workflow.
+        if (val('BearerToken', $provider)) {
+            $defaultOptions = [
+                'Authorization-Header-Message' => 'Bearer '.$this->accessToken()
+            ];
+        }
+
+        // Merge with any other Header options being set by child classes.
+        $requestOptions = array_filter(array_merge($defaultOptions, $this->getProfileRequestOptions()));
+
+        // Send the Access Token is a Get parameter, depending on the client workflow.
+        if (!val('BearerToken', $provider)) {
+            $defaultParams = [
+                'access_token' => $this->accessToken()
+            ];
+        }
         // Merge any inherited parameters and remove any empty parameters before sending them in the request.
         $requestParams = array_filter(array_merge($defaultParams, $this->requestProfileParams));
 
         // Request the profile from the Authentication Provider
-        $rawProfile = $this->api($uri, 'GET', $requestParams, $this->getProfileRequestOptions());
+        $rawProfile = $this->api($uri, 'GET', $requestParams, $requestOptions);
 
         // Translate the keys of the profile sent to match the keys we are looking for.
         $profile = $this->translateProfileResults($rawProfile);

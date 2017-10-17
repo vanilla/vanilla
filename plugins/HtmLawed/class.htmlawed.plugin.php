@@ -147,7 +147,7 @@ class HtmLawedPlugin extends Gdn_Plugin {
         $config = [
             'anti_link_spam' => ['`.`', ''],
             'balance' => 1,
-            'cdata' => 3,
+            'cdata' => 0,
             'comment' => 1,
             'css_expression' => 1,
             'deny_attribute' => $attributes,

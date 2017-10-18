@@ -598,4 +598,19 @@ class AddonManagerTest extends \PHPUnit\Framework\TestCase {
         $classes = $am->findClasses('TestOldPluginPlugin');
         $this->assertSame(\TestOldPluginPlugin::class, $classes[0]);
     }
+
+    /**
+     * Looking up an addon by class name should give the right addon, even if there is another addon that has a class with the same basename.
+     */
+    public function testSameBasenameEdgeCase() {
+        $am = new TestAddonManager();
+
+        $am->startAddonsByKey(['multiclass-namespaced-plugin', 'namespaced-plugin'], Addon::TYPE_ADDON);
+
+        $addon1 = $am->lookupByClassname(\Deeply\TestClass::class);
+        $this->assertEquals('multiclass-namespaced-plugin', $addon1->getKey());
+
+        $addon2 = $am->lookupByClassname(\Deeply\Nested\Namespaced\Fixture\TestClass::class);
+        $this->assertEquals('namespaced-plugin', $addon2->getKey());
+    }
 }

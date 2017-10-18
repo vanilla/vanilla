@@ -214,6 +214,39 @@ class Gdn_CookieIdentity {
     }
 
     /**
+     * Retrieve an attribute from the current JWT data.
+     *
+     * @param string $name
+     * @return mixed
+     */
+    public function getAttribute($name) {
+        $payload = $this->getJWTPayload($this->CookieName);
+        $result = val($name, $payload, null);
+        return $result;
+    }
+
+    /**
+     * Update an attribute in the current JWT data.
+     *
+     * @param string $name
+     * @param mixed $value
+     * @return bool
+     */
+    public function setAttribute($name, $value) {
+        $payload = $this->getJWTPayload($this->CookieName);
+        $result = false;
+
+        if (is_scalar($value) && (is_array($payload) || is_object($payload))) {
+            $expiry = val('exp', $payload, strtotime($this->PersistExpiry));
+            setValue($name, $payload, $value);
+            $this->setJWTPayload($this->CookieName, $payload, $expiry);
+            $result = true;
+        }
+
+        return $result;
+    }
+
+    /**
      * Generates the user's session cookie.
      *
      * @param int $userID The unique id assigned to the user in the database.
@@ -243,17 +276,13 @@ class Gdn_CookieIdentity {
         $payload = [
             'exp' => strtotime($this->PersistExpiry), // Expiration
             'iat' => $timestamp, // Issued at
-            'nbf' => $timestamp, // Not before
             'sub' => $userID // Subject
         ];
         Gdn::pluginManager()
             ->fireAs(self::class)
             ->fireEvent('setIdentity', ['payload' => &$payload]);
-        $jwt = JWT::encode($payload, $this->CookieSalt, self::JWT_ALGORITHM);
 
-        // Save the cookie.
-        safeCookie($this->CookieName, $jwt, $expiry, $this->CookiePath, $this->CookieDomain, null, true);
-        $_COOKIE[$this->CookieName] = $jwt;
+        $this->setJWTPayload($this->CookieName, $payload, $expiry);
         return $payload;
     }
 
@@ -421,6 +450,16 @@ class Gdn_CookieIdentity {
     }
 
     /**
+     * Get the last time this user authenticated.
+     *
+     * @return int|null
+     */
+    public function getAuthTime() {
+        $result = $this->getAttribute('iat');
+        return $result;
+    }
+
+    /**
      * Attempt to decode a JWT payload from a cookie value.
      *
      * @param string $name Name of the cookie holding a JWT token.
@@ -447,6 +486,35 @@ class Gdn_CookieIdentity {
         }
 
         return $result;
+    }
+
+    /**
+     * Set the last time this user authenticated.
+     *
+     * @param int $timestamp
+     */
+    public function setAuthTime($timestamp) {
+        $this->setAttribute('iat', $timestamp);
+    }
+
+    /**
+     * Attempt to encode a JWT payload and assign its value to a cookie.
+     *
+     * @param string $name
+     * @param array|object $payload
+     * @param int $expiry
+     * @return string
+     */
+    public function setJWTPayload($name, $payload, $expiry) {
+        $jwt = JWT::encode($payload, $this->CookieSalt, self::JWT_ALGORITHM);
+
+        setValue('exp', $payload, $expiry);
+
+        // Save the cookie.
+        safeCookie($name, $jwt, $expiry, $this->CookiePath, $this->CookieDomain, null, true);
+        $_COOKIE[$this->CookieName] = $jwt;
+
+        return $jwt;
     }
 
     /**

@@ -216,7 +216,23 @@ class AddonManager {
 
         $result = [];
         if ($searchAll === false) {
-            foreach ($this->autoloadClasses as $classKey => $classesEntry) {
+
+            // If the className does not contain a wildcard we can check the autloadClass index directly.
+            $fqPattern = Addon::parseFullyQualifiedClass($pattern);
+            if (strpos($fqPattern['className'], '*') === false) {
+
+                // Convert the pattern's class name to a class key.
+                $classKey = strtolower($fqPattern['className']);
+                if (array_key_exists($classKey, $this->autoloadClasses)) {
+                    $loadedClasses = [$classKey => $this->autoloadClasses[$classKey]];
+                } else {
+                    $loadedClasses = [];
+                }
+            } else {
+                $loadedClasses = $this->autoloadClasses;
+            }
+
+            foreach ($loadedClasses as $classKey => $classesEntry) {
                 foreach($classesEntry as $namespace => $classData) {
                     if ($fn($namespace.$classKey)) {
                         $result[] = $namespace.$classData['className'];

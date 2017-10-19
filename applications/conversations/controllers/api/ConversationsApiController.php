@@ -8,6 +8,7 @@
 use Garden\Schema\Schema;
 use Garden\Web\Exception\NotFoundException;
 use Garden\Web\Exception\ServerException;
+use Vanilla\Exception\ConfigurationException;
 use Vanilla\Utility\CapitalCaseScheme;
 
 /**
@@ -52,7 +53,7 @@ class ConversationsApiController extends AbstractApiController {
      */
     private function checkModerationPermission() {
         if (!$this->config->get('Conversations.Moderation.Allow', false)) {
-            throw permissionException();
+            throw new ConfigurationException('Conversations.Moderation.Allow');
         }
         $this->permission('Conversations.Moderation.Manage');
     }

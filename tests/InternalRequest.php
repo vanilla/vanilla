@@ -137,7 +137,7 @@ class InternalRequest extends HttpRequest implements RequestInterface {
 
         $response = new HttpResponse(
             $data->getStatus(),
-            array_merge($data->getHeaders(), ['X-Data-Meta', json_encode($data->getMetaArray())])
+            array_merge($data->getHeaders(), ['X-Data-Meta' => json_encode($data->getMetaArray())])
         );
         $response->setBody($data->getData());
 

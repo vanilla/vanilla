@@ -21,13 +21,14 @@ function writeActivity($activity, $sender, $session) {
     $format = val('Format', $activity);
 
     $title = '';
-    $excerpt = $activity->Story;
     if ($format) {
         $excerpt = Gdn_Format::to($excerpt, $format);
+    } else {
+        $excerpt = htmlspecialchars($activity->Story);
     }
 
     if ($activity->NotifyUserID > 0 || !in_array($activityType, ['WallComment', 'WallPost', 'AboutUpdate'])) {
-        $title = '<div class="Title">'.getValue('Headline', $activity).'</div>';
+        $title = '<div class="Title">'.htmlspecialchars(val('Headline', $activity)).'</div>';
     } else if ($activityType == 'WallPost') {
         $regardingUser = userBuilder($activity, 'Regarding');
         $photoAnchor = userPhoto($regardingUser);

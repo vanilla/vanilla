@@ -245,6 +245,10 @@ class ConversationsApiController extends AbstractApiController {
 
         $this->conversationByID($id);
 
+        if (!$this->conversationModel->inConversation($id, $this->getSession()->UserID)) {
+            $this->checkModerationPermission();
+        }
+
         list($offset, $limit) = offsetLimit("p{$query['page']}", $query['limit']);
 
         $conversationMembers = $this->conversationModel->getConversationMembers($id, false, $limit, $offset);
@@ -372,10 +376,14 @@ class ConversationsApiController extends AbstractApiController {
         $in = $this->postSchema('in')->setDescription('Add participants to a conversation.');
         $out = $this->schema($this->fullSchema(), 'out');
 
+        $body = $in->validate($body);
+
         // Not found exception thrown if the conversation does not exist.
         $this->conversationByID($id);
 
-        $body = $in->validate($body);
+        if (!$this->conversationModel->inConversation($id, $this->getSession()->UserID)) {
+            $this->checkModerationPermission();
+        }
 
         $success = $this->conversationModel->addUserToConversation($id, $body['participantUserIDs']);
         if (!$success) {

@@ -9,14 +9,34 @@ use Garden\Web\Data;
 use Garden\Web\Exception\NotFoundException;
 use Garden\Web\Exception\ServerException;
 use Vanilla\Utility\CapitalCaseScheme;
+use Vanilla\Utility\CamelCaseScheme;
 
 /**
  * API Controller for the `/roles` resource.
  */
 class RolesApiController extends AbstractApiController {
 
+    /** @var CamelCaseScheme */
+    private $camelCaseScheme;
+
     /** @var CapitalCaseScheme */
     private $caseScheme;
+
+    /** @var array Groups of permissions that can be consolidated into one. */
+    private $consolidatedPermissions = [
+        'discussions.moderate' => ['discussions.announce', 'discussions.close', 'discussions.sink'],
+        'discussions.manage' => ['discussions.delete', 'discussions.edit']
+    ];
+
+    /** @var array Permissions that have been deprecated and should no longer be used. */
+    private $deprecatedPermissions = [
+        'Garden.Activity.Delete',
+        'Garden.Activity.View',
+        'Garden.SignIn.Allow',
+        'Garden.Curation.Manage',
+        'Vanilla.Approval.Require',
+        'Vanilla.Comments.Me'
+    ];
 
     /** @var Schema */
     private $idParamSchema;
@@ -24,6 +44,27 @@ class RolesApiController extends AbstractApiController {
     /** @var PermissionModel */
     private $permissionModel;
 
+    /** @var array A static mapping of updated permission names. */
+    private $renamedPermissions = [
+        'Conversations.Moderation.Manage' => 'conversations.moderate',
+        'Email.Comments.Add' => 'comments.email',
+        'Email.Conversations.Add' => 'conversations.email',
+        'Email.Discussions.Add' => 'discussions.email',
+        'Garden.Moderation.Manage' => 'community.moderate',
+        'Garden.NoAds.Allow' => 'noAds.use',
+        'Garden.Settings.Manage' => 'site.manage',
+        'Garden.Users.Approve' => 'applicants.manage',
+        'Groups.Group.Add' => 'groups.add',
+        'Groups.Moderation.Manage' => 'groups.moderate',
+        'Reputation.Badges.Give' => 'badges.moderate',
+        'Vanilla.Tagging.Add' => 'tags.add'
+    ];
+
+    /** @var array Permissions with a fixed name. Do not change them. */
+    private $fixedPermissions = [
+        'Reactions.Negative.Add',
+        'Reactions.Positive.Add'
+    ];
     /** @var RoleModel */
     private $roleModel;
 
@@ -42,6 +83,48 @@ class RolesApiController extends AbstractApiController {
         $this->roleModel = $roleModel;
         $this->permissionModel = $permissionModel;
         $this->caseScheme = new CapitalCaseScheme();
+        $this->camelCaseScheme = new CamelCaseScheme();
+    }
+
+    /**
+     * Collapse multiple permissions down into a single one, where possible.
+     *
+     * @param array $permissions
+     * @return array
+     */
+    private function consolidatePermissions(array $permissions) {
+        $result = $permissions;
+
+        foreach ($this->consolidatedPermissions as $name => $perms) {
+            $pass = 0;
+            $total = count($perms);
+            foreach ($perms as $currentPerm) {
+                if (array_key_exists($currentPerm, $permissions) && $permissions[$currentPerm]) {
+                    $pass++;
+                }
+            }
+
+            if ($pass == $total) {
+                $val = true;
+            } elseif ($pass == 0) {
+                $val = false;
+            } else {
+                $val = null;
+            }
+
+            // If we had all or none of the child permissions, remove them. Only include the parent.
+            if ($val !== null) {
+                foreach ($perms as $currentPerm) {
+                    unset($result[$currentPerm]);
+                }
+            }
+
+            $result[$name] = $val;
+            unset($currentPerm, $pass, $fail);
+        }
+        unset($perms);
+
+        return $result;
     }
 
     /**
@@ -57,6 +140,60 @@ class RolesApiController extends AbstractApiController {
 
         $this->roleByID($id);
         $this->roleModel->deleteID($id);
+    }
+
+    /**
+     * Simplify the format of a permissions array.
+     *
+     * @param array $global Global permissions.
+     * @param array $categories Category-specific permissions.
+     * @return array
+     */
+    private function formatPermissions(array $global, array $categories) {
+        $result = [
+            'global' => [],
+            'categories' => []
+        ];
+
+        /**
+         * Format an array of permission names. Convert names as necessary and cast values to boolean.
+         *
+         * @param array $perms
+         * @return array
+         */
+        $format = function(array $perms) {
+            $result = [];
+
+            foreach ($perms as $name => $val) {
+                if ($this->isPermissionDeprecated($name)) {
+                    // Deprecated? Don't need it.
+                    continue;
+                }
+
+                $name = $this->renamePermission($name);
+                $result[$name] = (bool)$val;
+            }
+
+            $result = $this->consolidatePermissions($result);
+
+            ksort($result);
+            return $result;
+        };
+
+        $result['global'] = $format($global);
+
+        foreach ($categories as $cat) {
+            // Default category (-1) permissions now fall under an ID of zero (0).
+            $catPerms['id'] = $cat['JunctionID'] == -1 ? 0 : $cat['JunctionID'];
+
+            // Cleanup non-permission values from the row.
+            unset($cat['Name'], $cat['JunctionID'], $cat['JunctionTable'], $cat['JunctionColumn']);
+
+            $catPerms['permissions'] = $format($cat);
+            $result['categories'][] = $catPerms;
+        }
+
+        return $result;
     }
 
     /**
@@ -163,6 +300,17 @@ class RolesApiController extends AbstractApiController {
     }
 
     /**
+     * Determine if a permission slug is deprecated.
+     *
+     * @param string $permission
+     * @return bool
+     */
+    private function isPermissionDeprecated($permission) {
+        $result = in_array($permission, $this->deprecatedPermissions);
+        return $result;
+    }
+
+    /**
      * Tweak the data in a role row in a standard way.
      *
      * @param array $row
@@ -170,17 +318,13 @@ class RolesApiController extends AbstractApiController {
     protected function prepareRow(array &$row) {
         if (array_key_exists('RoleID', $row)) {
             $roleID = $row['RoleID'];
-            $rawPerms = $this->permissionModel->getPermissionsByRole($roleID);
-            $perms = [];
-            foreach ($rawPerms as $permission => $value) {
-                if (is_int($permission)) {
-                    $permission = $value;
-                    $value = true;
-                }
-                $perms[$permission] = $value;
-            }
-            ksort($perms);
-            $row['permissions'] = $perms;
+            $global = $this->permissionModel->getGlobalPermissions($roleID);
+            unset($global['PermissionID']);
+            $category = $this->permissionModel->getJunctionPermissions([
+                'RoleID' => $roleID,
+                'Category'
+            ]);
+            $row['permissions'] = $this->formatPermissions($global, $category);
         }
     }
 
@@ -240,6 +384,39 @@ class RolesApiController extends AbstractApiController {
 
         $result = $out->validate($row);
         return new Data($result, 201);
+    }
+
+    /**
+     * Rename a legacy Vanilla permission slug.
+     *
+     * @param string $permission
+     * @return string
+     */
+    private function renamePermission($permission) {
+        $result = $permission;
+
+        if (array_key_exists($permission, $this->renamedPermissions)) {
+            // Already got a mapping for this permission? Go ahead and use it.
+            $result = $this->renamedPermissions[$permission];
+        } else {
+            // Time to format the permission name.
+            $segments = explode('.', $permission);
+
+            // Pop the application off the top, if it seems safe to do so.
+            if (!in_array($permission, $this->fixedPermissions) && count($segments) == 3) {
+                unset($segments[0]);
+            }
+
+            foreach ($segments as &$seg) {
+                $seg = $this->camelCaseScheme->convert($seg);
+            }
+
+            // Cache the renamed permission for this request.
+            $result = implode('.', $segments);
+            $rename[$permission] = $result;
+        }
+
+        return $result;
     }
 
     /**

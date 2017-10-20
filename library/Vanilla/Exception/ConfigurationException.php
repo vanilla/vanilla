@@ -25,12 +25,12 @@ class ConfigurationException extends ForbiddenException {
 
         if (array_key_exists('configurationValue', $context)) {
             $message = sprintft(
-                "The %s config must be set to %s to support the current action.",
+                'The %s config must be set to %s to support the current action.',
                 $configuration,
                 json_encode($context['configurationValue'], JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE)
             );
         } else {
-            $message = sprintft("The %s config is required to support the current action.", $configurationName);
+            $message = sprintft('The %s config is required to support the current action.', $configurationName);
         }
 
         parent::__construct($message, $context);

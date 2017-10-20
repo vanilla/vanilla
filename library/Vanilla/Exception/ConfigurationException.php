@@ -28,7 +28,6 @@ class ConfigurationException extends ForbiddenException {
         $context['configurations'] = $configurations;
 
         $messageParts = [];
-        $messageParts[] = t('The site is not configured to support the current action.');
 
         $or = t('or');
         foreach ($configurations as $configurationName) {
@@ -41,7 +40,7 @@ class ConfigurationException extends ForbiddenException {
 
                 $messageParts[] = sprintft("The $configurationName config must be set to %s to support the current action.", implode(" $or ", $requiredValues));
             } else {
-                $messageParts[] = t("The $configurationName config is required to access this.");
+                $messageParts[] = t("The $configurationName config is required to support the current action.");
             }
         }
 

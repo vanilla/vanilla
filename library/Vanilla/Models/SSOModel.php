@@ -190,10 +190,13 @@ class SSOModel {
             $allowConnect = $this->config->get('Garden.Registration.AllowConnect', true);
 
             // Will automatically try to link users using the provided Email address if the Provider is "Trusted".
-            $autoConnect = $ssoData['authenticatorIsTrusted']
-                && $allowConnect
-                && $emailUnique
-                && $this->config->get('Garden.Registration.AutoConnect', false);
+            $autoConnect =
+                $emailUnique &&
+                (
+                    $ssoData['authenticatorIsTrusted']
+                    || ($allowConnect && $this->config->get('Garden.Registration.AutoConnect', false))
+                )
+            ;
 
             // Let's try to find a matching user.
             if ($autoConnect) {

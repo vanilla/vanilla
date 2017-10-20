@@ -14,6 +14,7 @@ use Interop\Container\ContainerInterface;
 use Vanilla\AddonManager;
 use Vanilla\Authenticator\Authenticator;
 use Vanilla\Authenticator\SSOAuthenticator;
+use Vanilla\Exception\PermissionException;
 use Vanilla\Models\SSOModel;
 use Vanilla\Utility\CamelCaseScheme;
 
@@ -186,7 +187,9 @@ class AuthenticateApiController extends AbstractApiController {
 
         $authenticatorInstance = $this->getAuthenticator($authenticator, $authenticatorID);
 
-        return $out->validate((bool)$this->userModel->getAuthenticationByUser($userID, $authenticatorInstance->getID()));
+        return $out->validate([
+            'linked' => (bool)$this->userModel->getAuthenticationByUser($userID, $authenticatorInstance->getID())
+        ]);
     }
 
     /**
@@ -225,7 +228,7 @@ class AuthenticateApiController extends AbstractApiController {
 
         $sessionData = $this->sessionModel->getID($authSessionID, DATASET_TYPE_ARRAY);
         if ($this->sessionModel->isExpired($sessionData)) {
-            throw new Exception('The session has expired.');
+            throw new ClientException('The session has expired.');
         }
 
         if (!empty($query['expand']) && isset($sessionData['Attributes']['linkUser']['existingUsers'])) {
@@ -267,11 +270,8 @@ class AuthenticateApiController extends AbstractApiController {
         // Check if the container can find the authenticator.
         try {
             $authenticatorInstance = $this->container->getArgs($authenticatorClassName, [$authenticatorID]);
+            return $authenticatorInstance;
         } catch (Exception $e) {}
-
-        if ($authenticatorInstance) {
-            return;
-        }
 
         // Use the addonManager to find the class.
         $authenticatorClasses = $this->addonManager->findClasses("*\\$authenticatorClassName");
@@ -403,8 +403,12 @@ class AuthenticateApiController extends AbstractApiController {
      * @param array $body
      * @return array
      */
-    public function post_linkUser(array $body) {
+    public function post_linkuser(array $body) {
         $this->permission();
+
+        if (!$this->config->get('Garden.Registration.AllowConnect', true)) {
+            throw new PermissionException('Garden.Registration.AllowConnect');
+        }
 
         // Custom validator
         $validator = function ($data, ValidationField $field) {
@@ -429,10 +433,10 @@ class AuthenticateApiController extends AbstractApiController {
 
         $in = $this->schema([
                 'authSessionID:s' => 'Identifier of the authentication session.',
+                'password:s' => 'Password of the user.',
                 'userID:i?' => 'Identifier of the user.',
                 'name:s?' => 'User name.',
                 'email:s?' => 'User email.',
-                'password:s?' => 'Password of the user.',
             ], 'in')
             ->addValidator('', $validator)
             ->setDescription('Link a user to an authenticator using the authSessionID and some other information. Required: userID + password or name + email + password.');
@@ -455,7 +459,7 @@ class AuthenticateApiController extends AbstractApiController {
             ])->resultArray();
 
             if (count($userResults) > 1) {
-                throw new ClientException('More than one user has the same Email and Name combination');
+                throw new ClientException('More than one user has the same Email and Name combination.');
             } else if (count($userResults) === 0) {
                 throw new ClientException('No user was found with the supplied information.');
             }

@@ -82,14 +82,13 @@ class SSOData implements \ArrayAccess {
 
         $invalidProperties = [];
         foreach ($required as $name) {
-            // Empty is used on purpose here. Nothing should be of empty value in there.
-            if (empty($this->$name)) {
+            if (!property_exists($this, $name)) {
                 $invalidProperties[] = $name;
             }
         }
 
         if (count($invalidProperties)) {
-            throw new \Exception("SSOData is invalid. The following properties are not set or empty: ".impode(',', $invalidProperties));
+            throw new \Exception("SSOData is invalid. The following properties are not set or empty: ".implode(',', $invalidProperties));
         }
     }
 

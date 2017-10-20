@@ -16,59 +16,23 @@ class ConfigurationException extends ForbiddenException {
     /**
      * Construct a {@link ConfigurationException} object.
      *
-     * @param array The configurations that failed the test.
+     * @param string The configurations that failed the test.
      * @param array $context Additional information for the error.
-     *   - You can set $context['configurationsRequiredValues'][{name}] = value|array
+     *   - You can set $context['configurationValue'] = value; to specify that the configuration requires a specific value to be set.
      */
-    public function __construct($configurations, array $context = []) {
-        if (!is_array($configurations)) {
-            $configurations = [$configurations];
+    public function __construct($configuration, array $context = []) {
+        $context['configuration'] = $configuration;
+
+        if (array_key_exists('configurationValue', $context)) {
+            $message = sprintft(
+                "The %s config must be set to %s to support the current action.",
+                $configuration,
+                json_encode($context['configurationValue'], JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE)
+            );
+        } else {
+            $message = sprintft("The %s config is required to support the current action.", $configurationName);
         }
 
-        $context['configurations'] = $configurations;
-
-        $messageParts = [];
-
-        $or = t('or');
-        foreach ($configurations as $configurationName) {
-            if (isset($context['requiredValues']) && array_key_exists($configurationName, $context['requiredValues'])) {
-                $requiredValues = $context['requiredValues'][$configurationName];
-                if (!is_array($requiredValues)) {
-                    $requiredValues = [$requiredValues];
-                }
-                array_walk($requiredValues, function(&$value) { $value = $this->translateValue($value); });
-
-                $messageParts[] = sprintft("The $configurationName config must be set to %s to support the current action.", implode(" $or ", $requiredValues));
-            } else {
-                $messageParts[] = t("The $configurationName config is required to support the current action.");
-            }
-        }
-
-        parent::__construct(implode(' ', $messageParts), $context);
-    }
-
-    /**
-     * Translate values to human readable format.
-     *
-     * @param mixed $value
-     * @return string
-     */
-    protected function translateValue($value) {
-        if (is_string($value)) {
-            $value = "\"$value\"";
-        } elseif ($value === true) {
-            $value = 'true';
-        } elseif ($value === false) {
-            $value = 'false';
-        } elseif ($value === null) {
-            $value = 'null';
-        } elseif (is_array($value)) {
-            foreach ($value as &$content) {
-                $content = $this->translateValue($content);
-            }
-            $value = str_replace(["\n    ", "\n", 'Array(, '], [', ', '', 'Array('], print_r($value, true));
-        }
-
-        return (string)$value;
+        parent::__construct($message, $context);
     }
 }

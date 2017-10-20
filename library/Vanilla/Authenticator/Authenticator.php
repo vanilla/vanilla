@@ -30,13 +30,14 @@ abstract class Authenticator {
     public function __construct($authenticatorID) {
         $this->authenticatorID = $authenticatorID;
 
-        if (array_pop(explode('\\', static::class)) !== $this->getNameImpl(static::class).'Authenticator') {
+        $classParts = explode('\\', static::class);
+        if (array_pop($classParts) !== $this->getNameImpl(static::class).'Authenticator') {
             throw new \Exception('Authenticator class name must end with Authenticator');
         }
     }
 
     /**
-     * Validate an authentication by using the request's data.
+     * Validate an authentication by using the equest's data.
      *
      * @throws Exception Reason why the authentication failed.
      * @param RequestInterface $request
@@ -60,7 +61,8 @@ abstract class Authenticator {
      */
     private function getNameImpl() {
         // return Name from "{Name}Authenticator"
-        return (string)substr(array_pop(explode('\\', static::class)), 0, -strlen('Authenticator'));
+        $classParts = explode('\\', static::class);
+        return (string)substr(array_pop($classParts), 0, -strlen('Authenticator'));
     }
 
     /**

@@ -81,6 +81,7 @@ class ProfileController extends Gdn_Controller {
         $this->addJsFile('jquery.autosize.min.js');
         $this->addJsFile('global.js');
         $this->addJsFile('cropimage.js');
+        $this->addJsFile('vendors/clipboard.min.js');
 
         $this->addCssFile('style.css');
         $this->addCssFile('vanillicon.css', 'static');
@@ -1324,10 +1325,11 @@ class ProfileController extends Gdn_Controller {
     private function revealTokenRow($token) {
         $deleteUrl = url('/profile/tokenDelete?accessTokenID='.$token['accessTokenID']);
         $deleteStr = t('Delete');
-
+        $tokenLabel = t('Copy To Clipboard');
+        $copiedMessage = t('Copied to Clipboard!');
 
         return <<<EOT
-<li id="Token_{$token['accessTokenID']}" class="Item Item-Token">{$token['accessToken']}<div class="Meta Options">
+<li id="Token_{$token['accessTokenID']}" class="Item Item-Token">{$token['accessToken']}<a href="#" title="{$tokenLabel}" data-copymessage="{$copiedMessage}" data-clipboard-text="{$token['accessToken']}" class="OptionsLink OptionsLink-Clipboard js-copyToClipboard" style="margin-left: 5px; display: none;"><svg class="copyToClipboard-icon" style="width: 20px; height: 20px; display: inline-block; vertical-align: middle;" viewBox="0 0 24 24"><title>{$tokenLabel}</title><path transform="translate(0 -2)" d="M17,12h4a1,1,0,0,1,1,1h0a1,1,0,0,1-1,1H17v2l-4-3,4-3Zm2-2H18V5H13.75V4.083a1.75,1.75,0,1,0-3.5,0V5H6V21H18V16h1v5a1,1,0,0,1-1,1H6a1,1,0,0,1-1-1V5A1,1,0,0,1,6,4H9.251a2.75,2.75,0,0,1,5.5,0H18a1,1,0,0,1,1,1ZM6,7V6H18V7ZM8,9.509A.461.461,0,0,1,8.389,9h5.692a.461.461,0,0,1,.389.509.461.461,0,0,1-.389.509H8.389A.461.461,0,0,1,8,9.509Zm3.261,2.243c.116,0,.209.228.209.509s-.093.51-.209.51H8.209c-.116,0-.209-.228-.209-.51s.093-.509.209-.509ZM12.2,14.5c.149,0,.269.227.269.509s-.12.509-.269.509H8.269c-.149,0-.269-.228-.269-.509s.12-.509.269-.509Zm2.82,3a.513.513,0,0,1,0,1.018H8.449a.513.513,0,0,1,0-1.018Z" style="fill: currentColor;"></path></svg></a><div class="Meta Options">
     <a href="$deleteUrl" class="OptionsLink Popup">{$deleteStr}</a>
 </div>
 </li>

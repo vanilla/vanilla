@@ -89,9 +89,8 @@ $(document).on("contentLoad", function(e) {
         if (Clipboard && Clipboard.isSupported()) {
             $(this).show();
             var copyMessage = $(this).data('copymessage');
-            new Clipboard(this, {
+            var clipboard = new Clipboard(this, {
                 target: function(trigger) {
-                    event.preventDefault();
                     gdn.informMessage(copyMessage);
                 }
             });

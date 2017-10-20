@@ -16,14 +16,60 @@ class ConfigurationException extends ForbiddenException {
     /**
      * Construct a {@link ConfigurationException} object.
      *
-     * @param string The configuration that failed the test.
+     * @param array The configurations that failed the test.
      * @param array $context Additional information for the error.
+     *   - You can set $context['configurationsRequiredValues'][{name}] = value|array
      */
-    public function __construct($configuration, array $context = []) {
-        $context['configuration'] = $configuration;
+    public function __construct($configurations, array $context = []) {
+        if (!is_array($configurations)) {
+            $configurations = [$configurations];
+        }
 
-        $msg = sprintf('The %s configuration value disallow you to do that.', $configuration);
+        $context['configurations'] = $configurations;
 
-        parent::__construct($msg, $context);
+        $messageParts = [];
+        $messageParts[] = t('The site is not configured to support the current action.');
+
+        $or = t('or');
+        foreach ($configurations as $configurationName) {
+            if (isset($context['requiredValues']) && array_key_exists($configurationName, $context['requiredValues'])) {
+                $requiredValues = $context['requiredValues'][$configurationName];
+                if (!is_array($requiredValues)) {
+                    $requiredValues = [$requiredValues];
+                }
+                array_walk($requiredValues, function(&$value) { $value = $this->translateValue($value); });
+
+                $messageParts[] = sprintft("The $configurationName config must be set to %s to support the current action.", implode(" $or ", $requiredValues));
+            } else {
+                $messageParts[] = t("The $configurationName config is required to access this.");
+            }
+        }
+
+        parent::__construct(implode(' ', $messageParts), $context);
+    }
+
+    /**
+     * Translate values to human readable format.
+     *
+     * @param mixed $value
+     * @return string
+     */
+    protected function translateValue($value) {
+        if (is_string($value)) {
+            $value = "\"$value\"";
+        } elseif ($value === true) {
+            $value = 'true';
+        } elseif ($value === false) {
+            $value = 'false';
+        } elseif ($value === null) {
+            $value = 'null';
+        } elseif (is_array($value)) {
+            foreach ($value as &$content) {
+                $content = $this->translateValue($content);
+            }
+            $value = str_replace(["\n    ", "\n", 'Array(, '], [', ', '', 'Array('], print_r($value, true));
+        }
+
+        return (string)$value;
     }
 }

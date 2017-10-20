@@ -53,7 +53,10 @@ class ConversationsApiController extends AbstractApiController {
      */
     private function checkModerationPermission() {
         if (!$this->config->get('Conversations.Moderation.Allow', false)) {
-            throw new ConfigurationException('Conversations.Moderation.Allow');
+            throw new ConfigurationException(
+                'Conversations.Moderation.Allow',
+                ['requiredValues' => ['Conversations.Moderation.Allow' => true]]
+            );
         }
         $this->permission('Conversations.Moderation.Manage');
     }

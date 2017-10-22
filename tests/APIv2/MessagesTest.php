@@ -99,8 +99,9 @@ class MessagesTest extends AbstractResourceTest {
     /**
      * Test GET /resource/<id>.
      *
-     * @expectedException Exception
-     * @expectedExceptionMessageRegExp /Conversations\.Moderation\.Allow/
+     * @expectedException \Exception
+     * @expectedExceptionCode 403
+     * @expectedExceptionMessage The site is not configured for moderating conversations.
      */
     public function testGet() {
         parent::testGet();
@@ -125,8 +126,9 @@ class MessagesTest extends AbstractResourceTest {
     /**
      * Test GET /messages.
      *
-     * @expectedException Exception
-     * @expectedExceptionMessageRegExp /Conversations\.Moderation\.Allow/
+     * @expectedException \Exception
+     * @expectedExceptionCode 403
+     * @expectedExceptionMessage The site is not configured for moderating conversations.
      */
     public function testIndex() {
         parent::testIndex();

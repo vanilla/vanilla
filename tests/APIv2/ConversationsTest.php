@@ -6,6 +6,7 @@
  */
 
 namespace VanillaTests\APIv2;
+use Garden\Web\Exception\ForbiddenException;
 
 /**
  * Test the /api/v2/conversations endpoints.
@@ -61,7 +62,7 @@ class ConversationsTest extends AbstractAPIv2Test {
      * Test GET /conversations/<id>.
      *
      * @expectedException \Exception
-     * @expectedExceptionMessageRegExp /Conversations\.Moderation\.Allow/
+     * @expectedExceptionMessage The site is not configured for moderating conversations.
      *
      * @return array
      */
@@ -89,7 +90,8 @@ class ConversationsTest extends AbstractAPIv2Test {
      * Test GET /conversations/<id>/participants.
      *
      * @expectedException \Exception
-     * @expectedExceptionMessageRegExp /Conversations\.Moderation\.Allow/
+     * @expectedExceptionCode 403
+     * @expectedExceptionMessage The site is not configured for moderating conversations.
      */
     public function testGetParticipants() {
         $conversation = $this->testPostParticipants();
@@ -117,7 +119,8 @@ class ConversationsTest extends AbstractAPIv2Test {
      * Test GET /conversations.
      *
      * @expectedException \Exception
-     * @expectedExceptionMessageRegExp /Conversations\.Moderation\.Allow/
+     * @expectedExceptionCode 403
+     * @expectedExceptionMessage The site is not configured for moderating conversations.
      */
     public function testIndex() {
         $nbsInsert = 3;
@@ -226,7 +229,8 @@ class ConversationsTest extends AbstractAPIv2Test {
      * Test POST /conversations/<id>/participants.
      *
      * @expectedException \Exception
-     * @expectedExceptionMessageRegExp /Conversations\.Moderation\.Allow/
+     * @expectedExceptionCode 403
+     * @expectedExceptionMessage The site is not configured for moderating conversations.
      *
      * @return array The conversation.
      */

@@ -62,9 +62,12 @@ class EbiView implements ViewInterface {
                     return url($path, $withDomain);
                 }
                 $addon = $addonManager->lookupAddon($addonKey);
+                if (!$addon) {
+                    $addon = $addonManager->lookupTheme($addonKey);
+                }
 
                 if ($addon) {
-                    return asset($addon->path($path, Addon::PATH_LOCAL), $withDomain);
+                    return asset($addon->path($path, Addon::PATH_ADDON), $withDomain);
                 }
             } else {
                 return $url;
@@ -97,10 +100,10 @@ class EbiView implements ViewInterface {
         $ebi->defineFunction('url');
 
         // Add custom attribute filters.
-        $ebi->defineFunction('script@src', $fn);
-        $ebi->defineFunction('link@href', $fn);
-        $ebi->defineFunction('a@href', 'url');
-        $ebi->defineFunction('form@action', 'url');
+        $ebi->defineFunction('@script:src', $fn);
+        $ebi->defineFunction('@link:href', $fn);
+        $ebi->defineFunction('@a:href', 'url');
+        $ebi->defineFunction('@form:action', 'url');
 
         $this->ebi = $ebi;
     }

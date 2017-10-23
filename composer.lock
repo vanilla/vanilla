@@ -821,16 +821,16 @@
         },
         {
             "name": "vanilla/ebi",
-            "version": "v0.2.1",
+            "version": "v0.2.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/vanilla/ebi.git",
-                "reference": "c4ca9c5930a0876b7ac88e5c0bf7a1ac29abccaf"
+                "reference": "a775b30855362a83a7b2d476e39e9f819e489085"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/vanilla/ebi/zipball/c4ca9c5930a0876b7ac88e5c0bf7a1ac29abccaf",
-                "reference": "c4ca9c5930a0876b7ac88e5c0bf7a1ac29abccaf",
+                "url": "https://api.github.com/repos/vanilla/ebi/zipball/a775b30855362a83a7b2d476e39e9f819e489085",
+                "reference": "a775b30855362a83a7b2d476e39e9f819e489085",
                 "shasum": ""
             },
             "require": {
@@ -858,7 +858,7 @@
                 }
             ],
             "description": "A template engine made with HTML.",
-            "time": "2017-10-19T19:33:18+00:00"
+            "time": "2017-10-23T14:52:09+00:00"
         },
         {
             "name": "vanilla/garden-container",
@@ -992,16 +992,16 @@
         },
         {
             "name": "vanilla/garden-schema",
-            "version": "v1.7",
+            "version": "v1.7.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/vanilla/garden-schema.git",
-                "reference": "04669138bd0786a0b81355959e56ebb1d02ec468"
+                "reference": "c61cf5b70d7719207112b6b7107275fa6628221c"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/vanilla/garden-schema/zipball/04669138bd0786a0b81355959e56ebb1d02ec468",
-                "reference": "04669138bd0786a0b81355959e56ebb1d02ec468",
+                "url": "https://api.github.com/repos/vanilla/garden-schema/zipball/c61cf5b70d7719207112b6b7107275fa6628221c",
+                "reference": "c61cf5b70d7719207112b6b7107275fa6628221c",
                 "shasum": ""
             },
             "require": {
@@ -1024,7 +1024,7 @@
                 }
             ],
             "description": "A simple data validation and cleaning library based on JSON Schema.",
-            "time": "2017-10-15T23:51:14+00:00"
+            "time": "2017-10-22T18:15:33+00:00"
         },
         {
             "name": "vanilla/htmlawed",
@@ -1257,37 +1257,40 @@
         },
         {
             "name": "myclabs/deep-copy",
-            "version": "1.6.1",
+            "version": "1.7.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/myclabs/DeepCopy.git",
-                "reference": "8e6e04167378abf1ddb4d3522d8755c5fd90d102"
+                "reference": "3b8a3a99ba1f6a3952ac2747d989303cbd6b7a3e"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/myclabs/DeepCopy/zipball/8e6e04167378abf1ddb4d3522d8755c5fd90d102",
-                "reference": "8e6e04167378abf1ddb4d3522d8755c5fd90d102",
+                "url": "https://api.github.com/repos/myclabs/DeepCopy/zipball/3b8a3a99ba1f6a3952ac2747d989303cbd6b7a3e",
+                "reference": "3b8a3a99ba1f6a3952ac2747d989303cbd6b7a3e",
                 "shasum": ""
             },
             "require": {
-                "php": ">=5.4.0"
+                "php": "^5.6 || ^7.0"
             },
             "require-dev": {
-                "doctrine/collections": "1.*",
-                "phpunit/phpunit": "~4.1"
+                "doctrine/collections": "^1.0",
+                "doctrine/common": "^2.6",
+                "phpunit/phpunit": "^4.1"
             },
             "type": "library",
             "autoload": {
                 "psr-4": {
                     "DeepCopy\\": "src/DeepCopy/"
-                }
+                },
+                "files": [
+                    "src/DeepCopy/deep_copy.php"
+                ]
             },
             "notification-url": "https://packagist.org/downloads/",
             "license": [
                 "MIT"
             ],
             "description": "Create deep copies (clones) of your objects",
-            "homepage": "https://github.com/myclabs/DeepCopy",
             "keywords": [
                 "clone",
                 "copy",
@@ -1295,7 +1298,7 @@
                 "object",
                 "object graph"
             ],
-            "time": "2017-04-12T18:52:22+00:00"
+            "time": "2017-10-19T19:58:43+00:00"
         },
         {
             "name": "phpdocumentor/reflection-common",

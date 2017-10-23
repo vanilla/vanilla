@@ -152,7 +152,7 @@ class Gdn_Smarty {
      * @param Gdn_Controller $controller The controller that is rendering the view.
      * @param \Vanilla\Addon $addon The owner addon.
      */
-    public function render($path, $controller, $addon) {
+    public function render($path, $controller, $addon = null) {
         $smarty = $this->smarty();
         $this->init($path, $controller);
         $compileID = $smarty->compile_id;

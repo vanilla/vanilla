@@ -150,8 +150,9 @@ class Gdn_Smarty {
      *
      * @param string $path The path to the view's file.
      * @param Gdn_Controller $controller The controller that is rendering the view.
+     * @param \Vanilla\Addon $addon The owner addon.
      */
-    public function render($path, $controller) {
+    public function render($path, $controller, $addon) {
         $smarty = $this->smarty();
         $this->init($path, $controller);
         $compileID = $smarty->compile_id;
@@ -159,7 +160,12 @@ class Gdn_Smarty {
             $compileID = CLIENT_NAME;
         }
 
-        $smarty->setTemplateDir(dirname($path));
+        $paths = [dirname($path)];
+        if ($addon instanceof \Vanilla\Addon) {
+            $paths[] = $addon->path('/views');
+        }
+
+        $smarty->setTemplateDir($paths);
         $smarty->display($path, null, $compileID);
     }
 

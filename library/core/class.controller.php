@@ -695,7 +695,8 @@ class Gdn_Controller extends Gdn_Pluggable {
         $ViewPath = $this->fetchViewLocation($View, $ControllerName, $ApplicationFolder);
 
         // Look up the owner addon.
-        $addonKey = strtolower(array_pop(explode('/', $ApplicationFolder ?: $this->ApplicationFolder)));
+        $parts = explode('/', $ApplicationFolder ?: $this->ApplicationFolder);
+        $addonKey = strtolower(array_pop($parts));
         $addon = Gdn::addonManager()->lookupAddon($addonKey);
 
         // Check to see if there is a handler for this particular extension.
@@ -1868,7 +1869,14 @@ class Gdn_Controller extends Gdn_Pluggable {
             $BodyIdentifier = strtolower($this->ApplicationFolder.'_'.$ControllerName.'_'.Gdn_Format::alphaNumeric(strtolower($this->RequestMethod)));
             include($MasterViewPath);
         } else {
-            $ViewHandler->render($MasterViewPath, $this);
+            if ($addonKey) {
+                $parts = explode('/', $addonKey);
+                $addon = Gdn::addonManager()->lookupAddon($parts = strtolower(array_pop($parts)));
+            } else {
+                $addon = null;
+            }
+
+            $ViewHandler->render($MasterViewPath, $this, $addon);
         }
     }
 

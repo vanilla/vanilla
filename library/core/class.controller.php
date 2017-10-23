@@ -694,6 +694,10 @@ class Gdn_Controller extends Gdn_Pluggable {
     public function fetchView($View = '', $ControllerName = false, $ApplicationFolder = false) {
         $ViewPath = $this->fetchViewLocation($View, $ControllerName, $ApplicationFolder);
 
+        // Look up the owner addon.
+        $addonKey = strtolower(array_pop(explode('/', $ApplicationFolder ?: $this->ApplicationFolder)));
+        $addon = Gdn::addonManager()->lookupAddon($addonKey);
+
         // Check to see if there is a handler for this particular extension.
         $ViewHandler = Gdn::factory('ViewHandler'.strtolower(strrchr($ViewPath, '.')));
 
@@ -704,7 +708,7 @@ class Gdn_Controller extends Gdn_Pluggable {
             include($ViewPath);
         } else {
             // Use the view handler to parse the view.
-            $ViewHandler->render($ViewPath, $this);
+            $ViewHandler->render($ViewPath, $this, $addon);
         }
         $ViewContents = ob_get_clean();
 

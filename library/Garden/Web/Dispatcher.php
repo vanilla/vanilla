@@ -175,10 +175,14 @@ class Dispatcher {
      * The meta information is merged with the above priority so actions can't override controllers and routes can't override actions.
      *
      * @param Data $data The data to merge with.
-     * @param array $meta The meta to merge.
+     * @param array|null $meta The meta to merge.
      * @param bool $replace Whether to replace existing items or not.
      */
-    private function mergeMeta(Data $data, array $meta, $replace = false) {
+    private function mergeMeta(Data $data, array $meta = null, $replace = false) {
+        if (empty($meta)) {
+            return;
+        }
+
         if ($replace) {
             $result = array_replace_recursive($data->getMetaArray(), $meta);
         } else {

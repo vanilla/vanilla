@@ -87,7 +87,8 @@ class ResourceRoute extends Route {
         $pathArgs = explode('/', $pathPart);
 
         // First look for the controller.
-        $controllerSlug = $this->filterName(array_shift($pathArgs));
+        $resource = array_shift($pathArgs);
+        $controllerSlug = $this->filterName($resource);
         $controllerClass = $this->classLocator->findClass(sprintf($this->controllerPattern, $controllerSlug));
         if ($controllerClass === null) {
             return null;
@@ -98,7 +99,7 @@ class ResourceRoute extends Route {
         $result = $this->findAction($controller, $request, $pathArgs);
 
         if ($result !== null) {
-            $result->setMeta('resource', $controllerSlug);
+            $result->setMeta('resource', $resource);
         }
 
         return $result;
@@ -307,8 +308,6 @@ class ResourceRoute extends Route {
         return $defaults;
     }
 
-
-
     /**
      * Split a function into its regular parameters and mapped parameters.
      *
@@ -391,8 +390,6 @@ class ResourceRoute extends Route {
 
         return $result;
     }
-
-
 
     /**
      * Get the classLocator.

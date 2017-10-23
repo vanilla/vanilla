@@ -47,6 +47,8 @@ abstract class Route {
         'path' => Route::MAP_PATH
     ];
 
+    private $defaults = [];
+
     /**
      * Get the conditions.
      *
@@ -250,13 +252,21 @@ abstract class Route {
             $result += $args;
         }
         if ($mapping & self::MAP_QUERY) {
-            $result += $request->getQuery();
+            $result += $request->getQuery() + $this->getDefault('query', []);
         }
         if ($mapping & self::MAP_BODY) {
             $result += $request->getBody();
         }
 
         return $result;
+    }
+
+    public function setDefault($key, $value) {
+        $this->defaults[$key] = $value;
+    }
+
+    public function getDefault($key, $default = null) {
+        return array_key_exists($key, $this->defaults) ? $this->defaults[$key] : $default;
     }
 
     /**

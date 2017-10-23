@@ -10,12 +10,16 @@ namespace Vanilla;
 use Ebi\TemplateLoaderInterface;
 
 class EbiTemplateLoader implements TemplateLoaderInterface {
+    use PluralizationTrait;
+
     private $addonManager;
 
     /**
      * @var Addon
      */
     private $currentAddon;
+
+    private $pathCache = [];
 
     public function __construct(AddonManager $addonManager) {
         $this->addonManager = $addonManager;
@@ -38,7 +42,17 @@ class EbiTemplateLoader implements TemplateLoaderInterface {
         }
     }
 
+    /**
+     * Get a component's physical path.
+     *
+     * @param string $component The component name.
+     * @return string Returns a root-relative path or an empty string if the component isn't found.
+     */
     public function componentPath($component) {
+        if (isset($this->pathCache[$component])) {
+            return $this->pathCache[$component];
+        }
+
         // Look for a namespace.
         $parts = explode(':', $component, 2);
         if (count($parts) === 2) {
@@ -46,22 +60,54 @@ class EbiTemplateLoader implements TemplateLoaderInterface {
 
             $addons = $this->searchAddonsFromNamespace($namespace);
         } else {
-            $addons = $this->searchAddons();
+            $addons = $this->searchAddonsFromComponent($component);
         }
 
-        $subPath = '/views/'.str_replace('.', '/', $component).'.html';
-        $subPath = str_replace('/master.html', '.master.html', $subPath);
+        $subPaths[] = "/views/$component.html";
+        if ($pos = strpos($component, '-')) {
+            $folder = substr($component, 0, $pos);
+            $subPaths[] = "/views/$folder/$component.html";
+        }
 
         foreach ($addons as $addon) {
-            /* @var Addon $addon */
-            $path = $addon->path($subPath);
+            foreach ($subPaths as $subPath) {
+                /* @var Addon $addon */
+                $path = $addon->path($subPath);
 
-            if (file_exists($path)) {
-                return $path;
+                if (file_exists($path)) {
+                    return $path;
+                }
             }
         }
 
         return '';
+
+    }
+
+    /**
+     * Get the addon that owns a component.
+     *
+     * Components must be named with a prefix that matches a controller that the addon owns in order to be located properly.
+     *
+     * @param string $component The name of the component to find.
+     * @return null|Addon Returns an addon or **null** if it could not be found.
+     */
+    private function getComponentAddon($component) {
+        if (preg_match('`^(?:[^:]+:)?([^-]+)`', $component, $m)) {
+            $resource = $m[1];
+            $plural = $this->plural($resource);
+
+            // Look for the controller that owns the component.
+            $controllers = [$plural.'ApiController', $plural.'Controller'];
+            foreach ($controllers as $controller) {
+                $classes = $this->addonManager->findClasses("*\\$controller");
+                foreach ($classes as $class) {
+                    $addon = $this->addonManager->lookupByClassname($class);
+                    return $addon;
+                }
+            }
+        }
+        return null;
     }
 
     /**
@@ -127,6 +173,11 @@ class EbiTemplateLoader implements TemplateLoaderInterface {
         // If there is no namespace then grab then assume this is an addon.
         $addon = $this->addonManager->lookupAddon($namespace);
         return $addon ? $this->searchAddons($addon) : [];
+    }
+
+    private function searchAddonsFromComponent($component) {
+        $addon = $this->getComponentAddon($component);
+        return $this->searchAddons($addon);
     }
 
     /**

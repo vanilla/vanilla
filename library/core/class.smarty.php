@@ -105,6 +105,8 @@ class Gdn_Smarty {
         $path = ($isHomepage) ? "" : Gdn::request()->path();
         $smarty->assign('Path', $path);
         $smarty->assign('Homepage', $isHomepage); // true/false
+        $smarty->assign('AssetRoot', rtrim(asset('/', true), '/'));
+        $smarty->assign('WebRoot', rtrim(url('/', true), '/'));
 
         // Assign the controller data last so the controllers override any default data.
         $smarty->assign($controller->Data);
@@ -147,7 +149,7 @@ class Gdn_Smarty {
      * Render the given view.
      *
      * @param string $path The path to the view's file.
-     * @param Controller $controller The controller that is rendering the view.
+     * @param Gdn_Controller $controller The controller that is rendering the view.
      */
     public function render($path, $controller) {
         $smarty = $this->smarty();

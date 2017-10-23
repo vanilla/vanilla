@@ -162,7 +162,9 @@ class Data implements \JsonSerializable, \ArrayAccess {
         $result = [];
 
         foreach ($this->meta as $key => $value) {
-            if ($key === 'CONTENT_TYPE' || substr_compare($key, 'HTTP_', 0, 5, true) === 0) {
+            if ($key === 'CONTENT_TYPE') {
+                $result['Content-Type'] = $value;
+            } elseif (substr_compare($key, 'HTTP_', 0, 5, true) === 0) {
                 $headerKey = $this->headerName(substr($key, 5));
 
                 $result[$headerKey] = $value;
@@ -199,6 +201,7 @@ class Data implements \JsonSerializable, \ArrayAccess {
             return $name;
         } else {
             $parts = explode('_', $name);
+
             $result = implode('-', array_map(function ($part) use ($special) {
                 $r = ucfirst(strtolower($part));
                 return isset($special[$r]) ? $special[$r] : $r;

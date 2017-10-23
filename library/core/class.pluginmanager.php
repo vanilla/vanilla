@@ -957,7 +957,7 @@ class Gdn_PluginManager extends Gdn_Pluggable implements ContainerInterface {
         if (is_array($var)) {
             reset($var);
             $name = key($var);
-            $var = current($var);
+            $var = (array)current($var);
 
             $var['Index'] = $name;
             $var['ClassName'] = $ClassName;

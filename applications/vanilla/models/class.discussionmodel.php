@@ -674,8 +674,6 @@ class DiscussionModel extends Gdn_Model {
             $where = [];
         }
 
-        $sql = $this->SQL;
-
         if (isset($where['CategoryID'])) {
             $where['d.CategoryID'] = $where['CategoryID'];
             unset($where['CategoryID']);
@@ -705,6 +703,11 @@ class DiscussionModel extends Gdn_Model {
         $this->EventArguments['Wheres'] = &$where;
         $this->fireEvent('BeforeGet');
 
+        // Verify permissions (restricting by category if necessary)
+        $perms = self::categoryPermissions();
+
+        $sql = $this->SQL;
+
         // Build up the base query. Self-join for optimization.
         $sql->select('d2.*')
             ->from('Discussion d')
@@ -714,9 +717,6 @@ class DiscussionModel extends Gdn_Model {
         foreach ($orderBy as $field => $direction) {
             $sql->orderBy($this->addFieldPrefix($field), $direction);
         }
-
-        // Verify permissions (restricting by category if necessary)
-        $perms = self::categoryPermissions();
 
         if ($perms !== true) {
             if (isset($where['d.CategoryID'])) {

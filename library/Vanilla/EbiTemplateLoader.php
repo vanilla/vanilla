@@ -63,11 +63,21 @@ class EbiTemplateLoader implements TemplateLoaderInterface {
             $addons = $this->searchAddonsFromComponent($component);
         }
 
-        $subPaths[] = "/views/$component.html";
-        if ($pos = strpos($component, '-')) {
-            $folder = substr($component, 0, $pos);
-            $subPaths[] = "/views/$folder/$component.html";
+
+        $suffixes = ['master' => 'masters'];
+
+        $subPaths = [];
+        if ($pos = strrpos($component, '-')) {
+            $sx = substr($component, $pos + 1);
+            if (isset($suffixes[$sx])) {
+                $subPaths[] = "/views/{$suffixes[$sx]}/$component.html";
+            } elseif ($pos = strpos($component, '-')) {
+                $folder = substr($component, 0, $pos);
+                $subPaths[] = "/views/$folder/$component.html";
+            }
         }
+
+        $subPaths[] = "/views/helpers/$component.html";
 
         foreach ($addons as $addon) {
             foreach ($subPaths as $subPath) {

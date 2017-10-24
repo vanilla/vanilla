@@ -102,6 +102,7 @@ class EbiView implements ViewInterface {
         // Add custom attribute filters.
         $ebi->defineFunction('@script:src', $fn);
         $ebi->defineFunction('@link:href', $fn);
+        $ebi->defineFunction('@img:src', $fn);
         $ebi->defineFunction('@a:href', 'url');
         $ebi->defineFunction('@form:action', 'url');
 

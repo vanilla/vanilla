@@ -166,7 +166,12 @@ class Gdn_Smarty {
         }
 
         $smarty->setTemplateDir($paths);
-        $smarty->display($path, null, $compileID);
+        try {
+            set_error_handler('Gdn_ErrorHandler', E_ALL & ~E_STRICT & ~E_NOTICE & ~E_WARNING);
+            $smarty->display($path, null, $compileID);
+        } finally {
+            restore_error_handler();
+        }
     }
 
     /**

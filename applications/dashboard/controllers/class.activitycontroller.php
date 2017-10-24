@@ -288,7 +288,7 @@ class ActivityController extends Gdn_Controller {
                 $iD = $this->ActivityModel->comment($activityComment);
 
                 if ($iD == SPAM || $iD == UNAPPROVED) {
-                    $this->StatusMessage = t('ActivityCommentRequiresApproval', 'Your comment will appear after it is approved.');
+                    $this->StatusMessage = t('Your comment will appear after it is approved.');
                     $this->render('Blank', 'Utility');
                     return;
                 }

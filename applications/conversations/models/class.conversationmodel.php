@@ -393,7 +393,7 @@ class ConversationModel extends ConversationsModel {
         if (!$row) {
             return false;
         }
-        return !empty($Row['Deleted']);
+        return empty($row['Deleted']);
     }
 
     public function joinLastMessages(&$data) {

@@ -8,6 +8,7 @@
 use Garden\Schema\Schema;
 use Garden\Web\Exception\NotFoundException;
 use Garden\Web\Exception\ServerException;
+use Vanilla\Exception\ConfigurationException;
 use Vanilla\Utility\CapitalCaseScheme;
 
 /**
@@ -48,11 +49,12 @@ class ConversationsApiController extends AbstractApiController {
     /**
      * Check that the user has moderation rights over conversations.
      *
-     * @throw Exception
+     * @throws ConfigurationException Throws an exception when the site is not configured for moderating conversations.
+     * @throws \Vanilla\Exception\PermissionException Throws an
      */
     private function checkModerationPermission() {
         if (!$this->config->get('Conversations.Moderation.Allow', false)) {
-            throw permissionException();
+            throw new ConfigurationException(t('The site is not configured for moderating conversations.'));
         }
         $this->permission('Conversations.Moderation.Manage');
     }

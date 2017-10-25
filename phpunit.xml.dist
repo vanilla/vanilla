@@ -25,16 +25,20 @@
 
     <testsuites>
         <testsuite name="Library">
-            <directory suffix="Test.php">./tests/Library/</directory>
+            <directory suffix="Test.php">./tests/Library/</directory> for
         </testsuite>
         <testsuite name="Models">
             <directory suffix="Test.php">./tests/Models</directory>
+            <directory suffix="Test.php">./applications/*/tests/Models</directory>
+            <directory suffix="Test.php">./plugins/*/tests/Models</directory>
         </testsuite>
         <testsuite name="APIv0">
             <directory suffix="Test.php">./tests/APIv0</directory>
         </testsuite>
         <testsuite name="APIv2">
             <directory suffix="Test.php">./tests/APIv2</directory>
+            <directory suffix="Test.php">./applications/*/tests/APIv2</directory>
+            <directory suffix="Test.php">./plugins/*/tests/APIv2</directory>
         </testsuite>
     </testsuites>
 

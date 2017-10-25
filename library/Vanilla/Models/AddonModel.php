@@ -167,6 +167,12 @@ class AddonModel implements LoggerAwareInterface {
         $wasEnabled = $this->isEnabledConfig($addon, $options);
 
         $this->addonManager->startAddon($addon);
+
+        // Load bootstrap file.
+        if ($bootstrap = $addon->getSpecial('bootstrap')) {
+            include_once $addon->path($bootstrap, Addon::PATH_FULL);
+        }
+
         $this->runSetup($addon);
         $this->enableInConfig($addon, true, $options);
         if ($pluginClass = $addon->getPluginClass()) {

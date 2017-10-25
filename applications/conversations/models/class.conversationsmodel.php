@@ -67,16 +67,21 @@ abstract class ConversationsModel extends Gdn_Model {
      * @param bool $idsOnly The returns only the userIDs or everything from UserConversation.
      * @param bool $limit
      * @param bool $offset
+     * @param bool|null $active **true** for active participants, **false** for users who have left the conversation and **null** for everyone.
      *
      * @return array Array of users or userIDs depending on $idsOnly's value.
      */
-    public function getConversationMembers($conversationID, $idsOnly = true, $limit = false, $offset = false) {
+    public function getConversationMembers($conversationID, $idsOnly = true, $limit = false, $offset = false, $active = null) {
         $conversationMembers = [];
 
         $userConversation = new Gdn_Model('UserConversation');
-        $userMembers = $userConversation->getWhere([
-            'ConversationID' => $conversationID
-        ], 'UserID', 'asc', $limit, $offset)->resultArray();
+        $where = ['ConversationID' => $conversationID];
+        if ($active === true) {
+            $where['Deleted'] = 0;
+        } elseif ($active === false) {
+            $where['Deleted'] = 1;
+        }
+        $userMembers = $userConversation->getWhere($where, 'UserID', 'asc', $limit, $offset)->resultArray();
 
         if (is_array($userMembers) && count($userMembers)) {
             if ($idsOnly) {

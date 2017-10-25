@@ -49,6 +49,13 @@ class EbiView implements ViewInterface {
                 $controller->renderAsset($props['name']);
             }
         });
+        $ebi->defineComponent('x-script', function ($props, $children = []) {
+            echo '<script>';
+            if (!empty($children[0])) {
+                call_user_func($children[0], $props);
+            }
+            echo '</script>';
+        });
 
         // Add custom functions.
         $fn = function ($url, $withDomain = false) use ($addonManager) {
@@ -56,10 +63,12 @@ class EbiView implements ViewInterface {
                 $addonKey = ltrim($m[1], '~');
                 $path = '/'.ltrim($m[2], '/');
 
-                if ($addonKey === '') {
+                if ($addonKey === 'asset') {
                     return asset($path, $withDomain);
-                } elseif ($addonKey === '@root') {
+                } elseif ($addonKey === 'url') {
                     return url($path, $withDomain);
+                } elseif ($addonKey === 'root') {
+                    return \Gdn::request()->urlDomain(true).$path;
                 }
                 $addon = $addonManager->lookupAddon($addonKey);
                 if (!$addon) {
@@ -70,7 +79,7 @@ class EbiView implements ViewInterface {
                     return asset($addon->path($path, Addon::PATH_ADDON), $withDomain);
                 }
             } else {
-                return $url;
+                return asset($url, $withDomain);
             }
 
             return '#not-found';

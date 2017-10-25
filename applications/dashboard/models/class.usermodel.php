@@ -1059,7 +1059,7 @@ class UserModel extends Gdn_Model {
      */
     public function expandUsers(array &$rows, array $columns) {
         // How are we supposed to lookup users by column if we don't have any columns?
-        if (count($columns) === 0) {
+        if (count($rows) === 0 || count($columns) === 0) {
             return;
         }
 

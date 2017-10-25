@@ -61,7 +61,7 @@ abstract class ConversationsModel extends Gdn_Model {
     }
 
     /**
-     * Get all the members of a conversation from the $conversationID.
+     * Get all the members (deleted or no) of a conversation from the $conversationID.
      *
      * @param int $conversationID The conversation ID.
      * @param bool $idsOnly The returns only the userIDs or everything from UserConversation.

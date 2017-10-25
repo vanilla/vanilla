@@ -238,6 +238,10 @@ class PostController extends VanillaController {
             $this->deliveryType(Gdn::request()->getValue('DeliveryType', $this->_DeliveryType));
             if ($draftID == 0) {
                 $draftID = $this->Form->getFormValue('DraftID', 0);
+            } else {
+                if ($draftID != $formValues['DraftID']) {
+                    throw new Exception('DraftID mismatch.');
+                }
             }
 
             $draft = $this->Form->buttonExists('Save_Draft') ? true : false;
@@ -301,7 +305,7 @@ class PostController extends VanillaController {
                             }
                         }
                         if ($discussionID == SPAM || $discussionID == UNAPPROVED) {
-                            $this->StatusMessage = t('DiscussionRequiresApprovalStatus', 'Your discussion will appear after it is approved.');
+                            $this->StatusMessage = t("Your discussion will appear after it is approved.");
 
                             // Clear out the form so that a draft won't save.
                             $this->Form->formValues([]);
@@ -710,7 +714,7 @@ class PostController extends VanillaController {
                     $this->EventArguments['Comment'] = $Comment;
                     $this->fireEvent('AfterCommentSave');
                 } elseif ($CommentID === SPAM || $CommentID === UNAPPROVED) {
-                    $this->StatusMessage = t('CommentRequiresApprovalStatus', 'Your comment will appear after it is approved.');
+                    $this->StatusMessage = t('Your comment will appear after it is approved.');
                 }
 
                 $this->Form->setValidationResults($this->CommentModel->validationResults());

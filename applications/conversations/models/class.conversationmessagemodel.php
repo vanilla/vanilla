@@ -208,14 +208,22 @@ class ConversationMessageModel extends ConversationsModel {
         $this->EventArguments['FormPostValues'] = $formPostValues;
         $this->fireEvent('BeforeSaveValidation');
 
+        $formIsValid = $this->validate($formPostValues);
+
+        $checkFlood = true;
         // Determine if spam check should be skipped.
         if (!$session->User->Admin && !$session->checkPermission('Garden.Moderation.Manage')) {
-            $this->setFloodControlEnabled(empty($options['NewConversation']));
+            $checkFlood = empty($options['NewConversation']);
+        }
+
+        $floodCheckPassed = !$checkFlood;
+        if ($formIsValid && $checkFlood) {
+            $floodCheckPassed = !$this->checkUserSpamming(Gdn::session()->UserID, $this->floodGate);
         }
 
         // Validate the form posted values
         $messageID = false;
-        if ($this->validate($formPostValues) && !$this->checkUserSpamming(Gdn::session()->UserID, $this->floodGate)) {
+        if ($formIsValid && $floodCheckPassed) {
             $fields = $this->Validation->schemaValidationFields(); // All fields on the form that relate to the schema
             touchValue('Format', $fields, c('Garden.InputFormatter', 'Html'));
 

@@ -2072,14 +2072,10 @@ class UserModel extends Gdn_Model {
 
         if (array_key_exists('Confirmed', $formPostValues)) {
             $formPostValues['Confirmed'] = forceBool($formPostValues['Confirmed'], '0', '1', '0');
-        } elseif (array_key_exists('EmailConfirmed', $formPostValues)) {
-            $formPostValues['Confirmed'] = forceBool($formPostValues['EmailConfirmed'], '1', '1', '0');
         }
 
         if (array_key_exists('Verified', $formPostValues)) {
             $formPostValues['Verified'] = forceBool($formPostValues['Verified'], '0', '1', '0');
-        } elseif (array_key_exists('BypassSpam', $formPostValues)) {
-            $formPostValues['Verified'] = forceBool($formPostValues['BypassSpam'], '0', '1', '0');
         }
 
         // Do not allowing setting this via general save.

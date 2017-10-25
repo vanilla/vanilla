@@ -8,6 +8,7 @@
 use Garden\Schema\Schema;
 use Garden\Web\Exception\NotFoundException;
 use Garden\Web\Exception\ServerException;
+use Vanilla\Exception\ConfigurationException;
 use Vanilla\Utility\CapitalCaseScheme;
 
 /**
@@ -48,11 +49,12 @@ class ConversationsApiController extends AbstractApiController {
     /**
      * Check that the user has moderation rights over conversations.
      *
-     * @throw Exception
+     * @throws ConfigurationException Throws an exception when the site is not configured for moderating conversations.
+     * @throws \Vanilla\Exception\PermissionException Throws an
      */
     private function checkModerationPermission() {
         if (!$this->config->get('Conversations.Moderation.Allow', false)) {
-            throw permissionException();
+            throw new ConfigurationException(t('The site is not configured for moderating conversations.'));
         }
         $this->permission('Conversations.Moderation.Manage');
     }
@@ -251,6 +253,10 @@ class ConversationsApiController extends AbstractApiController {
 
         $this->conversationByID($id);
 
+        if (!$this->conversationModel->inConversation($id, $this->getSession()->UserID)) {
+            $this->checkModerationPermission();
+        }
+
         list($offset, $limit) = offsetLimit("p{$query['page']}", $query['limit']);
 
         $active = null;
@@ -389,10 +395,14 @@ class ConversationsApiController extends AbstractApiController {
         $in = $this->postSchema('in')->setDescription('Add participants to a conversation.');
         $out = $this->schema($this->fullSchema(), 'out');
 
+        $body = $in->validate($body);
+
         // Not found exception thrown if the conversation does not exist.
         $this->conversationByID($id);
 
-        $body = $in->validate($body);
+        if (!$this->conversationModel->inConversation($id, $this->getSession()->UserID)) {
+            $this->checkModerationPermission();
+        }
 
         $success = $this->conversationModel->addUserToConversation($id, $body['participantUserIDs']);
         if (!$success) {

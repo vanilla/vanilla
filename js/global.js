@@ -725,7 +725,7 @@ jQuery(document).ready(function($) {
     var hijackClick = function(e) {
         var $elem = $(this);
         var $parent = $(this).closest('.Item');
-        var $flyout = $elem.closest('.ToggleFlyout');
+        var $toggleFlyout = $elem.closest('.ToggleFlyout');
         var href = $elem.attr('href');
         var progressClass = $elem.hasClass('Bookmark') ? 'Bookmarking' : 'InProgress';
 
@@ -747,7 +747,11 @@ jQuery(document).ready(function($) {
                 $elem.attr('href', href);
 
                 // If we are in a flyout, close it.
-                $flyout.removeClass('Open').find('.Flyout').hide();
+                $toggleFlyout
+                    .removeClass('Open')
+                    .find('.Flyout')
+                    .hide()
+                    .setFlyoutAttributes();
             },
             error: function(xhr) {
                 gdn.informError(xhr);
@@ -774,21 +778,28 @@ jQuery(document).ready(function($) {
 
     // Activate ToggleFlyout and ButtonGroup menus
     $(document).delegate('.ButtonGroup > .Handle', 'click', function() {
-        var buttonGroup = $(this).closest('.ButtonGroup');
-        if (buttonGroup.hasClass('Open')) {
-            // Close
-            $('.ButtonGroup').removeClass('Open');
-        } else {
-            // Close all other open button groups
-            $('.ButtonGroup').removeClass('Open');
+        var $buttonGroup = $(this).closest('.ButtonGroup');
+        if (!$buttonGroup.hasClass('Open')) {
+            $('.ButtonGroup')
+                .removeClass('Open')
+                .setFlyoutAttributes();
+            
             // Open this one
-            buttonGroup.addClass('Open');
+            $buttonGroup
+                .addClass('Open')
+                .setFlyoutAttributes();
+        } else {
+            $('.ButtonGroup')
+                .removeClass('Open')
+                .setFlyoutAttributes();
         }
         return false;
     });
-    var lastOpen = null;
-    $(document).delegate('.ToggleFlyout', 'click', function(e) {
 
+    var lastOpen = null;
+
+    $(document).delegate('.ToggleFlyout', 'click', function(e) {
+        var $toggleFlyout = $(this);
         var $flyout = $('.Flyout', this);
         var isHandle = false;
 
@@ -823,14 +834,17 @@ jQuery(document).ready(function($) {
             if (lastOpen !== null) {
                 $('.Flyout', lastOpen).hide();
                 $(lastOpen).removeClass('Open').closest('.Item').removeClass('Open');
+                $toggleFlyout.setFlyoutAttributes();
             }
 
             $(this).addClass('Open').closest('.Item').addClass('Open');
             $flyout.show();
             lastOpen = this;
+            $toggleFlyout.setFlyoutAttributes();
         } else {
             $flyout.hide();
             $(this).removeClass('Open').closest('.Item').removeClass('Open');
+            $toggleFlyout.setFlyoutAttributes();
         }
 
         if (isHandle)
@@ -844,6 +858,7 @@ jQuery(document).ready(function($) {
 
         $('.ToggleFlyout').removeClass('Open').closest('.Item').removeClass('Open');
         $('.Flyout').hide();
+        $(this).closest('.ToggleFlyout').setFlyoutAttributes();
     });
 
     $(document).delegate(document, 'click', function() {
@@ -851,7 +866,10 @@ jQuery(document).ready(function($) {
             $('.Flyout', lastOpen).hide();
             $(lastOpen).removeClass('Open').closest('.Item').removeClass('Open');
         }
-        $('.ButtonGroup').removeClass('Open');
+
+        $('.ButtonGroup')
+            .removeClass('Open')
+            .setFlyoutAttributes();
     });
 
     // Add a spinner onclick of buttons with this class
@@ -2102,20 +2120,65 @@ if (typeof String.prototype.trim !== 'function') {
     };
 }
 
-// jQuery UI .effect() replacement using CSS classes.
-jQuery.fn.effect = function(name) {
-    var that = this;
-    name = name + '-effect';
+jQuery.fn.extend({
+    // jQuery UI .effect() replacement using CSS classes.
+    effect: function(name) {
+        var that = this;
+        name = name + '-effect';
 
-    return this
-        .addClass(name)
-        .one('animationend webkitAnimationEnd', function () {
-            that.removeClass(name);
+        return this
+            .addClass(name)
+            .one('animationend webkitAnimationEnd', function () {
+                that.removeClass(name);
+            });
+    },
+
+    accessibleFlyoutHandle: function (isOpen) {
+        $(this).attr('aria-expanded', isOpen.toString());
+    },
+
+    accessibleFlyout: function (isOpen) {
+        $(this).attr('aria-hidden', (!isOpen).toString());
+    },
+
+    setFlyoutAttributes: function () {
+        $(this).each(function(){
+            var $handle = $(this).find('.FlyoutButton, .Handle, .editor-action:not(.editor-action-separator)');
+            var $flyout = $(this).find('.Flyout, .Dropdown');
+            var isOpen = $flyout.is(':visible');
+
+            $handle.accessibleFlyoutHandle(isOpen);
+            $flyout.accessibleFlyout(isOpen);
         });
-};
+    },
 
-// Setup AJAX filtering for flat category module.
+    accessibleFlyoutsInit: function () {
+        var $context = $(this);
+
+        $context.each(function(){
+
+            $context.find('.FlyoutButton, .Handle, .editor-action:not(.editor-action-separator)').each(function (){
+                $(this)
+                    .attr('tabindex', '0')
+                    .attr('role', 'button')
+                    .attr('aria-haspopup', 'true');
+
+                $(this).accessibleFlyoutHandle(false);
+            });
+
+            $context.find('.Flyout, .Dropdown').each(function (){
+                $(this).accessibleFlyout(false);
+
+                $(this).find('a').each(function() {
+                    $(this).attr('tabindex', '0');
+                });
+            });
+        });
+    }
+});
+
 $(document).on("contentLoad", function(e) {
+    // Setup AJAX filtering for flat category module.
     // Find each flat category module container, if any.
     $(".BoxFlatCategory", e.target).each(function(index, value){
         // Setup the constants we'll need to perform the lookup for this module instance.
@@ -2151,4 +2214,7 @@ $(document).on("contentLoad", function(e) {
             )
         });
     });
+
+    // Set up accessible flyouts
+    $('.ToggleFlyout, .editor-dropdown, .ButtonGroup').accessibleFlyoutsInit();
 });

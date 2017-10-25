@@ -25,7 +25,7 @@
 
     <testsuites>
         <testsuite name="Library">
-            <directory suffix="Test.php">./tests/Library/</directory> for
+            <directory suffix="Test.php">./tests/Library/</directory>
         </testsuite>
         <testsuite name="Models">
             <directory suffix="Test.php">./tests/Models</directory>

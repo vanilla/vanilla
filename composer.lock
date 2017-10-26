@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "content-hash": "b34ceb38a513d61b3129e7e9472084e8",
+    "content-hash": "bf1181394f3bd4a51a31f31e4cd0392f",
     "packages": [
         {
             "name": "chrisjean/php-ico",
@@ -821,16 +821,16 @@
         },
         {
             "name": "vanilla/ebi",
-            "version": "v0.2.3",
+            "version": "v0.3.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/vanilla/ebi.git",
-                "reference": "e8b7273d49ccdcc146f0889a71357b5919b5e44b"
+                "reference": "d8b52d59715807952742ba9a99f82c8273333581"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/vanilla/ebi/zipball/e8b7273d49ccdcc146f0889a71357b5919b5e44b",
-                "reference": "e8b7273d49ccdcc146f0889a71357b5919b5e44b",
+                "url": "https://api.github.com/repos/vanilla/ebi/zipball/d8b52d59715807952742ba9a99f82c8273333581",
+                "reference": "d8b52d59715807952742ba9a99f82c8273333581",
                 "shasum": ""
             },
             "require": {
@@ -858,7 +858,7 @@
                 }
             ],
             "description": "A template engine made with HTML.",
-            "time": "2017-10-25T01:16:44+00:00"
+            "time": "2017-10-26T02:38:07+00:00"
         },
         {
             "name": "vanilla/garden-container",

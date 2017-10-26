@@ -52,7 +52,7 @@
         "vanilla/legacy-passwords": "~1.0",
         "vanilla/nbbc": "~2.1",
         "vanilla/garden-schema": "^1.4.2",
-        "vanilla/ebi": "^0.2"
+        "vanilla/ebi": "^0.3"
     },
     "require-dev": {
         "phpunit/phpunit": "~5.0"

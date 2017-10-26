@@ -77,7 +77,7 @@ class EbiTemplateLoader implements TemplateLoaderInterface {
             }
         }
 
-        $subPaths[] = "/views/helpers/$component.html";
+        $subPaths[] = "/views/components/$component.html";
 
         foreach ($addons as $addon) {
             foreach ($subPaths as $subPath) {

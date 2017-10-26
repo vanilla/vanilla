@@ -10,6 +10,7 @@ namespace Vanilla\Web;
 use Ebi\Ebi;
 use Garden\EventManager;
 use Garden\Web\Data;
+use Garden\Web\RequestInterface;
 use Garden\Web\ViewInterface;
 use Vanilla\Addon;
 use Vanilla\AddonManager;
@@ -28,7 +29,8 @@ class EbiView implements ViewInterface {
         \Gdn_Session $session,
         \Gdn_Locale $locale,
         AddonManager $addonManager,
-        \UserModel $userModel
+        \UserModel $userModel,
+        RequestInterface $request
     ) {
         $userFunction = $this->makeUserFunction($userModel);
 
@@ -41,6 +43,7 @@ class EbiView implements ViewInterface {
         ];
         $ebi->setMeta('locale', $locale);
         $ebi->setMeta('device', ['type' => userAgentType(), 'mobile' => isMobile()]);
+        $ebi->setMeta('request', ['query' => $request->getQuery()]);
 
         // Add custom components.
         $ebi->defineComponent('asset', function ($props) use ($ebi) {

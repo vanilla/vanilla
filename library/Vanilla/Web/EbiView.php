@@ -60,6 +60,16 @@ class EbiView implements ViewInterface {
             echo '</script>';
         });
 
+        // Define a simple component not found component to help troubleshoot.
+        $ebi->defineComponent('@component-not-found', function ($props) {
+            $this->echoConsoleLog('error', 'Ebi component "%s" not found.', $props['component']);
+        });
+
+        // Define a simple component exception.
+        $ebi->defineComponent('@exception', function ($props) {
+            $this->echoConsoleLog('Ebi exception in component %s. %s', $props['component'], $props['message']);
+        });
+
         // Add custom functions.
         $fn = function ($url, $withDomain = false) use ($addonManager) {
             if (preg_match('`^(~[^/]+)(.*)$`', $url, $m)) {
@@ -119,6 +129,28 @@ class EbiView implements ViewInterface {
         $ebi->defineFunction('@form:action', 'url');
 
         $this->ebi = $ebi;
+    }
+
+    /**
+     * Write out a javascript console.log script to output debugging information in the browser.
+     *
+     * The arguments passed to this method get JSON encoded and output as arguments of the resulting console.log call.
+     * If you pass "error", "log", or "info" as the first argument here then the respective console method will be called
+     * instead.
+     *
+     * @param array $args The console.log arguments.
+     */
+    private function echoConsoleLog(...$args) {
+        if (in_array(reset($args), ['error', 'log', 'info'])) {
+            $method = array_shift($args);
+        } else {
+            $method = 'log';
+        }
+
+        $jsonArgs = array_map('json_encode', $args);
+        $argsStr = implode(', ', $jsonArgs);
+
+        echo "\n<script>console.$method($argsStr);</script>\n";
     }
 
     /**

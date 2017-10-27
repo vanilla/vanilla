@@ -35,7 +35,7 @@ class EbiTemplateLoader implements TemplateLoaderInterface {
         $path = $this->componentPath($component);
 
         if ($path) {
-            $partial = stringBeginsWith($path, PATH_ROOT, true, true).filemtime($path);
+            $partial = stringBeginsWith($path, PATH_ROOT, true, true).'-'.filemtime($path);
             return $partial;
         } else {
             return null;

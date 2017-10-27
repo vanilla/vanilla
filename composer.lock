@@ -821,16 +821,16 @@
         },
         {
             "name": "vanilla/ebi",
-            "version": "v0.3.1",
+            "version": "v0.3.3",
             "source": {
                 "type": "git",
                 "url": "https://github.com/vanilla/ebi.git",
-                "reference": "756af725a21ddd6ddba9206c0444679bcc210cc5"
+                "reference": "76160ac5e0c1360f47f817c806ed830b8198820c"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/vanilla/ebi/zipball/756af725a21ddd6ddba9206c0444679bcc210cc5",
-                "reference": "756af725a21ddd6ddba9206c0444679bcc210cc5",
+                "url": "https://api.github.com/repos/vanilla/ebi/zipball/76160ac5e0c1360f47f817c806ed830b8198820c",
+                "reference": "76160ac5e0c1360f47f817c806ed830b8198820c",
                 "shasum": ""
             },
             "require": {
@@ -858,7 +858,7 @@
                 }
             ],
             "description": "A template engine made with HTML.",
-            "time": "2017-10-26T21:23:29+00:00"
+            "time": "2017-10-27T20:10:50+00:00"
         },
         {
             "name": "vanilla/garden-container",

@@ -481,7 +481,7 @@ BQ;
                 case 'TextEx':
                     $quoteBody = $data->Body;
                     $insertName = $data->InsertName;
-                    if (strpos($insertName, ' ') !== false) {
+                    if ((strpos($insertName, ' ') OR strpos($insertName, '.')) !== false) {
                         $insertName = '"'.$insertName.'"';
                     }
                     $quote = '> '.sprintf(t('%s said:'), '@'.$insertName)."\n".

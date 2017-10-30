@@ -1,0 +1,20 @@
+{
+    "name": "VanillaConnect",
+    "description": "VanillaConnect SSO.",
+    "key": "vanillaconnect",
+    "type": "addon",
+    "version": "1.0",
+    "settingsUrl": "/settings/vanillaconnect",
+    "usePopupSettings": false,
+    "settingsPermission": "Garden.Settings.Manage",
+    "authors": [
+        {
+            "name": "Alexandre (DaazKu) Chouinard",
+            "email": "alexandre.c@vanillaforums.com",
+            "homepage": "https://github.com/DaazKu"
+        }
+    ],
+    "require": {
+        "vanilla": ">=2.4"
+    }
+}

@@ -60,7 +60,7 @@ class RolesApiController extends AbstractApiController {
         'Vanilla.Tagging.Add' => 'tags.add'
     ];
 
-    /** @var array Permissions with a fixed name. Do not change them. */
+    /** @var array These permissions should not be renamed. */
     private $fixedPermissions = [
         'Reactions.Negative.Add',
         'Reactions.Positive.Add'
@@ -394,8 +394,6 @@ class RolesApiController extends AbstractApiController {
      * @return string
      */
     private function renamePermission($permission) {
-        $result = $permission;
-
         if (array_key_exists($permission, $this->renamedPermissions)) {
             // Already got a mapping for this permission? Go ahead and use it.
             $result = $this->renamedPermissions[$permission];
@@ -414,7 +412,7 @@ class RolesApiController extends AbstractApiController {
 
             // Cache the renamed permission for this request.
             $result = implode('.', $segments);
-            $rename[$permission] = $result;
+            $this->renamedPermissions[$permission] = $result;
         }
 
         return $result;

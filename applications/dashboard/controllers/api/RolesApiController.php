@@ -78,6 +78,7 @@ class RolesApiController extends AbstractApiController {
      * RolesApiController constructor.
      *
      * @param RoleModel $roleModel
+     * @param PermissionModel $permissionModel
      */
     public function __construct(RoleModel $roleModel, PermissionModel $permissionModel) {
         $this->roleModel = $roleModel;

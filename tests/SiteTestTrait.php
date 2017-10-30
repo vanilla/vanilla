@@ -26,7 +26,7 @@ trait SiteTestTrait {
     protected static $siteInfo;
 
     /**
-     * @var array The addons to install.
+     * @var array The addons to install. Restored on teardownAfterClass();
      */
     protected static $addons = ['vanilla', 'conversations', 'stubcontent'];
 
@@ -51,7 +51,6 @@ trait SiteTestTrait {
     public static function setupBeforeClass() {
         $dic = self::$container = static::createContainer();
 
-
         /* @var TestInstallModel $installer */
         $installer = $dic->get(TestInstallModel::class);
 
@@ -71,6 +70,7 @@ trait SiteTestTrait {
      * Cleanup the container after testing is done.
      */
     public static function teardownAfterClass() {
+        self::$addons = ['vanilla', 'conversations', 'stubcontent'];
         Bootstrap::cleanup(self::container());
     }
 

@@ -121,9 +121,8 @@ class RolesApiController extends AbstractApiController {
             }
 
             $result[$name] = $val;
-            unset($currentPerm, $pass, $fail);
+            unset($currentPerm, $pass);
         }
-        unset($perms);
 
         return $result;
     }

@@ -17,13 +17,20 @@ use PDO;
  * Handles installing Vanilla.
  */
 class InstallModel {
+    /** @var array  */
     protected static $DEFAULT_ADDONS = ['vanilla', 'conversations', 'stubcontent'];
 
+    /** @var \Gdn_Configuration  */
     protected $config;
 
+    /** @var AddonModel  */
     protected $addonModel;
 
+    /** @var ContainerInterface  */
     protected $container;
+
+    /** @var \Gdn_Session  */
+    protected $session;
 
     /**
      * InstallModel constructor.
@@ -32,17 +39,25 @@ class InstallModel {
      * @param AddonModel $addonModel The addon model dependency used to enable installation addons.
      * @param ContainerInterface $container The container used to create additional dependencies once they are enabled.
      */
-    public function __construct(\Gdn_Configuration $config, AddonModel $addonModel, ContainerInterface $container) {
+    public function __construct(
+        \Gdn_Configuration $config,
+        AddonModel $addonModel,
+        ContainerInterface $container,
+        \Gdn_Session $session
+    ) {
         $this->config = $config;
         $this->addonModel = $addonModel;
         $this->container = $container;
+        $this->session = $session;
     }
 
     /**
      * Install Vanilla.
      *
-     * @param array $data Database installation information.
      * @see InstallModel::getSchema()
+     * @throws \Exception
+     * @param array $data Database installation information.
+     * @return array
      */
     public function install(array $data) {
         $data = $this->validate($data);
@@ -86,6 +101,14 @@ class InstallModel {
             'Email' => $data['admin']['email'],
             'Password' => $data['admin']['password']
         ]);
+
+        // Make sure that we install the addons as the admin user.
+        if (!$this->session->isValid()) {
+            $oldConfigValue = $this->config->get('Garden.Installed');
+            $this->config->set('Garden.Installed', true);
+            $this->session->start($adminUserID, false);
+            $this->config->set('Garden.Installed', $oldConfigValue);
+        }
 
         // Run through the addons.
         $data += ['addons' => static::$DEFAULT_ADDONS];

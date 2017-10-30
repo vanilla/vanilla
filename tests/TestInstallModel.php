@@ -28,8 +28,14 @@ class TestInstallModel extends InstallModel {
     /**
      * {@inheritdoc}
      */
-    public function __construct(\Gdn_Configuration $config, AddonModel $addonModel, ContainerInterface $container, \Gdn_Request $request) {
-        parent::__construct($config, $addonModel, $container);
+    public function __construct(
+        \Gdn_Configuration $config,
+        AddonModel $addonModel,
+        ContainerInterface $container,
+        \Gdn_Request $request,
+        \Gdn_Session $session
+    ) {
+        parent::__construct($config, $addonModel, $container, $session);
         $this->setBaseUrl($request->url('/'));
 
         $this->config->Data = [];

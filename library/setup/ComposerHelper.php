@@ -31,6 +31,47 @@ class ComposerHelper {
                 unlink($path);
             }
         }
+
+        static::removeFolder("$cacheDir/ebi");
+    }
+
+    /**
+     * Remove a folder (and all the sub-folders and files).
+     * Taken from http://php.net/manual/en/function.rmdir.php
+     *
+     * @param string $Dir
+     * @return void
+     */
+    protected static function removeFolder($path) {
+        if (!file_exists($path)) {
+            return;
+        }
+
+        if (is_file($path)) {
+            unlink($path);
+            return;
+        }
+
+        $path = rtrim($path, '/').'/';
+
+        // Get all of the files in the directory.
+        if ($dh = opendir($path)) {
+            while (($file = readdir($dh)) !== false) {
+                if (trim($file, '.') == '') {
+                    continue;
+                }
+
+                $subPath = $path.$file;
+
+                if (is_dir($subPath)) {
+                    self::removeFolder($subPath);
+                } else {
+                    unlink($subPath);
+                }
+            }
+            closedir($dh);
+        }
+        rmdir($path);
     }
 
     /**

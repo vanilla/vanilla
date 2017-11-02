@@ -127,10 +127,10 @@ class AddonManager {
     /**
      *  Attempt to load undefined class based on the addons that are enabled.
      *
-     * @param string $fqClassName Fully qualified class name to load.
+     * @param string $fullClassName Fully qualified class name to load.
      */
-    public function autoload($fqClassName) {
-        $suppliedClassInfo = Addon::parseFullyQualifiedClass($fqClassName);
+    public function autoload($fullClassName) {
+        $suppliedClassInfo = Addon::parseFullyQualifiedClass($fullClassName);
         $classKey = strtolower($suppliedClassInfo['className']);
 
         if (isset($this->autoloadClasses[$classKey])) {
@@ -176,16 +176,17 @@ class AddonManager {
      *
      * This method should only be used with enabled addons as searching through all addons takes a performance hit.
      *
-     * @param string $fqClassName Fully qualified class name.
+     * @param string $fullClassName Fully qualified class name.
      * @param bool $searchAll Whether or not to search all addons or just the enabled ones.
      * @return Addon|null Returns an {@link Addon} object or **null** if one isn't found.
      */
-    public function lookupByClassname($fqClassName, $searchAll = false) {
-        $lookupClassInfo = Addon::parseFullyQualifiedClass($fqClassName);
+    public function lookupByClassName($fullClassName, $searchAll = false) {
+        $lookupClassInfo = Addon::parseFullyQualifiedClass($fullClassName);
         $classKey = strtolower($lookupClassInfo['className']);
+        $nameSpace = $lookupClassInfo['namespace'];
 
-        if (isset($this->autoloadClasses[$classKey])) {
-            return reset($this->autoloadClasses[$classKey])['addon'];
+        if ($addon = valr("$classKey.$nameSpace.addon", $this->autoloadClasses)) {
+            return $addon;
         } elseif ($searchAll) {
             foreach ($this->lookupAllByType(Addon::TYPE_ADDON) as $addon) {
                 /* @var Addon $addon */

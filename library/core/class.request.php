@@ -10,6 +10,7 @@
  * @since 2.0
  */
 use Garden\Web\RequestInterface;
+use Vanilla\UploadedFile;
 
 /**
  * Represents a Request to the application, typically from the browser but potentially generated internally, in a format
@@ -1138,6 +1139,64 @@ class Gdn_Request implements RequestInterface {
     }
 
     /**
+     * Parse a PHP file array into a normalized array of UploadedFile objects.
+     *
+     * @param array $files A file array (e.g. $_FILES).
+     * @return array
+     */
+    private function parseFiles(array $files) {
+        /**
+         * Normalize a multidimensional upload array (e.g. my-form[details][avatars][]).
+         *
+         * @param array $files
+         * @return array
+         */
+        $normalizeArray = function(array $files) use (&$getUpload) {
+            $result = [];
+            foreach ($files['tmp_name'] as $key => $val) {
+                // Consolidate the attributes and push them down the tree.
+                $result[$key] = $getUpload([
+                    'error' => $files['error'][$key],
+                    'name' => $files['name'][$key],
+                    'size' => $files['size'][$key],
+                    'tmp_name' => $files['tmp_name'][$key],
+                    'type' => $files['type'][$key]
+                ]);
+            }
+            return $result;
+        };
+
+        /**
+         * Create an instance of UploadedFile, or an array of instances, from a file array.
+         *
+         * @param array $value
+         * @return array|UploadedFile
+         */
+        $getUpload = function(array $value) use (&$normalizeArray) {
+            if (is_array($value['tmp_name'])) {
+                // We need to go deeper.
+                $result = $normalizeArray($value);
+            } else {
+                $result = new UploadedFile(
+                    $value['tmp_name'],
+                    $value['size'],
+                    $value['error'],
+                    $value['name'],
+                    $value['type']
+                );
+            }
+
+            return $result;
+        };
+
+        $result = [];
+        foreach ($files as $key => $value) {
+            $result[$key] = $getUpload($value);
+        }
+        return $result;
+    }
+
+    /**
      * Attach an array of request arguments to the request.
      *
      * @param int $paramsType type of data to import. One of the self::INPUT_* constants
@@ -1151,7 +1210,7 @@ class Gdn_Request implements RequestInterface {
                 break;
 
             case self::INPUT_POST:
-                $argumentData = $this->decodePost($_POST, $_SERVER, 'php://input');
+                $argumentData = $this->decodePost($_POST, $_SERVER, 'php://input', $_FILES);
                 break;
 
             case self::INPUT_SERVER:
@@ -1185,7 +1244,7 @@ class Gdn_Request implements RequestInterface {
      * @param array $server Usually the {@link $_SERVER} super-global.
      * @param string $inputFile Usually **php://input** for the raw input stream.
      */
-    private function decodePost($post, $server, $inputFile = 'php://input') {
+    private function decodePost($post, $server, $inputFile = 'php://input', $files = null) {
         $contentType = !isset($server['CONTENT_TYPE']) ? 'application/x-www-form-urlencoded' : $server['CONTENT_TYPE'];
 
         if (stripos($contentType, 'application/json') !== false || stripos($contentType, 'text/plain') !== false) {
@@ -1197,6 +1256,12 @@ class Gdn_Request implements RequestInterface {
             }
         } else {
             $result = $post;
+        }
+
+        // Add data from the PHP files array.
+        if (is_array($files)) {
+            $fileData = $this->parseFiles($files);
+            $result = array_merge($fileData, $result);
         }
 
         return $result;

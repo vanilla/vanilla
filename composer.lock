@@ -606,16 +606,16 @@
         },
         {
             "name": "symfony/expression-language",
-            "version": "v103.2.7",
+            "version": "v103.2.8",
             "source": {
                 "type": "git",
                 "url": "https://github.com/vanilla/expression-language.git",
-                "reference": "b17e4b83989f021f38cc7c0db980988b94b0e276"
+                "reference": "439fb9bf041502725654dd1ef1798f82a0d6dbd6"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/vanilla/expression-language/zipball/b17e4b83989f021f38cc7c0db980988b94b0e276",
-                "reference": "b17e4b83989f021f38cc7c0db980988b94b0e276",
+                "url": "https://api.github.com/repos/vanilla/expression-language/zipball/439fb9bf041502725654dd1ef1798f82a0d6dbd6",
+                "reference": "439fb9bf041502725654dd1ef1798f82a0d6dbd6",
                 "shasum": ""
             },
             "require": {
@@ -652,9 +652,9 @@
             "description": "Symfony ExpressionLanguage Component",
             "homepage": "https://symfony.com",
             "support": {
-                "source": "https://github.com/vanilla/expression-language/tree/master"
+                "source": "https://github.com/vanilla/expression-language/tree/v103.2.8"
             },
-            "time": "2017-04-09T14:26:03+00:00"
+            "time": "2017-11-01T20:39:19+00:00"
         },
         {
             "name": "symfony/polyfill-apcu",
@@ -821,16 +821,16 @@
         },
         {
             "name": "vanilla/ebi",
-            "version": "v0.3.3",
+            "version": "v0.3.4",
             "source": {
                 "type": "git",
                 "url": "https://github.com/vanilla/ebi.git",
-                "reference": "76160ac5e0c1360f47f817c806ed830b8198820c"
+                "reference": "8ce59e9ee774013293dd7e2f5d11d0253e0e41ed"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/vanilla/ebi/zipball/76160ac5e0c1360f47f817c806ed830b8198820c",
-                "reference": "76160ac5e0c1360f47f817c806ed830b8198820c",
+                "url": "https://api.github.com/repos/vanilla/ebi/zipball/8ce59e9ee774013293dd7e2f5d11d0253e0e41ed",
+                "reference": "8ce59e9ee774013293dd7e2f5d11d0253e0e41ed",
                 "shasum": ""
             },
             "require": {
@@ -839,7 +839,8 @@
             },
             "require-dev": {
                 "bobthecow/faker": "dev-master",
-                "symfony/yaml": "^3.2"
+                "symfony/yaml": "^3.2",
+                "vanilla/htmlawed": "v2.2.4.1"
             },
             "type": "library",
             "autoload": {
@@ -858,7 +859,7 @@
                 }
             ],
             "description": "A template engine made with HTML.",
-            "time": "2017-10-27T20:10:50+00:00"
+            "time": "2017-10-30T21:57:28+00:00"
         },
         {
             "name": "vanilla/garden-container",

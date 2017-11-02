@@ -61,6 +61,42 @@ class RequestTest extends \PHPUnit\Framework\TestCase {
         $this->assertSame($req->getBody(), $req->getRequestArguments(Gdn_Request::INPUT_POST));
     }
 
+    /**
+     * Test that submitted files are properly merged into the POST array.
+     */
+    public function testFilesAsPost() {
+        // Backup the superglobals.
+        $post = $_POST;
+        $files = $_FILES;
+
+        $_FILES = [
+            'MyFile' => [
+                'error' => UPLOAD_ERR_OK,
+                'name' => 'MyFile.txt',
+                'size' => 10,
+                'tmp_name' => '/tmp/php/php123',
+                'type' => 'text/plain'
+            ],
+            'Foo' => [
+                'error' => UPLOAD_ERR_OK,
+                'name' => 'bar.jpg',
+                'size' => 1024,
+                'tmp_name' => '/tmp/php/php456',
+                'type' => 'image/jpeg'
+            ]
+        ];
+        $_POST = ['Foo' => 'Bar'];
+
+        $request = Gdn_Request::create()->fromEnvironment();
+
+        // Put everything back like we found it.
+        $_POST = $post;
+        $_FILES = $files;
+
+        $this->assertInstanceOf(\Vanilla\UploadedFile::class, $request->post('MyFile'));
+        $this->assertNotInstanceOf(\Vanilla\UploadedFile::class, $request->post('Foo'), 'POST value overwritten by file.');
+    }
+
     public function testGetUrl() {
         $request = new Gdn_Request();
         $request->setScheme('http');
@@ -227,6 +263,54 @@ class RequestTest extends \PHPUnit\Framework\TestCase {
 
         $req->port(8080);
         $this->assertSame($req->getPort(), $req->port());
+    }
+
+    /**
+     * Test that the files array is normalized when merged into the POST array.
+     */
+    public function testPostFileNormalization() {
+        // Backup the superglobals.
+        $files = $_FILES;
+
+        // This format represents what might come in from a form using input fields named "MyForm[Details][Avatars][]"
+        $_FILES = [
+            'MyForm' => [
+                'tmp_name' => [
+                    'Details' => [
+                        'Avatar' => ['/tmp/php/abc123', '/tmp/php/xyz890']
+                    ]
+                ],
+                'name' => [
+                    'Details' => [
+                        'Avatar' => ['AvatarOne', 'AvatarTwo']
+                    ]
+                ],
+                'size' => [
+                    'Details' => [
+                        'Avatar' => [100, 110]
+                    ]
+                ],
+                'type' => [
+                    'Details' => [
+                        'Avatar' => ['image/jpeg', 'image/jpeg']
+                    ]
+                ],
+                'error' => [
+                    'Details' => [
+                        'Avatar' => [UPLOAD_ERR_OK, UPLOAD_ERR_OK]
+                    ]
+                ]
+            ]
+        ];
+
+        $request = Gdn_Request::create()->fromEnvironment();
+
+        // Put everything back like we found it.
+        $_FILES = $files;
+
+        $formFiles = $request->post('MyForm');
+        $this->assertInstanceOf(\Vanilla\UploadedFile::class, $formFiles['Details']['Avatar'][0]);
+        $this->assertInstanceOf(\Vanilla\UploadedFile::class, $formFiles['Details']['Avatar'][1]);
     }
 
     public function testQueryEquivalence() {

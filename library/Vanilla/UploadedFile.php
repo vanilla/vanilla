@@ -1,4 +1,9 @@
 <?php
+/**
+ * @copyright 2009-2017 Vanilla Forums Inc.
+ * @license GNU GPLv2
+ */
+
 namespace Vanilla;
 
 use Gdn;

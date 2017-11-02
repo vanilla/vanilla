@@ -1,8 +1,11 @@
 <?php if (!defined('APPLICATION')) return;
 
+$Sender->EventArguments['DisableEmail'] = false;
+$Sender->fireAs('ProfileController')->fireEvent('BeforeCategoryNotificationPreferences');
+
 // If email is disabled, do not show those options.
-$emailClass = (c('Garden.Email.Disabled')) ? ' Hidden' : '';
-$span = (c('Garden.Email.Disabled')) ? '1' : '2';
+$emailClass = (c('Garden.Email.Disabled', $Sender->EventArguments['DisableEmail'])) ? ' Hidden' : '';
+$span = (c('Garden.Email.Disabled', $Sender->EventArguments['DisableEmail'])) ? '1' : '2';
 
 ?>
 <h2><?php echo t('Category Notifications'); ?></h2>

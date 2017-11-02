@@ -133,19 +133,7 @@ class EbiTemplateLoader implements TemplateLoaderInterface {
      * @return Addon[] Returns an array of addons.
      */
     public function searchAddons(Addon $base = null) {
-        $result = [];
-
-        for ($addon = $this->addonManager->getTheme();
-            $addon !== null;
-            $addon->getInfoValue('parent') && $addon = $this->addonManager->lookupTheme($addon->getInfoValue('parent'))) {
-
-            // Prevent infinite loops.
-            if (in_array($addon, $result)) {
-                break;
-            }
-
-            $result[] = $addon;
-        }
+        $result = $this->getThemeChain();
 
         if ($addon = $base ?: $this->getCurrentAddon()) {
             $result[] = $addon;
@@ -233,5 +221,27 @@ class EbiTemplateLoader implements TemplateLoaderInterface {
      */
     public function getAddonManager() {
         return $this->addonManager;
+    }
+
+    /**
+     * Get the current theme and its ancestors as an array.
+     *
+     * @return Addon[] Returns an array of addons.
+     */
+    public function getThemeChain() {
+        $result = [];
+
+        for ($addon = $this->addonManager->getTheme();
+             $addon !== null;
+             $addon->getInfoValue('parent') && $addon = $this->addonManager->lookupTheme($addon->getInfoValue('parent'))) {
+
+            // Prevent infinite loops.
+            if (in_array($addon, $result)) {
+                break;
+            }
+
+            $result[] = $addon;
+        }
+        return $result;
     }
 }

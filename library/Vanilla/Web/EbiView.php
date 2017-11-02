@@ -44,6 +44,7 @@ class EbiView implements ViewInterface {
         $ebi->setMeta('locale', $locale);
         $ebi->setMeta('device', ['type' => userAgentType(), 'mobile' => isMobile()]);
         $ebi->setMeta('request', ['query' => $request->getQuery()]);
+        $ebi->setMeta('theme', $this->getThemeConfig($ebi->getTemplateLoader()));
 
         // Add custom components.
         $ebi->defineComponent('asset', function ($props) use ($ebi) {
@@ -151,6 +152,29 @@ class EbiView implements ViewInterface {
         $argsStr = implode(', ', $jsonArgs);
 
         echo "\n<script>console.$method($argsStr);</script>\n";
+    }
+
+    /**
+     * Get the theme.json config file from the current theme and parent themes.
+     *
+     * @param EbiTemplateLoader $loader The template loader used to traverse the theme chain.
+     * @return array Returns the theme config array.
+     */
+    private function getThemeConfig(EbiTemplateLoader $loader) {
+        $themes = array_reverse($loader->getThemeChain());
+        $result = [];
+        foreach ($themes as $theme) {
+            /* @var Addon $theme */
+            $path = $theme->path('theme.json');
+            if (file_exists($path)) {
+                $data = json_decode(file_get_contents($path), true);
+
+                if (!empty($data) && is_array($data)) {
+                    $result = arrayReplaceConfig($result, $data);
+                }
+            }
+        }
+        return $result;
     }
 
     /**

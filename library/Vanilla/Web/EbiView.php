@@ -99,6 +99,19 @@ class EbiView implements ViewInterface {
             return '#not-found';
         };
         $ebi->defineFunction('assetUrl', $fn);
+        $ebi->defineFunction('category', function ($category) {
+            if (is_numeric($category)) {
+                $category = \CategoryModel::categories($category);
+            }
+            $result = arrayTranslate($category, [
+                'CategoryID' => 'categoryID',
+                'Name' => 'name',
+                'Description' => 'description',
+            ]);
+
+            $result['url'] = url($category['Url'], true);
+            return $result;
+        });
         $ebi->defineFunction('categoryUrl');
         $ebi->defineFunction('commentUrl');
         $ebi->defineFunction('discussionUrl');

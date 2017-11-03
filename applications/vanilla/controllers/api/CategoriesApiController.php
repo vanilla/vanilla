@@ -125,9 +125,13 @@ class CategoriesApiController extends AbstractApiController {
                 'minLength' => 0,
                 'allowNull' => true
             ],
-            'parentCategoryID:i' => 'Parent category ID.',
+            'parentCategoryID:i|n' => 'Parent category ID.',
             'urlCode:s' => 'The URL code of the category.',
             'url:s' => 'The URL to the category.',
+            'displayAs:s' => [
+                'description' => 'The display style of the category.',
+//                'enum' => ['categories', 'discussions', 'flat', 'heading']
+            ],
             'countCategories:i' => 'Total number of child categories.',
             'countDiscussions:i' => 'Total discussions in the category.',
             'countComments:i' => 'Total comments in the category.',
@@ -285,6 +289,8 @@ class CategoriesApiController extends AbstractApiController {
         } else {
             $categories = $this->categoryModel->getTree($parent['CategoryID'], ['maxdepth' => $query['maxDepth']]);
         }
+        array_walk($categories, [$this, 'prepareRow']);
+
 
         return $out->validate($categories);
     }
@@ -365,6 +371,11 @@ class CategoriesApiController extends AbstractApiController {
             $row['ParentCategoryID'] = null;
         }
         $row['Description'] = $row['Description'] ?: '';
+        $row['DisplayAs'] = strtolower($row['DisplayAs']);
+
+        if (!empty($row['Children']) && is_array($row['Children'])) {
+            array_walk($row['Children'], [$this, 'prepareRow']);
+        }
     }
 
     /**

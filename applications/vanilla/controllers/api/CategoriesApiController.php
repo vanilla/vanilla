@@ -83,6 +83,7 @@ class CategoriesApiController extends AbstractApiController {
         if (empty($category)) {
             throw new NotFoundException('Category');
         }
+        $this->prepareRow($category);
         return $category;
     }
 
@@ -130,7 +131,7 @@ class CategoriesApiController extends AbstractApiController {
             'url:s' => 'The URL to the category.',
             'displayAs:s' => [
                 'description' => 'The display style of the category.',
-//                'enum' => ['categories', 'discussions', 'flat', 'heading']
+                'enum' => ['categories', 'discussions', 'flat', 'heading']
             ],
             'countCategories:i' => 'Total number of child categories.',
             'countDiscussions:i' => 'Total discussions in the category.',

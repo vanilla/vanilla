@@ -508,7 +508,7 @@ if (!function_exists('validateEnum')) {
      * @return bool Returns true of the value is valid or false otherwise.
      */
     function validateEnum($value, $field) {
-        return (in_array($value, $field->Enum) || ($field->AllowNull && !validateRequired($value)));
+        return (inArrayI($value, $field->Enum) || ($field->AllowNull && !validateRequired($value)));
     }
 }
 

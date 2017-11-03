@@ -49,7 +49,7 @@ class CategoriesApiController extends AbstractApiController {
      */
     public function categoryPostSchema($type = '', array $extra = []) {
         if ($this->categoryPostSchema === null) {
-            $fields = ['name', 'parentCategoryID', 'urlCode'];
+            $fields = ['name', 'parentCategoryID?', 'urlCode', 'displayAs?'];
             $this->categoryPostSchema = $this->schema(
                 Schema::parse(array_merge($fields, $extra))->add($this->schemaWithParent()),
                 'CategoryPost'
@@ -131,7 +131,8 @@ class CategoriesApiController extends AbstractApiController {
             'url:s' => 'The URL to the category.',
             'displayAs:s' => [
                 'description' => 'The display style of the category.',
-                'enum' => ['categories', 'discussions', 'flat', 'heading']
+                'enum' => ['categories', 'discussions', 'flat', 'heading'],
+                'default' => 'discussions'
             ],
             'countCategories:i' => 'Total number of child categories.',
             'countDiscussions:i' => 'Total discussions in the category.',
@@ -173,7 +174,7 @@ class CategoriesApiController extends AbstractApiController {
 
         $in = $this->idParamSchema()->setDescription('Get a category for editing.');
         $out = $this->schema(Schema::parse([
-            'categoryID', 'name', 'parentCategoryID', 'urlCode', 'description'
+            'categoryID', 'name', 'parentCategoryID', 'urlCode', 'description', 'displayAs'
         ])->add($this->fullSchema()), 'out');
 
         $row = $this->category($id);

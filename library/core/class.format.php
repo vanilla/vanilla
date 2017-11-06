@@ -2170,7 +2170,9 @@ EOT;
      * @return string|bool Returns FALSE upon failure.
      */
     public static function toTimestamp($dateTime = '') {
-        if ($dateTime === '0000-00-00 00:00:00') {
+        if ($dateTime instanceof \DateTimeInterface) {
+            return $dateTime->getTimestamp();
+        } elseif ($dateTime === '0000-00-00 00:00:00') {
             return false;
         } elseif (($testTime = strtotime($dateTime)) !== false) {
             return $testTime;

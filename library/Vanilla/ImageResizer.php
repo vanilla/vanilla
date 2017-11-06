@@ -24,6 +24,101 @@ class ImageResizer {
     ];
 
     /**
+     * Resize an image.
+     *
+     * @param string $source The path of the source image.
+     * @param string $destination The path of the destination image.
+     * @param array $options An array of options constraining the image crop.
+     *
+     * - width: The max width of the destination image.
+     * - height: The max height of the destination image.
+     * - crop: Whether or not to crop the image to maintain the aspect ratio.
+     * @return array Returns an array containing the resize information.
+     */
+    public function resize($source, $destination, array $options) {
+        if (!file_exists($source)) {
+            throw new \InvalidArgumentException("Source file \"$source\" does not exist.", 400);
+        }
+
+        list($width, $height, $srcType) = getimagesize($source);
+        if (!in_array($srcType, [IMAGETYPE_GIF, IMAGETYPE_JPEG, IMAGETYPE_PNG])) {
+            if (isset(self::$typeExt[$srcType])) {
+                $srcType = self::$typeExt[$srcType];
+            }
+            throw new \InvalidArgumentException("Cannot resize images of this type ($srcType)");
+        }
+
+        if (pathinfo($destination, PATHINFO_EXTENSION) === '*') {
+            $destination = substr($destination, 0, -1).self::$typeExt[$srcType];
+        }
+
+        // Check for EXIF rotation tag, and rotate the image if present
+        if (function_exists('exif_read_data') && in_array($srcType, [IMAGETYPE_JPEG, IMAGETYPE_TIFF_II, IMAGETYPE_TIFF_MM], true)) {
+            try {
+                $exif = exif_read_data($source);
+                if (!empty($exif['Orientation'])) {
+                    switch ($exif['Orientation']) {
+                        case 6:
+                        case 8:
+                            list($width, $height) = [$height, $width];
+                            break;
+                    }
+                }
+            } catch (\Exception $ex) {
+                $exif = null;
+            }
+        }
+
+        $resize = $this->calculateResize(['height' => $height, 'width' => $width], $options);
+        $destType = $this->imageTypeFromExt($destination);
+
+        try {
+            $srcImage = $this->createImage($source, $srcType);
+            if (!empty($exif['Orientation'])) {
+                switch ($exif['Orientation']) {
+                    case 3:
+                        $srcImage = imagerotate($srcImage, 180, 0);
+                        break;
+                    case 6:
+                        $srcImage = imagerotate($srcImage, -90, 0);
+                        break;
+                    case 8:
+                        $srcImage = imagerotate($srcImage, 90, 0);
+                        break;
+                }
+            }
+
+            $destImage = imagecreatetruecolor($resize['width'], $resize['height']);
+
+            imagecopyresampled(
+                $destImage,
+                $srcImage,
+                0,
+                0,
+                $resize['sourceX'],
+                $resize['sourceY'],
+                $resize['width'],
+                $resize['height'],
+                $resize['sourceWidth'],
+                $resize['sourceHeight']
+            );
+            imagedestroy($srcImage); // destroy ASAP
+
+            $this->saveImage($destImage, $destination, $destType, $resize);
+        } finally {
+            if (is_resource($srcImage)) {
+                imagedestroy($srcImage);
+            }
+            if (is_resource($destImage)) {
+                imagedestroy($destImage);
+            }
+        }
+
+        $resize['path'] = $destination;
+        return $resize;
+    }
+
+    /**
      * Calculate an image crop based on source image information and options.
      *
      * @param array $source Information about the source image. It should have the following keys:
@@ -140,101 +235,6 @@ class ImageResizer {
     }
 
     /**
-     * Resize an image.
-     *
-     * @param string $source The path of the source image.
-     * @param string $destination The path of the destination image.
-     * @param array $options  An array of options constraining the image crop.
-     *
-     * - width: The max width of the destination image.
-     * - height: The max height of the destination image.
-     * - crop: Whether or not to crop the image to maintain the aspect ratio.
-     * @return array Returns an array containing the resize information.
-     */
-    public function resize($source, $destination, array $options) {
-        if (!file_exists($source)) {
-            throw new \InvalidArgumentException("Source file \"$source\" does not exist.", 400);
-        }
-
-        list($width, $height, $srcType) = getimagesize($source);
-        if (!in_array($srcType, [IMAGETYPE_GIF, IMAGETYPE_JPEG, IMAGETYPE_PNG])) {
-            if (isset(self::$typeExt[$srcType])) {
-                $srcType = self::$typeExt[$srcType];
-            }
-            throw new \InvalidArgumentException("Cannot resize images of this type ($srcType)");
-        }
-
-        if (pathinfo($destination, PATHINFO_EXTENSION) === '*') {
-            $destination = substr($destination, 0, -1).self::$typeExt[$srcType];
-        }
-
-        // Check for EXIF rotation tag, and rotate the image if present
-        if (function_exists('exif_read_data') && in_array($srcType, [IMAGETYPE_JPEG, IMAGETYPE_TIFF_II, IMAGETYPE_TIFF_MM], true)) {
-            try {
-                $exif = exif_read_data($source);
-                if (!empty($exif['Orientation'])) {
-                    switch ($exif['Orientation']) {
-                        case 6:
-                        case 8:
-                            list($width, $height) = [$height, $width];
-                            break;
-                    }
-                }
-            } catch (\Exception $ex) {
-                $exif = null;
-            }
-        }
-
-        $resize = $this->calculateResize(['height' => $height, 'width' => $width], $options);
-        $destType = $this->imageTypeFromExt($destination);
-
-        try {
-            $srcImage = $this->createImage($source, $srcType);
-            if (!empty($exif['Orientation'])) {
-                switch ($exif['Orientation']) {
-                    case 3:
-                        $srcImage = imagerotate($srcImage, 180, 0);
-                        break;
-                    case 6:
-                        $srcImage = imagerotate($srcImage, -90, 0);
-                        break;
-                    case 8:
-                        $srcImage = imagerotate($srcImage, 90, 0);
-                        break;
-                }
-            }
-
-            $destImage = imagecreatetruecolor($resize['width'], $resize['height']);
-
-            imagecopyresampled(
-                $destImage,
-                $srcImage,
-                0,
-                0,
-                $resize['sourceX'],
-                $resize['sourceY'],
-                $resize['width'],
-                $resize['height'],
-                $resize['sourceWidth'],
-                $resize['sourceHeight']
-            );
-            imagedestroy($srcImage); // destroy ASAP
-
-            $this->saveImage($destImage, $destination, $destType, $resize);
-        } finally {
-            if (is_resource($srcImage)) {
-                imagedestroy($srcImage);
-            }
-            if (is_resource($destImage)) {
-                imagedestroy($destImage);
-            }
-        }
-
-        $resize['path'] = $destination;
-        return $resize;
-    }
-
-    /**
      * Get the image type from a file extension.
      *
      * This is a convenience method for looking up an image based on a mapping of file extension names to image types.
@@ -253,6 +253,40 @@ class ImageResizer {
             return $type;
         }
         throw new \InvalidArgumentException("Unknown image type for extension '$ext'.", 400);
+    }
+
+    /**
+     * Create a GD image according to type.
+     *
+     * @param string $path The path of the image.
+     * @param int $type One of the __IMAGETYPE_*__ constants.
+     * @return resource Returns a GD resource of the image.
+     * @throws \Exception Throws an exception if **$type** not a recognized type.
+     */
+    private function createImage($path, $type) {
+        switch ($type) {
+            case IMAGETYPE_WBMP:
+                $r = imagecreatefromwbmp($path);
+                break;
+            case IMAGETYPE_GIF:
+                $r = imagecreatefromgif($path);
+                break;
+            case IMAGETYPE_JPEG:
+                $r = imagecreatefromjpeg($path);
+                break;
+            case IMAGETYPE_PNG:
+                $r = imagecreatefrompng($path);
+                imagealphablending($r, true);
+                break;
+            default:
+                $type = isset(self::$typeExt[$type]) ? self::$typeExt[$type] : $type;
+
+                throw new \InvalidArgumentException("Could not create image. Invalid type '$type'.", 400);
+        }
+        if ($r === false) {
+            throw new \Exception("Could not load image.");
+        }
+        return $r;
     }
 
     /**
@@ -318,39 +352,5 @@ class ImageResizer {
         } finally {
             unlink($tmpPath);
         }
-    }
-
-    /**
-     * Create a GD image according to type.
-     *
-     * @param string $path The path of the image.
-     * @param int $type One of the __IMAGETYPE_*__ constants.
-     * @return resource Returns a GD resource of the image.
-     * @throws \Exception Throws an exception if **$type** not a recognized type.
-     */
-    private function createImage($path, $type) {
-        switch ($type) {
-            case IMAGETYPE_BMP:
-                $r = imagecreatefromwbmp($path);
-                break;
-            case IMAGETYPE_GIF:
-                $r = imagecreatefromgif($path);
-                break;
-            case IMAGETYPE_JPEG:
-                $r = imagecreatefromjpeg($path);
-                break;
-            case IMAGETYPE_PNG:
-                $r = imagecreatefrompng($path);
-                imagealphablending($r, true);
-                break;
-            default:
-                $type = isset(self::$typeExt[$type]) ? self::$typeExt[$type] : $type;
-
-                throw new \InvalidArgumentException("Could not create image. Invalid type '$type'.", 400);
-        }
-        if ($r === false) {
-            throw new \Exception("Could not load image.");
-        }
-        return $r;
     }
 }

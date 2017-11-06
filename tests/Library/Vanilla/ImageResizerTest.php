@@ -31,6 +31,19 @@ class ImageResizerTest extends TestCase {
     }
 
     /**
+     * Test resize calculations with cropping.
+     *
+     * @param array $source The source dimensions of the image.
+     * @param array|null $expected The expected array.
+     * @dataProvider provideCalculateSampleCropTests
+     */
+    public function testCalculateSampleCrop(array $source, array $expected = null) {
+        $opts = ['width' => 150, 'height' => 100, 'crop' => true];
+
+        $this->assertCalculateResize($source, $opts, $expected ?: $opts);
+    }
+
+    /**
      * Calls **ImageResizer::calculateResize()** and asserts the result against an expected result.
      *
      * @param array $source The source argument for **calculateResize()**.
@@ -65,19 +78,6 @@ class ImageResizerTest extends TestCase {
         uksort($expected, $fn);
 
         $this->assertEquals($expected, $r);
-    }
-
-    /**
-     * Test resize calculations with cropping.
-     *
-     * @param array $source The source dimensions of the image.
-     * @param array|null $expected The expected array.
-     * @dataProvider provideCalculateSampleCropTests
-     */
-    public function testCalculateSampleCrop(array $source, array $expected = null) {
-        $opts = ['width' => 150, 'height' => 100, 'crop' => true];
-
-        $this->assertCalculateResize($source, $opts, $expected ?: $opts);
     }
 
     /**

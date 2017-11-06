@@ -230,14 +230,70 @@ label,
   }
 }
 
-// Handles case where there are more than one inputs in the input-wrap. i.e., a select and a button.
+
+// Input Groups (input-wrap-multiple)
+//
+// .input-wrap-multiple also works for other types of inputs. By default the inputs will take the same amount of space on the row.
+//
+// .input-wrap-1_3 - The first element will take 1/3 and the second 2/3 (only meant when there are 2 elements on row)
+// .input-wrap-2_3 - The first element will take 2/3 and the second 1/3 (only meant when there are 2 elements on row)
+//
+// Markup:
+// <form>
+//   <ul>
+//     <li class="form-group">
+//       <div class="label-wrap">
+//          <label>Checkbox field with multiple options</label>
+//          <div class="info">Info text for field</div>
+//       </div>
+//       <div class="input-wrap input-wrap-multiple {{modifier_class}}">
+//         <input type="number" value="0" min="0" class="form-control">
+//          <select class="form-control">
+//           <option value="hours">hours</option>
+//           <option value="days">days</option>
+//           <option value="weeks">weeks</option>
+//           <option value="months">months</option>
+//         </select>
+//       </div>
+//     </li>
+//   </ul>
+// </form>
+//
+// Styleguide 5.1.4.
+
+
 .input-wrap-multiple {
   display: flex;
 
   > *:not(:first-child) {
     margin-left: $spacer / 2;
   }
+
+
+  // Handles case where you want the first element to take 1/3 and the other 2/3
+  &.input-wrap-1_3 {
+    > * {
+      width: #{(100% * 2) / 3};
+    }
+
+    > *:first-child {
+      width: #{(100% / 3)};
+    }
+  }
+
+  // Handles case where you want the first element to take 2/3 and the other 1/3
+  &.input-wrap-2_3 {
+    > * {
+      width: #{(100% / 3)};
+    }
+
+    > *:first-child {
+      width: #{(100% * 2) / 3};
+    }
+  }
 }
+
+
 
 // Toggles
 //

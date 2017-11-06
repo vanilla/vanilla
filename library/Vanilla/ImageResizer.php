@@ -21,6 +21,7 @@ class ImageResizer {
         IMAGETYPE_TIFF_II => 'tiff',
         IMAGETYPE_TIFF_MM => 'tiff',
         IMAGETYPE_ICO => 'ico',
+        IMAGETYPE_WEBP => 'webp',
     ];
 
     /**
@@ -42,10 +43,8 @@ class ImageResizer {
 
         list($width, $height, $srcType) = getimagesize($source);
         if (!in_array($srcType, [IMAGETYPE_GIF, IMAGETYPE_JPEG, IMAGETYPE_PNG])) {
-            if (isset(self::$typeExt[$srcType])) {
-                $srcType = self::$typeExt[$srcType];
-            }
-            throw new \InvalidArgumentException("Cannot resize images of this type ($srcType)");
+            $ext = $this->extFromImageType($srcType);
+            throw new \InvalidArgumentException("Cannot resize images of this type ($ext).");
         }
 
         if (pathinfo($destination, PATHINFO_EXTENSION) === '*') {
@@ -244,7 +243,7 @@ class ImageResizer {
      * @param string $path The file path to examine.
      * @return int Returns one of the **IMAGETYPE_*** constants.
      */
-    private function imageTypeFromExt($path) {
+    public function imageTypeFromExt($path) {
         $ext = strtolower(pathinfo($path, PATHINFO_EXTENSION));
         if ($ext === 'jpeg') {
             return IMAGETYPE_JPEG;
@@ -279,14 +278,25 @@ class ImageResizer {
                 imagealphablending($r, true);
                 break;
             default:
-                $type = isset(self::$typeExt[$type]) ? self::$typeExt[$type] : $type;
+                $ext = $this->extFromImageType($type);
 
-                throw new \InvalidArgumentException("Could not create image. Invalid type '$type'.", 400);
+                throw new \InvalidArgumentException("Could not create image. Invalid type '$ext'.", 400);
         }
         if ($r === false) {
             throw new \Exception("Could not load image.");
         }
         return $r;
+    }
+
+    /**
+     * Get the file extension of an image type.
+     *
+     * @param int $type One of the __IMAGETYPE_*__ constants.
+     * @return string Returns the file extension or **$type** if it was not found.
+     */
+    public function extFromImageType($type) {
+        $ext = isset(self::$typeExt[$type]) ? self::$typeExt[$type] : (string)$type;
+        return $ext;
     }
 
     /**
@@ -312,7 +322,8 @@ class ImageResizer {
                 $this->saveIco($img, $path, $options);
                 break;
             default:
-                throw new \InvalidArgumentException("Could not save image. Invalid type '$type'.", 400);
+                $ext = self::extFromImageType($type);
+                throw new \InvalidArgumentException("Could not save image. Invalid type '$ext'.", 400);
         }
     }
 

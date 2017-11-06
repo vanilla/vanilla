@@ -199,18 +199,25 @@ class ImageResizerTest extends TestCase {
         $this->assertFileExists($r['path']);
 
         $size = getimagesize($r['path']);
-        list($dw, $dh) = $size;
+        list($dw, $dh, $type) = $size;
 
         $this->assertEquals($r['width'], $dw);
         $this->assertEquals($r['height'], $dh);
+        $this->assertEquals($resizer->imageTypeFromExt($r['path']), $type);
     }
 
+    /**
+     * Provide tests for **testResize()**.
+     *
+     * @return array Returns a data provider array.
+     */
     public function provideResizes() {
         $r = [
             [300, 300, 'png'],
             [300, 300, 'jpg'],
             [100, 100, 'png'],
             [100, 100, 'jpg'],
+            [100, 100, 'gif'],
             [32, 32, 'ico', ['icoSizes' => [16]]],
             [50, 100]
         ];

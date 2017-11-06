@@ -116,6 +116,7 @@ class EbiView implements ViewInterface {
         $ebi->defineFunction('commentUrl');
         $ebi->defineFunction('discussionUrl');
         $ebi->defineFunction('formatBigNumber', [\Gdn_Format::class, 'bigNumber']);
+        $ebi->defineFunction('formatHumanDate', [\Gdn_Format::class, 'date']);
         $ebi->defineFunction('formatSlug', [\Gdn_Format::class, 'url']);
         $ebi->defineFunction('meta', function ($name = null, $default = null) use ($ebi) {
             if ($name) {

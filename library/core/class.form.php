@@ -1843,12 +1843,12 @@ class Gdn_Form extends Gdn_Pluggable {
             );
         } else {
             $return .= $this->_nameAttribute($fieldName, $attributes);
+            if ($strength) {
+                $return .= ' data-strength="true"';
+            }
+            $return .= $this->_valueAttribute($fieldName, $attributes);
         }
 
-        if ($strength) {
-            $return .= ' data-strength="true"';
-        }
-        $return .= $this->_valueAttribute($fieldName, $attributes);
         $return .= $this->_attributesToString($attributes);
         $return .= ' />';
 

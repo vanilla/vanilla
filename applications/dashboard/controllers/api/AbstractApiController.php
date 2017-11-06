@@ -14,6 +14,11 @@ abstract class AbstractApiController extends \Vanilla\Web\Controller {
     private $userFragmentSchema;
 
     /**
+     * @var Schema
+     */
+    private $postFragmentSchema;
+
+    /**
      * Filter unwanted values from an array (particularly empty values from request parameters).
      *
      * @param array $values
@@ -57,6 +62,28 @@ abstract class AbstractApiController extends \Vanilla\Web\Controller {
             ], 'UserFragment');
         }
         return $this->userFragmentSchema;
+    }
+
+    /**
+     * Get the schema for posts joined to records.
+     *
+     * Posts are joined to categories and discussions, usually in the form of **firstPost** and **lastPost** fields.
+     *
+     * @return Schema Returns a schema.
+     */
+    public function getPostFragmentSchema() {
+        if ($this->postFragmentSchema === null) {
+            $this->postFragmentSchema = $this->schema([
+                'discussionID:i?' => 'The discussion ID of the post.',
+                'commentID:i?' => 'The comment ID of the post, if any.',
+                'name:s' => 'The title of the post.',
+                'url:s' => 'The URL of the post.',
+                'dateInserted:dt' => 'The date of the post.',
+                'insertUserID:i' => 'The author of the post.',
+                'insertUser?' => $this->getUserFragmentSchema(),
+            ], 'PostFragment');
+        }
+        return $this->postFragmentSchema;
     }
 
     public function options($path) {

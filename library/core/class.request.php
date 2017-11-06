@@ -1178,6 +1178,7 @@ class Gdn_Request implements RequestInterface {
                 $result = $normalizeArray($value);
             } else {
                 $result = new UploadedFile(
+                    Gdn::getContainer()->get(Gdn_Upload::class),
                     $value['tmp_name'],
                     $value['size'],
                     $value['error'],

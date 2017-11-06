@@ -6,9 +6,9 @@
 
 namespace Vanilla;
 
-use Gdn;
 use InvalidArgumentException;
 use RuntimeException;
+use Gdn_Upload;
 
 /**
  * Value object representing a file uploaded through an HTTP request.
@@ -33,16 +33,22 @@ class UploadedFile {
     /** @var int */
     private $size;
 
+    /** @var  Gdn_Upload */
+    private $uploadModel;
+
     /**
      * UploadedFile constructor.
      *
+     * @param Gdn_Upload $uploadModel
      * @param string $file
      * @param int $size
      * @param int $error
      * @param string|null $clientFileName
      * @param string|null $clientMediaType
      */
-    public function __construct($file, $size, $error, $clientFileName = null, $clientMediaType = null) {
+    public function __construct(Gdn_Upload $uploadModel, $file, $size, $error, $clientFileName = null, $clientMediaType = null) {
+        $this->uploadModel = $uploadModel;
+
         $this->setSize($size);
         $this->setError($error);
         $this->setClientFileName($clientFileName);
@@ -85,7 +91,7 @@ class UploadedFile {
         }
 
         try {
-            Gdn::getContainer()->get('Gdn_Upload')->saveAs($this->file, $targetPath);
+            $this->uploadModel->saveAs($this->file, $targetPath);
         } catch (\Exception $e) {
             throw new RuntimeException($e->getMessage(), $e->getCode());
         }

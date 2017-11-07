@@ -130,6 +130,7 @@ class EbiView implements ViewInterface {
             return json_encode($v, JSON_PRETTY_PRINT);
         });
         $ebi->defineFunction('pagerData', [$this, 'pagerData']);
+        $ebi->defineFunction('plural');
         $ebi->defineFunction('registerUrl');
         $ebi->defineFunction('signInUrl');
         $ebi->defineFunction('signOutUrl');

@@ -170,8 +170,9 @@ if (!function_exists('arrayTranslate')) {
                 continue;
             }
 
-            if (isset($array[$key])) {
-                $result[$newKey] = $array[$key];
+            if (valr($key, $array)) {
+                $result[$newKey] = valr($key, $array);
+                setvalr($key, $array, null);
                 unset($array[$key]);
             } else {
                 $result[$newKey] = null;

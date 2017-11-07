@@ -21,7 +21,6 @@ class ImageResizer {
         IMAGETYPE_TIFF_II => 'tiff',
         IMAGETYPE_TIFF_MM => 'tiff',
         IMAGETYPE_ICO => 'ico',
-        IMAGETYPE_WEBP => 'webp',
     ];
 
     /**

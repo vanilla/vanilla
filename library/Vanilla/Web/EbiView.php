@@ -129,6 +129,7 @@ class EbiView implements ViewInterface {
             jsonFilter($v);
             return json_encode($v, JSON_PRETTY_PRINT);
         });
+        $ebi->defineFunction('pagerData', [$this, 'pagerData']);
         $ebi->defineFunction('registerUrl');
         $ebi->defineFunction('signInUrl');
         $ebi->defineFunction('signOutUrl');
@@ -166,6 +167,87 @@ class EbiView implements ViewInterface {
         $argsStr = implode(', ', $jsonArgs);
 
         echo "\n<script>console.$method($argsStr);</script>\n";
+    }
+
+    /**
+     * Get the data that a pager component needs to build a pager.
+     *
+     * @param array $paging An array of paging options.
+     *
+     * - page: The current page.
+     * - pageCount: The total number of pages.
+     * - urlFormat: Required. A URL format where "%s" will be replaced with a page number.
+     * - more: Whether or not there are more records.
+     * @param int $maxPages The maximum number of pages to show.
+     */
+    public function pagerData($paging, $maxPages = 5) {
+        $paging += [
+            'page' => 0,
+            'pageCount' => null,
+            'urlFormat' => '?page=%s',
+            'more' => true
+        ];
+        $page = (int)$paging['page'];
+        $pageCount = $paging['pageCount'];
+        $hasMore = $page && $paging['more'] && (!$pageCount || $page < $pageCount);
+        $urlFormat = $paging['urlFormat'];
+        $result = [];
+        if ($page) {
+            $result['page'] = $page;
+        }
+
+        if ($page > 1) {
+            $result['previous'] = [
+                'type' => 'previous',
+                'url' => sprintf($urlFormat, $page - 1)
+            ];
+        }
+        if ($hasMore) {
+            $result['next'] = [
+                'type' => 'next',
+                'url' => sprintf($urlFormat, $page + 1)
+            ];
+        }
+
+        if ($pageCount) {
+            $result['pageCount'] = $pageCount;
+            if ($pageCount <= $maxPages) {
+                $groups = [[1, $pageCount]];
+            } else {
+                $groups = [[1, 1]];
+                $basis = $paging['page'] ?: 1;
+
+                if ($basis + $maxPages > $pageCount) {
+                    $groups[] = [$pageCount - $maxPages + 1, $pageCount];
+                } else {
+                    $groups[] = [$basis + 1, $basis + $maxPages - 2];
+                    $groups[] = [$pageCount, $pageCount];
+                }
+            }
+
+            $pages = [];
+            $last = 0;
+            foreach ($groups as $group) {
+                for ($i = $group[0]; $i <= $group[1]; $i++) {
+                    if ($i > $last + 1) {
+                        // Add an ellipsis between non-consecutive pages.
+                        $pages[] = [
+                            'type' => 'ellipsis'
+                        ];
+                    }
+                    $pages[] = [
+                        'type' => 'page',
+                        'url' => sprintf($urlFormat, $i),
+                        'page' => $i,
+                        'current' => $i === $page
+                    ];
+
+                    $last = $i;
+                }
+            }
+            $result['pages'] = $pages;
+        }
+        return $result;
     }
 
     /**

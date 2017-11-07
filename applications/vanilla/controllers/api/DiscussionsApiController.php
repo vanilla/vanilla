@@ -179,7 +179,8 @@ class DiscussionsApiController extends AbstractApiController {
             'url:s?' => 'The full URL to the discussion.',
             'lastPost?' => $this->getPostFragmentSchema(),
             'bookmarked:b' => 'Whether or not the discussion is bookmarked by the current user.',
-            'unread:b' => 'Whether or not the discussion should have an unread indicator.'
+            'unread:b' => 'Whether or not the discussion should have an unread indicator.',
+            'countUnread:i?' => 'The number of unread comments.',
         ]);
     }
 
@@ -222,7 +223,11 @@ class DiscussionsApiController extends AbstractApiController {
         }
 
         if ($this->getSession()->User) {
-            $row['unread'] = $row['CountUnreadComments'] !== 0 && ($row['CountUnreadComments'] !== true || dateCompare(val('DateFirstVisit', $this->getSession()->User), $row['DateInserted']) <= 0);
+            $row['unread'] = $row['CountUnreadComments'] !== 0
+                && ($row['CountUnreadComments'] !== true || dateCompare(val('DateFirstVisit', $this->getSession()->User), $row['DateInserted']) <= 0);
+            if ($row['CountUnreadComments'] !== true && $row['CountUnreadComments'] > 0) {
+                $row['countUnread'] = $row['CountUnreadComments'];
+            }
         } else {
             $row['unread'] = false;
         }

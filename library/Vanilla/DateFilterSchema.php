@@ -18,10 +18,10 @@ class DateFilterSchema extends Schema {
     private $dateRegEx = '(?<date>\d{4}-\d{2}-\d{2})(?<time>[ T]\d{2}:\d{2}(:\d{2})?)?';
 
     /** @var array Valid characters for opening an interval-notation range. */
-    private $intervalOpen = ['(', '['];
+    private $rangeOpen = ['(', '['];
 
     /** @var array Valid characters for closing an interval-notation range. */
-    private $intervalClose = [')', ']'];
+    private $rangeClose = [')', ']'];
 
     /** @var array Valid operators for simple date comparisons. */
     private $simpleOperators = ['=', '>', '<', '>=', '<='];
@@ -34,22 +34,7 @@ class DateFilterSchema extends Schema {
             throw new \InvalidArgumentException(self::class.' does not support custom schemas.');
         }
 
-        parent::__construct([
-            'type' => 'object',
-            'properties' => [
-                    'op:s' => [
-                        'enum' => ['=', '>', '<', '<=', '>=', '[]', '()', '[)', '(]']
-                ],
-                'value' => [
-                    'type' => ['datetime', 'array'],
-                    'items' => [
-                        'type' => 'datetime'
-                    ],
-                    'minItems' => 1,
-                    'maxItems' => 2
-                ]
-            ]
-        ]);
+        parent::__construct($schema);
     }
 
     /**
@@ -61,9 +46,9 @@ class DateFilterSchema extends Schema {
      * @param ValidationField $field
      * @return array|string
      */
-    private function parseInterval($dates, $open, $close, ValidationField $field) {
+    private function parseRange($dates, $open, $close, ValidationField $field) {
         // Quick sanity check on the values...
-        if (!in_array($open, $this->intervalOpen) || !in_array($close, $this->intervalClose)) {
+        if (!in_array($open, $this->rangeOpen) || !in_array($close, $this->rangeClose)) {
             return Invalid::value();
         } elseif (!is_string($dates)) {
             return Invalid::value();
@@ -91,6 +76,11 @@ class DateFilterSchema extends Schema {
             $dateTimeArray[1] = new DateTimeImmutable($dateArray[1]);
         } catch (\Exception $e) {
             $field->addTypeError('datetime');
+            return Invalid::value();
+        }
+
+        // Make sure the ending date isn't greater-than or equal-to the beginning date.
+        if ($dateTimeArray[0] >= $dateTimeArray[1]) {
             return Invalid::value();
         }
 
@@ -194,11 +184,11 @@ class DateFilterSchema extends Schema {
 
         if (is_string($value)) {
             $first = substr($value, 0, 1);
-            if (in_array($first, $this->intervalOpen)) {
+            if (in_array($first, $this->rangeOpen)) {
                 $last = substr($value, -1, 1);
-                if (in_array($last, $this->intervalClose) && strlen($value) > 2) {
+                if (in_array($last, $this->rangeClose) && strlen($value) > 2) {
                     $dates = substr($value, 1, -1);
-                    $result = $this->parseInterval($dates, $first, $last, $field);
+                    $result = $this->parseRange($dates, $first, $last, $field);
                 }
             } elseif (preg_match('/^(?<op><=|>=|>|<|)?\s*(?<value>'.$this->dateRegEx.')/i', $value, $match)) {
                 $result = $this->parseSimple($match['value'], $match['op'], $field);

@@ -8,7 +8,7 @@ A hero image can be fetched in 2 ways:
 ### PHP
 ```php
 if (class_exists('HeroImagePlugin')) {
-    $imageUrl = HeroImagePlugin::getHeroImageLink();
+    $imageUrl = HeroImagePlugin::getCurrentHeroImageLink();
 }
 ```
 

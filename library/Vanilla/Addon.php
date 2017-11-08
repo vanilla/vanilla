@@ -1191,7 +1191,7 @@ class Addon {
         $key = strtolower($classInfo['className']);
         if (array_key_exists($key, $this->classes)) {
             foreach($this->classes[$key] as $classData) {
-                if ($classInfo['namespace'] === $classData['namespace']) {
+                if (strtolower($classInfo['namespace']) === strtolower($classData['namespace'])) {
                     $path = $this->path($classData['path'], $relative);
                     return $path;
                 }

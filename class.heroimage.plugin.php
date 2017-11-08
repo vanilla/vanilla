@@ -65,6 +65,19 @@ class HeroImagePlugin extends Gdn_Plugin {
     }
 
     /**
+     * Get a fully qualified HeroImage link for the current category.
+     *
+     * @return string The URL to the category image. Will be empty if no slug could be found.
+     */
+    public static function getCurrentHeroImageLink() {
+        $categoryID = valr('Category.CategoryID', Gdn::controller());
+
+        $imageSlug = self::getHeroImageSlug($categoryID);
+        $url = $imageSlug ? Gdn_Upload::url($imageSlug) : '';
+        return $url;
+    }
+
+    /**
      * Handle the postback for the additional form field
      *
      * @param SettingsController $sender The settings controller

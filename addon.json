@@ -1,7 +1,7 @@
 {
     "key": "heroimage",
     "name": "Hero Image",
-    "description": "A plugin to add a hero image upload per category. Supports a default, inheritence from parents and overrides.",
+    "description": "A plugin to add a hero image upload per category. The image is accessible through the Smarty tag `{hero_image_url}`. Supports a default image and inheritence from parents.",
     "version": "1.0",
     "icon": "hero_image.png",
     "settingsUrl": "/settings/heroimage",

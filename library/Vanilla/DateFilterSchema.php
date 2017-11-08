@@ -30,14 +30,10 @@ class DateFilterSchema extends Schema {
     private $simpleOperators = ['=', '>', '<', '>=', '<='];
 
     /**
-     * {@inheritdoc}
+     * Initialize an instance of a new DateFilterSchema class.
      */
-    public function __construct(array $schema = []) {
-        if (!empty($schema)) {
-            throw new \InvalidArgumentException(self::class.' does not support custom schemas.');
-        }
-
-        parent::__construct($schema);
+    public function __construct() {
+        parent::__construct();
     }
 
     /**

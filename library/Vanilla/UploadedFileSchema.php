@@ -14,13 +14,9 @@ use Garden\Schema\ValidationException;
 class UploadedFileSchema extends Schema {
 
     /**
-     * {@inheritdoc}
+     * Initialize an instance of a new UploadedFileSchema class.
      */
-    public function __construct(array $schema = []) {
-        if (!empty($schema)) {
-            throw new \InvalidArgumentException(self::class.' does not support custom schemas.');
-        }
-
+    public function __construct() {
         parent::__construct([
             'id' => 'UploadedFile',
             'type' => 'string',

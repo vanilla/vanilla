@@ -2049,7 +2049,6 @@ class SettingsController extends DashboardController {
      * @param int|string $userIdentifier Either the username or user ID.
      */
     private function findBanRule($userIdentifier) {
-        $this->permission('Garden.Settings.Manage');
 
         $userModel = new UserModel();
 

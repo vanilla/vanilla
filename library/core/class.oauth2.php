@@ -709,7 +709,7 @@ class Gdn_OAuth2 extends Gdn_Plugin {
             val('ProfileKeyUniqueID', $provider, 'user_id') => 'UniqueID'
         ];
 
-        $profile = arrayTranslate($rawProfile, $translatedKeys, true);
+        $profile = self::translateArrayMulti($rawProfile, $translatedKeys, true);
 
         $profile['Provider'] = $this->providerKey;
 
@@ -863,7 +863,7 @@ class Gdn_OAuth2 extends Gdn_Plugin {
      *
      * @throws Exception.
      */
-    function requireVal($key, $arr, $context = null) {
+    public static function requireVal($key, $arr, $context = null) {
         $result = val($key, $arr);
         if (!$result) {
             throw new \Exception("Key {$key} missing from {$context} collection.", 500);
@@ -872,6 +872,58 @@ class Gdn_OAuth2 extends Gdn_Plugin {
     }
 
 
+    /**
+     * Allow admins to use dot notation to map values from multi-dimensional arrays.
+     *
+     * @param array $array The array from which we will extract values.
+     * @param array $mappings The map of keys where we will find the values in $array and the new keys we will assign to them.
+     * @param bool|false $addRemaining Tack on all the unmapped values of $array.
+     * @return array An array with the keys passed in $mappings with corresponding values from $array and all the remaining values of $array.
+     */
+    public static function translateArrayMulti($array, $mappings, $addRemaining = false) {
+        $array = (array)$array;
+        $result = [];
+        foreach ($mappings as $index => $value) {
+            if (is_numeric($index)) {
+                $key = $value;
+                $newKey = $value;
+            } else {
+                $key = $index;
+                $newKey = $value;
+            }
+
+            if ($newKey === null) {
+                unset($array[$key]);
+                continue;
+            }
+
+            if (valr($key, $array)) {
+                $result[$newKey] = valr($key, $array);
+                if (isset($array[$key])) {
+                    unset($array[$key]);
+                }
+            } else {
+                $result[$newKey] = null;
+            }
+        }
+
+        if ($addRemaining) {
+            foreach ($array as $key => $value) {
+                if (!isset($result[$key])) {
+                    $result[$key] = $value;
+                }
+            }
+        }
+        return $result;
+    }
+
+
+    /**
+     * When DB_Logger is turned on, log SSO data.
+     * 
+     * @param $message
+     * @param $data
+     */
     public function log($message, $data) {
         if (c('Vanilla.SSO.Debug')) {
             Logger::event(

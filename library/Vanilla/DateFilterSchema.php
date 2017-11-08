@@ -12,6 +12,9 @@ use Garden\Schema\Schema;
 use Garden\Schema\ValidationField;
 use Garden\Schema\ValidationException;
 
+/**
+ * Validate and parse a date filter string into an easy-to-use array representation.
+ */
 class DateFilterSchema extends Schema {
 
     /** @var string Regular expression for matching a datetime. */
@@ -49,14 +52,17 @@ class DateFilterSchema extends Schema {
     private function parseRange($dates, $open, $close, ValidationField $field) {
         // Quick sanity check on the values...
         if (!in_array($open, $this->rangeOpen) || !in_array($close, $this->rangeClose)) {
+            $field->addError('invalid', ['messageCode' => 'Invalid range format in {field}.']);
             return Invalid::value();
         } elseif (!is_string($dates)) {
+            $field->addTypeError('string');
             return Invalid::value();
         }
 
         // This notation only allows two dates, specifically.
         $dateArray = explode(',', $dates);
         if (count($dateArray) != 2) {
+            $field->addError('invalid', ['messageCode' => '{field} must be two datetime values.']);
             return Invalid::value();
         }
         array_walk($dateArray, 'trim');
@@ -64,7 +70,7 @@ class DateFilterSchema extends Schema {
         if (!preg_match("/{$this->dateRegEx}/i", $dateArray[0], $beginParts) ||
             !preg_match("/{$this->dateRegEx}/i", $dateArray[1], $endParts)
         ) {
-            $field->addTypeError('datetime');
+            $field->addError('invalid', ['messageCode' => 'Both values in {field} must be datetime.']);
             return Invalid::value();
         }
 
@@ -81,6 +87,7 @@ class DateFilterSchema extends Schema {
 
         // Make sure the ending date isn't greater-than or equal-to the beginning date.
         if ($dateTimeArray[0] >= $dateTimeArray[1]) {
+            $field->addError('invalid', ['messageCode' => 'End of {field} range must come after beginning.']);
             return Invalid::value();
         }
 
@@ -122,6 +129,7 @@ class DateFilterSchema extends Schema {
 
         // Sanity check on the parameters...
         if (!is_string($date) || !in_array($operator, $this->simpleOperators)) {
+            $field->addError('invalid', ['messageCode' => 'Invalid operator in {field}.']);
             return Invalid::value();
         }
 
@@ -192,7 +200,11 @@ class DateFilterSchema extends Schema {
                 }
             } elseif (preg_match('/^(?<op><=|>=|>|<|)?\s*(?<value>'.$this->dateRegEx.')/i', $value, $match)) {
                 $result = $this->parseSimple($match['value'], $match['op'], $field);
+            } else {
+                $field->addError('invalid', ['messageCode' => '{field} is not formatted as a valid date filter.']);
             }
+        } else {
+            $field->addTypeError('string');
         }
 
         return $result;

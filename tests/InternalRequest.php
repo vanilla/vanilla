@@ -139,7 +139,9 @@ class InternalRequest extends HttpRequest implements RequestInterface {
             $data->getStatus(),
             array_merge($data->getHeaders(), ['X-Data-Meta' => json_encode($data->getMetaArray())])
         );
-        $response->setBody($data->getData());
+        // Simulate that the data was sent over HTTP and thus was serialized.
+        $body = $data->jsonSerialize();
+        $response->setBody($body);
 
         return $response;
     }

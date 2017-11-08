@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "content-hash": "3ff5dd33964dc9866f43676908ef522a",
+    "content-hash": "0ed823c7d48d43e195e9ae6db2147dfd",
     "packages": [
         {
             "name": "chrisjean/php-ico",
@@ -679,16 +679,16 @@
         },
         {
             "name": "vanilla/garden-schema",
-            "version": "v1.7",
+            "version": "v1.7.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/vanilla/garden-schema.git",
-                "reference": "04669138bd0786a0b81355959e56ebb1d02ec468"
+                "reference": "0f27b859a31bb720f37c469c2184dbc591c293ea"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/vanilla/garden-schema/zipball/04669138bd0786a0b81355959e56ebb1d02ec468",
-                "reference": "04669138bd0786a0b81355959e56ebb1d02ec468",
+                "url": "https://api.github.com/repos/vanilla/garden-schema/zipball/0f27b859a31bb720f37c469c2184dbc591c293ea",
+                "reference": "0f27b859a31bb720f37c469c2184dbc591c293ea",
                 "shasum": ""
             },
             "require": {
@@ -711,7 +711,7 @@
                 }
             ],
             "description": "A simple data validation and cleaning library based on JSON Schema.",
-            "time": "2017-10-15T23:51:14+00:00"
+            "time": "2017-11-07T17:30:23+00:00"
         },
         {
             "name": "vanilla/htmlawed",
@@ -885,6 +885,48 @@
             ],
             "description": "A composer-compatible fork of the NBBC BBCode parsing library.",
             "time": "2016-04-26T18:19:47+00:00"
+        },
+        {
+            "name": "vanilla/vanilla-connect",
+            "version": "v0.1",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/vanilla/vanilla-connect-php.git",
+                "reference": "838657be3c04fd1dae2fb0cca333b2b0ac6319e6"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/vanilla/vanilla-connect-php/zipball/838657be3c04fd1dae2fb0cca333b2b0ac6319e6",
+                "reference": "838657be3c04fd1dae2fb0cca333b2b0ac6319e6",
+                "shasum": ""
+            },
+            "require": {
+                "firebase/php-jwt": "~5.0",
+                "php": ">=5.6.0"
+            },
+            "require-dev": {
+                "phpunit/phpunit": "~5.0"
+            },
+            "type": "project",
+            "autoload": {
+                "exclude-from-classmap": [
+                    "src/autoload.php"
+                ],
+                "psr-4": {
+                    "Vanilla\\": "src/Vanilla"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "GPL-2.0"
+            ],
+            "authors": [
+                {
+                    "name": "Alexandre (DaazKu) Chouinard",
+                    "email": "alexandre.c@vanillaforums.com"
+                }
+            ],
+            "time": "2017-10-05T21:51:35+00:00"
         }
     ],
     "packages-dev": [

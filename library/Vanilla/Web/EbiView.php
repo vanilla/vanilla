@@ -10,11 +10,14 @@ namespace Vanilla\Web;
 use Ebi\Ebi;
 use Garden\EventManager;
 use Garden\Web\Data;
+use Garden\Web\Dispatcher;
+use Garden\Web\Exception\HttpException;
 use Garden\Web\RequestInterface;
 use Garden\Web\ViewInterface;
 use Vanilla\Addon;
 use Vanilla\AddonManager;
 use Vanilla\EbiTemplateLoader;
+use Vanilla\InternalRequest;
 use Vanilla\PluralizationTrait;
 
 class EbiView implements ViewInterface {
@@ -30,7 +33,8 @@ class EbiView implements ViewInterface {
         \Gdn_Locale $locale,
         AddonManager $addonManager,
         \UserModel $userModel,
-        RequestInterface $request
+        RequestInterface $request,
+        Dispatcher $dispatcher
     ) {
         $userFunction = $this->makeUserFunction($userModel);
 
@@ -98,6 +102,7 @@ class EbiView implements ViewInterface {
 
             return '#not-found';
         };
+        $ebi->defineFunction('api', $this->makeApiFunction($dispatcher));
         $ebi->defineFunction('assetUrl', $fn);
         $ebi->defineFunction('category', function ($category) {
             if (is_numeric($category)) {
@@ -114,6 +119,7 @@ class EbiView implements ViewInterface {
         });
         $ebi->defineFunction('categoryUrl');
         $ebi->defineFunction('commentUrl');
+        $ebi->defineFunction('data', $this->makeDataFunction($ebi->getTemplateLoader()));
         $ebi->defineFunction('discussionUrl');
         $ebi->defineFunction('formatBigNumber', [\Gdn_Format::class, 'bigNumber']);
         $ebi->defineFunction('formatHumanDate', [\Gdn_Format::class, 'date']);
@@ -168,6 +174,20 @@ class EbiView implements ViewInterface {
         $argsStr = implode(', ', $jsonArgs);
 
         echo "\n<script>console.$method($argsStr);</script>\n";
+    }
+
+    private function makeApiFunction(Dispatcher $dispatcher) {
+        return function($path, $query = []) use ($dispatcher) {
+            $request = new InternalRequest('GET', "/api/v2/".ltrim($path), (array)$query);
+
+            $response = $dispatcher->dispatch($request);
+
+            if (substr($response->getStatus(), 0, 1) !== '2') {
+                throw HttpException::createFromStatus($response->getStatus(), $response->getDataItem('message'));
+            }
+
+            return $response->getData();
+        };
     }
 
     /**
@@ -272,6 +292,32 @@ class EbiView implements ViewInterface {
             }
         }
         return $result;
+    }
+
+    private function makeDataFunction(EbiTemplateLoader $loader) {
+        $themes = array_reverse($loader->getThemeChain());
+
+        return function ($name) use ($themes, $loader) {
+            static $data = [];
+            if (isset($data[$name])) {
+                return $data[$name];
+            }
+
+            $result = [];
+            foreach ($themes as $theme) {
+                /* @var Addon $theme */
+                $path = $theme->path("$name.json");
+                if (file_exists($path)) {
+                    $data = json_decode(file_get_contents($path), true);
+
+                    if (!empty($data) && is_array($data)) {
+                        $result = arrayReplaceConfig($result, $data);
+                    }
+                }
+            }
+            $data[$name] = $result;
+            return $result;
+        };
     }
 
     /**

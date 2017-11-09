@@ -63,7 +63,7 @@ abstract class ConversationsModel extends Gdn_Model {
     /**
      * Get all the members (deleted or no) of a conversation from the $conversationID.
      *
-     * @param int $conversationID The conversation ID.
+     * @param int|array $conversationID The conversation ID or a where clause for GDN_UserConversation.
      * @param bool $idsOnly The returns only the userIDs or everything from UserConversation.
      * @param bool $limit
      * @param bool $offset
@@ -75,7 +75,11 @@ abstract class ConversationsModel extends Gdn_Model {
         $conversationMembers = [];
 
         $userConversation = new Gdn_Model('UserConversation');
-        $where = ['ConversationID' => $conversationID];
+        if (is_array($conversationID)) {
+            $where = $conversationID;
+        } else {
+            $where = ['ConversationID' => $conversationID];
+        }
         if ($active === true) {
             $where['Deleted'] = 0;
         } elseif ($active === false) {

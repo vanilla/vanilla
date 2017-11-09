@@ -149,7 +149,7 @@ class ImageResizer {
 
         $result = $this->calculateWidthAndHeight($source['width'], $source['height'], $options);
 
-        $saveOptions = ['jpqQuality', 'pngQuality', 'icoSizes'];
+        $saveOptions = ['jpgQuality', 'pngQuality', 'icoSizes'];
         foreach ($saveOptions as $opt) {
             if (isset($options[$opt])) {
                 $result[$opt] = $options[$opt];

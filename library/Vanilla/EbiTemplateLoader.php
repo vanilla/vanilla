@@ -64,7 +64,7 @@ class EbiTemplateLoader implements TemplateLoaderInterface {
         }
 
 
-        $suffixes = ['master' => 'masters'];
+        $suffixes = ['master' => 'masters', 'widget' => 'widgets'];
 
         $subPaths = [];
         if ($pos = strrpos($component, '-')) {

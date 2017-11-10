@@ -119,7 +119,7 @@ class EbiView implements ViewInterface {
         });
         $ebi->defineFunction('categoryUrl');
         $ebi->defineFunction('commentUrl');
-        $ebi->defineFunction('data', $this->makeDataFunction($ebi->getTemplateLoader()));
+        $ebi->defineFunction('data', [$this, 'getData']);
         $ebi->defineFunction('discussionUrl');
         $ebi->defineFunction('formatBigNumber', [\Gdn_Format::class, 'bigNumber']);
         $ebi->defineFunction('formatHumanDate', [\Gdn_Format::class, 'date']);
@@ -178,7 +178,7 @@ class EbiView implements ViewInterface {
 
     private function makeApiFunction(Dispatcher $dispatcher) {
         return function($path, $query = []) use ($dispatcher) {
-            $request = new InternalRequest('GET', "/api/v2/".ltrim($path), (array)$query);
+            $request = new InternalRequest('GET', "/api/v2/".ltrim($path, '/'), (array)$query);
 
             $response = $dispatcher->dispatch($request);
 
@@ -294,30 +294,29 @@ class EbiView implements ViewInterface {
         return $result;
     }
 
-    private function makeDataFunction(EbiTemplateLoader $loader) {
+    public function getData($name) {
+        $loader = $this->ebi->getTemplateLoader();
         $themes = array_reverse($loader->getThemeChain());
+        static $data = [];
 
-        return function ($name) use ($themes, $loader) {
-            static $data = [];
-            if (isset($data[$name])) {
-                return $data[$name];
-            }
+        if (isset($data[$name])) {
+            return $data[$name];
+        }
 
-            $result = [];
-            foreach ($themes as $theme) {
-                /* @var Addon $theme */
-                $path = $theme->path("$name.json");
-                if (file_exists($path)) {
-                    $data = json_decode(file_get_contents($path), true);
+        $result = [];
+        foreach ($themes as $theme) {
+            /* @var Addon $theme */
+            $path = $theme->path("$name.json");
+            if (file_exists($path)) {
+                $data = json_decode(file_get_contents($path), true);
 
-                    if (!empty($data) && is_array($data)) {
-                        $result = arrayReplaceConfig($result, $data);
-                    }
+                if (!empty($data) && is_array($data)) {
+                    $result = arrayReplaceConfig($result, $data);
                 }
             }
-            $data[$name] = $result;
-            return $result;
-        };
+        }
+        $data[$name] = $result;
+        return $result;
     }
 
     /**

@@ -163,6 +163,9 @@ $dic->setInstance('Garden\Container\Container', $dic)
     ->setClass(\Vanilla\Web\EbiMasterView::class)
     ->setShared(true)
 
+    ->rule(\Vanilla\Web\EbiView::class)
+    ->setShared(true)
+
     ->rule(\Garden\ClassLocator::class)
     ->setClass(\Vanilla\VanillaClassLocator::class)
 

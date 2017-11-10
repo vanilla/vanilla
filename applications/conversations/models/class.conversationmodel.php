@@ -286,6 +286,9 @@ class ConversationModel extends ConversationsModel {
                 // Convert the array.
                 $userConversation = arrayTranslate($data, ['LastMessageID', 'CountReadMessages', 'DateLastViewed', 'Bookmarked']);
                 $userConversation['CountNewMessages'] = $conversation['CountMessages'] - $data['CountReadMessages'];
+                if ($userConversation['LastMessageID'] === null) {
+                    unset($userConversation['LastMessageID']);
+                }
             } else {
                 $userConversation = ['CountNewMessages' => 0, 'CountReadMessages' => $conversation['CountMessages'], 'DateLastViewed' => $conversation['DateUpdated']];
             }

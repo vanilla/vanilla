@@ -81,11 +81,18 @@ class ConversationsTest extends AbstractAPIv2Test {
 
         $name1 = $postedConversation['name'];
         $name2 = $conversation['name'];
-
         unset($postedConversation['name'], $conversation['name']);
+        $this->assertStringEndsWith($name1, $name2);
+
+        // Sort participants because they can ge re-ordered, but the results are still correct.
+        $fn = function ($a, $b) {
+            return strnatcmp($a['userID'], $b['userID']);
+        };
+        usort($postedConversation['participants'], $fn);
+        usort($conversation['participants'], $fn);
 
         $this->assertRowsEqual($postedConversation, $conversation);
-        $this->assertStringEndsWith($name1, $name2);
+
         $this->assertCamelCase($result->getBody());
 
         return $result->getBody();

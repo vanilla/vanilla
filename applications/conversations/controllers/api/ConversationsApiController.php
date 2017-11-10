@@ -145,13 +145,21 @@ class ConversationsApiController extends AbstractApiController {
             $schemaDefinition = [
                 'conversationID:i' => 'The ID of the conversation.',
                 'name:s' => 'The name of the conversation.',
+                'body:s' => 'The most recent unread message in the conversation.',
+                'url:s' => 'The URL of the conversation.',
                 'dateInserted:dt' => 'When the conversation was created.',
                 'insertUserID:i' => 'The user that created the conversation.',
                 'insertUser:o?' => $this->getUserFragmentSchema(),
                 'countParticipants:i' => 'The number of participants on the conversation.',
+                'participants?' => $this->getParticipantsSchema(),
                 'countMessages:i' => 'The number of messages on the conversation.',
                 'unread:bool?' => 'Whether the conversation has an unread indicator.',
                 'countUnread:int?' => 'The number of unread messages.',
+                'lastMessage:o?' => [
+                    'insertUserID:i' => 'The author of the your most recent message.',
+                    'dateInserted:dt' => 'The date of the message.',
+                    'insertUser' => $this->getUserFragmentSchema(),
+                ]
 //                'countReadMessages:n|i?' => 'The number of unread messages by the current user on the conversation.',
 //                'dateLastViewed:n|dt?' => 'When the conversation was last viewed by the current user.',
             ];
@@ -188,7 +196,7 @@ class ConversationsApiController extends AbstractApiController {
             $viewingUserID = null;
         }
 
-        $conversation = $this->conversationByID($id, $viewingUserID, 1000);
+        $conversation = $this->conversationByID($id, $viewingUserID, 5);
 
         // We check for the moderation permission after we get the conversation to make sure that it actually exists.
         if (!$isInConversation) {
@@ -327,7 +335,7 @@ class ConversationsApiController extends AbstractApiController {
         }
 
         if (!empty($query['expand'])) {
-            $this->userModel->expandUsers($conversations, ['InsertUserID']);
+            $this->userModel->expandUsers($conversations, ['InsertUserID', 'LastInsertUserID']);
         }
         array_walk($conversations, [$this, 'prepareRow']);
 
@@ -476,10 +484,38 @@ class ConversationsApiController extends AbstractApiController {
         } else {
             $conversation['name'] = ConversationModel::participantTitle($conversation, false);
         }
+        $conversation['body'] = isset($conversation['LastBody'])
+            ? Gdn_Format::to($conversation['LastBody'], $conversation['LastFormat'])
+            : t('No messages.');
+        $conversation['url'] = url("/conversations/{$conversation['ConversationID']}", true);
 
         if (array_key_exists('CountNewMessages', $conversation)) {
             $conversation['unread'] = $conversation['CountNewMessages'] > 0;
             $conversation['countUnread'] = $conversation['CountNewMessages'];
+        }
+
+        if (array_key_exists('Participants', $conversation)) {
+            array_walk($conversation['Participants'], [$this, 'translateParticipantStatus']);
+
+            // Do views a favor and move the current user to the end of the list.
+            foreach ($conversation['Participants'] as $i => $row) {
+                if ($row['UserID'] == $this->getSession()->UserID) {
+                    $index = $i;
+                    break;
+                }
+            }
+            if (isset($index)) {
+                $me = array_splice($conversation['Participants'], $index, 1);
+                $conversation['Participants'] = array_merge($conversation['Participants'], $me);
+            }
+        }
+
+        if (isset($conversation['LastInsertUser'])) {
+            $conversation['lastMessage'] = [
+                'insertUserID' => $conversation['LastInsertUserID'],
+                'dateInserted' => $conversation['LastDateInserted'],
+                'insertUser' => $conversation['LastInsertUser']
+            ];
         }
 
     }
@@ -494,6 +530,13 @@ class ConversationsApiController extends AbstractApiController {
             $row['Status'] = 'participating';
         } else {
             $row['Status'] = 'deleted';
+        }
+        if (isset($row['Name']) && isset($row['Photo'])) {
+            $row['User'] = [
+                'UserID' => $row['UserID'],
+                'Name' => $row['Name'],
+                'PhotoUrl' => empty($row['PhotoUrl']) ? UserModel::getDefaultAvatarUrl($row) : Gdn_Upload::url($row['PhotoUrl'])
+            ];
         }
     }
 
@@ -518,7 +561,8 @@ class ConversationsApiController extends AbstractApiController {
                             'type' => 'string',
                             'enum' => ['participating', 'deleted']
                         ],
-                    ]
+                    ],
+                    'required' => ['userID', 'status']
                 ],
                 'description' => 'List of participants.',
             ]

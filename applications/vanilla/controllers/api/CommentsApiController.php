@@ -167,6 +167,9 @@ class CommentsApiController extends AbstractApiController {
         $this->prepareRow($comment);
         $this->userModel->expandUsers($comment, ['InsertUserID']);
         $result = $out->validate($comment);
+
+        // Allow addons to modify the result.
+        $this->getEventManager()->fireArray('commentsApiController_get_data', [&$result]);
         return $result;
     }
 
@@ -290,6 +293,9 @@ class CommentsApiController extends AbstractApiController {
         }
 
         $result = $out->validate($rows);
+
+        // Allow addons to modify the result.
+        $this->getEventManager()->fireArray('commentsApiController_index_data', [&$result, $query]);
         return $result;
     }
 

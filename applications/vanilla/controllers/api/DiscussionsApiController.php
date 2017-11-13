@@ -204,6 +204,9 @@ class DiscussionsApiController extends AbstractApiController {
         $this->userModel->expandUsers($row, ['InsertUserID']);
 
         $result = $out->validate($row);
+
+        // Allow addons to modify the result.
+        $this->getEventManager()->fireArray('discussionsApiController_get_data', [&$result]);
         return $result;
     }
 
@@ -333,6 +336,9 @@ class DiscussionsApiController extends AbstractApiController {
         }
 
         $result = $out->validate($rows, true);
+
+        // Allow addons to modify the result.
+        $this->getEventManager()->fireArray('discussionsApiController_index_data', [&$result, $query]);
         return $result;
     }
 

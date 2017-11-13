@@ -225,7 +225,14 @@ class ConversationsApiController extends AbstractApiController {
                 'minimum' => 5,
                 'maximum' => 100
             ],
-            'expand:b?' => 'Expand associated records.',
+            'expand:a?' => [
+                'description' => 'Expand associated records.',
+                'items' => [
+                    'enum' => ['user'],
+                    'type' => 'string'
+                ],
+                'style' => 'form'
+            ]
         ], 'in')->setDescription('Get participants of a conversation.');
         $out = $this->schema([
             ':a' => [
@@ -274,8 +281,15 @@ class ConversationsApiController extends AbstractApiController {
             $this->translateParticipantStatus($row);
         }
 
-        if (!empty($query['expand'])) {
-            $this->userModel->expandUsers($data, ['UserID']);
+        // Expand associated rows.
+        if (array_key_exists('expand', $query)) {
+            $expand = [];
+            if (in_array('user', $query['expand'])) {
+                $expand[] = 'UserID';
+            }
+            if (!empty($expand)) {
+                $this->userModel->expandUsers($data, $expand);
+            }
         }
 
         return $out->validate($data);
@@ -294,18 +308,25 @@ class ConversationsApiController extends AbstractApiController {
             'insertUserID:i?' => 'Filter by author. (Has no effect if participantUserID is used)',
             'participantUserID:i?' => 'Filter by participating user.',
             'page:i?' => [
-                    'description' => 'Page number.',
-                    'default' => 1,
-                    'minimum' => 1,
+                'description' => 'Page number.',
+                'default' => 1,
+                'minimum' => 1,
+            ],
+            'limit:i?' => [
+                'description' => 'The number of items per page.',
+                'default' => $this->config->get('Conversations.Conversations.PerPage', 50),
+                'minimum' => 1,
+                'maximum' => 100
+            ],
+            'expand:a?' => [
+                'description' => 'Expand associated records.',
+                'items' => [
+                    'enum' => ['insertUser'],
+                    'type' => 'string'
                 ],
-                'limit:i?' => [
-                    'description' => 'The number of items per page.',
-                    'default' => $this->config->get('Conversations.Conversations.PerPage', 50),
-                    'minimum' => 1,
-                    'maximum' => 100
-                ],
-                'expand:b?' => 'Expand associated records.'
-            ], 'in')
+                'style' => 'form'
+            ]
+        ], 'in')
             ->requireOneOf(['insertUserID', 'participantUserID'])
             ->setDescription('List user conversations.');
         $out = $this->schema([':a' => $this->fullSchema()], 'out');
@@ -335,8 +356,15 @@ class ConversationsApiController extends AbstractApiController {
             )->resultArray();
         }
 
-        if (!empty($query['expand'])) {
-            $this->userModel->expandUsers($conversations, ['InsertUserID']);
+        // Expand associated rows.
+        if (array_key_exists('expand', $query)) {
+            $expand = [];
+            if (in_array('insertUser', $query['expand'])) {
+                $expand[] = 'InsertUserID';
+            }
+            if (!empty($expand)) {
+                $this->userModel->expandUsers($conversations, $expand);
+            }
         }
 
         return $out->validate($conversations);

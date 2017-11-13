@@ -225,14 +225,7 @@ class ConversationsApiController extends AbstractApiController {
                 'minimum' => 5,
                 'maximum' => 100
             ],
-            'expand:a?' => [
-                'description' => 'Expand associated records.',
-                'items' => [
-                    'enum' => ['user'],
-                    'type' => 'string'
-                ],
-                'style' => 'form'
-            ]
+            'expand?' => $this->getExpandFragment(['user'])
         ], 'in')->setDescription('Get participants of a conversation.');
         $out = $this->schema([
             ':a' => [
@@ -282,15 +275,10 @@ class ConversationsApiController extends AbstractApiController {
         }
 
         // Expand associated rows.
-        if (array_key_exists('expand', $query)) {
-            $expand = [];
-            if (in_array('user', $query['expand'])) {
-                $expand[] = 'UserID';
-            }
-            if (!empty($expand)) {
-                $this->userModel->expandUsers($data, $expand);
-            }
-        }
+        $this->userModel->expandUsers(
+            $data,
+            $this->getExpandFields($query, ['user' => 'userID'])
+        );
 
         return $out->validate($data);
     }
@@ -318,14 +306,7 @@ class ConversationsApiController extends AbstractApiController {
                 'minimum' => 1,
                 'maximum' => 100
             ],
-            'expand:a?' => [
-                'description' => 'Expand associated records.',
-                'items' => [
-                    'enum' => ['insertUser'],
-                    'type' => 'string'
-                ],
-                'style' => 'form'
-            ]
+            'expand?' => $this->getExpandFragment(['insertUser'])
         ], 'in')
             ->requireOneOf(['insertUserID', 'participantUserID'])
             ->setDescription('List user conversations.');
@@ -357,15 +338,10 @@ class ConversationsApiController extends AbstractApiController {
         }
 
         // Expand associated rows.
-        if (array_key_exists('expand', $query)) {
-            $expand = [];
-            if (in_array('insertUser', $query['expand'])) {
-                $expand[] = 'InsertUserID';
-            }
-            if (!empty($expand)) {
-                $this->userModel->expandUsers($conversations, $expand);
-            }
-        }
+        $this->userModel->expandUsers(
+            $conversations,
+            $this->getExpandFields($query, ['insertUser' => 'InsertUserID'])
+        );
 
         return $out->validate($conversations);
     }

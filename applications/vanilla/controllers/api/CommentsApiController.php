@@ -237,14 +237,7 @@ class CommentsApiController extends AbstractApiController {
             ],
             'insertUserID:i?' => 'Filter by author.',
             'after:dt?' => 'Limit to comments after this date.',
-            'expand:a?' => [
-                'description' => 'Expand associated records.',
-                'items' => [
-                    'enum' => ['insertUser'],
-                    'type' => 'string'
-                ],
-                'style' => 'form'
-            ]
+            'expand?' => $this->getExpandFragment(['insertUser'])
         ], 'in')->requireOneOf(['discussionID', 'insertUserID'])->setDescription('List comments.');
         $out = $this->schema([':a' => $this->commentSchema()], 'out');
 
@@ -290,15 +283,10 @@ class CommentsApiController extends AbstractApiController {
         }
 
         // Expand associated rows.
-        if (array_key_exists('expand', $query)) {
-            $expand = [];
-            if (in_array('insertUser', $query['expand'])) {
-                $expand[] = 'InsertUserID';
-            }
-            if (!empty($expand)) {
-                $this->userModel->expandUsers($rows, $expand);
-            }
-        }
+        $this->userModel->expandUsers(
+            $rows,
+            $this->getExpandFields($query, ['insertUser' => 'InsertUserID'])
+        );
 
         foreach ($rows as &$currentRow) {
             $this->prepareRow($currentRow);

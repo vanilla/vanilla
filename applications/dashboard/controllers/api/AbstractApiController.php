@@ -44,6 +44,47 @@ abstract class AbstractApiController extends \Vanilla\Web\Controller {
     }
 
     /**
+     * Determine which fields should be expanded, using a request and a field map.
+     *
+     * @param array $data An array representing request data.
+     * @param array $map An array of short-to-full field names (e.g. insertUser => InsertUserID).
+     * @param string $field The name of the field where the expand fields can be found.
+     * @return array
+     */
+    protected function getExpandFields(array $data, array $map, $field = 'expand') {
+        $result = [];
+        if (array_key_exists($field, $data)) {
+            $expand = $data[$field];
+            foreach ($map as $short => $full) {
+                if (in_array($short, $expand)) {
+                    $result[] = $full;
+                }
+            }
+        }
+        return $result;
+    }
+
+    /**
+     * Get a simple schema for nesting as an "expand" parameter.
+     *
+     * @param array $fields Valid values for the expand parameter.
+     * @return Schema
+     */
+    protected function getExpandFragment(array $fields) {
+        $result = $this->schema([
+            'description' => 'Expand associated records.',
+            'items' => [
+                'enum' => $fields,
+                'type' => 'string'
+            ],
+            'style' => 'form',
+            'type' => 'array'
+        ], 'ExpandFragment');
+
+        return $result;
+    }
+
+    /**
      * Get the schema for users joined to records.
      *
      * @return Schema Returns a schema.

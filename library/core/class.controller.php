@@ -1304,11 +1304,11 @@ class Gdn_Controller extends Gdn_Pluggable {
                     $this->addDefinition('InformMessageStack', json_encode($this->_InformMessages, JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT));
                 }
                 if ($this->redirectTo !== null) {
-                    $this->setJson('RedirectTo', str_replace('\\', '%5c', $this->redirectTo));
-                    $this->setJson('RedirectUrl', str_replace('\\', '%5c', $this->redirectTo));
+                    $this->addDefinition('RedirectTo', str_replace('\\', '%5c', $this->redirectTo));
+                    $this->addDefinition('RedirectUrl', str_replace('\\', '%5c', $this->redirectTo));
                 } else {
-                    $this->setJson('RedirectTo', str_replace('\\', '%5c', $this->RedirectUrl));
-                    $this->setJson('RedirectUrl', str_replace('\\', '%5c', $this->RedirectUrl));
+                    $this->addDefinition('RedirectTo', str_replace('\\', '%5c', $this->RedirectUrl));
+                    $this->addDefinition('RedirectUrl', str_replace('\\', '%5c', $this->RedirectUrl));
                 }
             }
 

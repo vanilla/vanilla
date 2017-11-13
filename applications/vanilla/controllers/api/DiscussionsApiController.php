@@ -68,7 +68,14 @@ class DiscussionsApiController extends AbstractApiController {
                 'minimum' => 1,
                 'maximum' => 100
             ],
-            'expand:b?' => 'Expand associated records.'
+            'expand:a?' => [
+                'description' => 'Expand associated records.',
+                'items' => [
+                    'enum' => ['insertUser'],
+                    'type' => 'string'
+                ],
+                'style' => 'form'
+            ]
         ], 'in');
         $out = $this->schema([':a' => $this->discussionSchema()], 'out');
 
@@ -79,9 +86,18 @@ class DiscussionsApiController extends AbstractApiController {
             'w.Bookmarked' => 1,
             'w.UserID' => $this->getSession()->UserID
         ])->resultArray();
-        if (!empty($query['expand'])) {
-            $this->userModel->expandUsers($rows, ['InsertUserID']);
+
+        // Expand associated rows.
+        if (array_key_exists('expand', $query)) {
+            $expand = [];
+            if (in_array('insertUser', $query['expand'])) {
+                $expand[] = 'InsertUserID';
+            }
+            if (!empty($expand)) {
+                $this->userModel->expandUsers($rows, $expand);
+            }
         }
+
         foreach ($rows as &$currentRow) {
             $this->prepareRow($currentRow);
         }
@@ -292,7 +308,14 @@ class DiscussionsApiController extends AbstractApiController {
                 'maximum' => 100
             ],
             'insertUserID:i?' => 'Filter by author.',
-            'expand:b?' => 'Expand associated records.'
+            'expand:a?' => [
+                'description' => 'Expand associated records.',
+                'items' => [
+                    'enum' => ['insertUser'],
+                    'type' => 'string'
+                ],
+                'style' => 'form'
+            ]
         ], 'in')->setDescription('List discussions.');
         $out = $this->schema([':a' => $this->discussionSchema()], 'out');
 
@@ -328,9 +351,17 @@ class DiscussionsApiController extends AbstractApiController {
             }
         }
 
-        if (!empty($query['expand'])) {
-            $this->userModel->expandUsers($rows, ['InsertUserID']);
+        // Expand associated rows.
+        if (array_key_exists('expand', $query)) {
+            $expand = [];
+            if (in_array('insertUser', $query['expand'])) {
+                $expand[] = 'InsertUserID';
+            }
+            if (!empty($expand)) {
+                $this->userModel->expandUsers($rows, $expand);
+            }
         }
+
         foreach ($rows as &$currentRow) {
             $this->prepareRow($currentRow);
         }

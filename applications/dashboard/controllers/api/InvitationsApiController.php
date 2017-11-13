@@ -156,7 +156,14 @@ class InvitationsApiController extends AbstractApiController {
                 'minimum' => 1,
                 'maximum' => 100
             ],
-            'expand:b?' => 'Expand associated records.'
+            'expand:a?' => [
+                'description' => 'Expand associated records.',
+                'items' => [
+                    'enum' => ['acceptedUser'],
+                    'type' => 'string'
+                ],
+                'style' => 'form'
+            ]
         ], 'in')->setDescription('Get a list of invitations sent by the current user.');
         $out = $this->schema([
             ':a' => $this->fullSchema()
@@ -173,8 +180,15 @@ class InvitationsApiController extends AbstractApiController {
             false
         )->resultArray();
 
-        if (!empty($query['expand'])) {
-            $this->userModel->expandUsers($rows, ['AcceptedUserID']);
+        // Expand associated rows.
+        if (array_key_exists('expand', $query)) {
+            $expand = [];
+            if (in_array('acceptedUser', $query['expand'])) {
+                $expand[] = 'AcceptedUserID';
+            }
+            if (!empty($expand)) {
+                $this->userModel->expandUsers($rows, $expand);
+            }
         }
 
         foreach ($rows as &$row) {

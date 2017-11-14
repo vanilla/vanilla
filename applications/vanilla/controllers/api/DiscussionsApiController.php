@@ -68,7 +68,7 @@ class DiscussionsApiController extends AbstractApiController {
                 'minimum' => 1,
                 'maximum' => 100
             ],
-            'expand?' => $this->getExpandFragment(['insertUser', 'lastUser'])
+            'expand?' => $this->getExpandFragment(['insertUser', 'lastUser', 'lastPost'])
         ], 'in');
         $out = $this->schema([':a' => $this->discussionSchema()], 'out');
 
@@ -171,6 +171,7 @@ class DiscussionsApiController extends AbstractApiController {
             'dateInserted:dt' => 'When the discussion was created.',
             'insertUserID:i' => 'The user that created the discussion.',
             'insertUser?' => $this->getUserFragmentSchema(),
+            'lastUser?' => $this->getUserFragmentSchema(),
             'pinned:b?' => 'Whether or not the discussion has been pinned.',
             'pinLocation:s|n' => [
                 'enum' => ['category', 'recent'],
@@ -239,7 +240,7 @@ class DiscussionsApiController extends AbstractApiController {
             $row['unread'] = false;
         }
 
-        if ($expand) {
+        if ($this->isExpandField('lastPost', $expand)) {
             $lastPost = [
                 'discussionID' => $row['DiscussionID'],
                 'dateInserted' => $row['DateLastComment'],
@@ -328,7 +329,7 @@ class DiscussionsApiController extends AbstractApiController {
                 'maximum' => 100
             ],
             'insertUserID:i?' => 'Filter by author.',
-            'expand?' => $this->getExpandFragment(['insertUser', 'lastUser'])
+            'expand?' => $this->getExpandFragment(['insertUser', 'lastUser', 'lastPost'])
         ], 'in')->setDescription('List discussions.');
         $out = $this->schema([':a' => $this->discussionSchema()], 'out');
 

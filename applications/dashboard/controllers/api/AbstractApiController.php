@@ -49,31 +49,6 @@ abstract class AbstractApiController extends \Vanilla\Web\Controller {
     }
 
     /**
-     * Resolve values from an expand parameter, based on the provided map.
-     *
-     * @param array $request An array representing request data.
-     * @param array $map An array of short-to-full field names (e.g. insertUser => InsertUserID).
-     * @param string $field The name of the field where the expand fields can be found.
-     * @return array
-     */
-    protected function resolveExpandFields(array $request, array $map, $field = 'expand') {
-        $result = [];
-        if (array_key_exists($field, $request)) {
-            $expand = $request[$field];
-            if (is_array($expand)) {
-                foreach ($map as $short => $full) {
-                    if (in_array($short, $expand)) {
-                        $result[] = $full;
-                    }
-                }
-            } elseif ($expand === true) {
-                $result = array_values($map);
-            }
-        }
-        return $result;
-    }
-
-    /**
      * Get a simple schema for nesting as an "expand" parameter.
      *
      * @param array $fields Valid values for the expand parameter.
@@ -132,8 +107,52 @@ abstract class AbstractApiController extends \Vanilla\Web\Controller {
         return $this->postFragmentSchema;
     }
 
+    /**
+     * Determine if a value is in the "expand" parameter.
+     *
+     * @param string $field The field name to search for.
+     * @param array|bool $expand An array of fields to expand, or true for all.
+     * @return bool
+     */
+    protected function isExpandField($field, $expand) {
+        $result = false;
+        if ($expand === true) {
+            // A boolean true allows everything.
+            $result = true;
+        } elseif (is_array($expand)) {
+            $result = in_array($field, $expand);
+        }
+        return $result;
+    }
+
     public function options($path) {
         return '';
+    }
+
+    /**
+     * Resolve values from an expand parameter, based on the provided map.
+     *
+     * @param array $request An array representing request data.
+     * @param array $map An array of short-to-full field names (e.g. insertUser => InsertUserID).
+     * @param string $field The name of the field where the expand fields can be found.
+     * @return array
+     */
+    protected function resolveExpandFields(array $request, array $map, $field = 'expand') {
+        $result = [];
+        if (array_key_exists($field, $request)) {
+            $expand = $request[$field];
+            if ($expand === true) {
+                // If the expand parameter is true, expand everything.
+                $result = array_values($map);
+            } elseif (is_array($expand)) {
+                foreach ($map as $short => $full) {
+                    if ($this->isExpandField($short, $expand)) {
+                        $result[] = $full;
+                    }
+                }
+            }
+        }
+        return $result;
     }
 
     /**

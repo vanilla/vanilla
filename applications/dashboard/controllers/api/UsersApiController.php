@@ -75,13 +75,11 @@ class UsersApiController extends AbstractApiController {
             'password:s' => 'Password of the user.',
             'hashMethod:s' => 'Hash method for the password.',
             'email:s' => 'Email address of the user.',
-            'photo:s' => [
-                'allowNull' => true,
+            'photo:s|n' => [
                 'minLength' => 0,
                 'description' => 'Raw photo field value from the user record.'
             ],
-            'photoUrl:s' => [
-                'allowNull' => true,
+            'photoUrl:s|n' => [
                 'minLength' => 0,
                 'description' => 'URL to the user photo.'
             ],

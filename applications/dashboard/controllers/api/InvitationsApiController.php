@@ -176,7 +176,7 @@ class InvitationsApiController extends AbstractApiController {
         // Expand associated rows.
         $this->userModel->expandUsers(
             $rows,
-            $this->getExpandFields($query, ['acceptedUser' => 'acceptedUserID'])
+            $this->resolveExpandFields($query, ['acceptedUser' => 'acceptedUserID'])
         );
 
         foreach ($rows as &$row) {

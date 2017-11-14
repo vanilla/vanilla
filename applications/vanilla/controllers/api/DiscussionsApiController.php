@@ -83,7 +83,7 @@ class DiscussionsApiController extends AbstractApiController {
         // Expand associated rows.
         $this->userModel->expandUsers(
             $rows,
-            $this->getExpandFields($query, ['insertUser' => 'InsertUserID'])
+            $this->resolveExpandFields($query, ['insertUser' => 'InsertUserID'])
         );
 
         foreach ($rows as &$currentRow) {
@@ -335,7 +335,7 @@ class DiscussionsApiController extends AbstractApiController {
         // Expand associated rows.
         $this->userModel->expandUsers(
             $rows,
-            $this->getExpandFields($query, ['insertUser' => 'InsertUserID'])
+            $this->resolveExpandFields($query, ['insertUser' => 'InsertUserID'])
         );
 
         foreach ($rows as &$currentRow) {

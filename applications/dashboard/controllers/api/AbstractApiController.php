@@ -44,17 +44,17 @@ abstract class AbstractApiController extends \Vanilla\Web\Controller {
     }
 
     /**
-     * Determine which fields should be expanded, using a request and a field map.
+     * Resolve values from an expand parameter, based on the provided map.
      *
-     * @param array $data An array representing request data.
+     * @param array $request An array representing request data.
      * @param array $map An array of short-to-full field names (e.g. insertUser => InsertUserID).
      * @param string $field The name of the field where the expand fields can be found.
      * @return array
      */
-    protected function getExpandFields(array $data, array $map, $field = 'expand') {
+    protected function resolveExpandFields(array $request, array $map, $field = 'expand') {
         $result = [];
-        if (array_key_exists($field, $data)) {
-            $expand = $data[$field];
+        if (array_key_exists($field, $request)) {
+            $expand = $request[$field];
             foreach ($map as $short => $full) {
                 if (in_array($short, $expand)) {
                     $result[] = $full;
@@ -71,7 +71,8 @@ abstract class AbstractApiController extends \Vanilla\Web\Controller {
      * @return Schema
      */
     protected function getExpandFragment(array $fields) {
-        $result = $this->schema([
+        // Avoid using Controller::schema, because API document generators likely can't handle this dynamic schema.
+        $result = Schema::parse([
             'description' => 'Expand associated records.',
             'items' => [
                 'enum' => $fields,
@@ -79,7 +80,7 @@ abstract class AbstractApiController extends \Vanilla\Web\Controller {
             ],
             'style' => 'form',
             'type' => 'array'
-        ], 'ExpandFragment');
+        ]);
 
         return $result;
     }

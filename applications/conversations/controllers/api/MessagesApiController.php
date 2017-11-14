@@ -234,7 +234,7 @@ class MessagesApiController extends AbstractApiController {
         // Expand associated rows.
         $this->userModel->expandUsers(
             $messages,
-            $this->getExpandFields($query, ['insertUser' => 'InsertUserID'])
+            $this->resolveExpandFields($query, ['insertUser' => 'InsertUserID'])
         );
 
         array_walk($messages, function(&$message) {

@@ -277,7 +277,7 @@ class ConversationsApiController extends AbstractApiController {
         // Expand associated rows.
         $this->userModel->expandUsers(
             $data,
-            $this->getExpandFields($query, ['user' => 'userID'])
+            $this->resolveExpandFields($query, ['user' => 'userID'])
         );
 
         return $out->validate($data);
@@ -340,7 +340,7 @@ class ConversationsApiController extends AbstractApiController {
         // Expand associated rows.
         $this->userModel->expandUsers(
             $conversations,
-            $this->getExpandFields($query, ['insertUser' => 'InsertUserID'])
+            $this->resolveExpandFields($query, ['insertUser' => 'InsertUserID'])
         );
 
         return $out->validate($conversations);

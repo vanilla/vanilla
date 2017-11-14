@@ -68,7 +68,7 @@ class DiscussionsApiController extends AbstractApiController {
                 'minimum' => 1,
                 'maximum' => 100
             ],
-            'expand?' => $this->getExpandFragment(['insertUser'])
+            'expand?' => $this->getExpandFragment(['insertUser', 'lastUser', 'lastPost'])
         ], 'in');
         $out = $this->schema([':a' => $this->discussionSchema()], 'out');
 
@@ -83,7 +83,7 @@ class DiscussionsApiController extends AbstractApiController {
         // Expand associated rows.
         $this->userModel->expandUsers(
             $rows,
-            $this->resolveExpandFields($query, ['insertUser' => 'InsertUserID'])
+            $this->resolveExpandFields($query, ['insertUser' => 'InsertUserID', 'lastUser' => 'LastUserID'])
         );
 
         foreach ($rows as &$currentRow) {
@@ -171,7 +171,7 @@ class DiscussionsApiController extends AbstractApiController {
             'dateInserted:dt' => 'When the discussion was created.',
             'insertUserID:i' => 'The user that created the discussion.',
             'insertUser?' => $this->getUserFragmentSchema(),
-            'bookmarked:b' => 'Whether or no the discussion is bookmarked by the current user.',
+            'lastUser?' => $this->getUserFragmentSchema(),
             'pinned:b?' => 'Whether or not the discussion has been pinned.',
             'pinLocation:s|n' => [
                 'enum' => ['category', 'recent'],
@@ -180,7 +180,12 @@ class DiscussionsApiController extends AbstractApiController {
             'closed:b' => 'Whether the discussion is closed or open.',
             'sink:b' => 'Whether or not the discussion has been sunk.',
             'countComments:i' => 'The number of comments on the discussion.',
-            'url:s?' => 'The full URL to the discussion.'
+            'countViews:i' => 'The number of views on the discussion.',
+            'url:s?' => 'The full URL to the discussion.',
+            'lastPost?' => $this->getPostFragmentSchema(),
+            'bookmarked:b' => 'Whether or not the discussion is bookmarked by the current user.',
+            'unread:b' => 'Whether or not the discussion should have an unread indicator.',
+            'countUnread:i?' => 'The number of unread comments.',
         ]);
     }
 
@@ -205,7 +210,7 @@ class DiscussionsApiController extends AbstractApiController {
         $this->discussionModel->categoryPermission('Vanilla.Discussions.View', $row['CategoryID']);
 
         $this->prepareRow($row);
-        $this->userModel->expandUsers($row, ['InsertUserID']);
+        $this->userModel->expandUsers($row, ['InsertUserID', 'LastUserID']);
 
         $result = $out->validate($row);
 
@@ -214,7 +219,7 @@ class DiscussionsApiController extends AbstractApiController {
         return $result;
     }
 
-    public function prepareRow(&$row) {
+    public function prepareRow(&$row, $expand = false) {
         $row['Announce'] = (bool)$row['Announce'];
         $row['Bookmarked'] = (bool)$row['Bookmarked'];
         $row['Url'] = discussionUrl($row);
@@ -223,6 +228,34 @@ class DiscussionsApiController extends AbstractApiController {
         if (!is_array($row['Attributes'])) {
             $attributes = dbdecode($row['Attributes']);
             $row['Attributes'] = is_array($attributes) ? $attributes : [];
+        }
+
+        if ($this->getSession()->User) {
+            $row['unread'] = $row['CountUnreadComments'] !== 0
+                && ($row['CountUnreadComments'] !== true || dateCompare(val('DateFirstVisit', $this->getSession()->User), $row['DateInserted']) <= 0);
+            if ($row['CountUnreadComments'] !== true && $row['CountUnreadComments'] > 0) {
+                $row['countUnread'] = $row['CountUnreadComments'];
+            }
+        } else {
+            $row['unread'] = false;
+        }
+
+        if ($this->isExpandField('lastPost', $expand)) {
+            $lastPost = [
+                'discussionID' => $row['DiscussionID'],
+                'dateInserted' => $row['DateLastComment'],
+                'insertUser' => $row['LastUser']
+            ];
+            if ($row['LastCommentID']) {
+                $lastPost['CommentID'] = $row['LastCommentID'];
+                $lastPost['name'] = sprintft('Re: %s', $row['Name']);
+                $lastPost['url'] = commentUrl($lastPost, true);
+            } else {
+                $lastPost['name'] = $row['Name'];
+                $lastPost['url'] = $row['Url'];
+            }
+
+            $row['lastPost'] = $lastPost;
         }
     }
 
@@ -296,12 +329,13 @@ class DiscussionsApiController extends AbstractApiController {
                 'maximum' => 100
             ],
             'insertUserID:i?' => 'Filter by author.',
-            'expand?' => $this->getExpandFragment(['insertUser'])
+            'expand?' => $this->getExpandFragment(['insertUser', 'lastUser', 'lastPost'])
         ], 'in')->setDescription('List discussions.');
         $out = $this->schema([':a' => $this->discussionSchema()], 'out');
 
         $query = $this->filterValues($query);
         $query = $in->validate($query);
+        $query += ['expand' => false];
 
         $where = array_intersect_key($query, array_flip(['categoryID', 'insertUserID']));
         if (array_key_exists('categoryID', $where)) {
@@ -335,11 +369,11 @@ class DiscussionsApiController extends AbstractApiController {
         // Expand associated rows.
         $this->userModel->expandUsers(
             $rows,
-            $this->resolveExpandFields($query, ['insertUser' => 'InsertUserID'])
+            $this->resolveExpandFields($query, ['insertUser' => 'InsertUserID', 'lastUser' => 'LastUserID'])
         );
 
         foreach ($rows as &$currentRow) {
-            $this->prepareRow($currentRow);
+            $this->prepareRow($currentRow, $query['expand']);
         }
 
         $result = $out->validate($rows, true);
@@ -419,7 +453,7 @@ class DiscussionsApiController extends AbstractApiController {
         }
 
         $row = $this->discussionByID($id);
-        $this->userModel->expandUsers($row, ['InsertUserID']);
+        $this->userModel->expandUsers($row, ['InsertUserID', 'LastUserID']);
         $this->prepareRow($row);
         $result = $out->validate($row);
         return $result;

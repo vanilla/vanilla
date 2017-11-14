@@ -186,7 +186,7 @@ class MessagesApiController extends AbstractApiController {
                     'minimum' => 1,
                     'maximum' => 100
                 ],
-                'expand:b?' => 'Expand associated records.'
+                'expand?' => $this->getExpandFragment(['insertUser'])
             ], 'in')
             ->requireOneOf(['conversationID', 'insertUserID'])
             ->setDescription('List user messages.');
@@ -231,9 +231,11 @@ class MessagesApiController extends AbstractApiController {
             $offset
         )->resultArray();
 
-        if (!empty($query['expand'])) {
-            $this->userModel->expandUsers($messages, ['InsertUserID']);
-        }
+        // Expand associated rows.
+        $this->userModel->expandUsers(
+            $messages,
+            $this->resolveExpandFields($query, ['insertUser' => 'InsertUserID'])
+        );
 
         array_walk($messages, function(&$message) {
             $this->prepareRow($message);

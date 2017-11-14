@@ -63,7 +63,7 @@ abstract class AbstractApiController extends \Vanilla\Web\Controller {
                 'type' => 'string'
             ],
             'style' => 'form',
-            'type' => 'array'
+            'type' => ['boolean', 'array']
         ]);
 
         return $result;

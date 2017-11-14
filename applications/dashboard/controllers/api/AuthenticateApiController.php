@@ -403,7 +403,7 @@ class AuthenticateApiController extends AbstractApiController {
      * @param array $body
      * @return array
      */
-    public function post_linkuser(array $body) {
+    public function post_linkUser(array $body) {
         $this->permission();
 
         if (!$this->config->get('Garden.Registration.AllowConnect', true)) {

@@ -68,7 +68,7 @@ class DiscussionsApiController extends AbstractApiController {
                 'minimum' => 1,
                 'maximum' => 100
             ],
-            'expand:b?' => 'Expand associated records.'
+            'expand?' => $this->getExpandFragment(['insertUser', 'lastUser'])
         ], 'in');
         $out = $this->schema([':a' => $this->discussionSchema()], 'out');
 
@@ -79,9 +79,13 @@ class DiscussionsApiController extends AbstractApiController {
             'w.Bookmarked' => 1,
             'w.UserID' => $this->getSession()->UserID
         ])->resultArray();
-        if (!empty($query['expand'])) {
-            $this->userModel->expandUsers($rows, ['InsertUserID', 'LastUserID']);
-        }
+
+        // Expand associated rows.
+        $this->userModel->expandUsers(
+            $rows,
+            $this->resolveExpandFields($query, ['insertUser' => 'InsertUserID', 'lastUser' => 'LastUserID'])
+        );
+
         foreach ($rows as &$currentRow) {
             $this->prepareRow($currentRow);
         }
@@ -208,6 +212,9 @@ class DiscussionsApiController extends AbstractApiController {
         $this->userModel->expandUsers($row, ['InsertUserID', 'LastUserID']);
 
         $result = $out->validate($row);
+
+        // Allow addons to modify the result.
+        $this->getEventManager()->fireArray('discussionsApiController_get_data', [&$result]);
         return $result;
     }
 
@@ -321,7 +328,7 @@ class DiscussionsApiController extends AbstractApiController {
                 'maximum' => 100
             ],
             'insertUserID:i?' => 'Filter by author.',
-            'expand:b?' => 'Expand associated records.'
+            'expand?' => $this->getExpandFragment(['insertUser', 'lastUser'])
         ], 'in')->setDescription('List discussions.');
         $out = $this->schema([':a' => $this->discussionSchema()], 'out');
 
@@ -358,14 +365,20 @@ class DiscussionsApiController extends AbstractApiController {
             }
         }
 
-        if ($query['expand']) {
-            $this->userModel->expandUsers($rows, ['InsertUserID', 'LastUserID']);
-        }
+        // Expand associated rows.
+        $this->userModel->expandUsers(
+            $rows,
+            $this->resolveExpandFields($query, ['insertUser' => 'InsertUserID', 'lastUser' => 'LastUserID'])
+        );
+
         foreach ($rows as &$currentRow) {
             $this->prepareRow($currentRow, $query['expand']);
         }
 
         $result = $out->validate($rows, true);
+
+        // Allow addons to modify the result.
+        $this->getEventManager()->fireArray('discussionsApiController_index_data', [&$result, $query]);
         return $result;
     }
 

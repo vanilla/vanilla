@@ -193,9 +193,10 @@ class AddonManagerTest extends \PHPUnit\Framework\TestCase {
 
         $subpath = reset($classes[$classKey])['path'];
         // Kludge: Check for the userPhoto() function.
-        $fileContents = file_get_contents($addon->path($subpath));
+        $path = $addon->path($subpath);
+        $fileContents = file_get_contents($path);
         if (preg_match('`function userPhoto`i', $fileContents)) {
-            $this->markTestSkipped("We can't test classes that redeclare userPhoto().");
+            $this->markTestSkipped("We can't test classes that redeclare userPhoto(). $path");
             return;
         }
 
@@ -540,6 +541,12 @@ class AddonManagerTest extends \PHPUnit\Framework\TestCase {
                 'Vanilla\API\DiscussionsController' => true,
                 'API\DiscussionsController' => false
             ],
+            'vanilla\*\DiscussionsController' => [
+                'DiscussionsController' => false,
+                'Vanilla\DiscussionsController' => true,
+                'Vanilla\API\DiscussionsController' => true,
+                'API\DiscussionsController' => false
+            ],
             '*\*Controller' => [
                 'DiscussionsController' => true,
                 'Vanilla\DiscussionsController' => true,
@@ -591,12 +598,36 @@ class AddonManagerTest extends \PHPUnit\Framework\TestCase {
     /**
      * Test finding classes on a started addon.
      */
-    public function testFindClassesStarted() {
+    public function testFindClassesNamespaceCaseMismatch() {
         $am = new TestAddonManager();
 
-        $am->startAddonsByKey(['test-old-plugin'], Addon::TYPE_ADDON);
-        $classes = $am->findClasses('TestOldPluginPlugin');
-        $this->assertSame(\TestOldPluginPlugin::class, $classes[0]);
+        $am->startAddonsByKey(['namespaced-plugin'], Addon::TYPE_ADDON);
+        $classes = $am->findClasses('deeply\\NESTed\\NamesPaced\\Fixture\\TestClass');
+        $this->assertSame(\Deeply\Nested\Namespaced\Fixture\TestClass::class, $classes[0]);
+    }
+
+    /**
+     * Test a findClass with a namespace case mismatch
+     */
+    public function testFindClassNamespaceCaseMismatch() {
+        $am = new TestAddonManager();
+
+        $am->startAddonsByKey(['namespaced-plugin'], Addon::TYPE_ADDON);
+
+        $addon = $am->lookupByClassname('deeply\\NESTed\\NamesPaced\\Fixture\\TestClass');
+        $this->assertEquals('namespaced-plugin', $addon->getKey());
+    }
+
+    /**
+     * Test a lookup with a namespace case mismatch
+     */
+    public function testLookupNamespaceCaseMismatch() {
+        $am = new TestAddonManager();
+
+        $am->startAddonsByKey(['namespaced-plugin'], Addon::TYPE_ADDON);
+
+        $addon = $am->lookupByClassname('deeply\\NESTed\\NamesPaced\\Fixture\\TestClass');
+        $this->assertEquals('namespaced-plugin', $addon->getKey());
     }
 
     /**

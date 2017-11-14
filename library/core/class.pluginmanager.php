@@ -214,6 +214,7 @@ class Gdn_PluginManager extends Gdn_Pluggable implements ContainerInterface {
             }
 
             $pluginPath = combinePaths([$searchPath, $pluginFolderName]);
+
             $pluginFile = $this->findPluginFileOld($pluginPath);
 
             if ($pluginFile === false) {
@@ -946,15 +947,13 @@ class Gdn_PluginManager extends Gdn_Pluggable implements ContainerInterface {
         // Return early!
         if (empty($PluginInfoString)) {
             return null;
-        } else {
-            eval($PluginInfoString);
         }
 
         eval($PluginInfoString);
 
         // Define the folder name and assign the class name for the newly added item.
         $var = !empty(${$VariableName}) ? ${$VariableName} : null;
-        if (is_array($var)) {
+        if (is_array($var) && !array_key_exists('Name', $var)) {
             reset($var);
             $name = key($var);
             $var = (array)current($var);

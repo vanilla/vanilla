@@ -49,6 +49,52 @@ abstract class AbstractApiController extends \Vanilla\Web\Controller {
     }
 
     /**
+     * Resolve values from an expand parameter, based on the provided map.
+     *
+     * @param array $request An array representing request data.
+     * @param array $map An array of short-to-full field names (e.g. insertUser => InsertUserID).
+     * @param string $field The name of the field where the expand fields can be found.
+     * @return array
+     */
+    protected function resolveExpandFields(array $request, array $map, $field = 'expand') {
+        $result = [];
+        if (array_key_exists($field, $request)) {
+            $expand = $request[$field];
+            if (is_array($expand)) {
+                foreach ($map as $short => $full) {
+                    if (in_array($short, $expand)) {
+                        $result[] = $full;
+                    }
+                }
+            } elseif ($expand === true) {
+                $result = array_values($map);
+            }
+        }
+        return $result;
+    }
+
+    /**
+     * Get a simple schema for nesting as an "expand" parameter.
+     *
+     * @param array $fields Valid values for the expand parameter.
+     * @return Schema
+     */
+    protected function getExpandFragment(array $fields) {
+        // Avoid using Controller::schema, because API document generators likely can't handle this dynamic schema.
+        $result = Schema::parse([
+            'description' => 'Expand associated records.',
+            'items' => [
+                'enum' => $fields,
+                'type' => 'string'
+            ],
+            'style' => 'form',
+            'type' => 'array'
+        ]);
+
+        return $result;
+    }
+
+    /**
      * Get the schema for users joined to records.
      *
      * @return Schema Returns a schema.

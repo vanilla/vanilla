@@ -67,7 +67,7 @@ class LinkUserTest extends AbstractAPIv2Test {
     }
 
     /**
-     * Test POST /authenticate/linkuser by sending userid + password.
+     * Test POST /authenticate/link-user by sending userid + password.
      */
     public function testLinkUserWithUserID() {
         $authSessionID = $this->createAuthSessionID();
@@ -79,7 +79,7 @@ class LinkUserTest extends AbstractAPIv2Test {
         ];
 
         $result = $this->api()->post(
-            $this->baseUrl.'/linkuser',
+            $this->baseUrl.'/link-user',
             $postData
         );
 
@@ -93,7 +93,7 @@ class LinkUserTest extends AbstractAPIv2Test {
     }
 
     /**
-     * Test POST /authenticate/linkuser by sending name + email + password.
+     * Test POST /authenticate/link-user by sending name + email + password.
      */
     public function testLinkUserWithNameEmail() {
         $authSessionID = $this->createAuthSessionID();
@@ -106,7 +106,7 @@ class LinkUserTest extends AbstractAPIv2Test {
         ];
 
         $result = $this->api()->post(
-            $this->baseUrl.'/linkuser',
+            $this->baseUrl.'/link-user',
             $postData
         );
 
@@ -120,7 +120,7 @@ class LinkUserTest extends AbstractAPIv2Test {
     }
 
     /**
-     * Test POST /authenticate/linkuser with a wrong password.
+     * Test POST /authenticate/link-user with a wrong password.
      *
      * @expectedException \Exception
      * @expectedExceptionMessage The password verification failed.
@@ -135,7 +135,7 @@ class LinkUserTest extends AbstractAPIv2Test {
         ];
 
         $result = $this->api()->post(
-            $this->baseUrl.'/linkuser',
+            $this->baseUrl.'/link-user',
             $postData
         );
 

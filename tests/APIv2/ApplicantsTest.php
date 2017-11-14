@@ -7,17 +7,17 @@
 namespace VanillaTests\APIv2;
 
 /**
- * Test the /api/v2/applications endpoints.
+ * Test the /api/v2/applicants endpoints.
  */
-class ApplicationsTest extends AbstractResourceTest {
+class ApplicantsTest extends AbstractResourceTest {
 
     /**
      * {@inheritdoc}
      */
     public function __construct($name = null, array $data = [], $dataName = '') {
-        $this->baseUrl = '/applications';
+        $this->baseUrl = '/applicants';
         $this->patchFields = ['status'];
-        $this->pk = 'applicationID';
+        $this->pk = 'applicantID';
 
         parent::__construct($name, $data, $dataName);
     }

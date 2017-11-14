@@ -7,15 +7,15 @@
 namespace VanillaTests\APIv2;
 
 /**
- * Test the /api/v2/invitations endpoints.
+ * Test the /api/v2/invites endpoints.
  */
-class InvitationsTest extends AbstractResourceTest {
+class InvitesTest extends AbstractResourceTest {
 
     /**
      * {@inheritdoc}
      */
     public function __construct($name = null, array $data = [], $dataName = '') {
-        $this->baseUrl = '/invitations';
+        $this->baseUrl = '/invites';
 
         parent::__construct($name, $data, $dataName);
     }

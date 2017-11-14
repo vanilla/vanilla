@@ -679,16 +679,16 @@
         },
         {
             "name": "vanilla/garden-schema",
-            "version": "v1.7.2",
+            "version": "v1.7.3",
             "source": {
                 "type": "git",
                 "url": "https://github.com/vanilla/garden-schema.git",
-                "reference": "0f27b859a31bb720f37c469c2184dbc591c293ea"
+                "reference": "939f6103aeb6d7586044fb2b83bdf705e2279d91"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/vanilla/garden-schema/zipball/0f27b859a31bb720f37c469c2184dbc591c293ea",
-                "reference": "0f27b859a31bb720f37c469c2184dbc591c293ea",
+                "url": "https://api.github.com/repos/vanilla/garden-schema/zipball/939f6103aeb6d7586044fb2b83bdf705e2279d91",
+                "reference": "939f6103aeb6d7586044fb2b83bdf705e2279d91",
                 "shasum": ""
             },
             "require": {
@@ -711,7 +711,7 @@
                 }
             ],
             "description": "A simple data validation and cleaning library based on JSON Schema.",
-            "time": "2017-11-07T17:30:23+00:00"
+            "time": "2017-11-14T17:57:43+00:00"
         },
         {
             "name": "vanilla/htmlawed",

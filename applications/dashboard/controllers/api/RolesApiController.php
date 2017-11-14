@@ -205,13 +205,11 @@ class RolesApiController extends AbstractApiController {
         $schema = Schema::parse([
             'roleID:i' => 'ID of the role.',
             'name:s' => 'Name of the role.',
-            'description:s' => [
-                'allowNull' => true,
+            'description:s|n' => [
                 'description' => 'Description of the role.',
                 'minLength' => 0
             ],
-            'type:s' => [
-                'allowNull' => true,
+            'type:s|n' => [
                 'description' => 'Default type of this role.',
                 'minLength' => 0
             ],

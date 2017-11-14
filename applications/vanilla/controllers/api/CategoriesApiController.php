@@ -121,10 +121,9 @@ class CategoriesApiController extends AbstractApiController {
         return Schema::parse([
             'categoryID:i' => 'The ID of the category.',
             'name:s' => 'The name of the category.',
-            'description:s' => [
+            'description:s|n' => [
                 'description' => 'The description of the category.',
                 'minLength' => 0,
-                'allowNull' => true
             ],
             'parentCategoryID:i|n' => 'Parent category ID.',
             'urlCode:s' => 'The URL code of the category.',

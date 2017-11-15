@@ -25,7 +25,7 @@ class InvitesApiController extends AbstractApiController {
     private $userModel;
 
     /**
-     * InvitationsApiController constructor.
+     * InvitesApiController constructor.
      *
      * @param CapitalCaseScheme $caseScheme
      * @param Gdn_Configuration $configuration
@@ -196,7 +196,7 @@ class InvitesApiController extends AbstractApiController {
     public function inviteByID($id) {
         $row = $this->invitationModel->getID($id, DATASET_TYPE_ARRAY);
         if (!$row) {
-            throw new NotFoundException('Invitation');
+            throw new NotFoundException('Invite');
         }
         return $row;
     }

@@ -248,7 +248,7 @@ class RolesApiController extends AbstractApiController {
     public function get($id, array $query) {
         $this->permission('Garden.Settings.Manage');
 
-        //$this->idParamSchema()->setDescription('Get a role.');
+        $this->idParamSchema()->setDescription('Get a role.');
         $in = $this->schema([
             'expand?' => $this->getExpandFragment(['permissions'])
         ], 'in');

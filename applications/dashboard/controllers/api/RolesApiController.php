@@ -440,15 +440,17 @@ class RolesApiController extends AbstractApiController {
         $body = $in->validate($body, true);
         // If a row associated with this ID cannot be found, a "not found" exception will be thrown.
         $this->roleByID($id);
-        $roleData = $this->caseScheme->convertArrayKeys($body);
-        $roleData['RoleID'] = $id;
-        $this->roleModel->save($roleData);
-        $this->validateModel($this->roleModel);
-        $row = $this->roleByID($id);
 
         if (array_key_exists('permissions', $body)) {
             $this->savePermissions($id, $body['permissions']);
+            unset($body['permissions']);
         }
+
+        $roleData = $this->caseScheme->convertArrayKeys($body);
+        $roleData['RoleID'] = $id;
+        $this->roleModel->save($roleData, ['DoPermissions' => false]);
+        $this->validateModel($this->roleModel);
+        $row = $this->roleByID($id);
 
         $result = $out->validate($row);
         return $result;

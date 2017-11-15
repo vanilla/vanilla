@@ -539,7 +539,7 @@ class CategoriesController extends VanillaController {
         $CategoryFollowToggleModule = new CategoryFollowToggleModule($this);
         $CategoryFollowToggleModule->setToggle();
 
-        $this->CategoryModel->Watching = !Gdn::session()->getPreference('ShowAllCategories');
+        //$this->CategoryModel->Watching = !Gdn::session()->getPreference('ShowAllCategories');
 
         if ($Category) {
             $Subtree = CategoryModel::getSubtree($Category, false);

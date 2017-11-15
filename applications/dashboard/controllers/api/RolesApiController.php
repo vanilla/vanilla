@@ -382,9 +382,30 @@ class RolesApiController extends AbstractApiController {
     }
 
     /**
+     * Fill the $renamedPermissions property with all known permissions.
+     */
+    private function loadAllPermissions() {
+        if ($this->permissionsLoaded !== true) {
+            $permissions = array_keys($this->permissionModel->permissionColumns());
+            unset($permissions[array_search('PermissionID', $permissions)]);
+
+            foreach ($permissions as $permission) {
+                if (!in_array($permissions, $this->deprecatedPermissions)) {
+                    // This function will cache a copy of the renamed permission in the property.
+                    $this->renamePermission($permission);
+                }
+            }
+
+            $this->permissionsLoaded = true;
+        }
+    }
+
+    /**
      * Tweak the data in a role row in a standard way.
      *
      * @param array $row
+     * @param array|bool $expand
+     * @throws ServerException if attempting to include permissions, but there are too many permission rows.
      */
     protected function prepareRow(array &$row, $expand = []) {
         if (array_key_exists('RoleID', $row)) {
@@ -445,12 +466,13 @@ class RolesApiController extends AbstractApiController {
         $this->roleByID($id);
 
         $in = $this->schema($this->getPermissionsFragment(), 'in');
-        $out = $this->schema([], 'out');
+        $out = $this->schema($this->getPermissionsFragment(), 'out');
 
         $body = $in->validate($body);
         $this->savePermissions($id, $body);
 
-        $result = $this->getFormattedPermissions($id);
+        $rows = $this->getFormattedPermissions($id);
+        $result = $out->validate($rows);
         return $result;
     }
 
@@ -489,22 +511,25 @@ class RolesApiController extends AbstractApiController {
     }
 
     /**
-     * Fill the $renamedPermissions property with all known permissions.
+     * Overwrite all permissions for a role.
+     *
+     * @param int $id
+     * @param array $body
+     * @return array
      */
-    private function loadAllPermissions() {
-        if ($this->permissionsLoaded !== true) {
-            $permissions = array_keys($this->permissionModel->permissionColumns());
-            unset($permissions[array_search('PermissionID', $permissions)]);
+    public function put_permissions($id, array $body) {
+        $this->permission('Garden.Settings.Manage');
+        $this->roleByID($id);
 
-            foreach ($permissions as $permission) {
-                if (!in_array($permissions, $this->deprecatedPermissions)) {
-                    // This function will cache a copy of the renamed permission in the property.
-                    $this->renamePermission($permission);
-                }
-            }
+        $in = $this->schema($this->getPermissionsFragment(), 'in');
+        $out = $this->schema($this->getPermissionsFragment(), 'out');
 
-            $this->permissionsLoaded = true;
-        }
+        $body = $in->validate($body);
+        $this->savePermissions($id, $body, true);
+
+        $rows = $this->getFormattedPermissions($id);
+        $result = $out->validate($rows);
+        return $result;
     }
 
     /**
@@ -588,10 +613,11 @@ class RolesApiController extends AbstractApiController {
     /**
      * Save a role's permissions.
      *
-     * @param int $roleID
-     * @param array $rows
+     * @param int $roleID The role ID.
+     * @param array $rows Permission rows.
+     * @param bool $overwrite If a permission isn't explicitly defined, set it to false. All permissions will be overwritten.
      */
-    private function savePermissions($roleID, array $rows) {
+    private function savePermissions($roleID, array $rows, $overwrite = false) {
         foreach ($rows as &$row) {
             if (array_key_exists('permissions', $row)) {
                 foreach ($row['permissions'] as $perm => $val) {
@@ -604,10 +630,14 @@ class RolesApiController extends AbstractApiController {
             }
         }
 
+        if ($overwrite) {
+            $this->permissionModel->saveAll([], ['RoleID' => $roleID]);
+        }
+
         $permissions = $this->normalizePermissions($rows, $roleID);
         foreach ($permissions as $perm) {
             // The category model has its own special permission saving routine.
-            if (array_key_exists('JunctionTable', $perm) && $perm['JunctionTable'] == 'Category' && $perm['JunctionID'] > 0) {
+            if (array_key_exists('JunctionTable', $perm) && $perm['JunctionTable'] == 'Category') {
                 $this->categoryModel->save([
                     'CategoryID' => $perm['JunctionID'],
                     'CustomPermissions' => true,

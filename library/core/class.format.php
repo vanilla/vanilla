@@ -984,6 +984,30 @@ class Gdn_Format {
     }
 
     /**
+     * Check to see if a string has quotes and replace with them with a placeholder.
+     *
+     * Good for displaying excerpts from discussions without showing quotes.
+     *
+     * @param string $html An HTML-formatted string.
+     * @param string $replaceWith The translation code to replace quotes with.
+     *
+     * @return string Returns the html with quotes removed.
+     */
+    protected static function replaceQuotes($html, $replaceWith = '(Quote)') {
+        // This regex can't have an end quote because BBCode formats with both Quote and UserQuote classes.
+        if (preg_match('/class="(User)?Quote/i', $html)) {
+            $htmlDom = pQuery::parseStr($html);
+
+            foreach($htmlDom->query('.UserQuote, .Quote') as $quoteBlock) {
+                $quoteBlock->html(t($replaceWith));
+            }
+            $html = (string)$htmlDom;
+        }
+
+        return $html;
+    }
+
+    /**
      * Returns spoiler text wrapped in a HTML spoiler wrapper.
      *
      * Parsers for NBBC and Markdown should use this function to format thier spoilers.
@@ -1031,21 +1055,18 @@ class Gdn_Format {
     }
 
     /**
-     * Format a string as plain text.
+     * Convert common tags in an HTML strings to plain text. You still need to sanitize your string!!!
      *
-     * @param string $body The text to format.
-     * @param string $format The current format of the text.
+     * @param string $html An HTML-formatted string.
+     * @param string $format The initial format of the text.
      * @param bool $collapse Treat a group of closing block tags as one when replacing with newlines.
-     * @return string Sanitized HTML.
-     * @since 2.1
+     *
+     * @return string An HTML-formatted strings with common tags replaced with plainText
      */
-    public static function plainText($body, $format = 'Html', $collapse = false) {
-        $result = Gdn_Format::to($body, $format);
-        $result = Gdn_Format::replaceSpoilers($result);
-
+    protected static function convertBasicHTMLTagsToPlainText($html, $format = 'Html', $collapse = false) {
         if ($format != 'Text') {
             // Remove returns and then replace html return tags with returns.
-            $result = str_replace(["\n", "\r"], ' ', $result);
+            $result = str_replace(["\n", "\r"], ' ', $html);
             $result = preg_replace('`<br\s*/?>`', "\n", $result);
 
             // Fix lists.
@@ -1060,9 +1081,54 @@ class Gdn_Format {
 
             // TODO: Fix hard returns within pre blocks.
 
-            $result = strip_tags($result);
+            return strip_tags($result);
         }
+    }
 
+    /**
+     * Format a string as plain text.
+     *
+     * @param string $body The text to format.
+     * @param string $format The current format of the text.
+     * @param bool $collapse Treat a group of closing block tags as one when replacing with newlines.
+     *
+     * @return string Sanitized HTML.
+     * @since 2.1
+     */
+    public static function plainText($body, $format = 'Html', $collapse = false) {
+        $result = Gdn_Format::to($body, $format);
+        $result = Gdn_Format::replaceSpoilers($result);
+        $result = Gdn_Format::convertBasicHTMLTagsToPlainText($result, $format, $collapse);
+        $result = trim(html_entity_decode($result, ENT_QUOTES, 'UTF-8'));
+
+        // Always filter after basic parsing.
+        $sanitized = Gdn_Format::htmlFilter($result);
+
+        // No magic `processHTML()` for plain text.
+
+        return $sanitized;
+    }
+
+    /**
+     * Format a string as an excerpt. Like plaintText but with additional types of content removed.
+     *
+     * Currently replaces:
+     * - Common HTML tags with plaintext.
+     * - Replaces spoilers and their text with (Spoiler).
+     * - Replaces quotes and their text with (Quote).
+     *
+     * @param string $body The text to format.
+     * @param string $format The current format of the text.
+     * @param bool $collapse Treat a group of closing block tags as one when replacing with newlines.
+     *
+     * @return string Sanitized HTML.
+     * @since 2.1
+     */
+    public static function excerpt($body, $format = 'Html', $collapse = false) {
+        $result = Gdn_Format::to($body, $format);
+        $result = Gdn_Format::replaceSpoilers($result);
+        $result = Gdn_Format::replaceQuotes($result);
+        $result = Gdn_Format::convertBasicHTMLTagsToPlainText($result, $format, $collapse);
         $result = trim(html_entity_decode($result, ENT_QUOTES, 'UTF-8'));
 
         // Always filter after basic parsing.

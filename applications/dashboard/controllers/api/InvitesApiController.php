@@ -231,6 +231,7 @@ class InvitesApiController extends AbstractApiController {
      * @param array $row
      */
     public function prepareRow(array &$row) {
+        $row['InviteID'] = $row['InvitationID'];
         $row['Status'] = empty($row['AcceptedUserID']) ? 'pending' : 'accepted';
     }
 }

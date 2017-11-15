@@ -52,7 +52,7 @@ class ApplicantsTest extends AbstractResourceTest {
      * Approving a user application.
      *
      * @expectedException \Exception
-     * @expectedExceptionMessage The application specified is already an active user.
+     * @expectedExceptionMessage The applicant specified is already an active user.
      */
     public function testApprove() {
         $row = $this->testPost();
@@ -85,7 +85,7 @@ class ApplicantsTest extends AbstractResourceTest {
      *
      * @expectedException \Exception
      * @expectedExceptionCode 404
-     * @expectedExceptionMessage Application not found.
+     * @expectedExceptionMessage Applicant not found.
      */
     public function testDecline() {
         $row = $this->testPost();

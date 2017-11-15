@@ -176,7 +176,7 @@ class UsersTest extends AbstractResourceTest {
         $configuration->set('Garden.Registration.SkipCaptcha', true);
 
         $fields = $this->registrationFields();
-        $invitation = $this->api()->post('/invitations', ['email' => $fields['email']])->getBody();
+        $invitation = $this->api()->post('/invites', ['email' => $fields['email']])->getBody();
         $fields['invitationCode'] = $invitation['code'];
         $this->verifyRegistration($fields);
     }

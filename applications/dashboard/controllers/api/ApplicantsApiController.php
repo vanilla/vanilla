@@ -12,9 +12,9 @@ use Garden\Web\Exception\ServerException;
 use Vanilla\Utility\CapitalCaseScheme;
 
 /**
- * API Controller for managing applications.
+ * API Controller for managing applicants.
  */
-class ApplicationsApiController extends AbstractApiController {
+class ApplicantsApiController extends AbstractApiController {
 
     /** @var CapitalCaseScheme */
     private $caseScheme;
@@ -26,7 +26,7 @@ class ApplicationsApiController extends AbstractApiController {
     private $userModel;
 
     /**
-     * ApplicationsApiController constructor.
+     * ApplicantsApiController constructor.
      *
      * @param CapitalCaseScheme $caseScheme
      * @param Gdn_Configuration $configuration
@@ -43,29 +43,29 @@ class ApplicationsApiController extends AbstractApiController {
     }
 
     /**
-     * Delete an application. For now, this will decline the user's application.
+     * Delete an applicant. For now, this will decline the applicant.
      *
-     * @param int $id The ID of the application.
-     * @throws ClientException if the application has been approved.
+     * @param int $id The ID of the applicant.
+     * @throws ClientException if the applicant has been approved.
      */
     public function delete($id) {
         $this->permission('Garden.Users.Approve');
 
-        $in = $this->idParamSchema()->setDescription('Delete an application.');
+        $in = $this->idParamSchema()->setDescription('Delete an applicant.');
         $out = $this->schema([], 'out');
 
         $row = $this->userByID($id);
         $this->prepareRow($row);
 
         if ($this->userModel->isApplicant($id) === false) {
-            throw new ClientException('The application specified is already an active user.');
+            throw new ClientException('The specified applicant is already an active user.');
         }
 
         $this->userModel->decline($id);
     }
 
     /**
-     * Get a schema instance comprised of all available application fields.
+     * Get a schema instance comprised of all available applicant fields.
      *
      * @return Schema Returns a schema object.
      */
@@ -74,16 +74,16 @@ class ApplicationsApiController extends AbstractApiController {
 
         if ($fullSchema === null) {
             $fullSchema = Schema::parse([
-                'applicationID:i' => 'Unique ID associated with the application.',
-                'email:s' => 'Email address associated with the application.',
-                'name:s' => 'Username on the application.',
+                'applicantID:i' => 'Unique ID associated with the applicant.',
+                'email:s' => 'Email address associated with the applicant.',
+                'name:s' => 'Username on the applicant.',
                 'discoveryText:s' => 'Reason why you want to join.',
                 'status:s' => [
-                    'description' => 'Current status of the application.',
+                    'description' => 'Current status of the applicant.',
                     'enum' => ['approved', 'declined', 'pending']
                 ],
-                'insertIPAddress:s' => 'IP address of the user who created the application.',
-                'dateInserted:dt' => 'When the application was created.'
+                'insertIPAddress:s' => 'IP address of the user who created the applicant.',
+                'dateInserted:dt' => 'When the applicant was created.'
             ]);
         }
 
@@ -91,16 +91,16 @@ class ApplicationsApiController extends AbstractApiController {
     }
 
     /**
-     * Get a single application.
+     * Get a single applicant.
      *
-     * @param int $id The ID of the application.
-     * @throws NotFoundException if the application could not be found.
+     * @param int $id The ID of the applicant.
+     * @throws NotFoundException if the applicant could not be found.
      * @return array
      */
     public function get($id) {
         $this->permission('Garden.Users.Approve');
 
-        $in = $this->idParamSchema()->setDescription('Get an application.');
+        $in = $this->idParamSchema()->setDescription('Get an applicant.');
         $out = $this->schema($this->fullSchema(), 'out');
 
         $row = $this->userByID($id);
@@ -111,7 +111,7 @@ class ApplicationsApiController extends AbstractApiController {
     }
 
     /**
-     * Get an ID-only application record schema.
+     * Get an ID-only applicant record schema.
      *
      * @param string $type The type of schema.
      * @return Schema Returns a schema object.
@@ -119,7 +119,7 @@ class ApplicationsApiController extends AbstractApiController {
     public function idParamSchema($type = 'in') {
         if ($this->idParamSchema === null) {
             $this->idParamSchema = $this->schema(
-                Schema::parse(['id:i' => 'The application ID.']),
+                Schema::parse(['id:i' => 'The applicant ID.']),
                 $type
             );
         }
@@ -147,7 +147,7 @@ class ApplicationsApiController extends AbstractApiController {
                 'minimum' => 1,
                 'maximum' => 100
             ]
-        ], 'in')->setDescription('Get a list of current applications.');
+        ], 'in')->setDescription('Get a list of current applicants.');
         $out = $this->schema(
             [':a' => $this->fullSchema()],
             'out'
@@ -167,7 +167,7 @@ class ApplicationsApiController extends AbstractApiController {
     }
 
     /**
-     * Approve or decline an application.
+     * Approve or decline an applicant.
      *
      * @param int $id
      * @param array $body
@@ -180,17 +180,17 @@ class ApplicationsApiController extends AbstractApiController {
         $this->idParamSchema('in');
         $in = $this->schema([
             'status:s' => [
-                'description' => 'Current status of the application.',
+                'description' => 'Current status of the applicant.',
                 'enum' => ['approved', 'declined']
             ]
-        ], 'in')->setDescription('Modify an application.');
+        ], 'in')->setDescription('Modify an applicant.');
         $out = $this->schema($this->fullSchema(), 'out');
 
         $row = $this->userByID($id);
         $this->prepareRow($row);
 
         if ($this->userModel->isApplicant($id) === false) {
-            throw new ClientException('The application specified is already an active user.');
+            throw new ClientException('The applicant specified is already an active user.');
         }
 
         $body = $in->validate($body, true);
@@ -216,7 +216,7 @@ class ApplicationsApiController extends AbstractApiController {
     }
 
     /**
-     * Submit an application.
+     * Create an applicant.
      *
      * @param array $body
      * @throws ClientException if the terms of service flag is false.
@@ -231,7 +231,7 @@ class ApplicationsApiController extends AbstractApiController {
             'name:s' => 'A username for the user.',
             'password:s' => 'A password for the user.',
             'discoveryText:s' => 'Why does the user wish to join?'
-        ], 'in')->setDescription('Submit an application.');
+        ], 'in')->setDescription('Create an applicant.');
         $out = $this->schema($this->fullSchema(), 'out');
 
         $body = $in->validate($body);
@@ -245,7 +245,7 @@ class ApplicationsApiController extends AbstractApiController {
         if (filter_var($userID, FILTER_VALIDATE_INT)) {
             $row = $this->userByID($userID);
         } else {
-            throw new ServerException('An unknown error occurred while attempting to create the application.', 500);
+            throw new ServerException('An unknown error occurred while attempting to create the applicant.', 500);
         }
         $this->prepareRow($row);
 
@@ -259,13 +259,13 @@ class ApplicationsApiController extends AbstractApiController {
      * @param array $row
      */
     public function prepareRow(array &$row) {
-        $row['ApplicationID'] = $row['UserID'];
+        $row['ApplicantID'] = $row['UserID'];
         unset($row['UserID']);
         $row['Status'] = 'pending';
     }
 
     /**
-     * Get an application by its numeric ID.
+     * Get an applicant by its numeric ID.
      *
      * @param int $id The user ID.
      * @throws NotFoundException if the user could not be found.
@@ -274,7 +274,7 @@ class ApplicationsApiController extends AbstractApiController {
     public function userByID($id) {
         $row = $this->userModel->getID($id, DATASET_TYPE_ARRAY);
         if (!$row || $row['Deleted'] > 0) {
-            throw new NotFoundException('Application');
+            throw new NotFoundException('Applicant');
         }
         return $row;
     }

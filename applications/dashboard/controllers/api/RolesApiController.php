@@ -566,6 +566,7 @@ class RolesApiController extends AbstractApiController {
                 Schema::parse($fields)->add($this->fullSchema()),
                 'RolePost'
             );
+            // garden-schema has an issue with merging nested schemas using Schema::add. This is a way around that for now.
             $this->rolePostSchema->merge(Schema::parse(['permissions?' => $this->getPermissionsFragment()]));
         }
         return $this->schema($this->rolePostSchema, $type);

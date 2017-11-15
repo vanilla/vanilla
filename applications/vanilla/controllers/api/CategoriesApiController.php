@@ -49,7 +49,7 @@ class CategoriesApiController extends AbstractApiController {
      */
     public function categoryPostSchema($type = '', array $extra = []) {
         if ($this->categoryPostSchema === null) {
-            $fields = ['name', 'parentCategoryID?', 'urlCode', 'displayAs?'];
+            $fields = ['name', 'parentCategoryID?', 'urlCode', 'displayAs?', 'customPermissions?'];
             $this->categoryPostSchema = $this->schema(
                 Schema::parse(array_merge($fields, $extra))->add($this->schemaWithParent()),
                 'CategoryPost'
@@ -126,6 +126,7 @@ class CategoriesApiController extends AbstractApiController {
                 'minLength' => 0,
             ],
             'parentCategoryID:i|n' => 'Parent category ID.',
+            'customPermissions:b' => 'Are custom permissions set for this category?',
             'urlCode:s' => 'The URL code of the category.',
             'url:s' => 'The URL to the category.',
             'displayAs:s' => [
@@ -316,7 +317,7 @@ class CategoriesApiController extends AbstractApiController {
 
         $body = $in->validate($body, true);
         // If a row associated with this ID cannot be found, a "not found" exception will be thrown.
-        $this->category($id);
+        $category = $this->category($id);
 
         if (array_key_exists('parentCategoryID', $body)) {
             $this->updateParent($id, $body['parentCategoryID']);
@@ -324,6 +325,13 @@ class CategoriesApiController extends AbstractApiController {
         }
 
         if (!empty($body)) {
+            if (array_key_exists('customPermissions', $body)) {
+                $this->categoryModel->save([
+                    'CategoryID' => $id,
+                    'CustomPermissions' => $body['customPermissions']
+                ]);
+                unset($body['customPermissions']);
+            }
             $categoryData = $this->caseScheme->convertArrayKeys($body);
             $this->categoryModel->setField($id, $categoryData);
         }
@@ -371,6 +379,7 @@ class CategoriesApiController extends AbstractApiController {
         if ($row['ParentCategoryID'] <= 0) {
             $row['ParentCategoryID'] = null;
         }
+        $row['CustomPermissions'] = ($row['PermissionCategoryID'] === $row['CategoryID']);
         $row['Description'] = $row['Description'] ?: '';
         $row['DisplayAs'] = strtolower($row['DisplayAs']);
 

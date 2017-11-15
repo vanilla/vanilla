@@ -1063,7 +1063,7 @@ class Gdn_Format {
      *
      * @return string An HTML-formatted strings with common tags replaced with plainText
      */
-    protected static function convertBasicHTMLTagsToPlainText($html, $format = 'Html', $collapse = false) {
+    protected static function convertCommonHTMLTagsToPlainText($html, $format = 'Html', $collapse = false) {
         if ($format != 'Text') {
             // Remove returns and then replace html return tags with returns.
             $result = str_replace(["\n", "\r"], ' ', $html);
@@ -1098,7 +1098,7 @@ class Gdn_Format {
     public static function plainText($body, $format = 'Html', $collapse = false) {
         $result = Gdn_Format::to($body, $format);
         $result = Gdn_Format::replaceSpoilers($result);
-        $result = Gdn_Format::convertBasicHTMLTagsToPlainText($result, $format, $collapse);
+        $result = Gdn_Format::convertCommonHTMLTagsToPlainText($result, $format, $collapse);
         $result = trim(html_entity_decode($result, ENT_QUOTES, 'UTF-8'));
 
         // Always filter after basic parsing.
@@ -1128,7 +1128,7 @@ class Gdn_Format {
         $result = Gdn_Format::to($body, $format);
         $result = Gdn_Format::replaceSpoilers($result);
         $result = Gdn_Format::replaceQuotes($result);
-        $result = Gdn_Format::convertBasicHTMLTagsToPlainText($result, $format, $collapse);
+        $result = Gdn_Format::convertCommonHTMLTagsToPlainText($result, $format, $collapse);
         $result = trim(html_entity_decode($result, ENT_QUOTES, 'UTF-8'));
 
         // Always filter after basic parsing.

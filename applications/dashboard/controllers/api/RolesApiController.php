@@ -425,6 +425,10 @@ class RolesApiController extends AbstractApiController {
         $this->validateModel($this->roleModel);
         $row = $this->roleByID($id);
 
+        if (array_key_exists('permissions', $body)) {
+            $this->savePermissions($id, $body['permissions']);
+        }
+
         $result = $out->validate($row);
         return $result;
     }
@@ -471,6 +475,10 @@ class RolesApiController extends AbstractApiController {
 
         if (!$id) {
             throw new ServerException('Unable to add role.', 500);
+        }
+
+        if (array_key_exists('permissions', $body)) {
+            $this->savePermissions($id, $body['permissions']);
         }
 
         $row = $this->roleByID($id);
@@ -558,6 +566,7 @@ class RolesApiController extends AbstractApiController {
                 Schema::parse($fields)->add($this->fullSchema()),
                 'RolePost'
             );
+            $this->rolePostSchema->merge(Schema::parse(['permissions?' => $this->getPermissionsFragment()]));
         }
         return $this->schema($this->rolePostSchema, $type);
     }
@@ -665,7 +674,7 @@ class RolesApiController extends AbstractApiController {
             }
 
             if ($type === 'category') {
-                if (filter_var($id, FILTER_VALIDATE_INT) && $id < 0 && $id !== -1) {
+                if (filter_var($id, FILTER_VALIDATE_INT) === false || ($id < 0 && $id !== -1)) {
                     throw new InvalidArgumentException('Category permissions must have a valid ID.');
                 }
                 $dbRow['JunctionTable'] = 'Category';

@@ -2532,6 +2532,7 @@ class UserModel extends Gdn_Model {
 
         $this->EventArguments['Keywords'] =& $keywords;
         $this->EventArguments['RankID'] =& $rankID;
+        $this->EventArguments['Optimize'] =& $optimize;
         $this->fireEvent('BeforeUserQuery');
 
         $this->userQuery();

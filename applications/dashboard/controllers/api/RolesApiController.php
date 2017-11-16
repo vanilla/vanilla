@@ -16,11 +16,17 @@ use Vanilla\Utility\CamelCaseScheme;
  */
 class RolesApiController extends AbstractApiController {
 
+    /** Maximum number of permission rows that can be displayed before an error is reported. */
+    const MAX_PERMISSIONS = 100;
+
     /** @var CamelCaseScheme */
     private $camelCaseScheme;
 
     /** @var CapitalCaseScheme */
     private $caseScheme;
+
+    /** @var CategoryModel */
+    private $categoryModel;
 
     /** @var array Groups of permissions that can be consolidated into one. */
     private $consolidatedPermissions = [
@@ -65,6 +71,10 @@ class RolesApiController extends AbstractApiController {
         'Reactions.Negative.Add',
         'Reactions.Positive.Add'
     ];
+
+    /** @var bool Have all permissions been loaded into $renamedPermissions? */
+    private $permissionsLoaded = false;
+
     /** @var RoleModel */
     private $roleModel;
 
@@ -79,10 +89,12 @@ class RolesApiController extends AbstractApiController {
      *
      * @param RoleModel $roleModel
      * @param PermissionModel $permissionModel
+     * @param CategoryModel $categoryModel
      */
-    public function __construct(RoleModel $roleModel, PermissionModel $permissionModel) {
+    public function __construct(RoleModel $roleModel, PermissionModel $permissionModel, CategoryModel $categoryModel) {
         $this->roleModel = $roleModel;
         $this->permissionModel = $permissionModel;
+        $this->categoryModel = $categoryModel;
         $this->caseScheme = new CapitalCaseScheme();
         $this->camelCaseScheme = new CamelCaseScheme();
     }
@@ -100,7 +112,10 @@ class RolesApiController extends AbstractApiController {
             $pass = 0;
             $total = count($perms);
             foreach ($perms as $currentPerm) {
-                if (array_key_exists($currentPerm, $permissions) && $permissions[$currentPerm]) {
+                if (!array_key_exists($currentPerm, $permissions)) {
+                    // If a key isn't present, assume this is the wrong permission type (e.g. global, category).
+                    continue 2;
+                } elseif ($permissions[$currentPerm]) {
                     $pass++;
                 }
             }
@@ -150,10 +165,7 @@ class RolesApiController extends AbstractApiController {
      * @return array
      */
     private function formatPermissions(array $global, array $categories) {
-        $result = [
-            'global' => [],
-            'categories' => []
-        ];
+        $result = [];
 
         /**
          * Format an array of permission names. Convert names as necessary and cast values to boolean.
@@ -180,17 +192,23 @@ class RolesApiController extends AbstractApiController {
             return $result;
         };
 
-        $result['global'] = $format($global);
+        $result[] = [
+            'type' => 'global',
+            'permissions' => $format($global)
+        ];
 
         foreach ($categories as $cat) {
             // Default category (-1) permissions now fall under an ID of zero (0).
-            $catPerms['id'] = $cat['JunctionID'] == -1 ? 0 : $cat['JunctionID'];
+            $catPerms = [
+                'id' => $cat['JunctionID'] == -1 ? 0 : $cat['JunctionID'],
+                'type' => 'category'
+            ];
 
             // Cleanup non-permission values from the row.
             unset($cat['Name'], $cat['JunctionID'], $cat['JunctionTable'], $cat['JunctionColumn']);
 
             $catPerms['permissions'] = $format($cat);
-            $result['categories'][] = $catPerms;
+            $result[] = $catPerms;
         }
 
         return $result;
@@ -216,7 +234,7 @@ class RolesApiController extends AbstractApiController {
             'deletable:b' => 'Is the role deletable?',
             'canSession:b' => 'Can users in this role start a session?',
             'personalInfo:b' => 'Is membership in this role personal information?',
-            'permissions:o?' => 'Permissions available to the role.'
+            'permissions?' => $this->getPermissionsFragment()
         ]);
         return $schema;
     }
@@ -225,17 +243,24 @@ class RolesApiController extends AbstractApiController {
      * Get a single role.
      *
      * @param int $id The ID of the role.
+     * @param array $query
      * @throws NotFoundException if unable to find the role.
      * @return array
      */
-    public function get($id) {
+    public function get($id, array $query) {
         $this->permission('Garden.Settings.Manage');
 
-        $in = $this->idParamSchema()->setDescription('Get a role.');
+        $this->idParamSchema()->setDescription('Get a role.');
+        $in = $this->schema([
+            'expand?' => $this->getExpandFragment(['permissions'])
+        ], 'in');
         $out = $this->schema($this->roleSchema(), 'out');
 
+        $query = $in->validate($query);
+        $query += ['expand' => false];
+
         $row = $this->roleByID($id);
-        $this->prepareRow($row);
+        $this->prepareRow($row, $query['expand']);
 
         $result = $out->validate($row);
         return $result;
@@ -262,6 +287,56 @@ class RolesApiController extends AbstractApiController {
     }
 
     /**
+     * Get an array of role permissions, formatted for the API.
+     *
+     * @param int $roleID
+     * @return array
+     */
+    private function getFormattedPermissions($roleID) {
+        $global = $this->permissionModel->getGlobalPermissions($roleID);
+        unset($global['PermissionID']);
+        $category = $this->permissionModel->getJunctionPermissions(
+            ['RoleID' => $roleID],
+            'Category'
+        );
+        $result = $this->formatPermissions($global, $category);
+        return $result;
+    }
+
+    /**
+     * Given a permission name, lookup its legacy equivalent.
+     *
+     * @param string $permission The new, shortened permission name.
+     * @return string|bool
+     */
+    private function getLegacyPermission($permission) {
+        $this->loadAllPermissions();
+        $result = array_search($permission, $this->renamedPermissions);
+        return $result;
+    }
+
+    /**
+     * Return a schema to represent a collection of permission rows.
+     *
+     * @return static
+     */
+    private function getPermissionsFragment() {
+        static $permissionsFragment;
+
+        if ($permissionsFragment === null) {
+            $permissionsFragment = Schema::parse([
+                ':a' => [
+                    'id:i?',
+                    'type:s' => ['enum' => ['global', 'category']],
+                    'permissions:o'
+                ]
+            ]);
+        }
+
+        return $permissionsFragment;
+    }
+
+    /**
      * Get an ID-only role record schema.
      *
      * @param string $type The type of schema.
@@ -280,17 +355,23 @@ class RolesApiController extends AbstractApiController {
     /**
      * List roles.
      *
+     * @param array $query
      * @return array
      */
-    public function index() {
+    public function index(array $query) {
         $this->permission('Garden.Settings.Manage');
 
-        $in = $this->schema([], 'in')->setDescription('List roles.');
+        $in = $this->schema([
+            'expand?' => $this->getExpandFragment(['permissions'])
+        ], 'in')->setDescription('List roles.');
         $out = $this->schema([':a' => $this->roleSchema()], 'out');
+
+        $query = $in->validate($query);
+        $query += ['expand' => false];
 
         $rows = $this->roleModel->getWithRankPermissions()->resultArray();
         foreach ($rows as &$row) {
-            $this->prepareRow($row);
+            $this->prepareRow($row, $query['expand']);
         }
 
         $result = $out->validate($rows);
@@ -309,20 +390,43 @@ class RolesApiController extends AbstractApiController {
     }
 
     /**
+     * Fill the $renamedPermissions property with all known permissions.
+     */
+    private function loadAllPermissions() {
+        if ($this->permissionsLoaded !== true) {
+            $permissions = array_keys($this->permissionModel->permissionColumns());
+            unset($permissions[array_search('PermissionID', $permissions)]);
+
+            foreach ($permissions as $permission) {
+                if (!in_array($permissions, $this->deprecatedPermissions)) {
+                    // This function will cache a copy of the renamed permission in the property.
+                    $this->renamePermission($permission);
+                }
+            }
+
+            $this->permissionsLoaded = true;
+        }
+    }
+
+    /**
      * Tweak the data in a role row in a standard way.
      *
      * @param array $row
+     * @param array|bool $expand
+     * @throws ServerException if attempting to include permissions, but there are too many permission rows.
      */
-    protected function prepareRow(array &$row) {
+    protected function prepareRow(array &$row, $expand = []) {
         if (array_key_exists('RoleID', $row)) {
             $roleID = $row['RoleID'];
-            $global = $this->permissionModel->getGlobalPermissions($roleID);
-            unset($global['PermissionID']);
-            $category = $this->permissionModel->getJunctionPermissions([
-                'RoleID' => $roleID,
-                'Category'
-            ]);
-            $row['permissions'] = $this->formatPermissions($global, $category);
+            if ($this->isExpandField('permissions', $expand)) {
+                $permissionCount = $this->permissionModel
+                    ->getWhere(['RoleID' => $roleID], '', 'asc', self::MAX_PERMISSIONS + 1)
+                    ->count();
+                if ($permissionCount > self::MAX_PERMISSIONS) {
+                    throw new ServerException('There are too many permissions to display.', 416);
+                }
+                $row['permissions'] = $this->getFormattedPermissions($roleID);
+            }
         }
     }
 
@@ -344,13 +448,41 @@ class RolesApiController extends AbstractApiController {
         $body = $in->validate($body, true);
         // If a row associated with this ID cannot be found, a "not found" exception will be thrown.
         $this->roleByID($id);
+
+        if (array_key_exists('permissions', $body)) {
+            $this->savePermissions($id, $body['permissions']);
+            unset($body['permissions']);
+        }
+
         $roleData = $this->caseScheme->convertArrayKeys($body);
         $roleData['RoleID'] = $id;
-        $this->roleModel->save($roleData);
+        $this->roleModel->save($roleData, ['DoPermissions' => false]);
         $this->validateModel($this->roleModel);
         $row = $this->roleByID($id);
 
         $result = $out->validate($row);
+        return $result;
+    }
+
+    /**
+     * Update permissions on a role.
+     *
+     * @param $id
+     * @param $body
+     * @return array
+     */
+    public function patch_permissions($id, array $body) {
+        $this->permission('Garden.Settings.Manage');
+        $this->roleByID($id);
+
+        $in = $this->schema($this->getPermissionsFragment(), 'in');
+        $out = $this->schema($this->getPermissionsFragment(), 'out');
+
+        $body = $in->validate($body);
+        $this->savePermissions($id, $body);
+
+        $rows = $this->getFormattedPermissions($id);
+        $result = $out->validate($rows);
         return $result;
     }
 
@@ -377,11 +509,37 @@ class RolesApiController extends AbstractApiController {
             throw new ServerException('Unable to add role.', 500);
         }
 
+        if (array_key_exists('permissions', $body)) {
+            $this->savePermissions($id, $body['permissions']);
+        }
+
         $row = $this->roleByID($id);
         $this->prepareRow($row);
 
         $result = $out->validate($row);
         return new Data($result, 201);
+    }
+
+    /**
+     * Overwrite all permissions for a role.
+     *
+     * @param int $id
+     * @param array $body
+     * @return array
+     */
+    public function put_permissions($id, array $body) {
+        $this->permission('Garden.Settings.Manage');
+        $this->roleByID($id);
+
+        $in = $this->schema($this->getPermissionsFragment(), 'in');
+        $out = $this->schema($this->getPermissionsFragment(), 'out');
+
+        $body = $in->validate($body);
+        $this->savePermissions($id, $body, true);
+
+        $rows = $this->getFormattedPermissions($id);
+        $result = $out->validate($rows);
+        return $result;
     }
 
     /**
@@ -443,6 +601,8 @@ class RolesApiController extends AbstractApiController {
                 Schema::parse($fields)->add($this->fullSchema()),
                 'RolePost'
             );
+            // garden-schema has an issue with merging nested schemas using Schema::add. This is a way around that for now.
+            $this->rolePostSchema->merge(Schema::parse(['permissions?' => $this->getPermissionsFragment()]));
         }
         return $this->schema($this->rolePostSchema, $type);
     }
@@ -458,5 +618,114 @@ class RolesApiController extends AbstractApiController {
             $this->roleSchema = $this->schema($this->fullSchema(), 'Role');
         }
         return $this->schema($this->roleSchema, $type);
+    }
+
+    /**
+     * Save a role's permissions.
+     *
+     * @param int $roleID The role ID.
+     * @param array $rows Permission rows.
+     * @param bool $overwrite If a permission isn't explicitly defined, set it to false. All permissions will be overwritten.
+     */
+    private function savePermissions($roleID, array $rows, $overwrite = false) {
+        foreach ($rows as &$row) {
+            if (array_key_exists('permissions', $row)) {
+                foreach ($row['permissions'] as $perm => $val) {
+                    if (array_key_exists($perm, $this->consolidatedPermissions)) {
+                        $expanded = array_fill_keys($this->consolidatedPermissions[$perm], (bool)$val);
+                        $row['permissions'] = array_merge($row['permissions'], $expanded);
+                        unset($row['permissions'][$perm]);
+                    }
+                }
+            }
+        }
+
+        if ($overwrite) {
+            $this->permissionModel->saveAll([], ['RoleID' => $roleID]);
+        }
+
+        $permissions = $this->normalizePermissions($rows, $roleID);
+        foreach ($permissions as $perm) {
+            // The category model has its own special permission saving routine.
+            if (array_key_exists('JunctionTable', $perm) && $perm['JunctionTable'] == 'Category') {
+                $this->categoryModel->save([
+                    'CategoryID' => $perm['JunctionID'],
+                    'CustomPermissions' => true,
+                    'Permissions' => [$perm]
+                ]);
+            } else {
+                $this->permissionModel->save($perm);
+            }
+        }
+    }
+
+    /**
+     * Given an array of permissions in the API format, alter it to be compatible with the permissions model.
+     *
+     * @param array $rows
+     * @param int $roleID
+     * @return array
+     */
+    private function normalizePermissions(array $rows, $roleID) {
+        // Grab allowed global permissions.
+        $global = $this->permissionModel->getGlobalPermissions($roleID);
+        unset($global['PermissionID']);
+        $global = array_keys($global);
+
+        // Grab allowed category permissions.
+        $category = $this->permissionModel->getJunctionPermissions(
+            ['JunctionID' => -1],
+            'Category'
+        );
+        $category = array_pop($category);
+        unset($category['RoleID'], $category['Name'], $category['JunctionTable'], $category['JunctionColumn'], $category['JunctionID']);
+        $category = array_keys($category);
+
+        $result = [];
+        foreach ($rows as $row) {
+            if (!array_key_exists('type', $row)) {
+                throw new InvalidArgumentException('The type property could not be found when setting permissions.');
+            }
+            if (!array_key_exists('permissions', $row)) {
+                throw new InvalidArgumentException('The permissions property could not be found when setting permissions.');
+            }
+
+            $type = $row['type'];
+            $id = array_key_exists('id', $row) ? $row['id'] : false;
+            $dbRow = ['RoleID' => $roleID];
+
+            // Ensure the permission names are legitimate and valid for their type.
+            foreach ($row['permissions'] as $permission => $value) {
+                $legacy = $this->getLegacyPermission($permission);
+                if ($legacy === false) {
+                    throw new InvalidArgumentException("Unknown permission: {$permission}");
+                }
+                if ($type === 'global' && !in_array($legacy, $global)) {
+                    throw new InvalidArgumentException("Invalid global permission: {$legacy}.");
+                } elseif ($type === 'category' && !in_array($legacy, $category)) {
+                    throw new InvalidArgumentException("Invalid category permission: {$legacy}.");
+                }
+
+                $dbRow[$legacy] = (bool)$value;
+            }
+
+            // The API uses 0 for default category permissions. Revert that.
+            if ($type === 'category' && $id === 0) {
+                $id = -1;
+            }
+
+            if ($type === 'category') {
+                if (filter_var($id, FILTER_VALIDATE_INT) === false || ($id < 0 && $id !== -1)) {
+                    throw new InvalidArgumentException('Category permissions must have a valid ID.');
+                }
+                $dbRow['JunctionTable'] = 'Category';
+                $dbRow['JunctionColumn'] = 'PermissionCategoryID';
+                $dbRow['JunctionID'] = $id;
+            }
+
+            $result[] = $dbRow;
+        }
+
+        return $result;
     }
 }

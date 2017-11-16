@@ -89,6 +89,7 @@ class RolesApiController extends AbstractApiController {
      *
      * @param RoleModel $roleModel
      * @param PermissionModel $permissionModel
+     * @param CategoryModel $categoryModel
      */
     public function __construct(RoleModel $roleModel, PermissionModel $permissionModel, CategoryModel $categoryModel) {
         $this->roleModel = $roleModel;
@@ -242,6 +243,7 @@ class RolesApiController extends AbstractApiController {
      * Get a single role.
      *
      * @param int $id The ID of the role.
+     * @param array $query
      * @throws NotFoundException if unable to find the role.
      * @return array
      */
@@ -313,6 +315,11 @@ class RolesApiController extends AbstractApiController {
         return $result;
     }
 
+    /**
+     * Return a schema to represent a collection of permission rows.
+     *
+     * @return static
+     */
     private function getPermissionsFragment() {
         static $permissionsFragment;
 
@@ -348,6 +355,7 @@ class RolesApiController extends AbstractApiController {
     /**
      * List roles.
      *
+     * @param array $query
      * @return array
      */
     public function index(array $query) {

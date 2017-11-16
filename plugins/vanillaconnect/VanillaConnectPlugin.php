@@ -360,7 +360,7 @@ class VanillaConnectPlugin extends Gdn_Plugin {
             ],
             'SignInUrl' => [
                 'LabelCode' => 'Sign In URL',
-                'Description' => t('The url that users use to sign in.').' '.t('Use target={target} to redirect users to the page they where on or target=WhateverYouWant to redirect to a specific url.')
+                'Description' => t('The url that users use to sign in.').' '.t('Use target={target} to redirect users to the page they were on or target=WhateverYouWant to redirect to a specific url.')
             ],
             'RegisterUrl' => [
                 'LabelCode' => 'Registration URL',

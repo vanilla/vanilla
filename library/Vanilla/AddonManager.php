@@ -601,7 +601,7 @@ class AddonManager {
         // Filter the list.
         if ($filter) {
             $array = array_filter($array, function ($row) use ($filter) {
-                return ($row['status'] & $filter) === $filter;
+                return ($row['status'] | $filter) === $filter;
             });
         }
 

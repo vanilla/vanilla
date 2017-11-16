@@ -482,7 +482,7 @@ BQ;
                     $quoteBody = $data->Body;
                     $insertName = $data->InsertName;
                     if (preg_match('/[^\w-]/', $insertName)) {
-                    $insertName = '"'.$insertName.'"';
+                        $insertName = '"'.$insertName.'"';
                     }
                     $quote = '> '.sprintf(t('%s said:'), '@'.$insertName)."\n".
                         '> '.str_replace("\n", "\n> ", $quoteBody)."\n";

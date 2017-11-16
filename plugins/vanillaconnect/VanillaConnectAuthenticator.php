@@ -129,21 +129,40 @@ class VanillaConnectAuthenticator extends SSOAuthenticator {
     /**
      * Get URL where the authentication response needs to be sent to.
      *
-     * @param string $providerURL
+     * @param string|null $target
      * @return string
      */
-    private function getRedirectURL($providerURL) {
+    private function getRedirectURL($target = null) {
         $url = $this->request->getScheme().'://'.$this->request->getHost().'/authenticate/'.$this->getName().'/'.rawurlencode($this->getID());
 
-        $target = false;
-        $providerQuery = [];
-        parse_str(parse_url($providerURL, PHP_URL_QUERY), $providerQuery);
-        $providerQuery = array_change_key_case($providerQuery, CASE_LOWER);
+        if ($target) {
+            $target = safeURL($target);
+            $url .= '?target='.rawurlencode($target);
+        }
 
-        // If a target is set on the provider URL let's use that.
-        if (!empty($providerQuery['target'])) {
-            $target = $providerQuery['target'];
-        } else {
+        return $url;
+    }
+
+    /**
+     * Extract `target=?` from the URL and return both the transformed URL and the target.
+     *
+     * @param $url
+     * @return array [$url, $target]
+     */
+    private function extractTargetFromURL($url) {
+        $query = [];
+        parse_str(parse_url($url, PHP_URL_QUERY), $query);
+        $query = array_change_key_case($query, CASE_LOWER);
+
+        $target = null;
+        if (!empty($query['target'])) {
+            $target = $query['target'];
+            $url = str_ireplace('target='.$query['target'], '', $url);
+            $url = str_replace('&&', '', $url);
+            $url = rtrim($url, '?&');
+        }
+
+        if ($target === '{target}') {
             $query = $this->request->getQuery();
             $query = array_change_key_case($query, CASE_LOWER);
             if (!empty($query['target'])) {
@@ -151,24 +170,16 @@ class VanillaConnectAuthenticator extends SSOAuthenticator {
             }
         }
 
-        if ($target) {
-            // Encode the target if we need to!
-            if (preg_match('/[a-z\d]/i', $target) === 1) {
-                $target = rawurlencode($target);
-            }
-            $url .= '?target='.$target;
-        }
-
-        return $url;
+        return [$url, $target];
     }
 
     /**
      * @inheritDoc
      */
     public function registrationURL() {
-        $url = $this->providerData['RegisterUrl'];
+        list($url, $target) = $this->extractTargetFromURL($this->providerData['RegisterUrl']);
         $url .= (strpos($url, '?') === false ? '?' : '&');
-        $url .= 'jwt='.$this->vanillaConnect->createRequestAuthJWT($this->generateNonce(), ['redirect' => $this->getRedirectURL($url)]);
+        $url .= 'jwt='.$this->vanillaConnect->createRequestAuthJWT($this->generateNonce(), ['redirect' => $this->getRedirectURL($target)]);
         return $url;
     }
 
@@ -176,9 +187,9 @@ class VanillaConnectAuthenticator extends SSOAuthenticator {
      * @inheritdoc
      */
     public function signInURL() {
-        $url = $this->providerData['SignInUrl'];
+        list($url, $target) = $this->extractTargetFromURL($this->providerData['SignInUrl']);
         $url .= (strpos($url, '?') === false ? '?' : '&');
-        $url .= 'jwt='.$this->vanillaConnect->createRequestAuthJWT($this->generateNonce(), ['redirect' => $this->getRedirectURL($url)]);
+        $url .= 'jwt='.$this->vanillaConnect->createRequestAuthJWT($this->generateNonce(), ['redirect' => $this->getRedirectURL($target)]);
         return $url;
     }
 

@@ -10,6 +10,7 @@ use Garden\Web\Data;
 use Garden\Web\Exception\ClientException;
 use Garden\Web\Exception\NotFoundException;
 use Garden\Web\Exception\ServerException;
+use Vanilla\DateFilterSchema;
 use Vanilla\Utility\CapitalCaseScheme;
 
 /**
@@ -22,6 +23,9 @@ class UsersApiController extends AbstractApiController {
 
     /** @var Gdn_Configuration */
     private $configuration;
+
+    /** @var DateFilterSchema */
+    private $dateFilterSchema;
 
     /** @var Schema */
     private $idParamSchema;
@@ -40,11 +44,13 @@ class UsersApiController extends AbstractApiController {
      *
      * @param UserModel $userModel
      * @param Gdn_Configuration $configuration
+     * @param DateFilterSchema $dateFilterSchema
      */
-    public function __construct(UserModel $userModel, Gdn_Configuration $configuration) {
+    public function __construct(UserModel $userModel, Gdn_Configuration $configuration, DateFilterSchema $dateFilterSchema) {
         $this->caseScheme = new CapitalCaseScheme();
         $this->configuration = $configuration;
         $this->userModel = $userModel;
+        $this->dateFilterSchema = $dateFilterSchema;
     }
 
     /**
@@ -168,6 +174,8 @@ class UsersApiController extends AbstractApiController {
         ]);
 
         $in = $this->schema([
+            'dateInserted?' => $this->dateFilterSchema,
+            'dateUpdated?' => $this->dateFilterSchema,
             'userID:a?' => [
                 'description' => 'One or more user IDs to lookup.',
                 'items' => ['type' => 'integer'],
@@ -189,10 +197,17 @@ class UsersApiController extends AbstractApiController {
 
         $query = $in->validate($query);
         list($offset, $limit) = offsetLimit("p{$query['page']}", $query['limit']);
-        $filter = '';
+        $filter = [];
 
         if (!empty($query['userID'])) {
-            $filter = ['UserID' => $query['userID']];
+            $filter['UserID'] = $query['userID'];
+        }
+
+        if ($dateInserted = $this->dateFilterField('dateInserted', $query)) {
+            $filter += $dateInserted;
+        }
+        if ($dateUpdated = $this->dateFilterField('dateUpdated', $query)) {
+            $filter += $dateUpdated;
         }
 
         $rows = $this->userModel->search($filter, '', '', $limit, $offset)->resultArray();

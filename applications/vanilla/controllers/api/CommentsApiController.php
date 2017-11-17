@@ -150,13 +150,17 @@ class CommentsApiController extends AbstractApiController {
      * Get a comment.
      *
      * @param int $id The ID of the comment.
+     * @param array $query The request query.
      * @return array
      */
-    public function get($id) {
+    public function get($id, array $query) {
         $this->permission();
 
-        $in = $this->idParamSchema()->setDescription('Get a comment.');
+        $this->idParamSchema();
+        $in = $this->schema([], 'in')->setDescription('Get a comment.');
         $out = $this->schema($this->commentSchema(), 'out');
+
+        $query = $in->validate($query);
 
         $comment = $this->commentByID($id);
         if ($comment['InsertUserID'] !== $this->getSession()->UserID) {
@@ -169,7 +173,7 @@ class CommentsApiController extends AbstractApiController {
         $result = $out->validate($comment);
 
         // Allow addons to modify the result.
-        $this->getEventManager()->fireArray('commentsApiController_get_data', [&$result]);
+        $this->getEventManager()->fireArray('commentsApiController_get_data', [$this, &$result, $query, $comment]);
         return $result;
     }
 
@@ -295,7 +299,7 @@ class CommentsApiController extends AbstractApiController {
         $result = $out->validate($rows);
 
         // Allow addons to modify the result.
-        $this->getEventManager()->fireArray('commentsApiController_index_data', [&$result, $query]);
+        $this->getEventManager()->fireArray('commentsApiController_index_data', [$this, &$result, $query, $rows]);
         return $result;
     }
 

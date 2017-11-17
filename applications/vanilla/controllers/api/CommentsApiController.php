@@ -156,8 +156,8 @@ class CommentsApiController extends AbstractApiController {
     public function get($id, array $query) {
         $this->permission();
 
-        $this->idParamSchema()->setDescription('Get a comment.');
-        $in = $this->schema([], 'in');
+        $this->idParamSchema();
+        $in = $this->schema([], 'in')->setDescription('Get a comment.');
         $out = $this->schema($this->commentSchema(), 'out');
 
         $query = $in->validate($query);

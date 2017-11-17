@@ -200,8 +200,8 @@ class DiscussionsApiController extends AbstractApiController {
     public function get($id, array $query) {
         $this->permission();
 
-        $this->idParamSchema()->setDescription('Get a discussion.');
-        $in = $this->schema([], 'in');
+        $this->idParamSchema();
+        $in = $this->schema([], 'in')->setDescription('Get a discussion.');
         $out = $this->schema($this->discussionSchema(), 'out');
 
         $query = $in->validate($query);

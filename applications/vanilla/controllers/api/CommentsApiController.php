@@ -7,6 +7,7 @@
 use Garden\Schema\Schema;
 use Garden\Web\Exception\NotFoundException;
 use Garden\Web\Exception\ServerException;
+use Vanilla\DateFilterSchema;
 use Vanilla\Utility\CapitalCaseScheme;
 
 /**
@@ -29,6 +30,9 @@ class CommentsApiController extends AbstractApiController {
     /** @var Schema */
     private $commentPostSchema;
 
+    /** @var DateFilterSchema */
+    private $dateFilterSchema;
+
     /** @var Schema */
     private $idParamSchema;
 
@@ -41,11 +45,13 @@ class CommentsApiController extends AbstractApiController {
      * @param CommentModel $commentModel
      * @param DiscussionModel $discussionModel
      * @param UserModel $userModel
+     * @param DateFilterSchema $dateFilterSchema
      */
-    public function __construct(CommentModel $commentModel, DiscussionModel $discussionModel, UserModel $userModel) {
+    public function __construct(CommentModel $commentModel, DiscussionModel $discussionModel, UserModel $userModel, DateFilterSchema $dateFilterSchema) {
         $this->commentModel = $commentModel;
         $this->discussionModel = $discussionModel;
         $this->userModel = $userModel;
+        $this->dateFilterSchema = $dateFilterSchema;
 
         $this->caseScheme = new CapitalCaseScheme();
     }
@@ -226,6 +232,8 @@ class CommentsApiController extends AbstractApiController {
         $this->permission();
 
         $in = $this->schema([
+            'dateInserted?' => $this->dateFilterSchema,
+            'dateUpdated?' => $this->dateFilterSchema,
             'discussionID:i?' => 'The discussion ID.',
             'page:i?' => [
                 'description' => 'Page number.',
@@ -240,51 +248,32 @@ class CommentsApiController extends AbstractApiController {
                 'maximum' => 100
             ],
             'insertUserID:i?' => 'Filter by author.',
-            'after:dt?' => 'Limit to comments after this date.',
             'expand?' => $this->getExpandFragment(['insertUser'])
         ], 'in')->requireOneOf(['discussionID', 'insertUserID'])->setDescription('List comments.');
         $out = $this->schema([':a' => $this->commentSchema()], 'out');
 
         $query = $in->validate($query);
 
-        $after = isset($query['after']) ? $query['after'] : null;
-        if ($after instanceof DateTimeImmutable) {
-            $after = $after->format(DateTime::ATOM);
-        }
-
         list($offset, $limit) = offsetLimit("p{$query['page']}", $query['limit']);
 
-        // Lookup by discussion or by user?
+        $where = [];
+
+        if (array_key_exists('insertUserID', $query)) {
+            $where['InsertUserID'] = $query['insertUserID'];
+        }
         if (array_key_exists('discussionID', $query)) {
             $discussion = $this->discussionByID($query['discussionID']);
             $this->discussionModel->categoryPermission('Vanilla.Discussions.View', $discussion['CategoryID']);
-
-            $where = [];
-
-            if (isset($query['insertUserID'])) {
-                $where['InsertUserID'] = $query['insertUserID'];
-            }
-
-            if ($after !== null) {
-                $where['DateInserted >'] = $after;
-            }
-
-            $rows = $this->commentModel->getByDiscussion(
-                $query['discussionID'],
-                $limit,
-                $offset,
-                $where
-            )->resultArray();
-        } else {
-            $rows = $this->commentModel->getByUser2(
-                $query['insertUserID'],
-                $limit,
-                $offset,
-                false,
-                $after,
-                'asc'
-            )->resultArray();
+            $where['DiscussionID'] = $query['discussionID'];
         }
+        if ($dateInserted = $this->dateFilterField('dateInserted', $query)) {
+            $where += $dateInserted;
+        }
+        if ($dateUpdated = $this->dateFilterField('dateUpdated', $query)) {
+            $where += $dateUpdated;
+        }
+
+        $rows = $this->commentModel->lookup($where, true, $limit, $offset, 'asc')->resultArray();
 
         // Expand associated rows.
         $this->userModel->expandUsers(

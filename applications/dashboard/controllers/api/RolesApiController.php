@@ -318,17 +318,20 @@ class RolesApiController extends AbstractApiController {
     /**
      * Return a schema to represent a collection of permission rows.
      *
-     * @return static
+     * @return Schema
      */
-    private function getPermissionsFragment() {
+    public function getPermissionsFragment() {
         static $permissionsFragment;
 
         if ($permissionsFragment === null) {
             $permissionsFragment = Schema::parse([
                 ':a' => [
-                    'id:i?',
-                    'type:s' => ['enum' => ['global', 'category']],
-                    'permissions:o'
+                    'items' => 'object',
+                    'properties' => [
+                        'id:i?',
+                        'type:s' => ['enum' => ['global', 'category']],
+                        'permissions:o'
+                    ]
                 ]
             ]);
         }

@@ -143,6 +143,7 @@ class EbiView implements ViewInterface {
         $ebi->defineFunction('signOutUrl');
         $ebi->defineFunction('t');
         $ebi->defineFunction('user', $this->makeUserFunction($userModel));
+        $ebi->defineFunction('tileClasses', [$this, 'tileClasses']);
         $ebi->defineFunction('url');
 
         // Add custom attribute filters.
@@ -399,5 +400,85 @@ class EbiView implements ViewInterface {
             $template = "$item-page";
         }
         return $template;
+    }
+
+
+    /**
+     * Get class to add to tile to get the correct width
+     *
+     * @param int $index index of current tile
+     * @param int $count total number of tiles
+     * @param int $columnCount number of columns in grid
+     * @return string class(es) for tile width
+     */
+    public function tileClasses($index, $count, $columnCount = 3) {
+        $index++;
+        $remainder = $count % $columnCount;
+        $classes = [];
+        $classPrefix = 'tile-1_';
+
+        if ( $count <= $columnCount ) { // Less than one row always takes up full width
+            array_push($classes, $classPrefix . $count);
+            array_push($classes, 'stretchToFit');
+        } else {
+            $beforeLastRowIndex = $count - ($columnCount + $remainder) + 1;
+
+            if ($remainder === 0 || ($index < $beforeLastRowIndex)) {
+                array_push($classes, $classPrefix . $columnCount);
+
+                if($index % $columnCount === 1) {
+                    array_push($classes, 'isFirst');
+                }
+
+                if($index % $columnCount === 0) {
+                    array_push($classes, 'isLast');
+                }
+
+                if ($columnCount > 2 && $columnCount % 2 === 1 && $index == ceil($columnCount / 2)) {
+                    array_push($classes, 'isMiddle');
+                }
+
+            } else { // Massage last 2 columns
+                $lastTwoRowsCount = $columnCount + $remainder;
+
+                $beforeLastRowCount = ceil($lastTwoRowsCount/2);
+                $lastRowCount = floor($lastTwoRowsCount/2);
+
+                $lastRowIndex = $beforeLastRowIndex + $beforeLastRowCount;
+
+                if ( $index <= $count - $lastRowCount) {
+                    array_push($classes, $classPrefix . $beforeLastRowCount);
+
+                    if ($index === $beforeLastRowIndex) {
+                        array_push($classes, 'isFirst');
+                    }
+
+                    if ($beforeLastRowCount % 2 === 1 && $index == $beforeLastRowIndex + floor($beforeLastRowCount / 2)) {
+                        array_push($classes, 'isMiddle');
+                    }
+
+                    if ($index == $beforeLastRowIndex + $beforeLastRowCount - 1) {
+                        array_push($classes, 'isLast');
+                    }
+
+                } else {
+                    array_push($classes, $classPrefix . $lastRowCount);
+
+                    if ($index == $lastRowIndex) {
+                        array_push($classes, 'isFirst');
+                    }
+
+                    if ($lastRowCount % 2 === 1 && $index == $lastRowIndex + floor($lastRowCount / 2)) {
+                        array_push($classes, 'isMiddle');
+                    }
+
+                    if ($index == $count) {
+                        array_push($classes, 'isLast');
+                    }
+                }
+            }
+        }
+
+        return implode(' ', $classes);
     }
 }

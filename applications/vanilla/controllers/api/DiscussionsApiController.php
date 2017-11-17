@@ -193,14 +193,18 @@ class DiscussionsApiController extends AbstractApiController {
      * Get a discussion.
      *
      * @param int $id The ID of the discussion.
+     * @param array $query The request query.
      * @throws NotFoundException if the discussion could not be found.
      * @return array
      */
-    public function get($id) {
+    public function get($id, array $query) {
         $this->permission();
 
-        $in = $this->idParamSchema()->setDescription('Get a discussion.');
+        $this->idParamSchema()->setDescription('Get a discussion.');
+        $in = $this->schema([], 'in');
         $out = $this->schema($this->discussionSchema(), 'out');
+
+        $query = $in->validate($query);
 
         $row = $this->discussionByID($id);
         if (!$row) {
@@ -215,7 +219,7 @@ class DiscussionsApiController extends AbstractApiController {
         $result = $out->validate($row);
 
         // Allow addons to modify the result.
-        $this->getEventManager()->fireArray('discussionsApiController_get_data', [&$result]);
+        $this->getEventManager()->fireArray('discussionsApiController_get_data', [&$result, $query]);
         return $result;
     }
 

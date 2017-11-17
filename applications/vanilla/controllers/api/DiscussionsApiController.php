@@ -93,7 +93,7 @@ class DiscussionsApiController extends AbstractApiController {
         );
 
         foreach ($rows as &$currentRow) {
-            $this->prepareRow($currentRow);
+            $currentRow = $this->normalizeOutput($currentRow);
         }
 
         $result = $out->validate($rows);
@@ -220,7 +220,7 @@ class DiscussionsApiController extends AbstractApiController {
 
         $this->discussionModel->categoryPermission('Vanilla.Discussions.View', $row['CategoryID']);
 
-        $this->prepareRow($row);
+        $row = $this->normalizeOutput($row);
         $this->userModel->expandUsers($row, ['InsertUserID', 'LastUserID']);
 
         $result = $out->validate($row);
@@ -230,44 +230,53 @@ class DiscussionsApiController extends AbstractApiController {
         return $result;
     }
 
-    public function prepareRow(&$row, $expand = false) {
-        $row['Announce'] = (bool)$row['Announce'];
-        $row['Bookmarked'] = (bool)$row['Bookmarked'];
-        $row['Url'] = discussionUrl($row);
-        $this->formatField($row, 'Body', $row['Format']);
+    /**
+     * Normalize a database record to match the Schema definition.
+     *
+     * @param array $dbRecord Database record.
+     * @return array Return a Schema record.
+     */
+    public function normalizeOutput(array $dbRecord, array $expand = []) {
+        $dbRecord['Announce'] = (bool)$dbRecord['Announce'];
+        $dbRecord['Bookmarked'] = (bool)$dbRecord['Bookmarked'];
+        $dbRecord['Url'] = discussionUrl($dbRecord);
+        $this->formatField($dbRecord, 'Body', $dbRecord['Format']);
 
-        if (!is_array($row['Attributes'])) {
-            $attributes = dbdecode($row['Attributes']);
-            $row['Attributes'] = is_array($attributes) ? $attributes : [];
+        if (!is_array($dbRecord['Attributes'])) {
+            $attributes = dbdecode($dbRecord['Attributes']);
+            $dbRecord['Attributes'] = is_array($attributes) ? $attributes : [];
         }
 
         if ($this->getSession()->User) {
-            $row['unread'] = $row['CountUnreadComments'] !== 0
-                && ($row['CountUnreadComments'] !== true || dateCompare(val('DateFirstVisit', $this->getSession()->User), $row['DateInserted']) <= 0);
-            if ($row['CountUnreadComments'] !== true && $row['CountUnreadComments'] > 0) {
-                $row['countUnread'] = $row['CountUnreadComments'];
+            $dbRecord['unread'] = $dbRecord['CountUnreadComments'] !== 0
+                && ($dbRecord['CountUnreadComments'] !== true || dateCompare(val('DateFirstVisit', $this->getSession()->User), $dbRecord['DateInserted']) <= 0);
+            if ($dbRecord['CountUnreadComments'] !== true && $dbRecord['CountUnreadComments'] > 0) {
+                $dbRecord['countUnread'] = $dbRecord['CountUnreadComments'];
             }
         } else {
-            $row['unread'] = false;
+            $dbRecord['unread'] = false;
         }
 
         if ($this->isExpandField('lastPost', $expand)) {
             $lastPost = [
-                'discussionID' => $row['DiscussionID'],
-                'dateInserted' => $row['DateLastComment'],
-                'insertUser' => $row['LastUser']
+                'discussionID' => $dbRecord['DiscussionID'],
+                'dateInserted' => $dbRecord['DateLastComment'],
+                'insertUser' => $dbRecord['LastUser']
             ];
-            if ($row['LastCommentID']) {
-                $lastPost['CommentID'] = $row['LastCommentID'];
-                $lastPost['name'] = sprintft('Re: %s', $row['Name']);
+            if ($dbRecord['LastCommentID']) {
+                $lastPost['CommentID'] = $dbRecord['LastCommentID'];
+                $lastPost['name'] = sprintft('Re: %s', $dbRecord['Name']);
                 $lastPost['url'] = commentUrl($lastPost, true);
             } else {
-                $lastPost['name'] = $row['Name'];
-                $lastPost['url'] = $row['Url'];
+                $lastPost['name'] = $dbRecord['Name'];
+                $lastPost['url'] = $dbRecord['Url'];
             }
 
-            $row['lastPost'] = $lastPost;
+            $dbRecord['lastPost'] = $lastPost;
         }
+
+        $schemaRecord = $this->camelCaseScheme->convertArrayKeys($dbRecord);
+        return $schemaRecord;
     }
 
     /**
@@ -393,7 +402,7 @@ class DiscussionsApiController extends AbstractApiController {
         );
 
         foreach ($rows as &$currentRow) {
-            $this->prepareRow($currentRow, $query['expand']);
+            $this->normalizeOutput($currentRow, $query['expand']);
         }
 
         $result = $out->validate($rows, true);
@@ -440,7 +449,7 @@ class DiscussionsApiController extends AbstractApiController {
         $this->validateModel($this->discussionModel);
 
         $result = $this->discussionByID($id);
-        $this->prepareRow($result);
+        $result = $this->normalizeOutput($result);
         return $out->validate($result);
     }
 
@@ -474,7 +483,7 @@ class DiscussionsApiController extends AbstractApiController {
 
         $row = $this->discussionByID($id);
         $this->userModel->expandUsers($row, ['InsertUserID', 'LastUserID']);
-        $this->prepareRow($row);
+        $row = $this->normalizeOutput($row);
         $result = $out->validate($row);
         return $result;
     }

@@ -159,7 +159,7 @@ class MessagesApiController extends AbstractApiController {
 
         $this->userModel->expandUsers($message, ['InsertUserID']);
 
-        $this->prepareRow($message);
+        $message = $this->normalizeOutput($message);
         return $out->validate($message);
     }
 
@@ -238,7 +238,7 @@ class MessagesApiController extends AbstractApiController {
         );
 
         array_walk($messages, function(&$message) {
-            $this->prepareRow($message);
+            $message = $this->normalizeOutput($message);
         });
 
         return $out->validate($messages);
@@ -261,12 +261,16 @@ class MessagesApiController extends AbstractApiController {
     }
 
     /**
-     * Prepare message for output.
+     * Normalize a database record to match the Schema definition.
      *
-     * @param array $message
+     * @param array $dbRecord Database record.
+     * @return array Return a Schema record.
      */
-    public function prepareRow(array &$message) {
-        $this->formatField($message, 'Body', $message['Format']);
+    public function normalizeOutput(array $dbRecord) {
+        $this->formatField($dbRecord, 'Body', $dbRecord['Format']);
+
+        $schemaRecord = $this->camelCaseScheme->convertArrayKeys($dbRecord);
+        return $schemaRecord;
     }
 
 //
@@ -332,7 +336,7 @@ class MessagesApiController extends AbstractApiController {
         }
 
         $message = $this->messageByID($messageID);
-        $this->prepareRow($message);
+        $message = $this->normalizeOutput($message);
         return $out->validate($message);
     }
 

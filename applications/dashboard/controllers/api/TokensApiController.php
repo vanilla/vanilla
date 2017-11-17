@@ -157,7 +157,7 @@ class TokensApiController extends AbstractApiController {
             }
         }
         $this->isActiveToken($row, true);
-        $this->prepareRow($row);
+        $row = $this->normalizeOutput($row);
 
         $result = $out->validate($row);
         return $result;
@@ -208,7 +208,7 @@ class TokensApiController extends AbstractApiController {
             $activeTokens[] = $token;
         }
         unset($token);
-        array_walk($activeTokens, [$this, 'prepareRow']);
+        $activeTokens = array_map([$this, 'normalizeOutput'], $activeTokens);
 
         $result = $out->validate($activeTokens);
         return $result;
@@ -245,28 +245,32 @@ class TokensApiController extends AbstractApiController {
         $row = $this->accessTokenModel->setAttribute($accessTokenID, 'name', $body['name']);
 
         // Serve up the result.
-        $this->prepareRow($row);
+        $row = $this->normalizeOutput($row);
         $result = $out->validate($row);
         return new Data($result, 201);
     }
 
     /**
-     * Prepare the current row for output.
+     * Normalize a database record to match the Schema definition.
      *
-     * @param array $row
+     * @param array $dbRecord Database record.
+     * @return array Return a Schema record.
      */
-    public function prepareRow(array &$row) {
+    public function normalizeOutput(array $dbRecord) {
         $name = null;
-        if (array_key_exists('Attributes', $row) && is_array($row['Attributes'])) {
-            if (array_key_exists('name', $row['Attributes']) && is_string($row['Attributes']['name'])) {
-                $name = $row['Attributes']['name'];
+        if (array_key_exists('Attributes', $dbRecord) && is_array($dbRecord['Attributes'])) {
+            if (array_key_exists('name', $dbRecord['Attributes']) && is_string($dbRecord['Attributes']['name'])) {
+                $name = $dbRecord['Attributes']['name'];
             }
         }
-        $row['Name'] = $name ?: t('Personal Access Token');
+        $dbRecord['Name'] = $name ?: t('Personal Access Token');
 
-        if (array_key_exists('Token', $row) && is_string($row['Token'])) {
-            $row['AccessToken'] = $this->accessTokenModel->signToken($row['Token']);
+        if (array_key_exists('Token', $dbRecord) && is_string($dbRecord['Token'])) {
+            $row['AccessToken'] = $this->accessTokenModel->signToken($dbRecord['Token']);
         }
+
+        $schemaRecord = $this->camelCaseScheme->convertArrayKeys($dbRecord);
+        return $schemaRecord;
     }
 
     /**

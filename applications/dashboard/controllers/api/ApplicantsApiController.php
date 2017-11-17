@@ -51,11 +51,10 @@ class ApplicantsApiController extends AbstractApiController {
     public function delete($id) {
         $this->permission('Garden.Users.Approve');
 
-        $in = $this->idParamSchema()->setDescription('Delete an applicant.');
-        $out = $this->schema([], 'out');
+        $this->idParamSchema()->setDescription('Delete an applicant.');
+        $this->schema([], 'out');
 
-        $row = $this->userByID($id);
-        $this->prepareRow($row);
+        $this->userByID($id);
 
         if ($this->userModel->isApplicant($id) === false) {
             throw new ClientException('The specified applicant is already an active user.');
@@ -100,11 +99,11 @@ class ApplicantsApiController extends AbstractApiController {
     public function get($id) {
         $this->permission('Garden.Users.Approve');
 
-        $in = $this->idParamSchema()->setDescription('Get an applicant.');
+        $this->idParamSchema()->setDescription('Get an applicant.');
         $out = $this->schema($this->fullSchema(), 'out');
 
         $row = $this->userByID($id);
-        $this->prepareRow($row);
+        $row = $this->normalizeOutput($row);
 
         $result = $out->validate($row);
         return $result;
@@ -159,7 +158,7 @@ class ApplicantsApiController extends AbstractApiController {
         $rows = $this->userModel->getApplicants($limit, $offset)->resultArray();
 
         foreach ($rows as &$row) {
-            $this->prepareRow($row);
+            $row = $this->normalizeOutput($row);
         }
 
         $result = $out->validate($rows);
@@ -187,7 +186,6 @@ class ApplicantsApiController extends AbstractApiController {
         $out = $this->schema($this->fullSchema(), 'out');
 
         $row = $this->userByID($id);
-        $this->prepareRow($row);
 
         if ($this->userModel->isApplicant($id) === false) {
             throw new ClientException('The applicant specified is already an active user.');
@@ -211,6 +209,8 @@ class ApplicantsApiController extends AbstractApiController {
         }
 
         $this->validateModel($this->userModel);
+
+        $row = $this->normalizeOutput($row);
         $result = $out->validate($row);
         return $result;
     }
@@ -247,21 +247,25 @@ class ApplicantsApiController extends AbstractApiController {
         } else {
             throw new ServerException('An unknown error occurred while attempting to create the applicant.', 500);
         }
-        $this->prepareRow($row);
+        $row = $this->normalizeOutput($row);
 
         $result = $out->validate($row);
         return $result;
     }
 
     /**
-     * Prepare the current row for output.
+     * Normalize a database record to match the Schema definition.
      *
-     * @param array $row
+     * @param array $dbRecord Database record.
+     * @return array Return a Schema record.
      */
-    public function prepareRow(array &$row) {
-        $row['ApplicantID'] = $row['UserID'];
-        unset($row['UserID']);
-        $row['Status'] = 'pending';
+    public function normalizeOutput(array $dbRecord) {
+        $dbRecord['ApplicantID'] = $dbRecord['UserID'];
+        unset($dbRecord['UserID']);
+        $dbRecord['Status'] = 'pending';
+
+        $schemaRecord = $this->camelCaseScheme->convertArrayKeys($dbRecord);
+        return $schemaRecord;
     }
 
     /**

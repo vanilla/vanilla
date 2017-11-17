@@ -121,7 +121,7 @@ class UsersApiController extends AbstractApiController {
         $out = $this->schema($this->userSchema(), 'out');
 
         $row = $this->userByID($id);
-        $this->prepareRow($row);
+        $row = $this->normalizeOutput($row);
 
         $result = $out->validate($row);
         return $result;
@@ -215,7 +215,7 @@ class UsersApiController extends AbstractApiController {
         $rows = $this->userModel->search($filter, '', '', $limit, $offset)->resultArray();
         foreach ($rows as &$row) {
             $this->userModel->setCalculatedFields($row);
-            $this->prepareRow($row);
+            $row = $this->normalizeOutput($row);
         }
 
         $result = $out->validate($rows);
@@ -223,29 +223,33 @@ class UsersApiController extends AbstractApiController {
     }
 
     /**
-     * Tweak the data in a user row in a standard way.
+     * Normalize a database record to match the Schema definition.
      *
-     * @param array $row
+     * @param array $dbRecord Database record.
+     * @return array Return a Schema record.
      */
-    protected function prepareRow(array &$row) {
-        if (array_key_exists('UserID', $row)) {
-            $userID = $row['UserID'];
+    protected function normalizeOutput(array $dbRecord) {
+        if (array_key_exists('UserID', $dbRecord)) {
+            $userID = $dbRecord['UserID'];
             $roles = $this->userModel->getRoles($userID)->resultArray();
-            $row['roles'] = $roles;
+            $dbRecord['roles'] = $roles;
         }
-        if (array_key_exists('Photo', $row)) {
-            $photo = userPhotoUrl($row);
-            $row['Photo'] = $photo;
-            $row['PhotoUrl'] = $photo;
+        if (array_key_exists('Photo', $dbRecord)) {
+            $photo = userPhotoUrl($dbRecord);
+            $dbRecord['Photo'] = $photo;
+            $dbRecord['PhotoUrl'] = $photo;
         }
-        if (array_key_exists('Verified', $row)) {
-            $row['bypassSpam'] = $row['Verified'];
-            unset($row['Verified']);
+        if (array_key_exists('Verified', $dbRecord)) {
+            $dbRecord['bypassSpam'] = $dbRecord['Verified'];
+            unset($dbRecord['Verified']);
         }
-        if (array_key_exists('Confirmed', $row)) {
-            $row['emailConfirmed'] = $row['Confirmed'];
-            unset($row['Confirmed']);
+        if (array_key_exists('Confirmed', $dbRecord)) {
+            $dbRecord['emailConfirmed'] = $dbRecord['Confirmed'];
+            unset($dbRecord['Confirmed']);
         }
+
+        $schemaRecord = $this->camelCaseScheme->convertArrayKeys($dbRecord);
+        return $schemaRecord;
     }
 
     /**
@@ -266,13 +270,13 @@ class UsersApiController extends AbstractApiController {
         $body = $in->validate($body, true);
         // If a row associated with this ID cannot be found, a "not found" exception will be thrown.
         $this->userByID($id);
-        $body = $this->translateRequest($body);
+        $body = $this->normalizeInput($body);
         $userData = $this->caseScheme->convertArrayKeys($body);
         $userData['UserID'] = $id;
         $this->userModel->save($userData);
         $this->validateModel($this->userModel);
         $row = $this->userByID($id);
-        $this->prepareRow($row);
+        $row = $this->normalizeOutput($row);
 
         $result = $out->validate($row);
         return $result;
@@ -293,7 +297,7 @@ class UsersApiController extends AbstractApiController {
 
         $body = $in->validate($body);
 
-        $body = $this->translateRequest($body);
+        $body = $this->normalizeInput($body);
         $userData = $this->caseScheme->convertArrayKeys($body);
         if (!array_key_exists('RoleID', $userData)) {
             $userData['RoleID'] = RoleModel::getDefaultRoles(RoleModel::TYPE_MEMBER);
@@ -310,7 +314,7 @@ class UsersApiController extends AbstractApiController {
         }
 
         $row = $this->userByID($id);
-        $this->prepareRow($row);
+        $row = $this->normalizeOutput($row);
 
         $result = $out->validate($row);
         return new Data($result, 201);
@@ -433,20 +437,21 @@ class UsersApiController extends AbstractApiController {
 //    }
 
     /**
-     * Translate a request to this endpoint into a format compatible for saving with the model.
+     * Normalize a Schema record to match the database definition.
      *
-     * @param array $body
-     * @return array
+     * @param array $schemaRecord Schema record.
+     * @return array Return a database record.
      */
-    private function translateRequest(array $body) {
-        if (array_key_exists('bypassSpam', $body)) {
-            $body['verified'] = $body['bypassSpam'];
+    private function normalizeInput(array $schemaRecord) {
+        if (array_key_exists('bypassSpam', $schemaRecord)) {
+            $schemaRecord['verified'] = $schemaRecord['bypassSpam'];
         }
-        if (array_key_exists('emailConfirmed', $body)) {
-            $body['confirmed'] = $body['emailConfirmed'];
+        if (array_key_exists('emailConfirmed', $schemaRecord)) {
+            $schemaRecord['confirmed'] = $schemaRecord['emailConfirmed'];
         }
 
-        return $body;
+        $dbRecord = $this->capitalCaseScheme->convertArrayKeys($schemaRecord);
+        return $dbRecord;
     }
 
     /**

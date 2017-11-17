@@ -111,8 +111,8 @@ class InvitesApiController extends AbstractApiController {
             $this->permission('Garden.Moderation.Manage');
         }
 
-        $this->prepareRow($row);
         $this->userModel->expandUsers($row, ['AcceptedUserID']);
+        $row = $this->normalizeOutput($row);
 
         $result = $out->validate($row);
         return $result;
@@ -180,7 +180,7 @@ class InvitesApiController extends AbstractApiController {
         );
 
         foreach ($rows as &$row) {
-            $this->prepareRow($row);
+            $row = $this->normalizeOutput($row);
         }
         $result = $out->validate($rows);
         return $result;
@@ -219,19 +219,23 @@ class InvitesApiController extends AbstractApiController {
         $inviteData = $this->caseScheme->convertArrayKeys($body);
         $row = $this->invitationModel->save($inviteData, ['ReturnRow' => true]);
         $this->validateModel($this->invitationModel);
-        $this->prepareRow($row);
+        $row = $this->normalizeOutput($row);
 
         $result = $out->validate($row);
         return $result;
     }
 
     /**
-     * Prepare the current row for output.
+     * Normalize a database record to match the Schema definition.
      *
-     * @param array $row
+     * @param array $dbRecord Database record.
+     * @return array Return a Schema record.
      */
-    public function prepareRow(array &$row) {
-        $row['InviteID'] = $row['InvitationID'];
-        $row['Status'] = empty($row['AcceptedUserID']) ? 'pending' : 'accepted';
+    public function normalizeOutput(array $dbRecord) {
+        $dbRecord['InviteID'] = $dbRecord['InvitationID'];
+        $dbRecord['Status'] = empty($dbRecord['AcceptedUserID']) ? 'pending' : 'accepted';
+
+        $schemaRecord = $this->camelCaseScheme->convertArrayKeys($dbRecord);
+        return $schemaRecord;
     }
 }

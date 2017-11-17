@@ -260,7 +260,7 @@ class RolesApiController extends AbstractApiController {
         $query += ['expand' => false];
 
         $row = $this->roleByID($id);
-        $this->prepareRow($row, $query['expand']);
+        $this->normalizeOutput($row, $query['expand']);
 
         $result = $out->validate($row);
         return $result;
@@ -374,7 +374,7 @@ class RolesApiController extends AbstractApiController {
 
         $rows = $this->roleModel->getWithRankPermissions()->resultArray();
         foreach ($rows as &$row) {
-            $this->prepareRow($row, $query['expand']);
+            $this->normalizeOutput($row, $query['expand']);
         }
 
         $result = $out->validate($rows);
@@ -412,15 +412,16 @@ class RolesApiController extends AbstractApiController {
     }
 
     /**
-     * Tweak the data in a role row in a standard way.
+     * Normalize a database record to match the Schema definition.
      *
-     * @param array $row
-     * @param array|bool $expand
-     * @throws ServerException if attempting to include permissions, but there are too many permission rows.
+     * @throws ServerException If attempting to include permissions, but there are too many permission rows.
+     * @param array $dbRecord Database record.
+     * @param array $expand
+     * @return array Return a Schema record.
      */
-    protected function prepareRow(array &$row, $expand = []) {
-        if (array_key_exists('RoleID', $row)) {
-            $roleID = $row['RoleID'];
+    protected function normalizeOutput(array $dbRecord, array $expand = []) {
+        if (array_key_exists('RoleID', $dbRecord)) {
+            $roleID = $dbRecord['RoleID'];
             if ($this->isExpandField('permissions', $expand)) {
                 $permissionCount = $this->permissionModel
                     ->getWhere(['RoleID' => $roleID], '', 'asc', self::MAX_PERMISSIONS + 1)
@@ -428,9 +429,12 @@ class RolesApiController extends AbstractApiController {
                 if ($permissionCount > self::MAX_PERMISSIONS) {
                     throw new ServerException('There are too many permissions to display.', 416);
                 }
-                $row['permissions'] = $this->getFormattedPermissions($roleID);
+                $dbRecord['permissions'] = $this->getFormattedPermissions($roleID);
             }
         }
+
+        $schemaRecord = $this->camelCaseScheme->convertArrayKeys($dbRecord);
+        return $schemaRecord;
     }
 
     /**
@@ -494,7 +498,7 @@ class RolesApiController extends AbstractApiController {
      *
      * @param array $body The request body.
      * @throws ServerException if the role could not be added.
-     * @return Data
+     * @return array
      */
     public function post(array $body) {
         $this->permission('Garden.Settings.Manage');
@@ -517,10 +521,10 @@ class RolesApiController extends AbstractApiController {
         }
 
         $row = $this->roleByID($id);
-        $this->prepareRow($row);
+        $row = $this->normalizeOutput($row);
 
         $result = $out->validate($row);
-        return new Data($result, 201);
+        return $result;
     }
 
     /**

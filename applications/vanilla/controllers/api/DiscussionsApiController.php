@@ -219,7 +219,7 @@ class DiscussionsApiController extends AbstractApiController {
         $result = $out->validate($row);
 
         // Allow addons to modify the result.
-        $this->getEventManager()->fireArray('discussionsApiController_get_data', [&$result, $query]);
+        $this->getEventManager()->fireArray('discussionsApiController_get_data', [$this, &$result, $query, $row]);
         return $result;
     }
 
@@ -383,7 +383,7 @@ class DiscussionsApiController extends AbstractApiController {
         $result = $out->validate($rows, true);
 
         // Allow addons to modify the result.
-        $this->getEventManager()->fireArray('discussionsApiController_index_data', [&$result, $query]);
+        $this->getEventManager()->fireArray('discussionsApiController_index_data', [$this, &$result, $query, $rows]);
         return $result;
     }
 

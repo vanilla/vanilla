@@ -644,4 +644,22 @@ class AddonManagerTest extends \PHPUnit\Framework\TestCase {
         $addon2 = $am->lookupByClassname(\Deeply\Nested\Namespaced\Fixture\TestClass::class);
         $this->assertEquals('namespaced-plugin', $addon2->getKey());
     }
+
+    /**
+     * Test looking up requirements that are not met.
+     *
+     * This test mimics the test from **AddonManager::checkRequirements()**.
+     */
+    public function testBadRequire() {
+        $am = new TestAddonManager();
+
+        $addon = $am->lookupAddon('bad-require');
+        $r = $am->lookupRequirements($addon, AddonManager::REQ_MISSING | AddonManager::REQ_VERSION);
+
+        $this->assertArrayHasKey('asd!', $r);
+        $this->assertArrayHasKey('namespaced-plugin', $r);
+
+        $this->assertSame(AddonManager::REQ_MISSING, $r['asd!']['status']);
+        $this->assertSame(AddonManager::REQ_VERSION, $r['namespaced-plugin']['status']);
+    }
 }

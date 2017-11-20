@@ -66,9 +66,10 @@ class AddonsApiController extends Controller {
      * Transform an addon to its API output equivalent.
      *
      * @param Addon $addon The addon to transform.
+     * @param string $themeType The type of theme to read as enabled.
      * @return array Returns an addon row.
      */
-    protected function filterOutput(Addon $addon) {
+    protected function filterOutput(Addon $addon, $themeType = 'desktop') {
         $r = $addon->getInfo();
         $r['addonID'] = $addon->getKey().($addon->getType() === Addon::TYPE_ADDON ? '' : '-'.$addon->getType());
         if (empty($r['name'])) {
@@ -77,7 +78,7 @@ class AddonsApiController extends Controller {
         $r['iconUrl'] = asset($addon->getIcon(), true);
 
         if ($addon->getType() === 'theme') {
-            $r['enabled'] = $this->addonModel->getThemeKey() === $addon->getKey();
+            $r['enabled'] = $this->addonModel->getThemeKey($themeType) === $addon->getKey();
         } else {
             $r['enabled'] = $this->addonModel->getAddonManager()->isEnabled($addon->getKey(), $addon->getType());
         }
@@ -111,7 +112,11 @@ class AddonsApiController extends Controller {
         $query = $in->validate($query);
 
         $addons = $this->addonModel->getWhere($query);
-        $addons = array_map([$this, 'filterOutput'], $addons);
+
+        $themeType = empty($query['themeType']) ? 'desktop' : $query['themeType'];
+        $addons = array_map(function (&$row) use ($themeType) {
+            return $this->filterOutput($row, $themeType);
+        }, $addons);
         usort($addons, function ($a, $b) {
             return strcasecmp($a['name'], $b['name']);
         });

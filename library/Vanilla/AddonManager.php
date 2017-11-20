@@ -524,7 +524,7 @@ class AddonManager {
             if (is_readable($cachePath)) {
                 $addon = require $cachePath;
                 $this->singleCache[$type][$addonDirName] = $addon;
-                return $addon;
+                return $addon === false ? null : $addon;
             }
         }
         // Look for the addon itself.

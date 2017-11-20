@@ -453,10 +453,13 @@ class AddonModel implements LoggerAwareInterface {
         } elseif ($where['enabled'] && $where['type'] === Addon::TYPE_THEME) {
             $addons = [$am->lookupTheme($this->getThemeKey($where['themeType']))];
         } elseif (!empty($where['enabled'])) {
-            $addons = array_merge(
-                array_values($am->getEnabled()),
-                [$am->lookupTheme($this->getThemeKey($where['themeType']))]
-            );
+            $addons = $am->getEnabled();
+            // Add the theme again because getEnabled() doesn't currently work with the mobile theme.
+            if ($theme = $am->lookupTheme($this->getThemeKey($where['themeType']))) {
+                $addons[$theme->getType().'/'.$theme->getKey()] = $theme;
+            }
+
+            $addons = array_values($addons);
         } elseif (!empty($where['type'])) {
             $addons = array_values($am->lookupAllByType($where['type']));
         } else {

@@ -419,7 +419,6 @@ class EbiView implements ViewInterface {
 
         if ( $count <= $columnCount ) { // Less than one row always takes up full width
             array_push($classes, $classPrefix . $count);
-            array_push($classes, 'stretchToFit');
         } else {
             $beforeLastRowIndex = $count - ($columnCount + $remainder) + 1;
 

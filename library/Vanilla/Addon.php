@@ -767,6 +767,14 @@ class Addon {
             $issues['multiple-plugins'] = "The addon should have at most one plugin class ($plugins).";
         }
 
+        if (isset($this->info['require']) && !is_array($this->info['require'])) {
+            $issues['invalid-require'] = "The require key must be an array.";
+        }
+
+        if (isset($this->info['conflict']) && !is_array($this->info['conflict'])) {
+            $issues['invalid-conflict'] = "The conflict key must be an array.";
+        }
+
         if ($trigger) {
             $this->triggerIssues();
         }
@@ -1076,6 +1084,19 @@ class Addon {
      */
     public function getRequirements() {
         $result = $this->getInfoValue('require', []);
+        if (!is_array($result)) {
+            return [];
+        }
+        return $result;
+    }
+
+    /**
+     * Get addons that conflict with this addon.
+     *
+     * @return array Returns an array in the form addonKey => version.
+     */
+    public function getConflicts() {
+        $result = $this->getInfoValue('conflict', []);
         if (!is_array($result)) {
             return [];
         }

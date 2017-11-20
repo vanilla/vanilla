@@ -662,4 +662,35 @@ class AddonManagerTest extends \PHPUnit\Framework\TestCase {
         $this->assertSame(AddonManager::REQ_MISSING, $r['asd!']['status']);
         $this->assertSame(AddonManager::REQ_VERSION, $r['namespaced-plugin']['status']);
     }
+
+
+    /**
+     * Test an addon with an invalid require key.
+     */
+    public function testInvalidRequire() {
+        $addon = Addon::__set_state(['info' => ['require' => []]]);
+        $issues = $addon->check();
+        $this->assertArrayNotHasKey('invalid-require', $issues);
+
+        $addon = Addon::__set_state(['info' => ['require' => 'foo']]);
+        $issues = $addon->check();
+        $this->assertArrayHasKey('invalid-require', $issues);
+
+        $this->assertEquals([], $addon->getRequirements());
+    }
+
+    /**
+     * Test an addon with an invalid conflict key.
+     */
+    public function testInvalidConflict() {
+        $addon = Addon::__set_state(['info' => ['conflict' => []]]);
+        $issues = $addon->check();
+        $this->assertArrayNotHasKey('invalid-conflict', $issues);
+
+        $addon = Addon::__set_state(['info' => ['conflict' => 'foo']]);
+        $issues = $addon->check();
+        $this->assertArrayHasKey('invalid-conflict', $issues);
+
+        $this->assertEquals([], $addon->getConflicts());
+    }
 }

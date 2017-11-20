@@ -1013,7 +1013,9 @@ class Addon {
             $req += ['op' => '==', 'v' => '0.0', 'logic' => ',', 'v2' => '999999'];
             $op = $req['op'];
 
-            if ($op === '-') {
+            if ($req['v'] === '*') {
+                $valid = true;
+            } elseif ($op === '-') {
                 $valid = version_compare($version, $req['v'], '>=') && version_compare($version, $req['v2'], '<=');
             } else {
                 $valid = version_compare($version, $req['v'], $op);

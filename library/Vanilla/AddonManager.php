@@ -605,7 +605,7 @@ class AddonManager {
                     $addon->getName(),
                     implode(', ', $conflicts)
                 );
-                throw new \Exception($msg, 400);
+                throw new \Exception($msg, 409);
             }
             return false;
         }

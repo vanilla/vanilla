@@ -726,7 +726,7 @@ class AddonManagerTest extends \PHPUnit\Framework\TestCase {
      * Test **AddonManager::checkConflicts()**.
      *
      * @expectedException \Exception
-     * @expectedExceptionCode 400
+     * @expectedExceptionCode 409
      * @expectedExceptionMessage Parent conflicts with: Grandparent.
      */
     public function testCheckConflicts() {

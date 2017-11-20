@@ -592,7 +592,9 @@ class AddonManager {
      * @param Addon $addon The addon to check.
      * @param int $filter One or more of the **AddonManager::REQ_*** constants concatenated by `|`.
      *
-     * @return Returns the requirements array. An empty array represents an addon with no requirements.
+     * When using this filter, any requirement statuses that meet at least one of the filters will be returned.
+     *
+     * @return array Returns the requirements array. An empty array represents an addon with no requirements.
      */
     public function lookupRequirements(Addon $addon, $filter = null) {
         $array = [];
@@ -601,7 +603,7 @@ class AddonManager {
         // Filter the list.
         if ($filter) {
             $array = array_filter($array, function ($row) use ($filter) {
-                return ($row['status'] & $filter) === $filter;
+                return ($row['status'] & $filter) > 0;
             });
         }
 

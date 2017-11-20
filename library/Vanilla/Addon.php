@@ -784,7 +784,7 @@ class Addon {
         if ($count = count($issues)) {
             $subdir = $this->getSubdir();
 
-            trigger_error("The addon in $subdir has $count issues.", E_USER_NOTICE);
+            trigger_error("The addon in $subdir has $count issue(s).", E_USER_NOTICE);
             foreach ($issues as $issue) {
                 trigger_error($issue, E_USER_NOTICE);
             }

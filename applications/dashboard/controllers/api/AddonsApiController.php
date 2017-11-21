@@ -155,7 +155,8 @@ class AddonsApiController extends Controller {
             throw new \Garden\Web\Exception\NotFoundException("Addon");
         }
 
-        $row = $out->validate($this->filterOutput(reset($addons)));
+        $themeType = empty($query['themeType']) ? 'desktop' : $query['themeType'];
+        $row = $out->validate($this->filterOutput(reset($addons), $themeType));
         return $row;
     }
 

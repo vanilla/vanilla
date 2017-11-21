@@ -88,14 +88,15 @@ class AddonModel implements LoggerAwareInterface {
 
         // Enable this addon's requirements.
         $requirements = $this->addonManager->lookupRequirements($addon, AddonManager::REQ_DISABLED);
+        $requiredAddons = [];
         foreach ($requirements as $addonKey => $row) {
-            $requiredAddon = $this->addonManager->lookupAddon($addonKey);
+            $requiredAddons[] = $requiredAddon = $this->addonManager->lookupAddon($addonKey);
             $this->enableInternal($requiredAddon, $options);
         }
 
         $this->enableInternal($addon, $options);
 
-        return array_merge([$addon], array_reverse($requirements));
+        return array_merge([$addon], array_reverse($requiredAddons));
     }
 
     /**

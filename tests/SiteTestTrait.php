@@ -18,7 +18,7 @@ trait SiteTestTrait {
     /**
      * @var Container
      */
-    private static $container;
+    protected static $container;
 
     /**
      * @var array

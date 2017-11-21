@@ -28,6 +28,10 @@ class AddonManager {
     const REQ_MISSING = 0x04; // addon missing from the manager
     const REQ_VERSION = 0x08; // addon isn't the correct version
 
+    // These constants for default themes will eventually be used in the bootstrap.
+    const DEFAULT_DESKTOP_THEME = 'default';
+    const DEFAULT_MOBILE_THEME = 'mobile';
+
     /// Properties ///
 
     /**
@@ -520,7 +524,7 @@ class AddonManager {
             if (is_readable($cachePath)) {
                 $addon = require $cachePath;
                 $this->singleCache[$type][$addonDirName] = $addon;
-                return $addon;
+                return $addon === false ? null : $addon;
             }
         }
         // Look for the addon itself.
@@ -1156,5 +1160,29 @@ class AddonManager {
      */
     public function isCacheEnabled() {
         return $this->cacheDir !== null;
+    }
+
+    /**
+     * Add an addon to the addon manager.
+     *
+     * This method is useful for adding ad-hoc addons that are outside of the scan directories.
+     *
+     * @param Addon $addon The addon to add.
+     * @param bool $start Whether or not to start the addon after adding.
+     * @return $this
+     */
+    public function add(Addon $addon, $start = true) {
+        if ($this->typeUsesMultiCaching($addon->getType())) {
+            $this->ensureMultiCache();
+            $this->multiCache[$addon->getKey()] = $addon;
+        } else {
+            $this->singleCache[$addon->getType()][$addon->getKey()] = $addon;
+        }
+
+        if ($start) {
+            $this->startAddon($addon);
+        }
+
+        return $this;
     }
 }

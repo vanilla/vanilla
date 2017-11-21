@@ -146,6 +146,7 @@ class CommentsApiController extends AbstractApiController {
             'body:s' => 'The body of the comment.',
             'format:s' => 'The input format of the comment.',
             'dateInserted:dt' => 'When the comment was created.',
+            'dateUpdated:dt|n' => 'When the comment was last updated.',
             'insertUserID:i' => 'The user that created the comment.',
             'insertUser?' => $this->getUserFragmentSchema(),
             'url:s?' => 'The full URL to the comment.'

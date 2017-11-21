@@ -93,6 +93,8 @@ class UsersApiController extends AbstractApiController {
             'showEmail:b' => 'Is the email address visible to other users?',
             'bypassSpam:b' => 'Should submissions from this user bypass SPAM checks?',
             'banned:i' => 'Is the user banned?',
+            'dateInserted:dt' => 'When the user was created.',
+            'dateUpdated:dt|n' => 'When the user was last updated.',
             'roles:a?' => $this->schema([
                 'roleID:i' => 'ID of the role.',
                 'name:s' => 'Name of the role.'
@@ -498,7 +500,7 @@ class UsersApiController extends AbstractApiController {
     public function userSchema($type = '') {
         if ($this->userSchema === null) {
             $schema = Schema::parse(['userID', 'name', 'email', 'photoUrl', 'emailConfirmed',
-                'showEmail', 'bypassSpam', 'banned', 'roles?']);
+                'showEmail', 'bypassSpam', 'banned', 'dateInserted', 'dateUpdated', 'roles?']);
             $schema = $schema->add($this->fullSchema());
             $this->userSchema = $this->schema($schema, 'User');
         }

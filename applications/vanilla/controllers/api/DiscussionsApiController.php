@@ -175,6 +175,7 @@ class DiscussionsApiController extends AbstractApiController {
             'body:s' => 'The body of the discussion.',
             'categoryID:i' => 'The category the discussion is in.',
             'dateInserted:dt' => 'When the discussion was created.',
+            'dateUpdated:dt|n' => 'When the discussion was last updated.',
             'insertUserID:i' => 'The user that created the discussion.',
             'insertUser?' => $this->getUserFragmentSchema(),
             'lastUser?' => $this->getUserFragmentSchema(),

@@ -8,6 +8,7 @@
 use Garden\Schema\Schema;
 use Garden\Web\Exception\NotFoundException;
 use Garden\Web\Exception\ServerException;
+use Vanilla\DateFilterSchema;
 use Vanilla\Utility\CapitalCaseScheme;
 
 /**
@@ -17,6 +18,9 @@ class DiscussionsApiController extends AbstractApiController {
 
     /** @var CapitalCaseScheme */
     private $caseScheme;
+
+    /** @var DateFilterSchema */
+    private $dateFilterSchema;
 
     /** @var DiscussionModel */
     private $discussionModel;
@@ -38,10 +42,12 @@ class DiscussionsApiController extends AbstractApiController {
      *
      * @param DiscussionModel $discussionModel
      * @param UserModel $userModel
+     * @param DateFilterSchema $dateFilterSchema
      */
-    public function __construct(DiscussionModel $discussionModel, UserModel $userModel) {
+    public function __construct(DiscussionModel $discussionModel, UserModel $userModel, DateFilterSchema $dateFilterSchema) {
         $this->discussionModel = $discussionModel;
         $this->userModel = $userModel;
+        $this->dateFilterSchema = $dateFilterSchema;
 
         $this->caseScheme = new CapitalCaseScheme();
     }
@@ -169,6 +175,7 @@ class DiscussionsApiController extends AbstractApiController {
             'body:s' => 'The body of the discussion.',
             'categoryID:i' => 'The category the discussion is in.',
             'dateInserted:dt' => 'When the discussion was created.',
+            'dateUpdated:dt|n' => 'When the discussion was last updated.',
             'insertUserID:i' => 'The user that created the discussion.',
             'insertUser?' => $this->getUserFragmentSchema(),
             'lastUser?' => $this->getUserFragmentSchema(),
@@ -314,6 +321,8 @@ class DiscussionsApiController extends AbstractApiController {
 
         $in = $this->schema([
             'categoryID:i?' => 'Filter by a category.',
+            'dateInserted?' => $this->dateFilterSchema,
+            'dateUpdated?' => $this->dateFilterSchema,
             'pinned:b?' => 'Whether or not to include pinned discussions. If true, only return pinned discussions. Cannot be used with the pinOrder parameter.',
             'pinOrder:s?' => [
                 'default' => 'first',
@@ -344,6 +353,13 @@ class DiscussionsApiController extends AbstractApiController {
         $where = array_intersect_key($query, array_flip(['categoryID', 'insertUserID']));
         if (array_key_exists('categoryID', $where)) {
             $where['d.CategoryID'] = $where['categoryID'];
+        }
+
+        if ($dateInserted = $this->dateFilterField('dateInserted', $query)) {
+            $where += $dateInserted;
+        }
+        if ($dateUpdated = $this->dateFilterField('dateUpdated', $query)) {
+            $where += $dateUpdated;
         }
 
         list($offset, $limit) = offsetLimit("p{$query['page']}", $query['limit']);

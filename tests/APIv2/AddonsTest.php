@@ -122,6 +122,44 @@ class AddonsTest extends AbstractAPIv2Test {
     }
 
     /**
+     * Test enabling a plugin with the API, but disabling it with the plugin manager.
+     */
+    public function testAddonModelPluginManagerInterop() {
+        // Enable via the API.
+        $this->api()->patch('/addons/buttonbar', ['enabled' => true]);
+        $this->assertPluginEnabled('buttonbar', true);
+
+        // Disable via plugin manager.
+        $pm = \Gdn::pluginManager();
+        $pm->disablePlugin('buttonbar');
+        $this->assertPluginEnabled('buttonbar', false);
+
+        // Enable via plugin manager.
+        $pm->enablePlugin('buttonbar', new \Gdn_Validation());
+        $this->assertPluginEnabled('buttonbar', true);
+
+        // Disable via API.
+        $this->api()->patch('/addons/buttonbar', ['enabled' => false]);
+        $this->assertPluginEnabled('buttonbar', false);
+    }
+
+    /**
+     * Assert that a plugin is enabled/disabled in the config.
+     * @param $pluginKey
+     * @param $pluginEnabled
+     */
+    private function assertPluginEnabled($pluginKey, $pluginEnabled) {
+        $plugins = $this->container()->get(\Gdn_Configuration::class)->get('EnabledPlugins');
+
+        // Since this is a single request we can't reload the state from the config so must check it directly.
+        foreach ($plugins as $key => $enabled) {
+            if (strcasecmp($key, $pluginKey) === 0) {
+                $this->assertSame($pluginEnabled, $enabled, "The plugin with key $key has the wrong enabled value.");
+            }
+        }
+    }
+
+    /**
      * Provide a list of hidden addons.
      *
      * @return array Returns a data provider.

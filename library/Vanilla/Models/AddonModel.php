@@ -143,11 +143,11 @@ class AddonModel implements LoggerAwareInterface {
                 if ($addon->getInfoValue('oldType') === 'application') {
                     $enabled = $this->config->get('EnabledApplications.'.$addon->getRawKey());
                 } else {
-                    $enabled = $this->config->get('EnabledPlugins.'.$addon->getKey());
+                    $enabled = $this->config->get('EnabledPlugins.'.$addon->getRawKey());
                 }
                 break;
             case Addon::TYPE_LOCALE:
-                $enabled = $this->config->get('EnabledLocales.'.$addon->getKey());
+                $enabled = $this->config->get('EnabledLocales.'.$addon->getRawKey());
                 break;
             case Addon::TYPE_THEME:
                 $options += ['themeType' => ''];
@@ -315,12 +315,12 @@ class AddonModel implements LoggerAwareInterface {
                         ['RemoveEmpty' => true]
                     );
                 } else {
-                    $this->config->saveToConfig('EnabledPlugins.'.$addon->getKey(), $enabled);
+                    $this->config->saveToConfig('EnabledPlugins.'.$addon->getRawKey(), $enabled);
                 }
                 break;
             case Addon::TYPE_LOCALE:
                 $this->config->saveToConfig(
-                    'EnabledLocales.'.$addon->getKey(),
+                    'EnabledLocales.'.$addon->getRawKey(),
                     $enabled ? $addon->getInfoValue('locale') : null,
                     ['RemoveEmpty' => true]
                 );

@@ -132,7 +132,8 @@ class TokensTest extends AbstractAPIv2Test {
         $this->assertTrue(is_int($body[$this->pk]));
         $this->assertTrue($body[$this->pk] > 0);
         $this->assertEquals($row['name'], $body['name']);
-        $this->assertInstanceOf('DateTimeImmutable', $body['dateInserted']);
+        $this->assertArrayHasKey('dateInserted', $body);
+        $this->assertInternalType('int', strtotime($body['dateInserted']));
 
         $this->accessTokenModel->verify($body['accessToken'], true);
 

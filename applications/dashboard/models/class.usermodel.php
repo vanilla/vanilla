@@ -1059,7 +1059,7 @@ class UserModel extends Gdn_Model {
      */
     public function expandUsers(array &$rows, array $columns) {
         // How are we supposed to lookup users by column if we don't have any columns?
-        if (count($columns) === 0) {
+        if (count($rows) === 0 || count($columns) === 0) {
             return;
         }
 
@@ -2072,14 +2072,10 @@ class UserModel extends Gdn_Model {
 
         if (array_key_exists('Confirmed', $formPostValues)) {
             $formPostValues['Confirmed'] = forceBool($formPostValues['Confirmed'], '0', '1', '0');
-        } elseif (array_key_exists('EmailConfirmed', $formPostValues)) {
-            $formPostValues['Confirmed'] = forceBool($formPostValues['EmailConfirmed'], '1', '1', '0');
         }
 
         if (array_key_exists('Verified', $formPostValues)) {
             $formPostValues['Verified'] = forceBool($formPostValues['Verified'], '0', '1', '0');
-        } elseif (array_key_exists('BypassSpam', $formPostValues)) {
-            $formPostValues['Verified'] = forceBool($formPostValues['BypassSpam'], '0', '1', '0');
         }
 
         // Do not allowing setting this via general save.
@@ -2546,6 +2542,7 @@ class UserModel extends Gdn_Model {
 
         $this->EventArguments['Keywords'] =& $keywords;
         $this->EventArguments['RankID'] =& $rankID;
+        $this->EventArguments['Optimize'] =& $optimize;
         $this->fireEvent('BeforeUserQuery');
 
         $this->userQuery();
@@ -2936,7 +2933,7 @@ class UserModel extends Gdn_Model {
             if (val('CheckCaptcha', $options, true) && Captcha::enabled()) {
                 $captchaIsValid = Captcha::validate();
                 if ($captchaIsValid !== true) {
-                    $this->Validation->addValidationResult('Garden.Registration.CaptchaPublicKey', 'The captcha was not completed correctly. Please try again.');
+                    $this->Validation->addValidationResult('Garden.Registration.CaptchaPublicKey', t('The captcha was not completed correctly. Please try again.'));
                     return false;
                 }
             }
@@ -3006,7 +3003,7 @@ class UserModel extends Gdn_Model {
             if ($checkCaptcha && Captcha::enabled()) {
                 $captchaIsValid = Captcha::validate();
                 if ($captchaIsValid !== true) {
-                    $this->Validation->addValidationResult('Garden.Registration.CaptchaPublicKey', 'The captcha was not completed correctly. Please try again.');
+                    $this->Validation->addValidationResult('Garden.Registration.CaptchaPublicKey', t('The captcha was not completed correctly. Please try again.'));
                     return false;
                 }
             }

@@ -8,6 +8,7 @@
 use Garden\Schema\Schema;
 use Garden\Web\Exception\NotFoundException;
 use Garden\Web\Exception\ServerException;
+use Vanilla\DateFilterSchema;
 use Vanilla\Utility\CapitalCaseScheme;
 
 /**
@@ -17,6 +18,9 @@ class DiscussionsApiController extends AbstractApiController {
 
     /** @var CapitalCaseScheme */
     private $caseScheme;
+
+    /** @var DateFilterSchema */
+    private $dateFilterSchema;
 
     /** @var DiscussionModel */
     private $discussionModel;
@@ -38,10 +42,12 @@ class DiscussionsApiController extends AbstractApiController {
      *
      * @param DiscussionModel $discussionModel
      * @param UserModel $userModel
+     * @param DateFilterSchema $dateFilterSchema
      */
-    public function __construct(DiscussionModel $discussionModel, UserModel $userModel) {
+    public function __construct(DiscussionModel $discussionModel, UserModel $userModel, DateFilterSchema $dateFilterSchema) {
         $this->discussionModel = $discussionModel;
         $this->userModel = $userModel;
+        $this->dateFilterSchema = $dateFilterSchema;
 
         $this->caseScheme = new CapitalCaseScheme();
     }
@@ -68,7 +74,7 @@ class DiscussionsApiController extends AbstractApiController {
                 'minimum' => 1,
                 'maximum' => 100
             ],
-            'expand:b?' => 'Expand associated records.'
+            'expand?' => $this->getExpandFragment(['insertUser', 'lastUser', 'lastPost'])
         ], 'in');
         $out = $this->schema([':a' => $this->discussionSchema()], 'out');
 
@@ -79,9 +85,13 @@ class DiscussionsApiController extends AbstractApiController {
             'w.Bookmarked' => 1,
             'w.UserID' => $this->getSession()->UserID
         ])->resultArray();
-        if (!empty($query['expand'])) {
-            $this->userModel->expandUsers($rows, ['InsertUserID', 'LastUserID']);
-        }
+
+        // Expand associated rows.
+        $this->userModel->expandUsers(
+            $rows,
+            $this->resolveExpandFields($query, ['insertUser' => 'InsertUserID', 'lastUser' => 'LastUserID'])
+        );
+
         foreach ($rows as &$currentRow) {
             $this->prepareRow($currentRow);
         }
@@ -165,8 +175,10 @@ class DiscussionsApiController extends AbstractApiController {
             'body:s' => 'The body of the discussion.',
             'categoryID:i' => 'The category the discussion is in.',
             'dateInserted:dt' => 'When the discussion was created.',
+            'dateUpdated:dt|n' => 'When the discussion was last updated.',
             'insertUserID:i' => 'The user that created the discussion.',
             'insertUser?' => $this->getUserFragmentSchema(),
+            'lastUser?' => $this->getUserFragmentSchema(),
             'pinned:b?' => 'Whether or not the discussion has been pinned.',
             'pinLocation:s|n' => [
                 'enum' => ['category', 'recent'],
@@ -188,14 +200,18 @@ class DiscussionsApiController extends AbstractApiController {
      * Get a discussion.
      *
      * @param int $id The ID of the discussion.
+     * @param array $query The request query.
      * @throws NotFoundException if the discussion could not be found.
      * @return array
      */
-    public function get($id) {
+    public function get($id, array $query) {
         $this->permission();
 
-        $in = $this->idParamSchema()->setDescription('Get a discussion.');
+        $this->idParamSchema();
+        $in = $this->schema([], 'in')->setDescription('Get a discussion.');
         $out = $this->schema($this->discussionSchema(), 'out');
+
+        $query = $in->validate($query);
 
         $row = $this->discussionByID($id);
         if (!$row) {
@@ -208,6 +224,9 @@ class DiscussionsApiController extends AbstractApiController {
         $this->userModel->expandUsers($row, ['InsertUserID', 'LastUserID']);
 
         $result = $out->validate($row);
+
+        // Allow addons to modify the result.
+        $this->getEventManager()->fireArray('discussionsApiController_get_data', [$this, &$result, $query, $row]);
         return $result;
     }
 
@@ -232,7 +251,7 @@ class DiscussionsApiController extends AbstractApiController {
             $row['unread'] = false;
         }
 
-        if ($expand) {
+        if ($this->isExpandField('lastPost', $expand)) {
             $lastPost = [
                 'discussionID' => $row['DiscussionID'],
                 'dateInserted' => $row['DateLastComment'],
@@ -302,6 +321,8 @@ class DiscussionsApiController extends AbstractApiController {
 
         $in = $this->schema([
             'categoryID:i?' => 'Filter by a category.',
+            'dateInserted?' => $this->dateFilterSchema,
+            'dateUpdated?' => $this->dateFilterSchema,
             'pinned:b?' => 'Whether or not to include pinned discussions. If true, only return pinned discussions. Cannot be used with the pinOrder parameter.',
             'pinOrder:s?' => [
                 'default' => 'first',
@@ -321,7 +342,7 @@ class DiscussionsApiController extends AbstractApiController {
                 'maximum' => 100
             ],
             'insertUserID:i?' => 'Filter by author.',
-            'expand:b?' => 'Expand associated records.'
+            'expand?' => $this->getExpandFragment(['insertUser', 'lastUser', 'lastPost'])
         ], 'in')->setDescription('List discussions.');
         $out = $this->schema([':a' => $this->discussionSchema()], 'out');
 
@@ -332,6 +353,13 @@ class DiscussionsApiController extends AbstractApiController {
         $where = array_intersect_key($query, array_flip(['categoryID', 'insertUserID']));
         if (array_key_exists('categoryID', $where)) {
             $where['d.CategoryID'] = $where['categoryID'];
+        }
+
+        if ($dateInserted = $this->dateFilterField('dateInserted', $query)) {
+            $where += $dateInserted;
+        }
+        if ($dateUpdated = $this->dateFilterField('dateUpdated', $query)) {
+            $where += $dateUpdated;
         }
 
         list($offset, $limit) = offsetLimit("p{$query['page']}", $query['limit']);
@@ -358,14 +386,20 @@ class DiscussionsApiController extends AbstractApiController {
             }
         }
 
-        if ($query['expand']) {
-            $this->userModel->expandUsers($rows, ['InsertUserID', 'LastUserID']);
-        }
+        // Expand associated rows.
+        $this->userModel->expandUsers(
+            $rows,
+            $this->resolveExpandFields($query, ['insertUser' => 'InsertUserID', 'lastUser' => 'LastUserID'])
+        );
+
         foreach ($rows as &$currentRow) {
             $this->prepareRow($currentRow, $query['expand']);
         }
 
         $result = $out->validate($rows, true);
+
+        // Allow addons to modify the result.
+        $this->getEventManager()->fireArray('discussionsApiController_index_data', [$this, &$result, $query, $rows]);
         return $result;
     }
 

@@ -784,7 +784,7 @@ class Addon {
         if ($count = count($issues)) {
             $subdir = $this->getSubdir();
 
-            trigger_error("The addon in $subdir has $count issues.", E_USER_NOTICE);
+            trigger_error("The addon in $subdir has $count issue(s).", E_USER_NOTICE);
             foreach ($issues as $issue) {
                 trigger_error($issue, E_USER_NOTICE);
             }
@@ -1182,16 +1182,16 @@ class Addon {
      *
      * This is a case insensitive lookup.
      *
-     * @param string $fqClassName Fully qualified class name.
+     * @param string $fullClassName Fully qualified class name.
      * @param string $relative One of the **Addon::PATH*** constants.
      * @return string Returns the path or an empty string of the class isn't found.
      */
-    public function getClassPath($fqClassName, $relative = self::PATH_FULL) {
-        $classInfo = self::parseFullyQualifiedClass($fqClassName);
+    public function getClassPath($fullClassName, $relative = self::PATH_FULL) {
+        $classInfo = self::parseFullyQualifiedClass($fullClassName);
         $key = strtolower($classInfo['className']);
         if (array_key_exists($key, $this->classes)) {
             foreach($this->classes[$key] as $classData) {
-                if ($classInfo['namespace'] === $classData['namespace']) {
+                if (strtolower($classInfo['namespace']) === strtolower($classData['namespace'])) {
                     $path = $this->path($classData['path'], $relative);
                     return $path;
                 }
@@ -1223,17 +1223,17 @@ class Addon {
     /**
      * Parse a fully qualified class name and return the namespace and className of it.
      *
-     * @param string $fqClassName Fully qualified class name.
+     * @param string $fullClassName Fully qualified class name.
      * @return array ['namespace' => $namespace, 'className' => $className]
      */
-    public static function parseFullyQualifiedClass($fqClassName) {
-        $lastNamespaceSeparatorPos = strrpos($fqClassName, '\\');
+    public static function parseFullyQualifiedClass($fullClassName) {
+        $lastNamespaceSeparatorPos = strrpos($fullClassName, '\\');
         if ($lastNamespaceSeparatorPos === false) {
             $namespace = '';
-            $className = $fqClassName;
+            $className = $fullClassName;
         } else {
-            $namespace = substr($fqClassName, 0, $lastNamespaceSeparatorPos+1);
-            $className = substr($fqClassName, $lastNamespaceSeparatorPos+1);
+            $namespace = substr($fullClassName, 0, $lastNamespaceSeparatorPos+1);
+            $className = substr($fullClassName, $lastNamespaceSeparatorPos+1);
         }
 
         return [

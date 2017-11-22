@@ -317,7 +317,7 @@ $dic->call(function (
         /* @var Addon $addon */
         if ($bootstrapPath = $addon->getSpecial('bootstrap')) {
             $bootstrapPath = $addon->path($bootstrapPath);
-            include $bootstrapPath;
+            include_once $bootstrapPath;
         }
     }
 

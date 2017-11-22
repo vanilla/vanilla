@@ -2,7 +2,7 @@
 /**
  * @author Alexandre (DaazKu) Chouinard <alexandre.c@vanillaforums.com>
  * @copyright 2009-2017 Vanilla Forums Inc.
- * @license GPLv2
+ * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
  */
 
 namespace VanillaTests\APIv2;
@@ -12,9 +12,9 @@ namespace VanillaTests\APIv2;
  */
 class MessagesTest extends AbstractResourceTest {
 
-    private static $userID;
+    protected static $userID;
 
-    private static $conversationID;
+    protected static $conversationID;
 
     /**
      * {@inheritdoc}
@@ -37,6 +37,12 @@ class MessagesTest extends AbstractResourceTest {
         $session = self::container()->get(\Gdn_Session::class);
         $session->start(self::$siteInfo['adminUserID'], false, false);
 
+        // Disable flood control checks on the models and make sure that those specific instances are injected into the controllers.
+        $conversationModel = self::container()->get(\ConversationModel::class)->setFloodControlEnabled(false);
+        self::container()->setInstance(\ConversationModel::class, $conversationModel);
+        $conversationMessageModel = self::container()->get(\ConversationMessageModel::class)->setFloodControlEnabled(false);
+        self::container()->setInstance(\ConversationMessageModel::class, $conversationMessageModel);
+
         /** @var \UsersApiController $usersAPIController */
         $usersAPIController = static::container()->get('UsersAPIController');
 
@@ -49,6 +55,9 @@ class MessagesTest extends AbstractResourceTest {
 
         /** @var \ConversationsApiController $conversationsAPiController */
         $conversationsAPiController = static::container()->get('ConversationsAPiController');
+
+        // Create the conversation as the newly created user.
+        $session->start(self::$userID, false, false);
 
         $conversation = $conversationsAPiController->post([
             'participantUserIDs' => [self::$userID]
@@ -88,6 +97,17 @@ class MessagesTest extends AbstractResourceTest {
     }
 
     /**
+     * Test GET /resource/<id>.
+     *
+     * @expectedException \Exception
+     * @expectedExceptionCode 403
+     * @expectedExceptionMessage The site is not configured for moderating conversations.
+     */
+    public function testGet() {
+        parent::testGet();
+    }
+
+    /**
      * {@inheritdoc}
      * @requires function MessagesApiController::patch
      */
@@ -101,6 +121,35 @@ class MessagesTest extends AbstractResourceTest {
      */
     public function testGetEditFields() {
         $this->fail(__METHOD__.' needs to be implemented');
+    }
+
+    /**
+     * Test GET /messages.
+     *
+     * @expectedException \Exception
+     * @expectedExceptionCode 403
+     * @expectedExceptionMessage The site is not configured for moderating conversations.
+     */
+    public function testIndex() {
+        parent::testIndex();
+    }
+
+    /**
+     * Test POST /resource.
+     *
+     * @param array|null $record Fields for a new record.
+     * @param array $extra Additional fields to send along with the POST request.
+     * @return array Returns the new record.
+     */
+    public function testPost($record = null, array $extra = []) {
+        $currentUserID = $this->api()->getUserID();
+        $this->api()->setUserID(self::$userID);
+
+        $result = parent::testPost($record, $extra);
+
+        $this->api()->setUserID($currentUserID);
+
+        return $result;
     }
 
     /**

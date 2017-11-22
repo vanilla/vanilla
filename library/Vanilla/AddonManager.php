@@ -28,6 +28,10 @@ class AddonManager {
     const REQ_MISSING = 0x04; // addon missing from the manager
     const REQ_VERSION = 0x08; // addon isn't the correct version
 
+    // These constants for default themes will eventually be used in the bootstrap.
+    const DEFAULT_DESKTOP_THEME = 'default';
+    const DEFAULT_MOBILE_THEME = 'mobile';
+
     /// Properties ///
 
     /**
@@ -127,15 +131,15 @@ class AddonManager {
     /**
      *  Attempt to load undefined class based on the addons that are enabled.
      *
-     * @param string $fqClassName Fully qualified class name to load.
+     * @param string $fullClassName Fully qualified class name to load.
      */
-    public function autoload($fqClassName) {
-        $suppliedClassInfo = Addon::parseFullyQualifiedClass($fqClassName);
+    public function autoload($fullClassName) {
+        $suppliedClassInfo = Addon::parseFullyQualifiedClass($fullClassName);
         $classKey = strtolower($suppliedClassInfo['className']);
 
         if (isset($this->autoloadClasses[$classKey])) {
-            foreach ($this->autoloadClasses[$classKey] as $namespace => $classData) {
-                if ($suppliedClassInfo['namespace'] === $namespace) {
+            foreach ($this->autoloadClasses[$classKey] as $namespaceKey => $classData) {
+                if (strtolower($suppliedClassInfo['namespace']) === $namespaceKey) {
                     include_once $classData['filePath'];
                 }
             }
@@ -176,23 +180,24 @@ class AddonManager {
      *
      * This method should only be used with enabled addons as searching through all addons takes a performance hit.
      *
-     * @param string $fqClassName Fully qualified class name.
+     * @param string $fullClassName Fully qualified class name.
      * @param bool $searchAll Whether or not to search all addons or just the enabled ones.
      * @return Addon|null Returns an {@link Addon} object or **null** if one isn't found.
      */
-    public function lookupByClassname($fqClassName, $searchAll = false) {
-        $lookupClassInfo = Addon::parseFullyQualifiedClass($fqClassName);
+    public function lookupByClassName($fullClassName, $searchAll = false) {
+        $lookupClassInfo = Addon::parseFullyQualifiedClass($fullClassName);
         $classKey = strtolower($lookupClassInfo['className']);
+        $namespaceKey = strtolower($lookupClassInfo['namespace']);
 
-        if (isset($this->autoloadClasses[$classKey])) {
-            return reset($this->autoloadClasses[$classKey])['addon'];
+        if ($addon = valr("$classKey.$namespaceKey.addon", $this->autoloadClasses)) {
+            return $addon;
         } elseif ($searchAll) {
             foreach ($this->lookupAllByType(Addon::TYPE_ADDON) as $addon) {
                 /* @var Addon $addon */
                 $classes = $addon->getClasses();
                 if (isset($classes[$classKey])) {
                     foreach ($classes[$classKey] as $classInfo) {
-                        if ($classInfo['namespace'] === $lookupClassInfo['namespace']) {
+                        if (strtolower($classInfo['namespace']) === $namespaceKey) {
                             return $addon;
                         }
                     }
@@ -216,10 +221,26 @@ class AddonManager {
 
         $result = [];
         if ($searchAll === false) {
-            foreach ($this->autoloadClasses as $classKey => $classesEntry) {
-                foreach($classesEntry as $namespace => $classData) {
-                    if ($fn($namespace.$classKey)) {
-                        $result[] = $namespace.$classData['className'];
+
+            // If the className does not contain a wildcard we can check the autloadClass index directly.
+            $fqPattern = Addon::parseFullyQualifiedClass($pattern);
+            if (strpos($fqPattern['className'], '*') === false) {
+
+                // Convert the pattern's class name to a class key.
+                $classKey = strtolower($fqPattern['className']);
+                if (array_key_exists($classKey, $this->autoloadClasses)) {
+                    $loadedClasses = [$classKey => $this->autoloadClasses[$classKey]];
+                } else {
+                    $loadedClasses = [];
+                }
+            } else {
+                $loadedClasses = $this->autoloadClasses;
+            }
+
+            foreach ($loadedClasses as $classKey => $classesEntry) {
+                foreach($classesEntry as $namespaceKey => $classData) {
+                    if ($fn($namespaceKey.$classKey)) {
+                        $result[] = $classData['namespace'].$classData['className'];
                     }
                 }
             }
@@ -246,6 +267,7 @@ class AddonManager {
      *
      * @param string $pattern A glob style pattern.
      * @param string $class The class to match.
+     * @return bool
      */
     protected function matchClass($pattern, $class) {
         $class = '\\'.ltrim($class, '\\');
@@ -502,7 +524,7 @@ class AddonManager {
             if (is_readable($cachePath)) {
                 $addon = require $cachePath;
                 $this->singleCache[$type][$addonDirName] = $addon;
-                return $addon;
+                return $addon === false ? null : $addon;
             }
         }
         // Look for the addon itself.
@@ -574,7 +596,9 @@ class AddonManager {
      * @param Addon $addon The addon to check.
      * @param int $filter One or more of the **AddonManager::REQ_*** constants concatenated by `|`.
      *
-     * @return Returns the requirements array. An empty array represents an addon with no requirements.
+     * When using this filter, any requirement statuses that meet at least one of the filters will be returned.
+     *
+     * @return array Returns the requirements array. An empty array represents an addon with no requirements.
      */
     public function lookupRequirements(Addon $addon, $filter = null) {
         $array = [];
@@ -583,7 +607,7 @@ class AddonManager {
         // Filter the list.
         if ($filter) {
             $array = array_filter($array, function ($row) use ($filter) {
-                return ($row['status'] & $filter) === $filter;
+                return ($row['status'] & $filter) > 0;
             });
         }
 
@@ -876,35 +900,39 @@ class AddonManager {
             foreach ($classesInfo as $classInfo) {
                 $subpath = $classInfo['path'];
                 $namespace = $classInfo['namespace'];
+                $namespaceKey = strtolower($classInfo['namespace']);
                 $className = $classInfo['className'];
 
                 if (isset($this->autoloadClasses[$classKey])) {
                     $orderedByPriority = [];
                     $addonAdded = false;
-                    foreach($this->autoloadClasses[$classKey] as $loadedClassNamespace => $loadedClassData) {
+                    foreach($this->autoloadClasses[$classKey] as $loadedClassNamespaceKey => $loadedClassData) {
                         $loadedClassAddon = $loadedClassData['addon'];
                         if (!$addonAdded && $addon->getPriority() < $loadedClassAddon->getPriority()) {
-                            $orderedByPriority[$namespace] = [
+                            $orderedByPriority[$namespaceKey] = [
                                 'filePath' => $addon->path($subpath),
+                                'namespace' => $namespace,
                                 'className' => $className,
                                 'addon' => $addon,
                             ];
                             $addonAdded = true;
                         }
-                        $orderedByPriority[$loadedClassNamespace] = $loadedClassData;
+                        $orderedByPriority[$loadedClassNamespaceKey] = $loadedClassData;
                     }
                     // Make sure we add the addon hes last after the priority check!
                     if (!$addonAdded) {
-                        $orderedByPriority[$namespace] = [
+                        $orderedByPriority[$namespaceKey] = [
                             'filePath' => $addon->path($subpath),
+                            'namespace' => $namespace,
                             'className' => $className,
                             'addon' => $addon,
                         ];
                     }
                     $this->autoloadClasses[$classKey] = $orderedByPriority;
                 } else {
-                    $this->autoloadClasses[$classKey][$namespace] = [
+                    $this->autoloadClasses[$classKey][$namespaceKey] = [
                         'filePath' => $addon->path($subpath),
+                        'namespace' => $namespace,
                         'className' => $className,
                         'addon' => $addon,
                     ];
@@ -929,9 +957,9 @@ class AddonManager {
         // Remove all of the addon's classes from the autoloader.
         foreach ($addon->getClasses() as $classKey => $classInfo) {
             if (isset($this->autoloadClasses[$classKey])) {
-                foreach($this->autoloadClasses[$classKey] as $namespace => $classData) {
-                    if ($classData['namespace'] === $namespace) {
-                        unset($this->autoloadClasses[$classKey][$namespace]);
+                foreach($this->autoloadClasses[$classKey] as $namespaceKey => $classData) {
+                    if (strtolower($classData['namespace']) === $namespaceKey) {
+                        unset($this->autoloadClasses[$classKey][$namespaceKey]);
                     }
                 }
             }
@@ -1132,5 +1160,29 @@ class AddonManager {
      */
     public function isCacheEnabled() {
         return $this->cacheDir !== null;
+    }
+
+    /**
+     * Add an addon to the addon manager.
+     *
+     * This method is useful for adding ad-hoc addons that are outside of the scan directories.
+     *
+     * @param Addon $addon The addon to add.
+     * @param bool $start Whether or not to start the addon after adding.
+     * @return $this
+     */
+    public function add(Addon $addon, $start = true) {
+        if ($this->typeUsesMultiCaching($addon->getType())) {
+            $this->ensureMultiCache();
+            $this->multiCache[$addon->getKey()] = $addon;
+        } else {
+            $this->singleCache[$addon->getType()][$addon->getKey()] = $addon;
+        }
+
+        if ($start) {
+            $this->startAddon($addon);
+        }
+
+        return $this;
     }
 }

@@ -8,6 +8,7 @@
 use Garden\Schema\Schema;
 use Garden\Web\Exception\NotFoundException;
 use Garden\Web\Exception\ServerException;
+use Vanilla\Exception\ConfigurationException;
 use Vanilla\Utility\CapitalCaseScheme;
 
 /**
@@ -48,11 +49,12 @@ class ConversationsApiController extends AbstractApiController {
     /**
      * Check that the user has moderation rights over conversations.
      *
-     * @throw Exception
+     * @throws ConfigurationException Throws an exception when the site is not configured for moderating conversations.
+     * @throws \Vanilla\Exception\PermissionException Throws an
      */
     private function checkModerationPermission() {
         if (!$this->config->get('Conversations.Moderation.Allow', false)) {
-            throw permissionException();
+            throw new ConfigurationException(t('The site is not configured for moderating conversations.'));
         }
         $this->permission('Conversations.Moderation.Manage');
     }
@@ -207,6 +209,11 @@ class ConversationsApiController extends AbstractApiController {
         $this->idParamSchema();
 
         $in = $this->schema([
+            'status:s?' => [
+                'description' => 'Filter by participant status.',
+                'enum' => ['all', 'participating', 'deleted'],
+                'default' => 'participating'
+            ],
             'page:i?' => [
                 'description' => 'Page number.',
                 'default' => 1,
@@ -218,7 +225,7 @@ class ConversationsApiController extends AbstractApiController {
                 'minimum' => 5,
                 'maximum' => 100
             ],
-            'expand:b?' => 'Expand associated records.',
+            'expand?' => $this->getExpandFragment(['user'])
         ], 'in')->setDescription('Get participants of a conversation.');
         $out = $this->schema([
             ':a' => [
@@ -230,9 +237,10 @@ class ConversationsApiController extends AbstractApiController {
                             'description' => 'The userID of the participant.',
                         ],
                         'user' => $this->getUserFragmentSchema(),
-                        'deleted' => [
-                            'type' => 'boolean',
-                            'description' => 'True if the user left the conversation.',
+                        'status' => [
+                            'description' => 'Participation status of the user.',
+                            'type' => 'string',
+                            'enum' => ['participating', 'deleted']
                         ],
                     ],
                 ],
@@ -245,15 +253,32 @@ class ConversationsApiController extends AbstractApiController {
 
         $this->conversationByID($id);
 
+        if (!$this->conversationModel->inConversation($id, $this->getSession()->UserID)) {
+            $this->checkModerationPermission();
+        }
+
         list($offset, $limit) = offsetLimit("p{$query['page']}", $query['limit']);
 
-        $conversationMembers = $this->conversationModel->getConversationMembers($id, false, $limit, $offset);
+        $active = null;
+        $status = $query['status'];
+        if ($status == 'deleted') {
+            $active = false;
+        } elseif ($status == 'participating') {
+            $active = true;
+        }
 
+        $conversationMembers = $this->conversationModel->getConversationMembers($id, false, $limit, $offset, $active);
         $data = array_values($conversationMembers);
 
-        if (!empty($query['expand'])) {
-            $this->userModel->expandUsers($data, ['UserID']);
+        foreach ($data as &$row) {
+            $this->translateParticipantStatus($row);
         }
+
+        // Expand associated rows.
+        $this->userModel->expandUsers(
+            $data,
+            $this->resolveExpandFields($query, ['user' => 'userID'])
+        );
 
         return $out->validate($data);
     }
@@ -271,18 +296,18 @@ class ConversationsApiController extends AbstractApiController {
             'insertUserID:i?' => 'Filter by author. (Has no effect if participantUserID is used)',
             'participantUserID:i?' => 'Filter by participating user.',
             'page:i?' => [
-                    'description' => 'Page number.',
-                    'default' => 1,
-                    'minimum' => 1,
-                ],
-                'limit:i?' => [
-                    'description' => 'The number of items per page.',
-                    'default' => $this->config->get('Conversations.Conversations.PerPage', 50),
-                    'minimum' => 1,
-                    'maximum' => 100
-                ],
-                'expand:b?' => 'Expand associated records.'
-            ], 'in')
+                'description' => 'Page number.',
+                'default' => 1,
+                'minimum' => 1,
+            ],
+            'limit:i?' => [
+                'description' => 'The number of items per page.',
+                'default' => $this->config->get('Conversations.Conversations.PerPage', 50),
+                'minimum' => 1,
+                'maximum' => 100
+            ],
+            'expand?' => $this->getExpandFragment(['insertUser'])
+        ], 'in')
             ->requireOneOf(['insertUserID', 'participantUserID'])
             ->setDescription('List user conversations.');
         $out = $this->schema([':a' => $this->fullSchema()], 'out');
@@ -312,9 +337,11 @@ class ConversationsApiController extends AbstractApiController {
             )->resultArray();
         }
 
-        if (!empty($query['expand'])) {
-            $this->userModel->expandUsers($conversations, ['InsertUserID']);
-        }
+        // Expand associated rows.
+        $this->userModel->expandUsers(
+            $conversations,
+            $this->resolveExpandFields($query, ['insertUser' => 'InsertUserID'])
+        );
 
         return $out->validate($conversations);
     }
@@ -372,10 +399,14 @@ class ConversationsApiController extends AbstractApiController {
         $in = $this->postSchema('in')->setDescription('Add participants to a conversation.');
         $out = $this->schema($this->fullSchema(), 'out');
 
+        $body = $in->validate($body);
+
         // Not found exception thrown if the conversation does not exist.
         $this->conversationByID($id);
 
-        $body = $in->validate($body);
+        if (!$this->conversationModel->inConversation($id, $this->getSession()->UserID)) {
+            $this->checkModerationPermission();
+        }
 
         $success = $this->conversationModel->addUserToConversation($id, $body['participantUserIDs']);
         if (!$success) {
@@ -448,6 +479,19 @@ class ConversationsApiController extends AbstractApiController {
         if (array_key_exists('subject', $conversation)) {
             $conversation['name'] = $conversation['subject'];
             unset($conversation['subject']);
+        }
+    }
+
+    /**
+     * Translate a row's Deleted field to a Status value.
+     *
+     * @param array $row
+     */
+    private function translateParticipantStatus(array &$row) {
+        if ($row['Deleted'] == 0) {
+            $row['Status'] = 'participating';
+        } else {
+            $row['Status'] = 'deleted';
         }
     }
 }

@@ -11,9 +11,9 @@ use Garden\Web\Exception\NotFoundException;
 use Vanilla\Utility\CapitalCaseScheme;
 
 /**
- * API Controller for the `/invitations` resource.
+ * API Controller for the `/invites` resource.
  */
-class InvitationsApiController extends AbstractApiController {
+class InvitesApiController extends AbstractApiController {
 
     /** @var CapitalCaseScheme */
     private $caseScheme;
@@ -25,7 +25,7 @@ class InvitationsApiController extends AbstractApiController {
     private $userModel;
 
     /**
-     * InvitationsApiController constructor.
+     * InvitesApiController constructor.
      *
      * @param CapitalCaseScheme $caseScheme
      * @param Gdn_Configuration $configuration
@@ -45,17 +45,17 @@ class InvitationsApiController extends AbstractApiController {
     }
 
     /**
-     * Delete an invitation.
+     * Delete an invite.
      *
-     * @param int $id The invitation ID.
+     * @param int $id The invite ID.
      */
     public function delete($id) {
         $this->permission('Garden.SignIn.Allow');
 
-        $in = $this->idParamSchema()->setDescription('Delete an invitation.');
+        $in = $this->idParamSchema()->setDescription('Delete an invite.');
         $out = $this->schema([], 'out');
 
-        $row = $this->invitationByID($id);
+        $row = $this->inviteByID($id);
 
         if ($row['InsertUserID'] !== $this->getSession()->UserID) {
             $this->permission('Garden.Moderation.Manage');
@@ -65,7 +65,7 @@ class InvitationsApiController extends AbstractApiController {
     }
 
     /**
-     * Get a schema instance comprised of all available invitation fields.
+     * Get a schema instance comprised of all available invite fields.
      *
      * @return Schema Returns a schema object.
      */
@@ -74,18 +74,18 @@ class InvitationsApiController extends AbstractApiController {
 
         if ($schema === null) {
             $schema = Schema::parse([
-                'invitationID:i' => 'A unique numerical ID for the invitation.',
-                'email:s' => 'The email address associated with an invitation.',
-                'code:s' => 'An invitation code.',
+                'inviteID:i' => 'A unique numerical ID for the invite.',
+                'email:s' => 'The email address associated with an invite.',
+                'code:s' => 'An invite code.',
                 'status' => [
-                    'description' => 'Current status for the invitation.',
+                    'description' => 'Current status for the invite.',
                     'enum' => ['accepted', 'pending']
                 ],
-                'insertUserID:i' => 'User who created the invitation.',
-                'dateInserted:dt' => 'When the invitation was created.',
+                'insertUserID:i' => 'User who created the invite.',
+                'dateInserted:dt' => 'When the invite was created.',
                 'acceptedUser:o|n?' => $this->getUserFragmentSchema(),
-                'acceptedUserID:i|n' => 'User who accepted the invitation.',
-                'dateAccepted:dt|n' => 'When the invitation was accepted.',
+                'acceptedUserID:i|n' => 'User who accepted the invite.',
+                'dateAccepted:dt|n' => 'When the invite was accepted.',
                 'dateExpires:dt|n' => 'When the expiration is set to expire.'
             ]);
         }
@@ -94,18 +94,18 @@ class InvitationsApiController extends AbstractApiController {
     }
 
     /**
-     * Get a single invitation.
+     * Get a single invite.
      *
-     * @param int $id The ID of the invitation.
+     * @param int $id The ID of the invite.
      * @return array
      */
     public function get($id) {
         $this->permission('Garden.SignIn.Allow');
 
-        $in = $this->idParamSchema()->setDescription('Get an invitation.');
+        $in = $this->idParamSchema()->setDescription('Get an invite.');
         $out = $this->schema($this->fullSchema(), 'out');
 
-        $row = $this->invitationByID($id);
+        $row = $this->inviteByID($id);
 
         if ($row['InsertUserID'] !== $this->getSession()->UserID) {
             $this->permission('Garden.Moderation.Manage');
@@ -119,7 +119,7 @@ class InvitationsApiController extends AbstractApiController {
     }
 
     /**
-     * Get an ID-only invitation record schema.
+     * Get an ID-only invite record schema.
      *
      * @param string $type The type of schema.
      * @return Schema Returns a schema object.
@@ -128,14 +128,14 @@ class InvitationsApiController extends AbstractApiController {
         static $ipParamSchema;
 
         if ($ipParamSchema === null) {
-            $ipParamSchema = Schema::parse(['id:i' => 'The invitation ID.']);
+            $ipParamSchema = Schema::parse(['id:i' => 'The invite ID.']);
         }
 
         return $this->schema($ipParamSchema, $type);
     }
 
     /**
-     * Get a list of invitations for the current user.
+     * Get a list of invites for the current user.
      *
      * @param array $query The request query.
      * @return array
@@ -156,8 +156,8 @@ class InvitationsApiController extends AbstractApiController {
                 'minimum' => 1,
                 'maximum' => 100
             ],
-            'expand:b?' => 'Expand associated records.'
-        ], 'in')->setDescription('Get a list of invitations sent by the current user.');
+            'expand?' => $this->getExpandFragment(['acceptedUser'])
+        ], 'in')->setDescription('Get a list of invites sent by the current user.');
         $out = $this->schema([
             ':a' => $this->fullSchema()
         ], 'out');
@@ -173,9 +173,11 @@ class InvitationsApiController extends AbstractApiController {
             false
         )->resultArray();
 
-        if (!empty($query['expand'])) {
-            $this->userModel->expandUsers($rows, ['AcceptedUserID']);
-        }
+        // Expand associated rows.
+        $this->userModel->expandUsers(
+            $rows,
+            $this->resolveExpandFields($query, ['acceptedUser' => 'acceptedUserID'])
+        );
 
         foreach ($rows as &$row) {
             $this->prepareRow($row);
@@ -185,22 +187,22 @@ class InvitationsApiController extends AbstractApiController {
     }
 
     /**
-     * Get a single invitation record by its unique ID.
+     * Get a single invite record by its unique ID.
      *
-     * @param int $id The invitation ID.
-     * @throws NotFoundException if the invitation could not be found.
+     * @param int $id The invite ID.
+     * @throws NotFoundException if the invite could not be found.
      * @return array
      */
-    public function invitationByID($id) {
+    public function inviteByID($id) {
         $row = $this->invitationModel->getID($id, DATASET_TYPE_ARRAY);
         if (!$row) {
-            throw new NotFoundException('Invitation');
+            throw new NotFoundException('Invite');
         }
         return $row;
     }
 
     /**
-     * Create a new invitation.
+     * Create a new invite.
      *
      * @param array $body The request body.
      * @return Data
@@ -209,13 +211,13 @@ class InvitationsApiController extends AbstractApiController {
         $this->permission('Garden.SignIn.Allow');
 
         $in = $this->schema([
-            'email:s' => 'The email address where the invitation should be sent.'
-        ], 'in')->setDescription('Create a new invitation.');
+            'email:s' => 'The email address where the invite should be sent.'
+        ], 'in')->setDescription('Create a new invite.');
         $out = $this->schema($this->fullSchema(), 'out');
 
         $body = $in->validate($body);
-        $invitationData = $this->caseScheme->convertArrayKeys($body);
-        $row = $this->invitationModel->save($invitationData, ['ReturnRow' => true]);
+        $inviteData = $this->caseScheme->convertArrayKeys($body);
+        $row = $this->invitationModel->save($inviteData, ['ReturnRow' => true]);
         $this->validateModel($this->invitationModel);
         $this->prepareRow($row);
 
@@ -229,6 +231,7 @@ class InvitationsApiController extends AbstractApiController {
      * @param array $row
      */
     public function prepareRow(array &$row) {
+        $row['InviteID'] = $row['InvitationID'];
         $row['Status'] = empty($row['AcceptedUserID']) ? 'pending' : 'accepted';
     }
 }

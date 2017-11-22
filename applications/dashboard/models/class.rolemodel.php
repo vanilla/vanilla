@@ -538,7 +538,7 @@ class RoleModel extends Gdn_Model {
      * Save role data.
      *
      * @param array $formPostValues The role row to save.
-     * @param array|false $settings Not used.
+     * @param array|false $settings Additional settings for the save.
      * @return bool|mixed Returns the role ID or false on error.
      */
     public function save($formPostValues, $settings = false) {
@@ -547,6 +547,7 @@ class RoleModel extends Gdn_Model {
 
         $roleID = val('RoleID', $formPostValues);
         $insert = $roleID > 0 ? false : true;
+        $doPermissions = val('DoPermissions', $settings, true);
 
         if ($insert) {
             // Figure out the next role ID.
@@ -572,41 +573,43 @@ class RoleModel extends Gdn_Model {
             // Now update the role permissions
             $role = $this->getByRoleID($roleID);
 
-            $permissionModel = Gdn::permissionModel();
+            if ($doPermissions) {
+                $permissionModel = Gdn::permissionModel();
 
-            if (array_key_exists('Permissions', $formPostValues)) {
-                $globalPermissions = $formPostValues['Permissions'];
-                $categoryPermissions = val('Category', $globalPermissions, []);
+                if (array_key_exists('Permissions', $formPostValues)) {
+                    $globalPermissions = $formPostValues['Permissions'];
+                    $categoryPermissions = val('Category', $globalPermissions, []);
 
-                // Massage the global permissions.
-                unset($globalPermissions['Category']);
-                $globalPermissions['RoleID'] = $roleID;
-                $globalPermissions['JunctionTable'] = null;
-                $globalPermissions['JunctionColumn'] = null;
-                $globalPermissions['JunctionID'] = null;
-                $permissions = [$globalPermissions];
+                    // Massage the global permissions.
+                    unset($globalPermissions['Category']);
+                    $globalPermissions['RoleID'] = $roleID;
+                    $globalPermissions['JunctionTable'] = null;
+                    $globalPermissions['JunctionColumn'] = null;
+                    $globalPermissions['JunctionID'] = null;
+                    $permissions = [$globalPermissions];
 
-                // Massage the category permissions.
-                foreach ($categoryPermissions as $perm) {
-                    $row = $perm;
-                    $row['RoleID'] = $roleID;
-                    $row['JunctionTable'] = 'Category';
-                    $row['JunctionColumn'] = 'PermissionCategoryID';
-                    $row['JunctionID'] = $row['CategoryID'];
-                    unset($row['CategoryID']);
-                    $permissions[] = $row;
+                    // Massage the category permissions.
+                    foreach ($categoryPermissions as $perm) {
+                        $row = $perm;
+                        $row['RoleID'] = $roleID;
+                        $row['JunctionTable'] = 'Category';
+                        $row['JunctionColumn'] = 'PermissionCategoryID';
+                        $row['JunctionID'] = $row['CategoryID'];
+                        unset($row['CategoryID']);
+                        $permissions[] = $row;
+                    }
+                } else {
+                    $permissions = val('Permission', $formPostValues);
+                    $permissions = $permissionModel->pivotPermissions($permissions, ['RoleID' => $roleID]);
                 }
-            } else {
-                $permissions = val('Permission', $formPostValues);
-                $permissions = $permissionModel->pivotPermissions($permissions, ['RoleID' => $roleID]);
-            }
 
-            $permissionsWhere = ['RoleID' => $roleID];
-            if (val('IgnoreCategoryPermissions', $formPostValues)) {
-                // Include the default category permissions when ignoring the rest.
-                $permissionsWhere['JunctionID'] = [null, -1];
+                $permissionsWhere = ['RoleID' => $roleID];
+                if (val('IgnoreCategoryPermissions', $formPostValues)) {
+                    // Include the default category permissions when ignoring the rest.
+                    $permissionsWhere['JunctionID'] = [null, -1];
+                }
+                $permissionModel->saveAll($permissions, $permissionsWhere);
             }
-            $permissionModel->saveAll($permissions, $permissionsWhere);
 
             if (Gdn::cache()->activeEnabled()) {
                 // Don't update the user table if we are just using cached permissions.

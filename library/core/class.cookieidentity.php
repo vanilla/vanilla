@@ -529,8 +529,10 @@ class Gdn_CookieIdentity {
 
         setValue('exp', $payload, $expiry);
 
-        // Save the cookie.
+        // Send the updated cookie to the browser.
         safeCookie($name, $jwt, $expiry, $this->CookiePath, $this->CookieDomain, null, true);
+
+        // Update the cookie for the current request.
         $_COOKIE[$this->CookieName] = $jwt;
 
         return $jwt;

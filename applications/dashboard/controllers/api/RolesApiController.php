@@ -5,11 +5,8 @@
  */
 
 use Garden\Schema\Schema;
-use Garden\Web\Data;
 use Garden\Web\Exception\NotFoundException;
 use Garden\Web\Exception\ServerException;
-use Vanilla\Utility\CapitalCaseScheme;
-use Vanilla\Utility\CamelCaseScheme;
 
 /**
  * API Controller for the `/roles` resource.
@@ -18,12 +15,6 @@ class RolesApiController extends AbstractApiController {
 
     /** Maximum number of permission rows that can be displayed before an error is reported. */
     const MAX_PERMISSIONS = 100;
-
-    /** @var CamelCaseScheme */
-    private $camelCaseScheme;
-
-    /** @var CapitalCaseScheme */
-    private $caseScheme;
 
     /** @var CategoryModel */
     private $categoryModel;
@@ -92,11 +83,11 @@ class RolesApiController extends AbstractApiController {
      * @param CategoryModel $categoryModel
      */
     public function __construct(RoleModel $roleModel, PermissionModel $permissionModel, CategoryModel $categoryModel) {
+        parent::__construct();
+
         $this->roleModel = $roleModel;
         $this->permissionModel = $permissionModel;
         $this->categoryModel = $categoryModel;
-        $this->caseScheme = new CapitalCaseScheme();
-        $this->camelCaseScheme = new CamelCaseScheme();
     }
 
     /**
@@ -260,7 +251,7 @@ class RolesApiController extends AbstractApiController {
         $query += ['expand' => false];
 
         $row = $this->roleByID($id);
-        $this->normalizeOutput($row, $query['expand']);
+        $row = $this->normalizeOutput($row, $query['expand']);
 
         $result = $out->validate($row);
         return $result;
@@ -374,7 +365,7 @@ class RolesApiController extends AbstractApiController {
 
         $rows = $this->roleModel->getWithRankPermissions()->resultArray();
         foreach ($rows as &$row) {
-            $this->normalizeOutput($row, $query['expand']);
+            $row = $this->normalizeOutput($row, $query['expand']);
         }
 
         $result = $out->validate($rows);
@@ -416,10 +407,10 @@ class RolesApiController extends AbstractApiController {
      *
      * @throws ServerException If attempting to include permissions, but there are too many permission rows.
      * @param array $dbRecord Database record.
-     * @param array $expand
+     * @param array|false $expand
      * @return array Return a Schema record.
      */
-    protected function normalizeOutput(array $dbRecord, array $expand = []) {
+    protected function normalizeOutput(array $dbRecord, $expand = []) {
         if (array_key_exists('RoleID', $dbRecord)) {
             $roleID = $dbRecord['RoleID'];
             if ($this->isExpandField('permissions', $expand)) {
@@ -461,7 +452,7 @@ class RolesApiController extends AbstractApiController {
             unset($body['permissions']);
         }
 
-        $roleData = $this->caseScheme->convertArrayKeys($body);
+        $roleData = $this->capitalCaseScheme->convertArrayKeys($body);
         $roleData['RoleID'] = $id;
         $this->roleModel->save($roleData, ['DoPermissions' => false]);
         $this->validateModel($this->roleModel);
@@ -508,7 +499,7 @@ class RolesApiController extends AbstractApiController {
 
         $body = $in->validate($body);
 
-        $roleData = $this->caseScheme->convertArrayKeys($body);
+        $roleData = $this->capitalCaseScheme->convertArrayKeys($body);
         $id = $this->roleModel->save($roleData);
         $this->validateModel($this->roleModel);
 

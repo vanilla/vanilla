@@ -6,17 +6,27 @@
  */
 
 use Garden\Schema\Schema;
+use Vanilla\Utility\CamelCaseScheme;
+use Vanilla\Utility\CapitalCaseScheme;
 
 abstract class AbstractApiController extends \Vanilla\Web\Controller {
-    /**
-     * @var Schema
-     */
+
+    /** @var CamelCaseScheme */
+    protected $camelCaseScheme;
+
+    /** @var CapitalCaseScheme */
+    protected $capitalCaseScheme;
+
+    /** @var Schema */
     private $userFragmentSchema;
 
-    /**
-     * @var Schema
-     */
+    /** @var Schema */
     private $postFragmentSchema;
+
+    public function __construct() {
+        $this->camelCaseScheme = new CamelCaseScheme();
+        $this->capitalCaseScheme = new CapitalCaseScheme();
+    }
 
     /**
      * If the parameter value is a valid date filter value, return an array of query conditions.

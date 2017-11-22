@@ -18,9 +18,6 @@ use Vanilla\Utility\CapitalCaseScheme;
  */
 class UsersApiController extends AbstractApiController {
 
-    /** @var CapitalCaseScheme */
-    private $caseScheme;
-
     /** @var Gdn_Configuration */
     private $configuration;
 
@@ -46,8 +43,13 @@ class UsersApiController extends AbstractApiController {
      * @param Gdn_Configuration $configuration
      * @param DateFilterSchema $dateFilterSchema
      */
-    public function __construct(UserModel $userModel, Gdn_Configuration $configuration, DateFilterSchema $dateFilterSchema) {
-        $this->caseScheme = new CapitalCaseScheme();
+    public function __construct(
+        UserModel $userModel,
+        Gdn_Configuration $configuration,
+        DateFilterSchema $dateFilterSchema
+    ) {
+        parent::__construct();
+
         $this->configuration = $configuration;
         $this->userModel = $userModel;
         $this->dateFilterSchema = $dateFilterSchema;
@@ -271,7 +273,7 @@ class UsersApiController extends AbstractApiController {
         // If a row associated with this ID cannot be found, a "not found" exception will be thrown.
         $this->userByID($id);
         $body = $this->normalizeInput($body);
-        $userData = $this->caseScheme->convertArrayKeys($body);
+        $userData = $this->capitalCaseScheme->convertArrayKeys($body);
         $userData['UserID'] = $id;
         $this->userModel->save($userData);
         $this->validateModel($this->userModel);
@@ -297,8 +299,7 @@ class UsersApiController extends AbstractApiController {
 
         $body = $in->validate($body);
 
-        $body = $this->normalizeInput($body);
-        $userData = $this->caseScheme->convertArrayKeys($body);
+        $userData = $this->normalizeInput($body);
         if (!array_key_exists('RoleID', $userData)) {
             $userData['RoleID'] = RoleModel::getDefaultRoles(RoleModel::TYPE_MEMBER);
         }
@@ -335,7 +336,7 @@ class UsersApiController extends AbstractApiController {
         $registrationMethod = $this->configuration->get('Garden.Registration.Method');
         $registrationMethod = strtolower($registrationMethod);
 
-        $userData = $this->caseScheme->convertArrayKeys($body);
+        $userData = $this->capitalCaseScheme->convertArrayKeys($body);
 
         $inputProperties = [
             'email:s' => 'An email address for this user.',

@@ -41,6 +41,8 @@ class TokensApiController extends AbstractApiController {
      * @param AccessTokenModel $accessTokenModel
      */
     public function __construct(AccessTokenModel $accessTokenModel) {
+        parent::__construct();
+
         $this->accessTokenModel = $accessTokenModel;
     }
 
@@ -124,7 +126,7 @@ class TokensApiController extends AbstractApiController {
                 'accessTokenID:i' => 'The unique numeric ID.',
                 'name:s|n' => 'A user-specified label.',
                 'dateInserted:dt' => 'When the token was generated.'
-            ], 'token');
+            ], 'Token');
         }
         return $this->fullSchema;
     }
@@ -247,7 +249,7 @@ class TokensApiController extends AbstractApiController {
         // Serve up the result.
         $row = $this->normalizeOutput($row);
         $result = $out->validate($row);
-        return new Data($result, 201);
+        return $result;
     }
 
     /**
@@ -266,7 +268,7 @@ class TokensApiController extends AbstractApiController {
         $dbRecord['Name'] = $name ?: t('Personal Access Token');
 
         if (array_key_exists('Token', $dbRecord) && is_string($dbRecord['Token'])) {
-            $row['AccessToken'] = $this->accessTokenModel->signToken($dbRecord['Token']);
+            $dbRecord['AccessToken'] = $this->accessTokenModel->signToken($dbRecord['Token']);
         }
 
         $schemaRecord = $this->camelCaseScheme->convertArrayKeys($dbRecord);

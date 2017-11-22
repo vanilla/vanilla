@@ -16,9 +16,6 @@ use Vanilla\Utility\CapitalCaseScheme;
  */
 class DiscussionsApiController extends AbstractApiController {
 
-    /** @var CapitalCaseScheme */
-    private $caseScheme;
-
     /** @var DateFilterSchema */
     private $dateFilterSchema;
 
@@ -44,12 +41,16 @@ class DiscussionsApiController extends AbstractApiController {
      * @param UserModel $userModel
      * @param DateFilterSchema $dateFilterSchema
      */
-    public function __construct(DiscussionModel $discussionModel, UserModel $userModel, DateFilterSchema $dateFilterSchema) {
+    public function __construct(
+        DiscussionModel $discussionModel,
+        UserModel $userModel,
+        DateFilterSchema $dateFilterSchema
+    ) {
+        parent::__construct();
+
         $this->discussionModel = $discussionModel;
         $this->userModel = $userModel;
         $this->dateFilterSchema = $dateFilterSchema;
-
-        $this->caseScheme = new CapitalCaseScheme();
     }
 
     /**
@@ -220,8 +221,8 @@ class DiscussionsApiController extends AbstractApiController {
 
         $this->discussionModel->categoryPermission('Vanilla.Discussions.View', $row['CategoryID']);
 
-        $row = $this->normalizeOutput($row);
         $this->userModel->expandUsers($row, ['InsertUserID', 'LastUserID']);
+        $row = $this->normalizeOutput($row);
 
         $result = $out->validate($row);
 
@@ -234,9 +235,10 @@ class DiscussionsApiController extends AbstractApiController {
      * Normalize a database record to match the Schema definition.
      *
      * @param array $dbRecord Database record.
+     * @param array|bool $expand
      * @return array Return a Schema record.
      */
-    public function normalizeOutput(array $dbRecord, array $expand = []) {
+    public function normalizeOutput(array $dbRecord, $expand = []) {
         $dbRecord['Announce'] = (bool)$dbRecord['Announce'];
         $dbRecord['Bookmarked'] = (bool)$dbRecord['Bookmarked'];
         $dbRecord['Url'] = discussionUrl($dbRecord);
@@ -402,7 +404,7 @@ class DiscussionsApiController extends AbstractApiController {
         );
 
         foreach ($rows as &$currentRow) {
-            $this->normalizeOutput($currentRow, $query['expand']);
+            $currentRow = $this->normalizeOutput($currentRow, $query['expand']);
         }
 
         $result = $out->validate($rows, true);
@@ -430,7 +432,7 @@ class DiscussionsApiController extends AbstractApiController {
         $body = $in->validate($body, true);
 
         $row = $this->discussionByID($id);
-        $discussionData = $this->caseScheme->convertArrayKeys($body);
+        $discussionData = $this->capitalCaseScheme->convertArrayKeys($body);
         $discussionData['DiscussionID'] = $id;
         $categoryID = $row['CategoryID'];
         if ($row['InsertUserID'] !== $this->getSession()->UserID) {
@@ -473,7 +475,7 @@ class DiscussionsApiController extends AbstractApiController {
         $this->fieldPermission($body, 'pinned', 'Vanilla.Discussions.Announce', $categoryID);
         $this->fieldPermission($body, 'sink', 'Vanilla.Discussions.Sink', $categoryID);
 
-        $discussionData = $this->caseScheme->convertArrayKeys($body);
+        $discussionData = $this->capitalCaseScheme->convertArrayKeys($body);
         $id = $this->discussionModel->save($discussionData);
         $this->validateModel($this->discussionModel);
 

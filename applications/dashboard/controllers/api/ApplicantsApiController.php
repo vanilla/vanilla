@@ -9,15 +9,11 @@ use Garden\Web\Data;
 use Garden\Web\Exception\ClientException;
 use Garden\Web\Exception\NotFoundException;
 use Garden\Web\Exception\ServerException;
-use Vanilla\Utility\CapitalCaseScheme;
 
 /**
  * API Controller for managing applicants.
  */
 class ApplicantsApiController extends AbstractApiController {
-
-    /** @var CapitalCaseScheme */
-    private $caseScheme;
 
     /** @var Schema */
     private $idParamSchema;
@@ -28,17 +24,17 @@ class ApplicantsApiController extends AbstractApiController {
     /**
      * ApplicantsApiController constructor.
      *
-     * @param CapitalCaseScheme $caseScheme
      * @param Gdn_Configuration $configuration
      * @param UserModel $userModel
      * @throws ClientException if the registration method on the site is not approval.
      */
-    public function __construct(CapitalCaseScheme $caseScheme, Gdn_Configuration $configuration, UserModel $userModel) {
+    public function __construct(Gdn_Configuration $configuration, UserModel $userModel) {
+        parent::__construct();
+
         $registrationMethod = strtolower($configuration->get('Garden.Registration.Method'));
         if ($registrationMethod !== 'approval') {
             throw new ClientException('The site is not configured for the approval registration method.');
         }
-        $this->caseScheme = $caseScheme;
         $this->userModel = $userModel;
     }
 
@@ -238,7 +234,7 @@ class ApplicantsApiController extends AbstractApiController {
 
         $this->userModel->validatePasswordStrength($body['password'], $body['name']);
 
-        $userData = $this->caseScheme->convertArrayKeys($body);
+        $userData = $this->capitalCaseScheme->convertArrayKeys($body);
         $userID = $this->userModel->register($userData);
         $this->validateModel($this->userModel);
 

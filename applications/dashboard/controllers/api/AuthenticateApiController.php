@@ -16,7 +16,6 @@ use Vanilla\Authenticator\Authenticator;
 use Vanilla\Authenticator\SSOAuthenticator;
 use Vanilla\Exception\PermissionException;
 use Vanilla\Models\SSOModel;
-use Vanilla\Utility\CamelCaseScheme;
 
 /**
  * API Controller for the `/authenticate` resource.
@@ -27,9 +26,6 @@ class AuthenticateApiController extends AbstractApiController {
 
     /** @var AddonManager */
     private $addonManager;
-
-    /** @var CamelCaseScheme */
-    private $camelCaseScheme;
 
     /** @var Gdn_Configuration */
     private $config;
@@ -69,8 +65,9 @@ class AuthenticateApiController extends AbstractApiController {
         SSOModel $ssoModel,
         UserModel $userModel
     ) {
+        parent::__construct();
+
         $this->addonManager = $addonManager;
-        $this->camelCaseScheme = new CamelCaseScheme();
         $this->config = $config;
         $this->container = $container;
         $this->request = $request;

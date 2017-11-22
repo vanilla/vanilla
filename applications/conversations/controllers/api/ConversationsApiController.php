@@ -9,15 +9,11 @@ use Garden\Schema\Schema;
 use Garden\Web\Exception\NotFoundException;
 use Garden\Web\Exception\ServerException;
 use Vanilla\Exception\ConfigurationException;
-use Vanilla\Utility\CapitalCaseScheme;
 
 /**
  * API Controller for the `/conversations` resource.
  */
 class ConversationsApiController extends AbstractApiController {
-
-    /** @var CapitalCaseScheme */
-    private $caseScheme;
 
     /** @var Gdn_Configuration */
     private $config;
@@ -40,7 +36,8 @@ class ConversationsApiController extends AbstractApiController {
         ConversationModel $conversationModel,
         UserModel $userModel
     ) {
-        $this->caseScheme = new CapitalCaseScheme();
+        parent::__construct();
+
         $this->config = $config;
         $this->conversationModel = $conversationModel;
         $this->userModel = $userModel;
@@ -370,7 +367,6 @@ class ConversationsApiController extends AbstractApiController {
 
         $body = $in->validate($body);
         $conversationData = $this->normalizeInput($body);
-        $conversationData = $this->caseScheme->convertArrayKeys($conversationData);
 
         $conversationID = $this->conversationModel->save($conversationData, ['ConversationOnly' => true]);
         $this->validateModel($this->conversationModel, true);

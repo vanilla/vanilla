@@ -8,15 +8,11 @@ use Garden\Schema\Schema;
 use Garden\Web\Data;
 use Garden\Web\Exception\ClientException;
 use Garden\Web\Exception\NotFoundException;
-use Vanilla\Utility\CapitalCaseScheme;
 
 /**
  * API Controller for the `/invites` resource.
  */
 class InvitesApiController extends AbstractApiController {
-
-    /** @var CapitalCaseScheme */
-    private $caseScheme;
 
     /** @var InvitationModel */
     private $invitationModel;
@@ -27,19 +23,19 @@ class InvitesApiController extends AbstractApiController {
     /**
      * InvitesApiController constructor.
      *
-     * @param CapitalCaseScheme $caseScheme
      * @param Gdn_Configuration $configuration
      * @param InvitationModel $invitationModel
      * @param UserModel $userModel
      * @throws ClientException if the site is not configured for user invitations.
      */
-    public function __construct(CapitalCaseScheme $caseScheme, GDN_Configuration $configuration, InvitationModel $invitationModel, UserModel $userModel) {
+    public function __construct(GDN_Configuration $configuration, InvitationModel $invitationModel, UserModel $userModel) {
+        parent::__construct();
+
         $registrationMethod = strtolower($configuration->get('Garden.Registration.Method'));
         if ($registrationMethod !== 'invitation') {
             throw new ClientException('The site is not configured for the invitation registration method.');
         }
 
-        $this->caseScheme = $caseScheme;
         $this->invitationModel = $invitationModel;
         $this->userModel = $userModel;
     }
@@ -216,7 +212,7 @@ class InvitesApiController extends AbstractApiController {
         $out = $this->schema($this->fullSchema(), 'out');
 
         $body = $in->validate($body);
-        $inviteData = $this->caseScheme->convertArrayKeys($body);
+        $inviteData = $this->capitalCaseScheme->convertArrayKeys($body);
         $row = $this->invitationModel->save($inviteData, ['ReturnRow' => true]);
         $this->validateModel($this->invitationModel);
         $row = $this->normalizeOutput($row);

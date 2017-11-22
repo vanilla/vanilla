@@ -6,22 +6,14 @@
 
 use Garden\Schema\Schema;
 use Garden\Web\Exception\NotFoundException;
-use Vanilla\Utility\CapitalCaseScheme;
-use Vanilla\Utility\CamelCaseScheme;
 
 /**
  * API Controller for the `/drafts` resource.
  */
 class DraftsApiController extends AbstractApiController {
 
-    /** @var CapitalCaseScheme */
-    private $capitalCaseScheme;
-
     /** @var DraftModel */
     private $draftModel;
-
-    /** @var CamelCaseScheme */
-    private $translateCaseScheme;
 
     /**
      * DraftsApiController constructor.
@@ -29,9 +21,9 @@ class DraftsApiController extends AbstractApiController {
      * @param DraftModel $draftModel
      */
     public function __construct(DraftModel $draftModel) {
+        parent::__construct();
+
         $this->draftModel = $draftModel;
-        $this->capitalCaseScheme = new CapitalCaseScheme();
-        $this->translateCaseScheme = new CamelCaseScheme();
     }
 
     /**

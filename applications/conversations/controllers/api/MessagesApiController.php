@@ -10,16 +10,11 @@ use Garden\Web\Exception\ClientException;
 use Garden\Web\Exception\NotFoundException;
 use Garden\Web\Exception\ServerException;
 use Vanilla\Exception\ConfigurationException;
-use Vanilla\Utility\CapitalCaseScheme;
-
 
 /**
  * API Controller for the `/messages` resource.
  */
 class MessagesApiController extends AbstractApiController {
-
-    /** @var CapitalCaseScheme */
-    private $caseScheme;
 
     /** @var Gdn_Configuration */
     private $config;
@@ -47,7 +42,8 @@ class MessagesApiController extends AbstractApiController {
         ConversationMessageModel $conversationMessageModel,
         UserModel $userModel
     ) {
-        $this->caseScheme = new CapitalCaseScheme();
+        parent::__construct();
+
         $this->config = $config;
         $this->conversationMessageModel = $conversationMessageModel;
         $this->conversationModel = $conversationModel;
@@ -328,7 +324,7 @@ class MessagesApiController extends AbstractApiController {
             throw new ClientException('You can not add a message to a conversation that you are not a participant of.');
         }
 
-        $messageData = $this->caseScheme->convertArrayKeys($body);
+        $messageData = $this->capitalCaseScheme->convertArrayKeys($body);
         $messageID = $this->conversationMessageModel->save($messageData, $conversation);
         $this->validateModel($this->conversationMessageModel, true);
         if (!$messageID) {

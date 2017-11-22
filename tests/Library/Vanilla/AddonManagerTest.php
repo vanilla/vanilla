@@ -193,9 +193,10 @@ class AddonManagerTest extends \PHPUnit\Framework\TestCase {
 
         $subpath = reset($classes[$classKey])['path'];
         // Kludge: Check for the userPhoto() function.
-        $fileContents = file_get_contents($addon->path($subpath));
+        $path = $addon->path($subpath);
+        $fileContents = file_get_contents($path);
         if (preg_match('`function userPhoto`i', $fileContents)) {
-            $this->markTestSkipped("We can't test classes that redeclare userPhoto().");
+            $this->markTestSkipped("We can't test classes that redeclare userPhoto(). $path");
             return;
         }
 
@@ -540,6 +541,12 @@ class AddonManagerTest extends \PHPUnit\Framework\TestCase {
                 'Vanilla\API\DiscussionsController' => true,
                 'API\DiscussionsController' => false
             ],
+            'vanilla\*\DiscussionsController' => [
+                'DiscussionsController' => false,
+                'Vanilla\DiscussionsController' => true,
+                'Vanilla\API\DiscussionsController' => true,
+                'API\DiscussionsController' => false
+            ],
             '*\*Controller' => [
                 'DiscussionsController' => true,
                 'Vanilla\DiscussionsController' => true,
@@ -591,11 +598,68 @@ class AddonManagerTest extends \PHPUnit\Framework\TestCase {
     /**
      * Test finding classes on a started addon.
      */
-    public function testFindClassesStarted() {
+    public function testFindClassesNamespaceCaseMismatch() {
         $am = new TestAddonManager();
 
-        $am->startAddonsByKey(['test-old-plugin'], Addon::TYPE_ADDON);
-        $classes = $am->findClasses('TestOldPluginPlugin');
-        $this->assertSame(\TestOldPluginPlugin::class, $classes[0]);
+        $am->startAddonsByKey(['namespaced-plugin'], Addon::TYPE_ADDON);
+        $classes = $am->findClasses('deeply\\NESTed\\NamesPaced\\Fixture\\TestClass');
+        $this->assertSame(\Deeply\Nested\Namespaced\Fixture\TestClass::class, $classes[0]);
+    }
+
+    /**
+     * Test a findClass with a namespace case mismatch
+     */
+    public function testFindClassNamespaceCaseMismatch() {
+        $am = new TestAddonManager();
+
+        $am->startAddonsByKey(['namespaced-plugin'], Addon::TYPE_ADDON);
+
+        $addon = $am->lookupByClassname('deeply\\NESTed\\NamesPaced\\Fixture\\TestClass');
+        $this->assertEquals('namespaced-plugin', $addon->getKey());
+    }
+
+    /**
+     * Test a lookup with a namespace case mismatch
+     */
+    public function testLookupNamespaceCaseMismatch() {
+        $am = new TestAddonManager();
+
+        $am->startAddonsByKey(['namespaced-plugin'], Addon::TYPE_ADDON);
+
+        $addon = $am->lookupByClassname('deeply\\NESTed\\NamesPaced\\Fixture\\TestClass');
+        $this->assertEquals('namespaced-plugin', $addon->getKey());
+    }
+
+    /**
+     * Looking up an addon by class name should give the right addon, even if there is another addon that has a class with the same basename.
+     */
+    public function testSameBasenameEdgeCase() {
+        $am = new TestAddonManager();
+
+        $am->startAddonsByKey(['multiclass-namespaced-plugin', 'namespaced-plugin'], Addon::TYPE_ADDON);
+
+        $addon1 = $am->lookupByClassname(\Deeply\TestClass::class);
+        $this->assertEquals('multiclass-namespaced-plugin', $addon1->getKey());
+
+        $addon2 = $am->lookupByClassname(\Deeply\Nested\Namespaced\Fixture\TestClass::class);
+        $this->assertEquals('namespaced-plugin', $addon2->getKey());
+    }
+
+    /**
+     * Test looking up requirements that are not met.
+     *
+     * This test mimics the test from **AddonManager::checkRequirements()**.
+     */
+    public function testBadRequire() {
+        $am = new TestAddonManager();
+
+        $addon = $am->lookupAddon('bad-require');
+        $r = $am->lookupRequirements($addon, AddonManager::REQ_MISSING | AddonManager::REQ_VERSION);
+
+        $this->assertArrayHasKey('asd!', $r);
+        $this->assertArrayHasKey('namespaced-plugin', $r);
+
+        $this->assertSame(AddonManager::REQ_MISSING, $r['asd!']['status']);
+        $this->assertSame(AddonManager::REQ_VERSION, $r['namespaced-plugin']['status']);
     }
 }

@@ -19,15 +19,15 @@ function writeActivity($activity, $sender, $session) {
         $cssClass .= ' HasPhoto';
 
     $format = val('Format', $activity);
-
-    $title = '';
-    $excerpt = $activity->Story;
-    if ($format) {
-        $excerpt = Gdn_Format::to($excerpt, $format);
+    if (!$format) {
+        $format = 'html';
     }
 
+    $title = '';
+    $excerpt = Gdn_Format::to($activity->Story, $format);
+
     if ($activity->NotifyUserID > 0 || !in_array($activityType, ['WallComment', 'WallPost', 'AboutUpdate'])) {
-        $title = '<div class="Title">'.getValue('Headline', $activity).'</div>';
+        $title = '<div class="Title">'.Gdn_Format::to(val('Headline', $activity), 'html').'</div>';
     } else if ($activityType == 'WallPost') {
         $regardingUser = userBuilder($activity, 'Regarding');
         $photoAnchor = userPhoto($regardingUser);

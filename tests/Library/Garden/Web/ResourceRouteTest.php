@@ -74,6 +74,7 @@ class ResourceRouteTest extends \PHPUnit\Framework\TestCase {
 
             'map body' => ['POST', '/discussions', [$dc, 'post'], ['body' => ['!']]],
             'map data' => ['PATCH', '/discussions/1', [$dc, 'patch'], ['id' => '1', 'data' => ['id' => '1', 0 => '!']]],
+            'post and patch' => ['POST', '/discussions/1', [$dc, 'patch'], ['id' => '1', 'data' => ['id' => '1', 0 => '!']]],
 
             'no mapping' => ['POST', '/discussions/no-map/a/b/c?f=b', [$dc, 'post_noMap'], ['query' => 'a', 'body' => 'b', 'data' => 'c']],
 

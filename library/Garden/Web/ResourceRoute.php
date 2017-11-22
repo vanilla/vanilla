@@ -380,6 +380,10 @@ class ResourceRoute extends Route {
 
         if ($method === 'get') {
             $result[] = ['index', null];
+        } elseif ($method === 'post' && !empty($pathArgs)) {
+            // This is a bit of a kludge to allow POST to be used against the usual PATCH method to allow for
+            // multipart/form-data on PATCH (edit) endpoints.
+            $result[] = ['patch', null];
         }
 
         return $result;

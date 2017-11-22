@@ -10,6 +10,7 @@ use Garden\Web\Data;
 use Garden\Web\Exception\ClientException;
 use Garden\Web\Exception\NotFoundException;
 use Garden\Web\Exception\ServerException;
+use Vanilla\DateFilterSchema;
 use Vanilla\Utility\CapitalCaseScheme;
 
 /**
@@ -22,6 +23,9 @@ class UsersApiController extends AbstractApiController {
 
     /** @var Gdn_Configuration */
     private $configuration;
+
+    /** @var DateFilterSchema */
+    private $dateFilterSchema;
 
     /** @var Schema */
     private $idParamSchema;
@@ -40,11 +44,13 @@ class UsersApiController extends AbstractApiController {
      *
      * @param UserModel $userModel
      * @param Gdn_Configuration $configuration
+     * @param DateFilterSchema $dateFilterSchema
      */
-    public function __construct(UserModel $userModel, Gdn_Configuration $configuration) {
+    public function __construct(UserModel $userModel, Gdn_Configuration $configuration, DateFilterSchema $dateFilterSchema) {
         $this->caseScheme = new CapitalCaseScheme();
         $this->configuration = $configuration;
         $this->userModel = $userModel;
+        $this->dateFilterSchema = $dateFilterSchema;
     }
 
     /**
@@ -75,13 +81,11 @@ class UsersApiController extends AbstractApiController {
             'password:s' => 'Password of the user.',
             'hashMethod:s' => 'Hash method for the password.',
             'email:s' => 'Email address of the user.',
-            'photo:s' => [
-                'allowNull' => true,
+            'photo:s|n' => [
                 'minLength' => 0,
                 'description' => 'Raw photo field value from the user record.'
             ],
-            'photoUrl:s' => [
-                'allowNull' => true,
+            'photoUrl:s|n' => [
                 'minLength' => 0,
                 'description' => 'URL to the user photo.'
             ],
@@ -89,6 +93,8 @@ class UsersApiController extends AbstractApiController {
             'showEmail:b' => 'Is the email address visible to other users?',
             'bypassSpam:b' => 'Should submissions from this user bypass SPAM checks?',
             'banned:i' => 'Is the user banned?',
+            'dateInserted:dt' => 'When the user was created.',
+            'dateUpdated:dt|n' => 'When the user was last updated.',
             'roles:a?' => $this->schema([
                 'roleID:i' => 'ID of the role.',
                 'name:s' => 'Name of the role.'
@@ -118,7 +124,6 @@ class UsersApiController extends AbstractApiController {
         $this->prepareRow($row);
 
         $result = $out->validate($row);
-        $this->prepareRow($result);
         return $result;
     }
 
@@ -171,6 +176,8 @@ class UsersApiController extends AbstractApiController {
         ]);
 
         $in = $this->schema([
+            'dateInserted?' => $this->dateFilterSchema,
+            'dateUpdated?' => $this->dateFilterSchema,
             'userID:a?' => [
                 'description' => 'One or more user IDs to lookup.',
                 'items' => ['type' => 'integer'],
@@ -192,10 +199,17 @@ class UsersApiController extends AbstractApiController {
 
         $query = $in->validate($query);
         list($offset, $limit) = offsetLimit("p{$query['page']}", $query['limit']);
-        $filter = '';
+        $filter = [];
 
         if (!empty($query['userID'])) {
-            $filter = ['UserID' => $query['userID']];
+            $filter['UserID'] = $query['userID'];
+        }
+
+        if ($dateInserted = $this->dateFilterField('dateInserted', $query)) {
+            $filter += $dateInserted;
+        }
+        if ($dateUpdated = $this->dateFilterField('dateUpdated', $query)) {
+            $filter += $dateUpdated;
         }
 
         $rows = $this->userModel->search($filter, '', '', $limit, $offset)->resultArray();
@@ -224,6 +238,14 @@ class UsersApiController extends AbstractApiController {
             $row['Photo'] = $photo;
             $row['PhotoUrl'] = $photo;
         }
+        if (array_key_exists('Verified', $row)) {
+            $row['bypassSpam'] = $row['Verified'];
+            unset($row['Verified']);
+        }
+        if (array_key_exists('Confirmed', $row)) {
+            $row['emailConfirmed'] = $row['Confirmed'];
+            unset($row['Confirmed']);
+        }
     }
 
     /**
@@ -244,6 +266,7 @@ class UsersApiController extends AbstractApiController {
         $body = $in->validate($body, true);
         // If a row associated with this ID cannot be found, a "not found" exception will be thrown.
         $this->userByID($id);
+        $body = $this->translateRequest($body);
         $userData = $this->caseScheme->convertArrayKeys($body);
         $userData['UserID'] = $id;
         $this->userModel->save($userData);
@@ -270,6 +293,7 @@ class UsersApiController extends AbstractApiController {
 
         $body = $in->validate($body);
 
+        $body = $this->translateRequest($body);
         $userData = $this->caseScheme->convertArrayKeys($body);
         if (!array_key_exists('RoleID', $userData)) {
             $userData['RoleID'] = RoleModel::getDefaultRoles(RoleModel::TYPE_MEMBER);
@@ -326,7 +350,7 @@ class UsersApiController extends AbstractApiController {
         $in = $this->schema($inputProperties, 'in')->setDescription('Submit a new user registration.');
         $out = $this->schema(['userID', 'name', 'email'], 'out')->add($this->fullSchema());
 
-        $body = $in->validate($body);
+        $in->validate($body);
 
         $this->userModel->validatePasswordStrength($userData['Password'], $userData['Name']);
 
@@ -409,6 +433,23 @@ class UsersApiController extends AbstractApiController {
 //    }
 
     /**
+     * Translate a request to this endpoint into a format compatible for saving with the model.
+     *
+     * @param array $body
+     * @return array
+     */
+    private function translateRequest(array $body) {
+        if (array_key_exists('bypassSpam', $body)) {
+            $body['verified'] = $body['bypassSpam'];
+        }
+        if (array_key_exists('emailConfirmed', $body)) {
+            $body['confirmed'] = $body['emailConfirmed'];
+        }
+
+        return $body;
+    }
+
+    /**
      * Get a user by its numeric ID.
      *
      * @param int $id The user ID.
@@ -459,7 +500,7 @@ class UsersApiController extends AbstractApiController {
     public function userSchema($type = '') {
         if ($this->userSchema === null) {
             $schema = Schema::parse(['userID', 'name', 'email', 'photoUrl', 'emailConfirmed',
-                'showEmail', 'bypassSpam', 'banned', 'roles?']);
+                'showEmail', 'bypassSpam', 'banned', 'dateInserted', 'dateUpdated', 'roles?']);
             $schema = $schema->add($this->fullSchema());
             $this->userSchema = $this->schema($schema, 'User');
         }

@@ -229,6 +229,8 @@ class SetupController extends DashboardController {
                 $ConfigurationFormValues['Garden.Email.SupportName'] = $ConfigurationFormValues['Garden.Title'];
 
                 $ConfigurationModel->save($ConfigurationFormValues, true);
+                // Reload Gdn_CookieIdentity with the new configuration.
+                Gdn::getContainer()->get('Identity')->init();
 
                 // If changing locale, redefine locale sources:
                 $NewLocale = 'en-CA'; // $this->Form->getFormValue('Garden.Locale', false);

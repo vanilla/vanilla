@@ -14,6 +14,62 @@ abstract class AbstractApiController extends \Vanilla\Web\Controller {
     private $userFragmentSchema;
 
     /**
+     * @var Schema
+     */
+    private $postFragmentSchema;
+
+    /**
+     * If the parameter value is a valid date filter value, return an array of query conditions.
+     *
+     * @param string $param The name of the parameter in the request (e.g. dateInserted).
+     * @param array $data Request data, such as the query.
+     * @param string $field A column name override. If none is provided, the value for $param is used.
+     * @return array|bool
+     */
+    public function dateFilterField($param, array $data, $field = null) {
+        if ($field === null) {
+            $field = $param;
+        }
+        $validOperators = ['=', '>', '<', '>=', '<=', '[]', '()', '[)', '(]'];
+        $result = false;
+
+        if (array_key_exists($param, $data)) {
+            $value = $data[$param];
+            if (array_key_exists('op', $value) && array_key_exists('value', $value)) {
+                $op = $value['op'];
+                $value = $value['value'];
+
+                if (in_array($op, $validOperators)) {
+                    switch ($op) {
+                        case '>':
+                        case '<':
+                        case '>=':
+                        case '<=':
+                            if ($value instanceof DateTimeImmutable) {
+                                $result = ["{$field} {$op}" => $value];
+                            }
+                            break;
+                        case '=':
+                        case '[]':
+                        case '()':
+                        case '[)':
+                        case '(]':
+                            // DateFilterSchema has already taken care of any inclusive/exclusive range adjustments.
+                            if (is_array($value) && count($value) == 2) {
+                                $result = [
+                                    "{$field} >=" => $value[0],
+                                    "{$field} <=" => $value[1],
+                                ];
+                            }
+                    }
+                }
+            }
+        }
+
+        return $result;
+    }
+
+    /**
      * Filter unwanted values from an array (particularly empty values from request parameters).
      *
      * @param array $values
@@ -44,6 +100,27 @@ abstract class AbstractApiController extends \Vanilla\Web\Controller {
     }
 
     /**
+     * Get a simple schema for nesting as an "expand" parameter.
+     *
+     * @param array $fields Valid values for the expand parameter.
+     * @return Schema
+     */
+    public function getExpandFragment(array $fields) {
+        // Avoid using Controller::schema, because API document generators likely can't handle this dynamic schema.
+        $result = Schema::parse([
+            'description' => 'Expand associated records.',
+            'items' => [
+                'enum' => $fields,
+                'type' => 'string'
+            ],
+            'style' => 'form',
+            'type' => ['boolean', 'array']
+        ]);
+
+        return $result;
+    }
+
+    /**
      * Get the schema for users joined to records.
      *
      * @return Schema Returns a schema.
@@ -59,8 +136,74 @@ abstract class AbstractApiController extends \Vanilla\Web\Controller {
         return $this->userFragmentSchema;
     }
 
+    /**
+     * Get the schema for posts joined to records.
+     *
+     * Posts are joined to categories and discussions, usually in the form of **firstPost** and **lastPost** fields.
+     *
+     * @return Schema Returns a schema.
+     */
+    public function getPostFragmentSchema() {
+        if ($this->postFragmentSchema === null) {
+            $this->postFragmentSchema = $this->schema([
+                'discussionID:i?' => 'The discussion ID of the post.',
+                'commentID:i?' => 'The comment ID of the post, if any.',
+                'name:s' => 'The title of the post.',
+                'url:s' => 'The URL of the post.',
+                'dateInserted:dt' => 'The date of the post.',
+                'insertUserID:i' => 'The author of the post.',
+                'insertUser?' => $this->getUserFragmentSchema(),
+            ], 'PostFragment');
+        }
+        return $this->postFragmentSchema;
+    }
+
+    /**
+     * Determine if a value is in the "expand" parameter.
+     *
+     * @param string $field The field name to search for.
+     * @param array|bool $expand An array of fields to expand, or true for all.
+     * @return bool
+     */
+    public function isExpandField($field, $expand) {
+        $result = false;
+        if ($expand === true) {
+            // A boolean true allows everything.
+            $result = true;
+        } elseif (is_array($expand)) {
+            $result = in_array($field, $expand);
+        }
+        return $result;
+    }
+
     public function options($path) {
         return '';
+    }
+
+    /**
+     * Resolve values from an expand parameter, based on the provided map.
+     *
+     * @param array $request An array representing request data.
+     * @param array $map An array of short-to-full field names (e.g. insertUser => InsertUserID).
+     * @param string $field The name of the field where the expand fields can be found.
+     * @return array
+     */
+    protected function resolveExpandFields(array $request, array $map, $field = 'expand') {
+        $result = [];
+        if (array_key_exists($field, $request)) {
+            $expand = $request[$field];
+            if ($expand === true) {
+                // If the expand parameter is true, expand everything.
+                $result = array_values($map);
+            } elseif (is_array($expand)) {
+                foreach ($map as $short => $full) {
+                    if ($this->isExpandField($short, $expand)) {
+                        $result[] = $full;
+                    }
+                }
+            }
+        }
+        return $result;
     }
 
     /**

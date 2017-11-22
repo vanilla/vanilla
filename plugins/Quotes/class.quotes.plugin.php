@@ -481,7 +481,7 @@ BQ;
                 case 'TextEx':
                     $quoteBody = $data->Body;
                     $insertName = $data->InsertName;
-                    if (strpos($insertName, ' ') !== false) {
+                    if (preg_match('/[^\w-]/', $insertName)) {
                         $insertName = '"'.$insertName.'"';
                     }
                     $quote = '> '.sprintf(t('%s said:'), '@'.$insertName)."\n".

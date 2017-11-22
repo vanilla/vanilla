@@ -6,9 +6,9 @@ echo $this->Form->close();
 <div class="Info">
     <?php
     if ($this->RequestMethod == 'discussion' || $this->RequestMethod == 'editdiscussion') {
-        $Message = t('DiscussionRequiresApproval', "Your discussion will appear after it is approved.");
+        $Message = t("Your discussion will appear after it is approved.");
     } else {
-        $Message = t('CommentRequiresApproval', "Your comment will appear after it is approved.");
+        $Message = t("Your comment will appear after it is approved.");
     }
     echo '<div>', $Message, '</div>';
 

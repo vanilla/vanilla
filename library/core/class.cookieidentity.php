@@ -249,12 +249,17 @@ class Gdn_CookieIdentity {
     /**
      * Generates the user's session cookie.
      *
+     * @throws Gdn_ErrorException If cookie salt is empty.
      * @param int $userID The unique id assigned to the user in the database.
      * @param boolean $persist Should the user's session remain persistent across visits?
      * @param array $data Additional data to include in the token.
      * @return array|bool
      */
     public function setIdentity($userID, $persist = false) {
+        if (empty($this->CookieSalt)) {
+            throw new Gdn_ErrorException('Cookie salt is empty.');
+        }
+
         if (is_null($userID)) {
             $this->_clearIdentity();
             return true;
@@ -322,6 +327,7 @@ class Gdn_CookieIdentity {
     /**
      * Set a cookie, using specified path, domain, salt and hash method
      *
+     * @throws Gdn_ErrorException If cookie salt is empty.
      * @param string $cookieName Name of the cookie
      * @param string $keyData
      * @param mixed $cookieContents
@@ -333,7 +339,6 @@ class Gdn_CookieIdentity {
      * @return void
      */
     public static function setCookie($cookieName, $keyData, $cookieContents, $cookieExpires, $path = null, $domain = null, $cookieHashMethod = null, $cookieSalt = null) {
-
         if (is_null($path)) {
             $path = Gdn::config('Garden.Cookie.Path', '/');
         }
@@ -354,6 +359,10 @@ class Gdn_CookieIdentity {
 
         if (!$cookieSalt) {
             $cookieSalt = Gdn::config('Garden.Cookie.Salt');
+        }
+
+        if (empty($cookieSalt)) {
+            throw new Gdn_ErrorException('Cookie salt is empty.');
         }
 
         // Create the cookie signature
@@ -391,6 +400,7 @@ class Gdn_CookieIdentity {
     /**
      * Validate security of our cookie.
      *
+     * @throws Gdn_ErrorException If cookie salt is empty.
      * @param $cookieName
      * @param null $cookieHashMethod
      * @param null $cookieSalt
@@ -407,6 +417,10 @@ class Gdn_CookieIdentity {
 
         if (is_null($cookieSalt)) {
             $cookieSalt = Gdn::config('Garden.Cookie.Salt');
+        }
+
+        if (empty($cookieSalt)) {
+            throw new Gdn_ErrorException('Cookie salt is empty.');
         }
 
         $cookieData = explode('|', $_COOKIE[$cookieName]);
@@ -462,10 +476,15 @@ class Gdn_CookieIdentity {
     /**
      * Attempt to decode a JWT payload from a cookie value.
      *
+     * @throws Gdn_ErrorException If cookie salt is empty.
      * @param string $name Name of the cookie holding a JWT token.
      * @return array|null
      */
     public function getJWTPayload($name) {
+        if (empty($this->CookieSalt)) {
+            throw new Gdn_ErrorException('Cookie salt is empty.');
+        }
+
         $result = null;
 
         if (array_key_exists($name, $_COOKIE)) {

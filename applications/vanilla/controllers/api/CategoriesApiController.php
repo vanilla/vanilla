@@ -49,7 +49,7 @@ class CategoriesApiController extends AbstractApiController {
      */
     public function categoryPostSchema($type = '', array $extra = []) {
         if ($this->categoryPostSchema === null) {
-            $fields = ['name', 'parentCategoryID', 'urlCode'];
+            $fields = ['name', 'parentCategoryID?', 'urlCode', 'displayAs?', 'customPermissions?'];
             $this->categoryPostSchema = $this->schema(
                 Schema::parse(array_merge($fields, $extra))->add($this->schemaWithParent()),
                 'CategoryPost'
@@ -83,6 +83,7 @@ class CategoriesApiController extends AbstractApiController {
         if (empty($category)) {
             throw new NotFoundException('Category');
         }
+        $this->prepareRow($category);
         return $category;
     }
 
@@ -120,14 +121,19 @@ class CategoriesApiController extends AbstractApiController {
         return Schema::parse([
             'categoryID:i' => 'The ID of the category.',
             'name:s' => 'The name of the category.',
-            'description:s' => [
+            'description:s|n' => [
                 'description' => 'The description of the category.',
                 'minLength' => 0,
-                'allowNull' => true
             ],
-            'parentCategoryID:i' => 'Parent category ID.',
+            'parentCategoryID:i|n' => 'Parent category ID.',
+            'customPermissions:b' => 'Are custom permissions set for this category?',
             'urlCode:s' => 'The URL code of the category.',
             'url:s' => 'The URL to the category.',
+            'displayAs:s' => [
+                'description' => 'The display style of the category.',
+                'enum' => ['categories', 'discussions', 'flat', 'heading'],
+                'default' => 'discussions'
+            ],
             'countCategories:i' => 'Total number of child categories.',
             'countDiscussions:i' => 'Total discussions in the category.',
             'countComments:i' => 'Total comments in the category.',
@@ -168,7 +174,7 @@ class CategoriesApiController extends AbstractApiController {
 
         $in = $this->idParamSchema()->setDescription('Get a category for editing.');
         $out = $this->schema(Schema::parse([
-            'categoryID', 'name', 'parentCategoryID', 'urlCode', 'description'
+            'categoryID', 'name', 'parentCategoryID', 'urlCode', 'description', 'displayAs'
         ])->add($this->fullSchema()), 'out');
 
         $row = $this->category($id);
@@ -285,6 +291,8 @@ class CategoriesApiController extends AbstractApiController {
         } else {
             $categories = $this->categoryModel->getTree($parent['CategoryID'], ['maxdepth' => $query['maxDepth']]);
         }
+        array_walk($categories, [$this, 'prepareRow']);
+
 
         return $out->validate($categories);
     }
@@ -309,7 +317,7 @@ class CategoriesApiController extends AbstractApiController {
 
         $body = $in->validate($body, true);
         // If a row associated with this ID cannot be found, a "not found" exception will be thrown.
-        $this->category($id);
+        $category = $this->category($id);
 
         if (array_key_exists('parentCategoryID', $body)) {
             $this->updateParent($id, $body['parentCategoryID']);
@@ -317,6 +325,13 @@ class CategoriesApiController extends AbstractApiController {
         }
 
         if (!empty($body)) {
+            if (array_key_exists('customPermissions', $body)) {
+                $this->categoryModel->save([
+                    'CategoryID' => $id,
+                    'CustomPermissions' => $body['customPermissions']
+                ]);
+                unset($body['customPermissions']);
+            }
             $categoryData = $this->caseScheme->convertArrayKeys($body);
             $this->categoryModel->setField($id, $categoryData);
         }
@@ -364,7 +379,13 @@ class CategoriesApiController extends AbstractApiController {
         if ($row['ParentCategoryID'] <= 0) {
             $row['ParentCategoryID'] = null;
         }
+        $row['CustomPermissions'] = ($row['PermissionCategoryID'] === $row['CategoryID']);
         $row['Description'] = $row['Description'] ?: '';
+        $row['DisplayAs'] = strtolower($row['DisplayAs']);
+
+        if (!empty($row['Children']) && is_array($row['Children'])) {
+            array_walk($row['Children'], [$this, 'prepareRow']);
+        }
     }
 
     /**

@@ -6,10 +6,10 @@
  */
 
 use Garden\Schema\Schema;
-use Garden\Web\Data;
 use Garden\Web\Exception\ClientException;
 use Garden\Web\Exception\NotFoundException;
 use Garden\Web\Exception\ServerException;
+use Vanilla\Exception\ConfigurationException;
 use Vanilla\Utility\CapitalCaseScheme;
 
 
@@ -61,7 +61,7 @@ class MessagesApiController extends AbstractApiController {
      */
     private function checkModerationPermission() {
         if (!$this->config->get('Conversations.Moderation.Allow', false)) {
-            throw permissionException();
+            throw new ConfigurationException(t('The site is not configured for moderating conversations.'));
         }
         $this->permission('Conversations.Moderation.Manage');
     }
@@ -186,7 +186,7 @@ class MessagesApiController extends AbstractApiController {
                     'minimum' => 1,
                     'maximum' => 100
                 ],
-                'expand:b?' => 'Expand associated records.'
+                'expand?' => $this->getExpandFragment(['insertUser'])
             ], 'in')
             ->requireOneOf(['conversationID', 'insertUserID'])
             ->setDescription('List user messages.');
@@ -231,9 +231,11 @@ class MessagesApiController extends AbstractApiController {
             $offset
         )->resultArray();
 
-        if (!empty($query['expand'])) {
-            $this->userModel->expandUsers($messages, ['InsertUserID']);
-        }
+        // Expand associated rows.
+        $this->userModel->expandUsers(
+            $messages,
+            $this->resolveExpandFields($query, ['insertUser' => 'InsertUserID'])
+        );
 
         array_walk($messages, function(&$message) {
             $this->prepareRow($message);

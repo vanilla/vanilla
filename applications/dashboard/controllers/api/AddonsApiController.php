@@ -41,8 +41,19 @@ class AddonsApiController extends Controller {
      */
     protected function fullSchema() {
         if ($this->schema === null) {
+            $requirementSchema = Schema::parse([
+                'addonID:s' => 'The ID of the addon used for API calls.',
+                'name:s' => 'The name of the addon.',
+                'key:s' => 'The unique key that identifies the addon',
+                'type:s' => [
+                    'description' => 'The type of addon.',
+                    'enum' => ['addon', 'theme', 'locale']
+                ],
+                'constraint:s' => 'The version requirement.',
+            ]);
+
             $this->schema = Schema::parse([
-                'addonID:s' => 'The ID of the addon used for updates.',
+                'addonID:s' => 'The ID of the addon used for API calls.',
                 'name:s' => 'The name of the addon.',
                 'key:s' => 'The unique key that identifies the addon',
                 'type:s' => [
@@ -55,7 +66,16 @@ class AddonsApiController extends Controller {
                     'format' => 'uri',
                 ],
                 'version:s' => 'The addon\'s version.',
-                'require:o?' => 'An associative array of addons that are required to enable the addon.',
+                'require:a?' => [
+                    'type' => 'array',
+                    'description' => 'An array of addons that are required to enable the addon.',
+                    'items' => $requirementSchema,
+                ],
+                'conflict:a?' => [
+                    'type' => 'array',
+                    'description' => 'An array of addons that conflict with this addon.',
+                    'items' => $requirementSchema,
+                ],
                 'enabled:b' => 'Whether or not the addon is enabled.',
             ])->setID('Addon');
         }
@@ -83,7 +103,37 @@ class AddonsApiController extends Controller {
             $r['enabled'] = $this->addonModel->getAddonManager()->isEnabled($addon->getKey(), $addon->getType());
         }
 
+        if (!empty($r['require'])) {
+            $r['require'] = $this->filterRequirements($r['require']);
+        }
+        if (!empty($r['conflict'])) {
+            $r['conflict'] = $this->filterRequirements($r['conflict']);
+        }
+
         return $r;
+    }
+
+    /**
+     * Filter a requirements array from the addon info.
+     *
+     * @param array $requirements A require or conflict array.
+     * @return array Returns an array of requirement.
+     */
+    protected function filterRequirements($requirements) {
+        $result = [];
+        foreach ($requirements as $key => $requirement) {
+            $addon = $this->addonModel->getAddonManager()->lookupAddon($key);
+            if ($addon) {
+                $result[] = [
+                    'addonID' => $addon->getKey().($addon->getType() === Addon::TYPE_ADDON ? '' : '-'.$addon->getType()),
+                    'name' => $addon->getName(),
+                    'type' => $addon->getType(),
+                    'key' => $addon->getKey(),
+                    'constraint' => $requirement,
+                ];
+            }
+        }
+        return $result;
     }
 
     /**

@@ -8,6 +8,7 @@
 namespace Vanilla\Web;
 
 use Garden\Web\Data;
+use Garden\Web\RequestInterface;
 use Garden\Web\ViewInterface;
 
 /**
@@ -20,12 +21,22 @@ class EbiMasterView implements ViewInterface {
     private $view;
 
     /**
+     * @var RequestInterface The current request.
+     */
+    private $request;
+
+    /**
      * EbiMasterView constructor.
      *
      * @param EbiView $view The view that will do all of the actual rendering.
+     * @param RequestInterface $request The current request.
      */
-    public function __construct(EbiView $view) {
+    public function __construct(
+        EbiView $view,
+        RequestInterface $request
+    ) {
         $this->view = $view;
+        $this->request = $request;
     }
 
     /**
@@ -39,6 +50,13 @@ class EbiMasterView implements ViewInterface {
      * @param Data $data The data to render.
      */
     public function render(Data $data) {
+        // See if we should be rendering the master view at all.
+        $query = array_change_key_case($this->request->getQuery()) + ['x-asset' => '', 'deliverytype' => ''];
+        if ($query['x-master'] === 'view' || $query['deliverytype'] === 'view') {
+            $this->view->render($data);
+            return;
+        }
+
         // First render the data as its own view.
         ob_start();
         $this->view->render($data);

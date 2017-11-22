@@ -21,6 +21,9 @@
  */
 class Gdn_Controller extends Gdn_Pluggable {
 
+    /** Seconds before reauthentication is required for protected operations. */
+    const REAUTH_TIMEOUT = 1200; // 20 minutes
+
     /** @var string The name of the application that this controller can be found in. */
     public $Application;
 
@@ -1155,6 +1158,34 @@ class Gdn_Controller extends Gdn_Pluggable {
                 Logger::logAccess('security_access', Logger::INFO, "{username} accessed {path}.");
             }
         }
+    }
+
+    /**
+     * Stop the current action and re-authenticate, if necessary.
+     */
+    public function reauth() {
+        // Make sure we're logged in...
+        if (Gdn::session()->UserID == 0) {
+            return;
+        }
+
+        // ...and have a proper password.
+        $user = Gdn::userModel()->getID(Gdn::session()->UserID);
+        if (val('HashMethod', $user) == 'Random') {
+            return;
+        }
+
+        // If the user has logged in recently enough, don't make them login again.
+        $lastAuthenticated = Gdn::authenticator()->identity()->getAuthTime();
+        if ($lastAuthenticated > 0) {
+            $sinceAuth = time() - $lastAuthenticated;
+            if ($sinceAuth < self::REAUTH_TIMEOUT) {
+                return;
+            }
+        }
+
+        Gdn::dispatcher()->dispatch('/profile/authenticate', false);
+        exit();
     }
 
     /**

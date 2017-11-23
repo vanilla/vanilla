@@ -225,7 +225,7 @@ class ConversationsApiController extends AbstractApiController {
                 'minimum' => 5,
                 'maximum' => 100
             ],
-            'expand?' => $this->getExpandFragment(['user'])
+            'expand?' => $this->getExpandDefinition(['user'])
         ], 'in')->setDescription('Get participants of a conversation.');
         $out = $this->schema([
             ':a' => [
@@ -306,7 +306,7 @@ class ConversationsApiController extends AbstractApiController {
                 'minimum' => 1,
                 'maximum' => 100
             ],
-            'expand?' => $this->getExpandFragment(['insertUser'])
+            'expand?' => $this->getExpandDefinition(['insertUser'])
         ], 'in')
             ->requireOneOf(['insertUserID', 'participantUserID'])
             ->setDescription('List user conversations.');

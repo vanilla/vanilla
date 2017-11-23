@@ -1281,7 +1281,8 @@ class Gdn_Controller extends Gdn_Pluggable {
             $this->setJson('Data', ($View instanceof Gdn_IModule) ? $View->toString() : $View);
             $this->setJson('InformMessages', $this->_InformMessages);
             $this->setJson('ErrorMessages', $this->_ErrorMessages);
-            $this->setJson('RedirectUrl', $this->RedirectUrl);
+            $this->setJson('RedirectUrl', str_replace('\\', '%5c', $this->RedirectUrl));
+
 
             // Make sure the database connection is closed before exiting.
             $this->finalize();
@@ -1299,7 +1300,7 @@ class Gdn_Controller extends Gdn_Pluggable {
             }
 
             if ($this->RedirectUrl != '' && $this->SyndicationMethod === SYNDICATION_NONE) {
-                $this->addDefinition('RedirectUrl', $this->RedirectUrl);
+                $this->addDefinition('RedirectUrl', str_replace('\\', '%5c', $this->RedirectUrl));
             }
 
             if ($this->_DeliveryMethod == DELIVERY_METHOD_XHTML && debug()) {

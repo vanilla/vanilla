@@ -2878,8 +2878,10 @@ if (!function_exists('redirectUrl')) {
             $code = 302;
         }
 
-        safeHeader("Location: ".$url, true, $code);
-
+        // Encode backslashes because most modern browsers convert backslashes to slashes.
+        // This would cause http://evil.domain\@trusted.domain/ to be converted to http://evil.domain/@trusted.domain/
+        $url = str_replace('\\', '%5c', $url);
+        safeHeader('Location: '.$url, true, $code);
         exit();
     }
 }

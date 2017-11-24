@@ -144,6 +144,7 @@ class EbiView implements ViewInterface {
         $ebi->defineFunction('t');
         $ebi->defineFunction('user', $this->makeUserFunction($userModel));
         $ebi->defineFunction('tileClasses', [$this, 'tileClasses']);
+        $ebi->defineFunction('generateNumberedClass', [$this, 'generateNumberedClass']);
         $ebi->defineFunction('url');
 
         // Add custom attribute filters.
@@ -175,6 +176,22 @@ class EbiView implements ViewInterface {
 
         echo "\n<script>console.$method($argsStr);</script>\n";
     }
+
+
+    /**
+     * Generate numbered css class in a range from 1 to X based on the length of a string
+     *
+     * @param string $input string used to generate class
+     * @param int $max highest value possible
+     * @param string $prefix class prefix
+     * @return string class
+     */
+
+    public function generateNumberedClass($input, $max=10, $prefix="secondaryColor-") {
+        $colorIndex = strlen($input) % 10 + 1;
+        return "secondaryColor-" . $colorIndex;
+    }
+
 
     private function makeApiFunction(Dispatcher $dispatcher) {
         return function($path, $query = []) use ($dispatcher) {

@@ -249,7 +249,7 @@ class CommentsApiController extends AbstractApiController {
                 'maximum' => 100
             ],
             'insertUserID:i?' => 'Filter by author.',
-            'expand?' => $this->getExpandFragment(['insertUser'])
+            'expand?' => $this->getExpandDefinition(['insertUser'])
         ], 'in')->requireOneOf(['discussionID', 'insertUserID'])->setDescription('List comments.');
         $out = $this->schema([':a' => $this->commentSchema()], 'out');
 

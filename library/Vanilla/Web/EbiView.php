@@ -314,7 +314,7 @@ class EbiView implements ViewInterface {
                 $processedData = $this->ebi->call('api', $dataSource['path'], $query);
             }
         } elseif($data['children']) {
-            $processedData$data['children'];
+            $processedData = $data['children'];
         }
         return $processedData;
     }

@@ -108,7 +108,7 @@ abstract class AbstractApiController extends \Vanilla\Web\Controller {
      */
     public function getExpandDefinition(array $fields, $default = false) {
         return [
-            'description' => 'Expand associated records.',
+            'description' => 'Expand associated records. Pass a boolean value to expand all fields, or an array of strings to selectively expand certain fields.',
             'default' => $default,
             'items' => [
                 'enum' => $fields,

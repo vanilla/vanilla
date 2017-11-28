@@ -50,6 +50,8 @@ class EbiMasterView implements ViewInterface {
      * @param Data $data The data to render.
      */
     public function render(Data $data) {
+        $master = $data->getMeta('master', 'default-master');
+
         // See if we should be rendering the master view at all.
         $query = array_change_key_case($this->request->getQuery()) + ['x-asset' => '', 'deliverytype' => ''];
         if ($query['x-master'] === 'view' || $query['deliverytype'] === 'view') {
@@ -70,7 +72,7 @@ class EbiMasterView implements ViewInterface {
         ], $data->getMetaArray());
 
         // Swap the template for the master template.
-        $masterData->setMeta('template', $masterData->getMeta('master', 'default-master'));
+        $masterData->setMeta('template', $master);
         $this->view->render($masterData);
     }
 

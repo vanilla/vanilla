@@ -28,6 +28,11 @@ class EbiView implements ViewInterface {
      */
     private $ebi;
 
+    /**
+     * @var Dispatcher
+     */
+    private $dispatcher;
+
     private $ids = [];
 
     public function __construct(Ebi $ebi,
@@ -39,6 +44,7 @@ class EbiView implements ViewInterface {
         Dispatcher $dispatcher
     ) {
         $this->ebi = $ebi;
+        $this->dispatcher = $dispatcher;
         $userFunction = $this->makeUserFunction($userModel);
 
         // Add meta information.
@@ -66,6 +72,14 @@ class EbiView implements ViewInterface {
                 call_user_func($children[0], $props);
             }
             echo '</script>';
+        });
+        $ebi->defineComponent('page', function ($props) {
+            if (empty(props['path'])) {
+                throw new \InvalidArgumentException("Missing required property 'path' in page component.", 400);
+            }
+            $props += ['query' => []];
+
+            $this->writePage($props['path'], $props['query']);
         });
 
         // Define a simple component not found component to help troubleshoot.
@@ -212,6 +226,13 @@ class EbiView implements ViewInterface {
 
             return $response->getData();
         };
+    }
+
+    public function writePage($path, $query = []) {
+        $request = new InternalRequest('GET', $path, (array)$query);
+        $response = $this->dispatcher->dispatch($request);
+        $response->setHeader('Content-Type', 'text/html');
+        $this->dispatcher->render($request, $response);
     }
 
 

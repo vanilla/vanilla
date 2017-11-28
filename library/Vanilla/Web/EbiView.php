@@ -28,6 +28,8 @@ class EbiView implements ViewInterface {
      */
     private $ebi;
 
+    private $ids = [];
+
     public function __construct(Ebi $ebi,
         \Gdn_Session $session,
         \Gdn_Locale $locale,
@@ -125,6 +127,9 @@ class EbiView implements ViewInterface {
         $ebi->defineFunction('formatBigNumber', [\Gdn_Format::class, 'bigNumber']);
         $ebi->defineFunction('formatHumanDate', [\Gdn_Format::class, 'date']);
         $ebi->defineFunction('formatSlug', [\Gdn_Format::class, 'url']);
+        $ebi->defineFunction('id', function ($id, $prefix = true) {
+            return $this->idAttribute($id, $prefix);
+        });
         $ebi->defineFunction('meta', function ($name = null, $default = null) use ($ebi) {
             if ($name) {
                 return $ebi->getMeta($name, $default);
@@ -152,6 +157,7 @@ class EbiView implements ViewInterface {
         $ebi->defineFunction('@img:src', $fn);
         $ebi->defineFunction('@a:href', 'url');
         $ebi->defineFunction('@form:action', 'url');
+        $ebi->defineFunction('@id', [$this, 'idAttribute']);
     }
 
     /**
@@ -479,5 +485,17 @@ class EbiView implements ViewInterface {
         }
 
         return implode(' ', $classes);
+    }
+
+    public function idAttribute($id, $px = false) {
+        if ($id[0] === '@') {
+            return substr($id, 1);
+        } elseif (!isset($this->ids[$id])) {
+            $this->ids[$id] = 0;
+            return ($px ? '@' : '').$id;
+        } else {
+            $this->ids[$id]++;
+            return ($px ? '@' : '').$id.$this->ids[$id];
+        }
     }
 }

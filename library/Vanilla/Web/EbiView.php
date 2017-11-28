@@ -51,7 +51,7 @@ class EbiView implements ViewInterface {
         $ebi->setMeta('locale', $locale);
         $ebi->setMeta('device', ['type' => userAgentType(), 'mobile' => isMobile()]);
         $ebi->setMeta('request', ['query' => $request->getQuery()]);
-        $ebi->setMeta('theme', $this->getData('theme'));
+        $ebi->setMeta('theme', $this->getJsonData('theme'));
 
         // Add custom components.
         $ebi->defineComponent('asset', function ($props) use ($ebi) {
@@ -122,12 +122,14 @@ class EbiView implements ViewInterface {
         });
         $ebi->defineFunction('categoryUrl');
         $ebi->defineFunction('commentUrl');
-        $ebi->defineFunction('data', [$this, 'getData']);
+        $ebi->defineFunction('getJsonData', [$this, 'getJsonData']);
+        $ebi->defineFunction('getData', [$this, 'getData']);
         $ebi->defineFunction('discussionUrl');
         $ebi->defineFunction('formatBigNumber', [\Gdn_Format::class, 'bigNumber']);
         $ebi->defineFunction('formatHumanDate', [\Gdn_Format::class, 'date']);
         $ebi->defineFunction('formatPlainText', [\Gdn_Format::class, 'plainText']);
         $ebi->defineFunction('formatSlug', [\Gdn_Format::class, 'url']);
+        $ebi->defineFunction('generateNumberedClass', [$this, 'generateNumberedClass']);
         $ebi->defineFunction('id', function ($id, $prefix = true) {
             return $this->idAttribute($id, $prefix);
         });
@@ -183,6 +185,21 @@ class EbiView implements ViewInterface {
         echo "\n<script>console.$method($argsStr);</script>\n";
     }
 
+
+    /**
+     * Generate numbered css class in a range from 1 to X based on the length of a string
+     *
+     * @param string $input string used to generate class
+     * @param int $max highest value possible
+     * @param string $prefix class prefix
+     * @return string class
+     */
+
+    public function generateNumberedClass($input, $max=10, $prefix="secondaryColor-") {
+        $colorIndex = strlen($input) % 10 + 1;
+        return "secondaryColor-" . $colorIndex;
+    }
+
     private function makeApiFunction(Dispatcher $dispatcher) {
         return function($path, $query = []) use ($dispatcher) {
             $request = new InternalRequest('GET', "/api/v2/".ltrim($path, '/'), (array)$query);
@@ -196,6 +213,8 @@ class EbiView implements ViewInterface {
             return $response->getData();
         };
     }
+
+
 
     /**
      * Get the data that a pager component needs to build a pager.
@@ -278,7 +297,42 @@ class EbiView implements ViewInterface {
         return $result;
     }
 
-    public function getData($name) {
+    /**
+     * Get data for component
+     *
+     * @param mixed $data
+     * @param mixed $data
+     * @return mixed The data
+     */
+    public function getData($data = false, $config = false, $page = false) {
+        $processedData = $data;
+
+        if ($config['dataSource']) {
+            $dataSource = $config['dataSource'];
+            if ($dataSource['source'] === 'theme') {
+                $processedData = $this->getJsonData($dataSource['source']);
+                if($dataSource['dataKey']) {
+                    $processedData = $processedData[$dataSource['dataKey']];
+    }
+            } elseif ($dataSource['source'] === 'theme') {
+                $processedData = $page;
+            } elseif ($dataSource['source'] === 'api') {
+                $query = $dataSource['query'] ?: [];
+                $processedData = $this->ebi->call('api', $dataSource['path'], $query);
+            }
+        } elseif($data['children']) {
+            $processedData = $data['children'];
+        }
+        return $processedData;
+    }
+
+    /**
+     * Get data from JSON file
+     *
+     * @param string $name The name of the file
+     * @return mixed The data
+     */
+    public function getJsonData($name) {
         $loader = $this->ebi->getTemplateLoader();
         $themes = array_reverse($loader->getThemeChain());
         static $data = [];
@@ -379,7 +433,7 @@ class EbiView implements ViewInterface {
             $newData = [
                 'title' => 'No Template',
                 'message' => 'There was not a template specified for the page.',
-                'data' => $data->getData()
+                'data' => $data->getJsonData()
             ];
             $this->ebi->write('error', $newData, []);
         }

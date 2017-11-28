@@ -155,7 +155,7 @@ $dic->setInstance('Garden\Container\Container', $dic)
     // Temporary HTML route to develop new views.
     ->rule('@api-v2-route-html')
     ->setClass(\Garden\Web\ResourceRoute::class)
-    ->setConstructorArgs(['/html/', ['*\\Pages\\%sController', '*\\%sApiController']])
+    ->setConstructorArgs(['/html/', ['*\\%sPageController', '*\\Pages\\%sController', '*\\%sApiController']])
     ->addCall('setMeta', ['CONTENT_TYPE', 'text/html'])
     ->addCall('setDefault', ['query', ['expand' => true]])
 

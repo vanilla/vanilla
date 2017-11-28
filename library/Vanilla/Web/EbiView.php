@@ -299,9 +299,9 @@ class EbiView implements ViewInterface {
      */
     public function getData($data = false, $config = false, $page = false) {
         $processedData = $data;
+        $dataSource = $data['dataSource'] ?: $config['dataSource'] ?: false;
 
-        if ($config['dataSource']) {
-            $dataSource = $config['dataSource'];
+        if ($dataSource) {
             if ($dataSource['source'] === 'theme') {
                 $processedData = $this->getJsonData($dataSource['source']);
                 if($dataSource['dataKey']) {
@@ -312,6 +312,11 @@ class EbiView implements ViewInterface {
             } elseif ($dataSource['source'] === 'api') {
                 $query = $dataSource['query'] ?: [];
                 $processedData = $this->ebi->call('api', $dataSource['path'], $query);
+            } elseif ($dataSource['source'] === 'page') {
+                $processedData = $page;
+                if($dataSource['dataKey']) {
+                    $processedData = $processedData[$dataSource['dataKey']];
+                }
             }
         } elseif($data['children']) {
             $processedData = $data['children'];

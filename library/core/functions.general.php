@@ -312,10 +312,12 @@ if (!function_exists('attribute')) {
             if (empty($val) || ($exclude && stringBeginsWith($attribute, $exclude))) {
                 continue;
             }
+
             if (is_array($val) && strpos($attribute, 'data-') === 0) {
                 $val = json_encode($val);
 
             }
+
             if ($val != '' && $attribute != 'Standard') {
                 $return .= ' '.$attribute.'="'.htmlspecialchars($val, ENT_COMPAT, 'UTF-8').'"';
             }
@@ -2880,6 +2882,9 @@ if (!function_exists('redirectTo')) {
             $statusCode = 302;
         }
 
+        // Encode backslashes because most modern browsers convert backslashes to slashes.
+        // This would cause http://evil.domain\@trusted.domain/ to be converted to http://evil.domain/@trusted.domain/
+        $url = str_replace('\\', '%5c', $url);
         safeHeader('Location: '.$url, true, $statusCode);
         exit();
     }

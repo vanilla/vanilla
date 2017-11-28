@@ -126,6 +126,7 @@ class EbiView implements ViewInterface {
         $ebi->defineFunction('discussionUrl');
         $ebi->defineFunction('formatBigNumber', [\Gdn_Format::class, 'bigNumber']);
         $ebi->defineFunction('formatHumanDate', [\Gdn_Format::class, 'date']);
+        $ebi->defineFunction('formatPlainText', [\Gdn_Format::class, 'plainText']);
         $ebi->defineFunction('formatSlug', [\Gdn_Format::class, 'url']);
         $ebi->defineFunction('id', function ($id, $prefix = true) {
             return $this->idAttribute($id, $prefix);

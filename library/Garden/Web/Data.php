@@ -12,7 +12,7 @@ use Garden\MetaTrait;
 /**
  * Represents the data in a web response.
  */
-class Data implements \JsonSerializable, \ArrayAccess {
+class Data implements \JsonSerializable, \ArrayAccess, \Countable {
     use MetaTrait;
 
     private $data;
@@ -275,5 +275,18 @@ class Data implements \JsonSerializable, \ArrayAccess {
      */
     public function offsetUnset($offset) {
         unset($this->data[$offset]);
+    }
+
+    /**
+     * Count elements of an object
+     * @link http://php.net/manual/en/countable.count.php
+     * @return int The custom count as an integer.
+     * </p>
+     * <p>
+     * The return value is cast to an integer.
+     * @since 5.1.0
+     */
+    public function count() {
+        return count($this->data);
     }
 }

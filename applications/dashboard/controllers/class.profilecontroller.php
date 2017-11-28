@@ -387,6 +387,9 @@ class ProfileController extends Gdn_Controller {
         if ($this->Form->authenticatedPostBack(true)) {
             $this->Form->setFormValue('UserID', $userID);
 
+            // This field cannot be updated from here.
+            $this->Form->removeFormValue('Password');
+
             if (!$canEditUsername) {
                 $this->Form->setFormValue("Name", $user['Name']);
             } else {

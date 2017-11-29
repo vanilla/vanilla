@@ -9,6 +9,7 @@ use Garden\Schema\Schema;
 use Garden\Web\Exception\NotFoundException;
 use Garden\Web\Exception\ServerException;
 use Vanilla\Exception\ConfigurationException;
+use Vanilla\ApiUtils;
 
 /**
  * API Controller for the `/conversations` resource.
@@ -36,8 +37,6 @@ class ConversationsApiController extends AbstractApiController {
         ConversationModel $conversationModel,
         UserModel $userModel
     ) {
-        parent::__construct();
-
         $this->config = $config;
         $this->conversationModel = $conversationModel;
         $this->userModel = $userModel;
@@ -463,7 +462,7 @@ class ConversationsApiController extends AbstractApiController {
             unset($schemaRecord['participantUserIDs']);
         }
 
-        $dbRecord = $this->capitalCaseScheme->convertArrayKeys($schemaRecord);
+        $dbRecord = ApiUtils::convertInputKeys($schemaRecord);
         return $dbRecord;
     }
 
@@ -479,7 +478,7 @@ class ConversationsApiController extends AbstractApiController {
             unset($dbRecord['subject']);
         }
 
-        $schemaRecord = $this->camelCaseScheme->convertArrayKeys($dbRecord);
+        $schemaRecord = ApiUtils::convertOutputKeys($dbRecord);
         return $schemaRecord;
     }
 

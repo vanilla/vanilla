@@ -8,6 +8,7 @@ use Garden\Schema\Schema;
 use Garden\Web\Data;
 use Garden\Web\Exception\ClientException;
 use Garden\Web\Exception\NotFoundException;
+use Vanilla\ApiUtils;
 
 /**
  * API Controller for the `/invites` resource.
@@ -29,8 +30,6 @@ class InvitesApiController extends AbstractApiController {
      * @throws ClientException if the site is not configured for user invitations.
      */
     public function __construct(GDN_Configuration $configuration, InvitationModel $invitationModel, UserModel $userModel) {
-        parent::__construct();
-
         $registrationMethod = strtolower($configuration->get('Garden.Registration.Method'));
         if ($registrationMethod !== 'invitation') {
             throw new ClientException('The site is not configured for the invitation registration method.');
@@ -212,7 +211,7 @@ class InvitesApiController extends AbstractApiController {
         $out = $this->schema($this->fullSchema(), 'out');
 
         $body = $in->validate($body);
-        $inviteData = $this->capitalCaseScheme->convertArrayKeys($body);
+        $inviteData = ApiUtils::convertInputKeys($body);
         $row = $this->invitationModel->save($inviteData, ['ReturnRow' => true]);
         $this->validateModel($this->invitationModel);
         $row = $this->normalizeOutput($row);
@@ -231,7 +230,7 @@ class InvitesApiController extends AbstractApiController {
         $dbRecord['InviteID'] = $dbRecord['InvitationID'];
         $dbRecord['Status'] = empty($dbRecord['AcceptedUserID']) ? 'pending' : 'accepted';
 
-        $schemaRecord = $this->camelCaseScheme->convertArrayKeys($dbRecord);
+        $schemaRecord = ApiUtils::convertOutputKeys($dbRecord);
         return $schemaRecord;
     }
 }

@@ -10,6 +10,7 @@ use Garden\Web\Exception\ClientException;
 use Garden\Web\Exception\NotFoundException;
 use Garden\Web\Exception\ServerException;
 use Vanilla\Exception\ConfigurationException;
+use Vanilla\ApiUtils;
 
 /**
  * API Controller for the `/messages` resource.
@@ -42,8 +43,6 @@ class MessagesApiController extends AbstractApiController {
         ConversationMessageModel $conversationMessageModel,
         UserModel $userModel
     ) {
-        parent::__construct();
-
         $this->config = $config;
         $this->conversationMessageModel = $conversationMessageModel;
         $this->conversationModel = $conversationModel;
@@ -265,7 +264,7 @@ class MessagesApiController extends AbstractApiController {
     public function normalizeOutput(array $dbRecord) {
         $this->formatField($dbRecord, 'Body', $dbRecord['Format']);
 
-        $schemaRecord = $this->camelCaseScheme->convertArrayKeys($dbRecord);
+        $schemaRecord = ApiUtils::convertOutputKeys($dbRecord);
         return $schemaRecord;
     }
 
@@ -324,7 +323,7 @@ class MessagesApiController extends AbstractApiController {
             throw new ClientException('You can not add a message to a conversation that you are not a participant of.');
         }
 
-        $messageData = $this->capitalCaseScheme->convertArrayKeys($body);
+        $messageData = ApiUtils::convertInputKeys($body);
         $messageID = $this->conversationMessageModel->save($messageData, $conversation);
         $this->validateModel($this->conversationMessageModel, true);
         if (!$messageID) {

@@ -7,6 +7,8 @@
 use Garden\Schema\Schema;
 use Garden\Web\Exception\NotFoundException;
 use Garden\Web\Exception\ServerException;
+use Vanilla\ApiUtils;
+use Vanilla\Utility\CamelCaseScheme;
 
 /**
  * API Controller for the `/roles` resource.
@@ -15,6 +17,9 @@ class RolesApiController extends AbstractApiController {
 
     /** Maximum number of permission rows that can be displayed before an error is reported. */
     const MAX_PERMISSIONS = 100;
+
+    /** @var CamelCaseScheme */
+    private $camelCaseScheme;
 
     /** @var CategoryModel */
     private $categoryModel;
@@ -83,11 +88,10 @@ class RolesApiController extends AbstractApiController {
      * @param CategoryModel $categoryModel
      */
     public function __construct(RoleModel $roleModel, PermissionModel $permissionModel, CategoryModel $categoryModel) {
-        parent::__construct();
-
         $this->roleModel = $roleModel;
         $this->permissionModel = $permissionModel;
         $this->categoryModel = $categoryModel;
+        $this->camelCaseScheme = new CamelCaseScheme();
     }
 
     /**
@@ -422,7 +426,7 @@ class RolesApiController extends AbstractApiController {
             }
         }
 
-        $schemaRecord = $this->camelCaseScheme->convertArrayKeys($dbRecord);
+        $schemaRecord = ApiUtils::convertOutputKeys($dbRecord);
         return $schemaRecord;
     }
 
@@ -450,7 +454,7 @@ class RolesApiController extends AbstractApiController {
             unset($body['permissions']);
         }
 
-        $roleData = $this->capitalCaseScheme->convertArrayKeys($body);
+        $roleData = ApiUtils::convertInputKeys($body);
         $roleData['RoleID'] = $id;
         $this->roleModel->save($roleData, ['DoPermissions' => false]);
         $this->validateModel($this->roleModel);
@@ -497,7 +501,7 @@ class RolesApiController extends AbstractApiController {
 
         $body = $in->validate($body);
 
-        $roleData = $this->capitalCaseScheme->convertArrayKeys($body);
+        $roleData = ApiUtils::convertInputKeys($body);
         $id = $this->roleModel->save($roleData);
         $this->validateModel($this->roleModel);
 

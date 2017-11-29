@@ -9,7 +9,7 @@ use Garden\Schema\Schema;
 use Garden\Web\Exception\NotFoundException;
 use Garden\Web\Exception\ServerException;
 use Vanilla\DateFilterSchema;
-use Vanilla\Utility\CapitalCaseScheme;
+use Vanilla\ApiUtils;
 
 /**
  * API Controller for the `/discussions` resource.
@@ -46,8 +46,6 @@ class DiscussionsApiController extends AbstractApiController {
         UserModel $userModel,
         DateFilterSchema $dateFilterSchema
     ) {
-        parent::__construct();
-
         $this->discussionModel = $discussionModel;
         $this->userModel = $userModel;
         $this->dateFilterSchema = $dateFilterSchema;
@@ -277,7 +275,7 @@ class DiscussionsApiController extends AbstractApiController {
             $dbRecord['lastPost'] = $lastPost;
         }
 
-        $schemaRecord = $this->camelCaseScheme->convertArrayKeys($dbRecord);
+        $schemaRecord = ApiUtils::convertOutputKeys($dbRecord);
         return $schemaRecord;
     }
 
@@ -431,7 +429,7 @@ class DiscussionsApiController extends AbstractApiController {
         $body = $in->validate($body, true);
 
         $row = $this->discussionByID($id);
-        $discussionData = $this->capitalCaseScheme->convertArrayKeys($body);
+        $discussionData = ApiUtils::convertInputKeys($body);
         $discussionData['DiscussionID'] = $id;
         $categoryID = $row['CategoryID'];
         if ($row['InsertUserID'] !== $this->getSession()->UserID) {
@@ -474,7 +472,7 @@ class DiscussionsApiController extends AbstractApiController {
         $this->fieldPermission($body, 'pinned', 'Vanilla.Discussions.Announce', $categoryID);
         $this->fieldPermission($body, 'sink', 'Vanilla.Discussions.Sink', $categoryID);
 
-        $discussionData = $this->capitalCaseScheme->convertArrayKeys($body);
+        $discussionData = ApiUtils::convertInputKeys($body);
         $id = $this->discussionModel->save($discussionData);
         $this->validateModel($this->discussionModel);
 

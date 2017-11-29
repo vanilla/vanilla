@@ -11,7 +11,7 @@ use Garden\Web\Exception\ClientException;
 use Garden\Web\Exception\NotFoundException;
 use Garden\Web\Exception\ServerException;
 use Vanilla\DateFilterSchema;
-use Vanilla\Utility\CapitalCaseScheme;
+use Vanilla\ApiUtils;
 
 /**
  * API Controller for the `/users` resource.
@@ -48,8 +48,6 @@ class UsersApiController extends AbstractApiController {
         Gdn_Configuration $configuration,
         DateFilterSchema $dateFilterSchema
     ) {
-        parent::__construct();
-
         $this->configuration = $configuration;
         $this->userModel = $userModel;
         $this->dateFilterSchema = $dateFilterSchema;
@@ -250,7 +248,7 @@ class UsersApiController extends AbstractApiController {
             unset($dbRecord['Confirmed']);
         }
 
-        $schemaRecord = $this->camelCaseScheme->convertArrayKeys($dbRecord);
+        $schemaRecord = ApiUtils::convertOutputKeys($dbRecord);
         return $schemaRecord;
     }
 
@@ -273,7 +271,7 @@ class UsersApiController extends AbstractApiController {
         // If a row associated with this ID cannot be found, a "not found" exception will be thrown.
         $this->userByID($id);
         $body = $this->normalizeInput($body);
-        $userData = $this->capitalCaseScheme->convertArrayKeys($body);
+        $userData = ApiUtils::convertInputKeys($body);
         $userData['UserID'] = $id;
         $this->userModel->save($userData);
         $this->validateModel($this->userModel);
@@ -336,7 +334,7 @@ class UsersApiController extends AbstractApiController {
         $registrationMethod = $this->configuration->get('Garden.Registration.Method');
         $registrationMethod = strtolower($registrationMethod);
 
-        $userData = $this->capitalCaseScheme->convertArrayKeys($body);
+        $userData = ApiUtils::convertInputKeys($body);
 
         $inputProperties = [
             'email:s' => 'An email address for this user.',
@@ -451,7 +449,7 @@ class UsersApiController extends AbstractApiController {
             $schemaRecord['confirmed'] = $schemaRecord['emailConfirmed'];
         }
 
-        $dbRecord = $this->capitalCaseScheme->convertArrayKeys($schemaRecord);
+        $dbRecord = ApiUtils::convertInputKeys($schemaRecord);
         return $dbRecord;
     }
 

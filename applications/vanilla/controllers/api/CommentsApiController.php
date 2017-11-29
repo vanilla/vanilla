@@ -8,6 +8,7 @@ use Garden\Schema\Schema;
 use Garden\Web\Exception\NotFoundException;
 use Garden\Web\Exception\ServerException;
 use Vanilla\DateFilterSchema;
+use Vanilla\ApiUtils;
 
 /**
  * API Controller for the `/comments` resource.
@@ -49,8 +50,6 @@ class CommentsApiController extends AbstractApiController {
         UserModel $userModel,
         DateFilterSchema $dateFilterSchema
     ) {
-        parent::__construct();
-
         $this->commentModel = $commentModel;
         $this->discussionModel = $discussionModel;
         $this->userModel = $userModel;
@@ -309,7 +308,7 @@ class CommentsApiController extends AbstractApiController {
             $dbRecord['Attributes'] = is_array($attributes) ? $attributes : [];
         }
 
-        $schemaRecord = $this->camelCaseScheme->convertArrayKeys($dbRecord);
+        $schemaRecord = ApiUtils::convertOutputKeys($dbRecord);
         return $schemaRecord;
     }
 
@@ -328,7 +327,7 @@ class CommentsApiController extends AbstractApiController {
         $out = $this->commentSchema('out');
 
         $body = $in->validate($body, true);
-        $commentData = $this->capitalCaseScheme->convertArrayKeys($body);
+        $commentData = ApiUtils::convertInputKeys($body);
         $commentData['CommentID'] = $id;
         $row = $this->commentByID($id);
         if ($row['InsertUserID'] !== $this->getSession()->UserID) {
@@ -367,7 +366,7 @@ class CommentsApiController extends AbstractApiController {
         $out = $this->commentSchema('out');
 
         $body = $in->validate($body);
-        $commentData = $this->capitalCaseScheme->convertArrayKeys($body);
+        $commentData = ApiUtils::convertInputKeys($body);
         $discussion = $this->discussionByID($commentData['DiscussionID']);
         $this->discussionModel->categoryPermission('Vanilla.Comments.Add', $discussion['CategoryID']);
         $id = $this->commentModel->save($commentData);

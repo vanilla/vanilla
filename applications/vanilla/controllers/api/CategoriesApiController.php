@@ -8,6 +8,7 @@ use Garden\Schema\Schema;
 use Garden\Web\Exception\ClientException;
 use Garden\Web\Exception\NotFoundException;
 use Garden\Web\Exception\ServerException;
+use Vanilla\ApiUtils;
 
 /**
  * API Controller for the `/categories` resource.
@@ -32,8 +33,6 @@ class CategoriesApiController extends AbstractApiController {
      * @param CategoryModel $categoryModel
      */
     public function __construct(CategoryModel $categoryModel) {
-        parent::__construct();
-
         $this->categoryModel = $categoryModel;
     }
 
@@ -328,7 +327,7 @@ class CategoriesApiController extends AbstractApiController {
                 ]);
                 unset($body['customPermissions']);
             }
-            $categoryData = $this->capitalCaseScheme->convertArrayKeys($body);
+            $categoryData = ApiUtils::convertInputKeys($body);
             $this->categoryModel->setField($id, $categoryData);
         }
 
@@ -353,7 +352,7 @@ class CategoriesApiController extends AbstractApiController {
 
         $body = $in->validate($body);
 
-        $categoryData = $this->capitalCaseScheme->convertArrayKeys($body);
+        $categoryData = ApiUtils::convertInputKeys($body);
         $id = $this->categoryModel->save($categoryData);
         $this->validateModel($this->categoryModel);
 
@@ -385,7 +384,7 @@ class CategoriesApiController extends AbstractApiController {
             $dbRecord['Children'] = array_map([$this, 'normalizeOutput'], $dbRecord['Children']);
         }
 
-        $schemaRecord = $this->camelCaseScheme->convertArrayKeys($dbRecord);
+        $schemaRecord = ApiUtils::convertOutputKeys($dbRecord);
         return $schemaRecord;
     }
 

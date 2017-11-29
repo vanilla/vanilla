@@ -6,6 +6,7 @@
 
 use Garden\Schema\Schema;
 use Garden\Web\Exception\NotFoundException;
+use Vanilla\ApiUtils;
 
 /**
  * API Controller for the `/drafts` resource.
@@ -21,8 +22,6 @@ class DraftsApiController extends AbstractApiController {
      * @param DraftModel $draftModel
      */
     public function __construct(DraftModel $draftModel) {
-        parent::__construct();
-
         $this->draftModel = $draftModel;
     }
 
@@ -322,7 +321,7 @@ class DraftsApiController extends AbstractApiController {
             unset($dbRecord[$col]);
         }
 
-        $schemaRecord = $this->camelCaseScheme->convertArrayKeys($dbRecord);
+        $schemaRecord = ApiUtils::convertOutputKeys($dbRecord);
         return $schemaRecord;
     }
 
@@ -368,7 +367,7 @@ class DraftsApiController extends AbstractApiController {
         }
         unset($schemaRecord['recordType'], $schemaRecord['parentRecordID']);
 
-        $result = $this->capitalCaseScheme->convertArrayKeys($schemaRecord);
+        $result = ApiUtils::convertInputKeys($schemaRecord);
         return $result;
     }
 }

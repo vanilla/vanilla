@@ -9,6 +9,7 @@ use Garden\Web\Data;
 use Garden\Web\Exception\ClientException;
 use Garden\Web\Exception\NotFoundException;
 use Garden\Web\Exception\ServerException;
+use Vanilla\ApiUtils;
 
 /**
  * API Controller for managing applicants.
@@ -29,8 +30,6 @@ class ApplicantsApiController extends AbstractApiController {
      * @throws ClientException if the registration method on the site is not approval.
      */
     public function __construct(Gdn_Configuration $configuration, UserModel $userModel) {
-        parent::__construct();
-
         $registrationMethod = strtolower($configuration->get('Garden.Registration.Method'));
         if ($registrationMethod !== 'approval') {
             throw new ClientException('The site is not configured for the approval registration method.');
@@ -234,7 +233,7 @@ class ApplicantsApiController extends AbstractApiController {
 
         $this->userModel->validatePasswordStrength($body['password'], $body['name']);
 
-        $userData = $this->capitalCaseScheme->convertArrayKeys($body);
+        $userData = ApiUtils::convertInputKeys($body);
         $userID = $this->userModel->register($userData);
         $this->validateModel($this->userModel);
 
@@ -260,7 +259,7 @@ class ApplicantsApiController extends AbstractApiController {
         unset($dbRecord['UserID']);
         $dbRecord['Status'] = 'pending';
 
-        $schemaRecord = $this->camelCaseScheme->convertArrayKeys($dbRecord);
+        $schemaRecord = ApiUtils::convertOutputKeys($dbRecord);
         return $schemaRecord;
     }
 

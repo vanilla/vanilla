@@ -8,6 +8,7 @@ use Garden\Schema\Schema;
 use Garden\Web\Data;
 use Garden\Web\Exception\ClientException;
 use Garden\Web\Exception\NotFoundException;
+use Vanilla\ApiUtils;
 
 /**
  * API Controller for the `/tokens` resource.
@@ -41,8 +42,6 @@ class TokensApiController extends AbstractApiController {
      * @param AccessTokenModel $accessTokenModel
      */
     public function __construct(AccessTokenModel $accessTokenModel) {
-        parent::__construct();
-
         $this->accessTokenModel = $accessTokenModel;
     }
 
@@ -271,7 +270,7 @@ class TokensApiController extends AbstractApiController {
             $dbRecord['AccessToken'] = $this->accessTokenModel->signToken($dbRecord['Token']);
         }
 
-        $schemaRecord = $this->camelCaseScheme->convertArrayKeys($dbRecord);
+        $schemaRecord = ApiUtils::convertOutputKeys($dbRecord);
         return $schemaRecord;
     }
 

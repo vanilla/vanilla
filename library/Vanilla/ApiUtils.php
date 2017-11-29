@@ -51,7 +51,7 @@ class ApiUtils {
      * @param Schema $schema The query string schema.
      * @return string Returns a URL with a %s placeholder for page number.
      */
-    protected static function pagerUrlFormat($url, $query, Schema $schema) {
+    protected static function pagerUrlFormat($url, array $query, Schema $schema) {
         $properties = $schema->getField('properties', []);
 
         // Loop through the query and add its parameters to the URL.

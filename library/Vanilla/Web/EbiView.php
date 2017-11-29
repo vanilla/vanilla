@@ -158,6 +158,7 @@ class EbiView implements ViewInterface {
             jsonFilter($v);
             return json_encode($v, JSON_PRETTY_PRINT);
         });
+        $ebi->defineFunction('longestCharacterCount', [$this, 'longestCharacterCount']);
         $ebi->defineFunction('pagerData', [$this, 'pagerData']);
         $ebi->defineFunction('plural');
         $ebi->defineFunction('registerUrl');
@@ -318,6 +319,7 @@ class EbiView implements ViewInterface {
         return $result;
     }
 
+
     /**
      * Get data for component
      *
@@ -382,6 +384,30 @@ class EbiView implements ViewInterface {
         $data[$name] = $result;
         return $result;
     }
+
+
+    /**
+     * Get the longest character count from array (translated before calculation)
+     *
+     * @param array $words
+     * @param int $offset
+     * @return int $count
+     */
+    public function longestCharacterCount($words, $offset = 0) {
+        $count = 0;
+
+        if(is_array($words) && sizeof($words) > 0) {
+            foreach ($words as $i => $value) {
+                $length = strlen(t($value));
+                if($length > $count) {
+                    $count = $length;
+                }
+            }
+        }
+
+        return $count + $offset;
+    }
+
 
     /**
      * A higher order function to get a user's information from an ID or user array.

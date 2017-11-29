@@ -8,15 +8,12 @@ use Garden\Schema\Schema;
 use Garden\Web\Data;
 use Garden\Web\Exception\ClientException;
 use Garden\Web\Exception\NotFoundException;
-use Vanilla\Utility\CapitalCaseScheme;
+use Vanilla\ApiUtils;
 
 /**
  * API Controller for the `/invites` resource.
  */
 class InvitesApiController extends AbstractApiController {
-
-    /** @var CapitalCaseScheme */
-    private $caseScheme;
 
     /** @var InvitationModel */
     private $invitationModel;
@@ -27,19 +24,17 @@ class InvitesApiController extends AbstractApiController {
     /**
      * InvitesApiController constructor.
      *
-     * @param CapitalCaseScheme $caseScheme
      * @param Gdn_Configuration $configuration
      * @param InvitationModel $invitationModel
      * @param UserModel $userModel
      * @throws ClientException if the site is not configured for user invitations.
      */
-    public function __construct(CapitalCaseScheme $caseScheme, GDN_Configuration $configuration, InvitationModel $invitationModel, UserModel $userModel) {
+    public function __construct(GDN_Configuration $configuration, InvitationModel $invitationModel, UserModel $userModel) {
         $registrationMethod = strtolower($configuration->get('Garden.Registration.Method'));
         if ($registrationMethod !== 'invitation') {
             throw new ClientException('The site is not configured for the invitation registration method.');
         }
 
-        $this->caseScheme = $caseScheme;
         $this->invitationModel = $invitationModel;
         $this->userModel = $userModel;
     }
@@ -111,8 +106,8 @@ class InvitesApiController extends AbstractApiController {
             $this->permission('Garden.Moderation.Manage');
         }
 
-        $this->prepareRow($row);
         $this->userModel->expandUsers($row, ['AcceptedUserID']);
+        $row = $this->normalizeOutput($row);
 
         $result = $out->validate($row);
         return $result;
@@ -180,7 +175,7 @@ class InvitesApiController extends AbstractApiController {
         );
 
         foreach ($rows as &$row) {
-            $this->prepareRow($row);
+            $row = $this->normalizeOutput($row);
         }
         $result = $out->validate($rows);
         return $result;
@@ -216,22 +211,26 @@ class InvitesApiController extends AbstractApiController {
         $out = $this->schema($this->fullSchema(), 'out');
 
         $body = $in->validate($body);
-        $inviteData = $this->caseScheme->convertArrayKeys($body);
+        $inviteData = ApiUtils::convertInputKeys($body);
         $row = $this->invitationModel->save($inviteData, ['ReturnRow' => true]);
         $this->validateModel($this->invitationModel);
-        $this->prepareRow($row);
+        $row = $this->normalizeOutput($row);
 
         $result = $out->validate($row);
         return $result;
     }
 
     /**
-     * Prepare the current row for output.
+     * Normalize a database record to match the Schema definition.
      *
-     * @param array $row
+     * @param array $dbRecord Database record.
+     * @return array Return a Schema record.
      */
-    public function prepareRow(array &$row) {
-        $row['InviteID'] = $row['InvitationID'];
-        $row['Status'] = empty($row['AcceptedUserID']) ? 'pending' : 'accepted';
+    public function normalizeOutput(array $dbRecord) {
+        $dbRecord['InviteID'] = $dbRecord['InvitationID'];
+        $dbRecord['Status'] = empty($dbRecord['AcceptedUserID']) ? 'pending' : 'accepted';
+
+        $schemaRecord = ApiUtils::convertOutputKeys($dbRecord);
+        return $schemaRecord;
     }
 }

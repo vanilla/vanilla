@@ -9,15 +9,12 @@ use Garden\Schema\Schema;
 use Garden\Web\Exception\NotFoundException;
 use Garden\Web\Exception\ServerException;
 use Vanilla\Exception\ConfigurationException;
-use Vanilla\Utility\CapitalCaseScheme;
+use Vanilla\ApiUtils;
 
 /**
  * API Controller for the `/conversations` resource.
  */
 class ConversationsApiController extends AbstractApiController {
-
-    /** @var CapitalCaseScheme */
-    private $caseScheme;
 
     /** @var Gdn_Configuration */
     private $config;
@@ -40,7 +37,6 @@ class ConversationsApiController extends AbstractApiController {
         ConversationModel $conversationModel,
         UserModel $userModel
     ) {
-        $this->caseScheme = new CapitalCaseScheme();
         $this->config = $config;
         $this->conversationModel = $conversationModel;
         $this->userModel = $userModel;
@@ -190,7 +186,7 @@ class ConversationsApiController extends AbstractApiController {
 
         $this->userModel->expandUsers($conversation, ['InsertUserID']);
 
-        $this->prepareRow($conversation);
+        $conversation = $this->normalizeOutput($conversation);
 
         return $out->validate($conversation);
     }
@@ -271,7 +267,7 @@ class ConversationsApiController extends AbstractApiController {
         $data = array_values($conversationMembers);
 
         foreach ($data as &$row) {
-            $this->translateParticipantStatus($row);
+            $row = $this->normalizeParticipantInput($row);
         }
 
         // Expand associated rows.
@@ -370,7 +366,6 @@ class ConversationsApiController extends AbstractApiController {
 
         $body = $in->validate($body);
         $conversationData = $this->normalizeInput($body);
-        $conversationData = $this->caseScheme->convertArrayKeys($conversationData);
 
         $conversationID = $this->conversationModel->save($conversationData, ['ConversationOnly' => true]);
         $this->validateModel($this->conversationModel, true);
@@ -452,34 +447,39 @@ class ConversationsApiController extends AbstractApiController {
     }
 
     /**
-     * Normalize input parameters.
+     * Normalize a Schema record to match the database definition.
      *
-     * @param array $input
-     * @return array The normalized input.
+     * @param array $schemaRecord Schema record.
+     * @return array Return a database record.
      */
-    public function normalizeInput(array $input) {
-        if (array_key_exists('name', $input)) {
-            $input['subject'] = $input['name'];
-            unset($input['name']);
+    public function normalizeInput(array $schemaRecord) {
+        if (array_key_exists('name', $schemaRecord)) {
+            $schemaRecord['subject'] = $schemaRecord['name'];
+            unset($schemaRecord['name']);
         }
-        if (array_key_exists('participantUserIDs', $input)) {
-            $input['recipientUserID'] = $input['participantUserIDs'];
-            unset($input['participantUserIDs']);
+        if (array_key_exists('participantUserIDs', $schemaRecord)) {
+            $schemaRecord['recipientUserID'] = $schemaRecord['participantUserIDs'];
+            unset($schemaRecord['participantUserIDs']);
         }
 
-        return $input;
+        $dbRecord = ApiUtils::convertInputKeys($schemaRecord);
+        return $dbRecord;
     }
 
     /**
-     * Prepare conversation for output.
+     * Normalize a database record to match the Schema definition.
      *
-     * @param array $conversation
+     * @param array $dbRecord Database record.
+     * @return array Return a Schema record.
      */
-    public function prepareRow(array &$conversation) {
-        if (array_key_exists('subject', $conversation)) {
-            $conversation['name'] = $conversation['subject'];
-            unset($conversation['subject']);
+    public function normalizeOutput(array $dbRecord) {
+        if (array_key_exists('subject', $dbRecord)) {
+            $dbRecord['name'] = $dbRecord['subject'];
+            unset($dbRecord['subject']);
         }
+
+        $schemaRecord = ApiUtils::convertOutputKeys($dbRecord);
+        return $schemaRecord;
     }
 
     /**
@@ -487,11 +487,13 @@ class ConversationsApiController extends AbstractApiController {
      *
      * @param array $row
      */
-    private function translateParticipantStatus(array &$row) {
+    private function normalizeParticipantInput(array $row) {
         if ($row['Deleted'] == 0) {
             $row['Status'] = 'participating';
         } else {
             $row['Status'] = 'deleted';
         }
+
+        return $row;
     }
 }

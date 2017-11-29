@@ -8,14 +8,11 @@
 use Garden\Schema\Schema;
 
 abstract class AbstractApiController extends \Vanilla\Web\Controller {
-    /**
-     * @var Schema
-     */
+
+    /** @var Schema */
     private $userFragmentSchema;
 
-    /**
-     * @var Schema
-     */
+    /** @var Schema */
     private $postFragmentSchema;
 
     /**

@@ -6,22 +6,15 @@
 
 use Garden\Schema\Schema;
 use Garden\Web\Exception\NotFoundException;
-use Vanilla\Utility\CapitalCaseScheme;
-use Vanilla\Utility\CamelCaseScheme;
+use Vanilla\ApiUtils;
 
 /**
  * API Controller for the `/drafts` resource.
  */
 class DraftsApiController extends AbstractApiController {
 
-    /** @var CapitalCaseScheme */
-    private $capitalCaseScheme;
-
     /** @var DraftModel */
     private $draftModel;
-
-    /** @var CamelCaseScheme */
-    private $translateCaseScheme;
 
     /**
      * DraftsApiController constructor.
@@ -30,8 +23,6 @@ class DraftsApiController extends AbstractApiController {
      */
     public function __construct(DraftModel $draftModel) {
         $this->draftModel = $draftModel;
-        $this->capitalCaseScheme = new CapitalCaseScheme();
-        $this->translateCaseScheme = new CamelCaseScheme();
     }
 
     /**
@@ -131,7 +122,7 @@ class DraftsApiController extends AbstractApiController {
         if ($row['InsertUserID'] !== $this->getSession()->UserID) {
             $this->permission('Garden.Moderation.Manage');
         }
-        $this->prepareRow($row);
+        $row = $this->normalizeOutput($row);
 
         $result = $out->validate($row);
         return $result;
@@ -153,7 +144,7 @@ class DraftsApiController extends AbstractApiController {
         if ($row['InsertUserID'] !== $this->getSession()->UserID) {
             $this->permission('Garden.Moderation.Manage');
         }
-        $this->prepareRow($row);
+        $row = $this->normalizeOutput($row);
 
         $result = $out->validate($row);
         return $result;
@@ -235,7 +226,7 @@ class DraftsApiController extends AbstractApiController {
         $rows = $this->draftModel->getWhere($where, '', 'asc', $limit, $offset)->resultArray();
 
         foreach ($rows as &$row) {
-            $this->prepareRow($row);
+            $row = $this->normalizeOutput($row);
         }
 
         $result = $out->validate($rows);
@@ -263,13 +254,13 @@ class DraftsApiController extends AbstractApiController {
 
         $body = $in->validate($body, true);
         $recordType = !empty($row['DiscussionID']) ? 'comment' : 'discussion';
-        $draftData = $this->translateRequest($body, $recordType);
+        $draftData = $this->normalizeInput($body, $recordType);
         $draftData['DraftID'] = $id;
         $this->draftModel->save($draftData);
         $this->validateModel($this->draftModel);
 
         $updatedRow = $this->draftByID($id);
-        $this->prepareRow($updatedRow);
+        $updatedRow = $this->normalizeOutput($updatedRow);
 
         $result = $out->validate($updatedRow);
         return $result;
@@ -288,104 +279,95 @@ class DraftsApiController extends AbstractApiController {
         $out = $this->schema($this->fullSchema(), 'out');
 
         $body = $in->validate($body);
-        $draftData = $this->translateRequest($body);
+        $draftData = $this->normalizeInput($body);
         $draftID = $this->draftModel->save($draftData);
         $this->validateModel($this->draftModel);
 
         $row = $this->draftByID($draftID);
-        $this->prepareRow($row);
+        $row = $this->normalizeOutput($row);
 
         $result = $out->validate($row);
         return $result;
     }
 
     /**
-     * Prepare data for output.
+     * Normalize a database record to match the Schema definition.
      *
-     * @param array $row
+     * @param array $dbRecord Database record.
+     * @return array Return a Schema record.
      */
-    public function prepareRow(array &$row) {
-        $row = $this->translateRow($row);
+    public function normalizeOutput(array $dbRecord) {
+        $parentRecordID = null;
+
+        $commentAttributes = ['Body', 'Format'];
+        $discussionAttributes = ['Announce', 'Body', 'Closed', 'Format', 'Name', 'Sink', 'Tags'];
+        if (array_key_exists('DiscussionID', $dbRecord) && !empty($dbRecord['DiscussionID'])) {
+            $dbRecord['RecordType'] = 'comment';
+            $parentRecordID = $dbRecord['DiscussionID'];
+            $attributes = $commentAttributes;
+        } else {
+            if (array_key_exists('CategoryID', $dbRecord) && !empty($dbRecord['CategoryID'])) {
+                $parentRecordID = $dbRecord['CategoryID'];
+            }
+            $dbRecord['RecordType'] = 'discussion';
+            $attributes = $discussionAttributes;
+        }
+
+        $dbRecord['Attributes'] = array_intersect_key($dbRecord, array_flip($attributes));
+        $dbRecord['ParentRecordID'] = $parentRecordID;
+
+        // Remove redundant attribute columns on the row.
+        foreach (array_merge($commentAttributes, $discussionAttributes) as $col) {
+            unset($dbRecord[$col]);
+        }
+
+        $schemaRecord = ApiUtils::convertOutputKeys($dbRecord);
+        return $schemaRecord;
     }
 
     /**
-     * Translate a request to this endpoint into a format compatible for saving with DraftModel.
+     * Normalize a Schema record to match the database definition.
      *
-     * @param array $body
-     * @param string $recordType
-     * @return array
+     * @param array $schemaRecord Schema record.
+     * @param string|null $recordType
+     * @return array Return a database record.
      */
-    private function translateRequest(array $body, $recordType = null) {
+    private function normalizeInput(array $schemaRecord, $recordType = null) {
         // If the record type is not explicitly defined by the parameters, try to extract it from $body.
-        if ($recordType === null && array_key_exists('recordType', $body)) {
-            $recordType = $body['recordType'];
+        if ($recordType === null && array_key_exists('recordType', $schemaRecord)) {
+            $recordType = $schemaRecord['recordType'];
         }
 
-        if (array_key_exists('attributes', $body)) {
+        if (array_key_exists('attributes', $schemaRecord)) {
             $columns = ['announce', 'body', 'categoryID', 'closed', 'format', 'name', 'sink', 'tags'];
-            $attributes = array_intersect_key($body['attributes'], array_flip($columns));
-            $body = array_merge($body, $attributes);
-            unset($body['attributes']);
+            $attributes = array_intersect_key($schemaRecord['attributes'], array_flip($columns));
+            $schemaRecord = array_merge($schemaRecord, $attributes);
+            unset($schemaRecord['attributes']);
         }
 
-        if (array_key_exists('tags', $body)) {
-            if (empty($body['tags'])) {
-                $body['tags'] = null;
-            } elseif (is_array($body['tags'])) {
-                $body['tags'] = implode(',', $body['tags']);
+        if (array_key_exists('tags', $schemaRecord)) {
+            if (empty($schemaRecord['tags'])) {
+                $schemaRecord['tags'] = null;
+            } elseif (is_array($schemaRecord['tags'])) {
+                $schemaRecord['tags'] = implode(',', $schemaRecord['tags']);
             }
         }
 
         switch ($recordType) {
             case 'comment':
-                if (array_key_exists('parentRecordID', $body)) {
-                    $body['DiscussionID'] = $body['parentRecordID'];
+                if (array_key_exists('parentRecordID', $schemaRecord)) {
+                    $schemaRecord['DiscussionID'] = $schemaRecord['parentRecordID'];
                 }
                 break;
             case 'discussion':
-                if (array_key_exists('parentRecordID', $body)) {
-                    $body['CategoryID'] = $body['parentRecordID'];
+                if (array_key_exists('parentRecordID', $schemaRecord)) {
+                    $schemaRecord['CategoryID'] = $schemaRecord['parentRecordID'];
                 }
-                $body['DiscussionID'] = null;
+                $schemaRecord['DiscussionID'] = null;
         }
-        unset($body['recordType'], $body['parentRecordID']);
+        unset($schemaRecord['recordType'], $schemaRecord['parentRecordID']);
 
-        $result = $this->capitalCaseScheme->convertArrayKeys($body);
-        return $result;
-    }
-
-    /**
-     * Translate the structure of a row from the drafts table into the format used by this endpoint.
-     *
-     * @param array $row
-     * @return array
-     */
-    private function translateRow(array $row) {
-        $parentRecordID = null;
-
-        $commentAttributes = ['Body', 'Format'];
-        $discussionAttributes = ['Announce', 'Body', 'Closed', 'Format', 'Name', 'Sink', 'Tags'];
-        if (array_key_exists('DiscussionID', $row) && !empty($row['DiscussionID'])) {
-            $row['RecordType'] = 'comment';
-            $parentRecordID = $row['DiscussionID'];
-            $attributes = $commentAttributes;
-        } else {
-            if (array_key_exists('CategoryID', $row) && !empty($row['CategoryID'])) {
-                $parentRecordID = $row['CategoryID'];
-            }
-            $row['RecordType'] = 'discussion';
-            $attributes = $discussionAttributes;
-        }
-
-        $row['Attributes'] = array_intersect_key($row, array_flip($attributes));
-        $row['ParentRecordID'] = $parentRecordID;
-
-        // Remove redundant attribute columns on the row.
-        foreach (array_merge($commentAttributes, $discussionAttributes) as $col) {
-            unset($row[$col]);
-        }
-
-        $result = $this->translateCaseScheme->convertArrayKeys($row);
+        $result = ApiUtils::convertInputKeys($schemaRecord);
         return $result;
     }
 }

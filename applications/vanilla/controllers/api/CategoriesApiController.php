@@ -8,15 +8,12 @@ use Garden\Schema\Schema;
 use Garden\Web\Exception\ClientException;
 use Garden\Web\Exception\NotFoundException;
 use Garden\Web\Exception\ServerException;
-use Vanilla\Utility\CapitalCaseScheme;
+use Vanilla\ApiUtils;
 
 /**
  * API Controller for the `/categories` resource.
  */
 class CategoriesApiController extends AbstractApiController {
-
-    /** @var CapitalCaseScheme */
-    private $caseScheme;
 
     /** @var CategoryModel */
     private $categoryModel;
@@ -37,7 +34,6 @@ class CategoriesApiController extends AbstractApiController {
      */
     public function __construct(CategoryModel $categoryModel) {
         $this->categoryModel = $categoryModel;
-        $this->caseScheme = new CapitalCaseScheme();
     }
 
     /**
@@ -83,7 +79,6 @@ class CategoriesApiController extends AbstractApiController {
         if (empty($category)) {
             throw new NotFoundException('Category');
         }
-        $this->prepareRow($category);
         return $category;
     }
 
@@ -156,7 +151,7 @@ class CategoriesApiController extends AbstractApiController {
         $out = $this->schema($this->schemaWithParent(), 'out');
 
         $row = $this->category($id);
-        $this->prepareRow($row);
+        $row = $this->normalizeOutput($row);
 
         $result = $out->validate($row);
         return $result;
@@ -178,6 +173,7 @@ class CategoriesApiController extends AbstractApiController {
         ])->add($this->fullSchema()), 'out');
 
         $row = $this->category($id);
+        $row = $this->normalizeOutput($row);
 
         $result = $out->validate($row);
         return $result;
@@ -224,7 +220,7 @@ class CategoriesApiController extends AbstractApiController {
         );
 
         foreach ($rows as &$row) {
-            $this->prepareRow($row);
+            $row = $this->normalizeOutput($row);
         }
 
         $result = $out->validate($rows);
@@ -291,8 +287,7 @@ class CategoriesApiController extends AbstractApiController {
         } else {
             $categories = $this->categoryModel->getTree($parent['CategoryID'], ['maxdepth' => $query['maxDepth']]);
         }
-        array_walk($categories, [$this, 'prepareRow']);
-
+        $categories = array_map([$this, 'normalizeOutput'], $categories);
 
         return $out->validate($categories);
     }
@@ -317,7 +312,7 @@ class CategoriesApiController extends AbstractApiController {
 
         $body = $in->validate($body, true);
         // If a row associated with this ID cannot be found, a "not found" exception will be thrown.
-        $category = $this->category($id);
+        $this->category($id);
 
         if (array_key_exists('parentCategoryID', $body)) {
             $this->updateParent($id, $body['parentCategoryID']);
@@ -332,11 +327,12 @@ class CategoriesApiController extends AbstractApiController {
                 ]);
                 unset($body['customPermissions']);
             }
-            $categoryData = $this->caseScheme->convertArrayKeys($body);
+            $categoryData = ApiUtils::convertInputKeys($body);
             $this->categoryModel->setField($id, $categoryData);
         }
 
         $row = $this->category($id);
+        $row = $this->normalizeOutput($row);
         $result = $out->validate($row);
         return $result;
     }
@@ -356,7 +352,7 @@ class CategoriesApiController extends AbstractApiController {
 
         $body = $in->validate($body);
 
-        $categoryData = $this->caseScheme->convertArrayKeys($body);
+        $categoryData = ApiUtils::convertInputKeys($body);
         $id = $this->categoryModel->save($categoryData);
         $this->validateModel($this->categoryModel);
 
@@ -365,27 +361,31 @@ class CategoriesApiController extends AbstractApiController {
         }
 
         $row = $this->category($id);
-        $this->prepareRow($row);
+        $row = $this->normalizeOutput($row);
         $result = $out->validate($row);
         return $result;
     }
 
     /**
-     * Prepare data for output.
+     * Normalize a database record to match the Schema definition.
      *
-     * @param array $row
+     * @param array $dbRecord Database record.
+     * @return array Return a Schema record.
      */
-    public function prepareRow(array &$row) {
-        if ($row['ParentCategoryID'] <= 0) {
-            $row['ParentCategoryID'] = null;
+    public function normalizeOutput(array $dbRecord) {
+        if ($dbRecord['ParentCategoryID'] <= 0) {
+            $dbRecord['ParentCategoryID'] = null;
         }
-        $row['CustomPermissions'] = ($row['PermissionCategoryID'] === $row['CategoryID']);
-        $row['Description'] = $row['Description'] ?: '';
-        $row['DisplayAs'] = strtolower($row['DisplayAs']);
+        $dbRecord['CustomPermissions'] = ($dbRecord['PermissionCategoryID'] === $dbRecord['CategoryID']);
+        $dbRecord['Description'] = $dbRecord['Description'] ?: '';
+        $dbRecord['DisplayAs'] = strtolower($dbRecord['DisplayAs']);
 
-        if (!empty($row['Children']) && is_array($row['Children'])) {
-            array_walk($row['Children'], [$this, 'prepareRow']);
+        if (!empty($dbRecord['Children']) && is_array($dbRecord['Children'])) {
+            $dbRecord['Children'] = array_map([$this, 'normalizeOutput'], $dbRecord['Children']);
         }
+
+        $schemaRecord = ApiUtils::convertOutputKeys($dbRecord);
+        return $schemaRecord;
     }
 
     /**
@@ -434,6 +434,7 @@ class CategoriesApiController extends AbstractApiController {
         }
 
         $result = $this->category($categoryID);
+        $result = $this->normalizeOutput($result);
         return $result;
     }
 

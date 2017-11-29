@@ -104,11 +104,11 @@ abstract class AbstractApiController extends \Vanilla\Web\Controller {
      *
      * @param array $fields Valid values for the expand parameter.
      * @param bool|string $default The default value of expand.
-     * @return Schema
+     * @return array
      */
     public function getExpandDefinition(array $fields, $default = false) {
-        return [
-            'description' => 'Expand associated records.',
+        $result = [
+            'description' => 'Expand associated records using one or more valid field names. A boolean true expands all expandable fields.',
             'default' => $default,
             'items' => [
                 'enum' => $fields,
@@ -117,6 +117,7 @@ abstract class AbstractApiController extends \Vanilla\Web\Controller {
             'style' => 'form',
             'type' => ['boolean', 'array'],
         ];
+        return $result;
     }
 
     /**

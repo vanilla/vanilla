@@ -158,7 +158,7 @@ class Data implements \JsonSerializable, \ArrayAccess {
      */
     public function jsonSerialize() {
         $data = $this->getData();
-        jsonFilter($data);
+        $data = $this->jsonFilter($data);
         return $data;
     }
 
@@ -270,6 +270,38 @@ class Data implements \JsonSerializable, \ArrayAccess {
         } else {
             echo json_encode($this, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_PARTIAL_OUTPUT_ON_ERROR);
         }
+    }
+
+    /**
+     * Prepare data for json_encode
+     *
+     * @param mixed $value
+     * @return mixed
+     */
+    private function jsonFilter($value) {
+        $fn = function (&$value, $key = '', $parentKey = '') use (&$fn) {
+            if (is_array($value)) {
+                array_walk($value, function(&$childValue, $childKey) use ($fn, $key) {
+                    $fn($childValue, $childKey, $key);
+                });
+            } elseif ($value instanceof \DateTimeInterface) {
+                $value = $value->format(\DateTime::RFC3339);
+            } elseif (is_string($value)) {
+                // Only attempt to unpack as an IP address if this field or its parent matches the IP field naming scheme.
+                $isIPField = (stringEndsWith($key, 'IPAddress', true) || stringEndsWith($parentKey, 'IPAddresses', true));
+                if ($isIPField && ($ip = ipDecode($value)) !== null) {
+                    $value = $ip;
+                }
+            }
+        };
+
+        if (is_array($value)) {
+            array_walk($value, $fn);
+        } else {
+            $fn($value);
+        }
+
+        return $value;
     }
 
     /**

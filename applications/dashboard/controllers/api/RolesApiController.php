@@ -243,12 +243,11 @@ class RolesApiController extends AbstractApiController {
 
         $this->idParamSchema()->setDescription('Get a role.');
         $in = $this->schema([
-            'expand?' => $this->getExpandFragment(['permissions'])
+            'expand?' => $this->getExpandDefinition(['permissions'])
         ], 'in');
         $out = $this->schema($this->roleSchema(), 'out');
 
         $query = $in->validate($query);
-        $query += ['expand' => false];
 
         $row = $this->roleByID($id);
         $row = $this->normalizeOutput($row, $query['expand']);
@@ -356,12 +355,11 @@ class RolesApiController extends AbstractApiController {
         $this->permission('Garden.Settings.Manage');
 
         $in = $this->schema([
-            'expand?' => $this->getExpandFragment(['permissions'])
+            'expand?' => $this->getExpandDefinition(['permissions'])
         ], 'in')->setDescription('List roles.');
         $out = $this->schema([':a' => $this->roleSchema()], 'out');
 
         $query = $in->validate($query);
-        $query += ['expand' => false];
 
         $rows = $this->roleModel->getWithRankPermissions()->resultArray();
         foreach ($rows as &$row) {

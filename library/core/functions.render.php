@@ -139,7 +139,7 @@ if (!function_exists('heading')) {
                 <a class="btn btn-icon btn-return" aria-label="Return" href="'.url($returnUrl).'">'.
                     dashboardSymbol('chevron-left').'
                 </a>
-                <h1>'.$title.'</h1>
+                '.$title.'
             </div>';
         }
 

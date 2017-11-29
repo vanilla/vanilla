@@ -347,6 +347,7 @@ class ProfileController extends Gdn_Controller {
      */
     public function edit($userReference = '', $username = '', $userID = '') {
         $this->permission('Garden.SignIn.Allow');
+
         $this->getUserInfo($userReference, $username, $userID, true);
         $userID = valr('User.UserID', $this);
         $settings = [];
@@ -386,6 +387,8 @@ class ProfileController extends Gdn_Controller {
 
         // If seeing the form for the first time...
         if ($this->Form->authenticatedPostBack(true)) {
+            $this->reauth();
+
             $this->Form->setFormValue('UserID', $userID);
 
             if (!$canEditUsername) {
@@ -1124,6 +1127,55 @@ class ProfileController extends Gdn_Controller {
             return false;
         }
         return true;
+    }
+
+    /**
+     * Prompt a user to enter their password, then re-submit form. Used for reauthenticating for sensitive actions.
+     */
+    public function authenticate() {
+        $this->permission('Garden.SignIn.Allow');
+
+        // If users are registering with SSO, don't bother with this form.
+        if (c('Garden.Registration.Method') == 'Connect') {
+            Gdn::dispatcher()->dispatch('DefaultPermission');
+            exit();
+        }
+
+        if ($this->Form->getFormValue('DoReauthenticate')) {
+            $originalSubmission = $this->Form->getFormValue('OriginalSubmission');
+            if ($this->Form->authenticatedPostBack()) {
+                $this->Form->validateRule(
+                    'AuthenticatePassword',
+                    'ValidateRequired',
+                    sprintf(t('ValidateRequired'), 'Password')
+                );
+                if ($this->Form->errorCount() === 0) {
+                    $password = $this->Form->getFormValue('AuthenticatePassword');
+                    $result = Gdn::userModel()->validateCredentials('', Gdn::session()->UserID, $password);
+                    if ($result !== false) {
+                        $now = time();
+                        Gdn::authenticator()->identity()->setAuthTime($now);
+                        $formData = json_decode($originalSubmission, true);
+                        if (is_array($formData)) {
+                            Gdn::request()->setRequestArguments(Gdn_Request::INPUT_POST, $formData);
+                        }
+                        Gdn::dispatcher()->dispatch();
+                        exit();
+                    } else {
+                        $this->Form->addError(t('Invalid password.'), 'AuthenticatePassword');
+                    }
+                }
+            }
+        } else {
+            $originalSubmission = json_encode(Gdn::request()->post());
+        }
+
+        $this->Form->addHidden('DoReauthenticate', 1);
+        $this->Form->addHidden('OriginalSubmission', $originalSubmission);
+
+        $this->getUserInfo();
+        $this->title(t('Enter Your Password'));
+        $this->render();
     }
 
     /**

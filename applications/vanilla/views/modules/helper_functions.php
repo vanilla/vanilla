@@ -93,7 +93,11 @@ if (!function_exists('WritePromotedContent')):
                 class="Title"><?php echo anchor(Gdn_Format::text(sliceString($content['Name'], $sender->TitleLimit), false), $contentURL, 'DiscussionLink'); ?></div>
             <div class="Body">
                 <?php
-                echo anchor(htmlspecialchars(sliceString(Gdn_Format::plainText($content['Body'], $content['Format']), $sender->BodyLimit)), $contentURL, 'BodyLink');
+                $linkContent = Gdn_Format::excerpt($content['Body'], $content['Format']);
+                $trimmedLinkContent = sliceString($linkContent, $sender->BodyLimit);
+
+                echo anchor(htmlspecialchars($trimmedLinkContent), $contentURL, 'BodyLink');
+
                 $sender->fireEvent('AfterPromotedBody'); // separate event to account for less space.
                 ?>
             </div>

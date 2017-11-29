@@ -75,7 +75,7 @@ class DiscussionsApiController extends AbstractApiController {
                 'minimum' => 1,
                 'maximum' => 100
             ],
-            'expand?' => $this->getExpandFragment(['insertUser', 'lastUser', 'lastPost'])
+            'expand?' => $this->getExpandDefinition(['insertUser', 'lastUser', 'lastPost'])
         ], 'in');
         $out = $this->schema([':a' => $this->discussionSchema()], 'out');
 
@@ -353,13 +353,12 @@ class DiscussionsApiController extends AbstractApiController {
                 'maximum' => 100
             ],
             'insertUserID:i?' => 'Filter by author.',
-            'expand?' => $this->getExpandFragment(['insertUser', 'lastUser', 'lastPost'])
+            'expand?' => $this->getExpandDefinition(['insertUser', 'lastUser', 'lastPost'])
         ], 'in')->setDescription('List discussions.');
         $out = $this->schema([':a' => $this->discussionSchema()], 'out');
 
         $query = $this->filterValues($query);
         $query = $in->validate($query);
-        $query += ['expand' => false];
 
         $where = array_intersect_key($query, array_flip(['categoryID', 'insertUserID']));
         if (array_key_exists('categoryID', $where)) {

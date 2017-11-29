@@ -110,23 +110,23 @@ abstract class AbstractApiController extends \Vanilla\Web\Controller {
     }
 
     /**
-     * Get a simple schema for nesting as an "expand" parameter.
+     * Get an "expand" parameter definition with specific fields.
      *
      * @param array $fields Valid values for the expand parameter.
-     * @return Schema
+     * @param bool|string $default The default value of expand.
+     * @return array
      */
-    public function getExpandFragment(array $fields) {
-        // Avoid using Controller::schema, because API document generators likely can't handle this dynamic schema.
-        $result = Schema::parse([
-            'description' => 'Expand associated records.',
+    public function getExpandDefinition(array $fields, $default = false) {
+        $result = [
+            'description' => 'Expand associated records using one or more valid field names. A boolean true expands all expandable fields.',
+            'default' => $default,
             'items' => [
                 'enum' => $fields,
                 'type' => 'string'
             ],
             'style' => 'form',
-            'type' => ['boolean', 'array']
-        ]);
-
+            'type' => ['boolean', 'array'],
+        ];
         return $result;
     }
 

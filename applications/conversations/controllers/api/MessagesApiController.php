@@ -182,7 +182,7 @@ class MessagesApiController extends AbstractApiController {
                     'minimum' => 1,
                     'maximum' => 100
                 ],
-                'expand?' => $this->getExpandFragment(['insertUser'])
+                'expand?' => $this->getExpandDefinition(['insertUser'])
             ], 'in')
             ->requireOneOf(['conversationID', 'insertUserID'])
             ->setDescription('List user messages.');

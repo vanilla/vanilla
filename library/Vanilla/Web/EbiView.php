@@ -217,7 +217,7 @@ class EbiView implements ViewInterface {
 
     private function makeApiFunction(Dispatcher $dispatcher) {
         return function($path, $query = []) use ($dispatcher) {
-            $request = new InternalRequest('GET', "/api/v2/".ltrim($path, '/'), (array)$query);
+            $request = new InternalRequest('GET', "/api/v2/".ltrim($path, '/'), (array)$query + ['expand' => true]);
 
             $response = $dispatcher->dispatch($request);
 
@@ -336,7 +336,7 @@ class EbiView implements ViewInterface {
                 $processedData = $this->getJsonData($dataSource['source']);
                 if($dataSource['dataKey']) {
                     $processedData = $processedData[$dataSource['dataKey']];
-    }
+                }
             } elseif ($dataSource['source'] === 'theme') {
                 $processedData = $page;
             } elseif ($dataSource['source'] === 'api') {

@@ -664,18 +664,24 @@ class VanillaSettingsController extends Gdn_Controller {
         if ($this->Form->authenticatedPostBack()) {
             $this->setupDiscussionTypes($this->Category);
             $upload = new Gdn_Upload();
-            $tmpImage = $upload->validateUpload('Photo_New', false);
-            if ($tmpImage) {
-                // Generate the target image name
-                $targetImage = $upload->generateTargetName(PATH_UPLOADS);
-                $imageBaseName = pathinfo($targetImage, PATHINFO_BASENAME);
+            $upload->allowFileExtension(null);
+            $upload->allowFileExtension(['png', 'gif', 'jpg', 'jpeg', 'svg']);
+            try {
+                $tmpImage = $upload->validateUpload('Photo_New', true, false);
+                if ($tmpImage) {
+                    // Generate the target image name
+                    $targetImage = $upload->generateTargetName(PATH_UPLOADS, '');
+                    $imageBaseName = pathinfo($targetImage, PATHINFO_BASENAME);
 
-                // Save the uploaded image
-                $parts = $upload->saveAs(
-                    $tmpImage,
-                    $imageBaseName
-                );
-                $this->Form->setFormValue('Photo', $parts['SaveName']);
+                    // Save the uploaded image
+                    $parts = $upload->saveAs(
+                        $tmpImage,
+                        $imageBaseName
+                    );
+                    $this->Form->setFormValue('Photo', $parts['SaveName']);
+                }
+            } catch (\Exception $ex) {
+                $this->Form->addError($ex);
             }
             $this->Form->setFormValue('CustomPoints', (bool)$this->Form->getFormValue('CustomPoints'));
 

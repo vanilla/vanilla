@@ -37,7 +37,7 @@ class RolesTest extends AbstractResourceTest {
      * @return array
      */
     private function getPermissions($roleID) {
-        $role = $this->api()->get("{$this->baseUrl}/{$roleID}",['expand' => 'permissions'])->getBody();
+        $role = $this->api()->get("{$this->baseUrl}/{$roleID}", ['expand' => 'permissions'])->getBody();
         return $role['permissions'];
     }
 

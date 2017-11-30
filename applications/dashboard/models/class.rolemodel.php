@@ -98,7 +98,8 @@ class RoleModel extends Gdn_Model {
      */
     public static function filterPersonalInfo($role) {
         if (is_string($role)) {
-            $role = array_shift(self::getByName($role));
+            $roles = self::getByName($role);
+            $role = array_shift($roles);
         }
 
         return (val('PersonalInfo', $role)) ? false : true;

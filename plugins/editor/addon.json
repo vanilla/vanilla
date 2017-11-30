@@ -19,5 +19,8 @@
     ],
     "require": {
         "vanilla": ">=2.2"
+    },
+    "conflict": {
+        "buttonbar": "*"
     }
 }

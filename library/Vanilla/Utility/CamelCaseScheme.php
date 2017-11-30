@@ -24,7 +24,7 @@ class CamelCaseScheme extends NameScheme {
 
         // Check for the final ID case.
         if (preg_match('`[a-z](I[Dd]|I[Pp])(s?)$`', $name, $m)) {
-            $sx = strtoupper($m[1].$m[2]);
+            $sx = strtoupper($m[1]).$m[2];
             $name = substr($name, 0, -strlen($sx));
         }
 

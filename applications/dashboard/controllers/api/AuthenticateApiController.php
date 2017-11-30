@@ -16,7 +16,7 @@ use Vanilla\Authenticator\Authenticator;
 use Vanilla\Authenticator\SSOAuthenticator;
 use Vanilla\Exception\PermissionException;
 use Vanilla\Models\SSOModel;
-use Vanilla\Utility\CamelCaseScheme;
+use Vanilla\ApiUtils;
 
 /**
  * API Controller for the `/authenticate` resource.
@@ -27,9 +27,6 @@ class AuthenticateApiController extends AbstractApiController {
 
     /** @var AddonManager */
     private $addonManager;
-
-    /** @var CamelCaseScheme */
-    private $camelCaseScheme;
 
     /** @var Gdn_Configuration */
     private $config;
@@ -70,7 +67,6 @@ class AuthenticateApiController extends AbstractApiController {
         UserModel $userModel
     ) {
         $this->addonManager = $addonManager;
-        $this->camelCaseScheme = new CamelCaseScheme();
         $this->config = $config;
         $this->container = $container;
         $this->request = $request;
@@ -241,7 +237,7 @@ class AuthenticateApiController extends AbstractApiController {
 
         // We need to add back the ssoData since it was cleaned and we want to preserve any extra information.
         if (isset($cleanedSessionData['attributes']['ssoData'])) {
-            $ssoData = $this->camelCaseScheme->convertArrayKeys($sessionData['Attributes']['ssoData']);
+            $ssoData = ApiUtils::convertOutputKeys($sessionData['Attributes']['ssoData']);
             $cleanedSessionData['attributes']['ssoData'] = $ssoData;
         }
 
@@ -370,7 +366,7 @@ class AuthenticateApiController extends AbstractApiController {
         ];
 
         if ($user) {
-            $response = array_merge(['authenticationStep' => 'authenticated'], $this->camelCaseScheme->convertArrayKeys($user));
+            $response = array_merge(['authenticationStep' => 'authenticated'], ApiUtils::convertOutputKeys($user));
         // We could not authenticate or autoconnect so they will need to do a manual connect.
         } else {
             if ($allowConnect) {

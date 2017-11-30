@@ -124,6 +124,10 @@ class CategoriesApiController extends AbstractApiController {
             'customPermissions:b' => 'Are custom permissions set for this category?',
             'urlCode:s' => 'The URL code of the category.',
             'url:s' => 'The URL to the category.',
+            'photoUrl:s' => [
+                'description' => 'The category image.',
+                'minLength' => 0,
+            ],
             'displayAs:s' => [
                 'description' => 'The display style of the category.',
                 'enum' => ['categories', 'discussions', 'flat', 'heading'],
@@ -285,7 +289,15 @@ class CategoriesApiController extends AbstractApiController {
                 $limit
             );
         } else {
-            $categories = $this->categoryModel->getTree($parent['CategoryID'], ['maxdepth' => $query['maxDepth']]);
+            $categories = $this->categoryModel->getTree(
+                $parent['CategoryID'],
+                [
+                    'maxdepth' => $query['maxDepth'],
+                    'filter' => function ($row) {
+                        return empty($row['Archived']);
+                    },
+                ]
+            );
         }
         $categories = array_map([$this, 'normalizeOutput'], $categories);
 

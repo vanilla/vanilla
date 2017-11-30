@@ -7,11 +7,16 @@
 
 namespace Garden\Web;
 
+use Gdn;
+use Gdn_Locale;
 use Garden\Web\Exception\NotFoundException;
 use Garden\Web\Exception\Pass;
 use Vanilla\Permissions;
 
 class Dispatcher {
+
+    /** @var Gdn_Locale */
+    private $locale;
 
     /**
      * @var array
@@ -22,6 +27,15 @@ class Dispatcher {
      * @var string|array|callable
      */
     private $allowedOrigins;
+
+    /**
+     * Dispatcher constructor.
+     *
+     * @param Gdn_Locale $locale
+     */
+    public function __construct(Gdn_Locale $locale) {
+        $this->locale = $locale;
+    }
 
     /**
      * Add a route to the routes list.
@@ -86,9 +100,12 @@ class Dispatcher {
                         try {
                             $request->isAuthenticatedPostBack(true);
                         } catch (\Exception $ex) {
-                            \Gdn::session()->getPermissions()->addBan(
+                            Gdn::session()->getPermissions()->addBan(
                                 Permissions::BAN_CSRF,
-                                ['msg' => t('Invalid CSRF token.', 'Invalid CSRF token. Please try again.'), 'code' => 403]
+                                [
+                                    'msg' => $this->locale->translate('Invalid CSRF token.', 'Invalid CSRF token. Please try again.'),
+                                    'code' => 403
+                                ]
                             );
                         }
                     }

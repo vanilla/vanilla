@@ -1310,11 +1310,12 @@ class Gdn_Controller extends Gdn_Pluggable {
             $this->setJson('InformMessages', $this->_InformMessages);
             $this->setJson('ErrorMessages', $this->_ErrorMessages);
             if ($this->redirectTo !== null) {
-                $this->setJson('RedirectTo', $this->redirectTo);
-                $this->setJson('RedirectUrl', $this->redirectTo);
+                 // See redirectTo function for details about encoding backslashes.
+                $this->setJson('RedirectTo', str_replace('\\', '%5c', $this->redirectTo));
+                $this->setJson('RedirectUrl', str_replace('\\', '%5c', $this->redirectTo));
             } else {
-                $this->setJson('RedirectTo', $this->RedirectUrl);
-                $this->setJson('RedirectUrl', $this->RedirectUrl);
+                $this->setJson('RedirectTo', str_replace('\\', '%5c', $this->RedirectUrl));
+                $this->setJson('RedirectUrl', str_replace('\\', '%5c', $this->RedirectUrl));
             }
 
             // Make sure the database connection is closed before exiting.
@@ -1334,11 +1335,11 @@ class Gdn_Controller extends Gdn_Pluggable {
                     $this->addDefinition('InformMessageStack', json_encode($this->_InformMessages, JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT));
                 }
                 if ($this->redirectTo !== null) {
-                    $this->addDefinition('RedirectTo', $this->redirectTo);
-                    $this->addDefinition('RedirectUrl', $this->redirectTo);
+                    $this->addDefinition('RedirectTo', str_replace('\\', '%5c', $this->redirectTo));
+                    $this->addDefinition('RedirectUrl', str_replace('\\', '%5c', $this->redirectTo));
                 } else {
-                    $this->addDefinition('RedirectTo', $this->RedirectUrl);
-                    $this->addDefinition('RedirectUrl', $this->RedirectUrl);
+                    $this->addDefinition('RedirectTo', str_replace('\\', '%5c', $this->RedirectUrl));
+                    $this->addDefinition('RedirectUrl', str_replace('\\', '%5c', $this->RedirectUrl));
                 }
             }
 

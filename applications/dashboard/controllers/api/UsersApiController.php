@@ -261,7 +261,7 @@ class UsersApiController extends AbstractApiController {
         $this->permission('Garden.Users.Edit');
 
         $this->idParamSchema('in');
-        $in = $this->userPostSchema('in')->setDescription('Update a user.');
+        $in = $this->schema($this->userPatchSchema(), 'in')->setDescription('Update a user.');
         $out = $this->userSchema('out');
 
         $body = $in->validate($body, true);
@@ -292,7 +292,7 @@ class UsersApiController extends AbstractApiController {
     public function post(array $body) {
         $this->permission('Garden.Users.Add');
 
-        $in = $this->userPostSchema('in', ['password', 'roleID?'])->setDescription('Add a user.');
+        $in = $this->schema($this->userPostSchema(), 'in')->setDescription('Add a user.');
         $out = $this->schema($this->userSchema(), 'out');
 
         $body = $in->validate($body);
@@ -469,29 +469,48 @@ class UsersApiController extends AbstractApiController {
     }
 
     /**
-     * Get a user schema with minimal add/edit fields.
+     * Get a user schema with minimal edit fields.
      *
-     * @param string $type The type of schema.
-     * @param array|null $extra Additional fields to include.
      * @return Schema Returns a schema object.
      */
-    public function userPostSchema($type = 'in', array $extra = []) {
-        $fields = [
-            'name',
-            'email',
-            'photo?',
-            'emailConfirmed' => ['default' => true],
-            'bypassSpam' => ['default' => false],
-            'roleID' => [
-                'type' => 'array',
-                'items' => ['type' => 'integer'],
-                'description' => 'Roles to set on the user.'
-            ]
-        ];
-        $schema = Schema::parse($extra)
-            ->add(Schema::parse($fields), true)
-            ->add($this->fullSchema());
-        return $this->schema($schema, $type);
+    public function userPatchSchema() {
+        static $schema;
+
+        if ($schema === null) {
+            $schema = $this->schema(Schema::parse([
+                'name?', 'email?', 'photo?', 'emailConfirmed?', 'bypassSpam?',
+                'roleID?' => [
+                    'type' => 'array',
+                    'items' => ['type' => 'integer'],
+                    'description' => 'Roles to set on the user.'
+                ]
+            ])->add($this->fullSchema()), 'UserPatch');
+        }
+
+        return $schema;
+    }
+
+    /**
+     * Get a user schema with minimal add fields.
+     *
+     * @return Schema Returns a schema object.
+     */
+    public function userPostSchema() {
+        static $schema;
+
+        if ($schema === null) {
+            $schema = $this->schema(Schema::parse([
+                'name', 'email', 'photo?', 'password',
+                'emailConfirmed' => ['default' => true], 'bypassSpam' => ['default' => false],
+                'roleID?' => [
+                    'type' => 'array',
+                    'items' => ['type' => 'integer'],
+                    'description' => 'Roles to set on the user.'
+                ]
+            ])->add($this->fullSchema()), 'UserPost');
+        }
+
+        return $schema;
     }
 
     /**

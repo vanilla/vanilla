@@ -270,10 +270,13 @@ class UsersApiController extends AbstractApiController {
         $body = $in->validate($body, true);
         // If a row associated with this ID cannot be found, a "not found" exception will be thrown.
         $this->userByID($id);
-        $body = $this->normalizeInput($body);
-        $userData = ApiUtils::convertInputKeys($body);
+        $userData = $this->normalizeInput($body);
         $userData['UserID'] = $id;
-        $this->userModel->save($userData);
+        $settings = [];
+        if (!empty($userData['RoleID'])) {
+            $settings['SaveRoles'] = true;
+        }
+        $this->userModel->save($userData, $settings);
         $this->validateModel($this->userModel);
         $row = $this->userByID($id);
         $row = $this->normalizeOutput($row);
@@ -476,23 +479,21 @@ class UsersApiController extends AbstractApiController {
      * @return Schema Returns a schema object.
      */
     public function userPostSchema($type = '', array $extra = []) {
-        if ($this->userPostSchema === null) {
-            $schema = Schema::parse([
-                'roleID:a' => 'Roles to set on the user.'
-            ])->add($this->fullSchema(), true);
-            $fields = [
-                'name',
-                'email',
-                'photo?',
-                'emailConfirmed' => ['default' => true],
-                'bypassSpam' => ['default' => false]
-            ];
-            $this->userPostSchema = $this->schema(
-                Schema::parse(array_merge($fields, $extra))->add($schema),
-                'UserPost'
-            );
-        }
-        return $this->schema($this->userPostSchema, $type);
+        $fields = [
+            'name',
+            'email',
+            'photo?',
+            'emailConfirmed' => ['default' => true],
+            'bypassSpam' => ['default' => false]
+        ];
+        $schema = Schema::parse(array_merge($fields, $extra))->add($this->fullSchema());
+        $schema->merge(Schema::parse([
+            'roleID:a' => [
+                'items' => ['type' => 'integer'],
+                'description' => 'Roles to set on the user.'
+            ]
+        ]));
+        return $schema;
     }
 
     /**

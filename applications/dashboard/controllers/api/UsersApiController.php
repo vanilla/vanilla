@@ -481,15 +481,16 @@ class UsersApiController extends AbstractApiController {
             'email',
             'photo?',
             'emailConfirmed' => ['default' => true],
-            'bypassSpam' => ['default' => false]
-        ];
-        $schema = Schema::parse(array_merge($fields, $extra))->add($this->fullSchema());
-        $schema->merge(Schema::parse([
-            'roleID:a' => [
+            'bypassSpam' => ['default' => false],
+            'roleID' => [
+                'type' => 'array',
                 'items' => ['type' => 'integer'],
                 'description' => 'Roles to set on the user.'
             ]
-        ]));
+        ];
+        $schema = Schema::parse($extra)
+            ->add(Schema::parse($fields), true)
+            ->add($this->fullSchema());
         return $this->schema($schema, $type);
     }
 

@@ -137,6 +137,7 @@ class EbiView implements ViewInterface {
         $ebi->defineFunction('categoryUrl');
         $ebi->defineFunction('commentUrl');
         $ebi->defineFunction('getJsonData', [$this, 'getJsonData']);
+        $ebi->defineFunction('getActiveKey', [$this, 'getActiveKey']);
         $ebi->defineFunction('getData', [$this, 'getData']);
         $ebi->defineFunction('discussionUrl');
         $ebi->defineFunction('formatBigNumber', [\Gdn_Format::class, 'bigNumber']);
@@ -317,6 +318,24 @@ class EbiView implements ViewInterface {
             $result['pages'] = $pages;
         }
         return $result;
+    }
+
+
+    /**
+     * Get data for component
+     *
+     * @param array $data
+     * @return mixed $key
+     */
+    public function getActiveKey($data) {
+        $key = false;
+        foreach ($data as $i => $item) {
+            if ($item['active']) {
+                $key = $i;
+                break;
+            }
+        }
+        return $key;
     }
 
 

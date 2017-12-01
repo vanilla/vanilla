@@ -31,9 +31,6 @@ class UsersApiController extends AbstractApiController {
     private $userModel;
 
     /** @var Schema */
-    private $userPostSchema;
-
-    /** @var Schema */
     private $userSchema;
 
     /**

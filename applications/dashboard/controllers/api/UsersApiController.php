@@ -475,7 +475,7 @@ class UsersApiController extends AbstractApiController {
      * @param array|null $extra Additional fields to include.
      * @return Schema Returns a schema object.
      */
-    public function userPostSchema($type = '', array $extra = []) {
+    public function userPostSchema($type = 'in', array $extra = []) {
         $fields = [
             'name',
             'email',
@@ -490,7 +490,7 @@ class UsersApiController extends AbstractApiController {
                 'description' => 'Roles to set on the user.'
             ]
         ]));
-        return $schema;
+        return $this->schema($schema, $type);
     }
 
     /**

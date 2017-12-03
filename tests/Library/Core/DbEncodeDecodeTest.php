@@ -7,10 +7,12 @@
 
 namespace VanillaTests\Library\Core;
 
+use PHPUnit\Framework\TestCase;
+
 /**
  * Test some of the global functions that operate (or mostly operate) on arrays.
  */
-class DbEncodeDecodeTest extends \PHPUnit\Framework\TestCase {
+class DbEncodeDecodeTest extends TestCase {
 
     /**
      * Test encoding/decoding an array.
@@ -89,7 +91,7 @@ class DbEncodeDecodeTest extends \PHPUnit\Framework\TestCase {
      * Make sure we have a bad string for {@link dbdecode()}.
      *
      * @param string $str The bad string to decode.
-     * @expectedException \PHPUnit_Framework_Error
+     * @expectedException \PHPUnit\Framework\Error\Notice
      * @dataProvider provideBadDbDecodeStrings
      */
     public function testBadDbDecodeString($str) {

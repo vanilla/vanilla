@@ -6,9 +6,9 @@
 
 namespace VanillaTests\Library\Vanilla;
 
+use PHPUnit\Framework\TestCase;
 use DateTimeImmutable;
 use Garden\Schema\Schema;
-use PHPUnit\Framework\TestCase;
 use Vanilla\DateFilterSchema;
 
 class DateFilterSchemaTest extends TestCase {

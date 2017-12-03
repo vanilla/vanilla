@@ -7,11 +7,12 @@
 
 namespace VanillaTests\APIv2;
 
+use PHPUnit\Framework\TestCase;
 use Vanilla\Utility\CamelCaseScheme;
 use VanillaTests\InternalClient;
 use VanillaTests\SiteTestTrait;
 
-abstract class AbstractAPIv2Test extends \PHPUnit_Framework_TestCase {
+abstract class AbstractAPIv2Test extends TestCase {
     use SiteTestTrait;
 
     /**

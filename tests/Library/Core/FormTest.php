@@ -7,10 +7,11 @@
 
 namespace VanillaTests\Library\Core;
 
+use PHPUnit\Framework\TestCase;
 use Gdn;
 use Gdn_Form;
 
-class FormTest extends \PHPUnit\Framework\TestCase {
+class FormTest extends TestCase {
     /**
      * Setup a dummy request because {@link Gdn_Form} needs it.
      */

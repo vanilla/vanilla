@@ -6,6 +6,7 @@
 
 namespace VanillaTests\APIv2;
 
+use PHPUnit\Framework\TestCase;
 use VanillaTests\SiteTestTrait;
 use Vanilla\DateFilterSchema;
 use DateTimeImmutable;
@@ -15,7 +16,7 @@ use DateTimeImmutable;
  *
  * @package VanillaTests\APIv2
  */
-class AbstractApiControllerTest extends \PHPUnit_Framework_TestCase {
+class AbstractApiControllerTest extends TestCase {
 
     use SiteTestTrait;
 

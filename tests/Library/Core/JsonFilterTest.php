@@ -6,12 +6,13 @@
 
 namespace VanillaTests\Library\Core;
 
+use PHPUnit\Framework\TestCase;
 use DateTime;
 
 /**
  * Test the jsonFilter function.
  */
-class JsonFilterTest extends \PHPUnit\Framework\TestCase {
+class JsonFilterTest extends TestCase {
 
     public function testJsonFilterDateTime() {
         $date = new DateTime('now', new \DateTimeZone('UTC'));

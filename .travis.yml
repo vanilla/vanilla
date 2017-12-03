@@ -28,8 +28,6 @@ language: php
 
 # Configure the build.
 matrix:
-  allow_failures:
-    - php: 7.2
   fast_finish: true
 
 # Send status update notifications to a HipChat room.

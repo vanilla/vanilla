@@ -1923,7 +1923,7 @@ class DiscussionModel extends Gdn_Model {
         $this->defineSchema();
 
         // If the site isn't configured to use categories, don't allow one to be set.
-        if (!c('Vanilla.Categories.Use')) {
+        if (!c('Vanilla.Categories.Use', true)) {
             unset($formPostValues['CategoryID']);
         }
 

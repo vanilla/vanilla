@@ -40,9 +40,6 @@ class RolesApiController extends AbstractApiController {
         'Vanilla.Comments.Me'
     ];
 
-    /** @var Schema */
-    private $idParamSchema;
-
     /** @var PermissionModel */
     private $permissionModel;
 
@@ -73,9 +70,6 @@ class RolesApiController extends AbstractApiController {
 
     /** @var RoleModel */
     private $roleModel;
-
-    /** @var Schema */
-    private $rolePostSchema;
 
     /** @var Schema */
     private $roleSchema;
@@ -229,7 +223,7 @@ class RolesApiController extends AbstractApiController {
             'deletable:b' => 'Is the role deletable?',
             'canSession:b' => 'Can users in this role start a session?',
             'personalInfo:b' => 'Is membership in this role personal information?',
-            'permissions?' => $this->getPermissionsFragment()
+            'permissions:a?' => $this->getPermissionFragment()
         ]);
         return $schema;
     }
@@ -245,10 +239,10 @@ class RolesApiController extends AbstractApiController {
     public function get($id, array $query) {
         $this->permission('Garden.Settings.Manage');
 
-        $this->idParamSchema()->setDescription('Get a role.');
+        $this->idParamSchema();
         $in = $this->schema([
             'expand?' => $this->getExpandDefinition(['permissions'])
-        ], 'in');
+        ], 'in')->setDescription('Get a role.');
         $out = $this->schema($this->roleSchema(), 'out');
 
         $query = $in->validate($query);
@@ -310,24 +304,21 @@ class RolesApiController extends AbstractApiController {
     }
 
     /**
-     * Return a schema to represent a collection of permission rows.
+     * Return a schema to represent a permission row.
      *
      * @return Schema
      */
-    public function getPermissionsFragment() {
+    public function getPermissionFragment() {
         static $permissionsFragment;
 
         if ($permissionsFragment === null) {
-            $permissionsFragment = Schema::parse([
-                ':a' => [
-                    'items' => 'object',
-                    'properties' => [
-                        'id:i?',
-                        'type:s' => ['enum' => ['global', 'category']],
-                        'permissions:o'
-                    ]
-                ]
-            ]);
+            $permissionsFragment = $this->schema([
+                'id:i?',
+                'type:s' => [
+                    'enum' => ['global', 'category'],
+                ],
+                'permissions:o',
+            ], 'PermissionFragment');
         }
 
         return $permissionsFragment;
@@ -336,17 +327,10 @@ class RolesApiController extends AbstractApiController {
     /**
      * Get an ID-only role record schema.
      *
-     * @param string $type The type of schema.
      * @return Schema Returns a schema object.
      */
-    public function idParamSchema($type = 'in') {
-        if ($this->idParamSchema === null) {
-            $this->idParamSchema = $this->schema(
-                Schema::parse(['id:i' => 'The role ID.']),
-                $type
-            );
-        }
-        return $this->schema($this->idParamSchema, $type);
+    public function idParamSchema() {
+        return $this->schema(['id:i' => 'The role ID.'], 'in');
     }
 
     /**
@@ -441,8 +425,8 @@ class RolesApiController extends AbstractApiController {
     public function patch($id, array $body) {
         $this->permission('Garden.Settings.Manage');
 
-        $this->idParamSchema('in');
-        $in = $this->rolePostSchema('in')->setDescription('Update a role.');
+        $this->idParamSchema();
+        $in = $this->rolePostSchema()->setDescription('Update a role.');
         $out = $this->roleSchema('out');
 
         $body = $in->validate($body, true);
@@ -473,16 +457,18 @@ class RolesApiController extends AbstractApiController {
      */
     public function patch_permissions($id, array $body) {
         $this->permission('Garden.Settings.Manage');
-        $this->roleByID($id);
 
-        $in = $this->schema($this->getPermissionsFragment(), 'in');
-        $out = $this->schema($this->getPermissionsFragment(), 'out');
+        $in = $this->schema([':a', $this->getPermissionFragment()], 'in')->setDescription('Update permissions on a role');
+        $out = $this->schema([':a', $this->getPermissionFragment()], 'out');
+
+        $this->roleByID($id);
 
         $body = $in->validate($body);
         $this->savePermissions($id, $body);
 
         $rows = $this->getFormattedPermissions($id);
         $result = $out->validate($rows);
+
         return $result;
     }
 
@@ -529,16 +515,18 @@ class RolesApiController extends AbstractApiController {
      */
     public function put_permissions($id, array $body) {
         $this->permission('Garden.Settings.Manage');
-        $this->roleByID($id);
 
-        $in = $this->schema($this->getPermissionsFragment(), 'in');
-        $out = $this->schema($this->getPermissionsFragment(), 'out');
+        $in = $this->schema([':a', $this->getPermissionFragment()], 'in')->setDescription('Overwrite all permissions for a role.');
+        $out = $this->schema([':a', $this->getPermissionFragment()], 'out');
+
+        $this->roleByID($id);
 
         $body = $in->validate($body);
         $this->savePermissions($id, $body, true);
 
         $rows = $this->getFormattedPermissions($id);
         $result = $out->validate($rows);
+
         return $result;
     }
 
@@ -591,20 +579,27 @@ class RolesApiController extends AbstractApiController {
     /**
      * Get a role schema with minimal add/edit fields.
      *
-     * @param string $type The type of schema.
      * @return Schema Returns a schema object.
      */
-    public function rolePostSchema($type = '') {
-        if ($this->rolePostSchema === null) {
-            $fields = ['name', 'description?', 'type?', 'deletable?', 'canSession?', 'personalInfo?'];
-            $this->rolePostSchema = $this->schema(
-                Schema::parse($fields)->add($this->fullSchema()),
+    public function rolePostSchema() {
+        static $rolePostSchema;
+
+        if ($rolePostSchema === null) {
+            $rolePostSchema = $this->schema(
+                Schema::parse([
+                    'name',
+                    'description?',
+                    'type?',
+                    'deletable?',
+                    'canSession?',
+                    'personalInfo?',
+                    'permissions?'
+                ])->add($this->fullSchema()),
                 'RolePost'
             );
-            // garden-schema has an issue with merging nested schemas using Schema::add. This is a way around that for now.
-            $this->rolePostSchema->merge(Schema::parse(['permissions?' => $this->getPermissionsFragment()]));
         }
-        return $this->schema($this->rolePostSchema, $type);
+
+        return $this->schema($rolePostSchema, 'in');
     }
 
     /**

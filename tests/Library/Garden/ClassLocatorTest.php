@@ -6,9 +6,10 @@
 
 namespace VanillaTests\Library\Garden;
 
+use PHPUnit\Framework\TestCase;
 use Garden\ClassLocator;
 
-class ClassLocatorTest extends \PHPUnit\Framework\TestCase {
+class ClassLocatorTest extends TestCase {
 
     public function testFindClass() {
         $classLocator = new ClassLocator();

@@ -9,8 +9,9 @@ namespace VanillaTests\APIv0;
 
 
 use Garden\Http\HttpResponse;
+use PHPUnit\Framework\TestCase;
 
-abstract class BaseTest extends \PHPUnit\Framework\TestCase {
+abstract class BaseTest extends TestCase {
     /** @var APIv0  $api */
     protected static $api;
 

@@ -31,9 +31,6 @@ class UsersApiController extends AbstractApiController {
     private $userModel;
 
     /** @var Schema */
-    private $userPostSchema;
-
-    /** @var Schema */
     private $userSchema;
 
     /**
@@ -264,16 +261,19 @@ class UsersApiController extends AbstractApiController {
         $this->permission('Garden.Users.Edit');
 
         $this->idParamSchema('in');
-        $in = $this->userPostSchema('in')->setDescription('Update a user.');
+        $in = $this->schema($this->userPatchSchema(), 'in')->setDescription('Update a user.');
         $out = $this->userSchema('out');
 
         $body = $in->validate($body, true);
         // If a row associated with this ID cannot be found, a "not found" exception will be thrown.
         $this->userByID($id);
-        $body = $this->normalizeInput($body);
-        $userData = ApiUtils::convertInputKeys($body);
+        $userData = $this->normalizeInput($body);
         $userData['UserID'] = $id;
-        $this->userModel->save($userData);
+        $settings = [];
+        if (!empty($userData['RoleID'])) {
+            $settings['SaveRoles'] = true;
+        }
+        $this->userModel->save($userData, $settings);
         $this->validateModel($this->userModel);
         $row = $this->userByID($id);
         $row = $this->normalizeOutput($row);
@@ -292,7 +292,7 @@ class UsersApiController extends AbstractApiController {
     public function post(array $body) {
         $this->permission('Garden.Users.Add');
 
-        $in = $this->userPostSchema('in', ['password', 'roleID?'])->setDescription('Add a user.');
+        $in = $this->schema($this->userPostSchema(), 'in')->setDescription('Add a user.');
         $out = $this->schema($this->userSchema(), 'out');
 
         $body = $in->validate($body);
@@ -469,30 +469,48 @@ class UsersApiController extends AbstractApiController {
     }
 
     /**
-     * Get a user schema with minimal add/edit fields.
+     * Get a user schema with minimal edit fields.
      *
-     * @param string $type The type of schema.
-     * @param array|null $extra Additional fields to include.
      * @return Schema Returns a schema object.
      */
-    public function userPostSchema($type = '', array $extra = []) {
-        if ($this->userPostSchema === null) {
-            $schema = Schema::parse([
-                'roleID:a' => 'Roles to set on the user.'
-            ])->add($this->fullSchema(), true);
-            $fields = [
-                'name',
-                'email',
-                'photo?',
-                'emailConfirmed' => ['default' => true],
-                'bypassSpam' => ['default' => false]
-            ];
-            $this->userPostSchema = $this->schema(
-                Schema::parse(array_merge($fields, $extra))->add($schema),
-                'UserPost'
-            );
+    public function userPatchSchema() {
+        static $schema;
+
+        if ($schema === null) {
+            $schema = $this->schema(Schema::parse([
+                'name?', 'email?', 'photo?', 'emailConfirmed?', 'bypassSpam?',
+                'roleID?' => [
+                    'type' => 'array',
+                    'items' => ['type' => 'integer'],
+                    'description' => 'Roles to set on the user.'
+                ]
+            ])->add($this->fullSchema()), 'UserPatch');
         }
-        return $this->schema($this->userPostSchema, $type);
+
+        return $schema;
+    }
+
+    /**
+     * Get a user schema with minimal add fields.
+     *
+     * @return Schema Returns a schema object.
+     */
+    public function userPostSchema() {
+        static $schema;
+
+        if ($schema === null) {
+            $schema = $this->schema(Schema::parse([
+                'name', 'email', 'photo?', 'password',
+                'emailConfirmed' => ['default' => true], 'bypassSpam' => ['default' => false],
+                'roleID?' => [
+                    'type' => 'array',
+                    'items' => ['type' => 'integer'],
+                    'description' => 'Roles to set on the user.'
+                ]
+            ])->add($this->fullSchema()), 'UserPost');
+        }
+
+        return $schema;
     }
 
     /**

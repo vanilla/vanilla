@@ -121,6 +121,7 @@ class EbiView implements ViewInterface {
         };
         $ebi->defineFunction('api', $this->makeApiFunction($dispatcher));
         $ebi->defineFunction('assetUrl', $fn);
+        $ebi->defineFunction('bodyImage', [$this, 'bodyImage']);
         $ebi->defineFunction('category', function ($category) {
             if (is_numeric($category)) {
                 $category = \CategoryModel::categories($category);
@@ -610,5 +611,21 @@ class EbiView implements ViewInterface {
             $this->ids[$id]++;
             return ($px ? '@' : '').$id.$this->ids[$id];
         }
+    }
+
+    public function bodyImage($html) {
+        $result = [];
+        if (preg_match_all('/<[^>]+src="([^"]+)"[^>]*?>/', $html, $matches, PREG_SET_ORDER)) {
+            foreach ($matches as $match) {
+                // Skip emoji.
+                if (preg_match('/class="[^"]*?\bemoji\b[^"]*"/', $match[0])) {
+                    continue;
+                }
+                $src = $match[1];
+                return $src;
+            }
+        }
+
+        return $result;
     }
 }

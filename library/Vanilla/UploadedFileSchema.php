@@ -6,6 +6,8 @@
 
 namespace Vanilla;
 
+use Gdn;
+use Gdn_Upload;
 use Garden\Schema\Invalid;
 use Garden\Schema\Schema;
 use Garden\Schema\ValidationField;
@@ -13,15 +15,69 @@ use Garden\Schema\ValidationException;
 
 class UploadedFileSchema extends Schema {
 
+    /** @var \Gdn_Configuration $config */
+    private $config;
+
+    /** @var int $maxFileSize */
+    private $maxSize;
+
+    /** @var array $extensions */
+    private $allowedExtensions = [];
+
     /**
      * Initialize an instance of a new UploadedFileSchema class.
      */
     public function __construct() {
+        $this->config = Gdn::getContainer()->get('Config');
+        $maxSize = Gdn_Upload::unformatFileSize($this->config->get('Garden.Upload.MaxFileSize', ini_get('upload_max_filesize')));
+        $allowedExtensions = $this->config->get('Garden.Upload.AllowedFileExtensions', []);
+
+        $this->setMaxSize($maxSize);
+        $this->setAllowedExtensions(array_map('strtolower', $allowedExtensions));
+
         parent::__construct([
             'id' => 'UploadedFile',
             'type' => 'string',
             'format' => 'binary'
         ]);
+    }
+
+    /**
+     * Get allowed file extensions.
+     *
+     * @return array
+     */
+    public function getAllowedExtensions() {
+        return $this->allowedExtensions;
+    }
+
+    /**
+     * Get the maximum file size.
+     *
+     * @return int
+     */
+    public function getMaxSize() {
+        return $this->maxSize;
+    }
+
+    /**
+     * Set allowed file extensions.
+     *
+     * @param array $allowedExtensions
+     * @return array
+     */
+    public function setAllowedExtensions(array $allowedExtensions) {
+        return $this->allowedExtensions = $allowedExtensions;
+    }
+
+    /**
+     * Set the maximum file size, in bytes.
+     *
+     * @param $maxSize
+     * @return int
+     */
+    public function setMaxSize($maxSize) {
+        return $this->maxSize = (int)$maxSize;
     }
 
     /**
@@ -54,9 +110,51 @@ class UploadedFileSchema extends Schema {
     protected function validateUploadedFile($value, ValidationField $field) {
         if (!($value instanceof UploadedFile)) {
             $field->addError('invalid', ['messageCode' => '{field} is not a valid file upload.']);
-            return Invalid::value();
+        }
+        $this->validateSize($value, $field);
+        $this->validateExtension($value, $field);
+
+        if ($field->getErrorCount() > 0) {
+            $value = Invalid::value();
+        }
+        return $value;
+    }
+
+    /**
+     * Verify a file's alleged extension is allowed.
+     *
+     * @param UploadedFile $upload
+     * @param ValidationField $field
+     * @return UploadedFile
+     */
+    protected function validateExtension(UploadedFile $upload, ValidationField $field) {
+        $result = false;
+        $file = $upload->getClientFilename();
+
+        if (is_string($file) && $ext = pathinfo($file, PATHINFO_EXTENSION)) {
+            $ext = strtolower($ext);
+            if (in_array($ext, $this->getAllowedExtensions())) {
+                $result = true;
+            }
         }
 
-        return $value;
+        if ($result !== true) {
+            $field->addError('invalid', ['messageCode' => '{field} is not an allowed upload type.']);
+        }
+
+        return $upload;
+    }
+
+    /**
+     * Verify a file's size is beneath the maximum.
+     *
+     * @param UploadedFile $upload
+     * @return UploadedFile
+     */
+    protected function validateSize(UploadedFile $upload, ValidationField $field) {
+        if ($upload->getSize() > $this->getMaxSize()) {
+            $field->addError('invalid', ['messageCode' => '{field} exceeds the maximum file size.']);
+        }
+        return $upload;
     }
 }

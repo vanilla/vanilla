@@ -234,6 +234,40 @@ class RequestTest extends TestCase {
     }
 
     /**
+     * Verify files with the UPLOAD_ERR_NO_FILE error are not added to the translated files array.
+     */
+    public function testNoFileRemoval() {
+        $post = $_POST;
+        $files = $_FILES;
+
+        $_FILES = [
+            'MyFile' => [
+                'error' => UPLOAD_ERR_OK,
+                'name' => 'MyFile.txt',
+                'size' => 10,
+                'tmp_name' => '/tmp/php/php123',
+                'type' => 'text/plain'
+            ],
+            'NoFile' => [
+                'error' => UPLOAD_ERR_NO_FILE,
+                'name' => 'bar.jpg',
+                'size' => 1024,
+                'tmp_name' => '/tmp/php/php456',
+                'type' => 'image/jpeg'
+            ]
+        ];
+
+        $request = Gdn_Request::create()->fromEnvironment();
+
+        // Put everything back like we found it.
+        $_POST = $post;
+        $_FILES = $files;
+
+        $this->assertInstanceOf(\Vanilla\UploadedFile::class, $request->post('MyFile'));
+        $this->assertFalse($request->post('NoFile', false), 'Nonexistent file was not removed.');
+    }
+
+    /**
      * The {@link Gdn_Request::path()} and {@link Gdn_Request::getPath()} methods should be compatible.
      */
     public function testPathEquivalence() {

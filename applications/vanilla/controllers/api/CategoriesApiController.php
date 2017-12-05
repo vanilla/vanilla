@@ -206,7 +206,7 @@ class CategoriesApiController extends AbstractApiController {
                 'default' => false,
                 'description' => 'Expand with the parent record.'
             ]
-        ]);
+        ])->setDescription('Search categories.');
         $out = $this->schema([':a' => $this->schemaWithParent($query['expand'])], 'out');
 
         $query = $in->validate($query);

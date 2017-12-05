@@ -74,7 +74,7 @@ class DiscussionsApiController extends AbstractApiController {
                 'maximum' => 100
             ],
             'expand?' => $this->getExpandDefinition(['insertUser', 'lastUser', 'lastPost'])
-        ], 'in');
+        ], 'in')->setDescription('Get a list of the current user\'s bookmarked discussions.');
         $out = $this->schema([':a' => $this->discussionSchema()], 'out');
 
         $query = $in->validate($query);

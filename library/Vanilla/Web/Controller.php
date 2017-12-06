@@ -155,7 +155,7 @@ abstract class Controller implements InjectableInterface {
     /**
      * Get the event manager.
      *
-     * @return mixed Returns the event manager.
+     * @return EventManager Returns the event manager.
      */
     public function getEventManager() {
         return $this->eventManager;
@@ -164,7 +164,7 @@ abstract class Controller implements InjectableInterface {
     /**
      * Set the event manager.
      *
-     * @param mixed $eventManager The new event manager.
+     * @param EventManager $eventManager The new event manager.
      * @return $this
      */
     public function setEventManager($eventManager) {

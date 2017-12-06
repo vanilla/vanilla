@@ -207,7 +207,7 @@ class DiscussionsApiController extends AbstractApiController {
         $this->permission();
 
         $this->idParamSchema();
-        $in = $this->schema([], ['discussionsGet', 'in'])->setDescription('Get a discussion.');
+        $in = $this->schema([], ['DiscussionGet', 'in'])->setDescription('Get a discussion.');
         $out = $this->schema($this->discussionSchema(), 'out');
 
         $query = $in->validate($query);
@@ -225,7 +225,7 @@ class DiscussionsApiController extends AbstractApiController {
         $result = $out->validate($row);
 
         // Allow addons to modify the result.
-        $result = $this->getEventManager()->fireFilter('discussionsApiController_get_data', $result, $this, $query, $row, $in);
+        $result = $this->getEventManager()->fireFilter('discussionsApiController_get_data', $result, $this, $in, $query, $row);
         return $result;
     }
 
@@ -352,7 +352,7 @@ class DiscussionsApiController extends AbstractApiController {
             ],
             'insertUserID:i?' => 'Filter by author.',
             'expand?' => $this->getExpandDefinition(['insertUser', 'lastUser', 'lastPost'])
-        ], ['discussionsIndex', 'in'])->setDescription('List discussions.');
+        ], ['DiscussionIndex', 'in'])->setDescription('List discussions.');
         $out = $this->schema([':a' => $this->discussionSchema()], 'out');
 
         $query = $this->filterValues($query);
@@ -407,7 +407,7 @@ class DiscussionsApiController extends AbstractApiController {
         $result = $out->validate($rows, true);
 
         // Allow addons to modify the result.
-        $result = $this->getEventManager()->fireFilter('discussionsApiController_index_data', $result, $this, $query, $rows, $in);
+        $result = $this->getEventManager()->fireFilter('discussionsApiController_index_data', $result, $this, $in, $query, $rows);
         return $result;
     }
 

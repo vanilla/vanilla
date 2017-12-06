@@ -354,8 +354,8 @@ class EbiView implements ViewInterface {
         if ($dataSource) {
             if ($dataSource['source'] === 'theme') {
                 $processedData = $this->getJsonData($dataSource['source']);
-                if($dataSource['dataKey']) {
-                    $processedData = $processedData[$dataSource['dataKey']];
+                if($dataSource['field']) {
+                    $processedData = $processedData[$dataSource['field']];
                 }
             } elseif ($dataSource['source'] === 'theme') {
                 $processedData = $page;
@@ -364,8 +364,8 @@ class EbiView implements ViewInterface {
                 $processedData = $this->ebi->call('api', $dataSource['path'], $query);
             } elseif ($dataSource['source'] === 'page') {
                 $processedData = $page;
-                if($dataSource['dataKey']) {
-                    $processedData = $processedData[$dataSource['dataKey']];
+                if($dataSource['field']) {
+                    $processedData = $processedData[$dataSource['field']];
                 }
             }
         } elseif($data['children']) {

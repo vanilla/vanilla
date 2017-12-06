@@ -225,7 +225,7 @@ class DiscussionsApiController extends AbstractApiController {
         $result = $out->validate($row);
 
         // Allow addons to modify the result.
-        $result = $this->getEventManager()->fireFilter('discussionsApiController_get_data', $result, $this, $in, $query, $row);
+        $result = $this->getEventManager()->fireFilter('discussionsApiController_get_output', $result, $this, $in, $query, $row);
         return $result;
     }
 
@@ -407,7 +407,7 @@ class DiscussionsApiController extends AbstractApiController {
         $result = $out->validate($rows, true);
 
         // Allow addons to modify the result.
-        $result = $this->getEventManager()->fireFilter('discussionsApiController_index_data', $result, $this, $in, $query, $rows);
+        $result = $this->getEventManager()->fireFilter('discussionsApiController_index_output', $result, $this, $in, $query, $rows);
         return $result;
     }
 

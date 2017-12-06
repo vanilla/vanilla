@@ -103,7 +103,8 @@ abstract class Controller implements InjectableInterface {
     public function schema($schema, $type = 'in') {
         $id = '';
         if (is_array($type)) {
-            list($id, $type) = $type;
+            $origType = $type;
+            list($id, $type) = $origType;
         } elseif (!in_array($type, ['in', 'out'], true)) {
             $id = $type;
             $type = '';
@@ -121,7 +122,7 @@ abstract class Controller implements InjectableInterface {
             // The type is a specific type of schema.
             $schema->setID($id);
 
-            $this->eventManager->fire("{$id}Schema_init", $schema);
+            $this->eventManager->fire("{$id}Schema_init", $this, $schema);
         }
 
         // Fire a generic schema event for documentation.

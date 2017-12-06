@@ -164,7 +164,7 @@ class CommentsApiController extends AbstractApiController {
         $this->permission();
 
         $this->idParamSchema();
-        $in = $this->schema([], 'in')->setDescription('Get a comment.');
+        $in = $this->schema([], ['CommentGet', 'in'])->setDescription('Get a comment.');
         $out = $this->schema($this->commentSchema(), 'out');
 
         $query = $in->validate($query);
@@ -180,7 +180,7 @@ class CommentsApiController extends AbstractApiController {
         $result = $out->validate($comment);
 
         // Allow addons to modify the result.
-        $this->getEventManager()->fireArray('commentsApiController_get_data', [$this, &$result, $query, $comment]);
+        $result = $this->getEventManager()->fireFilter('commentsApiController_get_data', $result, $this, $in, $query, $comment);
         return $result;
     }
 
@@ -250,7 +250,7 @@ class CommentsApiController extends AbstractApiController {
             ],
             'insertUserID:i?' => 'Filter by author.',
             'expand?' => $this->getExpandDefinition(['insertUser'])
-        ], 'in')->requireOneOf(['discussionID', 'insertUserID'])->setDescription('List comments.');
+        ], ['CommentIndex', 'in'])->requireOneOf(['discussionID', 'insertUserID'])->setDescription('List comments.');
         $out = $this->schema([':a' => $this->commentSchema()], 'out');
 
         $query = $in->validate($query);
@@ -289,7 +289,7 @@ class CommentsApiController extends AbstractApiController {
         $result = $out->validate($rows);
 
         // Allow addons to modify the result.
-        $this->getEventManager()->fireArray('commentsApiController_index_data', [$this, &$result, $query, $rows]);
+        $result = $this->getEventManager()->fireFilter('commentsApiController_index_data', $result, $this, $in, $query, $rows);
         return $result;
     }
 

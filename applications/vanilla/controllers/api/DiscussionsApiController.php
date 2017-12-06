@@ -358,9 +358,12 @@ class DiscussionsApiController extends AbstractApiController {
         $query = $this->filterValues($query);
         $query = $in->validate($query);
 
-        $where = array_intersect_key($query, array_flip(['categoryID', 'insertUserID']));
-        if (array_key_exists('categoryID', $where)) {
-            $where['d.CategoryID'] = $where['categoryID'];
+        $where = [];
+        if (array_key_exists('categoryID', $query)) {
+            $where['d.CategoryID'] = $query['categoryID'];
+        }
+        if (array_key_exists('insertUserID', $query)) {
+            $where['d.InsertUserID'] = $query['insertUserID'];
         }
 
         if ($dateInserted = $this->dateFilterField('dateInserted', $query)) {
@@ -375,6 +378,9 @@ class DiscussionsApiController extends AbstractApiController {
         if (array_key_exists('categoryID', $where)) {
             $this->discussionModel->categoryPermission('Vanilla.Discussions.View', $where['categoryID']);
         }
+
+        // Allow addons to update the where clause.
+        $this->getEventManager()->fireArray('discussionsApiController_filter', [$this, $in, $query, &$where]);
 
         $pinned = array_key_exists('pinned', $query) ? $query['pinned'] : null;
         if ($pinned === true) {

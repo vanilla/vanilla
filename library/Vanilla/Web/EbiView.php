@@ -137,6 +137,7 @@ class EbiView implements ViewInterface {
         });
         $ebi->defineFunction('categoryUrl');
         $ebi->defineFunction('commentUrl');
+        $ebi->defineFunction('pluralText', [$this, 'pluralText']);
         $ebi->defineFunction('getJsonData', [$this, 'getJsonData']);
         $ebi->defineFunction('getActiveKey', [$this, 'getActiveKey']);
         $ebi->defineFunction('getData', [$this, 'getData']);
@@ -372,6 +373,24 @@ class EbiView implements ViewInterface {
             $processedData = $data['children'];
         }
         return $processedData;
+    }
+
+
+    /**
+     * Get message based on count
+     *
+     * @param int $count number used in message
+     * @param string $textEmpty message when count is 0
+     * @param string $textSingular message when count is 1
+     * @param string $textPlural message when count is 1
+     * @return string the message
+     */
+    public function pluralText($count, $textEmpty, $textSingular, $textPlural) {
+        if ($count === 0) {
+            return $textEmpty;
+        } else {
+            return plural($count, $textSingular, $textPlural, number_format($count));
+        }
     }
 
     /**

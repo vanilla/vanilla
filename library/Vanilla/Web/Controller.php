@@ -114,7 +114,7 @@ abstract class Controller implements InjectableInterface {
         if (is_array($schema)) {
             $schema = Schema::parse($schema);
         } elseif ($schema instanceof Schema) {
-            $schema = new Schema($schema->getSchemaArray());
+            $schema = clone $schema;
         }
 
         // Fire an event for schema modification.

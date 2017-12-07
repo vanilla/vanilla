@@ -289,8 +289,10 @@ class DiscussionsApiController extends AbstractApiController {
     public function get_edit($id) {
         $this->permission('Garden.SignIn.Allow');
 
-        $in = $this->idParamSchema()->setDescription('Get a discussion for editing.');
-        $out = $this->schema(Schema::parse(['discussionID', 'name', 'body', 'format', 'categoryID', 'sink', 'closed', 'pinned', 'pinLocation'])->add($this->fullSchema()), 'out');
+        $this->idParamSchema()->setDescription('Get a discussion for editing.');
+        $out = $this->schema(
+            Schema::parse(['discussionID', 'name', 'body', 'format', 'categoryID', 'sink', 'closed', 'pinned', 'pinLocation']
+        )->add($this->fullSchema()), ['DiscussionGetEdit', 'out']);
 
         $row = $this->discussionByID($id);
         $row['Url'] = discussionUrl($row);
@@ -380,7 +382,7 @@ class DiscussionsApiController extends AbstractApiController {
         }
 
         // Allow addons to update the where clause.
-        $this->getEventManager()->fireArray('discussionsApiController_filter', [$this, $in, $query, &$where]);
+        $where = $this->getEventManager()->fireFilter('discussionsApiController_index_filters', $where, $this, $in, $query);
 
         $pinned = array_key_exists('pinned', $query) ? $query['pinned'] : null;
         if ($pinned === true) {
@@ -468,8 +470,8 @@ class DiscussionsApiController extends AbstractApiController {
     public function post(array $body) {
         $this->permission('Garden.SignIn.Allow');
 
-        $in = $this->schema($this->discussionPostSchema(), 'in')->setDescription('Add a discussion.');
-        $out = $this->schema($this->discussionSchema(), 'out');
+        $in = $this->discussionPostSchema('in')->setDescription('Add a discussion.');
+        $out = $this->discussionSchema('out');
 
         $body = $in->validate($body);
         $categoryID = $body['categoryID'];

@@ -350,30 +350,42 @@ class EbiView implements ViewInterface {
      */
     public function getData($data = false, $config = false, $page = false) {
         $processedData = $data;
-        $dataSource = $data['dataSource'] ?: $config['dataSource'] ?: false;
-
+        $dataSource = array_key_exists('dataSource', $data) ? $data['dataSource'] : (array_key_exists('dataSource', $config) ? $data['dataSource'] : false);
         if ($dataSource) {
-            if ($dataSource['source'] === 'theme') {
-                $processedData = $this->getJsonData($dataSource['source']);
-                if($dataSource['field']) {
-                    $processedData = $processedData[$dataSource['field']];
-                }
-            } elseif ($dataSource['source'] === 'theme') {
-                $processedData = $page;
-            } elseif ($dataSource['source'] === 'api') {
-                $query = $dataSource['query'] ?: [];
-                $processedData = $this->ebi->call('api', $dataSource['path'], $query);
-            } elseif ($dataSource['source'] === 'page') {
-                $processedData = $page;
-                if($dataSource['field']) {
-                    $processedData = $processedData[$dataSource['field']];
-                }
+            switch ($dataSource['source']) {
+                case 'theme':
+                    $processedData = $this->getJsonData($dataSource['source']);
+                    if($dataSource['field']) {
+                        $processedData = $processedData[$dataSource['field']];
+                    }
+                    break;
+                case 'api':
+                    $query = $dataSource['query'] ?: [];
+                    $processedData = $this->ebi->call('api', $dataSource['path'], $query);
+                    break;
+                case 'page':
+                    $processedData = $page;
+                    if($dataSource['field']) {
+                        $processedData = $processedData[$dataSource['field']];
+                    }
+                    break;
+                case 'self':
+                    $processedData = $dataSource['children'];
+                    break;
+                case 'ajax':
+                    //TODO
+                    break;
+                default:
+                    die('No data source found');
             }
-        } elseif($data['children']) {
-            $processedData = $data['children'];
+        } elseif (array_key_exists('field', $data)) {
+            $processedData = $data['field'];
         }
+
         return $processedData;
     }
+
+
 
 
     /**

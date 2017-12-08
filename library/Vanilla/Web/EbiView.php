@@ -372,11 +372,6 @@ class EbiView implements ViewInterface {
                 case 'self':
                     $processedData = $dataSource['children'];
                     break;
-                case 'ajax':
-                    //TODO
-                    break;
-                default:
-                    die('No data source found');
             }
         } elseif (array_key_exists('field', $data)) {
             $processedData = $data['field'];

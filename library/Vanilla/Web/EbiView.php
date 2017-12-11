@@ -137,19 +137,24 @@ class EbiView implements ViewInterface {
         });
         $ebi->defineFunction('categoryUrl');
         $ebi->defineFunction('commentUrl');
-        $ebi->defineFunction('pluralText', [$this, 'pluralText']);
-        $ebi->defineFunction('getJsonData', [$this, 'getJsonData']);
-        $ebi->defineFunction('getActiveKey', [$this, 'getActiveKey']);
-        $ebi->defineFunction('getData', [$this, 'getData']);
         $ebi->defineFunction('discussionUrl');
+        $ebi->defineFunction('expandData', [$this, 'expandData']);
         $ebi->defineFunction('formatBigNumber', [\Gdn_Format::class, 'bigNumber']);
         $ebi->defineFunction('formatHumanDate', [\Gdn_Format::class, 'date']);
         $ebi->defineFunction('formatPlainText', [\Gdn_Format::class, 'plainText']);
         $ebi->defineFunction('formatSlug', [\Gdn_Format::class, 'url']);
         $ebi->defineFunction('generateNumberedClass', [$this, 'generateNumberedClass']);
+        $ebi->defineFunction('getJsonData', [$this, 'getJsonData']);
+        $ebi->defineFunction('getActiveKey', [$this, 'getActiveKey']);
+        $ebi->defineFunction('getData', [$this, 'getData']);
         $ebi->defineFunction('id', function ($id, $prefix = true) {
             return $this->idAttribute($id, $prefix);
         });
+        $ebi->defineFunction('jsonEncode', function ($v) {
+            jsonFilter($v);
+            return json_encode($v, JSON_PRETTY_PRINT);
+        });
+        $ebi->defineFunction('longestCharacterCount', [$this, 'longestCharacterCount']);
         $ebi->defineFunction('meta', function ($name = null, $default = null) use ($ebi) {
             if ($name) {
                 return $ebi->getMeta($name, $default);
@@ -157,13 +162,10 @@ class EbiView implements ViewInterface {
                 return $ebi->getMetaArray();
             }
         });
-        $ebi->defineFunction('jsonEncode', function ($v) {
-            jsonFilter($v);
-            return json_encode($v, JSON_PRETTY_PRINT);
-        });
-        $ebi->defineFunction('longestCharacterCount', [$this, 'longestCharacterCount']);
         $ebi->defineFunction('pagerData', [$this, 'pagerData']);
         $ebi->defineFunction('plural');
+        $ebi->defineFunction('pluralText', [$this, 'pluralText']);
+        $ebi->defineFunction('queryData', [$this, 'queryData']);
         $ebi->defineFunction('registerUrl');
         $ebi->defineFunction('signInUrl');
         $ebi->defineFunction('signOutUrl');
@@ -378,6 +380,60 @@ class EbiView implements ViewInterface {
         }
 
         return $processedData;
+    }
+
+    /**
+     * Expand data from a config source.
+     *
+     * This method returns the original data where every key that ends in **Source** will be queried with **queryData()**.
+     *
+     * @param array $data The data to expand.
+     * @return array Returns the expanded data.
+     */
+    public function expandData($data = []) {
+        $result = [];
+
+        foreach ($data as $key => $value) {
+            if (substr($key, -6) === 'Source') {
+                $result[substr($key, 0, -6)] = $this->queryData($value);
+            } else {
+                $result[$key] = $value;
+            }
+        }
+        return $result;
+    }
+
+    /**
+     * Query data for the template.
+     *
+     * Queries must define a **source** key that defines where to query the data from. Other keys specify the specific query.
+     *
+     * - **api**: Make an API call from **path** with **query**.
+     * - **json**: Get data from a JSON file with **name**.
+     * - **theme**: Get data from the theme.json file.
+     * - **self**: Get data directly embedded in the query on the **data** key.
+     *
+     * @param array $query The query.
+     */
+    public function queryData($query = []) {
+        switch ($query['source']) {
+            case 'api':
+                $query += ['path' => '', 'query' => []];
+                $result = $this->ebi->call('api', $query['path'], $query['query']);
+                break;
+            case 'json':
+            case 'theme':
+                $query += ['name' => 'theme'];
+                $result = $this->getJsonData($query['name']);
+                break;
+            case 'self':
+                $query += ['data' => []];
+                $result = $query['data'];
+                break;
+            default:
+                throw new \InvalidArgumentException("Invalid query source for queryData. ({$query['source']})", 400);
+        }
+        return $result;
     }
 
 

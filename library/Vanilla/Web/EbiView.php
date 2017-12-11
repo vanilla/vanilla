@@ -385,7 +385,7 @@ class EbiView implements ViewInterface {
     /**
      * Expand data from a config source.
      *
-     * This method returns the original data where every key that ends in **Source** will be queried with **queryData()**.
+     * This method returns the original data where every key that ends in **-source** will be queried with **queryData()**.
      *
      * @param array $data The data to expand.
      * @return array Returns the expanded data.
@@ -394,8 +394,8 @@ class EbiView implements ViewInterface {
         $result = [];
 
         foreach ($data as $key => $value) {
-            if (substr($key, -6) === 'Source') {
-                $result[substr($key, 0, -6)] = $this->queryData($value);
+            if (substr($key, -7) === '-source') {
+                $result[substr($key, 0, -7)] = $this->queryData($value);
             } else {
                 $result[$key] = $value;
             }

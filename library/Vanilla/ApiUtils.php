@@ -149,6 +149,7 @@ class ApiUtils {
 
             $filterParam = $data['x-filter'];
 
+            // processor($name, $value) => [$updatedName => $updatedValue]
             if (isset($filterParam['processor']) && is_callable($filterParam['processor'])) {
                 $filters += $filterParam['processor']($filterParam['field'], $query[$property]);
             } else {

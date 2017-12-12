@@ -16,9 +16,6 @@ use Vanilla\ApiUtils;
  */
 class DiscussionsApiController extends AbstractApiController {
 
-    /** @var DateFilterSchema */
-    private $dateFilterSchema;
-
     /** @var DiscussionModel */
     private $discussionModel;
 
@@ -39,16 +36,13 @@ class DiscussionsApiController extends AbstractApiController {
      *
      * @param DiscussionModel $discussionModel
      * @param UserModel $userModel
-     * @param DateFilterSchema $dateFilterSchema
      */
     public function __construct(
         DiscussionModel $discussionModel,
-        UserModel $userModel,
-        DateFilterSchema $dateFilterSchema
+        UserModel $userModel
     ) {
         $this->discussionModel = $discussionModel;
         $this->userModel = $userModel;
-        $this->dateFilterSchema = $dateFilterSchema;
     }
 
     /**
@@ -331,9 +325,26 @@ class DiscussionsApiController extends AbstractApiController {
         $this->permission();
 
         $in = $this->schema([
-            'categoryID:i?' => 'Filter by a category.',
-            'dateInserted?' => $this->dateFilterSchema,
-            'dateUpdated?' => $this->dateFilterSchema,
+            'categoryID:i?' => [
+                'description' => 'Filter by a category.',
+                'x-filter' => [
+                    'field' => 'd.CategoryID'
+                ],
+            ],
+            'dateInserted?' => (new DateFilterSchema([
+                'x-swaggerTypeOverride' => 'string',
+                'x-filter' => [
+                    'field' => 'd.DateInserted',
+                    'processor' => [DateFilterSchema::class, 'dateFilterField'],
+                ],
+            ]))->setDescription('When the discussion was created.'),
+            'dateUpdated?' => (new DateFilterSchema([
+                'x-swaggerTypeOverride' => 'string',
+                'x-filter' => [
+                    'field' => 'd.DateUpdated',
+                    'processor' => [DateFilterSchema::class, 'dateFilterField'],
+                ],
+            ]))->setDescription('When the discussion was updated.'),
             'pinned:b?' => 'Whether or not to include pinned discussions. If true, only return pinned discussions. Cannot be used with the pinOrder parameter.',
             'pinOrder:s?' => [
                 'default' => 'first',
@@ -352,7 +363,12 @@ class DiscussionsApiController extends AbstractApiController {
                 'minimum' => 1,
                 'maximum' => 100
             ],
-            'insertUserID:i?' => 'Filter by author.',
+            'insertUserID:i?' => [
+                'description' => 'Filter by author.',
+                'x-filter' => [
+                    'field' => 'd.InsertUserID',
+                ],
+            ],
             'expand?' => $this->getExpandDefinition(['insertUser', 'lastUser', 'lastPost'])
         ], ['DiscussionIndex', 'in'])->setDescription('List discussions.');
         $out = $this->schema([':a' => $this->discussionSchema()], 'out');
@@ -360,20 +376,7 @@ class DiscussionsApiController extends AbstractApiController {
         $query = $this->filterValues($query);
         $query = $in->validate($query);
 
-        $where = [];
-        if (array_key_exists('categoryID', $query)) {
-            $where['d.CategoryID'] = $query['categoryID'];
-        }
-        if (array_key_exists('insertUserID', $query)) {
-            $where['d.InsertUserID'] = $query['insertUserID'];
-        }
-
-        if ($dateInserted = $this->dateFilterField('dateInserted', $query)) {
-            $where += $dateInserted;
-        }
-        if ($dateUpdated = $this->dateFilterField('dateUpdated', $query)) {
-            $where += $dateUpdated;
-        }
+        $where = ApiUtils::queryToFilters($in, $query);
 
         list($offset, $limit) = offsetLimit("p{$query['page']}", $query['limit']);
 

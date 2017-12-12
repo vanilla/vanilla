@@ -21,9 +21,6 @@ class UsersApiController extends AbstractApiController {
     /** @var Gdn_Configuration */
     private $configuration;
 
-    /** @var DateFilterSchema */
-    private $dateFilterSchema;
-
     /** @var Schema */
     private $idParamSchema;
 
@@ -38,16 +35,13 @@ class UsersApiController extends AbstractApiController {
      *
      * @param UserModel $userModel
      * @param Gdn_Configuration $configuration
-     * @param DateFilterSchema $dateFilterSchema
      */
     public function __construct(
         UserModel $userModel,
-        Gdn_Configuration $configuration,
-        DateFilterSchema $dateFilterSchema
+        Gdn_Configuration $configuration
     ) {
         $this->configuration = $configuration;
         $this->userModel = $userModel;
-        $this->dateFilterSchema = $dateFilterSchema;
     }
 
     /**
@@ -173,43 +167,48 @@ class UsersApiController extends AbstractApiController {
         ]);
 
         $in = $this->schema([
-            'dateInserted?' => $this->dateFilterSchema,
-            'dateUpdated?' => $this->dateFilterSchema,
+            'dateInserted?' => (new DateFilterSchema([
+                'x-swaggerTypeOverride' => 'string',
+                'x-filter' => [
+                    'field' => 'u.DateInserted',
+                    'processor' => [DateFilterSchema::class, 'dateFilterField'],
+                ],
+            ]))->setDescription('When the user was created.'),
+            'dateUpdated?' => (new DateFilterSchema([
+                'x-swaggerTypeOverride' => 'string',
+                'x-filter' => [
+                    'field' => 'u.DateUpdated',
+                    'processor' => [DateFilterSchema::class, 'dateFilterField'],
+                ],
+            ]))->setDescription('When the user was updated.'),
             'userID:a?' => [
                 'description' => 'One or more user IDs to lookup.',
                 'items' => ['type' => 'integer'],
-                'style' => 'form'
+                'style' => 'form',
+                'x-filter' => [
+                    'field' => 'u.UserID',
+                ],
             ],
             'page:i?' => [
                 'description' => 'Page number.',
                 'default' => 1,
-                'minimum' => 1
+                'minimum' => 1,
             ],
             'limit:i?' => [
                 'description' => 'The number of items per page.',
                 'default' => 30,
                 'minimum' => 1,
-                'maximum' => 100
+                'maximum' => 100,
             ]
         ], 'in')->setDescription('List users.');
         $out = $this->schema([':a' => $this->userSchema()], 'out');
 
         $query = $in->validate($query);
+        $where = ApiUtils::queryToFilters($in, $query);
+
         list($offset, $limit) = offsetLimit("p{$query['page']}", $query['limit']);
-        $filter = [];
 
-        if (!empty($query['userID'])) {
-            $filter['UserID'] = $query['userID'];
-        }
-
-        if ($dateInserted = $this->dateFilterField('dateInserted', $query)) {
-            $filter += $dateInserted;
-        }
-        if ($dateUpdated = $this->dateFilterField('dateUpdated', $query)) {
-            $filter += $dateUpdated;
-        }
-
-        $rows = $this->userModel->search($filter, '', '', $limit, $offset)->resultArray();
+        $rows = $this->userModel->search($where, '', '', $limit, $offset)->resultArray();
         foreach ($rows as &$row) {
             $this->userModel->setCalculatedFields($row);
             $row = $this->normalizeOutput($row);

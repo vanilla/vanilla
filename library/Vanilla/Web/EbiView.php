@@ -138,6 +138,7 @@ class EbiView implements ViewInterface {
         $ebi->defineFunction('categoryUrl');
         $ebi->defineFunction('commentUrl');
         $ebi->defineFunction('discussionUrl');
+        $ebi->defineFunction('eventsMeta', [$this, 'eventsMeta']);
         $ebi->defineFunction('expandData', [$this, 'expandData']);
         $ebi->defineFunction('formatBigNumber', [\Gdn_Format::class, 'bigNumber']);
         $ebi->defineFunction('formatHumanDate', [\Gdn_Format::class, 'date']);
@@ -380,6 +381,38 @@ class EbiView implements ViewInterface {
         }
 
         return $processedData;
+    }
+
+    /**
+     * Process data from event to an array
+     *
+     * The component used to display this data is generic, so the relevant data needs to be converted to an array
+     *
+     * @param array $data The data to process.
+     * @return array Returns the expanded data.
+     */
+    public function eventsMeta($data = []) {
+        $group = $this->ebi->call('api', '/groups/' . $data['groupID']);
+
+        $result = [[
+            'name' => 'When: ',
+            'data' => $data['dateStarts'],
+            'component' => 'generic-datetime'
+        ],[
+            'name' => 'Where: ',
+            'data' => $data['location']
+        ],[
+            'name' => 'Organizer: ',
+            'data' => $data['insertUser']['name']
+        ],[
+            'name' => 'Group: ',
+            'component' => 'generic-link',
+            'data' => [
+                'name' => $group['name'],
+                'url' => $group['url']
+            ]
+        ]];
+        return $result;
     }
 
     /**

@@ -458,6 +458,11 @@ class EbiView implements ViewInterface {
             case 'theme':
                 $query += ['name' => 'theme'];
                 $result = $this->getJsonData($query['name']);
+
+                if ($query['field']) {
+                    $result = $result[$query['field']];
+                }
+
                 break;
             case 'self':
                 $query += ['data' => []];

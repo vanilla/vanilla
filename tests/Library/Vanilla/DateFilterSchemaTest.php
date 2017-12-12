@@ -16,18 +16,22 @@ class DateFilterSchemaTest extends TestCase {
     /**
      * Provide invalid date filter strings to test error conditions.
      */
-    public function provideInvalidDates() {
+    public function provideInvalidDateFilters() {
         return [
-            'empty string' => [''],
-            'bad operator' => ['x2015-07-30'],
-            'bad date' => ['2015-01-50'],
-            'null' => [null],
-            'true' => [true],
-            'false' => [false],
-            'Range: one date' => ['[2010-01-01]'],
-            'Range: year-only' => ['[2010,2011]'],
-            'Range: three elements' => ['[2010-01-01,2010-01-15,2010-01-31]'],
-            'Range: later opening' => ['[2012-01-01,2011-12-31]']
+            'empty string' => ['', 'myDate is not formatted as a valid date filter.'],
+            'bad operator' => ['<>2015-07-30', 'myDate is not a valid datetime.'],
+            'bad date' => ['2015-01-50', 'myDate is not a valid datetime.'],
+            'null' => [null, 'myDate is not a valid date filter.'],
+            'true' => [true, 'myDate is not a valid date filter.'],
+            'false' => [false, 'myDate is not a valid date filter.'],
+            'Range: one date' => ['[2010-01-01]', 'myDate date filter range must contain 2 datetime values.'],
+            'Range: year-only' => ['[2010,2011]', 'Both values in myDate must be datetime.'],
+            'Range: three elements' => ['[2010-01-01,2010-01-15,2010-01-31]', 'myDate date filter range must contain 2 datetime values.'],
+            'Range: later opening' => ['[2012-01-01,2011-12-31]', 'End of myDate range must come after beginning.'],
+            'Range: incorrect delimiter 1' => ['[2017-12-04,2017-12-06$', 'myDate is not formatted as a valid date filter.'],
+            'Range: incorrect delimiter 2' => ['[2017-12-04,2017-12-06[', 'myDate is not formatted as a valid date filter.'],
+            'Range: incorrect delimiter 3' => ['[2017-12-04,2017-12-06', 'myDate is not formatted as a valid date filter.'],
+            'Range: incorrect delimiter 4' => ['(2017-12-04,2017-12-06}', 'myDate is not formatted as a valid date filter.'],
         ];
     }
 
@@ -36,49 +40,49 @@ class DateFilterSchemaTest extends TestCase {
      *
      * @return array
      */
-    public function provideValidDates() {
+    public function provideValidDateFilters() {
         return [
             '2012-10-31' => [
                 '2012-10-31',
                 '=',
                 [
                     new DateTimeImmutable('2012-10-31 00:00:00'),
-                    new DateTimeImmutable('2012-10-31 23:59:59')
-                ]
+                    new DateTimeImmutable('2012-10-31 23:59:59'),
+                ],
             ],
             '>=2017-09-01' => [
                 '>=2017-09-01',
                 '>=',
-                new DateTimeImmutable('2017-09-01')
+                [new DateTimeImmutable('2017-09-01')],
             ],
             '<2017-07-01' => [
                 '<2017-07-01',
                 '<',
-                new DateTimeImmutable('2017-07-01')
+                [new DateTimeImmutable('2017-07-01')],
             ],
             '[2017-01-01,2017-01-31]' => [
                 '[2017-01-01,2017-01-31]',
                 '[]',
                 [
                     new DateTimeImmutable('2017-01-01 00:00:00'),
-                    new DateTimeImmutable('2017-01-31 23:59:59')
-                ]
+                    new DateTimeImmutable('2017-01-31 23:59:59'),
+                ],
             ],
             '[2017-01-01,2017-01-31)' => [
                 '[2017-01-01,2017-01-31)',
                 '[)',
                 [
                     new DateTimeImmutable('2017-01-01 00:00:00'),
-                    new DateTimeImmutable('2017-01-30 23:59:59')
-                ]
+                    new DateTimeImmutable('2017-01-30 23:59:59'),
+                ],
             ],
             '(2017-01-01,2017-01-31]' => [
                 '(2017-01-01,2017-01-31]',
                 '(]',
                 [
                     new DateTimeImmutable('2017-01-02 00:00:00'),
-                    new DateTimeImmutable('2017-01-31 23:59:59')
-                ]
+                    new DateTimeImmutable('2017-01-31 23:59:59'),
+                ],
             ]
         ];
     }
@@ -86,41 +90,39 @@ class DateFilterSchemaTest extends TestCase {
     /**
      * Test parsing valid date strings.
      *
-     * @param string $input
+     * @param string $dateFilter
      * @param string $operator
      * @param string|array $value
-     * @dataProvider provideValidDates
+     * @dataProvider provideValidDateFilters
      */
-    public function testStringParsing($input, $operator, $value) {
-        $data = ['myDate' => $input];
+    public function testStringParsing($dateFilter, $operator, $value) {
+        $data = ['myDate' => $dateFilter];
         $schema = Schema::parse([
             'myDate' => new DateFilterSchema()
         ]);
         $validated = $schema->validate($data);
 
-        $this->assertEquals($operator, $validated['myDate']['op']);
+        $this->assertEquals($operator, $validated['myDate']['operator']);
 
-        if (is_array($value)) {
-            $this->assertContainsOnlyInstancesOf('DateTimeImmutable', $validated['myDate']['value']);
-        } else {
-            $this->assertInstanceOf('DateTimeImmutable', $validated['myDate']['value']);
-        }
-        $this->assertEquals($value, $validated['myDate']['value']);
+        $this->assertContainsOnlyInstancesOf('DateTimeImmutable', $validated['myDate']['date']);
+        $this->assertEquals($value, $validated['myDate']['date']);
     }
 
     /**
      * Test parsing invalid date strings.
      *
-     * @param string $input
-     * @dataProvider provideInvalidDates
+     * @param string $dateFilter
+     * @param string $errorMessage
+     * @dataProvider provideInvalidDateFilters
      * @expectedException Garden\Schema\ValidationException
      */
-    public function testStringErrors($input) {
-        $data = ['myDate' => $input];
+    public function testStringErrors($dateFilter, $errorMessage) {
+        $data = ['myDate' => $dateFilter];
         $schema = Schema::parse([
             'myDate' => new DateFilterSchema()
         ]);
 
+        $this->expectExceptionMessage($errorMessage);
         $schema->validate($data);
     }
 }

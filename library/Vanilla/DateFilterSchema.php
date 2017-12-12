@@ -11,15 +11,12 @@ use Garden\Schema\Invalid;
 use Garden\Schema\Schema;
 use Garden\Schema\ValidationField;
 use Garden\Schema\ValidationException;
+use function Sodium\compare;
 
 /**
  * Validate and parse a date filter string into an easy-to-use array representation.
  */
 class DateFilterSchema extends Schema {
-
-    /** @var string Regular expression for matching a datetime. */
-    private $dateRegEx = '(?<date>\d{4}-\d{2}-\d{2})(?<time>[ T]\d{2}:\d{2}(:\d{2})?)?';
-
     /** @var array Valid characters for opening an interval-notation range. */
     private $rangeOpen = ['(', '['];
 
@@ -32,8 +29,25 @@ class DateFilterSchema extends Schema {
     /**
      * Initialize an instance of a new DateFilterSchema class.
      */
-    public function __construct() {
-        parent::__construct();
+    public function __construct($extra = []) {
+        parent::__construct([
+            'type' => 'object',
+            'properties' => [
+                'operator' => [
+                    'type' => 'string',
+                    'default' => '=',
+                    'enum' => array_merge($this->simpleOperators, ['[]', '[)', '(]', '()'])
+                ],
+                'date' => [
+                    'type' => 'array',
+                    'minItems' => 1,
+                    'mixItems' => 2,
+                    'items' => [
+                        'type' => 'datetime',
+                    ]
+                ],
+            ],
+        ] + $extra);
     }
 
     /**
@@ -58,54 +72,53 @@ class DateFilterSchema extends Schema {
         // This notation only allows two dates, specifically.
         $dateArray = explode(',', $dates);
         if (count($dateArray) != 2) {
-            $field->addError('invalid', ['messageCode' => '{field} must be two datetime values.']);
+            $field->addError('invalid', ['messageCode' => '{field} date filter range must contain 2 datetime values.']);
             return Invalid::value();
         }
-        array_walk($dateArray, 'trim');
 
-        if (!preg_match("/{$this->dateRegEx}/i", $dateArray[0], $beginParts) ||
-            !preg_match("/{$this->dateRegEx}/i", $dateArray[1], $endParts)
-        ) {
+        $fakeField = new ValidationField($this->createValidation(), null, null);
+        if (Invalid::isInvalid($this->validateDatetime($dateArray[0], $fakeField))
+            || Invalid::isInvalid($this->validateDatetime($dateArray[1], $fakeField))) {
             $field->addError('invalid', ['messageCode' => 'Both values in {field} must be datetime.']);
             return Invalid::value();
         }
 
         // Convert strings to datetime objects.
-        /** @var DateTimeImmutable[] $dateTimeArray */
-        $dateTimeArray = [];
+        /** @var DateTimeImmutable[] $dateTimes */
+        $dateTimes = [];
         try {
-            $dateTimeArray[0] = new DateTimeImmutable($dateArray[0]);
-            $dateTimeArray[1] = new DateTimeImmutable($dateArray[1]);
+            $dateTimes[] = new DateTimeImmutable($dateArray[0]);
+            $dateTimes[] = new DateTimeImmutable($dateArray[1]);
         } catch (\Exception $e) {
             $field->addTypeError('datetime');
             return Invalid::value();
         }
 
         // Make sure the ending date isn't greater-than or equal-to the beginning date.
-        if ($dateTimeArray[0] >= $dateTimeArray[1]) {
+        if ($dateTimes[0] >= $dateTimes[1]) {
             $field->addError('invalid', ['messageCode' => 'End of {field} range must come after beginning.']);
             return Invalid::value();
         }
 
         // Adjust the beginning of the range to account for exclusive specifications.
         if ($open == '(') {
-            if (array_key_exists('time', $beginParts)) {
-                $dateTimeArray[0] = $dateTimeArray[0]->modify('+1 second');
+            if (preg_match('/\d\d:\d\d:\d\d/', $dateArray[0])) {
+                $dateTimes[0] = $dateTimes[0]->modify('+1 second');
             } else {
-                $dateTimeArray[0] = $dateTimeArray[0]->modify('+1 day');
+                $dateTimes[0] = $dateTimes[0]->modify('+1 day');
             }
         }
 
         // Adjust the closing of the range to account for inclusive and exclusive specifications.
-        if ($close == ']' && !array_key_exists('time', $endParts)) {
-            $dateTimeArray[1] = $dateTimeArray[1]->modify('+1 day')->modify('-1 second');
+        if ($close == ']' && !preg_match('/\d\d:\d\d:\d\d/', $dateArray[1])) {
+            $dateTimes[1] = $dateTimes[1]->modify('+1 day')->modify('-1 second');
         } elseif ($close == ')') {
-            $dateTimeArray[1] = $dateTimeArray[1]->modify('-1 second');
+            $dateTimes[1] = $dateTimes[1]->modify('-1 second');
         }
 
         $result = [
-            'op' => $open.$close,
-            'value' => $dateTimeArray
+            'operator' => $open.$close,
+            'date' => $dateTimes,
         ];
         return $result;
     }
@@ -129,29 +142,28 @@ class DateFilterSchema extends Schema {
             return Invalid::value();
         }
 
-        if (!preg_match("/{$this->dateRegEx}/i", $date, $dateTimeParts)) {
-            $field->addTypeError('datetime');
+        if (Invalid::isInvalid($this->validateDatetime($date, $field))) {
             return Invalid::value();
         }
 
         try {
-            $dateTime = new DateTimeImmutable($date);
+            $dateTimes = [new DateTimeImmutable($date)];
         } catch (\Exception $e) {
             $field->addTypeError('datetime');
             return Invalid::value();
         }
 
         // If all we have is a date, give us a range in that date.
-        if ($operator == '=' && !array_key_exists('time', $dateTimeParts)) {
-            $dateTime = [
-                $dateTime,
-                $dateTime->modify('+1 day')->modify('-1 second')
+        if ($operator == '=' && !preg_match('/\d\d:\d\d:\d\d/', $date)) {
+            $dateTimes = [
+                $dateTimes[0],
+                $dateTimes[0]->modify('+1 day')->modify('-1 second'),
             ];
         }
 
         $result = [
-            'op' => $operator,
-            'value' => $dateTime
+            'operator' => $operator,
+            'date' => $dateTimes,
         ];
         return $result;
     }
@@ -160,16 +172,27 @@ class DateFilterSchema extends Schema {
      * {@inheritdoc}
      */
     public function validate($data, $sparse = false) {
-        $field = new ValidationField($this->createValidation(), $this->getSchemaArray(), '', $sparse);
+        $validation = $this->createValidation();
+        $field = new ValidationField($validation, $this->getSchemaArray(), '', $sparse);
 
-        $clean = $this->validateDateFilter($data, $field);
-
-        if (Invalid::isInvalid($clean) && $field->isValid()) {
-            // This really shouldn't happen, but we want to protect against seeing the invalid object.
-            $field->addError('invalid', ['messageCode' => '{field} is invalid.', 'status' => 422]);
+        if (is_string($data)) {
+            $data = $this->stringToSchema($data, $field);
         }
 
-        if (!$field->getValidation()->isValid()) {
+        if (Invalid::isValid($data)) {
+            if (is_array($data)) {
+                $clean = $this->validateField($data, $field, $sparse);
+
+                if (Invalid::isInvalid($clean) && $field->isValid()) {
+                    // This really shouldn't happen, but we want to protect against seeing the invalid object.
+                    $field->addError('invalid', ['messageCode' => '{field} is invalid.', 'status' => 422]);
+                }
+            } else {
+            $field->addError('invalid', ['messageCode' => '{field} is not a valid date filter.']);
+            }
+        }
+
+        if (!$validation->isValid()) {
             throw new ValidationException($field->getValidation());
         }
 
@@ -181,26 +204,89 @@ class DateFilterSchema extends Schema {
      *
      * @param mixed $value The value to validate.
      * @param ValidationField $field The validation results to add.
-     * @return string|Invalid Returns the valid string or **null** if validation fails.
+     * @return string|false Returns the valid string or **null** if validation fails.
      */
-    private function validateDateFilter($value, ValidationField $field) {
+    private function stringToSchema($value, ValidationField $field) {
         $result = Invalid::value();
 
-        if (is_string($value)) {
-            $first = substr($value, 0, 1);
-            if (in_array($first, $this->rangeOpen)) {
-                $last = substr($value, -1, 1);
-                if (in_array($last, $this->rangeClose) && strlen($value) > 2) {
-                    $dates = substr($value, 1, -1);
-                    $result = $this->parseRange($dates, $first, $last, $field);
-                }
-            } elseif (preg_match('/^(?<op><=|>=|>|<|)?\s*(?<value>'.$this->dateRegEx.')/i', $value, $match)) {
-                $result = $this->parseSimple($match['value'], $match['op'], $field);
-            } else {
-                $field->addError('invalid', ['messageCode' => '{field} is not formatted as a valid date filter.']);
+        $escapedOpen = '['.implode('', array_map('preg_quote', $this->rangeOpen)).']';
+        $escapedClose = '['.implode('', array_map('preg_quote', $this->rangeClose)).']';
+
+        // Sort the operators so that the matches occur on the longest operators first.
+        $sortedSimpleOperators = $this->simpleOperators;
+        usort($sortedSimpleOperators, function($a, $b) {
+            if (strlen($a) > strlen($b)) {
+                return -1;
+            } else if (strlen($a) < strlen($b)) {
+                return 1;
             }
+            return 0;
+        });
+        $simpleOperators = '(?<op>'.implode('|', array_map('preg_quote', $sortedSimpleOperators)).'|)';
+
+        if (preg_match('/^(?<open>'.$escapedOpen.')(?<date>.+?)(?<close>'.$escapedClose.')$/', $value, $matches)) {
+            $result = $this->parseRange($matches['date'], $matches['open'], $matches['close'], $field);
+        } elseif (preg_match("/^(?!$escapedOpen)$simpleOperators?(?<date>.+)/", $value, $matches)) {
+            $result = $this->parseSimple($matches['date'], $matches['op'], $field);
         } else {
-            $field->addTypeError('string');
+            $field->addError('invalid', ['messageCode' => '{field} is not formatted as a valid date filter.']);
+        }
+
+        return $result;
+    }
+
+    /**
+     * If the parameter value is a valid date filter value, return an array of query conditions.
+     *
+     * @param string $field The name of the field in the filters.
+     * @param mixed $dateData The decoded date data.
+     * @return array
+     */
+    public static function dateFilterField($field, array $dateData) {
+        $validOperators = ['=', '>', '<', '>=', '<=', '[]', '()', '[)', '(]'];
+        $result = [];
+
+        if (array_key_exists('operator', $dateData) && array_key_exists('date', $dateData) && is_array($dateData['date'])) {
+            $op = $dateData['operator'];
+            $dates = $dateData['date'];
+
+            if (in_array($op, $validOperators)) {
+                switch ($op) {
+                    case '>':
+                    case '<':
+                    case '>=':
+                    case '<=':
+                        if ($dates[0] instanceof DateTimeImmutable) {
+                            $result = ["{$field} {$op}" => $dates];
+                        }
+                        break;
+                    case '[]':
+                    case '()':
+                    case '[)':
+                    case '(]':
+                        $operators = [
+                            substr($op, 0, 1) === '[' ? '>=' : '>',
+                            substr($op, 1, 1) === ']' ? '<=' : '<',
+                        ];
+                        // DateFilterSchema has already taken care of any inclusive/exclusive range adjustments.
+
+                        $result = [
+                            "{$field} $operators[0]" => $dates[0],
+                            "{$field} $operators[1]" => $dates[1],
+                        ];
+                        break;
+                    case '=':
+                        if (count($dates) === 1) {
+                            $result = ["{$field}" => $dates[0]];
+                        } else {
+                            $result = [
+                            "{$field} >=" => $dates[0],
+                            "{$field} <=" => $dates[1],
+                        ];
+                        }
+                        break;
+                }
+            }
         }
 
         return $result;

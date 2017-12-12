@@ -109,7 +109,7 @@ class ApiUtils {
      * @param Schema $schema The query string schema.
      * @return string Returns a URL with a %s placeholder for page number.
      */
-    protected static function pagerUrlFormat($url, array $query, Schema $schema) {
+    private static function pagerUrlFormat($url, array $query, Schema $schema) {
         $properties = $schema->getField('properties', []);
 
         // Loop through the query and add its parameters to the URL.
@@ -127,5 +127,36 @@ class ApiUtils {
             $url = (strpos($url, '?') === false ? '?' : '&').$argsStr;
         }
         return $url;
+    }
+
+    /**
+     * Convert query parameters to filters. Useful to fill a where clause ;)
+     *
+     * @param Schema $schema
+     * @param array $query
+     * @return array
+     */
+    public static function queryToFilters(Schema $schema, array $query) {
+        $filters = [];
+        if (empty($schema['properties'])) {
+            return $filters;
+        }
+
+        foreach ($schema['properties'] as $property => $data) {
+            if (!isset($data['x-filter']) || !array_key_exists($property, $query) || !isset($data['x-filter']['field'])) {
+                continue;
+            }
+
+            $filterParam = $data['x-filter'];
+
+            if (isset($filterParam['processor']) && is_callable($filterParam['processor'])) {
+                $filters += $filterParam['processor']($filterParam['field'], $query[$property]);
+            } else {
+                $filters += [$filterParam['field'] => $query[$property]];
+            }
+
+        }
+
+        return $filters;
     }
 }

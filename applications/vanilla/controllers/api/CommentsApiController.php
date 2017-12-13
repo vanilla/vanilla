@@ -275,7 +275,7 @@ class CommentsApiController extends AbstractApiController {
         $out = $this->schema([':a' => $this->commentSchema()], 'out');
 
         $query = $in->validate($query);
-        $where = ApiUtils::queryToFilters($query);
+        $where = ApiUtils::queryToFilters($in, $query);
 
         list($offset, $limit) = offsetLimit("p{$query['page']}", $query['limit']);
 

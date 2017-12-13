@@ -332,14 +332,12 @@ class DiscussionsApiController extends AbstractApiController {
                 ],
             ],
             'dateInserted?' => (new DateFilterSchema([
-                'x-swaggerTypeOverride' => 'string',
                 'x-filter' => [
                     'field' => 'd.DateInserted',
                     'processor' => [DateFilterSchema::class, 'dateFilterField'],
                 ],
             ]))->setDescription('When the discussion was created.'),
             'dateUpdated?' => (new DateFilterSchema([
-                'x-swaggerTypeOverride' => 'string',
                 'x-filter' => [
                     'field' => 'd.DateUpdated',
                     'processor' => [DateFilterSchema::class, 'dateFilterField'],

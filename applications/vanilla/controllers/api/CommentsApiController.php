@@ -228,14 +228,12 @@ class CommentsApiController extends AbstractApiController {
 
         $in = $this->schema([
             'dateInserted?' => (new DateFilterSchema([
-                'x-swaggerTypeOverride' => 'string',
                 'x-filter' => [
                     'field' => 'c.DateInserted',
                     'processor' => [DateFilterSchema::class, 'dateFilterField'],
                 ],
             ]))->setDescription('When the comment was created.'),
             'dateUpdated?' => (new DateFilterSchema([
-                'x-swaggerTypeOverride' => 'string',
                 'x-filter' => [
                     'field' => 'c.DateUpdated',
                     'processor' => [DateFilterSchema::class, 'dateFilterField'],

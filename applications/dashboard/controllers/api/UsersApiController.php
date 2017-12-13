@@ -168,14 +168,12 @@ class UsersApiController extends AbstractApiController {
 
         $in = $this->schema([
             'dateInserted?' => (new DateFilterSchema([
-                'x-swaggerTypeOverride' => 'string',
                 'x-filter' => [
                     'field' => 'u.DateInserted',
                     'processor' => [DateFilterSchema::class, 'dateFilterField'],
                 ],
             ]))->setDescription('When the user was created.'),
             'dateUpdated?' => (new DateFilterSchema([
-                'x-swaggerTypeOverride' => 'string',
                 'x-filter' => [
                     'field' => 'u.DateUpdated',
                     'processor' => [DateFilterSchema::class, 'dateFilterField'],

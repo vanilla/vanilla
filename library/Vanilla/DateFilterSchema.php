@@ -11,12 +11,20 @@ use Garden\Schema\Invalid;
 use Garden\Schema\Schema;
 use Garden\Schema\ValidationField;
 use Garden\Schema\ValidationException;
+use Garden\Web\Exception\ServerException;
 use function Sodium\compare;
 
 /**
  * Validate and parse a date filter string into an easy-to-use array representation.
  */
 class DateFilterSchema extends Schema {
+
+    const DEFAULT_DESCRIPTION = "This filter receive a string that can take two forms."
+        ."\nA single date that matches '{Operator}{DateTime}' where {Operator} can be [=,>,<,>=,<=] (If omitted operator defaults to =)."
+        ."\nA date range that matches '{Opening}{DateTime},{DateTime}{Closing}' where {Opening} can be '[' or '(' and"
+        ." {Closing} can be ']' or ')'. '[]' are inclusive and '()' are exclusive."
+    ;
+
     /** @var array Valid characters for opening an interval-notation range. */
     private $rangeOpen = ['(', '['];
 
@@ -30,7 +38,11 @@ class DateFilterSchema extends Schema {
      * Initialize an instance of a new DateFilterSchema class.
      */
     public function __construct($extra = []) {
-        parent::__construct([
+        if (isset($extra['description'])) {
+            $extra['description'] .= "\n".self::DEFAULT_DESCRIPTION;
+        }
+
+        parent::__construct($extra + [
             'type' => 'object',
             'properties' => [
                 'operator' => [
@@ -47,7 +59,7 @@ class DateFilterSchema extends Schema {
                     ]
                 ],
             ],
-        ] + $extra);
+        ]);
     }
 
     /**
@@ -238,6 +250,7 @@ class DateFilterSchema extends Schema {
     /**
      * If the parameter value is a valid date filter value, return an array of query conditions.
      *
+     * @throws ServerException
      * @param string $field The name of the field in the filters.
      * @param mixed $dateData The decoded date data.
      * @return array
@@ -257,22 +270,18 @@ class DateFilterSchema extends Schema {
                     case '>=':
                     case '<=':
                         if ($dates[0] instanceof DateTimeImmutable) {
-                            $result = ["{$field} {$op}" => $dates];
+                            $result = ["{$field} {$op}" => $dates[0]];
                         }
                         break;
                     case '[]':
                     case '()':
                     case '[)':
                     case '(]':
-                        $operators = [
-                            substr($op, 0, 1) === '[' ? '>=' : '>',
-                            substr($op, 1, 1) === ']' ? '<=' : '<',
-                        ];
-                        // DateFilterSchema has already taken care of any inclusive/exclusive range adjustments.
-
+                        // DateFilterSchema has already taken care of any inclusive/exclusive range adjustments
+                        // so we can always use >= and <=
                         $result = [
-                            "{$field} $operators[0]" => $dates[0],
-                            "{$field} $operators[1]" => $dates[1],
+                            "{$field} >=" => $dates[0],
+                            "{$field} <=" => $dates[1],
                         ];
                         break;
                     case '=':
@@ -280,13 +289,15 @@ class DateFilterSchema extends Schema {
                             $result = ["{$field}" => $dates[0]];
                         } else {
                             $result = [
-                            "{$field} >=" => $dates[0],
-                            "{$field} <=" => $dates[1],
-                        ];
+                                "{$field} >=" => $dates[0],
+                                "{$field} <=" => $dates[1],
+                            ];
                         }
                         break;
                 }
             }
+        } else {
+            throw new Exception('Invalid data supplied to DateFilterSchema');
         }
 
         return $result;

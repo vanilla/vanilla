@@ -331,18 +331,20 @@ class DiscussionsApiController extends AbstractApiController {
                     'field' => 'd.CategoryID'
                 ],
             ],
-            'dateInserted?' => (new DateFilterSchema([
+            'dateInserted?' => new DateFilterSchema([
+                'description' => 'When the discussion was created.',
                 'x-filter' => [
                     'field' => 'd.DateInserted',
                     'processor' => [DateFilterSchema::class, 'dateFilterField'],
                 ],
-            ]))->setDescription('When the discussion was created.'),
-            'dateUpdated?' => (new DateFilterSchema([
+            ]),
+            'dateUpdated?' => new DateFilterSchema([
+                'description' => 'When the discussion was updated.',
                 'x-filter' => [
                     'field' => 'd.DateUpdated',
                     'processor' => [DateFilterSchema::class, 'dateFilterField'],
                 ],
-            ]))->setDescription('When the discussion was updated.'),
+            ]),
             'pinned:b?' => 'Whether or not to include pinned discussions. If true, only return pinned discussions. Cannot be used with the pinOrder parameter.',
             'pinOrder:s?' => [
                 'default' => 'first',

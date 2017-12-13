@@ -167,18 +167,20 @@ class UsersApiController extends AbstractApiController {
         ]);
 
         $in = $this->schema([
-            'dateInserted?' => (new DateFilterSchema([
+            'dateInserted?' => new DateFilterSchema([
+                'description' => 'When the user was created.',
                 'x-filter' => [
                     'field' => 'u.DateInserted',
                     'processor' => [DateFilterSchema::class, 'dateFilterField'],
                 ],
-            ]))->setDescription('When the user was created.'),
-            'dateUpdated?' => (new DateFilterSchema([
+            ]),
+            'dateUpdated?' => new DateFilterSchema([
+                'description' => 'When the user was updated.',
                 'x-filter' => [
                     'field' => 'u.DateUpdated',
                     'processor' => [DateFilterSchema::class, 'dateFilterField'],
                 ],
-            ]))->setDescription('When the user was updated.'),
+            ]),
             'userID:a?' => [
                 'description' => 'One or more user IDs to lookup.',
                 'items' => ['type' => 'integer'],

@@ -227,18 +227,20 @@ class CommentsApiController extends AbstractApiController {
         $this->permission();
 
         $in = $this->schema([
-            'dateInserted?' => (new DateFilterSchema([
+            'dateInserted?' => new DateFilterSchema([
+                'description' => 'When the comment was created.',
                 'x-filter' => [
                     'field' => 'c.DateInserted',
                     'processor' => [DateFilterSchema::class, 'dateFilterField'],
                 ],
-            ]))->setDescription('When the comment was created.'),
-            'dateUpdated?' => (new DateFilterSchema([
+            ]),
+            'dateUpdated?' => new DateFilterSchema([
+                'description' => 'When the comment was updated.',
                 'x-filter' => [
                     'field' => 'c.DateUpdated',
                     'processor' => [DateFilterSchema::class, 'dateFilterField'],
                 ],
-            ]))->setDescription('When the comment was updated.'),
+            ]),
             'discussionID:i?' => [
                 'description' => 'The discussion ID.',
                 'x-filter' => [

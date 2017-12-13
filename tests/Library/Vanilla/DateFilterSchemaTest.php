@@ -42,6 +42,13 @@ class DateFilterSchemaTest extends TestCase {
      */
     public function provideValidDateFilters() {
         return [
+             '2012-10-31 00:01:01' => [
+                '2012-10-31 00:01:01',
+                '=',
+                [
+                    new DateTimeImmutable('2012-10-31 00:01:01'),
+                ],
+            ],
             '2012-10-31' => [
                 '2012-10-31',
                 '=',

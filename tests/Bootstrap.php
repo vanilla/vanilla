@@ -7,6 +7,7 @@
 
 namespace VanillaTests;
 
+use Ebi\Ebi;
 use Garden\Container\Container;
 use Garden\Container\Reference;
 use Garden\Web\RequestInterface;
@@ -193,6 +194,14 @@ class Bootstrap {
             ->rule(\Gdn_Plugin::class)
             ->setShared(true)
             ->addCall('setAddonFromManager')
+
+            ->rule(Ebi::class)
+            ->setConstructorArgs(['cachePath' => PATH_CACHE.'/ebi'])
+            ->setShared(true)
+
+            ->rule(\Ebi\TemplateLoaderInterface::class)
+            ->setClass(\Vanilla\EbiTemplateLoader::class)
+            ->setShared(true)
         ;
     }
 

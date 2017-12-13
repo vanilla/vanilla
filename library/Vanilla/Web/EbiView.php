@@ -155,6 +155,7 @@ class EbiView implements ViewInterface {
             return json_encode($v, JSON_PRETTY_PRINT);
         });
         $ebi->defineFunction('longestCharacterCount', [$this, 'longestCharacterCount']);
+        $ebi->defineFunction('normalizeCategoryTree', [$this, 'normalizeCategoryTree']);
         $ebi->defineFunction('meta', function ($name = null, $default = null) use ($ebi) {
             if ($name) {
                 return $ebi->getMeta($name, $default);
@@ -346,11 +347,11 @@ class EbiView implements ViewInterface {
     /**
      * Get data for component
      *
-     * @param mixed $data
+     * @param array $data
      * @param mixed $data
      * @return mixed The data
      */
-    public function getData($data = false, $config = false, $page = false) {
+    public function getData($data = [], $config = false, $page = false) {
         $processedData = $data;
         $dataSource = array_key_exists('dataSource', $data) ? $data['dataSource'] : (array_key_exists('dataSource', $config) ? $data['dataSource'] : false);
         if ($dataSource) {
@@ -725,6 +726,34 @@ class EbiView implements ViewInterface {
                 $src = $match[1];
                 return $src;
             }
+        }
+
+        return $result;
+    }
+
+    /**
+     * Normalize a category tree so that the first level of the tree is always headings or empty headings and group non-heading categories together.
+     *
+     * @param array $categories The categories to group.
+     * @return array Returns an array of category headings and children.
+     */
+    public function normalizeCategoryTree($categories) {
+        $result = [];
+
+        $lastHeading = ['children' => []];
+        foreach ($categories as $category) {
+            if (!empty($category['displayAs']) && $category['displayAs'] === 'heading') {
+                if (!empty($lastHeading['children'])) {
+                    $result[] = $lastHeading;
+                    $lastHeading = ['children' => []];
+                }
+                $result[] = $category;
+            } else {
+                $lastHeading['children'][] = $category;
+            }
+        }
+        if (!empty($lastHeading['children'])) {
+            $result[] = $lastHeading;
         }
 
         return $result;

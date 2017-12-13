@@ -36,10 +36,15 @@ class DateFilterSchema extends Schema {
 
     /**
      * Initialize an instance of a new DateFilterSchema class.
+     *
+     * @param array $extra Additional fields to set on the schema.
      */
     public function __construct($extra = []) {
+        // Use $schema->setDescription() to get rid of the default description.
         if (isset($extra['description'])) {
             $extra['description'] .= "\n".self::DEFAULT_DESCRIPTION;
+        } else {
+            $extra['description'] = self::DEFAULT_DESCRIPTION;
         }
 
         parent::__construct($extra + [
@@ -143,7 +148,7 @@ class DateFilterSchema extends Schema {
      * @param ValidationField $field
      * @return array|string
      */
-    public function parseSimple($date, $operator, ValidationField $field) {
+    private function parseSimple($date, $operator, ValidationField $field) {
         if ($operator == '') {
             $operator = '=';
         }

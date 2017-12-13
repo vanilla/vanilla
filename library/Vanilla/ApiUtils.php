@@ -132,6 +132,7 @@ class ApiUtils {
     /**
      * Convert query parameters to filters. Useful to fill a where clause ;)
      *
+     * @throws \Exception If something goes wrong.
      * @param Schema $schema
      * @param array $query
      * @return array
@@ -150,7 +151,10 @@ class ApiUtils {
             $filterParam = $data['x-filter'];
 
             // processor($name, $value) => [$updatedName => $updatedValue]
-            if (isset($filterParam['processor']) && is_callable($filterParam['processor'])) {
+            if (isset($filterParam['processor'])) {
+                if (!is_callable($filterParam['processor'])) {
+                    throw new \Exception('Field processor is not a callable');
+                }
                 $filters += $filterParam['processor']($filterParam['field'], $query[$property]);
             } else {
                 $filters += [$filterParam['field'] => $query[$property]];

@@ -12,9 +12,9 @@ use PHPUnit\Framework\TestCase;
 use Vanilla\ApiUtils;
 
 /**
- * Class DateFilterSchemaTest
+ * Class ApiUtilsTest
  */
-class DateFilterSchemaTest extends TestCase {
+class ApiUtilsTest extends TestCase {
 
     /**
      * @param Schema $schema

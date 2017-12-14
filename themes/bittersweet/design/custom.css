@@ -38,6 +38,10 @@ a:hover {
     background: #333;
 }
 
+.TopMenu li {
+    display: inline;
+}
+
 .Banner {
     position: relative;
     min-height: 98px;

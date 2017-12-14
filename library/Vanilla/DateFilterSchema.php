@@ -237,7 +237,7 @@ class DateFilterSchema extends Schema {
 
         if (preg_match('/^(?<open>'.$escapedOpen.')(?<date>.+?)(?<close>'.$escapedClose.')$/', $value, $matches)) {
             $result = $this->parseRange($matches['date'], $matches['open'], $matches['close'], $field);
-        } elseif (preg_match("/^(?!$escapedOpen)$simpleOperators?(?<date>.+)/", $value, $matches)) {
+        } elseif (preg_match("/^(?!$escapedOpen)$simpleOperators(?<date>.+)/", $value, $matches)) {
             $result = $this->parseSimple($matches['date'], $matches['op'], $field);
         } else {
             $field->addError('invalid', ['messageCode' => '{field} is not formatted as a valid date filter.']);

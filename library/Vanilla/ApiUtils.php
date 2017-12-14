@@ -128,4 +128,17 @@ class ApiUtils {
         }
         return $url;
     }
+
+    /**
+     * Get the page number from a page URL parameter (p*).
+     *
+     * @param string $pageUrlParam The page URL parameter.
+     * @return int Returns the page number.
+     */
+    public static function pageNumber($pageUrlParam) {
+        if (preg_match('`^p(\d+)$`', $pageUrlParam, $m)) {
+            return (int)$m[1];
+        }
+        return 1;
+    }
 }

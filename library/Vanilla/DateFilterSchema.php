@@ -20,7 +20,7 @@ use function Sodium\compare;
 class DateFilterSchema extends Schema {
 
     const DEFAULT_DESCRIPTION = "This filter receive a string that can take two forms."
-        ."\nA single date that matches '{Operator}{DateTime}' where {Operator} can be =, <, >, <=, >=  and, if omitted, defaults to =."
+        ."\nA single date that matches '{Operator}{DateTime}' where {Operator} can be =, &lt;, &gt;, &lt;=, &gt;=  and, if omitted, defaults to =."
         ."\nA date range that matches '{Opening}{DateTime},{DateTime}{Closing}' where {Opening} can be '[' or '(' and"
         ." {Closing} can be ']' or ')'. '[]' are inclusive and '()' are exclusive."
     ;

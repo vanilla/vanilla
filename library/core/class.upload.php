@@ -83,6 +83,7 @@ class Gdn_Upload extends Gdn_Pluggable {
     public function clear() {
         $this->_MaxFileSize = self::unformatFileSize(Gdn::config('Garden.Upload.MaxFileSize', ''));
         $this->_AllowedFileExtensions = Gdn::config('Garden.Upload.AllowedFileExtensions', []);
+        $this->_UploadedFile = null;
     }
 
     /**
@@ -303,7 +304,7 @@ class Gdn_Upload extends Gdn_Pluggable {
      * @return array|bool
      * @throws Exception
      */
-    public function saveAs($source, $target, $options = []) {
+    public function saveAs($source, $target, $options = [], $copy = false) {
         $this->EventArguments['Path'] = $source;
         $parsed = self::parse($target);
         $this->EventArguments['Parsed'] =& $parsed;
@@ -322,9 +323,14 @@ class Gdn_Upload extends Gdn_Pluggable {
 
             if (stringBeginsWith($source, PATH_UPLOADS)) {
                 rename($source, $target);
-            } elseif (!move_uploaded_file($source, $target))
-                throw new Exception(sprintf(t('Failed to move uploaded file to target destination (%s).'), $target));
+            } else {
+                $result = ($copy && is_uploaded_file($source)) ? copy($source, $target) : move_uploaded_file($source, $target);
+                if (!$result) {
+                    throw new Exception(sprintf(t('Failed to save uploaded file to target destination (%s).'), $target));
+                }
+            }
         }
+
         return $parsed;
     }
 

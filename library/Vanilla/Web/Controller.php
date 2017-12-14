@@ -11,13 +11,14 @@ use Garden\EventManager;
 use Garden\Schema\Schema;
 use Garden\Schema\Validation;
 use Garden\Schema\ValidationException;
-use Garden\Web\Exception\ForbiddenException;
 use Garden\Web\Exception\HttpException;
 use Gdn_Session as SessionInterface;
 use Gdn_Locale as LocaleInterface;
+use Gdn_Upload as Upload;
 use Gdn_Validation as DataValidation;
 use Vanilla\Exception\PermissionException;
 use Vanilla\InjectableInterface;
+use Vanilla\UploadedFile;
 use Vanilla\Utility\CamelCaseScheme;
 
 /**
@@ -39,6 +40,9 @@ abstract class Controller implements InjectableInterface {
      */
     private $locale;
 
+    /** @var Upload */
+    private $upload;
+
     /**
      * Set the base dependencies of the controller.
      *
@@ -48,11 +52,18 @@ abstract class Controller implements InjectableInterface {
      * @param SessionInterface|null $session The session of the current user.
      * @param EventManager|null $eventManager The event manager dependency.
      * @param LocaleInterface|null $local The current locale for translations.
+     * @param Upload $upload File upload handler.
      */
-    public function setDependencies(SessionInterface $session = null, EventManager $eventManager = null, LocaleInterface $local = null) {
+    public function setDependencies(
+        SessionInterface $session = null,
+        EventManager $eventManager = null,
+        LocaleInterface $local = null,
+        Upload $upload
+    ) {
         $this->session = $session;
         $this->eventManager = $eventManager;
         $this->locale = $local;
+        $this->upload = $upload;
     }
 
     /**
@@ -191,6 +202,51 @@ abstract class Controller implements InjectableInterface {
     public function setLocale($locale) {
         $this->locale = $locale;
         return $this;
+    }
+
+    /**
+     * Generate a valid upload path, relative to the uploads directory.
+     *
+     * @param string $ext The file's extension.
+     * @param bool $chunk Include an additional random subdirectory?
+     * @return string
+     */
+    public function generateUploadPath($ext, $chunk = false) {
+        $path = $this->upload->generateTargetName(PATH_UPLOADS, $ext, $chunk);
+        $result = stringBeginsWith($path, PATH_UPLOADS.'/', false, true);
+        return $result;
+    }
+
+    /**
+     * @param UploadedFile $upload
+     * @param string $destination
+     * @param string $nameFormat
+     * @param bool $copy
+     * @throws \Exception if failed to save the upload.
+     * @returns array|bool
+     */
+    public function saveUpload(UploadedFile $upload, $destination, $nameFormat = '%s', $copy = false) {
+        $destination = $result = stringBeginsWith($destination, PATH_UPLOADS.'/', false, true);
+        $ext = pathinfo($destination, PATHINFO_EXTENSION);
+        $baseName = basename($destination, ".{$ext}");
+        $dirName = dirname($destination);
+
+        $target = sprintf($nameFormat, $baseName);
+        if (!empty($ext)) {
+            $target .= ".{$ext}";
+        }
+        if (!empty($dirName)) {
+            $target = "{$dirName}/{$target}";
+        }
+        $target = PATH_UPLOADS."/{$target}";
+
+        $result = $this->upload->saveAs(
+            $upload->getFile(),
+            $target,
+            [],
+            $copy
+        );
+        return $result;
     }
 
     /**

@@ -12,7 +12,6 @@ use Garden\Schema\Schema;
 use Garden\Schema\ValidationField;
 use Garden\Schema\ValidationException;
 use Garden\Web\Exception\ServerException;
-use function Sodium\compare;
 
 /**
  * Validate and parse a date filter string into an easy-to-use array representation.
@@ -47,7 +46,7 @@ class DateFilterSchema extends Schema {
             $extra['description'] = self::DEFAULT_DESCRIPTION;
         }
 
-        parent::__construct($extra + [
+        parent::__construct([
             'type' => 'object',
             'properties' => [
                 'operator' => [
@@ -64,7 +63,7 @@ class DateFilterSchema extends Schema {
                     ]
                 ],
             ],
-        ]);
+        ] + $extra);
     }
 
     /**
@@ -94,20 +93,15 @@ class DateFilterSchema extends Schema {
         }
 
         $fakeField = new ValidationField($this->createValidation(), null, null);
-        if (Invalid::isInvalid($this->validateDatetime($dateArray[0], $fakeField))
-            || Invalid::isInvalid($this->validateDatetime($dateArray[1], $fakeField))) {
-            $field->addError('invalid', ['messageCode' => 'Both values in {field} must be datetime.']);
-            return Invalid::value();
-        }
 
         // Convert strings to datetime objects.
         /** @var DateTimeImmutable[] $dateTimes */
         $dateTimes = [];
-        try {
-            $dateTimes[] = new DateTimeImmutable($dateArray[0]);
-            $dateTimes[] = new DateTimeImmutable($dateArray[1]);
-        } catch (\Exception $e) {
-            $field->addTypeError('datetime');
+        $dateTimes[] = $this->validateDatetime($dateArray[0], $fakeField);
+        $dateTimes[] = $this->validateDatetime($dateArray[1], $fakeField);
+
+        if (Invalid::isInvalid($dateTimes[0]) || Invalid::isInvalid($dateTimes[1])) {
+            $field->addError('invalid', ['messageCode' => 'Both values in {field} must be datetime.']);
             return Invalid::value();
         }
 
@@ -205,7 +199,7 @@ class DateFilterSchema extends Schema {
                     $field->addError('invalid', ['messageCode' => '{field} is invalid.', 'status' => 422]);
                 }
             } else {
-            $field->addError('invalid', ['messageCode' => '{field} is not a valid date filter.']);
+                $field->addError('invalid', ['messageCode' => '{field} is not a valid date filter.']);
             }
         }
 
@@ -255,7 +249,7 @@ class DateFilterSchema extends Schema {
     /**
      * If the parameter value is a valid date filter value, return an array of query conditions.
      *
-     * @throws ServerException
+     * @throws Exception
      * @param string $field The name of the field in the filters.
      * @param mixed $dateData The decoded date data.
      * @return array
@@ -302,7 +296,7 @@ class DateFilterSchema extends Schema {
                 }
             }
         } else {
-            throw new Exception('Invalid data supplied to DateFilterSchema');
+            throw new Exception('Invalid data supplied to dateFilterField');
         }
 
         return $result;

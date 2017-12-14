@@ -132,7 +132,7 @@ class ApiUtils {
     /**
      * Convert query parameters to filters. Useful to fill a where clause ;)
      *
-     * @throws \Exception If something goes wrong.
+     * @throws \Exception If something goes wrong. Example, the field processor is not callable.
      * @param Schema $schema
      * @param array $query
      * @return array

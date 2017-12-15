@@ -267,26 +267,24 @@ class EbiView implements ViewInterface {
         $pageCount = $paging['pageCount'];
         $hasMore = $page && $paging['more'] && (!$pageCount || $page < $pageCount);
         $urlFormat = $paging['urlFormat'];
-        $result = [];
         if ($page) {
-            $result['page'] = $page;
+            $paging['page'] = $page;
         }
 
         if ($page > 1) {
-            $result['previous'] = [
+            $paging['previous'] = [
                 'type' => 'previous',
                 'url' => sprintf($urlFormat, $page - 1)
             ];
         }
         if ($hasMore) {
-            $result['next'] = [
+            $paging['next'] = [
                 'type' => 'next',
                 'url' => sprintf($urlFormat, $page + 1)
             ];
         }
 
         if ($pageCount) {
-            $result['pageCount'] = $pageCount;
             if ($pageCount <= $maxPages) {
                 $groups = [[1, $pageCount]];
             } else {
@@ -321,9 +319,9 @@ class EbiView implements ViewInterface {
                     $last = $i;
                 }
             }
-            $result['pages'] = $pages;
+            $paging['pages'] = $pages;
         }
-        return $result;
+        return $paging;
     }
 
 
@@ -359,7 +357,7 @@ class EbiView implements ViewInterface {
             switch ($dataSource['source']) {
                 case 'theme':
                     $processedData = $this->getJsonData($dataSource['source']);
-                    if($dataSource['field']) {
+                    if ($dataSource['field']) {
                         $processedData = $processedData[$dataSource['field']];
                     }
                     break;
@@ -369,7 +367,7 @@ class EbiView implements ViewInterface {
                     break;
                 case 'page':
                     $processedData = $page;
-                    if($dataSource['field']) {
+                    if ($dataSource['field']) {
                         $processedData = $processedData[$dataSource['field']];
                     }
                     break;

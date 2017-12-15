@@ -467,6 +467,7 @@ class CommentModel extends Gdn_Model {
 
         $result = $this->getWhere($where, 'CommentID', $order, $limit, $offset);
         $data =& $result->result();
+        $result->hasMore = $result->count() >= $limit;
 
         // Filter out any comments this user does not have access to.
         if ($permissionFilter && $perms !== true) {

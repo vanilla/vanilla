@@ -31,12 +31,23 @@ class DiscussionPageController extends Controller {
     }
 
     public function get($id, $slug = '', $page = '') {
-        $discussion = $this->discussionsApi->get($id, []);
+        $discussion = $this->discussionsApi->get($id, ['expand' => true]);
 
         $query = ['discussionID' => $discussion['discussionID'], 'page' => ApiUtils::pageNumber($page), 'expand' => true];
         $comments = $this->commentsApi->index($query);
 
-        $result = new Data(['discussion' => $discussion, 'comments' => $comments]);
+        $result = new Data(
+            ['discussion' => $discussion, 'comments' => $comments],
+            ['paging' => [
+                    'urlFormat' => discussionUrl([
+                        'DiscussionID' => $discussion['discussionID'],
+                        'Name' => $discussion['name'],
+                        'CategoryID' => $discussion['categoryID']
+                    ], '%s'),
+                    'query' => []
+                ] + $comments->getMeta('paging', [])
+            ]
+        );
 
         return $result;
     }

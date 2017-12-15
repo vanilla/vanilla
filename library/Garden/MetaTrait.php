@@ -106,4 +106,15 @@ trait MetaTrait {
         $this->meta = $meta;
         return $this;
     }
+
+    /**
+     * Merge another meta array with this one.
+     *
+     * @param array $meta The meta array to merge.
+     * @return $this
+     */
+    public function mergeMetaArray(array $meta) {
+        $this->meta = array_merge_recursive($this->meta, $meta);
+        return $this;
+    }
 }

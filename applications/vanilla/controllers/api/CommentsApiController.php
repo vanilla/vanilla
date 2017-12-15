@@ -5,6 +5,7 @@
  */
 
 use Garden\Schema\Schema;
+use Garden\Web\Data;
 use Garden\Web\Exception\NotFoundException;
 use Garden\Web\Exception\ServerException;
 use Vanilla\DateFilterSchema;
@@ -274,7 +275,14 @@ class CommentsApiController extends AbstractApiController {
             $where += $dateUpdated;
         }
 
-        $rows = $this->commentModel->lookup($where, true, $limit, $offset, 'asc')->resultArray();
+        $comments = $this->commentModel->lookup($where, true, $limit, $offset, 'asc');
+        $rows = $comments->resultArray();
+
+        if (isset($discussion) && count($where) === 1) {
+            $paging = ApiUtils::numberedPagerInfo($discussion['CountComments'], '/api/v2/comments', $query, $in);
+        } else {
+            $paging = ApiUtils::morePagerInfo(val('hasMore', $comments), '/api/v2/comments', $query, $in);
+        }
 
         // Expand associated rows.
         $this->userModel->expandUsers(
@@ -290,7 +298,7 @@ class CommentsApiController extends AbstractApiController {
 
         // Allow addons to modify the result.
         $this->getEventManager()->fireArray('commentsApiController_index_data', [$this, &$result, $query, $rows]);
-        return $result;
+        return new Data($result, ['paging' => $paging]);
     }
 
     /**

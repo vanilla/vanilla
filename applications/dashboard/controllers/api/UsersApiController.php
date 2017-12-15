@@ -373,7 +373,7 @@ class UsersApiController extends AbstractApiController {
         $in = $this->schema([
             'photo' => $photoUploadSchema
         ], 'in');
-        $out = $this->schema(Schema::parse(['photo'])->add($this->fullSchema()), 'out');
+        $out = $this->schema(Schema::parse(['photoUrl'])->add($this->fullSchema()), 'out');
 
         if ($id === null) {
             $id = $this->getSession()->UserID;

@@ -24,6 +24,9 @@ class Gdn_Upload extends Gdn_Pluggable {
     /** @var string */
     protected $_UploadedFile;
 
+    /** @var \Vanilla\FileUtils */
+    protected $fileUtils;
+
     /**
      * Class constructor.
      */
@@ -31,6 +34,8 @@ class Gdn_Upload extends Gdn_Pluggable {
         $this->clear();
         parent::__construct();
         $this->ClassName = 'Gdn_Upload';
+
+        $this->fileUtils = Gdn::getContainer()->get(\Vanilla\FileUtils::class);
     }
 
     /**
@@ -318,13 +323,14 @@ class Gdn_Upload extends Gdn_Pluggable {
         if (!$handled) {
             $target = PATH_UPLOADS.'/'.$parsed['Name'];
             if (!file_exists(dirname($target))) {
-                mkdir(dirname($target));
+                mkdir(dirname($target), 0777, true);
             }
 
             if (stringBeginsWith($source, PATH_UPLOADS)) {
                 rename($source, $target);
             } else {
-                $result = ($copy && is_uploaded_file($source)) ? copy($source, $target) : move_uploaded_file($source, $target);
+                $isUpload = $this->fileUtils->isUploadedFile($source);
+                $result = ($copy && $isUpload) ? copy($source, $target) : $this->fileUtils->moveUploadedFile($source, $target);
                 if (!$result) {
                     throw new Exception(sprintf(t('Failed to save uploaded file to target destination (%s).'), $target));
                 }
@@ -396,7 +402,7 @@ class Gdn_Upload extends Gdn_Pluggable {
     public function validateUpload($inputName, $throwException = true) {
         $ex = false;
 
-        if (!array_key_exists($inputName, $_FILES) || (!is_uploaded_file($_FILES[$inputName]['tmp_name']) && getValue('error', $_FILES[$inputName], 0) == 0)) {
+        if (!array_key_exists($inputName, $_FILES) || (!$this->fileUtils->isUploadedFile($_FILES[$inputName]['tmp_name']) && getValue('error', $_FILES[$inputName], 0) == 0)) {
             // Check the content length to see if we exceeded the max post size.
             $contentLength = Gdn::request()->getValueFrom('server', 'CONTENT_LENGTH');
             $maxPostSize = self::unformatFileSize(ini_get('post_max_size'));

@@ -27,10 +27,20 @@ class UploadedFileSchema extends Schema {
     /**
      * Initialize an instance of a new UploadedFileSchema class.
      */
-    public function __construct() {
+    public function __construct(array $options = []) {
         $this->config = Gdn::getContainer()->get('Config');
-        $maxSize = Gdn_Upload::unformatFileSize($this->config->get('Garden.Upload.MaxFileSize', ini_get('upload_max_filesize')));
-        $allowedExtensions = $this->config->get('Garden.Upload.AllowedFileExtensions', []);
+
+        if (array_key_exists('allowedExtensions', $options)) {
+            $allowedExtensions = $options['allowedExtensions'];
+        } else {
+            $allowedExtensions = $this->config->get('Garden.Upload.AllowedFileExtensions', []);
+        }
+
+        if (array_key_exists('maxSize', $options)) {
+            $maxSize = $options['maxSize'];
+        } else {
+            $maxSize = Gdn_Upload::unformatFileSize($this->config->get('Garden.Upload.MaxFileSize', ini_get('upload_max_filesize')));
+        }
 
         $this->setMaxSize($maxSize);
         $this->setAllowedExtensions(array_map('strtolower', $allowedExtensions));

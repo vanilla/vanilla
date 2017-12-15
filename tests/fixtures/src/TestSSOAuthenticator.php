@@ -8,10 +8,14 @@ use Vanilla\Models\SSOData;
 
 class TestSSOAuthenticator extends SSOAuthenticator {
 
-    /**
-     * @var array
-     */
-    private $ssoInfo;
+    /** @var string */
+    private $uniqueID;
+
+    /** @var array */
+    private $userData = [];
+
+    /** @var array */
+    private $extraData = [];
 
     /**
      * TestSSOAuthenticator constructor.
@@ -24,21 +28,56 @@ class TestSSOAuthenticator extends SSOAuthenticator {
      * @inheritDoc
      */
     protected function sso(RequestInterface $request) {
-        return new SSOData($this->ssoInfo);
+        return new SSOData(
+            $this->getName(),
+            $this->getID(),
+            $this->isTrusted(),
+            $this->uniqueID,
+            $this->userData,
+            $this->extraData
+        );
     }
 
     /**
      * @return array
      */
-    public function getSSOInfo() {
-        return $this->ssoInfo;
+    public function getUserData() {
+        return $this->userData;
     }
 
     /**
-     * @param array $ssoInfo
+     * @param array $userData
      */
-    public function setSSOInfo(array $ssoInfo) {
-        $this->ssoInfo = $ssoInfo;
+    public function setUserData(array $userData) {
+        $this->userData = $userData;
+    }
+
+    /**
+     * @return string
+     */
+    public function getUniqueID() {
+        return $this->uniqueID;
+    }
+
+    /**
+     * @param string $uniqueID
+     */
+    public function setUniqueID($uniqueID) {
+        $this->uniqueID = $uniqueID;
+    }
+
+    /**
+     * @return array
+     */
+    public function getExtraData() {
+        return $this->extraData;
+    }
+
+    /**
+     * @param array $extraData
+     */
+    public function setExtraData(array $extraData) {
+        $this->extraData = $extraData;
     }
 
     /**

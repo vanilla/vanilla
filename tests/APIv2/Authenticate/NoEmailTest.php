@@ -54,12 +54,13 @@ class NoEmailTest extends AbstractAPIv2Test {
 
         $uniqueID = uniqid('ne_');
         $this->currentUser = [
-            'uniqueID' => $uniqueID,
             'name' => 'Authenticate_'.$uniqueID,
         ];
 
         $this->authenticator = new TestSSOAuthenticator();
-        $this->authenticator->setSSOInfo($this->currentUser);
+
+        $this->authenticator->setUniqueID($uniqueID);
+        $this->authenticator->setUserData($this->currentUser);
 
         $this->container()->setInstance('TestSSOAuthenticator', $this->authenticator);
 

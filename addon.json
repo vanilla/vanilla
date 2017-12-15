@@ -1,0 +1,14 @@
+{
+    "key": "core",
+    "build": {
+        "process": "core",
+        "entries": {
+            "app": "./src/js/app.js",
+            "admin": "./src/js/admin.js"
+        },
+        "exports": {
+            "app": ["axios", "react", "react-dom"],
+            "admin": ["axios", "react", "react-dom"]
+        }
+    }
+}

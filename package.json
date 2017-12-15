@@ -1,0 +1,11 @@
+{
+    "name": "vanilla",
+    "description": "Vanilla is a powerfully simple discussion forum you can easily customize to make as unique as your community.",
+    "license": "GPL-2.0",
+    "dependencies": {
+        "axios": "^0.17.1",
+        "moment": "^2.19.4",
+        "react": "^16.2.0",
+        "react-dom": "^16.2.0"
+    }
+}

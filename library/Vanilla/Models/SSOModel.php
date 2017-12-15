@@ -6,6 +6,7 @@
 
 namespace Vanilla\Models;
 
+use Garden\EventManager;
 use Gdn_Configuration;
 use Gdn_Session;
 use Garden\Web\Exception\ServerException;
@@ -27,6 +28,9 @@ class SSOModel {
     /** @var CapitalCaseScheme */
     private $capitalCaseScheme;
 
+    /** @var EventManager */
+    private $eventManager;
+
     /** @var  \Gdn_Session */
     private $session;
 
@@ -38,18 +42,21 @@ class SSOModel {
      *
      * @param AddonManager $addonManager
      * @param Gdn_Configuration $config
+     * @param EventManager $eventManager
      * @param Gdn_Session $session
      * @param UserModel $userModel
      */
     public function __construct(
         AddonManager $addonManager,
         Gdn_Configuration $config,
+        EventManager $eventManager,
         Gdn_Session $session,
         UserModel $userModel
     ) {
         $this->addonManager = $addonManager;
         $this->capitalCaseScheme = new CapitalCaseScheme();
         $this->config = $config;
+        $this->eventManager = $eventManager;
         $this->session = $session;
         $this->userModel = $userModel;
     }
@@ -319,11 +326,7 @@ class SSOModel {
             'SaveRoles' => $saveRoles,
         ]);
 
-        /*
-         * TODO: Add a replacement event for AfterConnectSave.
-         * It was added 8 months ago so it is safe to assume that the only usage of it is the CategoryRoles plugin.
-         * https://github.com/vanilla/vanilla/commit/1d9ae17652213d888bbd07cac0f682959ca326b9
-         */
+        $this->eventManager->fireArray('afterUserSync', [$userID, $ssoData->getUser(), $ssoData->getExtra()]);
 
         return $userID !== false;
     }

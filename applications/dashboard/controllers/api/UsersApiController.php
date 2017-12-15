@@ -366,7 +366,7 @@ class UsersApiController extends AbstractApiController {
     public function post_photo($id = null, array $body) {
         $this->permission('Garden.SignIn.Allow');
 
-        $photoUploadSchema = UploadedFileSchema::parse([]);
+        $photoUploadSchema = new UploadedFileSchema();
         $photoUploadSchema->setAllowedExtensions(array_values(ImageResizer::getTypeExt()));
 
         $in = $this->schema([

@@ -8,6 +8,7 @@
 namespace Vanilla\Vanilla\Controllers\Pages;
 
 
+use Garden\Web\Data;
 use Vanilla\ApiUtils;
 use Vanilla\Web\Controller;
 
@@ -29,7 +30,9 @@ class DiscussionsPageController extends Controller {
         $data = [
             'discussions' => $this->discussionsApi->index(['page' => $page, 'expand' => true])
         ];
+        $meta = $data['discussions']->getMetaArray();
+        $meta['paging']['urlFormat'] = url('/discussions/p', true).'%s';
 
-        return $data;
+        return new Data($data, $meta);
     }
 }

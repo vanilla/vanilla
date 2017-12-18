@@ -75,7 +75,7 @@ if (!function_exists('writeDiscussionRow')) :
 
         $firstPageUrl = discussionUrl($discussion, 1);
         $lastComment = CommentModel::instance()->getID($discussion->LastCommentID);
-        $lastPageUrl = commentUrl($lastComment);
+        $lastPageUrl = $lastComment ? commentUrl($lastComment) : $firstPageUrl;
         ?>
         <tr id="Discussion_<?php echo $discussion->DiscussionID; ?>" class="<?php echo $cssClass; ?>">
             <?php $sender->fireEvent('BeforeDiscussionContent'); ?>

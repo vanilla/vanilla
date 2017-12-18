@@ -87,7 +87,7 @@ class AuthenticateApiController extends AbstractApiController {
         $this->sessionModel->insert([
             'SessionID' => $sessionID,
             'UserID' => $this->getSession()->UserID,
-            'DateExpire' => date(MYSQL_DATE_FORMAT, time() + self::SESSION_ID_EXPIRATION),
+            'DateExpires' => date(MYSQL_DATE_FORMAT, time() + self::SESSION_ID_EXPIRATION),
             'Attributes' => $data,
         ]);
 
@@ -208,7 +208,7 @@ class AuthenticateApiController extends AbstractApiController {
         $out = $this->schema([
             'authSessionID:s' => 'Identifier of the authentication session.',
             'dateInserted:dt' => 'When the session was created.',
-            'dateExpire:dt' => 'When the session expires.',
+            'dateExpires:dt' => 'When the session expires.',
             'attributes' => Schema::parse([
                 'ssoData:o' => $this->ssoDataSchema(), // This should do a sparse validation
                 'linkUser:o?' => Schema::parse([

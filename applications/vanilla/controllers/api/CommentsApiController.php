@@ -274,7 +274,7 @@ class CommentsApiController extends AbstractApiController {
                 ],
             ],
             'expand?' => $this->getExpandDefinition(['insertUser'])
-        ], 'in')->requireOneOf(['discussionID', 'insertUserID'])->setDescription('List comments.');
+        ], ['CommentIndex', 'in'])->requireOneOf(['discussionID', 'insertUserID'])->setDescription('List comments.');
         $out = $this->schema([':a' => $this->commentSchema()], 'out');
 
         $query = $in->validate($query);
@@ -321,8 +321,8 @@ class CommentsApiController extends AbstractApiController {
         $result = $out->validate($rows);
 
         // Allow addons to modify the result.
-        $this->getEventManager()->fireArray('commentsApiController_index_data', [$this, &$result, $query, $rows]);
-        return new Data($result, ['paging' => $paging]);
+        $result = $this->getEventManager()->fireFilter('commentsApiController_index_output', $result, $this, $in, $query, $rows);
+        return $result;
     }
 
     /**

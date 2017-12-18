@@ -427,6 +427,8 @@ class DiscussionsApiController extends AbstractApiController {
         $result = $out->validate($rows, true);
 
 
+        // Allow addons to modify the result.
+        $result = $this->getEventManager()->fireFilter('discussionsApiController_index_output', $result, $this, $in, $query, $rows);
         return $result;
     }
 

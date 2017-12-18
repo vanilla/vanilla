@@ -307,13 +307,20 @@ $transientKeyExists = $Construct->columnExists('TransientKey');
 if ($transientKeyExists) {
     $Construct->dropColumn('TransientKey');
 }
+$dateExpireExists = $Construct->columnExists('DateExpire');
+if ($dateExpireExists) {
+    $Construct->renameColumn('DateExpire', 'DateExpires');
+}
 
 $Construct
     ->column('SessionID', 'char(32)', false, 'primary')
     ->column('UserID', 'int', 0)
     ->column('DateInserted', 'datetime', false)
-    ->column('DateUpdated', 'datetime', null)
-    ->column('DateExpire', 'datetime', null, 'index')
+    ->column('DateUpdated', 'datetime', null);
+if (!$dateExpireExists) {
+    $Construct->column('DateExpires', 'datetime', null, 'index');
+}
+$Construct
     ->column('Attributes', 'text', null)
     ->set($Explicit, $Drop);
 

@@ -167,6 +167,7 @@ class EbiView implements ViewInterface {
         $ebi->defineFunction('plural');
         $ebi->defineFunction('pluralText', [$this, 'pluralText']);
         $ebi->defineFunction('queryData', [$this, 'queryData']);
+        $ebi->defineFunction('reactionIcon', [$this, 'reactionIcon']);
         $ebi->defineFunction('registerUrl');
         $ebi->defineFunction('signInUrl');
         $ebi->defineFunction('signOutUrl');
@@ -401,6 +402,93 @@ class EbiView implements ViewInterface {
         }
         return $result;
     }
+
+
+    /**
+     * Get reaction icon information
+     *
+     * @param string $urlCode The code of the reaction
+     * @return array $icon
+     */
+    public function reactionIcon($urlCode) {
+        $icon = [];
+
+        switch ($urlCode) {
+            case 'Quote':
+                $icon['title'] = "“";
+                $icon['name'] = "reaction-quote";
+                break;
+            case 'Insightful':
+                $icon['title'] = "👁";
+                $icon['name'] = "reaction-insightful";
+                break;
+            case 'OffTopic':
+                $icon['title'] = "😕";
+                $icon['name'] = "reaction-offTopic";
+                break;
+            case 'Disagree':
+                $icon['title'] = "😠";
+                $icon['name'] = "reaction-disagree";
+                break;
+            case 'Agree':
+                $icon['title'] = "😊";
+                $icon['name'] = "reaction-agree";
+                break;
+            case 'WTF':
+                $icon['title'] = "😲";
+                $icon['name'] = "reaction-wtf";
+                break;
+            case 'Awesome':
+                $icon['title'] = "♥";
+                $icon['name'] = "reaction-awesome";
+                break;
+            case 'LOL':
+                $icon['title'] = "😆";
+                $icon['name'] = "reaction-lol";
+                break;
+            case 'Promote':
+                $icon['title'] = "😆";
+                $icon['name'] = "reaction-promote";
+                break;
+            case 'Dislike':
+                $icon['title'] = "👍";
+                $icon['name'] = "reaction-dislike";
+                break;
+            case 'Like':
+                $icon['title'] = "👎";
+                $icon['name'] = "reaction-like";
+                break;
+            case 'Up':
+                $icon['title'] = "⬆";
+                $icon['name'] = "reaction-voteUp";
+                break;
+            case 'Down':
+                $icon['title'] = "⬇";
+                $icon['name'] = "reaction-voteDown";
+                break;
+            case 'Spam':
+                $icon['title'] = "☢";
+                $icon['name'] = "reaction-spam";
+                break;
+            case 'Abuse':
+                $icon['title'] = "💣";
+                $icon['name'] = "reaction-abuse";
+                break;
+            case 'Warn':
+                $icon['title'] = "⚠";
+                $icon['name'] = "reaction-warn";
+                break;
+            case 'Report':
+                $icon['title'] = "🚩";
+                $icon['name'] = "reaction-report";
+                break;
+            default:
+                $icon = false;
+        }
+
+        return $icon;
+    }
+
 
     /**
      * Query data for the template.

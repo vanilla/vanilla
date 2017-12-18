@@ -7,8 +7,6 @@
 
 namespace VanillaTests\Library\Vanilla;
 
-use Psr\Log\LoggerInterface;
-use Psr\Log\LoggerTrait;
 use Psr\Log\Test\LoggerInterfaceTest;
 use Vanilla\Logger;
 

@@ -21,17 +21,11 @@ class UsersApiController extends AbstractApiController {
     /** @var Gdn_Configuration */
     private $configuration;
 
-    /** @var DateFilterSchema */
-    private $dateFilterSchema;
-
     /** @var Schema */
     private $idParamSchema;
 
     /** @var UserModel */
     private $userModel;
-
-    /** @var Schema */
-    private $userPostSchema;
 
     /** @var Schema */
     private $userSchema;
@@ -41,16 +35,13 @@ class UsersApiController extends AbstractApiController {
      *
      * @param UserModel $userModel
      * @param Gdn_Configuration $configuration
-     * @param DateFilterSchema $dateFilterSchema
      */
     public function __construct(
         UserModel $userModel,
-        Gdn_Configuration $configuration,
-        DateFilterSchema $dateFilterSchema
+        Gdn_Configuration $configuration
     ) {
         $this->configuration = $configuration;
         $this->userModel = $userModel;
-        $this->dateFilterSchema = $dateFilterSchema;
     }
 
     /**
@@ -176,43 +167,48 @@ class UsersApiController extends AbstractApiController {
         ]);
 
         $in = $this->schema([
-            'dateInserted?' => $this->dateFilterSchema,
-            'dateUpdated?' => $this->dateFilterSchema,
+            'dateInserted?' => new DateFilterSchema([
+                'description' => 'When the user was created.',
+                'x-filter' => [
+                    'field' => 'u.DateInserted',
+                    'processor' => [DateFilterSchema::class, 'dateFilterField'],
+                ],
+            ]),
+            'dateUpdated?' => new DateFilterSchema([
+                'description' => 'When the user was updated.',
+                'x-filter' => [
+                    'field' => 'u.DateUpdated',
+                    'processor' => [DateFilterSchema::class, 'dateFilterField'],
+                ],
+            ]),
             'userID:a?' => [
                 'description' => 'One or more user IDs to lookup.',
                 'items' => ['type' => 'integer'],
-                'style' => 'form'
+                'style' => 'form',
+                'x-filter' => [
+                    'field' => 'u.UserID',
+                ],
             ],
             'page:i?' => [
                 'description' => 'Page number.',
                 'default' => 1,
-                'minimum' => 1
+                'minimum' => 1,
             ],
             'limit:i?' => [
                 'description' => 'The number of items per page.',
                 'default' => 30,
                 'minimum' => 1,
-                'maximum' => 100
+                'maximum' => 100,
             ]
         ], 'in')->setDescription('List users.');
         $out = $this->schema([':a' => $this->userSchema()], 'out');
 
         $query = $in->validate($query);
+        $where = ApiUtils::queryToFilters($in, $query);
+
         list($offset, $limit) = offsetLimit("p{$query['page']}", $query['limit']);
-        $filter = [];
 
-        if (!empty($query['userID'])) {
-            $filter['UserID'] = $query['userID'];
-        }
-
-        if ($dateInserted = $this->dateFilterField('dateInserted', $query)) {
-            $filter += $dateInserted;
-        }
-        if ($dateUpdated = $this->dateFilterField('dateUpdated', $query)) {
-            $filter += $dateUpdated;
-        }
-
-        $rows = $this->userModel->search($filter, '', '', $limit, $offset)->resultArray();
+        $rows = $this->userModel->search($where, '', '', $limit, $offset)->resultArray();
         foreach ($rows as &$row) {
             $this->userModel->setCalculatedFields($row);
             $row = $this->normalizeOutput($row);
@@ -264,16 +260,19 @@ class UsersApiController extends AbstractApiController {
         $this->permission('Garden.Users.Edit');
 
         $this->idParamSchema('in');
-        $in = $this->userPostSchema('in')->setDescription('Update a user.');
+        $in = $this->schema($this->userPatchSchema(), 'in')->setDescription('Update a user.');
         $out = $this->userSchema('out');
 
         $body = $in->validate($body, true);
         // If a row associated with this ID cannot be found, a "not found" exception will be thrown.
         $this->userByID($id);
-        $body = $this->normalizeInput($body);
-        $userData = ApiUtils::convertInputKeys($body);
+        $userData = $this->normalizeInput($body);
         $userData['UserID'] = $id;
-        $this->userModel->save($userData);
+        $settings = [];
+        if (!empty($userData['RoleID'])) {
+            $settings['SaveRoles'] = true;
+        }
+        $this->userModel->save($userData, $settings);
         $this->validateModel($this->userModel);
         $row = $this->userByID($id);
         $row = $this->normalizeOutput($row);
@@ -292,7 +291,7 @@ class UsersApiController extends AbstractApiController {
     public function post(array $body) {
         $this->permission('Garden.Users.Add');
 
-        $in = $this->userPostSchema('in', ['password', 'roleID?'])->setDescription('Add a user.');
+        $in = $this->schema($this->userPostSchema(), 'in')->setDescription('Add a user.');
         $out = $this->schema($this->userSchema(), 'out');
 
         $body = $in->validate($body);
@@ -469,30 +468,48 @@ class UsersApiController extends AbstractApiController {
     }
 
     /**
-     * Get a user schema with minimal add/edit fields.
+     * Get a user schema with minimal edit fields.
      *
-     * @param string $type The type of schema.
-     * @param array|null $extra Additional fields to include.
      * @return Schema Returns a schema object.
      */
-    public function userPostSchema($type = '', array $extra = []) {
-        if ($this->userPostSchema === null) {
-            $schema = Schema::parse([
-                'roleID:a' => 'Roles to set on the user.'
-            ])->add($this->fullSchema(), true);
-            $fields = [
-                'name',
-                'email',
-                'photo?',
-                'emailConfirmed' => ['default' => true],
-                'bypassSpam' => ['default' => false]
-            ];
-            $this->userPostSchema = $this->schema(
-                Schema::parse(array_merge($fields, $extra))->add($schema),
-                'UserPost'
-            );
+    public function userPatchSchema() {
+        static $schema;
+
+        if ($schema === null) {
+            $schema = $this->schema(Schema::parse([
+                'name?', 'email?', 'photo?', 'emailConfirmed?', 'bypassSpam?',
+                'roleID?' => [
+                    'type' => 'array',
+                    'items' => ['type' => 'integer'],
+                    'description' => 'Roles to set on the user.'
+                ]
+            ])->add($this->fullSchema()), 'UserPatch');
         }
-        return $this->schema($this->userPostSchema, $type);
+
+        return $schema;
+    }
+
+    /**
+     * Get a user schema with minimal add fields.
+     *
+     * @return Schema Returns a schema object.
+     */
+    public function userPostSchema() {
+        static $schema;
+
+        if ($schema === null) {
+            $schema = $this->schema(Schema::parse([
+                'name', 'email', 'photo?', 'password',
+                'emailConfirmed' => ['default' => true], 'bypassSpam' => ['default' => false],
+                'roleID?' => [
+                    'type' => 'array',
+                    'items' => ['type' => 'integer'],
+                    'description' => 'Roles to set on the user.'
+                ]
+            ])->add($this->fullSchema()), 'UserPost');
+        }
+
+        return $schema;
     }
 
     /**

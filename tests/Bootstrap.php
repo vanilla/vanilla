@@ -18,6 +18,7 @@ use Psr\Log\LoggerInterface;
 use Vanilla\Addon;
 use Vanilla\AddonManager;
 use Vanilla\InjectableInterface;
+use VanillaTests\Fixtures\NullCache;
 
 /**
  * Run bootstrap code for Vanilla tests.
@@ -73,9 +74,10 @@ class Bootstrap {
             ->addCall('setDependencies')
 
             // Cache
+            ->setInstance(NullCache::class, new NullCache())
+
             ->rule(\Gdn_Cache::class)
-            ->setShared(true)
-            ->setFactory(['Gdn_Cache', 'initialize'])
+            ->setAliasOf(NullCache::class)
             ->addAlias('Cache')
 
             // Configuration

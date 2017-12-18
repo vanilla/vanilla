@@ -103,7 +103,8 @@ abstract class Controller implements InjectableInterface {
     public function schema($schema, $type = 'in') {
         $id = '';
         if (is_array($type)) {
-            list($id, $type) = $type;
+            $origType = $type;
+            list($id, $type) = $origType;
         } elseif (!in_array($type, ['in', 'out'], true)) {
             $id = $type;
             $type = '';
@@ -113,7 +114,7 @@ abstract class Controller implements InjectableInterface {
         if (is_array($schema)) {
             $schema = Schema::parse($schema);
         } elseif ($schema instanceof Schema) {
-            $schema = new Schema($schema->getSchemaArray());
+            $schema = clone $schema;
         }
 
         // Fire an event for schema modification.
@@ -121,7 +122,7 @@ abstract class Controller implements InjectableInterface {
             // The type is a specific type of schema.
             $schema->setID($id);
 
-            $this->eventManager->fire("{$id}Schema_init", $schema);
+            $this->eventManager->fire("{$id}Schema_init", $this, $schema);
         }
 
         // Fire a generic schema event for documentation.
@@ -155,7 +156,7 @@ abstract class Controller implements InjectableInterface {
     /**
      * Get the event manager.
      *
-     * @return mixed Returns the event manager.
+     * @return EventManager Returns the event manager.
      */
     public function getEventManager() {
         return $this->eventManager;
@@ -164,7 +165,7 @@ abstract class Controller implements InjectableInterface {
     /**
      * Set the event manager.
      *
-     * @param mixed $eventManager The new event manager.
+     * @param EventManager $eventManager The new event manager.
      * @return $this
      */
     public function setEventManager($eventManager) {

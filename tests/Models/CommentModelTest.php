@@ -6,13 +6,14 @@
 
 namespace VanillaTests\Models;
 
+use PHPUnit\Framework\TestCase;
 use CommentModel;
 use VanillaTests\SiteTestTrait;
 
 /**
  * Test {@link CommentModel}.
  */
-class CommentModelTest extends \PHPUnit_Framework_TestCase {
+class CommentModelTest extends TestCase {
     use SiteTestTrait;
 
     /**

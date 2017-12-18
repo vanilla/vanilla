@@ -100,7 +100,6 @@ class UsersTest extends AbstractResourceTest {
     public function providePutFields() {
         $fields = [
             'ban' => ['ban', true, 'banned'],
-//            'verify' => ['verify', true, 'verified'],
         ];
         return $fields;
     }
@@ -138,6 +137,30 @@ class UsersTest extends AbstractResourceTest {
     }
 
     /**
+     * Test setting a user's roles with a PATCH request.
+     *
+     * @return array
+     */
+    public function testPatchWithRoles() {
+        $roleIDs = [
+            32 // Moderator
+        ];
+        $user = $this->testPost();
+        $result = $this->api()
+            ->patch("{$this->baseUrl}/{$user['userID']}", ['roleID' => $roleIDs])
+            ->getBody();
+
+        $userRoleIDs = array_column($result['roles'], 'roleID');
+        if (array_diff($roleIDs, $userRoleIDs)) {
+            $this->fail('Not all roles set on user.');
+        }
+        if (array_diff($userRoleIDs, $roleIDs)) {
+            $this->fail('Unexpected roles on user.');
+        }
+
+        return $result;
+    }
+    /**
      * {@inheritdoc}
      */
     public function testPost($record = null, array $extra = []) {
@@ -148,6 +171,33 @@ class UsersTest extends AbstractResourceTest {
             'password' => 'vanilla'
         ];
         $result = parent::testPost($record, $fields);
+        return $result;
+    }
+
+    /**
+     * Test adding a new user with non-default roles.
+     */
+    public function testPostWithRoles() {
+        $roleIDs = [
+            32 // Moderator
+        ];
+        $record = $this->record();
+        $fields = [
+            'bypassSpam' => true,
+            'emailConfirmed' => false,
+            'password' => 'vanilla',
+            'roleID' => $roleIDs
+        ];
+        $result = parent::testPost($record, $fields);
+
+        $userRoleIDs = array_column($result['roles'], 'roleID');
+        if (array_diff($roleIDs, $userRoleIDs)) {
+            $this->fail('Not all roles set on user.');
+        }
+        if (array_diff($userRoleIDs, $roleIDs)) {
+            $this->fail('Unexpected roles on user.');
+        }
+
         return $result;
     }
 

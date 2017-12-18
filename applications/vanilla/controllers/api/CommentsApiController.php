@@ -28,9 +28,6 @@ class CommentsApiController extends AbstractApiController {
     /** @var Schema */
     private $commentPostSchema;
 
-    /** @var DateFilterSchema */
-    private $dateFilterSchema;
-
     /** @var Schema */
     private $idParamSchema;
 
@@ -48,13 +45,11 @@ class CommentsApiController extends AbstractApiController {
     public function __construct(
         CommentModel $commentModel,
         DiscussionModel $discussionModel,
-        UserModel $userModel,
-        DateFilterSchema $dateFilterSchema
+        UserModel $userModel
     ) {
         $this->commentModel = $commentModel;
         $this->discussionModel = $discussionModel;
         $this->userModel = $userModel;
-        $this->dateFilterSchema = $dateFilterSchema;
     }
 
     /**
@@ -165,7 +160,7 @@ class CommentsApiController extends AbstractApiController {
         $this->permission();
 
         $this->idParamSchema();
-        $in = $this->schema([], 'in')->setDescription('Get a comment.');
+        $in = $this->schema([], ['CommentGet', 'in'])->setDescription('Get a comment.');
         $out = $this->schema($this->commentSchema(), 'out');
 
         $query = $in->validate($query);
@@ -181,7 +176,8 @@ class CommentsApiController extends AbstractApiController {
         $result = $out->validate($comment);
 
         // Allow addons to modify the result.
-        $this->getEventManager()->fireArray('commentsApiController_get_data', [$this, &$result, $query, $comment]);
+        $result = $this->getEventManager()->fireFilter('commentsApiController_get_output', $result, $this, $in, $query, $comment);
+
         return $result;
     }
 
@@ -234,9 +230,31 @@ class CommentsApiController extends AbstractApiController {
         $this->permission();
 
         $in = $this->schema([
-            'dateInserted?' => $this->dateFilterSchema,
-            'dateUpdated?' => $this->dateFilterSchema,
-            'discussionID:i?' => 'The discussion ID.',
+            'dateInserted?' => new DateFilterSchema([
+                'description' => 'When the comment was created.',
+                'x-filter' => [
+                    'field' => 'c.DateInserted',
+                    'processor' => [DateFilterSchema::class, 'dateFilterField'],
+                ],
+            ]),
+            'dateUpdated?' => new DateFilterSchema([
+                'description' => 'When the comment was updated.',
+                'x-filter' => [
+                    'field' => 'c.DateUpdated',
+                    'processor' => [DateFilterSchema::class, 'dateFilterField'],
+                ],
+            ]),
+            'discussionID:i?' => [
+                'description' => 'The discussion ID.',
+                'x-filter' => [
+                    'field' => 'DiscussionID',
+                    'processor' => function($name, $value) {
+                        $discussion = $this->discussionByID($value);
+                        $this->discussionModel->categoryPermission('Vanilla.Discussions.View', $discussion['CategoryID']);
+                        return [$name => $value];
+                    },
+                ],
+            ],
             'page:i?' => [
                 'description' => 'Page number.',
                 'default' => 1,
@@ -249,12 +267,18 @@ class CommentsApiController extends AbstractApiController {
                 'minimum' => 1,
                 'maximum' => 100
             ],
-            'insertUserID:i?' => 'Filter by author.',
+            'insertUserID:i?' => [
+                'description' => 'Filter by author.',
+                'x-filter' => [
+                    'field' => 'InsertUserID',
+                ],
+            ],
             'expand?' => $this->getExpandDefinition(['insertUser'])
         ], 'in')->requireOneOf(['discussionID', 'insertUserID'])->setDescription('List comments.');
         $out = $this->schema([':a' => $this->commentSchema()], 'out');
 
         $query = $in->validate($query);
+        $where = ApiUtils::queryToFilters($in, $query);
 
         list($offset, $limit) = offsetLimit("p{$query['page']}", $query['limit']);
 
@@ -268,12 +292,12 @@ class CommentsApiController extends AbstractApiController {
             $this->discussionModel->categoryPermission('Vanilla.Discussions.View', $discussion['CategoryID']);
             $where['DiscussionID'] = $query['discussionID'];
         }
-        if ($dateInserted = $this->dateFilterField('dateInserted', $query)) {
-            $where += $dateInserted;
-        }
-        if ($dateUpdated = $this->dateFilterField('dateUpdated', $query)) {
-            $where += $dateUpdated;
-        }
+//        if ($dateInserted = $this->dateFilterField('dateInserted', $query)) {
+//            $where += $dateInserted;
+//        }
+//        if ($dateUpdated = $this->dateFilterField('dateUpdated', $query)) {
+//            $where += $dateUpdated;
+//        }
 
         $comments = $this->commentModel->lookup($where, true, $limit, $offset, 'asc');
         $rows = $comments->resultArray();

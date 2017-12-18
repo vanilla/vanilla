@@ -123,14 +123,21 @@ class AuthenticateController extends Gdn_Controller {
             throw notFoundException();
         }
 
+
         if ($response['authenticationStep'] === 'authenticated') {
-            redirectTo(val('target', $this->request->getQuery(), '/'));
+            $redirectURL = (val('target', $this->request->getQuery(), '/'));
         } else {
             $target = val('target', $this->request->getQuery());
             if ($target) {
                 $target = '&target='.$target;
             }
-            redirectTo("/authenticate/connectuser?authSessionID={$response['authSessionID']}{$target}");
+            $redirectURL = "/authenticate/connectuser?authSessionID={$response['authSessionID']}{$target}";
+        }
+
+        if ($this->deliveryMethod() === DELIVERY_METHOD_JSON) {
+            $this->setRedirectTo($redirectURL);
+        } else {
+            redirectTo($redirectURL);
         }
     }
 

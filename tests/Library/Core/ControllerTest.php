@@ -7,12 +7,11 @@
 
 namespace VanillaTests\Library\Core;
 
+use PHPUnit\Framework\TestCase;
 use Gdn_Controller;
-use \PHPUnit\Framework\TestCase;
 use stdClass;
 
-
-class ControllerTest extends \PHPUnit\Framework\TestCase {
+class ControllerTest extends TestCase {
 
     /**
      * Testing that the same key will be used to set data and to get it back.

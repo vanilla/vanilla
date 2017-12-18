@@ -270,7 +270,7 @@ class CommentsApiController extends AbstractApiController {
                     'field' => 'InsertUserID',
                 ],
             ],
-            'expand?' => $this->getExpandDefinition(['insertUser'])
+            'expand?' => ApiUtils::getExpandDefinition(['insertUser'])
         ], ['CommentIndex', 'in'])->requireOneOf(['discussionID', 'insertUserID'])->setDescription('List comments.');
         $out = $this->schema([':a' => $this->commentSchema()], 'out');
 

@@ -48,6 +48,27 @@ class ApiUtils {
     }
 
     /**
+     * Get an "expand" parameter definition with specific fields.
+     *
+     * @param array $fields Valid values for the expand parameter.
+     * @param bool|string $default The default value of expand.
+     * @return array
+     */
+    public static function getExpandDefinition(array $fields, $default = false) {
+        $result = [
+            'description' => 'Expand associated records using one or more valid field names. A boolean true expands all expandable fields.',
+            'default' => $default,
+            'items' => [
+                'enum' => $fields,
+                'type' => 'string'
+            ],
+            'style' => 'form',
+            'type' => ['boolean', 'array'],
+        ];
+        return $result;
+    }
+
+    /**
      * Generate pager info when the total number of records is not known.
      *
      * @param int|array|bool $rows The count of rows from the current query or an array of rows from a result.

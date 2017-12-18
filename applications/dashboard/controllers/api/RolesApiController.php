@@ -241,7 +241,7 @@ class RolesApiController extends AbstractApiController {
 
         $this->idParamSchema();
         $in = $this->schema([
-            'expand?' => $this->getExpandDefinition(['permissions'])
+            'expand?' => ApiUtils::getExpandDefinition(['permissions'])
         ], 'in')->setDescription('Get a role.');
         $out = $this->schema($this->roleSchema(), 'out');
 
@@ -343,7 +343,7 @@ class RolesApiController extends AbstractApiController {
         $this->permission('Garden.Settings.Manage');
 
         $in = $this->schema([
-            'expand?' => $this->getExpandDefinition(['permissions'])
+            'expand?' => ApiUtils::getExpandDefinition(['permissions'])
         ], 'in')->setDescription('List roles.');
         $out = $this->schema([':a' => $this->roleSchema()], 'out');
 

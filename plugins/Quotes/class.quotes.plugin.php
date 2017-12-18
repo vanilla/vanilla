@@ -420,7 +420,12 @@ BLOCKQUOTE;
 
         if ($discussion) {
             // Check permission.
-            Gdn::controller()->permission('Vanilla.Discussions.View', true, 'Category', val('PermissionCategoryID', $discussion));
+            Gdn::controller()->permission(
+                ['Vanilla.Discussions.Add', 'Vanilla.Discussions.View'],
+                false,
+                'Category',
+                val('PermissionCategoryID', $discussion)
+            );
 
             $newFormat = $format;
             if ($newFormat == 'Wysiwyg') {

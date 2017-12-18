@@ -22,6 +22,9 @@ class PermissionModel extends Gdn_Model {
     /** @var array Permission columns. */
     protected $_PermissionColumns = [];
 
+    /** @var array Permission namespaces from enabled addons. */
+    private $namespaces;
+
     /**
      * Class constructor. Defines the related database table name.
      */
@@ -545,7 +548,7 @@ class PermissionModel extends Gdn_Model {
      * @return array
      */
     public function getJunctionPermissions($where, $junctionTable = null, $limitToSuffix = '', $options = []) {
-        $namespaces = $this->getAllowedPermissionNamespaces();
+        $namespaces = $this->getNamespaces();
         $roleID = val('RoleID', $where, null);
         $junctionID = val('JunctionID', $where, null);
         $limitToDefault = val('LimitToDefault', $options);
@@ -851,10 +854,7 @@ class PermissionModel extends Gdn_Model {
      * @return mixed
      */
     public function stripPermissions($row, $defaultRow, $limitToSuffix = '') {
-        static $namespaces;
-        if (!isset($namespaces)) {
-            $namespaces = $this->getAllowedPermissionNamespaces();
-        }
+        $namespaces = $this->getNamespaces();
 
         foreach ($defaultRow as $permissionName => $value) {
             if (in_array($permissionName, ['PermissionID', 'RoleID', 'JunctionTable', 'JunctionColumn', 'JunctionID'])) {
@@ -1448,5 +1448,18 @@ class PermissionModel extends Gdn_Model {
 
             $namespaceArray[$name.'.'.$suffix] = ['Value' => $value, 'PostValue' => $postValue];
         }
+    }
+
+    /**
+     * Get the namespaces from enabled permissions.
+     *
+     * @return array Returns an array of permission prefixes.
+     */
+    public function getNamespaces() {
+        if (!isset($this->namespaces)) {
+            $this->namespaces = $this->getAllowedPermissionNamespaces();
+        }
+        $namespaces = $this->namespaces;
+        return $namespaces;
     }
 }

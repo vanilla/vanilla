@@ -467,11 +467,11 @@ class EbiView implements ViewInterface {
                 $icon['name'] = "reaction-voteDown";
                 break;
             case 'Spam':
-                $icon['title'] = "☢";
+                $icon['title'] = "🛡";
                 $icon['name'] = "reaction-spam";
                 break;
             case 'Abuse':
-                $icon['title'] = "💣";
+                $icon['title'] = "😵";
                 $icon['name'] = "reaction-abuse";
                 break;
             case 'Warn':

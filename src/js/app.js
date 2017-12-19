@@ -1,6 +1,8 @@
-import Message from "./dep";
 import loadPolyfills from './polyfills';
+import events from './events';
 
-loadPolyfills().then(() => {
-    console.log(Message);
+events.onReady(() => {
+    return loadPolyfills().then(() => {
+        console.log("Test");
+    });
 })

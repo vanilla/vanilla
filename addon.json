@@ -7,7 +7,7 @@
             "admin": "./src/js/admin.js"
         },
         "exports": {
-            "app": ["axios"],
+            "app": ["axios", "./src/js/events", "./src/js/utility"],
             "admin": ["axios"]
         }
     }

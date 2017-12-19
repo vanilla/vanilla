@@ -1,3 +1,6 @@
 import Message from "./dep";
+import loadPolyfills from './polyfills';
 
-console.log(Message);
+loadPolyfills().then(() => {
+    console.log(Message);
+})

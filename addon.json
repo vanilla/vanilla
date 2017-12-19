@@ -7,8 +7,8 @@
             "admin": "./src/js/admin.js"
         },
         "exports": {
-            "app": ["axios", "react", "react-dom"],
-            "admin": ["axios", "react", "react-dom"]
+            "app": ["axios"],
+            "admin": ["axios"]
         }
     }
 }

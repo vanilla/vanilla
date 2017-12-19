@@ -4,8 +4,11 @@
     "license": "GPL-2.0",
     "dependencies": {
         "axios": "^0.17.1",
+        "babel-polyfill": "^6.26.0",
         "moment": "^2.19.4",
+        "promise-polyfill": "^6.1.0",
         "react": "^16.2.0",
-        "react-dom": "^16.2.0"
+        "react-dom": "^16.2.0",
+        "setasap": "^2.0.0"
     }
 }

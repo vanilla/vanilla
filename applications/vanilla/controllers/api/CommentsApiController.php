@@ -322,7 +322,7 @@ class CommentsApiController extends AbstractApiController {
 
         // Allow addons to modify the result.
         $result = $this->getEventManager()->fireFilter('commentsApiController_index_output', $result, $this, $in, $query, $rows);
-        return $result;
+        return new Data($result, ['paging' => $paging]);
     }
 
     /**

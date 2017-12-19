@@ -35,4 +35,13 @@ class DiscussionsPageController extends Controller {
 
         return new Data($data, $meta);
     }
+
+    public function get_bookmarkedDropdown(array $query) {
+        $result = new Data([]);
+        $result->addData($this->discussionsApi->get_bookmarked($query), 'discussions', true);
+        $result->addMeta('paging', 'urlFormat', url('/discussions/bookmarked', true).'?page=%s');
+        $result->setMeta('template', 'discussion-bookmarked-page');
+
+        return $result;
+    }
 }

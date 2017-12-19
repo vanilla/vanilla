@@ -72,7 +72,9 @@ class EbiMasterView implements ViewInterface {
         ], $data->getMetaArray());
 
         // Swap the template for the master template.
-        $masterData->setMeta('template', $master);
+        $masterData
+            ->setMeta('template', $master)
+            ->setMeta('contentTemplate', $data->getMeta('template'));
         $this->view->render($masterData);
     }
 

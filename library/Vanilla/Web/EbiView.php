@@ -419,67 +419,67 @@ class EbiView implements ViewInterface {
                 $icon['name'] = "reaction-quote";
                 break;
             case 'Insightful':
-                $icon['title'] = "👁";
+                $icon['title'] = '👁';
                 $icon['name'] = "reaction-insightful";
                 break;
             case 'OffTopic':
-                $icon['title'] = "😕";
+                $icon['title'] = '😕';
                 $icon['name'] = "reaction-offTopic";
                 break;
             case 'Disagree':
-                $icon['title'] = "😠";
+                $icon['title'] = '😠';
                 $icon['name'] = "reaction-disagree";
                 break;
             case 'Agree':
-                $icon['title'] = "😊";
+                $icon['title'] = '😊';
                 $icon['name'] = "reaction-agree";
                 break;
             case 'WTF':
-                $icon['title'] = "😲";
+                $icon['title'] = '😲';
                 $icon['name'] = "reaction-wtf";
                 break;
             case 'Awesome':
-                $icon['title'] = "♥";
+                $icon['title'] = '♥';
                 $icon['name'] = "reaction-awesome";
                 break;
             case 'LOL':
-                $icon['title'] = "😆";
+                $icon['title'] = '😆';
                 $icon['name'] = "reaction-lol";
                 break;
             case 'Promote':
-                $icon['title'] = "😆";
+                $icon['title'] = '😆';
                 $icon['name'] = "reaction-promote";
                 break;
             case 'Dislike':
-                $icon['title'] = "👍";
+                $icon['title'] = '👍';
                 $icon['name'] = "reaction-dislike";
                 break;
             case 'Like':
-                $icon['title'] = "👎";
+                $icon['title'] = '👎';
                 $icon['name'] = "reaction-like";
                 break;
             case 'Up':
-                $icon['title'] = "⬆";
+                $icon['title'] = '⬆';
                 $icon['name'] = "reaction-voteUp";
                 break;
             case 'Down':
-                $icon['title'] = "⬇";
+                $icon['title'] = '⬇';
                 $icon['name'] = "reaction-voteDown";
                 break;
             case 'Spam':
-                $icon['title'] = "🛡";
+                $icon['title'] = '🛡';
                 $icon['name'] = "reaction-spam";
                 break;
             case 'Abuse':
-                $icon['title'] = "😵";
+                $icon['title'] = '😵';
                 $icon['name'] = "reaction-abuse";
                 break;
             case 'Warn':
-                $icon['title'] = "⚠";
+                $icon['title'] = '⚠';
                 $icon['name'] = "reaction-warn";
                 break;
             case 'Report':
-                $icon['title'] = "🚩";
+                $icon['title'] = '🚩';
                 $icon['name'] = "reaction-report";
                 break;
             default:
@@ -683,6 +683,7 @@ class EbiView implements ViewInterface {
             ];
             $this->ebi->write('error', $newData, []);
         }
+        $metaBak['template'] = $template;
         $this->ebi->setMetaArray($metaBak);
     }
 

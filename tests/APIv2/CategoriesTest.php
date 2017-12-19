@@ -25,10 +25,10 @@ class CategoriesTest extends AbstractResourceTest {
     protected $baseUrl = '/categories';
 
     /** {@inheritdoc} */
-    protected $editFields = ['description', 'name', 'parentCategoryID', 'urlCode', 'displayAs'];
+    protected $editFields = ['description', 'name', 'parentCategoryID', 'urlcode', 'displayAs'];
 
     /** {@inheritdoc} */
-    protected $patchFields = ['description', 'name', 'parentCategoryID', 'urlCode', 'displayAs'];
+    protected $patchFields = ['description', 'name', 'parentCategoryID', 'urlcode', 'displayAs'];
 
     /** {@inheritdoc} */
     protected $pk = 'categoryID';
@@ -45,7 +45,7 @@ class CategoriesTest extends AbstractResourceTest {
         foreach ($this->patchFields as $key) {
             $value = $row[$key];
             switch ($key) {
-                case 'urlCode':
+                case 'urlcode':
                     $value = md5($value);
                 case 'displayAs':
                     $value = $value === 'flat' ? 'categories' : 'flat';
@@ -69,10 +69,10 @@ class CategoriesTest extends AbstractResourceTest {
     public function record() {
         $count = static::$recordCounter;
         $name = "Test Category {$count}";
-        $urlCode = strtolower(preg_replace('/[^A-Z0-9]/i', '-', $name));
+        $urlcode = strtolower(preg_replace('/[^A-Z0-9]/i', '-', $name));
         $record = [
             'name' => $name,
-            'urlCode' => $urlCode,
+            'urlcode' => $urlcode,
             'parentCategoryID' => self::PARENT_CATEGORY_ID,
             'displayAs' => 'flat'
         ];
@@ -97,7 +97,7 @@ class CategoriesTest extends AbstractResourceTest {
             $this->baseUrl,
             [
                 'name' => 'Test Parent Category',
-                'urlCode' => 'test-parent-category',
+                'urlcode' => 'test-parent-category',
                 'parentCategoryID' => -1
             ]
         )->getBody();
@@ -105,7 +105,7 @@ class CategoriesTest extends AbstractResourceTest {
             $this->baseUrl,
             [
                 'name' => 'Test Child Category',
-                'urlCode' => 'test-child-category',
+                'urlcode' => 'test-child-category',
                 'parentCategoryID' => self::PARENT_CATEGORY_ID
             ]
         )->getBody();
@@ -133,7 +133,7 @@ class CategoriesTest extends AbstractResourceTest {
             $this->baseUrl,
             [
                 'name' => 'Test Bad Parent',
-                'urlCode' => 'test-bad-parent',
+                'urlcode' => 'test-bad-parent',
                 'parentCategoryID' => self::PARENT_CATEGORY_ID
             ]
         )->getBody();
@@ -154,7 +154,7 @@ class CategoriesTest extends AbstractResourceTest {
             $this->baseUrl,
             [
                 'name' => 'Test Child Parent',
-                'urlCode' => 'test-child-parent',
+                'urlcode' => 'test-child-parent',
                 'parentCategoryID' => self::PARENT_CATEGORY_ID
             ]
         )->getBody();
@@ -175,7 +175,7 @@ class CategoriesTest extends AbstractResourceTest {
             $this->baseUrl,
             [
                 'name' => 'Test Parent as Child',
-                'urlCode' => 'test-parent-as-child',
+                'urlcode' => 'test-parent-as-child',
                 'parentCategoryID' => self::PARENT_CATEGORY_ID
             ]
         )->getBody();
@@ -183,7 +183,7 @@ class CategoriesTest extends AbstractResourceTest {
             $this->baseUrl,
             [
                 'name' => 'Test Child as Parent',
-                'urlCode' => 'test-child-as-parent',
+                'urlcode' => 'test-child-as-parent',
                 'parentCategoryID' => $row[$this->pk]
             ]
         )->getBody();

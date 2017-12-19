@@ -6,13 +6,14 @@
  */
 
 namespace Garden\Web;
+use Traversable;
 
 use Garden\MetaTrait;
 
 /**
  * Represents the data in a web response.
  */
-class Data implements \JsonSerializable, \ArrayAccess, \Countable {
+class Data implements \JsonSerializable, \ArrayAccess, \Countable, \IteratorAggregate  {
     use MetaTrait;
 
     private $data;
@@ -278,7 +279,9 @@ class Data implements \JsonSerializable, \ArrayAccess, \Countable {
     }
 
     /**
-     * Count elements of an object
+     * Count elements of an object.
+     *
+     * @return int The custom count as an integer.
      * @link http://php.net/manual/en/countable.count.php
      * @return int The custom count as an integer.
      * </p>
@@ -288,5 +291,15 @@ class Data implements \JsonSerializable, \ArrayAccess, \Countable {
      */
     public function count() {
         return count($this->data);
+    }
+
+    /**
+     * Retrieve an external iterator.
+     *
+     * @return Traversable An instance of an object implementing <b>Iterator</b> or <b>Traversable</b>.
+     * @link http://php.net/manual/en/iteratoraggregate.getiterator.php
+     */
+    public function getIterator() {
+        return new \ArrayIterator($this->data);
     }
 }

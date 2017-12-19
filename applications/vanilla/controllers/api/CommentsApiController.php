@@ -40,7 +40,6 @@ class CommentsApiController extends AbstractApiController {
      * @param CommentModel $commentModel
      * @param DiscussionModel $discussionModel
      * @param UserModel $userModel
-     * @param DateFilterSchema $dateFilterSchema
      */
     public function __construct(
         CommentModel $commentModel,

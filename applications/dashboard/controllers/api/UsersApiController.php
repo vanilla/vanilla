@@ -5,13 +5,16 @@
  */
 
 use Garden\Schema\Schema;
-use \Garden\Schema\ValidationException;
+use Garden\Schema\ValidationException;
 use Garden\Web\Data;
 use Garden\Web\Exception\ClientException;
 use Garden\Web\Exception\NotFoundException;
 use Garden\Web\Exception\ServerException;
-use Vanilla\DateFilterSchema;
 use Vanilla\ApiUtils;
+use Vanilla\DateFilterSchema;
+use Vanilla\ImageResizer;
+use Vanilla\UploadedFile;
+use Vanilla\UploadedFileSchema;
 
 /**
  * API Controller for the `/users` resource.
@@ -24,6 +27,9 @@ class UsersApiController extends AbstractApiController {
     /** @var Schema */
     private $idParamSchema;
 
+    /** @var ImageResizer */
+    private $imageResizer;
+
     /** @var UserModel */
     private $userModel;
 
@@ -35,13 +41,16 @@ class UsersApiController extends AbstractApiController {
      *
      * @param UserModel $userModel
      * @param Gdn_Configuration $configuration
+     * @param ImageResizer $imageResizer
      */
     public function __construct(
         UserModel $userModel,
-        Gdn_Configuration $configuration
+        Gdn_Configuration $configuration,
+        ImageResizer $imageResizer
     ) {
         $this->configuration = $configuration;
         $this->userModel = $userModel;
+        $this->imageResizer = $imageResizer;
     }
 
     /**
@@ -60,6 +69,34 @@ class UsersApiController extends AbstractApiController {
         $this->userModel->deleteID($id);
     }
 
+    /**
+     * Delete a user photo.
+     *
+     * @param int|null $id The ID of the user.
+     * @throws ClientException if the user does not have a photo.
+     */
+    public function delete_photo($id = null) {
+        $this->permission('Garden.SignIn.Allow');
+
+        $in = $this->idParamSchema()->setDescription('Delete a user photo.');
+        $out = $this->schema([], 'out');
+
+        if ($id === null) {
+            $id = $this->getSession()->UserID;
+        }
+
+        $user = $this->userByID($id);
+
+        if ($id !== $this->getSession()->UserID) {
+            $this->permission('Garden.Users.Edit');
+        }
+
+        if (empty($user['Photo'])) {
+            throw new ClientException('The user does not have a photo.');
+        }
+
+        $this->userModel->removePicture($id);
+    }
     /**
      * Get a schema instance comprised of all available user fields.
      *
@@ -319,6 +356,49 @@ class UsersApiController extends AbstractApiController {
     }
 
     /**
+     * Set a new photo on a user.
+     *
+     * @param $id A valid user ID.
+     * @param array $body The request body.
+     * @throws ClientException if the image provided is not supported.
+     * @return array
+     */
+    public function post_photo($id = null, array $body) {
+        $this->permission('Garden.SignIn.Allow');
+
+        $photoUploadSchema = new UploadedFileSchema([
+            'allowedExtensions' => array_values(ImageResizer::getTypeExt())
+        ]);
+
+        $in = $this->schema([
+            'photo' => $photoUploadSchema
+        ], 'in');
+        $out = $this->schema(Schema::parse(['photoUrl'])->add($this->fullSchema()), 'out');
+
+        if ($id === null) {
+            $id = $this->getSession()->UserID;
+        }
+
+        $this->userByID($id);
+
+        if ($id !== $this->getSession()->UserID) {
+            $this->permission('Garden.Users.Edit');
+        }
+
+        $body = $in->validate($body);
+
+        $photo = $this->processPhoto($body['photo']);
+        $this->userModel->removePicture($id);
+        $this->userModel->save(['UserID' => $id, 'Photo' => $photo]);
+
+        $user = $this->userByID($id);
+        $user = $this->normalizeOutput($user);
+
+        $result = $out->validate($user);
+        return $result;
+    }
+
+    /**
      * Submit a new user registration.
      *
      * @param array $body The request body.
@@ -450,6 +530,58 @@ class UsersApiController extends AbstractApiController {
 
         $dbRecord = ApiUtils::convertInputKeys($schemaRecord);
         return $dbRecord;
+    }
+
+    /**
+     * Process a user photo upload.
+     *
+     * @param UploadedFile $photo
+     * @throws Exception if there was an error encountered when saving the upload.
+     * @return string
+     */
+    private function processPhoto(UploadedFile $photo) {
+        // Make sure this upload extension is associated with an allowed image type, then grab the extension.
+        $this->imageResizer->imageTypeFromExt($photo->getClientFilename());
+        $ext = pathinfo(strtolower($photo->getClientFilename()), PATHINFO_EXTENSION);
+
+        $height = $this->configuration->get('Garden.Profile.MaxHeight');
+        $width = $this->configuration->get('Garden.Profile.MaxWidth');
+        $thumbSize = $this->configuration->get('Garden.Thumbnail.Size');
+
+        // The image is going to be squared off. Go with the larger dimension.
+        $size = $height >= $width ? $height : $width;
+
+        $destination = ProfileController::AVATAR_FOLDER.'/'.$this->generateUploadPath($ext, true);
+
+        // Resize/crop the photo, then save it. Save by copying so upload can be used again for the thumbnail.
+        $this->savePhoto($photo, $destination, $size, 'p', true);
+
+        // Resize and save the thumbnail.
+        $this->savePhoto($photo, $destination, $thumbSize, 'n');
+
+        return $destination;
+    }
+
+    /**
+     * Save a photo upload.
+     *
+     * @param UploadedFile $upload An instance of an uploaded file.
+     * @param string $destination The path, relative to the uploads directory, to save the images into.
+     * @param int $size Maximum size, in pixels, for the photo.
+     * @param string $prefix An optional prefix (e.g. p for full-size or n for thumbnail).
+     * @param bool $copy Should the upload be saved by copying, instead of moving?
+     * @throws Exception if there was an error encountered when saving the upload.
+     * @return array|bool
+     */
+    private function savePhoto(UploadedFile $upload, $destination, $size, $prefix = '', $copy = false) {
+        $this->imageResizer->resize(
+            $upload->getFile(),
+            null,
+            ['crop' => true, 'height' => $size, 'width' => $size]
+        );
+
+        $result = $this->saveUpload($upload, $destination, "{$prefix}%s", $copy);
+        return $result;
     }
 
     /**

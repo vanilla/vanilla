@@ -195,6 +195,10 @@ class Bootstrap {
             ->rule(\Gdn_Plugin::class)
             ->setShared(true)
             ->addCall('setAddonFromManager')
+
+            ->rule(\Vanilla\FileUtils::class)
+            ->setAliasOf(\VanillaTests\Fixtures\FileUtils::class)
+            ->addAlias('FileUtils')
         ;
     }
 

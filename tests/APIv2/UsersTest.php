@@ -6,7 +6,7 @@
 
 namespace VanillaTests\APIv2;
 
-use Gdn_PasswordHash;
+use VanillaTests\Fixtures\Uploader;
 
 /**
  * Test the /api/v2/users endpoints.
@@ -105,6 +105,19 @@ class UsersTest extends AbstractResourceTest {
     }
 
     /**
+     * Test removing a user's photo.
+     */
+    public function testDeletePhoto() {
+        $userID = $this->testPostPhoto();
+
+        $response = $this->api()->delete("{$this->baseUrl}/{$userID}/photo");
+        $this->assertEquals(204, $response->getStatusCode());
+
+        $user = $this->api()->get("{$this->baseUrl}/{$userID}")->getBody();
+        $this->assertStringEndsWith('/applications/dashboard/design/images/defaulticon.png', $user['photoUrl']);
+    }
+
+    /**
      * {@inheritdoc}
      */
     public function testGetEdit($record = null) {
@@ -172,6 +185,31 @@ class UsersTest extends AbstractResourceTest {
         ];
         $result = parent::testPost($record, $fields);
         return $result;
+    }
+
+    /**
+     * Test adding a photo for a user.
+     *
+     * @return int ID of the user used for this test.
+     */
+    public function testPostPhoto() {
+        $user = $this->testGet();
+
+        Uploader::resetUploads();
+        $photo = Uploader::uploadFile('photo', PATH_ROOT.'/tests/fixtures/apple.jpg');
+        $response = $this->api()->post("{$this->baseUrl}/{$user['userID']}/photo", ['photo' => $photo]);
+
+        $this->assertEquals(201, $response->getStatusCode());
+        $this->assertInternalType('array', $response->getBody());
+
+        $responseBody = $response->getBody();
+        $this->assertArrayHasKey('photoUrl', $responseBody);
+        $this->assertNotEmpty($responseBody['photoUrl']);
+        $this->assertNotFalse(filter_var($responseBody['photoUrl'], FILTER_VALIDATE_URL), 'Photo is not a valid URL.');
+        $this->assertStringEndsNotWith('/applications/dashboard/design/images/defaulticon.png', $responseBody['photoUrl']);
+        $this->assertNotEquals($user['photoUrl'], $responseBody['photoUrl']);
+
+        return $user['userID'];
     }
 
     /**

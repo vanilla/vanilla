@@ -46,27 +46,6 @@ abstract class AbstractApiController extends \Vanilla\Web\Controller {
     }
 
     /**
-     * Get an "expand" parameter definition with specific fields.
-     *
-     * @param array $fields Valid values for the expand parameter.
-     * @param bool|string $default The default value of expand.
-     * @return array
-     */
-    public function getExpandDefinition(array $fields, $default = false) {
-        $result = [
-            'description' => 'Expand associated records using one or more valid field names. A boolean true expands all expandable fields.',
-            'default' => $default,
-            'items' => [
-                'enum' => $fields,
-                'type' => 'string'
-            ],
-            'style' => 'form',
-            'type' => ['boolean', 'array'],
-        ];
-        return $result;
-    }
-
-    /**
      * Get the schema for users joined to records.
      *
      * @return Schema Returns a schema.

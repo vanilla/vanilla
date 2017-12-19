@@ -151,7 +151,7 @@ class InvitesApiController extends AbstractApiController {
                 'minimum' => 1,
                 'maximum' => 100
             ],
-            'expand?' => $this->getExpandDefinition(['acceptedUser'])
+            'expand?' => ApiUtils::getExpandDefinition(['acceptedUser'])
         ], 'in')->setDescription('Get a list of invites sent by the current user.');
         $out = $this->schema([
             ':a' => $this->fullSchema()

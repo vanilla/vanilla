@@ -5,6 +5,7 @@
  */
 
 use Garden\Schema\Schema;
+use Garden\Web\Data;
 use Garden\Web\Exception\ClientException;
 use Garden\Web\Exception\NotFoundException;
 use Garden\Web\Exception\ServerException;
@@ -277,7 +278,7 @@ class CategoriesApiController extends AbstractApiController {
      * List categories.
      *
      * @param array $query The query string.
-     * @return array
+     * @return Data
      */
     public function index(array $query) {
         $this->permission('Garden.SignIn.Allow');
@@ -328,7 +329,7 @@ class CategoriesApiController extends AbstractApiController {
         }
         $categories = array_map([$this, 'normalizeOutput'], $categories);
 
-        return $out->validate($categories);
+        return new Data($out->validate($categories));
     }
 
     /**

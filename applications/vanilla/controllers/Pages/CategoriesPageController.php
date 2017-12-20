@@ -10,18 +10,24 @@ namespace Vanilla\Vanilla\Controllers\Pages;
 
 use Garden\Web\Data;
 use Vanilla\ApiUtils;
+use Vanilla\Web\EbiView;
 
 class CategoriesPageController {
     private $categoriesApi;
 
     private $discussionsApi;
 
+    private $view;
+
     public function __construct(
         \CategoriesApiController $categoriesApi,
-        \DiscussionsApiController $discussionsApi
+        \DiscussionsApiController $discussionsApi,
+        EbiView $view
+
     ) {
         $this->categoriesApi = $categoriesApi;
         $this->discussionsApi = $discussionsApi;
+        $this->view = $view;
     }
 
     public function index($urlCode = '', $page = '') {
@@ -80,7 +86,10 @@ class CategoriesPageController {
                     $query['parentCategoryID'] = $parentCategoryID;
                 }
                 $query['depth'] = 3;
-                $result->addData($this->categoriesApi->index($query), 'categories', true);
+                $categories = $this->categoriesApi->index($query);
+                $categories->setData($this->view->normalizeCategoryTree($categories->getData()));
+                $result->addData($categories, 'categories', true);
+
                 $result->setMeta('template', 'category-index-page');
 
                 break;

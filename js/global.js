@@ -193,6 +193,48 @@
             });
         });
     });
+
+    $(document).on("contentLoad", function(e) {
+        // Setup AJAX filtering for flat category module.
+        // Find each flat category module container, if any.
+        $(".BoxFlatCategory", e.target).each(function(index, value){
+            // Setup the constants we'll need to perform the lookup for this module instance.
+            var container = value;
+            var categoryID = $("input[name=CategoryID]", container).val();
+            var limit = parseInt($("input[name=Limit]", container).val());
+
+            // If we don't even have a category, don't bother setting up filtering.
+            if (typeof categoryID === "undefined") {
+                return;
+            }
+
+            // limit was parsed as an int when originally defined.  If it isn't a valid value now, default to 10.
+            if (isNaN(limit) || limit < 1) {
+                limit = 10;
+            }
+
+            // Anytime someone types something into the search box in this instance's container...
+            $(container).on("keyup", ".SearchForm .InputBox", function(filterEvent) {
+                var url = gdn.url("module/flatcategorymodule/vanilla");
+
+                // ...perform an AJAX request, replacing the current category data with the result's data.
+                jQuery.get(
+                    gdn.url("module/flatcategorymodule/vanilla"),
+                    {
+                        categoryID: categoryID,
+                        filter: filterEvent.target.value,
+                        limit: limit
+                    },
+                    function(data, textStatus, jqXHR) {
+                        $(".FlatCategoryResult", container).replaceWith($(".FlatCategoryResult", data));
+                    }
+                )
+            });
+        });
+
+        // Set up accessible flyouts
+        $('.ToggleFlyout, .editor-dropdown, .ButtonGroup').accessibleFlyoutsInit();
+    });
 })(window, jQuery);
 
 // Stuff to fire on document.ready().
@@ -2120,7 +2162,9 @@ if (typeof String.prototype.trim !== 'function') {
     };
 }
 
-jQuery.fn.extend({
+(function ($) {
+
+$.fn.extend({
     // jQuery UI .effect() replacement using CSS classes.
     effect: function(name) {
         var that = this;
@@ -2177,44 +2221,4 @@ jQuery.fn.extend({
     }
 });
 
-$(document).on("contentLoad", function(e) {
-    // Setup AJAX filtering for flat category module.
-    // Find each flat category module container, if any.
-    $(".BoxFlatCategory", e.target).each(function(index, value){
-        // Setup the constants we'll need to perform the lookup for this module instance.
-        var container = value;
-        var categoryID = $("input[name=CategoryID]", container).val();
-        var limit = parseInt($("input[name=Limit]", container).val());
-
-        // If we don't even have a category, don't bother setting up filtering.
-        if (typeof categoryID === "undefined") {
-            return;
-        }
-
-        // limit was parsed as an int when originally defined.  If it isn't a valid value now, default to 10.
-        if (isNaN(limit) || limit < 1) {
-            limit = 10;
-        }
-
-        // Anytime someone types something into the search box in this instance's container...
-        $(container).on("keyup", ".SearchForm .InputBox", function(filterEvent) {
-            var url = gdn.url("module/flatcategorymodule/vanilla");
-
-            // ...perform an AJAX request, replacing the current category data with the result's data.
-            jQuery.get(
-                gdn.url("module/flatcategorymodule/vanilla"),
-                {
-                    categoryID: categoryID,
-                    filter: filterEvent.target.value,
-                    limit: limit
-                },
-                function(data, textStatus, jqXHR) {
-                    $(".FlatCategoryResult", container).replaceWith($(".FlatCategoryResult", data));
-                }
-            )
-        });
-    });
-
-    // Set up accessible flyouts
-    $('.ToggleFlyout, .editor-dropdown, .ButtonGroup').accessibleFlyoutsInit();
-});
+})(jQuery);

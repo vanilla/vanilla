@@ -24,7 +24,7 @@ class Data implements \JsonSerializable, \ArrayAccess, \Countable, \IteratorAggr
      * @param mixed $data The main response data.
      * @param array|int $meta Either an array of meta information or an integer HTTP response status.
      */
-    public function __construct($data, $meta = []) {
+    public function __construct($data = [], $meta = []) {
         $this->data = $data;
 
         if (is_int($meta)) {
@@ -86,15 +86,19 @@ class Data implements \JsonSerializable, \ArrayAccess, \Countable, \IteratorAggr
     /**
      * Add another data object as a sub array of this data.
      *
-     * @param Data $data The data to add.
+     * @param array|Data $data The data to add.
      * @param string $key The key to add the data to.
      * @param bool $mergeMeta Whether or not to merge the meta array.
      * @return $this
      */
-    public function addData(Data $data, $key, $mergeMeta = false) {
-        $this->data[$key] = $data->getData();
-        if ($mergeMeta) {
-            $this->mergeMetaArray($data->getMetaArray());
+    public function addData($data, $key, $mergeMeta = false) {
+        if (is_array($data)) {
+            $this->data[$key] = $data;
+        } else {
+            $this->data[$key] = $data->getData();
+            if ($mergeMeta) {
+                $this->mergeMetaArray($data->getMetaArray());
+            }
         }
         return $this;
     }

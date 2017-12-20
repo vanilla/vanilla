@@ -145,20 +145,46 @@ class CategoriesApiController extends AbstractApiController {
      * Get a single category.
      *
      * @param int $id The ID of the category.
-     * @throws NotFoundException if unable to find the category.
+     * @param array $query The querystring.
+     * @throws NotFoundException Throws an exception when unable to find the category.
      * @return array
      */
-    public function get($id) {
-        $this->permission('Garden.Settings.Manage');
+    public function get($id, array $query) {
+        return $this->getInternal($id, $query);
+    }
+
+    /**
+     * Get a single category.
+     *
+     * @param int|string $idOrCode The ID of the category.
+     * @param array $query The querystring.
+     * @throws NotFoundException Throws an exception when unable to find the category.
+     * @return array
+     */
+    private function getInternal($idOrCode, array $query = []) {
+        $this->permission('Garden.SignIn.Allow');
 
         $in = $this->idParamSchema()->setDescription('Get a category.');
         $out = $this->schema($this->schemaWithParent(), 'out');
 
-        $row = $this->category($id);
+        $row = $this->category($idOrCode);
+        $this->permission('Vanilla.Discussions.View', $row['CategoryID']);
         $row = $this->normalizeOutput($row);
 
         $result = $out->validate($row);
         return $result;
+    }
+
+    /**
+     * Get a single category by URL code.
+     *
+     * @param string $urlCode The URL code of the category.
+     * @param array $query The querystring.
+     * @throws NotFoundException Throws an exception when unable to find the category.
+     * @return array
+     */
+    public function get_urlCodes($urlCode, array $query = []) {
+        return $this->getInternal($urlCode, $query);
     }
 
     /**
@@ -264,7 +290,7 @@ class CategoriesApiController extends AbstractApiController {
                 'default' => 2
             ],
             'page:i?' => [
-                'description' => 'Page number.',
+                'description' => 'The page number for flat category displays.',
                 'default' => 1,
                 'minimum' => 1,
                 'maximum' => $this->categoryModel->getMaxPages()
@@ -278,7 +304,8 @@ class CategoriesApiController extends AbstractApiController {
         } elseif (array_key_exists('parentCategoryCode', $query)) {
             $parent = $this->category($query['parentCategoryCode']);
         } else {
-            $parent = $this->category(-1);
+            // The root category config sets the DisplayAs of the root category.
+            $parent = c('Vanilla.RootCategory', []) + $this->category(-1);
         }
 
         if ($parent['DisplayAs'] === 'Flat') {

@@ -96,7 +96,8 @@ class ApiUtils {
      * @return int Returns the number of pages.
      */
     public static function pageCount($count, $limit) {
-        return (int)ceil($count / $limit);
+        $result = (int)ceil($count / $limit);
+        return $result <= 0 ? 1 : $result;
     }
 
     /**

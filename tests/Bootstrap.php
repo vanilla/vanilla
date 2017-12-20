@@ -319,6 +319,9 @@ class Bootstrap {
         if (Gdn::getContainer() === $container) {
             Gdn::setContainer(null);
         }
+        if (class_exists('CategoryModel', false)) {
+            \CategoryModel::$Categories = null;
+        }
     }
 
     /**

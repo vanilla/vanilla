@@ -4,16 +4,24 @@
  * @license GPLv2
  */
 
+// @ts-nocheck
+
 import Promise from "promise-polyfill";
 import setAsap from "setasap";
 
+import * as utility from "@core/utility";
+
 /**
  * Polyfills core-js and a few additional things.
+ *
  * Feel free to add additional polyfills here if they're simple,
  * but only functionality present in the latest major version of Chrome, Firefox, and Safari
  * should be polyfilled.
+ *
+ * @returns {Promise<any>} - A Promise that resolves when all polyfills have been loaded.
  */
 export default function loadPolyfills() {
+
     /**
      * We need to polyfill promises in order to use webpack's dynamic imports
      * to polyfill the other feature. It's small so ¯\_(ツ)_/¯.
@@ -34,9 +42,9 @@ export default function loadPolyfills() {
      */
     function polyfillNodeListforEach() {
         if (window.NodeList && !NodeList.prototype.forEach) {
-            NodeList.prototype.forEach = function(callback, thisArg) {
+            NodeList.prototype.forEach = function forEach (callback, thisArg) {
                 thisArg = thisArg || window;
-                for (var i = 0; i < this.length; i++) {
+                for (let i = 0; i < this.length; i++) {
                     callback.call(thisArg, this[i], i, this);
                 }
             };
@@ -53,19 +61,25 @@ export default function loadPolyfills() {
      * https://developer.mozilla.org/en-US/docs/Web/API/Element/closest#Polyfill
      */
     function polyfillClosest() {
-        if (!Element.prototype.matches)
+        if (!Element.prototype.matches) {
             Element.prototype.matches = Element.prototype.msMatchesSelector || Element.prototype.webkitMatchesSelector;
+        }
 
-        if (!Element.prototype.closest)
-            Element.prototype.closest = function(s) {
-                var el = this;
-                if (!document.documentElement.contains(el)) return null;
+        if (!Element.prototype.closest) {
+            Element.prototype.closest = function closest(s) {
+                let el = this;
+                if (!document.documentElement.contains(el)) {
+                    return null;
+                }
                 do {
-                    if (el.matches(s)) return el;
+                    if (el.matches(s)) {
+                        return el;
+                    }
                     el = el.parentElement || el.parentNode;
                 } while (el !== null);
                 return null;
             };
+        }
     }
 
     /**
@@ -78,8 +92,8 @@ export default function loadPolyfills() {
      * https://developer.mozilla.org/en-US/docs/Web/API/ChildNode/remove#Polyfill
      */
     function polyfillRemove() {
-        (function(arr) {
-            arr.forEach(function(item) {
+        (arr => {
+            arr.forEach(item => {
                 if (item.hasOwnProperty("remove")) {
                     return;
                 }
@@ -88,8 +102,10 @@ export default function loadPolyfills() {
                     enumerable: true,
                     writable: true,
                     value: function remove() {
-                        if (this.parentNode !== null) this.parentNode.removeChild(this);
-                    }
+                        if (this.parentNode !== null) {
+                            this.parentNode.removeChild(this);
+                        }
+                    },
                 });
             });
         })([Element.prototype, CharacterData.prototype, DocumentType.prototype]);
@@ -97,14 +113,16 @@ export default function loadPolyfills() {
 
     /**
      * Dynamically import a core-js polyfill.
+     *
+     * @returns {Promise<any>} - A Promise that resolves when core JS has been loaded.
      */
     function polyfillCoreJs() {
         return import(/* webpackChunkName: "polyfill" */ "babel-polyfill")
-            .then(test => {
-                console.log("Loading polyfills");
+            .then(() => {
+                utility.log("Loading polyfills");
             })
             .catch(e => {
-                console.log(e);
+                utility.log(e);
             });
     }
 

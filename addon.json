@@ -3,11 +3,12 @@
     "build": {
         "process": "core",
         "entries": {
-            "app": "./src/js/app.js",
-            "admin": "./src/js/admin.js"
+            "app": "./src/scripts/app.js",
+            "admin": "./src/scripts/admin.js",
+            "bootstrap": "./src/scripts/bootstrap.js"
         },
         "exports": {
-            "app": ["axios", "./src/js/events", "./src/js/utility"],
+            "app": ["axios", "./src/scripts/events", "./src/scripts/utility"],
             "admin": ["axios"]
         }
     }

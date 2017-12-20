@@ -4,7 +4,11 @@
     "license": "GPL-2.0",
     "dependencies": {
         "axios": "^0.17.1",
+        "babel-eslint": "^8.0.3",
         "babel-polyfill": "^6.26.0",
+        "eslint": "^4.13.1",
+        "lodash": "^4.17.4",
+        "lodash.debounce": "^4.0.8",
         "moment": "^2.19.4",
         "promise-polyfill": "^6.1.0",
         "react": "^16.2.0",

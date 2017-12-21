@@ -40,7 +40,8 @@ class DiscussionsPageController extends Controller {
         $result = new Data([]);
         $result->addData($this->discussionsApi->get_bookmarked($query), 'discussions', true);
         $result->addMeta('paging', 'urlFormat', url('/discussions/bookmarked', true).'?page=%s');
-        $result->setMeta('template', 'discussion-bookmarked-page');
+        $result->setMeta('template', 'discussion-bookmarked-dropdown');
+        $result->setMeta('master', 'empty-master');
 
         return $result;
     }

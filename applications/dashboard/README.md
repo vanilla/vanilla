@@ -41,7 +41,7 @@ yarn install
 $ yarn build
 ```
 
-Compiles all theme assets using t. SCSS stylesheets will be compiled to [`design/admin.css`](design/admin.css) and Javascript in the `js/src` directory will be concatenated and output to [`js/dashboard.js`](js/dashboard.js).
+Compiles all theme assets using Grunt. SCSS stylesheets will be compiled to [`design/admin.css`](design/admin.css) and Javascript in the `js/src` directory will be concatenated and output to [`js/dashboard.js`](js/dashboard.js).
 
 **Watch** (run continuously)
 

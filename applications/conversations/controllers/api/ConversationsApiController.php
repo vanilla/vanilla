@@ -289,8 +289,8 @@ class ConversationsApiController extends AbstractApiController {
         $this->permission('Conversations.Conversations.Add');
 
         $in = $this->schema([
-            'insertUserID:i?' => 'Filter by author. (Has no effect if participantUserID is used)',
-            'participantUserID:i?' => 'Filter by participating user.',
+            'insertUserID:i?' => 'Filter by author.',
+            'participantUserID:i?' => 'Filter by participating user. (Has no effect if insertUserID is used)',
             'page:i?' => [
                 'description' => 'Page number.',
                 'default' => 1,
@@ -304,7 +304,6 @@ class ConversationsApiController extends AbstractApiController {
             ],
             'expand?' => ApiUtils::getExpandDefinition(['insertUser'])
         ], 'in')
-            ->requireOneOf(['insertUserID', 'participantUserID'])
             ->setDescription('List user conversations.');
         $out = $this->schema([':a' => $this->fullSchema()], 'out');
 
@@ -313,13 +312,7 @@ class ConversationsApiController extends AbstractApiController {
 
         list($offset, $limit) = offsetLimit("p{$query['page']}", $query['limit']);
 
-        if (!empty($query['participantUserID'])) {
-            if ($query['participantUserID'] !== $this->getSession()->UserID) {
-                $this->checkModerationPermission();
-            }
-
-            $conversations = $this->conversationModel->get2($query['participantUserID'], $offset, $limit)->resultArray();
-        } else if (!empty($query['insertUserID'])) {
+        if (!empty($query['insertUserID'])) {
             if ($query['insertUserID'] !== $this->getSession()->UserID) {
                 $this->checkModerationPermission();
             }
@@ -331,6 +324,14 @@ class ConversationsApiController extends AbstractApiController {
                 $limit,
                 $offset
             )->resultArray();
+        } else {
+            $participantUserID = isset($query['participantUserID']) ? $query['participantUserID'] : $this->getSession()->UserID;
+
+            if ($participantUserID !== $this->getSession()->UserID) {
+                $this->checkModerationPermission();
+            }
+
+            $conversations = $this->conversationModel->get2($participantUserID, $offset, $limit)->resultArray();
         }
 
         // Expand associated rows.

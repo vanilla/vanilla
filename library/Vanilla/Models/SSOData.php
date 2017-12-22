@@ -7,69 +7,189 @@
 
 namespace Vanilla\Models;
 
-use Vanilla\ArrayAccessTrait;
-
 /**
  * Class SSOData
- *
- * This is a data object containing information returned by an SSOAuthenticator.
- * Adding methods to this object probably means that you are doing something wrong.
- *
- * @package Vanilla\Models
  */
-class SSOData implements \ArrayAccess {
-    use ArrayAccessTrait;
+class SSOData implements \JsonSerializable {
 
-    /**
-     * @var string Maps to "GDN_UserAuthenticationProvider.AuthenticationSchemeAlias"
-     */
-    public $authenticatorName;
+    /** @var array $userFields */
+    private static $userFields = ['name', 'email', 'photo', 'roles'];
 
-    /**
-     * @var string Maps to "GDN_UserAuthenticationProvider.ProviderKey"
-     */
-    public $authenticatorID;
+    /** @var string Maps to "GDN_UserAuthenticationProvider.AuthenticationSchemeAlias" */
+    private $authenticatorName;
 
-    /**
-     * @var bool Whether the authenticator can sync Roles or User info.
-     */
-    public $authenticatorIsTrusted;
+    /** @var string Maps to "GDN_UserAuthenticationProvider.ProviderKey" */
+    private $authenticatorID;
 
-    /**
-     * @var string Maps to "GDN_UserAuthentication.ForeignUserKey"
-     */
-    public $uniqueID;
+    /** @var bool Whether the authenticator can sync Roles or User info. */
+    private $authenticatorIsTrusted;
+
+    /** @var string Maps to "GDN_UserAuthentication.ForeignUserKey" */
+    private $uniqueID;
+
+    /** @var array $user */
+    private $user = [];
+
+    /** @var array $extra */
+    private $extra = [];
 
     /**
      * SSOData constructor.
      *
-     * @param array $associativeArray
+     * @param string $authenticatorName
+     * @param string $authenticatorID
+     * @param bool $authenticatorIsTrusted
+     * @param string $uniqueID
+     * @param array $userData
+     * @param array $extra
      * @throws \Exception If a non associative array is passed to the constructor.
      */
-    public function __construct(array $associativeArray = []) {
-        if (array_key_exists(0, $associativeArray)) {
-            throw new \Exception(__CLASS__.' can only be initialized with an associative array.');
-        }
+    public function __construct(
+        $authenticatorName,
+        $authenticatorID,
+        $authenticatorIsTrusted,
+        $uniqueID,
+        $userData = [],
+        $extra = []
+    ) {
+        $this->authenticatorName = $authenticatorName;
+        $this->authenticatorID = $authenticatorID;
+        $this->authenticatorIsTrusted = $authenticatorIsTrusted;
+        $this->uniqueID = $uniqueID;
+        $this->extra = $extra;
 
-        foreach($associativeArray as $name => $value) {
-            $this->$name = $value;
+        foreach ($userData as $key => $value) {
+            $this->setUserValue($key, $value);
         }
     }
 
     /**
-     * Getter with default value.
-     * Deprecate when we can use the coalesce operator.
-     *
-     * @param string $name
-     * @param mixed $default
-     * @return mixed The extra information or the default if not found.
+     * @return string
      */
-    public function coalesce($name, $default = null) {
-        if (property_exists($this, $name)) {
-            return $this->$name;
-        }
+    public function getAuthenticatorName() {
+        return $this->authenticatorName;
+    }
 
-        return $default;
+    /**
+     * @param $authenticatorName
+     * @return $this
+     */
+    public function setAuthenticatorName($authenticatorName) {
+        $this->authenticatorName = $authenticatorName;
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getAuthenticatorID() {
+        return $this->authenticatorID;
+    }
+
+    /**
+     * @param $authenticatorID
+     * @return $this
+     */
+    public function setAuthenticatorID($authenticatorID) {
+        $this->authenticatorID = $authenticatorID;
+        return $this;
+    }
+
+    /**
+     * @return bool
+     */
+    public function getAuthenticatorIsTrusted() {
+        return $this->authenticatorIsTrusted;
+    }
+
+    /**
+     * @param $authenticatorIsTrusted
+     * @return $this
+     */
+    public function setAuthenticatorIsTrusted($authenticatorIsTrusted) {
+        $this->authenticatorIsTrusted = $authenticatorIsTrusted;
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getUniqueID() {
+        return $this->uniqueID;
+    }
+
+    /**
+     * @param $uniqueID
+     * @return $this
+     */
+    public function setUniqueID($uniqueID) {
+        $this->uniqueID = $uniqueID;
+        return $this;
+    }
+
+    /**
+     * @return array
+     */
+    public function getUser() {
+        return $this->user;
+    }
+
+    /**
+     * @param $key
+     * @return mixed|null
+     */
+    public function getUserValue($key) {
+        return isset($this->user[$key]) ? $this->user[$key] : null;
+    }
+
+    /**
+     * @param $key
+     * @param $value
+     * @return $this
+     */
+    public function setUserValue($key, $value) {
+        if (in_array($key, self::$userFields)) {
+            $this->user[$key] = $value;
+        }
+        return $this;
+    }
+
+    /**
+     * @return array
+     */
+    public function getExtra() {
+        return $this->extra;
+    }
+
+    /**
+     * @param $key
+     * @return mixed|null
+     */
+    public function getExtraValue($key) {
+        return isset($this->extra[$key]) ? $this->extra[$key] : null;
+    }
+
+    /**
+     * @param $key
+     * @param $value
+     * @return $this
+     */
+    public function setExtraValue($key, $value) {
+        $this->extra[$key] = $value;
+        return $this;
+    }
+
+    /**
+     * Split user data from extra data.
+     *
+     * @param $data
+     * @return array [$userData, $extraData]
+     */
+    public static function splitProviderData($data) {
+        return [
+            array_intersect_key($data, array_flip(self::$userFields)),
+            array_diff_key($data, array_flip(self::$userFields)),
+        ];
     }
 
     /**
@@ -82,20 +202,40 @@ class SSOData implements \ArrayAccess {
 
         $invalidProperties = [];
         foreach ($required as $name) {
-            if (!property_exists($this, $name)) {
+            if ($this->$name === null) {
                 $invalidProperties[] = $name;
             }
         }
 
         if (count($invalidProperties)) {
-            throw new \Exception("SSOData is invalid. The following properties are not set or empty: ".implode(',', $invalidProperties));
+            throw new \Exception("SSOData is invalid. The following properties are not set: ".implode(',', $invalidProperties));
         }
+    }
+
+    /**
+     * Create an SSOData object from an array of data.
+     *
+     * @throws \ErrorException if the SSOData object is not valid.
+     * @param array $array
+     * @return SSOData
+     */
+    public static function fromArray(array $array) {
+        $ssoData = new SSOData(
+            array_key_exists('authenticatorName', $array) ? $array['authenticatorName'] : null,
+            array_key_exists('authenticatorID', $array) ? $array['authenticatorID'] : null,
+            array_key_exists('authenticatorIsTrusted', $array) ? $array['authenticatorIsTrusted'] : null,
+            array_key_exists('uniqueID', $array) ? $array['uniqueID'] : null,
+            array_key_exists('user', $array) ? $array['user'] : [],
+            array_key_exists('extra', $array) ? $array['extra'] : []
+        );
+        $ssoData->validate();
+        return $ssoData;
     }
 
     /**
      * {@inheritdoc}
      */
-    protected function getArrayAccessSource() {
-        return $this;
+    public function jsonSerialize() {
+        return get_object_vars($this);
     }
 }

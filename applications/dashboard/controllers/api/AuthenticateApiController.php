@@ -498,14 +498,17 @@ class AuthenticateApiController extends AbstractApiController {
                 'authenticatorID:s' => 'ID of the authenticator instance that was used to create this object.',
                 'authenticatorIsTrusted:b' => 'If the authenticator is trusted to sync user\'s information.',
                 'uniqueID:s' => 'Unique ID of the user supplied by the provider.',
-                'email:s?' => 'Email of the user.',
-                'name:s?' => 'Name of the user.',
-                'roles:a?' => [
-                    'description' => 'One or more role name.',
-                    'items' => ['type' => 'string'],
-                    'style' => 'form',
+                'user:o' => [
+                    'email:s?' => 'Email of the user.',
+                    'name:s?' => 'Name of the user.',
+                    'photo:s?' => 'Photo of the user.',
+                    'roles:a?' => [
+                        'description' => 'One or more role name.',
+                        'items' => ['type' => 'string'],
+                        'style' => 'form',
+                    ],
                 ],
-                '...:s?' => 'Any other information.',
+                'extra:o' => 'Any other information.',
             ], 'SSOData')->setDescription('SSOAuthenticator\'s supplied information.');
         }
 

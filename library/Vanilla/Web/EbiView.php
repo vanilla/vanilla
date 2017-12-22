@@ -122,6 +122,7 @@ class EbiView implements ViewInterface {
         $ebi->defineFunction('api', $this->makeApiFunction($dispatcher));
         $ebi->defineFunction('assetUrl', $fn);
         $ebi->defineFunction('bodyImage', [$this, 'bodyImage']);
+        $ebi->defineFunction('boolean', [$this, 'boolean']);
         $ebi->defineFunction('category', function ($category) {
             if (is_numeric($category)) {
                 $category = \CategoryModel::categories($category);
@@ -183,6 +184,17 @@ class EbiView implements ViewInterface {
         $ebi->defineFunction('@a:href', 'url');
         $ebi->defineFunction('@form:action', 'url');
         $ebi->defineFunction('@id', [$this, 'idAttribute']);
+    }
+
+    /**
+     * Make sure you have a true boolean, not a string boolean
+     *
+     * @param mixed $val
+     * @return boolean
+     *
+     */
+    public function boolean($val) {
+        return filter_var($val, FILTER_VALIDATE_BOOLEAN);
     }
 
     /**

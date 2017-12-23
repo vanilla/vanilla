@@ -26,7 +26,7 @@ class HtmLawedPlugin extends Gdn_Plugin {
      *
      * @param $sender
      */
-    public function base_render_before($sender) {
+    public function gdn_dispatcher_appStartup_handler($sender) {
         Gdn::pluginManager()->disablePlugin('HtmLawed');
     }
 

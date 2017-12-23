@@ -335,19 +335,19 @@ class DashboardHooks extends Gdn_Plugin {
      */
     public function settingsController_render_before($sender) {
         // Set this in your config to dismiss our upgrade warnings. Not recommended.
-        if (c('Vanilla.WarnedMeToUpgrade') === 'PHP 5.6') {
+        if (c('Vanilla.WarnedMeToUpgrade') === 'PHP 7.0') {
             return;
         }
 
-        if (version_compare(phpversion(), '5.6') < 0) {
-            $upgradeMessage = ['Content' => 'Upgrade to <b>PHP 5.6</b> or higher immediately. Version '.phpversion().' is no longer supported.', 'AssetTarget' => 'Content', 'CssClass' => 'WarningMessage'];
+        if (version_compare(phpversion(), '7.0') < 0) {
+            $upgradeMessage = ['Content' => 'Upgrade to <b>PHP 7.1</b> or higher immediately. Version '.phpversion().' is not supported in the next version of Vanilla.', 'AssetTarget' => 'Content', 'CssClass' => 'WarningMessage'];
             $messageModule = new MessageModule($sender, $upgradeMessage);
             $sender->addModule($messageModule);
         }
 
         $mysqlVersion = gdn::sql()->version();
         if (version_compare($mysqlVersion, '5.6') < 0) {
-            $upgradeMessage = ['Content' => 'We recommend using <b>MySQL 5.6</b> or higher. Version '.htmlspecialchars($mysqlVersion).' will not support all upcoming Vanilla features.', 'AssetTarget' => 'Content', 'CssClass' => 'InfoMessage'];
+            $upgradeMessage = ['Content' => 'We recommend using at least <b>MySQL 5.7</b> or <b>MariaDB 10.2</b>. Version '.htmlspecialchars($mysqlVersion).' will not support all upcoming Vanilla features.', 'AssetTarget' => 'Content', 'CssClass' => 'InfoMessage'];
             $messageModule = new MessageModule($sender, $upgradeMessage);
             $sender->addModule($messageModule);
         }

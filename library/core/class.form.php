@@ -3187,7 +3187,7 @@ PASSWORDMETER;
     protected function _nameAttribute($fieldName, $attributes) {
         // Name from attributes overrides the default.
         $name = $this->escapeFieldName(arrayValueI('name', $attributes, $fieldName));
-        return ' name="'.htmlspecialchars($name, ENT_COMPAT, c('Garden.Charset', 'UTF-8')).'"';
+        return ' name="'.htmlspecialchars($name).'"';
     }
 
     /**

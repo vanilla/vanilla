@@ -192,7 +192,7 @@ class OpenIDPlugin extends Gdn_Plugin {
         $Mode = $Sender->Request->get('openid_mode');
         switch ($Mode) {
             case 'cancel':
-                $Sender->render('Cancel', '', 'plugins/OpenID');
+                redirectTo(Gdn::router()->getDestination('DefaultController'));
                 break;
             case 'id_res':
                 if ($OpenID->validate()) {

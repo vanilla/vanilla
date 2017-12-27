@@ -57,3 +57,38 @@ export function log(value) {
         console.log(value);
     }
 }
+
+/**
+ * Log an error to console.
+ *
+ * @param {any} value - The value to log.
+ */
+export function logError(value) {
+    // eslint-disable-next-line no-console
+    console.error("ERROR: " + value);
+}
+
+/**
+ * Log a warning to console.
+ *
+ * @param {any} value - The value to log.
+ */
+export function logWarning(value) {
+    // eslint-disable-next-line no-console
+    console.warn("WARNING: " + value);
+}
+
+/**
+ * A simple, fast method of hashing a string. Similar to Java's hash function.
+ * https://stackoverflow.com/a/7616484/1486603
+ *
+ * @param {string} str - The string to hash.
+ *
+ * @returns {number} - The hash code returned.
+ */
+export function hashString(str) {
+    function hashReduce(prevHash, currVal) {
+        return (prevHash << 5) - prevHash + currVal.charCodeAt(0);
+    }
+    return str.split("").reduce(hashReduce, 0);
+}

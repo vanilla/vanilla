@@ -84,11 +84,11 @@ echo $this->Form->errors();
             <div class="input-wrap">
             <?php switch (strtolower(val('Type', $Options, 'textarea'))) {
                 case 'textbox':
-                    echo $this->Form->textBox($this->Form->escapeString('Text_'.$Code));
+                    echo $this->Form->textBox($this->Form->escapeFieldName('Text_'.$Code));
                     break;
                 case 'textarea':
                 default:
-                    echo $this->Form->textBox($this->Form->escapeString('Text_'.$Code), ['MultiLine' => TRUE]);
+                    echo $this->Form->textBox($this->Form->escapeFieldName('Text_'.$Code), ['MultiLine' => TRUE]);
                     break;
             } ?>
             </div>

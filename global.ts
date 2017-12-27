@@ -16,3 +16,5 @@ interface NodeSelector {
 interface Window {
     Waypoint: any;
 }
+
+interface EventTarget extends HTMLElement {};

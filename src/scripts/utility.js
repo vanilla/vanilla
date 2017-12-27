@@ -65,7 +65,7 @@ export function log(value) {
  */
 export function logError(value) {
     // eslint-disable-next-line no-console
-    console.error("ERROR: " + value);
+    console.error(value);
 }
 
 /**
@@ -75,7 +75,7 @@ export function logError(value) {
  */
 export function logWarning(value) {
     // eslint-disable-next-line no-console
-    console.warn("WARNING: " + value);
+    console.warn(value);
 }
 
 /**

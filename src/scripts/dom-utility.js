@@ -51,16 +51,12 @@ export function unhideElement(element) {
 /**
  * Check if an element is visible or not.
  *
- * @param {Element} element - The element to check.
+ * @param {HTMLElement} element - The element to check.
  *
  * @returns {boolean} - The visibility.
  */
 export function elementIsVisible(element) {
-    if (!(element instanceof HTMLElement)) {
-        return false;
-    }
-
-    return element.offsetWidth > 0 && element.offsetHeight > 0;
+    return !!( element.offsetWidth || element.offsetHeight || element.getClientRects().length );
 }
 
 const eventFunctionKeys = [];
@@ -95,11 +91,16 @@ export function delegateEvent(eventName, filterSelector, callback, scopeSelector
 
     if (!eventFunctionKeys.includes(eventHash)) {
         eventFunctionKeys.push(eventHash);
-        scope.addEventListener(eventName, () => {
 
-            // @ts-ignore
-            if (event.target.matches(filterSelector)) {
-                callback(event);
+        scope.addEventListener(eventName, (event) => {
+
+            // Get the nearest DOMNode that matches the given selector.
+            const match = event.target.closest(filterSelector);
+
+            if (match) {
+
+                // Call the callback with the matching element as the context.
+                callback.call(match, event);
             }
         });
     }

@@ -254,7 +254,7 @@ function writeAddonMedia($addonName, $addonInfo, $isEnabled, $addonType, $filter
     $pluginUrl = val('PluginUrl', $addonInfo, '');
 
     if ($upgrade && $pluginUrl) {
-        $info[] = anchor(printf(t('%1$s version %2$s is available.'), $screenName, $newVersion),
+        $info[] = anchor(sprintf(t('%1$s version %2$s is available.'), $screenName, $newVersion),
             combinePaths([$pluginUrl, 'find', urlencode($screenName)], '/'));
     }
 

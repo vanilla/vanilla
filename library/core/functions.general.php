@@ -2476,6 +2476,8 @@ if (!function_exists('proxyHead')) {
      * @throws Exception Throws an exception when there is an unrecoverable error making the request.
      */
     function proxyHead($url, $headers = null, $timeout = false, $followRedirects = false) {
+        deprecated('proxyHead()', 'class ProxyRequest');
+
         if (is_null($headers)) {
             $headers = [];
         }
@@ -2633,6 +2635,8 @@ if (!function_exists('proxyRequest')) {
      * @return string Returns the response body.
      */
     function proxyRequest($url, $timeout = false, $followRedirects = false) {
+        deprecated('proxyRequest()', 'class ProxyRequest');
+
         $originalTimeout = $timeout;
         if ($timeout === false) {
             $timeout = c('Garden.SocketTimeout', 1.0);

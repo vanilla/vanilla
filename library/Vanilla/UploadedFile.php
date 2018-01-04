@@ -118,6 +118,15 @@ class UploadedFile {
     }
 
     /**
+     * Get the temporary filename associated with this uploaded file.
+     *
+     * @return string
+     */
+    public function getFile() {
+        return $this->file;
+    }
+
+    /**
      * Retrieve the filename sent by the client.
      *
      * @return string|null The filename sent by the client or null if none was provided.

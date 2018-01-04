@@ -801,7 +801,7 @@ class PermissionModel extends Gdn_Model {
      *
      * @param int|array $roleID The role(s) to get the permissions for.
      * @param string $limitToSuffix Whether or not to limit the permissions to a suffix.
-     * @return Returns an
+     * @return array
      */
     public function getGlobalPermissions($roleID, $limitToSuffix = '') {
         $roleIDs = (array)$roleID;

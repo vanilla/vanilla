@@ -16,5 +16,8 @@
     ],
     "require": {
         "vanilla": ">=2.1"
+    },
+    "conflict": {
+        "editor": "*"
     }
 }

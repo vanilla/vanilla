@@ -132,6 +132,33 @@ if (!function_exists('arrayKeyExistsI')) {
     }
 }
 
+if (!function_exists('arrayReplaceConfig')) {
+    /**
+     * Replaces elements from an override array into a default array recursively, overwriting numeric arrays entirely.
+     *
+     * This function differs from **array_replace_recursive** in that if an array is numeric it will be completely replaced.
+     *
+     * @param array $default The array of default values.
+     * @param array $override The array of override values.
+     * @return array Returns the replaced arrays.
+     */
+    function arrayReplaceConfig(array $default, array $override) {
+        if (isset($override[0]) || empty($default)) {
+            return $override;
+        }
+
+        $result = array_replace($default, $override);
+
+        foreach ($result as $key => &$value) {
+            if (is_array($value) && isset($default[$key]) && isset($override[$key]) && is_array($default[$key]) && !isset($value[0]) && !isset($default[$key][0])) {
+                $value = arrayReplaceConfig($default[$key], $override[$key]);
+            }
+        }
+
+        return $result;
+    }
+}
+
 if (!function_exists('arraySearchI')) {
     /**
      * Case-insensitive version of array_search.
@@ -308,17 +335,17 @@ if (!function_exists('attribute')) {
         } else {
             $exclude = $valueOrExclude;
         }
-      
+
         foreach ($name as $attribute => $val) {
             if ((empty($val) && !in_array($val, [0, '0'], true)) || ($exclude && stringBeginsWith($attribute, $exclude))) {
                 continue;
             }
-          
+
             if (is_array($val) && strpos($attribute, 'data-') === 0) {
                 $val = json_encode($val);
 
             }
-          
+
             if ($val != '' && $attribute != 'Standard') {
                 $return .= ' '.$attribute.'="'.htmlspecialchars($val, ENT_COMPAT, 'UTF-8').'"';
             }
@@ -2883,6 +2910,9 @@ if (!function_exists('redirectTo')) {
             $statusCode = 302;
         }
 
+        // Encode backslashes because most modern browsers convert backslashes to slashes.
+        // This would cause http://evil.domain\@trusted.domain/ to be converted to http://evil.domain/@trusted.domain/
+        $url = str_replace('\\', '%5c', $url);
         safeHeader('Location: '.$url, true, $statusCode);
         exit();
     }

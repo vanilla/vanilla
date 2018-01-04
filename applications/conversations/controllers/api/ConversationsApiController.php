@@ -9,15 +9,12 @@ use Garden\Schema\Schema;
 use Garden\Web\Exception\NotFoundException;
 use Garden\Web\Exception\ServerException;
 use Vanilla\Exception\ConfigurationException;
-use Vanilla\Utility\CapitalCaseScheme;
+use Vanilla\ApiUtils;
 
 /**
  * API Controller for the `/conversations` resource.
  */
 class ConversationsApiController extends AbstractApiController {
-
-    /** @var CapitalCaseScheme */
-    private $caseScheme;
 
     /** @var Gdn_Configuration */
     private $config;
@@ -40,7 +37,6 @@ class ConversationsApiController extends AbstractApiController {
         ConversationModel $conversationModel,
         UserModel $userModel
     ) {
-        $this->caseScheme = new CapitalCaseScheme();
         $this->config = $config;
         $this->conversationModel = $conversationModel;
         $this->userModel = $userModel;
@@ -205,7 +201,8 @@ class ConversationsApiController extends AbstractApiController {
             $this->checkModerationPermission();
         }
 
-        $this->userModel->expandUsers($conversation, ['insertUserID']);
+        $this->userModel->expandUsers($conversation, ['InsertUserID']);
+        $conversation = $this->normalizeOutput($conversation);
 
         return $out->validate($conversation);
     }
@@ -240,7 +237,7 @@ class ConversationsApiController extends AbstractApiController {
                 'minimum' => 5,
                 'maximum' => 100
             ],
-            'expand:b?' => 'Expand associated records.',
+            'expand?' => ApiUtils::getExpandDefinition(['user'])
         ], 'in')->setDescription('Get participants of a conversation.');
         $out = $this->schema($this->getParticipantsSchema(), 'out');
 
@@ -266,13 +263,12 @@ class ConversationsApiController extends AbstractApiController {
         $conversationMembers = $this->conversationModel->getConversationMembers($id, false, $limit, $offset, $active);
         $data = array_values($conversationMembers);
 
-        foreach ($data as &$row) {
-            $this->translateParticipantStatus($row);
-        }
-
-        if (!empty($query['expand'])) {
-            $this->userModel->expandUsers($data, ['UserID']);
-        }
+        // Expand associated rows.
+        $this->userModel->expandUsers(
+            $data,
+            $this->resolveExpandFields($query, ['user' => 'UserID'])
+        );
+        $data = array_map([$this, 'normalizeParticipantOutput'], $data);
 
         return $out->validate($data);
     }
@@ -287,22 +283,21 @@ class ConversationsApiController extends AbstractApiController {
         $this->permission('Conversations.Conversations.Add');
 
         $in = $this->schema([
-            'insertUserID:i?' => 'Filter by author. (Has no effect if participantUserID is used)',
-            'participantUserID:i?' => 'Filter by participating user.',
+            'insertUserID:i?' => 'Filter by author.',
+            'participantUserID:i?' => 'Filter by participating user. (Has no effect if insertUserID is used)',
             'page:i?' => [
-                    'description' => 'Page number.',
-                    'default' => 1,
-                    'minimum' => 1,
-                ],
-                'limit:i?' => [
-                    'description' => 'The number of items per page.',
-                    'default' => $this->config->get('Conversations.Conversations.PerPage', 50),
-                    'minimum' => 1,
-                    'maximum' => 100
-                ],
-                'expand:b?' => 'Expand associated records.'
-            ], 'in')
-            ->setDescription('List user conversations.');
+                'description' => 'Page number.',
+                'default' => 1,
+                'minimum' => 1,
+            ],
+            'limit:i?' => [
+                'description' => 'The number of items per page.',
+                'default' => $this->config->get('Conversations.Conversations.PerPage', 50),
+                'minimum' => 1,
+                'maximum' => 100
+            ],
+            'expand?' => ApiUtils::getExpandDefinition(['insertUser', 'lastInsertUser']),
+        ], 'in')->setDescription('List user conversations.');
         $out = $this->schema([':a' => $this->fullSchema()], 'out');
 
         $query = $this->filterValues($query);
@@ -310,17 +305,7 @@ class ConversationsApiController extends AbstractApiController {
 
         list($offset, $limit) = offsetLimit("p{$query['page']}", $query['limit']);
 
-        if (empty($query['participantUserID']) && empty($query['insertUserID'])) {
-            $query['participantUserID'] = $this->getSession()->UserID;
-        }
-
-        if (!empty($query['participantUserID'])) {
-            if ($query['participantUserID'] !== $this->getSession()->UserID) {
-                $this->checkModerationPermission();
-            }
-
-            $conversations = $this->conversationModel->get2($query['participantUserID'], $offset, $limit)->resultArray();
-        } elseif (!empty($query['insertUserID'])) {
+        if (!empty($query['insertUserID'])) {
             if ($query['insertUserID'] !== $this->getSession()->UserID) {
                 $this->checkModerationPermission();
             }
@@ -334,12 +319,25 @@ class ConversationsApiController extends AbstractApiController {
             )->resultArray();
 
             $this->conversationModel->joinParticipants($conversations);
+        } else {
+            $participantUserID = isset($query['participantUserID']) ? $query['participantUserID'] : $this->getSession()->UserID;
+
+            if ($participantUserID !== $this->getSession()->UserID) {
+                $this->checkModerationPermission();
+            }
+
+            $conversations = $this->conversationModel->get2($participantUserID, $offset, $limit)->resultArray();
         }
 
-        if (!empty($query['expand'])) {
-            $this->userModel->expandUsers($conversations, ['InsertUserID', 'LastInsertUserID']);
-        }
-        array_walk($conversations, [$this, 'prepareRow']);
+        // Expand associated rows.
+        $this->userModel->expandUsers(
+            $conversations,
+            $this->resolveExpandFields(
+                $query,
+                ['insertUser' => 'InsertUserID', 'lastInsertUser' => 'LastInsertUserID']
+            )
+        );
+        $conversations = array_map([$this, 'normalizeOutput'], $conversations);
 
         return $out->validate($conversations);
     }
@@ -368,7 +366,6 @@ class ConversationsApiController extends AbstractApiController {
 
         $body = $in->validate($body);
         $conversationData = $this->normalizeInput($body);
-        $conversationData = $this->caseScheme->convertArrayKeys($conversationData);
 
         $conversationID = $this->conversationModel->save($conversationData, ['ConversationOnly' => true]);
         $this->validateModel($this->conversationModel, true);
@@ -417,8 +414,8 @@ class ConversationsApiController extends AbstractApiController {
         );
         $data = array_values($conversationMembers);
 
-        array_walk($data, [$this, 'translateParticipantStatus']);
         $this->userModel->expandUsers($data, ['UserID']);
+        $data = array_map([$this, 'normalizeParticipantOutput'], $data);
 
         return $out->validate($data);
     }
@@ -456,90 +453,97 @@ class ConversationsApiController extends AbstractApiController {
     }
 
     /**
-     * Normalize input parameters.
+     * Normalize a Schema record to match the database definition.
      *
-     * @param array $input
-     * @return array The normalized input.
+     * @param array $schemaRecord Schema record.
+     * @return array Return a database record.
      */
-    public function normalizeInput(array $input) {
-        if (array_key_exists('name', $input)) {
-            $input['subject'] = $input['name'];
-            unset($input['name']);
+    public function normalizeInput(array $schemaRecord) {
+        if (array_key_exists('name', $schemaRecord)) {
+            $schemaRecord['subject'] = $schemaRecord['name'];
+            unset($schemaRecord['name']);
         }
-        if (array_key_exists('participantUserIDs', $input)) {
-            $input['recipientUserID'] = $input['participantUserIDs'];
-            unset($input['participantUserIDs']);
+        if (array_key_exists('participantUserIDs', $schemaRecord)) {
+            $schemaRecord['recipientUserID'] = $schemaRecord['participantUserIDs'];
+            unset($schemaRecord['participantUserIDs']);
         }
 
-        return $input;
+        $dbRecord = ApiUtils::convertInputKeys($schemaRecord);
+        return $dbRecord;
     }
 
     /**
-     * Prepare conversation for output.
+     * Normalize a database record to match the Schema definition.
      *
-     * @param array $conversation
+     * @param array $dbRecord Database record.
+     * @return array Return a Schema record.
      */
-    public function prepareRow(array &$conversation) {
-        if (!empty($conversation['Subject'])) {
-            $conversation['name'] = $conversation['Subject'];
-            unset($conversation['Subject']);
+    public function normalizeOutput(array $dbRecord) {
+        if (!empty($dbRecord['Subject'])) {
+            $dbRecord['name'] = $dbRecord['Subject'];
+            unset($dbRecord['Subject']);
         } else {
-            $conversation['name'] = ConversationModel::participantTitle($conversation, false);
+            $dbRecord['name'] = ConversationModel::participantTitle($dbRecord, false);
         }
-        $conversation['body'] = isset($conversation['LastBody'])
-            ? Gdn_Format::to($conversation['LastBody'], $conversation['LastFormat'])
+        $dbRecord['body'] = isset($dbRecord['LastBody'])
+            ? Gdn_Format::to($dbRecord['LastBody'], $dbRecord['LastFormat'])
             : t('No messages.');
-        $conversation['url'] = url("/conversations/{$conversation['ConversationID']}", true);
+        $dbRecord['url'] = url("/conversations/{$dbRecord['ConversationID']}", true);
 
-        if (array_key_exists('CountNewMessages', $conversation)) {
-            $conversation['unread'] = $conversation['CountNewMessages'] > 0;
-            $conversation['countUnread'] = $conversation['CountNewMessages'];
+        if (array_key_exists('CountNewMessages', $dbRecord)) {
+            $dbRecord['unread'] = $dbRecord['CountNewMessages'] > 0;
+            $dbRecord['countUnread'] = $dbRecord['CountNewMessages'];
         }
 
-        if (array_key_exists('Participants', $conversation)) {
-            array_walk($conversation['Participants'], [$this, 'translateParticipantStatus']);
+        if (array_key_exists('Participants', $dbRecord)) {
+            $dbRecord['Participants'] = array_map([$this, 'normalizeParticipantOutput'], $dbRecord['Participants']);
 
             // Do views a favor and move the current user to the end of the list.
-            foreach ($conversation['Participants'] as $i => $row) {
+            foreach ($dbRecord['Participants'] as $i => $row) {
                 if ($row['UserID'] == $this->getSession()->UserID) {
                     $index = $i;
                     break;
                 }
             }
             if (isset($index)) {
-                $me = array_splice($conversation['Participants'], $index, 1);
-                $conversation['Participants'] = array_merge($conversation['Participants'], $me);
+                $me = array_splice($dbRecord['Participants'], $index, 1);
+                $dbRecord['Participants'] = array_merge($dbRecord['Participants'], $me);
             }
         }
 
-        if (isset($conversation['LastInsertUser'])) {
-            $conversation['lastMessage'] = [
-                'insertUserID' => $conversation['LastInsertUserID'],
-                'dateInserted' => $conversation['LastDateInserted'],
-                'insertUser' => $conversation['LastInsertUser']
+        if (isset($dbRecord['LastInsertUser'])) {
+            $dbRecord['lastMessage'] = [
+                'insertUserID' => $dbRecord['LastInsertUserID'],
+                'dateInserted' => $dbRecord['LastDateInserted'],
+                'insertUser' => $dbRecord['LastInsertUser']
             ];
         }
 
+        $schemaRecord = ApiUtils::convertOutputKeys($dbRecord);
+        return $schemaRecord;
     }
 
     /**
      * Translate a row's Deleted field to a Status value.
      *
-     * @param array $row
+     * @param array $dbRecord
+     * @return array
      */
-    private function translateParticipantStatus(array &$row) {
-        if ($row['Deleted'] == 0) {
-            $row['Status'] = 'participating';
+    private function normalizeParticipantOutput(array $dbRecord) {
+        if ($dbRecord['Deleted'] == 0) {
+            $dbRecord['Status'] = 'participating';
         } else {
-            $row['Status'] = 'deleted';
+            $dbRecord['Status'] = 'deleted';
         }
         if (isset($row['Name']) && isset($row['Photo'])) {
-            $row['User'] = [
+            $dbRecord['User'] = [
                 'UserID' => $row['UserID'],
                 'Name' => $row['Name'],
-                'PhotoUrl' => empty($row['PhotoUrl']) ? UserModel::getDefaultAvatarUrl($row) : Gdn_Upload::url($row['PhotoUrl'])
+                'PhotoUrl' => empty($dbRecord['PhotoUrl']) ? UserModel::getDefaultAvatarUrl($dbRecord) : Gdn_Upload::url($dbRecord['PhotoUrl'])
             ];
         }
+
+        return ApiUtils::convertOutputKeys($dbRecord);
     }
 
     /**

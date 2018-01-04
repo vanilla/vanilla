@@ -7,15 +7,13 @@
 use Garden\Schema\Schema;
 use Garden\Web\Exception\NotFoundException;
 use Garden\Web\Exception\ServerException;
-use Vanilla\Utility\CapitalCaseScheme;
+use Vanilla\DateFilterSchema;
+use Vanilla\ApiUtils;
 
 /**
  * API Controller for the `/comments` resource.
  */
 class CommentsApiController extends AbstractApiController {
-
-    /** @var CapitalCaseScheme */
-    private $caseScheme;
 
     /** @var CommentModel */
     private $commentModel;
@@ -42,12 +40,14 @@ class CommentsApiController extends AbstractApiController {
      * @param DiscussionModel $discussionModel
      * @param UserModel $userModel
      */
-    public function __construct(CommentModel $commentModel, DiscussionModel $discussionModel, UserModel $userModel) {
+    public function __construct(
+        CommentModel $commentModel,
+        DiscussionModel $discussionModel,
+        UserModel $userModel
+    ) {
         $this->commentModel = $commentModel;
         $this->discussionModel = $discussionModel;
         $this->userModel = $userModel;
-
-        $this->caseScheme = new CapitalCaseScheme();
     }
 
     /**
@@ -140,6 +140,7 @@ class CommentsApiController extends AbstractApiController {
             'body:s' => 'The body of the comment.',
             'format:s' => 'The input format of the comment.',
             'dateInserted:dt' => 'When the comment was created.',
+            'dateUpdated:dt|n' => 'When the comment was last updated.',
             'insertUserID:i' => 'The user that created the comment.',
             'insertUser?' => $this->getUserFragmentSchema(),
             'url:s?' => 'The full URL to the comment.'
@@ -150,13 +151,17 @@ class CommentsApiController extends AbstractApiController {
      * Get a comment.
      *
      * @param int $id The ID of the comment.
+     * @param array $query The request query.
      * @return array
      */
-    public function get($id) {
+    public function get($id, array $query) {
         $this->permission();
 
-        $in = $this->idParamSchema()->setDescription('Get a comment.');
+        $this->idParamSchema();
+        $in = $this->schema([], ['CommentGet', 'in'])->setDescription('Get a comment.');
         $out = $this->schema($this->commentSchema(), 'out');
+
+        $query = $in->validate($query);
 
         $comment = $this->commentByID($id);
         if ($comment['InsertUserID'] !== $this->getSession()->UserID) {
@@ -164,9 +169,12 @@ class CommentsApiController extends AbstractApiController {
             $this->discussionModel->categoryPermission('Vanilla.Discussions.View', $discussion['CategoryID']);
         }
 
-        $this->prepareRow($comment);
         $this->userModel->expandUsers($comment, ['InsertUserID']);
+        $comment = $this->normalizeOutput($comment);
         $result = $out->validate($comment);
+
+        // Allow addons to modify the result.
+        $result = $this->getEventManager()->fireFilter('commentsApiController_get_output', $result, $this, $in, $query, $comment);
         return $result;
     }
 
@@ -219,7 +227,31 @@ class CommentsApiController extends AbstractApiController {
         $this->permission();
 
         $in = $this->schema([
-            'discussionID:i?' => 'The discussion ID.',
+            'dateInserted?' => new DateFilterSchema([
+                'description' => 'When the comment was created.',
+                'x-filter' => [
+                    'field' => 'c.DateInserted',
+                    'processor' => [DateFilterSchema::class, 'dateFilterField'],
+                ],
+            ]),
+            'dateUpdated?' => new DateFilterSchema([
+                'description' => 'When the comment was updated.',
+                'x-filter' => [
+                    'field' => 'c.DateUpdated',
+                    'processor' => [DateFilterSchema::class, 'dateFilterField'],
+                ],
+            ]),
+            'discussionID:i?' => [
+                'description' => 'The discussion ID.',
+                'x-filter' => [
+                    'field' => 'DiscussionID',
+                    'processor' => function($name, $value) {
+                        $discussion = $this->discussionByID($value);
+                        $this->discussionModel->categoryPermission('Vanilla.Discussions.View', $discussion['CategoryID']);
+                        return [$name => $value];
+                    },
+                ],
+            ],
             'page:i?' => [
                 'description' => 'Page number.',
                 'default' => 1,
@@ -232,80 +264,57 @@ class CommentsApiController extends AbstractApiController {
                 'minimum' => 1,
                 'maximum' => 100
             ],
-            'insertUserID:i?' => 'Filter by author.',
-            'after:dt?' => 'Limit to comments after this date.',
-            'expand:b?' => [
-                'description' => 'Expand associated records.',
-                'default' => false
-            ]
-        ], 'in')->requireOneOf(['discussionID', 'insertUserID'])->setDescription('List comments.');
+            'insertUserID:i?' => [
+                'description' => 'Filter by author.',
+                'x-filter' => [
+                    'field' => 'InsertUserID',
+                ],
+            ],
+            'expand?' => ApiUtils::getExpandDefinition(['insertUser'])
+        ], ['CommentIndex', 'in'])->requireOneOf(['discussionID', 'insertUserID'])->setDescription('List comments.');
         $out = $this->schema([':a' => $this->commentSchema()], 'out');
 
         $query = $in->validate($query);
-
-        $after = isset($query['after']) ? $query['after'] : null;
-        if ($after instanceof DateTimeImmutable) {
-            $after = $after->format(DateTime::ATOM);
-        }
+        $where = ApiUtils::queryToFilters($in, $query);
 
         list($offset, $limit) = offsetLimit("p{$query['page']}", $query['limit']);
 
-        // Lookup by discussion or by user?
-        if (array_key_exists('discussionID', $query)) {
-            $discussion = $this->discussionByID($query['discussionID']);
-            $this->discussionModel->categoryPermission('Vanilla.Discussions.View', $discussion['CategoryID']);
+        $rows = $this->commentModel->lookup($where, true, $limit, $offset, 'asc')->resultArray();
 
-            $where = [];
+        // Expand associated rows.
+        $this->userModel->expandUsers(
+            $rows,
+            $this->resolveExpandFields($query, ['insertUser' => 'InsertUserID'])
+        );
 
-            if (isset($query['insertUserID'])) {
-                $where['InsertUserID'] = $query['insertUserID'];
-            }
-
-            if ($after !== null) {
-                $where['DateInserted >'] = $after;
-            }
-
-            $rows = $this->commentModel->getByDiscussion(
-                $query['discussionID'],
-                $limit,
-                $offset,
-                $where
-            )->resultArray();
-        } else {
-            $rows = $this->commentModel->getByUser2(
-                $query['insertUserID'],
-                $limit,
-                $offset,
-                false,
-                $after,
-                'asc'
-            )->resultArray();
-        }
-
-        if ($query['expand']) {
-            $this->userModel->expandUsers($rows, ['InsertUserID']);
-        }
         foreach ($rows as &$currentRow) {
-            $this->prepareRow($currentRow);
+            $currentRow = $this->normalizeOutput($currentRow);
         }
 
         $result = $out->validate($rows);
+
+        // Allow addons to modify the result.
+        $result = $this->getEventManager()->fireFilter('commentsApiController_index_output', $result, $this, $in, $query, $rows);
         return $result;
     }
 
     /**
-     * Prepare data for output.
+     * Normalize a database record to match the Schema definition.
      *
-     * @param array $row
+     * @param array $dbRecord Database record.
+     * @return array Return a Schema record.
      */
-    public function prepareRow(array &$row) {
-        $this->formatField($row, 'Body', $row['Format']);
-        $row['Url'] = commentUrl($row);
+    public function normalizeOutput(array $dbRecord) {
+        $this->formatField($dbRecord, 'Body', $dbRecord['Format']);
+        $dbRecord['Url'] = commentUrl($dbRecord);
 
-        if (!is_array($row['Attributes'])) {
-            $attributes = dbdecode($row['Attributes']);
-            $row['Attributes'] = is_array($attributes) ? $attributes : [];
+        if (!is_array($dbRecord['Attributes'])) {
+            $attributes = dbdecode($dbRecord['Attributes']);
+            $dbRecord['Attributes'] = is_array($attributes) ? $attributes : [];
         }
+
+        $schemaRecord = ApiUtils::convertOutputKeys($dbRecord);
+        return $schemaRecord;
     }
 
     /**
@@ -323,7 +332,7 @@ class CommentsApiController extends AbstractApiController {
         $out = $this->commentSchema('out');
 
         $body = $in->validate($body, true);
-        $commentData = $this->caseScheme->convertArrayKeys($body);
+        $commentData = ApiUtils::convertInputKeys($body);
         $commentData['CommentID'] = $id;
         $row = $this->commentByID($id);
         if ($row['InsertUserID'] !== $this->getSession()->UserID) {
@@ -342,7 +351,7 @@ class CommentsApiController extends AbstractApiController {
         $this->validateModel($this->commentModel);
         $row = $this->commentByID($id);
         $this->userModel->expandUsers($row, ['InsertUserID']);
-        $this->prepareRow($row);
+        $row = $this->normalizeOutput($row);
 
         $result = $out->validate($row);
         return $result;
@@ -362,7 +371,7 @@ class CommentsApiController extends AbstractApiController {
         $out = $this->commentSchema('out');
 
         $body = $in->validate($body);
-        $commentData = $this->caseScheme->convertArrayKeys($body);
+        $commentData = ApiUtils::convertInputKeys($body);
         $discussion = $this->discussionByID($commentData['DiscussionID']);
         $this->discussionModel->categoryPermission('Vanilla.Comments.Add', $discussion['CategoryID']);
         $id = $this->commentModel->save($commentData);
@@ -371,8 +380,8 @@ class CommentsApiController extends AbstractApiController {
             throw new ServerException('Unable to insert comment.', 500);
         }
         $row = $this->commentByID($id);
-        $this->prepareRow($row);
         $this->userModel->expandUsers($row, ['InsertUserID']);
+        $row = $this->normalizeOutput($row);
 
         $result = $out->validate($row);
         return $result;

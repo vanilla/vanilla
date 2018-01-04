@@ -123,14 +123,21 @@ class AuthenticateController extends Gdn_Controller {
             throw notFoundException();
         }
 
+
         if ($response['authenticationStep'] === 'authenticated') {
-            redirectTo(val('target', $this->request->getQuery(), '/'));
+            $redirectURL = (val('target', $this->request->getQuery(), '/'));
         } else {
             $target = val('target', $this->request->getQuery());
             if ($target) {
                 $target = '&target='.$target;
             }
-            redirectTo("/authenticate/connectuser?authSessionID={$response['authSessionID']}{$target}");
+            $redirectURL = "/authenticate/connectuser?authSessionID={$response['authSessionID']}{$target}";
+        }
+
+        if ($this->deliveryMethod() === DELIVERY_METHOD_JSON) {
+            $this->setRedirectTo($redirectURL);
+        } else {
+            redirectTo($redirectURL);
         }
     }
 
@@ -150,7 +157,7 @@ class AuthenticateController extends Gdn_Controller {
             $this->setData('existingUsers', $session['attributes']['linkuser']['existingUsers']);
         }
 
-        $ssoData = new SSOData($session['attributes']['ssoData']);
+        $ssoData = SSOData::fromArray($session['attributes']['ssoData']);
         $this->setData('ssoData', $ssoData);
 
         $connectSuccess = false;
@@ -169,7 +176,7 @@ class AuthenticateController extends Gdn_Controller {
                 }
 
                 // Set connect option so that the SSOModel knows how to properly sync the user's roles.
-                $ssoData['connectOption'] = $connectOption;
+                $ssoData->setExtraValue('connectOption', $connectOption);
 
                 if ($connectUserID) {
                     // This will effectively sync the user info / roles if there is a need for it.
@@ -180,8 +187,8 @@ class AuthenticateController extends Gdn_Controller {
             }
 
         } else {
-            $this->form->setValue('createUserName', $ssoData->coalesce('name'));
-            $this->form->setValue('createUserEmail', $ssoData->coalesce('email'));
+            $this->form->setValue('createUserName', $ssoData->getUserValue('name'));
+            $this->form->setValue('createUserEmail', $ssoData->getUserValue('email'));
         }
 
         if ($connectSuccess) {
@@ -251,8 +258,8 @@ class AuthenticateController extends Gdn_Controller {
         $this->form->validateRule('createUserEmail', 'ValidateEmail', t('Email is invalid.'));
 
         if ($this->form->errorCount() === 0) {
-            $ssoData['name'] = $this->form->getFormValue('createUserName');
-            $ssoData['email'] = $this->form->getFormValue('createUserEmail');
+            $ssoData->setUserValue('name', $this->form->getFormValue('createUserName'));
+            $ssoData->setUserValue('email', $this->form->getFormValue('createUserEmail'));
             $user = $this->ssoModel->createUser($ssoData);
 
             if ($user) {
@@ -260,8 +267,8 @@ class AuthenticateController extends Gdn_Controller {
 
                 $this->userModel->saveAuthentication([
                     'UserID' => $userID,
-                    'Provider' => $ssoData['authenticatorID'],
-                    'UniqueID' => $ssoData['uniqueID']
+                    'Provider' => $ssoData->getAuthenticatorID(),
+                    'UniqueID' => $ssoData->getUniqueID(),
                 ]);
                 // Clean the session.
                 $this->sessionModel->deleteID($authSessionID);

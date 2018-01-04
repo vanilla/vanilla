@@ -7,8 +7,9 @@
 
 namespace VanillaTests\Library\Core;
 
+use PHPUnit\Framework\TestCase;
 
-class GeneralFunctionsTest extends \PHPUnit\Framework\TestCase {
+class GeneralFunctionsTest extends TestCase {
 
     /**
      * Test {@link urlMatch()}.

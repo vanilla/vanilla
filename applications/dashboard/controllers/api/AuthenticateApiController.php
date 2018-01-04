@@ -16,7 +16,7 @@ use Vanilla\Authenticator\Authenticator;
 use Vanilla\Authenticator\SSOAuthenticator;
 use Vanilla\Exception\PermissionException;
 use Vanilla\Models\SSOModel;
-use Vanilla\Utility\CamelCaseScheme;
+use Vanilla\ApiUtils;
 
 /**
  * API Controller for the `/authenticate` resource.
@@ -27,9 +27,6 @@ class AuthenticateApiController extends AbstractApiController {
 
     /** @var AddonManager */
     private $addonManager;
-
-    /** @var CamelCaseScheme */
-    private $camelCaseScheme;
 
     /** @var Gdn_Configuration */
     private $config;
@@ -70,7 +67,6 @@ class AuthenticateApiController extends AbstractApiController {
         UserModel $userModel
     ) {
         $this->addonManager = $addonManager;
-        $this->camelCaseScheme = new CamelCaseScheme();
         $this->config = $config;
         $this->container = $container;
         $this->request = $request;
@@ -91,7 +87,7 @@ class AuthenticateApiController extends AbstractApiController {
         $this->sessionModel->insert([
             'SessionID' => $sessionID,
             'UserID' => $this->getSession()->UserID,
-            'DateExpire' => date(MYSQL_DATE_FORMAT, time() + self::SESSION_ID_EXPIRATION),
+            'DateExpires' => date(MYSQL_DATE_FORMAT, time() + self::SESSION_ID_EXPIRATION),
             'Attributes' => $data,
         ]);
 
@@ -212,7 +208,7 @@ class AuthenticateApiController extends AbstractApiController {
         $out = $this->schema([
             'authSessionID:s' => 'Identifier of the authentication session.',
             'dateInserted:dt' => 'When the session was created.',
-            'dateExpire:dt' => 'When the session expires.',
+            'dateExpires:dt' => 'When the session expires.',
             'attributes' => Schema::parse([
                 'ssoData:o' => $this->ssoDataSchema(), // This should do a sparse validation
                 'linkUser:o?' => Schema::parse([
@@ -241,7 +237,7 @@ class AuthenticateApiController extends AbstractApiController {
 
         // We need to add back the ssoData since it was cleaned and we want to preserve any extra information.
         if (isset($cleanedSessionData['attributes']['ssoData'])) {
-            $ssoData = $this->camelCaseScheme->convertArrayKeys($sessionData['Attributes']['ssoData']);
+            $ssoData = ApiUtils::convertOutputKeys($sessionData['Attributes']['ssoData']);
             $cleanedSessionData['attributes']['ssoData'] = $ssoData;
         }
 
@@ -370,7 +366,7 @@ class AuthenticateApiController extends AbstractApiController {
         ];
 
         if ($user) {
-            $response = array_merge(['authenticationStep' => 'authenticated'], $this->camelCaseScheme->convertArrayKeys($user));
+            $response = array_merge(['authenticationStep' => 'authenticated'], ApiUtils::convertOutputKeys($user));
         // We could not authenticate or autoconnect so they will need to do a manual connect.
         } else {
             if ($allowConnect) {
@@ -502,14 +498,17 @@ class AuthenticateApiController extends AbstractApiController {
                 'authenticatorID:s' => 'ID of the authenticator instance that was used to create this object.',
                 'authenticatorIsTrusted:b' => 'If the authenticator is trusted to sync user\'s information.',
                 'uniqueID:s' => 'Unique ID of the user supplied by the provider.',
-                'email:s?' => 'Email of the user.',
-                'name:s?' => 'Name of the user.',
-                'roles:a?' => [
-                    'description' => 'One or more role name.',
-                    'items' => ['type' => 'string'],
-                    'style' => 'form',
+                'user:o' => [
+                    'email:s?' => 'Email of the user.',
+                    'name:s?' => 'Name of the user.',
+                    'photo:s?' => 'Photo of the user.',
+                    'roles:a?' => [
+                        'description' => 'One or more role name.',
+                        'items' => ['type' => 'string'],
+                        'style' => 'form',
+                    ],
                 ],
-                '...:s?' => 'Any other information.',
+                'extra:o' => 'Any other information.',
             ], 'SSOData')->setDescription('SSOAuthenticator\'s supplied information.');
         }
 

@@ -10,16 +10,12 @@ use Garden\Web\Exception\ClientException;
 use Garden\Web\Exception\NotFoundException;
 use Garden\Web\Exception\ServerException;
 use Vanilla\Exception\ConfigurationException;
-use Vanilla\Utility\CapitalCaseScheme;
-
+use Vanilla\ApiUtils;
 
 /**
  * API Controller for the `/messages` resource.
  */
 class MessagesApiController extends AbstractApiController {
-
-    /** @var CapitalCaseScheme */
-    private $caseScheme;
 
     /** @var Gdn_Configuration */
     private $config;
@@ -47,7 +43,6 @@ class MessagesApiController extends AbstractApiController {
         ConversationMessageModel $conversationMessageModel,
         UserModel $userModel
     ) {
-        $this->caseScheme = new CapitalCaseScheme();
         $this->config = $config;
         $this->conversationMessageModel = $conversationMessageModel;
         $this->conversationModel = $conversationModel;
@@ -159,7 +154,7 @@ class MessagesApiController extends AbstractApiController {
 
         $this->userModel->expandUsers($message, ['InsertUserID']);
 
-        $this->prepareRow($message);
+        $message = $this->normalizeOutput($message);
         return $out->validate($message);
     }
 
@@ -186,7 +181,7 @@ class MessagesApiController extends AbstractApiController {
                     'minimum' => 1,
                     'maximum' => 100
                 ],
-                'expand:b?' => 'Expand associated records.'
+                'expand?' => ApiUtils::getExpandDefinition(['insertUser'])
             ], 'in')
             ->requireOneOf(['conversationID', 'insertUserID'])
             ->setDescription('List user messages.');
@@ -231,12 +226,14 @@ class MessagesApiController extends AbstractApiController {
             $offset
         )->resultArray();
 
-        if (!empty($query['expand'])) {
-            $this->userModel->expandUsers($messages, ['InsertUserID']);
-        }
+        // Expand associated rows.
+        $this->userModel->expandUsers(
+            $messages,
+            $this->resolveExpandFields($query, ['insertUser' => 'InsertUserID'])
+        );
 
         array_walk($messages, function(&$message) {
-            $this->prepareRow($message);
+            $message = $this->normalizeOutput($message);
         });
 
         return $out->validate($messages);
@@ -259,12 +256,16 @@ class MessagesApiController extends AbstractApiController {
     }
 
     /**
-     * Prepare message for output.
+     * Normalize a database record to match the Schema definition.
      *
-     * @param array $message
+     * @param array $dbRecord Database record.
+     * @return array Return a Schema record.
      */
-    public function prepareRow(array &$message) {
-        $this->formatField($message, 'Body', $message['Format']);
+    public function normalizeOutput(array $dbRecord) {
+        $this->formatField($dbRecord, 'Body', $dbRecord['Format']);
+
+        $schemaRecord = ApiUtils::convertOutputKeys($dbRecord);
+        return $schemaRecord;
     }
 
 //
@@ -322,7 +323,7 @@ class MessagesApiController extends AbstractApiController {
             throw new ClientException('You can not add a message to a conversation that you are not a participant of.');
         }
 
-        $messageData = $this->caseScheme->convertArrayKeys($body);
+        $messageData = ApiUtils::convertInputKeys($body);
         $messageID = $this->conversationMessageModel->save($messageData, $conversation);
         $this->validateModel($this->conversationMessageModel, true);
         if (!$messageID) {
@@ -330,7 +331,7 @@ class MessagesApiController extends AbstractApiController {
         }
 
         $message = $this->messageByID($messageID);
-        $this->prepareRow($message);
+        $message = $this->normalizeOutput($message);
         return $out->validate($message);
     }
 

@@ -5,20 +5,21 @@
  */
 
 use Garden\Schema\Schema;
-use \Garden\Schema\ValidationException;
+use Garden\Schema\ValidationException;
 use Garden\Web\Data;
 use Garden\Web\Exception\ClientException;
 use Garden\Web\Exception\NotFoundException;
 use Garden\Web\Exception\ServerException;
-use Vanilla\Utility\CapitalCaseScheme;
+use Vanilla\ApiUtils;
+use Vanilla\DateFilterSchema;
+use Vanilla\ImageResizer;
+use Vanilla\UploadedFile;
+use Vanilla\UploadedFileSchema;
 
 /**
  * API Controller for the `/users` resource.
  */
 class UsersApiController extends AbstractApiController {
-
-    /** @var CapitalCaseScheme */
-    private $caseScheme;
 
     /** @var Gdn_Configuration */
     private $configuration;
@@ -26,11 +27,11 @@ class UsersApiController extends AbstractApiController {
     /** @var Schema */
     private $idParamSchema;
 
+    /** @var ImageResizer */
+    private $imageResizer;
+
     /** @var UserModel */
     private $userModel;
-
-    /** @var Schema */
-    private $userPostSchema;
 
     /** @var Schema */
     private $userSchema;
@@ -40,11 +41,16 @@ class UsersApiController extends AbstractApiController {
      *
      * @param UserModel $userModel
      * @param Gdn_Configuration $configuration
+     * @param ImageResizer $imageResizer
      */
-    public function __construct(UserModel $userModel, Gdn_Configuration $configuration) {
-        $this->caseScheme = new CapitalCaseScheme();
+    public function __construct(
+        UserModel $userModel,
+        Gdn_Configuration $configuration,
+        ImageResizer $imageResizer
+    ) {
         $this->configuration = $configuration;
         $this->userModel = $userModel;
+        $this->imageResizer = $imageResizer;
     }
 
     /**
@@ -64,6 +70,34 @@ class UsersApiController extends AbstractApiController {
     }
 
     /**
+     * Delete a user photo.
+     *
+     * @param int|null $id The ID of the user.
+     * @throws ClientException if the user does not have a photo.
+     */
+    public function delete_photo($id = null) {
+        $this->permission('Garden.SignIn.Allow');
+
+        $in = $this->idParamSchema()->setDescription('Delete a user photo.');
+        $out = $this->schema([], 'out');
+
+        if ($id === null) {
+            $id = $this->getSession()->UserID;
+        }
+
+        $user = $this->userByID($id);
+
+        if ($id !== $this->getSession()->UserID) {
+            $this->permission('Garden.Users.Edit');
+        }
+
+        if (empty($user['Photo'])) {
+            throw new ClientException('The user does not have a photo.');
+        }
+
+        $this->userModel->removePicture($id);
+    }
+    /**
      * Get a schema instance comprised of all available user fields.
      *
      * @return Schema Returns a schema object.
@@ -75,13 +109,11 @@ class UsersApiController extends AbstractApiController {
             'password:s' => 'Password of the user.',
             'hashMethod:s' => 'Hash method for the password.',
             'email:s' => 'Email address of the user.',
-            'photo:s' => [
-                'allowNull' => true,
+            'photo:s|n' => [
                 'minLength' => 0,
                 'description' => 'Raw photo field value from the user record.'
             ],
-            'photoUrl:s' => [
-                'allowNull' => true,
+            'photoUrl:s|n' => [
                 'minLength' => 0,
                 'description' => 'URL to the user photo.'
             ],
@@ -89,6 +121,8 @@ class UsersApiController extends AbstractApiController {
             'showEmail:b' => 'Is the email address visible to other users?',
             'bypassSpam:b' => 'Should submissions from this user bypass SPAM checks?',
             'banned:i' => 'Is the user banned?',
+            'dateInserted:dt' => 'When the user was created.',
+            'dateUpdated:dt|n' => 'When the user was last updated.',
             'roles:a?' => $this->schema([
                 'roleID:i' => 'ID of the role.',
                 'name:s' => 'Name of the role.'
@@ -115,7 +149,7 @@ class UsersApiController extends AbstractApiController {
         $out = $this->schema($this->userSchema(), 'out');
 
         $row = $this->userByID($id);
-        $this->prepareRow($row);
+        $row = $this->normalizeOutput($row);
 
         $result = $out->validate($row);
         return $result;
@@ -170,37 +204,51 @@ class UsersApiController extends AbstractApiController {
         ]);
 
         $in = $this->schema([
+            'dateInserted?' => new DateFilterSchema([
+                'description' => 'When the user was created.',
+                'x-filter' => [
+                    'field' => 'u.DateInserted',
+                    'processor' => [DateFilterSchema::class, 'dateFilterField'],
+                ],
+            ]),
+            'dateUpdated?' => new DateFilterSchema([
+                'description' => 'When the user was updated.',
+                'x-filter' => [
+                    'field' => 'u.DateUpdated',
+                    'processor' => [DateFilterSchema::class, 'dateFilterField'],
+                ],
+            ]),
             'userID:a?' => [
                 'description' => 'One or more user IDs to lookup.',
                 'items' => ['type' => 'integer'],
-                'style' => 'form'
+                'style' => 'form',
+                'x-filter' => [
+                    'field' => 'u.UserID',
+                ],
             ],
             'page:i?' => [
                 'description' => 'Page number.',
                 'default' => 1,
-                'minimum' => 1
+                'minimum' => 1,
             ],
             'limit:i?' => [
                 'description' => 'The number of items per page.',
                 'default' => 30,
                 'minimum' => 1,
-                'maximum' => 100
+                'maximum' => 100,
             ]
         ], 'in')->setDescription('List users.');
         $out = $this->schema([':a' => $this->userSchema()], 'out');
 
         $query = $in->validate($query);
+        $where = ApiUtils::queryToFilters($in, $query);
+
         list($offset, $limit) = offsetLimit("p{$query['page']}", $query['limit']);
-        $filter = '';
 
-        if (!empty($query['userID'])) {
-            $filter = ['UserID' => $query['userID']];
-        }
-
-        $rows = $this->userModel->search($filter, '', '', $limit, $offset)->resultArray();
+        $rows = $this->userModel->search($where, '', '', $limit, $offset)->resultArray();
         foreach ($rows as &$row) {
             $this->userModel->setCalculatedFields($row);
-            $this->prepareRow($row);
+            $row = $this->normalizeOutput($row);
         }
 
         $result = $out->validate($rows);
@@ -208,29 +256,33 @@ class UsersApiController extends AbstractApiController {
     }
 
     /**
-     * Tweak the data in a user row in a standard way.
+     * Normalize a database record to match the Schema definition.
      *
-     * @param array $row
+     * @param array $dbRecord Database record.
+     * @return array Return a Schema record.
      */
-    protected function prepareRow(array &$row) {
-        if (array_key_exists('UserID', $row)) {
-            $userID = $row['UserID'];
+    protected function normalizeOutput(array $dbRecord) {
+        if (array_key_exists('UserID', $dbRecord)) {
+            $userID = $dbRecord['UserID'];
             $roles = $this->userModel->getRoles($userID)->resultArray();
-            $row['roles'] = $roles;
+            $dbRecord['roles'] = $roles;
         }
-        if (array_key_exists('Photo', $row)) {
-            $photo = userPhotoUrl($row);
-            $row['Photo'] = $photo;
-            $row['PhotoUrl'] = $photo;
+        if (array_key_exists('Photo', $dbRecord)) {
+            $photo = userPhotoUrl($dbRecord);
+            $dbRecord['Photo'] = $photo;
+            $dbRecord['PhotoUrl'] = $photo;
         }
-        if (array_key_exists('Verified', $row)) {
-            $row['bypassSpam'] = $row['Verified'];
-            unset($row['Verified']);
+        if (array_key_exists('Verified', $dbRecord)) {
+            $dbRecord['bypassSpam'] = $dbRecord['Verified'];
+            unset($dbRecord['Verified']);
         }
-        if (array_key_exists('Confirmed', $row)) {
-            $row['emailConfirmed'] = $row['Confirmed'];
-            unset($row['Confirmed']);
+        if (array_key_exists('Confirmed', $dbRecord)) {
+            $dbRecord['emailConfirmed'] = $dbRecord['Confirmed'];
+            unset($dbRecord['Confirmed']);
         }
+
+        $schemaRecord = ApiUtils::convertOutputKeys($dbRecord);
+        return $schemaRecord;
     }
 
     /**
@@ -245,19 +297,22 @@ class UsersApiController extends AbstractApiController {
         $this->permission('Garden.Users.Edit');
 
         $this->idParamSchema('in');
-        $in = $this->userPostSchema('in')->setDescription('Update a user.');
+        $in = $this->schema($this->userPatchSchema(), 'in')->setDescription('Update a user.');
         $out = $this->userSchema('out');
 
         $body = $in->validate($body, true);
         // If a row associated with this ID cannot be found, a "not found" exception will be thrown.
         $this->userByID($id);
-        $body = $this->translateRequest($body);
-        $userData = $this->caseScheme->convertArrayKeys($body);
+        $userData = $this->normalizeInput($body);
         $userData['UserID'] = $id;
-        $this->userModel->save($userData);
+        $settings = [];
+        if (!empty($userData['RoleID'])) {
+            $settings['SaveRoles'] = true;
+        }
+        $this->userModel->save($userData, $settings);
         $this->validateModel($this->userModel);
         $row = $this->userByID($id);
-        $this->prepareRow($row);
+        $row = $this->normalizeOutput($row);
 
         $result = $out->validate($row);
         return $result;
@@ -273,13 +328,12 @@ class UsersApiController extends AbstractApiController {
     public function post(array $body) {
         $this->permission('Garden.Users.Add');
 
-        $in = $this->userPostSchema('in', ['password', 'roleID?'])->setDescription('Add a user.');
+        $in = $this->schema($this->userPostSchema(), 'in')->setDescription('Add a user.');
         $out = $this->schema($this->userSchema(), 'out');
 
         $body = $in->validate($body);
 
-        $body = $this->translateRequest($body);
-        $userData = $this->caseScheme->convertArrayKeys($body);
+        $userData = $this->normalizeInput($body);
         if (!array_key_exists('RoleID', $userData)) {
             $userData['RoleID'] = RoleModel::getDefaultRoles(RoleModel::TYPE_MEMBER);
         }
@@ -295,10 +349,53 @@ class UsersApiController extends AbstractApiController {
         }
 
         $row = $this->userByID($id);
-        $this->prepareRow($row);
+        $row = $this->normalizeOutput($row);
 
         $result = $out->validate($row);
         return new Data($result, 201);
+    }
+
+    /**
+     * Set a new photo on a user.
+     *
+     * @param $id A valid user ID.
+     * @param array $body The request body.
+     * @throws ClientException if the image provided is not supported.
+     * @return array
+     */
+    public function post_photo($id = null, array $body) {
+        $this->permission('Garden.SignIn.Allow');
+
+        $photoUploadSchema = new UploadedFileSchema([
+            'allowedExtensions' => array_values(ImageResizer::getTypeExt())
+        ]);
+
+        $in = $this->schema([
+            'photo' => $photoUploadSchema
+        ], 'in');
+        $out = $this->schema(Schema::parse(['photoUrl'])->add($this->fullSchema()), 'out');
+
+        if ($id === null) {
+            $id = $this->getSession()->UserID;
+        }
+
+        $this->userByID($id);
+
+        if ($id !== $this->getSession()->UserID) {
+            $this->permission('Garden.Users.Edit');
+        }
+
+        $body = $in->validate($body);
+
+        $photo = $this->processPhoto($body['photo']);
+        $this->userModel->removePicture($id);
+        $this->userModel->save(['UserID' => $id, 'Photo' => $photo]);
+
+        $user = $this->userByID($id);
+        $user = $this->normalizeOutput($user);
+
+        $result = $out->validate($user);
+        return $result;
     }
 
     /**
@@ -316,7 +413,7 @@ class UsersApiController extends AbstractApiController {
         $registrationMethod = $this->configuration->get('Garden.Registration.Method');
         $registrationMethod = strtolower($registrationMethod);
 
-        $userData = $this->caseScheme->convertArrayKeys($body);
+        $userData = ApiUtils::convertInputKeys($body);
 
         $inputProperties = [
             'email:s' => 'An email address for this user.',
@@ -418,20 +515,73 @@ class UsersApiController extends AbstractApiController {
 //    }
 
     /**
-     * Translate a request to this endpoint into a format compatible for saving with the model.
+     * Normalize a Schema record to match the database definition.
      *
-     * @param array $body
-     * @return array
+     * @param array $schemaRecord Schema record.
+     * @return array Return a database record.
      */
-    private function translateRequest(array $body) {
-        if (array_key_exists('bypassSpam', $body)) {
-            $body['verified'] = $body['bypassSpam'];
+    private function normalizeInput(array $schemaRecord) {
+        if (array_key_exists('bypassSpam', $schemaRecord)) {
+            $schemaRecord['verified'] = $schemaRecord['bypassSpam'];
         }
-        if (array_key_exists('emailConfirmed', $body)) {
-            $body['confirmed'] = $body['emailConfirmed'];
+        if (array_key_exists('emailConfirmed', $schemaRecord)) {
+            $schemaRecord['confirmed'] = $schemaRecord['emailConfirmed'];
         }
 
-        return $body;
+        $dbRecord = ApiUtils::convertInputKeys($schemaRecord);
+        return $dbRecord;
+    }
+
+    /**
+     * Process a user photo upload.
+     *
+     * @param UploadedFile $photo
+     * @throws Exception if there was an error encountered when saving the upload.
+     * @return string
+     */
+    private function processPhoto(UploadedFile $photo) {
+        // Make sure this upload extension is associated with an allowed image type, then grab the extension.
+        $this->imageResizer->imageTypeFromExt($photo->getClientFilename());
+        $ext = pathinfo(strtolower($photo->getClientFilename()), PATHINFO_EXTENSION);
+
+        $height = $this->configuration->get('Garden.Profile.MaxHeight');
+        $width = $this->configuration->get('Garden.Profile.MaxWidth');
+        $thumbSize = $this->configuration->get('Garden.Thumbnail.Size');
+
+        // The image is going to be squared off. Go with the larger dimension.
+        $size = $height >= $width ? $height : $width;
+
+        $destination = ProfileController::AVATAR_FOLDER.'/'.$this->generateUploadPath($ext, true);
+
+        // Resize/crop the photo, then save it. Save by copying so upload can be used again for the thumbnail.
+        $this->savePhoto($photo, $destination, $size, 'p', true);
+
+        // Resize and save the thumbnail.
+        $this->savePhoto($photo, $destination, $thumbSize, 'n');
+
+        return $destination;
+    }
+
+    /**
+     * Save a photo upload.
+     *
+     * @param UploadedFile $upload An instance of an uploaded file.
+     * @param string $destination The path, relative to the uploads directory, to save the images into.
+     * @param int $size Maximum size, in pixels, for the photo.
+     * @param string $prefix An optional prefix (e.g. p for full-size or n for thumbnail).
+     * @param bool $copy Should the upload be saved by copying, instead of moving?
+     * @throws Exception if there was an error encountered when saving the upload.
+     * @return array|bool
+     */
+    private function savePhoto(UploadedFile $upload, $destination, $size, $prefix = '', $copy = false) {
+        $this->imageResizer->resize(
+            $upload->getFile(),
+            null,
+            ['crop' => true, 'height' => $size, 'width' => $size]
+        );
+
+        $result = $this->saveUpload($upload, $destination, "{$prefix}%s", $copy);
+        return $result;
     }
 
     /**
@@ -450,30 +600,48 @@ class UsersApiController extends AbstractApiController {
     }
 
     /**
-     * Get a user schema with minimal add/edit fields.
+     * Get a user schema with minimal edit fields.
      *
-     * @param string $type The type of schema.
-     * @param array|null $extra Additional fields to include.
      * @return Schema Returns a schema object.
      */
-    public function userPostSchema($type = '', array $extra = []) {
-        if ($this->userPostSchema === null) {
-            $schema = Schema::parse([
-                'roleID:a' => 'Roles to set on the user.'
-            ])->add($this->fullSchema(), true);
-            $fields = [
-                'name',
-                'email',
-                'photo?',
-                'emailConfirmed' => ['default' => true],
-                'bypassSpam' => ['default' => false]
-            ];
-            $this->userPostSchema = $this->schema(
-                Schema::parse(array_merge($fields, $extra))->add($schema),
-                'UserPost'
-            );
+    public function userPatchSchema() {
+        static $schema;
+
+        if ($schema === null) {
+            $schema = $this->schema(Schema::parse([
+                'name?', 'email?', 'photo?', 'emailConfirmed?', 'bypassSpam?',
+                'roleID?' => [
+                    'type' => 'array',
+                    'items' => ['type' => 'integer'],
+                    'description' => 'Roles to set on the user.'
+                ]
+            ])->add($this->fullSchema()), 'UserPatch');
         }
-        return $this->schema($this->userPostSchema, $type);
+
+        return $schema;
+    }
+
+    /**
+     * Get a user schema with minimal add fields.
+     *
+     * @return Schema Returns a schema object.
+     */
+    public function userPostSchema() {
+        static $schema;
+
+        if ($schema === null) {
+            $schema = $this->schema(Schema::parse([
+                'name', 'email', 'photo?', 'password',
+                'emailConfirmed' => ['default' => true], 'bypassSpam' => ['default' => false],
+                'roleID?' => [
+                    'type' => 'array',
+                    'items' => ['type' => 'integer'],
+                    'description' => 'Roles to set on the user.'
+                ]
+            ])->add($this->fullSchema()), 'UserPost');
+        }
+
+        return $schema;
     }
 
     /**
@@ -485,7 +653,7 @@ class UsersApiController extends AbstractApiController {
     public function userSchema($type = '') {
         if ($this->userSchema === null) {
             $schema = Schema::parse(['userID', 'name', 'email', 'photoUrl', 'emailConfirmed',
-                'showEmail', 'bypassSpam', 'banned', 'roles?']);
+                'showEmail', 'bypassSpam', 'banned', 'dateInserted', 'dateUpdated', 'roles?']);
             $schema = $schema->add($this->fullSchema());
             $this->userSchema = $this->schema($schema, 'User');
         }

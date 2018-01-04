@@ -232,8 +232,8 @@ class VanillaConnectPlugin extends Gdn_Plugin {
         }
 
         // Redirect to /authenticate/vanillaconnect which will redirect to the proper URL with the JWT.
-        $signInUrl = url('/entry/vanillaconnect/signin/'.rawurlencode($provider['AuthenticationKey'])).'?target='.rawurlencode($this->request->getPath());
-        $registerUrl = url('/entry/vanillaconnect/register/'.rawurlencode($provider['AuthenticationKey'])).'?target='.rawurlencode($this->request->getPath());
+        $signInUrl = '/entry/vanillaconnect/signin/'.rawurlencode($provider['AuthenticationKey']).'?target='.rawurlencode($this->request->getPath());
+        $registerUrl = '/entry/vanillaconnect/register/'.rawurlencode($provider['AuthenticationKey']).'?target='.rawurlencode($this->request->getPath());
 
         $result = '<div class="vanilla-connect">';
         $result .= anchor(sprintf(t('Sign In with %s'), $provider['Name']), $signInUrl, 'Button Primary SignInLink');
@@ -360,7 +360,7 @@ class VanillaConnectPlugin extends Gdn_Plugin {
             ],
             'SignInUrl' => [
                 'LabelCode' => 'Sign In URL',
-                'Description' => t('The url that users use to sign in.').' '.t('Use {target} to specify a redirect.')
+                'Description' => t('The url that users use to sign in.').' '.t('Use target={target} to redirect users to the page they were on or target=WhateverYouWant to redirect to a specific url.')
             ],
             'RegisterUrl' => [
                 'LabelCode' => 'Registration URL',

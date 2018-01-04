@@ -1177,13 +1177,13 @@ class UserController extends DashboardController {
             throw permissionException('Javascript');
         }
 
-        // First, set the field value.
-        Gdn::userModel()->setField($UserID, 'Verified', $Verified);
-
         $User = Gdn::userModel()->getID($UserID);
         if (!$User) {
             throw notFoundException('User');
         }
+
+        // First, set the field value.
+        Gdn::userModel()->setField($UserID, 'Verified', $Verified);
 
         // Send back the verified button.
         require_once $this->fetchViewLocation('helper_functions', 'Profile', 'Dashboard');

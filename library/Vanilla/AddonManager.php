@@ -28,6 +28,10 @@ class AddonManager {
     const REQ_MISSING = 0x04; // addon missing from the manager
     const REQ_VERSION = 0x08; // addon isn't the correct version
 
+    // These constants for default themes will eventually be used in the bootstrap.
+    const DEFAULT_DESKTOP_THEME = 'default';
+    const DEFAULT_MOBILE_THEME = 'mobile';
+
     /// Properties ///
 
     /**
@@ -520,7 +524,7 @@ class AddonManager {
             if (is_readable($cachePath)) {
                 $addon = require $cachePath;
                 $this->singleCache[$type][$addonDirName] = $addon;
-                return $addon;
+                return $addon === false ? null : $addon;
             }
         }
         // Look for the addon itself.
@@ -580,6 +584,35 @@ class AddonManager {
     }
 
     /**
+     * Check to see if an addon has any conflicts with another addon(s).
+     *
+     * @param Addon $addon The addon to check.
+     * @param bool $throw Whether or not to throw an exception if there are conflicts.
+     * @return bool Returns **true** if there are no conflicts or **false** otherwise.
+     * @throws \Exception Throws an exception if there are conflicts and **$throw** is **true**.
+     */
+    public function checkConflicts(Addon $addon, $throw = false) {
+        $addons = $this->lookupConflicts($addon);
+        $conflicts = [];
+        foreach ($addons as $key => $_) {
+            $conflicts[] = $this->lookupAddon($key)->getName();
+        }
+
+        if (!empty($conflicts)) {
+            if ($throw) {
+                $msg = sprintf(
+                    '%1$s conflicts with: %2$s.',
+                    $addon->getName(),
+                    implode(', ', $conflicts)
+                );
+                throw new \Exception($msg, 409);
+            }
+            return false;
+        }
+        return true;
+    }
+
+    /**
      * Get all of the requirements for an addon.
      *
      * This method returns an array of all of the addon requirements for a given addon. The return is an array of
@@ -592,7 +625,9 @@ class AddonManager {
      * @param Addon $addon The addon to check.
      * @param int $filter One or more of the **AddonManager::REQ_*** constants concatenated by `|`.
      *
-     * @return Returns the requirements array. An empty array represents an addon with no requirements.
+     * When using this filter, any requirement statuses that meet at least one of the filters will be returned.
+     *
+     * @return array Returns the requirements array. An empty array represents an addon with no requirements.
      */
     public function lookupRequirements(Addon $addon, $filter = null) {
         $array = [];
@@ -601,11 +636,65 @@ class AddonManager {
         // Filter the list.
         if ($filter) {
             $array = array_filter($array, function ($row) use ($filter) {
-                return ($row['status'] & $filter) === $filter;
+                return ($row['status'] & $filter) > 0;
             });
         }
 
         return $array;
+    }
+
+    /**
+     * Lookup the addons that conflict with an addon.
+     *
+     * This method returns an array of all of the conflicting addons in the following format:
+     *
+     * ```
+     * 'addonKey' => ['from' => ['addonKey', ...]]
+     * ```
+     *
+     * @param Addon $addon The addon to lookup the conflicts for.
+     * @return array Returns an array of conflicts.
+     */
+    public function lookupConflicts(Addon $addon) {
+        // Get a list of requirements to check their conflicts too.
+        $addons = [$addon->getKey() => $addon];
+        $reqs = $this->lookupRequirements($addon, self::REQ_DISABLED | self::REQ_ENABLED);
+        foreach ($reqs as $key => $_) {
+            $addons[$key] = $this->lookupAddon($key);
+        }
+
+        $enabled = $this->getEnabled();
+        $conflicts = [];
+        foreach ($addons as $a) {
+            /* @var Addon $a */
+            foreach ($a->getConflicts() as $key => $req) {
+                $conflict = null;
+                if (isset($addons[$key])) {
+                    $conflict = $addons[$key];
+                } elseif ($this->isEnabled($key, Addon::TYPE_ADDON)) {
+                    $conflict = $this->lookupAddon($key);
+                }
+
+                if ($conflict && Addon::checkVersion($conflict->getVersion(), $req)) {
+                    $conflicts[$conflict->getKey()]['from'][] = $a->getKey();
+                }
+            }
+
+            // Check against enabled addons.
+            foreach ($enabled as $a2) {
+                /* @var Addon $a2 */
+                if (isset($conflicts[$a2->getKey()])) {
+                    continue;
+                }
+
+                $a2Conflicts = $a2->getConflicts();
+                if (isset($a2Conflicts[$a->getKey()]) && Addon::checkVersion($a->getVersion(), $a2Conflicts[$a->getKey()])) {
+                    $conflicts[$a2->getKey()]['from'][] = $a->getKey();
+                }
+            }
+        }
+
+        return $conflicts;
     }
 
     /**
@@ -1154,5 +1243,29 @@ class AddonManager {
      */
     public function isCacheEnabled() {
         return $this->cacheDir !== null;
+    }
+
+    /**
+     * Add an addon to the addon manager.
+     *
+     * This method is useful for adding ad-hoc addons that are outside of the scan directories.
+     *
+     * @param Addon $addon The addon to add.
+     * @param bool $start Whether or not to start the addon after adding.
+     * @return $this
+     */
+    public function add(Addon $addon, $start = true) {
+        if ($this->typeUsesMultiCaching($addon->getType())) {
+            $this->ensureMultiCache();
+            $this->multiCache[$addon->getKey()] = $addon;
+        } else {
+            $this->singleCache[$addon->getType()][$addon->getKey()] = $addon;
+        }
+
+        if ($start) {
+            $this->startAddon($addon);
+        }
+
+        return $this;
     }
 }

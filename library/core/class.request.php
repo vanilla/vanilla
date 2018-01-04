@@ -1155,13 +1155,17 @@ class Gdn_Request implements RequestInterface {
             $result = [];
             foreach ($files['tmp_name'] as $key => $val) {
                 // Consolidate the attributes and push them down the tree.
-                $result[$key] = $getUpload([
+                $upload = $getUpload([
                     'error' => $files['error'][$key],
                     'name' => $files['name'][$key],
                     'size' => $files['size'][$key],
                     'tmp_name' => $files['tmp_name'][$key],
                     'type' => $files['type'][$key]
                 ]);
+                if ($upload instanceof UploadedFile && $upload->getError() === UPLOAD_ERR_NO_FILE) {
+                    continue;
+                }
+                $result[$key] = $upload;
             }
             return $result;
         };
@@ -1192,7 +1196,11 @@ class Gdn_Request implements RequestInterface {
 
         $result = [];
         foreach ($files as $key => $value) {
-            $result[$key] = $getUpload($value);
+            $upload = $getUpload($value);
+            if ($upload instanceof UploadedFile && $upload->getError() === UPLOAD_ERR_NO_FILE) {
+                continue;
+            }
+            $result[$key] = $upload;
         }
         return $result;
     }

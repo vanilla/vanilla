@@ -7,17 +7,17 @@
 namespace VanillaTests\APIv2;
 
 /**
- * Test the /api/v2/applications endpoints.
+ * Test the /api/v2/applicants endpoints.
  */
-class ApplicationsTest extends AbstractResourceTest {
+class ApplicantsTest extends AbstractResourceTest {
 
     /**
      * {@inheritdoc}
      */
     public function __construct($name = null, array $data = [], $dataName = '') {
-        $this->baseUrl = '/applications';
+        $this->baseUrl = '/applicants';
         $this->patchFields = ['status'];
-        $this->pk = 'applicationID';
+        $this->pk = 'applicantID';
 
         parent::__construct($name, $data, $dataName);
     }
@@ -52,7 +52,7 @@ class ApplicationsTest extends AbstractResourceTest {
      * Approving a user application.
      *
      * @expectedException \Exception
-     * @expectedExceptionMessage The application specified is already an active user.
+     * @expectedExceptionMessage The applicant specified is already an active user.
      */
     public function testApprove() {
         $row = $this->testPost();
@@ -85,7 +85,7 @@ class ApplicationsTest extends AbstractResourceTest {
      *
      * @expectedException \Exception
      * @expectedExceptionCode 404
-     * @expectedExceptionMessage Application not found.
+     * @expectedExceptionMessage Applicant not found.
      */
     public function testDecline() {
         $row = $this->testPost();

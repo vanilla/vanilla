@@ -8,15 +8,13 @@
 use Garden\Schema\Schema;
 use Garden\Web\Exception\NotFoundException;
 use Garden\Web\Exception\ServerException;
-use Vanilla\Utility\CapitalCaseScheme;
+use Vanilla\DateFilterSchema;
+use Vanilla\ApiUtils;
 
 /**
  * API Controller for the `/discussions` resource.
  */
 class DiscussionsApiController extends AbstractApiController {
-
-    /** @var CapitalCaseScheme */
-    private $caseScheme;
 
     /** @var DiscussionModel */
     private $discussionModel;
@@ -39,11 +37,12 @@ class DiscussionsApiController extends AbstractApiController {
      * @param DiscussionModel $discussionModel
      * @param UserModel $userModel
      */
-    public function __construct(DiscussionModel $discussionModel, UserModel $userModel) {
+    public function __construct(
+        DiscussionModel $discussionModel,
+        UserModel $userModel
+    ) {
         $this->discussionModel = $discussionModel;
         $this->userModel = $userModel;
-
-        $this->caseScheme = new CapitalCaseScheme();
     }
 
     /**
@@ -68,8 +67,8 @@ class DiscussionsApiController extends AbstractApiController {
                 'minimum' => 1,
                 'maximum' => 100
             ],
-            'expand:b?' => 'Expand associated records.'
-        ], 'in');
+            'expand?' => ApiUtils::getExpandDefinition(['insertUser', 'lastUser', 'lastPost'])
+        ], 'in')->setDescription('Get a list of the current user\'s bookmarked discussions.');
         $out = $this->schema([':a' => $this->discussionSchema()], 'out');
 
         $query = $in->validate($query);
@@ -79,11 +78,15 @@ class DiscussionsApiController extends AbstractApiController {
             'w.Bookmarked' => 1,
             'w.UserID' => $this->getSession()->UserID
         ])->resultArray();
-        if (!empty($query['expand'])) {
-            $this->userModel->expandUsers($rows, ['InsertUserID']);
-        }
+
+        // Expand associated rows.
+        $this->userModel->expandUsers(
+            $rows,
+            $this->resolveExpandFields($query, ['insertUser' => 'InsertUserID', 'lastUser' => 'LastUserID'])
+        );
+
         foreach ($rows as &$currentRow) {
-            $this->prepareRow($currentRow);
+            $currentRow = $this->normalizeOutput($currentRow);
         }
 
         $result = $out->validate($rows);
@@ -165,9 +168,10 @@ class DiscussionsApiController extends AbstractApiController {
             'body:s' => 'The body of the discussion.',
             'categoryID:i' => 'The category the discussion is in.',
             'dateInserted:dt' => 'When the discussion was created.',
+            'dateUpdated:dt|n' => 'When the discussion was last updated.',
             'insertUserID:i' => 'The user that created the discussion.',
             'insertUser?' => $this->getUserFragmentSchema(),
-            'bookmarked:b' => 'Whether or no the discussion is bookmarked by the current user.',
+            'lastUser?' => $this->getUserFragmentSchema(),
             'pinned:b?' => 'Whether or not the discussion has been pinned.',
             'pinLocation:s|n' => [
                 'enum' => ['category', 'recent'],
@@ -176,7 +180,12 @@ class DiscussionsApiController extends AbstractApiController {
             'closed:b' => 'Whether the discussion is closed or open.',
             'sink:b' => 'Whether or not the discussion has been sunk.',
             'countComments:i' => 'The number of comments on the discussion.',
-            'url:s?' => 'The full URL to the discussion.'
+            'countViews:i' => 'The number of views on the discussion.',
+            'url:s?' => 'The full URL to the discussion.',
+            'lastPost?' => $this->getPostFragmentSchema(),
+            'bookmarked:b' => 'Whether or not the discussion is bookmarked by the current user.',
+            'unread:b' => 'Whether or not the discussion should have an unread indicator.',
+            'countUnread:i?' => 'The number of unread comments.',
         ]);
     }
 
@@ -184,14 +193,18 @@ class DiscussionsApiController extends AbstractApiController {
      * Get a discussion.
      *
      * @param int $id The ID of the discussion.
+     * @param array $query The request query.
      * @throws NotFoundException if the discussion could not be found.
      * @return array
      */
-    public function get($id) {
+    public function get($id, array $query) {
         $this->permission();
 
-        $in = $this->idParamSchema()->setDescription('Get a discussion.');
+        $this->idParamSchema();
+        $in = $this->schema([], ['DiscussionGet', 'in'])->setDescription('Get a discussion.');
         $out = $this->schema($this->discussionSchema(), 'out');
+
+        $query = $in->validate($query);
 
         $row = $this->discussionByID($id);
         if (!$row) {
@@ -200,23 +213,64 @@ class DiscussionsApiController extends AbstractApiController {
 
         $this->discussionModel->categoryPermission('Vanilla.Discussions.View', $row['CategoryID']);
 
-        $this->prepareRow($row);
-        $this->userModel->expandUsers($row, ['InsertUserID']);
+        $this->userModel->expandUsers($row, ['InsertUserID', 'LastUserID']);
+        $row = $this->normalizeOutput($row);
 
         $result = $out->validate($row);
+
+        // Allow addons to modify the result.
+        $result = $this->getEventManager()->fireFilter('discussionsApiController_get_output', $result, $this, $in, $query, $row);
         return $result;
     }
 
-    public function prepareRow(&$row) {
-        $row['Announce'] = (bool)$row['Announce'];
-        $row['Bookmarked'] = (bool)$row['Bookmarked'];
-        $row['Url'] = discussionUrl($row);
-        $this->formatField($row, 'Body', $row['Format']);
+    /**
+     * Normalize a database record to match the Schema definition.
+     *
+     * @param array $dbRecord Database record.
+     * @param array|bool $expand
+     * @return array Return a Schema record.
+     */
+    public function normalizeOutput(array $dbRecord, $expand = []) {
+        $dbRecord['Announce'] = (bool)$dbRecord['Announce'];
+        $dbRecord['Bookmarked'] = (bool)$dbRecord['Bookmarked'];
+        $dbRecord['Url'] = discussionUrl($dbRecord);
+        $this->formatField($dbRecord, 'Body', $dbRecord['Format']);
 
-        if (!is_array($row['Attributes'])) {
-            $attributes = dbdecode($row['Attributes']);
-            $row['Attributes'] = is_array($attributes) ? $attributes : [];
+        if (!is_array($dbRecord['Attributes'])) {
+            $attributes = dbdecode($dbRecord['Attributes']);
+            $dbRecord['Attributes'] = is_array($attributes) ? $attributes : [];
         }
+
+        if ($this->getSession()->User) {
+            $dbRecord['unread'] = $dbRecord['CountUnreadComments'] !== 0
+                && ($dbRecord['CountUnreadComments'] !== true || dateCompare(val('DateFirstVisit', $this->getSession()->User), $dbRecord['DateInserted']) <= 0);
+            if ($dbRecord['CountUnreadComments'] !== true && $dbRecord['CountUnreadComments'] > 0) {
+                $dbRecord['countUnread'] = $dbRecord['CountUnreadComments'];
+            }
+        } else {
+            $dbRecord['unread'] = false;
+        }
+
+        if ($this->isExpandField('lastPost', $expand)) {
+            $lastPost = [
+                'discussionID' => $dbRecord['DiscussionID'],
+                'dateInserted' => $dbRecord['DateLastComment'],
+                'insertUser' => $dbRecord['LastUser']
+            ];
+            if ($dbRecord['LastCommentID']) {
+                $lastPost['CommentID'] = $dbRecord['LastCommentID'];
+                $lastPost['name'] = sprintft('Re: %s', $dbRecord['Name']);
+                $lastPost['url'] = commentUrl($lastPost, true);
+            } else {
+                $lastPost['name'] = $dbRecord['Name'];
+                $lastPost['url'] = $dbRecord['Url'];
+            }
+
+            $dbRecord['lastPost'] = $lastPost;
+        }
+
+        $schemaRecord = ApiUtils::convertOutputKeys($dbRecord);
+        return $schemaRecord;
     }
 
     /**
@@ -229,8 +283,10 @@ class DiscussionsApiController extends AbstractApiController {
     public function get_edit($id) {
         $this->permission('Garden.SignIn.Allow');
 
-        $in = $this->idParamSchema()->setDescription('Get a discussion for editing.');
-        $out = $this->schema(Schema::parse(['discussionID', 'name', 'body', 'format', 'categoryID', 'sink', 'closed', 'pinned', 'pinLocation'])->add($this->fullSchema()), 'out');
+        $this->idParamSchema()->setDescription('Get a discussion for editing.');
+        $out = $this->schema(
+            Schema::parse(['discussionID', 'name', 'body', 'format', 'categoryID', 'sink', 'closed', 'pinned', 'pinLocation']
+        )->add($this->fullSchema()), ['DiscussionGetEdit', 'out']);
 
         $row = $this->discussionByID($id);
         $row['Url'] = discussionUrl($row);
@@ -269,7 +325,26 @@ class DiscussionsApiController extends AbstractApiController {
         $this->permission();
 
         $in = $this->schema([
-            'categoryID:i?' => 'Filter by a category.',
+            'categoryID:i?' => [
+                'description' => 'Filter by a category.',
+                'x-filter' => [
+                    'field' => 'd.CategoryID'
+                ],
+            ],
+            'dateInserted?' => new DateFilterSchema([
+                'description' => 'When the discussion was created.',
+                'x-filter' => [
+                    'field' => 'd.DateInserted',
+                    'processor' => [DateFilterSchema::class, 'dateFilterField'],
+                ],
+            ]),
+            'dateUpdated?' => new DateFilterSchema([
+                'description' => 'When the discussion was updated.',
+                'x-filter' => [
+                    'field' => 'd.DateUpdated',
+                    'processor' => [DateFilterSchema::class, 'dateFilterField'],
+                ],
+            ]),
             'pinned:b?' => 'Whether or not to include pinned discussions. If true, only return pinned discussions. Cannot be used with the pinOrder parameter.',
             'pinOrder:s?' => [
                 'default' => 'first',
@@ -288,24 +363,29 @@ class DiscussionsApiController extends AbstractApiController {
                 'minimum' => 1,
                 'maximum' => 100
             ],
-            'insertUserID:i?' => 'Filter by author.',
-            'expand:b?' => 'Expand associated records.'
-        ], 'in')->setDescription('List discussions.');
+            'insertUserID:i?' => [
+                'description' => 'Filter by author.',
+                'x-filter' => [
+                    'field' => 'd.InsertUserID',
+                ],
+            ],
+            'expand?' => ApiUtils::getExpandDefinition(['insertUser', 'lastUser', 'lastPost'])
+        ], ['DiscussionIndex', 'in'])->setDescription('List discussions.');
         $out = $this->schema([':a' => $this->discussionSchema()], 'out');
 
         $query = $this->filterValues($query);
         $query = $in->validate($query);
 
-        $where = array_intersect_key($query, array_flip(['categoryID', 'insertUserID']));
-        if (array_key_exists('categoryID', $where)) {
-            $where['d.CategoryID'] = $where['categoryID'];
-        }
+        $where = ApiUtils::queryToFilters($in, $query);
 
         list($offset, $limit) = offsetLimit("p{$query['page']}", $query['limit']);
 
         if (array_key_exists('categoryID', $where)) {
             $this->discussionModel->categoryPermission('Vanilla.Discussions.View', $where['categoryID']);
         }
+
+        // Allow addons to update the where clause.
+        $where = $this->getEventManager()->fireFilter('discussionsApiController_index_filters', $where, $this, $in, $query);
 
         $pinned = array_key_exists('pinned', $query) ? $query['pinned'] : null;
         if ($pinned === true) {
@@ -325,14 +405,20 @@ class DiscussionsApiController extends AbstractApiController {
             }
         }
 
-        if (!empty($query['expand'])) {
-            $this->userModel->expandUsers($rows, ['InsertUserID']);
-        }
+        // Expand associated rows.
+        $this->userModel->expandUsers(
+            $rows,
+            $this->resolveExpandFields($query, ['insertUser' => 'InsertUserID', 'lastUser' => 'LastUserID'])
+        );
+
         foreach ($rows as &$currentRow) {
-            $this->prepareRow($currentRow);
+            $currentRow = $this->normalizeOutput($currentRow, $query['expand']);
         }
 
         $result = $out->validate($rows, true);
+
+        // Allow addons to modify the result.
+        $result = $this->getEventManager()->fireFilter('discussionsApiController_index_output', $result, $this, $in, $query, $rows);
         return $result;
     }
 
@@ -354,7 +440,7 @@ class DiscussionsApiController extends AbstractApiController {
         $body = $in->validate($body, true);
 
         $row = $this->discussionByID($id);
-        $discussionData = $this->caseScheme->convertArrayKeys($body);
+        $discussionData = ApiUtils::convertInputKeys($body);
         $discussionData['DiscussionID'] = $id;
         $categoryID = $row['CategoryID'];
         if ($row['InsertUserID'] !== $this->getSession()->UserID) {
@@ -373,7 +459,7 @@ class DiscussionsApiController extends AbstractApiController {
         $this->validateModel($this->discussionModel);
 
         $result = $this->discussionByID($id);
-        $this->prepareRow($result);
+        $result = $this->normalizeOutput($result);
         return $out->validate($result);
     }
 
@@ -387,8 +473,8 @@ class DiscussionsApiController extends AbstractApiController {
     public function post(array $body) {
         $this->permission('Garden.SignIn.Allow');
 
-        $in = $this->schema($this->discussionPostSchema(), 'in')->setDescription('Add a discussion.');
-        $out = $this->schema($this->discussionSchema(), 'out');
+        $in = $this->discussionPostSchema('in')->setDescription('Add a discussion.');
+        $out = $this->discussionSchema('out');
 
         $body = $in->validate($body);
         $categoryID = $body['categoryID'];
@@ -397,7 +483,7 @@ class DiscussionsApiController extends AbstractApiController {
         $this->fieldPermission($body, 'pinned', 'Vanilla.Discussions.Announce', $categoryID);
         $this->fieldPermission($body, 'sink', 'Vanilla.Discussions.Sink', $categoryID);
 
-        $discussionData = $this->caseScheme->convertArrayKeys($body);
+        $discussionData = ApiUtils::convertInputKeys($body);
         $id = $this->discussionModel->save($discussionData);
         $this->validateModel($this->discussionModel);
 
@@ -406,8 +492,8 @@ class DiscussionsApiController extends AbstractApiController {
         }
 
         $row = $this->discussionByID($id);
-        $this->userModel->expandUsers($row, ['InsertUserID']);
-        $this->prepareRow($row);
+        $this->userModel->expandUsers($row, ['InsertUserID', 'LastUserID']);
+        $row = $this->normalizeOutput($row);
         $result = $out->validate($row);
         return $result;
     }

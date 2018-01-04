@@ -7,13 +7,14 @@
 
 namespace VanillaTests\Library\Vanilla;
 
+use PHPUnit\Framework\TestCase;
 use Vanilla\Addon;
 
 
 /**
  * Tests of the {@link Addon::checkVersion()} method.
  */
-class CheckVersionTest extends \PHPUnit\Framework\TestCase {
+class CheckVersionTest extends TestCase {
     /**
      * Check exact version matching.
      */

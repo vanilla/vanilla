@@ -767,6 +767,14 @@ class Addon {
             $issues['multiple-plugins'] = "The addon should have at most one plugin class ($plugins).";
         }
 
+        if (isset($this->info['require']) && !is_array($this->info['require'])) {
+            $issues['invalid-require'] = "The require key must be an array.";
+        }
+
+        if (isset($this->info['conflict']) && !is_array($this->info['conflict'])) {
+            $issues['invalid-conflict'] = "The conflict key must be an array.";
+        }
+
         if ($trigger) {
             $this->triggerIssues();
         }
@@ -784,7 +792,7 @@ class Addon {
         if ($count = count($issues)) {
             $subdir = $this->getSubdir();
 
-            trigger_error("The addon in $subdir has $count issues.", E_USER_NOTICE);
+            trigger_error("The addon in $subdir has $count issue(s).", E_USER_NOTICE);
             foreach ($issues as $issue) {
                 trigger_error($issue, E_USER_NOTICE);
             }
@@ -1005,7 +1013,9 @@ class Addon {
             $req += ['op' => '==', 'v' => '0.0', 'logic' => ',', 'v2' => '999999'];
             $op = $req['op'];
 
-            if ($op === '-') {
+            if ($req['v'] === '*') {
+                $valid = true;
+            } elseif ($op === '-') {
                 $valid = version_compare($version, $req['v'], '>=') && version_compare($version, $req['v2'], '<=');
             } else {
                 $valid = version_compare($version, $req['v'], $op);
@@ -1076,6 +1086,19 @@ class Addon {
      */
     public function getRequirements() {
         $result = $this->getInfoValue('require', []);
+        if (!is_array($result)) {
+            return [];
+        }
+        return $result;
+    }
+
+    /**
+     * Get addons that conflict with this addon.
+     *
+     * @return array Returns an array in the form addonKey => version.
+     */
+    public function getConflicts() {
+        $result = $this->getInfoValue('conflict', []);
         if (!is_array($result)) {
             return [];
         }

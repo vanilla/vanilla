@@ -21,6 +21,9 @@
  */
 class Gdn_Controller extends Gdn_Pluggable {
 
+    /** Seconds before reauthentication is required for protected operations. */
+    const REAUTH_TIMEOUT = 1200; // 20 minutes
+
     /** @var string The name of the application that this controller can be found in. */
     public $Application;
 
@@ -1158,6 +1161,34 @@ class Gdn_Controller extends Gdn_Pluggable {
     }
 
     /**
+     * Stop the current action and re-authenticate, if necessary.
+     */
+    public function reauth() {
+        // Make sure we're logged in...
+        if (Gdn::session()->UserID == 0) {
+            return;
+        }
+
+        // ...and have a proper password.
+        $user = Gdn::userModel()->getID(Gdn::session()->UserID);
+        if (val('HashMethod', $user) == 'Random') {
+            return;
+        }
+
+        // If the user has logged in recently enough, don't make them login again.
+        $lastAuthenticated = Gdn::authenticator()->identity()->getAuthTime();
+        if ($lastAuthenticated > 0) {
+            $sinceAuth = time() - $lastAuthenticated;
+            if ($sinceAuth < self::REAUTH_TIMEOUT) {
+                return;
+            }
+        }
+
+        Gdn::dispatcher()->dispatch('/profile/authenticate', false);
+        exit();
+    }
+
+    /**
      * Removes a CSS file from the collection.
      *
      * @param string $fileName The CSS file to search for.
@@ -1279,11 +1310,12 @@ class Gdn_Controller extends Gdn_Pluggable {
             $this->setJson('InformMessages', $this->_InformMessages);
             $this->setJson('ErrorMessages', $this->_ErrorMessages);
             if ($this->redirectTo !== null) {
-                $this->setJson('RedirectTo', $this->redirectTo);
-                $this->setJson('RedirectUrl', $this->redirectTo);
+                 // See redirectTo function for details about encoding backslashes.
+                $this->setJson('RedirectTo', str_replace('\\', '%5c', $this->redirectTo));
+                $this->setJson('RedirectUrl', str_replace('\\', '%5c', $this->redirectTo));
             } else {
-                $this->setJson('RedirectTo', $this->RedirectUrl);
-                $this->setJson('RedirectUrl', $this->RedirectUrl);
+                $this->setJson('RedirectTo', str_replace('\\', '%5c', $this->RedirectUrl));
+                $this->setJson('RedirectUrl', str_replace('\\', '%5c', $this->RedirectUrl));
             }
 
             // Make sure the database connection is closed before exiting.
@@ -1303,11 +1335,11 @@ class Gdn_Controller extends Gdn_Pluggable {
                     $this->addDefinition('InformMessageStack', json_encode($this->_InformMessages, JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT));
                 }
                 if ($this->redirectTo !== null) {
-                    $this->addDefinition('RedirectTo', $this->redirectTo);
-                    $this->addDefinition('RedirectUrl', $this->redirectTo);
+                    $this->addDefinition('RedirectTo', str_replace('\\', '%5c', $this->redirectTo));
+                    $this->addDefinition('RedirectUrl', str_replace('\\', '%5c', $this->redirectTo));
                 } else {
-                    $this->addDefinition('RedirectTo', $this->RedirectUrl);
-                    $this->addDefinition('RedirectUrl', $this->RedirectUrl);
+                    $this->addDefinition('RedirectTo', str_replace('\\', '%5c', $this->RedirectUrl));
+                    $this->addDefinition('RedirectUrl', str_replace('\\', '%5c', $this->RedirectUrl));
                 }
             }
 

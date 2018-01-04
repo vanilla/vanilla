@@ -444,6 +444,56 @@ class CommentModel extends Gdn_Model {
     }
 
     /**
+     *
+     * Get comments based on specific criteria, optionally filtered by user permissions.
+     *
+     * @param array $where Conditions for filtering comments with a WHERE clause.
+     * @param bool $permissionFilter Filter results by the current user's permissions.
+     * @param int|null $limit Max number to get.
+     * @param int $offset Number to skip.
+     * @param string $order Order comments ascending (asc) or descending (desc) by ID.
+     * @return Gdn_DataSet SQL results.
+     */
+    public function lookup(array $where = [], $permissionFilter = true, $limit = null, $offset = 0, $order = 'desc') {
+        if ($limit === null) {
+            $limit = $this->getDefaultLimit();
+        }
+
+        $perms = DiscussionModel::categoryPermissions();
+
+        if (is_array($perms) && empty($perms)) {
+            return new Gdn_DataSet([]);
+        }
+
+        $result = $this->getWhere($where, 'CommentID', $order, $limit, $offset);
+        $data =& $result->result();
+
+        // Filter out any comments this user does not have access to.
+        if ($permissionFilter && $perms !== true) {
+            $remove = [];
+
+            foreach ($result->result() as $index => $row) {
+                if (!in_array($row->CategoryID, $perms)) {
+                    $remove[] = $index;
+                }
+            }
+
+            if (count($remove) > 0) {
+                foreach ($remove as $index) {
+                    unset($data[$index]);
+                }
+
+                $data = array_values($data);
+            }
+        }
+
+        $this->EventArguments['Comments'] =& $result;
+        $this->fireEvent('AfterGet');
+
+        return $result;
+    }
+
+    /**
      * Set the order of the comments or return current order.
      *
      * Getter/setter for $this->_OrderBy.

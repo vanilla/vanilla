@@ -74,7 +74,8 @@ if (!function_exists('writeDiscussionRow')) :
         $discussion->CountPages = ceil($discussion->CountComments / $sender->CountCommentsPerPage);
 
         $firstPageUrl = discussionUrl($discussion, 1);
-        $lastPageUrl = discussionUrl($discussion, val('CountPages', $discussion)).'#latest';
+        $lastComment = CommentModel::instance()->getID($discussion->LastCommentID);
+        $lastPageUrl = $lastComment ? commentUrl($lastComment) : $firstPageUrl;
         ?>
         <tr id="Discussion_<?php echo $discussion->DiscussionID; ?>" class="<?php echo $cssClass; ?>">
             <?php $sender->fireEvent('BeforeDiscussionContent'); ?>

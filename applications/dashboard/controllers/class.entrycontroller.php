@@ -532,7 +532,7 @@ class EntryController extends Gdn_Controller {
 
                 // Don't overwrite the user photo if the user uploaded a new one.
                 $photo = val('Photo', $user);
-                if (!val('Photo', $data) || ($photo && !isUrl($photo))) {
+                if ($photo && !isUrl($photo)) {
                     unset($data['Photo']);
                 }
 
@@ -1826,6 +1826,13 @@ class EntryController extends Gdn_Controller {
             }
 
             if ($this->Form->isPostBack() === true) {
+                // Backward compatibility fix.
+                $confirm = $this->Form->getFormValue('Confirm');
+                $passwordMatch = $this->Form->getFormValue('PasswordMatch');
+                if ($confirm && !$passwordMatch) {
+                    $this->Form->setValue('PasswordMatch', $confirm);
+                }
+
                 $this->UserModel->Validation->applyRule('Password', 'Required');
                 $this->UserModel->Validation->applyRule('Password', 'Strength');
                 $this->UserModel->Validation->applyRule('Password', 'Match');

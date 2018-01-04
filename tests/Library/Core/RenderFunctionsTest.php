@@ -7,10 +7,12 @@
 
 namespace VanillaTests\Library\Core;
 
+use PHPUnit\Framework\TestCase;
+
 /**
  * Test some of the functions in functions.render.php.
  */
-class RenderFunctionsTest extends \PHPUnit\Framework\TestCase {
+class RenderFunctionsTest extends TestCase {
     /**
      * Make sure the render functions are included.
      */

@@ -7,17 +7,21 @@
 
 namespace VanillaTests\APIv2;
 
+use CategoryModel;
+
 /**
  * Test the /api/v2/discussions endpoints.
  */
 class DiscussionsTest extends AbstractResourceTest {
+
+    /** @var array */
+    private static $categoryIDs = [];
 
     /**
      * {@inheritdoc}
      */
     public function __construct($name = null, array $data = [], $dataName = '') {
         $this->baseUrl = '/discussions';
-        $this->record += ['categoryID' => 1, 'name' => __CLASS__];
 
         $this->patchFields = ['body', 'categoryID', 'closed', 'format', 'name', 'pinLocation', 'pinned', 'sink'];
 
@@ -27,8 +31,21 @@ class DiscussionsTest extends AbstractResourceTest {
     /**
      * {@inheritdoc}
      */
+    public function record() {
+        $record = $this->record;
+        $record += ['categoryID' => reset(self::$categoryIDs), 'name' => __CLASS__];
+        return $record;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     protected function modifyRow(array $row) {
         $row = parent::modifyRow($row);
+
+        if (array_key_exists('categoryID', $row) && !in_array($row['categoryID'], self::$categoryIDs)) {
+            throw new \Exception('Provided category ID ('.$row['categoryID'].') was not associated with a valid test category');
+        }
 
         $row['closed'] = !$row['closed'];
         $row['pinned'] = !$row['pinned'];
@@ -50,6 +67,25 @@ class DiscussionsTest extends AbstractResourceTest {
             'bookmark' => ['bookmark', true, 'bookmarked'],
         ];
         return $fields;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public static function setupBeforeClass() {
+        parent::setupBeforeClass();
+
+        /** @var CategoryModel $categoryModel */
+        $categoryModel = self::container()->get('CategoryModel');
+        $categories = ['Test Category A', 'Test Category B', 'Test Category C'];
+        foreach ($categories as $category) {
+            $urlCode = preg_replace('/[^A-Z0-9]+/i', '-', strtolower($category));
+            self::$categoryIDs[] = $categoryModel->save([
+                'Name' => $category,
+                'UrlCode' => $urlCode,
+                'InsertUserID' => self::$siteInfo['adminUserID']
+            ]);
+        }
     }
 
     /**

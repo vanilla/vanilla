@@ -409,7 +409,7 @@ abstract class Gdn_Plugin extends Gdn_Pluggable implements Gdn_IPlugin {
      */
     public function render($view) {
         $pluginFolder = $this->getPluginFolder(false);
-        $this->Sender->render($view, '', $pluginFolder);
+        Gdn::controller()->render($view, '', $pluginFolder);
     }
 
     /**

@@ -6,12 +6,13 @@
 
 namespace VanillaTests\Library\Core;
 
+use PHPUnit\Framework\TestCase;
 use Gdn_Request;
 
 /**
  * Test the {@link Gdn_Request} class.
  */
-class RequestTest extends \PHPUnit\Framework\TestCase {
+class RequestTest extends TestCase {
 
     public function provideUrls() {
         return [
@@ -230,6 +231,40 @@ class RequestTest extends \PHPUnit\Framework\TestCase {
             'Three' => 'Charlie',
             'Four' => 'Delta'
         ], $request->getQuery());
+    }
+
+    /**
+     * Verify files with the UPLOAD_ERR_NO_FILE error are not added to the translated files array.
+     */
+    public function testNoFileRemoval() {
+        $post = $_POST;
+        $files = $_FILES;
+
+        $_FILES = [
+            'MyFile' => [
+                'error' => UPLOAD_ERR_OK,
+                'name' => 'MyFile.txt',
+                'size' => 10,
+                'tmp_name' => '/tmp/php/php123',
+                'type' => 'text/plain'
+            ],
+            'NoFile' => [
+                'error' => UPLOAD_ERR_NO_FILE,
+                'name' => 'bar.jpg',
+                'size' => 1024,
+                'tmp_name' => '/tmp/php/php456',
+                'type' => 'image/jpeg'
+            ]
+        ];
+
+        $request = Gdn_Request::create()->fromEnvironment();
+
+        // Put everything back like we found it.
+        $_POST = $post;
+        $_FILES = $files;
+
+        $this->assertInstanceOf(\Vanilla\UploadedFile::class, $request->post('MyFile'));
+        $this->assertFalse($request->post('NoFile', false), 'Nonexistent file was not removed.');
     }
 
     /**

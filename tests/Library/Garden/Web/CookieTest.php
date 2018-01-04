@@ -7,12 +7,13 @@
 
 namespace VanillaTests\Library\Garden\Web;
 
+use PHPUnit\Framework\TestCase;
 use Garden\Web\Cookie;
 
 /**
  * Test the {@link ResourceRoute} class.
  */
-class CookieTest extends \PHPUnit\Framework\TestCase {
+class CookieTest extends TestCase {
 
     /**
      * Parse a Cookie header into its individual cookie key-value pairs.

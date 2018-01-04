@@ -214,14 +214,52 @@ class Gdn_CookieIdentity {
     }
 
     /**
+     * Retrieve an attribute from the current JWT data.
+     *
+     * @param string $name
+     * @return mixed
+     */
+    public function getAttribute($name) {
+        $payload = $this->getJWTPayload($this->CookieName);
+        $result = val($name, $payload, null);
+        return $result;
+    }
+
+    /**
+     * Update an attribute in the current JWT data.
+     *
+     * @param string $name
+     * @param mixed $value
+     * @return bool
+     */
+    public function setAttribute($name, $value) {
+        $payload = $this->getJWTPayload($this->CookieName);
+        $result = false;
+
+        if (is_scalar($value) && (is_array($payload) || is_object($payload))) {
+            $expiry = val('exp', $payload, strtotime($this->PersistExpiry));
+            setValue($name, $payload, $value);
+            $this->setJWTPayload($this->CookieName, $payload, $expiry);
+            $result = true;
+        }
+
+        return $result;
+    }
+
+    /**
      * Generates the user's session cookie.
      *
+     * @throws Gdn_ErrorException If cookie salt is empty.
      * @param int $userID The unique id assigned to the user in the database.
      * @param boolean $persist Should the user's session remain persistent across visits?
      * @param array $data Additional data to include in the token.
      * @return array|bool
      */
     public function setIdentity($userID, $persist = false) {
+        if (empty($this->CookieSalt)) {
+            throw new Gdn_ErrorException('Cookie salt is empty.');
+        }
+
         if (is_null($userID)) {
             $this->_clearIdentity();
             return true;
@@ -243,17 +281,13 @@ class Gdn_CookieIdentity {
         $payload = [
             'exp' => strtotime($this->PersistExpiry), // Expiration
             'iat' => $timestamp, // Issued at
-            'nbf' => $timestamp, // Not before
             'sub' => $userID // Subject
         ];
         Gdn::pluginManager()
             ->fireAs(self::class)
             ->fireEvent('setIdentity', ['payload' => &$payload]);
-        $jwt = JWT::encode($payload, $this->CookieSalt, self::JWT_ALGORITHM);
 
-        // Save the cookie.
-        safeCookie($this->CookieName, $jwt, $expiry, $this->CookiePath, $this->CookieDomain, null, true);
-        $_COOKIE[$this->CookieName] = $jwt;
+        $this->setJWTPayload($this->CookieName, $payload, $expiry);
         return $payload;
     }
 
@@ -293,6 +327,7 @@ class Gdn_CookieIdentity {
     /**
      * Set a cookie, using specified path, domain, salt and hash method
      *
+     * @throws Gdn_ErrorException If cookie salt is empty.
      * @param string $cookieName Name of the cookie
      * @param string $keyData
      * @param mixed $cookieContents
@@ -304,7 +339,6 @@ class Gdn_CookieIdentity {
      * @return void
      */
     public static function setCookie($cookieName, $keyData, $cookieContents, $cookieExpires, $path = null, $domain = null, $cookieHashMethod = null, $cookieSalt = null) {
-
         if (is_null($path)) {
             $path = Gdn::config('Garden.Cookie.Path', '/');
         }
@@ -325,6 +359,10 @@ class Gdn_CookieIdentity {
 
         if (!$cookieSalt) {
             $cookieSalt = Gdn::config('Garden.Cookie.Salt');
+        }
+
+        if (empty($cookieSalt)) {
+            throw new Gdn_ErrorException('Cookie salt is empty.');
         }
 
         // Create the cookie signature
@@ -362,6 +400,7 @@ class Gdn_CookieIdentity {
     /**
      * Validate security of our cookie.
      *
+     * @throws Gdn_ErrorException If cookie salt is empty.
      * @param $cookieName
      * @param null $cookieHashMethod
      * @param null $cookieSalt
@@ -378,6 +417,10 @@ class Gdn_CookieIdentity {
 
         if (is_null($cookieSalt)) {
             $cookieSalt = Gdn::config('Garden.Cookie.Salt');
+        }
+
+        if (empty($cookieSalt)) {
+            throw new Gdn_ErrorException('Cookie salt is empty.');
         }
 
         $cookieData = explode('|', $_COOKIE[$cookieName]);
@@ -421,12 +464,27 @@ class Gdn_CookieIdentity {
     }
 
     /**
+     * Get the last time this user authenticated.
+     *
+     * @return int|null
+     */
+    public function getAuthTime() {
+        $result = $this->getAttribute('iat');
+        return $result;
+    }
+
+    /**
      * Attempt to decode a JWT payload from a cookie value.
      *
+     * @throws Gdn_ErrorException If cookie salt is empty.
      * @param string $name Name of the cookie holding a JWT token.
      * @return array|null
      */
     public function getJWTPayload($name) {
+        if (empty($this->CookieSalt)) {
+            throw new Gdn_ErrorException('Cookie salt is empty.');
+        }
+
         $result = null;
 
         if (array_key_exists($name, $_COOKIE)) {
@@ -447,6 +505,37 @@ class Gdn_CookieIdentity {
         }
 
         return $result;
+    }
+
+    /**
+     * Set the last time this user authenticated.
+     *
+     * @param int $timestamp
+     */
+    public function setAuthTime($timestamp) {
+        $this->setAttribute('iat', $timestamp);
+    }
+
+    /**
+     * Attempt to encode a JWT payload and assign its value to a cookie.
+     *
+     * @param string $name
+     * @param array|object $payload
+     * @param int $expiry
+     * @return string
+     */
+    public function setJWTPayload($name, $payload, $expiry) {
+        $jwt = JWT::encode($payload, $this->CookieSalt, self::JWT_ALGORITHM);
+
+        setValue('exp', $payload, $expiry);
+
+        // Send the updated cookie to the browser.
+        safeCookie($name, $jwt, $expiry, $this->CookiePath, $this->CookieDomain, null, true);
+
+        // Update the cookie for the current request.
+        $_COOKIE[$this->CookieName] = $jwt;
+
+        return $jwt;
     }
 
     /**

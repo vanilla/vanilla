@@ -2542,6 +2542,7 @@ class UserModel extends Gdn_Model {
 
         $this->EventArguments['Keywords'] =& $keywords;
         $this->EventArguments['RankID'] =& $rankID;
+        $this->EventArguments['Optimize'] =& $optimize;
         $this->fireEvent('BeforeUserQuery');
 
         $this->userQuery();
@@ -2932,7 +2933,7 @@ class UserModel extends Gdn_Model {
             if (val('CheckCaptcha', $options, true) && Captcha::enabled()) {
                 $captchaIsValid = Captcha::validate();
                 if ($captchaIsValid !== true) {
-                    $this->Validation->addValidationResult('Garden.Registration.CaptchaPublicKey', 'The captcha was not completed correctly. Please try again.');
+                    $this->Validation->addValidationResult('Garden.Registration.CaptchaPublicKey', t('The captcha was not completed correctly. Please try again.'));
                     return false;
                 }
             }
@@ -3002,7 +3003,7 @@ class UserModel extends Gdn_Model {
             if ($checkCaptcha && Captcha::enabled()) {
                 $captchaIsValid = Captcha::validate();
                 if ($captchaIsValid !== true) {
-                    $this->Validation->addValidationResult('Garden.Registration.CaptchaPublicKey', 'The captcha was not completed correctly. Please try again.');
+                    $this->Validation->addValidationResult('Garden.Registration.CaptchaPublicKey', t('The captcha was not completed correctly. Please try again.'));
                     return false;
                 }
             }

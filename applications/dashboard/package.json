@@ -10,12 +10,10 @@
     "grunt-contrib-copy": "^1.0.0",
     "grunt-contrib-csslint": "0.5.x",
     "grunt-contrib-imagemin": "1.0.x",
-    "grunt-contrib-jshint": "0.11.x",
     "grunt-contrib-watch": "1.0.x",
     "grunt-kss": "^4.0.0",
     "grunt-sass": "1.1.x",
     "grunt-sass-globbing": "^1.5.1",
-    "grunt-scss-lint": "^0.3.8",
     "grunt-wiredep": "3.0.x",
     "load-grunt-tasks": "3.3.x",
     "time-grunt": "1.2.x"

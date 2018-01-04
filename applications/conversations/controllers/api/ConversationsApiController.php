@@ -64,7 +64,9 @@ class ConversationsApiController extends AbstractApiController {
      *
      * @param int $id The conversation ID.
      * @param int|null $viewingUserID The user viewing the conversation. Should only be set if user is part of the conversation.
-     * @throws NotFoundException if the conversation could not be found.
+     * @param int $participants The max number of participants to join to the conversation.
+     * If zero then the participants aren't joined at all.
+     * @throws NotFoundException Throws an exception if the conversation could not be found.
      * @return array
      */
     private function conversationByID($id, $viewingUserID = null, $participants = 0) {

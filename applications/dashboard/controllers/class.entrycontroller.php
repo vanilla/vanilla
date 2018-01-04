@@ -532,7 +532,7 @@ class EntryController extends Gdn_Controller {
 
                 // Don't overwrite the user photo if the user uploaded a new one.
                 $photo = val('Photo', $user);
-                if (!val('Photo', $data) || ($photo && !isUrl($photo))) {
+                if ($photo && !isUrl($photo)) {
                     unset($data['Photo']);
                 }
 

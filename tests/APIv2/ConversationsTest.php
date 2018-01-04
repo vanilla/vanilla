@@ -79,7 +79,20 @@ class ConversationsTest extends AbstractAPIv2Test {
         // The current model assign dateUpdated as dateLastViewed which makes the test fail.
         unset($postedConversation['dateLastViewed'], $conversation['dateLastViewed']);
 
+        $name1 = $postedConversation['name'];
+        $name2 = $conversation['name'];
+        unset($postedConversation['name'], $conversation['name']);
+        $this->assertStringEndsWith($name1, $name2);
+
+        // Sort participants because they can ge re-ordered, but the results are still correct.
+        $fn = function ($a, $b) {
+            return strnatcmp($a['userID'], $b['userID']);
+        };
+        usort($postedConversation['participants'], $fn);
+        usort($conversation['participants'], $fn);
+
         $this->assertRowsEqual($postedConversation, $conversation);
+
         $this->assertCamelCase($result->getBody());
 
         return $result->getBody();
@@ -248,8 +261,10 @@ class ConversationsTest extends AbstractAPIv2Test {
 
         $this->assertEquals(201, $result->getStatusCode());
 
-        $updatedConversation = $result->getBody();
+        $newParticipants = $result->getBody();
+        $this->assertEquals(count($postData['participantUserIDs']), count($newParticipants));
 
+        $updatedConversation = $this->api()->get("{$this->baseUrl}/{$conversation[$this->pk]}")->getBody();
         $this->assertEquals(
             $conversation['countParticipants'] + count($postData['participantUserIDs']),
             $updatedConversation['countParticipants']

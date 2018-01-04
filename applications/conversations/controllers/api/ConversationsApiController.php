@@ -60,10 +60,12 @@ class ConversationsApiController extends AbstractApiController {
      *
      * @param int $id The conversation ID.
      * @param int|null $viewingUserID The user viewing the conversation. Should only be set if user is part of the conversation.
-     * @throws NotFoundException if the conversation could not be found.
+     * @param int $participants The max number of participants to join to the conversation.
+     * If zero then the participants aren't joined at all.
+     * @throws NotFoundException Throws an exception if the conversation could not be found.
      * @return array
      */
-    private function conversationByID($id, $viewingUserID = null) {
+    private function conversationByID($id, $viewingUserID = null, $participants = 0) {
         if ($viewingUserID) {
             $options = ['viewingUserID' => $viewingUserID];
         } else {
@@ -73,6 +75,11 @@ class ConversationsApiController extends AbstractApiController {
         $conversation = $this->conversationModel->getID($id, DATASET_TYPE_ARRAY, $options);
         if (!$conversation) {
             throw new NotFoundException('Conversation');
+        }
+
+        if ($participants) {
+            $data = [&$conversation];
+            $this->conversationModel->joinParticipants($data, $participants);
         }
 
         return $conversation;
@@ -133,14 +140,24 @@ class ConversationsApiController extends AbstractApiController {
         if ($schema === null) {
             $schemaDefinition = [
                 'conversationID:i' => 'The ID of the conversation.',
-                'name:s?' => 'The name of the conversation.',
+                'name:s' => 'The name of the conversation.',
+                'body:s' => 'The most recent unread message in the conversation.',
+                'url:s' => 'The URL of the conversation.',
                 'dateInserted:dt' => 'When the conversation was created.',
                 'insertUserID:i' => 'The user that created the conversation.',
                 'insertUser:o?' => $this->getUserFragmentSchema(),
                 'countParticipants:i' => 'The number of participants on the conversation.',
+                'participants?' => $this->getParticipantsSchema(),
                 'countMessages:i' => 'The number of messages on the conversation.',
-                'countReadMessages:n|i?' => 'The number of unread messages by the current user on the conversation.',
-                'dateLastViewed:n|dt?' => 'When the conversation was last viewed by the current user.',
+                'unread:bool?' => 'Whether the conversation has an unread indicator.',
+                'countUnread:int?' => 'The number of unread messages.',
+                'lastMessage:o?' => [
+                    'insertUserID:i' => 'The author of the your most recent message.',
+                    'dateInserted:dt' => 'The date of the message.',
+                    'insertUser' => $this->getUserFragmentSchema(),
+                ]
+//                'countReadMessages:n|i?' => 'The number of unread messages by the current user on the conversation.',
+//                'dateLastViewed:n|dt?' => 'When the conversation was last viewed by the current user.',
             ];
 
             // We unset to preserve the order of the parameters.
@@ -175,9 +192,7 @@ class ConversationsApiController extends AbstractApiController {
             $viewingUserID = null;
         }
 
-        $conversation = $this->conversationByID($id, $viewingUserID);
-        $data = [&$conversation];
-        $this->conversationModel->joinParticipants($data, 1000);
+        $conversation = $this->conversationByID($id, $viewingUserID, 5);
 
         // We check for the moderation permission after we get the conversation to make sure that it actually exists.
         if (!$isInConversation) {
@@ -185,7 +200,6 @@ class ConversationsApiController extends AbstractApiController {
         }
 
         $this->userModel->expandUsers($conversation, ['InsertUserID']);
-
         $conversation = $this->normalizeOutput($conversation);
 
         return $out->validate($conversation);
@@ -223,26 +237,7 @@ class ConversationsApiController extends AbstractApiController {
             ],
             'expand?' => ApiUtils::getExpandDefinition(['user'])
         ], 'in')->setDescription('Get participants of a conversation.');
-        $out = $this->schema([
-            ':a' => [
-                'items' => [
-                    'type'  => 'object',
-                    'properties' => [
-                        'userID' => [
-                            'type' => 'integer',
-                            'description' => 'The userID of the participant.',
-                        ],
-                        'user' => $this->getUserFragmentSchema(),
-                        'status' => [
-                            'description' => 'Participation status of the user.',
-                            'type' => 'string',
-                            'enum' => ['participating', 'deleted']
-                        ],
-                    ],
-                ],
-                'description' => 'List of participants.',
-            ]
-        ], 'out');
+        $out = $this->schema($this->getParticipantsSchema(), 'out');
 
         $query = $this->filterValues($query);
         $query = $in->validate($query);
@@ -266,15 +261,12 @@ class ConversationsApiController extends AbstractApiController {
         $conversationMembers = $this->conversationModel->getConversationMembers($id, false, $limit, $offset, $active);
         $data = array_values($conversationMembers);
 
-        foreach ($data as &$row) {
-            $row = $this->normalizeParticipantInput($row);
-        }
-
         // Expand associated rows.
         $this->userModel->expandUsers(
             $data,
-            $this->resolveExpandFields($query, ['user' => 'userID'])
+            $this->resolveExpandFields($query, ['user' => 'UserID'])
         );
+        $data = array_map([$this, 'normalizeParticipantOutput'], $data);
 
         return $out->validate($data);
     }
@@ -302,9 +294,8 @@ class ConversationsApiController extends AbstractApiController {
                 'minimum' => 1,
                 'maximum' => 100
             ],
-            'expand?' => ApiUtils::getExpandDefinition(['insertUser'])
-        ], 'in')
-            ->setDescription('List user conversations.');
+            'expand?' => ApiUtils::getExpandDefinition(['insertUser', 'lastInsertUser']),
+        ], 'in')->setDescription('List user conversations.');
         $out = $this->schema([':a' => $this->fullSchema()], 'out');
 
         $query = $this->filterValues($query);
@@ -324,6 +315,8 @@ class ConversationsApiController extends AbstractApiController {
                 $limit,
                 $offset
             )->resultArray();
+
+            $this->conversationModel->joinParticipants($conversations);
         } else {
             $participantUserID = isset($query['participantUserID']) ? $query['participantUserID'] : $this->getSession()->UserID;
 
@@ -337,8 +330,12 @@ class ConversationsApiController extends AbstractApiController {
         // Expand associated rows.
         $this->userModel->expandUsers(
             $conversations,
-            $this->resolveExpandFields($query, ['insertUser' => 'InsertUserID'])
+            $this->resolveExpandFields(
+                $query,
+                ['insertUser' => 'InsertUserID', 'lastInsertUser' => 'LastInsertUserID']
+            )
         );
+        $conversations = array_map([$this, 'normalizeOutput'], $conversations);
 
         return $out->validate($conversations);
     }
@@ -374,7 +371,8 @@ class ConversationsApiController extends AbstractApiController {
             throw new ServerException('Unable to insert conversation.', 500);
         }
 
-        $conversation = $this->conversationByID($conversationID, $this->getSession()->UserID);
+        $conversation = $this->conversationByID($conversationID, $this->getSession()->UserID, 5);
+        $conversation = $this->normalizeOutput($conversation);
         return $out->validate($conversation);
     }
 
@@ -393,7 +391,7 @@ class ConversationsApiController extends AbstractApiController {
         $this->idParamSchema();
 
         $in = $this->postSchema('in')->setDescription('Add participants to a conversation.');
-        $out = $this->schema($this->fullSchema(), 'out');
+        $out = $this->schema($this->getParticipantsSchema(), 'out');
 
         $body = $in->validate($body);
 
@@ -409,10 +407,16 @@ class ConversationsApiController extends AbstractApiController {
             throw new ServerException('Unable to add participants.', 500);
         }
 
-        // Fetch up to date conversation.
-        $conversation = $this->conversationByID($id);
+        $conversationMembers = $this->conversationModel->getConversationMembers(
+            ['conversationID' => $id, 'UserID' => $body['participantUserIDs']],
+            false
+        );
+        $data = array_values($conversationMembers);
 
-        return $out->validate($conversation);
+        $this->userModel->expandUsers($data, ['UserID']);
+        $data = array_map([$this, 'normalizeParticipantOutput'], $data);
+
+        return $out->validate($data);
     }
 
     /**
@@ -474,9 +478,44 @@ class ConversationsApiController extends AbstractApiController {
      * @return array Return a Schema record.
      */
     public function normalizeOutput(array $dbRecord) {
-        if (array_key_exists('subject', $dbRecord)) {
-            $dbRecord['name'] = $dbRecord['subject'];
-            unset($dbRecord['subject']);
+        if (!empty($dbRecord['Subject'])) {
+            $dbRecord['name'] = $dbRecord['Subject'];
+            unset($dbRecord['Subject']);
+        } else {
+            $dbRecord['name'] = ConversationModel::participantTitle($dbRecord, false);
+        }
+        $dbRecord['body'] = isset($dbRecord['LastBody'])
+            ? Gdn_Format::to($dbRecord['LastBody'], $dbRecord['LastFormat'])
+            : t('No messages.');
+        $dbRecord['url'] = url("/conversations/{$dbRecord['ConversationID']}", true);
+
+        if (array_key_exists('CountNewMessages', $dbRecord)) {
+            $dbRecord['unread'] = $dbRecord['CountNewMessages'] > 0;
+            $dbRecord['countUnread'] = $dbRecord['CountNewMessages'];
+        }
+
+        if (array_key_exists('Participants', $dbRecord)) {
+            // Do views a favor and move the current user to the end of the list.
+            foreach ($dbRecord['Participants'] as $i => $row) {
+                if ($row['UserID'] == $this->getSession()->UserID) {
+                    $index = $i;
+                    break;
+                }
+            }
+            if (isset($index)) {
+                $me = array_splice($dbRecord['Participants'], $index, 1);
+                $dbRecord['Participants'] = array_merge($dbRecord['Participants'], $me);
+            }
+
+            $dbRecord['Participants'] = array_map([$this, 'normalizeParticipantOutput'], $dbRecord['Participants']);
+        }
+
+        if (isset($dbRecord['LastInsertUser'])) {
+            $dbRecord['lastMessage'] = [
+                'insertUserID' => $dbRecord['LastInsertUserID'],
+                'dateInserted' => $dbRecord['LastDateInserted'],
+                'insertUser' => $dbRecord['LastInsertUser']
+            ];
         }
 
         $schemaRecord = ApiUtils::convertOutputKeys($dbRecord);
@@ -486,15 +525,52 @@ class ConversationsApiController extends AbstractApiController {
     /**
      * Translate a row's Deleted field to a Status value.
      *
-     * @param array $row
+     * @param array $dbRecord
+     * @return array
      */
-    private function normalizeParticipantInput(array $row) {
-        if ($row['Deleted'] == 0) {
-            $row['Status'] = 'participating';
+    private function normalizeParticipantOutput(array $dbRecord) {
+        if ($dbRecord['Deleted'] == 0) {
+            $dbRecord['Status'] = 'participating';
         } else {
-            $row['Status'] = 'deleted';
+            $dbRecord['Status'] = 'deleted';
+        }
+        if (isset($row['Name']) && isset($row['Photo'])) {
+            $dbRecord['User'] = [
+                'UserID' => $row['UserID'],
+                'Name' => $row['Name'],
+                'PhotoUrl' => empty($dbRecord['PhotoUrl']) ? UserModel::getDefaultAvatarUrl($dbRecord) : Gdn_Upload::url($dbRecord['PhotoUrl'])
+            ];
         }
 
-        return $row;
+        return ApiUtils::convertOutputKeys($dbRecord);
+    }
+
+    /**
+     * The schema for a list of participants in a conversation.
+     *
+     * @return Schema Returns a schema with the **ConversationParticipants** ID.
+     */
+    private function getParticipantsSchema() {
+        return Schema::parse([
+            ':a' => [
+                'items' => [
+                    'type' => 'object',
+                    'properties' => [
+                        'userID' => [
+                            'type' => 'integer',
+                            'description' => 'The userID of the participant.',
+                        ],
+                        'user' => $this->getUserFragmentSchema(),
+                        'status' => [
+                            'description' => 'Participation status of the user.',
+                            'type' => 'string',
+                            'enum' => ['participating', 'deleted']
+                        ],
+                    ],
+                    'required' => ['userID', 'status']
+                ],
+                'description' => 'List of participants.',
+            ]
+        ])->setID('ConversationParticipants');
     }
 }

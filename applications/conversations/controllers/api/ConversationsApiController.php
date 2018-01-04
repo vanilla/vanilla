@@ -80,9 +80,7 @@ class ConversationsApiController extends AbstractApiController {
         if ($participants) {
             $data = [&$conversation];
             $this->conversationModel->joinParticipants($data, $participants);
-            $this->prepareRow($conversation);
         }
-
 
         return $conversation;
     }
@@ -374,6 +372,7 @@ class ConversationsApiController extends AbstractApiController {
         }
 
         $conversation = $this->conversationByID($conversationID, $this->getSession()->UserID, 5);
+        $conversation = $this->normalizeOutput($conversation);
         return $out->validate($conversation);
     }
 
@@ -496,8 +495,6 @@ class ConversationsApiController extends AbstractApiController {
         }
 
         if (array_key_exists('Participants', $dbRecord)) {
-            $dbRecord['Participants'] = array_map([$this, 'normalizeParticipantOutput'], $dbRecord['Participants']);
-
             // Do views a favor and move the current user to the end of the list.
             foreach ($dbRecord['Participants'] as $i => $row) {
                 if ($row['UserID'] == $this->getSession()->UserID) {
@@ -509,6 +506,8 @@ class ConversationsApiController extends AbstractApiController {
                 $me = array_splice($dbRecord['Participants'], $index, 1);
                 $dbRecord['Participants'] = array_merge($dbRecord['Participants'], $me);
             }
+
+            $dbRecord['Participants'] = array_map([$this, 'normalizeParticipantOutput'], $dbRecord['Participants']);
         }
 
         if (isset($dbRecord['LastInsertUser'])) {

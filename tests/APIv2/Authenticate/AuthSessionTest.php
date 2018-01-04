@@ -47,7 +47,6 @@ class AuthSessionTest extends AbstractAPIv2Test {
 
         $uniqueID = uniqid('lu_');
         $userData = [
-            'uniqueID' => $uniqueID,
             'name' => 'Authenticate_'.$uniqueID,
             'email' => 'authenticate_'.$uniqueID.'@example.com',
             'password' => 'pwd_'.$uniqueID,
@@ -58,7 +57,8 @@ class AuthSessionTest extends AbstractAPIv2Test {
         $userFragment = $usersAPIController->post($userData)->getData();
         $this->currentUser = array_merge($userFragment, $userData);
 
-        $this->authenticator->setSSOInfo($userData);
+        $this->authenticator->setUniqueID($uniqueID);
+        $this->authenticator->setUserData($userData);
 
         $this->container()->setInstance('TestSSOAuthenticator', $this->authenticator);
 

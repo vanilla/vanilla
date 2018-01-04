@@ -230,6 +230,22 @@
     }
   }
 
+  .nav-pill {
+    color: $body-bg;
+    background: transparentize($grey, .4);
+
+    //color: #1892d8;
+    //background: rgba(255, 255, 255, .75);
+    display: inline-block;
+    ///* text-transform: uppercase; */
+    font-size: 8px;
+    line-height: 1;
+    padding: 2px 4px;
+    border-radius: 3px;
+    vertical-align: middle;
+    font-weight: normal;
+  }
+
   .nav-link {
     font-weight: 300;
 
@@ -240,6 +256,11 @@
       &:hover {
         color: $white;
         background-color: $nav-pills-active-link-hover-bg;
+
+        .nav-pill {
+          color: $nav-pills-active-link-hover-bg;
+          background-color: transparentize($white, .3);
+        }
       }
     }
 

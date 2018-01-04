@@ -84,14 +84,7 @@ abstract class SSOAuthenticator extends Authenticator {
      */
     public final function validateAuthentication(RequestInterface $request) {
         $ssoData = $this->sso($request);
-
-        // Make sure that the following fields are filled.
-        $ssoData['authenticatorID'] = $this->getID();
-        $ssoData['authenticatorName'] = $this->getName();
-        $ssoData['authenticatorIsTrusted'] = $this->isTrusted();
-
         $ssoData->validate();
-
         return $ssoData;
     }
 }

@@ -87,7 +87,7 @@ class AuthenticateApiController extends AbstractApiController {
         $this->sessionModel->insert([
             'SessionID' => $sessionID,
             'UserID' => $this->getSession()->UserID,
-            'DateExpire' => date(MYSQL_DATE_FORMAT, time() + self::SESSION_ID_EXPIRATION),
+            'DateExpires' => date(MYSQL_DATE_FORMAT, time() + self::SESSION_ID_EXPIRATION),
             'Attributes' => $data,
         ]);
 
@@ -208,7 +208,7 @@ class AuthenticateApiController extends AbstractApiController {
         $out = $this->schema([
             'authSessionID:s' => 'Identifier of the authentication session.',
             'dateInserted:dt' => 'When the session was created.',
-            'dateExpire:dt' => 'When the session expires.',
+            'dateExpires:dt' => 'When the session expires.',
             'attributes' => Schema::parse([
                 'ssoData:o' => $this->ssoDataSchema(), // This should do a sparse validation
                 'linkUser:o?' => Schema::parse([
@@ -498,14 +498,17 @@ class AuthenticateApiController extends AbstractApiController {
                 'authenticatorID:s' => 'ID of the authenticator instance that was used to create this object.',
                 'authenticatorIsTrusted:b' => 'If the authenticator is trusted to sync user\'s information.',
                 'uniqueID:s' => 'Unique ID of the user supplied by the provider.',
-                'email:s?' => 'Email of the user.',
-                'name:s?' => 'Name of the user.',
-                'roles:a?' => [
-                    'description' => 'One or more role name.',
-                    'items' => ['type' => 'string'],
-                    'style' => 'form',
+                'user:o' => [
+                    'email:s?' => 'Email of the user.',
+                    'name:s?' => 'Name of the user.',
+                    'photo:s?' => 'Photo of the user.',
+                    'roles:a?' => [
+                        'description' => 'One or more role name.',
+                        'items' => ['type' => 'string'],
+                        'style' => 'form',
+                    ],
                 ],
-                '...:s?' => 'Any other information.',
+                'extra:o' => 'Any other information.',
             ], 'SSOData')->setDescription('SSOAuthenticator\'s supplied information.');
         }
 

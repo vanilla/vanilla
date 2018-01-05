@@ -143,3 +143,26 @@ describe("metaDataFunctions", () => {
         expect(utility.getMeta("foo")).toBe("foo2");
     })
 })
+
+describe("formatUrl", () => {
+    it("passes absolute URLs through directly", () => {
+        const paths = [
+            "https://test.com",
+            "//test.com",
+            "http://test.com",
+        ];
+
+        paths.forEach(path => {
+            expect(utility.formatUrl(path)).toBe(path);
+        })
+    });
+
+    it("follows the given format", () => {
+        window.gdn = {};
+        window.gdn.meta = {
+            UrlFormat: "/test/{Path}",
+        };
+
+        expect(utility.formatUrl("/discussions")).toBe("/test/discussions");
+    });
+});

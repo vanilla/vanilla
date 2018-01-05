@@ -1,3 +1,9 @@
+/**
+ * @author Adam Charron <adam.c@vanillaforums.com>
+ * @copyright 2009-2018 Vanilla Forums Inc.
+ * @license GPLv2
+ */
+
 import { polyfillClosest } from "../polyfills";
 
 // Because there is something weird happening in watch mode if this gets applied twice.

@@ -113,8 +113,8 @@ export function generateRandomString(length = 5) {
         throw new Error("generateRandomString can only deal with integers.");
     }
 
-    const chars = 'abcdefghijkmnopqrstuvwxyzABCDEFGHJKLMNPQRSTUVWXYZ23456789!@#$%*';
-    let result = '';
+    const chars = "abcdefghijkmnopqrstuvwxyzABCDEFGHJKLMNPQRSTUVWXYZ23456789!@#$%*";
+    let result = "";
     for (let i = 0; i < length; i++) {
         result += chars.charAt(Math.floor(Math.random() * chars.length));
     }
@@ -130,6 +130,7 @@ export function generateRandomString(length = 5) {
  * @returns {any}
  */
 export function getMeta(key, defaultValue = undefined) {
+
     /** gdn.meta may be set in an inline script in the head of the documenet. */
     const gdn = window["gdn"] || {};
 
@@ -151,6 +152,7 @@ export function getMeta(key, defaultValue = undefined) {
  * @param {any} value - The value to set.
  */
 export function setMeta(key, value) {
+
     /** gdn.meta may be set in an inline script in the head of the documenet. */
     const gdn = window["gdn"] || {};
 
@@ -159,4 +161,29 @@ export function setMeta(key, value) {
     }
 
     gdn.meta[key] = value;
+}
+
+/**
+ * Format a URL in the format passed from the controller.
+ *
+ * @param {string} path - The path to format.
+ *
+ * @returns {string}
+ */
+export function formatUrl(path) {
+    if (path.indexOf("//") >= 0) {
+        return path;
+    } // this is an absolute path.
+
+    const urlFormat = getMeta("UrlFormat", "/{Path}");
+
+    if (path.substr(0, 1) === "/") {
+        path = path.substr(1);
+    }
+
+    if (urlFormat.indexOf("?") >= 0) {
+        path = path.replace("?", "&");
+    }
+
+    return urlFormat.replace("{Path}", path);
 }

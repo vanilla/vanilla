@@ -4,7 +4,7 @@
  * @license GPLv2
  */
 
-import * as utility from "./utility";
+import * as utility from "@core/utility";
 import debounce from "lodash/debounce";
 
 /**

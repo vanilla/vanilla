@@ -4,8 +4,6 @@
  * @license GPLv2
  */
 
-import { getConfig } from "@core/configuration";
-
 /**
  * Resolve an array of functions that return promises sequentially.
  *
@@ -57,7 +55,7 @@ export function resolvePromisesSequentially(promiseFunctions) {
  * @param {any} value - The value to log.
  */
 export function log(value) {
-    if (getConfig("debug", false)) {
+    if (getMeta("debug", false)) {
         // eslint-disable-next-line no-console
         console.log(value);
     }

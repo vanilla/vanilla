@@ -65,7 +65,7 @@ export function elementIsVisible(element) {
     return !!( element.offsetWidth || element.offsetHeight || element.getClientRects().length );
 }
 
-const eventFunctionKeys = [];
+const delegatedEventListeners = {};
 
 /**
  * Create an event listener using event delegation.
@@ -74,6 +74,8 @@ const eventFunctionKeys = [];
  * @param {string} filterSelector - A CSS selector to match against.
  * @param {function} callback - The callback function. This gets passed the fired event.
  * @param {string=} scopeSelector - And element to scope the event listener to.
+ *
+ * @returns {string} - The hash of the event. Save this to use removeDelegatedEvent().
  */
 export function delegateEvent(eventName, filterSelector, callback, scopeSelector) {
     let functionKey = eventName + filterSelector + callback.toString();
@@ -93,15 +95,14 @@ export function delegateEvent(eventName, filterSelector, callback, scopeSelector
         scope = document;
     }
 
-    const eventHash = utility.hashString(functionKey);
+    const eventHash = utility.hashString(functionKey).toString();
 
-    if (!eventFunctionKeys.includes(eventHash)) {
-        eventFunctionKeys.push(eventHash);
-
-        scope.addEventListener(eventName, (event) => {
+    if (!Object.keys(delegatedEventListeners).includes(eventHash)) {
+        console.log(scope);
+        const listener = scope.addEventListener(eventName, (event) => {
 
             // Get the nearest DOMNode that matches the given selector.
-            const match = event.target.closest(filterSelector);
+            const match = filterSelector ? event.target.closest(filterSelector) : event.target;
 
             if (match) {
 
@@ -109,7 +110,25 @@ export function delegateEvent(eventName, filterSelector, callback, scopeSelector
                 callback.call(match, event);
             }
         });
+        delegatedEventListeners[eventHash] = listener;
+        return eventHash;
     }
+}
+
+/**
+ * Remove a delegated event listener.
+ *
+ * @param {string} eventHash - The event hash passed from delegateEvent().
+ */
+export function removeDelegatedEvent(eventHash) {
+    delegatedEventListeners[eventHash].remove();
+    delete delegatedEventListeners[eventHash];
+}
+
+export function removeAllEventListeners() {
+    Object.keys(delegatedEventListeners).forEach(key => {
+        removeDelegatedEvent(key);
+    })
 }
 
 /**

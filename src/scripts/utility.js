@@ -1,3 +1,9 @@
+/**
+ * @author Adam Charron <adam.c@vanillaforums.com>
+ * @copyright 2009-2018 Vanilla Forums Inc.
+ * @license GPLv2
+ */
+
 import { getConfig } from "@core/configuration";
 
 /**
@@ -97,35 +103,44 @@ export function hashString(str) {
  *
  * @param {number=} length - The lenght of the desired string.
  *
- * @returns {string}
+ * @returns {string} - The generated string.
+ * @throws {Error} - If you pass a length less than 0.
  */
 export function generateRandomString(length = 5) {
+    if (length < 0) {
+        throw new Error("generateRandomString can only deal with non-negative lengths.");
+    }
+
+    if (!Number.isInteger(length)) {
+        throw new Error("generateRandomString can only deal with integers.");
+    }
+
     const chars = 'abcdefghijkmnopqrstuvwxyzABCDEFGHJKLMNPQRSTUVWXYZ23456789!@#$%*';
     let result = '';
-    let pos = 0;
     for (let i = 0; i < length; i++) {
-        pos = Math.floor(Math.random() * chars.length);
-        result += chars.substring(pos, pos + 1);
+        result += chars.charAt(Math.floor(Math.random() * chars.length));
     }
     return result;
 }
-
-const gdn = window["gdn"] || {};
-
-/** gdn.meta may be set in an inline script in the head of the documenet. */
-const metaData = gdn.meta ? {...gdn.meta} : {};
 
 /**
  * Get a piece of metadata passed from the server.
  *
  * @param {string} key - The key to lookup.
- * @param {any} defaultValue - A fallback value in case the key cannot be found.
+ * @param {any=} defaultValue - A fallback value in case the key cannot be found.
  *
  * @returns {any}
  */
-export function getMeta(key, defaultValue) {
-    if (metaData[key]) {
-        return metaData[key];
+export function getMeta(key, defaultValue = undefined) {
+    /** gdn.meta may be set in an inline script in the head of the documenet. */
+    const gdn = window["gdn"] || {};
+
+    if (!gdn.meta) {
+        gdn.meta = {};
+    }
+
+    if (gdn.meta[key]) {
+        return gdn.meta[key];
     }
 
     return defaultValue;
@@ -138,5 +153,12 @@ export function getMeta(key, defaultValue) {
  * @param {any} value - The value to set.
  */
 export function setMeta(key, value) {
-    metaData[key] = value;
+    /** gdn.meta may be set in an inline script in the head of the documenet. */
+    const gdn = window["gdn"] || {};
+
+    if (!gdn.meta) {
+        gdn.meta = {};
+    }
+
+    gdn.meta[key] = value;
 }

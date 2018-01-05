@@ -1,3 +1,9 @@
+/**
+ * @author Adam Charron <adam.c@vanillaforums.com>
+ * @copyright 2009-2018 Vanilla Forums Inc.
+ * @license GPLv2
+ */
+
 import * as utility from "../utility";
 
 describe("resolvePromisesSequentially()", () => {
@@ -57,3 +63,83 @@ describe("resolvePromisesSequentially()", () => {
         return expect(utility.resolvePromisesSequentially(functions)).resolves.toEqual(expectation);
     });
 });
+
+// describe("logging", () => {
+//     // // @ts-ignore
+//     // global.console = {
+//     //     error: jest.fn();
+//     // }
+// })
+
+describe("hashString", () => {
+    test("the same string always results in the same value", () => {
+        const str = "a; lksdjfl;aska;lskd fjaskl;dfj al;skdjfalsjkdfa;lksdjfl;kasdjflksaf;kbfjal;skdfbjanv;slkdfjbals;dkjfslkadfj;alsdjf;oiawjef;oiawbejvf;ioawbevf;aoiwebfjaov;wifebvl";
+        expect(utility.hashString(str)).toBe(utility.hashString(str));
+    });
+
+    test("different strings hash to different values", () => {
+        const str1 = "a;slkdfjl;askdjfkl;asdjfkl;asjdfl;";
+        const str2 = "a;sldkfjal;skdfjl;kasjdfl;k;laksjdf;laksjdf;laksjdf;lkajsd;lkfjaskl;dfjals;kdfjnal;skdjbfl;kasbdjfv;laskjbdfal;skdjfalv;skdjfalskdbjnfav;bslkdfjnalv;ksdfjbalskdfbjalvsk.dfjbalsv;kdbfjalsv;kdfjbadklsfjals";
+
+        expect(utility.hashString(str1)).not.toBe(utility.hashString(str2));
+    });
+});
+
+describe("generateRandomString", () => {
+    it("generates strings of a proper length", () => {
+        const possibleValues = [
+            3,
+            41000,
+            0,
+            424,
+            23,
+            255
+        ];
+
+        possibleValues.forEach(value => {
+            expect(utility.generateRandomString(value).length).toBe(value);
+        })
+    })
+
+    it("errors when passed an negative number", () => {
+        expect(() => utility.generateRandomString(-1)).toThrowError();
+    });
+
+    it("errors when passed a non-integer number", () => {
+        // @ts-ignore
+        expect(() => utility.generateRandomString("asd")).toThrowError();
+        expect(() => utility.generateRandomString(123.42)).toThrowError();
+    })
+});
+
+describe("metaDataFunctions", () => {
+    beforeEach(() => {
+        // @ts-ignore
+        if (!global.gdn || !global.gdn.meta) {
+            global.gdn = {};
+            global.gdn.meta = {};
+        }
+
+        global.gdn.meta = {
+            foo: "foo"
+        }
+    })
+
+    it("can fetch existing metaData", () => {
+        expect(utility.getMeta("foo")).toBe("foo");
+    })
+
+    it("return a default value if the requested one can't be found", () => {
+        expect(utility.getMeta("baz", "fallback")).toBe("fallback");
+    })
+
+    it("can set a new meta value", () => {
+        utility.setMeta("test", "result");
+        expect(utility.getMeta("test")).toBe("result");
+    })
+
+    it("can override existing values with new ones", () => {
+        utility.setMeta("foo", "foo2");
+        expect(utility.getMeta("foo")).toBe("foo2");
+    })
+})

@@ -20,3 +20,4 @@ interface Window {
 interface EventTarget extends HTMLElement {};
 
 declare var gdn: any;
+

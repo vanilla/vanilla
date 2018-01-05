@@ -14,5 +14,27 @@
         "react": "^16.2.0",
         "react-dom": "^16.2.0",
         "setasap": "^2.0.0"
+    },
+    "devDependencies": {
+        "@types/jest": "^22.0.0",
+        "@vanillaforums/babel-preset": "^1.0.0",
+        "babel-core": "^6.26.0",
+        "babel-jest": "^22.0.4",
+        "jest": "^22.0.4"
+    },
+    "jest": {
+        "testPathIgnorePatterns": [
+            "/node_modules/",
+            "/fixtures/",
+            "/bower_components/"
+        ],
+        "watchPathIgnorePatterns": [
+            "/fixtures/"
+        ],
+        "moduleNameMapper": {
+            "@core/(.*)$": "<rootDir>/src/scripts/$1",
+            "@dashboard/(.*)$": "<rootDir>/applications/dashboard/src/scripts/$1",
+            "@vanilla/(.*)$": "<rootDir>/applications/vanilla/src/scripts/$1"
+        }
     }
 }

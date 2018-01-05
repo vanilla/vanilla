@@ -116,3 +116,42 @@ export function toggleAttribute(element, attribute) {
     const newValue = element.getAttribute(attribute) === "false";
     element.setAttribute(attribute, newValue);
 }
+
+const dataMap = new WeakMap();
+
+/**
+ * Set a piece of data specific to a DOM Element. Similar to `$.data`.
+ *
+ * @param {Element} element - The DOM Element to assosciate the data with.
+ * @param {string} key - The key to assosciate the data with.
+ * @param {string} value - The value to store.
+ */
+export function setData(element, key, value) {
+    const initialValue = dataMap.has(element) ? dataMap.get(element) : {};
+    initialValue[key] = value;
+
+    dataMap.set(element, initialValue);
+}
+
+/**
+ * Get a piece of data specific to a DOM Element. Similar to `$.data`.
+ *
+ * @param {Element} element - The DOM Element to lookup.
+ * @param {string} key - The key to lookup.
+ * @param {any=} defaultValue - A value to use if the element or key aren't found.
+ *
+ * @return {any}
+ */
+export function getData(element, key, defaultValue) {
+    if (dataMap.has(element) && dataMap.get(element)[key]) {
+        return dataMap.get(element)[key];
+    }
+
+    const attributeString = `data-${key}`;
+
+    if (element.hasAttribute(attributeString)) {
+        return element.getAttribute(attributeString);
+    }
+
+    return defaultValue;
+}

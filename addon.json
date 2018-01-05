@@ -3,7 +3,6 @@
     "build": {
         "process": "core",
         "entries": {
-            "admin": "./src/scripts/admin.js",
             "bootstrap": "./src/scripts/bootstrap.js"
         },
         "exports": {

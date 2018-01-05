@@ -10,7 +10,6 @@ import { getConfig } from "@core/configuration";
  * @example
  * const urls = ['/url1', '/url2', '/url3']
  * const functions = urls.map(url => () => fetch(url))
- *
  * resolvePromisesSequentially(funcs)
  *   .then(console.log)
  *   .catch(console.error)
@@ -91,4 +90,53 @@ export function hashString(str) {
         return (prevHash << 5) - prevHash + currVal.charCodeAt(0);
     }
     return str.split("").reduce(hashReduce, 0);
+}
+
+/**
+ * Generates a random string of letters and numbers and a few whitelisted characters.
+ *
+ * @param {number=} length - The lenght of the desired string.
+ *
+ * @returns {string}
+ */
+export function generateRandomString(length = 5) {
+    const chars = 'abcdefghijkmnopqrstuvwxyzABCDEFGHJKLMNPQRSTUVWXYZ23456789!@#$%*';
+    let result = '';
+    let pos = 0;
+    for (let i = 0; i < length; i++) {
+        pos = Math.floor(Math.random() * chars.length);
+        result += chars.substring(pos, pos + 1);
+    }
+    return result;
+}
+
+const gdn = window["gdn"] || {};
+
+/** gdn.meta may be set in an inline script in the head of the documenet. */
+const metaData = gdn.meta ? {...gdn.meta} : {};
+
+/**
+ * Get a piece of metadata passed from the server.
+ *
+ * @param {string} key - The key to lookup.
+ * @param {any} defaultValue - A fallback value in case the key cannot be found.
+ *
+ * @returns {any}
+ */
+export function getMeta(key, defaultValue) {
+    if (metaData[key]) {
+        return metaData[key];
+    }
+
+    return defaultValue;
+}
+
+/**
+ * Set a piece of metadata. This will override what was passed from the server.
+ *
+ * @param {string} key - The key to store under.
+ * @param {any} value - The value to set.
+ */
+export function setMeta(key, value) {
+    metaData[key] = value;
 }

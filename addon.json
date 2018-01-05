@@ -6,7 +6,12 @@
             "bootstrap": "./src/scripts/bootstrap.js"
         },
         "exports": {
-            "app": ["axios", "./src/scripts/events", "./src/scripts/utility"],
+            "app": [
+                "./src/scripts/events",
+                "./src/scripts/utility",
+                "./src/scripts/dom-utility",
+                "axios"
+            ],
             "admin": ["axios"]
         }
     }

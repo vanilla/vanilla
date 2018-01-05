@@ -17,16 +17,22 @@
     },
     "devDependencies": {
         "@types/jest": "^22.0.0",
-        "@vanillaforums/babel-preset": "^1.0.0",
+        "@vanillaforums/babel-preset": "^1.0.2",
         "babel-core": "^6.26.0",
         "babel-jest": "^22.0.4",
+        "cross-env": "^5.1.3",
         "jest": "^22.0.4"
+    },
+    "scripts": {
+        "test": "cross-env NODE_ENV=test BABEL_ENV=test jest",
+        "test:watch": "cross-env NODE_ENV=test BABEL_ENV=test jest --watch --no-cache"
     },
     "jest": {
         "testPathIgnorePatterns": [
             "/node_modules/",
             "/fixtures/",
-            "/bower_components/"
+            "/bower_components/",
+            "test-setup.js"
         ],
         "watchPathIgnorePatterns": [
             "/fixtures/"
@@ -35,6 +41,12 @@
             "@core/(.*)$": "<rootDir>/src/scripts/$1",
             "@dashboard/(.*)$": "<rootDir>/applications/dashboard/src/scripts/$1",
             "@vanilla/(.*)$": "<rootDir>/applications/vanilla/src/scripts/$1"
-        }
+        },
+        "transform": {
+            "^.+\\.(js|jsx|ts|tsx)$": "babel-jest"
+        },
+        "setupFiles": [
+            "<rootDir>/src/scripts/__tests__/test-setup.js"
+        ]
     }
 }

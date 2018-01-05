@@ -62,7 +62,7 @@ export function unhideElement(element) {
  * @returns {boolean} - The visibility.
  */
 export function elementIsVisible(element) {
-    return !!( element.offsetWidth || element.offsetHeight || element.getClientRects().length );
+    return !!(element.offsetWidth || element.offsetHeight || element.getClientRects().length);
 }
 
 const delegatedEventListeners = {};
@@ -98,9 +98,7 @@ export function delegateEvent(eventName, filterSelector, callback, scopeSelector
     const eventHash = utility.hashString(functionKey).toString();
 
     if (!Object.keys(delegatedEventListeners).includes(eventHash)) {
-        console.log(scope);
-        const listener = scope.addEventListener(eventName, (event) => {
-
+        const wrappedCallback = event => {
             // Get the nearest DOMNode that matches the given selector.
             const match = filterSelector ? event.target.closest(filterSelector) : event.target;
 
@@ -109,8 +107,14 @@ export function delegateEvent(eventName, filterSelector, callback, scopeSelector
                 // Call the callback with the matching element as the context.
                 callback.call(match, event);
             }
-        });
-        delegatedEventListeners[eventHash] = listener;
+        };
+
+        const listener = scope.addEventListener(eventName, wrappedCallback);
+        delegatedEventListeners[eventHash] = {
+            scope,
+            eventName,
+            wrappedCallback,
+        };
         return eventHash;
     }
 }
@@ -121,14 +125,15 @@ export function delegateEvent(eventName, filterSelector, callback, scopeSelector
  * @param {string} eventHash - The event hash passed from delegateEvent().
  */
 export function removeDelegatedEvent(eventHash) {
-    delegatedEventListeners[eventHash].remove();
+    const { scope, eventName, wrappedCallback } = delegatedEventListeners[eventHash];
+    scope.removeEventListener(eventName, wrappedCallback);
     delete delegatedEventListeners[eventHash];
 }
 
-export function removeAllEventListeners() {
+export function removeAllDelegatedEvents() {
     Object.keys(delegatedEventListeners).forEach(key => {
         removeDelegatedEvent(key);
-    })
+    });
 }
 
 /**

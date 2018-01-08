@@ -16,5 +16,20 @@
             "email": "support@vanillaforums.com",
             "homepage": "https://open.vanillaforums.com"
         }
-    ]
+    ],
+    "build": {
+        "process": "core",
+        "entries": {
+            "app": "./src/scripts/dashboard-app.js",
+            "admin": "./src/scripts/dashboard-admin.js"
+        },
+        "exports": {
+            "app": [
+                "./src/scripts/common/components"
+            ],
+            "admin": [
+                "./src/scripts/common/components"
+            ]
+        }
+    }
 }

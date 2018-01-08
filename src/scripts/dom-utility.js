@@ -185,3 +185,10 @@ export function getData(element, key, defaultValue) {
 
     return defaultValue;
 }
+
+/**
+ * Render a react component.
+ */
+export function renderComponent() {
+
+}

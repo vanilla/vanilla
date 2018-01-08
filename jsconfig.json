@@ -1,6 +1,7 @@
 {
     "compilerOptions": {
         "checkJs": true,
+        "jsx": "preserve",
         "lib": [
             "es2017",
             "dom",

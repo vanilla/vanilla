@@ -10,7 +10,9 @@
                 "./src/scripts/events",
                 "./src/scripts/utility",
                 "./src/scripts/dom-utility",
-                "axios"
+                "axios",
+                "react",
+                "react-dom"
             ],
             "admin": ["axios"]
         }

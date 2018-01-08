@@ -117,7 +117,7 @@ class UpdateModel extends Gdn_Model {
             '/class.*.plugin.php', // plugin
             '/about.php', // theme
             '/definitions.php', // locale
-            '/index.php', // vanilla core
+            '/environment.php', // vanilla core
             'vanilla2export.php' // porter
         ];
 
@@ -148,7 +148,7 @@ class UpdateModel extends Gdn_Model {
             }
 
             foreach ($entries as $entry) {
-                if ($entry['Name'] == '/index.php') {
+                if ($entry['Name'] == '/environment.php') {
                     // This could be the core vanilla package.
                     $version = self::parseCoreVersion($entry['Path']);
 

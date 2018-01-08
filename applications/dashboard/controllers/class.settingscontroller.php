@@ -1689,7 +1689,7 @@ class SettingsController extends DashboardController {
                 // Save the text to the locale.
                 $translations = [];
                 foreach ($this->data('ThemeInfo.Options.Text', []) as $key => $default) {
-                    $value = $this->Form->getFormValue($this->Form->escapeString('Text_'.$key));
+                    $value = $this->Form->getFormValue($this->Form->escapeFieldName('Text_'.$key));
                     $configSaveData["ThemeOption.{$key}"] = $value;
                     //$this->Form->setFormValue('Text_'.$Key, $Value);
                 }
@@ -1709,7 +1709,7 @@ class SettingsController extends DashboardController {
                         $value = $default;
                     }
 
-                    $this->Form->setValue($this->Form->escapeString('Text_'.$key), $value);
+                    $this->Form->setValue($this->Form->escapeFieldName('Text_'.$key), $value);
                 }
             }
 
@@ -1754,7 +1754,7 @@ class SettingsController extends DashboardController {
                 // Save the text to the locale.
                 $translations = [];
                 foreach ($this->data('ThemeInfo.Options.Text', []) as $key => $default) {
-                    $value = $this->Form->getFormValue($this->Form->escapeString('Text_'.$key));
+                    $value = $this->Form->getFormValue($this->Form->escapeFieldName('Text_'.$key));
                     $configSaveData["ThemeOption.{$key}"] = $value;
                     //$this->Form->setFormValue('Text_'.$Key, $Value);
                 }
@@ -1776,7 +1776,7 @@ class SettingsController extends DashboardController {
                         $value = $default;
                     }
 
-                    $this->Form->setFormValue($this->Form->escapeString('Text_'.$key), $value);
+                    $this->Form->setFormValue($this->Form->escapeFieldName('Text_'.$key), $value);
                 }
             }
 

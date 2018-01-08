@@ -811,4 +811,41 @@ class Gdn_Session {
 
         return $session;
     }
+
+    /**
+     * Create a session that expires.
+     *
+     * @param mixed $data The data to store in the session.
+     * @param int $ttl Time to live before expiring.
+     * @return string The session ID.
+     */
+    public function createTemporarySession($data, $ttl = 1200) {
+        $sessionID = betterRandomString(32, 'aA0');
+
+        $sessionModel = new SessionModel();
+        $sessionModel->insert([
+            'SessionID' => $sessionID,
+            'UserID' => $this->UserID,
+            'DateExpires' => date(MYSQL_DATE_FORMAT, time() + $ttl),
+            'Attributes' => $data,
+        ]);
+
+        return $sessionID;
+    }
+
+    /**
+     * Get a temporary session.
+     *
+     * @param string $sessionID The session ID.
+     * @return mixed|bool Return the session if it is valid of false otherwise.
+     */
+    public function getTemporarySession($sessionID) {
+        $sessionModel = new SessionModel();
+        $sessionData = $sessionModel->getID($sessionID, DATASET_TYPE_ARRAY);
+        if ($sessionModel->isExpired($sessionData)) {
+            return false;
+        }
+
+        return $sessionData;
+    }
 }

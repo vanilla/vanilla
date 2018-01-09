@@ -792,8 +792,14 @@ class Gdn_MySQLStructure extends Gdn_DatabaseStructure {
             $return .= ' null';
         }
 
-        if (!is_null($column->Default) && $column->Type !== 'timestamp') {
-            $return .= " default ".self::_quoteValue($column->Default);
+        if (!is_null($column->Default)) {
+            if ($column->Type !== 'timestamp') {
+                $return .= " default ".self::_quoteValue($column->Default);
+            } else {
+                if (in_array(strtolower($column->Default), ['current_timestamp', 'current_timestamp()'])) {
+                    $return .= " default ".$column->Default;
+                }
+            }
         }
 
         if ($column->AutoIncrement) {

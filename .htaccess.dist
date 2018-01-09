@@ -11,6 +11,9 @@
     ####
     #RewriteBase /
 
+    # Make sure that / doesn't try to go to index.php without a rewrite :)
+    DirectoryIndex disabled
+
     ####
     # Deny access to certain directories that SHOULD NOT be exposed.
     ####
@@ -27,15 +30,14 @@
     # You can comment out this section if it causes you problems.
     # This is just a nice to have for security purposes.
     ####
-    RewriteCond %{REQUEST_URI} !^/index.php$
-    RewriteRule ^(.+\.php)$ index.php [E=X_REWRITE:1,E=X_PATH_INFO:/$1,L]
+    RewriteCond %{REQUEST_URI} !/index.php$
+    RewriteRule (.+\.php) [E=X_REWRITE:1,E=X_PATH_INFO:/$1,L]
 
     ####
     # Redirect any non existing file/directory to /index.php
     ####
     RewriteCond %{REQUEST_FILENAME} !-f
-    RewriteCond %{REQUEST_FILENAME} !-d
-    RewriteRule ^(.*)$ index.php [E=X_REWRITE:1,E=X_PATH_INFO:/$1,L]
+    RewriteRule (.*) index.php [E=X_REWRITE:1,E=X_PATH_INFO:/$1,L]
 
     ####
     # Add the proper X_REWRITE server variable for rewritten requests.

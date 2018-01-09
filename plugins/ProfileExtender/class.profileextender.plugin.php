@@ -405,6 +405,8 @@ class ProfileExtenderPlugin extends Gdn_Plugin {
             // Get the custom fields
             $ProfileFields = Gdn::userModel()->getMeta($Sender->User->UserID, 'Profile.%', 'Profile.');
 
+            Gdn::controller()->setData('ExtendedFields', $ProfileFields);
+
             // Get allowed GDN_User fields.
             $Blacklist = array_combine($this->ReservedNames, $this->ReservedNames);
             $NativeFields = array_diff_key((array)$Sender->User, $Blacklist);

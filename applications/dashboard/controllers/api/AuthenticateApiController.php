@@ -76,25 +76,6 @@ class AuthenticateApiController extends AbstractApiController {
     }
 
     /**
-     * Store the data and return the associated SessionID to retrieve it.
-     *
-     * @param array $data The data to store.
-     * @return string SessionID
-     */
-    private function createSession($data) {
-        $sessionID = betterRandomString(32, 'aA0');
-
-        $this->sessionModel->insert([
-            'SessionID' => $sessionID,
-            'UserID' => $this->getSession()->UserID,
-            'DateExpires' => date(MYSQL_DATE_FORMAT, time() + self::SESSION_ID_EXPIRATION),
-            'Attributes' => $data,
-        ]);
-
-        return $sessionID;
-    }
-
-    /**
      * Unlink a user from the specified authenticator.
      * If no user is specified it will unlink the current user.
      *
@@ -222,8 +203,8 @@ class AuthenticateApiController extends AbstractApiController {
 
         $query = $in->validate($query);
 
-        $sessionData = $this->sessionModel->getID($authSessionID, DATASET_TYPE_ARRAY);
-        if ($this->sessionModel->isExpired($sessionData)) {
+        $sessionData = $this->getSession()->getTemporarySession($authSessionID);
+        if (!$sessionData) {
             throw new ClientException('The session has expired.');
         }
 
@@ -384,7 +365,7 @@ class AuthenticateApiController extends AbstractApiController {
 
         if ($response['authenticationStep'] === 'linkUser') {
             // Store all the information needed for the next authentication step.
-            $response['authSessionID'] = $this->createSession($sessionData);
+            $response['authSessionID'] = $this->getSession()->createTemporarySession($sessionData, self::SESSION_ID_EXPIRATION);
         }
 
         return $out->validate($response);
@@ -440,8 +421,8 @@ class AuthenticateApiController extends AbstractApiController {
 
         $in->validate($body);
 
-        $sessionData = $this->sessionModel->getID($body['authSessionID'], DATASET_TYPE_ARRAY);
-        if ($this->sessionModel->isExpired($sessionData)) {
+        $sessionData = $this->getSession()->getTemporarySession($body['authSessionID']);
+        if (!$sessionData) {
             throw new Exception('The session has expired.');
         }
 

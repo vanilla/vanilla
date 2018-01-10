@@ -44,7 +44,7 @@ if (!$CancelUrl) {
     $this->fireEvent('BeforeBodyInput');
 
     echo '<div class="P">';
-    echo $this->Form->bodyBox('Body', ['Table' => 'Discussion', 'FileUpload' => true]);
+    echo $this->Form->bodyBox('Body', ['Table' => 'Discussion', 'FileUpload' => true, 'placeholder' => t('Type your message here'), 'title' => t('Type your message here')]);
     echo '</div>';
 
     $Options = '';

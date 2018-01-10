@@ -142,11 +142,14 @@ class OpenIDPlugin extends Gdn_Plugin {
         // Check session before retrieving
         $session = Gdn::session();
         $openID = $session->stash('OpenID', '', false);
+        if ($openID) {
+            $openID = unserialize($openID);
+        }
         if (!$openID) {
             $openID = $this->getOpenID();
         }
 
-        if ($session->stash('OpenID', '', false) || $openID->validate()) {
+        if ($openID && $openID->validate()) {
             $attr = $openID->getAttributes();
 
             // This isn't a trusted connection. Don't allow it to automatically connect a user account.
@@ -165,7 +168,7 @@ class OpenIDPlugin extends Gdn_Plugin {
             }
 
             $sender->setData('Verified', true);
-            $session->stash('OpenID', $openID);
+            $session->stash('OpenID', serialize($openID));
 
             $this->EventArguments['OpenID'] = $openID;
             $this->EventArguments['Form'] = $form;

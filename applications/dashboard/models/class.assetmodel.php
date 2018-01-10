@@ -179,7 +179,7 @@ class AssetModel extends Gdn_Model {
         }
 
         // Add the bootstrap after everything else.
-        $addons[] = '/js/bootstrap/core-bootstrap.js';
+        $addons[] = "/js/bootstrap-$basename/core-bootstrap-$basename.js";
         $result = array_merge($libs, $addons);
 
         return $result;

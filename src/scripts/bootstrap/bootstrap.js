@@ -4,7 +4,7 @@
  * @license GPLv2
  */
 
-import loadPolyfills from "@core/polyfills";
+import loadPolyfills from "@core/bootstrap/polyfills";
 import events from "@core/events";
 import * as utility from "@core/utility";
 

@@ -4,6 +4,8 @@
  * @license GPLv2
  */
 
+// import sprintfJs from "sprintf-js";
+
 /**
  * Resolve an array of functions that return promises sequentially.
  *
@@ -187,3 +189,8 @@ export function formatUrl(path) {
 
     return urlFormat.replace("{Path}", path);
 }
+
+/**
+ * Re-exported from sprintf-js https://www.npmjs.com/package/sprintf-js
+ */
+// export const sprintf = sprintfJs.sprintf;

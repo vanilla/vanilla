@@ -3,7 +3,8 @@
     "build": {
         "process": "core",
         "entries": {
-            "bootstrap": "./src/scripts/bootstrap.js"
+            "bootstrap-app": "./src/scripts/bootstrap/bootstrap.js",
+            "bootstrap-admin": "./src/scripts/bootstrap/bootstrap.js"
         },
         "exports": {
             "app": [
@@ -14,7 +15,14 @@
                 "react",
                 "react-dom"
             ],
-            "admin": ["axios"]
+            "admin": [
+                "axios",
+                "./src/scripts/events",
+                "./src/scripts/utility",
+                "./src/scripts/dom-utility",
+                "react",
+                "react-dom"
+            ]
         }
     }
 }

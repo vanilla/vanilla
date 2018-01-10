@@ -1788,9 +1788,9 @@ class Gdn_Controller extends Gdn_Pluggable {
 
                 // Add the built addon javascript files.
                 $addonJs = $AssetModel->getAddonJsFiles($ThemeType, $this->MasterView === 'admin' ? 'admin' : 'app', $ETag);
-                $busta = assetVersion('', '');
+                $busta = trim(assetVersion('', ''), '.');
                 foreach ($addonJs as $path) {
-                    $this->Head->addScript(asset($path));
+                    $this->Head->addScript(asset($path)."?h=$busta", 'text/javascript', false, ['defer' => 'true']);
                 }
 
                 foreach ($this->_JsFiles as $Index => $JsInfo) {

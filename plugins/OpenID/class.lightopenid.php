@@ -299,13 +299,13 @@ class LightOpenID {
     }
 
     protected function request($url, $method = 'GET', $params = []) {
-        $timeStart = microtime();
+        $timeStart = microtime(true);
         if (function_exists('curl_init') && !ini_get('safe_mode')) {
             $result = $this->request_curl($url, $method, $params);
         } else {
             $result = $this->request_streams($url, $method, $params);
         }
-        $timeDiff = microtime() - $timeStart;
+        $timeDiff = microtime(true) - $timeStart;
 
         // Make sure every request takes at least .5 second.
         // This nullify brute forcing
@@ -773,5 +773,25 @@ class LightOpenID {
             return $this->getAxAttributes() + $this->getSregAttributes();
         }
         return $this->getSregAttributes();
+    }
+
+    /**
+     * Get data for the OpenID authentication attempt.
+     *
+     * @return array
+     */
+    public function getData() {
+        return $this->data;
+    }
+
+    /**
+     * Set OpenID authentication data.
+     *
+     * @param array $data
+     * @return array
+     */
+    public function setData(array $data) {
+        $this->data = $data;
+        return $this->data;
     }
 }

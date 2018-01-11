@@ -141,15 +141,29 @@ class OpenIDPlugin extends Gdn_Plugin {
 
         // Check session before retrieving
         $session = Gdn::session();
-        $openID = $session->stash('OpenID', '', false);
-        if ($openID) {
-            $openID = unserialize($openID);
-        }
-        if (!$openID) {
-            $openID = $this->getOpenID();
+        $openID = $this->getOpenID();
+        $sessionData = $session->stash('OpenID', '', false);
+
+        /**
+         * Save a successful validation and do not attempt to validate again. If a nonce is used as part of the request,
+         * and the user has to enter additional information to register (e.g. email), a second authentication attempt
+         * after they've submitted the requested information would fail.
+         */
+        if ($sessionData) {
+            $validated = true;
+            $openID->setData($sessionData['data']);
+            $openID->identity = $sessionData['identity'];
+        } elseif ($openID->validate()) {
+            $validated = true;
+            $session->stash('OpenID', [
+                'data' => $openID->getData(),
+                'identity' => $openID->identity
+            ]);
+        } else {
+            $validated = false;
         }
 
-        if ($openID && $openID->validate()) {
+        if ($validated) {
             $attr = $openID->getAttributes();
 
             // This isn't a trusted connection. Don't allow it to automatically connect a user account.
@@ -168,7 +182,6 @@ class OpenIDPlugin extends Gdn_Plugin {
             }
 
             $sender->setData('Verified', true);
-            $session->stash('OpenID', serialize($openID));
 
             $this->EventArguments['OpenID'] = $openID;
             $this->EventArguments['Form'] = $form;

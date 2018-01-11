@@ -16,10 +16,10 @@
                 "react-dom"
             ],
             "admin": [
-                "axios",
                 "./src/scripts/events",
                 "./src/scripts/utility",
                 "./src/scripts/dom-utility",
+                "axios",
                 "react",
                 "react-dom"
             ]

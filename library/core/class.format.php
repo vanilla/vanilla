@@ -1262,7 +1262,7 @@ class Gdn_Format {
                 $inTag--;
             }
 
-            if (c('Garden.Format.WarnLeaving', false) && isset($matches[4]) && $inAnchor) {
+            if (c('Garden.Format.WarnLeaving', false) && isset($matches[4]) && $inTag && $inAnchor) {
                 // This is a the href url value in an anchor tag.
                 $url = $matches[4];
                 $domain = parse_url($url, PHP_URL_HOST);

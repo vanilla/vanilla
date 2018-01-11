@@ -825,7 +825,7 @@ jQuery(document).ready(function($) {
             $('.ButtonGroup')
                 .removeClass('Open')
                 .setFlyoutAttributes();
-            
+
             // Open this one
             $buttonGroup
                 .addClass('Open')

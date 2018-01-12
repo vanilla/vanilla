@@ -14,6 +14,9 @@ const gdn = {
     ...(window["gdn"] || {})
 };
 
-// utility.log(gdn);
+// Wrap like this because we can't import utility (cyclical dependency)/
+if (gdn.meta["debug"]) {
+    console.log(gdn);
+}
 
 export default gdn;

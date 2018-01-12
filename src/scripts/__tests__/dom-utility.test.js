@@ -5,7 +5,6 @@
  */
 
 import * as domUtility from "../dom-utility";
-import { polyfillClosest } from "../polyfills";
 
 const input = `<script>alert("Got you!")</script>`;
 const output = `&lt;script&gt;alert("Got you!")&lt;/script&gt;`;
@@ -135,5 +134,20 @@ describe("removing delegated events", () => {
 
         expect(callback1.mock.calls.length).toBe(0);
         expect(callback2.mock.calls.length).toBe(0);
+    })
+});
+
+describe("getFormData", () => {
+    beforeEach(() => {
+        document.body.innerHTML = `
+            <form>
+                <input type="text" name="foo" value="foo">
+            </form>
+        `
+    });
+
+    it ("can get get data out of a form", () => {
+        const form = document.querySelector("form");
+        expect(domUtility.getFormData(form)).toEqual({foo: "foo"});
     })
 });

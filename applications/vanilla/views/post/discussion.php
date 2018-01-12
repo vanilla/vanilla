@@ -7,14 +7,23 @@ if (!$CancelUrl) {
         $CancelUrl = '/categories/'.urlencode($this->Category->UrlCode);
     }
 }
+
+$isEditMode = !property_exists($this, 'Discussion') || !is_object($this->Discussion);
 ?>
+
 <div id="DiscussionForm" class="FormTitleWrapper DiscussionForm">
     <?php
     if ($this->deliveryType() == DELIVERY_TYPE_ALL) {
         echo wrap($this->data('Title'), 'h1', ['class' => 'H']);
     }
     echo '<div class="FormWrapper">';
-    echo $this->Form->open();
+
+    $formOptions = [
+        "data-endpoint" => "/discussions",
+        "data-submit-type" => $isEditMode ? "PATCH" : "POST",
+    ];
+
+    echo $this->Form->open($formOptions);
     echo $this->Form->errors();
 
     $this->fireEvent('BeforeFormInputs');
@@ -67,7 +76,7 @@ if (!$CancelUrl) {
     echo '<div class="Buttons">';
     $this->fireEvent('BeforeFormButtons');
     echo $this->Form->button((property_exists($this, 'Discussion')) ? 'Save' : 'Post Discussion', ['class' => 'Button Primary DiscussionButton']);
-    if (!property_exists($this, 'Discussion') || !is_object($this->Discussion) || (property_exists($this, 'Draft') && is_object($this->Draft))) {
+    if ($isEditMode || (property_exists($this, 'Draft') && is_object($this->Draft))) {
         echo $this->Form->button('Save Draft', ['class' => 'Button DraftButton']);
     }
     echo $this->Form->button('Preview', ['class' => 'Button PreviewButton']);

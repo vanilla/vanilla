@@ -1,5 +1,6 @@
 {
     "compilerOptions": {
+        "allowJs": true,
         "checkJs": true,
         "jsx": "preserve",
         "lib": [
@@ -7,6 +8,7 @@
             "dom",
             "dom.iterable"
         ],
+        "target": "es2017",
         "baseUrl": ".",
         "paths": {
             "@core/*": ["./src/scripts/*"],

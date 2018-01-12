@@ -46,6 +46,12 @@ export function polyfillClosest() {
     }
 
     if (!Element.prototype.closest) {
+        /**
+         * Closest Polyfill
+         *
+         * @param {string} s - The string to match against.
+         * @returns {HTMLElement}
+         */
         Element.prototype.closest = function closest(s) {
             let el = this;
             if (!document.documentElement.contains(el)) {

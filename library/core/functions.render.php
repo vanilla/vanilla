@@ -981,49 +981,48 @@ if (!function_exists('linkDropDown')) {
         }
         $selectedLink = val($selectedKey, $links);
         $output .= '<span class="ToggleFlyout selectBox '.trim($extraClasses).'">';
-        $output .=  '  <span class="selectBox-label">';
-        $output .=       $label;
-        $output .=  '  </span><span class="selectBox-content">';
-        $output .=  '    <a href="#" role="button" class="FlyoutButton selectBox-toggle" tabindex="0">';
-        $output .=  '      <span class="selectBox-selected">';
-        $output .=           val('name', $selectedLink);
-        $output .=  '      </span>';
-        $output .=  '      <span class="vanillaDropDown-arrow">▾</span>';
-        $output .=  '    </a>';
-        $output .=  '    <span class="Flyout vanillaDropDown-content">';
-        $output .=  '      <ul class="selectBox-items MenuItems" role="presentation">';
+        $output .= '  <span class="selectBox-label">';
+        $output .=      $label;
+        $output .= '  </span>';
+        $output .= '  <span class="selectBox-main">';
+
+        $output .= '      <a href="#" role="button" class="FlyoutButton selectBox-toggle" tabindex="0">';
+        $output .= '        <span class="selectBox-selected">';
+        $output .=            val('name', $selectedLink);
+        $output .= '        </span>';
+        $output .= '        <span class="vanillaDropDown-arrow">▾</span>';
+        $output .= '      </a>';
+        $output .= '      <span class="Flyout MenuItems selectBox-content">';
+        $output .= '        <ul class="selectBox-items" role="presentation">';
         foreach($links as $i => $link) {
             if (val('active', $link)) {
-                $output .=  '        <li class="selectBox-item isSelected" role="presentation">';
-                $output .=  '            <span role="menuitem" class="selectbox-link" tabindex="0" aria-current="location">';
-                $output .=  '              <svg class="selectBox-selectedIcon icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">';
-                $output .=  '                  <title>✓</title>';
-                $output .=  '                  <polygon fill="currentColor" points="5,12.7 3.6,14.1 9,19.5 20.4,7.9 19,6.5 9,16.8"></polygon>';
-                $output .=  '              </svg>';
-                $output .=  '              <span class="selectBox-selectedText">';
-                $output .=                   val('name', $link);
-                $output .=  '              </span>';
-                $output .=  '            </span>';
-                $output .=  '        </li>';
+                $output .= '<li class="selectBox-item isSelected" role="presentation">';
+                $output .= '  <span role="menuitem" class="dropdown-menu-link selectBox-link" tabindex="0" aria-current="location">';
+                $output .= '    <svg class="vanillaIcon selectBox-selectedIcon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">';
+                $output .= '      <title>✓</title>';
+                $output .= '      <polygon fill="currentColor" points="5,12.7 3.6,14.1 9,19.5 20.4,7.9 19,6.5 9,16.8"></polygon>';
+                $output .= '    </svg>';
+                $output .= '    <span class="selectBox-selectedText">';
+                $output .=        val('name', $link);
+                $output .= '    </span>';
+                $output .= '  </span>';
+                $output .= '</li>';
             } else {
-                $output .=  '        <li class="menu-row" role="presentation">';
-                $output .=  '            <a role="menuitem" class="selectbox-link" tabindex="0" href="#">Category</a>';
-                $output .=  '        </li>';
+                $output .= '<li class="selectBox-item" role="presentation">';
+                $output .= '  <a role="menuitem" class="dropdown-menu-link selectBox-link" tabindex="0" href="#">';
+                $output .=      val('name', $link);
+                $output .= '  </a>';
+                $output .= '</li>';
             }
         }
-        $output .=  '      </ul>';
-        $output .=  '    </span>';
-        $output .=  '  </span>';
-        $output .=  '</span>';
+        $output .= '        </ul>';
+        $output .= '      </span>';
+        $output .= '    </span>';
+        $output .= '  </span>';
+        $output .= '</span>';
         return $output;
     }
 }
-
-
-
-
-
-
 
 if (!function_exists('panelHeading')) {
     /**

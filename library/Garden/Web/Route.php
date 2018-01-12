@@ -2,11 +2,12 @@
 /**
  * @author Todd Burry <todd@vanillaforums.com>
  * @copyright 2009-2018 Vanilla Forums Inc.
- * @license Proprietary
+ * @license GPLv2
  */
 
 namespace Garden\Web;
 
+use Garden\MetaTrait;
 
 /**
  * The base class for routes.
@@ -15,6 +16,8 @@ namespace Garden\Web;
  * dispatch information or **null** if it can't map the route.
  */
 abstract class Route {
+    use MetaTrait;
+
     const MAP_ARGS = 0x1; // map to path args
     const MAP_QUERY = 0x2; // map to querystring
     const MAP_BODY = 0x4; // map to post body
@@ -25,6 +28,7 @@ abstract class Route {
      * Route constructor.
      */
     public function __construct() {
+        // This is here so that subclasses can call parent::__construct() to be forwards compatible with any code added later.
     }
 
     /**
@@ -42,6 +46,8 @@ abstract class Route {
         'data' => Route::MAP_ARGS | Route::MAP_QUERY | Route::MAP_BODY,
         'path' => Route::MAP_PATH
     ];
+
+    private $defaults = [];
 
     /**
      * Get the conditions.
@@ -246,13 +252,21 @@ abstract class Route {
             $result += $args;
         }
         if ($mapping & self::MAP_QUERY) {
-            $result += $request->getQuery();
+            $result += $request->getQuery() + $this->getDefault('query', []);
         }
         if ($mapping & self::MAP_BODY) {
             $result += $request->getBody();
         }
 
         return $result;
+    }
+
+    public function setDefault($key, $value) {
+        $this->defaults[$key] = $value;
+    }
+
+    public function getDefault($key, $default = null) {
+        return array_key_exists($key, $this->defaults) ? $this->defaults[$key] : $default;
     }
 
     /**

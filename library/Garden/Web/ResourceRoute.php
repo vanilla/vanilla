@@ -87,15 +87,26 @@ class ResourceRoute extends Route {
         $pathArgs = explode('/', $pathPart);
 
         // First look for the controller.
-        $controllerSlug = $this->filterName(array_shift($pathArgs));
-        $controllerClass = $this->classLocator->findClass(sprintf($this->controllerPattern, $controllerSlug));
-        if ($controllerClass === null) {
+        $resource = array_shift($pathArgs);
+        $controllerSlug = $this->filterName($resource);
+        foreach ((array)$this->controllerPattern as $controllerPattern) {
+            $controllerClass = $this->classLocator->findClass(sprintf($controllerPattern, $controllerSlug));
+            if ($controllerClass) {
+                break;
+            }
+        }
+        if (!isset($controllerClass)) {
             return null;
         }
 
         // Now look for a method.
         $controller = $this->createInstance($controllerClass);
         $result = $this->findAction($controller, $request, $pathArgs);
+
+        if ($result !== null) {
+            $result->setMeta('resource', $resource);
+        }
+
         return $result;
     }
 
@@ -150,6 +161,8 @@ class ResourceRoute extends Route {
 
                 if ($callbackArgs !== null) {
                     $result = new Action($callback, $callbackArgs);
+                    $result->setMeta('method', $request->getMethod());
+                    $result->setMeta('action', $result->getCallback()[1]);
                     return $result;
                 }
             }
@@ -300,8 +313,6 @@ class ResourceRoute extends Route {
         return $defaults;
     }
 
-
-
     /**
      * Split a function into its regular parameters and mapped parameters.
      *
@@ -388,8 +399,6 @@ class ResourceRoute extends Route {
 
         return $result;
     }
-
-
 
     /**
      * Get the classLocator.

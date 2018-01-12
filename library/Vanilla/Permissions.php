@@ -6,10 +6,15 @@
 
 namespace Vanilla;
 
+use Vanilla\Utility\CamelCaseScheme;
+use Vanilla\Utility\DelimitedScheme;
+
 /**
  * Compile, manage and check user permissions.
  */
-class Permissions {
+class Permissions implements \JsonSerializable {
+    use PermissionsTranslationTrait;
+
     const BAN_BANNED = '!banned';
     const BAN_DELETED = '!deleted';
     const BAN_UPDATING = '!updating';
@@ -39,6 +44,7 @@ class Permissions {
      * @param array $permissions The internal permissions array, usually from a cache.
      */
     public function __construct($permissions = []) {
+        $this->nameScheme =  new DelimitedScheme('.', new CamelCaseScheme());
         $this->setPermissions($permissions);
     }
 
@@ -403,5 +409,33 @@ class Permissions {
                 return false;
             }
         }
+    }
+
+    /**
+     * Get an array representation of the permissions suitable for the page.
+     *
+     * @return array Returns an array with permissions, bans, and the isAdmin flag.
+     */
+    public function jsonSerialize() {
+        // Translate the internal permissions into a better one for json.
+        $permissions = [];
+        foreach ($this->permissions as $key => $value) {
+            if (is_string($value)) {
+                $permissions[$this->renamePermission($value)] = true;
+            } elseif (is_array($value)) {
+                $newKey = $this->renamePermission($key);
+                if (empty($permissions[$newKey])) {
+                    $permissions[$newKey] = array_map('intval', $value);
+                }
+            }
+        }
+
+        $result = [
+            'permissions' => $permissions,
+            'bans' => $this->bans,
+            'isAdmin' => $this->isAdmin
+        ];
+
+        return $result;
     }
 }

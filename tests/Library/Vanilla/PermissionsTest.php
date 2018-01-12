@@ -357,6 +357,46 @@ class PermissionsTest extends TestCase {
     }
 
     /**
+     * Test a basic JSON serialize array.
+     */
+    public function testJsonSerialize() {
+        $permissions = new Permissions();
+
+        $permissions->setPermissions([
+            'Vanilla.Discussions.Add',
+            'Vanilla.Discussions.Edit',
+            'Vanilla.Comments.Add' => [10],
+            'Vanilla.Comments.Edit' => [10]
+        ]);
+
+        $json = $permissions->jsonSerialize();
+        $this->assertEquals([
+            'discussions.add' => true,
+            'discussions.edit' => true,
+            'comments.add' => [10],
+            'comments.edit' => [10]
+        ], $json['permissions']);
+    }
+
+    /**
+     * Test a per-category permission, but with a global override to true.
+     */
+    public function testJsonSerializeGlobalOverride() {
+        $permissions = new Permissions();
+
+        $permissions->set('Vanilla.Discussions.Add', true);
+        $permissions->set('Vanilla.Discussions.Edit', false);
+        $permissions->add('Vanilla.Discussions.Add', [10]);
+        $permissions->add('Vanilla.Discussions.Edit', [10]);
+
+        $json = $permissions->jsonSerialize();
+        $this->assertEquals([
+            'discussions.add' => true,
+            'discussions.edit' => [10],
+        ], $json['permissions']);
+    }
+
+    /**
      * Ban names must start with "!".
      *
      * @expectedException \InvalidArgumentException

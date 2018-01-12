@@ -1,7 +1,10 @@
-.PageControls .selectBox {
-  margin-right: 10px;
-  float: left;
+.PageControls {
+  .selectBox {
+    margin-right: 10px;
+    float: left;
+  }
 }
+
 
 .selectBox {
   display: inline-block;
@@ -48,6 +51,8 @@
   vertical-align: middle;
 }
 
+
+
 .selectBox-items {
   list-style: none;
   margin: 0;
@@ -69,15 +74,17 @@
   transition-duration: .15s;
   transition-timing-function: ease-out;
   min-width: 150px;
-  text-decoration: none !important;
+  text-decoration: none!important;
   text-align: left;
   line-height: 33px;
   padding: 2px 14px 0 38px;
   outline: 0;
 }
 
+
+
+
+// Do not commit, for testing
 #Content .BoxNewDiscussion {
   display: inline-block !important;
 }
-
-/*# sourceMappingURL=style-compat.css.map */

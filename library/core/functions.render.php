@@ -404,7 +404,11 @@ if (!function_exists('categoryFilters')) {
      * @param string $extraClasses any extra classes you add to the dropdown
      */
     function categoryFilters($links, $extraClasses = ''){
-        linkDropDown($links, 'selectBox '.trim($extraClasses), t('View: '));
+        $output = '';
+        if (c('Vanilla.EnableCategoryFollowing')) {
+            $output = linkDropDown($links, 'selectBox-following '.trim($extraClasses), t('View: '));
+        }
+        return $output;
     }
 }
 
@@ -960,13 +964,14 @@ if (!function_exists('linkDropDown')) {
      * @param array $links
      *   Has the following properties:
      *     ** 'url': string: The url for the link
-     *     ** 'text': string: The text for the link
+     *     ** 'name': string: The text for the link
      *     ** 'active': boolean: is it the current page
      * @param string $extraClasses any extra classes you add to the dropdown
      * @param string $label the label of the dropdown
      *
      */
     function linkDropDown($links, $extraClasses = '', $label) {
+        $output = '';
         $selectedKey = 0;
         foreach($links as $i => $link) {
             if (val('active', $link)) {
@@ -975,42 +980,42 @@ if (!function_exists('linkDropDown')) {
             }
         }
         $selectedLink = val($selectedKey, $links);
-        echo '<div class="selectBox '.trim($extraClasses).'">';
-        echo '  <span class="selectBox-label">';
-        echo                $label;
-        echo '  </span>';
-        echo '    <div class="selectBox-content vanillaDropDown">';
-        echo '        <button class="selectBox-toggle vanillaDropDown-handle">';
-        echo '            <span class="selectBox-selected">';
-        echo                val('text', $selectedLink);
-        echo '            </span>';
-        echo '            <span class="vanillaDropDown-arrow">▾</span>';
-        echo '        </button>';
-        echo '        <div class="vanillaDropDown-content">';
-        echo '            <ul class="menu" role="presentation">';
+        $output .= '<span class="ToggleFlyout selectBox '.trim($extraClasses).'">';
+        $output .=  '  <span class="selectBox-label">';
+        $output .=       $label;
+        $output .=  '  </span><span class="selectBox-content">';
+        $output .=  '    <a href="#" role="button" class="FlyoutButton selectBox-toggle" tabindex="0">';
+        $output .=  '      <span class="selectBox-selected">';
+        $output .=           val('name', $selectedLink);
+        $output .=  '      </span>';
+        $output .=  '      <span class="vanillaDropDown-arrow">▾</span>';
+        $output .=  '    </a>';
+        $output .=  '    <span class="Flyout vanillaDropDown-content">';
+        $output .=  '      <ul class="selectBox-items MenuItems" role="presentation">';
         foreach($links as $i => $link) {
             if (val('active', $link)) {
-                echo '        <li class="menu-row isSelected" role="presentation">';
-                echo '            <span role="menuitem" class="menu-item" tabindex="0" aria-current="location">';
-                echo '              <svg class="selectBox-selectedIcon icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">';
-                echo '                  <title>✓</title>';
-                echo '                  <polygon fill="currentColor" points="5,12.7 3.6,14.1 9,19.5 20.4,7.9 19,6.5 9,16.8"></polygon>';
-                echo '              </svg>';
-                echo '              <span class="selectBox-selectedText">';
-                echo                  val('text', $link);
-                echo '              </span>';
-                echo '            </span>';
-                echo '        </li>';
+                $output .=  '        <li class="selectBox-item isSelected" role="presentation">';
+                $output .=  '            <span role="menuitem" class="selectbox-link" tabindex="0" aria-current="location">';
+                $output .=  '              <svg class="selectBox-selectedIcon icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">';
+                $output .=  '                  <title>✓</title>';
+                $output .=  '                  <polygon fill="currentColor" points="5,12.7 3.6,14.1 9,19.5 20.4,7.9 19,6.5 9,16.8"></polygon>';
+                $output .=  '              </svg>';
+                $output .=  '              <span class="selectBox-selectedText">';
+                $output .=                   val('name', $link);
+                $output .=  '              </span>';
+                $output .=  '            </span>';
+                $output .=  '        </li>';
             } else {
-                echo '        <li class="menu-row" role="presentation">';
-                echo '            <a role="menuitem" class="menu-item" tabindex="0" href="#">Category</a>';
-                echo '        </li>';
+                $output .=  '        <li class="menu-row" role="presentation">';
+                $output .=  '            <a role="menuitem" class="selectbox-link" tabindex="0" href="#">Category</a>';
+                $output .=  '        </li>';
             }
         }
-        echo '            </ul>';
-        echo '        </div>';
-        echo '    </div>';
-        echo '</div>';
+        $output .=  '      </ul>';
+        $output .=  '    </span>';
+        $output .=  '  </span>';
+        $output .=  '</span>';
+        return $output;
     }
 }
 

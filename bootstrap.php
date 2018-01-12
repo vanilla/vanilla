@@ -148,6 +148,7 @@ $dic->setInstance('Garden\Container\Container', $dic)
     ->rule('@api-v2-route')
     ->setClass(\Garden\Web\ResourceRoute::class)
     ->setConstructorArgs(['/api/v2/', '*\\%sApiController'])
+    ->addCall('setMeta', ['CONTENT_TYPE', 'application/json; charset=utf-8'])
 
     ->rule(\Garden\ClassLocator::class)
     ->setClass(\Vanilla\VanillaClassLocator::class)

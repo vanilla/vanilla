@@ -2,7 +2,7 @@
 /**
  * Conversations model.
  *
- * @copyright 2009-2017 Vanilla Forums Inc.
+ * @copyright 2009-2018 Vanilla Forums Inc.
  * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
  * @package Conversations
  * @since 2.0
@@ -63,7 +63,7 @@ abstract class ConversationsModel extends Gdn_Model {
     /**
      * Get all the members (deleted or no) of a conversation from the $conversationID.
      *
-     * @param int $conversationID The conversation ID.
+     * @param int|array $conversationID The conversation ID or a where clause for GDN_UserConversation.
      * @param bool $idsOnly The returns only the userIDs or everything from UserConversation.
      * @param bool $limit
      * @param bool $offset
@@ -75,7 +75,11 @@ abstract class ConversationsModel extends Gdn_Model {
         $conversationMembers = [];
 
         $userConversation = new Gdn_Model('UserConversation');
-        $where = ['ConversationID' => $conversationID];
+        if (is_array($conversationID)) {
+            $where = $conversationID;
+        } else {
+            $where = ['ConversationID' => $conversationID];
+        }
         if ($active === true) {
             $where['Deleted'] = 0;
         } elseif ($active === false) {

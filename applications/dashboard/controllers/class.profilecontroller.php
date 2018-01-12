@@ -2,7 +2,7 @@
 /**
  * Manages individual user profiles.
  *
- * @copyright 2009-2017 Vanilla Forums Inc.
+ * @copyright 2009-2018 Vanilla Forums Inc.
  * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
  * @package Dashboard
  * @since 2.0
@@ -1318,7 +1318,7 @@ class ProfileController extends Gdn_Controller {
                 $token = $tokenApi->post([
                     'name' => $this->Form->getFormValue('Name'),
                     'transientKey' => $this->Form->getFormValue('TransientKey')
-                ])->getData();
+                ]);
 
                 $this->jsonTarget(".DataList-Tokens", $this->revealTokenRow($token), 'Prepend');
 

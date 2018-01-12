@@ -1,0 +1,28 @@
+{
+    "key": "core",
+    "build": {
+        "process": "core",
+        "entries": {
+            "bootstrap-app": "./src/scripts/bootstrap/bootstrap.js",
+            "bootstrap-admin": "./src/scripts/bootstrap/bootstrap.js"
+        },
+        "exports": {
+            "app": [
+                "./src/scripts/events",
+                "./src/scripts/utility",
+                "./src/scripts/dom-utility",
+                "axios",
+                "react",
+                "react-dom"
+            ],
+            "admin": [
+                "./src/scripts/events",
+                "./src/scripts/utility",
+                "./src/scripts/dom-utility",
+                "axios",
+                "react",
+                "react-dom"
+            ]
+        }
+    }
+}

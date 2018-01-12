@@ -5,7 +5,7 @@
  * @author Mark O'Sullivan <markm@vanillaforums.com>
  * @author Todd Burry <todd@vanillaforums.com>
  * @author Tim Gunter <tim@vanillaforums.com>
- * @copyright 2009-2017 Vanilla Forums Inc.
+ * @copyright 2009-2018 Vanilla Forums Inc.
  * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
  * @package Core
  * @since 2.0
@@ -1729,6 +1729,8 @@ class Gdn_Controller extends Gdn_Pluggable {
 
                 $ETag = AssetModel::eTag();
                 $ThemeType = isMobile() ? 'mobile' : 'desktop';
+                /* @var \AssetModel $AssetModel */
+                $AssetModel = Gdn::getContainer()->get(\AssetModel::class);
 
                 // And now search for/add all css files.
                 foreach ($this->_CssFiles as $CssInfo) {
@@ -1741,7 +1743,6 @@ class Gdn_Controller extends Gdn_Pluggable {
                     // style.css and admin.css deserve some custom processing.
                     if (in_array($CssFile, $CssAnchors)) {
                         // Grab all of the css files from the asset model.
-                        $AssetModel = new AssetModel();
                         $CssFiles = $AssetModel->getCssFiles($ThemeType, ucfirst(substr($CssFile, 0, -4)), $ETag);
                         foreach ($CssFiles as $Info) {
                             $this->Head->addCss($Info[1], 'all', true, $CssInfo);
@@ -1789,6 +1790,13 @@ class Gdn_Controller extends Gdn_Pluggable {
                 $this->fireEvent('AfterJsCdns');
 
                 $this->Head->addScript('', 'text/javascript', false, ['content' => $this->definitionList(false)]);
+
+                // Add the built addon javascript files.
+                $addonJs = $AssetModel->getAddonJsFiles($ThemeType, $this->MasterView === 'admin' ? 'admin' : 'app', $ETag);
+                $busta = trim(assetVersion('', ''), '.');
+                foreach ($addonJs as $path) {
+                    $this->Head->addScript(asset($path)."?h=$busta", 'text/javascript', false, ['defer' => 'true']);
+                }
 
                 foreach ($this->_JsFiles as $Index => $JsInfo) {
                     $JsFile = $JsInfo['FileName'];

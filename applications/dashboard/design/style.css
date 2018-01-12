@@ -64,8 +64,7 @@ blockquote, q {
 }
 
 textarea, input[type=text] {
-  -webkit-box-sizing: border-box;
-          box-sizing: border-box;
+  box-sizing: border-box;
 }
 
 .textarea-autosize {
@@ -737,10 +736,8 @@ div.FileUpload .CurrentImage {
 .ActivateSlider {
   display: inline-block;
   background: #bbb;
-  -webkit-box-shadow: 0 10px 30px #333 inset;
-          box-shadow: 0 10px 30px #333 inset;
-  -webkit-box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5) inset;
-          box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5) inset;
+  box-shadow: 0 10px 30px #333 inset;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5) inset;
   border: solid 1px #ccc;
   width: 125px;
   border-radius: 4px;
@@ -962,8 +959,7 @@ a.Small img {
 .DismissMessage.Box {
   background: #fff8ce;
   border: 1px solid #c5bea4;
-  -webkit-box-shadow: none;
-          box-shadow: none;
+  box-shadow: none;
   margin: 0 0 10px;
   /* Make sure that .Box definitions don't override the base DismissMessage margin! */
 }
@@ -1143,10 +1139,8 @@ body > #Frame > .Head {
   border-radius: 2px;
   background: #fff;
   padding: 5px 0;
-  -webkit-box-shadow: 0 5px 10px #eee;
-          box-shadow: 0 5px 10px #eee;
-  -webkit-box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
-          box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 5px 10px #eee;
+  box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
 }
 
 .MenuItems a, .MenuItems a:link, .MenuItems a:visited, .MenuItems a:active {
@@ -1225,10 +1219,8 @@ body > #Frame > .Head {
   background: #fff;
   color: #000;
   border-radius: 2px;
-  -webkit-box-shadow: 0 5px 10px #eee;
-          box-shadow: 0 5px 10px #eee;
-  -webkit-box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
-          box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 5px 10px #eee;
+  box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
   border: solid 1px #999;
 }
 
@@ -1814,8 +1806,7 @@ overflow: hidden;
 
 .SearchForm .InputBox {
   width: 100%;
-  -webkit-box-sizing: border-box;
-          box-sizing: border-box;
+  box-sizing: border-box;
   font-size: 14px;
   padding: 6px 25px 6px 8px;
   border-radius: .35ex;
@@ -5232,8 +5223,7 @@ input + .ReactSprite {
 
 /* Token input */
 ul.token-input-list {
-  -webkit-box-sizing: border-box;
-          box-sizing: border-box;
+  box-sizing: border-box;
   border: 1px solid #aaa;
   color: #333;
   font-size: 15px;
@@ -5380,10 +5370,8 @@ div.token-input-dropdown ul li.token-input-selected-dropdown-item {
   /* So high because a client actually had 99999 in a theme */
   border-radius: 2px;
   overflow: hidden;
-  -webkit-box-shadow: 0 5px 10px #eee;
-          box-shadow: 0 5px 10px #eee;
-  -webkit-box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
-          box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 5px 10px #eee;
+  box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
 }
 
 .atwho-view .cur {
@@ -5752,8 +5740,7 @@ Styleguide Definitions
 .item-attachment .dl-columns dd {
   float: left;
   padding: 0 10px;
-  -webkit-box-sizing: border-box;
-          box-sizing: border-box;
+  box-sizing: border-box;
 }
 
 /*

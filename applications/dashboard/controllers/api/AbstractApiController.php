@@ -1,7 +1,7 @@
 <?php
 /**
  * @author Todd Burry <todd@vanillaforums.com>
- * @copyright 2009-2017 Vanilla Forums Inc.
+ * @copyright 2009-2018 Vanilla Forums Inc.
  * @license GPLv2
  */
 
@@ -44,27 +44,6 @@ abstract class AbstractApiController extends \Vanilla\Web\Controller {
             $row[$field] = Gdn_Format::to($row[$field], $format) ?: '<!-- empty -->';
         }
         }
-
-    /**
-     * Get an "expand" parameter definition with specific fields.
-     *
-     * @param array $fields Valid values for the expand parameter.
-     * @param bool|string $default The default value of expand.
-     * @return array
-     */
-    public function getExpandDefinition(array $fields, $default = false) {
-        $result = [
-            'description' => 'Expand associated records using one or more valid field names. A boolean true expands all expandable fields.',
-            'default' => $default,
-            'items' => [
-                'enum' => $fields,
-                'type' => 'string'
-            ],
-            'style' => 'form',
-            'type' => ['boolean', 'array'],
-        ];
-        return $result;
-    }
 
     /**
      * Get the schema for users joined to records.

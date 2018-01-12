@@ -2,7 +2,7 @@
 /**
  * OpenID Plugin.
  *
- * @copyright 2009-2017 Vanilla Forums Inc.
+ * @copyright 2009-2018 Vanilla Forums Inc.
  * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
  * @package OpenID
  */
@@ -141,12 +141,29 @@ class OpenIDPlugin extends Gdn_Plugin {
 
         // Check session before retrieving
         $session = Gdn::session();
-        $openID = $session->stash('OpenID', '', false);
-        if (!$openID) {
-            $openID = $this->getOpenID();
+        $openID = $this->getOpenID();
+        $sessionData = $session->stash('OpenID', '', false);
+
+        /**
+         * Save a successful validation and do not attempt to validate again. If a nonce is used as part of the request,
+         * and the user has to enter additional information to register (e.g. email), a second authentication attempt
+         * after they've submitted the requested information would fail.
+         */
+        if ($sessionData) {
+            $validated = true;
+            $openID->setData($sessionData['data']);
+            $openID->identity = $sessionData['identity'];
+        } elseif ($openID->validate()) {
+            $validated = true;
+            $session->stash('OpenID', [
+                'data' => $openID->getData(),
+                'identity' => $openID->identity
+            ]);
+        } else {
+            $validated = false;
         }
 
-        if ($session->stash('OpenID', '', false) || $openID->validate()) {
+        if ($validated) {
             $attr = $openID->getAttributes();
 
             // This isn't a trusted connection. Don't allow it to automatically connect a user account.
@@ -165,7 +182,6 @@ class OpenIDPlugin extends Gdn_Plugin {
             }
 
             $sender->setData('Verified', true);
-            $session->stash('OpenID', $openID);
 
             $this->EventArguments['OpenID'] = $openID;
             $this->EventArguments['Form'] = $form;
@@ -192,7 +208,7 @@ class OpenIDPlugin extends Gdn_Plugin {
         $Mode = $Sender->Request->get('openid_mode');
         switch ($Mode) {
             case 'cancel':
-                $Sender->render('Cancel', '', 'plugins/OpenID');
+                redirectTo(Gdn::router()->getDestination('DefaultController'));
                 break;
             case 'id_res':
                 if ($OpenID->validate()) {

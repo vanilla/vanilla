@@ -1,6 +1,6 @@
 <?php
 /**
- * @copyright 2009-2017 Vanilla Forums Inc.
+ * @copyright 2009-2018 Vanilla Forums Inc.
  * @license GPLv2
  */
 
@@ -46,7 +46,7 @@ class CategoriesApiController extends AbstractApiController {
      */
     public function categoryPostSchema($type = '', array $extra = []) {
         if ($this->categoryPostSchema === null) {
-            $fields = ['name', 'parentCategoryID?', 'urlCode', 'displayAs?', 'customPermissions?'];
+            $fields = ['name', 'parentCategoryID?', 'urlcode', 'displayAs?', 'customPermissions?'];
             $this->categoryPostSchema = $this->schema(
                 Schema::parse(array_merge($fields, $extra))->add($this->schemaWithParent()),
                 'CategoryPost'
@@ -123,7 +123,7 @@ class CategoriesApiController extends AbstractApiController {
             ],
             'parentCategoryID:i|n' => 'Parent category ID.',
             'customPermissions:b' => 'Are custom permissions set for this category?',
-            'urlCode:s' => 'The URL code of the category.',
+            'urlcode:s' => 'The URL code of the category.',
             'url:s' => 'The URL to the category.',
             'photoUrl:s' => [
                 'description' => 'The category image.',
@@ -200,7 +200,7 @@ class CategoriesApiController extends AbstractApiController {
 
         $in = $this->idParamSchema()->setDescription('Get a category for editing.');
         $out = $this->schema(Schema::parse([
-            'categoryID', 'name', 'parentCategoryID', 'urlCode', 'description', 'displayAs'
+            'categoryID', 'name', 'parentCategoryID', 'urlcode', 'description', 'displayAs'
         ])->add($this->fullSchema()), 'out');
 
         $row = $this->category($id);
@@ -367,7 +367,7 @@ class CategoriesApiController extends AbstractApiController {
                 ]);
                 unset($body['customPermissions']);
             }
-            $categoryData = ApiUtils::convertInputKeys($body);
+            $categoryData = $this->normalizeInput($body);
             $this->categoryModel->setField($id, $categoryData);
         }
 
@@ -392,7 +392,7 @@ class CategoriesApiController extends AbstractApiController {
 
         $body = $in->validate($body);
 
-        $categoryData = ApiUtils::convertInputKeys($body);
+        $categoryData = $this->normalizeInput($body);
         $id = $this->categoryModel->save($categoryData);
         $this->validateModel($this->categoryModel);
 
@@ -404,6 +404,23 @@ class CategoriesApiController extends AbstractApiController {
         $row = $this->normalizeOutput($row);
         $result = $out->validate($row);
         return $result;
+    }
+
+    /**
+     * Normalize request data to be passed to a model.
+     *
+     * @param array $request
+     * @return array
+     */
+    public function normalizeInput(array $request) {
+        $request = ApiUtils::convertInputKeys($request);
+
+        if (array_key_exists('Urlcode', $request)) {
+            $request['UrlCode'] = $request['Urlcode'];
+            unset($request['Urlcode']);
+        }
+
+        return $request;
     }
 
     /**
@@ -505,7 +522,7 @@ class CategoriesApiController extends AbstractApiController {
     public function schemaWithParent($expand = false, $type = '') {
         $attributes = ['parentCategoryID:i|n' => 'Parent category ID.'];
         if ($expand) {
-            $attributes['parent:o?'] = Schema::parse(['categoryID', 'name', 'urlCode', 'url'])
+            $attributes['parent:o?'] = Schema::parse(['categoryID', 'name', 'urlcode', 'url'])
                 ->add($this->fullSchema());
         }
         $schema = $this->fullSchema();

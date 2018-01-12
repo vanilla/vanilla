@@ -1,6 +1,6 @@
 <?php
 /**
- * @copyright 2009-2017 Vanilla Forums Inc.
+ * @copyright 2009-2018 Vanilla Forums Inc.
  * @license GNU GPLv2
  */
 
@@ -115,6 +115,15 @@ class UploadedFile {
      */
     public function getError() {
         return $this->error;
+    }
+
+    /**
+     * Get the temporary filename associated with this uploaded file.
+     *
+     * @return string
+     */
+    public function getFile() {
+        return $this->file;
     }
 
     /**

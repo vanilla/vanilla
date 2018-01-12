@@ -1,0 +1,20 @@
+{
+    "compilerOptions": {
+        "checkJs": true,
+        "jsx": "preserve",
+        "lib": [
+            "es2017",
+            "dom",
+            "dom.iterable"
+        ],
+        "baseUrl": ".",
+        "paths": {
+            "@core/*": ["./src/scripts/*"],
+            "@vanilla/*": ["./applications/vanilla/src/scripts/*"],
+            "@dashboard/*": ["./applications/dashboard/src/scripts/*"]
+        }
+    },
+    "exclude": [
+        "**/node_modules"
+    ]
+}

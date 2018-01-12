@@ -1,6 +1,6 @@
 <?php
 /**
- * @copyright 2009-2017 Vanilla Forums Inc.
+ * @copyright 2009-2018 Vanilla Forums Inc.
  * @license GPLv2
  */
 
@@ -34,7 +34,12 @@ class InvitesTest extends AbstractResourceTest {
      */
     public static function setupBeforeClass() {
         parent::setupBeforeClass();
-        static::container()->get('Config')->set('Garden.Registration.Method', 'Invitation');
+
+        /** @var \Gdn_Configuration $config */
+        $config = static::container()->get('Config');
+        $config->set('Garden.Email.Disabled', true, true, false);
+        $config->set('Garden.Registration.Method', 'Invitation');
+
     }
 
     /**

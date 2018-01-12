@@ -1,7 +1,7 @@
 <?php
 /**
  * @author Todd Burry <todd@vanillaforums.com>
- * @copyright 2009-2017 Vanilla Forums Inc.
+ * @copyright 2009-2018 Vanilla Forums Inc.
  * @license GPLv2
  */
 
@@ -44,6 +44,27 @@ class ApiUtils {
         }
 
         $result = $scheme->convertArrayKeys($output);
+        return $result;
+    }
+
+    /**
+     * Get an "expand" parameter definition with specific fields.
+     *
+     * @param array $fields Valid values for the expand parameter.
+     * @param bool|string $default The default value of expand.
+     * @return array
+     */
+    public static function getExpandDefinition(array $fields, $default = false) {
+        $result = [
+            'description' => 'Expand associated records using one or more valid field names. A boolean true expands all expandable fields.',
+            'default' => $default,
+            'items' => [
+                'enum' => $fields,
+                'type' => 'string'
+            ],
+            'style' => 'form',
+            'type' => ['boolean', 'array'],
+        ];
         return $result;
     }
 

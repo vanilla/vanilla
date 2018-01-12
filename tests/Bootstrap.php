@@ -1,7 +1,7 @@
 <?php
 /**
  * @author Todd Burry <todd@vanillaforums.com>
- * @copyright 2009-2017 Vanilla Forums Inc.
+ * @copyright 2009-2018 Vanilla Forums Inc.
  * @license GPLv2
  */
 
@@ -196,6 +196,10 @@ class Bootstrap {
             ->rule(\Gdn_Plugin::class)
             ->setShared(true)
             ->addCall('setAddonFromManager')
+
+            ->rule(\Vanilla\FileUtils::class)
+            ->setAliasOf(\VanillaTests\Fixtures\FileUtils::class)
+            ->addAlias('FileUtils')
 
             ->rule(Ebi::class)
             ->setConstructorArgs(['cachePath' => PATH_CACHE.'/ebi'])

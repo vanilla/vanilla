@@ -1,6 +1,6 @@
 <?php
 /**
- * @copyright 2009-2017 Vanilla Forums Inc.
+ * @copyright 2009-2018 Vanilla Forums Inc.
  * @license GPLv2
  */
 
@@ -272,7 +272,7 @@ class CommentsApiController extends AbstractApiController {
                     'field' => 'InsertUserID',
                 ],
             ],
-            'expand?' => $this->getExpandDefinition(['insertUser'])
+            'expand?' => ApiUtils::getExpandDefinition(['insertUser'])
         ], ['CommentIndex', 'in'])->requireOneOf(['discussionID', 'insertUserID'])->setDescription('List comments.');
         $out = $this->schema([':a' => $this->commentSchema()], 'out');
 

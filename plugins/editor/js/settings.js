@@ -1,3 +1,5 @@
+(function($) {
+
 $(document).on('contentLoad', function() {
 
     var forceFormat = 'wysiwyg',
@@ -23,3 +25,5 @@ $(document).on('contentLoad', function() {
         });
     }
 });
+
+})(jQuery);

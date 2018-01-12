@@ -92,10 +92,11 @@ if (!$hasUserID) {
                 </li>
                 <?php endif; ?>
 
-                <?php if ($displayConnectName) : ?>
+                <?php
+                    $PasswordMessage = t('ConnectLeaveBlank', 'Leave blank unless connecting to an existing account.');
+                    if ($displayConnectName) : ?>
                 <li>
                     <?php
-                    $PasswordMessage = t('ConnectLeaveBlank', 'Leave blank unless connecting to an existing account.');
 
                     if (count($ExistingUsers) == 1 && $NoConnectName) {
                         $PasswordMessage = t('ConnectExistingPassword', 'Enter your existing account password.');

@@ -4,7 +4,7 @@
  *
  * @author Todd Burry <todd@vanillaforums.com>
  * @author Tim Gunter <tim@vanillaforums.com>
- * @copyright 2009-2017 Vanilla Forums Inc.
+ * @copyright 2009-2018 Vanilla Forums Inc.
  * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
  * @package Core
  * @since 2.0
@@ -1540,7 +1540,7 @@ class Gdn_Request implements RequestInterface {
         static $rewrite = null;
         if ($rewrite === null) {
             // Garden.RewriteUrls is maintained for compatibility but X_REWRITE is what really need to be used.
-            $rewrite = val('X_REWRITE', $_SERVER, c('Garden.RewriteUrls', false));
+            $rewrite = val('X_REWRITE', $_SERVER, c('Garden.RewriteUrls', true));
         }
 
         if (!$allowSSL) {

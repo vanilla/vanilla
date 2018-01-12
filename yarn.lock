@@ -82,6 +82,10 @@
     babel-preset-env "^1.6.1"
     babel-preset-react "^6.24.1"
 
+"@vanillaforums/eslint-config@^1.1.1":
+  version "1.1.1"
+  resolved "https://registry.yarnpkg.com/@vanillaforums/eslint-config/-/eslint-config-1.1.1.tgz#48967264214f656fb1564a2395343d14a2990c50"
+
 abab@^1.0.3:
   version "1.0.4"
   resolved "https://registry.yarnpkg.com/abab/-/abab-1.0.4.tgz#5faad9c2c07f60dd76770f71cf025b62a63cfd4e"

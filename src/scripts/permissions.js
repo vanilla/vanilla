@@ -26,7 +26,7 @@ export function hasPermission(permissions, id = null) {
         return true;
     }
 
-    for (let permission of permissions) {
+    for (const permission of permissions) {
         if (hasInternal(permission, id) === false) {
             return false;
         }
@@ -71,7 +71,7 @@ export function hasAny(permissions, id = null) {
  * @returns {boolean}
  */
 export function isBanned(permissions = []) {
-    let ban = getBan(permissions);
+    const ban = getBan(permissions);
     return ban !== null;
 }
 
@@ -86,18 +86,18 @@ function getBan(permissions = []) {
     permissions = permissions.map((str) => str.toLowerCase());
     const bans = gdn.permissions.bans || {};
 
-    for (let name in bans) {
-        let ban = bans[name];
+    for (const name in bans) {
+        const ban = bans[name];
 
         if (name in permissions) {
             // The permission check is overriding the ban.
             continue;
         } else if (ban.except) {
-            let except = typeof ban.except === 'string' ? [ban.except] : ban.except;
+            const except = typeof ban.except === 'string' ? [ban.except] : ban.except;
 
             // There is an exception, so see if any of those permissions apply.
             let has = false;
-            for (let permission of except) {
+            for (const permission of except) {
                 if (hasInternal(permission)) {
                     has = true;
                     break;
@@ -122,7 +122,7 @@ function getBan(permissions = []) {
  * @returns {boolean|null}
  */
 function hasInternal(permission, id = null) {
-    let permissions = gdn.permissions.permissions || {};
+    const permissions = gdn.permissions.permissions || {};
 
     if (permission === 'admin') {
         return !!gdn.permissions.isAdmin;

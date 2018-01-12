@@ -11,11 +11,12 @@ const gdn = {
     meta: {},
     permissions: {},
     translations: {},
-    ...(window["gdn"] || {})
+    ...(window["gdn"] || {}),
 };
 
 // Wrap like this because we can't import utility (cyclical dependency)/
 if (gdn.meta["debug"]) {
+    // eslint-disable-next-line no-console
     console.log(gdn);
 }
 

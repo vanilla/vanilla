@@ -2528,7 +2528,8 @@ class UserModel extends Gdn_Model {
 
         // Check for an IP address.
         if (preg_match('`\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}`', $keywords)) {
-            $iPAddress = $keywords;
+            $ipAddress = $keywords;
+            $this->addIpFilters($ipAddress, ['LastIPAddress']);
         } elseif (strtolower($keywords) == 'banned') {
             $this->SQL->where('u.Banned >', 0);
             $keywords = '';
@@ -2555,9 +2556,6 @@ class UserModel extends Gdn_Model {
 
         if (!empty($roleID)) {
             $this->SQL->join('UserRole ur2', "u.UserID = ur2.UserID and ur2.RoleID = $roleID");
-        } elseif (isset($iPAddress)) {
-            $fields = ['LastIPAddress'];
-            $this->addIpFilters($iPAddress, $fields);
         } elseif (isset($numericQuery)) {
             // We've searched for a number. Return UserID AND any exact numeric name match.
             $this->SQL->beginWhereGroup()
@@ -2594,7 +2592,6 @@ class UserModel extends Gdn_Model {
             ->where('u.Deleted', 0)
             ->orderBy($orderFields, $orderDirection)
             ->limit($limit, $offset)
-            ->groupBy('u.UserID')
             ->get();
 
         $result = &$data->result();
@@ -2620,12 +2617,23 @@ class UserModel extends Gdn_Model {
      * @param array $fields The additional fields to check in the UserTable
      */
     private function addIpFilters($ip, $fields = []) {
-        $this->SQL->join('UserIP uip', 'u.userID = uip.UserID', 'left');
-        $this->SQL
-            ->orOp()
-            ->beginWhereGroup()
-            ->orWhere('uip.IPAddress', inet_pton($ip));
+        // Get a clean SQL object.
+        $sql = clone $this->SQL;
+        $sql->reset();
 
+        // Get all users that matches the IP address.
+        $sql
+            ->select('UserID')
+            ->from('UserIP')
+            ->where('IPAddress', inet_pton($ip));
+
+        $matchingUserIDs = $sql->get()->resultArray();
+
+        // Add these users to search query.
+        $this->SQL
+            ->orWhereIn('u.UserID', $matchingUserIDs);
+
+        // Check the user table ip fields.
         $allowedFields = ['LastIPAddress', 'InsertIPAddress', 'UpdateIPAddress'];
 
         foreach ($fields as $field) {
@@ -2633,8 +2641,6 @@ class UserModel extends Gdn_Model {
                 $this->SQL->orWhereIn('u.'.$field, [$ip, inet_pton($ip)]);
             }
         }
-
-        $this->SQL->endWhereGroup();
     }
 
     /**

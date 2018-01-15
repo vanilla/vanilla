@@ -280,12 +280,12 @@ class FacebookPlugin extends Gdn_Plugin {
      * @throws Gdn_UserException
      */
     public function profileController_facebookConnect_create($sender, $userReference, $username, $code = false) {
+        $sender->permission('Garden.SignIn.Allow');
+
         $transientKey = Gdn::request()->get('state');
         if (empty($transientKey) || Gdn::session()->validateTransientKey($transientKey) === false) {
             throw new Gdn_UserException(t('Invalid CSRF token.', 'Invalid CSRF token. Please try again.'), 403);
         }
-
-        $sender->permission('Garden.SignIn.Allow');
 
         $sender->getUserInfo($userReference, $username, '', true);
         $sender->_setBreadcrumbs(t('Connections'), '/profile/connections');

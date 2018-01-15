@@ -1,3 +1,19 @@
+.followButton {
+  white-space: nowrap;
+  font-size: 10px;
+  text-transform: uppercase;
+  vertical-align: middle;
+  font-weight: 400;
+  padding: 0 5px;
+}
+
+.followButton-icon {
+  width: 14px;
+  height: 14px;
+  margin-right: 5px;
+  vertical-align: sub;
+}
+
 .vanillaIcon {
   display: inline-block;
   width: 24px;

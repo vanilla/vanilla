@@ -19,9 +19,9 @@ writeAdminCheck();
 
 echo '</div>';
 
-echo '<h1>'.$this->data('Discussion.Name').'</h1>';
+echo '<h1>'.$this->data('Discussion.Name').' '.followButton(true).'</h1>';
 
-writeFollowButton(true);
+
 
 echo "</div>\n\n";
 

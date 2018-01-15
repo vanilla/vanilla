@@ -39,9 +39,11 @@ if ($subtreeView) {
     }
 }
 
+
 echo '<div class="PageControls Top">';
 PagerModule::write($PagerOptions);
 echo Gdn_Theme::module('NewDiscussionModule', $this->data('_NewDiscussionProperties', ['CssClass' => 'Button Action Primary']));
+echo categoryFilters([['url' => 'http://google.ca', 'active' => true, 'name' => 'All'], ['url' => 'http://google.ca', 'name' => 'Following']]);
 $this->fireEvent('PageControls');
 echo '</div>';
 

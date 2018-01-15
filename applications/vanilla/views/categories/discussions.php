@@ -1,6 +1,11 @@
 <?php if (!defined('APPLICATION')) exit();
 echo '<h1 class="H HomepageTitle">'.$this->data('Title').'</h1>';
 $ViewLocation = $this->fetchViewLocation('discussions', 'discussions');
+if (c('Vanilla.EnableCategoryFollowing')) {
+    echo '<div class="PageControls Top">';
+    echo categoryFilters([['url' => 'http://google.ca', 'active' => true, 'name' => 'All'], ['url' => 'http://google.ca', 'name' => 'Following']]);
+    echo '</div>';
+}
 ?>
 <div class="Categories">
     <?php foreach ($this->CategoryData->result() as $Category) :

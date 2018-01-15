@@ -1,18 +1,19 @@
 <?php
 /**
  * @author Todd Burry <todd@vanillaforums.com>
- * @copyright 2009-2017 Vanilla Forums Inc.
+ * @copyright 2009-2018 Vanilla Forums Inc.
  * @license Proprietary
  */
 
 namespace VanillaTests\Library\Core;
 
+use PHPUnit\Framework\TestCase;
 use Gdn_DataSet;
 
 /**
  * Test the {@link Gdn_DataSet} class.
  */
-class DataSetTest extends \PHPUnit\Framework\TestCase {
+class DataSetTest extends TestCase {
     /**
      * A basic test of newing up a dataset.
      */

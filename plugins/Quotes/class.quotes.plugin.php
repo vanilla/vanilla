@@ -3,7 +3,7 @@
  * Quotes Plugin.
  *
  * @author Tim Gunter <tim@vanillaforums.com>
- * @copyright 2009-2017 Vanilla Forums Inc.
+ * @copyright 2009-2018 Vanilla Forums Inc.
  * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
  * @package Quotes
  */
@@ -173,6 +173,8 @@ class QuotesPlugin extends Gdn_Plugin {
      * @param bool $format
      */
     public function discussionController_getQuote_create($sender, $selector, $format = false) {
+        $sender->permission('Garden.SignIn.Allow');
+
         $sender->deliveryMethod(DELIVERY_METHOD_JSON);
         $sender->deliveryType(DELIVERY_TYPE_VIEW);
 
@@ -185,8 +187,8 @@ class QuotesPlugin extends Gdn_Plugin {
         ];
 
         $quoteData['selector'] = $selector;
-        list($type, $iD) = explode('_', $selector);
-        $this->formatQuote($type, $iD, $quoteData, $format);
+        list($type, $id) = explode('_', $selector);
+        $this->formatQuote($type, $id, $quoteData, $format);
 
         $sender->setJson('Quote', $quoteData);
         $sender->render('GetQuote', '', 'plugins/Quotes');
@@ -367,16 +369,18 @@ BLOCKQUOTE;
      * @param postController $sender
      */
     public function postController_beforeCommentRender_handler($sender) {
+        $sender->permission('Garden.SignIn.Allow');
+
         if ($sender->data('Plugin.Quotes.QuoteSource')) {
             if (sizeof($sender->RequestArgs) < 2) {
                 return;
             }
             $selector = $sender->RequestArgs[1];
-            list($type, $iD) = explode('_', $selector);
+            list($type, $id) = explode('_', $selector);
             $quoteData = [
                 'status' => 'failed'
             ];
-            $this->formatQuote($type, $iD, $quoteData);
+            $this->formatQuote($type, $id, $quoteData);
             if ($quoteData['status'] == 'success') {
                 $sender->Form->setValue('Body', "{$quoteData['body']}\n");
             }
@@ -387,11 +391,11 @@ BLOCKQUOTE;
      * Format the quote.
      *
      * @param string $type
-     * @param int $iD
+     * @param int $id
      * @param array $quoteData
      * @param bool $format
      */
-    protected function formatQuote($type, $iD, &$quoteData, $format = false) {
+    protected function formatQuote($type, $id, &$quoteData, $format = false) {
         // Temporarily disable Emoji parsing (prevent double-parsing to HTML)
         $emojiEnabled = Emoji::instance()->enabled;
         Emoji::instance()->enabled = false;
@@ -400,24 +404,29 @@ BLOCKQUOTE;
             $format = c('Garden.InputFormatter');
         }
 
+        $discussionModel = new DiscussionModel();
         $type = strtolower($type);
-        $model = false;
         switch ($type) {
             case 'comment':
-                $model = new CommentModel();
+                $commentModel = new CommentModel();
+                $data = $commentModel->getID($id);
+                $discussion = $discussionModel->getID(val('DiscussionID', $data));
                 break;
-
             case 'discussion':
-                $model = new DiscussionModel();
-                break;
-
-            default:
+                $data = $discussionModel->getID($id);
+                $discussion = $data;
                 break;
         }
 
-        //$QuoteData = array();
-        if ($model) {
-            $data = $model->getID($iD);
+        if ($discussion) {
+            // Check permission.
+            Gdn::controller()->permission(
+                ['Vanilla.Discussions.Add', 'Vanilla.Discussions.View'],
+                false,
+                'Category',
+                val('PermissionCategoryID', $discussion)
+            );
+
             $newFormat = $format;
             if ($newFormat == 'Wysiwyg') {
                 $newFormat = 'Html';
@@ -460,8 +469,8 @@ BLOCKQUOTE;
 
                 case 'BBCode':
                     $author = htmlspecialchars($data->InsertName);
-                    if ($iD) {
-                        $iDString = ';'.($type === 'comment' ? 'c' : 'd').'-'.htmlspecialchars($iD);
+                    if ($id) {
+                        $iDString = ';'.($type === 'comment' ? 'c' : 'd').'-'.htmlspecialchars($id);
                     }
 
                     $quoteBody = $data->Body;
@@ -513,7 +522,7 @@ BLOCKQUOTE;
                 'authorid' => $data->InsertUserID,
                 'authorname' => $data->InsertName,
                 'type' => $type,
-                'typeid' => $iD
+                'typeid' => $id
             ]);
         }
 

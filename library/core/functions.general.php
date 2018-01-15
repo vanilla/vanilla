@@ -2,7 +2,7 @@
 /**
  * General functions
  *
- * @copyright 2009-2017 Vanilla Forums Inc.
+ * @copyright 2009-2018 Vanilla Forums Inc.
  * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
  * @package Core
  * @since 2.0
@@ -2476,6 +2476,8 @@ if (!function_exists('proxyHead')) {
      * @throws Exception Throws an exception when there is an unrecoverable error making the request.
      */
     function proxyHead($url, $headers = null, $timeout = false, $followRedirects = false) {
+        deprecated('proxyHead()', 'class ProxyRequest');
+
         if (is_null($headers)) {
             $headers = [];
         }
@@ -2633,6 +2635,8 @@ if (!function_exists('proxyRequest')) {
      * @return string Returns the response body.
      */
     function proxyRequest($url, $timeout = false, $followRedirects = false) {
+        deprecated('proxyRequest()', 'class ProxyRequest');
+
         $originalTimeout = $timeout;
         if ($timeout === false) {
             $timeout = c('Garden.SocketTimeout', 1.0);
@@ -2910,6 +2914,9 @@ if (!function_exists('redirectTo')) {
             $statusCode = 302;
         }
 
+        // Encode backslashes because most modern browsers convert backslashes to slashes.
+        // This would cause http://evil.domain\@trusted.domain/ to be converted to http://evil.domain/@trusted.domain/
+        $url = str_replace('\\', '%5c', $url);
         safeHeader('Location: '.$url, true, $statusCode);
         exit();
     }

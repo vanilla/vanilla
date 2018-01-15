@@ -1,6 +1,6 @@
 <?php
 /**
- * @copyright 2009-2017 Vanilla Forums Inc.
+ * @copyright 2009-2018 Vanilla Forums Inc.
  * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
  */
 
@@ -15,7 +15,7 @@ class SessionModel extends Gdn_Model {
      */
     public function __construct() {
         parent::__construct('Session');
-        $this->setPruneField('DateExpire');
+        $this->setPruneField('DateExpires');
         $this->setPruneAfter('45 minutes');
     }
 
@@ -58,7 +58,7 @@ class SessionModel extends Gdn_Model {
             return true;
         }
 
-        $time = strtotime($session['DateExpire']);
+        $time = strtotime($session['DateExpires']);
         if ($time && $time < time()) {
             return true;
         }

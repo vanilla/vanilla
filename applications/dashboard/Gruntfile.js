@@ -23,7 +23,7 @@ module.exports = function (grunt) {
       }
       , sass: {
         files: ['scss/**/*.scss']
-        , tasks: ['sass_globbing', 'scsslint', 'sass', 'autoprefixer']
+        , tasks: ['sass_globbing', 'sass', 'autoprefixer']
       }
       , livereload: {
         options: {
@@ -173,14 +173,6 @@ module.exports = function (grunt) {
       }
     },
 
-    scsslint: {
-      options: {
-        force: true
-        , config: 'scss/.scss-lint.yml'
-      }
-      , all: ['scss/src/**/*.scss']
-    },
-
     autoprefixer: {
       dist: {
         src: ['design/admin.css', 'design/style.css'],
@@ -193,14 +185,6 @@ module.exports = function (grunt) {
           ]
         }
       }
-    },
-
-    jshint: {
-      options: {
-        force: true
-        , jshintrc: 'js/.jshintrc'
-      }
-      , all: ['js/src/main.js']
     },
 
     concat: {
@@ -297,11 +281,9 @@ module.exports = function (grunt) {
 
   grunt.registerTask('default', [
     'sass_globbing'
-    , 'scsslint'
     , 'sass'
     , 'autoprefixer'
     , 'concat:dist'
-    , 'jshint'
     , 'imagemin'
   ]);
 };

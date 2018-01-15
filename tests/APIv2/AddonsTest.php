@@ -1,7 +1,7 @@
 <?php
 /**
  * @author Todd Burry <todd@vanillaforums.com>
- * @copyright 2009-2017 Vanilla Forums Inc.
+ * @copyright 2009-2018 Vanilla Forums Inc.
  * @license Proprietary
  */
 
@@ -157,6 +157,18 @@ class AddonsTest extends AbstractAPIv2Test {
                 $this->assertSame($pluginEnabled, $enabled, "The plugin with key $key has the wrong enabled value.");
             }
         }
+    }
+
+    /**
+     * You shouldn't be able to enable two conflicting plugins at the same time.
+     *
+     * @expectedException \Exception
+     * @expectedExceptionCode 409
+     * @expectedExceptionMessage Advanced Editor conflicts with: Button Bar.
+     */
+    public function testConflictingAddons() {
+        $this->api()->patch('/addons/buttonbar', ['enabled' => true]);
+        $this->api()->patch('/addons/editor', ['enabled' => true]);
     }
 
     /**

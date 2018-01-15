@@ -3,7 +3,7 @@
  * Theme system.
  *
  * @author Mark O'Sullivan <markm@vanillaforums.com>
- * @copyright 2009-2017 Vanilla Forums Inc.
+ * @copyright 2009-2018 Vanilla Forums Inc.
  * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
  * @package Core
  * @since 2.0
@@ -216,7 +216,7 @@ class Gdn_Theme {
                 if (is_array($breadcrumbs) && count($breadcrumbs) > 0) {
                     $last = array_pop($breadcrumbs);
                     $path = val('Url', $last);
-                    $defaultText = val('Name', $last, t('Back'));
+                    $defaultText = htmlspecialchars(val('Name', $last, t('Back')));
                 } else {
                     $path = '/';
                     $defaultText = c('Garden.Title', t('Back'));
@@ -246,7 +246,7 @@ class Gdn_Theme {
                 }
                 if ($session->isValid() && $session->User->CountUnreadConversations) {
                     $class = trim($class.' HasCount');
-                    $text .= ' <span class="Alert">'.$session->User->CountUnreadConversations.'</span>';
+                    $text .= ' <span class="Alert">'.htmlspecialchars($session->User->CountUnreadConversations).'</span>';
                 }
                 if (!$session->isValid() || !Gdn::addonManager()->lookupAddon('conversations')) {
                     $text = false;
@@ -263,18 +263,18 @@ class Gdn_Theme {
             case 'profile':
                 touchValue('Permissions', $options, 'Garden.SignIn.Allow');
                 if (!$text && $session->isValid()) {
-                    $text = $session->User->Name;
+                    $text = htmlspecialchars($session->User->Name);
                 }
                 if ($session->isValid() && $session->User->CountNotifications) {
                     $class = trim($class.' HasCount');
-                    $text .= ' <span class="Alert">'.$session->User->CountNotifications.'</span>';
+                    $text .= ' <span class="Alert">'.htmlspecialchars($session->User->CountNotifications).'</span>';
                 }
                 break;
             case 'user':
                 $path = 'profile';
                 touchValue('Permissions', $options, 'Garden.SignIn.Allow');
                 if (!$text && $session->isValid()) {
-                    $text = $session->User->Name;
+                    $text = htmlspecialchars($session->User->Name);
                 }
 
                 break;
@@ -295,7 +295,7 @@ class Gdn_Theme {
                 }
                 if ($session->isValid() && $session->User->CountDrafts) {
                     $class = trim($class.' HasCount');
-                    $text .= ' <span class="Alert">'.$session->User->CountDrafts.'</span>';
+                    $text .= ' <span class="Alert">'.htmlspecialchars($session->User->CountDrafts).'</span>';
                 }
                 break;
             case 'discussions/bookmarked':
@@ -305,7 +305,7 @@ class Gdn_Theme {
                 }
                 if ($session->isValid() && $session->User->CountBookmarks) {
                     $class = trim($class.' HasCount');
-                    $text .= ' <span class="Count">'.$session->User->CountBookmarks.'</span>';
+                    $text .= ' <span class="Count">'.htmlspecialchars($session->User->CountBookmarks).'</span>';
                 }
                 break;
             case 'discussions/mine':
@@ -315,7 +315,7 @@ class Gdn_Theme {
                 }
                 if ($session->isValid() && $session->User->CountDiscussions) {
                     $class = trim($class.' HasCount');
-                    $text .= ' <span class="Count">'.$session->User->CountDiscussions.'</span>';
+                    $text .= ' <span class="Count">'.htmlspecialchars($session->User->CountDiscussions).'</span>';
                 }
                 break;
             case 'register':

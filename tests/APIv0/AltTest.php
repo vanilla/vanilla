@@ -1,20 +1,18 @@
 <?php
 /**
  * @author Todd Burry <todd@vanillaforums.com>
- * @copyright 2009-2017 Vanilla Forums Inc.
+ * @copyright 2009-2018 Vanilla Forums Inc.
  * @license GPLv2
  */
 
 namespace VanillaTests\APIv0;
 
-use Garden\Http\HttpClient;
-use Garden\Http\HttpResponse;
-use PDO;
+use PHPUnit\Framework\TestCase;
 
 /**
  * Tests an alternate install method.
  */
-class AltTest extends \PHPUnit\Framework\TestCase {
+class AltTest extends TestCase {
     /** @var APIv0  $api */
     protected static $api;
 

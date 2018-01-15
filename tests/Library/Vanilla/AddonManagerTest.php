@@ -1,12 +1,13 @@
 <?php
 /**
  * @author Todd Burry <todd@vanillaforums.com>
- * @copyright 2009-2017 Vanilla Forums Inc.
+ * @copyright 2009-2018 Vanilla Forums Inc.
  * @license GPLv2
  */
 
 namespace VanillaTests\Library\Vanilla;
 
+use PHPUnit\Framework\TestCase;
 use Test\OldApplication\Controllers\Api\NewApiController;
 use Test\OldApplication\Controllers\ArchiveController;
 use Test\OldApplication\Controllers\HiddenController;
@@ -16,7 +17,7 @@ use Vanilla\Addon;
 use VanillaTests\Fixtures\TestAddonManager;
 
 
-class AddonManagerTest extends \PHPUnit\Framework\TestCase {
+class AddonManagerTest extends TestCase {
 
     private static $types = [Addon::TYPE_ADDON, Addon::TYPE_THEME, Addon::TYPE_LOCALE];
 
@@ -661,5 +662,117 @@ class AddonManagerTest extends \PHPUnit\Framework\TestCase {
 
         $this->assertSame(AddonManager::REQ_MISSING, $r['asd!']['status']);
         $this->assertSame(AddonManager::REQ_VERSION, $r['namespaced-plugin']['status']);
+    }
+
+
+    /**
+     * Test an addon with an invalid require key.
+     */
+    public function testInvalidRequire() {
+        $addon = Addon::__set_state(['info' => ['require' => []]]);
+        $issues = $addon->check();
+        $this->assertArrayNotHasKey('invalid-require', $issues);
+
+        $addon = Addon::__set_state(['info' => ['require' => 'foo']]);
+        $issues = $addon->check();
+        $this->assertArrayHasKey('invalid-require', $issues);
+
+        $this->assertEquals([], $addon->getRequirements());
+    }
+
+    /**
+     * Test an addon with an invalid conflict key.
+     */
+    public function testInvalidConflict() {
+        $addon = Addon::__set_state(['info' => ['conflict' => []]]);
+        $issues = $addon->check();
+        $this->assertArrayNotHasKey('invalid-conflict', $issues);
+
+        $addon = Addon::__set_state(['info' => ['conflict' => 'foo']]);
+        $issues = $addon->check();
+        $this->assertArrayHasKey('invalid-conflict', $issues);
+
+        $this->assertEquals([], $addon->getConflicts());
+    }
+
+    /**
+     * Test **AddonManager::lookupConflicts()**.
+     */
+    public function testLookupConflicts() {
+        $am = $this->makeConflictedAddonManager();
+        $am->startAddon($am->lookupAddon('grand-parent'));
+
+        $parent = $am->lookupAddon('parent');
+        $parentConflicts = $am->lookupConflicts($parent);
+        $this->assertArrayHasKey('grand-parent', $parentConflicts);
+
+        $child = $am->lookupAddon('child');
+        $childConflicts = $am->lookupConflicts($child);
+        $this->assertArrayHasKey('grand-parent', $childConflicts);
+    }
+
+    /**
+     * An addon should list enabled addons that conflict with it even if it doesn't list the conflict itself.
+     */
+    public function testLookupConflicts2() {
+        $am = $this->makeConflictedAddonManager();
+        $am->startAddon($am->lookupAddon('child'));
+
+        $gp = $am->lookupAddon('grand-parent');
+        $gpConflicts = $am->lookupConflicts($gp);
+        $this->assertArrayHasKey('child', $gpConflicts);
+    }
+
+    /**
+     * Test **AddonManager::checkConflicts()**.
+     *
+     * @expectedException \Exception
+     * @expectedExceptionCode 409
+     * @expectedExceptionMessage Parent conflicts with: Grandparent.
+     */
+    public function testCheckConflicts() {
+        $am = $this->makeConflictedAddonManager();
+        $am->startAddon($am->lookupAddon('grand-parent'));
+
+        $parent = $am->lookupAddon('parent');
+        $this->assertFalse($am->checkConflicts($parent, false));
+
+        $am->checkConflicts($parent, true);
+    }
+
+    /**
+     * Make an addon manager that has conflicting addons..
+     *
+     * @return AddonManager
+     */
+    private function makeConflictedAddonManager() {
+        $am = new AddonManager([], PATH_ROOT.'/tests/cache/cam');
+
+        $am->add(Addon::__set_state(['info' => [
+            'key' => 'grand-parent',
+            'name' => 'Grandparent',
+            'type' => Addon::TYPE_ADDON
+        ]]), false);
+
+        $am->add(Addon::__set_state(['info' => [
+            'key' => 'parent',
+            'name' => 'Parent',
+            'type' => Addon::TYPE_ADDON,
+            'require' => [
+                'child' => '1'
+            ]
+        ]]), false);
+
+        $am->add(Addon::__set_state(['info' => [
+            'key' => 'child',
+            'name' => 'Child',
+            'type' => Addon::TYPE_ADDON,
+            'version' => '1',
+            'conflict' => [
+                'grand-parent' => '*'
+            ]
+        ]]), false);
+
+        return $am;
     }
 }

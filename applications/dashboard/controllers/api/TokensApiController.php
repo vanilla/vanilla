@@ -1,6 +1,6 @@
 <?php
 /**
- * @copyright 2009-2017 Vanilla Forums Inc.
+ * @copyright 2009-2018 Vanilla Forums Inc.
  * @license GPLv2
  */
 
@@ -31,9 +31,6 @@ class TokensApiController extends AbstractApiController {
     private $fullSchema;
 
     /** @var Schema */
-    private $idSchema;
-
-    /** @var Schema */
     private $sensitiveSchema;
 
     /**
@@ -52,7 +49,7 @@ class TokensApiController extends AbstractApiController {
      * @throws ClientException if current user isn't authorized to delete the token.
      */
     public function delete($id) {
-        $this->schema($this->idSchema(),'in')->setDescription('Revoke an access token.');
+        $this->idParamSchema()->setDescription('Revoke an access token.');
         $out = $this->schema([], 'out');
 
         $row = $this->token($id);
@@ -141,10 +138,11 @@ class TokensApiController extends AbstractApiController {
     public function get($id, array $query) {
         $this->permission('Garden.Tokens.Add');
 
+        $this->idParamSchema();
         $in = $this->schema([
             'id',
             'transientKey:s' => 'A valid CSRF token for the current user.'
-        ], 'in')->add($this->idSchema())->setDescription('Reveal a usable access token.');
+        ], 'in')->setDescription('Reveal a usable access token.');
         $out = $this->schema($this->sensitiveSchema(), 'out');
 
         $query['id'] = $id;
@@ -169,14 +167,8 @@ class TokensApiController extends AbstractApiController {
      *
      * @return Schema
      */
-    public function idSchema() {
-        if (!isset($this->idSchema)) {
-            $this->idSchema = $this->schema(
-                ['id:i' => 'The numeric ID of a token.'],
-                'tokenID'
-            );
-        }
-        return $this->idSchema;
+    public function idParamSchema() {
+        return $this->schema(['id:i' => 'The numeric ID of a token.'], 'in');
     }
 
     /**
@@ -187,7 +179,7 @@ class TokensApiController extends AbstractApiController {
     public function index() {
         $this->permission('Garden.Tokens.Add');
 
-        $in = $this->schema([], 'in');
+        $in = $this->schema([], 'in')->setDescription('Get a list of access token IDs for the current user.');
         // Full access token details are not available in the index. Use GET on a single ID for sensitive information.
         $out = $this->schema([
             ':a' => $this->schema([
@@ -195,7 +187,7 @@ class TokensApiController extends AbstractApiController {
                 'name',
                 'dateInserted'
             ])->add($this->fullSchema())
-        ], 'out')->setDescription('Get a list of access token IDs for the current user.');
+        ], 'out');
 
         $rows = $this->accessTokenModel->getWhere([
             'UserID' => $this->getSession()->UserID,

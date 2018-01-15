@@ -1,7 +1,7 @@
 <?php
 /**
  * @author Todd Burry <todd@vanillaforums.com>
- * @copyright 2009-2017 Vanilla Forums Inc.
+ * @copyright 2009-2018 Vanilla Forums Inc.
  * @license Proprietary
  */
 
@@ -125,6 +125,9 @@ class Dispatcher {
             } catch (\Exception $dispatchEx) {
                 $response = $this->makeResponse($dispatchEx);
                 break;
+            } catch (\Error $dispatchError) {
+                $response = $this->makeResponse($dispatchError);
+                break;
             }
         }
 
@@ -184,11 +187,11 @@ class Dispatcher {
         } elseif (is_array($raw) || is_string($raw)) {
             // This is an array of response data.
             $result = new Data($raw);
-        } elseif ($raw instanceof \Exception) {
+        } elseif ($raw instanceof \Exception || $raw instanceof \Error) {
             $data = $raw instanceof \JsonSerializable ? $raw->jsonSerialize() : ['message' => $raw->getMessage(), 'status' => $raw->getCode()];
             $result = new Data($data, $raw->getCode());
             // Provide stack trace as meta information.
-            $result->setMeta('error_trace', $raw->getTraceAsString());
+            $result->setMeta('errorTrace', $raw->getTraceAsString());
         } elseif ($raw instanceof \JsonSerializable) {
             $result = new Data((array)$raw->jsonSerialize());
         } elseif (!empty($ob)) {

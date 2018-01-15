@@ -2,7 +2,7 @@
 /**
  * Discussion model
  *
- * @copyright 2009-2017 Vanilla Forums Inc.
+ * @copyright 2009-2018 Vanilla Forums Inc.
  * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
  * @package Vanilla
  * @since 2.0
@@ -1922,6 +1922,11 @@ class DiscussionModel extends Gdn_Model {
         // Define the primary key in this model's table.
         $this->defineSchema();
 
+        // If the site isn't configured to use categories, don't allow one to be set.
+        if (!c('Vanilla.Categories.Use', true)) {
+            unset($formPostValues['CategoryID']);
+        }
+
         // Add & apply any extra validation rules:
         if (array_key_exists('Body', $formPostValues)) {
             $this->Validation->applyRule('Body', 'Required');
@@ -1936,10 +1941,12 @@ class DiscussionModel extends Gdn_Model {
 
         // Validate category permissions.
         $categoryID = val('CategoryID', $formPostValues);
-        if ($categoryID > 0) {
+        if ($categoryID !== false) {
             $checkPermission = val('CheckPermission', $settings, true);
             $category = CategoryModel::categories($categoryID);
-            if ($category && $checkPermission && !CategoryModel::checkPermission($category, 'Vanilla.Discussions.Add')) {
+            if (!$category) {
+                $this->Validation->addValidationResult('CategoryID', "@Category {$categoryID} does not exist.");
+            } elseif ($checkPermission && !CategoryModel::checkPermission($category, 'Vanilla.Discussions.Add')) {
                 $this->Validation->addValidationResult('CategoryID', 'You do not have permission to post in this category');
             }
         }

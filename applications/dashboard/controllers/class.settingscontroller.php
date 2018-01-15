@@ -2,7 +2,7 @@
 /**
  * Managing core Dashboard settings.
  *
- * @copyright 2009-2017 Vanilla Forums Inc.
+ * @copyright 2009-2018 Vanilla Forums Inc.
  * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
  * @package Dashboard
  * @since 2.0
@@ -1689,7 +1689,7 @@ class SettingsController extends DashboardController {
                 // Save the text to the locale.
                 $translations = [];
                 foreach ($this->data('ThemeInfo.Options.Text', []) as $key => $default) {
-                    $value = $this->Form->getFormValue($this->Form->escapeString('Text_'.$key));
+                    $value = $this->Form->getFormValue($this->Form->escapeFieldName('Text_'.$key));
                     $configSaveData["ThemeOption.{$key}"] = $value;
                     //$this->Form->setFormValue('Text_'.$Key, $Value);
                 }
@@ -1709,7 +1709,7 @@ class SettingsController extends DashboardController {
                         $value = $default;
                     }
 
-                    $this->Form->setValue($this->Form->escapeString('Text_'.$key), $value);
+                    $this->Form->setValue($this->Form->escapeFieldName('Text_'.$key), $value);
                 }
             }
 
@@ -1754,7 +1754,7 @@ class SettingsController extends DashboardController {
                 // Save the text to the locale.
                 $translations = [];
                 foreach ($this->data('ThemeInfo.Options.Text', []) as $key => $default) {
-                    $value = $this->Form->getFormValue($this->Form->escapeString('Text_'.$key));
+                    $value = $this->Form->getFormValue($this->Form->escapeFieldName('Text_'.$key));
                     $configSaveData["ThemeOption.{$key}"] = $value;
                     //$this->Form->setFormValue('Text_'.$Key, $Value);
                 }
@@ -1776,7 +1776,7 @@ class SettingsController extends DashboardController {
                         $value = $default;
                     }
 
-                    $this->Form->setFormValue($this->Form->escapeString('Text_'.$key), $value);
+                    $this->Form->setFormValue($this->Form->escapeFieldName('Text_'.$key), $value);
                 }
             }
 

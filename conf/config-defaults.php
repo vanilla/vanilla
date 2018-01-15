@@ -28,7 +28,6 @@ $Configuration['Cache']['Filecache']['Store']  = PATH_CACHE.'/Filecache';
 
 // Technical content stuff.
 $Configuration['Garden']['ContentType'] = 'text/html';
-$Configuration['Garden']['Charset'] = 'utf-8';
 $Configuration['Garden']['Locale'] = 'en';
 $Configuration['Garden']['LocaleCodeset'] = 'UTF8';
 

@@ -1,7 +1,7 @@
 <?php
 /**
  * @author Todd Burry <todd@vanillaforums.com>
- * @copyright 2009-2017 Vanilla Forums Inc.
+ * @copyright 2009-2018 Vanilla Forums Inc.
  * @license GPLv2
  */
 
@@ -352,12 +352,14 @@ class CategoryCollection {
         }
         if (!empty($keys)) {
             $cacheCategories = $this->cache->get($keys);
-            foreach ($cacheCategories as $key => $category) {
-                $this->calculateDynamic($category);
-                $this->categories[(int)$category['CategoryID']] = $category;
-                $this->categorySlugs[strtolower($category['UrlCode'])] = (int)$category['CategoryID'];
+            if (!empty($cacheCategories)) {
+                foreach ($cacheCategories as $key => $category) {
+                    $this->calculateDynamic($category);
+                    $this->categories[(int)$category['CategoryID']] = $category;
+                    $this->categorySlugs[strtolower($category['UrlCode'])] = (int)$category['CategoryID'];
 
-                $categories[(int)$category['CategoryID']] = $category;
+                    $categories[(int)$category['CategoryID']] = $category;
+                }
             }
         }
 

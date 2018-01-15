@@ -1,7 +1,7 @@
 <?php
 /**
  * @author Todd Burry <todd@vanillaforums.com>
- * @copyright 2009-2017 Vanilla Forums Inc.
+ * @copyright 2009-2018 Vanilla Forums Inc.
  * @license GPLv2
  */
 
@@ -111,14 +111,27 @@ class AddonModel implements LoggerAwareInterface {
         $validation = new Validation();
 
         if (!$options['force'] && $this->isEnabledConfig($addon, $options)) {
-            $validation->addError('enabled', 'The {addonName} {addonType} is already enabled.', ['addonName' => $addon->getName(), 'addonType' => $addon->getType()]);
+            $validation->addError(
+                'enabled',
+                'The {addonName} {addonType} is already enabled.',
+                ['addonName' => $addon->getName(), 'addonType' => $addon->getType()]
+            );
             throw new ValidationException($validation);
         }
 
         try {
             $this->addonManager->checkRequirements($addon, true);
         } catch (\Exception $ex) {
-            $validation->addError('requirements', $ex->getMessage());
+            $validation->addError('requirements', $ex->getMessage(), $ex->getCode());
+        }
+
+        try {
+            $this->addonManager->checkConflicts($addon, true);
+        } catch (\Exception $ex) {
+            $validation->addError('conflicts', $ex->getMessage(), $ex->getCode());
+        }
+
+        if (!$validation->isValid()) {
             throw new ValidationException($validation);
         }
 

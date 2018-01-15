@@ -1098,8 +1098,7 @@ figure {
 }
 
 hr {
-  -webkit-box-sizing: content-box;
-          box-sizing: content-box;
+  box-sizing: content-box;
   height: 0;
 }
 
@@ -1159,8 +1158,7 @@ input {
 
 input[type="checkbox"],
 input[type="radio"] {
-  -webkit-box-sizing: border-box;
-          box-sizing: border-box;
+  box-sizing: border-box;
   padding: 0;
 }
 
@@ -1171,8 +1169,7 @@ input[type="number"]::-webkit-outer-spin-button {
 
 input[type="search"] {
   -webkit-appearance: textfield;
-  -webkit-box-sizing: content-box;
-          box-sizing: content-box;
+  box-sizing: content-box;
 }
 
 input[type="search"]::-webkit-search-cancel-button,
@@ -4914,15 +4911,13 @@ input[type="checkbox"].disabled {
 }
 
 html {
-  -webkit-box-sizing: border-box;
-          box-sizing: border-box;
+  box-sizing: border-box;
 }
 
 *,
 *::before,
 *::after {
-  -webkit-box-sizing: inherit;
-          box-sizing: inherit;
+  box-sizing: inherit;
 }
 
 @-moz-viewport {
@@ -5109,8 +5104,7 @@ legend {
 }
 
 input[type="search"] {
-  -webkit-box-sizing: inherit;
-          box-sizing: inherit;
+  box-sizing: inherit;
   -webkit-appearance: none;
 }
 
@@ -6365,8 +6359,7 @@ select.nav-stats-users:focus,
   padding: 0.5625rem;
   font-weight: 500;
   border-radius: 0.25rem;
-  -webkit-box-shadow: 0 0 5px rgba(0, 0, 0, 0.15);
-          box-shadow: 0 0 5px rgba(0, 0, 0, 0.15);
+  box-shadow: 0 0 5px rgba(0, 0, 0, 0.15);
 }
 
 .popover-single {
@@ -7717,8 +7710,7 @@ select + select {
 .icheckbox,
 .icheckbox:focus,
 .icheckbox.focus {
-  -webkit-box-shadow: 0px 0px 4px 1px #0291db;
-          box-shadow: 0px 0px 4px 1px #0291db;
+  box-shadow: 0px 0px 4px 1px #0291db;
 }
 
 .iradio {
@@ -7793,8 +7785,7 @@ label[id^=iCheck] {
 
 .checkbox-painted-wrapper input:focus + label,
 .radio-painted-wrapper input:focus + label {
-  -webkit-box-shadow: 0px 0px 4px 1px #0291db;
-          box-shadow: 0px 0px 4px 1px #0291db;
+  box-shadow: 0px 0px 4px 1px #0291db;
 }
 
 .checkbox-painted-wrapper input[type="radio"],
@@ -7848,6 +7839,33 @@ label[id^=iCheck] {
 
 .spoiler.spoiler-visible .spoiler-content {
   display: block;
+}
+
+.label-flex {
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-align: center;
+  -webkit-align-items: center;
+      -ms-flex-align: center;
+          align-items: center;
+}
+
+.label-flex .TinyProgress {
+  padding-top: 0;
+  padding-bottom: 0;
+}
+
+.flex-grow {
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-flex: 1;
+  -webkit-flex-grow: 1;
+      -ms-flex-positive: 1;
+          flex-grow: 1;
 }
 
 .hero {
@@ -8332,8 +8350,7 @@ label[id^=iCheck] {
   display: block;
   width: 100%;
   height: 1rem;
-  -webkit-box-shadow: inset 0 -0.75rem 0.75rem 0 white;
-          box-shadow: inset 0 -0.75rem 0.75rem 0 white;
+  box-shadow: inset 0 -0.75rem 0.75rem 0 white;
   content: '';
 }
 
@@ -8628,6 +8645,18 @@ button.close {
   }
 }
 
+.panel-nav .nav-pill {
+  color: #f6f9fb;
+  background: rgba(148, 154, 162, 0.6);
+  display: inline-block;
+  font-size: 8px;
+  line-height: 1;
+  padding: 2px 4px;
+  border-radius: 3px;
+  vertical-align: middle;
+  font-weight: normal;
+}
+
 .panel-nav .nav-link {
   font-weight: 300;
 }
@@ -8657,6 +8686,23 @@ button.close {
 .file-upload .panel-nav input:hover ~ .nav-link.file-upload-browse:hover, .panel-nav select.nav-link:hover:focus, .panel-nav .nav-link.drop-enabled:hover {
   color: #fff;
   background-color: #0291db;
+}
+
+.panel-nav .nav-link.active .nav-pill, .panel-nav .file-upload input:focus ~ .nav-link.file-upload-choose .nav-pill, .file-upload .panel-nav input:focus ~ .nav-link.file-upload-choose .nav-pill, .panel-nav
+.file-upload input:focus ~ .nav-link.file-upload-browse .nav-pill,
+.file-upload .panel-nav input:focus ~ .nav-link.file-upload-browse .nav-pill, .panel-nav
+.file-upload input:hover ~ .nav-link.file-upload-choose .nav-pill,
+.file-upload .panel-nav input:hover ~ .nav-link.file-upload-choose .nav-pill, .panel-nav
+.file-upload input:hover ~ .nav-link.file-upload-browse .nav-pill,
+.file-upload .panel-nav input:hover ~ .nav-link.file-upload-browse .nav-pill, .panel-nav select.nav-link:focus .nav-pill, .panel-nav .nav-link.drop-enabled .nav-pill, .panel-nav .nav-link.active:hover .nav-pill, .panel-nav .file-upload input:focus ~ .nav-link.file-upload-choose:hover .nav-pill, .file-upload .panel-nav input:focus ~ .nav-link.file-upload-choose:hover .nav-pill, .panel-nav
+.file-upload input:focus ~ .nav-link.file-upload-browse:hover .nav-pill,
+.file-upload .panel-nav input:focus ~ .nav-link.file-upload-browse:hover .nav-pill, .panel-nav
+.file-upload input:hover ~ .nav-link.file-upload-choose:hover .nav-pill,
+.file-upload .panel-nav input:hover ~ .nav-link.file-upload-choose:hover .nav-pill, .panel-nav
+.file-upload input:hover ~ .nav-link.file-upload-browse:hover .nav-pill,
+.file-upload .panel-nav input:hover ~ .nav-link.file-upload-browse:hover .nav-pill, .panel-nav select.nav-link:hover:focus .nav-pill, .panel-nav .nav-link.drop-enabled:hover .nav-pill {
+  color: #0291db;
+  background-color: rgba(255, 255, 255, 0.7);
 }
 
 .panel-nav .nav-link:hover, .panel-nav .nav-link.hover {
@@ -9689,8 +9735,7 @@ button.close {
   background: #333;
   border: 0.0625rem solid #000;
   opacity: .9;
-  -webkit-box-shadow: inset 0 0 1px 0 rgba(255, 255, 255, 0.72);
-          box-shadow: inset 0 0 1px 0 rgba(255, 255, 255, 0.72);
+  box-shadow: inset 0 0 1px 0 rgba(255, 255, 255, 0.72);
   border-radius: 0.125rem;
 }
 
@@ -10427,8 +10472,7 @@ strong,
 .Section-Dashboard.Message.index .DismissMessage.Box {
   background: #fff8ce;
   border: 1px solid #c5bea4;
-  -webkit-box-shadow: none;
-          box-shadow: none;
+  box-shadow: none;
   margin: 0 0 10px;
   /* Make sure that .Box definitions don't override the base DismissMessage margin! */
 }

@@ -1235,3 +1235,18 @@ label[id^=iCheck] {
     }
   }
 }
+
+.label-flex {
+  display: flex;
+  align-items: center;
+
+  .TinyProgress {
+    padding-top: 0;
+    padding-bottom: 0;
+  }
+}
+
+.flex-grow {
+  display: flex;
+  flex-grow: 1;
+}

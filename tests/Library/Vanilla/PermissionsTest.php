@@ -1,14 +1,15 @@
 <?php
 /**
- * @copyright 2009-2017 Vanilla Forums Inc.
+ * @copyright 2009-2018 Vanilla Forums Inc.
  * @license GPLv2
  */
 
 namespace VanillaTests\Library\Vanilla;
 
+use PHPUnit\Framework\TestCase;
 use Vanilla\Permissions;
 
-class PermissionsTest extends \PHPUnit\Framework\TestCase {
+class PermissionsTest extends TestCase {
 
     public function testAdd() {
         $permissions = new Permissions();

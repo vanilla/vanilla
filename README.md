@@ -60,6 +60,7 @@ Our _minimum_ requirements are now:
 * To [import into Vanilla](#migrating-to-vanilla) you need MySQLi (`--with-mysqli`).
 * To use our social plugins you need [OpenSSL](http://php.net/manual/en/openssl.installation.php).
 * MySQL 5.0 or newer (or Percona/MariaDB equivalent).
+* MySQL strict mode [disabled](https://www.liquidweb.com/kb/how-to-disable-mysql-strict-mode/).
 
 Vanilla ships with a `.htaccess` file required for Apache support. Using nginx or IIS may require additional configuration.
 

@@ -1,7 +1,7 @@
 <?php
 /**
  * @author Todd Burry <todd@vanillaforums.com>
- * @copyright 2009-2017 Vanilla Forums Inc.
+ * @copyright 2009-2018 Vanilla Forums Inc.
  * @license GPLv2
  */
 
@@ -584,6 +584,35 @@ class AddonManager {
     }
 
     /**
+     * Check to see if an addon has any conflicts with another addon(s).
+     *
+     * @param Addon $addon The addon to check.
+     * @param bool $throw Whether or not to throw an exception if there are conflicts.
+     * @return bool Returns **true** if there are no conflicts or **false** otherwise.
+     * @throws \Exception Throws an exception if there are conflicts and **$throw** is **true**.
+     */
+    public function checkConflicts(Addon $addon, $throw = false) {
+        $addons = $this->lookupConflicts($addon);
+        $conflicts = [];
+        foreach ($addons as $key => $_) {
+            $conflicts[] = $this->lookupAddon($key)->getName();
+        }
+
+        if (!empty($conflicts)) {
+            if ($throw) {
+                $msg = sprintf(
+                    '%1$s conflicts with: %2$s.',
+                    $addon->getName(),
+                    implode(', ', $conflicts)
+                );
+                throw new \Exception($msg, 409);
+            }
+            return false;
+        }
+        return true;
+    }
+
+    /**
      * Get all of the requirements for an addon.
      *
      * This method returns an array of all of the addon requirements for a given addon. The return is an array of
@@ -612,6 +641,60 @@ class AddonManager {
         }
 
         return $array;
+    }
+
+    /**
+     * Lookup the addons that conflict with an addon.
+     *
+     * This method returns an array of all of the conflicting addons in the following format:
+     *
+     * ```
+     * 'addonKey' => ['from' => ['addonKey', ...]]
+     * ```
+     *
+     * @param Addon $addon The addon to lookup the conflicts for.
+     * @return array Returns an array of conflicts.
+     */
+    public function lookupConflicts(Addon $addon) {
+        // Get a list of requirements to check their conflicts too.
+        $addons = [$addon->getKey() => $addon];
+        $reqs = $this->lookupRequirements($addon, self::REQ_DISABLED | self::REQ_ENABLED);
+        foreach ($reqs as $key => $_) {
+            $addons[$key] = $this->lookupAddon($key);
+        }
+
+        $enabled = $this->getEnabled();
+        $conflicts = [];
+        foreach ($addons as $a) {
+            /* @var Addon $a */
+            foreach ($a->getConflicts() as $key => $req) {
+                $conflict = null;
+                if (isset($addons[$key])) {
+                    $conflict = $addons[$key];
+                } elseif ($this->isEnabled($key, Addon::TYPE_ADDON)) {
+                    $conflict = $this->lookupAddon($key);
+                }
+
+                if ($conflict && Addon::checkVersion($conflict->getVersion(), $req)) {
+                    $conflicts[$conflict->getKey()]['from'][] = $a->getKey();
+                }
+            }
+
+            // Check against enabled addons.
+            foreach ($enabled as $a2) {
+                /* @var Addon $a2 */
+                if (isset($conflicts[$a2->getKey()])) {
+                    continue;
+                }
+
+                $a2Conflicts = $a2->getConflicts();
+                if (isset($a2Conflicts[$a->getKey()]) && Addon::checkVersion($a->getVersion(), $a2Conflicts[$a->getKey()])) {
+                    $conflicts[$a2->getKey()]['from'][] = $a->getKey();
+                }
+            }
+        }
+
+        return $conflicts;
     }
 
     /**

@@ -1819,11 +1819,11 @@
         // jQuery chaining
         return this;
     };
-}(jQuery));
 
-$(document).on('contentLoad', function(e) {
-    $('.BodyBox,.js-bodybox', e.target).setAsEditor();
-});
+    $(document).on('contentLoad', function(e) {
+        $('.BodyBox,.js-bodybox', e.target).setAsEditor();
+    });
+}(jQuery));
 
 /*
  * This is an example of hooking into the custom parse event, to enable

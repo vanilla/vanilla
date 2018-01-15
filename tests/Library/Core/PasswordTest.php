@@ -1,18 +1,19 @@
 <?php
 /**
  * @author Todd Burry <todd@vanillaforums.com>
- * @copyright 2009-2017 Vanilla Forums Inc.
+ * @copyright 2009-2018 Vanilla Forums Inc.
  * @license Proprietary
  */
 
 namespace VanillaTests\Library\Core;
 
+use PHPUnit\Framework\TestCase;
 use Gdn_PasswordHash;
 
 /**
  * Test the the {@link Gdn_PasswordHash} class.
  */
-class PasswordTest extends \PHPUnit\Framework\TestCase {
+class PasswordTest extends TestCase {
 
     /**
      * Make sure an empty password fails.

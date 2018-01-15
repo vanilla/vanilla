@@ -7,11 +7,12 @@
 
 namespace VanillaTests\Library\Core;
 
+use PHPUnit\Framework\TestCase;
 use DateTime;
 use DateTimeZone;
 
 
-class DateTimeTest extends \PHPUnit\Framework\TestCase{
+class DateTimeTest extends TestCase {
 
     /**
      * Test that different named timezones in the same place produce equivalent dates.

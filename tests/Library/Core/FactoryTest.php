@@ -6,13 +6,15 @@
  */
 
 namespace Library\Core;
+
+use PHPUnit\Framework\TestCase;
 use Gdn;
 use VanillaTests\Fixtures\Tuple;
 
 /**
  * Tests for the {@link Gdn_Factory}.
  */
-class FactoryTest extends \PHPUnit\Framework\TestCase {
+class FactoryTest extends TestCase {
     const TUPLE = 'VanillaTests\Fixtures\Tuple';
 
     /**

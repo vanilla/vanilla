@@ -1,0 +1,9 @@
+{
+	"version": 3,
+	"file": "style-compat.css",
+	"sources": [
+		"../scss/style-compat.scss"
+	],
+	"mappings": "",
+	"names": []
+}

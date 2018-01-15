@@ -1,12 +1,12 @@
 <?php
 /**
- * @copyright 2009-2017 Vanilla Forums Inc.
+ * @copyright 2009-2018 Vanilla Forums Inc.
  * @license GPLv2
  */
 
 namespace VanillaTests\APIv2;
 
-use Gdn_PasswordHash;
+use VanillaTests\Fixtures\Uploader;
 
 /**
  * Test the /api/v2/users endpoints.
@@ -100,9 +100,21 @@ class UsersTest extends AbstractResourceTest {
     public function providePutFields() {
         $fields = [
             'ban' => ['ban', true, 'banned'],
-//            'verify' => ['verify', true, 'verified'],
         ];
         return $fields;
+    }
+
+    /**
+     * Test removing a user's photo.
+     */
+    public function testDeletePhoto() {
+        $userID = $this->testPostPhoto();
+
+        $response = $this->api()->delete("{$this->baseUrl}/{$userID}/photo");
+        $this->assertEquals(204, $response->getStatusCode());
+
+        $user = $this->api()->get("{$this->baseUrl}/{$userID}")->getBody();
+        $this->assertStringEndsWith('/applications/dashboard/design/images/defaulticon.png', $user['photoUrl']);
     }
 
     /**
@@ -138,6 +150,30 @@ class UsersTest extends AbstractResourceTest {
     }
 
     /**
+     * Test setting a user's roles with a PATCH request.
+     *
+     * @return array
+     */
+    public function testPatchWithRoles() {
+        $roleIDs = [
+            32 // Moderator
+        ];
+        $user = $this->testPost();
+        $result = $this->api()
+            ->patch("{$this->baseUrl}/{$user['userID']}", ['roleID' => $roleIDs])
+            ->getBody();
+
+        $userRoleIDs = array_column($result['roles'], 'roleID');
+        if (array_diff($roleIDs, $userRoleIDs)) {
+            $this->fail('Not all roles set on user.');
+        }
+        if (array_diff($userRoleIDs, $roleIDs)) {
+            $this->fail('Unexpected roles on user.');
+        }
+
+        return $result;
+    }
+    /**
      * {@inheritdoc}
      */
     public function testPost($record = null, array $extra = []) {
@@ -148,6 +184,58 @@ class UsersTest extends AbstractResourceTest {
             'password' => 'vanilla'
         ];
         $result = parent::testPost($record, $fields);
+        return $result;
+    }
+
+    /**
+     * Test adding a photo for a user.
+     *
+     * @return int ID of the user used for this test.
+     */
+    public function testPostPhoto() {
+        $user = $this->testGet();
+
+        Uploader::resetUploads();
+        $photo = Uploader::uploadFile('photo', PATH_ROOT.'/tests/fixtures/apple.jpg');
+        $response = $this->api()->post("{$this->baseUrl}/{$user['userID']}/photo", ['photo' => $photo]);
+
+        $this->assertEquals(201, $response->getStatusCode());
+        $this->assertInternalType('array', $response->getBody());
+
+        $responseBody = $response->getBody();
+        $this->assertArrayHasKey('photoUrl', $responseBody);
+        $this->assertNotEmpty($responseBody['photoUrl']);
+        $this->assertNotFalse(filter_var($responseBody['photoUrl'], FILTER_VALIDATE_URL), 'Photo is not a valid URL.');
+        $this->assertStringEndsNotWith('/applications/dashboard/design/images/defaulticon.png', $responseBody['photoUrl']);
+        $this->assertNotEquals($user['photoUrl'], $responseBody['photoUrl']);
+
+        return $user['userID'];
+    }
+
+    /**
+     * Test adding a new user with non-default roles.
+     */
+    public function testPostWithRoles() {
+        $roleIDs = [
+            32 // Moderator
+        ];
+        $record = $this->record();
+        $fields = [
+            'bypassSpam' => true,
+            'emailConfirmed' => false,
+            'password' => 'vanilla',
+            'roleID' => $roleIDs
+        ];
+        $result = parent::testPost($record, $fields);
+
+        $userRoleIDs = array_column($result['roles'], 'roleID');
+        if (array_diff($roleIDs, $userRoleIDs)) {
+            $this->fail('Not all roles set on user.');
+        }
+        if (array_diff($userRoleIDs, $roleIDs)) {
+            $this->fail('Unexpected roles on user.');
+        }
+
         return $result;
     }
 

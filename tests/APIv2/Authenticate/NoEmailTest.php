@@ -1,7 +1,7 @@
 <?php
 /**
  * @author Alexandre (DaazKu) Chouinard <alexandre.c@vanillaforums.com>
- * @copyright 2009-2017 Vanilla Forums Inc.
+ * @copyright 2009-2018 Vanilla Forums Inc.
  * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
  */
 
@@ -54,12 +54,13 @@ class NoEmailTest extends AbstractAPIv2Test {
 
         $uniqueID = uniqid('ne_');
         $this->currentUser = [
-            'uniqueID' => $uniqueID,
             'name' => 'Authenticate_'.$uniqueID,
         ];
 
         $this->authenticator = new TestSSOAuthenticator();
-        $this->authenticator->setSSOInfo($this->currentUser);
+
+        $this->authenticator->setUniqueID($uniqueID);
+        $this->authenticator->setUserData($this->currentUser);
 
         $this->container()->setInstance('TestSSOAuthenticator', $this->authenticator);
 

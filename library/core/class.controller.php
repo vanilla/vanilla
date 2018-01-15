@@ -5,7 +5,7 @@
  * @author Mark O'Sullivan <markm@vanillaforums.com>
  * @author Todd Burry <todd@vanillaforums.com>
  * @author Tim Gunter <tim@vanillaforums.com>
- * @copyright 2009-2017 Vanilla Forums Inc.
+ * @copyright 2009-2018 Vanilla Forums Inc.
  * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
  * @package Core
  * @since 2.0
@@ -1310,11 +1310,12 @@ class Gdn_Controller extends Gdn_Pluggable {
             $this->setJson('InformMessages', $this->_InformMessages);
             $this->setJson('ErrorMessages', $this->_ErrorMessages);
             if ($this->redirectTo !== null) {
-                $this->setJson('RedirectTo', $this->redirectTo);
-                $this->setJson('RedirectUrl', $this->redirectTo);
+                 // See redirectTo function for details about encoding backslashes.
+                $this->setJson('RedirectTo', str_replace('\\', '%5c', $this->redirectTo));
+                $this->setJson('RedirectUrl', str_replace('\\', '%5c', $this->redirectTo));
             } else {
-                $this->setJson('RedirectTo', $this->RedirectUrl);
-                $this->setJson('RedirectUrl', $this->RedirectUrl);
+                $this->setJson('RedirectTo', str_replace('\\', '%5c', $this->RedirectUrl));
+                $this->setJson('RedirectUrl', str_replace('\\', '%5c', $this->RedirectUrl));
             }
 
             // Make sure the database connection is closed before exiting.
@@ -1334,11 +1335,11 @@ class Gdn_Controller extends Gdn_Pluggable {
                     $this->addDefinition('InformMessageStack', json_encode($this->_InformMessages, JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT));
                 }
                 if ($this->redirectTo !== null) {
-                    $this->addDefinition('RedirectTo', $this->redirectTo);
-                    $this->addDefinition('RedirectUrl', $this->redirectTo);
+                    $this->addDefinition('RedirectTo', str_replace('\\', '%5c', $this->redirectTo));
+                    $this->addDefinition('RedirectUrl', str_replace('\\', '%5c', $this->redirectTo));
                 } else {
-                    $this->addDefinition('RedirectTo', $this->RedirectUrl);
-                    $this->addDefinition('RedirectUrl', $this->RedirectUrl);
+                    $this->addDefinition('RedirectTo', str_replace('\\', '%5c', $this->RedirectUrl));
+                    $this->addDefinition('RedirectUrl', str_replace('\\', '%5c', $this->RedirectUrl));
                 }
             }
 
@@ -1723,6 +1724,8 @@ class Gdn_Controller extends Gdn_Pluggable {
 
                 $ETag = AssetModel::eTag();
                 $ThemeType = isMobile() ? 'mobile' : 'desktop';
+                /* @var \AssetModel $AssetModel */
+                $AssetModel = Gdn::getContainer()->get(\AssetModel::class);
 
                 // And now search for/add all css files.
                 foreach ($this->_CssFiles as $CssInfo) {
@@ -1735,7 +1738,6 @@ class Gdn_Controller extends Gdn_Pluggable {
                     // style.css and admin.css deserve some custom processing.
                     if (in_array($CssFile, $CssAnchors)) {
                         // Grab all of the css files from the asset model.
-                        $AssetModel = new AssetModel();
                         $CssFiles = $AssetModel->getCssFiles($ThemeType, ucfirst(substr($CssFile, 0, -4)), $ETag);
                         foreach ($CssFiles as $Info) {
                             $this->Head->addCss($Info[1], 'all', true, $CssInfo);
@@ -1783,6 +1785,13 @@ class Gdn_Controller extends Gdn_Pluggable {
                 $this->fireEvent('AfterJsCdns');
 
                 $this->Head->addScript('', 'text/javascript', false, ['content' => $this->definitionList(false)]);
+
+                // Add the built addon javascript files.
+                $addonJs = $AssetModel->getAddonJsFiles($ThemeType, $this->MasterView === 'admin' ? 'admin' : 'app', $ETag);
+                $busta = trim(assetVersion('', ''), '.');
+                foreach ($addonJs as $path) {
+                    $this->Head->addScript(asset($path)."?h=$busta", 'text/javascript', false, ['defer' => 'true']);
+                }
 
                 foreach ($this->_JsFiles as $Index => $JsInfo) {
                     $JsFile = $JsInfo['FileName'];

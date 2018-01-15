@@ -1,15 +1,10 @@
 import events from "@core/events";
-import * as utility from "@core/utility";
+import * as apiUtility from "@core/api-utility";
 import * as domUtility from "@core/dom-utility";
 import Quill from "quill";
 import axios from "axios";
 
-events.onVanillaReady(() => {
-    console.log("Hello from the editor");
-    new RichEditor(".bodybox-wrap .TextBoxWrapper");
-});
-
-const options = {
+let options = {
     // debug: "info",
     modules: {
         toolbar: ['bold', 'italic', 'underline', 'strike'],
@@ -48,14 +43,33 @@ class RichEditor {
     /**
      * Handle the editor form submit.
      *
-     * @type {function(Event): void}
+     * @param {Event} event - A javascript event.
+     *
+     * @returns {boolean}
      */
     handleFormSubmit = (event) => {
         event.preventDefault();
 
         const formData = domUtility.getFormData(this.form);
+        const transformedData = apiUtility.transformLegacyFormData(formData);
+        const editorResult = this.editor.getContents();
+        transformedData["body"] = JSON.stringify(editorResult);
+
         console.log(formData);
+        console.log(transformedData);
+
+        // axios.post("/api/v2/discussions", transformedData)
+        //     .then((response) => {
+        //         console.log(response);
+        //     }).catch((error) => {
+        //         console.log(error);
+        //     });
 
         return false;
     }
 }
+
+events.onVanillaReady(() => {
+    console.log("Hello from the editor");
+    new RichEditor(".bodybox-wrap .TextBoxWrapper");
+});

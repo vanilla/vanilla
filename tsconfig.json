@@ -14,7 +14,8 @@
             "@core/*": ["./src/scripts/*"],
             "@vanilla/*": ["./applications/vanilla/src/scripts/*"],
             "@dashboard/*": ["./applications/dashboard/src/scripts/*"]
-        }
+        },
+        "moduleResolution": "node"
     },
     "exclude": [
         "**/node_modules"

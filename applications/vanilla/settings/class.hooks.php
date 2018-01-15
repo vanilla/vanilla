@@ -818,6 +818,8 @@ class VanillaHooks implements Gdn_IPlugin {
      * @param ProfileController $sender ProfileController.
      */
     public function profileController_comments_create($sender, $userReference = '', $username = '', $page = '', $userID = '') {
+        $sender->permission('Garden.Profiles.View');
+
         $sender->editMode(false);
         $view = $sender->View;
 
@@ -877,6 +879,8 @@ class VanillaHooks implements Gdn_IPlugin {
      * @param ProfileController $sender ProfileController.
      */
     public function profileController_discussions_create($sender, $userReference = '', $username = '', $page = '', $userID = '') {
+        $sender->permission('Garden.Profiles.View');
+
         $sender->editMode(false);
 
         // Tell the ProfileController what tab to load

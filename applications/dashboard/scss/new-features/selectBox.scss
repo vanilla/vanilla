@@ -23,20 +23,24 @@
 }
 
 .selectBox-main {
-  position: static;
+  display: inline-block;
+  position: relative;
+  cursor: pointer;
+  user-select: none;
+  height: 100%;
 }
 
 .selectBox-content {
-  display: inline-flex;
-  position: relative;
-  align-items: center;
-  justify-content: flex-start;
-  flex-wrap: nowrap;
+  left: 100%;
+  margin: {
+    left: -29px;
+    top: 10px;
+  }
 }
 
 .selectBox-toggle {
   position: relative;
-  display: inline-block;
+  display: block;
   line-height: 1;
   vertical-align: middle;
   cursor: pointer;
@@ -70,12 +74,25 @@
 .selectBox-item {
   position: relative;
   display: block;
+
+  .dropdown-menu-link.selectBox-link {
+    position: relative;
+    padding-left: 30px;
+  }
+
+  &.isActive {
+    .selectBox-link {
+      pointer-events: none;
+      cursor: default;
+    }
+  }
 }
 
 
 
 .selectBox-link {
   display: block;
+  box-sizing: border-box;
   white-space: nowrap;
   text-overflow: ellipsis;
   overflow: hidden;
@@ -85,6 +102,15 @@
 
 }
 
+.selectBox-selectedIcon {
+  position: absolute;
+  left: 5px;
+  top: 0;
+  bottom: 0;
+  margin: auto 0;
+  width: 18px;
+  height: 18px;
+}
 
 
 

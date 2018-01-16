@@ -23,7 +23,8 @@
         "exports": {
             "*": [
                 "./src/scripts/api/discussions"
-            ]
+            ],
+            "app": []
         }
     }
 }

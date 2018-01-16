@@ -1,0 +1,1 @@
+{"name":"lib_vanilla_app","content":{"dll-reference lib_vanilla_app":{"id":0,"meta":{}},"./applications/vanilla/src/scripts/api/discussions.js":{"id":2,"meta":{}},"./src/scripts/ApiCaller.js":{"id":3,"meta":{}},"./src/scripts/ajax.js":{"id":4,"meta":{}}}}

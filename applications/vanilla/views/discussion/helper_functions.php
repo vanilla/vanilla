@@ -705,7 +705,7 @@ if (!function_exists('followButton')) :
             $output .= anchor(
                 $icon.$text,
                 '/the-following-endpoint',
-                'Hijack followButton'.($following ? ' isFollowing' : ''),
+                'Hijack followButton'.($following ? ' TextColor isFollowing' : ''),
                 ['title' => $text, 'aria-pressed' => $following ? 'true' : 'false', 'role' => 'button', 'tabindex' => '0']
             );
         }

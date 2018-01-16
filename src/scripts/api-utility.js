@@ -15,6 +15,7 @@ import flow from "lodash/flow";
  */
 function lowerCaseFirstLetter(input) {
     return input.charAt(0).toLowerCase() + input.slice(1);
+
 }
 
 /**

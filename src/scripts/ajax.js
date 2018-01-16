@@ -9,6 +9,8 @@
 import axios from "axios";
 
 const instance = axios.create();
-instance.defaults.timeout = 2500;
+this.api.defaults.timeout = 2500;
+
+// TODO: Add response interceptors to fire certain events.
 
 export default instance;

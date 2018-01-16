@@ -124,7 +124,7 @@ class FacebookPlugin extends Gdn_Plugin {
         }
 
         if (isset($sender->Data['Methods'])) {
-            $url = $this->authorizeUri();
+            $url = url('entry/facebook');
 
             // Add the facebook method to the controller.
             $fbMethod = [
@@ -282,10 +282,9 @@ class FacebookPlugin extends Gdn_Plugin {
     public function profileController_facebookConnect_create($sender, $userReference, $username, $code = false) {
         $sender->permission('Garden.SignIn.Allow');
 
-        $transientKey = Gdn::request()->get('state');
-        if (empty($transientKey) || Gdn::session()->validateTransientKey($transientKey) === false) {
-            throw new Gdn_UserException(t('Invalid CSRF token.', 'Invalid CSRF token. Please try again.'), 403);
-        }
+        $state = json_decode(Gdn::request()->get('state', ''), true);
+        $suppliedCSRFToken = val('csrf', $state);
+        SsoUtils::verifyCSRFToken('facebookSocial', $suppliedCSRFToken);
 
         $sender->getUserInfo($userReference, $username, '', true);
         $sender->_setBreadcrumbs(t('Connections'), '/profile/connections');
@@ -322,7 +321,7 @@ class FacebookPlugin extends Gdn_Plugin {
      * @return string
      */
     private function _getButton() {
-        $url = $this->authorizeUri();
+        $url = url('entry/facebook');
 
         return socialSigninButton('Facebook', $url, 'icon', ['rel' => 'nofollow']);
     }
@@ -372,12 +371,14 @@ class FacebookPlugin extends Gdn_Plugin {
             return;
         }
 
+        $state = json_decode(Gdn::request()->get('state', ''), true);
+        $suppliedCSRFToken = val('csrf', $state);
+        SsoUtils::verifyCSRFToken('facebook', $suppliedCSRFToken);
+
         if (isset($_GET['error'])) { // TODO global nope x2
             throw new Gdn_UserException(val('error_description', $_GET, t('There was an error connecting to Facebook')));
         }
 
-        $appID = c('Plugins.Facebook.ApplicationID');
-        $secret = c('Plugins.Facebook.Secret');
         $code = val('code', $_GET); // TODO nope
         $query = '';
         if ($sender->Request->get('display')) {
@@ -531,11 +532,14 @@ class FacebookPlugin extends Gdn_Plugin {
             $redirectUri .= '&'.$query;
         }
 
+        // Generate a CSRF token.
+        $csrfToken = SsoUtils::createCSRFToken();
+
         $authQuery = http_build_query([
             'client_id' => $appID,
             'redirect_uri' => $redirectUri,
             'scope' => $scopes,
-            'state' => Gdn::session()->transientKey()
+            'state' => json_encode(['csrf' => $csrfToken]),
         ]);
         $signinHref = "https://graph.facebook.com/oauth/authorize?{$authQuery}";
 
@@ -569,7 +573,7 @@ class FacebookPlugin extends Gdn_Plugin {
 
             $target = val('Target', $_GET, $path ? $path : '/'); // TODO rm global
 
-            if (ltrim($target, '/') == 'entry/signin' || empty($target)) {
+            if (ltrim($target, '/') == 'entry/signin' || ltrim($target, '/') == 'entry/facebook' || empty($target)) {
                 $target = '/';
             }
 
@@ -624,6 +628,13 @@ class FacebookPlugin extends Gdn_Plugin {
      */
     public function socialReactions() {
         return c('Plugins.Facebook.SocialReactions', true) && $this->isConfigured();
+    }
+
+    /**
+     * Create an entry/facebook endpoint that redirects to the authorization URI.
+     */
+    public function entryController_facebook_create() {
+        redirectTo($this->authorizeUri(), 302, false);
     }
 
     /**

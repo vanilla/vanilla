@@ -8,13 +8,15 @@ use Garden\Schema\Schema;
 use Garden\Web\Exception\NotFoundException;
 use Garden\Web\Exception\ServerException;
 use Vanilla\ApiUtils;
+use Vanilla\PermissionsTranslationTrait;
 use Vanilla\Utility\CamelCaseScheme;
+use Vanilla\Utility\DelimitedScheme;
 
 /**
  * API Controller for the `/roles` resource.
  */
 class RolesApiController extends AbstractApiController {
-    use \Vanilla\PermissionsTranslationTrait;
+    use PermissionsTranslationTrait;
 
     /** Maximum number of permission rows that can be displayed before an error is reported. */
     const MAX_PERMISSIONS = 100;
@@ -45,7 +47,7 @@ class RolesApiController extends AbstractApiController {
         $this->roleModel = $roleModel;
         $this->permissionModel = $permissionModel;
         $this->categoryModel = $categoryModel;
-        $this->nameScheme =  new \Vanilla\Utility\DelimitedScheme('.', new CamelCaseScheme());
+        $this->nameScheme =  new DelimitedScheme('.', new CamelCaseScheme());
     }
 
     /**

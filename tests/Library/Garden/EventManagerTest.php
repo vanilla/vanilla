@@ -7,6 +7,7 @@
 
 namespace VanillaTests\Library\Core;
 
+use PHPUnit\Framework\TestCase;
 use Garden\EventManager;
 use Vanilla\Addon;
 use Vanilla\AddonManager;
@@ -16,7 +17,7 @@ use VanillaTests\Fixtures\Container;
 /**
  * Tests for the {@link EventManager} class.
  */
-class EventManagerTest extends \PHPUnit\Framework\TestCase {
+class EventManagerTest extends TestCase {
 
     /**
      * Creates an {@link AddonManager} against Vanilla.
@@ -67,7 +68,7 @@ class EventManagerTest extends \PHPUnit\Framework\TestCase {
 
             try {
                 $pm->registerPlugin($class);
-            } catch (\PHPUnit_Framework_Error_Notice $ex) {
+            } catch (\PHPUnit\Framework\Error\Notice $ex) {
                 // This is okay.
                 continue;
             }
@@ -336,7 +337,7 @@ class EventManagerTest extends \PHPUnit\Framework\TestCase {
     /**
      * Make sure an event with higher than max priority just goes down to max priority.
      *
-     * @expectedException \PHPUnit_Framework_Error_Notice
+     * @expectedException \PHPUnit\Framework\Error\Notice
      */
     public function testMaxPriority() {
         $em = new EventManager();

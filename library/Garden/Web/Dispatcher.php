@@ -1,17 +1,22 @@
 <?php
 /**
  * @author Todd Burry <todd@vanillaforums.com>
- * @copyright 2009-2017 Vanilla Forums Inc.
+ * @copyright 2009-2018 Vanilla Forums Inc.
  * @license Proprietary
  */
 
 namespace Garden\Web;
 
+use Gdn;
+use Gdn_Locale;
 use Garden\Web\Exception\NotFoundException;
 use Garden\Web\Exception\Pass;
 use Vanilla\Permissions;
 
 class Dispatcher {
+
+    /** @var Gdn_Locale */
+    private $locale;
 
     /**
      * @var array
@@ -22,6 +27,15 @@ class Dispatcher {
      * @var string|array|callable
      */
     private $allowedOrigins;
+
+    /**
+     * Dispatcher constructor.
+     *
+     * @param Gdn_Locale $locale
+     */
+    public function __construct(Gdn_Locale $locale) {
+        $this->locale = $locale;
+    }
 
     /**
      * Add a route to the routes list.
@@ -86,9 +100,12 @@ class Dispatcher {
                         try {
                             $request->isAuthenticatedPostBack(true);
                         } catch (\Exception $ex) {
-                            \Gdn::session()->getPermissions()->addBan(
+                            Gdn::session()->getPermissions()->addBan(
                                 Permissions::BAN_CSRF,
-                                ['msg' => t('Invalid CSRF token.', 'Invalid CSRF token. Please try again.'), 'code' => 403]
+                                [
+                                    'msg' => $this->locale->translate('Invalid CSRF token.', 'Invalid CSRF token. Please try again.'),
+                                    'code' => 403
+                                ]
                             );
                         }
                     }
@@ -107,6 +124,9 @@ class Dispatcher {
                 continue;
             } catch (\Exception $dispatchEx) {
                 $response = $this->makeResponse($dispatchEx);
+                break;
+            } catch (\Error $dispatchError) {
+                $response = $this->makeResponse($dispatchError);
                 break;
             }
         }
@@ -167,11 +187,11 @@ class Dispatcher {
         } elseif (is_array($raw) || is_string($raw)) {
             // This is an array of response data.
             $result = new Data($raw);
-        } elseif ($raw instanceof \Exception) {
+        } elseif ($raw instanceof \Exception || $raw instanceof \Error) {
             $data = $raw instanceof \JsonSerializable ? $raw->jsonSerialize() : ['message' => $raw->getMessage(), 'status' => $raw->getCode()];
             $result = new Data($data, $raw->getCode());
             // Provide stack trace as meta information.
-            $result->setMeta('error_trace', $raw->getTraceAsString());
+            $result->setMeta('errorTrace', $raw->getTraceAsString());
         } elseif ($raw instanceof \JsonSerializable) {
             $result = new Data((array)$raw->jsonSerialize());
         } elseif (!empty($ob)) {

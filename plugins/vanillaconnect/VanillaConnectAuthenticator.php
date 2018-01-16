@@ -1,7 +1,7 @@
 <?php
 /**
  * @author Alexandre (DaazKu) Chouinard <alexandre.c@vanillaforums.com>
- * @copyright 2009-2017 Vanilla Forums Inc.
+ * @copyright 2009-2018 Vanilla Forums Inc.
  * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
  */
 
@@ -90,17 +90,22 @@ class VanillaConnectAuthenticator extends SSOAuthenticator {
      * @return SSOData
      */
     private function claimToSSOData($claim) {
-        $claim['uniqueID'] = $claim['id'];
+        $uniqueID = $claim['id'];
 
         foreach (array_keys(VanillaConnect::JWT_RESPONSE_CLAIM_TEMPLATE) as $key) {
             unset($claim[$key]);
         }
 
-        $claim['authenticatorID'] = $this->getID();
-        $claim['authenticatorName'] = $this->getName();
-        $claim['authenticatorIsTrusted'] = $this->isTrusted();
+        list($userData, $extraData) = SSOData::splitProviderData($claim);
 
-        $ssoData = new SSOData($claim);
+        $ssoData = new SSOData(
+            $this->getName(),
+            $this->getID(),
+            $this->isTrusted(),
+            $uniqueID,
+            $userData,
+            $extraData
+        );
         $ssoData->validate();
 
         return $ssoData;

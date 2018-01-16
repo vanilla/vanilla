@@ -4,7 +4,7 @@
  *
  * Use the AssetModel_StyleCss_Handler event to include CSS files in your plugin.
  *
- * @copyright 2009-2017 Vanilla Forums Inc.
+ * @copyright 2009-2018 Vanilla Forums Inc.
  * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
  * @package Dashboard
  * @since 2.1
@@ -22,6 +22,16 @@ class AssetModel extends Gdn_Model {
 
      /** @var string */
     public $UrlPrefix = '';
+
+    /**
+     * @var \Vanilla\AddonManager
+     */
+    private $addonManager;
+
+    public function __construct(\Vanilla\AddonManager $addonManager) {
+        parent::__construct();
+        $this->addonManager = $addonManager;
+    }
 
     /**
      * Get list of CSS anchor files
@@ -93,6 +103,7 @@ class AssetModel extends Gdn_Model {
         // Include theme customizations last so that they override everything else.
         switch ($basename) {
             case 'style':
+                $this->addCssFile(asset('/applications/dashboard/design/style-compat.css', true), false, ['Sort' => -9.999]);
                 $this->addCssFile('custom.css', false, ['Sort' => 1000]);
 
                 if (Gdn::controller()->Theme && Gdn::controller()->ThemeOptions) {
@@ -136,6 +147,43 @@ class AssetModel extends Gdn_Model {
         usort($paths, ['AssetModel', '_comparePath']);
 
         return $paths;
+    }
+
+    public function getAddonJsFiles($themeType, $basename, $eTag) {
+        $basename = $basename === 'style' ? 'app' : $basename;
+
+        if (!in_array($basename, ['app', 'admin'], true)) {
+            trigger_error("Unknown core js basename: $basename");
+            return [];
+        }
+
+        // Add the lib.
+        $libs = [
+            "/js/$basename/lib-core-$basename.js"
+        ];
+
+        // Loop through the enabled addons and get their javascript.
+        $addons = [];
+        foreach ($this->addonManager->getEnabled() as $addon) {
+            /* @var Addon $addon */
+            if ($addon->getType() !== Addon::TYPE_ADDON) {
+                continue;
+            }
+
+            $build = $addon->getInfoValue('build', []);
+            if (!empty($build['exports'][$basename])) {
+                $libs[] = $addon->path("/js/$basename/lib-".$addon->getKey()."-$basename.js", Addon::PATH_ADDON);
+            }
+            if (!empty($build['entries'][$basename])) {
+                $addons[] = $addon->path("/js/$basename/".$addon->getKey()."-$basename.js", Addon::PATH_ADDON);
+            }
+        }
+
+        // Add the bootstrap after everything else.
+        $addons[] = "/js/bootstrap-$basename/core-bootstrap-$basename.js";
+        $result = array_merge($libs, $addons);
+
+        return $result;
     }
 
     /**

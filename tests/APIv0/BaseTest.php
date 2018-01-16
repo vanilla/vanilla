@@ -1,7 +1,7 @@
 <?php
 /**
  * @author Todd Burry <todd@vanillaforums.com>
- * @copyright 2009-2017 Vanilla Forums Inc.
+ * @copyright 2009-2018 Vanilla Forums Inc.
  * @license Proprietary
  */
 
@@ -9,8 +9,9 @@ namespace VanillaTests\APIv0;
 
 
 use Garden\Http\HttpResponse;
+use PHPUnit\Framework\TestCase;
 
-abstract class BaseTest extends \PHPUnit\Framework\TestCase {
+abstract class BaseTest extends TestCase {
     /** @var APIv0  $api */
     protected static $api;
 

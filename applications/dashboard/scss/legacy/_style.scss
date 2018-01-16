@@ -2192,7 +2192,7 @@ blockquote.Quote, blockquote.UserQuote {
   border-left: 4px solid $grey-5;
   border-left: 4px solid rgba(0, 0, 0, 0.1);
   min-width: 200px;
-  overflow-y: auto;
+  overflow-y: initial;
 }
 
 .Message small {

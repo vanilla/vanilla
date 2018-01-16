@@ -2,7 +2,7 @@
 /**
  * Manages users manually authenticating (signing in).
  *
- * @copyright 2009-2017 Vanilla Forums Inc.
+ * @copyright 2009-2018 Vanilla Forums Inc.
  * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
  * @package Dashboard
  * @since 2.0
@@ -532,7 +532,7 @@ class EntryController extends Gdn_Controller {
 
                 // Don't overwrite the user photo if the user uploaded a new one.
                 $photo = val('Photo', $user);
-                if (!val('Photo', $data) || ($photo && !isUrl($photo))) {
+                if ($photo && !isUrl($photo)) {
                     unset($data['Photo']);
                 }
 

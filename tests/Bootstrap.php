@@ -1,7 +1,7 @@
 <?php
 /**
  * @author Todd Burry <todd@vanillaforums.com>
- * @copyright 2009-2017 Vanilla Forums Inc.
+ * @copyright 2009-2018 Vanilla Forums Inc.
  * @license GPLv2
  */
 
@@ -17,6 +17,7 @@ use Psr\Log\LoggerInterface;
 use Vanilla\Addon;
 use Vanilla\AddonManager;
 use Vanilla\InjectableInterface;
+use VanillaTests\Fixtures\NullCache;
 
 /**
  * Run bootstrap code for Vanilla tests.
@@ -72,9 +73,10 @@ class Bootstrap {
             ->addCall('setDependencies')
 
             // Cache
+            ->setInstance(NullCache::class, new NullCache())
+
             ->rule(\Gdn_Cache::class)
-            ->setShared(true)
-            ->setFactory(['Gdn_Cache', 'initialize'])
+            ->setAliasOf(NullCache::class)
             ->addAlias('Cache')
 
             // Configuration
@@ -193,6 +195,10 @@ class Bootstrap {
             ->rule(\Gdn_Plugin::class)
             ->setShared(true)
             ->addCall('setAddonFromManager')
+
+            ->rule(\Vanilla\FileUtils::class)
+            ->setAliasOf(\VanillaTests\Fixtures\FileUtils::class)
+            ->addAlias('FileUtils')
         ;
     }
 

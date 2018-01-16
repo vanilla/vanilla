@@ -1,14 +1,15 @@
 <?php
 /**
- * @copyright 2009-2017 Vanilla Forums Inc.
+ * @copyright 2009-2018 Vanilla Forums Inc.
  * @license GPLv2
  */
 
 namespace VanillaTests\Library\Vanilla;
 
+use PHPUnit\Framework\TestCase;
 use Vanilla\Permissions;
 
-class PermissionsTest extends \PHPUnit\Framework\TestCase {
+class PermissionsTest extends TestCase {
 
     public function testAdd() {
         $permissions = new Permissions();
@@ -353,6 +354,46 @@ class PermissionsTest extends \PHPUnit\Framework\TestCase {
 
         $ban = $perm->getBan();
         $this->assertEquals(Permissions::BAN_DELETED, $ban['type']);
+    }
+
+    /**
+     * Test a basic JSON serialize array.
+     */
+    public function testJsonSerialize() {
+        $permissions = new Permissions();
+
+        $permissions->setPermissions([
+            'Vanilla.Discussions.Add',
+            'Vanilla.Discussions.Edit',
+            'Vanilla.Comments.Add' => [10],
+            'Vanilla.Comments.Edit' => [10]
+        ]);
+
+        $json = $permissions->jsonSerialize();
+        $this->assertEquals([
+            'discussions.add' => true,
+            'discussions.edit' => true,
+            'comments.add' => [10],
+            'comments.edit' => [10]
+        ], $json['permissions']);
+    }
+
+    /**
+     * Test a per-category permission, but with a global override to true.
+     */
+    public function testJsonSerializeGlobalOverride() {
+        $permissions = new Permissions();
+
+        $permissions->set('Vanilla.Discussions.Add', true);
+        $permissions->set('Vanilla.Discussions.Edit', false);
+        $permissions->add('Vanilla.Discussions.Add', [10]);
+        $permissions->add('Vanilla.Discussions.Edit', [10]);
+
+        $json = $permissions->jsonSerialize();
+        $this->assertEquals([
+            'discussions.add' => true,
+            'discussions.edit' => [10],
+        ], $json['permissions']);
     }
 
     /**

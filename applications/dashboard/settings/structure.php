@@ -4,7 +4,7 @@
 /**
  * Dashboard database structure.
  *
- * @copyright 2009-2017 Vanilla Forums Inc.
+ * @copyright 2009-2018 Vanilla Forums Inc.
  * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
  * @package Dashboard
  * @since 2.0
@@ -307,13 +307,20 @@ $transientKeyExists = $Construct->columnExists('TransientKey');
 if ($transientKeyExists) {
     $Construct->dropColumn('TransientKey');
 }
+$dateExpireExists = $Construct->columnExists('DateExpire');
+if ($dateExpireExists) {
+    $Construct->renameColumn('DateExpire', 'DateExpires');
+}
 
 $Construct
     ->column('SessionID', 'char(32)', false, 'primary')
     ->column('UserID', 'int', 0)
     ->column('DateInserted', 'datetime', false)
-    ->column('DateUpdated', 'datetime', null)
-    ->column('DateExpire', 'datetime', null, 'index')
+    ->column('DateUpdated', 'datetime', null);
+if (!$dateExpireExists) {
+    $Construct->column('DateExpires', 'datetime', null, 'index');
+}
+$Construct
     ->column('Attributes', 'text', null)
     ->set($Explicit, $Drop);
 

@@ -1,21 +1,21 @@
 <?php
 /**
  * @author Todd Burry <todd@vanillaforums.com>
- * @copyright 2009-2017 Vanilla Forums Inc.
+ * @copyright 2009-2018 Vanilla Forums Inc.
  * @license GPLv2
  */
 
 namespace VanillaTests\Model;
 
+use PHPUnit\Framework\TestCase;
 use Garden\Container\Container;
-use Vanilla\AddonManager;
 use VanillaTests\Bootstrap;
 use VanillaTests\TestInstallModel;
 
 /**
  * Test basic Vanilla installation.
  */
-class InstallTest extends \PHPUnit\Framework\TestCase {
+class InstallTest extends TestCase {
     /**
      * Test installing Vanilla with the {@link \Vanilla\Models\InstallModel}.
      */

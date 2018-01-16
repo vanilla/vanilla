@@ -1,12 +1,13 @@
 <?php
 /**
  * @author Todd Burry <todd@vanillaforums.com>
- * @copyright 2009-2017 Vanilla Forums Inc.
+ * @copyright 2009-2018 Vanilla Forums Inc.
  * @license GPLv2
  */
 
 namespace VanillaTests\Library\Garden\Web;
 
+use PHPUnit\Framework\TestCase;
 use Garden\Web\Action;
 use Garden\Web\ResourceRoute;
 use Garden\Web\Route;
@@ -16,7 +17,7 @@ use VanillaTests\Fixtures\Request;
 /**
  * Test the {@link ResourceRoute} class.
  */
-class ResourceRouteTest extends \PHPUnit\Framework\TestCase {
+class ResourceRouteTest extends TestCase {
     /**
      * Create a new {@link ResourceRoute} initialized for testing with fixtures.
      */
@@ -226,7 +227,7 @@ class ResourceRouteTest extends \PHPUnit\Framework\TestCase {
     /**
      * Test that correct casing on method names is enforced.
      *
-     * @expectedException \PHPUnit_Framework_Error_Notice
+     * @expectedException \PHPUnit\Framework\Error\Notice
      */
     public function testMethodCaseSensitivity() {
 //        post_noMap($query, $body, $data)

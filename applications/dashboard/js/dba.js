@@ -30,9 +30,7 @@ jQuery(document).ready(function($) {
                 url += '&' + $.param(job.args);
             }
 
-            if ($('.TinyProgress', $row).length == 0) {
-                $row.append('<span class="TinyProgress">&nbsp;</span>');
-            }
+            $('.TinyProgress, .DBA-percentage', $row).show();
 
             $.ajax({
                 url: url,
@@ -54,16 +52,16 @@ jQuery(document).ready(function($) {
                         if (result.Percent) {
                             count = count + ' • ' + result.Percent;
                         }
-                        $('.Count', $row).show().text(count);
+                        $('.Count', $row).text(count);
                     } else if (result.Percent) {
-                        $('.Count', $row).show().text(result.Percent);
+                        $('.Count', $row).text(result.Percent);
                     }
 
                     if (result.Complete) {
                         jobs[id].complete = true;
-
+                        $('.Count', $row).text('100%');
                         $('.TinyProgress', $row).remove();
-                        $row.addClass('Complete');
+                        $row.find('.js-onComplete').addClass('Complete');
                     }
 
                     if (result.Args) {

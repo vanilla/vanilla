@@ -3,7 +3,7 @@
  * ProfileExtender Plugin.
  *
  * @author Lincoln Russell <lincoln@vanillaforums.com>
- * @copyright 2009-2017 Vanilla Forums Inc.
+ * @copyright 2009-2018 Vanilla Forums Inc.
  * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
  * @package ProfileExtender
  */
@@ -404,6 +404,8 @@ class ProfileExtenderPlugin extends Gdn_Plugin {
         try {
             // Get the custom fields
             $ProfileFields = Gdn::userModel()->getMeta($Sender->User->UserID, 'Profile.%', 'Profile.');
+
+            Gdn::controller()->setData('ExtendedFields', $ProfileFields);
 
             // Get allowed GDN_User fields.
             $Blacklist = array_combine($this->ReservedNames, $this->ReservedNames);

@@ -1,7 +1,7 @@
 <?php
 /**
  * @author Todd Burry <todd@vanillaforums.com>
- * @copyright 2009-2017 Vanilla Forums Inc.
+ * @copyright 2009-2018 Vanilla Forums Inc.
  * @license GPLv2
  */
 
@@ -14,57 +14,6 @@ abstract class AbstractApiController extends \Vanilla\Web\Controller {
 
     /** @var Schema */
     private $postFragmentSchema;
-
-    /**
-     * If the parameter value is a valid date filter value, return an array of query conditions.
-     *
-     * @param string $param The name of the parameter in the request (e.g. dateInserted).
-     * @param array $data Request data, such as the query.
-     * @param string $field A column name override. If none is provided, the value for $param is used.
-     * @return array|bool
-     */
-    public function dateFilterField($param, array $data, $field = null) {
-        if ($field === null) {
-            $field = $param;
-        }
-        $validOperators = ['=', '>', '<', '>=', '<=', '[]', '()', '[)', '(]'];
-        $result = false;
-
-        if (array_key_exists($param, $data)) {
-            $value = $data[$param];
-            if (array_key_exists('op', $value) && array_key_exists('value', $value)) {
-                $op = $value['op'];
-                $value = $value['value'];
-
-                if (in_array($op, $validOperators)) {
-                    switch ($op) {
-                        case '>':
-                        case '<':
-                        case '>=':
-                        case '<=':
-                            if ($value instanceof DateTimeImmutable) {
-                                $result = ["{$field} {$op}" => $value];
-                            }
-                            break;
-                        case '=':
-                        case '[]':
-                        case '()':
-                        case '[)':
-                        case '(]':
-                            // DateFilterSchema has already taken care of any inclusive/exclusive range adjustments.
-                            if (is_array($value) && count($value) == 2) {
-                                $result = [
-                                    "{$field} >=" => $value[0],
-                                    "{$field} <=" => $value[1],
-                                ];
-                            }
-                    }
-                }
-            }
-        }
-
-        return $result;
-    }
 
     /**
      * Filter unwanted values from an array (particularly empty values from request parameters).
@@ -94,27 +43,6 @@ abstract class AbstractApiController extends \Vanilla\Web\Controller {
         if (array_key_exists($field, $row)) {
             $row[$field] = Gdn_Format::to($row[$field], $format) ?: '<!-- empty -->';
         }
-    }
-
-    /**
-     * Get an "expand" parameter definition with specific fields.
-     *
-     * @param array $fields Valid values for the expand parameter.
-     * @param bool|string $default The default value of expand.
-     * @return array
-     */
-    public function getExpandDefinition(array $fields, $default = false) {
-        $result = [
-            'description' => 'Expand associated records using one or more valid field names. A boolean true expands all expandable fields.',
-            'default' => $default,
-            'items' => [
-                'enum' => $fields,
-                'type' => 'string'
-            ],
-            'style' => 'form',
-            'type' => ['boolean', 'array'],
-        ];
-        return $result;
     }
 
     /**

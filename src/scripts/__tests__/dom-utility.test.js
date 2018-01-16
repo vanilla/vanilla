@@ -5,7 +5,6 @@
  */
 
 import * as domUtility from "../dom-utility";
-import { polyfillClosest } from "../polyfills";
 
 const input = `<script>alert("Got you!")</script>`;
 const output = `&lt;script&gt;alert("Got you!")&lt;/script&gt;`;

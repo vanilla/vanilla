@@ -615,8 +615,15 @@ class Gdn_Controller extends Gdn_Pluggable {
             $this->_Definitions['Search'] = t('Search');
         }
 
+        if (debug()) {
+            $this->_Definitions['debug'] = true;
+        }
+
         // Output a JavaScript object with all the definitions.
-        $result = 'gdn=window.gdn||{};gdn.meta='.json_encode($this->_Definitions).';';
+        $result = 'gdn=window.gdn||{};'.
+            'gdn.meta='.json_encode($this->_Definitions).';'.
+            'gdn.permissions='.json_encode(Gdn::session()->getPermissions()).';';
+
         if ($wrap) {
             $result = "<script>$result</script>";
         }

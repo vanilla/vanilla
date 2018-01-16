@@ -8,7 +8,7 @@ if (!$CancelUrl) {
     }
 }
 
-$isEditMode = !property_exists($this, 'Discussion') || !is_object($this->Discussion);
+$isEditMode = property_exists($this, 'Discussion') || is_object($this->Discussion);
 ?>
 
 <div id="DiscussionForm" class="FormTitleWrapper DiscussionForm">
@@ -18,12 +18,7 @@ $isEditMode = !property_exists($this, 'Discussion') || !is_object($this->Discuss
     }
     echo '<div class="FormWrapper">';
 
-    $formOptions = [
-        "data-endpoint" => "/discussions",
-        "data-submit-type" => $isEditMode ? "PATCH" : "POST",
-    ];
-
-    echo $this->Form->open($formOptions);
+    echo $this->Form->open(["data-submit-type" => "discussions"]);
     echo $this->Form->errors();
 
     $this->fireEvent('BeforeFormInputs');
@@ -76,7 +71,7 @@ $isEditMode = !property_exists($this, 'Discussion') || !is_object($this->Discuss
     echo '<div class="Buttons">';
     $this->fireEvent('BeforeFormButtons');
     echo $this->Form->button((property_exists($this, 'Discussion')) ? 'Save' : 'Post Discussion', ['class' => 'Button Primary DiscussionButton']);
-    if ($isEditMode || (property_exists($this, 'Draft') && is_object($this->Draft))) {
+    if (!$isEditMode || (property_exists($this, 'Draft') && is_object($this->Draft))) {
         echo $this->Form->button('Save Draft', ['class' => 'Button DraftButton']);
     }
     echo $this->Form->button('Preview', ['class' => 'Button PreviewButton']);

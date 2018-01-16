@@ -12,6 +12,7 @@
                 "./src/scripts/utility",
                 "./src/scripts/dom-utility",
                 "./src/scripts/api-utility",
+                "./src/scripts/ApiCaller",
                 "axios",
                 "react",
                 "react-dom"

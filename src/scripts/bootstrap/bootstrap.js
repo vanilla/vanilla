@@ -14,3 +14,7 @@ loadPolyfills().then(() => {
         utility.log("Bootstrapping complete.");
     });
 });
+
+document.addEventListener("HTMLEvents", () => {
+    console.log("Event!");
+});

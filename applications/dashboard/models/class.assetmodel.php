@@ -152,7 +152,7 @@ class AssetModel extends Gdn_Model {
     public function getAddonJsFiles($themeType, $basename, $eTag) {
         $basename = $basename === 'style' ? 'app' : $basename;
 
-        if (c("HotReload.Enabled", true)) {
+        if (c("HotReload.Enabled", false)) {
             return [
                 "http://127.0.0.1:3030/$basename-hot-bundle.js"
             ];

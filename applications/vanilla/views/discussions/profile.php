@@ -11,7 +11,7 @@ if (is_object($this->DiscussionData) && $this->DiscussionData->numRows() > 0) {
     include($ViewLocation);
     echo $this->Pager->toString('more');
 } elseif ($this->data('UnfilteredDiscussionsCount', 0) > 0) {
-    echo '<li class="Item Empty">'.t('Every discussions on this page have been filtered out because you do not have the permission to see them.').'</li>';
+    echo '<li class="Item Empty">'.t('You do not have access to any discussions on this page.').'</li>';
     echo $this->Pager->toString('more');
 } else {
     echo wrap(t("This user has not made any discussions yet."), 'li', ['Class' => 'Item Empty']);

@@ -8,7 +8,7 @@ if (sizeof($this->data('Comments'))) {
     echo $this->fetchView('profilecomments', 'Discussion', 'Vanilla');
     echo $this->Pager->toString('more');
 } elseif ($this->data('UnfilteredCommentsCount', 0) > 0) {
-    echo '<li class="Item Empty">'.t('Every comments on this page have been filtered out because you do not have the permission to see them.').'</li>';
+    echo '<li class="Item Empty">'.t('You do not have access to any comments on this page.').'</li>';
     echo $this->Pager->toString('more');
 } else {
     echo '<li class="Item Empty">'.t('This user has not commented yet.').'</li>';

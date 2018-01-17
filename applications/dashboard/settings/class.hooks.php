@@ -10,6 +10,8 @@
 
 use Garden\Container\Container;
 use Garden\Container\Reference;
+use Garden\Web\Exception\ClientException;
+use Vanilla\Exception\PermissionException;
 
 /**
  * Event handlers for the Dashboard application.
@@ -654,6 +656,23 @@ class DashboardHooks extends Gdn_Plugin {
             }
         }
         $this->checkAccessToken();
+    }
+
+    /**
+     * Check to see if a user is banned.
+     *
+     * @throws Exception if the user is banned.
+     */
+    public function base_afterSignIn_handler() {
+        if ($ban = Gdn::session()->getPermissions()->getBan([])) {
+            throw new ClientException($ban['msg'], 401, $ban);
+        } else if (!Gdn::session()->isValid()) {
+            if (!Gdn::session()->getPermissions()->has('Garden.SignIn.Allow')) {
+                throw new PermissionException('Garden.SignIn.Allow');
+            } else {
+                throw new ClientException('The session could not be started', 401);
+            }
+        }
     }
 
     /**

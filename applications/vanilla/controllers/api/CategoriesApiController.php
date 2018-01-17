@@ -367,6 +367,40 @@ class CategoriesApiController extends AbstractApiController {
     }
 
     /**
+     * Set the "follow" status on a category for the current user.
+     *
+     * @param int $id The target category's ID.
+     * @return array
+     */
+    public function put_follow($id, array $body) {
+        $this->permission('Garden.SignIn.Allow');
+
+        $schema = ['follow:b' => 'The category-follow status for the current user.'];
+        $in = $this->schema($schema);
+        $out = $this->schema($schema);
+
+        $category = $this->category($id);
+        $body = $in->validate($body);
+        $userID = $this->getSession()->UserID;
+        $followed = $this->categoryModel->getFollowed($userID);
+
+        // Is this a new follow?
+        if ($body['follow'] && !array_key_exists($id, $followed)) {
+            $this->permission('Vanilla.Discussions.View', $category['PermissionCategoryID']);
+            if (count($followed) >= $this->categoryModel->getMaxFollowedCategories()) {
+                throw new ClientException('Already following the maximum number of categories.');
+            }
+        }
+
+        $this->categoryModel->follow($userID, $id, $body['follow']);
+
+        $result = $out->validate([
+            'follow' => $this->categoryModel->isFollowed($userID, $id)
+        ]);
+        return $result;
+    }
+
+    /**
      * Normalize request data to be passed to a model.
      *
      * @param array $request

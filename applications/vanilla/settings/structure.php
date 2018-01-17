@@ -164,8 +164,12 @@ $Construct->table('UserCategory')
     ->column('UserID', 'int', false, 'primary')
     ->column('CategoryID', 'int', false, 'primary')
     ->column('DateMarkedRead', 'datetime', null)
-    ->column('Unfollow', 'tinyint(1)', 0)
-    ->set($Explicit, $Drop);
+    ->column('Follow', 'tinyint(1)', 0);
+
+// This column should be removed when muting categories is dropped in favor of category following..
+$Construct->column('Unfollow', 'tinyint(1)', 0);
+
+$Construct->set($Explicit, $Drop);
 
 // Allows the tracking of relationships between discussions and users (bookmarks, dismissed announcements, # of read comments in a discussion, etc)
 // column($Name, $Type, $Length = '', $Null = FALSE, $Default = null, $KeyType = FALSE, $AutoIncrement = FALSE)

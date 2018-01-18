@@ -338,17 +338,18 @@ class CategoryModel extends Gdn_Model {
             throw new InvalidArgumentException('Invalid $categoryID');
         }
 
+        $isFollowed = $this->isFollowed($userID, $categoryID);
+        if ($follow === null) {
+            $follow = !$isFollowed;
+        }
+        $follow = $follow ? 1 : 0;
+
         $category = static::categories($categoryID);
         if (!is_array($category)) {
             throw new InvalidArgumentException('Category not found.');
-        } elseif ($category['DisplayAs'] !== 'Discussions') {
+        } elseif ($category['DisplayAs'] !== 'Discussions' && !$isFollowed) {
             throw new InvalidArgumentException('Category not configured to display as discussions.');
         }
-
-        if ($follow === null) {
-            $follow = !$this->isFollowed($userID, $categoryID);
-        }
-        $follow = $follow ? 1 : 0;
 
         $this->SQL->replace(
             'UserCategory',

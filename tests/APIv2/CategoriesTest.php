@@ -82,7 +82,6 @@ class CategoriesTest extends AbstractResourceTest {
         return $record;
     }
 
-
     /**
      * Test flagging (and unflagging) a category as followed by the current user.
      */
@@ -223,5 +222,35 @@ class CategoriesTest extends AbstractResourceTest {
             "{$this->baseUrl}/{$row[$this->pk]}",
             ['parentCategoryID' => $child[$this->pk]]
         );
+    }
+
+    /**
+     * Test unfollowing a category after its display type has changed to something incompatible with following.
+     */
+    public function testUnfollowDisplay() {
+        $record = $this->record();
+        $record['displayAs'] = 'discussions';
+        $row = $this->testPost($record);
+
+        $follow = $this->api()->put("{$this->baseUrl}/{$row[$this->pk]}/follow", ['follow' => true]);
+        $this->assertEquals(200, $follow->getStatusCode());
+        $followBody = $follow->getBody();
+        $this->assertTrue($followBody['follow']);
+
+        $index = $this->api()->get($this->baseUrl, ['parentCategoryID' => self::PARENT_CATEGORY_ID])->getBody();
+        $categories = array_column($index, null, 'categoryID');
+        $this->assertArrayHasKey($row['categoryID'], $categories);
+        $this->assertTrue($categories[$row['categoryID']]['follow']);
+
+        $this->api()->patch("{$this->baseUrl}/{$row[$this->pk]}", ['displayAs' => 'categories']);
+
+        $follow = $this->api()->put("{$this->baseUrl}/{$row[$this->pk]}/follow", ['follow' => false]);
+        $this->assertEquals(200, $follow->getStatusCode());
+        $followBody = $follow->getBody();
+        $this->assertFalse($followBody['follow']);
+
+        $index = $this->api()->get($this->baseUrl, ['parentCategoryID' => self::PARENT_CATEGORY_ID])->getBody();
+        $categories = array_column($index, null, 'categoryID');
+        $this->assertFalse($categories[$row['categoryID']]['follow']);
     }
 }

@@ -6,17 +6,19 @@
  */
 
 namespace Garden\Web;
+use Traversable;
 
+use Garden\MetaTrait;
 use DateTime;
 use DateTimeInterface;
 
 /**
  * Represents the data in a web response.
  */
-class Data implements \JsonSerializable, \ArrayAccess {
-    private $data;
+class Data implements \JsonSerializable, \ArrayAccess, \Countable, \IteratorAggregate  {
+    use MetaTrait;
 
-    private $meta;
+    private $data;
 
     /**
      * Create a {@link Data} instance representing the data in a web response.
@@ -24,7 +26,7 @@ class Data implements \JsonSerializable, \ArrayAccess {
      * @param mixed $data The main response data.
      * @param array|int $meta Either an array of meta information or an integer HTTP response status.
      */
-    public function __construct($data, $meta = []) {
+    public function __construct($data = [], $meta = []) {
         $this->data = $data;
 
         if (is_int($meta)) {
@@ -84,6 +86,26 @@ class Data implements \JsonSerializable, \ArrayAccess {
     }
 
     /**
+     * Add another data object as a sub array of this data.
+     *
+     * @param array|Data $data The data to add.
+     * @param string $key The key to add the data to.
+     * @param bool $mergeMeta Whether or not to merge the meta array.
+     * @return $this
+     */
+    public function addData($data, $key, $mergeMeta = false) {
+        if (is_array($data)) {
+            $this->data[$key] = $data;
+        } else {
+            $this->data[$key] = $data->getData();
+            if ($mergeMeta) {
+                $this->mergeMetaArray($data->getMetaArray());
+            }
+        }
+        return $this;
+    }
+
+    /**
      * Get the HTTP status.
      *
      * @return int Returns the status.
@@ -106,49 +128,6 @@ class Data implements \JsonSerializable, \ArrayAccess {
      */
     public function setStatus($status) {
         return $this->setMeta('status', $status);
-    }
-
-    /**
-     * Get a single item from the meta array.
-     *
-     * @param string $name The key to get from.
-     * @param mixed $default The default value if no item at the key exists.
-     * @return mixed Returns the meta value.
-     */
-    public function getMeta($name, $default = null) {
-        return isset($this->meta[$name]) ? $this->meta[$name] : $default;
-    }
-
-    /**
-     * Set a single item to the meta array.
-     *
-     * @param string $name The key to set.
-     * @param mixed $value The new value.
-     * @return $this
-     */
-    public function setMeta($name, $value) {
-        $this->meta[$name] = $value;
-        return $this;
-    }
-
-    /**
-     * Get the entire meta array.
-     *
-     * @return array Returns the meta.
-     */
-    public function getMetaArray() {
-        return $this->meta;
-    }
-
-    /**
-     * Set the entire meta array.
-     *
-     * @param array $meta The new meta array.
-     * @return $this
-     */
-    public function setMetaArray(array $meta) {
-        $this->meta = $meta;
-        return $this;
     }
 
     /**
@@ -206,7 +185,9 @@ class Data implements \JsonSerializable, \ArrayAccess {
         $result = [];
 
         foreach ($this->meta as $key => $value) {
-            if ($key === 'CONTENT_TYPE' || substr_compare($key, 'HTTP_', 0, 5, true) === 0) {
+            if ($key === 'CONTENT_TYPE') {
+                $result['Content-Type'] = $value;
+            } elseif (substr_compare($key, 'HTTP_', 0, 5, true) === 0) {
                 $headerKey = $this->headerName(substr($key, 5));
 
                 $result[$headerKey] = $value;
@@ -243,6 +224,7 @@ class Data implements \JsonSerializable, \ArrayAccess {
             return $name;
         } else {
             $parts = explode('_', $name);
+
             $result = implode('-', array_map(function ($part) use ($special) {
                 $r = ucfirst(strtolower($part));
                 return isset($special[$r]) ? $special[$r] : $r;
@@ -393,5 +375,25 @@ class Data implements \JsonSerializable, \ArrayAccess {
             }
             return $result;
         }
+    }
+
+    /**
+     * Count elements of an object.
+     *
+     * @link http://php.net/manual/en/countable.count.php
+     * @return int The custom count as an integer.
+     */
+    public function count() {
+        return count($this->data);
+    }
+
+    /**
+     * Retrieve an external iterator.
+     *
+     * @return Traversable An instance of an object implementing <b>Iterator</b> or <b>Traversable</b>.
+     * @link http://php.net/manual/en/iteratoraggregate.getiterator.php
+     */
+    public function getIterator() {
+        return new \ArrayIterator($this->data);
     }
 }

@@ -28,7 +28,7 @@ class CategoriesApiController extends AbstractApiController {
     private $idParamSchema;
 
     /**
-     * CategoriessApiController constructor.
+     * CategoriesApiController constructor.
      *
      * @param CategoryModel $categoryModel
      */
@@ -133,7 +133,8 @@ class CategoriesApiController extends AbstractApiController {
             'countDiscussions:i' => 'Total discussions in the category.',
             'countComments:i' => 'Total comments in the category.',
             'countAllDiscussions:i' => 'Total of all discussions in a category and its children.',
-            'countAllComments:i' => 'Total of all comments in a category and its children.'
+            'countAllComments:i' => 'Total of all comments in a category and its children.',
+            'follow:b?' => 'Is the category being followed by the current user?'
         ]);
     }
 
@@ -277,6 +278,8 @@ class CategoriesApiController extends AbstractApiController {
             $parent = $this->category(-1);
         }
 
+        $joinUserCategory = $this->categoryModel->joinUserCategory();
+        $this->categoryModel->setJoinUserCategory(true);
         if ($parent['DisplayAs'] === 'Flat') {
             list($offset, $limit) = offsetLimit("p{$query['page']}", $this->categoryModel->getDefaultLimit());
             $categories = $this->categoryModel->getTreeAsFlat(
@@ -287,6 +290,7 @@ class CategoriesApiController extends AbstractApiController {
         } else {
             $categories = $this->categoryModel->getTree($parent['CategoryID'], ['maxdepth' => $query['maxDepth']]);
         }
+        $this->categoryModel->setJoinUserCategory($joinUserCategory);
         $categories = array_map([$this, 'normalizeOutput'], $categories);
 
         return $out->validate($categories);

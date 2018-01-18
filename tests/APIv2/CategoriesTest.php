@@ -7,6 +7,8 @@
 
 namespace VanillaTests\APIv2;
 
+use CategoryModel;
+
 /**
  * Test the /api/v2/categories endpoints.
  */
@@ -78,6 +80,35 @@ class CategoriesTest extends AbstractResourceTest {
         ];
         static::$recordCounter++;
         return $record;
+    }
+
+
+    /**
+     * Test flagging (and unflagging) a category as followed by the current user.
+     */
+    public function testFollow() {
+        $record = $this->record();
+        $record['displayAs'] = 'discussions';
+        $row = $this->testPost($record);
+
+        $follow = $this->api()->put("{$this->baseUrl}/{$row[$this->pk]}/follow", ['follow' => true]);
+        $this->assertEquals(200, $follow->getStatusCode());
+        $followBody = $follow->getBody();
+        $this->assertTrue($followBody['follow']);
+
+        $index = $this->api()->get($this->baseUrl, ['parentCategoryID' => self::PARENT_CATEGORY_ID])->getBody();
+        $categories = array_column($index, null, 'categoryID');
+        $this->assertArrayHasKey($row['categoryID'], $categories);
+        $this->assertTrue($categories[$row['categoryID']]['follow']);
+
+        $follow = $this->api()->put("{$this->baseUrl}/{$row[$this->pk]}/follow", ['follow' => false]);
+        $this->assertEquals(200, $follow->getStatusCode());
+        $followBody = $follow->getBody();
+        $this->assertFalse($followBody['follow']);
+
+        $index = $this->api()->get($this->baseUrl, ['parentCategoryID' => self::PARENT_CATEGORY_ID])->getBody();
+        $categories = array_column($index, null, 'categoryID');
+        $this->assertFalse($categories[$row['categoryID']]['follow']);
     }
 
     /**

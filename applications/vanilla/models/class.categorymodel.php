@@ -229,6 +229,8 @@ class CategoryModel extends Gdn_Model {
             $following = !((bool)val('Archived', $category) || (bool)val('Unfollow', $userData, false));
             $category['Following'] = $following;
 
+            $category['Follow'] = boolval($userData['Follow']);
+
             // Calculate the read field.
             if (strcasecmp($category['DisplayAs'], 'heading') === 0) {
                 $category['Read'] = false;
@@ -1627,6 +1629,8 @@ class CategoryModel extends Gdn_Model {
                 // Calculate the following field.
                 $following = !((bool)val('Archived', $category) || (bool)val('Unfollow', $row, false));
                 $categories[$iD]['Following'] = $following;
+
+                $categories[$iD]['Follow'] = boolval($row['Follow']);
 
                 // Calculate the read field.
                 if ($category['DisplayAs'] == 'Heading') {

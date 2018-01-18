@@ -185,7 +185,7 @@ class Dispatcher {
     private function mergeMeta(Data $data, array $meta = null, $replace = false) {
         if (empty($meta)) {
             return;
-    }
+        }
 
         if ($replace) {
             $result = array_replace_recursive($data->getMetaArray(), $meta);

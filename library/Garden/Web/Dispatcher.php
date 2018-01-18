@@ -7,12 +7,17 @@
 
 namespace Garden\Web;
 
+use Gdn;
+use Gdn_Locale;
 use Garden\Web\Exception\NotFoundException;
 use Garden\Web\Exception\Pass;
 use Interop\Container\ContainerInterface;
 use Vanilla\Permissions;
 
 class Dispatcher {
+
+    /** @var Gdn_Locale */
+    private $locale;
 
     /**
      * @var array
@@ -32,9 +37,11 @@ class Dispatcher {
     /**
      * Dispatcher constructor.
      *
+     * @param Gdn_Locale $locale
      * @param ContainerInterface $container The container is used to fetch view handlers.
      */
-    public function __construct(ContainerInterface $container) {
+    public function __construct(Gdn_Locale $locale, ContainerInterface $container) {
+        $this->locale = $locale;
         $this->container = $container;
     }
 
@@ -100,10 +107,13 @@ class Dispatcher {
                         /* @var \Gdn_Request $request */
                         try {
                             $request->isAuthenticatedPostBack(true);
-                        } catch (\Exception $csrfEx) {
-                            \Gdn::session()->getPermissions()->addBan(
+                        } catch (\Exception $ex) {
+                            Gdn::session()->getPermissions()->addBan(
                                 Permissions::BAN_CSRF,
-                                ['msg' => t('Invalid CSRF token.', 'Invalid CSRF token. Please try again.'), 'code' => 403]
+                                [
+                                    'msg' => $this->locale->translate('Invalid CSRF token.', 'Invalid CSRF token. Please try again.'),
+                                    'code' => 403
+                                ]
                             );
                         }
                     }

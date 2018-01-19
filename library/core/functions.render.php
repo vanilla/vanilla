@@ -980,20 +980,20 @@ if (!function_exists('linkDropDown')) {
             }
         }
         $selectedLink = val($selectedKey, $links);
-        $output .= '<span class="ToggleFlyout selectBox '.trim($extraClasses).'">';
-        $output .= '  <span class="selectBox-label">';
-        $output .=      $label;
-        $output .= '  </span>';
-        $output .= '  <span class="selectBox-main">';
+        $extraClasses = trim($extraClasses);
+        $linkName = val('name', $selectedLink);
 
-        $output .= '      <a href="#" role="button" class="FlyoutButton selectBox-toggle" tabindex="0">';
-        $output .= '        <span class="selectBox-selected">';
-        $output .=            val('name', $selectedLink);
-        $output .= '        </span>';
-        $output .= '        <span class="vanillaDropDown-arrow">▾</span>';
-        $output .= '      </a>';
-        $output .= '      <span class="Flyout MenuItems selectBox-content">';
-        $output .= '        <ul class="selectBox-items" role="presentation">';
+        $output .= <<<EOT
+        <span class="ToggleFlyout selectBox {$extraClasses}">
+          <span class="selectBox-label">{$label}</span>
+          <span class="selectBox-main">
+              <a href="#" role="button" class="FlyoutButton selectBox-toggle" tabindex="0">
+                <span class="selectBox-selected">{$linkName}</span>
+                <span class="vanillaDropDown-arrow">▾</span>
+              </a>
+              <span class="Flyout MenuItems selectBox-content">
+                <ul class="selectBox-items" role="presentation">
+EOT;
         foreach($links as $i => $link) {
             if (val('active', $link)) {
                 $output .= '<li class="selectBox-item isActive" role="presentation">';
@@ -1015,11 +1015,19 @@ if (!function_exists('linkDropDown')) {
                 $output .= '</li>';
             }
         }
-        $output .= '        </ul>';
-        $output .= '      </span>';
-        $output .= '    </span>';
-        $output .= '  </span>';
-        $output .= '</span>';
+        $output .= <<<EOT
+                </ul>
+              </span>
+            </span>
+          </span>
+        </span>
+EOT;
+
+
+
+
+
+
         return $output;
     }
 }

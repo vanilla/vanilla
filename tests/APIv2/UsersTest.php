@@ -144,7 +144,7 @@ class UsersTest extends AbstractResourceTest {
         $newRow['photoUrl'] = $newRow['photo'];
         unset($newRow['photo']);
 
-        $this->assertRowsEqual($newRow, $r->getBody(), true);
+        $this->assertRowsEqual($newRow, $r->getBody());
 
         return $r->getBody();
     }

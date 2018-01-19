@@ -22,6 +22,11 @@ class Gdn_Session {
      */
     const CSRF_NAME = 'TransientKey';
 
+    /**
+     * CSRF tokens time to live.
+     */
+    const CSRF_TOKEN_TTL = 1200; // 20 minutes.
+
     /** @var int Unique user identifier. */
     public $UserID;
 
@@ -823,7 +828,7 @@ class Gdn_Session {
         static $csrfToken;
 
         if ($csrfToken === null || $forceNew) {
-            $expiration = time() + 1200; // 20 minutes;
+            $expiration = time() + self::CSRF_TOKEN_TTL;
             $csrfToken = betterRandomString(32);
 
             /** @var Gdn_CookieIdentity $identity */

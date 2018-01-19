@@ -229,6 +229,23 @@ body.Discussion a.Bookmark {
     padding: 8px;
 }
 
+.PageControls::after {
+    content: '';
+    clear: both;
+    display: table;
+}
+
+.PageControls .selectBox-following,
+.PageControls .ButtonGroup {
+    margin-top: 10px;
+    margin-bottom: 10px;
+    margin-right: 10px;
+}
+
+.PagerNub {
+    display: none;
+}
+
 .Pager {
     float: none;
     font-size: 120%;

@@ -665,7 +665,7 @@ class DashboardHooks extends Gdn_Plugin {
      */
     public function base_afterSignIn_handler() {
         if (!Gdn::session()->isValid()) {
-            if ($ban = Gdn::session()->getPermissions()->getBan([])) {
+            if ($ban = Gdn::session()->getPermissions()->getBan()) {
                 throw new ClientException($ban['msg'], 401, $ban);
             } else {
                 if (!Gdn::session()->getPermissions()->has('Garden.SignIn.Allow')) {

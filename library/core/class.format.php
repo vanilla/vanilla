@@ -1915,7 +1915,7 @@ EOT;
             }
 
             if ($mention) {
-                $parts[$i] = anchor('@'.$mention, url(str_replace('{name}', rawurlencode($mention), self::$MentionsUrlFormat), true)).$suffix;
+                $parts[$i] = anchor('@'.$mention, url(str_replace('{name}', rawurlencode($mention), self::$MentionsUrlFormat), true), '', ['rel' => 'nofollow']).$suffix;
             } else {
                 $parts[$i] = '@' . $parts[$i];
             }

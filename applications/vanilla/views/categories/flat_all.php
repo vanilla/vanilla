@@ -5,7 +5,7 @@
     }
 ?>
 
-<h1 class="H HomepageTitle"><?php echo $this->data('Title'); ?></h1>
+<h1 class="H HomepageTitle"><?php echo $this->data('Title').followButton(true); ?></h1>
 
 <?php
     if ($description = $this->description()) {

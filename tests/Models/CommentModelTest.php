@@ -7,6 +7,7 @@
 namespace VanillaTests\Models;
 
 use CommentModel;
+use DiscussionModel;
 use VanillaTests\SiteTestTrait;
 
 /**
@@ -19,20 +20,31 @@ class CommentModelTest extends \PHPUnit_Framework_TestCase {
      * Test the lookup method.
      */
     public function testLookup() {
-        $model = new CommentModel();
-        $fields = [
-            'DiscussionID' => 9999,
+        $commentModel = new CommentModel();
+        $discussionModel = new DiscussionModel();
+
+        $discussion = [
+            'CategoryID' => 1,
+            'Name' => 'Comment Lookup Test',
+            'Body' => 'foo foo foo',
+            'Format' => 'Text',
+            'InsertUserID' => 1
+        ];
+        $discussionID = $discussionModel->save($discussion);
+
+        $comment = [
+            'DiscussionID' => $discussionID,
             'Body' => 'Hello world.',
             'Format' => 'Text'
         ];
-        $id = $model->save($fields);
-        $this->assertNotFalse($id);
+        $commentID = $commentModel->save($comment);
+        $this->assertNotFalse($commentID);
 
-        $result = $model->lookup(['CommentID' => $id] + $fields);
+        $result = $commentModel->lookup(['CommentID' => $commentID] + $comment);
         $this->assertInstanceOf('Gdn_DataSet', $result);
         $this->assertEquals(1, $result->count());
 
         $row = $result->firstRow(DATASET_TYPE_ARRAY);
-        $this->assertEquals($id, $row['CommentID']);
+        $this->assertEquals($commentID, $row['CommentID']);
     }
 }

@@ -135,8 +135,16 @@ class DiscussionsApiController extends AbstractApiController {
     public function discussionPostSchema($type = '') {
         if ($this->discussionPostSchema === null) {
             $this->discussionPostSchema = $this->schema(
-                Schema::parse(
-                    ['name', 'body', 'format', 'categoryID', 'closed?', 'sink?', 'pinned?', 'pinLocation?'])->add($this->fullSchema()),
+                Schema::parse([
+                    'name',
+                    'body',
+                    'format:s' => 'The input format of the discussion.',
+                    'categoryID',
+                    'closed?',
+                    'sink?',
+                    'pinned?',
+                    'pinLocation?',
+                ])->add($this->fullSchema()),
                 'DiscussionPost'
             );
         }
@@ -285,8 +293,18 @@ class DiscussionsApiController extends AbstractApiController {
 
         $this->idParamSchema()->setDescription('Get a discussion for editing.');
         $out = $this->schema(
-            Schema::parse(['discussionID', 'name', 'body', 'format', 'categoryID', 'sink', 'closed', 'pinned', 'pinLocation']
-        )->add($this->fullSchema()), ['DiscussionGetEdit', 'out']);
+            Schema::parse([
+                'discussionID',
+                'name',
+                'body',
+                'format:s' => 'The input format of the discussion.',
+                'categoryID',
+                'sink',
+                'closed',
+                'pinned',
+                'pinLocation',
+            ])->add($this->fullSchema()
+        ), ['DiscussionGetEdit', 'out']);
 
         $row = $this->discussionByID($id);
         $row['Url'] = discussionUrl($row);

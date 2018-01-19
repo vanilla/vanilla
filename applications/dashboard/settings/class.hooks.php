@@ -664,13 +664,15 @@ class DashboardHooks extends Gdn_Plugin {
      * @throws Exception if the user is banned.
      */
     public function base_afterSignIn_handler() {
-        if ($ban = Gdn::session()->getPermissions()->getBan([])) {
-            throw new ClientException($ban['msg'], 401, $ban);
-        } else if (!Gdn::session()->isValid()) {
-            if (!Gdn::session()->getPermissions()->has('Garden.SignIn.Allow')) {
-                throw new PermissionException('Garden.SignIn.Allow');
+        if (!Gdn::session()->isValid()) {
+            if ($ban = Gdn::session()->getPermissions()->getBan([])) {
+                throw new ClientException($ban['msg'], 401, $ban);
             } else {
-                throw new ClientException('The session could not be started', 401);
+                if (!Gdn::session()->getPermissions()->has('Garden.SignIn.Allow')) {
+                    throw new PermissionException('Garden.SignIn.Allow');
+                } else {
+                    throw new ClientException('The session could not be started', 401);
+                }
             }
         }
     }

@@ -238,6 +238,7 @@ class SSOModel {
 
         if ($user) {
             $this->session->start($user['UserID']);
+            $this->userModel->fireEvent('AfterSignIn');
 
             // Allow user's synchronization
             $syncInfo = $this->config->get('Garden.Registration.ConnectSynchronize', true);

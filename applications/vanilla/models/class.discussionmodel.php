@@ -718,6 +718,21 @@ class DiscussionModel extends Gdn_Model {
             $sql->orderBy($this->addFieldPrefix($field), $direction);
         }
 
+        if (array_key_exists('Followed', $where)) {
+            if ($where['Followed']) {
+                $categoryModel = new CategoryModel();
+                $followed = $categoryModel->getFollowed(Gdn::session()->UserID);
+                $categoryIDs = array_column($followed, 'CategoryID');
+
+                if (isset($where['d.CategoryID'])) {
+                    $where['d.CategoryID'] = array_values(array_intersect((array)$where['d.CategoryID'], $categoryIDs));
+                } else {
+                    $where['d.CategoryID'] = $categoryIDs;
+                }
+            }
+            unset($where['Followed']);
+        }
+
         if ($perms !== true) {
             if (isset($where['d.CategoryID'])) {
                 $where['d.CategoryID'] = array_values(array_intersect((array)$where['d.CategoryID'], $perms));
@@ -1174,6 +1189,21 @@ class DiscussionModel extends Gdn_Model {
         }
 
         $this->discussionSummaryQuery([], false);
+
+        if (array_key_exists('Followed', $wheres)) {
+            if ($wheres['Followed']) {
+                $categoryModel = new CategoryModel();
+                $followed = $categoryModel->getFollowed(Gdn::session()->UserID);
+                $categoryIDs = array_column($followed, 'CategoryID');
+
+                if (isset($wheres['d.CategoryID'])) {
+                    $wheres['d.CategoryID'] = array_values(array_intersect((array)$wheres['d.CategoryID'], $categoryIDs));
+                } else {
+                    $wheres['d.CategoryID'] = $categoryIDs;
+                }
+            }
+            unset($wheres['Followed']);
+        }
 
         if (!empty($wheres)) {
             $this->SQL->where($wheres);

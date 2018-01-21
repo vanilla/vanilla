@@ -23,7 +23,7 @@
     ],
     "config": {
         "platform": {
-            "php": "5.6.31"
+            "php": "7.0.26"
         }
     },
     "require": {

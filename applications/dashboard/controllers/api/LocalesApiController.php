@@ -28,7 +28,11 @@ class LocalesApiController extends Controller {
     }
 
     /**
+     * Get the translations for a locale.
      *
+     * @param string $locale The locale slug.
+     * @param array $query Query string parameters.
+     * @return Data Returns the translations.
      */
     public function get_translations($locale, array $query = []) {
         $this->permission();
@@ -42,6 +46,7 @@ class LocalesApiController extends Controller {
 
         $this->locale->set($locale);
 
+        // Don't bother validating the translations since they are a free-form array.
         $translations = (array)$this->locale->getDefinitions();
 
         if (!empty($query['js'])) {

@@ -24,17 +24,6 @@ const toolbarOptions = [
 const options = {
     modules: {
         toolbar: toolbarOptions,
-        keyboard: {
-            bindings: {
-                tab: false,
-                handleEnter: {
-                    key: 13,
-                    handler: function() {
-                        // Do nothing
-                    }
-                }
-            }
-        }
         // autoLinker: true,
     },
     placeholder: "Create a new post...",

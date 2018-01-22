@@ -17,6 +17,12 @@ class QuillOperation {
     const LIST_TYPE_BULLET = "bullet";
     const LIST_TYPE_ORDERED = "ordered";
     const LIST_TYPE_NONE = "none";
+    const BLOCK_TYPE_PARAGRAPH = "paragraph";
+    const BLOCK_TYPE_CODE = "code";
+    const BLOCK_TYPE_BLOCKQUOTE = "blockquote";
+    const BLOCK_TYPE_HEADER = "header";
+    const BLOCK_TYPE_EMBED = "embed";
+    const BLOCK_TYPE_LIST = "list";
 
     private $allowedInsertTypes = [
         self::INSERT_TYPE_STRING,
@@ -29,14 +35,23 @@ class QuillOperation {
         self::LIST_TYPE_ORDERED,
     ];
 
+    private $allowedBlockTypes = [
+        self::BLOCK_TYPE_BLOCKQUOTE,
+        self::BLOCK_TYPE_CODE,
+        self::BLOCK_TYPE_EMBED,
+        self::BLOCK_TYPE_HEADER,
+        self::BLOCK_TYPE_PARAGRAPH,
+        self::BLOCK_TYPE_LIST,
+    ];
+
     /** @var string The content of the operation  */
     public $content = "";
 
     /** @var string The type of insert. */
     public $insertType = self::INSERT_TYPE_STRING;
 
-    /** @var bool Is the text formatted as a code block. */
-    public $codeBlock = false;
+    /** @var string The block type of the insert. */
+    public $blockType = self::BLOCK_TYPE_PARAGRAPH;
 
     /** @var bool Does the text have strike-through. */
     public $strike = false;
@@ -48,13 +63,13 @@ class QuillOperation {
     public $italic = false;
 
     /** @var string What type of list is the item. */
-    public $list = self::LIST_TYPE_NONE;
+    public $listType = self::LIST_TYPE_NONE;
 
     /** @var int What level of indentation does the item have. */
     public $indent = 0;
 
     /** @var int What level of heading is this item. */
-    public $header = 0;
+    public $headerLevel = 0;
 
     /** @var string|null Is this item a link? If so, what is the link. */
     public $link = null;
@@ -72,32 +87,47 @@ class QuillOperation {
         $attributes = val("attributes", $operationArray);
 
         if ($attributes) {
+            // Get Block Type
+            if (val("code-block", $attributes)) {
+                $this->blockType = self::BLOCK_TYPE_CODE;
+            } elseif (val("list", $attributes)) {
+                $this->blockType = self::BLOCK_TYPE_LIST;
+                if (val("indent", $attributes)) {
+                    $this->indent = val("indent", $attributes);
+                }
+            } elseif (val("header", $attributes)) {
+                $this->blockType = self::BLOCK_TYPE_HEADER;
+                $this->headerLevel = val("header", $attributes);
+            } elseif (val("blockquote", $attributes)) {
+                $this->blockType = self::BLOCK_TYPE_BLOCKQUOTE;
+            } else {
+                $this->blockType = self::BLOCK_TYPE_PARAGRAPH;
+            }
+
             // List values
             $list = val("list", $attributes);
 
             if ($list && in_array($list, $this->allowedListTypes)) {
-                $this->list = $list;
+                $this->listType = $list;
             }
 
             // Boolean Values
             $booleanAttributes = [
-                "codeBlock" => "code-block",
                 "strike",
                 "bold",
                 "italic",
             ];
 
-            foreach ($booleanAttributes as $key => $value) {
-                if (in_array($value, $booleanAttributes)) {
-                    $classKey = is_int($key) ? $value : $key;
-                    $this->{$value} = val($classKey, $attributes);
+            foreach ($booleanAttributes as $attr) {
+                if (val($attr, $attributes)) {
+                    $this->{$attr} = val($attr, $attributes);
                 }
             }
 
             // Numbered Values
             $numberedAttributes = [
                 "indent",
-                "header",
+                "headerLevel",
             ];
 
             foreach($numberedAttributes as $attr) {
@@ -106,8 +136,6 @@ class QuillOperation {
                 }
             }
         }
-
-        $this->validate();
     }
 
     /**
@@ -126,7 +154,15 @@ class QuillOperation {
 
         // Only one block level element may be active at a time.
 
-        if($this->header > 0)
+        $onlyOneCanBeTrue = [
+            $this->header > 0,
+            $this->code,
+            $this->blockquote,
+        ];
+
+        if (count(array_filter($onlyOneCanBeTrue)) > 1) {
+            return false;
+        }
 
         return true;
     }

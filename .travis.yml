@@ -14,11 +14,14 @@ before_script:
   - composer install --optimize-autoloader
   - composer require phpunit/phpunit ~5
   - tests/travis/setup.sh
+  - yarn
 
 # Cache Composer package files.
 cache:
   directories:
     - $HOME/.composer/cache/files
+    - node_modules
+  yarn: true
 
 # No additional system dependencies to install. Skip the install step.
 install: true
@@ -49,6 +52,7 @@ php:
 # Steps of the build script.
 script:
   - tests/travis/main.sh
+  - yarn run test
   - ls -lah ./conf
   - cat /tmp/error.log
   - cat /tmp/access.log

@@ -134,7 +134,7 @@ class CategoriesApiController extends AbstractApiController {
             'countComments:i' => 'Total comments in the category.',
             'countAllDiscussions:i' => 'Total of all discussions in a category and its children.',
             'countAllComments:i' => 'Total of all comments in a category and its children.',
-            'follow:b?' => 'Is the category being followed by the current user?'
+            'followed:b?' => 'Is the category being followed by the current user?'
         ]);
     }
 
@@ -389,7 +389,7 @@ class CategoriesApiController extends AbstractApiController {
     public function put_follow($id, array $body) {
         $this->permission('Garden.SignIn.Allow');
 
-        $schema = ['follow:b' => 'The category-follow status for the current user.'];
+        $schema = ['followed:b' => 'The category-follow status for the current user.'];
         $in = $this->schema($schema);
         $out = $this->schema($schema);
 
@@ -399,17 +399,17 @@ class CategoriesApiController extends AbstractApiController {
         $followed = $this->categoryModel->getFollowed($userID);
 
         // Is this a new follow?
-        if ($body['follow'] && !array_key_exists($id, $followed)) {
+        if ($body['followed'] && !array_key_exists($id, $followed)) {
             $this->permission('Vanilla.Discussions.View', $category['PermissionCategoryID']);
             if (count($followed) >= $this->categoryModel->getMaxFollowedCategories()) {
                 throw new ClientException('Already following the maximum number of categories.');
             }
         }
 
-        $this->categoryModel->follow($userID, $id, $body['follow']);
+        $this->categoryModel->follow($userID, $id, $body['followed']);
 
         $result = $out->validate([
-            'follow' => $this->categoryModel->isFollowed($userID, $id)
+            'followed' => $this->categoryModel->isFollowed($userID, $id)
         ]);
         return $result;
     }

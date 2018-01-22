@@ -90,24 +90,24 @@ class CategoriesTest extends AbstractResourceTest {
         $record['displayAs'] = 'discussions';
         $row = $this->testPost($record);
 
-        $follow = $this->api()->put("{$this->baseUrl}/{$row[$this->pk]}/follow", ['follow' => true]);
+        $follow = $this->api()->put("{$this->baseUrl}/{$row[$this->pk]}/follow", ['followed' => true]);
         $this->assertEquals(200, $follow->getStatusCode());
         $followBody = $follow->getBody();
-        $this->assertTrue($followBody['follow']);
+        $this->assertTrue($followBody['followed']);
 
         $index = $this->api()->get($this->baseUrl, ['parentCategoryID' => self::PARENT_CATEGORY_ID])->getBody();
         $categories = array_column($index, null, 'categoryID');
         $this->assertArrayHasKey($row['categoryID'], $categories);
-        $this->assertTrue($categories[$row['categoryID']]['follow']);
+        $this->assertTrue($categories[$row['categoryID']]['followed']);
 
-        $follow = $this->api()->put("{$this->baseUrl}/{$row[$this->pk]}/follow", ['follow' => false]);
+        $follow = $this->api()->put("{$this->baseUrl}/{$row[$this->pk]}/follow", ['followed' => false]);
         $this->assertEquals(200, $follow->getStatusCode());
         $followBody = $follow->getBody();
-        $this->assertFalse($followBody['follow']);
+        $this->assertFalse($followBody['followed']);
 
         $index = $this->api()->get($this->baseUrl, ['parentCategoryID' => self::PARENT_CATEGORY_ID])->getBody();
         $categories = array_column($index, null, 'categoryID');
-        $this->assertFalse($categories[$row['categoryID']]['follow']);
+        $this->assertFalse($categories[$row['categoryID']]['followed']);
     }
 
     /**
@@ -129,7 +129,7 @@ class CategoriesTest extends AbstractResourceTest {
 
         // Follow. Make sure we're following.
         $testCategoryID = self::PARENT_CATEGORY_ID;
-        $this->api()->put("{$this->baseUrl}/{$testCategoryID}/follow", ['follow' => true]);
+        $this->api()->put("{$this->baseUrl}/{$testCategoryID}/follow", ['followed' => true]);
         $postFollow = $this->api()->get($this->baseUrl, ['followed' => true])->getBody();
         $this->assertCount(1, $postFollow);
         $this->assertEquals($testCategoryID, $postFollow[0]['categoryID']);
@@ -248,25 +248,25 @@ class CategoriesTest extends AbstractResourceTest {
         $record['displayAs'] = 'discussions';
         $row = $this->testPost($record);
 
-        $follow = $this->api()->put("{$this->baseUrl}/{$row[$this->pk]}/follow", ['follow' => true]);
+        $follow = $this->api()->put("{$this->baseUrl}/{$row[$this->pk]}/follow", ['followed' => true]);
         $this->assertEquals(200, $follow->getStatusCode());
         $followBody = $follow->getBody();
-        $this->assertTrue($followBody['follow']);
+        $this->assertTrue($followBody['followed']);
 
         $index = $this->api()->get($this->baseUrl, ['parentCategoryID' => self::PARENT_CATEGORY_ID])->getBody();
         $categories = array_column($index, null, 'categoryID');
         $this->assertArrayHasKey($row['categoryID'], $categories);
-        $this->assertTrue($categories[$row['categoryID']]['follow']);
+        $this->assertTrue($categories[$row['categoryID']]['followed']);
 
         $this->api()->patch("{$this->baseUrl}/{$row[$this->pk]}", ['displayAs' => 'categories']);
 
-        $follow = $this->api()->put("{$this->baseUrl}/{$row[$this->pk]}/follow", ['follow' => false]);
+        $follow = $this->api()->put("{$this->baseUrl}/{$row[$this->pk]}/follow", ['followed' => false]);
         $this->assertEquals(200, $follow->getStatusCode());
         $followBody = $follow->getBody();
-        $this->assertFalse($followBody['follow']);
+        $this->assertFalse($followBody['followed']);
 
         $index = $this->api()->get($this->baseUrl, ['parentCategoryID' => self::PARENT_CATEGORY_ID])->getBody();
         $categories = array_column($index, null, 'categoryID');
-        $this->assertFalse($categories[$row['categoryID']]['follow']);
+        $this->assertFalse($categories[$row['categoryID']]['followed']);
     }
 }

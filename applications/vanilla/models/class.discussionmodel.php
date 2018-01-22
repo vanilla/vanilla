@@ -1190,21 +1190,6 @@ class DiscussionModel extends Gdn_Model {
 
         $this->discussionSummaryQuery([], false);
 
-        if (array_key_exists('Followed', $wheres)) {
-            if ($wheres['Followed']) {
-                $categoryModel = new CategoryModel();
-                $followed = $categoryModel->getFollowed(Gdn::session()->UserID);
-                $categoryIDs = array_column($followed, 'CategoryID');
-
-                if (isset($wheres['d.CategoryID'])) {
-                    $wheres['d.CategoryID'] = array_values(array_intersect((array)$wheres['d.CategoryID'], $categoryIDs));
-                } else {
-                    $wheres['d.CategoryID'] = $categoryIDs;
-                }
-            }
-            unset($wheres['Followed']);
-        }
-
         if (!empty($wheres)) {
             $this->SQL->where($wheres);
         }

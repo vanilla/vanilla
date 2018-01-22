@@ -114,7 +114,7 @@ class DiscussionsTest extends AbstractResourceTest {
             'urlcode' => __FUNCTION__
         ]);
         $testCategoryID = $category['categoryID'];
-        $this->api()->put("categories/{$testCategoryID}/follow", ['follow' => true]);
+        $this->api()->put("categories/{$testCategoryID}/follow", ['followed' => true]);
 
         // Add some discussions
         $totalDiscussions = 3;

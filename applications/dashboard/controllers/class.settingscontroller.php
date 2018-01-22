@@ -1292,6 +1292,7 @@ class SettingsController extends DashboardController {
         $AvailableLocales = array_filter($AvailableLocales, function ($locale) use ($EnabledLocales) {
             return !val('Hidden', $locale) || isset($EnabledLocales[val('Index', $locale)]);
         });
+        static::sortAddons($AvailableLocales);
 
         $this->setData('AvailableLocales', $AvailableLocales);
         $this->setData('EnabledLocales', $EnabledLocales);
@@ -1613,7 +1614,7 @@ class SettingsController extends DashboardController {
      * @return int Result of strcasecmp.
      */
     public static function compareAddonName($a, $b) {
-        return strcasecmp(val('Name', $a), val('Name', $b));
+        return strcasecmp(val('EnName', $a, val('Name', $a)), val('EnName', $b, val('Name', $b)));
     }
 
     /**

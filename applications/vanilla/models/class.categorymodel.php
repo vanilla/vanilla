@@ -3503,7 +3503,7 @@ SQL;
         }
 
         $categories = $query->get()->resultArray();
-        L
+
         $result = [];
         foreach ($categories as $category) {
             self::calculate($category);

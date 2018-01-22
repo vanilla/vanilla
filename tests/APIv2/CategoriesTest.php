@@ -120,6 +120,22 @@ class CategoriesTest extends AbstractResourceTest {
     }
 
     /**
+     * Test getting a list of followed categories.
+     */
+    public function testIndexFollowed() {
+        // Make sure we're starting from scratch.
+        $preFollow = $this->api()->get($this->baseUrl, ['followed' => true])->getBody();
+        $this->assertEmpty($preFollow);
+
+        // Follow. Make sure we're following.
+        $testCategoryID = self::PARENT_CATEGORY_ID;
+        $this->api()->put("{$this->baseUrl}/{$testCategoryID}/follow", ['follow' => true]);
+        $postFollow = $this->api()->get($this->baseUrl, ['followed' => true])->getBody();
+        $this->assertCount(1, $postFollow);
+        $this->assertEquals($testCategoryID, $postFollow[0]['categoryID']);
+    }
+
+    /**
      * Ensure moving a category actually moves it and updates the new parent's category count.
      */
     public function testMove() {

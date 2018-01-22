@@ -178,7 +178,7 @@ export function formatUrl(path) {
  * Translate a string into the current locale.
  *
  * @param {string} str The string to translate.
- * @param {string|undefined} defaultTranslation The default translation to use.
+ * @param {string=} defaultTranslation The default translation to use.
  */
 export function translate(str, defaultTranslation) {
     // Codes that begin with @ are considered literals.

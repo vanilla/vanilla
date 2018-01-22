@@ -44,9 +44,10 @@ export default class AutoLinker {
         quill.keyboard.addBinding({
             collapsed: true,
             key: ' ',
-            prefix: this.REGEXP_HTTP_GLOBAL_WITH_WS,
+            prefix: AutoLinker.REGEXP_HTTP_GLOBAL_WITH_WS,
             handler: (range, context) => {
                 const url = this.sliceFromLastWhitespace(context.prefix);
+                console.log(url);
                 const ops = [
                     { retain: range.index - url.length },
                     { delete: url.length },
@@ -68,7 +69,7 @@ export default class AutoLinker {
             if (typeof node.data !== 'string') {
                 return undefined;
             }
-            const matches = node.data.match(this.REGEXP_HTTP_GLOBAL);
+            const matches = node.data.match(AutoLinker.REGEXP_HTTP_GLOBAL);
             if (matches && matches.length > 0) {
                 const ops = [];
                 let str = node.data;

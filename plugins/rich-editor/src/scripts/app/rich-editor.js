@@ -16,7 +16,7 @@ events.onVanillaReady(() => {
  * Set up the new discussion form if it exists.
  */
 function setupNewDiscussionForm() {
-    const discussionFormContainer = document.querySelector("#DiscussionForm .QuillContainer");
+    const discussionFormContainer = document.querySelector("#DiscussionForm .js-richText");
 
     if (discussionFormContainer) {
         new RichEditor(discussionFormContainer);
@@ -24,7 +24,7 @@ function setupNewDiscussionForm() {
 }
 
 function setupCommentForm() {
-    const commentFormContainer = document.querySelector("#Form_Comment .QuillContainer");
+    const commentFormContainer = document.querySelector("#Form_Comment .js-richText");
 
     if (commentFormContainer) {
         new RichEditor(commentFormContainer);

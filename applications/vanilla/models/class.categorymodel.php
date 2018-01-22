@@ -938,19 +938,10 @@ class CategoryModel extends Gdn_Model {
             $query->like('Name', $filter);
         }
 
-        $categoryTree = $query->get()->resultArray();
-        self::calculateData($categoryTree);
-        self::joinUserData($categoryTree);
+        $categories = $query->get()->resultArray();
+        $categories = $this->flattenCategories($categories);
 
-        foreach ($categoryTree as &$category) {
-            // Fix the depth to be relative, not global.
-            $category['Depth'] = 1;
-
-            // We don't have children, but trees are expected to have this key.
-            $category['Children'] = [];
-        }
-
-        return $categoryTree;
+        return $categories;
     }
 
     /**
@@ -987,6 +978,27 @@ class CategoryModel extends Gdn_Model {
             }
         }
         return $result;
+    }
+
+    /**
+     * Prepare an array of category rows for display as a flat list.
+     *
+     * @param array $categories Category rows.
+     * @return array
+     */
+    public function flattenCategories(array $categories) {
+        self::calculateData($categories);
+        self::joinUserData($categories);
+
+        foreach ($categories as &$category) {
+            // Fix the depth to be relative, not global.
+            $category['Depth'] = 1;
+
+            // We don't have children, but trees are expected to have this key.
+            $category['Children'] = [];
+        }
+
+        return $categories;
     }
 
     /**
@@ -2196,6 +2208,32 @@ class CategoryModel extends Gdn_Model {
             $data = false;
         }
         return $data;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getWhere($where = false, $orderFields = '', $orderDirection = 'asc', $limit = false, $offset = false) {
+        if (!is_array($where)) {
+            $where = [];
+        }
+
+        if (array_key_exists('Followed', $where)) {
+            if ($where['Followed']) {
+                $followed = $this->getFollowed(Gdn::session()->UserID);
+                $categoryIDs = array_column($followed, 'CategoryID');
+
+                if (isset($where['CategoryID'])) {
+                    $where['CategoryID'] = array_values(array_intersect((array)$where['CategoryID'], $categoryIDs));
+                } else {
+                    $where['CategoryID'] = $categoryIDs;
+                }
+            }
+            unset($where['Followed']);
+        }
+
+        $result = parent::getWhere($where, $orderFields, $orderDirection, $limit, $offset);
+        return $result;
     }
 
     /**

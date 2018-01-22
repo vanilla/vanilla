@@ -256,6 +256,10 @@ class CategoriesApiController extends AbstractApiController {
         $in = $this->schema([
             'parentCategoryID:i?' => 'Parent category ID.',
             'parentCategoryCode:s?' => 'Parent category URL code.',
+            'followed:b' => [
+                'default' => false,
+                'description' => 'Only list categories followed by the current user.'
+            ],
             'maxDepth:i?' => [
                 'description' => '',
                 'default' => 2
@@ -280,8 +284,14 @@ class CategoriesApiController extends AbstractApiController {
 
         $joinUserCategory = $this->categoryModel->joinUserCategory();
         $this->categoryModel->setJoinUserCategory(true);
-        if ($parent['DisplayAs'] === 'Flat') {
-            list($offset, $limit) = offsetLimit("p{$query['page']}", $this->categoryModel->getDefaultLimit());
+        list($offset, $limit) = offsetLimit("p{$query['page']}", $this->categoryModel->getDefaultLimit());
+        if ($query['followed']) {
+            $categories = $this->categoryModel
+                ->getWhere(['Followed' => true], '', 'asc', $limit, $offset)
+                ->resultArray();
+            $categories = array_values($categories);
+            $categories = $this->categoryModel->flattenCategories($categories);
+        } elseif ($parent['DisplayAs'] === 'Flat') {
             $categories = $this->categoryModel->getTreeAsFlat(
                 $parent['CategoryID'],
                 $offset,

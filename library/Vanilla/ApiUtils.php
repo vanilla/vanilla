@@ -145,7 +145,7 @@ class ApiUtils {
             $argsStr = 'page=%s'.(empty($argsStr) ? '' : '&'.$argsStr);
         }
         if (!empty($argsStr)) {
-            $url = (strpos($url, '?') === false ? '?' : '&').$argsStr;
+            $url .= (strpos($url, '?') === false ? '?' : '&').$argsStr;
         }
         return $url;
     }

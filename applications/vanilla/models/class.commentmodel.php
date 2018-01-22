@@ -465,7 +465,30 @@ class CommentModel extends Gdn_Model {
             return new Gdn_DataSet([]);
         }
 
-        $result = $this->getWhere($where, 'CommentID', $order, $limit, $offset);
+        // All fields should be associated with a table. If there isn't one, assign it to comments.
+        foreach ($where as $field => $value) {
+            if (strpos($field, '.') === false) {
+                $where["c.{$field}"] = $value;
+                unset($where[$field]);
+            }
+        }
+
+        $query = $this->SQL
+            ->select('c.*')
+            ->select('d.CategoryID')
+            ->from('Comment c')
+            ->join('Discussion d', 'c.DiscussionID = d.DiscussionID')
+            ->orderBy('c.CommentID', $order);
+        if (!empty($where)) {
+            $query->where($where);
+        }
+        if ($limit) {
+            $query->limit($limit);
+        }
+        if ($offset) {
+            $query->offset($offset);
+        }
+        $result = $query->get();
         $data =& $result->result();
 
         // Filter out any comments this user does not have access to.

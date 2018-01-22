@@ -16,11 +16,11 @@ events.onVanillaReady(() => {
  * Set up the new discussion form if it exists.
  */
 function setupNewDiscussionForm() {
-    const discussionFormContainer = document.querySelector("#DiscussionForm .js-richText");
+    const discussionFormContainer = document.querySelectorAll("#DiscussionForm .js-richText");
 
-    if (discussionFormContainer) {
-        new RichEditor(discussionFormContainer);
-    }
+    discussionFormContainer.forEach(container => {
+        new RichEditor(container);
+    })
 }
 
 function setupCommentForm() {

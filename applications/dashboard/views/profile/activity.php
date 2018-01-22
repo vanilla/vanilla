@@ -12,7 +12,7 @@ if ($Session->isValid() && checkPermission('Garden.Profiles.Edit')) {
     echo '<div class="FormWrapper FormWrapper-Condensed">';
     echo $this->Form->open(['action' => url("/activity/post/{$this->User->UserID}?Target=".urlencode(userUrl($this->User))), 'class' => 'Activity']);
     echo $this->Form->errors();
-    echo $this->Form->bodyBox('Comment', ['Wrap' => TRUE]);
+    echo $this->Form->bodyBox('Comment', ['Wrap' => true, 'ImageUpload' => true]);
     echo '<div class="Buttons">';
     echo $this->Form->button($ButtonText, ['class' => 'Button Primary']);
     echo '</div>';

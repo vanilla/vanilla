@@ -4,7 +4,7 @@
  * @license GPLv2
  */
 
-// import sprintfJs from "sprintf-js";
+import gdn from "@core/gdn";
 
 /**
  * Resolve an array of functions that return promises sequentially.
@@ -132,15 +132,7 @@ export function generateRandomString(length = 5) {
  * @returns {any}
  */
 export function getMeta(key, defaultValue = undefined) {
-
-    /** gdn.meta may be set in an inline script in the head of the documenet. */
-    const gdn = window["gdn"] || {};
-
-    if (!gdn.meta) {
-        gdn.meta = {};
-    }
-
-    if (gdn.meta[key]) {
+    if (gdn.meta && gdn.meta[key]) {
         return gdn.meta[key];
     }
 
@@ -154,14 +146,6 @@ export function getMeta(key, defaultValue = undefined) {
  * @param {any} value - The value to set.
  */
 export function setMeta(key, value) {
-
-    /** gdn.meta may be set in an inline script in the head of the documenet. */
-    const gdn = window["gdn"] || {};
-
-    if (!gdn.meta) {
-        gdn.meta = {};
-    }
-
     gdn.meta[key] = value;
 }
 

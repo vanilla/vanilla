@@ -6,15 +6,19 @@
  */
 
 namespace Garden\Web;
+use Traversable;
 
+use Garden\MetaTrait;
+use DateTime;
+use DateTimeInterface;
 
 /**
  * Represents the data in a web response.
  */
-class Data implements \JsonSerializable, \ArrayAccess {
-    private $data;
+class Data implements \JsonSerializable, \ArrayAccess, \Countable, \IteratorAggregate  {
+    use MetaTrait;
 
-    private $meta;
+    private $data;
 
     /**
      * Create a {@link Data} instance representing the data in a web response.
@@ -22,7 +26,7 @@ class Data implements \JsonSerializable, \ArrayAccess {
      * @param mixed $data The main response data.
      * @param array|int $meta Either an array of meta information or an integer HTTP response status.
      */
-    public function __construct($data, $meta = []) {
+    public function __construct($data = [], $meta = []) {
         $this->data = $data;
 
         if (is_int($meta)) {
@@ -82,6 +86,26 @@ class Data implements \JsonSerializable, \ArrayAccess {
     }
 
     /**
+     * Add another data object as a sub array of this data.
+     *
+     * @param array|Data $data The data to add.
+     * @param string $key The key to add the data to.
+     * @param bool $mergeMeta Whether or not to merge the meta array.
+     * @return $this
+     */
+    public function addData($data, $key, $mergeMeta = false) {
+        if (is_array($data)) {
+            $this->data[$key] = $data;
+        } else {
+            $this->data[$key] = $data->getData();
+            if ($mergeMeta) {
+                $this->mergeMetaArray($data->getMetaArray());
+            }
+        }
+        return $this;
+    }
+
+    /**
      * Get the HTTP status.
      *
      * @return int Returns the status.
@@ -107,49 +131,6 @@ class Data implements \JsonSerializable, \ArrayAccess {
     }
 
     /**
-     * Get a single item from the meta array.
-     *
-     * @param string $name The key to get from.
-     * @param mixed $default The default value if no item at the key exists.
-     * @return mixed Returns the meta value.
-     */
-    public function getMeta($name, $default = null) {
-        return isset($this->meta[$name]) ? $this->meta[$name] : $default;
-    }
-
-    /**
-     * Set a single item to the meta array.
-     *
-     * @param string $name The key to set.
-     * @param mixed $value The new value.
-     * @return $this
-     */
-    public function setMeta($name, $value) {
-        $this->meta[$name] = $value;
-        return $this;
-    }
-
-    /**
-     * Get the entire meta array.
-     *
-     * @return array Returns the meta.
-     */
-    public function getMetaArray() {
-        return $this->meta;
-    }
-
-    /**
-     * Set the entire meta array.
-     *
-     * @param array $meta The new meta array.
-     * @return $this
-     */
-    public function setMetaArray(array $meta) {
-        $this->meta = $meta;
-        return $this;
-    }
-
-    /**
      * Specify data which should be serialized to JSON.
      *
      * @return mixed data which can be serialized by <b>json_encode</b>,
@@ -158,7 +139,7 @@ class Data implements \JsonSerializable, \ArrayAccess {
      */
     public function jsonSerialize() {
         $data = $this->getData();
-        jsonFilter($data);
+        $data = $this->jsonFilter($data);
         return $data;
     }
 
@@ -204,7 +185,9 @@ class Data implements \JsonSerializable, \ArrayAccess {
         $result = [];
 
         foreach ($this->meta as $key => $value) {
-            if ($key === 'CONTENT_TYPE' || substr_compare($key, 'HTTP_', 0, 5, true) === 0) {
+            if ($key === 'CONTENT_TYPE') {
+                $result['Content-Type'] = $value;
+            } elseif (substr_compare($key, 'HTTP_', 0, 5, true) === 0) {
                 $headerKey = $this->headerName(substr($key, 5));
 
                 $result[$headerKey] = $value;
@@ -241,6 +224,7 @@ class Data implements \JsonSerializable, \ArrayAccess {
             return $name;
         } else {
             $parts = explode('_', $name);
+
             $result = implode('-', array_map(function ($part) use ($special) {
                 $r = ucfirst(strtolower($part));
                 return isset($special[$r]) ? $special[$r] : $r;
@@ -270,6 +254,57 @@ class Data implements \JsonSerializable, \ArrayAccess {
         } else {
             echo json_encode($this, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_PARTIAL_OUTPUT_ON_ERROR);
         }
+    }
+
+    /**
+     * Decode a packed IP address to its human-readable form.
+     *
+     * @param string $packedIP A string representing a packed IP address.
+     * @return string|null A human-readable representation of the provided IP address.
+     */
+    private function ipDecode($packedIP) {
+        if (filter_var($packedIP, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4|FILTER_FLAG_IPV6)) {
+            // If it's already a valid IP address, don't bother unpacking it.
+            $result = $packedIP;
+        } elseif ($iP = @inet_ntop($packedIP)) {
+            $result = $iP;
+        } else {
+            $result = null;
+        }
+
+        return $result;
+    }
+
+    /**
+     * Prepare data for json_encode
+     *
+     * @param mixed $value
+     * @return mixed
+     */
+    private function jsonFilter($value) {
+        $fn = function (&$value, $key = '', $parentKey = '') use (&$fn) {
+            if (is_array($value)) {
+                array_walk($value, function(&$childValue, $childKey) use ($fn, $key) {
+                    $fn($childValue, $childKey, $key);
+                });
+            } elseif ($value instanceof DateTimeInterface) {
+                $value = $value->format(DateTime::RFC3339);
+            } elseif (is_string($value)) {
+                // Only attempt to unpack as an IP address if this field or its parent matches the IP field naming scheme.
+                $isIPField = ($this->stringEndsWith($key, 'IPAddress', true) || $this->stringEndsWith($parentKey, 'IPAddresses', true));
+                if ($isIPField && ($ip = $this->ipDecode($value)) !== null) {
+                    $value = $ip;
+                }
+            }
+        };
+
+        if (is_array($value)) {
+            array_walk($value, $fn);
+        } else {
+            $fn($value);
+        }
+
+        return $value;
     }
 
     /**
@@ -314,5 +349,51 @@ class Data implements \JsonSerializable, \ArrayAccess {
      */
     public function offsetUnset($offset) {
         unset($this->data[$offset]);
+    }
+
+    /**
+     * Checks whether or not string A ends with string B.
+     *
+     * @param string $haystack The main string to check.
+     * @param string $needle The substring to check against.
+     * @param bool $caseInsensitive Whether or not the comparison should be case insensitive.
+     * @param bool $trim Whether or not to trim $B off of $A if it is found.
+     * @return bool|string Returns true/false unless $trim is true.
+     */
+    private function stringEndsWith($haystack, $needle, $caseInsensitive = false, $trim = false) {
+        if (strlen($haystack) < strlen($needle)) {
+            return $trim ? $haystack : false;
+        } elseif (strlen($needle) == 0) {
+            if ($trim) {
+                return $haystack;
+            }
+            return true;
+        } else {
+            $result = substr_compare($haystack, $needle, -strlen($needle), strlen($needle), $caseInsensitive) == 0;
+            if ($trim) {
+                $result = $result ? substr($haystack, 0, -strlen($needle)) : $haystack;
+            }
+            return $result;
+        }
+    }
+
+    /**
+     * Count elements of an object.
+     *
+     * @link http://php.net/manual/en/countable.count.php
+     * @return int The custom count as an integer.
+     */
+    public function count() {
+        return count($this->data);
+    }
+
+    /**
+     * Retrieve an external iterator.
+     *
+     * @return Traversable An instance of an object implementing <b>Iterator</b> or <b>Traversable</b>.
+     * @link http://php.net/manual/en/iteratoraggregate.getiterator.php
+     */
+    public function getIterator() {
+        return new \ArrayIterator($this->data);
     }
 }

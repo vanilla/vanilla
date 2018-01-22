@@ -325,10 +325,12 @@ class EditorPlugin extends Gdn_Plugin {
         $editorToolbarAll = [];
         $allowedEditorActions = $this->getAllowedEditorActions();
         $allowedEditorActions['emoji'] = Emoji::instance()->hasEditorList();
-        if (val('FileUpload', $attributes) && $this->canUpload()) {
-            $allowedEditorActions['fileuploads'] = true;
-            $allowedEditorActions['imageuploads'] = true;
-            $allowedEditorActions['images'] = false;
+        $fileUpload = val('FileUpload', $attributes);
+        $imageUpload = $fileUpload || val('ImageUpload', $attributes);
+        if (($fileUpload || $imageUpload) && $this->canUpload()) {
+            $allowedEditorActions['fileuploads'] = $fileUpload;
+            $allowedEditorActions['imageuploads'] = $imageUpload;
+            $allowedEditorActions['images'] = !$imageUpload;
         }
         $fontColorList = $this->getFontColorList();
         $fontFormatOptions = $this->getFontFormatOptions();

@@ -23,9 +23,16 @@ class QuillOperation {
         self::INSERT_TYPE_IMAGE,
     ];
 
-    /**
-     * The type of insert.
-     */
+    private $allowedListTypes = [
+        self::LIST_TYPE_NONE,
+        self::LIST_TYPE_BULLET,
+        self::LIST_TYPE_ORDERED,
+    ];
+
+    /** @var string The content of the operation  */
+    public $content = "";
+
+    /** @var string The type of insert. */
     public $insertType = self::INSERT_TYPE_STRING;
 
     /** @var bool Is the text formatted as a code block. */
@@ -52,10 +59,75 @@ class QuillOperation {
     /** @var string|null Is this item a link? If so, what is the link. */
     public $link = null;
 
-    /** @var string|null If this item is an image provides the image url. */
-    public $image = null;
+    public function __construct($operationArray) {
+        $insert = $operationArray["insert"];
+        if (is_string($insert)) {
+            $this->insertType = self::INSERT_TYPE_STRING;
+            $this->content = $insert;
+        } elseif (is_array($insert) && $insert["image"]) {
+            $this->insertType = self::INSERT_TYPE_IMAGE;
+            $this->content = $insert;
+        }
 
-    public function __construct(array $operationArray) {
+        $attributes = val("attributes", $operationArray);
 
+        if ($attributes) {
+            // List values
+            $list = val("list", $attributes);
+
+            if ($list && in_array($list, $this->allowedListTypes)) {
+                $this->list = $list;
+            }
+
+            // Boolean Values
+            $booleanAttributes = [
+                "codeBlock" => "code-block",
+                "strike",
+                "bold",
+                "italic",
+            ];
+
+            foreach ($booleanAttributes as $key => $value) {
+                if (in_array($value, $booleanAttributes)) {
+                    $classKey = is_int($key) ? $value : $key;
+                    $this->{$value} = val($classKey, $attributes);
+                }
+            }
+
+            // Numbered Values
+            $numberedAttributes = [
+                "indent",
+                "header",
+            ];
+
+            foreach($numberedAttributes as $attr) {
+                if (is_int(val($attr, $attributes))) {
+                    $this->{$attr} = $attributes[$attr];
+                }
+            }
+        }
+
+        $this->validate();
+    }
+
+    /**
+     * Validate inserted values;
+     *
+     * @returns bool
+     */
+    public function validate(): bool {
+        if (!in_array($this->insertType, $this->allowedInsertTypes)) {
+            return false;
+        }
+
+        if (!in_array($this->list, $this->allowedListTypes)) {
+            return false;
+        }
+
+        // Only one block level element may be active at a time.
+
+        if($this->header > 0)
+
+        return true;
     }
 }

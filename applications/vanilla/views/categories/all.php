@@ -1,8 +1,10 @@
 <?php if (!defined('APPLICATION')) exit();
 include_once $this->fetchViewLocation('helper_functions', 'categories');
 $title = $this->data('Title');
+$userID = Gdn::session()->UserID;
+$categoryID = $this->Category->CategoryID;
 if(!is_null($this->Category)) {
-    $title .= followButton(true);
+    $title .= followButton($this->CategoryModel->isFollowed($userID, $categoryID));
 }
 echo '<h1 class="H HomepageTitle">'.$title.'</h1>';
 if ($description = $this->description()) {

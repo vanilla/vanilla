@@ -1,11 +1,12 @@
 <?php if (!defined('APPLICATION')) exit();
-
     if (!function_exists('GetOptions')) {
         include $this->fetchViewLocation('helper_functions', 'categories');
     }
+    $userID = Gdn::session()->UserID;
+    $categoryID = $this->Category->CategoryID;
 ?>
 
-<h1 class="H HomepageTitle"><?php echo $this->data('Title').followButton(true); ?></h1>
+<h1 class="H HomepageTitle"><?php echo $this->data('Title').followButton($this->CategoryModel->isFollowed($userID, $categoryID)); ?></h1>
 
 <?php
     if ($description = $this->description()) {

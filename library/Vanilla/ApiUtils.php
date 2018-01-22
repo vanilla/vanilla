@@ -89,12 +89,12 @@ class ApiUtils {
             'links' => []
         ];
 
-        $r['links']['first'] = sprintf($r['urlFormat'], 1);
+        $r['links']['first'] = str_replace('%s', 1, $r['urlFormat']);
         if ($r['page'] > 1) {
-            $r['links']['prev'] = $r['page'] > 2 ? sprintf($r['urlFormat'], $r['page'] - 1) : $r['links']['first'];
+            $r['links']['prev'] = $r['page'] > 2 ? str_replace('%s', $r['page'] - 1, $r['urlFormat']) : $r['links']['first'];
         }
         if ($r['more']) {
-            $r['links']['next'] = sprintf($r['urlFormat'], $r['page'] + 1);
+            $r['links']['next'] = str_replace('%s', $r['page'] + 1, $r['urlFormat']);
         }
 
         return $r;
@@ -118,13 +118,13 @@ class ApiUtils {
             'links' => []
         ];
 
-        $r['links']['first'] = sprintf($r['urlFormat'], 1);
-        $r['links']['last'] = sprintf($r['urlFormat'], $r['pageCount']);
+        $r['links']['first'] = str_replace('%s', 1, $r['urlFormat']);
+        $r['links']['last'] = str_replace('%s', $r['pageCount'], $r['urlFormat']);
         if ($r['page'] > 1) {
-            $r['links']['prev'] = $r['page'] > 2 ? sprintf($r['urlFormat'], $r['page'] - 1) : $r['links']['first'];
+            $r['links']['prev'] = $r['page'] > 2 ? str_replace('%s', $r['page'] - 1, $r['urlFormat']) : $r['links']['first'];
         }
         if ($r['page'] < $r['pageCount']) {
-            $r['links']['next'] = sprintf($r['urlFormat'], $r['page'] + 1);
+            $r['links']['next'] = str_replace('%s', $r['page'] + 1, $r['urlFormat']);
         }
 
         return $r;
@@ -145,6 +145,7 @@ class ApiUtils {
      * Calculate a pager URL format.
      *
      * This method passes through all of the non-default arguments from a query string to the resulting URL.
+     * Note that the returned URL is not compatible with printf due to URL encoding.
      *
      * @param string $url The basic URL format without querystring.
      * @param array $query The current query string.

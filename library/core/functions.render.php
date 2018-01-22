@@ -975,7 +975,7 @@ if (!function_exists('linkDropDown')) {
         $selectedKey = 0;
         foreach($links as $i => $link) {
             if (val('active', $link)) {
-                $selected = $i;
+                $selectedKey = $i;
                 break;
             }
         }

@@ -154,8 +154,8 @@ class InstallModel {
             throw new ValidationException($validation);
         }
 
-        if (PHP_VERSION_ID < 50600) {
-            $validation->addError('', 'PHP {version} or higher is required.', ['version' => '5.6']);
+        if (PHP_VERSION_ID < 70000) {
+            $validation->addError('', 'PHP {version} or higher is required.', ['version' => '7.0']);
         }
 
         if (!class_exists(\PDO::class)) {

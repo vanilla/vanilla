@@ -234,7 +234,7 @@ class ConversationsTest extends AbstractAPIv2Test {
         $this->assertTrue(is_int($body[$this->pk]));
         $this->assertTrue($body[$this->pk] > 0);
 
-        $this->assertRowsEqual($expectedResult, $body, true);
+        $this->assertRowsEqual($expectedResult, $body);
 
         return $body;
     }

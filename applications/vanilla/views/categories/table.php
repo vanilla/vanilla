@@ -1,5 +1,8 @@
-<?php if (!defined('APPLICATION')) return; ?>
-    <h1 class="H HomepageTitle"><?php echo $this->data('Title').followButton(true); ?></h1>
+<?php if (!defined('APPLICATION')) return;
+$userID = Gdn::session()->UserID;
+$categoryID = $this->Category->CategoryID;
+?>
+    <h1 class="H HomepageTitle"><?php echo $this->data('Title').followButton($this->CategoryModel->isFollowed($userID, $categoryID)); ?></h1>
     <div class="P PageDescription"><?php echo $this->description(); ?></div>
 <?php
 $this->fireEvent('AfterDescription');

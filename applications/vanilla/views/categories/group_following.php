@@ -1,2 +1,4 @@
 <?php if (!defined('APPLICATION')) exit();
-echo followButton(true);
+$userID = Gdn::session()->UserID;
+$categoryID = $this->Category->CategoryID;
+echo followButton($this->CategoryModel->isFollowed($userID, $categoryID));

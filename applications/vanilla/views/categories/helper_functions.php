@@ -430,11 +430,18 @@ if (!function_exists('followButton')) :
     /**
      *
      * Writes the Follow/following button
-     * @param $following bool
+     *
+     * @param int $categoryID
+     * @return string
      */
-    function followButton($following) {
+    function followButton($categoryID) {
         $output = " ";
-        if (c('Vanilla.EnableCategoryFollowing')) {
+        $userID = Gdn::session()->UserID;
+
+        if (c('Vanilla.EnableCategoryFollowing') && $userID) {
+            $categoryModel = new CategoryModel();
+            $following = $categoryModel->isFollowed($userID, $categoryID);
+
             $iconTitle = t('Follow');
 
             $icon = <<<EOT

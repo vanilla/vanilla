@@ -1,10 +1,12 @@
 <?php if (!defined('APPLICATION')) exit();
 $Session = Gdn::session();
 include_once $this->fetchViewLocation('helper_functions', 'discussions', 'vanilla');
+include_once $this->fetchViewLocation('helper_functions', 'categories', 'vanilla');
 
 echo '<h1 class="H HomepageTitle">'.
     adminCheck(NULL, ['', ' ']).
     $this->data('Title').
+    followButton($this->data('Category.CategoryID')).
     '</h1>';
 
 $Description = $this->data('Category.Description', $this->description());

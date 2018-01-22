@@ -1790,7 +1790,12 @@ class Gdn_Controller extends Gdn_Pluggable {
                 $addonJs = $AssetModel->getAddonJsFiles($ThemeType, $this->MasterView === 'admin' ? 'admin' : 'app', $ETag);
                 $busta = trim(assetVersion('', ''), '.');
                 foreach ($addonJs as $path) {
-                    $this->Head->addScript(asset($path)."?h=$busta", 'text/javascript', false, ['defer' => 'true']);
+                    $scriptPath = asset($path);
+
+                    if (!c("HotReload.Enabled", false)) {
+                        $scriptPath .= "?h=$busta";
+                    }
+                    $this->Head->addScript($scriptPath, 'text/javascript', false, ['defer' => 'true']);
                 }
 
                 foreach ($this->_JsFiles as $Index => $JsInfo) {

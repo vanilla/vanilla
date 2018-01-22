@@ -17,14 +17,5 @@
             "email": "support@vanillaforums.com",
             "homepage": "https://open.vanillaforums.com"
         }
-    ],
-    "build": {
-        "process": "core",
-        "exports": {
-            "*": [
-                "./src/scripts/api/discussions"
-            ],
-            "app": []
-        }
-    }
+    ]
 }

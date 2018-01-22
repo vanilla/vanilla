@@ -6,6 +6,17 @@
 class RichEditorPlugin extends Gdn_Plugin {
 
     /**
+     * Setup some variables for instance.
+     */
+    public function __construct() {
+        parent::__construct();
+
+        // Check for additional formats
+        $this->EventArguments['formats'] = &$this->Formats;
+        $this->fireEvent('GetFormats');
+    }
+
+    /**
      * Add the style script to the head
      *
      * @param Gdn_Controller $sender
@@ -28,8 +39,10 @@ class RichEditorPlugin extends Gdn_Plugin {
      * @param Gdn_Form $sender
      */
     public function gdn_form_beforeBodyBox_handler($sender, $args) {
-        $view = "<div id='toolbar'></div>";
+        $view = '<div class="QuillContainer"></div>';
 
         $args['BodyBox'] .= $view;
+
+        $sender->setValue('Format', 'Rich');
     }
 }

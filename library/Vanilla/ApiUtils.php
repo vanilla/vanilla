@@ -8,6 +8,7 @@
 namespace Vanilla;
 
 use Garden\Schema\Schema;
+use Garden\Web\Data;
 use Vanilla\Utility\CamelCaseScheme;
 use Vanilla\Utility\CapitalCaseScheme;
 
@@ -84,8 +85,17 @@ class ApiUtils {
         $r = [
             'page' => $query['page'] ?: 1,
             'more' => $count === true || $count >= $query['limit'],
-            'urlFormat' => static::pagerUrlFormat($url, $query, $schema)
+            'urlFormat' => static::pagerUrlFormat($url, $query, $schema),
+            'links' => []
         ];
+
+        $r['links']['first'] = sprintf($r['urlFormat'], 1);
+        if ($r['page'] > 1) {
+            $r['links']['prev'] = $r['page'] > 2 ? sprintf($r['urlFormat'], $r['page'] - 1) : $r['links']['first'];
+        }
+        if ($r['more']) {
+            $r['links']['next'] = sprintf($r['urlFormat'], $r['page'] + 1);
+        }
 
         return $r;
     }
@@ -105,7 +115,18 @@ class ApiUtils {
             'pageCount' => static::pageCount($totalCount, $query['limit']),
             'urlFormat' => static::pagerUrlFormat($url, $query, $schema),
             'totalCount' => $totalCount, // For regenerating with different URL.
+            'links' => []
         ];
+
+        $r['links']['first'] = sprintf($r['urlFormat'], 1);
+        $r['links']['last'] = sprintf($r['urlFormat'], $r['pageCount']);
+        if ($r['page'] > 1) {
+            $r['links']['prev'] = $r['page'] > 2 ? sprintf($r['urlFormat'], $r['page'] - 1) : $r['links']['first'];
+        }
+        if ($r['page'] < $r['pageCount']) {
+            $r['links']['next'] = sprintf($r['urlFormat'], $r['page'] + 1);
+        }
+
         return $r;
     }
 
@@ -148,6 +169,31 @@ class ApiUtils {
             $url .= (strpos($url, '?') === false ? '?' : '&').$argsStr;
         }
         return $url;
+    }
+
+    /**
+     * Add paging information to API results.
+     *
+     * @param array|Data $data The results returned by the API.
+     * @param array $pagingInfo Paging information.
+     * @return Data
+     */
+    public static function setPageMeta($data, $pagingInfo) {
+        if (!($data instanceof Data)) {
+            $data = new Data($data);
+        }
+
+        if (!$pagingInfo) {
+            return $data;
+        }
+
+        $data->setMeta('paging', $pagingInfo);
+
+        foreach($pagingInfo['links'] as $key => $value) {
+            $data->setHeader('Paging-'.ucfirst($key), $value);
+        }
+
+        return $data;
     }
 
     /**

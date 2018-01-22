@@ -164,7 +164,7 @@ $Construct->table('UserCategory')
     ->column('UserID', 'int', false, 'primary')
     ->column('CategoryID', 'int', false, 'primary')
     ->column('DateMarkedRead', 'datetime', null)
-    ->column('Follow', 'tinyint(1)', 0);
+    ->column('Followed', 'tinyint(1)', 0);
 
 // This column should be removed when muting categories is dropped in favor of category following..
 $Construct->column('Unfollow', 'tinyint(1)', 0);

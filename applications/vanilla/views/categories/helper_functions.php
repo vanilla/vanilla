@@ -438,7 +438,7 @@ if (!function_exists('followButton')) :
         $output = " ";
         $userID = Gdn::session()->UserID;
 
-        if (c('Vanilla.EnableCategoryFollowing') && $userID) {
+        if ($categoryID && c('Vanilla.EnableCategoryFollowing') && $userID) {
             $categoryModel = new CategoryModel();
             $following = $categoryModel->isFollowed($userID, $categoryID);
 

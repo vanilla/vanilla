@@ -8,12 +8,6 @@ $categoryID = $this->Category->CategoryID;
 $this->fireEvent('AfterDescription');
 $this->fireEvent('AfterPageTitle');
 
-if (c('Vanilla.EnableCategoryFollowing')) {
-    echo '<div class="PageControls Top">';
-    echo categoryFilters([['url' => 'http://google.ca', 'active' => true, 'name' => 'All'], ['url' => 'http://google.ca', 'name' => 'Following']]);
-    echo '</div>';
-}
-
 $categories = $this->data('CategoryTree');
 
 writeCategoryTable($categories, 1);

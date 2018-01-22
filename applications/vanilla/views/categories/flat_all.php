@@ -14,12 +14,6 @@
     }
     $this->fireEvent('AfterPageTitle');
 
-    if (c('Vanilla.EnableCategoryFollowing')) {
-        echo '<div class="PageControls Top">';
-        echo categoryFilters([['url' => 'http://google.ca', 'active' => true, 'name' => 'All'], ['url' => 'http://google.ca', 'name' => 'Following']]);
-        echo '</div>';
-    }
-
     $categories = $this->data('CategoryTree');
     $this->EventArguments['NumRows'] = count($categories);
 ?>

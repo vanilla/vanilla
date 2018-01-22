@@ -395,20 +395,18 @@ if (!function_exists('category')) {
 
 if (!function_exists('categoryFilters')) {
     /**
-     * Returns category filtering for category following
-     * @param array $links
-     *   Has the following properties:
-     *     ** 'url': string: The url for the link
-     *     ** 'text': string: The text for the link
-     *     ** 'active': boolean: is it the current page
-     * @param string $extraClasses any extra classes you add to the dropdown
+     * Returns category filtering.
+     *
+     * @param array $filters A multidimensional array of rows with the following properties:
+     *     ** 'name': Friendly name for the filter.
+     *     ** 'param': URL parameter associated with the filter.
+     *     ** 'value': A value for the URL parameter.
+     * @param string $extraClasses any extra classes you add to the drop down
+     * @param string $default The default label for when no filter is active.
+     * @return string
      */
-    function categoryFilters($links, $extraClasses = ''){
-        $output = '';
-        if (c('Vanilla.EnableCategoryFollowing')) {
-            $output = linkDropDown($links, 'selectBox-following '.trim($extraClasses), t('View: '));
-        }
-        return $output;
+    function categoryFilters(array $filters = [], $extraClasses = '', $default = 'All', $label = 'View: '){
+        return filtersDropDown(url('categories'), $filters, $extraClasses, $default, $label);
     }
 }
 
@@ -670,6 +668,23 @@ if (!function_exists('commentUrl')) {
     }
 }
 
+if (!function_exists('discussionFilters')) {
+    /**
+     * Returns discussions filtering.
+     *
+     * @param array $filters A multidimensional array of rows with the following properties:
+     *     ** 'name': Friendly name for the filter.
+     *     ** 'param': URL parameter associated with the filter.
+     *     ** 'value': A value for the URL parameter.
+     * @param string $extraClasses any extra classes you add to the drop down
+     * @param string $default The default label for when no filter is active.
+     * @return string
+     */
+    function discussionFilters(array $filters = [], $extraClasses = '', $default = 'All', $label = 'View: '){
+        return filtersDropDown(url('discussions'), $filters, $extraClasses, $default, $label);
+    }
+}
+
 if (!function_exists('discussionUrl')) {
     /**
      * Return a URL for a discussion. This function is in here and not functions.general so that plugins can override.
@@ -716,6 +731,69 @@ if (!function_exists('exportCSV')) {
             fputcsv($output, $row);
         }
         fclose($output);
+    }
+}
+
+if (!function_exists('filtersDropDown')) {
+    /**
+     * Returns a filtering drop-down menu.
+     *
+     * @param string $baseUrl Target URL with no query string applied.
+     * @param array $filters A multidimensional array of rows with the following properties:
+     *     ** 'name': Friendly name for the filter.
+     *     ** 'param': URL parameter associated with the filter.
+     *     ** 'value': A value for the URL parameter.
+     * @param string $extraClasses any extra classes you add to the drop down
+     * @param string $default The default label for when no filter is active.
+     * @return string
+     */
+    function filtersDropDown($baseUrl, array $filters = [], $extraClasses = '', $default = 'All', $label = 'View: ') {
+        $output = '';
+
+        if (c('Vanilla.EnableCategoryFollowing')) {
+            $links = [];
+            $active = null;
+
+            // Translate filters into links.
+            foreach ($filters as $filter) {
+                // Make sure we have the bare minimum: a label and a URL parameter.
+                if (!array_key_exists('name', $filter)) {
+                    throw new InvalidArgumentException('Filter does not have a name field.');
+                }
+                if (!array_key_exists('param', $filter)) {
+                    throw new InvalidArgumentException('Filter does not have a param field.');
+                }
+
+                // Prepare for consumption by linkDropDown.
+                $value = val('value', $filter, 1);
+                $url = url($baseUrl.'?'.http_build_query([$filter['param'] => $value]));
+                $link = [
+                    'name' => $filter['name'],
+                    'url' => $url
+                ];
+
+                // If we don't already have an active link, and this parameter and value match, this is the active link.
+                if ($active === null && Gdn::request()->get($filter['param']) == $value) {
+                    $active = $filter['name'];
+                    $link['active'] = true;
+                }
+
+                // Queue up another filter link.
+                $links[] = $link;
+            }
+
+            // Add the default link to the top of the list.
+            array_unshift($links, [
+                'active' => $active === null,
+                'name' => $default,
+                'url' => $baseUrl
+            ]);
+
+            // Generate the markup for the drop down menu.
+            $output = linkDropDown($links, 'selectBox-following '.trim($extraClasses), t($label));
+        }
+
+        return $output;
     }
 }
 
@@ -966,8 +1044,8 @@ if (!function_exists('linkDropDown')) {
      *     ** 'url': string: The url for the link
      *     ** 'name': string: The text for the link
      *     ** 'active': boolean: is it the current page
-     * @param string $extraClasses any extra classes you add to the dropdown
-     * @param string $label the label of the dropdown
+     * @param string $extraClasses any extra classes you add to the drop down
+     * @param string $label the label of the drop down
      *
      */
     function linkDropDown($links, $extraClasses = '', $label) {

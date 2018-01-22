@@ -346,6 +346,10 @@ class DiscussionsApiController extends AbstractApiController {
                     'processor' => [DateFilterSchema::class, 'dateFilterField'],
                 ],
             ]),
+            'followed:b' => [
+                'default' => false,
+                'description' => 'Only fetch discussions from followed categories. Pinned discussions are mixed in.'
+            ],
             'pinned:b?' => 'Whether or not to include pinned discussions. If true, only return pinned discussions. Cannot be used with the pinOrder parameter.',
             'pinOrder:s?' => [
                 'default' => 'first',
@@ -388,12 +392,15 @@ class DiscussionsApiController extends AbstractApiController {
         // Allow addons to update the where clause.
         $where = $this->getEventManager()->fireFilter('discussionsApiController_index_filters', $where, $this, $in, $query);
 
+        if ($query['followed']) {
+            $where['Followed'] = true;
+            $query['pinOrder'] = 'mixed';
+        }
+
         $pinned = array_key_exists('pinned', $query) ? $query['pinned'] : null;
         if ($pinned === true) {
             $announceWhere = array_merge($where, ['d.Announce >' => '0']);
             $rows = $this->discussionModel->getAnnouncements($announceWhere, $offset, $limit)->resultArray();
-        } elseif ($pinned === false) {
-            $rows = $this->discussionModel->getWhereRecent($where, $limit, $offset, false)->resultArray();
         } else {
             $pinOrder = array_key_exists('pinOrder', $query) ? $query['pinOrder'] : null;
             if ($pinOrder == 'first') {

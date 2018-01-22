@@ -248,6 +248,7 @@ class UsersTest extends AbstractResourceTest {
         $configuration->set('Garden.Registration.Method', 'Basic');
         $configuration->set('Garden.Registration.ConfirmEmail', false);
         $configuration->set('Garden.Registration.SkipCaptcha', true);
+        $configuration->set('Garden.Email.Disabled', true);
 
         $fields = $this->registrationFields();
         $this->verifyRegistration($fields);
@@ -262,6 +263,7 @@ class UsersTest extends AbstractResourceTest {
         $configuration->set('Garden.Registration.Method', 'Invitation');
         $configuration->set('Garden.Registration.ConfirmEmail', false);
         $configuration->set('Garden.Registration.SkipCaptcha', true);
+        $configuration->set('Garden.Email.Disabled', true);
 
         $fields = $this->registrationFields();
         $invitation = $this->api()->post('/invites', ['email' => $fields['email']])->getBody();

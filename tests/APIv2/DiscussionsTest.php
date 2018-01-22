@@ -101,6 +101,40 @@ class DiscussionsTest extends AbstractResourceTest {
     }
 
     /**
+     * Test getting a list of discussions from followed categories.
+     */
+    public function testIndexFollowed() {
+        // Make sure we're starting from scratch.
+        $preFollow = $this->api()->get($this->baseUrl, ['followed' => true])->getBody();
+        $this->assertEmpty($preFollow);
+
+        // Create a new category to follow.
+        $category = $this->api()->post("categories", [
+            'name' => __FUNCTION__,
+            'urlcode' => __FUNCTION__
+        ]);
+        $testCategoryID = $category['categoryID'];
+        $this->api()->put("categories/{$testCategoryID}/follow", ['followed' => true]);
+
+        // Add some discussions
+        $totalDiscussions = 3;
+        $record = $this->record();
+        $record['categoryID'] = $testCategoryID;
+        for ($i = 1; $i <= $totalDiscussions; $i++) {
+            $this->testPost($record);
+        }
+
+        // See if we have any discussions.
+        $postFollow = $this->api()->get($this->baseUrl, ['followed' => true])->getBody();
+        $this->assertCount($totalDiscussions, $postFollow);
+
+        // Make sure discussions are only from the followed category.
+        $categoryIDs = array_unique(array_column($postFollow, 'categoryID'));
+        $this->assertCount(1, $categoryIDs);
+        $this->assertEquals($testCategoryID, $categoryIDs[0]);
+    }
+
+    /**
      * Test PATCH /discussions/<id> with a a single field update.
      *
      * @param string $field The name of the field to patch.

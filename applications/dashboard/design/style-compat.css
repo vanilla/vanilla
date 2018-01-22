@@ -75,17 +75,14 @@
   max-height: 100%;
 }
 
+.selectBox-toggle:active {
+  text-decoration: none;
+}
+
 .vanillaDropDown-arrow,
 .selectBox-selected {
   line-height: 1;
   vertical-align: middle;
-}
-
-.selectBox-items {
-  display: block;
-  position: relative;
-  list-style: none;
-  margin: 0;
 }
 
 .selectBox-item {
@@ -124,8 +121,8 @@
   height: 18px;
 }
 
-#Content .BoxNewDiscussion {
-  display: inline-block !important;
+body.Categories.isMobile .PageControls.Top {
+  display: block;
 }
 
 /*# sourceMappingURL=style-compat.css.map */

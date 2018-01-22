@@ -51,6 +51,10 @@
   appearance: none;
   white-space: nowrap;
   max-height: 100%;
+
+  &:active {
+    text-decoration: none;
+  }
 }
 
 .vanillaDropDown-arrow,
@@ -58,18 +62,6 @@
   line-height: 1;
   vertical-align: middle;
 }
-
-
-
-
-
-.selectBox-items {
-  display: block;
-  position: relative;
-  list-style: none;
-  margin: 0;
-}
-
 
 .selectBox-item {
   position: relative;
@@ -112,9 +104,6 @@
   height: 18px;
 }
 
-
-
-// Do not commit, for testing
-#Content .BoxNewDiscussion {
-  display: inline-block !important;
+body.Categories.isMobile .PageControls.Top {
+  display: block;
 }

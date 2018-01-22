@@ -991,8 +991,7 @@ if (!function_exists('linkDropDown')) {
                 <span class="selectBox-selected">{$linkName}</span>
                 <span class="vanillaDropDown-arrow">▾</span>
               </a>
-              <span class="Flyout MenuItems selectBox-content">
-                <ul class="selectBox-items" role="presentation">
+              <ul class="Flyout MenuItems selectBox-content" role="presentation">
 EOT;
         foreach($links as $i => $link) {
             if (val('active', $link)) {
@@ -1016,8 +1015,7 @@ EOT;
             }
         }
         $output .= <<<EOT
-                </ul>
-              </span>
+              </ul>
             </span>
           </span>
         </span>

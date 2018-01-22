@@ -158,6 +158,35 @@ class CategoriesController extends VanillaController {
     }
 
     /**
+     * Get a flattened tree representing the current user's followed categories.
+     *
+     * @param bool $recent Include recent post information?
+     * @return array
+s     */
+    private function getFollowed($recent = false) {
+        $perPage = c('Vanilla.Categories.PerPage', 30);
+        $page = Gdn::request()->get(
+            'Page',
+            Gdn::request()->get('page', null)
+        );
+        list($offset, $limit) = offsetLimit($page, $perPage);
+
+        $result = $this->CategoryModel
+            ->getWhere(['Followed' => true], '', 'asc', $limit, $offset)
+            ->resultArray();
+        $result = $this->CategoryModel->flattenCategories($result);
+
+        if ($recent) {
+            $this->CategoryModel->joinRecent($result);
+        }
+
+        $this->setData('_Limit', $perPage);
+        $this->setData('_CurrentRecords', count($result));
+
+        return $result;
+    }
+
+    /**
      * "Table" layout for categories. Mimics more traditional forum category layout.
      *
      * @param string $category
@@ -220,6 +249,8 @@ class CategoriesController extends VanillaController {
         $layout = c('Vanilla.Categories.Layout');
 
         if ($categoryIdentifier == '') {
+            $this->setData('Followed', boolval(Gdn::request()->get('followed')));
+
             switch ($layout) {
                 case 'mixed':
                     $this->View = 'discussions';
@@ -481,12 +512,18 @@ class CategoriesController extends VanillaController {
             };
         }
 
-        $this->setData('CategoryTree', $this->getCategoryTree(
-            $Category ?: -1,
-            $Category ? null : CategoryModel::getRootDisplayAs(),
-            true,
-            true
-        ));
+        if ($this->data('Followed')) {
+            $categoryTree = $this->getFollowed(true);
+        } else {
+            $categoryTree = $this->getCategoryTree(
+                $Category ?: -1,
+                $Category ? null : CategoryModel::getRootDisplayAs(),
+                true,
+                true
+            );
+        }
+
+        $this->setData('CategoryTree', $categoryTree);
 
         // Add modules
         $this->addModule('NewDiscussionModule');

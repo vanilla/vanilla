@@ -231,7 +231,7 @@ class CommentsApiController extends AbstractApiController {
      * List comments.
      *
      * @param array $query The query string.
-     * @return mixed
+     * @return Data
      */
     public function index(array $query) {
         $this->permission();
@@ -289,14 +289,8 @@ class CommentsApiController extends AbstractApiController {
 
         list($offset, $limit) = offsetLimit("p{$query['page']}", $query['limit']);
 
-        $comments = $this->commentModel->lookup($where, true, $limit, $offset, 'asc');
-        $rows = $comments->resultArray();
-
-        if (isset($discussion) && count($where) === 1) {
-            $paging = ApiUtils::numberedPagerInfo($discussion['CountComments'], '/api/v2/comments', $query, $in);
-        } else {
-            $paging = ApiUtils::morePagerInfo(val('hasMore', $comments), '/api/v2/comments', $query, $in);
-        }
+        $rows = $this->commentModel->lookup($where, true, $limit, $offset, 'asc')->resultArray();
+        $hasMore = $this->commentModel->LastCommentCount >= $limit;
 
         // Expand associated rows.
         $this->userModel->expandUsers(
@@ -312,7 +306,15 @@ class CommentsApiController extends AbstractApiController {
 
         // Allow addons to modify the result.
         $result = $this->getEventManager()->fireFilter('commentsApiController_index_output', $result, $this, $in, $query, $rows);
-        return new Data($result, ['paging' => $paging]);
+
+        if (isset($where['DiscussionID']) && count($where) === 1) {
+            $discussion = $this->discussionByID($where['DiscussionID']);
+            $paging = ApiUtils::numberedPagerInfo($discussion['CountComments'], '/api/v2/comments', $query, $in);
+        } else {
+            $paging = ApiUtils::morePagerInfo($hasMore, '/api/v2/comments', $query, $in);
+        }
+
+        return ApiUtils::setPageMeta($result, $paging);
     }
 
     /**

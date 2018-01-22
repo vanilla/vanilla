@@ -162,7 +162,7 @@ class MessagesApiController extends AbstractApiController {
      * List messages of a user.
      *
      * @param array $query The query string.
-     * @return array
+     * @return Data
      */
     public function index(array $query) {
         $this->permission('Conversations.Conversations.Add');
@@ -236,7 +236,16 @@ class MessagesApiController extends AbstractApiController {
             $message = $this->normalizeOutput($message);
         });
 
-        return $out->validate($messages);
+        $result = $out->validate($messages);
+
+        $paging = ApiUtils::numberedPagerInfo(
+            $this->conversationMessageModel->getCountWhere($where),
+            '/api/v2/messages',
+            $query,
+            $in
+        );
+
+        return ApiUtils::setPageMeta($result, $paging);
     }
 
     /**

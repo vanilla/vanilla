@@ -185,7 +185,7 @@ class CategoriesApiController extends AbstractApiController {
      * Search categories.
      *
      * @param array $query The query string.
-     * @return array
+     * @return Data
      */
     public function get_search(array $query) {
         $this->permission('Garden.SignIn.Allow');
@@ -226,7 +226,10 @@ class CategoriesApiController extends AbstractApiController {
         }
 
         $result = $out->validate($rows);
-        return $result;
+
+        $paging = ApiUtils::morePagerInfo($result, '/api/v2/comments', $query, $in);
+
+        return ApiUtils::setPageMeta($result, $paging);
     }
 
     /**
@@ -259,17 +262,23 @@ class CategoriesApiController extends AbstractApiController {
             'parentCategoryCode:s?' => 'Parent category URL code.',
             'followed:b' => [
                 'default' => false,
-                'description' => 'Only list categories followed by the current user.'
+                'description' => 'Only list categories followed by the current user.',
             ],
             'maxDepth:i?' => [
                 'description' => '',
-                'default' => 2
+                'default' => 2,
             ],
             'page:i?' => [
-                'description' => 'The page number for flat category displays.',
+                'description' => 'The page number. Works with flat and followed categories.',
                 'default' => 1,
                 'minimum' => 1,
-                'maximum' => $this->categoryModel->getMaxPages()
+                'maximum' => $this->categoryModel->getMaxPages(),
+            ],
+            'limit:i?' => [
+                'description' => 'The number of items per page.',
+                'default' => $this->categoryModel->getDefaultLimit(),
+                'minimum' => 1,
+                'maximum' => 100,
             ],
         ], 'in')->setDescription('List categories.');
         $out = $this->schema([':a' => $this->schemaWithChildren()], 'out');
@@ -286,7 +295,9 @@ class CategoriesApiController extends AbstractApiController {
 
         $joinUserCategory = $this->categoryModel->joinUserCategory();
         $this->categoryModel->setJoinUserCategory(true);
-        list($offset, $limit) = offsetLimit("p{$query['page']}", $this->categoryModel->getDefaultLimit());
+
+        list($offset, $limit) = offsetLimit("p{$query['page']}", $query['limit']);
+
         if ($query['followed']) {
             $categories = $this->categoryModel
                 ->getWhere(['Followed' => true], '', 'asc', $limit, $offset)
@@ -297,12 +308,20 @@ class CategoriesApiController extends AbstractApiController {
             $categories = $this->categoryModel->flattenCategories($categories);
             // Reset indexes for proper output detection as an indexed array.
             $categories = array_values($categories);
+
+            $totalCountCallBack = function() {
+                return $this->categoryModel->getCount(['Followed' => true]);
+            };
         } elseif ($parent['DisplayAs'] === 'Flat') {
             $categories = $this->categoryModel->getTreeAsFlat(
                 $parent['CategoryID'],
                 $offset,
                 $limit
             );
+
+            $totalCountCallBack = function() use ($parent) {
+                return $parent['CountCategories'];
+            };
         } else {
             $categories = $this->categoryModel->getTree(
                 $parent['CategoryID'],
@@ -317,7 +336,15 @@ class CategoriesApiController extends AbstractApiController {
         $this->categoryModel->setJoinUserCategory($joinUserCategory);
         $categories = array_map([$this, 'normalizeOutput'], $categories);
 
-        return new Data($out->validate($categories));
+        $result = $out->validate($categories);
+
+        if (isset($totalCountCallBack)) {
+            $paging = ApiUtils::numberedPagerInfo($totalCountCallBack(), '/api/v2/categories', $query, $in);
+        } else {
+            $paging = [];
+        }
+
+        return ApiUtils::setPageMeta($result, $paging);
     }
 
     /**

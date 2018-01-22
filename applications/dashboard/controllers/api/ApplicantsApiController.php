@@ -123,7 +123,8 @@ class ApplicantsApiController extends AbstractApiController {
     /**
      * Get a list of current applicants.
      *
-     * @return array
+     * @param $query
+     * @return Data
      */
     public function index(array $query) {
         $this->permission('Garden.Users.Approve');
@@ -152,12 +153,13 @@ class ApplicantsApiController extends AbstractApiController {
         list($offset, $limit) = offsetLimit("p{$query['page']}", $query['limit']);
         $rows = $this->userModel->getApplicants($limit, $offset)->resultArray();
 
-        foreach ($rows as &$row) {
-            $row = $this->normalizeOutput($row);
-        }
+        $rows = array_map([$this, 'normalizeOutput'], $rows);
 
         $result = $out->validate($rows);
-        return $result;
+
+        $paging = ApiUtils::numberedPagerInfo($this->userModel->getApplicantCount(), '/api/v2/applicants', $query, $in);
+
+        return ApiUtils::setPageMeta($result, $paging);
     }
 
     /**

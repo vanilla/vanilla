@@ -289,8 +289,12 @@ class CategoriesApiController extends AbstractApiController {
             $categories = $this->categoryModel
                 ->getWhere(['Followed' => true], '', 'asc', $limit, $offset)
                 ->resultArray();
-            $categories = array_values($categories);
+
+            // Index by ID for category calculation functions.
+            $categories = array_column($categories, null, 'CategoryID');
             $categories = $this->categoryModel->flattenCategories($categories);
+            // Reset indexes for proper output detection as an indexed array.
+            $categories = array_values($categories);
         } elseif ($parent['DisplayAs'] === 'Flat') {
             $categories = $this->categoryModel->getTreeAsFlat(
                 $parent['CategoryID'],

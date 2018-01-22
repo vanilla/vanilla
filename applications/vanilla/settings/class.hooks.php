@@ -853,6 +853,7 @@ class VanillaHooks implements Gdn_IPlugin {
             $sender->View = 'profilecomments';
         }
         $sender->setData('Comments', $comments);
+        $sender->setData('UnfilteredCommentsCount', $commentModel->LastCommentCount);
 
         // Set the HandlerType back to normal on the profilecontroller so that it fetches it's own views
         $sender->HandlerType = HANDLER_TYPE_NORMAL;
@@ -890,6 +891,8 @@ class VanillaHooks implements Gdn_IPlugin {
         $discussionModel = new DiscussionModel();
         $discussions = $discussionModel->getByUser($sender->User->UserID, $limit, $offset, false, Gdn::session()->UserID);
         $countDiscussions = $offset + $discussionModel->LastDiscussionCount + 1;
+
+        $sender->setData('UnfilteredDiscussionsCount', $discussionModel->LastDiscussionCount);
         $sender->DiscussionData = $sender->setData('Discussions', $discussions);
 
         // Build a pager

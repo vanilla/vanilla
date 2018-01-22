@@ -4,7 +4,7 @@
  * @license GPLv2
  */
 
-import { polyfillClosest } from "../polyfills";
+import { polyfillClosest } from "../bootstrap/polyfills";
 
 // Because there is something weird happening in watch mode if this gets applied twice.
 // Likely the JSDOM references get deleted and need to be referenced.

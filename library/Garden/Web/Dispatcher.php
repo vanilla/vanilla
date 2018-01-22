@@ -2,16 +2,22 @@
 /**
  * @author Todd Burry <todd@vanillaforums.com>
  * @copyright 2009-2018 Vanilla Forums Inc.
- * @license Proprietary
+ * @license GPLv2
  */
 
 namespace Garden\Web;
 
+use Gdn;
+use Gdn_Locale;
 use Garden\Web\Exception\NotFoundException;
 use Garden\Web\Exception\Pass;
+use Interop\Container\ContainerInterface;
 use Vanilla\Permissions;
 
 class Dispatcher {
+
+    /** @var Gdn_Locale */
+    private $locale;
 
     /**
      * @var array
@@ -22,6 +28,22 @@ class Dispatcher {
      * @var string|array|callable
      */
     private $allowedOrigins;
+
+    /**
+     * @var ContainerInterface $container
+     */
+    private $container;
+
+    /**
+     * Dispatcher constructor.
+     *
+     * @param Gdn_Locale $locale
+     * @param ContainerInterface $container The container is used to fetch view handlers.
+     */
+    public function __construct(Gdn_Locale $locale, ContainerInterface $container) {
+        $this->locale = $locale;
+        $this->container = $container;
+    }
 
     /**
      * Add a route to the routes list.
@@ -85,10 +107,13 @@ class Dispatcher {
                         /* @var \Gdn_Request $request */
                         try {
                             $request->isAuthenticatedPostBack(true);
-                        } catch (\Exception $csrfEx) {
-                            \Gdn::session()->getPermissions()->addBan(
+                        } catch (\Exception $ex) {
+                            Gdn::session()->getPermissions()->addBan(
                                 Permissions::BAN_CSRF,
-                                ['msg' => t('Invalid CSRF token.', 'Invalid CSRF token. Please try again.'), 'code' => 403]
+                                [
+                                    'msg' => $this->locale->translate('Invalid CSRF token.', 'Invalid CSRF token. Please try again.'),
+                                    'code' => 403
+                                ]
                             );
                         }
                     }
@@ -100,6 +125,10 @@ class Dispatcher {
                         $ob = ob_get_clean();
                     }
                     $response = $this->makeResponse($actionResponse, $ob);
+                    if (is_object($action) && method_exists($action, 'getMetaArray')) {
+                        $this->mergeMeta($response, $action->getMetaArray());
+                    }
+                    $this->mergeMeta($response, $route->getMetaArray());
                     break;
                 }
             } catch (Pass $pass) {
@@ -107,9 +136,11 @@ class Dispatcher {
                 continue;
             } catch (\Exception $dispatchEx) {
                 $response = $this->makeResponse($dispatchEx);
+                $this->mergeMeta($response, $route->getMetaArray());
                 break;
             } catch (\Error $dispatchError) {
                 $response = $this->makeResponse($dispatchError);
+                $this->mergeMeta($response, $route->getMetaArray());
                 break;
             }
         }
@@ -146,6 +177,35 @@ class Dispatcher {
     }
 
     /**
+     * Merge the given meta array on top or below a data object's meta array.
+     *
+     * Meta information is used to pass information such as additional headers, page title, template name, etc. to views.
+     * The meta information comes from several sources:
+     *
+     * 1. Controllers can set custom information during their **method** invocation.
+     * 2. Routes can add meta information to **actions** when they match that is specific to the action.
+     * 3. The **routes** themselves can set default meta information for any response that matches.
+     *
+     * The meta information is merged with the above priority so actions can't override controllers and routes can't override actions.
+     *
+     * @param Data $data The data to merge with.
+     * @param array|null $meta The meta to merge.
+     * @param bool $replace Whether to replace existing items or not.
+     */
+    private function mergeMeta(Data $data, array $meta = null, $replace = false) {
+        if (empty($meta)) {
+            return;
+        }
+
+        if ($replace) {
+            $result = array_replace_recursive($data->getMetaArray(), $meta);
+        } else {
+            $result = array_replace_recursive($meta, $data->getMetaArray());
+        }
+        $data->setMetaArray($result);
+    }
+
+    /**
      * Handle a request.
      *
      * This method dispatches the request to an appropriate callback depending on the available routes and renders the contents.
@@ -154,7 +214,8 @@ class Dispatcher {
      */
     public function handle(RequestInterface $request) {
         $response = $this->dispatch($request);
-        $response->render();
+
+        $this->render($request, $response);
     }
 
     /**
@@ -175,6 +236,8 @@ class Dispatcher {
             $result = new Data($data, $raw->getCode());
             // Provide stack trace as meta information.
             $result->setMeta('errorTrace', $raw->getTraceAsString());
+
+            $this->mergeMeta($result, ['template' => 'error-page']);
         } elseif ($raw instanceof \JsonSerializable) {
             $result = new Data((array)$raw->jsonSerialize());
         } elseif (!empty($ob)) {
@@ -263,5 +326,36 @@ class Dispatcher {
     public function setAllowedOrigins($origins) {
         $this->allowedOrigins = $origins;
         return $this;
+    }
+
+    /**
+     * Finalize the request and render the response.
+     *
+     * This method is public for the sake of refactoring with the old dispatcher, but should be protected once the old
+     * dispatcher is removed.
+     *
+     * @param RequestInterface $request The initial request.
+     * @param Data $response The response data.
+     */
+    public function render(RequestInterface $request, Data $response) {
+        $contentType = $response->getHeader('Content-Type', $request->getHeader('Accept'));
+        if (preg_match('`([a-z]+/[a-z0-9.-]+)`i', $contentType, $m)) {
+            $contentType = strtolower($m[1]);
+        } else {
+            $contentType = 'application/json';
+        }
+
+        // Check to see if there is a view handler.
+        $viewKey = "@view-$contentType";
+
+        if ($this->container->has($viewKey)) {
+            /* @var ViewInterface $view */
+            $view = $this->container->get($viewKey);
+
+            $view->render($response);
+        } else {
+            // The default is JSON which may need to change.
+            $response->render();
+        }
     }
 }

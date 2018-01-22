@@ -26,6 +26,11 @@ abstract class AbstractAPIv2Test extends TestCase {
     private $startSessionOnSetup = true;
 
     /**
+     * @var array Fields that are getting formatted using the format column.
+     */
+    protected $formattedFields = ['body'];
+
+    /**
      * Whether to start a session on setUp() or not.
      *
      * @param bool $enabled
@@ -66,11 +71,17 @@ abstract class AbstractAPIv2Test extends TestCase {
         return $this->api;
     }
 
-    public function assertRowsEqual(array $expected, array $actual, $format = false) {
-        // Fix the body and format.
-        if ($format && array_key_exists('body', $expected) && array_key_exists('format', $expected)) {
-            $expected['body'] = \Gdn_Format::to($expected['body'], $expected['format']);
-            unset($expected['format']);
+    public function assertRowsEqual(array $expected, array $actual) {
+        // Fix formatted fields.
+        foreach([&$expected, &$actual] as &$row) {
+            if (array_intersect(array_keys($row), $this->formattedFields) && array_key_exists('format', $row)) {
+                foreach ($this->formattedFields as $field) {
+                    if (array_key_exists($field, $row)) {
+                        $row[$field] = \Gdn_Format::to($row[$field], $row['format']);
+                    }
+                }
+                unset($row['format']);
+            }
         }
 
         $actualSparse = [];

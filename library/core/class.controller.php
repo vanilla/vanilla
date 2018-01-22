@@ -615,8 +615,15 @@ class Gdn_Controller extends Gdn_Pluggable {
             $this->_Definitions['Search'] = t('Search');
         }
 
+        if (debug()) {
+            $this->_Definitions['debug'] = true;
+        }
+
         // Output a JavaScript object with all the definitions.
-        $result = 'gdn=window.gdn||{};gdn.meta='.json_encode($this->_Definitions).';';
+        $result = 'gdn=window.gdn||{};'.
+            'gdn.meta='.json_encode($this->_Definitions).';'.
+            'gdn.permissions='.json_encode(Gdn::session()->getPermissions()).';';
+
         if ($wrap) {
             $result = "<script>$result</script>";
         }
@@ -1607,6 +1614,7 @@ class Gdn_Controller extends Gdn_Pluggable {
                 // Pick our route.
                 switch ($ex->getCode()) {
                     case 401:
+                    case 403:
                         $route = 'DefaultPermission';
                         break;
                     case 404:
@@ -1627,7 +1635,7 @@ class Gdn_Controller extends Gdn_Pluggable {
                         ->passData('Url', url())
                         ->passData('Breadcrumbs', $this->data('Breadcrumbs', []))
                         ->dispatch($route);
-                } elseif (in_array($ex->getCode(), [401, 404])) {
+                } elseif (in_array($ex->getCode(), [401, 403, 404])) {
                     // Default forbidden & not found codes.
                     Gdn::dispatcher()
                         ->passData('Message', $ex->getMessage())

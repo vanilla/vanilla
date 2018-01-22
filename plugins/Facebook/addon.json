@@ -13,7 +13,7 @@
     "icon": "facebook_social_connect.png",
     "key": "facebook",
     "type": "addon",
-    "documentationUrl": "http://docs.vanillaforums.com/help/addons/social/facebook/",
+    "documentationUrl": "https://docs.vanillaforums.com/help/sso/social-connect/#facebook",
     "authors": [
         {
             "name": "Todd Burry",

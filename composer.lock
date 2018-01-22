@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "content-hash": "024a3434c0f647be75912d6f9e16ffe5",
+    "content-hash": "bc63e9037fb2c5744381c6d83e22f1cd",
     "packages": [
         {
             "name": "chrisjean/php-ico",
@@ -2201,10 +2201,10 @@
     "prefer-stable": false,
     "prefer-lowest": false,
     "platform": {
-        "php": ">=5.6.0"
+        "php": ">=7.0.0"
     },
     "platform-dev": [],
     "platform-overrides": {
-        "php": "5.6.31"
+        "php": "7.0.26"
     }
 }

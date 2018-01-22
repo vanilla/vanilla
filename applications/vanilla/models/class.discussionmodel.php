@@ -718,6 +718,21 @@ class DiscussionModel extends Gdn_Model {
             $sql->orderBy($this->addFieldPrefix($field), $direction);
         }
 
+        if (array_key_exists('Followed', $where)) {
+            if ($where['Followed']) {
+                $categoryModel = new CategoryModel();
+                $followed = $categoryModel->getFollowed(Gdn::session()->UserID);
+                $categoryIDs = array_column($followed, 'CategoryID');
+
+                if (isset($where['d.CategoryID'])) {
+                    $where['d.CategoryID'] = array_values(array_intersect((array)$where['d.CategoryID'], $categoryIDs));
+                } else {
+                    $where['d.CategoryID'] = $categoryIDs;
+                }
+            }
+            unset($where['Followed']);
+        }
+
         if ($perms !== true) {
             if (isset($where['d.CategoryID'])) {
                 $where['d.CategoryID'] = array_values(array_intersect((array)$where['d.CategoryID'], $perms));

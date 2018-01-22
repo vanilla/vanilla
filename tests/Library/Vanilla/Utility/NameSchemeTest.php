@@ -9,6 +9,7 @@ namespace VanillaTests\Library\Vanilla\Utility;
 
 use PHPUnit\Framework\TestCase;
 use Vanilla\Utility\CamelCaseScheme;
+use Vanilla\Utility\DelimitedScheme;
 
 /**
  * Tests for Vanilla\Utility\NameScheme classes.
@@ -26,6 +27,17 @@ class NameSchemeTest extends TestCase {
         $actual = $names->convert($name);
 
         $this->assertEquals($expected, $actual);
+    }
+
+    /**
+     * Test a basic delimited scheme.
+     */
+    public function testDelimitedName() {
+        $names = new DelimitedScheme('.', new CamelCaseScheme());
+        $name = 'Foo.Bar.BazBam';
+
+        $converted = $names->convert($name);
+        $this->assertEquals('foo.bar.bazBam', $converted);
     }
 
     /**

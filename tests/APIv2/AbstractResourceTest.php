@@ -105,7 +105,7 @@ abstract class AbstractResourceTest extends AbstractAPIv2Test {
         $this->assertTrue(is_int($body[$this->pk]));
         $this->assertTrue($body[$this->pk] > 0);
 
-        $this->assertRowsEqual($record, $body, true);
+        $this->assertRowsEqual($record, $body);
 
         return $body;
     }
@@ -124,7 +124,7 @@ abstract class AbstractResourceTest extends AbstractAPIv2Test {
 
         $this->assertEquals(200, $r->getStatusCode());
 
-        $this->assertRowsEqual($newRow, $r->getBody(), true);
+        $this->assertRowsEqual($newRow, $r->getBody());
 
         return $r->getBody();
     }

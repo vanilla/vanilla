@@ -7,6 +7,8 @@
 
 namespace VanillaTests\APIv2;
 
+use CategoryModel;
+
 /**
  * Test the /api/v2/categories endpoints.
  */
@@ -81,12 +83,56 @@ class CategoriesTest extends AbstractResourceTest {
     }
 
     /**
+     * Test flagging (and unflagging) a category as followed by the current user.
+     */
+    public function testFollow() {
+        $record = $this->record();
+        $record['displayAs'] = 'discussions';
+        $row = $this->testPost($record);
+
+        $follow = $this->api()->put("{$this->baseUrl}/{$row[$this->pk]}/follow", ['followed' => true]);
+        $this->assertEquals(200, $follow->getStatusCode());
+        $followBody = $follow->getBody();
+        $this->assertTrue($followBody['followed']);
+
+        $index = $this->api()->get($this->baseUrl, ['parentCategoryID' => self::PARENT_CATEGORY_ID])->getBody();
+        $categories = array_column($index, null, 'categoryID');
+        $this->assertArrayHasKey($row['categoryID'], $categories);
+        $this->assertTrue($categories[$row['categoryID']]['followed']);
+
+        $follow = $this->api()->put("{$this->baseUrl}/{$row[$this->pk]}/follow", ['followed' => false]);
+        $this->assertEquals(200, $follow->getStatusCode());
+        $followBody = $follow->getBody();
+        $this->assertFalse($followBody['followed']);
+
+        $index = $this->api()->get($this->baseUrl, ['parentCategoryID' => self::PARENT_CATEGORY_ID])->getBody();
+        $categories = array_column($index, null, 'categoryID');
+        $this->assertFalse($categories[$row['categoryID']]['followed']);
+    }
+
+    /**
      * {@inheritdoc}
      */
     public function testGetEdit($record = null) {
         $row = $this->testPost();
         $result = parent::testGetEdit($row);
         return $result;
+    }
+
+    /**
+     * Test getting a list of followed categories.
+     */
+    public function testIndexFollowed() {
+        // Make sure we're starting from scratch.
+        $preFollow = $this->api()->get($this->baseUrl, ['followed' => true])->getBody();
+        $this->assertEmpty($preFollow);
+
+        // Follow. Make sure we're following.
+        $testCategoryID = self::PARENT_CATEGORY_ID;
+        $this->api()->put("{$this->baseUrl}/{$testCategoryID}/follow", ['followed' => true]);
+        $postFollow = $this->api()->get($this->baseUrl, ['followed' => true])->getBody();
+        $this->assertCount(1, $postFollow);
+        $this->assertEquals($testCategoryID, $postFollow[0]['categoryID']);
     }
 
     /**
@@ -192,5 +238,35 @@ class CategoriesTest extends AbstractResourceTest {
             "{$this->baseUrl}/{$row[$this->pk]}",
             ['parentCategoryID' => $child[$this->pk]]
         );
+    }
+
+    /**
+     * Test unfollowing a category after its display type has changed to something incompatible with following.
+     */
+    public function testUnfollowDisplay() {
+        $record = $this->record();
+        $record['displayAs'] = 'discussions';
+        $row = $this->testPost($record);
+
+        $follow = $this->api()->put("{$this->baseUrl}/{$row[$this->pk]}/follow", ['followed' => true]);
+        $this->assertEquals(200, $follow->getStatusCode());
+        $followBody = $follow->getBody();
+        $this->assertTrue($followBody['followed']);
+
+        $index = $this->api()->get($this->baseUrl, ['parentCategoryID' => self::PARENT_CATEGORY_ID])->getBody();
+        $categories = array_column($index, null, 'categoryID');
+        $this->assertArrayHasKey($row['categoryID'], $categories);
+        $this->assertTrue($categories[$row['categoryID']]['followed']);
+
+        $this->api()->patch("{$this->baseUrl}/{$row[$this->pk]}", ['displayAs' => 'categories']);
+
+        $follow = $this->api()->put("{$this->baseUrl}/{$row[$this->pk]}/follow", ['followed' => false]);
+        $this->assertEquals(200, $follow->getStatusCode());
+        $followBody = $follow->getBody();
+        $this->assertFalse($followBody['followed']);
+
+        $index = $this->api()->get($this->baseUrl, ['parentCategoryID' => self::PARENT_CATEGORY_ID])->getBody();
+        $categories = array_column($index, null, 'categoryID');
+        $this->assertFalse($categories[$row['categoryID']]['followed']);
     }
 }

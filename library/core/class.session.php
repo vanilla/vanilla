@@ -430,16 +430,8 @@ class Gdn_Session {
             // Instantiate a UserModel to get session info
             $this->User = $userModel->getSession($this->UserID);
 
+            $userSignedIn = false;
             if ($this->User) {
-                if ($setIdentity) {
-                    Gdn::authenticator()->setIdentity($this->UserID, $persist);
-                    Logger::event('session_start', Logger::INFO, 'Session started for {username}.');
-                    Gdn::pluginManager()->callEventHandlers($this, 'Gdn_Session', 'Start');
-                }
-
-                $userModel->EventArguments['User'] =& $this->User;
-                $userModel->fireEvent('AfterGetSession');
-
                 $this->permissions->setPermissions($this->User->Permissions);
 
                 // Set permission overrides.
@@ -451,22 +443,36 @@ class Gdn_Session {
                     $this->permissions->addBan(Permissions::BAN_BANNED, ['msg' => t('You are banned.')]);
                 }
 
-                $this->_Preferences = $this->User->Preferences;
-                $this->_Attributes = $this->User->Attributes;
+                if ($this->permissions->has('Garden.SignIn.Allow')) {
+                    if ($setIdentity) {
+                        Gdn::authenticator()->setIdentity($this->UserID, $persist);
+                        Logger::event('session_start', Logger::INFO, 'Session started for {username}.');
+                        Gdn::pluginManager()->callEventHandlers($this, 'Gdn_Session', 'Start');
+                    }
 
-                // Save any visit-level information.
-                if ($setIdentity) {
-                    $userModel->updateVisit($this->UserID);
-                }
+                    $userModel->EventArguments['User'] =& $this->User;
+                    $userModel->fireEvent('AfterGetSession');
 
-                /**
-                 * This checks ensures TK cookies aren't set for API calls, but are set for normal users where
-                 * $SetIdentity may be false on subsequent page loads after logging in.
-                 */
-                if ($setIdentity || $userID === false) {
-                    $this->ensureTransientKey();
+                    $this->_Preferences = $this->User->Preferences;
+                    $this->_Attributes = $this->User->Attributes;
+
+                    // Save any visit-level information.
+                    if ($setIdentity) {
+                        $userModel->updateVisit($this->UserID);
+                    }
+
+                    /**
+                     * This checks ensures TK cookies aren't set for API calls, but are set for normal users where
+                     * $SetIdentity may be false on subsequent page loads after logging in.
+                     */
+                    if ($setIdentity || $userID === false) {
+                        $this->ensureTransientKey();
+                    }
+                    $userSignedIn = true;
                 }
-            } else {
+            }
+
+            if (!$userSignedIn) {
                 $this->UserID = 0;
                 $this->User = false;
 

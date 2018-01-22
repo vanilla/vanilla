@@ -50,3 +50,6 @@ $Configuration['Vanilla']['Modules']['ShowBookmarkedModule'] = false;
 
 // Allow users to delete their own comments if are still allowed to edit (per timeout).
 $Configuration['Vanilla']['Comments']['AllowSelfDelete'] = false;
+
+// Allow users to follow categories. Users will be able to see a feed of discussions of only their followed categories.
+$Configuration['Vanilla']['EnableCategoryFollowing'] = false;

@@ -25,6 +25,9 @@ class CategoryModel extends Gdn_Model {
     /** Cache key. */
     const MASTER_VOTE_KEY = 'Categories.Rebuild.Vote';
 
+    /** The default maximum number of categories a user can follow. */
+    const MAX_FOLLOWED_CATEGORIES_DEFAULT = 100;
+
     /** Flag for aggregating comment counts. */
     const AGGREGATE_COMMENT = 'comment';
 
@@ -226,6 +229,8 @@ class CategoryModel extends Gdn_Model {
             $following = !((bool)val('Archived', $category) || (bool)val('Unfollow', $userData, false));
             $category['Following'] = $following;
 
+            $category['Followed'] = boolval($userData['Followed']);
+
             // Calculate the read field.
             if (strcasecmp($category['DisplayAs'], 'heading') === 0) {
                 $category['Read'] = false;
@@ -242,19 +247,24 @@ class CategoryModel extends Gdn_Model {
     }
 
     /**
-     * Get the per-category information for the current user.
+     * Get the per-category information for a user.
      *
+     * @param int $userID
      * @return array|mixed
      */
-    private function getUserCategories() {
-        if (Gdn::session()->UserID) {
-            $key = 'UserCategory_'.Gdn::session()->UserID;
+    private function getUserCategories($userID = null) {
+        if ($userID === null) {
+            $userID = Gdn::session()->UserID;
+        }
+
+        if ($userID) {
+            $key = 'UserCategory_'.$userID;
             $userData = Gdn::cache()->get($key);
             if ($userData === Gdn_Cache::CACHEOP_FAILURE) {
                 $sql = clone $this->SQL;
                 $sql->reset();
 
-                $userData = $sql->getWhere('UserCategory', ['UserID' => Gdn::session()->UserID])->resultArray();
+                $userData = $sql->getWhere('UserCategory', ['UserID' => $userID])->resultArray();
                 $userData = array_column($userData, null, 'CategoryID');
                 Gdn::cache()->store($key, $userData);
                 return $userData;
@@ -283,6 +293,97 @@ class CategoryModel extends Gdn_Model {
      */
     public static function getRootDisplayAs() {
         return c('Vanilla.RootCategory.DisplayAs', 'Categories');
+    }
+
+    /**
+     * Get a list of a user's followed categories.
+     *
+     * @param int $userID The target user's ID.
+     * @return array
+     */
+    public function getFollowed($userID) {
+        $key = "Follow_{$userID}";
+        $result = Gdn::cache()->get($key);
+        if ($result === Gdn_Cache::CACHEOP_FAILURE) {
+            $sql = clone $this->SQL;
+            $sql->reset();
+
+            $userData = $sql->getWhere('UserCategory', [
+                'UserID' => $userID,
+                'Followed' => 1
+            ])->resultArray();
+            $result = array_column($userData, null, 'CategoryID');
+            Gdn::cache()->store($key, $result);
+        }
+
+        return $result;
+    }
+
+    /**
+     * Set whether a user is following a category.
+     *
+     * @param int $userID The target user's ID.
+     * @param int $categoryID The target category's ID.
+     * @param bool|null $followed True for following. False for not following. Null for toggle.
+     * @return bool A boolean value representing the user's resulting "follow" status for the category.
+     */
+    public function follow($userID, $categoryID, $followed = null) {
+        $validationOptions = ['options' => [
+            'min_range' => 1
+        ]];
+        if (!($userID = filter_var($userID, FILTER_VALIDATE_INT, $validationOptions))) {
+            throw new InvalidArgumentException('Invalid $userID');
+        }
+        if (!($categoryID = filter_var($categoryID, FILTER_VALIDATE_INT, $validationOptions))) {
+            throw new InvalidArgumentException('Invalid $categoryID');
+        }
+
+        $isFollowed = $this->isFollowed($userID, $categoryID);
+        if ($followed === null) {
+            $followed = !$isFollowed;
+        }
+        $followed = $followed ? 1 : 0;
+
+        $category = static::categories($categoryID);
+        if (!is_array($category)) {
+            throw new InvalidArgumentException('Category not found.');
+        } elseif ($category['DisplayAs'] !== 'Discussions' && !$isFollowed) {
+            throw new InvalidArgumentException('Category not configured to display as discussions.');
+        }
+
+        $this->SQL->replace(
+            'UserCategory',
+            ['Followed' => $followed],
+            ['UserID' => $userID, 'CategoryID' => $categoryID]
+        );
+        static::clearUserCache();
+        Gdn::cache()->remove("Follow_{$userID}");
+
+        $result = $this->isFollowed($userID, $categoryID);
+        return $result;
+    }
+
+    /**
+     * Get the maximum number of categories a user is allowed to follow.
+     *
+     * @return mixed
+     */
+    public function getMaxFollowedCategories() {
+        $result = c('Vanilla.MaxFollowedCategories', self::MAX_FOLLOWED_CATEGORIES_DEFAULT);
+        return $result;
+    }
+    /**
+     * Is the specified user following the specified category?
+     *
+     * @param int $userID The target user's ID.
+     * @param int $categoryID The target category's ID.
+     * @return bool
+     */
+    public function isFollowed($userID, $categoryID) {
+        $followed = $this->getFollowed($userID);
+        $result = array_key_exists($categoryID, $followed);
+
+        return $result;
     }
 
     /**
@@ -514,10 +615,16 @@ class CategoryModel extends Gdn_Model {
     }
 
     /**
+     * Clear the cached UserCategory data for a specific user.
      *
+     * @param int|null $userID The user to clear. Use `null` for the current user.
      */
-    public static function clearUserCache() {
-        $key = 'UserCategory_'.Gdn::session()->UserID;
+    public static function clearUserCache($userID = null) {
+        if ($userID === null) {
+            $userID = Gdn::session()->UserID;
+        }
+
+        $key = 'UserCategory_'.$userID;
         Gdn::cache()->remove($key);
     }
 
@@ -831,19 +938,10 @@ class CategoryModel extends Gdn_Model {
             $query->like('Name', $filter);
         }
 
-        $categoryTree = $query->get()->resultArray();
-        self::calculateData($categoryTree);
-        self::joinUserData($categoryTree);
+        $categories = $query->get()->resultArray();
+        $categories = $this->flattenCategories($categories);
 
-        foreach ($categoryTree as &$category) {
-            // Fix the depth to be relative, not global.
-            $category['Depth'] = 1;
-
-            // We don't have children, but trees are expected to have this key.
-            $category['Children'] = [];
-        }
-
-        return $categoryTree;
+        return $categories;
     }
 
     /**
@@ -880,6 +978,27 @@ class CategoryModel extends Gdn_Model {
             }
         }
         return $result;
+    }
+
+    /**
+     * Prepare an array of category rows for display as a flat list.
+     *
+     * @param array $categories Category rows.
+     * @return array
+     */
+    public function flattenCategories(array $categories) {
+        self::calculateData($categories);
+        self::joinUserData($categories);
+
+        foreach ($categories as &$category) {
+            // Fix the depth to be relative, not global.
+            $category['Depth'] = 1;
+
+            // We don't have children, but trees are expected to have this key.
+            $category['Children'] = [];
+        }
+
+        return $categories;
     }
 
     /**
@@ -1524,6 +1643,8 @@ class CategoryModel extends Gdn_Model {
                 $following = !((bool)val('Archived', $category) || (bool)val('Unfollow', $row, false));
                 $categories[$iD]['Following'] = $following;
 
+                $categories[$iD]['Followed'] = boolval($row['Followed']);
+
                 // Calculate the read field.
                 if ($category['DisplayAs'] == 'Heading') {
                     $categories[$iD]['Read'] = false;
@@ -2087,6 +2208,32 @@ class CategoryModel extends Gdn_Model {
             $data = false;
         }
         return $data;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getWhere($where = false, $orderFields = '', $orderDirection = 'asc', $limit = false, $offset = false) {
+        if (!is_array($where)) {
+            $where = [];
+        }
+
+        if (array_key_exists('Followed', $where)) {
+            if ($where['Followed']) {
+                $followed = $this->getFollowed(Gdn::session()->UserID);
+                $categoryIDs = array_column($followed, 'CategoryID');
+
+                if (isset($where['CategoryID'])) {
+                    $where['CategoryID'] = array_values(array_intersect((array)$where['CategoryID'], $categoryIDs));
+                } else {
+                    $where['CategoryID'] = $categoryIDs;
+                }
+            }
+            unset($where['Followed']);
+        }
+
+        $result = parent::getWhere($where, $orderFields, $orderDirection, $limit, $offset);
+        return $result;
     }
 
     /**

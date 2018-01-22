@@ -113,22 +113,6 @@ describe("generateRandomString", () => {
 });
 
 describe("metaDataFunctions", () => {
-    beforeEach(() => {
-        // @ts-ignore
-        if (!global.gdn || !global.gdn.meta) {
-            global.gdn = {};
-            global.gdn.meta = {};
-        }
-
-        global.gdn.meta = {
-            foo: "foo"
-        }
-    })
-
-    it("can fetch existing metaData", () => {
-        expect(utility.getMeta("foo")).toBe("foo");
-    })
-
     it("return a default value if the requested one can't be found", () => {
         expect(utility.getMeta("baz", "fallback")).toBe("fallback");
     })
@@ -158,10 +142,7 @@ describe("formatUrl", () => {
     });
 
     it("follows the given format", () => {
-        window.gdn = {};
-        window.gdn.meta = {
-            UrlFormat: "/test/{Path}",
-        };
+        utility.setMeta("UrlFormat", "/test/{Path}");
 
         expect(utility.formatUrl("/discussions")).toBe("/test/discussions");
     });

@@ -6,6 +6,7 @@
  */
 
 use Garden\Schema\Schema;
+use Garden\Web\Data;
 use Garden\Web\Exception\NotFoundException;
 use Garden\Web\Exception\ServerException;
 use Vanilla\DateFilterSchema;
@@ -49,7 +50,7 @@ class DiscussionsApiController extends AbstractApiController {
      * Get a list of the current user's bookmarked discussions.
      *
      * @param array $query The request query.
-     * @return array
+     * @return Data
      */
     public function get_bookmarked(array $query) {
         $this->permission('Garden.SignIn.Allow');
@@ -90,7 +91,7 @@ class DiscussionsApiController extends AbstractApiController {
         }
 
         $result = $out->validate($rows);
-        return $result;
+        return new Data($result, ['paging' => ApiUtils::morePagerInfo($result, '/api/v2/discussions/bookmarked', $query, $in)]);
     }
 
     /**
@@ -319,7 +320,7 @@ class DiscussionsApiController extends AbstractApiController {
      * List discussions.
      *
      * @param array $query The query string.
-     * @return array
+     * @return Data
      */
     public function index(array $query) {
         $this->permission();
@@ -405,6 +406,14 @@ class DiscussionsApiController extends AbstractApiController {
             }
         }
 
+        if (empty($where) ||
+            (isset($where['d.CategoryID']) && (count($where) === 1 || (count($where) === 2 && isset($where['Announce']))))
+        ) {
+            $paging = ApiUtils::numberedPagerInfo($this->discussionModel->getCount($where), '/api/v2/discussions', $query, $in);
+        } else {
+            $paging = ApiUtils::morePagerInfo($rows, '/api/v2/discussions', $query, $in);
+        }
+
         // Expand associated rows.
         $this->userModel->expandUsers(
             $rows,
@@ -419,7 +428,7 @@ class DiscussionsApiController extends AbstractApiController {
 
         // Allow addons to modify the result.
         $result = $this->getEventManager()->fireFilter('discussionsApiController_index_output', $result, $this, $in, $query, $rows);
-        return $result;
+        return new Data($result, ['paging' => $paging]);
     }
 
     /**

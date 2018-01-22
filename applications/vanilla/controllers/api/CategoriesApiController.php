@@ -248,7 +248,7 @@ class CategoriesApiController extends AbstractApiController {
      * List categories.
      *
      * @param array $query The query string.
-     * @return array
+     * @return Data
      */
     public function index(array $query) {
         $this->permission('Garden.SignIn.Allow');
@@ -261,7 +261,7 @@ class CategoriesApiController extends AbstractApiController {
                 'default' => 2
             ],
             'page:i?' => [
-                'description' => 'Page number.',
+                'description' => 'The page number for flat category displays.',
                 'default' => 1,
                 'minimum' => 1,
                 'maximum' => $this->categoryModel->getMaxPages()
@@ -275,7 +275,8 @@ class CategoriesApiController extends AbstractApiController {
         } elseif (array_key_exists('parentCategoryCode', $query)) {
             $parent = $this->category($query['parentCategoryCode']);
         } else {
-            $parent = $this->category(-1);
+            // The root category config sets the DisplayAs of the root category.
+            $parent = c('Vanilla.RootCategory', []) + $this->category(-1);
         }
 
         $joinUserCategory = $this->categoryModel->joinUserCategory();
@@ -288,12 +289,20 @@ class CategoriesApiController extends AbstractApiController {
                 $limit
             );
         } else {
-            $categories = $this->categoryModel->getTree($parent['CategoryID'], ['maxdepth' => $query['maxDepth']]);
+            $categories = $this->categoryModel->getTree(
+                $parent['CategoryID'],
+                [
+                    'maxdepth' => $query['maxDepth'],
+                    'filter' => function ($row) {
+                        return empty($row['Archived']);
+                    },
+                ]
+            );
         }
         $this->categoryModel->setJoinUserCategory($joinUserCategory);
         $categories = array_map([$this, 'normalizeOutput'], $categories);
 
-        return $out->validate($categories);
+        return new Data($out->validate($categories));
     }
 
     /**

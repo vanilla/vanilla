@@ -7,12 +7,19 @@
 // import * as utility from "@core/utility";
 
 /** The gdn object may be set in an inline script in the head of the document. */
-const gdn = {
-    meta: {},
-    permissions: {},
-    translations: {},
-    ...(window["gdn"] || {}),
-};
+const gdn = window['gdn'] || {};
+
+if (!('meta' in gdn)) {
+    gdn.meta = {};
+}
+
+if (!('permissions' in gdn)) {
+    gdn.permissions = {};
+}
+
+if (!('translations' in gdn)) {
+    gdn.translations = {};
+}
 
 // Wrap like this because we can't import utility (cyclical dependency)/
 if (gdn.meta["debug"]) {

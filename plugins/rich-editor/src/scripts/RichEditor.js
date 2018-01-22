@@ -8,7 +8,7 @@ import Quill from "quill";
 import * as utility from "@core/utility";
 import AutoLinker from "./AutoLinker";
 
-// Quill.register('modules/autoLinker', AutoLinker);
+Quill.register('modules/autoLinker', AutoLinker);
 
 const toolbarOptions = [
     ["bold", "italic", "underline", "strike"], // toggled buttons
@@ -24,7 +24,7 @@ const toolbarOptions = [
 const options = {
     modules: {
         toolbar: toolbarOptions,
-        // autoLinker: true,
+        autoLinker: true,
     },
     placeholder: "Create a new post...",
     theme: "bubble",

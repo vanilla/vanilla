@@ -18,8 +18,8 @@
         "vanilla": ">=2.5"
     },
     "conflict": {
-        "Quotes": "",
-        "editor": ""
+        "Quotes": "*",
+        "editor": "*"
     },
     "build": {
         "process": "core",

@@ -105,32 +105,47 @@ if (!function_exists('heading')) {
      * Handles url-ifying. Adds an optional button or return link.
      *
      * @param string $title The page title.
-     * @param string $buttonText The text appearing on the button.
+     * @param string|array $buttonText The text appearing on the button or an array of button definitions.
      * @param string $buttonUrl The url for the button.
      * @param string|array $buttonAttributes Can be string CSS class or an array of attributes. CSS class defaults to `btn btn-primary`.
      * @param string $returnUrl The url for the return chrevron button.
      * @return string The structured heading string.
      */
     function heading($title, $buttonText = '', $buttonUrl = '', $buttonAttributes = [], $returnUrl = '') {
-
-        if (is_string($buttonAttributes)) {
-            $buttonAttributes = ['class' => $buttonAttributes];
+        if (is_array($buttonText)) {
+            $buttons = $buttonText;
+        } elseif (!empty($buttonText)) {
+            $buttons = [[
+                'text' => $buttonText,
+                'url' => $buttonUrl,
+                'attributes' => $buttonAttributes
+            ]];
+        } else {
+            $buttons = [];
         }
 
-        if ($buttonText !== '') {
-            if (val('class', $buttonAttributes, false) === false) {
-                $buttonAttributes['class'] = 'btn btn-primary';
+        $buttonsString = '';
+        foreach ($buttons as $button) {
+            $buttonText = $button['text'];
+            $buttonUrl = $button['url'];
+            $buttonAttributes = $button['attributes'];
+            if (is_string($buttonAttributes)) {
+                $buttonAttributes = ['class' => $buttonAttributes];
             }
-            $buttonAttributes = attribute($buttonAttributes);
-        }
 
-        $button = '';
+            if ($buttonText !== '') {
+                if (val('class', $buttonAttributes, false) === false) {
+                    $buttonAttributes['class'] = 'btn btn-primary';
+                }
+            }
 
-        if ($buttonText !== '' && $buttonUrl === '') {
-            $button = '<button type="button" '.$buttonAttributes.'>'.$buttonText.'</button>';
-        } else if ($buttonText !== '' && $buttonUrl !== '') {
-            $button = '<a '.$buttonAttributes.' href="'.url($buttonUrl).'">'.$buttonText.'</a>';
+            if ($buttonUrl === '') {
+                $buttonsString .= ' <button type="button" '.attribute($buttonAttributes).'>'.$buttonText.'</button>';
+            } else {
+                $buttonsString .= ' <a '.attribute($buttonAttributes).' href="'.url($buttonUrl).'">'.$buttonText.'</a>';
+            }
         }
+        $buttonsString = '<div class="btn-container">'.$buttonsString.'</div>';
 
         $title = '<h1>'.$title.'</h1>';
 
@@ -143,7 +158,7 @@ if (!function_exists('heading')) {
             </div>';
         }
 
-        return '<header class="header-block">'.$title.$button.'</header>';
+        return '<header class="header-block">'.$title.$buttonsString.'</header>';
     }
 }
 

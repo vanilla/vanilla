@@ -1,0 +1,119 @@
+$richEditor-icon_size: 24px !default;
+$richEditor-menuButton_size: 39px !default;
+$richEditor_leftPadding: 36px !default;
+$richEditor_minHeight: 200px !default;
+$richEditor_padding: 9px 12px 0 !default;
+$richEditor-paragraphMenu_offset: 9px!default;
+$richEditor-embedMenu_padding: 0 !default;
+
+.richEditor {
+  position: relative;
+  display: block;
+  padding-left: $richEditor_leftPadding;
+}
+
+.richEditor-frame.InputBox {
+  background: white;
+  height: auto;
+  padding: 0;
+}
+
+.richEditor-menu {
+  display: inline-block;
+  position: relative;
+}
+
+.richEditorParagraphMenu {
+  position: absolute;
+  top: $richEditor-paragraphMenu_offset;
+  left: #{($richEditor_leftPadding - $richEditor-icon_size) / 2};
+  height: $richEditor-icon_size;
+  width: $richEditor-icon_size;
+}
+
+.richEditor-text {
+  position: relative;
+  min-height: $richEditor_minHeight;
+  padding: $richEditor_padding;
+
+  &:focus {
+    outline-offset: -2px;
+    outline-style: auto;
+    outline-width: 5px;
+    outline-color: Highlight;
+    outline-color: -webkit-focus-ring-color;
+    z-index: 1;
+  }
+}
+
+
+
+.richEditor-menuItems {
+  position: relative;
+  display: flex;
+  align-items: flex-start;
+  justify-content: flex-start;
+  flex-wrap: nowrap;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.richEditor-menuItem {
+  display: block;
+  margin: 0;
+  padding: 0;
+
+  .richEditor-button {
+    height: $richEditor-menuButton_size;
+    width: $richEditor-menuButton_size;
+  }
+
+  &.isRightAligned {
+    margin-left: auto;
+  }
+}
+
+.richEditor-button {
+  display: block;
+  position: relative;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+  border: 0;
+  padding: 0;
+  height: $richEditor-icon_size;
+  width: $richEditor-icon_size;
+
+  &:not(:disabled) {
+    cursor: pointer;
+  }
+
+  &:focus {
+    z-index: 1;
+  }
+}
+
+.richEditorEmbedMenu {
+  display: block;
+  width: 100%;
+  padding: $richEditor-embedMenu_padding;
+
+}
+
+.richEditorInline-icon {
+  display: block;
+  margin: auto;
+  height: $richEditor-icon_size;
+  width: $richEditor-icon_size;
+}
+
+// Paragraph Level Menu
+.richEditorParagraphMenu {
+
+}
+
+// Inline Level Menu
+
+
+// Embed Menu

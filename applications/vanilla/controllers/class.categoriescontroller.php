@@ -249,7 +249,19 @@ s     */
         $layout = c('Vanilla.Categories.Layout');
 
         if ($categoryIdentifier == '') {
-            $this->setData('Followed', boolval(Gdn::request()->get('followed')));
+            $followed = Gdn::request()->get('followed', null);
+            if (c('Vanilla.SaveFollowingPreference')) {
+                if ($followed === null) {
+                    $followed = Gdn::session()->getPreference('FollowedCategories', false);
+                    if ($followed) {
+                        Gdn::request()->setQueryItem('followed', $followed ? 1 : 0);
+                    }
+                } else {
+                    $followed = boolval($followed);
+                    Gdn::session()->setPreference('FollowedCategories', $followed);
+                }
+            }
+            $this->setData('Followed', $followed);
 
             switch ($layout) {
                 case 'mixed':

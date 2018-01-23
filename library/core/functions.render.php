@@ -397,16 +397,32 @@ if (!function_exists('categoryFilters')) {
     /**
      * Returns category filtering.
      *
-     * @param array $filters A multidimensional array of rows with the following properties:
-     *     ** 'name': Friendly name for the filter.
-     *     ** 'param': URL parameter associated with the filter.
-     *     ** 'value': A value for the URL parameter.
      * @param string $extraClasses any extra classes you add to the drop down
-     * @param string $default The default label for when no filter is active.
      * @return string
      */
-    function categoryFilters(array $filters = [], $extraClasses = '', $default = 'All', $label = 'View: '){
-        return filtersDropDown(url('categories'), $filters, $extraClasses, $default, $label);
+    function categoryFilters($extraClasses = '') {
+        $baseUrl = url('categories');
+        $filters = [['name' => 'Following', 'param' => 'followed']];
+
+        $defaultParams = [];
+        if (Gdn::request()->get('followed')) {
+            $defaultParams['followed'] = 0;
+        }
+
+        if (!empty($defaultParams)) {
+            $defaultUrl = $baseUrl.'?'.http_build_query($defaultParams);
+        } else {
+            $defaultUrl = $baseUrl;
+        }
+
+        return filtersDropDown(
+            url('categories'),
+            $filters,
+            $extraClasses,
+            'All',
+            $defaultUrl,
+            'View'
+        );
     }
 }
 
@@ -672,16 +688,32 @@ if (!function_exists('discussionFilters')) {
     /**
      * Returns discussions filtering.
      *
-     * @param array $filters A multidimensional array of rows with the following properties:
-     *     ** 'name': Friendly name for the filter.
-     *     ** 'param': URL parameter associated with the filter.
-     *     ** 'value': A value for the URL parameter.
      * @param string $extraClasses any extra classes you add to the drop down
-     * @param string $default The default label for when no filter is active.
      * @return string
      */
-    function discussionFilters(array $filters = [], $extraClasses = '', $default = 'All', $label = 'View: '){
-        return filtersDropDown(url('discussions'), $filters, $extraClasses, $default, $label);
+    function discussionFilters($extraClasses = '') {
+        $baseUrl = url('discussions');
+        $filters = [['name' => 'Following', 'param' => 'followed']];
+
+        $defaultParams = [];
+        if (Gdn::request()->get('followed')) {
+            $defaultParams['followed'] = 0;
+        }
+
+        if (!empty($defaultParams)) {
+            $defaultUrl = $baseUrl.'?'.http_build_query($defaultParams);
+        } else {
+            $defaultUrl = $baseUrl;
+        }
+
+        return filtersDropDown(
+            url('discussions'),
+            $filters,
+            $extraClasses,
+            'All',
+            $defaultUrl,
+            'View'
+        );
     }
 }
 
@@ -745,9 +777,11 @@ if (!function_exists('filtersDropDown')) {
      *     ** 'value': A value for the URL parameter.
      * @param string $extraClasses any extra classes you add to the drop down
      * @param string $default The default label for when no filter is active.
+     * @param string|null $defaultURL URL override to return to the default, unfiltered state.
+     * @param string $label Text for the label to attach to the cont
      * @return string
      */
-    function filtersDropDown($baseUrl, array $filters = [], $extraClasses = '', $default = 'All', $label = 'View: ') {
+    function filtersDropDown($baseUrl, array $filters = [], $extraClasses = '', $default = 'All', $defaultUrl = null, $label = 'View') {
         $output = '';
 
         if (c('Vanilla.EnableCategoryFollowing')) {
@@ -786,11 +820,11 @@ if (!function_exists('filtersDropDown')) {
             array_unshift($links, [
                 'active' => $active === null,
                 'name' => $default,
-                'url' => $baseUrl
+                'url' => $defaultUrl ?: $baseUrl
             ]);
 
             // Generate the markup for the drop down menu.
-            $output = linkDropDown($links, 'selectBox-following '.trim($extraClasses), t($label));
+            $output = linkDropDown($links, 'selectBox-following '.trim($extraClasses), t($label).': ');
         }
 
         return $output;

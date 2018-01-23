@@ -45,9 +45,7 @@ PagerModule::write($PagerOptions);
 echo Gdn_Theme::module('NewDiscussionModule', $this->data('_NewDiscussionProperties', ['CssClass' => 'Button Action Primary']));
 // Avoid displaying in a category's list of discussions.
 if (!$this->data('Category.CategoryID')) {
-    echo discussionFilters([
-        ['name' => 'Following', 'param' => 'followed']
-    ]);
+    echo discussionFilters();
 }
 $this->fireEvent('PageControls');
 echo '</div>';

@@ -9,9 +9,8 @@ $this->fireEvent('AfterDescription');
 $this->fireEvent('AfterPageTitle');
 if (c('Vanilla.EnableCategoryFollowing')) {
     echo '<div class="PageControls Top">';
-    echo categoryFilters([
-        ['name' => 'Following', 'param' => 'followed']
-    ]);    echo '</div>';
+    echo categoryFilters();
+    echo '</div>';
 }
 $categories = $this->data('CategoryTree');
 writeCategoryTable($categories);

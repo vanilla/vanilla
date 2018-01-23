@@ -75,7 +75,7 @@ if (!function_exists('getOptions')):
 
         $dropdown->addLink(t('Mark Read'), "/category/markread?categoryid={$categoryID}&tkey={$tk}", 'mark-read');
 
-        if (c('Vanilla.EnableCategoryFollowing')) {
+        if (c('Vanilla.EnableCategoryFollowing') && val('DisplayAs', $category) == 'Discussions') {
             $dropdown->addLink(
                 t($followed ? 'Unfollow' : 'Follow'),
                 "/category/followed?tkey={$tk}&categoryid={$categoryID}&value=" . ($followed ? 0 : 1),
@@ -444,8 +444,9 @@ if (!function_exists('followButton')) :
     function followButton($categoryID) {
         $output = ' ';
         $userID = Gdn::session()->UserID;
+        $category = CategoryModel::categories($categoryID);
 
-        if ($categoryID && c('Vanilla.EnableCategoryFollowing') && $userID) {
+        if (c('Vanilla.EnableCategoryFollowing') && $userID && $category && $category['DisplayAs'] == 'Discussions') {
             $categoryModel = new CategoryModel();
             $following = $categoryModel->isFollowed($userID, $categoryID);
 

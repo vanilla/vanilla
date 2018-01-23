@@ -126,9 +126,9 @@ if (!function_exists('heading')) {
 
         $buttonsString = '';
         foreach ($buttons as $button) {
-            $buttonText = $button['text'];
-            $buttonUrl = $button['url'];
-            $buttonAttributes = $button['attributes'];
+            $buttonText = $button['text'] ?? '';
+            $buttonUrl = $button['url'] ?? '';
+            $buttonAttributes = $button['attributes'] ?? [];
             if (is_string($buttonAttributes)) {
                 $buttonAttributes = ['class' => $buttonAttributes];
             }

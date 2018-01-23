@@ -6,6 +6,7 @@
 $Session = Gdn::session();
 include_once $this->fetchViewLocation('helper_functions', 'discussions', 'vanilla');
 include_once $this->fetchViewLocation('table_functions', 'discussions', 'vanilla');
+include_once $this->fetchViewLocation('helper_functions', 'categories', 'vanilla');
 
 /**
  * Render the page.
@@ -16,7 +17,7 @@ if ($this->data('_PagerUrl')) {
     $PagerOptions['Url'] = $this->data('_PagerUrl');
 }
 
-echo '<h1 class="H HomepageTitle">'.$this->data('Title').'</h1>';
+echo '<h1 class="H HomepageTitle">'.$this->data('Title').followButton($this->data('Category.CategoryID')).'</h1>';
 
 $Description = $this->data('Category.Description', $this->description());
 echo wrapIf(Gdn_Format::htmlFilter($Description), 'div', ['class' => 'P PageDescription']);
@@ -39,13 +40,15 @@ if ($subtreeView) {
     }
 }
 
-
 echo '<div class="PageControls Top">';
 PagerModule::write($PagerOptions);
 echo Gdn_Theme::module('NewDiscussionModule', $this->data('_NewDiscussionProperties', ['CssClass' => 'Button Action Primary']));
-echo discussionFilters([
-    ['name' => 'Following', 'param' => 'followed'],
-]);
+// Avoid displaying in a category's list of discussions.
+if (!$this->data('Category.CategoryID')) {
+    echo discussionFilters([
+        ['name' => 'Following', 'param' => 'followed']
+    ]);
+}
 $this->fireEvent('PageControls');
 echo '</div>';
 

@@ -40,9 +40,12 @@ if ($this->data('_PagerUrl'))
 echo '<div class="PageControls Top">';
 PagerModule::write($PagerOptions);
 echo Gdn_Theme::module('NewDiscussionModule', $this->data('_NewDiscussionProperties', ['CssClass' => 'Button Action Primary']));
-echo discussionFilters([
-    ['name' => 'Following', 'param' => 'followed'],
-]);
+// Avoid displaying in a category's list of discussions.
+if (!$this->data('Category.CategoryID')) {
+    echo discussionFilters([
+        ['name' => 'Following', 'param' => 'followed']
+    ]);
+}
 $this->fireEvent('PageControls');
 echo '</div>';
 

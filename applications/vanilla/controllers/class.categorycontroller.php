@@ -33,6 +33,57 @@ class CategoryController extends VanillaController {
         $this->render();
     }
 
+    /**
+     * Allows user to follow or unfollow a category.
+     *
+     * @param int $DiscussionID Unique discussion ID.
+     */
+    public function followed($categoryID = null) {
+        // Make sure we are posting back.
+        if (!$this->Request->isAuthenticatedPostBack()) {
+            //throw permissionException('Javascript');
+        }
+
+        if (!Gdn::session()->isValid()) {
+            throw permissionException('SignedIn');
+        }
+
+        $userID = Gdn::session()->UserID;
+
+        $categoryModel = new CategoryModel();
+        $category = CategoryModel::categories($categoryID);
+        if (!$category) {
+            throw notFoundException('Category');
+        }
+
+        // Check the form to see if the data was posted.
+        $form = new Gdn_Form();
+        $categoryID = $form->getFormValue('CategoryID', $categoryID);
+        $followed = $form->getFormValue('Followed', null);
+
+        $result = $categoryModel->follow($userID, $categoryID, $followed);
+
+        // Set the new value for api calls and json targets.
+        $this->setData([
+            'UserID' => $userID,
+            'CategoryID' => $categoryID,
+            'Followed' => $result
+        ]);
+
+        //  Short circuit if this is an api call.
+        if ($this->deliveryType() === DELIVERY_TYPE_DATA) {
+            $this->render('Blank', 'Utility', 'Dashboard');
+            return;
+        }
+
+        // Return the appropriate bookmark.
+        require_once $this->fetchViewLocation('helper_functions', 'Categories');
+        $markup = followButton($categoryID);
+        $this->jsonTarget("!element", $markup, 'ReplaceWith');
+
+        $this->render('Blank', 'Utility', 'Dashboard');
+    }
+
     public function initialize() {
         parent::initialize();
 

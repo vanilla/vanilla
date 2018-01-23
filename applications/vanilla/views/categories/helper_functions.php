@@ -435,7 +435,7 @@ if (!function_exists('followButton')) :
      * @return string
      */
     function followButton($categoryID) {
-        $output = " ";
+        $output = ' ';
         $userID = Gdn::session()->UserID;
 
         if ($categoryID && c('Vanilla.EnableCategoryFollowing') && $userID) {
@@ -454,7 +454,7 @@ EOT;
             $text = $following ? t('Following') : t('Follow');
             $output .= anchor(
                 $icon.$text,
-                '/the-following-endpoint',
+                "/category/followed/{$categoryID}/".Gdn::session()->transientKey(),
                 'Hijack followButton'.($following ? ' TextColor isFollowing' : ''),
                 ['title' => $text, 'aria-pressed' => $following ? 'true' : 'false', 'role' => 'button', 'tabindex' => '0']
             );

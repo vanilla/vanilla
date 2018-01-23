@@ -14,34 +14,15 @@ class QuillOperation {
 
     const INSERT_TYPE_STRING = "string";
     const INSERT_TYPE_IMAGE = "image";
-    const LIST_TYPE_BULLET = "bullet";
-    const LIST_TYPE_ORDERED = "ordered";
-    const LIST_TYPE_NONE = "none";
-    const BLOCK_TYPE_PARAGRAPH = "paragraph";
-    const BLOCK_TYPE_CODE = "code";
-    const BLOCK_TYPE_BLOCKQUOTE = "blockquote";
-    const BLOCK_TYPE_HEADER = "header";
-    const BLOCK_TYPE_EMBED = "embed";
-    const BLOCK_TYPE_LIST = "list";
+
+    const NEWLINE_TYPE_START = "start";
+    const NEWLINE_TYPE_END = "end";
+    const NEWLINE_TYPE_ONLY = "only";
+    const NEWLINE_TYPE_NONE = "none";
 
     private $allowedInsertTypes = [
         self::INSERT_TYPE_STRING,
         self::INSERT_TYPE_IMAGE,
-    ];
-
-    private $allowedListTypes = [
-        self::LIST_TYPE_NONE,
-        self::LIST_TYPE_BULLET,
-        self::LIST_TYPE_ORDERED,
-    ];
-
-    private $allowedBlockTypes = [
-        self::BLOCK_TYPE_BLOCKQUOTE,
-        self::BLOCK_TYPE_CODE,
-        self::BLOCK_TYPE_EMBED,
-        self::BLOCK_TYPE_HEADER,
-        self::BLOCK_TYPE_PARAGRAPH,
-        self::BLOCK_TYPE_LIST,
     ];
 
     /** @var string The content of the operation  */
@@ -50,8 +31,8 @@ class QuillOperation {
     /** @var string The type of insert. */
     public $insertType = self::INSERT_TYPE_STRING;
 
-    /** @var string The block type of the insert. */
-    public $blockType = self::BLOCK_TYPE_PARAGRAPH;
+    /** @var bool The block type of the insert. */
+    public $inline = false;
 
     /** @var bool Does the text have strike-through. */
     public $strike = false;
@@ -62,17 +43,24 @@ class QuillOperation {
     /** @var bool Is the text italic. */
     public $italic = false;
 
-    /** @var string What type of list is the item. */
-    public $listType = self::LIST_TYPE_NONE;
-
     /** @var int What level of indentation does the item have. */
     public $indent = 0;
 
-    /** @var int What level of heading is this item. */
-    public $headerLevel = 0;
+    /** @var bool */
+    public $list = false;
 
     /** @var string|null Is this item a link? If so, what is the link. */
     public $link = null;
+
+    /** @var string Does this item start of end with a newline. */
+    public $newline = self::NEWLINE_TYPE_NONE;
+
+    /** @var array All attributes directly from the source. These shouldn't be used directly in rendering. */
+    public $attributes = [];
+
+    private $newlineOnlyRegexp = "/^\\n$/";
+    private $newlineStartRegexp = "/^\\n/";
+    private $newlineEndRegexp = "/\\n$/";
 
     public function __construct($operationArray) {
         $insert = $operationArray["insert"];
@@ -87,47 +75,31 @@ class QuillOperation {
         $attributes = val("attributes", $operationArray);
 
         if ($attributes) {
-            // Get Block Type
-            if (val("code-block", $attributes)) {
-                $this->blockType = self::BLOCK_TYPE_CODE;
-            } elseif (val("list", $attributes)) {
-                $this->blockType = self::BLOCK_TYPE_LIST;
-                if (val("indent", $attributes)) {
-                    $this->indent = val("indent", $attributes);
-                }
-            } elseif (val("header", $attributes)) {
-                $this->blockType = self::BLOCK_TYPE_HEADER;
-                $this->headerLevel = val("header", $attributes);
-            } elseif (val("blockquote", $attributes)) {
-                $this->blockType = self::BLOCK_TYPE_BLOCKQUOTE;
-            } else {
-                $this->blockType = self::BLOCK_TYPE_PARAGRAPH;
-            }
-
-            // List values
-            $list = val("list", $attributes);
-
-            if ($list && in_array($list, $this->allowedListTypes)) {
-                $this->listType = $list;
-            }
+            $this->attributes = $attributes;
 
             // Boolean Values
             $booleanAttributes = [
                 "strike",
                 "bold",
                 "italic",
+                "list"
             ];
 
             foreach ($booleanAttributes as $attr) {
                 if (val($attr, $attributes)) {
                     $this->{$attr} = val($attr, $attributes);
+                    $this->inline = true;
                 }
+            }
+
+            if (val("link", $attributes)) {
+                $this->link = val("link", $attributes);
+                $this->inline = true;
             }
 
             // Numbered Values
             $numberedAttributes = [
                 "indent",
-                "headerLevel",
             ];
 
             foreach($numberedAttributes as $attr) {
@@ -135,35 +107,37 @@ class QuillOperation {
                     $this->{$attr} = $attributes[$attr];
                 }
             }
+
+            if (val("header", $attributes) > 0) {
+                $this->inline = false;
+            }
+        }
+
+        if (preg_match($this->newlineOnlyRegexp, $this->content)) {
+            $this->newline = self::NEWLINE_TYPE_ONLY;
+            $this->stripStartingNewLine();
+        } elseif (preg_match($this->newlineStartRegexp, $this->content)) {
+            $this->newline = self::NEWLINE_TYPE_START;
+            $this->stripStartingNewLine();
+        } elseif (preg_match($this->newlineEndRegexp, $this->content)) {
+            $this->newline = self::NEWLINE_TYPE_END;
+            $this->stripEndingNewLine();
+        } else {
+            $this->newline = self::NEWLINE_TYPE_NONE;
+        }
+
+        // If there is only a newline left, replace it with with a break tag.
+        if (preg_match($this->newlineOnlyRegexp, $this->content)) {
+            $this->content = preg_replace($this->newlineOnlyRegexp, "<br>", $this->content);
+
         }
     }
 
-    /**
-     * Validate inserted values;
-     *
-     * @returns bool
-     */
-    public function validate(): bool {
-        if (!in_array($this->insertType, $this->allowedInsertTypes)) {
-            return false;
-        }
+    private function stripStartingNewLine() {
+        $this->content = preg_replace($this->newlineStartRegexp, "", $this->content);
+    }
 
-        if (!in_array($this->list, $this->allowedListTypes)) {
-            return false;
-        }
-
-        // Only one block level element may be active at a time.
-
-        $onlyOneCanBeTrue = [
-            $this->header > 0,
-            $this->code,
-            $this->blockquote,
-        ];
-
-        if (count(array_filter($onlyOneCanBeTrue)) > 1) {
-            return false;
-        }
-
-        return true;
+    private function stripEndingNewLine() {
+        $this->content = preg_replace($this->newlineEndRegexp, "", $this->content);
     }
 }

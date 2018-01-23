@@ -19,7 +19,7 @@ class QuillRenderer {
      */
     public function renderDelta(string $deltaString) {
         $html = "";
-        $blocks = $this->makeOperations($deltaString);
+        $blocks = $this->makeBlocks($deltaString);
 
         foreach($blocks as $block) {
             $html .= $this->renderBlock($block);
@@ -33,9 +33,9 @@ class QuillRenderer {
      *
      * @param string $deltaString - A Quill insert-only delta. https://quilljs.com/docs/delta/.
      *
-     * @returns QuillOperation[]
+     * @returns QuillBlock[]
      */
-    private function makeOperations(string $deltaString): array {
+    private function makeBlocks(string $deltaString): array {
         $delta = json_decode($deltaString, true);
 
         /** @var QuillOperation[] $operations */
@@ -45,114 +45,61 @@ class QuillRenderer {
             $operations[] = new QuillOperation($opArray);
         }
 
-        $blocks = [];
-
-        $currentIndex = 0;
-        foreach($operations as $key => $operation) {
-            $newlineRegexp = "/\\n$/";
-
-            // Join together everything from the last newline ending operation to the current one in one block.
-            if (preg_match($newlineRegexp, $operation->content)) {
-                $block = [
-                    "blockType" => $operation->blockType,
-                    "indent" => $operation->indent,
-                    "headerLevel" => $operation->headerLevel,
-                    "listType" => $operation->listType,
-                    "operations" => [],
-                ];
-
-                for ($i = $currentIndex; $i < $key; $i++) {
-                    $block["operations"][] = $operations[$i];
-                }
-
-                $blocks[] = $block;
-                $currentIndex = $key + 1;
-            }
-        }
-
-        $blocks = $this->mergeListBlocks($blocks);
-
-        return $blocks;
-    }
-
-    /**
-     * Merge adjacent list blocks of the same type together.
-     *
-     * @param array[] $blocks - The blocks to look through.
-     *
-     * @return array[]
-     */
-    private function mergeListBlocks(array $blocks) {
-        $results = [];
-
-        // Store a block in progress.
-        $buildingBlock = false;
-
-        foreach ($blocks as $block) {
-            $isList = $block["blockType"] === QuillOperation::BLOCK_TYPE_LIST;
-            $isSameTypeAsPreviousBlock = $buildingBlock["listType"] === val("listType", $block);
-            $updateExistingBuildingBlock = $isList && $isSameTypeAsPreviousBlock && $buildingBlock;
-
-            // Add to existing
-            if ($updateExistingBuildingBlock) {
-                foreach($block["operations"] as $op) {
-                    $buildingBlock["operations"][] = $op;
-                }
-            } else {
-                // Clear the existing buildingBlock.
-                if ($buildingBlock) {
-                    $results[] = $buildingBlock;
-                    $buildingBlock = false;
-                }
-
-                // Start the building block over.
-                if ($isList) {
-                    $buildingBlock = $block;
-                // Ignore the building block.
-                } else {
-                    $results[] = $block;
-                }
-            }
-        }
-
-        // Clear the block one last time.
-        if ($buildingBlock) {
-            $results[] = $buildingBlock;
-        }
-
-        return $results;
+        return QuillBlock::generateFromOps($operations);
     }
 
     /**
      * Render an block element.
      *
-     * @param array $block The block of operations to render.
+     * @param QuillBlock $block The block of operations to render.
      */
-    private function renderBlock(array $block) {
-        switch($block["blockType"]) {
-            case QuillOperation::BLOCK_TYPE_PARAGRAPH:
+    private function renderBlock(QuillBlock $block) {
+        $attributes = [];
+        $addNewLine = false;
+        switch($block->blockType) {
+            case QuillBlock::TYPE_PARAGRAPH:
                 $containerTag = "p";
+
+                foreach ($block->operations as &$op) {
+                    // Replace double newlines with an opening and closing <p> tags and a <br> tag.
+                    $op->content = preg_replace("/\\n\\n/", "</p><p><br></p><p>", $op->content);
+                    // Replace all newlines with opening and closing <p> tags.
+                    $op->content = preg_replace("/\\n/", "</p><p>", $op->content);
+                }
                 break;
-            case QuillOperation::BLOCK_TYPE_BLOCKQUOTE:
+            case QuillBlock::TYPE_BLOCKQUOTE:
                 $containerTag = "blockquote";
                 break;
-            case QuillOperation::BLOCK_TYPE_HEADER:
-                $containerTag = "h" . $block["headerLevel"];
+            case QuillBlock::TYPE_HEADER:
+                $containerTag = "h" . $block->headerLevel;
                 break;
-            case QuillOperation::BLOCK_TYPE_LIST:
-                $containerTag = $block["listType"] === QuillOperation::LIST_TYPE_BULLET ? "ul" : "ol";
+            case QuillBlock::TYPE_LIST:
+                $containerTag = $block->listType === QuillBlock::LIST_TYPE_BULLET ? "ul" : "ol";
                 break;
-            case QuillOperation::BLOCK_TYPE_CODE:
+            case QuillBlock::TYPE_CODE:
                 $containerTag = "pre";
+                $attributes = [
+                    "class" => "ql-syntax",
+                    "spellcheck" => "false",
+                ];
+                $addNewLine = true;
                 break;
             default:
-                return;
+                return "";
         }
 
-        $result = "<$containerTag>";
+        $result = "<$containerTag";
+        foreach ($attributes as $attrKey => $attrValue) {
+            $result .= " $attrKey=\"$attrValue\"";
+        }
+        $result .= ">";
 
-        foreach($block["operations"] as $op) {
-            $result .= $this->renderInlineElements($op);
+        foreach($block->operations as $op) {
+            $result .= $this->renderOperation($op);
+        }
+
+        if ($addNewLine) {
+            $result .= "\n";
         }
 
         $result .= "</$containerTag>";
@@ -164,30 +111,47 @@ class QuillRenderer {
      *
      * @param QuillOperation $operation
      */
-    private function renderInlineElements(QuillOperation $operation) {
+    private function renderOperation(QuillOperation $operation) {
         $tags = [];
 
-        if ($operation->listType) {
-            $tags[] = "li";
+        if ($operation->list) {
+            $tags[] = ["name" => "li"];
+        }
+
+        if ($operation->link) {
+            $tags[] = [
+                "name" => "a",
+                "attributes" => [
+                    "href" => $operation->link,
+                ],
+            ];
         }
 
         if ($operation->bold) {
-            $tags[] = "strong";
+            $tags[] = ["name" => "strong"];
         }
 
         if ($operation->italic) {
-            $tags[] = "em";
+            $tags[] = ["name" => "em"];
         }
 
         if ($operation->strike) {
-            $tags[] = "s";
+            $tags[] = ["name" => "s"];
         }
 
         $beforeTags = [];
         $afterTags = [];
         foreach ($tags as $tag) {
-            array_push($beforeTags, "<$tag>");
-            array_unshift($afterTags, "</$tag>");
+            $openingTag = "<{$tag['name']}";
+
+            if (val("attributes", $tag)) {
+                foreach ($tag["attributes"] as $attrKey => $attr) {
+                    $openingTag .= " $attrKey=\"$attr\"";
+                }
+            }
+            $openingTag .= ">";
+            array_push($beforeTags, $openingTag);
+            array_unshift($afterTags, "</{$tag['name']}>");
         }
 
         return implode("", $beforeTags) . $operation->content . implode("", $afterTags);

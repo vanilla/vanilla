@@ -387,11 +387,11 @@ class Gdn_Form extends Gdn_Pluggable {
         $dataAttribute = $allowEmpty ? 'data-allow-empty="true"' : 'data-allow-empty="false"';
 
         return '<div id="'.$this->escapeFieldName($fieldName).'" class="'.$cssClass.'" '.$dataAttribute.'>'
-            .$this->input($fieldName, 'text', $valueAttributes)
-            .$this->input($fieldName.'-text', 'text', $textAttributes)
-            .'<span class="js-color-picker-preview color-picker-preview"></span>'
-            .$this->input($fieldName.'-color', 'color', $colorAttributes)
-            .'</div>';
+        .$this->input($fieldName, 'text', $valueAttributes)
+        .$this->input($fieldName.'-text', 'text', $textAttributes)
+        .'<span class="js-color-picker-preview color-picker-preview"></span>'
+        .$this->input($fieldName.'-color', 'color', $colorAttributes)
+        .'</div>';
     }
 
     /**
@@ -645,12 +645,12 @@ class Gdn_Form extends Gdn_Pluggable {
             $toggle = '
                 <div class="label-wrap-wide">
                     <div class="label label-'.$fieldName.'" id="'.$attributes['aria-labelledby'].'">'.t($label).'</div>'.
-                $info.'
+                    $info.'
                 </div>
                 <div class="input-wrap-right">
                     <div class="toggle-wrap">'.
-                $input.
-                $toggleLabel.'
+                        $input.
+                        $toggleLabel.'
                     </div>
                 </div>';
         } else {
@@ -718,10 +718,10 @@ class Gdn_Form extends Gdn_Pluggable {
         return '
             <div '.$wrapperAttributesString.' role="search">
                 <div class="search-icon-wrap search-icon-search-wrap">'.dashboardSymbol('search').'</div>'.
-            $this->textBox($field, $textBoxAttributes).
-            $this->button('Go', ['class' => 'search-submit']).
-            $clear.
-            $searchInfo.'
+                $this->textBox($field, $textBoxAttributes).
+                $this->button('Go', ['class' => 'search-submit']).
+                $clear.
+                $searchInfo.'
             </div>';
     }
 
@@ -811,11 +811,11 @@ class Gdn_Form extends Gdn_Pluggable {
 
         $label = '
             <div class="label-wrap">'
-            .$label
-            .$labelDescription.'
+                .$label
+                .$labelDescription.'
                 <div id="'.$imageWrapperId.'" class="js-image-preview-old">'
-            .$currentImage
-            .$removeCurrentImage.'
+                    .$currentImage
+                    .$removeCurrentImage.'
                 </div>
                 <div class="js-image-preview-new hidden">
                     <div><img class="js-image-preview"></div>
@@ -962,18 +962,18 @@ class Gdn_Form extends Gdn_Pluggable {
                 $instance['value'] = $data->$valueField;
                 $instance['id'] = $fieldName.$i;
                 if (is_array($checkedValues) && in_array(
-                        $data->$valueField,
-                        $checkedValues
-                    )
+                    $data->$valueField,
+                    $checkedValues
+                )
                 ) {
                     $instance['checked'] = 'checked';
                 }
 
                 $return .= '<li>'.$this->checkBox(
-                        $fieldName.'[]',
-                        $data->$textField,
-                        $instance
-                    )."</li>\n";
+                    $fieldName.'[]',
+                    $data->$textField,
+                    $instance
+                )."</li>\n";
                 ++$i;
             }
         } elseif (is_array($dataSet)) {
@@ -1062,9 +1062,9 @@ class Gdn_Form extends Gdn_Pluggable {
                 $instance['value'] = $data->$valueField;
                 $instance['id'] = $fieldName.$i;
                 if (is_array($checkedValues) && in_array(
-                        $data->$valueField,
-                        $checkedValues
-                    )
+                    $data->$valueField,
+                    $checkedValues
+                )
                 ) {
                     $instance['checked'] = 'checked';
                 }
@@ -1445,9 +1445,9 @@ class Gdn_Form extends Gdn_Pluggable {
             $textField = arrayValueI('TextField', $attributes, 'text');
             $data = $dataSet->firstRow();
             if (is_object($data) && property_exists($data, $valueField) && property_exists(
-                    $data,
-                    $textField
-                )
+                $data,
+                $textField
+            )
             ) {
                 foreach ($dataSet->result() as $data) {
                     $return .= '<option value="'.$data->$valueField.
@@ -1573,9 +1573,9 @@ class Gdn_Form extends Gdn_Pluggable {
                         $return .= "<li>".substr($problems[$i], 1)."</li>\n";
                     } else {
                         $return .= '<li>'.sprintf(
-                                t($problems[$i]),
-                                t($fieldName)
-                            )."</li>\n";
+                            t($problems[$i]),
+                            t($fieldName)
+                        )."</li>\n";
                     }
                 }
             }
@@ -1594,9 +1594,9 @@ class Gdn_Form extends Gdn_Pluggable {
                         $return .= rtrim(substr($problems[$i], 1), '.').'. ';
                     } else {
                         $return .= rtrim(sprintf(
-                                t($problems[$i]),
-                                t($fieldName)
-                            ), '.').'. ';
+                            t($problems[$i]),
+                            t($fieldName)
+                        ), '.').'. ';
                     }
                 }
             }
@@ -1651,7 +1651,7 @@ class Gdn_Form extends Gdn_Pluggable {
 
                 if ($j == 0) {
                     $headings .= '<td'.($alt ? ' class="Alt"' : '').
-                        '>'.t($colName).'</td>';
+                    '>'.t($colName).'</td>';
                 }
 
                 if (array_key_exists($rowName, $group[$colName])) {
@@ -1666,7 +1666,7 @@ class Gdn_Form extends Gdn_Pluggable {
             }
             if ($headings != '') {
                 $return .= "<thead><tr><th>".t($groupName)."</th>".
-                    $headings."</tr></thead>\r\n<tbody>";
+                $headings."</tr></thead>\r\n<tbody>";
             }
 
             $aRowName = explode('.', $rowName);
@@ -1676,7 +1676,7 @@ class Gdn_Form extends Gdn_Pluggable {
                 for ($i = 0; $i < $rowNameCount; ++$i) {
                     if ($i < $rowNameCount - 1) {
                         $rowName .= '<span class="Parent">'.
-                            t($aRowName[$i]).'</span>';
+                        t($aRowName[$i]).'</span>';
                     } else {
                         $rowName .= t($aRowName[$i]);
                     }
@@ -1884,7 +1884,7 @@ PASSWORDMETER;
         return '<div class="input-wrap">'.$this->input($fieldName, $type, $attributes).'</div>';
     }
 
-    /**
+        /**
      * Returns XHTML for a label element.
      *
      * @param string $translationCode Code to be translated and presented within the label tag.
@@ -2139,9 +2139,9 @@ PASSWORDMETER;
             $textField = arrayValueI('TextField', $attributes, 'text');
             $data = $dataSet->firstRow();
             if (property_exists($data, $valueField) && property_exists(
-                    $data,
-                    $textField
-                )
+                $data,
+                $textField
+            )
             ) {
                 foreach ($dataSet->result() as $data) {
                     $attributes['value'] = $data->$valueField;
@@ -2237,7 +2237,7 @@ PASSWORDMETER;
     }
 
 
-    /// =========================================================================
+        /// =========================================================================
     /// Methods for interfacing with the model & db.
     /// =========================================================================
 
@@ -2290,8 +2290,8 @@ PASSWORDMETER;
         } else {
             if (!is_array($this->_ValidationResults[$fieldName])) {
                 $this->_ValidationResults[$fieldName] = [
-                    $this->_ValidationResults[$fieldName],
-                    $errorCode];
+                $this->_ValidationResults[$fieldName],
+                $errorCode];
             } else {
                 $this->_ValidationResults[$fieldName][] = $errorCode;
             }
@@ -2528,18 +2528,18 @@ PASSWORDMETER;
             // separated into their own dropdowns on-screen) get added to the
             // collection as a single field as well...
             if (array_key_exists(
-                    'DateFields',
-                    $collection
-                ) === true
+                'DateFields',
+                $collection
+            ) === true
             ) {
                 $dateFields = $collection['DateFields'];
                 if (is_array($dateFields) === true) {
                     $count = count($dateFields);
                     for ($i = 0; $i < $count; ++$i) {
                         if (array_key_exists(
-                                $dateFields[$i],
-                                $this->_FormValues
-                            ) ===
+                            $dateFields[$i],
+                            $this->_FormValues
+                        ) ===
                             false
                         ) { // Saving dates in the format: YYYY-MM-DD
                             $year = val(
@@ -2778,11 +2778,11 @@ PASSWORDMETER;
         }
 
         // Get the file extension of the file.
-        $ext = val('OutputType', $options, trim($upload->getUploadedFileExtension(), '.'));
+            $ext = val('OutputType', $options, trim($upload->getUploadedFileExtension(), '.'));
         if ($ext == 'jpeg') {
             $ext = 'jpg';
         }
-        trace($ext, 'Ext');
+            trace($ext, 'Ext');
 
         // The file is valid so let's come up with its new name.
         if (isset($options['Name'])) {
@@ -2794,7 +2794,7 @@ PASSWORDMETER;
         }
 
         // We need to parse out the size.
-        $size = val('Size', $options);
+            $size = val('Size', $options);
         if ($size) {
             if (is_numeric($size)) {
                 touchValue('Width', $options, $size);
@@ -2805,7 +2805,7 @@ PASSWORDMETER;
             }
         }
 
-        trace($options, "Saving image $name.");
+            trace($options, "Saving image $name.");
         try {
             $parsed = $upload->saveImageAs($tmpName, $name, val('Height', $options, ''), val('Width', $options, ''), $options);
             trace($parsed, 'Saved Image');

@@ -112,4 +112,21 @@ abstract class AbstractAPIv2Test extends TestCase {
             }
         }
     }
+
+    /**
+     * Test paging on a resource. Must have at least 2 records.
+     *
+     * @param $resourceUrl
+     */
+    protected function pagingTest($resourceUrl) {
+        $pagingTestUrl = $resourceUrl.(strpos($resourceUrl, '?') === false ? '?' : '&').'limit=1';
+
+        $result = $this->api()->get($pagingTestUrl);
+        $this->assertNotEmpty($result->getHeader('Paging-First'));
+        $this->assertNotEmpty($result->getHeader('Paging-Next'));
+
+        $result = $this->api()->get(str_replace('/api/v2', '', $result->getHeader('Paging-Next')));
+        $this->assertEquals(200, $result->getStatusCode());
+        $this->assertEquals(1, count($result->getBody()));
+    }
 }

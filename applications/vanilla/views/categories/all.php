@@ -9,10 +9,8 @@ if ($description = $this->description()) {
     echo wrap($description, 'div', ['class' => 'P PageDescription']);
 }
 $this->fireEvent('AfterPageTitle');
-if (c('Vanilla.EnableCategoryFollowing')) {
-    echo '<div class="PageControls Top">';
-    echo categoryFilters();
-    echo '</div>';
+if (!$this->data('Category') && c('Vanilla.EnableCategoryFollowing')) {
+    echo '<div class="PageControls Top">'.categoryFilters().'</div>';
 }
 $categories = $this->data('CategoryTree');
 writeCategoryList($categories, 1);

@@ -7,10 +7,8 @@ $categoryID = isset($this->Category) ? $this->Category->CategoryID : null;
 <?php
 $this->fireEvent('AfterDescription');
 $this->fireEvent('AfterPageTitle');
-if (c('Vanilla.EnableCategoryFollowing')) {
-    echo '<div class="PageControls Top">';
-    echo categoryFilters();
-    echo '</div>';
+if (!$this->data('Category') && c('Vanilla.EnableCategoryFollowing')) {
+    echo '<div class="PageControls Top">'.categoryFilters().'</div>';
 }
 $categories = $this->data('CategoryTree');
 writeCategoryTable($categories);

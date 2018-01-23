@@ -379,7 +379,7 @@ class Gdn_Locale extends Gdn_Pluggable {
     /**
      * Returns the name of the currently loaded locale.
      *
-     * @return boolean
+     * @return string
      */
     public function current() {
         if ($this->Locale == '') {

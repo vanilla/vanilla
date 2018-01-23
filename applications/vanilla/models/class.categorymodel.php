@@ -229,7 +229,7 @@ class CategoryModel extends Gdn_Model {
             $following = !((bool)val('Archived', $category) || (bool)val('Unfollow', $userData, false));
             $category['Following'] = $following;
 
-            $category['Follow'] = boolval($userData['Follow']);
+            $category['Followed'] = boolval($userData['Followed']);
 
             // Calculate the read field.
             if (strcasecmp($category['DisplayAs'], 'heading') === 0) {
@@ -310,7 +310,7 @@ class CategoryModel extends Gdn_Model {
 
             $userData = $sql->getWhere('UserCategory', [
                 'UserID' => $userID,
-                'Follow' => 1
+                'Followed' => 1
             ])->resultArray();
             $result = array_column($userData, null, 'CategoryID');
             Gdn::cache()->store($key, $result);
@@ -324,10 +324,10 @@ class CategoryModel extends Gdn_Model {
      *
      * @param int $userID The target user's ID.
      * @param int $categoryID The target category's ID.
-     * @param bool|null $follow True for following. False for not following. Null for toggle.
+     * @param bool|null $followed True for following. False for not following. Null for toggle.
      * @return bool A boolean value representing the user's resulting "follow" status for the category.
      */
-    public function follow($userID, $categoryID, $follow = null) {
+    public function follow($userID, $categoryID, $followed = null) {
         $validationOptions = ['options' => [
             'min_range' => 1
         ]];
@@ -339,10 +339,10 @@ class CategoryModel extends Gdn_Model {
         }
 
         $isFollowed = $this->isFollowed($userID, $categoryID);
-        if ($follow === null) {
-            $follow = !$isFollowed;
+        if ($followed === null) {
+            $followed = !$isFollowed;
         }
-        $follow = $follow ? 1 : 0;
+        $followed = $followed ? 1 : 0;
 
         $category = static::categories($categoryID);
         if (!is_array($category)) {
@@ -353,7 +353,7 @@ class CategoryModel extends Gdn_Model {
 
         $this->SQL->replace(
             'UserCategory',
-            ['Follow' => $follow],
+            ['Followed' => $followed],
             ['UserID' => $userID, 'CategoryID' => $categoryID]
         );
         static::clearUserCache();
@@ -938,19 +938,10 @@ class CategoryModel extends Gdn_Model {
             $query->like('Name', $filter);
         }
 
-        $categoryTree = $query->get()->resultArray();
-        self::calculateData($categoryTree);
-        self::joinUserData($categoryTree);
+        $categories = $query->get()->resultArray();
+        $categories = $this->flattenCategories($categories);
 
-        foreach ($categoryTree as &$category) {
-            // Fix the depth to be relative, not global.
-            $category['Depth'] = 1;
-
-            // We don't have children, but trees are expected to have this key.
-            $category['Children'] = [];
-        }
-
-        return $categoryTree;
+        return $categories;
     }
 
     /**
@@ -987,6 +978,27 @@ class CategoryModel extends Gdn_Model {
             }
         }
         return $result;
+    }
+
+    /**
+     * Prepare an array of category rows for display as a flat list.
+     *
+     * @param array $categories Category rows.
+     * @return array
+     */
+    public function flattenCategories(array $categories) {
+        self::calculateData($categories);
+        self::joinUserData($categories);
+
+        foreach ($categories as &$category) {
+            // Fix the depth to be relative, not global.
+            $category['Depth'] = 1;
+
+            // We don't have children, but trees are expected to have this key.
+            $category['Children'] = [];
+        }
+
+        return $categories;
     }
 
     /**
@@ -1631,7 +1643,7 @@ class CategoryModel extends Gdn_Model {
                 $following = !((bool)val('Archived', $category) || (bool)val('Unfollow', $row, false));
                 $categories[$iD]['Following'] = $following;
 
-                $categories[$iD]['Follow'] = boolval($row['Follow']);
+                $categories[$iD]['Followed'] = boolval($row['Followed']);
 
                 // Calculate the read field.
                 if ($category['DisplayAs'] == 'Heading') {
@@ -2196,6 +2208,32 @@ class CategoryModel extends Gdn_Model {
             $data = false;
         }
         return $data;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getWhere($where = false, $orderFields = '', $orderDirection = 'asc', $limit = false, $offset = false) {
+        if (!is_array($where)) {
+            $where = [];
+        }
+
+        if (array_key_exists('Followed', $where)) {
+            if ($where['Followed']) {
+                $followed = $this->getFollowed(Gdn::session()->UserID);
+                $categoryIDs = array_column($followed, 'CategoryID');
+
+                if (isset($where['CategoryID'])) {
+                    $where['CategoryID'] = array_values(array_intersect((array)$where['CategoryID'], $categoryIDs));
+                } else {
+                    $where['CategoryID'] = $categoryIDs;
+                }
+            }
+            unset($where['Followed']);
+        }
+
+        $result = parent::getWhere($where, $orderFields, $orderDirection, $limit, $offset);
+        return $result;
     }
 
     /**

@@ -74,7 +74,11 @@ class CommentsApiController extends AbstractApiController {
     public function commentPostSchema($type = '') {
         if ($this->commentPostSchema === null) {
             $this->commentPostSchema = $this->schema(
-                Schema::parse(['body', 'format', 'discussionID'])->add($this->fullSchema()),
+                Schema::parse([
+                    'body',
+                    'format:s' => 'The input format of the comment.',
+                    'discussionID'
+                ])->add($this->fullSchema()),
                 'CommentPost'
             );
         }
@@ -138,7 +142,6 @@ class CommentsApiController extends AbstractApiController {
             'commentID:i' => 'The ID of the comment.',
             'discussionID:i' => 'The ID of the discussion.',
             'body:s' => 'The body of the comment.',
-            'format:s' => 'The input format of the comment.',
             'dateInserted:dt' => 'When the comment was created.',
             'dateUpdated:dt|n' => 'When the comment was last updated.',
             'insertUserID:i' => 'The user that created the comment.',
@@ -188,7 +191,12 @@ class CommentsApiController extends AbstractApiController {
         $this->permission('Garden.SignIn.Allow');
 
         $in = $this->idParamSchema()->setDescription('Get a comment for editing.');
-        $out = $this->schema(Schema::parse(['commentID', 'discussionID', 'body', 'format'])->add($this->fullSchema()), 'out');
+        $out = $this->schema(Schema::parse([
+            'commentID',
+            'discussionID',
+            'body',
+            'format:s' => 'The input format of the comment.',
+        ])->add($this->fullSchema()), 'out');
 
         $comment = $this->commentByID($id);
         $comment['Url'] = commentUrl($comment);

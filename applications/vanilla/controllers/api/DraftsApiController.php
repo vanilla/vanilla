@@ -69,9 +69,11 @@ class DraftsApiController extends AbstractApiController {
 
         if (!isset($draftPostSchema)) {
             $draftPostSchema = $this->schema(
-                Schema::parse(
-                    ['recordType', 'parentRecordID?', 'attributes']
-                )->add($this->fullSchema()),
+                Schema::parse([
+                    'recordType',
+                    'parentRecordID?',
+                    'attributes'
+                ])->add($this->fullSchema()),
                 'DraftPost'
             );
         }
@@ -138,7 +140,11 @@ class DraftsApiController extends AbstractApiController {
         $this->permission('Garden.SignIn.Allow');
 
         $in = $this->idParamSchema('in')->setDescription('Get a draft for editing.');
-        $out = $this->schema(['draftID', 'parentRecordID', 'attributes'], 'out')->add($this->fullSchema());
+        $out = $this->schema([
+            'draftID',
+            'parentRecordID',
+            'attributes',
+        ], 'out')->add($this->fullSchema());
 
         $row = $this->draftByID($id);
         if ($row['InsertUserID'] !== $this->getSession()->UserID) {

@@ -111,18 +111,10 @@ class AuthenticateController extends Gdn_Controller {
      * @throws Exception
      */
     public function index($authenticator = '', $authenticatorID = '') {
-        try {
-            $response = $this->authenticateApiController->post([
-                'authenticator' => $authenticator,
-                'authenticatorID' => $authenticatorID,
-            ]);
-        } catch(Exception $e) {
-            if (debug()) {
-                throw $e;
-            }
-            throw notFoundException();
-        }
-
+        $response = $this->authenticateApiController->post([
+            'authenticator' => $authenticator,
+            'authenticatorID' => $authenticatorID,
+        ]);
 
         if ($response['authenticationStep'] === 'authenticated') {
             $redirectURL = (val('target', $this->request->getQuery(), '/'));

@@ -1614,6 +1614,7 @@ class Gdn_Controller extends Gdn_Pluggable {
                 // Pick our route.
                 switch ($ex->getCode()) {
                     case 401:
+                    case 403:
                         $route = 'DefaultPermission';
                         break;
                     case 404:
@@ -1634,7 +1635,7 @@ class Gdn_Controller extends Gdn_Pluggable {
                         ->passData('Url', url())
                         ->passData('Breadcrumbs', $this->data('Breadcrumbs', []))
                         ->dispatch($route);
-                } elseif (in_array($ex->getCode(), [401, 404])) {
+                } elseif (in_array($ex->getCode(), [401, 403, 404])) {
                     // Default forbidden & not found codes.
                     Gdn::dispatcher()
                         ->passData('Message', $ex->getMessage())
@@ -1793,9 +1794,14 @@ class Gdn_Controller extends Gdn_Pluggable {
 
                 $this->Head->addScript('', 'text/javascript', false, ['content' => $this->definitionList(false)]);
 
+                $busta = trim(assetVersion('', ''), '.');
+
+                // Add the client-side translations.
+                // This is done in the controller rather than the asset model because the translations are not linked to compiled code.
+                $this->Head->addScript(url('/api/v2/locales/'.rawurlencode(Gdn::locale()->current())."/translations?js=1&x-cache=1&h=$busta", true), 'text/javascript', false, ['defer' => 'true']);
+
                 // Add the built addon javascript files.
                 $addonJs = $AssetModel->getAddonJsFiles($ThemeType, $this->MasterView === 'admin' ? 'admin' : 'app', $ETag);
-                $busta = trim(assetVersion('', ''), '.');
                 foreach ($addonJs as $path) {
                     $scriptPath = asset($path);
 

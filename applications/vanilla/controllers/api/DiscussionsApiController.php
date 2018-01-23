@@ -135,8 +135,16 @@ class DiscussionsApiController extends AbstractApiController {
     public function discussionPostSchema($type = '') {
         if ($this->discussionPostSchema === null) {
             $this->discussionPostSchema = $this->schema(
-                Schema::parse(
-                    ['name', 'body', 'format', 'categoryID', 'closed?', 'sink?', 'pinned?', 'pinLocation?'])->add($this->fullSchema()),
+                Schema::parse([
+                    'name',
+                    'body',
+                    'format:s' => 'The input format of the discussion.',
+                    'categoryID',
+                    'closed?',
+                    'sink?',
+                    'pinned?',
+                    'pinLocation?',
+                ])->add($this->fullSchema()),
                 'DiscussionPost'
             );
         }
@@ -285,8 +293,18 @@ class DiscussionsApiController extends AbstractApiController {
 
         $this->idParamSchema()->setDescription('Get a discussion for editing.');
         $out = $this->schema(
-            Schema::parse(['discussionID', 'name', 'body', 'format', 'categoryID', 'sink', 'closed', 'pinned', 'pinLocation']
-        )->add($this->fullSchema()), ['DiscussionGetEdit', 'out']);
+            Schema::parse([
+                'discussionID',
+                'name',
+                'body',
+                'format:s' => 'The input format of the discussion.',
+                'categoryID',
+                'sink',
+                'closed',
+                'pinned',
+                'pinLocation',
+            ])->add($this->fullSchema()
+        ), ['DiscussionGetEdit', 'out']);
 
         $row = $this->discussionByID($id);
         $row['Url'] = discussionUrl($row);
@@ -345,6 +363,10 @@ class DiscussionsApiController extends AbstractApiController {
                     'processor' => [DateFilterSchema::class, 'dateFilterField'],
                 ],
             ]),
+            'followed:b' => [
+                'default' => false,
+                'description' => 'Only fetch discussions from followed categories. Pinned discussions are mixed in.'
+            ],
             'pinned:b?' => 'Whether or not to include pinned discussions. If true, only return pinned discussions. Cannot be used with the pinOrder parameter.',
             'pinOrder:s?' => [
                 'default' => 'first',
@@ -387,12 +409,15 @@ class DiscussionsApiController extends AbstractApiController {
         // Allow addons to update the where clause.
         $where = $this->getEventManager()->fireFilter('discussionsApiController_index_filters', $where, $this, $in, $query);
 
+        if ($query['followed']) {
+            $where['Followed'] = true;
+            $query['pinOrder'] = 'mixed';
+        }
+
         $pinned = array_key_exists('pinned', $query) ? $query['pinned'] : null;
         if ($pinned === true) {
             $announceWhere = array_merge($where, ['d.Announce >' => '0']);
             $rows = $this->discussionModel->getAnnouncements($announceWhere, $offset, $limit)->resultArray();
-        } elseif ($pinned === false) {
-            $rows = $this->discussionModel->getWhereRecent($where, $limit, $offset, false)->resultArray();
         } else {
             $pinOrder = array_key_exists('pinOrder', $query) ? $query['pinOrder'] : null;
             if ($pinOrder == 'first') {

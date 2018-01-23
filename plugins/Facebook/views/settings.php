@@ -9,7 +9,7 @@ echo $this->Form->errors();
     </div>
     <div class="padded">
         <?php echo t('Facebook Connect allows users to sign in using their Facebook account.'); ?>
-        <?php echo ' '.anchor(sprintf(t('How to set up %s.'), t('Facebook Connect')), 'http://docs.vanillaforums.com/help/addons/social/facebook/', ['target' => '_blank']); ?>
+        <?php echo ' '.anchor(sprintf(t('How to set up %s.'), t('Facebook Connect')), 'http://docs.vanillaforums.com/help/sso/social-connect/#facebook', ['target' => '_blank']); ?>
     </div>
     <ul>
         <li class="form-group">

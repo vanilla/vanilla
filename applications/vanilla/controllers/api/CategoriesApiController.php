@@ -134,7 +134,7 @@ class CategoriesApiController extends AbstractApiController {
             'countComments:i' => 'Total comments in the category.',
             'countAllDiscussions:i' => 'Total of all discussions in a category and its children.',
             'countAllComments:i' => 'Total of all comments in a category and its children.',
-            'follow:b?' => 'Is the category being followed by the current user?'
+            'followed:b?' => 'Is the category being followed by the current user?'
         ]);
     }
 
@@ -256,6 +256,10 @@ class CategoriesApiController extends AbstractApiController {
         $in = $this->schema([
             'parentCategoryID:i?' => 'Parent category ID.',
             'parentCategoryCode:s?' => 'Parent category URL code.',
+            'followed:b' => [
+                'default' => false,
+                'description' => 'Only list categories followed by the current user.'
+            ],
             'maxDepth:i?' => [
                 'description' => '',
                 'default' => 2
@@ -280,8 +284,18 @@ class CategoriesApiController extends AbstractApiController {
 
         $joinUserCategory = $this->categoryModel->joinUserCategory();
         $this->categoryModel->setJoinUserCategory(true);
-        if ($parent['DisplayAs'] === 'Flat') {
-            list($offset, $limit) = offsetLimit("p{$query['page']}", $this->categoryModel->getDefaultLimit());
+        list($offset, $limit) = offsetLimit("p{$query['page']}", $this->categoryModel->getDefaultLimit());
+        if ($query['followed']) {
+            $categories = $this->categoryModel
+                ->getWhere(['Followed' => true], '', 'asc', $limit, $offset)
+                ->resultArray();
+
+            // Index by ID for category calculation functions.
+            $categories = array_column($categories, null, 'CategoryID');
+            $categories = $this->categoryModel->flattenCategories($categories);
+            // Reset indexes for proper output detection as an indexed array.
+            $categories = array_values($categories);
+        } elseif ($parent['DisplayAs'] === 'Flat') {
             $categories = $this->categoryModel->getTreeAsFlat(
                 $parent['CategoryID'],
                 $offset,
@@ -379,7 +393,7 @@ class CategoriesApiController extends AbstractApiController {
     public function put_follow($id, array $body) {
         $this->permission('Garden.SignIn.Allow');
 
-        $schema = ['follow:b' => 'The category-follow status for the current user.'];
+        $schema = ['followed:b' => 'The category-follow status for the current user.'];
         $in = $this->schema($schema);
         $out = $this->schema($schema);
 
@@ -389,17 +403,17 @@ class CategoriesApiController extends AbstractApiController {
         $followed = $this->categoryModel->getFollowed($userID);
 
         // Is this a new follow?
-        if ($body['follow'] && !array_key_exists($id, $followed)) {
+        if ($body['followed'] && !array_key_exists($id, $followed)) {
             $this->permission('Vanilla.Discussions.View', $category['PermissionCategoryID']);
             if (count($followed) >= $this->categoryModel->getMaxFollowedCategories()) {
                 throw new ClientException('Already following the maximum number of categories.');
             }
         }
 
-        $this->categoryModel->follow($userID, $id, $body['follow']);
+        $this->categoryModel->follow($userID, $id, $body['followed']);
 
         $result = $out->validate([
-            'follow' => $this->categoryModel->isFollowed($userID, $id)
+            'followed' => $this->categoryModel->isFollowed($userID, $id)
         ]);
         return $result;
     }

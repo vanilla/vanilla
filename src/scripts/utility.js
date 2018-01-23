@@ -175,6 +175,32 @@ export function formatUrl(path) {
 }
 
 /**
+ * Translate a string into the current locale.
+ *
+ * @param {string} str The string to translate.
+ * @param {string=} defaultTranslation The default translation to use.
+ */
+export function translate(str, defaultTranslation) {
+    // Codes that begin with @ are considered literals.
+    if (str.substr(0, 1) === '@') {
+        return str.substr(1);
+    }
+
+    if (gdn.translations[str] !== undefined) {
+        return gdn.translations[str];
+    }
+
+    return defaultTranslation !== undefined ? defaultTranslation : str;
+}
+
+/**
+ * The t function is an alias for translate.
+ *
+ * @type {translate}
+ */
+export const t = translate;
+
+/**
  * Re-exported from sprintf-js https://www.npmjs.com/package/sprintf-js
  */
 // export const sprintf = sprintfJs.sprintf;

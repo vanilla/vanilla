@@ -188,6 +188,7 @@ class Bootstrap {
             ->rule('@api-v2-route')
             ->setClass(\Garden\Web\ResourceRoute::class)
             ->setConstructorArgs(['/api/v2/', '%sApiController'])
+            ->addCall('setConstraint', ['locale', ['position' => 0]])
 
             ->rule(\Garden\ClassLocator::class)
             ->setClass(\Vanilla\VanillaClassLocator::class)

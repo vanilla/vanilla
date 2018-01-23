@@ -120,20 +120,12 @@ class DiscussionsController extends VanillaController {
 
         $this->setData('Breadcrumbs', [['Name' => t('Recent Discussions'), 'Url' => '/discussions']]);
 
-        $followed = Gdn::request()->get('followed', null);
-        if (c('Vanilla.SaveFollowingPreference')) {
-            if ($followed === null) {
-                $followed = Gdn::session()->getPreference('FollowedDiscussions', false);
-                if ($followed) {
-                    Gdn::request()->setQueryItem('followed', $followed ? 1 : 0);
-                }
-            } else {
-                $followed = boolval($followed);
-                Gdn::session()->setPreference('FollowedDiscussions', $followed);
-            }
-        }
+        $followed = paramPreference(
+            'followed',
+            'FollowedDiscussions',
+            'Vanilla.SaveFollowingPreference'
+        );
         $this->setData('Followed', $followed);
-
 
         // Set criteria & get discussions data
         $this->setData('Category', false, true);

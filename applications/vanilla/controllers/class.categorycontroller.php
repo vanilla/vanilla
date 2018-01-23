@@ -70,10 +70,12 @@ class CategoryController extends VanillaController {
             'Followed' => $result
         ]);
 
-        //  Short circuit if this is an api call.
-        if ($this->deliveryType() === DELIVERY_TYPE_DATA) {
-            $this->render('Blank', 'Utility', 'Dashboard');
-            return;
+        switch ($this->deliveryType()) {
+            case DELIVERY_TYPE_DATA:
+                $this->render('Blank', 'Utility', 'Dashboard');
+                return;
+            case DELIVERY_TYPE_ALL:
+                redirectTo('/categories');
         }
 
         // Return the appropriate bookmark.

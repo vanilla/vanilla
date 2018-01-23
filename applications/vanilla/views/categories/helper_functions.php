@@ -71,10 +71,17 @@ if (!function_exists('getOptions')):
 
         $dropdown = new DropdownModule('dropdown', '', 'OptionsMenu');
         $tk = urlencode(Gdn::session()->transientKey());
-        $hide = (int)!val('Following', $category);
+        $followed = val('Followed', $category);
 
         $dropdown->addLink(t('Mark Read'), "/category/markread?categoryid={$categoryID}&tkey={$tk}", 'mark-read');
-        $dropdown->addLink(t($hide ? 'Unmute' : 'Mute'), "/category/follow?categoryid={$categoryID}&value={$hide}&tkey={$tk}", 'hide');
+
+        if (c('Vanilla.EnableCategoryFollowing')) {
+            $dropdown->addLink(
+                t($followed ? 'Unfollow' : 'Follow'),
+                "/category/followed?tkey={$tk}&categoryid={$categoryID}&value=" . ($followed ? 0 : 1),
+                'hide'
+            );
+        }
 
         // Allow plugins to add options
         $sender->EventArguments['CategoryOptionsDropdown'] = &$dropdown;

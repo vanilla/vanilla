@@ -807,6 +807,7 @@ class VanillaSettingsController extends Gdn_Controller {
 
         $cf->initialize([
             'Vanilla.EnableCategoryFollowing' => [
+                'LabelCode' => 'Category Following',
                 'Control' => 'toggle',
                 'Description' => t(
                     'Some themes must be updated for category following.',

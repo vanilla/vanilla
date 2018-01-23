@@ -6,17 +6,14 @@
 
 import Quill from "quill";
 import * as utility from "@core/utility";
-import AutoLinker from "./AutoLinker";
-
-// Quill.register('modules/autoLinker', AutoLinker);
 
 const toolbarOptions = [
-    ["bold", "italic", "underline", "strike"], // toggled buttons
+    ["bold", "italic", "strike"], // toggled buttons
     ['link', 'image'], // Links and images
-    ["blockquote", "code-block"], // Blocks
-    [{ header: 1 }, { header: 2 }], // custom button values
+    // ["blockquote", "code-block"], // Blocks
+    // [{ header: 1 }, { header: 2 }], // custom button values
     [{ list: "ordered"}, { list: "bullet" }],
-    [{ indent: "-1"}, { indent: "+1" }], // outdent/indent
+    // [{ indent: "-1"}, { indent: "+1" }], // outdent/indent
     [{ header: [1, 2, false] }],
     ["clean"], // remove formatting button
 ];

@@ -8,6 +8,7 @@
 namespace Vanilla;
 
 use Garden\Schema\Schema;
+use Garden\Web\Data;
 use Vanilla\Utility\CamelCaseScheme;
 use Vanilla\Utility\CapitalCaseScheme;
 
@@ -84,8 +85,17 @@ class ApiUtils {
         $r = [
             'page' => $query['page'] ?: 1,
             'more' => $count === true || $count >= $query['limit'],
-            'urlFormat' => static::pagerUrlFormat($url, $query, $schema)
+            'urlFormat' => static::pagerUrlFormat($url, $query, $schema),
+            'links' => []
         ];
+
+        $r['links']['first'] = str_replace('%s', 1, $r['urlFormat']);
+        if ($r['page'] > 1) {
+            $r['links']['prev'] = $r['page'] > 2 ? str_replace('%s', $r['page'] - 1, $r['urlFormat']) : $r['links']['first'];
+        }
+        if ($r['more']) {
+            $r['links']['next'] = str_replace('%s', $r['page'] + 1, $r['urlFormat']);
+        }
 
         return $r;
     }
@@ -105,7 +115,18 @@ class ApiUtils {
             'pageCount' => static::pageCount($totalCount, $query['limit']),
             'urlFormat' => static::pagerUrlFormat($url, $query, $schema),
             'totalCount' => $totalCount, // For regenerating with different URL.
+            'links' => []
         ];
+
+        $r['links']['first'] = str_replace('%s', 1, $r['urlFormat']);
+        $r['links']['last'] = str_replace('%s', $r['pageCount'], $r['urlFormat']);
+        if ($r['page'] > 1) {
+            $r['links']['prev'] = $r['page'] > 2 ? str_replace('%s', $r['page'] - 1, $r['urlFormat']) : $r['links']['first'];
+        }
+        if ($r['page'] < $r['pageCount']) {
+            $r['links']['next'] = str_replace('%s', $r['page'] + 1, $r['urlFormat']);
+        }
+
         return $r;
     }
 
@@ -124,6 +145,7 @@ class ApiUtils {
      * Calculate a pager URL format.
      *
      * This method passes through all of the non-default arguments from a query string to the resulting URL.
+     * Note that the returned URL is not compatible with printf due to URL encoding.
      *
      * @param string $url The basic URL format without querystring.
      * @param array $query The current query string.
@@ -145,9 +167,34 @@ class ApiUtils {
             $argsStr = 'page=%s'.(empty($argsStr) ? '' : '&'.$argsStr);
         }
         if (!empty($argsStr)) {
-            $url = (strpos($url, '?') === false ? '?' : '&').$argsStr;
+            $url .= (strpos($url, '?') === false ? '?' : '&').$argsStr;
         }
         return $url;
+    }
+
+    /**
+     * Add paging information to API results.
+     *
+     * @param array|Data $data The results returned by the API.
+     * @param array $pagingInfo Paging information.
+     * @return Data
+     */
+    public static function setPageMeta($data, $pagingInfo) {
+        if (!($data instanceof Data)) {
+            $data = new Data($data);
+        }
+
+        if (!$pagingInfo) {
+            return $data;
+        }
+
+        $data->setMeta('paging', $pagingInfo);
+
+        foreach($pagingInfo['links'] as $key => $value) {
+            $data->setHeader('Paging-'.ucfirst($key), $value);
+        }
+
+        return $data;
     }
 
     /**

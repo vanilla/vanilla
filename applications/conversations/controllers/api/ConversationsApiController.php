@@ -211,7 +211,7 @@ class ConversationsApiController extends AbstractApiController {
      * @param int $id The ID of the conversation.
      * @param array $query The query string.
      * @throws NotFoundException if the conversation could not be found.
-     * @return array
+     * @return Data
      */
     public function get_participants($id, array $query) {
         $this->permission('Conversations.Conversations.Add');
@@ -268,14 +268,23 @@ class ConversationsApiController extends AbstractApiController {
         );
         $data = array_map([$this, 'normalizeParticipantOutput'], $data);
 
-        return $out->validate($data);
+        $result = $out->validate($data);
+
+        $paging = ApiUtils::numberedPagerInfo(
+            $this->conversationModel->getConversationMembersCount($id, $active),
+            "/api/v2/conversations/$id/participants",
+            $query,
+            $in
+        );
+
+        return ApiUtils::setPageMeta($result, $paging);
     }
 
     /**
      * List conversations of a user.
      *
      * @param array $query The query string.
-     * @return array
+     * @return Data
      */
     public function index(array $query) {
         $this->permission('Conversations.Conversations.Add');
@@ -337,7 +346,11 @@ class ConversationsApiController extends AbstractApiController {
         );
         $conversations = array_map([$this, 'normalizeOutput'], $conversations);
 
-        return $out->validate($conversations);
+        $result = $out->validate($conversations);
+
+        $paging = ApiUtils::morePagerInfo($result, '/api/v2/conversations', $query, $in);
+
+        return ApiUtils::setPageMeta($result, $paging);
     }
 
     /**

@@ -5,6 +5,7 @@
  */
 
 use Garden\Schema\Schema;
+use Garden\Web\Data;
 use Garden\Web\Exception\NotFoundException;
 use Garden\Web\Exception\ServerException;
 use Vanilla\DateFilterSchema;
@@ -178,6 +179,7 @@ class CommentsApiController extends AbstractApiController {
 
         // Allow addons to modify the result.
         $result = $this->getEventManager()->fireFilter('commentsApiController_get_output', $result, $this, $in, $query, $comment);
+
         return $result;
     }
 
@@ -229,7 +231,7 @@ class CommentsApiController extends AbstractApiController {
      * List comments.
      *
      * @param array $query The query string.
-     * @return mixed
+     * @return Data
      */
     public function index(array $query) {
         $this->permission();
@@ -288,6 +290,7 @@ class CommentsApiController extends AbstractApiController {
         list($offset, $limit) = offsetLimit("p{$query['page']}", $query['limit']);
 
         $rows = $this->commentModel->lookup($where, true, $limit, $offset, 'asc')->resultArray();
+        $hasMore = $this->commentModel->LastCommentCount >= $limit;
 
         // Expand associated rows.
         $this->userModel->expandUsers(
@@ -303,7 +306,15 @@ class CommentsApiController extends AbstractApiController {
 
         // Allow addons to modify the result.
         $result = $this->getEventManager()->fireFilter('commentsApiController_index_output', $result, $this, $in, $query, $rows);
-        return $result;
+
+        if (isset($where['DiscussionID']) && count($where) === 1) {
+            $discussion = $this->discussionByID($where['DiscussionID']);
+            $paging = ApiUtils::numberedPagerInfo($discussion['CountComments'], '/api/v2/comments', $query, $in);
+        } else {
+            $paging = ApiUtils::morePagerInfo($hasMore, '/api/v2/comments', $query, $in);
+        }
+
+        return ApiUtils::setPageMeta($result, $paging);
     }
 
     /**

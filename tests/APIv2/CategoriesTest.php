@@ -38,6 +38,9 @@ class CategoriesTest extends AbstractResourceTest {
     /** {@inheritdoc} */
     protected $singular = 'category';
 
+    /** {@inheritdoc} */
+    protected $testPagingOnIndex = false;
+
     /**
      * {@inheritdoc}
      */

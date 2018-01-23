@@ -6005,6 +6005,12 @@ Styleguide Attachments
   display: none;
 }
 
+.InputBox {
+  background: #fff;
+  border: 1px solid #999;
+  border: 1px solid rgba(0, 0, 0, 0.4);
+}
+
 .jcrop-holder {
   direction: ltr;
   text-align: left;
@@ -6178,12 +6184,6 @@ Styleguide Attachments
 .jcrop-holder img,
 img.jcrop-preview {
   max-width: none;
-}
-
-.InputBox {
-  background: #fff;
-  border: 1px solid #999;
-  border: 1px solid rgba(0, 0, 0, 0.4);
 }
 
 .padded {

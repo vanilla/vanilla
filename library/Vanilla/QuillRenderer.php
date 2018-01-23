@@ -56,6 +56,12 @@ class QuillRenderer {
     private function renderBlock(QuillBlock $block) {
         $attributes = [];
         $addNewLine = false;
+
+        // Don't render no-ops
+        if (count($block->operations) < 1) {
+            return "";
+        }
+
         switch($block->blockType) {
             case QuillBlock::TYPE_PARAGRAPH:
                 $containerTag = "p";
@@ -112,10 +118,26 @@ class QuillRenderer {
      * @param QuillOperation $operation
      */
     private function renderOperation(QuillOperation $operation) {
+        if ($operation->newline === QuillOperation::NEWLINE_TYPE_ONLY && !$operation->list) {
+            return "<br>";
+        }
+
+        // Don't render ops without content.
+        if ($operation->content === "") {
+            return "";
+        }
+
         $tags = [];
 
         if ($operation->list) {
-            $tags[] = ["name" => "li"];
+            $listTag = ["name" => "li"];
+            $indent = $operation->indent;
+            if ($indent > 0) {
+                $listTag["attributes"] = [
+                    "class" => "ql-indent-$indent",
+                ];
+            }
+            $tags[] = $listTag;
         }
 
         if ($operation->link) {
@@ -154,7 +176,14 @@ class QuillRenderer {
             array_unshift($afterTags, "</{$tag['name']}>");
         }
 
-        return implode("", $beforeTags) . $operation->content . implode("", $afterTags);
+        $result = "";
+
+        if ($operation->newline === QuillOperation::NEWLINE_TYPE_START) {
+            $result .= "<p><br></p>";
+        }
+        $result .= implode("", $beforeTags) . $operation->content . implode("", $afterTags);
+
+        return $result;
     }
 
     /**

@@ -82,7 +82,6 @@ class QuillOperation {
                 "strike",
                 "bold",
                 "italic",
-                "list"
             ];
 
             foreach ($booleanAttributes as $attr) {
@@ -90,6 +89,10 @@ class QuillOperation {
                     $this->{$attr} = val($attr, $attributes);
                     $this->inline = true;
                 }
+            }
+
+            if (val("list", $attributes)) {
+                $this->list = true;
             }
 
             if (val("link", $attributes)) {
@@ -129,7 +132,6 @@ class QuillOperation {
         // If there is only a newline left, replace it with with a break tag.
         if (preg_match($this->newlineOnlyRegexp, $this->content)) {
             $this->content = preg_replace($this->newlineOnlyRegexp, "<br>", $this->content);
-
         }
     }
 

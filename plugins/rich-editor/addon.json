@@ -1,0 +1,30 @@
+{
+    "name": "Rich Editor",
+    "description": "The new WYSIWYG editor for Vanilla. Easy to use, with support for rich content embedding. Also supports a more minimal text mode, Markdown, and BBCode.",
+    "version": "0.1",
+    "mobileFriendly": true,
+    "hasLocale": true,
+    "icon": "richeditor.png",
+    "key": "rich-editor",
+    "type": "addon",
+    "authors": [
+        {
+            "name": "Adam Charron",
+            "email": "adam.c@vanillaforums.com",
+            "homepage": "http://www.vanillaforums.com"
+        }
+    ],
+    "require": {
+        "vanilla": ">=2.5"
+    },
+    "conflict": {
+        "Quotes": "*",
+        "editor": "*"
+    },
+    "build": {
+        "process": "core",
+        "entries": {
+            "app": "./src/scripts/app/rich-editor.js"
+        }
+    }
+}

@@ -1,19 +1,20 @@
 <?php
 /**
  * @author Todd Burry <todd@vanillaforums.com>
- * @copyright 2009-2017 Vanilla Forums Inc.
+ * @copyright 2009-2018 Vanilla Forums Inc.
  * @license GPLv2
  */
 
 namespace VanillaTests\Library\Vanilla;
 
+use PHPUnit\Framework\TestCase;
 use Vanilla\Addon;
 
 
 /**
  * Tests of the {@link Addon::checkVersion()} method.
  */
-class CheckVersionTest extends \PHPUnit\Framework\TestCase {
+class CheckVersionTest extends TestCase {
     /**
      * Check exact version matching.
      */

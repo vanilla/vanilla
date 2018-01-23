@@ -2,18 +2,19 @@
 
 /**
  * @author Todd Burry <todd@vanillaforums.com>
- * @copyright 2009-2017 Vanilla Forums Inc.
+ * @copyright 2009-2018 Vanilla Forums Inc.
  * @license Proprietary
  */
 
 namespace VanillaTests\Library\Core;
 
+use PHPUnit\Framework\TestCase;
 use Gdn_PluginManager;
 
 /**
  * Test the {@link Gdn_PluginManager} class.
  */
-class PluginManagerTest extends \PHPUnit\Framework\TestCase {
+class PluginManagerTest extends TestCase {
     /**
      * Test a basic usage of {@link Gdn_PluginManager::registerCallback}.
      */

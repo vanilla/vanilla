@@ -1,18 +1,19 @@
 <?php
 /**
- * @copyright 2009-2017 Vanilla Forums Inc.
+ * @copyright 2009-2018 Vanilla Forums Inc.
  * @license GPLv2
  */
 
 namespace VanillaTests\Models;
 
+use PHPUnit\Framework\TestCase;
 use CommentModel;
 use VanillaTests\SiteTestTrait;
 
 /**
  * Test {@link CommentModel}.
  */
-class CommentModelTest extends \PHPUnit_Framework_TestCase {
+class CommentModelTest extends TestCase {
     use SiteTestTrait;
 
     /**

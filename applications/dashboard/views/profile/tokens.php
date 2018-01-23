@@ -2,7 +2,7 @@
 <h1 class="H"><?=t('Personal Access Tokens')?></h1>
 
 <div class="PageControls Top">
-    <a href="<?=userUrl($this->User, '', 'token')?>" class="Button Action Popup Primary"><?=t('Generate New Token')?></a>
+    <a href="<?=url(userUrl($this->User, '', 'token'))?>" class="Button Action Popup Primary"><?=t('Generate New Token')?></a>
 </div>
 <div class="DataListWrap">
     <ul class="DataList DataList-Tokens">

@@ -5,7 +5,7 @@
  * @author Mark O'Sullivan <markm@vanillaforums.com>
  * @author Todd Burry <todd@vanillaforums.com>
  * @author Lincoln Russell <lincoln@vanillaforums.com>
- * @copyright 2009-2017 Vanilla Forums Inc.
+ * @copyright 2009-2018 Vanilla Forums Inc.
  * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
  * @package Core
  * @since 2.0
@@ -1058,31 +1058,28 @@ class Gdn_Format {
      * Convert common tags in an HTML strings to plain text. You still need to sanitize your string!!!
      *
      * @param string $html An HTML-formatted string.
-     * @param string $format The initial format of the text.
      * @param bool $collapse Treat a group of closing block tags as one when replacing with newlines.
      *
      * @return string An HTML-formatted strings with common tags replaced with plainText
      */
-    protected static function convertCommonHTMLTagsToPlainText($html, $format = 'Html', $collapse = false) {
-        if ($format != 'Text') {
-            // Remove returns and then replace html return tags with returns.
-            $result = str_replace(["\n", "\r"], ' ', $html);
-            $result = preg_replace('`<br\s*/?>`', "\n", $result);
+    protected static function convertCommonHTMLTagsToPlainText($html, $collapse = false) {
+        // Remove returns and then replace html return tags with returns.
+        $result = str_replace(["\n", "\r"], ' ', $html);
+        $result = preg_replace('`<br\s*/?>`', "\n", $result);
 
-            // Fix lists.
-            $result = Gdn_Format::replaceListItems($result);
+        // Fix lists.
+        $result = Gdn_Format::replaceListItems($result);
 
-            $allBlocks = '(?:div|table|dl|pre|blockquote|address|p|h[1-6]|section|article|aside|hgroup|header|footer|nav|figure|figcaption|details|menu|summary)';
-            $pattern = "</{$allBlocks}>";
-            if ($collapse) {
-                $pattern = "((\s+)?{$pattern})+";
-            }
-            $result = preg_replace("`{$pattern}`", "\n\n", $result);
-
-            // TODO: Fix hard returns within pre blocks.
-
-            return strip_tags($result);
+        $allBlocks = '(?:div|table|dl|pre|blockquote|address|p|h[1-6]|section|article|aside|hgroup|header|footer|nav|figure|figcaption|details|menu|summary)';
+        $pattern = "</{$allBlocks}>";
+        if ($collapse) {
+            $pattern = "((\s+)?{$pattern})+";
         }
+        $result = preg_replace("`{$pattern}`", "\n\n", $result);
+
+        // TODO: Fix hard returns within pre blocks.
+
+        return strip_tags($result);
     }
 
     /**
@@ -1098,7 +1095,9 @@ class Gdn_Format {
     public static function plainText($body, $format = 'Html', $collapse = false) {
         $result = Gdn_Format::to($body, $format);
         $result = Gdn_Format::replaceSpoilers($result);
-        $result = Gdn_Format::convertCommonHTMLTagsToPlainText($result, $format, $collapse);
+        if (strtolower($format) !== 'text') {
+            $result = Gdn_Format::convertCommonHTMLTagsToPlainText($result, $collapse);
+        }
         $result = trim(html_entity_decode($result, ENT_QUOTES, 'UTF-8'));
 
         // Always filter after basic parsing.
@@ -1128,7 +1127,9 @@ class Gdn_Format {
         $result = Gdn_Format::to($body, $format);
         $result = Gdn_Format::replaceSpoilers($result);
         $result = Gdn_Format::replaceQuotes($result);
-        $result = Gdn_Format::convertCommonHTMLTagsToPlainText($result, $format, $collapse);
+        if (strtolower($format) !== 'text') {
+            $result = Gdn_Format::convertCommonHTMLTagsToPlainText($result, $collapse);
+        }
         $result = trim(html_entity_decode($result, ENT_QUOTES, 'UTF-8'));
 
         // Always filter after basic parsing.
@@ -1261,7 +1262,7 @@ class Gdn_Format {
                 $inTag--;
             }
 
-            if (c('Garden.Format.WarnLeaving', false) && isset($matches[4]) && $inAnchor) {
+            if (c('Garden.Format.WarnLeaving', false) && isset($matches[4]) && $inTag && $inAnchor) {
                 // This is a the href url value in an anchor tag.
                 $url = $matches[4];
                 $domain = parse_url($url, PHP_URL_HOST);

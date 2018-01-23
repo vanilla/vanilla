@@ -1,7 +1,7 @@
 <?php
 /**
  * @author Alexandre (DaazKu) Chouinard <alexandre.c@vanillaforums.com>
- * @copyright 2009-2017 Vanilla Forums Inc.
+ * @copyright 2009-2018 Vanilla Forums Inc.
  * @license GPLv2
  */
 
@@ -181,7 +181,7 @@ class MessagesApiController extends AbstractApiController {
                     'minimum' => 1,
                     'maximum' => 100
                 ],
-                'expand?' => $this->getExpandDefinition(['insertUser'])
+                'expand?' => ApiUtils::getExpandDefinition(['insertUser'])
             ], 'in')
             ->requireOneOf(['conversationID', 'insertUserID'])
             ->setDescription('List user messages.');

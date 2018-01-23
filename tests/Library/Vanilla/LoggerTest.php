@@ -1,14 +1,12 @@
 <?php
 /**
  * @author Todd Burry <todd@vanillaforums.com>
- * @copyright 2009-2017 Vanilla Forums Inc.
+ * @copyright 2009-2018 Vanilla Forums Inc.
  * @license GPLv2
  */
 
 namespace VanillaTests\Library\Vanilla;
 
-use Psr\Log\LoggerInterface;
-use Psr\Log\LoggerTrait;
 use Psr\Log\Test\LoggerInterfaceTest;
 use Vanilla\Logger;
 

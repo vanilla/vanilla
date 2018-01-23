@@ -1,7 +1,7 @@
 <?php
 /**
  * @author Todd Burry <todd@vanillaforums.com>
- * @copyright 2009-2017 Vanilla Forums Inc.
+ * @copyright 2009-2018 Vanilla Forums Inc.
  * @license GPLv2
  */
 
@@ -27,7 +27,7 @@ class ImageResizer {
      * Resize an image.
      *
      * @param string $source The path of the source image.
-     * @param string $destination The path of the destination image.
+     * @param string|null $destination The path of the destination image. Use `null` for an in-place resize.
      * @param array $options An array of options constraining the image crop.
      *
      * - width: The max width of the destination image.
@@ -46,8 +46,14 @@ class ImageResizer {
             throw new \InvalidArgumentException("Cannot resize images of this type ($ext).");
         }
 
-        if (pathinfo($destination, PATHINFO_EXTENSION) === '*') {
-            $destination = substr($destination, 0, -1).self::$typeExt[$srcType];
+        if ($destination === null) {
+            $destType = $srcType;
+            $destination = $source;
+        } else {
+            if (pathinfo($destination, PATHINFO_EXTENSION) === '*') {
+                $destination = substr($destination, 0, -1) . self::$typeExt[$srcType];
+            }
+            $destType = $this->imageTypeFromExt($destination);
         }
 
         // Check for EXIF rotation tag, and rotate the image if present
@@ -68,7 +74,6 @@ class ImageResizer {
         }
 
         $resize = $this->calculateResize(['height' => $height, 'width' => $width], $options);
-        $destType = $this->imageTypeFromExt($destination);
 
         try {
             $srcImage = $this->createImage($source, $srcType);
@@ -230,6 +235,15 @@ class ImageResizer {
             'sourceX' => $sx,
             'sourceY' => $sy
         ];
+    }
+
+    /**
+     * Return the type-to-extension map.
+     *
+     * @return array
+     */
+    public static function getTypeExt() {
+        return static::$typeExt;
     }
 
     /**

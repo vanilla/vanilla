@@ -2,7 +2,7 @@
 /**
  * Update model.
  *
- * @copyright 2009-2017 Vanilla Forums Inc.
+ * @copyright 2009-2018 Vanilla Forums Inc.
  * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
  * @package Dashboard
  * @since 2.0
@@ -117,7 +117,7 @@ class UpdateModel extends Gdn_Model {
             '/class.*.plugin.php', // plugin
             '/about.php', // theme
             '/definitions.php', // locale
-            '/index.php', // vanilla core
+            '/environment.php', // vanilla core
             'vanilla2export.php' // porter
         ];
 
@@ -148,7 +148,7 @@ class UpdateModel extends Gdn_Model {
             }
 
             foreach ($entries as $entry) {
-                if ($entry['Name'] == '/index.php') {
+                if ($entry['Name'] == '/environment.php') {
                     // This could be the core vanilla package.
                     $version = self::parseCoreVersion($entry['Path']);
 

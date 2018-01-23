@@ -1,7 +1,7 @@
 <?php
 /**
  * @author Alexandre (DaazKu) Chouinard <alexandre.c@vanillaforums.com>
- * @copyright 2009-2017 Vanilla Forums Inc.
+ * @copyright 2009-2018 Vanilla Forums Inc.
  * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
  */
 
@@ -84,14 +84,7 @@ abstract class SSOAuthenticator extends Authenticator {
      */
     public final function validateAuthentication(RequestInterface $request) {
         $ssoData = $this->sso($request);
-
-        // Make sure that the following fields are filled.
-        $ssoData['authenticatorID'] = $this->getID();
-        $ssoData['authenticatorName'] = $this->getName();
-        $ssoData['authenticatorIsTrusted'] = $this->isTrusted();
-
         $ssoData->validate();
-
         return $ssoData;
     }
 }

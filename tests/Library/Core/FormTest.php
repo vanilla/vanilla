@@ -1,16 +1,17 @@
 <?php
 /**
  * @author Todd Burry <todd@vanillaforums.com>
- * @copyright 2009-2017 Vanilla Forums Inc.
+ * @copyright 2009-2018 Vanilla Forums Inc.
  * @license GPLv2
  */
 
 namespace VanillaTests\Library\Core;
 
+use PHPUnit\Framework\TestCase;
 use Gdn;
 use Gdn_Form;
 
-class FormTest extends \PHPUnit\Framework\TestCase {
+class FormTest extends TestCase {
     /**
      * Setup a dummy request because {@link Gdn_Form} needs it.
      */

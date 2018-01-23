@@ -1,17 +1,20 @@
 <?php
 /**
- * @copyright 2009-2017 Vanilla Forums Inc.
+ * @copyright 2009-2018 Vanilla Forums Inc.
  * @license GPLv2
  */
 
 use Garden\Schema\Schema;
-use \Garden\Schema\ValidationException;
+use Garden\Schema\ValidationException;
 use Garden\Web\Data;
 use Garden\Web\Exception\ClientException;
 use Garden\Web\Exception\NotFoundException;
 use Garden\Web\Exception\ServerException;
-use Vanilla\DateFilterSchema;
 use Vanilla\ApiUtils;
+use Vanilla\DateFilterSchema;
+use Vanilla\ImageResizer;
+use Vanilla\UploadedFile;
+use Vanilla\UploadedFileSchema;
 
 /**
  * API Controller for the `/users` resource.
@@ -21,17 +24,14 @@ class UsersApiController extends AbstractApiController {
     /** @var Gdn_Configuration */
     private $configuration;
 
-    /** @var DateFilterSchema */
-    private $dateFilterSchema;
-
     /** @var Schema */
     private $idParamSchema;
 
+    /** @var ImageResizer */
+    private $imageResizer;
+
     /** @var UserModel */
     private $userModel;
-
-    /** @var Schema */
-    private $userPostSchema;
 
     /** @var Schema */
     private $userSchema;
@@ -41,16 +41,16 @@ class UsersApiController extends AbstractApiController {
      *
      * @param UserModel $userModel
      * @param Gdn_Configuration $configuration
-     * @param DateFilterSchema $dateFilterSchema
+     * @param ImageResizer $imageResizer
      */
     public function __construct(
         UserModel $userModel,
         Gdn_Configuration $configuration,
-        DateFilterSchema $dateFilterSchema
+        ImageResizer $imageResizer
     ) {
         $this->configuration = $configuration;
         $this->userModel = $userModel;
-        $this->dateFilterSchema = $dateFilterSchema;
+        $this->imageResizer = $imageResizer;
     }
 
     /**
@@ -69,6 +69,34 @@ class UsersApiController extends AbstractApiController {
         $this->userModel->deleteID($id);
     }
 
+    /**
+     * Delete a user photo.
+     *
+     * @param int|null $id The ID of the user.
+     * @throws ClientException if the user does not have a photo.
+     */
+    public function delete_photo($id = null) {
+        $this->permission('Garden.SignIn.Allow');
+
+        $in = $this->idParamSchema()->setDescription('Delete a user photo.');
+        $out = $this->schema([], 'out');
+
+        if ($id === null) {
+            $id = $this->getSession()->UserID;
+        }
+
+        $user = $this->userByID($id);
+
+        if ($id !== $this->getSession()->UserID) {
+            $this->permission('Garden.Users.Edit');
+        }
+
+        if (empty($user['Photo'])) {
+            throw new ClientException('The user does not have a photo.');
+        }
+
+        $this->userModel->removePicture($id);
+    }
     /**
      * Get a schema instance comprised of all available user fields.
      *
@@ -176,43 +204,48 @@ class UsersApiController extends AbstractApiController {
         ]);
 
         $in = $this->schema([
-            'dateInserted?' => $this->dateFilterSchema,
-            'dateUpdated?' => $this->dateFilterSchema,
+            'dateInserted?' => new DateFilterSchema([
+                'description' => 'When the user was created.',
+                'x-filter' => [
+                    'field' => 'u.DateInserted',
+                    'processor' => [DateFilterSchema::class, 'dateFilterField'],
+                ],
+            ]),
+            'dateUpdated?' => new DateFilterSchema([
+                'description' => 'When the user was updated.',
+                'x-filter' => [
+                    'field' => 'u.DateUpdated',
+                    'processor' => [DateFilterSchema::class, 'dateFilterField'],
+                ],
+            ]),
             'userID:a?' => [
                 'description' => 'One or more user IDs to lookup.',
                 'items' => ['type' => 'integer'],
-                'style' => 'form'
+                'style' => 'form',
+                'x-filter' => [
+                    'field' => 'u.UserID',
+                ],
             ],
             'page:i?' => [
                 'description' => 'Page number.',
                 'default' => 1,
-                'minimum' => 1
+                'minimum' => 1,
             ],
             'limit:i?' => [
                 'description' => 'The number of items per page.',
                 'default' => 30,
                 'minimum' => 1,
-                'maximum' => 100
+                'maximum' => 100,
             ]
         ], 'in')->setDescription('List users.');
         $out = $this->schema([':a' => $this->userSchema()], 'out');
 
         $query = $in->validate($query);
+        $where = ApiUtils::queryToFilters($in, $query);
+
         list($offset, $limit) = offsetLimit("p{$query['page']}", $query['limit']);
-        $filter = [];
 
-        if (!empty($query['userID'])) {
-            $filter['UserID'] = $query['userID'];
-        }
-
-        if ($dateInserted = $this->dateFilterField('dateInserted', $query)) {
-            $filter += $dateInserted;
-        }
-        if ($dateUpdated = $this->dateFilterField('dateUpdated', $query)) {
-            $filter += $dateUpdated;
-        }
-
-        $rows = $this->userModel->search($filter, '', '', $limit, $offset)->resultArray();
+        $rows = $this->userModel->search($where, '', '', $limit, $offset)->resultArray();
         foreach ($rows as &$row) {
             $this->userModel->setCalculatedFields($row);
             $row = $this->normalizeOutput($row);
@@ -264,16 +297,19 @@ class UsersApiController extends AbstractApiController {
         $this->permission('Garden.Users.Edit');
 
         $this->idParamSchema('in');
-        $in = $this->userPostSchema('in')->setDescription('Update a user.');
+        $in = $this->schema($this->userPatchSchema(), 'in')->setDescription('Update a user.');
         $out = $this->userSchema('out');
 
         $body = $in->validate($body, true);
         // If a row associated with this ID cannot be found, a "not found" exception will be thrown.
         $this->userByID($id);
-        $body = $this->normalizeInput($body);
-        $userData = ApiUtils::convertInputKeys($body);
+        $userData = $this->normalizeInput($body);
         $userData['UserID'] = $id;
-        $this->userModel->save($userData);
+        $settings = [];
+        if (!empty($userData['RoleID'])) {
+            $settings['SaveRoles'] = true;
+        }
+        $this->userModel->save($userData, $settings);
         $this->validateModel($this->userModel);
         $row = $this->userByID($id);
         $row = $this->normalizeOutput($row);
@@ -292,7 +328,7 @@ class UsersApiController extends AbstractApiController {
     public function post(array $body) {
         $this->permission('Garden.Users.Add');
 
-        $in = $this->userPostSchema('in', ['password', 'roleID?'])->setDescription('Add a user.');
+        $in = $this->schema($this->userPostSchema(), 'in')->setDescription('Add a user.');
         $out = $this->schema($this->userSchema(), 'out');
 
         $body = $in->validate($body);
@@ -317,6 +353,49 @@ class UsersApiController extends AbstractApiController {
 
         $result = $out->validate($row);
         return new Data($result, 201);
+    }
+
+    /**
+     * Set a new photo on a user.
+     *
+     * @param $id A valid user ID.
+     * @param array $body The request body.
+     * @throws ClientException if the image provided is not supported.
+     * @return array
+     */
+    public function post_photo($id = null, array $body) {
+        $this->permission('Garden.SignIn.Allow');
+
+        $photoUploadSchema = new UploadedFileSchema([
+            'allowedExtensions' => array_values(ImageResizer::getTypeExt())
+        ]);
+
+        $in = $this->schema([
+            'photo' => $photoUploadSchema
+        ], 'in');
+        $out = $this->schema(Schema::parse(['photoUrl'])->add($this->fullSchema()), 'out');
+
+        if ($id === null) {
+            $id = $this->getSession()->UserID;
+        }
+
+        $this->userByID($id);
+
+        if ($id !== $this->getSession()->UserID) {
+            $this->permission('Garden.Users.Edit');
+        }
+
+        $body = $in->validate($body);
+
+        $photo = $this->processPhoto($body['photo']);
+        $this->userModel->removePicture($id);
+        $this->userModel->save(['UserID' => $id, 'Photo' => $photo]);
+
+        $user = $this->userByID($id);
+        $user = $this->normalizeOutput($user);
+
+        $result = $out->validate($user);
+        return $result;
     }
 
     /**
@@ -454,6 +533,58 @@ class UsersApiController extends AbstractApiController {
     }
 
     /**
+     * Process a user photo upload.
+     *
+     * @param UploadedFile $photo
+     * @throws Exception if there was an error encountered when saving the upload.
+     * @return string
+     */
+    private function processPhoto(UploadedFile $photo) {
+        // Make sure this upload extension is associated with an allowed image type, then grab the extension.
+        $this->imageResizer->imageTypeFromExt($photo->getClientFilename());
+        $ext = pathinfo(strtolower($photo->getClientFilename()), PATHINFO_EXTENSION);
+
+        $height = $this->configuration->get('Garden.Profile.MaxHeight');
+        $width = $this->configuration->get('Garden.Profile.MaxWidth');
+        $thumbSize = $this->configuration->get('Garden.Thumbnail.Size');
+
+        // The image is going to be squared off. Go with the larger dimension.
+        $size = $height >= $width ? $height : $width;
+
+        $destination = ProfileController::AVATAR_FOLDER.'/'.$this->generateUploadPath($ext, true);
+
+        // Resize/crop the photo, then save it. Save by copying so upload can be used again for the thumbnail.
+        $this->savePhoto($photo, $destination, $size, 'p', true);
+
+        // Resize and save the thumbnail.
+        $this->savePhoto($photo, $destination, $thumbSize, 'n');
+
+        return $destination;
+    }
+
+    /**
+     * Save a photo upload.
+     *
+     * @param UploadedFile $upload An instance of an uploaded file.
+     * @param string $destination The path, relative to the uploads directory, to save the images into.
+     * @param int $size Maximum size, in pixels, for the photo.
+     * @param string $prefix An optional prefix (e.g. p for full-size or n for thumbnail).
+     * @param bool $copy Should the upload be saved by copying, instead of moving?
+     * @throws Exception if there was an error encountered when saving the upload.
+     * @return array|bool
+     */
+    private function savePhoto(UploadedFile $upload, $destination, $size, $prefix = '', $copy = false) {
+        $this->imageResizer->resize(
+            $upload->getFile(),
+            null,
+            ['crop' => true, 'height' => $size, 'width' => $size]
+        );
+
+        $result = $this->saveUpload($upload, $destination, "{$prefix}%s", $copy);
+        return $result;
+    }
+
+    /**
      * Get a user by its numeric ID.
      *
      * @param int $id The user ID.
@@ -469,30 +600,48 @@ class UsersApiController extends AbstractApiController {
     }
 
     /**
-     * Get a user schema with minimal add/edit fields.
+     * Get a user schema with minimal edit fields.
      *
-     * @param string $type The type of schema.
-     * @param array|null $extra Additional fields to include.
      * @return Schema Returns a schema object.
      */
-    public function userPostSchema($type = '', array $extra = []) {
-        if ($this->userPostSchema === null) {
-            $schema = Schema::parse([
-                'roleID:a' => 'Roles to set on the user.'
-            ])->add($this->fullSchema(), true);
-            $fields = [
-                'name',
-                'email',
-                'photo?',
-                'emailConfirmed' => ['default' => true],
-                'bypassSpam' => ['default' => false]
-            ];
-            $this->userPostSchema = $this->schema(
-                Schema::parse(array_merge($fields, $extra))->add($schema),
-                'UserPost'
-            );
+    public function userPatchSchema() {
+        static $schema;
+
+        if ($schema === null) {
+            $schema = $this->schema(Schema::parse([
+                'name?', 'email?', 'photo?', 'emailConfirmed?', 'bypassSpam?',
+                'roleID?' => [
+                    'type' => 'array',
+                    'items' => ['type' => 'integer'],
+                    'description' => 'Roles to set on the user.'
+                ]
+            ])->add($this->fullSchema()), 'UserPatch');
         }
-        return $this->schema($this->userPostSchema, $type);
+
+        return $schema;
+    }
+
+    /**
+     * Get a user schema with minimal add fields.
+     *
+     * @return Schema Returns a schema object.
+     */
+    public function userPostSchema() {
+        static $schema;
+
+        if ($schema === null) {
+            $schema = $this->schema(Schema::parse([
+                'name', 'email', 'photo?', 'password',
+                'emailConfirmed' => ['default' => true], 'bypassSpam' => ['default' => false],
+                'roleID?' => [
+                    'type' => 'array',
+                    'items' => ['type' => 'integer'],
+                    'description' => 'Roles to set on the user.'
+                ]
+            ])->add($this->fullSchema()), 'UserPost');
+        }
+
+        return $schema;
     }
 
     /**

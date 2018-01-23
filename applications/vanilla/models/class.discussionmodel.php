@@ -2,7 +2,7 @@
 /**
  * Discussion model
  *
- * @copyright 2009-2017 Vanilla Forums Inc.
+ * @copyright 2009-2018 Vanilla Forums Inc.
  * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
  * @package Vanilla
  * @since 2.0
@@ -1923,7 +1923,7 @@ class DiscussionModel extends Gdn_Model {
         $this->defineSchema();
 
         // If the site isn't configured to use categories, don't allow one to be set.
-        if (!c('Vanilla.Categories.Use')) {
+        if (!c('Vanilla.Categories.Use', true)) {
             unset($formPostValues['CategoryID']);
         }
 

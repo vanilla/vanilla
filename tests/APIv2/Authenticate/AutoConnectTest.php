@@ -1,7 +1,7 @@
 <?php
 /**
  * @author Alexandre (DaazKu) Chouinard <alexandre.c@vanillaforums.com>
- * @copyright 2009-2017 Vanilla Forums Inc.
+ * @copyright 2009-2018 Vanilla Forums Inc.
  * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
  */
 
@@ -54,7 +54,6 @@ class AutoConnectTest extends AbstractAPIv2Test {
 
         $uniqueID = uniqid('ac_');
         $userData = [
-            'uniqueID' => $uniqueID,
             'name' => 'Authenticate_'.$uniqueID,
             'email' => 'authenticate_'.$uniqueID.'@example.com',
             'password' => 'pwd_'.$uniqueID,
@@ -65,7 +64,8 @@ class AutoConnectTest extends AbstractAPIv2Test {
         $userFragment = $usersAPIController->post($userData)->getData();
         $this->currentUser = array_merge($userFragment, $userData);
 
-        $this->authenticator->setSSOInfo($userData);
+        $this->authenticator->setUniqueID($uniqueID);
+        $this->authenticator->setUserData($userData);
 
         $this->container()->setInstance('TestSSOAuthenticator', $this->authenticator);
 

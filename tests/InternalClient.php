@@ -1,7 +1,7 @@
 <?php
 /**
  * @author Todd Burry <todd@vanillaforums.com>
- * @copyright 2009-2017 Vanilla Forums Inc.
+ * @copyright 2009-2018 Vanilla Forums Inc.
  * @license GPLv2
  */
 
@@ -105,8 +105,8 @@ class InternalClient extends HttpClient {
             }
 
             $dataMeta = json_decode($response->getHeader('X-Data-Meta'), true);
-            if (!empty($dataMeta['error_trace'])) {
-                $message .= "\n".$dataMeta['error_trace'];
+            if (!empty($dataMeta['errorTrace'])) {
+                $message .= "\n".$dataMeta['errorTrace'];
             }
 
             throw new \Exception($message, $response->getStatusCode());

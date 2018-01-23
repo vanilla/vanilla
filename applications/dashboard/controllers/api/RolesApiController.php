@@ -1,6 +1,6 @@
 <?php
 /**
- * @copyright 2009-2017 Vanilla Forums Inc.
+ * @copyright 2009-2018 Vanilla Forums Inc.
  * @license GPLv2
  */
 
@@ -8,74 +8,30 @@ use Garden\Schema\Schema;
 use Garden\Web\Exception\NotFoundException;
 use Garden\Web\Exception\ServerException;
 use Vanilla\ApiUtils;
+use Vanilla\PermissionsTranslationTrait;
 use Vanilla\Utility\CamelCaseScheme;
+use Vanilla\Utility\DelimitedScheme;
 
 /**
  * API Controller for the `/roles` resource.
  */
 class RolesApiController extends AbstractApiController {
+    use PermissionsTranslationTrait;
 
     /** Maximum number of permission rows that can be displayed before an error is reported. */
     const MAX_PERMISSIONS = 100;
 
-    /** @var CamelCaseScheme */
-    private $camelCaseScheme;
-
     /** @var CategoryModel */
     private $categoryModel;
 
-    /** @var array Groups of permissions that can be consolidated into one. */
-    private $consolidatedPermissions = [
-        'discussions.moderate' => ['discussions.announce', 'discussions.close', 'discussions.sink'],
-        'discussions.manage' => ['discussions.delete', 'discussions.edit']
-    ];
-
-    /** @var array Permissions that have been deprecated and should no longer be used. */
-    private $deprecatedPermissions = [
-        'Garden.Activity.Delete',
-        'Garden.Activity.View',
-        'Garden.SignIn.Allow',
-        'Garden.Curation.Manage',
-        'Vanilla.Approval.Require',
-        'Vanilla.Comments.Me'
-    ];
-
-    /** @var Schema */
-    private $idParamSchema;
-
     /** @var PermissionModel */
     private $permissionModel;
-
-    /** @var array A static mapping of updated permission names. */
-    private $renamedPermissions = [
-        'Conversations.Moderation.Manage' => 'conversations.moderate',
-        'Email.Comments.Add' => 'comments.email',
-        'Email.Conversations.Add' => 'conversations.email',
-        'Email.Discussions.Add' => 'discussions.email',
-        'Garden.Moderation.Manage' => 'community.moderate',
-        'Garden.NoAds.Allow' => 'noAds.use',
-        'Garden.Settings.Manage' => 'site.manage',
-        'Garden.Users.Approve' => 'applicants.manage',
-        'Groups.Group.Add' => 'groups.add',
-        'Groups.Moderation.Manage' => 'groups.moderate',
-        'Reputation.Badges.Give' => 'badges.moderate',
-        'Vanilla.Tagging.Add' => 'tags.add'
-    ];
-
-    /** @var array These permissions should not be renamed. */
-    private $fixedPermissions = [
-        'Reactions.Negative.Add',
-        'Reactions.Positive.Add'
-    ];
 
     /** @var bool Have all permissions been loaded into $renamedPermissions? */
     private $permissionsLoaded = false;
 
     /** @var RoleModel */
     private $roleModel;
-
-    /** @var Schema */
-    private $rolePostSchema;
 
     /** @var Schema */
     private $roleSchema;
@@ -91,50 +47,7 @@ class RolesApiController extends AbstractApiController {
         $this->roleModel = $roleModel;
         $this->permissionModel = $permissionModel;
         $this->categoryModel = $categoryModel;
-        $this->camelCaseScheme = new CamelCaseScheme();
-    }
-
-    /**
-     * Collapse multiple permissions down into a single one, where possible.
-     *
-     * @param array $permissions
-     * @return array
-     */
-    private function consolidatePermissions(array $permissions) {
-        $result = $permissions;
-
-        foreach ($this->consolidatedPermissions as $name => $perms) {
-            $pass = 0;
-            $total = count($perms);
-            foreach ($perms as $currentPerm) {
-                if (!array_key_exists($currentPerm, $permissions)) {
-                    // If a key isn't present, assume this is the wrong permission type (e.g. global, category).
-                    continue 2;
-                } elseif ($permissions[$currentPerm]) {
-                    $pass++;
-                }
-            }
-
-            if ($pass == $total) {
-                $val = true;
-            } elseif ($pass == 0) {
-                $val = false;
-            } else {
-                $val = null;
-            }
-
-            // If we had all or none of the child permissions, remove them. Only include the parent.
-            if ($val !== null) {
-                foreach ($perms as $currentPerm) {
-                    unset($result[$currentPerm]);
-                }
-            }
-
-            $result[$name] = $val;
-            unset($currentPerm, $pass);
-        }
-
-        return $result;
+        $this->nameScheme =  new DelimitedScheme('.', new CamelCaseScheme());
     }
 
     /**
@@ -229,7 +142,7 @@ class RolesApiController extends AbstractApiController {
             'deletable:b' => 'Is the role deletable?',
             'canSession:b' => 'Can users in this role start a session?',
             'personalInfo:b' => 'Is membership in this role personal information?',
-            'permissions?' => $this->getPermissionsFragment()
+            'permissions:a?' => $this->getPermissionFragment()
         ]);
         return $schema;
     }
@@ -245,10 +158,10 @@ class RolesApiController extends AbstractApiController {
     public function get($id, array $query) {
         $this->permission('Garden.Settings.Manage');
 
-        $this->idParamSchema()->setDescription('Get a role.');
+        $this->idParamSchema();
         $in = $this->schema([
-            'expand?' => $this->getExpandDefinition(['permissions'])
-        ], 'in');
+            'expand?' => ApiUtils::getExpandDefinition(['permissions'])
+        ], 'in')->setDescription('Get a role.');
         $out = $this->schema($this->roleSchema(), 'out');
 
         $query = $in->validate($query);
@@ -310,24 +223,21 @@ class RolesApiController extends AbstractApiController {
     }
 
     /**
-     * Return a schema to represent a collection of permission rows.
+     * Return a schema to represent a permission row.
      *
      * @return Schema
      */
-    public function getPermissionsFragment() {
+    public function getPermissionFragment() {
         static $permissionsFragment;
 
         if ($permissionsFragment === null) {
-            $permissionsFragment = Schema::parse([
-                ':a' => [
-                    'items' => 'object',
-                    'properties' => [
-                        'id:i?',
-                        'type:s' => ['enum' => ['global', 'category']],
-                        'permissions:o'
-                    ]
-                ]
-            ]);
+            $permissionsFragment = $this->schema([
+                'id:i?',
+                'type:s' => [
+                    'enum' => ['global', 'category'],
+                ],
+                'permissions:o',
+            ], 'PermissionFragment');
         }
 
         return $permissionsFragment;
@@ -336,17 +246,10 @@ class RolesApiController extends AbstractApiController {
     /**
      * Get an ID-only role record schema.
      *
-     * @param string $type The type of schema.
      * @return Schema Returns a schema object.
      */
-    public function idParamSchema($type = 'in') {
-        if ($this->idParamSchema === null) {
-            $this->idParamSchema = $this->schema(
-                Schema::parse(['id:i' => 'The role ID.']),
-                $type
-            );
-        }
-        return $this->schema($this->idParamSchema, $type);
+    public function idParamSchema() {
+        return $this->schema(['id:i' => 'The role ID.'], 'in');
     }
 
     /**
@@ -359,7 +262,7 @@ class RolesApiController extends AbstractApiController {
         $this->permission('Garden.Settings.Manage');
 
         $in = $this->schema([
-            'expand?' => $this->getExpandDefinition(['permissions'])
+            'expand?' => ApiUtils::getExpandDefinition(['permissions'])
         ], 'in')->setDescription('List roles.');
         $out = $this->schema([':a' => $this->roleSchema()], 'out');
 
@@ -371,17 +274,6 @@ class RolesApiController extends AbstractApiController {
         }
 
         $result = $out->validate($rows);
-        return $result;
-    }
-
-    /**
-     * Determine if a permission slug is deprecated.
-     *
-     * @param string $permission
-     * @return bool
-     */
-    private function isPermissionDeprecated($permission) {
-        $result = in_array($permission, $this->deprecatedPermissions);
         return $result;
     }
 
@@ -441,8 +333,8 @@ class RolesApiController extends AbstractApiController {
     public function patch($id, array $body) {
         $this->permission('Garden.Settings.Manage');
 
-        $this->idParamSchema('in');
-        $in = $this->rolePostSchema('in')->setDescription('Update a role.');
+        $this->idParamSchema();
+        $in = $this->rolePostSchema()->setDescription('Update a role.');
         $out = $this->roleSchema('out');
 
         $body = $in->validate($body, true);
@@ -473,16 +365,18 @@ class RolesApiController extends AbstractApiController {
      */
     public function patch_permissions($id, array $body) {
         $this->permission('Garden.Settings.Manage');
-        $this->roleByID($id);
 
-        $in = $this->schema($this->getPermissionsFragment(), 'in');
-        $out = $this->schema($this->getPermissionsFragment(), 'out');
+        $in = $this->schema([':a', $this->getPermissionFragment()], 'in')->setDescription('Update permissions on a role');
+        $out = $this->schema([':a', $this->getPermissionFragment()], 'out');
+
+        $this->roleByID($id);
 
         $body = $in->validate($body);
         $this->savePermissions($id, $body);
 
         $rows = $this->getFormattedPermissions($id);
         $result = $out->validate($rows);
+
         return $result;
     }
 
@@ -529,46 +423,17 @@ class RolesApiController extends AbstractApiController {
      */
     public function put_permissions($id, array $body) {
         $this->permission('Garden.Settings.Manage');
-        $this->roleByID($id);
 
-        $in = $this->schema($this->getPermissionsFragment(), 'in');
-        $out = $this->schema($this->getPermissionsFragment(), 'out');
+        $in = $this->schema([':a', $this->getPermissionFragment()], 'in')->setDescription('Overwrite all permissions for a role.');
+        $out = $this->schema([':a', $this->getPermissionFragment()], 'out');
+
+        $this->roleByID($id);
 
         $body = $in->validate($body);
         $this->savePermissions($id, $body, true);
 
         $rows = $this->getFormattedPermissions($id);
         $result = $out->validate($rows);
-        return $result;
-    }
-
-    /**
-     * Rename a legacy Vanilla permission slug.
-     *
-     * @param string $permission
-     * @return string
-     */
-    private function renamePermission($permission) {
-        if (array_key_exists($permission, $this->renamedPermissions)) {
-            // Already got a mapping for this permission? Go ahead and use it.
-            $result = $this->renamedPermissions[$permission];
-        } else {
-            // Time to format the permission name.
-            $segments = explode('.', $permission);
-
-            // Pop the application off the top, if it seems safe to do so.
-            if (!in_array($permission, $this->fixedPermissions) && count($segments) == 3) {
-                unset($segments[0]);
-            }
-
-            foreach ($segments as &$seg) {
-                $seg = $this->camelCaseScheme->convert($seg);
-            }
-
-            // Cache the renamed permission for this request.
-            $result = implode('.', $segments);
-            $this->renamedPermissions[$permission] = $result;
-        }
 
         return $result;
     }
@@ -591,20 +456,27 @@ class RolesApiController extends AbstractApiController {
     /**
      * Get a role schema with minimal add/edit fields.
      *
-     * @param string $type The type of schema.
      * @return Schema Returns a schema object.
      */
-    public function rolePostSchema($type = '') {
-        if ($this->rolePostSchema === null) {
-            $fields = ['name', 'description?', 'type?', 'deletable?', 'canSession?', 'personalInfo?'];
-            $this->rolePostSchema = $this->schema(
-                Schema::parse($fields)->add($this->fullSchema()),
+    public function rolePostSchema() {
+        static $rolePostSchema;
+
+        if ($rolePostSchema === null) {
+            $rolePostSchema = $this->schema(
+                Schema::parse([
+                    'name',
+                    'description?',
+                    'type?',
+                    'deletable?',
+                    'canSession?',
+                    'personalInfo?',
+                    'permissions?'
+                ])->add($this->fullSchema()),
                 'RolePost'
             );
-            // garden-schema has an issue with merging nested schemas using Schema::add. This is a way around that for now.
-            $this->rolePostSchema->merge(Schema::parse(['permissions?' => $this->getPermissionsFragment()]));
         }
-        return $this->schema($this->rolePostSchema, $type);
+
+        return $this->schema($rolePostSchema, 'in');
     }
 
     /**

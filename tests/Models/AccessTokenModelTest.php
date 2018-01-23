@@ -1,19 +1,20 @@
 <?php
 /**
  * @author Todd Burry <todd@vanillaforums.com>
- * @copyright 2009-2017 Vanilla Forums Inc.
+ * @copyright 2009-2018 Vanilla Forums Inc.
  * @license GPLv2
  */
 
 namespace VanillaTests\Models;
 
+use PHPUnit\Framework\TestCase;
 use AccessTokenModel;
 use VanillaTests\SiteTestTrait;
 
 /**
  * Test the {@link AccessTokenModel}.
  */
-class AccessTokenModelTest extends \PHPUnit_Framework_TestCase {
+class AccessTokenModelTest extends TestCase {
     use SiteTestTrait;
 
     /**

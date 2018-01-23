@@ -1,8 +1,16 @@
 <?php
 
 use Garden\Container\Container;
-use Vanilla\Addon;
-use Vanilla\InjectableInterface;
+
+// Alias classes for some limited PHPUnit v6 compatibility with v5. To be removed when PHPUnit v5 support is dropped.
+$classCompatibility = [
+    'PHPUnit_Framework_Error_Notice' => 'PHPUnit\\Framework\\Error\\Notice',
+];
+foreach ($classCompatibility as $legacyClass => $class) {
+    if (class_exists($legacyClass) && !class_exists($class)) {
+        class_alias($legacyClass, $class);
+    }
+}
 
 // Define some constants to help with testing.
 define('APPLICATION', 'Vanilla Tests');

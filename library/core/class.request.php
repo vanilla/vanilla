@@ -4,7 +4,7 @@
  *
  * @author Todd Burry <todd@vanillaforums.com>
  * @author Tim Gunter <tim@vanillaforums.com>
- * @copyright 2009-2017 Vanilla Forums Inc.
+ * @copyright 2009-2018 Vanilla Forums Inc.
  * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
  * @package Core
  * @since 2.0
@@ -1155,13 +1155,17 @@ class Gdn_Request implements RequestInterface {
             $result = [];
             foreach ($files['tmp_name'] as $key => $val) {
                 // Consolidate the attributes and push them down the tree.
-                $result[$key] = $getUpload([
+                $upload = $getUpload([
                     'error' => $files['error'][$key],
                     'name' => $files['name'][$key],
                     'size' => $files['size'][$key],
                     'tmp_name' => $files['tmp_name'][$key],
                     'type' => $files['type'][$key]
                 ]);
+                if ($upload instanceof UploadedFile && $upload->getError() === UPLOAD_ERR_NO_FILE) {
+                    continue;
+                }
+                $result[$key] = $upload;
             }
             return $result;
         };
@@ -1192,7 +1196,11 @@ class Gdn_Request implements RequestInterface {
 
         $result = [];
         foreach ($files as $key => $value) {
-            $result[$key] = $getUpload($value);
+            $upload = $getUpload($value);
+            if ($upload instanceof UploadedFile && $upload->getError() === UPLOAD_ERR_NO_FILE) {
+                continue;
+            }
+            $result[$key] = $upload;
         }
         return $result;
     }
@@ -1532,7 +1540,7 @@ class Gdn_Request implements RequestInterface {
         static $rewrite = null;
         if ($rewrite === null) {
             // Garden.RewriteUrls is maintained for compatibility but X_REWRITE is what really need to be used.
-            $rewrite = val('X_REWRITE', $_SERVER, c('Garden.RewriteUrls', false));
+            $rewrite = val('X_REWRITE', $_SERVER, c('Garden.RewriteUrls', true));
         }
 
         if (!$allowSSL) {

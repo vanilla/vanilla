@@ -797,6 +797,30 @@ class VanillaSettingsController extends Gdn_Controller {
     }
 
     /**
+     * Edit advanced category settings.
+     */
+    public function categorySettings() {
+        $this->permission(['Garden.Community.Manage', 'Garden.Settings.Manage'], false);
+        $this->setHighlightRoute('vanilla/settings/categories');
+
+        $cf = new ConfigurationModule($this);
+
+        $cf->initialize([
+            'Vanilla.EnableCategoryFollowing' => [
+                'LabelCode' => 'Category Following',
+                'Control' => 'toggle',
+                'Description' => t(
+                    'Some themes must be updated for category following.',
+                    'Some themes may need to be updated to work with category following. You can disable the feature while you update your theme.'
+                )
+            ],
+        ]);
+
+        $this->setData('Title', t('Advanced Category Settings'));
+        $cf->renderAll();
+    }
+
+    /**
      * Move through the category's parents to determine the proper management page URL.
      *
      * @param array|object $category

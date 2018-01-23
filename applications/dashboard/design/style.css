@@ -6180,6 +6180,12 @@ img.jcrop-preview {
   max-width: none;
 }
 
+.InputBox {
+  background: #fff;
+  border: 1px solid #999;
+  border: 1px solid rgba(0, 0, 0, 0.4);
+}
+
 .padded {
   margin-top: 1.125rem;
   margin-bottom: 1.125rem;

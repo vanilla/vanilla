@@ -1,7 +1,6 @@
 <?php if (!defined('APPLICATION')) exit();
 include_once $this->fetchViewLocation('helper_functions', 'categories');
 $title = $this->data('Title');
-$userID = Gdn::session()->UserID;
 if (!is_null($this->Category)) {
     $title .= followButton($this->Category->CategoryID);
 }

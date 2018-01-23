@@ -41,7 +41,7 @@ class CategoryController extends VanillaController {
     public function followed($categoryID = null) {
         // Make sure we are posting back.
         if (!$this->Request->isAuthenticatedPostBack()) {
-            //throw permissionException('Javascript');
+            throw permissionException('Javascript');
         }
 
         if (!Gdn::session()->isValid()) {

@@ -431,7 +431,7 @@ if (!function_exists('categoryFilters')) {
         }
 
         return filtersDropDown(
-            url('categories'),
+            $baseUrl,
             $filters,
             $extraClasses,
             'All',
@@ -722,7 +722,7 @@ if (!function_exists('discussionFilters')) {
         }
 
         return filtersDropDown(
-            url('discussions'),
+            $baseUrl,
             $filters,
             $extraClasses,
             'All',
@@ -1147,11 +1147,6 @@ EOT;
           </span>
         </span>
 EOT;
-
-
-
-
-
 
         return $output;
     }

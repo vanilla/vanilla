@@ -444,8 +444,9 @@ if (!function_exists('followButton')) :
     function followButton($categoryID) {
         $output = ' ';
         $userID = Gdn::session()->UserID;
+        $category = CategoryModel::categories($categoryID);
 
-        if ($categoryID && c('Vanilla.EnableCategoryFollowing') && $userID) {
+        if (c('Vanilla.EnableCategoryFollowing') && $userID && $category && strtolower($category['DisplayAs']) == 'discussions') {
             $categoryModel = new CategoryModel();
             $following = $categoryModel->isFollowed($userID, $categoryID);
 

@@ -180,7 +180,7 @@ class InvitesApiController extends AbstractApiController {
 
         $result = $out->validate($rows);
 
-        $paging = ApiUtils::numberedPagerInfo($this->userModel->getInvitationCount($userID), '/api/v2/invites', $query, $in);
+        $paging = ApiUtils::numberedPagerInfo($this->invitationModel->getCount(['InsertUserID' => $userID]), '/api/v2/invites', $query, $in);
 
         return ApiUtils::setPageMeta($result, $paging);
     }

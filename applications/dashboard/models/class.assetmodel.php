@@ -168,11 +168,33 @@ class AssetModel extends Gdn_Model {
             "/js/$basename/lib-core-$basename.js"
         ];
 
+        $themes = [];
+
+        /* @var Addon $theme */
+        $theme = $this->addonManager->getTheme();
+        while (isset($theme)) {
+            $fullKey = $theme->getType().'/'.$theme->getKey();
+
+            if (isset($themes[$fullKey])) {
+                break;
+            }
+            $themes[$fullKey] = $theme;
+
+            // Look for this theme's base theme.
+            if ($parentTheme = $theme->getInfoValue('parentTheme')) {
+                $theme = $this->addonManager->lookupTheme($parentTheme);
+            } else {
+                break;
+            }
+        }
+
+        $scanAddons = array_merge($this->addonManager->getEnabled(), array_flip($themes));
+
         // Loop through the enabled addons and get their javascript.
         $addons = [];
-        foreach ($this->addonManager->getEnabled() as $addon) {
+        foreach ($scanAddons as $addon) {
             /* @var Addon $addon */
-            if ($addon->getType() !== Addon::TYPE_ADDON) {
+            if (!in_array($addon->getType(), [Addon::TYPE_ADDON, Addon::TYPE_THEME])) {
                 continue;
             }
 
@@ -184,6 +206,8 @@ class AssetModel extends Gdn_Model {
                 $addons[] = $addon->path("/js/$basename/".$addon->getKey()."-$basename.js", Addon::PATH_ADDON);
             }
         }
+
+
 
         // Add the bootstrap after everything else.
         $addons[] = "/js/bootstrap-$basename/core-bootstrap-$basename.js";

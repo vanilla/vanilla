@@ -7,6 +7,7 @@
 
 namespace Vanilla\Web;
 
+use AssetModel;
 use Ebi\Ebi;
 use Garden\EventManager;
 use Garden\Web\Data;
@@ -41,7 +42,8 @@ class EbiView implements ViewInterface {
         AddonManager $addonManager,
         \UserModel $userModel,
         RequestInterface $request,
-        Dispatcher $dispatcher
+        Dispatcher $dispatcher,
+        AssetModel $assetModel
     ) {
         $this->ebi = $ebi;
         $this->dispatcher = $dispatcher;
@@ -58,6 +60,7 @@ class EbiView implements ViewInterface {
         $ebi->setMeta('device', ['type' => userAgentType(), 'mobile' => isMobile()]);
         $ebi->setMeta('request', ['query' => $request->getQuery()]);
         $ebi->setMeta('theme', $this->getJsonData('theme'));
+        $ebi->setMeta('cacheBuster', trim(assetVersion('', ''), '.'));
 
         // Add custom components.
         $ebi->defineComponent('asset', function ($props) use ($ebi) {
@@ -137,6 +140,9 @@ class EbiView implements ViewInterface {
             return $result;
         });
         $ebi->defineFunction('categoryUrl');
+        $ebi->defineFunction('coreJs', function () use ($assetModel) {
+            return $assetModel->getAddonJsFiles('', 'app', '');
+        });
         $ebi->defineFunction('commentUrl');
         $ebi->defineFunction('discussionUrl');
         $ebi->defineFunction('expandData', [$this, 'expandData']);

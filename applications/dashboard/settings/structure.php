@@ -284,10 +284,10 @@ $Construct
     ->column('UserID', 'int', false, 'index')
     ->column('Type', 'varchar(20)', false, 'index')
     ->column('Scope', 'text', true)
-    ->column('DateInserted', 'timestamp', false)
+    ->column('DateInserted', 'timestamp', ['Null' => false, 'Default' => 'current_timestamp'])
     ->column('InsertUserID', 'int', true)
     ->column('InsertIPAddress', 'ipaddress', false)
-    ->column('DateExpires', 'timestamp', false)
+    ->column('DateExpires', 'timestamp', ['Null' => false, 'Default' => 'current_timestamp'])
     ->column('Attributes', 'text', true)
     ->set($Explicit, $Drop);
 

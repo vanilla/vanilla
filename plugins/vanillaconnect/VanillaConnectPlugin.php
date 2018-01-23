@@ -122,11 +122,7 @@ class VanillaConnectPlugin extends Gdn_Plugin {
 
             saveToConfig('Garden.Registration.SendConnectEmail', false, false);
 
-            if ($this->ssoModel->sso($ssoData)) {
-                if ($this->session->UserID != $currentUserID) {
-                    $this->userModel->fireEvent('AfterSignIn');
-                }
-            } else {
+            if (!$this->ssoModel->sso($ssoData)) {
                 throw new \Exception('Unable to push connect the user.');
             }
         } catch (\Exception $e) {

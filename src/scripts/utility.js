@@ -4,7 +4,7 @@
  * @license GPLv2
  */
 
-// import sprintfJs from "sprintf-js";
+import gdn from "@core/gdn";
 
 /**
  * Resolve an array of functions that return promises sequentially.
@@ -132,15 +132,7 @@ export function generateRandomString(length = 5) {
  * @returns {any}
  */
 export function getMeta(key, defaultValue = undefined) {
-
-    /** gdn.meta may be set in an inline script in the head of the documenet. */
-    const gdn = window["gdn"] || {};
-
-    if (!gdn.meta) {
-        gdn.meta = {};
-    }
-
-    if (gdn.meta[key]) {
+    if (gdn.meta && gdn.meta[key]) {
         return gdn.meta[key];
     }
 
@@ -154,14 +146,6 @@ export function getMeta(key, defaultValue = undefined) {
  * @param {any} value - The value to set.
  */
 export function setMeta(key, value) {
-
-    /** gdn.meta may be set in an inline script in the head of the documenet. */
-    const gdn = window["gdn"] || {};
-
-    if (!gdn.meta) {
-        gdn.meta = {};
-    }
-
     gdn.meta[key] = value;
 }
 
@@ -189,6 +173,32 @@ export function formatUrl(path) {
 
     return urlFormat.replace("{Path}", path);
 }
+
+/**
+ * Translate a string into the current locale.
+ *
+ * @param {string} str The string to translate.
+ * @param {string=} defaultTranslation The default translation to use.
+ */
+export function translate(str, defaultTranslation) {
+    // Codes that begin with @ are considered literals.
+    if (str.substr(0, 1) === '@') {
+        return str.substr(1);
+    }
+
+    if (gdn.translations[str] !== undefined) {
+        return gdn.translations[str];
+    }
+
+    return defaultTranslation !== undefined ? defaultTranslation : str;
+}
+
+/**
+ * The t function is an alias for translate.
+ *
+ * @type {translate}
+ */
+export const t = translate;
 
 /**
  * Re-exported from sprintf-js https://www.npmjs.com/package/sprintf-js

@@ -5,6 +5,7 @@
  */
 
 import * as utility from "../utility";
+import gdn from "../gdn";
 
 describe("resolvePromisesSequentially()", () => {
     it("resolves promises in order", () => {
@@ -113,22 +114,6 @@ describe("generateRandomString", () => {
 });
 
 describe("metaDataFunctions", () => {
-    beforeEach(() => {
-        // @ts-ignore
-        if (!global.gdn || !global.gdn.meta) {
-            global.gdn = {};
-            global.gdn.meta = {};
-        }
-
-        global.gdn.meta = {
-            foo: "foo"
-        }
-    })
-
-    it("can fetch existing metaData", () => {
-        expect(utility.getMeta("foo")).toBe("foo");
-    })
-
     it("return a default value if the requested one can't be found", () => {
         expect(utility.getMeta("baz", "fallback")).toBe("fallback");
     })
@@ -158,11 +143,24 @@ describe("formatUrl", () => {
     });
 
     it("follows the given format", () => {
-        window.gdn = {};
-        window.gdn.meta = {
-            UrlFormat: "/test/{Path}",
-        };
+        utility.setMeta("UrlFormat", "/test/{Path}");
 
         expect(utility.formatUrl("/discussions")).toBe("/test/discussions");
+    });
+});
+
+describe("translate", () => {
+    gdn.translations['foo'] = 'bar';
+
+    it("Translates a string", () => {
+        expect(utility.translate('foo')).toBe('bar');
+    });
+
+    it("Returns the default string", () => {
+        expect(utility.translate('baz', 'bam')).toBe('bam');
+    });
+
+    it("Falls back to the string code", () => {
+        expect(utility.translate('moo')).toBe('moo');
     });
 });

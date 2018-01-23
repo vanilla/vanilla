@@ -162,7 +162,7 @@ class CategoriesController extends VanillaController {
      *
      * @param bool $recent Include recent post information?
      * @return array
-s     */
+     */
     private function getFollowed($recent = false) {
         $perPage = c('Vanilla.Categories.PerPage', 30);
         $page = Gdn::request()->get(

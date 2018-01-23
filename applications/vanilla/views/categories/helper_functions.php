@@ -71,10 +71,17 @@ if (!function_exists('getOptions')):
 
         $dropdown = new DropdownModule('dropdown', '', 'OptionsMenu');
         $tk = urlencode(Gdn::session()->transientKey());
-        $hide = (int)!val('Following', $category);
+        $followed = val('Followed', $category);
 
         $dropdown->addLink(t('Mark Read'), "/category/markread?categoryid={$categoryID}&tkey={$tk}", 'mark-read');
-        $dropdown->addLink(t($hide ? 'Unmute' : 'Mute'), "/category/follow?categoryid={$categoryID}&value={$hide}&tkey={$tk}", 'hide');
+
+        if (c('Vanilla.EnableCategoryFollowing')) {
+            $dropdown->addLink(
+                t($followed ? 'Unfollow' : 'Follow'),
+                "/category/followed?tkey={$tk}&categoryid={$categoryID}&value=" . ($followed ? 0 : 1),
+                'hide'
+            );
+        }
 
         // Allow plugins to add options
         $sender->EventArguments['CategoryOptionsDropdown'] = &$dropdown;
@@ -423,5 +430,42 @@ if (!function_exists('getWriteChildrenMethod')):
         }
 
         return $writeChildren;
+    }
+endif;
+
+if (!function_exists('followButton')) :
+    /**
+     *
+     * Writes the Follow/following button
+     *
+     * @param int $categoryID
+     * @return string
+     */
+    function followButton($categoryID) {
+        $output = ' ';
+        $userID = Gdn::session()->UserID;
+
+        if ($categoryID && c('Vanilla.EnableCategoryFollowing') && $userID) {
+            $categoryModel = new CategoryModel();
+            $following = $categoryModel->isFollowed($userID, $categoryID);
+
+            $iconTitle = t('Follow');
+
+            $icon = <<<EOT
+                <svg xmlns="http://www.w3.org/2000/svg" class="followButton-icon" viewBox="0 0 16 16" aria-hidden="true">
+                    <title>{$iconTitle}</title>  
+                    <path d="M7.568,14.317a.842.842,0,0,1-1.684,0,4.21,4.21,0,0,0-4.21-4.21h0a.843.843,0,0,1,0-1.685A5.9,5.9,0,0,1,7.568,14.317Zm4.21,0a.842.842,0,0,1-1.684,0A8.421,8.421,0,0,0,1.673,5.9h0a.842.842,0,0,1,0-1.684,10.1,10.1,0,0,1,10.105,10.1Zm4.211,0a.842.842,0,0,1-1.684,0A12.633,12.633,0,0,0,1.673,1.683.842.842,0,0,1,1.673,0,14.315,14.315,0,0,1,15.989,14.315ZM1.673,16a1.684,1.684,0,1,1,1.684-1.684h0A1.684,1.684,0,0,1,1.673,16Z" transform="translate(0.011 0.001)" style="fill: currentColor;"/>
+                </svg>
+EOT;
+           
+            $text = $following ? t('Following') : t('Follow');
+            $output .= anchor(
+                $icon.$text,
+                "/category/followed/{$categoryID}/".Gdn::session()->transientKey(),
+                'Hijack followButton'.($following ? ' TextColor isFollowing' : ''),
+                ['title' => $text, 'aria-pressed' => $following ? 'true' : 'false', 'role' => 'button', 'tabindex' => '0']
+            );
+        }
+        return $output;
     }
 endif;

@@ -4064,6 +4064,35 @@ if (!function_exists('ipDecodeRecursive')) {
     }
 }
 
+if (!function_exists('paramPreference')) {
+    /**
+     * Conditionally save and load a query parameter value from a user's preferences.
+     *     If the parameter is not sent in the request query, attempt to load from the user's preferences.
+     *     If the parameter is set, save to the user's preferences.
+     * @param string $param Query string parameter name
+     * @param string $preference User preference name
+     * @param string|null $config Config value, used as a conditional for performing this action
+     * @param string null $configVal Look for a specific config value, instead of allowing truthy values.
+     * @return mixed
+     */
+    function paramPreference($param, $preference, $config = null, $configVal = null) {
+        $value = Gdn::request()->get($param, null);
+
+        if ($config === null || (($configVal === null && c($config)) || c($config) === $configVal)) {
+            if ($value === null) {
+                $value = Gdn::session()->getPreference($preference, null);
+                if ($value) {
+                    Gdn::request()->setQueryItem($param, $value);
+                }
+            } else {
+                Gdn::session()->setPreference($preference, $value);
+            }
+        }
+
+        return $value;
+    }
+}
+
 if (!function_exists('TagUrl')) {
     /**
      *

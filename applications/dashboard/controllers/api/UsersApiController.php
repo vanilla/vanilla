@@ -194,7 +194,7 @@ class UsersApiController extends AbstractApiController {
      * List users.
      *
      * @param array $query The query string.
-     * @return array
+     * @return Data
      */
     public function index(array $query) {
         $this->permission([
@@ -252,7 +252,24 @@ class UsersApiController extends AbstractApiController {
         }
 
         $result = $out->validate($rows);
-        return $result;
+
+        // Determine if we are gonna use the "numbered" or "more" pageInfo.
+        if (empty($where)) {
+            if (!Gdn::userModel()->pastUserMegaThreshold()) {
+                $totalCount = $this->userModel->getCount();
+            }
+        } elseif (!Gdn::userModel()->pastUserThreshold()) {
+            $totalCount = $this->userModel->searchCount($where);
+        }
+
+        if (isset($totalCount)) {
+            $paging = ApiUtils::numberedPagerInfo($totalCount, '/api/v2/users', $query, $in);
+        } else {
+            $paging = ApiUtils::morePagerInfo($result, '/api/v2/users', $query, $in);
+        }
+
+        return ApiUtils::setPageMeta($result, $paging);
+
     }
 
     /**

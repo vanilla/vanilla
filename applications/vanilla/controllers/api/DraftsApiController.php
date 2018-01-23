@@ -179,7 +179,7 @@ class DraftsApiController extends AbstractApiController {
      * List drafts created by the current user.
      *
      * @param array $query The query string.
-     * @return array
+     * @return Data
      */
     public function index(array $query) {
         $this->permission('Garden.SignIn.Allow');
@@ -236,7 +236,15 @@ class DraftsApiController extends AbstractApiController {
         }
 
         $result = $out->validate($rows);
-        return $result;
+
+        $paging = ApiUtils::numberedPagerInfo(
+            $this->draftModel->getCount($where),
+            '/api/v2/drafts',
+            $query,
+            $in
+        );
+
+        return ApiUtils::setPageMeta($result, $paging);
     }
 
     /**

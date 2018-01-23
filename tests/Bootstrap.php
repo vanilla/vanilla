@@ -188,6 +188,7 @@ class Bootstrap {
             ->rule('@api-v2-route')
             ->setClass(\Garden\Web\ResourceRoute::class)
             ->setConstructorArgs(['/api/v2/', '%sApiController'])
+            ->addCall('setConstraint', ['locale', ['position' => 0]])
 
             ->rule(\Garden\ClassLocator::class)
             ->setClass(\Vanilla\VanillaClassLocator::class)
@@ -299,6 +300,8 @@ class Bootstrap {
      * @param Container $container The container to clean up.
      */
     public static function cleanup(Container $container) {
+        \CategoryModel::$Categories = null;
+
         if ($container->hasInstance(AddonManager::class)) {
             /* @var AddonManager $addonManager */
 

@@ -99,6 +99,28 @@ abstract class ConversationsModel extends Gdn_Model {
     }
 
     /**
+     * Get the count of all the members of a conversation from the $conversationID.
+     *
+     * @param int $conversationID The conversation ID.
+     * @param bool|null $active **true** for active participants, **false** for users who have left the conversation and **null** for everyone.
+     *
+     * @return array Array of users or userIDs depending on $idsOnly's value.
+     */
+    public function getConversationMembersCount($conversationID, $active = null) {
+        $userConversation = new Gdn_Model('UserConversation');
+
+        $where = ['ConversationID' => $conversationID];
+
+        if ($active === true) {
+            $where['Deleted'] = 0;
+        } elseif ($active === false) {
+            $where['Deleted'] = 1;
+        }
+
+        return $userConversation->getCount($where);
+    }
+
+    /**
      * Check if user posting to the conversation is already a member.
      *
      * @param int $conversationID The conversation ID.

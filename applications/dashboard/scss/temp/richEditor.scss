@@ -95,7 +95,10 @@ $richEditor-embedMenu_padding: 0 !default;
 }
 
 .richEditorEmbedMenu {
+  display: block;
+  width: 100%;
   padding: $richEditor-embedMenu_padding;
+
 }
 
 .richEditorInline-icon {

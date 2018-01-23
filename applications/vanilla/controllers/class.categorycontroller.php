@@ -38,9 +38,9 @@ class CategoryController extends VanillaController {
      *
      * @param int $DiscussionID Unique discussion ID.
      */
-    public function followed($categoryID = null) {
+    public function followed($categoryID = null, $tKey = null) {
         // Make sure we are posting back.
-        if (!$this->Request->isAuthenticatedPostBack()) {
+        if (!$this->Request->isAuthenticatedPostBack() && !Gdn::session()->validateTransientKey($tKey)) {
             throw permissionException('Javascript');
         }
 

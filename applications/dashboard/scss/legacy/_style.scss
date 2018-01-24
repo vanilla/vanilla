@@ -6001,3 +6001,13 @@ Styleguide Attachments
 .Groups.Section-DiscussionList .HomepageTitle {
   display: none;
 }
+
+
+// Special case for editor compatibility. The Bootstrap 3 derived themes have .InputBox that we can use
+// for the border style. If we set a default in style-compat.scss, it won't inherit the styles from
+// Bootstrap 3, so we need to set it before so it gets overwritten.
+.InputBox {
+  background: #fff;
+  border: 1px solid #999;
+  border: 1px solid rgba(0, 0, 0, 0.4);
+}

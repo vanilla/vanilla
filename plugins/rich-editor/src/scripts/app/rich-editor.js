@@ -20,7 +20,7 @@ function setupNewDiscussionForm() {
 
     discussionFormContainer.forEach(container => {
         new RichEditor(container);
-    })
+    });
 }
 
 function setupCommentForm() {

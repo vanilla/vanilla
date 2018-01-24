@@ -19,6 +19,7 @@ class QuillOperation {
     const NEWLINE_TYPE_END = "end";
     const NEWLINE_TYPE_ONLY = "only";
     const NEWLINE_TYPE_NONE = "none";
+    const NEWLINE_TYPE_ATTRIBUTOR = "attibutor";
 
     private $allowedInsertTypes = [
         self::INSERT_TYPE_STRING,
@@ -31,8 +32,8 @@ class QuillOperation {
     /** @var string The type of insert. */
     public $insertType = self::INSERT_TYPE_STRING;
 
-    /** @var bool The block type of the insert. */
-    public $inline = false;
+    /** @var bool Whether or not the operation should clear a block. */
+    public $applyBackwards = false;
 
     /** @var bool Does the text have strike-through. */
     public $strike = false;
@@ -49,6 +50,9 @@ class QuillOperation {
     /** @var bool */
     public $list = false;
 
+    /** @var bool */
+    public $header = false;
+
     /** @var string|null Is this item a link? If so, what is the link. */
     public $link = null;
 
@@ -63,7 +67,7 @@ class QuillOperation {
     private $newlineEndRegexp = "/\\n$/";
 
     public function __construct($operationArray) {
-        $insert = $operationArray["insert"];
+        $insert = val("insert", $operationArray);
         if (is_string($insert)) {
             $this->insertType = self::INSERT_TYPE_STRING;
             $this->content = $insert;
@@ -87,7 +91,6 @@ class QuillOperation {
             foreach ($booleanAttributes as $attr) {
                 if (val($attr, $attributes)) {
                     $this->{$attr} = val($attr, $attributes);
-                    $this->inline = true;
                 }
             }
 
@@ -97,7 +100,6 @@ class QuillOperation {
 
             if (val("link", $attributes)) {
                 $this->link = val("link", $attributes);
-                $this->inline = true;
             }
 
             // Numbered Values
@@ -111,14 +113,24 @@ class QuillOperation {
                 }
             }
 
-            if (val("header", $attributes) > 0) {
-                $this->inline = false;
+            if (val("header", $attributes) || val("code-block", $attributes)) {
+                $this->applyBackwards = true;
             }
         }
 
+
+        $isList = val("list", $attributes);
+        $isCodeBlock = val("code-block", $attributes);
+        $isQuote = val("blockquote", $attributes);
+        $isHeader = val("header", $attributes);
+
         if (preg_match($this->newlineOnlyRegexp, $this->content)) {
             $this->newline = self::NEWLINE_TYPE_ONLY;
-            $this->stripStartingNewLine();
+            if ($isList || $isCodeBlock || $isQuote || $isHeader) {
+                $this->stripStartingNewLine();
+
+                $this->newline = self::NEWLINE_TYPE_ATTRIBUTOR;
+            }
         } elseif (preg_match($this->newlineStartRegexp, $this->content)) {
             $this->newline = self::NEWLINE_TYPE_START;
             $this->stripStartingNewLine();
@@ -127,11 +139,6 @@ class QuillOperation {
             $this->stripEndingNewLine();
         } else {
             $this->newline = self::NEWLINE_TYPE_NONE;
-        }
-
-        // If there is only a newline left, replace it with with a break tag.
-        if (preg_match($this->newlineOnlyRegexp, $this->content)) {
-            $this->content = preg_replace($this->newlineOnlyRegexp, "<br>", $this->content);
         }
     }
 

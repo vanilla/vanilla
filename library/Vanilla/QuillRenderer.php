@@ -44,8 +44,9 @@ class QuillRenderer {
         foreach($delta as $opArray) {
             $operations[] = new QuillOperation($opArray);
         }
+        $blockFactory = new QuillBlockFactory($operations);
 
-        return QuillBlock::generateFromOps($operations);
+        return $blockFactory->blocks;
     }
 
     /**
@@ -56,6 +57,7 @@ class QuillRenderer {
     private function renderBlock(QuillBlock $block) {
         $attributes = [];
         $addNewLine = false;
+        $result = "";
 
         // Don't render no-ops
         if (count($block->operations) < 1) {
@@ -66,11 +68,17 @@ class QuillRenderer {
             case QuillBlock::TYPE_PARAGRAPH:
                 $containerTag = "p";
 
-                foreach ($block->operations as &$op) {
+                foreach ($block->operations as $op) {
+                    // Replace only a newline with just a break.
+                    $op->content = preg_replace("/^\\n$/", "<br>", $op->content);
                     // Replace double newlines with an opening and closing <p> tags and a <br> tag.
-                    $op->content = preg_replace("/\\n\\n/", "</p><p><br></p><p>", $op->content);
+                    $op->content = preg_replace("/[\\n]{2,}/", "</p><p><br></p><p>", $op->content);
                     // Replace all newlines with opening and closing <p> tags.
                     $op->content = preg_replace("/\\n/", "</p><p>", $op->content);
+                }
+
+                if ($block->blockIndentLevel > 0) {
+                    $attributes["class"] = 'ql-indent-'.$block->blockIndentLevel;
                 }
                 break;
             case QuillBlock::TYPE_BLOCKQUOTE:
@@ -94,13 +102,13 @@ class QuillRenderer {
                 return "";
         }
 
-        $result = "<$containerTag";
+        $result .= "<$containerTag";
         foreach ($attributes as $attrKey => $attrValue) {
             $result .= " $attrKey=\"$attrValue\"";
         }
         $result .= ">";
 
-        foreach($block->operations as $op) {
+        foreach($block->operations as $key => $op) {
             $result .= $this->renderOperation($op);
         }
 
@@ -118,10 +126,6 @@ class QuillRenderer {
      * @param QuillOperation $operation
      */
     private function renderOperation(QuillOperation $operation) {
-        if ($operation->newline === QuillOperation::NEWLINE_TYPE_ONLY && !$operation->list) {
-            return "<br>";
-        }
-
         // Don't render ops without content.
         if ($operation->content === "") {
             return "";
@@ -145,6 +149,7 @@ class QuillRenderer {
                 "name" => "a",
                 "attributes" => [
                     "href" => $operation->link,
+                    "target" => "_blank"
                 ],
             ];
         }
@@ -176,14 +181,7 @@ class QuillRenderer {
             array_unshift($afterTags, "</{$tag['name']}>");
         }
 
-        $result = "";
-
-        if ($operation->newline === QuillOperation::NEWLINE_TYPE_START) {
-            $result .= "<p><br></p>";
-        }
-        $result .= implode("", $beforeTags) . $operation->content . implode("", $afterTags);
-
-        return $result;
+        return implode("", $beforeTags) . $operation->content . implode("", $afterTags);
     }
 
     /**

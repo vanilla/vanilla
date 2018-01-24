@@ -40,6 +40,8 @@ class QuillBlock {
     /** @var string */
     public $headerLevel = 0;
 
+    public $blockIndentLevel = 0;
+
     /**
      * QuillBlock constructor.
      *
@@ -62,6 +64,15 @@ class QuillBlock {
             $this->blockType = self::TYPE_BLOCKQUOTE;
         } else {
             $this->blockType = self::TYPE_PARAGRAPH;
+            $this->getBlockIndent();
+        }
+    }
+
+    private function getBlockIndent() {
+        foreach ($this->operations as $op) {
+            if ($op->indent > 0) {
+                $this->blockIndentLevel = $op->indent;
+            }
         }
     }
 
@@ -80,87 +91,6 @@ class QuillBlock {
         }
 
         return $result;
-    }
-
-    /**
-     * Generate multiple blocks from a list of operations.
-     *
-     * @param QuillOperation[] $operations The operations to build blocks from.
-     *
-     * @returns QuillBlock[]
-     */
-    public static function generateFromOps(array $operations) {
-        /** @var QuillBlock[] $blocks */
-        $blocks = [];
-
-        $blockStartIndex = -1;
-        $blockListType = null;
-        foreach($operations as $currentIndex => $operation) {
-            // We are starting a new block.
-            if ($blockStartIndex === -1) {
-                $blockStartIndex = $currentIndex;
-            }
-
-            // Clear the block when list type changes.
-            $operationListType = val("list", $operation->attributes, self::LIST_TYPE_NONE);
-            if (!$blockListType || ($operation->list && $operationListType !== $blockListType)) {
-                // The previous block is closed with this operation. Close the old one.
-                $length = $currentIndex - $blockStartIndex + 1;
-                $blocks[] = new QuillBlock(array_slice($operations, $blockStartIndex, $length));
-                $blockStartIndex = -1;
-                $blockListType = $operationListType;
-            }
-
-            if ($operation->content === "" && $operation->list) {
-                // List information comes in the next insert after it's text. This is really dumb but whatever.
-                // Update the previous insert with the list info.
-                $operations[$currentIndex - 1]->list = $operation->list;
-                $operations[$currentIndex - 1]->indent = $operation->indent;
-                $operations[$currentIndex - 1]->attributes["list"] = $operationListType;
-                continue;
-            }
-
-            if ($operation->newline === QuillOperation::NEWLINE_TYPE_END) {
-                // The block is complete including this operation. Include this op and close the current block.
-                $length = $currentIndex - $blockStartIndex + 1;
-                $blocks[] = new QuillBlock(array_slice($operations, $blockStartIndex, $length));
-                $blockStartIndex = -1;
-                continue;
-            } elseif ($operation->newline === QuillOperation::NEWLINE_TYPE_START) {
-                // The previous block is complete before this operation. Close the old one.
-                $length = $currentIndex - $blockStartIndex;
-                $blocks[] = new QuillBlock(array_slice($operations, $blockStartIndex, $length));
-
-                if (!$operation->list) {
-                    // Clone off a newline op.
-                    $newlineOp = clone $operation;
-                    $newlineOp->content = "";
-
-                    // Create a new block with just the newline.
-                    $blocks[] = new QuillBlock([$operation]);
-                }
-
-                // Adjust the newline status of the current block before continuing.
-                $operation->newline = QuillOperation::NEWLINE_TYPE_NONE;
-                $blockStartIndex = $currentIndex;
-            } elseif ($operation->newline === QuillOperation::NEWLINE_TYPE_ONLY) {
-                // The previous block is complete before this operation. Close the old one.
-                $length = $currentIndex - $blockStartIndex;
-                $blocks[] = new QuillBlock(array_slice($operations, $blockStartIndex, $length));
-
-                // Increment the counter by one. We don't want to include this item twice!
-                $blockStartIndex = $currentIndex + 1;
-                // Create a new block with just the newline.
-                $blocks[] = new QuillBlock([$operation]);
-            }
-        }
-        return $blocks;
-    }
-
-    private function validateOperations() {
-        // Ensure the same blocktype
-
-//        $operationIsInline
     }
 
     /**

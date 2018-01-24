@@ -13,7 +13,7 @@ use Vanilla\QuillRenderer;
 class QuillRendererTest extends TestCase {
     public function testRenderDelta() {
         $fixturePath = realpath("../../fixtures/editor-rendering");
-        $testDirectories = array_reverse(array_diff(scandir($fixturePath), ['..', '.']));
+        $testDirectories = array_diff(scandir($fixturePath), ['..', '.']);
         $renderer = new QuillRenderer();
 
         foreach($testDirectories as $dir) {

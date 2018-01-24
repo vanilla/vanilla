@@ -84,6 +84,10 @@
   z-index: 1;
 }
 
+.richEditor-button:hover .richEditorInline-icon, .richEditor-button:focus .richEditorInline-icon {
+  opacity: 1;
+}
+
 .richEditorEmbedMenu {
   display: block;
   width: 100%;
@@ -95,6 +99,69 @@
   margin: auto;
   height: 24px;
   width: 24px;
+  opacity: 0.5;
+}
+
+.richEditorAtMentionMenu {
+  width: 200px;
+}
+
+.richEditorAtMentionMenu-user {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  box-sizing: border-box;
+  overflow: hidden;
+}
+
+.richEditorAtMentionMenu-photoWrap {
+  margin-right: 10px;
+}
+
+.richEditorAtMentionMenu-photo {
+  width: 30px;
+  height: 30px;
+}
+
+.richEditorAtMentionMenu-userName {
+  flex-grow: 1;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  max-width: calc(100% - 40px);
+}
+
+.richEditorAtMentionMenu-mark {
+  padding: 0;
+  font-weight: 600;
+}
+
+.richEditorAtMentionMenu-photo {
+  display: block;
+}
+
+.richEditorInsertLinkMenu.FlyoutMenu {
+  display: flex;
+  flex-wrap: nowrap;
+  align-items: center;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+.richEditor-close.Close {
+  position: relative;
+  display: block;
+  width: 39px;
+  height: 39px;
+  line-height: 39px;
+  top: auto;
+  right: auto;
+  text-align: center;
+}
+
+.richEditorInsertLinkMenu-input.InputBox {
+  border: 0 !important;
+  flex-grow: 1;
 }
 
 /*# sourceMappingURL=style-compat.css.map */

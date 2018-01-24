@@ -5,6 +5,11 @@ $richEditor_minHeight: 200px !default;
 $richEditor_padding: 9px 12px 0 !default;
 $richEditor-paragraphMenu_offset: 9px!default;
 $richEditor-embedMenu_padding: 0 !default;
+$richEditor-icon_opacity: .5 !default;
+$richEditor-atMention_width: 200px !default;
+$richEditor-atMentionAvatar_width: 30px !default;
+$richEditor-atMentionAvatar_margin: 10px !default;
+$richEditor-atMentionMark_weight: 600 !default;
 
 .richEditor {
   position: relative;
@@ -92,6 +97,13 @@ $richEditor-embedMenu_padding: 0 !default;
   &:focus {
     z-index: 1;
   }
+
+  &:hover,
+  &:focus {
+    .richEditorInline-icon {
+      opacity: 1;
+    }
+  }
 }
 
 .richEditorEmbedMenu {
@@ -106,14 +118,72 @@ $richEditor-embedMenu_padding: 0 !default;
   margin: auto;
   height: $richEditor-icon_size;
   width: $richEditor-icon_size;
+  opacity: $richEditor-icon_opacity;
 }
 
-// Paragraph Level Menu
-.richEditorParagraphMenu {
+// @mention menu
+.richEditorAtMentionMenu {
+  width: $richEditor-atMention_width;
+}
+
+.richEditorAtMentionMenu-user {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  box-sizing: border-box;
+  overflow: hidden;
+}
+
+.richEditorAtMentionMenu-photoWrap {
+  margin-right: $richEditor-atMentionAvatar_margin;
+}
+
+.richEditorAtMentionMenu-photo {
+  width: $richEditor-atMentionAvatar_width;
+  height: $richEditor-atMentionAvatar_width;
+}
+
+.richEditorAtMentionMenu-userName {
+  flex-grow: 1;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  max-width: calc(100% - #{$richEditor-atMentionAvatar_margin + $richEditor-atMentionAvatar_width});
+}
+
+.richEditorAtMentionMenu-mark {
+  padding: 0;
+  font-weight: $richEditor-atMentionMark_weight;
+}
+
+.richEditorAtMentionMenu-photo {
+  display: block;
+}
+
+// Link Menu
+.richEditorInsertLinkMenu.FlyoutMenu {
+  display: flex;
+  flex-wrap: nowrap;
+  align-items: center;
+  padding: {
+    left: 5px;
+    right: 5px;
+  }
+}
+
+.richEditor-close.Close {
+  position: relative;
+  display: block;
+  width: $richEditor-menuButton_size;
+  height: $richEditor-menuButton_size;
+  line-height: $richEditor-menuButton_size;
+  top: auto;
+  right: auto;
+  text-align: center;
 
 }
 
-// Inline Level Menu
-
-
-// Embed Menu
+.richEditorInsertLinkMenu-input.InputBox {
+  border: 0 !important;
+  flex-grow: 1;
+}

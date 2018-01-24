@@ -160,33 +160,55 @@
 <hr/>
 
 <h2>@mention menu</h2>
-<div class="richEditor-menu richEditorLinkMenu" role="dialog" aria-label="<?php echo t('Insert @Mention User Link') ?>">
-    <ul class="richEditor-menuItems MenuItems" role="menubar">
-        <li class="richEditor-menuItem" role="menuitem">
-            <a href="#" class="richEditorLinkMenu-link">
-                <span class="PhotoWrap richEditorLinkMenu-photoWrap">
-                    <img src="https://secure.gravatar.com/avatar/b0420af06d6fecc16fc88a88cbea8218/?default=https%3A%2F%2Fvanillicon.com%2Fb0420af06d6fecc16fc88a88cbea8218_200.png&amp;rating=g&amp;size=120" alt="Linc" class="richEditorLinkMenu-photo"/>
-                </span>
-                <span class="richEditorLinkMenu-userName">
-                    <mark class="richEditorLinkMenu-mark">Fra</mark>nk
+<div class="richEditor-menu richEditorAtMentionMenu" role="dialog" aria-label="<?php echo t('Insert @Mention User Link') ?>">
+    <ul class="richEditorAtMentionMenu-items MenuItems" role="menu">
+        <li class="richEditor-menuItem richEditorAtMentionMenu-item" role="menuitem">
+            <a href="#" class="richEditorAtMentionMenu-link">
+                <span class="richEditorAtMentionMenu-user">
+                    <span class="PhotoWrap richEditorAtMentionMenu-photoWrap">
+                        <img src="https://secure.gravatar.com/avatar/b0420af06d6fecc16fc88a88cbea8218/?default=https%3A%2F%2Fvanillicon.com%2Fb0420af06d6fecc16fc88a88cbea8218_200.png&amp;rating=g&amp;size=120" alt="Linc" class="richEditorAtMentionMenu-photo ProfilePhoto"/>
+                    </span>
+                    <span class="richEditorAtMentionMenu-userName">
+                        <mark class="richEditorAtMentionMenu-mark">Fra</mark>nkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkz
+                    </span>
                 </span>
             </a>
         </li>
+
+
+
+
+
+        <li class="richEditor-menuItem richEditorAtMentionMenu-item" role="menuitem">
+            <a href="#" class="richEditorAtMentionMenu-link">
+                <span class="richEditorAtMentionMenu-user">
+                    <span class="PhotoWrap richEditorAtMentionMenu-photoWrap">
+                        <img src="https://secure.gravatar.com/avatar/b0420af06d6fecc16fc88a88cbea8218/?default=https%3A%2F%2Fvanillicon.com%2Fb0420af06d6fecc16fc88a88cbea8218_200.png&amp;rating=g&amp;size=120" alt="Linc" class="richEditorAtMentionMenu-photo ProfilePhoto"/>
+                    </span>
+                    <span class="richEditorAtMentionMenu-userName">
+                        <mark class="richEditorAtMentionMenu-mark">Fra</mark>nk
+                    </span>
+                </span>
+            </a>
+        </li>
+
+
+
     </ul>
 </div>
 
 
 <h2>Link Menu</h2>
-<div class="richEditor-menu MenuItems richEditorInsertLinkMenu" role="dialog" aria-label="<?php echo 'Insert Url'; ?>">
-    <input class="InputBox editor-input-url" placeholder="http://">
-    <a href="#" class="Close" aria-label="<?php echo t('Close'); ?>" role="button">
+<div class="richEditor-menu FlyoutMenu richEditorInsertLinkMenu" role="dialog" aria-label="<?php echo 'Insert Url'; ?>">
+    <input class="InputBox richEditorInsertLinkMenu-input" placeholder="Paste or type a link…">
+    <a href="#" aria-label="<?php echo t('Close'); ?>" class="Close richEditor-close" role="button">
         <span>×</span>
     </a>
 </div>
 
 
 <h2>Insert Media</h2>
-<div class="richEditor-menu MenuItems richEditorInsertMediaMenu" role="dialog" aria-labeledby="tempId-insertMediaMenu-title" aria-describedby="tempId-insertMediaMenu-p">
+<div class="richEditor-menu FlyoutMenu richEditorInsertMediaMenu" role="dialog" aria-labeledby="tempId-insertMediaMenu-title" aria-describedby="tempId-insertMediaMenu-p">
     <div class="richEditorInsertMediaMenu-header">
         <h2 id="tempId-insertMediaMenu-title" class="H richEditorInsertMediaMenu-title">
             Insert Media
@@ -206,7 +228,7 @@
         <div class="Buttons">
             <input type="submit" class="Button Primary" value="<?php echo t('Insert'); ?>" aria-label="<?php echo t('Insert Media') ?>">
         </div>
-        <a href="#" aria-label="<?php echo t('Close'); ?>" class="Close">
+        <a href="#" aria-label="<?php echo t('Close'); ?>" class="Close richEditor-close">
             <span>×</span>
         </a>
     </div>

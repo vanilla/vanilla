@@ -10,6 +10,7 @@ $richEditor-atMention_width: 200px !default;
 $richEditor-atMentionAvatar_width: 30px !default;
 $richEditor-atMentionAvatar_margin: 10px !default;
 $richEditor-atMentionMark_weight: 600 !default;
+$richEditor-insertLink_width: 387px !default;
 
 .richEditor {
   position: relative;
@@ -26,6 +27,16 @@ $richEditor-atMentionMark_weight: 600 !default;
 .richEditor-menu {
   display: inline-block;
   position: relative;
+
+  &.FlyoutMenu { // Temporary
+    position: relative;
+    top: auto;
+    left: auto;
+    right: auto;
+    bottom: auto;
+    display: block;
+    float: none;
+  }
 }
 
 .richEditorParagraphMenu {
@@ -126,6 +137,20 @@ $richEditor-atMentionMark_weight: 600 !default;
   width: $richEditor-atMention_width;
 }
 
+.richEditorAtMentionMenu-items {
+  width: 100%;
+
+
+  &.MenuItems { // Temporary
+    position: relative;
+    top: auto;
+    left: auto;
+    right: auto;
+    bottom: auto;
+    display: block;
+  }
+}
+
 .richEditorAtMentionMenu-user {
   display: flex;
   align-items: center;
@@ -165,6 +190,8 @@ $richEditor-atMentionMark_weight: 600 !default;
   display: flex;
   flex-wrap: nowrap;
   align-items: center;
+  max-width: $richEditor-insertLink_width;
+  width: 100%;
   padding: {
     left: 5px;
     right: 5px;

@@ -196,7 +196,7 @@
 
     </ul>
 </div>
-
+<hr/>
 
 <h2>Link Menu</h2>
 <div class="richEditor-menu FlyoutMenu richEditorInsertLinkMenu" role="dialog" aria-label="<?php echo 'Insert Url'; ?>">
@@ -205,7 +205,7 @@
         <span>×</span>
     </a>
 </div>
-
+<hr/>
 
 <h2>Insert Media</h2>
 <div class="richEditor-menu FlyoutMenu richEditorInsertMediaMenu" role="dialog" aria-labeledby="tempId-insertMediaMenu-title" aria-describedby="tempId-insertMediaMenu-p">

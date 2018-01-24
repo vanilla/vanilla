@@ -15,6 +15,16 @@
   position: relative;
 }
 
+.richEditor-menu.FlyoutMenu {
+  position: relative;
+  top: auto;
+  left: auto;
+  right: auto;
+  bottom: auto;
+  display: block;
+  float: none;
+}
+
 .richEditorParagraphMenu {
   position: absolute;
   top: 9px;
@@ -106,6 +116,19 @@
   width: 200px;
 }
 
+.richEditorAtMentionMenu-items {
+  width: 100%;
+}
+
+.richEditorAtMentionMenu-items.MenuItems {
+  position: relative;
+  top: auto;
+  left: auto;
+  right: auto;
+  bottom: auto;
+  display: block;
+}
+
 .richEditorAtMentionMenu-user {
   display: flex;
   align-items: center;
@@ -144,6 +167,8 @@
   display: flex;
   flex-wrap: nowrap;
   align-items: center;
+  max-width: 387px;
+  width: 100%;
   padding-left: 5px;
   padding-right: 5px;
 }

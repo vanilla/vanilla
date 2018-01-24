@@ -13,11 +13,16 @@ namespace Vanilla;
 class QuillBlockFactory {
 
     /** @var QuillBlock[] */
-    public $blocks = [];
+    private $blocks = [];
 
+    /** @var int */
     private $currentIndex = 0;
+
+    /** @var int  */
     private $blockStartIndex = 0;
-    private $currentListType = QuillBlock::LIST_TYPE_NONE;
+
+    /** @var string */
+    private $currentListType = QuillOperation::LIST_TYPE_NONE;
 
     /** @var QuillOperation[]  */
     private $operations = [];
@@ -26,7 +31,6 @@ class QuillBlockFactory {
      * QuillBlock constructor.
      *
      * @param QuillOperation[] $operations The operations to build blocks from.
-     * @param string $blockType
      */
     public function __construct(array $operations) {
         $this->operations = $operations;
@@ -43,16 +47,22 @@ class QuillBlockFactory {
     }
 
     /**
+     * @return QuillBlock[]
+     */
+    public function getBlocks(): array {
+        return $this->blocks;
+    }
+
+    /**
      * Reset the properties we know about the current block.
      *
      * @param int $index
-     * @return bool
      */
     private function resetBlock($index = -1) {
         // Add the current block the blocks array.
 
         $this->blockStartIndex = $index;
-        $this->currentListType = QuillBlock::LIST_TYPE_NONE;
+        $this->currentListType = QuillOperation::LIST_TYPE_NONE;
     }
 
     /**
@@ -74,10 +84,10 @@ class QuillBlockFactory {
      * @param QuillOperation $operation - The operation to check.
      */
     private function parseNewLine(QuillOperation &$operation) {
-        switch ($operation->newline) {
+        switch ($operation->getNewlineType()) {
             case QuillOperation::NEWLINE_TYPE_ATTRIBUTOR:
                 // The previous block is complete including this operation.
-                if ($operation->list) {
+                if ($operation->getListType() === QuillOperation::LIST_TYPE_NONE) {
                     return;
                 }
                 $this->clearBlock();
@@ -101,15 +111,15 @@ class QuillBlockFactory {
                 // Don't add the newline block for quotes.
                 // Clone off a newline op.
                 $newlineOp = clone $operation;
-                $newlineOp->content = "\n";
-                $newlineOp->newline = QuillOperation::NEWLINE_TYPE_ONLY;
+                $newlineOp->setContent("\n");
+                $newlineOp->setNewlineType(QuillOperation::NEWLINE_TYPE_ONLY);
 
                 // Create a new block with just the newline.
                 $this->blocks[] = new QuillBlock([$newlineOp]);
 
                 // Strip the newline off the of the block.
-                $operation->content = preg_replace("/^\\n/", "", $operation->content);
-                $operation->newline = QuillOperation::NEWLINE_TYPE_NONE;
+                $operation->setContent(preg_replace("/^\\n/", "", $operation->getContent()));
+                $operation->setNewlineType(QuillOperation::NEWLINE_TYPE_NONE);
                 $this->resetBlock($this->currentIndex);
                 break;
             case QuillOperation::NEWLINE_TYPE_NONE:
@@ -121,18 +131,17 @@ class QuillBlockFactory {
      * Apply the properties of the next operation to the current one if applicable. It is pretty dumb that this needs
      * to be done at all.
      *
-     * @param number $index
+     * @param QuillOperation $currentOperation The operation to apply properties too.
      */
-    public function parseBackProperties(QuillOperation &$currentOperation) {
+    public function parseBackProperties(QuillOperation $currentOperation) {
         $nextOp = array_key_exists($this->currentIndex + 1, $this->operations)
             ? $this->operations[$this->currentIndex + 1]
             : false;
 
-        if ($nextOp && $nextOp->list) {
-            $listType =  $nextOp->attributes["list"];
+        if ($nextOp && $nextOp->getListType() === QuillOperation::LIST_TYPE_NONE) {
+            $listType =  $nextOp->getListType();
 
-            $currentOperation->list = true;
-            $currentOperation->attributes["list"] = $listType;
+            $currentOperation->setListType($listType);
 
             if ($listType !== $this->currentListType) {
                 // The previous block is complete with the last operation. This operation is it's own block.
@@ -142,8 +151,8 @@ class QuillBlockFactory {
             }
         }
 
-        if ($nextOp && $nextOp->indent) {
-            $currentOperation->indent = $nextOp->indent;
+        if ($nextOp && $nextOp->getIndent()) {
+            $currentOperation->setIndent($nextOp->getIndent());
         }
     }
 }

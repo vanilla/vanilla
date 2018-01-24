@@ -18,35 +18,22 @@ class QuillBlock {
     const TYPE_HEADER = "header";
     const TYPE_LIST = "list";
 
-    // List types
-    const LIST_TYPE_BULLET = "bullet";
-    const LIST_TYPE_ORDERED = "ordered";
-    const LIST_TYPE_NONE = "none";
-
-    private $allowedBlockTypes = [
-        self::TYPE_BLOCKQUOTE,
-        self::TYPE_CODE,
-        self::TYPE_HEADER,
-        self::TYPE_PARAGRAPH,
-        self::TYPE_LIST,
-    ];
-
     /** @var QuillOperation[] */
-    public $operations = [];
+    private $operations = [];
 
     /** @var string */
-    public $listType = self::LIST_TYPE_NONE;
+    private $listType = QuillOperation::LIST_TYPE_NONE;
 
-    /** @var string */
-    public $headerLevel = 0;
+    /** @var int */
+    private $headerLevel = 0;
 
-    public $blockIndentLevel = 0;
+    /** @var int */
+    private $indentLevel = 0;
 
     /**
      * QuillBlock constructor.
      *
      * @param QuillOperation[] $operations The operations to build blocks from.
-     * @param string $blockType
      */
     public function __construct(array $operations) {
         $this->operations = $operations;
@@ -63,17 +50,41 @@ class QuillBlock {
         } elseif ($this->extractAttribute("blockquote")) {
             $this->blockType = self::TYPE_BLOCKQUOTE;
         } else {
+            foreach ($this->operations as $op) {
+                if ($op->getIndent() > 0) {
+                    $this->indent = $op->getIndent();
+                }
+            }
             $this->blockType = self::TYPE_PARAGRAPH;
-            $this->getBlockIndent();
         }
     }
 
-    private function getBlockIndent() {
-        foreach ($this->operations as $op) {
-            if ($op->indent > 0) {
-                $this->blockIndentLevel = $op->indent;
-            }
-        }
+    /**
+     * @return QuillOperation[]
+     */
+    public function getOperations(): array {
+        return $this->operations;
+    }
+
+    /**
+     * @return string
+     */
+    public function getListType(): string {
+        return $this->listType;
+    }
+
+    /**
+     * @return int
+     */
+    public function getHeaderLevel(): int {
+        return $this->headerLevel;
+    }
+
+    /**
+     * @return int;
+     */
+    public function getIndentLevel(): int {
+        return $this->indentLevel;
     }
 
     /**
@@ -85,60 +96,11 @@ class QuillBlock {
         $result = false;
 
         foreach ($this->operations as $op) {
-            if (array_key_exists($attributeName, $op->attributes)) {
-                $result = $op->attributes[$attributeName];
+            if ($op->getAttribute($attributeName)) {
+                $result = $op->getAttribute($attributeName);
             }
         }
 
         return $result;
     }
-
-    /**
-     * Merge adjacent list blocks of the same type together.
-     *
-     * @param QuillBlock[] $blocks - The blocks to look through.
-     *
-     * @return array[]
-     */
-    private function mergeListBlocks(array $blocks) {
-        $results = [];
-
-        // Store a block in progress.
-        $buildingBlock = false;
-
-        foreach ($blocks as $block) {
-            $isList = $block["blockType"] === self::TYPE_LIST;
-            $isSameTypeAsPreviousBlock = $buildingBlock["listType"] === val("listType", $block);
-            $updateExistingBuildingBlock = $isList && $isSameTypeAsPreviousBlock && $buildingBlock;
-
-            // Add to existing
-            if ($updateExistingBuildingBlock) {
-                foreach($block["operations"] as $op) {
-                    $buildingBlock["operations"][] = $op;
-                }
-            } else {
-                // Clear the existing buildingBlock.
-                if ($buildingBlock) {
-                    $results[] = $buildingBlock;
-                    $buildingBlock = false;
-                }
-
-                // Start the building block over.
-                if ($isList) {
-                    $buildingBlock = $block;
-                    // Ignore the building block.
-                } else {
-                    $results[] = $block;
-                }
-            }
-        }
-
-        // Clear the block one last time.
-        if ($buildingBlock) {
-            $results[] = $buildingBlock;
-        }
-
-        return $results;
-    }
-
 }

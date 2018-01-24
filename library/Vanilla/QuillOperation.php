@@ -21,46 +21,28 @@ class QuillOperation {
     const NEWLINE_TYPE_NONE = "none";
     const NEWLINE_TYPE_ATTRIBUTOR = "attibutor";
 
-    private $allowedInsertTypes = [
-        self::INSERT_TYPE_STRING,
-        self::INSERT_TYPE_IMAGE,
-    ];
+    // List types
+    const LIST_TYPE_BULLET = "bullet";
+    const LIST_TYPE_ORDERED = "ordered";
+    const LIST_TYPE_NONE = "none";
 
     /** @var string The content of the operation  */
-    public $content = "";
+    private $content = "";
 
     /** @var string The type of insert. */
-    public $insertType = self::INSERT_TYPE_STRING;
+    private $insertType = self::INSERT_TYPE_STRING;
 
-    /** @var bool Whether or not the operation should clear a block. */
-    public $applyBackwards = false;
-
-    /** @var bool Does the text have strike-through. */
-    public $strike = false;
-
-    /** @var bool Is the text bold. */
-    public $bold = false;
-
-    /** @var bool Is the text italic. */
-    public $italic = false;
-
-    /** @var int What level of indentation does the item have. */
-    public $indent = 0;
-
-    /** @var bool */
-    public $list = false;
-
-    /** @var bool */
-    public $header = false;
-
-    /** @var string|null Is this item a link? If so, what is the link. */
-    public $link = null;
+    /** @var string */
+    private $listType = self::LIST_TYPE_NONE;
 
     /** @var string Does this item start of end with a newline. */
-    public $newline = self::NEWLINE_TYPE_NONE;
+    private $newlineType = self::NEWLINE_TYPE_NONE;
+
+    /** @var int */
+    private $indent = 0;
 
     /** @var array All attributes directly from the source. These shouldn't be used directly in rendering. */
-    public $attributes = [];
+    private $attributes = [];
 
     private $newlineOnlyRegexp = "/^\\n$/";
     private $newlineStartRegexp = "/^\\n/";
@@ -76,53 +58,13 @@ class QuillOperation {
             $this->content = $insert;
         }
 
-        $attributes = val("attributes", $operationArray);
+        $this->attributes = val("attributes", $operationArray, []);
+        $this->listType = $this->getAttribute("list");
 
-        if ($attributes) {
-            $this->attributes = $attributes;
-
-            // Boolean Values
-            $booleanAttributes = [
-                "strike",
-                "bold",
-                "italic",
-            ];
-
-            foreach ($booleanAttributes as $attr) {
-                if (val($attr, $attributes)) {
-                    $this->{$attr} = val($attr, $attributes);
-                }
-            }
-
-            if (val("list", $attributes)) {
-                $this->list = true;
-            }
-
-            if (val("link", $attributes)) {
-                $this->link = val("link", $attributes);
-            }
-
-            // Numbered Values
-            $numberedAttributes = [
-                "indent",
-            ];
-
-            foreach($numberedAttributes as $attr) {
-                if (is_int(val($attr, $attributes))) {
-                    $this->{$attr} = $attributes[$attr];
-                }
-            }
-
-            if (val("header", $attributes) || val("code-block", $attributes)) {
-                $this->applyBackwards = true;
-            }
-        }
-
-
-        $isList = val("list", $attributes);
-        $isCodeBlock = val("code-block", $attributes);
-        $isQuote = val("blockquote", $attributes);
-        $isHeader = val("header", $attributes);
+        $isList = $this->listType;
+        $isCodeBlock = $this->getAttribute("code-block");
+        $isQuote = $this->getAttribute("blockquote");
+        $isHeader = $this->getAttribute("header");
 
         // Parse new lines.
         if (preg_match($this->newlineOnlyRegexp, $this->content)) {
@@ -141,6 +83,80 @@ class QuillOperation {
         } else {
             $this->newline = self::NEWLINE_TYPE_NONE;
         }
+    }
+
+    /**
+     * @return string
+     */
+    public function getContent(): string {
+        return $this->content;
+    }
+
+    /**
+     * @param string $content
+     */
+    public function setContent(string $content): void {
+        $this->content = $content;
+    }
+
+    /**
+     * @return string
+     */
+    public function getInsertType(): string {
+        return $this->insertType;
+    }
+
+    /**
+     * @return string
+     */
+    public function getListType(): string {
+        return $this->listType;
+    }
+
+    /**
+     * @param string $listType
+     */
+    public function setListType(string $listType): void {
+        $this->listType = $listType;
+    }
+
+    /**
+     * @return string
+     */
+    public function getNewlineType(): string {
+        return $this->newline;
+    }
+
+    /**
+     * @param string $newlineType
+     */
+    public function setNewlineType(string $newlineType): void {
+        $this->newlineType = $newlineType;
+    }
+
+    /**
+     * @return int
+     */
+    public function getIndent(): int {
+        return $this->indent;
+    }
+
+    /**
+     * @param int $indent
+     */
+    public function setIndent(int $indent): void {
+        $this->indent = $indent;
+    }
+
+    /**
+     * Get an attribute out of the operation by string name.
+     *
+     * @param string $name - The attribute to look up.
+     *
+     * @return mixed
+     */
+    public function getAttribute(string $name) {
+        return val($name, $this->attributes);
     }
 
     /**

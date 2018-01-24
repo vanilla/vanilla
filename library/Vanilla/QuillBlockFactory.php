@@ -40,12 +40,6 @@ class QuillBlockFactory {
             $this->parseNewLine($currentIndex, $operation);
             $this->parseBackProperties($currentIndex, $operation);
         }
-
-//        $length = count($operations) - $this->blockStartIndex - 1;
-//        echo $this->blockStartIndex
-//        print $length;
-
-//        $this->blocks[] = new QuillBlock(array_slice($this->operations, $this->blockStartIndex, $length));
     }
 
     private function clearBlock($index = -1) {
@@ -87,13 +81,14 @@ class QuillBlockFactory {
                 $this->blocks[] = new QuillBlock(array_slice($this->operations, $this->blockStartIndex, $length));
                 $this->clearBlock();
 
-//                // Clone off a newline op.
-//                $newlineOp = clone $operation;
-//                $newlineOp->content = "\n";
-//                $newlineOp->newline = QuillOperation::NEWLINE_TYPE_ONLY;
-//
-//                // Create a new block with just the newline.
-//                $this->blocks[] = new QuillBlock([$newlineOp]);
+                // Don't add the newline block for quotes.
+                // Clone off a newline op.
+                $newlineOp = clone $operation;
+                $newlineOp->content = "\n";
+                $newlineOp->newline = QuillOperation::NEWLINE_TYPE_ONLY;
+
+                // Create a new block with just the newline.
+                $this->blocks[] = new QuillBlock([$newlineOp]);
 
                 // Strip the newline off the of the block.
                 $operation->content = preg_replace("/^\\n/", "", $operation->content);

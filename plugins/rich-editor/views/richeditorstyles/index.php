@@ -157,6 +157,7 @@
         </li>
     </ul>
 </div>
+
 <hr/>
 
 <h2>@mention menu</h2>
@@ -175,10 +176,6 @@
             </a>
         </li>
 
-
-
-
-
         <li class="richEditor-menuItem richEditorAtMentionMenu-item" role="menuitem">
             <a href="#" class="richEditorAtMentionMenu-link">
                 <span class="richEditorAtMentionMenu-user">
@@ -191,11 +188,9 @@
                 </span>
             </a>
         </li>
-
-
-
     </ul>
 </div>
+
 <hr/>
 
 <h2>Link Menu</h2>
@@ -233,7 +228,3 @@
         </a>
     </div>
 </div>
-
-
-
-

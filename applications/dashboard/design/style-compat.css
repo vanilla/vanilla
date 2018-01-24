@@ -86,6 +86,10 @@
   width: 24px;
 }
 
+.richEditor-button.richEditorParagraphMenu-handle {
+  background: transparent;
+}
+
 .richEditor-button:not(:disabled) {
   cursor: pointer;
 }
@@ -109,7 +113,7 @@
   margin: auto;
   height: 24px;
   width: 24px;
-  opacity: 0.5;
+  opacity: 0.6;
 }
 
 .richEditorAtMentionMenu {

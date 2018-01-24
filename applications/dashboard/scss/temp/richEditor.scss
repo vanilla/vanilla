@@ -5,7 +5,7 @@ $richEditor_minHeight: 200px !default;
 $richEditor_padding: 9px 12px 0 !default;
 $richEditor-paragraphMenu_offset: 9px!default;
 $richEditor-embedMenu_padding: 0 !default;
-$richEditor-icon_opacity: .5 !default;
+$richEditor-icon_opacity: .6 !default;
 $richEditor-atMention_width: 200px !default;
 $richEditor-atMentionAvatar_width: 30px !default;
 $richEditor-atMentionAvatar_margin: 10px !default;
@@ -100,6 +100,10 @@ $richEditor-insertLink_width: 387px !default;
   padding: 0;
   height: $richEditor-icon_size;
   width: $richEditor-icon_size;
+
+  &.richEditorParagraphMenu-handle {
+    background: transparent;
+  }
 
   &:not(:disabled) {
     cursor: pointer;
@@ -215,3 +219,5 @@ $richEditor-insertLink_width: 387px !default;
   flex-grow: 1;
   max-width: calc(100% - #{$richEditor-menuButton_size})
 }
+
+// Insert Media

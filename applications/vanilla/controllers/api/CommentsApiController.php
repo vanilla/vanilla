@@ -231,7 +231,7 @@ class CommentsApiController extends AbstractApiController {
      * List comments.
      *
      * @param array $query The query string.
-     * @return mixed
+     * @return Data
      */
     public function index(array $query) {
         $this->permission();
@@ -263,13 +263,13 @@ class CommentsApiController extends AbstractApiController {
                 ],
             ],
             'page:i?' => [
-                'description' => 'Page number.',
+                'description' => 'Page number. See [Pagination](https://docs.vanillaforums.com/apiv2/#pagination).',
                 'default' => 1,
                 'minimum' => 1,
                 'maximum' => $this->discussionModel->getMaxPages()
             ],
             'limit:i?' => [
-                'description' => 'The number of items per page.',
+                'description' => 'Desired number of items per page.',
                 'default' => $this->commentModel->getDefaultLimit(),
                 'minimum' => 1,
                 'maximum' => 100
@@ -290,6 +290,7 @@ class CommentsApiController extends AbstractApiController {
         list($offset, $limit) = offsetLimit("p{$query['page']}", $query['limit']);
 
         $where = [];
+        $hasMore = $this->commentModel->LastCommentCount >= $limit;
 
         if (array_key_exists('insertUserID', $query)) {
             $where['InsertUserID'] = $query['insertUserID'];
@@ -329,7 +330,15 @@ class CommentsApiController extends AbstractApiController {
 
         // Allow addons to modify the result.
         $result = $this->getEventManager()->fireFilter('commentsApiController_index_output', $result, $this, $in, $query, $rows);
-        return new Data($result, ['paging' => $paging]);
+
+        if (isset($where['DiscussionID']) && count($where) === 1) {
+            $discussion = $this->discussionByID($where['DiscussionID']);
+            $paging = ApiUtils::numberedPagerInfo($discussion['CountComments'], '/api/v2/comments', $query, $in);
+        } else {
+            $paging = ApiUtils::morePagerInfo($hasMore, '/api/v2/comments', $query, $in);
+        }
+
+        return ApiUtils::setPageMeta($result, $paging);
     }
 
     /**

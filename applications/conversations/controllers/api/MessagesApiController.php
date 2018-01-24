@@ -162,7 +162,7 @@ class MessagesApiController extends AbstractApiController {
      * List messages of a user.
      *
      * @param array $query The query string.
-     * @return array
+     * @return Data
      */
     public function index(array $query) {
         $this->permission('Conversations.Conversations.Add');
@@ -171,12 +171,12 @@ class MessagesApiController extends AbstractApiController {
                 'conversationID:i?'=> 'Filter by conversation.',
                 'insertUserID:i?' => 'Filter by author.',
                 'page:i?' => [
-                    'description' => 'Page number.',
+                'description' => 'Page number. See [Pagination](https://docs.vanillaforums.com/apiv2/#pagination).',
                     'default' => 1,
                     'minimum' => 1,
                 ],
                 'limit:i?' => [
-                    'description' => 'The number of items per page.',
+                    'description' => 'Desired number of items per page.',
                     'default' => $this->config->get('Conversations.Messages.PerPage', 50),
                     'minimum' => 1,
                     'maximum' => 100
@@ -236,7 +236,16 @@ class MessagesApiController extends AbstractApiController {
             $message = $this->normalizeOutput($message);
         });
 
-        return $out->validate($messages);
+        $result = $out->validate($messages);
+
+        $paging = ApiUtils::numberedPagerInfo(
+            $this->conversationMessageModel->getCountWhere($where),
+            '/api/v2/messages',
+            $query,
+            $in
+        );
+
+        return ApiUtils::setPageMeta($result, $paging);
     }
 
     /**

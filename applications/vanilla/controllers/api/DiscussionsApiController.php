@@ -57,13 +57,13 @@ class DiscussionsApiController extends AbstractApiController {
 
         $in = $this->schema([
             'page:i?' => [
-                'description' => 'Page number.',
+                'description' => 'Page number. See [Pagination](https://docs.vanillaforums.com/apiv2/#pagination).',
                 'default' => 1,
                 'minimum' => 1,
                 'maximum' => $this->discussionModel->getMaxPages()
             ],
             'limit:i?' => [
-                'description' => 'The number of items per page.',
+                'description' => 'Desired number of items per page.',
                 'default' => $this->discussionModel->getDefaultLimit(),
                 'minimum' => 1,
                 'maximum' => 100
@@ -91,7 +91,10 @@ class DiscussionsApiController extends AbstractApiController {
         }
 
         $result = $out->validate($rows);
-        return new Data($result, ['paging' => ApiUtils::morePagerInfo($result, '/api/v2/discussions/bookmarked', $query, $in)]);
+
+        $paging = ApiUtils::morePagerInfo($result, '/api/v2/discussions/bookmarked', $query, $in);
+
+        return ApiUtils::setPageMeta($result, $paging);
     }
 
     /**
@@ -375,13 +378,13 @@ class DiscussionsApiController extends AbstractApiController {
                 'enum' => ['first', 'mixed'],
             ],
             'page:i?' => [
-                'description' => 'Page number.',
+                'description' => 'Page number. See [Pagination](https://docs.vanillaforums.com/apiv2/#pagination).',
                 'default' => 1,
                 'minimum' => 1,
                 'maximum' => $this->discussionModel->getMaxPages()
             ],
             'limit:i?' => [
-                'description' => 'The number of items per page.',
+                'description' => 'Desired number of items per page.',
                 'default' => $this->discussionModel->getDefaultLimit(),
                 'minimum' => 1,
                 'maximum' => 100
@@ -455,7 +458,16 @@ class DiscussionsApiController extends AbstractApiController {
 
         // Allow addons to modify the result.
         $result = $this->getEventManager()->fireFilter('discussionsApiController_index_output', $result, $this, $in, $query, $rows);
-        return new Data($result, ['paging' => $paging]);
+
+        $whereCount = count($where);
+        $isWhereOptimized = (isset($where['d.CategoryID']) && ($whereCount === 1 || ($whereCount === 2 && isset($where['Announce']))));
+        if ($whereCount === 0 || $isWhereOptimized) {
+            $paging = ApiUtils::numberedPagerInfo($this->discussionModel->getCount($where), '/api/v2/discussions', $query, $in);
+        } else {
+            $paging = ApiUtils::morePagerInfo($rows, '/api/v2/discussions', $query, $in);
+        }
+
+        return ApiUtils::setPageMeta($result, $paging);
     }
 
     /**

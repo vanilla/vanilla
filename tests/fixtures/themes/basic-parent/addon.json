@@ -1,5 +1,6 @@
 {
 	"key": "basic-parent",
 	"name": "Test Theme Parent",
-	"type": "theme"
+	"type": "theme",
+    "b": "b"
 }

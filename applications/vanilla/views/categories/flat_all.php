@@ -1,8 +1,9 @@
 <?php if (!defined('APPLICATION')) exit();
-
     if (!function_exists('GetOptions')) {
         include $this->fetchViewLocation('helper_functions', 'categories');
     }
+    $userID = Gdn::session()->UserID;
+    $categoryID = $this->Category->CategoryID;
 ?>
 
 <h1 class="H HomepageTitle"><?php echo $this->data('Title'); ?></h1>

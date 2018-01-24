@@ -1,2 +1,16 @@
 // A style sheet for compatibility with new features.
 // This should always be added after style.css and not be overridden.
+@import "new-features/followButton";
+@import "new-features/vanillaIcon";
+@import "new-features/selectBox";
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0,0,0,0);
+  border: 0;
+}

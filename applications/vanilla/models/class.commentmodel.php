@@ -490,7 +490,7 @@ class CommentModel extends Gdn_Model {
         }
         $result = $query->get();
         $data =& $result->result();
-        $result->hasMore = $result->count() >= $limit;
+        $this->LastCommentCount = $result->numRows();
 
         // Filter out any comments this user does not have access to.
         if ($permissionFilter && $perms !== true) {

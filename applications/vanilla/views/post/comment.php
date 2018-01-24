@@ -24,7 +24,7 @@ $this->fireEvent('BeforeCommentForm');
             <div class="Form-Body">
                 <div class="FormWrapper FormWrapper-Condensed">
                     <?php
-                    echo $this->Form->open(['id' => 'Form_Comment', "data-submit-type" => "comments"]);
+                    echo $this->Form->open(['id' => 'Form_Comment']);
                     echo $this->Form->errors();
                     $this->fireEvent('BeforeBodyField');
 

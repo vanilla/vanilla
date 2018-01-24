@@ -1,8 +1,8 @@
 <?php
 /**
- * @author Adam Charron <adam.c@vanillaforums.com>
+ * @author Adam (charrondev) Charron <adam.c@vanillaforums.com>
  * @copyright 2009-2018 Vanilla Forums Inc.
- * @license GPLv2
+ * @license @license https://opensource.org/licenses/GPL-2.0 GPL-2.0
  */
 
 namespace Vanilla;
@@ -44,7 +44,6 @@ class QuillOperation {
     /** @var array All attributes directly from the source. These shouldn't be used directly in rendering. */
     private $attributes = [];
 
-    private $newlineOnlyRegexp = "/^\\n$/";
     private $newlineStartRegexp = "/^\\n/";
     private $newlineEndRegexp = "/\\n$/";
 
@@ -59,7 +58,8 @@ class QuillOperation {
         }
 
         $this->attributes = val("attributes", $operationArray, []);
-        $this->listType = $this->getAttribute("list");
+        $this->listType = $this->getAttribute("list", self::LIST_TYPE_NONE);
+        $this->indent = $this->getAttribute("indent", 0);
 
         $isList = $this->listType;
         $isCodeBlock = $this->getAttribute("code-block");
@@ -152,11 +152,12 @@ class QuillOperation {
      * Get an attribute out of the operation by string name.
      *
      * @param string $name - The attribute to look up.
+     * @param bool $default - The default value to return if not found.
      *
      * @return mixed
      */
-    public function getAttribute(string $name) {
-        return val($name, $this->attributes);
+    public function getAttribute(string $name, $default = false) {
+        return val($name, $this->attributes, $default);
     }
 
     /**

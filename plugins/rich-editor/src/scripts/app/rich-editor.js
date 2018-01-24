@@ -1,7 +1,7 @@
-/**
- * @author Adam Charron <adam.c@vanillaforums.com>
+/*
+ * @author Adam (charrondev) Charron <adam.c@vanillaforums.com>
  * @copyright 2009-2018 Vanilla Forums Inc.
- * @license GPLv2
+ * @license @license https://opensource.org/licenses/GPL-2.0 GPL-2.0
  */
 
 import events from "@core/events";

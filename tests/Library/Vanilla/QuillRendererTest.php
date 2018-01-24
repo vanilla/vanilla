@@ -21,33 +21,25 @@ class QuillRendererTest extends TestCase {
         $this->renderer = new QuillRenderer();
     }
 
-    private function renderFixtureDirectory($dirname) {
-        $fixturePath = realpath("../../fixtures/editor-rendering/".$dirname);
+    /**
+     * @dataProvider directoryProvider
+     */
+    public function testRenderDelta($dirname) {
+        $fixturePath = realpath(__DIR__."/../../fixtures/editor-rendering/".$dirname);
 
-        $input = file_get_contents(realpath($fixturePath . "/input.json"));
-        $expectedOutput = trim(file_get_contents(realpath($fixturePath . "/output.html")));
+        $input = file_get_contents($fixturePath . "/input.json");
+        $expectedOutput = trim(file_get_contents($fixturePath . "/output.html"));
 
         $output = $this->renderer->renderDelta($input);
         $this->assertEquals($expectedOutput, $output);
     }
 
-    public function testRenderParagraphs() {
-        $this->renderFixtureDirectory("paragraphs");
-    }
-
-    public function testRenderHeadings() {
-        $this->renderFixtureDirectory("headings");
-    }
-
-    public function testRenderInline() {
-        $this->renderFixtureDirectory("inline-formatting");
-    }
-
-    public function testRenderLists() {
-        $this->renderFixtureDirectory("lists");
-    }
-
-    public function testRenderEverything() {
-        $this->renderFixtureDirectory("everything");
+    public function directoryProvider() {
+        return [
+            ["paragraphs"],
+            ["headings"],
+            ["lists"],
+            ["everything"],
+        ];
     }
 }

@@ -1,8 +1,8 @@
 <?php
 /**
- * @author Adam Charron <adam.c@vanillaforums.com>
+ * @author Adam (charrondev) Charron <adam.c@vanillaforums.com>
  * @copyright 2009-2018 Vanilla Forums Inc.
- * @license GPLv2
+ * @license @license https://opensource.org/licenses/GPL-2.0 GPL-2.0
  */
 
 namespace Vanilla;
@@ -29,6 +29,9 @@ class QuillBlock {
 
     /** @var int */
     private $indentLevel = 0;
+
+    /** @var string  */
+    private $blockType = self::TYPE_PARAGRAPH;
 
     /**
      * QuillBlock constructor.
@@ -57,6 +60,13 @@ class QuillBlock {
             }
             $this->blockType = self::TYPE_PARAGRAPH;
         }
+    }
+
+    /**
+     * @return string
+     */
+    public function getBlockType(): string {
+        return $this->blockType;
     }
 
     /**

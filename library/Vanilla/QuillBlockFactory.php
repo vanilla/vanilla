@@ -1,8 +1,8 @@
 <?php
 /**
- * @author Adam Charron <adam.c@vanillaforums.com>
+ * @author Adam (charrondev) Charron <adam.c@vanillaforums.com>
  * @copyright 2009-2018 Vanilla Forums Inc.
- * @license GPLv2
+ * @license @license https://opensource.org/licenses/GPL-2.0 GPL-2.0
  */
 
 namespace Vanilla;
@@ -36,7 +36,7 @@ class QuillBlockFactory {
         $this->operations = $operations;
         $this->operations[] = new QuillOperation([]);
 
-        foreach($operations as $currentIndex => $operation) {
+        foreach ($operations as $currentIndex => $operation) {
             if ($this->blockStartIndex < 0) {
                 $this->blockStartIndex = $currentIndex;
             }
@@ -44,6 +44,9 @@ class QuillBlockFactory {
             $this->parseNewLine($operation);
             $this->parseBackProperties($operation);
         }
+
+        $this->currentIndex = count($operations);
+        $this->clearBlock();
     }
 
     /**
@@ -56,7 +59,7 @@ class QuillBlockFactory {
     /**
      * Reset the properties we know about the current block.
      *
-     * @param int $index
+     * @param int $index - The block index to set thin
      */
     private function resetBlock($index = -1) {
         // Add the current block the blocks array.
@@ -86,10 +89,15 @@ class QuillBlockFactory {
     private function parseNewLine(QuillOperation &$operation) {
         switch ($operation->getNewlineType()) {
             case QuillOperation::NEWLINE_TYPE_ATTRIBUTOR:
-                // The previous block is complete including this operation.
-                if ($operation->getListType() === QuillOperation::LIST_TYPE_NONE) {
+                $isListItem = $operation->getListType() !== QuillOperation::LIST_TYPE_NONE;
+                $isStartingNewListType = $this->currentListType === QuillOperation::LIST_TYPE_NONE && $isListItem;
+                $isContinuingActiveListType = $this->currentListType !== QuillOperation::LIST_TYPE_NONE
+                    && $operation->getListType() === $this->currentListType;
+                if ($isStartingNewListType || $isContinuingActiveListType) {
                     return;
                 }
+
+                // The previous block is complete including this operation.
                 $this->clearBlock();
                 $this->resetBlock();
                 break;
@@ -138,16 +146,18 @@ class QuillBlockFactory {
             ? $this->operations[$this->currentIndex + 1]
             : false;
 
-        if ($nextOp && $nextOp->getListType() === QuillOperation::LIST_TYPE_NONE) {
-            $listType =  $nextOp->getListType();
+        if ($nextOp) {
+            $nextListType = $nextOp->getListType();
 
-            $currentOperation->setListType($listType);
+            $currentOperation->setListType($nextListType);
 
-            if ($listType !== $this->currentListType) {
+            $nextListTypeIsNotNone = $nextListType !== QuillOperation::LIST_TYPE_NONE;
+            $nextListTypeWillChange = $nextListType !== $this->currentListType;
+            if ($nextListTypeIsNotNone && $nextListTypeWillChange) {
                 // The previous block is complete with the last operation. This operation is it's own block.
                 $this->clearBlock(false);
                 $this->resetBlock($this->currentIndex);
-                $this->currentListType = $listType;
+                $this->currentListType = $nextListType;
             }
         }
 

@@ -95,7 +95,7 @@ class QuillOperation {
     /**
      * @param string $content
      */
-    public function setContent(string $content): void {
+    public function setContent(string $content) {
         $this->content = $content;
     }
 
@@ -116,7 +116,7 @@ class QuillOperation {
     /**
      * @param string $listType
      */
-    public function setListType(string $listType): void {
+    public function setListType(string $listType) {
         $this->listType = $listType;
     }
 
@@ -130,7 +130,7 @@ class QuillOperation {
     /**
      * @param string $newlineType
      */
-    public function setNewlineType(string $newlineType): void {
+    public function setNewlineType(string $newlineType) {
         $this->newlineType = $newlineType;
     }
 
@@ -144,7 +144,7 @@ class QuillOperation {
     /**
      * @param int $indent
      */
-    public function setIndent(int $indent): void {
+    public function setIndent(int $indent) {
         $this->indent = $indent;
     }
 

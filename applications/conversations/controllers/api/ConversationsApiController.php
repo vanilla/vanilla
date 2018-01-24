@@ -225,12 +225,12 @@ class ConversationsApiController extends AbstractApiController {
                 'default' => 'participating'
             ],
             'page:i?' => [
-                'description' => 'Page number.',
+                'description' => 'Page number. See [Pagination](https://docs.vanillaforums.com/apiv2/#pagination).',
                 'default' => 1,
                 'minimum' => 1,
             ],
             'limit:i?' => [
-                'description' => 'The number of items per page.',
+                'description' => 'Desired number of items per page.',
                 'default' => 5,
                 'minimum' => 5,
                 'maximum' => 100
@@ -293,12 +293,12 @@ class ConversationsApiController extends AbstractApiController {
             'insertUserID:i?' => 'Filter by author.',
             'participantUserID:i?' => 'Filter by participating user. (Has no effect if insertUserID is used)',
             'page:i?' => [
-                'description' => 'Page number.',
+                'description' => 'Page number. See [Pagination](https://docs.vanillaforums.com/apiv2/#pagination).',
                 'default' => 1,
                 'minimum' => 1,
             ],
             'limit:i?' => [
-                'description' => 'The number of items per page.',
+                'description' => 'Desired number of items per page.',
                 'default' => $this->config->get('Conversations.Conversations.PerPage', 50),
                 'minimum' => 1,
                 'maximum' => 100

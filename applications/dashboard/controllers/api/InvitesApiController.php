@@ -140,13 +140,13 @@ class InvitesApiController extends AbstractApiController {
 
         $in = $this->schema([
             'page:i?' => [
-                'description' => 'Page number.',
+                'description' => 'Page number. See [Pagination](https://docs.vanillaforums.com/apiv2/#pagination).',
                 'default' => 1,
                 'minimum' => 1,
                 'maximum' => 100
             ],
             'limit:i?' => [
-                'description' => 'The number of items per page.',
+                'description' => 'Desired number of items per page.',
                 'default' => 30,
                 'minimum' => 1,
                 'maximum' => 100

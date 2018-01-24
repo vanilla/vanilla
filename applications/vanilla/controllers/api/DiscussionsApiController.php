@@ -458,7 +458,10 @@ class DiscussionsApiController extends AbstractApiController {
         $isWhereOptimized = (isset($where['d.CategoryID']) && ($whereCount === 1 || ($whereCount === 2 && isset($where['Announce']))));
         if ($whereCount === 0 || $isWhereOptimized) {
             $paging = ApiUtils::numberedPagerInfo($this->discussionModel->getCount($where), '/api/v2/discussions', $query, $in);
-            $breadcrumbs = $this->categoryModel->getApiBreadcrumbs($where['d.CategoryID']);
+
+            if (!empty($query['categoryID'])) {
+                $breadcrumbs = $this->categoryModel->getApiBreadcrumbs($query['categoryID']);
+            }
         } else {
             $paging = ApiUtils::morePagerInfo($rows, '/api/v2/discussions', $query, $in);
         }

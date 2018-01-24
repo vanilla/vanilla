@@ -587,6 +587,10 @@ class CategoriesController extends VanillaController {
             $Subtree = CategoryModel::getSubtree($Category, false);
             $CategoryIDs = array_column($Subtree, 'CategoryID');
             $Categories = $this->CategoryModel->getFull($CategoryIDs)->resultArray();
+        } elseif ($this->data('Followed')) {
+            $Categories = $this->CategoryModel->getWhere(['Followed' => true])->resultArray();
+            $Categories = array_column($Categories, null, 'CategoryID');
+            $Categories = $this->CategoryModel->flattenCategories($Categories);
         } else {
             $Categories = $this->CategoryModel->getFull()->resultArray();
         }

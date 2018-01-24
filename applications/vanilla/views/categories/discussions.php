@@ -1,5 +1,8 @@
 <?php if (!defined('APPLICATION')) exit();
 echo '<h1 class="H HomepageTitle">'.$this->data('Title').'</h1>';
+if (!$this->data('Category') && c('Vanilla.EnableCategoryFollowing')) {
+    echo '<div class="PageControls Top">'.categoryFilters().'</div>';
+}
 $ViewLocation = $this->fetchViewLocation('discussions', 'discussions');
 ?>
 <div class="Categories">

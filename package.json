@@ -31,7 +31,7 @@
         "mutationobserver-shim": "^0.3.2"
     },
     "scripts": {
-        "test": "cross-env NODE_ENV=test BABEL_ENV=test jest",
+        "test": "cross-env NODE_ENV=test BABEL_ENV=test jest --no-cache",
         "test:watch": "cross-env NODE_ENV=test BABEL_ENV=test jest --watch"
     },
     "jest": {

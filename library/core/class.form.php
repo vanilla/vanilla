@@ -2254,19 +2254,17 @@ PASSWORDMETER;
     public function addError($error, $fieldName = '') {
         if (is_string($error)) {
             $errorCode = $error;
-        } elseif (is_a($error, 'Gdn_UserException')) {
-            $errorCode = '@'.Gdn_Format::htmlFilter($error->getMessage());
         } elseif (is_a($error, 'Exception')) {
-            // Strip the extra information out of the exception.
-            $parts = explode('|', $error->getMessage());
-            $message = htmlspecialchars($parts[0]);
-            if (count($parts) >= 3) {
-                $fileSuffix = ": {$parts[1]}->{$parts[2]}(...)";
-            } else {
-                $fileSuffix = "";
-            }
-
             if (debug()) {
+                // Strip the extra information out of the exception.
+                $parts = explode('|', $error->getMessage());
+                $message = htmlspecialchars($parts[0]);
+                if (count($parts) >= 3) {
+                    $fileSuffix = ": {$parts[1]}->{$parts[2]}(...)";
+                } else {
+                    $fileSuffix = "";
+                }
+
                 $errorCode = '@<pre>'.
                     $message."\n".
                     '## '.$error->getFile().'('.$error->getLine().")".$fileSuffix."\n".

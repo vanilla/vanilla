@@ -255,7 +255,8 @@ class UserModel extends Gdn_Model {
         // Grab the permissions for the user.
         if ($user->UserID == 0) {
             $permissions = $this->getPermissions(0);
-        } elseif (is_array($user->Permissions)) {
+        } elseif (!Gdn::cache()->activeEnabled() && is_array($user->Permissions)) {
+            // Only attempt to use the DB field value if permissions aren't being cached elsewhere.
             $permissions = new Vanilla\Permissions($user->Permissions);
         } else {
             $permissions = $this->getPermissions($user->UserID);

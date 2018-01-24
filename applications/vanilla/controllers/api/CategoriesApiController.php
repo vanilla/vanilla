@@ -344,7 +344,13 @@ class CategoriesApiController extends AbstractApiController {
             $paging = [];
         }
 
-        return ApiUtils::setPageMeta($result, $paging);
+        $data = ApiUtils::setPageMeta($result, $paging);
+
+        if (!empty($query['parentCategoryID'])) {
+            $data->setMeta('breadcrumbs', $this->categoryModel->getApiBreadcrumbs($query['parentCategoryID']));
+        }
+
+        return $data;
     }
 
     /**

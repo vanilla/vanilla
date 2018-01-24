@@ -1952,6 +1952,65 @@ class CategoryModel extends Gdn_Model {
     }
 
     /**
+     * Get a category and its ancestors in a way suitable for breadcrumbs.
+     *
+     * @param int $categoryID The category to get the breadcrumbs for.
+     * @param bool $addSelf Whether or not to add a self relationship for the current category.
+     * @return array Returns an array of category breadcrumbs.
+     */
+    public function getApiBreadcrumbs(int $categoryID, $addSelf = true) {
+        $result = [];
+
+        $category = $this->getOne($categoryID);
+
+        if (!isset($category)) {
+            return $result;
+        }
+
+        $pluck = function ($category) use ($categoryID, $addSelf) {
+            $r = [
+                'name' => $category['Name'],
+                'url' => $category['Url'],
+                'recordType' => 'category',
+                'recordID' => (int)$category['CategoryID']
+            ];
+
+            if ($addSelf && $categoryID === $r['recordID']) {
+                $r['rel'] = 'self';
+            }
+
+            return $r;
+        };
+
+        // Build up the ancestor array by tracing back through parents.
+        if ($category['DisplayAs'] !== 'Heading') {
+            $result[$category['CategoryID']] = $pluck($category);
+        }
+
+        while ($category = $this->getOne($category['ParentCategoryID'])) {
+            // Check for an infinite loop.
+            if (isset($result[$category['CategoryID']])) {
+                break;
+            }
+
+            if ($category['CategoryID'] == -1) {
+                break;
+            }
+
+            if (!$category['PermsDiscussionsView']) {
+                $category = $this->getOne($category['ParentCategoryID']);
+                continue;
+            }
+
+            if ($category['DisplayAs'] !== 'Heading') {
+                $result[$category['CategoryID']] = $pluck($category);
+            }
+        }
+        $result = array_reverse($result, false); // order for breadcrumbs
+        return $result;
+    }
+
+    /**
      * Get all of the ancestor categories above this one.
      * @param int|string $Category The category ID or url code.
      * @param bool $checkPermissions Whether or not to only return the categories with view permission.

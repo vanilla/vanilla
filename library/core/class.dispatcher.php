@@ -260,7 +260,7 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
             // Now that the controller has been found, dispatch to a method on it.
             $this->dispatchController($request, $routeArgs);
         } else {
-            $response->render();
+            $this->dispatcher->render($request, $response);
         }
     }
 

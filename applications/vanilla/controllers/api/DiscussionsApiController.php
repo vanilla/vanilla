@@ -32,18 +32,23 @@ class DiscussionsApiController extends AbstractApiController {
     /** @var UserModel */
     private $userModel;
 
+    private $categoryModel;
+
     /**
      * DiscussionsApiController constructor.
      *
      * @param DiscussionModel $discussionModel
      * @param UserModel $userModel
+     * @param CategoryModel $categoryModel
      */
     public function __construct(
         DiscussionModel $discussionModel,
-        UserModel $userModel
+        UserModel $userModel,
+        CategoryModel $categoryModel
     ) {
         $this->discussionModel = $discussionModel;
         $this->userModel = $userModel;
+        $this->categoryModel = $categoryModel;
     }
 
     /**
@@ -206,8 +211,8 @@ class DiscussionsApiController extends AbstractApiController {
      *
      * @param int $id The ID of the discussion.
      * @param array $query The request query.
-     * @throws NotFoundException if the discussion could not be found.
-     * @return array
+     * @throws NotFoundException Throws an exception when the discussion cannot be found.
+     * @return Data
      */
     public function get($id, array $query) {
         $this->permission();
@@ -232,7 +237,7 @@ class DiscussionsApiController extends AbstractApiController {
 
         // Allow addons to modify the result.
         $result = $this->getEventManager()->fireFilter('discussionsApiController_get_output', $result, $this, $in, $query, $row);
-        return $result;
+        return new Data($result, ['breadcrumbs' => $this->categoryModel->getApiBreadcrumbs($result['categoryID'])]);
     }
 
     /**
@@ -453,11 +458,18 @@ class DiscussionsApiController extends AbstractApiController {
         $isWhereOptimized = (isset($where['d.CategoryID']) && ($whereCount === 1 || ($whereCount === 2 && isset($where['Announce']))));
         if ($whereCount === 0 || $isWhereOptimized) {
             $paging = ApiUtils::numberedPagerInfo($this->discussionModel->getCount($where), '/api/v2/discussions', $query, $in);
+            $breadcrumbs = $this->categoryModel->getApiBreadcrumbs($where['d.CategoryID']);
         } else {
             $paging = ApiUtils::morePagerInfo($rows, '/api/v2/discussions', $query, $in);
         }
 
-        return ApiUtils::setPageMeta($result, $paging);
+        $data = ApiUtils::setPageMeta($result, $paging);
+
+        if (isset($breadcrumbs)) {
+            $data->setMeta('breadcrumbs', $breadcrumbs);
+        }
+
+        return $data;
     }
 
     /**

@@ -164,7 +164,7 @@
     <ul class="richEditor-menuItems MenuItems" role="menubar">
         <li class="richEditor-menuItem" role="menuitem">
             <a href="#" class="richEditorLinkMenu-link">
-                <span class="richEditorLinkMenu-photoWrap">
+                <span class="PhotoWrap richEditorLinkMenu-photoWrap">
                     <img src="https://secure.gravatar.com/avatar/b0420af06d6fecc16fc88a88cbea8218/?default=https%3A%2F%2Fvanillicon.com%2Fb0420af06d6fecc16fc88a88cbea8218_200.png&amp;rating=g&amp;size=120" alt="Linc" class="richEditorLinkMenu-photo"/>
                 </span>
                 <span class="richEditorLinkMenu-userName">
@@ -179,53 +179,34 @@
 <h2>Link Menu</h2>
 <div class="richEditor-menu MenuItems richEditorInsertLinkMenu" role="dialog" aria-label="<?php echo 'Insert Url'; ?>">
     <input class="InputBox editor-input-url" placeholder="http://">
-
-
+    <a href="#" class="Close" aria-label="<?php echo t('Close'); ?>" role="button">
+        <span>×</span>
+    </a>
 </div>
 
 
 <h2>Insert Media</h2>
-<div class="richEditor-menu MenuItems richEditorInsertMediaMenu" role="dialog" aria-labeledby="tempId-insertMediaMenu">
-
-
-
-
-    <div class="editor-insert-dialog Flyout MenuItems editor-file-image" aria-hidden="false">
-        <div class="file-title">
-            Insert an image
-            <span class="js-can-drop info">you can also drag-and-drop</span>
-        </div>
-        <div class="dd-separator" role="presentation"></div>
-        <div class="file-input">
-            <input type="file" name="editorupload[]" multiple="" data-upload-type="image" accept=".jpg,.jpeg,.gif,.png,.bmp,.tiff,image/jpeg,image/pjpeg,image/jpeg,image/pjpeg,image/gif,image/png,image/bmp,image/x-windows-bmp,image/tiff,image/x-tiff">
-        </div>
-        <div class="dd-separator" role="presentation"></div>
-        <div class="image-input" title="Paste the URL of an image to quickly embed it.">
-            <input class="InputBox editor-input-image" placeholder="Image URL">
-        </div>
-    </div>
-
-
-
-
-
-
-
-
-
-
+<div class="richEditor-menu MenuItems richEditorInsertMediaMenu" role="dialog" aria-labeledby="tempId-insertMediaMenu-title" aria-describedby="tempId-insertMediaMenu-p">
     <div class="richEditorInsertMediaMenu-header">
-        <h2 id="tempId-insertMediaMenu" class="H">
+        <h2 id="tempId-insertMediaMenu-title" class="H richEditorInsertMediaMenu-title">
             Insert Media
         </h2>
-
+        <p id="tempId-insertMediaMenu-p" class="richEditorInsertMediaMenu-p">
+            <?php echo t('Paste the URL of the media you want.'); ?>
+        </p>
         <label class="">
-
+            <input class="InputBox editor-input-url" placeholder="http://">
         </label>
     </div>
 
     <div class="Footer">
-        <a href="#" class="Close">
+        <a href="#" aria-label="<?php echo t('Get Help on Inserting Media'); ?>">
+            Help
+        </a>
+        <div class="Buttons">
+            <input type="submit" class="Button Primary" value="<?php echo t('Insert'); ?>" aria-label="<?php echo t('Insert Media') ?>">
+        </div>
+        <a href="#" aria-label="<?php echo t('Close'); ?>" class="Close">
             <span>×</span>
         </a>
     </div>

@@ -62,8 +62,8 @@
 
 <h2>Paragraph Level Formatting Menu</h2>
 
-<div class="richEditor-menu">
-    <ul class="richEditor-menuItems MenuItems" role="menubar" aria-label="<?php echo t('Paragraph Level Formatting Menu'); ?>">
+<div class="richEditor-menu" role="dialog" aria-label="<?php echo t('Paragraph Level Formatting Menu') ?>">
+    <ul class="richEditor-menuItems MenuItems" role="menubar">
         <li class="richEditor-menuItem" role="menuitem">
             <button class="richEditor-button" type="button">
                 <svg class="richEditorInline-icon" viewBox="0 0 24 24">
@@ -113,7 +113,7 @@
 
 <h2>Inline Level Formatting Menu</h2>
 
-<div class="richEditor-menu richEditorInlineMenu">
+<div class="richEditor-menu richEditorInlineMenu" role="dialog" aria-label="<?php echo t('Inline Level Formatting Menu') ?>">
     <ul class="richEditor-menuItems MenuItems" role="menubar" aria-label="<?php echo t('Inline Level Formatting Menu'); ?>">
         <li class="richEditor-menuItem" role="menuitem">
             <button class="richEditor-button" type="button">
@@ -159,18 +159,78 @@
 </div>
 <hr/>
 
-<!--<h2>@mention menu</h2>-->
-<!--<div class="richEditor-menu richEditorLinkMenu">-->
-<!--    <ul class="richEditor-menuItems MenuItems" role="menubar" aria-label="--><?php //echo t('@mention'); ?><!--">-->
-<!--        <li class="richEditor-menuItem" role="menuitem">-->
-<!--            <a href="#" class="richEditorLinkMenu-link">-->
-<!--                <span class="richEditorLinkMenu-photoWrap">-->
-<!--                    <img src="https://secure.gravatar.com/avatar/b0420af06d6fecc16fc88a88cbea8218/?default=https%3A%2F%2Fvanillicon.com%2Fb0420af06d6fecc16fc88a88cbea8218_200.png&amp;rating=g&amp;size=120" alt="Linc" class="richEditorLinkMenu-photo"/>-->
-<!--                </span>-->
-<!--                <span class="richEditorLinkMenu-userName">-->
-<!--                    <mark class="richEditorLinkMenu-mark">Fra</mark>nk-->
-<!--                </span>-->
-<!--            </a>-->
-<!--        </li>-->
-<!--    </ul>-->
-<!--</div>-->
+<h2>@mention menu</h2>
+<div class="richEditor-menu richEditorLinkMenu" role="dialog" aria-label="<?php echo t('Insert @Mention User Link') ?>">
+    <ul class="richEditor-menuItems MenuItems" role="menubar">
+        <li class="richEditor-menuItem" role="menuitem">
+            <a href="#" class="richEditorLinkMenu-link">
+                <span class="richEditorLinkMenu-photoWrap">
+                    <img src="https://secure.gravatar.com/avatar/b0420af06d6fecc16fc88a88cbea8218/?default=https%3A%2F%2Fvanillicon.com%2Fb0420af06d6fecc16fc88a88cbea8218_200.png&amp;rating=g&amp;size=120" alt="Linc" class="richEditorLinkMenu-photo"/>
+                </span>
+                <span class="richEditorLinkMenu-userName">
+                    <mark class="richEditorLinkMenu-mark">Fra</mark>nk
+                </span>
+            </a>
+        </li>
+    </ul>
+</div>
+
+
+<h2>Link Menu</h2>
+<div class="richEditor-menu MenuItems richEditorInsertLinkMenu" role="dialog" aria-label="<?php echo 'Insert Url'; ?>">
+    <input class="InputBox editor-input-url" placeholder="http://">
+
+
+</div>
+
+
+<h2>Insert Media</h2>
+<div class="richEditor-menu MenuItems richEditorInsertMediaMenu" role="dialog" aria-labeledby="tempId-insertMediaMenu">
+
+
+
+
+    <div class="editor-insert-dialog Flyout MenuItems editor-file-image" aria-hidden="false">
+        <div class="file-title">
+            Insert an image
+            <span class="js-can-drop info">you can also drag-and-drop</span>
+        </div>
+        <div class="dd-separator" role="presentation"></div>
+        <div class="file-input">
+            <input type="file" name="editorupload[]" multiple="" data-upload-type="image" accept=".jpg,.jpeg,.gif,.png,.bmp,.tiff,image/jpeg,image/pjpeg,image/jpeg,image/pjpeg,image/gif,image/png,image/bmp,image/x-windows-bmp,image/tiff,image/x-tiff">
+        </div>
+        <div class="dd-separator" role="presentation"></div>
+        <div class="image-input" title="Paste the URL of an image to quickly embed it.">
+            <input class="InputBox editor-input-image" placeholder="Image URL">
+        </div>
+    </div>
+
+
+
+
+
+
+
+
+
+
+    <div class="richEditorInsertMediaMenu-header">
+        <h2 id="tempId-insertMediaMenu" class="H">
+            Insert Media
+        </h2>
+
+        <label class="">
+
+        </label>
+    </div>
+
+    <div class="Footer">
+        <a href="#" class="Close">
+            <span>×</span>
+        </a>
+    </div>
+</div>
+
+
+
+

@@ -29,4 +29,11 @@ function setupCommentForm() {
     if (commentFormContainer) {
         new RichEditor(commentFormContainer);
     }
+
+    $(document).on("EditCommentFormLoaded", (event, container) => {
+        const $commentFormContainer = $(container).find(".js-richText");
+        if ($commentFormContainer) {
+            new RichEditor($commentFormContainer[0]);
+        }
+    });
 }

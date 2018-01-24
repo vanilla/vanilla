@@ -81,7 +81,6 @@ export default class RichEditor {
         }
 
         this.editor.on("text-change", this.synchronizeDelta.bind(this));
-        this.initSpaceToLinkConverter();
     }
 
     /**

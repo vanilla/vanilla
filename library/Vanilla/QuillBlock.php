@@ -55,7 +55,7 @@ class QuillBlock {
         } else {
             foreach ($this->operations as $op) {
                 if ($op->getIndent() > 0) {
-                    $this->indent = $op->getIndent();
+                    $this->indentLevel = $op->getIndent();
                 }
             }
             $this->blockType = self::TYPE_PARAGRAPH;

@@ -61,7 +61,7 @@ class QuillOperation {
         $this->listType = $this->getAttribute("list", self::LIST_TYPE_NONE);
         $this->indent = $this->getAttribute("indent", 0);
 
-        $isList = $this->listType;
+        $isList = $this->listType !== self::LIST_TYPE_NONE;
         $isCodeBlock = $this->getAttribute("code-block");
         $isQuote = $this->getAttribute("blockquote");
         $isHeader = $this->getAttribute("header");

@@ -45,8 +45,10 @@ class QuillBlockFactory {
             $this->parseBackProperties($operation);
         }
 
+        // Clear the last block.
         $this->currentIndex = count($operations);
-        $this->clearBlock();
+
+        $this->clearBlock(false);
     }
 
     /**
@@ -74,6 +76,9 @@ class QuillBlockFactory {
      * @param bool $includeSelf Whether or not the newly created block should contain the current operation.
      */
     public function clearBlock($includeSelf = true) {
+        if ($this->blockStartIndex < 0) {
+            return;
+        }
         $length = $this->currentIndex - $this->blockStartIndex;
         if($includeSelf) {
             $length += 1;
@@ -110,23 +115,26 @@ class QuillBlockFactory {
                 // Close the block including this item.
                 $this->clearBlock();
                 $this->resetBlock();
+
+                if ($this->currentListType !== QuillOperation::LIST_TYPE_NONE) {
+                    // Add a newline block
+                    $this->blocks[] = self::generateNewLineBlock();
+                }
                 break;
             case QuillOperation::NEWLINE_TYPE_START:
                 // The previous block is complete before this operation. Close the old one.
                 $this->clearBlock(false);
                 $this->resetBlock();
 
+                $nextOp = $this->operations[$this->currentIndex + 1];
+                $isQuoteText = $nextOp && $nextOp->getAttribute("blockquote");
+
                 // Don't add the newline block for quotes.
-                // Clone off a newline op.
-                $newlineOp = clone $operation;
-                $newlineOp->setContent("\n");
-                $newlineOp->setNewlineType(QuillOperation::NEWLINE_TYPE_ONLY);
+                if (!$isQuoteText) {
+                    $this->blocks[] = self::generateNewLineBlock();
+                }
 
-                // Create a new block with just the newline.
-                $this->blocks[] = new QuillBlock([$newlineOp]);
-
-                // Strip the newline off the operation.
-                $operation->setContent(ltrim($operation->getContent(), "\n"));
+                // Replace the newline attribute and try again
                 $operation->setNewlineType(QuillOperation::NEWLINE_TYPE_NONE);
                 $this->resetBlock($this->currentIndex);
                 break;
@@ -164,5 +172,14 @@ class QuillBlockFactory {
         if ($nextOp && $nextOp->getIndent()) {
             $currentOperation->setIndent($nextOp->getIndent());
         }
+    }
+
+    /**
+     * Generate a block with only a newline op.
+     *
+     * @return QuillBlock
+     */
+    private static function generateNewLineBlock(): QuillBlock {
+        return new QuillBlock([new QuillOperation(["insert" => "\n"])]);
     }
 }

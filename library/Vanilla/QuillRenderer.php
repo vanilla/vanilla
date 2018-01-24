@@ -169,7 +169,7 @@ class QuillRenderer {
             $tags[] = ["name" => "em"];
         }
 
-        if ($operation->getAttribute("italic")) {
+        if ($operation->getAttribute("strike")) {
             $tags[] = ["name" => "s"];
         }
 

@@ -193,13 +193,13 @@ class CategoriesApiController extends AbstractApiController {
         $in = $this->schema([
             'query:s' => 'Category name filter.',
             'page:i?' => [
-                'description' => 'Page number.',
+                'description' => 'Page number. See [Pagination](https://docs.vanillaforums.com/apiv2/#pagination).',
                 'default' => 1,
                 'minimum' => 1,
                 'maximum' => $this->categoryModel->getMaxPages()
             ],
             'limit:i?' => [
-                'description' => 'The number of items per page.',
+                'description' => 'Desired number of items per page.',
                 'default' => $this->categoryModel->getDefaultLimit(),
                 'minimum' => 1,
                 'maximum' => 200
@@ -269,13 +269,13 @@ class CategoriesApiController extends AbstractApiController {
                 'default' => 2,
             ],
             'page:i?' => [
-                'description' => 'The page number. Works with flat and followed categories.',
+                'description' => 'Page number. Works with flat and followed categories. See [Pagination](https://docs.vanillaforums.com/apiv2/#pagination)',
                 'default' => 1,
                 'minimum' => 1,
                 'maximum' => $this->categoryModel->getMaxPages(),
             ],
             'limit:i?' => [
-                'description' => 'The number of items per page.',
+                'description' => 'Desired number of items per page.',
                 'default' => $this->categoryModel->getDefaultLimit(),
                 'minimum' => 1,
                 'maximum' => 100,

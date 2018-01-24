@@ -57,13 +57,13 @@ class DiscussionsApiController extends AbstractApiController {
 
         $in = $this->schema([
             'page:i?' => [
-                'description' => 'Page number.',
+                'description' => 'Page number. See [Pagination](https://docs.vanillaforums.com/apiv2/#pagination).',
                 'default' => 1,
                 'minimum' => 1,
                 'maximum' => $this->discussionModel->getMaxPages()
             ],
             'limit:i?' => [
-                'description' => 'The number of items per page.',
+                'description' => 'Desired number of items per page.',
                 'default' => $this->discussionModel->getDefaultLimit(),
                 'minimum' => 1,
                 'maximum' => 100
@@ -378,13 +378,13 @@ class DiscussionsApiController extends AbstractApiController {
                 'enum' => ['first', 'mixed'],
             ],
             'page:i?' => [
-                'description' => 'Page number.',
+                'description' => 'Page number. See [Pagination](https://docs.vanillaforums.com/apiv2/#pagination).',
                 'default' => 1,
                 'minimum' => 1,
                 'maximum' => $this->discussionModel->getMaxPages()
             ],
             'limit:i?' => [
-                'description' => 'The number of items per page.',
+                'description' => 'Desired number of items per page.',
                 'default' => $this->discussionModel->getDefaultLimit(),
                 'minimum' => 1,
                 'maximum' => 100

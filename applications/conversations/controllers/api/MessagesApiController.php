@@ -171,12 +171,12 @@ class MessagesApiController extends AbstractApiController {
                 'conversationID:i?'=> 'Filter by conversation.',
                 'insertUserID:i?' => 'Filter by author.',
                 'page:i?' => [
-                    'description' => 'Page number.',
+                'description' => 'Page number. See [Pagination](https://docs.vanillaforums.com/apiv2/#pagination).',
                     'default' => 1,
                     'minimum' => 1,
                 ],
                 'limit:i?' => [
-                    'description' => 'The number of items per page.',
+                    'description' => 'Desired number of items per page.',
                     'default' => $this->config->get('Conversations.Messages.PerPage', 50),
                     'minimum' => 1,
                     'maximum' => 100

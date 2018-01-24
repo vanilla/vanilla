@@ -145,7 +145,6 @@ $dic->setInstance('Garden\Container\Container', $dic)
         return new \Garden\Web\PreflightRoute('/api/v2', true);
     })])
     ->addCall('setAllowedOrigins', ['isTrustedDomain'])
-    ->addCall('addRoute', ['route' => new Reference('@api-v2-route-html'), 'api-v2-html'])
 
     ->rule('@api-v2-route')
     ->setClass(\Garden\Web\ResourceRoute::class)
@@ -155,7 +154,7 @@ $dic->setInstance('Garden\Container\Container', $dic)
     // Temporary HTML route to develop new views.
     ->rule('@api-v2-route-html')
     ->setClass(\Garden\Web\ResourceRoute::class)
-    ->setConstructorArgs(['/html/', ['*\\%sPageController', '*\\Pages\\%sController', '*\\%sApiController']])
+    ->setConstructorArgs(['/', ['*\\%sPageController', '*\\Pages\\%sController', '*\\%sApiController']])
     ->addCall('setMeta', ['CONTENT_TYPE', 'text/html'])
     ->addCall('setDefault', ['query', ['expand' => true]])
 
@@ -289,6 +288,12 @@ $dic->call(function (
 
     // Re-apply loaded user settings.
     $config->overlayDynamic();
+
+    // Set up routing for new themes.
+    if ($addonManager->getAddonInfoValue($addonManager->getTheme(), 'themeEngine') === 'v2') {
+        $dic->rule(\Garden\Web\Dispatcher::class)
+            ->addCall('addRoute', ['route' => new Reference('@api-v2-route-html'), 'api-v2-html']);
+    }
 
     /**
      * Bootstrap Late

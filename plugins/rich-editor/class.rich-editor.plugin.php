@@ -1,6 +1,8 @@
 <?php
 /**
- * @copyright Copyright 2008, 2009 Vanilla Forums Inc.
+ * @author Adam Charron <adam.c@vanillaforums.com>
+ * @copyright 2009-2018 Vanilla Forums Inc.
+ * @license GPLv2
  */
 
 class RichEditorPlugin extends Gdn_Plugin {

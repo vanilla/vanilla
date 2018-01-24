@@ -117,8 +117,8 @@ class QuillBlockFactory {
                 // Create a new block with just the newline.
                 $this->blocks[] = new QuillBlock([$newlineOp]);
 
-                // Strip the newline off the of the block.
-                $operation->setContent(preg_replace("/^\\n/", "", $operation->getContent()));
+                // Strip the newline off the operation.
+                $operation->setContent(ltrim($operation->getContent(), "\n"));
                 $operation->setNewlineType(QuillOperation::NEWLINE_TYPE_NONE);
                 $this->resetBlock($this->currentIndex);
                 break;

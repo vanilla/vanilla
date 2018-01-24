@@ -67,7 +67,7 @@ class QuillOperation {
         $isHeader = $this->getAttribute("header");
 
         // Parse new lines.
-        if (preg_match($this->newlineOnlyRegexp, $this->content)) {
+        if ($this->content === "\n") {
             $this->newline = self::NEWLINE_TYPE_ONLY;
             if ($isList || $isCodeBlock || $isQuote || $isHeader) {
                 $this->stripStartingNewLine();
@@ -163,13 +163,13 @@ class QuillOperation {
      * Strip off a starting newline character from the objects content.
      */
     private function stripStartingNewLine() {
-        $this->content = preg_replace($this->newlineStartRegexp, "", $this->content);
+        $this->content = ltrim($this->content, "\n");
     }
 
     /**
      * Strip off a trailing newline character from the objects content.
      */
     private function stripEndingNewLine() {
-        $this->content = preg_replace($this->newlineEndRegexp, "", $this->content);
+        $this->content = rtrim($this->content, "\n");
     }
 }

@@ -98,6 +98,7 @@ class QuillBlock {
         foreach ($this->operations as $op) {
             if ($op->getAttribute($attributeName)) {
                 $result = $op->getAttribute($attributeName);
+                break;
             }
         }
 

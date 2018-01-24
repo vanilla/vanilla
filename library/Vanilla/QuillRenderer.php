@@ -74,11 +74,11 @@ class QuillRenderer {
 
                 foreach ($block->getOperations() as $op) {
                     // Replace only a newline with just a break.
-                    $op->setContent(preg_replace("/^\\n$/", "<br>", $op->getContent()));
-                    // Replace double newlines with an opening and closing <p> tags and a <br> tag.
+                    $op->setContent(str_replace("\n", "<br>", $op->getContent()));
+                    // Replace 2 or more newlines with an opening and closing <p> tags and a <br> tag.
                     $op->setContent(preg_replace("/[\\n]{2,}/", "</p><p><br></p><p>", $op->getContent()));
                     // Replace all newlines with opening and closing <p> tags.
-                    $op->setContent(preg_replace("/\\n/", "</p><p>", $op->getContent()));
+                    $op->setContent(str_replace("\n", "</p><p>", $op->getContent()));
                 }
 
                 if ($block->getIndentLevel() > 0) {

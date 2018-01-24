@@ -762,6 +762,10 @@ class Addon {
             }
         }
 
+        if (preg_match('`-(addon|theme|locale)$`', $rawKey)) {
+            $issues['invalid-key-suffix'] = "The addon key cannot end with -addon, -theme, or -locale.";
+        }
+
         if (!empty($this->special['otherPlugins'])) {
             $plugins = implode(', ', array_merge([$this->special['plugin']], $this->special['otherPlugins']));
             $issues['multiple-plugins'] = "The addon should have at most one plugin class ($plugins).";
@@ -808,6 +812,37 @@ class Addon {
      */
     public function getKey() {
         return empty($this->info['key']) ? '' : $this->info['key'];
+    }
+
+    /**
+     * Get the global key of an addon.
+     *
+     * This method allows addons of all types to be keyed in a global namespace.
+     *
+     * Addons of type "addon" use their key as their global key. All other types have the "-<type>" suffix.
+     *
+     * @return string Returns a string key.
+     */
+    public function getGlobalKey(): string {
+        if ($this->getType() === Addon::TYPE_ADDON) {
+            return $this->getKey();
+        } else {
+            return $this->getKey().'-'.$this->getType();
+        }
+    }
+
+    /**
+     * Split a global key into an addon key and type.
+     *
+     * @param string $key They key to split.
+     * @return string[2] Returns an array in the form [key, type].
+     */
+    public static function splitGlobalKey(string $key): array {
+        if (preg_match('`^(.+)-(locale|theme)$`', $key, $m)) {
+            return [$m[1], $m[2]];
+        } else {
+            return [$key, Addon::TYPE_ADDON];
+        }
     }
 
     /**

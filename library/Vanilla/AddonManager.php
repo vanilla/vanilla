@@ -513,6 +513,10 @@ class AddonManager {
      * @return Addon|null Returns an addon object or null if one isn't found.
      */
     private function lookupSingleCachedAddon($addonDirName, $type) {
+        if (empty($addonDirName)) {
+            return null;
+        }
+
         // Look at our in-request cache.
         if (isset($this->singleCache[$type][$addonDirName])) {
             $result = $this->singleCache[$type][$addonDirName];
@@ -923,6 +927,30 @@ class AddonManager {
     }
 
     /**
+     * Lookup an addon info value, looking through parent addons.
+     *
+     * @param Addon $addon The base addon to look up.
+     * @param string $key The info value key.
+     * @param mixed $default The default value of the info value is not found.
+     */
+    public function getAddonInfoValue(Addon $addon, string $key, $default = null) {
+        $loop = [];
+
+        for ($a = $addon; $a !== null; $a = $this->lookupByType($a->getInfoValue('parent', ''), $a->getType())) {
+            // Check for infinite loops.
+            if (isset($loop[$a->getGlobalKey()])) {
+                return $default;
+            }
+
+            if (null !== $value = $a->getInfoValue($key)) {
+                return $value;
+            }
+        }
+
+        return $default;
+    }
+
+    /**
      * Get the theme.
      *
      * @return Addon|null Returns the theme.
@@ -1080,6 +1108,16 @@ class AddonManager {
             }
         }
         return $count;
+    }
+
+    /**
+     *  Lookup an addon by global key.
+     *
+     * @param string $globalKey The global key of the addon.
+     * @return null|Addon Returns the addon or **null** if one isn't found.
+     */
+    public function lookup(string $globalKey) {
+        return $this->lookupByType(...Addon::splitGlobalKey($globalKey));
     }
 
     /**

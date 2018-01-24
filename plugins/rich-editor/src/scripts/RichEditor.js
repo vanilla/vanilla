@@ -98,38 +98,4 @@ export default class RichEditor {
 
         return;
     }
-
-    initSpaceToLinkConverter() {
-        // @ts-ignore
-        this.editor.keyboard.addBinding({
-            collapsed: true,
-            key: ' ',
-            prefix: /https?:\/\/[^\s]+/, // call handler only when matched this regex
-            handler: (() => {
-                let prevOffset = 0;
-                return (range) => {
-                    let url;
-                    const regex = /https?:\/\/[^\s]+/g;
-                    const text = this.editor.getText(prevOffset, range.index);
-                    const match = text.match(regex);
-                    if (match === null) {
-                        prevOffset = range.index;
-                        return true;
-                    }
-                    if (match.length > 1) {
-                        url = match[match.length - 1];
-                    } else {
-                        url = match[0];
-                    }
-                    const ops = [];
-                    ops.push({retain: range.index - url.length});
-                    ops.push({delete: url.length});
-                    ops.push({insert: url, attributes: {link: url}});
-                    this.editor.updateContents({ops});
-                    prevOffset = range.index;
-                    return true;
-                };
-            }),
-        });
-    }
 }

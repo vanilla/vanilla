@@ -1361,7 +1361,7 @@ jQuery(document).ready(function($) {
 
 
         // Verify we have a valid videoid
-        var pattern = /^[\w-]+(\?autoplay\=1)(\&start=[\w-]+)?$/;
+        var pattern = /^[\w-]+(\?autoplay\=1)(\&start=[\w-]+)?(\&rel=.)?$/;
         if (!pattern.test(videoid)) {
             return false;
         }

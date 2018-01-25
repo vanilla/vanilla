@@ -1,0 +1,16 @@
+// Fixes for the image cropper
+
+.box-crop .box-source {
+    max-width: 100%;
+    overflow: auto;
+}
+
+@media screen and (max-width: 600px) {
+    .box-crop .box-source {
+        display: none;
+    }
+
+    .change-picture .thumbnail-message {
+        display: none;
+    }
+}

@@ -163,8 +163,9 @@ window.vanilla.embed = function(host) {
         } else if (message[0] == 'unload') {
             // Scroll to the top of the IFRAME if the top position is not in the view.
             var currentScrollAmount = (window.pageYOffset || document.documentElement.scrollTop);
-            if (offsetFromTop('vanilla' + id) - currentScrollAmount < 0) {
-                document.getElementById('vanilla' + id).scrollIntoView(true);
+            var offsetTop = offsetFromTop('vanilla' + id);
+            if (offsetTop - currentScrollAmount < 0) {
+                window.scrollTo(0, offsetTop);
             }
 
             iframe.style.visibility = "hidden";

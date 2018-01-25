@@ -416,6 +416,10 @@ if (!function_exists('categoryFilters')) {
      * @return string
      */
     function categoryFilters($extraClasses = '') {
+        if (!Gdn::session()->isValid()) {
+            return;
+        }
+
         $baseUrl = url('categories');
         $filters = [['name' => 'Following', 'param' => 'followed']];
 
@@ -707,6 +711,10 @@ if (!function_exists('discussionFilters')) {
      * @return string
      */
     function discussionFilters($extraClasses = '') {
+        if (!Gdn::session()->isValid()) {
+            return;
+        }
+
         $baseUrl = url('discussions');
         $filters = [['name' => 'Following', 'param' => 'followed']];
 

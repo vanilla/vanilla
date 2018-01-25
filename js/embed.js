@@ -161,7 +161,9 @@ window.vanilla.embed = function(host) {
                 }
             }
         } else if (message[0] == 'unload') {
-            if (window.attachEvent || scrollPosition('vanilla' + id) < 0) {
+            // Scroll to the top of the IFRAME if the top position is not in the view.
+            var currentScrollAmount = (window.pageYOffset || document.documentElement.scrollTop);
+            if (scrollPosition('vanilla' + id) - currentScrollAmount < 0) {
                 document.getElementById('vanilla' + id).scrollIntoView(true);
             }
 

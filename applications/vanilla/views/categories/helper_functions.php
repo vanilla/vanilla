@@ -354,6 +354,11 @@ if (!function_exists('writeCategoryList')):
      * @param int $depth
      */
     function writeCategoryList($categories, $depth = 1) {
+        if (empty($categories)) {
+            echo '<div class="Empty">'.t('No categories were found.').'</div>';
+            return;
+        }
+
         ?>
         <div class="DataListWrap">
             <ul class="DataList CategoryList">
@@ -370,6 +375,11 @@ endif;
 
 if (!function_exists('writeCategoryTable')):
     function writeCategoryTable($categories, $depth = 1, $inTable = false) {
+        if (empty($categories)) {
+            echo '<div class="Empty">'.t('No categories were found.').'</div>';
+            return;
+        }
+
         foreach ($categories as $category) {
             $displayAs = val('DisplayAs', $category);
             $urlCode = $category['UrlCode'];

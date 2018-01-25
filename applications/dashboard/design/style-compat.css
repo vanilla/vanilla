@@ -90,6 +90,10 @@
   background: transparent;
 }
 
+.richEditor-button.richEditorParagraphMenu-handle .richEditorInline-icon {
+  opacity: 1;
+}
+
 .richEditor-button:not(:disabled) {
   cursor: pointer;
 }
@@ -193,6 +197,14 @@
   border: 0 !important;
   flex-grow: 1;
   max-width: calc(100% - 39px);
+}
+
+.richEditorInsertMediaMenu {
+  padding: 9px 12px;
+}
+
+.richEditorInsertMediaMenu-title {
+  margin-top: 0;
 }
 
 /*# sourceMappingURL=style-compat.css.map */

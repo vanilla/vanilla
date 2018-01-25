@@ -11,6 +11,7 @@ $richEditor-atMentionAvatar_width: 30px !default;
 $richEditor-atMentionAvatar_margin: 10px !default;
 $richEditor-atMentionMark_weight: 600 !default;
 $richEditor-insertLink_width: 387px !default;
+$richEditor-insertMenu_padding: 9px 12px !default;
 
 .richEditor {
   position: relative;
@@ -27,6 +28,7 @@ $richEditor-insertLink_width: 387px !default;
 .richEditor-menu {
   display: inline-block;
   position: relative;
+
 
   &.FlyoutMenu { // Temporary
     position: relative;
@@ -103,6 +105,10 @@ $richEditor-insertLink_width: 387px !default;
 
   &.richEditorParagraphMenu-handle {
     background: transparent;
+
+    .richEditorInline-icon {
+      opacity: 1;
+    }
   }
 
   &:not(:disabled) {
@@ -221,3 +227,11 @@ $richEditor-insertLink_width: 387px !default;
 }
 
 // Insert Media
+
+.richEditorInsertMediaMenu {
+  padding: $richEditor-insertMenu_padding;
+}
+
+.richEditorInsertMediaMenu-title {
+  margin-top: 0;
+}

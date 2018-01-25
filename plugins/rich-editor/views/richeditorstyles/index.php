@@ -63,41 +63,41 @@
 <h2>Paragraph Level Formatting Menu</h2>
 
 <div class="richEditor-menu" role="dialog" aria-label="<?php echo t('Paragraph Level Formatting Menu') ?>">
-    <ul class="richEditor-menuItems MenuItems" role="menubar">
-        <li class="richEditor-menuItem" role="menuitem">
-            <button class="richEditor-button" type="button">
+    <ul class="richEditor-menuItems MenuItems" role="radiogroup">
+        <li class="richEditor-menuItem" role="presentation">
+            <button class="richEditor-button" type="button" role="radio">
                 <svg class="richEditorInline-icon" viewBox="0 0 24 24">
                     <title><?php echo t('Title'); ?></title>
                     <path d="M12.3,17H10.658V12.5H6.051V17H4.417V7.006H6.051v4.088h4.607V7.006H12.3Zm5.944,0H16.637V10.547q0-1.155.055-1.832-.157.163-.387.362t-1.534,1.258l-.807-1.019L16.9,7.006h1.34Z" style="fill: currentColor"/>
                 </svg>
             </button>
         </li>
-        <li class="richEditor-menuItem" role="menuitem">
-            <button class="richEditor-button" type="button">
+        <li class="richEditor-menuItem" role="presentation">
+            <button class="richEditor-button" type="button" role="radio">
                 <svg class="richEditorInline-icon" viewBox="0 0 24 24">
                     <title><?php echo t('Subtitle'); ?></title>
                     <path d="M12.3,17H10.658V12.5H6.051V17H4.417V7.006H6.051v4.088h4.607V7.006H12.3Zm8,0H13.526V15.783L16.1,13.192a22.007,22.007,0,0,0,1.514-1.657,3.978,3.978,0,0,0,.543-.92,2.475,2.475,0,0,0,.171-.923,1.4,1.4,0,0,0-.407-1.066,1.557,1.557,0,0,0-1.124-.39,3,3,0,0,0-1.111.212,5.239,5.239,0,0,0-1.241.766l-.868-1.06a5.612,5.612,0,0,1,1.62-1,4.744,4.744,0,0,1,1.675-.294,3.294,3.294,0,0,1,2.235.728,2.46,2.46,0,0,1,.841,1.959,3.453,3.453,0,0,1-.242,1.285,5.212,5.212,0,0,1-.746,1.254,17.041,17.041,0,0,1-1.671,1.747l-1.736,1.682v.068H20.3Z" style="fill: currentColor"/>
                 </svg>
             </button>
         </li>
-        <li class="richEditor-menuItem" role="menuitem">
-            <button class="richEditor-button" type="button">
+        <li class="richEditor-menuItem" role="presentation">
+            <button class="richEditor-button" type="button" role="radio">
                 <svg class="richEditorInline-icon" viewBox="0 0 24 24">
                     <title><?php echo t('Quote'); ?></title>
                     <path d="M10.531,17.286V12.755H8.122a9.954,9.954,0,0,1,.1-1.408,4.22,4.22,0,0,1,.388-1.286,2.62,2.62,0,0,1,.735-.918A1.815,1.815,0,0,1,10.49,8.8V6.755a3.955,3.955,0,0,0-2,.49A4.164,4.164,0,0,0,7.082,8.551a5.84,5.84,0,0,0-.817,1.9A9.65,9.65,0,0,0,6,12.755v4.531Zm7.469,0V12.755H15.592a9.954,9.954,0,0,1,.1-1.408,4.166,4.166,0,0,1,.388-1.286,2.606,2.606,0,0,1,.734-.918A1.819,1.819,0,0,1,17.959,8.8V6.755a3.958,3.958,0,0,0-2,.49,4.174,4.174,0,0,0-1.408,1.306,5.86,5.86,0,0,0-.816,1.9,9.649,9.649,0,0,0-.266,2.306v4.531Z" style="fill: currentColor;"/>
                 </svg>
             </button>
         </li>
-        <li class="richEditor-menuItem" role="menuitem">
-            <button class="richEditor-button" type="button">
+        <li class="richEditor-menuItem" role="presentation">
+            <button class="richEditor-button" type="button" role="radio">
                 <svg class="richEditorInline-icon" viewBox="0 0 24 24">
                     <title><?php echo t('Paragraph Code Block'); ?></title>
                     <path fill="currentColor" fill-rule="evenodd" d="M9.11588626,16.5074223 L3.14440918,12.7070466 L3.14440918,11.6376386 L9.11588626,7.32465415 L9.11588626,9.04808032 L4.63575044,12.0883808 L9.11588626,14.7663199 L9.11588626,16.5074223 Z M14.48227,5.53936141 L11.1573124,18.4606386 L9.80043634,18.4606386 L13.131506,5.53936141 L14.48227,5.53936141 Z M15.1729321,14.7663199 L19.6530679,12.0883808 L15.1729321,9.04808032 L15.1729321,7.32465415 L21.1444092,11.6376386 L21.1444092,12.7070466 L15.1729321,16.5074223 L15.1729321,14.7663199 Z"/>
                 </svg>
             </button>
         </li>
-        <li class="richEditor-menuItem" role="menuitem">
-            <button class="richEditor-button" type="button">
+        <li class="richEditor-menuItem" role="presentation">
+            <button class="richEditor-button" type="button" role="radio">
                 <svg class="richEditorInline-icon" viewBox="0 0 24 24">
                     <title><?php echo t('Spoiler'); ?></title>
                     <path d="M8.138,16.569l.606-.606a6.677,6.677,0,0,0,1.108.562,5.952,5.952,0,0,0,2.674.393,7.935,7.935,0,0,0,1.008-.2,11.556,11.556,0,0,0,5.7-4.641.286.286,0,0,0-.02-.345c-.039-.05-.077-.123-.116-.173a14.572,14.572,0,0,0-2.917-3.035l.6-.6a15.062,15.062,0,0,1,2.857,3.028,1.62,1.62,0,0,0,.154.245,1.518,1.518,0,0,1,.02,1.5,12.245,12.245,0,0,1-6.065,4.911,6.307,6.307,0,0,1-1.106.22,4.518,4.518,0,0,1-.581.025,6.655,6.655,0,0,1-2.383-.466A8.023,8.023,0,0,1,8.138,16.569Zm-.824-.59a14.661,14.661,0,0,1-2.965-3.112,1.424,1.424,0,0,1,0-1.867A13.69,13.69,0,0,1,8.863,6.851a6.31,6.31,0,0,1,6.532.123c.191.112.381.231.568.356l-.621.621c-.092-.058-.184-.114-.277-.168a5.945,5.945,0,0,0-3.081-.909,6.007,6.007,0,0,0-2.868.786,13.127,13.127,0,0,0-4.263,3.929c-.214.271-.214.343,0,.639a13.845,13.845,0,0,0,3.059,3.153ZM13.9,9.4l-.618.618a2.542,2.542,0,0,0-3.475,3.475l-.61.61A3.381,3.381,0,0,1,12,8.822,3.4,3.4,0,0,1,13.9,9.4Zm.74.674a3.3,3.3,0,0,1,.748,2.138,3.382,3.382,0,0,1-5.515,2.629l.6-.6a2.542,2.542,0,0,0,3.559-3.559Zm-3.146,3.146L13.008,11.7a1.129,1.129,0,0,1-1.516,1.516Zm-.6-.811a1.061,1.061,0,0,1-.018-.2A1.129,1.129,0,0,1,12,11.079a1.164,1.164,0,0,1,.2.017Z" style="fill: currentColor;"/>
@@ -206,19 +206,17 @@
 <div class="richEditor-menu FlyoutMenu richEditorInsertMediaMenu" role="dialog" aria-labeledby="tempId-insertMediaMenu-title" aria-describedby="tempId-insertMediaMenu-p">
     <div class="richEditorInsertMediaMenu-header">
         <h2 id="tempId-insertMediaMenu-title" class="H richEditorInsertMediaMenu-title">
-            Insert Media
+            <?php echo t('Insert Media'); ?>
         </h2>
-        <p id="tempId-insertMediaMenu-p" class="richEditorInsertMediaMenu-p">
+        <p id="tempId-insertMediaMenu-p" class="richEditorInsertMediaMenu-description">
             <?php echo t('Paste the URL of the media you want.'); ?>
         </p>
-        <label class="">
-            <input class="InputBox editor-input-url" placeholder="http://">
-        </label>
+        <input class="InputBox editor-input-url" placeholder="http://">
     </div>
 
     <div class="Footer">
         <a href="#" aria-label="<?php echo t('Get Help on Inserting Media'); ?>">
-            Help
+            <?php echo t('Help'); ?>
         </a>
         <div class="Buttons">
             <input type="submit" class="Button Primary" value="<?php echo t('Insert'); ?>" aria-label="<?php echo t('Insert Media') ?>">

@@ -163,7 +163,7 @@ window.vanilla.embed = function(host) {
         } else if (message[0] == 'unload') {
             // Scroll to the top of the IFRAME if the top position is not in the view.
             var currentScrollAmount = (window.pageYOffset || document.documentElement.scrollTop);
-            if (scrollPosition('vanilla' + id) - currentScrollAmount < 0) {
+            if (offsetFromTop('vanilla' + id) - currentScrollAmount < 0) {
                 document.getElementById('vanilla' + id).scrollIntoView(true);
             }
 
@@ -178,7 +178,7 @@ window.vanilla.embed = function(host) {
         }
     }
 
-    scrollPosition = function(id) {
+    offsetFromTop = function(id) {
         var node = document.getElementById(id),
             top = 0,
             topScroll = 0;

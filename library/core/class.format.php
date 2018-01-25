@@ -1397,7 +1397,7 @@ class Gdn_Format {
 
         $urlParts = parse_url($url);
 
-        parse_str($urlParts['query'] ?? '', $query);
+        parse_str(val('query', $urlParts,  ''), $query);
         // There's the possibility the query string could be encoded, resulting in parameters that begin with "amp;"
         foreach ($query as $key => $val) {
             $newKey = stringBeginsWith($key, 'amp;', false, true);

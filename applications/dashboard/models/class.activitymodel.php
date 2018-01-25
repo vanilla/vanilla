@@ -1483,9 +1483,11 @@ class ActivityModel extends Gdn_Model {
         $activityID = val('ActivityID', $activity);
         if (!$activityID) {
             if (!$delete) {
-                $storageObject = FloodControlHelper::configure($this, 'Vanilla', 'Activity');
-                if ($this->checkUserSpamming(Gdn::session()->UserID, $storageObject)) {
-                    return false;
+                if (!val('DisableFloodControl', $options)) {
+                    $storageObject = FloodControlHelper::configure($this, 'Vanilla', 'Activity');
+                    if ($this->checkUserSpamming(Gdn::session()->UserID, $storageObject)) {
+                        return false;
+                    }
                 }
 
                 $this->addInsertFields($activity);
@@ -1707,7 +1709,7 @@ class ActivityModel extends Gdn_Model {
         $result = [];
         foreach (self::$Queue as $userID => $activities) {
             foreach ($activities as $activityType => $row) {
-                $result[] = $this->save($row[0], false, $row[1]);
+                $result[] = $this->save($row[0], false, ['DisableFloodControl' => true] + $row[1]);
             }
         }
         self::$Queue = [];

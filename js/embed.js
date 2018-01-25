@@ -161,8 +161,11 @@ window.vanilla.embed = function(host) {
                 }
             }
         } else if (message[0] == 'unload') {
-            if (window.attachEvent || scrollPosition('vanilla' + id) < 0) {
-                document.getElementById('vanilla' + id).scrollIntoView(true);
+            // Scroll to the top of the IFRAME if the top position is not in the view.
+            var currentScrollAmount = (window.pageYOffset || document.documentElement.scrollTop);
+            var offsetTop = offsetFromTop('vanilla' + id);
+            if (offsetTop - currentScrollAmount < 0) {
+                window.scrollTo(0, offsetTop);
             }
 
             iframe.style.visibility = "hidden";
@@ -176,7 +179,7 @@ window.vanilla.embed = function(host) {
         }
     }
 
-    scrollPosition = function(id) {
+    offsetFromTop = function(id) {
         var node = document.getElementById(id),
             top = 0,
             topScroll = 0;

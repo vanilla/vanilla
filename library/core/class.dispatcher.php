@@ -39,6 +39,7 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
         '/^sso(\/.*)?$/' => self::BLOCK_NEVER,
         '/^discussions\/getcommentcounts/' => self::BLOCK_NEVER,
         '/^entry(\/.*)?$/' => self::BLOCK_PERMISSION,
+        '/^settings\/analyticstick.json$/' => self::BLOCK_PERMISSION,
         '/^user\/usernameavailable(\/.*)?$/' => self::BLOCK_PERMISSION,
         '/^user\/emailavailable(\/.*)?$/' => self::BLOCK_PERMISSION,
         '/^home\/termsofservice(\/.*)?$/' => self::BLOCK_PERMISSION,

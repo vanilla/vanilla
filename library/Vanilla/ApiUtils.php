@@ -82,22 +82,11 @@ class ApiUtils {
     public static function morePagerInfo($rows, $url, array $query, Schema $schema) {
         $count = is_array($rows) ? count($rows) : $rows;
 
-        $r = [
+        return [
             'page' => $query['page'] ?: 1,
             'more' => $count === true || $count >= $query['limit'],
             'urlFormat' => static::pagerUrlFormat($url, $query, $schema),
-            'links' => []
         ];
-
-        $r['links']['first'] = str_replace('%s', 1, $r['urlFormat']);
-        if ($r['page'] > 1) {
-            $r['links']['prev'] = $r['page'] > 2 ? str_replace('%s', $r['page'] - 1, $r['urlFormat']) : $r['links']['first'];
-        }
-        if ($r['more']) {
-            $r['links']['next'] = str_replace('%s', $r['page'] + 1, $r['urlFormat']);
-        }
-
-        return $r;
     }
 
     /**
@@ -110,24 +99,12 @@ class ApiUtils {
      * @return array Returns an array suitable to generate a pager.
      */
     public static function numberedPagerInfo($totalCount, $url, array $query, Schema $schema) {
-        $r = [
+        return [
             'page' => $query['page'] ?: 1,
             'pageCount' => static::pageCount($totalCount, $query['limit']),
             'urlFormat' => static::pagerUrlFormat($url, $query, $schema),
             'totalCount' => $totalCount, // For regenerating with different URL.
-            'links' => []
         ];
-
-        $r['links']['first'] = str_replace('%s', 1, $r['urlFormat']);
-        $r['links']['last'] = str_replace('%s', $r['pageCount'], $r['urlFormat']);
-        if ($r['page'] > 1) {
-            $r['links']['prev'] = $r['page'] > 2 ? str_replace('%s', $r['page'] - 1, $r['urlFormat']) : $r['links']['first'];
-        }
-        if ($r['page'] < $r['pageCount']) {
-            $r['links']['next'] = str_replace('%s', $r['page'] + 1, $r['urlFormat']);
-        }
-
-        return $r;
     }
 
     /**

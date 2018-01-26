@@ -2103,7 +2103,13 @@ if (!function_exists('joinRecords')) {
                 // Check to see if the user has permission to view this record.
                 $categoryID = getValue('CategoryID', $record, -1);
                 if (!in_array($categoryID, $allowedCats)) {
-                    $unsets[] = $index;
+                    if ($unset) {
+                        $unsets[] = $index;
+                    } else {
+                        $row['RecordType'] = null;
+                        $row['RecordID'] = null;
+                        unset($row['RecordBody'], $row['RecordFormat']);
+                    }
                     continue;
                 }
             }

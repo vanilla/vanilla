@@ -125,6 +125,10 @@ class CategoriesApiController extends AbstractApiController {
             'customPermissions:b' => 'Are custom permissions set for this category?',
             'urlcode:s' => 'The URL code of the category.',
             'url:s' => 'The URL to the category.',
+            'photoUrl:s' => [
+                'description' => 'The category image.',
+                'minLength' => 0,
+            ],
             'displayAs:s' => [
                 'description' => 'The display style of the category.',
                 'enum' => ['categories', 'discussions', 'flat', 'heading'],
@@ -143,20 +147,46 @@ class CategoriesApiController extends AbstractApiController {
      * Get a single category.
      *
      * @param int $id The ID of the category.
-     * @throws NotFoundException if unable to find the category.
+     * @param array $query The querystring.
+     * @throws NotFoundException Throws an exception when unable to find the category.
      * @return array
      */
-    public function get($id) {
-        $this->permission('Garden.Settings.Manage');
+    public function get($id, array $query) {
+        return $this->getInternal($id, $query);
+    }
+
+    /**
+     * Get a single category.
+     *
+     * @param int|string $idOrCode The ID of the category.
+     * @param array $query The querystring.
+     * @throws NotFoundException Throws an exception when unable to find the category.
+     * @return array
+     */
+    private function getInternal($idOrCode, array $query = []) {
+        $this->permission('Garden.SignIn.Allow');
 
         $in = $this->idParamSchema()->setDescription('Get a category.');
         $out = $this->schema($this->schemaWithParent(), 'out');
 
-        $row = $this->category($id);
+        $row = $this->category($idOrCode);
+        $this->permission('Vanilla.Discussions.View', $row['CategoryID']);
         $row = $this->normalizeOutput($row);
 
         $result = $out->validate($row);
         return $result;
+    }
+
+    /**
+     * Get a single category by URL code.
+     *
+     * @param string $urlCode The URL code of the category.
+     * @param array $query The querystring.
+     * @throws NotFoundException Throws an exception when unable to find the category.
+     * @return array
+     */
+    public function get_urlCodes($urlCode, array $query = []) {
+        return $this->getInternal($urlCode, $query);
     }
 
     /**

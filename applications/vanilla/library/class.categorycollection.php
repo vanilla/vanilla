@@ -413,10 +413,32 @@ class CategoryCollection {
         $defaultOptions = [
             'maxdepth' => 3,
             'collapsecategories' => false,
-            'permission' => 'PermsDiscussionsView'
+            'permission' => 'PermsDiscussionsView',
+            'filter' => []
         ];
         $options = array_change_key_case($options) ?: [];
         $options = $options + $defaultOptions ;
+
+        // Build up the filter.
+        if (!empty($options['filter'])) {
+            if (is_callable($options['filter'])) {
+                $filter = $options['filter'];
+            } else {
+                $where = $options['filter'];
+                $filter = function ($row) use ($where) {
+                    foreach ($where as $key => $value) {
+                        if ($row[$key] != $value) {
+                            return false;
+                        }
+                    }
+                    return true;
+                };
+            }
+        } else {
+            $filter = function () {
+                return true;
+            };
+        }
 
         $currentDepth = 1;
         $parents = [$parentID];
@@ -432,8 +454,8 @@ class CategoryCollection {
                 $category = $child;
                 $category['Children'] = [];
 
-                // Skip the fake root.
-                if ($category['CategoryID'] == -1) {
+                // Skip the fake root and categories that don't pass the filter.
+                if ($category['CategoryID'] == -1 || !$filter($category)) {
                     continue;
                 }
 

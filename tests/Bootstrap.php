@@ -7,6 +7,7 @@
 
 namespace VanillaTests;
 
+use Ebi\Ebi;
 use Garden\Container\Container;
 use Garden\Container\Reference;
 use Garden\Web\RequestInterface;
@@ -200,6 +201,14 @@ class Bootstrap {
             ->rule(\Vanilla\FileUtils::class)
             ->setAliasOf(\VanillaTests\Fixtures\FileUtils::class)
             ->addAlias('FileUtils')
+
+            ->rule(Ebi::class)
+            ->setConstructorArgs(['cachePath' => PATH_CACHE.'/ebi'])
+            ->setShared(true)
+
+            ->rule(\Ebi\TemplateLoaderInterface::class)
+            ->setClass(\Vanilla\EbiTemplateLoader::class)
+            ->setShared(true)
         ;
     }
 
@@ -316,6 +325,9 @@ class Bootstrap {
         }
         if (Gdn::getContainer() === $container) {
             Gdn::setContainer(null);
+        }
+        if (class_exists('CategoryModel', false)) {
+            \CategoryModel::$Categories = null;
         }
     }
 

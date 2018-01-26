@@ -105,6 +105,8 @@ class Gdn_Smarty {
         $path = ($isHomepage) ? "" : Gdn::request()->path();
         $smarty->assign('Path', $path);
         $smarty->assign('Homepage', $isHomepage); // true/false
+        $smarty->assign('AssetRoot', rtrim(asset('/', true), '/'));
+        $smarty->assign('WebRoot', rtrim(url('/', true), '/'));
 
         // Assign the controller data last so the controllers override any default data.
         $smarty->assign($controller->Data);
@@ -147,9 +149,10 @@ class Gdn_Smarty {
      * Render the given view.
      *
      * @param string $path The path to the view's file.
-     * @param Controller $controller The controller that is rendering the view.
+     * @param Gdn_Controller $controller The controller that is rendering the view.
+     * @param \Vanilla\Addon $addon The owner addon.
      */
-    public function render($path, $controller) {
+    public function render($path, $controller, $addon = null) {
         $smarty = $this->smarty();
         $this->init($path, $controller);
         $compileID = $smarty->compile_id;
@@ -157,8 +160,18 @@ class Gdn_Smarty {
             $compileID = CLIENT_NAME;
         }
 
-        $smarty->setTemplateDir(dirname($path));
-        $smarty->display($path, null, $compileID);
+        $paths = [dirname($path)];
+        if ($addon instanceof \Vanilla\Addon) {
+            $paths[] = $addon->path('/views');
+        }
+
+        $smarty->setTemplateDir($paths);
+        try {
+            set_error_handler('Gdn_ErrorHandler', E_ALL & ~E_STRICT & ~E_NOTICE & ~E_WARNING);
+            $smarty->display($path, null, $compileID);
+        } finally {
+            restore_error_handler();
+        }
     }
 
     /**

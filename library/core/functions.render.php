@@ -460,8 +460,15 @@ if (!function_exists('categoryUrl')) {
         }
         $category = (array)$category;
 
-        $result = '/categories/'.rawurlencode($category['UrlCode']);
-        if ($page && $page > 1) {
+        if (empty($category['UrlCode'])) {
+            $result = '/categories';
+        } else {
+            $result = '/categories/'.rawurlencode($category['UrlCode']);
+        }
+
+        if ($page === '%s') {
+            $result .= '/p%s';
+        } elseif ($page && $page > 1) {
             $result .= '/p'.$page;
         }
         return url($result, $withDomain);
@@ -761,7 +768,9 @@ if (!function_exists('discussionUrl')) {
         $result = '/discussion/'.$discussion->DiscussionID.'/'.$name;
 
         if ($page) {
-            if ($page > 1 || Gdn::session()->UserID) {
+            if ($page === '%s') {
+                $result .= '/p%s';
+            } elseif ($page > 1 || Gdn::session()->UserID) {
                 $result .= '/p'.$page;
             }
         }

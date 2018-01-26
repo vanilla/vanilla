@@ -289,8 +289,32 @@ class CommentsApiController extends AbstractApiController {
 
         list($offset, $limit) = offsetLimit("p{$query['page']}", $query['limit']);
 
-        $rows = $this->commentModel->lookup($where, true, $limit, $offset, 'asc')->resultArray();
+        $where = [];
         $hasMore = $this->commentModel->LastCommentCount >= $limit;
+
+        if (array_key_exists('insertUserID', $query)) {
+            $where['InsertUserID'] = $query['insertUserID'];
+        }
+        if (array_key_exists('discussionID', $query)) {
+            $discussion = $this->discussionByID($query['discussionID']);
+            $this->discussionModel->categoryPermission('Vanilla.Discussions.View', $discussion['CategoryID']);
+            $where['DiscussionID'] = $query['discussionID'];
+        }
+//        if ($dateInserted = $this->dateFilterField('dateInserted', $query)) {
+//            $where += $dateInserted;
+//        }
+//        if ($dateUpdated = $this->dateFilterField('dateUpdated', $query)) {
+//            $where += $dateUpdated;
+//        }
+
+        $comments = $this->commentModel->lookup($where, true, $limit, $offset, 'asc');
+        $rows = $comments->resultArray();
+
+        if (isset($discussion) && count($where) === 1) {
+            $paging = ApiUtils::numberedPagerInfo($discussion['CountComments'], '/api/v2/comments', $query, $in);
+        } else {
+            $paging = ApiUtils::morePagerInfo(val('hasMore', $comments), '/api/v2/comments', $query, $in);
+        }
 
         // Expand associated rows.
         $this->userModel->expandUsers(

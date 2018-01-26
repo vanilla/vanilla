@@ -138,7 +138,8 @@ class ApiUtils {
      * @return int Returns the number of pages.
      */
     public static function pageCount($count, $limit) {
-        return (int)ceil($count / $limit);
+        $result = (int)ceil($count / $limit);
+        return $result <= 0 ? 1 : $result;
     }
 
     /**
@@ -231,5 +232,18 @@ class ApiUtils {
         }
 
         return $filters;
+    }
+
+    /**
+     * Get the page number from a page URL parameter (p*).
+     *
+     * @param string $pageUrlParam The page URL parameter.
+     * @return int Returns the page number.
+     */
+    public static function pageNumber($pageUrlParam) {
+        if (preg_match('`^p(\d+)$`', $pageUrlParam, $m)) {
+            return (int)$m[1];
+        }
+        return 1;
     }
 }

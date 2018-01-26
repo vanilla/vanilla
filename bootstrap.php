@@ -1,5 +1,6 @@
 <?php
 
+use Ebi\Ebi;
 use Garden\Container\Container;
 use Garden\Container\Reference;
 use Vanilla\Addon;
@@ -150,6 +151,20 @@ $dic->setInstance('Garden\Container\Container', $dic)
     ->setConstructorArgs(['/api/v2/', '*\\%sApiController'])
     ->addCall('setMeta', ['CONTENT_TYPE', 'application/json; charset=utf-8'])
 
+    // Temporary HTML route to develop new views.
+    ->rule('@api-v2-route-html')
+    ->setClass(\Garden\Web\ResourceRoute::class)
+    ->setConstructorArgs(['/', ['*\\%sPageController', '*\\Pages\\%sController', '*\\%sApiController']])
+    ->addCall('setMeta', ['CONTENT_TYPE', 'text/html'])
+    ->addCall('setDefault', ['query', ['expand' => true]])
+
+    ->rule('@view-text/html')
+    ->setClass(\Vanilla\Web\EbiMasterView::class)
+    ->setShared(true)
+
+    ->rule(\Vanilla\Web\EbiView::class)
+    ->setShared(true)
+
     ->rule(\Garden\ClassLocator::class)
     ->setClass(\Vanilla\VanillaClassLocator::class)
 
@@ -188,6 +203,14 @@ $dic->setInstance('Garden\Container\Container', $dic)
 
     ->rule('ViewHandler.tpl')
     ->setClass('Gdn_Smarty')
+    ->setShared(true)
+
+    ->rule(Ebi::class)
+    ->setConstructorArgs(['cachePath' => PATH_CACHE.'/ebi'])
+    ->setShared(true)
+
+    ->rule(\Ebi\TemplateLoaderInterface::class)
+    ->setClass(\Vanilla\EbiTemplateLoader::class)
     ->setShared(true)
 
     ->rule('Gdn_Form')
@@ -265,6 +288,12 @@ $dic->call(function (
 
     // Re-apply loaded user settings.
     $config->overlayDynamic();
+
+    // Set up routing for new themes.
+    if ($addonManager->getAddonInfoValue($addonManager->getTheme(), 'themeEngine') === 'v2') {
+        $dic->rule(\Garden\Web\Dispatcher::class)
+            ->addCall('addRoute', ['route' => new Reference('@api-v2-route-html'), 'api-v2-html']);
+    }
 
     /**
      * Bootstrap Late

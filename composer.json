@@ -26,6 +26,12 @@
             "php": "7.0.26"
         }
     },
+    "repositories": [
+        {
+            "type": "vcs",
+            "url": "https://github.com/vanilla/expression-language"
+        }
+    ],
     "require": {
         "php": ">=7.0.0",
         "container-interop/container-interop": "^1.1",
@@ -46,7 +52,8 @@
         "vanilla/legacy-oauth": "~1.0",
         "vanilla/legacy-passwords": "~1.0",
         "vanilla/nbbc": "~2.1",
-        "vanilla/vanilla-connect": "~0.1"
+        "vanilla/vanilla-connect": "~0.1",
+        "vanilla/ebi": "^0.3"
     },
     "require-dev": {
         "phpunit/phpunit": "~5.0"

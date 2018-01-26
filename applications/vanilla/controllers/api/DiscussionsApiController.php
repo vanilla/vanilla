@@ -393,7 +393,7 @@ class DiscussionsApiController extends AbstractApiController {
                 'description' => 'Filter by author.',
                 'x-filter' => [
                     'field' => 'd.InsertUserID',
-                ],
+            ],
             ],
             'expand?' => ApiUtils::getExpandDefinition(['insertUser', 'lastUser', 'lastPost'])
         ], ['DiscussionIndex', 'in'])->setDescription('List discussions.');
@@ -408,6 +408,8 @@ class DiscussionsApiController extends AbstractApiController {
 
         if (array_key_exists('categoryID', $where)) {
             $this->discussionModel->categoryPermission('Vanilla.Discussions.View', $where['categoryID']);
+//        } else {
+//            $this->discussionModel->Watching = true;
         }
 
         // Allow addons to update the where clause.
@@ -432,6 +434,14 @@ class DiscussionsApiController extends AbstractApiController {
                 $where['Announce'] = 'all';
                 $rows = $this->discussionModel->getWhereRecent($where, $limit, $offset, false)->resultArray();
             }
+        }
+
+        if (empty($where) ||
+            (isset($where['d.CategoryID']) && (count($where) === 1 || (count($where) === 2 && isset($where['Announce']))))
+        ) {
+            $paging = ApiUtils::numberedPagerInfo($this->discussionModel->getCount($where), '/api/v2/discussions', $query, $in);
+        } else {
+            $paging = ApiUtils::morePagerInfo($rows, '/api/v2/discussions', $query, $in);
         }
 
         // Expand associated rows.

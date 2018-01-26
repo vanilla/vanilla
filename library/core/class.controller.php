@@ -704,6 +704,11 @@ class Gdn_Controller extends Gdn_Pluggable {
     public function fetchView($View = '', $ControllerName = false, $ApplicationFolder = false) {
         $ViewPath = $this->fetchViewLocation($View, $ControllerName, $ApplicationFolder);
 
+        // Look up the owner addon.
+        $parts = explode('/', $ApplicationFolder ?: $this->ApplicationFolder);
+        $addonKey = strtolower(array_pop($parts));
+        $addon = Gdn::addonManager()->lookupAddon($addonKey);
+
         // Check to see if there is a handler for this particular extension.
         $ViewHandler = Gdn::factory('ViewHandler'.strtolower(strrchr($ViewPath, '.')));
 
@@ -714,7 +719,7 @@ class Gdn_Controller extends Gdn_Pluggable {
             include($ViewPath);
         } else {
             // Use the view handler to parse the view.
-            $ViewHandler->render($ViewPath, $this);
+            $ViewHandler->render($ViewPath, $this, $addon);
         }
         $ViewContents = ob_get_clean();
 
@@ -1917,7 +1922,14 @@ class Gdn_Controller extends Gdn_Pluggable {
             $BodyIdentifier = strtolower($this->ApplicationFolder.'_'.$ControllerName.'_'.Gdn_Format::alphaNumeric(strtolower($this->RequestMethod)));
             include($MasterViewPath);
         } else {
-            $ViewHandler->render($MasterViewPath, $this);
+            if ($addonKey) {
+                $parts = explode('/', $addonKey);
+                $addon = Gdn::addonManager()->lookupAddon($parts = strtolower(array_pop($parts)));
+            } else {
+                $addon = null;
+            }
+
+            $ViewHandler->render($MasterViewPath, $this, $addon);
         }
     }
 

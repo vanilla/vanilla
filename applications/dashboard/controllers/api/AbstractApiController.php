@@ -43,7 +43,7 @@ abstract class AbstractApiController extends \Vanilla\Web\Controller {
         if (array_key_exists($field, $row)) {
             $row[$field] = Gdn_Format::to($row[$field], $format) ?: '<!-- empty -->';
         }
-    }
+        }
 
     /**
      * Get the schema for users joined to records.

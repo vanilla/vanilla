@@ -181,14 +181,19 @@ class EbiView implements ViewInterface {
         $ebi->defineFunction('t');
         $ebi->defineFunction('user', $this->makeUserFunction($userModel));
         $ebi->defineFunction('tileClasses', [$this, 'tileClasses']);
-        $ebi->defineFunction('url');
+
+        $url = function (...$args) {
+            return url(...$args).'#!';
+        };
+
+        $ebi->defineFunction('url', $url);
 
         // Add custom attribute filters.
         $ebi->defineFunction('@script:src', $fn);
         $ebi->defineFunction('@link:href', $fn);
         $ebi->defineFunction('@img:src', $fn);
-        $ebi->defineFunction('@a:href', 'url');
-        $ebi->defineFunction('@form:action', 'url');
+        $ebi->defineFunction('@a:href', $url);
+        $ebi->defineFunction('@form:action', $url);
         $ebi->defineFunction('@id', [$this, 'idAttribute']);
     }
 

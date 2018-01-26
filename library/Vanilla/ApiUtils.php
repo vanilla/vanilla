@@ -190,10 +190,6 @@ class ApiUtils {
 
         $data->setMeta('paging', $pagingInfo);
 
-        foreach($pagingInfo['links'] as $key => $value) {
-            $data->setHeader('Paging-'.ucfirst($key), $value);
-        }
-
         return $data;
     }
 

@@ -43,16 +43,16 @@ $this->fireEvent('BeforeCommentForm');
                         $CancelClass = 'Cancel';
                     }
 
-                    echo '<span class="'.$CancelClass.'">';
-                    echo anchor($CancelText, '/');
-                    $CategoryID = $this->data('Discussion.CategoryID');
-                    if (c('Vanilla.Categories.Use', true) && $CategoryID) {
-                        $Category = CategoryModel::categories($CategoryID);
-                        if ($Category) {
-                            echo ' <span class="Bullet">•</span> '.anchor(htmlspecialchars($Category['Name']), categoryUrl($Category));
-                        }
-                    }
-                    echo '</span>';
+//                    echo '<span class="'.$CancelClass.'">';
+//                    echo anchor($CancelText, '/');
+//                    $CategoryID = $this->data('Discussion.CategoryID');
+//                    if (c('Vanilla.Categories.Use', true) && $CategoryID) {
+//                        $Category = CategoryModel::categories($CategoryID);
+//                        if ($Category) {
+//                            echo ' <span class="Bullet">•</span> '.anchor(htmlspecialchars($Category['Name']), categoryUrl($Category));
+//                        }
+//                    }
+//                    echo '</span>';
 
                     $ButtonOptions = ['class' => 'Button Primary CommentButton'];
                     $ButtonOptions['tabindex'] = 1;

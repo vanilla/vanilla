@@ -150,6 +150,10 @@ $dic->setInstance('Garden\Container\Container', $dic)
     ->setConstructorArgs(['/api/v2/', '*\\%sApiController'])
     ->addCall('setMeta', ['CONTENT_TYPE', 'application/json; charset=utf-8'])
 
+    ->rule('@view-application/json')
+    ->setClass(\Vanilla\Web\JsonView::class)
+    ->setShared(true)
+
     ->rule(\Garden\ClassLocator::class)
     ->setClass(\Vanilla\VanillaClassLocator::class)
 
@@ -184,6 +188,10 @@ $dic->setInstance('Garden\Container\Container', $dic)
     ->setShared(true)
 
     ->rule('Smarty')
+    ->setShared(true)
+
+    ->rule('WebLinking')
+    ->setClass(\Vanilla\Web\WebLinking::class)
     ->setShared(true)
 
     ->rule('ViewHandler.tpl')

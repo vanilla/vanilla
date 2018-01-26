@@ -127,7 +127,7 @@ $richEditor-insertMenu_padding: 9px 12px !default;
   }
 }
 
-.richEditorEmbedMenu {
+.embedBar {
   display: block;
   width: 100%;
   padding: $richEditor-embedMenu_padding;
@@ -143,11 +143,11 @@ $richEditor-insertMenu_padding: 9px 12px !default;
 }
 
 // @mention menu
-.richEditorAtMentionMenu {
+.atMention {
   width: $richEditor-atMention_width;
 }
 
-.richEditorAtMentionMenu-items {
+.atMention-items {
   width: 100%;
 
 
@@ -161,7 +161,7 @@ $richEditor-insertMenu_padding: 9px 12px !default;
   }
 }
 
-.richEditorAtMentionMenu-user {
+.atMention-user {
   display: flex;
   align-items: center;
   width: 100%;
@@ -169,16 +169,16 @@ $richEditor-insertMenu_padding: 9px 12px !default;
   overflow: hidden;
 }
 
-.richEditorAtMentionMenu-photoWrap {
+.atMention-photoWrap {
   margin-right: $richEditor-atMentionAvatar_margin;
 }
 
-.richEditorAtMentionMenu-photo {
+.atMention-photo {
   width: $richEditor-atMentionAvatar_width;
   height: $richEditor-atMentionAvatar_width;
 }
 
-.richEditorAtMentionMenu-userName {
+.atMention-userName {
   flex-grow: 1;
   overflow: hidden;
   white-space: nowrap;
@@ -186,17 +186,17 @@ $richEditor-insertMenu_padding: 9px 12px !default;
   max-width: calc(100% - #{$richEditor-atMentionAvatar_margin + $richEditor-atMentionAvatar_width});
 }
 
-.richEditorAtMentionMenu-mark {
+.atMention-mark {
   padding: 0;
   font-weight: $richEditor-atMentionMark_weight;
 }
 
-.richEditorAtMentionMenu-photo {
+.atMention-photo {
   display: block;
 }
 
 // Link Menu
-.richEditorInsertLinkMenu.FlyoutMenu {
+.insertLink.FlyoutMenu {
   display: flex;
   flex-wrap: nowrap;
   align-items: center;
@@ -204,7 +204,6 @@ $richEditor-insertMenu_padding: 9px 12px !default;
   width: 100%;
   padding: {
     left: 5px;
-    right: 5px;
   }
 }
 
@@ -220,18 +219,50 @@ $richEditor-insertMenu_padding: 9px 12px !default;
   user-select: none;
 }
 
-.richEditorInsertLinkMenu-input.InputBox {
+.insertLink-input.InputBox {
   border: 0 !important;
   flex-grow: 1;
   max-width: calc(100% - #{$richEditor-menuButton_size})
 }
 
 // Insert Media
-
-.richEditorInsertMediaMenu {
+.insertMedia {
   padding: $richEditor-insertMenu_padding;
+
+  .InputBox {
+    width: 100%;
+    box-sizing: border-box;
+  }
+
+  .richEditor-close {
+    position: absolute;
+    top: 0;
+    right: 0;
+  }
+
+  .Footer {
+    display: flex;
+  }
 }
 
-.richEditorInsertMediaMenu-title {
+.insertMedia-title {
   margin-top: 0;
+  max-width: calc(100% - #{$richEditor-menuButton_size});
+  min-height: $richEditor-menuButton_size;
+}
+
+.insertMedia-footer {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  margin-top: 12px;
+}
+
+.insertMedia-help {
+  margin-right: auto;
+  font-size: 12px;
+}
+
+.insertMedia-insert {
+  margin-bottom: 3px;
 }

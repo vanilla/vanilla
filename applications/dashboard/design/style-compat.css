@@ -106,7 +106,7 @@
   opacity: 1;
 }
 
-.richEditorEmbedMenu {
+.embedBar {
   display: block;
   width: 100%;
   padding: 0;
@@ -120,15 +120,15 @@
   opacity: 0.6;
 }
 
-.richEditorAtMentionMenu {
+.atMention {
   width: 200px;
 }
 
-.richEditorAtMentionMenu-items {
+.atMention-items {
   width: 100%;
 }
 
-.richEditorAtMentionMenu-items.MenuItems {
+.atMention-items.MenuItems {
   position: relative;
   top: auto;
   left: auto;
@@ -137,7 +137,7 @@
   display: block;
 }
 
-.richEditorAtMentionMenu-user {
+.atMention-user {
   display: flex;
   align-items: center;
   width: 100%;
@@ -145,16 +145,16 @@
   overflow: hidden;
 }
 
-.richEditorAtMentionMenu-photoWrap {
+.atMention-photoWrap {
   margin-right: 10px;
 }
 
-.richEditorAtMentionMenu-photo {
+.atMention-photo {
   width: 30px;
   height: 30px;
 }
 
-.richEditorAtMentionMenu-userName {
+.atMention-userName {
   flex-grow: 1;
   overflow: hidden;
   white-space: nowrap;
@@ -162,23 +162,22 @@
   max-width: calc(100% - 40px);
 }
 
-.richEditorAtMentionMenu-mark {
+.atMention-mark {
   padding: 0;
   font-weight: 600;
 }
 
-.richEditorAtMentionMenu-photo {
+.atMention-photo {
   display: block;
 }
 
-.richEditorInsertLinkMenu.FlyoutMenu {
+.insertLink.FlyoutMenu {
   display: flex;
   flex-wrap: nowrap;
   align-items: center;
   max-width: 387px;
   width: 100%;
   padding-left: 5px;
-  padding-right: 5px;
 }
 
 .richEditor-close.Close {
@@ -193,18 +192,51 @@
   user-select: none;
 }
 
-.richEditorInsertLinkMenu-input.InputBox {
+.insertLink-input.InputBox {
   border: 0 !important;
   flex-grow: 1;
   max-width: calc(100% - 39px);
 }
 
-.richEditorInsertMediaMenu {
+.insertMedia {
   padding: 9px 12px;
 }
 
-.richEditorInsertMediaMenu-title {
+.insertMedia .InputBox {
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.insertMedia .richEditor-close {
+  position: absolute;
+  top: 0;
+  right: 0;
+}
+
+.insertMedia .Footer {
+  display: flex;
+}
+
+.insertMedia-title {
   margin-top: 0;
+  max-width: calc(100% - 39px);
+  min-height: 39px;
+}
+
+.insertMedia-footer {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  margin-top: 12px;
+}
+
+.insertMedia-help {
+  margin-right: auto;
+  font-size: 12px;
+}
+
+.insertMedia-insert {
+  margin-bottom: 3px;
 }
 
 /*# sourceMappingURL=style-compat.css.map */

@@ -131,8 +131,13 @@ class InternalRequest extends HttpRequest implements RequestInterface {
                 $cookies[$key] = rawurldecode($val);
             }
         }
+
         $_COOKIE = $cookies;
         $data = $this->dispatcher->dispatch($this);
+        // Render the view in case it updates the Data object.
+        ob_start();
+            $this->dispatcher->render($this->container->get(\Gdn_Request::class), $data);
+        ob_end_clean();
         $_COOKIE = $cookieStash;
 
         $response = new HttpResponse(

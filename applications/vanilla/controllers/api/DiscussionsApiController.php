@@ -94,7 +94,7 @@ class DiscussionsApiController extends AbstractApiController {
 
         $paging = ApiUtils::morePagerInfo($result, '/api/v2/discussions/bookmarked', $query, $in);
 
-        return ApiUtils::setPageMeta($result, $paging);
+        return new Data($result, ['paging' => $paging]);
     }
 
     /**
@@ -457,7 +457,7 @@ class DiscussionsApiController extends AbstractApiController {
             $paging = ApiUtils::morePagerInfo($rows, '/api/v2/discussions', $query, $in);
         }
 
-        return ApiUtils::setPageMeta($result, $paging);
+        return new Data($result, ['paging' => $paging]);
     }
 
     /**

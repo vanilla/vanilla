@@ -5,6 +5,7 @@
  */
 
 use Garden\Schema\Schema;
+use Garden\Web\Data;
 use Garden\Web\Exception\NotFoundException;
 use Vanilla\ApiUtils;
 
@@ -244,7 +245,7 @@ class DraftsApiController extends AbstractApiController {
             $in
         );
 
-        return ApiUtils::setPageMeta($result, $paging);
+        return new Data($result, ['paging' => $paging]);
     }
 
     /**

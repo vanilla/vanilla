@@ -120,12 +120,15 @@ abstract class AbstractAPIv2Test extends TestCase {
      */
     protected function pagingTest($resourceUrl) {
         $pagingTestUrl = $resourceUrl.(strpos($resourceUrl, '?') === false ? '?' : '&').'limit=1';
+        $resourcePath = parse_url($resourceUrl, PHP_URL_PATH);
 
         $result = $this->api()->get($pagingTestUrl);
-        $this->assertNotEmpty($result->getHeader('Paging-First'));
-        $this->assertNotEmpty($result->getHeader('Paging-Next'));
+        $link = $result->getHeader('Link');
+        $this->assertNotEmpty($link);
+        $this->assertTrue(preg_match('/<([^;]*?'.preg_quote($resourcePath, '/').'[^>]+)>; rel="first"/', $link) === 1);
+        $this->assertTrue(preg_match('/<([^;]*?'.preg_quote($resourcePath, '/').'[^>]+)>; rel="next"/', $link, $matches) === 1);
 
-        $result = $this->api()->get(str_replace('/api/v2', '', $result->getHeader('Paging-Next')));
+        $result = $this->api()->get(str_replace('/api/v2', '', $matches[1]));
         $this->assertEquals(200, $result->getStatusCode());
         $this->assertEquals(1, count($result->getBody()));
     }

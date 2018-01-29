@@ -159,7 +159,7 @@ class ApplicantsApiController extends AbstractApiController {
 
         $paging = ApiUtils::numberedPagerInfo($this->userModel->getApplicantCount(), '/api/v2/applicants', $query, $in);
 
-        return ApiUtils::setPageMeta($result, $paging);
+        return new Data($result, ['paging' => $paging]);
     }
 
     /**

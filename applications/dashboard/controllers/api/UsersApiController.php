@@ -268,7 +268,7 @@ class UsersApiController extends AbstractApiController {
             $paging = ApiUtils::morePagerInfo($result, '/api/v2/users', $query, $in);
         }
 
-        return ApiUtils::setPageMeta($result, $paging);
+        return new Data($result, ['paging' => $paging]);
 
     }
 

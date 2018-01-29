@@ -229,7 +229,7 @@ class CategoriesApiController extends AbstractApiController {
 
         $paging = ApiUtils::morePagerInfo($result, '/api/v2/comments', $query, $in);
 
-        return ApiUtils::setPageMeta($result, $paging);
+        return new Data($result, ['paging' => $paging]);
     }
 
     /**
@@ -344,7 +344,7 @@ class CategoriesApiController extends AbstractApiController {
             $paging = [];
         }
 
-        return ApiUtils::setPageMeta($result, $paging);
+        return new Data($result, ['paging' => $paging]);
     }
 
     /**

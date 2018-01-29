@@ -314,7 +314,7 @@ class CommentsApiController extends AbstractApiController {
             $paging = ApiUtils::morePagerInfo($hasMore, '/api/v2/comments', $query, $in);
         }
 
-        return ApiUtils::setPageMeta($result, $paging);
+        return new Data($result, ['paging' => $paging]);
     }
 
     /**

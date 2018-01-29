@@ -150,27 +150,6 @@ class ApiUtils {
     }
 
     /**
-     * Add paging information to API results.
-     *
-     * @param array|Data $data The results returned by the API.
-     * @param array $pagingInfo Paging information.
-     * @return Data
-     */
-    public static function setPageMeta($data, $pagingInfo) {
-        if (!($data instanceof Data)) {
-            $data = new Data($data);
-        }
-
-        if (!$pagingInfo) {
-            return $data;
-        }
-
-        $data->setMeta('paging', $pagingInfo);
-
-        return $data;
-    }
-
-    /**
      * Convert query parameters to filters. Useful to fill a where clause ;)
      *
      * @throws \Exception If something goes wrong. Example, the field processor is not callable.

@@ -13,7 +13,7 @@ $editor_file_input_name = $this->data('_editorFileInputName');
 
 foreach ($this->data('_EditorToolbar') as $button) {
     $title =  valr('attr.title', $button);
-    $screenReaderMarkup = $title ?'<span class="sr-only">' . $title . '</span>' : '';
+    $screenReaderMarkup = $title ? '<span class="sr-only">' . $title . '</span>' : '';
 
    // If the type is not an array, it's a regular button (type==button)
    if (!is_array($button['type'])) {

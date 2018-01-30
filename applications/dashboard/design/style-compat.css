@@ -1,21 +1,3 @@
-.change-picture {
-  max-width: 100%;
-}
-
-.box-crop .box-source {
-  max-width: 100%;
-  overflow: auto;
-}
-
-@media screen and (max-width: 600px) {
-  .Popup .box-crop .box-source {
-    display: none;
-  }
-  .Popup .change-picture .thumbnail-message {
-    display: none;
-  }
-}
-
 .followButton {
   white-space: nowrap;
   font-size: 10px;

@@ -1,4 +1,4 @@
-<div class="padded thumbnail-message">
+<div class="padded change-picture-instructions">
     <?php echo t('Define Thumbnail', 'Click and drag across the picture to define your thumbnail.');?>
 </div>
 <div class="box-crop clearfix">

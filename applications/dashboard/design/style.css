@@ -2509,7 +2509,7 @@ body.isMobile .box-crop .box-source {
   display: none;
 }
 
-body.isMobile .change-picture .thumbnail-message {
+body.isMobile .change-picture .change-picture-instructions {
   display: none;
 }
 

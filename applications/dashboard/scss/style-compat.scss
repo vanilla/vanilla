@@ -1,7 +1,5 @@
-// A style sheet for compatibility with new features and fixes.
 // This should always be added after style.css and not be overridden.
 
-// Features
 @import "new-features/followButton";
 @import "new-features/vanillaIcon";
 @import "new-features/selectBox";

@@ -453,12 +453,12 @@ class EditorPlugin extends Gdn_Plugin {
         $editorToolbarAll['indent'] = ['edit' => 'format', 'action' => 'indent', 'type' => 'button', 'attr' => ['class' => 'editor-action icon icon-indent-right editor-dialog-fire-close editor-optional-button', 'data-wysihtml5-command' => 'indent', 'title' => t('Indent'), 'data-editor' => '{"action":"indent","value":""}']];
         $editorToolbarAll['outdent'] = ['edit' => 'format', 'action' => 'outdent', 'type' => 'button', 'attr' => ['class' => 'editor-action icon icon-indent-left editor-dialog-fire-close editor-optional-button', 'data-wysihtml5-command' => 'outdent', 'title' => t('Outdent'), 'data-editor' => '{"action":"outdent","value":""}']];
 
-        $editorToolbarAll['sep-format'] = ['type' => 'separator', 'attr' => ['title' => t("Divider"),'class' => 'editor-sep sep-headers editor-optional-button']];
+        $editorToolbarAll['sep-format'] = ['type' => 'separator', 'attr' => ['class' => 'editor-sep sep-headers editor-optional-button']];
         $editorToolbarAll['format'] = ['edit' => 'format', 'action' => 'headers', 'type' =>
             $toolbarFormatOptions,
             'attr' => ['class' => 'editor-action icon icon-paragraph editor-dd-format', 'title' => t('Format'), 'data-editor' => '{"action":"format","value":""}']];
 
-        $editorToolbarAll['sep-media'] = ['type' => 'separator', 'attr' => ['title' => t("Divider"),'class' => 'editor-sep sep-media editor-optional-button']];
+        $editorToolbarAll['sep-media'] = ['type' => 'separator', 'attr' => ['class' => 'editor-sep sep-media editor-optional-button']];
         $editorToolbarAll['emoji'] = ['edit' => 'media', 'action' => 'emoji', 'type' => $toolbarDropdownEmoji, 'attr' => ['class' => 'editor-action icon icon-smile editor-dd-emoji', 'data-wysihtml5-command' => '', 'title' => t('Emoji'), 'data-editor' => '{"action":"emoji","value":""}']];
         $editorToolbarAll['links'] = ['edit' => 'media', 'action' => 'link', 'type' => [], 'attr' => ['class' => 'editor-action icon icon-link editor-dd-link editor-optional-button', 'data-wysihtml5-command' => 'createLink', 'title' => t('Url'), 'data-editor' => '{"action":"url","value":""}']];
         $editorToolbarAll['images'] = ['edit' => 'media', 'action' => 'image', 'type' => [], 'attr' => ['class' => 'editor-action icon icon-picture editor-dd-image', 'data-wysihtml5-command' => 'insertImage', 'title' => t('Image'), 'data-editor' => '{"action":"image","value":""}']];
@@ -466,12 +466,12 @@ class EditorPlugin extends Gdn_Plugin {
         $editorToolbarAll['fileuploads'] = ['edit' => 'media', 'action' => 'fileupload', 'type' => [], 'attr' => ['class' => 'editor-action icon icon-file editor-dd-fileupload', 'data-wysihtml5-command' => '', 'title' => t('Attach file'), 'data-editor' => '{"action":"fileupload","value":""}']];
         $editorToolbarAll['imageuploads'] = ['edit' => 'media', 'action' => 'imageupload', 'type' => [], 'attr' => ['class' => 'editor-action icon icon-picture editor-dd-imageupload', 'data-wysihtml5-command' => '', 'title' => t('Attach image'), 'data-editor' => '{"action":"imageupload","value":""}']];
 
-        $editorToolbarAll['sep-align'] = ['type' => 'separator', 'attr' => ['title' => t("Divider"),'class' => 'editor-sep sep-align editor-optional-button']];
+        $editorToolbarAll['sep-align'] = ['type' => 'separator', 'attr' => ['class' => 'editor-sep sep-align editor-optional-button']];
         $editorToolbarAll['alignleft'] = ['edit' => 'format', 'action' => 'alignleft', 'type' => 'button', 'attr' => ['class' => 'editor-action icon icon-align-left editor-dialog-fire-close editor-optional-button', 'data-wysihtml5-command' => 'justifyLeft', 'title' => t('Align left'), 'data-editor' => '{"action":"alignleft","value":""}']];
         $editorToolbarAll['aligncenter'] = ['edit' => 'format', 'action' => 'aligncenter', 'type' => 'button', 'attr' => ['class' => 'editor-action icon icon-align-center editor-dialog-fire-close editor-optional-button', 'data-wysihtml5-command' => 'justifyCenter', 'title' => t('Align center'), 'data-editor' => '{"action":"aligncenter","value":""}']];
         $editorToolbarAll['alignright'] = ['edit' => 'format', 'action' => 'alignright', 'type' => 'button', 'attr' => ['class' => 'editor-action icon icon-align-right editor-dialog-fire-close editor-optional-button', 'data-wysihtml5-command' => 'justifyRight', 'title' => t('Align right'), 'data-editor' => '{"action":"alignright","value":""}']];
 
-        $editorToolbarAll['sep-switches'] = ['type' => 'separator', 'attr' => ['title' => t("Divider"),'class' => 'editor-sep sep-switches editor-optional-button']];
+        $editorToolbarAll['sep-switches'] = ['type' => 'separator', 'attr' => ['class' => 'editor-sep sep-switches editor-optional-button']];
         $editorToolbarAll['togglehtml'] = ['edit' => 'switches', 'action' => 'togglehtml', 'type' => 'button', 'attr' => ['class' => 'editor-action icon icon-source editor-toggle-source editor-dialog-fire-close editor-optional-button', 'data-wysihtml5-action' => 'change_view', 'title' => t('Toggle HTML view'), 'data-editor' => '{"action":"togglehtml","value":""}']];
         $editorToolbarAll['fullpage'] = ['edit' => 'switches', 'action' => 'fullpage', 'type' => 'button', 'attr' => ['class' => 'editor-action icon icon-resize-full editor-toggle-fullpage-button editor-dialog-fire-close editor-optional-button', 'title' => t('Toggle full page'), 'data-editor' => '{"action":"fullpage","value":""}']];
         $editorToolbarAll['lights'] = ['edit' => 'switches', 'action' => 'lights', 'type' => 'button', 'attr' => ['class' => 'editor-action icon icon-adjust editor-toggle-lights-button editor-dialog-fire-close editor-optional-button', 'title' => t('Toggle lights'), 'data-editor' => '{"action":"lights","value":""}']];

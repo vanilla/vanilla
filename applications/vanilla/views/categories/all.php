@@ -9,7 +9,7 @@ if ($description = $this->description()) {
     echo wrap($description, 'div', ['class' => 'P PageDescription']);
 }
 $this->fireEvent('AfterPageTitle');
-if (!$this->data('Category') && c('Vanilla.EnableCategoryFollowing')) {
+if ($this->data('EnableFollowingFilter')) {
     echo '<div class="PageControls Top">'.categoryFilters().'</div>';
 }
 $categories = $this->data('CategoryTree');

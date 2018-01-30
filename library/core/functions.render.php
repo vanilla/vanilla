@@ -421,9 +421,15 @@ if (!function_exists('categoryFilters')) {
         }
 
         $baseUrl = 'categories';
-        $filters = [['name' => 'Following', 'param' => 'followed']];
+        $filters = [
+            [
+                'name' => 'Following',
+                'param' => 'followed',
+                'extra' => ['save' => 1]
+            ]
+        ];
 
-        $defaultParams = [];
+        $defaultParams = ['save' => 1];
         if (Gdn::request()->get('followed')) {
             $defaultParams['followed'] = 0;
         }
@@ -716,9 +722,15 @@ if (!function_exists('discussionFilters')) {
         }
 
         $baseUrl = 'discussions';
-        $filters = [['name' => 'Following', 'param' => 'followed']];
+        $filters = [
+            [
+                'name' => 'Following',
+                'param' => 'followed',
+                'extra' => ['save' => 1]
+            ]
+        ];
 
-        $defaultParams = [];
+        $defaultParams = ['save' => 1];
         if (Gdn::request()->get('followed')) {
             $defaultParams['followed'] = 0;
         }
@@ -823,7 +835,11 @@ if (!function_exists('filtersDropDown')) {
 
                 // Prepare for consumption by linkDropDown.
                 $value = val('value', $filter, 1);
-                $url = url($baseUrl.'?'.http_build_query([$filter['param'] => $value]));
+                $query = [$filter['param'] => $value];
+                if (array_key_exists('extra', $filter) && is_array($filter['extra'])) {
+                    $query += $filter['extra'];
+                }
+                $url = url($baseUrl.'?'.http_build_query($query));
                 $link = [
                     'name' => $filter['name'],
                     'url' => $url

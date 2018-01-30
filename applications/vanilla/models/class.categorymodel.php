@@ -364,6 +364,16 @@ class CategoryModel extends Gdn_Model {
     }
 
     /**
+     * Get the enabled status of category following, returned as a boolean value.
+     *
+     * @return bool
+     */
+    public function followingEnabled() {
+        $result = boolval(c('Vanilla.EnableCategoryFollowing'));
+        return $result;
+    }
+
+    /**
      * Get the maximum number of categories a user is allowed to follow.
      *
      * @return mixed

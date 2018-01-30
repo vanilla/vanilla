@@ -420,7 +420,7 @@ if (!function_exists('categoryFilters')) {
             return;
         }
 
-        $baseUrl = url('categories');
+        $baseUrl = 'categories';
         $filters = [['name' => 'Following', 'param' => 'followed']];
 
         $defaultParams = [];
@@ -715,7 +715,7 @@ if (!function_exists('discussionFilters')) {
             return;
         }
 
-        $baseUrl = url('discussions');
+        $baseUrl = 'discussions';
         $filters = [['name' => 'Following', 'param' => 'followed']];
 
         $defaultParams = [];

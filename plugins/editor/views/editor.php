@@ -12,10 +12,8 @@ $html_arrow_down = '<span class="icon icon-caret-down" aria-hidden="true"></span
 $editor_file_input_name = $this->data('_editorFileInputName');
 
 foreach ($this->data('_EditorToolbar') as $button) {
-    $screenReaderMarkup = '';
-    if ($title = valr('attr.title', $button)) {
-        $screenReaderMarkup = '<span class="sr-only">' . $title . '</span>';
-    }
+    $title =  valr('attr.title', $button);
+    $screenReaderMarkup = $title ?'<span class="sr-only">' . $title . '</span>' : '';
 
    // If the type is not an array, it's a regular button (type==button)
    if (!is_array($button['type'])) {

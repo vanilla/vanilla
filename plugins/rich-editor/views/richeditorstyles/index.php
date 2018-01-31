@@ -4,7 +4,7 @@
     </p>
     <div class="richEditor-frame InputBox">
         <div class="richEditor-text userContent" contenteditable="true">
-            
+
         </div>
         <div class="richEditor-menu richEditorParagraphMenu">
             <button class="richEditor-button richEditorParagraphMenu-handle" type="button" aria-haspopup="menu" aria-expanded="false" aria-controls="tempId-paragraphLevelMenu-toggle">
@@ -45,9 +45,6 @@
                         </svg>
                     </button>
                 </li>
-
-
-
                 <li class="richEditor-menuItem isRightAligned" role="menuitem">
                     <button class="richEditor-button" type="button" aria-pressed="false">
                         <svg class="richEditorInline-icon" viewBox="0 0 24 24">

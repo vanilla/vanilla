@@ -26,6 +26,7 @@ class RolesTest extends AbstractResourceTest {
             'canSession' => true,
             'personalInfo' => false
         ];
+        $this->testPagingOnIndex = false;
 
         parent::__construct($name, $data, $dataName);
     }

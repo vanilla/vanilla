@@ -23,6 +23,9 @@ abstract class AbstractResourceTest extends AbstractAPIv2Test {
     /** @var array Fields to be checked with get/<id>/edit */
     protected $editFields = ['name', 'body', 'format'];
 
+    /** @var bool Whether to check if paging works or not in the index. */
+    protected $testPagingOnIndex = true;
+
     /**
      * @var string The singular name of the resource.
      */
@@ -296,24 +299,40 @@ abstract class AbstractResourceTest extends AbstractAPIv2Test {
         $originalIndex = $this->api()->get($indexUrl);
         $this->assertEquals(200, $originalIndex->getStatusCode());
 
-        // Insert a few rows.
-        $rows = [];
-        for ($i = 0; $i < static::INDEX_ROWS; $i++) {
-            $rows[] = $this->testPost();
-        }
+        $rows = $this->generateIndexRows();
 
         $newIndex = $this->api()->get($indexUrl);
 
         $originalRows = $originalIndex->getBody();
         $newRows = $newIndex->getBody();
-        $this->assertEquals(count($originalRows)+self::INDEX_ROWS, count($newRows));
+        $this->assertEquals(count($originalRows)+count($rows), count($newRows));
         // The index should be a proper indexed array.
         for ($i = 0; $i < count($newRows); $i++) {
             $this->assertArrayHasKey($i, $newRows);
         }
 
+        if ($this->testPagingOnIndex) {
+            $this->pagingTest($indexUrl);
+        }
+
         // There's not much we can really test here so just return and let subclasses do some more assertions.
         return [$rows, $newRows];
+    }
+
+    /**
+     * Generate rows for the index test.
+     *
+     * @return array
+     */
+    protected function generateIndexRows() {
+        $rows = [];
+
+        // Insert a few rows.
+        for ($i = 0; $i < static::INDEX_ROWS; $i++) {
+            $rows[] = $this->testPost();
+        }
+
+        return $rows;
     }
 
     /**

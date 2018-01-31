@@ -5,6 +5,7 @@
  */
 
 use Garden\Schema\Schema;
+use Garden\Web\Data;
 use Garden\Web\Exception\ClientException;
 use Garden\Web\Exception\NotFoundException;
 use Garden\Web\Exception\ServerException;
@@ -184,7 +185,7 @@ class CategoriesApiController extends AbstractApiController {
      * Search categories.
      *
      * @param array $query The query string.
-     * @return array
+     * @return Data
      */
     public function get_search(array $query) {
         $this->permission('Garden.SignIn.Allow');
@@ -192,13 +193,13 @@ class CategoriesApiController extends AbstractApiController {
         $in = $this->schema([
             'query:s' => 'Category name filter.',
             'page:i?' => [
-                'description' => 'Page number.',
+                'description' => 'Page number. See [Pagination](https://docs.vanillaforums.com/apiv2/#pagination).',
                 'default' => 1,
                 'minimum' => 1,
                 'maximum' => $this->categoryModel->getMaxPages()
             ],
             'limit:i?' => [
-                'description' => 'The number of items per page.',
+                'description' => 'Desired number of items per page.',
                 'default' => $this->categoryModel->getDefaultLimit(),
                 'minimum' => 1,
                 'maximum' => 200
@@ -225,7 +226,10 @@ class CategoriesApiController extends AbstractApiController {
         }
 
         $result = $out->validate($rows);
-        return $result;
+
+        $paging = ApiUtils::morePagerInfo($result, '/api/v2/comments', $query, $in);
+
+        return new Data($result, ['paging' => $paging]);
     }
 
     /**
@@ -248,7 +252,7 @@ class CategoriesApiController extends AbstractApiController {
      * List categories.
      *
      * @param array $query The query string.
-     * @return array
+     * @return Data
      */
     public function index(array $query) {
         $this->permission('Garden.SignIn.Allow');
@@ -258,17 +262,23 @@ class CategoriesApiController extends AbstractApiController {
             'parentCategoryCode:s?' => 'Parent category URL code.',
             'followed:b' => [
                 'default' => false,
-                'description' => 'Only list categories followed by the current user.'
+                'description' => 'Only list categories followed by the current user.',
             ],
             'maxDepth:i?' => [
                 'description' => '',
-                'default' => 2
+                'default' => 2,
             ],
             'page:i?' => [
-                'description' => 'Page number.',
+                'description' => 'Page number. Works with flat and followed categories. See [Pagination](https://docs.vanillaforums.com/apiv2/#pagination)',
                 'default' => 1,
                 'minimum' => 1,
-                'maximum' => $this->categoryModel->getMaxPages()
+                'maximum' => $this->categoryModel->getMaxPages(),
+            ],
+            'limit:i?' => [
+                'description' => 'Desired number of items per page.',
+                'default' => $this->categoryModel->getDefaultLimit(),
+                'minimum' => 1,
+                'maximum' => 100,
             ],
         ], 'in')->setDescription('List categories.');
         $out = $this->schema([':a' => $this->schemaWithChildren()], 'out');
@@ -279,12 +289,15 @@ class CategoriesApiController extends AbstractApiController {
         } elseif (array_key_exists('parentCategoryCode', $query)) {
             $parent = $this->category($query['parentCategoryCode']);
         } else {
-            $parent = $this->category(-1);
+            // The root category config sets the DisplayAs of the root category.
+            $parent = c('Vanilla.RootCategory', []) + $this->category(-1);
         }
 
         $joinUserCategory = $this->categoryModel->joinUserCategory();
         $this->categoryModel->setJoinUserCategory(true);
-        list($offset, $limit) = offsetLimit("p{$query['page']}", $this->categoryModel->getDefaultLimit());
+
+        list($offset, $limit) = offsetLimit("p{$query['page']}", $query['limit']);
+
         if ($query['followed']) {
             $categories = $this->categoryModel
                 ->getWhere(['Followed' => true], '', 'asc', $limit, $offset)
@@ -295,19 +308,43 @@ class CategoriesApiController extends AbstractApiController {
             $categories = $this->categoryModel->flattenCategories($categories);
             // Reset indexes for proper output detection as an indexed array.
             $categories = array_values($categories);
+
+            $totalCountCallBack = function() {
+                return $this->categoryModel->getCount(['Followed' => true]);
+            };
         } elseif ($parent['DisplayAs'] === 'Flat') {
             $categories = $this->categoryModel->getTreeAsFlat(
                 $parent['CategoryID'],
                 $offset,
                 $limit
             );
+
+            $totalCountCallBack = function() use ($parent) {
+                return $parent['CountCategories'];
+            };
         } else {
-            $categories = $this->categoryModel->getTree($parent['CategoryID'], ['maxdepth' => $query['maxDepth']]);
+            $categories = $this->categoryModel->getTree(
+                $parent['CategoryID'],
+                [
+                    'maxdepth' => $query['maxDepth'],
+                    'filter' => function ($row) {
+                        return empty($row['Archived']);
+                    },
+                ]
+            );
         }
         $this->categoryModel->setJoinUserCategory($joinUserCategory);
         $categories = array_map([$this, 'normalizeOutput'], $categories);
 
-        return $out->validate($categories);
+        $result = $out->validate($categories);
+
+        if (isset($totalCountCallBack)) {
+            $paging = ApiUtils::numberedPagerInfo($totalCountCallBack(), '/api/v2/categories', $query, $in);
+        } else {
+            $paging = [];
+        }
+
+        return new Data($result, ['paging' => $paging]);
     }
 
     /**

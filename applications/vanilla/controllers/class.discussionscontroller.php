@@ -120,6 +120,12 @@ class DiscussionsController extends VanillaController {
 
         $this->setData('Breadcrumbs', [['Name' => t('Recent Discussions'), 'Url' => '/discussions']]);
 
+        $followed = paramPreference(
+            'followed',
+            'FollowedDiscussions',
+            'Vanilla.SaveFollowingPreference'
+        );
+        $this->setData('Followed', $followed);
 
         // Set criteria & get discussions data
         $this->setData('Category', false, true);
@@ -132,7 +138,10 @@ class DiscussionsController extends VanillaController {
         // Check for individual categories.
         $categoryIDs = $this->getCategoryIDs();
         $where = [];
-        if ($categoryIDs) {
+        if ($this->data('Followed')) {
+            $categoryModel = new CategoryModel();
+            $where['d.CategoryID'] = array_keys($categoryModel->getFollowed(Gdn::session()->UserID));
+        } elseif ($categoryIDs) {
             $where['d.CategoryID'] = CategoryModel::filterCategoryPermissions($categoryIDs);
         } else {
             $DiscussionModel->Watching = true;

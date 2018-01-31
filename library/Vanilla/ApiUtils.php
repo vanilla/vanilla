@@ -8,6 +8,7 @@
 namespace Vanilla;
 
 use Garden\Schema\Schema;
+use Garden\Web\Data;
 use Vanilla\Utility\CamelCaseScheme;
 use Vanilla\Utility\CapitalCaseScheme;
 
@@ -81,13 +82,11 @@ class ApiUtils {
     public static function morePagerInfo($rows, $url, array $query, Schema $schema) {
         $count = is_array($rows) ? count($rows) : $rows;
 
-        $r = [
+        return [
             'page' => $query['page'] ?: 1,
             'more' => $count === true || $count >= $query['limit'],
-            'urlFormat' => static::pagerUrlFormat($url, $query, $schema)
+            'urlFormat' => static::pagerUrlFormat($url, $query, $schema),
         ];
-
-        return $r;
     }
 
     /**
@@ -100,13 +99,12 @@ class ApiUtils {
      * @return array Returns an array suitable to generate a pager.
      */
     public static function numberedPagerInfo($totalCount, $url, array $query, Schema $schema) {
-        $r = [
+        return [
             'page' => $query['page'] ?: 1,
             'pageCount' => static::pageCount($totalCount, $query['limit']),
             'urlFormat' => static::pagerUrlFormat($url, $query, $schema),
             'totalCount' => $totalCount, // For regenerating with different URL.
         ];
-        return $r;
     }
 
     /**
@@ -124,6 +122,7 @@ class ApiUtils {
      * Calculate a pager URL format.
      *
      * This method passes through all of the non-default arguments from a query string to the resulting URL.
+     * Note that the returned URL is not compatible with printf due to URL encoding.
      *
      * @param string $url The basic URL format without querystring.
      * @param array $query The current query string.
@@ -145,7 +144,7 @@ class ApiUtils {
             $argsStr = 'page=%s'.(empty($argsStr) ? '' : '&'.$argsStr);
         }
         if (!empty($argsStr)) {
-            $url = (strpos($url, '?') === false ? '?' : '&').$argsStr;
+            $url .= (strpos($url, '?') === false ? '?' : '&').$argsStr;
         }
         return $url;
     }

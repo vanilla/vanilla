@@ -91,7 +91,7 @@ class AddonsApiController extends Controller {
      */
     protected function filterOutput(Addon $addon, $themeType = 'desktop') {
         $r = $addon->getInfo();
-        $r['addonID'] = $addon->getKey().($addon->getType() === Addon::TYPE_ADDON ? '' : '-'.$addon->getType());
+        $r['addonID'] = $addon->getGlobalKey();
         if (empty($r['name'])) {
             $r['name'] = $addon->getRawKey() ?: $addon->getKey();
         }
@@ -125,7 +125,7 @@ class AddonsApiController extends Controller {
             $addon = $this->addonModel->getAddonManager()->lookupAddon($key);
             if ($addon) {
                 $result[] = [
-                    'addonID' => $addon->getKey().($addon->getType() === Addon::TYPE_ADDON ? '' : '-'.$addon->getType()),
+                    'addonID' => $addon->getGlobalKey(),
                     'name' => $addon->getName(),
                     'type' => $addon->getType(),
                     'key' => $addon->getKey(),

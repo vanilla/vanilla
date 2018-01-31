@@ -6,6 +6,7 @@
  */
 
 use Garden\Schema\Schema;
+use Garden\Web\Data;
 use Garden\Web\Exception\NotFoundException;
 use Garden\Web\Exception\ServerException;
 use Vanilla\Exception\ConfigurationException;
@@ -211,7 +212,7 @@ class ConversationsApiController extends AbstractApiController {
      * @param int $id The ID of the conversation.
      * @param array $query The query string.
      * @throws NotFoundException if the conversation could not be found.
-     * @return array
+     * @return Data
      */
     public function get_participants($id, array $query) {
         $this->permission('Conversations.Conversations.Add');
@@ -225,12 +226,12 @@ class ConversationsApiController extends AbstractApiController {
                 'default' => 'participating'
             ],
             'page:i?' => [
-                'description' => 'Page number.',
+                'description' => 'Page number. See [Pagination](https://docs.vanillaforums.com/apiv2/#pagination).',
                 'default' => 1,
                 'minimum' => 1,
             ],
             'limit:i?' => [
-                'description' => 'The number of items per page.',
+                'description' => 'Desired number of items per page.',
                 'default' => 5,
                 'minimum' => 5,
                 'maximum' => 100
@@ -268,14 +269,23 @@ class ConversationsApiController extends AbstractApiController {
         );
         $data = array_map([$this, 'normalizeParticipantOutput'], $data);
 
-        return $out->validate($data);
+        $result = $out->validate($data);
+
+        $paging = ApiUtils::numberedPagerInfo(
+            $this->conversationModel->getConversationMembersCount($id, $active),
+            "/api/v2/conversations/$id/participants",
+            $query,
+            $in
+        );
+
+        return new Data($result, ['paging' => $paging]);
     }
 
     /**
      * List conversations of a user.
      *
      * @param array $query The query string.
-     * @return array
+     * @return Data
      */
     public function index(array $query) {
         $this->permission('Conversations.Conversations.Add');
@@ -284,12 +294,12 @@ class ConversationsApiController extends AbstractApiController {
             'insertUserID:i?' => 'Filter by author.',
             'participantUserID:i?' => 'Filter by participating user. (Has no effect if insertUserID is used)',
             'page:i?' => [
-                'description' => 'Page number.',
+                'description' => 'Page number. See [Pagination](https://docs.vanillaforums.com/apiv2/#pagination).',
                 'default' => 1,
                 'minimum' => 1,
             ],
             'limit:i?' => [
-                'description' => 'The number of items per page.',
+                'description' => 'Desired number of items per page.',
                 'default' => $this->config->get('Conversations.Conversations.PerPage', 50),
                 'minimum' => 1,
                 'maximum' => 100
@@ -337,7 +347,11 @@ class ConversationsApiController extends AbstractApiController {
         );
         $conversations = array_map([$this, 'normalizeOutput'], $conversations);
 
-        return $out->validate($conversations);
+        $result = $out->validate($conversations);
+
+        $paging = ApiUtils::morePagerInfo($result, '/api/v2/conversations', $query, $in);
+
+        return new Data($result, ['paging' => $paging]);
     }
 
     /**

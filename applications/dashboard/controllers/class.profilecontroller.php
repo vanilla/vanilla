@@ -325,14 +325,23 @@ class ProfileController extends Gdn_Controller {
             $this->setData('Connections', []);
             $this->fireEvent('GetConnections');
 
-            // Send back the connection button.
-            $Connection = $this->data("Connections.$Provider");
+            // Send back the connection buttons.
             require_once $this->fetchViewLocation('connection_functions');
-            $this->jsonTarget(
-                "#Provider_$Provider .ActivateSlider",
-                connectButton($Connection),
-                'ReplaceWith'
-            );
+
+            foreach ($this->data('Connections') as $Key => $Row) {
+                $Provider = val($Row['ProviderKey'], $Providers, []);
+                touchValue('Connected', $Row, !is_null(val('UniqueID', $Provider, null)));
+
+                ob_start();
+                    writeConnection($Row);
+                    $connection = ob_get_contents();
+                ob_end_clean();
+                $this->jsonTarget(
+                    "#Provider_$Key",
+                    $connection,
+                    'ReplaceWith'
+                );
+            }
 
             $this->render('Blank', 'Utility', 'Dashboard');
         }

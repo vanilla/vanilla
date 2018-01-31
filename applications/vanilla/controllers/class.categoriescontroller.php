@@ -248,14 +248,28 @@ class CategoriesController extends VanillaController {
         // Figure out which category layout to choose (Defined on "Homepage" settings page).
         $layout = c('Vanilla.Categories.Layout');
 
-        if ($categoryIdentifier == '') {
+        if ($this->CategoryModel->followingEnabled()) {
+            // Only use the following filter on the root category level.
+            $enableFollowingFilter = $categoryIdentifier === '';
+            $this->fireEvent('EnableFollowingFilter', [
+                'CategoryIdentifier' => $categoryIdentifier,
+                'EnableFollowingFilter' => &$enableFollowingFilter
+            ]);
+
             $followed = paramPreference(
                 'followed',
                 'FollowedCategories',
-                'Vanilla.SaveFollowingPreference'
+                'Vanilla.SaveFollowingPreference',
+                null,
+                Gdn::request()->get('save')
             );
-            $this->setData('Followed', $followed);
+        } else {
+            $enableFollowingFilter = $followed = false;
+        }
+        $this->setData('EnableFollowingFilter', $enableFollowingFilter);
+        $this->setData('Followed', $followed);
 
+        if ($categoryIdentifier == '') {
             switch ($layout) {
                 case 'mixed':
                     $this->View = 'discussions';

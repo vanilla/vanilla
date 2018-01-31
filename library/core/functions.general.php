@@ -4079,9 +4079,10 @@ if (!function_exists('paramPreference')) {
      * @param string $preference User preference name
      * @param string|null $config Config value, used as a conditional for performing this action
      * @param string null $configVal Look for a specific config value, instead of allowing truthy values.
+     * @param bool $save Save the parameter value to the user preference, if available.
      * @return mixed
      */
-    function paramPreference($param, $preference, $config = null, $configVal = null) {
+    function paramPreference($param, $preference, $config = null, $configVal = null, $save = false) {
         $value = Gdn::request()->get($param, null);
 
         if ($config === null || (($configVal === null && c($config)) || c($config) === $configVal)) {
@@ -4090,7 +4091,7 @@ if (!function_exists('paramPreference')) {
                 if ($value) {
                     Gdn::request()->setQueryItem($param, $value);
                 }
-            } else {
+            } elseif ($save) {
                 Gdn::session()->setPreference($preference, $value);
             }
         }

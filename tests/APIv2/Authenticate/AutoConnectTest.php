@@ -110,6 +110,9 @@ class AutoConnectTest extends AbstractAPIv2Test {
             $this->assertArrayHasKey('authSessionID', $body);
         }
 
+        // Start the session as the current user to do the verification.
+        $this->api()->setUserID($this->currentUser['userID']);
+
         $result = $this->api()->get(
             $this->baseUrl.'/'.$this->authenticator->getName().'/'.$this->authenticator->getID()
         );

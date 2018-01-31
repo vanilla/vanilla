@@ -425,6 +425,8 @@ class Gdn_Session {
             return;
         }
 
+        $this->permissions = new Permissions();
+
         // Retrieve the authenticated UserID from the Authenticator module.
         $userModel = Gdn::authenticator()->getUserModel();
         $this->UserID = $userID !== false ? $userID : Gdn::authenticator()->getIdentity();

@@ -271,4 +271,9 @@
   font-size: 24px;
 }
 
+.ql-tooltip,
+.ql-hidden {
+  display: none;
+}
+
 /*# sourceMappingURL=style-compat.css.map */

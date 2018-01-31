@@ -55,15 +55,10 @@ class RichEditorPlugin extends Gdn_Plugin {
      * @param Gdn_Form $sender
      */
     public function gdn_form_beforeBodyBox_handler($sender, $args) {
-//        require_once Gdn::controller()->fetchViewLocation("helper_functions", "", "plugins/rich-editor");
-//        $view = renderEditorShell();
-
-        $myId = $this->get_editorID();
-
-        $view = "<div class='js-richText'></div>";
-
-        $args['BodyBox'] .= $view;
-
+        require_once Gdn::controller()->fetchViewLocation("helper_functions", "", "plugins/rich-editor");
+        $editorID = $this->get_editorID();
+        $smarty = new Gdn_Smarty();
+        $args['BodyBox'] = $smarty->render(PATH_PLUGINS."/rich-editor/views/richEditor.tpl", $sender);
         $sender->setValue('Format', 'Rich');
     }
 }

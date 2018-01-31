@@ -271,6 +271,15 @@
   font-size: 24px;
 }
 
+.richEditor ~ .TextBoxWrapper {
+  display: none;
+}
+
+.ql-tooltip,
+.ql-hidden {
+  display: none;
+}
+
 .followButton {
   white-space: nowrap;
   font-size: 10px;

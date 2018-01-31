@@ -7,6 +7,30 @@
 
 class RichEditorPlugin extends Gdn_Plugin {
 
+    /** @var integer */
+    private static $editorID;
+    /** @var integer */
+    private $editorNumber;
+
+    /**
+     * Set some properties we always need.
+     */
+    public function __construct() {
+        parent::__construct();
+        $this->editorNumber = ++$this->editorID;
+    }
+
+    /**
+     * Add the style script to the head
+     *
+     * @param Gdn_Controller $sender
+     * @return void
+     */
+
+    public function get_editorID() {
+        return $this->editorNumber;
+    }
+
     /**
      * Add the style script to the head
      *
@@ -18,8 +42,9 @@ class RichEditorPlugin extends Gdn_Plugin {
             return;
         }
 
-        $sender->addCssFile("//cdn.quilljs.com/1.3.4/quill.bubble.css");
+//        $sender->addCssFile("//cdn.quilljs.com/1.3.4/quill.bubble.css");
         $sender->addDefinition("editor", "RichEditor");
+
     }
 
     /**
@@ -32,9 +57,15 @@ class RichEditorPlugin extends Gdn_Plugin {
     public function gdn_form_beforeBodyBox_handler($sender, $args) {
 //        require_once Gdn::controller()->fetchViewLocation("helper_functions", "", "plugins/rich-editor");
 //        $view = renderEditorShell();
+
+        $myId = $this->get_editorID();
+
         $view = "<div class='js-richText'></div>";
 
-        $args['BodyBox'] .= $view;
+
+        $args['BodyBox'] .= $view . "HERE: " .$myId;
+
+
 
         $sender->setValue('Format', 'Rich');
     }

@@ -62,10 +62,7 @@ class RichEditorPlugin extends Gdn_Plugin {
 
         $view = "<div class='js-richText'></div>";
 
-
-        $args['BodyBox'] .= $view . "HERE: " .$myId;
-
-
+        $args['BodyBox'] .= $view;
 
         $sender->setValue('Format', 'Rich');
     }

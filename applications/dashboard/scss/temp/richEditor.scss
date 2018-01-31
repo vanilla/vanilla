@@ -315,8 +315,11 @@ $richEditor-emoji_width: 7 * $richEditor-menuButton_size + 2 * $richEditor-inser
   font-size: $richEditor-icon_size;
 }
 
-// Temporary
+.richEditor ~ .TextBoxWrapper {
+  display: none;
+}
 
+// Temporary
 .ql-tooltip,
 .ql-hidden {
   display: none;

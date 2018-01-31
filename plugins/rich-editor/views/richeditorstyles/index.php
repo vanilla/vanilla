@@ -167,7 +167,7 @@
             <a href="#" class="atMention-link">
                 <span class="atMention-user">
                     <span class="PhotoWrap atMention-photoWrap">
-                        <img src="https://secure.gravatar.com/avatar/b0420af06d6fecc16fc88a88cbea8218/?default=https%3A%2F%2Fvanillicon.com%2Fb0420af06d6fecc16fc88a88cbea8218_200.png&amp;rating=g&amp;size=120" alt="Linc" class="atMention-photo ProfilePhoto"/>
+                        <img src="https://secure.gravatar.com/avatar/b0420af06d6fecc16fc88a88cbea8218/?default=https%3A%2F%2Fvanillicon.com%2Fb0420af06d6fecc16fc88a88cbea8218_20w0.png&amp;rating=g&amp;size=120" alt="Linc" class="atMention-photo ProfilePhoto"/>
                     </span>
                     <span class="atMention-userName">
                         <mark class="atMention-mark">Fra</mark>nkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkz

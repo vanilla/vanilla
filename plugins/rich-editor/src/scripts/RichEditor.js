@@ -4,27 +4,17 @@
  * @license https://opensource.org/licenses/GPL-2.0 GPL-2.0
  */
 
-import Quill from "quill";
+import Quill from "quill/quill";
+import VanillaTheme from "./VanillaTheme";
 import * as utility from "@core/utility";
+//
 
-const toolbarOptions = [
-    ["bold", "italic", "strike"], // toggled buttons
-    ['link', 'image'], // Links and images
-    // ["blockquote", "code-block"], // Blocks
-    // [{ header: 1 }, { header: 2 }], // custom button values
-    [{ list: "ordered"}, { list: "bullet" }],
-    // [{ indent: "-1"}, { indent: "+1" }], // outdent/indent
-    [{ header: [1, 2, false] }],
-    ["clean"], // remove formatting button
-];
+
+Quill.register("themes/vanilla", VanillaTheme);
 
 const options = {
-    modules: {
-        toolbar: toolbarOptions,
-        // autoLinker: true,
-    },
     placeholder: "Create a new post...",
-    theme: "bubble",
+    theme: "vanilla",
 };
 
 export default class RichEditor {

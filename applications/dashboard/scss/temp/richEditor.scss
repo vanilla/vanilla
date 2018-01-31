@@ -11,7 +11,10 @@ $richEditor-atMentionAvatar_width: 30px !default;
 $richEditor-atMentionAvatar_margin: 10px !default;
 $richEditor-atMentionMark_weight: 600 !default;
 $richEditor-insertLink_width: 387px !default;
-$richEditor-insertMenu_padding: 9px 12px !default;
+$richEditor-insertPopover_paddingVertical: 9px !default;
+$richEditor-insertPopover_paddingHorizontal: 12px !default;
+$richEditor-insertPopover_maxHeight: 250px !default;
+$richEditor-emoji_width: 7 * $richEditor-menuButton_size + 2 * $richEditor-insertPopover_paddingHorizontal;
 
 .richEditor {
   position: relative;
@@ -226,8 +229,8 @@ $richEditor-insertMenu_padding: 9px 12px !default;
 }
 
 // Insert Media
-.insertMedia {
-  padding: $richEditor-insertMenu_padding;
+.insertPopover {
+
 
   .InputBox {
     width: 100%;
@@ -245,17 +248,38 @@ $richEditor-insertMenu_padding: 9px 12px !default;
   }
 }
 
+.insertPopover-header {
+  padding: {
+    top: $richEditor-insertPopover_paddingVertical;
+    bottom: $richEditor-insertPopover_paddingVertical;
+    left: $richEditor-insertPopover_paddingHorizontal;
+    right: $richEditor-insertPopover_paddingHorizontal;
+  }
+}
+
+.insertPopover-footer {
+  padding: {
+    bottom: $richEditor-insertPopover_paddingVertical;
+    left: $richEditor-insertPopover_paddingHorizontal;
+    right: $richEditor-insertPopover_paddingHorizontal;
+  }
+}
+
 .insertMedia-title {
-  margin-top: 0;
+  margin: 0;
   max-width: calc(100% - #{$richEditor-menuButton_size});
-  min-height: $richEditor-menuButton_size;
+  min-height: #{$richEditor-menuButton_size - $richEditor-insertPopover_paddingVertical};
 }
 
 .insertMedia-footer {
   display: flex;
   align-items: center;
   justify-content: flex-end;
-  margin-top: 12px;
+  padding: {
+    left: $richEditor-insertPopover_paddingHorizontal;
+    right: $richEditor-insertPopover_paddingHorizontal;
+    bottom: $richEditor-insertPopover_paddingVertical;
+  }
 }
 
 .insertMedia-help {
@@ -265,4 +289,28 @@ $richEditor-insertMenu_padding: 9px 12px !default;
 
 .insertMedia-insert {
   margin-bottom: 3px;
+}
+
+
+.insertPopover-body {
+  max-height: $richEditor-insertPopover_maxHeight;
+  overflow: auto;
+  padding: {
+    left: $richEditor-insertPopover_paddingHorizontal;
+    right: $richEditor-insertPopover_paddingHorizontal;
+  }
+  margin-bottom: $richEditor-insertPopover_paddingHorizontal;
+}
+
+.richEditor-emojis {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  justify-content: flex-start;
+}
+
+.richEditor-insertEmoji {
+  width: $richEditor-menuButton_size;
+  height: $richEditor-menuButton_size;
+  font-size: $richEditor-icon_size;
 }

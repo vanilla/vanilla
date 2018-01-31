@@ -206,14 +206,17 @@
 <hr/>
 
 <h2>Insert Media</h2>
-<div class="richEditor-menu FlyoutMenu insertMedia" role="dialog" aria-labeledby="tempId-insertMediaMenu-title" aria-describedby="tempId-insertMediaMenu-p">
-    <div class="insertMedia-header">
+<div class="richEditor-menu FlyoutMenu insertMedia insertPopover" role="dialog" aria-labeledby="tempId-insertMediaMenu-title" aria-describedby="tempId-insertMediaMenu-p">
+    <div class="insertPopover-header">
         <h2 id="tempId-insertMediaMenu-title" class="H insertMedia-title">
             <?php echo t('Insert Media'); ?>
         </h2>
         <a href="#" aria-label="<?php echo t('Close'); ?>" class="Close richEditor-close">
             <span>×</span>
         </a>
+    </div>
+
+    <div class="insertPopover-body">
         <p id="tempId-insertMediaMenu-p" class="insertMedia-description">
             <?php echo t('Paste the URL of the media you want.'); ?>
         </p>
@@ -228,3 +231,77 @@
         <input type="submit" class="Button Primary insertMedia-insert" value="<?php echo t('Insert'); ?>" aria-label="<?php echo t('Insert Media') ?>">
     </div>
 </div>
+
+<h2>Emoji List</h2>
+
+<div class="richEditor-menu FlyoutMenu insertEmoji insertPopover" role="dialog" aria-labeledby="tempId-insertEmoji-title">
+    <div class="insertPopover-header">
+        <h2 id="tempId-insertMediaMenu-title" class="H insertMedia-title">
+            <?php echo t('Smileys & Faces'); ?>
+        </h2>
+        <a href="#" aria-label="<?php echo t('Close'); ?>" class="Close richEditor-close">
+            <span>×</span>
+        </a>
+    </div>
+    <div class="insertPopover-body">
+        <div class="richEditor-emojis">
+            <button class="richEditor-button richEditor-insertEmoji" data-emoji="😀">😀</button>
+
+
+
+            <button class="richEditor-button richEditor-insertEmoji" data-emoji="😁">😁</button>
+            <button class="richEditor-button richEditor-insertEmoji" data-emoji="😂">😂</button>
+            <button class="richEditor-button richEditor-insertEmoji" data-emoji="😀">😀</button>
+            <button class="richEditor-button richEditor-insertEmoji" data-emoji="😁">😁</button>
+            <button class="richEditor-button richEditor-insertEmoji" data-emoji="😂">😂</button>
+            <button class="richEditor-button richEditor-insertEmoji" data-emoji="😁">😁</button>
+            <button class="richEditor-button richEditor-insertEmoji" data-emoji="😂">😂</button>
+            <button class="richEditor-button richEditor-insertEmoji" data-emoji="😀">😀</button>
+            <button class="richEditor-button richEditor-insertEmoji" data-emoji="😁">😁</button>
+            <button class="richEditor-button richEditor-insertEmoji" data-emoji="😂">😂</button>
+            <button class="richEditor-button richEditor-insertEmoji" data-emoji="😁">😁</button>
+            <button class="richEditor-button richEditor-insertEmoji" data-emoji="😂">😂</button>
+            <button class="richEditor-button richEditor-insertEmoji" data-emoji="😀">😀</button>
+            <button class="richEditor-button richEditor-insertEmoji" data-emoji="😁">😁</button>
+            <button class="richEditor-button richEditor-insertEmoji" data-emoji="😂">😂</button>
+            <button class="richEditor-button richEditor-insertEmoji" data-emoji="😁">😁</button>
+            <button class="richEditor-button richEditor-insertEmoji" data-emoji="😂">😂</button>
+            <button class="richEditor-button richEditor-insertEmoji" data-emoji="😀">😀</button>
+            <button class="richEditor-button richEditor-insertEmoji" data-emoji="😁">😁</button>
+            <button class="richEditor-button richEditor-insertEmoji" data-emoji="😂">😂</button>
+            <button class="richEditor-button richEditor-insertEmoji" data-emoji="😁">😁</button>
+            <button class="richEditor-button richEditor-insertEmoji" data-emoji="😂">😂</button>
+            <button class="richEditor-button richEditor-insertEmoji" data-emoji="😀">😀</button>
+            <button class="richEditor-button richEditor-insertEmoji" data-emoji="😁">😁</button>
+            <button class="richEditor-button richEditor-insertEmoji" data-emoji="😂">😂</button>
+            <button class="richEditor-button richEditor-insertEmoji" data-emoji="😁">😁</button>
+            <button class="richEditor-button richEditor-insertEmoji" data-emoji="😂">😂</button>
+            <button class="richEditor-button richEditor-insertEmoji" data-emoji="😀">😀</button>
+            <button class="richEditor-button richEditor-insertEmoji" data-emoji="😁">😁</button>
+            <button class="richEditor-button richEditor-insertEmoji" data-emoji="😂">😂</button>
+            <button class="richEditor-button richEditor-insertEmoji" data-emoji="😁">😁</button>
+            <button class="richEditor-button richEditor-insertEmoji" data-emoji="😂">😂</button>
+            <button class="richEditor-button richEditor-insertEmoji" data-emoji="😀">😀</button>
+            <button class="richEditor-button richEditor-insertEmoji" data-emoji="😁">😁</button>
+            <button class="richEditor-button richEditor-insertEmoji" data-emoji="😂">😂</button>
+            <button class="richEditor-button richEditor-insertEmoji" data-emoji="😁">😁</button>
+            <button class="richEditor-button richEditor-insertEmoji" data-emoji="😂">😂</button>
+            <button class="richEditor-button richEditor-insertEmoji" data-emoji="😀">😀</button>
+            <button class="richEditor-button richEditor-insertEmoji" data-emoji="😁">😁</button>
+            <button class="richEditor-button richEditor-insertEmoji" data-emoji="😂">😂</button>
+            <button class="richEditor-button richEditor-insertEmoji" data-emoji="😁">😁</button>
+            <button class="richEditor-button richEditor-insertEmoji" data-emoji="😂">😂</button>
+            <button class="richEditor-button richEditor-insertEmoji" data-emoji="😀">😀</button>
+            <button class="richEditor-button richEditor-insertEmoji" data-emoji="😁">😁</button>
+            <button class="richEditor-button richEditor-insertEmoji" data-emoji="😂">😂</button>
+            <button class="richEditor-button richEditor-insertEmoji" data-emoji="😁">😁</button>
+            <button class="richEditor-button richEditor-insertEmoji" data-emoji="😂">😂</button>
+            <button class="richEditor-button richEditor-insertEmoji" data-emoji="😀">😀</button>
+            <button class="richEditor-button richEditor-insertEmoji" data-emoji="😁">😁</button>
+            <button class="richEditor-button richEditor-insertEmoji" data-emoji="😂">😂</button>
+
+
+        </div>
+    </div>
+</div>
+

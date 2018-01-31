@@ -198,36 +198,47 @@
   max-width: calc(100% - 39px);
 }
 
-.insertMedia {
-  padding: 9px 12px;
-}
-
-.insertMedia .InputBox {
+.insertPopover .InputBox {
   width: 100%;
   box-sizing: border-box;
 }
 
-.insertMedia .richEditor-close {
+.insertPopover .richEditor-close {
   position: absolute;
   top: 0;
   right: 0;
 }
 
-.insertMedia .Footer {
+.insertPopover .Footer {
   display: flex;
 }
 
+.insertPopover-header {
+  padding-top: 9px;
+  padding-bottom: 9px;
+  padding-left: 12px;
+  padding-right: 12px;
+}
+
+.insertPopover-footer {
+  padding-bottom: 9px;
+  padding-left: 12px;
+  padding-right: 12px;
+}
+
 .insertMedia-title {
-  margin-top: 0;
+  margin: 0;
   max-width: calc(100% - 39px);
-  min-height: 39px;
+  min-height: 30px;
 }
 
 .insertMedia-footer {
   display: flex;
   align-items: center;
   justify-content: flex-end;
-  margin-top: 12px;
+  padding-left: 12px;
+  padding-right: 12px;
+  padding-bottom: 9px;
 }
 
 .insertMedia-help {
@@ -237,6 +248,27 @@
 
 .insertMedia-insert {
   margin-bottom: 3px;
+}
+
+.insertPopover-body {
+  max-height: 250px;
+  overflow: auto;
+  padding-left: 12px;
+  padding-right: 12px;
+  margin-bottom: 12px;
+}
+
+.richEditor-emojis {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  justify-content: flex-start;
+}
+
+.richEditor-insertEmoji {
+  width: 39px;
+  height: 39px;
+  font-size: 24px;
 }
 
 /*# sourceMappingURL=style-compat.css.map */

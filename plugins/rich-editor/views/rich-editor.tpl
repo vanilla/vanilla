@@ -44,18 +44,19 @@
                         </svg>
                     </button>
                 </li>
-                <li class="richEditor-menuItem" role="menuitem">
-                    <button class="richEditor-button emojiButton" type="button" aria-pressed="false">
-                        TEST EMOJI
-                    </button>
-                </li>
+
+                {*<li class="richEditor-menuItem" role="menuitem">*}
+                    {*<button class="richEditor-button emojiButton" type="button" aria-pressed="false">*}
+                        {*TEST EMOJI*}
+                    {*</button>*}
+                {*</li>*}
 
 
-                <li class="richEditor-menuItem" role="menuitem">
-                    <button class="richEditor-button imageButton" type="button" aria-pressed="false">
-                        TEST IMAGE
-                    </button>
-                </li>
+                {*<li class="richEditor-menuItem" role="menuitem">*}
+                    {*<button class="richEditor-button imageButton" type="button" aria-pressed="false">*}
+                        {*TEST IMAGE*}
+                    {*</button>*}
+                {*</li>*}
 
                 <li class="richEditor-menuItem isRightAligned" role="menuitem">
                     <button class="richEditor-button" type="button" aria-pressed="false">

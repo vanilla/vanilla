@@ -5,7 +5,12 @@
  */
 
 import Quill from "quill";
+import EmojiBlot from "./blots/EmojiBlot.js";
 import * as utility from "@core/utility";
+
+Quill.register({
+    "formats/emoji": EmojiBlot
+});
 
 const toolbarOptions = [
     ["bold", "italic", "strike"], // toggled buttons
@@ -23,8 +28,8 @@ const options = {
         toolbar: toolbarOptions,
         // autoLinker: true,
     },
-    placeholder: "Create a new post...",
-    theme: "bubble",
+    placeholder: false,
+    theme: false,
 };
 
 export default class RichEditor {
@@ -72,16 +77,29 @@ export default class RichEditor {
 
     initializeWithRichFormat() {
         utility.log("Initializing Rich Editor");
-        this.editor = new Quill(this.container, options);
+        const editor = new Quill(this.container, options);
         this.bodybox.style.display = "none";
         // this.editor.keyboard.removeHotkeys(9);
 
         if (this.initialValue) {
             utility.log("Setting existing content as contents of editor");
-            this.editor.setContents(JSON.parse(this.initialValue));
+            editor.setContents(JSON.parse(this.initialValue));
         }
 
-        this.editor.on("text-change", this.synchronizeDelta.bind(this));
+        editor.on("text-change", this.synchronizeDelta.bind(this));
+
+        console.log("Editor: ", this.editor);
+
+        const insertEmoji = function() {
+            const editorSelection = editor.getSelection();
+            const cursorPosition = editorSelection && editorSelection.index ? editorSelection.index : 0;
+            editor.insertEmbed(cursorPosition, "emoji", '😊', 'toto');
+
+            editor.insertText(cursorPosition + 1, ' ');
+            editor.setSelection(cursorPosition + 2);
+        };
+
+        document.querySelector(".emojiButton").addEventListener("click", insertEmoji);
     }
 
     /**
@@ -89,7 +107,7 @@ export default class RichEditor {
      * as a hidden input (Because we aren't overriding the submit)
      */
     synchronizeDelta() {
-        this.bodybox.value = JSON.stringify(this.editor.getContents()["ops"]);
+        // this.bodybox.value = JSON.stringify(this.editor.getContents()["ops"]);
     }
 
     initializeOtherFormat() {

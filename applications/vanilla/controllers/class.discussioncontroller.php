@@ -441,6 +441,9 @@ class DiscussionController extends VanillaController {
             throw notFoundException('Discussion');
         }
 
+        // Make sure that the user has access to the discussion.
+        $this->DiscussionModel->categoryPermission('Vanilla.Discussions.View', $Discussion['CategoryID']);
+
         $Bookmark = $this->DiscussionModel->bookmark($DiscussionID, $UserID, $Bookmark);
 
         // Set the new value for api calls and json targets.

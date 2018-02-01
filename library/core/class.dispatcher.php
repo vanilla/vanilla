@@ -39,6 +39,7 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
         '/^sso(\/.*)?$/' => self::BLOCK_NEVER,
         '/^discussions\/getcommentcounts/' => self::BLOCK_NEVER,
         '/^entry(\/.*)?$/' => self::BLOCK_PERMISSION,
+        '/^settings\/analyticstick.json$/' => self::BLOCK_PERMISSION,
         '/^user\/usernameavailable(\/.*)?$/' => self::BLOCK_PERMISSION,
         '/^user\/emailavailable(\/.*)?$/' => self::BLOCK_PERMISSION,
         '/^home\/termsofservice(\/.*)?$/' => self::BLOCK_PERMISSION,
@@ -197,6 +198,17 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
     }
 
     /**
+     * Convert a dash-cased name into capital case.
+     *
+     * @param string $name The name to convert.
+     * @return string Returns the filtered name.
+     */
+    private function filterName($name) {
+        $result = implode('', array_map('ucfirst', explode('-', $name)));
+        return $result;
+    }
+
+    /**
      * Dispatch a request to a controller method.
      *
      * This method analyzes a request and figures out which controller and method it maps to. It also instantiates the
@@ -260,7 +272,7 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
             // Now that the controller has been found, dispatch to a method on it.
             $this->dispatchController($request, $routeArgs);
         } else {
-            $response->render();
+            $this->dispatcher->render($request, $response);
         }
     }
 
@@ -462,11 +474,11 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
         } else {
             $application = '';
         }
-        $controller = ucfirst(reset($parts));
+        $controller = $this->filterName(reset($parts));
 
         // This is a kludge until we can refactor- settings controllers better.
         if ($controller === 'Settings' && $application !== 'dashboard') {
-            $controller = ucfirst($application).$controller;
+            $controller = $this->filterName($application).$controller;
         }
 
         $controllerName = $controller.'Controller';
@@ -475,9 +487,9 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
         if (class_exists($controllerName, true)) {
             array_shift($parts);
             return [$controllerName, $parts];
-        } elseif (!empty($application) && class_exists($application.'Controller', true)) {
+        } elseif (!empty($application) && class_exists($this->filterName($application).'Controller', true)) {
             // There is a controller with the same name as the application so use it.
-            return [ucfirst($application).'Controller', $parts];
+            return [$this->filterName($application).'Controller', $parts];
         } else {
             return ['', $parts];
         }

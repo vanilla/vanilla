@@ -240,12 +240,14 @@ class Data implements \JsonSerializable, \ArrayAccess, \Countable, \IteratorAggr
     public function render() {
         http_response_code($this->getStatus());
 
-        if (!$this->hasHeader('Content-Type')) {
-            header('Content-Type: application/json; charset=utf-8', true);
-        }
-        foreach ($this->getHeaders() as $name => $value) {
-            foreach ((array)$value as $line) {
-                header("$name: $line");
+        if (!headers_sent()) {
+            if (!$this->hasHeader('Content-Type')) {
+                header('Content-Type: application/json; charset=utf-8', true);
+            }
+            foreach ($this->getHeaders() as $name => $value) {
+                foreach ((array)$value as $line) {
+                    header("$name: $line");
+                }
             }
         }
 

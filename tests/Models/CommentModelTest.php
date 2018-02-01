@@ -15,7 +15,19 @@ use VanillaTests\SiteTestTrait;
  * Test {@link CommentModel}.
  */
 class CommentModelTest extends TestCase {
-    use SiteTestTrait;
+    use SiteTestTrait {
+        setupBeforeClass as baseSetupBeforeClass;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public static function setupBeforeClass() {
+        self::baseSetupBeforeClass();
+
+        // Test as an admin
+        self::container()->get('Session')->start(self::$siteInfo['adminUserID']);
+    }
 
     /**
      * Test the lookup method.

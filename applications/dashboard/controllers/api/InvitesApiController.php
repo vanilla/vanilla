@@ -133,20 +133,20 @@ class InvitesApiController extends AbstractApiController {
      * Get a list of invites for the current user.
      *
      * @param array $query The request query.
-     * @return array
+     * @return Data
      */
     public function index(array $query) {
         $this->permission('Garden.SignIn.Allow');
 
         $in = $this->schema([
             'page:i?' => [
-                'description' => 'Page number.',
+                'description' => 'Page number. See [Pagination](https://docs.vanillaforums.com/apiv2/#pagination).',
                 'default' => 1,
                 'minimum' => 1,
                 'maximum' => 100
             ],
             'limit:i?' => [
-                'description' => 'The number of items per page.',
+                'description' => 'Desired number of items per page.',
                 'default' => 30,
                 'minimum' => 1,
                 'maximum' => 100
@@ -160,8 +160,10 @@ class InvitesApiController extends AbstractApiController {
         $query = $in->validate($query);
         list($offset, $limit) = offsetLimit("p{$query['page']}", $query['limit']);
 
+        $userID = $this->getSession()->UserID;
+
         $rows = $this->invitationModel->getByUserID(
-            $this->getSession()->UserID,
+            $userID,
             '',
             $limit,
             $offset,
@@ -174,11 +176,13 @@ class InvitesApiController extends AbstractApiController {
             $this->resolveExpandFields($query, ['acceptedUser' => 'acceptedUserID'])
         );
 
-        foreach ($rows as &$row) {
-            $row = $this->normalizeOutput($row);
-        }
+        $rows = array_map([$this, 'normalizeOutput'], $rows);
+
         $result = $out->validate($rows);
-        return $result;
+
+        $paging = ApiUtils::numberedPagerInfo($this->invitationModel->getCount(['InsertUserID' => $userID]), '/api/v2/invites', $query, $in);
+
+        return new Data($result, ['paging' => $paging]);
     }
 
     /**

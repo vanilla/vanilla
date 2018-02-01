@@ -110,7 +110,7 @@ class AddonManagerTest extends TestCase {
         $keys = [
             'test-old-application' => Addon::TYPE_ADDON,
             'test-old-plugin' => Addon::TYPE_ADDON,
-            'test-old-theme' => Addon::TYPE_THEME
+            'test-old' => Addon::TYPE_THEME
         ];
 
         foreach ($keys as $key => $type) {
@@ -144,7 +144,7 @@ class AddonManagerTest extends TestCase {
         $tm = $this->createTestManager();
 
         // Test a requirement with transitive requirements.
-        $addon = $tm->lookupTheme('test-old-theme');
+        $addon = $tm->lookupTheme('test-old');
         $reqs = $tm->lookupRequirements($addon);
         $this->assertArrayHasKey('test-old-plugin', $reqs);
         $this->assertArrayHasKey('test-old-application', $reqs);
@@ -163,7 +163,7 @@ class AddonManagerTest extends TestCase {
         $tm->startAddonsByKey(['test-old-application'], Addon::TYPE_ADDON);
 
         // Test a requirement with transitive requirements.
-        $addon = $tm->lookupTheme('test-old-theme');
+        $addon = $tm->lookupTheme('test-old');
         $reqs = $tm->lookupRequirements($addon, AddonManager::REQ_DISABLED);
         $this->assertArrayHasKey('test-old-plugin', $reqs);
         $this->assertArrayNotHasKey('test-old-application', $reqs);
@@ -227,16 +227,16 @@ class AddonManagerTest extends TestCase {
             $this->assertTrue(in_array($addon->getType(), [Addon::TYPE_ADDON]));
         }
 
-        $locale = $manager->lookupLocale('test-locale');
+        $locale = $manager->lookupLocale('test');
         $this->assertNotEmpty($locale);
         $this->assertTrue($locale instanceof Addon);
-        $this->assertSame('test-locale', $locale->getKey());
+        $this->assertSame('test', $locale->getKey());
         $this->assertSame(Addon::TYPE_LOCALE, $locale->getType());
 
-        $theme = $manager->lookupTheme('test-old-theme');
+        $theme = $manager->lookupTheme('test-old');
         $this->assertNotEmpty($theme);
         $this->assertTrue($theme instanceof Addon);
-        $this->assertSame('test-old-theme', $theme->getKey());
+        $this->assertSame('test-old', $theme->getKey());
         $this->assertSame(Addon::TYPE_THEME, $theme->getType());
     }
 
@@ -738,6 +738,47 @@ class AddonManagerTest extends TestCase {
         $this->assertFalse($am->checkConflicts($parent, false));
 
         $am->checkConflicts($parent, true);
+    }
+
+    public function testLookupNonExistant() {
+        $am = $this->createTestManager();
+
+        $this->assertNull($am->lookupTheme('asdf'));
+        $this->assertNull($am->lookupByType('asdf', Addon::TYPE_THEME));
+        $this->assertNull($am->lookupByType('', Addon::TYPE_THEME));
+    }
+
+    /**
+     * Test **AddonManager::getAddonInfoValue()**.
+     */
+    public function testGetAddonInfoValue() {
+        $am = $this->createTestManager();
+
+        $basic = $am->lookupTheme('basic');
+
+
+        $this->assertEquals('a', $am->getAddonInfoValue($basic, 'a'));
+        $this->assertEquals('b', $am->getAddonInfoValue($basic, 'b'));
+        $this->assertEquals('no', $am->getAddonInfoValue($basic, 'c', 'no'));
+    }
+
+    /**
+     * Test **AddonManager::lookup()**.
+     */
+    public function testGlobalLookup() {
+        $am = $this->createTestManager();
+
+        $addon = $am->lookup('test-plugin');
+        $this->assertEquals('test-plugin', $addon->getKey());
+        $this->assertEquals(Addon::TYPE_ADDON, $addon->getType());
+
+        $theme = $am->lookup('basic-theme');
+        $this->assertEquals('basic', $theme->getKey());
+        $this->assertEquals(Addon::TYPE_THEME, $theme->getType());
+
+        $locale = $am->lookup('test-locale');
+        $this->assertEquals('test', $locale->getKey());
+        $this->assertEquals(Addon::TYPE_LOCALE, $locale->getType());
     }
 
     /**

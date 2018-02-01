@@ -435,11 +435,7 @@ class AddonModel implements LoggerAwareInterface {
     }
 
     public function splitID($addonID) {
-        if (preg_match('`^(.+)-(locale|theme)$`', $addonID, $m)) {
-            return [$m[1], $m[2]];
-        } else {
-            return [$addonID, Addon::TYPE_ADDON];
-        }
+        return Addon::splitGlobalKey($addonID);
     }
 
     /**
@@ -462,7 +458,7 @@ class AddonModel implements LoggerAwareInterface {
 
         // Do a bit of optimization depending on the filter.
         if ($where['addonID']) {
-            list($key, $type) = $this->splitID($where['addonID']);
+            list($key, $type) = Addon::splitGlobalKey($where['addonID']);
             $addons = [$am->lookupByType($key, $type)];
         } elseif ($where['enabled'] && $where['type'] === Addon::TYPE_THEME) {
             $addons = [$am->lookupTheme($this->getThemeKey($where['themeType']))];

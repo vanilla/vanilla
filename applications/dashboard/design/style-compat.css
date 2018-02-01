@@ -4,7 +4,12 @@
   padding-left: 36px;
 }
 
+.richEditor em {
+  font-style: oblique;
+}
+
 .richEditor-frame.InputBox {
+  position: relative;
   background: white;
   height: auto;
   padding: 0;
@@ -25,6 +30,13 @@
   float: none;
 }
 
+.richEditor-inlineNub {
+  width: 8px;
+  height: 8px;
+  background: black;
+  position: absolute;
+}
+
 .richEditorParagraphMenu {
   position: absolute;
   top: 9px;
@@ -36,7 +48,12 @@
 .richEditor-text {
   position: relative;
   min-height: 200px;
-  padding: 9px 12px 0;
+  padding: 9px 12px;
+  outline-color: transparent;
+}
+
+.richEditor-text .ql-editor {
+  min-height: 191px;
 }
 
 .richEditor-text:focus {
@@ -46,6 +63,10 @@
   outline-color: Highlight;
   outline-color: -webkit-focus-ring-color;
   z-index: 1;
+}
+
+.ql-clipboard {
+  display: none;
 }
 
 .richEditor-menuItems {
@@ -84,6 +105,7 @@
   padding: 0;
   height: 24px;
   width: 24px;
+  background: none;
 }
 
 .richEditor-button.richEditorParagraphMenu-handle {
@@ -102,7 +124,7 @@
   z-index: 1;
 }
 
-.richEditor-button:hover .richEditorInline-icon, .richEditor-button:focus .richEditorInline-icon {
+.richEditor-button:hover .richEditorInline-icon, .richEditor-button:focus .richEditorInline-icon, .richEditor-button.isActive .richEditorInline-icon {
   opacity: 1;
 }
 

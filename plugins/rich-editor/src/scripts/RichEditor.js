@@ -9,6 +9,8 @@ import VanillaTheme from "./quill/VanillaTheme";
 
 import * as utility from "@core/utility";
 
+// Quill.debug(true);
+
 Quill.register("themes/vanilla", VanillaTheme);
 
 const options = {

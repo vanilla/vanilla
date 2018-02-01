@@ -5,10 +5,9 @@
  */
 
 import Quill from "quill/quill";
-import VanillaTheme from "./VanillaTheme";
-import * as utility from "@core/utility";
-//
+import VanillaTheme from "./quill/VanillaTheme";
 
+import * as utility from "@core/utility";
 
 Quill.register("themes/vanilla", VanillaTheme);
 

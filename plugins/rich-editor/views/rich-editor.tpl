@@ -3,7 +3,7 @@
         {t c="Insert instructions for editor here"}
     </p>
     <div class="richEditor-frame InputBox">
-        <div class="richEditor-text userContent js-richText" contenteditable="true">
+        <div class="richEditor-text userContent js-richText">
 
         </div>
         <div class="richEditor-menu richEditorParagraphMenu">
@@ -26,6 +26,7 @@
                         </svg>
                     </button>
                 </li>
+
                 <li class="richEditor-menuItem" role="menuitem">
                     <button class="richEditor-button" type="button" aria-pressed="false">
                         <svg class="richEditorInline-icon" viewBox="0 0 24 24">
@@ -48,6 +49,14 @@
                         TEST EMOJI
                     </button>
                 </li>
+
+
+                <li class="richEditor-menuItem" role="menuitem">
+                    <button class="richEditor-button imageButton" type="button" aria-pressed="false">
+                        TEST IMAGE
+                    </button>
+                </li>
+
                 <li class="richEditor-menuItem isRightAligned" role="menuitem">
                     <button class="richEditor-button" type="button" aria-pressed="false">
                         <svg class="richEditorInline-icon" viewBox="0 0 24 24">

@@ -1,50 +1,21 @@
 import Quill from "quill";
-const Inline = Quill.import("blots/inline");
+let Embed = Quill.import('blots/embed');
 
-export default class EmojiBlot extends Inline {
-
-    static blotName = "emoji";
-    static tagName = "span";
-
-    static create(classes) {
+export default class EmojiBlot extends Embed {
+    static create(emojiData) {
         let node = super.create();
-
-        console.log("node: ", node);
-
-        classes.split(" ").forEach(iconClass => {
-            node.classList.add(iconClass);
-        });
+        node.dataset.emoji = emojiData.emojiChar;
+        node.classList.add("emoji");
+        node.innerHTML = emojiData.emojiChar;
         return node;
     }
 
-    static formats(node) {
-        let format = {};
-        if (node.hasAttribute("class")) {
-            format.class = node.getAttribute("class");
-        }
-        return format;
-    }
-
     static value(node) {
-        
-
-
-        return node.getAttribute("class");
-    }
-
-    format(name, value) {
-        if (name === "class") {
-            if (value) {
-                this.domNode.setAttribute(name, value);
-            } else {
-                this.domNode.removeAttribute(name, value);
-            }
-        } else {
-            super.format(name, value);
+        return {
+            'emojiChar': node.dataset.emoji
         }
     }
 }
 
-// EmojiBlot.blotName = "emoji";
-// EmojiBlot.tagName = "span";
-
+EmojiBlot.blotName = 'emoji';
+EmojiBlot.tagName = 'span';

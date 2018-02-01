@@ -1,9 +1,15 @@
+/**
+ * @author Adam (charrondev) Charron <adam.c@vanillaforums.com>
+ * @copyright 2009-2018 Vanilla Forums Inc.
+ * @license https://opensource.org/licenses/GPL-2.0 GPL-2.0
+ */
+
 import React from "react";
 import * as PropTypes from "prop-types";
 import Quill from "quill";
 import EditorToolbar from "./EditorToolbar";
 import Emitter from "quill/core/emitter";
-import {Range} from "quill/core/selection";
+import { Range } from "quill/core/selection";
 
 export default class InlineEditorToolbar extends React.Component {
     static propTypes = {
@@ -56,6 +62,13 @@ export default class InlineEditorToolbar extends React.Component {
     }
 
     /**
+     * Be sure to remove the listeners when the component unmounts.
+     */
+    componentWillUnmount() {
+        this.quill.off(Quill.events.EDITOR_CHANGE);
+    }
+
+    /**
      * Handle changes from the editor.
      * @param {string} type - The event type. See {quill/core/emitter}
      * @param {RangeStatic} range - The new range.
@@ -100,11 +113,12 @@ export default class InlineEditorToolbar extends React.Component {
      * Determine position of the toolbar based on the bounds reported from quill.
      *
      * @param {BoundsStatic} bounds - The bounds to check.
-     * @param {boolean} isLastLine - Whether or not the selection is encompasses the last line.
      *
      * @returns {Object} - The x and y position to offset the toolbar by.
      * @property {number} x
      * @property {number} y
+     * @property {number} nubX
+     * @property {number} nubY
      */
     getCoordinates(bounds) {
 
@@ -120,6 +134,15 @@ export default class InlineEditorToolbar extends React.Component {
         };
     }
 
+    /**
+     * Calculate the X coordinates for the toolbar and it's nub.
+     *
+     * @param {BoundsStatic} bounds - The bounds to check.
+     *
+     * @returns {Object} - The X coordinates.
+     * @property {number} toolbarPosition
+     * @property {number} nubPosition
+     */
     makeXCoordinates(bounds) {
         const containerSize = this.quill.root.offsetWidth;
         const selfSize = this.toolbar.offsetWidth;
@@ -142,6 +165,15 @@ export default class InlineEditorToolbar extends React.Component {
         };
     }
 
+    /**
+     * Calculate the Y coordinates for the toolbar and it's nub.
+     *
+     * @param {BoundsStatic} bounds - The bounds to check.
+     *
+     * @returns {Object} - The Y coordinates.
+     * @property {number} toolbarPosition
+     * @property {number} nubPosition
+     */
     makeYCoordinates(bounds) {
         const offset = 6;
         let toolbarPosition = bounds.bottom + offset;
@@ -159,6 +191,9 @@ export default class InlineEditorToolbar extends React.Component {
         };
     }
 
+    /**
+     * @inheritDoc
+     */
     render() {
         const toolbarTranslation = {
             position: "absolute",

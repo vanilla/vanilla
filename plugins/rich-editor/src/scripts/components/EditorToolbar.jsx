@@ -1,3 +1,9 @@
+/**
+ * @author Adam (charrondev) Charron <adam.c@vanillaforums.com>
+ * @copyright 2009-2018 Vanilla Forums Inc.
+ * @license https://opensource.org/licenses/GPL-2.0 GPL-2.0
+ */
+
 import React from "react";
 import * as PropTypes from "prop-types";
 import Quill from "quill";
@@ -80,6 +86,9 @@ export default class EditorToolbar extends React.Component {
         });
     }
 
+    /**
+     * Be sure to remove the listeners when the component unmounts.
+     */
     componentWillUnmount() {
         this.quill.off(Quill.events.EDITOR_CHANGE);
         this.quill.off(Quill.events.SCROLL_OPTIMIZE);
@@ -166,9 +175,5 @@ export default class EditorToolbar extends React.Component {
         };
 
         this.setState(newState);
-    }
-
-    updateItem(itemKey) {
-
     }
 }

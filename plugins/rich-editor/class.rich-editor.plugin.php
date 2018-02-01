@@ -21,14 +21,10 @@ class RichEditorPlugin extends Gdn_Plugin {
     }
 
     /**
-     * Add the style script to the head
-     *
-     * @param Gdn_Controller $sender
      * @return int
      */
-
-    public function get_editorID(): int {
-        return $this->editorNumber;
+    public static function getEditorID(): int {
+        return self::$editorID;
     }
 
     /**
@@ -55,8 +51,7 @@ class RichEditorPlugin extends Gdn_Plugin {
     public function gdn_form_beforeBodyBox_handler($sender, $args) {
         /** @var Gdn_Controller $controller */
         $controller = Gdn::controller();
-        /** @var int $editorID */
-        $editorID = $this->get_editorID();
+        $editorID = $this->getEditorID();
 
         $controller->setData('editorData', [
             'editorID' => $editorID,

@@ -1,5 +1,3 @@
-{debug}
-
 <div class="richEditor" aria-label="{t c="Type your message"}>" data-id="{$editorData.editorID}" aria-describedby="{$editorData.editorDescriptionID}" role="textbox" aria-multiline="true">
     <p id="{$editorData.editorDescriptionID}" class="sr-only">
         {t c="Insert instructions for editor here"}

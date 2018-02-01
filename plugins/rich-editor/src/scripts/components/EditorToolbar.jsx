@@ -11,11 +11,6 @@ import { t } from "@core/utility";
 import EditorMenuItem from "./EditorMenuItem";
 
 /**
- * @typedef {Object} Props
- * @property {Quill} quill - A quill instance.
- */
-
-/**
  * @typedef {Object} MenuItemData
  * @property {boolean} active - Whether the given item should be lit up.
  * @property {string} [value] - A value if applicable.

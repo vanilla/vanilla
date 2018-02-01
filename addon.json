@@ -16,7 +16,6 @@
                 "axios",
                 "react",
                 "react-dom",
-                "quill",
                 "prop-types"
             ],
             "app": [],

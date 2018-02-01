@@ -42,9 +42,7 @@ class RichEditorPlugin extends Gdn_Plugin {
             return;
         }
 
-//        $sender->addCssFile("//cdn.quilljs.com/1.3.4/quill.bubble.css");
         $sender->addDefinition("editor", "RichEditor");
-
     }
 
     /**
@@ -65,9 +63,6 @@ class RichEditorPlugin extends Gdn_Plugin {
             'editorDescriptionID' => 'richEditor-'.$editorID.'-description',
 
         ]);
-
-        // Load up the helper functions for the editor views.
-        //$controller->fetchView('helper_functions', '', 'plugins/rich-editor');
 
         // Render the editor view.
         $args['BodyBox'] = $controller->fetchView('rich-editor', '', 'plugins/rich-editor');

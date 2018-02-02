@@ -167,6 +167,7 @@ export default class InlineEditorToolbar extends React.Component {
      * @returns {Object} - The Y coordinates.
      * @property {number} toolbarPosition
      * @property {number} nubPosition
+     * @property {boolean} nubPointsDown
      */
     getYCoordinates() {
         const bounds = this.getBounds();
@@ -177,17 +178,19 @@ export default class InlineEditorToolbar extends React.Component {
         const offset = 6;
         let toolbarPosition = bounds.top - this.toolbar.offsetHeight - offset;
         let nubPosition = this.toolbar.offsetHeight - this.nub.offsetHeight / 2;
-
+        let nubPointsDown = true;
 
         const isNearStart = bounds.top < 30;
         if (isNearStart) {
             toolbarPosition = bounds.bottom + offset;
             nubPosition = 0 - this.nub.offsetHeight / 2;
+            nubPointsDown = false;
         }
 
         return {
             toolbarPosition,
             nubPosition,
+            nubPointsDown,
         };
     }
 
@@ -202,6 +205,7 @@ export default class InlineEditorToolbar extends React.Component {
             position: "absolute",
         };
         let nubStyles = {};
+        let classes = "richEditor-inlineMenu ";
 
         if (x && y) {
             toolbarStyles = {
@@ -216,9 +220,12 @@ export default class InlineEditorToolbar extends React.Component {
                 left: x.nubPosition,
                 top: y.nubPosition,
             };
+
+            classes += y.nubPointsDown ? "isPositionTop" : "isPositionDown";
         }
 
-        return<div style={toolbarStyles} ref={(toolbar) => this.toolbar = toolbar }>
+
+        return<div className={classes} style={toolbarStyles} ref={(toolbar) => this.toolbar = toolbar}>
             <EditorToolbar quill={this.quill}/>
             <div style={nubStyles} className="richEditor-inlineNub" ref={(nub) => this.nub = nub} />
         </div>;

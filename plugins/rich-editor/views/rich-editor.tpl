@@ -6,7 +6,7 @@
         <div class="js-richText">
             <div class="ql-editor richEditor-text userContent" data-gramm="false" contenteditable="true" data-placeholder="Create a new post..."></div>
         </div>
-        <div class="richEditorInlineMenu"></div>
+        <div class="js-richEditorInlineMenu"></div>
 
         <div class="richEditor-menu embedBar">
             <ul class="richEditor-menuItems" role="menubar" aria-label="{t c="Inline Level Formatting Menu"}">

@@ -52,7 +52,7 @@ export default class VanillaTheme extends Theme {
      * Mount an inline toolbar (react component).
      */
     mountToolbar() {
-        const container = this.quill.container.closest(".richEditor").querySelector(".richEditorInlineMenu");
+        const container = this.quill.container.closest(".richEditor").querySelector(".js-richEditorInlineMenu");
         ReactDOM.render(<InlineEditorToolbar quill={this.quill}/>, container);
     }
 }

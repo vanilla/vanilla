@@ -7,6 +7,7 @@
 import React from "react";
 import * as PropTypes from "prop-types";
 import Quill from "quill";
+import Events from "@core/events";
 import EditorToolbar from "./EditorToolbar";
 import Emitter from "quill/core/emitter";
 import { Range } from "quill/core/selection";
@@ -20,11 +21,7 @@ export default class InlineEditorToolbar extends React.Component {
     quill;
 
     /** @type {Object}
-     * @property {boolean} isVisible - Whether or not the inline toolbar should be shown.
-     * @property {number} x - X offset from the left position in pixels.
-     * @property {number} y - Y offset from the top position in pixels.
-     * @property {number | string} nubX - The X offset of the nub from the left of the toolbar.
-     * @property {number} nubY - The y offset of the nub from the top of the toolbar.
+     * @property {BoundsStatic} - The current quill bounds.
      * */
     state;
 
@@ -33,6 +30,9 @@ export default class InlineEditorToolbar extends React.Component {
 
     /** @type {HTMLElement} */
     nub;
+
+    /** @type {number} */
+    resizeListener;
 
     /**
      * @inheritDoc
@@ -49,6 +49,7 @@ export default class InlineEditorToolbar extends React.Component {
             y: 0,
             nubX: "50%",
             nubY: 0,
+            bounds: null,
         };
 
         this.handleEditorChange = this.handleEditorChange.bind(this);
@@ -59,6 +60,12 @@ export default class InlineEditorToolbar extends React.Component {
      */
     componentDidMount() {
         this.quill.on(Emitter.events.EDITOR_CHANGE, this.handleEditorChange);
+
+        this.resizeListener = Events.addResizeListener(() => {
+            this.setState({
+                bounds: null,
+            });
+        });
     }
 
     /**
@@ -66,6 +73,7 @@ export default class InlineEditorToolbar extends React.Component {
      */
     componentWillUnmount() {
         this.quill.off(Quill.events.EDITOR_CHANGE);
+        Events.removeResizeListener(this.resizeListener);
     }
 
     /**
@@ -82,68 +90,42 @@ export default class InlineEditorToolbar extends React.Component {
 
         if (range && range.length > 0 && source === Emitter.sources.USER) {
             const numLines = this.quill.getLines(range.index, range.length);
-            let coordinates;
+            let bounds;
 
             if (numLines.length === 1) {
-                const bounds = this.quill.getBounds(range);
-
-                coordinates = this.getCoordinates(bounds);
+                bounds = this.quill.getBounds(range);
             } else {
 
                 // If mutliline we want to position at the center of the last line's selection.
                 const lastLine = numLines[numLines.length - 1];
                 const index = this.quill.getIndex(lastLine);
                 const length = Math.min(lastLine.length() - 1, range.index + range.length - index);
-                const bounds = this.quill.getBounds(new Range(index, length));
-                coordinates = this.getCoordinates(bounds);
+                bounds = this.quill.getBounds(new Range(index, length));
             }
 
             this.setState({
-                ...coordinates,
-                isVisible: true,
+                bounds,
             });
         } else {
             this.setState({
-                isVisible: false,
+                bounds: null,
             });
         }
     }
 
     /**
-     * Determine position of the toolbar based on the bounds reported from quill.
-     *
-     * @param {BoundsStatic} bounds - The bounds to check.
-     *
-     * @returns {Object} - The x and y position to offset the toolbar by.
-     * @property {number} x
-     * @property {number} y
-     * @property {number} nubX
-     * @property {number} nubY
-     */
-    getCoordinates(bounds) {
-
-        // Gather X positions
-        const x = this.makeXCoordinates(bounds);
-        const y = this.makeYCoordinates(bounds);
-
-        return {
-            x: x.toolbarPosition,
-            y: y.toolbarPosition,
-            nubX: x.nubPosition,
-            nubY: y.nubPosition,
-        };
-    }
-
-    /**
      * Calculate the X coordinates for the toolbar and it's nub.
-     *
-     * @param {BoundsStatic} bounds - The bounds to check.
      *
      * @returns {Object} - The X coordinates.
      * @property {number} toolbarPosition
      * @property {number} nubPosition
      */
-    makeXCoordinates(bounds) {
+    getXCoordinates() {
+        const { bounds } = this.state;
+        if (!bounds) {
+            return;
+        }
+
         const containerSize = this.quill.root.offsetWidth;
         const selfSize = this.toolbar.offsetWidth;
         const nubSize = this.nub.offsetWidth;
@@ -168,15 +150,17 @@ export default class InlineEditorToolbar extends React.Component {
     /**
      * Calculate the Y coordinates for the toolbar and it's nub.
      *
-     * @param {BoundsStatic} bounds - The bounds to check.
-     *
      * @returns {Object} - The Y coordinates.
      * @property {number} toolbarPosition
      * @property {number} nubPosition
      */
-    makeYCoordinates(bounds) {
-        const offset = 6;
+    getYCoordinates() {
+        const { bounds } = this.state;
+        if (!bounds) {
+            return;
+        }
 
+        const offset = 6;
         let toolbarPosition = bounds.top - this.toolbar.offsetHeight - offset;
         let nubPosition = this.toolbar.offsetHeight - this.nub.offsetHeight / 2;
 
@@ -197,30 +181,28 @@ export default class InlineEditorToolbar extends React.Component {
      * @inheritDoc
      */
     render() {
-        const toolbarTranslation = {
-            position: "absolute",
-            top: this.state.y,
-            left: this.state.x,
-            zIndex: 5,
-        };
-
-        const visible = {
-            visibility: "visible",
-        };
-
-        const hidden = {
+        const x = this.getXCoordinates();
+        const y = this.getYCoordinates();
+        let toolbarStyles = {
             visibility: "hidden",
+            position: "absolute",
         };
+        let nubStyles = {};
 
-        const toolbarStyles = {
-            ...toolbarTranslation,
-            ...(this.state.isVisible ? visible : hidden),
-        };
+        if (x && y) {
+            toolbarStyles = {
+                position: "absolute",
+                top: y.toolbarPosition,
+                left: x.toolbarPosition,
+                zIndex: 5,
+                visibility: "visible",
+            };
 
-        const nubStyles = {
-            left: this.state.nubX,
-            top: this.state.nubY,
-        };
+            nubStyles = {
+                left: x.nubPosition,
+                top: y.nubPosition,
+            };
+        }
 
         return<div style={toolbarStyles} ref={(toolbar) => this.toolbar = toolbar }>
             <EditorToolbar quill={this.quill}/>

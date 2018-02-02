@@ -107,11 +107,4 @@ export default class RichEditor {
     synchronizeDelta() {
         this.bodybox.value = JSON.stringify(this.editor.getContents()["ops"]);
     }
-
-    initializeOtherFormat() {
-
-        // TODO: check if we can convert from a format
-
-        return;
-    }
 }

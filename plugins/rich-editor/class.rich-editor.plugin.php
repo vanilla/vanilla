@@ -8,7 +8,7 @@
 class RichEditorPlugin extends Gdn_Plugin {
 
     /** @var integer */
-    private static $editorID;
+    private static $editorID = 0;
     /** @var integer */
     private $editorNumber;
 

@@ -176,13 +176,15 @@ export default class InlineEditorToolbar extends React.Component {
      */
     makeYCoordinates(bounds) {
         const offset = 6;
-        let toolbarPosition = bounds.bottom + offset;
-        let nubPosition = 0 - this.nub.offsetHeight / 2;
 
-        const isNearEnd = this.quill.root.offsetHeight - bounds.bottom < 30;
-        if (isNearEnd) {
-            toolbarPosition = bounds.top - this.toolbar.offsetHeight - offset;
-            nubPosition = this.toolbar.offsetHeight - this.nub.offsetHeight / 2;
+        let toolbarPosition = bounds.top - this.toolbar.offsetHeight - offset;
+        let nubPosition = this.toolbar.offsetHeight - this.nub.offsetHeight / 2;
+
+
+        const isNearStart = bounds.top < 30;
+        if (isNearStart) {
+            toolbarPosition = bounds.bottom + offset;
+            nubPosition = 0 - this.nub.offsetHeight / 2;
         }
 
         return {

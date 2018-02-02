@@ -20,9 +20,10 @@ export default class InlineEditorToolbar extends React.Component {
     /** @type {Quill} */
     quill;
 
-    /** @type {Object}
-     * @property {BoundsStatic} - The current quill bounds.
-     * */
+    /**
+     * @type {Object}
+     * @property {RangeStatic} - The current quill selected text range..
+     */
     state;
 
     /** @type {HTMLElement} */
@@ -62,9 +63,7 @@ export default class InlineEditorToolbar extends React.Component {
         this.quill.on(Emitter.events.EDITOR_CHANGE, this.handleEditorChange);
 
         this.resizeListener = Events.addResizeListener(() => {
-            this.setState({
-                bounds: null,
-            });
+            this.forceUpdate();
         });
     }
 
@@ -78,6 +77,7 @@ export default class InlineEditorToolbar extends React.Component {
 
     /**
      * Handle changes from the editor.
+     *
      * @param {string} type - The event type. See {quill/core/emitter}
      * @param {RangeStatic} range - The new range.
      * @param {RangeStatic} oldRange - The old range.
@@ -89,28 +89,42 @@ export default class InlineEditorToolbar extends React.Component {
         }
 
         if (range && range.length > 0 && source === Emitter.sources.USER) {
-            const numLines = this.quill.getLines(range.index, range.length);
-            let bounds;
-
-            if (numLines.length === 1) {
-                bounds = this.quill.getBounds(range);
-            } else {
-
-                // If mutliline we want to position at the center of the last line's selection.
-                const lastLine = numLines[numLines.length - 1];
-                const index = this.quill.getIndex(lastLine);
-                const length = Math.min(lastLine.length() - 1, range.index + range.length - index);
-                bounds = this.quill.getBounds(new Range(index, length));
-            }
-
             this.setState({
-                bounds,
+                range,
             });
         } else {
             this.setState({
-                bounds: null,
+                range: null,
             });
         }
+    }
+
+    /**
+     * Get the bounds for the current range.
+     *
+     * @returns {BoundsStatic} The current quill bounds.
+     */
+    getBounds() {
+        const { range } = this.state;
+        if (!range) {
+            return null;
+        }
+
+        const numLines = this.quill.getLines(range.index, range.length);
+        let bounds;
+
+        if (numLines.length === 1) {
+            bounds = this.quill.getBounds(range);
+        } else {
+
+            // If multi-line we want to position at the center of the last line's selection.
+            const lastLine = numLines[numLines.length - 1];
+            const index = this.quill.getIndex(lastLine);
+            const length = Math.min(lastLine.length() - 1, range.index + range.length - index);
+            bounds = this.quill.getBounds(new Range(index, length));
+        }
+
+        return bounds;
     }
 
     /**
@@ -121,7 +135,7 @@ export default class InlineEditorToolbar extends React.Component {
      * @property {number} nubPosition
      */
     getXCoordinates() {
-        const { bounds } = this.state;
+        const bounds = this.getBounds();
         if (!bounds) {
             return null;
         }
@@ -155,7 +169,7 @@ export default class InlineEditorToolbar extends React.Component {
      * @property {number} nubPosition
      */
     getYCoordinates() {
-        const { bounds } = this.state;
+        const bounds = this.getBounds();
         if (!bounds) {
             return null;
         }

@@ -82,7 +82,6 @@ em {
   list-style: none;
   margin: 0;
   padding: 0;
-  z-index: 2;
 }
 
 .richEditor-menuItem {
@@ -126,7 +125,7 @@ em {
 }
 
 .richEditor-button:focus {
-  z-index: 1;
+  z-index: 2;
 }
 
 .richEditor-button:hover .richEditorInline-icon, .richEditor-button:focus .richEditorInline-icon, .richEditor-button.isActive .richEditorInline-icon {
@@ -308,7 +307,6 @@ em {
   align-items: flex-start;
   justify-content: center;
   overflow: hidden;
-  z-index: 1;
   width: 24px;
   height: 24px;
   -webkit-user-select: none;
@@ -324,19 +322,23 @@ em {
   display: block;
   width: 12px;
   height: 12px;
-  transform: translateY(-50%) rotate(45deg);
-  border: 1px solid #999;
+  border-top: 1px solid #999;
+  border-right: 1px solid #999;
   box-shadow: 0 0 5px 1px #eee;
   box-shadow: 0 0 5px 1px rgba(0, 0, 0, 0.2);
   background: white;
 }
 
 .richEditor-inlineMenu.isUp {
-  transform: translateY(-14.4px);
+  transform: translateY(-12px);
+}
+
+.richEditor-inlineMenu.isUp .richEditor-nub {
+  transform: translateY(-50%) rotate(135deg);
 }
 
 .richEditor-inlineMenu.isDown {
-  transform: translateY(14.4px);
+  transform: translateY(12px);
 }
 
 .richEditor-inlineMenu.isDown .richEditor-nubPosition {
@@ -346,7 +348,7 @@ em {
 }
 
 .richEditor-inlineMenu.isDown .richEditor-nub {
-  transform: translateY(50%) rotate(45deg);
+  transform: translateY(50%) rotate(-45deg);
 }
 
 .followButton {

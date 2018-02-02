@@ -20,6 +20,22 @@ export function onReady(callback) {
     }
 }
 
+const resizeKeys = [];
+
+/**
+ * Runs when the window is resized. Debounce by default.
+ *
+ * @param {EventListener} callback - The Callback to run.
+ * @param {string|number=} key - A key to prevent adding an event twice. If the passed key has already been used, a new event listener will not be registered.
+ * @param {number=} waitTime - The debounce time in between callback calls. Defaults to 200ms.
+ */
+export function onResize(callback, key = undefined, waitTime = 200) {
+    if (!key || resizeKeys.includes(key)) {
+        resizeKeys.push(key);
+        window.addEventListener("resize", debounce(callback, waitTime));
+    }
+}
+
 /**
  * Class for addons to register events with.
  *

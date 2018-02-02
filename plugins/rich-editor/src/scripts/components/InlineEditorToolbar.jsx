@@ -123,7 +123,7 @@ export default class InlineEditorToolbar extends React.Component {
     getXCoordinates() {
         const { bounds } = this.state;
         if (!bounds) {
-            return;
+            return null;
         }
 
         const containerSize = this.quill.root.offsetWidth;
@@ -157,7 +157,7 @@ export default class InlineEditorToolbar extends React.Component {
     getYCoordinates() {
         const { bounds } = this.state;
         if (!bounds) {
-            return;
+            return null;
         }
 
         const offset = 6;

@@ -9,17 +9,22 @@ const fs = require("fs");
 const path = require("path");
 
 describe("rendering", () => {
-    let editor;
+    let quill;
 
     beforeAll(() => {
         document.body.innerHTML = `
             <form>
-                <div class="js-richText"></div>
+                <div class="richEditor">
+                    <div class="js-richText"></div>
+                    <div class="js-richEditorInlineMenu"></div>
+                </div>
                 <textarea class="BodyBox"></textarea>
             </form>
         `;
 
-        editor = new RichEditor(".js-richText");
+        const container = document.querySelector(".js-richText");
+
+        quill = new RichEditor(container);
 
         // Stub out this method not provided by JSDOM
     });
@@ -33,7 +38,7 @@ describe("rendering", () => {
             const input = JSON.parse(fs.readFileSync(path.join(fixtureDir, fixture, "input.json"), "utf8"));
             const expectedOutput = fs.readFileSync(path.join(fixtureDir, fixture, "output.html"), "utf8");
 
-            editor.editor.setContents(input);
+            quill.editor.setContents(input);
             const richText = document.querySelector(".ql-editor");
             expect(richText.innerHTML).toEqual(expectedOutput.trim());
         });

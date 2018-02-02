@@ -1,4 +1,4 @@
-import Quill from "quill";
+import Quill from "quill/quill";
 let Embed = Quill.import('blots/embed');
 
 export default class EmojiBlot extends Embed {
@@ -17,5 +17,6 @@ export default class EmojiBlot extends Embed {
     }
 }
 
-EmojiBlot.blotName = 'emoji';
+EmojiBlot.className = "emoji";
+EmojiBlot.blotName = 'emojis';
 EmojiBlot.tagName = 'span';

@@ -14,6 +14,8 @@ import * as utility from "@core/utility";
 Quill.register(EmojiBlot);
 Quill.register(ImageBlot);
 
+console.log(Quill.imports);
+
 // Theme
 Quill.register("themes/vanilla", VanillaTheme);
 
@@ -75,7 +77,7 @@ export default class RichEditor {
         }
 
         this.editor.on("text-change", this.synchronizeDelta.bind(this));
-        
+
         // const insertEmoji = () => {
         //     const editorSelection = this.editor.getSelection();
         //     const emoji = '😊';

@@ -11,7 +11,6 @@ import * as utility from "@core/utility";
 Quill.register("themes/vanilla", VanillaTheme);
 
 const options = {
-    placeholder: "Create a new post...",
     theme: "vanilla",
 };
 

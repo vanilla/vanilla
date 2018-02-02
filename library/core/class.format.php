@@ -12,6 +12,7 @@
  */
 
 use Garden\EventManager;
+use Vanilla\QuillRenderer;
 
 /**
  * Output formatter.
@@ -37,7 +38,7 @@ class Gdn_Format {
 
     /** @var array  */
     protected static $SanitizedFormats = [
-        'html', 'bbcode', 'wysiwyg', 'text', 'textex', 'markdown'
+        'html', 'bbcode', 'wysiwyg', 'text', 'textex', 'markdown', 'rich'
     ];
 
     /**
@@ -2442,5 +2443,27 @@ EOT;
 
             return $sanitized;
         }
+    }
+
+    /**
+     * Format text from Rich editor input.
+     *
+     * @param $mixed
+     * @return mixed|string
+     */
+    public static function rich($mixed) {
+        static $quillRenderer;
+        if (!isset($quillRenderer)) {
+            $quillRenderer = new QuillRenderer();
+        }
+
+        $mixed = $quillRenderer->renderDelta($mixed);
+
+        // Always filter after basic parsing.
+        // Wysiwyg is already formatted HTML. Don't try to doubly encode its code blocks.
+        $filterOptions = ['codeBlockEntities' => false];
+        $sanitized = Gdn_Format::htmlFilter($mixed, $filterOptions);
+
+        return $sanitized;
     }
 }

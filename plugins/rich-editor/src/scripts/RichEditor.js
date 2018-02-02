@@ -5,9 +5,16 @@
  */
 
 import Quill from "quill/quill";
+import EmojiBlot from "./blots/EmojiBlot.js";
+import ImageBlot from "./blots/ImageBlot.js";
 import VanillaTheme from "./quill/VanillaTheme";
 import * as utility from "@core/utility";
 
+// Blots
+Quill.register(EmojiBlot);
+Quill.register(ImageBlot);
+
+// Theme
 Quill.register("themes/vanilla", VanillaTheme);
 
 const options = {
@@ -68,6 +75,29 @@ export default class RichEditor {
         }
 
         this.editor.on("text-change", this.synchronizeDelta.bind(this));
+        
+        // const insertEmoji = () => {
+        //     const editorSelection = this.editor.getSelection();
+        //     const emoji = '😊';
+        //     let range = this.editor.getSelection(true);
+        //     this.editor.insertEmbed(range.index, 'emoji', {
+        //         'emojiChar': emoji
+        //     }, Quill.sources.USER);
+        //     this.editor.setSelection(range.index + 1, Quill.sources.SILENT);
+        //
+        // };
+        // document.querySelector(".emojiButton").addEventListener("click", insertEmoji);
+        //
+        // const insertImage = () => {
+        //     let range = this.editor.getSelection(true);
+        //     this.editor.insertEmbed(range.index, 'embeddedImage', {
+        //         alt: 'Quill Cloud',
+        //         url: 'http://stephane.local/uploads/userpics/966/pNOH8FCLAMG82.jpg'
+        //     }, Quill.sources.USER);
+        //     this.editor.setSelection(range.index + 1, Quill.sources.SILENT);
+        // };
+        // document.querySelector(".imageButton").addEventListener("click", insertImage);
+
     }
 
     /**

@@ -1,1 +1,3 @@
-../vanilla-cli/src/NodeTools/Linter/configs/.eslintrc
+{
+    "extends": "@vanillaforums/eslint-config"
+}

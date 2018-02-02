@@ -18,5 +18,5 @@ export default class ImageBlot extends Embed {
     }
 }
 
-ImageBlot.blotName = 'image';
+ImageBlot.blotName = 'embeddedImage';
 ImageBlot.tagName = 'img';

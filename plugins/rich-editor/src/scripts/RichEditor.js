@@ -17,14 +17,6 @@ Quill.register(ImageBlot);
 // Theme
 Quill.register("themes/vanilla", VanillaTheme);
 
-// Temporary function
-const makeElement = (tag, attrs) => {
-    const elem = document.createElement(tag);
-    Object.keys(attrs).forEach(key => elem[key] = attrs[key]);
-    return elem;
-};
-
-
 const options = {
     theme: "vanilla",
 };
@@ -98,7 +90,7 @@ export default class RichEditor {
         //
         // const insertImage = () => {
         //     let range = this.editor.getSelection(true);
-        //     this.editor.insertEmbed(range.index, 'image', {
+        //     this.editor.insertEmbed(range.index, 'embeddedImage', {
         //         alt: 'Quill Cloud',
         //         url: 'http://stephane.local/uploads/userpics/966/pNOH8FCLAMG82.jpg'
         //     }, Quill.sources.USER);

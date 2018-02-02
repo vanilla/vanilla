@@ -43,9 +43,10 @@ export function onResize(callback, key = undefined, waitTime = 200) {
  * Events will be exectuted in the order they are registered.
  */
 export class Events {
-    constructor() {
-        this.vanillaReadyEvents = [];
+    vanillaReadyEvents = [];
+    resizeListeners = [];
 
+    constructor() {
         // Function binding
         this.onVanillaReady = this.onVanillaReady.bind(this);
         this.execute = this.execute.bind(this);
@@ -61,11 +62,40 @@ export class Events {
     }
 
     /**
+     * Register a callback for when the window resizes.
+     *
+     * @param {function(): void} callback - The function to call on resize.
+     *
+     * @returns {number} - The key to event listener. Use this with removeResizeListener.
+     */
+    addResizeListener(callback) {
+        const length = this.resizeListeners.push(callback);
+        return length - 1;
+    }
+
+    /**
+     * Remove a window resize listener.
+     *
+     * @param {number} callbackKey - The key returned from addResizeListener.
+     */
+    removeResizeListener(callbackKey) {
+        this.resizeListeners[callbackKey] = null;
+    }
+
+    /**
      * Execute all of the registered events in order.
      *
      * @returns {Promise<any[]>} - A Promise when the events have all fired.
      */
     execute() {
+        window.addEventListener("resize", debounce(() => {
+            for (const callback of this.resizeListeners) {
+                if (callback !== null) {
+                    callback();
+                }
+            }
+        }, 200));
+
         return utility.resolvePromisesSequentially(this.vanillaReadyEvents).then();
     }
 }

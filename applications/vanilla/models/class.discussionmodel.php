@@ -1421,10 +1421,11 @@ class DiscussionModel extends Gdn_Model {
      * @access public
      *
      * @param bool $escape Prepends category IDs with @
+     * @param bool $forceRefresh Reset the cache and pull fresh permission values.
      * @return array Protected local _CategoryPermissions
      */
-    public static function categoryPermissions($escape = false) {
-        if (is_null(self::$categoryPermissions)) {
+    public static function categoryPermissions($escape = false, $forceRefresh = false) {
+        if (is_null(self::$categoryPermissions) || $forceRefresh) {
             $session = Gdn::session();
 
             if ((is_object($session->User) && $session->User->Admin)) {

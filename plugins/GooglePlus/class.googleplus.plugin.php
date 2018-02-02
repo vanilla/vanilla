@@ -68,11 +68,11 @@ class GooglePlusPlugin extends Gdn_Plugin {
     /**
      * Retrieve where to send the user for authorization.
      *
-     * @param array $state
+     * @param array $extraState
      *
      * @return string
      */
-    public function authorizeUri($state = []) {
+    public function authorizeUri($extraState = []) {
         $url = 'https://accounts.google.com/o/oauth2/auth';
         $get = [
             'response_type' => 'code',
@@ -81,9 +81,24 @@ class GooglePlusPlugin extends Gdn_Plugin {
             'scope' => 'https://www.googleapis.com/auth/userinfo.profile https://www.googleapis.com/auth/userinfo.email'
         ];
 
-        if (is_array($state)) {
-            $get['state'] = http_build_query($state);
+        $state = array_merge(
+            [
+                'csrf' => SsoUtils::createCSRFToken(),
+            ],
+            (array)$extraState
+        );
+
+
+        if (isset($state['target'])) {
+            $target = strtolower(ltrim($get['state']['target'], '/'));
+            if (in_array($target, ['entry/signin', 'entry/googleplusauthredirect'])) {
+                $get['state']['target'] = '/';
+            }
+        } else {
+            $state['target'] = '/';
         }
+
+        $get['state'] = json_encode($state);
 
         return $url.'?'.http_build_query($get);
     }
@@ -165,6 +180,11 @@ class GooglePlusPlugin extends Gdn_Plugin {
         curl_setopt($ch, CURLOPT_URL, $url);
 
         if ($method == 'POST') {
+            if (strpos($url, 'https://accounts.google.com/o/oauth2/token') === 0) {
+                // We need to prevent the redirection so that the access token is not wiped from the form on postback.
+                curl_setopt($ch, CURLOPT_FOLLOWLOCATION, false);
+            }
+
             curl_setopt($ch, CURLOPT_POST, true);
             curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query($data));
             trace("  POST $url");
@@ -185,6 +205,9 @@ class GooglePlusPlugin extends Gdn_Plugin {
 
         if ($httpCode != 200) {
             $error = val('error', $result, $response);
+            if (is_array($error)) {
+                $error = val('message', $error, $response);
+            }
 
             throw new Gdn_UserException($error, $httpCode);
         }
@@ -207,7 +230,7 @@ class GooglePlusPlugin extends Gdn_Plugin {
      */
     public function signInButton($type = 'button') {
         $target = Gdn::request()->post('Target', Gdn::request()->get('Target', url('', '/')));
-        $url = $this->authorizeUri(['target' => $target]);
+        $url = url('entry/googleplusauthredirect?Target='.$target);
 
         $result = socialSignInButton('Google', $url, $type, ['rel' => 'nofollow']);
         return $result;
@@ -275,10 +298,26 @@ class GooglePlusPlugin extends Gdn_Plugin {
             return;
         }
 
-        // Grab the google plus profile from the session staff.
-        $googlePlus = Gdn::session()->stash(self::PROVIDER_KEY, '', false);
-        $accessToken = val('AccessToken', $googlePlus);
-        $profile = val('Profile', $googlePlus);
+        $state = json_decode(Gdn::request()->get('state', ''), true);
+        $suppliedCSRFToken = val('csrf', $state);
+        SsoUtils::verifyCSRFToken(self::PROVIDER_KEY, $suppliedCSRFToken);
+
+        $code = Gdn::request()->get('code');
+        $accessToken = $sender->Form->getFormValue('AccessToken');
+
+        // Get the access token.
+        if (!$accessToken && $code) {
+            // Exchange the token for an access token.
+            $accessToken = $this->getAccessToken($code);
+        }
+        $this->accessToken($accessToken);
+
+        // Get the profile.
+        try {
+            $profile = $this->api('/userinfo');
+        } catch (Exception $ex) {
+            $sender->Form->addError('There was an error with the Google+ connection.');
+        }
 
         // This isn't a trusted connection. Don't allow it to automatically connect a user account.
         saveToConfig('Garden.Registration.AutoConnect', false, false);
@@ -292,6 +331,7 @@ class GooglePlusPlugin extends Gdn_Plugin {
         if (c('Plugins.GooglePlus.UseAvatars', true)) {
             $form->setFormValue('Photo', val('picture', $profile));
         }
+        $form->addHidden('AccessToken', $accessToken);
 
         if (c('Plugins.GooglePlus.UseFullNames')) {
             $form->setFormValue('Name', val('name', $profile));
@@ -367,6 +407,13 @@ class GooglePlusPlugin extends Gdn_Plugin {
     }
 
     /**
+     * Endpoint that redirects to the authorization URL.
+     */
+    public function entryController_googlePlusAuthRedirect_create() {
+        redirectTo($this->authorizeUri(['target', Gdn::request()->get('Target', '/')]), 302, false);
+    }
+
+    /**
      * Endpoint for authenticating with Google+.
      *
      * @param EntryController $sender
@@ -380,23 +427,22 @@ class GooglePlusPlugin extends Gdn_Plugin {
             throw new Gdn_UserException($error);
         }
 
-        // Get an access token.
-        Gdn::session()->stash(self::PROVIDER_KEY); // remove any old google plus.
-        $accessToken = $this->getAccessToken($code);
-        $this->accessToken($accessToken);
+        $state = json_decode($state, true);
 
-        // Get the user's information.
-        $profile = $this->api('/userinfo');
-
-        if ($state) {
-            parse_str($state, $state);
-        } else {
-            $state = ['r' => 'entry', 'uid' => null];
+        // This is an sso request, we need to redispatch to /entry/connect/googleplus
+        if (empty($state['r'])) {
+            $url = '/entry/connect/googleplus?'.http_build_query($sender->Request->getQuery());
+            redirectTo($url);
         }
 
         switch ($state['r']) {
             case 'profile':
                 // This is a connect request from the user's profile.
+
+                $this->accessToken($this->getAccessToken($code));
+
+                // Get the user's information.
+                $profile = $this->api('/userinfo');
 
                 $user = Gdn::userModel()->getID($state['uid']);
                 if (!$user) {
@@ -420,17 +466,6 @@ class GooglePlusPlugin extends Gdn_Plugin {
                 $this->fireEvent('AfterConnection');
 
                 redirectTo(userUrl($user, '', 'connections'));
-                break;
-            case 'entry':
-            default:
-                // This is an sso request, we need to redispatch to /entry/connect/googleplus
-                Gdn::session()->stash(self::PROVIDER_KEY, ['AccessToken' => $accessToken, 'Profile' => $profile]);
-                $url = '/entry/connect/googleplus';
-
-                if ($target = val('target', $state)) {
-                    $url .= '?Target='.urlencode($target);
-                }
-                redirectTo($url);
                 break;
         }
     }
@@ -501,7 +536,7 @@ class GooglePlusPlugin extends Gdn_Plugin {
     }
 
     /**
-     * Endpoint to comnfigure this addon.
+     * Endpoint to configure this addon.
      *
      * @param $sender
      * @param $args

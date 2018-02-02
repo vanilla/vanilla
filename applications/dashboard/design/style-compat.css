@@ -4,6 +4,10 @@
   padding-left: 36px;
 }
 
+.richEditor em {
+  font-style: oblique;
+}
+
 .richEditor-frame.InputBox {
   background: white;
   height: auto;
@@ -25,6 +29,13 @@
   float: none;
 }
 
+.richEditor-inlineNub {
+  width: 8px;
+  height: 8px;
+  background: black;
+  position: absolute;
+}
+
 .richEditorParagraphMenu {
   position: absolute;
   top: 9px;
@@ -36,7 +47,12 @@
 .richEditor-text {
   position: relative;
   min-height: 200px;
-  padding: 9px 12px 0;
+  padding: 9px 12px;
+  outline-color: transparent;
+}
+
+.richEditor-text .ql-editor {
+  min-height: 191px;
 }
 
 .richEditor-text:focus {
@@ -46,6 +62,10 @@
   outline-color: Highlight;
   outline-color: -webkit-focus-ring-color;
   z-index: 1;
+}
+
+.ql-clipboard {
+  display: none;
 }
 
 .richEditor-menuItems {
@@ -84,6 +104,7 @@
   padding: 0;
   height: 24px;
   width: 24px;
+  background: none;
 }
 
 .richEditor-button.richEditorParagraphMenu-handle {
@@ -102,7 +123,7 @@
   z-index: 1;
 }
 
-.richEditor-button:hover .richEditorInline-icon, .richEditor-button:focus .richEditorInline-icon {
+.richEditor-button:hover .richEditorInline-icon, .richEditor-button:focus .richEditorInline-icon, .richEditor-button.isActive .richEditorInline-icon {
   opacity: 1;
 }
 
@@ -275,9 +296,146 @@
   display: none;
 }
 
-.ql-tooltip,
-.ql-hidden {
-  display: none;
+.richEditor-container {
+  position: relative;
+}
+
+.followButton {
+  white-space: nowrap;
+  font-size: 10px;
+  text-transform: uppercase;
+  vertical-align: middle;
+  font-weight: 400;
+  padding: 0 5px;
+  text-decoration: none;
+}
+
+.followButton.isFollowing:not(:hover) {
+  opacity: 0.7;
+}
+
+.followButton-icon {
+  width: 14px;
+  height: 14px;
+  margin-right: 5px;
+  vertical-align: sub;
+}
+
+.vanillaIcon {
+  display: inline-block;
+  width: 24px;
+  height: 24px;
+}
+
+.PageControls .selectBox {
+  margin-right: 10px;
+  float: left;
+}
+
+.selectBox {
+  display: inline-block;
+  position: relative;
+  white-space: nowrap;
+  vertical-align: middle;
+}
+
+.selectBox-label {
+  display: inline-block;
+  position: relative;
+  cursor: pointer;
+  user-select: none;
+  height: 100%;
+  margin-right: 5px;
+}
+
+.selectBox-main {
+  display: inline-block;
+  position: relative;
+  cursor: pointer;
+  user-select: none;
+  height: 100%;
+}
+
+.selectBox-content {
+  left: 100%;
+  margin-left: -29px;
+  margin-top: 10px;
+}
+
+.selectBox-toggle {
+  position: relative;
+  display: block;
+  line-height: 1;
+  vertical-align: middle;
+  cursor: pointer;
+  user-select: none;
+  outline: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+  white-space: nowrap;
+  max-height: 100%;
+}
+
+.selectBox-toggle:active {
+  text-decoration: none;
+}
+
+.vanillaDropDown-arrow,
+.selectBox-selected {
+  line-height: 1;
+  vertical-align: middle;
+}
+
+.selectBox-item {
+  position: relative;
+  display: block;
+}
+
+.selectBox-item .dropdown-menu-link.selectBox-link {
+  position: relative;
+  padding-left: 30px;
+}
+
+.selectBox-item.isActive .selectBox-link {
+  pointer-events: none;
+  cursor: default;
+}
+
+.selectBox-link {
+  display: block;
+  box-sizing: border-box;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  width: 100%;
+  text-decoration: none !important;
+  text-align: left;
+}
+
+.selectBox-selectedIcon {
+  position: absolute;
+  left: 5px;
+  top: 0;
+  bottom: 0;
+  margin: auto 0;
+  width: 18px;
+  height: 18px;
+}
+
+body.Categories.isMobile .PageControls.Top {
+  display: block;
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  border: 0;
 }
 
 /*# sourceMappingURL=style-compat.css.map */

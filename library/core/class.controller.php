@@ -1053,6 +1053,33 @@ class Gdn_Controller extends Gdn_Pluggable {
     }
 
     /**
+     * Determine if this is a valid API v1 (Simple API) request. Write methods optionally require valid authentication.
+     *
+     * @param bool $validateAuth Verify access token has been validated for write methods.
+     * @return bool
+     */
+    private function isLegacyAPI($validateAuth = true) {
+        $result = false;
+
+        // API v1 tags the dispatcher with an "API" property.
+        if (val('API', Gdn::dispatcher())) {
+            $method = strtolower(Gdn::request()->getMethod());
+            $readMethods = ['get'];
+            if ($validateAuth && !in_array($method, $readMethods)) {
+                /**
+                 * API v1 bypasses TK checks if the access token was valid.
+                 * Do not trust the presence of a valid user ID. An API call could be made by a signed-in user without using an access token.
+                 */
+                $result = Gdn::session()->validateTransientKey(null) === true;
+            } else {
+                $result = true;
+            }
+        }
+
+        return $result;
+    }
+
+    /**
      * If JSON is going to be sent to the client, this method allows you to add
      * extra values to the JSON array.
      *
@@ -1173,6 +1200,11 @@ class Gdn_Controller extends Gdn_Pluggable {
     public function reauth() {
         // Make sure we're logged in...
         if (Gdn::session()->UserID == 0) {
+            return;
+        }
+
+        // ...aren't in an API v1 call...
+        if ($this->isLegacyAPI()) {
             return;
         }
 
@@ -1909,7 +1941,7 @@ class Gdn_Controller extends Gdn_Pluggable {
             $ControllerName = substr($ControllerName, 4);
         }
 
-        $this->setData('CssClass', ucfirst($this->Application).' '.$ControllerName.' '.$this->RequestMethod.' '.$this->CssClass, true);
+        $this->setData('CssClass', ucfirst($this->Application).' '.$ControllerName.' is'.ucfirst($ThemeType).' '.$this->RequestMethod.' '.$this->CssClass, true);
 
         // Check to see if there is a handler for this particular extension.
         $ViewHandler = Gdn::factory('ViewHandler'.strtolower(strrchr($MasterViewPath, '.')));

@@ -158,6 +158,35 @@ class CategoriesController extends VanillaController {
     }
 
     /**
+     * Get a flattened tree representing the current user's followed categories.
+     *
+     * @param bool $recent Include recent post information?
+     * @return array
+     */
+    private function getFollowed($recent = false) {
+        $perPage = c('Vanilla.Categories.PerPage', 30);
+        $page = Gdn::request()->get(
+            'Page',
+            Gdn::request()->get('page', null)
+        );
+        list($offset, $limit) = offsetLimit($page, $perPage);
+
+        $result = $this->CategoryModel
+            ->getWhere(['Followed' => true], '', 'asc', $limit, $offset)
+            ->resultArray();
+        $result = $this->CategoryModel->flattenCategories($result);
+
+        if ($recent) {
+            $this->CategoryModel->joinRecent($result);
+        }
+
+        $this->setData('_Limit', $perPage);
+        $this->setData('_CurrentRecords', count($result));
+
+        return $result;
+    }
+
+    /**
      * "Table" layout for categories. Mimics more traditional forum category layout.
      *
      * @param string $category
@@ -218,6 +247,27 @@ class CategoriesController extends VanillaController {
     public function index($categoryIdentifier = '', $page = '0') {
         // Figure out which category layout to choose (Defined on "Homepage" settings page).
         $layout = c('Vanilla.Categories.Layout');
+
+        if ($this->CategoryModel->followingEnabled()) {
+            // Only use the following filter on the root category level.
+            $enableFollowingFilter = $categoryIdentifier === '';
+            $this->fireEvent('EnableFollowingFilter', [
+                'CategoryIdentifier' => $categoryIdentifier,
+                'EnableFollowingFilter' => &$enableFollowingFilter
+            ]);
+
+            $followed = paramPreference(
+                'followed',
+                'FollowedCategories',
+                'Vanilla.SaveFollowingPreference',
+                null,
+                Gdn::request()->get('save')
+            );
+        } else {
+            $enableFollowingFilter = $followed = false;
+        }
+        $this->setData('EnableFollowingFilter', $enableFollowingFilter);
+        $this->setData('Followed', $followed);
 
         if ($categoryIdentifier == '') {
             switch ($layout) {
@@ -481,12 +531,18 @@ class CategoriesController extends VanillaController {
             };
         }
 
-        $this->setData('CategoryTree', $this->getCategoryTree(
-            $Category ?: -1,
-            $Category ? null : CategoryModel::getRootDisplayAs(),
-            true,
-            true
-        ));
+        if ($this->data('Followed')) {
+            $categoryTree = $this->getFollowed(true);
+        } else {
+            $categoryTree = $this->getCategoryTree(
+                $Category ?: -1,
+                $Category ? null : CategoryModel::getRootDisplayAs(),
+                true,
+                true
+            );
+        }
+
+        $this->setData('CategoryTree', $categoryTree);
 
         // Add modules
         $this->addModule('NewDiscussionModule');
@@ -545,6 +601,10 @@ class CategoriesController extends VanillaController {
             $Subtree = CategoryModel::getSubtree($Category, false);
             $CategoryIDs = array_column($Subtree, 'CategoryID');
             $Categories = $this->CategoryModel->getFull($CategoryIDs)->resultArray();
+        } elseif ($this->data('Followed')) {
+            $Categories = $this->CategoryModel->getWhere(['Followed' => true])->resultArray();
+            $Categories = array_column($Categories, null, 'CategoryID');
+            $Categories = $this->CategoryModel->flattenCategories($Categories);
         } else {
             $Categories = $this->CategoryModel->getFull()->resultArray();
         }

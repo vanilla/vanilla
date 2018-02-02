@@ -364,6 +364,16 @@ class CategoryModel extends Gdn_Model {
     }
 
     /**
+     * Get the enabled status of category following, returned as a boolean value.
+     *
+     * @return bool
+     */
+    public function followingEnabled() {
+        $result = boolval(c('Vanilla.EnableCategoryFollowing'));
+        return $result;
+    }
+
+    /**
      * Get the maximum number of categories a user is allowed to follow.
      *
      * @return mixed
@@ -2237,6 +2247,27 @@ class CategoryModel extends Gdn_Model {
     }
 
     /**
+     * {@inheritdoc}
+     */
+    public function getCount($wheres = '') {
+        if (array_key_exists('Followed', (array)$wheres)) {
+            if ($wheres['Followed']) {
+                $followed = $this->getFollowed(Gdn::session()->UserID);
+                $categoryIDs = array_column($followed, 'CategoryID');
+
+                if (isset($wheres['CategoryID'])) {
+                    $wheres['CategoryID'] = array_values(array_intersect((array)$wheres['CategoryID'], $categoryIDs));
+                } else {
+                    $wheres['CategoryID'] = $categoryIDs;
+                }
+            }
+            unset($wheres['Followed']);
+        }
+
+        return parent::getCount($wheres);
+    }
+
+    /**
      * A simplified version of GetWhere that polls the cache instead of the database.
      * @param array $where
      * @return array
@@ -3482,6 +3513,7 @@ SQL;
         }
 
         $categories = $query->get()->resultArray();
+
         $result = [];
         foreach ($categories as $category) {
             self::calculate($category);

@@ -6,6 +6,7 @@
  */
 
 use Garden\Schema\Schema;
+use Garden\Web\Data;
 use Garden\Web\Exception\NotFoundException;
 use Garden\Web\Exception\ServerException;
 use Vanilla\DateFilterSchema;
@@ -49,20 +50,20 @@ class DiscussionsApiController extends AbstractApiController {
      * Get a list of the current user's bookmarked discussions.
      *
      * @param array $query The request query.
-     * @return array
+     * @return Data
      */
     public function get_bookmarked(array $query) {
         $this->permission('Garden.SignIn.Allow');
 
         $in = $this->schema([
             'page:i?' => [
-                'description' => 'Page number.',
+                'description' => 'Page number. See [Pagination](https://docs.vanillaforums.com/apiv2/#pagination).',
                 'default' => 1,
                 'minimum' => 1,
                 'maximum' => $this->discussionModel->getMaxPages()
             ],
             'limit:i?' => [
-                'description' => 'The number of items per page.',
+                'description' => 'Desired number of items per page.',
                 'default' => $this->discussionModel->getDefaultLimit(),
                 'minimum' => 1,
                 'maximum' => 100
@@ -90,7 +91,10 @@ class DiscussionsApiController extends AbstractApiController {
         }
 
         $result = $out->validate($rows);
-        return $result;
+
+        $paging = ApiUtils::morePagerInfo($result, '/api/v2/discussions/bookmarked', $query, $in);
+
+        return new Data($result, ['paging' => $paging]);
     }
 
     /**
@@ -337,7 +341,7 @@ class DiscussionsApiController extends AbstractApiController {
      * List discussions.
      *
      * @param array $query The query string.
-     * @return array
+     * @return Data
      */
     public function index(array $query) {
         $this->permission();
@@ -374,13 +378,13 @@ class DiscussionsApiController extends AbstractApiController {
                 'enum' => ['first', 'mixed'],
             ],
             'page:i?' => [
-                'description' => 'Page number.',
+                'description' => 'Page number. See [Pagination](https://docs.vanillaforums.com/apiv2/#pagination).',
                 'default' => 1,
                 'minimum' => 1,
                 'maximum' => $this->discussionModel->getMaxPages()
             ],
             'limit:i?' => [
-                'description' => 'The number of items per page.',
+                'description' => 'Desired number of items per page.',
                 'default' => $this->discussionModel->getDefaultLimit(),
                 'minimum' => 1,
                 'maximum' => 100
@@ -444,7 +448,16 @@ class DiscussionsApiController extends AbstractApiController {
 
         // Allow addons to modify the result.
         $result = $this->getEventManager()->fireFilter('discussionsApiController_index_output', $result, $this, $in, $query, $rows);
-        return $result;
+
+        $whereCount = count($where);
+        $isWhereOptimized = (isset($where['d.CategoryID']) && ($whereCount === 1 || ($whereCount === 2 && isset($where['Announce']))));
+        if ($whereCount === 0 || $isWhereOptimized) {
+            $paging = ApiUtils::numberedPagerInfo($this->discussionModel->getCount($where), '/api/v2/discussions', $query, $in);
+        } else {
+            $paging = ApiUtils::morePagerInfo($rows, '/api/v2/discussions', $query, $in);
+        }
+
+        return new Data($result, ['paging' => $paging]);
     }
 
     /**

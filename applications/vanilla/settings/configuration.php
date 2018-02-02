@@ -53,3 +53,6 @@ $Configuration['Vanilla']['Comments']['AllowSelfDelete'] = false;
 
 // Allow users to follow categories. Users will be able to see a feed of discussions of only their followed categories.
 $Configuration['Vanilla']['EnableCategoryFollowing'] = false;
+
+// Save user preferences when they filter categories or recent discussions by their "followed" status.
+$Configuration['Vanilla']['SaveFollowingPreference'] = true;

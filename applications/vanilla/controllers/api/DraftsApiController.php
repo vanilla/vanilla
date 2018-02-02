@@ -5,6 +5,7 @@
  */
 
 use Garden\Schema\Schema;
+use Garden\Web\Data;
 use Garden\Web\Exception\NotFoundException;
 use Vanilla\ApiUtils;
 
@@ -179,7 +180,7 @@ class DraftsApiController extends AbstractApiController {
      * List drafts created by the current user.
      *
      * @param array $query The query string.
-     * @return array
+     * @return Data
      */
     public function index(array $query) {
         $this->permission('Garden.SignIn.Allow');
@@ -194,12 +195,12 @@ class DraftsApiController extends AbstractApiController {
                 'default' => null
             ],
             'page:i?' => [
-                'description' => 'Page number.',
+                'description' => 'Page number. See [Pagination](https://docs.vanillaforums.com/apiv2/#pagination).',
                 'default' => 1,
                 'minimum' => 1
             ],
             'limit:i?' => [
-                'description' => 'The number of items per page.',
+                'description' => 'Desired number of items per page.',
                 'default' => 30,
                 'minimum' => 1,
                 'maximum' => 100
@@ -236,7 +237,15 @@ class DraftsApiController extends AbstractApiController {
         }
 
         $result = $out->validate($rows);
-        return $result;
+
+        $paging = ApiUtils::numberedPagerInfo(
+            $this->draftModel->getCount($where),
+            '/api/v2/drafts',
+            $query,
+            $in
+        );
+
+        return new Data($result, ['paging' => $paging]);
     }
 
     /**

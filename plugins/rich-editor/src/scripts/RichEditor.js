@@ -4,9 +4,10 @@
  * @license https://opensource.org/licenses/GPL-2.0 GPL-2.0
  */
 
-import Quill from "quill";
+import Quill from "quill/quill";
 import EmojiBlot from "./blots/EmojiBlot.js";
 import ImageBlot from "./blots/ImageBlot.js";
+import VanillaTheme from "./quill/VanillaTheme";
 import * as utility from "@core/utility";
 
 Quill.register(EmojiBlot);
@@ -37,7 +38,7 @@ const options = {
         // autoLinker: true,
     },
     placeholder: false,
-    theme: false,
+    theme: "vanilla",
 };
 
 export default class RichEditor {
@@ -87,7 +88,6 @@ export default class RichEditor {
         utility.log("Initializing Rich Editor");
         this.editor = new Quill(this.container, options);
         this.bodybox.style.display = "none";
-        // this.editor.keyboard.removeHotkeys(9);
 
         if (this.initialValue) {
             utility.log("Setting existing content as contents of editor");
@@ -129,7 +129,9 @@ export default class RichEditor {
     }
 
     initializeOtherFormat() {
+
         // TODO: check if we can convert from a format
+
         return;
     }
 }

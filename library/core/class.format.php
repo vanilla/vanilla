@@ -1395,12 +1395,24 @@ class Gdn_Format {
             list($width, $height) = Gdn_Format::getEmbedSize();
         }
 
+        $urlParts = parse_url($url);
+
+        parse_str(val('query', $urlParts,  ''), $query);
+        // There's the possibility the query string could be encoded, resulting in parameters that begin with "amp;"
+        foreach ($query as $key => $val) {
+            $newKey = stringBeginsWith($key, 'amp;', false, true);
+            if ($newKey !== $key) {
+                $query[$newKey] = $val;
+                unset($query[$key]);
+            }
+        }
+
         // For each embed, add a key, a string to test the url against using strpos, and the regex for the url to parse.
         // The is an array of strings. If there are more than one way to match the url, you can add multiple regex strings
         // in the regex array. This is useful for backwards-compatibility when a service updates its url structure.
         $embeds = [
             'YouTube' => [
-                'regex' => ['/https?:\/\/(?:(?:www.)|(?:m.))?(?:(?:youtube.com)|(?:youtu.be))\/(?:(?:playlist?)|(?:(?:watch\?v=)?(?P<videoId>[\w-]{11})))(?:\?|\&)?(?:list=(?P<listId>[\w-]*))?(?:t=(?:(?P<minutes>\d)*m)?(?P<seconds>\d)*s)?(?:#t=(?P<start>\d*))?/i']
+                'regex' => ['/https?:\/\/(?:(?:www.)|(?:m.))?(?:(?:youtube.com)|(?:youtu.be))\/(?:(?:playlist?)|(?:(?:watch\?v=)?(?P<videoId>[\w-]{11})))(?:\?|\&)?(?:list=(?P<listId>[\w-]*))?(?:t=(?:(?P<minutes>\d*)m)?(?P<seconds>\d*)s)?(?:#t=(?P<start>\d*))?/i']
             ],
             'Twitter' => [
                 'regex' => ['/https?:\/\/(?:www\.)?twitter\.com\/(?:#!\/)?(?:[^\/]+)\/status(?:es)?\/([\d]+)/i']
@@ -1505,6 +1517,10 @@ EOT;
                     if ($start = val('start', $matches)) {
                         $fullUrl .= '&start='.$start;
                         $start = '#t='.$start;
+                    }
+
+                    if (array_key_exists('rel', $query)) {
+                        $fullUrl .= "&rel={$query['rel']}";
                     }
 
                     $result = '<span class="VideoWrap">';

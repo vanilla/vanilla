@@ -105,32 +105,47 @@ if (!function_exists('heading')) {
      * Handles url-ifying. Adds an optional button or return link.
      *
      * @param string $title The page title.
-     * @param string $buttonText The text appearing on the button.
+     * @param string|array $buttonText The text appearing on the button or an array of button definitions.
      * @param string $buttonUrl The url for the button.
      * @param string|array $buttonAttributes Can be string CSS class or an array of attributes. CSS class defaults to `btn btn-primary`.
      * @param string $returnUrl The url for the return chrevron button.
      * @return string The structured heading string.
      */
     function heading($title, $buttonText = '', $buttonUrl = '', $buttonAttributes = [], $returnUrl = '') {
-
-        if (is_string($buttonAttributes)) {
-            $buttonAttributes = ['class' => $buttonAttributes];
+        if (is_array($buttonText)) {
+            $buttons = $buttonText;
+        } elseif (!empty($buttonText)) {
+            $buttons = [[
+                'text' => $buttonText,
+                'url' => $buttonUrl,
+                'attributes' => $buttonAttributes
+            ]];
+        } else {
+            $buttons = [];
         }
 
-        if ($buttonText !== '') {
-            if (val('class', $buttonAttributes, false) === false) {
-                $buttonAttributes['class'] = 'btn btn-primary';
+        $buttonsString = '';
+        foreach ($buttons as $button) {
+            $buttonText = $button['text'] ?? '';
+            $buttonUrl = $button['url'] ?? '';
+            $buttonAttributes = $button['attributes'] ?? [];
+            if (is_string($buttonAttributes)) {
+                $buttonAttributes = ['class' => $buttonAttributes];
             }
-            $buttonAttributes = attribute($buttonAttributes);
-        }
 
-        $button = '';
+            if ($buttonText !== '') {
+                if (val('class', $buttonAttributes, false) === false) {
+                    $buttonAttributes['class'] = 'btn btn-primary';
+                }
+            }
 
-        if ($buttonText !== '' && $buttonUrl === '') {
-            $button = '<button type="button" '.$buttonAttributes.'>'.$buttonText.'</button>';
-        } else if ($buttonText !== '' && $buttonUrl !== '') {
-            $button = '<a '.$buttonAttributes.' href="'.url($buttonUrl).'">'.$buttonText.'</a>';
+            if ($buttonUrl === '') {
+                $buttonsString .= ' <button type="button" '.attribute($buttonAttributes).'>'.$buttonText.'</button>';
+            } else {
+                $buttonsString .= ' <a '.attribute($buttonAttributes).' href="'.url($buttonUrl).'">'.$buttonText.'</a>';
+            }
         }
+        $buttonsString = '<div class="btn-container">'.$buttonsString.'</div>';
 
         $title = '<h1>'.$title.'</h1>';
 
@@ -143,7 +158,7 @@ if (!function_exists('heading')) {
             </div>';
         }
 
-        return '<header class="header-block">'.$title.$button.'</header>';
+        return '<header class="header-block">'.$title.$buttonsString.'</header>';
     }
 }
 
@@ -390,6 +405,49 @@ if (!function_exists('category')) {
         }
 
         return $category;
+    }
+}
+
+if (!function_exists('categoryFilters')) {
+    /**
+     * Returns category filtering.
+     *
+     * @param string $extraClasses any extra classes you add to the drop down
+     * @return string
+     */
+    function categoryFilters($extraClasses = '') {
+        if (!Gdn::session()->isValid()) {
+            return;
+        }
+
+        $baseUrl = 'categories';
+        $filters = [
+            [
+                'name' => 'Following',
+                'param' => 'followed',
+                'extra' => ['save' => 1]
+            ]
+        ];
+
+        $defaultParams = ['save' => 1];
+        if (Gdn::request()->get('followed')) {
+            $defaultParams['followed'] = 0;
+        }
+
+        if (!empty($defaultParams)) {
+            $defaultUrl = $baseUrl.'?'.http_build_query($defaultParams);
+        } else {
+            $defaultUrl = $baseUrl;
+        }
+
+        return filtersDropDown(
+            $baseUrl,
+            $filters,
+            $extraClasses,
+            'All',
+            $defaultUrl,
+            'View'
+        );
     }
 }
 
@@ -651,6 +709,49 @@ if (!function_exists('commentUrl')) {
     }
 }
 
+if (!function_exists('discussionFilters')) {
+    /**
+     * Returns discussions filtering.
+     *
+     * @param string $extraClasses any extra classes you add to the drop down
+     * @return string
+     */
+    function discussionFilters($extraClasses = '') {
+        if (!Gdn::session()->isValid()) {
+            return;
+        }
+
+        $baseUrl = 'discussions';
+        $filters = [
+            [
+                'name' => 'Following',
+                'param' => 'followed',
+                'extra' => ['save' => 1]
+            ]
+        ];
+
+        $defaultParams = ['save' => 1];
+        if (Gdn::request()->get('followed')) {
+            $defaultParams['followed'] = 0;
+        }
+
+        if (!empty($defaultParams)) {
+            $defaultUrl = $baseUrl.'?'.http_build_query($defaultParams);
+        } else {
+            $defaultUrl = $baseUrl;
+        }
+
+        return filtersDropDown(
+            $baseUrl,
+            $filters,
+            $extraClasses,
+            'All',
+            $defaultUrl,
+            'View'
+        );
+    }
+}
+
 if (!function_exists('discussionUrl')) {
     /**
      * Return a URL for a discussion. This function is in here and not functions.general so that plugins can override.
@@ -697,6 +798,75 @@ if (!function_exists('exportCSV')) {
             fputcsv($output, $row);
         }
         fclose($output);
+    }
+}
+
+if (!function_exists('filtersDropDown')) {
+    /**
+     * Returns a filtering drop-down menu.
+     *
+     * @param string $baseUrl Target URL with no query string applied.
+     * @param array $filters A multidimensional array of rows with the following properties:
+     *     ** 'name': Friendly name for the filter.
+     *     ** 'param': URL parameter associated with the filter.
+     *     ** 'value': A value for the URL parameter.
+     * @param string $extraClasses any extra classes you add to the drop down
+     * @param string $default The default label for when no filter is active.
+     * @param string|null $defaultURL URL override to return to the default, unfiltered state.
+     * @param string $label Text for the label to attach to the cont
+     * @return string
+     */
+    function filtersDropDown($baseUrl, array $filters = [], $extraClasses = '', $default = 'All', $defaultUrl = null, $label = 'View') {
+        $output = '';
+
+        if (c('Vanilla.EnableCategoryFollowing')) {
+            $links = [];
+            $active = null;
+
+            // Translate filters into links.
+            foreach ($filters as $filter) {
+                // Make sure we have the bare minimum: a label and a URL parameter.
+                if (!array_key_exists('name', $filter)) {
+                    throw new InvalidArgumentException('Filter does not have a name field.');
+                }
+                if (!array_key_exists('param', $filter)) {
+                    throw new InvalidArgumentException('Filter does not have a param field.');
+                }
+
+                // Prepare for consumption by linkDropDown.
+                $value = val('value', $filter, 1);
+                $query = [$filter['param'] => $value];
+                if (array_key_exists('extra', $filter) && is_array($filter['extra'])) {
+                    $query += $filter['extra'];
+                }
+                $url = url($baseUrl.'?'.http_build_query($query));
+                $link = [
+                    'name' => $filter['name'],
+                    'url' => $url
+                ];
+
+                // If we don't already have an active link, and this parameter and value match, this is the active link.
+                if ($active === null && Gdn::request()->get($filter['param']) == $value) {
+                    $active = $filter['name'];
+                    $link['active'] = true;
+                }
+
+                // Queue up another filter link.
+                $links[] = $link;
+            }
+
+            // Add the default link to the top of the list.
+            array_unshift($links, [
+                'active' => $active === null,
+                'name' => $default,
+                'url' => $defaultUrl ?: $baseUrl
+            ]);
+
+            // Generate the markup for the drop down menu.
+            $output = linkDropDown($links, 'selectBox-following '.trim($extraClasses), t($label).': ');
+        }
+
+        return $output;
     }
 }
 
@@ -935,6 +1105,74 @@ if (!function_exists('ipAnchor')) {
         } else {
             return $iP;
         }
+    }
+}
+
+if (!function_exists('linkDropDown')) {
+    /**
+     * Write a link drop down control.
+     *
+     * @param array $links
+     *   Has the following properties:
+     *     ** 'url': string: The url for the link
+     *     ** 'name': string: The text for the link
+     *     ** 'active': boolean: is it the current page
+     * @param string $extraClasses any extra classes you add to the drop down
+     * @param string $label the label of the drop down
+     *
+     */
+    function linkDropDown($links, $extraClasses = '', $label) {
+        $output = '';
+        $selectedKey = 0;
+        foreach($links as $i => $link) {
+            if (val('active', $link)) {
+                $selectedKey = $i;
+                break;
+            }
+        }
+        $selectedLink = val($selectedKey, $links);
+        $extraClasses = trim($extraClasses);
+        $linkName = val('name', $selectedLink);
+
+        $output .= <<<EOT
+        <span class="ToggleFlyout selectBox {$extraClasses}">
+          <span class="selectBox-label">{$label}</span>
+          <span class="selectBox-main">
+              <a href="#" role="button" class="FlyoutButton selectBox-toggle" tabindex="0">
+                <span class="selectBox-selected">{$linkName}</span>
+                <span class="vanillaDropDown-arrow">▾</span>
+              </a>
+              <ul class="Flyout MenuItems selectBox-content" role="presentation">
+EOT;
+        foreach($links as $i => $link) {
+            if (val('active', $link)) {
+                $output .= '<li class="selectBox-item isActive" role="presentation">';
+                $output .= '  <a href="'.val('url', $link).'" role="menuitem" class="dropdown-menu-link selectBox-link" tabindex="0" aria-current="location">';
+                $output .= '    <svg class="vanillaIcon selectBox-selectedIcon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 18 18">';
+                $output .= '      <title>✓</title>';
+                $output .= '      <polygon fill="currentColor" points="1.938,8.7 0.538,10.1 5.938,15.5 17.337,3.9 15.938,2.5 5.938,12.8"></polygon>';
+                $output .= '    </svg>';
+                $output .= '    <span class="selectBox-selectedText">';
+                $output .=        val('name', $link);
+                $output .= '    </span>';
+                $output .= '  </a>';
+                $output .= '</li>';
+            } else {
+                $output .= '<li class="selectBox-item" role="presentation">';
+                $output .= '  <a href="'.val('url', $link).'" role="menuitem" class="dropdown-menu-link selectBox-link" tabindex="0" href="#">';
+                $output .=      val('name', $link);
+                $output .= '  </a>';
+                $output .= '</li>';
+            }
+        }
+        $output .= <<<EOT
+              </ul>
+            </span>
+          </span>
+        </span>
+EOT;
+
+        return $output;
     }
 }
 

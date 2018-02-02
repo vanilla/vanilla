@@ -8,6 +8,7 @@
 namespace VanillaTests\APIv2;
 
 use CategoryModel;
+use DiscussionModel;
 
 /**
  * Test the /api/v2/discussions endpoints.
@@ -88,6 +89,10 @@ class DiscussionsTest extends AbstractResourceTest {
         }
     }
 
+    public function setUp() {
+        parent::setUp();
+        DiscussionModel::categoryPermissions(false, true);
+    }
     /**
      * Verify a bookmarked discussion shows up under /discussions/bookmarked.
      */

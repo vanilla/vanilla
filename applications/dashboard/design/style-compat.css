@@ -1,11 +1,22 @@
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  border: 0;
+}
+
+em {
+  font-style: italic;
+}
+
 .richEditor {
   position: relative;
   display: block;
   padding-left: 36px;
-}
-
-.richEditor em {
-  font-style: oblique;
 }
 
 .richEditor-frame.InputBox {
@@ -28,13 +39,6 @@
   bottom: auto;
   display: block;
   float: none;
-}
-
-.richEditor-inlineNub {
-  width: 8px;
-  height: 8px;
-  background: black;
-  position: absolute;
 }
 
 .richEditorParagraphMenu {
@@ -297,6 +301,13 @@
   display: none;
 }
 
+.richEditor-inlineNub {
+  position: absolute;
+  width: 24px;
+  height: 24px;
+  background: white;
+}
+
 .followButton {
   white-space: nowrap;
   font-size: 10px;
@@ -422,17 +433,6 @@
 
 body.Categories.isMobile .PageControls.Top {
   display: block;
-}
-
-.sr-only {
-  position: absolute;
-  width: 1px;
-  height: 1px;
-  padding: 0;
-  margin: -1px;
-  overflow: hidden;
-  clip: rect(0, 0, 0, 0);
-  border: 0;
 }
 
 /*# sourceMappingURL=style-compat.css.map */

@@ -1,5 +1,6 @@
 $richEditor-icon_size: 24px !default;
 $richEditor-menuButton_size: 39px !default;
+$richEditor-bg_color: white !default;
 $richEditor_leftPadding: 36px !default;
 $richEditor_minHeight: 200px !default;
 $richEditor_verticalPadding: 9px !default;
@@ -16,20 +17,17 @@ $richEditor-insertPopover_paddingVertical: 9px !default;
 $richEditor-insertPopover_paddingHorizontal: 12px !default;
 $richEditor-insertPopover_maxHeight: 250px !default;
 $richEditor-emoji_width: 7 * $richEditor-menuButton_size + 2 * $richEditor-insertPopover_paddingHorizontal;
+$richEditor-nub_width: 24px !default;
 
 .richEditor {
   position: relative;
   display: block;
   padding-left: $richEditor_leftPadding;
-
-    em {
-      font-style: oblique;
-    }
 }
 
 .richEditor-frame.InputBox {
   position: relative;
-  background: white;
+  background: $richEditor-bg_color;
   height: auto;
   padding: 0;
 }
@@ -48,13 +46,6 @@ $richEditor-emoji_width: 7 * $richEditor-menuButton_size + 2 * $richEditor-inser
     display: block;
     float: none;
   }
-}
-
-.richEditor-inlineNub {
-    width: 8px;
-    height: 8px;
-    background: black;
-    position: absolute;
 }
 
 .richEditorParagraphMenu {
@@ -339,4 +330,21 @@ $richEditor-emoji_width: 7 * $richEditor-menuButton_size + 2 * $richEditor-inser
 
 .richEditor ~ .TextBoxWrapper {
   display: none;
+}
+
+
+// Nub styles
+
+.richEditor-inlineNub {
+  position: absolute;
+  width: $richEditor-nub_width;
+  height: $richEditor-nub_width;
+  background: $richEditor-bg_color;
+
+
+
+  //border: 1px solid #999;
+  //border-radius: 2px;
+  //box-shadow: 0 5px 10px #eee;
+  //box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
 }

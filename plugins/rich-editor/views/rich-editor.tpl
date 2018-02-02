@@ -3,24 +3,10 @@
         {t c="Insert instructions for editor here"}
     </p>
     <div class="richEditor-frame InputBox">
-
-        <div class="richEditor-container">
-            <div class="js-richText">
-                <div class="ql-editor richEditor-text userContent" data-gramm="false" contenteditable="true" data-placeholder="{t c="Type your message"}"></div>
-            </div>
-            <div class="js-richEditorInlineMenu"></div>
+        <div class="js-richText">
+            <div class="ql-editor richEditor-text userContent" data-gramm="false" contenteditable="true" data-placeholder="Create a new post..."></div>
         </div>
-
-        <div class="richEditor-menu richEditorParagraphMenu">
-            <button class="richEditor-button richEditorParagraphMenu-handle" type="button" aria-haspopup="menu" aria-expanded="false" aria-controls="tempId-paragraphLevelMenu-toggle">
-                <svg class="richEditorInline-icon" viewBox="0 0 24 24">
-                    <title>¶</title>
-                    <path fill="currentColor" fill-rule="evenodd" d="M15,6 L17,6 L17,18 L15,18 L15,6 Z M11,6 L13.0338983,6 L13.0338983,18 L11,18 L11,6 Z M11,13.8666667 C8.790861,13.8666667 7,12.1056533 7,9.93333333 C7,7.76101332 8.790861,6 11,6 C11,7.68571429 11,11.6190476 11,13.8666667 Z"/>
-                </svg>
-            </button>
-            {* Paragraph level menu goes here *}
-        </div>
-
+        <div class="js-richEditorInlineMenu"></div>
 
         <div class="richEditor-menu embedBar">
             <ul class="richEditor-menuItems" role="menubar" aria-label="{t c="Inline Level Formatting Menu"}">
@@ -32,7 +18,6 @@
                         </svg>
                     </button>
                 </li>
-
                 <li class="richEditor-menuItem" role="menuitem">
                     <button class="richEditor-button" type="button" aria-pressed="false">
                         <svg class="richEditorInline-icon" viewBox="0 0 24 24">
@@ -50,20 +35,6 @@
                         </svg>
                     </button>
                 </li>
-
-                {*<li class="richEditor-menuItem" role="menuitem">*}
-                    {*<button class="richEditor-button emojiButton" type="button" aria-pressed="false">*}
-                        {*TEST EMOJI*}
-                    {*</button>*}
-                {*</li>*}
-
-
-                {*<li class="richEditor-menuItem" role="menuitem">*}
-                    {*<button class="richEditor-button imageButton" type="button" aria-pressed="false">*}
-                        {*TEST IMAGE*}
-                    {*</button>*}
-                {*</li>*}
-
                 <li class="richEditor-menuItem isRightAligned" role="menuitem">
                     <button class="richEditor-button" type="button" aria-pressed="false">
                         <svg class="richEditorInline-icon" viewBox="0 0 24 24">
@@ -74,5 +45,14 @@
                 </li>
             </ul>
         </div>
+    </div>
+    <div class="richEditor-menu richEditorParagraphMenu">
+        <button class="richEditor-button richEditorParagraphMenu-handle" type="button" aria-haspopup="menu" aria-expanded="false" aria-controls="tempId-paragraphLevelMenu-toggle">
+            <svg class="richEditorInline-icon" viewBox="0 0 24 24">
+                <title>¶</title>
+                <path fill="currentColor" fill-rule="evenodd" d="M15,6 L17,6 L17,18 L15,18 L15,6 Z M11,6 L13.0338983,6 L13.0338983,18 L11,18 L11,6 Z M11,13.8666667 C8.790861,13.8666667 7,12.1056533 7,9.93333333 C7,7.76101332 8.790861,6 11,6 C11,7.68571429 11,11.6190476 11,13.8666667 Z"/>
+            </svg>
+        </button>
+        {* Paragraph level menu goes here *}
     </div>
 </div>

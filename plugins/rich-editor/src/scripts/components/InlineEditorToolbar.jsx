@@ -142,8 +142,7 @@ export default class InlineEditorToolbar extends React.Component {
 
         const containerSize = this.quill.root.offsetWidth;
         const selfSize = this.toolbar.offsetWidth;
-        const nubSize = this.nub.offsetWidth;
-        const padding = 12;
+        const padding = -6;
         const start = bounds.left;
         const end = bounds.right;
 
@@ -153,7 +152,7 @@ export default class InlineEditorToolbar extends React.Component {
         const averageOffset = Math.round((start + end) / 2);
 
         const toolbarPosition = Math.max(min, Math.min(max, averageOffset)) - halfToolbarSize;
-        const nubPosition = averageOffset - toolbarPosition - nubSize / 2;
+        const nubPosition = averageOffset - toolbarPosition;
 
         return {
             toolbarPosition,
@@ -175,9 +174,9 @@ export default class InlineEditorToolbar extends React.Component {
             return null;
         }
 
-        const offset = 6;
+        const offset = 0;
         let toolbarPosition = bounds.top - this.toolbar.offsetHeight - offset;
-        let nubPosition = this.toolbar.offsetHeight - this.nub.offsetHeight / 2;
+        let nubPosition = this.toolbar.offsetHeight;
         let nubPointsDown = true;
 
         const isNearStart = bounds.top < 30;
@@ -221,13 +220,15 @@ export default class InlineEditorToolbar extends React.Component {
                 top: y.nubPosition,
             };
 
-            classes += y.nubPointsDown ? "isPositionTop" : "isPositionDown";
+            classes += y.nubPointsDown ? "isUp" : "isDown";
         }
 
 
-        return<div className={classes} style={toolbarStyles} ref={(toolbar) => this.toolbar = toolbar}>
+        return <div className={classes} style={toolbarStyles} ref={(toolbar) => this.toolbar = toolbar}>
             <EditorToolbar quill={this.quill}/>
-            <div style={nubStyles} className="richEditor-inlineNub" ref={(nub) => this.nub = nub} />
+            <div style={nubStyles} className="richEditor-nubPosition" ref={(nub) => this.nub = nub}>
+                <div className="richEditor-nub"/>
+            </div>
         </div>;
     }
 }

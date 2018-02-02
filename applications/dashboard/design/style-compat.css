@@ -1,14 +1,26 @@
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  border: 0;
+}
+
+em {
+  font-style: italic;
+}
+
 .richEditor {
   position: relative;
   display: block;
   padding-left: 36px;
 }
 
-.richEditor em {
-  font-style: oblique;
-}
-
 .richEditor-frame.InputBox {
+  position: relative;
   background: white;
   height: auto;
   padding: 0;
@@ -27,13 +39,6 @@
   bottom: auto;
   display: block;
   float: none;
-}
-
-.richEditor-inlineNub {
-  width: 8px;
-  height: 8px;
-  background: black;
-  position: absolute;
 }
 
 .richEditorParagraphMenu {
@@ -120,7 +125,7 @@
 }
 
 .richEditor-button:focus {
-  z-index: 1;
+  z-index: 2;
 }
 
 .richEditor-button:hover .richEditorInline-icon, .richEditor-button:focus .richEditorInline-icon, .richEditor-button.isActive .richEditorInline-icon {
@@ -296,8 +301,54 @@
   display: none;
 }
 
-.richEditor-container {
+.richEditor-nubPosition {
+  position: absolute;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  overflow: hidden;
+  width: 24px;
+  height: 24px;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+  transform: translateX(-50%);
+  margin-top: -1px;
+}
+
+.richEditor-nub {
   position: relative;
+  display: block;
+  width: 12px;
+  height: 12px;
+  border-top: 1px solid #999;
+  border-right: 1px solid #999;
+  box-shadow: 0 0 5px 1px #eee;
+  box-shadow: 0 0 5px 1px rgba(0, 0, 0, 0.2);
+  background: white;
+}
+
+.richEditor-inlineMenu.isUp {
+  transform: translateY(-12px);
+}
+
+.richEditor-inlineMenu.isUp .richEditor-nub {
+  transform: translateY(-50%) rotate(135deg);
+}
+
+.richEditor-inlineMenu.isDown {
+  transform: translateY(12px);
+}
+
+.richEditor-inlineMenu.isDown .richEditor-nubPosition {
+  align-items: flex-end;
+  transform: translateY(-50%) translateX(-50%);
+  margin-top: 1px;
+}
+
+.richEditor-inlineMenu.isDown .richEditor-nub {
+  transform: translateY(50%) rotate(-45deg);
 }
 
 .followButton {
@@ -425,17 +476,6 @@
 
 body.Categories.isMobile .PageControls.Top {
   display: block;
-}
-
-.sr-only {
-  position: absolute;
-  width: 1px;
-  height: 1px;
-  padding: 0;
-  margin: -1px;
-  overflow: hidden;
-  clip: rect(0, 0, 0, 0);
-  border: 0;
 }
 
 /*# sourceMappingURL=style-compat.css.map */

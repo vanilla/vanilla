@@ -227,7 +227,7 @@ export default class InlineEditorToolbar extends React.Component {
         return <div className={classes} style={toolbarStyles} ref={(toolbar) => this.toolbar = toolbar}>
             <EditorToolbar quill={this.quill}/>
             <div style={nubStyles} className="richEditor-nubPosition" ref={(nub) => this.nub = nub}>
-                <div class="richEditor-nub"/>
+                <div className="richEditor-nub"/>
             </div>
         </div>;
     }

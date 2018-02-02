@@ -65,6 +65,28 @@ export function elementIsVisible(element) {
     return !!(element.offsetWidth || element.offsetHeight || element.getClientRects().length);
 }
 
+/**
+ * Get the form data out of a form element.
+ *
+ * @param {Element} formElement - The element to get the data out of.
+ *
+ * @returns {Object}
+ */
+export function getFormData(formElement) {
+    if (!(formElement instanceof HTMLFormElement)) {
+        return {};
+    }
+
+    const data = new FormData(formElement);
+    const result = {};
+
+    for (let [key, value] of data.entries()) {
+        result[key] = value;
+    }
+
+    return result;
+}
+
 const delegatedEventListeners = {};
 
 /**

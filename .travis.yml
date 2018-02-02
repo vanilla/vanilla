@@ -21,6 +21,7 @@ cache:
   directories:
     - $HOME/.composer/cache/files
     - node_modules
+    - plugins/rich-editor/node_modules
   yarn: true
 
 # No additional system dependencies to install. Skip the install step.

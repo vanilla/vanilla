@@ -9,7 +9,6 @@
 }
 
 .richEditor-frame.InputBox {
-  position: relative;
   background: white;
   height: auto;
   padding: 0;
@@ -295,6 +294,10 @@
 
 .richEditor ~ .TextBoxWrapper {
   display: none;
+}
+
+.richEditor-container {
+  position: relative;
 }
 
 .followButton {

@@ -28,7 +28,6 @@ $richEditor-emoji_width: 7 * $richEditor-menuButton_size + 2 * $richEditor-inser
 }
 
 .richEditor-frame.InputBox {
-  position: relative;
   background: white;
   height: auto;
   padding: 0;
@@ -339,4 +338,8 @@ $richEditor-emoji_width: 7 * $richEditor-menuButton_size + 2 * $richEditor-inser
 
 .richEditor ~ .TextBoxWrapper {
   display: none;
+}
+
+.richEditor-container {
+  position: relative;
 }

@@ -14,8 +14,6 @@ import * as utility from "@core/utility";
 Quill.register(EmojiBlot);
 Quill.register(ImageBlot);
 
-console.log(Quill.imports);
-
 // Theme
 Quill.register("themes/vanilla", VanillaTheme);
 

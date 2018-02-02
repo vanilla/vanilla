@@ -10,10 +10,14 @@ import ImageBlot from "./blots/ImageBlot.js";
 import VanillaTheme from "./quill/VanillaTheme";
 import * as utility from "@core/utility";
 
+// Blots
 Quill.register(EmojiBlot);
 Quill.register(ImageBlot);
 
+// Theme
+Quill.register("themes/vanilla", VanillaTheme);
 
+// Temporary function
 const makeElement = (tag, attrs) => {
     const elem = document.createElement(tag);
     Object.keys(attrs).forEach(key => elem[key] = attrs[key]);
@@ -21,23 +25,7 @@ const makeElement = (tag, attrs) => {
 };
 
 
-const toolbarOptions = [
-    ["bold", "italic", "strike"], // toggled buttons
-    ['link', 'image'], // Links and images
-    // ["blockquote", "code-block"], // Blocks
-    // [{ header: 1 }, { header: 2 }], // custom button values
-    [{ list: "ordered"}, { list: "bullet" }],
-    // [{ indent: "-1"}, { indent: "+1" }], // outdent/indent
-    [{ header: [1, 2, false] }],
-    ["clean"], // remove formatting button
-];
-
 const options = {
-    modules: {
-        toolbar: toolbarOptions,
-        // autoLinker: true,
-    },
-    placeholder: false,
     theme: "vanilla",
 };
 

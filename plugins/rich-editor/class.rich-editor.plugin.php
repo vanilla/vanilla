@@ -8,7 +8,7 @@
 class RichEditorPlugin extends Gdn_Plugin {
 
     /** @var integer */
-    private static $editorID;
+    private static $editorID = 0;
     /** @var integer */
     private $editorNumber;
 
@@ -21,14 +21,10 @@ class RichEditorPlugin extends Gdn_Plugin {
     }
 
     /**
-     * Add the style script to the head
-     *
-     * @param Gdn_Controller $sender
-     * @return void
+     * @return int
      */
-
-    public function get_editorID() {
-        return $this->editorNumber;
+    public static function getEditorID(): int {
+        return self::$editorID;
     }
 
     /**
@@ -42,9 +38,7 @@ class RichEditorPlugin extends Gdn_Plugin {
             return;
         }
 
-//        $sender->addCssFile("//cdn.quilljs.com/1.3.4/quill.bubble.css");
         $sender->addDefinition("editor", "RichEditor");
-
     }
 
     /**
@@ -57,17 +51,13 @@ class RichEditorPlugin extends Gdn_Plugin {
     public function gdn_form_beforeBodyBox_handler($sender, $args) {
         /** @var Gdn_Controller $controller */
         $controller = Gdn::controller();
-        /** @var int $editorID */
-        $editorID = $this->get_editorID();
+        $editorID = $this->getEditorID();
 
         $controller->setData('editorData', [
             'editorID' => $editorID,
             'editorDescriptionID' => 'richEditor-'.$editorID.'-description',
 
         ]);
-
-        // Load up the helper functions for the editor views.
-        //$controller->fetchView('helper_functions', '', 'plugins/rich-editor');
 
         // Render the editor view.
         $args['BodyBox'] = $controller->fetchView('rich-editor', '', 'plugins/rich-editor');

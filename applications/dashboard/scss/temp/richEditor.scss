@@ -2,7 +2,8 @@ $richEditor-icon_size: 24px !default;
 $richEditor-menuButton_size: 39px !default;
 $richEditor_leftPadding: 36px !default;
 $richEditor_minHeight: 200px !default;
-$richEditor_padding: 9px 12px 0 !default;
+$richEditor_verticalPadding: 9px !default;
+$richEditor_padding: $richEditor_verticalPadding 12px !default;
 $richEditor-paragraphMenu_offset: 9px!default;
 $richEditor-embedMenu_padding: 0 !default;
 $richEditor-icon_opacity: .6 !default;
@@ -20,9 +21,14 @@ $richEditor-emoji_width: 7 * $richEditor-menuButton_size + 2 * $richEditor-inser
   position: relative;
   display: block;
   padding-left: $richEditor_leftPadding;
+
+    em {
+      font-style: oblique;
+    }
 }
 
 .richEditor-frame.InputBox {
+  position: relative;
   background: white;
   height: auto;
   padding: 0;
@@ -44,6 +50,13 @@ $richEditor-emoji_width: 7 * $richEditor-menuButton_size + 2 * $richEditor-inser
   }
 }
 
+.richEditor-inlineNub {
+    width: 8px;
+    height: 8px;
+    background: black;
+    position: absolute;
+}
+
 .richEditorParagraphMenu {
   position: absolute;
   top: $richEditor-paragraphMenu_offset;
@@ -56,6 +69,11 @@ $richEditor-emoji_width: 7 * $richEditor-menuButton_size + 2 * $richEditor-inser
   position: relative;
   min-height: $richEditor_minHeight;
   padding: $richEditor_padding;
+  outline-color: transparent;
+
+  .ql-editor {
+      min-height: $richEditor_minHeight - $richEditor_verticalPadding;
+  }
 
   &:focus {
     outline-offset: -2px;
@@ -67,7 +85,9 @@ $richEditor-emoji_width: 7 * $richEditor-menuButton_size + 2 * $richEditor-inser
   }
 }
 
-
+.ql-clipboard {
+    display: none;
+}
 
 .richEditor-menuItems {
   position: relative;
@@ -105,6 +125,7 @@ $richEditor-emoji_width: 7 * $richEditor-menuButton_size + 2 * $richEditor-inser
   padding: 0;
   height: $richEditor-icon_size;
   width: $richEditor-icon_size;
+  background: none;
 
   &.richEditorParagraphMenu-handle {
     background: transparent;
@@ -123,7 +144,8 @@ $richEditor-emoji_width: 7 * $richEditor-menuButton_size + 2 * $richEditor-inser
   }
 
   &:hover,
-  &:focus {
+  &:focus,
+  &.isActive{
     .richEditorInline-icon {
       opacity: 1;
     }
@@ -316,11 +338,5 @@ $richEditor-emoji_width: 7 * $richEditor-menuButton_size + 2 * $richEditor-inser
 }
 
 .richEditor ~ .TextBoxWrapper {
-  display: none;
-}
-
-// Temporary
-.ql-tooltip,
-.ql-hidden {
   display: none;
 }

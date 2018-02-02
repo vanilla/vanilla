@@ -7,7 +7,7 @@
             "bootstrap-admin": "./src/scripts/bootstrap/bootstrap.js"
         },
         "exports": {
-            "app": [
+            "*": [
                 "./src/scripts/events",
                 "./src/scripts/gdn",
                 "./src/scripts/permissions",
@@ -15,18 +15,11 @@
                 "./src/scripts/dom-utility",
                 "axios",
                 "react",
-                "react-dom"
+                "react-dom",
+                "prop-types"
             ],
-            "admin": [
-                "./src/scripts/events",
-                "./src/scripts/gdn",
-                "./src/scripts/permissions",
-                "./src/scripts/utility",
-                "./src/scripts/dom-utility",
-                "axios",
-                "react",
-                "react-dom"
-            ]
+            "app": [],
+            "admin": []
         }
     }
 }

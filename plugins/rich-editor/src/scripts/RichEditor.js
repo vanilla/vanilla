@@ -62,7 +62,6 @@ export default class RichEditor {
         utility.log("Initializing Rich Editor");
         this.editor = new Quill(this.container, options);
         this.bodybox.style.display = "none";
-        // this.editor.keyboard.removeHotkeys(9);
 
         if (this.initialValue) {
             utility.log("Setting existing content as contents of editor");

@@ -37,6 +37,11 @@ export function onResize(callback, key = undefined, waitTime = 200) {
 }
 
 /**
+ * @typedef WindowDimensions
+ * @property
+ */
+
+/**
  * Class for addons to register events with.
  *
  * Events can take a callback or return a Promise.
@@ -58,6 +63,15 @@ export class Events {
      */
     onVanillaReady(callback) {
         this.vanillaReadyEvents.push(callback);
+    }
+
+    /**
+     * Register a callback for when the window resizes.
+     *
+     * @param {function()} callback
+     */
+    onWindowResize(callback) {
+
     }
 
     /**

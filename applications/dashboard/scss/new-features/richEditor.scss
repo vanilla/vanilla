@@ -17,7 +17,9 @@ $richEditor-insertPopover_paddingVertical: 9px !default;
 $richEditor-insertPopover_paddingHorizontal: 12px !default;
 $richEditor-insertPopover_maxHeight: 250px !default;
 $richEditor-emoji_width: 7 * $richEditor-menuButton_size + 2 * $richEditor-insertPopover_paddingHorizontal;
-$richEditor-nub_width: 24px !default;
+$richEditor-nub_width: 12px !default;
+$richEditor-menu_borderWidth: 1px !default;
+$richEditor-menu_offset: $richEditor-nub_width * 1.2;
 
 .richEditor {
   position: relative;
@@ -35,7 +37,6 @@ $richEditor-nub_width: 24px !default;
 .richEditor-menu {
   display: inline-block;
   position: relative;
-
 
   &.FlyoutMenu { // Temporary
     position: relative;
@@ -89,6 +90,7 @@ $richEditor-nub_width: 24px !default;
   list-style: none;
   margin: 0;
   padding: 0;
+  z-index: 1;
 }
 
 .richEditor-menuItem {
@@ -335,16 +337,52 @@ $richEditor-nub_width: 24px !default;
 
 // Nub styles
 
-.richEditor-inlineNub {
+.richEditor-nubPosition {
   position: absolute;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  overflow: hidden;
+  z-index: 1;
+  width: $richEditor-nub_width * 2;
+  height: $richEditor-nub_width * 2;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+  transform: translateX(-50%);
+  margin-top: -$richEditor-menu_borderWidth;
+}
+
+.richEditor-nub {
+  position: relative;
+  display: block;
   width: $richEditor-nub_width;
   height: $richEditor-nub_width;
+  transform: translateY(-50%) rotate(45deg);
+  border: $richEditor-menu_borderWidth solid #999;
+  box-shadow: 0 0 5px 1px #eee;
+  box-shadow: 0 0 5px 1px rgba(0, 0, 0, 0.2);
   background: $richEditor-bg_color;
+}
 
+// Orientation specific styles
 
+.richEditor-inlineMenu {
+  &.isUp {
+    transform: translateY(-$richEditor-menu_offset);
+  }
 
-  //border: 1px solid #999;
-  //border-radius: 2px;
-  //box-shadow: 0 5px 10px #eee;
-  //box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
+  &.isDown {
+    transform: translateY($richEditor-menu_offset);
+
+    .richEditor-nubPosition {
+      align-items: flex-end;
+      transform: translateY(-50%) translateX(-50%);
+      margin-top: $richEditor-menu_borderWidth;
+    }
+    .richEditor-nub {
+      transform: translateY(50%) rotate(45deg);
+    }
+  }
 }

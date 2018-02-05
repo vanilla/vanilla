@@ -78,7 +78,7 @@ $richEditor-menu_offset: $richEditor-nub_width !default;
 }
 
 .ql-clipboard {
-    display: none;
+    @include sr-only();
 }
 
 .richEditor-menuItems {

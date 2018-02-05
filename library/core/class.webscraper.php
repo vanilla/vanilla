@@ -14,6 +14,9 @@ class WebScraper {
     /** Type for generic image URLs. */
     const TYPE_IMAGE = 'image';
 
+    /** @var bool */
+    private $disableFetch = false;
+
     /** @var array */
     private $types = [
         'getty' => ['domains' => ['embed.gettyimages.com']],
@@ -38,23 +41,35 @@ class WebScraper {
      * @throws Exception if there was an error encountered while getting the page's info.
      */
     private function fetchPageInfo($url) {
-        $pageInfo = fetchPageInfo($url);
-
-        if ($pageInfo['Exception']) {
-            throw new Exception($pageInfo['Exception']);
-        }
-
-        $name = $pageInfo['Title'] ?: null;
-        $body = $pageInfo['Description'] ?: null;
-        $photoUrl = !empty($pageInfo['Images']) ? reset($pageInfo['Images']) : null;
-
         $result = [
             'url' => $url,
-            'name' => $name,
-            'body' => $body,
-            'photoUrl' => $photoUrl
+            'name' => null,
+            'body' => null,
+            'photoUrl' => null
         ];
+
+        if (!$this->disableFetch) {
+            $pageInfo = fetchPageInfo($url);
+
+            if ($pageInfo['Exception']) {
+                throw new Exception($pageInfo['Exception']);
+            }
+
+            $result['name'] = $pageInfo['Title'] ?: null;
+            $result['body'] = $pageInfo['Description'] ?: null;
+            $result['photoUrl'] = !empty($pageInfo['Images']) ? reset($pageInfo['Images']) : null;
+        }
+
         return $result;
+    }
+
+    /**
+     * Get the status of the "disable fetch" flag.
+     *
+     * @return bool
+     */
+    public function getDisableFetch() {
+        return $this->disableFetch;
     }
 
     /**
@@ -193,7 +208,7 @@ class WebScraper {
             'photoUrl' => null,
             'height' => null,
             'width' => null,
-            'attributes' => null
+            'attributes' => []
         ];
 
         $result = array_merge($defaults, $data);
@@ -229,9 +244,9 @@ class WebScraper {
 
         // Get basic info from the page markup.
         $data = $this->fetchPageInfo($url);
+
         $data['width'] = $width;
         $data['height'] = $height;
-
         $data['attributes'] = ['mediaID' => $mediaID];
 
         return $data;
@@ -461,7 +476,7 @@ class WebScraper {
     private function lookupWistia($url) {
         // Try the wvideo-style URL.
         $wvideo = preg_match(
-            '/https?:\/\/(?:[A-za-z0-9\-]+\.)?(?:wistia\.com|wi\.st)\/.*?\?wvideo=(?<videoID>([A-za-z0-9]+))(\?wtime=(?<time>((\d)+m)?((\d)+s)?))?/i',
+            '/https?:\/\/(?:[A-za-z0-9\-]+\.)?(?:wistia\.com|wi\.st)\/.*?\?wvideo=(?<videoID>[A-za-z0-9]+)([\?&]wtime=(?<time>((\d)+m)?((\d)+s)?))?/i',
             $url,
             $matches
         );
@@ -474,8 +489,8 @@ class WebScraper {
             );
         }
 
-        $videoID = $matches['videoID'] ?: null;
-        $time = $matches['time'] ?: null;
+        $videoID = array_key_exists('videoID', $matches) ? $matches['videoID'] : null;
+        $time = array_key_exists('time', $matches) ? $matches['time'] : null;
 
         // Get basic info from the page markup.
         $data = $this->fetchPageInfo($url);
@@ -516,10 +531,21 @@ class WebScraper {
         $data = $this->fetchPageInfo($url);
 
         $data['attributes'] = [
-            'videoID' => $urlParts['videoId'] ?: null,
-            'listID' => $urlParts['listId'] ?: null,
+            'videoID' => array_key_exists('videoId', $urlParts) ? $urlParts['videoId'] : null,
+            'listID' => array_key_exists('listId', $urlParts) ? $urlParts['listId'] : null,
             'start' => $start
         ];
         return $data;
+    }
+
+    /**
+     * Set value of the "disable fetch" flag. Disabling fetch will avoid downloading page contents.
+     *
+     * @param bool $disableFetch
+     * @return self
+     */
+    public function setDisableFetch($disableFetch) {
+        $this->disableFetch = boolval($disableFetch);
+        return $this;
     }
 }

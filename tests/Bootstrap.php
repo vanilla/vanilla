@@ -209,6 +209,10 @@ class Bootstrap {
             ->rule('WebLinking')
             ->setClass(\Vanilla\Web\WebLinking::class)
             ->setShared(true)
+
+            ->rule(\WebScraper::class)
+            ->setShared(true)
+            ->addCall('setDisableFetch', [true]);
         ;
     }
 

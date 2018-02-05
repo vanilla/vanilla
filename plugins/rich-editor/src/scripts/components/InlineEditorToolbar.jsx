@@ -13,7 +13,7 @@ import { Range } from "quill/core/selection";
 import Keyboard from "quill/modules/keyboard";
 import LinkBlot from "quill/formats/link";
 import FloatingToolbar from "./FloatingToolbar";
-import {t} from "@core/utility";
+import { t } from "@core/utility";
 
 export default class InlineEditorToolbar extends React.Component {
     static propTypes = {

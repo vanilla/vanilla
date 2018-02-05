@@ -87,7 +87,7 @@ class WebScraper {
     public function getPageInfo($url, $forceRefresh = false) {
         $urlKey = md5($url);
         $cacheKey = "WebScraper.{$urlKey}";
-        $result = null;
+        $info = null;
 
         if (!$forceRefresh) {
             $info = Gdn::cache()->get($cacheKey);

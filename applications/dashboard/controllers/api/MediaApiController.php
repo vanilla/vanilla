@@ -12,10 +12,25 @@ class MediaApiController extends AbstractApiController {
     /** @var WebScraper */
     private $webScraper;
 
+    /**
+     * MediaApiController constructor.
+     *
+     * @param WebScraper $webScraper
+     */
     public function __construct(WebScraper $webScraper) {
         $this->webScraper = $webScraper;
     }
 
+    /**
+     * Scrape information from a URL.
+     *
+     * @param array $body The request body.
+     * @return array
+     * @throws Exception
+     * @throws \Garden\Schema\ValidationException
+     * @throws \Garden\Web\Exception\HttpException
+     * @throws \Vanilla\Exception\PermissionException
+     */
     public function post_scrape(array $body) {
         $this->permission('Garden.SignIn.Allow');
 
@@ -25,7 +40,7 @@ class MediaApiController extends AbstractApiController {
                 'default' => false,
                 'description' => 'Force the scrape even if the result is cached.'
             ]
-        ]);
+        ], 'in');
         $out = $this->schema([
             'url:s'	=> 'The URL that was scraped.',
             'type:s' => [
@@ -39,7 +54,7 @@ class MediaApiController extends AbstractApiController {
             'height:i|n' => 'The height of the image/video/etc. if applicable. This may be the photoUrl, but might exist even when there is no photoUrl in the case of a video without preview image.',
             'width:i|n' => 'The width of the image/video/etc. if applicable.',
             'attributes:o|n' => 'Any additional attributes required by the the specific embed.',
-        ]);
+        ], 'out');
 
         $body = $in->validate($body);
 

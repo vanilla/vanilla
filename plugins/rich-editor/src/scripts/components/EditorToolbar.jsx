@@ -42,7 +42,6 @@ export default class EditorToolbar extends React.Component {
         },
         link: {
             active: false,
-            value: "",
         },
     };
 
@@ -154,12 +153,6 @@ export default class EditorToolbar extends React.Component {
         }
 
         for (const [itemKey, itemData] of Object.entries(this.state)) {
-            if ("value" in itemData) {
-
-                // Handle the link thing.
-                continue;
-            }
-
             this.updateBooleanFormat(itemKey, itemData, range);
         }
     }

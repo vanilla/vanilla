@@ -173,8 +173,11 @@ export default class InlineEditorToolbar extends React.Component {
 
     /**
      * Handle clicks on the link menu's close button.
+     *
+     * @param {React.MouseEvent} event - The click event.
      */
-    onCloseClick = () => {
+    onCloseClick = (event) => {
+        event.preventDefault();
         this.setState({
             showLink: false,
         });

@@ -17,6 +17,6 @@ export default class EmojiBlot extends Embed {
     }
 }
 
-EmojiBlot.className = "emoji";
-EmojiBlot.blotName = 'emojis';
+EmojiBlot.className = 'emoji';
+EmojiBlot.blotName = 'emoji';
 EmojiBlot.tagName = 'span';

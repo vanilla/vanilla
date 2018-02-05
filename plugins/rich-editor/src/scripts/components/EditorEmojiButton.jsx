@@ -6,7 +6,7 @@
 
 import React from "react";
 import * as PropTypes from "prop-types";
-import Quill from "quill";
+import Quill from "quill/quill";
 
 /**
  * Component for a single item in a EditorToolbar.

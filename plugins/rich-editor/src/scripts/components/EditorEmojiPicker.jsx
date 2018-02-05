@@ -6,7 +6,7 @@
 
 import React from "react";
 import * as PropTypes from "prop-types";
-import Quill from "quill";
+import Quill from "quill/quill";
 import EditorEmojiMenu from "../components/EditorEmojiMenu";
 import { t } from "@core/utility";
 

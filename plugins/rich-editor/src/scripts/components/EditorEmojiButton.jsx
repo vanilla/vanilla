@@ -6,9 +6,7 @@
 
 import React from "react";
 import * as PropTypes from "prop-types";
-import * as Icons from "./Icons";
-import classnames from "classnames";
-import { t } from "@core/utility";
+import Quill from "quill";
 
 /**
  * Component for a single item in a EditorToolbar.
@@ -16,23 +14,33 @@ import { t } from "@core/utility";
 export default class EditorEmojiButton extends React.Component {
 
     static propTypes = {
-        propertyName: PropTypes.string,
-        isActive: PropTypes.bool,
-        clickHandler: PropTypes.func,
+        quill: PropTypes.instanceOf(Quill).isRequired,
+        emoji: PropTypes.object.isRequired,
+        closeMenu: PropTypes.func.isRequired,
     };
 
+    /**
+     * @inheritDoc
+     */
+    constructor(props) {
+        super(props);
+        this.quill = props.quill;
+        this.emojiChar = props.emoji.emoji;
+        this.closeMenu = props.closeMenu;
+    }
+
+    insertEmojiBlot = () => {
+        const range = this.quill.getSelection(true);
+        this.quill.insertEmbed(range.index, 'emoji', {
+            emojiChar: this.emojiChar,
+        }, Quill.sources.USER);
+        this.quill.setSelection(range.index + 1, Quill.sources.SILENT);
+        this.closeMenu();
+    }
+
     render() {
-        const { propertyName, isActive, clickHandler } = this.props;
-        const Icon = Icons[propertyName];
-
-        const buttonClasses = classnames("richEditor-button", {
-            isActive,
-        });
-
-        return <li className="richEditor-menuItem" role="menuitem">
-            <button className={buttonClasses} type="button" onClick={clickHandler}>
-                <Icon />
-            </button>
-        </li>;
+        return <button className="richEditor-button richEditor-insertEmoji" type="button" onClick={this.insertEmojiBlot}>
+            {this.emojiChar}
+        </button>;
     }
 }

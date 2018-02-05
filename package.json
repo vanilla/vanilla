@@ -6,6 +6,7 @@
         "axios": "^0.17.1",
         "babel-polyfill": "^6.26.0",
         "classnames": "^2.2.5",
+        "emojibase-data": "^2.2.0",
         "eslint": "^4.16.0",
         "eslint-plugin-react": "^7.6.1",
         "lodash": "^4.17.4",

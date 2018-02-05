@@ -9,8 +9,10 @@ import * as PropTypes from "prop-types";
 import Quill from "quill";
 import Events from "@core/events";
 import EditorToolbar from "./EditorToolbar";
+import LinkToolbar from "./LinkToolbar";
 import Emitter from "quill/core/emitter";
 import { Range } from "quill/core/selection";
+import Keyboard from "quill/modules/keyboard";
 
 export default class InlineEditorToolbar extends React.Component {
     static propTypes = {
@@ -35,6 +37,30 @@ export default class InlineEditorToolbar extends React.Component {
     /** @type {number} */
     resizeListener;
 
+    /** @type {Object<string, MenuItemData>} */
+    menuItems = {
+        bold: {
+            active: false,
+        },
+        italic: {
+            active: false,
+        },
+        strike: {
+            active: false,
+        },
+        code: {
+            active: false,
+        },
+        link: {
+            active: false,
+            value: "",
+            formatter: () => {
+                this.quill.format("link", true, Emitter.sources.USER);
+                this.setState({showLink: true});
+            },
+        },
+    };
+
     /**
      * @inheritDoc
      */
@@ -45,12 +71,8 @@ export default class InlineEditorToolbar extends React.Component {
         this.quill = props.quill;
 
         this.state = {
-            isVisible: false,
-            x: 0,
-            y: 0,
-            nubX: "50%",
-            nubY: 0,
-            bounds: null,
+            range: null,
+            showLink: false,
         };
 
         this.handleEditorChange = this.handleEditorChange.bind(this);
@@ -71,9 +93,11 @@ export default class InlineEditorToolbar extends React.Component {
      * Be sure to remove the listeners when the component unmounts.
      */
     componentWillUnmount() {
-        this.quill.off(Quill.events.EDITOR_CHANGE);
+        this.quill.off(Quill.events.EDITOR_CHANGE, this.handleEditorChange);
         Events.removeResizeListener(this.resizeListener);
     }
+
+    /** SECTION: position */
 
     /**
      * Handle changes from the editor.
@@ -92,7 +116,7 @@ export default class InlineEditorToolbar extends React.Component {
             this.setState({
                 range,
             });
-        } else {
+        } else if (!this.state.showLink) {
             this.setState({
                 range: null,
             });
@@ -194,6 +218,23 @@ export default class InlineEditorToolbar extends React.Component {
     }
 
     /**
+     * asdf
+     *
+     * @param {React.KeyboardEvent} event - asdf
+     */
+    onLinkKeyDown = (event) => {
+        if (Keyboard.match(event.nativeEvent, "Enter")) {
+            event.preventDefault();
+            const value = event.target.value || "";
+            this.quill.format('link', value, Emitter.sources.USER);
+            this.setState({
+                showLink: false,
+                range: null,
+            });
+        }
+    };
+
+    /**
      * @inheritDoc
      */
     render() {
@@ -223,9 +264,12 @@ export default class InlineEditorToolbar extends React.Component {
             classes += y.nubPointsDown ? "isUp" : "isDown";
         }
 
+        const currentToolbar = this.state.showLink
+            ? <LinkToolbar keyDownHandler={this.onLinkKeyDown}/>
+            : <EditorToolbar menuItems={this.menuItems} quill={this.quill}/>    ;
 
         return <div className={classes} style={toolbarStyles} ref={(toolbar) => this.toolbar = toolbar}>
-            <EditorToolbar quill={this.quill}/>
+            {currentToolbar}
             <div style={nubStyles} className="richEditor-nubPosition" ref={(nub) => this.nub = nub}>
                 <div className="richEditor-nub"/>
             </div>

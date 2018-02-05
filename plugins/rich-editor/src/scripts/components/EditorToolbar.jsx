@@ -14,6 +14,7 @@ import EditorMenuItem from "./EditorMenuItem";
  * @typedef {Object} MenuItemData
  * @property {boolean} active - Whether the given item should be lit up.
  * @property {string} [value] - A value if applicable.
+ * @property {function} [formatter] - A custom handler to run in addition to the default handler.
  */
 
 /**
@@ -23,7 +24,7 @@ export default class EditorToolbar extends React.Component {
 
     static propTypes = {
         quill: PropTypes.instanceOf(Quill).isRequired,
-        menuItems: PropTypes.arrayOf(PropTypes.object),
+        menuItems: PropTypes.object,
     };
 
     static defaultItems = {
@@ -36,7 +37,7 @@ export default class EditorToolbar extends React.Component {
         strike: {
             active: false,
         },
-        inlineCode: {
+        code: {
             active: false,
         },
         link: {
@@ -66,27 +67,39 @@ export default class EditorToolbar extends React.Component {
     }
 
     /**
+     * Handle quill changes. Used to detect selection changes.
+     *
+     * @param {string} type - The change type.
+     * @param {RangeStatic} range - The new selection range.
+     */
+    quillChangeHandler = (type, range) => {
+        if (type === Quill.events.SELECTION_CHANGE) {
+            this.update(range);
+        }
+    };
+
+    /**
+     * React to quill optimizations passes.
+     */
+    quillOptimizeHandler = () => {
+        const [range] = this.quill.selection.getRange();
+        this.update(range);
+    };
+
+    /**
      * Attach some quill listeners.
      */
     componentWillMount() {
-        this.quill.on(Quill.events.EDITOR_CHANGE, (type, range) => {
-            if (type === Quill.events.SELECTION_CHANGE) {
-                this.update(range);
-            }
-        });
-
-        this.quill.on(Quill.events.SCROLL_OPTIMIZE, () => {
-            const [range] = this.quill.selection.getRange();
-            this.update(range);
-        });
+        this.quill.on(Quill.events.EDITOR_CHANGE, this.quillChangeHandler);
+        this.quill.on(Quill.events.SCROLL_OPTIMIZE, this.quillOptimizeHandler);
     }
 
     /**
      * Be sure to remove the listeners when the component unmounts.
      */
     componentWillUnmount() {
-        this.quill.off(Quill.events.EDITOR_CHANGE);
-        this.quill.off(Quill.events.SCROLL_OPTIMIZE);
+        this.quill.off(Quill.events.EDITOR_CHANGE, this.quillChangeHandler);
+        this.quill.off(Quill.events.SCROLL_OPTIMIZE, this.quillOptimizeHandler);
     }
 
     /**
@@ -119,8 +132,13 @@ export default class EditorToolbar extends React.Component {
     menuItemClickHandler(itemKey, event) {
         const itemData = this.state[itemKey];
 
-        // Fall back to boolean
-        this.quill.format(itemKey, !itemData.active, Quill.sources.USER);
+        if ("formatter" in itemData) {
+            itemData.formatter();
+        } else {
+            // Fall back to simple boolean
+            this.quill.format(itemKey, !itemData.active, Quill.sources.USER);
+        }
+
         this.update();
     }
 

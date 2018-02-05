@@ -13,6 +13,7 @@ import * as utility from "@core/utility";
 // Blots
 Quill.register(EmojiBlot);
 Quill.register(ImageBlot);
+// Quill.debug(true);
 
 // Theme
 Quill.register("themes/vanilla", VanillaTheme);

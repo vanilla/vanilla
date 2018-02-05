@@ -175,6 +175,31 @@ class WebScraper {
     }
 
     /**
+     * Attempt to get the width and height of an image.
+     *
+     * @param string $url
+     * @return array
+     */
+    private function getImageSize($url) {
+        $size = [null, null];
+
+        if (!$this->disableFetch) {
+            // Make sure the URL is valid.
+            $urlParts = parse_url($url);
+            if ($urlParts === false || !in_array(val('scheme', $urlParts), ['http', 'https'])) {
+                throw new Exception('Invalid URL.', 400);
+            }
+
+            $result = getimagesize($url);
+            if (is_array($result) && count($result) >= 2) {
+                $size = [$result[0], $result[1]];
+            }
+        }
+
+        return $size;
+    }
+
+    /**
      * Get site-specific data from a page.
      *
      * @param string $type A supported site type.
@@ -283,7 +308,12 @@ class WebScraper {
      * @return array
      */
     private function lookupImage($url) {
-        $data = ['photoUrl' => $url];
+        list($width, $height) = $this->getImageSize($url);
+        $data = [
+            'photoUrl' => $url,
+            'width' => $width,
+            'height' => $height
+        ];
         return $data;
     }
 
@@ -533,6 +563,12 @@ class WebScraper {
 
         // Get info from the page markup.
         $data = $this->fetchPageInfo($url);
+
+        if ($data['photoUrl']) {
+            list($width, $height) = $this->getImageSize($data['photoUrl']);
+            $data['width'] = $width;
+            $data['height'] = $height;
+        }
 
         $data['attributes'] = [
             'videoID' => array_key_exists('videoId', $urlParts) ? $urlParts['videoId'] : null,

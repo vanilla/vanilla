@@ -8,6 +8,7 @@ import React from "react";
 import ReactDOM from "react-dom";
 import InlineEditorToolbar from "../components/InlineEditorToolbar";
 import Theme from "quill/core/theme";
+import EditorEmojiPicker from "../components/EditorEmojiPicker";
 
 export default class VanillaTheme extends Theme {
     static TOOLBAR_CONFIG = [
@@ -33,6 +34,7 @@ export default class VanillaTheme extends Theme {
         this.quill.root.classList.add("userContent");
         this.setupTabBehaviour();
         this.mountToolbar();
+        this.mountEmojiMenu();
     }
 
     /**
@@ -51,5 +53,14 @@ export default class VanillaTheme extends Theme {
     mountToolbar() {
         const container = this.quill.container.closest(".richEditor").querySelector(".js-richEditorInlineMenu");
         ReactDOM.render(<InlineEditorToolbar quill={this.quill}/>, container);
+    }
+
+    /**
+     * Mount Emoji Menu (react component).
+     */
+
+    mountEmojiMenu() {
+        const container = this.quill.container.closest(".richEditor").querySelector(".js-emojiHandle");
+        ReactDOM.render(<EditorEmojiPicker quill={this.quill}/>, container);
     }
 }

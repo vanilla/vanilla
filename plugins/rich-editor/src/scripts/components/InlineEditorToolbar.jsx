@@ -76,7 +76,7 @@ export default class InlineEditorToolbar extends React.Component {
     componentDidMount() {
         this.quill.on(Emitter.events.EDITOR_CHANGE, this.handleEditorChange);
         this.quill.root.addEventListener("LinkShortcut", () => {
-            if (this.quill.getSelection().length > 0) {
+            if (this.quill.getSelection().length) {
                 this.focusLinkInput();
             }
         });

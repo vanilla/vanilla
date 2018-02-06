@@ -51,6 +51,9 @@ export default class InlineEditorToolbar extends React.Component {
             active: false,
             value: "",
             formatter: () => {
+                this.setState({
+                    previousRange: this.quill.getSelection(),
+                });
                 this.focusLinkInput();
             },
         },
@@ -68,6 +71,7 @@ export default class InlineEditorToolbar extends React.Component {
         this.state = {
             showLink: false,
             value: "",
+            previousRange: {},
         };
 
         this.handleEditorChange = this.handleEditorChange.bind(this);
@@ -105,10 +109,11 @@ export default class InlineEditorToolbar extends React.Component {
         if (range && range.length > 0 && source === Emitter.sources.USER) {
             const [link, offset] = this.quill.scroll.descendant(LinkBlot, range.index);
             if (link) {
-                this.linkRange = new Range(range.index - offset, link.length());
+                const linkRange = new Range(range.index - offset, link.length())
                 const href = LinkBlot.formats(link.domNode);
                 this.setState({
                     value: href,
+                    previousSelection: linkRange,
                 });
                 this.focusLinkInput();
             } else {
@@ -160,7 +165,6 @@ export default class InlineEditorToolbar extends React.Component {
             this.quill.format('link', value, Emitter.sources.USER);
             this.setState({
                 showLink: false,
-                range: null,
             });
         }
 
@@ -168,6 +172,7 @@ export default class InlineEditorToolbar extends React.Component {
             this.setState({
                 showLink: false,
             });
+            this.quill.setSelection(this.state.previousRange, Emitter.sources.USER);
         }
     };
 
@@ -178,6 +183,7 @@ export default class InlineEditorToolbar extends React.Component {
      */
     onCloseClick = (event) => {
         event.preventDefault();
+        this.quill.setSelection(this.state.previousRange, Emitter.sources.USER);
         this.setState({
             showLink: false,
         });

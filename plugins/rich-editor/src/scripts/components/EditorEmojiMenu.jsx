@@ -16,6 +16,8 @@ export default class EditorEmojiMenu extends React.Component {
         quill: PropTypes.instanceOf(Quill).isRequired,
         isVisible: PropTypes.bool.isRequired,
         closeMenu: PropTypes.func.isRequired,
+        menuID: PropTypes.string.isRequired,
+        menuTitleID: PropTypes.string.isRequired,
     };
 
     /**

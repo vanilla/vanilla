@@ -34,7 +34,7 @@ class MediaApiController extends AbstractApiController {
     /**
      * Delete a media item by ID.
      *
-     * @param $id
+     * @param $id The media item's numeric ID.
      */
     public function delete($id) {
         $this->permission('Garden.SignIn.Allow');
@@ -51,9 +51,31 @@ class MediaApiController extends AbstractApiController {
     }
 
     /**
-     * Process a user upload and insert into the media table..
+     * Delete a media item by its URL.
      *
-     * @param UploadedFile $upload
+     * @param array $query The request query.
+     */
+    public function delete_byUrl(array $query) {
+        $this->permission('Garden.SignIn.Allow');
+
+        $in = $this->schema(['url:s' => 'Full URL to the item.'], 'in')->setDescription('Delete a media item, using its URL.');
+        $out = $this->schema([], 'out');
+
+        $in->validate($query);
+
+        $row = $this->mediaByUrl($query['url']);
+        if ($row['InsertUserID'] !== $this->getSession()->UserID) {
+            $this->permission('Garden.Moderation.Manage');
+        }
+
+        $this->mediaModel->deleteID($row['MediaID']);
+    }
+
+    /**
+     * Process a user upload and insert into the media table.
+     *
+     * @param UploadedFile $upload An object representing an uploaded file.
+     * @param string $type The upload type (e.g. "image").
      * @throws Exception if there was an error encountered when saving the upload.
      * @return array
      */
@@ -86,7 +108,6 @@ class MediaApiController extends AbstractApiController {
         $this->validateModel($this->mediaModel);
 
         $result = $this->mediaByID($id);
-        echo null;
         return $result;
     }
 
@@ -115,7 +136,7 @@ class MediaApiController extends AbstractApiController {
     /**
      * Get a media item's information by ID.
      *
-     * @param $id
+     * @param int $id The media item's numeric ID.
      * @return array
      * @throws NotFoundException if the media item could not be found.
      */
@@ -126,6 +147,31 @@ class MediaApiController extends AbstractApiController {
         $out = $this->schema($this->fullSchema(), 'out');
 
         $row = $this->mediaByID($id);
+        if ($row['InsertUserID'] !== $this->getSession()->UserID) {
+            $this->permission('Garden.Moderation.Manage');
+        }
+
+        $row = $this->normalizeOutput($row);
+        $result = $out->validate($row);
+        return $result;
+    }
+
+    /**
+     * Get a media item's information by its URL.
+     *
+     * @param $query The request query.
+     * @return array
+     * @throws NotFoundException if the media item could not be found.
+     */
+    public function get_byUrl(array $query) {
+        $this->permission('Garden.SignIn.Allow');
+
+        $in = $this->schema(['url:s' => 'Full URL to the item.'], 'in')->setDescription('Get a media item, using its URL.');
+        $out = $this->schema($this->fullSchema(), 'out');
+
+        $query = $in->validate($query);
+
+        $row = $this->mediaByUrl($query['url']);
         if ($row['InsertUserID'] !== $this->getSession()->UserID) {
             $this->permission('Garden.Moderation.Manage');
         }
@@ -167,10 +213,47 @@ class MediaApiController extends AbstractApiController {
     }
 
     /**
+     * Get a media row by its full URL.
+     *
+     * @param string $url The full media URL.
+     * @throws NotFoundException if the media item could not be found.
+     * @return array
+     */
+    public function mediaByUrl($url) {
+        $fullPath = parse_url($url, PHP_URL_PATH);
+        if (empty($fullPath)) {
+            throw new Exception("Invalid media URL: {$url}");
+        }
+
+        $fullPath = trim($fullPath, '\\/');
+        $webRoot = Gdn::request()->webRoot();
+
+        // Get the path relative to the web root.
+        $relativePath = trim(stringBeginsWith($fullPath, $webRoot, true, true), '\\/');
+        // Get the uploads file system path relative to the site path.
+        $uploadsPath = trim(stringBeginsWith(PATH_UPLOADS, PATH_ROOT, true, true), '\\/');
+        // Get the media web path, relative to the uploads file system path.
+        $mediaPath = trim(stringBeginsWith($relativePath, $uploadsPath, true, true), '\\/');
+
+        $row = $this->mediaModel->getWhere(
+            ['Path' => $mediaPath],
+            '',
+            'asc',
+            1
+        )->firstRow(DATASET_TYPE_ARRAY);
+
+        if (!$row) {
+            throw new NotFoundException('Media');
+        }
+
+        return $row;
+    }
+
+    /**
      * Normalize a database record to match the Schema definition.
      *
      * @param array $row Database record.
-     * @return array Return a Schema record.
+     * @return array Return a record, normalized for output.
      */
     public function normalizeOutput(array $row) {
         $row['foreignID'] = $row['ForeignID'] ?? null;
@@ -193,7 +276,7 @@ class MediaApiController extends AbstractApiController {
      * Upload a file and store it in GDN_Media against the current user with "embed" as the table.
      * Return information from the media row along with a full URL to the file.
      *
-     * @param array $body
+     * @param array $body The request body.
      * @return array
      */
     public function post(array $body) {

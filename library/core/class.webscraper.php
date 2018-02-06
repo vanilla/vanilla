@@ -49,11 +49,12 @@ class WebScraper {
             'url' => $url,
             'name' => null,
             'body' => null,
-            'photoUrl' => null
+            'photoUrl' => null,
+            'media' => []
         ];
 
         if (!$this->disableFetch) {
-            $pageInfo = fetchPageInfo($url);
+            $pageInfo = fetchPageInfo($url, 3, false, true);
 
             if ($pageInfo['Exception']) {
                 throw new Exception($pageInfo['Exception']);
@@ -62,6 +63,7 @@ class WebScraper {
             $result['name'] = $pageInfo['Title'] ?: null;
             $result['body'] = $pageInfo['Description'] ?: null;
             $result['photoUrl'] = !empty($pageInfo['Images']) ? reset($pageInfo['Images']) : null;
+            $result['media'] = $pageInfo['Media'];
         }
 
         return $result;
@@ -107,6 +109,24 @@ class WebScraper {
         }
 
         return $info;
+    }
+
+    /**
+     * Given an array of info from fetchPageInfo, attempt to determine the size of the image in photoUrl.
+     *
+     * @param array $pageInfo
+     * @return array
+     * @throws Exception
+     */
+    private function getSizeFromPhotoUrl(array $pageInfo) {
+        $width = null;
+        $height = null;
+
+        if (array_key_exists('photoUrl', $pageInfo) && !empty($pageInfo['photoUrl'])) {
+            list($width, $height) = $this->getImageSize($pageInfo['photoUrl']);
+        }
+
+        return [$width, $height];
     }
 
     /**
@@ -179,6 +199,7 @@ class WebScraper {
      *
      * @param string $url
      * @return array
+     * @throws Exception if the URL is invalid.
      */
     private function getImageSize($url) {
         $size = [null, null];
@@ -245,6 +266,37 @@ class WebScraper {
     }
 
     /**
+     * Get width and height of first item of the media type from OpenGraph info in fetchPageInfo result.
+     *
+     * @param array $pageInfo Array result of a call to fetchPageInfo.
+     * @param string $type Media type: image or video.
+     * @param int|null $defaultWidth Default width.
+     * @param int|null $defaultHeight Default height.
+     * @return array
+     * @throws InvalidArgumentException if an invalid type is specified.
+     */
+    private function getMediaSize(array $pageInfo, $type, $defaultWidth = null, $defaultHeight = null) {
+        $validTypes = ['image', 'video'];
+        if (!in_array($type, $validTypes)) {
+            throw new InvalidArgumentException("Invalid type: {$type}");
+        }
+
+        $width = $defaultWidth;
+        $height = $defaultHeight;
+
+        if (array_key_exists('media', $pageInfo)
+            && array_key_exists($type, $pageInfo['media'])
+            && !empty($pageInfo['media'][$type])) {
+
+            $media = reset($pageInfo['media'][$type]);
+            $width = val('width', $media, $defaultWidth);
+            $height = val('height', $media, $defaultHeight);
+        }
+
+        return [$width, $height];
+    }
+
+    /**
      * Gather general information about a document..
      *
      * @param string $url
@@ -298,6 +350,18 @@ class WebScraper {
         // Get basic info from the page markup.
         $data = $this->fetchPageInfo($url);
 
+        // Fix templating tags in OpenGraph data.
+        foreach ($data as $key => &$value) {
+            $cleanTags = ['name', 'body', 'photoUrl'];
+            if (in_array($key, $cleanTags) && preg_match('/{{[^\s]+ \|\| \'(?<content>.*)\'}}/', $value, $matches)) {
+                $value = $matches['content'];
+            }
+        }
+
+        list($width, $height) = $this->getMediaSize($data, 'video');
+        $data['width'] = $width;
+        $data['height'] = $height;
+
         $data['attributes'] = ['channelID' => $channelID];
 
         return $data;
@@ -332,7 +396,10 @@ class WebScraper {
 
         // Get basic info from the page markup.
         $data = $this->fetchPageInfo($url);
+        list($width, $height) = $this->getMediaSize($data, 'image');
 
+        $data['width'] = $width;
+        $data['height'] = $height;
         $data['attributes'] = ['mediaID' => $mediaID];
 
         return $data;
@@ -353,7 +420,10 @@ class WebScraper {
 
         // Get basic info from the page markup.
         $data = $this->fetchPageInfo($url);
+        list($width, $height) = $this->getSizeFromPhotoUrl($data);
 
+        $data['width'] = $width;
+        $data['height'] = $height;
         $data['attributes'] = ['mediaID' => $mediaID];
 
         return $data;
@@ -375,7 +445,10 @@ class WebScraper {
 
         // Get basic info from the page markup.
         $data = $this->fetchPageInfo($url);
+        list($width, $height) = $this->getSizeFromPhotoUrl($data);
 
+        $data['width'] = $width;
+        $data['height'] = $height;
         $data['attributes'] = ['pinID' => $pinID];
 
         return $data;
@@ -398,7 +471,10 @@ class WebScraper {
 
         // Get basic info from the page markup.
         $data = $this->fetchPageInfo($url);
+        list($width, $height) = $this->getSizeFromPhotoUrl($data);
 
+        $data['width'] = $width;
+        $data['height'] = $height;
         $data['attributes'] = [
             'user' => $user,
             'track' => $track
@@ -423,7 +499,10 @@ class WebScraper {
 
         // Get basic info from the page markup.
         $data = $this->fetchPageInfo($url);
+        list($width, $height) = $this->getSizeFromPhotoUrl($data);
 
+        $data['width'] = $width;
+        $data['height'] = $height;
         $data['attributes'] = ['channel' => $channel];
 
         return $data;
@@ -447,7 +526,10 @@ class WebScraper {
 
         // Get basic info from the page markup.
         $data = $this->fetchPageInfo($url);
+        list($width, $height) = $this->getSizeFromPhotoUrl($data);
 
+        $data['width'] = $width;
+        $data['height'] = $height;
         $data['attributes'] = ['statusID' => $statusID];
 
         return $data;
@@ -470,7 +552,10 @@ class WebScraper {
 
         // Get basic info from the page markup.
         $data = $this->fetchPageInfo($url);
+        list($width, $height) = $this->getSizeFromPhotoUrl($data);
 
+        $data['width'] = $width;
+        $data['height'] = $height;
         $data['attributes'] = [
             'videoID' => $videoID
         ];
@@ -496,6 +581,19 @@ class WebScraper {
         // Get basic info from the page markup.
         $data = $this->fetchPageInfo($url);
 
+        // Attempt to load more info from Vine.
+        if ($videoID && !$this->disableFetch) {
+            $vineRaw = file_get_contents("https://archive.vine.co/posts/{$videoID}.json");
+            $vineData = json_decode($vineRaw);
+            $data['name'] = val('username', $vineData, null);
+            $data['body'] = val('description', $vineData, null);
+            $data['photoUrl'] = val('thumbnailUrl', $vineData, null);
+        }
+
+        list($width, $height) = $this->getSizeFromPhotoUrl($data);
+
+        $data['width'] = $width;
+        $data['height'] = $height;
         $data['attributes'] = ['videoID' => $videoID];
 
         return $data;
@@ -528,7 +626,10 @@ class WebScraper {
 
         // Get basic info from the page markup.
         $data = $this->fetchPageInfo($url);
+        list($width, $height) = $this->getSizeFromPhotoUrl($data);
 
+        $data['width'] = $width;
+        $data['height'] = $height;
         $data['attributes'] = [
             'videoID' => $videoID,
             'time' => $time

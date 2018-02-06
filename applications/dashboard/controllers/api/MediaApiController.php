@@ -45,7 +45,7 @@ class MediaApiController extends AbstractApiController {
             'url:s'	=> 'The URL that was scraped.',
             'type:s' => [
                 'description' => 'The type of site. This determines how the embed is rendered.',
-                'enum' => ['getty', 'hitbox', 'image', 'imgur', 'instagram', 'pinterest', 'site',
+                'enum' => ['getty', 'image', 'imgur', 'instagram', 'pinterest', 'site', 'smashcast',
                     'soundcloud', 'twitch', 'twitter', 'vimeo', 'vine', 'wistia', 'youtube']
             ],
             'name:s|n' => 'The title of the page/item/etc. if any.',

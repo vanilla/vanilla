@@ -30,17 +30,17 @@ class WebScraper {
     public function __construct() {
         // Add some default sites.
         $this->registerType('getty', ['embed.gettyimages.com'], [$this, 'lookupGetty']);
-        $this->registerType('hitbox', ['hitbox.tv'], [$this, 'lookupHitbox']);
-        $this->registerType('imgur', ['i.imgur.com'], [$this, 'lookupImgur']);
+        $this->registerType('imgur', ['imgur.com'], [$this, 'lookupImgur']);
         $this->registerType('instagram', ['instagram.com', 'instagr.am'], [$this, 'lookupInstagram']);
-        $this->registerType('pinterest', ['pinterest.com'], [$this, 'lookupPinterest']);
+        $this->registerType('pinterest', ['pinterest.com', 'pinterest.ca'], [$this, 'lookupPinterest']);
+        $this->registerType('smashcast', ['hitbox.tv', 'smashcast.tv'], [$this, 'lookupSmashcast']);
         $this->registerType('soundcloud', ['soundcloud.com'], [$this, 'lookupSoundcloud']);
         $this->registerType('twitch', ['twitch.tv'], [$this, 'lookupTwitch']);
         $this->registerType('twitter', ['twitter.com'], [$this, 'lookupTwitter']);
         $this->registerType('vimeo', ['vimeo.com'], [$this, 'lookupVimeo']);
         $this->registerType('vine', ['vine.co'], [$this, 'lookupVine']);
         $this->registerType('wistia', ['wistia.com', 'wi.st'], [$this, 'lookupWistia']);
-        $this->registerType('youtube', ['youtube.com', 'youtu.be'], [$this, 'lookupYouTube']);
+        $this->registerType('youtube', ['youtube.com', 'youtube.ca', 'youtu.be'], [$this, 'lookupYouTube']);
     }
 
     /**
@@ -357,54 +357,19 @@ class WebScraper {
      */
     private function lookupGetty($url) {
         preg_match(
-            '/https?:\/\/embed.gettyimages\.com\/(?<mediaID>[\w=?&;+-_]*)\/(?<width>[\d]*)\/(?<height>[\d]*)/i',
+            '/https?:\/\/embed.gettyimages\.com\/embed\/(?<mediaID>[\d]+)/i',
             $url,
             $matches
         );
         $mediaID = $matches['mediaID'] ?: null;
-        $width = $matches['width'] ?: null;
-        $height = $matches['height'] ?: null;
 
-        // Get basic info from the page markup.
-        $data = $this->fetchPageInfo($url);
-
-        $data['width'] = $width;
-        $data['height'] = $height;
-        $data['attributes'] = ['mediaID' => $mediaID];
-
-        return $data;
-    }
-
-    /**
-     * Grab info from Smashcast.tv (formerly Hitbox.tv).
-     *
-     * @param string $url
-     * @return array
-     */
-    private function lookupHitbox($url) {
-        preg_match(
-            '/https?:\/\/(?:www\.)?hitbox\.tv\/(?<channelID>[\w]+)/i',
-            $url,
-            $matches
-        );
-        $channelID = $matches['channelID'] ?: null;
-
-        // Get basic info from the page markup.
-        $data = $this->fetchPageInfo($url);
-
-        // Fix templating tags in OpenGraph data.
-        foreach ($data as $key => &$value) {
-            $cleanTags = ['name', 'body', 'photoUrl'];
-            if (in_array($key, $cleanTags) && preg_match('/{{[^\s]+ \|\| \'(?<content>.*)\'}}/', $value, $matches)) {
-                $value = $matches['content'];
-            }
+        $data = [];
+        if ($mediaID) {
+            $oembed = $this->getOembed("http://embed.gettyimages.com/oembed?url=http%3a%2f%2fgty.im%2f{$mediaID}");
+            $data = array_merge($data, $oembed);
         }
 
-        list($width, $height) = $this->getMediaSize($data, 'video');
-        $data['width'] = $width;
-        $data['height'] = $height;
-
-        $data['attributes'] = ['channelID' => $channelID];
+        $data['attributes'] = ['mediaID' => $mediaID];
 
         return $data;
     }
@@ -430,18 +395,21 @@ class WebScraper {
      */
     private function lookupImgur($url) {
         preg_match(
-            '/https?:\/\/i\.imgur\.com\/(?<mediaID>[a-z0-9]+)\.gifv/i',
+            '/https?:\/\/([im]\.)?imgur\.com\/(?<mediaID>[a-z0-9]+)(\.(?<ext>.{1,3}))?/i',
             $url,
             $matches
         );
         $mediaID = $matches['mediaID'] ?: null;
+        $data = [];
 
-        // Get basic info from the page markup.
-        $data = $this->fetchPageInfo($url);
-        list($width, $height) = $this->getMediaSize($data, 'image');
+        if ($mediaID) {
+            // Get basic info from the page markup.
+            $data = $this->fetchPageInfo("https://imgur.com/{$mediaID}");
+            list($width, $height) = $this->getMediaSize($data, 'image');
+            $data['width'] = $width;
+            $data['height'] = $height;
+        }
 
-        $data['width'] = $width;
-        $data['height'] = $height;
         $data['attributes'] = ['mediaID' => $mediaID];
 
         return $data;
@@ -479,7 +447,7 @@ class WebScraper {
      */
     private function lookupPinterest($url) {
         preg_match(
-            '/https?:\/\/(?:www\.)?pinterest\.com\/pin\/(?<pinID>[\d]+)/i',
+            '/https?:\/\/(?:www\.)?pinterest\.(ca|com)\/pin\/(?<pinID>[\d]+)/i',
             $url,
             $matches
         );
@@ -492,6 +460,40 @@ class WebScraper {
         $data['width'] = $width;
         $data['height'] = $height;
         $data['attributes'] = ['pinID' => $pinID];
+
+        return $data;
+    }
+
+    /**
+     * Grab info from Smashcast.tv (formerly Hitbox.tv).
+     *
+     * @param string $url
+     * @return array
+     */
+    private function lookupSmashcast($url) {
+        preg_match(
+            '/https?:\/\/(?:www\.)?(smashcast|hitbox)\.tv\/(?<channelID>[\w\-]+)/i',
+            $url,
+            $matches
+        );
+        $channelID = $matches['channelID'] ?: null;
+
+        // Get basic info from the page markup.
+        $data = $this->fetchPageInfo($url);
+
+        // Fix templating tags in OpenGraph data.
+        foreach ($data as $key => &$value) {
+            $cleanTags = ['name', 'body', 'photoUrl'];
+            if (in_array($key, $cleanTags) && preg_match('/{{[^\s]+ \|\| \'(?<content>.*)\'}}/', $value, $matches)) {
+                $value = $matches['content'];
+            }
+        }
+
+        list($width, $height) = $this->getMediaSize($data, 'video');
+        $data['width'] = $width;
+        $data['height'] = $height;
+
+        $data['attributes'] = ['channelID' => $channelID];
 
         return $data;
     }
@@ -592,6 +594,19 @@ class WebScraper {
 
         $videoID = $matches['videoID'] ?: null;
 
+        // Try another way to get the video ID.
+        if (!$videoID && !$this->disableFetch) {
+            $request = new ProxyRequest();
+            $rawResponse = $request->request([
+                'URL' => "https://vimeo.com/api/oembed.json?url=".urlencode($url),
+                'Redirects' => true
+            ]);
+            $response = json_decode($rawResponse, true);
+            if (is_array($response)) {
+                $videoID = val('video_id', $response, null);
+            }
+        }
+
         // Get basic info from the page markup.
         $data = $this->fetchPageInfo($url);
         list($width, $height) = $this->getSizeFromPhotoUrl($data);
@@ -678,7 +693,7 @@ class WebScraper {
     private function lookupYouTube($url) {
         // Get info from the URL.
         preg_match(
-            '/https?:\/\/(?:(?:www.)|(?:m.))?(?:(?:youtube.com)|(?:youtu.be))\/(?:(?:playlist?)|(?:(?:watch\?v=)?(?P<videoId>[\w-]{11})))(?:\?|\&)?(?:list=(?P<listId>[\w-]*))?(?:t=(?:(?P<minutes>\d*)m)?(?P<seconds>\d*)s)?(?:#t=(?P<start>\d*))?/i',
+            '/https?:\/\/(?:(?:www.)|(?:m.))?(?:(?:youtube.(ca|com))|(?:youtu.be))\/(?:(?:playlist?)|(?:(?:watch\?v=)?(?P<videoId>[\w-]{11})))(?:\?|\&)?(?:list=(?P<listId>[\w-]*))?(?:t=(?:(?P<minutes>\d*)m)?(?P<seconds>\d*)s)?(?:#t=(?P<start>\d*))?/i',
             $url,
             $urlParts
         );

@@ -222,29 +222,31 @@ class MediaApiController extends AbstractApiController {
     public function mediaByUrl($url) {
         $uploadPaths = Gdn_Upload::urls();
 
-        $path = false;
+        $testPaths = [];
         foreach ($uploadPaths as $type => $urlPrefix) {
             if (stringBeginsWith($url, $urlPrefix)) {
                 $path = trim(stringBeginsWith($url, $urlPrefix, true, true), '\\/');
                 if (!empty($type)) {
-                    $path = $type.$path;
+                    $path = "$type/$path";
                 }
-                break;
+                $testPaths[] = $path;
             }
         }
 
-        if (!$path) {
+        if (empty($testPaths)) {
             throw new NotFoundException('Media');
         }
 
+        // Any matches?.
         $row = $this->mediaModel->getWhere(
-            ['Path' => $path],
+            ['Path' => $testPaths],
             '',
             'asc',
             1
         )->firstRow(DATASET_TYPE_ARRAY);
 
-        if (!$row) {
+        // Couldn't find a match.
+        if (empty($row)) {
             throw new NotFoundException('Media');
         }
 

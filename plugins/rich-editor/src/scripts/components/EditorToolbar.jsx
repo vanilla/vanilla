@@ -7,6 +7,7 @@
 import React from "react";
 import * as PropTypes from "prop-types";
 import Quill from "quill/quill";
+import LinkBlot from "quill/formats/link";
 import { t } from "@core/utility";
 import EditorMenuItem from "./EditorMenuItem";
 
@@ -132,7 +133,7 @@ export default class EditorToolbar extends React.Component {
         const itemData = this.state[itemKey];
 
         if ("formatter" in itemData) {
-            itemData.formatter();
+            itemData.formatter(itemData);
         } else {
             // Fall back to simple boolean
             this.quill.format(itemKey, !itemData.active, Quill.sources.USER);
@@ -149,12 +150,35 @@ export default class EditorToolbar extends React.Component {
      */
     update(range = null) {
         if (!range) {
-            [range] = this.quill.selection.getRange();
+            return;
         }
 
         for (const [itemKey, itemData] of Object.entries(this.state)) {
+            if (itemKey === "link") {
+                const newState = {
+                    [itemKey]: {
+                        ...itemData,
+                        active: this.rangeContainsLinkBlot(range),
+                    },
+                };
+                this.setState(newState);
+                continue;
+            }
+
             this.updateBooleanFormat(itemKey, itemData, range);
         }
+    }
+
+    /**
+     * Check if a given range contains a link blot. Could be more than one.
+     *
+     * @param {RangeStatic} range - The range to check.
+     *
+     * @returns {boolean} -
+     */
+    rangeContainsLinkBlot(range) {
+        const links = this.quill.scroll.descendants(LinkBlot, range.index, range.length);
+        return links.length > 0;
     }
 
     /**

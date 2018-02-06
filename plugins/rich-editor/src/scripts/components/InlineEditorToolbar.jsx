@@ -9,11 +9,11 @@ import * as PropTypes from "prop-types";
 import Quill from "quill/quill";
 import EditorToolbar from "./EditorToolbar";
 import Emitter from "quill/core/emitter";
-import { Range } from "quill/core/selection";
 import Keyboard from "quill/modules/keyboard";
 import LinkBlot from "quill/formats/link";
 import FloatingToolbar from "./FloatingToolbar";
 import { t } from "@core/utility";
+import * as quillUtilities from "../quill-utilities";
 
 export default class InlineEditorToolbar extends React.Component {
     static propTypes = {
@@ -50,12 +50,7 @@ export default class InlineEditorToolbar extends React.Component {
         link: {
             active: false,
             value: "",
-            formatter: () => {
-                this.setState({
-                    previousRange: this.quill.getSelection(),
-                });
-                this.focusLinkInput();
-            },
+            formatter: this.linkFormatter.bind(this),
         },
     };
 
@@ -73,8 +68,6 @@ export default class InlineEditorToolbar extends React.Component {
             value: "",
             previousRange: {},
         };
-
-        this.handleEditorChange = this.handleEditorChange.bind(this);
     }
 
     /**
@@ -82,6 +75,11 @@ export default class InlineEditorToolbar extends React.Component {
      */
     componentDidMount() {
         this.quill.on(Emitter.events.EDITOR_CHANGE, this.handleEditorChange);
+        this.quill.root.addEventListener("LinkShortcut", () => {
+            if (this.quill.getSelection().length > 0) {
+                this.focusLinkInput();
+            }
+        });
     }
 
     /**
@@ -91,8 +89,6 @@ export default class InlineEditorToolbar extends React.Component {
         this.quill.off(Quill.events.EDITOR_CHANGE, this.handleEditorChange);
     }
 
-    /** SECTION: position */
-
     /**
      * Handle changes from the editor.
      *
@@ -101,26 +97,49 @@ export default class InlineEditorToolbar extends React.Component {
      * @param {RangeStatic} oldRange - The old range.
      * @param {Sources} source - The source of the change.
      */
-    handleEditorChange(type, range, oldRange, source) {
+    handleEditorChange = (type, range, oldRange, source) => {
         if (type !== Emitter.events.SELECTION_CHANGE) {
             return;
         }
 
         if (range && range.length > 0 && source === Emitter.sources.USER) {
-            const [link, offset] = this.quill.scroll.descendant(LinkBlot, range.index);
-            if (link) {
-                const linkRange = new Range(range.index - offset, link.length())
-                const href = LinkBlot.formats(link.domNode);
-                this.setState({
-                    value: href,
-                    previousSelection: linkRange,
-                });
-                this.focusLinkInput();
-            } else {
-                this.clearLinkInput();
-            }
+            this.clearLinkInput();
         } else if (!this.state.ignoreSelectionReset) {
             this.clearLinkInput();
+        }
+    };
+
+
+    /**
+     * Format (or unformat) link blots in a given area. Will fully unformat a link even if the link is not entirely
+     * inside of the current selection.
+     *
+     * @param {MenuItemData} menuItemData - The current state of the menu item.
+     */
+    linkFormatter(menuItemData) {
+        if (menuItemData.active) {
+            const range = this.quill.getSelection();
+
+            /** @type {Blot[]} */
+            const currentLinks = this.quill.scroll.descendants(LinkBlot, range.index, range.length);
+            const firstLink = currentLinks[0];
+            const lastLink = currentLinks[currentLinks.length - 1];
+
+            const startRange = firstLink && {
+                index: firstLink.offset(this.quill.scroll),
+                length: firstLink.length(),
+            };
+
+            const endRange = lastLink && {
+                index: lastLink.offset(this.quill.scroll),
+                length: lastLink.length(),
+            };
+            const finalRange = quillUtilities.expandRange(range, startRange, endRange);
+
+            this.quill.formatText(finalRange.index, finalRange.length, 'link', false, Emitter.sources.USER);
+            this.clearLinkInput();
+        } else {
+            this.focusLinkInput();
         }
     }
 
@@ -133,6 +152,7 @@ export default class InlineEditorToolbar extends React.Component {
         this.setState({
             showLink: true,
             ignoreSelectionReset: true,
+            previousRange: this.quill.getSelection(),
         }, () => {
             this.linkInput.focus();
             setTimeout(() => {
@@ -163,15 +183,11 @@ export default class InlineEditorToolbar extends React.Component {
             event.preventDefault();
             const value = event.target.value || "";
             this.quill.format('link', value, Emitter.sources.USER);
-            this.setState({
-                showLink: false,
-            });
+            this.clearLinkInput();
         }
 
         if (Keyboard.match(event.nativeEvent, "escape")) {
-            this.setState({
-                showLink: false,
-            });
+            this.clearLinkInput();
             this.quill.setSelection(this.state.previousRange, Emitter.sources.USER);
         }
     };
@@ -183,10 +199,8 @@ export default class InlineEditorToolbar extends React.Component {
      */
     onCloseClick = (event) => {
         event.preventDefault();
+        this.clearLinkInput();
         this.quill.setSelection(this.state.previousRange, Emitter.sources.USER);
-        this.setState({
-            showLink: false,
-        });
     };
 
     /**

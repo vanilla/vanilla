@@ -55,9 +55,39 @@ class MediaApiController extends AbstractApiController {
      *
      * @param UploadedFile $upload
      * @throws Exception if there was an error encountered when saving the upload.
-     * @return string
+     * @return array
      */
-    private function doUpload(UploadedFile $upload) {
+    private function doUpload(UploadedFile $upload, $type) {
+        $file = $upload->getFile();
+
+        $media = [
+            'Name' => $upload->getClientFilename(),
+            'Type' => $upload->getClientMediaType(),
+            'Size' => $upload->getSize(),
+            'ForeignID' => $this->getSession()->UserID,
+            'ForeignTable' => 'embed'
+        ];
+
+        switch ($type) {
+            case 'image':
+                $imageSize = getimagesize($file);
+                if (is_array($imageSize)) {
+                    $media['ImageWidth'] = $imageSize[0];
+                    $media['ImageHeight'] = $imageSize[1];
+                }
+        }
+
+        $ext = pathinfo(strtolower($upload->getClientFilename()), PATHINFO_EXTENSION);
+        $destination = $this->generateUploadPath($ext, true);
+        $uploadResult = $this->saveUpload($upload, $destination);
+        $media['Path'] = $uploadResult['Name'];
+
+        $id = $this->mediaModel->save($media);
+        $this->validateModel($this->mediaModel);
+
+        $result = $this->mediaByID($id);
+        echo null;
+        return $result;
     }
 
     /**
@@ -72,8 +102,8 @@ class MediaApiController extends AbstractApiController {
             'name:s' => 'The original filename of the upload.',
             'type:s' => 'MIME type',
             'size:i' =>'File size in bytes',
-            'width:i' => 'Image width',
-            'height:i' => 'Image height',
+            'width:i|n' => 'Image width',
+            'height:i|n' => 'Image height',
             'dateInserted:dt' => 'When the media item was created.',
             'insertUserID:i' => 'The user that created the media item.',
             'foreignType:s|n' => 'Table the media is linked to.',
@@ -184,7 +214,7 @@ class MediaApiController extends AbstractApiController {
 
         $body = $in->validate($body);
 
-        $row = $this->doUpload($body['file']);
+        $row = $this->doUpload($body['file'], $body['type']);
 
         $row = $this->normalizeOutput($row);
         $result = $out->validate($row);

@@ -2504,15 +2504,6 @@ dl.About dd {
   display: block;
 }
 
-/* ======================================================== Image Cropper */
-body.isMobile .box-crop .box-source {
-  display: none;
-}
-
-body.isMobile .change-picture .change-picture-instructions {
-  display: none;
-}
-
 /* ======================================================== Thumbnail Cropper */
 .Popup .CurrentPicture {
   display: none;

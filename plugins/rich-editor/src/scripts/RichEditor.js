@@ -66,35 +66,35 @@ export default class RichEditor {
 
     initializeWithRichFormat() {
         utility.log("Initializing Rich Editor");
-        this.editor = new Quill(this.container, options);
+        this.quill = new Quill(this.container, options);
         this.bodybox.style.display = "none";
 
         if (this.initialValue) {
             utility.log("Setting existing content as contents of editor");
-            this.editor.setContents(JSON.parse(this.initialValue));
+            this.quill.setContents(JSON.parse(this.initialValue));
         }
 
-        this.editor.on("text-change", this.synchronizeDelta.bind(this));
+        this.quill.on("text-change", this.synchronizeDelta.bind(this));
 
         // const insertEmoji = () => {
-        //     const editorSelection = this.editor.getSelection();
+        //     const editorSelection = this.quill.getSelection();
         //     const emoji = '😊';
-        //     let range = this.editor.getSelection(true);
-        //     this.editor.insertEmbed(range.index, 'emoji', {
+        //     let range = this.quill.getSelection(true);
+        //     this.quill.insertEmbed(range.index, 'emoji', {
         //         'emojiChar': emoji
         //     }, Quill.sources.USER);
-        //     this.editor.setSelection(range.index + 1, Quill.sources.SILENT);
+        //     this.quill.setSelection(range.index + 1, Quill.sources.SILENT);
         //
         // };
         // document.querySelector(".emojiButton").addEventListener("click", insertEmoji);
         //
         // const insertImage = () => {
-        //     let range = this.editor.getSelection(true);
-        //     this.editor.insertEmbed(range.index, 'embeddedImage', {
+        //     let range = this.quill.getSelection(true);
+        //     this.quill.insertEmbed(range.index, 'embeddedImage', {
         //         alt: 'Quill Cloud',
         //         url: 'http://stephane.local/uploads/userpics/966/pNOH8FCLAMG82.jpg'
         //     }, Quill.sources.USER);
-        //     this.editor.setSelection(range.index + 1, Quill.sources.SILENT);
+        //     this.quill.setSelection(range.index + 1, Quill.sources.SILENT);
         // };
         // document.querySelector(".imageButton").addEventListener("click", insertImage);
 
@@ -105,7 +105,7 @@ export default class RichEditor {
      * as a hidden input (Because we aren't overriding the submit)
      */
     synchronizeDelta() {
-        this.bodybox.value = JSON.stringify(this.editor.getContents()["ops"]);
+        this.bodybox.value = JSON.stringify(this.quill.getContents()["ops"]);
     }
 
     initializeOtherFormat() {

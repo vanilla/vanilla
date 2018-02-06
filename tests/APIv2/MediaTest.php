@@ -69,22 +69,22 @@ class MediaTest extends AbstractAPIv2Test {
                 true
             ],
             [
-                'https://embed.gettyimages.com/foo-bar/640/360',
+                'https://embed.gettyimages.com/embed/1234567890',
                 'getty',
                 [
                     'name' => null,
                     'body' => null,
                     'photoUrl' => null,
-                    'height' => 360,
-                    'width' => 640,
+                    'height' => null,
+                    'width' => null,
                     'attributes' => [
-                        'mediaID' => 'foo-bar'
+                        'mediaID' => '1234567890'
                     ],
                 ]
             ],
             [
-                'https://hitbox.tv/foobar',
-                'hitbox',
+                'https://smashcast.tv/foobar',
+                'smashcast',
                 [
                     'name' => null,
                     'body' => null,
@@ -97,8 +97,8 @@ class MediaTest extends AbstractAPIv2Test {
                 ]
             ],
             [
-                'https://www.hitbox.tv/foobar',
-                'hitbox',
+                'https://www.smashcast.tv/foobar',
+                'smashcast',
                 [
                     'name' => null,
                     'body' => null,

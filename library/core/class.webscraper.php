@@ -406,6 +406,7 @@ class WebScraper {
             // Get basic info from the page markup.
             $data = $this->fetchPageInfo("https://imgur.com/{$mediaID}");
             list($width, $height) = $this->getMediaSize($data, 'image');
+            $data['url'] = $url;
             $data['width'] = $width;
             $data['height'] = $height;
         }

@@ -22,20 +22,26 @@ class WebScraper {
     private $disableFetch = false;
 
     /** @var array */
-    private $types = [
-        'getty' => ['domains' => ['embed.gettyimages.com']],
-        'hitbox' => ['domains' => ['hitbox.tv']],
-        'imgur' => ['domains' => ['i.imgur.com']],
-        'instagram' => ['domains' => ['instagram.com', 'instagr.am']],
-        'pinterest' => ['domains' => ['pinterest.com']],
-        'soundcloud' => ['domains' => ['soundcloud.com']],
-        'twitch' => ['domains' => ['twitch.tv']],
-        'twitter' => ['domains' => ['twitter.com']],
-        'vimeo' => ['domains' => ['vimeo.com']],
-        'vine' => ['domains' => ['vine.co']],
-        'wistia' => ['domains' => ['wistia.com', 'wi.st']],
-        'youtube' => ['domains' => ['youtube.com', 'youtu.be']]
-    ];
+    private $types = [];
+
+    /**
+     * WebScraper constructor.
+     */
+    public function __construct() {
+        // Add some default sites.
+        $this->registerType('getty', ['embed.gettyimages.com'], [$this, 'lookupGetty']);
+        $this->registerType('hitbox', ['hitbox.tv'], [$this, 'lookupHitbox']);
+        $this->registerType('imgur', ['i.imgur.com'], [$this, 'lookupImgur']);
+        $this->registerType('instagram', ['instagram.com', 'instagr.am'], [$this, 'lookupInstagram']);
+        $this->registerType('pinterest', ['pinterest.com'], [$this, 'lookupPinterest']);
+        $this->registerType('soundcloud', ['soundcloud.com'], [$this, 'lookupSoundcloud']);
+        $this->registerType('twitch', ['twitch.tv'], [$this, 'lookupTwitch']);
+        $this->registerType('twitter', ['twitter.com'], [$this, 'lookupTwitter']);
+        $this->registerType('vimeo', ['vimeo.com'], [$this, 'lookupVimeo']);
+        $this->registerType('vine', ['vine.co'], [$this, 'lookupVine']);
+        $this->registerType('wistia', ['wistia.com', 'wi.st'], [$this, 'lookupWistia']);
+        $this->registerType('youtube', ['youtube.com', 'youtu.be'], [$this, 'lookupYouTube']);
+    }
 
     /**
      * Fetch page info and normalize its keys.
@@ -241,13 +247,7 @@ class WebScraper {
             }
 
             $config = $types[$type];
-
-            $lookup = array_key_exists('function', $config) ? $config['function'] : [$this, "lookup{$type}"];
-            if (!is_callable($lookup)) {
-                throw new Exception("Unable to call info lookup function for type: {$type}");
-            }
-
-            $data = call_user_func($lookup, $url);
+            $data = call_user_func($config['callback'], $url);
         }
 
         $defaults = [
@@ -677,6 +677,23 @@ class WebScraper {
             'start' => $start
         ];
         return $data;
+    }
+
+    /**
+     * Register a site.
+     *
+     * @param string $type
+     * @param array $domains
+     * @param callable $callback
+     * @return self
+     */
+    public function registerType($type, array $domains, callable $callback) {
+        $this->types[$type] = [
+            'domains' => $domains,
+            'callback' => $callback
+        ];
+
+        return $this;
     }
 
     /**

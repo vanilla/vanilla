@@ -9,15 +9,13 @@ class RichEditorPlugin extends Gdn_Plugin {
 
     /** @var integer */
     private static $editorID = 0;
-    /** @var integer */
-    private $editorNumber;
 
     /**
      * Set some properties we always need.
      */
     public function __construct() {
         parent::__construct();
-        $this->editorNumber = ++$this->editorID;
+        self::$editorID++;
     }
 
     /**

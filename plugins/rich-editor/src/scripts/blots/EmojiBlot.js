@@ -5,11 +5,13 @@ export default class EmojiBlot extends Embed {
         const node = super.create();
         node.classList.add("emoji");
         node.innerHTML = emojiData.emojiChar;
+        this.emojiData = emojiData;
         return node;
     }
+
     static value(node) {
         return {
-            emojiChar: node.dataset.emoji,
+            emojiChar: this.emojiData.emojiChar,
         }
     }
 }

@@ -9,11 +9,9 @@ import * as PropTypes from "prop-types";
 import Quill from "quill/quill";
 import EditorEmojiMenu from "../components/EditorEmojiMenu";
 import * as Icons from "./Icons";
+import UniqueID from "react-html-id";
 
 export default class EditorEmojiPicker extends React.Component {
-
-    /** @type {number} */
-    static count;
 
     static propTypes = {
         quill: PropTypes.instanceOf(Quill).isRequired,
@@ -25,16 +23,11 @@ export default class EditorEmojiPicker extends React.Component {
     constructor(props) {
         super(props);
 
-        if (!this.count) {
-            this.count = 1;
-        } else {
-            this.count++;
-        }
-
-        this.editorID = this.count;
-        this.menuID = "emojiMenu-menu-" + this.editorID;
-        this.buttonID = "emojiMenu-button-" + this.editorID;
-        this.menuTitleID = "emojiMenu-title-" + this.editorID;
+        UniqueID.enableUniqueIds(this);
+        this.ID = this.nextUniqueId();
+        this.menuID = "emojiMenu-menu-" + this.ID;
+        this.buttonID = "emojiMenu-button-" + this.ID;
+        this.menuTitleID = "emojiMenu-title-" + this.ID;
 
         // Quill can directly on the class as it won't ever change in a single instance.
         this.quill = props.quill;
@@ -91,7 +84,7 @@ export default class EditorEmojiPicker extends React.Component {
      */
     render() {
         return <div className="emojiPicker">
-            <EditorEmojiMenu {...this.state} menuTitleID={this.menuTitleID} quill={this.quill} closeMenu={this.closeMenu}/>
+            <EditorEmojiMenu {...this.state} menuID={this.menuID} menuTitleID={this.menuTitleID} quill={this.quill} closeMenu={this.closeMenu}/>
             <button onClick={this.toggleEmojiMenu} className="richEditor-button" type="button" id={this.buttonID} aria-controls={this.menuID} aria-expanded={this.state.isVisible} aria-haspopup="menu">
                 {Icons.emoji()}
             </button>

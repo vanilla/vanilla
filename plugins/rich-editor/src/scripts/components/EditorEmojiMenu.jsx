@@ -12,11 +12,8 @@ import EditorEmojiButton from "../components/EditorEmojiButton";
 import emojis from 'emojibase-data/en/data.json';
 
 export default class EditorEmojiMenu extends React.Component {
-
-
     static propTypes = {
         quill: PropTypes.instanceOf(Quill).isRequired,
-        menuTitleID: PropTypes.string.isRequired,
         isVisible: PropTypes.bool.isRequired,
         closeMenu: PropTypes.func.isRequired,
     };
@@ -34,9 +31,9 @@ export default class EditorEmojiMenu extends React.Component {
      */
     render() {
         if(this.props.isVisible) {
-            return <div className="richEditor-menu insertEmoji FlyoutMenu insertPopover" role="dialog" aria-labelledby="{this.menuTitleID">
+            return <div id={this.props.menuID} className="richEditor-menu insertEmoji FlyoutMenu insertPopover" role="dialog" aria-labelledby={this.props.menuTitleID}>
                 <div className="insertPopover-header">
-                    <h2 id="{props.menuTitleID}" className="H insertMedia-title">
+                    <h2 id={this.props.menuTitleID} className="H insertMedia-title">
                         {t('Smileys & Faces')}
                     </h2>
                     <a href="#" aria-label="{t('Close');}" onClick={this.props.closeMenu} className="Close richEditor-close">
@@ -52,7 +49,7 @@ export default class EditorEmojiMenu extends React.Component {
                 </div>
             </div>;
         } else {
-            return null;
+            return <div role="dialog" id={this.props.menuID} hidden></div>;
         }
     }
 }

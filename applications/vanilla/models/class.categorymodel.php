@@ -664,7 +664,6 @@ class CategoryModel extends Gdn_Model {
                     ->select('c.CommentID', 'max', 'LastCommentID')
                     ->select('d.DiscussionID', 'max', 'LastDiscussionID')
                     ->select('c.DateInserted', 'max', 'DateLastComment')
-                    ->select('d.DateInserted', 'max', 'DateLastDiscussion')
                     ->from('Comment c')
                     ->join('Discussion d', 'd.DiscussionID = c.DiscussionID')
                     ->groupBy('d.CategoryID')

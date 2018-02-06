@@ -297,6 +297,48 @@ class WebScraper {
     }
 
     /**
+     * Get oEmbed data from a URL.
+     *
+     * @param $url
+     * @return array
+     * @throws Exception if the URL is invalid.
+     */
+    private function getOembed($url) {
+        $result = [];
+
+        if (!$this->disableFetch) {
+            // Make sure the URL is valid.
+            $urlParts = parse_url($url);
+            if ($urlParts === false || !in_array(val('scheme', $urlParts), ['http', 'https'])) {
+                throw new Exception('Invalid URL.', 400);
+            }
+
+            $request = new ProxyRequest();
+            $rawResponse = $request->request([
+                'URL' => $url,
+                'Redirects' => true,
+            ]);
+            if ($request->status() !== 200) {
+                throw new Exception("Failed to load URL: {$url}");
+            }
+
+            $response = json_decode($rawResponse, true);
+            if (is_array($response)) {
+                $validAttributes = ['type', 'version', 'title', 'author_name', 'author_url', 'provider_name', 'provider_url',
+                    'cache_age', 'thumbnail_url', 'thumbnail_width', 'thumbnail_height'];
+                $oembed = array_intersect_key($response, array_combine($validAttributes, $validAttributes));
+
+                $result['name'] = val('title', $oembed, null);
+                $result['photoUrl'] = val('thumbnail_url', $oembed, null);
+                $result['width'] = val('thumbnail_width', $oembed, null);
+                $result['height'] = val('thumbnail_height', $oembed, null);
+            }
+        }
+
+        return $result;
+    }
+
+    /**
      * Gather general information about a document..
      *
      * @param string $url
@@ -578,22 +620,11 @@ class WebScraper {
 
         $videoID = $matches['videoID'] ?: null;
 
-        // Get basic info from the page markup.
-        $data = $this->fetchPageInfo($url);
+        $data = [];
 
-        // Attempt to load more info from Vine.
-        if ($videoID && !$this->disableFetch) {
-            $vineRaw = file_get_contents("https://archive.vine.co/posts/{$videoID}.json");
-            $vineData = json_decode($vineRaw);
-            $data['name'] = val('username', $vineData, null);
-            $data['body'] = val('description', $vineData, null);
-            $data['photoUrl'] = val('thumbnailUrl', $vineData, null);
-        }
+        $oembed = $this->getOembed("https://vine.co/oembed.json?url=https%3A%2F%2Fvine.co%2Fv%2F{$videoID}");
+        $data = array_merge($data, $oembed);
 
-        list($width, $height) = $this->getSizeFromPhotoUrl($data);
-
-        $data['width'] = $width;
-        $data['height'] = $height;
         $data['attributes'] = ['videoID' => $videoID];
 
         return $data;
@@ -652,6 +683,8 @@ class WebScraper {
             $urlParts
         );
 
+        $videoID = array_key_exists('videoId', $urlParts) ? $urlParts['videoId'] : null;
+
         // Figure out the start time.
         $start = null;
         if (array_key_exists('start', $urlParts)) {
@@ -662,17 +695,13 @@ class WebScraper {
             $start = ($minutes * 60) + $seconds;
         }
 
-        // Get info from the page markup.
-        $data = $this->fetchPageInfo($url);
+        $data = [];
 
-        if ($data['photoUrl']) {
-            list($width, $height) = $this->getImageSize($data['photoUrl']);
-            $data['width'] = $width;
-            $data['height'] = $height;
-        }
+        $oembed = $this->getOembed("https://www.youtube.com/oembed?url=https%3A%2F%2Fwww.youtube.com%2Fwatch%3Fv%3D{$videoID}");
+        $data = array_merge($data, $oembed);
 
         $data['attributes'] = [
-            'videoID' => array_key_exists('videoId', $urlParts) ? $urlParts['videoId'] : null,
+            'videoID' => $videoID,
             'listID' => array_key_exists('listId', $urlParts) ? $urlParts['listId'] : null,
             'start' => $start
         ];

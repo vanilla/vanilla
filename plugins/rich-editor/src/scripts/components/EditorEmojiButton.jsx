@@ -24,18 +24,21 @@ export default class EditorEmojiButton extends React.Component {
      */
     constructor(props) {
         super(props);
-        this.quill = props.quill;
         this.emojiChar = props.emoji.emoji;
-        this.closeMenu = props.closeMenu;
     }
 
-    insertEmojiBlot = () => {
-        const range = this.quill.getSelection(true);
-        this.quill.insertEmbed(range.index, 'emoji', {
+
+    /**
+     * Insert Emoji
+     * @param {SyntheticEvent} e
+     */
+    insertEmojiBlot = (e) => {
+        const range = this.props.quill.getSelection(true);
+        this.props.quill.insertEmbed(range.index, 'emoji', {
             emojiChar: this.emojiChar,
         }, Quill.sources.USER);
-        this.quill.setSelection(range.index + 1, Quill.sources.SILENT);
-        this.closeMenu();
+        this.props.quill.setSelection(range.index + 1, Quill.sources.SILENT);
+        this.props.closeMenu(e);
     }
 
     render() {

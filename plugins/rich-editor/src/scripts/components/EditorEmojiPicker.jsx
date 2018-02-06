@@ -84,10 +84,10 @@ export default class EditorEmojiPicker extends React.Component {
      */
     render() {
         return <div className="emojiPicker">
-            <EditorEmojiMenu {...this.state} menuID={this.menuID} menuTitleID={this.menuTitleID} quill={this.quill} closeMenu={this.closeMenu}/>
             <button onClick={this.toggleEmojiMenu} className="richEditor-button" type="button" id={this.buttonID} aria-controls={this.menuID} aria-expanded={this.state.isVisible} aria-haspopup="menu">
                 {Icons.emoji()}
             </button>
+            <EditorEmojiMenu {...this.state} menuID={this.menuID} menuTitleID={this.menuTitleID} quill={this.quill} closeMenu={this.closeMenu}/>
         </div>;
     }
 }

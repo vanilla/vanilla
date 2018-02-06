@@ -1,5 +1,4 @@
-import Quill from "quill/quill";
-const Embed = Quill.import('blots/embed');
+import Embed from "quill/blots/embed";
 
 export default class EmojiBlot extends Embed {
     static create(emojiData) {

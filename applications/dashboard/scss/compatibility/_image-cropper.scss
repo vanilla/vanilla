@@ -1,0 +1,10 @@
+/** Hides the image cropper on mobile themes. This image cropper is not mobile compatible. */
+body.isMobile {
+    .box-crop .box-source {
+        display: none;
+    }
+
+    .change-picture .change-picture-instructions {
+        display: none;
+    }
+}

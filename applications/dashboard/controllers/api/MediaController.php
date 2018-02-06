@@ -102,7 +102,7 @@ class MediaApiController extends AbstractApiController {
         $ext = pathinfo(strtolower($upload->getClientFilename()), PATHINFO_EXTENSION);
         $destination = $this->generateUploadPath($ext, true);
         $uploadResult = $this->saveUpload($upload, $destination);
-        $media['Path'] = $uploadResult['Name'];
+        $media['Path'] = $uploadResult['SaveName'];
 
         $id = $this->mediaModel->save($media);
         $this->validateModel($this->mediaModel);
@@ -220,23 +220,25 @@ class MediaApiController extends AbstractApiController {
      * @return array
      */
     public function mediaByUrl($url) {
-        $fullPath = parse_url($url, PHP_URL_PATH);
-        if (empty($fullPath)) {
-            throw new Exception("Invalid media URL: {$url}");
+        $uploadPaths = Gdn_Upload::urls();
+
+        $path = false;
+        foreach ($uploadPaths as $type => $urlPrefix) {
+            if (stringBeginsWith($url, $urlPrefix)) {
+                $path = trim(stringBeginsWith($url, $urlPrefix, true, true), '\\/');
+                if (!empty($type)) {
+                    $path = $type.$path;
+                }
+                break;
+            }
         }
 
-        $fullPath = trim($fullPath, '\\/');
-        $webRoot = Gdn::request()->webRoot();
-
-        // Get the path relative to the web root.
-        $relativePath = trim(stringBeginsWith($fullPath, $webRoot, true, true), '\\/');
-        // Get the uploads file system path relative to the site path.
-        $uploadsPath = trim(stringBeginsWith(PATH_UPLOADS, PATH_ROOT, true, true), '\\/');
-        // Get the media web path, relative to the uploads file system path.
-        $mediaPath = trim(stringBeginsWith($relativePath, $uploadsPath, true, true), '\\/');
+        if (!$path) {
+            throw new NotFoundException('Media');
+        }
 
         $row = $this->mediaModel->getWhere(
-            ['Path' => $mediaPath],
+            ['Path' => $path],
             '',
             'asc',
             1

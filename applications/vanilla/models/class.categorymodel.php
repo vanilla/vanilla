@@ -689,19 +689,17 @@ class CategoryModel extends Gdn_Model {
                     $discussionID = valr("$commentID.DiscussionID", $discussions, null);
 
                     $dateLastComment = Gdn_Format::toTimestamp($row['DateLastComment']);
-                    $dateLastDiscussion = Gdn_Format::toTimestamp($row['DateLastDiscussion']);
+
+                    $discussionModel = new DiscussionModel();
+                    $latestDiscussion = $discussionModel->getID($category['LastDiscussionID']);
+                    $dateLastDiscussion = Gdn_Format::toTimestamp(val('DateInserted', $latestDiscussion));
 
                     $set = ['LastCommentID' => $commentID];
 
                     if ($discussionID) {
-                        $lastDiscussionID = val('LastDiscussionID', $category);
-
                         if ($dateLastComment >= $dateLastDiscussion) {
                             // The most recent discussion is from this comment.
                             $set['LastDiscussionID'] = $discussionID;
-                        } else {
-                            // The most recent discussion has no comments.
-                            $set['LastCommentID'] = null;
                         }
                     } else {
                         // Something went wrong.

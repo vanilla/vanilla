@@ -6,7 +6,7 @@
 
 import React from "react";
 import * as PropTypes from "prop-types";
-import Quill from "quill";
+import Quill from "quill/quill";
 import Events from "@core/events";
 import EditorToolbar from "./EditorToolbar";
 import Emitter from "quill/core/emitter";

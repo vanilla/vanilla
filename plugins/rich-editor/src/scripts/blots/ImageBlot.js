@@ -1,10 +1,8 @@
-import Quill from "quill/quill";
-let Embed = Quill.import('blots/embed');
-
+import Embed from "quill/blots/embed";
 
 export default class ImageBlot extends Embed {
     static create(value) {
-        let node = super.create();
+        const node = super.create();
         node.setAttribute('alt', value.alt);
         node.setAttribute('src', value.url);
         return node;
@@ -13,7 +11,7 @@ export default class ImageBlot extends Embed {
     static value(node) {
         return {
             alt: node.getAttribute('alt'),
-            url: node.getAttribute('src')
+            url: node.getAttribute('src'),
         };
     }
 }

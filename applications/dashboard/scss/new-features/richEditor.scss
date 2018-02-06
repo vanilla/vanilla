@@ -1,3 +1,4 @@
+$richEditor-font_size: 16px !default;
 $richEditor-icon_size: 24px !default;
 $richEditor-menuButton_size: 39px !default;
 $richEditor-bg_color: white !default;
@@ -22,59 +23,60 @@ $richEditor-menu_borderWidth: 1px !default;
 $richEditor-menu_offset: $richEditor-nub_width !default;
 
 .richEditor {
-  position: relative;
-  display: block;
-  padding-left: $richEditor_leftPadding;
+    position: relative;
+    display: block;
+    padding-left: $richEditor_leftPadding;
+    font-size: $richEditor-font_size;
 }
 
 .richEditor-frame.InputBox {
-  position: relative;
-  background: $richEditor-bg_color;
-  height: auto;
-  padding: 0;
+    position: relative;
+    background: $richEditor-bg_color;
+    height: auto;
+    padding: 0;
 }
 
 .richEditor-menu {
-  display: inline-block;
-  position: relative;
-
-  &.FlyoutMenu { // Temporary
+    display: inline-block;
     position: relative;
-    top: auto;
-    left: auto;
-    right: auto;
-    bottom: auto;
-    display: block;
-    float: none;
-  }
+
+    &.FlyoutMenu { // Temporary
+        position: relative;
+        top: auto;
+        left: auto;
+        right: auto;
+        bottom: auto;
+        display: block;
+        float: none;
+    }
 }
 
 .richEditorParagraphMenu {
-  position: absolute;
-  top: $richEditor-paragraphMenu_offset;
-  left: #{($richEditor_leftPadding - $richEditor-icon_size) / 2};
-  height: $richEditor-icon_size;
-  width: $richEditor-icon_size;
+    position: absolute;
+    top: $richEditor-paragraphMenu_offset;
+    left: #{($richEditor_leftPadding - $richEditor-icon_size) / 2};
+    height: $richEditor-icon_size;
+    width: $richEditor-icon_size;
 }
 
 .richEditor-text {
-  position: relative;
-  min-height: $richEditor_minHeight;
-  padding: $richEditor_padding;
-  outline-color: transparent;
+    position: relative;
+    min-height: $richEditor_minHeight;
+    padding: $richEditor_padding;
+    outline-color: transparent;
 
-  .ql-editor {
-      min-height: $richEditor_minHeight - $richEditor_verticalPadding;
-  }
+    .ql-editor {
+        min-height: $richEditor_minHeight - $richEditor_verticalPadding;
+    }
 
-  &:focus {
-    outline-offset: -2px;
-    outline-style: auto;
-    outline-width: 5px;
-    outline-color: Highlight;
-    outline-color: -webkit-focus-ring-color;
-    z-index: 1;
-  }
+    &:focus {
+        outline-offset: -2px;
+        outline-style: auto;
+        outline-width: 5px;
+        outline-color: Highlight;
+        outline-color: -webkit-focus-ring-color;
+        z-index: 1;
+    }
 }
 
 .ql-clipboard {
@@ -82,311 +84,322 @@ $richEditor-menu_offset: $richEditor-nub_width !default;
 }
 
 .richEditor-menuItems {
-  position: relative;
-  display: flex;
-  align-items: flex-start;
-  justify-content: flex-start;
-  flex-wrap: nowrap;
-  list-style: none;
-  margin: 0;
-  padding: 0;
+    position: relative;
+    display: flex;
+    align-items: flex-start;
+    justify-content: flex-start;
+    flex-wrap: nowrap;
+    list-style: none;
+    margin: 0;
+    padding: 0;
 }
 
 .richEditor-menuItem {
-  display: block;
-  margin: 0;
-  padding: 0;
+    display: block;
+    margin: 0;
+    padding: 0;
 
-  .richEditor-button {
-    height: $richEditor-menuButton_size;
-    width: $richEditor-menuButton_size;
-  }
+    .richEditor-button {
+        height: $richEditor-menuButton_size;
+        width: $richEditor-menuButton_size;
+    }
 
-  &.isRightAligned {
-    margin-left: auto;
-  }
+    &.isRightAligned {
+        margin-left: auto;
+    }
 }
 
 .richEditor-button {
-  display: block;
-  position: relative;
-  -webkit-appearance: none;
-  -moz-appearance: none;
-  appearance: none;
-  border: 0;
-  padding: 0;
-  height: $richEditor-icon_size;
-  width: $richEditor-icon_size;
-  background: none;
+    display: block;
+    position: relative;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+    border: 0;
+    padding: 0;
+    height: $richEditor-icon_size;
+    width: $richEditor-icon_size;
+    background: none;
 
-  &.richEditorParagraphMenu-handle {
-    background: transparent;
+    &.richEditorParagraphMenu-handle {
+        background: transparent;
 
-    .richEditorInline-icon {
-      opacity: 1;
+        .richEditorInline-icon {
+            opacity: 1;
+        }
     }
-  }
 
-  &:not(:disabled) {
-    cursor: pointer;
-  }
-
-  &:focus {
-    z-index: 2;
-  }
-
-  &:hover,
-  &:focus,
-  &.isActive{
-    .richEditorInline-icon {
-      opacity: 1;
+    &:not(:disabled) {
+        cursor: pointer;
     }
-  }
+
+    &:focus {
+        z-index: 2;
+    }
+
+    &:hover,
+    &:focus,
+    &.isActive{
+        .richEditorInline-icon {
+            opacity: 1;
+        }
+    }
 }
 
 .embedBar {
-  display: block;
-  width: 100%;
-  padding: $richEditor-embedMenu_padding;
+    display: block;
+    width: 100%;
+    padding: $richEditor-embedMenu_padding;
 
 }
 
 .richEditorInline-icon {
-  display: block;
-  margin: auto;
-  height: $richEditor-icon_size;
-  width: $richEditor-icon_size;
-  opacity: $richEditor-icon_opacity;
+    display: block;
+    margin: auto;
+    height: $richEditor-icon_size;
+    width: $richEditor-icon_size;
+    opacity: $richEditor-icon_opacity;
 }
 
 // @mention menu
 .atMention {
-  width: $richEditor-atMention_width;
+    width: $richEditor-atMention_width;
 }
 
 .atMention-items {
-  width: 100%;
+    width: 100%;
 
 
-  &.MenuItems { // Temporary
-    position: relative;
-    top: auto;
-    left: auto;
-    right: auto;
-    bottom: auto;
-    display: block;
-  }
+    &.MenuItems { // Temporary
+        position: relative;
+        top: auto;
+        left: auto;
+        right: auto;
+        bottom: auto;
+        display: block;
+    }
 }
 
 .atMention-user {
-  display: flex;
-  align-items: center;
-  width: 100%;
-  box-sizing: border-box;
-  overflow: hidden;
+    display: flex;
+    align-items: center;
+    width: 100%;
+    box-sizing: border-box;
+    overflow: hidden;
 }
 
 .atMention-photoWrap {
-  margin-right: $richEditor-atMentionAvatar_margin;
+    margin-right: $richEditor-atMentionAvatar_margin;
 }
 
 .atMention-photo {
-  width: $richEditor-atMentionAvatar_width;
-  height: $richEditor-atMentionAvatar_width;
+    width: $richEditor-atMentionAvatar_width;
+    height: $richEditor-atMentionAvatar_width;
 }
 
 .atMention-userName {
-  flex-grow: 1;
-  overflow: hidden;
-  white-space: nowrap;
-  text-overflow: ellipsis;
-  max-width: calc(100% - #{$richEditor-atMentionAvatar_margin + $richEditor-atMentionAvatar_width});
+    flex-grow: 1;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    max-width: calc(100% - #{$richEditor-atMentionAvatar_margin + $richEditor-atMentionAvatar_width});
 }
 
 .atMention-mark {
-  padding: 0;
-  font-weight: $richEditor-atMentionMark_weight;
+    padding: 0;
+    font-weight: $richEditor-atMentionMark_weight;
 }
 
 .atMention-photo {
-  display: block;
+    display: block;
 }
 
 // Link Menu
 .insertLink.FlyoutMenu {
-  display: flex;
-  flex-wrap: nowrap;
-  align-items: center;
-  max-width: $richEditor-insertLink_width;
-  width: 100%;
-  padding: {
-    left: 5px;
-  }
+    display: flex;
+    flex-wrap: nowrap;
+    align-items: center;
+    max-width: $richEditor-insertLink_width;
+    width: 100%;
+    padding: {
+        left: 5px;
+    }
 }
 
 .richEditor-close.Close {
-  position: relative;
-  display: block;
-  width: $richEditor-menuButton_size;
-  height: $richEditor-menuButton_size;
-  line-height: $richEditor-menuButton_size;
-  top: auto;
-  right: auto;
-  text-align: center;
-  user-select: none;
+    position: relative;
+    display: block;
+    width: $richEditor-menuButton_size;
+    height: $richEditor-menuButton_size;
+    line-height: $richEditor-menuButton_size;
+    top: auto;
+    right: auto;
+    text-align: center;
+    user-select: none;
 }
 
 .insertLink-input.InputBox {
-  border: 0 !important;
-  flex-grow: 1;
-  max-width: calc(100% - #{$richEditor-menuButton_size})
+    border: 0 !important;
+    flex-grow: 1;
+    max-width: calc(100% - #{$richEditor-menuButton_size})
 }
 
 // Insert Media
 .insertPopover {
+    position: relative;
+    z-index: 6;
 
+    .InputBox {
+        width: 100%;
+        box-sizing: border-box;
+    }
 
-  .InputBox {
-    width: 100%;
-    box-sizing: border-box;
-  }
+    .richEditor-close {
+        position: absolute;
+        top: 0;
+        right: 0;
+    }
 
-  .richEditor-close {
-    position: absolute;
-    top: 0;
-    right: 0;
-  }
-
-  .Footer {
-    display: flex;
-  }
+    .Footer {
+        display: flex;
+    }
 }
 
 .insertPopover-header {
-  padding: {
-    top: $richEditor-insertPopover_paddingVertical;
-    bottom: $richEditor-insertPopover_paddingVertical;
-    left: $richEditor-insertPopover_paddingHorizontal;
-    right: $richEditor-insertPopover_paddingHorizontal;
-  }
+    padding: {
+        top: $richEditor-insertPopover_paddingVertical;
+        bottom: $richEditor-insertPopover_paddingVertical;
+        left: $richEditor-insertPopover_paddingHorizontal;
+        right: $richEditor-insertPopover_paddingHorizontal;
+    }
 }
 
 .insertPopover-footer {
-  padding: {
-    bottom: $richEditor-insertPopover_paddingVertical;
-    left: $richEditor-insertPopover_paddingHorizontal;
-    right: $richEditor-insertPopover_paddingHorizontal;
-  }
+    padding: {
+        bottom: $richEditor-insertPopover_paddingVertical;
+        left: $richEditor-insertPopover_paddingHorizontal;
+        right: $richEditor-insertPopover_paddingHorizontal;
+    }
 }
 
 .insertMedia-title {
-  margin: 0;
-  max-width: calc(100% - #{$richEditor-menuButton_size});
-  min-height: #{$richEditor-menuButton_size - $richEditor-insertPopover_paddingVertical};
+    margin: 0;
+    max-width: calc(100% - #{$richEditor-menuButton_size});
+    min-height: #{$richEditor-menuButton_size - $richEditor-insertPopover_paddingVertical};
 }
 
 .insertMedia-footer {
-  display: flex;
-  align-items: center;
-  justify-content: flex-end;
-  padding: {
-    left: $richEditor-insertPopover_paddingHorizontal;
-    right: $richEditor-insertPopover_paddingHorizontal;
-    bottom: $richEditor-insertPopover_paddingVertical;
-  }
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    padding: {
+        left: $richEditor-insertPopover_paddingHorizontal;
+        right: $richEditor-insertPopover_paddingHorizontal;
+        bottom: $richEditor-insertPopover_paddingVertical;
+    }
 }
 
 .insertMedia-help {
-  margin-right: auto;
-  font-size: 12px;
+    margin-right: auto;
+    font-size: 12px;
 }
 
 .insertMedia-insert {
-  margin-bottom: 3px;
+    margin-bottom: 3px;
 }
 
 
 .insertPopover-body {
-  max-height: $richEditor-insertPopover_maxHeight;
-  overflow: auto;
-  padding: {
-    left: $richEditor-insertPopover_paddingHorizontal;
-    right: $richEditor-insertPopover_paddingHorizontal;
-  }
-  margin-bottom: $richEditor-insertPopover_paddingHorizontal;
+    max-height: $richEditor-insertPopover_maxHeight;
+    overflow: auto;
+    padding: {
+        left: $richEditor-insertPopover_paddingHorizontal;
+        right: $richEditor-insertPopover_paddingHorizontal;
+    }
+    margin-bottom: $richEditor-insertPopover_paddingHorizontal;
 }
 
+.richEditor-menu.insertEmoji {
+    position: absolute;
+    bottom: 100%;
+    left: 0;
+}
+
+
 .richEditor-emojis {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: flex-start;
-  justify-content: flex-start;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-start;
+    justify-content: flex-start;
 }
 
 .richEditor-insertEmoji {
-  width: $richEditor-menuButton_size;
-  height: $richEditor-menuButton_size;
-  font-size: $richEditor-icon_size;
+    width: $richEditor-menuButton_size;
+    height: $richEditor-menuButton_size;
+    font-size: $richEditor-icon_size;
 }
 
 .richEditor ~ .TextBoxWrapper {
-  display: none;
+    display: none;
 }
+
 
 
 // Nub styles
 
 .richEditor-nubPosition {
-  position: absolute;
-  display: flex;
-  align-items: flex-start;
-  justify-content: center;
-  overflow: hidden;
-  width: $richEditor-nub_width * 2;
-  height: $richEditor-nub_width * 2;
-  -webkit-user-select: none;
-  -moz-user-select: none;
-  -ms-user-select: none;
-  user-select: none;
-  transform: translateX(-50%);
-  margin-top: -$richEditor-menu_borderWidth;
+    position: absolute;
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    overflow: hidden;
+    width: $richEditor-nub_width * 2;
+    height: $richEditor-nub_width * 2;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+    transform: translateX(-50%);
+    margin-top: -$richEditor-menu_borderWidth;
 }
 
 .richEditor-nub {
-  position: relative;
-  display: block;
-  width: $richEditor-nub_width;
-  height: $richEditor-nub_width;
-  border: {
-    top: $richEditor-menu_borderWidth solid #999;
-    right: $richEditor-menu_borderWidth solid #999;
-  }
-  box-shadow: 0 0 5px 1px #eee;
-  box-shadow: 0 0 5px 1px rgba(0, 0, 0, 0.2);
-  background: $richEditor-bg_color;
+    position: relative;
+    display: block;
+    width: $richEditor-nub_width;
+    height: $richEditor-nub_width;
+    border: {
+        top: $richEditor-menu_borderWidth solid #999;
+        right: $richEditor-menu_borderWidth solid #999;
+    }
+    box-shadow: 0 0 5px 1px #eee;
+    box-shadow: 0 0 5px 1px rgba(0, 0, 0, 0.2);
+    background: $richEditor-bg_color;
 }
 
 // Orientation specific styles
 
 .richEditor-inlineMenu {
-  &.isUp {
-    transform: translateY(-$richEditor-menu_offset);
+    &.isUp {
+        transform: translateY(-$richEditor-menu_offset);
 
-    .richEditor-nub {
-      transform: translateY(-50%) rotate(135deg);
+        .richEditor-nub {
+            transform: translateY(-50%) rotate(135deg);
+        }
     }
-  }
 
-  &.isDown {
-    transform: translateY($richEditor-menu_offset);
+    &.isDown {
+        transform: translateY($richEditor-menu_offset);
 
-    .richEditor-nubPosition {
-      align-items: flex-end;
-      transform: translateY(-50%) translateX(-50%);
-      margin-top: $richEditor-menu_borderWidth;
+        .richEditor-nubPosition {
+            align-items: flex-end;
+            transform: translateY(-50%) translateX(-50%);
+            margin-top: $richEditor-menu_borderWidth;
+        }
+        .richEditor-nub {
+            transform: translateY(50%) rotate(-45deg);
+        }
     }
-    .richEditor-nub {
-      transform: translateY(50%) rotate(-45deg);
-    }
-  }
 }
+
+

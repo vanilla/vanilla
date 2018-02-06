@@ -7,17 +7,18 @@
 
 namespace VanillaTests\APIv2;
 
+use Gdn_Upload;
 use Garden\Http\HttpResponse;
 use Vanilla\UploadedFile;
 use VanillaTests\Fixtures\Uploader;
 
 /**
- * Test the /api/v2/medias endpoints.
+ * Test the /api/v2/media endpoints.
  */
-class MediasTest extends AbstractAPIv2Test {
+class MediaTest extends AbstractAPIv2Test {
 
     /** @var string */
-    private $baseUrl = '/medias';
+    private $baseUrl = '/media';
 
     /**
      * Test posting.
@@ -43,7 +44,7 @@ class MediasTest extends AbstractAPIv2Test {
 
         return [
             'uploadedFile' => $photo,
-            'responseBody' => $body,
+            'responseBody' => $result->getBody(),
         ];
     }
 
@@ -129,8 +130,10 @@ class MediasTest extends AbstractAPIv2Test {
         $this->assertArrayHasKey('mediaID', $body);
         $this->assertTrue(is_int($body['mediaID']));
 
+        $urlPrefix = Gdn_Upload::urls('');
         $this->assertArrayHasKey('url', $body);
-        $this->markTestIncomplete('Need to validate URL');
+        $this->assertStringStartsWith($urlPrefix, $body['url']);
+        $filename = PATH_UPLOADS.substr($body['url'], strlen($urlPrefix));
 
         $this->assertArrayHasKey('name', $body);
         $this->assertEquals($uploadedFile->getClientFilename(), $body['name']);
@@ -144,7 +147,7 @@ class MediasTest extends AbstractAPIv2Test {
         $this->assertArrayHasKey('width', $body);
         $this->assertArrayHasKey('height', $body);
         if (strpos($body['type'], 'image/') === 0) {
-            $imageInfo = getimagesize($uploadedFile->getFile());
+            $imageInfo = getimagesize($filename);
             $this->assertEquals($imageInfo[0], $body['width']);
             $this->assertEquals($imageInfo[1], $body['height']);
         } else {

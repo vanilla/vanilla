@@ -18,6 +18,7 @@ before_script:
   - yarn install --pure-lockfile
   - cd plugins/rich-editor
   - yarn install --pure-lockfile --modules-folder ./plugins/rich-editor
+  - cd ../..
 
 # Cache Composer package files.
 cache:

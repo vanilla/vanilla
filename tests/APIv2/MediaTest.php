@@ -6,48 +6,6 @@ use WebScraper;
 class MediaTest extends AbstractAPIv2Test {
 
     /**
-     * Called after each test is executed.
-     *
-     * @throws \Garden\Container\ContainerException
-     * @throws \Garden\Container\NotFoundException
-     */
-    public function tearDown() {
-        // Make sure fetching page info is re-disabled, after every test.
-        $this->setDisableFetch(true);
-    }
-
-    /**
-     * Test scraping pages with /media/scrape.
-     *
-     * @dataProvider provideScrapeUrls
-     * @param array $url
-     * @param string $type
-     * @param array $info
-     * @param bool $enableFetch
-     * @throws \Garden\Container\ContainerException
-     * @throws \Garden\Container\NotFoundException
-     */
-    public function testScrape($url, $type, array $info, $enableFetch = false) {
-        // Fetching is disabled by default in tests. Should it be enabled for this test?
-        if ($enableFetch) {
-            $this->setDisableFetch(false);
-        }
-        $result = $this->api()->post('media/scrape', ['url' => $url]);
-        $this->assertEquals(201, $result->getStatusCode());
-
-        $body = $result->getBody();
-        $this->assertEquals($url, $body['url']);
-        $this->assertEquals($type, $body['type']);
-
-        // Body and type have been validated. Validate the remaining fields.
-        unset($body['url'], $body['type']);
-        $this->assertCount(count($info), $body);
-        foreach ($body as $key => $value) {
-            $this->assertEquals($info[$key], $value);
-        }
-    }
-
-    /**
      * Provide scrape-able URLs in the testing environment and expected information to be returned by each.
      *
      * @return array
@@ -476,10 +434,10 @@ class MediaTest extends AbstractAPIv2Test {
                     'height' => null,
                     'width' => null,
                     'attributes' => [
-                            'videoID' => '9bZkp7q19f0',
-                            'listID' => null,
-                            'start' => null,
-                        ],
+                        'videoID' => '9bZkp7q19f0',
+                        'listID' => null,
+                        'start' => null,
+                    ],
                 ]
             ],
             [
@@ -533,6 +491,87 @@ class MediaTest extends AbstractAPIv2Test {
         ];
 
         return $urls;
+    }
+
+    /**
+     * Provide data to verify a parsed URL matches a type.
+     *
+     * @return array
+     */
+    public function provideTypeUrls() {
+        $urls = [
+            ['https://vine.co/v/abc123', 'vine'],
+            ['https://embed.gettyimages.com/embed/1234567890', 'getty'],
+            ['https://www.smashcast.tv/example', 'smashcast'],
+            ['https://imgur.com/example', 'imgur'],
+            ['https://imgur.com/example.jpg', 'imgur'],
+            ['https://i.imgur.com/example', 'imgur'],
+            ['https://m.imgur.com/example', 'imgur'],
+            ['https://www.pinterest.com/pin/1234567890', 'pinterest'],
+            ['https://vimeo.com/251083506', 'vimeo'],
+            ['https://youtube.com/watch?v=example', 'youtube'],
+            ['https://youtube.ca/watch?v=example', 'youtube']
+        ];
+
+        return $urls;
+    }
+
+    /**
+     * Called after each test is executed.
+     *
+     * @throws \Garden\Container\ContainerException
+     * @throws \Garden\Container\NotFoundException
+     */
+    public function tearDown() {
+        // Make sure fetching page info is re-disabled, after every test.
+        $this->setDisableFetch(true);
+    }
+
+    /**
+     * Test scraping pages with /media/scrape.
+     *
+     * @dataProvider provideScrapeUrls
+     * @param array $url
+     * @param string $type
+     * @param array $info
+     * @param bool $enableFetch
+     * @throws \Garden\Container\ContainerException
+     * @throws \Garden\Container\NotFoundException
+     */
+    public function testScrape($url, $type, array $info, $enableFetch = false) {
+        // Fetching is disabled by default in tests. Should it be enabled for this test?
+        if ($enableFetch) {
+            $this->setDisableFetch(false);
+        }
+        $result = $this->api()->post('media/scrape', ['url' => $url]);
+        $this->assertEquals(201, $result->getStatusCode());
+
+        $body = $result->getBody();
+        $this->assertEquals($url, $body['url']);
+        $this->assertEquals($type, $body['type']);
+
+        // Body and type have been validated. Validate the remaining fields.
+        unset($body['url'], $body['type']);
+        $this->assertCount(count($info), $body);
+        foreach ($body as $key => $value) {
+            $this->assertEquals($info[$key], $value);
+        }
+    }
+
+    /**
+     * Verify a URL matches a specific type.
+     *
+     * @param string $url
+     * @param string $type
+     * @dataProvider provideTypeUrls
+     */
+    public function testUrlType($url, $type) {
+        $result = $this->api()->post('media/scrape', ['url' => $url]);
+        $this->assertEquals(201, $result->getStatusCode());
+
+        $body = $result->getBody();
+        $this->assertEquals($url, $body['url']);
+        $this->assertEquals($type, $body['type']);
     }
 
     /**

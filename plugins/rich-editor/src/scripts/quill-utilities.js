@@ -4,6 +4,9 @@
  * @license https://opensource.org/licenses/GPL-2.0 GPL-2.0
  */
 
+import LinkBlot from "quill/formats/link";
+import Emitter from "quill/core/emitter";
+
 /**
  * @typedef {Object} BoundaryStatic
  * @property {number} start
@@ -70,4 +73,47 @@ export function expandRange(range, startRange = null, endRange = null) {
     }
 
     return convertBoundaryToRange(boundary);
+}
+
+/**
+ * Check if a given range contains a blot of a certain type. Could be more than one.
+ *
+ * @param {Quill} quill - A quill instance.
+ * @param {RangeStatic} range - The range to check.
+ * @param {Function} blotConstructor - A class constructor for a blot.
+ *
+ * @returns {boolean} -
+ */
+export function rangeContainsBlot(quill, range, blotConstructor) {
+    const links = quill.scroll.descendants(blotConstructor, range.index, range.length);
+    return links.length > 0;
+}
+
+/**
+ * Format (or unformat) all blots in a given range. Will fully unformat a link even if the link is not entirely
+ * inside of the current selection.
+ *
+ * @param {Quill} quill - A quill instance.
+ * @param {RangeStatic} range - The range to check.
+ * @param {Function} blotConstructor - A class constructor for a blot.
+ */
+export function disableAllBlotsInRange(quill, range, blotConstructor) {
+
+    /** @type {Blot[]} */
+    const currentLinks = quill.scroll.descendants(blotConstructor, range.index, range.length);
+    const firstLink = currentLinks[0];
+    const lastLink = currentLinks[currentLinks.length - 1];
+
+    const startRange = firstLink && {
+        index: firstLink.offset(quill.scroll),
+        length: firstLink.length(),
+    };
+
+    const endRange = lastLink && {
+        index: lastLink.offset(quill.scroll),
+        length: lastLink.length(),
+    };
+    const finalRange = expandRange(range, startRange, endRange);
+
+    quill.formatText(finalRange.index, finalRange.length, 'link', false, Emitter.sources.USER);
 }

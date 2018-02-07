@@ -32,21 +32,17 @@ export default class VanillaTheme extends Theme {
         super(quill, options);
         this.quill.root.classList.add("richEditor-text");
         this.quill.root.classList.add("userContent");
-        this.setupKeyboardListeners();
+        this.setupTabBehaviour();
         this.mountToolbar();
         this.mountEmojiMenu();
     }
 
-    setupKeyboardListeners() {
+    /**
+     * Nullify the tab key.
+     */
+    setupTabBehaviour() {
+        // Nullify the tab key.
         this.options.modules.keyboard.bindings.tab = false;
-        this.options.modules.keyboard.bindings.link = {
-            key: "k",
-            metaKey: true,
-            handler: () => {
-                const event = new CustomEvent("LinkShortcut");
-                this.quill.root.dispatchEvent(event);
-            },
-        };
     }
 
     /**

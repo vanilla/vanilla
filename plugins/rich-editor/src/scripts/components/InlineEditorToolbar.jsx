@@ -75,11 +75,23 @@ export default class InlineEditorToolbar extends React.Component {
      */
     componentDidMount() {
         this.quill.on(Emitter.events.EDITOR_CHANGE, this.handleEditorChange);
-        this.quill.root.addEventListener("LinkShortcut", () => {
-            if (this.quill.getSelection().length) {
-                this.focusLinkInput();
-            }
-        });
+
+        // Add a key binding for the link popup.
+        this.quill.options.modules.keyboard.bindings.link = {
+            key: "k",
+            metaKey: true,
+            handler: () => {
+                const range = this.quill.getSelection();
+                if (range.length) {
+                    if (quillUtilities.rangeContainsBlot(this.quill, range, LinkBlot)) {
+                        quillUtilities.disableAllBlotsInRange(this.quill, range, LinkBlot);
+                        this.clearLinkInput();
+                    } else {
+                        this.focusLinkInput();
+                    }
+                }
+            },
+        };
     }
 
     /**
@@ -111,32 +123,14 @@ export default class InlineEditorToolbar extends React.Component {
 
 
     /**
-     * Format (or unformat) link blots in a given area. Will fully unformat a link even if the link is not entirely
-     * inside of the current selection.
+     * Special formatting for the link blot.
      *
      * @param {MenuItemData} menuItemData - The current state of the menu item.
      */
     linkFormatter(menuItemData) {
         if (menuItemData.active) {
             const range = this.quill.getSelection();
-
-            /** @type {Blot[]} */
-            const currentLinks = this.quill.scroll.descendants(LinkBlot, range.index, range.length);
-            const firstLink = currentLinks[0];
-            const lastLink = currentLinks[currentLinks.length - 1];
-
-            const startRange = firstLink && {
-                index: firstLink.offset(this.quill.scroll),
-                length: firstLink.length(),
-            };
-
-            const endRange = lastLink && {
-                index: lastLink.offset(this.quill.scroll),
-                length: lastLink.length(),
-            };
-            const finalRange = quillUtilities.expandRange(range, startRange, endRange);
-
-            this.quill.formatText(finalRange.index, finalRange.length, 'link', false, Emitter.sources.USER);
+            quillUtilities.disableAllBlotsInRange(this.quill, range, LinkBlot);
             this.clearLinkInput();
         } else {
             this.focusLinkInput();

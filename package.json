@@ -31,16 +31,14 @@
         "babel-core": "^6.26.0",
         "babel-eslint": "^8.2.1",
         "babel-jest": "^22.0.4",
-        "cross-env": "^5.1.3",
-        "cross-spawn": "^6.0.4",
         "glob": "^7.1.2",
         "html-loader-jest": "^0.2.1",
         "jest": "^22.1.4",
         "mutationobserver-shim": "^0.3.2"
     },
     "scripts": {
-        "test": "cross-env NODE_ENV=test BABEL_ENV=test jest --no-cache",
-        "test:watch": "cross-env NODE_ENV=test BABEL_ENV=test jest --watch"
+        "test": "NODE_ENV=test BABEL_ENV=test jest --no-cache",
+        "test:watch": "NODE_ENV=test BABEL_ENV=test jest --watch"
     },
     "jest": {
         "testPathIgnorePatterns": [

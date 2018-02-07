@@ -14,8 +14,8 @@ before_script:
   - composer install --optimize-autoloader
   - composer require phpunit/phpunit ~5
   - tests/travis/setup.sh
-  - yarn install
-  - yarn install --modules-folder ./plugins/rich-editor
+  - yarn install --pure-lockfile
+  - yarn install --pure-lockfile --modules-folder ./plugins/rich-editor
 
 # Cache Composer package files.
 cache:

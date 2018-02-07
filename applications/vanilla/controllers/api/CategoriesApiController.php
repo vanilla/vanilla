@@ -431,8 +431,8 @@ class CategoriesApiController extends AbstractApiController {
         $this->permission('Garden.SignIn.Allow');
 
         $schema = ['followed:b' => 'The category-follow status for the current user.'];
-        $in = $this->schema($schema);
-        $out = $this->schema($schema);
+        $in = $this->schema($schema, 'in');
+        $out = $this->schema($schema, 'out');
 
         $category = $this->category($id);
         $body = $in->validate($body);

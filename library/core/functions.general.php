@@ -935,6 +935,60 @@ if (!function_exists('fetchPageInfo')) {
                 throw new Exception('Failed to load page for parsing.');
             }
 
+            /**
+             * Parse a page for OpenGraph media information.
+             *
+             * @param array $pageInfo
+             */
+            $getOpenGraphMedia = function (array &$pageInfo) use ($dom) {
+                $pageInfo['Media'] = [];
+
+                // Only target og:image and og:video tags.
+                $mediaTypes = ['image', 'video'];
+                foreach ($mediaTypes as $mediaType) {
+                    $tags = $dom->query('meta[property ^= "og:'.$mediaType.'"]');
+
+                    /** @var pQuery\DomNode $node */
+                    foreach ($tags as $node) {
+                        $property = $node->attr('property');
+                        $content = $node->attr('content');
+
+                        // If this is a root type element, save any existing type row data and start a new row.
+                        if ($property == "og:{$mediaType}") {
+                            if (isset($media)) {
+                                if (!array_key_exists($mediaType, $pageInfo['Media'])) {
+                                    $pageInfo['Media'][$mediaType] = [];
+                                }
+                                $pageInfo['Media'][$mediaType][] = $media;
+                            }
+                            $media = ['value' => $content];
+                        } else {
+                            // Shave off the type prefix. Save the content, if it's something we actually want.
+                            $subproperty = trim(stringBeginsWith(
+                                $property,
+                                "og:{$mediaType}",
+                                false,
+                                true
+                            ), ':');
+                            if (in_array($subproperty, ['height', 'width'])) {
+                                if (isset($media)) {
+                                    $media[$subproperty] = $content;
+                                }
+                            }
+                        }
+                    }
+
+                    // Save any outstanding information. Clear the row in preparation for the next iteration.
+                    if (isset($media)) {
+                        if (!array_key_exists($mediaType, $pageInfo['Media'])) {
+                            $pageInfo['Media'][$mediaType] = [];
+                        }
+                        $pageInfo['Media'][$mediaType][] = $media;
+                        unset($media);
+                    }
+                }
+            };
+
             // FIRST PASS: Look for open graph title, desc, images
             $pageInfo['Title'] = domGetContent($dom, 'meta[property="og:title"]');
 
@@ -991,69 +1045,14 @@ if (!function_exists('fetchPageInfo')) {
             $pageInfo['Title'] = htmlEntityDecode($pageInfo['Title']);
             $pageInfo['Description'] = htmlEntityDecode($pageInfo['Description']);
 
+            /**
+             * Add OpenGraph media information?
+             */
+            if ($includeMedia) {
+                $getOpenGraphMedia($pageInfo);
+            }
         } catch (Exception $ex) {
             $pageInfo['Exception'] = $ex->getMessage();
-        }
-
-        /**
-         * Parse a page for OpenGraph media information.
-         *
-         * @param array $pageInfo
-         */
-        $getOpenGraphMedia = function (array &$pageInfo) use ($dom) {
-            $pageInfo['Media'] = [];
-
-            // Only target og:image and og:video tags.
-            $mediaTypes = ['image', 'video'];
-            foreach ($mediaTypes as $mediaType) {
-                $tags = $dom->query('meta[property ^= "og:'.$mediaType.'"]');
-
-                /** @var pQuery\DomNode $node */
-                foreach ($tags as $node) {
-                    $property = $node->attr('property');
-                    $content = $node->attr('content');
-
-                    // If this is a root type element, save any existing type row data and start a new row.
-                    if ($property == "og:{$mediaType}") {
-                        if (isset($media)) {
-                            if (!array_key_exists($mediaType, $pageInfo['Media'])) {
-                                $pageInfo['Media'][$mediaType] = [];
-                            }
-                            $pageInfo['Media'][$mediaType][] = $media;
-                        }
-                        $media = ['value' => $content];
-                    } else {
-                        // Shave off the type prefix. Save the content, if it's something we actually want.
-                        $subproperty = trim(stringBeginsWith(
-                            $property,
-                            "og:{$mediaType}",
-                            false,
-                            true
-                        ), ':');
-                        if (in_array($subproperty, ['height', 'width'])) {
-                            if (isset($media)) {
-                                $media[$subproperty] = $content;
-                            }
-                        }
-                    }
-                }
-
-                // Save any outstanding information. Clear the row in preparation for the next iteration.
-                if (isset($media)) {
-                    if (!array_key_exists($mediaType, $pageInfo['Media'])) {
-                        $pageInfo['Media'][$mediaType] = [];
-                    }
-                    $pageInfo['Media'][$mediaType][] = $media;
-                    unset($media);
-                }
-            }
-        };
-
-        /**
-         * Add OpenGraph media information?
-         */
-        if ($includeMedia) {
-            $getOpenGraphMedia($pageInfo);
         }
 
         return $pageInfo;

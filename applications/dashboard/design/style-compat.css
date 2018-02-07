@@ -228,6 +228,7 @@ em {
 
 .insertLink-input.InputBox {
   border: 0 !important;
+  margin-bottom: 0 !important;
   flex-grow: 1;
   max-width: calc(100% - 39px);
 }

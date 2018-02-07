@@ -42,9 +42,7 @@ export default class VanillaTheme extends Theme {
      */
     setupTabBehaviour() {
         // Nullify the tab key.
-        this.options.modules.keyboard.bindings = {
-            tab: false,
-        };
+        this.options.modules.keyboard.bindings.tab = false;
     }
 
     /**

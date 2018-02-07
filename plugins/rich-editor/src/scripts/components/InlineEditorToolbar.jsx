@@ -7,10 +7,13 @@
 import React from "react";
 import * as PropTypes from "prop-types";
 import Quill from "quill/quill";
-import Events from "@core/events";
 import EditorToolbar from "./EditorToolbar";
 import Emitter from "quill/core/emitter";
-import { Range } from "quill/core/selection";
+import Keyboard from "quill/modules/keyboard";
+import LinkBlot from "quill/formats/link";
+import FloatingToolbar from "./FloatingToolbar";
+import { t } from "@core/utility";
+import * as quillUtilities from "../quill-utilities";
 
 export default class InlineEditorToolbar extends React.Component {
     static propTypes = {
@@ -22,18 +25,34 @@ export default class InlineEditorToolbar extends React.Component {
 
     /**
      * @type {Object}
-     * @property {RangeStatic} - The current quill selected text range..
+     * @property {boolean} showLink
+     * @property {boolean} ignoreSelectionReset
      */
     state;
 
     /** @type {HTMLElement} */
-    toolbar;
+    linkInput;
 
-    /** @type {HTMLElement} */
-    nub;
-
-    /** @type {number} */
-    resizeListener;
+    /** @type {Object<string, MenuItemData>} */
+    menuItems = {
+        bold: {
+            active: false,
+        },
+        italic: {
+            active: false,
+        },
+        strike: {
+            active: false,
+        },
+        code: {
+            active: false,
+        },
+        link: {
+            active: false,
+            value: "",
+            formatter: this.linkFormatter.bind(this),
+        },
+    };
 
     /**
      * @inheritDoc
@@ -45,15 +64,10 @@ export default class InlineEditorToolbar extends React.Component {
         this.quill = props.quill;
 
         this.state = {
-            isVisible: false,
-            x: 0,
-            y: 0,
-            nubX: "50%",
-            nubY: 0,
-            bounds: null,
+            showLink: false,
+            value: "",
+            previousRange: {},
         };
-
-        this.handleEditorChange = this.handleEditorChange.bind(this);
     }
 
     /**
@@ -62,17 +76,29 @@ export default class InlineEditorToolbar extends React.Component {
     componentDidMount() {
         this.quill.on(Emitter.events.EDITOR_CHANGE, this.handleEditorChange);
 
-        this.resizeListener = Events.addResizeListener(() => {
-            this.forceUpdate();
-        });
+        // Add a key binding for the link popup.
+        this.quill.options.modules.keyboard.bindings.link = {
+            key: "k",
+            metaKey: true,
+            handler: () => {
+                const range = this.quill.getSelection();
+                if (range.length) {
+                    if (quillUtilities.rangeContainsBlot(this.quill, range, LinkBlot)) {
+                        quillUtilities.disableAllBlotsInRange(this.quill, range, LinkBlot);
+                        this.clearLinkInput();
+                    } else {
+                        this.focusLinkInput();
+                    }
+                }
+            },
+        };
     }
 
     /**
      * Be sure to remove the listeners when the component unmounts.
      */
     componentWillUnmount() {
-        this.quill.off(Quill.events.EDITOR_CHANGE);
-        Events.removeResizeListener(this.resizeListener);
+        this.quill.off(Quill.events.EDITOR_CHANGE, this.handleEditorChange);
     }
 
     /**
@@ -83,152 +109,130 @@ export default class InlineEditorToolbar extends React.Component {
      * @param {RangeStatic} oldRange - The old range.
      * @param {Sources} source - The source of the change.
      */
-    handleEditorChange(type, range, oldRange, source) {
+    handleEditorChange = (type, range, oldRange, source) => {
         if (type !== Emitter.events.SELECTION_CHANGE) {
             return;
         }
 
         if (range && range.length > 0 && source === Emitter.sources.USER) {
-            this.setState({
-                range,
-            });
+            this.clearLinkInput();
+        } else if (!this.state.ignoreSelectionReset) {
+            this.clearLinkInput();
+        }
+    };
+
+
+    /**
+     * Special formatting for the link blot.
+     *
+     * @param {MenuItemData} menuItemData - The current state of the menu item.
+     */
+    linkFormatter(menuItemData) {
+        if (menuItemData.active) {
+            const range = this.quill.getSelection();
+            quillUtilities.disableAllBlotsInRange(this.quill, range, LinkBlot);
+            this.clearLinkInput();
         } else {
-            this.setState({
-                range: null,
-            });
+            this.focusLinkInput();
         }
     }
 
     /**
-     * Get the bounds for the current range.
+     * Apply focus to the link input.
      *
-     * @returns {BoundsStatic} The current quill bounds.
+     * We need to temporarily stop ignore selection changes for the link menu (it will lose selection).
      */
-    getBounds() {
-        const { range } = this.state;
-        if (!range) {
-            return null;
-        }
-
-        const numLines = this.quill.getLines(range.index, range.length);
-        let bounds;
-
-        if (numLines.length === 1) {
-            bounds = this.quill.getBounds(range);
-        } else {
-
-            // If multi-line we want to position at the center of the last line's selection.
-            const lastLine = numLines[numLines.length - 1];
-            const index = this.quill.getIndex(lastLine);
-            const length = Math.min(lastLine.length() - 1, range.index + range.length - index);
-            bounds = this.quill.getBounds(new Range(index, length));
-        }
-
-        return bounds;
+    focusLinkInput() {
+        this.setState({
+            showLink: true,
+            ignoreSelectionReset: true,
+            previousRange: this.quill.getSelection(),
+        }, () => {
+            this.linkInput.focus();
+            setTimeout(() => {
+                this.setState({
+                    ignoreSelectionReset: false,
+                });
+            }, 100);
+        });
     }
 
     /**
-     * Calculate the X coordinates for the toolbar and it's nub.
-     *
-     * @returns {Object} - The X coordinates.
-     * @property {number} toolbarPosition
-     * @property {number} nubPosition
+     * Clear the link menu's input content and hide the link menu..
      */
-    getXCoordinates() {
-        const bounds = this.getBounds();
-        if (!bounds) {
-            return null;
-        }
-
-        const containerSize = this.quill.root.offsetWidth;
-        const selfSize = this.toolbar.offsetWidth;
-        const padding = -6;
-        const start = bounds.left;
-        const end = bounds.right;
-
-        const halfToolbarSize = selfSize / 2;
-        const min = halfToolbarSize + padding;
-        const max = containerSize - halfToolbarSize - padding;
-        const averageOffset = Math.round((start + end) / 2);
-
-        const toolbarPosition = Math.max(min, Math.min(max, averageOffset)) - halfToolbarSize;
-        const nubPosition = averageOffset - toolbarPosition;
-
-        return {
-            toolbarPosition,
-            nubPosition,
-        };
+    clearLinkInput() {
+        this.setState({
+            value: "",
+            showLink: false,
+        });
     }
 
     /**
-     * Calculate the Y coordinates for the toolbar and it's nub.
+     * Handle key-presses for the link toolbar.
      *
-     * @returns {Object} - The Y coordinates.
-     * @property {number} toolbarPosition
-     * @property {number} nubPosition
-     * @property {boolean} nubPointsDown
+     * @param {React.KeyboardEvent} event - The key-press event.
      */
-    getYCoordinates() {
-        const bounds = this.getBounds();
-        if (!bounds) {
-            return null;
+    onLinkKeyDown = (event) => {
+        if (Keyboard.match(event.nativeEvent, "enter")) {
+            event.preventDefault();
+            const value = event.target.value || "";
+            this.quill.format('link', value, Emitter.sources.USER);
+            this.clearLinkInput();
         }
 
-        const offset = 0;
-        let toolbarPosition = bounds.top - this.toolbar.offsetHeight - offset;
-        let nubPosition = this.toolbar.offsetHeight;
-        let nubPointsDown = true;
-
-        const isNearStart = bounds.top < 30;
-        if (isNearStart) {
-            toolbarPosition = bounds.bottom + offset;
-            nubPosition = 0 - this.nub.offsetHeight / 2;
-            nubPointsDown = false;
+        if (Keyboard.match(event.nativeEvent, "escape")) {
+            this.clearLinkInput();
+            this.quill.setSelection(this.state.previousRange, Emitter.sources.USER);
         }
+    };
 
-        return {
-            toolbarPosition,
-            nubPosition,
-            nubPointsDown,
-        };
-    }
+    /**
+     * Handle clicks on the link menu's close button.
+     *
+     * @param {React.MouseEvent} event - The click event.
+     */
+    onCloseClick = (event) => {
+        event.preventDefault();
+        this.clearLinkInput();
+        this.quill.setSelection(this.state.previousRange, Emitter.sources.USER);
+    };
+
+    /**
+     * Handle changes to the the close menu's input.
+     *
+     * @param {React.SyntheticEvent} event -
+     */
+    onLinkInputChange = (event) => {
+        this.setState({value: event.target.value});
+    };
 
     /**
      * @inheritDoc
      */
     render() {
-        const x = this.getXCoordinates();
-        const y = this.getYCoordinates();
-        let toolbarStyles = {
-            visibility: "hidden",
-            position: "absolute",
-        };
-        let nubStyles = {};
-        let classes = "richEditor-inlineMenu ";
-
-        if (x && y) {
-            toolbarStyles = {
-                position: "absolute",
-                top: y.toolbarPosition,
-                left: x.toolbarPosition,
-                zIndex: 5,
-                visibility: "visible",
-            };
-
-            nubStyles = {
-                left: x.nubPosition,
-                top: y.nubPosition,
-            };
-
-            classes += y.nubPointsDown ? "isUp" : "isDown";
-        }
-
-
-        return <div className={classes} style={toolbarStyles} ref={(toolbar) => this.toolbar = toolbar}>
-            <EditorToolbar quill={this.quill}/>
-            <div style={nubStyles} className="richEditor-nubPosition" ref={(nub) => this.nub = nub}>
-                <div className="richEditor-nub"/>
-            </div>
+        return <div>
+            <FloatingToolbar quill={this.quill} forceVisibility={this.state.showLink ? "hidden" : "ignore"}>
+                <EditorToolbar quill={this.quill} menuItems={this.menuItems}/>
+            </FloatingToolbar>
+            <FloatingToolbar quill={this.quill} forceVisibility={this.state.showLink ? "visible" : "hidden"}>
+                <div className="richEditor-menu FlyoutMenu insertLink" role="dialog" aria-label={t("Insert Url")}>
+                    <input
+                        value={this.state.value}
+                        onChange={this.onLinkInputChange}
+                        ref={(ref) => this.linkInput = ref}
+                        onKeyDown={this.onLinkKeyDown}
+                        className="InputBox insertLink-input"
+                        placeholder={t("Paste or type a link…")}
+                    />
+                    <a href="#"
+                        aria-label={t("Close")}
+                        className="Close richEditor-close"
+                        role="button"
+                        onClick={this.onCloseClick}>
+                        <span>×</span>
+                    </a>
+                </div>
+            </FloatingToolbar>
         </div>;
     }
 }

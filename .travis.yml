@@ -14,12 +14,15 @@ before_script:
   - composer install --optimize-autoloader
   - composer require phpunit/phpunit ~5
   - tests/travis/setup.sh
-  - yarn
+  - yarn install
+  - yarn install --modules-folder ./plugins/rich-editor
 
 # Cache Composer package files.
 cache:
   directories:
     - $HOME/.composer/cache/files
+    - ./node_modules
+    - ./plugins/rich-editor/node_modules
   yarn: true
 
 # No additional system dependencies to install. Skip the install step.

@@ -371,6 +371,20 @@ jQuery(document).ready(function($) {
         return false;
     });
 
+    // Add noopener to any user content with target="_blank"
+    $("a[target='_blank']")
+        .filter(":not([rel*='noopener']):not([data-allow-opener='true'])")
+            .each(function() {
+            var $this = $(this);
+            var rel = $this.attr("rel");
+
+            if (rel) {
+                $this.attr("rel", rel + " noopener");
+            } else {
+                $this.attr("rel", "noopener");
+            }
+        });
+
     // This turns any anchor with the "Popup" class into an in-page pop-up (the
     // view of the requested in-garden link will be displayed in a popup on the
     // current screen).

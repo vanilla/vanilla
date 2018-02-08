@@ -371,7 +371,11 @@ jQuery(document).ready(function($) {
         return false;
     });
 
-    // Add noopener to any user content with target="_blank"
+    /**
+     * Add `rel='noopener'` to everything on the page.
+     *
+     * If you really need the linked page to have window.opener, set the `data-allow-opener='true'` on your link.
+     */
     $("a[target='_blank']")
         .filter(":not([rel*='noopener']):not([data-allow-opener='true'])")
             .each(function() {

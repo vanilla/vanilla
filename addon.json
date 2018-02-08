@@ -6,6 +6,7 @@
     "icon": "hero_image.png",
     "settingsUrl": "/settings/heroimage",
     "settingsPermission": "Garden.Settings.Manage",
+    "documentationUrl": "https://docs.vanillaforums.com/help/addons/hero-image",
     "author": [
         {
             "name": "Adam Charron",

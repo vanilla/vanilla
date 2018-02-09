@@ -12,7 +12,7 @@
  */
 
 use Garden\EventManager;
-use Vanilla\QuillRenderer;
+use Vanilla\Renderer;
 
 /**
  * Output formatter.
@@ -2454,7 +2454,7 @@ EOT;
     public static function rich($mixed) {
         static $quillRenderer;
         if (!isset($quillRenderer)) {
-            $quillRenderer = new QuillRenderer();
+            $quillRenderer = new Renderer();
         }
 
         $mixed = $quillRenderer->renderDelta($mixed);

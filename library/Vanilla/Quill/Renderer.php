@@ -5,12 +5,12 @@
  * @license https://opensource.org/licenses/GPL-2.0 GPL-2.0
  */
 
-namespace Vanilla;
+namespace Vanilla\Quill;
 
 /**
  * A PHP quill.js renderer for Vanilla.
  */
-class QuillRenderer {
+class Renderer {
 
     /**
      * Render an HTML string from a quill string delta.
@@ -35,18 +35,18 @@ class QuillRenderer {
      *
      * @param string $deltaString - A Quill insert-only delta. https://quilljs.com/docs/delta/.
      *
-     * @returns QuillBlock[]
+     * @returns Blot[]
      */
     private function makeBlocks(string $deltaString): array {
         $delta = json_decode($deltaString, true);
 
-        /** @var QuillOperation[] $operations */
+        /** @var Operation[] $operations */
         $operations = [];
 
         foreach($delta as $opArray) {
-            $operations[] = new QuillOperation($opArray);
+            $operations[] = new Operation($opArray);
         }
-        $blockFactory = new QuillBlockFactory($operations);
+        $blockFactory = new BlotFactory($operations);
 
         return $blockFactory->getBlocks();
     }
@@ -54,11 +54,11 @@ class QuillRenderer {
     /**
      * Render an block element.
      *
-     * @param QuillBlock $block The block of operations to render.
+     * @param Blot $block The block of operations to render.
      *
      * @return string
      */
-    private function renderBlock(QuillBlock $block): string {
+    private function renderBlock(Blot $block): string {
         $attributes = [];
         $addNewLine = false;
         $result = "";
@@ -69,7 +69,7 @@ class QuillRenderer {
         }
 
         switch($block->getBlockType()) {
-            case QuillBlock::TYPE_PARAGRAPH:
+            case Blot::TYPE_PARAGRAPH:
                 $containerTag = "p";
 
                 foreach ($block->getOperations() as $op) {
@@ -85,16 +85,16 @@ class QuillRenderer {
                     $attributes["class"] = 'ql-indent-'.$block->getIndentLevel();
                 }
                 break;
-            case QuillBlock::TYPE_BLOCKQUOTE:
+            case Blot::TYPE_BLOCKQUOTE:
                 $containerTag = "blockquote";
                 break;
-            case QuillBlock::TYPE_HEADER:
+            case Blot::TYPE_HEADER:
                 $containerTag = "h" . $block->getHeaderLevel();
                 break;
-            case QuillBlock::TYPE_LIST:
-                $containerTag = $block->getListType() === QuillOperation::LIST_TYPE_BULLET ? "ul" : "ol";
+            case Blot::TYPE_LIST:
+                $containerTag = $block->getListType() === Operation::LIST_TYPE_BULLET ? "ul" : "ol";
                 break;
-            case QuillBlock::TYPE_CODE:
+            case Blot::TYPE_CODE:
                 $containerTag = "pre";
                 $attributes = [
                     "class" => "ql-syntax",
@@ -127,11 +127,11 @@ class QuillRenderer {
     /**
      * Render an operation
      *
-     * @param QuillOperation $operation
+     * @param Operation $operation
      *
      * @return string
      */
-    private function renderOperation(QuillOperation $operation): string {
+    private function renderOperation(Operation $operation): string {
         // Don't render ops without content.
         if ($operation->getContent() === "") {
             return "";
@@ -139,7 +139,7 @@ class QuillRenderer {
 
         $tags = [];
 
-        if ($operation->getListType() !== QuillOperation::LIST_TYPE_NONE) {
+        if ($operation->getListType() !== Operation::LIST_TYPE_NONE) {
             $listTag = ["name" => "li"];
             $indent = $operation->getIndent();
             if ($indent > 0) {
@@ -194,9 +194,9 @@ class QuillRenderer {
     /**
      * Render an image type operation
      *
-     * @param QuillOperation $operation
+     * @param Operation $operation
      */
-    private function renderImageInsert(QuillOperation $operation) {
+    private function renderImageInsert(Operation $operation) {
         return "<p>".$operation->getContent()."</p>";
     }
 }

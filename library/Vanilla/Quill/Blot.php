@@ -5,12 +5,12 @@
  * @license https://opensource.org/licenses/GPL-2.0 GPL-2.0
  */
 
-namespace Vanilla;
+namespace Vanilla\Quill;
 
 /**
  * Quill Operations still need one more pass before they are easily renderable.
  */
-class QuillBlock {
+class Blot {
     // Block Types
     const TYPE_PARAGRAPH = "paragraph";
     const TYPE_CODE = "code";
@@ -18,11 +18,11 @@ class QuillBlock {
     const TYPE_HEADER = "header";
     const TYPE_LIST = "list";
 
-    /** @var QuillOperation[] */
+    /** @var Operation[] */
     private $operations = [];
 
     /** @var string */
-    private $listType = QuillOperation::LIST_TYPE_NONE;
+    private $listType = Operation::LIST_TYPE_NONE;
 
     /** @var int */
     private $headerLevel = 0;
@@ -36,7 +36,7 @@ class QuillBlock {
     /**
      * QuillBlock constructor.
      *
-     * @param QuillOperation[] $operations The operations to build blocks from.
+     * @param Operation[] $operations The operations to build blocks from.
      */
     public function __construct(array $operations) {
         $this->operations = $operations;
@@ -70,7 +70,7 @@ class QuillBlock {
     }
 
     /**
-     * @return QuillOperation[]
+     * @return Operation[]
      */
     public function getOperations(): array {
         return $this->operations;

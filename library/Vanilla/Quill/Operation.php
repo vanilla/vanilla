@@ -5,12 +5,12 @@
  * @license https://opensource.org/licenses/GPL-2.0 GPL-2.0
  */
 
-namespace Vanilla;
+namespace Vanilla\Quill;
 
 /**
  * A class used to parse a Quill Delta into workable, strictly whitelisted PHP.
  */
-class QuillOperation {
+class Operation {
 
     const INSERT_TYPE_STRING = "string";
     const INSERT_TYPE_IMAGE = "image";

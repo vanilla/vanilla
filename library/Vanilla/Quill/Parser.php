@@ -69,10 +69,6 @@ class Parser {
                         $currentBlotType = $blot;
                     }
 
-                    if ($blotInstance->getNewLineType() === AbstractBlot::NEWLINE_TYPE_START) {
-                        $this->blocks[] = Block::makeEmptyBlock();
-                    }
-
                     $block->pushBlot($blotInstance);
 
                     if ($blotInstance->hasConsumedNextOp()) {
@@ -91,6 +87,9 @@ class Parser {
         foreach ($this->blocks as $block) {
             $result .= $block->render();
         }
+
+        // One last replace to fix the breaks.
+        $result = \preg_replace("/<p><\/p>/", "<p><br></p>", $result);
 
         return $result;
     }

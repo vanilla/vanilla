@@ -8,6 +8,17 @@
 namespace Vanilla\Quill\Formats;
 
 class Bold extends AbstractFormat {
+
+    /**
+     * @inheritDoc
+     */
+    protected static function getBlackListedNestedFormats(): array {
+        return [
+            Link::class,
+            Code::class,
+        ];
+    }
+
     /**
      * @inheritDoc
      */

@@ -47,7 +47,6 @@ class Block {
         }
 
         $result .= "</" . $this->getSurroundingTag() . ">";
-        $result = $this->createLineBreaks($result);
         return $result;
     }
 
@@ -87,15 +86,5 @@ class Block {
         }
 
         return $index;
-    }
-
-    private function createLineBreaks(string $input): string {
-        $surroundingTag = $this->getSurroundingTag();
-
-        $singleNewLineReplacement = "</{$surroundingTag}><{$surroundingTag}>";
-        $doubleNewLineReplacement = "</{$surroundingTag}><{$surroundingTag}><br></{$surroundingTag}><{$surroundingTag}>";
-        $result = \preg_replace("/[\\n]{2,}/", $doubleNewLineReplacement, $input);
-        $result = \preg_replace("/\\n/", $singleNewLineReplacement, $result);
-        return $result;
     }
 }

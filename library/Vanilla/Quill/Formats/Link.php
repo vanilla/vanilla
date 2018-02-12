@@ -8,6 +8,16 @@
 namespace Vanilla\Quill\Formats;
 
 class Link extends AbstractFormat {
+
+    /**
+     * @inheritDoc
+     */
+    protected static function getBlackListedNestedFormats(): array {
+        return [
+            Code::class,
+        ];
+    }
+
     /**
      * @inheritDoc
      */
@@ -32,7 +42,6 @@ class Link extends AbstractFormat {
                 "attributes" => [
                     "href" => $this->currentOperation["attributes"]["link"],
                     "target" => "_blank",
-                    "rel" => "noopener",
                 ],
             ];
         }

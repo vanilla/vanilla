@@ -57,10 +57,7 @@ class TextBlot extends AbstractBlot {
             $result .= self::renderOpeningTag($tag);
         }
 
-        // Trim trailing new lines.
-        $strippedContent = \rtrim($this->content, "\n");
-
-        $result .= $strippedContent;
+        $result .= $this->createLineBreaks($this->content);
         foreach($this->closingTags as $tag) {
             $result .= self::renderClosingTag($tag);
         }
@@ -106,5 +103,12 @@ class TextBlot extends AbstractBlot {
      */
     public function hasConsumedNextOp(): bool {
         return false;
+    }
+
+    private function createLineBreaks(string $input): string {
+        // The replace any leftovers.
+        $singleNewLineReplacement = "</p><p>";
+        $result = \preg_replace("/\\n/", $singleNewLineReplacement, $input);
+        return $result;
     }
 }

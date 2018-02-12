@@ -49,4 +49,8 @@ abstract class AbstractListBlot extends TextBlot {
     public function hasConsumedNextOp(): bool {
         return true;
     }
+
+    protected function trimNewLines() {
+        $this->content = \ltrim($this->content, "\n");
+    }
 }

@@ -8,6 +8,18 @@
 namespace Vanilla\Quill\Formats;
 
 class Italic extends AbstractFormat {
+
+    /**
+     * @inheritDoc
+     */
+    protected static function getBlackListedNestedFormats(): array {
+        return [
+            Bold::class,
+            Link::class,
+            Code::class,
+        ];
+    }
+
     /**
      * @inheritDoc
      */

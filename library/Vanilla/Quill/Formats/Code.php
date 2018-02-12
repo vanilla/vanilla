@@ -8,6 +8,14 @@
 namespace Vanilla\Quill\Formats;
 
 class Code extends AbstractFormat {
+
+    /**
+     * @inheritDoc
+     */
+    protected static function getBlackListedNestedFormats(): array {
+        return [];
+    }
+
     /**
      * @inheritDoc
      */

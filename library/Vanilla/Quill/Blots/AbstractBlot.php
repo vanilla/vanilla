@@ -58,12 +58,15 @@ abstract class AbstractBlot {
             return static::NEWLINE_TYPE_ONLY;
         }
 
-        if (\stringBeginsWith($this->content, "\n")) {
-            $this->content = \ltrim($this->content, "\n");
+        if (\preg_match("/^\\n/", $this->content)) {
             return static::NEWLINE_TYPE_START;
         }
 
         return "";
+    }
+
+    protected function trimNewLines() {
+        return;
     }
 
     /**
@@ -93,5 +96,6 @@ abstract class AbstractBlot {
         $this->previousOperation = $previousOperation;
         $this->currentOperation = $currentOperation;
         $this->nextOperation = $nextOperation;
+        $this->trimNewLines();
     }
 }

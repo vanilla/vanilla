@@ -8,6 +8,18 @@
 namespace Vanilla\Quill\Formats;
 
 class Strike extends AbstractFormat {
+
+    /**
+     * @inheritDoc
+     */
+    protected static function getBlackListedNestedFormats(): array {
+        return [
+            Link::class,
+            Code::class,
+            Italic::class,
+            Bold::class,
+        ];
+    }
     /**
      * @inheritDoc
      */

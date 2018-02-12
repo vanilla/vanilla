@@ -13,6 +13,13 @@ use Vanilla\Quill\Blots\AbstractBlot;
 abstract class AbstractFormat extends AbstractBlot {
 
     /**
+     * Get the formats allowed to be nested inside of this format.
+     *
+     * @return array
+     */
+    abstract protected static function getBlackListedNestedFormats(): array;
+
+    /**
      * Get the name of the HTML tag for this blot.
      *
      * @return string
@@ -63,7 +70,16 @@ abstract class AbstractFormat extends AbstractBlot {
      * @inheritDoc
      */
     public function getOpeningTag(): array {
-        if (!static::matches([$this->previousOperation]) || Link::matches([$this->previousOperation, $this->currentOperation])) {
+        $selfMatchesPrevious = static::matches([$this->previousOperation]);
+        $matchesBlackListedFormat = false;
+        foreach(static::getBlackListedNestedFormats() as $blackListedFormat) {
+            if ($blackListedFormat::matches([$this->previousOperation, $this->currentOperation])) {
+                $matchesBlackListedFormat = true;
+                break;
+            }
+        }
+
+        if (!$selfMatchesPrevious || $matchesBlackListedFormat) {
             return [
                 "tag" => static::getTagName(),
             ];
@@ -76,7 +92,15 @@ abstract class AbstractFormat extends AbstractBlot {
      * @inheritDoc
      */
     public function getClosingTag(): array {
-        if (!static::matches([$this->nextOperation]) || Link::matches([$this->nextOperation, $this->currentOperation])) {
+        $selfMatchesNext = static::matches([$this->nextOperation]);
+        $matchesBlackListedFormat = false;
+        foreach(static::getBlackListedNestedFormats() as $blackListedFormat) {
+            if ($blackListedFormat::matches([$this->nextOperation, $this->currentOperation])) {
+                $matchesBlackListedFormat = true;
+                break;
+            }
+        }
+        if (!$selfMatchesNext || $matchesBlackListedFormat) {
             return [
                 "tag" => static::getTagName(),
             ];

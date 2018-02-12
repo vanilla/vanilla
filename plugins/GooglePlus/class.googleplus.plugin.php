@@ -21,6 +21,19 @@ class GooglePlusPlugin extends Gdn_Plugin {
     /** @var string */
     protected $_AccessToken = null;
 
+    /** @var SsoUtils */
+    private $ssoUtils;
+
+    /**
+     * Constructor.
+     *
+     * @param SsoUtils $ssoUtils
+     */
+    public function __construct(SsoUtils $ssoUtils) {
+        parent::__construct();
+        $this->ssoUtils = $ssoUtils;
+    }
+
     /**
      * Get current access token.
      *
@@ -81,9 +94,12 @@ class GooglePlusPlugin extends Gdn_Plugin {
             'scope' => 'https://www.googleapis.com/auth/userinfo.profile https://www.googleapis.com/auth/userinfo.email'
         ];
 
+        // Get a state token.
+        $stateToken = $this->ssoUtils->getStateToken();
+
         $state = array_merge(
             [
-                'csrf' => SsoUtils::createCSRFToken(),
+                'token' => $stateToken,
             ],
             (array)$extraState
         );
@@ -299,8 +315,8 @@ class GooglePlusPlugin extends Gdn_Plugin {
         }
 
         $state = json_decode(Gdn::request()->get('state', ''), true);
-        $suppliedCSRFToken = val('csrf', $state);
-        SsoUtils::verifyCSRFToken(self::PROVIDER_KEY, $suppliedCSRFToken);
+        $suppliedStateToken = val('token', $state);
+        $this->ssoUtils->verifyStateToken(self::PROVIDER_KEY, $suppliedStateToken);
 
         $code = Gdn::request()->get('code');
         $accessToken = $sender->Form->getFormValue('AccessToken');

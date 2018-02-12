@@ -72,7 +72,7 @@ class AltTest extends TestCase {
                 'Title' => get_called_class(),
                 'Domain' => parse_url($api->getBaseUrl(), PHP_URL_HOST),
                 'Cookie' => [
-                    'Salt' => '',
+                    'Salt' => 'salt',
                     'Name' => 'vf_'.strtolower(get_called_class()).'_ENDTX',
                     'Domain' => '',
                 ],

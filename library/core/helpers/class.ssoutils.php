@@ -43,7 +43,7 @@ class SsoUtils {
         $this->session = $session;
 
         if (!$this->cookieSalt) {
-            throw new Gdn_ErrorException('Cookie salt is empty.');
+            throw new Gdn_UserException('Cookie salt is empty.');
         }
     }
 

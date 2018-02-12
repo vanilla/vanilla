@@ -1,4 +1,4 @@
-@mixin spinnerLoader($dimension: 18px, $thickness: 3px, $color, $speed: 0.7s) {
+@mixin spinnerLoader($dimension: 18px, $thickness: 3px, $color: #0291db, $speed: 0.7s) {
     @include defaultTransition(opacity);
     display: block;
     width: $dimension;
@@ -29,3 +29,28 @@ $spinnerOffset: 73deg;
         transform: rotate(#{360 + $spinnerOffset});
     }
 }
+
+@mixin generateStylesFromMap($map) {
+    @each $property, $value in $map {
+        #{$property} : $value;
+    }
+}
+
+@mixin generateButtonClass($buttonMap) {
+    & {
+        @include generateStylesFromMap(map-get($buttonMap, "default"));
+    }
+
+    &:not([disalbed]) {
+        &:hover {
+            @include generateStylesFromMap(map-get($buttonMap, "hover"));
+            z-index: 2;
+        }
+
+        &:active {
+            @include generateStylesFromMap(map-get($buttonMap, "focus"));
+            z-index: 1;
+        }
+    }
+}
+

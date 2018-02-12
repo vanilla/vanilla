@@ -306,7 +306,7 @@
 
     <h2>Spoiler</h2>
     <div class="spoiler isShowingSpoiler">
-        <button class="button-spoiler">
+        <button class="iconButton button-spoiler">
             <span class="spoiler-warning">
                 <svg class="icon spoiler-icon">
                     <title>Crossed Eye</title>
@@ -340,42 +340,28 @@
     <h2>Code Block - Paragraph</h2>
     <pre class="codeBlock">
         <code class="code">
-            /**
-             * Adds locale data to the view, and adds a respond button to the discussion page.
-             */
-            class MyThemeNameThemeHooks extends Gdn_Plugin {
+/**
+ * Adds locale data to the view, and adds a respond button to the discussion page.
+ */
+class MyThemeNameThemeHooks extends Gdn_Plugin {
 
-                /**
-                 * Fetches the current locale and sets the data for the theme view.
-                 * Render the locale in a smarty template using {$locale}
-                 *
-                 * @param  Controller $sender The sending controller object.
-                 */
-                public function base_render_before($sender) {
-                    // Bail out if we're in the dashboard
-                    if (inSection('Dashboard')) {
-                        return;
-                    }
+    /**
+     * Fetches the current locale and sets the data for the theme view.
+     * Render the locale in a smarty template using {$locale}
+     *
+     * @param  Controller $sender The sending controller object.
+     */
+    public function base_render_beforebase_render_beforebase_render_beforebase_render_beforebase_render_before($sender) {
+        // Bail out if we're in the dashboard
+        if (inSection('Dashboard')) {
+            return;
+        }
 
-                    // Fetch the currently enabled locale (en by default)
-                    $locale = Gdn::locale()->current();
-                    $sender->setData('locale', $locale);
-                }
-
-                /**
-                 * Adds a 'respond' button on a discussion page below the discussion title that links to the comment form.
-                 *
-                 * @param DiscussionController $sender The sending object.
-                 */
-                public function discussionController_afterDiscussionTitle_handlerdiscussionController_afterDiscussionTitle_handlerdiscussionController_afterDiscussionTitle_handler($sender) {
-                    // Ensure the user is signed in.
-                    if (Gdn::session()) {
-                        echo '<div class="below-discussion-title">'.
-                             '  <a class="respond-button Button" href="#Form_Comment">Respond</a>'.
-                             '</div>';
-                    }
-                }
-            }
+        // Fetch the currently enabled locale (en by default)
+        $locale = Gdn::locale()->current();
+        $sender->setData('locale', $locale);
+    }
+}
 
         </code>
     </pre>

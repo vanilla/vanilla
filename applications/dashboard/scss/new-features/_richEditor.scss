@@ -21,10 +21,14 @@ $richEditor-emoji_width: 7 * $richEditor-menuButton_size + 2 * $richEditor-inser
 $richEditor-nub_width: 12px !default;
 $richEditor-menu_borderWidth: 1px !default;
 $richEditor-menu_offset: $richEditor-nub_width !default;
-$richEditor-blockquote_bg: #f4f4f5 !default;
+$richEditor-blockquote_bg: #f9f9fa !default;
 $richEditor-code_fontSize: .86em !default;
-$richEditor-code_verticalPadding: .07em !default;
-$richEditor-code_horizontalPadding: .5em !default;
+$richEditor-inlineCode_verticalPadding: .07em !default;
+$richEditor-inlineCode_horizontalPadding: .5em !default;
+$richEditor-codeBlock_padding: 16px !default;
+$richEditor-code_fg: #000000 !default;
+$richEditor-code_bg: #f9f9fa !default;
+$richEditor-code_borderColor: #cacaca;
 
 .richEditor {
     position: relative;
@@ -113,17 +117,23 @@ $richEditor-code_horizontalPadding: .5em !default;
     }
 }
 
+// button reset
+.iconButton,
 .richEditor-button {
-    display: block;
     position: relative;
     -webkit-appearance: none;
     -moz-appearance: none;
     appearance: none;
     border: 0;
     padding: 0;
+    background: none;
+}
+
+
+.richEditor-button {
+    display: block;
     height: $richEditor-icon_size;
     width: $richEditor-icon_size;
-    background: none;
 
     &.richEditorParagraphMenu-handle {
         background: transparent;
@@ -418,26 +428,63 @@ $richEditor-code_horizontalPadding: .5em !default;
 }
 
 // Code
+.userContent code,
 .code {
-    display: inline-block;
+    display: inline;
     font-size: $richEditor-code_fontSize;
+    vertical-align: middle;
     line-height: 1em;
     border-radius: 3px;
+    border: solid 1px $richEditor-code_borderColor;
     box-sizing: border-box;
+    font-family: monospace;
+    background-color: $richEditor-code_bg;
     padding: {
-        top: $richEditor-code_verticalPadding;
-        bottom: $richEditor-code_verticalPadding;
-        left: $richEditor-code_horizontalPadding;
-        right: $richEditor-code_horizontalPadding;
+        top: $richEditor-inlineCode_verticalPadding;
+        bottom: $richEditor-inlineCode_verticalPadding;
+        left: $richEditor-inlineCode_horizontalPadding;
+        right: $richEditor-inlineCode_horizontalPadding;
     }
 }
 
+.userContent pre,
 .codeBlock { // pre
     overflow-x: auto;
+    background: inherit;
+    border: 0;
+    word-wrap: normal;
+    line-height: 1.4;
+    padding: 0;
+    white-space: pre;
+
     .code {
         display: block;
-        padding: 0;
         background: none;
-        white-space: nowrap;
+        font-size: 1em;
+        padding: 12px;
+        background-color: $richEditor-code_bg;
+    }
+}
+
+
+.userContent {
+    font-size: inherit;
+
+    &,
+    span,
+    div,
+    td,
+    th,
+    code,
+    a,
+    p
+    {
+        word-break: break-word;
+        word-break: break-all;
+    }
+
+    img {
+        max-width: 100%;
+        max-height: 100%;
     }
 }

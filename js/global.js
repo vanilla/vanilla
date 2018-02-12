@@ -378,7 +378,7 @@ jQuery(document).ready(function($) {
      */
     $("a[target='_blank']")
         .filter(":not([rel*='noopener']):not([data-allow-opener='true'])")
-            .each(function() {
+        .each(function() {
             var $this = $(this);
             var rel = $this.attr("rel");
 

@@ -485,23 +485,23 @@ class MyThemeNameThemeHooks extends Gdn_Plugin {
 
     <h2>Embed - Video Placeholder</h2>
     <div class="embedVideo is16by9" aria-label="Video title">
-        <button class="iconButton">
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 22 22">
+        <button class="embedVideo-playButton iconButton" style="background-image: url('https://images.pexels.com/photos/31459/pexels-photo.jpg?w=1260&h=750&dpr=2&auto=compress&cs=tinysrgb')">
+            <svg class="embedVideo-playIcon" xmlns="http://www.w3.org/2000/svg" viewBox="-1 -1 24 24">
                 <title>Play Video</title>
-                <path d="M11,0A11,11,0,1,0,22,11,11,11,0,0,0,11,0Zm0,20.308A9.308,9.308,0,1,1,20.308,11,9.308,9.308,0,0,1,11,20.308Z"/>
-                <polygon points="8.609 6.696 8.609 15.304 16.261 11 8.609 6.696"/>
+                <path class="embedVideo-playIconPath" style="fill: currentColor; stroke-width: .3;" d="M11,0A11,11,0,1,0,22,11,11,11,0,0,0,11,0Zm0,20.308A9.308,9.308,0,1,1,20.308,11,9.308,9.308,0,0,1,11,20.308Z"/>
+                <polygon class="embedVideo-playIconPath" style="fill: currentColor; stroke-width: .3;" points="8.609 6.696 8.609 15.304 16.261 11 8.609 6.696"/>
             </svg>
         </button>
     </div>
 
     <h2>Embed - Video Standard Ratio (default rations include: 21:9, 16:9, 4:3, 1:1) Notice we get a custom class for the ratio </h2>
     <div class="embedVideo is16by9">
-        <iframe class="embed-responsive-item" src="https://www.youtube.com/embed/zpOULjyy-n8?rel=0" allowfullscreen></iframe>
+        <iframe class="embedVideo-iframe" src="https://www.youtube.com/embed/zpOULjyy-n8?rel=0" allowfullscreen></iframe>
     </div>
 
     <h2>Embed - Video Calculated Ratio (default rations include: 21:9, 16:9, 4:3, 1:1. If no standard ratio is found, set padding-top with inline styles on embedVideo element. I'm using 16:9 as an example here, but the technique is the same no matter the ratio. Divide width / height - example: 9/16 gives 56.25%)</h2>
     <div class="embedVideo" style="padding-top: 56.25%;">
-        <iframe class="embed-responsive-item" src="https://www.youtube.com/embed/zpOULjyy-n8?rel=0" allowfullscreen></iframe>
+        <iframe class="embedVideo-iframe" src="https://www.youtube.com/embed/zpOULjyy-n8?rel=0" allowfullscreen></iframe>
     </div>
 
     <h2>Embed - Internal URL</h2>

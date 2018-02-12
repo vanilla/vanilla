@@ -440,11 +440,26 @@ body.isMobile .change-picture .change-picture-instructions {
   background-color: #f9f9fa;
 }
 
-.userContent {
-  font-size: inherit;
+.userContent > *:not(:last-child) {
+  margin-bottom: .6em;
+}
+
+.userContent > *:not(:last-child) + h1,
+.userContent > *:not(:last-child) + h2,
+.userContent > *:not(:last-child) + h3,
+.userContent > *:not(:last-child) + h4,
+.userContent > *:not(:last-child) + h5,
+.userContent > *:not(:last-child) + h6 {
+  margin-top: 9.6px;
 }
 
 .userContent,
+.userContent h1,
+.userContent h2,
+.userContent h3,
+.userContent h4,
+.userContent h5,
+.userContent h6,
 .userContent span,
 .userContent div,
 .userContent td,
@@ -456,9 +471,85 @@ body.isMobile .change-picture .change-picture-instructions {
   word-break: break-all;
 }
 
-.userContent img {
+.userContent iframe,
+.userContent .embedImage-img,
+.userContent img:not(.emoji) {
+  display: block;
+  position: relative;
+  margin-left: auto;
+  margin-right: auto;
   max-width: 100%;
-  max-height: 100%;
+  max-height: 80vh;
+}
+
+.embedVideo {
+  position: relative;
+  display: block;
+  width: 100%;
+  background-color: #000000;
+  padding-left: 0;
+  padding-right: 0;
+  padding-bottom: 0;
+}
+
+.embedVideo.is21by9 {
+  padding-top: 42.8571428571%;
+}
+
+.embedVideo.is16by9 {
+  padding-top: 56.25%;
+}
+
+.embedVideo.is4by3 {
+  padding-top: 75%;
+}
+
+.embedVideo.is1by1 {
+  padding-top: 100%;
+}
+
+.embedVideo iframe,
+.embedVideo .embedVideo-iframe {
+  position: absolute;
+  display: block;
+  top: 0;
+  left: 0;
+  height: 100%;
+  width: 100%;
+}
+
+.embedVideo-playButton {
+  position: absolute;
+  display: block;
+  top: 0;
+  left: 0;
+  height: 100%;
+  width: 100%;
+  background-size: cover;
+  background-repeat: no-repeat;
+  cursor: pointer;
+}
+
+.embedVideo-playIcon {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  margin: auto;
+  width: 80px;
+  height: 80px;
+  color: white;
+}
+
+.embedVideo-playIconPath {
+  stroke: rgba(0, 0, 0, 0.1);
+}
+
+.emoji {
+  width: 20px;
+  height: 20px;
+  vertical-align: -.232em;
 }
 
 .followButton {

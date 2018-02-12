@@ -527,19 +527,21 @@ class MyThemeNameThemeHooks extends Gdn_Plugin {
     <h2>Embed - External URL ~ With Image</h2>
     <a href="#" class="embedLink">
         <article class="embedLink-body">
-            <div class="embedLink-image" aria-hidden="true" style="url(https://cdn.mdn.mozilla.net/static/img/opengraph-logo.72382e605ce3.png)">
+            <div class="embedLink-image" aria-hidden="true" style="background-image: url(https://cdn.mdn.mozilla.net/static/img/opengraph-logo.72382e605ce3.png)">
+
             </div>
             <div class="embedLink-main">
                 <div class="embedLink-header">
                     <h3 class="embedLink-title">
-                        Hulk attacks New York, kills 17, injures 23 in deadliest attack in 5 years
+                        Hulk attacks New York, kills 17, injures 23 in deadliest attack in 5 years   Hulk attacks New York, kills 17, injures 23 in deadliest attack in 5 years
                     </h3>
                     <span class="embedLink-source meta">
                         nytimes.com
                     </span>
                 </div>
                 <div class="embedLink-excerpt">
-                    The Battle of New York, locally known as "The Incident", was a major battle between the Avengers and Loki with his borrowed Chitauri army in Manhattan, New York City. It was, according to Loki's plan, the first battle in Loki's war to subjugate Earth, but the actions of the Avengers neutralized the threat of the Chitauri before they could continue the invasion…
+                    The Battle of New York, locally known as "The Incident",
+                    was a major battle between the Avengers and Loki with his borrowed Chitauri army in Manhattan, New York City. It was, according to Loki's plan, the first battle in Loki's war to subjugate Earth, but the actions of the Avengers neutralized the threat of the Chitauri before they could continue the invasion…
                 </div>
             </div>
         </article>
@@ -551,14 +553,15 @@ class MyThemeNameThemeHooks extends Gdn_Plugin {
             <div class="embedLink-main">
                 <div class="embedLink-header">
                     <h3 class="embedLink-title">
-                        Hulk attacks New York, kills 17, injures 23 in deadliest attack in 5 years
+                        Hulk attacks New York, kills 17, injures 23 in deadliest attack in 5 years   Hulk attacks New York, kills 17, injures 23 in deadliest attack in 5 years
                     </h3>
                     <span class="embedLink-source meta">
                         nytimes.com
                     </span>
                 </div>
                 <div class="embedLink-excerpt">
-                    The Battle of New York, locally known as "The Incident", was a major battle between the Avengers and Loki with his borrowed Chitauri army in Manhattan, New York City. It was, according to Loki's plan, the first battle in Loki's war to subjugate Earth, but the actions of the Avengers neutralized the threat of the Chitauri before they could continue the invasion…
+                    The Battle of New York, locally known as "The Incident",
+                    was a major battle between the Avengers and Loki with his borrowed Chitauri army in Manhattan, New York City. It was, according to Loki's plan, the first battle in Loki's war to subjugate Earth, but the actions of the Avengers neutralized the threat of the Chitauri before they could continue the invasion…
                 </div>
             </div>
         </article>

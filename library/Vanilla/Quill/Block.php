@@ -68,6 +68,26 @@ class Block {
     }
 
     /**
+     * Get the position in the blots array of the first blot of the given type. Defaults to -1.
+     *
+     * @param string $blotType
+     *
+     * @return int
+     */
+    public function getIndexForBlotOfType(string $blotType): int {
+        $index = -1;
+
+        foreach($this->blots as $blotIndex => $blot) {
+            if(get_class($blot) === $blotType) {
+                $index = $blotIndex;
+                break;
+            }
+        }
+
+        return $index;
+    }
+
+    /**
      * Determine the html tag the surrounds the block.
      *
      * @return string
@@ -91,25 +111,5 @@ class Block {
         }
 
         return $result;
-    }
-
-    /**
-     * Get the position in the blots array of the first blot of the given type. Defaults to -1.
-     *
-     * @param string $blotType
-     *
-     * @return int
-     */
-    public function getIndexForBlotOfType(string $blotType): int {
-        $index = -1;
-
-        foreach($this->blots as $blotIndex => $blot) {
-            if(get_class($blot) === $blotType) {
-                $index = $blotIndex;
-                break;
-            }
-        }
-
-        return $index;
     }
 }

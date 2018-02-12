@@ -27,10 +27,18 @@ class HeadingBlot extends TextBlot {
         return $found;
     }
 
+    /**
+     * Get the heading level for the current block.
+     *
+     * @return int
+     */
     public function getHeadingLevel(): int {
         return valr("attributes.header", $this->nextOperation);
     }
 
+    /**
+     * @inheritDoc
+     */
     public function shouldClearCurrentBlock(Block $block): bool {
         return true;
     }

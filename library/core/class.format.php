@@ -2452,18 +2452,13 @@ EOT;
      * @return mixed|string
      */
     public static function rich($mixed) {
-        static $quillRenderer;
-        if (!isset($quillRenderer)) {
-            $quillRenderer = new Renderer();
-        }
-
-        $mixed = $quillRenderer->renderDelta($mixed);
+        $operations = json_decode($mixed, true);
+        $renderer = new Vanilla\Quill\Renderer($operations);
+        $mixed = $renderer->render();
 
         // Always filter after basic parsing.
-        // Wysiwyg is already formatted HTML. Don't try to doubly encode its code blocks.
+        // Wysiwyg editors are already formatted HTML. Don't try to doubly encode its code blocks.
         $filterOptions = ['codeBlockEntities' => false];
-        $sanitized = Gdn_Format::htmlFilter($mixed, $filterOptions);
-
-        return $sanitized;
+        return Gdn_Format::htmlFilter($mixed, $filterOptions);
     }
 }

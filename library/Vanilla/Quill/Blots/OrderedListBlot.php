@@ -8,6 +8,10 @@
 namespace Vanilla\Quill\Blots;
 
 class OrderedListBlot extends AbstractListBlot {
+
+    /**
+     * @inheritDoc
+     */
     protected static function getListType(): string {
         return "ordered";
     }

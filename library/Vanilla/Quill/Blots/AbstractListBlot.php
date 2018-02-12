@@ -11,8 +11,30 @@ use Vanilla\Quill\Block;
 
 abstract class AbstractListBlot extends TextBlot {
 
+    /** @var bool */
+    private $shouldClearCurrentBlock = false;
+
+    /**
+     * Get the type of list.
+     *
+     * @return string
+     */
     abstract protected static function getListType(): string;
 
+    /**
+     * @inheritDoc
+     */
+    public function __construct(array $currentOperation, array $previousOperation, array $nextOperation) {
+        parent::__construct($currentOperation, $previousOperation, $nextOperation);
+        if (\stringBeginsWith($this->content, "\n")) {
+            $this->content = \ltrim($this->content, "\n");
+            $this->shouldClearCurrentBlock = true;
+        }
+    }
+
+    /**
+     * @inheritDoc
+     */
     public function render(): string {
         $classString = "";
         $indentLevel = valr("attributes.indent", $this->nextOperation);
@@ -39,8 +61,11 @@ abstract class AbstractListBlot extends TextBlot {
         return $found;
     }
 
+    /**
+     * @inheritDoc
+     */
     public function shouldClearCurrentBlock(Block $block): bool {
-       return \stringBeginsWith($this->content, "\n");
+       return $this->shouldClearCurrentBlock;
     }
 
     /**
@@ -48,9 +73,5 @@ abstract class AbstractListBlot extends TextBlot {
      */
     public function hasConsumedNextOp(): bool {
         return true;
-    }
-
-    protected function trimNewLines() {
-        $this->content = \ltrim($this->content, "\n");
     }
 }

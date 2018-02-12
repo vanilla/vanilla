@@ -9,11 +9,26 @@ namespace Vanilla\Quill\Formats;
 
 use Vanilla\Quill\Block;
 use Vanilla\Quill\Blots\AbstractBlot;
+use Vanilla\Quill\Blots\TextBlot;
 
+/**
+ * An different type of blot that can contain nested blots inside. Multiple of these can be active at the same time.
+ *
+ * @see TextBlot Usage of these blots can be found in the TextBlot class.
+ *
+ * @package Vanilla\Quill\Formats
+ */
 abstract class AbstractFormat extends AbstractBlot {
 
     /**
-     * Get the formats allowed to be nested inside of this format.
+     * Get the formats allowed that cannot be "nested" inside this one.
+     *
+     * If a format is set here, and is also present on the before/after/current operation, then this format will
+     * always create start/end html tags.
+     *
+     * @example
+     * <strong>Bold only<em>Bold and italic</em><strong> is allowed.
+     * <em>Italic only<strong>italic and bold</strong></em> is not.
      *
      * @return array
      */
@@ -40,11 +55,16 @@ abstract class AbstractFormat extends AbstractBlot {
         return false;
     }
 
-
+    /**
+     * @inheritDoc
+     */
     public function render(): string {
         return "";
     }
 
+    /**
+     * @inheritDoc
+     */
     public function shouldClearCurrentBlock(Block $block): bool {
         return false;
     }

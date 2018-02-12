@@ -8,6 +8,10 @@
 namespace Vanilla\Quill\Blots;
 
 class BulletedListBlot extends AbstractListBlot {
+
+    /**
+     * @inheritDoc
+     */
     protected static function getListType(): string {
         return "bullet";
     }

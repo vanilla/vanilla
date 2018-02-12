@@ -8,7 +8,7 @@
 namespace VanillaTests\Library\Vanilla\Quill;
 
 use PHPUnit\Framework\TestCase;
-use Vanilla\Quill\Parser;
+use Vanilla\Quill\Renderer;
 use Vanilla\Quill\Blots;
 
 
@@ -28,7 +28,7 @@ class ParserTest extends TestCase {
 
         $json = \json_decode($input, true);
 
-        $parser = new Parser($json, $blots);
+        $parser = new Renderer($json, $blots);
 
         $output = $parser->render();
         $this->assertEquals($expectedOutput, $output);

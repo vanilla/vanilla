@@ -8,22 +8,19 @@
 namespace Vanilla\Quill\Blots;
 
 use Vanilla\Quill\Block;
+use Vanilla\Quill\Formats\AbstractFormat;
 
 /**
- * Class AbstractBlot
+ * All blots extend AbstractBlot. Even formats. Blots map lightly to quill blots.
+ *
+ * This is pretty bare-bones so you likely want to extend TextBlot or AbstractFormat instead.
+ * @see TextBlot
+ * @see AbstractFormat
+ * @see https://github.com/quilljs/parchment#blots Explanation of the JS implementation of quill (parchment) blots.
  *
  * @package Vanilla\Quill\Blot
  */
 abstract class AbstractBlot {
-
-    const NEWLINE_TYPE_START = "start";
-    const NEWLINE_TYPE_ONLY = "only";
-
-    /** @var string */
-    protected $currentBlockTagName;
-
-    /** @var string */
-    protected $classnames;
 
     /** @var string */
     protected $content = "";
@@ -37,9 +34,6 @@ abstract class AbstractBlot {
     /** @var array  */
     protected $nextOperation = [];
 
-    /** @var Format */
-    protected $formats = [];
-
     /**
      * Determine if the operations match this Blot type.
      *
@@ -49,25 +43,21 @@ abstract class AbstractBlot {
      */
     abstract public static function matches(array $operations): bool;
 
+    /**
+     * Render the blot into an HTML string.
+     *
+     * @return string
+     */
     abstract public function render(): string;
 
+    /**
+     * Determine whether or not this Blot should clear the current Block.
+     *
+     * @param Block $block
+     *
+     * @return bool
+     */
     abstract public function shouldClearCurrentBlock(Block $block): bool;
-
-    public function getNewLineType(): string {
-        if ($this->content === "\n") {
-            return static::NEWLINE_TYPE_ONLY;
-        }
-
-        if (\preg_match("/^\\n/", $this->content)) {
-            return static::NEWLINE_TYPE_START;
-        }
-
-        return "";
-    }
-
-    protected function trimNewLines() {
-        return;
-    }
 
     /**
      * Determine whether or not this blot uses both current and next operation.
@@ -76,12 +66,18 @@ abstract class AbstractBlot {
      */
     abstract public function hasConsumedNextOp(): bool;
 
-    public function isEmpty(): bool {
-        if ($this->content === "\n" || $this->content === "") {
-            return true;
-        }
+    /**
+     * @return string
+     */
+    public function getContent(): string {
+        return $this->content;
+    }
 
-        return false;
+    /**
+     * @param string $content
+     */
+    public function setContent(string $content) {
+        $this->content = $content;
     }
 
     /**
@@ -90,12 +86,10 @@ abstract class AbstractBlot {
      * @param array $currentOperation The current operation.
      * @param array $previousOperation The next operation. Used to determine closing tags.
      * @param array $nextOperation The previous operation. Used to determine opening tags.
-     * @param int $opIndex
      */
     public function __construct(array $currentOperation, array $previousOperation, array $nextOperation) {
         $this->previousOperation = $previousOperation;
         $this->currentOperation = $currentOperation;
         $this->nextOperation = $nextOperation;
-        $this->trimNewLines();
     }
 }

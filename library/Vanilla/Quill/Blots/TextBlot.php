@@ -12,10 +12,15 @@ use Vanilla\Quill\Block;
 
 class TextBlot extends AbstractBlot {
 
+    /** @var array[] */
     private $openingTags = [];
-    private $closingTags = [];
-    protected $content = "";
 
+    /** @var array[] */
+    private $closingTags = [];
+
+    /**
+     * The inline formats to use.
+     */
     const FORMATS = [
         Formats\Link::class,
         Formats\Bold::class,
@@ -40,6 +45,9 @@ class TextBlot extends AbstractBlot {
         return true;
     }
 
+    /**
+     * @inheritDoc
+     */
     public function render(): string {
         foreach(self::FORMATS as $format) {
             if ($format::matches([$this->currentOperation])) {
@@ -65,11 +73,23 @@ class TextBlot extends AbstractBlot {
         return $result;
     }
 
+    /**
+     * @inheritDoc
+     */
     public function shouldClearCurrentBlock(Block $block): bool {
         return false;
     }
 
-    private static function renderOpeningTag(array $tag) {
+    /**
+     * Render the opening tags for the current blot.
+     *
+     * @param array $tag - The tag to render.
+     * - string $tag
+     * - array $attributes
+     *
+     * @return string;
+     */
+    private static function renderOpeningTag(array $tag): string {
         $tagName = val("tag", $tag);
 
         if (!$tagName) {
@@ -78,8 +98,10 @@ class TextBlot extends AbstractBlot {
 
         $result = "<".$tagName;
 
-        if (\array_key_exists("attributes", $tag)) {
-            foreach ($tag["attributes"] as $attrKey => $attr) {
+        /** @var array $attributes */
+        $attributes = val("attributes", $tag);
+        if ($attributes) {
+            foreach ($attributes as $attrKey => $attr) {
                 $result .= " $attrKey=\"$attr\"";
             }
         }
@@ -88,7 +110,16 @@ class TextBlot extends AbstractBlot {
         return $result;
     }
 
-    private static function renderClosingTag(array $tag) {
+    /**
+     * Render the closing tags for the current blot.
+     *
+     * @param array $tag - The tag to render.
+     * - string $tag
+     * - array $attributes
+     *
+     * @return string;
+     */
+    private static function renderClosingTag(array $tag): string {
         $closingTag = val("tag", $tag);
 
         if (!$closingTag) {
@@ -105,10 +136,12 @@ class TextBlot extends AbstractBlot {
         return false;
     }
 
-    private function createLineBreaks(string $input): string {
-        // The replace any leftovers.
+    /**
+     * @inheritDoc
+     */
+    protected function createLineBreaks(string $input): string {
+        // Replace any newlines with breaks
         $singleNewLineReplacement = "</p><p>";
-        $result = \preg_replace("/\\n/", $singleNewLineReplacement, $input);
-        return $result;
+        return \preg_replace("/\\n/", $singleNewLineReplacement, $input);
     }
 }

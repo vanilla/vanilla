@@ -6,20 +6,28 @@
  */
 
 namespace Vanilla\Quill;
+
 use Vanilla\Quill\Blots\AbstractBlot;
 use Vanilla\Quill\Blots\BulletedListBlot;
 use Vanilla\Quill\Blots\HeadingBlot;
-use Vanilla\Quill\Blots\ListBlot;
 use Vanilla\Quill\Blots\OrderedListBlot;
 use Vanilla\Quill\Blots\TextBlot;
 
 /**
- * Quill Operations still need one more pass before they are easily renderable.
+ * Class to represent a group of a quill blots. One block can contain multiple inline type blots.
+ *
+ * @package Vanilla\Quill
  */
 class Block {
+
     /** @var AbstractBlot[] */
     private $blots = [];
 
+    /**
+     * Create any empty block. When rendered it will output <p><br></p>
+     *
+     * @return Block
+     */
     public static function makeEmptyBlock(): Block {
         $block = new Block();
         $block->blots = [
@@ -50,10 +58,20 @@ class Block {
         return $result;
     }
 
+    /**
+     * Add a blot to this block.
+     *
+     * @param AbstractBlot $blot
+     */
     public function pushBlot(AbstractBlot $blot) {
         $this->blots[] = $blot;
     }
 
+    /**
+     * Determine the html tag the surrounds the block.
+     *
+     * @return string
+     */
     private function getSurroundingTag() {
         $result = "p";
 
@@ -75,6 +93,13 @@ class Block {
         return $result;
     }
 
+    /**
+     * Get the position in the blots array of the first blot of the given type. Defaults to -1.
+     *
+     * @param string $blotType
+     *
+     * @return int
+     */
     public function getIndexForBlotOfType(string $blotType): int {
         $index = -1;
 

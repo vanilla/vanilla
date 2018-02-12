@@ -2704,6 +2704,43 @@ class UserModel extends Gdn_Model {
     }
 
     /**
+     * Search all users by username.
+     *
+     * @param string $name The username to search. Supports wildcards (e.g. user*).
+     * @param string $sortField Column to sort resutls by.
+     * @param string $sortDirection Direction used for column sort.
+     * @param int|bool $limit Maximum results to return.
+     * @param int|bool $offset Offset for result rows.
+     * @return Gdn_DataSet
+     */
+    public function searchByName($name, $sortField = 'name', $sortDirection = 'asc', $limit = false, $offset = false) {
+        $wildcardSearch = (strpos($name, '*') !== false);
+
+        // Preserve existing % by escaping.
+        $name = trim($name);
+        $name = str_replace('%', '\%', $name);
+        if ($wildcardSearch) {
+            // Convert * to new, unescaped %.
+            $name = str_replace('*', '%', $name);
+        }
+
+        // Avoid potential pollution by resetting.
+        $this->SQL->reset();
+        $this->SQL->from('User');
+        if ($wildcardSearch) {
+            $this->SQL->like('Name', $name, 'right');
+        } else {
+            $this->SQL->where('Name', $name);
+        }
+        $result = $this->SQL
+            ->where('Deleted', 0)
+            ->orderBy($sortField, $sortDirection)
+            ->limit($limit, $offset)
+            ->get();
+        return $result;
+    }
+
+    /**
      *
      *
      * @return string
@@ -2722,21 +2759,7 @@ class UserModel extends Gdn_Model {
     public function tagSearch($search, $limit = 10) {
         $search = trim(str_replace(['%', '_'], ['\%', '\_'], $search));
 
-        switch (c('Garden.MentionsOrder')) {
-            case 'Name':
-                $order = 'Name';
-                $direction = 'asc';
-                break;
-            case 'DateLastActive':
-                $order = 'DateLastActive';
-                $direction = 'desc';
-                break;
-            case 'CountComments':
-            default:
-                $order = 'CountComments';
-                $direction = 'desc';
-                break;
-        }
+        list($order, $direction) = $this->getMentionsSort();
 
         return $this->SQL
             ->select('UserID', '', 'id')
@@ -4980,6 +5003,33 @@ class UserModel extends Gdn_Model {
         if ($result === false) {
             throw new Gdn_UserException('The password is too weak.');
         }
+        return $result;
+    }
+
+    /**
+     * Get the proper sort column and direction for a user query, based on the Garden.MentionsOrder config.
+     *
+     * @return array An array of two elements representing a sort: column and direction.
+     */
+    public function getMentionsSort() {
+        $mentionsOrder = c('Garden.MentionsOrder');
+        switch ($mentionsOrder) {
+            case 'Name':
+                $column = 'Name';
+                $direction = 'asc';
+                break;
+            case 'DateLastActive':
+                $column = 'DateLastActive';
+                $direction = 'desc';
+                break;
+            case 'CountComments':
+            default:
+                $column = 'CountComments';
+                $direction = 'desc';
+                break;
+        }
+
+        $result = [$column, $direction];
         return $result;
     }
 }

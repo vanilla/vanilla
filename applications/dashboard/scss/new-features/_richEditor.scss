@@ -30,6 +30,7 @@ $richEditor-code_fg: #000000 !default;
 $richEditor-code_bg: #f9f9fa !default;
 $richEditor-code_borderColor: #cacaca;
 $richEditor-videoPlayIcon_width: 80px;
+$richEditor-videoPlayIcon_hoverColor: #0291db;
 
 .richEditor {
     position: relative;
@@ -154,7 +155,7 @@ $richEditor-videoPlayIcon_width: 80px;
 
     &:hover,
     &:focus,
-    &.isActive{
+    &.isActive {
         .richEditorInline-icon {
             opacity: 1;
         }
@@ -546,6 +547,13 @@ $richEditor-videoPlayIcon_width: 80px;
     iframe,
     .embedVideo-iframe {
         @include absolute-fullSizeOfParent;
+    }
+
+    &:focus,
+    &:hover {
+        .embedVideo-playIcon {
+            transform: scale(1.1);
+        }
     }
 }
 

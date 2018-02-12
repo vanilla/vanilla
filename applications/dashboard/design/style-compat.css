@@ -518,6 +518,10 @@ body.isMobile .change-picture .change-picture-instructions {
   width: 100%;
 }
 
+.embedVideo:focus .embedVideo-playIcon, .embedVideo:hover .embedVideo-playIcon {
+  transform: scale(1.1);
+}
+
 .embedVideo-playButton {
   position: absolute;
   display: block;

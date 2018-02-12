@@ -1,0 +1,88 @@
+$embedLoader_width: 135px;
+$embedLoader-box_bg: #FFFFFF;
+$embedLoader-box_boxShadow: 0 0 2px 0 rgba(0, 0, 0, .3);
+$embedLoader_spinner-width: 42px;
+$embedLoader-spinner-color: #0291db;
+$embedLoader-embedError-bg: rgba(255, 57, 52, .12);
+$embedLoader-embedError-padding: 15px;
+$embedLoader-embedError-shadow: 0 1px 3px 0 rgba(0, 0, 0, .3);
+$embedLoader-closeButton_width: 24px;
+
+.embed {
+
+}
+
+// Loading embed
+
+.embedLoader {
+    display: block;
+    position: relative;
+}
+
+.embedLoader-box {
+    background: $embedLoader-box_bg;
+    box-shadow: $embedLoader-box_boxShadow;
+    width: $embedLoader_width;
+    height: $embedLoader_width;
+    margin: auto;
+}
+
+
+// Loading Error
+
+.embedLoader-errors {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    min-height: $embedLoader_width;
+    margin:0;
+    padding: 0;
+    text-indent: 0;
+    list-style-type: none;
+
+    // todo: undo list styles
+}
+
+.embedLoader-error {
+    display: flex;
+    align-items: center;
+    list-style: none;
+    margin:0;
+    box-shadow: $embedLoader-embedError-shadow;
+    padding: $embedLoader-embedError-padding;
+
+    .embedLoader-warningIcon {
+        align-self: flex-start;
+    }
+
+    .closeButton {
+        opacity: $embedLoader-closeButton_opacity;
+        width: $embedLoader-closeButton_width;
+        height: $embedLoader-closeButton_width;
+        align-self: flex-start;
+        margin: 0 0 0 auto;
+
+        &,
+        &:hover,
+        &:focus
+        {
+            background: none !important;
+            border: 0 !important;
+            color: inherit !important;
+            line-height: normal;
+            overflow: hidden;
+            padding: 0 !important;
+            -webkit-appearance: button !important; /* for input */
+            -webkit-user-select: none !important; /* for button */
+            -moz-user-select: none !important;
+            -ms-user-select: none !important;
+        }
+
+        &:hover,
+        &:focus {
+            opacity: 1;
+        }
+    }
+}
+
+

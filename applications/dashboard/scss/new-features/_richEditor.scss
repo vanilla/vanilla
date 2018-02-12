@@ -21,6 +21,10 @@ $richEditor-emoji_width: 7 * $richEditor-menuButton_size + 2 * $richEditor-inser
 $richEditor-nub_width: 12px !default;
 $richEditor-menu_borderWidth: 1px !default;
 $richEditor-menu_offset: $richEditor-nub_width !default;
+$richEditor-blockquote_bg: #f4f4f5 !default;
+$richEditor-code_fontSize: .86em !default;
+$richEditor-code_verticalPadding: .07em !default;
+$richEditor-code_horizontalPadding: .5em !default;
 
 .richEditor {
     position: relative;
@@ -403,4 +407,37 @@ $richEditor-menu_offset: $richEditor-nub_width !default;
     }
 }
 
+.blockQuote {
+    display: block;
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    width: 100%;
+    vertical-align: middle;
+    background-color: $richEditor-blockquote_bg;
+}
 
+// Code
+.code {
+    display: inline-block;
+    font-size: $richEditor-code_fontSize;
+    line-height: 1em;
+    border-radius: 3px;
+    box-sizing: border-box;
+    padding: {
+        top: $richEditor-code_verticalPadding;
+        bottom: $richEditor-code_verticalPadding;
+        left: $richEditor-code_horizontalPadding;
+        right: $richEditor-code_horizontalPadding;
+    }
+}
+
+.codeBlock { // pre
+    overflow-x: auto;
+    .code {
+        display: block;
+        padding: 0;
+        background: none;
+        white-space: nowrap;
+    }
+}

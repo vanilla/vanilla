@@ -1,9 +1,13 @@
+// This CSS file should always be added after style.css and not be overridden.
+
 // Compatibility
+@import "compatibility/_mixins.scss";
+@import "compatibility/scaffolding";
+@import "compatibility/utilities";
 @import "compatibility/image-cropper";
 
-// This should always be added after style.css and not be overridden.
-@import "compatibility/utilities";
-@import "compatibility/scaffolding";
+// New Features
+@import "new-features/mixins";
 @import "new-features/richEditor";
 @import "new-features/followButton";
 @import "new-features/vanillaIcon";

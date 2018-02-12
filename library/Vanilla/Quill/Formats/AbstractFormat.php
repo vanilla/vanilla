@@ -87,6 +87,13 @@ abstract class AbstractFormat extends AbstractBlot {
     }
 
     /**
+     * Get an attributes array for the blot's tag.
+     */
+    protected function getAttributes(): array {
+        return [];
+    }
+
+    /**
      * @inheritDoc
      */
     public function getOpeningTag(): array {
@@ -102,6 +109,7 @@ abstract class AbstractFormat extends AbstractBlot {
         if (!$selfMatchesPrevious || $matchesBlackListedFormat) {
             return [
                 "tag" => static::getTagName(),
+                "attributes" => $this->getAttributes(),
             ];
         }
 

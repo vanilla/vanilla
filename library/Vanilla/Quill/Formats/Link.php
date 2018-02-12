@@ -33,32 +33,12 @@ class Link extends AbstractFormat {
     }
 
     /**
-     * @inheritDoc
+     * Get an attributes array for the blot's tag.
      */
-    public function getOpeningTag(): array {
-        if (!static::matches([$this->previousOperation])) {
-            return [
-                "tag" => self::getTagName(),
-                "attributes" => [
-                    "href" => $this->currentOperation["attributes"]["link"],
-                    "target" => "_blank",
-                ],
-            ];
-        }
-
-        return [];
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public function getClosingTag(): array {
-        if (!static::matches([$this->nextOperation])) {
-            return [
-                "tag" => static::getTagName(),
-            ];
-        }
-
-        return [];
+    protected function getAttributes(): array {
+        return [
+            "href" => $this->currentOperation["attributes"]["link"],
+            "target" => "_blank",
+        ];
     }
 }

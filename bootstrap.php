@@ -63,10 +63,18 @@ $dic->setInstance('Garden\Container\Container', $dic)
     ->setShared(true)
     ->addAlias('ApplicationManager')
 
+    ->rule(Garden\Web\Cookie::class)
+    ->setShared(true)
+    ->addAlias('Cookie')
+
     // PluginManager
     ->rule('Gdn_PluginManager')
     ->setShared(true)
     ->addAlias('PluginManager')
+
+    ->rule(SsoUtils::class)
+    ->setShared(true)
+    ->addAlias('SsoUtils')
 
     // ThemeManager
     ->rule('Gdn_ThemeManager')
@@ -314,6 +322,13 @@ $dic->call(function (
 
     // Now that all of the events have been bound, fire an event that allows plugins to modify the container.
     $eventManager->fire('container_init', $dic);
+});
+
+// Send out cookie headers.
+register_shutdown_function(function() use ($dic) {
+    $dic->call(function(Garden\Web\Cookie $cookie) {
+        $cookie->flush();
+    });
 });
 
 /**

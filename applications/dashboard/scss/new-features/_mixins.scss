@@ -1,3 +1,13 @@
+@mixin defaultTransition($timing-default: .15s, $easing-default: ease-out, $properties...) {
+    transition-property: $properties;
+    transition-duration: $timing-default;
+    transition-timing-function: $easing-default;
+}
+
+@mixin customCubicBezier($startA, $endA, $startB, $endB){
+    transition-timing-function: cubic-bezier($startA, $endA, $startB, $endB);
+}
+
 @mixin spinnerLoader($dimension: 18px, $thickness: 3px, $color: #0291db, $speed: 0.7s) {
     @include defaultTransition(opacity);
     display: block;

@@ -7,9 +7,19 @@ $embedLoader-embedError-bg: rgba(255, 57, 52, .12);
 $embedLoader-embedError-padding: 15px;
 $embedLoader-embedError-shadow: 0 1px 3px 0 rgba(0, 0, 0, .3);
 $embedLoader-closeButton_width: 24px;
+$embedLoader-closeButton_opacity: .7;
+$embeded-error_bg: rgba(255,57,52,0.12);
+$embeded-icon_width: 24px;
 
 .embed {
+    display: block;
+}
 
+.embedLoader-icon {
+    display: inline-block;
+    width: $embeded-icon_width;
+    height: $embeded-icon_width;
+    flex-basis: $embeded-icon_width;
 }
 
 // Loading embed
@@ -20,11 +30,18 @@ $embedLoader-closeButton_width: 24px;
 }
 
 .embedLoader-box {
+    display: flex;
+    align-items: center;
+    justify-content: center;
     background: $embedLoader-box_bg;
     box-shadow: $embedLoader-box_boxShadow;
     width: $embedLoader_width;
     height: $embedLoader_width;
     margin: auto;
+}
+
+.embedLoader-loader {
+    @include spinnerLoader($embedLoader_spinner-width);
 }
 
 
@@ -45,11 +62,17 @@ $embedLoader-closeButton_width: 24px;
 
 .embedLoader-error {
     display: flex;
+    overflow: hidden;
     align-items: center;
     list-style: none;
     margin:0;
     box-shadow: $embedLoader-embedError-shadow;
     padding: $embedLoader-embedError-padding;
+    background: $embeded-error_bg;
+
+    + .embedLoader-error {
+        margin-top: 12px;
+    }
 
     .embedLoader-warningIcon {
         align-self: flex-start;
@@ -61,6 +84,7 @@ $embedLoader-closeButton_width: 24px;
         height: $embedLoader-closeButton_width;
         align-self: flex-start;
         margin: 0 0 0 auto;
+        cursor: pointer;
 
         &,
         &:hover,
@@ -85,4 +109,83 @@ $embedLoader-closeButton_width: 24px;
     }
 }
 
+.userContent {
+    .embedLoader-errorMessage {
+        max-width: calc(100% - #{$embeded-icon_width * 3});
+        padding-left: $embeded-icon_width;
+    }
+}
 
+.embedImage {
+    display: block;
+    width: $embedImage_width;
+    max-width: 100%;
+    margin: auto;
+}
+
+.embedVideo {
+    position: relative;
+    display: block;
+    width: $embedVideo_width;
+    max-width: 100%;
+    margin: auto;
+
+
+    background-color: #000000;
+    padding: {
+        left: 0;
+        right: 0;
+        bottom: 0;
+    };
+
+    &.is21by9 {
+        padding-top: #{(9/21*100%)};
+    }
+
+    &.is16by9 {
+        padding-top: #{(9/16*100%)};
+    }
+
+    &.is4by3 {
+        padding-top: #{(3/4*100%)};
+    }
+
+    &.is1by1 {
+        padding-top: 100%;
+    }
+
+    iframe,
+    .embedVideo-iframe {
+        @include absolute-fullSizeOfParent;
+    }
+
+    &:focus,
+    &:hover {
+        .embedVideo-playIcon {
+            transform: scale(1.1);
+        }
+    }
+}
+
+.embedVideo-playButton {
+    @include absolute-fullSizeOfParent;
+    background-size: cover;
+    background-repeat: no-repeat;
+    cursor: pointer;
+}
+
+.embedVideo-playIcon {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    margin: auto;
+    width: $richEditor-videoPlayIcon_width;
+    height: $richEditor-videoPlayIcon_width;
+    color: white;
+}
+
+.embedVideo-playIconPath {
+    stroke: rgba(0, 0, 0, 0.1);
+}

@@ -127,6 +127,49 @@ class UsersTest extends AbstractResourceTest {
     }
 
     /**
+     * Test GET /users/names.
+     */
+    public function testNames() {
+        $request = $this->api()->get("{$this->baseUrl}/names");
+
+        $this->assertEquals(200, $request->getStatusCode());
+
+        $rows = $request->getBody();
+        $this->assertNotEmpty($rows);
+        foreach ($rows as $user) {
+            $this->assertArrayHasKey('userID', $user);
+            $this->assertArrayHasKey('name', $user);
+            $this->assertArrayHasKey('photoUrl', $user);
+        }
+
+        $this->pagingTest("{$this->baseUrl}/names");
+    }
+
+    /**
+     * Test filtering with GET /users/names.
+     */
+    public function testNamesFilter() {
+        $users = $this->api()->get($this->baseUrl)->getBody();
+        $testUser = array_pop($users);
+
+        $searchFull = $this->api()->get("{$this->baseUrl}/names", ['name' => $testUser['name']])->getBody();
+        $row = reset($searchFull);
+        $this->assertEquals($testUser['userID'], $row['userID']);
+
+        $partialName = substr($row['name'], 0, -1);
+        $searchWildcard = $this->api()->get("{$this->baseUrl}/names", ['name' => "{$partialName}*"])->getBody();
+        $found = false;
+        foreach ($searchWildcard as $user) {
+            $this->assertStringStartsWith($partialName, $user['name']);
+            if ($testUser['userID'] == $user['userID']) {
+                $found = true;
+                break;
+            }
+        }
+        $this->assertTrue($found, 'Unable to successfully lookup user by name with wildcard.');
+    }
+
+    /**
      * Test PATCH /users/<id> with a full record overwrite.
      */
     public function testPatchFull() {

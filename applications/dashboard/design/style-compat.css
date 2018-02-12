@@ -934,7 +934,32 @@ body.Categories.isMobile .PageControls.Top {
   width: calc(100% - 225px);
 }
 
+.embedLink-header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: flex-start;
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+.embedLink-userName {
+  margin: 0 0 0 12px;
+  padding: 0;
+  color: #555A62;
+  font-weight: bold;
+}
+
+.embedLink-dateTime {
+  font-size: .8em;
+  margin: 0 0 0 12px;
+  padding: 0;
+  color: #737373;
+}
+
 .embedLink-title {
+  display: block;
+  width: 100%;
   margin: 0;
   padding: 0;
   font-size: 14px;
@@ -954,12 +979,17 @@ body.Categories.isMobile .PageControls.Top {
   margin: 6px 0;
 }
 
+.embedLink-source + .embedLink-excerpt {
+  margin-top: 0;
+}
+
 .embedLink-excerpt {
   font-size: 14px;
   color: #555A62;
   overflow: hidden;
   text-overflow: ellipsis;
   word-break: break-word;
+  margin-top: 12px;
   max-width: 100%;
   line-height: 1.5;
   max-height: 63px;

@@ -5,37 +5,38 @@
  * @license GPLv2
  */
 
-namespace VanillaTests\Library\Vanilla;
+namespace VanillaTests\Library\Vanilla\Quill;
 
 use PHPUnit\Framework\TestCase;
-use Vanilla\QuillRenderer;
+use Vanilla\Quill\Renderer;
+use Vanilla\Quill\Blots;
 
-class QuillRendererTest extends TestCase {
 
-    /** @var QuillRenderer */
-    private $renderer;
-
-    public function __construct(string $name = null, array $data = [], string $dataName = '') {
-        parent::__construct($name, $data, $dataName);
-
-        $this->renderer = new QuillRenderer();
-    }
-
+class RendererTest extends TestCase {
     /**
      * @dataProvider directoryProvider
      */
-    public function testRenderDelta($dirname) {
-        $fixturePath = realpath(__DIR__."/../../fixtures/editor-rendering/".$dirname);
+    public function testRender($dirname) {
+        $fixturePath = realpath(__DIR__."/../../../fixtures/editor-rendering/".$dirname);
 
         $input = file_get_contents($fixturePath . "/input.json");
         $expectedOutput = trim(file_get_contents($fixturePath . "/output.html"));
 
-        $output = $this->renderer->renderDelta($input);
+        $blots = [
+            Blots\TextBlot::class,
+        ];
+
+        $json = \json_decode($input, true);
+
+        $parser = new Renderer($json, $blots);
+
+        $output = $parser->render();
         $this->assertEquals($expectedOutput, $output);
     }
 
     public function directoryProvider() {
         return [
+            ["inline-formatting"],
             ["paragraphs"],
             ["headings"],
             ["lists"],

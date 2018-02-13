@@ -1,0 +1,86 @@
+@mixin sr-only() {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0,0,0,0);
+    border: 0;
+}
+
+@mixin absolute-topRight($topOffset:0, $rightOffset:0)
+{
+    position: absolute;
+    top: $topOffset;
+    right: $rightOffset;
+}
+
+@mixin absolute-topLeft($topOffset:0, $leftOffset:0) {
+    position: absolute;
+    top: $topOffset;
+    left: $leftOffset;
+}
+
+@mixin absolute-bottomRight($bottomOffset:0, $rightOffset:0) {
+    position: absolute;
+    bottom: $bottomOffset;
+    right: $rightOffset;
+}
+
+@mixin absolute-bottomLeft($bottomOffset:0, $leftOffset:0) {
+    position: absolute;
+    bottom: $bottomOffset;
+    left: $leftOffset;
+}
+
+@mixin absolute-fullSizeOfParent {
+    position: absolute;
+    display: block;
+    top: 0;
+    left: 0;
+    height: 100%;
+    width: 100%;
+}
+
+@mixin absolute-middleOfParent {
+    position: absolute;
+    display: block;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    max-height: 100%;
+    max-width: 100%;
+    margin: auto;
+}
+
+@mixin absolute-middleLeft($leftOffset:0) {
+    position: absolute;
+    display: block;
+    top: 0;
+    left: $leftOffset;
+    right: 0;
+    bottom: 0;
+    max-height: 100%;
+    max-width: 100%;
+    margin: auto 0;
+}
+
+@mixin absolute-middleRight($rightOffset:0) {
+    position: absolute;
+    display: block;
+    top: 0;
+    right: $rightOffset;
+    bottom: 0;
+    max-height: 100%;
+    max-width: 100%;
+    margin: auto 0;
+}
+
+@mixin noSelect() {
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+}

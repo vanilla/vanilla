@@ -1,0 +1,66 @@
+@mixin defaultTransition($timing-default: .15s, $easing-default: ease-out, $properties...) {
+    transition-property: $properties;
+    transition-duration: $timing-default;
+    transition-timing-function: $easing-default;
+}
+
+@mixin customCubicBezier($startA, $endA, $startB, $endB){
+    transition-timing-function: cubic-bezier($startA, $endA, $startB, $endB);
+}
+
+@mixin spinnerLoader($dimension: 18px, $thickness: 3px, $color: #0291db, $speed: 0.7s) {
+    @include defaultTransition(opacity);
+    display: block;
+    width: $dimension;
+    height: $dimension;
+    border-radius: 50%;
+    border: {
+        top: $thickness solid $color;
+        right: $thickness solid rgba($color, 0.2);
+        bottom: $thickness solid rgba($color, 0.2);
+        left: $thickness solid rgba($color, 0.2);
+    }
+    transform: translateZ(0);
+    animation: spinnerLoader $speed infinite ease-in-out;
+
+    &::after {
+        border-radius: 50%;
+        width: $dimension;
+        height: $dimension;
+    }
+}
+
+$spinnerOffset: 73deg;
+@keyframes spinnerLoader {
+    0% {
+        transform: rotate($spinnerOffset);
+    }
+    100% {
+        transform: rotate(#{360 + $spinnerOffset});
+    }
+}
+
+@mixin generateStylesFromMap($map) {
+    @each $property, $value in $map {
+        #{$property} : $value;
+    }
+}
+
+@mixin generateButtonClass($buttonMap) {
+    & {
+        @include generateStylesFromMap(map-get($buttonMap, "default"));
+    }
+
+    &:not([disalbed]) {
+        &:hover {
+            @include generateStylesFromMap(map-get($buttonMap, "hover"));
+            z-index: 2;
+        }
+
+        &:active {
+            @include generateStylesFromMap(map-get($buttonMap, "focus"));
+            z-index: 1;
+        }
+    }
+}
+

@@ -970,6 +970,7 @@ body.Categories.isMobile .PageControls.Top {
   justify-content: flex-start;
   font-size: 14px;
   line-height: 1.5;
+  margin-bottom: 6px;
 }
 
 .embedLink-userName {
@@ -1005,11 +1006,7 @@ body.Categories.isMobile .PageControls.Top {
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  margin: 6px 0;
-}
-
-.embedLink-source + .embedLink-excerpt {
-  margin-top: 0;
+  margin: 6px 0 0;
 }
 
 .embedLink-excerpt {
@@ -1018,7 +1015,6 @@ body.Categories.isMobile .PageControls.Top {
   overflow: hidden;
   text-overflow: ellipsis;
   word-break: break-word;
-  margin-top: 12px;
   max-width: 100%;
   line-height: 1.5;
   max-height: 63px;

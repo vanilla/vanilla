@@ -50,4 +50,42 @@
         </button>
         {* Paragraph level menu goes here *}
     </div>
+
+    <button type="button" class="test-sagan">
+        TEST - Saganify!
+    </button><br/>
+
+    <button type="button" class="test-spoiler">
+        TEST - Spoiler
+    </button><br/>
+    <button type="button" class="test-blockinline">
+        TEST - Code Block - Inline
+    </button><br/>
+    <button type="button" class="test-blockparagraph">
+        TEST - Code Block - Paragraph
+    </button><br/>
+    <button type="button" class="test-blockquote">
+        TEST - Blockquote
+    </button><br/>
+    <button type="button" class="test-loading">
+        TEST - Embed - Loading
+    </button><br/>
+    <button type="button" class="test-error">
+        TEST - Embed - Error
+    </button><br/>
+    <button type="button" class="test-image">
+        TEST - Embed - Image
+    </button><br/>
+    <button type="button" class="test-video">
+        TEST - Embed - Video
+    </button><br/>
+    <button type="button" class="test-urlinternal">
+        TEST - Embed - Internal URL
+    </button><br/>
+    <button type="button" class="test-urlexternalimage">
+        TEST - Embed - External URL With Image
+    </button><br/>
+    <button type="button" class="test-urlexternal">
+        TEST - Embed - External URL Without Image
+    </button>
 </div>

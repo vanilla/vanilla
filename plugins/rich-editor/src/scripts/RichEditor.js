@@ -7,12 +7,14 @@
 import Quill from "quill/quill";
 import EmojiBlot from "./blots/EmojiBlot.js";
 import ImageBlot from "./blots/ImageBlot.js";
+import SpoilerBlot from "./blots/SpoilerBlot.js";
 import VanillaTheme from "./quill/VanillaTheme";
 import * as utility from "@core/utility";
 
 // Blots
 Quill.register(EmojiBlot);
-// Quill.register(ImageBlot);
+Quill.register(SpoilerBlot);
+Quill.register(ImageBlot);
 
 // Theme
 Quill.register("themes/vanilla", VanillaTheme);
@@ -96,8 +98,28 @@ export default class RichEditor {
         //     }, Quill.sources.USER);
         //     this.quill.setSelection(range.index + 1, Quill.sources.SILENT);
         // };
-        // document.querySelector(".imageButton").addEventListener("click", insertImage);
 
+        const insertSpoiler = () => {
+            const range = this.quill.getSelection(true);
+            const text = this.quill.getText(range.index, range.length);
+            this.quill.insertEmbed(range.index, 'spoiler', {
+                contents: text,
+            }, Quill.sources.USER);
+            this.quill.setSelection(range.index + text.length, Quill.sources.SILENT);
+        };
+        document.querySelector(".test-spoiler").addEventListener("click", insertSpoiler);
+
+
+        // Dummy data
+        const insertText = () => {
+            const range = this.quill.getSelection(true);
+            const blurb = "Quasar rich in mystery Apollonius of Perga concept of the number one rich in mystery! Apollonius of Perga, rogue, hearts of the stars, brain is the seed of intelligence dispassionate extraterrestrial observer finite but unbounded. Tingling of the spine kindling the energy hidden in matter gathered by gravity science Apollonius of Perga Euclid cosmic fugue gathered by gravity take root and flourish dream of the mind's eye descended from astronomers ship of the imagination vastness is bearable only through love with pretty stories for which there's little good evidence Orion's sword. Trillion a billion trillion Apollonius of Perga, not a sunrise but a galaxyrise the sky calls to us! Descended from astronomers?\n" +
+                "Vanquish the impossible, another world. Are creatures of the cosmos, white dwarf Cambrian explosion ship of the imagination colonies, how far away. Venture, extraplanetary stirred by starlight, cosmic ocean across the centuries. With pretty stories for which there's little good evidence extraplanetary concept of the number one culture quasar permanence of the stars, Orion's sword, white dwarf. Something incredible is waiting to be known birth Hypatia tingling of the spine network of wormholes bits of moving fluff ship of the imagination as a patch of light.\n" +
+                "With pretty stories for which there's little good evidence Euclid dream of the mind's eye, rings of Uranus decipherment the sky calls to us descended from astronomers trillion, Tunguska event radio telescope, hydrogen atoms! Concept of the number one, at the edge of forever ship of the imagination, Sea of Tranquility, hydrogen atoms encyclopaedia galactica astonishment something incredible is waiting to be known tendrils of gossamer clouds. The only home we've ever known extraordinary claims require extraordinary evidence. Stirred by starlight made in the interiors of collapsing stars galaxies emerged into consciousness! Dispassionate extraterrestrial observer and billions upon billions upon billions upon billions upon billions upon billions upon billions?";
+            this.quill.insertText(range.index, blurb, Quill.sources.USER);
+            this.quill.setSelection(range.index + blurb.length, Quill.sources.SILENT);
+        };
+        document.querySelector(".test-sagan").addEventListener("click", insertText);
     }
 
     /**

@@ -12,7 +12,7 @@ export default class EmojiBlot extends Embed {
     static value(node) {
         return {
             emojiChar: this.emojiData.emojiChar,
-        }
+        };
     }
 }
 

@@ -34,7 +34,7 @@ class TextBlot extends AbstractBlot {
      */
     public function __construct(array $currentOperation, array $previousOperation, array $nextOperation) {
         parent::__construct($currentOperation, $previousOperation, $nextOperation);
-        $this->content = val("insert", $this->currentOperation, "");
+        $this->content = val("insert", $this->currentOperation);
     }
 
 
@@ -42,7 +42,16 @@ class TextBlot extends AbstractBlot {
      * @inheritDoc
      */
     public static function matches(array $operations): bool {
-        return true;
+        $matches = false;
+
+        foreach ($operations as $op) {
+            if (\is_string(val("insert", $op))) {
+                $matches = true;
+                break;
+            }
+        }
+
+        return $matches;
     }
 
     /**

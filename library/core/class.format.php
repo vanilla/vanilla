@@ -995,7 +995,7 @@ class Gdn_Format {
         if (preg_match('/target="_blank"/i', $html)) {
             $htmlDom = pQuery::parseStr($html);
 
-            foreach($htmlDom->query('a[target="_blank"]') as $targetBlankLink) {
+            foreach($htmlDom->query('a[target="_blank"]:not([rel*="noopener"])') as $targetBlankLink) {
                 $rel = $targetBlankLink->attr("rel");
                 if ($rel) {
                     $targetBlankLink->attr("rel", $rel . " noopener");

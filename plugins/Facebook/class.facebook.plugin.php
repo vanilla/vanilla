@@ -21,6 +21,19 @@ class FacebookPlugin extends Gdn_Plugin {
     /** @var null  */
     protected $_RedirectUri = null;
 
+    /** @var SsoUtils */
+    private $ssoUtils;
+
+    /**
+     * Constructor.
+     *
+     * @param SsoUtils $ssoUtils
+     */
+    public function __construct(SsoUtils $ssoUtils) {
+        parent::__construct();
+        $this->ssoUtils = $ssoUtils;
+    }
+
     /**
      * Retrieve an access token from the session.
      *
@@ -283,8 +296,8 @@ class FacebookPlugin extends Gdn_Plugin {
         $sender->permission('Garden.SignIn.Allow');
 
         $state = json_decode(Gdn::request()->get('state', ''), true);
-        $suppliedCSRFToken = val('csrf', $state);
-        SsoUtils::verifyCSRFToken('facebookSocial', $suppliedCSRFToken);
+        $suppliedStateToken = val('token', $state);
+        $this->ssoUtils->verifyStateToken('facebookSocial', $suppliedStateToken);
 
         $sender->getUserInfo($userReference, $username, '', true);
         $sender->_setBreadcrumbs(t('Connections'), '/profile/connections');
@@ -372,8 +385,8 @@ class FacebookPlugin extends Gdn_Plugin {
         }
 
         $state = json_decode(Gdn::request()->get('state', ''), true);
-        $suppliedCSRFToken = val('csrf', $state);
-        SsoUtils::verifyCSRFToken('facebook', $suppliedCSRFToken);
+        $suppliedStateToken = val('token', $state);
+        $this->ssoUtils->verifyStateToken('facebook', $suppliedStateToken);
 
         if (isset($_GET['error'])) { // TODO global nope x2
             throw new Gdn_UserException(val('error_description', $_GET, t('There was an error connecting to Facebook')));
@@ -532,14 +545,14 @@ class FacebookPlugin extends Gdn_Plugin {
             $redirectUri .= '&'.$query;
         }
 
-        // Generate a CSRF token.
-        $csrfToken = SsoUtils::createCSRFToken();
+        // Get a state token.
+        $stateToken = $this->ssoUtils->getStateToken();
 
         $authQuery = http_build_query([
             'client_id' => $appID,
             'redirect_uri' => $redirectUri,
             'scope' => $scopes,
-            'state' => json_encode(['csrf' => $csrfToken]),
+            'state' => json_encode(['token' => $stateToken]),
         ]);
         $signinHref = "https://graph.facebook.com/oauth/authorize?{$authQuery}";
 

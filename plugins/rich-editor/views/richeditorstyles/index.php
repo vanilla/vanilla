@@ -305,7 +305,7 @@
 <div class="userContent">
 
     <h2>Spoiler</h2>
-    <div class="spoiler isShowingSpoiler">
+    <div class="spoiler isOpen">
         <button class="iconButton button-spoiler">
             <span class="spoiler-warning">
                 <span class="spoiler-warningMain">

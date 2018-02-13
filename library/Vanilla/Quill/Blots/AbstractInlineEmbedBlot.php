@@ -18,14 +18,7 @@ abstract class AbstractInlineEmbedBlot extends AbstractBlot {
      *
      * @return string
      */
-    abstract protected static function getHTMLTag(): string;
-
-    /**
-     * Get the class for the wrapping HTML tag. This will generally not be a
-     *
-     * @return string
-     */
-    abstract protected static function getHTMLTagClass(): string;
+    abstract protected static function getContainerHTMLTag(): string;
 
     /**
      * Get the key to pull the main content out of the currentBlot.
@@ -33,6 +26,13 @@ abstract class AbstractInlineEmbedBlot extends AbstractBlot {
      * @return string
      */
     abstract protected static function getInsertKey(): string;
+
+    /**
+     * Get the class for the wrapping HTML tag. This will generally not be a
+     *
+     * @return string
+     */
+    abstract protected function getContainerHMTLAttributes(): array;
 
     /**
      * @inheritDoc
@@ -46,17 +46,17 @@ abstract class AbstractInlineEmbedBlot extends AbstractBlot {
      * @inheritDoc
      */
     public function render(): string {
-        $result = "<" . static::getHTMLTag();
+        $result = "<" . static::getContainerHTMLTag();
 
-        $class = static::getHTMLTagClass();
-        if ($class) {
-            $result .= " class=\"$class\"";
+        $attributes = $this->getContainerHMTLAttributes();
+        foreach ($attributes as $attrKey => $attr) {
+            $result .= " $attrKey=\"$attr\"";
         }
         $result .= ">";
         $result .= static::ZERO_WIDTH_WHITESPACE;
-        $result .= "<span contenteditable='false'>" . $this->content . "</span>";
+        $result .= "<span contenteditable=\"false\">" . $this->content . "</span>";
         $result .= static::ZERO_WIDTH_WHITESPACE;
-        $result .= "</" . static::getHTMLTag() . ">";
+        $result .= "</" . static::getContainerHTMLTag() . ">";
 
         return $result;
     }
@@ -93,15 +93,6 @@ abstract class AbstractInlineEmbedBlot extends AbstractBlot {
      * @inheritDoc
      */
     public static function matches(array $operations): bool {
-        $found = false;
-
-        foreach($operations as $op) {
-            if(valr(static::getInsertKey(), $op)) {
-                $found = true;
-                break;
-            }
-        }
-
-        return $found;
+        return valr(static::getInsertKey(), $operations[0]);
     }
 }

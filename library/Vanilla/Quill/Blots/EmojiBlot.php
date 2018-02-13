@@ -12,15 +12,18 @@ class EmojiBlot extends AbstractInlineEmbedBlot {
     /**
      * @inheritDoc
      */
-    protected static function getHTMLTag(): string {
+    protected static function getContainerHTMLTag(): string {
         return "span";
     }
 
     /**
      * @inheritDoc
      */
-    protected static function getHTMLTagClass(): string {
-        return "emoji";
+    protected function getContainerHMTLAttributes(): array {
+        return [
+            "class" => "emoji",
+            "data-emoji-char" => $this->content,
+        ];
     }
 
     /**

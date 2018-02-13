@@ -40,6 +40,7 @@ class RendererTest extends TestCase {
             ["paragraphs"],
             ["headings"],
             ["lists"],
+            ["emoji"],
             ["everything"],
         ];
     }

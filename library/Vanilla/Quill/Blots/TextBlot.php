@@ -34,7 +34,7 @@ class TextBlot extends AbstractBlot {
      */
     public function __construct(array $currentOperation, array $previousOperation, array $nextOperation) {
         parent::__construct($currentOperation, $previousOperation, $nextOperation);
-        $this->content = val("insert", $this->currentOperation);
+        $this->content = \htmlentities(val("insert", $this->currentOperation), \ENT_QUOTES);
     }
 
 

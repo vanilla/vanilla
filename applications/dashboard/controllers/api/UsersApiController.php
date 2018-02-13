@@ -184,10 +184,10 @@ class UsersApiController extends AbstractApiController {
         $this->permission('Garden.SignIn.Allow');
 
         $in = $this->schema([
-            'name:s?' => 'Filter for username. Supports full or wildcard matches (e.g. User*).',
+            'name:s' => 'Filter for username. Supports full or partial matching with appended wildcard (e.g. User*).',
             'order:s?' => [
                 'description' => 'Sort method for results.',
-                'enum' => ['name', 'dateLastActive', 'countComments', 'mention'],
+                'enum' => ['countComments', 'dateLastActive', 'name', 'mention'],
                 'default' => 'name'
             ],
             'page:i?' => [
@@ -201,18 +201,13 @@ class UsersApiController extends AbstractApiController {
                 'minimum' => 1,
                 'maximum' => 100,
             ]
-        ], 'in');
+        ], 'in')->setDescription('Search for users by full or partial name matching.');
         $out = $this->schema([
             ':a' => Schema::parse(['userID', 'name', 'photoUrl'])->add($this->userSchema())
         ], 'out');
 
         $query = $in->validate($query);
         list($offset, $limit) = offsetLimit("p{$query['page']}", $query['limit']);
-
-        $filters = [];
-        if (!empty($query['name'])) {
-            $filters['name'] = trim(str_replace('*', '%', $query['name']));
-        }
 
         if ($query['order'] == 'mention') {
             list($sortField, $sortDirection) = $this->userModel->getMentionsSort();
@@ -229,15 +224,9 @@ class UsersApiController extends AbstractApiController {
             }
         }
 
-        if (!empty($query['name'])) {
-            $rows = $this->userModel
-                ->searchByName($query['name'], $sortField, $sortDirection, $limit, $offset)
-                ->resultArray();
-        } else {
-            $rows = $this->userModel
-                ->getWhere([], $sortField, $sortDirection, $limit, $offset)
-                ->resultArray();
-        }
+        $rows = $this->userModel
+            ->searchByName($query['name'], $sortField, $sortDirection, $limit, $offset)
+            ->resultArray();
 
         foreach ($rows as &$row) {
             $this->userModel->setCalculatedFields($row);

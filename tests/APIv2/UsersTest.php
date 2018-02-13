@@ -127,40 +127,43 @@ class UsersTest extends AbstractResourceTest {
     }
 
     /**
-     * Test GET /users/names.
+     * Test full-name filtering with GET /users/names.
      */
-    public function testNames() {
-        $request = $this->api()->get("{$this->baseUrl}/names");
-
-        $this->assertEquals(200, $request->getStatusCode());
-
-        $rows = $request->getBody();
-        $this->assertNotEmpty($rows);
-        foreach ($rows as $user) {
-            $this->assertArrayHasKey('userID', $user);
-            $this->assertArrayHasKey('name', $user);
-            $this->assertArrayHasKey('photoUrl', $user);
-        }
-
-        $this->pagingTest("{$this->baseUrl}/names");
-    }
-
-    /**
-     * Test filtering with GET /users/names.
-     */
-    public function testNamesFilter() {
+    public function testNamesFull() {
         $users = $this->api()->get($this->baseUrl)->getBody();
         $testUser = array_pop($users);
 
-        $searchFull = $this->api()->get("{$this->baseUrl}/names", ['name' => $testUser['name']])->getBody();
+        $request = $this->api()->get("{$this->baseUrl}/names", ['name' => $testUser['name']]);
+        $this->assertEquals(200, $request->getStatusCode());
+        $searchFull = $request->getBody();
         $row = reset($searchFull);
         $this->assertEquals($testUser['userID'], $row['userID']);
+    }
 
-        $partialName = substr($row['name'], 0, -1);
-        $searchWildcard = $this->api()->get("{$this->baseUrl}/names", ['name' => "{$partialName}*"])->getBody();
+    /**
+     * Test partial-name filtering with GET /users/names.
+     */
+    public function testNamesWildcard() {
+        $users = $this->api()->get($this->baseUrl)->getBody();
+        $testUser = array_pop($users);
+
+        $partialName = substr($testUser['name'], 0, -1);
+        $request = $this->api()->get("{$this->baseUrl}/names", ['name' => "{$partialName}*"]);
+        $this->assertEquals(200, $request->getStatusCode());
+        $searchWildcard = $request->getBody();
+        $this->assertNotEmpty($searchWildcard);
+
         $found = false;
         foreach ($searchWildcard as $user) {
+            // Make sure all the required fields are included.
+            $this->assertArrayHasKey('userID', $user);
+            $this->assertArrayHasKey('name', $user);
+            $this->assertArrayHasKey('photoUrl', $user);
+
+            // Make sure this is a valid match.
             $this->assertStringStartsWith($partialName, $user['name']);
+
+            // Make sure our user is actually in the result.
             if ($testUser['userID'] == $user['userID']) {
                 $found = true;
                 break;

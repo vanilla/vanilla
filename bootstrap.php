@@ -74,7 +74,6 @@ $dic->setInstance('Garden\Container\Container', $dic)
 
     ->rule(SsoUtils::class)
     ->setShared(true)
-    ->addAlias('SsoUtils')
 
     // ThemeManager
     ->rule('Gdn_ThemeManager')

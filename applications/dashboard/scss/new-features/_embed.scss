@@ -304,5 +304,9 @@ $embedded-linkImage_width: 225px !default;
     max-height: #{$embedded-linkTitle_lineHeight * $embedded-linkTitle_fontSize * 3}
 }
 
-
+.blockQuote {
+    padding: 3px 3px 3px 18px;
+    border-left: solid #D8D8D8 6px;
+    color: #A3A3A3;
+}
 

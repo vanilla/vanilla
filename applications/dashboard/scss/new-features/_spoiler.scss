@@ -3,7 +3,7 @@ $spoiler-borderRadius: 2px !default;
 $spoiler-bg: #fff8d9 !default;
 $spoiler-fontSize: 16px !default;
 $spoiler-horizontalPadding: 18px !default;
-$spoiler-icon_size: 30px !default;
+$spoiler-icon_size: 24px !default;
 $buttonSpoiler-fg: #555a62 !default;
 $buttonSpoiler-bg: transparent !default;
 $buttonSpoiler-hover_fg: #f52c6e !default;
@@ -80,24 +80,49 @@ $buttonSpoiler: (
     padding: 0 $spoiler-horizontalPadding;
     outline: 0;
     cursor: pointer;
-
-    .spoiler-icon {
-        @include absolute-topLeft(50%);
-        transform: translateY(-50%);
-        width: $spoiler-icon_size;
-        height: $spoiler-icon_size;
-    }
+    text-align: center;
 }
 
-.spoiler-warning {
+.spoiler-warningMain {
     position: relative;
-    top: .1em;
-    padding-left: #{$spoiler-icon_size + 6px};
+    display: flex;
+    box-sizing: border-box;
+    justify-content: center;
+    padding: 0 $spoiler-icon_size;
+    width: 100%;
+    line-height: 1;
 
+    //top: .1em;
+    //padding-left: #{$spoiler-icon_size + 6px};
+}
+
+.spoiler-icon {
+    position: relative;
+    width: $spoiler-icon_size;
+    height: $spoiler-icon_size;
+    margin-right: 12px;
 }
 
 .spoiler-chevron {
-    margin-left: 6px;
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    width: $spoiler-icon_size * 1.5;
+    height: $spoiler-icon_size * 2;
+    display: flex;
+    align-items: center;
+}
+
+.spoiler-warningAfter,
+.spoiler-warningBefore
+{
+    margin: 0;
+    padding: 0;
+}
+
+.spoiler-warningBefore {
+    margin-right: 6px;
 }
 
 .spoiler-content {

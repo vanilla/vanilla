@@ -21,18 +21,21 @@ $richEditor-emoji_width: 7 * $richEditor-menuButton_size + 2 * $richEditor-inser
 $richEditor-nub_width: 12px !default;
 $richEditor-menu_borderWidth: 1px !default;
 $richEditor-menu_offset: $richEditor-nub_width !default;
-$richEditor-blockquote_bg: #f9f9fa !default;
 $richEditor-code_fontSize: .86em !default;
 $richEditor-inlineCode_verticalPadding: .07em !default;
 $richEditor-inlineCode_horizontalPadding: .5em !default;
 $richEditor-codeBlock_padding: 16px !default;
 $richEditor-code_fg: #000000 !default;
-$richEditor-code_bg: #f9f9fa !default;
-$richEditor-code_borderColor: #cacaca;
+$richEditor-inlineCode_borderRadius: 2;
+$richEditor-inlineCode_borderColor: #a3a3a3;
+$richEditor-paragraphCode_bg: #f6f8fa;
+$richEditor-paragraphCode_fontSize: 14px;
+
 $richEditor-videoPlayIcon_width: 80px;
 $richEditor-videoPlayIcon_hoverColor: #0291db;
 $embedVideo_width: 640px;
 $embedImage_width: 640px;
+$embedded-quote_fg: #A3A3A3 !default;
 
 .richEditor {
     position: relative;
@@ -423,11 +426,17 @@ $embedImage_width: 640px;
 .blockQuote {
     display: block;
     margin: 0;
-    padding: 0;
+    padding: {
+        top: 0;
+        left: 18px;
+        right: 0;
+        bottom: 0;
+    };
     box-sizing: border-box;
     width: 100%;
     vertical-align: middle;
-    background-color: $richEditor-blockquote_bg;
+    border-left: solid #D8D8D8 6px;
+    color: $embedded-quote_fg;
 }
 
 // Code
@@ -437,11 +446,15 @@ $embedImage_width: 640px;
     font-size: $richEditor-code_fontSize;
     vertical-align: middle;
     line-height: 1em;
-    border-radius: 3px;
-    border: solid 1px $richEditor-code_borderColor;
     box-sizing: border-box;
     font-family: monospace;
-    background-color: $richEditor-code_bg;
+    background: transparent;
+    border: {
+        radius: $richEditor-inlineCode_borderRadius;
+        width: 1px;
+        style: solid;
+        color: $richEditor-inlineCode_borderColor;
+    }
     padding: {
         top: $richEditor-inlineCode_verticalPadding;
         bottom: $richEditor-inlineCode_verticalPadding;
@@ -461,11 +474,13 @@ $embedImage_width: 640px;
     white-space: pre;
 
     .code {
+        border-radius: 0;
+        border: 0;
         display: block;
         background: none;
-        font-size: 1em;
         padding: 12px;
-        background-color: $richEditor-code_bg;
+        font-size: $richEditor-paragraphCode_fontSize;
+        background-color: $richEditor-paragraphCode_bg;
     }
 }
 
@@ -502,6 +517,7 @@ $embedImage_width: 640px;
     {
         word-break: break-word;
         text-overflow: ellipsis;
+        line-height: 1.5;
     }
 
     iframe,

@@ -53,9 +53,7 @@ abstract class AbstractInlineEmbedBlot extends AbstractBlot {
             $result .= " $attrKey=\"$attr\"";
         }
         $result .= ">";
-        $result .= static::ZERO_WIDTH_WHITESPACE;
         $result .= "<span contenteditable=\"false\">" . $this->content . "</span>";
-        $result .= static::ZERO_WIDTH_WHITESPACE;
         $result .= "</" . static::getContainerHTMLTag() . ">";
 
         return $result;

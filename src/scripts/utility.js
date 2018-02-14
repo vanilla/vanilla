@@ -204,3 +204,15 @@ export const t = translate;
  * Re-exported from sprintf-js https://www.npmjs.com/package/sprintf-js
  */
 // export const sprintf = sprintfJs.sprintf;
+
+/**
+ * The htmlStringToElement function is for creating HTML templates from a string
+ * Do _NOT_ use with data from user input, as it can be a security hole
+ *
+ * @type {Element}
+ */
+export const htmlStringToElement = (html) => {
+    const template = document.createElement('template');
+    template.innerHTML = html.trim();
+    return template.content.firstChild;
+};

@@ -8,13 +8,24 @@ import Quill from "quill/quill";
 import EmojiBlot from "./blots/EmojiBlot.js";
 import ImageBlot from "./blots/ImageBlot.js";
 import SpoilerBlot from "./blots/SpoilerBlot.js";
+import CodeInlineBlot from "./formats/CodeInlineBlot.js";
+import CodeBlockBlot from "./blots/CodeBlockBlot.js";
+import VideoBlot from "./blots/VideoBlot.js";
 import VanillaTheme from "./quill/VanillaTheme";
 import * as utility from "@core/utility";
 
 // Blots
 Quill.register(EmojiBlot);
-Quill.register(SpoilerBlot);
 Quill.register(ImageBlot);
+Quill.register(SpoilerBlot);
+Quill.register(CodeInlineBlot);
+Quill.register(CodeBlockBlot);
+Quill.register(VideoBlot);
+
+
+// Quill.register({
+//     'formats/code-inline': CodeInlineBlot,
+// });
 
 // Theme
 Quill.register("themes/vanilla", VanillaTheme);
@@ -102,8 +113,8 @@ export default class RichEditor {
         const insertSpoiler = () => {
             const range = this.quill.getSelection(true);
             const text = this.quill.getText(range.index, range.length);
-            this.quill.insertEmbed(range.index, 'spoiler', {
-                contents: text,
+            this.quill.insertEmbed(range.index, 'list', {
+                content: text,
             }, Quill.sources.USER);
             this.quill.setSelection(range.index + text.length, Quill.sources.SILENT);
         };
@@ -120,7 +131,64 @@ export default class RichEditor {
             this.quill.setSelection(range.index + blurb.length, Quill.sources.SILENT);
         };
         document.querySelector(".test-sagan").addEventListener("click", insertText);
+
+
+        // Code Block - Inline
+        const insertInlineCodeBlock = () => {
+            const range = this.quill.getSelection(true);
+            const text = this.quill.getText(range.index, range.length);
+
+            this.quill.deleteText(range.index, range.length, Quill.sources.SILENT);
+
+            this.quill.insertEmbed(range.index, 'code-inline', {
+                content: text,
+            }, Quill.sources.USER);
+            this.quill.setSelection(range.index + text.length, Quill.sources.SILENT);
+
+            // this.quill.formatText(range.index, text.length, 'code-inline', {
+            //     content: text,
+            // }, Quill.sources.USER);
+            // this.quill.setSelection(range.index, text.length, Quill.sources.SILENT);
+
+        };
+        document.querySelector(".test-blockinline").addEventListener("click", insertInlineCodeBlock);
+
+        // Code Block - Block
+        const insertCodeBlockBlock = () => {
+            const range = this.quill.getSelection(true);
+            const text = this.quill.getText(range.index, range.length);
+            console.log("code block text: ", text);
+            // this.quill.deleteText(range.index, range.length, Quill.sources.SILENT);
+            this.quill.insertEmbed(range.index, 'code-block', {
+                content: text,
+            }, Quill.sources.USER);
+            this.quill.setSelection(range.index + text.length, Quill.sources.SILENT);
+        };
+        document.querySelector(".test-blockparagraph").addEventListener("click", insertCodeBlockBlock);
+
+
+
+
+        // Code Block - Block
+        const insertVideo = () => {
+            const range = this.quill.getSelection(true);
+            // this.quill.deleteText(range.index, range.length, Quill.sources.SILENT);
+            this.quill.insertEmbed(range.index, 'video-placeholder', {
+                photoUrl: 'https://i.ytimg.com/vi/QljRe99OMCU/hqdefault.jpg',
+                url: 'https://www.youtube.com/watch?v=QljRe99OMCU',
+                width: 480,
+                height: 360,
+                ratio: "4:3",
+
+            }, Quill.sources.USER);
+            this.quill.setSelection(range.index + 1, Quill.sources.SILENT);
+        };
+        document.querySelector(".test-video").addEventListener("click", insertVideo);
+
     }
+
+
+
 
     /**
      * For compatibility with the legacy base theme's javascript the Quill Delta needs to always be in the main form

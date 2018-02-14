@@ -409,13 +409,14 @@ body.isMobile .change-picture .change-picture-instructions {
 
 .userContent code,
 .code {
-  display: inline;
+  display: inline-block;
   font-size: 0.86em;
   vertical-align: middle;
   line-height: 1em;
   box-sizing: border-box;
   font-family: monospace;
   background: transparent;
+  margin: 0 1ex;
   border-radius: 2;
   border-width: 1px;
   border-style: solid;
@@ -862,26 +863,6 @@ body.Categories.isMobile .PageControls.Top {
   width: 640px;
   max-width: 100%;
   margin: auto;
-  background-color: #000000;
-  padding-left: 0;
-  padding-right: 0;
-  padding-bottom: 0;
-}
-
-.embedVideo.is21by9 {
-  padding-top: 42.8571428571%;
-}
-
-.embedVideo.is16by9 {
-  padding-top: 56.25%;
-}
-
-.embedVideo.is4by3 {
-  padding-top: 75%;
-}
-
-.embedVideo.is1by1 {
-  padding-top: 100%;
 }
 
 .embedVideo iframe,
@@ -896,6 +877,33 @@ body.Categories.isMobile .PageControls.Top {
 
 .embedVideo:focus .embedVideo-playIcon, .embedVideo:hover .embedVideo-playIcon {
   transform: scale(1.1);
+}
+
+.embedVideo-ratio {
+  position: relative;
+  display: block;
+  background-color: #000000;
+  margin: 0;
+  width: 100%;
+  padding-left: 0;
+  padding-right: 0;
+  padding-bottom: 0;
+}
+
+.embedVideo-ratio.is21by9 {
+  padding-top: 42.8571428571%;
+}
+
+.embedVideo-ratio.is16by9 {
+  padding-top: 56.25%;
+}
+
+.embedVideo-ratio.is4by3 {
+  padding-top: 75%;
+}
+
+.embedVideo-ratio.is1by1 {
+  padding-top: 100%;
 }
 
 .embedVideo-playButton {

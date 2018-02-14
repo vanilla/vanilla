@@ -699,6 +699,9 @@ class CategoryModel extends Gdn_Model {
                         if ($dateLastComment >= $dateLastDiscussion) {
                             // The most recent discussion is from this comment.
                             $set['LastDiscussionID'] = $discussionID;
+                        } else {
+                            // The most recent discussion has no comments.
+                            $set['LastCommentID'] = null;
                         }
                     } else {
                         // Something went wrong.

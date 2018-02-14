@@ -89,7 +89,6 @@ export default class RichEditor {
             return;
         }
         const container = playButton.closest(".embedVideo-ratio");
-        console.log("playButton.dataset.url: ", playButton.dataset.url);
         container.innerHTML = '<iframe frameborder="0" allow="autoplay; encrypted-media" class="embedVideo-iframe" src="' + playButton.dataset.url + '" allowfullscreen></iframe>';
     }
 
@@ -182,14 +181,11 @@ export default class RichEditor {
         };
         document.querySelector(".test-blockparagraph").addEventListener("click", insertCodeBlockBlock);
 
-
-
-
         // Code Block - Block
         const insertVideo = () => {
             const range = this.quill.getSelection(true);
-            // this.quill.deleteText(range.index, range.length, Quill.sources.SILENT);
-            this.quill.insertEmbed(range.index, 'video-placeholder', {
+            this.quill.insertText(range.index, '\n', Quill.sources.SILENT);
+            this.quill.insertEmbed(range.index + 1, 'video-placeholder', {
                 photoUrl: 'https://i.ytimg.com/vi/wupToqz1e2g/hqdefault.jpg',
                 url: 'https://www.youtube.com/embed/wupToqz1e2g',
                 name: "Video Title",
@@ -197,14 +193,11 @@ export default class RichEditor {
                 height: 1276,
 
             }, Quill.sources.USER);
-            this.quill.setSelection(range.index + 1, Quill.sources.SILENT);
+            this.quill.setSelection(range.index + 2, Quill.sources.SILENT);
         };
         document.querySelector(".test-video").addEventListener("click", insertVideo);
-
-        // Event Handlers
         delegateEvent('click', '.js-playVideo', this.handlePlayVideo);
     }
-
 
     /**
      * For compatibility with the legacy base theme's javascript the Quill Delta needs to always be in the main form

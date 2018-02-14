@@ -15,9 +15,9 @@ import classnames from "classnames";
 export default class EditorMenuItem extends React.Component {
 
     static propTypes = {
-        propertyName: PropTypes.string,
+        propertyName: PropTypes.string.isRequired,
+        clickHandler: PropTypes.func.isRequired,
         isActive: PropTypes.bool,
-        clickHandler: PropTypes.func,
     };
 
     render() {
@@ -25,7 +25,7 @@ export default class EditorMenuItem extends React.Component {
         const Icon = Icons[propertyName];
 
         const buttonClasses = classnames("richEditor-button", {
-            isActive,
+            isActive: isActive || false,
         });
 
         return <li className="richEditor-menuItem" role="menuitem">

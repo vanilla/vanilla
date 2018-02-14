@@ -4,7 +4,7 @@
  * @license https://opensource.org/licenses/GPL-2.0 GPL-2.0
  */
 
-import * as quillUtilities from "../src/scripts/quill-utilities";
+import * as quillUtilities from "../quill-utilities";
 
 describe("Range/Boundary conversions", () => {
     it("converts range to boundary", () => {

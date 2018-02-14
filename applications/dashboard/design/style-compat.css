@@ -73,10 +73,7 @@ body.isMobile .change-picture .change-picture-instructions {
   min-height: 200px;
   padding: 9px 12px;
   outline-color: transparent;
-}
-
-.richEditor-text .ql-editor {
-  min-height: 191px;
+  white-space: pre-wrap !important;
 }
 
 .richEditor-text:focus {

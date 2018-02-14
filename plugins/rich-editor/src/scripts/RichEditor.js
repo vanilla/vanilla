@@ -13,6 +13,7 @@ import CodeBlockBlot from "./blots/CodeBlockBlot.js";
 import VideoBlot from "./blots/VideoBlot.js";
 import VanillaTheme from "./quill/VanillaTheme";
 import * as utility from "@core/utility";
+import { delegateEvent } from "@core/dom-utility";
 
 // Blots
 Quill.register(EmojiBlot);
@@ -75,6 +76,21 @@ export default class RichEditor {
         } else {
             this.initializeOtherFormat();
         }
+    }
+
+    /**
+     * Handle a click on a video.
+     *
+     * @param {Event} event - The event.
+     */
+    handlePlayVideo() {
+        const playButton = this;
+        if (!(playButton instanceof HTMLElement)) {
+            return;
+        }
+        const container = playButton.closest(".embedVideo-ratio");
+        console.log("playButton.dataset.url: ", playButton.dataset.url);
+        container.innerHTML = '<iframe class="embedVideo-iframe" src="' + playButton.dataset.url + '" allowfullscreen></iframe>';
     }
 
     initializeWithRichFormat() {
@@ -175,7 +191,8 @@ export default class RichEditor {
             // this.quill.deleteText(range.index, range.length, Quill.sources.SILENT);
             this.quill.insertEmbed(range.index, 'video-placeholder', {
                 photoUrl: 'https://i.ytimg.com/vi/QljRe99OMCU/hqdefault.jpg',
-                url: 'https://www.youtube.com/watch?v=QljRe99OMCU',
+                url: 'https://www.youtube.com/watch?v=wupToqz1e2g&rel=0&autoplay=1',
+                name: "Video Title",
                 width: 480,
                 height: 360,
                 ratio: "4:3",
@@ -185,9 +202,9 @@ export default class RichEditor {
         };
         document.querySelector(".test-video").addEventListener("click", insertVideo);
 
+        // Event Handlers
+        delegateEvent('click', '.js-playVideo', this.handlePlayVideo);
     }
-
-
 
 
     /**

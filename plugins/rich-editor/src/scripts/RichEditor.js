@@ -90,7 +90,7 @@ export default class RichEditor {
         }
         const container = playButton.closest(".embedVideo-ratio");
         console.log("playButton.dataset.url: ", playButton.dataset.url);
-        container.innerHTML = '<iframe class="embedVideo-iframe" src="' + playButton.dataset.url + '" allowfullscreen></iframe>';
+        container.innerHTML = '<iframe frameborder="0" allow="autoplay; encrypted-media" class="embedVideo-iframe" src="' + playButton.dataset.url + '" allowfullscreen></iframe>';
     }
 
     initializeWithRichFormat() {
@@ -190,12 +190,11 @@ export default class RichEditor {
             const range = this.quill.getSelection(true);
             // this.quill.deleteText(range.index, range.length, Quill.sources.SILENT);
             this.quill.insertEmbed(range.index, 'video-placeholder', {
-                photoUrl: 'https://i.ytimg.com/vi/QljRe99OMCU/hqdefault.jpg',
-                url: 'https://www.youtube.com/watch?v=wupToqz1e2g&rel=0&autoplay=1',
+                photoUrl: 'https://i.ytimg.com/vi/wupToqz1e2g/hqdefault.jpg',
+                url: 'https://www.youtube.com/embed/wupToqz1e2g',
                 name: "Video Title",
-                width: 480,
-                height: 360,
-                ratio: "4:3",
+                width: 1858,
+                height: 1276,
 
             }, Quill.sources.USER);
             this.quill.setSelection(range.index + 1, Quill.sources.SILENT);

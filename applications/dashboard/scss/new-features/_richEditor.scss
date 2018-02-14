@@ -79,10 +79,7 @@ $embedded-quote_fg: #A3A3A3 !default;
     min-height: $richEditor_minHeight;
     padding: $richEditor_padding;
     outline-color: transparent;
-
-    .ql-editor {
-        min-height: $richEditor_minHeight - $richEditor_verticalPadding;
-    }
+    white-space: pre-wrap !important; // Needed for spaces around embed blots to work properly!
 
     &:focus {
         outline-offset: -2px;

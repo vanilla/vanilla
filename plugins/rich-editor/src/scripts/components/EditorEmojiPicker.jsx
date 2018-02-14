@@ -6,7 +6,7 @@
 
 import React from "react";
 import * as PropTypes from "prop-types";
-import Quill from "quill/quill";
+import Quill from "quill/core";
 import EditorEmojiMenu from "../components/EditorEmojiMenu";
 import * as Icons from "./Icons";
 import UniqueID from "react-html-id";

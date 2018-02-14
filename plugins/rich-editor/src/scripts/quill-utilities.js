@@ -4,7 +4,6 @@
  * @license https://opensource.org/licenses/GPL-2.0 GPL-2.0
  */
 
-import LinkBlot from "quill/formats/link";
 import Emitter from "quill/core/emitter";
 
 /**
@@ -85,8 +84,8 @@ export function expandRange(range, startRange = null, endRange = null) {
  * @returns {boolean} -
  */
 export function rangeContainsBlot(quill, range, blotConstructor) {
-    const links = quill.scroll.descendants(blotConstructor, range.index, range.length);
-    return links.length > 0;
+    const blots = quill.scroll.descendants(blotConstructor, range.index, range.length);
+    return blots.length > 0;
 }
 
 /**
@@ -100,18 +99,18 @@ export function rangeContainsBlot(quill, range, blotConstructor) {
 export function disableAllBlotsInRange(quill, range, blotConstructor) {
 
     /** @type {Blot[]} */
-    const currentLinks = quill.scroll.descendants(blotConstructor, range.index, range.length);
-    const firstLink = currentLinks[0];
-    const lastLink = currentLinks[currentLinks.length - 1];
+    const currentBlots = quill.scroll.descendants(blotConstructor, range.index, range.length);
+    const firstBlot = currentBlots[0];
+    const lastBlot = currentBlots[currentBlots.length - 1];
 
-    const startRange = firstLink && {
-        index: firstLink.offset(quill.scroll),
-        length: firstLink.length(),
+    const startRange = firstBlot && {
+        index: firstBlot.offset(quill.scroll),
+        length: firstBlot.length(),
     };
 
-    const endRange = lastLink && {
-        index: lastLink.offset(quill.scroll),
-        length: lastLink.length(),
+    const endRange = lastBlot && {
+        index: lastBlot.offset(quill.scroll),
+        length: lastBlot.length(),
     };
     const finalRange = expandRange(range, startRange, endRange);
 

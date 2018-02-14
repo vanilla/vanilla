@@ -4,18 +4,8 @@
  * @license https://opensource.org/licenses/GPL-2.0 GPL-2.0
  */
 
-import Quill from "quill/quill";
-import EmojiBlot from "./blots/EmojiBlot.js";
-import ImageBlot from "./blots/ImageBlot.js";
-import VanillaTheme from "./quill/VanillaTheme";
+import Quill from "./Quill";
 import * as utility from "@core/utility";
-
-// Blots
-Quill.register(EmojiBlot);
-// Quill.register(ImageBlot);
-
-// Theme
-Quill.register("themes/vanilla", VanillaTheme);
 
 const options = {
     theme: "vanilla",
@@ -75,29 +65,6 @@ export default class RichEditor {
         }
 
         this.quill.on("text-change", this.synchronizeDelta.bind(this));
-
-        // const insertEmoji = () => {
-        //     const editorSelection = this.quill.getSelection();
-        //     const emoji = '😊';
-        //     let range = this.quill.getSelection(true);
-        //     this.quill.insertEmbed(range.index, 'emoji', {
-        //         'emojiChar': emoji
-        //     }, Quill.sources.USER);
-        //     this.quill.setSelection(range.index + 1, Quill.sources.SILENT);
-        //
-        // };
-        // document.querySelector(".emojiButton").addEventListener("click", insertEmoji);
-        //
-        // const insertImage = () => {
-        //     let range = this.quill.getSelection(true);
-        //     this.quill.insertEmbed(range.index, 'embeddedImage', {
-        //         alt: 'Quill Cloud',
-        //         url: 'http://stephane.local/uploads/userpics/966/pNOH8FCLAMG82.jpg'
-        //     }, Quill.sources.USER);
-        //     this.quill.setSelection(range.index + 1, Quill.sources.SILENT);
-        // };
-        // document.querySelector(".imageButton").addEventListener("click", insertImage);
-
     }
 
     /**

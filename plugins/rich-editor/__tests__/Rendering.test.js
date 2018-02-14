@@ -4,30 +4,23 @@
  * @license GPLv2
  */
 
-import RichEditor from "../src/scripts/RichEditor";
+import Quill from "../src/scripts/Quill";
 const fs = require("fs");
 const path = require("path");
 
 describe("rendering", () => {
-    let richEditor;
+    let quill;
 
     beforeAll(() => {
         document.body.innerHTML = `
             <form>
-                <div class="richEditor">
-                    <div class="js-richText"></div>
-                    <div class="js-richEditorInlineMenu"></div>
-                    <div class="js-emojiHandle"></div>
-                </div>
-                <textarea class="BodyBox"></textarea>
+                <div class="js-richText"></div>
             </form>
         `;
 
         const container = document.querySelector(".js-richText");
 
-        richEditor = new RichEditor(container);
-
-        // Stub out this method not provided by JSDOM
+        quill = new Quill(container);
     });
 
     const fixtureDir = path.resolve(__dirname, "../../../tests/fixtures/editor-rendering/");
@@ -39,7 +32,7 @@ describe("rendering", () => {
             const input = JSON.parse(fs.readFileSync(path.join(fixtureDir, fixture, "input.json"), "utf8"));
             const expectedOutput = fs.readFileSync(path.join(fixtureDir, fixture, "output.html"), "utf8");
 
-            richEditor.quill.setContents(input);
+            quill.setContents(input);
             const richText = document.querySelector(".ql-editor");
             expect(richText.innerHTML).toEqual(expectedOutput.trim());
         });

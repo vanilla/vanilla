@@ -9,12 +9,12 @@ import EmojiBlot from "./blots/EmojiBlot.js";
 import ImageBlot from "./blots/ImageBlot.js";
 import EmbedErrorBlot from "./blots/EmbedErrorBlot.js";
 import SpoilerBlot from "./blots/SpoilerBlot.js";
-import CodeInlineBlot from "./formats/CodeInlineBlot.js";
 import CodeBlockBlot from "./blots/CodeBlockBlot.js";
 import VideoBlot from "./blots/VideoBlot.js";
 import LinkEmbedBlot from "./blots/LinkEmbed.js";
 import EmbedLoadingBlot from "./blots/EmbedLoadingBlot.js";
 import BlockquoteBlot from "./blots/BlockquoteBlot.js";
+import CodeInlineBlot from "./formats/CodeInlineBlot.js";
 import VanillaTheme from "./quill/VanillaTheme";
 import * as utility from "@core/utility";
 import { delegateEvent } from "@core/dom-utility";
@@ -30,11 +30,7 @@ Quill.register(EmbedLoadingBlot);
 Quill.register(BlockquoteBlot);
 Quill.register(LinkEmbedBlot);
 Quill.register(EmbedErrorBlot);
-
-
-// Quill.register({
-//     'formats/code-inline': CodeInlineBlot,
-// });
+Quill.register(CodeInlineBlot);
 
 // Theme
 Quill.register("themes/vanilla", VanillaTheme);
@@ -160,21 +156,19 @@ export default class RichEditor {
         const insertInlineCodeBlock = () => {
             const range = this.quill.getSelection(true);
             const text = this.quill.getText(range.index, range.length);
-
-            this.quill.deleteText(range.index, range.length, Quill.sources.SILENT);
-
-            this.quill.insertEmbed(range.index, 'code-inline', {
-                content: text,
-            }, Quill.sources.USER);
-            this.quill.setSelection(range.index + text.length, Quill.sources.SILENT);
-
-            // this.quill.formatText(range.index, text.length, 'code-inline', {
+            // this.quill.deleteText(range.index, range.length, Quill.sources.SILENT);
+            // this.quill.insertEmbed(range.index, 'code-inline', {
             //     content: text,
             // }, Quill.sources.USER);
-            // this.quill.setSelection(range.index, text.length, Quill.sources.SILENT);
+            // this.quill.setSelection(range.index + text.length, Quill.sources.SILENT);
+
+            this.quill.formatText(range.index, text.length, 'code-inline', {
+                content: text,
+            }, Quill.sources.USER);
+            this.quill.setSelection(range.index, text.length, Quill.sources.SILENT);
 
         };
-        document.querySelector(".test-blockinline").addEventListener("click", insertInlineCodeBlock);
+        document.querySelector(".test-codeblockinline").addEventListener("click", insertInlineCodeBlock);
 
         // Code Block - Block
         const insertCodeBlockBlock = () => {
@@ -244,9 +238,6 @@ export default class RichEditor {
             this.quill.setSelection(range.index + 2, Quill.sources.SILENT);
         };
         document.querySelector(".test-blockquote").addEventListener("click", insertCodeBlock);
-
-
-
 
         // Code Block - Block
         const insertVideo = () => {

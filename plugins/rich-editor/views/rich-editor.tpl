@@ -58,7 +58,7 @@
     <button type="button" class="test-spoiler">
         Spoiler
     </button><br/>
-    <button type="button" class="test-blockinline">
+    <button type="button" class="test-codeblockinline">
         Code Block - Inline
     </button><br/>
     <button type="button" class="test-blockparagraph">

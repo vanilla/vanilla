@@ -426,21 +426,13 @@ body.isMobile .change-picture .change-picture-instructions {
   padding-right: 0.5em;
 }
 
-.userContent pre,
-.codeBlock {
+.code.isBlock {
   overflow-x: auto;
-  background: inherit;
   border: 0;
   word-wrap: normal;
   line-height: 1.4;
-  padding: 0;
   white-space: pre;
-}
-
-.userContent pre .code,
-.codeBlock .code {
   border-radius: 0;
-  border: 0;
   display: block;
   background: none;
   padding: 12px;

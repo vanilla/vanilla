@@ -344,8 +344,7 @@
     </p>
 
     <h2>Code Block - Paragraph</h2>
-    <pre class="codeBlock">
-        <code class="code isBlock">/**
+    <code class="code isBlock">/**
  * Adds locale data to the view, and adds a respond button to the discussion page.
  */
 class MyThemeNameThemeHooks extends Gdn_Plugin {
@@ -367,7 +366,6 @@ class MyThemeNameThemeHooks extends Gdn_Plugin {
         $sender->setData('locale', $locale);
     }
 }</code>
-    </pre>
 
 
     <h2>Blockquote</h2>

@@ -58,11 +58,11 @@
     <button type="button" class="test-spoiler">
         Spoiler
     </button><br/>
-    <button type="button" class="test-codeblockinline">
-        DONE - Code Block - Inline
-    </button><br/>
     <button type="button" class="test-blockparagraph">
         Code Block - Paragraph
+    </button><br/>
+    <button type="button" class="test-codeblockinline">
+        DONE - Code Block - Inline
     </button><br/>
     <button type="button" class="test-blockquote">
         DONE - Blockquote

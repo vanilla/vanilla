@@ -664,7 +664,6 @@ class CategoryModel extends Gdn_Model {
                     ->select('c.CommentID', 'max', 'LastCommentID')
                     ->select('d.DiscussionID', 'max', 'LastDiscussionID')
                     ->select('c.DateInserted', 'max', 'DateLastComment')
-                    ->select('d.DateInserted', 'max', 'DateLastDiscussion')
                     ->from('Comment c')
                     ->join('Discussion d', 'd.DiscussionID = c.DiscussionID')
                     ->groupBy('d.CategoryID')
@@ -689,13 +688,14 @@ class CategoryModel extends Gdn_Model {
                     $discussionID = valr("$commentID.DiscussionID", $discussions, null);
 
                     $dateLastComment = Gdn_Format::toTimestamp($row['DateLastComment']);
-                    $dateLastDiscussion = Gdn_Format::toTimestamp($row['DateLastDiscussion']);
+
+                    $discussionModel = new DiscussionModel();
+                    $latestDiscussion = $discussionModel->getID($category['LastDiscussionID']);
+                    $dateLastDiscussion = Gdn_Format::toTimestamp(val('DateInserted', $latestDiscussion));
 
                     $set = ['LastCommentID' => $commentID];
 
                     if ($discussionID) {
-                        $lastDiscussionID = val('LastDiscussionID', $category);
-
                         if ($dateLastComment >= $dateLastDiscussion) {
                             // The most recent discussion is from this comment.
                             $set['LastDiscussionID'] = $discussionID;

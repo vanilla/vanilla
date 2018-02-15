@@ -13,6 +13,7 @@ import CodeInlineBlot from "./formats/CodeInlineBlot.js";
 import CodeBlockBlot from "./blots/CodeBlockBlot.js";
 import VideoBlot from "./blots/VideoBlot.js";
 import LinkEmbedBlot from "./blots/LinkEmbed.js";
+import EmbedLoadingBlot from "./blots/EmbedLoadingBlot.js";
 import VanillaTheme from "./quill/VanillaTheme";
 import * as utility from "@core/utility";
 import { delegateEvent } from "@core/dom-utility";
@@ -24,6 +25,7 @@ Quill.register(SpoilerBlot);
 Quill.register(CodeInlineBlot);
 Quill.register(CodeBlockBlot);
 Quill.register(VideoBlot);
+Quill.register(EmbedLoadingBlot);
 Quill.register(LinkEmbedBlot);
 Quill.register(EmbedErrorBlot);
 
@@ -201,6 +203,15 @@ export default class RichEditor {
             this.quill.setSelection(range.index + 2, Quill.sources.SILENT);
         };
         document.querySelector(".test-error").addEventListener("click", insertEmbedError);
+
+        // Embed Loading - Blok
+        const insertEmbedLoading = () => {
+            const range = this.quill.getSelection(true);
+            this.quill.insertText(range.index, '\n', Quill.sources.SILENT);
+            this.quill.insertEmbed(range.index + 1, 'embed-loading', {}, Quill.sources.USER);
+            this.quill.setSelection(range.index + 2, Quill.sources.SILENT);
+        };
+        document.querySelector(".test-loading").addEventListener("click", insertEmbedLoading);
 
 
 

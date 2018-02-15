@@ -229,7 +229,6 @@ class UsersApiController extends AbstractApiController {
             ->resultArray();
 
         foreach ($rows as &$row) {
-            $this->userModel->setCalculatedFields($row);
             $row = $this->normalizeOutput($row);
         }
         $result = $out->validate($rows);

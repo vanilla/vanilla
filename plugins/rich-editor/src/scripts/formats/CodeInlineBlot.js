@@ -1,9 +1,11 @@
-import Code from "quill/formats/code";
+import {Code} from "quill/formats/code";
 
-class CodeInline extends Code {
-    static constructor(domNode) {
-        //super();
-        console.log("constructor domNode: ", domNode);
+export default class CodeInline extends Code {
+    constructor(domNode) {
+        super(domNode);
+        domNode.classList.add('code');
+        domNode.classList.add('codeInline');
+        console.log("HERE");
     }
 }
 

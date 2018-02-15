@@ -9,7 +9,7 @@ import EmojiBlot from "./blots/EmojiBlot.js";
 import ImageBlot from "./blots/ImageBlot.js";
 import EmbedErrorBlot from "./blots/EmbedErrorBlot.js";
 import SpoilerBlot from "./blots/SpoilerBlot.js";
-import CodeBlockBlot from "./blots/CodeBlockBlot.js";
+// import CodeBlockBlot from "./blots/CodeBlockBlot.js";
 import VideoBlot from "./blots/VideoBlot.js";
 import LinkEmbedBlot from "./blots/LinkEmbed.js";
 import EmbedLoadingBlot from "./blots/EmbedLoadingBlot.js";
@@ -23,14 +23,29 @@ import { delegateEvent } from "@core/dom-utility";
 Quill.register(EmojiBlot);
 Quill.register(ImageBlot);
 Quill.register(SpoilerBlot);
-Quill.register(CodeInlineBlot);
-Quill.register(CodeBlockBlot);
+// Quill.register(CodeBlockBlot);
 Quill.register(VideoBlot);
 Quill.register(EmbedLoadingBlot);
 Quill.register(BlockquoteBlot);
 Quill.register(LinkEmbedBlot);
 Quill.register(EmbedErrorBlot);
-Quill.register(CodeInlineBlot);
+Quill.register("formats/code", CodeInlineBlot);
+
+
+// Quill.register({
+//     'blots/block'        : Block,
+//     'blots/block/embed'  : BlockEmbed,
+//     'blots/break'        : Break,
+//     'blots/container'    : Container,
+//     'blots/cursor'       : Cursor,
+//     'blots/embed'        : Embed,
+//     'blots/inline'       : Inline,
+//     'blots/scroll'       : Scroll,
+//     'blots/text'         : TextBlot,
+//     'modules/clipboard'  : Clipboard,
+//     'modules/history'    : History,
+//     'modules/keyboard'   : Keyboard
+// });
 
 // Theme
 Quill.register("themes/vanilla", VanillaTheme);
@@ -154,19 +169,7 @@ export default class RichEditor {
 
         // Code Block - Inline
         const insertInlineCodeBlock = () => {
-            const range = this.quill.getSelection(true);
-            const text = this.quill.getText(range.index, range.length);
-            // this.quill.deleteText(range.index, range.length, Quill.sources.SILENT);
-            // this.quill.insertEmbed(range.index, 'code-inline', {
-            //     content: text,
-            // }, Quill.sources.USER);
-            // this.quill.setSelection(range.index + text.length, Quill.sources.SILENT);
-
-            this.quill.formatText(range.index, text.length, 'code-inline', {
-                content: text,
-            }, Quill.sources.USER);
-            this.quill.setSelection(range.index, text.length, Quill.sources.SILENT);
-
+            this.quill.format('code-inline', true, Quill.sources.USER);
         };
         document.querySelector(".test-codeblockinline").addEventListener("click", insertInlineCodeBlock);
 
@@ -174,8 +177,6 @@ export default class RichEditor {
         const insertCodeBlockBlock = () => {
             const range = this.quill.getSelection(true);
             const text = this.quill.getText(range.index, range.length);
-            console.log("code block text: ", text);
-            // this.quill.deleteText(range.index, range.length, Quill.sources.SILENT);
             this.quill.insertEmbed(range.index, 'code-block', {
                 content: text,
             }, Quill.sources.USER);

@@ -127,13 +127,13 @@ class UsersTest extends AbstractResourceTest {
     }
 
     /**
-     * Test full-name filtering with GET /users/names.
+     * Test full-name filtering with GET /users/by-names.
      */
     public function testNamesFull() {
         $users = $this->api()->get($this->baseUrl)->getBody();
         $testUser = array_pop($users);
 
-        $request = $this->api()->get("{$this->baseUrl}/names", ['name' => $testUser['name']]);
+        $request = $this->api()->get("{$this->baseUrl}/by-names", ['name' => $testUser['name']]);
         $this->assertEquals(200, $request->getStatusCode());
         $searchFull = $request->getBody();
         $row = reset($searchFull);
@@ -141,14 +141,14 @@ class UsersTest extends AbstractResourceTest {
     }
 
     /**
-     * Test partial-name filtering with GET /users/names.
+     * Test partial-name filtering with GET /users/by-names.
      */
     public function testNamesWildcard() {
         $users = $this->api()->get($this->baseUrl)->getBody();
         $testUser = array_pop($users);
 
         $partialName = substr($testUser['name'], 0, -1);
-        $request = $this->api()->get("{$this->baseUrl}/names", ['name' => "{$partialName}*"]);
+        $request = $this->api()->get("{$this->baseUrl}/by-names", ['name' => "{$partialName}*"]);
         $this->assertEquals(200, $request->getStatusCode());
         $searchWildcard = $request->getBody();
         $this->assertNotEmpty($searchWildcard);

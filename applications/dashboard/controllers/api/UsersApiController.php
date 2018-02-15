@@ -180,7 +180,7 @@ class UsersApiController extends AbstractApiController {
      * @param array $query
      * @return array
      */
-    public function get_names(array $query) {
+    public function get_byNames(array $query) {
         $this->permission('Garden.SignIn.Allow');
 
         $in = $this->schema([

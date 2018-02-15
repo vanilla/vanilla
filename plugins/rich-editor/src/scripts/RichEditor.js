@@ -11,6 +11,7 @@ import SpoilerBlot from "./blots/SpoilerBlot.js";
 import CodeInlineBlot from "./formats/CodeInlineBlot.js";
 import CodeBlockBlot from "./blots/CodeBlockBlot.js";
 import VideoBlot from "./blots/VideoBlot.js";
+import LinkEmbedBlot from "./blots/LinkEmbed.js";
 import VanillaTheme from "./quill/VanillaTheme";
 import * as utility from "@core/utility";
 import { delegateEvent } from "@core/dom-utility";
@@ -22,6 +23,7 @@ Quill.register(SpoilerBlot);
 Quill.register(CodeInlineBlot);
 Quill.register(CodeBlockBlot);
 Quill.register(VideoBlot);
+Quill.register(LinkEmbedBlot);
 
 
 // Quill.register({
@@ -197,6 +199,54 @@ export default class RichEditor {
         };
         document.querySelector(".test-video").addEventListener("click", insertVideo);
         delegateEvent('click', '.js-playVideo', this.handlePlayVideo);
+
+
+
+
+        // Link Internal
+        const insertLinkInternal = () => {
+            const range = this.quill.getSelection(true);
+            this.quill.insertText(range.index, '\n', Quill.sources.SILENT);
+            this.quill.insertEmbed(range.index + 1, 'link-embed', {
+                url: 'https://www.google.ca/',
+                userPhoto: 'https://secure.gravatar.com/avatar/b0420af06d6fecc16fc88a88cbea8218/',
+                userName: 'steve_captain_rogers',
+                timestamp: '2017-02-17 11:13',
+                humanTime: 'Feb 17, 2017 11:13 AM',
+                excerpt: 'The Battle of New York, locally known as "The Incident", was a major battle between the Avengers and Loki with his borrowed Chitauri army in Manhattan, New York City. It was, according to Loki\'s plan, the first battle in Loki\'s war to subjugate Earth, but the actions of the Avengers neutralized the threat of the Chitauri before they could continue the invasion.',
+            }, Quill.sources.USER);
+            this.quill.setSelection(range.index + 2, Quill.sources.SILENT);
+        };
+        document.querySelector(".test-urlinternal").addEventListener("click", insertLinkInternal);
+
+        // Link External - Image
+        const insertLinkExternalImage = () => {
+            const range = this.quill.getSelection(true);
+            this.quill.insertText(range.index, '\n', Quill.sources.SILENT);
+            this.quill.insertEmbed(range.index + 1, 'link-embed', {
+                url: 'https://www.google.ca/',
+                name: 'Hulk attacks New York, kills 17, injures 23 in deadliest attack in 5 years   Hulk attacks New York, kills 17, injures 23 in deadliest attack in 5 years',
+                source: 'nytimes.com',
+                linkImage: 'https://cdn.mdn.mozilla.net/static/img/opengraph-logo.72382e605ce3.png',
+                excerpt: 'The Battle of New York, locally known as "The Incident", was a major battle between the Avengers and Loki with his borrowed Chitauri army in Manhattan, New York City. It was, according to Loki\'s plan, the first battle in Loki\'s war to subjugate Earth, but the actions of the Avengers neutralized the threat of the Chitauri before they could continue the invasion.',
+            }, Quill.sources.USER);
+            this.quill.setSelection(range.index + 2, Quill.sources.SILENT);
+        };
+        document.querySelector(".test-urlexternalimage").addEventListener("click", insertLinkExternalImage);
+
+        // Link External - No Image
+        const insertLinkExternalNoImage = () => {
+            const range = this.quill.getSelection(true);
+            this.quill.insertText(range.index, '\n', Quill.sources.SILENT);
+            this.quill.insertEmbed(range.index + 1, 'link-embed', {
+                url: 'https://www.google.ca/',
+                name: 'Hulk attacks New York, kills 17, injures 23 in deadliest attack in 5 years   Hulk attacks New York, kills 17, injures 23 in deadliest attack in 5 years',
+                source: 'nytimes.com',
+                excerpt: 'The Battle of New York, locally known as "The Incident", was a major battle between the Avengers and Loki with his borrowed Chitauri army in Manhattan, New York City. It was, according to Loki\'s plan, the first battle in Loki\'s war to subjugate Earth, but the actions of the Avengers neutralized the threat of the Chitauri before they could continue the invasion.',
+            }, Quill.sources.USER);
+            this.quill.setSelection(range.index + 2, Quill.sources.SILENT);
+        };
+        document.querySelector(".test-urlexternal").addEventListener("click", insertLinkExternalNoImage);
     }
 
     /**

@@ -59,16 +59,6 @@ export default class VideoBlot extends BlockEmbed {
         return node;
     }
 
-    static formats(node) {
-        const ratio = node.querySelectorAll('.embedVideo-ratio');
-        const format = {
-            height: ratio.offsetHeight,
-            width: ratio.offsetWidth,
-        };
-        return format;
-    }
-
-
     static value(node) {
         return getData(node, "data");
     }

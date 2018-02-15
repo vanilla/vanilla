@@ -569,8 +569,7 @@ class MyThemeNameThemeHooks extends Gdn_Plugin {
                     </span>
                 </div>
                 <div class="embedLink-excerpt">
-                    The Battle of New York, locally known as "The Incident",
-                    was a major battle between the Avengers and Loki with his borrowed Chitauri army in Manhattan, New York City. It was, according to Loki's plan, the first battle in Loki's war to subjugate Earth, but the actions of the Avengers neutralized the threat of the Chitauri before they could continue the invasion…
+                    The Battle of New York, locally known as "The Incident", was a major battle between the Avengers and Loki with his borrowed Chitauri army in Manhattan, New York City. It was, according to Loki's plan, the first battle in Loki's war to subjugate Earth, but the actions of the Avengers neutralized the threat of the Chitauri before they could continue the invasion…
                 </div>
             </div>
         </article>

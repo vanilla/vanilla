@@ -30,9 +30,9 @@ class Block {
      */
     public static function makeEmptyBlock(): Block {
         $block = new Block();
-        $block->blots = [
-            new TextBlot(["insert" => "<br>"], [], []),
-        ];
+        $blot = new TextBlot(["insert" => ""], [], []);
+        $blot->setContent("<br>");
+        $block->pushBlot($blot);
         return $block;
     }
 

@@ -13,6 +13,23 @@ use Vanilla\Quill\Blots;
 
 
 class RendererTest extends TestCase {
+
+    /**
+     * Replace all zero-width whitespace in a string.
+     *
+     * U+200B zero width space
+     * U+200C zero width non-joiner Unicode code point
+     * U+200D zero width joiner Unicode code point
+     * U+FEFF zero width no-break space Unicode code point
+     *
+     * @param string $text The string to filter.
+     *
+     * @return string
+     */
+    private function stripZeroWidthWhitespace(string $text): string {
+        return preg_replace( '/[\x{200B}-\x{200D}\x{FEFF}]/u', '', $text );
+    }
+
     /**
      * @dataProvider directoryProvider
      */
@@ -21,6 +38,7 @@ class RendererTest extends TestCase {
 
         $input = file_get_contents($fixturePath . "/input.json");
         $expectedOutput = trim(file_get_contents($fixturePath . "/output.html"));
+        $expectedOutput = $this->stripZeroWidthWhitespace($expectedOutput);
 
         $blots = [
             Blots\TextBlot::class,
@@ -40,6 +58,7 @@ class RendererTest extends TestCase {
             ["paragraphs"],
             ["headings"],
             ["lists"],
+            ["emoji"],
             ["everything"],
         ];
     }

@@ -51,41 +51,40 @@
         {* Paragraph level menu goes here *}
     </div>
 
-    <button type="button" class="test-sagan">
-        DONE - Saganify!
-    </button><br/>
-
-    <button type="button" class="test-spoiler">
-        ** Spoiler **
-    </button><br/>
-    <button type="button" class="test-blockparagraph">
-        DONE - Code Block - Paragraph
-    </button><br/>
-    <button type="button" class="test-codeblockinline">
-        DONE - Code Block - Inline
-    </button><br/>
-    <button type="button" class="test-blockquote">
-        DONE - Blockquote
-    </button><br/>
-    <button type="button" class="test-loading">
-        DONE - Embed - Loading
-    </button><br/>
-    <button type="button" class="test-error">
-        DONE - Embed - Error
-    </button><br/>
-    <button type="button" class="test-image">
-        DONE - Embed - Image
-    </button><br/>
-    <button type="button" class="test-video">
-        DONE - Embed - Video
-    </button><br/>
-    <button type="button" class="test-urlinternal">
-        DONE - Embed - Internal URL
-    </button><br/>
-    <button type="button" class="test-urlexternalimage">
-        DONE - Embed - External URL With Image
-    </button><br/>
-    <button type="button" class="test-urlexternal">
-        DONE - Embed - External URL Without Image
-    </button>
+    {*<button type="button" class="test-sagan">*}
+        {*Saganify!*}
+    {*</button><br/>*}
+    {*<button type="button" class="test-spoiler">*}
+        {*Spoiler*}
+    {*</button><br/>*}
+    {*<button type="button" class="test-blockparagraph">*}
+        {*Code Block - Paragraph*}
+    {*</button><br/>*}
+    {*<button type="button" class="test-codeblockinline">*}
+        {*Code Block - Inline*}
+    {*</button><br/>*}
+    {*<button type="button" class="test-blockquote">*}
+        {*Blockquote*}
+    {*</button><br/>*}
+    {*<button type="button" class="test-loading">*}
+        {*Embed - Loading*}
+    {*</button><br/>*}
+    {*<button type="button" class="test-error">*}
+        {*Embed - Error*}
+    {*</button><br/>*}
+    {*<button type="button" class="test-image">*}
+        {*Embed - Image*}
+    {*</button><br/>*}
+    {*<button type="button" class="test-video">*}
+        {*Embed - Video*}
+    {*</button><br/>*}
+    {*<button type="button" class="test-urlinternal">*}
+        {*Embed - Internal URL*}
+    {*</button><br/>*}
+    {*<button type="button" class="test-urlexternalimage">*}
+        {*Embed - External URL With Image*}
+    {*</button><br/>*}
+    {*<button type="button" class="test-urlexternal">*}
+        {*Embed - External URL Without Image*}
+    {*</button>*}
 </div>

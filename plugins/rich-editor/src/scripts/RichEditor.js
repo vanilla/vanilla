@@ -7,6 +7,7 @@
 import Quill from "quill/quill";
 import EmojiBlot from "./blots/EmojiBlot.js";
 import ImageBlot from "./blots/ImageBlot.js";
+import EmbedErrorBlot from "./blots/EmbedErrorBlot.js";
 import SpoilerBlot from "./blots/SpoilerBlot.js";
 import CodeInlineBlot from "./formats/CodeInlineBlot.js";
 import CodeBlockBlot from "./blots/CodeBlockBlot.js";
@@ -24,6 +25,7 @@ Quill.register(CodeInlineBlot);
 Quill.register(CodeBlockBlot);
 Quill.register(VideoBlot);
 Quill.register(LinkEmbedBlot);
+Quill.register(EmbedErrorBlot);
 
 
 // Quill.register({
@@ -183,6 +185,22 @@ export default class RichEditor {
         };
         document.querySelector(".test-blockparagraph").addEventListener("click", insertCodeBlockBlock);
 
+
+
+        // Embed Error - Blok
+        const insertEmbedError = () => {
+            const range = this.quill.getSelection(true);
+            this.quill.insertText(range.index, '\n', Quill.sources.SILENT);
+            this.quill.insertEmbed(range.index + 1, 'embed-error', {
+                errors: [{
+                    message: 'Embed failed please try again',
+                }, {
+                    message: 'Error Message 2Error Message 2Error Message 2Error Message 2Error Message 2Error Message 2Error Message 2Error Message 2Error Message 2Error Message 2Error Message 2Error Message 2Error Message 2Error Message 2Error Message 2Error Message 2Error Message 2Error Message 2Error Message 2Error Message 2Error Message 2Error Message 2Error Message 2Error Message 2',
+                }],
+            }, Quill.sources.USER);
+            this.quill.setSelection(range.index + 2, Quill.sources.SILENT);
+        };
+        document.querySelector(".test-error").addEventListener("click", insertEmbedError);
 
 
 

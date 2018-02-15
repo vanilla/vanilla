@@ -118,9 +118,13 @@ $embedVideo_width: 640px;
     .embedLoader-errorMessage {
         max-width: calc(100% - #{$embeded-icon_width * 3});
         padding-left: $embeded-icon_width;
+
     }
 }
 
+.embed {
+    white-space: normal;
+}
 
 // Image
 

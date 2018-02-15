@@ -10,6 +10,7 @@ export default class LinkEmbedBlock extends BlockEmbed {
     static create(data) {
         // console.log("Video Data: ", data);
         const node = super.create();
+        node.classList.add('embed');
         node.classList.add('embedLink');
         node.setAttribute('href', this.sanitize(data.url));
 

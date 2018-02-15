@@ -5,6 +5,7 @@ import { getData } from "@core/dom-utility";
 export default class ImageBlot extends BlockEmbed {
     static create(data) {
         const node = super.create();
+        node.classList.add('embed');
         node.classList.add('embedImage');
 
         const image = document.createElement('img');

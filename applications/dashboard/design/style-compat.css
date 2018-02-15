@@ -847,6 +847,10 @@ body.Categories.isMobile .PageControls.Top {
   padding-left: 24px;
 }
 
+.embed {
+  white-space: normal;
+}
+
 .embedImage {
   display: block;
   width: 640px;

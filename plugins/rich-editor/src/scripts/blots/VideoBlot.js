@@ -23,6 +23,7 @@ export default class VideoBlot extends BlockEmbed {
     static create(data) {
         // console.log("Video Data: ", data);
         const node = super.create();
+        node.classList.add('embed');
         node.classList.add('embedVideo');
         data.name = data.name || '';
 

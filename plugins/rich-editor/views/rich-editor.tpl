@@ -71,7 +71,7 @@
         TEST - Embed - Loading
     </button><br/>
     <button type="button" class="test-error">
-        TEST - Embed - Error
+        DONE - TEST - Embed - Error
     </button><br/>
     <button type="button" class="test-image">
         DONE - TEST - Embed - Image

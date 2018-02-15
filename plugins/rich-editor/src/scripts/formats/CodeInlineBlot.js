@@ -2,7 +2,7 @@ import Code from "quill/formats/code";
 
 class CodeInline extends Code {
     static constructor(domNode) {
-        super();
+        //super();
         console.log("constructor domNode: ", domNode);
     }
 }

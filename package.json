@@ -33,7 +33,6 @@
         "babel-jest": "^22.0.4",
         "enzyme": "^3.3.0",
         "enzyme-adapter-react-16": "^1.1.1",
-        "enzyme-to-json": "^3.3.1",
         "eslint": "^4.17.0",
         "eslint-plugin-react": "^7.6.1",
         "glob": "^7.1.2",
@@ -67,9 +66,6 @@
             "^.+\\.(js|jsx|ts|tsx)$": "babel-jest",
             "^.+\\.svg?$": "html-loader-jest"
         },
-        "snapshotSerializers": [
-            "enzyme-to-json/serializer"
-        ],
         "transformIgnorePatterns": [],
         "setupFiles": [
             "<rootDir>/src/scripts/__tests__/test-setup.js"

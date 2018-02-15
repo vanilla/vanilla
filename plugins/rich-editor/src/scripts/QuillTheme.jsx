@@ -6,21 +6,11 @@
 
 import React from "react";
 import ReactDOM from "react-dom";
-import InlineEditorToolbar from "../components/InlineEditorToolbar";
 import Theme from "quill/core/theme";
-import EditorEmojiPicker from "../components/EditorEmojiPicker";
+import InlineEditorToolbar from "./components/InlineEditorToolbar";
+import EditorEmojiPicker from "./components/EditorEmojiPicker";
 
 export default class VanillaTheme extends Theme {
-    static TOOLBAR_CONFIG = [
-        "bold", "italic", "strike", "code", "link",
-    ];
-
-    static DEFAULTS = {
-        modules: {
-            toolbar: false,
-        },
-        placeholder: "Create a new post...",
-    };
 
     /**
      * Constructor.
@@ -29,7 +19,12 @@ export default class VanillaTheme extends Theme {
      * @param {QuillOptionsStatic} options - The current options for the instance.
      */
     constructor(quill, options) {
-        super(quill, options);
+        const themeOptions = {
+            ...options,
+            placeholder: "Create a new post...",
+        };
+
+        super(quill, themeOptions);
         this.quill.root.classList.add("richEditor-text");
         this.quill.root.classList.add("userContent");
         this.setupTabBehaviour();

@@ -4,7 +4,7 @@
     "version": "0.1",
     "mobileFriendly": true,
     "hasLocale": true,
-    "icon": "richeditor.png",
+    "icon": "rich_editor.png",
     "key": "rich-editor",
     "type": "addon",
     "authors": [

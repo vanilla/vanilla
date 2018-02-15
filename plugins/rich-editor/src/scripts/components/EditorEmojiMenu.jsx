@@ -6,7 +6,7 @@
 
 import React from "react";
 import * as PropTypes from "prop-types";
-import Quill from "quill/quill";
+import Quill from "quill/core";
 import { t } from "@core/utility";
 import EditorEmojiButton from "../components/EditorEmojiButton";
 import emojis from 'emojibase-data/en/data.json';

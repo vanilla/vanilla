@@ -6,7 +6,7 @@
 
 import React from "react";
 import * as PropTypes from "prop-types";
-import Quill from "quill/quill";
+import Quill from "quill/core";
 import LinkBlot from "quill/formats/link";
 import { t } from "@core/utility";
 import EditorMenuItem from "./EditorMenuItem";
@@ -63,8 +63,6 @@ export default class EditorToolbar extends React.Component {
 
         // Quill can directly on the class as it won't ever change in a single instance.
         this.quill = props.quill;
-
-        this.menuItemClickHandler = this.menuItemClickHandler.bind(this);
     }
 
     /**
@@ -110,12 +108,21 @@ export default class EditorToolbar extends React.Component {
         const menuItems = Object.keys(this.state).map((itemName, key) => {
             const isActive = this.state[itemName].active;
 
-            return <EditorMenuItem propertyName={itemName} key={key} isActive={isActive} clickHandler={(e) => this.menuItemClickHandler(itemName, e)}/>;
+            return <EditorMenuItem
+                propertyName={itemName}
+                key={key}
+                isActive={isActive}
+                clickHandler={this.formatItem.bind(this, itemName)}
+            />;
         });
 
         return (
             <div className="richEditor-menu" role="dialog" aria-label={t("Inline Level Formatting Menu")}>
-                <ul className="richEditor-menuItems MenuItems" role="menubar" aria-label={t("Inline Level Formatting Menu")}>
+                <ul
+                    className="richEditor-menuItems MenuItems"
+                    role="menubar"
+                    aria-label={t("Inline Level Formatting Menu")}
+                >
                     {menuItems}
                 </ul>
             </div>
@@ -128,9 +135,8 @@ export default class EditorToolbar extends React.Component {
      * Generic item click handler. This will defer to other handlers where available.
      *
      * @param {string} itemKey - The key of the item that was clicked.
-     * @param {React.SyntheticEvent} event - The click event.
      */
-    menuItemClickHandler(itemKey, event) {
+    formatItem(itemKey) {
         const itemData = this.state[itemKey];
 
         if ("formatter" in itemData) {
@@ -141,7 +147,7 @@ export default class EditorToolbar extends React.Component {
         }
 
         this.update();
-    }
+    };
 
 
     /**

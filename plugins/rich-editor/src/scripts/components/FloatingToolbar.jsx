@@ -6,7 +6,7 @@
 
 import React from "react";
 import * as PropTypes from "prop-types";
-import Quill from "quill/quill";
+import Quill from "quill/core";
 import Events from "@core/events";
 import Emitter from "quill/core/emitter";
 import { Range } from "quill/core/selection";

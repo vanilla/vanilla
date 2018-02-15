@@ -4,10 +4,44 @@
  * @license https://opensource.org/licenses/GPL-2.0 GPL-2.0
  */
 
+<<<<<<< HEAD
+import Quill from "quill/quill";
+import EmojiBlot from "./blots/EmojiBlot.js";
+import ImageBlot from "./blots/ImageBlot.js";
+import EmbedErrorBlot from "./blots/EmbedErrorBlot.js";
+import SpoilerBlot from "./blots/SpoilerBlot.js";
+import CodeBlockBlot from "./blots/CodeBlockBlot.js";
+import VideoBlot from "./blots/VideoBlot.js";
+import LinkEmbedBlot from "./blots/LinkEmbed.js";
+import EmbedLoadingBlot from "./blots/EmbedLoadingBlot.js";
+import BlockquoteBlot from "./blots/BlockquoteBlot.js";
+import CodeInlineBlot from "./formats/CodeInlineBlot.js";
+import VanillaTheme from "./quill/VanillaTheme";
+=======
 import Quill from "./Quill";
+>>>>>>> feature/rich-editor-mvp
 import * as utility from "@core/utility";
-import {delegateEvent} from "@core/dom-utility";
+import { delegateEvent } from "@core/dom-utility";
 
+<<<<<<< HEAD
+Quill.register({
+    'blots/emoji': EmojiBlot,
+    'blots/image-embed': ImageBlot,
+    'blots/spoiler-block': SpoilerBlot,
+    'blots/video-placeholder': VideoBlot,
+    'blots/loading-embed': EmbedLoadingBlot,
+    'blots/link-embed': LinkEmbedBlot,
+    'blots/error-embed': EmbedErrorBlot,
+    'blots/blockquote-block': BlockquoteBlot,
+    'blots/code-block': CodeBlockBlot,
+    'formats/code-inline': CodeInlineBlot,
+});
+
+// Theme
+Quill.register("themes/vanilla", VanillaTheme);
+
+=======
+>>>>>>> feature/rich-editor-mvp
 const options = {
     theme: "vanilla",
 };
@@ -80,6 +114,7 @@ export default class RichEditor {
         }
 
         this.quill.on("text-change", this.synchronizeDelta.bind(this));
+<<<<<<< HEAD
 
         // const insertEmoji = () => {
         //     const editorSelection = this.quill.getSelection();
@@ -263,6 +298,8 @@ export default class RichEditor {
             this.quill.setSelection(range.index + 2, Quill.sources.SILENT);
         };
         document.querySelector(".test-urlexternal").addEventListener("click", insertLinkExternalNoImage);
+=======
+>>>>>>> feature/rich-editor-mvp
     }
 
     /**

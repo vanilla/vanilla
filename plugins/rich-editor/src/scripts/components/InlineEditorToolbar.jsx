@@ -6,12 +6,12 @@
 
 import React from "react";
 import * as PropTypes from "prop-types";
-import Quill from "quill/quill";
-import EditorToolbar from "./EditorToolbar";
+import Quill from "quill/core";
 import Emitter from "quill/core/emitter";
 import Keyboard from "quill/modules/keyboard";
 import LinkBlot from "quill/formats/link";
 import FloatingToolbar from "./FloatingToolbar";
+import EditorToolbar from "./EditorToolbar";
 import { t } from "@core/utility";
 import * as quillUtilities from "../quill-utilities";
 

@@ -9,7 +9,7 @@ import EmojiBlot from "./blots/EmojiBlot.js";
 import ImageBlot from "./blots/ImageBlot.js";
 import EmbedErrorBlot from "./blots/EmbedErrorBlot.js";
 import SpoilerBlot from "./blots/SpoilerBlot.js";
-// import CodeBlockBlot from "./blots/CodeBlockBlot.js";
+import CodeBlockBlot from "./blots/CodeBlockBlot.js";
 import VideoBlot from "./blots/VideoBlot.js";
 import LinkEmbedBlot from "./blots/LinkEmbed.js";
 import EmbedLoadingBlot from "./blots/EmbedLoadingBlot.js";
@@ -19,33 +19,18 @@ import VanillaTheme from "./quill/VanillaTheme";
 import * as utility from "@core/utility";
 import { delegateEvent } from "@core/dom-utility";
 
-// Blots
-Quill.register(EmojiBlot);
-Quill.register(ImageBlot);
-Quill.register(SpoilerBlot);
-// Quill.register(CodeBlockBlot);
-Quill.register(VideoBlot);
-Quill.register(EmbedLoadingBlot);
-Quill.register(BlockquoteBlot);
-Quill.register(LinkEmbedBlot);
-Quill.register(EmbedErrorBlot);
-Quill.register("formats/code", CodeInlineBlot);
-
-
-// Quill.register({
-//     'blots/block'        : Block,
-//     'blots/block/embed'  : BlockEmbed,
-//     'blots/break'        : Break,
-//     'blots/container'    : Container,
-//     'blots/cursor'       : Cursor,
-//     'blots/embed'        : Embed,
-//     'blots/inline'       : Inline,
-//     'blots/scroll'       : Scroll,
-//     'blots/text'         : TextBlot,
-//     'modules/clipboard'  : Clipboard,
-//     'modules/history'    : History,
-//     'modules/keyboard'   : Keyboard
-// });
+Quill.register({
+    'blots/emoji': EmojiBlot,
+    'blots/image-embed': ImageBlot,
+    'blots/spoiler-block': SpoilerBlot,
+    'blots/video-placeholder': VideoBlot,
+    'blots/loading-embed': EmbedLoadingBlot,
+    'blots/link-embed': LinkEmbedBlot,
+    'blots/error-embed': EmbedErrorBlot,
+    'blots/blockquote-block': BlockquoteBlot,
+    'blots/code-block': CodeBlockBlot,
+    'formats/code-inline': CodeInlineBlot,
+});
 
 // Theme
 Quill.register("themes/vanilla", VanillaTheme);
@@ -175,12 +160,13 @@ export default class RichEditor {
 
         // Code Block - Block
         const insertCodeBlockBlock = () => {
-            const range = this.quill.getSelection(true);
-            const text = this.quill.getText(range.index, range.length);
-            this.quill.insertEmbed(range.index, 'code-block', {
-                content: text,
-            }, Quill.sources.USER);
-            this.quill.setSelection(range.index + text.length, Quill.sources.SILENT);
+            this.quill.format('code-block', true, Quill.sources.USER);
+            // const range = this.quill.getSelection(true);
+            // const text = this.quill.getText(range.index, range.length);
+            // this.quill.insertEmbed(range.index, 'code-block', {
+            //     content: text,
+            // }, Quill.sources.USER);
+            // this.quill.setSelection(range.index + text.length, Quill.sources.SILENT);
         };
         document.querySelector(".test-blockparagraph").addEventListener("click", insertCodeBlockBlock);
 
@@ -190,7 +176,7 @@ export default class RichEditor {
         const insertEmbedError = () => {
             const range = this.quill.getSelection(true);
             this.quill.insertText(range.index, '\n', Quill.sources.SILENT);
-            this.quill.insertEmbed(range.index + 1, 'embed-error', {
+            this.quill.insertEmbed(range.index + 1, 'error-embed', {
                 errors: [{
                     message: 'Embed failed please try again',
                 }, {
@@ -205,7 +191,7 @@ export default class RichEditor {
         const insertEmbedLoading = () => {
             const range = this.quill.getSelection(true);
             this.quill.insertText(range.index, '\n', Quill.sources.SILENT);
-            this.quill.insertEmbed(range.index + 1, 'embed-loading', {}, Quill.sources.USER);
+            this.quill.insertEmbed(range.index + 1, 'loading-embed', {}, Quill.sources.USER);
             this.quill.setSelection(range.index + 2, Quill.sources.SILENT);
         };
         document.querySelector(".test-loading").addEventListener("click", insertEmbedLoading);

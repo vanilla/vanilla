@@ -40,5 +40,5 @@ export default class EmbedErrorBlot extends BlockEmbed {
     }
 }
 
-EmbedErrorBlot.blotName = 'embed-error';
+EmbedErrorBlot.blotName = 'error-embed';
 EmbedErrorBlot.tagName = 'div';

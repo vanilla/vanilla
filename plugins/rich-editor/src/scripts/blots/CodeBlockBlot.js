@@ -1,26 +1,18 @@
-import { BlockEmbed } from "quill/blots/block";
-import { setData } from "@core/dom-utility";
-import { getData } from "@core/dom-utility";
+import CodeBlock from "quill/formats/code";
 
-export default class CodeBlockBlot extends BlockEmbed {
-    static create(data) {
-        const node = super.create(data);
-        node.classList.add("embed");
-        node.classList.add("codeBlock");
+export default class CodeBlockBlot extends CodeBlock {
+    static create(value) {
+        const domNode = super.create(value);
+        domNode.setAttribute('spellcheck', false);
+        domNode.classList.add('codeBlock');
 
         const code = document.createElement('code');
+        code.classList.add('code');
+        code.classList.add('isBlock');
+        code.innerHTML = value;
+        domNode.appendChild(code);
 
-        code.innerHTML = data.content;
-
-        node.appendChild(code);
-
-        setData(node, "data", data);
-
-        return node;
-    }
-
-    static value(node) {
-        return getData(node, "data");
+        return domNode;
     }
 }
 

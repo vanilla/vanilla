@@ -340,12 +340,12 @@
 
     <h2>Code Block - Inline</h2>
     <p>
-        With pretty stories for which <code class="code">{text code="Custom&nbsp;Text" default="Some default custom text"}</code> not a sunrise but a galaxyrise Apollonius of Perga, cosmic fugue preserve and cherish that pale blue dot muse about, a very small stage in a vast cosmic arena. Vastness is bearable only through love quasar. Ship of the imagination descended from astronomers, take root and flourish, Rig Veda colonies, astonishment. The ash of stellar alchemy rings of Uranus a very small stage in a vast cosmic arena. Gathered by gravity vanquish the impossible corpus callosum vanquish the impossible, venture hundreds of thousands, the carbon in our apple pies hundreds of thousands culture dream of the mind's eye, take root and flourish Rig Veda consciousness and billions upon billions upon billions upon billions upon billions upon billions upon billions.
+        With pretty stories for which <code class="code isInline">{text code="Custom&nbsp;Text" default="Some default custom text"}</code> not a sunrise but a galaxyrise Apollonius of Perga, cosmic fugue preserve and cherish that pale blue dot muse about, a very small stage in a vast cosmic arena. Vastness is bearable only through love quasar. Ship of the imagination descended from astronomers, take root and flourish, Rig Veda colonies, astonishment. The ash of stellar alchemy rings of Uranus a very small stage in a vast cosmic arena. Gathered by gravity vanquish the impossible corpus callosum vanquish the impossible, venture hundreds of thousands, the carbon in our apple pies hundreds of thousands culture dream of the mind's eye, take root and flourish Rig Veda consciousness and billions upon billions upon billions upon billions upon billions upon billions upon billions.
     </p>
 
     <h2>Code Block - Paragraph</h2>
     <pre class="codeBlock">
-        <code class="code">/**
+        <code class="code isBlock">/**
  * Adds locale data to the view, and adds a respond button to the discussion page.
  */
 class MyThemeNameThemeHooks extends Gdn_Plugin {

@@ -1,13 +1,12 @@
-import {Code} from "quill/formats/code";
+import { Code } from "quill/formats/code";
 
-export default class CodeInline extends Code {
+export default class CodeInlineBlot extends Code {
     constructor(domNode) {
         super(domNode);
         domNode.classList.add('code');
-        domNode.classList.add('codeInline');
-        console.log("HERE");
+        domNode.classList.add('isInline');
     }
 }
 
-CodeInline.blotName = 'code-inline';
-CodeInline.tagName = 'code';
+CodeInlineBlot.blotName = 'code-inline';
+CodeInlineBlot.tagName = 'code';

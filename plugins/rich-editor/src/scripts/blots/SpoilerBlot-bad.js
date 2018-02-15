@@ -1,7 +1,6 @@
 import Block from "quill/blots/block";
 import Parchment from 'parchment';
 import Container from 'quill/blots/container';
-import Inline from 'quill/blots/inline';
 import { setData } from "@core/dom-utility";
 import { getData } from "@core/dom-utility";
 
@@ -34,56 +33,12 @@ export default class SpoilerBlot extends Container {
     // }
 
     static create(value) {
-        // const node = super.create("div");
-        //
-        // console.log("spoiler value: ", value);
-        //
-        // return node;
+        const node = super.create("div");
 
-        const tagName = value;
-        const node = super.create(tagName);
+        console.log("spoiler value: ", value);
+
         return node;
     }
-
-    // static formats(domNode) {
-    //     return undefined;
-    // }
-    //
-    // format(name, value) {
-    //     if (this.children.length > 0) {
-    //         this.children.tail.format(name, value);
-    //     }
-    // }
-    //
-    // formats() {
-    //     return { [this.statics.blotName]: this.statics.formats(this.domNode) };
-    // }
-    //
-    // insertBefore(blot, ref) {
-    //     const index = ref == null ? this.length() : ref.offset(this);
-    //     const after = this.split(index);
-    //     after.parent.insertBefore(blot, after);
-    // }
-    //
-    // optimize() {
-    //     super.optimize();
-    //     const next = this.next;
-    //     if (next != null && next.prev === this && next.statics.blotName === this.statics.blotName && next.domNode.tagName === this.domNode.tagName) {
-    //         next.moveChildren(this);
-    //         next.remove();
-    //     }
-    // }
-    //
-    // replace(target) {
-    //     if (target.statics.blotName !== this.statics.blotName) {
-    //         const item = Parchment.create(this.statics.defaultChild);
-    //         target.moveChildren(item);
-    //         this.appendChild(item);
-    //     }
-    //     super.replace(target);
-    // }
-
-
 
     constructor(domNode) {
         super(domNode);
@@ -122,6 +77,16 @@ export default class SpoilerBlot extends Container {
     // }
     //
 
+    format(name, value) {
+        if (this.children.length > 0) {
+            this.children.tail.format(name, value);
+        }
+    }
+
+    formats() {
+        // We don't inherit from FormatBlot
+        return { [this.statics.blotName]: this.statics.formats(this.domNode) };
+    }
 
     // insertBefore(blot, ref) {
     //     if (blot instanceof ListItem) {
@@ -145,24 +110,21 @@ export default class SpoilerBlot extends Container {
     //     }
     // }
 
-    replace(target) {
-        if (target.statics.blotName !== this.statics.blotName) {
-            const item = Parchment.create(this.statics.defaultChild);
-            target.moveChildren(item);
-            this.appendChild(item);
-        }
-        super.replace(target);
-    }
+    // replace(target) {
+    //     if (target.statics.blotName !== this.statics.blotName) {
+    //         const item = Parchment.create(this.statics.defaultChild);
+    //         target.moveChildren(item);
+    //         this.appendChild(item);
+    //     }
+    //     super.replace(target);
+    // }
 }
 
 SpoilerBlot.blotName = 'spoiler-block';
 SpoilerBlot.scope = Parchment.Scope.BLOCK_BLOT;
-SpoilerBlot.tagName = 'div';
-SpoilerBlot.defaultChild = "inline";
-SpoilerBlot.allowedChildren = [Inline];
-// SpoilerBlot.scope = Parchment.Scope.BLOCK_BLOT;
-// SpoilerBlot.allowedChildren = [BlockquoteItem];
+SpoilerBlot.tagName = ['div'];
 // SpoilerContainerBlot.defaultChild = 'list-item';
+// SpoilerContainerBlot.allowedChildren = [ListItem];
 
 // export default class SpoilerBlot extends Block {
 //

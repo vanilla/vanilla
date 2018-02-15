@@ -464,13 +464,13 @@ $embedded-quote_fg: #A3A3A3 !default;
 }
 
 .code.isBlock {
+    display: block;
     overflow-x: auto;
     border: 0;
     word-wrap: normal;
     line-height: 1.4;
     white-space: pre;
     border-radius: 0;
-    display: block;
     background: none;
     padding: 12px;
     font-size: $richEditor-paragraphCode_fontSize;

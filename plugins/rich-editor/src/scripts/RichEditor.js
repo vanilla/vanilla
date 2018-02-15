@@ -103,12 +103,23 @@ export default class RichEditor {
         // };
 
         const insertSpoiler = () => {
-            const range = this.quill.getSelection(true);
-            const text = this.quill.getText(range.index, range.length);
-            this.quill.insertEmbed(range.index, 'list', {
-                content: text,
-            }, Quill.sources.USER);
-            this.quill.setSelection(range.index + text.length, Quill.sources.SILENT);
+            // const range = this.quill.getSelection(true);
+            // const text = this.quill.getText(range.index, range.length);
+            // this.quill.insertEmbed(range.index, 'list', {
+            //     content: text,
+            // }, Quill.sources.USER);
+            // this.quill.setSelection(range.index + text.length, Quill.sources.SILENT);
+            //
+            //
+
+            this.quill.format('spoiler-block', true, Quill.sources.USER);
+
+            // const range = this.quill.getSelection(true);
+            // this.quill.insertText(range.index, '\n', Quill.sources.SILENT);
+            // this.quill.insertEmbed(range.index + 1, 'spoiler-block', {
+            //     contents: "Yo"
+            // }, Quill.sources.USER);
+            // this.quill.setSelection(range.index + 2, Quill.sources.SILENT);
         };
         document.querySelector(".test-spoiler").addEventListener("click", insertSpoiler);
 
@@ -134,12 +145,6 @@ export default class RichEditor {
         // Code Block - Block
         const insertCodeBlockBlock = () => {
             this.quill.format('code-block', true, Quill.sources.USER);
-            // const range = this.quill.getSelection(true);
-            // const text = this.quill.getText(range.index, range.length);
-            // this.quill.insertEmbed(range.index, 'code-block', {
-            //     content: text,
-            // }, Quill.sources.USER);
-            // this.quill.setSelection(range.index + text.length, Quill.sources.SILENT);
         };
         document.querySelector(".test-blockparagraph").addEventListener("click", insertCodeBlockBlock);
 

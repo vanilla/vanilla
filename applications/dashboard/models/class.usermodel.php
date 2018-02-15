@@ -2714,14 +2714,13 @@ class UserModel extends Gdn_Model {
      * @return Gdn_DataSet
      */
     public function searchByName($name, $sortField = 'name', $sortDirection = 'asc', $limit = false, $offset = false) {
-        $wildcardSearch = (strpos($name, '*') !== false);
+        $wildcardSearch = (substr($name, -1, 1) === '*');
 
         // Preserve existing % by escaping.
         $name = trim($name);
         $name = str_replace('%', '\%', $name);
         if ($wildcardSearch) {
-            // Convert * to new, unescaped %.
-            $name = str_replace('*', '%', $name);
+            $name = rtrim($name, '*');
         }
 
         // Avoid potential pollution by resetting.

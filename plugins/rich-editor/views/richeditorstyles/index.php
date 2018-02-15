@@ -371,8 +371,8 @@ class MyThemeNameThemeHooks extends Gdn_Plugin {
 
 
     <h2>Blockquote</h2>
-    <blockquote class="blockQuote">
-        <div class="blockQuote-main">
+    <blockquote class="blockquote">
+        <div class="blockquote-main">
             <p>
                 <strong>Can we use jsConnect without providing an email address?</strong><br/>
                 No. You absolutely must send an email, which is the only method for mapping users. If you are importing forum users without email addresses and need a way to map them over SSO, we recommend using dummy email addresses that follow a formula like <code>uniqueID</code> <a href="#">@yoursite.com</a>.

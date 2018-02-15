@@ -420,7 +420,7 @@ $embedded-quote_fg: #A3A3A3 !default;
     }
 }
 
-.blockQuote {
+.blockquote {
     display: block;
     margin: 0;
     padding: {
@@ -429,6 +429,8 @@ $embedded-quote_fg: #A3A3A3 !default;
         right: 0;
         bottom: 0;
     };
+    padding: 3px 3px 3px 18px;
+    border-left: solid #D8D8D8 6px;
     box-sizing: border-box;
     width: 100%;
     vertical-align: middle;

@@ -2,17 +2,17 @@ import { BlockEmbed } from "quill/blots/block";
 import { setData } from "@core/dom-utility";
 import { getData } from "@core/dom-utility";
 
-export default class CodeBlockBlot extends BlockEmbed {
+export default class BlockquoteBlot extends BlockEmbed {
     static create(data) {
         const node = super.create(data);
         node.classList.add("embed");
-        node.classList.add("codeBlock");
+        node.classList.add("blockquote");
 
-        const code = document.createElement('code');
+        const quote = document.createElement('div');
+        quote.classList.add('blockquote-main');
+        quote.innerHTML = data.content;
 
-        code.innerHTML = data.content;
-
-        node.appendChild(code);
+        node.appendChild(quote);
 
         setData(node, "data", data);
 
@@ -24,5 +24,5 @@ export default class CodeBlockBlot extends BlockEmbed {
     }
 }
 
-CodeBlockBlot.blotName = 'code-block';
-CodeBlockBlot.tagName = 'pre';
+BlockquoteBlot.blotName = 'blockquote-block';
+BlockquoteBlot.tagName = 'blockquote';

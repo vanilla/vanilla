@@ -14,6 +14,7 @@ import CodeBlockBlot from "./blots/CodeBlockBlot.js";
 import VideoBlot from "./blots/VideoBlot.js";
 import LinkEmbedBlot from "./blots/LinkEmbed.js";
 import EmbedLoadingBlot from "./blots/EmbedLoadingBlot.js";
+import BlockquoteBlot from "./blots/BlockquoteBlot.js";
 import VanillaTheme from "./quill/VanillaTheme";
 import * as utility from "@core/utility";
 import { delegateEvent } from "@core/dom-utility";
@@ -26,6 +27,7 @@ Quill.register(CodeInlineBlot);
 Quill.register(CodeBlockBlot);
 Quill.register(VideoBlot);
 Quill.register(EmbedLoadingBlot);
+Quill.register(BlockquoteBlot);
 Quill.register(LinkEmbedBlot);
 Quill.register(EmbedErrorBlot);
 
@@ -215,7 +217,7 @@ export default class RichEditor {
 
 
 
-        // Code Block - Block
+        // Insert Image
         const insertImage = () => {
             const range = this.quill.getSelection(true);
             this.quill.insertText(range.index, '\n', Quill.sources.SILENT);
@@ -226,6 +228,23 @@ export default class RichEditor {
             this.quill.setSelection(range.index + 2, Quill.sources.SILENT);
         };
         document.querySelector(".test-image").addEventListener("click", insertImage);
+
+
+
+        // Code Block - Block
+        const insertCodeBlock = () => {
+            const range = this.quill.getSelection(true);
+            this.quill.insertText(range.index, '\n', Quill.sources.SILENT);
+            this.quill.insertEmbed(range.index + 1, 'blockquote-block', {
+                content: '<p>\n' +
+                '  <strong>Can we use jsConnect without providing an email address?</strong><br/>\n' +
+                '  No. You absolutely must send an email, which is the only method for mapping users. If you are importing forum users without email addresses and need a way to map them over SSO, we recommend using dummy email addresses that follow a formula like <code>uniqueID</code> <a href="#">@yoursite.com</a>.\n' +
+                '</p>',
+            }, Quill.sources.USER);
+            this.quill.setSelection(range.index + 2, Quill.sources.SILENT);
+        };
+        document.querySelector(".test-blockquote").addEventListener("click", insertCodeBlock);
+
 
 
 

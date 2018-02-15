@@ -309,9 +309,3 @@ $embedVideo_width: 640px;
     line-height: $embedded-linkTitle_lineHeight;
     max-height: #{$embedded-linkTitle_lineHeight * $embedded-linkTitle_fontSize * 3}
 }
-
-.blockQuote {
-    padding: 3px 3px 3px 18px;
-    border-left: solid #D8D8D8 6px;
-    color: #A3A3A3;
-}

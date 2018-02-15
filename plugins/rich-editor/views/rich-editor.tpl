@@ -52,40 +52,40 @@
     </div>
 
     <button type="button" class="test-sagan">
-        DONE - TEST - Saganify!
+        DONE - Saganify!
     </button><br/>
 
     <button type="button" class="test-spoiler">
-        TEST - Spoiler
+        Spoiler
     </button><br/>
     <button type="button" class="test-blockinline">
-        TEST - Code Block - Inline
+        Code Block - Inline
     </button><br/>
     <button type="button" class="test-blockparagraph">
-        TEST - Code Block - Paragraph
+        Code Block - Paragraph
     </button><br/>
     <button type="button" class="test-blockquote">
-        TEST - Blockquote
+        DONE - Blockquote
     </button><br/>
     <button type="button" class="test-loading">
-        TEST - Embed - Loading
+        DONE - Embed - Loading
     </button><br/>
     <button type="button" class="test-error">
-        DONE - TEST - Embed - Error
+        DONE - Embed - Error
     </button><br/>
     <button type="button" class="test-image">
-        DONE - TEST - Embed - Image
+        DONE - Embed - Image
     </button><br/>
     <button type="button" class="test-video">
-        DONE - TEST - Embed - Video
+        DONE - Embed - Video
     </button><br/>
     <button type="button" class="test-urlinternal">
-        DONE - TEST - Embed - Internal URL
+        DONE - Embed - Internal URL
     </button><br/>
     <button type="button" class="test-urlexternalimage">
-        DONE - TEST - Embed - External URL With Image
+        DONE - Embed - External URL With Image
     </button><br/>
     <button type="button" class="test-urlexternal">
-        DONE - TEST - Embed - External URL Without Image
+        DONE - Embed - External URL Without Image
     </button>
 </div>

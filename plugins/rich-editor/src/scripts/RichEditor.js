@@ -112,7 +112,7 @@ export default class RichEditor {
             //
             //
 
-            this.quill.format('spoiler-block', true, Quill.sources.USER);
+            this.quill.format('spoiler', true, Quill.sources.USER);
 
             // const range = this.quill.getSelection(true);
             // this.quill.insertText(range.index, '\n', Quill.sources.SILENT);

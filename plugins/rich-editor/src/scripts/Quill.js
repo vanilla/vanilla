@@ -13,8 +13,8 @@ import Strike from 'quill/formats/strike';
 import EmojiBlot from "./blots/EmojiBlot.js";
 import ImageBlot from "./blots/ImageBlot.js";
 import EmbedErrorBlot from "./blots/EmbedErrorBlot.js";
-import SpoilerBlot from "./blots/SpoilerBlot.js";
-import CodeBlockBlot, { CodeBlockChildBlot } from "./blots/CodeBlockBlot.js";
+import SpoilerBlot, { SpoilerContentBlot } from "./blots/SpoilerBlot.js";
+import CodeBlockBlot from "./blots/CodeBlockBlot.js";
 import VideoBlot from "./blots/VideoBlot.js";
 import LinkEmbedBlot from "./blots/LinkEmbed.js";
 import EmbedLoadingBlot from "./blots/EmbedLoadingBlot.js";
@@ -29,12 +29,12 @@ Quill.register({
     // Block formats
     'formats/blockquote': BlockquoteBlot,
     'formats/code-block': CodeBlockBlot,
-    'formats/code-block/child': CodeBlockChildBlot,
     'formats/header': Header,
     'formats/list': List,
     'formats/list/item': ListItem,
     'formats/image-embed': ImageBlot,
     'formats/spoiler': SpoilerBlot,
+    'formats/spoiler/content': SpoilerContentBlot,
     'formats/video-placeholder': VideoBlot,
     'formats/loading-embed': EmbedLoadingBlot,
     'formats/link-embed': LinkEmbedBlot,

@@ -3,6 +3,10 @@ import { setData } from "@core/dom-utility";
 import { getData } from "@core/dom-utility";
 
 export default class BlockquoteBlot extends BlockEmbed {
+
+    static blotName = "blockquote-block";
+    static tagName = 'blockquote';
+
     static create(data) {
         const node = super.create(data);
         node.classList.add("embed");
@@ -23,6 +27,3 @@ export default class BlockquoteBlot extends BlockEmbed {
         return getData(node, "data");
     }
 }
-
-BlockquoteBlot.blotName = 'blockquote-block';
-BlockquoteBlot.tagName = 'blockquote';

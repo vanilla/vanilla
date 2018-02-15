@@ -52,7 +52,7 @@
     </div>
 
     <button type="button" class="test-sagan">
-        TEST - Saganify!
+        DONE - TEST - Saganify!
     </button><br/>
 
     <button type="button" class="test-spoiler">
@@ -74,18 +74,18 @@
         TEST - Embed - Error
     </button><br/>
     <button type="button" class="test-image">
-        TEST - Embed - Image
+        DONE - TEST - Embed - Image
     </button><br/>
     <button type="button" class="test-video">
-        TEST - Embed - Video
+        DONE - TEST - Embed - Video
     </button><br/>
     <button type="button" class="test-urlinternal">
-        TEST - Embed - Internal URL
+        DONE - TEST - Embed - Internal URL
     </button><br/>
     <button type="button" class="test-urlexternalimage">
-        TEST - Embed - External URL With Image
+        DONE - TEST - Embed - External URL With Image
     </button><br/>
     <button type="button" class="test-urlexternal">
-        TEST - Embed - External URL Without Image
+        DONE - TEST - Embed - External URL Without Image
     </button>
 </div>

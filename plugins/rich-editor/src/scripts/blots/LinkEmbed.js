@@ -60,7 +60,7 @@ export default class LinkEmbedBlock extends BlockEmbed {
 
         let title = false;
         if (data.name) {
-            const title = document.createElement('h3');
+            title = document.createElement('h3');
             title.classList.add('embedLink-title');
             title.innerHTML = data.name;
         }

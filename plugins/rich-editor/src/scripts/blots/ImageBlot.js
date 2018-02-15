@@ -1,20 +1,27 @@
-import Embed from "quill/blots/embed";
+import { BlockEmbed } from "quill/blots/block";
+import { setData } from "@core/dom-utility";
+import { getData } from "@core/dom-utility";
 
-export default class ImageBlot extends Embed {
-    static create(value) {
+export default class ImageBlot extends BlockEmbed {
+    static create(data) {
         const node = super.create();
-        node.setAttribute('alt', value.alt);
-        node.setAttribute('src', value.url);
+        node.classList.add('embedImage');
+
+        const image = document.createElement('img');
+        image.classList.add('embedImage-img');
+        image.setAttribute('src', data.url);
+        image.setAttribute('alt', data.alt || '');
+
+        node.appendChild(image);
+
+        setData(node, "data", data);
         return node;
     }
 
     static value(node) {
-        return {
-            alt: node.getAttribute('alt'),
-            url: node.getAttribute('src'),
-        };
+        return getData(node, "data");
     }
 }
 
-ImageBlot.blotName = 'embeddedImage';
-ImageBlot.tagName = 'img';
+ImageBlot.blotName = 'image-embed';
+ImageBlot.tagName = 'div';

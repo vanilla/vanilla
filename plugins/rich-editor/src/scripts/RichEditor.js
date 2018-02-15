@@ -183,6 +183,23 @@ export default class RichEditor {
         };
         document.querySelector(".test-blockparagraph").addEventListener("click", insertCodeBlockBlock);
 
+
+
+
+        // Code Block - Block
+        const insertImage = () => {
+            const range = this.quill.getSelection(true);
+            this.quill.insertText(range.index, '\n', Quill.sources.SILENT);
+            this.quill.insertEmbed(range.index + 1, 'image-embed', {
+                url: 'https://images.pexels.com/photos/31459/pexels-photo.jpg?w=1260&h=750&dpr=2&auto=compress&cs=tinysrgb',
+                alt: "Some Alt Text",
+            }, Quill.sources.USER);
+            this.quill.setSelection(range.index + 2, Quill.sources.SILENT);
+        };
+        document.querySelector(".test-image").addEventListener("click", insertImage);
+
+
+
         // Code Block - Block
         const insertVideo = () => {
             const range = this.quill.getSelection(true);

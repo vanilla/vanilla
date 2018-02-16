@@ -371,6 +371,12 @@ class DiscussionsApiController extends AbstractApiController {
                     'processor' => [DateFilterSchema::class, 'dateFilterField'],
                 ],
             ]),
+            'type:s?' => [
+                'description' => 'Filter by discussion type.',
+                'x-filter' => [
+                    'field' => 'd.Type'
+                ],
+            ],
             'followed:b' => [
                 'default' => false,
                 'description' => 'Only fetch discussions from followed categories. Pinned discussions are mixed in.'

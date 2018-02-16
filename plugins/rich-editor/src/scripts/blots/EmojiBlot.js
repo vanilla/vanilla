@@ -1,16 +1,17 @@
 import Embed from "quill/blots/embed";
+import { setData, getData } from "@core/dom-utility";
 
 export default class EmojiBlot extends Embed {
-    static create(emojiData) {
+    static create(data) {
         const node = super.create();
         node.classList.add("emoji");
-        node.innerHTML = emojiData.emojiChar;
-        node.dataset.emojiChar = emojiData.emojiChar;
+        node.innerHTML = data.emojiChar;
+        setData(node, data);
         return node;
     }
 
     static value(node) {
-        return { ...node.dataset };
+        return getData(node, "data");
     }
 }
 

@@ -176,6 +176,10 @@ class DiscussionsApiController extends AbstractApiController {
     protected function fullSchema() {
         return Schema::parse([
             'discussionID:i' => 'The ID of the discussion.',
+            'type:s|n' => [
+                //'enum' => [] // Let's find a way to fill that properly.
+                'description' => 'The type of this discussion if any.',
+            ],
             'name:s' => 'The title of the discussion.',
             'body:s' => 'The body of the discussion.',
             'categoryID:i' => 'The category the discussion is in.',

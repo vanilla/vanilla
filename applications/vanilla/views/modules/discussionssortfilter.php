@@ -21,7 +21,7 @@
                     $label = val('name', $link);
                 }
             }
-            echo linkDropDown($dropdown, 'selectBox-ideationFilter', 'Sort');
+            echo linkDropDown($dropdown, 'selectBox-ideationFilter', 'Filter');
         } ?>
         </span>
     <?php } ?>

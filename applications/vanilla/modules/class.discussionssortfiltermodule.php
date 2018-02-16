@@ -154,8 +154,7 @@ class DiscussionsSortFilterModule extends Gdn_Module {
             return [''];
         }
 
-        $sortDropdown = [];
-
+        $filterDropdown = [];
 
         $dropdowns = [];
         foreach($this->filters as $filterSet) {
@@ -170,7 +169,6 @@ class DiscussionsSortFilterModule extends Gdn_Module {
 
             // Override the trigger text?
             $selectedValue = val($setKey, $this->selectedFilters);
-
 
             if ($selectedValue && $selectedValue != 'none') {
                 $selected = val('name', $filterSet['filters'][$selectedValue]);
@@ -209,12 +207,12 @@ class DiscussionsSortFilterModule extends Gdn_Module {
                 $link = $dropdown->getItems()[val('group', $filter)]['items'][val('key', $filter)];
                 $group = val('group', $filter);
                 if($lastGroup != $group && $index != 0 && ($index != $filterLength - 1)) {
-                    $sortDropdown[] = [
+                    $filterDropdown[] = [
                         "separator" => true
                     ];
                 }
 
-                $sortDropdown[] = [
+                $filterDropdown[] = [
                     'name' => val('text', $link),
                     'url' => url('/'.val('url', $link)),
                     'active' => (val('key', $filter) === $selectedValue || ($selectedValue == false && $index == 0)),
@@ -224,7 +222,7 @@ class DiscussionsSortFilterModule extends Gdn_Module {
                 $index++;
             }
 
-            $dropdowns[] = $sortDropdown;
+            $dropdowns[] = $filterDropdown;
         }
         return $dropdowns;
     }

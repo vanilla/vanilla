@@ -177,9 +177,6 @@ class DiscussionsSortFilterModule extends Gdn_Module {
                 $dropdown->setTrigger($selected);
             }
 
-            //$dropdown->setView($this->dropdownView);
-            //$dropdown->setForceDivider(true); // Adds dividers between groups in the dropdown.
-
             $lastGroup = '';
             $index = 0;
             $filters = val('filters', $filterSet);
@@ -220,17 +217,12 @@ class DiscussionsSortFilterModule extends Gdn_Module {
                 $sortDropdown[] = [
                     'name' => val('text', $link),
                     'url' => url('/'.val('url', $link)),
-                    'active' => val('key', $filter) === $selectedValue,
+                    'active' => (val('key', $filter) === $selectedValue || ($selectedValue == false && $index == 0)),
                 ];
 
                 $lastGroup = $group;
                 $index++;
-
-
             }
-//            $dropdowns[] = $dropdown;
-
-            $break = "here";
 
             $dropdowns[] = $sortDropdown;
         }

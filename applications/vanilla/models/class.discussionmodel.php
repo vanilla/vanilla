@@ -52,6 +52,7 @@ class DiscussionModel extends Gdn_Model {
      *   `['field1' => 'direction', 'field2' => 'direction']`
      */
     protected static $allowedSorts = [
+        'none' => ['key' => self::EMPTY_FILTER_KEY, 'name' => 'None'],
         'hot' => ['key' => 'hot', 'name' => 'Hot', 'orderBy' => ['DateLastComment' => 'desc']],
         'top' => ['key' => 'top', 'name' => 'Top', 'orderBy' => ['Score' => 'desc', 'DateInserted' => 'desc']],
         'new' => ['key' => 'new', 'name' => 'New', 'orderBy' => ['DateInserted' => 'desc']]

@@ -128,17 +128,17 @@ class DiscussionsSortFilterModule extends Gdn_Module {
                 }
             }
             $key = val('key', $sort);
-            $queryString = DiscussionModel::getSortFilterQueryString($this->selectedSort, $this->selectedFilters, $key);
+            $queryString = val('key', $sort) !== 'none' ? DiscussionModel::getSortFilterQueryString($this->selectedSort, $this->selectedFilters, $key) : '';
             $sortData[$key]['name'] = val('name', $sort);
             $sortData[$key]['url'] = $this->getPagelessPath().$queryString;
             $sortData[$key]['rel'] = 'nofollow';
         }
         if (val($this->selectedSort, $sortData)) {
             $sortData[$this->selectedSort]['cssClass'] = self::ACTIVE_CSS_CLASS;
+            $sortData[$this->selectedSort]['active'] = true;
         } elseif (val($sortKey = DiscussionModel::getDefaultSortKey(), $sortData)) {
             $sortData[$sortKey]['cssClass'] = self::ACTIVE_CSS_CLASS;
         }
-
 
         return $sortData;
     }

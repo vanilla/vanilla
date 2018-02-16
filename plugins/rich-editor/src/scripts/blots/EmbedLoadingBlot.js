@@ -7,15 +7,15 @@ export default class EmbedLoadingBlot extends BlockEmbed {
         node.classList.add('embed');
         node.setAttribute('role', 'alert');
 
-        node.innerHTML = "<div class=\"embedLoader\">\n" +
-            "            <div class=\"embedLoader-box\">\n" +
-            "                <div class=\"embedLoader-loader\">\n" +
-            "                    <span class=\"sr-only\">\n" +
-                                    t('Loading...') +
-            "                    </span>\n" +
-            "                </div>\n" +
-            "            </div>\n" +
-            "        </div>";
+        node.innerHTML = `<div class='embedLoader'>
+                            <div class='embedLoader-box'>
+                                <div class='embedLoader-loader'>
+                                    <span class='sr-only'>
+                                        ${t('Loading...')}
+                                    </span>
+                                </div>
+                            </div>
+                        </div>`;
         return node;
     }
 

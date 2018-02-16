@@ -1,4 +1,6 @@
 // Compatibility
+@import "compatibility/_mixins.scss";
+@import "compatibility/utilities";
 @import "compatibility/image-cropper";
 
 // This should always be added after style.css and not be overridden.

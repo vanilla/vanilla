@@ -1,3 +1,9 @@
+$menu-separator_height: 1px;
+$menu-separator_margin: $baseUnit;
+$menu-separator_style: solid;
+$menu-separator_color: #dddee0 !default;
+
+
 .PageControls {
   .selectBox {
     margin-right: 10px;
@@ -106,4 +112,13 @@
 
 body.Categories.isMobile .PageControls.Top {
   display: block;
+}
+
+.menu-separator {
+    background: none; // TODO: get rid of when we get the new editor
+    border-bottom: $menu-separator_height $menu-separator_style $menu-separator_color;
+    margin: $menu-separator_margin 0;
+    hr { // We keep the <hr/> for accessibility
+        @include srcOnly();
+    }
 }

@@ -4,7 +4,8 @@
         "process": "core",
         "entries": {
             "bootstrap-app": "./src/scripts/bootstrap/bootstrap.js",
-            "bootstrap-admin": "./src/scripts/bootstrap/bootstrap.js"
+            "bootstrap-admin": "./src/scripts/bootstrap/bootstrap.js",
+            "core-app": "./src/scripts/app/core-app.js"
         },
         "exports": {
             "*": [

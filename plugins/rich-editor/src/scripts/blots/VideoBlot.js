@@ -1,7 +1,6 @@
 import { BlockEmbed } from "quill/blots/block";
 import { t } from "@core/utility";
-import { setData } from "@core/dom-utility";
-import { getData } from "@core/dom-utility";
+import { setData, getData } from "@core/dom-utility";
 
 function simplifyFraction(numerator, denominator){
     let gcd = (a, b) => {

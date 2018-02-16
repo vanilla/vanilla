@@ -1,6 +1,5 @@
 import { BlockEmbed } from "quill/blots/block";
-import { setData } from "@core/dom-utility";
-import { getData } from "@core/dom-utility";
+import { setData, getData } from "@core/dom-utility";
 
 export default class BlockquoteBlot extends BlockEmbed {
 

@@ -1,7 +1,6 @@
 import { BlockEmbed } from "quill/blots/block";
 import shave from 'shave';
-import { setData } from "@core/dom-utility";
-import { getData } from "@core/dom-utility";
+import { setData, getData } from "@core/dom-utility";
 
 export default class LinkEmbedBlock extends BlockEmbed {
 

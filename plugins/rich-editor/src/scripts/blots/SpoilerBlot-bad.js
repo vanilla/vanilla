@@ -1,8 +1,7 @@
 import Block from "quill/blots/block";
 import Parchment from 'parchment';
 import Container from 'quill/blots/container';
-import { setData } from "@core/dom-utility";
-import { getData } from "@core/dom-utility";
+import { setData, getData } from "@core/dom-utility";
 
 // static value(node) {
 //     return getData(node, "data");

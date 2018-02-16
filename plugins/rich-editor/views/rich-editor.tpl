@@ -50,4 +50,41 @@
         </button>
         {* Paragraph level menu goes here *}
     </div>
+
+    {*<button type="button" class="test-sagan">*}
+        {*Saganify!*}
+    {*</button><br/>*}
+    {*<button type="button" class="test-spoiler">*}
+        {*Spoiler*}
+    {*</button><br/>*}
+    {*<button type="button" class="test-blockparagraph">*}
+        {*Code Block - Paragraph*}
+    {*</button><br/>*}
+    {*<button type="button" class="test-codeblockinline">*}
+        {*Code Block - Inline*}
+    {*</button><br/>*}
+    {*<button type="button" class="test-blockquote">*}
+        {*Blockquote*}
+    {*</button><br/>*}
+    {*<button type="button" class="test-loading">*}
+        {*Embed - Loading*}
+    {*</button><br/>*}
+    {*<button type="button" class="test-error">*}
+        {*Embed - Error*}
+    {*</button><br/>*}
+    {*<button type="button" class="test-image">*}
+        {*Embed - Image*}
+    {*</button><br/>*}
+    {*<button type="button" class="test-video">*}
+        {*Embed - Video*}
+    {*</button><br/>*}
+    {*<button type="button" class="test-urlinternal">*}
+        {*Embed - Internal URL*}
+    {*</button><br/>*}
+    {*<button type="button" class="test-urlexternalimage">*}
+        {*Embed - External URL With Image*}
+    {*</button><br/>*}
+    {*<button type="button" class="test-urlexternal">*}
+        {*Embed - External URL Without Image*}
+    {*</button>*}
 </div>

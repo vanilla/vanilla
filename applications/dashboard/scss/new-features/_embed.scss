@@ -14,6 +14,7 @@ $embedded-fontWeight_bold: bold !default;
 $embedded-linkTitle_fontSize: 14px !default;
 $embedded-linkTitle_lineHeight: 1.5 !default;
 $embedded-linkImage_width: 225px !default;
+$embedVideo_width: 640px;
 
 .embed {
     display: block;
@@ -117,9 +118,13 @@ $embedded-linkImage_width: 225px !default;
     .embedLoader-errorMessage {
         max-width: calc(100% - #{$embeded-icon_width * 3});
         padding-left: $embeded-icon_width;
+
     }
 }
 
+.embed {
+    white-space: normal;
+}
 
 // Image
 
@@ -139,8 +144,25 @@ $embedded-linkImage_width: 225px !default;
     max-width: 100%;
     margin: auto;
 
+    iframe,
+    .embedVideo-iframe {
+        @include absolute-fullSizeOfParent;
+    }
 
+    &:focus,
+    &:hover {
+        .embedVideo-playIcon {
+            transform: scale(1.1);
+        }
+    }
+}
+
+.embedVideo-ratio {
+    position: relative;
+    display: block;
     background-color: #000000;
+    margin: 0;
+    width: 100%;
     padding: {
         left: 0;
         right: 0;
@@ -161,18 +183,6 @@ $embedded-linkImage_width: 225px !default;
 
     &.is1by1 {
         padding-top: 100%;
-    }
-
-    iframe,
-    .embedVideo-iframe {
-        @include absolute-fullSizeOfParent;
-    }
-
-    &:focus,
-    &:hover {
-        .embedVideo-playIcon {
-            transform: scale(1.1);
-        }
     }
 }
 
@@ -299,10 +309,3 @@ $embedded-linkImage_width: 225px !default;
     line-height: $embedded-linkTitle_lineHeight;
     max-height: #{$embedded-linkTitle_lineHeight * $embedded-linkTitle_fontSize * 3}
 }
-
-.blockQuote {
-    padding: 3px 3px 3px 18px;
-    border-left: solid #D8D8D8 6px;
-    color: #A3A3A3;
-}
-

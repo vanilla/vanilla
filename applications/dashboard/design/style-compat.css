@@ -390,13 +390,15 @@ body.isMobile .change-picture .change-picture-instructions {
   transform: translateY(50%) rotate(-45deg);
 }
 
-.blockQuote {
+.blockquote {
   display: block;
   margin: 0;
   padding-top: 0;
   padding-left: 18px;
   padding-right: 0;
   padding-bottom: 0;
+  padding: 3px 3px 3px 18px;
+  border-left: solid #D8D8D8 6px;
   box-sizing: border-box;
   width: 100%;
   vertical-align: middle;
@@ -406,13 +408,14 @@ body.isMobile .change-picture .change-picture-instructions {
 
 .userContent code,
 .code {
-  display: inline;
+  display: inline-block;
   font-size: 0.86em;
   vertical-align: middle;
   line-height: 1em;
   box-sizing: border-box;
   font-family: monospace;
   background: transparent;
+  margin: 0 1ex;
   border-radius: 2;
   border-width: 1px;
   border-style: solid;
@@ -423,22 +426,14 @@ body.isMobile .change-picture .change-picture-instructions {
   padding-right: 0.5em;
 }
 
-.userContent pre,
-.codeBlock {
+.code.isBlock {
+  display: block;
   overflow-x: auto;
-  background: inherit;
   border: 0;
   word-wrap: normal;
   line-height: 1.4;
-  padding: 0;
   white-space: pre;
-}
-
-.userContent pre .code,
-.codeBlock .code {
   border-radius: 0;
-  border: 0;
-  display: block;
   background: none;
   padding: 12px;
   font-size: 14px;
@@ -846,6 +841,10 @@ body.Categories.isMobile .PageControls.Top {
   padding-left: 24px;
 }
 
+.embed {
+  white-space: normal;
+}
+
 .embedImage {
   display: block;
   width: 640px;
@@ -859,26 +858,6 @@ body.Categories.isMobile .PageControls.Top {
   width: 640px;
   max-width: 100%;
   margin: auto;
-  background-color: #000000;
-  padding-left: 0;
-  padding-right: 0;
-  padding-bottom: 0;
-}
-
-.embedVideo.is21by9 {
-  padding-top: 42.8571428571%;
-}
-
-.embedVideo.is16by9 {
-  padding-top: 56.25%;
-}
-
-.embedVideo.is4by3 {
-  padding-top: 75%;
-}
-
-.embedVideo.is1by1 {
-  padding-top: 100%;
 }
 
 .embedVideo iframe,
@@ -893,6 +872,33 @@ body.Categories.isMobile .PageControls.Top {
 
 .embedVideo:focus .embedVideo-playIcon, .embedVideo:hover .embedVideo-playIcon {
   transform: scale(1.1);
+}
+
+.embedVideo-ratio {
+  position: relative;
+  display: block;
+  background-color: #000000;
+  margin: 0;
+  width: 100%;
+  padding-left: 0;
+  padding-right: 0;
+  padding-bottom: 0;
+}
+
+.embedVideo-ratio.is21by9 {
+  padding-top: 42.8571428571%;
+}
+
+.embedVideo-ratio.is16by9 {
+  padding-top: 56.25%;
+}
+
+.embedVideo-ratio.is4by3 {
+  padding-top: 75%;
+}
+
+.embedVideo-ratio.is1by1 {
+  padding-top: 100%;
 }
 
 .embedVideo-playButton {
@@ -1015,12 +1021,6 @@ body.Categories.isMobile .PageControls.Top {
   max-width: 100%;
   line-height: 1.5;
   max-height: 63px;
-}
-
-.blockQuote {
-  padding: 3px 3px 3px 18px;
-  border-left: solid #D8D8D8 6px;
-  color: #A3A3A3;
 }
 
 /*# sourceMappingURL=style-compat.css.map */

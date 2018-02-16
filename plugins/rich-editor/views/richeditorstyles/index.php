@@ -305,7 +305,7 @@
 <div class="userContent">
 
     <h2>Spoiler</h2>
-    <div class="spoiler isShowingSpoiler">
+    <div class="spoiler isOpen">
         <button class="iconButton button-spoiler">
             <span class="spoiler-warning">
                 <span class="spoiler-warningMain">
@@ -340,12 +340,11 @@
 
     <h2>Code Block - Inline</h2>
     <p>
-        With pretty stories for which <code class="code">{text code="Custom&nbsp;Text" default="Some default custom text"}</code> not a sunrise but a galaxyrise Apollonius of Perga, cosmic fugue preserve and cherish that pale blue dot muse about, a very small stage in a vast cosmic arena. Vastness is bearable only through love quasar. Ship of the imagination descended from astronomers, take root and flourish, Rig Veda colonies, astonishment. The ash of stellar alchemy rings of Uranus a very small stage in a vast cosmic arena. Gathered by gravity vanquish the impossible corpus callosum vanquish the impossible, venture hundreds of thousands, the carbon in our apple pies hundreds of thousands culture dream of the mind's eye, take root and flourish Rig Veda consciousness and billions upon billions upon billions upon billions upon billions upon billions upon billions.
+        With pretty stories for which <code class="code isInline">{text code="Custom&nbsp;Text" default="Some default custom text"}</code> not a sunrise but a galaxyrise Apollonius of Perga, cosmic fugue preserve and cherish that pale blue dot muse about, a very small stage in a vast cosmic arena. Vastness is bearable only through love quasar. Ship of the imagination descended from astronomers, take root and flourish, Rig Veda colonies, astonishment. The ash of stellar alchemy rings of Uranus a very small stage in a vast cosmic arena. Gathered by gravity vanquish the impossible corpus callosum vanquish the impossible, venture hundreds of thousands, the carbon in our apple pies hundreds of thousands culture dream of the mind's eye, take root and flourish Rig Veda consciousness and billions upon billions upon billions upon billions upon billions upon billions upon billions.
     </p>
 
     <h2>Code Block - Paragraph</h2>
-    <pre class="codeBlock">
-        <code class="code">/**
+    <code class="code isBlock">/**
  * Adds locale data to the view, and adds a respond button to the discussion page.
  */
 class MyThemeNameThemeHooks extends Gdn_Plugin {
@@ -367,12 +366,11 @@ class MyThemeNameThemeHooks extends Gdn_Plugin {
         $sender->setData('locale', $locale);
     }
 }</code>
-    </pre>
 
 
     <h2>Blockquote</h2>
-    <blockquote class="blockQuote">
-        <div class="blockQuote-main">
+    <blockquote class="blockquote">
+        <div class="blockquote-main">
             <p>
                 <strong>Can we use jsConnect without providing an email address?</strong><br/>
                 No. You absolutely must send an email, which is the only method for mapping users. If you are importing forum users without email addresses and need a way to map them over SSO, we recommend using dummy email addresses that follow a formula like <code>uniqueID</code> <a href="#">@yoursite.com</a>.
@@ -395,7 +393,7 @@ class MyThemeNameThemeHooks extends Gdn_Plugin {
 
 
     <h2>Embed - Error</h2>
-    <div class="embed" aria-live="polite">
+    <div class="embed" role="alert">
         <ul class="embedLoader-errors">
             <li class="embedLoader-error">
                 <svg class="embedLoader-icon embedLoader-warningIcon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
@@ -406,7 +404,7 @@ class MyThemeNameThemeHooks extends Gdn_Plugin {
                     Embed failed please try again
                 </span>
 
-                <button class="closeButton">
+                <button class="closeButton js-closeEmbedError">
                     <svg class="embedLoader-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
                         <path fill="currentColor" d="M12,10.6293581 L5.49002397,4.11938207 C5.30046135,3.92981944 4.95620859,3.96673045 4.69799105,4.22494799 L4.22494799,4.69799105 C3.97708292,4.94585613 3.92537154,5.29601344 4.11938207,5.49002397 L10.6293581,12 L4.11938207,18.509976 C3.92981944,18.6995387 3.96673045,19.0437914 4.22494799,19.3020089 L4.69799105,19.775052 C4.94585613,20.0229171 5.29601344,20.0746285 5.49002397,19.8806179 L12,13.3706419 L18.509976,19.8806179 C18.6995387,20.0701806 19.0437914,20.0332695 19.3020089,19.775052 L19.775052,19.3020089 C20.0229171,19.0541439 20.0746285,18.7039866 19.8806179,18.509976 L13.3706419,12 L19.8806179,5.49002397 C20.0701806,5.30046135 20.0332695,4.95620859 19.775052,4.69799105 L19.3020089,4.22494799 C19.0541439,3.97708292 18.7039866,3.92537154 18.509976,4.11938207 L12,10.6293581 Z"/>
                     </svg>
@@ -489,24 +487,30 @@ class MyThemeNameThemeHooks extends Gdn_Plugin {
     </div>
 
     <h2>Embed - Video Placeholder</h2>
-    <div class="embedVideo is16by9" aria-label="Video title">
-        <button class="embedVideo-playButton iconButton" style="background-image: url('https://images.pexels.com/photos/31459/pexels-photo.jpg?w=1260&h=750&dpr=2&auto=compress&cs=tinysrgb')">
-            <svg class="embedVideo-playIcon" xmlns="http://www.w3.org/2000/svg" viewBox="-1 -1 24 24">
-                <title>Play Video</title>
-                <path class="embedVideo-playIconPath embedVideo-playIconPath-circle" style="fill: currentColor; stroke-width: .3;" d="M11,0A11,11,0,1,0,22,11,11,11,0,0,0,11,0Zm0,20.308A9.308,9.308,0,1,1,20.308,11,9.308,9.308,0,0,1,11,20.308Z"/>
-                <polygon class="embedVideo-playIconPath embedVideo-playIconPath-triangle" style="fill: currentColor; stroke-width: .3;" points="8.609 6.696 8.609 15.304 16.261 11 8.609 6.696"/>
-            </svg>
-        </button>
+    <div class="embedVideo" aria-label="Video title">
+        <div class="embedVideo-ratio is16by9">
+            <button class="embedVideo-playButton iconButton js-playVideo" style="background-image: url('https://images.pexels.com/photos/31459/pexels-photo.jpg?w=1260&h=750&dpr=2&auto=compress&cs=tinysrgb')">
+                <svg class="embedVideo-playIcon" xmlns="http://www.w3.org/2000/svg" viewBox="-1 -1 24 24">
+                    <title>Play Video</title>
+                    <path class="embedVideo-playIconPath embedVideo-playIconPath-circle" style="fill: currentColor; stroke-width: .3;" d="M11,0A11,11,0,1,0,22,11,11,11,0,0,0,11,0Zm0,20.308A9.308,9.308,0,1,1,20.308,11,9.308,9.308,0,0,1,11,20.308Z"/>
+                    <polygon class="embedVideo-playIconPath embedVideo-playIconPath-triangle" style="fill: currentColor; stroke-width: .3;" points="8.609 6.696 8.609 15.304 16.261 11 8.609 6.696"/>
+                </svg>
+            </button>
+        </div>
     </div>
 
     <h2>Embed - Video Standard Ratio (default rations include: 21:9, 16:9, 4:3, 1:1) Notice we get a custom class for the ratio </h2>
-    <div class="embedVideo is16by9">
-        <iframe class="embedVideo-iframe" src="https://www.youtube.com/embed/zpOULjyy-n8?rel=0" allowfullscreen></iframe>
+    <div class="embedVideo">
+        <div class="embedVideo-ratio is16by9">
+            <iframe class="embedVideo-iframe" src="https://www.youtube.com/embed/zpOULjyy-n8?rel=0" allowfullscreen></iframe>
+        </div>
     </div>
 
     <h2>Embed - Video Calculated Ratio (default rations include: 21:9, 16:9, 4:3, 1:1. If no standard ratio is found, set padding-top with inline styles on embedVideo element. I'm using 16:9 as an example here, but the technique is the same no matter the ratio. Divide width / height - example: 9/16 gives 56.25%)</h2>
-    <div class="embedVideo" style="padding-top: 56.25%;">
-        <iframe class="embedVideo-iframe" src="https://www.youtube.com/embed/zpOULjyy-n8?rel=0" allowfullscreen></iframe>
+    <div class="embedVideo">
+        <div class="embedVideo-ratio" style="padding-top: 56.25%;">
+            <iframe class="embedVideo-iframe" src="https://www.youtube.com/embed/zpOULjyy-n8?rel=0" allowfullscreen></iframe>
+        </div>
     </div>
 
     <h2>Embed - Internal URL</h2>
@@ -563,8 +567,7 @@ class MyThemeNameThemeHooks extends Gdn_Plugin {
                     </span>
                 </div>
                 <div class="embedLink-excerpt">
-                    The Battle of New York, locally known as "The Incident",
-                    was a major battle between the Avengers and Loki with his borrowed Chitauri army in Manhattan, New York City. It was, according to Loki's plan, the first battle in Loki's war to subjugate Earth, but the actions of the Avengers neutralized the threat of the Chitauri before they could continue the invasion…
+                    The Battle of New York, locally known as "The Incident", was a major battle between the Avengers and Loki with his borrowed Chitauri army in Manhattan, New York City. It was, according to Loki's plan, the first battle in Loki's war to subjugate Earth, but the actions of the Avengers neutralized the threat of the Chitauri before they could continue the invasion…
                 </div>
             </div>
         </article>

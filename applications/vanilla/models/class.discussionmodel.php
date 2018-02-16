@@ -3225,7 +3225,7 @@ class DiscussionModel extends Gdn_Model {
         self::$allowedFilters[$setKey]['filters'][self::EMPTY_FILTER_KEY] = [
             'key' => self::EMPTY_FILTER_KEY,
             'setKey' => $setKey,
-            'name' => sprintf(t('Clear %s'), $setName),
+            'name' => $setName,
             'wheres' => [], 'group' => 'default'
         ];
     }

@@ -1138,7 +1138,7 @@ if (!function_exists('linkDropDown')) {
         <span class="ToggleFlyout selectBox {$extraClasses}">
           <span class="selectBox-label">{$label}</span>
           <span class="selectBox-main">
-              <a href="#" role="button" class="FlyoutButton selectBox-toggle" tabindex="0">
+              <a href="#" role="button" rel="nofollow" class="FlyoutButton selectBox-toggle" tabindex="0">
                 <span class="selectBox-selected">{$linkName}</span>
                 <span class="vanillaDropDown-arrow">▾</span>
               </a>

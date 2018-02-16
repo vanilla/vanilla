@@ -153,6 +153,10 @@ class DiscussionsSortFilterModule extends Gdn_Module {
         if (!$this->filters) {
             return [''];
         }
+
+        $sortDropdown = [];
+
+
         $dropdowns = [];
         foreach($this->filters as $filterSet) {
             // Check to see if there's a category restriction.
@@ -166,16 +170,23 @@ class DiscussionsSortFilterModule extends Gdn_Module {
 
             // Override the trigger text?
             $selectedValue = val($setKey, $this->selectedFilters);
+
+
             if ($selectedValue && $selectedValue != 'none') {
                 $selected = val('name', $filterSet['filters'][$selectedValue]);
                 $dropdown->setTrigger($selected);
             }
 
-            $dropdown->setView($this->dropdownView);
-            $dropdown->setForceDivider(true); // Adds dividers between groups in the dropdown.
+            //$dropdown->setView($this->dropdownView);
+            //$dropdown->setForceDivider(true); // Adds dividers between groups in the dropdown.
+
+            $lastGroup = '';
+            $index = 0;
+            $filters = val('filters', $filterSet);
+            $filterLength = sizeof($filters);
 
             // Add the filters to the dropdown
-            foreach (val('filters', $filterSet) as $filter) {
+            foreach ($filters as $filter) {
                 $key = val('group', $filter, '').'.'.val('key', $filter);
                 $queryString = DiscussionModel::getSortFilterQueryString(
                     $this->selectedSort,
@@ -197,8 +208,31 @@ class DiscussionsSortFilterModule extends Gdn_Module {
                     [],
                     ['rel' => 'nofollow']
                 );
+
+                $link = $dropdown->getItems()[val('group', $filter)]['items'][val('key', $filter)];
+                $group = val('group', $filter);
+                if($lastGroup != $group && $index != 0 && ($index != $filterLength - 1)) {
+                    $sortDropdown[] = [
+                        "separator" => true
+                    ];
+                }
+
+                $sortDropdown[] = [
+                    'name' => val('text', $link),
+                    'url' => url('/'.val('url', $link)),
+                    'active' => val('key', $filter) === $selectedValue,
+                ];
+
+                $lastGroup = $group;
+                $index++;
+
+
             }
-            $dropdowns[] = $dropdown;
+//            $dropdowns[] = $dropdown;
+
+            $break = "here";
+
+            $dropdowns[] = $sortDropdown;
         }
         return $dropdowns;
     }

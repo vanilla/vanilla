@@ -16,8 +16,6 @@ export default class LinkEmbedBlock extends BlockEmbed {
         node.setAttribute('target', '_blank');
         node.setAttribute('rel', 'noopener noreferrer');
 
-        // LinkEmbedBlock.lineHeight = getLineHeight(node) || 63;
-
         let userPhoto = false
         if (data.userPhoto) {
             userPhoto = document.createElement('span');
@@ -123,16 +121,6 @@ export default class LinkEmbedBlock extends BlockEmbed {
     static value(node) {
         return getData(node, "data");
     }
-}
-
-function getLineHeight(node){
-    let temp = document.createElement(node.nodeName);
-    temp.setAttribute("style", "margin:0px;padding:0px;font-family:" + node.style.fontFamily + ";font-size:" + node.style.fontSize);
-    temp.innerHTML = "test";
-    temp = node.parentNode.appendChild(temp);
-    const lineHeight = temp.clientHeight;
-    temp.parentNode.removeChild(temp);
-    return lineHeight;
 }
 
 function sanitize(url, protocols) {

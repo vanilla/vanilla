@@ -1,10 +1,14 @@
 /**
- * @author Stephane LaFlèche <stephane.l@vanillaforums.com>
+ * @author Stéphane LaFlèche <stephane.l@vanillaforums.com>
  * @copyright 2009-2018 Vanilla Forums Inc.
  * @license GPLv2
  */
 
-import * as utility from "@core/utility";
+import { parseDomForEmoji } from "@core/emoji-utility";
 
-utility.log("core-app loaded");
 
+import events from "@core/events";
+
+events.onVanillaReady(() => {
+    parseDomForEmoji();
+});

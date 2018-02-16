@@ -515,8 +515,7 @@ $embedded-quote_fg: #A3A3A3 !default;
     }
 
     iframe,
-    .embedImage-img,
-    img:not(.emoji) {
+    .embedImage-img {
         display: block;
         position: relative;
         margin: {
@@ -528,9 +527,7 @@ $embedded-quote_fg: #A3A3A3 !default;
     }
 }
 
-
-
-.emoji {
+.emoji { // old emoji support
     width: 20px;
     height: 20px;
     vertical-align: -.232em;

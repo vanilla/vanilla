@@ -128,7 +128,7 @@ class DiscussionsSortFilterModule extends Gdn_Module {
                 }
             }
             $key = val('key', $sort);
-            $queryString = val('key', $sort) !== 'none' ? DiscussionModel::getSortFilterQueryString($this->selectedSort, $this->selectedFilters, $key) : '';
+            $queryString = val('key', $sort) !== DiscussionModel::EMPTY_FILTER_KEY ? DiscussionModel::getSortFilterQueryString($this->selectedSort, $this->selectedFilters, $key) : '';
             $sortData[$key]['name'] = val('name', $sort);
             $sortData[$key]['url'] = $this->getPagelessPath().$queryString;
             $sortData[$key]['rel'] = 'nofollow';

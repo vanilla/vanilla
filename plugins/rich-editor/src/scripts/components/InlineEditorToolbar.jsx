@@ -10,7 +10,7 @@ import Quill from "quill/core";
 import Emitter from "quill/core/emitter";
 import Keyboard from "quill/modules/keyboard";
 import LinkBlot from "quill/formats/link";
-import FloatingToolbar from "./FloatingToolbar";
+import SelectionPositionToolbar from "./SelectionPositionToolbar";
 import EditorToolbar from "./EditorToolbar";
 import { t } from "@core/utility";
 import * as quillUtilities from "../quill-utilities";
@@ -211,10 +211,10 @@ export default class InlineEditorToolbar extends React.Component {
      */
     render() {
         return <div>
-            <FloatingToolbar quill={this.quill} forceVisibility={this.state.showLink ? "hidden" : "ignore"}>
+            <SelectionPositionToolbar quill={this.quill} forceVisibility={this.state.showLink ? "hidden" : "ignore"}>
                 <EditorToolbar quill={this.quill} menuItems={this.menuItems}/>
-            </FloatingToolbar>
-            <FloatingToolbar quill={this.quill} forceVisibility={this.state.showLink ? "visible" : "hidden"}>
+            </SelectionPositionToolbar>
+            <SelectionPositionToolbar quill={this.quill} forceVisibility={this.state.showLink ? "visible" : "hidden"}>
                 <div className="richEditor-menu FlyoutMenu insertLink" role="dialog" aria-label={t("Insert Url")}>
                     <input
                         value={this.state.value}
@@ -232,7 +232,7 @@ export default class InlineEditorToolbar extends React.Component {
                         <span>×</span>
                     </a>
                 </div>
-            </FloatingToolbar>
+            </SelectionPositionToolbar>
         </div>;
     }
 }

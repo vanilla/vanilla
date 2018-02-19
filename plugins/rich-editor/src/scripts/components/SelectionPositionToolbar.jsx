@@ -213,18 +213,18 @@ export default class FloatingToolbar extends React.Component {
         if (x && y && this.props.forceVisibility === "ignore" || this.props.forceVisibility === "visible") {
             toolbarStyles = {
                 position: "absolute",
-                top: y.toolbarPosition,
-                left: x.toolbarPosition,
+                top: y ? y.toolbarPosition : 0,
+                left: x ? x.toolbarPosition : 0,
                 zIndex: 5,
                 visibility: "visible",
             };
 
             nubStyles = {
-                left: x.nubPosition,
-                top: y.nubPosition,
+                left: x ? x.nubPosition : 0,
+                top: y ? y.nubPosition : 0,
             };
 
-            classes += y.nubPointsDown ? "isUp" : "isDown";
+            classes += y && y.nubPointsDown ? "isUp" : "isDown";
         }
 
         return <div className={classes} style={toolbarStyles} ref={(ref) => this.selfNode = ref}>

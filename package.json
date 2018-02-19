@@ -7,7 +7,7 @@
         "babel-polyfill": "^6.26.0",
         "classnames": "^2.2.5",
         "emojibase-data": "^2.2.0",
-        "lodash": "^4.17.4",
+        "lodash": "^4.17.5",
         "lodash.debounce": "^4.0.8",
         "moment": "^2.19.4",
         "promise-polyfill": "^6.1.0",

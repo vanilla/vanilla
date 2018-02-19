@@ -6,7 +6,7 @@
         <div class="js-richText">
             <div class="ql-editor richEditor-text userContent" data-gramm="false" contenteditable="true" data-placeholder="Create a new post..."></div>
         </div>
-        <div class="js-richEditorInlineMenu"></div>
+        <div class="js-InlineEditorToolbar"></div>
 
         <div class="richEditor-menu embedBar">
             <ul class="richEditor-menuItems" role="menubar" aria-label="{t c="Inline Level Formatting Menu"}">
@@ -41,14 +41,16 @@
             </ul>
         </div>
     </div>
-    <div class="richEditor-menu richEditorParagraphMenu">
-        <button class="richEditor-button richEditorParagraphMenu-handle" type="button" aria-haspopup="menu" aria-expanded="false" aria-controls="tempId-paragraphLevelMenu-toggle">
-            <svg class="richEditorInline-icon" viewBox="0 0 24 24">
-                <title>¶</title>
-                <path fill="currentColor" fill-rule="evenodd" d="M15,6 L17,6 L17,18 L15,18 L15,6 Z M11,6 L13.0338983,6 L13.0338983,18 L11,18 L11,6 Z M11,13.8666667 C8.790861,13.8666667 7,12.1056533 7,9.93333333 C7,7.76101332 8.790861,6 11,6 C11,7.68571429 11,11.6190476 11,13.8666667 Z"/>
-            </svg>
-        </button>
-        {* Paragraph level menu goes here *}
+    <div class="js-ParagraphEditorToolbar">
+        <div class="richEditor-menu richEditorParagraphMenu">
+            <button class="richEditor-button richEditorParagraphMenu-handle" type="button" aria-haspopup="menu" aria-expanded="false" aria-controls="tempId-paragraphLevelMenu-toggle">
+                <svg class="richEditorInline-icon" viewBox="0 0 24 24">
+                    <title>¶</title>
+                    <path fill="currentColor" fill-rule="evenodd" d="M15,6 L17,6 L17,18 L15,18 L15,6 Z M11,6 L13.0338983,6 L13.0338983,18 L11,18 L11,6 Z M11,13.8666667 C8.790861,13.8666667 7,12.1056533 7,9.93333333 C7,7.76101332 8.790861,6 11,6 C11,7.68571429 11,11.6190476 11,13.8666667 Z"/>
+                </svg>
+            </button>
+            {* Paragraph level menu goes here *}
+        </div>
     </div>
 
     {*<button type="button" class="test-sagan">*}
@@ -63,9 +65,9 @@
     {*<button type="button" class="test-codeblockinline">*}
         {*Code Block - Inline*}
     {*</button><br/>*}
-    {*<button type="button" class="test-blockquote">*}
-        {*Blockquote*}
-    {*</button><br/>*}
+    <button type="button" class="test-blockquote">
+        Blockquote
+    </button><br/>
     {*<button type="button" class="test-loading">*}
         {*Embed - Loading*}
     {*</button><br/>*}

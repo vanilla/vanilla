@@ -11,22 +11,26 @@ import LinkBlot from "quill/formats/link";
 import { t } from "@core/utility";
 import EditorMenuItem from "./EditorMenuItem";
 import * as quillUtilities from "../quill-utilities";
+import isEqual from "lodash/isEqual";
 
 /**
  * @typedef {Object} MenuItemData
  * @property {boolean} active - Whether the given item should be lit up.
  * @property {string} [value] - A value if applicable.
+ * @property {string} [formatName] - The name of the format if it is different than the item's key.
+ * @property {Object} [enableValue] - The value to use to enable this item.
  * @property {function} [formatter] - A custom handler to run in addition to the default handler.
  */
 
 /**
  * Component for declaring a dynamic toolbar linked to a quill instance.
  */
-export default class EditorToolbar extends React.Component {
+export default class EditorToolbar extends React.PureComponent {
 
     static propTypes = {
         quill: PropTypes.instanceOf(Quill).isRequired,
         menuItems: PropTypes.object,
+        isHidden: PropTypes.bool,
     };
 
     static defaultItems = {
@@ -72,7 +76,7 @@ export default class EditorToolbar extends React.Component {
      * @param {RangeStatic} range - The new selection range.
      */
     quillChangeHandler = (type, range) => {
-        if (type === Quill.events.SELECTION_CHANGE) {
+        if (type === Quill.events.SELECTION_CHANGE && !this.props.isHidden) {
             this.update(range);
         }
     };
@@ -81,8 +85,10 @@ export default class EditorToolbar extends React.Component {
      * React to quill optimizations passes.
      */
     quillOptimizeHandler = () => {
-        const [range] = this.quill.selection.getRange();
-        this.update(range);
+        if (!this.props.isHidden) {
+            const [range] = this.quill.selection.getRange();
+            this.update(range);
+        }
     };
 
     /**
@@ -142,8 +148,16 @@ export default class EditorToolbar extends React.Component {
         if ("formatter" in itemData) {
             itemData.formatter(itemData);
         } else {
+            const formatName = itemData.formatName || itemKey;
+            let value;
+
+            if (itemData.active) {
+                value = false;
+            } else {
+                value = itemData.enableValue || true;
+            }
             // Fall back to simple boolean
-            this.quill.format(itemKey, !itemData.active, Quill.sources.USER);
+            this.quill.format(formatName, value, Quill.sources.USER);
         }
 
         this.update();
@@ -187,7 +201,9 @@ export default class EditorToolbar extends React.Component {
         let newActiveState = false;
         if (range !== null) {
             const formats = this.quill.getFormat(range);
-            if (formats[itemKey]) {
+            const lookupKey = itemData.formatName || itemKey;
+            const value = formats[lookupKey];
+            if (itemData.enableValue ? value === itemData.enableValue : value) {
                 newActiveState = true;
             }
         }

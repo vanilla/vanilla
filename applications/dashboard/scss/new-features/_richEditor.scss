@@ -72,6 +72,7 @@ $embedded-quote_fg: #A3A3A3 !default;
     left: #{($richEditor_leftPadding - $richEditor-icon_size) / 2};
     height: $richEditor-icon_size;
     width: $richEditor-icon_size;
+    transition: transform 0.02s linear;
 }
 
 .richEditor-text {

@@ -31,7 +31,7 @@
         <span class="discussion-filters">
         <?php
         foreach ($this->getFilterDropdowns() as $dropdown) {
-            $label = val('name', val(0, $dropdown), "Filter");
+            $label = val('name', val(0, $dropdown), 'Filter');
             foreach ($dropdown as $link) {
                 if (val('active', $link)) {
                     $label = val('name', $link);

@@ -34,7 +34,14 @@ class TextBlot extends AbstractBlot {
      */
     public function __construct(array $currentOperation, array $previousOperation, array $nextOperation) {
         parent::__construct($currentOperation, $previousOperation, $nextOperation);
-        $this->content = \htmlentities(val("insert", $this->currentOperation), \ENT_QUOTES);
+
+        $insert = val("insert", $this->currentOperation, "");
+
+        if (!\is_string($insert)) {
+            throw new \Exception("Failed attempting to render a a non-text Quill Blot as a TextBlot.");
+        }
+
+        $this->content = \htmlentities($insert, \ENT_QUOTES);
     }
 
 

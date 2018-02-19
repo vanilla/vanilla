@@ -5,6 +5,9 @@
  */
 
 import Emitter from "quill/core/emitter";
+import Container from "quill/blots/container";
+import Parchment from "parchment";
+// import ContentBlockBlot from "./"
 
 /**
  * @typedef {Object} BoundaryStatic
@@ -115,4 +118,83 @@ export function disableAllBlotsInRange(quill, range, blotConstructor) {
     const finalRange = expandRange(range, startRange, endRange);
 
     quill.formatText(finalRange.index, finalRange.length, 'link', false, Emitter.sources.USER);
+}
+
+/**
+ * Create a new Blot class from a child class.
+ *
+ * This should basically sit is a wrapper around the child, but the blotName,
+ * and className, and tagName, should all be set on this. The parent's class should be used as the formatName.
+ *
+ * @param {typeof ContentBlock} ChildBlot - A class constructor for Block blot or a child of one.
+ *
+ * @returns {typeof Container}
+ */
+export function makeWrapperBlot(ChildBlot) {
+
+    console.log(ChildBlot.blotName);
+    return class extends Container {
+
+        static scope = Parchment.Scope.BLOCK_BLOT;
+        static defaultChild = ChildBlot.blotName;
+        static allowedChildren = [ChildBlot];
+
+        static create() {
+            const domNode = super.create();
+
+            if (this.className) {
+                domNode.classList.add(this.className);
+            }
+            return domNode;
+        }
+
+        static formats(domNode) {
+            const classMatch = this.className && domNode.classList.contains(this.className);
+            const tagMatch = domNode.tagName.toLowerCase() === this.blotName;
+
+            if (this.className ? classMatch && tagMatch : tagMatch) {
+                return true;
+            }
+
+            return undefined;
+        }
+
+        formats() {
+            return {
+                [this.constructor.blotName]: this.constructor.formats(this.domNode),
+            };
+        }
+
+        insertBefore(blot, ref) {
+            console.log(blot);
+            console.log(ChildBlot);
+            if (blot instanceof ChildBlot) {
+                super.insertBefore(blot, ref);
+            } else {
+                const index = ref == null ? this.length() : ref.offset(this);
+                const after = this.split(index);
+                after.parent.insertBefore(blot, after);
+            }
+        }
+
+        optimize(context) {
+            super.optimize(context);
+            const prev = this.prev;
+            if (prev != null && prev.next === this &&
+                prev.statics.blotName === this.statics.blotName &&
+                prev.domNode.tagName === this.domNode.tagName) {
+                prev.moveChildren(this);
+                prev.remove();
+            }
+        }
+
+        replace(target) {
+            if (target.statics.blotName !== this.statics.blotName) {
+                const item = Parchment.create(this.statics.defaultChild);
+                target.moveChildren(item);
+                this.appendChild(item);
+            }
+            super.replace(target);
+        }
+    };
 }

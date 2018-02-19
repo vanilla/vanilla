@@ -50,6 +50,9 @@ export default class VanillaTheme extends Theme {
         ReactDOM.render(<InlineEditorToolbar quill={this.quill}/>, container);
     }
 
+    /**
+     * Mount the paragraph formatting toolbar (react component).
+     */
     mountParagraphMenu() {
         const container = this.quill.container.closest(".richEditor").querySelector(".js-ParagraphEditorToolbar");
         ReactDOM.render(<ParagraphEditorToolbar quill={this.quill}/>, container);
@@ -58,7 +61,6 @@ export default class VanillaTheme extends Theme {
     /**
      * Mount Emoji Menu (react component).
      */
-
     mountEmojiMenu() {
         const container = this.quill.container.closest(".richEditor").querySelector(".js-emojiHandle");
         ReactDOM.render(<EditorEmojiPicker quill={this.quill}/>, container);

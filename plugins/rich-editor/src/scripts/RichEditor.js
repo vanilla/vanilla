@@ -81,10 +81,6 @@ export default class RichEditor {
 
         this.quill.on("text-change", this.synchronizeDelta.bind(this));
 
-        // const insertSpoiler = () => {
-        //     this.quill.format('spoiler', true, Quill.sources.USER);
-        // };
-        // document.querySelector(".test-spoiler").addEventListener("click", insertSpoiler);
 
     //     // Dummy data
     //     const insertText = () => {
@@ -96,18 +92,6 @@ export default class RichEditor {
     //         this.quill.setSelection(range.index + blurb.length, Quill.sources.SILENT);
     //     };
     //     document.querySelector(".test-sagan").addEventListener("click", insertText);
-    //
-    //     // Code Block - Inline
-    //     const insertInlineCodeBlock = () => {
-    //         this.quill.format('code-inline', true, Quill.sources.USER);
-    //     };
-    //     document.querySelector(".test-codeblockinline").addEventListener("click", insertInlineCodeBlock);
-    //
-    //     // Code Block - Block
-    //     const insertCodeBlockBlock = () => {
-    //         this.quill.format('code-block', true, Quill.sources.USER);
-    //     };
-    //     document.querySelector(".test-blockparagraph").addEventListener("click", insertCodeBlockBlock);
     //
     //     // Embed Error - Blok
     //     const insertEmbedError = () => {
@@ -146,25 +130,11 @@ export default class RichEditor {
     //     document.querySelector(".test-image").addEventListener("click", insertImage);
     //
 
-        const resetQuill = () => {
-            this.quill.setContents("");
-        };
-        document.querySelector(".clearQuill").addEventListener("click", resetQuill);
-        // Code Block - Block
-        // const insertCodeBlock = () => {
-        //     const range = this.quill.getSelection(true);
-        //     this.quill.insertText(range.index, '\n', Quill.sources.SILENT);
-        //     this.quill.insertEmbed(range.index + 1, 'blockquote-block', {
-        //         content: '<p>\n' +
-        //         '  <strong>Can we use jsConnect without providing an email address?</strong><br/>\n' +
-        //         '  No. You absolutely must send an email, which is the only method for mapping users. If you are importing forum users without email addresses and need a way to map them over SSO, we recommend using dummy email addresses that follow a formula like <code>uniqueID</code> <a href="#">@yoursite.com</a>.\n' +
-        //         '</p>',
-        //     }, Quill.sources.USER);
-        //     this.quill.setSelection(range.index + 2, Quill.sources.SILENT);
+        // const resetQuill = () => {
+        //     this.quill.setContents("");
         // };
-        // document.querySelector(".test-blockquote").addEventListener("click", insertCodeBlock);
+        // document.querySelector(".clearQuill").addEventListener("click", resetQuill);
     //
-    //     // Code Block - Block
     //     const insertVideo = () => {
     //         const range = this.quill.getSelection(true);
     //         this.quill.insertText(range.index, '\n', Quill.sources.SILENT);

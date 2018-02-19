@@ -65,12 +65,12 @@
     {*<button type="button" class="test-codeblockinline">*}
         {*Code Block - Inline*}
     {*</button><br/>*}
-    <button type="button" class="clearQuill">
-        ClearQuill
-    </button><br/>
-    <button type="button" class="test-blockquote">
-        Blockquote
-    </button><br/>
+    {*<button type="button" class="clearQuill">*}
+        {*ClearQuill*}
+    {*</button><br/>*}
+    {*<button type="button" class="test-blockquote">*}
+        {*Blockquote*}
+    {*</button><br/>*}
     {*<button type="button" class="test-loading">*}
         {*Embed - Loading*}
     {*</button><br/>*}

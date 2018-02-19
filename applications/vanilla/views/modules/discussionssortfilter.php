@@ -23,7 +23,7 @@
                 $sortLinks[0]['active'] = true;
             }
 
-            echo linkDropDown($sortLinks, 'selectBox-ideationFilter', 'Sort');
+            echo linkDropDown($sortLinks, 'selectBox-discussionsSortFilter', 'Sort');
         ?>
         </span>
     <?php }
@@ -37,7 +37,7 @@
                     $label = val('name', $link);
                 }
             }
-            echo linkDropDown($dropdown, 'selectBox-ideationFilter', 'Filter');
+            echo linkDropDown($dropdown, 'selectBox-discussionsSortFilter', 'Filter');
         } ?>
         </span>
     <?php } ?>

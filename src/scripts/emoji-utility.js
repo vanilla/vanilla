@@ -46,15 +46,13 @@ export function isEmojiSupported() {
  * Returns either native emoji or fallback image
  *
  * @param {emojiChar} Emoji Character
- * @returns {String|HTMLImageElement} - The emoji
+ * @returns {string|HTMLImageElement} - The emoji
  */
 export function parseEmoji(emojiChar) {
     if(browserSupportsEmoji) {
         return emojiChar;
     }
-
     return twemoji.parse(emojiChar, emojiOptions);
-
 }
 
 /**

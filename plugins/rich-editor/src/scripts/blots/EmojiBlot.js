@@ -1,19 +1,25 @@
 import Embed from "quill/blots/embed";
+import { setData, getData} from "@core/dom-utility";
+import { parseEmoji, isEmojiSupported } from "@core/emoji-utility";
 
 export default class EmojiBlot extends Embed {
-    static create(emojiData) {
+    static create(data) {
         const node = super.create();
-        node.classList.add("emoji");
-        node.innerHTML = emojiData.emojiChar;
-        node.dataset.emojiChar = emojiData.emojiChar;
+        if (isEmojiSupported()) {
+            node.innerHTML = data.emojiChar;
+            node.classList.add("nativeEmoji");
+        } else {
+            node.innerHTML = parseEmoji(data.emojiChar);
+        }
+        setData(node, "data", data);
         return node;
     }
 
     static value(node) {
-        return { ...node.dataset };
+        return getData(node, "data");
     }
 }
 
-EmojiBlot.className = 'emoji';
+EmojiBlot.className = 'safeEmoji';
 EmojiBlot.blotName = 'emoji';
 EmojiBlot.tagName = 'span';

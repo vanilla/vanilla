@@ -66,7 +66,7 @@ export default class RichEditor {
             return;
         }
         const container = playButton.closest(".embedVideo-ratio");
-        container.innerHTML = '<iframe frameborder="0" allow="autoplay; encrypted-media" class="embedVideo-iframe" src="' + playButton.dataset.url + '" allowfullscreen></iframe>';
+        container.innerHTML = `<iframe frameborder="0" allow="autoplay; encrypted-media" class="embedVideo-iframe" src="${playButton.dataset.url}" allowfullscreen></iframe>`;
     }
 
     initializeWithRichFormat() {
@@ -81,10 +81,10 @@ export default class RichEditor {
 
         this.quill.on("text-change", this.synchronizeDelta.bind(this));
 
-        const insertSpoiler = () => {
-            this.quill.format('spoiler', true, Quill.sources.USER);
-        };
-        document.querySelector(".test-spoiler").addEventListener("click", insertSpoiler);
+        // const insertSpoiler = () => {
+        //     this.quill.format('spoiler', true, Quill.sources.USER);
+        // };
+        // document.querySelector(".test-spoiler").addEventListener("click", insertSpoiler);
 
     //     // Dummy data
     //     const insertText = () => {

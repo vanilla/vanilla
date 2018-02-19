@@ -473,8 +473,7 @@ body.isMobile .change-picture .change-picture-instructions {
 }
 
 .userContent iframe,
-.userContent .embedImage-img,
-.userContent img:not(.emoji) {
+.userContent .embedImage-img {
   display: block;
   position: relative;
   margin-left: auto;
@@ -1021,6 +1020,18 @@ body.Categories.isMobile .PageControls.Top {
   max-width: 100%;
   line-height: 1.5;
   max-height: 63px;
+}
+
+.nativeEmoji {
+  font-family: "Segoe UI Emoji";
+}
+
+.fallBackEmoji {
+  display: inline-block;
+  height: 1em;
+  width: 1em;
+  margin: 0 .05em 0 .1em;
+  vertical-align: -0.1em;
 }
 
 /*# sourceMappingURL=style-compat.css.map */

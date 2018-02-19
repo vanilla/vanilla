@@ -49,9 +49,9 @@ export function isEmojiSupported() {
  * @returns {String|HTMLImageElement} - The emoji
  */
 export function parseEmoji(emojiChar) {
-    // if(browserSupportsEmoji) {
-    //     return emojiChar;
-    // }
+    if(browserSupportsEmoji) {
+        return emojiChar;
+    }
 
     return twemoji.parse(emojiChar, emojiOptions);
 

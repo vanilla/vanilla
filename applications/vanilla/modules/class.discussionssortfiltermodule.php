@@ -206,7 +206,7 @@ class DiscussionsSortFilterModule extends Gdn_Module {
 
                 $link = $dropdown->getItems()[val('group', $filter)]['items'][val('key', $filter)];
                 $group = val('group', $filter);
-                if($lastGroup != $group && $index != 0 && ($index != $filterLength - 1)) {
+                if ($lastGroup != $group && $index != 0 && $index != ($filterLength - 1)) {
                     $filterDropdown[] = [
                         "separator" => true
                     ];

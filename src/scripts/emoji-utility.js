@@ -4,25 +4,35 @@
  * @license GPLv2
  */
 import twemoji from "twemoji";
+import * as utility from "@core/utility";
 
 const emojiOptions = {
     className: "fallBackEmoji",
     size: "72x72",
 };
 
+// Test Char for Emoji 5.0
+const testChar = '\uD83E\uDD96'; // U+1F996 T-Rex -> update test character with new emoji version support.
+
 function emojiSupported() {
-    const node = document.createElement('canvas');
-    if (!node.getContext || !node.getContext('2d') || typeof node.getContext('2d').fillText !== 'function') {
+    const canvas = document.createElement('canvas');
+    if (canvas.getContext && canvas.getContext('2d')) {
+        const pixelRatio = window.devicePixelRatio || 1;
+        const offset = 12 * pixelRatio;
+        const ctx = canvas.getContext('2d');
+        ctx.fillStyle = '#f00';
+        ctx.textBaseline = 'top';
+        ctx.font = '32px Arial';
+        ctx.fillText(testChar, 0, 0);
+        return ctx.getImageData(offset, offset, 1, 1).data[0] !== 0;
+    } else {
         return false;
     }
-    const ctx = node.getContext('2d');
-    ctx.textBaseline = 'top';
-    ctx.font = '32px Arial';
-    ctx.fillText('\ud83d\ude03', 0, 0);
-    return ctx.getImageData(16, 16, 1, 1).data[0] !== 0;
 }
 
 const browserSupportsEmoji = emojiSupported();
+
+utility.log("Emoji Supported: ", browserSupportsEmoji);
 
 export function isEmojiSupported() {
     return browserSupportsEmoji;
@@ -35,10 +45,18 @@ export function parseEmoji(emojiChar) {
     return twemoji.parse(emojiChar, emojiOptions);
 }
 
+/**
+ * Replace emojis in DOM element with images if unsupported
+ *
+ * @param {domNode} Element to search in
+ * @returns {Element|null} - The emoji
+ */
+
 export function parseDomForEmoji(domNode = document.body) {
     if(browserSupportsEmoji) {
         return;
     }
-    console.log("parsing dom for emojis");
-    twemoji.parse(domNode, emojiOptions);
+    const div = document.createElement("div");
+    div.innerHTML = twemoji.parse(domNode, emojiOptions);
+    return div.firstChild;
 }

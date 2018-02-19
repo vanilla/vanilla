@@ -5,12 +5,11 @@ import { parseEmoji, isEmojiSupported } from "@core/emoji-utility";
 export default class EmojiBlot extends Embed {
     static create(data) {
         const node = super.create();
-        if (isEmojiSupported()) { // Native support
+        if (isEmojiSupported()) {
             node.innerHTML = data.emojiChar;
             node.classList.add("nativeEmoji");
         } else {
-            const fallbackEmoji = parseEmoji(data.emojiChar);
-            node.innerHTML = fallbackEmoji + " "; // the space is important to make it like a "word"
+            node.innerHTML = parseEmoji(data.emojiChar);
         }
         setData(node, "data", data);
         return node;
@@ -21,6 +20,6 @@ export default class EmojiBlot extends Embed {
     }
 }
 
-EmojiBlot.className = 'smartEmoji';
+EmojiBlot.className = 'safeEmoji';
 EmojiBlot.blotName = 'emoji';
 EmojiBlot.tagName = 'span';

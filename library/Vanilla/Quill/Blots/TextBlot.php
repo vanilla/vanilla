@@ -74,7 +74,9 @@ class TextBlot extends AbstractBlot {
             $result .= self::renderOpeningTag($tag);
         }
 
-        $result .= $this->createLineBreaks($this->content);
+        if ($this->content) {
+            $result .= $this->createLineBreaks($this->content);
+        }
         foreach($this->closingTags as $tag) {
             $result .= self::renderClosingTag($tag);
         }

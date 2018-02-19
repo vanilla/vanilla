@@ -15,18 +15,22 @@ const emojiOptions = {
 const testChar = '\uD83E\uDD96'; // U+1F996 T-Rex -> update test character with new emoji version support.
 
 function emojiSupported() {
-    const canvas = document.createElement('canvas');
-    if (canvas.getContext && canvas.getContext('2d')) {
-        const pixelRatio = window.devicePixelRatio || 1;
-        const offset = 12 * pixelRatio;
-        const ctx = canvas.getContext('2d');
-        ctx.fillStyle = '#f00';
-        ctx.textBaseline = 'top';
-        ctx.font = '32px Arial';
-        ctx.fillText(testChar, 0, 0);
-        return ctx.getImageData(offset, offset, 1, 1).data[0] !== 0;
+    if (process.env.NODE_ENV !== 'test') { // Test environment
+        const canvas = document.createElement('canvas');
+        if (canvas.getContext && canvas.getContext('2d')) {
+            const pixelRatio = window.devicePixelRatio || 1;
+            const offset = 12 * pixelRatio;
+            const ctx = canvas.getContext('2d');
+            ctx.fillStyle = '#f00';
+            ctx.textBaseline = 'top';
+            ctx.font = '32px Arial';
+            ctx.fillText(testChar, 0, 0);
+            return ctx.getImageData(offset, offset, 1, 1).data[0] !== 0;
+        } else {
+            return false;
+        }
     } else {
-        return false;
+        return true;
     }
 }
 

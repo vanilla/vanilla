@@ -28,7 +28,6 @@ export default class EditorEmojiButton extends React.Component {
         this.emojiChar = props.emoji.emoji;
     }
 
-
     /**
      * Insert Emoji
      * @param {SyntheticEvent} e
@@ -43,8 +42,7 @@ export default class EditorEmojiButton extends React.Component {
     }
 
     render() {
-        return <button className="richEditor-button richEditor-insertEmoji" type="button" onClick={this.insertEmojiBlot}>
-            {parseEmoji(this.emojiChar)}
+        return <button className="richEditor-button richEditor-insertEmoji" type="button" dangerouslySetInnerHTML={{__html: parseEmoji(this.emojiChar)}} onClick={this.insertEmojiBlot}>
         </button>;
     }
 }

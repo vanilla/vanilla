@@ -21,7 +21,7 @@ class EmojiBlot extends AbstractInlineEmbedBlot {
      */
     protected function getContainerHMTLAttributes(): array {
         return [
-            "class" => "safeEmoji"
+            "class" => "safeEmoji nativeEmoji"
         ];
     }
 
@@ -29,6 +29,6 @@ class EmojiBlot extends AbstractInlineEmbedBlot {
      * @inheritDoc
      */
     protected static function getInsertKey(): string {
-        return "insert.data.emojiChar";
+        return "insert.emoji.emojiChar";
     }
 }

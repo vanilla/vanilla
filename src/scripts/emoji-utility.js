@@ -42,25 +42,31 @@ export function isEmojiSupported() {
     return browserSupportsEmoji;
 }
 
+/**
+ * Returns either native emoji or fallback image
+ *
+ * @param {emojiChar} Emoji Character
+ * @returns {String|HTMLImageElement} - The emoji
+ */
 export function parseEmoji(emojiChar) {
-    if(browserSupportsEmoji) {
-        return emojiChar;
-    }
+    // if(browserSupportsEmoji) {
+    //     return emojiChar;
+    // }
+
     return twemoji.parse(emojiChar, emojiOptions);
+
 }
 
 /**
  * Replace emojis in DOM element with images if unsupported
  *
  * @param {domNode} Element to search in
- * @returns {Element|null} - The emoji
+ * @returns {null} - The emoji
  */
 
 export function parseDomForEmoji(domNode = document.body) {
     if(browserSupportsEmoji) {
         return;
     }
-    const div = document.createElement("div");
-    div.innerHTML = twemoji.parse(domNode, emojiOptions);
-    return div.firstChild;
+    twemoji.parse(domNode, emojiOptions);
 }

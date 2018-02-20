@@ -1,8 +1,7 @@
 import CodeBlock from "quill/formats/code";
 import { makeWrapperBlot } from "../quill-utilities";
-import {SpoilerContentBlot} from "./SpoilerBlot";
 
-export class CodeBlockContentsBlot extends CodeBlock {
+export class CodeBlockContentBlot extends CodeBlock {
 
     static blotName = 'codeblock-contents';
     static tagName = 'code';
@@ -39,7 +38,7 @@ export class CodeBlockContentsBlot extends CodeBlock {
     }
 }
 
-const CodeBlockBlot = makeWrapperBlot(CodeBlockContentsBlot);
+const CodeBlockBlot = makeWrapperBlot(CodeBlockContentBlot);
 
 CodeBlockBlot.blotName = "code-block";
 CodeBlockBlot.tagName = "pre";

@@ -1032,6 +1032,7 @@ body.Categories.isMobile .PageControls.Top {
   width: 1em;
   margin: 0 .05em 0 .1em;
   vertical-align: -0.1em;
+  user-select: none;
 }
 
 /*# sourceMappingURL=style-compat.css.map */

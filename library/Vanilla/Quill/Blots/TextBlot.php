@@ -151,7 +151,9 @@ class TextBlot extends AbstractBlot {
      * @inheritDoc
      */
     protected function createLineBreaks(string $input): string {
-        if ($input === "\n") {
+        $isTouchingEmoji = valr("insert.emoji", $this->nextOperation) || valr("insert.emoji", $this->previousOperation);
+
+        if ($input === "\n" && !$isTouchingEmoji) {
             return "<br>";
         }
 

@@ -286,6 +286,7 @@ class DiscussionsApiController extends AbstractApiController {
         }
 
         $schemaRecord = ApiUtils::convertOutputKeys($dbRecord);
+        $schemaRecord['type'] = isset($schemaRecord['type']) ? lcfirst($schemaRecord['type']) : null;
 
         // Allow addons to hook into the normalization process.
         $options = ['expand' => $expand];

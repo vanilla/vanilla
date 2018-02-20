@@ -66,7 +66,7 @@ export default class RichEditor {
             return;
         }
         const container = playButton.closest(".embedVideo-ratio");
-        container.innerHTML = '<iframe frameborder="0" allow="autoplay; encrypted-media" class="embedVideo-iframe" src="' + playButton.dataset.url + '" allowfullscreen></iframe>';
+        container.innerHTML = `<iframe frameborder="0" allow="autoplay; encrypted-media" class="embedVideo-iframe" src="${playButton.dataset.url}" allowfullscreen></iframe>`;
     }
 
     initializeWithRichFormat() {
@@ -80,7 +80,6 @@ export default class RichEditor {
         }
 
         this.quill.on("text-change", this.synchronizeDelta.bind(this));
-
 
     //     // Dummy data
     //     const insertText = () => {

@@ -4675,6 +4675,10 @@ tweetnacl@^0.14.3, tweetnacl@~0.14.0:
   version "0.14.5"
   resolved "https://registry.yarnpkg.com/tweetnacl/-/tweetnacl-0.14.5.tgz#5ae68177f192d4456269d108afa93ff8743f4f64"
 
+twemoji@^2.5.0:
+  version "2.5.0"
+  resolved "https://registry.yarnpkg.com/twemoji/-/twemoji-2.5.0.tgz#518807f7cdfccb200f24168465284406e7ac5b56"
+
 type-check@~0.3.2:
   version "0.3.2"
   resolved "https://registry.yarnpkg.com/type-check/-/type-check-0.3.2.tgz#5884cab512cf1d355e3fb784f30804b2b520db72"

@@ -7,6 +7,7 @@
 import React from "react";
 import * as PropTypes from "prop-types";
 import Quill from "quill/core";
+import { parseEmoji } from "@core/emoji-utility";
 
 /**
  * Component for a single item in a EditorToolbar.
@@ -27,7 +28,6 @@ export default class EditorEmojiButton extends React.Component {
         this.emojiChar = props.emoji.emoji;
     }
 
-
     /**
      * Insert Emoji
      * @param {SyntheticEvent} e
@@ -42,8 +42,7 @@ export default class EditorEmojiButton extends React.Component {
     }
 
     render() {
-        return <button className="richEditor-button richEditor-insertEmoji" type="button" onClick={this.insertEmojiBlot}>
-            {this.emojiChar}
+        return <button className="richEditor-button richEditor-insertEmoji" type="button" dangerouslySetInnerHTML={{__html: parseEmoji(this.emojiChar)}} onClick={this.insertEmojiBlot}>
         </button>;
     }
 }

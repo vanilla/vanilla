@@ -21,8 +21,7 @@ class EmojiBlot extends AbstractInlineEmbedBlot {
      */
     protected function getContainerHMTLAttributes(): array {
         return [
-            "class" => "emoji",
-            "data-emoji-char" => $this->content,
+            "class" => "safeEmoji nativeEmoji"
         ];
     }
 

@@ -67,7 +67,7 @@ export function close() {
     </svg>;
 }
 
-export function pilcro() {
+export function pilcrow() {
     return <svg className="richEditorInline-icon" viewBox="0 0 24 24">
         <title>¶</title>
         <path fill="currentColor" fillRule="evenodd" d="M15,6 L17,6 L17,18 L15,18 L15,6 Z M11,6 L13.0338983,6 L13.0338983,18 L11,18 L11,6 Z M11,13.8666667 C8.790861,13.8666667 7,12.1056533 7,9.93333333 C7,7.76101332 8.790861,6 11,6 C11,7.68571429 11,11.6190476 11,13.8666667 Z"/>

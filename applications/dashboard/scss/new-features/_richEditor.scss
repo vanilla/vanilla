@@ -30,6 +30,7 @@ $richEditor-inlineCode_borderRadius: 2;
 $richEditor-inlineCode_borderColor: #a3a3a3;
 $richEditor-paragraphCode_bg: #f6f8fa;
 $richEditor-paragraphCode_fontSize: 14px;
+$richEditor-pilcrowAnimation_duration: 0.3s;
 
 $richEditor-videoPlayIcon_width: 80px;
 $richEditor-videoPlayIcon_hoverColor: #0291db;
@@ -66,14 +67,24 @@ $embedded-quote_fg: #A3A3A3 !default;
     }
 }
 
+@keyframes fadein {
+    0% {
+        opacity: 0;
+    }
+    100% {
+        opacity: 1;
+    }
+}
+
 .richEditorParagraphMenu {
     position: absolute;
     top: $richEditor-paragraphMenu_offset;
-    left: #{($richEditor_leftPadding - $richEditor-icon_size) / 2};
+    right: calc(100% + 6px);
     height: $richEditor-icon_size;
     width: $richEditor-icon_size;
     z-index: 1;
-    transition: transform 0.02s linear;
+    animation: fadein $richEditor-pilcrowAnimation_duration ease;
+    animation-iteration-count: 1;
 }
 
 .richEditor-text {
@@ -143,6 +154,12 @@ $embedded-quote_fg: #A3A3A3 !default;
 
     &.richEditorParagraphMenu-handle {
         background: transparent;
+        transition: opacity $richEditor-pilcrowAnimation_duration ease;
+
+        &.isHidden {
+            opacity: 0;
+            pointer-events: none;
+        }
 
         .richEditorInline-icon {
             opacity: 1;

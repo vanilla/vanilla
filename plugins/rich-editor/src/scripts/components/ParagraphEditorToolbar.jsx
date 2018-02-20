@@ -9,7 +9,7 @@ import * as PropTypes from "prop-types";
 import Quill from "quill/core";
 import Emitter from "quill/core/emitter";
 import EditorToolbar from "./EditorToolbar";
-import { pilcro as PilcroIcon } from "./Icons";
+import { pilcrow as PilcrowIcon } from "./Icons";
 import { closeEditorFlyouts, CLOSE_FLYOUT_EVENT } from "../quill-utilities";
 
 export default class ParagraphEditorToolbar extends React.PureComponent {
@@ -74,6 +74,7 @@ export default class ParagraphEditorToolbar extends React.PureComponent {
         this.quill = props.quill;
 
         this.state = {
+            showPilcrow: true,
             showMenu: false,
             range: this.constructor.initialRange,
         };
@@ -85,7 +86,6 @@ export default class ParagraphEditorToolbar extends React.PureComponent {
     componentDidMount() {
         this.quill.on(Emitter.events.EDITOR_CHANGE, this.handleEditorChange);
         document.addEventListener(CLOSE_FLYOUT_EVENT, this.closeMenu);
-
     }
 
     /**
@@ -133,9 +133,25 @@ export default class ParagraphEditorToolbar extends React.PureComponent {
                 showMenu: false,
             });
         }
+
+        let numLines = 0;
+
+        if (range) {
+            numLines = this.quill.getLines(range.index || 0, range.length || 0);
+        }
+
+        if (numLines.length <= 1 && !this.state.showPilcrow) {
+            this.setState({
+                showPilcrow: true,
+            });
+        } else if (numLines.length > 1) {
+            this.setState({
+                showPilcrow: false,
+            });
+        }
     };
 
-    getPilcroStyles() {
+    getPilcrowStyles() {
         const bounds = this.quill.getBounds(this.state.range);
 
         // This is the pixel offset from the top needed to make things align correctly.
@@ -170,11 +186,11 @@ export default class ParagraphEditorToolbar extends React.PureComponent {
     }
 
     /**
-     * Click handler for the Pilcro
+     * Click handler for the Pilcrow
      *
      * @param {React.MouseEvent} event - The event from the click handler.
      */
-    pilcroClickHandler = (event) => {
+    pilcrowClickHandler = (event) => {
         event.preventDefault();
         this.setState({
             showMenu: !this.state.showMenu,
@@ -184,19 +200,23 @@ export default class ParagraphEditorToolbar extends React.PureComponent {
 
     render() {
         const toolbarStyles = this.getToolbarStyles();
-        const pilcroStyles = this.getPilcroStyles();
+        const pilcrowStyles = this.getPilcrowStyles();
         const toolbarClasses = this.getToolbarClasses();
+        let pilcrowClasses = "richEditor-button richEditorParagraphMenu-handle";
+        if (!this.state.showPilcrow) {
+            pilcrowClasses += " isHidden";
+        }
 
-        return <div style={pilcroStyles} className="richEditor-menu richEditorParagraphMenu">
+        return <div style={pilcrowStyles} className="richEditor-menu richEditorParagraphMenu">
             <button
-                className="richEditor-button richEditorParagraphMenu-handle"
+                className={pilcrowClasses}
                 type="button"
                 aria-haspopup="menu"
                 aria-expanded="false"
                 aria-controls="tempId-paragraphLevelMenu-toggle"
-                onClick={this.pilcroClickHandler}
+                onClick={this.pilcrowClickHandler}
             >
-                <PilcroIcon/>
+                <PilcrowIcon/>
             </button>
             <div className={toolbarClasses} style={toolbarStyles} ref={(ref) => this.toolbarNode = ref}>
                 <EditorToolbar quill={this.quill} menuItems={this.menuItems} isHidden={!this.state.showMenu}/>

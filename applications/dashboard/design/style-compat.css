@@ -60,14 +60,24 @@ body.isMobile .change-picture .change-picture-instructions {
   float: none;
 }
 
+@keyframes fadein {
+  0% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
 .richEditorParagraphMenu {
   position: absolute;
   top: 9px;
-  left: 6px;
+  right: calc(100% + 6px);
   height: 24px;
   width: 24px;
   z-index: 1;
-  transition: transform 0.02s linear;
+  animation: fadein 0.3s ease;
+  animation-iteration-count: 1;
 }
 
 .richEditor-text {
@@ -143,6 +153,12 @@ body.isMobile .change-picture .change-picture-instructions {
 
 .richEditor-button.richEditorParagraphMenu-handle {
   background: transparent;
+  transition: opacity 0.3s ease;
+}
+
+.richEditor-button.richEditorParagraphMenu-handle.isHidden {
+  opacity: 0;
+  pointer-events: none;
 }
 
 .richEditor-button.richEditorParagraphMenu-handle .richEditorInline-icon {

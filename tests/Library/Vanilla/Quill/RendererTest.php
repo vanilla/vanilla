@@ -62,6 +62,9 @@ class RendererTest extends TestCase {
             ["everything"],
             ["embed-image"],
             ["embed-video"],
+            ["embed-internal"],
+            ["embed-external"],
+            ["embed-external-image"],
         ];
     }
 }

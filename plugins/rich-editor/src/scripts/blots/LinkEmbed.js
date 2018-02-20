@@ -37,7 +37,7 @@ export default class LinkEmbedBlock extends BlockEmbed {
             linkImage = document.createElement('div');
             linkImage.classList.add('embedLink-image');
             linkImage.setAttribute('aria-hidden', 'true');
-            linkImage.setAttribute('style', 'background-image: url("' + data.linkImage + '");');
+            linkImage.setAttribute('style', 'background-image: url(' + data.linkImage + ');');
         }
 
         let userName = false;
@@ -116,7 +116,7 @@ export default class LinkEmbedBlock extends BlockEmbed {
 
     static sanitize(url) {
         return sanitize(url, this.PROTOCOL_WHITELIST) ? url : this.SANITIZED_URL;
-    }
+    }9
 
     static value(node) {
         return getData(node, "data");

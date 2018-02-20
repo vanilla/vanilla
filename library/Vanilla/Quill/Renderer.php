@@ -29,6 +29,7 @@ class Renderer {
         Blots\Embeds\EmojiBlot::class,
         Blots\Embeds\ImageBlot::class,
         Blots\Embeds\VideoBlot::class,
+        Blots\Embeds\LinkEmbedBlot::class,
         Blots\TextBlot::class,
     ];
 

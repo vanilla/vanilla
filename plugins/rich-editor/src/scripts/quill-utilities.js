@@ -139,7 +139,7 @@ export function closeEditorFlyouts(firingKey = "") {
 }
 
 /**
- * Create a new Blot class from a child class.
+ * HOC to create a new Blot class from a child class.
  *
  * This should basically sit is a wrapper around the child, but the blotName,
  * and className, and tagName, should all be set on this. The parent's class should be used as the formatName.

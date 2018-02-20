@@ -146,6 +146,19 @@ export default class ParagraphEditorToolbar extends React.PureComponent {
         };
     }
 
+    getToolbarClasses() {
+        const bounds = this.quill.getBounds(this.state.range);
+        let classes = "richEditor-toolbarContainer richEditor-paragraphToolbarContainer";
+
+        if (bounds.top > 30) {
+            classes += " isUp";
+        } else {
+            classes += " isDown";
+        }
+
+        return classes;
+    }
+
     getToolbarStyles() {
         const hiddenStyles = {
             visibility: "hidden",
@@ -172,6 +185,7 @@ export default class ParagraphEditorToolbar extends React.PureComponent {
     render() {
         const toolbarStyles = this.getToolbarStyles();
         const pilcroStyles = this.getPilcroStyles();
+        const toolbarClasses = this.getToolbarClasses();
 
         return <div style={pilcroStyles} className="richEditor-menu richEditorParagraphMenu">
             <button
@@ -184,8 +198,11 @@ export default class ParagraphEditorToolbar extends React.PureComponent {
             >
                 <PilcroIcon/>
             </button>
-            <div style={toolbarStyles} ref={(ref) => this.toolbarNode = ref}>
+            <div className={toolbarClasses} style={toolbarStyles} ref={(ref) => this.toolbarNode = ref}>
                 <EditorToolbar quill={this.quill} menuItems={this.menuItems} isHidden={!this.state.showMenu}/>
+                <div className="richEditor-nubPosition">
+                    <div className="richEditor-nub"/>
+                </div>
             </div>
         </div>;
     }

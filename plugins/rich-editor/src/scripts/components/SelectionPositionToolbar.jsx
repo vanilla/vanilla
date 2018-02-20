@@ -226,7 +226,7 @@ export default class FloatingToolbar extends React.Component {
             position: "absolute",
         };
         let nubStyles = {};
-        let classes = "richEditor-inlineMenu ";
+        let classes = "richEditor-inlineToolbarContainer richEditor-toolbarContainer ";
 
         if (x && y && !this.state.hideSelf && this.props.forceVisibility === "ignore" || this.props.forceVisibility === "visible") {
             toolbarStyles = {

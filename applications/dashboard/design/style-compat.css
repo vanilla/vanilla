@@ -370,26 +370,60 @@ body.isMobile .change-picture .change-picture-instructions {
   background: white;
 }
 
-.richEditor-inlineMenu.isUp {
+.richEditor-toolbarContainer.isUp {
   transform: translateY(-12px);
 }
 
-.richEditor-inlineMenu.isUp .richEditor-nub {
+.richEditor-toolbarContainer.isUp .richEditor-nubPosition {
+  top: 100%;
+}
+
+.richEditor-toolbarContainer.isUp .richEditor-nub {
   transform: translateY(-50%) rotate(135deg);
 }
 
-.richEditor-inlineMenu.isDown {
+.richEditor-toolbarContainer.isDown {
   transform: translateY(12px);
 }
 
-.richEditor-inlineMenu.isDown .richEditor-nubPosition {
+.richEditor-toolbarContainer.isDown .richEditor-nubPosition {
+  bottom: 100%;
+}
+
+.richEditor-toolbarContainer.isDown .richEditor-nubPosition {
   align-items: flex-end;
   transform: translateY(-50%) translateX(-50%);
   margin-top: 1px;
 }
 
-.richEditor-inlineMenu.isDown .richEditor-nub {
+.richEditor-toolbarContainer.isDown .richEditor-nub {
   transform: translateY(50%) rotate(-45deg);
+}
+
+.richEditor-paragraphToolbarContainer {
+  position: absolute;
+}
+
+.richEditor-paragraphToolbarContainer .richEditor-nubPosition {
+  left: 2px;
+}
+
+.richEditor-paragraphToolbarContainer.isUp {
+  bottom: 100%;
+}
+
+.richEditor-paragraphToolbarContainer.isUp .richEditor-nubPosition {
+  top: 100%;
+  transform: none;
+}
+
+.richEditor-paragraphToolbarContainer.isDown {
+  top: 100%;
+}
+
+.richEditor-paragraphToolbarContainer.isDown .richEditor-nubPosition {
+  bottom: 100%;
+  transform: translateY(1px);
 }
 
 .blockquote {

@@ -156,74 +156,65 @@ class DiscussionsSortFilterModule extends Gdn_Module {
 
         $filterDropdown = [];
 
-        $dropdowns = [];
-        foreach($this->filters as $filterSet) {
+        foreach($this->filters as $filter) {
             // Check to see if there's a category restriction.
-            if ($categories = val('categories', $filterSet)) {
-                if (!in_array($this->categoryID, $categories)) {
+            if (!empty($filter['categories'])) {
+                if (!in_array($this->categoryID, $filter['categories'])) {
                     continue;
                 }
             }
-            $setKey = val('key', $filterSet);
-            $dropdown = new DropdownModule('discussions-filter-'.$setKey, val('name', $filterSet), 'discussion-filter');
 
-            // Override the trigger text?
-            $selectedValue = val($setKey, $this->selectedFilters);
+            $key = $filter['key'];
 
-            if ($selectedValue && $selectedValue != 'none') {
-                $selected = val('name', $filterSet['filters'][$selectedValue]);
-                $dropdown->setTrigger($selected);
-            }
+            $selected = $this->selectedFilters[$key] ?? null;
 
-            $lastGroup = '';
-            $index = 0;
-            $filters = val('filters', $filterSet);
-            $filterLength = sizeof($filters);
+            $currentGroup = null;
+            $path = $this->getPagelessPath();
+            $values = array_values($filter['filters']);
+            $totalValues = count($values);
 
-            // Add the filters to the dropdown
-            foreach ($filters as $filter) {
-                $key = val('group', $filter, '').'.'.val('key', $filter);
-                $queryString = DiscussionModel::getSortFilterQueryString(
+            for ($i = 0; $i < $totalValues; $i++) {
+                $value = $values[$i];
+                $valueKey = $value['key'];
+                $query = DiscussionModel::getSortFilterQueryString(
                     $this->selectedSort,
                     $this->selectedFilters,
                     '',
-                    [$setKey => val('key', $filter)]
+                    [$key => $valueKey]
                 );
 
-                $pathAndQuery = $this->getPagelessPath().$queryString;
-                if (empty($pathAndQuery)) {
-                    $pathAndQuery = '/';
+                $url = $path.$query;
+                if (empty($url)) {
+                    $url = '/';
                 }
 
-                $dropdown->addLink(
-                    val('name', $filter),
-                    $pathAndQuery,
-                    $key,
-                    '',
-                    [],
-                    ['rel' => 'nofollow']
-                );
-
-                $link = $dropdown->getItems()[val('group', $filter)]['items'][val('key', $filter)];
-                $group = val('group', $filter);
-                if ($lastGroup != $group && $index != 0 && $index != ($filterLength - 1)) {
+                $group = $value['group'] ?? null;
+                if($i > 0 && $currentGroup !== $group) {
                     $filterDropdown[] = [
-                        "separator" => true
+                        'separator' => true
                     ];
                 }
 
+                if ($selected === null && $i === 0) {
+                    $isActive = true;
+                } elseif ($selected === $valueKey) {
+                    $isActive = true;
+                } else {
+                    $isActive = false;
+                }
+
                 $filterDropdown[] = [
-                    'name' => val('text', $link),
-                    'url' => url('/'.val('url', $link)),
-                    'active' => (val('key', $filter) === $selectedValue || ($selectedValue == false && $index == 0)),
+                    'name' => $value['name'],
+                    'url' => url($url),
+                    'active' => $isActive,
                 ];
 
-                $lastGroup = $group;
-                $index++;
+                $currentGroup = $group;
             }
 
             $dropdowns[] = $filterDropdown;
         }
+
         return $dropdowns;
     }
 

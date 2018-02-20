@@ -1,8 +1,7 @@
-import Container from "quill/blots/container";
-import Block from 'quill/blots/block';
-import Parchment from "parchment";
+import ContentBlockBlot from "./ContentBlockBlot";
+import { makeWrapperBlot } from "../quill-utilities";
 
-export class SpoilerContentBlot extends Block {
+export class SpoilerContentBlot extends ContentBlockBlot {
 
     static blotName = "spoiler-content";
     static className = "spoiler-content";
@@ -15,27 +14,10 @@ export class SpoilerContentBlot extends Block {
     }
 }
 
-export default class SpoilerBlot extends Container {
+const SpoilerBlot = makeWrapperBlot(SpoilerContentBlot);
 
-    static blotName = 'spoiler';
-    static className = 'spoiler';
-    static tagName = 'div';
-    static scope = Parchment.Scope.BLOCK_BLOT;
-    static defaultChild = 'spoiler-content';
-    static allowedChildren = [SpoilerContentBlot];
+SpoilerBlot.blotName = "spoiler";
+SpoilerBlot.className = "spoiler";
+SpoilerBlot.tagName = "div";
 
-    static create() {
-        const domNode = super.create();
-        domNode.classList.add('spoiler');
-        return domNode;
-    }
-
-    replace(target) {
-        if (target.statics.blotName !== this.statics.blotName) {
-            const item = Parchment.create(this.statics.defaultChild);
-            target.moveChildren(item);
-            this.appendChild(item);
-        }
-        super.replace(target);
-    }
-}
+export default SpoilerBlot;

@@ -18,7 +18,7 @@ import CodeBlockBlot from "./blots/CodeBlockBlot.js";
 import VideoBlot from "./blots/VideoBlot.js";
 import LinkEmbedBlot from "./blots/LinkEmbed.js";
 import EmbedLoadingBlot from "./blots/EmbedLoadingBlot.js";
-import BlockquoteBlot from "./blots/BlockquoteBlot.js";
+import BlockquoteBlot, { BlockquoteContentBlot } from "./blots/BlockquoteBlot.js";
 import CodeInlineBlot from "./formats/CodeInlineBlot.js";
 
 // Other
@@ -28,6 +28,7 @@ import QuillTheme from "./QuillTheme";
 Quill.register({
     // Block formats
     'formats/blockquote': BlockquoteBlot,
+    'formats/blockquote/content': BlockquoteContentBlot,
     'formats/code-block': CodeBlockBlot,
     'formats/header': Header,
     'formats/list': List,
@@ -51,6 +52,6 @@ Quill.register({
     // Other
     'formats/indent': Indent,
     'themes/vanilla': QuillTheme,
-});
+}, true);
 
 export default Quill;

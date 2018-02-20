@@ -1,28 +1,24 @@
-import { BlockEmbed } from "quill/blots/block";
-import { setData, getData } from "@core/dom-utility";
+import ContentBlockBlot from "./ContentBlockBlot";
+import { makeWrapperBlot } from "../quill-utilities";
 
-export default class BlockquoteBlot extends BlockEmbed {
+export class BlockquoteContentBlot extends ContentBlockBlot {
 
-    static blotName = "blockquote-block";
-    static tagName = 'blockquote';
+    static blotName = "blockquote-content";
+    static className = "blockquote-content";
+    static tagName = 'div';
 
-    static create(data) {
-        const node = super.create(data);
-        node.classList.add("embed");
-        node.classList.add("blockquote");
-
-        const quote = document.createElement('div');
-        quote.classList.add('blockquote-main');
-        quote.innerHTML = data.content;
-
-        node.appendChild(quote);
-
-        setData(node, "data", data);
-
-        return node;
-    }
-
-    static value(node) {
-        return getData(node, "data");
+    static create() {
+        const domNode = super.create();
+        domNode.classList.add('blockquote-content');
+        domNode.classList.add('blockquote-main');
+        return domNode;
     }
 }
+
+const BlockquoteBlot = makeWrapperBlot(BlockquoteContentBlot);
+
+BlockquoteBlot.blotName = "blockquote";
+BlockquoteBlot.tagName = "blockquote";
+BlockquoteBlot.className = "blockquote";
+
+export default BlockquoteBlot;

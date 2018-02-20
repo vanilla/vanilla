@@ -10,10 +10,11 @@ import Quill from "quill/core";
 import Emitter from "quill/core/emitter";
 import Keyboard from "quill/modules/keyboard";
 import LinkBlot from "quill/formats/link";
-import FloatingToolbar from "./FloatingToolbar";
+import SelectionPositionToolbar from "./SelectionPositionToolbar";
 import EditorToolbar from "./EditorToolbar";
 import { t } from "@core/utility";
 import * as quillUtilities from "../quill-utilities";
+import {CLOSE_FLYOUT_EVENT} from "../quill-utilities";
 
 export default class InlineEditorToolbar extends React.Component {
     static propTypes = {
@@ -75,6 +76,7 @@ export default class InlineEditorToolbar extends React.Component {
      */
     componentDidMount() {
         this.quill.on(Emitter.events.EDITOR_CHANGE, this.handleEditorChange);
+        document.addEventListener(CLOSE_FLYOUT_EVENT, this.clearLinkInput);
 
         // Add a key binding for the link popup.
         this.quill.options.modules.keyboard.bindings.link = {
@@ -99,6 +101,7 @@ export default class InlineEditorToolbar extends React.Component {
      */
     componentWillUnmount() {
         this.quill.off(Quill.events.EDITOR_CHANGE, this.handleEditorChange);
+        document.removeEventListener(CLOSE_FLYOUT_EVENT, this.clearLinkInput);
     }
 
     /**
@@ -160,12 +163,12 @@ export default class InlineEditorToolbar extends React.Component {
     /**
      * Clear the link menu's input content and hide the link menu..
      */
-    clearLinkInput() {
+    clearLinkInput = () => {
         this.setState({
             value: "",
             showLink: false,
         });
-    }
+    };
 
     /**
      * Handle key-presses for the link toolbar.
@@ -211,10 +214,10 @@ export default class InlineEditorToolbar extends React.Component {
      */
     render() {
         return <div>
-            <FloatingToolbar quill={this.quill} forceVisibility={this.state.showLink ? "hidden" : "ignore"}>
+            <SelectionPositionToolbar quill={this.quill} forceVisibility={this.state.showLink ? "hidden" : "ignore"}>
                 <EditorToolbar quill={this.quill} menuItems={this.menuItems}/>
-            </FloatingToolbar>
-            <FloatingToolbar quill={this.quill} forceVisibility={this.state.showLink ? "visible" : "hidden"}>
+            </SelectionPositionToolbar>
+            <SelectionPositionToolbar quill={this.quill} forceVisibility={this.state.showLink ? "visible" : "hidden"}>
                 <div className="richEditor-menu FlyoutMenu insertLink" role="dialog" aria-label={t("Insert Url")}>
                     <input
                         value={this.state.value}
@@ -232,7 +235,7 @@ export default class InlineEditorToolbar extends React.Component {
                         <span>×</span>
                     </a>
                 </div>
-            </FloatingToolbar>
+            </SelectionPositionToolbar>
         </div>;
     }
 }

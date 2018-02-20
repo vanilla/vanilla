@@ -7,6 +7,7 @@
 
 namespace Vanilla\Quill\Blots;
 
+use Vanilla\Quill\Blots\Embeds\EmojiBlot;
 use Vanilla\Quill\Formats;
 use Vanilla\Quill\Block;
 
@@ -151,7 +152,7 @@ class TextBlot extends AbstractBlot {
      * @inheritDoc
      */
     protected function createLineBreaks(string $input): string {
-        $isTouchingEmoji = valr("insert.emoji", $this->nextOperation) || valr("insert.emoji", $this->previousOperation);
+        $isTouchingEmoji = EmojiBlot::matches([$this->nextOperation]) || EmojiBlot::matches([$this->previousOperation]);
 
         if ($input === "\n" && !$isTouchingEmoji) {
             return "<br>";

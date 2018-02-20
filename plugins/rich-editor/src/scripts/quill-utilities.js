@@ -155,6 +155,11 @@ export function makeWrapperBlot(ChildBlot) {
         static defaultChild = ChildBlot.blotName;
         static allowedChildren = [ChildBlot];
 
+        /**
+         * Create the domNode with the class applied to it. This is necessary for copy-pasting to work.
+         *
+         * @returns {Node} - The DOM Node for the Blot.
+         */
         static create() {
             const domNode = super.create();
 
@@ -164,26 +169,40 @@ export function makeWrapperBlot(ChildBlot) {
             return domNode;
         }
 
+        /**
+         * Return the formats for the Blot. Check matching of the tag as well as classname if applicable.
+         *
+         * This is necessary for copy/paste to work.
+         *
+         * @param {Node} domNode - The DOM Node to check.
+         *
+         * @returns {boolean} Whether or a not a DOM Node represents this format.
+         */
         static formats(domNode) {
             const classMatch = this.className && domNode.classList.contains(this.className);
             const tagMatch = domNode.tagName.toLowerCase() === this.blotName;
 
-            if (this.className ? classMatch && tagMatch : tagMatch) {
-                return true;
-            }
-
-            return undefined;
+            return this.className ? classMatch && tagMatch : tagMatch;
         }
 
+        /**
+         * Get the formats out of the Blot instance's DOM Node.
+         *
+         * @returns {Object} - The Formats for the Blot.
+         */
         formats() {
             return {
                 [this.constructor.blotName]: this.constructor.formats(this.domNode),
             };
         }
 
+        /**
+         * Allow the blot to split into 2 unless it's the insert is it's child Blot.
+         *
+         * @param {Blot} blot - The Blot to insert.
+         * @param {any} ref - ?
+         */
         insertBefore(blot, ref) {
-            console.log(blot);
-            console.log(ChildBlot);
             if (blot instanceof ChildBlot) {
                 super.insertBefore(blot, ref);
             } else {
@@ -193,6 +212,11 @@ export function makeWrapperBlot(ChildBlot) {
             }
         }
 
+        /**
+         * Join the children elements together where possible.
+         *
+         * @param {any} context -
+         */
         optimize(context) {
             super.optimize(context);
             const prev = this.prev;
@@ -204,6 +228,13 @@ export function makeWrapperBlot(ChildBlot) {
             }
         }
 
+        /**
+         * Replace another blot with this Blot.
+         *
+         * Take the target's children and create a new Child blot, and insert that contents.
+         *
+         * @param {Blot} target - The target blot to replace.
+         */
         replace(target) {
             if (target.statics.blotName !== this.statics.blotName) {
                 const item = Parchment.create(this.statics.defaultChild);

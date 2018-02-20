@@ -60,6 +60,7 @@ class RendererTest extends TestCase {
             ["lists"],
             ["emoji"],
             ["everything"],
+            ["embed-image"],
         ];
     }
 }

@@ -151,6 +151,10 @@ class TextBlot extends AbstractBlot {
      * @inheritDoc
      */
     protected function createLineBreaks(string $input): string {
+        if ($input === "\n") {
+            return "<br>";
+        }
+
         // Replace any newlines with breaks
         $singleNewLineReplacement = "</p><p>";
         return \preg_replace("/\\n/", $singleNewLineReplacement, $input);

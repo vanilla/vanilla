@@ -9,11 +9,11 @@ import * as PropTypes from "prop-types";
 import Quill from "quill/core";
 import Emitter from "quill/core/emitter";
 import EditorToolbar from "./EditorToolbar";
-import throttle from "lodash/throttle";
 import { pilcro as PilcroIcon } from "./Icons";
-import Events from "@core/events";
+import { closeEditorFlyouts, CLOSE_FLYOUT_EVENT } from "../quill-utilities";
 
 export default class ParagraphEditorToolbar extends React.PureComponent {
+
     static propTypes = {
         quill: PropTypes.instanceOf(Quill),
     };
@@ -28,7 +28,8 @@ export default class ParagraphEditorToolbar extends React.PureComponent {
 
     /**
      * @type {Object}
-     * @property {RangeStatic} - The current quill selected text range..
+     * @property {RangeStatic} range - The current quill selected text range.
+     * @property {number} showMenu - Whether or not to display the Paragraph toolbar.
      */
     state;
 
@@ -37,9 +38,6 @@ export default class ParagraphEditorToolbar extends React.PureComponent {
 
     /** @type {HTMLElement} */
     nub;
-
-    /** @type {number} */
-    resizeListener;
 
     menuItems = {
         title: {
@@ -86,10 +84,8 @@ export default class ParagraphEditorToolbar extends React.PureComponent {
      */
     componentDidMount() {
         this.quill.on(Emitter.events.EDITOR_CHANGE, this.handleEditorChange);
+        document.addEventListener(CLOSE_FLYOUT_EVENT, this.closeMenu);
 
-        this.resizeListener = Events.addResizeListener(() => {
-            this.forceUpdate();
-        });
     }
 
     /**
@@ -97,8 +93,23 @@ export default class ParagraphEditorToolbar extends React.PureComponent {
      */
     componentWillUnmount() {
         this.quill.off(Emitter.events.EDITOR_CHANGE, this.handleEditorChange);
-        Events.removeResizeListener(this.resizeListener);
+        document.removeEventListener(CLOSE_FLYOUT_EVENT, this.closeMenu);
     }
+
+    /**
+     * Close the menu.
+     *
+     * @param {Event} event -
+     */
+    closeMenu = (event) => {
+        if (event.detail.firingKey === this.constructor.name) {
+            return;
+        }
+
+        this.setState({
+            showMenu: false,
+        });
+    };
 
     /**
      * Handle changes from the editor.
@@ -113,6 +124,8 @@ export default class ParagraphEditorToolbar extends React.PureComponent {
             this.setState({
                 range,
             });
+
+            closeEditorFlyouts(this.constructor.name);
         }
 
         if (source !== Quill.sources.SILENT) {
@@ -146,13 +159,14 @@ export default class ParagraphEditorToolbar extends React.PureComponent {
     /**
      * Click handler for the Pilcro
      *
-     * @param {React.MouseEvent} event
+     * @param {React.MouseEvent} event - The event from the click handler.
      */
     pilcroClickHandler = (event) => {
         event.preventDefault();
         this.setState({
             showMenu: !this.state.showMenu,
         });
+        closeEditorFlyouts(this.constructor.name);
     };
 
     render() {

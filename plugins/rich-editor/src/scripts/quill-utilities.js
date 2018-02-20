@@ -7,7 +7,7 @@
 import Emitter from "quill/core/emitter";
 import Container from "quill/blots/container";
 import Parchment from "parchment";
-// import ContentBlockBlot from "./"
+import ContentBlockBlot from "./blots/ContentBlockBlot";
 
 /**
  * @typedef {Object} BoundaryStatic
@@ -120,19 +120,35 @@ export function disableAllBlotsInRange(quill, range, blotConstructor) {
     quill.formatText(finalRange.index, finalRange.length, 'link', false, Emitter.sources.USER);
 }
 
+export const CLOSE_FLYOUT_EVENT = "editor:close-flyouts";
+
+/**
+ * Fires an event to close the editor flyouts.
+ *
+ * @param {string} firingKey - A key to fire the event with. This will be attached to the event so that you do some
+ * filtering when setting up you listeners.
+ */
+export function closeEditorFlyouts(firingKey = "") {
+    const event = new CustomEvent(CLOSE_FLYOUT_EVENT, {
+        detail: {
+            firingKey,
+        },
+    });
+
+    document.dispatchEvent(event);
+}
+
 /**
  * Create a new Blot class from a child class.
  *
  * This should basically sit is a wrapper around the child, but the blotName,
  * and className, and tagName, should all be set on this. The parent's class should be used as the formatName.
  *
- * @param {typeof ContentBlock} ChildBlot - A class constructor for Block blot or a child of one.
+ * @param {typeof ContentBlockBlot} ChildBlot - A class constructor for Block blot or a child of one.
  *
  * @returns {typeof Container}
  */
 export function makeWrapperBlot(ChildBlot) {
-
-    console.log(ChildBlot.blotName);
     return class extends Container {
 
         static scope = Parchment.Scope.BLOCK_BLOT;

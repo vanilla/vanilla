@@ -10,6 +10,7 @@ import Quill from "quill/core";
 import EditorEmojiMenu from "../components/EditorEmojiMenu";
 import * as Icons from "./Icons";
 import UniqueID from "react-html-id";
+import { closeEditorFlyouts, CLOSE_FLYOUT_EVENT } from "../quill-utilities";
 
 export default class EditorEmojiPicker extends React.Component {
 
@@ -40,6 +41,11 @@ export default class EditorEmojiPicker extends React.Component {
 
     }
 
+    /**
+     * Handle the escape key.
+     *
+     * @param {React.KeyboardEvent} event - A synthetic keyboard event.
+     */
     escFunction(event){
         if(event.keyCode === 27) {
             this.closeMenu(event);
@@ -48,36 +54,43 @@ export default class EditorEmojiPicker extends React.Component {
 
     /**
      * Toggle Menu menu
-     * @param {SyntheticEvent} e
      */
+    toggleEmojiMenu = () => {
+        closeEditorFlyouts(this.constructor.name);
 
-    toggleEmojiMenu = (e) => {
-        this.setState(prevState => ({
-            isVisible: !prevState.isVisible,
-        }));
-    }
+        this.setState({
+            isVisible: !this.state.isVisible,
+        });
+    };
 
     componentDidMount(){
         document.addEventListener("keydown", this.escFunction, false);
+        document.addEventListener(CLOSE_FLYOUT_EVENT, this.closeMenu);
+
+
     }
 
     componentWillUnmount(){
         document.removeEventListener("keydown", this.escFunction, false);
+        document.removeEventListener(CLOSE_FLYOUT_EVENT, this.closeMenu);
     }
 
     /**
      * Closes menu
-     * @param {SyntheticEvent} e
+     * @param {SyntheticEvent} e - The fired event. This could be a custom event.
      */
-
     closeMenu = (e) => {
+        if (e.detail && e.detail.firingKey && e.detail.firingKey === this.constructor.name) {
+            return;
+        }
+
         this.setState({
             isVisible: false,
         });
 
         e.preventDefault();
         e.stopPropagation();
-    }
+    };
 
     /**
      * @inheritDoc

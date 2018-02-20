@@ -5,7 +5,6 @@ import {SpoilerContentBlot} from "./SpoilerBlot";
 export class CodeBlockContentsBlot extends CodeBlock {
 
     static blotName = 'codeblock-contents';
-    static className = 'code';
     static tagName = 'code';
 
     static create() {

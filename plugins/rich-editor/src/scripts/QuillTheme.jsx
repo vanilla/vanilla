@@ -10,6 +10,7 @@ import Theme from "quill/core/theme";
 import InlineEditorToolbar from "./components/InlineEditorToolbar";
 import ParagraphEditorToolbar from "./components/ParagraphEditorToolbar";
 import EditorEmojiPicker from "./components/EditorEmojiPicker";
+import { closeEditorFlyouts } from "./quill-utilities";
 
 export default class VanillaTheme extends Theme {
 
@@ -28,6 +29,7 @@ export default class VanillaTheme extends Theme {
         super(quill, themeOptions);
         this.quill.root.classList.add("richEditor-text");
         this.quill.root.classList.add("userContent");
+        this.quill.root.addEventListener("focusin", closeEditorFlyouts);
         this.setupTabBehaviour();
         this.mountToolbar();
         this.mountEmojiMenu();

@@ -66,6 +66,7 @@ body.isMobile .change-picture .change-picture-instructions {
   left: 6px;
   height: 24px;
   width: 24px;
+  z-index: 1;
   transition: transform 0.02s linear;
 }
 

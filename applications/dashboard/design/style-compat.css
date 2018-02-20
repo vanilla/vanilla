@@ -158,7 +158,6 @@ body.isMobile .change-picture .change-picture-instructions {
 
 .richEditor-button.richEditorParagraphMenu-handle.isHidden {
   opacity: 0;
-  pointer-events: none;
 }
 
 .richEditor-button.richEditorParagraphMenu-handle .richEditorInline-icon {

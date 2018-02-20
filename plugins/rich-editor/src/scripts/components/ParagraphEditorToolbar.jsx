@@ -210,6 +210,7 @@ export default class ParagraphEditorToolbar extends React.PureComponent {
         return <div style={pilcrowStyles} className="richEditor-menu richEditorParagraphMenu">
             <button
                 className={pilcrowClasses}
+                disabled={!this.state.showPilcrow}
                 type="button"
                 aria-haspopup="menu"
                 aria-expanded="false"

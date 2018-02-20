@@ -333,7 +333,12 @@ class CommentsApiController extends AbstractApiController {
         }
 
         $schemaRecord = ApiUtils::convertOutputKeys($dbRecord);
-        return $schemaRecord;
+
+        // Allow addons to hook into the normalization process.
+        $options = [];
+        $result = $this->getEventManager()->fireFilter('commentsApiController_normalizeOutput', $schemaRecord, $this, $options);
+
+        return $result;
     }
 
     /**

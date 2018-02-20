@@ -76,10 +76,17 @@ export default class EditorToolbar extends React.PureComponent {
      * @param {RangeStatic} range - The new selection range.
      */
     quillChangeHandler = (type, range) => {
-        if (type === Quill.events.SELECTION_CHANGE && !this.props.isHidden) {
+        if (!this.props.isHidden) {
             this.update(range);
         }
     };
+
+    componentWillReceiveProps(nextProps) {
+        if (this.props.isHidden && !nextProps.isHidden) {
+            const [range] = this.quill.selection.getRange();
+            this.update(range);
+        }
+    }
 
     /**
      * React to quill optimizations passes.

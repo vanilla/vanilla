@@ -180,7 +180,7 @@ export function makeWrapperBlot(ChildBlot) {
          */
         static formats(domNode) {
             const classMatch = this.className && domNode.classList.contains(this.className);
-            const tagMatch = domNode.tagName.toLowerCase() === this.blotName;
+            const tagMatch = domNode.tagName.toLowerCase() === this.tagName.toLowerCase();
 
             return this.className ? classMatch && tagMatch : tagMatch;
         }
@@ -219,12 +219,12 @@ export function makeWrapperBlot(ChildBlot) {
          */
         optimize(context) {
             super.optimize(context);
-            const prev = this.prev;
-            if (prev != null && prev.next === this &&
-                prev.statics.blotName === this.statics.blotName &&
-                prev.domNode.tagName === this.domNode.tagName) {
-                prev.moveChildren(this);
-                prev.remove();
+            const next = this.next;
+            if (next != null && next.prev === this &&
+                next.statics.blotName === this.statics.blotName &&
+                next.domNode.tagName === this.domNode.tagName) {
+                next.moveChildren(this);
+                next.remove();
             }
         }
 

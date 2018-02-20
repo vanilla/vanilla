@@ -14,7 +14,7 @@ import EmojiBlot from "./blots/EmojiBlot.js";
 import ImageBlot from "./blots/ImageBlot.js";
 import EmbedErrorBlot from "./blots/EmbedErrorBlot.js";
 import SpoilerBlot, { SpoilerContentBlot } from "./blots/SpoilerBlot.js";
-import CodeBlockBlot, { CodeBlockContentBlot } from "./blots/CodeBlockBlot.js";
+import CodeBlockBlot from "./blots/CodeBlockBlot.js";
 import VideoBlot from "./blots/VideoBlot.js";
 import LinkEmbedBlot from "./blots/LinkEmbed.js";
 import EmbedLoadingBlot from "./blots/EmbedLoadingBlot.js";
@@ -30,7 +30,6 @@ Quill.register({
     'formats/blockquote': BlockquoteBlot,
     'formats/blockquote/content': BlockquoteContentBlot,
     'formats/code-block': CodeBlockBlot,
-    'formats/code-block/contents': CodeBlockContentBlot,
     'formats/header': Header,
     'formats/list': List,
     'formats/list/item': ListItem,

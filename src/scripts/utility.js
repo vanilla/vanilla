@@ -54,23 +54,23 @@ export function resolvePromisesSequentially(promiseFunctions) {
  *
  * This only prints in debug mode.
  *
- * @param {any} value - The value to log.
+ * @param {...any} value - The value to log.
  */
-export function log(value) {
+export function log(...value) {
     if (getMeta("debug", false)) {
         // eslint-disable-next-line no-console
-        console.log(value);
+        console.log.apply(console, value);
     }
 }
 
 /**
  * Log an error to console.
  *
- * @param {any} value - The value to log.
+ * @param {...any} value - The value to log.
  */
-export function logError(value) {
+export function logError(...value) {
     // eslint-disable-next-line no-console
-    console.error(value);
+    console.error.apply(console, value);
 }
 
 /**
@@ -204,3 +204,4 @@ export const t = translate;
  * Re-exported from sprintf-js https://www.npmjs.com/package/sprintf-js
  */
 // export const sprintf = sprintfJs.sprintf;
+

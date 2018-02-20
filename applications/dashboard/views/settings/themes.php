@@ -6,8 +6,8 @@ $themeSpacer = 'applications/dashboard/design/images/theme-spacer.png';
 
 $links = '<ul>';
 $links .= wrap(anchor(t("Video tutorial on managing appearance"), 'settings/tutorials/appearance'), 'li');
-$links .= wrap(anchor(t('Theming Overview'), 'http://docs.vanillaforums.com/theming/'), 'li');
-$links .= wrap(anchor(t('Quick-Start Guide to Creating Themes for Vanilla'), 'http://docs.vanillaforums.com/theming/quickstart/'), 'li');
+$links .= wrap(anchor(t('Addons Overview'), 'https://docs.vanillaforums.com/developer/addons/'), 'li');
+$links .= wrap(anchor(t('Quick-Start Guide to Creating Themes for Vanilla'), 'https://docs.vanillaforums.com/developer/addons/theme-quickstart/'), 'li');
 $links .= '</ul>';
 
 helpAsset(sprintf(t('About %s'), t('Themes')), sprintf(t('ThemeHelp'), '<code style="word-wrap: break-word;">'.PATH_THEMES.'</code>').'<br/><br/>'.anchor(t('Theming Documentation'), 'http://docs.vanillaforums.com/developer/theming/', '', ["target" => "_blank"]));

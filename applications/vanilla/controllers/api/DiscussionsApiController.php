@@ -286,7 +286,13 @@ class DiscussionsApiController extends AbstractApiController {
         }
 
         $schemaRecord = ApiUtils::convertOutputKeys($dbRecord);
-        return $schemaRecord;
+        $schemaRecord['type'] = isset($schemaRecord['type']) ? lcfirst($schemaRecord['type']) : null;
+
+        // Allow addons to hook into the normalization process.
+        $options = ['expand' => $expand];
+        $result = $this->getEventManager()->fireFilter('discussionsApiController_normalizeOutput', $schemaRecord, $this, $options);
+
+        return $result;
     }
 
     /**

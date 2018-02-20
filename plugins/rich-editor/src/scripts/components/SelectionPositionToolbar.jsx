@@ -10,6 +10,7 @@ import Quill from "quill/core";
 import Events from "@core/events";
 import Emitter from "quill/core/emitter";
 import { Range } from "quill/core/selection";
+import {CLOSE_FLYOUT_EVENT} from "../quill-utilities";
 
 export default class FloatingToolbar extends React.Component {
     static propTypes = {
@@ -47,6 +48,7 @@ export default class FloatingToolbar extends React.Component {
 
         this.state = {
             range: null,
+            hideSelf: false,
         };
 
         this.handleEditorChange = this.handleEditorChange.bind(this);
@@ -57,6 +59,7 @@ export default class FloatingToolbar extends React.Component {
      */
     componentDidMount() {
         this.quill.on(Emitter.events.EDITOR_CHANGE, this.handleEditorChange);
+        document.addEventListener(CLOSE_FLYOUT_EVENT, this.hideSelf);
 
         this.resizeListener = Events.addResizeListener(() => {
             this.forceUpdate();
@@ -68,8 +71,21 @@ export default class FloatingToolbar extends React.Component {
      */
     componentWillUnmount() {
         this.quill.off(Quill.events.EDITOR_CHANGE, this.handleEditorChange);
+        document.removeEventListener(CLOSE_FLYOUT_EVENT, this.hideSelf);
         Events.removeResizeListener(this.resizeListener);
     }
+
+    unHideSelf = () => {
+        this.setState({
+            hideSelf: false,
+        });
+    };
+
+    hideSelf = () => {
+        this.setState({
+            hideSelf: true,
+        });
+    };
 
     /** SECTION: position */
 
@@ -90,6 +106,8 @@ export default class FloatingToolbar extends React.Component {
             this.setState({
                 range,
             });
+
+            this.unHideSelf();
         } else {
             if (this.props.forceVisibility === "visible") {
                 return;
@@ -208,23 +226,23 @@ export default class FloatingToolbar extends React.Component {
             position: "absolute",
         };
         let nubStyles = {};
-        let classes = "richEditor-inlineMenu ";
+        let classes = "richEditor-inlineToolbarContainer richEditor-toolbarContainer ";
 
-        if (x && y && this.props.forceVisibility === "ignore" || this.props.forceVisibility === "visible") {
+        if (x && y && !this.state.hideSelf && this.props.forceVisibility === "ignore" || this.props.forceVisibility === "visible") {
             toolbarStyles = {
                 position: "absolute",
-                top: y.toolbarPosition,
-                left: x.toolbarPosition,
+                top: y ? y.toolbarPosition : 0,
+                left: x ? x.toolbarPosition : 0,
                 zIndex: 5,
                 visibility: "visible",
             };
 
             nubStyles = {
-                left: x.nubPosition,
-                top: y.nubPosition,
+                left: x ? x.nubPosition : 0,
+                top: y ? y.nubPosition : 0,
             };
 
-            classes += y.nubPointsDown ? "isUp" : "isDown";
+            classes += y && y.nubPointsDown ? "isUp" : "isDown";
         }
 
         return <div className={classes} style={toolbarStyles} ref={(ref) => this.selfNode = ref}>

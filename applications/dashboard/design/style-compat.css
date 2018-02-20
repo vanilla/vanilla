@@ -60,12 +60,24 @@ body.isMobile .change-picture .change-picture-instructions {
   float: none;
 }
 
+@keyframes fadein {
+  0% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
 .richEditorParagraphMenu {
   position: absolute;
   top: 9px;
-  left: 6px;
+  right: calc(100% + 6px);
   height: 24px;
   width: 24px;
+  z-index: 1;
+  animation: fadein 0.3s ease;
+  animation-iteration-count: 1;
 }
 
 .richEditor-text {
@@ -141,6 +153,11 @@ body.isMobile .change-picture .change-picture-instructions {
 
 .richEditor-button.richEditorParagraphMenu-handle {
   background: transparent;
+  transition: opacity 0.3s ease;
+}
+
+.richEditor-button.richEditorParagraphMenu-handle.isHidden {
+  opacity: 0;
 }
 
 .richEditor-button.richEditorParagraphMenu-handle .richEditorInline-icon {
@@ -368,26 +385,60 @@ body.isMobile .change-picture .change-picture-instructions {
   background: white;
 }
 
-.richEditor-inlineMenu.isUp {
+.richEditor-toolbarContainer.isUp {
   transform: translateY(-12px);
 }
 
-.richEditor-inlineMenu.isUp .richEditor-nub {
+.richEditor-toolbarContainer.isUp .richEditor-nubPosition {
+  top: 100%;
+}
+
+.richEditor-toolbarContainer.isUp .richEditor-nub {
   transform: translateY(-50%) rotate(135deg);
 }
 
-.richEditor-inlineMenu.isDown {
+.richEditor-toolbarContainer.isDown {
   transform: translateY(12px);
 }
 
-.richEditor-inlineMenu.isDown .richEditor-nubPosition {
+.richEditor-toolbarContainer.isDown .richEditor-nubPosition {
+  bottom: 100%;
+}
+
+.richEditor-toolbarContainer.isDown .richEditor-nubPosition {
   align-items: flex-end;
   transform: translateY(-50%) translateX(-50%);
   margin-top: 1px;
 }
 
-.richEditor-inlineMenu.isDown .richEditor-nub {
+.richEditor-toolbarContainer.isDown .richEditor-nub {
   transform: translateY(50%) rotate(-45deg);
+}
+
+.richEditor-paragraphToolbarContainer {
+  position: absolute;
+}
+
+.richEditor-paragraphToolbarContainer .richEditor-nubPosition {
+  left: 2px;
+}
+
+.richEditor-paragraphToolbarContainer.isUp {
+  bottom: 100%;
+}
+
+.richEditor-paragraphToolbarContainer.isUp .richEditor-nubPosition {
+  top: 100%;
+  transform: none;
+}
+
+.richEditor-paragraphToolbarContainer.isDown {
+  top: 100%;
+}
+
+.richEditor-paragraphToolbarContainer.isDown .richEditor-nubPosition {
+  bottom: 100%;
+  transform: translateY(1px);
 }
 
 .blockquote {
@@ -621,10 +672,6 @@ body.Categories.isMobile .PageControls.Top {
   border-width: 1px;
   border-radius: 2px;
   background-color: #fff8d9;
-}
-
-.spoiler .spoiler-content {
-  display: none;
 }
 
 .spoiler .spoiler-chevronUp {

@@ -393,7 +393,7 @@ class ProxyRequest {
         $cookie = '';
         $encodeCookies = true;
         foreach ($_COOKIE as $key => $value) {
-            if (strncasecmp($key, 'XDEBUG', 6) == 0) {
+            if (!debug() && strncasecmp($key, 'XDEBUG', 6) == 0) {
                 continue;
             }
 

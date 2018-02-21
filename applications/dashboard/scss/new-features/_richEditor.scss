@@ -79,7 +79,8 @@ $embedded-quote_fg: #A3A3A3 !default;
 .richEditorParagraphMenu {
     position: absolute;
     top: $richEditor-paragraphMenu_offset;
-    right: calc(100% + 6px);
+    left: -6px;
+    transform: translateX(-100%);
     height: $richEditor-icon_size;
     width: $richEditor-icon_size;
     z-index: 1;
@@ -500,7 +501,7 @@ $embedded-quote_fg: #A3A3A3 !default;
     box-sizing: border-box;
     font-family: monospace;
     background: transparent;
-    margin: 0 1ex;
+    margin: 0;
     border: {
         radius: $richEditor-inlineCode_borderRadius;
         width: 1px;

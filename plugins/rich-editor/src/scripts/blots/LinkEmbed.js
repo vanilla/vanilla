@@ -37,7 +37,7 @@ export default class LinkEmbedBlock extends BlockEmbed {
             linkImage = document.createElement('div');
             linkImage.classList.add('embedLink-image');
             linkImage.setAttribute('aria-hidden', 'true');
-            linkImage.setAttribute('style', 'background-image: url("' + data.linkImage + '");');
+            linkImage.setAttribute('style', 'background-image: url(' + data.linkImage + ');');
         }
 
         let userName = false;

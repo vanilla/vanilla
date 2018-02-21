@@ -7,6 +7,7 @@
 
 namespace Vanilla\Quill\Blots;
 
+use Vanilla\Quill\Blots\Embeds\EmojiBlot;
 use Vanilla\Quill\Formats;
 use Vanilla\Quill\Block;
 
@@ -158,6 +159,12 @@ class TextBlot extends AbstractBlot {
      * @inheritDoc
      */
     protected function createLineBreaks(string $input): string {
+        $isTouchingEmoji = EmojiBlot::matches([$this->nextOperation]) || EmojiBlot::matches([$this->previousOperation]);
+
+        if ($input === "\n" && !$isTouchingEmoji) {
+            return "<br>";
+        }
+
         // Replace any newlines with breaks
         $singleNewLineReplacement = "</p><p>";
         return \preg_replace("/\\n/", $singleNewLineReplacement, $input);

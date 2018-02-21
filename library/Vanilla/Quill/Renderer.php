@@ -26,7 +26,10 @@ class Renderer {
         Blots\HeadingBlot::class,
         Blots\BulletedListBlot::class,
         Blots\OrderedListBlot::class,
-        Blots\EmojiBlot::class,
+        Blots\Embeds\EmojiBlot::class,
+        Blots\Embeds\ImageBlot::class,
+        Blots\Embeds\VideoBlot::class,
+        Blots\Embeds\LinkEmbedBlot::class,
         Blots\TextBlot::class,
     ];
 

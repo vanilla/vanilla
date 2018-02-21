@@ -9,6 +9,7 @@ namespace Vanilla\Quill;
 
 use Vanilla\Quill\Blots\AbstractBlot;
 use Vanilla\Quill\Blots\BulletedListBlot;
+use Vanilla\Quill\Blots\Embeds\AbstractBlockEmbedBlot;
 use Vanilla\Quill\Blots\HeadingBlot;
 use Vanilla\Quill\Blots\OrderedListBlot;
 use Vanilla\Quill\Blots\TextBlot;
@@ -44,6 +45,10 @@ class Block {
     public function render(): string {
         if (count($this->blots) === 0) {
             return "";
+        }
+
+        if (count($this->blots) === 1 && $this->blots[0] instanceof AbstractBlockEmbedBlot) {
+            return $this->blots[0]->render();
         }
 
         $result = "<" . $this->getSurroundingTag() . ">";

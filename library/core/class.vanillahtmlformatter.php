@@ -11,6 +11,18 @@ use \Garden\EventManager;
  */
 class VanillaHtmlFormatter {
 
+    protected $richEditorAllowedClasses = [
+        'embed',
+        'embedImage',
+        'embedImage-img',
+        'embedVideo',
+        'embedVideo-ratio',
+        'embedVideo-playButton',
+        'embedVideo-playIcon',
+        'iconButton',
+        'js-playVideo',
+    ];
+
     /** @var array Classes users may have in their content. */
     protected $allowedClasses = [
         'AlignCenter',
@@ -144,6 +156,7 @@ class VanillaHtmlFormatter {
      *
      * @param string $html String of HTML to filter.
      * @param array $options An array of options. The "spec" key is used for extra HTML specifications.
+     *
      * @return string Returns the filtered HTML.
      */
     public function format($html, $options = []) {

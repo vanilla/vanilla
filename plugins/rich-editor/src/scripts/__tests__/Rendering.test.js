@@ -25,12 +25,18 @@ describe("rendering", () => {
         const testName = path.basename(fixture);
 
         test(testName, () => {
-            const input = JSON.parse(fs.readFileSync(path.join(fixtureDir, fixture, "input.json"), "utf8"));
-            const expectedOutput = fs.readFileSync(path.join(fixtureDir, fixture, "output.html"), "utf8");
+            let input = JSON.parse(fs.readFileSync(path.join(fixtureDir, fixture, "input.json"), "utf8"));
+            let expectedOutput = fs.readFileSync(path.join(fixtureDir, fixture, "output.html"), "utf8");
+
+            // Strip off extra whitespace
+            expectedOutput = expectedOutput.replace(/\s+/, " ");
 
             quill.setContents(input);
             const richText = document.querySelector(".ql-editor");
-            expect(richText.innerHTML).toEqual(expectedOutput.trim());
+
+            const editorOuput = richText.innerHTML.replace(/\s+/, " ");
+
+            expect(editorOuput).toEqual(expectedOutput.trim());
         });
     });
 });

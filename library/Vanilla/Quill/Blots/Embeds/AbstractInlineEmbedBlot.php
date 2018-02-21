@@ -5,9 +5,10 @@
  * @license https://opensource.org/licenses/GPL-2.0 GPL-2.0
  */
 
-namespace Vanilla\Quill\Blots;
+namespace Vanilla\Quill\Blots\Embeds;
 
 use Vanilla\Quill\Block;
+use Vanilla\Quill\Blots\AbstractBlot;
 
 abstract class AbstractInlineEmbedBlot extends AbstractBlot {
 

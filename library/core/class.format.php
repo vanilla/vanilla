@@ -2481,11 +2481,11 @@ EOT;
     public static function rich($mixed) {
         $operations = json_decode($mixed, true);
         $renderer = new Vanilla\Quill\Renderer($operations);
-        $mixed = $renderer->render();
+        return $renderer->render();
 
         // Always filter after basic parsing.
         // Wysiwyg editors are already formatted HTML. Don't try to doubly encode its code blocks.
-        $filterOptions = ['codeBlockEntities' => false];
-        return Gdn_Format::htmlFilter($mixed, $filterOptions);
+//        $filterOptions = ['codeBlockEntities' => false];
+//        return Gdn_Format::htmlFilter($mixed, $filterOptions);
     }
 }

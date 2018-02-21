@@ -467,7 +467,7 @@ body.isMobile .change-picture .change-picture-instructions {
   box-sizing: border-box;
   font-family: monospace;
   background: transparent;
-  margin: 0 1ex;
+  margin: 0;
   border-radius: 2;
   border-width: 1px;
   border-style: solid;

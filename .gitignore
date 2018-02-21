@@ -32,6 +32,7 @@
 !/plugins/HtmLawed/
 !/plugins/OpenID/
 !/plugins/oauth2/
+!/plugins/oauth2authenticator/
 !/plugins/PrivateCommunity/
 !/plugins/ProfileExtender/
 !/plugins/Quotes/

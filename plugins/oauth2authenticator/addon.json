@@ -1,0 +1,18 @@
+{
+    "key": "oauth2authenticator",
+    "name": "OAuth2 Authenticator",
+    "description": "Adds SSO capabilities over the OAuth2 protocol.",
+    "version": "1.0",
+    "license": "GPL-2.0",
+    "type": "addon",
+    "require": {
+        "Vanilla": "^2.4"
+    },
+    "authors": [
+        {
+            "name": "Alexandre (DaazKu) Chouinard",
+            "email": "alexandre.c@vanillaforums.com"
+        }
+    ],
+    "icon": "oauth2.png"
+}

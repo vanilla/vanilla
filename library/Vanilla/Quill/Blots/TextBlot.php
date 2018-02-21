@@ -38,10 +38,6 @@ class TextBlot extends AbstractBlot {
 
         $insert = val("insert", $this->currentOperation, "");
 
-        if (!\is_string($insert)) {
-            throw new \Exception("Failed attempting to render a a non-text Quill Blot as a TextBlot.");
-        }
-
         $this->content = \htmlentities($insert, \ENT_QUOTES);
     }
 
@@ -50,16 +46,7 @@ class TextBlot extends AbstractBlot {
      * @inheritDoc
      */
     public static function matches(array $operations): bool {
-        $matches = false;
-
-        foreach ($operations as $op) {
-            if (\is_string(val("insert", $op))) {
-                $matches = true;
-                break;
-            }
-        }
-
-        return $matches;
+        return \is_string(val("insert", $operations[0]));
     }
 
     /**

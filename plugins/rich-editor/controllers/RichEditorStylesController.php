@@ -9,4 +9,8 @@ class RichEditorStylesController extends VanillaController {
     public function index() {
         $this->render();
     }
+
+    public function rendered() {
+        $this->render();
+    }
 }

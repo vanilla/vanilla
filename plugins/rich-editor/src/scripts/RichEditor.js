@@ -81,119 +81,119 @@ export default class RichEditor {
 
         this.quill.on("text-change", this.synchronizeDelta.bind(this));
 
-    //     // Dummy data
-    //     const insertText = () => {
-    //         const range = this.quill.getSelection(true);
-    //         const blurb = "Quasar rich in mystery Apollonius of Perga concept of the number one rich in mystery! Apollonius of Perga, rogue, hearts of the stars, brain is the seed of intelligence dispassionate extraterrestrial observer finite but unbounded. Tingling of the spine kindling the energy hidden in matter gathered by gravity science Apollonius of Perga Euclid cosmic fugue gathered by gravity take root and flourish dream of the mind's eye descended from astronomers ship of the imagination vastness is bearable only through love with pretty stories for which there's little good evidence Orion's sword. Trillion a billion trillion Apollonius of Perga, not a sunrise but a galaxyrise the sky calls to us! Descended from astronomers?\n" +
-    //             "Vanquish the impossible, another world. Are creatures of the cosmos, white dwarf Cambrian explosion ship of the imagination colonies, how far away. Venture, extraplanetary stirred by starlight, cosmic ocean across the centuries. With pretty stories for which there's little good evidence extraplanetary concept of the number one culture quasar permanence of the stars, Orion's sword, white dwarf. Something incredible is waiting to be known birth Hypatia tingling of the spine network of wormholes bits of moving fluff ship of the imagination as a patch of light.\n" +
-    //             "With pretty stories for which there's little good evidence Euclid dream of the mind's eye, rings of Uranus decipherment the sky calls to us descended from astronomers trillion, Tunguska event radio telescope, hydrogen atoms! Concept of the number one, at the edge of forever ship of the imagination, Sea of Tranquility, hydrogen atoms encyclopaedia galactica astonishment something incredible is waiting to be known tendrils of gossamer clouds. The only home we've ever known extraordinary claims require extraordinary evidence. Stirred by starlight made in the interiors of collapsing stars galaxies emerged into consciousness! Dispassionate extraterrestrial observer and billions upon billions upon billions upon billions upon billions upon billions upon billions?";
-    //         this.quill.insertText(range.index, blurb, Quill.sources.USER);
-    //         this.quill.setSelection(range.index + blurb.length, Quill.sources.SILENT);
-    //     };
-    //     document.querySelector(".test-sagan").addEventListener("click", insertText);
-    //
-    //     // Embed Error - Blok
-    //     const insertEmbedError = () => {
-    //         const range = this.quill.getSelection(true);
-    //         this.quill.insertText(range.index, '\n', Quill.sources.SILENT);
-    //         this.quill.insertEmbed(range.index + 1, 'error-embed', {
-    //             errors: [{
-    //                 message: 'Embed failed please try again',
-    //             }, {
-    //                 message: 'Error Message 2Error Message 2Error Message 2Error Message 2Error Message 2Error Message 2Error Message 2Error Message 2Error Message 2Error Message 2Error Message 2Error Message 2Error Message 2Error Message 2Error Message 2Error Message 2Error Message 2Error Message 2Error Message 2Error Message 2Error Message 2Error Message 2Error Message 2Error Message 2',
-    //             }],
-    //         }, Quill.sources.USER);
-    //         this.quill.setSelection(range.index + 2, Quill.sources.SILENT);
-    //     };
-    //     document.querySelector(".test-error").addEventListener("click", insertEmbedError);
-    //
-    //     // Embed Loading - Blok
-    //     const insertEmbedLoading = () => {
-    //         const range = this.quill.getSelection(true);
-    //         this.quill.insertText(range.index, '\n', Quill.sources.SILENT);
-    //         this.quill.insertEmbed(range.index + 1, 'loading-embed', {}, Quill.sources.USER);
-    //         this.quill.setSelection(range.index + 2, Quill.sources.SILENT);
-    //     };
-    //     document.querySelector(".test-loading").addEventListener("click", insertEmbedLoading);
-    //
-    //     // Insert Image
-    //     const insertImage = () => {
-    //         const range = this.quill.getSelection(true);
-    //         this.quill.insertText(range.index, '\n', Quill.sources.SILENT);
-    //         this.quill.insertEmbed(range.index + 1, 'image-embed', {
-    //             url: 'https://images.pexels.com/photos/31459/pexels-photo.jpg?w=1260&h=750&dpr=2&auto=compress&cs=tinysrgb',
-    //             alt: "Some Alt Text",
-    //         }, Quill.sources.USER);
-    //         this.quill.setSelection(range.index + 2, Quill.sources.SILENT);
-    //     };
-    //     document.querySelector(".test-image").addEventListener("click", insertImage);
-    //
+        // Dummy data
+        const insertText = () => {
+            const range = this.quill.getSelection(true);
+            const blurb = "Quasar rich in mystery Apollonius of Perga concept of the number one rich in mystery! Apollonius of Perga, rogue, hearts of the stars, brain is the seed of intelligence dispassionate extraterrestrial observer finite but unbounded. Tingling of the spine kindling the energy hidden in matter gathered by gravity science Apollonius of Perga Euclid cosmic fugue gathered by gravity take root and flourish dream of the mind's eye descended from astronomers ship of the imagination vastness is bearable only through love with pretty stories for which there's little good evidence Orion's sword. Trillion a billion trillion Apollonius of Perga, not a sunrise but a galaxyrise the sky calls to us! Descended from astronomers?\n" +
+                "Vanquish the impossible, another world. Are creatures of the cosmos, white dwarf Cambrian explosion ship of the imagination colonies, how far away. Venture, extraplanetary stirred by starlight, cosmic ocean across the centuries. With pretty stories for which there's little good evidence extraplanetary concept of the number one culture quasar permanence of the stars, Orion's sword, white dwarf. Something incredible is waiting to be known birth Hypatia tingling of the spine network of wormholes bits of moving fluff ship of the imagination as a patch of light.\n" +
+                "With pretty stories for which there's little good evidence Euclid dream of the mind's eye, rings of Uranus decipherment the sky calls to us descended from astronomers trillion, Tunguska event radio telescope, hydrogen atoms! Concept of the number one, at the edge of forever ship of the imagination, Sea of Tranquility, hydrogen atoms encyclopaedia galactica astonishment something incredible is waiting to be known tendrils of gossamer clouds. The only home we've ever known extraordinary claims require extraordinary evidence. Stirred by starlight made in the interiors of collapsing stars galaxies emerged into consciousness! Dispassionate extraterrestrial observer and billions upon billions upon billions upon billions upon billions upon billions upon billions?";
+            this.quill.insertText(range.index, blurb, Quill.sources.USER);
+            this.quill.setSelection(range.index + blurb.length, Quill.sources.SILENT);
+        };
+        document.querySelector(".test-sagan").addEventListener("click", insertText);
 
-        // const resetQuill = () => {
-        //     this.quill.setContents("");
-        // };
-        // document.querySelector(".clearQuill").addEventListener("click", resetQuill);
-    //
-    //     const insertVideo = () => {
-    //         const range = this.quill.getSelection(true);
-    //         this.quill.insertText(range.index, '\n', Quill.sources.SILENT);
-    //         this.quill.insertEmbed(range.index + 1, 'video-placeholder', {
-    //             photoUrl: 'https://i.ytimg.com/vi/wupToqz1e2g/hqdefault.jpg',
-    //             url: 'https://www.youtube.com/embed/wupToqz1e2g',
-    //             name: "Video Title",
-    //             width: 1858,
-    //             height: 1276,
-    //
-    //         }, Quill.sources.USER);
-    //         this.quill.setSelection(range.index + 2, Quill.sources.SILENT);
-    //     };
-    //     document.querySelector(".test-video").addEventListener("click", insertVideo);
-    //     delegateEvent('click', '.js-playVideo', this.handlePlayVideo);
-    //
-    //     // Link Internal
-    //     const insertLinkInternal = () => {
-    //         const range = this.quill.getSelection(true);
-    //         this.quill.insertText(range.index, '\n', Quill.sources.SILENT);
-    //         this.quill.insertEmbed(range.index + 1, 'link-embed', {
-    //             url: 'https://www.google.ca/',
-    //             userPhoto: 'https://secure.gravatar.com/avatar/b0420af06d6fecc16fc88a88cbea8218/',
-    //             userName: 'steve_captain_rogers',
-    //             timestamp: '2017-02-17 11:13',
-    //             humanTime: 'Feb 17, 2017 11:13 AM',
-    //             excerpt: 'The Battle of New York, locally known as "The Incident", was a major battle between the Avengers and Loki with his borrowed Chitauri army in Manhattan, New York City. It was, according to Loki\'s plan, the first battle in Loki\'s war to subjugate Earth, but the actions of the Avengers neutralized the threat of the Chitauri before they could continue the invasion.',
-    //         }, Quill.sources.USER);
-    //         this.quill.setSelection(range.index + 2, Quill.sources.SILENT);
-    //     };
-    //     document.querySelector(".test-urlinternal").addEventListener("click", insertLinkInternal);
-    //
-    //     // Link External - Image
-    //     const insertLinkExternalImage = () => {
-    //         const range = this.quill.getSelection(true);
-    //         this.quill.insertText(range.index, '\n', Quill.sources.SILENT);
-    //         this.quill.insertEmbed(range.index + 1, 'link-embed', {
-    //             url: 'https://www.google.ca/',
-    //             name: 'Hulk attacks New York, kills 17, injures 23 in deadliest attack in 5 years   Hulk attacks New York, kills 17, injures 23 in deadliest attack in 5 years',
-    //             source: 'nytimes.com',
-    //             linkImage: 'https://cdn.mdn.mozilla.net/static/img/opengraph-logo.72382e605ce3.png',
-    //             excerpt: 'The Battle of New York, locally known as "The Incident", was a major battle between the Avengers and Loki with his borrowed Chitauri army in Manhattan, New York City. It was, according to Loki\'s plan, the first battle in Loki\'s war to subjugate Earth, but the actions of the Avengers neutralized the threat of the Chitauri before they could continue the invasion.',
-    //         }, Quill.sources.USER);
-    //         this.quill.setSelection(range.index + 2, Quill.sources.SILENT);
-    //     };
-    //     document.querySelector(".test-urlexternalimage").addEventListener("click", insertLinkExternalImage);
-    //
-    //     // Link External - No Image
-    //     const insertLinkExternalNoImage = () => {
-    //         const range = this.quill.getSelection(true);
-    //         this.quill.insertText(range.index, '\n', Quill.sources.SILENT);
-    //         this.quill.insertEmbed(range.index + 1, 'link-embed', {
-    //             url: 'https://www.google.ca/',
-    //             name: 'Hulk attacks New York, kills 17, injures 23 in deadliest attack in 5 years   Hulk attacks New York, kills 17, injures 23 in deadliest attack in 5 years',
-    //             source: 'nytimes.com',
-    //             excerpt: 'The Battle of New York, locally known as "The Incident", was a major battle between the Avengers and Loki with his borrowed Chitauri army in Manhattan, New York City. It was, according to Loki\'s plan, the first battle in Loki\'s war to subjugate Earth, but the actions of the Avengers neutralized the threat of the Chitauri before they could continue the invasion.',
-    //         }, Quill.sources.USER);
-    //         this.quill.setSelection(range.index + 2, Quill.sources.SILENT);
-    //     };
-    //     document.querySelector(".test-urlexternal").addEventListener("click", insertLinkExternalNoImage);
+        // Embed Error - Blok
+        const insertEmbedError = () => {
+            const range = this.quill.getSelection(true);
+            this.quill.insertText(range.index, '\n', Quill.sources.SILENT);
+            this.quill.insertEmbed(range.index + 1, 'error-embed', {
+                errors: [{
+                    message: 'Embed failed please try again',
+                }, {
+                    message: 'Error Message 2Error Message 2Error Message 2Error Message 2Error Message 2Error Message 2Error Message 2Error Message 2Error Message 2Error Message 2Error Message 2Error Message 2Error Message 2Error Message 2Error Message 2Error Message 2Error Message 2Error Message 2Error Message 2Error Message 2Error Message 2Error Message 2Error Message 2Error Message 2',
+                }],
+            }, Quill.sources.USER);
+            this.quill.setSelection(range.index + 2, Quill.sources.SILENT);
+        };
+        document.querySelector(".test-error").addEventListener("click", insertEmbedError);
+
+        // Embed Loading - Blok
+        const insertEmbedLoading = () => {
+            const range = this.quill.getSelection(true);
+            this.quill.insertText(range.index, '\n', Quill.sources.SILENT);
+            this.quill.insertEmbed(range.index + 1, 'loading-embed', {}, Quill.sources.USER);
+            this.quill.setSelection(range.index + 2, Quill.sources.SILENT);
+        };
+        document.querySelector(".test-loading").addEventListener("click", insertEmbedLoading);
+
+        // Insert Image
+        const insertImage = () => {
+            const range = this.quill.getSelection(true);
+            this.quill.insertText(range.index, '\n', Quill.sources.SILENT);
+            this.quill.insertEmbed(range.index + 1, 'image-embed', {
+                url: 'https://images.pexels.com/photos/31459/pexels-photo.jpg?w=1260&h=750&dpr=2&auto=compress&cs=tinysrgb',
+                alt: "Some Alt Text",
+            }, Quill.sources.USER);
+            this.quill.setSelection(range.index + 2, Quill.sources.SILENT);
+        };
+        document.querySelector(".test-image").addEventListener("click", insertImage);
+
+
+        const resetQuill = () => {
+            this.quill.setContents("");
+        };
+        document.querySelector(".clearQuill").addEventListener("click", resetQuill);
+
+        const insertVideo = () => {
+            const range = this.quill.getSelection(true);
+            this.quill.insertText(range.index, '\n', Quill.sources.SILENT);
+            this.quill.insertEmbed(range.index + 1, 'video-placeholder', {
+                photoUrl: 'https://i.ytimg.com/vi/wupToqz1e2g/hqdefault.jpg',
+                url: 'https://www.youtube.com/embed/wupToqz1e2g',
+                name: "Video Title",
+                width: 1858,
+                height: 1276,
+
+            }, Quill.sources.USER);
+            this.quill.setSelection(range.index + 2, Quill.sources.SILENT);
+        };
+        document.querySelector(".test-video").addEventListener("click", insertVideo);
+        delegateEvent('click', '.js-playVideo', this.handlePlayVideo);
+
+        // Link Internal
+        const insertLinkInternal = () => {
+            const range = this.quill.getSelection(true);
+            this.quill.insertText(range.index, '\n', Quill.sources.SILENT);
+            this.quill.insertEmbed(range.index + 1, 'link-embed', {
+                url: 'https://www.google.ca/',
+                userPhoto: 'https://secure.gravatar.com/avatar/b0420af06d6fecc16fc88a88cbea8218/',
+                userName: 'steve_captain_rogers',
+                timestamp: '2017-02-17 11:13',
+                humanTime: 'Feb 17, 2017 11:13 AM',
+                excerpt: 'The Battle of New York, locally known as "The Incident", was a major battle between the Avengers and Loki with his borrowed Chitauri army in Manhattan, New York City. It was, according to Loki\'s plan, the first battle in Loki\'s war to subjugate Earth, but the actions of the Avengers neutralized the threat of the Chitauri before they could continue the invasion.',
+            }, Quill.sources.USER);
+            this.quill.setSelection(range.index + 2, Quill.sources.SILENT);
+        };
+        document.querySelector(".test-urlinternal").addEventListener("click", insertLinkInternal);
+
+        // Link External - Image
+        const insertLinkExternalImage = () => {
+            const range = this.quill.getSelection(true);
+            this.quill.insertText(range.index, '\n', Quill.sources.SILENT);
+            this.quill.insertEmbed(range.index + 1, 'link-embed', {
+                url: 'https://www.google.ca/',
+                name: 'Hulk attacks New York, kills 17, injures 23 in deadliest attack in 5 years   Hulk attacks New York, kills 17, injures 23 in deadliest attack in 5 years',
+                source: 'nytimes.com',
+                linkImage: 'https://cdn.mdn.mozilla.net/static/img/opengraph-logo.72382e605ce3.png',
+                excerpt: 'The Battle of New York, locally known as "The Incident", was a major battle between the Avengers and Loki with his borrowed Chitauri army in Manhattan, New York City. It was, according to Loki\'s plan, the first battle in Loki\'s war to subjugate Earth, but the actions of the Avengers neutralized the threat of the Chitauri before they could continue the invasion.',
+            }, Quill.sources.USER);
+            this.quill.setSelection(range.index + 2, Quill.sources.SILENT);
+        };
+        document.querySelector(".test-urlexternalimage").addEventListener("click", insertLinkExternalImage);
+
+        // Link External - No Image
+        const insertLinkExternalNoImage = () => {
+            const range = this.quill.getSelection(true);
+            this.quill.insertText(range.index, '\n', Quill.sources.SILENT);
+            this.quill.insertEmbed(range.index + 1, 'link-embed', {
+                url: 'https://www.google.ca/',
+                name: 'Hulk attacks New York, kills 17, injures 23 in deadliest attack in 5 years   Hulk attacks New York, kills 17, injures 23 in deadliest attack in 5 years',
+                source: 'nytimes.com',
+                excerpt: 'The Battle of New York, locally known as "The Incident", was a major battle between the Avengers and Loki with his borrowed Chitauri army in Manhattan, New York City. It was, according to Loki\'s plan, the first battle in Loki\'s war to subjugate Earth, but the actions of the Avengers neutralized the threat of the Chitauri before they could continue the invasion.',
+            }, Quill.sources.USER);
+            this.quill.setSelection(range.index + 2, Quill.sources.SILENT);
+        };
+        document.querySelector(".test-urlexternal").addEventListener("click", insertLinkExternalNoImage);
     }
 
     /**

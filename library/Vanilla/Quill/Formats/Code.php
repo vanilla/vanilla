@@ -27,6 +27,15 @@ class Code extends AbstractFormat {
      * @inheritDoc
      */
     protected static function getAttributeLookupKey(): string {
-        return "code";
+        return "code-inline";
+    }
+
+    /**
+     * Get an attributes array for the blot's tag.
+     */
+    protected function getAttributes(): array {
+        return [
+            "class" => "code-inline code isInline",
+        ];
     }
 }

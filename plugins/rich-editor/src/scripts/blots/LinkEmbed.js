@@ -116,7 +116,7 @@ export default class LinkEmbedBlock extends BlockEmbed {
 
     static sanitize(url) {
         return sanitize(url, this.PROTOCOL_WHITELIST) ? url : this.SANITIZED_URL;
-    }9
+    }
 
     static value(node) {
         return getData(node, "data");

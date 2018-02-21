@@ -55,20 +55,6 @@ export default class RichEditor {
         }
     }
 
-    /**
-     * Handle a click on a video.
-     *
-     * @param {Event} event - The event.
-     */
-    handlePlayVideo() {
-        const playButton = this;
-        if (!(playButton instanceof HTMLElement)) {
-            return;
-        }
-        const container = playButton.closest(".embedVideo-ratio");
-        container.innerHTML = `<iframe frameborder="0" allow="autoplay; encrypted-media" class="embedVideo-iframe" src="${playButton.dataset.url}" allowfullscreen></iframe>`;
-    }
-
     initializeWithRichFormat() {
         utility.log("Initializing Rich Editor");
         this.quill = new Quill(this.container, options);
@@ -80,6 +66,24 @@ export default class RichEditor {
         }
 
         this.quill.on("text-change", this.synchronizeDelta.bind(this));
+        // this.tempSetupListenersForInsertButtons();
+    }
+
+    /**
+     * For compatibility with the legacy base theme's javascript the Quill Delta needs to always be in the main form
+     * as a hidden input (Because we aren't overriding the submit)
+     */
+    synchronizeDelta() {
+        this.bodybox.value = JSON.stringify(this.quill.getContents()["ops"]);
+    }
+
+    initializeOtherFormat() {
+        // TODO: check if we can convert from a format
+        return;
+    }
+
+    tempSetupListenersForInsertButtons() {
+        document.querySelector(".richEditor-tempButtons").style.display = "block";
 
         // Dummy data
         const insertText = () => {
@@ -148,7 +152,6 @@ export default class RichEditor {
             this.quill.setSelection(range.index + 2, Quill.sources.SILENT);
         };
         document.querySelector(".test-video").addEventListener("click", insertVideo);
-        delegateEvent('click', '.js-playVideo', this.handlePlayVideo);
 
         // Link Internal
         const insertLinkInternal = () => {
@@ -194,18 +197,5 @@ export default class RichEditor {
             this.quill.setSelection(range.index + 2, Quill.sources.SILENT);
         };
         document.querySelector(".test-urlexternal").addEventListener("click", insertLinkExternalNoImage);
-    }
-
-    /**
-     * For compatibility with the legacy base theme's javascript the Quill Delta needs to always be in the main form
-     * as a hidden input (Because we aren't overriding the submit)
-     */
-    synchronizeDelta() {
-        this.bodybox.value = JSON.stringify(this.quill.getContents()["ops"]);
-    }
-
-    initializeOtherFormat() {
-        // TODO: check if we can convert from a format
-        return;
     }
 }

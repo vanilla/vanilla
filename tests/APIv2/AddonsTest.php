@@ -20,7 +20,7 @@ class AddonsTest extends AbstractAPIv2Test {
     ];
 
     private $coreThemes = [
-        '2011Compatibility', 'EmbedFriendly', 'bittersweet', 'default', 'mobile', // themes
+        'EmbedFriendly', 'bittersweet', 'default', 'mobile', // themes
     ];
 
     private $hiddenAddons = [

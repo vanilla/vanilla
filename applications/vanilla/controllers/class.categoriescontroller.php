@@ -161,9 +161,14 @@ class CategoriesController extends VanillaController {
      * Get a flattened tree representing the current user's followed categories.
      *
      * @param bool $recent Include recent post information?
+     * @param array|null $filterIDs An array of category IDs. Filter result to a subset of these categories.
      * @return array
      */
-    private function getFollowed($recent = false) {
+    private function getFollowed($recent = false, $filterIDs = null) {
+        if ($filterIDs !== null && !is_array($filterIDs)) {
+            throw new InvalidArgumentException('Filter IDs must be in an array.');
+        }
+
         $perPage = c('Vanilla.Categories.PerPage', 30);
         $page = Gdn::request()->get(
             'Page',
@@ -171,8 +176,14 @@ class CategoriesController extends VanillaController {
         );
         list($offset, $limit) = offsetLimit($page, $perPage);
 
+        $where = ['Followed' => true];
+
+        if (!empty($filterIDs)) {
+            $where['CategoryID'] = $filterIDs;
+        }
+
         $result = $this->CategoryModel
-            ->getWhere(['Followed' => true], '', 'asc', $limit, $offset)
+            ->getWhere($where, '', 'asc', $limit, $offset)
             ->resultArray();
         $result = $this->CategoryModel->flattenCategories($result);
 
@@ -532,7 +543,17 @@ class CategoriesController extends VanillaController {
         }
 
         if ($this->data('Followed')) {
-            $categoryTree = $this->getFollowed(true);
+            if ($Category) {
+                $ancestor = CategoryModel::categories($Category);
+                if (empty($ancestor)) {
+                    throw new Gdn_UserException("Invalid category ID: {$Category}");
+                }
+                $flatTree = $this->CategoryModel->getTreeAsFlat($ancestor['CategoryID']);
+                $filterIDs = array_column($flatTree, 'CategoryID');
+            } else {
+                $filterIDs = null;
+            }
+            $categoryTree = $this->getFollowed(true, $filterIDs);
         } else {
             $categoryTree = $this->getCategoryTree(
                 $Category ?: -1,

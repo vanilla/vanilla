@@ -176,6 +176,10 @@ class DiscussionsApiController extends AbstractApiController {
     protected function fullSchema() {
         return Schema::parse([
             'discussionID:i' => 'The ID of the discussion.',
+            'type:s|n' => [
+                //'enum' => [] // Let's find a way to fill that properly.
+                'description' => 'The type of this discussion if any.',
+            ],
             'name:s' => 'The title of the discussion.',
             'body:s' => 'The body of the discussion.',
             'categoryID:i' => 'The category the discussion is in.',
@@ -282,7 +286,13 @@ class DiscussionsApiController extends AbstractApiController {
         }
 
         $schemaRecord = ApiUtils::convertOutputKeys($dbRecord);
-        return $schemaRecord;
+        $schemaRecord['type'] = isset($schemaRecord['type']) ? lcfirst($schemaRecord['type']) : null;
+
+        // Allow addons to hook into the normalization process.
+        $options = ['expand' => $expand];
+        $result = $this->getEventManager()->fireFilter('discussionsApiController_normalizeOutput', $schemaRecord, $this, $options);
+
+        return $result;
     }
 
     /**
@@ -367,6 +377,12 @@ class DiscussionsApiController extends AbstractApiController {
                     'processor' => [DateFilterSchema::class, 'dateFilterField'],
                 ],
             ]),
+            'type:s?' => [
+                'description' => 'Filter by discussion type.',
+                'x-filter' => [
+                    'field' => 'd.Type'
+                ],
+            ],
             'followed:b' => [
                 'default' => false,
                 'description' => 'Only fetch discussions from followed categories. Pinned discussions are mixed in.'

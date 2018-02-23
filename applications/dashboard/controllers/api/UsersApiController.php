@@ -175,6 +175,70 @@ class UsersApiController extends AbstractApiController {
     }
 
     /**
+     * Get a list of users, filtered by username.
+     *
+     * @param array $query
+     * @return array
+     */
+    public function get_byNames(array $query) {
+        $this->permission('Garden.SignIn.Allow');
+
+        $in = $this->schema([
+            'name:s' => 'Filter for username. Supports full or partial matching with appended wildcard (e.g. User*).',
+            'order:s?' => [
+                'description' => 'Sort method for results.',
+                'enum' => ['countComments', 'dateLastActive', 'name', 'mention'],
+                'default' => 'name'
+            ],
+            'page:i?' => [
+                'description' => 'Page number. See [Pagination](https://docs.vanillaforums.com/apiv2/#pagination).',
+                'default' => 1,
+                'minimum' => 1,
+            ],
+            'limit:i?' => [
+                'description' => 'Desired number of items per page.',
+                'default' => 30,
+                'minimum' => 1,
+                'maximum' => 100,
+            ]
+        ], 'in')->setDescription('Search for users by full or partial name matching.');
+        $out = $this->schema([
+            ':a' => Schema::parse(['userID', 'name', 'photoUrl'])->add($this->userSchema())
+        ], 'out');
+
+        $query = $in->validate($query);
+        list($offset, $limit) = offsetLimit("p{$query['page']}", $query['limit']);
+
+        if ($query['order'] == 'mention') {
+            list($sortField, $sortDirection) = $this->userModel->getMentionsSort();
+        } else {
+            $sortField = $query['order'];
+            switch ($sortField) {
+                case 'countComments':
+                case 'dateLastActive':
+                    $sortDirection = 'desc';
+                    break;
+                case 'name':
+                default:
+                    $sortDirection = 'asc';
+            }
+        }
+
+        $rows = $this->userModel
+            ->searchByName($query['name'], $sortField, $sortDirection, $limit, $offset)
+            ->resultArray();
+
+        foreach ($rows as &$row) {
+            $row = $this->normalizeOutput($row);
+        }
+        $result = $out->validate($rows);
+
+        $paging = ApiUtils::morePagerInfo($result, '/api/v2/users/names', $query, $in);
+
+        return new Data($result, ['paging' => $paging]);
+    }
+
+    /**
      * Get an ID-only user record schema.
      *
      * @param string $type The type of schema.

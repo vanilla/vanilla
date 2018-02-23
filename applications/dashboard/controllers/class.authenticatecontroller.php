@@ -141,12 +141,12 @@ class AuthenticateController extends Gdn_Controller {
      */
     public function connectUser($authSessionID) {
         $session = $this->authenticateApiController->get_session($authSessionID, ['expand' => true]);
-        if (!isset($session['attributes']['linkuser'])) {
+        if (!isset($session['attributes']['linkUser'])) {
             throw new Gdn_UserException('Invalid session.');
         }
 
-        if (isset($session['attributes']['linkuser']['existingUsers'])) {
-            $this->setData('existingUsers', $session['attributes']['linkuser']['existingUsers']);
+        if (isset($session['attributes']['linkUser']['existingUsers'])) {
+            $this->setData('existingUsers', $session['attributes']['linkUser']['existingUsers']);
         }
 
         $ssoData = SSOData::fromArray($session['attributes']['ssoData']);
@@ -203,7 +203,9 @@ class AuthenticateController extends Gdn_Controller {
 
         $userID = false;
 
-        $body = [];
+        $body = [
+            'authSessionID' => $authSessionID,
+        ];
         if ($this->form->errorCount() === 0) {
             $body['password'] = $this->form->getFormValue('linkUserPassword');
 
@@ -224,8 +226,8 @@ class AuthenticateController extends Gdn_Controller {
 
         if (!empty($body)) {
             try {
-                $userFragment = $this->authenticateApiController->post_linkUser($authSessionID, $body);
-                $userID = $userFragment['UserID'];
+                $userFragment = $this->authenticateApiController->post_linkUser($body);
+                $userID = $userFragment['userID'];
             } catch(Exception $e) {
                 $this->form->addError($e->getMessage());
             }

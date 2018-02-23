@@ -31,19 +31,19 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
 
     /** @var array List of exceptions not to block */
     private $blockExceptions = [
-        '/^utility(\/.*)?$/' => self::BLOCK_NEVER,
-        '/^asset(\/.*)?$/' => self::BLOCK_NEVER,
-        '/^home\/error(\/.*)?/' => self::BLOCK_NEVER,
-        '/^home\/leave(\/.*)?/' => self::BLOCK_NEVER,
-        '/^plugin(\/.*)?$/' => self::BLOCK_NEVER,
-        '/^sso(\/.*)?$/' => self::BLOCK_NEVER,
-        '/^discussions\/getcommentcounts/' => self::BLOCK_NEVER,
-        '/^entry(\/.*)?$/' => self::BLOCK_PERMISSION,
-        '/^settings\/analyticstick.json$/' => self::BLOCK_PERMISSION,
-        '/^user\/usernameavailable(\/.*)?$/' => self::BLOCK_PERMISSION,
-        '/^user\/emailavailable(\/.*)?$/' => self::BLOCK_PERMISSION,
-        '/^home\/termsofservice(\/.*)?$/' => self::BLOCK_PERMISSION,
-        '/^api\/v\d+\/applications$/' => self::BLOCK_NEVER,
+        '#^api/v\d+/applications$#' => self::BLOCK_NEVER,
+        '#^asset(/|$)#' => self::BLOCK_NEVER,
+        '#^discussions/getcommentcounts(/|$)#' => self::BLOCK_NEVER,
+        '#^entry(/|$)#' => self::BLOCK_PERMISSION,
+        '#^home/error(/|$)#' => self::BLOCK_NEVER,
+        '#^home/leaving(/|$)#' => self::BLOCK_NEVER,
+        '#^home/termsofservice(/|$)#' => self::BLOCK_PERMISSION,
+        '#^plugin(/|$)#' => self::BLOCK_NEVER,
+        '#^settings/analyticstick.json$#' => self::BLOCK_PERMISSION,
+        '#^sso(/|$)#' => self::BLOCK_NEVER,
+        '#^user/emailavailable(/|$)#' => self::BLOCK_PERMISSION,
+        '#^user/usernameavailable(/|$)#' => self::BLOCK_PERMISSION,
+        '#^utility(/|$)#' => self::BLOCK_NEVER,
     ];
 
     /** @var string The name of the controller to be dispatched. */

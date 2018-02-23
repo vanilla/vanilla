@@ -888,6 +888,14 @@ body.Categories.isMobile .PageControls.Top {
   padding-left: 24px;
 }
 
+.userContent .embedLink-title {
+  margin: 0;
+}
+
+.userContent .embedLink-title:not(:last-child) {
+  margin: 0 0 6px;
+}
+
 .embed {
   white-space: normal;
 }
@@ -1056,7 +1064,7 @@ body.Categories.isMobile .PageControls.Top {
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  margin: 6px 0 0;
+  margin: 0;
 }
 
 .embedLink-excerpt {

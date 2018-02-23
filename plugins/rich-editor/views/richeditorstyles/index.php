@@ -518,6 +518,9 @@ class MyThemeNameThemeHooks extends Gdn_Plugin {
         <article class="embedLink-body">
             <div class="embedLink-main">
                 <div class="embedLink-header">
+                    <h3 class="embedLink-title">
+                        Hulk attacks New York, kills 17, injures 23 in deadliest attack in 5 years   Hulk attacks New York, kills 17, injures 23 in deadliest attack in 5 years
+                    </h3>
                     <span class="embedLink-userPhoto PhotoWrap">
                         <img src="https://secure.gravatar.com/avatar/b0420af06d6fecc16fc88a88cbea8218/?default=https%3A%2F%2Fvanillicon.com%2Fb0420af06d6fecc16fc88a88cbea8218_200.png&amp;rating=g&amp;size=120" alt="Linc" class="ProfilePhoto ProfilePhotoMedium">
                     </span>

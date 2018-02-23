@@ -61,6 +61,10 @@ class LinkEmbedBlot extends AbstractBlockEmbedBlot {
 
         $result = "<div class=\"embedLink-header\">";
 
+        if ($name) {
+            $result .= "<h3 class=\"embedLink-title\">$name</h3>";
+        }
+
         if ($userPhoto) {
             $result .= "<span class=\"embedLink-userPhoto PhotoWrap\">";
             $result .=      "<img src=\"$userPhoto\" alt=\"$userName\" class=\"ProfilePhoto ProfilePhotoMedium\">";
@@ -73,10 +77,6 @@ class LinkEmbedBlot extends AbstractBlockEmbedBlot {
 
         if ($timestamp) {
             $result .= "<time class=\"embedLink-dateTime meta\" datetime=\"$timestamp\">$humanTime</time>";
-        }
-
-        if ($name) {
-            $result .= "<h3 class=\"embedLink-title\">$name</h3>";
         }
 
         if ($source) {

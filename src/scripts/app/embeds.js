@@ -5,8 +5,8 @@
  */
 
 import { delegateEvent } from "@core/dom-utility";
-import { onResize } from "@core/events";
 import { setData, getData } from "@core/dom-utility";
+import Events from "@core/events";
 import shave from 'shave';
 
 /**
@@ -64,7 +64,7 @@ export function setupEmbeds() {
     truncateEmbeds();
 
     // Resize
-    onResize(() => {
+    Events.addResizeListener(() => {
         truncateEmbeds();
-    }, "truncate-embedlinks");
+    });
 }

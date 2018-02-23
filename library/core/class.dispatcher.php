@@ -31,7 +31,7 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
 
     /** @var array List of exceptions not to block */
     private $blockExceptions = [
-        '#^api/v\d+/applications$#' => self::BLOCK_NEVER,
+        '#^api/v\d+/applicants(/|$)#' => self::BLOCK_NEVER,
         '#^asset(/|$)#' => self::BLOCK_NEVER,
         '#^discussions/getcommentcounts(/|$)#' => self::BLOCK_NEVER,
         '#^entry(/|$)#' => self::BLOCK_PERMISSION,

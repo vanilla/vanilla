@@ -33,6 +33,7 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
     private $blockExceptions = [
         '#^api/v\d+/applicants(/|$)#' => self::BLOCK_NEVER,
         '#^asset(/|$)#' => self::BLOCK_NEVER,
+        '#^authenticate(/|$)#' => self::BLOCK_NEVER,
         '#^discussions/getcommentcounts(/|$)#' => self::BLOCK_NEVER,
         '#^entry(/|$)#' => self::BLOCK_PERMISSION,
         '#^home/error(/|$)#' => self::BLOCK_NEVER,

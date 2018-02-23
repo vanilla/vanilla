@@ -10,9 +10,9 @@ import Events from "@core/events";
 import shave from 'shave';
 
 /**
- * Truncate embeds in container
+ * Truncate embed link excerpts in a container
  *
- * @param {Element} container - Element containing embeds
+ * @param {Element} container - Element containing embeds to truncate
  */
 export function truncateEmbeds(container = document.body) {
     const embeds = container.querySelectorAll('.embedLink-excerpt');
@@ -25,16 +25,16 @@ export function truncateEmbeds(container = document.body) {
         } else {
             el.innerHTML = untruncatedText;
         }
-        shaveEmbedLink(el);
+        truncateTextBasedOnMaxHeight(el);
     });
 }
 
 /**
- * Shave a link embed
+ * Truncate element text based on max-height
  *
- * @param {Element} excerpt - The embed.
+ * @param {Element} excerpt - The excerpt to truncate.
  */
-export function shaveEmbedLink(excerpt) {
+export function truncateTextBasedOnMaxHeight(excerpt) {
     const maxHeight = parseInt(getComputedStyle(excerpt)['max-height'], 10);
     if(maxHeight && maxHeight > 0) {
         shave(excerpt, maxHeight);

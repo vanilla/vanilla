@@ -77,6 +77,10 @@ export default class LinkEmbedBlock extends BlockEmbed {
         excerpt.innerHTML = data.excerpt;
 
         // Assemble header
+        if (title) {
+            header.appendChild(title);
+        }
+
         if (userPhoto) {
             header.appendChild(userPhoto);
         }
@@ -87,10 +91,6 @@ export default class LinkEmbedBlock extends BlockEmbed {
 
         if (dateTime) {
             header.appendChild(dateTime);
-        }
-
-        if (title) {
-            header.appendChild(title);
         }
 
         if (source) {

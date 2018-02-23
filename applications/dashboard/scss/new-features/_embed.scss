@@ -15,6 +15,7 @@ $embedded-linkTitle_fontSize: 14px !default;
 $embedded-linkTitle_lineHeight: 1.5 !default;
 $embedded-linkImage_width: 225px !default;
 $embedVideo_width: 640px;
+$embed-spacing: 6px !default;
 
 .embed {
     display: block;
@@ -260,7 +261,7 @@ $embedVideo_width: 640px;
     justify-content: flex-start;
     font-size: $embedded-linkTitle_fontSize;
     line-height: $embedded-linkTitle_lineHeight;
-    margin-bottom: 6px;
+    margin-bottom: $embed-spacing;
 }
 
 .embedLink-userName {
@@ -288,6 +289,10 @@ $embedVideo_width: 640px;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+
+    &:not(:last-child) {
+        margin-bottom: $embed-spacing;
+    }
 }
 
 .embedLink-source {
@@ -296,7 +301,7 @@ $embedVideo_width: 640px;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
-    margin: 6px 0 0;
+    margin: 0;
 }
 
 .embedLink-excerpt {

@@ -1050,13 +1050,17 @@ body.Categories.isMobile .PageControls.Top {
   text-overflow: ellipsis;
 }
 
+.embedLink-title:not(:last-child) {
+  margin-bottom: 6px;
+}
+
 .embedLink-source {
   font-size: 12.04px;
   color: rgba(85, 90, 98, 0.72);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  margin: 6px 0 0;
+  margin: 0;
 }
 
 .embedLink-excerpt {

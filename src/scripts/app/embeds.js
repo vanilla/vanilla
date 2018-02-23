@@ -4,8 +4,42 @@
  * @license https://opensource.org/licenses/GPL-2.0 GPL-2.0
  */
 
-
 import { delegateEvent } from "@core/dom-utility";
+import { setData, getData } from "@core/dom-utility";
+import Events from "@core/events";
+import shave from 'shave';
+
+/**
+ * Truncate embed link excerpts in a container
+ *
+ * @param {Element} container - Element containing embeds to truncate
+ */
+export function truncateEmbeds(container = document.body) {
+    const embeds = container.querySelectorAll('.embedLink-excerpt');
+    embeds.forEach(el => {
+        let untruncatedText = getData(el, 'untruncatedText');
+
+        if (!untruncatedText) {
+            untruncatedText = el.innerHTML;
+            setData(el, 'untruncatedText', untruncatedText);
+        } else {
+            el.innerHTML = untruncatedText;
+        }
+        truncateTextBasedOnMaxHeight(el);
+    });
+}
+
+/**
+ * Truncate element text based on max-height
+ *
+ * @param {Element} excerpt - The excerpt to truncate.
+ */
+export function truncateTextBasedOnMaxHeight(excerpt) {
+    const maxHeight = parseInt(getComputedStyle(excerpt)['max-height'], 10);
+    if(maxHeight && maxHeight > 0) {
+        shave(excerpt, maxHeight);
+    }
+}
 
 /**
  * Handle a click on a video.
@@ -21,7 +55,16 @@ function handlePlayVideo() {
     container.innerHTML = `<iframe frameborder="0" allow="autoplay; encrypted-media" class="embedVideo-iframe" src="${playButton.dataset.url}" allowfullscreen></iframe>`;
 }
 
+
+/**
+ * Init handler for embeds
+ */
 export function setupEmbeds() {
     delegateEvent('click', '.js-playVideo', handlePlayVideo);
-}
+    truncateEmbeds();
 
+    // Resize
+    Events.addResizeListener(() => {
+        truncateEmbeds();
+    });
+}

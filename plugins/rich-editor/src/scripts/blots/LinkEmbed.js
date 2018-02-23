@@ -16,6 +16,13 @@ export default class LinkEmbedBlock extends BlockEmbed {
         node.setAttribute('target', '_blank');
         node.setAttribute('rel', 'noopener noreferrer');
 
+        let title = false;
+        if (data.name) {
+            title = document.createElement('h3');
+            title.classList.add('embedLink-title');
+            title.innerHTML = data.name;
+        }
+
         let userPhoto = false
         if (data.userPhoto) {
             userPhoto = document.createElement('span');
@@ -54,13 +61,6 @@ export default class LinkEmbedBlock extends BlockEmbed {
             dateTime.classList.add('meta');
             dateTime.setAttribute('datetime', data.timestamp);
             dateTime.innerHTML = data.humanTime;
-        }
-
-        let title = false;
-        if (data.name) {
-            title = document.createElement('h3');
-            title.classList.add('embedLink-title');
-            title.innerHTML = data.name;
         }
 
         const article = document.createElement('article');

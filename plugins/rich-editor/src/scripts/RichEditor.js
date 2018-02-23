@@ -159,6 +159,7 @@ export default class RichEditor {
             this.quill.insertText(range.index, '\n', Quill.sources.SILENT);
             this.quill.insertEmbed(range.index + 1, 'link-embed', {
                 url: 'https://www.google.ca/',
+                name: 'Hulk attacks New York, kills 17, injures 23 in deadliest attack in 5 years   Hulk attacks New York, kills 17, injures 23 in deadliest attack in 5 years',
                 userPhoto: 'https://secure.gravatar.com/avatar/b0420af06d6fecc16fc88a88cbea8218/',
                 userName: 'steve_captain_rogers',
                 timestamp: '2017-02-17 11:13',

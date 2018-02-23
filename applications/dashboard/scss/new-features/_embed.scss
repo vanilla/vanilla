@@ -119,7 +119,12 @@ $embed-spacing: 6px !default;
     .embedLoader-errorMessage {
         max-width: calc(100% - #{$embeded-icon_width * 3});
         padding-left: $embeded-icon_width;
-
+    }
+    .embedLink-title {
+        margin: 0;
+        &:not(:last-child) {
+            margin: 0 0 $embed-spacing;
+        }
     }
 }
 
@@ -289,10 +294,6 @@ $embed-spacing: 6px !default;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
-
-    &:not(:last-child) {
-        margin-bottom: $embed-spacing;
-    }
 }
 
 .embedLink-source {

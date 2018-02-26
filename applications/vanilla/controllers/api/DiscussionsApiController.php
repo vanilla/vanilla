@@ -197,6 +197,7 @@ class DiscussionsApiController extends AbstractApiController {
             'sink:b' => 'Whether or not the discussion has been sunk.',
             'countComments:i' => 'The number of comments on the discussion.',
             'countViews:i' => 'The number of views on the discussion.',
+            'score:i|n' => 'Total points associated with this post.',
             'url:s?' => 'The full URL to the discussion.',
             'lastPost?' => $this->getPostFragmentSchema(),
             'bookmarked:b' => 'Whether or not the discussion is bookmarked by the current user.',

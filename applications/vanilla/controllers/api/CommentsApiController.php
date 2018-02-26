@@ -146,6 +146,7 @@ class CommentsApiController extends AbstractApiController {
             'dateInserted:dt' => 'When the comment was created.',
             'dateUpdated:dt|n' => 'When the comment was last updated.',
             'insertUserID:i' => 'The user that created the comment.',
+            'score:i|n' => 'Total points associated with this post.',
             'insertUser?' => $this->getUserFragmentSchema(),
             'url:s?' => 'The full URL to the comment.'
         ]);

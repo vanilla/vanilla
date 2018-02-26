@@ -2342,17 +2342,13 @@ class UserModel extends Gdn_Model {
                 }
 
                 $this->EventArguments['UserID'] = $userID;
+                $this->clearCache($userID, ['user']);
                 $this->fireEvent('AfterSave');
             } else {
                 $userID = false;
             }
         } else {
             $userID = false;
-        }
-
-        // Clear cached user data
-        if (!$insert && $userID) {
-            $this->clearCache($userID, ['user']);
         }
 
         return $userID;

@@ -245,3 +245,73 @@ export function makeWrapperBlot(ChildBlot) {
         }
     };
 }
+
+/**
+ * Create a "wrapped" blot.
+ *
+ * @param {typeof Blot} BlotConstructor
+ */
+export function wrappedBlot(BlotConstructor) {
+    return class extends BlotConstructor {
+
+        constructor(domNode) {
+            super(domNode);
+
+            if (!this.constructor.parentName) {
+                throw new Error("Attempted to instantiate wrapped Blot without setting static value parentName");
+            }
+        }
+
+        /**
+         * If this is the only child blot we want to delete the parent with it.
+         */
+        remove() {
+            if (this.prev == null && this.next == null) {
+                this.parent.remove();
+            } else {
+                super.remove();
+            }
+        }
+
+
+        /**
+         * Delete this blot it has no children. Wrap it if it doesn't have it's proper parent name.
+         *
+         * Because optimize is not allowed to change the length or value of the document, the default child must have a length of 0 in it's default state.
+         *
+         * @param {Object} context - A shared context that is passed through all updated Blots.
+         */
+        optimize(context) {
+            super.optimize(context);
+            if (this.children.length === 0) {
+                this.remove();
+            }
+
+            if (this.parent.statics.blotName !== this.statics.parentName) {
+                const Wrapper = Parchment.create(this.statics.parentName);
+                this.wrap(Wrapper);
+            }
+        }
+
+        /**
+         * Replace this blot with another blot.
+         *
+         * @param {string} name - The name of the replacement Blot.
+         * @param {any} value - The value for the replacement Blot.
+         *
+         * @returns {Blot} - The blot to replace this one.
+         */
+        replaceWith(name, value) {
+            this.parent.unwrap();
+            return super.replaceWith(name, value);
+        }
+
+        /**
+         * Since this Blot is wrapped by "useless" Blot, we also need to unwrap that Blot.
+         */
+        unwrap() {
+            this.parent.unwrap();
+            super.unwrap();
+        }
+    };
+}

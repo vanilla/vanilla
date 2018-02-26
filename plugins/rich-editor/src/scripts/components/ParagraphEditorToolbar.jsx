@@ -51,7 +51,7 @@ export default class ParagraphEditorToolbar extends React.PureComponent {
             active: false,
         },
         blockquote: {
-            formatName: "blockquote",
+            formatName: "blockquote-line",
             active: false,
         },
         codeBlock: {
@@ -59,7 +59,7 @@ export default class ParagraphEditorToolbar extends React.PureComponent {
             active: false,
         },
         spoiler: {
-
+            formatName: "spoiler-line",
             active: false,
         },
     };

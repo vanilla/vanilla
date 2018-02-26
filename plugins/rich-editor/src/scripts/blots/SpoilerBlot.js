@@ -1,23 +1,31 @@
-import ContentBlockBlot from "./ContentBlockBlot";
-import { makeWrapperBlot } from "../quill-utilities";
+/**
+ * @author Adam (charrondev) Charron <adam.c@vanillaforums.com>
+ * @copyright 2009-2018 Vanilla Forums Inc.
+ * @license https://opensource.org/licenses/GPL-2.0 GPL-2.0
+ */
 
-export class SpoilerContentBlot extends ContentBlockBlot {
+import WrapperBlot from "./WrapperBlot";
+import ClassFormatBlot  from "./ClassFormatBlot";
+import { wrappedBlot } from "../quill-utilities";
 
-    static blotName = "spoiler-content";
-    static className = "spoiler-content";
-    static tagName = 'div';
-
-    static create() {
-        const domNode = super.create();
-        domNode.classList.add('spoiler-content');
-        return domNode;
-    }
+class SpoilerLineBlot extends ClassFormatBlot {
+    static blotName = "spoiler-line";
+    static className = "spoiler-line";
+    static tagName = 'p';
+    static parentName = "spoiler-content";
 }
 
-const SpoilerBlot = makeWrapperBlot(SpoilerContentBlot);
+export default wrappedBlot(SpoilerLineBlot);
 
-SpoilerBlot.blotName = "spoiler";
-SpoilerBlot.className = "spoiler";
-SpoilerBlot.tagName = "div";
+class ContentBlot extends WrapperBlot {
+    static className = 'spoiler-content';
+    static blotName = 'spoiler-content';
+    static parentName = 'spoiler';
+}
 
-export default SpoilerBlot;
+export const SpoilerContentBlot = wrappedBlot(ContentBlot);
+
+export class SpoilerWrapperBlot extends WrapperBlot {
+    static className = 'spoiler';
+    static blotName = 'spoiler';
+}

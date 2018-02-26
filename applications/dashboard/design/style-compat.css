@@ -13,6 +13,10 @@ em {
   border: 0;
 }
 
+.isHidden {
+  display: none !important;
+}
+
 /** Hides the image cropper on mobile themes. This image cropper is not mobile compatible. */
 body.isMobile .box-crop .box-source {
   display: none;

@@ -1,3 +1,7 @@
 .sr-only {
     @include sr-only;
 }
+
+.isHidden {
+    display: none !important;
+}

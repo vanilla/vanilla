@@ -12,7 +12,7 @@ import EditorEmojiButton from "../components/EditorEmojiButton";
 import emojis from 'emojibase-data/en/data.json';
 import classNames from 'classnames';
 
-export default class EditorEmojiMenu extends React.Component {
+export default class EditorEmojiMenu extends React.PureComponent {
     static propTypes = {
         quill: PropTypes.instanceOf(Quill).isRequired,
         isVisible: PropTypes.bool.isRequired,

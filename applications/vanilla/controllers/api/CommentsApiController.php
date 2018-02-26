@@ -179,7 +179,7 @@ class CommentsApiController extends AbstractApiController {
         $result = $out->validate($comment);
 
         // Allow addons to modify the result.
-        $result = $this->getEventManager()->fireFilter('commentsApiController_get_output', $result, $this, $in, $query, $comment);
+        $result = $this->getEventManager()->fireFilter('commentsApiController_getOutput', $result, $this, $in, $query, $comment);
 
         return $result;
     }
@@ -306,7 +306,7 @@ class CommentsApiController extends AbstractApiController {
         $result = $out->validate($rows);
 
         // Allow addons to modify the result.
-        $result = $this->getEventManager()->fireFilter('commentsApiController_index_output', $result, $this, $in, $query, $rows);
+        $result = $this->getEventManager()->fireFilter('commentsApiController_indexOutput', $result, $this, $in, $query, $rows);
 
         if (isset($where['DiscussionID']) && count($where) === 1) {
             $discussion = $this->discussionByID($where['DiscussionID']);

@@ -305,6 +305,15 @@ class EventManager {
     }
 
     /**
+     * Get all of handlers.
+     *
+     * @return array Returns all the handlers.
+     */
+    public function getAllHandlers() {
+        return $this->handlers;
+    }
+
+    /**
      * Get all of the handlers bound to an event.
      *
      * @param string $name The name of the event.

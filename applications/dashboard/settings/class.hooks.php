@@ -341,8 +341,9 @@ class DashboardHooks extends Gdn_Plugin {
             return;
         }
 
-        if (version_compare(phpversion(), '7.0') < 0) {
-            $upgradeMessage = ['Content' => 'Upgrade to <b>PHP 7.1</b> or higher immediately. Version '.phpversion().' is no longer supported.', 'AssetTarget' => 'Content', 'CssClass' => 'WarningMessage'];
+        $phpVersion = phpversion();
+        if (version_compare($phpVersion, '7.1') < 0) {
+            $upgradeMessage = ['Content' => 'We recommend using at least PHP 7.1. Support for PHP '.htmlspecialchars($phpVersion).' may be dropped in upcoming releases.', 'AssetTarget' => 'Content', 'CssClass' => 'WarningMessage'];
             $messageModule = new MessageModule($sender, $upgradeMessage);
             $sender->addModule($messageModule);
         }

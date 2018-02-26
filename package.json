@@ -15,6 +15,7 @@
         "quill": "^1.3.5",
         "react": "^16.2.0",
         "react-dom": "^16.2.0",
+        "react-virtualized": "^9.18.5",
         "setasap": "^2.0.0",
         "shave": "^2.1.3",
         "sprintf-js": "^1.1.1",

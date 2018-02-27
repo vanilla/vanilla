@@ -39,9 +39,11 @@ export default class EditorEmojiMenu extends React.PureComponent {
     cellRenderer = ({ columnIndex, rowIndex, style }) => {
         const pos = rowIndex * rowSize + columnIndex;
         const emojiData = emojis[pos];
-        return (
-            <EditorEmojiButton style={style} closeMenu={this.props.closeMenu} quill={this.props.quill} key={"emoji-" + emojiData.hexcode} emojiData={emojiData} />
-        );
+        let result = null;
+        if(emojiData) {
+            result = <EditorEmojiButton style={style} closeMenu={this.props.closeMenu} quill={this.props.quill} key={"emoji-" + emojiData.hexcode} emojiData={emojiData} />;
+        }
+        return result;
     }
 
     /**

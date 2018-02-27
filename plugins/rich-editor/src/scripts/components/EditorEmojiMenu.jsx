@@ -13,7 +13,7 @@ import emojis from 'emojibase-data/en/data.json';
 import classNames from 'classnames';
 import { Grid, AutoSizer } from 'react-virtualized';
 import { groups as emojiGroups } from 'emojibase-data/meta/groups.json';
-import * as utility from "@core/utility";
+import * as utility from '@core/utility';
 
 const buttonSize = 39;
 const colSize = 7;
@@ -55,6 +55,29 @@ export default class EditorEmojiMenu extends React.PureComponent {
     }
 
     /**
+     * handle Emoji Scroll
+     */
+
+    handleEmojiScroll = () => {
+
+
+        this.setState({
+            scrollTarget: -1,
+        });
+    };
+
+
+    /**
+     * Scroll to category
+     */
+
+    scrollToCategory = (categoryId) => {
+        this.setState({
+            scrollTarget: groupIndexes[categoryId].rowIndex,
+        });
+    };
+
+    /**
      * Render list row
      */
     cellRenderer = ({ columnIndex, rowIndex, style }) => {
@@ -66,7 +89,6 @@ export default class EditorEmojiMenu extends React.PureComponent {
         }
         return result;
     };
-
 
     /**
      * Get Group SVG Path
@@ -103,20 +125,6 @@ export default class EditorEmojiMenu extends React.PureComponent {
             utility.log("Error, unable to find SVG path for group: ", group);
         }
         return path;
-    };
-
-    /**
-     * Scroll to category
-     */
-
-    scrollToCategory = (categoryId) => {
-        let rowNumber = groupIndexes[categoryId].rowIndex;
-
-        console.log("rowNumber: ", rowNumber);
-
-        this.setState({
-            scrollTarget: rowNumber,
-        });
     };
 
     /**
@@ -157,8 +165,11 @@ export default class EditorEmojiMenu extends React.PureComponent {
                             height={height}
                             width={width}
 
+                            overscanRowCount={50}
+
                             scrollToAlignment="start"
                             scrollToRow={this.state.scrollTarget}
+                            onScroll={this.handleEmojiScroll}
                         />
                     )}
                 </AutoSizer>

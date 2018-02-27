@@ -16,8 +16,9 @@ export default class EditorEmojiButton extends React.Component {
 
     static propTypes = {
         quill: PropTypes.instanceOf(Quill).isRequired,
-        emoji: PropTypes.object.isRequired,
+        emojiData: PropTypes.object.isRequired,
         closeMenu: PropTypes.func.isRequired,
+        style: PropTypes.object.isRequired,
     };
 
     /**
@@ -25,7 +26,7 @@ export default class EditorEmojiButton extends React.Component {
      */
     constructor(props) {
         super(props);
-        this.emojiChar = props.emoji.emoji;
+        this.emojiChar = props.emojiData.emoji;
     }
 
     /**
@@ -42,7 +43,6 @@ export default class EditorEmojiButton extends React.Component {
     }
 
     render() {
-        return <button className="richEditor-button richEditor-insertEmoji" type="button" dangerouslySetInnerHTML={{__html: parseEmoji(this.emojiChar)}} onClick={this.insertEmojiBlot}>
-        </button>;
+        return <button style={this.props.style} className="richEditor-button richEditor-insertEmoji" type="button" dangerouslySetInnerHTML={{__html: parseEmoji(this.emojiChar)}} onClick={this.insertEmojiBlot} />;
     }
 }

@@ -11,6 +11,11 @@ import { t } from "@core/utility";
 import EditorEmojiButton from "../components/EditorEmojiButton";
 import emojis from 'emojibase-data/en/data.json';
 import classNames from 'classnames';
+import { Grid, AutoSizer } from 'react-virtualized';
+
+const buttonSize = 39;
+const colSize = 7;
+const rowSize = 7;
 
 export default class EditorEmojiMenu extends React.PureComponent {
     static propTypes = {
@@ -26,7 +31,23 @@ export default class EditorEmojiMenu extends React.PureComponent {
      */
     constructor(props) {
         super(props);
-        this.emojiList = emojis;
+        console.log("total emojis: ", emojis.length);
+    }
+
+    /**
+     * Render list row
+     */
+    cellRenderer = ({ columnIndex, rowIndex, style }) => {
+        const pos = rowIndex * rowSize + columnIndex;
+        const emojiData = emojis[pos];
+
+        if(!emojiData) {
+            console.log("BAD: ", pos);
+            return;
+        }
+        return (
+            <EditorEmojiButton style={style} closeMenu={this.props.closeMenu} quill={this.props.quill} key={"emoji-" + emojiData.hexcode} emojiData={emojiData} />
+        );
     }
 
     /**
@@ -54,11 +75,21 @@ export default class EditorEmojiMenu extends React.PureComponent {
                 </a>
             </div>
             <div className="insertPopover-body">
-                <div className="richEditor-emojis">
-                    {this.emojiList.map((emoji, i) => {
-                        return <EditorEmojiButton key={i} quill={this.props.quill} emoji={emoji} closeMenu={this.props.closeMenu}/>;
-                    })}
-                </div>
+                <Grid
+                    containerRole = ''
+                    // containerStyle={{display: 'flex', flexWrap: 'wrap', alignItems: 'flex-start', justifyContent: 'flex-start'}}
+                    // containerStyle={{display: 'table-cell'}}
+                    cellRenderer={this.cellRenderer}
+
+                    columnCount={colSize}
+                    columnWidth={buttonSize}
+
+                    rowCount={Math.ceil(emojis.length / colSize)}
+                    rowHeight={buttonSize}
+
+                    height={buttonSize * Math.ceil(emojis.length / colSize) * rowSize}
+                    width={buttonSize * colSize}
+                />
             </div>
         </div>;
     }

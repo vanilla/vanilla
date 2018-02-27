@@ -42,6 +42,10 @@ $buttonSpoiler: (
         display: none;
     }
 
+    .spoiler-content {
+        display: none;
+    }
+
     &.isShowingSpoiler {
         .spoiler-content {
             display: block;

@@ -687,6 +687,10 @@ body.Categories.isMobile .PageControls.Top {
   display: none;
 }
 
+.spoiler .spoiler-content {
+  display: none;
+}
+
 .spoiler.isShowingSpoiler .spoiler-content {
   display: block;
 }

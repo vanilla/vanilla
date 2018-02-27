@@ -2,6 +2,11 @@ import { BlockEmbed } from "quill/blots/block";
 import { t } from "@core/utility";
 
 export default class EmbedLoadingBlot extends BlockEmbed {
+
+    static blotName = 'loading-embed';
+    static className = 'loading-embed';
+    static tagName = 'div';
+
     static create() {
         const node = super.create();
         node.classList.add('embed');
@@ -23,7 +28,3 @@ export default class EmbedLoadingBlot extends BlockEmbed {
         return;
     }
 }
-
-EmbedLoadingBlot.blotName = 'loading-embed';
-EmbedLoadingBlot.className = 'loading-embed';
-EmbedLoadingBlot.tagName = 'div';

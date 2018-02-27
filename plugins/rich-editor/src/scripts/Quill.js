@@ -13,8 +13,7 @@ import Strike from 'quill/formats/strike';
 import EmojiBlot from "./blots/EmojiBlot.js";
 import ImageBlot from "./blots/ImageBlot.js";
 import EmbedErrorBlot from "./blots/EmbedErrorBlot.js";
-import SpoilerLineBlot, { SpoilerWrapperBlot, SpoilerContentBlot, InlinedWrapperBlot } from "./blots/SpoilerBlot.js";
-import SpoilerButtonBlot from "./blots/SpoilerButtonBlot";
+import SpoilerLineBlot, { SpoilerWrapperBlot, SpoilerContentBlot, SpoilerButtonBlot } from "./blots/SpoilerBlot.js";
 import CodeBlockBlot from "./blots/CodeBlockBlot.js";
 import VideoBlot from "./blots/VideoBlot.js";
 import LinkEmbedBlot from "./blots/LinkEmbed.js";
@@ -31,7 +30,6 @@ Quill.register({
     'formats/blockquote/line': BlockquoteLineBlot,
     'formats/blockquote/content': BlockquoteContentBlot,
     'formats/blockquote/wrapper': BlockquoteWrapperBlot,
-    'formats/inlined': InlinedWrapperBlot,
     'formats/code-block': CodeBlockBlot,
     'formats/header': Header,
     'formats/list': List,

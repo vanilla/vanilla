@@ -8,14 +8,14 @@ import WrapperBlot from "./WrapperBlot";
 import ClassFormatBlot  from "./ClassFormatBlot";
 import { wrappedBlot } from "../quill-utilities";
 
-class BlockQuoteLineBlot extends ClassFormatBlot {
+class BlockquoteLineBlot extends ClassFormatBlot {
     static blotName = "blockquote-line";
     static className = "blockquote-line";
     static tagName = 'p';
     static parentName = "blockquote-content";
 }
 
-export default wrappedBlot(BlockQuoteLineBlot);
+export default wrappedBlot(BlockquoteLineBlot);
 
 class ContentBlot extends WrapperBlot {
     static className = 'blockquote-content';
@@ -23,9 +23,9 @@ class ContentBlot extends WrapperBlot {
     static parentName = 'blockquote';
 }
 
-export const BlockQuoteContentBlot = wrappedBlot(ContentBlot);
+export const BlockquoteContentBlot = wrappedBlot(ContentBlot);
 
-export class BlockQuoteWrapperBlot extends WrapperBlot {
+export class BlockquoteWrapperBlot extends WrapperBlot {
     static className = 'blockquote';
     static blotName = 'blockquote';
 }

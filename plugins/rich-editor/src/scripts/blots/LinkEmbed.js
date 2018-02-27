@@ -131,5 +131,6 @@ function sanitize(url, protocols) {
 }
 
 LinkEmbedBlock.blotName = 'link-embed';
+LinkEmbedBlock.className = 'link-embed';
 LinkEmbedBlock.tagName = 'a';
 LinkEmbedBlock.PROTOCOL_WHITELIST = ['http', 'https', 'mailto', 'tel'];

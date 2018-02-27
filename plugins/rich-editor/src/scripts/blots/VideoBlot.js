@@ -1,4 +1,5 @@
 import { BlockEmbed } from "quill/blots/block";
+import Embed from "quill/blots/embed";
 import { t } from "@core/utility";
 import { setData, getData } from "@core/dom-utility";
 
@@ -18,7 +19,7 @@ function simplifyFraction(numerator, denominator){
     };
 }
 
-export default class VideoBlot extends BlockEmbed {
+export default class VideoBlot extends Embed {
     static create(data) {
         // console.log("Video Data: ", data);
         const node = super.create();
@@ -66,4 +67,5 @@ export default class VideoBlot extends BlockEmbed {
 }
 
 VideoBlot.blotName = 'video-placeholder';
+VideoBlot.className = 'video-placeholder';
 VideoBlot.tagName = 'div';

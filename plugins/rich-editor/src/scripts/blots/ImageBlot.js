@@ -24,4 +24,5 @@ export default class ImageBlot extends BlockEmbed {
 }
 
 ImageBlot.blotName = 'image-embed';
+ImageBlot.className = 'image-embed';
 ImageBlot.tagName = 'div';

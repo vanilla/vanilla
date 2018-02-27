@@ -1,79 +1,5 @@
-/**
- * @author Adam (charrondev) Charron <adam.c@vanillaforums.com>
- * @copyright 2009-2018 Vanilla Forums Inc.
- * @license https://opensource.org/licenses/GPL-2.0 GPL-2.0
- */
-
-import WrapperBlot from "./WrapperBlot";
-import ClassFormatBlot  from "./ClassFormatBlot";
-import { wrappedBlot } from "../quill-utilities";
-import Break from "quill/blots/break";
 import Parchment from "parchment";
-
-class SpoilerLineBlot extends ClassFormatBlot {
-    static blotName = "spoiler-line";
-    static className = "spoiler-line";
-    static tagName = 'p';
-    static parentName = "spoiler-content";
-
-    insertAt(index, length) {
-        super.insertAt(index, length);
-    }
-}
-
-export default wrappedBlot(SpoilerLineBlot);
-
-class ContentBlot extends WrapperBlot {
-    static className = 'spoiler-content';
-    static blotName = 'spoiler-content';
-    static parentName = 'spoiler';
-
-    hasLastTwoEmptyChildren() {
-        let children = this.children;
-
-        return children.length >= 3
-            && children.tail.children.tail.domNode.nodeName === "BR"
-            && children.tail.prev.children.tail.domNode.nodeName === "BR"
-            && children.tail.prev.prev.children.tail.domNode.nodeName === "BR";
-    }
-
-    // insertAt(index, name, value) {
-    //     super.insertAt(index, name, value);
-    //
-    //     if (this.hasLastThreeEmptyChildren()) {
-    //         // Place the insert at the end of this Blot.
-    //         this.parent.parent.insertAt(this.offset() + this.length(), name, value);
-    //
-    //     } else {
-    //         super.insertAt(index, name, value);
-    //     }
-    // }
-
-    update(mutations) {
-        super.update(mutations);
-        console.log(mutations);
-    }
-
-    optimize(context) {
-        // super.optimize(context);
-        if (this.hasLastTwoEmptyChildren()) {
-            console.log(this.children);
-
-            this.children.tail.remove();
-            this.children.tail.remove();
-
-            const block = Parchment.create("block");
-            // block.insertInto(this.parent.parent);
-            this.parent.parent.insertAt(this.offset() + this.length(), block);
-
-            this.children.tail.remove();
-        } else {
-            super.optimize(context);
-        }
-    }
-}
-
-export const SpoilerContentBlot = wrappedBlot(ContentBlot);
+import Embed from "quill/blots/embed";
 
 const spoilerButton = `
 <button class="iconButton button-spoiler" type="button">
@@ -104,48 +30,21 @@ const spoilerButton = `
         </button>
 `;
 
-export class InlinedWrapperBlot extends WrapperBlot {
-    static className = "inlined";
-    static blotName = "inlined";
-    static tagName = "span";
-}
+export default class SpoilerButtonBlot extends Embed {
 
-export class SpoilerWrapperBlot extends WrapperBlot {
-    static className = 'spoiler';
-    static blotName = 'spoiler';
+    static tagName =  "div";
+    static blotName = "spoiler-button";
+    static className = "spoiler-buttonContainer";
 
-    isOpen = true;
+    static create() {
+        const node = super.create();
 
-    attachHandle() {
-        this.handle = document.createElement("div");
-        this.handle.classList.add("spoiler-buttonContainer");
-        this.handle.innerHTML = spoilerButton;
-        this.handle.setAttribute("contenteditable", false);
+        node.classList.add("isShowingSpoiler");
+        node.setAttribute("contenteditable", false);
+        node.classList.add("spoiler-buttonContainer");
+        node.innerHTML = spoilerButton;
 
-        this.handle.addEventListener("click", () => {
-            this.isOpen = !this.isOpen;
-            this.setOpenState();
-        });
-        this.domNode.prepend(this.handle);
-    }
-
-    setOpenState() {
-        if (this.domNode.classList.contains("isShowingSpoiler") !== this.isOpen) {
-            this.domNode.classList.toggle("isShowingSpoiler");
-        }
-    }
-
-    optimize() {
-        super.optimize();
-
-        if (!this.domNode.children[0].classList.contains("spoiler-buttonContainer")) {
-            this.attachHandle();
-        }
-
-        this.setOpenState();
-    }
-
-    update(index, length) {
-        super.update(index, length);
+        return node;
     }
 }
+

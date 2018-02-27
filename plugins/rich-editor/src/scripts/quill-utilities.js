@@ -7,7 +7,6 @@
 import Emitter from "quill/core/emitter";
 import Container from "quill/blots/container";
 import Parchment from "parchment";
-import ContentBlockBlot from "./blots/ContentBlockBlot";
 
 /**
  * @typedef {Object} BoundaryStatic

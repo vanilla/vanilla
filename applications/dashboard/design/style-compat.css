@@ -723,16 +723,14 @@ body.Categories.isMobile .PageControls.Top {
   text-align: left;
 }
 
-.button-spoiler:not([disalbed]):hover {
+.button-spoiler:not([disabled]):hover {
   color: #f52c6e;
   background-color: transparent;
-  z-index: 2;
 }
 
-.button-spoiler:not([disalbed]):active {
+.button-spoiler:not([disabled]):active {
   color: #f52c6e;
   background-color: transparent;
-  z-index: 1;
 }
 
 .spoiler-warningMain {
@@ -773,8 +771,18 @@ body.Categories.isMobile .PageControls.Top {
   margin-right: 6px;
 }
 
+.ql-cursor {
+  background: orange;
+  width: 4px;
+  height: 24px;
+}
+
 .spoiler-content {
   padding: 0 18px 18px 18px;
+}
+
+.spoiler-buttonContainer {
+  white-space: normal;
 }
 
 .embed {

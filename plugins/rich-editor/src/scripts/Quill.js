@@ -13,12 +13,13 @@ import Strike from 'quill/formats/strike';
 import EmojiBlot from "./blots/EmojiBlot.js";
 import ImageBlot from "./blots/ImageBlot.js";
 import EmbedErrorBlot from "./blots/EmbedErrorBlot.js";
-import SpoilerLineBlot, { SpoilerWrapperBlot, SpoilerContentBlot } from "./blots/SpoilerBlot.js";
+import SpoilerLineBlot, { SpoilerWrapperBlot, SpoilerContentBlot, InlinedWrapperBlot } from "./blots/SpoilerBlot.js";
+import SpoilerButtonBlot from "./blots/SpoilerButtonBlot";
 import CodeBlockBlot from "./blots/CodeBlockBlot.js";
 import VideoBlot from "./blots/VideoBlot.js";
 import LinkEmbedBlot from "./blots/LinkEmbed.js";
 import EmbedLoadingBlot from "./blots/EmbedLoadingBlot.js";
-import BlockQuoteLineBlot, { BlockQuoteWrapperBlot, BlockQuoteContentBlot } from "./blots/BlockquoteBlot.js";
+import BlockquoteLineBlot, { BlockquoteWrapperBlot, BlockquoteContentBlot } from "./blots/BlockquoteBlot.js";
 import CodeInlineBlot from "./formats/CodeInlineBlot.js";
 
 // Other
@@ -27,9 +28,10 @@ import QuillTheme from "./QuillTheme";
 
 Quill.register({
     // Block formats
-    'formats/blockquote/line': BlockQuoteLineBlot,
-    'formats/blockquote/content': BlockQuoteContentBlot,
-    'formats/blockquote/wrapper': BlockQuoteWrapperBlot,
+    'formats/blockquote/line': BlockquoteLineBlot,
+    'formats/blockquote/content': BlockquoteContentBlot,
+    'formats/blockquote/wrapper': BlockquoteWrapperBlot,
+    'formats/inlined': InlinedWrapperBlot,
     'formats/code-block': CodeBlockBlot,
     'formats/header': Header,
     'formats/list': List,
@@ -38,6 +40,7 @@ Quill.register({
     'formats/spoiler/line': SpoilerLineBlot,
     'formats/spoiler/content': SpoilerContentBlot,
     'formats/spoiler/wrapper': SpoilerWrapperBlot,
+    'formats/spoiler/button': SpoilerButtonBlot,
     'formats/video-placeholder': VideoBlot,
     'formats/loading-embed': EmbedLoadingBlot,
     'formats/link-embed': LinkEmbedBlot,

@@ -43,7 +43,7 @@ export default class WrapperBlot extends Container {
         super.optimize(context);
         const next = this.next;
         if (next != null && next.prev === this &&
-            next.statics.blotName === this.statics.blotName &&
+            next.constructor.blotName === this.constructor.blotName &&
             next.domNode.tagName === this.domNode.tagName) {
             next.moveChildren(this);
             next.remove();

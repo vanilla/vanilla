@@ -67,7 +67,7 @@ $buttonSpoiler: (
 }
 
 .button-spoiler {
-    @include generateButtonClass($buttonSpoiler);
+    @include generateButtonClass($buttonSpoiler, false);
     @include noSelect;
     width: 100%;
     max-width: 100%;
@@ -121,6 +121,16 @@ $buttonSpoiler: (
     margin-right: 6px;
 }
 
+.ql-cursor {
+    background: orange;
+    width: 4px;
+    height : 24px;
+}
+
 .spoiler-content {
     padding: 0 $spoiler-horizontalPadding $spoiler-horizontalPadding $spoiler-horizontalPadding;
+}
+
+.spoiler-buttonContainer {
+    white-space: normal;
 }

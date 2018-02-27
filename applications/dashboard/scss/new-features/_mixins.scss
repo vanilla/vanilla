@@ -46,20 +46,26 @@ $spinnerOffset: 73deg;
     }
 }
 
-@mixin generateButtonClass($buttonMap) {
+@mixin generateButtonClass($buttonMap, $useZIndex: false) {
     & {
         @include generateStylesFromMap(map-get($buttonMap, "default"));
     }
 
-    &:not([disalbed]) {
+    &:not([disabled]) {
         &:hover {
             @include generateStylesFromMap(map-get($buttonMap, "hover"));
-            z-index: 2;
+
+            @if $useZIndex {
+                z-index: 2;
+            }
         }
 
         &:active {
             @include generateStylesFromMap(map-get($buttonMap, "focus"));
-            z-index: 1;
+
+            @if $useZIndex {
+                z-index: 1;
+            }
         }
     }
 }

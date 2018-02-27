@@ -25,4 +25,5 @@ export default class EmbedLoadingBlot extends BlockEmbed {
 }
 
 EmbedLoadingBlot.blotName = 'loading-embed';
+EmbedLoadingBlot.className = 'loading-embed';
 EmbedLoadingBlot.tagName = 'div';

@@ -59,8 +59,6 @@ export default class EditorEmojiMenu extends React.PureComponent {
                 isHidden: !this.props.isVisible,
             }
         );
-
-
         return <div id={this.props.menuID} className={componentClassNames} role="dialog" aria-hidden={!this.props.isVisible} aria-labelledby={this.props.menuTitleID}>
             <div className="insertPopover-header">
                 <h2 id={this.props.menuTitleID} className="H insertMedia-title">
@@ -75,8 +73,6 @@ export default class EditorEmojiMenu extends React.PureComponent {
                     {({ height, width }) => (
                         <Grid
                             containerRole = ''
-                            // containerStyle={{display: 'flex', flexWrap: 'wrap', alignItems: 'flex-start', justifyContent: 'flex-start'}}
-                            // containerStyle={{display: 'table-cell'}}
                             cellRenderer={this.cellRenderer}
 
                             columnCount={colSize}

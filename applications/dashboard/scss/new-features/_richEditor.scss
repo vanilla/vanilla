@@ -587,3 +587,18 @@ $embedded-quote_fg: #A3A3A3 !default;
     height: 20px;
     vertical-align: -.232em;
 }
+
+.richEditor-button {
+    user-select: none;
+}
+
+// Emoji Groups
+.emojiGroups {
+    display: flex;
+    flex-wrap: nowrap;
+}
+
+.emojiGroup-icon {
+    width: $richEditor-icon_size;
+    size: $richEditor-icon_size;
+}

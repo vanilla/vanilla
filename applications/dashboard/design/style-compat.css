@@ -548,6 +548,20 @@ body.isMobile .change-picture .change-picture-instructions {
   vertical-align: -.232em;
 }
 
+.richEditor-button {
+  user-select: none;
+}
+
+.emojiGroups {
+  display: flex;
+  flex-wrap: nowrap;
+}
+
+.emojiGroup-icon {
+  width: 24px;
+  size: 24px;
+}
+
 .followButton {
   white-space: nowrap;
   font-size: 10px;

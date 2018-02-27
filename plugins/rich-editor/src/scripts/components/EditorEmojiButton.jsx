@@ -44,13 +44,13 @@ export default class EditorEmojiButton extends React.Component {
     }
 
     render() {
-        const componentClassNames = classNames(
+        const componentClasses = classNames(
             'richEditor-button',
             'richEditor-insertEmoji',
             'emojiChar-' + this.emojiChar
         );
 
-        return <button style={this.props.style} className={componentClassNames} type="button" onClick={this.insertEmojiBlot}>
+        return <button style={this.props.style} className={componentClasses} type="button" onClick={this.insertEmojiBlot}>
             <span className="safeEmoji" dangerouslySetInnerHTML={{__html: parseEmoji(this.emojiChar)}} />
         </button>;
     }

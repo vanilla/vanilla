@@ -1,3 +1,4 @@
+@charset "UTF-8";
 em {
   font-style: italic;
 }
@@ -133,6 +134,12 @@ body.isMobile .change-picture .change-picture-instructions {
 .richEditor-menuItem .richEditor-button {
   height: 39px;
   width: 39px;
+  font-size: 24px;
+  line-height: 39px;
+}
+
+.richEditor-menuItem .richEditor-button.emojiChar-🇺🇳 {
+  font-size: 14px;
 }
 
 .richEditor-menuItem.isRightAligned {
@@ -334,10 +341,13 @@ body.isMobile .change-picture .change-picture-instructions {
 .insertPopover-body {
   max-height: 100vh;
   height: 292.5px;
-  overflow: auto;
+  margin-bottom: 12px;
   padding-left: 12px;
   padding-right: 12px;
-  margin-bottom: 12px;
+}
+
+.content-wrapper {
+  height: 100%;
 }
 
 .richEditor-menu.insertEmoji {
@@ -1074,6 +1084,10 @@ body.Categories.isMobile .PageControls.Top {
   max-width: 100%;
   line-height: 1.5;
   max-height: 63px;
+}
+
+.safeEmoji {
+  display: inline;
 }
 
 .nativeEmoji {

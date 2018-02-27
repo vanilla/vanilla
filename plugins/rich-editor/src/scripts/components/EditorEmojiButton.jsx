@@ -8,6 +8,7 @@ import React from "react";
 import * as PropTypes from "prop-types";
 import Quill from "quill/core";
 import { parseEmoji } from "@core/emoji-utility";
+import classNames from 'classnames';
 
 /**
  * Component for a single item in a EditorToolbar.
@@ -43,6 +44,14 @@ export default class EditorEmojiButton extends React.Component {
     }
 
     render() {
-        return <button style={this.props.style} className="richEditor-button richEditor-insertEmoji" type="button" dangerouslySetInnerHTML={{__html: parseEmoji(this.emojiChar)}} onClick={this.insertEmojiBlot} />;
+        const componentClassNames = classNames(
+            'richEditor-button',
+            'richEditor-insertEmoji',
+            'emojiChar-' + this.emojiChar
+        );
+
+        return <button style={this.props.style} className={componentClassNames} type="button" onClick={this.insertEmojiBlot}>
+            <span className="safeEmoji" dangerouslySetInnerHTML={{__html: parseEmoji(this.emojiChar)}} />
+        </button>;
     }
 }

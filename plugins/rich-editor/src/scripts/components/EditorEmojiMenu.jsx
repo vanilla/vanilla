@@ -31,7 +31,6 @@ export default class EditorEmojiMenu extends React.PureComponent {
      */
     constructor(props) {
         super(props);
-        console.log("total emojis: ", emojis.length);
     }
 
     /**
@@ -40,11 +39,6 @@ export default class EditorEmojiMenu extends React.PureComponent {
     cellRenderer = ({ columnIndex, rowIndex, style }) => {
         const pos = rowIndex * rowSize + columnIndex;
         const emojiData = emojis[pos];
-
-        if(!emojiData) {
-            console.log("BAD: ", pos);
-            return;
-        }
         return (
             <EditorEmojiButton style={style} closeMenu={this.props.closeMenu} quill={this.props.quill} key={"emoji-" + emojiData.hexcode} emojiData={emojiData} />
         );

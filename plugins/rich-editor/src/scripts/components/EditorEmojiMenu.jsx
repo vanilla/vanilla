@@ -70,26 +70,30 @@ export default class EditorEmojiMenu extends React.PureComponent {
                 <h2 id={this.props.menuTitleID} className="H insertMedia-title">
                     {t('Smileys & Faces')}
                 </h2>
-                <a href="#" aria-label="{t('Close');}" onClick={this.props.closeMenu} className="Close richEditor-close">
+                <a href="#" aria-label={t('Close')} onClick={this.props.closeMenu} className="Close richEditor-close">
                     <span>×</span>
                 </a>
             </div>
             <div className="insertPopover-body">
-                <Grid
-                    containerRole = ''
-                    // containerStyle={{display: 'flex', flexWrap: 'wrap', alignItems: 'flex-start', justifyContent: 'flex-start'}}
-                    // containerStyle={{display: 'table-cell'}}
-                    cellRenderer={this.cellRenderer}
+                <AutoSizer>
+                    {({ height, width }) => (
+                        <Grid
+                            containerRole = ''
+                            // containerStyle={{display: 'flex', flexWrap: 'wrap', alignItems: 'flex-start', justifyContent: 'flex-start'}}
+                            // containerStyle={{display: 'table-cell'}}
+                            cellRenderer={this.cellRenderer}
 
-                    columnCount={colSize}
-                    columnWidth={buttonSize}
+                            columnCount={colSize}
+                            columnWidth={buttonSize}
 
-                    rowCount={Math.ceil(emojis.length / colSize)}
-                    rowHeight={buttonSize}
+                            rowCount={Math.ceil(emojis.length / colSize)}
+                            rowHeight={buttonSize}
 
-                    height={buttonSize * Math.ceil(emojis.length / colSize) * rowSize}
-                    width={buttonSize * colSize}
-                />
+                            height={height}
+                            width={width}
+                        />
+                    )}
+                </AutoSizer>
             </div>
         </div>;
     }

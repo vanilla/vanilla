@@ -332,7 +332,8 @@ body.isMobile .change-picture .change-picture-instructions {
 }
 
 .insertPopover-body {
-  max-height: 250px;
+  max-height: 100vh;
+  height: 292.5px;
   overflow: auto;
   padding-left: 12px;
   padding-right: 12px;
@@ -343,13 +344,6 @@ body.isMobile .change-picture .change-picture-instructions {
   position: absolute;
   bottom: 100%;
   left: 0;
-}
-
-.richEditor-emojis {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: flex-start;
-  justify-content: flex-start;
 }
 
 .richEditor-insertEmoji {

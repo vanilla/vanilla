@@ -16,7 +16,8 @@ $richEditor-atMentionMark_weight: 600 !default;
 $richEditor-insertLink_width: 387px !default;
 $richEditor-insertPopover_paddingVertical: 9px !default;
 $richEditor-insertPopover_paddingHorizontal: 12px !default;
-$richEditor-insertPopover_maxHeight: 250px !default;
+$richEditor-insertPopover_maxHeight: 100vh !default;
+$richEditor-insertPopover_height: $richEditor-menuButton_size * 7.5 !default;
 $richEditor-emoji_width: 7 * $richEditor-menuButton_size + 2 * $richEditor-insertPopover_paddingHorizontal;
 $richEditor-nub_width: 12px !default;
 $richEditor-menu_borderWidth: 1px !default;
@@ -349,6 +350,7 @@ $embedded-quote_fg: #A3A3A3 !default;
 
 .insertPopover-body {
     max-height: $richEditor-insertPopover_maxHeight;
+    height: $richEditor-insertPopover_height;
     overflow: auto;
     padding: {
         left: $richEditor-insertPopover_paddingHorizontal;
@@ -361,14 +363,6 @@ $embedded-quote_fg: #A3A3A3 !default;
     position: absolute;
     bottom: 100%;
     left: 0;
-}
-
-
-.richEditor-emojis {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: flex-start;
-    justify-content: flex-start;
 }
 
 .richEditor-insertEmoji {

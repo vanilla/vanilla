@@ -1088,10 +1088,11 @@ body.Categories.isMobile .PageControls.Top {
 
 .safeEmoji {
   display: inline;
+  font-family: "Segoe UI Emoji", sans-serif;
 }
 
 .nativeEmoji {
-  font-family: "Segoe UI Emoji";
+  font-family: "Segoe UI Emoji", sans-serif;
 }
 
 .fallBackEmoji {

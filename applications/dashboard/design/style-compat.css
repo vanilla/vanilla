@@ -689,6 +689,7 @@ body.Categories.isMobile .PageControls.Top {
 
 .spoiler .spoiler-content {
   max-height: 0;
+  display: none;
 }
 
 .spoiler.isShowingSpoiler .spoiler-content {

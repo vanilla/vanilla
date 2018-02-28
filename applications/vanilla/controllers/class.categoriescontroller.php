@@ -97,7 +97,10 @@ class CategoriesController extends VanillaController {
         $this->title(htmlspecialchars(val('Name', $category, '')));
         $this->description(sprintf(t("Archives for %s"), gmdate('F Y', strtotime($from))), true);
         $this->addJsFile('discussions.js');
-        $this->Head->addTag('meta', ['name' => 'robots', 'content' => 'noindex']);
+
+        if ($this->Head) {
+            $this->Head->addTag('meta', ['name' => 'robots', 'content' => 'noindex, follow']);
+        }
 
         $this->ControllerName = 'DiscussionsController';
         $this->CssClass = 'Discussions';

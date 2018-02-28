@@ -764,6 +764,10 @@ class DiscussionsController extends VanillaController {
             $this->setData('Tags', $tags);
             $this->setData('Tag', $tagRow);
 
+            if ($this->Head) {
+                $this->Head->addTag('meta', ['name' => 'robots', 'content' => 'noindex, follow']);
+            }
+
             $childTags = $tagModel->getChildTags($tagRow['TagID']);
             $this->setData('ChildTags', $childTags);
         }

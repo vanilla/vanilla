@@ -14,7 +14,7 @@ $richEditor-atMentionAvatar_width: 30px !default;
 $richEditor-atMentionAvatar_margin: 10px !default;
 $richEditor-atMentionMark_weight: 600 !default;
 $richEditor-insertLink_width: 387px !default;
-$richEditor-insertPopover_paddingVertical: 9px !default;
+$richEditor-insertPopover_paddingVertical: 12px !default;
 $richEditor-insertPopover_paddingHorizontal: 12px !default;
 $richEditor-insertPopover_maxHeight: 100vh !default;
 $richEditor-insertPopover_height: $richEditor-menuButton_size * 7.5 !default;
@@ -32,6 +32,9 @@ $richEditor-inlineCode_borderColor: #a3a3a3;
 $richEditor-paragraphCode_bg: #f6f8fa;
 $richEditor-paragraphCode_fontSize: 14px;
 $richEditor-pilcrowAnimation_duration: 0.3s;
+$richEditor-emojiCategory_color: #737982;
+$richEditor-emojiCategory_hoverColor: #212327;
+$richEditor-emojiCategory_selectedBg: #aee4fe;
 
 $richEditor-videoPlayIcon_width: 80px;
 $richEditor-videoPlayIcon_hoverColor: #0291db;
@@ -159,6 +162,11 @@ $embedded-quote_fg: #A3A3A3 !default;
     display: block;
     height: $richEditor-icon_size;
     width: $richEditor-icon_size;
+
+    &.emojiGroup {
+        width: $richEditor-icon_size;
+        height: $richEditor-icon_size;
+    }
 
     &.richEditorParagraphMenu-handle {
         background: transparent;
@@ -593,12 +601,34 @@ $embedded-quote_fg: #A3A3A3 !default;
 }
 
 // Emoji Groups
+
 .emojiGroups {
     display: flex;
     flex-wrap: nowrap;
 }
 
+.emojiGroup {
+    color: $richEditor-emojiCategory_color;
+
+    &:hover {
+        color: $richEditor-emojiCategory_hoverColor;
+    }
+
+
+    &.isSelected {
+        background-color: $richEditor-emojiCategory_selectedBg;
+    }
+
+    + .emojiGroup {
+        margin-left: 10px;
+    }
+}
+
 .emojiGroup-icon {
+    display: block;
+    position: relative;
+    margin: 0;
+    padding: 0;
     width: $richEditor-icon_size;
     size: $richEditor-icon_size;
 }

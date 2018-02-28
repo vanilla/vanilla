@@ -18,19 +18,23 @@ import * as utility from '@core/utility';
 const buttonSize = 39;
 const colSize = 7;
 const rowSize = 7;
-const groupIndexes = {};
-
+const rowIndexesByGroupId = {};
+// const groupIdByRowIndex = {};
 
 /**
  * Get start positions for each category
  */
 emojis.map((data, key) => {
-    if (!(data.group in groupIndexes)) {
-        groupIndexes[data.group] = {
-            rowIndex: Math.floor(key / colSize),
-        };
+    const groupID = data.group;
+    if (!(groupID in rowIndexesByGroupId)) {
+        const rowIndex = Math.floor(key / colSize);
+        rowIndexesByGroupId[groupID] = rowIndex;
+        // groupIdByRowIndex[rowIndex] = groupID;
     }
 });
+
+utility.log("rowIndexesByGroupId: ", rowIndexesByGroupId);
+// utility.log("groupIdByRowIndex: ", groupIdByRowIndex);
 
 export default class EditorEmojiMenu extends React.PureComponent {
     static propTypes = {
@@ -46,34 +50,58 @@ export default class EditorEmojiMenu extends React.PureComponent {
      */
     constructor(props) {
         super(props);
-        this.currentGroup = emojiGroups[0];
         utility.log("Emojis Loaded: ", emojis);
-
         this.state = {
             scrollTarget: 0,
+            selectedGroup: emojiGroups[0],
+            overscanRowCount: 20,
+            rowStartIndex: 0,
+            lastRowIndex: null,
         };
     }
+
+    handleOnSectionRendered = (event) => {
+        const lastRowIndex = this.state.rowStartIndex;
+        const newRowIndex = event.rowStartIndex;
+        let selectedGroup = 0;
+        let targetRow = 0;
+
+        if ( newRowIndex > lastRowIndex) {
+            targetRow = newRowIndex;
+        } else {
+            targetRow = lastRowIndex;
+        }
+
+        Object.values(rowIndexesByGroupId).map((groupRow, groupKey) => {
+            if (targetRow >= groupRow) {
+                selectedGroup = groupKey;
+            }
+        });
+
+        this.setState({
+            rowStartIndex: event.rowStartIndex,
+            lastRowIndex,
+            selectedGroup,
+        });
+    };
 
     /**
      * handle Emoji Scroll
      */
 
     handleEmojiScroll = () => {
-
-
         this.setState({
             scrollTarget: -1,
         });
     };
 
-
     /**
      * Scroll to category
      */
-
     scrollToCategory = (categoryId) => {
         this.setState({
-            scrollTarget: groupIndexes[categoryId].rowIndex,
+            scrollTarget: rowIndexesByGroupId[categoryId],
+            selectedGroup: categoryId,
         });
     };
 
@@ -85,7 +113,7 @@ export default class EditorEmojiMenu extends React.PureComponent {
         const emojiData = emojis[pos];
         let result = null;
         if(emojiData) {
-            result = <EditorEmojiButton style={style} closeMenu={this.props.closeMenu} quill={this.props.quill} key={"emoji-" + emojiData.hexcode} emojiData={emojiData} />;
+            result = <EditorEmojiButton style={style} closeMenu={this.props.closeMenu} quill={this.props.quill} key={"emoji-" + emojiData.hexcode} emojiData={emojiData} index={pos} rowIndex={rowIndex} />;
         }
         return result;
     };
@@ -165,11 +193,13 @@ export default class EditorEmojiMenu extends React.PureComponent {
                             height={height}
                             width={width}
 
-                            overscanRowCount={50}
+                            overscanRowCount={this.state.overscanRowCount}
 
                             scrollToAlignment="start"
                             scrollToRow={this.state.scrollTarget}
+
                             onScroll={this.handleEmojiScroll}
+                            onSectionRendered={this.handleOnSectionRendered}
                         />
                     )}
                 </AutoSizer>
@@ -177,11 +207,13 @@ export default class EditorEmojiMenu extends React.PureComponent {
             <div className="insertPopover-footer">
                 <div className="emojiGroups">
                     {Object.values(emojiGroups).map((groupName, groupKey) => {
+                        const isSelected = this.state.selectedGroup === groupKey;
                         const componentClasses = classNames(
                             'richEditor-button',
                             'emojiGroup',
+                            { isSelected: isSelected }
                         );
-                        return <button type="button" onClick={() => this.scrollToCategory(groupKey)} key={'emojiGroup-' + groupName} title={t(groupName)} aria-label={t('Jump to emoji category: ') + t(groupName)} className={componentClasses}>
+                        return <button type="button" onClick={() => this.scrollToCategory(groupKey)} aria-current={isSelected} key={'emojiGroup-' + groupName} title={t(groupName)} aria-label={t('Jump to emoji category: ') + t(groupName)} className={componentClasses}>
                             <svg className="emojiGroup-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
                                 <title>{t(groupName)}</title>
                                 {this.getGroupSVGPath(groupName)}

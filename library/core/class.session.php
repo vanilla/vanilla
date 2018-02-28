@@ -288,23 +288,19 @@ class Gdn_Session {
      * @return bool
      */
     public function isNewVisit() {
-        static $result = null;
+        if ($this->User) {
+            $cookie = $this->getCookie('-Vv', false);
+            $userVisitExpiry = Gdn_Format::toTimeStamp($this->User->DateLastActive) + self::VISIT_LENGTH;
 
-        if ($result === null) {
-            if ($this->User) {
-                $cookie = $this->getCookie('-Vv', false);
-                $userVisitExpiry = Gdn_Format::toTimeStamp($this->User->DateLastActive) + self::VISIT_LENGTH;
-
-                if ($cookie) {
-                    $result = false; // User has cookie, not a new visit.
-                } elseif ($userVisitExpiry > time())
-                    $result = false; // User was last active less than 20 minutes ago, not a new visit.
-                else {
-                    $result = true; // No cookie and not active in the last 20 minutes? New visit.
-                }
-            } else {
-                return false;
+            if ($cookie) {
+                $result = false; // User has cookie, not a new visit.
+            } elseif ($userVisitExpiry > time())
+                $result = false; // User was last active less than 20 minutes ago, not a new visit.
+            else {
+                $result = true; // No cookie and not active in the last 20 minutes? New visit.
             }
+        } else {
+            $result = false;
         }
 
         return $result;

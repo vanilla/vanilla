@@ -81,26 +81,25 @@ export default class VanillaTheme extends Theme {
             key: Keyboard.keys.BACKSPACE,
             collapsed: true,
             format: ['spoiler-line'],
-            // prefix: /\n$/,
-            // suffix: /^\s+$/,
             handler: (range) => {
-                const [line, offset] = this.quill.getLine(range.index);
-                const isFirst = line === line.parent.children.head;
+                const [line] = this.quill.getLine(range.index);
 
-                console.log("backspace");
-                if (isFirst) {
+                // Check if this is the first line in the SpoilerContentBlot.
+                const isFirstLine = line === line.parent.children.head;
+
+                if (isFirstLine) {
+                    // The fact that this is always the grandparent of the line is enforced at the Blot level.
+                    const spoilerBlot = line.parent.parent;
 
                     const delta = new Delta()
-                        .retain(0)
-                        .retain(line.parent.parent.length(), { 'spoiler-line': false });
-                    console.log(delta);
+                        .retain(spoilerBlot.offset())
+                        .retain(spoilerBlot.length(), { 'spoiler-line': false });
                     this.quill.updateContents(delta, Emitter.sources.USER);
-                    // console.log(delta);
-                    // this.quill.updateContents(delta, Emitter.sources.USER);
-                    // this.quill.setSelection(range.index + line.length() - offset);
 
+                    // Return false to prevent default behaviour.
                     return false;
                 } else {
+                    // Return true to allow default behaviour.
                     return true;
                 }
             },

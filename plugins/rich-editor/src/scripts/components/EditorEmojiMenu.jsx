@@ -19,7 +19,6 @@ const buttonSize = 39;
 const colSize = 7;
 const rowSize = 7;
 const rowIndexesByGroupId = {};
-// const groupIdByRowIndex = {};
 
 /**
  * Get start positions for each category
@@ -29,7 +28,6 @@ emojis.map((data, key) => {
     if (!(groupID in rowIndexesByGroupId)) {
         const rowIndex = Math.floor(key / colSize);
         rowIndexesByGroupId[groupID] = rowIndex;
-        // groupIdByRowIndex[rowIndex] = groupID;
     }
 });
 
@@ -60,6 +58,9 @@ export default class EditorEmojiMenu extends React.PureComponent {
         };
     }
 
+    /**
+     * Handler when new rows are rendered. We use this to figure out what category is current
+     */
     handleOnSectionRendered = (event) => {
         const lastRowIndex = this.state.rowStartIndex;
         const newRowIndex = event.rowStartIndex;
@@ -86,9 +87,8 @@ export default class EditorEmojiMenu extends React.PureComponent {
     };
 
     /**
-     * handle Emoji Scroll
+     * Handle Emoji Scroll
      */
-
     handleEmojiScroll = () => {
         this.setState({
             scrollTarget: -1,
@@ -121,7 +121,6 @@ export default class EditorEmojiMenu extends React.PureComponent {
     /**
      * Get Group SVG Path
      */
-
     getGroupSVGPath = (group) => {
         let path = null;
         switch(group) {
@@ -211,7 +210,7 @@ export default class EditorEmojiMenu extends React.PureComponent {
                         const componentClasses = classNames(
                             'richEditor-button',
                             'emojiGroup',
-                            { isSelected: isSelected }
+                            { isSelected }
                         );
                         return <button type="button" onClick={() => this.scrollToCategory(groupKey)} aria-current={isSelected} key={'emojiGroup-' + groupName} title={t(groupName)} aria-label={t('Jump to emoji category: ') + t(groupName)} className={componentClasses}>
                             <svg className="emojiGroup-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">

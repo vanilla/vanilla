@@ -230,14 +230,5 @@ export function wrappedBlot(BlotConstructor) {
 
             newBlot.insertInto(this.scroll, scrollReference);
         }
-
-        // replaceAllWith(name, value) {
-        //     if (this instanceof WrapperBlot) {
-        //         this.children.foreach(child => {
-        //             child.moveChildren(this.scroll, this.parent);
-        //             child.replaceWith(name, value);
-        //         });
-        //     }
-        // }
     };
 }

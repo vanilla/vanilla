@@ -69,7 +69,9 @@
             "^.+\\.(js|jsx|ts|tsx)$": "babel-jest",
             "^.+\\.svg?$": "html-loader-jest"
         },
-        "transformIgnorePatterns": [],
+        "transformIgnorePatterns": [
+            "node_modules/react"
+        ],
         "setupFiles": [
             "<rootDir>/src/scripts/__tests__/test-setup.js"
         ]

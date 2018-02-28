@@ -4,20 +4,25 @@
  * @license https://opensource.org/licenses/GPL-2.0 GPL-2.0
  */
 
-import React from "react";
-import ReactDOM from "react-dom";
+// Quill
 import Theme from "quill/core/theme";
 import Keyboard from "quill/modules/keyboard";
 import Delta from "quill-delta";
 import Emitter from "quill/core/emitter";
+import WrapperBlot, { LineBlot } from "./blots/abstract/WrapperBlot";
+import CodeBlockBlot from "./blots/CodeBlockBlot";
+import { closeEditorFlyouts } from "./quill-utilities";
+
+// React
+import React from "react";
+import ReactDOM from "react-dom";
 import InlineEditorToolbar from "./components/InlineEditorToolbar";
 import ParagraphEditorToolbar from "./components/ParagraphEditorToolbar";
 import EditorEmojiPicker from "./components/EditorEmojiPicker";
-import { closeEditorFlyouts } from "./quill-utilities";
-
-import WrapperBlot, { LineBlot } from "./blots/abstract/WrapperBlot";
 
 export default class VanillaTheme extends Theme {
+
+    static MULTI_LINE_BLOTS = ['spoiler-line', 'blockquote-line', 'code-block'];
 
     /** @var {Quill} */
     quill;
@@ -43,6 +48,7 @@ export default class VanillaTheme extends Theme {
         this.setupTabBehaviour();
         this.setupNewlineBlockEscapes();
         this.setupKeyboardArrowBlockEscapes();
+        this.setupBlockDeleteHandler();
 
         // Mount react components
         this.mountToolbar();
@@ -56,33 +62,35 @@ export default class VanillaTheme extends Theme {
     setupTabBehaviour() {
         // Nullify the tab key.
         this.options.modules.keyboard.bindings.tab = false;
-        // this.options.modules.keyboard.bindings["Block Escape Backspace"] = {
-        //     key: Keyboard.keys.BACKSPACE,
-        //     collapsed: true,
-        //     format: ['spoiler-line'],
-        //     handler: (range) => {
-        //         const [line] = this.quill.getLine(range.index);
-        //
-        //         // Check if this is the first line in the SpoilerContentBlot.
-        //         const isFirstLine = line === line.parent.children.head;
-        //
-        //         if (isFirstLine) {
-        //             // The fact that this is always the grandparent of the line is enforced at the Blot level.
-        //             const spoilerBlot = line.parent.parent;
-        //
-        //             const delta = new Delta()
-        //                 .retain(spoilerBlot.offset())
-        //                 .retain(spoilerBlot.length(), { 'spoiler-line': false });
-        //             this.quill.updateContents(delta, Emitter.sources.USER);
-        //
-        //             // Return false to prevent default behaviour.
-        //             return false;
-        //         } else {
-        //             // Return true to allow default behaviour.
-        //             return true;
-        //         }
-        //     },
-        // };
+    }
+
+    setupBlockDeleteHandler() {
+        this.options.modules.keyboard.bindings["Block Escape Backspace"] = {
+            key: Keyboard.keys.BACKSPACE,
+            collapsed: true,
+            format: this.constructor.MULTI_LINE_BLOTS,
+            handler: (range) => {
+                let [line] = this.quill.getLine(range.index);
+
+                const isOnlyChild = !line.prev && !line.next;
+
+                if (line instanceof LineBlot) {
+                    line = line.getContentBlot();
+                }
+
+                // Check if this is the first line in the SpoilerContentBlot.
+                const isLineEmpty = line.children.length === 1 && line.domNode.textContent === "";
+
+                if (isLineEmpty && isOnlyChild) {
+                    const delta = new Delta()
+                        .retain(range.index)
+                        .delete(1);
+                    this.quill.updateContents(delta, Emitter.sources.USER);
+                }
+
+                return true;
+            },
+        };
     }
 
     /**
@@ -93,14 +101,16 @@ export default class VanillaTheme extends Theme {
         this.options.modules.keyboard.bindings["Block Escape Enter"] = {
             key: Keyboard.keys.ENTER,
             collapsed: true,
-            format: ['spoiler-line', 'blockquote-line'],
+            format: this.constructor.MULTI_LINE_BLOTS,
             handler: (range) => {
                 const [line, offset] = this.quill.getLine(range.index);
                 const isWrapped = line.parent instanceof WrapperBlot;
                 const isNewLine = line.domNode.textContent === "";
+                const isPreviousNewline = line.prev && line.prev.domNode.textContent === "";
                 const isOnlyNewLine = isNewLine && line.parent.children.length === 1;
+                const passesCodeBlockCriteria = !(line instanceof CodeBlockBlot) || isPreviousNewline;
 
-                if (isWrapped && isNewLine && !isOnlyNewLine) {
+                if (isWrapped && isNewLine && !isOnlyNewLine && passesCodeBlockCriteria) {
                     const positionUpToPreviousNewline = range.index + line.length() - offset;
                     const delta = new Delta()
                         .retain(positionUpToPreviousNewline)
@@ -138,18 +148,50 @@ export default class VanillaTheme extends Theme {
             line = line.getWrapperBlot();
         }
 
-        const isFirstBlot = line.parent === line.scroll && line === line.parent.head;
+        const isFirstBlot = line.parent === line.scroll && line === line.parent.children.head;
 
         if (isFirstBlot) {
             // const index = quill.
-            const delta = new Delta()
-                .insert("\n");
-
-            this.quill.updateContents(delta);
+            const newContents = [
+                {
+                    insert: "\n",
+                },
+                ...this.quill.getContents()["ops"],
+            ];
+            this.quill.setContents(newContents);
         }
 
+        return true;
+    }
 
-        // this.quill.setSelection(positionUpToPreviousNewline - 1);
+    /**
+     * Insert a normal newline after the current range.
+     * @private
+     *
+     * @param {RangeStatic} range - A Quill range.
+     *
+     * @returns {boolean} false to prevent default.
+     */
+    insertNewlineAfterRange(range) {
+        let [line] = this.quill.getLine(range.index);
+
+        if (line instanceof LineBlot) {
+            line = line.getWrapperBlot();
+        }
+
+        const isLastBlot = line.parent === line.scroll && line === line.parent.children.tail;
+
+        if (isLastBlot) {
+            // const index = quill.
+            const newContents = [
+                ...this.quill.getContents()["ops"],
+                {
+                    insert: "\n",
+                },
+            ];
+            this.quill.setContents(newContents);
+            this.quill.setSelection(range.index + 1, 0);
+        }
 
         return true;
     }
@@ -158,20 +200,34 @@ export default class VanillaTheme extends Theme {
      * Add keyboard bindings that allow the user to escape multi-line blocks with arrow keys.
      */
     setupKeyboardArrowBlockEscapes() {
-        this.options.modules.keyboard.bindings["Block Escape Up"] = {
-            key: Keyboard.keys.UP,
+        const commonCriteria = {
             collapsed: true,
             offset: 0, // Only apply if on the first character of a line.
-            format: ['spoiler-line', 'blockquote-line', 'code-block'],
+            format: this.constructor.MULTI_LINE_BLOTS,
+        };
+
+        this.options.modules.keyboard.bindings["Block Escape Up"] = {
+            ...commonCriteria,
+            key: Keyboard.keys.UP,
             handler: this.insertNewlineBeforeRange,
         };
 
         this.options.modules.keyboard.bindings["Block Escape Left"] = {
+            ...commonCriteria,
             key: Keyboard.keys.LEFT,
-            collapsed: true,
-            offset: 0, // Only apply if on the first character of a line.
-            format: ['spoiler-line', 'blockquote-line', 'code-block'],
             handler: this.insertNewlineBeforeRange,
+        };
+
+        this.options.modules.keyboard.bindings["Block Escape Down"] = {
+            ...commonCriteria,
+            key: Keyboard.keys.DOWN,
+            handler: this.insertNewlineAfterRange,
+        };
+
+        this.options.modules.keyboard.bindings["Block Escape Right"] = {
+            ...commonCriteria,
+            key: Keyboard.keys.RIGHT,
+            handler: this.insertNewlineAfterRange,
         };
     }
 

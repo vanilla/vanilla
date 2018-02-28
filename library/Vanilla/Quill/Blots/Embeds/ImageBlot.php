@@ -12,7 +12,7 @@ class ImageBlot extends AbstractBlockEmbedBlot {
      * @inheritDoc
      */
     protected static function getInsertKey(): string {
-        return "insert.image-embed";
+        return "insert.embed-image";
     }
 
     /**
@@ -22,7 +22,7 @@ class ImageBlot extends AbstractBlockEmbedBlot {
         $imageUrl = \htmlentities(val("url", $data, ""), \ENT_QUOTES);
         $altText = val("alt", $data, "");
 
-        $result =   "<div class=\"embed embedImage\">";
+        $result =   "<div class=\"embed-image embed embedImage\">";
         $result .=      "<img class=\"embedImage-img\" src=\"$imageUrl\" alt=\"$altText\">";
         $result .=  "</div>";
 

@@ -12,7 +12,7 @@ class LinkEmbedBlot extends AbstractBlockEmbedBlot {
      * @inheritDoc
      */
     protected static function getInsertKey(): string {
-        return "insert.link-embed";
+        return "insert.embed-link";
     }
 
     /**
@@ -29,7 +29,7 @@ class LinkEmbedBlot extends AbstractBlockEmbedBlot {
         $main = '<div class="embedLink-main">' . $headerHtml . $excerptHtml . '</div>';
 
 
-        $result = "<a class=\"embed embedLink\" href=\"$url\" target=\"_blank\" rel=\"noopener noreferrer\">";
+        $result = "<a class=\"embed-link embed embedLink\" href=\"$url\" target=\"_blank\" rel=\"noopener noreferrer\">";
         $result .= '<article class="embedLink-body">';
 
         if ($imageUrl) {

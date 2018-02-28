@@ -12,7 +12,7 @@ class VideoBlot extends AbstractBlockEmbedBlot {
      * @inheritDoc
      */
     protected static function getInsertKey(): string {
-        return "insert.video-placeholder";
+        return "insert.embed-video";
     }
 
     /**
@@ -28,7 +28,7 @@ class VideoBlot extends AbstractBlockEmbedBlot {
         // TODO: Calculate the ratio in the scrape endpoint and use it here.
         $defaultRatioParams = 'style="padding-top: 68.67599569429494%;"';
 
-        $result =   "<div class=\"embed embedVideo\">";
+        $result =   "<div class=\"embed-video embed embedVideo\">";
         $result .=      "<div class=\"embedVideo-ratio\" $defaultRatioParams>";
         $result .=          "<button type=\"button\" data-url=\"$url\" aria-label=\"$name\" ";
         $result .=              "class=\"embedVideo-playButton iconButton js-playVideo\" ";

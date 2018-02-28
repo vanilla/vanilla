@@ -6,6 +6,8 @@
 
 import Container from "quill/blots/container";
 import Parchment from "parchment";
+import ClassFormatBlot from "./ClassFormatBlot";
+import { wrappedBlot } from "../../quill-utilities";
 
 /**
  * A Blot implementing functions necessary to wrap another Blot as a "Dump" DOM Element.
@@ -14,8 +16,10 @@ import Parchment from "parchment";
  */
 export default class WrapperBlot extends Container {
 
-    static scope = Parchment.Scope.BLOCK;
+    // This cannot be Parchment.Scope.BLOCK or it will match and attributor and break pasting.
+    static scope = Parchment.Scope.BLOCK_BLOT;
     static tagName = "div";
+    static allowedChildren = [WrapperBlot];
 
     /**
      * We want to NOT return the format of this Blot. This blot should never be created on its own. Only through its
@@ -55,3 +59,28 @@ export default class WrapperBlot extends Container {
         }
     }
 }
+
+const ContentBlot = wrappedBlot(WrapperBlot);
+
+class TempLineBlot extends ClassFormatBlot {
+
+    /**
+     * @returns {ContentBlot} - The parent blot of this Blot.
+     */
+    getContentBlot() {
+        return this.parent;
+    }
+
+    /**
+     * @returns {WrapperBlot} - The parent blot of this Blot.
+     */
+    getWrapperBlot() {
+        return this.parent.parent;
+    }
+}
+
+export const LineBlot = wrappedBlot(TempLineBlot);
+
+ContentBlot.allowedChildren = [LineBlot];
+
+export { ContentBlot };

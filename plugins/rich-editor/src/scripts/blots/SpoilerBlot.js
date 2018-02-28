@@ -5,50 +5,26 @@
  */
 
 import Parchment from "parchment";
-import WrapperBlot from "./WrapperBlot";
-import ClassFormatBlot  from "./ClassFormatBlot";
-import { wrappedBlot } from "../quill-utilities";
+import WrapperBlot, { ContentBlot, LineBlot } from "./abstract/WrapperBlot";
 import SpoilerButtonBlot from "./SpoilerButtonBlot";
-import Embed from "quill/blots/embed";
 
 /**
  * Represent a single line of a Spoiler.
  */
-class SpoilerLineBlot extends ClassFormatBlot {
+export default class SpoilerLineBlot extends LineBlot {
     static blotName = "spoiler-line";
     static className = "spoiler-line";
     static tagName = 'p';
     static parentName = "spoiler-content";
-
-    eject() {
-        this.moveChildren(this.scroll, this.parent.parent);
-    }
 }
-
-export default wrappedBlot(SpoilerLineBlot);
 
 /**
  * Represents the full content area of a spoiler.
  */
-class ContentBlot extends WrapperBlot {
+export class SpoilerContentBlot extends ContentBlot {
     static className = 'spoiler-content';
     static blotName = 'spoiler-content';
     static parentName = 'spoiler';
-    static allowedChildren = [SpoilerLineBlot];
-}
-
-export const SpoilerContentBlot = wrappedBlot(ContentBlot);
-
-export class BlockCursor extends Embed {
-    static blotName = "block-cursor";
-    static className = "cursor";
-    static tagName = "span";
-
-    create() {
-        const node = super.create();
-        node.setAttribute("contenteditable", false);
-        return node;
-    }
 }
 
 /**
@@ -58,9 +34,13 @@ export class BlockCursor extends Embed {
 export class SpoilerWrapperBlot extends WrapperBlot {
     static className = 'spoiler';
     static blotName = 'spoiler';
-    static allowedChildren = [...WrapperBlot.allowedChildren, SpoilerButtonBlot, SpoilerLineBlot];
+    static allowedChildren = [...WrapperBlot.allowedChildren, SpoilerButtonBlot];
 
-    isOpen = true;
+    static create() {
+        const node = super.create();
+        node.classList.add("isShowingSpoiler");
+        return node;
+    }
 
     /**
      * Attach the toggle button to the spoiler, and set it's event listener.
@@ -69,19 +49,6 @@ export class SpoilerWrapperBlot extends WrapperBlot {
         if (!this.toggleButton) {
             this.toggleButton = Parchment.create("spoiler-button");
             this.insertBefore(this.toggleButton, this.children.head);
-            this.toggleButton.domNode.addEventListener("click", () => {
-                this.isOpen = !this.isOpen;
-                this.updateOpenClass();
-            });
-        }
-    }
-
-    /**
-     * Update the visibility class on the spoiler to match it's open/closed state.
-     */
-    updateOpenClass() {
-        if (this.domNode.classList.contains("isShowingSpoiler") !== this.isOpen) {
-            this.domNode.classList.toggle("isShowingSpoiler");
         }
     }
 
@@ -98,35 +65,9 @@ export class SpoilerWrapperBlot extends WrapperBlot {
     constructor(domNode) {
         super(domNode);
         this.attachToggleButton();
-        this.updateOpenClass();
-    }
-
-    /**
-     * Open the spoiler if something modifies its children when it is closed.
-     */
-    deleteAt(index, length) {
-        if (!this.isOpen) {
-            this.isOpen = true;
-            this.updateOpenClass();
-        }
-
-        super.deleteAt(index, length);
     }
 
     optimize(context) {
         super.optimize(context);
-        this.updateOpenClass();
-    }
-
-    /**
-     * Open the spoiler if something modifies its children when it is closed.
-     */
-    insertAt(index, value, ref) {
-        if (!this.isOpen) {
-            this.isOpen = true;
-            this.updateOpenClass();
-        }
-
-        super.insertAt(index, value, ref);
     }
 }

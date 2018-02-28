@@ -1,6 +1,4 @@
 import Scroll from "quill/blots/scroll";
-import Parchment from "parchment";
-import WrapperBlot from "./WrapperBlot";
 
 export default class ScrollBlot extends Scroll {
     deleteAt(index, length) {

@@ -6,7 +6,7 @@
 
 import Emitter from "quill/core/emitter";
 import Parchment from "parchment";
-import WrapperBlot from "./blots/WrapperBlot";
+import WrapperBlot from "./blots/abstract/WrapperBlot";
 
 /**
  * @typedef {Object} BoundaryStatic

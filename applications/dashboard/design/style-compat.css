@@ -688,11 +688,12 @@ body.Categories.isMobile .PageControls.Top {
 }
 
 .spoiler .spoiler-content {
-  display: none;
+  max-height: 0;
 }
 
 .spoiler.isShowingSpoiler .spoiler-content {
   display: block;
+  max-height: 99999px;
 }
 
 .spoiler.isShowingSpoiler .spoiler-chevronUp {

@@ -7,9 +7,14 @@
 import Container from "quill/blots/container";
 import Parchment from "parchment";
 
+/**
+ * A Blot implementing functions necessary to wrap another Blot as a "Dump" DOM Element.
+ *
+ * The wrapped blots should additionally use the `wrappedBlot` Higher-order function in `quill-utilities`.
+ */
 export default class WrapperBlot extends Container {
 
-    static scope = Parchment.Scope.BLOCK_BLOT;
+    static scope = Parchment.Scope.BLOCK;
     static tagName = "div";
 
     /**

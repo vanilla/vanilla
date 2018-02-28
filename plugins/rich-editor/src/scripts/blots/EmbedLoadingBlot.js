@@ -3,13 +3,14 @@ import { t } from "@core/utility";
 
 export default class EmbedLoadingBlot extends BlockEmbed {
 
-    static blotName = 'loading-embed';
-    static className = 'loading-embed';
+    static blotName = 'embed-loading';
+    static className = 'embed-loading';
     static tagName = 'div';
 
     static create() {
         const node = super.create();
         node.classList.add('embed');
+        node.classList.add('embed-loading');
         node.setAttribute('role', 'alert');
 
         node.innerHTML = `<div class='embedLoader'>

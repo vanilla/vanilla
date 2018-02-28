@@ -20,10 +20,16 @@ function simplifyFraction(numerator, denominator){
 }
 
 export default class VideoBlot extends Embed {
+
+    static blotName = 'embed-video';
+    static className = 'embed-video';
+    static tagName = 'div';
+
     static create(data) {
         // console.log("Video Data: ", data);
         const node = super.create();
         node.classList.add('embed');
+        node.classList.add('embed-video');
         node.classList.add('embedVideo');
         data.name = data.name || '';
 
@@ -65,7 +71,3 @@ export default class VideoBlot extends Embed {
         return getData(node, "data");
     }
 }
-
-VideoBlot.blotName = 'video-placeholder';
-VideoBlot.className = 'video-placeholder';
-VideoBlot.tagName = 'div';

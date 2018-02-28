@@ -2,9 +2,15 @@ import { BlockEmbed } from "quill/blots/block";
 import { setData, getData } from "@core/dom-utility";
 
 export default class ImageBlot extends BlockEmbed {
+
+    static blotName = 'embed-image';
+    static className = 'embed-image';
+    static tagName = 'div';
+
     static create(data) {
         const node = super.create();
         node.classList.add('embed');
+        node.classList.add('embed-image');
         node.classList.add('embedImage');
 
         const image = document.createElement('img');
@@ -22,7 +28,3 @@ export default class ImageBlot extends BlockEmbed {
         return getData(node, "data");
     }
 }
-
-ImageBlot.blotName = 'image-embed';
-ImageBlot.className = 'image-embed';
-ImageBlot.tagName = 'div';

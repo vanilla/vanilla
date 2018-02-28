@@ -3,6 +3,11 @@ import { setData, getData} from "@core/dom-utility";
 import { parseEmoji, isEmojiSupported } from "@core/emoji-utility";
 
 export default class EmojiBlot extends Embed {
+
+    static className = 'safeEmoji';
+    static blotName = 'emoji';
+    static tagName = 'span';
+
     static create(data) {
         const node = super.create();
         if (isEmojiSupported()) {
@@ -19,7 +24,3 @@ export default class EmojiBlot extends Embed {
         return getData(node, "data");
     }
 }
-
-EmojiBlot.className = 'safeEmoji';
-EmojiBlot.blotName = 'emoji';
-EmojiBlot.tagName = 'span';

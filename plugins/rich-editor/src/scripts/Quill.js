@@ -13,7 +13,8 @@ import Strike from 'quill/formats/strike';
 import EmojiBlot from "./blots/EmojiBlot.js";
 import ImageBlot from "./blots/ImageBlot.js";
 import EmbedErrorBlot from "./blots/EmbedErrorBlot.js";
-import SpoilerLineBlot, { SpoilerWrapperBlot, SpoilerContentBlot, SpoilerButtonBlot } from "./blots/SpoilerBlot.js";
+import SpoilerLineBlot, { SpoilerWrapperBlot, SpoilerContentBlot, BlockCursor } from "./blots/SpoilerBlot.js";
+import SpoilerButtonBlot from "./blots/SpoilerButtonBlot";
 import CodeBlockBlot from "./blots/CodeBlockBlot.js";
 import VideoBlot from "./blots/VideoBlot.js";
 import LinkEmbedBlot from "./blots/LinkEmbed.js";
@@ -22,10 +23,14 @@ import BlockquoteLineBlot, { BlockquoteWrapperBlot, BlockquoteContentBlot } from
 import CodeInlineBlot from "./formats/CodeInlineBlot.js";
 
 // Other
+import ScrollBlot from "./blots/ScrollBlot";
 import { IndentClass as Indent } from "quill/formats/indent";
 import QuillTheme from "./QuillTheme";
 
 Quill.register({
+    'blots/scroll': ScrollBlot,
+    'blots/block-cursor': BlockCursor,
+
     // Block formats
     'formats/blockquote/line': BlockquoteLineBlot,
     'formats/blockquote/content': BlockquoteContentBlot,

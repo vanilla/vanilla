@@ -1,5 +1,14 @@
+/**
+ * @author Adam (charrondev) Charron <adam.c@vanillaforums.com>
+ * @copyright 2009-2018 Vanilla Forums Inc.
+ * @license https://opensource.org/licenses/GPL-2.0 GPL-2.0
+ */
+
 import Block from "quill/blots/block";
 
+/**
+ * A Block Blot implementing class matching functionality and representation in the outputted delta.
+ */
 export default class ClassFormatBlot extends Block {
 
     static create() {

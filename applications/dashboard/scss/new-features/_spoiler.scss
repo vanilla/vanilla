@@ -43,14 +43,12 @@ $buttonSpoiler: (
     }
 
     .spoiler-content {
-        max-height: 0;
         display: none;
     }
 
     &.isShowingSpoiler {
         .spoiler-content {
             display: block;
-            max-height: 99999px;
         }
 
         .spoiler-chevronUp {
@@ -125,12 +123,6 @@ $buttonSpoiler: (
 
 .spoiler-warningBefore {
     margin-right: 6px;
-}
-
-.ql-cursor {
-    background: orange;
-    width: 4px;
-    height : 24px;
 }
 
 .spoiler-content {

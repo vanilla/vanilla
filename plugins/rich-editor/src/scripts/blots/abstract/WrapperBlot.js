@@ -60,8 +60,16 @@ export default class WrapperBlot extends Container {
     }
 }
 
+/**
+ * A Content blot is both a WrappedBlot and a WrapperBlot.
+ */
 const ContentBlot = wrappedBlot(WrapperBlot);
 
+/**
+ * A Line blot is responsible for recreating it's wrapping Blots.
+ *
+ * Always has a WrapperBlot around it.
+ */
 class TempLineBlot extends ClassFormatBlot {
 
     /**

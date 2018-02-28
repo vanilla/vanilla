@@ -201,8 +201,6 @@ export function wrappedBlot(BlotConstructor) {
          *
          * @param {string} name - The name of the replacement Blot.
          * @param {any} value - The value for the replacement Blot.
-         *
-         * @returns {Blot} - The blot to replace this one.
          */
         replaceWith(name, value) {
             const topLevelWrapper = this.getWrapperBlot();
@@ -214,21 +212,21 @@ export function wrappedBlot(BlotConstructor) {
             topLevelWrapper.remove();
         }
 
-        getWrapperBlot() {
-            let wrapper = this.parent;
-
-            if (wrapper.getWrapperBlot) {
-                wrapper = wrapper.getWrapperBlot();
-            }
-
-            return wrapper;
-        }
-
-        replaceWithIntoScroll(name, value, scrollReference) {
+        /**
+         * Replace this ContainerBlot with another one.
+         *
+         * Then attach that new Blot to the scroll in before the passed insertBefore Blot.
+         * This is needed because we a normal replaceWith doesn't work (cyclicly recreates it's parents).
+         *
+         * @param {string} name - The name of the Blot to replace this one with.
+         * @param {string} value - The initial value of the new blot.
+         * @param {Blot} insertBefore - The Blot to insert this blot before in the ScrollBlot.
+         */
+        replaceWithIntoScroll(name, value, insertBefore) {
             const newBlot = Parchment.create(name, value);
             this.moveChildren(newBlot);
 
-            newBlot.insertInto(this.scroll, scrollReference);
+            newBlot.insertInto(this.scroll, insertBefore);
         }
     };
 }

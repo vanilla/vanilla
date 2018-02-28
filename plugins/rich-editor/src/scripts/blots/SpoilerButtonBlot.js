@@ -46,14 +46,23 @@ export default class SpoilerButtonBlot extends BlockEmbed {
         return node;
     }
 
+    /**
+     * 0 Length so because it is not editable.
+     */
     length() {
         return 0;
     }
 
+    /**
+     * Don't allow quill to automatically delete this element. It must be removed manually.
+     */
     deleteAt() {
         return false;
     }
 
+    /**
+     * Only allow insertion into a SpoilerWrapperBlot.
+     */
     insertInto(parentBlot, refBlot) {
         if (parentBlot instanceof SpoilerWrapperBlot) {
             super.insertInto(parentBlot, refBlot);

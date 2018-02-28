@@ -74,7 +74,7 @@ export default class EditorEmojiMenu extends React.PureComponent {
         }
 
         Object.values(rowIndexesByGroupId).map((groupRow, groupKey) => {
-            if (targetRow >= groupRow) {
+            if (newRowIndex >= groupRow) {
                 selectedGroup = groupKey;
             }
         });

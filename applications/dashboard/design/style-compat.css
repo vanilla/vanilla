@@ -163,6 +163,11 @@ body.isMobile .change-picture .change-picture-instructions {
   width: 24px;
 }
 
+.richEditor-button.emojiGroup {
+  width: 24px;
+  height: 24px;
+}
+
 .richEditor-button.richEditorParagraphMenu-handle {
   background: transparent;
   transition: opacity 0.3s ease;
@@ -302,14 +307,14 @@ body.isMobile .change-picture .change-picture-instructions {
 }
 
 .insertPopover-header {
-  padding-top: 9px;
-  padding-bottom: 9px;
+  padding-top: 12px;
+  padding-bottom: 12px;
   padding-left: 12px;
   padding-right: 12px;
 }
 
 .insertPopover-footer {
-  padding-bottom: 9px;
+  padding-bottom: 12px;
   padding-left: 12px;
   padding-right: 12px;
 }
@@ -317,7 +322,7 @@ body.isMobile .change-picture .change-picture-instructions {
 .insertMedia-title {
   margin: 0;
   max-width: calc(100% - 39px);
-  min-height: 30px;
+  min-height: 27px;
 }
 
 .insertMedia-footer {
@@ -326,7 +331,7 @@ body.isMobile .change-picture .change-picture-instructions {
   justify-content: flex-end;
   padding-left: 12px;
   padding-right: 12px;
-  padding-bottom: 9px;
+  padding-bottom: 12px;
 }
 
 .insertMedia-help {
@@ -546,6 +551,42 @@ body.isMobile .change-picture .change-picture-instructions {
   width: 20px;
   height: 20px;
   vertical-align: -.232em;
+}
+
+.richEditor-button {
+  user-select: none;
+}
+
+.emojiGroups {
+  display: flex;
+  flex-wrap: nowrap;
+  justify-content: space-between;
+  padding-left: 3px;
+}
+
+.emojiGroup {
+  color: #737982;
+}
+
+.emojiGroup:hover {
+  color: #212327;
+}
+
+.emojiGroup.isSelected {
+  background-color: #aee4fe;
+}
+
+.emojiGroup + .emojiGroup {
+  margin-left: 10px;
+}
+
+.emojiGroup-icon {
+  display: block;
+  position: relative;
+  margin: 0;
+  padding: 0;
+  width: 24px;
+  size: 24px;
 }
 
 .followButton {
@@ -1088,10 +1129,11 @@ body.Categories.isMobile .PageControls.Top {
 
 .safeEmoji {
   display: inline;
+  font-family: "Segoe UI Emoji", sans-serif;
 }
 
 .nativeEmoji {
-  font-family: "Segoe UI Emoji";
+  font-family: "Segoe UI Emoji", sans-serif;
 }
 
 .fallBackEmoji {

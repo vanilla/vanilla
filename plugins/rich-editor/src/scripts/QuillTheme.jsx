@@ -142,7 +142,9 @@ export default class VanillaTheme extends Theme {
      * @returns {boolean} false to prevent default.
      */
     insertNewlineBeforeRange(range) {
-        let [line] = this.quill.getLine(range.index);
+        // eslint-disable-next-line
+        let [line, offset] = this.quill.getLine(range.index);
+        const isAtStartOfLine = offset === line.offset();
 
         if (line instanceof LineBlot) {
             line = line.getWrapperBlot();
@@ -150,7 +152,7 @@ export default class VanillaTheme extends Theme {
 
         const isFirstBlot = line.parent === line.scroll && line === line.parent.children.head;
 
-        if (isFirstBlot) {
+        if (isFirstBlot && isAtStartOfLine) {
             // const index = quill.
             const newContents = [
                 {
@@ -173,7 +175,12 @@ export default class VanillaTheme extends Theme {
      * @returns {boolean} false to prevent default.
      */
     insertNewlineAfterRange(range) {
-        let [line] = this.quill.getLine(range.index);
+        // eslint-disable-next-line
+        let [line, offset] = this.quill.getLine(range.index);
+        const length = line.length();
+
+        // Check that we are at the end of the line.
+        const isAtEndOfLine = offset + 1 === length;
 
         if (line instanceof LineBlot) {
             line = line.getWrapperBlot();
@@ -181,7 +188,7 @@ export default class VanillaTheme extends Theme {
 
         const isLastBlot = line.parent === line.scroll && line === line.parent.children.tail;
 
-        if (isLastBlot) {
+        if (isLastBlot && isAtEndOfLine) {
             // const index = quill.
             const newContents = [
                 ...this.quill.getContents()["ops"],
@@ -202,7 +209,6 @@ export default class VanillaTheme extends Theme {
     setupKeyboardArrowBlockEscapes() {
         const commonCriteria = {
             collapsed: true,
-            offset: 0, // Only apply if on the first character of a line.
             format: this.constructor.MULTI_LINE_BLOTS,
         };
 

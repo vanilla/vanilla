@@ -185,8 +185,8 @@ export default class VanillaTheme extends Theme {
         const deleteDelta = new Delta()
             .retain(positionUpToPreviousNewline - deleteAmount)
             .delete(deleteAmount);
-        this.quill.updateContents(deleteDelta);
-        this.quill.setSelection(positionUpToPreviousNewline - deleteAmount);
+        this.quill.updateContents(deleteDelta, Emitter.sources.USER);
+        this.quill.setSelection(positionUpToPreviousNewline - deleteAmount, Emitter.sources.USER);
     }
 
     /**

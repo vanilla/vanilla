@@ -120,12 +120,15 @@ export default class ParagraphEditorToolbar extends React.PureComponent {
      * @param {Sources} source - The source of the change.
      */
     handleEditorChange = (type, range, oldRange, source) => {
-        if (range && range.length === 0) {
+        if (typeof range.index !== "number") {
+            range = this.quill.getSelection();
+        }
+
+        if (range) {
             this.setState({
                 range,
             });
 
-            closeEditorFlyouts(this.constructor.name);
         }
 
         if (source !== Quill.sources.SILENT) {

@@ -72,14 +72,18 @@ export default class VanillaTheme extends Theme {
             handler: (range) => {
                 let [line] = this.quill.getLine(range.index);
 
-                const isOnlyChild = !line.prev && !line.next;
+                const isCodeBlock = line instanceof CodeBlockBlot;
+                const isOnlyChild = isCodeBlock || !line.prev && !line.next;
 
                 if (line instanceof LineBlot) {
                     line = line.getContentBlot();
                 }
 
                 // Check if this is the first line in the SpoilerContentBlot.
-                const isLineEmpty = line.children.length === 1 && line.domNode.textContent === "";
+                const isLineEmpty = isCodeBlock || (
+                        line.children.length === 1
+                        && line.domNode.textContent === ""
+                    );
 
                 if (isLineEmpty && isOnlyChild) {
                     const delta = new Delta()
@@ -114,7 +118,7 @@ export default class VanillaTheme extends Theme {
                     const positionUpToPreviousNewline = range.index + line.length() - offset;
                     const delta = new Delta()
                         .retain(positionUpToPreviousNewline)
-                        .insert("\n", { 'spoiler-line': false, 'blockquote-line': false });
+                        .insert("\n", { 'spoiler-line': false, 'blockquote-line': false, 'code-block': false });
                     this.quill.updateContents(delta, Emitter.sources.USER);
 
                     // Now we need to clean up that extra newline.

@@ -50,7 +50,7 @@ export default class SpoilerButtonBlot extends BlockEmbed {
      * 0 Length so because it is not editable.
      */
     length() {
-        return 0;
+        return 1;
     }
 
     /**

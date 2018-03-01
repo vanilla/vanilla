@@ -81,6 +81,7 @@ $buttonSpoiler: (
     outline: 0;
     cursor: pointer;
     text-align: center;
+    opacity: 1;
 }
 
 .spoiler-warningMain {
@@ -91,9 +92,6 @@ $buttonSpoiler: (
     padding: 0 $spoiler-icon_size;
     width: 100%;
     line-height: 1;
-
-    //top: .1em;
-    //padding-left: #{$spoiler-icon_size + 6px};
 }
 
 .spoiler-icon {
@@ -131,4 +129,5 @@ $buttonSpoiler: (
 
 .spoiler-buttonContainer {
     white-space: normal;
+    user-select: none;
 }

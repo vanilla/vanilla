@@ -766,6 +766,7 @@ body.Categories.isMobile .PageControls.Top {
   outline: 0;
   cursor: pointer;
   text-align: center;
+  opacity: 1;
 }
 
 .button-spoiler {
@@ -830,6 +831,7 @@ body.Categories.isMobile .PageControls.Top {
 
 .spoiler-buttonContainer {
   white-space: normal;
+  user-select: none;
 }
 
 .embed {

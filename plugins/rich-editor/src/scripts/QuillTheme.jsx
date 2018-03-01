@@ -24,6 +24,8 @@ export default class VanillaTheme extends Theme {
 
     static MULTI_LINE_BLOTS = ['spoiler-line', 'blockquote-line', 'code-block'];
 
+    static CLEAR_MULTI_LINE_BLOTS = { 'spoiler-line': false, 'blockquote-line': false, 'code-block': false };
+
     /** @var {Quill} */
     quill;
 
@@ -64,36 +66,100 @@ export default class VanillaTheme extends Theme {
         this.options.modules.keyboard.bindings.tab = false;
     }
 
+    clearEmptyBlot(range) {
+        let [line] = this.quill.getLine(range.index);
+
+        const isCodeBlock = line instanceof CodeBlockBlot;
+        const isOnlyChild = !line.prev && !line.next;
+
+        if (!isOnlyChild && !isCodeBlock) {
+            return true;
+        }
+
+        if (line instanceof LineBlot) {
+            line = line.getContentBlot();
+        }
+
+        // Check if this is the first line a ContentBlot or is a CodeBlot.
+        const { textContent } = line.domNode;
+        const isLineEmpty = line.children.length === 1 && (textContent === "" || textContent === "\n") ;
+
+        if (!isLineEmpty && !isCodeBlock) {
+            return true;
+        }
+
+        const delta = new Delta()
+            .retain(range.index)
+            .delete(1);
+        this.quill.updateContents(delta, Emitter.sources.USER);
+        return false;
+    }
+
+    clearFirstBlotWithContents(range) {
+        let [line] = this.quill.getLine(range.index);
+
+        const { textContent } = line.domNode;
+        const isLineEmpty = line.children.length === 1 && (textContent === "" || textContent === "\n") ;
+        if (isLineEmpty) {
+            return true;
+        }
+
+        let isFirstInBlot = true;
+
+        if (line instanceof LineBlot) {
+            line = line.getWrapperBlot();
+            isFirstInBlot = line === line.parent.children.head;
+        }
+
+        if (!isFirstInBlot) {
+            return true;
+        }
+
+        const isFirstInScroll = line === this.quill.scroll.children.head;
+        if (!isFirstInScroll) {
+            return true;
+        }
+
+        const delta = new Delta()
+            .retain(line.length(), { 'spoiler-line': false, 'blockquote-line': false, 'code-block': false });
+        this.quill.updateContents(delta, Emitter.sources.USER);
+
+        // Return false to prevent default behaviour.
+        return false;
+    }
+
+    clearFirstPositionMultiLineBlot = (range) => {
+        const [line] = this.quill.getLine(range.index);
+
+        if (line instanceof LineBlot || line instanceof CodeBlockBlot) {
+            this.clearFirstBlotWithContents(range);
+            this.quill.setSelection(range);
+        }
+
+        return true;
+    };
+
     setupBlockDeleteHandler() {
+
+        this.options.modules.keyboard.bindings["Clear Blot in First Position Selection"] = {
+            key: Keyboard.keys.BACKSPACE,
+            collapsed: false,
+            handler: this.clearFirstPositionMultiLineBlot,
+        };
+
+        this.options.modules.keyboard.bindings["Block Escape Delete"] = {
+            key: Keyboard.keys.BACKSPACE,
+            offset: 0,
+            collapsed: true,
+            format: this.constructor.MULTI_LINE_BLOTS,
+            handler: this.clearFirstBlotWithContents,
+        };
+
         this.options.modules.keyboard.bindings["Block Escape Backspace"] = {
             key: Keyboard.keys.BACKSPACE,
             collapsed: true,
             format: this.constructor.MULTI_LINE_BLOTS,
-            handler: (range) => {
-                let [line] = this.quill.getLine(range.index);
-
-                const isCodeBlock = line instanceof CodeBlockBlot;
-                const isOnlyChild = isCodeBlock || !line.prev && !line.next;
-
-                if (line instanceof LineBlot) {
-                    line = line.getContentBlot();
-                }
-
-                // Check if this is the first line in the SpoilerContentBlot.
-                const isLineEmpty = isCodeBlock || (
-                        line.children.length === 1
-                        && line.domNode.textContent === ""
-                    );
-
-                if (isLineEmpty && isOnlyChild) {
-                    const delta = new Delta()
-                        .retain(range.index)
-                        .delete(1);
-                    this.quill.updateContents(delta, Emitter.sources.USER);
-                }
-
-                return true;
-            },
+            handler: this.clearEmptyBlot,
         };
     }
 

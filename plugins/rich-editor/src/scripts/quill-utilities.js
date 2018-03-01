@@ -185,8 +185,6 @@ export function wrappedBlot(BlotConstructor) {
         /**
          * Delete this blot it has no children. Wrap it if it doesn't have it's proper parent name.
          *
-         * Because optimize is not allowed to change the length or value of the document, the default child must have a length of 0 in it's default state.
-         *
          * @param {Object} context - A shared context that is passed through all updated Blots.
          */
         optimize(context) {

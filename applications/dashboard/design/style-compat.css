@@ -560,6 +560,8 @@ body.isMobile .change-picture .change-picture-instructions {
 .emojiGroups {
   display: flex;
   flex-wrap: nowrap;
+  justify-content: space-between;
+  padding-left: 3px;
 }
 
 .emojiGroup {

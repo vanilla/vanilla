@@ -12,7 +12,7 @@ import Emitter from "quill/core/emitter";
 import WrapperBlot, { LineBlot } from "./blots/abstract/WrapperBlot";
 import CodeBlockBlot from "./blots/CodeBlockBlot";
 import { closeEditorFlyouts } from "./quill-utilities";
-
+import Parchment from "parchment";
 // React
 import React from "react";
 import ReactDOM from "react-dom";
@@ -64,6 +64,11 @@ export default class VanillaTheme extends Theme {
     setupTabBehaviour() {
         // Nullify the tab key.
         this.options.modules.keyboard.bindings.tab = false;
+        this.options.modules.keyboard.bindings["indent code-block"] = false;
+        this.options.modules.keyboard.bindings["outdent code-block"] = false;
+        this.options.modules.keyboard.bindings["remove tab"] = false;
+        this.options.modules.keyboard.bindings["code exit"] = false;
+
     }
 
     clearEmptyBlot(range) {
@@ -163,41 +168,77 @@ export default class VanillaTheme extends Theme {
         };
     }
 
+    insertNewLineAfterBlotAndTrim(range, deleteAmount = 1) {
+        const [line, offset] = this.quill.getLine(range.index);
+
+        const newBlot = Parchment.create("block", "");
+        let thisBlot = line;
+        if (line instanceof LineBlot) {
+            thisBlot = line.getWrapperBlot();
+        }
+
+        const nextBlot = thisBlot.next;
+        newBlot.insertInto(this.quill.scroll, nextBlot);
+
+        // Now we need to clean up that extra newline.
+        const positionUpToPreviousNewline = range.index + line.length() - offset;
+        const deleteDelta = new Delta()
+            .retain(positionUpToPreviousNewline - deleteAmount)
+            .delete(deleteAmount);
+        this.quill.updateContents(deleteDelta);
+        this.quill.setSelection(positionUpToPreviousNewline - deleteAmount);
+    }
+
     /**
      * Add keyboard bindings that allow the user to
      * @private
      */
     setupNewlineBlockEscapes() {
-        this.options.modules.keyboard.bindings["Block Escape Enter"] = {
+        this.options.modules.keyboard.bindings["MutliLine Escape Enter"] = {
             key: Keyboard.keys.ENTER,
             collapsed: true,
-            format: this.constructor.MULTI_LINE_BLOTS,
+            format: ["spoiler-line", "blockquote-line"],
             handler: (range) => {
-                const [line, offset] = this.quill.getLine(range.index);
-                const isWrapped = line.parent instanceof WrapperBlot;
-                const isNewLine = line.domNode.textContent === "";
-                const isPreviousNewline = line.prev && line.prev.domNode.textContent === "";
-                const isOnlyNewLine = isNewLine && line.parent.children.length === 1;
-                const passesCodeBlockCriteria = !(line instanceof CodeBlockBlot) || isPreviousNewline;
+                const [line] = this.quill.getLine(range.index);
 
-                if (isWrapped && isNewLine && !isOnlyNewLine && passesCodeBlockCriteria) {
-                    const positionUpToPreviousNewline = range.index + line.length() - offset;
-                    const delta = new Delta()
-                        .retain(positionUpToPreviousNewline)
-                        .insert("\n", { 'spoiler-line': false, 'blockquote-line': false, 'code-block': false });
-                    this.quill.updateContents(delta, Emitter.sources.USER);
-
-                    // Now we need to clean up that extra newline.
-                    const deleteDelta = new Delta()
-                        .retain(positionUpToPreviousNewline - 1)
-                        .delete(1);
-                    this.quill.updateContents(deleteDelta);
-                    this.quill.setSelection(positionUpToPreviousNewline - 1);
-
-                    return false;
-                } else {
+                const contentBlot = line.getContentBlot();
+                if (line !== contentBlot.children.tail) {
                     return true;
                 }
+
+                const { textContent } = line.domNode;
+                const currentLineIsEmpty = textContent === "";
+                if (!currentLineIsEmpty) {
+                    return true;
+                }
+
+                const previousLine = line.prev;
+                if (!previousLine) {
+                    return true;
+                }
+
+                this.insertNewLineAfterBlotAndTrim(range);
+
+                return false;
+            },
+        };
+
+        this.options.modules.keyboard.bindings["CodeBlock Escape Enter"] = {
+            key: Keyboard.keys.ENTER,
+            collapsed: true,
+            format: ["code-block"],
+            handler: (range) => {
+                const [line] = this.quill.getLine(range.index);
+
+                const { textContent } = line.domNode;
+                const currentLineIsEmpty = /\n\n\n$/.test(textContent);
+                if (!currentLineIsEmpty) {
+                    return true;
+                }
+
+                this.insertNewLineAfterBlotAndTrim(range, 2);
+
+                return false;
             },
         };
 

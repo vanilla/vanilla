@@ -836,6 +836,13 @@
           _this.choose(e);
           return e.preventDefault();
         });
+
+        // Clear the menu when anything is touched or clicked. The touchend is here for mobile safari handling.
+        $("body").on("click touchend", function() {
+            _this.context.clear_range();
+          _this.hide();
+        });
+
         return this.$el.on('mouseenter.atwho-view', 'ul', function(e) {
           return _this.context.mark_range();
         }).on('mouseleave.atwho-view', 'ul', function(e) {

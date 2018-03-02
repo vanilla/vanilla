@@ -135,23 +135,29 @@ class UsersApiController extends AbstractApiController {
      * Get a single user.
      *
      * @param int $id The ID of the user.
+     * @param array $query The request query.
      * @throws NotFoundException if the user could not be found.
      * @return array
      */
-    public function get($id) {
+    public function get($id, array $query) {
         $this->permission([
             'Garden.Users.Add',
             'Garden.Users.Edit',
             'Garden.Users.Delete'
         ]);
 
-        $in = $this->idParamSchema()->setDescription('Get a user.');
+        $this->idParamSchema();
+        $in = $this->schema([], ['UserGet', 'in'])->setDescription('Get a user.');
         $out = $this->schema($this->userSchema(), 'out');
 
+        $query = $in->validate($query);
         $row = $this->userByID($id);
         $row = $this->normalizeOutput($row);
 
         $result = $out->validate($row);
+
+        // Allow addons to modify the result.
+        $result = $this->getEventManager()->fireFilter('usersApiController_getOutput', $result, $this, $in, $query, $row);
         return $result;
     }
 
@@ -301,7 +307,7 @@ class UsersApiController extends AbstractApiController {
                 'minimum' => 1,
                 'maximum' => 100,
             ]
-        ], 'in')->setDescription('List users.');
+        ], ['UserIndex', 'in'])->setDescription('List users.');
         $out = $this->schema([':a' => $this->userSchema()], 'out');
 
         $query = $in->validate($query);
@@ -332,6 +338,8 @@ class UsersApiController extends AbstractApiController {
             $paging = ApiUtils::morePagerInfo($result, '/api/v2/users', $query, $in);
         }
 
+        // Allow addons to modify the result.
+        $result = $this->getEventManager()->fireFilter('usersApiController_indexOutput', $result, $this, $in, $query, $rows);
         return new Data($result, ['paging' => $paging]);
 
     }

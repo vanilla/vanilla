@@ -390,7 +390,26 @@ class VanillaSettingsController extends Gdn_Controller {
                 $this->setData('Category', $Category);
 
                 if ($this->deliveryType() == DELIVERY_TYPE_ALL) {
-                    redirectTo('vanilla/settings/categories');
+                    $redirect = 'vanilla/settings/categories';
+
+                    if (!empty($parent)) {
+                        $parentCategory = CategoryModel::categories($parent);
+                        $visitedCategoryIDs = [];
+                        do {
+                            // Check against cycling dependency which would make make an infinite loop.
+                            if (in_array($parentCategory['CategoryID'], $visitedCategoryIDs)) {
+                                break;
+                            }
+                            $visitedCategoryIDs[] = $parentCategory['CategoryID'];
+
+                            if (in_array($parentCategory['DisplayAs'], ['Categories', 'Flat'])) {
+                                $redirect = 'vanilla/settings/categories?parent='.$parentCategory['UrlCode'];
+                                break;
+                            }
+                        } while ($parentCategory = CategoryModel::categories($parentCategory['ParentCategoryID']));
+                    }
+
+                    redirectTo($redirect);
                 } elseif ($this->deliveryType() === DELIVERY_TYPE_DATA && method_exists($this, 'getCategory')) {
                     $this->Data = [];
                     $this->getCategory($CategoryID);

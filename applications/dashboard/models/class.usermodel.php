@@ -2341,6 +2341,7 @@ class UserModel extends Gdn_Model {
                     $this->sendEmailConfirmationEmail($user, true);
                 }
 
+                $this->clearCache($userID, ['user']);
                 $this->EventArguments['UserID'] = $userID;
                 $this->fireEvent('AfterSave');
             } else {
@@ -2348,11 +2349,6 @@ class UserModel extends Gdn_Model {
             }
         } else {
             $userID = false;
-        }
-
-        // Clear cached user data
-        if (!$insert && $userID) {
-            $this->clearCache($userID, ['user']);
         }
 
         return $userID;

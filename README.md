@@ -48,14 +48,14 @@ If you professionally run a large community or enterprise forum, our cloud solut
 
 We strongly recommend:
 
-*  **PHP 7.0** or higher.
+*  **PHP 7.1** or higher.
 *  MySQL 5.6 or higher (or Percona/MariaDB equivalent).
 
-If your server is not running PHP 7.0 or higher, **you should address this soon**. While PHP 5.6 will receive security patches thru 2018, Vanilla may end support for it prior to that.
+If your server is not running PHP 7.1 or higher, **you should address this soon**. While PHP 7.0 will receive security patches until December 2018, Vanilla may end support for it prior to that.
 
 Our _minimum_ requirements are now:
 
-* PHP 5.6 or newer.
+* PHP 7.0 or newer.
 * PHP extensions mbstring (`--enable-mbstring`), cURL (`--with-curl`), and PDO (on by default).
 * To [import into Vanilla](#migrating-to-vanilla) you need MySQLi (`--with-mysqli`).
 * To use our social plugins you need [OpenSSL](http://php.net/manual/en/openssl.installation.php).

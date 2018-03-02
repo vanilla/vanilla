@@ -9,10 +9,10 @@
 **/node_modules/**
 **/npm-shrinkwrap.json
 **/package.json
-**/*.dist
 **/*.scss
 **/*.map
 **/.yo-rc.json
+*/**/*.dist
 */**/*.md
 */**/*.txt
 */**/.travis.yml

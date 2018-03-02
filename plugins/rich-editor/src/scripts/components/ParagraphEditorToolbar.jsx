@@ -125,10 +125,11 @@ export default class ParagraphEditorToolbar extends React.PureComponent {
                 range = this.quill.getSelection();
             }
 
-            this.setState({
-                range,
-            });
-
+            if (range != null) {
+                this.setState({
+                    range,
+                });
+            }
         }
 
         if (source !== Quill.sources.SILENT) {

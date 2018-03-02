@@ -235,6 +235,11 @@ class Dispatcher {
             $result = new Data($raw);
         } elseif ($raw instanceof \Exception || $raw instanceof \Error) {
 
+            // Let's not mask errors when in debug mode!
+            if ($raw instanceof \Error && debug())  {
+                throw $raw;
+            }
+
             // Make sure that there's a "proper" conversion from non-HTTP to HTTP exceptions since
             // errors in the 2xx ranges are treated as success.
             // ValidationException status code are compatible with HTTP codes.

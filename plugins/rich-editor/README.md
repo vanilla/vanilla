@@ -1,6 +1,6 @@
 # Rich Editor (WIP)
 
-A highly-functional WYSIWYG editor for Vanilla built on top of [contenteditable](https://developer.mozilla.org/en-US/docs/Web/Guide/HTML/Editable_content) using [Quill.js](https://quilljs.com/) and [React](https://reactjs.org/).
+A highly-functional WYSIWYG editor for Vanilla built on top of [contenteditable](https://developer.mozilla.org/en-US/docs/Web/Guide/HTML/Editable_content) using [Quill.js](https://quilljs.com/), [Quill's document model parchment](https://github.com/quilljs/parchment) and [React](https://reactjs.org/).
 
 This plugin conflicts with and aims to replace some existing plugins.
 
@@ -76,7 +76,7 @@ Every Blot has reference to:
 
 ### Existing Blots
 
-Existing Blots will generally be imported from Quill, but could also be imported from Parchment or the rich editor. The most common Blots to extend `Block`, `Inline`, `Embed`, `BlockEmbed`, and `Container`. Some custom Blots provided are `WrapperBlot`, `ContentBlot`, and `LineBlot`,
+Existing Blots will generally be imported from Quill, but could also be imported from Parchment or the rich editor. The most common Blots to extend are `Block`, `Inline`, `Embed`, `BlockEmbed`, and `Container`. Some custom Blots provided are `WrapperBlot`, `ContentBlot`, and `LineBlot`,
 
 **Block**
 

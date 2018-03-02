@@ -1,6 +1,6 @@
 # Rich Editor (WIP)
 
-A highly-functional WYSIWYG editor for Vanilla built on top of [contenteditable](https://developer.mozilla.org/en-US/docs/Web/Guide/HTML/Editable_content) using [Quill.js](https://quilljs.com/), [Quill's document model parchment](https://github.com/quilljs/parchment) and [React](https://reactjs.org/).
+A highly-functional Rich Text editor for Vanilla built on top of [contenteditable](https://developer.mozilla.org/en-US/docs/Web/Guide/HTML/Editable_content) using [Quill.js](https://quilljs.com/), [Quill's document model parchment](https://github.com/quilljs/parchment) and [React](https://reactjs.org/).
 
 This plugin conflicts with and aims to replace some existing plugins.
 
@@ -9,7 +9,7 @@ This plugin conflicts with and aims to replace some existing plugins.
 
 ## Core features
 
-- Consistent WYSIWYG experience.
+- Rich editing experience (similar to Medium editor).
 - Rich text embeds of external and internal content.
 - Improved video and image embedding.
 - Intuitive minimal design.
@@ -17,8 +17,6 @@ This plugin conflicts with and aims to replace some existing plugins.
 - Consistent serialized format that can be easily parsed on the server and client (JSON).
 - Convert all existing Advanced Editor formats (HTML/Wysiwyg, Markdown, BBCode, Text, TextEx).
 - Extendable to support future embeddable objects.
-
-## Formatting Options
 
 ## Formatting
 

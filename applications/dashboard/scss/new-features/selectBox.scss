@@ -56,8 +56,8 @@ $selectBox-toggle_fontSize: 13px !default;
 
 .selectBox-toggle {
   position: relative;
-  display: block;
-  vertical-align: middle;
+  display: inline-block;
+  vertical-align: inherit;
   cursor: pointer;
   user-select: none;
   outline: none;
@@ -130,4 +130,9 @@ body.Categories.isMobile .PageControls.Top {
     hr { // We keep the <hr/> for accessibility
         @include sr-only();
     }
+}
+
+
+.selectBox-discussionsSortFilter {
+  margin-top: .4em;
 }

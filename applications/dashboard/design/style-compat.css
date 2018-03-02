@@ -89,8 +89,8 @@ body.isMobile .change-picture .change-picture-instructions {
 
 .selectBox-toggle {
   position: relative;
-  display: block;
-  vertical-align: middle;
+  display: inline-block;
+  vertical-align: inherit;
   cursor: pointer;
   user-select: none;
   outline: none;
@@ -166,6 +166,10 @@ body.Categories.isMobile .PageControls.Top {
   overflow: hidden;
   clip: rect(0, 0, 0, 0);
   border: 0;
+}
+
+.selectBox-discussionsSortFilter {
+  margin-top: .4em;
 }
 
 .sr-only {

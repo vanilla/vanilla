@@ -1,12 +1,14 @@
 $menu-separator_height: 1px;
-$menu-separator_margin: $baseUnit;
+$menu-separator_margin: 6px !default;
 $menu-separator_style: solid;
 $menu-separator_color: #dddee0 !default;
+$selectBox-toggle_lineHeight: 13px !default;
+$selectBox-toggle_fontSize: 13px !default;
 
 
 .PageControls {
   .selectBox {
-    margin-right: 10px;
+    margin-right: 15px;
     float: left;
   }
 }
@@ -28,12 +30,20 @@ $menu-separator_color: #dddee0 !default;
   margin-right: 5px;
 }
 
+.selectBox-label,
+.selectBox-main,
+.selectBox-toggle {
+    font-size: $selectBox-toggle_lineHeight;
+    line-height: $selectBox-toggle_lineHeight;
+    font-weight: normal;
+}
+
+
 .selectBox-main {
   display: inline-block;
   position: relative;
   cursor: pointer;
   user-select: none;
-  height: 100%;
 }
 
 .selectBox-content {
@@ -47,7 +57,6 @@ $menu-separator_color: #dddee0 !default;
 .selectBox-toggle {
   position: relative;
   display: block;
-  line-height: 1;
   vertical-align: middle;
   cursor: pointer;
   user-select: none;
@@ -119,6 +128,6 @@ body.Categories.isMobile .PageControls.Top {
     border-bottom: $menu-separator_height $menu-separator_style $menu-separator_color;
     margin: $menu-separator_margin 0;
     hr { // We keep the <hr/> for accessibility
-        @include srcOnly();
+        @include sr-only();
     }
 }

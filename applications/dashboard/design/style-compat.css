@@ -1,3 +1,14 @@
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  border: 0;
+}
+
 /** Hides the image cropper on mobile themes. This image cropper is not mobile compatible. */
 body.isMobile .box-crop .box-source {
   display: none;
@@ -35,7 +46,7 @@ body.isMobile .change-picture .change-picture-instructions {
 }
 
 .PageControls .selectBox {
-  margin-right: 10px;
+  margin-right: 15px;
   float: left;
 }
 
@@ -55,12 +66,19 @@ body.isMobile .change-picture .change-picture-instructions {
   margin-right: 5px;
 }
 
+.selectBox-label,
+.selectBox-main,
+.selectBox-toggle {
+  font-size: 13px;
+  line-height: 13px;
+  font-weight: normal;
+}
+
 .selectBox-main {
   display: inline-block;
   position: relative;
   cursor: pointer;
   user-select: none;
-  height: 100%;
 }
 
 .selectBox-content {
@@ -72,7 +90,6 @@ body.isMobile .change-picture .change-picture-instructions {
 .selectBox-toggle {
   position: relative;
   display: block;
-  line-height: 1;
   vertical-align: middle;
   cursor: pointer;
   user-select: none;
@@ -132,6 +149,23 @@ body.isMobile .change-picture .change-picture-instructions {
 
 body.Categories.isMobile .PageControls.Top {
   display: block;
+}
+
+.menu-separator {
+  background: none;
+  border-bottom: 1px solid #dddee0;
+  margin: 6px 0;
+}
+
+.menu-separator hr {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  border: 0;
 }
 
 .sr-only {

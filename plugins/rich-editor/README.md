@@ -24,13 +24,20 @@ This plugin conflicts with and aims to replace some existing plugins.
 
 There are two main types of formatting: inline and block. Inline formatting applies to text within a paragraph while block formatting applies to entire paragraphs.
 
+The MODIFIER-KEY varies by platform.
+
+**MacOS** - CMD (⌘)
+**Windows** - CTRL
+**LINUX** - CTRL
+
+
 | Format    | Type      | Applied With      | Notes
 | ------    | ----      | ------------      | -----
-| Bold      | Inline    | Button, cmd-b     |
-| Italic    | Inline    | Button, cmd-i     |    
+| Bold      | Inline    | Button, MODIFIER-KEY- + b     |
+| Italic    | Inline    | Button, MODIFIER-KEY- + i     |    
 | Code      | Inline    | Button            | Code has both inline and block versions.
 | Strike    | Inline    | Button            |
-| Link      | Inline    | Button, cmd-k     |
+| Link      | Inline    | Button, MODIFIER-KEY- + k     |
 | H1, H2    | Block     | Button            | Two levels of heading are supported.
 | Bullets   | Block     | Auto              | A bulleted list automatically starts when you start a paragraph with "-" or "*"
 | Numbers   | Block     | Auto              | A numbered list automatically starts when you start a paragraph with "1." or any number plus a ".".

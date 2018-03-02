@@ -1,5 +1,5 @@
 {
-    "name": "Rich Editor",
+    "name": "Rich Editor (WIP)",
     "description": "The new WYSIWYG editor for Vanilla. Easy to use, with support for rich content embedding. Also supports a more minimal text mode, Markdown, and BBCode.",
     "version": "0.1",
     "mobileFriendly": true,

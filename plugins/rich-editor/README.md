@@ -53,7 +53,7 @@ There are two main types of formatting: inline and block. Inline formatting appl
 
 This plugin is primarily javascript based. The main entrypoint for the application is [src/scripts/app/rich-editor.js](./src/scripts/app/rich-editor.js)
 
-The [`RichEditor` class](./src/scripts/RichEditor.js) is responsible for a single editor instance. It uses our extended [`Quill` class](./src/scripts/Quill.js) to which loads all of our custom Blots from [/blots](./src/scripts/blots) and [/formats](.src/scripts/formats).
+The [`RichEditor` class](./src/scripts/RichEditor.js) is responsible for a single editor instance. It uses our extended [`Quill` class](./src/scripts/Quill.js) which loads all of our custom Blots from [/blots](./src/scripts/blots) and [/formats](.src/scripts/formats).
 
 A custom [Quill theme](./src/scripts/QuillTheme.jsx) is responsible for mounting the various React components that make up the editor's UI. These components can be found in [/components](./src/scripts/components) and primarily consist of
 
@@ -64,7 +64,9 @@ A custom [Quill theme](./src/scripts/QuillTheme.jsx) is responsible for mounting
 
 ### What is a Blot?
 
-A Blot is javascript class used as part of Quill's (and it's underlying library Parchment's) in memory document format. Quill uses LinkedLists for it's data structure. Every Blot has reference to:
+A Blot is javascript class used as part of Quill's (and its underlying library Parchment's) in memory document format. Quill uses LinkedLists for its in-memory data structure. This is different from Quill's persistent [Delta JSON format](https://quilljs.com/guides/designing-the-delta-format/).
+
+Every Blot has reference to:
 
 - Its parent `.parent`
 - Its children `.children`
@@ -78,15 +80,15 @@ Existing Blots will generally be imported from Quill, but could also be imported
 
 **Block**
 
-Equivalent to a paragraph. A line break signifies the end of a Block unless `white-space: pre` is set, in which case line breaks will be preserved. This is already handled in the `CodeBlockBlot`.
+Equivalent to a paragraph. A line break signifies the end of a Block unless `white-space: pre` is set, in which case line breaks will be preserved. This is handled in the `CodeBlockBlot`.
 
 **Inline**
 
-Represents and Inline text containing element. See [quill/formats](https://github.com/quilljs/quill/tree/master/formats) for examples of these. Bold, Italic, and Strike through blots are examples of these.
+Represents an text containing element. See [quill/formats](https://github.com/quilljs/quill/tree/master/formats) for examples of these (Bold, Italic, Strike).
 
 **BlockEmbed** and **Embed**
 
-Represents an element which is __not__ contenteditable. Quill by default has no control or knowledge of the contents of these Blots. Embeds have a length of 1 and get deleted all at once unless special handling is introduced. Embeds can store arbitrary data in their `insert` by implementing the `static value()` function.
+Represents an element which is __not__ contenteditable. Quill by default has no control or knowledge of the contents of these Blots. Embeds have a length of 1 and get deleted all at once unless special handling is introduced. Embeds can store arbitrary data in their delta/persistent data-structure by implementing the `static value()` function.
  
 The BlockEmbed behaves like a Block element and generally cannot have siblings within its container and it's top level DOM element __must__ have `display: block`. Look at the LinkEmbedBlot or the ImageBlot for an example.
 

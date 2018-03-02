@@ -1,24 +1,25 @@
-import ContentBlockBlot from "./ContentBlockBlot";
-import { makeWrapperBlot } from "../quill-utilities";
+/**
+ * @author Adam (charrondev) Charron <adam.c@vanillaforums.com>
+ * @copyright 2009-2018 Vanilla Forums Inc.
+ * @license https://opensource.org/licenses/GPL-2.0 GPL-2.0
+ */
 
-export class BlockquoteContentBlot extends ContentBlockBlot {
+import WrapperBlot, { ContentBlot, LineBlot } from "./abstract/WrapperBlot";
 
-    static blotName = "blockquote-content";
-    static className = "blockquote-content";
-    static tagName = 'div';
-
-    static create() {
-        const domNode = super.create();
-        domNode.classList.add('blockquote-content');
-        domNode.classList.add('blockquote-main');
-        return domNode;
-    }
+export default class BlockquoteLineBlot extends LineBlot {
+    static blotName = "blockquote-line";
+    static className = "blockquote-line";
+    static tagName = 'p';
+    static parentName = "blockquote-content";
 }
 
-const BlockquoteBlot = makeWrapperBlot(BlockquoteContentBlot);
+export class BlockquoteContentBlot extends ContentBlot {
+    static className = 'blockquote-content';
+    static blotName = 'blockquote-content';
+    static parentName = 'blockquote';
+}
 
-BlockquoteBlot.blotName = "blockquote";
-BlockquoteBlot.tagName = "blockquote";
-BlockquoteBlot.className = "blockquote";
-
-export default BlockquoteBlot;
+export class BlockquoteWrapperBlot extends WrapperBlot {
+    static className = 'blockquote';
+    static blotName = 'blockquote';
+}

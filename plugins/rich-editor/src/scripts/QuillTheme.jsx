@@ -4,15 +4,21 @@
  * @license https://opensource.org/licenses/GPL-2.0 GPL-2.0
  */
 
+// Quill
+import Theme from "quill/core/theme";
+import { closeEditorFlyouts } from "./quill-utilities";
+import KeyboardBindings from "./KeyboardBindings";
+// React
 import React from "react";
 import ReactDOM from "react-dom";
-import Theme from "quill/core/theme";
 import InlineEditorToolbar from "./components/InlineEditorToolbar";
 import ParagraphEditorToolbar from "./components/ParagraphEditorToolbar";
 import EditorEmojiPicker from "./components/EditorEmojiPicker";
-import { closeEditorFlyouts } from "./quill-utilities";
 
 export default class VanillaTheme extends Theme {
+
+    /** @var {Quill} */
+    quill;
 
     /**
      * Constructor.
@@ -30,18 +36,18 @@ export default class VanillaTheme extends Theme {
         this.quill.root.classList.add("richEditor-text");
         this.quill.root.classList.add("userContent");
         this.quill.root.addEventListener("focusin", closeEditorFlyouts);
-        this.setupTabBehaviour();
+
+        // Add keyboard bindings to options.
+        const keyboardBindings = new KeyboardBindings(this.quill);
+        this.options.modules.keyboard.bindings = {
+            ...this.options.modules.keyboard.bindings,
+            ...keyboardBindings.bindings,
+        };
+
+        // Mount react components
         this.mountToolbar();
         this.mountEmojiMenu();
         this.mountParagraphMenu();
-    }
-
-    /**
-     * Nullify the tab key.
-     */
-    setupTabBehaviour() {
-        // Nullify the tab key.
-        this.options.modules.keyboard.bindings.tab = false;
     }
 
     /**

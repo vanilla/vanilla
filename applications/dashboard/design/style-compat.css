@@ -728,6 +728,10 @@ body.Categories.isMobile .PageControls.Top {
   display: none;
 }
 
+.spoiler .spoiler-content {
+  display: none;
+}
+
 .spoiler.isShowingSpoiler .spoiler-content {
   display: block;
 }
@@ -762,6 +766,7 @@ body.Categories.isMobile .PageControls.Top {
   outline: 0;
   cursor: pointer;
   text-align: center;
+  opacity: 1;
 }
 
 .button-spoiler {
@@ -772,16 +777,14 @@ body.Categories.isMobile .PageControls.Top {
   text-align: left;
 }
 
-.button-spoiler:not([disalbed]):hover {
+.button-spoiler:not([disabled]):hover {
   color: #f52c6e;
   background-color: transparent;
-  z-index: 2;
 }
 
-.button-spoiler:not([disalbed]):active {
+.button-spoiler:not([disabled]):active {
   color: #f52c6e;
   background-color: transparent;
-  z-index: 1;
 }
 
 .spoiler-warningMain {
@@ -824,6 +827,11 @@ body.Categories.isMobile .PageControls.Top {
 
 .spoiler-content {
   padding: 0 18px 18px 18px;
+}
+
+.spoiler-buttonContainer {
+  white-space: normal;
+  user-select: none;
 }
 
 .embed {

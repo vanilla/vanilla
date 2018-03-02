@@ -51,7 +51,7 @@ export default class ParagraphEditorToolbar extends React.PureComponent {
             active: false,
         },
         blockquote: {
-            formatName: "blockquote",
+            formatName: "blockquote-line",
             active: false,
         },
         codeBlock: {
@@ -59,7 +59,7 @@ export default class ParagraphEditorToolbar extends React.PureComponent {
             active: false,
         },
         spoiler: {
-
+            formatName: "spoiler-line",
             active: false,
         },
     };
@@ -120,12 +120,16 @@ export default class ParagraphEditorToolbar extends React.PureComponent {
      * @param {Sources} source - The source of the change.
      */
     handleEditorChange = (type, range, oldRange, source) => {
-        if (range && range.length === 0) {
-            this.setState({
-                range,
-            });
+        if (range) {
+            if (typeof range.index !== "number") {
+                range = this.quill.getSelection();
+            }
 
-            closeEditorFlyouts(this.constructor.name);
+            if (range != null) {
+                this.setState({
+                    range,
+                });
+            }
         }
 
         if (source !== Quill.sources.SILENT) {

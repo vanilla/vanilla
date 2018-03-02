@@ -103,11 +103,16 @@ export default class FloatingToolbar extends React.Component {
         }
 
         if (range && range.length > 0 && source === Emitter.sources.USER) {
-            this.setState({
-                range,
-            });
+            const content = this.quill.getText(range.index, range.length);
+            const isNewLinesOnly = /(\n){1,}/.test(content);
 
-            this.unHideSelf();
+            if (!isNewLinesOnly) {
+                this.setState({
+                    range,
+                });
+                this.unHideSelf();
+            }
+
         } else {
             if (this.props.forceVisibility === "visible") {
                 return;

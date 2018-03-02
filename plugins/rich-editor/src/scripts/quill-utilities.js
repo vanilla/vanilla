@@ -5,9 +5,8 @@
  */
 
 import Emitter from "quill/core/emitter";
-import Container from "quill/blots/container";
 import Parchment from "parchment";
-import ContentBlockBlot from "./blots/ContentBlockBlot";
+import WrapperBlot from "./blots/abstract/WrapperBlot";
 
 /**
  * @typedef {Object} BoundaryStatic
@@ -139,109 +138,93 @@ export function closeEditorFlyouts(firingKey = "") {
 }
 
 /**
- * HOC to create a new Blot class from a child class.
+ * Higher-order function to create a "wrapped" blot.
  *
- * This should basically sit is a wrapper around the child, but the blotName,
- * and className, and tagName, should all be set on this. The parent's class should be used as the formatName.
+ * Takes an existing Blot class and implements methods necessary to properly instantiate and cleanup it's parent Blot.
+ * the passed Blot class must implement the static property parentName, which should reference a register Blot that is
+ * and instance of WrapperBlot.
  *
- * @param {typeof ContentBlockBlot} ChildBlot - A class constructor for Block blot or a child of one.
- *
- * @returns {typeof Container}
+ * @param {typeof Blot} BlotConstructor
  */
-export function makeWrapperBlot(ChildBlot) {
-    return class extends Container {
+export function wrappedBlot(BlotConstructor) {
+    return class extends BlotConstructor {
 
-        static scope = Parchment.Scope.BLOCK_BLOT;
-        static defaultChild = ChildBlot.blotName;
-        static allowedChildren = [ChildBlot];
+        constructor(domNode) {
+            super(domNode);
 
-        /**
-         * Create the domNode with the class applied to it. This is necessary for copy-pasting to work.
-         *
-         * @returns {Node} - The DOM Node for the Blot.
-         */
-        static create() {
-            const domNode = super.create();
-
-            if (this.className) {
-                domNode.classList.add(this.className);
+            if (!this.constructor.parentName) {
+                throw new Error("Attempted to instantiate wrapped Blot without setting static value parentName");
             }
-            return domNode;
+        }
+
+        attach() {
+            super.attach();
+            if (this.parent.constructor.blotName !== this.statics.parentName) {
+                const Wrapper = Parchment.create(this.statics.parentName);
+
+                if (!(Wrapper instanceof WrapperBlot)) {
+                    throw new Error("The provided static parentName did not instantiate an instance of a WrapperBlot.");
+                }
+
+                this.wrap(Wrapper);
+            }
         }
 
         /**
-         * Return the formats for the Blot. Check matching of the tag as well as classname if applicable.
-         *
-         * This is necessary for copy/paste to work.
-         *
-         * @param {Node} domNode - The DOM Node to check.
-         *
-         * @returns {boolean} Whether or a not a DOM Node represents this format.
+         * If this is the only child blot we want to delete the parent with it.
          */
-        static formats(domNode) {
-            const classMatch = this.className && domNode.classList.contains(this.className);
-            const tagMatch = domNode.tagName.toLowerCase() === this.tagName.toLowerCase();
-
-            return this.className ? classMatch && tagMatch : tagMatch;
-        }
-
-        /**
-         * Get the formats out of the Blot instance's DOM Node.
-         *
-         * @returns {Object} - The Formats for the Blot.
-         */
-        formats() {
-            return {
-                [this.constructor.blotName]: this.constructor.formats(this.domNode),
-            };
-        }
-
-        /**
-         * Allow the blot to split into 2 unless it's the insert is it's child Blot.
-         *
-         * @param {Blot} blot - The Blot to insert.
-         * @param {any} ref - ?
-         */
-        insertBefore(blot, ref) {
-            if (blot instanceof ChildBlot) {
-                super.insertBefore(blot, ref);
+        remove() {
+            if (this.prev == null && this.next == null) {
+                this.parent.remove();
             } else {
-                const index = ref == null ? this.length() : ref.offset(this);
-                const after = this.split(index);
-                after.parent.insertBefore(blot, after);
+                super.remove();
             }
         }
 
+
         /**
-         * Join the children elements together where possible.
+         * Delete this blot it has no children. Wrap it if it doesn't have it's proper parent name.
          *
-         * @param {any} context -
+         * @param {Object} context - A shared context that is passed through all updated Blots.
          */
         optimize(context) {
             super.optimize(context);
-            const next = this.next;
-            if (next != null && next.prev === this &&
-                next.statics.blotName === this.statics.blotName &&
-                next.domNode.tagName === this.domNode.tagName) {
-                next.moveChildren(this);
-                next.remove();
+            if (this.children.length === 0) {
+                this.remove();
             }
         }
 
         /**
-         * Replace another blot with this Blot.
+         * Replace this blot with another blot.
          *
-         * Take the target's children and create a new Child blot, and insert that contents.
-         *
-         * @param {Blot} target - The target blot to replace.
+         * @param {string} name - The name of the replacement Blot.
+         * @param {any} value - The value for the replacement Blot.
          */
-        replace(target) {
-            if (target.statics.blotName !== this.statics.blotName) {
-                const item = Parchment.create(this.statics.defaultChild);
-                target.moveChildren(item);
-                this.appendChild(item);
-            }
-            super.replace(target);
+        replaceWith(name, value) {
+            const topLevelWrapper = this.getWrapperBlot();
+            const immediateWrapper = this.parent;
+
+            immediateWrapper.children.forEach(child => {
+                child.replaceWithIntoScroll(name, value, topLevelWrapper);
+            });
+            topLevelWrapper.remove();
+        }
+
+        /**
+         * Replace this ContainerBlot with another one.
+         *
+         * Then attach that new Blot to the scroll in before the passed insertBefore Blot.
+         * This is needed because we a normal replaceWith doesn't work (cyclicly recreates it's parents).
+         *
+         * @param {string} name - The name of the Blot to replace this one with.
+         * @param {string} value - The initial value of the new blot.
+         * @param {Blot} insertBefore - The Blot to insert this blot before in the ScrollBlot.
+         */
+        replaceWithIntoScroll(name, value, insertBefore) {
+            const newBlot = Parchment.create(name, value);
+            this.moveChildren(newBlot);
+
+            newBlot.insertInto(this.scroll, insertBefore);
         }
     };
 }

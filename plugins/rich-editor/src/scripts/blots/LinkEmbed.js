@@ -5,11 +5,16 @@ import { setData, getData } from "@core/dom-utility";
 export default class LinkEmbedBlock extends BlockEmbed {
 
     static lineHeight = false;
+    static blotName = 'embed-link';
+    static className = 'embed-link';
+    static tagName = 'a';
+    static PROTOCOL_WHITELIST = ['http', 'https', 'mailto', 'tel'];
 
     static create(data) {
         // console.log("Video Data: ", data);
         const node = super.create();
         node.classList.add('embed');
+        node.classList.add('embed-link');
         node.classList.add('embedLink');
         node.setAttribute('href', this.sanitize(data.url));
 
@@ -129,7 +134,3 @@ function sanitize(url, protocols) {
     const protocol = anchor.href.slice(0, anchor.href.indexOf(':'));
     return protocols.indexOf(protocol) > -1;
 }
-
-LinkEmbedBlock.blotName = 'link-embed';
-LinkEmbedBlock.tagName = 'a';
-LinkEmbedBlock.PROTOCOL_WHITELIST = ['http', 'https', 'mailto', 'tel'];

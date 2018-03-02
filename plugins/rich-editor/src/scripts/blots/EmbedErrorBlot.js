@@ -1,6 +1,11 @@
 import { BlockEmbed } from "quill/blots/block";
 
 export default class EmbedErrorBlot extends BlockEmbed {
+
+    static blotName = 'embed-error';
+    static className = 'embed-error';
+    static tagName = 'div';
+
     static create(data) {
         const node = super.create();
         node.classList.add('embed');
@@ -37,6 +42,3 @@ export default class EmbedErrorBlot extends BlockEmbed {
         return;
     }
 }
-
-EmbedErrorBlot.blotName = 'error-embed';
-EmbedErrorBlot.tagName = 'div';

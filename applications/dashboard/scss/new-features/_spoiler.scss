@@ -42,6 +42,10 @@ $buttonSpoiler: (
         display: none;
     }
 
+    .spoiler-content {
+        display: none;
+    }
+
     &.isShowingSpoiler {
         .spoiler-content {
             display: block;
@@ -67,7 +71,7 @@ $buttonSpoiler: (
 }
 
 .button-spoiler {
-    @include generateButtonClass($buttonSpoiler);
+    @include generateButtonClass($buttonSpoiler, false);
     @include noSelect;
     width: 100%;
     max-width: 100%;
@@ -77,6 +81,7 @@ $buttonSpoiler: (
     outline: 0;
     cursor: pointer;
     text-align: center;
+    opacity: 1;
 }
 
 .spoiler-warningMain {
@@ -87,9 +92,6 @@ $buttonSpoiler: (
     padding: 0 $spoiler-icon_size;
     width: 100%;
     line-height: 1;
-
-    //top: .1em;
-    //padding-left: #{$spoiler-icon_size + 6px};
 }
 
 .spoiler-icon {
@@ -123,4 +125,9 @@ $buttonSpoiler: (
 
 .spoiler-content {
     padding: 0 $spoiler-horizontalPadding $spoiler-horizontalPadding $spoiler-horizontalPadding;
+}
+
+.spoiler-buttonContainer {
+    white-space: normal;
+    user-select: none;
 }

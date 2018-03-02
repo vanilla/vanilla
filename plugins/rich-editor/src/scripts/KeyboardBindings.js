@@ -252,8 +252,10 @@ export default class KeyboardBindings {
             return true;
         }
 
+        const blotName = line.constructor.blotName;
+
         const delta = new Delta()
-            .retain(line.length(), { 'spoiler-line': false, 'blockquote-line': false, 'code-block': false });
+            .retain(line.length(), { [blotName]: false });
         this.quill.updateContents(delta, Emitter.sources.USER);
 
         // Return false to prevent default behaviour.
@@ -272,18 +274,14 @@ export default class KeyboardBindings {
      */
     clearFirstPositionMultiLineBlot = (range) => {
         const [line] = this.quill.getLine(range.index);
-        const lastLine = this.quill.getLine(range.index + range.length)[0];
         const selection = this.quill.getSelection();
 
         const rangeStartsBeforeSelection = range.index < selection.index;
         const rangeEndsAfterSelection = range.index + range.length > selection.index + selection.length;
         const isFirstLineSelected = selection.index === 0;
-        const isLastLineSelected = selection.length === this.quill.scroll.length() - 1;
-        const selectionIsEntireScroll = isFirstLineSelected && isLastLineSelected;
+        const selectionIsEntireScroll = isFirstLineSelected;
         const blotMatches = line instanceof LineBlot
-            || line instanceof CodeBlockBlot
-            || lastLine instanceof LineBlot
-            || lastLine instanceof CodeBlockBlot;
+            || line instanceof CodeBlockBlot;
 
         if ((rangeStartsBeforeSelection || rangeEndsAfterSelection || selectionIsEntireScroll) && blotMatches) {
             let delta = new Delta();
@@ -293,13 +291,6 @@ export default class KeyboardBindings {
             if (isFirstLineSelected) {
                 delta = delta.insert("\n");
                 newSelection.length += 1;
-            }
-
-            if (isLastLineSelected) {
-                newSelection.length += 1;
-                delta = delta
-                    .retain(range.length)
-                    .insert("\n");
             }
 
             this.quill.updateContents(delta, Emitter.sources.USER);

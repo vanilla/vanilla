@@ -839,7 +839,7 @@
 
         // Clear the menu when anything is touched or clicked. The touchend is here for mobile safari handling.
         $("body").on("click touchend", function() {
-            _this.context.clear_range();
+          _this.context.clear_range();
           _this.hide();
         });
 

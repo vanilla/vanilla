@@ -162,7 +162,7 @@ body.Categories.isMobile .PageControls.Top {
   display: block;
 }
 
-.discussion-sort-filter-module {
+.ButtonGroup.discussion-sort-filter-module {
   display: flex;
   align-items: center;
 }

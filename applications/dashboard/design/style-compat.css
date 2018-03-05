@@ -45,11 +45,6 @@ body.isMobile .change-picture .change-picture-instructions {
   height: 24px;
 }
 
-.PageControls .selectBox {
-  margin-right: 15px;
-  float: left;
-}
-
 .selectBox {
   display: inline-block;
   position: relative;
@@ -57,31 +52,32 @@ body.isMobile .change-picture .change-picture-instructions {
   vertical-align: middle;
 }
 
+.PageControls .selectBox {
+  margin-right: 15px;
+  float: left;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+}
+
 .selectBox-label {
-  display: inline-block;
   position: relative;
   cursor: pointer;
   user-select: none;
-  height: 100%;
   margin-right: 5px;
 }
 
-.selectBox-label,
-.selectBox-main,
-.selectBox-toggle {
-  font-size: 13px;
-  line-height: 13px;
-  font-weight: normal;
-}
-
 .selectBox-main {
-  display: inline-block;
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
   position: relative;
   cursor: pointer;
   user-select: none;
 }
 
 .selectBox-content {
+  display: none;
   left: 100%;
   margin-left: -29px;
   margin-top: 10px;
@@ -103,12 +99,6 @@ body.isMobile .change-picture .change-picture-instructions {
 
 .selectBox-toggle:active {
   text-decoration: none;
-}
-
-.vanillaDropDown-arrow,
-.selectBox-selected {
-  line-height: 1;
-  vertical-align: middle;
 }
 
 .selectBox-item {
@@ -147,10 +137,6 @@ body.isMobile .change-picture .change-picture-instructions {
   height: 18px;
 }
 
-body.Categories.isMobile .PageControls.Top {
-  display: block;
-}
-
 .menu-separator {
   background: none;
   border-bottom: 1px solid #dddee0;
@@ -168,8 +154,17 @@ body.Categories.isMobile .PageControls.Top {
   border: 0;
 }
 
+.PageControls {
+  position: relative;
+}
+
+body.Categories.isMobile .PageControls.Top {
+  display: block;
+}
+
 .discussion-sort-filter-module {
-  margin-top: .4em;
+  display: flex;
+  align-items: center;
 }
 
 .sr-only {

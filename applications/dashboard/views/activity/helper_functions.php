@@ -151,7 +151,7 @@ if (!function_exists('WriteActivityComment')):
             <?php } ?>
             <div class="ItemContent ActivityComment">
                 <?php echo userAnchor($author, 'Title Name'); ?>
-                <div class="Excerpt userContent"><?php echo Gdn_Format::to($comment['Body'], $comment['Format']); ?></div>
+                <div class="Excerpt"><?php echo Gdn_Format::to($comment['Body'], $comment['Format']); ?></div>
                 <div class="Meta">
                     <span class="DateCreated"><?php echo Gdn_Format::date($comment['DateInserted'], 'html'); ?></span>
                     <?php

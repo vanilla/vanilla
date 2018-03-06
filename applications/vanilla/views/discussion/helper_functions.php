@@ -159,7 +159,7 @@ if (!function_exists('writeComment')) :
                 </div>
                 <div class="Item-BodyWrap">
                     <div class="Item-Body">
-                        <div class="Message">
+                        <div class="Message userContent">
                             <?php
                             echo formatBody($comment);
                             ?>

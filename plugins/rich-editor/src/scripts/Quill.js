@@ -24,6 +24,7 @@ import CodeInlineBlot from "./formats/CodeInlineBlot.js";
 // Other
 import { IndentClass as Indent } from "quill/formats/indent";
 import QuillTheme from "./QuillTheme";
+import QuillEmbedModule from "./QuillEmbedModule";
 
 Quill.register({
     // Block formats
@@ -55,6 +56,7 @@ Quill.register({
     // Other
     'formats/indent': Indent,
     'themes/vanilla': QuillTheme,
+    'modules/embed': QuillEmbedModule,
 }, true);
 
 export default Quill;

@@ -52,107 +52,12 @@ export default class VanillaTheme extends Theme {
             ...keyboardBindings.bindings,
         };
 
-        this.setupImageUploads();
+        this.options.modules.embed = true;
 
         // Mount react components
         this.mountToolbar();
         this.mountEmojiMenu();
         this.mountParagraphMenu();
-    }
-
-    /**
-     * Setup image upload listeners and handlers.
-     * @private
-     */
-    setupImageUploads() {
-        this.fileUploader = new FileUploader(
-            this.onImageUploadStart,
-            this.onImageUploadSuccess,
-            this.onImageUploadFailure,
-        );
-
-        this.quill.root.addEventListener('drop', this.fileUploader.dropHandler, false);
-        this.quill.root.addEventListener('paste', this.fileUploader.pasteHandler, false);
-        this.setupImageUploadButton();
-    }
-
-    /**
-     * Handler for the beginning of an image upload.
-     * @private
-     *
-     * @param {File} file - The file being uploaded.
-     */
-    onImageUploadStart = (file) => {
-        const selection = this.quill.getSelection();
-        const startIndex = selection ? selection.index : this.quill.scroll.length();
-        this.quill.insertEmbed(startIndex, "embed-loading", {});
-        const [blot] = this.quill.getLine(startIndex);
-
-        blot.registerDeleteCallback(() => {
-            if (this.currentUploads.has(file)) {
-                this.currentUploads.delete(file);
-            }
-        });
-
-        this.currentUploads.set(file, blot);
-    };
-
-    /**
-     * Handler for a successful image upload.
-     * @private
-     *
-     * @param {File} file - The file being uploaded.
-     * @param {Object} response - The axios response from the ajax request.
-     */
-    onImageUploadSuccess = (file, response) => {
-        const imageEmbed = Parchment.create("embed-image", { url: response.data.url });
-        const completedBlot = this.currentUploads.get(file);
-
-        // The loading blot may have been undone/deleted since we created it.
-        if (completedBlot) {
-            completedBlot.replaceWith(imageEmbed);
-        }
-
-        this.currentUploads.delete(file);
-    };
-
-    /**
-     * Handler for a failed image upload.
-     * @private
-     *
-     * @param {File} file - The file being uploaded.
-     * @param {Error} error - The error thrown from the bad upload.
-     */
-    onImageUploadFailure = (file, error) => {
-        logError(error.message);
-        const imageEmbed = Parchment.create("embed-error", { errors: [error] });
-        const errorBlot = this.currentUploads.get(file);
-
-        // The loading blot may have been undone/deleted since we created it.
-        if (errorBlot) {
-            errorBlot.replaceWith(imageEmbed);
-        }
-
-        errorBlot.replaceWith(imageEmbed);
-        this.currentUploads.delete(file);
-    };
-
-    /**
-     * Setup the the fake file input for image uploads.
-     */
-    setupImageUploadButton() {
-        const fakeImageUpload = this.quill.container.closest(".richEditor").querySelector(".js-fakeFileUpload");
-        const imageUpload = this.quill.container.closest(".richEditor").querySelector(".js-fileUpload");
-
-        fakeImageUpload.addEventListener("click", () => {
-            closeEditorFlyouts();
-            imageUpload.click();
-        });
-
-        imageUpload.addEventListener("change", () => {
-            const file = imageUpload.files[0];
-            this.fileUploader.uploadFile(file);
-        });
     }
 
     /**

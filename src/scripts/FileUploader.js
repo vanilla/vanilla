@@ -66,16 +66,12 @@ export default class FileUploader {
      */
     dropHandler = (event) => {
         if (event.dataTransfer && event.dataTransfer.files && event.dataTransfer.files.length) {
-            const filteredFiles = Array
+            event.preventDefault();
+            const files = Array
                 .from(event.dataTransfer.files)
-                .filter(this.imageFilter);
-
-            if (filteredFiles.length > 0) {
-                event.preventDefault();
-            }
 
             // Currently only 1 file is supported.
-            const mainFile = filteredFiles[0];
+            const mainFile = files[0];
             this.uploadFile(mainFile);
         }
     };
@@ -89,19 +85,27 @@ export default class FileUploader {
         if (event.clipboardData && event.clipboardData.items && event.clipboardData.items.length) {
             const files = Array
                 .from(event.clipboardData.items)
-                .map(item => item.getAsFile ? item.getAsFile() : item)
+                .map(item => item.getAsFile ? item.getAsFile() : null)
                 .filter(Boolean);
 
-            const filteredFiles = [].filter.call(files, this.imageFilter);
-            if (filteredFiles.length > 0) {
+            if (files.length > 0) {
                 event.preventDefault();
+                // Currently only 1 file is supported.
+                const mainFile = files[0];
+                this.uploadFile(mainFile);
             }
-
-            // Currently only 1 file is supported.
-            const mainFile = filteredFiles[0];
-            this.uploadFile(mainFile);
         }
     };
+
+    /**
+     * Handle an image of the wrong type being uploaded.
+     *
+     * @param {string} type - The type of the image the user tried to upload.
+     */
+    handleBadImageType(type) {
+        const error = new Error(`Unable to upload an image of type ${type}. Supported formats included .gif, .jpg and .png`);
+        this.uploadFailureCallback(null, error);
+    }
 
     /**
      * Upload a file using Vanilla's API v2.
@@ -109,7 +113,13 @@ export default class FileUploader {
      * @param {File} file - The file to upload.
      */
     uploadFile(file) {
+        if (!this.imageFilter(file)) {
+            this.handleBadImageType(file.type);
+            return;
+        }
+
         this.uploadStartCallback(file);
+
         const data = new FormData();
         data.append("file", file, file.name);
         data.append("type", "image");

@@ -22,6 +22,9 @@ class Gdn_Session {
      */
     const CSRF_NAME = 'TransientKey';
 
+    /** Maximum length of inactivity, in seconds, before a visit is considered new. */
+    const VISIT_LENGTH = 1200; // 20 minutes
+
     /** @var int Unique user identifier. */
     public $UserID;
 
@@ -280,36 +283,40 @@ class Gdn_Session {
     }
 
     /**
-     *
+     * Determine if this is a new visit for this user.
      *
      * @return bool
      */
+    public function isNewVisit() {
+        if ($this->User) {
+            $cookie = $this->getCookie('-Vv', false);
+            $userVisitExpiry = Gdn_Format::toTimeStamp($this->User->DateLastActive) + self::VISIT_LENGTH;
+
+            if ($cookie) {
+                $result = false; // User has cookie, not a new visit.
+            } elseif ($userVisitExpiry > time())
+                $result = false; // User was last active less than 20 minutes ago, not a new visit.
+            else {
+                $result = true; // No cookie and not active in the last 20 minutes? New visit.
+            }
+        } else {
+            $result = false;
+        }
+
+        return $result;
+    }
+
+    /**
+     * Update the visit cookie.
+     *
+     * @return bool Is this a new visit?
+     */
     public function newVisit() {
-        static $newVisit = null;
+        $newVisit = $this->isNewVisit();
 
-        if ($newVisit !== null) {
-            return $newVisit;
-        }
-
-        if (!$this->User) {
-            return false;
-        }
-
-        $current = $this->getCookie('-Vv');
         $now = time();
-        $timeToExpire = 1200; // 20 minutes
-        $expires = $now + $timeToExpire;
-
-        // Figure out if this is a new visit.
-        if ($current) {
-            $newVisit = false; // user has cookie, not a new visit.
-        } elseif (Gdn_Format::toTimeStamp($this->User->DateLastActive) + $timeToExpire > $now)
-            $newVisit = false; // user was last active less than 20 minutes ago, not a new visit.
-        else {
-            $newVisit = true;
-        }
-
-        $this->setCookie('-Vv', $now, $expires);
+        $expiry = $now + self::VISIT_LENGTH;
+        $this->setCookie('-Vv', $now, $expiry);
 
         return $newVisit;
     }

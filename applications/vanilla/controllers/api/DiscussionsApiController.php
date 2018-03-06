@@ -197,6 +197,7 @@ class DiscussionsApiController extends AbstractApiController {
             'sink:b' => 'Whether or not the discussion has been sunk.',
             'countComments:i' => 'The number of comments on the discussion.',
             'countViews:i' => 'The number of views on the discussion.',
+            'score:i|n' => 'Total points associated with this post.',
             'url:s?' => 'The full URL to the discussion.',
             'lastPost?' => $this->getPostFragmentSchema(),
             'bookmarked:b' => 'Whether or not the discussion is bookmarked by the current user.',
@@ -235,7 +236,7 @@ class DiscussionsApiController extends AbstractApiController {
         $result = $out->validate($row);
 
         // Allow addons to modify the result.
-        $result = $this->getEventManager()->fireFilter('discussionsApiController_get_output', $result, $this, $in, $query, $row);
+        $result = $this->getEventManager()->fireFilter('discussionsApiController_getOutput', $result, $this, $in, $query, $row);
         return $result;
     }
 
@@ -427,7 +428,7 @@ class DiscussionsApiController extends AbstractApiController {
         }
 
         // Allow addons to update the where clause.
-        $where = $this->getEventManager()->fireFilter('discussionsApiController_index_filters', $where, $this, $in, $query);
+        $where = $this->getEventManager()->fireFilter('discussionsApiController_indexFilters', $where, $this, $in, $query);
 
         if ($query['followed']) {
             $where['Followed'] = true;
@@ -463,7 +464,7 @@ class DiscussionsApiController extends AbstractApiController {
         $result = $out->validate($rows, true);
 
         // Allow addons to modify the result.
-        $result = $this->getEventManager()->fireFilter('discussionsApiController_index_output', $result, $this, $in, $query, $rows);
+        $result = $this->getEventManager()->fireFilter('discussionsApiController_indexOutput', $result, $this, $in, $query, $rows);
 
         $whereCount = count($where);
         $isWhereOptimized = (isset($where['d.CategoryID']) && ($whereCount === 1 || ($whereCount === 2 && isset($where['Announce']))));

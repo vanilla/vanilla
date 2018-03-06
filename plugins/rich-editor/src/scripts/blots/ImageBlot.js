@@ -1,7 +1,7 @@
 import { setData, getData } from "@core/dom-utility";
-import Parchment from 'parchment';
+import { BlockEmbed } from "quill/blots/block";
 
-export default class ImageBlot extends Parchment.Embed {
+export default class ImageBlot extends BlockEmbed {
 
     static blotName = 'embed-image';
     static className = 'embed-image';

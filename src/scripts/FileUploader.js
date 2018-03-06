@@ -22,7 +22,7 @@ import ajax from "@core/ajax";
 export default class FileUploader {
 
     /** This should mirror extensions allowed in Vanilla\ImageResizer.php */
-    static IMAGE_REGEX = /^image\/(gif|jpe?g|a?png|bmp|tiff|ico)/i;
+    static IMAGE_REGEX = /^image\/(gif|jpe?g|png)/i;
 
     uploadStartCallback = () => {};
     uploadSuccessCallback = () => {};

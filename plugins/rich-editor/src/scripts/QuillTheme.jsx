@@ -15,6 +15,8 @@ import InlineEditorToolbar from "./components/InlineEditorToolbar";
 import ParagraphEditorToolbar from "./components/ParagraphEditorToolbar";
 import EditorEmojiPicker from "./components/EditorEmojiPicker";
 
+import FileUploader from "@core/FileUploader";
+
 export default class VanillaTheme extends Theme {
 
     /** @var {Quill} */
@@ -44,10 +46,50 @@ export default class VanillaTheme extends Theme {
             ...keyboardBindings.bindings,
         };
 
+        this.setupImageUploadHandlers();
+
         // Mount react components
         this.mountToolbar();
         this.mountEmojiMenu();
         this.mountParagraphMenu();
+    }
+
+    onImageUploadStart = (file) => {
+        alert("Started!");
+    };
+
+    onImageUploadSuccess = (file, response) => {
+        const currentIndex = this.quill.getSelection();
+        this.quill.insertEmbed(currentIndex.index, "embed-image", {url: response.data.url});
+    };
+
+    onImageUploadFailure = (file, error) => {
+        console.error("Image upload failed: ",  error.message);
+    };
+
+    setupImageUploadHandlers() {
+        const fileUploader = new FileUploader(
+            this.onImageUploadStart,
+            this.onImageUploadSuccess,
+            this.onImageUploadFailure,
+        );
+
+        this.quill.root.addEventListener('drop', fileUploader.dropHandler, false);
+        this.quill.root.addEventListener('paste', fileUploader.pasteHandler, false);
+    }
+
+    setupImageUploadButton() {
+        const fakeImageUpload = this.quill.container.closest(".richEditor").querySelector(".js-fakeFileUpload");
+        const imageUpload = this.quill.container.closest(".richEditor").querySelector(".js-fileUpload");
+
+        fakeImageUpload.addEventListener("click", () => {
+            imageUpload.click();
+        });
+
+        imageUpload.addEventListener("change", (event) => {
+            console.log("Image uploaded!", event);
+            console.log(imageUpload.value);
+        });
     }
 
     /**

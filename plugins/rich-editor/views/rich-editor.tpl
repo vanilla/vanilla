@@ -21,11 +21,12 @@
                     </div>
                 </li>
                 <li class="richEditor-menuItem" role="menuitem">
-                    <button class="richEditor-button" type="button" aria-pressed="false">
+                    <button class="richEditor-button richEditor-buttonUpload js-fakeFileUpload" type="button" aria-pressed="false">
                         <svg class="richEditorInline-icon" viewBox="0 0 24 24">
                             <title>{t c="Image"}</title>
                             <path fill="currentColor" fill-rule="nonzero" d="M3,5 L3,19 L21,19 L21,5 L3,5 Z M3,4 L21,4 C21.5522847,4 22,4.44771525 22,5 L22,19 C22,19.5522847 21.5522847,20 21,20 L3,20 C2.44771525,20 2,19.5522847 2,19 L2,5 C2,4.44771525 2.44771525,4 3,4 Z M4,18 L20,18 L20,13.7142857 L15.2272727,7.42857143 L10.5,13.7142857 L7.5,11.5 L4,16.5510204 L4,18 Z M7.41729323,10.2443609 C8.24572036,10.2443609 8.91729323,9.57278803 8.91729323,8.7443609 C8.91729323,7.91593378 8.24572036,7.2443609 7.41729323,7.2443609 C6.58886611,7.2443609 5.91729323,7.91593378 5.91729323,8.7443609 C5.91729323,9.57278803 6.58886611,10.2443609 7.41729323,10.2443609 Z"/>
                         </svg>
+                        <input class="js-fileUpload richEditor-upload" type="file">
                     </button>
                 </li>
 

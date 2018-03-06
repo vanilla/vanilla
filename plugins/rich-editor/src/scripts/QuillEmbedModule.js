@@ -80,6 +80,7 @@ export default class QuillEmbedModule extends Module {
     onImageUploadStart = (file) => {
         this.quill.insertEmbed(this.lastSelection.index, "embed-loading", {}, Emitter.sources.USER);
         const [blot] = this.quill.getLine(this.lastSelection.index);
+        this.insertTrailingNewline();
 
         blot.registerDeleteCallback(() => {
             if (this.currentUploads.has(file)) {
@@ -152,5 +153,9 @@ export default class QuillEmbedModule extends Module {
             const file = imageUpload.files[0];
             this.fileUploader.uploadFile(file);
         });
+    }
+
+    insertTrailingNewline() {
+        this.quill.setSelection(this.lastSelection.index + 1);
     }
 }

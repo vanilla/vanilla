@@ -82,19 +82,19 @@ export default class FileUploader {
      * @param {DragEvent} event - https://developer.mozilla.org/en-US/docs/Web/API/DragEvent
      */
     pasteHandler = (event) => {
-        if (event.clipboardData && event.clipboardData.items && event.clipboardData.items.length) {
-            const files = Array
-                .from(event.clipboardData.items)
-                .map(item => item.getAsFile ? item.getAsFile() : null)
-                .filter(Boolean);
-
-            if (files.length > 0) {
-                event.preventDefault();
-                // Currently only 1 file is supported.
-                const mainFile = files[0];
-                this.uploadFile(mainFile);
-            }
-        }
+        // if (event.clipboardData && event.clipboardData.items && event.clipboardData.items.length) {
+        //     const files = Array
+        //         .from(event.clipboardData.items)
+        //         .map(item => item.getAsFile ? item.getAsFile() : null)
+        //         .filter(Boolean);
+        //
+        //     if (files.length > 0) {
+        //         event.preventDefault();
+        //         // Currently only 1 file is supported.
+        //         const mainFile = files[0];
+        //         this.uploadFile(mainFile);
+        //     }
+        // }
     };
 
     /**

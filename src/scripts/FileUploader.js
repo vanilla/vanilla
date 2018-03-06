@@ -109,6 +109,7 @@ export default class FileUploader {
      * @param {File} file - The file to upload.
      */
     uploadFile(file) {
+        this.uploadStartCallback(file);
         const data = new FormData();
         data.append("file", file, file.name);
         data.append("type", "image");

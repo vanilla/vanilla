@@ -8,6 +8,8 @@
 import Theme from "quill/core/theme";
 import { closeEditorFlyouts } from "./quill-utilities";
 import KeyboardBindings from "./KeyboardBindings";
+import Emitter from "quill/core/emitter";
+
 // React
 import React from "react";
 import ReactDOM from "react-dom";
@@ -59,8 +61,9 @@ export default class VanillaTheme extends Theme {
     };
 
     onImageUploadSuccess = (file, response) => {
-        const currentIndex = this.quill.getSelection();
-        this.quill.insertEmbed(currentIndex.index, "embed-image", {url: response.data.url});
+        const selection = this.quill.getSelection();
+        const startIndex = selection ? selection.index : this.quill.scroll.length();
+        this.quill.insertEmbed(startIndex, "embed-image", {url: response.data.url}, Emitter.sources.USER);
     };
 
     onImageUploadFailure = (file, error) => {

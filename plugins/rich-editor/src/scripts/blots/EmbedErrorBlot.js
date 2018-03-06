@@ -13,6 +13,7 @@ export default class EmbedErrorBlot extends BlockEmbed {
 
         const errors = document.createElement('ul');
         errors.classList.add('embedLoader-errors');
+        errors.setAttribute("contenteditable", false);
 
         data.errors.forEach(function insertError (i) {
             const error = document.createElement('li');

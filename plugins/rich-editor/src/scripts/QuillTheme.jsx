@@ -20,6 +20,7 @@ import EditorEmojiPicker from "./components/EditorEmojiPicker";
 
 import FileUploader from "@core/FileUploader";
 import EmbedLoadingBlot from "./blots/EmbedLoadingBlot";
+import {logError} from "@core/utility";
 
 export default class VanillaTheme extends Theme {
 
@@ -50,7 +51,7 @@ export default class VanillaTheme extends Theme {
             ...keyboardBindings.bindings,
         };
 
-        this.setupImageUploadHandlers();
+        this.setupImageUploads();
 
         // Mount react components
         this.mountToolbar();
@@ -66,8 +67,6 @@ export default class VanillaTheme extends Theme {
         this.quill.insertEmbed(startIndex, "embed-loading", {});
         const [blot] = this.quill.getLine(startIndex);
 
-        console.log(blot);
-
         blot.registerDeleteCallback(() => {
             if (this.currentUploads.has(file)) {
                 this.currentUploads.delete(file);
@@ -78,26 +77,30 @@ export default class VanillaTheme extends Theme {
     };
 
     onImageUploadSuccess = (file, response) => {
-        const selection = this.quill.getSelection();
-        const startIndex = selection ? selection.index : this.quill.scroll.length();
-        const imageEmbed = Parchment.create("embed-image", {url: response.data.url});
+        const imageEmbed = Parchment.create("embed-image", { url: response.data.url });
         const completedBlot = this.currentUploads.get(file);
         completedBlot.replaceWith(imageEmbed);
+        this.currentUploads.delete(file);
     };
 
     onImageUploadFailure = (file, error) => {
-        console.error("Image upload failed: ",  error.message);
+        logError(error.message);
+        const imageEmbed = Parchment.create("embed-error", { errors: [error] });
+        const erroredBlot = this.currentUploads.get(file);
+        erroredBlot.replaceWith(imageEmbed);
+        this.currentUploads.delete(file);
     };
 
-    setupImageUploadHandlers() {
-        const fileUploader = new FileUploader(
+    setupImageUploads() {
+        this.fileUploader = new FileUploader(
             this.onImageUploadStart,
             this.onImageUploadSuccess,
             this.onImageUploadFailure,
         );
 
-        this.quill.root.addEventListener('drop', fileUploader.dropHandler, false);
-        this.quill.root.addEventListener('paste', fileUploader.pasteHandler, false);
+        this.quill.root.addEventListener('drop', this.fileUploader.dropHandler, false);
+        this.quill.root.addEventListener('paste', this.fileUploader.pasteHandler, false);
+        this.setupImageUploadButton();
     }
 
     setupImageUploadButton() {
@@ -105,12 +108,13 @@ export default class VanillaTheme extends Theme {
         const imageUpload = this.quill.container.closest(".richEditor").querySelector(".js-fileUpload");
 
         fakeImageUpload.addEventListener("click", () => {
+            closeEditorFlyouts();
             imageUpload.click();
         });
 
-        imageUpload.addEventListener("change", (event) => {
-            console.log("Image uploaded!", event);
-            console.log(imageUpload.value);
+        imageUpload.addEventListener("change", () => {
+            const file = imageUpload.files[0];
+            this.fileUploader.uploadFile(file);
         });
     }
 

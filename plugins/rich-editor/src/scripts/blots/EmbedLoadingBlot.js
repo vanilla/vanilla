@@ -28,4 +28,24 @@ export default class EmbedLoadingBlot extends BlockEmbed {
     static value() {
         return;
     }
+
+    /**
+     * Register a callback for when the blot is detached.
+     *
+     * @param {function} callback - The callback to call.
+     */
+    registerDeleteCallback(callback) {
+        this.deleteCallback = callback;
+    }
+
+    /**
+     * Call the delete callback if set when detaching.
+     */
+    detach() {
+        if (this.deleteCallback) {
+            this.deleteCallback();
+        }
+
+        super.detach();
+    }
 }

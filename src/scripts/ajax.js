@@ -5,14 +5,30 @@
  */
 
 import axios from "axios";
+import { formatUrl, getMeta } from "@core/utility";
 
-const instance = axios.create();
-
-const middlewares = [];
 
 /**
- * Register a middleware to run before after every request.
+ * Add the transient key to every request.
+ *
+ * @see {AxiosTransformer}
+ *
+ * @param {FormData} data - The data from the request.
+ *
+ * @returns {string|Buffer|ArrayBuffer|FormData|Stream} - Must
  */
-export const registerMiddleware = (callback) => middlewares.push(callback);
+function addTransientKey(data) {
+    data.append("transientKey", getMeta("TransientKey"));
+    return data;
+}
+
+const dataTransformers = [
+    addTransientKey,
+];
+
+const instance = axios.create({
+    baseURL: formatUrl("/api/v2/"),
+    transformRequest: dataTransformers,
+});
 
 export default instance;

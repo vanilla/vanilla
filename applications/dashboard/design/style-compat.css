@@ -193,6 +193,10 @@ body.isMobile .change-picture .change-picture-instructions {
   opacity: 1;
 }
 
+.richEditor-upload {
+  display: none;
+}
+
 .embedBar {
   display: block;
   width: 100%;

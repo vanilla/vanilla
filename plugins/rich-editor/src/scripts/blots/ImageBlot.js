@@ -1,5 +1,5 @@
-import { BlockEmbed } from "quill/blots/block";
 import { setData, getData } from "@core/dom-utility";
+import { BlockEmbed } from "quill/blots/block";
 
 export default class ImageBlot extends BlockEmbed {
 

@@ -8,6 +8,8 @@
 import Theme from "quill/core/theme";
 import { closeEditorFlyouts } from "./quill-utilities";
 import KeyboardBindings from "./KeyboardBindings";
+import Parchment from "parchment";
+
 // React
 import React from "react";
 import ReactDOM from "react-dom";
@@ -15,10 +17,16 @@ import InlineEditorToolbar from "./components/InlineEditorToolbar";
 import ParagraphEditorToolbar from "./components/ParagraphEditorToolbar";
 import EditorEmojiPicker from "./components/EditorEmojiPicker";
 
+import FileUploader from "@core/FileUploader";
+import {logError} from "@core/utility";
+
 export default class VanillaTheme extends Theme {
 
     /** @var {Quill} */
     quill;
+
+    /** @var A File:Blot map. */
+    currentUploads = new Map();
 
     /**
      * Constructor.
@@ -43,6 +51,8 @@ export default class VanillaTheme extends Theme {
             ...this.options.modules.keyboard.bindings,
             ...keyboardBindings.bindings,
         };
+
+        this.options.modules.embed = true;
 
         // Mount react components
         this.mountToolbar();

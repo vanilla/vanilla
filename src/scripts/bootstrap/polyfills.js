@@ -107,6 +107,29 @@ function polyfillCoreJs() {
 }
 
 /**
+ * Fixes CustomEvent in IE 9-11
+ *
+ * @see https://developer.mozilla.org/en-US/docs/Web/API/CustomEvent/CustomEvent
+ */
+function polyfillCustomEvent() {
+    if ( typeof window.CustomEvent === "function" ) {
+        return;
+    }
+
+    function CustomEvent ( event, params ) {
+        params = params || { bubbles: false, cancelable: false, detail: undefined };
+        const evt = document.createEvent( 'CustomEvent' );
+        evt.initCustomEvent( event, params.bubbles, params.cancelable, params.detail );
+        return evt;
+    }
+
+    CustomEvent.prototype = window.Event.prototype;
+
+    window.CustomEvent = CustomEvent;
+}
+
+
+/**
  * Polyfills core-js and a few additional things.
  *
  * Feel free to add additional polyfills here if they're simple,
@@ -126,5 +149,5 @@ export default function loadPolyfills() {
         window.Promise = Promise;
     }
 
-    return Promise.all([polyfillNodeListforEach(), polyfillCoreJs(), polyfillClosest(), polyfillRemove()]);
+    return Promise.all([polyfillNodeListforEach(), polyfillCoreJs(), polyfillClosest(), polyfillRemove(), polyfillCustomEvent()]);
 }

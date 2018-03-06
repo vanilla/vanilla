@@ -80,6 +80,7 @@ define('ADDON_TYPE_PLUGIN', 1);
 define('ADDON_TYPE_THEME', 2);
 define('ADDON_TYPE_LOCALE', 4);
 define('ADDON_TYPE_APPLICATION', 5);
+define('ADDON_TYPE_GENERAL', 6);
 define('ADDON_TYPE_CORE', 10);
 
 // Use this constant if you are sick of looking up how to format dates to go into the database.

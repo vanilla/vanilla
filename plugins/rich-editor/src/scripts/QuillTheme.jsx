@@ -25,6 +25,9 @@ export default class VanillaTheme extends Theme {
     /** @var {Quill} */
     quill;
 
+    /** @var A File:Blot map. */
+    currentUploads = new Map();
+
     /**
      * Constructor.
      *
@@ -57,8 +60,28 @@ export default class VanillaTheme extends Theme {
         this.mountParagraphMenu();
     }
 
-    currentUploads = new Map();
+    /**
+     * Setup image upload listeners and handlers.
+     * @private
+     */
+    setupImageUploads() {
+        this.fileUploader = new FileUploader(
+            this.onImageUploadStart,
+            this.onImageUploadSuccess,
+            this.onImageUploadFailure,
+        );
 
+        this.quill.root.addEventListener('drop', this.fileUploader.dropHandler, false);
+        this.quill.root.addEventListener('paste', this.fileUploader.pasteHandler, false);
+        this.setupImageUploadButton();
+    }
+
+    /**
+     * Handler for the beginning of an image upload.
+     * @private
+     *
+     * @param {File} file - The file being uploaded.
+     */
     onImageUploadStart = (file) => {
         const selection = this.quill.getSelection();
         const startIndex = selection ? selection.index : this.quill.scroll.length();
@@ -74,6 +97,13 @@ export default class VanillaTheme extends Theme {
         this.currentUploads.set(file, blot);
     };
 
+    /**
+     * Handler for a successful image upload.
+     * @private
+     *
+     * @param {File} file - The file being uploaded.
+     * @param {Object} response - The axios response from the ajax request.
+     */
     onImageUploadSuccess = (file, response) => {
         const imageEmbed = Parchment.create("embed-image", { url: response.data.url });
         const completedBlot = this.currentUploads.get(file);
@@ -86,6 +116,13 @@ export default class VanillaTheme extends Theme {
         this.currentUploads.delete(file);
     };
 
+    /**
+     * Handler for a failed image upload.
+     * @private
+     *
+     * @param {File} file - The file being uploaded.
+     * @param {Error} error - The error thrown from the bad upload.
+     */
     onImageUploadFailure = (file, error) => {
         logError(error.message);
         const imageEmbed = Parchment.create("embed-error", { errors: [error] });
@@ -100,18 +137,9 @@ export default class VanillaTheme extends Theme {
         this.currentUploads.delete(file);
     };
 
-    setupImageUploads() {
-        this.fileUploader = new FileUploader(
-            this.onImageUploadStart,
-            this.onImageUploadSuccess,
-            this.onImageUploadFailure,
-        );
-
-        this.quill.root.addEventListener('drop', this.fileUploader.dropHandler, false);
-        this.quill.root.addEventListener('paste', this.fileUploader.pasteHandler, false);
-        this.setupImageUploadButton();
-    }
-
+    /**
+     * Setup the the fake file input for image uploads.
+     */
     setupImageUploadButton() {
         const fakeImageUpload = this.quill.container.closest(".richEditor").querySelector(".js-fakeFileUpload");
         const imageUpload = this.quill.container.closest(".richEditor").querySelector(".js-fileUpload");

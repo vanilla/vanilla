@@ -9,6 +9,7 @@ import Theme from "quill/core/theme";
 import { closeEditorFlyouts } from "./quill-utilities";
 import KeyboardBindings from "./KeyboardBindings";
 import Emitter from "quill/core/emitter";
+import Parchment from "parchment";
 
 // React
 import React from "react";
@@ -18,6 +19,7 @@ import ParagraphEditorToolbar from "./components/ParagraphEditorToolbar";
 import EditorEmojiPicker from "./components/EditorEmojiPicker";
 
 import FileUploader from "@core/FileUploader";
+import EmbedLoadingBlot from "./blots/EmbedLoadingBlot";
 
 export default class VanillaTheme extends Theme {
 
@@ -56,14 +58,31 @@ export default class VanillaTheme extends Theme {
         this.mountParagraphMenu();
     }
 
+    currentUploads = new Map();
+
     onImageUploadStart = (file) => {
-        alert("Started!");
+        const selection = this.quill.getSelection();
+        const startIndex = selection ? selection.index : this.quill.scroll.length();
+        this.quill.insertEmbed(startIndex, "embed-loading", {});
+        const [blot] = this.quill.getLine(startIndex);
+
+        console.log(blot);
+
+        blot.registerDeleteCallback(() => {
+            if (this.currentUploads.has(file)) {
+                this.currentUploads.delete(file);
+            }
+        });
+
+        this.currentUploads.set(file, blot);
     };
 
     onImageUploadSuccess = (file, response) => {
         const selection = this.quill.getSelection();
         const startIndex = selection ? selection.index : this.quill.scroll.length();
-        this.quill.insertEmbed(startIndex, "embed-image", {url: response.data.url}, Emitter.sources.USER);
+        const imageEmbed = Parchment.create("embed-image", {url: response.data.url});
+        const completedBlot = this.currentUploads.get(file);
+        completedBlot.replaceWith(imageEmbed);
     };
 
     onImageUploadFailure = (file, error) => {

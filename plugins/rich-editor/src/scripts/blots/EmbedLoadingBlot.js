@@ -28,4 +28,16 @@ export default class EmbedLoadingBlot extends BlockEmbed {
     static value() {
         return;
     }
+
+    registerDeleteCallback(callback) {
+        this.deleteCallback = callback;
+    }
+
+    detach() {
+        if (this.deleteCallback) {
+            this.deleteCallback();
+        }
+
+        super.detach();
+    }
 }

@@ -317,5 +317,4 @@ class Pocket {
             $model->save($pocket);
         }
     }
-
 }

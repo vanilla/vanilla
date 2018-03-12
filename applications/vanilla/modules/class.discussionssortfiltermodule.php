@@ -128,17 +128,17 @@ class DiscussionsSortFilterModule extends Gdn_Module {
                 }
             }
             $key = val('key', $sort);
-            $queryString = DiscussionModel::getSortFilterQueryString($this->selectedSort, $this->selectedFilters, $key);
+            $queryString = val('key', $sort) !== DiscussionModel::EMPTY_FILTER_KEY ? DiscussionModel::getSortFilterQueryString($this->selectedSort, $this->selectedFilters, $key) : '';
             $sortData[$key]['name'] = val('name', $sort);
             $sortData[$key]['url'] = $this->getPagelessPath().$queryString;
             $sortData[$key]['rel'] = 'nofollow';
         }
         if (val($this->selectedSort, $sortData)) {
             $sortData[$this->selectedSort]['cssClass'] = self::ACTIVE_CSS_CLASS;
+            $sortData[$this->selectedSort]['active'] = true;
         } elseif (val($sortKey = DiscussionModel::getDefaultSortKey(), $sortData)) {
             $sortData[$sortKey]['cssClass'] = self::ACTIVE_CSS_CLASS;
         }
-
 
         return $sortData;
     }
@@ -153,53 +153,68 @@ class DiscussionsSortFilterModule extends Gdn_Module {
         if (!$this->filters) {
             return [''];
         }
-        $dropdowns = [];
-        foreach($this->filters as $filterSet) {
+
+        $filterDropdown = [];
+
+        foreach($this->filters as $filter) {
             // Check to see if there's a category restriction.
-            if ($categories = val('categories', $filterSet)) {
-                if (!in_array($this->categoryID, $categories)) {
+            if (!empty($filter['categories'])) {
+                if (!in_array($this->categoryID, $filter['categories'])) {
                     continue;
                 }
             }
-            $setKey = val('key', $filterSet);
-            $dropdown = new DropdownModule('discussions-filter-'.$setKey, val('name', $filterSet), 'discussion-filter');
 
-            // Override the trigger text?
-            $selectedValue = val($setKey, $this->selectedFilters);
-            if ($selectedValue && $selectedValue != 'none') {
-                $selected = val('name', $filterSet['filters'][$selectedValue]);
-                $dropdown->setTrigger($selected);
-            }
+            $key = $filter['key'];
 
-            $dropdown->setView($this->dropdownView);
-            $dropdown->setForceDivider(true); // Adds dividers between groups in the dropdown.
+            $selected = $this->selectedFilters[$key] ?? null;
 
-            // Add the filters to the dropdown
-            foreach (val('filters', $filterSet) as $filter) {
-                $key = val('group', $filter, '').'.'.val('key', $filter);
-                $queryString = DiscussionModel::getSortFilterQueryString(
+            $currentGroup = null;
+            $path = $this->getPagelessPath();
+            $values = array_values($filter['filters']);
+            $totalValues = count($values);
+
+            for ($i = 0; $i < $totalValues; $i++) {
+                $value = $values[$i];
+                $valueKey = $value['key'];
+                $query = DiscussionModel::getSortFilterQueryString(
                     $this->selectedSort,
                     $this->selectedFilters,
                     '',
-                    [$setKey => val('key', $filter)]
+                    [$key => $valueKey]
                 );
 
-                $pathAndQuery = $this->getPagelessPath().$queryString;
-                if (empty($pathAndQuery)) {
-                    $pathAndQuery = '/';
+                $url = $path.$query;
+                if (empty($url)) {
+                    $url = '/';
                 }
 
-                $dropdown->addLink(
-                    val('name', $filter),
-                    $pathAndQuery,
-                    $key,
-                    '',
-                    [],
-                    ['rel' => 'nofollow']
-                );
+                $group = $value['group'] ?? null;
+                if($i > 0 && $currentGroup !== $group) {
+                    $filterDropdown[] = [
+                        'separator' => true
+                    ];
+                }
+
+                if ($selected === null && $i === 0) {
+                    $isActive = true;
+                } elseif ($selected === $valueKey) {
+                    $isActive = true;
+                } else {
+                    $isActive = false;
+                }
+
+                $filterDropdown[] = [
+                    'name' => $value['name'],
+                    'url' => url($url),
+                    'active' => $isActive,
+                ];
+
+                $currentGroup = $group;
             }
-            $dropdowns[] = $dropdown;
+
+            $dropdowns[] = $filterDropdown;
         }
+
         return $dropdowns;
     }
 

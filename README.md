@@ -3,9 +3,9 @@ You cannot clone this repo right into a web directory - it requires a build step
 
 ![Vanilla](http://images.v-cdn.net/vanilla-black-logo-400.svg)
 
-[![Build Status](https://api.travis-ci.org/vanilla/vanilla.svg?branch=master)](https://travis-ci.org/vanilla/vanilla)
-[![PR Stats](http://issuestats.com/github/vanilla/vanilla/badge/pr?style=flat-round)](http://issuestats.com/github/vanilla/vanilla)
-[![Issue Stats](http://issuestats.com/github/vanilla/vanilla/badge/issue?style=flat-round)](http://issuestats.com/github/vanilla/vanilla)
+[![Build Status](https://img.shields.io/travis/vanilla/vanilla/master.svg)](https://travis-ci.org/vanilla/vanilla)
+[![PR Stats](https://img.shields.io/github/issues-pr-raw/vanilla/vanilla.svg)](https://github.com/vanilla/vanilla/pulls)
+[![Issue Stats](https://img.shields.io/github/issues-raw/vanilla/vanilla.svg)](https://github.com/vanilla/vanilla/issues)
 
 ## Howdy, Stranger!
 

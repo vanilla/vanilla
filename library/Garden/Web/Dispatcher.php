@@ -9,6 +9,8 @@ namespace Garden\Web;
 
 use Gdn;
 use Gdn_Locale;
+use Garden\Schema\ValidationException;
+use Garden\Web\Exception\HttpException;
 use Garden\Web\Exception\NotFoundException;
 use Garden\Web\Exception\Pass;
 use Interop\Container\ContainerInterface;
@@ -232,8 +234,22 @@ class Dispatcher {
             // This is an array of response data.
             $result = new Data($raw);
         } elseif ($raw instanceof \Exception || $raw instanceof \Error) {
-            $data = $raw instanceof \JsonSerializable ? $raw->jsonSerialize() : ['message' => $raw->getMessage(), 'status' => $raw->getCode()];
-            $result = new Data($data, $raw->getCode());
+
+            // Let's not mask errors when in debug mode!
+            if ($raw instanceof \Error && debug())  {
+                throw $raw;
+            }
+
+            // Make sure that there's a "proper" conversion from non-HTTP to HTTP exceptions since
+            // errors in the 2xx ranges are treated as success.
+            // ValidationException status code are compatible with HTTP codes.
+            $errorCode = $raw->getCode();
+            if (!$raw instanceof HttpException && !$raw instanceof ValidationException) {
+                $errorCode = 500;
+            }
+
+            $data = $raw instanceof \JsonSerializable ? $raw->jsonSerialize() : ['message' => $raw->getMessage()];
+            $result = new Data($data, $errorCode);
             // Provide stack trace as meta information.
             $result->setMeta('errorTrace', $raw->getTraceAsString());
 

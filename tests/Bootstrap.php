@@ -189,6 +189,11 @@ class Bootstrap {
             ->setClass(\Garden\Web\ResourceRoute::class)
             ->setConstructorArgs(['/api/v2/', '%sApiController'])
             ->addCall('setConstraint', ['locale', ['position' => 0]])
+            ->addCall('setMeta', ['CONTENT_TYPE', 'application/json; charset=utf-8'])
+
+            ->rule('@view-application/json')
+            ->setClass(\Vanilla\Web\JsonView::class)
+            ->setShared(true)
 
             ->rule(\Garden\ClassLocator::class)
             ->setClass(\Vanilla\VanillaClassLocator::class)
@@ -200,6 +205,14 @@ class Bootstrap {
             ->rule(\Vanilla\FileUtils::class)
             ->setAliasOf(\VanillaTests\Fixtures\FileUtils::class)
             ->addAlias('FileUtils')
+
+            ->rule('WebLinking')
+            ->setClass(\Vanilla\Web\WebLinking::class)
+            ->setShared(true)
+
+            ->rule(\WebScraper::class)
+            ->setShared(true)
+            ->addCall('setDisableFetch', [true]);
         ;
     }
 

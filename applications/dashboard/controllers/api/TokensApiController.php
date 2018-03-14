@@ -259,7 +259,7 @@ class TokensApiController extends AbstractApiController {
         $dbRecord['Name'] = $name ?: t('Personal Access Token');
 
         if (array_key_exists('Token', $dbRecord) && is_string($dbRecord['Token'])) {
-            $dbRecord['AccessToken'] = $this->accessTokenModel->signToken($dbRecord['Token']);
+            $dbRecord['AccessToken'] = $this->accessTokenModel->signTokenRow($dbRecord);
         }
 
         $schemaRecord = ApiUtils::convertOutputKeys($dbRecord);

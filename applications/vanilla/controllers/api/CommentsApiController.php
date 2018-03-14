@@ -146,6 +146,7 @@ class CommentsApiController extends AbstractApiController {
             'dateInserted:dt' => 'When the comment was created.',
             'dateUpdated:dt|n' => 'When the comment was last updated.',
             'insertUserID:i' => 'The user that created the comment.',
+            'score:i|n' => 'Total points associated with this post.',
             'insertUser?' => $this->getUserFragmentSchema(),
             'url:s?' => 'The full URL to the comment.'
         ]);
@@ -178,7 +179,7 @@ class CommentsApiController extends AbstractApiController {
         $result = $out->validate($comment);
 
         // Allow addons to modify the result.
-        $result = $this->getEventManager()->fireFilter('commentsApiController_get_output', $result, $this, $in, $query, $comment);
+        $result = $this->getEventManager()->fireFilter('commentsApiController_getOutput', $result, $this, $in, $query, $comment);
 
         return $result;
     }
@@ -305,7 +306,7 @@ class CommentsApiController extends AbstractApiController {
         $result = $out->validate($rows);
 
         // Allow addons to modify the result.
-        $result = $this->getEventManager()->fireFilter('commentsApiController_index_output', $result, $this, $in, $query, $rows);
+        $result = $this->getEventManager()->fireFilter('commentsApiController_indexOutput', $result, $this, $in, $query, $rows);
 
         if (isset($where['DiscussionID']) && count($where) === 1) {
             $discussion = $this->discussionByID($where['DiscussionID']);
@@ -314,7 +315,7 @@ class CommentsApiController extends AbstractApiController {
             $paging = ApiUtils::morePagerInfo($hasMore, '/api/v2/comments', $query, $in);
         }
 
-        return ApiUtils::setPageMeta($result, $paging);
+        return new Data($result, ['paging' => $paging]);
     }
 
     /**
@@ -333,7 +334,12 @@ class CommentsApiController extends AbstractApiController {
         }
 
         $schemaRecord = ApiUtils::convertOutputKeys($dbRecord);
-        return $schemaRecord;
+
+        // Allow addons to hook into the normalization process.
+        $options = [];
+        $result = $this->getEventManager()->fireFilter('commentsApiController_normalizeOutput', $schemaRecord, $this, $options);
+
+        return $result;
     }
 
     /**

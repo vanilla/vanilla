@@ -898,10 +898,11 @@ if (!function_exists('fetchPageInfo')) {
      * @param integer $timeout How long to allow for this request.
      * Default Garden.SocketTimeout or 1, 0 to never timeout. Default is 0.
      * @param bool $sendCookies Whether or not to send browser cookies with the request.
+     * @param bool $includeMedia Include media (e.g. image, video) attributes?
      * @return array Returns an array containing Url, Title, Description, Images (array) and Exception
      * (if there were problems retrieving the page).
      */
-    function fetchPageInfo($url, $timeout = 3, $sendCookies = false) {
+    function fetchPageInfo($url, $timeout = 3, $sendCookies = false, $includeMedia = false) {
         $pageInfo = [
             'Url' => $url,
             'Title' => '',
@@ -933,6 +934,60 @@ if (!function_exists('fetchPageInfo')) {
             if (!$dom) {
                 throw new Exception('Failed to load page for parsing.');
             }
+
+            /**
+             * Parse a page for OpenGraph media information.
+             *
+             * @param array $pageInfo
+             */
+            $getOpenGraphMedia = function (array &$pageInfo) use ($dom) {
+                $pageInfo['Media'] = [];
+
+                // Only target og:image and og:video tags.
+                $mediaTypes = ['image', 'video'];
+                foreach ($mediaTypes as $mediaType) {
+                    $tags = $dom->query('meta[property ^= "og:'.$mediaType.'"]');
+
+                    /** @var pQuery\DomNode $node */
+                    foreach ($tags as $node) {
+                        $property = $node->attr('property');
+                        $content = $node->attr('content');
+
+                        // If this is a root type element, save any existing type row data and start a new row.
+                        if ($property == "og:{$mediaType}") {
+                            if (isset($media)) {
+                                if (!array_key_exists($mediaType, $pageInfo['Media'])) {
+                                    $pageInfo['Media'][$mediaType] = [];
+                                }
+                                $pageInfo['Media'][$mediaType][] = $media;
+                            }
+                            $media = ['value' => $content];
+                        } else {
+                            // Shave off the type prefix. Save the content, if it's something we actually want.
+                            $subproperty = trim(stringBeginsWith(
+                                $property,
+                                "og:{$mediaType}",
+                                false,
+                                true
+                            ), ':');
+                            if (in_array($subproperty, ['height', 'width'])) {
+                                if (isset($media)) {
+                                    $media[$subproperty] = $content;
+                                }
+                            }
+                        }
+                    }
+
+                    // Save any outstanding information. Clear the row in preparation for the next iteration.
+                    if (isset($media)) {
+                        if (!array_key_exists($mediaType, $pageInfo['Media'])) {
+                            $pageInfo['Media'][$mediaType] = [];
+                        }
+                        $pageInfo['Media'][$mediaType][] = $media;
+                        unset($media);
+                    }
+                }
+            };
 
             // FIRST PASS: Look for open graph title, desc, images
             $pageInfo['Title'] = domGetContent($dom, 'meta[property="og:title"]');
@@ -990,9 +1045,16 @@ if (!function_exists('fetchPageInfo')) {
             $pageInfo['Title'] = htmlEntityDecode($pageInfo['Title']);
             $pageInfo['Description'] = htmlEntityDecode($pageInfo['Description']);
 
+            /**
+             * Add OpenGraph media information?
+             */
+            if ($includeMedia) {
+                $getOpenGraphMedia($pageInfo);
+            }
         } catch (Exception $ex) {
             $pageInfo['Exception'] = $ex->getMessage();
         }
+
         return $pageInfo;
     }
 }
@@ -2103,7 +2165,13 @@ if (!function_exists('joinRecords')) {
                 // Check to see if the user has permission to view this record.
                 $categoryID = getValue('CategoryID', $record, -1);
                 if (!in_array($categoryID, $allowedCats)) {
-                    $unsets[] = $index;
+                    if ($unset) {
+                        $unsets[] = $index;
+                    } else {
+                        $row['RecordType'] = null;
+                        $row['RecordID'] = null;
+                        unset($row['RecordBody'], $row['RecordFormat']);
+                    }
                     continue;
                 }
             }
@@ -4073,9 +4141,10 @@ if (!function_exists('paramPreference')) {
      * @param string $preference User preference name
      * @param string|null $config Config value, used as a conditional for performing this action
      * @param string null $configVal Look for a specific config value, instead of allowing truthy values.
+     * @param bool $save Save the parameter value to the user preference, if available.
      * @return mixed
      */
-    function paramPreference($param, $preference, $config = null, $configVal = null) {
+    function paramPreference($param, $preference, $config = null, $configVal = null, $save = false) {
         $value = Gdn::request()->get($param, null);
 
         if ($config === null || (($configVal === null && c($config)) || c($config) === $configVal)) {
@@ -4084,7 +4153,7 @@ if (!function_exists('paramPreference')) {
                 if ($value) {
                     Gdn::request()->setQueryItem($param, $value);
                 }
-            } else {
+            } elseif ($save) {
                 Gdn::session()->setPreference($preference, $value);
             }
         }

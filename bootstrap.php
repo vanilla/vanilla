@@ -63,10 +63,17 @@ $dic->setInstance('Garden\Container\Container', $dic)
     ->setShared(true)
     ->addAlias('ApplicationManager')
 
+    ->rule(Garden\Web\Cookie::class)
+    ->setShared(true)
+    ->addAlias('Cookie')
+
     // PluginManager
     ->rule('Gdn_PluginManager')
     ->setShared(true)
     ->addAlias('PluginManager')
+
+    ->rule(SsoUtils::class)
+    ->setShared(true)
 
     // ThemeManager
     ->rule('Gdn_ThemeManager')
@@ -150,6 +157,10 @@ $dic->setInstance('Garden\Container\Container', $dic)
     ->setConstructorArgs(['/api/v2/', '*\\%sApiController'])
     ->addCall('setMeta', ['CONTENT_TYPE', 'application/json; charset=utf-8'])
 
+    ->rule('@view-application/json')
+    ->setClass(\Vanilla\Web\JsonView::class)
+    ->setShared(true)
+
     ->rule(\Garden\ClassLocator::class)
     ->setClass(\Vanilla\VanillaClassLocator::class)
 
@@ -184,6 +195,10 @@ $dic->setInstance('Garden\Container\Container', $dic)
     ->setShared(true)
 
     ->rule('Smarty')
+    ->setShared(true)
+
+    ->rule('WebLinking')
+    ->setClass(\Vanilla\Web\WebLinking::class)
     ->setShared(true)
 
     ->rule('ViewHandler.tpl')
@@ -306,6 +321,13 @@ $dic->call(function (
 
     // Now that all of the events have been bound, fire an event that allows plugins to modify the container.
     $eventManager->fire('container_init', $dic);
+});
+
+// Send out cookie headers.
+register_shutdown_function(function() use ($dic) {
+    $dic->call(function(Garden\Web\Cookie $cookie) {
+        $cookie->flush();
+    });
 });
 
 /**

@@ -135,23 +135,29 @@ class UsersApiController extends AbstractApiController {
      * Get a single user.
      *
      * @param int $id The ID of the user.
+     * @param array $query The request query.
      * @throws NotFoundException if the user could not be found.
      * @return array
      */
-    public function get($id) {
+    public function get($id, array $query) {
         $this->permission([
             'Garden.Users.Add',
             'Garden.Users.Edit',
             'Garden.Users.Delete'
         ]);
 
-        $in = $this->idParamSchema()->setDescription('Get a user.');
+        $this->idParamSchema();
+        $in = $this->schema([], ['UserGet', 'in'])->setDescription('Get a user.');
         $out = $this->schema($this->userSchema(), 'out');
 
+        $query = $in->validate($query);
         $row = $this->userByID($id);
         $row = $this->normalizeOutput($row);
 
         $result = $out->validate($row);
+
+        // Allow addons to modify the result.
+        $result = $this->getEventManager()->fireFilter('usersApiController_getOutput', $result, $this, $in, $query, $row);
         return $result;
     }
 
@@ -172,6 +178,70 @@ class UsersApiController extends AbstractApiController {
 
         $result = $out->validate($row);
         return $result;
+    }
+
+    /**
+     * Get a list of users, filtered by username.
+     *
+     * @param array $query
+     * @return array
+     */
+    public function get_byNames(array $query) {
+        $this->permission('Garden.SignIn.Allow');
+
+        $in = $this->schema([
+            'name:s' => 'Filter for username. Supports full or partial matching with appended wildcard (e.g. User*).',
+            'order:s?' => [
+                'description' => 'Sort method for results.',
+                'enum' => ['countComments', 'dateLastActive', 'name', 'mention'],
+                'default' => 'name'
+            ],
+            'page:i?' => [
+                'description' => 'Page number. See [Pagination](https://docs.vanillaforums.com/apiv2/#pagination).',
+                'default' => 1,
+                'minimum' => 1,
+            ],
+            'limit:i?' => [
+                'description' => 'Desired number of items per page.',
+                'default' => 30,
+                'minimum' => 1,
+                'maximum' => 100,
+            ]
+        ], 'in')->setDescription('Search for users by full or partial name matching.');
+        $out = $this->schema([
+            ':a' => Schema::parse(['userID', 'name', 'photoUrl'])->add($this->userSchema())
+        ], 'out');
+
+        $query = $in->validate($query);
+        list($offset, $limit) = offsetLimit("p{$query['page']}", $query['limit']);
+
+        if ($query['order'] == 'mention') {
+            list($sortField, $sortDirection) = $this->userModel->getMentionsSort();
+        } else {
+            $sortField = $query['order'];
+            switch ($sortField) {
+                case 'countComments':
+                case 'dateLastActive':
+                    $sortDirection = 'desc';
+                    break;
+                case 'name':
+                default:
+                    $sortDirection = 'asc';
+            }
+        }
+
+        $rows = $this->userModel
+            ->searchByName($query['name'], $sortField, $sortDirection, $limit, $offset)
+            ->resultArray();
+
+        foreach ($rows as &$row) {
+            $row = $this->normalizeOutput($row);
+        }
+        $result = $out->validate($rows);
+
+        $paging = ApiUtils::morePagerInfo($result, '/api/v2/users/names', $query, $in);
+
+        return new Data($result, ['paging' => $paging]);
     }
 
     /**
@@ -237,7 +307,7 @@ class UsersApiController extends AbstractApiController {
                 'minimum' => 1,
                 'maximum' => 100,
             ]
-        ], 'in')->setDescription('List users.');
+        ], ['UserIndex', 'in'])->setDescription('List users.');
         $out = $this->schema([':a' => $this->userSchema()], 'out');
 
         $query = $in->validate($query);
@@ -268,7 +338,9 @@ class UsersApiController extends AbstractApiController {
             $paging = ApiUtils::morePagerInfo($result, '/api/v2/users', $query, $in);
         }
 
-        return ApiUtils::setPageMeta($result, $paging);
+        // Allow addons to modify the result.
+        $result = $this->getEventManager()->fireFilter('usersApiController_indexOutput', $result, $this, $in, $query, $rows);
+        return new Data($result, ['paging' => $paging]);
 
     }
 

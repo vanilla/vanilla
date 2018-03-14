@@ -916,6 +916,7 @@ class Gdn_Format {
 
                 // Do HTML filtering before our special changes.
                 $result = $formatter->format($mixed, $options);
+                $result = self::sanitizeLinks($result);
             } else {
                 // The text does not contain HTML and does not have to be purified.
                 // This is an optimization because purifying is very slow and memory intense.
@@ -982,6 +983,32 @@ class Gdn_Format {
 
         return $html;
     }
+
+    /**
+     * Add noopener to any link that has target="_blank"
+     *
+     * @param string $html An HTML-formatted string.
+     *
+     * @return string Returns the html with noopener added to any links with target="_blank".
+     */
+    protected static function sanitizeLinks($html) {
+        if (preg_match('/target="_blank"/i', $html)) {
+            $htmlDom = pQuery::parseStr($html);
+
+            foreach($htmlDom->query('a[target="_blank"]:not([rel*="noopener"])') as $targetBlankLink) {
+                $rel = $targetBlankLink->attr("rel");
+                if ($rel) {
+                    $targetBlankLink->attr("rel", $rel . " noopener");
+                } else {
+                    $targetBlankLink->attr("rel", "noopener");
+                }
+            }
+            $html = (string)$htmlDom;
+        }
+
+        return $html;
+    }
+
 
     /**
      * Check to see if a string has quotes and replace with them with a placeholder.
@@ -1395,12 +1422,24 @@ class Gdn_Format {
             list($width, $height) = Gdn_Format::getEmbedSize();
         }
 
+        $urlParts = parse_url($url);
+
+        parse_str(val('query', $urlParts,  ''), $query);
+        // There's the possibility the query string could be encoded, resulting in parameters that begin with "amp;"
+        foreach ($query as $key => $val) {
+            $newKey = stringBeginsWith($key, 'amp;', false, true);
+            if ($newKey !== $key) {
+                $query[$newKey] = $val;
+                unset($query[$key]);
+            }
+        }
+
         // For each embed, add a key, a string to test the url against using strpos, and the regex for the url to parse.
         // The is an array of strings. If there are more than one way to match the url, you can add multiple regex strings
         // in the regex array. This is useful for backwards-compatibility when a service updates its url structure.
         $embeds = [
             'YouTube' => [
-                'regex' => ['/https?:\/\/(?:(?:www.)|(?:m.))?(?:(?:youtube.com)|(?:youtu.be))\/(?:(?:playlist?)|(?:(?:watch\?v=)?(?P<videoId>[\w-]{11})))(?:\?|\&)?(?:list=(?P<listId>[\w-]*))?(?:t=(?:(?P<minutes>\d)*m)?(?P<seconds>\d)*s)?(?:#t=(?P<start>\d*))?/i']
+                'regex' => ['/https?:\/\/(?:(?:www.)|(?:m.))?(?:(?:youtube.com)|(?:youtu.be))\/(?:(?:playlist?)|(?:(?:watch\?v=)?(?P<videoId>[\w-]{11})))(?:\?|\&)?(?:list=(?P<listId>[\w-]*))?(?:t=(?:(?P<minutes>\d*)m)?(?P<seconds>\d*)s)?(?:#t=(?P<start>\d*))?/i']
             ],
             'Twitter' => [
                 'regex' => ['/https?:\/\/(?:www\.)?twitter\.com\/(?:#!\/)?(?:[^\/]+)\/status(?:es)?\/([\d]+)/i']
@@ -1505,6 +1544,10 @@ EOT;
                     if ($start = val('start', $matches)) {
                         $fullUrl .= '&start='.$start;
                         $start = '#t='.$start;
+                    }
+
+                    if (array_key_exists('rel', $query)) {
+                        $fullUrl .= "&rel={$query['rel']}";
                     }
 
                     $result = '<span class="VideoWrap">';

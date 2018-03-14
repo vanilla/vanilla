@@ -22,10 +22,8 @@ class Gdn_Session {
      */
     const CSRF_NAME = 'TransientKey';
 
-    /**
-     * CSRF tokens time to live.
-     */
-    const CSRF_TOKEN_TTL = 1200; // 20 minutes.
+    /** Maximum length of inactivity, in seconds, before a visit is considered new. */
+    const VISIT_LENGTH = 1200; // 20 minutes
 
     /** @var int Unique user identifier. */
     public $UserID;
@@ -285,36 +283,40 @@ class Gdn_Session {
     }
 
     /**
-     *
+     * Determine if this is a new visit for this user.
      *
      * @return bool
      */
+    public function isNewVisit() {
+        if ($this->User) {
+            $cookie = $this->getCookie('-Vv', false);
+            $userVisitExpiry = Gdn_Format::toTimeStamp($this->User->DateLastActive) + self::VISIT_LENGTH;
+
+            if ($cookie) {
+                $result = false; // User has cookie, not a new visit.
+            } elseif ($userVisitExpiry > time())
+                $result = false; // User was last active less than 20 minutes ago, not a new visit.
+            else {
+                $result = true; // No cookie and not active in the last 20 minutes? New visit.
+            }
+        } else {
+            $result = false;
+        }
+
+        return $result;
+    }
+
+    /**
+     * Update the visit cookie.
+     *
+     * @return bool Is this a new visit?
+     */
     public function newVisit() {
-        static $newVisit = null;
+        $newVisit = $this->isNewVisit();
 
-        if ($newVisit !== null) {
-            return $newVisit;
-        }
-
-        if (!$this->User) {
-            return false;
-        }
-
-        $current = $this->getCookie('-Vv');
         $now = time();
-        $timeToExpire = 1200; // 20 minutes
-        $expires = $now + $timeToExpire;
-
-        // Figure out if this is a new visit.
-        if ($current) {
-            $newVisit = false; // user has cookie, not a new visit.
-        } elseif (Gdn_Format::toTimeStamp($this->User->DateLastActive) + $timeToExpire > $now)
-            $newVisit = false; // user was last active less than 20 minutes ago, not a new visit.
-        else {
-            $newVisit = true;
-        }
-
-        $this->setCookie('-Vv', $now, $expires);
+        $expiry = $now + self::VISIT_LENGTH;
+        $this->setCookie('-Vv', $now, $expiry);
 
         return $newVisit;
     }
@@ -424,6 +426,8 @@ class Gdn_Session {
         if (!c('Garden.Installed', false)) {
             return;
         }
+
+        $this->permissions = new Permissions();
 
         // Retrieve the authenticated UserID from the Authenticator module.
         $userModel = Gdn::authenticator()->getUserModel();
@@ -821,87 +825,5 @@ class Gdn_Session {
         }
 
         return $session;
-    }
-
-    /**
-     * Generate a CSRF token that ca be used externally.
-     * ie. oauth2 state parameter validation.
-     *
-     * @param bool $forceNew The CSRF token is generated on a per request basis. Use forceNew to regenerate it.
-     * @return The CSRF token.
-     */
-    public function generateCSRFToken($forceNew = false) {
-        static $csrfToken;
-
-        if ($csrfToken === null || $forceNew) {
-            $expiration = time() + self::CSRF_TOKEN_TTL;
-            $csrfToken = betterRandomString(32);
-
-            /** @var Gdn_CookieIdentity $identity */
-            $identity = Gdn::getContainer()->get('Identity');
-            $identity->setJWTPayload(
-                c('Garden.Cookie.Name', 'Vanilla').'-csrf',
-                [
-                    'csrfToken' => $csrfToken,
-                    'expiration' => $expiration,
-                ],
-                $expiration
-            );
-        }
-
-        return $csrfToken;
-    }
-
-    /**
-     * Consume the CSRF token. Will prevent it from being used a subsequent time.
-     *
-     * @param string $csrfToken
-     * @return array|null the CSRF data.
-     * @throws Exception If the token doesn't match or have expired.
-     */
-    public function consumeCSRFToken($csrfToken) {
-        $cookieName = c('Garden.Cookie.Name', 'Vanilla').'-csrf';
-        /** @var Gdn_CookieIdentity $identity */
-        $identity = Gdn::getContainer()->get('Identity');
-
-        // This checks the expiration.
-        $data = $identity->getJWTPayload($cookieName);
-
-        if (!$data || empty($data['csrfToken'])) {
-            throw new Exception(t('The session is missing or contain an expired CSRF token.'));
-        }
-        if (!$this->isCSRFDataValid($csrfToken, $data)) {
-            throw new Exception('Invalid CSRF token.');
-        }
-
-        $identity::deleteCookie($cookieName);
-
-        return $data;
-    }
-
-    /**
-     * Utility function used to validate CSRF data.
-     *
-     * @param string $csrfToken
-     * @param array $csrfTokenData
-     * @return bool true if the data is valid and false otherwise.
-     */
-    public function isCSRFDataValid($csrfToken, $csrfTokenData) {
-        // Validate expected data.
-        if (!is_array($csrfTokenData) || empty($csrfTokenData['csrfToken']) || empty($csrfTokenData['expiration'])) {
-            return false;
-        }
-
-        // Check for expiration.
-        if ($csrfTokenData['expiration'] < time()) {
-            return false;
-        }
-
-        // Check the token.
-        if ($csrfToken !== $csrfTokenData['csrfToken']) {
-            return false;
-        }
-
-        return true;
     }
 }

@@ -46,8 +46,9 @@ trait PermissionsTranslationTrait {
         'Garden.Users.Approve' => 'applicants.manage',
         'Groups.Group.Add' => 'groups.add',
         'Groups.Moderation.Manage' => 'groups.moderate',
+        'Plugins.Attachments.Upload.Allow' => 'uploads.add',
         'Reputation.Badges.Give' => 'badges.moderate',
-        'Vanilla.Tagging.Add' => 'tags.add'
+        'Vanilla.Tagging.Add' => 'tags.add',
     ];
 
     /** @var array These permissions should not be renamed. */

@@ -1138,34 +1138,40 @@ if (!function_exists('linkDropDown')) {
         <span class="ToggleFlyout selectBox {$extraClasses}">
           <span class="selectBox-label">{$label}</span>
           <span class="selectBox-main">
-              <a href="#" role="button" class="FlyoutButton selectBox-toggle" tabindex="0">
+              <a href="#" role="button" rel="nofollow" class="FlyoutButton selectBox-toggle" tabindex="0">
                 <span class="selectBox-selected">{$linkName}</span>
                 <span class="vanillaDropDown-arrow">▾</span>
               </a>
               <ul class="Flyout MenuItems selectBox-content" role="presentation">
 EOT;
         foreach($links as $i => $link) {
-            if (val('active', $link)) {
-                $output .= '<li class="selectBox-item isActive" role="presentation">';
-                $output .= '  <a href="'.val('url', $link).'" role="menuitem" class="dropdown-menu-link selectBox-link" tabindex="0" aria-current="location">';
-                $output .= '    <svg class="vanillaIcon selectBox-selectedIcon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 18 18">';
-                $output .= '      <title>✓</title>';
-                $output .= '      <polygon fill="currentColor" points="1.938,8.7 0.538,10.1 5.938,15.5 17.337,3.9 15.938,2.5 5.938,12.8"></polygon>';
-                $output .= '    </svg>';
-                $output .= '    <span class="selectBox-selectedText">';
-                $output .=        val('name', $link);
-                $output .= '    </span>';
-                $output .= '  </a>';
-                $output .= '</li>';
-            } else {
-                $output .= '<li class="selectBox-item" role="presentation">';
-                $output .= '  <a href="'.val('url', $link).'" role="menuitem" class="dropdown-menu-link selectBox-link" tabindex="0" href="#">';
-                $output .=      val('name', $link);
-                $output .= '  </a>';
-                $output .= '</li>';
+                if (val('separator', $link)) {
+                    $output .= '<li class="menu-separator" role="presentation">';
+                        $output .= '<hr/>';
+                    $output .= '</li>';
+                } else {
+                    if (val('active', $link)) {
+                        $output .= '<li class="selectBox-item isActive" role="presentation">';
+                        $output .= '  <a href="'.val('url', $link).'" role="menuitem" class="dropdown-menu-link selectBox-link" tabindex="0" aria-current="location">';
+                        $output .= '    <svg class="vanillaIcon selectBox-selectedIcon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 18 18">';
+                        $output .= '      <title>✓</title>';
+                        $output .= '      <polygon fill="currentColor" points="1.938,8.7 0.538,10.1 5.938,15.5 17.337,3.9 15.938,2.5 5.938,12.8"></polygon>';
+                        $output .= '    </svg>';
+                        $output .= '    <span class="selectBox-selectedText">';
+                        $output .=        val('name', $link);
+                        $output .= '    </span>';
+                        $output .= '  </a>';
+                        $output .= '</li>';
+                    } else {
+                        $output .= '<li class="selectBox-item" role="presentation">';
+                        $output .= '  <a href="'.val('url', $link).'" role="menuitem" class="dropdown-menu-link selectBox-link" tabindex="0" href="#">';
+                        $output .=      val('name', $link);
+                        $output .= '  </a>';
+                        $output .= '</li>';
+                    }
+                }
             }
-        }
-        $output .= <<<EOT
+                $output .= <<<EOT
               </ul>
             </span>
           </span>

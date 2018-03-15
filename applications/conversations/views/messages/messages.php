@@ -40,7 +40,7 @@ foreach ($Messages as $Message) {
                 $this->fireEvent('AfterConversationMessageDate');
                 ?>
             </div>
-            <div class="Message">
+            <div class="Message userContent">
                 <?php
                 $this->fireEvent('BeforeConversationMessageBody');
                 echo Gdn_Format::to($Message->Body, $Format);

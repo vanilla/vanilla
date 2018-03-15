@@ -59,7 +59,7 @@ function writeActivity($activity, $sender, $session) {
     <?php } ?>
    <div class="ItemContent Activity">
       <?php echo $title; ?>
-    <?php echo wrapIf($excerpt, 'div', ['class' => 'Excerpt']); ?>
+    <?php echo wrapIf($excerpt, 'div', ['class' => 'Excerpt userContent']); ?>
     <?php
     $sender->EventArguments['Activity'] = $activity;
     $sender->fireAs('ActivityController')->fireEvent('AfterActivityBody');

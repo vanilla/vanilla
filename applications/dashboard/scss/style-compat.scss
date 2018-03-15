@@ -1,7 +1,7 @@
 // This CSS file should always be added after style.css and not be overridden.
 
 // Compatibility
-@import "compatibility/_mixins.scss";
+@import "compatibility/mixins";
 @import "compatibility/scaffolding";
 @import "compatibility/utilities";
 @import "compatibility/image-cropper";

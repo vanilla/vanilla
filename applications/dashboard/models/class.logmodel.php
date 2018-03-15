@@ -8,16 +8,29 @@
  * @since 2.1
  */
 
+use Vanilla\PrunableTrait;
+
 /**
  * Handles additional logging.
  */
 class LogModel extends Gdn_Pluggable {
+
+    use PrunableTrait;
 
     private static $instance = null;
     private $recalcIDs = [
         'Discussion' => [],
     ];
     private static $transactionID = null;
+
+    public function __construct() {
+        parent::__construct();
+        try {
+            $this->setPruneAfter(c('Logs.Common.PruneAfter', '3 months'));
+        } catch(Exception $e) {
+            $this->setPruneAfter('3 months');
+        }
+    }
 
     /**
      * Begin a log transaction.
@@ -27,15 +40,69 @@ class LogModel extends Gdn_Pluggable {
     }
 
     /**
-     * Purge entries from the log.
+     * Delete records from the log table.
      *
-     * @param int[]|string $logIDs An array or CSV of log IDs.
+     * @param array $where The where clause.
+     * @param array $options Options for the delete.
+     * @return mixed
      */
-    public function delete($logIDs) {
-        if (!is_array($logIDs)) {
+    public function delete($where = [], $options = []) {
+        if (!is_array($where)) {
             $logIDs = explode(',', $logIDs);
+        } else {
+            $keysAreIDs = true;
+            $keys = array_keys($where);
+            foreach ($keys as $key) {
+                if (!filter_var($key, FILTER_VALIDATE_INT, ['min_range' => '1'])) {
+                    $keysAreIDs = false;
+                    break;
+                }
+            }
+
+            if ($keysAreIDs) {
+                $logIDs = $keys;
+            }
         }
 
+        if (isset($logIDs)) {
+            deprecated('delete(int[])', 'deleteIDs');
+            $this->deleteIDs($logIDs);
+            return;
+        }
+
+        Gdn::sql()->delete('Log', $where, $options['limit'] ?? false);
+    }
+
+    /**
+     * Prune old rows.
+     *
+     * @param int|null $limit Then number of rows to delete or **null** to use the default prune limit.
+     */
+    public function prune($limit = null) {
+        $date = $this->getPruneDate();
+
+        $options = [];
+        if ($limit === null) {
+            $options['limit'] = $this->getPruneLimit();
+        } elseif ($limit !== 0) {
+            $options['limit'] = $limit;
+        }
+
+        $this->delete(
+            [
+                $this->getPruneField().' <' => $date->format('Y-m-d H:i:s'),
+                'Operation' => ['Edit','Spam','Moderate','Error'],
+            ],
+            $options
+        );
+    }
+
+    /**
+     * Purge entries from the log and clean associated records if needed.
+     *
+     * @param int[] $logIDs
+     */
+    public function deleteIDs(array $logIDs) {
         // Get the log entries.
         $logs = $this->getIDs($logIDs);
         $models = [];
@@ -511,6 +578,9 @@ class LogModel extends Gdn_Pluggable {
             $l->EventArguments['LogID'] = $logID;
             $l->fireEvent('AfterInsert');
         }
+
+        self::instance()->prune();
+
         return $logID;
     }
 

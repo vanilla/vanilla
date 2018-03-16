@@ -509,3 +509,9 @@ td.BigCount {
 .CountItemWrap {
     width: auto; /* Keep counts from being mushed together */
 }
+
+/* Groups */
+
+.groupsSearch {
+    width: 100%;
+}

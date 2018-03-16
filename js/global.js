@@ -1900,40 +1900,16 @@ jQuery(document).ready(function($) {
                     // string as well as spaces. Spaces make things more
                     // complicated.
                     matcher: function(flag, subtext, should_start_with_space) {
-                        var match, regexp;
-                        flag = flag.replace(/[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g, "\\$&");
-
+                        var regexStr = '(@(?=(")?)(\\w+|\\1(?:[^\\u0000-\\u001f\\u007f-\\u009f\\u2028]+?)\\1))(?:\\s|$)';
                         if (should_start_with_space) {
-                            flag = '(?:^|\\s)' + flag;
+                            regexStr = '(?:^|\\s)' + regexStr;
                         }
-
-                        // Note: adding whitespace to regex makes the query in
-                        // remote_filter and before_insert callbacks throw
-                        // undefined when not accounted for, so optional
-                        // assigments added to each.
-                        //regexp = new RegExp(flag + '([A-Za-z0-9_\+\-]*)$|' + flag + '([^\\x00-\\xff]*)$', 'gi');
-                        // Note: this does make the searching a bit more loose,
-                        // but it's the only way, as spaces make searching
-                        // more ambiguous.
-                        // \xA0 non-breaking space
-                        // Skip \n which is \x0A and threat is as EOL
-                        //https://developer.mozilla.org/en/docs/Web/JavaScript/Reference/Global_Objects/RegExp#character-classes
-                        var whiteSpaceNoLineFeed = '\\f\\r\\t\\v\​\u00a0\\u1680​\\u180e'; //\u2000​-\u200a​\u2028\u2029\u202f\u205f​\u3000\ufeff  <- was throwing error.
-                        regexp = new RegExp(flag + '\"?(['+whiteSpaceNoLineFeed+'A-Za-z0-9_\+\-]*)\"?(?:\\n|$)|' + flag + '\"?([^\\x00-\\x09\\x0B-\\xff]*)\"?(?:\\n|$)', 'gi');
-
-                        match = regexp.exec(subtext);
+                        var regex = new RegExp(regexStr, 'gi');
+                        var match = regex.exec(subtext);
+                        console.log(regexStr, match);
                         if (match) {
-                            console.log("flag: ", flag);
-                            console.log("subtext: ", subtext);
-                            console.log("regexp: ", regexp);
-                            console.log();
-                            // Store the original matching string to check against
-                            // quotation marks after the at symbol, to prevent
-                            // double insertions of the at symbol. This will be
-                            // used in the before_insert callback.
-                            this.raw_at_match = match[0];
-
-                            return match[2] || match[1];
+                            this.raw_at_match = match[2];
+                            return match[3];
                         } else {
                             return null;
                         }

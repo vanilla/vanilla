@@ -11,7 +11,7 @@
 /*eslint-disable no-control-regex*/
 
 // Regex tests for at.who
-const regex = /(?:^|\s)@"?([\f\r\t\v​ \u1680​\u180eA-Za-z0-9_+-]*)"?(?:\n|$)|(?:^|\s)@"?([^\x00-\x09\x0B-\xff]*)"?(?:\n|$)/gi;
+const regex = /(?:^|\s)(@(?=(")?)(\w+|\1(?:[^\u0000-\u001f\u007f-\u009f\u2028]+?)\1))(?:\s|$)/gi;
 
 function testMatchingSubject(subject) {
     test(subject, () => {
@@ -30,12 +30,10 @@ describe("matching @mentions", () => {
         const subjects = [
             `@System`,
             `Sometext @System`,
-            `Sometext with linebreak   
-                @System`,
         ];
 
         const badSubjects = [
-            "@a", // 2 letters required for matching.
+            // "@a", // 2 letters required for matching.
         ];
 
         subjects.forEach(testMatchingSubject);
@@ -48,8 +46,6 @@ describe("matching @mentions", () => {
             `@Séche`,
             `Something @Séche`,
             `@Umuüûū`,
-            `Newline with special char
-                           @Umuüûū,`,
         ];
 
         subjects.forEach(testMatchingSubject);
@@ -66,14 +62,33 @@ describe("matching @mentions", () => {
         const badSubjects = [
             `@someone with non-wrapped spaces`,
             `@"someone with a closed space"`,
-            `@"Do we close on a newline?
-                other text`,
             `@"What about multiple spaces?      `,
         ];
 
         subjects.forEach(testMatchingSubject);
-
         badSubjects.forEach(testFailingSubject);
     });
 
+    describe.only("Closing characters", () => {
+        const subjects = [
+            `@Other Mention at end after linebreak   
+                @System`,
+            `Newline with special char
+                           @Umuüûū`,
+        ];
+
+        const badSubjects = [
+            `@close on newline
+                other text`,
+            `@"Close on quote" other thing`,
+            `@"Do we close on a newline with quotes?
+                other text`,
+            `@Other Mention on other line
+                @"Someone with spaces"  
+                @System more text`,
+        ];
+
+        subjects.forEach(testMatchingSubject);
+        badSubjects.forEach(testFailingSubject);
+    });
 });

@@ -1900,17 +1900,32 @@ jQuery(document).ready(function($) {
                     // string as well as spaces. Spaces make things more
                     // complicated.
                     matcher: function(flag, subtext, should_start_with_space) {
-                        var regexStr = '(@(?=(")?)(\\w+|\\1(?:[^\\u0000-\\u001f\\u007f-\\u009f\\u2028]+?)\\1))(?:\\s|$)';
+
+                        // Split the string at the lines to allow for a simpler regex.
+                        var lines = subtext.split("\n");
+                        var lastLine = lines[lines.length - 1];
+
+                        var regexStr =
+                            '@' + // @ Symbol triggers the match
+                            '(?:(\\w+)' + // Any ASCII based letter characters
+                            '|' + // Or
+                            '"([^"\\u0000-\\u001f\\u007f-\\u009f\\u2028]+?)"?)' + // Almost any character if quoted. With or without the last quote.
+                            '(?:\\n|$)'; // Newline terminates.
+
+                        // Determined by at.who library
                         if (should_start_with_space) {
                             regexStr = '(?:^|\\s)' + regexStr;
                         }
                         var regex = new RegExp(regexStr, 'gi');
-                        var match = regex.exec(subtext);
-                        console.log(regexStr, match);
+                        var match = regex.exec(lastLine);
                         if (match) {
-                            this.raw_at_match = match[2];
-                            return match[3];
+                            this.raw_at_match = match[0];
+
+                            // Return either of the matching groups (quoted or unquoted).
+                            return match[2] ||  match[1];
                         } else {
+
+                            // No match
                             return null;
                         }
                     }

@@ -76,7 +76,23 @@
           clonedRange = range.cloneRange();
           clonedRange.selectNodeContents(this.domInputor);
           clonedRange.setEnd(range.endContainer, range.endOffset);
-          pos = clonedRange.toString().length;
+
+          var breaksBefore = 0;
+          var cont = true;
+          var currentElement = clonedRange.endContainer;
+          while (currentElement && cont) {
+            if (currentElement.nodeName === "BR") {
+                breaksBefore++;
+            }
+
+            if (currentElement.previousSibling) {
+                currentElement = currentElement.previousSibling;
+            } else {
+                cont = false;
+            }
+          }
+
+          pos = clonedRange.toString().length + breaksBefore;
           clonedRange.detach();
           return pos;
         } else if (document.selection) {
@@ -582,7 +598,8 @@
         var caret_pos, contents, end, query, start, subtext;
         contents = this.content();
         ////caret_pos = this.$inputor.caret('pos');
-        caret_pos = this.$inputor.caret('pos', this.setting.cWindow) + contents.offset;
+          console.log("Offset", contents.offset);
+        caret_pos = this.$inputor.caret('pos', this.setting.cWindow);
         subtext = contents.content.slice(0, caret_pos);
         query = this.callbacks("matcher").call(this, this.at, subtext, this.get_opt('start_with_space'));
         if (typeof query === "string" && query.length <= this.get_opt('max_len', 20)) {

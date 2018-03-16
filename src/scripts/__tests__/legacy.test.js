@@ -10,8 +10,8 @@
  */
 /*eslint-disable no-control-regex*/
 
-// Regex tests for at.who
-const regex = /(?:^|\s)(@(?=(")?)(\w+|\1(?:[^\u0000-\u001f\u007f-\u009f\u2028]+?)\1))(?:\s|$)/gi;
+// Regex tests for at.who. See global.js `matcher()` at line 1902
+const regex = /(?:^|\s)@(?:(\w+)|"([^"\u0000-\u001f\u007f-\u009f\u2028]+?)"?)(?:\n|$)/gi;
 
 function testMatchingSubject(subject) {
     test(subject, () => {
@@ -37,32 +37,34 @@ describe("matching @mentions", () => {
         ];
 
         subjects.forEach(testMatchingSubject);
-
         badSubjects.forEach(testFailingSubject);
     });
 
     describe("special characters", () => {
         const subjects = [
-            `@Séche`,
-            `Something @Séche`,
-            `@Umuüûū`,
+            `@"Séche"`,
+            `Something @"Séche"`,
+            `@"Umuüûū"`,
+        ];
+
+        const badSubjects = [
+            `@Séche`, // Unquoted accent character
         ];
 
         subjects.forEach(testMatchingSubject);
-
-        // badSubjects.forEach(testFailingSubject);
+        badSubjects.forEach(testFailingSubject);
     });
 
     describe("names with spaces", () => {
         const subjects = [
             `@"Someon asdf `,
-            `@Some `, // Single space but no closing braces?
+            `@"someone with a closed space"`,
+            `@"What about multiple spaces?      `,
         ];
 
         const badSubjects = [
             `@someone with non-wrapped spaces`,
-            `@"someone with a closed space"`,
-            `@"What about multiple spaces?      `,
+            `@Some `,
         ];
 
         subjects.forEach(testMatchingSubject);
@@ -74,18 +76,11 @@ describe("matching @mentions", () => {
             `@Other Mention at end after linebreak   
                 @System`,
             `Newline with special char
-                           @Umuüûū`,
+                           @"Umuüûū"`,
         ];
 
         const badSubjects = [
-            `@close on newline
-                other text`,
             `@"Close on quote" other thing`,
-            `@"Do we close on a newline with quotes?
-                other text`,
-            `@Other Mention on other line
-                @"Someone with spaces"  
-                @System more text`,
         ];
 
         subjects.forEach(testMatchingSubject);

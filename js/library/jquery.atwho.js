@@ -78,20 +78,23 @@
           clonedRange.setEnd(range.endContainer, range.endOffset);
 
           var breaksBefore = 0;
-          var cont = true;
+          var shouldContinue = true;
           var currentElement = clonedRange.endContainer;
-          while (currentElement && cont) {
+
+          // Check the elements backwards from the final one in our selection for breaks.
+          while (currentElement && shouldContinue) {
             if (currentElement.nodeName === "BR") {
-                breaksBefore++;
+              breaksBefore++;
             }
 
             if (currentElement.previousSibling) {
-                currentElement = currentElement.previousSibling;
+              currentElement = currentElement.previousSibling;
             } else {
-                cont = false;
+              shouldContinue = false;
             }
           }
 
+          // The string representation of a Range does not contain breaks or newlines. We have to count them ourselves.
           pos = clonedRange.toString().length + breaksBefore;
           clonedRange.detach();
           return pos;
@@ -577,7 +580,6 @@
       Controller.prototype.content = function() {
         var result = {
           content: null,
-          offset: 0
         };
 
         if (this.$inputor.is('textarea, input')) {
@@ -586,7 +588,6 @@
           var textNode = $(document.createElement('div'));
           var html = this.$inputor.html();
           var breaks = /<br(\s+)?(\/)?>/g;
-          result.offset = html.match(breaks) ? html.match(breaks).length : 0;
           textNode.html(html.replace(breaks, "\n"));
           result.content = textNode.text();
         }
@@ -597,8 +598,6 @@
       Controller.prototype.catch_query = function() {
         var caret_pos, contents, end, query, start, subtext;
         contents = this.content();
-        ////caret_pos = this.$inputor.caret('pos');
-          console.log("Offset", contents.offset);
         caret_pos = this.$inputor.caret('pos', this.setting.cWindow);
         subtext = contents.content.slice(0, caret_pos);
         query = this.callbacks("matcher").call(this, this.at, subtext, this.get_opt('start_with_space'));

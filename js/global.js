@@ -1905,6 +1905,7 @@ jQuery(document).ready(function($) {
                         var lines = subtext.split("\n");
                         var lastLine = lines[lines.length - 1];
 
+                        // If you change this you MUST change the regex in src/scripts/__tests__/legacy.test.js !!!
                         var regexStr =
                             '@' + // @ Symbol triggers the match
                             '(?:(\\w+)' + // Any ASCII based letter characters

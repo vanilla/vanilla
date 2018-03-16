@@ -1923,6 +1923,10 @@ jQuery(document).ready(function($) {
 
                         match = regexp.exec(subtext);
                         if (match) {
+                            console.log("flag: ", flag);
+                            console.log("subtext: ", subtext);
+                            console.log("regexp: ", regexp);
+                            console.log();
                             // Store the original matching string to check against
                             // quotation marks after the at symbol, to prevent
                             // double insertions of the at symbol. This will be

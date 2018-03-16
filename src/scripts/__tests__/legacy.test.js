@@ -11,13 +11,14 @@
 /*eslint-disable no-control-regex*/
 
 // Regex tests for at.who. See global.js `matcher()` at line 1902
-var regexStr =
+const regexStr =
     '(?:^|\\s)' + // Space before
     '@' + // @ Symbol triggers the match
     '(?:(\\w+)' + // Any ASCII based letter characters
     '|' + // Or
     '"([^"\\u0000-\\u001f\\u007f-\\u009f\\u2028]+?)"?)' + // Almost any character if quoted. With or without the last quote.
     '(?:\\n|$)'; // Newline terminates.
+const regex = new RegExp(regexStr, 'gi');
 
 function testMatchingSubject(subject) {
     test(subject, () => {

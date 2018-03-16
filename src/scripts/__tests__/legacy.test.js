@@ -69,7 +69,7 @@ describe("matching @mentions", () => {
         badSubjects.forEach(testFailingSubject);
     });
 
-    describe.only("Closing characters", () => {
+    describe("Closing characters", () => {
         const subjects = [
             `@Other Mention at end after linebreak   
                 @System`,

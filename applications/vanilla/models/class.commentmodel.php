@@ -1609,4 +1609,27 @@ class CommentModel extends Gdn_Model {
             $this->_Where = $value;
         }
     }
+    /**
+     * Determines whether or not the current user can edit a comment.
+     *
+     * @param object|array $comment The comment to examine.
+     * @param int &$timeLeft Sets the time left to edit or 0 if not applicable.
+     * @return bool Returns true if the user can edit or false otherwise.
+     */
+    public static function canEdit($comment, &$timeLeft = 0) {
+        $discussionModel = new DiscussionModel();
+        $discussion = $discussionModel->getID(val('DiscussionID', $comment));        $category = CategoryModel::categories(val('CategoryID', $discussion));
+
+        // Users with global edit permission can edit.
+        if (CategoryModel::checkPermission($category, 'Vanilla.Comments.Edit')) {
+            return true;
+        }
+
+        // Non-mods can't edit if they aren't the author.
+        if (Gdn::session()->UserID != val('InsertUserID', $comment)) {
+            return false;
+        }
+
+        return parent::editContentTimeout($comment, $timeLeft);
+    }
 }

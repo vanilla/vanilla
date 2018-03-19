@@ -741,8 +741,7 @@ class DiscussionController extends VanillaController {
                 }
 
                 // Make sure that content can (still) be edited.
-                $canEdit = DiscussionModel::canEdit($discussion);
-                if (!$canEdit && !c('Vanilla.Comments.AllowSelfDelete')) {
+                if (!$this->CommentModel->canEdit($comment)) {
                     $this->categoryPermission($discussion->CategoryID, 'Vanilla.Comments.Delete');
                 }
 

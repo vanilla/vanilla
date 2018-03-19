@@ -123,6 +123,7 @@ class CategoriesApiController extends AbstractApiController {
             ],
             'parentCategoryID:i|n' => 'Parent category ID.',
             'customPermissions:b' => 'Are custom permissions set for this category?',
+            'archived:b' => 'The archived state of this category.',
             'urlcode:s' => 'The URL code of the category.',
             'url:s' => 'The URL to the category.',
             'displayAs:s' => [
@@ -268,6 +269,10 @@ class CategoriesApiController extends AbstractApiController {
                 'description' => '',
                 'default' => 2,
             ],
+            'archived:b|n' => [
+                'description' => 'Filter by archived status of a category. True for archived only. False for no archived categories. Not compatible with followed filter.',
+                'default' => false
+            ],
             'page:i?' => [
                 'description' => 'Page number. Works with flat and followed categories. See [Pagination](https://docs.vanillaforums.com/apiv2/#pagination)',
                 'default' => 1,
@@ -319,7 +324,7 @@ class CategoriesApiController extends AbstractApiController {
                 $limit
             );
 
-            $totalCountCallBack = function() use ($parent) {
+            $totalCountCallBack = function () use ($parent) {
                 return $parent['CountCategories'];
             };
         } else {
@@ -327,11 +332,33 @@ class CategoriesApiController extends AbstractApiController {
                 $parent['CategoryID'],
                 [
                     'maxdepth' => $query['maxDepth'],
-                    'filter' => function ($row) {
-                        return empty($row['Archived']);
-                    },
                 ]
             );
+
+            if ($query['archived'] === true) {
+                $categories = array_filter($categories, function($category) {
+                    return array_key_exists('Archived', $category) && $category['Archived'];
+                });
+            } elseif ($query['archived'] === false) {
+                // Filter out archived categories.
+                $archiveFilter = function(array $categories) use (&$archiveFilter) {
+                    $result = [];
+                    foreach ($categories as $index => $category) {
+                        // Archived? Discard.
+                        if (array_key_exists('Archived', $category) && $category['Archived'] === 1) {
+                            continue;
+                        }
+                        // Process any children.
+                        if (!empty($category['Children'])) {
+                            $category['Children'] = $archiveFilter($category['Children']);
+                        }
+                        // If the category made it this far, include it.
+                        $result[] = $category;
+                    }
+                    return $result;
+                };
+                $categories = $archiveFilter($categories);
+            }
         }
         $this->categoryModel->setJoinUserCategory($joinUserCategory);
         $categories = array_map([$this, 'normalizeOutput'], $categories);

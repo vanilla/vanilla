@@ -20,6 +20,13 @@ abstract class SSOAuthenticator extends Authenticator {
     private $isTrusted = false;
 
     /**
+     * Determine whether the authenticator can automatically link users by email.
+     *
+     * @var bool
+     */
+    private $autoLinkUser = false;
+
+    /**
      * Authenticator constructor.
      *
      * @param string $authenticatorID Currently maps to "UserAuthenticationProvider.AuthenticationKey".
@@ -31,17 +38,25 @@ abstract class SSOAuthenticator extends Authenticator {
     /**
      * Getter of isTrusted.
      */
-    public final function isTrusted() {
+    public final function isTrusted(): bool {
         return $this->isTrusted;
     }
 
     /**
-     * Setter of isTrusted.
-     *
-     * @param bool $isTrusted
+     * @return bool
      */
-    protected function setTrusted($isTrusted) {
-        $this->isTrusted = $isTrusted;
+    public function isAutoLinkUser(): bool {
+        return $this->autoLinkUser;
+    }
+
+    /**
+     * @param bool $autoLinkUser
+     * @return SSOAuthenticator
+     */
+    public function setAutoLinkUser(bool $autoLinkUser): SSOAuthenticator {
+        $this->autoLinkUser = $autoLinkUser;
+
+        return $this;
     }
 
     /**
@@ -66,6 +81,20 @@ abstract class SSOAuthenticator extends Authenticator {
     public abstract function signOutURL();
 
     /**
+     * Validate an authentication by using the request's data.
+     *
+     * @throws Exception Reason why the authentication failed.
+     * @param RequestInterface $request
+     * @return SSOData The user's information.
+     */
+    public final function validateAuthentication(RequestInterface $request) {
+        $ssoData = $this->sso($request);
+        $ssoData->validate();
+
+        return $ssoData;
+    }
+
+    /**
      * Core implementation of the validateAuthentication() function.
      *
      * @throws Exception Reason why the authentication failed.
@@ -76,15 +105,14 @@ abstract class SSOAuthenticator extends Authenticator {
     protected abstract function sso(RequestInterface $request);
 
     /**
-     * Validate an authentication by using the request's data.
+     * Setter of isTrusted.
      *
-     * @throws Exception Reason why the authentication failed.
-     * @param RequestInterface $request
-     * @return SSOData The user's information.
+     * @param bool $isTrusted
+     * @return SSOAuthenticator
      */
-    public final function validateAuthentication(RequestInterface $request) {
-        $ssoData = $this->sso($request);
-        $ssoData->validate();
-        return $ssoData;
+    protected function setTrusted(bool $isTrusted): SSOAuthenticator {
+        $this->isTrusted = $isTrusted;
+
+        return $this;
     }
 }

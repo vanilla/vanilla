@@ -10,12 +10,10 @@ use Garden\Web\Exception\ClientException;
 use Garden\Web\Exception\NotFoundException;
 use Garden\Web\Exception\ServerException;
 use Garden\Web\RequestInterface;
-use Interop\Container\ContainerInterface;
-use Vanilla\AddonManager;
-use Vanilla\Authenticator\Authenticator;
 use Vanilla\Authenticator\SSOAuthenticator;
 use Vanilla\Exception\PermissionException;
 use Vanilla\Models\SSOModel;
+use Vanilla\Models\AuthenticatorModel;
 use Vanilla\ApiUtils;
 
 /**
@@ -25,14 +23,11 @@ class AuthenticateApiController extends AbstractApiController {
 
     const SESSION_ID_EXPIRATION = 1200; // 20 minutes
 
-    /** @var AddonManager */
-    private $addonManager;
+    /** @var AuthenticatorModel */
+    private $authenticatorModel;
 
     /** @var Gdn_Configuration */
     private $config;
-
-    /** @var ContainerInterface */
-    private $container;
 
     /** @var RequestInterface */
     private $request;
@@ -49,26 +44,22 @@ class AuthenticateApiController extends AbstractApiController {
     /**
      * AuthenticationController constructor.
      *
-     * @param AddonManager $addonManager
      * @param Gdn_Configuration $config
-     * @param ContainerInterface $container,
      * @param RequestInterface $request
      * @param SessionModel $sessionModel
      * @param SSOModel $ssoModel
      * @param UserModel $userModel
      */
     public function __construct(
-        AddonManager $addonManager,
+        AuthenticatorModel $authenticatorModel,
         Gdn_Configuration $config,
-        ContainerInterface $container,
         RequestInterface $request,
         SessionModel $sessionModel,
         SSOModel $ssoModel,
         UserModel $userModel
     ) {
-        $this->addonManager = $addonManager;
+        $this->authenticatorModel = $authenticatorModel;
         $this->config = $config;
-        $this->container = $container;
         $this->request = $request;
         $this->sessionModel = $sessionModel;
         $this->ssoModel = $ssoModel;
@@ -125,7 +116,7 @@ class AuthenticateApiController extends AbstractApiController {
             $userID = $this->getSession()->UserID;
         }
 
-        $authenticatorInstance = $this->getAuthenticator($authenticator, $authenticatorID);
+        $authenticatorInstance = $this->authenticatorModel->getAuthenticator($authenticator, $authenticatorID);
 
         $data = [];
         $this->userModel->getDelete(
@@ -181,7 +172,7 @@ class AuthenticateApiController extends AbstractApiController {
             $userID = $this->getSession()->UserID;
         }
 
-        $authenticatorInstance = $this->getAuthenticator($authenticator, $authenticatorID);
+        $authenticatorInstance = $this->authenticatorModel->getAuthenticator($authenticator, $authenticatorID);
 
         return $out->validate([
             'linked' => (bool)$this->userModel->getAuthenticationByUser($userID, $authenticatorInstance->getID())
@@ -245,62 +236,6 @@ class AuthenticateApiController extends AbstractApiController {
     }
 
     /**
-     * Get an authenticator.
-     *
-     * @param string $authenticatorType
-     * @param string $authenticatorID
-     * @return Authenticator
-     * @throws NotFoundException
-     * @throws ServerException
-     */
-    private function getAuthenticator($authenticatorType, $authenticatorID) {
-        if (empty($authenticatorType)) {
-            throw new NotFoundException();
-        }
-
-        $authenticatorClassName = $authenticatorType.'Authenticator';
-
-        /** @var Authenticator $authenticatorInstance */
-        $authenticatorInstance = null;
-
-        // Check if the container can find the authenticator.
-        try {
-            $authenticatorInstance = $this->container->getArgs($authenticatorClassName, [$authenticatorID]);
-            return $authenticatorInstance;
-        } catch (Exception $e) {}
-
-        // Use the addonManager to find the class.
-        $authenticatorClasses = $this->addonManager->findClasses("*\\$authenticatorClassName");
-
-        if (empty($authenticatorClasses)) {
-            throw new NotFoundException($authenticatorClassName);
-        }
-
-        // Throw an exception if there are multiple authenticators with that type.
-        // We are not handling authenticators with the same name in different namespaces for now.
-        if (count($authenticatorClasses) > 1) {
-            throw new ServerException(
-                "Multiple class named \"$authenticatorClasses\" have been found.",
-                500,
-                ['classes' => $authenticatorClasses]
-            );
-        }
-
-        $fqnAuthenticationClass = $authenticatorClasses[0];
-
-        if (!is_a($fqnAuthenticationClass, Authenticator::class, true)) {
-            throw new ServerException(
-                "\"$fqnAuthenticationClass\" is not an ".Authenticator::class,
-                500
-            );
-        }
-
-        $authenticatorInstance = $this->container->getArgs($fqnAuthenticationClass, [$authenticatorID]);
-
-        return $authenticatorInstance;
-    }
-
-    /**
      * Authenticate a user using the specified authenticator.
      *
      * @param array $body
@@ -333,7 +268,7 @@ class AuthenticateApiController extends AbstractApiController {
             throw new ClientException("Cannot authenticate while already logged in.", 403);
         }
 
-        $authenticatorInstance = $this->getAuthenticator($authenticator, $authenticatorID);
+        $authenticatorInstance = $this->authenticatorModel->getAuthenticator($authenticator, $authenticatorID);
 
         if (is_a($authenticatorInstance, SSOAuthenticator::class)) {
 

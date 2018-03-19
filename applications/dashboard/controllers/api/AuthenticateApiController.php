@@ -265,7 +265,7 @@ class AuthenticateApiController extends AbstractApiController {
         $authenticatorID = isset($body['authenticatorID']) ? $body['authenticatorID'] : null;
 
         if ($this->getSession()->isValid()) {
-            throw new ClientException("Cannot authenticate while already logged in.", 403);
+            throw new ClientException('Cannot authenticate while already logged in.', 403);
         }
 
         $authenticatorInstance = $this->authenticatorModel->getAuthenticator($authenticator, $authenticatorID);
@@ -279,7 +279,7 @@ class AuthenticateApiController extends AbstractApiController {
                 throw new ServerException("Unknown error while authenticating with $authenticatorType.", 500);
             }
 
-            $user = $this->ssoModel->sso($ssoData, false);
+            $user = $this->ssoModel->sso($ssoData);
         } else {
             throw new ServerException(get_class($authenticatorInstance).' is not a supported authenticator yet.', 500);
         }

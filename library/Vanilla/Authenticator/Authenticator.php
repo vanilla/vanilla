@@ -21,6 +21,9 @@ abstract class Authenticator {
      */
     private $authenticatorID;
 
+    /** @var bool Determine if this authenticator is active or not. */
+    private $active = true;
+
     /**
      * Authenticator constructor.
      *
@@ -66,11 +69,34 @@ abstract class Authenticator {
     }
 
     /**
-     * Getter of the authenticator's Name.
+     * Getter of the authenticator's name.
      *
      * @return string
      */
     public function getName() {
         return $this->getNameImpl();
     }
+
+    /**
+     * Getter of the authenticator's active property.
+     *
+     * @return bool
+     */
+    public function isActive(): bool {
+        return $this->active;
+    }
+
+    /**
+     * Setter of the authenticator's active property.
+     *
+     * @param bool $active
+     * @return static
+     */
+    public function setActive(bool $active): Authenticator {
+        $this->active = $active;
+
+        return $this;
+    }
+
+
 }

@@ -233,6 +233,11 @@ class DiscussionModel extends Gdn_Model {
             return true;
         }
 
+        // Make sure only moderators can edit closed things.
+        if (val('Closed', $discussion)) {
+            return false;
+        }
+
         // Non-mods can't edit if they aren't the author.
         if (Gdn::session()->UserID != val('InsertUserID', $discussion)) {
             return false;

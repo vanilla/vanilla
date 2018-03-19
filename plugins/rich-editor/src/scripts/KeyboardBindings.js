@@ -38,7 +38,6 @@ export default class KeyboardBindings {
         this.bindings["outdent code-block"] = false;
         this.bindings["remove tab"] = false;
         this.bindings["code exit"] = false;
-
     }
 
     /**
@@ -57,8 +56,8 @@ export default class KeyboardBindings {
             key: Keyboard.keys.BACKSPACE,
             offset: 0,
             collapsed: true,
-            format: this.constructor.MULTI_LINE_BLOTS,
-            handler: this.stripFormattingFromFirstBlot,
+            format: KeyboardBindings.MULTI_LINE_BLOTS,
+            handler: this.handleBlockStartDelete,
         };
 
         this.bindings["MultiLine Backspace"] = {
@@ -83,7 +82,7 @@ export default class KeyboardBindings {
     addBlockArrowKeyHandlers() {
         const commonCriteria = {
             collapsed: true,
-            format: this.constructor.MULTI_LINE_BLOTS,
+            format: KeyboardBindings.MULTI_LINE_BLOTS,
         };
 
         this.bindings["Block Up"] = {
@@ -112,6 +111,78 @@ export default class KeyboardBindings {
     }
 
     /**
+     * Special handling for the ENTER key for Mutliline Blots.
+     *
+     * @if
+     * If there is 1 trailing newline line after the first line,
+     * and the user is on the last line,
+     * and the user types ENTER,
+     *
+     * @then
+     * Enter a newline after the Blot,
+     * move the cursor there,
+     * and trim the trailing newlines from the Blot.
+     *
+     * @param {RangeStatic} range - The range when the enter key is pressed.
+     *
+     * @returns {boolean} - False to prevent default.
+     */
+    handleMultilineEnter = (range) => {
+        const [line] = this.quill.getLine(range.index);
+
+        const contentBlot = line.getContentBlot();
+        if (line !== contentBlot.children.tail) {
+            return true;
+        }
+
+        const { textContent } = line.domNode;
+        const currentLineIsEmpty = textContent === "";
+        if (!currentLineIsEmpty) {
+            return true;
+        }
+
+        const previousLine = line.prev;
+        if (!previousLine) {
+            return true;
+        }
+
+        this.insertNewLineAfterBlotAndTrim(range);
+
+        return false;
+    };
+
+    /**
+     * Special handling for the ENTER key for Code Blocks.
+     *
+     * @if
+     * If there are 2 tailing newlines after the first line,
+     * and the user is on the last line,
+     * and the user types ENTER,
+     *
+     * @then
+     * Enter a newline after the Blot,
+     * move the cursor there,
+     * and trim the trailing newlines from the Blot.
+     *
+     * @param {RangeStatic} range - The range when the enter key is pressed.
+     *
+     * @returns {boolean} - False to prevent default.
+     */
+    handleCodeBlockEnter = (range) => {
+        const [line] = this.quill.getLine(range.index);
+
+        const { textContent } = line.domNode;
+        const currentLineIsEmpty = /\n\n\n$/.test(textContent);
+        if (!currentLineIsEmpty) {
+            return true;
+        }
+
+        this.insertNewLineAfterBlotAndTrim(range, 2);
+
+        return false;
+    };
+
+    /**
      * Add keyboard options.bindings that allow the user to
      * @private
      */
@@ -120,50 +191,15 @@ export default class KeyboardBindings {
             key: Keyboard.keys.ENTER,
             collapsed: true,
             format: ["spoiler-line", "blockquote-line"],
-            handler: (range) => {
-                const [line] = this.quill.getLine(range.index);
-
-                const contentBlot = line.getContentBlot();
-                if (line !== contentBlot.children.tail) {
-                    return true;
-                }
-
-                const { textContent }  = line.domNode;
-                const currentLineIsEmpty = textContent === "";
-                if (!currentLineIsEmpty) {
-                    return true;
-                }
-
-                const previousLine = line.prev;
-                if (!previousLine) {
-                    return true;
-                }
-
-                this.insertNewLineAfterBlotAndTrim(range);
-
-                return false;
-            },
+            handler: this.handleMultilineEnter,
         };
 
         this.bindings["CodeBlock Enter"] = {
             key: Keyboard.keys.ENTER,
             collapsed: true,
             format: ["code-block"],
-            handler: (range) => {
-                const [line] = this.quill.getLine(range.index);
-
-                const { textContent } = line.domNode;
-                const currentLineIsEmpty = /\n\n\n$/.test(textContent);
-                if (!currentLineIsEmpty) {
-                    return true;
-                }
-
-                this.insertNewLineAfterBlotAndTrim(range, 2);
-
-                return false;
-            },
+            handler: this.handleCodeBlockEnter,
         };
-
     }
 
     /**
@@ -176,6 +212,7 @@ export default class KeyboardBindings {
     handleMultiLineBackspace(range) {
         const [ line ] = this.quill.getLine(range.index);
 
+        // Check if this is an empty multi-line blot
         const hasSiblings = line.prev || line.next;
 
         if (hasSiblings) {
@@ -183,16 +220,15 @@ export default class KeyboardBindings {
         }
 
         const contentBlot = line.getContentBlot();
-
-        // Check if this is the first line a ContentBlot or is a CodeBlot.
-        const { textContent } = contentBlot.domNode;
-
-        if (textContent !== "") {
+        if (contentBlot.domNode.textContent !== "") {
             return true;
         }
 
-        line.replaceWith("block", "");
-        return true;
+        const delta = new Delta()
+            .retain(range.index)
+            .retain(1, {[line.constructor.blotName]: false});
+        this.quill.updateContents(delta, Emitter.sources.USER);
+        return false;
     }
 
     /**
@@ -205,7 +241,7 @@ export default class KeyboardBindings {
     handleCodeBlockBackspace(range) {
         const [ line ] = this.quill.getLine(range.index);
 
-        // Check if this is the first line a ContentBlot or is a CodeBlot.
+        // Check if this is an empty code block.
         const { textContent } = line.domNode;
 
         if (textContent !== "\n") {
@@ -221,43 +257,64 @@ export default class KeyboardBindings {
     }
 
     /**
+     * Strips the formatting from a blot in the first position.
+     *
+     * @param {Blot} blot - The blot to alter.
+     */
+    stripFormattingFromFirstBlot = (blot) => {
+        const blotName = blot.constructor.blotName;
+
+        const delta = new Delta()
+            .retain(blot.length(), { [blotName]: false });
+        this.quill.updateContents(delta, Emitter.sources.USER);
+    }
+
+    /**
+     * Determine if a Blot is the first Blot in the scroll (or first through descendant blots).
+     *
+     * @example Both of the following are valid.
+     *
+     * Scroll -> Blot
+     * Scroll -> Container -> Container -> Container -> Blot
+     *
+     * @param {Blot} blot - the blot to check.
+     *
+     * @returns {boolean} - Whether or not the blot is in the first position.
+     */
+    isBlotFirstInScroll(blot) {
+        const isFirstBlotInBlot = (childBlot, parentBlot) => {
+            // Bail out if there are not more children.
+            if (!parentBlot.children || !parentBlot.children.head) {
+                return false;
+            }
+
+            // We found our match.
+            if (childBlot === parentBlot.children.head) {
+                return true;
+            }
+
+            // Recurse through children.
+            return isFirstBlotInBlot(childBlot, parentBlot.children.head);
+        };
+
+        return isFirstBlotInBlot(blot, this.quill.scroll);
+    }
+
+    /**
      * Strips the formatting from the first Blot if it is a block-quote, code-block, or spoiler.
      *
      * @param {RangeStatic} range - The range that was altered.
      *
      * @returns {boolean} - False to prevent default.
      */
-    stripFormattingFromFirstBlot(range) {
+    handleBlockStartDelete = (range) => {
         let [line] = this.quill.getLine(range.index);
 
-        const { textContent } = line.domNode;
-        const isLineEmpty = line.children.length === 1 && (textContent === "" || textContent === "\n") ;
-        if (isLineEmpty) {
+        if (!this.isBlotFirstInScroll(line)) {
             return true;
         }
 
-        let isFirstInBlot = true;
-
-        if (line instanceof LineBlot) {
-            line = line.getWrapperBlot();
-            isFirstInBlot = line === line.parent.children.head;
-        }
-
-        if (!isFirstInBlot) {
-            return true;
-        }
-
-        const isFirstInScroll = line === this.quill.scroll.children.head;
-        if (!isFirstInScroll) {
-            return true;
-        }
-
-        const blotName = line.constructor.blotName;
-
-        const delta = new Delta()
-            .retain(line.length(), { [blotName]: false });
-        this.quill.updateContents(delta, Emitter.sources.USER);
-
+        this.stripFormattingFromFirstBlot(line);
         // Return false to prevent default behaviour.
         return false;
     }
@@ -265,8 +322,7 @@ export default class KeyboardBindings {
     /**
      * Delete the entire first Blot if the whole thing and something else is selected.
      *
-     * We want deleting all of the content of the Blot to be different from the deleting the whole document or a large
-     * part of it.
+     * We want deleting all of the content of the Blot to be different from the deleting the whole document or a large part of it.
      *
      * @param {RangeStatic} range - The range that was altered.
      *

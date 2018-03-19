@@ -314,6 +314,14 @@ class AuthenticateApiController extends AbstractApiController {
         $in = $this->schema([
             'authenticator:s' => 'The authenticator that will be used.',
             'authenticatorID:s?' => 'Authenticator instance\'s identifier.',
+            'setCookie:b' => [
+                'default' => true,
+                'description' => 'Set session cookie on success.',
+            ],
+            'persist:b' => [
+                'default' => false,
+                'description' => 'Set the persist option on the cookie when it is set.'
+            ],
         ])->setDescription('Authenticate a user using a specific authenticator.');
         $out = $this->schema(Schema::parse([
             'authenticationStep:s' => [
@@ -324,7 +332,7 @@ class AuthenticateApiController extends AbstractApiController {
             'authSessionID:s?' => 'Identifier of the authentication session. Returned if more steps are required to complete the authentication.',
         ]), 'out');
 
-        $in->validate($body);
+        $body = $in->validate($body);
 
         $authenticator = $body['authenticator'];
         $authenticatorID = isset($body['authenticatorID']) ? $body['authenticatorID'] : null;
@@ -344,7 +352,10 @@ class AuthenticateApiController extends AbstractApiController {
                 throw new ServerException("Unknown error while authenticating with $authenticatorType.", 500);
             }
 
-            $user = $this->ssoModel->sso($ssoData, false);
+            $user = $this->ssoModel->sso($ssoData, [
+                'setCookie' => $body['setCookie'],
+                'persist' => $body['persist'],
+            ]);
         } else {
             throw new ServerException(get_class($authenticatorInstance).' is not a supported authenticator yet.', 500);
         }

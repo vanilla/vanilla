@@ -18,6 +18,15 @@ body.isMobile .change-picture .change-picture-instructions {
   display: none;
 }
 
+@media (max-width: 600px) {
+  .box-crop .box-source {
+    display: none;
+  }
+  .change-picture .change-picture-instructions {
+    display: none;
+  }
+}
+
 .followButton {
   white-space: nowrap;
   font-size: 10px;

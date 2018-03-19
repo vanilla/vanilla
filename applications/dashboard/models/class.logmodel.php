@@ -17,6 +17,7 @@ class LogModel extends Gdn_Pluggable {
 
     use PrunableTrait;
 
+    /** @var int Timestamp of when to prune delete logs. */
     private $deletePruneAfter;
 
     private static $instance = null;
@@ -40,7 +41,7 @@ class LogModel extends Gdn_Pluggable {
     }
 
     /**
-     * Set the prune after delete date.
+     * Set the prune time of delete logs.
      *
      * @param string $pruneAfter A string compatible with {@link strtotime()}.
      * @return $this
@@ -60,7 +61,7 @@ class LogModel extends Gdn_Pluggable {
     }
 
     /**
-     * Get the exact timestamp to prune.
+     * Get the exact timestamp to prune delete logs.
      *
      * @return \DateTimeInterface|null Returns the date that we should prune after.
      */

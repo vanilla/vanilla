@@ -241,27 +241,6 @@ class DiscussionModel extends Gdn_Model {
         return self::editContentTimeout($discussion, $timeLeft);
     }
 
-    /**
-     * Checks whether the time frame when a discussion can be edited has passed.
-     *
-     * @param object|array $discussion The discussion to examine.
-     * @param int $timeLeft Sets the time left to edit or 0 if not applicable.
-     * @return bool Whether the time to edit the discussion has passed.
-     */
-    public static function editContentTimeout($discussion, &$timeLeft = 0) {
-        // Determine if we still have time to edit.
-        $timeInserted = strtotime(val('DateInserted', $discussion));
-        $editContentTimeout = c('Garden.EditContentTimeout', -1);
-
-        $canEdit = $editContentTimeout == -1 || $timeInserted + $editContentTimeout > time();
-
-        if ($canEdit && $editContentTimeout > 0) {
-            $timeLeft = $timeInserted + $editContentTimeout - time();
-        }
-
-        return $canEdit;
-    }
-
     public function counts($column, $from = false, $to = false, $max = false) {
         $result = ['Complete' => true];
         switch ($column) {

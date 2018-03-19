@@ -922,6 +922,7 @@ class Gdn_Model extends Gdn_Pluggable {
         // Determine if we still have time to edit.
         $timeInserted = strtotime(val('DateInserted', $data));
         $editContentTimeout = c('Garden.EditContentTimeout', -1);
+        $canEdit = false;
 
         if ($editContentTimeout == -1) {
             $canEdit = true;

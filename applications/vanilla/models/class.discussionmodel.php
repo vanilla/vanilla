@@ -238,7 +238,7 @@ class DiscussionModel extends Gdn_Model {
             return false;
         }
 
-        return self::editContentTimeout($discussion, $timeLeft);
+        return parent::editContentTimeout($discussion, $timeLeft);
     }
 
     public function counts($column, $from = false, $to = false, $max = false) {

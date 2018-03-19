@@ -511,6 +511,9 @@ td.BigCount {
 }
 
 /* Groups */
+.groupToolbar {
+    margin-top: -9px;
+}
 
 .groupSearch {
     width: 100%;

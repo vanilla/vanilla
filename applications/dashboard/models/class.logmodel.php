@@ -17,6 +17,8 @@ class LogModel extends Gdn_Pluggable {
 
     use PrunableTrait;
 
+    private $deletePruneAfter;
+
     private static $instance = null;
     private $recalcIDs = [
         'Discussion' => [],
@@ -29,6 +31,54 @@ class LogModel extends Gdn_Pluggable {
             $this->setPruneAfter(c('Logs.Common.PruneAfter', '3 months'));
         } catch(Exception $e) {
             $this->setPruneAfter('3 months');
+        }
+        try {
+            $this->setDeletePruneAfter(c('Logs.Delete.PruneAfter', '1 year'));
+        } catch(Exception $e) {
+            $this->setDeletePruneAfter('1 year');
+        }
+    }
+
+    /**
+     * Set the prune after delete date.
+     *
+     * @param string $pruneAfter A string compatible with {@link strtotime()}.
+     * @return $this
+     */
+    private function setDeletePruneAfter($pruneAfter) {
+        if ($pruneAfter) {
+            // Make sure the string can be converted into a date.
+            $now = time();
+            $testTime = strtotime($pruneAfter, $now);
+            if ($testTime === false) {
+                throw new \InvalidArgumentException('Invalid timespan value for "delete prune after".', 400);
+            }
+        }
+
+        $this->deletePruneAfter = $pruneAfter;
+        return $this;
+    }
+
+    /**
+     * Get the exact timestamp to prune.
+     *
+     * @return \DateTimeInterface|null Returns the date that we should prune after.
+     */
+    public function getDeletePruneDate() {
+        if (!$this->deletePruneAfter) {
+            return null;
+        } else {
+            $tz = new \DateTimeZone('UTC');
+            $now = new \DateTimeImmutable('now', $tz);
+            $test = new \DateTimeImmutable($this->deletePruneAfter, $tz);
+
+            $interval = $test->diff($now);
+
+            if ($interval->invert === 1) {
+                return $now->add($interval);
+            } else {
+                return $test;
+            }
         }
     }
 
@@ -79,7 +129,8 @@ class LogModel extends Gdn_Pluggable {
      * @param int|null $limit Then number of rows to delete or **null** to use the default prune limit.
      */
     public function prune($limit = null) {
-        $date = $this->getPruneDate();
+        $dateCommonPrune = $this->getPruneDate();
+        $dateDeletePrune = $this->getDeletePruneDate();
 
         $options = [];
         if ($limit === null) {
@@ -90,8 +141,15 @@ class LogModel extends Gdn_Pluggable {
 
         $this->delete(
             [
-                $this->getPruneField().' <' => $date->format('Y-m-d H:i:s'),
+                $this->getPruneField().' <' => $dateCommonPrune->format('Y-m-d H:i:s'),
                 'Operation' => ['Edit','Spam','Moderate','Error'],
+            ],
+            $options
+        );
+        $this->delete(
+            [
+                $this->getPruneField().' <' => $dateDeletePrune->format('Y-m-d H:i:s'),
+                'Operation' => 'Delete',
             ],
             $options
         );

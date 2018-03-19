@@ -431,7 +431,6 @@ class AuthenticateApiController extends AbstractApiController {
             $ssoDataSchema = $this->schema([
                 'authenticatorName:s' => 'Name of the authenticator that was used to create this object.',
                 'authenticatorID:s' => 'ID of the authenticator instance that was used to create this object.',
-                'authenticatorIsTrusted:b' => 'If the authenticator is trusted to sync user\'s information.',
                 'uniqueID:s' => 'Unique ID of the user supplied by the provider.',
                 'user:o' => [
                     'email:s?' => 'Email of the user.',

@@ -81,9 +81,12 @@ class AutoConnectTest extends AbstractAPIv2Test {
      *
      * @dataProvider provider
      */
-    public function testAuthenticate($configurations, $expectedResults) {
+    public function testAuthenticate($configurations, $authenticatorProperties, $expectedResults) {
         foreach($configurations as $key => $value) {
             self::$config->set($key, $value);
+        }
+        foreach($authenticatorProperties as $property => $value) {
+            $this->authenticator->$property($value);
         }
 
         $postData = [
@@ -136,15 +139,23 @@ class AutoConnectTest extends AbstractAPIv2Test {
             'Garden.Registration.NoEmail' => [false, true],
             'Garden.Registration.EmailUnique' => [false, true],
             'Garden.Registration.AllowConnect' => [false, true],
-            'Garden.Registration.AutoConnect' => [false, true],
         ];
         $configurationSets = $this->configurationSetsGenerator($configurationsDefinition);
 
-        foreach($configurationSets as $configurationSet) {
-            $data[] = [
-                'configurations' => $configurationSet,
-                'expectedResults' => $this->determineExpectedResult($configurationSet),
-            ];
+        $authenticatorProperties = [
+            'setAutoLinkUser' => [true, false],
+        ];
+        $authenticatorPropertiesSets = $this->configurationSetsGenerator($authenticatorProperties);
+
+
+        foreach($authenticatorPropertiesSets as $authenticatorProperties) {
+            foreach($configurationSets as $configurations) {
+                $data[] = [
+                    'configurations' => $configurations,
+                    'authenticatorProperties' => $authenticatorProperties,
+                    'expectedResults' => $this->determineExpectedResult($configurations, $authenticatorProperties),
+                ];
+            }
         }
 
         return $data;
@@ -153,10 +164,11 @@ class AutoConnectTest extends AbstractAPIv2Test {
     /**
      * Determine if the a configuration combination should pass or fail a test.
      *
-     * @param $configurationSet
+     * @param array $configurationSet
+     * @param array $authenticatorProperties
      * @return array
      */
-    private function determineExpectedResult($configurationSet) {
+    private function determineExpectedResult($configurationSet, $authenticatorProperties) {
         $authenticationFailure = [
             'authenticationStep' => 'linkUser',
             'isUserLinked' => false,
@@ -181,7 +193,7 @@ class AutoConnectTest extends AbstractAPIv2Test {
             return $authenticationFailure;
         }
 
-        if (!$configurationSet['Garden.Registration.AutoConnect']) {
+        if (!$authenticatorProperties['setAutoLinkUser']) {
             return $authenticationFailure;
         }
 

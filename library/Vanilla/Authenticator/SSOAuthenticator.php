@@ -45,7 +45,7 @@ abstract class SSOAuthenticator extends Authenticator {
     /**
      * @return bool
      */
-    public function isAutoLinkUser(): bool {
+    public function canAutoLinkUser(): bool {
         return $this->autoLinkUser;
     }
 

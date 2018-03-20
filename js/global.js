@@ -1906,11 +1906,37 @@ jQuery(document).ready(function($) {
                         var lastLine = lines[lines.length - 1];
 
                         // If you change this you MUST change the regex in src/scripts/__tests__/legacy.test.js !!!
+                        /**
+                         * Put together the non-excluded characters.
+                         *
+                         * @param {boolean} excludeWhiteSpace - Whether or not to exclude whitespace characters.
+                         *
+                         * @returns {string} A Regex string.
+                         */
+                        function nonExcludedCharacters(excludeWhiteSpace) {
+                            var excluded = '[^' +
+                                '\\u2028' + // Line terminator
+                                '\\u0000-\\u001f\\u007f-\\u009f' + // Control characters
+                                '"'; // Quote character
+
+                            if (excludeWhiteSpace) {
+                                excluded += '\\s';
+                            }
+
+                            excluded += "]";
+                            return excluded;
+                        }
+
                         var regexStr =
+                            '(?:^|\\s)' + // Space before
                             '@' + // @ Symbol triggers the match
-                            '(?:(\\w+)' + // Any ASCII based letter characters
-                            '|' + // Or
-                            '"([^"\\u0000-\\u001f\\u007f-\\u009f\\u2028]+?)"?)' + // Almost any character if quoted. With or without the last quote.
+                            '(' +
+                                // One or more non-greedy characters that aren't exluded. Whitespace is excluded.
+                                '(' + nonExcludedCharacters(true) + '+?)"?' +
+                                '|' + // Or
+                                // One or more non-greedy characters that aren't excluded. White is allowed, but a starting quote is required.
+                                '"(' + nonExcludedCharacters(false) + '+?)"?' +
+                            ')' +
                             '(?:\\n|$)'; // Newline terminates.
 
                         // Determined by at.who library

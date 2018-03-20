@@ -11,12 +11,38 @@
 /*eslint-disable no-control-regex*/
 
 // Regex tests for at.who. See global.js `matcher()` at line 1902
+
+/**
+ * Put together the non-excluded characters.
+ *
+ * @param {boolean} excludeWhiteSpace - Whether or not to exclude whitespace characters.
+ *
+ * @returns {string} A Regex string.
+ */
+function nonExcludedCharacters(excludeWhiteSpace) {
+    let excluded = '[^' +
+        '\\u2028' + // Line terminator
+        '\\u0000-\\u001f\\u007f-\\u009f' + // Control characters
+        '"'; // Quote character
+
+    if (excludeWhiteSpace) {
+        excluded += '\\s';
+    }
+
+    excluded += "]";
+    return excluded;
+}
+
 const regexStr =
     '(?:^|\\s)' + // Space before
     '@' + // @ Symbol triggers the match
-    '(?:(\\w+)' + // Any ASCII based letter characters
-    '|' + // Or
-    '"([^"\\u0000-\\u001f\\u007f-\\u009f\\u2028]+?)"?)' + // Almost any character if quoted. With or without the last quote.
+    '(' +
+        // One or more non-greedy characters that aren't exluded. Whitespace is excluded.
+        '(' + nonExcludedCharacters(true) + '+?)"?' +
+        '|' + // Or
+        // One or more non-greedy characters that aren't excluded. White is allowed, but a starting quote is required.
+        '"(' + nonExcludedCharacters(false) + '+?)"?' +
+    ')' +
     '(?:\\n|$)'; // Newline terminates.
 const regex = new RegExp(regexStr, 'gi');
 
@@ -52,14 +78,11 @@ describe("matching @mentions", () => {
             `@"Séche"`,
             `Something @"Séche"`,
             `@"Umuüûū"`,
-        ];
-
-        const badSubjects = [
             `@Séche`, // Unquoted accent character
+            `@Umuüûū"`,
         ];
 
         subjects.forEach(testMatchingSubject);
-        badSubjects.forEach(testFailingSubject);
     });
 
     describe("names with spaces", () => {
@@ -80,7 +103,7 @@ describe("matching @mentions", () => {
 
     describe("Closing characters", () => {
         const subjects = [
-            `@Other Mention at end after linebreak   
+            `@Other Mention at end after linebreak
                 @System`,
             `Newline with special char
                            @"Umuüûū"`,

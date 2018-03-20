@@ -183,9 +183,12 @@ class SSOModel {
      *
      * @throws ServerException
      * @param SSOData $ssoData
+     * @param array $options
+     *   - setCookie:b Set session cookie on success. Default: true
+     *   - persist:b Set the persist option on the cookie when it is set. Default: false
      * @return array|false The authenticated user info or false.
      */
-    public function sso(SSOData $ssoData) {
+    public function sso(SSOData $ssoData, $options) {
         $user = $this->getUser($ssoData);
 
         /** @var SSOAuthenticator $ssoAuthenticator */
@@ -240,7 +243,7 @@ class SSOModel {
         }
 
         if ($user) {
-            $this->session->start($user['UserID']);
+            $this->session->start($user['UserID'], $options['setCookie'] ?? true, $options['persistCookie'] ?? false);
             $this->userModel->fireEvent('AfterSignIn');
 
             // Allow user's synchronization

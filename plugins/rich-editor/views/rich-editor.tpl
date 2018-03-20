@@ -20,6 +20,7 @@
                         </button>
                     </div>
                 </li>
+                {if $editorData.hasUploadPermission}
                 <li class="richEditor-menuItem" role="menuitem">
                     <button class="richEditor-button richEditor-buttonUpload js-fakeFileUpload" type="button" aria-pressed="false">
                         <svg class="richEditorInline-icon" viewBox="0 0 24 24">
@@ -29,7 +30,7 @@
                         <input class="js-fileUpload richEditor-upload" type="file" accept="image/gif, image/jpeg, image/jpg, image/png">
                     </button>
                 </li>
-
+                {/if}
                 <li class="richEditor-menuItem" role="menuitem">
                     <button class="richEditor-button" type="button" aria-pressed="false">
                         <svg class="richEditorInline-icon" viewBox="0 0 24 24">

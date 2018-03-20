@@ -43,6 +43,8 @@ abstract class SSOAuthenticator extends Authenticator {
     }
 
     /**
+     * Getter of autoLinkUser.
+     *
      * @return bool
      */
     public function canAutoLinkUser(): bool {
@@ -50,6 +52,8 @@ abstract class SSOAuthenticator extends Authenticator {
     }
 
     /**
+     * Setter of autoLinkUser.
+     * 
      * @param bool $autoLinkUser
      * @return SSOAuthenticator
      */

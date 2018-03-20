@@ -18,6 +18,15 @@ body.isMobile .change-picture .change-picture-instructions {
   display: none;
 }
 
+@media (max-width: 600px) {
+  .box-crop .box-source {
+    display: none;
+  }
+  .change-picture .change-picture-instructions {
+    display: none;
+  }
+}
+
 .followButton {
   white-space: nowrap;
   font-size: 10px;
@@ -165,17 +174,6 @@ body.Categories.isMobile .PageControls.Top {
 .ButtonGroup.discussion-sort-filter-module {
   display: flex;
   align-items: center;
-}
-
-.sr-only {
-  position: absolute;
-  width: 1px;
-  height: 1px;
-  padding: 0;
-  margin: -1px;
-  overflow: hidden;
-  clip: rect(0, 0, 0, 0);
-  border: 0;
 }
 
 /*# sourceMappingURL=style-compat.css.map */

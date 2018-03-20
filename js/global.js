@@ -1915,9 +1915,9 @@ jQuery(document).ready(function($) {
                          */
                         function nonExcludedCharacters(excludeWhiteSpace) {
                             var excluded = '[^' +
-                                '\\u2028' + // Line terminator
+                                '"' + // Quote character
                                 '\\u0000-\\u001f\\u007f-\\u009f' + // Control characters
-                                '"'; // Quote character
+                                '\\u2028';// Line terminator
 
                             if (excludeWhiteSpace) {
                                 excluded += '\\s';
@@ -1928,14 +1928,15 @@ jQuery(document).ready(function($) {
                         }
 
                         var regexStr =
-                            '(?:^|\\s)' + // Space before
                             '@' + // @ Symbol triggers the match
                             '(' +
-                                // One or more non-greedy characters that aren't exluded. Whitespace is excluded.
-                                '(' + nonExcludedCharacters(true) + '+?)"?' +
+                            // One or more non-greedy characters that aren't excluded. White is allowed, but a starting quote is required.
+                            '"(' + nonExcludedCharacters(false) + '+?)"?' +
+
                                 '|' + // Or
-                                // One or more non-greedy characters that aren't excluded. White is allowed, but a starting quote is required.
-                                '"(' + nonExcludedCharacters(false) + '+?)"?' +
+                            // One or more non-greedy characters that aren't exluded. Whitespace is excluded.
+                            '(' + nonExcludedCharacters(true) + '+?)"?' +
+
                             ')' +
                             '(?:\\n|$)'; // Newline terminates.
 

@@ -441,6 +441,8 @@
         var _this = this;
         return this.$inputor.on('keyup.atwho', function(e) {
           return _this.on_keyup(e);
+        }).on('input.atwho', function() {
+            _this.dispatch();
         }).on('keydown.atwho', function(e) {
           return _this.on_keydown(e);
         }).on('scroll.atwho', function(e) {
@@ -474,12 +476,10 @@
               _ref.view.hide();
             }
             break;
-          case KEY_CODE.DOWN:
-          case KEY_CODE.UP:
-            $.noop();
-            break;
           default:
-            this.dispatch();
+            $.noop();
+            // This used to dispatch here, but there was an issue with accented characters on mac. Dispatch now happens
+            // On input.
         }
       };
 

@@ -20,10 +20,10 @@
  * @returns {string} A Regex string.
  */
 function nonExcludedCharacters(excludeWhiteSpace) {
-    let excluded = '[^' +
-        '\\u2028' + // Line terminator
+    var excluded = '[^' +
+        '"' + // Quote character
         '\\u0000-\\u001f\\u007f-\\u009f' + // Control characters
-        '"'; // Quote character
+        '\\u2028';// Line terminator
 
     if (excludeWhiteSpace) {
         excluded += '\\s';
@@ -33,15 +33,17 @@ function nonExcludedCharacters(excludeWhiteSpace) {
     return excluded;
 }
 
-const regexStr =
+var regexStr =
     '(?:^|\\s)' + // Space before
     '@' + // @ Symbol triggers the match
     '(' +
-        // One or more non-greedy characters that aren't exluded. Whitespace is excluded.
-        '(' + nonExcludedCharacters(true) + '+?)"?' +
-        '|' + // Or
-        // One or more non-greedy characters that aren't excluded. White is allowed, but a starting quote is required.
-        '"(' + nonExcludedCharacters(false) + '+?)"?' +
+    // One or more non-greedy characters that aren't excluded. White is allowed, but a starting quote is required.
+    '"(' + nonExcludedCharacters(false) + '+?)"?' +
+
+    '|' + // Or
+    // One or more non-greedy characters that aren't exluded. Whitespace is excluded.
+    '(' + nonExcludedCharacters(true) + '+?)"?' +
+
     ')' +
     '(?:\\n|$)'; // Newline terminates.
 const regex = new RegExp(regexStr, 'gi');
@@ -59,10 +61,12 @@ function testFailingSubject(subject) {
 }
 
 describe("matching @mentions", () => {
+    console.log(regex);
     describe("simple mentions", () => {
         const subjects = [
             `@System`,
             `Sometext @System`,
+            `asdfasdf @joe`,
         ];
 
         const badSubjects = [

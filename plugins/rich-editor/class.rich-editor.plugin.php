@@ -54,7 +54,7 @@ class RichEditorPlugin extends Gdn_Plugin {
         $controller->setData('editorData', [
             'editorID' => $editorID,
             'editorDescriptionID' => 'richEditor-'.$editorID.'-description',
-            'hasUploadPermission' => CheckPermission('uploads.add'),
+            'hasUploadPermission' => checkPermission('uploads.add'),
         ]);
 
         // Render the editor view.

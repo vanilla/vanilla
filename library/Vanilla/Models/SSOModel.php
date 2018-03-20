@@ -196,6 +196,9 @@ class SSOModel {
         if (!is_a($ssoAuthenticator, SSOAuthenticator::class)) {
             throw new ServerException('Expected an SSOAuthenticator');
         }
+        if (!$ssoAuthenticator->isActive()) {
+            throw new ServerException('The authenticator is not active.');
+        }
 
         if (!$user) {
             // Allows registration without an email address.

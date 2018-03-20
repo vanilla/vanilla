@@ -255,7 +255,7 @@ class AuthenticateApiController extends AbstractApiController {
             ],
             'persist:b' => [
                 'default' => false,
-                'description' => 'Set the persist option on the cookie when it is set.'
+                'description' => 'Set the persist option on the cookie when it is set.',
             ],
         ])->setDescription('Authenticate a user using a specific authenticator.');
         $out = $this->schema(Schema::parse([
@@ -273,7 +273,7 @@ class AuthenticateApiController extends AbstractApiController {
         $authenticatorID = isset($body['authenticatorID']) ? $body['authenticatorID'] : null;
 
         if ($this->getSession()->isValid()) {
-            throw new ClientException("Cannot authenticate while already logged in.", 403);
+            throw new ClientException('Cannot authenticate while already logged in.', 403);
         }
 
         $authenticatorInstance = $this->authenticatorModel->getAuthenticator($authenticator, $authenticatorID);

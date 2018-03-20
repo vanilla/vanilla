@@ -61,7 +61,6 @@ function testFailingSubject(subject) {
 }
 
 describe("matching @mentions", () => {
-    console.log(regex);
     describe("simple mentions", () => {
         const subjects = [
             `@System`,

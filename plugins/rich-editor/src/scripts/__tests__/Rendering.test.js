@@ -25,8 +25,17 @@ describe("rendering", () => {
         const testName = path.basename(fixture);
 
         test(testName, () => {
-            let input = JSON.parse(fs.readFileSync(path.join(fixtureDir, fixture, "input.json"), "utf8"));
-            let expectedOutput = fs.readFileSync(path.join(fixtureDir, fixture, "output.html"), "utf8");
+            const input = JSON.parse(fs.readFileSync(path.join(fixtureDir, fixture, "input.json"), "utf8"));
+
+            const clientSpecificOutputPath = path.join(fixtureDir, fixture, "output-client.html");
+            const genericOutputPath = path.join(fixtureDir, fixture, "output.html");
+            let expectedOutput;
+
+            if (fs.existsSync(clientSpecificOutputPath)) {
+                expectedOutput = fs.readFileSync(clientSpecificOutputPath, "utf8");
+            } else {
+                expectedOutput = fs.readFileSync(genericOutputPath, "utf8");
+            }
 
             // Strip off extra whitespace
             expectedOutput = expectedOutput.replace(/\s+/, " ");

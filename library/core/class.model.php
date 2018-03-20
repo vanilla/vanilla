@@ -912,7 +912,7 @@ class Gdn_Model extends Gdn_Pluggable {
     }
 
     /**
-     * Checks whether the time frame or editing content has passed.
+     * Checks whether the time frame for editing content has passed.
      *
      * @param object|array $data The content data to examine.
      * @param int $timeLeft Sets the time left to edit or 0 if not applicable.

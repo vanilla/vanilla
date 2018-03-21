@@ -83,8 +83,8 @@ class TestSSOAuthenticator extends SSOAuthenticator {
     /**
      * @inheritDoc
      */
-    public function setTrusted($isTrusted) {
-        parent::setTrusted($isTrusted);
+    public function setTrusted(bool $isTrusted): SSOAuthenticator {
+        return parent::setTrusted($isTrusted);
     }
 
     /**

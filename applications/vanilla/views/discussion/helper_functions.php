@@ -437,19 +437,10 @@ if (!function_exists('getCommentOptions')) :
 
         $categoryID = val('CategoryID', $discussion);
 
-        // Determine if we still have time to edit
-        $editContentTimeout = c('Garden.EditContentTimeout', -1);
-        $canEdit = $editContentTimeout == -1 || strtotime($comment->DateInserted) + $editContentTimeout > time();
-        $timeLeft = '';
-        $canEditDiscussions = CategoryModel::checkPermission($categoryID, 'Vanilla.Discussions.Edit');
-        if ($canEdit && $editContentTimeout > 0 && !$canEditDiscussions) {
-            $timeLeft = strtotime($comment->DateInserted) + $editContentTimeout - time();
-            $timeLeft = $timeLeft > 0 ? ' ('.Gdn_Format::seconds($timeLeft).')' : '';
-        }
-
         // Can the user edit the comment?
-        $canEditComments = CategoryModel::checkPermission($categoryID, 'Vanilla.Comments.Edit');
-        if (($canEdit && $session->UserID == $comment->InsertUserID) || $canEditComments) {
+        $commentModel = new CommentModel();
+        $canEdit = $commentModel->canEdit($comment);
+        if ($canEdit) {
             $options['EditComment'] = [
                 'Label' => t('Edit').$timeLeft,
                 'Url' => '/post/editcomment/'.$comment->CommentID,
@@ -458,8 +449,12 @@ if (!function_exists('getCommentOptions')) :
         }
 
         // Can the user delete the comment?
-        $selfDeleting = ($canEdit && $session->UserID == $comment->InsertUserID && c('Vanilla.Comments.AllowSelfDelete'));
-        if ($selfDeleting || CategoryModel::checkPermission($categoryID, 'Vanilla.Comments.Delete')) {
+        $canDelete = CategoryModel::checkPermission(
+            $categoryID,
+            'Vanilla.Comments.Delete'
+        );
+        $canSelfDelete = ($canEdit && $session->UserID == $comment->InsertUserID && c('Vanilla.Comments.AllowSelfDelete'));
+        if ($canDelete || $canSelfDelete) {
             $options['DeleteComment'] = [
                 'Label' => t('Delete'),
                 'Url' => '/discussion/deletecomment/'.$comment->CommentID.'/'.$session->transientKey().'/?Target='.urlencode("/discussion/{$comment->DiscussionID}/x"),

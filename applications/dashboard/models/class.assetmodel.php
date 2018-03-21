@@ -168,8 +168,14 @@ class AssetModel extends Gdn_Model {
             "/js/$basename/lib-core-$basename.js"
         ];
 
-        // Loop through the enabled addons and get their javascript.
         $addons = [];
+
+        $core = "/js/$basename/core-$basename.js";
+        if (file_exists(PATH_ROOT."/$core")) {
+            $addons[] = $core;
+        }
+
+        // Loop through the enabled addons and get their javascript.
         foreach ($this->addonManager->getEnabled() as $addon) {
             /* @var Addon $addon */
             if ($addon->getType() !== Addon::TYPE_ADDON) {

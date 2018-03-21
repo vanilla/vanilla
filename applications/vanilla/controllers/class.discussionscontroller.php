@@ -276,7 +276,6 @@ class DiscussionsController extends VanillaController {
         $discussionModel->setFilters(Gdn::request()->get());
         $this->setData('Sort', $discussionModel->getSort());
         $this->setData('Filters', $discussionModel->getFilters());
-        $discussionModel->Watching = true;
 
         // Get Discussion Count
         $countDiscussions = $discussionModel->getUnreadCount();

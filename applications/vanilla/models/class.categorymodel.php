@@ -397,7 +397,7 @@ class CategoryModel extends Gdn_Model {
     }
 
     /**
-     *
+     * Get followed categories, taking into account view permissions and the category's HideAllDiscussions flag, optionally.
      *
      * @param bool $honorHideAllDiscussion Whether or not the HideAllDiscussions flag will be checked on categories.
      * @return array|bool Category IDs or true if all categories are watched.
@@ -413,7 +413,7 @@ class CategoryModel extends Gdn_Model {
                 continue;
             }
 
-            if ($category['PermsDiscussionsView'] && $category['Following']) {
+            if ($category['PermsDiscussionsView'] && $category['Followed']) {
                 $watch[] = $categoryID;
             }
         }

@@ -26,6 +26,9 @@ class CategoriesTest extends AbstractResourceTest {
     /** {@inheritdoc} */
     protected $baseUrl = '/categories';
 
+    /** @var CategoryModel */
+    protected $categoryModel;
+
     /** {@inheritdoc} */
     protected $editFields = ['description', 'name', 'parentCategoryID', 'urlcode', 'displayAs'];
 
@@ -61,6 +64,18 @@ class CategoriesTest extends AbstractResourceTest {
     }
 
     /**
+     * Get an instance of CategoryModel.
+     *
+     * @return CategoryModel
+     */
+    protected function getCategoryModel() {
+        if (!isset($this->categoryModel)) {
+            $this->categoryModel = $this->container()->get(CategoryModel::class);
+        }
+        return $this->categoryModel;
+    }
+
+    /**
      * {@inheritdoc}
      */
     public function indexUrl() {
@@ -83,6 +98,61 @@ class CategoriesTest extends AbstractResourceTest {
         ];
         static::$recordCounter++;
         return $record;
+    }
+
+    /**
+     * Test getting only archived categories.
+     */
+    public function testFilterArchived() {
+        $categoryModel = $this->getCategoryModel();
+
+        // Make sure there'es at least one archived category.
+        $archived = $this->testPost();
+        $categoryModel->setField($archived['categoryID'], 'Archived', 1);
+
+        $categories = $this->api()->get($this->baseUrl, [
+            'archived' => true,
+            'parentCategoryID' => self::PARENT_CATEGORY_ID
+        ])->getBody();
+
+        // Iterate through the results, detecting the archived status.
+        $notArchived = 0;
+        foreach ($categories as $category) {
+            if ($category['archived'] !== true) {
+                $notArchived++;
+            }
+        }
+
+        // Verify no non-archived categories were included.
+        $this->assertEquals(0, $notArchived);
+    }
+
+    /**
+     * Test getting only categories that are not archived.
+     */
+    public function testFilterNotArchived() {
+        $categoryModel = $this->getCategoryModel();
+
+        // Make sure there's at least one archived category.
+        $archived = $this->testPost();
+        $categoryModel->setField($archived['categoryID'], 'Archived', 1);
+
+        // Get only non-archived categories.
+        $categories = $this->api()->get($this->baseUrl, [
+            'archived' => false,
+            'parentCategoryID' => self::PARENT_CATEGORY_ID
+        ])->getBody();
+
+        // Iterate through the results, detecting the archived status.
+        $archived = 0;
+        foreach ($categories as $category) {
+            if ($category['archived'] === true) {
+                $archived++;
+            }
+        }
+
+        // Verify no archived categories were returned.
+        $this->assertEquals(0, $archived);
     }
 
     /**
@@ -241,6 +311,40 @@ class CategoriesTest extends AbstractResourceTest {
             "{$this->baseUrl}/{$row[$this->pk]}",
             ['parentCategoryID' => $child[$this->pk]]
         );
+    }
+
+    /**
+     * Test getting both archived and non-archived categories.
+     */
+    public function testNoFilterArchived() {
+        $categoryModel = $this->getCategoryModel();
+
+        // Make sure there's at least one archived category.
+        $archived = $this->testPost();
+        $categoryModel->setField($archived['categoryID'], 'Archived', 1);
+
+        // ...and one non-archived category.
+        $notArchived = $this->testPost();
+
+        // Get only non-archived categories.
+        $categories = $this->api()->get($this->baseUrl, [
+            'archived' => '',
+            'parentCategoryID' => self::PARENT_CATEGORY_ID
+        ])->getBody();
+
+        // Iterate through the results, making sure both archived and non-archived categories are included.
+        $archivedFound = false;
+        $notArchivedFound = false;
+        foreach ($categories as $category) {
+            if ($archived['categoryID'] === $category['categoryID']) {
+                $archivedFound = true;
+            } elseif ($notArchived['categoryID'] === $category['categoryID']) {
+                $notArchivedFound = true;
+            }
+        }
+
+        // Verify we were able to locate the archived and non-archived categories.
+        $this->assertTrue($archivedFound && $notArchivedFound);
     }
 
     /**

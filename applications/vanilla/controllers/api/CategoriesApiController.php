@@ -335,29 +335,33 @@ class CategoriesApiController extends AbstractApiController {
                 ]
             );
 
-            if ($query['archived'] === true) {
-                $categories = array_filter($categories, function($category) {
-                    return array_key_exists('Archived', $category) && $category['Archived'];
-                });
-            } elseif ($query['archived'] === false) {
-                // Filter out archived categories.
-                $archiveFilter = function(array $categories) use (&$archiveFilter) {
+            // Filter tree by the category "archived" fields.
+            if ($query['archived'] !== null) {
+                /**
+                 * Recursively filter a list of categories by their archived flag.
+                 *
+                 * @param array $categories
+                 * @param int $archived
+                 * @return array
+                 */
+                $archiveFilter = function (array $categories, $archived) use (&$archiveFilter) {
                     $result = [];
                     foreach ($categories as $index => $category) {
-                        // Archived? Discard.
-                        if (array_key_exists('Archived', $category) && $category['Archived'] === 1) {
+                        // Discard, based on archived value.
+                        if (array_key_exists('Archived', $category) && $category['Archived'] === $archived) {
                             continue;
                         }
                         // Process any children.
                         if (!empty($category['Children'])) {
-                            $category['Children'] = $archiveFilter($category['Children']);
+                            $category['Children'] = $archiveFilter($category['Children'], $archived);
                         }
                         // If the category made it this far, include it.
                         $result[] = $category;
                     }
                     return $result;
                 };
-                $categories = $archiveFilter($categories);
+
+                $categories = $archiveFilter($categories, $query['archived'] ? 0 : 1);
             }
         }
         $this->categoryModel->setJoinUserCategory($joinUserCategory);

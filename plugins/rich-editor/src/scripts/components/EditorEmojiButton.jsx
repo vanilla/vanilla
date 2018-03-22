@@ -46,19 +46,54 @@ export default class EditorEmojiButton extends React.Component {
         this.props.closeMenu(e);
     }
 
+    /**
+     * Handle key presses
+     * @param {SyntheticEvent} e
+     */
+    handleKeyPress = (event) => {
+
+        switch (event.key) {
+        case "ArrowRight":
+        case "ArrowDown":
+            event.stopPropagation();
+            event.preventDefault();
+            const nextSibling = this.domButton.nextSibling;
+            if (nextSibling) {
+                nextSibling.focus();
+            }
+            break;
+        case "ArrowUp":
+        case "ArrowLeft":
+            event.stopPropagation();
+            event.preventDefault();
+            const previousSibling = this.domButton.previousSibling;
+            if (previousSibling) {
+                previousSibling.focus();
+            }
+            break;
+        }
+    }
+
+    /**
+     * Check to see if element should get focus
+     * @param {Object} prevProps
+     */
     componentDidUpdate = (prevProps) => {
         if (this.domButton && prevProps.selectedButton) {
             this.domButton.focus();
         }
     }
 
+    /**
+     * @inheritDoc
+     */
     render() {
         const componentClasses = classNames(
             'richEditor-button',
             'richEditor-insertEmoji',
             'emojiChar-' + this.emojiChar,
         );
-        return <button ref={(button) => { this.domButton = button; }}  style={this.props.style} className={componentClasses} data-index={this.props.position} type="button" onClick={this.insertEmojiBlot}>
+        return <button ref={(button) => { this.domButton = button; }} onKeyDown={this.handleKeyPress} style={this.props.style} className={componentClasses} data-index={this.props.position} type="button" onClick={this.insertEmojiBlot}>
             <span className="safeEmoji" dangerouslySetInnerHTML={{__html: parseEmoji(this.emojiChar)}} />
         </button>;
     }

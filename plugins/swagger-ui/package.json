@@ -10,7 +10,7 @@
         "immutable": "^3.8.2",
         "prop-types": "^15.6.0",
         "react": "^16.2.0",
-        "swagger-ui": "^3.8.1"
+        "swagger-ui": "^3.12.1"
     },
     "version": "1.0.0"
 }

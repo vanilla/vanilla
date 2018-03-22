@@ -1450,9 +1450,11 @@ extsprintf@^1.2.0:
   version "1.4.0"
   resolved "https://registry.yarnpkg.com/extsprintf/-/extsprintf-1.4.0.tgz#e2689f8f356fad62cca65a3a91c5df5f9551692f"
 
-fast-json-patch@1.1.8:
-  version "1.1.8"
-  resolved "https://registry.yarnpkg.com/fast-json-patch/-/fast-json-patch-1.1.8.tgz#8db58c9d12c3ff9c23456ee812cc29fac722b772"
+fast-json-patch@^2.0.6:
+  version "2.0.6"
+  resolved "https://registry.yarnpkg.com/fast-json-patch/-/fast-json-patch-2.0.6.tgz#86fff8f8662391aa819722864d632e603e6ee605"
+  dependencies:
+    deep-equal "^1.0.1"
 
 faye-websocket@^0.10.0:
   version "0.10.0"
@@ -2180,6 +2182,10 @@ lodash.clonedeep@^4.5.0:
   version "4.5.0"
   resolved "https://registry.yarnpkg.com/lodash.clonedeep/-/lodash.clonedeep-4.5.0.tgz#e23f3f9c4f8fbdde872529c1071857a086e5ccef"
 
+lodash.debounce@^4:
+  version "4.0.8"
+  resolved "https://registry.yarnpkg.com/lodash.debounce/-/lodash.debounce-4.0.8.tgz#82d79bff30a67c4005ffd5e2515300ad9ca4d7af"
+
 lodash.escaperegexp@^4.1.2:
   version "4.1.2"
   resolved "https://registry.yarnpkg.com/lodash.escaperegexp/-/lodash.escaperegexp-4.1.2.tgz#64762c48618082518ac3df4ccf5d5886dae20347"
@@ -2208,9 +2214,9 @@ lodash.mergewith@^4.6.0:
   version "4.6.0"
   resolved "https://registry.yarnpkg.com/lodash.mergewith/-/lodash.mergewith-4.6.0.tgz#150cf0a16791f5903b8891eab154609274bdea55"
 
-lodash@4.17.2:
-  version "4.17.2"
-  resolved "https://registry.yarnpkg.com/lodash/-/lodash-4.17.2.tgz#34a3055babe04ce42467b607d700072c7ff6bf42"
+lodash@4.17.5:
+  version "4.17.5"
+  resolved "https://registry.yarnpkg.com/lodash/-/lodash-4.17.5.tgz#99a92d65c0272debe8c96b6057bc8fbfa3bed511"
 
 lodash@^4.14.0, lodash@^4.16.2, lodash@^4.17.2, lodash@^4.17.4, lodash@^4.2.0, lodash@^4.2.1:
   version "4.17.4"
@@ -2661,6 +2667,14 @@ prop-types@15.5.8:
   dependencies:
     fbjs "^0.8.9"
 
+prop-types@^15:
+  version "15.6.1"
+  resolved "https://registry.yarnpkg.com/prop-types/-/prop-types-15.6.1.tgz#36644453564255ddda391191fb3a125cbdf654ca"
+  dependencies:
+    fbjs "^0.8.16"
+    loose-envify "^1.3.1"
+    object-assign "^4.1.1"
+
 prop-types@^15.5.1, prop-types@^15.5.10, prop-types@^15.5.4, prop-types@^15.5.8, prop-types@^15.6.0:
   version "15.6.0"
   resolved "https://registry.yarnpkg.com/prop-types/-/prop-types-15.6.0.tgz#ceaf083022fc46b4a35f69e13ef75aed0d639856"
@@ -2763,6 +2777,13 @@ react-collapse@^4.0.3:
   resolved "https://registry.yarnpkg.com/react-collapse/-/react-collapse-4.0.3.tgz#b96de959ed0092a43534630b599a4753dd76d543"
   dependencies:
     prop-types "^15.5.8"
+
+react-debounce-input@^3.2.0:
+  version "3.2.0"
+  resolved "https://registry.yarnpkg.com/react-debounce-input/-/react-debounce-input-3.2.0.tgz#6978c6061d898f549f40417fb0d2ebbecf50aaaa"
+  dependencies:
+    lodash.debounce "^4"
+    prop-types "^15"
 
 react-dom@^15.6.2:
   version "15.6.2"
@@ -3343,9 +3364,9 @@ supports-color@^5.1.0:
   dependencies:
     has-flag "^2.0.0"
 
-swagger-client@^3.4.4:
-  version "3.4.4"
-  resolved "https://registry.yarnpkg.com/swagger-client/-/swagger-client-3.4.4.tgz#e5e8855ded31d3411431cb727d21abc82ab86a8e"
+swagger-client@^3.5.1:
+  version "3.5.1"
+  resolved "https://registry.yarnpkg.com/swagger-client/-/swagger-client-3.5.1.tgz#389a8ebc90602ff87bdee529d3a3f6b1d6980203"
   dependencies:
     babel-runtime "^6.23.0"
     btoa "1.1.2"
@@ -3353,7 +3374,7 @@ swagger-client@^3.4.4:
     cross-fetch "0.0.8"
     deep-extend "^0.4.1"
     encode-3986 "^1.0.0"
-    fast-json-patch "1.1.8"
+    fast-json-patch "^2.0.6"
     isomorphic-form-data "0.0.1"
     js-yaml "^3.8.1"
     lodash "^4.16.2"
@@ -3362,9 +3383,9 @@ swagger-client@^3.4.4:
     utf8-bytes "0.0.1"
     utfstring "^2.0.0"
 
-swagger-ui@^3.8.1:
-  version "3.8.1"
-  resolved "https://registry.yarnpkg.com/swagger-ui/-/swagger-ui-3.8.1.tgz#c58b2b51869b9953f4b49fe6a2acd13c41a32eea"
+swagger-ui@^3.12.1:
+  version "3.13.0"
+  resolved "https://registry.yarnpkg.com/swagger-ui/-/swagger-ui-3.13.0.tgz#13c10c995a2222595c27bab5f4a0f855e986ae08"
   dependencies:
     "@braintree/sanitize-url" "^2.0.2"
     base64-js "^1.2.0"
@@ -3379,7 +3400,7 @@ swagger-ui@^3.8.1:
     ieee754 "^1.1.8"
     immutable "^3.x.x"
     js-yaml "^3.5.5"
-    lodash "4.17.2"
+    lodash "4.17.5"
     matcher "^0.1.2"
     memoizee "0.4.1"
     promise-worker "^1.1.1"
@@ -3389,6 +3410,7 @@ swagger-ui@^3.8.1:
     react-addons-shallow-compare "0.14.8"
     react-addons-test-utils "^15.6.2"
     react-collapse "^4.0.3"
+    react-debounce-input "^3.2.0"
     react-dom "^15.6.2"
     react-height "^2.0.0"
     react-hot-loader "1.3.1"
@@ -3408,14 +3430,14 @@ swagger-ui@^3.8.1:
     scroll-to-element "^2.0.0"
     serialize-error "2.0.0"
     shallowequal "0.2.2"
-    swagger-client "^3.4.4"
+    swagger-client "^3.5.1"
     url-parse "^1.1.8"
     whatwg-fetch "0.11.1"
     worker-loader "^0.7.1"
     xml "1.0.1"
     xml-but-prettier "^1.0.1"
     yaml-js "0.2.0"
-    zenscroll "4.0.0"
+    zenscroll "4.0.1"
   optionalDependencies:
     webpack-dev-server "2.5.0"
 
@@ -3724,6 +3746,6 @@ yargs@^6.0.0:
     y18n "^3.2.1"
     yargs-parser "^4.2.0"
 
-zenscroll@4.0.0:
-  version "4.0.0"
-  resolved "https://registry.yarnpkg.com/zenscroll/-/zenscroll-4.0.0.tgz#4baefa4a1b9fb3bcc6d365e200648ff339e447a8"
+zenscroll@4.0.1:
+  version "4.0.1"
+  resolved "https://registry.yarnpkg.com/zenscroll/-/zenscroll-4.0.1.tgz#b8838bbb5cd7daeef584269bcb659c314ffc21de"

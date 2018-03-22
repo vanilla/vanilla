@@ -1,0 +1,11 @@
+button.Close {
+    @include resetButton;
+}
+
+.Close-x {
+    color: #000;
+    font-family: arial;
+    font-size: 22px;
+    font-weight: bold;
+    padding: 0;
+}

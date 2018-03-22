@@ -84,3 +84,10 @@
     -ms-user-select: none;
     user-select: none;
 }
+
+@mixin resetButton() {
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+    border: 0;
+}

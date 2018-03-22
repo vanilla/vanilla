@@ -42,6 +42,10 @@ export default class EditorEmojiMenu extends React.PureComponent {
         closeMenu: PropTypes.func.isRequired,
         menuID: PropTypes.string.isRequired,
         menuTitleID: PropTypes.string.isRequired,
+        menuDescriptionID: PropTypes.string.isRequired,
+        emojiCategoriesID: PropTypes.string.isRequired,
+        pickerID: PropTypes.string.isRequired,
+        checkForExternalFocus: PropTypes.func.isRequired,
     };
 
     /**
@@ -50,6 +54,7 @@ export default class EditorEmojiMenu extends React.PureComponent {
     constructor(props) {
         super(props);
         utility.log("Emojis Loaded: ", emojis);
+        this.emojiGroupLength = Object.values(emojiGroups).length;
         this.state = {
             scrollTarget: 0,
             selectedGroup: emojiGroups[0],
@@ -128,6 +133,19 @@ export default class EditorEmojiMenu extends React.PureComponent {
     };
 
     /**
+     * Focus on Emoji Categories
+     */
+    focusOnCategories = () => {
+        const categories = document.getElementById(this.props.emojiCategoriesID);
+        if (categories) {
+            const firstButton = categories.querySelector('.richEditor-button');
+            if (firstButton) {
+                firstButton.focus();
+            }
+        }
+    };
+
+    /**
      * @inheritDoc
      */
     render() {
@@ -140,14 +158,21 @@ export default class EditorEmojiMenu extends React.PureComponent {
                 isHidden: !this.props.isVisible,
             }
         );
-        return <div id={this.props.menuID} className={componentClasses} role="dialog" aria-hidden={!this.props.isVisible} aria-labelledby={this.props.menuTitleID}>
+        return <div id={this.props.menuID} className={componentClasses} role="dialog" aria-describedby={this.menuDescriptionID} aria-hidden={!this.props.isVisible} aria-labelledby={this.props.menuTitleID}>
             <div className="insertPopover-header">
                 <h2 id={this.props.menuTitleID} className="H insertMedia-title">
                     {t('Smileys & Faces')}
                 </h2>
-                <a href="#" aria-label={t('Close')} onClick={this.props.closeMenu} className="Close richEditor-close">
-                    <span>×</span>
-                </a>
+                <div id={this.menuDescriptionID} className="sr-only">
+                    {t('Insert an emoji in your message.')}
+                </div>
+                <button type="button" onClick={this.props.closeMenu} className="Close richEditor-close">
+                    <span className="Close-x" aria-hidden="true">×</span>
+                    <span className="sr-only">{t('Close')}</span>
+                </button>
+                <button type="button" className="accessibility-jumpTo" onClick={() => this.focusOnCategories()}>
+                    {t('Jump past emoji list, to categories')}
+                </button>
             </div>
             <div className="insertPopover-body">
                 <AutoSizer>
@@ -166,6 +191,7 @@ export default class EditorEmojiMenu extends React.PureComponent {
                             width={width}
 
                             overscanRowCount={this.state.overscanRowCount}
+                            tabIndex={-1}
 
                             scrollToAlignment="start"
                             scrollToRow={this.state.scrollTarget}
@@ -177,7 +203,7 @@ export default class EditorEmojiMenu extends React.PureComponent {
                 </AutoSizer>
             </div>
             <div className="insertPopover-footer">
-                <div className="emojiGroups">
+                <div id={this.props.emojiCategoriesID} className="emojiGroups" aria-label={t('Emoji Categories')} tabIndex={-1}>
                     {Object.values(emojiGroups).map((groupName, groupKey) => {
                         const isSelected = this.state.selectedGroup === groupKey;
                         const componentClasses = classNames(
@@ -185,7 +211,15 @@ export default class EditorEmojiMenu extends React.PureComponent {
                             'emojiGroup',
                             { isSelected }
                         );
-                        return <button type="button" onClick={() => this.scrollToCategory(groupKey)} aria-current={isSelected} key={'emojiGroup-' + groupName} title={t(groupName)} aria-label={t('Jump to emoji category: ') + t(groupName)} className={componentClasses}>
+
+                        let onBlur;
+                        if(groupKey + 1 === this.emojiGroupLength) {
+                            onBlur = this.props.checkForExternalFocus;
+                        } else {
+                            onBlur = null;
+                        }
+
+                        return <button type="button" onClick={() => this.scrollToCategory(groupKey)} onBlur={onBlur} aria-current={isSelected} key={'emojiGroup-' + groupName} title={t(groupName)} aria-label={t('Jump to emoji category: ') + t(groupName)} className={componentClasses}>
                             {this.getGroupSVGPath(groupName)}
                         </button>;
                     })}

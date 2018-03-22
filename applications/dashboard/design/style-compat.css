@@ -27,6 +27,21 @@ body.isMobile .change-picture .change-picture-instructions {
   display: none;
 }
 
+button.Close {
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+  border: 0;
+}
+
+.Close-x {
+  color: #000;
+  font-family: arial;
+  font-size: 22px;
+  font-weight: bold;
+  padding: 0;
+}
+
 @keyframes spinnerLoader {
   0% {
     transform: rotate(73deg);

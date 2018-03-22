@@ -20,6 +20,7 @@ const buttonSize = 39;
 const colSize = 7;
 const rowSize = 7;
 const rowIndexesByGroupId = {};
+const cellIndexesByGroupId = {};
 
 /**
  * Get start positions for each category
@@ -29,11 +30,11 @@ emojis.map((data, key) => {
     if (!(groupID in rowIndexesByGroupId)) {
         const rowIndex = Math.floor(key / colSize);
         rowIndexesByGroupId[groupID] = rowIndex;
+        cellIndexesByGroupId[groupID] = key;
     }
 });
 
 utility.log("rowIndexesByGroupId: ", rowIndexesByGroupId);
-// utility.log("groupIdByRowIndex: ", groupIdByRowIndex);
 
 export default class EditorEmojiMenu extends React.PureComponent {
     static propTypes = {
@@ -57,7 +58,7 @@ export default class EditorEmojiMenu extends React.PureComponent {
         this.emojiGroupLength = Object.values(emojiGroups).length;
         this.state = {
             scrollTarget: 0,
-            selectedGroup: emojiGroups[0],
+            firstEmojiOfGroup: 0,
             overscanRowCount: 20,
             rowStartIndex: 0,
             lastRowIndex: null,
@@ -98,6 +99,7 @@ export default class EditorEmojiMenu extends React.PureComponent {
     handleEmojiScroll = () => {
         this.setState({
             scrollTarget: -1,
+            firstEmojiOfGroup: -1,
         });
     };
 
@@ -107,6 +109,7 @@ export default class EditorEmojiMenu extends React.PureComponent {
     scrollToCategory = (categoryId) => {
         this.setState({
             scrollTarget: rowIndexesByGroupId[categoryId],
+            firstEmojiOfGroup: cellIndexesByGroupId[categoryId],
             selectedGroup: categoryId,
         });
     };
@@ -118,8 +121,9 @@ export default class EditorEmojiMenu extends React.PureComponent {
         const pos = rowIndex * rowSize + columnIndex;
         const emojiData = emojis[pos];
         let result = null;
+        const selectedButton = this.state.firstEmojiOfGroup >= 0 && this.state.firstEmojiOfGroup === pos ;
         if(emojiData) {
-            result = <EditorEmojiButton style={style} closeMenu={this.props.closeMenu} quill={this.props.quill} key={"emoji-" + emojiData.hexcode} emojiData={emojiData} index={pos} rowIndex={rowIndex} />;
+            result = <EditorEmojiButton selectedButton={selectedButton} style={style} closeMenu={this.props.closeMenu} quill={this.props.quill} key={"emoji-" + emojiData.hexcode} emojiData={emojiData} index={pos} rowIndex={rowIndex} />;
         }
         return result;
     };
@@ -171,7 +175,7 @@ export default class EditorEmojiMenu extends React.PureComponent {
                     <span className="sr-only">{t('Close')}</span>
                 </button>
                 <button type="button" className="accessibility-jumpTo" onClick={() => this.focusOnCategories()}>
-                    {t('Jump past emoji list, to categories')}
+                    {t('Jump past emoji list, to emoji categories.')}
                 </button>
             </div>
             <div className="insertPopover-body">
@@ -212,15 +216,16 @@ export default class EditorEmojiMenu extends React.PureComponent {
                             { isSelected }
                         );
 
-                        let onBlur;
+                        let onBlur = () => {};
                         if(groupKey + 1 === this.emojiGroupLength) {
                             onBlur = this.props.checkForExternalFocus;
-                        } else {
-                            onBlur = null;
                         }
 
                         return <button type="button" onClick={() => this.scrollToCategory(groupKey)} onBlur={onBlur} aria-current={isSelected} key={'emojiGroup-' + groupName} title={t(groupName)} aria-label={t('Jump to emoji category: ') + t(groupName)} className={componentClasses}>
                             {this.getGroupSVGPath(groupName)}
+                            <span className="sr-only">
+                                {t('Jump to Category: ') + t(groupName)}
+                            </span>
                         </button>;
                     })}
                 </div>

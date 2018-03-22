@@ -62,7 +62,6 @@ export default class EditorEmojiPicker extends React.Component {
      */
     checkForExternalFocus = (e) => {
         setImmediate(() => {
-            console.log("YOOOOO", e);
             const activeElement = document.activeElement;
             const emojiPickerElement = document.getElementById(this.pickerID);
             if(activeElement.id !== this.pickerID && !emojiPickerElement.contains(activeElement)) {
@@ -85,8 +84,6 @@ export default class EditorEmojiPicker extends React.Component {
     componentDidMount(){
         document.addEventListener("keydown", this.escFunction, false);
         document.addEventListener(CLOSE_FLYOUT_EVENT, this.closeMenu);
-
-
     }
 
     componentWillUnmount(){

@@ -195,7 +195,7 @@ class SSOData implements \JsonSerializable {
      *
      * @throws \Exception If the validation fails.
      */
-    public function validate(): void {
+    public function validate() {
         $required = ['authenticatorType', 'authenticatorID', 'uniqueID'];
 
         $invalidProperties = [];

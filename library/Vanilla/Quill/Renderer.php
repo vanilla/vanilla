@@ -36,8 +36,8 @@ class Renderer {
     /** @var array[] */
     private $operations = [];
 
-    /** @var Block[]  */
-    private $blocks = [];
+    /** @var Group[]  */
+    private $groups = [];
 
     /**
      * Parser constructor.
@@ -54,7 +54,7 @@ class Renderer {
      */
     public function parse() {
         $operationLength = \count($this->operations);
-        $block = new Block();
+        $block = new Group();
         $currentBlotType = null;
 
         for($i = 0; $i < $operationLength; $i++) {
@@ -84,13 +84,13 @@ class Renderer {
                     $autoCloseBlock = $currentBlotType !== null && $currentBlotType !== $blot;
 
                     if ($blotInstance->shouldClearCurrentBlock($block) || $autoCloseBlock) {
-                        $this->blocks[] = $block;
-                        $block = new Block();
+                       $this->groups[] = $block;
+                        $block = new Group();
                         $currentBlotType = $blot;
                     }
 
                     if (is_a($blotInstance, Blots\AbstractListBlot::class) && $blotInstance->shouldClearCurrentBlock($block)) {
-                        $this->blocks[] = Block::makeEmptyBlock();
+                       $this->groups[] = Group::makeEmptyGroup();
                     }
 
                     $block->pushBlot($blotInstance);
@@ -103,7 +103,7 @@ class Renderer {
                 }
             }
         }
-        $this->blocks[] = $block;
+       $this->groups[] = $block;
     }
 
     /**
@@ -113,8 +113,8 @@ class Renderer {
      */
     public function render(): string {
         $result = "";
-        foreach ($this->blocks as $block) {
-            $result .= $block->render();
+        foreach ($this->groups as $group) {
+            $result .= $group->render();
         }
 
         // One last replace to fix the breaks.

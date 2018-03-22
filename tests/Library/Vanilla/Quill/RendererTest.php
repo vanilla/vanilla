@@ -59,12 +59,16 @@ class RendererTest extends TestCase {
             ["headings"],
             ["lists"],
             ["emoji"],
-            ["everything"],
             ["embed-image"],
             ["embed-video"],
             ["embed-internal"],
             ["embed-external"],
             ["embed-external-image"],
+//            ["blockquote"],
+//            ["spoiler"],
+//            ["code-block"],
+//            ["all"],
+//            ["all-blocks"],
         ];
     }
 }

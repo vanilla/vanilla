@@ -9,7 +9,7 @@ namespace Vanilla\Quill\Blots;
 
 use Vanilla\Quill\Blots\Embeds\EmojiBlot;
 use Vanilla\Quill\Formats;
-use Vanilla\Quill\Block;
+use Vanilla\Quill\Group;
 
 class TextBlot extends AbstractBlot {
 
@@ -82,7 +82,7 @@ class TextBlot extends AbstractBlot {
     /**
      * @inheritDoc
      */
-    public function shouldClearCurrentBlock(Block $block): bool {
+    public function shouldClearCurrentBlock(Group $block): bool {
         return false;
     }
 

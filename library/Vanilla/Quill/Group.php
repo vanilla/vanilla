@@ -19,7 +19,7 @@ use Vanilla\Quill\Blots\TextBlot;
  *
  * @package Vanilla\Quill
  */
-class Block {
+class Group {
 
     /** @var AbstractBlot[] */
     private $blots = [];
@@ -27,10 +27,10 @@ class Block {
     /**
      * Create any empty block. When rendered it will output <p><br></p>
      *
-     * @return Block
+     * @return Group
      */
-    public static function makeEmptyBlock(): Block {
-        $block = new Block();
+    public static function makeEmptyGroup(): Group {
+        $block = new Group();
         $blot = new TextBlot(["insert" => ""], [], []);
         $blot->setContent("<br>");
         $block->pushBlot($blot);

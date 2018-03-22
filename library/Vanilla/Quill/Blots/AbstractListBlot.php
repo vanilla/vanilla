@@ -7,7 +7,7 @@
 
 namespace Vanilla\Quill\Blots;
 
-use Vanilla\Quill\Block;
+use Vanilla\Quill\Group;
 
 abstract class AbstractListBlot extends TextBlot {
 
@@ -64,7 +64,7 @@ abstract class AbstractListBlot extends TextBlot {
     /**
      * @inheritDoc
      */
-    public function shouldClearCurrentBlock(Block $block): bool {
+    public function shouldClearCurrentBlock(Group $block): bool {
        return $this->shouldClearCurrentBlock;
     }
 

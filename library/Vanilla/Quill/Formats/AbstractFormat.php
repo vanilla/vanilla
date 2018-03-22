@@ -7,7 +7,7 @@
 
 namespace Vanilla\Quill\Formats;
 
-use Vanilla\Quill\Block;
+use Vanilla\Quill\Group;
 use Vanilla\Quill\Blots\AbstractBlot;
 use Vanilla\Quill\Blots\TextBlot;
 
@@ -65,7 +65,7 @@ abstract class AbstractFormat extends AbstractBlot {
     /**
      * @inheritDoc
      */
-    public function shouldClearCurrentBlock(Block $block): bool {
+    public function shouldClearCurrentBlock(Group $block): bool {
         return false;
     }
 

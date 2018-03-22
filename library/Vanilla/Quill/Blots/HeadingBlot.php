@@ -7,9 +7,23 @@
 
 namespace Vanilla\Quill\Blots;
 
-use Vanilla\Quill\Block;
+use Vanilla\Quill\Group;
 
-class HeadingBlot extends TextBlot {
+class HeadingBlot extends AbstractBlockBlot {
+    /**
+     * @inheritDoc
+     */
+    protected static function isOwnGroup(): bool {
+        return true;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    protected static function getAttributeKey(): string {
+        return "header";
+    }
+
 
     /**
      * @inheritDoc
@@ -34,13 +48,6 @@ class HeadingBlot extends TextBlot {
      */
     public function getHeadingLevel(): int {
         return valr("attributes.header", $this->nextOperation);
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public function shouldClearCurrentBlock(Block $block): bool {
-        return true;
     }
 
     /**

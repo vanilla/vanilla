@@ -35,6 +35,7 @@ $richEditor-pilcrowAnimation_duration: 0.3s;
 $richEditor-emojiCategory_color: #737982;
 $richEditor-emojiCategory_hoverColor: #212327;
 $richEditor-emojiCategory_selectedBg: #aee4fe;
+$richEditor-emojiButton_selectedBorderColor: #0291db;
 $richEditor-emojiGroup_paddingLeft: 3px;
 
 $richEditor-videoPlayIcon_width: 80px;
@@ -390,6 +391,16 @@ $embedded-quote_fg: #A3A3A3 !default;
     width: $richEditor-menuButton_size;
     height: $richEditor-menuButton_size;
     font-size: $richEditor-icon_size;
+    border: {
+        style: solid;
+        width: 2px;
+        color: transparent;
+    }
+
+    &:focus {
+        outline: 0;
+        border-color: $richEditor-emojiButton_selectedBorderColor;
+    }
 }
 
 .richEditor ~ .TextBoxWrapper {

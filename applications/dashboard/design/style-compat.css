@@ -416,6 +416,14 @@ button.Close {
   width: 39px;
   height: 39px;
   font-size: 24px;
+  border-style: solid;
+  border-width: 2px;
+  border-color: transparent;
+}
+
+.richEditor-insertEmoji:focus {
+  outline: 0;
+  border-color: #0291db;
 }
 
 .richEditor ~ .TextBoxWrapper {

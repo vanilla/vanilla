@@ -36,7 +36,10 @@ class DiscussionModel extends Gdn_Model {
     /** @var array */
     private static $discussionTypes = null;
 
-    /** @var bool */
+    /**
+     * @deprecated 2.6
+     * @var bool
+     */
     public $Watching = false;
 
     /** @var array Discussion Permissions */

@@ -49,7 +49,10 @@ class CategoryModel extends Gdn_Model {
      */
     private $collection;
 
-    /** @var bool */
+    /**
+     * @deprecated 2.6
+     * @var bool
+     */
     public $Watching = false;
 
     /** @var array Merged Category data, including Pure + UserCategory. */

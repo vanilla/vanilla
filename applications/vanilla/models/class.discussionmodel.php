@@ -331,11 +331,7 @@ class DiscussionModel extends Gdn_Model {
      */
     public function discussionSummaryQuery($additionalFields = [], $join = true) {
         // Verify permissions (restricting by category if necessary)
-        if ($this->Watching) {
-            $perms = CategoryModel::categoryWatch();
-        } else {
-            $perms = self::categoryPermissions();
-        }
+        $perms = self::categoryPermissions();
 
         if ($perms !== true) {
             $this->SQL->whereIn('d.CategoryID', $perms);
@@ -664,10 +660,10 @@ class DiscussionModel extends Gdn_Model {
         }
 
         // Determine category watching
-        if ($this->Watching && !isset($where['d.CategoryID'])) {
-            $watch = CategoryModel::categoryWatch();
-            if ($watch !== true) {
-                $where['d.CategoryID'] = $watch;
+        if (!isset($where['d.CategoryID'])) {
+            $categoryIDs = CategoryModel::getVisibleCategoryIDs(['filterHideDiscussions' => true]);
+            if ($categoryIDs !== true) {
+                $where['d.CategoryID'] = $categoryIDs;
             }
         }
 
@@ -1518,11 +1514,7 @@ class DiscussionModel extends Gdn_Model {
      */
     public function getCount($wheres = [], $unused = null) {
         // Get permissions.
-        if ($this->Watching) {
-            $perms = CategoryModel::categoryWatch();
-        } else {
-            $perms = self::categoryPermissions();
-        }
+        $perms = self::categoryPermissions();
 
         // No permissions... That is sad :(
         if (!$perms) {
@@ -1608,11 +1600,7 @@ class DiscussionModel extends Gdn_Model {
         }
 
         // Check permission and limit to categories as necessary
-        if ($this->Watching) {
-            $perms = CategoryModel::categoryWatch();
-        } else {
-            $perms = self::categoryPermissions();
-        }
+        $perms = self::categoryPermissions();
 
         if (!$wheres || (count($wheres) == 1 && isset($wheres['d.CategoryID']))) {
             // Grab the counts from the faster category cache.

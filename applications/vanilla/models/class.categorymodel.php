@@ -8,6 +8,8 @@
  * @since 2.0
  */
 
+use Garden\EventManager;
+
 /**
  * Manages discussion categories' data.
  */
@@ -397,7 +399,7 @@ class CategoryModel extends Gdn_Model {
     }
 
     /**
-     * Get all categories, taking into account view permissions and, optionally, the category's HideAllDiscussions flag,.
+     * Get user's category IDs, taking into account permissions, muting and, optionally, the HideAllDiscussions field,
      *
      * @deprecated 2.6
      * @param bool $honorHideAllDiscussion Whether or not the HideAllDiscussions flag will be checked on categories.
@@ -414,7 +416,7 @@ class CategoryModel extends Gdn_Model {
                 continue;
             }
 
-            if ($category['PermsDiscussionsView']) {
+            if ($category['PermsDiscussionsView'] && $category['Following']) {
                 $watch[] = $categoryID;
             }
         }
@@ -427,6 +429,66 @@ class CategoryModel extends Gdn_Model {
         }
 
         return $watch;
+    }
+
+    /**
+     * Get a list of IDs of categories visible to the current user.
+     *
+     * @param array $options
+     * @return array|bool An array of filtered categories or true if no categories were filtered.
+     */
+    public function getVisibleCategories(array $options = []) {
+        $categories = $this->categories();
+        $unfiltered = true;
+        $result = [];
+
+        // Options
+        $filterHideDiscussions = $options['filterHideDiscussions'] ?? false;
+
+        foreach ($categories as $categoryID => $category) {
+            if ($filterHideDiscussions && val('HideAllDiscussions', $category)) {
+                $unfiltered = false;
+                continue;
+            }
+
+            if ($category['PermsDiscussionsView']) {
+                $result[] = $category;
+            } elseif ($unfiltered) {
+                $unfiltered = false;
+            }
+        }
+
+        if ($unfiltered) {
+            $result = true;
+        }
+
+        return $result;
+    }
+
+    /**
+     * Get a list of IDs of categories visible to the current user.
+     *
+     * @see CategoryModel::categoryWatch
+     * @param array $options
+     * @return array|bool An array of filtered category IDs or true if no categories were filtered.
+     */
+    public static function getVisibleCategoryIDs(array $options = []) {
+        $categoryModel = self::instance();
+        $result = $categoryModel->getVisibleCategories($options);
+        if (is_array($result)) {
+            $result = array_column($result, 'CategoryID');
+        }
+
+        /** @var EventManager $eventManager */
+        $eventManager = Gdn::getContainer()->get(EventManager::class);
+
+        // Backwards-compatible CategoryModel::categoryWatch event.
+        $eventManager->fireDeprecated('categoryModel_categoryWatch', $categoryModel, ['CategoryIDs' => &$result]);
+
+        // Allow addons to modify the visible categories.
+        $result = $eventManager->fireFilter('categoryModel_visibleCategoryIDs', $result);
+
+        return $result;
     }
 
     /**
@@ -2098,8 +2160,8 @@ class CategoryModel extends Gdn_Model {
             $categoryID = [$categoryID];
         }
 
-        if (!$categoryID && $this->Watching) {
-            $categoryID = self::categoryWatch(false);
+        if (!$categoryID) {
+            $categoryID = CategoryModel::getVisibleCategoryIDs();
         }
 
         switch ($permissions) {
@@ -2157,8 +2219,9 @@ class CategoryModel extends Gdn_Model {
         // Filter out the categories we aren't supposed to view.
         if ($restrictIDs && !is_array($restrictIDs)) {
             $restrictIDs = [$restrictIDs];
-        } elseif ($this->Watching)
-            $restrictIDs = self::categoryWatch();
+        } else {
+            $restrictIDs = self::getVisibleCategoryIDs(['filterHideDiscussions' => true]);
+        }
 
         switch ($permissions) {
             case 'Vanilla.Discussions.Add':

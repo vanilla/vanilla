@@ -10,6 +10,7 @@ namespace Vanilla\Quill\Blots;
 use Vanilla\Quill\Group;
 
 class HeadingBlot extends AbstractBlockBlot {
+
     /**
      * @inheritDoc
      */
@@ -23,7 +24,6 @@ class HeadingBlot extends AbstractBlockBlot {
     protected static function getAttributeKey(): string {
         return "header";
     }
-
 
     /**
      * @inheritDoc
@@ -53,8 +53,14 @@ class HeadingBlot extends AbstractBlockBlot {
     /**
      * @inheritDoc
      */
-    public function hasConsumedNextOp(): bool {
-        return true;
+    public function getGroupOpeningTag(): string {
+        return "<h" . $this->getHeadingLevel() . ">";
     }
 
+    /**
+     * @inheritDoc
+     */
+    public function getGroupClosingTag(): string {
+        return "</h" . $this->getHeadingLevel() . ">";
+    }
 }

@@ -15,4 +15,18 @@ class OrderedListBlot extends AbstractListBlot {
     protected static function getListType(): string {
         return "ordered";
     }
+
+    /**
+     * @inheritDoc
+     */
+    public function getGroupOpeningTag(): string {
+        return "<ol>";
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function getGroupClosingTag(): string {
+        return "</ol>";
+    }
 }

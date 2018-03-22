@@ -67,6 +67,24 @@ abstract class AbstractBlot {
     abstract public function hasConsumedNextOp(): bool;
 
     /**
+     * Get the HTML to represent the opening tag of the Group this is contained in.
+     *
+     * @return string
+     */
+    public function getGroupOpeningTag(): string {
+        return "<p>";
+    }
+
+    /**
+     * Get the HTML to represent the closing tag of the Group this is container in.
+     *
+     * @return string
+     */
+    public function getGroupClosingTag(): string {
+        return "</p>";
+    }
+
+    /**
      * @return string
      */
     public function getContent(): string {

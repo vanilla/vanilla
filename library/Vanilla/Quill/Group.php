@@ -7,7 +7,9 @@
 
 namespace Vanilla\Quill;
 
+use SebastianBergmann\CodeCoverage\Report\Text;
 use Vanilla\Quill\Blots\AbstractBlot;
+use Vanilla\Quill\Blots\AbstractListBlot;
 use Vanilla\Quill\Blots\BulletedListBlot;
 use Vanilla\Quill\Blots\Embeds\AbstractBlockEmbedBlot;
 use Vanilla\Quill\Blots\HeadingBlot;
@@ -23,6 +25,16 @@ class Group {
 
     /** @var AbstractBlot[] */
     private $blots = [];
+
+    /**
+     * @var AbstractBlot[]
+     *
+     * Blots that can determine the surrounding tag over the other blot types.
+     */
+    const OVERRIDING_BLOTS = [
+        AbstractListBlot::class,
+        HeadingBlot::class,
+    ];
 
     /**
      * Create any empty block. When rendered it will output <p><br></p>
@@ -51,7 +63,9 @@ class Group {
             return $this->blots[0]->render();
         }
 
-        $result = "<" . $this->getSurroundingTag() . ">";
+        $surroundTagBlot = $this->getBlotForSurroundingTags();
+
+        $result = $surroundTagBlot->getGroupOpeningTag();
 
         $lastBlotIndex = null;
 
@@ -59,7 +73,7 @@ class Group {
             $result .= $blot->render();
         }
 
-        $result .= "</" . $this->getSurroundingTag() . ">";
+        $result .= $surroundTagBlot->getGroupClosingTag();
         return $result;
     }
 
@@ -92,29 +106,17 @@ class Group {
         return $index;
     }
 
-    /**
-     * Determine the html tag the surrounds the block.
-     *
-     * @return string
-     */
-    private function getSurroundingTag() {
-        $result = "p";
+    private function getBlotForSurroundingTags(): AbstractBlot {
+        $blot = $this->blots[0];
 
-        $headingIndex = $this->getIndexForBlotOfType(HeadingBlot::class);
-        if ($headingIndex >= 0) {
-            /** @var HeadingBlot $headingBlot */
-            $headingBlot = $this->blots[$headingIndex];
-            $result = "h" . $headingBlot->getHeadingLevel();
+        foreach(static::OVERRIDING_BLOTS as $overridingBlot) {
+            $index = $this->getIndexForBlotOfType($overridingBlot);
+            if ($index >= 0) {
+                $blot = $this->blots[$index];
+                break;
+            }
         }
 
-        if($this->getIndexForBlotOfType(OrderedListBlot::class) >= 0) {
-            $result = "ol";
-        }
-
-        if($this->getIndexForBlotOfType(BulletedListBlot::class) >= 0) {
-            $result = "ul";
-        }
-
-        return $result;
+        return $blot;
     }
 }

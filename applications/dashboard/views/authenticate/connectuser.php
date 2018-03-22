@@ -37,7 +37,7 @@ $getMeBox = function($user, $isChecked) use ($form) {
 };
 ?>
 <div class="connectBox">
-    <h1><?php printf(t('%s Connect'), $ssoData->getAuthenticatorName()); ?></h1>
+    <h1><?php printf(t('%s Connect'), $ssoData->getAuthenticatorType()); ?></h1>
     <div>
 <?php
         echo $form->open();

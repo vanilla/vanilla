@@ -14,7 +14,21 @@ class HeadingBlot extends AbstractBlockBlot {
     /**
      * @inheritDoc
      */
-    protected static function isOwnGroup(): bool {
+    public function getGroupOpeningTag(): string {
+        return "<h" . $this->getHeadingLevel() . ">";
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function getGroupClosingTag(): string {
+        return "</h" . $this->getHeadingLevel() . ">";
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public static function isOwnGroup(): bool {
         return true;
     }
 
@@ -28,39 +42,17 @@ class HeadingBlot extends AbstractBlockBlot {
     /**
      * @inheritDoc
      */
-    public static function matches(array $operations): bool {
-        $found = false;
-
-        foreach($operations as $op) {
-            if(valr("attributes.header", $op)) {
-                $found = true;
-                break;
-            }
-        }
-
-        return $found;
+    protected static function getMatchingAttributeValue() {
+        return [1, 2, 3, 4, 5, 6];
     }
+
 
     /**
      * Get the heading level for the current block.
      *
      * @return int
      */
-    public function getHeadingLevel(): int {
+    private function getHeadingLevel(): int {
         return valr("attributes.header", $this->nextOperation);
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public function getGroupOpeningTag(): string {
-        return "<h" . $this->getHeadingLevel() . ">";
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public function getGroupClosingTag(): string {
-        return "</h" . $this->getHeadingLevel() . ">";
     }
 }

@@ -1,26 +1,42 @@
-<h1>Block operations H1 Title here. Code Block next.</h1><code class="code-block code isBlock" spellcheck="false">/**
- *adds locale data to the view, and adds a respond button to the discussion page.
+<?php
+/**
+ * @author Adam (charrondev) Charron <adam.c@vanillaforums.com>
+ * @copyright 2009-2018 Vanilla Forums Inc.
+ * @license https://opensource.org/licenses/GPL-2.0 GPL-2.0
  */
-class MyThemeNameThemeHooks extends Gdn_Plugin {
+
+namespace Vanilla\Quill\Blots;
+
+class SpoilerLineBlot extends AbstractLineBlot {
 
     /**
-     * Fetches the current locale and sets the data for the theme view.
-     * Render the locale in a smarty template using {$locale}
-     *
-     * @param  Controller $sender The sending controller object.
+     * @inheritDoc
      */
-    public function base_render_beforebase_render_beforebase_render_beforebase_render_beforebase_render_before($sender) {
-        // Bail out if we&#039;re in the dashboard
-        if (inSection(&#039;Dashboard&#039;)) {
-            return;
-        }
-
-        // Fetch the currently enabled locale (en by default)
-        $locale = Gdn::locale()-&gt;current();
-        $sender-&gt;setData(&#039;locale&#039;, $locale);
+    protected static function getLineType(): string {
+        return "spoiler";
     }
-}
-</code><p><br></p><h2>H2 Here. Spoiler next</h2><div class="spoiler"><div contenteditable="false" class="spoiler-buttonContainer">
+
+    /**
+     * @inheritDoc
+     */
+    public function getGroupOpeningTag(): string {
+        $wrapperClass = static::getLineType();
+        $contentClass = static::getLineType() . "-content";
+
+        $button = $this->getToggleButton();
+
+        return "<div class=\"$wrapperClass\">$button<div class=\"$contentClass\">";
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function getGroupClosingTag(): string {
+        return "</div></div>";
+    }
+
+    private function getToggleButton(): string {
+        return '<div contenteditable="false" class="spoiler-buttonContainer">
 <button class="iconButton button-spoiler js-toggleSpoiler">
     <span class="spoiler-warning">
         <span class="spoiler-warningMain">
@@ -46,4 +62,6 @@ class MyThemeNameThemeHooks extends Gdn_Plugin {
             </svg>
         </span>
     </span>
-</button></div><div class="spoiler-content"><p class="spoiler-line">Some Spoiler content with formatting <strong>bold</strong> <em>italic </em><s>strike</s></p><p class="spoiler-line"><br></p><p class="spoiler-line"><br></p><p class="spoiler-line">Newlines above <a href="test link" target="_blank">Link</a></p><p class="spoiler-line">Another line</p></div></div><p><br></p><p>A blockquote will be next.</p><p><br></p><div class="blockquote"><div class="blockquote-content"><p class="blockquote-line">Some Block quote content<strong>bold</strong> <em>italic </em><s>strike</s></p><p class="blockquote-line"><s>More blockquote content</s></p></div></div><p><br></p><p><br></p>
+</button></div>';
+    }
+}

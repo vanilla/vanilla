@@ -21,7 +21,7 @@ abstract class AbstractListBlot extends AbstractBlockBlot {
     /**
      * @inheritDoc
      */
-    protected static function isOwnGroup(): bool {
+    public static function isOwnGroup(): bool {
         return false;
     }
 

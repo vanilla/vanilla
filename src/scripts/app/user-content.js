@@ -68,3 +68,17 @@ export function setupEmbeds() {
         truncateEmbeds();
     });
 }
+
+function handleToggleSpoiler() {
+    const toggleButton = this;
+    if (!(toggleButton instanceof HTMLElement)) {
+        return;
+    }
+
+    const spoilerContainer = toggleButton.closest(".spoiler");
+    spoilerContainer.classList.toggle("isShowingSpoiler");
+}
+
+export function setupSpoilers() {
+    delegateEvent('click', '.js-toggleSpoiler', handleToggleSpoiler);
+}

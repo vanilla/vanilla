@@ -5,11 +5,12 @@
  */
 
 import { parseDomForEmoji } from "@core/emoji-utility";
-import { setupEmbeds } from "@core/app/embeds";
+import { setupEmbeds, setupSpoilers } from "@core/app/user-content";
 
 import events from "@core/events";
 
 events.onVanillaReady(() => {
     parseDomForEmoji();
     setupEmbeds();
+    setupSpoilers();
 });

@@ -48,7 +48,7 @@ abstract class AbstractBlockEmbedBlot extends AbstractBlot {
     /**
      * @inheritDoc
      */
-    public function shouldClearCurrentBlock(Group $block): bool {
+    public function shouldClearCurrentGroup(Group $group): bool {
         return true;
     }
 

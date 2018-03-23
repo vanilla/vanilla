@@ -8,6 +8,7 @@
 namespace Vanilla\Quill\Blots;
 
 use Vanilla\Quill\Group;
+use Vanilla\Quill\Renderer;
 
 abstract class AbstractBlockBlot extends TextBlot {
 
@@ -19,7 +20,7 @@ abstract class AbstractBlockBlot extends TextBlot {
      *
      * @return bool
      */
-    abstract protected static function isOwnGroup(): bool;
+    abstract public static function isOwnGroup(): bool;
 
     /**
      * Get the attribute key to check for matches on.
@@ -48,6 +49,8 @@ abstract class AbstractBlockBlot extends TextBlot {
         } elseif (\stringBeginsWith($this->content, "\n")) {
             $this->content = \ltrim($this->content, "\n");
             $this->shouldClearCurrentGroup = true;
+        } elseif (\array_key_exists(Renderer::GROUP_BREAK_MARKER, $this->currentOperation)) {
+            $this->shouldClearCurrentGroup = true;
         } else {
             $this->shouldClearCurrentGroup = false;
         }
@@ -58,11 +61,16 @@ abstract class AbstractBlockBlot extends TextBlot {
      */
     public static function matches(array $operations): bool {
         $found = false;
-        $key = static::getAttributeKey();
-        $value = static::getMatchingAttributeValue();
+        $lookupKey = static::getAttributeKey();
+        $expected = static::getMatchingAttributeValue();
 
         foreach($operations as $op) {
-            if(valr("attributes.$key", $op) === $value) {
+            $value = valr("attributes.$lookupKey", $op);
+
+            if (
+                (\is_array($expected) && \in_array($value, $expected))
+                || $value === $expected
+            ) {
                 $found = true;
                 break;
             }
@@ -74,7 +82,7 @@ abstract class AbstractBlockBlot extends TextBlot {
     /**
      * @inheritDoc
      */
-    public function shouldClearCurrentBlock(Group $block): bool {
+    public function shouldClearCurrentGroup(Group $group): bool {
         return $this->shouldClearCurrentGroup;
     }
 

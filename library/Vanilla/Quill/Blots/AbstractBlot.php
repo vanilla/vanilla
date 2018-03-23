@@ -53,11 +53,11 @@ abstract class AbstractBlot {
     /**
      * Determine whether or not this Blot should clear the current Block.
      *
-     * @param Group $block
+     * @param Group $group
      *
      * @return bool
      */
-    abstract public function shouldClearCurrentBlock(Group $block): bool;
+    abstract public function shouldClearCurrentGroup(Group $group): bool;
 
     /**
      * Determine whether or not this blot uses both current and next operation.

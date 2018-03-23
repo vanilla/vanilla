@@ -40,13 +40,9 @@ class RendererTest extends TestCase {
         $expectedOutput = trim(file_get_contents($fixturePath . "/output.html"));
         $expectedOutput = $this->stripZeroWidthWhitespace($expectedOutput);
 
-        $blots = [
-            Blots\TextBlot::class,
-        ];
-
         $json = \json_decode($input, true);
 
-        $parser = new Renderer($json, $blots);
+        $parser = new Renderer($json);
 
         $output = $parser->render();
         $this->assertEquals($expectedOutput, $output);
@@ -64,11 +60,11 @@ class RendererTest extends TestCase {
             ["embed-internal"],
             ["embed-external"],
             ["embed-external-image"],
-//            ["blockquote"],
-//            ["spoiler"],
-//            ["code-block"],
-//            ["all"],
-//            ["all-blocks"],
+            ["blockquote"],
+            ["spoiler"],
+            ["code-block"],
+            ["all"],
+            ["all-blocks"],
         ];
     }
 }

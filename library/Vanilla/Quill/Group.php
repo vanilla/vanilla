@@ -9,9 +9,13 @@ namespace Vanilla\Quill;
 
 use SebastianBergmann\CodeCoverage\Report\Text;
 use Vanilla\Quill\Blots\AbstractBlot;
+use Vanilla\Quill\Blots\AbstractLineBlot;
 use Vanilla\Quill\Blots\AbstractListBlot;
+use Vanilla\Quill\Blots\BlockquoteLineBlot;
 use Vanilla\Quill\Blots\BulletedListBlot;
+use Vanilla\Quill\Blots\CodeBlockBlot;
 use Vanilla\Quill\Blots\Embeds\AbstractBlockEmbedBlot;
+use Vanilla\Quill\Blots\Embeds\AbstractInlineEmbedBlot;
 use Vanilla\Quill\Blots\HeadingBlot;
 use Vanilla\Quill\Blots\OrderedListBlot;
 use Vanilla\Quill\Blots\TextBlot;
@@ -32,8 +36,10 @@ class Group {
      * Blots that can determine the surrounding tag over the other blot types.
      */
     const OVERRIDING_BLOTS = [
-        AbstractListBlot::class,
         HeadingBlot::class,
+        CodeBlockBlot::class,
+        AbstractListBlot::class,
+        AbstractLineBlot::class,
     ];
 
     /**
@@ -47,6 +53,29 @@ class Group {
         $blot->setContent("<br>");
         $block->pushBlot($blot);
         return $block;
+    }
+
+    public function isBreakOnlyGroup(): bool {
+        if (count($this->blots) !== 1) {
+            return false;
+        }
+
+        $blot = $this->blots[0];
+        return \get_class($blot) === TextBlot::class && $this->blots[0]->getContent() === "";
+    }
+
+    public function endsWithBlotOfType($blotClass, $needsExactMatch = false): bool {
+        if (count($this->blots) === 0) {
+            return false;
+        }
+
+        $lastBlot = $this->blots[count($this->blots) - 1];
+
+        if ($needsExactMatch) {
+            return \get_class($lastBlot) === $blotClass;
+        } else {
+            return $lastBlot instanceof $blotClass;
+        }
     }
 
     /**
@@ -64,16 +93,50 @@ class Group {
         }
 
         $surroundTagBlot = $this->getBlotForSurroundingTags();
-
         $result = $surroundTagBlot->getGroupOpeningTag();
 
-        $lastBlotIndex = null;
+        if ($surroundTagBlot instanceof AbstractLineBlot) {
+            $result .= $this->renderLineGroup($surroundTagBlot);
+        } else {
+            foreach ($this->blots as $blot) {
+                $blotIsBreak = get_class($blot) === TextBlot::class && $blot->getContent() === "";
+                if (!$this->isBreakOnlyGroup() && $blotIsBreak) {
+                    continue;
+                }
 
-        foreach ($this->blots as $blot) {
-            $result .= $blot->render();
+                $result .= $blot->render();
+            }
         }
 
         $result .= $surroundTagBlot->getGroupClosingTag();
+        return $result;
+    }
+
+    /**
+     * @param AbstractLineBlot $lineBlot
+     */
+    private function renderLineGroup(AbstractLineBlot $lineBlot) {
+        $result = "";
+
+        $result .= $lineBlot->renderLineStart();
+
+        foreach ($this->blots as $index => $blot) {
+            // Ignore starting newlines.
+            if ($index === 0 && $blot->getContent() === "") {
+                continue;
+            }
+            $result .= $blot->render();
+
+            if ($blot instanceof AbstractLineBlot) {
+                $result .= $blot->renderLineEnd();
+                $result .= $blot->renderNewLines();
+
+                if ($index < count($this->blots) - 1) {
+                    $result .= $lineBlot->renderLineStart();
+                }
+            }
+        }
+
         return $result;
     }
 
@@ -97,7 +160,7 @@ class Group {
         $index = -1;
 
         foreach($this->blots as $blotIndex => $blot) {
-            if(get_class($blot) === $blotType) {
+            if($blot instanceof $blotType) {
                 $index = $blotIndex;
                 break;
             }

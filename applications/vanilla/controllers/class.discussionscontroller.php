@@ -152,8 +152,6 @@ class DiscussionsController extends VanillaController {
             $where['d.CategoryID'] = array_keys($categoryModel->getFollowed(Gdn::session()->UserID));
         } elseif ($categoryIDs) {
             $where['d.CategoryID'] = CategoryModel::filterCategoryPermissions($categoryIDs);
-        } else {
-            $DiscussionModel->Watching = true;
         }
 
         // Get Discussion Count
@@ -278,7 +276,6 @@ class DiscussionsController extends VanillaController {
         $discussionModel->setFilters(Gdn::request()->get());
         $this->setData('Sort', $discussionModel->getSort());
         $this->setData('Filters', $discussionModel->getFilters());
-        $discussionModel->Watching = true;
 
         // Get Discussion Count
         $countDiscussions = $discussionModel->getUnreadCount();

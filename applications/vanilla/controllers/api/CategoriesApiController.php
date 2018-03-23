@@ -324,7 +324,7 @@ class CategoriesApiController extends AbstractApiController {
                 $limit
             );
 
-            $totalCountCallBack = function () use ($parent) {
+            $totalCountCallBack = function() use ($parent) {
                 return $parent['CountCategories'];
             };
         } else {
@@ -337,31 +337,7 @@ class CategoriesApiController extends AbstractApiController {
 
             // Filter tree by the category "archived" fields.
             if ($query['archived'] !== null) {
-                /**
-                 * Recursively filter a list of categories by their archived flag.
-                 *
-                 * @param array $categories
-                 * @param int $archived
-                 * @return array
-                 */
-                $archiveFilter = function (array $categories, $archived) use (&$archiveFilter) {
-                    $result = [];
-                    foreach ($categories as $index => $category) {
-                        // Discard, based on archived value.
-                        if (array_key_exists('Archived', $category) && $category['Archived'] === $archived) {
-                            continue;
-                        }
-                        // Process any children.
-                        if (!empty($category['Children'])) {
-                            $category['Children'] = $archiveFilter($category['Children'], $archived);
-                        }
-                        // If the category made it this far, include it.
-                        $result[] = $category;
-                    }
-                    return $result;
-                };
-
-                $categories = $archiveFilter($categories, $query['archived'] ? 0 : 1);
+                $categories = $this->archiveFilter($categories, $query['archived'] ? 0 : 1);
             }
         }
         $this->categoryModel->setJoinUserCategory($joinUserCategory);
@@ -376,6 +352,30 @@ class CategoriesApiController extends AbstractApiController {
         }
 
         return new Data($result, ['paging' => $paging]);
+    }
+
+    /**
+     * Recursively filter a list of categories by their archived flag.
+     *
+     * @param array $categories
+     * @param int $archived
+     * @return array
+     */
+    private function archiveFilter(array $categories, $archived) {
+        $result = [];
+        foreach ($categories as $index => $category) {
+            // Discard, based on archived value.
+            if (array_key_exists('Archived', $category) && $category['Archived'] === $archived) {
+                continue;
+            }
+            // Process any children.
+            if (!empty($category['Children'])) {
+                $category['Children'] = $this->archiveFilter($category['Children'], $archived);
+            }
+            // If the category made it this far, include it.
+            $result[] = $category;
+        }
+        return $result;
     }
 
     /**

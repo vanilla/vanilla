@@ -8,7 +8,7 @@
 namespace VanillaTests\APIv2\Authenticate;
 
 use VanillaTests\APIv2\AbstractAPIv2Test;
-use VanillaTests\Fixtures\TestSSOAuthenticator;
+use VanillaTests\Fixtures\MockSSOAuthenticator;
 
 /**
  * Test the /api/v2/authenticate endpoints.
@@ -18,7 +18,7 @@ class AuthSessionTest extends AbstractAPIv2Test {
     private $baseUrl = '/authenticate';
 
     /**
-     * @var TestSSOAuthenticator
+     * @var MockSSOAuthenticator
      */
     private $authenticator;
 
@@ -33,8 +33,8 @@ class AuthSessionTest extends AbstractAPIv2Test {
     public static function setupBeforeClass() {
         parent::setupBeforeClass();
         self::container()
-            ->rule(TestSSOAuthenticator::class)
-            ->setAliasOf('TestSSOAuthenticator');
+            ->rule(MockSSOAuthenticator::class)
+            ->setAliasOf('MockSSOAuthenticator');
     }
 
     /**
@@ -42,8 +42,6 @@ class AuthSessionTest extends AbstractAPIv2Test {
      */
     public function setUp() {
         parent::setUp();
-
-        $this->authenticator = new TestSSOAuthenticator();
 
         $uniqueID = uniqid('lu_');
         $userData = [
@@ -57,10 +55,9 @@ class AuthSessionTest extends AbstractAPIv2Test {
         $userFragment = $usersAPIController->post($userData)->getData();
         $this->currentUser = array_merge($userFragment, $userData);
 
-        $this->authenticator->setUniqueID($uniqueID);
-        $this->authenticator->setUserData($userData);
+        $this->authenticator = new MockSSOAuthenticator($uniqueID, $userData);
 
-        $this->container()->setInstance('TestSSOAuthenticator', $this->authenticator);
+        $this->container()->setInstance('MockSSOAuthenticator', $this->authenticator);
 
         $session = $this->container()->get(\Gdn_Session::class);
         $session->end();
@@ -120,7 +117,7 @@ class AuthSessionTest extends AbstractAPIv2Test {
      */
     protected function createAuthSessionID() {
         $postData = [
-            'authenticator' => $this->authenticator->getName(),
+            'authenticatorType' => $this->authenticator::getType(),
             'authenticatorID' => $this->authenticator->getID(),
         ];
 

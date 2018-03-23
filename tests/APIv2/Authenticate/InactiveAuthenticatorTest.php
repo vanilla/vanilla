@@ -8,15 +8,16 @@
 namespace VanillaTests\APIv2\Authenticate;
 
 use Prophecy\Exception\Exception;
+use Vanilla\Models\SSOData;
 use VanillaTests\APIv2\AbstractAPIv2Test;
-use VanillaTests\Fixtures\TestSSOAuthenticator;
+use VanillaTests\Fixtures\MockSSOAuthenticator;
 
 /**
  * Class InactiveAuthenticatorTest
  */
 class InactiveAuthenticatorTest extends AbstractAPIv2Test {
 
-    /** @var TestSSOAuthenticator */
+    /** @var MockSSOAuthenticator */
     private $authenticator;
 
     /**
@@ -25,8 +26,8 @@ class InactiveAuthenticatorTest extends AbstractAPIv2Test {
     public static function setupBeforeClass() {
         parent::setupBeforeClass();
         self::container()
-            ->rule(TestSSOAuthenticator::class)
-            ->setAliasOf('TestSSOAuthenticator');
+            ->rule(MockSSOAuthenticator::class)
+            ->setAliasOf('MockSSOAuthenticator');
     }
 
     /**
@@ -35,13 +36,11 @@ class InactiveAuthenticatorTest extends AbstractAPIv2Test {
     public function setUp() {
         parent::setUp();
 
-        $this->authenticator = new TestSSOAuthenticator();
-
         $uniqueID = uniqid('inactv_auth_');
-        $this->authenticator->setUniqueID($uniqueID);
+        $this->authenticator = new MockSSOAuthenticator($uniqueID);
         $this->authenticator->setActive(false);
 
-        $this->container()->setInstance('TestSSOAuthenticator', $this->authenticator);
+        $this->container()->setInstance('MockSSOAuthenticator', $this->authenticator);
 
         $session = $this->container()->get(\Gdn_Session::class);
         $session->end();
@@ -53,7 +52,7 @@ class InactiveAuthenticatorTest extends AbstractAPIv2Test {
      */
     public function testInactiveAuth() {
         $postData = [
-            'authenticator' => $this->authenticator->getName(),
+            'authenticatorType' => $this->authenticator::getType(),
             'authenticatorID' => $this->authenticator->getID(),
         ];
 

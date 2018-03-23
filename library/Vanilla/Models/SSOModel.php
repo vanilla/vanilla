@@ -192,7 +192,7 @@ class SSOModel {
         $user = $this->getUser($ssoData);
 
         /** @var SSOAuthenticator $ssoAuthenticator */
-        $ssoAuthenticator = $this->authenticatorModel->getAuthenticator($ssoData->getAuthenticatorName(), $ssoData->getAuthenticatorID());
+        $ssoAuthenticator = $this->authenticatorModel->getAuthenticator($ssoData->getAuthenticatorType(), $ssoData->getAuthenticatorID());
         if (!is_a($ssoAuthenticator, SSOAuthenticator::class)) {
             throw new ServerException('Expected an SSOAuthenticator');
         }

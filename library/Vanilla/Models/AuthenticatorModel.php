@@ -8,7 +8,8 @@
 namespace Vanilla\Models;
 
 
-use \Exception;
+use Exception;
+use Gdn_AuthenticationProviderModel;
 use Garden\Container\Container;
 use Garden\Web\Exception\ServerException;
 use Garden\Web\Exception\NotFoundException;
@@ -20,18 +21,23 @@ class AuthenticatorModel {
     /** @var Container */
     private $container;
 
+    /** @var Gdn_AuthenticationProviderModel */
+    private $authenticationProviderModel;
+
     /** @var AddonManager */
     private $addonManager;
 
     /**
      * AuthenticatorModel constructor.
      *
-     * @param Container $container
      * @param AddonManager $addonManager
+     * @param Gdn_AuthenticationProviderModel $authenticationProviderModel
+     * @param Container $container
      */
-    public function __construct(Container $container, AddonManager $addonManager) {
-        $this->container = $container;
+    public function __construct(AddonManager $addonManager, Gdn_AuthenticationProviderModel $authenticationProviderModel, Container $container) {
         $this->addonManager = $addonManager;
+        $this->authenticationProviderModel = $authenticationProviderModel;
+        $this->container = $container;
     }
 
     /**
@@ -45,7 +51,7 @@ class AuthenticatorModel {
      */
     public function getAuthenticator($authenticatorType, $authenticatorID) {
         if (empty($authenticatorType)) {
-            throw new NotFoundException();
+            throw new NotFoundException('Authenticator does not exist.');
         }
 
         $authenticatorClassName = $authenticatorType.'Authenticator';
@@ -88,5 +94,17 @@ class AuthenticatorModel {
         $authenticatorInstance = $this->container->getArgs($fqnAuthenticationClass, [$authenticatorID]);
 
         return $authenticatorInstance;
+    }
+
+    /**
+     * Get an authenticator.
+     *
+     * @param string $authenticatorID
+     * @return Authenticator
+     */
+    public function getAuthenticatorByID($authenticatorID) {
+        $authenticatorData = $this->authenticationProviderModel->getID($authenticatorID, DATASET_TYPE_ARRAY);
+
+        return $this->getAuthenticator($authenticatorData['AuthenticationSchemeAlias'] ?? null, $authenticatorID);
     }
 }

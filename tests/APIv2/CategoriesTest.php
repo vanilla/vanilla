@@ -112,7 +112,7 @@ class CategoriesTest extends AbstractResourceTest {
         // Iterate through the results, detecting the archived status.
         $notArchived = 0;
         foreach ($categories as $category) {
-            if ($category['archived'] !== true) {
+            if ($category['isArchived'] !== true) {
                 $notArchived++;
             }
         }
@@ -138,7 +138,7 @@ class CategoriesTest extends AbstractResourceTest {
         // Iterate through the results, detecting the archived status.
         $archived = 0;
         foreach ($categories as $category) {
-            if ($category['archived'] === true) {
+            if ($category['isArchived'] === true) {
                 $archived++;
             }
         }

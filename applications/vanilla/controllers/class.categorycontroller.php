@@ -31,7 +31,7 @@ class CategoryController extends VanillaController {
      * @param $tKey
      */
     public function follow($categoryID, $value, $tKey) {
-        deprecated(__CLASS__.'::'.__FUNCTION__, __CLASS__.'::followed');
+        deprecated(__METHOD__, __CLASS__.'::followed');
 
         if (Gdn::session()->validateTransientKey($tKey)) {
             $this->CategoryModel->saveUserTree($categoryID, ['Unfollow' => (int)(!(bool)$value)]);

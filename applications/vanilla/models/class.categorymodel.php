@@ -413,7 +413,7 @@ class CategoryModel extends Gdn_Model {
      * @return array|bool Category IDs or true if all categories are watched.
      */
     public static function categoryWatch($honorHideAllDiscussion = true) {
-        deprecated(__CLASS__.'::'.__FUNCTION__, __CLASS__.'::getVisibleCategoryIDs');
+        deprecated(__METHOD__, __CLASS__.'::getVisibleCategoryIDs');
         $categories = self::categories();
         $allCount = count($categories);
 

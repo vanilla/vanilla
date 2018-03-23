@@ -7,11 +7,11 @@
 namespace Vanilla\Models;
 
 use Garden\EventManager;
+use Garden\Web\Exception\ServerException;
 use Gdn_Configuration;
 use Gdn_Session;
-use Garden\Web\Exception\ServerException;
 use UserModel;
-use Vanilla\AddonManager;
+use Vanilla\Authenticator\SSOAuthenticator;
 use Vanilla\Utility\CapitalCaseScheme;
 
 /**
@@ -19,8 +19,8 @@ use Vanilla\Utility\CapitalCaseScheme;
  */
 class SSOModel {
 
-    /** @var AddonManager */
-    private $addonManager;
+    /** @var AuthenticatorModel */
+    private $authenticatorModel;
 
     /** @var Gdn_Configuration */
     private $config;
@@ -40,20 +40,20 @@ class SSOModel {
     /**
      * SSOModel constructor.
      *
-     * @param AddonManager $addonManager
+     * @param AuthenticatorModel $authenticatorModel
      * @param Gdn_Configuration $config
      * @param EventManager $eventManager
      * @param Gdn_Session $session
      * @param UserModel $userModel
      */
     public function __construct(
-        AddonManager $addonManager,
+        AuthenticatorModel $authenticatorModel,
         Gdn_Configuration $config,
         EventManager $eventManager,
         Gdn_Session $session,
         UserModel $userModel
     ) {
-        $this->addonManager = $addonManager;
+        $this->authenticatorModel = $authenticatorModel;
         $this->capitalCaseScheme = new CapitalCaseScheme();
         $this->config = $config;
         $this->eventManager = $eventManager;
@@ -183,10 +183,22 @@ class SSOModel {
      *
      * @throws ServerException
      * @param SSOData $ssoData
+     * @param array $options
+     *   - setCookie:b Set session cookie on success. Default: true
+     *   - persist:b Set the persist option on the cookie when it is set. Default: false
      * @return array|false The authenticated user info or false.
      */
-    public function sso(SSOData $ssoData) {
+    public function sso(SSOData $ssoData, $options) {
         $user = $this->getUser($ssoData);
+
+        /** @var SSOAuthenticator $ssoAuthenticator */
+        $ssoAuthenticator = $this->authenticatorModel->getAuthenticator($ssoData->getAuthenticatorName(), $ssoData->getAuthenticatorID());
+        if (!is_a($ssoAuthenticator, SSOAuthenticator::class)) {
+            throw new ServerException('Expected an SSOAuthenticator');
+        }
+        if (!$ssoAuthenticator->isActive()) {
+            throw new ServerException('The authenticator is not active.');
+        }
 
         if (!$user) {
             // Allows registration without an email address.
@@ -196,16 +208,10 @@ class SSOModel {
             $emailUnique = !$noEmail && $this->config->get('Garden.Registration.EmailUnique', true);
 
             // Allows SSO connections to link a VanillaUser to a ForeignUser.
-            $allowConnect = $this->config->get('Garden.Registration.AllowConnect', true);
+            $allowConnect = $emailUnique && $this->config->get('Garden.Registration.AllowConnect', true);
 
             // Will automatically try to link users using the provided Email address if the Provider is "Trusted".
-            $autoConnect =
-                $emailUnique &&
-                (
-                    $ssoData->getAuthenticatorIsTrusted()
-                    || ($allowConnect && $this->config->get('Garden.Registration.AutoConnect', false))
-                )
-            ;
+            $autoConnect = $allowConnect && $ssoAuthenticator->canAutoLinkUser();
 
             // Let's try to find a matching user.
             if ($autoConnect) {
@@ -237,7 +243,7 @@ class SSOModel {
         }
 
         if ($user) {
-            $this->session->start($user['UserID']);
+            $this->session->start($user['UserID'], $options['setCookie'] ?? true, $options['persistCookie'] ?? false);
             $this->userModel->fireEvent('AfterSignIn');
 
             // Allow user's synchronization
@@ -248,7 +254,7 @@ class SSOModel {
                 $syncRoles = $this->config->get('Garden.SSO.SyncRoles', false);
 
                 // Override $syncRoles if the authenticator is trusted.
-                if ($ssoData->getAuthenticatorIsTrusted()) {
+                if ($ssoAuthenticator->isTrusted()) {
                     // Synchronize user's roles only on registration.
                     $syncRolesOnlyRegistration = $this->config->get('Garden.SSO.SyncRolesOnRegistrationOnly', false);
 

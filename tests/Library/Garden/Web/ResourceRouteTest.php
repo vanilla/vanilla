@@ -79,6 +79,12 @@ class ResourceRouteTest extends TestCase {
 
             'no mapping' => ['POST', '/discussions/no-map/a/b/c?f=b', [$dc, 'post_noMap'], ['query' => 'a', 'body' => 'b', 'data' => 'c']],
 
+            // Nested get and index
+            'index /sub' => ['GET', '/discussions/sub', [$dc, 'index_sub'], []],
+            'get /sub/:arg' => ['GET', '/discussions/sub/abc', [$dc, 'get_sub'], ['arg' => 'abc']],
+            'index /:id/idsub' => ['GET', '/discussions/123/idsub', [$dc, 'index_idsub'], ['id' => '123']],
+            'get /:id/idsub/:id2' => ['GET', '/discussions/123/idsub/abc', [$dc, 'get_idsub'], ['id' => '123', 'id2' => 'abc']],
+
             // Special routes are special.
             'bad index' => ['GET', '/discussions/index', null],
             'bad get' => ['GET', '/discussions/get/123', null],

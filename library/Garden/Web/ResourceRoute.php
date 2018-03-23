@@ -203,7 +203,7 @@ class ResourceRoute extends Route {
      * @return callable|null Returns the method callback or null if it doesn't.
      */
     private function findMethod($controller, $methodName) {
-        $regex = '`^(get|post|patch|put|options|delete)(_|$)`i';
+        $regex = '`^(get|index|post|patch|put|options|delete)(_|$)`i';
 
         // Getters and setters aren't found.
         if (!(preg_match($regex, $methodName) || strcasecmp($methodName, 'index') === 0)) {
@@ -381,10 +381,18 @@ class ResourceRoute extends Route {
         if (isset($pathArgs[0])) {
             $name = lcfirst($this->filterName($pathArgs[0]));
             $result[] = ["{$method}_{$name}", 0];
+
+            if ($method === 'get') {
+                $result[] = ["index_{$name}", 0];
+            }
         }
         if (isset($pathArgs[1])) {
             $name = lcfirst($this->filterName($pathArgs[1]));
             $result[] = ["{$method}_{$name}", 1];
+
+            if ($method === 'get') {
+                $result[] = ["index_{$name}", 1];
+            }
         }
 
         $result[] = [$method, null];

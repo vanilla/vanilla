@@ -1,6 +1,6 @@
 <?php if (!defined('APPLICATION')) exit(); ?>
 <div class="Box Moderators">
-    <?php echo panelHeading(t('Moderators')); ?>
+    <?php echo panelHeading(t('Moderators'), ['aria-level' => '2']); ?>
     <ul class="PanelInfo">
         <?php
         $moderators = $this->data('Moderators', []);

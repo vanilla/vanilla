@@ -222,7 +222,7 @@ endforeach; ?>
         ob_start();
         ?>
         <div class="Box Tags">
-            <?php echo panelHeading(t($this->ParentID > 0 ? 'Tagged' : 'Popular Tags')); ?>
+            <?php echo panelHeading(t($this->ParentID > 0 ? 'Tagged' : 'Popular Tags'), ['aria-level' => '2']); ?>
             <ul class="TagCloud">
                 <?php foreach ($this->_TagData->result() as $tag) :
 ?>

@@ -1,6 +1,6 @@
 <?php if (!defined('APPLICATION')) exit(); ?>
 <div class="Box BoxDrafts">
-    <?php echo panelHeading(t('My Drafts')); ?>
+    <?php echo panelHeading(t('My Drafts'), ['aria-level' => '2']); ?>
     <ul class="PanelInfo PanelDiscussions">
         <?php foreach ($this->Data->result() as $Draft) {
             $EditUrl = !is_numeric($Draft->DiscussionID) || $Draft->DiscussionID <= 0 ? '/post/editdiscussion/0/'.$Draft->DraftID : '/post/editcomment/0/'.$Draft->DraftID;

@@ -5,7 +5,7 @@ $Content = $this->data('Content');
 if (!empty($Content) || $this->getShowIfNoResults()) :
     ?>
     <div class="Box BoxPromoted">
-        <?php echo panelHeading(t('Promoted Content')); ?>
+        <?php echo panelHeading(t('Promoted Content'), ['aria-level' => '2']); ?>
         <div class="PanelInfo DataList">
             <?php
             if ($Content):

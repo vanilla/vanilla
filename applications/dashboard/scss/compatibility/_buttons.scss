@@ -31,12 +31,13 @@ button.Close {
         background-color: white;
         color: black;
         display: block;
-        font-size: 22px;
+        font-size: 14px;
         clip: auto;
         margin: 0;
         height: auto;
         padding: 0 12px;
         width: 100%;
         z-index: 2;
+        transform: translateY(-100%);
     }
 }

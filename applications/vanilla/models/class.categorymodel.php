@@ -49,6 +49,9 @@ class CategoryModel extends Gdn_Model {
      */
     private $collection;
 
+    /** @var EventManager */
+    private $eventManager;
+
     /**
      * @deprecated 2.6
      * @var bool
@@ -89,6 +92,7 @@ class CategoryModel extends Gdn_Model {
     public function __construct() {
         parent::__construct('Category');
         $this->collection = $this->createCollection();
+        $this->eventManager = Gdn::getContainer()->get(EventManager::class);
     }
 
     /**
@@ -442,7 +446,7 @@ class CategoryModel extends Gdn_Model {
      * @return array|bool An array of filtered categories or true if no categories were filtered.
      */
     public function getVisibleCategories(array $options = []) {
-        $categories = $this->categories();
+        $categories = self::categories();
         $unfiltered = true;
         $result = [];
 
@@ -466,6 +470,9 @@ class CategoryModel extends Gdn_Model {
             $result = true;
         }
 
+        // Allow addons to modify the visible categories.
+        $result = $this->eventManager->fireFilter('categoryModel_visibleCategories', $result);
+
         return $result;
     }
 
@@ -488,9 +495,6 @@ class CategoryModel extends Gdn_Model {
 
         // Backwards-compatible CategoryModel::categoryWatch event.
         $eventManager->fireDeprecated('categoryModel_categoryWatch', $categoryModel, ['CategoryIDs' => &$result]);
-
-        // Allow addons to modify the visible categories.
-        $result = $eventManager->fireFilter('categoryModel_visibleCategoryIDs', $result);
 
         return $result;
     }

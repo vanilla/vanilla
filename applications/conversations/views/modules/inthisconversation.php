@@ -1,6 +1,6 @@
 <?php if (!defined('APPLICATION')) exit(); ?>
 <div class="Box InThisConversation">
-    <?php echo panelHeading(t('In this Conversation')); ?>
+    <?php echo panelHeading(t('In this Conversation'), ['aria-level' => '2']); ?>
     <ul class="PanelInfo">
         <?php foreach ($this->data('Participants') as $User): ?>
             <li>

@@ -20,14 +20,14 @@ class CategoriesTest extends AbstractResourceTest {
     /** The standard parent category ID. */
     const PARENT_CATEGORY_ID = 1;
 
+    /** @var CategoryModel */
+    private static $categoryModel;
+
     /** @var int A value to ensure new records are unique. */
     protected static $recordCounter = 1;
 
     /** {@inheritdoc} */
     protected $baseUrl = '/categories';
-
-    /** @var CategoryModel */
-    protected $categoryModel;
 
     /** {@inheritdoc} */
     protected $editFields = ['description', 'name', 'parentCategoryID', 'urlcode', 'displayAs'];
@@ -64,18 +64,6 @@ class CategoriesTest extends AbstractResourceTest {
     }
 
     /**
-     * Get an instance of CategoryModel.
-     *
-     * @return CategoryModel
-     */
-    protected function getCategoryModel() {
-        if (!isset($this->categoryModel)) {
-            $this->categoryModel = $this->container()->get(CategoryModel::class);
-        }
-        return $this->categoryModel;
-    }
-
-    /**
      * {@inheritdoc}
      */
     public function indexUrl() {
@@ -101,14 +89,20 @@ class CategoriesTest extends AbstractResourceTest {
     }
 
     /**
+     * {@inheritdoc}
+     */
+    public static function setupBeforeClass() {
+        parent::setupBeforeClass();
+        self::$categoryModel = self::container()->get(CategoryModel::class);
+    }
+
+    /**
      * Test getting only archived categories.
      */
     public function testFilterArchived() {
-        $categoryModel = $this->getCategoryModel();
-
         // Make sure there'es at least one archived category.
         $archived = $this->testPost();
-        $categoryModel->setField($archived['categoryID'], 'Archived', 1);
+        self::$categoryModel->setField($archived['categoryID'], 'Archived', 1);
 
         $categories = $this->api()->get($this->baseUrl, [
             'archived' => true,
@@ -131,11 +125,9 @@ class CategoriesTest extends AbstractResourceTest {
      * Test getting only categories that are not archived.
      */
     public function testFilterNotArchived() {
-        $categoryModel = $this->getCategoryModel();
-
         // Make sure there's at least one archived category.
         $archived = $this->testPost();
-        $categoryModel->setField($archived['categoryID'], 'Archived', 1);
+        self::$categoryModel->setField($archived['categoryID'], 'Archived', 1);
 
         // Get only non-archived categories.
         $categories = $this->api()->get($this->baseUrl, [
@@ -317,11 +309,9 @@ class CategoriesTest extends AbstractResourceTest {
      * Test getting both archived and non-archived categories.
      */
     public function testNoFilterArchived() {
-        $categoryModel = $this->getCategoryModel();
-
         // Make sure there's at least one archived category.
         $archived = $this->testPost();
-        $categoryModel->setField($archived['categoryID'], 'Archived', 1);
+        self::$categoryModel->setField($archived['categoryID'], 'Archived', 1);
 
         // ...and one non-archived category.
         $notArchived = $this->testPost();

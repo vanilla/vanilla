@@ -664,7 +664,7 @@ class DiscussionModel extends Gdn_Model {
 
         // Determine category watching
         if (!isset($where['d.CategoryID'])) {
-            $categoryIDs = CategoryModel::getVisibleCategoryIDs(['filterHideDiscussions' => true]);
+            $categoryIDs = CategoryModel::instance()->getVisibleCategoryIDs(['filterHideDiscussions' => true]);
             if ($categoryIDs !== true) {
                 $where['d.CategoryID'] = $categoryIDs;
             }

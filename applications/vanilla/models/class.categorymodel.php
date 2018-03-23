@@ -443,6 +443,7 @@ class CategoryModel extends Gdn_Model {
      * Get a list of IDs of categories visible to the current user.
      *
      * @param array $options
+     *   - filterHideDiscussions (bool): Filter out categories with a truthy HideAllDiscussions column?
      * @return array|bool An array of filtered categories or true if no categories were filtered.
      */
     public function getVisibleCategories(array $options = []) {
@@ -480,10 +481,10 @@ class CategoryModel extends Gdn_Model {
      * Get a list of IDs of categories visible to the current user.
      *
      * @see CategoryModel::categoryWatch
-     * @param array $options
+     * @param array $options Options compatible with CategoryModel::getVisibleCategories
      * @return array|bool An array of filtered category IDs or true if no categories were filtered.
      */
-    public static function getVisibleCategoryIDs(array $options = []) {
+    public function getVisibleCategoryIDs(array $options = []) {
         $categoryModel = self::instance();
         $result = $categoryModel->getVisibleCategories($options);
         if (is_array($result)) {
@@ -2169,7 +2170,7 @@ class CategoryModel extends Gdn_Model {
         }
 
         if (!$categoryID) {
-            $categoryID = CategoryModel::getVisibleCategoryIDs();
+            $categoryID = CategoryModel::instance()->getVisibleCategoryIDs();
         }
 
         switch ($permissions) {
@@ -2228,7 +2229,7 @@ class CategoryModel extends Gdn_Model {
         if ($restrictIDs && !is_array($restrictIDs)) {
             $restrictIDs = [$restrictIDs];
         } else {
-            $restrictIDs = self::getVisibleCategoryIDs(['filterHideDiscussions' => true]);
+            $restrictIDs = $this->getVisibleCategoryIDs(['filterHideDiscussions' => true]);
         }
 
         switch ($permissions) {

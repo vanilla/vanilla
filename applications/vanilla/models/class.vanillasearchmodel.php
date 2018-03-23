@@ -48,7 +48,7 @@ class VanillaSearchModel extends Gdn_Model {
     public function discussionSql($searchModel, $addMatch = true) {
         // Get permission and limit search categories if necessary.
         if ($addMatch) {
-            $perms = CategoryModel::getVisibleCategoryIDs();
+            $perms = CategoryModel::instance()->getVisibleCategoryIDs();
 
             if ($perms !== true) {
                 $this->SQL->whereIn('d.CategoryID', $perms);
@@ -92,7 +92,7 @@ class VanillaSearchModel extends Gdn_Model {
     public function commentSql($searchModel, $addMatch = true) {
         if ($addMatch) {
             // Get permission and limit search categories if necessary.
-            $perms = CategoryModel::getVisibleCategoryIDs();
+            $perms = CategoryModel::instance()->getVisibleCategoryIDs();
             if ($perms !== true) {
                 $this->SQL->whereIn('d.CategoryID', $perms);
             }

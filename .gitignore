@@ -39,6 +39,7 @@
 !/plugins/SplitMerge/
 !/plugins/StopForumSpam/
 !/plugins/stubcontent/
+!/plugins/swagger-ui/
 !/plugins/Tagging/
 !/plugins/Twitter/
 !/plugins/VanillaStats/

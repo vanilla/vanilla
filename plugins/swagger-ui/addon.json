@@ -1,0 +1,23 @@
+{
+    "key": "swagger-ui",
+    "name": "API v2 Docs",
+    "description": "API v2 documentation customized for your community right in your dashboard.",
+    "version": "1.0",
+    "license": "GPLv2",
+    "type": "addon",
+    "oldType": "plugin",
+    "require": {
+        "Vanilla": "^2.6"
+    },
+    "authors": [
+        {
+            "name": "Todd Burry",
+            "email": "todd@vanillaforums.com"
+        }
+    ],
+    "icon": "swagger.png",
+    "build": {
+        "processVersion": "v1"
+    },
+    "hidden": true
+}

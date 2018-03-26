@@ -27,6 +27,10 @@ body.isMobile .change-picture .change-picture-instructions {
   }
 }
 
+.categoryList-heading + .DataTableWrap > .categoryList-genericHeading {
+  display: none;
+}
+
 .followButton {
   white-space: nowrap;
   font-size: 10px;

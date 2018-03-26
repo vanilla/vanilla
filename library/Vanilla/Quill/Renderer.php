@@ -51,38 +51,54 @@ class Renderer {
      */
     public function __construct(array $operations) {
         $this->operations = $operations;
-        $this->splitNewLines();
+        $this->splitPlainTextNewlines();
         $this->parse();
     }
 
-    private function splitNewLines() {
+    /**
+     * Split operations with newlines inside of them into their own operations.
+     */
+    private function splitPlainTextNewlines() {
         $newOperations = [];
 
         foreach($this->operations as $opIndex => $op) {
-            if (\array_key_exists("attributes", $op) || !\array_key_exists("insert", $op) || !is_string($op["insert"])) {
+            // Determine if this is a plain text insert with no attributes.
+            $isBareInsertOperation =
+                !\array_key_exists("attributes", $op)
+                && \array_key_exists("insert", $op)
+                && is_string($op["insert"]);
+
+            // Other types of inserts should not get split, they need special handling inside of their blot.
+            // Just skip over them.
+            if (!$isBareInsertOperation) {
                 $newOperations[] = $op;
                 continue;
             }
 
+            // A newline on its own needs special handling. We don't want to break it into 2 newlines.
             if ($op["insert"] === "\n") {
                 $op[static::GROUP_BREAK_MARKER] = true;
+                $op["insert"] = "";
                 $newOperations[] = $op;
                 continue;
             }
 
+            // Explode on newlines into new operations. Every new operation,
+            // and the next old operation should get a GROUP_BREAK_MARKER.
             $pieces = \explode("\n", $op["insert"]);
-
             if (count($pieces) > 1) {
+                // Create a new insert from the exploded piece.
                 foreach($pieces as $index => $piece) {
                     $insert = ["insert" =>  $piece];
-
                     $insert[static::GROUP_BREAK_MARKER] = true;
-
                     $newOperations[] = $insert;
                 }
 
-//                // Also set a break marker on the next blot.
-                if ($opIndex < count($this->operations) - 1) {
+                $isNotLastOperation = $opIndex < count($this->operations) - 1;
+                $isNewLineOnly = $newOperations[count($newOperations) - 1]["insert"] === "";
+
+                // Set a marker on the next blot if the last piece is a newline.
+                if ($isNotLastOperation && $isNewLineOnly) {
                     $this->operations[$opIndex + 1][static::GROUP_BREAK_MARKER] = true;
                 }
             } else {
@@ -99,7 +115,6 @@ class Renderer {
     private function parse() {
         $operationLength = \count($this->operations);
         $group = new Group();
-        $currentBlotType = null;
 
         for($i = 0; $i < $operationLength; $i++) {
 
@@ -117,27 +132,28 @@ class Renderer {
 
             foreach(self::BLOTS as $blot) {
 
+                // Find the matching blot type for the current, last, and next operation.
                 if ($blot::matches([$currentOp, $nextOp])) {
                     /** @var AbstractBlot $blotInstance */
                     $blotInstance = new $blot($currentOp, $previousOp, $nextOp);
-                    $autoCloseBlock = $currentBlotType !== null && $currentBlotType !== Blots\TextBlot::class && $blot !== Blots\TextBlot::class && $currentBlotType !== $blot;
 
-                    if ($blotInstance->shouldClearCurrentGroup($group) || $autoCloseBlock) {
+                    // Ask the blot if it should close the current group.
+                    if ($blotInstance->shouldClearCurrentGroup($group)) {
                         $this->groups[] = $group;
                         $group = new Group();
-                        $currentBlotType = $blot;
                     }
 
                     $group->pushBlot($blotInstance);
 
+                    // Check with the blot if absorbed the next operation (some blots are made of 2 operations)
                     if ($blotInstance->hasConsumedNextOp()) {
                         $i++;
                     }
 
+                    // Some block type blots get a group all to themselves.
                     if ($blotInstance instanceof Blots\AbstractBlockBlot && $blotInstance->isOwnGroup()) {
                         $this->groups[] = $group;
                         $group = new Group();
-                        $currentBlotType = null;
                     }
 
                     break;
@@ -154,42 +170,40 @@ class Renderer {
      */
     public function render(): string {
         $result = "";
-        $previousGroupEndsWithInlineEmbed = false;
         $previousGroupEndsWithBlockEmbed = false;
         $previousGroupIsBreakOnly = false;
         foreach ($this->groups as $index => $group) {
             $skip = false;
             $isLastPosition = $index === count($this->groups) - 1;
 
-            if (!$isLastPosition && $group->isBreakOnlyGroup()) {
-                $nextGroup = $this->groups[$index + 1];
+            if ($group->isBreakOnlyGroup()) {
 
-                // Skip if the this is last Break in a series of 2+ breaks.
-                if ($previousGroupIsBreakOnly && !$nextGroup->isBreakOnlyGroup()) {
+                if ($previousGroupIsBreakOnly) {
+                    // Skip if the this is last Break in a series of 2+ breaks.
+                    if (!$isLastPosition) {
+                        $nextGroup = $this->groups[$index + 1];
+                        if (!$nextGroup->isBreakOnlyGroup()) {
+                            $skip = true;
+                        }
+                    }
+
+                    // If there are multiple breaks at the end of the delta, the last one doesn't render.
+                    if ($isLastPosition) {
+                        $skip = true;
+                    }
+                }
+
+                // Skip the last line break unless the previous group was a block embed.
+                if ($isLastPosition && !$previousGroupEndsWithBlockEmbed) {
                     $skip = true;
                 }
             }
 
-            if ($isLastPosition && $previousGroupIsBreakOnly && $group->isBreakOnlyGroup()) {
-                $skip = true;
-            }
-
-            if (
-                $group->isBreakOnlyGroup()
-                && !$previousGroupIsBreakOnly
-                && !$previousGroupEndsWithBlockEmbed
-                && (
-                    $previousGroupEndsWithInlineEmbed
-                    || $isLastPosition
-                )
-            ) {
-                $skip = true;
-            }
-
+            // Update previous group values.
             $previousGroupIsBreakOnly = $group->isBreakOnlyGroup();
-            $previousGroupEndsWithInlineEmbed = $group->endsWithBlotOfType(Blots\Embeds\AbstractInlineEmbedBlot::class);
             $previousGroupEndsWithBlockEmbed = $group->endsWithBlotOfType(Blots\Embeds\AbstractBlockEmbedBlot::class);
 
+            // Render unless we decided we had to sip this group.
             if (!$skip) {
                 $result .= $group->render();
             }

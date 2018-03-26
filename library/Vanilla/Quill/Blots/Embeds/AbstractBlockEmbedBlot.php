@@ -65,4 +65,20 @@ abstract class AbstractBlockEmbedBlot extends AbstractBlot {
     public static function matches(array $operations): bool {
         return (boolean) valr(static::getInsertKey(), $operations[0]);
     }
+
+    /**
+     * @inheritDoc
+     */
+    public function getGroupOpeningTag(): string {
+        return "";
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function getGroupClosingTag(): string {
+        return "";
+    }
+
+
 }

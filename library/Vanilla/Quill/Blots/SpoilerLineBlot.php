@@ -35,6 +35,11 @@ class SpoilerLineBlot extends AbstractLineBlot {
         return "</div></div>";
     }
 
+    /**
+     * Get the HTML for the toggle button of the spoiler group.
+     *
+     * @return string
+     */
     private function getToggleButton(): string {
         return '<div contenteditable="false" class="spoiler-buttonContainer">
 <button class="iconButton button-spoiler js-toggleSpoiler">

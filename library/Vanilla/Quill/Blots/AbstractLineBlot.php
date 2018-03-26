@@ -9,11 +9,6 @@ namespace Vanilla\Quill\Blots;
 
 abstract class AbstractLineBlot extends AbstractBlockBlot {
 
-    private $needsOpeningTag = true;
-    private $needsClosingTag = true;
-    private $needsTrailingOpenTag = false;
-    private $needsStartingClosingTag = false;
-
     /**
      * Get the main part of the line name.
      *
@@ -35,21 +30,17 @@ abstract class AbstractLineBlot extends AbstractBlockBlot {
         return false;
     }
 
-    private function renderContent(): string {
-        $class = static::getAttributeKey();
-        $result = "";
-        if ($this->needsOpeningTag) {
-            $result .= "<p class=\"$class\">";
-        }
-
-        $result .= parent::render();
-        if ($this-> needsClosingTag) {
-            $result .= "</p>";
-        }
-
-        return $result;
-    }
-
+    /**
+     * Render additional newlines inside of the line.
+     *
+     * Sometimes the nextOperation which is joined onto a line blot has more than one newline. eg. \n\n\n\n
+     * The first one is just to apply the attribute but the additional ones need to be rendered as newlines inside
+     * of the group.
+     *
+     * @see Group::renderLineGroup()
+     *
+     * @return string
+     */
     public function renderNewLines(): string {
         $class = static::getAttributeKey();
         $result = "";
@@ -63,47 +54,24 @@ abstract class AbstractLineBlot extends AbstractBlockBlot {
         return $result;
     }
 
+    /**
+     * Render the HTML for the start of a line.
+     * @see Group::renderLineGroup()
+     *
+     * @return string
+     */
     public function renderLineStart(): string {
         $class = static::getAttributeKey();
         return "<p class=\"$class\">";
     }
 
+    /**
+     * Render the HTML for the end of a line.
+     * @see Group::renderLineGroup()
+     *
+     * @return string
+     */
     public function renderLineEnd(): string {
         return "</p>";
-    }
-
-    /**
-     * @inheritDoc
-     */
-//    public function render(): string {
-////        return $this->content;
-//    }
-
-    /**
-     * @param bool $needsOpeningTag
-     */
-    public function setNeedsOpeningTag(bool $needsOpeningTag) {
-        $this->needsOpeningTag = $needsOpeningTag;
-    }
-
-    /**
-     * @param bool $needsClosingTag
-     */
-    public function setNeedsClosingTag(bool $needsClosingTag) {
-        $this->needsClosingTag = $needsClosingTag;
-    }
-
-    /**
-     * @param bool $needsTrailingOpenTag
-     */
-    public function setNeedsTrailingOpenTag(bool $needsTrailingOpenTag) {
-        $this->needsTrailingOpenTag = $needsTrailingOpenTag;
-    }
-
-    /**
-     * @param bool $needsStartingClosingTag
-     */
-    public function setNeedsStartingClosingTag(bool $needsStartingClosingTag) {
-        $this->needsStartingClosingTag = $needsStartingClosingTag;
     }
 }

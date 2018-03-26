@@ -7,17 +7,11 @@
 
 namespace Vanilla\Quill;
 
-use SebastianBergmann\CodeCoverage\Report\Text;
 use Vanilla\Quill\Blots\AbstractBlot;
 use Vanilla\Quill\Blots\AbstractLineBlot;
 use Vanilla\Quill\Blots\AbstractListBlot;
-use Vanilla\Quill\Blots\BlockquoteLineBlot;
-use Vanilla\Quill\Blots\BulletedListBlot;
 use Vanilla\Quill\Blots\CodeBlockBlot;
-use Vanilla\Quill\Blots\Embeds\AbstractBlockEmbedBlot;
-use Vanilla\Quill\Blots\Embeds\AbstractInlineEmbedBlot;
 use Vanilla\Quill\Blots\HeadingBlot;
-use Vanilla\Quill\Blots\OrderedListBlot;
 use Vanilla\Quill\Blots\TextBlot;
 
 /**
@@ -55,6 +49,11 @@ class Group {
         return $block;
     }
 
+    /**
+     * Determine if this group is made up only of a break.
+     *
+     * @return bool
+     */
     public function isBreakOnlyGroup(): bool {
         if (count($this->blots) !== 1) {
             return false;
@@ -64,7 +63,15 @@ class Group {
         return \get_class($blot) === TextBlot::class && $this->blots[0]->getContent() === "";
     }
 
-    public function endsWithBlotOfType($blotClass, $needsExactMatch = false): bool {
+    /**
+     * Check if the group's last matches the passed Blot class.
+     *
+     * @param $blotClass - The class constructor of a Blot.
+     * @param bool $needsExactMatch - If true, the class must match exactly, no child classes are allowed.
+     *
+     * @return bool
+     */
+    public function endsWithBlotOfType(string $blotClass, $needsExactMatch = false): bool {
         if (count($this->blots) === 0) {
             return false;
         }
@@ -73,9 +80,9 @@ class Group {
 
         if ($needsExactMatch) {
             return \get_class($lastBlot) === $blotClass;
-        } else {
-            return $lastBlot instanceof $blotClass;
         }
+
+        return $lastBlot instanceof $blotClass;
     }
 
     /**
@@ -84,21 +91,20 @@ class Group {
      * @return string
      */
     public function render(): string {
+        // Don't render empty groups.
         if (count($this->blots) === 0) {
             return "";
-        }
-
-        if (count($this->blots) === 1 && $this->blots[0] instanceof AbstractBlockEmbedBlot) {
-            return $this->blots[0]->render();
         }
 
         $surroundTagBlot = $this->getBlotForSurroundingTags();
         $result = $surroundTagBlot->getGroupOpeningTag();
 
+        // Line blots have special rendering.
         if ($surroundTagBlot instanceof AbstractLineBlot) {
             $result .= $this->renderLineGroup($surroundTagBlot);
         } else {
             foreach ($this->blots as $blot) {
+                // Don't render breaks unless the group is just a break.
                 $blotIsBreak = get_class($blot) === TextBlot::class && $blot->getContent() === "";
                 if (!$this->isBreakOnlyGroup() && $blotIsBreak) {
                     continue;
@@ -113,12 +119,21 @@ class Group {
     }
 
     /**
-     * @param AbstractLineBlot $lineBlot
+     * Render out a line group. These need special handling just like they do on the frontend.
+     *
+     * Formats (or anything needed to be rendered the the TextBlots render) like bold and italic are not LineBlots even
+     * if they need to be contained in the line, so we determined what type of line wrapper we need, render the start
+     * of the line, and don't render the close until we get to another line blot.
+     *
+     * @param AbstractLineBlot $firstLineBlot - The first line blot found in the group. This is not necessarily the
+     * first blot in the group.
+     *
+     * @return string
      */
-    private function renderLineGroup(AbstractLineBlot $lineBlot) {
+    private function renderLineGroup(AbstractLineBlot $firstLineBlot): string {
         $result = "";
 
-        $result .= $lineBlot->renderLineStart();
+        $result .= $firstLineBlot->renderLineStart();
 
         foreach ($this->blots as $index => $blot) {
             // Ignore starting newlines.
@@ -132,7 +147,7 @@ class Group {
                 $result .= $blot->renderNewLines();
 
                 if ($index < count($this->blots) - 1) {
-                    $result .= $lineBlot->renderLineStart();
+                    $result .= $blot->renderLineStart();
                 }
             }
         }
@@ -169,6 +184,11 @@ class Group {
         return $index;
     }
 
+    /**
+     * Determine which blot should create the surrounding HTML tags of the group.
+     *
+     * @return AbstractBlot
+     */
     private function getBlotForSurroundingTags(): AbstractBlot {
         $blot = $this->blots[0];
 

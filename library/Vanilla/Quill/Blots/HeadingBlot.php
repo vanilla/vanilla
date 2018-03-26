@@ -48,7 +48,7 @@ class HeadingBlot extends AbstractBlockBlot {
 
 
     /**
-     * Get the heading level for the current block.
+     * Get the heading level for the blot.
      *
      * @return int
      */

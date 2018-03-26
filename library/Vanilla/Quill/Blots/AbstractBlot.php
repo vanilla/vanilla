@@ -51,7 +51,7 @@ abstract class AbstractBlot {
     abstract public function render(): string;
 
     /**
-     * Determine whether or not this Blot should clear the current Block.
+     * Determine whether or not this Blot should clear the current Group.
      *
      * @param Group $group
      *

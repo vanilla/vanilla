@@ -15,7 +15,7 @@ use Vanilla\Quill\Blots\HeadingBlot;
 use Vanilla\Quill\Blots\TextBlot;
 
 /**
- * Class to represent a group of a quill blots. One block can contain multiple inline type blots.
+ * Class to represent a group of a quill blots. One Group can contain multiple inline type blots.
  *
  * @package Vanilla\Quill
  */
@@ -37,16 +37,16 @@ class Group {
     ];
 
     /**
-     * Create any empty block. When rendered it will output <p><br></p>
+     * Create any empty group. When rendered it will output <p><br></p>
      *
      * @return Group
      */
     public static function makeEmptyGroup(): Group {
-        $block = new Group();
+        $group = new Group();
         $blot = new TextBlot(["insert" => ""], [], []);
         $blot->setContent("<br>");
-        $block->pushBlot($blot);
-        return $block;
+        $group->pushBlot($blot);
+        return $group;
     }
 
     /**

@@ -110,7 +110,7 @@ class Renderer {
     }
 
     /**
-     * Parse the operations into an array of Blocks.
+     * Parse the operations into an array of Groups.
      */
     private function parse() {
         $operationLength = \count($this->operations);

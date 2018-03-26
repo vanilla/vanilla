@@ -8,6 +8,8 @@
  * @since 2.0
  */
 
+use Garden\EventManager;
+
 /**
  * Handles user data.
  */
@@ -49,6 +51,9 @@ class UserModel extends Gdn_Model {
     /** Timeout for SSO */
     const SSO_TIMEOUT = 1200;
 
+    /** @var EventManager */
+    private $eventManager;
+
     /** @var */
     public $SessionColumns;
 
@@ -63,6 +68,8 @@ class UserModel extends Gdn_Model {
      */
     public function __construct() {
         parent::__construct('User');
+
+        $this->eventManager = Gdn::getContainer()->get(EventManager::class);
 
         $this->addFilterField([
             'Admin', 'Deleted', 'CountVisits', 'CountInvitations', 'CountNotifications', 'Preferences', 'Permissions',
@@ -1057,8 +1064,9 @@ class UserModel extends Gdn_Model {
      *
      * @param array $rows Results we need to associate user data with.
      * @param array $columns Database columns containing UserIDs to get data for.
+     * @param array $options
      */
-    public function expandUsers(array &$rows, array $columns) {
+    public function expandUsers(array &$rows, array $columns, array $options = []) {
         // How are we supposed to lookup users by column if we don't have any columns?
         if (count($rows) === 0 || count($columns) === 0) {
             return;
@@ -1131,6 +1139,8 @@ class UserModel extends Gdn_Model {
                 $populate($row);
             }
         }
+
+        $rows = $this->eventManager->fireFilter('userModel_expandUsers', $rows, $single, $options);
     }
 
     /**

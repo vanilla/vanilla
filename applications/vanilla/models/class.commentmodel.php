@@ -733,7 +733,7 @@ class CommentModel extends Gdn_Model {
 
                         // Find all discussions with content from after DateMarkedRead
                         $discussionModel = new DiscussionModel();
-                        $discussions = $discussionModel->get(0, 101, [
+                        $discussions = $discussionModel->get(0, $lookBackCount, [
                             'CategoryID' => $categoryID,
                             'DateLastComment>' => $dateMarkedRead
                         ]);

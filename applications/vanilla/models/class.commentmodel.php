@@ -751,22 +751,16 @@ class CommentModel extends Gdn_Model {
         if ($discussions->numRows() > $lookBackCount) {
             return;
         }
-        // Loop over these and see if any are still unread.
-        $markAsRead = true;
-        while ($discussion = $discussions->nextRow(DATASET_TYPE_ARRAY)) {
-            if ($discussion['Read']) {
-                continue;
-            }
-            $markAsRead = false;
-            break;
+
+        // Search through all of these and see if any are still unread.
+        if (in_array(true, array_column($discussions->resultArray(), 'Read'), true) {
+            return;
         }
 
         // Mark this category read if all the new content is read.
-        if ($markAsRead) {
-            $categoryModel = new CategoryModel();
-            $categoryModel->saveUserTree($categoryID, ['DateMarkedRead' => Gdn_Format::toDateTime()]);
-            unset($categoryModel);
-        }
+        $categoryModel = new CategoryModel();
+        $categoryModel->saveUserTree($categoryID, ['DateMarkedRead' => Gdn_Format::toDateTime()]);
+        unset($categoryModel);
     }
 
     /**

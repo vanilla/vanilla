@@ -234,13 +234,13 @@ if (!function_exists('WriteTableHead')):
     function writeTableHead() {
         ?>
         <tr>
-            <td class="CategoryName">
+            <td class="CategoryName" role="columnheader">
                 <div class="Wrap"><?php echo categoryHeading(); ?></div>
             </td>
-            <td class="BigCount CountDiscussions">
+            <td class="BigCount CountDiscussions" role="columnheader">
                 <div class="Wrap"><?php echo t('Discussions'); ?></div>
             </td>
-            <td class="BigCount CountComments">
+            <td class="BigCount CountComments" role="columnheader">
                 <div class="Wrap"><?php echo t('Comments'); ?></div>
             </td>
             <td class="BlockColumn LatestPost">

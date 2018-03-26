@@ -32,7 +32,7 @@ foreach ($this->DraftData->resultArray() as $Draft) {
             }
             ?>
             <?php if ($excerpt) : ?>
-                <div class="Excerpt" >
+                <div class="Excerpt">
                     <?php echo anchor($excerpt, $editUrl); ?>
                 </div>
             <?php endif; ?>

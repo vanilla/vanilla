@@ -7,7 +7,7 @@
 
 namespace Vanilla\Quill\Blots;
 
-use Vanilla\Quill\Group;
+use Vanilla\Quill\BlotGroup;
 
 abstract class AbstractListBlot extends AbstractBlockBlot {
 

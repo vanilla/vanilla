@@ -19,8 +19,6 @@ use Vanilla\Quill\Blots\AbstractBlot;
  */
 class Renderer {
 
-    const GROUP_BREAK_MARKER = "group-break-marker";
-
     /**
      * The blot types to check for. Not all blot types are used at the top level.
      */
@@ -41,7 +39,7 @@ class Renderer {
     /** @var array[] */
     private $operations = [];
 
-    /** @var Group[]  */
+    /** @var BlotGroup[]  */
     private $groups = [];
 
     /**
@@ -77,20 +75,20 @@ class Renderer {
 
             // A newline on its own needs special handling. We don't want to break it into 2 newlines.
             if ($op["insert"] === "\n") {
-                $op[static::GROUP_BREAK_MARKER] = true;
+                $op[BlotGroup::BREAK_MARKER] = true;
                 $op["insert"] = "";
                 $newOperations[] = $op;
                 continue;
             }
 
             // Explode on newlines into new operations. Every new operation,
-            // and the next old operation should get a GROUP_BREAK_MARKER.
+            // and the next old operation should get a BREAK_MARKER.
             $pieces = \explode("\n", $op["insert"]);
             if (count($pieces) > 1) {
                 // Create a new insert from the exploded piece.
                 foreach($pieces as $index => $piece) {
                     $insert = ["insert" =>  $piece];
-                    $insert[static::GROUP_BREAK_MARKER] = true;
+                    $insert[BlotGroup::BREAK_MARKER] = true;
                     $newOperations[] = $insert;
                 }
 
@@ -99,7 +97,7 @@ class Renderer {
 
                 // Set a marker on the next blot if the last piece is a newline.
                 if ($isNotLastOperation && $isNewLineOnly) {
-                    $this->operations[$opIndex + 1][static::GROUP_BREAK_MARKER] = true;
+                    $this->operations[$opIndex + 1][BlotGroup::BREAK_MARKER] = true;
                 }
             } else {
                 $newOperations[] = $op;
@@ -114,7 +112,7 @@ class Renderer {
      */
     private function parse() {
         $operationLength = \count($this->operations);
-        $group = new Group();
+        $group = new BlotGroup();
 
         for($i = 0; $i < $operationLength; $i++) {
 
@@ -140,7 +138,7 @@ class Renderer {
                     // Ask the blot if it should close the current group.
                     if ($blotInstance->shouldClearCurrentGroup($group)) {
                         $this->groups[] = $group;
-                        $group = new Group();
+                        $group = new BlotGroup();
                     }
 
                     $group->pushBlot($blotInstance);
@@ -153,7 +151,7 @@ class Renderer {
                     // Some block type blots get a group all to themselves.
                     if ($blotInstance instanceof Blots\AbstractBlockBlot && $blotInstance->isOwnGroup()) {
                         $this->groups[] = $group;
-                        $group = new Group();
+                        $group = new BlotGroup();
                     }
 
                     break;

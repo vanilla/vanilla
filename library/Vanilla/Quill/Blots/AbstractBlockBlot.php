@@ -7,7 +7,7 @@
 
 namespace Vanilla\Quill\Blots;
 
-use Vanilla\Quill\Group;
+use Vanilla\Quill\BlotGroup;
 use Vanilla\Quill\Renderer;
 
 abstract class AbstractBlockBlot extends TextBlot {
@@ -49,7 +49,7 @@ abstract class AbstractBlockBlot extends TextBlot {
         } elseif (\stringBeginsWith($this->content, "\n")) {
             $this->content = \ltrim($this->content, "\n");
             $this->shouldClearCurrentGroup = true;
-        } elseif (\array_key_exists(Renderer::GROUP_BREAK_MARKER, $this->currentOperation)) {
+        } elseif (\array_key_exists(BlotGroup::BREAK_MARKER, $this->currentOperation)) {
             $this->shouldClearCurrentGroup = true;
         } else {
             $this->shouldClearCurrentGroup = false;
@@ -82,7 +82,7 @@ abstract class AbstractBlockBlot extends TextBlot {
     /**
      * @inheritDoc
      */
-    public function shouldClearCurrentGroup(Group $group): bool {
+    public function shouldClearCurrentGroup(BlotGroup $group): bool {
         return $this->shouldClearCurrentGroup;
     }
 

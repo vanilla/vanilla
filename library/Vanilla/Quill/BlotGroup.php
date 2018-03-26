@@ -19,7 +19,9 @@ use Vanilla\Quill\Blots\TextBlot;
  *
  * @package Vanilla\Quill
  */
-class Group {
+class BlotGroup {
+
+    const BREAK_MARKER = "group-break-marker";
 
     /** @var AbstractBlot[] */
     private $blots = [];
@@ -39,10 +41,10 @@ class Group {
     /**
      * Create any empty group. When rendered it will output <p><br></p>
      *
-     * @return Group
+     * @return BlotGroup
      */
-    public static function makeEmptyGroup(): Group {
-        $group = new Group();
+    public static function makeEmptyGroup(): BlotGroup {
+        $group = new BlotGroup();
         $blot = new TextBlot(["insert" => ""], [], []);
         $blot->setContent("<br>");
         $group->pushBlot($blot);

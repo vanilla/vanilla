@@ -7,7 +7,7 @@
 
 namespace Vanilla\Quill\Blots\Embeds;
 
-use Vanilla\Quill\Group;
+use Vanilla\Quill\BlotGroup;
 use Vanilla\Quill\Blots\AbstractBlot;
 
 abstract class AbstractInlineEmbedBlot extends AbstractBlot {
@@ -77,7 +77,7 @@ abstract class AbstractInlineEmbedBlot extends AbstractBlot {
     /**
      * @inheritDoc
      */
-    public function shouldClearCurrentGroup(Group $group): bool {
+    public function shouldClearCurrentGroup(BlotGroup $group): bool {
         return false;
     }
 

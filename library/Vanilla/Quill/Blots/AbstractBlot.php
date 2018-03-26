@@ -7,7 +7,7 @@
 
 namespace Vanilla\Quill\Blots;
 
-use Vanilla\Quill\Group;
+use Vanilla\Quill\BlotGroup;
 use Vanilla\Quill\Formats\AbstractFormat;
 
 /**
@@ -53,11 +53,11 @@ abstract class AbstractBlot {
     /**
      * Determine whether or not this Blot should clear the current Group.
      *
-     * @param Group $group
+     * @param BlotGroup $group
      *
      * @return bool
      */
-    abstract public function shouldClearCurrentGroup(Group $group): bool;
+    abstract public function shouldClearCurrentGroup(BlotGroup $group): bool;
 
     /**
      * Determine whether or not this blot uses both current and next operation.

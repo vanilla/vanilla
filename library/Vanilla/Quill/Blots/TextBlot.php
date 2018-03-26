@@ -9,7 +9,7 @@ namespace Vanilla\Quill\Blots;
 
 use Vanilla\Quill\Blots\Embeds\EmojiBlot;
 use Vanilla\Quill\Formats;
-use Vanilla\Quill\Group;
+use Vanilla\Quill\BlotGroup;
 use Vanilla\Quill\Renderer;
 
 class TextBlot extends AbstractBlot {
@@ -41,7 +41,7 @@ class TextBlot extends AbstractBlot {
         $this->content = \htmlentities($insert, \ENT_QUOTES);
 
         if (preg_match("/\\n$/", $this->content)) {
-            $this->currentOperation[Renderer::GROUP_BREAK_MARKER] = true;
+            $this->currentOperation[BlotGroup::BREAK_MARKER] = true;
             $this->content = \rtrim($this->content, "\n");
         }
     }
@@ -85,8 +85,8 @@ class TextBlot extends AbstractBlot {
     /**
      * @inheritDoc
      */
-    public function shouldClearCurrentGroup(Group $group): bool {
-        return \array_key_exists(Renderer::GROUP_BREAK_MARKER, $this->currentOperation);
+    public function shouldClearCurrentGroup(BlotGroup $group): bool {
+        return \array_key_exists(BlotGroup::BREAK_MARKER, $this->currentOperation);
     }
 
     /**

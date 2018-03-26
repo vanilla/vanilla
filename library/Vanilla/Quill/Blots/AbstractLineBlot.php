@@ -37,7 +37,7 @@ abstract class AbstractLineBlot extends AbstractBlockBlot {
      * The first one is just to apply the attribute but the additional ones need to be rendered as newlines inside
      * of the group.
      *
-     * @see Group::renderLineGroup()
+     * @see BlotGroup::renderLineGroup()
      *
      * @return string
      */
@@ -56,7 +56,8 @@ abstract class AbstractLineBlot extends AbstractBlockBlot {
 
     /**
      * Render the HTML for the start of a line.
-     * @see Group::renderLineGroup()
+     *
+     * @see BlotGroup::renderLineGroup()
      *
      * @return string
      */
@@ -67,7 +68,8 @@ abstract class AbstractLineBlot extends AbstractBlockBlot {
 
     /**
      * Render the HTML for the end of a line.
-     * @see Group::renderLineGroup()
+     *
+     * @see BlotGroup::renderLineGroup()
      *
      * @return string
      */

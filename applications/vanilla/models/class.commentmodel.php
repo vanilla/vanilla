@@ -716,7 +716,7 @@ class CommentModel extends Gdn_Model {
             }
 
             /**
-             * Fuzzy way of trying to automatically mark a cateogyr read again
+             * Fuzzy way of trying to automatically mark a category read again
              * if the user reads all the comments on the first few pages.
              */
 

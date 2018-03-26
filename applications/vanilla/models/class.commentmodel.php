@@ -753,7 +753,7 @@ class CommentModel extends Gdn_Model {
         }
 
         // Search through all of these and exit if any are still unread.
-        if (in_array(false, array_column($discussions->resultArray(), 'Read'), true) {
+        if (in_array(false, array_column($discussions->resultArray(), 'Read'), true)) {
             return;
         }
 

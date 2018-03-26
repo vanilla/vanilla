@@ -27,52 +27,13 @@ body.isMobile .change-picture .change-picture-instructions {
   display: none;
 }
 
-button.Close {
-  -webkit-appearance: none;
-  -moz-appearance: none;
-  appearance: none;
-  border: 0;
-}
-
-.Close-x {
-  color: #000;
-  font-family: arial;
-  font-size: 22px;
-  font-weight: bold;
-  padding: 0;
-}
-
-.accessibility-jumpTo {
-  -webkit-appearance: none;
-  -moz-appearance: none;
-  appearance: none;
-  border: 0;
-  border: 0;
-  clip: rect(0 0 0 0);
-  height: 1px;
-  margin: -1px;
-  overflow: hidden;
-  padding: 0;
-  position: absolute;
-  width: 1px;
-}
-
-.accessibility-jumpTo:focus {
-  position: absolute;
-  top: 50px;
-  left: 0;
-  text-align: left;
-  background-color: white;
-  color: black;
-  display: block;
-  font-size: 14px;
-  clip: auto;
-  margin: 0;
-  height: auto;
-  padding: 0 12px;
-  width: 100%;
-  z-index: 2;
-  transform: translateY(-100%);
+@media (max-width: 600px) {
+  .box-crop .box-source {
+    display: none;
+  }
+  .change-picture .change-picture-instructions {
+    display: none;
+  }
 }
 
 @keyframes spinnerLoader {
@@ -745,7 +706,6 @@ button.Close {
   white-space: nowrap;
   text-overflow: ellipsis;
   overflow: hidden;
-  width: 100%;
   text-decoration: none !important;
   text-align: left;
 }

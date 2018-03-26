@@ -52,7 +52,6 @@ class DiscussionModel extends Gdn_Model {
      *   `['field1' => 'direction', 'field2' => 'direction']`
      */
     protected static $allowedSorts = [
-        'none' => ['key' => self::EMPTY_FILTER_KEY, 'name' => 'None'],
         'hot' => ['key' => 'hot', 'name' => 'Hot', 'orderBy' => ['DateLastComment' => 'desc']],
         'top' => ['key' => 'top', 'name' => 'Top', 'orderBy' => ['Score' => 'desc', 'DateInserted' => 'desc']],
         'new' => ['key' => 'new', 'name' => 'New', 'orderBy' => ['DateInserted' => 'desc']]
@@ -234,33 +233,17 @@ class DiscussionModel extends Gdn_Model {
             return true;
         }
 
+        // Make sure only moderators can edit closed things.
+        if (val('Closed', $discussion)) {
+            return false;
+        }
+
         // Non-mods can't edit if they aren't the author.
         if (Gdn::session()->UserID != val('InsertUserID', $discussion)) {
             return false;
         }
 
-        return self::editContentTimeout($discussion, $timeLeft);
-    }
-
-    /**
-     * Checks whether the time frame when a discussion can be edited has passed.
-     *
-     * @param object|array $discussion The discussion to examine.
-     * @param int $timeLeft Sets the time left to edit or 0 if not applicable.
-     * @return bool Whether the time to edit the discussion has passed.
-     */
-    public static function editContentTimeout($discussion, &$timeLeft = 0) {
-        // Determine if we still have time to edit.
-        $timeInserted = strtotime(val('DateInserted', $discussion));
-        $editContentTimeout = c('Garden.EditContentTimeout', -1);
-
-        $canEdit = $editContentTimeout == -1 || $timeInserted + $editContentTimeout > time();
-
-        if ($canEdit && $editContentTimeout > 0) {
-            $timeLeft = $timeInserted + $editContentTimeout - time();
-        }
-
-        return $canEdit;
+        return parent::editContentTimeout($discussion, $timeLeft);
     }
 
     public function counts($column, $from = false, $to = false, $max = false) {

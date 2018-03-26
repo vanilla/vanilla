@@ -657,8 +657,8 @@ class CommentModel extends Gdn_Model {
 
         $newComments = false;
 
-        $session = Gdn::session();
-        if ($session->UserID > 0) {
+        $userID = Gdn::session()->UserID;
+        if ($userID > 0) {
             // Max comments we could have seen
             $countWatch = $limit + $offset;
             if ($countWatch > $totalComments) {
@@ -689,7 +689,7 @@ class CommentModel extends Gdn_Model {
                             'DateLastViewed' => Gdn_Format::toDateTime()
                         ],
                         [
-                            'UserID' => $session->UserID,
+                            'UserID' => $userID,
                             'DiscussionID' => $discussion->DiscussionID
                         ]
                     );
@@ -706,7 +706,7 @@ class CommentModel extends Gdn_Model {
                     $this->SQL->insert(
                         'UserDiscussion',
                         [
-                            'UserID' => $session->UserID,
+                            'UserID' => $userID,
                             'DiscussionID' => $discussion->DiscussionID,
                             'CountComments' => $countWatch,
                             'DateLastViewed' => Gdn_Format::toDateTime()

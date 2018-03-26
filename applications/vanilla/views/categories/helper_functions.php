@@ -257,6 +257,7 @@ if (!function_exists('WriteTableRow')):
         $children = $row['Children'];
         $writeChildren = getWriteChildrenMethod($row, $depth);
         $h = 'h'.($depth + 1);
+        $level = 3;
         ?>
         <tr class="<?php echo cssClass($row); ?>">
             <td class="CategoryName">
@@ -266,7 +267,7 @@ if (!function_exists('WriteTableRow')):
 
                     echo categoryPhoto($row);
 
-                    echo "<{$h}>";
+                    echo "<{$h} aria-level='".$level."'>";
                     $safeName = htmlspecialchars($row['Name']);
                     echo $row['DisplayAs'] === 'Heading' ? $safeName : anchor($safeName, $row['Url']);
                     Gdn::controller()->EventArguments['Category'] = $row;
@@ -397,13 +398,14 @@ if (!function_exists('writeCategoryTable')):
                 }
                 ?>
                 <div id="CategoryGroup-<?php echo $urlCode; ?>" class="CategoryGroup <?php echo $class; ?>">
-                    <h2 class="H"><?php echo $name; ?></h2>
+                    <h2 class="H categoryList-heading"><?php echo $name; ?></h2>
                     <?php writeCategoryTable($category['Children'], $depth + 1, $inTable); ?>
                 </div>
                 <?php
             else :
                 if (!$inTable) { ?>
                     <div class="DataTableWrap">
+                        <h2 class="sr-only categoryList-genericHeading"><?php echo t('Category List') ?></h2>
                         <table class="DataTable CategoryTable">
                             <thead>
                             <?php writeTableHead(); ?>

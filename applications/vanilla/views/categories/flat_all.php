@@ -18,6 +18,7 @@
     $this->EventArguments['NumRows'] = count($categories);
 ?>
 
+<h2 class="sr-only"><?php echo t('Category List'); ?></h2>
 <ul class="DataList CategoryList">
 <?php
     foreach ($categories as $category) {

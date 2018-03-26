@@ -363,9 +363,7 @@ if (!function_exists('writeCategoryList')):
 
         ?>
         <div class="DataListWrap">
-            <span class="sr-only">
-                <h2><?php echo t('Category List'); ?></h2>
-            </span>
+            <h2 class="sr-only"><?php echo t('Category List'); ?></h2>
             <ul class="DataList CategoryList">
                 <?php
                 foreach ($categories as $category) {

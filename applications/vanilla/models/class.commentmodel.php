@@ -723,48 +723,48 @@ class CommentModel extends Gdn_Model {
             // If this discussion is in a category that has been marked read,
             // check if reading this thread causes it to be completely read again
             $categoryID = val('CategoryID', $discussion);
-            if ($categoryID) {
-                $category = CategoryModel::categories($categoryID);
-                if ($category) {
-                    $dateMarkedRead = val('DateMarkedRead', $category);
-                    if ($dateMarkedRead) {
-                        // Fuzzy way of looking back about 2 pages into the past
-                        $lookBackCount = c('Vanilla.Discussions.PerPage', 50) * 2;
+            if (!$categoryID) {
+                return;
+            }
+            $category = CategoryModel::categories($categoryID);
+            if (!$category) {
+                return;
+            }
+            $dateMarkedRead = val('DateMarkedRead', $category);
+            if ($dateMarkedRead) {
+                // Fuzzy way of looking back about 2 pages into the past
+                $lookBackCount = c('Vanilla.Discussions.PerPage', 50) * 2;
 
-                        // Find all discussions with content from after DateMarkedRead
-                        $discussionModel = new DiscussionModel();
-                        $discussions = $discussionModel->get(0, $lookBackCount, [
-                            'CategoryID' => $categoryID,
-                            'DateLastComment>' => $dateMarkedRead
-                        ]);
-                        unset($discussionModel);
+                // Find all discussions with content from after DateMarkedRead
+                $discussionModel = new DiscussionModel();
+                $discussions = $discussionModel->get(0, $lookBackCount + 1, [
+                    'CategoryID' => $categoryID,
+                    'DateLastComment>' => $dateMarkedRead
+                ]);
+                unset($discussionModel);
 
-                        // Abort if we get back as many as we asked for, meaning a
-                        // lot has happened.
-                        $numDiscussions = $discussions->numRows();
-                        if ($numDiscussions <= $lookBackCount) {
-                            // Loop over these and see if any are still unread
-                            $markAsRead = true;
-                            while ($discussion = $discussions->nextRow(DATASET_TYPE_ARRAY)) {
-                                if ($discussion['Read']) {
-                                    continue;
-                                }
-                                $markAsRead = false;
-                                break;
-                            }
-
-                            // Mark this category read if all the new content is read
-                            if ($markAsRead) {
-                                $categoryModel = new CategoryModel();
-                                $categoryModel->saveUserTree($categoryID, ['DateMarkedRead' => Gdn_Format::toDateTime()]);
-                                unset($categoryModel);
-                            }
-
+                // Abort if we get back as many as we asked for, meaning a
+                // lot has happened.
+                $numDiscussions = $discussions->numRows();
+                if ($numDiscussions <= $lookBackCount) {
+                    // Loop over these and see if any are still unread
+                    $markAsRead = true;
+                    while ($discussion = $discussions->nextRow(DATASET_TYPE_ARRAY)) {
+                        if ($discussion['Read']) {
+                            continue;
                         }
+                        $markAsRead = false;
+                        break;
+                    }
+
+                    // Mark this category read if all the new content is read
+                    if ($markAsRead) {
+                        $categoryModel = new CategoryModel();
+                        $categoryModel->saveUserTree($categoryID, ['DateMarkedRead' => Gdn_Format::toDateTime()]);
+                        unset($categoryModel);
                     }
                 }
             }
-
         }
     }
 

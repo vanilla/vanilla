@@ -1,7 +1,7 @@
 <?php if (!defined('APPLICATION')) exit(); ?>
 <div class="ButtonGroup discussion-sort-filter-module pull-left">
     <?php if ($this->showSorts()) { ?>
-        <span class="discussion-sorts">
+        <span class="discussion-refine discussion-sorts">
         <?php
             $sortLinks = [];
             $foundActiveLink = false;
@@ -28,7 +28,7 @@
         </span>
     <?php }
     if ($this->showFilters()) { ?>
-        <span class="discussion-filters">
+        <span class="discussion-refine discussion-filters">
         <?php
         foreach ($this->getFilterDropdowns() as $dropdown) {
             $label = val('name', val(0, $dropdown), 'Filter');

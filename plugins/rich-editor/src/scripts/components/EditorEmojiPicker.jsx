@@ -25,10 +25,14 @@ export default class EditorEmojiPicker extends React.Component {
         super(props);
 
         UniqueID.enableUniqueIds(this);
+        const prefix = 'emojiPicker-';
         this.ID = this.nextUniqueId();
-        this.menuID = "emojiMenu-menu-" + this.ID;
-        this.buttonID = "emojiMenu-button-" + this.ID;
-        this.menuTitleID = "emojiMenu-title-" + this.ID;
+        this.pickerID = prefix + this.ID;
+        this.menuID = prefix + 'menu-' + this.ID;
+        this.buttonID = prefix + 'button-' + this.ID;
+        this.menuTitleID = prefix + 'title-' + this.ID;
+        this.menuDescriptionID = prefix + 'description-' + this.ID;
+        this.emojiCategoriesID = prefix + 'categories-' + this.ID;
 
         // Quill can directly on the class as it won't ever change in a single instance.
         this.quill = props.quill;
@@ -53,6 +57,20 @@ export default class EditorEmojiPicker extends React.Component {
     }
 
     /**
+     * Close if we lose focus on the component
+     * @param {React.FocusEvent} event - A synthetic event.
+     */
+    checkForExternalFocus = (event) => {
+        setImmediate(() => {
+            const activeElement = document.activeElement;
+            const emojiPickerElement = document.getElementById(this.pickerID);
+            if(activeElement.id !== this.pickerID && !emojiPickerElement.contains(activeElement)) {
+                this.closeMenu(event);
+            }
+        });
+    };
+
+    /**
      * Toggle Menu menu
      */
     toggleEmojiMenu = () => {
@@ -66,8 +84,6 @@ export default class EditorEmojiPicker extends React.Component {
     componentDidMount(){
         document.addEventListener("keydown", this.escFunction, false);
         document.addEventListener(CLOSE_FLYOUT_EVENT, this.closeMenu);
-
-
     }
 
     componentWillUnmount(){
@@ -77,30 +93,34 @@ export default class EditorEmojiPicker extends React.Component {
 
     /**
      * Closes menu
-     * @param {SyntheticEvent} e - The fired event. This could be a custom event.
+     * @param {SyntheticEvent} event - The fired event. This could be a custom event.
      */
-    closeMenu = (e) => {
-        if (e.detail && e.detail.firingKey && e.detail.firingKey === this.constructor.name) {
+    closeMenu = (event) => {
+        if (event.detail && event.detail.firingKey && event.detail.firingKey === this.constructor.name) {
             return;
         }
+
+        const activeElement = document.activeElement;
+        const parentElement = document.getElementById(this.pickerID);
 
         this.setState({
             isVisible: false,
         });
 
-        e.preventDefault();
-        e.stopPropagation();
+        if (parentElement.contains(activeElement)) {
+            document.getElementById(this.buttonID).focus();
+        }
     };
 
     /**
      * @inheritDoc
      */
     render() {
-        return <div className="emojiPicker">
-            <button onClick={this.toggleEmojiMenu} className="richEditor-button" type="button" id={this.buttonID} aria-controls={this.menuID} aria-expanded={this.state.isVisible} aria-haspopup="menu">
+        return <div id={this.pickerID} className="emojiPicker">
+            <button onClick={this.toggleEmojiMenu} onBlur={this.checkForExternalFocus} className="richEditor-button" type="button" id={this.buttonID} aria-controls={this.menuID} aria-expanded={this.state.isVisible} aria-haspopup="true">
                 {Icons.emoji()}
             </button>
-            <EditorEmojiMenu {...this.state} menuID={this.menuID} menuTitleID={this.menuTitleID} quill={this.quill} closeMenu={this.closeMenu}/>
+            <EditorEmojiMenu {...this.state} checkForExternalFocus={this.checkForExternalFocus} pickerID={this.pickerID} menuID={this.menuID} menuDescriptionID={this.menuDescriptionID} emojiCategoriesID={this.emojiCategoriesID} menuTitleID={this.menuTitleID} quill={this.quill} closeMenu={this.closeMenu}/>
         </div>;
     }
 }

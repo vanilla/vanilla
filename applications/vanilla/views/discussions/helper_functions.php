@@ -166,7 +166,7 @@ if (!function_exists('WriteDiscussion')) :
    </span>
 
             <div class="ItemContent Discussion">
-                <div class="Title">
+                <div class="Title" role="heading" aria-level="3">
                     <?php
                     echo adminCheck($discussion, ['', ' ']).anchor($discussionName, $discussionUrl);
                     $sender->fireEvent('AfterDiscussionTitle');

@@ -121,9 +121,9 @@ export default class EditorEmojiMenu extends React.PureComponent {
         const pos = rowIndex * rowSize + columnIndex;
         const emojiData = emojis[pos];
         let result = null;
-        const selectedButton = this.state.firstEmojiOfGroup >= 0 && this.state.firstEmojiOfGroup === pos ;
+        const isSelectedButton = this.state.firstEmojiOfGroup >= 0 && this.state.firstEmojiOfGroup === pos ;
         if(emojiData) {
-            result = <EditorEmojiButton selectedButton={selectedButton} style={style} closeMenu={this.props.closeMenu} quill={this.props.quill} key={"emoji-" + emojiData.hexcode} emojiData={emojiData} index={pos} rowIndex={rowIndex} />;
+            result = <EditorEmojiButton isSelectedButton={isSelectedButton} style={style} closeMenu={this.props.closeMenu} quill={this.props.quill} key={"emoji-" + emojiData.hexcode} emojiData={emojiData} index={pos} rowIndex={rowIndex} />;
         }
         return result;
     };

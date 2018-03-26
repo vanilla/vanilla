@@ -22,7 +22,7 @@ export default class EditorEmojiButton extends React.Component {
         style: PropTypes.object.isRequired,
         index: PropTypes.number.isRequired,
         rowIndex: PropTypes.number.isRequired,
-        selectedButton: PropTypes.bool.isRequired,
+        isSelectedButton: PropTypes.bool.isRequired,
     };
 
     /**
@@ -35,20 +35,20 @@ export default class EditorEmojiButton extends React.Component {
 
     /**
      * Insert Emoji
-     * @param {SyntheticEvent} e
+     * @param {React.SyntheticEvent} event
      */
-    insertEmojiBlot = (e) => {
+    insertEmojiBlot = (event) => {
         const range = this.props.quill.getSelection(true);
         this.props.quill.insertEmbed(range.index, 'emoji', {
             emojiChar: this.emojiChar,
         }, Quill.sources.USER);
         this.props.quill.setSelection(range.index + 1, Quill.sources.SILENT);
-        this.props.closeMenu(e);
+        this.props.closeMenu(event);
     }
 
     /**
      * Handle key presses
-     * @param {SyntheticEvent} e
+     * @param {React.SyntheticEvent} e
      */
     handleKeyPress = (event) => {
 
@@ -78,8 +78,8 @@ export default class EditorEmojiButton extends React.Component {
      * Check to see if element should get focus
      * @param {Object} prevProps
      */
-    componentDidUpdate = (prevProps) => {
-        if (this.domButton && prevProps.selectedButton) {
+    componentDidUpdate = function (prevProps) {
+        if (this.domButton && prevProps.isSelectedButton) {
             this.domButton.focus();
         }
     }
@@ -93,7 +93,7 @@ export default class EditorEmojiButton extends React.Component {
             'richEditor-insertEmoji',
             'emojiChar-' + this.emojiChar,
         );
-        return <button ref={(button) => { this.domButton = button; }} onKeyDown={this.handleKeyPress} style={this.props.style} className={componentClasses} data-index={this.props.position} type="button" onClick={this.insertEmojiBlot}>
+        return <button ref={(elButton) => { this.domButton = elButton; }} onKeyDown={this.handleKeyPress} style={this.props.style} className={componentClasses} data-index={this.props.position} type="button" onClick={this.insertEmojiBlot}>
             <span className="safeEmoji" dangerouslySetInnerHTML={{__html: parseEmoji(this.emojiChar)}} />
         </button>;
     }

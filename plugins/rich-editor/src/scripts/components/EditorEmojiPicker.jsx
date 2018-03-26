@@ -58,14 +58,14 @@ export default class EditorEmojiPicker extends React.Component {
 
     /**
      * Close if we lose focus on the component
-     * @param {React.Event} event - A synthetic event.
+     * @param {React.FocusEvent} event - A synthetic event.
      */
-    checkForExternalFocus = (e) => {
+    checkForExternalFocus = (event) => {
         setImmediate(() => {
             const activeElement = document.activeElement;
             const emojiPickerElement = document.getElementById(this.pickerID);
             if(activeElement.id !== this.pickerID && !emojiPickerElement.contains(activeElement)) {
-                this.closeMenu(e);
+                this.closeMenu(event);
             }
         });
     };
@@ -93,10 +93,10 @@ export default class EditorEmojiPicker extends React.Component {
 
     /**
      * Closes menu
-     * @param {SyntheticEvent} e - The fired event. This could be a custom event.
+     * @param {SyntheticEvent} event - The fired event. This could be a custom event.
      */
-    closeMenu = (e) => {
-        if (e.detail && e.detail.firingKey && e.detail.firingKey === this.constructor.name) {
+    closeMenu = (event) => {
+        if (event.detail && event.detail.firingKey && event.detail.firingKey === this.constructor.name) {
             return;
         }
 

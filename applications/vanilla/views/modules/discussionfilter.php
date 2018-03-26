@@ -34,7 +34,7 @@ if (c('Vanilla.Discussions.ShowCounts', true)) {
 <div class="BoxFilter BoxDiscussionFilter">
     <span class="sr-only BoxFilter-HeadingWrap">
         <h2 class="BoxFilter-Heading">
-            <?php echo t('Site Links'); ?>
+            <?php echo t('Quick Links'); ?>
         </h2>
     </span>
     <ul role="nav" class="FilterMenu">

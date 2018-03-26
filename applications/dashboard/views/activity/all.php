@@ -8,7 +8,7 @@ $this->fireEvent('BeforeStatusForm');
 $Session = Gdn::session();
 if ($Session->checkPermission('Garden.Profiles.Edit')) {
     echo '<div class="FormWrapper FormWrapper-Condensed">';
-    echo '<h2 class="sr-only">'.t('Post a Comment').'</h2>';
+    echo '<h2 class="sr-only">'.t('Post Comment').'</h2>';
     echo $this->Form->open(['action' => url('/activity/post/'.$this->data('Filter')), 'class' => 'Activity']);
     echo $this->Form->errors();
     echo $this->Form->bodyBox('Comment', ['Wrap' => true]);

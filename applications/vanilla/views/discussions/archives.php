@@ -16,7 +16,7 @@ require_once $this->fetchViewLocation('helper_functions');
 </div>
 
 <?php
-echo '<h2 class="sr-only">'.t('Discussions List').'</h2>';
+echo '<h2 class="sr-only">'.t('Discussion List').'</h2>';
 if (c('Vanilla.Discussions.Layout') == 'table'):
     if (!function_exists('WriteDiscussionHeading'))
         require_once $this->fetchViewLocation('table_functions');

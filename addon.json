@@ -8,6 +8,7 @@
         },
         "exports": {
             "app": [
+                "./src/scripts/application",
                 "./src/scripts/events",
                 "./src/scripts/gdn",
                 "./src/scripts/permissions",
@@ -15,9 +16,10 @@
                 "./src/scripts/dom-utility",
                 "axios",
                 "react",
-                "react-dom"
+                "prop-types"
             ],
             "admin": [
+                "./src/scripts/application",
                 "./src/scripts/events",
                 "./src/scripts/gdn",
                 "./src/scripts/permissions",
@@ -25,7 +27,7 @@
                 "./src/scripts/dom-utility",
                 "axios",
                 "react",
-                "react-dom"
+                "prop-types"
             ]
         }
     }

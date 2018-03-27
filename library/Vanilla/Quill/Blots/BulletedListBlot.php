@@ -15,4 +15,18 @@ class BulletedListBlot extends AbstractListBlot {
     protected static function getListType(): string {
         return "bullet";
     }
+
+    /**
+     * @inheritDoc
+     */
+    public function getGroupOpeningTag(): string {
+        return "<ul>";
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function getGroupClosingTag(): string {
+        return "</ul>";
+    }
 }

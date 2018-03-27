@@ -65,11 +65,17 @@ class UserModel extends Gdn_Model {
 
     /**
      * Class constructor. Defines the related database table name.
+     *
+     * @param EventManager $eventManager
      */
-    public function __construct() {
+    public function __construct(EventManager $eventManager = null) {
         parent::__construct('User');
 
-        $this->eventManager = Gdn::getContainer()->get(EventManager::class);
+        if ($eventManager === null) {
+            $this->eventManager = Gdn::getContainer()->get(EventManager::class);
+        } else {
+            $this->eventManager = $eventManager;
+        }
 
         $this->addFilterField([
             'Admin', 'Deleted', 'CountVisits', 'CountInvitations', 'CountNotifications', 'Preferences', 'Permissions',
@@ -1064,7 +1070,7 @@ class UserModel extends Gdn_Model {
      *
      * @param array $rows Results we need to associate user data with.
      * @param array $columns Database columns containing UserIDs to get data for.
-     * @param array $options
+     * @param array $options Additional options. Passed to filter event.
      */
     public function expandUsers(array &$rows, array $columns, array $options = []) {
         // How are we supposed to lookup users by column if we don't have any columns?

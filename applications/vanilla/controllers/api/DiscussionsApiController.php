@@ -83,7 +83,8 @@ class DiscussionsApiController extends AbstractApiController {
         // Expand associated rows.
         $this->userModel->expandUsers(
             $rows,
-            $this->resolveExpandFields($query, ['insertUser' => 'InsertUserID', 'lastUser' => 'LastUserID'])
+            $this->resolveExpandFields($query, ['insertUser' => 'InsertUserID', 'lastUser' => 'LastUserID']),
+            ['expand' => $query['expand']]
         );
 
         foreach ($rows as &$currentRow) {
@@ -230,7 +231,7 @@ class DiscussionsApiController extends AbstractApiController {
 
         $this->discussionModel->categoryPermission('Vanilla.Discussions.View', $row['CategoryID']);
 
-        $this->userModel->expandUsers($row, ['InsertUserID', 'LastUserID']);
+        $this->userModel->expandUsers($row, ['InsertUserID', 'LastUserID'], ['expand' => true]);
         $row = $this->normalizeOutput($row);
 
         $result = $out->validate($row);

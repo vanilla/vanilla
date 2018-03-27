@@ -110,7 +110,7 @@ export class ParagraphEditorToolbar extends React.PureComponent {
      * @param {Event} event -
      */
     closeMenu = (event) => {
-        if (event.detail.firingKey === this.constructor.name) {
+        if (event.detail && event.detail.firingKey === this.constructor.name) {
             return;
         }
 
@@ -228,6 +228,13 @@ export class ParagraphEditorToolbar extends React.PureComponent {
             showMenu: !this.state.showMenu,
         });
         closeEditorFlyouts(this.constructor.name);
+        const menu = document.getElementById(this.menuID);
+        const firstButton = menu ? menu.querySelector('.richEditor-button') : false;
+        if (firstButton) {
+            setImmediate(() => {
+                firstButton.focus();
+            });
+        }
     };
 
     /**

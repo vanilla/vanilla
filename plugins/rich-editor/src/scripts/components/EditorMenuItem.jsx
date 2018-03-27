@@ -9,6 +9,7 @@ import * as PropTypes from "prop-types";
 import * as Icons from "./Icons";
 import classnames from "classnames";
 import EditorToolbar from "./EditorToolbar";
+import { t } from "@core/utility";
 
 /**
  * Component for a single item in a EditorToolbar.
@@ -40,7 +41,7 @@ export default class EditorMenuItem extends React.Component {
         });
 
         return <li className="richEditor-menuItem" role="presentation">
-            <button className={buttonClasses} type="button" aria-label={this.props.propertyName} role="menuitem" aria-pressed={this.props.isActive} onClick={clickHandler} onBlur={this.checkForExternalFocus}>
+            <button className={buttonClasses} type="button" aria-label={t('richEditor.menu.' + this.props.propertyName)} role="menuitem" aria-pressed={this.props.isActive} onClick={clickHandler} onBlur={this.checkForExternalFocus}>
                 <Icon />
             </button>
         </li>;

@@ -1,6 +1,8 @@
 <div class="richEditor" aria-label="{t c="Type your message"}>" data-id="{$editorData.editorID}" aria-describedby="{$editorData.editorDescriptionID}" role="textbox" aria-multiline="true">
     <p id="{$editorData.editorDescriptionID}" class="sr-only">
-        {t c="Insert instructions for editor here"}
+        {t c="richEditor.description.title"}
+        {t c="richEditor.description.paragraphMenu"}
+        {t c="richEditor.description.inlineMenu"}
     </p>
     <div class="richEditor-frame InputBox">
         <div class="js-richText">

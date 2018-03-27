@@ -76,6 +76,7 @@ export default class InlineEditorToolbar extends React.Component {
      */
     componentDidMount() {
         this.quill.on(Emitter.events.EDITOR_CHANGE, this.handleEditorChange);
+        document.addEventListener("keydown", this.escFunction, false);
         document.addEventListener(CLOSE_FLYOUT_EVENT, this.clearLinkInput);
 
         // Add a key binding for the link popup.
@@ -101,8 +102,22 @@ export default class InlineEditorToolbar extends React.Component {
      */
     componentWillUnmount() {
         this.quill.off(Quill.events.EDITOR_CHANGE, this.handleEditorChange);
+        document.removeEventListener("keydown", this.escFunction, false);
         document.removeEventListener(CLOSE_FLYOUT_EVENT, this.clearLinkInput);
     }
+
+    /**
+     * Close the menu.
+     *
+     * @param {Event} event -
+     */
+    escFunction = (event) => {
+        if(event.keyCode === 27) {
+            const range = this.quill.getSelection(true);
+            window.console.log("range: ", range);
+            this.quill.setSelection((range.length + range.index), 0, Emitter.sources.USER);
+        }
+    };
 
     /**
      * Handle changes from the editor.
@@ -213,8 +228,10 @@ export default class InlineEditorToolbar extends React.Component {
      * @inheritDoc
      */
     render() {
+        const alertMessage = this.state.showLink ? null : <span aria-live="assertive" role="alert" className="sr-only">{t('Inline Menu Available')}</span>;
         return <div>
             <SelectionPositionToolbar quill={this.quill} forceVisibility={this.state.showLink ? "hidden" : "ignore"}>
+                {alertMessage}
                 <EditorToolbar quill={this.quill} menuItems={this.menuItems}/>
             </SelectionPositionToolbar>
             <SelectionPositionToolbar quill={this.quill} forceVisibility={this.state.showLink ? "visible" : "hidden"}>

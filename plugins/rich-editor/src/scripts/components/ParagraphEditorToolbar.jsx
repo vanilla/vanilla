@@ -12,6 +12,7 @@ import EditorToolbar from "./EditorToolbar";
 import { pilcrow as PilcrowIcon } from "./Icons";
 import { closeEditorFlyouts, CLOSE_FLYOUT_EVENT } from "../quill-utilities";
 import UniqueID from "react-html-id";
+import { t } from "@core/utility";
 
 export default class ParagraphEditorToolbar extends React.PureComponent {
 
@@ -85,11 +86,13 @@ export default class ParagraphEditorToolbar extends React.PureComponent {
         };
     }
 
+
     /**
      * Mount quill listeners.
      */
     componentDidMount() {
         this.quill.on(Emitter.events.EDITOR_CHANGE, this.handleEditorChange);
+        document.addEventListener("keydown", this.escFunction, false);
         document.addEventListener(CLOSE_FLYOUT_EVENT, this.closeMenu);
     }
 
@@ -98,6 +101,7 @@ export default class ParagraphEditorToolbar extends React.PureComponent {
      */
     componentWillUnmount() {
         this.quill.off(Emitter.events.EDITOR_CHANGE, this.handleEditorChange);
+        document.removeEventListener("keydown", this.escFunction, false);
         document.removeEventListener(CLOSE_FLYOUT_EVENT, this.closeMenu);
     }
 
@@ -107,14 +111,32 @@ export default class ParagraphEditorToolbar extends React.PureComponent {
      * @param {Event} event -
      */
     closeMenu = (event) => {
-        if (event.detail && event.detail.firingKey === this.constructor.name) {
+        if (event.detail && event.detail.firingKey && event.detail.firingKey === this.constructor.name) {
             return;
         }
+
+        const activeElement = document.activeElement;
+        const parentElement = document.getElementById(this.componentID);
 
         this.setState({
             showMenu: false,
         });
+
+        if (parentElement.contains(activeElement)) {
+            document.getElementById(this.buttonID).focus();
+        }
     };
+
+    /**
+     * Handle the escape key.
+     *
+     * @param {React.KeyboardEvent} event - A synthetic keyboard event.
+     */
+    escFunction = (event) => {
+        if(event.keyCode === 27) {
+            this.closeMenu(event);
+        }
+    }
 
     /**
      * Handle changes from the editor.
@@ -237,6 +259,7 @@ export default class ParagraphEditorToolbar extends React.PureComponent {
                 className={pilcrowClasses}
                 aria-haspopup="true"
                 onClick={this.pilcrowClickHandler}
+                aria-label={t('richEditor.menu.paragraph')}
             >
                 <PilcrowIcon/>
             </button>

@@ -126,13 +126,13 @@ export default class EditorToolbar extends React.PureComponent {
                 key={key}
                 isActive={isActive}
                 isLast={key + 1 === menuItemList.length}
-                clickHandler={this.formatItem.bind(this, itemName)}
+                clickHandler={this.formatItem.bind(this, itemName, event)}
                 checkForExternalFocus={checkForExternalFocus}
             />;
         });
 
         return (
-            <div className="richEditor-menu" role="dialog" aria-label={t("Inline Level Formatting Menu")}>
+            <div className="richEditor-menu">
                 <ul className="richEditor-menuItems MenuItems" role="presentation">
                     {menuItems}
                 </ul>

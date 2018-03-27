@@ -16,5 +16,11 @@
             "email": "support@vanillaforums.com",
             "homepage": "https://open.vanillaforums.com"
         }
-    ]
+    ],
+    "build": {
+        "process": "core",
+        "entries": {
+            "app": "./src/scripts/dashboard-app.tsx"
+        }
+    }
 }

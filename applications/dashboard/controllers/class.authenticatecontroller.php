@@ -236,6 +236,14 @@ class AuthenticateController extends Gdn_Controller {
         return $userID;
     }
 
+    public function password() {
+        $this->renderReact();
+    }
+
+    public function signin() {
+        $this->renderReact();
+    }
+
     /**
      * Create a new user using the "createuser" connect form fields.
      *

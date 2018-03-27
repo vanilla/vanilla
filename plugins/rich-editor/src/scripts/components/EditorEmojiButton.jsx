@@ -9,14 +9,15 @@ import * as PropTypes from "prop-types";
 import Quill from "quill/core";
 import { parseEmoji } from "@core/emoji-utility";
 import classNames from 'classnames';
+import { withEditor, editorContextTypes } from "./EditorProvider";
 
 /**
  * Component for a single item in a EditorToolbar.
  */
-export default class EditorEmojiButton extends React.Component {
+export class EditorEmojiButton extends React.Component {
 
     static propTypes = {
-        quill: PropTypes.instanceOf(Quill).isRequired,
+        ...editorContextTypes,
         emojiData: PropTypes.object.isRequired,
         closeMenu: PropTypes.func.isRequired,
         style: PropTypes.object.isRequired,
@@ -98,3 +99,5 @@ export default class EditorEmojiButton extends React.Component {
         </button>;
     }
 }
+
+export default withEditor(EditorEmojiButton);

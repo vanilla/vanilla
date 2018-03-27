@@ -7,7 +7,7 @@
 
 namespace Vanilla\Quill\Blots;
 
-use Vanilla\Quill\Block;
+use Vanilla\Quill\BlotGroup;
 use Vanilla\Quill\Formats\AbstractFormat;
 
 /**
@@ -51,13 +51,13 @@ abstract class AbstractBlot {
     abstract public function render(): string;
 
     /**
-     * Determine whether or not this Blot should clear the current Block.
+     * Determine whether or not this Blot should clear the current Group.
      *
-     * @param Block $block
+     * @param BlotGroup $group
      *
      * @return bool
      */
-    abstract public function shouldClearCurrentBlock(Block $block): bool;
+    abstract public function shouldClearCurrentGroup(BlotGroup $group): bool;
 
     /**
      * Determine whether or not this blot uses both current and next operation.
@@ -65,6 +65,24 @@ abstract class AbstractBlot {
      * @return bool
      */
     abstract public function hasConsumedNextOp(): bool;
+
+    /**
+     * Get the HTML to represent the opening tag of the Group this is contained in.
+     *
+     * @return string
+     */
+    public function getGroupOpeningTag(): string {
+        return "<p>";
+    }
+
+    /**
+     * Get the HTML to represent the closing tag of the Group this is container in.
+     *
+     * @return string
+     */
+    public function getGroupClosingTag(): string {
+        return "</p>";
+    }
 
     /**
      * @return string

@@ -34,12 +34,14 @@
                 </li>
                 {/if}
                 <li class="richEditor-menuItem" role="menuitem">
-                    <button class="richEditor-button" type="button" aria-pressed="false">
-                        <svg class="richEditorInline-icon" viewBox="0 0 24 24">
-                            <title>{t c="HTML View"}</title>
-                            <path d="M4,5a.944.944,0,0,0-1,.875v12.25A.944.944,0,0,0,4,19H20a.944.944,0,0,0,1-.875V5.875A.944.944,0,0,0,20,5ZM4,4H20a1.9,1.9,0,0,1,2,1.778V18.222A1.9,1.9,0,0,1,20,20H4a1.9,1.9,0,0,1-2-1.778V5.778A1.9,1.9,0,0,1,4,4ZM9.981,16.382l-4.264-3.7V11.645L9.981,7.45V9.126l-3.2,2.958,3.2,2.605Zm4.326-1.693,3.2-2.605-3.2-2.958V7.45l4.265,4.195v1.041l-4.265,3.7Z" style="fill: currentColor"/>
-                        </svg>
-                    </button>
+                    <div class="js-EmbedDialogue">
+                        <button class="richEditor-button" type="button" aria-pressed="false">
+                            <svg class="richEditorInline-icon" viewBox="0 0 24 24">
+                                <title>{t c="Embed"}</title>
+                                <path d="M4,5a.944.944,0,0,0-1,.875v12.25A.944.944,0,0,0,4,19H20a.944.944,0,0,0,1-.875V5.875A.944.944,0,0,0,20,5ZM4,4H20a1.9,1.9,0,0,1,2,1.778V18.222A1.9,1.9,0,0,1,20,20H4a1.9,1.9,0,0,1-2-1.778V5.778A1.9,1.9,0,0,1,4,4ZM9.981,16.382l-4.264-3.7V11.645L9.981,7.45V9.126l-3.2,2.958,3.2,2.605Zm4.326-1.693,3.2-2.605-3.2-2.958V7.45l4.265,4.195v1.041l-4.265,3.7Z" style="fill: currentColor"/>
+                            </svg>
+                        </button>
+                    </div>
                 </li>
                 <li class="richEditor-menuItem isRightAligned" role="menuitem">
                     <button class="richEditor-button" type="button" aria-pressed="false">

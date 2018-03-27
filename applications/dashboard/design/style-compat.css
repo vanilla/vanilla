@@ -405,21 +405,32 @@ button.Close {
 }
 
 .insertPopover-body {
-  max-height: 100vh;
-  height: 292.5px;
   margin-bottom: 12px;
   padding-left: 12px;
   padding-right: 12px;
+}
+
+.insertEmoji-body {
+  max-height: 100vh;
+  height: 292.5px;
 }
 
 .content-wrapper {
   height: 100%;
 }
 
-.richEditor-menu.insertEmoji {
+.embedDialogue {
+  position: relative;
+}
+
+.richEditor-menu.insertPopover {
   position: absolute;
   bottom: 100%;
   left: 0;
+}
+
+.insertMedia-title {
+  font-size: 100%;
 }
 
 .richEditor-insertEmoji {

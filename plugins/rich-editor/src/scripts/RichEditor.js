@@ -66,6 +66,17 @@ export default class RichEditor {
         }
 
         this.quill.on("text-change", this.synchronizeDelta.bind(this));
+        this.bodybox.addEventListener("paste", (event) => {
+            event.stopPropagation();
+            event.preventDefault();
+
+            // Get pasted data via clipboard API
+            const clipboardData = event.clipboardData || window.clipboardData;
+            const pastedData = clipboardData.getData('Text');
+            console.log(pastedData);
+            const delta = JSON.parse(pastedData);
+            this.quill.setContents(delta);
+        });
         // this.tempSetupListenersForInsertButtons();
     }
 

@@ -7,12 +7,9 @@
 
 namespace Vanilla\Quill\Blots;
 
-use Vanilla\Quill\Block;
+use Vanilla\Quill\BlotGroup;
 
-abstract class AbstractListBlot extends TextBlot {
-
-    /** @var bool */
-    private $shouldClearCurrentBlock = false;
+abstract class AbstractListBlot extends AbstractBlockBlot {
 
     /**
      * Get the type of list.
@@ -24,12 +21,22 @@ abstract class AbstractListBlot extends TextBlot {
     /**
      * @inheritDoc
      */
-    public function __construct(array $currentOperation, array $previousOperation, array $nextOperation) {
-        parent::__construct($currentOperation, $previousOperation, $nextOperation);
-        if (\stringBeginsWith($this->content, "\n")) {
-            $this->content = \ltrim($this->content, "\n");
-            $this->shouldClearCurrentBlock = true;
-        }
+    public static function isOwnGroup(): bool {
+        return false;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    protected static function getAttributeKey(): string {
+        return "list";
+    }
+
+    /**
+     * @inheritDoc
+     */
+    protected static function getMatchingAttributeValue() {
+        return static::getListType();
     }
 
     /**
@@ -43,35 +50,5 @@ abstract class AbstractListBlot extends TextBlot {
         }
 
         return "<li$classString>" . parent::render() . "</li>";
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public static function matches(array $operations): bool {
-        $found = false;
-
-        foreach($operations as $op) {
-            if(valr("attributes.list", $op) === static::getListType()) {
-                $found = true;
-                break;
-            }
-        }
-
-        return $found;
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public function shouldClearCurrentBlock(Block $block): bool {
-       return $this->shouldClearCurrentBlock;
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public function hasConsumedNextOp(): bool {
-        return true;
     }
 }

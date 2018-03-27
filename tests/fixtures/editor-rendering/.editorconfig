@@ -1,0 +1,5 @@
+# editorconfig.org
+root = true
+
+trim_trailing_whitespace = false
+insert_final_newline = false

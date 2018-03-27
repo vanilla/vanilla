@@ -366,10 +366,7 @@ $embedded-quote_fg: #A3A3A3 !default;
     margin-bottom: 3px;
 }
 
-
 .insertPopover-body {
-    max-height: $richEditor-insertPopover_maxHeight;
-    height: $richEditor-insertPopover_height;
     margin-bottom: $richEditor-insertPopover_paddingHorizontal;
     padding: {
         left: $richEditor-insertPopover_paddingHorizontal;
@@ -377,14 +374,27 @@ $embedded-quote_fg: #A3A3A3 !default;
     }
 }
 
+.insertEmoji-body {
+    max-height: $richEditor-insertPopover_maxHeight;
+    height: $richEditor-insertPopover_height;
+}
+
 .content-wrapper {
     height: 100%;
 }
 
-.richEditor-menu.insertEmoji {
+.embedDialogue {
+    position: relative;
+}
+
+.richEditor-menu.insertPopover {
     position: absolute;
     bottom: 100%;
     left: 0;
+}
+
+.insertMedia-title {
+    font-size: 100%;
 }
 
 .richEditor-insertEmoji {
@@ -396,8 +406,6 @@ $embedded-quote_fg: #A3A3A3 !default;
 .richEditor ~ .TextBoxWrapper {
     display: none;
 }
-
-
 
 // Nub styles
 .richEditor-nubPosition {

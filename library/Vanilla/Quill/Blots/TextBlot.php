@@ -9,7 +9,8 @@ namespace Vanilla\Quill\Blots;
 
 use Vanilla\Quill\Blots\Embeds\EmojiBlot;
 use Vanilla\Quill\Formats;
-use Vanilla\Quill\Block;
+use Vanilla\Quill\BlotGroup;
+use Vanilla\Quill\Renderer;
 
 class TextBlot extends AbstractBlot {
 
@@ -37,8 +38,12 @@ class TextBlot extends AbstractBlot {
         parent::__construct($currentOperation, $previousOperation, $nextOperation);
 
         $insert = val("insert", $this->currentOperation, "");
-
         $this->content = \htmlentities($insert, \ENT_QUOTES);
+
+        if (preg_match("/\\n$/", $this->content)) {
+            $this->currentOperation[BlotGroup::BREAK_MARKER] = true;
+            $this->content = \rtrim($this->content, "\n");
+        }
     }
 
 
@@ -69,9 +74,7 @@ class TextBlot extends AbstractBlot {
             $result .= self::renderOpeningTag($tag);
         }
 
-        if ($this->content) {
-            $result .= $this->createLineBreaks($this->content);
-        }
+        $result .= $this->createLineBreaks($this->content);
         foreach($this->closingTags as $tag) {
             $result .= self::renderClosingTag($tag);
         }
@@ -82,8 +85,8 @@ class TextBlot extends AbstractBlot {
     /**
      * @inheritDoc
      */
-    public function shouldClearCurrentBlock(Block $block): bool {
-        return false;
+    public function shouldClearCurrentGroup(BlotGroup $group): bool {
+        return \array_key_exists(BlotGroup::BREAK_MARKER, $this->currentOperation);
     }
 
     /**
@@ -146,14 +149,14 @@ class TextBlot extends AbstractBlot {
      * @inheritDoc
      */
     protected function createLineBreaks(string $input): string {
-        $isTouchingEmoji = EmojiBlot::matches([$this->nextOperation]) || EmojiBlot::matches([$this->previousOperation]);
-
-        if ($input === "\n" && !$isTouchingEmoji) {
+        if ($this->content === "") {
             return "<br>";
         }
 
-        // Replace any newlines with breaks
-        $singleNewLineReplacement = "</p><p>";
-        return \preg_replace("/\\n/", $singleNewLineReplacement, $input);
+        if (\preg_match("/^\\n.+/", $this->content)) {
+            return \preg_replace("/^\\n/", "<br></p><p>", $input);
+        } else {
+            return $input;
+        }
     }
 }

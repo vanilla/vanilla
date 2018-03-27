@@ -11,13 +11,12 @@ import Emitter from "quill/core/emitter";
 import EditorToolbar from "./EditorToolbar";
 import { pilcrow as PilcrowIcon } from "./Icons";
 import { closeEditorFlyouts, CLOSE_FLYOUT_EVENT } from "../quill-utilities";
-import UniqueID from "react-html-id";
-import { t } from "@core/utility";
+import { withEditor, editorContextTypes } from "./EditorProvider";
 
-export default class ParagraphEditorToolbar extends React.PureComponent {
+export class ParagraphEditorToolbar extends React.PureComponent {
 
     static propTypes = {
-        quill: PropTypes.instanceOf(Quill),
+        ...editorContextTypes,
     };
 
     static initialRange = {
@@ -74,11 +73,7 @@ export default class ParagraphEditorToolbar extends React.PureComponent {
 
         // Quill can directly on the class as it won't ever change in a single instance.
         this.quill = props.quill;
-        UniqueID.enableUniqueIds(this);
-        this.ID = this.nextUniqueId();
-        this.componentID = "paragraphMenu-component-" + this.ID;
-        this.menuID = "paragraphMenu-menu-" + this.ID;
-        this.buttonID = "paragraphMenu-button-" + this.ID;
+
         this.state = {
             showPilcrow: true,
             showMenu: false,
@@ -86,13 +81,11 @@ export default class ParagraphEditorToolbar extends React.PureComponent {
         };
     }
 
-
     /**
      * Mount quill listeners.
      */
     componentDidMount() {
         this.quill.on(Emitter.events.EDITOR_CHANGE, this.handleEditorChange);
-        document.addEventListener("keydown", this.escFunction, false);
         document.addEventListener(CLOSE_FLYOUT_EVENT, this.closeMenu);
     }
 
@@ -101,7 +94,6 @@ export default class ParagraphEditorToolbar extends React.PureComponent {
      */
     componentWillUnmount() {
         this.quill.off(Emitter.events.EDITOR_CHANGE, this.handleEditorChange);
-        document.removeEventListener("keydown", this.escFunction, false);
         document.removeEventListener(CLOSE_FLYOUT_EVENT, this.closeMenu);
     }
 
@@ -111,33 +103,14 @@ export default class ParagraphEditorToolbar extends React.PureComponent {
      * @param {Event} event -
      */
     closeMenu = (event) => {
-        if (event.detail && event.detail.firingKey && event.detail.firingKey === this.constructor.name) {
+        if (event.detail.firingKey === this.constructor.name) {
             return;
         }
-
-        const activeElement = document.activeElement;
-        const parentElement = document.getElementById(this.componentID);
 
         this.setState({
             showMenu: false,
         });
-
-        if (parentElement.contains(activeElement)) {
-            document.getElementById(this.buttonID).focus();
-        }
     };
-
-    /**
-     * Handle the escape key.
-     *
-     * @param {React.KeyboardEvent} event - A synthetic keyboard event.
-     */
-    escFunction = (event) => {
-        if(event.keyCode === 27) {
-            this.closeMenu(event);
-            document.getElementById(this.buttonID).focus();
-        }
-    }
 
     /**
      * Handle changes from the editor.
@@ -230,71 +203,35 @@ export default class ParagraphEditorToolbar extends React.PureComponent {
         closeEditorFlyouts(this.constructor.name);
     };
 
-    /**
-     * Close if we lose focus on the component
-     * @param {React.FocusEvent} event - A synthetic event.
-     */
-    checkForExternalFocus = (event) => {
-        setImmediate(() => {
-            const activeElement = document.activeElement;
-            const paragraphMenu = document.getElementById(this.componentID);
-            if (activeElement.id !== paragraphMenu && !paragraphMenu.contains(activeElement)) {
-                this.closeMenu(event);
-            }
-        });
-    };
-
-    /**
-     * Handle key presses
-     * @param {React.SyntheticEvent} e
-     */
-    handleKeyPress = (event) => {
-        switch (event.key) {
-        case "ArrowUp":
-        case "ArrowRight":
-            event.preventDefault();
-            this.setState({
-                showMenu: false,
-            });
-            break;
-        case "ArrowDown":
-        case "ArrowLeft":
-            event.preventDefault();
-            this.setState({
-                showMenu: true,
-            });
-            break;
-        }
-        closeEditorFlyouts(this.constructor.name);
-    }
-
     render() {
+        const toolbarStyles = this.getToolbarStyles();
+        const pilcrowStyles = this.getPilcrowStyles();
+        const toolbarClasses = this.getToolbarClasses();
         let pilcrowClasses = "richEditor-button richEditorParagraphMenu-handle";
         if (!this.state.showPilcrow) {
             pilcrowClasses += " isHidden";
         }
 
-        return <div id={this.componentID} style={this.getPilcrowStyles()} className="richEditor-menu richEditorParagraphMenu">
+        return <div style={pilcrowStyles} className="richEditor-menu richEditorParagraphMenu">
             <button
-                type="button"
-                id={this.buttonID}
-                aria-controls={this.menuID}
-                aria-expanded={this.state.showMenu}
-                disabled={!this.state.showPilcrow}
                 className={pilcrowClasses}
-                aria-haspopup="true"
+                disabled={!this.state.showPilcrow}
+                type="button"
+                aria-haspopup="menu"
+                aria-expanded="false"
+                aria-controls="tempId-paragraphLevelMenu-toggle"
                 onClick={this.pilcrowClickHandler}
-                onKeyDown={this.handleKeyPress}
-                aria-label={t('richEditor.menu.paragraph')}
             >
                 <PilcrowIcon/>
             </button>
-            <div id={this.menuID} className={this.getToolbarClasses()} style={this.getToolbarStyles()} ref={(ref) => this.toolbarNode = ref} role="menu">
-                <EditorToolbar quill={this.quill} menuItems={this.menuItems} isHidden={!this.state.showMenu} checkForExternalFocus={this.checkForExternalFocus} itemRole="menuitem"/>
-                <div role="presentation" className="richEditor-nubPosition">
+            <div className={toolbarClasses} style={toolbarStyles} ref={(ref) => this.toolbarNode = ref}>
+                <EditorToolbar menuItems={this.menuItems} isHidden={!this.state.showMenu}/>
+                <div className="richEditor-nubPosition">
                     <div className="richEditor-nub"/>
                 </div>
             </div>
         </div>;
     }
 }
+
+export default withEditor(ParagraphEditorToolbar);

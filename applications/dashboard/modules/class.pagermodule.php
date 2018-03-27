@@ -112,11 +112,11 @@ class PagerModule extends Gdn_Module {
     }
 
     /**
-     * Add prev/next rel meta pagination tags to the document head. Also, add Link header to the response.
+     * Add prev/next relationship links to document and the response headers.
      *
      * @param Gdn_Controller $controller
      */
-    private function addPageMeta(Gdn_Controller $controller) {
+    private function addRelLinks(Gdn_Controller $controller) {
         static $pending = true;
 
         // Make sure this only happens once.
@@ -127,7 +127,7 @@ class PagerModule extends Gdn_Module {
 
             if ($currentPage > 1) {
                 $prevHref = $this->pageUrl($currentPage - 1);
-                $head->addTag('meta', [
+                $head->addTag('link', [
                     'rel' => 'prev',
                     'href' => $prevHref
                 ]);
@@ -136,7 +136,7 @@ class PagerModule extends Gdn_Module {
 
             if ($this->hasMorePages()) {
                 $nextHref = $this->pageUrl($currentPage + 1);
-                $head->addTag('meta', [
+                $head->addTag('link', [
                     'rel' => 'next',
                     'href' => $nextHref
                 ]);
@@ -193,7 +193,7 @@ class PagerModule extends Gdn_Module {
             }
 
             $this->_PropertiesDefined = true;
-            $this->addPageMeta(Gdn::controller());
+            $this->addRelLinks(Gdn::controller());
 
             Gdn::controller()->EventArguments['Pager'] = $this;
             Gdn::controller()->fireEvent('PagerInit');

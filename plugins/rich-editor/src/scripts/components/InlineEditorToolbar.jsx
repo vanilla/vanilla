@@ -259,7 +259,7 @@ export class InlineEditorToolbar extends React.Component {
     render() {
         const alertMessage = this.state.showLink ? null : <span aria-live="assertive" role="alert" className="sr-only">{t('Inline Menu Available')}</span>;
         return <div>
-            <SelectionPositionToolbar setVisibility={this.setVisibilityOfUrlInput.bind(this)} quill={this.quill} forceVisibility={this.state.showLink ? "hidden" : "ignore"}>
+            <SelectionPositionToolbar setVisibility={this.setVisibilityOfMenu.bind(this)} quill={this.quill} forceVisibility={this.state.showLink ? "hidden" : "ignore"}>
                 {alertMessage}
                 <EditorToolbar quill={this.quill} menuItems={this.menuItems}/>
             </SelectionPositionToolbar>

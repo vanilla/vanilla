@@ -136,8 +136,6 @@ export class ParagraphEditorToolbar extends React.PureComponent {
             console.log("Escape from Paragraph Toolbar");
             this.closeMenu(event);
             document.getElementById(this.buttonID).focus();
-            // event.stopPropagation();
-            // event.stopImmediatePropagation();
         }
     }
 
@@ -286,6 +284,7 @@ export class ParagraphEditorToolbar extends React.PureComponent {
                 className={pilcrowClasses}
                 aria-haspopup="menu"
                 onClick={this.pilcrowClickHandler}
+                onKeyDown={this.handleKeyPress}
             >
                 <PilcrowIcon/>
             </button>

@@ -114,13 +114,11 @@ export class InlineEditorToolbar extends React.Component {
      * @param {Event} event -
      */
     escFunction = (event) => {
-
-        this.setState({
-            value: "",
-            showLink: false,
-        });
-
         if(event.keyCode === 27 && (this.state.isMenuVisible || this.state.isUrlInputVisible)) {
+            this.setState({
+                value: "",
+                showLink: false,
+            });
             const range = this.quill.getSelection(true);
             this.quill.setSelection((range.length + range.index), 0, Emitter.sources.USER);
         }

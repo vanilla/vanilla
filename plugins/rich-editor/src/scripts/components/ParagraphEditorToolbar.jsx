@@ -11,6 +11,7 @@ import Emitter from "quill/core/emitter";
 import EditorToolbar from "./EditorToolbar";
 import { pilcrow as PilcrowIcon } from "./Icons";
 import { closeEditorFlyouts, CLOSE_FLYOUT_EVENT } from "../quill-utilities";
+import UniqueID from "react-html-id";
 
 export default class ParagraphEditorToolbar extends React.PureComponent {
 
@@ -72,7 +73,11 @@ export default class ParagraphEditorToolbar extends React.PureComponent {
 
         // Quill can directly on the class as it won't ever change in a single instance.
         this.quill = props.quill;
-
+        UniqueID.enableUniqueIds(this);
+        this.ID = this.nextUniqueId();
+        this.componentID = "paragraphMenu-component-" + this.ID;
+        this.menuID = "paragraphMenu-menu-" + this.ID;
+        this.buttonID = "paragraphMenu-button-" + this.ID;
         this.state = {
             showPilcrow: true,
             showMenu: false,
@@ -102,7 +107,7 @@ export default class ParagraphEditorToolbar extends React.PureComponent {
      * @param {Event} event -
      */
     closeMenu = (event) => {
-        if (event.detail.firingKey === this.constructor.name) {
+        if (event.detail && event.detail.firingKey === this.constructor.name) {
             return;
         }
 
@@ -202,30 +207,42 @@ export default class ParagraphEditorToolbar extends React.PureComponent {
         closeEditorFlyouts(this.constructor.name);
     };
 
+    /**
+     * Close if we lose focus on the component
+     * @param {React.FocusEvent} event - A synthetic event.
+     */
+    checkForExternalFocus = (event) => {
+        setImmediate(() => {
+            const activeElement = document.activeElement;
+            const paragraphMenu = document.getElementById(this.componentID);
+            if (activeElement.id !== paragraphMenu && !paragraphMenu.contains(activeElement)) {
+                this.closeMenu(event);
+            }
+        });
+    };
+
     render() {
-        const toolbarStyles = this.getToolbarStyles();
-        const pilcrowStyles = this.getPilcrowStyles();
-        const toolbarClasses = this.getToolbarClasses();
         let pilcrowClasses = "richEditor-button richEditorParagraphMenu-handle";
         if (!this.state.showPilcrow) {
             pilcrowClasses += " isHidden";
         }
 
-        return <div style={pilcrowStyles} className="richEditor-menu richEditorParagraphMenu">
+        return <div id={this.componentID} style={this.getPilcrowStyles()} className="richEditor-menu richEditorParagraphMenu">
             <button
-                className={pilcrowClasses}
-                disabled={!this.state.showPilcrow}
                 type="button"
-                aria-haspopup="menu"
-                aria-expanded="false"
-                aria-controls="tempId-paragraphLevelMenu-toggle"
+                id={this.buttonID}
+                aria-controls={this.menuID}
+                aria-expanded={this.state.showMenu}
+                disabled={!this.state.showPilcrow}
+                className={pilcrowClasses}
+                aria-haspopup="true"
                 onClick={this.pilcrowClickHandler}
             >
                 <PilcrowIcon/>
             </button>
-            <div className={toolbarClasses} style={toolbarStyles} ref={(ref) => this.toolbarNode = ref}>
-                <EditorToolbar quill={this.quill} menuItems={this.menuItems} isHidden={!this.state.showMenu}/>
-                <div className="richEditor-nubPosition">
+            <div id={this.menuID} className={this.getToolbarClasses()} style={this.getToolbarStyles()} ref={(ref) => this.toolbarNode = ref} role="menu">
+                <EditorToolbar quill={this.quill} menuItems={this.menuItems} isHidden={!this.state.showMenu} checkForExternalFocus={this.checkForExternalFocus}/>
+                <div role="presentation" className="richEditor-nubPosition">
                     <div className="richEditor-nub"/>
                 </div>
             </div>

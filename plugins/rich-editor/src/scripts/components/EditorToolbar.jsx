@@ -11,7 +11,6 @@ import LinkBlot from "quill/formats/link";
 import { t } from "@core/utility";
 import EditorMenuItem from "./EditorMenuItem";
 import * as quillUtilities from "../quill-utilities";
-import isEqual from "lodash/isEqual";
 
 /**
  * @typedef {Object} MenuItemData
@@ -29,8 +28,9 @@ export default class EditorToolbar extends React.PureComponent {
 
     static propTypes = {
         quill: PropTypes.instanceOf(Quill).isRequired,
-        menuItems: PropTypes.object,
+        menuItems: PropTypes.object.isRequired,
         isHidden: PropTypes.bool,
+        checkForExternalFocus: PropTypes.func,
     };
 
     static defaultItems = {
@@ -62,9 +62,7 @@ export default class EditorToolbar extends React.PureComponent {
      */
     constructor(props) {
         super(props);
-
         this.state = props.menuItems || EditorToolbar.defaultItems;
-
         // Quill can directly on the class as it won't ever change in a single instance.
         this.quill = props.quill;
     }
@@ -118,24 +116,24 @@ export default class EditorToolbar extends React.PureComponent {
      * @inheritDoc
      */
     render() {
-        const menuItems = Object.keys(this.state).map((itemName, key) => {
+        const menuItemList = Object.keys(this.state);
+        const checkForExternalFocus = this.props.checkForExternalFocus;
+        const menuItems = menuItemList.map((itemName, key) => {
             const isActive = this.state[itemName].active;
-
             return <EditorMenuItem
                 propertyName={itemName}
+                label={t('itemName')}
                 key={key}
                 isActive={isActive}
+                isLast={key + 1 === menuItemList.length}
                 clickHandler={this.formatItem.bind(this, itemName)}
+                checkForExternalFocus={checkForExternalFocus}
             />;
         });
 
         return (
             <div className="richEditor-menu" role="dialog" aria-label={t("Inline Level Formatting Menu")}>
-                <ul
-                    className="richEditor-menuItems MenuItems"
-                    role="menubar"
-                    aria-label={t("Inline Level Formatting Menu")}
-                >
+                <ul className="richEditor-menuItems MenuItems" role="presentation">
                     {menuItems}
                 </ul>
             </div>
@@ -168,7 +166,7 @@ export default class EditorToolbar extends React.PureComponent {
         }
 
         this.update();
-    };
+    }
 
 
     /**

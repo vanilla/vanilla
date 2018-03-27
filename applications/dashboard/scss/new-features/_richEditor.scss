@@ -365,7 +365,6 @@ $embedded-quote_fg: #A3A3A3 !default;
     margin-bottom: 3px;
 }
 
-
 .insertPopover-body {
     margin-bottom: $richEditor-insertPopover_paddingHorizontal;
     padding: {
@@ -383,10 +382,18 @@ $embedded-quote_fg: #A3A3A3 !default;
     height: 100%;
 }
 
-.richEditor-menu.insertEmoji {
+.embedDialogue {
+    position: relative;
+}
+
+.richEditor-menu.insertPopover {
     position: absolute;
     bottom: 100%;
     left: 0;
+}
+
+.insertMedia-title {
+    font-size: 100%;
 }
 
 .richEditor-insertEmoji {

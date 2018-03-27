@@ -15,10 +15,8 @@ import React from "react";
 import ReactDOM from "react-dom";
 import InlineEditorToolbar from "./components/InlineEditorToolbar";
 import ParagraphEditorToolbar from "./components/ParagraphEditorToolbar";
-import EditorEmojiPicker from "./components/EditorEmojiPicker";
-
-import FileUploader from "@core/FileUploader";
-import {logError} from "@core/utility";
+import EmojiPicker from "./components/EmojiPicker";
+import EmbedDialogue from "./components/EmbedDialogue";
 import EditorProvider from "./components/EditorProvider";
 
 export default class VanillaTheme extends Theme {
@@ -59,6 +57,7 @@ export default class VanillaTheme extends Theme {
         this.mountToolbar();
         this.mountEmojiMenu();
         this.mountParagraphMenu();
+        this.mountEmbedDialogue();
     }
 
     /**
@@ -66,7 +65,6 @@ export default class VanillaTheme extends Theme {
      */
     mountToolbar() {
         const container = this.quill.container.closest(".richEditor").querySelector(".js-InlineEditorToolbar");
-        console.log(this.quill);
         ReactDOM.render(
             <EditorProvider quill={this.quill}>
                 <InlineEditorToolbar/>
@@ -95,7 +93,17 @@ export default class VanillaTheme extends Theme {
         const container = this.quill.container.closest(".richEditor").querySelector(".js-emojiHandle");
         ReactDOM.render(
             <EditorProvider quill={this.quill}>
-                <EditorEmojiPicker/>
+                <EmojiPicker/>
+            </EditorProvider>,
+            container
+        );
+    }
+
+    mountEmbedDialogue() {
+        const container = this.quill.container.closest(".richEditor").querySelector(".js-EmbedDialogue");
+        ReactDOM.render(
+            <EditorProvider quill={this.quill}>
+                <EmbedDialogue />
             </EditorProvider>,
             container
         );

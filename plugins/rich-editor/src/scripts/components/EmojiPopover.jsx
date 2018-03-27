@@ -14,7 +14,7 @@ import { Grid, AutoSizer } from 'react-virtualized';
 import { groups as emojiGroups } from 'emojibase-data/meta/groups.json';
 import * as utility from '@core/utility';
 import * as Icons from "./Icons";
-import InsertPopover from "./InsertPopover";
+import InsertPopover from "./Popover";
 import { withEditor, editorContextTypes } from "./EditorProvider";
 
 const buttonSize = 39;
@@ -41,10 +41,7 @@ export class EmojiPopover extends React.PureComponent {
         ...editorContextTypes,
         isVisible: PropTypes.bool.isRequired,
         closeMenu: PropTypes.func.isRequired,
-        menuID: PropTypes.string.isRequired,
-        emojiCategoriesID: PropTypes.string.isRequired,
-        pickerID: PropTypes.string.isRequired,
-        checkForExternalFocus: PropTypes.func.isRequired,
+        blurHandler: PropTypes.func.isRequired,
     };
 
     /**
@@ -157,7 +154,7 @@ export class EmojiPopover extends React.PureComponent {
         const title = t('Smileys & Faces');
         const description = t('Insert an emoji in your message.');
 
-        const extraHeadingContent = <button type="button" className="accessibility-jumpTo" onClick={() => this.focusOnCategories()}>
+        const extraHeadingContent = <button type="button" className="accessibility-jumpTo" onClick={this.focusOnCategories}>
             {t('Jump past emoji list, to emoji categories.')}
         </button>;
 
@@ -204,7 +201,7 @@ export class EmojiPopover extends React.PureComponent {
 
                 let onBlur = () => {};
                 if(groupKey + 1 === this.emojiGroupLength) {
-                    onBlur = this.props.checkForExternalFocus;
+                    onBlur = this.props.blurHandler;
                 }
 
                 return <button
@@ -226,12 +223,13 @@ export class EmojiPopover extends React.PureComponent {
         </div>;
 
         return <InsertPopover
+            id={this.props.id}
             title={title}
             accessibleDescription={description}
             additionalHeaderContent={extraHeadingContent}
             body={body}
             footer={footer}
-            className="insertEmoji"
+            additionalClassRoot="insertEmoji"
             closeMenu={this.props.closeMenu}
             isVisible={this.props.isVisible}
         />;

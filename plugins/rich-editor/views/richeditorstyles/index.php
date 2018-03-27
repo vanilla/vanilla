@@ -203,7 +203,7 @@
 <hr/>
 
 <h2>Insert Media</h2>
-<div class="richEditor-menu FlyoutMenu insertMedia insertPopover" role="dialog" aria-labelledby="tempId-insertMediaMenu-title" aria-describedby="tempId-insertMediaMenu-p">
+<div class="richEditor-menu FlyoutMenu insertMedia insertPopover" style="position: relative;" role="dialog" aria-labelledby="tempId-insertMediaMenu-title" aria-describedby="tempId-insertMediaMenu-p">
     <div class="insertPopover-header">
         <h2 id="tempId-insertMediaMenu-title" class="H insertMedia-title">
             <?php echo t('Insert Media'); ?>

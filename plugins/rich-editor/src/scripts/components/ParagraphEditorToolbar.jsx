@@ -251,12 +251,14 @@ export default class ParagraphEditorToolbar extends React.PureComponent {
     handleKeyPress = (event) => {
         switch (event.key) {
         case "ArrowUp":
+        case "ArrowRight":
             event.preventDefault();
             this.setState({
                 showMenu: false,
             });
             break;
         case "ArrowDown":
+        case "ArrowLeft":
             event.preventDefault();
             this.setState({
                 showMenu: true,

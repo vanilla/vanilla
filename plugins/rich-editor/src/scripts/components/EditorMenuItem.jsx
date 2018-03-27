@@ -36,6 +36,41 @@ export default class EditorMenuItem extends React.Component {
         this.buttonRole = props.role !== undefined ? props.role : "button";
     }
 
+    /**
+     * Handle key presses
+     * @param {Object} e
+     */
+    handleKeyPress = (event) => {
+        switch (event.key) {
+        case "ArrowRight":
+        case "ArrowDown":
+            event.stopPropagation();
+            event.preventDefault();
+            if (this.props.isLast) {
+                this.domButton.parentElement.firstChild.focus();
+            } else {
+                const nextSibling = this.domButton.nextSibling;
+                if (nextSibling) {
+                    nextSibling.focus();
+                }
+            }
+            break;
+        case "ArrowUp":
+        case "ArrowLeft":
+            event.stopPropagation();
+            event.preventDefault();
+            if (this.props.isFirst) {
+                this.domButton.parentElement.lastChild.focus();
+            } else {
+                const previousSibling = this.domButton.previousSibling;
+                if (previousSibling) {
+                    previousSibling.focus();
+                }
+            }
+            break;
+        }
+    };
+
     render() {
         const { propertyName, isActive, clickHandler } = this.props;
         const Icon = Icons[propertyName];
@@ -43,7 +78,7 @@ export default class EditorMenuItem extends React.Component {
             isActive: isActive || false,
         });
 
-        return <button className={buttonClasses} type="button" aria-label={t('richEditor.menu.' + this.props.propertyName)} role={this.props.role} aria-pressed={this.props.isActive} onClick={clickHandler} onBlur={this.checkForExternalFocus}>
+        return <button ref={(ref) => { this.domButton = ref; }} className={buttonClasses} type="button" aria-label={t('richEditor.menu.' + this.props.propertyName)} role={this.props.role} aria-pressed={this.props.isActive} onClick={clickHandler} onBlur={this.checkForExternalFocus} onKeyDown={this.handleKeyPress}>
             <Icon />
         </button>;
     }

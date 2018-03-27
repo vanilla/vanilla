@@ -135,6 +135,7 @@ export default class ParagraphEditorToolbar extends React.PureComponent {
     escFunction = (event) => {
         if(event.keyCode === 27) {
             this.closeMenu(event);
+            document.getElementById(this.buttonID).focus();
         }
     }
 
@@ -243,6 +244,28 @@ export default class ParagraphEditorToolbar extends React.PureComponent {
         });
     };
 
+    /**
+     * Handle key presses
+     * @param {React.SyntheticEvent} e
+     */
+    handleKeyPress = (event) => {
+        switch (event.key) {
+        case "ArrowUp":
+            event.preventDefault();
+            this.setState({
+                showMenu: false,
+            });
+            break;
+        case "ArrowDown":
+            event.preventDefault();
+            this.setState({
+                showMenu: true,
+            });
+            break;
+        }
+        closeEditorFlyouts(this.constructor.name);
+    }
+
     render() {
         let pilcrowClasses = "richEditor-button richEditorParagraphMenu-handle";
         if (!this.state.showPilcrow) {
@@ -259,12 +282,13 @@ export default class ParagraphEditorToolbar extends React.PureComponent {
                 className={pilcrowClasses}
                 aria-haspopup="true"
                 onClick={this.pilcrowClickHandler}
+                onKeyDown={this.handleKeyPress}
                 aria-label={t('richEditor.menu.paragraph')}
             >
                 <PilcrowIcon/>
             </button>
             <div id={this.menuID} className={this.getToolbarClasses()} style={this.getToolbarStyles()} ref={(ref) => this.toolbarNode = ref} role="menu">
-                <EditorToolbar quill={this.quill} menuItems={this.menuItems} isHidden={!this.state.showMenu} checkForExternalFocus={this.checkForExternalFocus}/>
+                <EditorToolbar quill={this.quill} menuItems={this.menuItems} isHidden={!this.state.showMenu} checkForExternalFocus={this.checkForExternalFocus} itemRole="menuitem"/>
                 <div role="presentation" className="richEditor-nubPosition">
                     <div className="richEditor-nub"/>
                 </div>

@@ -31,6 +31,7 @@ export default class EditorToolbar extends React.PureComponent {
         menuItems: PropTypes.object.isRequired,
         isHidden: PropTypes.bool,
         checkForExternalFocus: PropTypes.func,
+        itemRole: PropTypes.string,
     };
 
     static defaultItems = {
@@ -126,16 +127,18 @@ export default class EditorToolbar extends React.PureComponent {
                 key={key}
                 isActive={isActive}
                 isLast={key + 1 === menuItemList.length}
+                isFirst={key === 0}
                 clickHandler={this.formatItem.bind(this, itemName, event)}
                 checkForExternalFocus={checkForExternalFocus}
+                role={this.props.itemRole}
             />;
         });
 
         return (
-            <div className="richEditor-menu">
-                <ul className="richEditor-menuItems MenuItems" role="presentation">
+            <div className="richEditor-menu" role="menu">
+                <div className="richEditor-menuItems MenuItems">
                     {menuItems}
-                </ul>
+                </div>
             </div>
         );
     }

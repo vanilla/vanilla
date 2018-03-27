@@ -22,7 +22,9 @@ export default class EditorMenuItem extends React.Component {
         clickHandler: PropTypes.func.isRequired,
         isActive: PropTypes.bool.isRequired,
         checkForExternalFocus: PropTypes.func,
+        isFirst: PropTypes.bool.isRequired,
         isLast: PropTypes.bool.isRequired,
+        role: PropTypes.string,
     };
 
     /**
@@ -31,19 +33,18 @@ export default class EditorMenuItem extends React.Component {
     constructor(props) {
         super(props);
         this.checkForExternalFocus = (props.isLast && props.checkForExternalFocus !== undefined) ? props.checkForExternalFocus : doNothingOnBlur => {};
+        this.buttonRole = props.role !== undefined ? props.role : "button";
     }
 
     render() {
         const { propertyName, isActive, clickHandler } = this.props;
         const Icon = Icons[propertyName];
-        const buttonClasses = classnames("richEditor-button", {
+        const buttonClasses = classnames("richEditor-button", "richEditor-menuItem", {
             isActive: isActive || false,
         });
 
-        return <li className="richEditor-menuItem" role="presentation">
-            <button className={buttonClasses} type="button" aria-label={t('richEditor.menu.' + this.props.propertyName)} role="menuitem" aria-pressed={this.props.isActive} onClick={clickHandler} onBlur={this.checkForExternalFocus}>
-                <Icon />
-            </button>
-        </li>;
+        return <button className={buttonClasses} type="button" aria-label={t('richEditor.menu.' + this.props.propertyName)} role={this.props.role} aria-pressed={this.props.isActive} onClick={clickHandler} onBlur={this.checkForExternalFocus}>
+            <Icon />
+        </button>;
     }
 }

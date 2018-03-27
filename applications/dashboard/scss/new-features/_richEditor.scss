@@ -127,10 +127,11 @@ $embedded-quote_fg: #A3A3A3 !default;
 
 .richEditor-menuItem {
     display: block;
-    margin: 0;
     padding: 0;
+    margin: 0;
 
-    .richEditor-button {
+    .richEditor-button,
+    &.richEditor-button {
         height: $richEditor-menuButton_size;
         width: $richEditor-menuButton_size;
         font-size: #{$richEditor-menuButton_size * 24 / 39};

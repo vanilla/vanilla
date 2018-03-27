@@ -203,7 +203,7 @@ abstract class Authenticator {
             'getRegisterUrl' => $this->getRegisterUrl(),
             'getSignOutUrl' => $this->getSignOutUrl(),
             'ui' => [
-                'url' => url('/authenticate/signin/'.static::getType().'/'.$this->getID())
+                'url' => strtolower(url('/authenticate/signin/'.static::getType().'/'.$this->getID())),
             ],
             'isActive' => $this->isActive(),
             'attributes' => [],
@@ -275,5 +275,4 @@ abstract class Authenticator {
      * @return array The user's information.
      */
      abstract public function validateAuthentication(RequestInterface $request);
-
 }

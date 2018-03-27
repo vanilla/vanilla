@@ -13,6 +13,7 @@ import { pilcrow as PilcrowIcon } from "./Icons";
 import { closeEditorFlyouts, CLOSE_FLYOUT_EVENT } from "../quill-utilities";
 import { withEditor, editorContextTypes } from "./EditorProvider";
 import UniqueID from "react-html-id";
+import { t } from "@core/utility";
 
 export class ParagraphEditorToolbar extends React.PureComponent {
 
@@ -285,6 +286,7 @@ export class ParagraphEditorToolbar extends React.PureComponent {
             <button
                 type="button"
                 id={this.buttonID}
+                aria-label={t('richEditor.menu.paragraph')}
                 aria-controls={this.menuID}
                 aria-expanded={this.state.showMenu}
                 disabled={!this.state.showPilcrow}

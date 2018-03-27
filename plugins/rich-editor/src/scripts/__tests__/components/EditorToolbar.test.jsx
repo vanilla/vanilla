@@ -1,7 +1,7 @@
 import React from "react";
 import { mount, shallow } from "enzyme";
 import EditorMenuItem from "../../components/EditorMenuItem";
-import EditorToolbar from "../../components/EditorToolbar";
+import { EditorToolbar } from "../../components/EditorToolbar";
 import Quill from "quill/core";
 
 jest.mock('quill/core');

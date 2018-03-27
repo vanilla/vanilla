@@ -405,11 +405,14 @@ button.Close {
 }
 
 .insertPopover-body {
-  max-height: 100vh;
-  height: 292.5px;
   margin-bottom: 12px;
   padding-left: 12px;
   padding-right: 12px;
+}
+
+.insertEmoji-body {
+  max-height: 100vh;
+  height: 292.5px;
 }
 
 .content-wrapper {

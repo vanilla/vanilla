@@ -11,11 +11,12 @@ import Emitter from "quill/core/emitter";
 import EditorToolbar from "./EditorToolbar";
 import { pilcrow as PilcrowIcon } from "./Icons";
 import { closeEditorFlyouts, CLOSE_FLYOUT_EVENT } from "../quill-utilities";
+import { withEditor, editorContextTypes } from "./EditorProvider";
 
-export default class ParagraphEditorToolbar extends React.PureComponent {
+export class ParagraphEditorToolbar extends React.PureComponent {
 
     static propTypes = {
-        quill: PropTypes.instanceOf(Quill),
+        ...editorContextTypes,
     };
 
     static initialRange = {
@@ -224,7 +225,7 @@ export default class ParagraphEditorToolbar extends React.PureComponent {
                 <PilcrowIcon/>
             </button>
             <div className={toolbarClasses} style={toolbarStyles} ref={(ref) => this.toolbarNode = ref}>
-                <EditorToolbar quill={this.quill} menuItems={this.menuItems} isHidden={!this.state.showMenu}/>
+                <EditorToolbar menuItems={this.menuItems} isHidden={!this.state.showMenu}/>
                 <div className="richEditor-nubPosition">
                     <div className="richEditor-nub"/>
                 </div>
@@ -232,3 +233,5 @@ export default class ParagraphEditorToolbar extends React.PureComponent {
         </div>;
     }
 }
+
+export default withEditor(ParagraphEditorToolbar);

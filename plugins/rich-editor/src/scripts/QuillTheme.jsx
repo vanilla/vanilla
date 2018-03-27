@@ -19,6 +19,7 @@ import EditorEmojiPicker from "./components/EditorEmojiPicker";
 
 import FileUploader from "@core/FileUploader";
 import {logError} from "@core/utility";
+import EditorProvider from "./components/EditorProvider";
 
 export default class VanillaTheme extends Theme {
 
@@ -65,7 +66,13 @@ export default class VanillaTheme extends Theme {
      */
     mountToolbar() {
         const container = this.quill.container.closest(".richEditor").querySelector(".js-InlineEditorToolbar");
-        ReactDOM.render(<InlineEditorToolbar quill={this.quill}/>, container);
+        console.log(this.quill);
+        ReactDOM.render(
+            <EditorProvider quill={this.quill}>
+                <InlineEditorToolbar/>
+            </EditorProvider>,
+            container
+        );
     }
 
     /**
@@ -73,7 +80,12 @@ export default class VanillaTheme extends Theme {
      */
     mountParagraphMenu() {
         const container = this.quill.container.closest(".richEditor").querySelector(".js-ParagraphEditorToolbar");
-        ReactDOM.render(<ParagraphEditorToolbar quill={this.quill}/>, container);
+        ReactDOM.render(
+            <EditorProvider quill={this.quill}>
+                <ParagraphEditorToolbar/>
+            </EditorProvider>,
+            container
+        );
     }
 
     /**
@@ -81,6 +93,11 @@ export default class VanillaTheme extends Theme {
      */
     mountEmojiMenu() {
         const container = this.quill.container.closest(".richEditor").querySelector(".js-emojiHandle");
-        ReactDOM.render(<EditorEmojiPicker quill={this.quill}/>, container);
+        ReactDOM.render(
+            <EditorProvider quill={this.quill}>
+                <EditorEmojiPicker/>
+            </EditorProvider>,
+            container
+        );
     }
 }

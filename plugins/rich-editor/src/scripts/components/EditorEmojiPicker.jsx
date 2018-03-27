@@ -5,17 +5,16 @@
  */
 
 import React from "react";
-import * as PropTypes from "prop-types";
-import Quill from "quill/core";
-import EditorEmojiMenu from "../components/EditorEmojiMenu";
+import EmojiPopover from "./EmojiPopover";
 import * as Icons from "./Icons";
 import UniqueID from "react-html-id";
 import { closeEditorFlyouts, CLOSE_FLYOUT_EVENT } from "../quill-utilities";
+import { withEditor, editorContextTypes } from "./EditorProvider";
 
-export default class EditorEmojiPicker extends React.Component {
+export class EditorEmojiPicker extends React.Component {
 
     static propTypes = {
-        quill: PropTypes.instanceOf(Quill).isRequired,
+        ...editorContextTypes,
     };
 
     /**
@@ -120,7 +119,9 @@ export default class EditorEmojiPicker extends React.Component {
             <button onClick={this.toggleEmojiMenu} onBlur={this.checkForExternalFocus} className="richEditor-button" type="button" id={this.buttonID} aria-controls={this.menuID} aria-expanded={this.state.isVisible} aria-haspopup="true">
                 {Icons.emoji()}
             </button>
-            <EditorEmojiMenu {...this.state} checkForExternalFocus={this.checkForExternalFocus} pickerID={this.pickerID} menuID={this.menuID} menuDescriptionID={this.menuDescriptionID} emojiCategoriesID={this.emojiCategoriesID} menuTitleID={this.menuTitleID} quill={this.quill} closeMenu={this.closeMenu}/>
+            <EmojiPopover {...this.state} checkForExternalFocus={this.checkForExternalFocus} pickerID={this.pickerID} menuID={this.menuID} menuDescriptionID={this.menuDescriptionID} emojiCategoriesID={this.emojiCategoriesID} menuTitleID={this.menuTitleID} closeMenu={this.closeMenu}/>
         </div>;
     }
 }
+
+export default withEditor(EditorEmojiPicker);

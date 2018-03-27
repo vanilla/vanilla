@@ -11,7 +11,7 @@ import LinkBlot from "quill/formats/link";
 import { t } from "@core/utility";
 import EditorMenuItem from "./EditorMenuItem";
 import * as quillUtilities from "../quill-utilities";
-import isEqual from "lodash/isEqual";
+import { withEditor, editorContextTypes } from "./EditorProvider";
 
 /**
  * @typedef {Object} MenuItemData
@@ -25,10 +25,10 @@ import isEqual from "lodash/isEqual";
 /**
  * Component for declaring a dynamic toolbar linked to a quill instance.
  */
-export default class EditorToolbar extends React.PureComponent {
+export class EditorToolbar extends React.PureComponent {
 
     static propTypes = {
-        quill: PropTypes.instanceOf(Quill).isRequired,
+        ...editorContextTypes,
         menuItems: PropTypes.object,
         isHidden: PropTypes.bool,
     };
@@ -225,3 +225,5 @@ export default class EditorToolbar extends React.PureComponent {
         this.setState(newState);
     }
 }
+
+export default withEditor(EditorToolbar);

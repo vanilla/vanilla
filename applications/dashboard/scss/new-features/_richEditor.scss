@@ -367,13 +367,16 @@ $embedded-quote_fg: #A3A3A3 !default;
 
 
 .insertPopover-body {
-    max-height: $richEditor-insertPopover_maxHeight;
-    height: $richEditor-insertPopover_height;
     margin-bottom: $richEditor-insertPopover_paddingHorizontal;
     padding: {
         left: $richEditor-insertPopover_paddingHorizontal;
         right: $richEditor-insertPopover_paddingHorizontal;
     }
+}
+
+.insertEmoji-body {
+    max-height: $richEditor-insertPopover_maxHeight;
+    height: $richEditor-insertPopover_height;
 }
 
 .content-wrapper {
@@ -395,8 +398,6 @@ $embedded-quote_fg: #A3A3A3 !default;
 .richEditor ~ .TextBoxWrapper {
     display: none;
 }
-
-
 
 // Nub styles
 .richEditor-nubPosition {

@@ -10,11 +10,12 @@ import Quill from "quill/core";
 import Events from "@core/events";
 import Emitter from "quill/core/emitter";
 import { Range } from "quill/core/selection";
-import {CLOSE_FLYOUT_EVENT} from "../quill-utilities";
+import { CLOSE_FLYOUT_EVENT } from "../quill-utilities";
+import { withEditor, editorContextTypes } from "./EditorProvider";
 
-export default class FloatingToolbar extends React.Component {
+export class FloatingToolbar extends React.Component {
     static propTypes = {
-        quill: PropTypes.instanceOf(Quill).isRequired,
+        ...editorContextTypes,
         children: PropTypes.node.isRequired,
         forceVisibility: PropTypes.string.isRequired,
     };
@@ -258,3 +259,5 @@ export default class FloatingToolbar extends React.Component {
         </div>;
     }
 }
+
+export default withEditor(FloatingToolbar);

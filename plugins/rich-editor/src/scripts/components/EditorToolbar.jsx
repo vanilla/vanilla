@@ -162,9 +162,9 @@ export class EditorToolbar extends React.PureComponent {
                 isActive={isActive}
                 isLast={key + 1 === menuItemList.length}
                 isFirst={key === 0}
-                clickHandler={this.formatItem.bind(this, itemName, event)}
+                clickHandler={(event) => {this.formatItem(itemName, event)}}
                 checkForExternalFocus={checkForExternalFocus}
-                onKeyDown={this.handleKeyPress.bind(this, itemName, event)}
+                onKeyDown={(event) => {this.handleKeyPress(itemName, event)}}
                 role={this.props.itemRole}
             />;
         });

@@ -6,6 +6,10 @@ ShallowWrapper {
   Symbol(enzyme.__root__): [Circular],
   Symbol(enzyme.__unrendered__): <EditorMenuItem
     clickHandler={[Function]}
+    isActive={true}
+    isFirst={false}
+    isLast={false}
+    label="Bold"
     propertyName="bold"
   />,
   Symbol(enzyme.__renderer__): Object {
@@ -20,28 +24,45 @@ ShallowWrapper {
     "key": undefined,
     "nodeType": "host",
     "props": Object {
-      "children": <button
-        className="richEditor-button"
-        onClick={[Function]}
-        type="button"
-      >
-        <bold />
-      </button>,
-      "className": "richEditor-menuItem",
-      "role": "menuitem",
+      "aria-label": "richEditor.menu.bold",
+      "aria-pressed": true,
+      "children": <bold />,
+      "className": "richEditor-button richEditor-menuItem isActive",
+      "onBlur": [Function],
+      "onClick": [Function],
+      "onKeyDown": [Function],
+      "role": undefined,
+      "type": "button",
     },
-    "ref": null,
+    "ref": [Function],
     "rendered": Object {
+      "instance": null,
+      "key": undefined,
+      "nodeType": "function",
+      "props": Object {},
+      "ref": null,
+      "rendered": null,
+      "type": [Function],
+    },
+    "type": "button",
+  },
+  Symbol(enzyme.__nodes__): Array [
+    Object {
       "instance": null,
       "key": undefined,
       "nodeType": "host",
       "props": Object {
+        "aria-label": "richEditor.menu.bold",
+        "aria-pressed": true,
         "children": <bold />,
-        "className": "richEditor-button",
+        "className": "richEditor-button richEditor-menuItem isActive",
+        "onBlur": [Function],
         "onClick": [Function],
+        "onKeyDown": [Function],
+        "role": undefined,
         "type": "button",
       },
-      "ref": null,
+      "ref": [Function],
       "rendered": Object {
         "instance": null,
         "key": undefined,
@@ -52,49 +73,6 @@ ShallowWrapper {
         "type": [Function],
       },
       "type": "button",
-    },
-    "type": "li",
-  },
-  Symbol(enzyme.__nodes__): Array [
-    Object {
-      "instance": null,
-      "key": undefined,
-      "nodeType": "host",
-      "props": Object {
-        "children": <button
-          className="richEditor-button"
-          onClick={[Function]}
-          type="button"
-        >
-          <bold />
-        </button>,
-        "className": "richEditor-menuItem",
-        "role": "menuitem",
-      },
-      "ref": null,
-      "rendered": Object {
-        "instance": null,
-        "key": undefined,
-        "nodeType": "host",
-        "props": Object {
-          "children": <bold />,
-          "className": "richEditor-button",
-          "onClick": [Function],
-          "type": "button",
-        },
-        "ref": null,
-        "rendered": Object {
-          "instance": null,
-          "key": undefined,
-          "nodeType": "function",
-          "props": Object {},
-          "ref": null,
-          "rendered": null,
-          "type": [Function],
-        },
-        "type": "button",
-      },
-      "type": "li",
     },
   ],
   Symbol(enzyme.__options__): Object {

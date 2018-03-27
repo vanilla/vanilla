@@ -51,7 +51,7 @@ export class PopoverController extends React.Component {
      * @param {React.KeyboardEvent} event - A synthetic keyboard event.
      */
     handleEscapeKey = (event) => {
-        if(event.keyCode === 27) {
+        if(event.keyCode === 27 && this.state.isVisible) {
             this.closeMenu(event);
         }
     };

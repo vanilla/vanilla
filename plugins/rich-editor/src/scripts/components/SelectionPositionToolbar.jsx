@@ -18,6 +18,7 @@ export class FloatingToolbar extends React.Component {
         ...editorContextTypes,
         children: PropTypes.node.isRequired,
         forceVisibility: PropTypes.string.isRequired,
+        setVisibility: PropTypes.func.isRequired,
     };
 
     /** @type {Quill} */
@@ -51,7 +52,7 @@ export class FloatingToolbar extends React.Component {
             range: null,
             hideSelf: false,
         };
-
+        this.props.setVisibility(true);
         this.handleEditorChange = this.handleEditorChange.bind(this);
     }
 
@@ -80,12 +81,14 @@ export class FloatingToolbar extends React.Component {
         this.setState({
             hideSelf: false,
         });
+        this.props.setVisibility(true);
     };
 
     hideSelf = () => {
         this.setState({
             hideSelf: true,
         });
+        this.props.setVisibility(false);
     };
 
     /** SECTION: position */

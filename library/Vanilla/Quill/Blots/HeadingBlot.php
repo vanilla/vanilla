@@ -7,47 +7,52 @@
 
 namespace Vanilla\Quill\Blots;
 
-use Vanilla\Quill\Block;
+use Vanilla\Quill\BlotGroup;
 
-class HeadingBlot extends TextBlot {
+class HeadingBlot extends AbstractBlockBlot {
 
     /**
      * @inheritDoc
      */
-    public static function matches(array $operations): bool {
-        $found = false;
-
-        foreach($operations as $op) {
-            if(valr("attributes.header", $op)) {
-                $found = true;
-                break;
-            }
-        }
-
-        return $found;
+    public function getGroupOpeningTag(): string {
+        return "<h" . $this->getHeadingLevel() . ">";
     }
 
     /**
-     * Get the heading level for the current block.
+     * @inheritDoc
+     */
+    public function getGroupClosingTag(): string {
+        return "</h" . $this->getHeadingLevel() . ">";
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public static function isOwnGroup(): bool {
+        return true;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    protected static function getAttributeKey(): string {
+        return "header";
+    }
+
+    /**
+     * @inheritDoc
+     */
+    protected static function getMatchingAttributeValue() {
+        return [1, 2, 3, 4, 5, 6];
+    }
+
+
+    /**
+     * Get the heading level for the blot.
      *
      * @return int
      */
-    public function getHeadingLevel(): int {
+    private function getHeadingLevel(): int {
         return valr("attributes.header", $this->nextOperation);
     }
-
-    /**
-     * @inheritDoc
-     */
-    public function shouldClearCurrentBlock(Block $block): bool {
-        return true;
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public function hasConsumedNextOp(): bool {
-        return true;
-    }
-
 }

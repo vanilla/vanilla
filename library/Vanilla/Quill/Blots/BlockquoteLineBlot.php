@@ -7,26 +7,29 @@
 
 namespace Vanilla\Quill\Blots;
 
-class OrderedListBlot extends AbstractListBlot {
+class BlockquoteLineBlot extends AbstractLineBlot {
 
     /**
      * @inheritDoc
      */
-    protected static function getListType(): string {
-        return "ordered";
+    protected static function getLineType(): string {
+        return "blockquote";
     }
 
     /**
      * @inheritDoc
      */
     public function getGroupOpeningTag(): string {
-        return "<ol>";
+        $wrapperClass = static::getLineType();
+        $contentClass = static::getLineType() . "-content";
+
+        return "<div class=\"$wrapperClass\"><div class=\"$contentClass\">";
     }
 
     /**
      * @inheritDoc
      */
     public function getGroupClosingTag(): string {
-        return "</ol>";
+        return "</div></div>";
     }
 }

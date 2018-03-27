@@ -1,0 +1,8 @@
+[
+    { "insert": "Line 1" },
+    { "attributes": { "blockquote-line": true }, "insert": "\n\n" },
+    { "insert": "Line 3" },
+    { "attributes": { "blockquote-line": true }, "insert": "\n\n\n\n" },
+    { "insert": "Line 7" },
+    { "attributes": { "blockquote-line": true }, "insert": "\n" }
+]

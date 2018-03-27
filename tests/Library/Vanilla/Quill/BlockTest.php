@@ -8,19 +8,19 @@
 namespace VanillaTests\Library\Vanilla\Quill;
 
 use PHPUnit\Framework\TestCase;
-use Vanilla\Quill\Block;
+use Vanilla\Quill\BlotGroup;
 use Vanilla\Quill\Blots\HeadingBlot;
 use Vanilla\Quill\Blots\TextBlot;
 
 class BlockTest extends TestCase {
     public function testMakeEmptyBlock() {
-        $block = Block::makeEmptyBlock();
+        $block = BlotGroup::makeEmptyGroup();
 
         $this->assertEquals("<p><br></p>", $block->render(), "The empty block renders as a line break.");
     }
 
     public function testGetIndexForBlockType() {
-        $block = new Block();
+        $block = new BlotGroup();
         $emptyBlot = new TextBlot([], [], []);
         $headingBlot = new HeadingBlot(["insert" => "H1",], [], [
             "attributes" => [

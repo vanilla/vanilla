@@ -8,7 +8,7 @@
 namespace Vanilla\Quill\Blots\Embeds;
 
 use Vanilla\Quill\Blots\AbstractBlot;
-use Vanilla\Quill\Block;
+use Vanilla\Quill\BlotGroup;
 
 abstract class AbstractBlockEmbedBlot extends AbstractBlot {
 
@@ -48,7 +48,7 @@ abstract class AbstractBlockEmbedBlot extends AbstractBlot {
     /**
      * @inheritDoc
      */
-    public function shouldClearCurrentBlock(Block $block): bool {
+    public function shouldClearCurrentGroup(BlotGroup $group): bool {
         return true;
     }
 
@@ -65,4 +65,20 @@ abstract class AbstractBlockEmbedBlot extends AbstractBlot {
     public static function matches(array $operations): bool {
         return (boolean) valr(static::getInsertKey(), $operations[0]);
     }
+
+    /**
+     * @inheritDoc
+     */
+    public function getGroupOpeningTag(): string {
+        return "";
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function getGroupClosingTag(): string {
+        return "";
+    }
+
+
 }

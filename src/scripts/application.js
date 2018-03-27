@@ -58,6 +58,30 @@ export function translate(str, defaultTranslation) {
  */
 export const t = translate;
 
+/**
+ * Format a URL in the format passed from the controller.
+ *
+ * @param {string} path - The path to format.
+ *
+ * @returns {string}
+ */
+export function formatUrl(path) {
+    if (path.indexOf("//") >= 0) {
+        return path;
+    } // this is an absolute path.
+
+    const urlFormat = getMeta("UrlFormat", "/{Path}");
+
+    if (path.substr(0, 1) === "/") {
+        path = path.substr(1);
+    }
+
+    if (urlFormat.indexOf("?") >= 0) {
+        path = path.replace("?", "&");
+    }
+
+    return urlFormat.replace("{Path}", path);
+}
 
 /**
  * @type {Object} The currently registered components.

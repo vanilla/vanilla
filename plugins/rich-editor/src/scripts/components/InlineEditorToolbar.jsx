@@ -45,6 +45,7 @@ export class InlineEditorToolbar extends React.Component {
             active: false,
         },
         code: {
+            formatName: "code-inline",
             active: false,
         },
         link: {

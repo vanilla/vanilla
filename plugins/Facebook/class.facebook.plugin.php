@@ -431,7 +431,7 @@ class FacebookPlugin extends Gdn_Plugin {
         }
 
         // This isn't a trusted connection. Don't allow it to automatically connect a user account.
-        saveToConfig('Garden.Registration.AutoConnect', false, false);
+//        saveToConfig('Garden.Registration.AutoConnect', false, false);
 
         $form = $sender->Form; //new gdn_Form();
         $iD = val('id', $profile);
@@ -441,6 +441,7 @@ class FacebookPlugin extends Gdn_Plugin {
         $form->setFormValue('FullName', val('name', $profile));
         $form->setFormValue('Email', val('email', $profile));
         $form->setFormValue('Photo', "//graph.facebook.com/{$iD}/picture?width=200&height=200");
+        $form->setFormValue('Target', val('Target', $state, '/'));
         $form->addHidden('AccessToken', $accessToken);
 
         if (c('Plugins.Facebook.UseFacebookNames')) {
@@ -542,7 +543,7 @@ class FacebookPlugin extends Gdn_Plugin {
         }
 
         if ($query) {
-            $redirectUri .= '&'.$query;
+            $redirectUri .= '?'.$query;
         }
 
         // Get a state token.
@@ -552,7 +553,7 @@ class FacebookPlugin extends Gdn_Plugin {
             'client_id' => $appID,
             'redirect_uri' => $redirectUri,
             'scope' => $scopes,
-            'state' => json_encode(['token' => $stateToken]),
+            'state' => json_encode(['token' => $stateToken, 'Target' => $this->getTargetUri()]),
         ]);
         $signinHref = "https://graph.facebook.com/oauth/authorize?{$authQuery}";
 
@@ -584,7 +585,18 @@ class FacebookPlugin extends Gdn_Plugin {
             $this->_RedirectUri = $redirectUri;
         }
 
+        $target = $this->getTargetUri();
+
         return $this->_RedirectUri;
+    }
+
+    public function getTargetUri() {
+        $path = Gdn::request()->path();
+        $target = val('Target', $_GET, $path ? $path : '/'); // TODO rm global
+        if (ltrim($target, '/') == 'entry/signin' || ltrim($target, '/') == 'entry/facebook' || empty($target)) {
+            $target = '/';
+        }
+        return $target;
     }
 
     /**
@@ -666,5 +678,18 @@ class FacebookPlugin extends Gdn_Plugin {
             ['AuthenticationKey' => self::PROVIDER_KEY],
             true
         );
+    }
+
+    /**
+     * @param $redirectUri
+     * @param $redirectUriQuery
+     * @return array
+     */
+    public function extractTargetFromUri($redirectUri) {
+        $redirectUriParts = parse_url($redirectUri);
+        $redirectUri = (val('scheme', $redirectUriParts) && val('host', $redirectUriParts)) ? val('scheme', $redirectUriParts).'://'.val('host', $redirectUriParts).val('path', $redirectUriParts) : null;
+        parse_str(val('query', $redirectUriParts), $redirectUriQuery);
+        $target = val('Target', $redirectUriQuery, '/');
+        return ['redirectUri' => $redirectUri, 'target' => $target];
     }
 }

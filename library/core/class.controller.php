@@ -224,8 +224,9 @@ class Gdn_Controller extends Gdn_Pluggable {
             'definitionlist', 'deliverymethod', 'deliverytype', 'description', 'errormessages', 'fetchview',
             'fetchviewlocation', 'finalize', 'getasset', 'getimports', 'getjson', 'getstatusmessage', 'image',
             'informmessage', 'intitialize', 'isinternal', 'jsfiles', 'json', 'jsontarget', 'masterview', 'pagename',
-            'permission', 'removecssfile', 'render', 'xrender', 'renderasset', 'renderdata', 'renderexception', 'rendermaster',
-            'sendheaders', 'setdata', 'setformsaved', 'setheader', 'setjson', 'setlastmodified', 'statuscode', 'title'
+            'permission', 'removecssfile', 'render', 'xrender', 'renderasset', 'renderdata', 'renderexception',
+            'rendermaster', 'renderreact', 'sendheaders', 'setdata', 'setformsaved', 'setheader', 'setjson',
+            'setlastmodified', 'statuscode', 'title'
         ];
         $this->MasterView = '';
         $this->ModuleSortContainer = '';
@@ -615,6 +616,10 @@ class Gdn_Controller extends Gdn_Pluggable {
             $this->_Definitions['Search'] = t('Search');
         }
 
+        $this->_Definitions['basePath'] = $this->_Definitions['basePath'] ?? rtrim('/'.trim(Gdn::request()->webRoot(), '/'), '/');
+        $this->_Definitions['assetPath'] = $this->_Definitions['assetPath'] ?? rtrim('/'.trim(Gdn::request()->assetRoot(), '/'), '/');
+        $this->_Definitions['title'] = $this->_Definitions['title'] ?? c('Garden.Title');
+
         if (debug()) {
             $this->_Definitions['debug'] = true;
         }
@@ -788,6 +793,9 @@ class Gdn_Controller extends Gdn_Pluggable {
 
                 $basePath = val('SearchPath', $pluginInfo);
                 $applicationFolder = val('Folder', $pluginInfo);
+            } elseif ($applicationFolder === 'core') {
+                $basePath = PATH_ROOT;
+                $applicationFolder = 'resources';
             } else {
                 $basePath = PATH_APPLICATIONS;
                 $applicationFolder = strtolower($applicationFolder);
@@ -1585,6 +1593,16 @@ class Gdn_Controller extends Gdn_Pluggable {
     }
 
     /**
+     * Render a page that hosts a react component.
+     */
+    public function renderReact() {
+        if (!$this->data('hasPanel')) {
+            $this->CssClass .= ' NoPanel';
+        }
+        $this->render('react', '', 'core');
+    }
+
+    /**
      *
      *
      * @param $value
@@ -1835,7 +1853,7 @@ class Gdn_Controller extends Gdn_Pluggable {
                 // Add the built addon javascript files.
                 $addonJs = $AssetModel->getAddonJsFiles($ThemeType, $this->MasterView === 'admin' ? 'admin' : 'app', $ETag);
                 foreach ($addonJs as $path) {
-                    $this->Head->addScript(asset($path)."?h=$busta", 'text/javascript', false, ['defer' => 'true']);
+                    $this->Head->addScript($path."?h=$busta", 'text/javascript', false, ['defer' => 'true']);
                 }
 
                 foreach ($this->_JsFiles as $Index => $JsInfo) {

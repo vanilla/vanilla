@@ -4,7 +4,7 @@
  * @license GPLv2
  */
 
-import gdn from "@core/gdn";
+import { getMeta } from "@core/application";
 
 /**
  * Resolve an array of functions that return promises sequentially.
@@ -22,7 +22,7 @@ import gdn from "@core/gdn";
  */
 export function resolvePromisesSequentially(promiseFunctions) {
     if (!Array.isArray(promiseFunctions)) {
-        throw new Error("First argument need to be an array of Promises");
+        throw new Error("First argument needs to be an array of Promises");
     }
 
     return new Promise((resolve, reject) => {
@@ -54,33 +54,33 @@ export function resolvePromisesSequentially(promiseFunctions) {
  *
  * This only prints in debug mode.
  *
- * @param {any} value - The value to log.
+ * @param {...*} value - The value to log.
  */
-export function log(value) {
+export function log(...value) {
     if (getMeta("debug", false)) {
         // eslint-disable-next-line no-console
-        console.log(value);
+        console.log(...value);
     }
 }
 
 /**
  * Log an error to console.
  *
- * @param {any} value - The value to log.
+ * @param {...*} value - The value to log.
  */
-export function logError(value) {
+export function logError(...value) {
     // eslint-disable-next-line no-console
-    console.error(value);
+    console.error(...value);
 }
 
 /**
  * Log a warning to console.
  *
- * @param {any} value - The value to log.
+ * @param {...*} value - The value to log.
  */
-export function logWarning(value) {
+export function logWarning(...value) {
     // eslint-disable-next-line no-console
-    console.warn(value);
+    console.warn(...value);
 }
 
 /**
@@ -122,83 +122,6 @@ export function generateRandomString(length = 5) {
     }
     return result;
 }
-
-/**
- * Get a piece of metadata passed from the server.
- *
- * @param {string} key - The key to lookup.
- * @param {any=} defaultValue - A fallback value in case the key cannot be found.
- *
- * @returns {any}
- */
-export function getMeta(key, defaultValue = undefined) {
-    if (gdn.meta && gdn.meta[key]) {
-        return gdn.meta[key];
-    }
-
-    return defaultValue;
-}
-
-/**
- * Set a piece of metadata. This will override what was passed from the server.
- *
- * @param {string} key - The key to store under.
- * @param {any} value - The value to set.
- */
-export function setMeta(key, value) {
-    gdn.meta[key] = value;
-}
-
-/**
- * Format a URL in the format passed from the controller.
- *
- * @param {string} path - The path to format.
- *
- * @returns {string}
- */
-export function formatUrl(path) {
-    if (path.indexOf("//") >= 0) {
-        return path;
-    } // this is an absolute path.
-
-    const urlFormat = getMeta("UrlFormat", "/{Path}");
-
-    if (path.substr(0, 1) === "/") {
-        path = path.substr(1);
-    }
-
-    if (urlFormat.indexOf("?") >= 0) {
-        path = path.replace("?", "&");
-    }
-
-    return urlFormat.replace("{Path}", path);
-}
-
-/**
- * Translate a string into the current locale.
- *
- * @param {string} str The string to translate.
- * @param {string=} defaultTranslation The default translation to use.
- */
-export function translate(str, defaultTranslation) {
-    // Codes that begin with @ are considered literals.
-    if (str.substr(0, 1) === '@') {
-        return str.substr(1);
-    }
-
-    if (gdn.translations[str] !== undefined) {
-        return gdn.translations[str];
-    }
-
-    return defaultTranslation !== undefined ? defaultTranslation : str;
-}
-
-/**
- * The t function is an alias for translate.
- *
- * @type {translate}
- */
-export const t = translate;
 
 /**
  * Re-exported from sprintf-js https://www.npmjs.com/package/sprintf-js

@@ -251,8 +251,6 @@ class WebScraper {
         }
 
         $defaults = [
-            'url' => $url,
-            'type' => $type,
             'name' => null,
             'body' => null,
             'photoUrl' => null,
@@ -260,8 +258,10 @@ class WebScraper {
             'width' => null,
             'attributes' => []
         ];
-
         $result = array_merge($defaults, $data);
+        $result['url'] = $url;
+        $result['type'] = $type;
+
         return $result;
     }
 
@@ -299,7 +299,7 @@ class WebScraper {
     /**
      * Get oEmbed data from a URL.
      *
-     * @param $url
+     * @param string $url
      * @return array
      * @throws Exception if the URL is invalid.
      */
@@ -325,13 +325,22 @@ class WebScraper {
             $response = json_decode($rawResponse, true);
             if (is_array($response)) {
                 $validAttributes = ['type', 'version', 'title', 'author_name', 'author_url', 'provider_name', 'provider_url',
-                    'cache_age', 'thumbnail_url', 'width', 'height', 'thumbnail_width', 'thumbnail_height'];
-                $oembed = array_intersect_key($response, array_combine($validAttributes, $validAttributes));
+                    'cache_age', 'thumbnail_url', 'thumbnail_width', 'thumbnail_height'];
 
-                $result['name'] = val('title', $oembed, null);
-                $result['photoUrl'] = val('thumbnail_url', $oembed, null);
-                $result['width'] = val('width', $oembed, val('thumbnail_width', $oembed, null));
-                $result['height'] = val('height', $oembed, val('thumbnail_height', $oembed, null));
+                $type = $response['type'] ?? null;
+                switch ($type) {
+                    case 'photo':
+                        $validAttributes = array_merge(['url', 'width', 'height'], $validAttributes);
+                        break;
+                    case 'video':
+                    case 'rich':
+                        $validAttributes = array_merge(['url', 'width', 'height'], $validAttributes);
+                        break;
+                }
+
+                // Make it easier to compare by key.
+                $validAttributes = array_combine($validAttributes, $validAttributes);
+                $result = array_intersect_key($response, $validAttributes);
             }
         }
 
@@ -366,10 +375,12 @@ class WebScraper {
         $data = [];
         if ($mediaID) {
             $oembed = $this->getOembed("http://embed.gettyimages.com/oembed?url=http%3a%2f%2fgty.im%2f{$mediaID}");
-            $data = array_merge($data, $oembed);
+            $data = array_merge($data, $this->normalizeOembed($oembed));
         }
 
-        $data['attributes'] = ['mediaID' => $mediaID];
+        $attributes = $data['attributes'] ?? [];
+        $attributes['mediaID'] = $mediaID;
+        $data['attributes'] = $attributes;
 
         return $data;
     }
@@ -639,9 +650,11 @@ class WebScraper {
         $data = [];
 
         $oembed = $this->getOembed("https://vine.co/oembed.json?url=https%3A%2F%2Fvine.co%2Fv%2F{$videoID}");
-        $data = array_merge($data, $oembed);
+        $data = array_merge($data, $this->normalizeOembed($oembed));
 
-        $data['attributes'] = ['videoID' => $videoID];
+        $attributes = $data['attributes'] ?? [];
+        $attributes['videoID'] = $videoID;
+        $data['attributes'] = $attributes;
 
         return $data;
     }
@@ -714,14 +727,50 @@ class WebScraper {
         $data = [];
 
         $oembed = $this->getOembed("https://www.youtube.com/oembed?url=https%3A%2F%2Fwww.youtube.com%2Fwatch%3Fv%3D{$videoID}");
-        $data = array_merge($data, $oembed);
+        $data = array_merge($data, $this->normalizeOembed($oembed));
 
-        $data['attributes'] = [
-            'videoID' => $videoID,
-            'listID' => array_key_exists('listId', $urlParts) ? $urlParts['listId'] : null,
-            'start' => $start
-        ];
+        $attributes = $data['attributes'] ?? [];
+        $attributes['videoID'] = $videoID;
+        $attributes['listID'] = array_key_exists('listId', $urlParts) ? $urlParts['listId'] : null;
+        $attributes['start'] = $start;
+        $data['attributes'] = $attributes;
+
         return $data;
+    }
+
+    /**
+     * Normalize oEmbed fields.
+     *
+     * @return array
+     */
+    private function normalizeOembed(array $oembed) {
+        // Simple renaming.
+        $fields = ['name' => 'title', 'photoUrl' => 'thumbnail_url'];
+        foreach ($fields as $new => $original) {
+            $val = $oembed[$original] ?? null;
+            $oembed[$new] = $val;
+            unset($oembed[$original]);
+        }
+
+        $attributes = [];
+
+        foreach (['width', 'height'] as $sizeAttribute) {
+            $thumbField = "thumbnail_{$sizeAttribute}";
+            $primary = val($sizeAttribute, $oembed, null);
+            $thumb = val($thumbField, $oembed);
+            if ($primary && $thumb) {
+                $attributes[$thumbField] = $thumb;
+            } elseif ($thumb) {
+                $primary = $thumb;
+            }
+            $oembed[$sizeAttribute] = $primary;
+            unset($oembed[$thumbField]);
+        }
+
+        if (!empty($attributes)) {
+            $oembed['attributes'] = $attributes;
+        }
+        return $oembed;
     }
 
     /**

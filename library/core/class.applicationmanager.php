@@ -267,7 +267,7 @@ class Gdn_ApplicationManager {
         }
         if (class_exists($hooks)) {
             /* @var Gdn_IPlugin $hooks The hooks object should be a plugin. */
-            $hooks = new $hooks();
+            $hooks = Gdn::getContainer()->get($hooks);
 
             if (method_exists($hooks, 'setup')) {
                 $hooks->setup();
@@ -315,6 +315,10 @@ class Gdn_ApplicationManager {
 
         // Clear the object caches.
         $this->addonManager->stopAddonsByKey([$applicationName], \Vanilla\Addon::TYPE_ADDON);
+
+        /** @var \Garden\EventManager $eventManager */
+        $eventManager = Gdn::getContainer()->get(\Garden\EventManager::class);
+        $this->addonManager->unbindAddonEvents($addon, $eventManager);
     }
 
     /**

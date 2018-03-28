@@ -565,7 +565,7 @@ class FacebookPlugin extends Gdn_Plugin {
     }
 
     /**
-     * Figure out where to send user after auth step.
+     * Send the Facebook entry page to Facebook as the redirectURI.
      *
      * @param null $newValue
      *
@@ -585,15 +585,17 @@ class FacebookPlugin extends Gdn_Plugin {
             $this->_RedirectUri = $redirectUri;
         }
 
-        $target = $this->getTargetUri();
-
         return $this->_RedirectUri;
     }
 
+    /**
+     * Get the target URL to pass to the state when making requests.
+     *
+     * @return mixed|string
+     */
     public function getTargetUri() {
-        $path = Gdn::request()->path();
-        $target = val('Target', $_GET, $path ? $path : '/'); // TODO rm global
-        if (ltrim($target, '/') == 'entry/signin' || ltrim($target, '/') == 'entry/facebook' || empty($target)) {
+        $target = Gdn::request()->getValueFrom(Gdn_Request::INPUT_GET, 'Target', '/');
+        if (ltrim($target, '/') == 'entry/signin' || ltrim($target, '/') == 'entry/facebook') {
             $target = '/';
         }
         return $target;
@@ -678,18 +680,5 @@ class FacebookPlugin extends Gdn_Plugin {
             ['AuthenticationKey' => self::PROVIDER_KEY],
             true
         );
-    }
-
-    /**
-     * @param $redirectUri
-     * @param $redirectUriQuery
-     * @return array
-     */
-    public function extractTargetFromUri($redirectUri) {
-        $redirectUriParts = parse_url($redirectUri);
-        $redirectUri = (val('scheme', $redirectUriParts) && val('host', $redirectUriParts)) ? val('scheme', $redirectUriParts).'://'.val('host', $redirectUriParts).val('path', $redirectUriParts) : null;
-        parse_str(val('query', $redirectUriParts), $redirectUriQuery);
-        $target = val('Target', $redirectUriQuery, '/');
-        return ['redirectUri' => $redirectUri, 'target' => $target];
     }
 }

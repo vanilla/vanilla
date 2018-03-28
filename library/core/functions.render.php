@@ -1190,7 +1190,8 @@ if (!function_exists('panelHeading')) {
      * @param string $attributes The attributes of the tag.
      * @return string The full tag.
      */
-    function panelHeading($content, $attributes = '') {
+    function panelHeading($content, $attributes = []) {
+        $attributes = array_merge(['aria-level' => '2'], $attributes);
         return wrap($content, 'h4', $attributes);
     }
 }

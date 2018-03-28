@@ -8,7 +8,7 @@ if ($this->Data !== FALSE) {
     }
     ?>
     <div class="Box BoxCategories">
-        <?php echo panelHeading(t('Categories'), ['aria-level' => '2']); ?>
+        <?php echo panelHeading(t('Categories')); ?>
         <ul class="PanelInfo PanelCategories">
             <?php
             echo '<li'.($OnCategories ? ' class="Active"' : '').'>'.

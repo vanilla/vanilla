@@ -178,17 +178,17 @@ class AddonsApiController extends Controller {
     /**
      * Get a single addon.
      *
-     * @param string $addonID The addon ID to get.
+     * @param string $id The addon ID to get.
      * @param array $query The query string.
      * @return array Returns an addon info row.
      * @throws \Garden\Web\Exception\NotFoundException Throws an exception when the addon is not found.
      */
-    public function get($addonID, array $query) {
+    public function get($id, array $query) {
         $this->permission('Garden.Settings.Manage');
 
-        $id = $this->schema([
-            'addonID:s' => 'The ID of the addon.'
-        ], 'in')->setDescription('Get an addon.');
+//        $id = $this->schema([
+//            'addonID:s' => 'The ID of the addon.'
+//        ], 'in')->setDescription('Get an addon.');
 
         $in = $this->schema([
             'themeType:s?' => [
@@ -200,7 +200,7 @@ class AddonsApiController extends Controller {
         $out = $this->schema($this->fullSchema(), 'out');
         $query = $in->validate($query);
 
-        $addons = $this->addonModel->getWhere(['addonID' => $addonID]);
+        $addons = $this->addonModel->getWhere(['addonID' => $id]);
         if (empty($addons)) {
             throw new \Garden\Web\Exception\NotFoundException("Addon");
         }
@@ -213,12 +213,12 @@ class AddonsApiController extends Controller {
     /**
      * Enable or disable an addon.
      *
-     * @param string $addonID The addon ID.
+     * @param string $id The addon ID.
      * @param array $body The request body.
      * @return array Returns an array of affected addons.
      * @throws \Garden\Web\Exception\NotFoundException Throws an exception when the addon is not found.
      */
-    public function patch($addonID, array $body) {
+    public function patch($id, array $body) {
         $this->permission('Garden.Settings.Manage');
 
         $idSchema = $this->schema([
@@ -236,7 +236,7 @@ class AddonsApiController extends Controller {
 
         $body = $in->validate($body);
 
-        $addons = $this->addonModel->getWhere(['addonID' => $addonID]);
+        $addons = $this->addonModel->getWhere(['addonID' => $id]);
         if (empty($addons)) {
             throw new \Garden\Web\Exception\NotFoundException("Addon");
         }

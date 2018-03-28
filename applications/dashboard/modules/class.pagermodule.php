@@ -131,7 +131,7 @@ class PagerModule extends Gdn_Module {
                     'rel' => 'prev',
                     'href' => url($prevHref)
                 ]);
-                $this->webLinking->addLink('prev', $prevHref);
+                $this->webLinking->addLink('prev', url($prevHref, true));
             }
 
             if ($this->hasMorePages()) {
@@ -140,7 +140,7 @@ class PagerModule extends Gdn_Module {
                     'rel' => 'next',
                     'href' => url($nextHref)
                 ]);
-                $this->webLinking->addLink('next', $nextHref);
+                $this->webLinking->addLink('next', url($nextHref, true));
             }
 
             $linkHeader = $this->webLinking->getLinkHeaderValue();

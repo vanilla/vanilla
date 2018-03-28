@@ -31,8 +31,8 @@ export class PopoverController extends React.Component {
         };
 
         this.controllerID = this.props.classNameRoot + "-" + this.props.editorID;
-        this.popoverID = this.props.classNameRoot + "-popover" + this.props.editorID;
-        this.buttonID = this.props.classNameRoot + "-button" + this.props.editorID;
+        this.popoverID = this.props.classNameRoot + "-popover-" + this.props.editorID;
+        this.buttonID = this.props.classNameRoot + "-button-" + this.props.editorID;
     }
 
     componentDidMount(){

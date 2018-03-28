@@ -75,11 +75,10 @@ export class ParagraphEditorToolbar extends React.PureComponent {
 
         // Quill can directly on the class as it won't ever change in a single instance.
         this.quill = props.quill;
-        UniqueID.enableUniqueIds(this);
-        this.ID = this.nextUniqueId();
-        this.componentID = "paragraphMenu-component-" + this.ID;
-        this.menuID = "paragraphMenu-menu-" + this.ID;
-        this.buttonID = "paragraphMenu-button-" + this.ID;
+        this.ID = this.props.editorID + "paragraphMenu";
+        this.componentID = this.ID + "-component";
+        this.menuID = this.ID + "-menu";
+        this.buttonID = this.ID + "-button";
         this.state = {
             showPilcrow: true,
             showMenu: false,

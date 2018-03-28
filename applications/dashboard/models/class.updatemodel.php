@@ -265,6 +265,7 @@ class UpdateModel extends Gdn_Model {
         $variable = $info['Variable'];
         $info = $info[$key];
 
+        // If there wasn't a "Variable" in the original $info, try the updated $info.
         if (empty($variable) && array_key_exists('Variable', $info)) {
             $variable = $info['Variable'];
         }

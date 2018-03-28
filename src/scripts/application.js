@@ -1,18 +1,17 @@
 /**
  * Application functions for interop between components in different packages.
  *
- * @module app
+ * @module application
  */
-import React from 'react';
 import gdn from "@core/gdn";
 
 /**
  * Get a piece of metadata passed from the server.
  *
  * @param {string} key - The key to lookup.
- * @param {any=} defaultValue - A fallback value in case the key cannot be found.
+ * @param {*=} defaultValue - A fallback value in case the key cannot be found.
  *
- * @returns {any}
+ * @returns {*} Returns a meta value or the default value.
  */
 export function getMeta(key, defaultValue = undefined) {
     if (gdn.meta && gdn.meta[key]) {
@@ -26,7 +25,7 @@ export function getMeta(key, defaultValue = undefined) {
  * Set a piece of metadata. This will override what was passed from the server.
  *
  * @param {string} key - The key to store under.
- * @param {any} value - The value to set.
+ * @param {*} value - The value to set.
  */
 export function setMeta(key, value) {
     gdn.meta[key] = value;
@@ -37,6 +36,7 @@ export function setMeta(key, value) {
  *
  * @param {string} str The string to translate.
  * @param {string=} defaultTranslation The default translation to use.
+ * @returns {string} Returns the translation or the default.
  */
 export function translate(str, defaultTranslation) {
     // Codes that begin with @ are considered literals.
@@ -63,7 +63,7 @@ export const t = translate;
  *
  * @param {string} path - The path to format.
  *
- * @returns {string}
+ * @returns {string} Returns a URL that can be used in the APP.
  */
 export function formatUrl(path) {
     if (path.indexOf("//") >= 0) {
@@ -113,6 +113,7 @@ export function componentExists(name) {
  * Get a component from the component registry.
  *
  * @param {string} name The name of the component.
+ * @returns {React.Component|undefined} Returns the component or **undefined** if there is no registered component.
  */
 export function getComponent(name) {
     return allComponents[name.toLowerCase()];

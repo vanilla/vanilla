@@ -54,7 +54,7 @@ export function resolvePromisesSequentially(promiseFunctions) {
  *
  * This only prints in debug mode.
  *
- * @param {any} value - The value to log.
+ * @param {...*} value - The value to log.
  */
 export function log(...value) {
     if (getMeta("debug", false)) {
@@ -66,7 +66,7 @@ export function log(...value) {
 /**
  * Log an error to console.
  *
- * @param {any} value - The value to log.
+ * @param {...*} value - The value to log.
  */
 export function logError(...value) {
     // eslint-disable-next-line no-console
@@ -76,7 +76,7 @@ export function logError(...value) {
 /**
  * Log a warning to console.
  *
- * @param {any} value - The value to log.
+ * @param {...*} value - The value to log.
  */
 export function logWarning(...value) {
     // eslint-disable-next-line no-console

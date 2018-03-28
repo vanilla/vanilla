@@ -1146,7 +1146,14 @@ class UserModel extends Gdn_Model {
             }
         }
 
-        $rows = $this->eventManager->fireFilter('userModel_expandUsers', $rows, $single, $options);
+        // Don't bother addons with whether or not this is a single row. Pack and unpack it here, as necessary.
+        if ($single) {
+            $rows = [$rows];
+        }
+        $rows = $this->eventManager->fireFilter('userModel_expandUsers', $rows, $options);
+        if ($single) {
+            $rows = reset($rows);
+        }
     }
 
     /**

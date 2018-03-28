@@ -12,6 +12,7 @@ use Garden\Web\Cookie;
 use Garden\Web\RequestInterface;
 use Gdn_AuthenticationProviderModel;
 use Gdn_Configuration;
+use Firebase\JWT\JWT;
 use UserAuthenticationNonceModel;
 use Vanilla\Authenticator\SSOAuthenticator;
 use Vanilla\Models\SSOData;
@@ -22,6 +23,9 @@ use Vanilla\Models\SSOData;
  * @package Vanilla\VanillaConnect
  */
 class VanillaConnectAuthenticator extends SSOAuthenticator {
+
+    /** Signing algorithm for JWT tokens. */
+    const JWT_ALGORITHM = 'HS256';
 
     /** @var Cookie $cookie */
     private $cookie;
@@ -49,7 +53,7 @@ class VanillaConnectAuthenticator extends SSOAuthenticator {
      * @param string $providerID
      * @param Gdn_AuthenticationProviderModel $authProviderModel
      * @param Gdn_Configuration $config
-     * @param Cookie $cookie
+     * @paraVam Cookie $cookie
      * @param RequestInterface $request
      * @param UserAuthenticationNonceModel $nonceModel
      */
@@ -69,6 +73,11 @@ class VanillaConnectAuthenticator extends SSOAuthenticator {
 
         $this->cookie = $cookie;
         $this->cookieName = $config->get('Garden.Cookie.Name', 'Vanilla').'-vanillaconnectnonce';
+        $this->cookieSalt = $config->get('Garden.Cookie.Salt');
+
+        if (!$this->cookieSalt) {
+            throw new Gdn_UserException('Cookie salt is empty.');
+        }
 
         $this->nonceModel = $nonceModel;
         $this->request = $request;
@@ -135,7 +144,17 @@ class VanillaConnectAuthenticator extends SSOAuthenticator {
     private function generateNonce() {
         $nonce = uniqid(VanillaConnect::NAME.'_');
         $this->nonceModel->insert(['Nonce' => $nonce, 'Token' => VanillaConnect::NAME]);
-        $this->cookie->set($this->cookieName, $nonce, VanillaConnect::TIMEOUT);
+
+        $iat = time();
+        $expiration = $iat + VanillaConnect::TIMEOUT;
+
+        $jwt = JWT::encode([
+            'nonce' => $nonce,
+            'exp' => $expiration,
+            'iat' => $iat,
+        ], $this->cookieSalt, self::JWT_ALGORITHM);
+        $this->cookie->set($this->cookieName, $jwt, VanillaConnect::TIMEOUT);
+
         return $nonce;
     }
 
@@ -248,7 +267,14 @@ class VanillaConnectAuthenticator extends SSOAuthenticator {
             throw new Exception('The nonce has expired.');
         }
 
-        $cookiedNonce = $this->cookie->get($this->cookieName);
+        $jwt = $this->cookie->get($this->cookieName);
+        if ($jwt) {
+            try {
+                $decoded = (array)JWT::decode($jwt, $this->cookieSalt, [self::JWT_ALGORITHM]);
+                $cookiedNonce = $decoded['nonce'] ?? null;
+            } catch (Exception $e) {}
+        }
+
         if (!$cookiedNonce || $cookiedNonce !== $nonce) {
             throw new Exception('Nonce does not match cookied value.');
         }

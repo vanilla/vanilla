@@ -8,19 +8,19 @@ if (!function_exists('WriteDiscussionHeading')) :
         ?>
         <tr>
             <?php echo adminCheck(NULL, ['<td class="CheckBoxColumn"><div class="Wrap">', '</div></td>']); ?>
-            <td class="DiscussionName">
+            <td class="DiscussionName" role="columnheader">
                 <div class="Wrap"><?php echo discussionHeading() ?></div>
             </td>
-            <td class="BlockColumn BlockColumn-User FirstUser">
+            <td class="BlockColumn BlockColumn-User FirstUser" role="columnheader">
                 <div class="Wrap"><?php echo t('Started By'); ?></div>
             </td>
-            <td class="BigCount CountReplies">
+            <td class="BigCount CountReplies" role="columnheader">
                 <div class="Wrap"><?php echo t('Replies'); ?></div>
             </td>
-            <td class="BigCount CountViews">
+            <td class="BigCount CountViews" role="columnheader">
                 <div class="Wrap"><?php echo t('Views'); ?></div>
             </td>
-            <td class="BlockColumn BlockColumn-User LastUser">
+            <td class="BlockColumn BlockColumn-User LastUser" role="columnheader">
                 <div class="Wrap"><?php echo t('Most Recent Comment', 'Most Recent'); ?></div>
             </td>
         </tr>
@@ -171,6 +171,7 @@ if (!function_exists('WriteDiscussionTable')) :
         $c = Gdn::controller();
         ?>
         <div class="DataTableWrap">
+            <h2 class="sr-only"><?php echo t('Discussion List'); ?></h2>
             <table class="DataTable DiscussionsTable">
                 <thead>
                 <?php

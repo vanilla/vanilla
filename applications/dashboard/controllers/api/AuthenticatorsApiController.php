@@ -37,11 +37,11 @@ class AuthenticatorsApiController extends AbstractApiController  {
     /**
      * Get an authenticator.
      *
-     * @param $type
-     * @param $id
+     * @param string $type
+     * @param string $id
      * @return Authenticator
      */
-    public function authenticator($type, $id) {
+    public function authenticator(string $type, string $id): Authenticator {
         try {
             $authenticator = $this->authenticatorModel->getAuthenticator($type, $id);
         } catch (Exception $e) {
@@ -63,10 +63,10 @@ class AuthenticatorsApiController extends AbstractApiController  {
     /**
      * Get an authenticator by its ID.
      *
-     * @param $id
+     * @param string $id
      * @return Authenticator
      */
-    public function authenticatorByID($id) {
+    public function authenticatorByID(string $id): Authenticator {
         try {
             $authenticator = $this->authenticatorModel->getAuthenticatorByID($id);
         } catch (Exception $e) {
@@ -125,7 +125,7 @@ class AuthenticatorsApiController extends AbstractApiController  {
      *
      * @return Schema Returns a schema object.
      */
-    public function typeParamSchema() {
+    public function typeParamSchema(): Schema {
         if ($this->typeParamSchema === null) {
             $this->typeParamSchema = $this->schema(
                 Schema::parse(['type:s' => 'The authenticator type.']),
@@ -142,7 +142,7 @@ class AuthenticatorsApiController extends AbstractApiController  {
      * @param string $id
      * @return array
      */
-    public function get(string $type, string $id) {
+    public function get(string $type, string $id): array {
         $this->permission('Garden.Setting.Manage');
 
         $this->typeParamSchema();
@@ -162,7 +162,7 @@ class AuthenticatorsApiController extends AbstractApiController  {
      *
      * @return Data
      */
-    public function index() {
+    public function index(): Data {
         $this->permission('Garden.Setting.Manage');
 
         $this->schema([], ['AuthenticatorIndex', 'in'])->setDescription('List authenticators.');
@@ -185,7 +185,7 @@ class AuthenticatorsApiController extends AbstractApiController  {
      * @param Authenticator $authenticator
      * @return array Return a Schema record.
      */
-    protected function normalizeOutput(Authenticator $authenticator) {
+    protected function normalizeOutput(Authenticator $authenticator): array {
         $record = $authenticator->getAuthenticatorInfo();
         $record['authenticatorID'] = strtolower($record['authenticatorID']);
         $record['type'] = strtolower($record['type']);
@@ -201,7 +201,7 @@ class AuthenticatorsApiController extends AbstractApiController  {
      * @param array $body
      * @return array
      */
-    public function patch(string $id, array $body) {
+    public function patch(string $id, array $body): array {
         $this->permission('Garden.Setting.Manage');
 
         $this->idParamSchema();

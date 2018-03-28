@@ -49,7 +49,7 @@ class AuthenticatorModel {
      * @throws NotFoundException
      * @throws ServerException
      */
-    public function getAuthenticator($authenticatorType, $authenticatorID) {
+    public function getAuthenticator(string $authenticatorType, string $authenticatorID) {
         if (empty($authenticatorType)) {
             throw new NotFoundException('Authenticator does not exist.');
         }
@@ -110,7 +110,7 @@ class AuthenticatorModel {
      * @param string $authenticatorID
      * @return Authenticator
      */
-    public function getAuthenticatorByID($authenticatorID) {
+    public function getAuthenticatorByID(string $authenticatorID) {
         $authenticatorData = $this->authenticationProviderModel->getID($authenticatorID, DATASET_TYPE_ARRAY);
 
         return $this->getAuthenticator($authenticatorData['AuthenticationSchemeAlias'] ?? null, $authenticatorID);
@@ -119,7 +119,7 @@ class AuthenticatorModel {
     /**
      * Get authenticator instances.
      *
-     * @return array
+     * @return Authenticator[]
      */
     public function getAuthenticators() {
         $authenticatorClasses = $this->getAuthenticatorClasses();

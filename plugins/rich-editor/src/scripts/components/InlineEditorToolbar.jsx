@@ -272,13 +272,10 @@ export class InlineEditorToolbar extends React.Component {
                         className="InputBox insertLink-input"
                         placeholder={t("Paste or type a link…")}
                     />
-                    <a href="#"
-                        aria-label={t("Close")}
-                        className="Close richEditor-close"
-                        role="button"
-                        onClick={this.onCloseClick}>
-                        <span>×</span>
-                    </a>
+                    <button type="button" onClick={this.onCloseClick} className="Close richEditor-close">
+                        <span className="Close-x" aria-hidden="true">×</span>
+                        <span className="sr-only">{t('Close')}</span>
+                    </button>
                 </div>
             </SelectionPositionToolbar>
         </div>;

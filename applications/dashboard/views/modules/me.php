@@ -2,6 +2,8 @@
 $Session = Gdn::session();
 $User = $Session->User;
 $CssClass = '';
+$transientKey = Gdn::session()->transientKey();
+
 if ($this->CssClass)
     $CssClass .= ' '.$this->CssClass;
 
@@ -36,7 +38,7 @@ if ($Session->isValid()):
     $CountNotifications = $User->CountNotifications;
     $CNotifications = is_numeric($CountNotifications) && $CountNotifications > 0 ? '<span class="Alert NotificationsAlert">'.$CountNotifications.'</span>' : '';
 
-    echo '<span class="ToggleFlyout" rel="/profile/notificationspopin">';
+    echo '<span class="ToggleFlyout" rel="/profile/notificationspopin?TransientKey='.htmlspecialchars(urlencode($transientKey)).'">';
     echo anchor(sprite('SpNotifications', 'Sprite Sprite16', t('Notifications')).$CNotifications, userUrl($User), 'MeButton FlyoutButton js-clear-notifications', ['title' => t('Notifications'), 'tabindex' => '0', "role" => "button", "aria-haspopup" => "true"]);
     echo sprite('SpFlyoutHandle', 'Arrow');
     echo '<div class="Flyout FlyoutMenu"></div></span>';

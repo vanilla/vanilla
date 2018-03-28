@@ -645,8 +645,12 @@ class ProfileController extends Gdn_Controller {
         $this->render();
     }
 
-    public function notificationsPopin() {
+    public function notificationsPopin($transientKey = '') {
         $this->permission('Garden.SignIn.Allow');
+
+        if (Gdn::session()->validateTransientKey($transientKey) !== true) {
+            throw new Gdn_UserException(t('Invalid CSRF token.', 'Invalid CSRF token. Please try again.'), 403);
+        }
 
         $where = [
             'NotifyUserID' => Gdn::session()->UserID,

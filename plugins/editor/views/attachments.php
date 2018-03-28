@@ -36,7 +36,7 @@ $editorkey = $this->data('_editorkey');
          <input type="hidden" name="MediaIDs[]" value="<?php echo $attachment['MediaID']; ?>" disabled="disabled"/>
          <?php echo $filePreviewCss; ?>
          <div class="file-data">
-            <a class="filename" data-type="<?php echo $attachment['Type']; ?>"
+            <a class="filename" data-type="<?php echo htmlspecialchars($attachment['Type']); ?>"
                href="<?php echo $pathParse['Url'] ?>"
                target="_blank"
                 <?php

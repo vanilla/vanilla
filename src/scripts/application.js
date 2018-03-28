@@ -14,11 +14,20 @@ import gdn from "@core/gdn";
  * @returns {*} Returns a meta value or the default value.
  */
 export function getMeta(key, defaultValue = undefined) {
-    if (gdn.meta && gdn.meta[key]) {
-        return gdn.meta[key];
+    if (!gdn.meta) {
+        return defaultValue;
     }
 
-    return defaultValue;
+    const parts = key.split('.');
+    let haystack = gdn.meta;
+
+    for (const part of parts) {
+        haystack = haystack[part];
+        if (haystack === undefined) {
+            return defaultValue;
+        }
+    }
+    return haystack;
 }
 
 /**
@@ -28,7 +37,21 @@ export function getMeta(key, defaultValue = undefined) {
  * @param {*} value - The value to set.
  */
 export function setMeta(key, value) {
-    gdn.meta[key] = value;
+    if (gdn.meta === null || typeof gdn.meta !== 'object') {
+        gdn.meta = {};
+    }
+
+    const parts = key.split('.');
+    const last = parts.pop();
+    let haystack = gdn.meta;
+
+    for (const part of parts) {
+        if (haystack[part] === null || typeof haystack[part] !== 'object') {
+            haystack[part] = {};
+        }
+        haystack = haystack[part];
+    }
+    haystack[last] = value;
 }
 
 /**

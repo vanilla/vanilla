@@ -30,7 +30,7 @@ export default class DocumentTitle extends React.Component {
     }
 
     getHeadTitle(props) {
-        const siteTitle = getMeta('title', '');
+        const siteTitle = getMeta('ui.siteName', '');
         const parts = [];
 
         if (props.title && props.title.length > 0) {

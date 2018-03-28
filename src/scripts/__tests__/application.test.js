@@ -22,6 +22,19 @@ describe("metaDataFunctions", () => {
         application.setMeta("foo", "foo2");
         expect(application.getMeta("foo")).toBe("foo2");
     })
+
+    it("dot syntax for nested getMeta values", () => {
+        application.setMeta("ui", { foo: "bar", bar: { baz: "bam" }});
+        expect(application.getMeta("ui.foo")).toBe("bar");
+        expect(application.getMeta("ui.bar.baz")).toBe("bam");
+        expect(application.getMeta("ui.bar.bax", "de")).toBe("de");
+        expect(application.getMeta("uiz.bar.bax", "de")).toBe("de");
+    })
+
+    it("dot syntax for nested setMeta values", () => {
+        application.setMeta('a.b.c', 'd');
+        expect(application.getMeta('a')).toEqual({b: {c: 'd'}});
+    })
 })
 
 describe("translate", () => {

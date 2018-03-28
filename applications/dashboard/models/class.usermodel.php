@@ -2194,8 +2194,8 @@ class UserModel extends Gdn_Model {
                     $confirmEmailRoleID = RoleModel::getDefaultRoles(RoleModel::TYPE_UNCONFIRMED);
                     if (!empty($confirmEmailRoleID)) {
                         // The confirm email role is set and it exists so go ahead with the email confirmation.
-                        $newKey = $this->confirmationCode();
-                        $emailKey = touchValue('EmailKey', $attributes, $newKey);
+                        $emailKey = $this->confirmationCode();
+                        setValue('EmailKey', $attributes, $emailKey);
                         $fields['Attributes'] = dbencode($attributes);
                         $fields['Confirmed'] = 0;
                     }

@@ -118,7 +118,8 @@ export class EditorToolbar extends React.PureComponent {
 
     /**
      * Handle key presses
-     * @param {React.SyntheticEvent} e
+     * @param {Object} menuItemData
+     * @param {React.SyntheticEvent} event
      */
     handleKeyPress = (menuItemData, event) => {
         switch (event.key) {
@@ -237,7 +238,7 @@ export class EditorToolbar extends React.PureComponent {
      * Handle the simple on/off inline formats (eg. bold, italic).
      *
      * @param {string} itemKey - The key of the item.
-     * @param {MenuItemData} itemData - The item to modify.
+     * @param {Object} itemData - The item to modify.
      * @param {Object} range - The range to update.
      */
     updateBooleanFormat(itemKey, itemData, range) {

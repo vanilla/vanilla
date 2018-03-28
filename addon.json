@@ -15,8 +15,15 @@
                 "./src/scripts/utility",
                 "./src/scripts/dom-utility",
                 "axios",
+                "classnames",
+                "moment",
                 "react",
-                "prop-types"
+                "react-dom",
+                "react-redux",
+                "react-router-dom",
+                "redux",
+                "prop-types",
+                "sprintf-js"
             ],
             "admin": [
                 "./src/scripts/application",
@@ -26,8 +33,15 @@
                 "./src/scripts/utility",
                 "./src/scripts/dom-utility",
                 "axios",
+                "classnames",
+                "moment",
                 "react",
-                "prop-types"
+                "react-dom",
+                "react-redux",
+                "react-router-dom",
+                "redux",
+                "prop-types",
+                "sprintf-js"
             ]
         }
     }

@@ -16,6 +16,11 @@ import { getMeta } from "@core/application";
  * </DocumentTitle>
  */
 export default class DocumentTitle extends React.Component {
+    static propTypes = {
+        title: PropTypes.string,
+        children: PropTypes.node,
+    }
+
     componentDidMount() {
         document.title = this.getHeadTitle(this.props);
     }
@@ -45,9 +50,4 @@ export default class DocumentTitle extends React.Component {
             return <h1>{this.props.title}</h1>;
         }
     }
-}
-
-DocumentTitle.propTypes = {
-    title: PropTypes.string,
-    children: PropTypes.node,
 }

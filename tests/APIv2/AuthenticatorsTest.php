@@ -37,7 +37,7 @@ class AuthenticatorsTest extends AbstractAPIv2Test {
         parent::setupBeforeClass();
 
         /** @var AuthenticatorModel $authenticatorModel */
-        $authenticatorModel = self::container()->get('AuthenticatorModel');
+        $authenticatorModel = self::container()->get(AuthenticatorModel::class);
         self::$authenticators = $authenticatorModel->getAuthenticators();
 
 

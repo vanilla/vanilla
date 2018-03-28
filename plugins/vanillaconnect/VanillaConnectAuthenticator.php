@@ -53,7 +53,7 @@ class VanillaConnectAuthenticator extends SSOAuthenticator {
      * @param string $providerID
      * @param Gdn_AuthenticationProviderModel $authProviderModel
      * @param Gdn_Configuration $config
-     * @paraVam Cookie $cookie
+     * @param Cookie $cookie
      * @param RequestInterface $request
      * @param UserAuthenticationNonceModel $nonceModel
      */

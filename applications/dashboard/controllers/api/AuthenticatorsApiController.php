@@ -206,7 +206,7 @@ class AuthenticatorsApiController extends AbstractApiController  {
 
         $this->idParamSchema();
         $in = $this->schema(
-            Schema::parse(['active'])->add($this->fullSchema()),
+            Schema::parse(['isActive'])->add($this->fullSchema()),
             ['AuthenticatorPatch', 'in']
         )->setDescription('Update an authenticator.');
         $out = $this->schema($this->fullSchema(), 'out');

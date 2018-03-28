@@ -205,7 +205,7 @@
 <h2>Insert Media</h2>
 <div class="richEditor-menu FlyoutMenu insertMedia insertPopover" style="position: relative;" role="dialog" aria-labelledby="tempId-insertMediaMenu-title" aria-describedby="tempId-insertMediaMenu-p">
     <div class="insertPopover-header">
-        <h2 id="tempId-insertMediaMenu-title" class="H insertMedia-title">
+        <h2 id="tempId-insertMediaMenu-title" class="H popover-title">
             <?php echo t('Insert Media'); ?>
         </h2>
         <a href="#" aria-label="<?php echo t('Close'); ?>" class="Close richEditor-close">
@@ -233,7 +233,7 @@
 
 <div class="richEditor-menu FlyoutMenu insertEmoji insertPopover" style="position: relative; overflow: hidden" role="dialog" aria-labelledby="tempId-insertEmoji-title">
     <div class="insertPopover-header">
-        <h2 id="tempId-insertMediaMenu-title" class="H insertMedia-title">
+        <h2 id="tempId-insertMediaMenu-title" class="H popover-title">
             <?php echo t('Smileys & Faces'); ?>
         </h2>
         <a href="#" aria-label="<?php echo t('Close'); ?>" class="Close richEditor-close">

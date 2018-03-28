@@ -22,7 +22,8 @@ export class Popover extends React.PureComponent {
         id: PropTypes.string,
         footer: PropTypes.element,
         additionalHeaderContent: PropTypes.element,
-        additionalClassRoot: PropTypes.string,
+        popoverTitleID: PropTypes.string.isRequired,
+        popoverDescriptionID: PropTypes.string.isRequired,
     };
 
     render() {
@@ -39,9 +40,6 @@ export class Popover extends React.PureComponent {
         );
 
         classes += this.props.className ? ` ${this.props.className}` : "";
-
-        const menuDescriptionID = "editor-description-" + this.props.editorID;
-        const titleID = "editor-title-" + this.props.editorID;
 
         const headerClasses = classNames(
             "insertPopover-header",
@@ -67,16 +65,16 @@ export class Popover extends React.PureComponent {
         return <div
             className={classes}
             role="dialog"
-            aria-describedby={menuDescriptionID}
+            aria-describedby={this.props.popoverDescriptionID}
             aria-hidden={!this.props.isVisible}
-            aria-labelledby={titleID}
+            aria-labelledby={this.props.popoverTitleID}
             id={this.props.id}
         >
             <div className={headerClasses}>
-                <h2 id={titleID} className="H insertMedia-title">
+                <h2 id={this.props.popoverTitleID} tabIndex="-1" className="H popover-title">
                     {this.props.title}
                 </h2>
-                <div id={menuDescriptionID} className="sr-only">
+                <div id={this.props.popoverDescriptionID} className="sr-only">
                     {this.props.accessibleDescription}
                 </div>
                 <button type="button" onClick={this.props.closeMenu} className="Close richEditor-close">

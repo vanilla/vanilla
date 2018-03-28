@@ -380,7 +380,7 @@ button.Close {
   padding-right: 12px;
 }
 
-.insertMedia-title {
+.popover-title {
   margin: 0;
   max-width: calc(100% - 39px);
   min-height: 27px;
@@ -429,7 +429,7 @@ button.Close {
   left: 0;
 }
 
-.insertMedia-title {
+.popover-title {
   font-size: 100%;
 }
 

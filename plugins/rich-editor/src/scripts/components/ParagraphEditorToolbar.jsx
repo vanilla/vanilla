@@ -133,7 +133,6 @@ export class ParagraphEditorToolbar extends React.PureComponent {
      */
     escFunction = (event) => {
         if(event.keyCode === 27 && this.state.showMenu) {
-            console.log("Escape from Paragraph Toolbar");
             this.closeMenu(event);
             document.getElementById(this.buttonID).focus();
         }

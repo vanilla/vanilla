@@ -251,23 +251,49 @@ export class ParagraphEditorToolbar extends React.PureComponent {
     };
 
     /**
+     * Get element containing menu items
+     */
+    getMenuContainer = () => {
+        const parentElement = document.getElementById(this.menuID);
+        if (parentElement) {
+            const menu = parentElement.querySelector('.richEditor-menuItems');
+            if (menu) {
+                return menu;
+            }
+        }
+        return false;
+    }
+
+    /**
      * Handle key presses
      * @param {React.SyntheticEvent} e
      */
     handleKeyPress = (event) => {
         switch (event.key) {
         case "ArrowUp":
-        case "ArrowRight":
-            event.preventDefault();
-            this.setState({
-                showMenu: false,
-            });
-            break;
-        case "ArrowDown":
-        case "ArrowLeft":
             event.preventDefault();
             this.setState({
                 showMenu: true,
+            }, () => {
+                setImmediate(() => {
+                    const menu = this.getMenuContainer();
+                    if(menu) {
+                        menu.firstChild.focus();
+                    }
+                });
+            });
+            break;
+        case "ArrowDown":
+            event.preventDefault();
+            this.setState({
+                showMenu: true,
+            }, () => {
+                setImmediate(() => {
+                    const menu = this.getMenuContainer();
+                    if(menu) {
+                        menu.lastChild.focus();
+                    }
+                });
             });
             break;
         }

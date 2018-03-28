@@ -325,13 +325,13 @@ class WebScraper {
             $response = json_decode($rawResponse, true);
             if (is_array($response)) {
                 $validAttributes = ['type', 'version', 'title', 'author_name', 'author_url', 'provider_name', 'provider_url',
-                    'cache_age', 'thumbnail_url', 'thumbnail_width', 'thumbnail_height'];
+                    'cache_age', 'thumbnail_url', 'width', 'height', 'thumbnail_width', 'thumbnail_height'];
                 $oembed = array_intersect_key($response, array_combine($validAttributes, $validAttributes));
 
                 $result['name'] = val('title', $oembed, null);
                 $result['photoUrl'] = val('thumbnail_url', $oembed, null);
-                $result['width'] = val('thumbnail_width', $oembed, null);
-                $result['height'] = val('thumbnail_height', $oembed, null);
+                $result['width'] = val('width', $oembed, val('thumbnail_width', $oembed, null));
+                $result['height'] = val('height', $oembed, val('thumbnail_height', $oembed, null));
             }
         }
 

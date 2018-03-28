@@ -45,6 +45,7 @@ export class InlineEditorToolbar extends React.Component {
             active: false,
         },
         code: {
+            formatName: "code-inline",
             active: false,
         },
         link: {
@@ -67,6 +68,8 @@ export class InlineEditorToolbar extends React.Component {
             showLink: false,
             value: "",
             previousRange: {},
+            isUrlInputVisible: false,
+            isMenuVisible: false,
         };
     }
 
@@ -75,6 +78,7 @@ export class InlineEditorToolbar extends React.Component {
      */
     componentDidMount() {
         this.quill.on(Emitter.events.EDITOR_CHANGE, this.handleEditorChange);
+        document.addEventListener("keydown", this.escFunction, false);
         document.addEventListener(quillUtilities.CLOSE_FLYOUT_EVENT, this.clearLinkInput);
 
         // Add a key binding for the link popup.
@@ -100,8 +104,25 @@ export class InlineEditorToolbar extends React.Component {
      */
     componentWillUnmount() {
         this.quill.off(Quill.events.EDITOR_CHANGE, this.handleEditorChange);
+        document.removeEventListener("keydown", this.escFunction, false);
         document.removeEventListener(quillUtilities.CLOSE_FLYOUT_EVENT, this.clearLinkInput);
     }
+
+    /**
+     * Close the menu.
+     *
+     * @param {Event} event -
+     */
+    escFunction = (event) => {
+        if(event.keyCode === 27 && (this.state.isMenuVisible || this.state.isUrlInputVisible)) {
+            this.setState({
+                value: "",
+                showLink: false,
+            });
+            const range = this.quill.getSelection(true);
+            this.quill.setSelection((range.length + range.index), 0, Emitter.sources.USER);
+        }
+    };
 
     /**
      * Handle changes from the editor.
@@ -202,21 +223,46 @@ export class InlineEditorToolbar extends React.Component {
     /**
      * Handle changes to the the close menu's input.
      *
-     * @param {React.SyntheticEvent} event -
+     * @param {React.SyntheticEvent} event
      */
     onLinkInputChange = (event) => {
         this.setState({value: event.target.value});
+    };
+
+
+    /**
+     * Set visibility of url input
+     *
+     * @param {bool} isVisible
+     */
+    setVisibilityOfUrlInput = (isVisible) => {
+        this.setState({
+            isUrlInputVisible: isVisible,
+        });
+    };
+
+    /**
+     * Set visibility of url input
+     *
+     * @param {bool} isVisible
+     */
+    setVisibilityOfMenu = (isVisible) => {
+        this.setState({
+            isMenuVisible: isVisible,
+        });
     };
 
     /**
      * @inheritDoc
      */
     render() {
+        const alertMessage = this.state.showLink ? null : <span aria-live="assertive" role="alert" className="sr-only">{t('Inline Menu Available')}</span>;
         return <div>
-            <SelectionPositionToolbar forceVisibility={this.state.showLink ? "hidden" : "ignore"}>
-                <EditorToolbar menuItems={this.menuItems}/>
+            <SelectionPositionToolbar setVisibility={this.setVisibilityOfMenu.bind(this)} quill={this.quill} forceVisibility={this.state.showLink ? "hidden" : "ignore"}>
+                {alertMessage}
+                <EditorToolbar quill={this.quill} menuItems={this.menuItems}/>
             </SelectionPositionToolbar>
-            <SelectionPositionToolbar forceVisibility={this.state.showLink ? "visible" : "hidden"}>
+            <SelectionPositionToolbar setVisibility={this.setVisibilityOfUrlInput.bind(this)} quill={this.quill} forceVisibility={this.state.showLink ? "visible" : "hidden"}>
                 <div className="richEditor-menu FlyoutMenu insertLink" role="dialog" aria-label={t("Insert Url")}>
                     <input
                         value={this.state.value}
@@ -226,13 +272,10 @@ export class InlineEditorToolbar extends React.Component {
                         className="InputBox insertLink-input"
                         placeholder={t("Paste or type a link…")}
                     />
-                    <a href="#"
-                        aria-label={t("Close")}
-                        className="Close richEditor-close"
-                        role="button"
-                        onClick={this.onCloseClick}>
-                        <span>×</span>
-                    </a>
+                    <button type="button" onClick={this.onCloseClick} className="Close richEditor-close">
+                        <span className="Close-x" aria-hidden="true">×</span>
+                        <span className="sr-only">{t('Close')}</span>
+                    </button>
                 </div>
             </SelectionPositionToolbar>
         </div>;

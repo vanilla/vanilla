@@ -25,7 +25,7 @@ export default class EditorProvider extends React.PureComponent {
     getChildContext() {
         return {
             quill: this.props.quill,
-            editorID: uniqueId(),
+            editorID: "richEditor" + uniqueId(),
         };
     }
 

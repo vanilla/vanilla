@@ -42,6 +42,8 @@ export class EmojiPopover extends React.PureComponent {
         isVisible: PropTypes.bool.isRequired,
         closeMenu: PropTypes.func.isRequired,
         blurHandler: PropTypes.func.isRequired,
+        popoverTitleID: PropTypes.string.isRequired,
+        popoverDescriptionID: PropTypes.string.isRequired,
     };
 
     /**
@@ -232,6 +234,9 @@ export class EmojiPopover extends React.PureComponent {
             additionalClassRoot="insertEmoji"
             closeMenu={this.props.closeMenu}
             isVisible={this.props.isVisible}
+            popoverTitleID={this.props.popoverTitleID}
+            popoverDescriptionID={this.props.popoverDescriptionID}
+            targetTitleOnOpen={this.props.targetTitleOnOpen}
         />;
     }
 }

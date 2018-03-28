@@ -31,6 +31,8 @@ export class EditorToolbar extends React.PureComponent {
         ...editorContextTypes,
         menuItems: PropTypes.object,
         isHidden: PropTypes.bool,
+        checkForExternalFocus: PropTypes.func,
+        itemRole: PropTypes.string,
     };
 
     static defaultItems = {
@@ -115,29 +117,64 @@ export class EditorToolbar extends React.PureComponent {
     }
 
     /**
+     * Handle key presses
+     * @param {Object} menuItemData
+     * @param {React.SyntheticEvent} event
+     */
+    handleKeyPress = (menuItemData, event) => {
+        switch (event.key) {
+        case "ArrowRight":
+        case "ArrowDown":
+            event.stopPropagation();
+            event.preventDefault();
+            if (menuItemData) {
+                //test
+            }
+            const nextSibling = this.domButton.nextSibling;
+            if (nextSibling) {
+                nextSibling.focus();
+            }
+            break;
+        case "ArrowUp":
+        case "ArrowLeft":
+            event.stopPropagation();
+            event.preventDefault();
+            const previousSibling = this.domButton.previousSibling;
+            if (previousSibling) {
+                previousSibling.focus();
+            }
+            break;
+        }
+    }
+
+    /**
      * @inheritDoc
      */
     render() {
-        const menuItems = Object.keys(this.state).map((itemName, key) => {
+        const menuItemList = Object.keys(this.state);
+        const checkForExternalFocus = this.props.checkForExternalFocus;
+        const menuItems = menuItemList.map((itemName, key) => {
             const isActive = this.state[itemName].active;
 
             return <EditorMenuItem
                 propertyName={itemName}
+                label={t('itemName')}
                 key={key}
                 isActive={isActive}
-                clickHandler={this.formatItem.bind(this, itemName)}
+                isLast={key + 1 === menuItemList.length}
+                isFirst={key === 0}
+                clickHandler={(event) => {this.formatItem(itemName, event)}}
+                checkForExternalFocus={checkForExternalFocus}
+                onKeyDown={(event) => {this.handleKeyPress(itemName, event)}}
+                role={this.props.itemRole}
             />;
         });
 
         return (
-            <div className="richEditor-menu" role="dialog" aria-label={t("Inline Level Formatting Menu")}>
-                <ul
-                    className="richEditor-menuItems MenuItems"
-                    role="menubar"
-                    aria-label={t("Inline Level Formatting Menu")}
-                >
+            <div className="richEditor-menu" role="menu">
+                <div className="richEditor-menuItems MenuItems">
                     {menuItems}
-                </ul>
+                </div>
             </div>
         );
     }
@@ -201,7 +238,7 @@ export class EditorToolbar extends React.PureComponent {
      * Handle the simple on/off inline formats (eg. bold, italic).
      *
      * @param {string} itemKey - The key of the item.
-     * @param {MenuItemData} itemData - The item to modify.
+     * @param {Object} itemData - The item to modify.
      * @param {Object} range - The range to update.
      */
     updateBooleanFormat(itemKey, itemData, range) {

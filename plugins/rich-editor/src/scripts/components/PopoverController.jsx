@@ -16,6 +16,7 @@ export class PopoverController extends React.Component {
         PopoverComponentClass: PropTypes.func.isRequired,
         classNameRoot: PropTypes.string.isRequired,
         icon: PropTypes.element.isRequired,
+        targetTitleOnOpen: PropTypes.bool,
     };
 
     /**
@@ -31,8 +32,11 @@ export class PopoverController extends React.Component {
         };
 
         this.controllerID = this.props.classNameRoot + "-" + this.props.editorID;
-        this.popoverID = this.props.classNameRoot + "-popover" + this.props.editorID;
-        this.buttonID = this.props.classNameRoot + "-button" + this.props.editorID;
+        this.popoverID = this.props.classNameRoot + "-popover-" + this.props.editorID;
+        this.buttonID = this.props.classNameRoot + "-button-" + this.props.editorID;
+        this.popoverTitleID =  this.props.classNameRoot + "-popoverTitle-" + this.props.editorID;
+        this.popoverDescriptionID =  this.props.classNameRoot + "-popoverDescription-" + this.props.editorID;
+        this.targetTitleOnOpen = !!this.props.targetTitleOnOpen;
     }
 
     componentDidMount(){
@@ -51,7 +55,7 @@ export class PopoverController extends React.Component {
      * @param {React.KeyboardEvent} event - A synthetic keyboard event.
      */
     handleEscapeKey = (event) => {
-        if(event.keyCode === 27) {
+        if(event.keyCode === 27 && this.state.isVisible) {
             this.closeMenu(event);
         }
     };
@@ -79,9 +83,16 @@ export class PopoverController extends React.Component {
      */
     togglePopover = () => {
         closeEditorFlyouts(this.constructor.name);
+        const titleID = this.popoverTitleID;
 
         this.setState({
             isVisible: !this.state.isVisible,
+        }, () => {
+            if (this.targetTitleOnOpen && this.state.isVisible) {
+                setImmediate(() => {
+                    document.getElementById(titleID).focus();
+                });
+            }
         });
     };
 
@@ -128,6 +139,9 @@ export class PopoverController extends React.Component {
                 isVisible={this.state.isVisible}
                 blurHandler={this.checkForExternalFocus}
                 closeMenu={this.closeMenu}
+                popoverTitleID={this.popoverTitleID}
+                popoverDescriptionID={this.popoverDescriptionID}
+                targetTitleOnOpen={this.props.targetTitleOnOpen}
             />
         </div>;
     }

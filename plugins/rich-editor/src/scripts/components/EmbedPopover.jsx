@@ -54,6 +54,9 @@ export class EmbedPopover extends React.PureComponent {
             additionalClassRoot="insertMedia"
             closeMenu={this.props.closeMenu}
             isVisible={this.props.isVisible}
+            popoverTitleID={this.props.popoverTitleID}
+            popoverDescriptionID={this.props.popoverDescriptionID}
+            targetTitleOnOpen={this.props.targetTitleOnOpen}
         />;
     }
 }

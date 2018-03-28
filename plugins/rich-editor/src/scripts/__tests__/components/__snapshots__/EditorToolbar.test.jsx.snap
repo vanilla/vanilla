@@ -68,40 +68,67 @@ ShallowWrapper {
     "key": undefined,
     "nodeType": "host",
     "props": Object {
-      "aria-label": "Inline Level Formatting Menu",
-      "children": <ul
-        aria-label="Inline Level Formatting Menu"
+      "children": <div
         className="richEditor-menuItems MenuItems"
-        role="menubar"
       >
         <EditorMenuItem
+          checkForExternalFocus={undefined}
           clickHandler={[Function]}
           isActive={false}
+          isFirst={true}
+          isLast={false}
+          label="itemName"
+          onKeyDown={[Function]}
           propertyName="bold"
+          role={undefined}
         />
         <EditorMenuItem
+          checkForExternalFocus={undefined}
           clickHandler={[Function]}
           isActive={false}
+          isFirst={false}
+          isLast={false}
+          label="itemName"
+          onKeyDown={[Function]}
           propertyName="italic"
+          role={undefined}
         />
         <EditorMenuItem
+          checkForExternalFocus={undefined}
           clickHandler={[Function]}
           isActive={false}
+          isFirst={false}
+          isLast={false}
+          label="itemName"
+          onKeyDown={[Function]}
           propertyName="strike"
+          role={undefined}
         />
         <EditorMenuItem
+          checkForExternalFocus={undefined}
           clickHandler={[Function]}
           isActive={false}
+          isFirst={false}
+          isLast={false}
+          label="itemName"
+          onKeyDown={[Function]}
           propertyName="code"
+          role={undefined}
         />
         <EditorMenuItem
+          checkForExternalFocus={undefined}
           clickHandler={[Function]}
           isActive={false}
+          isFirst={false}
+          isLast={true}
+          label="itemName"
+          onKeyDown={[Function]}
           propertyName="link"
+          role={undefined}
         />
-      </ul>,
+      </div>,
       "className": "richEditor-menu",
-      "role": "dialog",
+      "role": "menu",
     },
     "ref": null,
     "rendered": Object {
@@ -109,36 +136,64 @@ ShallowWrapper {
       "key": undefined,
       "nodeType": "host",
       "props": Object {
-        "aria-label": "Inline Level Formatting Menu",
         "children": Array [
           <EditorMenuItem
+            checkForExternalFocus={undefined}
             clickHandler={[Function]}
             isActive={false}
+            isFirst={true}
+            isLast={false}
+            label="itemName"
+            onKeyDown={[Function]}
             propertyName="bold"
+            role={undefined}
           />,
           <EditorMenuItem
+            checkForExternalFocus={undefined}
             clickHandler={[Function]}
             isActive={false}
+            isFirst={false}
+            isLast={false}
+            label="itemName"
+            onKeyDown={[Function]}
             propertyName="italic"
+            role={undefined}
           />,
           <EditorMenuItem
+            checkForExternalFocus={undefined}
             clickHandler={[Function]}
             isActive={false}
+            isFirst={false}
+            isLast={false}
+            label="itemName"
+            onKeyDown={[Function]}
             propertyName="strike"
+            role={undefined}
           />,
           <EditorMenuItem
+            checkForExternalFocus={undefined}
             clickHandler={[Function]}
             isActive={false}
+            isFirst={false}
+            isLast={false}
+            label="itemName"
+            onKeyDown={[Function]}
             propertyName="code"
+            role={undefined}
           />,
           <EditorMenuItem
+            checkForExternalFocus={undefined}
             clickHandler={[Function]}
             isActive={false}
+            isFirst={false}
+            isLast={true}
+            label="itemName"
+            onKeyDown={[Function]}
             propertyName="link"
+            role={undefined}
           />,
         ],
         "className": "richEditor-menuItems MenuItems",
-        "role": "menubar",
       },
       "ref": null,
       "rendered": Array [
@@ -147,9 +202,15 @@ ShallowWrapper {
           "key": "0",
           "nodeType": "class",
           "props": Object {
+            "checkForExternalFocus": undefined,
             "clickHandler": [Function],
             "isActive": false,
+            "isFirst": true,
+            "isLast": false,
+            "label": "itemName",
+            "onKeyDown": [Function],
             "propertyName": "bold",
+            "role": undefined,
           },
           "ref": null,
           "rendered": null,
@@ -160,9 +221,15 @@ ShallowWrapper {
           "key": "1",
           "nodeType": "class",
           "props": Object {
+            "checkForExternalFocus": undefined,
             "clickHandler": [Function],
             "isActive": false,
+            "isFirst": false,
+            "isLast": false,
+            "label": "itemName",
+            "onKeyDown": [Function],
             "propertyName": "italic",
+            "role": undefined,
           },
           "ref": null,
           "rendered": null,
@@ -173,9 +240,15 @@ ShallowWrapper {
           "key": "2",
           "nodeType": "class",
           "props": Object {
+            "checkForExternalFocus": undefined,
             "clickHandler": [Function],
             "isActive": false,
+            "isFirst": false,
+            "isLast": false,
+            "label": "itemName",
+            "onKeyDown": [Function],
             "propertyName": "strike",
+            "role": undefined,
           },
           "ref": null,
           "rendered": null,
@@ -186,9 +259,15 @@ ShallowWrapper {
           "key": "3",
           "nodeType": "class",
           "props": Object {
+            "checkForExternalFocus": undefined,
             "clickHandler": [Function],
             "isActive": false,
+            "isFirst": false,
+            "isLast": false,
+            "label": "itemName",
+            "onKeyDown": [Function],
             "propertyName": "code",
+            "role": undefined,
           },
           "ref": null,
           "rendered": null,
@@ -199,16 +278,22 @@ ShallowWrapper {
           "key": "4",
           "nodeType": "class",
           "props": Object {
+            "checkForExternalFocus": undefined,
             "clickHandler": [Function],
             "isActive": false,
+            "isFirst": false,
+            "isLast": true,
+            "label": "itemName",
+            "onKeyDown": [Function],
             "propertyName": "link",
+            "role": undefined,
           },
           "ref": null,
           "rendered": null,
           "type": [Function],
         },
       ],
-      "type": "ul",
+      "type": "div",
     },
     "type": "div",
   },
@@ -218,40 +303,67 @@ ShallowWrapper {
       "key": undefined,
       "nodeType": "host",
       "props": Object {
-        "aria-label": "Inline Level Formatting Menu",
-        "children": <ul
-          aria-label="Inline Level Formatting Menu"
+        "children": <div
           className="richEditor-menuItems MenuItems"
-          role="menubar"
         >
           <EditorMenuItem
+            checkForExternalFocus={undefined}
             clickHandler={[Function]}
             isActive={false}
+            isFirst={true}
+            isLast={false}
+            label="itemName"
+            onKeyDown={[Function]}
             propertyName="bold"
+            role={undefined}
           />
           <EditorMenuItem
+            checkForExternalFocus={undefined}
             clickHandler={[Function]}
             isActive={false}
+            isFirst={false}
+            isLast={false}
+            label="itemName"
+            onKeyDown={[Function]}
             propertyName="italic"
+            role={undefined}
           />
           <EditorMenuItem
+            checkForExternalFocus={undefined}
             clickHandler={[Function]}
             isActive={false}
+            isFirst={false}
+            isLast={false}
+            label="itemName"
+            onKeyDown={[Function]}
             propertyName="strike"
+            role={undefined}
           />
           <EditorMenuItem
+            checkForExternalFocus={undefined}
             clickHandler={[Function]}
             isActive={false}
+            isFirst={false}
+            isLast={false}
+            label="itemName"
+            onKeyDown={[Function]}
             propertyName="code"
+            role={undefined}
           />
           <EditorMenuItem
+            checkForExternalFocus={undefined}
             clickHandler={[Function]}
             isActive={false}
+            isFirst={false}
+            isLast={true}
+            label="itemName"
+            onKeyDown={[Function]}
             propertyName="link"
+            role={undefined}
           />
-        </ul>,
+        </div>,
         "className": "richEditor-menu",
-        "role": "dialog",
+        "role": "menu",
       },
       "ref": null,
       "rendered": Object {
@@ -259,36 +371,64 @@ ShallowWrapper {
         "key": undefined,
         "nodeType": "host",
         "props": Object {
-          "aria-label": "Inline Level Formatting Menu",
           "children": Array [
             <EditorMenuItem
+              checkForExternalFocus={undefined}
               clickHandler={[Function]}
               isActive={false}
+              isFirst={true}
+              isLast={false}
+              label="itemName"
+              onKeyDown={[Function]}
               propertyName="bold"
+              role={undefined}
             />,
             <EditorMenuItem
+              checkForExternalFocus={undefined}
               clickHandler={[Function]}
               isActive={false}
+              isFirst={false}
+              isLast={false}
+              label="itemName"
+              onKeyDown={[Function]}
               propertyName="italic"
+              role={undefined}
             />,
             <EditorMenuItem
+              checkForExternalFocus={undefined}
               clickHandler={[Function]}
               isActive={false}
+              isFirst={false}
+              isLast={false}
+              label="itemName"
+              onKeyDown={[Function]}
               propertyName="strike"
+              role={undefined}
             />,
             <EditorMenuItem
+              checkForExternalFocus={undefined}
               clickHandler={[Function]}
               isActive={false}
+              isFirst={false}
+              isLast={false}
+              label="itemName"
+              onKeyDown={[Function]}
               propertyName="code"
+              role={undefined}
             />,
             <EditorMenuItem
+              checkForExternalFocus={undefined}
               clickHandler={[Function]}
               isActive={false}
+              isFirst={false}
+              isLast={true}
+              label="itemName"
+              onKeyDown={[Function]}
               propertyName="link"
+              role={undefined}
             />,
           ],
           "className": "richEditor-menuItems MenuItems",
-          "role": "menubar",
         },
         "ref": null,
         "rendered": Array [
@@ -297,9 +437,15 @@ ShallowWrapper {
             "key": "0",
             "nodeType": "class",
             "props": Object {
+              "checkForExternalFocus": undefined,
               "clickHandler": [Function],
               "isActive": false,
+              "isFirst": true,
+              "isLast": false,
+              "label": "itemName",
+              "onKeyDown": [Function],
               "propertyName": "bold",
+              "role": undefined,
             },
             "ref": null,
             "rendered": null,
@@ -310,9 +456,15 @@ ShallowWrapper {
             "key": "1",
             "nodeType": "class",
             "props": Object {
+              "checkForExternalFocus": undefined,
               "clickHandler": [Function],
               "isActive": false,
+              "isFirst": false,
+              "isLast": false,
+              "label": "itemName",
+              "onKeyDown": [Function],
               "propertyName": "italic",
+              "role": undefined,
             },
             "ref": null,
             "rendered": null,
@@ -323,9 +475,15 @@ ShallowWrapper {
             "key": "2",
             "nodeType": "class",
             "props": Object {
+              "checkForExternalFocus": undefined,
               "clickHandler": [Function],
               "isActive": false,
+              "isFirst": false,
+              "isLast": false,
+              "label": "itemName",
+              "onKeyDown": [Function],
               "propertyName": "strike",
+              "role": undefined,
             },
             "ref": null,
             "rendered": null,
@@ -336,9 +494,15 @@ ShallowWrapper {
             "key": "3",
             "nodeType": "class",
             "props": Object {
+              "checkForExternalFocus": undefined,
               "clickHandler": [Function],
               "isActive": false,
+              "isFirst": false,
+              "isLast": false,
+              "label": "itemName",
+              "onKeyDown": [Function],
               "propertyName": "code",
+              "role": undefined,
             },
             "ref": null,
             "rendered": null,
@@ -349,16 +513,22 @@ ShallowWrapper {
             "key": "4",
             "nodeType": "class",
             "props": Object {
+              "checkForExternalFocus": undefined,
               "clickHandler": [Function],
               "isActive": false,
+              "isFirst": false,
+              "isLast": true,
+              "label": "itemName",
+              "onKeyDown": [Function],
               "propertyName": "link",
+              "role": undefined,
             },
             "ref": null,
             "rendered": null,
             "type": [Function],
           },
         ],
-        "type": "ul",
+        "type": "div",
       },
       "type": "div",
     },

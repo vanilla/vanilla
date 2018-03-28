@@ -127,10 +127,11 @@ $embedded-quote_fg: #A3A3A3 !default;
 
 .richEditor-menuItem {
     display: block;
-    margin: 0;
     padding: 0;
+    margin: 0;
 
-    .richEditor-button {
+    .richEditor-button,
+    &.richEditor-button {
         height: $richEditor-menuButton_size;
         width: $richEditor-menuButton_size;
         font-size: #{$richEditor-menuButton_size * 24 / 39};
@@ -339,7 +340,7 @@ $embedded-quote_fg: #A3A3A3 !default;
     }
 }
 
-.insertMedia-title {
+.popover-title {
     margin: 0;
     max-width: calc(100% - #{$richEditor-menuButton_size});
     min-height: #{$richEditor-menuButton_size - $richEditor-insertPopover_paddingVertical};
@@ -392,7 +393,7 @@ $embedded-quote_fg: #A3A3A3 !default;
     left: 0;
 }
 
-.insertMedia-title {
+.popover-title {
     font-size: 100%;
 }
 

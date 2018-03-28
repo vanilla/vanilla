@@ -184,18 +184,18 @@ button.Close {
 
 .richEditor-menuItem {
   display: block;
-  margin: 0;
   padding: 0;
+  margin: 0;
 }
 
-.richEditor-menuItem .richEditor-button {
+.richEditor-menuItem .richEditor-button, .richEditor-menuItem.richEditor-button {
   height: 39px;
   width: 39px;
   font-size: 24px;
   line-height: 39px;
 }
 
-.richEditor-menuItem .richEditor-button.emojiChar-🇺🇳 {
+.richEditor-menuItem .richEditor-button.emojiChar-🇺🇳, .richEditor-menuItem.richEditor-button.emojiChar-🇺🇳 {
   font-size: 14px;
 }
 
@@ -380,7 +380,7 @@ button.Close {
   padding-right: 12px;
 }
 
-.insertMedia-title {
+.popover-title {
   margin: 0;
   max-width: calc(100% - 39px);
   min-height: 27px;
@@ -429,7 +429,7 @@ button.Close {
   left: 0;
 }
 
-.insertMedia-title {
+.popover-title {
   font-size: 100%;
 }
 

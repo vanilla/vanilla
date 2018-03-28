@@ -581,19 +581,6 @@ class FacebookPlugin extends Gdn_Plugin {
                 $p = urlencode(ltrim($p, '='));
                 $redirectUri = $uri.'='.$p;
             }
-
-            $path = Gdn::request()->path();
-
-            $target = val('Target', $_GET, $path ? $path : '/'); // TODO rm global
-
-            if (ltrim($target, '/') == 'entry/signin' || ltrim($target, '/') == 'entry/facebook' || empty($target)) {
-                $target = '/';
-            }
-
-            $args = ['Target' => $target];
-
-            $redirectUri .= strpos($redirectUri, '?') === false ? '?' : '&';
-            $redirectUri .= http_build_query($args);
             $this->_RedirectUri = $redirectUri;
         }
 

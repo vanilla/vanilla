@@ -8,8 +8,10 @@
 namespace Vanilla\VanillaConnect;
 
 use Exception;
+use Garden\Web\Cookie;
 use Garden\Web\RequestInterface;
 use Gdn_AuthenticationProviderModel;
+use Gdn_Configuration;
 use UserAuthenticationNonceModel;
 use Vanilla\Authenticator\SSOAuthenticator;
 use Vanilla\Models\SSOData;
@@ -21,24 +23,22 @@ use Vanilla\Models\SSOData;
  */
 class VanillaConnectAuthenticator extends SSOAuthenticator {
 
-    /**
-     * @var RequestInterface
-     */
+    /** @var Cookie $cookie */
+    private $cookie;
+
+    /** @var string */
+    private $cookieName;
+
+    /** @var RequestInterface */
     private $request;
 
-    /**
-     * @var array
-     */
+    /** @var array */
     private $providerData;
 
-    /**
-     * @var VanillaConnect
-     */
+    /** @var VanillaConnect */
     private $vanillaConnect;
 
-    /**
-     * @var UserAuthenticationNonceModel
-     */
+    /** @var UserAuthenticationNonceModel */
     private $nonceModel;
 
     /**
@@ -48,12 +48,16 @@ class VanillaConnectAuthenticator extends SSOAuthenticator {
      *
      * @param string $providerID
      * @param Gdn_AuthenticationProviderModel $authProviderModel
+     * @param Gdn_Configuration $config
+     * @param Cookie $cookie
      * @param RequestInterface $request
      * @param UserAuthenticationNonceModel $nonceModel
      */
     public function __construct(
         $providerID,
         Gdn_AuthenticationProviderModel $authProviderModel,
+        Gdn_Configuration $config,
+        Cookie $cookie,
         RequestInterface $request,
         UserAuthenticationNonceModel $nonceModel
     ) {
@@ -62,6 +66,9 @@ class VanillaConnectAuthenticator extends SSOAuthenticator {
         }
 
         parent::__construct($providerID);
+
+        $this->cookie = $cookie;
+        $this->cookieName = $config->get('Garden.Cookie.Name', 'Vanilla').'-vanillaconnectnonce';
 
         $this->nonceModel = $nonceModel;
         $this->request = $request;
@@ -128,6 +135,7 @@ class VanillaConnectAuthenticator extends SSOAuthenticator {
     private function generateNonce() {
         $nonce = uniqid(VanillaConnect::NAME.'_');
         $this->nonceModel->insert(['Nonce' => $nonce, 'Token' => VanillaConnect::NAME]);
+        $this->cookie->set($this->cookieName, $nonce, VanillaConnect::TIMEOUT);
         return $nonce;
     }
 
@@ -230,7 +238,6 @@ class VanillaConnectAuthenticator extends SSOAuthenticator {
      * @throws Exception
      *
      * @param string $nonce
-     * @return bool
      */
     private function validateNonce($nonce) {
         $nonceData = $this->nonceModel->getWhere(['Nonce' => $nonce])->firstRow(DATASET_TYPE_ARRAY);
@@ -239,6 +246,11 @@ class VanillaConnectAuthenticator extends SSOAuthenticator {
         }
         if (strtotime($nonceData['Timestamp']) < time() - VanillaConnect::TIMEOUT) {
             throw new Exception('The nonce has expired.');
+        }
+
+        $cookiedNonce = $this->cookie->get($this->cookieName);
+        if (!$cookiedNonce || $cookiedNonce !== $nonce) {
+            throw new Exception('Nonce does not match cookied value.');
         }
     }
 

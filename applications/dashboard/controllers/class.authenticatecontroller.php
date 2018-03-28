@@ -172,7 +172,7 @@ class AuthenticateController extends Gdn_Controller {
 
                 if ($connectUserID) {
                     // This will effectively sync the user info / roles if there is a need for it.
-                    $connectSuccess = (bool)$this->ssoModel->sso($ssoData);
+                    $connectSuccess = (bool)$this->ssoModel->sso($ssoData, []);
                 } else {
                     $this->form->addError(t('Unable to connect user.'));
                 }

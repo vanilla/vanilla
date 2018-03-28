@@ -7,14 +7,15 @@
 
 namespace Vanilla\VanillaConnect;
 
-use Gdn_AuthenticationProviderModel;
-use Gdn_Configuration;
 use EntryController;
-use Logger;
 use Garden\Web\Exception\NotFoundException;
 use Garden\Web\RequestInterface;
+use Garden\Container\Container;
+use Gdn_AuthenticationProviderModel;
+use Gdn_Configuration;
 use Gdn_Plugin;
 use Gdn_Session;
+use Logger;
 use UserAuthenticationNonceModel;
 use UserModel;
 use Vanilla\Models\SSOModel;
@@ -30,6 +31,9 @@ class VanillaConnectPlugin extends Gdn_Plugin {
      * @var Gdn_Configuration
      */
     private $config;
+
+    /** @var Container */
+    private $container;
 
     /**
      * @var UserAuthenticationNonceModel
@@ -61,6 +65,7 @@ class VanillaConnectPlugin extends Gdn_Plugin {
      *
      * @param Gdn_AuthenticationProviderModel $authProviderModel
      * @param Gdn_Configuration $config
+     * @param Container $container
      * @param RequestInterface $request
      * @param Gdn_Session $session
      * @param SSOModel $ssoModel
@@ -70,6 +75,7 @@ class VanillaConnectPlugin extends Gdn_Plugin {
     public function __construct(
         Gdn_AuthenticationProviderModel $authProviderModel,
         Gdn_Configuration $config,
+        Container $container,
         UserAuthenticationNonceModel $nonceModel,
         RequestInterface $request,
         Gdn_Session $session,
@@ -80,6 +86,7 @@ class VanillaConnectPlugin extends Gdn_Plugin {
 
         $this->authProviderModel = $authProviderModel;
         $this->config = $config;
+        $this->container = $container;
         $this->nonceModel = $nonceModel;
         $this->request = $request;
         $this->session = $session;
@@ -110,12 +117,7 @@ class VanillaConnectPlugin extends Gdn_Plugin {
 
         try {
             $clientID = VanillaConnect::extractClientID($jwt);
-            $vanillaConnectAuthenticator = new VanillaConnectAuthenticator(
-                $clientID,
-                $this->authProviderModel,
-                $this->request,
-                $this->nonceModel
-            );
+            $vanillaConnectAuthenticator = $this->container->getArgs(VanillaConnectAuthenticator::class, [$clientID]);
             $ssoData = $vanillaConnectAuthenticator->validatePushSSOAuthentication($jwt);
 
             $currentUserID = $this->session->UserID;
@@ -254,12 +256,7 @@ class VanillaConnectPlugin extends Gdn_Plugin {
             throw new NotFoundException();
         }
 
-        $vanillaConnectAuthenticator = new VanillaConnectAuthenticator(
-            $clientID,
-            $this->authProviderModel,
-            $this->request,
-            $this->nonceModel
-        );
+        $vanillaConnectAuthenticator = $this->container->getArgs(VanillaConnectAuthenticator::class, [$clientID]);
 
         if ($action === 'signin') {
             $url = $vanillaConnectAuthenticator->signInURL();

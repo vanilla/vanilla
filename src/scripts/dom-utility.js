@@ -209,6 +209,26 @@ export function getData(element, key, defaultValue) {
 }
 
 /**
+ * Get an HTML element from a CSS selector or DOM Node.
+ *
+ * @param {string|Node} selectorOrElement - A CSS selector or an HTML element.
+ *
+ * @throws {Error} - If no element was found.
+ * @returns {HTMLElement} - An HTMLElement no matter what.
+ */
+export function ensureHtmlElement(selectorOrElement) {
+    if (typeof selectorOrElement === "string") {
+        selectorOrElement = document.querySelector(selectorOrElement);
+    }
+
+    if (!(selectorOrElement instanceof HTMLElement)) {
+        throw new Error(`HTMLElement could not be found for ${selectorOrElement}.`);
+    }
+
+    return selectorOrElement;
+}
+
+/**
  * Render a react component.
  */
 export function renderComponent() {

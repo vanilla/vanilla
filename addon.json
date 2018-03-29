@@ -9,15 +9,24 @@
         },
         "exports": {
             "*": [
-                "./src/scripts/events",
+                "./src/scripts/ajax",
+                "./src/scripts/application",
                 "./src/scripts/gdn",
                 "./src/scripts/permissions",
                 "./src/scripts/utility",
                 "./src/scripts/dom-utility",
+                "./src/scripts/Components/DocumentTitle",
+                "./src/scripts/Main/NotFoundPage",
                 "axios",
+                "classnames",
+                "moment",
+                "prop-types",
                 "react",
                 "react-dom",
-                "prop-types"
+                "react-redux",
+                "react-router-dom",
+                "redux",
+                "sprintf-js"
             ],
             "app": [],
             "admin": []

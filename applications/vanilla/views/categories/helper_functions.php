@@ -146,6 +146,7 @@ if (!function_exists('writeListItem')):
         $cssClass = cssClass($category);
         $writeChildren = getWriteChildrenMethod($category, $depth);
         $rssIcon = '';
+        $headingLevel = $depth + 2;
 
         if (val('DisplayAs', $category) === 'Discussions') {
             $rssImage = img('applications/dashboard/design/images/rss.gif', ['alt' => t('RSS Feed')]);
@@ -154,7 +155,7 @@ if (!function_exists('writeListItem')):
 
         if (val('DisplayAs', $category) === 'Heading') : ?>
             <li id="Category_<?php echo $categoryID; ?>" class="CategoryHeading <?php echo $cssClass; ?>">
-                <div class="ItemContent Category">
+                <div role="heading" aria-level="<?php echo $headingLevel; ?>" class="ItemContent Category">
                     <div class="Options"><?php echo getOptions($category); ?></div>
                     <?php echo Gdn_Format::text(val('Name', $category)); ?>
                 </div>
@@ -171,7 +172,7 @@ if (!function_exists('writeListItem')):
                         <?php echo getOptions($category) ?>
                     </div>
                     <?php echo categoryPhoto($category); ?>
-                    <div class="TitleWrap">
+                    <div role="heading" aria-level="<?php echo $headingLevel; ?>" class="TitleWrap">
                         <?php echo anchor(Gdn_Format::text(val('Name', $category)), categoryUrl($category), 'Title');
                         Gdn::controller()->fireEvent('AfterCategoryTitle');
                         ?>
@@ -233,13 +234,13 @@ if (!function_exists('WriteTableHead')):
     function writeTableHead() {
         ?>
         <tr>
-            <td class="CategoryName">
+            <td class="CategoryName" role="columnheader">
                 <div class="Wrap"><?php echo categoryHeading(); ?></div>
             </td>
-            <td class="BigCount CountDiscussions">
+            <td class="BigCount CountDiscussions" role="columnheader">
                 <div class="Wrap"><?php echo t('Discussions'); ?></div>
             </td>
-            <td class="BigCount CountComments">
+            <td class="BigCount CountComments" role="columnheader">
                 <div class="Wrap"><?php echo t('Comments'); ?></div>
             </td>
             <td class="BlockColumn LatestPost">
@@ -256,6 +257,7 @@ if (!function_exists('WriteTableRow')):
         $children = $row['Children'];
         $writeChildren = getWriteChildrenMethod($row, $depth);
         $h = 'h'.($depth + 1);
+        $level = 3;
         ?>
         <tr class="<?php echo cssClass($row); ?>">
             <td class="CategoryName">
@@ -265,7 +267,7 @@ if (!function_exists('WriteTableRow')):
 
                     echo categoryPhoto($row);
 
-                    echo "<{$h}>";
+                    echo "<{$h} aria-level='".$level."'>";
                     $safeName = htmlspecialchars($row['Name']);
                     echo $row['DisplayAs'] === 'Heading' ? $safeName : anchor($safeName, $row['Url']);
                     Gdn::controller()->EventArguments['Category'] = $row;
@@ -361,6 +363,7 @@ if (!function_exists('writeCategoryList')):
 
         ?>
         <div class="DataListWrap">
+            <h2 class="sr-only"><?php echo t('Category List'); ?></h2>
             <ul class="DataList CategoryList">
                 <?php
                 foreach ($categories as $category) {
@@ -393,13 +396,14 @@ if (!function_exists('writeCategoryTable')):
                 }
                 ?>
                 <div id="CategoryGroup-<?php echo $urlCode; ?>" class="CategoryGroup <?php echo $class; ?>">
-                    <h2 class="H"><?php echo $name; ?></h2>
+                    <h2 class="H categoryList-heading"><?php echo $name; ?></h2>
                     <?php writeCategoryTable($category['Children'], $depth + 1, $inTable); ?>
                 </div>
                 <?php
             else :
                 if (!$inTable) { ?>
                     <div class="DataTableWrap">
+                        <h2 class="sr-only categoryList-genericHeading"><?php echo t('Category List') ?></h2>
                         <table class="DataTable CategoryTable">
                             <thead>
                             <?php writeTableHead(); ?>
@@ -468,7 +472,7 @@ if (!function_exists('followButton')) :
                     <path d="M7.568,14.317a.842.842,0,0,1-1.684,0,4.21,4.21,0,0,0-4.21-4.21h0a.843.843,0,0,1,0-1.685A5.9,5.9,0,0,1,7.568,14.317Zm4.21,0a.842.842,0,0,1-1.684,0A8.421,8.421,0,0,0,1.673,5.9h0a.842.842,0,0,1,0-1.684,10.1,10.1,0,0,1,10.105,10.1Zm4.211,0a.842.842,0,0,1-1.684,0A12.633,12.633,0,0,0,1.673,1.683.842.842,0,0,1,1.673,0,14.315,14.315,0,0,1,15.989,14.315ZM1.673,16a1.684,1.684,0,1,1,1.684-1.684h0A1.684,1.684,0,0,1,1.673,16Z" transform="translate(0.011 0.001)" style="fill: currentColor;"/>
                 </svg>
 EOT;
-           
+
             $text = $following ? t('Following') : t('Follow');
             $output .= anchor(
                 $icon.$text,

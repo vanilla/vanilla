@@ -1275,6 +1275,28 @@ class AddonManager {
     }
 
     /**
+     * Unbind the events of an addon's plugin class (if any).
+     *
+     * If the addon doesn't have a plugin then nothing will happen.
+     *
+     * @param Addon $addon The addon to unbind.
+     * @param EventManager $eventManager The event manager to bind the plugin classes to.
+     */
+    public function unbindAddonEvents(Addon $addon, EventManager $eventManager) {
+        // Check that the addon has a plugin.
+        if (!($pluginClass = $addon->getPluginClass())) {
+            return;
+        }
+
+        // Only register the plugin if it implements the Gdn_IPlugin interface.
+        if (is_a($pluginClass, 'Gdn_IPlugin', true)) {
+            $eventManager->unbindClass($pluginClass);
+        } else {
+            trigger_error("$pluginClass does not implement Gdn_IPlugin", E_USER_DEPRECATED);
+        }
+    }
+
+    /**
      * Tells whether the AddonManager's cache is enabled or not.
      *
      * @return bool

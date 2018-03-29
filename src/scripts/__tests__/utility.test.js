@@ -5,7 +5,6 @@
  */
 
 import * as utility from "../utility";
-import gdn from "../gdn";
 
 describe("resolvePromisesSequentially()", () => {
     it("resolves promises in order", () => {
@@ -83,84 +82,5 @@ describe("hashString", () => {
         const str2 = "a;sldkfjal;skdfjl;kasjdfl;k;laksjdf;laksjdf;laksjdf;lkajsd;lkfjaskl;dfjals;kdfjnal;skdjbfl;kasbdjfv;laskjbdfal;skdjfalv;skdjfalskdbjnfav;bslkdfjnalv;ksdfjbalskdfbjalvsk.dfjbalsv;kdbfjalsv;kdfjbadklsfjals";
 
         expect(utility.hashString(str1)).not.toBe(utility.hashString(str2));
-    });
-});
-
-describe("generateRandomString", () => {
-    it("generates strings of a proper length", () => {
-        const possibleValues = [
-            3,
-            41000,
-            0,
-            424,
-            23,
-            255
-        ];
-
-        possibleValues.forEach(value => {
-            expect(utility.generateRandomString(value).length).toBe(value);
-        })
-    })
-
-    it("errors when passed an negative number", () => {
-        expect(() => utility.generateRandomString(-1)).toThrowError();
-    });
-
-    it("errors when passed a non-integer number", () => {
-        // @ts-ignore
-        expect(() => utility.generateRandomString("asd")).toThrowError();
-        expect(() => utility.generateRandomString(123.42)).toThrowError();
-    })
-});
-
-describe("metaDataFunctions", () => {
-    it("return a default value if the requested one can't be found", () => {
-        expect(utility.getMeta("baz", "fallback")).toBe("fallback");
-    })
-
-    it("can set a new meta value", () => {
-        utility.setMeta("test", "result");
-        expect(utility.getMeta("test")).toBe("result");
-    })
-
-    it("can override existing values with new ones", () => {
-        utility.setMeta("foo", "foo2");
-        expect(utility.getMeta("foo")).toBe("foo2");
-    })
-})
-
-describe("formatUrl", () => {
-    it("passes absolute URLs through directly", () => {
-        const paths = [
-            "https://test.com",
-            "//test.com",
-            "http://test.com",
-        ];
-
-        paths.forEach(path => {
-            expect(utility.formatUrl(path)).toBe(path);
-        })
-    });
-
-    it("follows the given format", () => {
-        utility.setMeta("UrlFormat", "/test/{Path}");
-
-        expect(utility.formatUrl("/discussions")).toBe("/test/discussions");
-    });
-});
-
-describe("translate", () => {
-    gdn.translations['foo'] = 'bar';
-
-    it("Translates a string", () => {
-        expect(utility.translate('foo')).toBe('bar');
-    });
-
-    it("Returns the default string", () => {
-        expect(utility.translate('baz', 'bam')).toBe('bam');
-    });
-
-    it("Falls back to the string code", () => {
-        expect(utility.translate('moo')).toBe('moo');
     });
 });

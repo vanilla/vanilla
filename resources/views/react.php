@@ -1,0 +1,1 @@
+<div data-react="<?php echo htmlspecialchars($this->data('component', 'App')) ?>"></div>

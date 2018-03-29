@@ -149,11 +149,16 @@ class DiscussionsController extends VanillaController {
         $categoryIDs = $this->getCategoryIDs();
         $where = [];
         if ($this->data('Followed')) {
-            $where['d.CategoryID'] = array_keys($categoryModel->getFollowed(Gdn::session()->UserID));
+            $followedCategories = array_keys($categoryModel->getFollowed(Gdn::session()->UserID));
+            $visibleCategories = CategoryModel::instance()->getVisibleCategoryIDs(['filterHideDiscussions' => true]);
+            if ($visibleCategories === true) {
+                $visibleFollowedCategories = $followedCategories;
+            } else {
+                $visibleFollowedCategories = array_intersect($followedCategories, $visibleCategories);
+            }
+            $where['d.CategoryID'] = $visibleFollowedCategories;
         } elseif ($categoryIDs) {
             $where['d.CategoryID'] = CategoryModel::filterCategoryPermissions($categoryIDs);
-        } else {
-            $DiscussionModel->Watching = true;
         }
 
         // Get Discussion Count
@@ -278,7 +283,6 @@ class DiscussionsController extends VanillaController {
         $discussionModel->setFilters(Gdn::request()->get());
         $this->setData('Sort', $discussionModel->getSort());
         $this->setData('Filters', $discussionModel->getFilters());
-        $discussionModel->Watching = true;
 
         // Get Discussion Count
         $countDiscussions = $discussionModel->getUnreadCount();

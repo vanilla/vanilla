@@ -23,7 +23,14 @@ foreach ($this->DraftData->resultArray() as $Draft) {
             class="Options"><?php
                 echo anchor(t('Draft.Delete', '&times;'), $deleteUrl, 'Delete'); ?></div>
         <div class="ItemContent">
-            <?php echo anchor(Gdn_Format::text(val('Name', $Draft), false), $editUrl, 'Title DraftLink'); ?>
+            <?php
+            $anchorText = Gdn_Format::text(val('Name', $Draft), false);
+            if (!empty($anchorText)) {
+                echo anchor(wrap($anchorText, "span", ['class' => 'Draft-Title', 'role' => 'heading', 'aria-level' => '2']), $editUrl, 'Title DraftLink');
+            } else {
+                echo anchor(wrap(t('No Title'), "h2"), $editUrl, 'sr-only');
+            }
+            ?>
             <?php if ($excerpt) : ?>
                 <div class="Excerpt">
                     <?php echo anchor($excerpt, $editUrl); ?>

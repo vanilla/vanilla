@@ -5,6 +5,7 @@ $Configuration = [];
 
 // Auto-enable some addons.
 $Configuration['EnabledPlugins']['stubcontent'] = true;
+$Configuration['EnabledPlugins']['swagger-ui'] = true;
 $Configuration['EnabledApplications']['Dashboard'] = 'dashboard';
 
 // Database defaults.

@@ -69,8 +69,6 @@ class DiscussionsModule extends Gdn_Module {
 
         if ($categoryIDs) {
             $where['d.CategoryID'] = CategoryModel::filterCategoryPermissions($categoryIDs);
-        } else {
-            $discussionModel->Watching = true;
         }
 
         $this->setData('Discussions', $discussionModel->get(0, $limit, $where));

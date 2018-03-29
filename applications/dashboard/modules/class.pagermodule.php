@@ -8,10 +8,15 @@
  * @since 2.0
  */
 
+use Vanilla\Web\WebLinking;
+
 /**
  * Builds a pager control related to a dataset.
  */
 class PagerModule extends Gdn_Module {
+
+    /** @var WebLinking */
+    private $webLinking;
 
     /** @var int The id applied to the div tag that contains the pager. */
     public $ClientID;
@@ -100,7 +105,51 @@ class PagerModule extends Gdn_Module {
         $this->_PropertiesDefined = false;
         $this->_Totalled = false;
         $this->_LastOffset = 0;
+
+        $this->webLinking = Gdn::getContainer()->get(WebLinking::class);
+
         parent::__construct($sender);
+    }
+
+    /**
+     * Add prev/next relationship links to document and the response headers.
+     *
+     * @param Gdn_Controller $controller
+     */
+    private function addRelLinks(Gdn_Controller $controller) {
+        static $pending = true;
+
+        // Make sure this only happens once.
+        if ($pending === true) {
+            /** @var HeadModule $head */
+            $head = $controller->Head;
+            $currentPage = pageNumber($this->Offset, $this->Limit);
+
+            if ($currentPage > 1) {
+                $prevHref = $this->pageUrl($currentPage - 1);
+                $head->addTag('link', [
+                    'rel' => 'prev',
+                    'href' => url($prevHref)
+                ]);
+                $this->webLinking->addLink('prev', url($prevHref, true));
+            }
+
+            if ($this->hasMorePages()) {
+                $nextHref = $this->pageUrl($currentPage + 1);
+                $head->addTag('link', [
+                    'rel' => 'next',
+                    'href' => url($nextHref)
+                ]);
+                $this->webLinking->addLink('next', url($nextHref, true));
+            }
+
+            $linkHeader = $this->webLinking->getLinkHeaderValue();
+            if ($linkHeader) {
+                $controller->setHeader('Link', $linkHeader);
+            }
+
+            $pending = false;
+        }
     }
 
     /**
@@ -144,6 +193,7 @@ class PagerModule extends Gdn_Module {
             }
 
             $this->_PropertiesDefined = true;
+            $this->addRelLinks(Gdn::controller());
 
             Gdn::controller()->EventArguments['Pager'] = $this;
             Gdn::controller()->fireEvent('PagerInit');
@@ -261,7 +311,7 @@ class PagerModule extends Gdn_Module {
         if ($this->UrlCallBack) {
             return call_user_func($this->UrlCallBack, $this->Record, $page);
         } else {
-            return self::formatUrl($this->Url, 'p'.$page);
+            return self::formatUrl($this->Url, $page > 1 ? 'p'.$page : '');
         }
     }
 

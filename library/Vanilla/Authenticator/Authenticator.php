@@ -7,6 +7,9 @@
 
 namespace Vanilla\Authenticator;
 
+use Exception;
+use Garden\Schema\Schema;
+use Garden\Schema\ValidationException;
 use Garden\Web\RequestInterface;
 
 abstract class Authenticator {
@@ -27,34 +30,109 @@ abstract class Authenticator {
     /**
      * Authenticator constructor.
      *
-     * @throws \Exception
+     * @throws Exception
+     * @throws ValidationException
      * @param string $authenticatorID
      */
     public function __construct($authenticatorID) {
         $this->authenticatorID = $authenticatorID;
 
         $classParts = explode('\\', static::class);
-        if (array_pop($classParts) !== $this->getNameImpl(static::class).'Authenticator') {
-            throw new \Exception('Authenticator class name must end with Authenticator');
+        if (array_pop($classParts) !== static::getTypeImpl().'Authenticator') {
+            throw new \Exception('Authenticator class name must end with "Authenticator".');
         }
+
+        // Let's validate ourselves :)
+        $this->getAuthenticatorInfo();
     }
 
     /**
-     * Validate an authentication by using the equest's data.
+     * Get this authenticate Schema.
      *
-     * @throws Exception Reason why the authentication failed.
-     * @param RequestInterface $request
-     * @return array The user's information.
+     * @return Schema
      */
-    public abstract function validateAuthentication(RequestInterface $request);
+    public static function getAuthenticatorSchema(): Schema {
+        return Schema::parse([
+            'authenticatorID:s' => 'Authenticator instance\'s identifier.',
+            'type:s' => 'Authenticator instance\'s type.',
+            'name:s' => 'User friendly name of the authenticator.',
+            'getSignInUrl:s|n' => 'The configured sign in URL of the provider.',
+            'getRegisterUrl:s|n' => 'The configured register URL of the provider.',
+            'getSignOutUrl:s|n' => 'The configured sign out URL of the provider.',
+            'ui:o' => static::getUiSchema(),
+            'isActive:b' => 'Whether or not the authenticator can be used.',
+            'attributes:o' => 'Provider specific attributes',
+        ]);
+    }
 
     /**
-     * Getter of the authenticator's ID.
+     * Information on this type of authenticator.
+     * Check Authenticator::getAuthenticatorTypeSchema() to know what is returned by this function.
+     *
+     * @throws ValidationException
+     * @return array
+     */
+    final public static function getAuthenticatorTypeInfo(): array {
+        $defaults = static::getAuthenticatorTypeDefaultInfo();
+        $info = static::getAuthenticatorTypeInfoImpl();
+
+        return static::getAuthenticatorTypeSchema()->validate($info + $defaults);
+    }
+
+    /**
+     * Return authenticator type default information.
+     * This method is intended to fill information so that child classes won't have to do it.
+     * Use getAuthenticatorTypeInfoImpl() to fill the "final" information.
+     *
+     * @return array
+     */
+    protected static function getAuthenticatorTypeDefaultInfo(): array {
+        $type =  static::getType();
+        return [
+            'type' => $type,
+            'name' => ucfirst($type),
+            'isUnique' => static::isUnique(),
+
+        ];
+    }
+
+    /**
+     * Return essential non-default authenticator type information.
+     *
+     * Must be returned by this method:
+     * - ui.photoUrl
+     * - ui.backgroundColor
+     *
+     * Any fields from getAuthenticatorTypeSchema() can be overridden from this method.
+     *
+     * @return array
+     */
+    abstract protected static function getAuthenticatorTypeInfoImpl(): array;
+
+    /**
+     * Get the authenticator type schema.
+     *
+     * @return Schema
+     */
+    public static function getAuthenticatorTypeSchema(): Schema {
+        return Schema::parse([
+            'type:s' => 'Authenticator instance\'s type.',
+            'name:s' => 'User friendly name of the authenticator.',
+            'ui:o'  => Schema::parse([
+                'photoUrl' => null,
+                'backgroundColor' => null,
+            ])->add(static::getUiSchema()),
+            'isUnique:b' => 'Whether one or more authenticators of this type can be created.',
+        ]);
+    }
+
+    /**
+     * Getter of type.
      *
      * @return string
      */
-    public final function getID() {
-        return $this->authenticatorID;
+    final public static function getType() {
+        return static::getTypeImpl();
     }
 
     /**
@@ -62,23 +140,35 @@ abstract class Authenticator {
      *
      * @return string
      */
-    private function getNameImpl() {
-        // return Name from "{Name}Authenticator"
+    private static function getTypeImpl() {
+        // return Type from "{Type}Authenticator"
         $classParts = explode('\\', static::class);
         return (string)substr(array_pop($classParts), 0, -strlen('Authenticator'));
     }
 
     /**
-     * Getter of the authenticator's name.
+     * Get the authenticator UI information schema.
      *
-     * @return string
+     * @return Schema
      */
-    public function getName() {
-        return $this->getNameImpl();
+     public static function getUiSchema(): Schema {
+        return Schema::parse([
+            'url:s' => 'Local URL from which you can initiate the SignIn process with this authenticator',
+            'photoUrl:s' => 'The icon for the button.',
+            'buttonName:s' => 'The display text to put in the button. Ex: "Sign in with Facebook"',
+            'backgroundColor:s' => 'A css color code. (Hex color, rgb or rgba)',
+        ]);
     }
 
     /**
-     * Getter of the authenticator's active property.
+     * Tell whether this type of authenticator can have multiple instance or not.
+     *
+     * @return bool
+     */
+    abstract public static function isUnique(): bool;
+
+    /**
+     * Getter of active.
      *
      * @return bool
      */
@@ -87,16 +177,102 @@ abstract class Authenticator {
     }
 
     /**
-     * Setter of the authenticator's active property.
+     * Setter of active.
      *
      * @param bool $active
-     * @return static
+     * @return self
      */
-    public function setActive(bool $active): Authenticator {
+    public function setActive(bool $active): self {
         $this->active = $active;
 
         return $this;
     }
 
+    /**
+     * Return authenticator default information.
+     *
+     * This method is intended to fill information so that child classes won't have to do it.
+     * Use getAuthenticatorInfoImpl() to fill the "final" information.
+     *
+     * @return array
+     */
+    protected function getAuthenticatorDefaultInfo(): array {
+        return [
+            'authenticatorID' => $this->getID(),
+            'getSignInUrl' => $this->getSignInUrl(),
+            'getRegisterUrl' => $this->getRegisterUrl(),
+            'getSignOutUrl' => $this->getSignOutUrl(),
+            'ui' => [
+                'url' => strtolower(url('/authenticate/signin/'.static::getType().'/'.$this->getID())),
+            ],
+            'isActive' => $this->isActive(),
+            'attributes' => [],
+        ];
+    }
 
+    /**
+     * Get all the authenticator information.
+     *
+     * @throws ValidationException
+     * @return array
+     */
+    final public function getAuthenticatorInfo(): array {
+        $defaults = $this->getAuthenticatorDefaultInfo();
+        $instanceInfo = $this->getAuthenticatorInfoImpl();
+        $typeInfo = static::getAuthenticatorTypeInfo();
+
+        return static::getAuthenticatorSchema()->validate(array_replace_recursive($defaults, $instanceInfo, $typeInfo));
+
+    }
+
+    /**
+     * Return essential non-default authenticator information.
+     *
+     * Must be returned by this method:
+     * - ui.buttonName
+     *
+     * Any fields from getAuthenticatorSchema(), but fields from getAuthenticatorTypeInfo(), can be overridden from this method.
+     *
+     * @return array
+     */
+    abstract protected function getAuthenticatorInfoImpl(): array;
+
+    /**
+     * Getter of the authenticator's ID.
+     *
+     * @return string
+     */
+    final public function getID(): string {
+        return $this->authenticatorID;
+    }
+
+    /**
+     * Returns the register in URL.
+     *
+     * @return string|null
+     */
+    abstract public function getRegisterUrl();
+
+    /**
+     * Returns the sign in URL.
+     *
+     * @return string|null
+     */
+    abstract public function getSignInUrl();
+
+    /**
+     * Returns the sign out URL.
+     *
+     * @return string|null
+     */
+    abstract public function getSignOutUrl();
+
+    /**
+     * Validate an authentication by using the request's data.
+     *
+     * @throws Exception Reason why the authentication failed.
+     * @param RequestInterface $request
+     * @return array The user's information.
+     */
+     abstract public function validateAuthentication(RequestInterface $request);
 }

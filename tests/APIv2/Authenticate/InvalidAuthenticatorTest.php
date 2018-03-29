@@ -29,7 +29,7 @@ class InvalidAuthenticatorTest extends AbstractAPIv2Test {
      */
     public function testAuthenticate() {
         $postData = [
-            'authenticator' => 'invalid',
+            'authenticatorType' => 'invalid',
             'authenticatorID' => '',
         ];
 

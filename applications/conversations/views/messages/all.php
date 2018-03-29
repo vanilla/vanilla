@@ -19,7 +19,6 @@ if (checkPermission('Conversations.Conversations.Add')) {
 echo '</div>';
 ?>
     <div class="DataListWrap">
-        <h2 class="Hidden"><?php echo $this->data('Title'); ?></h2>
         <ul class="Condensed DataList Conversations">
             <?php
             if (count($this->data('Conversations') > 0)):

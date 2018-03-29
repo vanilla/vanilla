@@ -136,10 +136,10 @@ if (!function_exists('writePromotedContentTable')):
                 <table class="DataTable">
                     <thead>
                     <tr>
-                        <td class="DiscussionName">
+                        <td class="DiscussionName" role="columnheader">
                             <div class="Wrap"><?php echo t('Subject'); ?></div>
                         </td>
-                        <td class="BlockColumn BlockColumn-User LastUser">
+                        <td class="BlockColumn BlockColumn-User LastUser" role="columnheader">
                             <div class="Wrap"><?php echo t('Author'); ?></div>
                         </td>
                     </tr>

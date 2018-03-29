@@ -48,7 +48,7 @@ foreach ($this->data('Conversations') as $Conversation) {
             <?php
             $Url = '/messages/'.$Conversation->ConversationID.'/#Item_'.$JumpToItem;
 
-            echo '<h3 class="Users">';
+            echo '<h3 aria-level="2" class="Users">';
 
             if ($Names) {
                 if ($LastPhoto) {

@@ -626,7 +626,8 @@ class Gdn_Controller extends Gdn_Pluggable {
 
         // Output a JavaScript object with all the definitions.
         $result = 'gdn=window.gdn||{};'.
-            'gdn.meta='.json_encode($this->_Definitions).';';
+            'gdn.meta='.json_encode($this->_Definitions).';'.
+            'gdn.permissions='.json_encode(Gdn::session()->getPermissions()).';';
 
         if ($wrap) {
             $result = "<script>$result</script>";
@@ -1842,6 +1843,18 @@ class Gdn_Controller extends Gdn_Pluggable {
                 $this->fireEvent('AfterJsCdns');
 
                 $this->Head->addScript('', 'text/javascript', false, ['content' => $this->definitionList(false)]);
+
+                $busta = trim(assetVersion('', ''), '.');
+
+                // Add the client-side translations.
+                // This is done in the controller rather than the asset model because the translations are not linked to compiled code.
+                $this->Head->addScript(url('/api/v2/locales/'.rawurlencode(Gdn::locale()->current())."/translations?js=1&x-cache=1&h=$busta", true), 'text/javascript', false, ['defer' => 'true']);
+
+                // Add the built addon javascript files.
+                $addonJs = $AssetModel->getAddonJsFiles($ThemeType, $this->MasterView === 'admin' ? 'admin' : 'app', $ETag);
+                foreach ($addonJs as $path) {
+                    $this->Head->addScript($path."?h=$busta", 'text/javascript', false, ['defer' => 'true']);
+                }
 
                 foreach ($this->_JsFiles as $Index => $JsInfo) {
                     $JsFile = $JsInfo['FileName'];

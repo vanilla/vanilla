@@ -616,13 +616,26 @@ class Gdn_Controller extends Gdn_Pluggable {
             $this->_Definitions['Search'] = t('Search');
         }
 
-        $this->_Definitions['basePath'] = $this->_Definitions['basePath'] ?? rtrim('/'.trim(Gdn::request()->webRoot(), '/'), '/');
-        $this->_Definitions['assetPath'] = $this->_Definitions['assetPath'] ?? rtrim('/'.trim(Gdn::request()->assetRoot(), '/'), '/');
-        $this->_Definitions['title'] = $this->_Definitions['title'] ?? c('Garden.Title');
-
         if (debug()) {
             $this->_Definitions['debug'] = true;
         }
+
+        // These items are added in a controlled matter for newer client-side apps so are nested.
+        $this->_Definitions += [
+            'context' => [], 'ui' => []
+        ];
+
+        $this->_Definitions['context'] += [
+            'host' => Gdn::request()->domain(),
+            'basePath' => rtrim('/'.trim(Gdn::request()->webRoot(), '/'), '/'),
+            'assetPath' => rtrim('/'.trim(Gdn::request()->assetRoot(), '/'), '/'),
+        ];
+        $this->_Definitions['ui'] += [
+            'siteName' => c('Garden.Title'),
+            'siteTitle' => c('Garden.HomepageTitle', c('Garden.Title')),
+            'locale' => Gdn::locale()->current(),
+            'inputFormat' => strtolower(c('Garden.InputFormatter')),
+        ];
 
         // Output a JavaScript object with all the definitions.
         $result = 'gdn=window.gdn||{};'.

@@ -14,11 +14,22 @@ import gdn from "@core/gdn";
  * @returns {*} Returns a meta value or the default value.
  */
 export function getMeta(key, defaultValue = undefined) {
-    if (gdn.meta && gdn.meta[key]) {
-        return gdn.meta[key];
+    if (!gdn.meta) {
+        return defaultValue;
     }
 
-    return defaultValue;
+    const parts = key.split('.');
+    let haystack = gdn.meta;
+
+    for (let i = 0; i < parts.length; i++) {
+        const part = parts[i];
+
+        haystack = haystack[part];
+        if (haystack === undefined) {
+            return defaultValue;
+        }
+    }
+    return haystack;
 }
 
 /**
@@ -28,7 +39,22 @@ export function getMeta(key, defaultValue = undefined) {
  * @param {*} value - The value to set.
  */
 export function setMeta(key, value) {
-    gdn.meta[key] = value;
+    if (gdn.meta === null || typeof gdn.meta !== 'object') {
+        gdn.meta = {};
+    }
+
+    const parts = key.split('.');
+    const last = parts.pop();
+    let haystack = gdn.meta;
+
+    for (let i = 0; i < parts.length; i++) {
+        const part = parts[i];
+        if (haystack[part] === null || typeof haystack[part] !== 'object') {
+            haystack[part] = {};
+        }
+        haystack = haystack[part];
+    }
+    haystack[last] = value;
 }
 
 /**
@@ -87,7 +113,7 @@ export function formatUrl(path) {
  * @type {Object} The currently registered components.
  * @private
  */
-const allComponents = {};
+const _components = {};
 
 /**
  * Register a component in the components registry.
@@ -96,7 +122,7 @@ const allComponents = {};
  * @param {React.Component} component The component to register.
  */
 export function addComponent(name, component) {
-    allComponents[name.toLowerCase()] = component;
+    _components[name.toLowerCase()] = component;
 }
 
 /**
@@ -106,7 +132,7 @@ export function addComponent(name, component) {
  * @returns {boolean} Returns **true** if the component has been registered or **false** otherwise.
  */
 export function componentExists(name) {
-    return allComponents[name.toLowerCase()] !== undefined;
+    return _components[name.toLowerCase()] !== undefined;
 }
 
 /**
@@ -116,14 +142,14 @@ export function componentExists(name) {
  * @returns {React.Component|undefined} Returns the component or **undefined** if there is no registered component.
  */
 export function getComponent(name) {
-    return allComponents[name.toLowerCase()];
+    return _components[name.toLowerCase()];
 }
 
 /**
  * @type {Array} The currently registered routes.
  * @private
  */
-const allRoutes = [];
+const _routes = [];
 
 /**
  * Register one or more routes to the app component.
@@ -132,9 +158,9 @@ const allRoutes = [];
  */
 export function addRoutes(routes) {
     if (!Array.isArray(routes)) {
-        allRoutes.push(routes);
+        _routes.push(routes);
     } else {
-        allRoutes.push(...routes);
+        _routes.push(...routes);
     }
 }
 
@@ -144,5 +170,51 @@ export function addRoutes(routes) {
  * @returns {Array} Returns an array of routes.
  */
 export function getRoutes() {
-    return allRoutes;
+    return _routes;
+}
+
+/**
+ * @type {Array}
+ * @private
+ */
+const _readyHandlers = [];
+
+/**
+ * Register a callback that executes when the document and the core libraries are ready to use.
+ *
+ * @param {PromiseOrNormalCallback} callback - The function to call. This can return a Promise but doesn't have to.
+ */
+export function onReady(callback) {
+    _readyHandlers.push(callback);
+}
+
+/**
+ * Execute all of the registered events in order.
+ *
+ * @returns {Promise<any[]>} - A Promise when the events have all fired.
+ */
+export function _executeReady() {
+    return new Promise(resolve => {
+        const exec = () => {
+            Promise.all(_readyHandlers).then(resolve);
+        };
+
+        if (document.readyState !== "loading") {
+            exec();
+        } else {
+            document.addEventListener("DOMContentLoaded", exec);
+        }
+    });
+}
+
+/**
+ * Execute a callback when a piece of DOM content is ready to be operated on.
+ *
+ * This is similar to onReady() but also includes content that is added dynamically (ex. AJAX).
+ * Note that this function is meant to bridge the non-react parts of the application with react.
+ *
+ * @param {function} callback The callback to execute.
+ */
+export function onContent(callback) {
+    document.addEventListener('X-DOMContentReady', callback);
 }

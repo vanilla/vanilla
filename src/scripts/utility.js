@@ -4,7 +4,25 @@
  * @license GPLv2
  */
 
-import { getMeta } from "@core/application";
+/**
+ * @type {boolean} The current debug setting.
+ * @private
+ */
+let _debug = false;
+
+/**
+ * Get or set the debug flag.
+ *
+ * @param {boolean=} debug The new value of debug.
+ * @returns {boolean} returns the current debug setting.
+ */
+export function debug(debug = undefined) {
+    if (debug !== undefined) {
+        _debug = debug;
+    }
+
+    return _debug;
+}
 
 /**
  * Resolve an array of functions that return promises sequentially.
@@ -57,7 +75,7 @@ export function resolvePromisesSequentially(promiseFunctions) {
  * @param {...*} value - The value to log.
  */
 export function log(...value) {
-    if (getMeta("debug", false)) {
+    if (_debug) {
         // eslint-disable-next-line no-console
         console.log(...value);
     }
@@ -96,31 +114,6 @@ export function hashString(str) {
         return (prevHash << 5) - prevHash + currVal.charCodeAt(0);
     }
     return str.split("").reduce(hashReduce, 0);
-}
-
-/**
- * Generates a random string of letters and numbers and a few whitelisted characters.
- *
- * @param {number=} length - The lenght of the desired string.
- *
- * @returns {string} - The generated string.
- * @throws {Error} - If you pass a length less than 0.
- */
-export function generateRandomString(length = 5) {
-    if (length < 0) {
-        throw new Error("generateRandomString can only deal with non-negative lengths.");
-    }
-
-    if (!Number.isInteger(length)) {
-        throw new Error("generateRandomString can only deal with integers.");
-    }
-
-    const chars = "abcdefghijkmnopqrstuvwxyzABCDEFGHJKLMNPQRSTUVWXYZ23456789!@#$%*";
-    let result = "";
-    for (let i = 0; i < length; i++) {
-        result += chars.charAt(Math.floor(Math.random() * chars.length));
-    }
-    return result;
 }
 
 /**

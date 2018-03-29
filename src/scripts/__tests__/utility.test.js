@@ -5,7 +5,6 @@
  */
 
 import * as utility from "../utility";
-import gdn from "../gdn";
 
 describe("resolvePromisesSequentially()", () => {
     it("resolves promises in order", () => {
@@ -84,31 +83,4 @@ describe("hashString", () => {
 
         expect(utility.hashString(str1)).not.toBe(utility.hashString(str2));
     });
-});
-
-describe("generateRandomString", () => {
-    it("generates strings of a proper length", () => {
-        const possibleValues = [
-            3,
-            41000,
-            0,
-            424,
-            23,
-            255
-        ];
-
-        possibleValues.forEach(value => {
-            expect(utility.generateRandomString(value).length).toBe(value);
-        })
-    })
-
-    it("errors when passed an negative number", () => {
-        expect(() => utility.generateRandomString(-1)).toThrowError();
-    });
-
-    it("errors when passed a non-integer number", () => {
-        // @ts-ignore
-        expect(() => utility.generateRandomString("asd")).toThrowError();
-        expect(() => utility.generateRandomString(123.42)).toThrowError();
-    })
 });

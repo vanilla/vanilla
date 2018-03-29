@@ -9,7 +9,6 @@
         "exports": {
             "*": [
                 "./src/scripts/application",
-                "./src/scripts/events",
                 "./src/scripts/gdn",
                 "./src/scripts/permissions",
                 "./src/scripts/utility",

@@ -9,7 +9,7 @@
         },
         "exports": {
             "*": [
-                "./src/scripts/ajax",
+                "./src/scripts/api",
                 "./src/scripts/application",
                 "./src/scripts/gdn",
                 "./src/scripts/permissions",

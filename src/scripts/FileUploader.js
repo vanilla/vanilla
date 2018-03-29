@@ -5,7 +5,7 @@
  */
 
 import { log } from "@core/utility";
-import ajax from "@core/ajax";
+import ajax from "@core/api";
 
 /**
  * A callback for events on the FileUploader class.

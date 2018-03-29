@@ -341,13 +341,6 @@ class DashboardHooks extends Gdn_Plugin {
             return;
         }
 
-        $phpVersion = phpversion();
-        if (version_compare($phpVersion, '7.1') < 0) {
-            $upgradeMessage = ['Content' => 'We recommend using at least PHP 7.1. Support for PHP '.htmlspecialchars($phpVersion).' may be dropped in upcoming releases.', 'AssetTarget' => 'Content', 'CssClass' => 'WarningMessage'];
-            $messageModule = new MessageModule($sender, $upgradeMessage);
-            $sender->addModule($messageModule);
-        }
-
         $mysqlVersion = gdn::sql()->version();
         if (version_compare($mysqlVersion, '5.6') < 0) {
             $upgradeMessage = ['Content' => 'We recommend using at least <b>MySQL 5.7</b> or <b>MariaDB 10.2</b>. Version '.htmlspecialchars($mysqlVersion).' will not support all upcoming Vanilla features.', 'AssetTarget' => 'Content', 'CssClass' => 'InfoMessage'];

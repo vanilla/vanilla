@@ -187,7 +187,7 @@ class AddonsApiController extends Controller {
         $this->permission('Garden.Settings.Manage');
 
         $id = $this->schema([
-            'addonID:s' => 'The ID of the addon.'
+            'id:s' => 'The ID of the addon.',
         ], 'in')->setDescription('Get an addon.');
 
         $in = $this->schema([
@@ -222,7 +222,7 @@ class AddonsApiController extends Controller {
         $this->permission('Garden.Settings.Manage');
 
         $idSchema = $this->schema([
-            'addonID:s' => 'The ID of the addon.'
+            'id:s' => 'The ID of the addon.'
         ], 'in');
         $in = $this->schema([
             'enabled:b' => 'Enable or disable the addon.',

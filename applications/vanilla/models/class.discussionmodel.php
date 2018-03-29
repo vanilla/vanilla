@@ -723,6 +723,11 @@ class DiscussionModel extends Gdn_Model {
                 $where['d.CategoryID'] = $perms;
             }
         }
+        
+        // Remove empty CategoryID condition - that could have resulted due to above merge
+        if (isset($where['d.CategoryID']) && empty($where['d.CategoryID'])) {
+            unset($where['d.CategoryID']);
+        }
 
         // Check to see whether or not we are removing announcements.
         if (strtolower(val('Announce', $where)) == 'all') {

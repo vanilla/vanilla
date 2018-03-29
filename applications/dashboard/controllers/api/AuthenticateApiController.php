@@ -98,7 +98,7 @@ class AuthenticateApiController extends AbstractApiController {
         $this->permission();
 
         $this->schema([
-            'authenticator:s' => 'The authenticator that will be used.',
+            'authenticatorType:s' => 'The authenticator type that will be used.',
             'authenticatorID:s?' => 'Authenticator instance\'s identifier.',
         ]);
         $in = $this->schema([
@@ -154,7 +154,7 @@ class AuthenticateApiController extends AbstractApiController {
         $this->permission();
 
         $this->schema([
-            'authenticator:s' => 'The authenticator that will be used.',
+            'authenticatorType:s' => 'The authenticator type that will be used.',
             'authenticatorID:s?' => 'Authenticator instance\'s identifier.',
         ], 'in');
         $in = $this->schema([
@@ -247,7 +247,7 @@ class AuthenticateApiController extends AbstractApiController {
         $this->permission();
 
         $in = $this->schema([
-            'authenticator:s' => 'The authenticator that will be used.',
+            'authenticatorType:s' => 'The authenticator type that will be used.',
             'authenticatorID:s?' => 'Authenticator instance\'s identifier.',
             'setCookie:b' => [
                 'default' => true,
@@ -269,14 +269,14 @@ class AuthenticateApiController extends AbstractApiController {
 
         $body = $in->validate($body);
 
-        $authenticator = $body['authenticator'];
+        $authenticatorType = $body['authenticatorType'];
         $authenticatorID = isset($body['authenticatorID']) ? $body['authenticatorID'] : null;
 
         if ($this->getSession()->isValid()) {
             throw new ClientException('Cannot authenticate while already logged in.', 403);
         }
 
-        $authenticatorInstance = $this->authenticatorModel->getAuthenticator($authenticator, $authenticatorID);
+        $authenticatorInstance = $this->authenticatorModel->getAuthenticator($authenticatorType, $authenticatorID);
 
         if (is_a($authenticatorInstance, SSOAuthenticator::class)) {
 
@@ -440,7 +440,7 @@ class AuthenticateApiController extends AbstractApiController {
 
         if ($ssoDataSchema === null) {
             $ssoDataSchema = $this->schema([
-                'authenticatorName:s' => 'Name of the authenticator that was used to create this object.',
+                'authenticatorType:s' => 'Name of the authenticator that was used to create this object.',
                 'authenticatorID:s' => 'ID of the authenticator instance that was used to create this object.',
                 'uniqueID:s' => 'Unique ID of the user supplied by the provider.',
                 'user:o' => [

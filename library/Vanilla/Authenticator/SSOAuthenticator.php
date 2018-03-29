@@ -7,17 +7,11 @@
 
 namespace Vanilla\Authenticator;
 
+use Garden\Schema\Schema;
 use Garden\Web\RequestInterface;
 use Vanilla\Models\SSOData;
 
 abstract class SSOAuthenticator extends Authenticator {
-    /**
-     * Tells whether the data returned by this authenticator is authoritative or not.
-     * User info/roles can only be synchronized by trusted authenticators.
-     *
-     * @var bool
-     */
-    private $isTrusted = false;
 
     /**
      * Determine whether the authenticator can automatically link users by email.
@@ -25,6 +19,29 @@ abstract class SSOAuthenticator extends Authenticator {
      * @var bool
      */
     private $autoLinkUser = false;
+
+    /**
+     * Whether or not, using the authenticator, the user can link his account from the profile page.'
+     *
+     * @var bool
+     */
+    private $linkSession = false;
+
+    /**
+     * Tells whether the data returned by this authenticator is authoritative or not.
+     * User info/roles can only be synchronized by trusted authenticators.
+     *
+     * @var bool
+     */
+    private $signIn = false;
+
+    /**
+     * Tells whether the data returned by this authenticator is authoritative or not.
+     * User info/roles can only be synchronized by trusted authenticators.
+     *
+     * @var bool
+     */
+    private $trusted = false;
 
     /**
      * Authenticator constructor.
@@ -36,10 +53,38 @@ abstract class SSOAuthenticator extends Authenticator {
     }
 
     /**
-     * Getter of isTrusted.
+     * @inheritdoc
      */
-    public final function isTrusted(): bool {
-        return $this->isTrusted;
+    final protected function getAuthenticatorDefaultInfo(): array {
+        return array_merge_recursive(
+            parent::getAuthenticatorDefaultInfo(),
+            [
+                'sso' => [
+                    'canSignIn' => $this->canSignIn(),
+                    'canLinkSession' => $this->canLinkSession(),
+                    'isTrusted' => $this->isTrusted(),
+                    'canAutoLinkUser' => $this->canAutoLinkUser(),
+                ],
+            ]
+        );
+    }
+
+    /**
+     * Get this authenticate Schema.
+     *
+     * @return Schema
+     */
+    public static function getAuthenticatorSchema(): Schema {
+        return parent::getAuthenticatorSchema()->merge(
+            Schema::parse([
+                'sso:o' => Schema::parse([
+                    'canSignIn:b' => 'Whether or not the authenticator can be used to sign in.',
+                    'canLinkSession:b' => 'Whether or not, using the authenticator, the user can link his account from the profile page.',
+                    'isTrusted:b' => 'Whether or not the authenticator is trusted to synchronize user information.',
+                    'canAutoLinkUser:b' => 'Whether or not the authenticator can automatically link the incoming user information to an existing user account.',
+                ])
+            ])
+        );
     }
 
     /**
@@ -53,36 +98,76 @@ abstract class SSOAuthenticator extends Authenticator {
 
     /**
      * Setter of autoLinkUser.
-     * 
+     *
      * @param bool $autoLinkUser
-     * @return SSOAuthenticator
+     * @return self
      */
-    public function setAutoLinkUser(bool $autoLinkUser): SSOAuthenticator {
+    public function setAutoLinkUser(bool $autoLinkUser): self {
         $this->autoLinkUser = $autoLinkUser;
 
         return $this;
     }
 
     /**
-     * Returns the registration in URL.
+     * Getter of linkSession.
      *
-     * @return string|false
+     * @return bool
      */
-    public abstract function registrationURL();
+    public function canLinkSession(): bool {
+        return $this->linkSession;
+    }
 
     /**
-     * Returns the sign in URL.
+     * Setter of linkSession.
      *
-     * @return string|false
+     * @param bool $linkSession
+     * @return self
      */
-    public abstract function signInURL();
+    public function setLinkSession(bool $linkSession): self {
+        $this->linkSession = $linkSession;
+
+        return $this;
+    }
 
     /**
-     * Returns the sign out URL.
+     * Getter of signIn.
      *
-     * @return string|false
+     * @return bool
      */
-    public abstract function signOutURL();
+    public function canSignIn(): bool {
+        return $this->signIn;
+    }
+
+    /**
+     * Setter of signIn.
+     *
+     * @param bool $signIn
+     * @return self
+     */
+    public function setSignIn(bool $signIn): self {
+        $this->signIn = $signIn;
+
+        return $this;
+    }
+
+    /**
+     * Getter of trusted.
+     */
+    final public function isTrusted(): bool {
+        return $this->trusted;
+    }
+
+    /**
+     * Setter of trusted.
+     *
+     * @param bool $trusted
+     * @return self
+     */
+    protected function setTrusted(bool $trusted): self {
+        $this->trusted = $trusted;
+
+        return $this;
+    }
 
     /**
      * Validate an authentication by using the request's data.
@@ -91,7 +176,7 @@ abstract class SSOAuthenticator extends Authenticator {
      * @param RequestInterface $request
      * @return SSOData The user's information.
      */
-    public final function validateAuthentication(RequestInterface $request) {
+    final public function validateAuthentication(RequestInterface $request) {
         $ssoData = $this->sso($request);
         $ssoData->validate();
 
@@ -106,17 +191,5 @@ abstract class SSOAuthenticator extends Authenticator {
      * @param RequestInterface $request
      * @return SSOData The user's information.
      */
-    protected abstract function sso(RequestInterface $request);
-
-    /**
-     * Setter of isTrusted.
-     *
-     * @param bool $isTrusted
-     * @return SSOAuthenticator
-     */
-    protected function setTrusted(bool $isTrusted): SSOAuthenticator {
-        $this->isTrusted = $isTrusted;
-
-        return $this;
-    }
+    protected abstract function sso(RequestInterface $request): SSOData;
 }

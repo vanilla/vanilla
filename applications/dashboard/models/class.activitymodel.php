@@ -1096,7 +1096,6 @@ class ActivityModel extends Gdn_Model {
 
         if ($this->validate($comment)) {
             $activity = $this->getID($comment['ActivityID'], DATASET_TYPE_ARRAY);
-            Gdn::controller()->json('Activity', $activity);
 
             $_ActivityID = $comment['ActivityID'];
             // Check to see if this is a shared activity/notification.

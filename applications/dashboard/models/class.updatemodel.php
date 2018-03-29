@@ -112,6 +112,7 @@ class UpdateModel extends Gdn_Model {
         $result = [];
 
         $infoPaths = [
+            '/addon.json', // addon
             '/settings/about.php', // application
             '/default.php', // plugin
             '/class.*.plugin.php', // plugin
@@ -184,8 +185,17 @@ class UpdateModel extends Gdn_Model {
                         'Path' => $entry['Path']];
                     break;
                 } else {
-                    // This could be an addon.
-                    $info = self::parseInfoArray($entry['Path']);
+                    // Support for newer addon.json info.
+                    if ($entry['Name'] === '/addon.json') {
+                        // Build a relative path to addon.json.
+                        $addonDir = dirname($entry['Path']);
+                        $addonDir = stringBeginsWith($addonDir, PATH_ROOT, false, true);
+                        $info = self::addonJsonConverter($addonDir);
+                    } else {
+                        // This could be an addon.
+                        $info = self::parseInfoArray($entry['Path']);
+                    }
+
                     $result = self::checkAddon($info, $entry);
                     if (!empty($result)) {
                         break;
@@ -254,6 +264,11 @@ class UpdateModel extends Gdn_Model {
         $key = key($info);
         $variable = $info['Variable'];
         $info = $info[$key];
+
+        // If there wasn't a "Variable" in the original $info, try the updated $info.
+        if (empty($variable) && array_key_exists('Variable', $info)) {
+            $variable = $info['Variable'];
+        }
 
         $addon = array_merge(['AddonKey' => $key, 'AddonTypeID' => ''], $info);
         switch ($variable) {

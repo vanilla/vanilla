@@ -174,7 +174,7 @@ class CommentsApiController extends AbstractApiController {
             $this->discussionModel->categoryPermission('Vanilla.Discussions.View', $discussion['CategoryID']);
         }
 
-        $this->userModel->expandUsers($comment, ['InsertUserID']);
+        $this->userModel->expandUsers($comment, ['InsertUserID'], ['expand' => true]);
         $comment = $this->normalizeOutput($comment);
         $result = $out->validate($comment);
 
@@ -296,7 +296,8 @@ class CommentsApiController extends AbstractApiController {
         // Expand associated rows.
         $this->userModel->expandUsers(
             $rows,
-            $this->resolveExpandFields($query, ['insertUser' => 'InsertUserID'])
+            $this->resolveExpandFields($query, ['insertUser' => 'InsertUserID']),
+            ['expand' => $query['expand']]
         );
 
         foreach ($rows as &$currentRow) {
@@ -375,7 +376,7 @@ class CommentsApiController extends AbstractApiController {
         $this->commentModel->save($commentData);
         $this->validateModel($this->commentModel);
         $row = $this->commentByID($id);
-        $this->userModel->expandUsers($row, ['InsertUserID']);
+        $this->userModel->expandUsers($row, ['InsertUserID'], ['expand' => true]);
         $row = $this->normalizeOutput($row);
 
         $result = $out->validate($row);
@@ -405,7 +406,7 @@ class CommentsApiController extends AbstractApiController {
             throw new ServerException('Unable to insert comment.', 500);
         }
         $row = $this->commentByID($id);
-        $this->userModel->expandUsers($row, ['InsertUserID']);
+        $this->userModel->expandUsers($row, ['InsertUserID'], ['expand' => true]);
         $row = $this->normalizeOutput($row);
 
         $result = $out->validate($row);

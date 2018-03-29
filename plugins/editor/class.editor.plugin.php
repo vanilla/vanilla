@@ -610,12 +610,7 @@ class EditorPlugin extends Gdn_Plugin {
         $c->addDefinition('allowedImageExtensions', json_encode($allowedImageExtensions));
         $c->addDefinition('allowedFileExtensions', json_encode($allowedFileExtensions));
 
-        $allowedMimeTypes = [];
-        foreach($allowedFileExtensions as $ext) {
-            if ($mime = $this->lookupMime($ext)) {
-                $allowedMimeTypes = array_merge($allowedMimeTypes, $mime);
-            }
-        }
+        $allowedMimeTypes = $this->getAllowedMimeTypes();
 
         $allowedImageMimeTypes = [];
         foreach($allowedImageExtensions as $ext) {
@@ -704,6 +699,26 @@ class EditorPlugin extends Gdn_Plugin {
     }
 
     /**
+     * Get a list of valid MIME types for file uploads.
+     *
+     * @return array
+     */
+    private function getAllowedMimeTypes() {
+        $result = [];
+
+        $allowedExtensions = c('Garden.Upload.AllowedFileExtensions', []);
+        if (is_array($allowedExtensions)) {
+            foreach ($allowedExtensions as $extension) {
+                if ($mimeTypes = $this->lookupMime($extension)) {
+                    $result = array_merge($result, $mimeTypes);
+                }
+            }
+        }
+
+        return $result;
+    }
+
+    /**
      * Endpoint to upload files.
      *
      * @param PostController $sender
@@ -720,6 +735,12 @@ class EditorPlugin extends Gdn_Plugin {
         // Grab raw upload data ($_FILES), essentially. It's only needed
         // because the methods on the Upload class do not expose all variables.
         $fileData = Gdn::request()->getValueFrom(Gdn_Request::INPUT_FILES, $this->editorFileInputName, false);
+
+        $mimeType = $fileData['type'];
+        $allowedMimeTypes = $this->getAllowedMimeTypes();
+        if (!in_array($mimeType, $allowedMimeTypes)) {
+            throw new Gdn_UserException('Invalid file type.');
+        }
 
         $discussionID = ($sender->Request->post('DiscussionID')) ? $sender->Request->post('DiscussionID') : '';
 

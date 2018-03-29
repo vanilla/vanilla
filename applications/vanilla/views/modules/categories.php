@@ -21,12 +21,22 @@ if ($this->Data !== FALSE) {
                 if ($Category->CategoryID < 0 || $MaxDepth > 0 && $Category->Depth > $MaxDepth)
                     continue;
 
-                if ($Category->DisplayAs === 'Heading')
-                    $CssClass = 'Heading '.$Category->CssClass;
-                else
-                    $CssClass = 'Depth'.$Category->Depth.($CategoryID == $Category->CategoryID ? ' Active' : '').' '.$Category->CssClass;
+                $attributes = false;
 
-                echo '<li class="ClearFix '.$CssClass.'">';
+                if ($Category->DisplayAs === 'Heading') {
+
+                    $CssClass = 'Heading '.$Category->CssClass;
+                    $attributes = ['aria-level' => $Category->Depth + 2];
+                } else {
+                    $CssClass = 'Depth'.$Category->Depth.($CategoryID == $Category->CategoryID ? ' Active' : '').' '.$Category->CssClass;
+                }
+
+
+                if (is_array($attributes)) {
+                    $attributes = attribute($attributes);
+                }
+
+                echo '<li class="ClearFix '.$CssClass.'" '.$attributes.'>';
 
                 if ($Category->CountAllDiscussions > 0) {
                     $CountText = '<span class="Aside"><span class="Count">'.bigPlural($Category->CountAllDiscussions, '%s discussion').'</span></span>';

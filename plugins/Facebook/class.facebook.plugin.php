@@ -441,6 +441,7 @@ class FacebookPlugin extends Gdn_Plugin {
         $form->setFormValue('FullName', val('name', $profile));
         $form->setFormValue('Email', val('email', $profile));
         $form->setFormValue('Photo', "//graph.facebook.com/{$iD}/picture?width=200&height=200");
+        $form->setFormValue('Target', val('target', $state, '/'));
         $form->addHidden('AccessToken', $accessToken);
 
         if (c('Plugins.Facebook.UseFacebookNames')) {
@@ -542,7 +543,7 @@ class FacebookPlugin extends Gdn_Plugin {
         }
 
         if ($query) {
-            $redirectUri .= '&'.$query;
+            $redirectUri .= (stripos($redirectUri, '?') === false) ? '?' : '&' .$query;
         }
 
         // Get a state token.
@@ -552,7 +553,7 @@ class FacebookPlugin extends Gdn_Plugin {
             'client_id' => $appID,
             'redirect_uri' => $redirectUri,
             'scope' => $scopes,
-            'state' => json_encode(['token' => $stateToken]),
+            'state' => json_encode(['token' => $stateToken, 'target' => $this->getTargetUri()]),
         ]);
         $signinHref = "https://graph.facebook.com/oauth/authorize?{$authQuery}";
 
@@ -564,7 +565,7 @@ class FacebookPlugin extends Gdn_Plugin {
     }
 
     /**
-     * Figure out where to send user after auth step.
+     * Send the Facebook entry page to Facebook as the redirectURI.
      *
      * @param null $newValue
      *
@@ -581,23 +582,23 @@ class FacebookPlugin extends Gdn_Plugin {
                 $p = urlencode(ltrim($p, '='));
                 $redirectUri = $uri.'='.$p;
             }
-
-            $path = Gdn::request()->path();
-
-            $target = val('Target', $_GET, $path ? $path : '/'); // TODO rm global
-
-            if (ltrim($target, '/') == 'entry/signin' || ltrim($target, '/') == 'entry/facebook' || empty($target)) {
-                $target = '/';
-            }
-
-            $args = ['Target' => $target];
-
-            $redirectUri .= strpos($redirectUri, '?') === false ? '?' : '&';
-            $redirectUri .= http_build_query($args);
             $this->_RedirectUri = $redirectUri;
         }
 
         return $this->_RedirectUri;
+    }
+
+    /**
+     * Get the target URL to pass to the state when making requests.
+     *
+     * @return mixed|string
+     */
+    public function getTargetUri() {
+        $target = Gdn::request()->getValueFrom(Gdn_Request::INPUT_GET, 'Target', '/');
+        if (ltrim($target, '/') == 'entry/signin' || ltrim($target, '/') == 'entry/facebook') {
+            $target = '/';
+        }
+        return $target;
     }
 
     /**

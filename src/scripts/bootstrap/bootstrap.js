@@ -5,12 +5,22 @@
  */
 
 import loadPolyfills from "@core/bootstrap/polyfills";
-import events from "@core/events";
+import { onContent, getMeta, _executeReady } from "@core/application";
 import * as utility from "@core/utility";
+import { _mountComponents } from "@core/internal";
+
+utility.debug(getMeta('debug', false));
+
+onContent((e) => {
+    _mountComponents(e.target);
+});
 
 loadPolyfills().then(() => {
     utility.log("Bootstrapping");
-    events.execute().then(() => {
+    _executeReady().then(() => {
         utility.log("Bootstrapping complete.");
+
+        const contentEvent = new CustomEvent('X-DOMContentReady', { bubbles: true, cancelable: false });
+        document.dispatchEvent(contentEvent);
     });
 });

@@ -9,7 +9,7 @@ import { onContent, getMeta, _executeReady } from "@core/application";
 import * as utility from "@core/utility";
 import { _mountComponents } from "@core/internal";
 
-utility.setDebug(getMeta('debug', false));
+utility.debug(getMeta('debug', false));
 
 onContent((e) => {
     _mountComponents(e.target);

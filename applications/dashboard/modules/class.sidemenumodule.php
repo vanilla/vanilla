@@ -309,7 +309,7 @@ if (!class_exists('SideMenuModule', false)) {
 
                 // Hightlight the correct item in the group.
                 foreach ($item['Links'] as &$link) {
-                    if (val('Url', $link) && url($link['Url']) == $highlightUrl) {
+                    if (val('Url', $link) && (strpos($highlightUrl, url($link['Url'])) === 0)) {
                         $link['Attributes']['class'] = concatSep(' ', val('class', $link['Attributes']), 'Active');
                         $item['Attributes']['class'] = concatSep(' ', val('class', $item['Attributes']), 'Active');
                     }

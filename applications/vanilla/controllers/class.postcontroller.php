@@ -670,6 +670,12 @@ class PostController extends VanillaController {
 
             if ($DraftID == 0) {
                 $DraftID = $this->Form->getFormValue('DraftID', 0);
+                if ($DraftID) {
+                    $draft = $this->DraftModel->getID($DraftID, DATASET_TYPE_ARRAY);
+                    if ((val('InsertUserID', $draft) != $Session->UserID) && !checkPermission('Garden.Community.Manage')) {
+                        throw new Exception('Invalid DraftID.');
+                    }
+                }
             }
 
             $Type = getIncomingValue('Type');

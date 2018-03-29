@@ -372,6 +372,7 @@ class FacebookPlugin extends Gdn_Plugin {
             return;
         }
 
+        $state = json_decode(Gdn::request()->get('state', ''), true);
         if (isset($_GET['error'])) { // TODO global nope x2
             throw new Gdn_UserException(val('error_description', $_GET, t('There was an error connecting to Facebook')));
         }
@@ -427,6 +428,7 @@ class FacebookPlugin extends Gdn_Plugin {
         $form->setFormValue('FullName', val('name', $profile));
         $form->setFormValue('Email', val('email', $profile));
         $form->setFormValue('Photo', "//graph.facebook.com/{$iD}/picture?width=200&height=200");
+        $form->setFormValue('Target', val('target', $state, '/'));
         $form->addHidden('AccessToken', $accessToken);
 
         if (c('Plugins.Facebook.UseFacebookNames')) {
@@ -528,7 +530,7 @@ class FacebookPlugin extends Gdn_Plugin {
         }
 
         if ($query) {
-            $redirectUri .= '&'.$query;
+            $redirectUri .= (stripos($redirectUri, '?') === false) ? '?' : '&' .$query;
         }
 
         $authQuery = http_build_query([
@@ -564,23 +566,23 @@ class FacebookPlugin extends Gdn_Plugin {
                 $p = urlencode(ltrim($p, '='));
                 $redirectUri = $uri.'='.$p;
             }
-
-            $path = Gdn::request()->path();
-
-            $target = val('Target', $_GET, $path ? $path : '/'); // TODO rm global
-
-            if (ltrim($target, '/') == 'entry/signin' || empty($target)) {
-                $target = '/';
-            }
-
-            $args = ['Target' => $target];
-
-            $redirectUri .= strpos($redirectUri, '?') === false ? '?' : '&';
-            $redirectUri .= http_build_query($args);
             $this->_RedirectUri = $redirectUri;
         }
 
         return $this->_RedirectUri;
+    }
+
+    /**
+     * Get the target URL to pass to the state when making requests.
+     *
+     * @return mixed|string
+     */
+    public function getTargetUri() {
+        $target = Gdn::request()->getValueFrom(Gdn_Request::INPUT_GET, 'Target', '/');
+        if (ltrim($target, '/') == 'entry/signin' || ltrim($target, '/') == 'entry/facebook') {
+            $target = '/';
+        }
+        return $target;
     }
 
     /**

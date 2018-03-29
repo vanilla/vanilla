@@ -5,9 +5,9 @@
  */
 
 import React from "react";
-import { t } from "@core/utility";
 import * as PropTypes from "prop-types";
 import classNames from 'classnames';
+import { t } from "@core/application";
 import { withEditor, editorContextTypes } from "../ContextProvider";
 
 export class Popover extends React.PureComponent {

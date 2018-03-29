@@ -5,7 +5,7 @@
  */
 
 import React from "react";
-import { t } from "@core/utility";
+import { t } from "@core/application";
 
 const currentColorFill = {
     fill: "currentColor",

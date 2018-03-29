@@ -7,11 +7,11 @@
 import React from "react";
 import Quill from "quill/core";
 import Emitter from "quill/core/emitter";
+import { t } from "@core/application";
 import Toolbar from "./Generic/Toolbar";
 import { pilcrow as PilcrowIcon } from "./Icons";
 import { closeEditorFlyouts, CLOSE_FLYOUT_EVENT } from "../Quill/utility";
 import { withEditor, editorContextTypes } from "./ContextProvider";
-import { t } from "@core/utility";
 
 export class ParagraphToolbar extends React.PureComponent {
 

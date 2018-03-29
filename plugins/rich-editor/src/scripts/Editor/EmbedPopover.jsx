@@ -5,8 +5,8 @@
  */
 
 import React from "react";
-import { t } from "@core/utility";
 import * as PropTypes from "prop-types";
+import { t } from "@core/application";
 import { withEditor, editorContextTypes } from "./ContextProvider";
 import Popover from "./Generic/Popover";
 

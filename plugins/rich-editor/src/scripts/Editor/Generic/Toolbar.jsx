@@ -8,7 +8,7 @@ import React from "react";
 import * as PropTypes from "prop-types";
 import Quill from "quill/core";
 import LinkBlot from "quill/formats/link";
-import { t } from "@core/utility";
+import { t } from "@core/application";
 import MenuItem from "./MenuItem";
 import * as quillUtilities from "../../Quill/utility";
 import { withEditor, editorContextTypes } from "../ContextProvider";

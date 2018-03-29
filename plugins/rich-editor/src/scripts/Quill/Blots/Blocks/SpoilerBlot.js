@@ -5,7 +5,7 @@
  */
 
 import WrapperBlot, { ContentBlot, LineBlot } from "../Abstract/WrapperBlot";
-import { t } from "@core/utility";
+import { t } from "@core/application";
 
 /**
  * Represent a single line of a Spoiler.

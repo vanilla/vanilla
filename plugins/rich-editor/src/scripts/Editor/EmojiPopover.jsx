@@ -5,14 +5,14 @@
  */
 
 import React from "react";
-import * as PropTypes from "prop-types";
-import { t } from "@core/utility";
-import EmojiButton from "./EmojiButton";
-import emojis from 'emojibase-data/en/data.json';
-import classNames from 'classnames';
 import { Grid, AutoSizer } from 'react-virtualized';
+import * as PropTypes from "prop-types";
+import classNames from 'classnames';
+import emojis from 'emojibase-data/en/data.json';
 import { groups as emojiGroups } from 'emojibase-data/meta/groups.json';
-import * as utility from '@core/utility';
+import { t } from "@core/application";
+import { log } from "@core/utility";
+import EmojiButton from "./EmojiButton";
 import * as Icons from "./Icons";
 import Popover from "./Generic/Popover";
 import { withEditor, editorContextTypes } from "./ContextProvider";
@@ -34,7 +34,7 @@ emojis.map((data, key) => {
     }
 });
 
-utility.log("rowIndexesByGroupId: ", rowIndexesByGroupId);
+log("rowIndexesByGroupId: ", rowIndexesByGroupId);
 
 export class EmojiPopover extends React.PureComponent {
     static propTypes = {
@@ -51,7 +51,7 @@ export class EmojiPopover extends React.PureComponent {
      */
     constructor(props) {
         super(props);
-        utility.log("Emojis Loaded: ", emojis);
+        log("Emojis Loaded: ", emojis);
         this.emojiGroupLength = Object.values(emojiGroups).length;
         this.state = {
             scrollTarget: 0,

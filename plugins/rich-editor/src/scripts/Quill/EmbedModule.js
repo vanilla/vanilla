@@ -9,7 +9,7 @@ import Module from "quill/core/module";
 import { closeEditorFlyouts } from "./utility";
 import Parchment from "parchment";
 import FileUploader from "@core/FileUploader";
-import {logError} from "@core/utility";
+import { logError } from "@core/utility";
 import Emitter from "quill/core/emitter";
 
 /**

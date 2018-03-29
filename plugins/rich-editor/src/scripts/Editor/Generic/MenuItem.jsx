@@ -6,9 +6,9 @@
 
 import React from "react";
 import * as PropTypes from "prop-types";
-import * as Icons from "../Icons";
 import classnames from "classnames";
-import { t } from "@core/utility";
+import { t } from "@core/application";
+import * as Icons from "../Icons";
 
 /**
  * Component for a single item in a EditorToolbar.

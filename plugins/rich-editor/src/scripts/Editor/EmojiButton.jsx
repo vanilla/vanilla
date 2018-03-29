@@ -7,8 +7,8 @@
 import React from "react";
 import * as PropTypes from "prop-types";
 import Quill from "quill/core";
-import { parseEmoji } from "@core/emoji-utility";
 import classNames from 'classnames';
+import { parseEmoji } from "@core/emoji-utility";
 import { withEditor, editorContextTypes } from "./ContextProvider";
 
 /**

@@ -9,9 +9,9 @@ import Quill from "quill/core";
 import Emitter from "quill/core/emitter";
 import Keyboard from "quill/modules/keyboard";
 import LinkBlot from "quill/formats/link";
+import { t } from "@core/application";
 import SelectionPositionToolbar from "./SelectionPositionToolbarContainer";
 import Toolbar from "./Generic/Toolbar";
-import { t } from "@core/utility";
 import * as quillUtilities from "../Quill/utility";
 import { withEditor, editorContextTypes } from "./ContextProvider";
 

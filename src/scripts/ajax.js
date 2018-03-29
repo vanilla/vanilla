@@ -5,8 +5,7 @@
  */
 
 import axios from "axios";
-import { formatUrl, getMeta } from "@core/utility";
-
+import { formatUrl, getMeta } from "@core/application";
 
 /**
  * Add the transient key to every request.

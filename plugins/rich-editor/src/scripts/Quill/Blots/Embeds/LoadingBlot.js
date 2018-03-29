@@ -1,5 +1,11 @@
+/**
+ * @author Stéphane (slafleche) LaFlèche <stephane.l@vanillaforums.com>
+ * @copyright 2009-2018 Vanilla Forums Inc.
+ * @license https://opensource.org/licenses/GPL-2.0 GPL-2.0
+ */
+
 import { BlockEmbed } from "quill/blots/block";
-import { t } from "@core/utility";
+import { t } from "@core/application";
 
 export default class LoadingBlot extends BlockEmbed {
 

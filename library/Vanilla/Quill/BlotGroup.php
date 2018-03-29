@@ -73,7 +73,7 @@ class BlotGroup {
      *
      * @return bool
      */
-    public function endsWithBlotOfType(string $blotClass, $needsExactMatch = false): bool {
+    public function endsWithBlotOfType(string $blotClass, bool $needsExactMatch = false): bool {
         if (count($this->blots) === 0) {
             return false;
         }

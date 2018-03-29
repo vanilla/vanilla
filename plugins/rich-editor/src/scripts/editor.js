@@ -12,22 +12,22 @@ const options = {
     theme: "vanilla",
 };
 
-function initializeEditor(bodybox) {
+function initializeEditor(bodybox, container) {
     utility.log("Initializing Rich Editor");
-    const initialValue = this.bodybox.value;
-    const quill = new Quill(this.container, options);
+    const initialValue = bodybox.value;
+    const quill = new Quill(container, options);
     bodybox.style.display = "none";
 
     if (initialValue) {
         utility.log("Setting existing content as contents of editor");
-        quill.setContents(JSON.parse(this.initialValue));
+        quill.setContents(JSON.parse(initialValue));
     }
 
     quill.on("text-change", () => {
         bodybox.value = JSON.stringify(quill.getContents()["ops"]);
     });
 
-    this.bodybox.addEventListener("paste", (event) => {
+    bodybox.addEventListener("paste", (event) => {
         event.stopPropagation();
         event.preventDefault();
 
@@ -52,10 +52,10 @@ export function mountEditor(containerSelector) {
         throw new Error("Could not find the BodyBox to mount editor to.");
     }
 
-    const initialFormat = this.bodybox.getAttribute("format") || "rich";
+    const initialFormat = bodybox.getAttribute("format") || "Rich";
 
-    if (initialFormat === "rich") {
-        initializeEditor(bodybox);
+    if (initialFormat === "Rich") {
+        initializeEditor(bodybox, container);
     } else {
         throw new Error(`Unsupported initial editor format ${initialFormat}`);
     }

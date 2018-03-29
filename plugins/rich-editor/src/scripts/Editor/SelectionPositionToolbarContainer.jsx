@@ -6,8 +6,8 @@
 
 import React from "react";
 import * as PropTypes from "prop-types";
+import debounce from "lodash/debounce";
 import Quill from "quill/core";
-import Events from "@core/events";
 import Emitter from "quill/core/emitter";
 import { Range } from "quill/core/selection";
 import { CLOSE_FLYOUT_EVENT } from "../Quill/utility";
@@ -62,10 +62,7 @@ export class SelectionPositionToolbarContainer extends React.Component {
     componentDidMount() {
         this.quill.on(Emitter.events.EDITOR_CHANGE, this.handleEditorChange);
         document.addEventListener(CLOSE_FLYOUT_EVENT, this.hideSelf);
-
-        this.resizeListener = Events.addResizeListener(() => {
-            this.forceUpdate();
-        });
+        window.addEventListener("resize", this.windowResizeListener);
     }
 
     /**
@@ -74,8 +71,15 @@ export class SelectionPositionToolbarContainer extends React.Component {
     componentWillUnmount() {
         this.quill.off(Quill.events.EDITOR_CHANGE, this.handleEditorChange);
         document.removeEventListener(CLOSE_FLYOUT_EVENT, this.hideSelf);
-        Events.removeResizeListener(this.resizeListener);
+        window.removeEventListener(this.windowResizeListener);
     }
+
+    /**
+     * Force update on window resize.
+     *
+     * @returns {Function} - The debounced update function.
+     */
+    windowResizeListener = () => debounce(this.forceUpdate, 200);
 
     unHideSelf = () => {
         this.setState({

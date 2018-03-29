@@ -4,12 +4,12 @@
  * @license https://opensource.org/licenses/GPL-2.0 GPL-2.0
  */
 
-import events from "@core/events";
+import { onReady } from "@core/application";
 import { mountEditor } from "./editor";
 
-events.onVanillaReady(() => {
+onReady(() => {
     setupEditor();
-    setupCommentForm();
+    setupCommentEditForm();
 });
 
 /**
@@ -21,7 +21,10 @@ function setupEditor() {
     discussionFormContainer.forEach(mountEditor);
 }
 
-function setupCommentForm() {
+/**
+ * Set up the editor if the someone clicks edit on a form.
+ */
+function setupCommentEditForm() {
     $(document).on("EditCommentFormLoaded", (event, container) => {
         const $commentFormContainer = $(container).find(".js-richText");
         if ($commentFormContainer) {

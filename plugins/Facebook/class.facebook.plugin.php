@@ -431,7 +431,7 @@ class FacebookPlugin extends Gdn_Plugin {
         }
 
         // This isn't a trusted connection. Don't allow it to automatically connect a user account.
-//        saveToConfig('Garden.Registration.AutoConnect', false, false);
+        saveToConfig('Garden.Registration.AutoConnect', false, false);
 
         $form = $sender->Form; //new gdn_Form();
         $iD = val('id', $profile);
@@ -441,7 +441,7 @@ class FacebookPlugin extends Gdn_Plugin {
         $form->setFormValue('FullName', val('name', $profile));
         $form->setFormValue('Email', val('email', $profile));
         $form->setFormValue('Photo', "//graph.facebook.com/{$iD}/picture?width=200&height=200");
-        $form->setFormValue('Target', val('Target', $state, '/'));
+        $form->setFormValue('Target', val('target', $state, '/'));
         $form->addHidden('AccessToken', $accessToken);
 
         if (c('Plugins.Facebook.UseFacebookNames')) {
@@ -543,7 +543,7 @@ class FacebookPlugin extends Gdn_Plugin {
         }
 
         if ($query) {
-            $redirectUri .= '?'.$query;
+            $redirectUri .= (stripos($redirectUri, '?') === false) ? '?' : '&' .$query;
         }
 
         // Get a state token.
@@ -553,7 +553,7 @@ class FacebookPlugin extends Gdn_Plugin {
             'client_id' => $appID,
             'redirect_uri' => $redirectUri,
             'scope' => $scopes,
-            'state' => json_encode(['token' => $stateToken, 'Target' => $this->getTargetUri()]),
+            'state' => json_encode(['token' => $stateToken, 'target' => $this->getTargetUri()]),
         ]);
         $signinHref = "https://graph.facebook.com/oauth/authorize?{$authQuery}";
 

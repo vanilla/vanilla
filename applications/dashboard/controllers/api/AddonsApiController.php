@@ -186,9 +186,9 @@ class AddonsApiController extends Controller {
     public function get($id, array $query) {
         $this->permission('Garden.Settings.Manage');
 
-//        $id = $this->schema([
-//            'addonID:s' => 'The ID of the addon.'
-//        ], 'in')->setDescription('Get an addon.');
+        $id = $this->schema([
+            'addonID:s' => 'The ID of the addon.'
+        ], 'in')->setDescription('Get an addon.');
 
         $in = $this->schema([
             'themeType:s?' => [

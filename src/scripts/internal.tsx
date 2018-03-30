@@ -15,9 +15,9 @@ import App from "@core/Main/App";
  *
  * The page signifies that an element contains a component with the `data-react="<Component>"` attribute.
  *
- * @param {Element} parent The parent element to search. This element is not included in the search.
+ * @param parent - The parent element to search. This element is not included in the search.
  */
-export function _mountComponents(parent) {
+export function _mountComponents(parent: Element) {
     if (!componentExists('App')) {
         addComponent('App', App);
     }

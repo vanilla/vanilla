@@ -4,7 +4,12 @@
  * @license GPLv2
  */
 
-// import * as utility from "@core/utility";
+interface Gdn {
+    meta: AnyObject;
+    permissions: AnyObject;
+    translations: AnyObject;
+    [key: string]: any
+}
 
 /** The gdn object may be set in an inline script in the head of the document. */
 const gdn = window['gdn'] || {};
@@ -21,4 +26,4 @@ if (!('translations' in gdn)) {
     gdn.translations = {};
 }
 
-export default gdn;
+export default gdn as Gdn;

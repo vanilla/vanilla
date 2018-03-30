@@ -8,12 +8,8 @@ import gdn from "@core/gdn";
 
 /**
  * Determine if all of the provided permissions are present.
- *
- * @param {string|string[]} permissions
- * @param {number|null} id
- * @returns {boolean}
  */
-export function hasPermission(permissions, id = null) {
+export function hasPermission(permissions: string | string[], id: number | null) {
     if (typeof permissions === 'string') {
         permissions = [permissions];
     }
@@ -37,12 +33,12 @@ export function hasPermission(permissions, id = null) {
 
 /**
  * Determine if any of the provided permissions are present.
- *
- * @param {string|string[]} permissions
- * @param {number|null} id
- * @returns {boolean}
  */
-export function hasAny(permissions, id = null) {
+export function hasAny(permissions: string | string[], id: number | null = null): boolean {
+    if (typeof permissions === "string") {
+        permissions = [permissions];
+    }
+
     if (isBanned(permissions)) {
         return false;
     }
@@ -66,11 +62,10 @@ export function hasAny(permissions, id = null) {
 /**
  * Determine if the current user is banned.
  *
- * @param {string[]} permissions An optional array of permissions being checked. Any permission starting with "!" means
+ * @param permissions - An optional array of permissions being checked. Any permission starting with "!" means
  * that a ban with that name is ignored.
- * @returns {boolean}
  */
-export function isBanned(permissions = []) {
+export function isBanned(permissions: string[] = []): boolean {
     const ban = getBan(permissions);
     return ban !== null;
 }
@@ -78,11 +73,10 @@ export function isBanned(permissions = []) {
 /**
  * Get the currently active ban.
  *
- * @param {string[]} permissions An optional array of permissions being checked. Any permission starting with "!" means
+ * @param permissions - An optional array of permissions being checked. Any permission starting with "!" means
  * that a ban with that name is ignored.
- * @returns {Object|null}
  */
-function getBan(permissions = []) {
+function getBan(permissions: string[] = []): object | null {
     permissions = permissions.map((str) => str.toLowerCase());
     const bans = gdn.permissions.bans || {};
 
@@ -116,12 +110,8 @@ function getBan(permissions = []) {
 
 /**
  * Check just the permissions array, ignoring overrides from admin/bans.
- *
- * @param {string} permission
- * @param {int|null} id
- * @returns {boolean|null}
  */
-function hasInternal(permission, id = null) {
+function hasInternal(permission: string, id: number | null = null): boolean | null {
     const permissions = gdn.permissions.permissions || {};
 
     if (permission === 'admin') {

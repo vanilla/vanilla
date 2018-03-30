@@ -579,6 +579,27 @@ class UsersApiController extends AbstractApiController {
     }
 
     /**
+     * Send a password reset email.
+     *
+     * @param array $body The POST body.
+     * @throws Exception Throws all exceptions to the dispatcher.
+     */
+    public function post_requestPassword(array $body) {
+        $this->permission();
+
+        $in = $this->schema([
+            'email:s' => 'The email/username of the user.',
+        ]);
+
+        $body = $in->validate($body);
+
+        $this->userModel->passwordRequest($body['email']);
+        $this->validateModel($this->userModel, true);
+
+        return '';
+    }
+
+    /**
      * Verify a user.
      *
      * @param int $id The ID of the user.

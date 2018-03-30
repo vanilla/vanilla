@@ -1,5 +1,5 @@
 <?php if (!defined('APPLICATION')) exit(); ?>
-<h1><?php echo t("Reset my password") ?></h1>
+<h1><?php echo t("Recover Password") ?></h1>
 <div class="">
     <?php
     // Make sure to force this form to post to the correct place in case the view is
@@ -9,7 +9,7 @@
     <ul>
         <li>
             <?php
-            echo $this->Form->label('Enter your Email address or username', 'Email');
+            echo $this->Form->label($this->data('RecoverPasswordLabelCode', 'Enter your email to continue.'), 'Email');
             echo $this->Form->textBox('Email', ['autofocus' => 'autofocus']);
             ?>
         </li>

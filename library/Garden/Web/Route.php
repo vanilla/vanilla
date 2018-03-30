@@ -180,8 +180,23 @@ abstract class Route {
     protected function testConstraint(\ReflectionParameter $parameter, $value, array $meta = []) {
         if ($parameter->isDefaultValueAvailable() && $value === $parameter->getDefaultValue()) {
             return true;
-        } elseif ($this->hasConstraint($parameter)) {
+        }
+
+        /**
+         * Test the value against a type hint.
+         */
+        if ($parameter->hasType() && !$this->validateType($value, $parameter->getType())) {
+            return false;
+        }
+
+        if ($this->hasConstraint($parameter)) {
             $constraint = $this->constraints[strtolower($parameter->getName())];
+
+            // Look for specific rules for the type.
+            $type = $parameter->hasType() ? $parameter->getType()->getName() : 'notype';
+            if (!empty($constraint["$type"])) {
+                $constraint = $constraint["$type"] + $constraint;
+            }
 
             // Check the meta information.
             foreach ($meta as $metaKey => $metaValue) {
@@ -276,4 +291,28 @@ abstract class Route {
      * @return mixed Returns match information or **null** if the route doesn't match.
      */
     abstract public function match(RequestInterface $request);
+
+    /**
+     * Test to see if a value is valid against a type hint.
+     *
+     * @param mixed $value The value to validate.
+     * @param \ReflectionType $type The type to validate against.
+     * @return bool Returns **true** if the type check passes or **false** otherwise.
+     */
+    private function validateType($value, \ReflectionType $type): bool {
+        if (in_array($value, ['', null], true)) {
+            return $type->allowsNull();
+        }
+
+        // Test against the built in types.
+        switch ($type->getName()) {
+            case 'bool':
+                return filter_var($value, FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE) !== null;
+            case 'int':
+                return filter_var($value, FILTER_VALIDATE_INT) !== false;
+            case 'float':
+                return filter_var($value, FILTER_VALIDATE_FLOAT) !== false;
+        }
+        return true;
+    }
 }

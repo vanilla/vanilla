@@ -11,6 +11,7 @@ use PHPUnit\Framework\TestCase;
 use Garden\Web\Action;
 use Garden\Web\ResourceRoute;
 use Garden\Web\Route;
+use VanillaTests\Fixtures\CommentsController;
 use VanillaTests\Fixtures\DiscussionsController;
 use VanillaTests\Fixtures\Request;
 
@@ -61,6 +62,7 @@ class ResourceRouteTest extends TestCase {
      */
     public function provideKnownRoutes() {
         $dc = DiscussionsController::class;
+        $cc = CommentsController::class;
 
         $r = [
             'index' => ['GET', '/discussions', [$dc, 'index'], ['page' => '']],
@@ -85,10 +87,16 @@ class ResourceRouteTest extends TestCase {
             'index /:id/idsub' => ['GET', '/discussions/123/idsub', [$dc, 'index_idsub'], ['id' => '123']],
             'get /:id/idsub/:id2' => ['GET', '/discussions/123/idsub/abc', [$dc, 'get_idsub'], ['id' => '123', 'id2' => 'abc']],
 
+            // Integer type hints.
+            'index comments' => ['GET', '/comments/p1', [$cc, 'index'], ['param' => 'p1']],
+            'get comments/:id' => ['GET', '/comments/1', [$cc, 'get'], ['id' => '1']],
+            'get comments/archives' => ['GET', '/comments/archives', [$cc, 'index_archives']],
+            'get comments/:id/archives' => ['GET', '/comments/1/archives', [$cc, 'get_archives'], ['id' => '1']],
+
             // Special routes are special.
             'bad index' => ['GET', '/discussions/index', null],
             'bad get' => ['GET', '/discussions/get/123', null],
-            'bad post' => ['PATCH', '/discussions/post', null]
+            'bad post' => ['PATCH', '/discussions/post', null],
         ];
 
         return $r;

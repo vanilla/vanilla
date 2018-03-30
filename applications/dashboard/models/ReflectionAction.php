@@ -249,7 +249,7 @@ class ReflectionAction {
 
         } catch (ShortCircuitException $ex) {
             // We should have everything we need now.
-        } catch (\Exception $ex) {
+        } catch (\Throwable $ex) {
             $other['deprecated'] = true;
             // We shouldn't get here, but let's allow it.
             $summary = "Something happened before the output schema was found. The endpoint most likely didn't define its output properly.";

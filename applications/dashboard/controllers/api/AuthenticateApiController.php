@@ -459,4 +459,44 @@ class AuthenticateApiController extends AbstractApiController {
 
         return $ssoDataSchema;
     }
+
+    /**
+     * Authenticate a user with username/email and password.
+     *
+     * @param array $body The username/password to sign in.
+     * @return array Returns the signed in user.
+     * @throws \Exception Throws all exceptions to be dispatched as error responses.
+     */
+    public function post_password(array $body): array {
+        $this->permission();
+
+        $in = $this->schema([
+            'username:s' => 'The user\'s Username or email address.',
+            'password:s' => 'The user\'s password.',
+            'persist:b' => [
+                'description' => 'Whether the session should persist past the browser closing.',
+                'default' => false,
+            ],
+        ])->setDescription('Authenticate a user with username/email and password.');
+        $out = $this->schema([
+            'userID:i' => 'The ID of the user that signed in.',
+            'name:s' => 'The username of the user that signed in.',
+            'photoUrl:s' => [
+                'description' => 'The URL of the user\'s avatar.',
+                'format' => 'uri',
+            ],
+        ], 'out');
+        $body = $in->validate($body);
+
+        // Look up the user.
+        $user = $this->userModel->validateCredentials($body['username'], 0, $body['password'], true);
+        $row = ['userID' => val('UserID', $user)];
+        $this->userModel->expandUsers($row, ['userID']);
+        $result = $out->validate($row['user']);
+
+        $this->getSession()->start($result['userID'], true, $body['persist']);
+
+
+        return $result;
+    }
 }

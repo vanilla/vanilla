@@ -168,7 +168,7 @@ class ReflectionAction {
                 $arg = [];
             } elseif ($param->hasType()) {
                 $type = $param->getType();
-                switch (strtolower($type->getName())) {
+                switch (strtolower($type->__toString())) {
                     case 'bool':
                         $arg = false;
                         $schemaType = 'boolean';

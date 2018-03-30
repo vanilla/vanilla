@@ -193,7 +193,7 @@ abstract class Route {
             $constraint = $this->constraints[strtolower($parameter->getName())];
 
             // Look for specific rules for the type.
-            $type = $parameter->hasType() ? $parameter->getType()->getName() : 'notype';
+            $type = $parameter->hasType() ? $parameter->getType()->__toString() : 'notype';
             if (!empty($constraint["$type"])) {
                 $constraint = $constraint["$type"] + $constraint;
             }
@@ -305,7 +305,7 @@ abstract class Route {
         }
 
         // Test against the built in types.
-        switch ($type->getName()) {
+        switch ($type->__toString()) {
             case 'bool':
                 return filter_var($value, FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE) !== null;
             case 'int':

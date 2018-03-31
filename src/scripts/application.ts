@@ -4,8 +4,8 @@
  * @module application
  */
 import gdn from "@core/gdn";
-import { ComponentClass, ComponentElement } from "react";
 import { PromiseOrNormalCallback } from "@core/utility";
+import { ComponentClass, ComponentElement } from "react";
 
 /**
  * Get a piece of metadata passed from the server.
@@ -15,7 +15,7 @@ import { PromiseOrNormalCallback } from "@core/utility";
  *
  * @returns Returns a meta value or the default value.
  */
-export function getMeta(key: string, defaultValue: any = undefined) {
+export function getMeta(key: string, defaultValue?: any) {
     if (!gdn.meta) {
         return defaultValue;
     }
@@ -23,9 +23,7 @@ export function getMeta(key: string, defaultValue: any = undefined) {
     const parts = key.split('.');
     let haystack = gdn.meta;
 
-    for (let i = 0; i < parts.length; i++) {
-        const part = parts[i];
-
+    for (const part of parts) {
         haystack = haystack[part];
         if (haystack === undefined) {
             return defaultValue;
@@ -54,8 +52,7 @@ export function setMeta(key: string, value: any) {
 
     let haystack = gdn.meta;
 
-    for (let i = 0; i < parts.length; i++) {
-        const part = parts[i];
+    for (const part of parts) {
         if (haystack[part] === null || typeof haystack[part] !== 'object') {
             haystack[part] = {};
         }
@@ -201,12 +198,13 @@ export function onReady(callback: PromiseOrNormalCallback) {
  */
 export function _executeReady(): Promise<any[]> {
     return new Promise(resolve => {
+        const handlerPromises = _readyHandlers.map(handler => handler());
         const exec = () => {
-            Promise.all(_readyHandlers.map(handler => handler())).then(resolve);
+            return Promise.all(handlerPromises).then(resolve);
         };
 
         if (document.readyState !== "loading") {
-            exec();
+            return exec();
         } else {
             document.addEventListener("DOMContentLoaded", exec);
         }

@@ -80,7 +80,7 @@ const delegatedEventListeners = {};
 export function delegateEvent(
     eventName: string,
     filterSelector: string,
-    callback: Function,
+    callback: () => void,
     scopeSelector?: string
 ): string | undefined {
     let functionKey = eventName + filterSelector + callback.toString();

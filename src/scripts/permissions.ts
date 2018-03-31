@@ -80,7 +80,7 @@ function getBan(permissions: string[] = []): object | null {
     permissions = permissions.map((str) => str.toLowerCase());
     const bans = gdn.permissions.bans || {};
 
-    for (const name in bans) {
+    for (const name of bans) {
         const ban = bans[name];
 
         if (name in permissions) {
@@ -102,7 +102,7 @@ function getBan(permissions: string[] = []): object | null {
             }
         }
         // There was no exception to the ban so we are banned.
-        ban['type'] = name;
+        ban.type = name;
         return ban;
     }
     return null;

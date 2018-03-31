@@ -13,12 +13,12 @@ let _debug = false;
 /**
  * Get or set the debug flag.
  *
- * @param debug - The new value of debug.
+ * @param newValue - The new value of debug.
  * @returns the current debug setting.
  */
-export function debug(debug?: boolean): boolean {
-    if (debug !== undefined) {
-        _debug = debug;
+export function debug(newValue?: boolean): boolean {
+    if (newValue !== undefined) {
+        _debug = newValue;
     }
 
     return _debug;
@@ -81,7 +81,7 @@ export function resolvePromisesSequentially(promiseFunctions: PromiseOrNormalCal
  */
 export function log(...value: any[]) {
     if (_debug) {
-        // eslint-disable-next-line no-console
+        // tslint:disable-next-line:no-console
         console.log(...value);
     }
 }
@@ -92,7 +92,7 @@ export function log(...value: any[]) {
  * @param value - The value to log.
  */
 export function logError(...value: any[]) {
-    // eslint-disable-next-line no-console
+    // tslint:disable-next-line:no-console
     console.error(...value);
 }
 
@@ -102,7 +102,7 @@ export function logError(...value: any[]) {
  * @param value - The value to log.
  */
 export function logWarning(...value: any[]) {
-    // eslint-disable-next-line no-console
+    // tslint:disable-next-line:no-console
     console.warn(...value);
 }
 
@@ -116,6 +116,7 @@ export function logWarning(...value: any[]) {
  */
 export function hashString(str: string): number {
     function hashReduce(prevHash, currVal) {
+        // tslint:disable-next-line:no-bitwise
         return (prevHash << 5) - prevHash + currVal.charCodeAt(0);
     }
     return str.split("").reduce(hashReduce, 0);

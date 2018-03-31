@@ -4,15 +4,15 @@
  * @license GPLv2
  */
 
-interface Gdn {
+interface IGdn {
     meta: AnyObject;
     permissions: AnyObject;
     translations: AnyObject;
-    [key: string]: any
+    [key: string]: any;
 }
 
 /** The gdn object may be set in an inline script in the head of the document. */
-const gdn = window['gdn'] || {};
+const gdn = window.gdn || {};
 
 if (!('meta' in gdn)) {
     gdn.meta = {};
@@ -26,4 +26,4 @@ if (!('translations' in gdn)) {
     gdn.translations = {};
 }
 
-export default gdn as Gdn;
+export default gdn as IGdn;

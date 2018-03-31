@@ -3,7 +3,6 @@
     "description": "Vanilla is a powerfully simple discussion forum you can easily customize to make as unique as your community.",
     "license": "GPL-2.0",
     "dependencies": {
-        "@types/react": "^16.1.0",
         "axios": "^0.17.1",
         "babel-polyfill": "^6.26.0",
         "classnames": "^2.2.5",
@@ -24,6 +23,8 @@
     },
     "devDependencies": {
         "@types/jest": "^22.0.0",
+        "@types/react": "^16.1.0",
+        "@types/react-dom": "^16.0.4",
         "@vanillaforums/babel-preset": "^1.0.2",
         "@vanillaforums/eslint-config": "^1.2.2",
         "@vanillaforums/tslint-config": "^1.0.2",

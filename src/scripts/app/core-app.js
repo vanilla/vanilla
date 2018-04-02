@@ -7,9 +7,9 @@
 import { parseDomForEmoji } from "@core/emoji-utility";
 import { setupEmbeds, setupSpoilers } from "@core/app/user-content";
 
-import events from "@core/events";
+import { onReady } from "@core/application";
 
-events.onVanillaReady(() => {
+onReady(() => {
     parseDomForEmoji();
     setupEmbeds();
     setupSpoilers();

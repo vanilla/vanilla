@@ -196,7 +196,7 @@ export function onReady(callback) {
 export function _executeReady() {
     return new Promise(resolve => {
         const exec = () => {
-            Promise.all(_readyHandlers).then(resolve);
+            Promise.all(_readyHandlers.map(handler => handler())).then(resolve);
         };
 
         if (document.readyState !== "loading") {

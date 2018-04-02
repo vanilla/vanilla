@@ -6,7 +6,7 @@
 
 import { delegateEvent } from "@core/dom-utility";
 import { setData, getData } from "@core/dom-utility";
-import Events from "@core/events";
+import debounce from "lodash/debounce";
 import shave from 'shave';
 
 /**
@@ -64,9 +64,7 @@ export function setupEmbeds() {
     truncateEmbeds();
 
     // Resize
-    Events.addResizeListener(() => {
-        truncateEmbeds();
-    });
+    window.addEventListener("resize", debounce(truncateEmbeds, 200));
 }
 
 function handleToggleSpoiler() {

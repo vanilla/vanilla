@@ -368,6 +368,14 @@ class MessagesController extends ConversationsController {
 
         $this->Conversation = $this->ConversationModel->getID($conversationID);
         $this->Conversation->Participants = $this->ConversationModel->getRecipients($conversationID);
+
+        //Verify if participant email should be visible
+        foreach ($this->Conversation->Participants as $participant) {
+            if (!Gdn::session()->checkPermission('Garden.PersonalInfo.View')) {
+                $participant->Email = '';
+            }
+        }
+
         $this->setData('Conversation', $this->Conversation);
 
         // Bad conversation? Redirect

@@ -147,7 +147,7 @@ class VanillaHtmlFormatter {
      * @return string Returns the filtered HTML.
      */
     public function format($html, $options = []) {
-        $attributes = c('Garden.Html.BlockedAttributes', 'on*, target');
+        $attributes = c('Garden.Html.BlockedAttributes', 'on*, target, download');
 
         $specOverrides = val('spec', $options, []);
         if (!is_array($specOverrides)) {

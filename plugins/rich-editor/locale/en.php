@@ -14,3 +14,25 @@ $Definition['richEditor.menu.paragraph'] = 'Paragraph Style Menu';
 $Definition['richEditor.menu.spoiler'] = 'Spoiler';
 $Definition['richEditor.menu.subheading'] = 'Subheading';
 $Definition['richEditor.menu.strike'] = 'Strike Through';
+
+$Definition['Emoji Categories'] = 'Emoji Categories';
+$Definition['Get Help on Inserting Media'] = 'Get Help on Inserting Media';
+$Definition['In emoji category: '] = 'In emoji category: ';
+$Definition['Inline Menu Available'] = 'Inline Menu Available';
+$Definition['Insert an embedded web page, or video into your message'] = 'Insert an embedded web page, or video into your message';
+$Definition['Insert an emoji in your message.'] = 'Insert an emoji in your message.';
+$Definition['Jump past emoji list, to emoji categories.'] = 'Jump past emoji list, to emoji categories.';
+$Definition['Jumped to emoji category: '] = 'Jumped to emoji category: ';
+$Definition['Paste the URL of the media you want.'] = 'Paste the URL of the media you want.';
+$Definition['Paste or type a link…'] = 'Paste or type a link…';
+$Definition['Smileys & Faces'] = 'Smileys & Faces';
+
+// Emoji Group Names
+$Definition['smileys-people'] = 'Smileys and People';
+$Definition['animals-nature'] = 'Animals and Nature';
+$Definition['food-drink'] = 'Food and Drink';
+$Definition['travel-places'] = 'Travel and Places';
+$Definition['activities'] = 'Activities';
+$Definition['objects'] = 'Objects';
+$Definition['symbols'] = 'Symbols';
+$Definition['flags'] = 'Flags';

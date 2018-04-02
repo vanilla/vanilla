@@ -7,8 +7,9 @@
 
 namespace VanillaTests\APIv2\Authenticate;
 
+use Vanilla\Models\SSOData;
 use VanillaTests\APIv2\AbstractAPIv2Test;
-use VanillaTests\Fixtures\TestSSOAuthenticator;
+use VanillaTests\Fixtures\MockSSOAuthenticator;
 
 /**
  * Test the /api/v2/authenticate endpoints.
@@ -23,7 +24,7 @@ class AutoConnectTest extends AbstractAPIv2Test {
     private $baseUrl = '/authenticate';
 
     /**
-     * @var TestSSOAuthenticator
+     * @var MockSSOAuthenticator
      */
     private $authenticator;
 
@@ -38,8 +39,8 @@ class AutoConnectTest extends AbstractAPIv2Test {
     public static function setupBeforeClass() {
         parent::setupBeforeClass();
         self::container()
-            ->rule(TestSSOAuthenticator::class)
-            ->setAliasOf('TestSSOAuthenticator');
+            ->rule(MockSSOAuthenticator::class)
+            ->setAliasOf('MockSSOAuthenticator');
 
         self::$config = self::container()->get('Config');
     }
@@ -49,8 +50,6 @@ class AutoConnectTest extends AbstractAPIv2Test {
      */
     public function setUp() {
         parent::setUp();
-
-        $this->authenticator = new TestSSOAuthenticator();
 
         $uniqueID = uniqid('ac_');
         $userData = [
@@ -64,10 +63,9 @@ class AutoConnectTest extends AbstractAPIv2Test {
         $userFragment = $usersAPIController->post($userData)->getData();
         $this->currentUser = array_merge($userFragment, $userData);
 
-        $this->authenticator->setUniqueID($uniqueID);
-        $this->authenticator->setUserData($userData);
+        $this->authenticator = new MockSSOAuthenticator($uniqueID, $userData);
 
-        $this->container()->setInstance('TestSSOAuthenticator', $this->authenticator);
+        $this->container()->setInstance('MockSSOAuthenticator', $this->authenticator);
 
         $session = $this->container()->get(\Gdn_Session::class);
         $session->end();
@@ -81,13 +79,16 @@ class AutoConnectTest extends AbstractAPIv2Test {
      *
      * @dataProvider provider
      */
-    public function testAuthenticate($configurations, $expectedResults) {
+    public function testAuthenticate($configurations, $authenticatorProperties, $expectedResults) {
         foreach($configurations as $key => $value) {
             self::$config->set($key, $value);
         }
+        foreach($authenticatorProperties as $property => $value) {
+            $this->authenticator->$property($value);
+        }
 
         $postData = [
-            'authenticator' => $this->authenticator->getName(),
+            'authenticatorType' => $this->authenticator::getType(),
             'authenticatorID' => $this->authenticator->getID(),
         ];
 
@@ -114,7 +115,7 @@ class AutoConnectTest extends AbstractAPIv2Test {
         $this->api()->setUserID($this->currentUser['userID']);
 
         $result = $this->api()->get(
-            $this->baseUrl.'/'.$this->authenticator->getName().'/'.$this->authenticator->getID()
+            $this->baseUrl.'/'.$this->authenticator::getType().'/'.$this->authenticator->getID()
         );
 
         $this->assertEquals(200, $result->getStatusCode());
@@ -136,15 +137,23 @@ class AutoConnectTest extends AbstractAPIv2Test {
             'Garden.Registration.NoEmail' => [false, true],
             'Garden.Registration.EmailUnique' => [false, true],
             'Garden.Registration.AllowConnect' => [false, true],
-            'Garden.Registration.AutoConnect' => [false, true],
         ];
         $configurationSets = $this->configurationSetsGenerator($configurationsDefinition);
 
-        foreach($configurationSets as $configurationSet) {
-            $data[] = [
-                'configurations' => $configurationSet,
-                'expectedResults' => $this->determineExpectedResult($configurationSet),
-            ];
+        $authenticatorProperties = [
+            'setAutoLinkUser' => [true, false],
+        ];
+        $authenticatorPropertiesSets = $this->configurationSetsGenerator($authenticatorProperties);
+
+
+        foreach($authenticatorPropertiesSets as $authenticatorProperties) {
+            foreach($configurationSets as $configurations) {
+                $data[] = [
+                    'configurations' => $configurations,
+                    'authenticatorProperties' => $authenticatorProperties,
+                    'expectedResults' => $this->determineExpectedResult($configurations, $authenticatorProperties),
+                ];
+            }
         }
 
         return $data;
@@ -153,10 +162,11 @@ class AutoConnectTest extends AbstractAPIv2Test {
     /**
      * Determine if the a configuration combination should pass or fail a test.
      *
-     * @param $configurationSet
+     * @param array $configurationSet
+     * @param array $authenticatorProperties
      * @return array
      */
-    private function determineExpectedResult($configurationSet) {
+    private function determineExpectedResult($configurationSet, $authenticatorProperties) {
         $authenticationFailure = [
             'authenticationStep' => 'linkUser',
             'isUserLinked' => false,
@@ -181,7 +191,7 @@ class AutoConnectTest extends AbstractAPIv2Test {
             return $authenticationFailure;
         }
 
-        if (!$configurationSet['Garden.Registration.AutoConnect']) {
+        if (!$authenticatorProperties['setAutoLinkUser']) {
             return $authenticationFailure;
         }
 

@@ -36,7 +36,10 @@ class DiscussionModel extends Gdn_Model {
     /** @var array */
     private static $discussionTypes = null;
 
-    /** @var bool */
+    /**
+     * @deprecated 2.6
+     * @var bool
+     */
     public $Watching = false;
 
     /** @var array Discussion Permissions */
@@ -233,33 +236,17 @@ class DiscussionModel extends Gdn_Model {
             return true;
         }
 
+        // Make sure only moderators can edit closed things.
+        if (val('Closed', $discussion)) {
+            return false;
+        }
+
         // Non-mods can't edit if they aren't the author.
         if (Gdn::session()->UserID != val('InsertUserID', $discussion)) {
             return false;
         }
 
-        return self::editContentTimeout($discussion, $timeLeft);
-    }
-
-    /**
-     * Checks whether the time frame when a discussion can be edited has passed.
-     *
-     * @param object|array $discussion The discussion to examine.
-     * @param int $timeLeft Sets the time left to edit or 0 if not applicable.
-     * @return bool Whether the time to edit the discussion has passed.
-     */
-    public static function editContentTimeout($discussion, &$timeLeft = 0) {
-        // Determine if we still have time to edit.
-        $timeInserted = strtotime(val('DateInserted', $discussion));
-        $editContentTimeout = c('Garden.EditContentTimeout', -1);
-
-        $canEdit = $editContentTimeout == -1 || $timeInserted + $editContentTimeout > time();
-
-        if ($canEdit && $editContentTimeout > 0) {
-            $timeLeft = $timeInserted + $editContentTimeout - time();
-        }
-
-        return $canEdit;
+        return parent::editContentTimeout($discussion, $timeLeft);
     }
 
     public function counts($column, $from = false, $to = false, $max = false) {
@@ -347,11 +334,7 @@ class DiscussionModel extends Gdn_Model {
      */
     public function discussionSummaryQuery($additionalFields = [], $join = true) {
         // Verify permissions (restricting by category if necessary)
-        if ($this->Watching) {
-            $perms = CategoryModel::categoryWatch();
-        } else {
-            $perms = self::categoryPermissions();
-        }
+        $perms = self::categoryPermissions();
 
         if ($perms !== true) {
             $this->SQL->whereIn('d.CategoryID', $perms);
@@ -680,10 +663,10 @@ class DiscussionModel extends Gdn_Model {
         }
 
         // Determine category watching
-        if ($this->Watching && !isset($where['d.CategoryID'])) {
-            $watch = CategoryModel::categoryWatch();
-            if ($watch !== true) {
-                $where['d.CategoryID'] = $watch;
+        if (!isset($where['d.CategoryID'])) {
+            $categoryIDs = CategoryModel::instance()->getVisibleCategoryIDs(['filterHideDiscussions' => true]);
+            if ($categoryIDs !== true) {
+                $where['d.CategoryID'] = $categoryIDs;
             }
         }
 
@@ -1534,11 +1517,7 @@ class DiscussionModel extends Gdn_Model {
      */
     public function getCount($wheres = [], $unused = null) {
         // Get permissions.
-        if ($this->Watching) {
-            $perms = CategoryModel::categoryWatch();
-        } else {
-            $perms = self::categoryPermissions();
-        }
+        $perms = self::categoryPermissions();
 
         // No permissions... That is sad :(
         if (!$perms) {
@@ -1624,11 +1603,7 @@ class DiscussionModel extends Gdn_Model {
         }
 
         // Check permission and limit to categories as necessary
-        if ($this->Watching) {
-            $perms = CategoryModel::categoryWatch();
-        } else {
-            $perms = self::categoryPermissions();
-        }
+        $perms = self::categoryPermissions();
 
         if (!$wheres || (count($wheres) == 1 && isset($wheres['d.CategoryID']))) {
             // Grab the counts from the faster category cache.
@@ -3225,7 +3200,7 @@ class DiscussionModel extends Gdn_Model {
         self::$allowedFilters[$setKey]['filters'][self::EMPTY_FILTER_KEY] = [
             'key' => self::EMPTY_FILTER_KEY,
             'setKey' => $setKey,
-            'name' => sprintf(t('Clear %s'), $setName),
+            'name' => $setName,
             'wheres' => [], 'group' => 'default'
         ];
     }

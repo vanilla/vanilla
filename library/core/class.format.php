@@ -916,7 +916,6 @@ class Gdn_Format {
 
                 // Do HTML filtering before our special changes.
                 $result = $formatter->format($mixed, $options);
-                $result = self::sanitizeLinks($result);
             } else {
                 // The text does not contain HTML and does not have to be purified.
                 // This is an optimization because purifying is very slow and memory intense.
@@ -983,32 +982,6 @@ class Gdn_Format {
 
         return $html;
     }
-
-    /**
-     * Add noopener to any link that has target="_blank"
-     *
-     * @param string $html An HTML-formatted string.
-     *
-     * @return string Returns the html with noopener added to any links with target="_blank".
-     */
-    protected static function sanitizeLinks($html) {
-        if (preg_match('/target="_blank"/i', $html)) {
-            $htmlDom = pQuery::parseStr($html);
-
-            foreach($htmlDom->query('a[target="_blank"]:not([rel*="noopener"])') as $targetBlankLink) {
-                $rel = $targetBlankLink->attr("rel");
-                if ($rel) {
-                    $targetBlankLink->attr("rel", $rel . " noopener");
-                } else {
-                    $targetBlankLink->attr("rel", "noopener");
-                }
-            }
-            $html = (string)$htmlDom;
-        }
-
-        return $html;
-    }
-
 
     /**
      * Check to see if a string has quotes and replace with them with a placeholder.
@@ -1958,7 +1931,11 @@ EOT;
             }
 
             if ($mention) {
-                $parts[$i] = anchor('@'.$mention, url(str_replace('{name}', rawurlencode($mention), self::$MentionsUrlFormat), true), '', ['rel' => 'nofollow']).$suffix;
+                $attributes = [];
+                if (self::$DisplayNoFollow) {
+                    $attributes['rel'] = 'nofollow';
+                }
+                $parts[$i] = anchor('@'.$mention, url(str_replace('{name}', rawurlencode($mention), self::$MentionsUrlFormat), true), '', $attributes).$suffix;
             } else {
                 $parts[$i] = '@' . $parts[$i];
             }

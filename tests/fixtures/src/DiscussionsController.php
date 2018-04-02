@@ -106,4 +106,20 @@ class DiscussionsController {
 
     public function get_article($path, $page = '') {
     }
+
+    public function index_sub() {
+
+    }
+
+    public function get_sub($arg) {
+
+    }
+
+    public function get_idsub($id, $id2) {
+
+    }
+
+    public function index_idsub($id) {
+
+    }
 }

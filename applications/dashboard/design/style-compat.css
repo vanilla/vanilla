@@ -1,9 +1,33 @@
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  border: 0;
+}
+
 /** Hides the image cropper on mobile themes. This image cropper is not mobile compatible. */
 body.isMobile .box-crop .box-source {
   display: none;
 }
 
 body.isMobile .change-picture .change-picture-instructions {
+  display: none;
+}
+
+@media (max-width: 600px) {
+  .box-crop .box-source {
+    display: none;
+  }
+  .change-picture .change-picture-instructions {
+    display: none;
+  }
+}
+
+.categoryList-heading + .DataTableWrap > .categoryList-genericHeading {
   display: none;
 }
 
@@ -34,11 +58,6 @@ body.isMobile .change-picture .change-picture-instructions {
   height: 24px;
 }
 
-.PageControls .selectBox {
-  margin-right: 10px;
-  float: left;
-}
-
 .selectBox {
   display: inline-block;
   position: relative;
@@ -46,24 +65,32 @@ body.isMobile .change-picture .change-picture-instructions {
   vertical-align: middle;
 }
 
+.PageControls .selectBox {
+  margin-right: 15px;
+  float: left;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+}
+
 .selectBox-label {
-  display: inline-block;
   position: relative;
   cursor: pointer;
   user-select: none;
-  height: 100%;
   margin-right: 5px;
 }
 
 .selectBox-main {
-  display: inline-block;
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
   position: relative;
   cursor: pointer;
   user-select: none;
-  height: 100%;
 }
 
 .selectBox-content {
+  display: none;
   left: 100%;
   margin-left: -29px;
   margin-top: 10px;
@@ -71,9 +98,8 @@ body.isMobile .change-picture .change-picture-instructions {
 
 .selectBox-toggle {
   position: relative;
-  display: block;
-  line-height: 1;
-  vertical-align: middle;
+  display: inline-block;
+  vertical-align: inherit;
   cursor: pointer;
   user-select: none;
   outline: none;
@@ -86,12 +112,6 @@ body.isMobile .change-picture .change-picture-instructions {
 
 .selectBox-toggle:active {
   text-decoration: none;
-}
-
-.vanillaDropDown-arrow,
-.selectBox-selected {
-  line-height: 1;
-  vertical-align: middle;
 }
 
 .selectBox-item {
@@ -115,7 +135,6 @@ body.isMobile .change-picture .change-picture-instructions {
   white-space: nowrap;
   text-overflow: ellipsis;
   overflow: hidden;
-  width: 100%;
   text-decoration: none !important;
   text-align: left;
 }
@@ -130,11 +149,13 @@ body.isMobile .change-picture .change-picture-instructions {
   height: 18px;
 }
 
-body.Categories.isMobile .PageControls.Top {
-  display: block;
+.menu-separator {
+  background: none;
+  border-bottom: 1px solid #dddee0;
+  margin: 6px 0;
 }
 
-.sr-only {
+.menu-separator hr {
   position: absolute;
   width: 1px;
   height: 1px;
@@ -143,6 +164,19 @@ body.Categories.isMobile .PageControls.Top {
   overflow: hidden;
   clip: rect(0, 0, 0, 0);
   border: 0;
+}
+
+.PageControls {
+  position: relative;
+}
+
+body.Categories.isMobile .PageControls.Top {
+  display: block;
+}
+
+.ButtonGroup.discussion-sort-filter-module {
+  display: flex;
+  align-items: center;
 }
 
 /*# sourceMappingURL=style-compat.css.map */

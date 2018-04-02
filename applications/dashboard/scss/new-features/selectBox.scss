@@ -1,109 +1,139 @@
-.PageControls {
-  .selectBox {
-    margin-right: 10px;
-    float: left;
-  }
-}
-
+$menu-separator_height: 1px;
+$menu-separator_margin: 6px !default;
+$menu-separator_style: solid;
+$menu-separator_color: #dddee0 !default;
+$selectBox-toggle_lineHeight: 13px !default;
+$selectBox-toggle_fontSize: 13px !default;
 
 .selectBox {
-  display: inline-block;
-  position: relative;
-  white-space: nowrap;
-  vertical-align: middle;
+    display: inline-block;
+    position: relative;
+    white-space: nowrap;
+    vertical-align: middle;
+}
+
+.PageControls {
+    .selectBox {
+        margin-right: 15px;
+        float: left;
+        display: flex;
+        align-items: center;
+        justify-content: flex-start;
+    }
 }
 
 .selectBox-label {
-  display: inline-block;
-  position: relative;
-  cursor: pointer;
-  user-select: none;
-  height: 100%;
-  margin-right: 5px;
+    position: relative;
+    cursor: pointer;
+    user-select: none;
+    //height: $selectBox-toggle_lineHeight;
+    margin-right: 5px;
 }
 
+
+
 .selectBox-main {
-  display: inline-block;
-  position: relative;
-  cursor: pointer;
-  user-select: none;
-  height: 100%;
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+    position: relative;
+    cursor: pointer;
+    user-select: none;
 }
 
 .selectBox-content {
-  left: 100%;
-  margin: {
-    left: -29px;
-    top: 10px;
-  }
+    display: none;
+
+
+    left: 100%;
+    margin: {
+        left: -29px;
+        top: 10px;
+    }
 }
 
 .selectBox-toggle {
-  position: relative;
-  display: block;
-  line-height: 1;
-  vertical-align: middle;
-  cursor: pointer;
-  user-select: none;
-  outline: none;
-  -webkit-appearance: none;
-  -moz-appearance: none;
-  appearance: none;
-  white-space: nowrap;
-  max-height: 100%;
+    position: relative;
+    display: inline-block;
+    vertical-align: inherit;
+    cursor: pointer;
+    user-select: none;
+    outline: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+    white-space: nowrap;
+    max-height: 100%;
 
-  &:active {
-    text-decoration: none;
-  }
-}
-
-.vanillaDropDown-arrow,
-.selectBox-selected {
-  line-height: 1;
-  vertical-align: middle;
+    &:active {
+        text-decoration: none;
+    }
 }
 
 .selectBox-item {
-  position: relative;
-  display: block;
-
-  .dropdown-menu-link.selectBox-link {
     position: relative;
-    padding-left: 30px;
-  }
+    display: block;
 
-  &.isActive {
-    .selectBox-link {
-      pointer-events: none;
-      cursor: default;
+    .dropdown-menu-link.selectBox-link {
+        position: relative;
+        padding-left: 30px;
     }
-  }
+
+    &.isActive {
+        .selectBox-link {
+            pointer-events: none;
+            cursor: default;
+        }
+    }
 }
 
-
-
 .selectBox-link {
-  display: block;
-  box-sizing: border-box;
-  white-space: nowrap;
-  text-overflow: ellipsis;
-  overflow: hidden;
-  width: 100%;
-  text-decoration: none !important;
-  text-align: left;
-
+    display: block;
+    box-sizing: border-box;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    text-decoration: none !important;
+    text-align: left;
 }
 
 .selectBox-selectedIcon {
-  position: absolute;
-  left: 5px;
-  top: 0;
-  bottom: 0;
-  margin: auto 0;
-  width: 18px;
-  height: 18px;
+    position: absolute;
+    left: 5px;
+    top: 0;
+    bottom: 0;
+    margin: auto 0;
+    width: 18px;
+    height: 18px;
+}
+
+
+.menu-separator {
+    background: none; // TODO: get rid of when we get the new editor
+    border-bottom: $menu-separator_height $menu-separator_style $menu-separator_color;
+    margin: $menu-separator_margin 0;
+
+    hr { // We keep the <hr/> for accessibility
+        @include sr-only();
+    }
+}
+
+
+// Move me
+.PageControls {
+    position: relative;
 }
 
 body.Categories.isMobile .PageControls.Top {
-  display: block;
+    display: block;
+}
+
+.ButtonGroup.discussion-sort-filter-module {
+    display: flex;
+    align-items: center;
+}
+
+.discussion-sorts,
+.discussion-filters {
+
 }

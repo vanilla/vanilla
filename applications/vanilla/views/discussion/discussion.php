@@ -84,7 +84,7 @@ $this->fireEvent('BeforeDiscussionDisplay');
         <?php $this->fireEvent('BeforeDiscussionBody'); ?>
         <div class="Item-BodyWrap">
             <div class="Item-Body">
-                <div class="Message">
+                <div class="Message userContent">
                     <?php
                     echo formatBody($Discussion);
                     ?>

@@ -1,6 +1,6 @@
 <?php if (!defined('APPLICATION')) exit(); ?>
 <div id="RecentActivity" class="Box">
-    <h4><?php echo val('ActivityModuleTitle', $this, t('Recent Activity')); ?></h4>
+    <h4 aria-level="2"><?php echo val('ActivityModuleTitle', $this, t('Recent Activity')); ?></h4>
     <ul class="PanelInfo">
         <?php
         $Data = $this->ActivityData;

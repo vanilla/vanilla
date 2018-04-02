@@ -27,7 +27,7 @@ function writeActivity($activity, $sender, $session) {
     $excerpt = Gdn_Format::to($activity->Story, $format);
 
     if ($activity->NotifyUserID > 0 || !in_array($activityType, ['WallComment', 'WallPost', 'AboutUpdate'])) {
-        $title = '<div class="Title">'.Gdn_Format::to(val('Headline', $activity), 'html').'</div>';
+        $title = '<div class="Title" role="heading" aria-level="3">'.Gdn_Format::to(val('Headline', $activity), 'html').'</div>';
     } else if ($activityType == 'WallPost') {
         $regardingUser = userBuilder($activity, 'Regarding');
         $photoAnchor = userPhoto($regardingUser);
@@ -59,7 +59,7 @@ function writeActivity($activity, $sender, $session) {
     <?php } ?>
    <div class="ItemContent Activity">
       <?php echo $title; ?>
-    <?php echo wrapIf($excerpt, 'div', ['class' => 'Excerpt']); ?>
+    <?php echo wrapIf($excerpt, 'div', ['class' => 'Excerpt userContent']); ?>
     <?php
     $sender->EventArguments['Activity'] = $activity;
     $sender->fireAs('ActivityController')->fireEvent('AfterActivityBody');

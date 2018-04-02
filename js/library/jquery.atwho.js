@@ -76,7 +76,26 @@
           clonedRange = range.cloneRange();
           clonedRange.selectNodeContents(this.domInputor);
           clonedRange.setEnd(range.endContainer, range.endOffset);
-          pos = clonedRange.toString().length;
+
+          var breaksBefore = 0;
+          var shouldContinue = true;
+          var currentElement = clonedRange.endContainer;
+
+          // Check the elements backwards from the final one in our selection for breaks.
+          while (currentElement && shouldContinue) {
+            if (currentElement.nodeName === "BR") {
+              breaksBefore++;
+            }
+
+            if (currentElement.previousSibling) {
+              currentElement = currentElement.previousSibling;
+            } else {
+              shouldContinue = false;
+            }
+          }
+
+          // The string representation of a Range does not contain breaks or newlines. We have to count them ourselves.
+          pos = clonedRange.toString().length + breaksBefore;
           clonedRange.detach();
           return pos;
         } else if (document.selection) {
@@ -422,6 +441,8 @@
         var _this = this;
         return this.$inputor.on('keyup.atwho', function(e) {
           return _this.on_keyup(e);
+        }).on('input.atwho', function() {
+            _this.dispatch();
         }).on('keydown.atwho', function(e) {
           return _this.on_keydown(e);
         }).on('scroll.atwho', function(e) {
@@ -455,12 +476,10 @@
               _ref.view.hide();
             }
             break;
-          case KEY_CODE.DOWN:
-          case KEY_CODE.UP:
-            $.noop();
-            break;
           default:
-            this.dispatch();
+            $.noop();
+            // This used to dispatch here, but there was an issue with accented characters on mac. Dispatch now happens
+            // On input.
         }
       };
 
@@ -561,7 +580,6 @@
       Controller.prototype.content = function() {
         var result = {
           content: null,
-          offset: 0
         };
 
         if (this.$inputor.is('textarea, input')) {
@@ -570,7 +588,6 @@
           var textNode = $(document.createElement('div'));
           var html = this.$inputor.html();
           var breaks = /<br(\s+)?(\/)?>/g;
-          result.offset = html.match(breaks) ? html.match(breaks).length : 0;
           textNode.html(html.replace(breaks, "\n"));
           result.content = textNode.text();
         }
@@ -581,8 +598,7 @@
       Controller.prototype.catch_query = function() {
         var caret_pos, contents, end, query, start, subtext;
         contents = this.content();
-        ////caret_pos = this.$inputor.caret('pos');
-        caret_pos = this.$inputor.caret('pos', this.setting.cWindow) + contents.offset;
+        caret_pos = this.$inputor.caret('pos', this.setting.cWindow);
         subtext = contents.content.slice(0, caret_pos);
         query = this.callbacks("matcher").call(this, this.at, subtext, this.get_opt('start_with_space'));
         if (typeof query === "string" && query.length <= this.get_opt('max_len', 20)) {

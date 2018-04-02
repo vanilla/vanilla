@@ -21,7 +21,18 @@ class CategoryController extends VanillaController {
         $this->CategoryModel = new CategoryModel();
     }
 
+    /**
+     * Mute or unmute a category.
+     *
+     * @deprecated 2.6 Deprecated in favor of whitelist-style category following.
+     * @see CategoryController::followed
+     * @param $categoryID
+     * @param $value
+     * @param $tKey
+     */
     public function follow($categoryID, $value, $tKey) {
+        deprecated(__METHOD__, __CLASS__.'::followed');
+
         if (Gdn::session()->validateTransientKey($tKey)) {
             $this->CategoryModel->saveUserTree($categoryID, ['Unfollow' => (int)(!(bool)$value)]);
         }

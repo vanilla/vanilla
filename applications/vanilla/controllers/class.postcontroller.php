@@ -634,21 +634,9 @@ class PostController extends VanillaController {
 
         // Check permissions
         if ($Discussion && $Editing) {
-            // Permission to edit
-            if ($this->Comment->InsertUserID != $Session->UserID) {
-                $this->categoryPermission($Discussion->CategoryID, 'Vanilla.Comments.Edit');
-            }
-
             // Make sure that content can (still) be edited.
-            $EditContentTimeout = c('Garden.EditContentTimeout', -1);
-            $CanEdit = $EditContentTimeout == -1 || strtotime($this->Comment->DateInserted) + $EditContentTimeout > time();
-            if (!$CanEdit) {
-                $this->categoryPermission($Discussion->CategoryID, 'Vanilla.Comments.Edit');
-            }
-
-            // Make sure only moderators can edit closed things
-            if ($Discussion->Closed) {
-                $this->categoryPermission($Discussion->CategoryID, 'Vanilla.Comments.Edit');
+            if (!$this->CommentModel::canEdit($this->Comment)) {
+                throw permissionException('Vanilla.Comments.Edit');
             }
 
             $this->Form->setFormValue('CommentID', $CommentID);

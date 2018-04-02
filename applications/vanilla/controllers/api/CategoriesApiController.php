@@ -123,6 +123,7 @@ class CategoriesApiController extends AbstractApiController {
             ],
             'parentCategoryID:i|n' => 'Parent category ID.',
             'customPermissions:b' => 'Are custom permissions set for this category?',
+            'isArchived:b' => 'The archived state of this category.',
             'urlcode:s' => 'The URL code of the category.',
             'url:s' => 'The URL to the category.',
             'displayAs:s' => [
@@ -268,6 +269,10 @@ class CategoriesApiController extends AbstractApiController {
                 'description' => '',
                 'default' => 2,
             ],
+            'archived:b|n' => [
+                'description' => 'Filter by archived status of a category. True for archived only. False for no archived categories. Not compatible with followed filter.',
+                'default' => false
+            ],
             'page:i?' => [
                 'description' => 'Page number. Works with flat and followed categories. See [Pagination](https://docs.vanillaforums.com/apiv2/#pagination)',
                 'default' => 1,
@@ -327,11 +332,13 @@ class CategoriesApiController extends AbstractApiController {
                 $parent['CategoryID'],
                 [
                     'maxdepth' => $query['maxDepth'],
-                    'filter' => function ($row) {
-                        return empty($row['Archived']);
-                    },
                 ]
             );
+
+            // Filter tree by the category "archived" fields.
+            if ($query['archived'] !== null) {
+                $categories = $this->archiveFilter($categories, $query['archived'] ? 0 : 1);
+            }
         }
         $this->categoryModel->setJoinUserCategory($joinUserCategory);
         $categories = array_map([$this, 'normalizeOutput'], $categories);
@@ -345,6 +352,30 @@ class CategoriesApiController extends AbstractApiController {
         }
 
         return new Data($result, ['paging' => $paging]);
+    }
+
+    /**
+     * Recursively filter a list of categories by their archived flag.
+     *
+     * @param array $categories
+     * @param int $archived
+     * @return array
+     */
+    private function archiveFilter(array $categories, $archived) {
+        $result = [];
+        foreach ($categories as $index => $category) {
+            // Discard, based on archived value.
+            if (array_key_exists('Archived', $category) && $category['Archived'] === $archived) {
+                continue;
+            }
+            // Process any children.
+            if (!empty($category['Children'])) {
+                $category['Children'] = $this->archiveFilter($category['Children'], $archived);
+            }
+            // If the category made it this far, include it.
+            $result[] = $category;
+        }
+        return $result;
     }
 
     /**
@@ -489,6 +520,8 @@ class CategoriesApiController extends AbstractApiController {
         if (!empty($dbRecord['Children']) && is_array($dbRecord['Children'])) {
             $dbRecord['Children'] = array_map([$this, 'normalizeOutput'], $dbRecord['Children']);
         }
+
+        $dbRecord['isArchived'] = $dbRecord['Archived'];
 
         $schemaRecord = ApiUtils::convertOutputKeys($dbRecord);
         return $schemaRecord;

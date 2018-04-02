@@ -16,13 +16,10 @@ class SSOData implements \JsonSerializable {
     private static $userFields = ['name', 'email', 'photo', 'roles'];
 
     /** @var string Maps to "GDN_UserAuthenticationProvider.AuthenticationSchemeAlias" */
-    private $authenticatorName;
+    private $authenticatorType;
 
     /** @var string Maps to "GDN_UserAuthenticationProvider.ProviderKey" */
     private $authenticatorID;
-
-    /** @var bool Whether the authenticator can sync Roles or User info. */
-    private $authenticatorIsTrusted;
 
     /** @var string Maps to "GDN_UserAuthentication.ForeignUserKey" */
     private $uniqueID;
@@ -36,25 +33,22 @@ class SSOData implements \JsonSerializable {
     /**
      * SSOData constructor.
      *
-     * @param string $authenticatorName
+     * @param string $authenticatorType
      * @param string $authenticatorID
-     * @param bool $authenticatorIsTrusted
      * @param string $uniqueID
      * @param array $userData
      * @param array $extra
      * @throws \Exception If a non associative array is passed to the constructor.
      */
     public function __construct(
-        $authenticatorName,
-        $authenticatorID,
-        $authenticatorIsTrusted,
-        $uniqueID,
-        $userData = [],
-        $extra = []
+        string $authenticatorType,
+        string $authenticatorID,
+        string $uniqueID,
+        array $userData = [],
+        array $extra = []
     ) {
-        $this->authenticatorName = $authenticatorName;
+        $this->authenticatorType = $authenticatorType;
         $this->authenticatorID = $authenticatorID;
-        $this->authenticatorIsTrusted = $authenticatorIsTrusted;
         $this->uniqueID = $uniqueID;
         $this->extra = $extra;
 
@@ -64,73 +58,69 @@ class SSOData implements \JsonSerializable {
     }
 
     /**
+     * Getter of authenticatorType.
+     *
      * @return string
      */
-    public function getAuthenticatorName() {
-        return $this->authenticatorName;
+    public function getAuthenticatorType(): string {
+        return $this->authenticatorType;
     }
 
     /**
-     * @param $authenticatorName
-     * @return $this
+     * Setter of authenticatorType.
+     *
+     * @param string $authenticatorType
+     * @return self
      */
-    public function setAuthenticatorName($authenticatorName) {
-        $this->authenticatorName = $authenticatorName;
+    public function setAuthenticatorType(string $authenticatorType): self {
+        $this->authenticatorType = $authenticatorType;
+
         return $this;
     }
 
     /**
+     * Getter of authenticatorID.
+     *
      * @return string
      */
-    public function getAuthenticatorID() {
+    public function getAuthenticatorID(): string {
         return $this->authenticatorID;
     }
 
     /**
-     * @param $authenticatorID
-     * @return $this
+     * Setter of authenticatorID.
+     *
+     * @param string $authenticatorID
      */
-    public function setAuthenticatorID($authenticatorID) {
+    public function setAuthenticatorID(string $authenticatorID) {
         $this->authenticatorID = $authenticatorID;
-        return $this;
     }
 
     /**
-     * @return bool
-     */
-    public function getAuthenticatorIsTrusted() {
-        return $this->authenticatorIsTrusted;
-    }
-
-    /**
-     * @param $authenticatorIsTrusted
-     * @return $this
-     */
-    public function setAuthenticatorIsTrusted($authenticatorIsTrusted) {
-        $this->authenticatorIsTrusted = $authenticatorIsTrusted;
-        return $this;
-    }
-
-    /**
+     * Getter of uniqueID.
+     *
      * @return string
      */
-    public function getUniqueID() {
+    public function getUniqueID(): string {
         return $this->uniqueID;
     }
 
     /**
-     * @param $uniqueID
-     * @return $this
+     * Setter of uniqueID.
+     *
+     * @param string $uniqueID
+     * @return self
      */
-    public function setUniqueID($uniqueID) {
+    public function setUniqueID(string $uniqueID): self {
         $this->uniqueID = $uniqueID;
+
         return $this;
     }
 
     /**
      * @return array
      */
-    public function getUser() {
+    public function getUser(): array {
         return $this->user;
     }
 
@@ -143,11 +133,13 @@ class SSOData implements \JsonSerializable {
     }
 
     /**
+     * Setter of user's value.
+     *
      * @param $key
      * @param $value
-     * @return $this
+     * @return self
      */
-    public function setUserValue($key, $value) {
+    public function setUserValue($key, $value): self {
         if (in_array($key, self::$userFields)) {
             $this->user[$key] = $value;
         }
@@ -155,6 +147,8 @@ class SSOData implements \JsonSerializable {
     }
 
     /**
+     * Getter of extra.
+     *
      * @return array
      */
     public function getExtra() {
@@ -162,6 +156,8 @@ class SSOData implements \JsonSerializable {
     }
 
     /**
+     * Getter of extra's value.
+     *
      * @param $key
      * @return mixed|null
      */
@@ -170,11 +166,13 @@ class SSOData implements \JsonSerializable {
     }
 
     /**
+     * Setter of extra's value.
+     *
      * @param $key
      * @param $value
-     * @return $this
+     * @return self
      */
-    public function setExtraValue($key, $value) {
+    public function setExtraValue($key, $value): self {
         $this->extra[$key] = $value;
         return $this;
     }
@@ -185,7 +183,7 @@ class SSOData implements \JsonSerializable {
      * @param $data
      * @return array [$userData, $extraData]
      */
-    public static function splitProviderData($data) {
+    public static function splitProviderData($data): array {
         return [
             array_intersect_key($data, array_flip(self::$userFields)),
             array_diff_key($data, array_flip(self::$userFields)),
@@ -198,7 +196,7 @@ class SSOData implements \JsonSerializable {
      * @throws \Exception If the validation fails.
      */
     public function validate() {
-        $required = ['authenticatorName', 'authenticatorID', 'authenticatorIsTrusted', 'uniqueID'];
+        $required = ['authenticatorType', 'authenticatorID', 'uniqueID'];
 
         $invalidProperties = [];
         foreach ($required as $name) {
@@ -208,7 +206,7 @@ class SSOData implements \JsonSerializable {
         }
 
         if (count($invalidProperties)) {
-            throw new \Exception("SSOData is invalid. The following properties are not set: ".implode(',', $invalidProperties));
+            throw new \Exception('SSOData is invalid. The following properties are not set: '.implode(',', $invalidProperties));
         }
     }
 
@@ -219,11 +217,10 @@ class SSOData implements \JsonSerializable {
      * @param array $array
      * @return SSOData
      */
-    public static function fromArray(array $array) {
+    public static function fromArray(array $array): SSOData {
         $ssoData = new SSOData(
-            array_key_exists('authenticatorName', $array) ? $array['authenticatorName'] : null,
+            array_key_exists('authenticatorType', $array) ? $array['authenticatorType'] : null,
             array_key_exists('authenticatorID', $array) ? $array['authenticatorID'] : null,
-            array_key_exists('authenticatorIsTrusted', $array) ? $array['authenticatorIsTrusted'] : null,
             array_key_exists('uniqueID', $array) ? $array['uniqueID'] : null,
             array_key_exists('user', $array) ? $array['user'] : [],
             array_key_exists('extra', $array) ? $array['extra'] : []

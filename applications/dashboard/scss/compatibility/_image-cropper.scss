@@ -8,3 +8,15 @@ body.isMobile {
         display: none;
     }
 }
+
+// Hide on smaller screens
+
+@media (max-width: 600px){ // 600px is the size of the default popup styles
+    .box-crop .box-source {
+        display: none;
+    }
+
+    .change-picture .change-picture-instructions {
+        display: none;
+    }
+}

@@ -158,7 +158,7 @@ export class Toolbar extends React.PureComponent {
 
             return <MenuItem
                 propertyName={itemName}
-                label={t('itemName')}
+                label={t(itemName)}
                 key={key}
                 isActive={isActive}
                 isLast={key + 1 === menuItemList.length}

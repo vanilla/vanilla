@@ -83,7 +83,7 @@ export class EmojiPopover extends React.PureComponent {
             rowStartIndex: event.rowStartIndex,
             lastRowIndex,
             selectedGroup,
-            alertMessage: t("In category: ") + t(emojiGroups[selectedGroup]),
+            alertMessage: t("In emoji category: ") + t(emojiGroups[selectedGroup]),
         });
     };
 
@@ -110,7 +110,7 @@ export class EmojiPopover extends React.PureComponent {
             scrollTarget: rowIndexesByGroupId[categoryId],
             firstEmojiOfGroup: cellIndexesByGroupId[categoryId],
             selectedGroup: categoryId,
-            alertMessage: t("Jumped to category: ") + t(emojiGroups[categoryId]),
+            alertMessage: t("Jumped to emoji category: ") + t(emojiGroups[categoryId]),
         });
     };
 

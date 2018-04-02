@@ -26,6 +26,7 @@ $Definition['Jumped to emoji category: '] = 'Jumped to emoji category: ';
 $Definition['Paste the URL of the media you want.'] = 'Paste the URL of the media you want.';
 $Definition['Paste or type a link…'] = 'Paste or type a link…';
 $Definition['Smileys & Faces'] = 'Smileys & Faces';
+$Definition['richEditor.emojiPicker.description.pageUpDown'] = 'Use keyboard shortcuts "page up" and "page down" to cycle through available categories when menu is open.';
 
 // Emoji Group Names
 $Definition['smileys-people'] = 'Smileys and People';

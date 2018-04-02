@@ -209,7 +209,10 @@ export class EmojiPopover extends React.PureComponent {
      */
     render() {
         const title = t('Smileys & Faces');
-        const description = t('Insert an emoji in your message.');
+        const description = [
+            t('Insert an emoji in your message.'),
+            t('Use keyboard shortcuts "page up" and "page down" to cycle through available categories when menu is open.'),
+        ].join(' ');
 
         const extraHeadingContent = <button type="button" className="accessibility-jumpTo" onClick={this.focusOnCategories}>
             {t('Jump past emoji list, to emoji categories.')}
@@ -235,6 +238,10 @@ export class EmojiPopover extends React.PureComponent {
 
                     scrollToAlignment="start"
                     scrollToRow={this.state.scrollTarget}
+
+                    aria-readonly={null}
+                    aria-label={null}
+                    role={null}
 
                     onScroll={this.handleEmojiScroll}
                     onSectionRendered={this.handleOnSectionRendered}

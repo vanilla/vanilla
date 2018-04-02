@@ -129,7 +129,7 @@ abstract class ConversationsModel extends Gdn_Model {
      * @return bool
      */
     public function validConversationMember($conversationID, $userID) {
-        $conversationMembers = $this->getConversationMembers($conversationID);
+        $conversationMembers = $this->getConversationMembers($conversationID, true, false, false, true);
         return (in_array($userID, $conversationMembers));
     }
 

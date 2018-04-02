@@ -4,23 +4,22 @@
  * @license GPLv2
  */
 
-import loadPolyfills from "@core/bootstrap/polyfills";
 import { onContent, getMeta, _executeReady } from "@core/application";
-import * as utility from "@core/utility";
+import { log, logError, debug } from "@core/utility";
 import { _mountComponents } from "@core/internal";
 
-utility.debug(getMeta('debug', false));
+debug(getMeta('debug', false));
 
 onContent((e) => {
     _mountComponents(e.target);
 });
 
-loadPolyfills().then(() => {
-    utility.log("Bootstrapping");
-    _executeReady().then(() => {
-        utility.log("Bootstrapping complete.");
+log("Bootstrapping");
+_executeReady().then(() => {
+    log("Bootstrapping complete.");
 
-        const contentEvent = new CustomEvent('X-DOMContentReady', { bubbles: true, cancelable: false });
-        document.dispatchEvent(contentEvent);
-    });
+    const contentEvent = new CustomEvent('X-DOMContentReady', { bubbles: true, cancelable: false });
+    document.dispatchEvent(contentEvent);
+}).catch(error => {
+    logError(error);
 });

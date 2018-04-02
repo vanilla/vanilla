@@ -59,6 +59,7 @@ export class EmojiPopover extends React.PureComponent {
             overscanRowCount: 20,
             rowStartIndex: 0,
             lastRowIndex: null,
+            alertMessage: null,
         };
 
         this.categoryPickerID = "emojiPicker-categories-" + props.editorID;
@@ -82,6 +83,7 @@ export class EmojiPopover extends React.PureComponent {
             rowStartIndex: event.rowStartIndex,
             lastRowIndex,
             selectedGroup,
+            alertMessage: t("In category: ") + t(emojiGroups[selectedGroup]),
         });
     };
 
@@ -95,6 +97,11 @@ export class EmojiPopover extends React.PureComponent {
         });
     };
 
+    handleCategoryClick(event, categoryId) {
+        event.preventDefault();
+        this.scrollToCategory(categoryId);
+    }
+
     /**
      * Scroll to category
      */
@@ -103,6 +110,7 @@ export class EmojiPopover extends React.PureComponent {
             scrollTarget: rowIndexesByGroupId[categoryId],
             firstEmojiOfGroup: cellIndexesByGroupId[categoryId],
             selectedGroup: categoryId,
+            alertMessage: t("Jumped to category: ") + t(emojiGroups[categoryId]),
         });
     };
 
@@ -113,7 +121,7 @@ export class EmojiPopover extends React.PureComponent {
         const pos = rowIndex * rowSize + columnIndex;
         const emojiData = emojis[pos];
         let result = null;
-        const isSelectedButton = this.state.firstEmojiOfGroup >= 0 && this.state.firstEmojiOfGroup === pos ;
+        const isSelectedButton = this.state.firstEmojiOfGroup >= 0 && this.state.firstEmojiOfGroup === pos;
         if(emojiData) {
             result = <EmojiButton
                 isSelectedButton={isSelectedButton}
@@ -145,6 +153,53 @@ export class EmojiPopover extends React.PureComponent {
             const firstButton = categories.querySelector('.richEditor-button');
             if (firstButton) {
                 firstButton.focus();
+            }
+        }
+    };
+
+    componentDidMount(){
+        document.addEventListener("keydown", this.handleKeyDown, false);
+    }
+
+    componentWillUnmount(){
+        document.removeEventListener("keydown", this.handleKeyDown, false);
+    }
+
+    /**
+     * Jump to adjacent category
+     *
+     * @param {bool} isNext - Are we jumping to the next group
+     */
+
+    jumpToAdjacentCategory(isNext = true) {
+        const offset = isNext ? 1 : -1;
+        const groupLength = this.emojiGroupLength - 1;
+        let targetGroupID = this.state.selectedGroup + offset;
+
+        if (targetGroupID > groupLength) {
+            targetGroupID = 0;
+        } else if(targetGroupID < 0) {
+            targetGroupID = groupLength;
+        }
+        this.scrollToCategory(targetGroupID);
+    }
+
+    /**
+     * Handle key press.
+     *
+     * @param {React.KeyboardEvent} event - A synthetic keyboard event.
+     */
+    handleKeyDown = (event) => {
+        if (this.props.isVisible) {
+            switch(event.code) {
+            case "PageUp":
+                event.preventDefault();
+                this.jumpToAdjacentCategory(false);
+            break;
+            case "PageDown":
+                event.preventDefault();
+                this.jumpToAdjacentCategory(true);
+            break;
             }
         }
     };
@@ -208,7 +263,7 @@ export class EmojiPopover extends React.PureComponent {
 
                 return <button
                     type="button"
-                    onClick={() => this.scrollToCategory(groupKey)}
+                    onClick={(event) => this.handleCategoryClick(event, groupKey)}
                     onBlur={onBlur}
                     aria-current={isSelected}
                     aria-label={t('Jump to emoji category: ') + t(groupName)}
@@ -228,6 +283,7 @@ export class EmojiPopover extends React.PureComponent {
             id={this.props.id}
             title={title}
             accessibleDescription={description}
+            alertMessage={this.state.alertMessage}
             additionalHeaderContent={extraHeadingContent}
             body={body}
             footer={footer}

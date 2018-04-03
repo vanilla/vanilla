@@ -70,6 +70,9 @@ class TestLogger implements LoggerInterface {
         return null;
     }
 
+    /**
+     * Clear the log.
+     */
     public function clear() {
         $this->log = [];
     }

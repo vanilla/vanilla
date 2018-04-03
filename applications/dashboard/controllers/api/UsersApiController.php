@@ -590,13 +590,12 @@ class UsersApiController extends AbstractApiController {
         $in = $this->schema([
             'email:s' => 'The email/username of the user.',
         ]);
+        $out = $this->schema([], 'out');
 
         $body = $in->validate($body);
 
         $this->userModel->passwordRequest($body['email']);
         $this->validateModel($this->userModel, true);
-
-        return '';
     }
 
     /**

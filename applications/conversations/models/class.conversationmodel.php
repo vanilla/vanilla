@@ -345,7 +345,7 @@ class ConversationModel extends ConversationsModel {
             ->get();
 
         $options = ['Join'  => ['Name', 'Photo']];
-        if (Gdn::session()->checkPermission('Garden.PersonalInfo.View')) {
+        if (Gdn::session()->checkPermission(['Garden.PersonalInfo.View', 'Garden.Users.Edit'], false)) {
             $options['Join'][] = 'Email';
         }
 

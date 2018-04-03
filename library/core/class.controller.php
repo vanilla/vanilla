@@ -1863,25 +1863,8 @@ class Gdn_Controller extends Gdn_Pluggable {
                 // This is done in the controller rather than the asset model because the translations are not linked to compiled code.
                 $this->Head->addScript(url('/api/v2/locales/'.rawurlencode(Gdn::locale()->current())."/translations?js=1&x-cache=1&h=$busta", true), 'text/javascript', false, ['defer' => 'true']);
 
-                $polyfillFileUrl = asset("/js/polyfills/core-polyfills.js", false, $addVersion);
-
-                $debug = c("Debug", false);
-                $logAdding = $debug ? "console.log('Older browser detected. Initiating polyfills.');" : "";
-                $logNotAdding = $debug ? "console.log('Modern browser detected. No polyfills necessary');" : "";
-
-                // Add the polyfill loader.
-                $scriptContent =
-                    "var supportsAllFeatures = window.Promise && window.fetch && window.Symbol"
-                    ."&& window.CustomEvent && Element.prototype.remove && Element.prototype.closest"
-                    ."&& window.NodeList && NodeList.prototype.forEach;"
-                    ."if (!supportsAllFeatures) {"
-                        .$logAdding
-                        ."var head = document.getElementsByTagName('head')[0];"
-                        ."var script = document.createElement('script');"
-                        ."script.src = '$polyfillFileUrl';"
-                        ."head.appendChild(script);"
-                    ."} else { $logNotAdding }";
-                $this->Head->addScript(null, null, null, null, $scriptContent);
+                $polyfillContent = $AssetModel->getInlinePolyfillJSContent();
+                $this->Head->addScript(null, null, false, ["content" => $polyfillContent]);
 
                 // Add the built addon javascript files.
                 $addonJs = $AssetModel->getAddonJsFiles($ThemeType, $this->MasterView === 'admin' ? 'admin' : 'app', $ETag);

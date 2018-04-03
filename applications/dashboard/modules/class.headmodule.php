@@ -137,10 +137,8 @@ if (!class_exists('HeadModule', false)) {
          *  - numeric: This will be the script's sort.
          *  - string: This will hint the script (inline will inline the file in the page.
          *  - array: An array of options (ex. sort, hint, version).
-         * @param string $content The content of the script tag.
-         *
          */
-        public function addScript($src, $type = 'text/javascript', $addVersion = true, $options = [], $content = null) {
+        public function addScript($src, $type = 'text/javascript', $addVersion = true, $options = []) {
             if (is_numeric($options)) {
                 $options = ['sort' => $options];
             } elseif (is_string($options)) {
@@ -164,6 +162,10 @@ if (!class_exists('HeadModule', false)) {
             }
             if (isset($options['defer'])) {
                 $attributes['defer'] = $options['defer'];
+            }
+
+            if (isset($options['content'])) {
+                $content = $options['content'];
             }
 
             foreach ($options as $key => $value) {

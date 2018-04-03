@@ -24,6 +24,7 @@ export class Popover extends React.PureComponent {
         additionalHeaderContent: PropTypes.element,
         popoverTitleID: PropTypes.string.isRequired,
         popoverDescriptionID: PropTypes.string.isRequired,
+        alertMessage: PropTypes.string,
     };
 
     render() {
@@ -62,6 +63,8 @@ export class Popover extends React.PureComponent {
             }
         );
 
+        const alertMessage = this.props.alertMessage ? <span aria-live="assertive" role="alert" className="sr-only">{this.props.alertMessage}</span> : null;
+
         return <div
             className={classes}
             role="dialog"
@@ -70,6 +73,7 @@ export class Popover extends React.PureComponent {
             aria-labelledby={this.props.popoverTitleID}
             id={this.props.id}
         >
+            {alertMessage}
             <div className={headerClasses}>
                 <h2 id={this.props.popoverTitleID} tabIndex="-1" className="H popover-title">
                     {this.props.title}

@@ -16,7 +16,7 @@ use Interop\Container\ContainerInterface;
 use ReflectionClass;
 use ReflectionMethod;
 use Vanilla\AddonManager;
-use OpenApiApiController;
+use Vanilla\Dashboard\Controllers\API\OpenApiApiController;
 
 /**
  * Handles the swagger JSON commands.
@@ -58,7 +58,7 @@ class SwaggerModel {
 
     private $exclude = [
         OpenApiApiController::class,
-        \AuthenticateApiController::class,
+//        \AuthenticateApiController::class,
         \AuthenticatorsApiController::class,
     ];
 

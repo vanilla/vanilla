@@ -8,6 +8,12 @@ interface Element {
 interface Window {
     Waypoint: any;
     gdn: any;
+    Promise?: PromiseConstructor;
+    NodeList?: typeof NodeList;
+    Symbol?: SymbolConstructor;
+    CustomEvent?: typeof CustomEvent;
+    Event: typeof Event;
+    [key: string]: any;
 }
 
 declare interface AnyObject {

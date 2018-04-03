@@ -471,7 +471,7 @@ class AuthenticateApiController extends AbstractApiController {
         $this->permission();
 
         $in = $this->schema([
-            'username:s' => 'The user\'s Username or email address.',
+            'username:s' => 'The user\'s username or email address.',
             'password:s' => 'The user\'s password.',
             'persist:b' => [
                 'description' => 'Whether the session should persist past the browser closing.',

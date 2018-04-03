@@ -1542,7 +1542,16 @@ EOT;
             }
         } else {
             if (hasEditProfile($this->User->UserID)) {
-                $module->addLink('Options', sprite('SpEdit').' '.t('Edit Profile'), '/profile/edit', false, ['class' => 'Popup EditAccountLink']);
+                $editLinkUrl = '/profile/edit';
+
+                // Kludge for if we're on /profile/edit/username for the current user.
+                $requestUrl = Gdn_Url::request();
+                $editUrl = "profile/edit/{$this->User->Name}";
+                if ($requestUrl === $editUrl) {
+                    $editLinkUrl = $editUrl;
+                }
+
+                $module->addLink('Options', sprite('SpEdit').' '.t('Edit Profile'), $editLinkUrl, false, ['class' => 'Popup EditAccountLink']);
             }
 
             // Add profile options for the profile owner

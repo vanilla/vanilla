@@ -4,24 +4,23 @@
  * @license GPLv2
  */
 
-import * as application from "@core/application.js";
+import * as application from "@core/application";
 import gdn from "@core/gdn";
-import * as utility from "@core/utility";
 
 describe("metaDataFunctions", () => {
     it("return a default value if the requested one can't be found", () => {
         expect(application.getMeta("baz", "fallback")).toBe("fallback");
-    })
+    });
 
     it("can set a new meta value", () => {
         application.setMeta("test", "result");
         expect(application.getMeta("test")).toBe("result");
-    })
+    });
 
     it("can override existing values with new ones", () => {
         application.setMeta("foo", "foo2");
         expect(application.getMeta("foo")).toBe("foo2");
-    })
+    });
 
     it("dot syntax for nested getMeta values", () => {
         application.setMeta("ui", { foo: "bar", bar: { baz: "bam" }});
@@ -29,13 +28,13 @@ describe("metaDataFunctions", () => {
         expect(application.getMeta("ui.bar.baz")).toBe("bam");
         expect(application.getMeta("ui.bar.bax", "de")).toBe("de");
         expect(application.getMeta("uiz.bar.bax", "de")).toBe("de");
-    })
+    });
 
     it("dot syntax for nested setMeta values", () => {
         application.setMeta('a.b.c', 'd');
         expect(application.getMeta('a')).toEqual({b: {c: 'd'}});
-    })
-})
+    });
+});
 
 describe("translate", () => {
     gdn.translations['foo'] = 'bar';
@@ -63,7 +62,7 @@ describe("formatUrl", () => {
 
         paths.forEach(path => {
             expect(application.formatUrl(path)).toBe(path);
-        })
+        });
     });
 
     it("follows the given format", () => {

@@ -8,7 +8,7 @@ import * as utility from "../utility";
 
 describe("resolvePromisesSequentially()", () => {
     it("resolves promises in order", () => {
-        const order = [];
+        const order: number[] = [];
 
         const func1 = () => {
             order.push(1);
@@ -63,13 +63,6 @@ describe("resolvePromisesSequentially()", () => {
         return expect(utility.resolvePromisesSequentially(functions)).resolves.toEqual(expectation);
     });
 });
-
-// describe("logging", () => {
-//     // // @ts-ignore
-//     // global.console = {
-//     //     error: jest.fn();
-//     // }
-// })
 
 describe("hashString", () => {
     test("the same string always results in the same value", () => {

@@ -13,23 +13,28 @@ let _debug = false;
 /**
  * Get or set the debug flag.
  *
- * @param {boolean=} debug The new value of debug.
- * @returns {boolean} returns the current debug setting.
+ * @param newValue - The new value of debug.
+ * @returns the current debug setting.
  */
-export function debug(debug = undefined) {
-    if (debug !== undefined) {
-        _debug = debug;
+export function debug(newValue?: boolean): boolean {
+    if (newValue !== undefined) {
+        _debug = newValue;
     }
 
     return _debug;
 }
 
+type NormalCallback = (...args: any[]) => any;
+type PromiseCallback = (...args: any[]) => Promise<any>;
+
+export type PromiseOrNormalCallback = NormalCallback | PromiseCallback;
+
 /**
  * Resolve an array of functions that return promises sequentially.
  *
- * @param {PromiseOrNormalCallback[]} promiseFunctions - The functions to execute.
+ * @param promiseFunctions - The functions to execute.
  *
- * @returns {Promise<any[]>} - An array of all results in sequential order.
+ * @returns An array of all results in sequential order.
  *
  * @example
  * const urls = ['/url1', '/url2', '/url3']
@@ -38,7 +43,7 @@ export function debug(debug = undefined) {
  *   .then(console.log)
  *   .catch(console.error)
  */
-export function resolvePromisesSequentially(promiseFunctions) {
+export function resolvePromisesSequentially(promiseFunctions: PromiseOrNormalCallback[]): Promise<any[]> {
     if (!Array.isArray(promiseFunctions)) {
         throw new Error("First argument needs to be an array of Promises");
     }
@@ -72,11 +77,11 @@ export function resolvePromisesSequentially(promiseFunctions) {
  *
  * This only prints in debug mode.
  *
- * @param {...*} value - The value to log.
+ * @param value - The value to log.
  */
-export function log(...value) {
+export function log(...value: any[]) {
     if (_debug) {
-        // eslint-disable-next-line no-console
+        // tslint:disable-next-line:no-console
         console.log(...value);
     }
 }
@@ -84,20 +89,20 @@ export function log(...value) {
 /**
  * Log an error to console.
  *
- * @param {...*} value - The value to log.
+ * @param value - The value to log.
  */
-export function logError(...value) {
-    // eslint-disable-next-line no-console
+export function logError(...value: any[]) {
+    // tslint:disable-next-line:no-console
     console.error(...value);
 }
 
 /**
  * Log a warning to console.
  *
- * @param {...*} value - The value to log.
+ * @param value - The value to log.
  */
-export function logWarning(...value) {
-    // eslint-disable-next-line no-console
+export function logWarning(...value: any[]) {
+    // tslint:disable-next-line:no-console
     console.warn(...value);
 }
 
@@ -105,12 +110,13 @@ export function logWarning(...value) {
  * A simple, fast method of hashing a string. Similar to Java's hash function.
  * https://stackoverflow.com/a/7616484/1486603
  *
- * @param {string} str - The string to hash.
+ * @param str - The string to hash.
  *
- * @returns {number} - The hash code returned.
+ * @returns The hash code returned.
  */
-export function hashString(str) {
+export function hashString(str: string): number {
     function hashReduce(prevHash, currVal) {
+        // tslint:disable-next-line:no-bitwise
         return (prevHash << 5) - prevHash + currVal.charCodeAt(0);
     }
     return str.split("").reduce(hashReduce, 0);

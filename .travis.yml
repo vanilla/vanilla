@@ -53,6 +53,7 @@ php:
 script:
   - tests/travis/main.sh
   - yarn run test
+  - yarn run lint:ts
   - ls -lah ./conf
   - cat /tmp/error.log
   - cat /tmp/access.log

@@ -25,7 +25,9 @@
                 "redux",
                 "prop-types",
                 "sprintf-js"
-            ]
+            ],
+            "app": [],
+            "admin": []
         }
     }
 }

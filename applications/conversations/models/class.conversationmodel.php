@@ -344,12 +344,12 @@ class ConversationModel extends ConversationsModel {
             ->limit($limit)
             ->get();
 
-        $fields = ['Join'  => 'Name', 'Photo'];
-        if (Gdn::session()->checkPermission('Garden.Email.View')) {
-            array_push($fields['Join'], 'Email');
+        $options = ['Join'  => ['Name', 'Photo']];
+        if (Gdn::session()->checkPermission('Garden.PersonalInfo.View')) {
+            $options['Join'][] = 'Email';
         }
-        
-        Gdn::userModel()->joinUsers($data->result(), ['UserID']);
+
+        Gdn::userModel()->joinUsers($data->result(), ['UserID'], $options);
         return $data;
     }
 

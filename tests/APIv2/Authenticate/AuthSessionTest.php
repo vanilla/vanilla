@@ -138,4 +138,82 @@ class AuthSessionTest extends AbstractAPIv2Test {
 
         return $body['authSessionID'];
     }
+
+    /**
+     * A user should be able to sign in with their username and password.
+     */
+    public function testPostPasswordName() {
+        $this->assertNoSession();
+
+        $result = $this->api()->post("{$this->baseUrl}/password", [
+            'username' => $this->currentUser['name'],
+            'password' => $this->currentUser['password']
+        ]);
+
+        $this->assertSessionUserID();
+    }
+
+    /**
+     * A user should be able to sign in with their email and password.
+     */
+    public function testPostPasswordEmail() {
+        $this->assertNoSession();
+
+        $result = $this->api()->post("{$this->baseUrl}/password", [
+            'username' => $this->currentUser['email'],
+            'password' => $this->currentUser['password']
+        ]);
+
+        $this->assertSessionUserID();
+    }
+
+    /**
+     * An incorrect username should return 404.
+     *
+     * @expectedException \Exception
+     * @expectedExceptionCode 404
+     */
+    public function testPostPasswordNotFound() {
+        $result = $this->api()->post("{$this->baseUrl}/password", [
+            'username' => $this->currentUser['email'].'!!!!',
+            'password' => $this->currentUser['password']
+        ]);
+    }
+
+    /**
+     * An incorrect password should return 401.
+     *
+     * @expectedException \Exception
+     * @expectedExceptionCode 401
+     */
+    public function testPostPasswordIncorrect() {
+        $result = $this->api()->post("{$this->baseUrl}/password", [
+            'username' => $this->currentUser['email'],
+            'password' => $this->currentUser['password'].'!!!'
+        ]);
+    }
+
+    /**
+     * Assert that there is not currently a user in the session.
+     */
+    public function assertNoSession() {
+        /* @var \Gdn_Session $session */
+        $session = $this->container()->get(\Gdn_Session::class);
+        $this->assertEquals(0, $session->UserID);
+    }
+
+    /**
+     * Assert that a given user has a session.
+     *
+     * @param int|null $expected The expected user or **null** for the current user.
+     */
+    public function assertSessionUserID(int $expected = null) {
+        if ($expected === null) {
+            $expected = $this->currentUser['userID'];
+        }
+
+        /* @var \Gdn_Session $session */
+        $session = $this->container()->get(\Gdn_Session::class);
+        $this->assertEquals($expected, $session->UserID);
+    }
 }

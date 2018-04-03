@@ -159,6 +159,8 @@ class DiscussionsController extends VanillaController {
             $where['d.CategoryID'] = $visibleFollowedCategories;
         } elseif ($categoryIDs) {
             $where['d.CategoryID'] = CategoryModel::filterCategoryPermissions($categoryIDs);
+        } else {
+            $where['d.CategoryID'] = CategoryModel::instance()->getVisibleCategoryIDs(['filterHideDiscussions' => true]);
         }
 
         // Get Discussion Count
@@ -289,7 +291,9 @@ class DiscussionsController extends VanillaController {
         $this->setData('CountDiscussions', $countDiscussions);
 
         // Get Discussions
-        $this->DiscussionData = $discussionModel->getUnread($page, $limit);
+        $this->DiscussionData = $discussionModel->getUnread($page, $limit, [
+            'd.CategoryID' => CategoryModel::instance()->getVisibleCategoryIDs(['filterHideDiscussions' => true])
+        ]);
 
         $this->setData('Discussions', $this->DiscussionData, true);
         $this->setJson('Loading', $page.' to '.$limit);

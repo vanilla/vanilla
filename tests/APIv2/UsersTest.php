@@ -36,6 +36,17 @@ class UsersTest extends AbstractResourceTest {
     }
 
     /**
+     * Disable email before running tests.
+     */
+    public function setUp() {
+        parent::setUp();
+
+        /** @var \Gdn_Configuration $configuration */
+        $configuration = static::container()->get('Config');
+        $configuration->set('Garden.Email.Disabled', true);
+    }
+
+    /**
      * {@inheritdoc}
      */
     public function record() {
@@ -315,6 +326,36 @@ class UsersTest extends AbstractResourceTest {
         $invitation = $this->api()->post('/invites', ['email' => $fields['email']])->getBody();
         $fields['invitationCode'] = $invitation['code'];
         $this->verifyRegistration($fields);
+    }
+
+    public function testRequestPassword() {
+        // Create a user first.
+        $user = $this->api()->post('/users', [
+            'name' => 'testRequestPassword',
+            'email' => 'userstest@example.com',
+            'password' => '123Test234Test',
+        ])->getBody();
+
+        $r = $this->api()->post('/users/request-password', ['email' => $user['email']]);
+
+        $this->assertLog(['event' => 'password_reset_skipped', 'email' => $user['email']]);
+
+        try {
+            $this->logger->clear();
+            $r = $this->api()->post('/users/request-password', ['email' => $user['name']]);
+            $this->fail('You shouldn\'t be able to reset a password with a username.');
+        } catch (\Exception $ex) {
+            $this->assertEquals(400, $ex->getCode());
+        }
+
+        /* @var \Gdn_Configuration $config */
+        $config = $this->container()->get(\Gdn_Configuration::class);
+        $config->set('Garden.Registration.NameUnique', true);
+        $config->set('Garden.Registration.EmailUnique', false);
+
+        $this->logger->clear();
+        $r = $this->api()->post('/users/request-password', ['email' => $user['name']]);
+        $this->assertLog(['event' => 'password_reset_skipped', 'email' => $user['email']]);
     }
 
     /**

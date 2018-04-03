@@ -89,7 +89,7 @@ echo $this->Form->open(['Action' => url('/entry/passwordrequest'), 'id' => 'Form
     <ul>
         <li>
             <?php
-            echo $this->Form->label('Enter your Email address or username', 'Email');
+            echo $this->Form->label($this->data('RecoverPasswordLabelCode', 'Enter your email to continue.'), 'Email');
             echo $this->Form->textBox('Email');
             ?>
         </li>

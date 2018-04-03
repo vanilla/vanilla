@@ -18,8 +18,13 @@ class MockSSOAuthenticator extends SSOAuthenticator {
      * @param $userData
      * @param $extraData
      */
-    public function __construct($uniqueID, $userData = [], $extraData = []) {
+    public function __construct($uniqueID = null, $userData = [], $extraData = []) {
         parent::__construct('MockSSO');
+
+        if ($uniqueID === null) {
+            $uniqueID = uniqid('MockSSO_');
+        }
+
         $this
             ->setData(new SSOData(
                 self::getType(),

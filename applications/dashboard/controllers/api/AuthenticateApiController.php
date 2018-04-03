@@ -249,10 +249,6 @@ class AuthenticateApiController extends AbstractApiController {
         $in = $this->schema([
             'authenticatorType:s' => 'The authenticator type that will be used.',
             'authenticatorID:s?' => 'Authenticator instance\'s identifier.',
-            'setCookie:b' => [
-                'default' => true,
-                'description' => 'Set session cookie on success.',
-            ],
             'persist:b' => [
                 'default' => false,
                 'description' => 'Set the persist option on the cookie when it is set.',
@@ -263,7 +259,7 @@ class AuthenticateApiController extends AbstractApiController {
                 'description' => 'Tells whether the user is now authenticated or if additional step(s) are required.',
                 'enum' => ['authenticated', 'linkUser'],
             ],
-            'userID:i?' => 'Identifier of the authenticated user.',
+            'user?' => $this->getUserFragmentSchema(),
             'authSessionID:s?' => 'Identifier of the authentication session. Returned if more steps are required to complete the authentication.',
         ]), 'out');
 
@@ -278,8 +274,8 @@ class AuthenticateApiController extends AbstractApiController {
 
         $authenticatorInstance = $this->authenticatorModel->getAuthenticator($authenticatorType, $authenticatorID);
 
-        if (is_a($authenticatorInstance, SSOAuthenticator::class)) {
-
+        $sso = is_a($authenticatorInstance, SSOAuthenticator::class);
+        if ($sso) {
             /** @var SSOAuthenticator $authenticatorInstance */
             $ssoData = $authenticatorInstance->validateAuthentication($this->request);
 
@@ -288,33 +284,40 @@ class AuthenticateApiController extends AbstractApiController {
             }
 
             $user = $this->ssoModel->sso($ssoData, [
-                'setCookie' => $body['setCookie'],
                 'persist' => $body['persist'],
             ]);
+
+            // Allows registration without an email address.
+            $noEmail = $this->config->get('Garden.Registration.NoEmail', false);
+
+            // Specifies whether Emails are unique or not.
+            $emailUnique = !$noEmail && $this->config->get('Garden.Registration.EmailUnique', true);
+
+            // Specifies whether Names are unique or not.
+            $nameUnique = $this->config->get('Garden.Registration.NameUnique', true);
+
+            // Allows SSO connections to link a VanillaUser to a ForeignUser.
+            $allowConnect = $this->config->get('Garden.Registration.AllowConnect', true);
+
+            $sessionData = [
+                'ssoData' => $ssoData,
+            ];
         } else {
-            throw new ServerException(get_class($authenticatorInstance).' is not a supported authenticator yet.', 500);
+            $user = $authenticatorInstance->validateAuthentication($this->request);
+
+            $this->getSession()->start($user['UserID'], true, $body['persist']);
         }
 
-        // Allows registration without an email address.
-        $noEmail = $this->config->get('Garden.Registration.NoEmail', false);
-
-        // Specifies whether Emails are unique or not.
-        $emailUnique = !$noEmail && $this->config->get('Garden.Registration.EmailUnique', true);
-
-        // Specifies whether Names are unique or not.
-        $nameUnique = $this->config->get('Garden.Registration.NameUnique', true);
-
-        // Allows SSO connections to link a VanillaUser to a ForeignUser.
-        $allowConnect = $this->config->get('Garden.Registration.AllowConnect', true);
-
-        $sessionData = [
-            'ssoData' => $ssoData,
-        ];
-
         if ($user) {
-            $response = array_merge(['authenticationStep' => 'authenticated'], ApiUtils::convertOutputKeys($user));
+            $properlyExpanded = ['UserID' => $user['UserID']];
+            $this->userModel->expandUsers($properlyExpanded, ['UserID']);
+
+            $response = [
+                'authenticationStep' => 'authenticated',
+                'user' => $properlyExpanded['User'],
+            ];
         // We could not authenticate or autoconnect so they will need to do a manual connect.
-        } else {
+        } else if ($sso) {
             if ($allowConnect) {
                 $existingUserIDs = $this->ssoModel->findMatchingUserIDs($ssoData, $emailUnique, $nameUnique);
                 if (!empty($existingUserIDs)) {
@@ -478,25 +481,16 @@ class AuthenticateApiController extends AbstractApiController {
                 'default' => false,
             ],
         ])->setDescription('Authenticate a user with username/email and password.');
-        $out = $this->schema([
-            'userID:i' => 'The ID of the user that signed in.',
-            'name:s' => 'The username of the user that signed in.',
-            'photoUrl:s' => [
-                'description' => 'The URL of the user\'s avatar.',
-                'format' => 'uri',
-            ],
-        ], 'out');
+        $out = $this->schema($this->getUserFragmentSchema(), 'out');
+
         $body = $in->validate($body);
 
-        // Look up the user.
-        $user = $this->userModel->validateCredentials($body['username'], 0, $body['password'], true);
-        $row = ['userID' => val('UserID', $user)];
-        $this->userModel->expandUsers($row, ['userID']);
-        $result = $out->validate($row['user']);
+        $result = $this->post([
+            'authenticatorType' => 'password',
+            'authenticatorID' => 'password',
+            'persist' => $body['persist'] ?? false,
+        ]);
 
-        $this->getSession()->start($result['userID'], true, $body['persist']);
-
-
-        return $result;
+        return $out->validate($result['user']);
     }
 }

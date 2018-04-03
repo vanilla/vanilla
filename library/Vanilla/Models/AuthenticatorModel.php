@@ -21,6 +21,9 @@ class AuthenticatorModel {
     /** @var Container */
     private $container;
 
+    /** @var string[] */
+    private $authenticatorClasses = [];
+
     /** @var Gdn_AuthenticationProviderModel */
     private $authenticationProviderModel;
 
@@ -38,6 +41,31 @@ class AuthenticatorModel {
         $this->addonManager = $addonManager;
         $this->authenticationProviderModel = $authenticationProviderModel;
         $this->container = $container;
+    }
+
+    /**
+     * Register an authenticator class.
+     * Necessary only for authenticators that are not in an addon.
+     *
+     * @param string $authenticatorClass
+     * @return self
+     */
+    public function registerAuthenticatorClass(string $authenticatorClass): self {
+        $this->authenticatorClasses[$authenticatorClass] = true;
+
+        return $this;
+    }
+
+    /**
+     * Un-register an authenticator class.
+     *
+     * @param string $authenticatorClass
+     * @return self
+     */
+    public function unregisterAuthenticatorClass(string $authenticatorClass): self {
+        unset($this->authenticatorClasses[$authenticatorClass]);
+
+        return $this;
     }
 
     /**
@@ -59,22 +87,10 @@ class AuthenticatorModel {
         /** @var Authenticator $authenticatorInstance */
         $authenticatorInstance = null;
 
-        // Check if the container can find the authenticator.
-        try {
-            $authenticatorInstance = $this->container->getArgs($authenticatorClassName, [$authenticatorID]);
-
-            if (!is_a($authenticatorInstance, Authenticator::class, true)) {
-                throw new ServerException(
-                    "\"$authenticatorClassName\" is not an ".Authenticator::class,
-                    500
-                );
-            }
-
-            return $authenticatorInstance;
-        } catch (Exception $e) {}
-
-        // Use the addonManager to find the class.
-        $authenticatorClasses = $this->addonManager->findClasses("*\\$authenticatorClassName");
+        // Get authenticator classes.
+        $authenticatorClasses = array_filter($this->getAuthenticatorClasses(), function($class) use ($authenticatorClassName) {
+            return preg_match("/(?:^|\\\\)$authenticatorClassName$/i", $class);
+        });
 
         if (empty($authenticatorClasses)) {
             throw new NotFoundException($authenticatorClassName);
@@ -90,30 +106,19 @@ class AuthenticatorModel {
             );
         }
 
-        $fqnAuthenticationClass = $authenticatorClasses[0];
+        $fullyQualifiedAuthenticationClass = reset($authenticatorClasses);
 
-        if (!is_a($fqnAuthenticationClass, Authenticator::class, true)) {
-            throw new ServerException(
-                "\"$fqnAuthenticationClass\" is not an ".Authenticator::class,
-                500
-            );
+        if (!is_a($fullyQualifiedAuthenticationClass, Authenticator::class, true)) {
+            throw new ServerException("$fullyQualifiedAuthenticationClass is not an ".Authenticator::class);
         }
 
-        $authenticatorInstance = $this->container->getArgs($fqnAuthenticationClass, [$authenticatorID]);
+        try {
+            $authenticatorInstance = $this->container->getArgs($fullyQualifiedAuthenticationClass, [$authenticatorID]);
+        } catch (Exception $e) {
+            $authenticatorInstance = $this->container->get($fullyQualifiedAuthenticationClass);
+        }
 
         return $authenticatorInstance;
-    }
-
-    /**
-     * Get an authenticator.
-     *
-     * @param string $authenticatorID
-     * @return Authenticator
-     */
-    public function getAuthenticatorByID(string $authenticatorID) {
-        $authenticatorData = $this->authenticationProviderModel->getID($authenticatorID, DATASET_TYPE_ARRAY);
-
-        return $this->getAuthenticator($authenticatorData['AuthenticationSchemeAlias'] ?? null, $authenticatorID);
     }
 
     /**
@@ -143,8 +148,10 @@ class AuthenticatorModel {
                 }
             } else {
                 try {
-                    $this->container->get($authenticatorClassName);
+                    $authenticatorInstance = $this->container->get($authenticatorClass);
+                    $authenticators[] = $authenticatorInstance;
                 } catch (Exception $e) {}
+
             }
         }
 
@@ -157,10 +164,13 @@ class AuthenticatorModel {
      * @return array
      */
     public function getAuthenticatorClasses() {
-        $authenticatorClasses = $this->addonManager->findClasses('*Authenticator');
+        $authenticatorClasses = array_unique(
+            $this->addonManager->findClasses('*Authenticator') + array_keys($this->authenticatorClasses)
+        );
 
         return array_filter($authenticatorClasses, function($authenticatorClass) {
-            return is_a($authenticatorClass, Authenticator::class, true);
+            $result = is_subclass_of($authenticatorClass, Authenticator::class, true);
+            return $result;
         });
     }
 }

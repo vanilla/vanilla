@@ -7,6 +7,7 @@
 
 use Garden\Schema\Schema;
 use Garden\Web\Data;
+use Garden\Web\Exception\NotFoundException;
 use Vanilla\Models\AuthenticatorModel;
 use Vanilla\Authenticator\Authenticator;
 use Vanilla\Authenticator\SSOAuthenticator;
@@ -23,6 +24,9 @@ class AuthenticatorsApiController extends AbstractApiController  {
     private $idParamSchema;
 
     /** @var Schema */
+    private $typeParamSchema;
+
+    /** @var Schema */
     private $fullSchema;
 
     /**
@@ -37,6 +41,7 @@ class AuthenticatorsApiController extends AbstractApiController  {
     /**
      * Get an authenticator.
      *
+     * @throws NotFoundException
      * @param string $type
      * @param string $id
      * @return Authenticator
@@ -44,31 +49,6 @@ class AuthenticatorsApiController extends AbstractApiController  {
     public function authenticator(string $type, string $id): Authenticator {
         try {
             $authenticator = $this->authenticatorModel->getAuthenticator($type, $id);
-        } catch (Exception $e) {
-            Logger::log(Logger::DEBUG, 'authenticator_not_found', [
-                'exception' => [
-                    'message' => $e->getMessage(),
-                    'code' => $e->getCode(),
-                    'file' => $e->getFile(),
-                    'line' => $e->getLine(),
-                ]
-            ]);
-
-            throw new NotFoundException('Authenticator');
-        }
-
-        return $authenticator;
-    }
-
-    /**
-     * Get an authenticator by its ID.
-     *
-     * @param string $id
-     * @return Authenticator
-     */
-    public function authenticatorByID(string $id): Authenticator {
-        try {
-            $authenticator = $this->authenticatorModel->getAuthenticatorByID($id);
         } catch (Exception $e) {
             Logger::log(Logger::DEBUG, 'authenticator_not_found', [
                 'exception' => [
@@ -112,10 +92,9 @@ class AuthenticatorsApiController extends AbstractApiController  {
      */
     public function idParamSchema() {
         if ($this->idParamSchema === null) {
-            $this->idParamSchema = $this->schema(
-                Schema::parse(['id:s' => 'The authenticator ID.']),
-                $type
-            );
+            $this->idParamSchema = Schema::parse([
+                'authenticatorID:s' => 'The authenticator ID.',
+            ]);
         }
         return $this->schema($this->idParamSchema, 'in');
     }
@@ -127,10 +106,9 @@ class AuthenticatorsApiController extends AbstractApiController  {
      */
     public function typeParamSchema(): Schema {
         if ($this->typeParamSchema === null) {
-            $this->typeParamSchema = $this->schema(
-                Schema::parse(['type:s' => 'The authenticator type.']),
-                $type
-            );
+            $this->typeParamSchema = Schema::parse([
+                'type:s' => 'The authenticator type.',
+            ]);
         }
         return $this->schema($this->typeParamSchema, 'in');
     }
@@ -197,11 +175,12 @@ class AuthenticatorsApiController extends AbstractApiController  {
     /**
      * Update an authenticator.
      *
+     * @param string $type
      * @param string $id
      * @param array $body
      * @return array
      */
-    public function patch(string $id, array $body): array {
+    public function patch(string $type, string $id, array $body): array {
         $this->permission('Garden.Setting.Manage');
 
         $this->idParamSchema();
@@ -211,11 +190,11 @@ class AuthenticatorsApiController extends AbstractApiController  {
         )->setDescription('Update an authenticator.');
         $out = $this->schema($this->fullSchema(), 'out');
 
-        $authenticator = $this->authenticatorByID($id);
+        $authenticator = $this->authenticator($type, $id);
 
         $body = $in->validate($body);
 
-        $authenticator->setActive($body['active']);
+        $authenticator->setActive($body['isActive']);
 
         $result = $this->normalizeOutput($authenticator);
 

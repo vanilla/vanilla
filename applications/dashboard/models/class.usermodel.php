@@ -3321,7 +3321,7 @@ class UserModel extends Gdn_Model {
      * @param string $password
      * @return object|false Returns the user matching the credentials or **false** if the user doesn't validate.
      */
-    public function validateCredentials($email = '', $iD = 0, $password) {
+    public function validateCredentials($email = '', $iD = 0, $password, $throw = false) {
         $this->EventArguments['Credentials'] = ['Email' => $email, 'ID' => $iD, 'Password' => $password];
         $this->fireEvent('BeforeValidateCredentials');
 
@@ -3364,19 +3364,26 @@ class UserModel extends Gdn_Model {
             $dataSet = $this->SQL->get();
         }
 
-        if ($dataSet->numRows() < 1) {
+        if ($dataSet->numRows() < 1 || val('Deleted', $dataSet->firstRow())) {
+            if ($throw) {
+                $validation = new \Garden\Schema\Validation();
+                $validation->addError('username', sprintf(t('User not found.'), strtolower(t(UserModel::signinLabelCode()))), 404);
+                throw new \Garden\Schema\ValidationException($validation);
+            }
+
             return false;
         }
 
         $userData = $dataSet->firstRow();
-        // Check for a deleted user.
-        if (val('Deleted', $userData)) {
-            return false;
-        }
 
         $passwordHash = new Gdn_PasswordHash();
         $hashMethod = val('HashMethod', $userData);
         if (!$passwordHash->checkPassword($password, $userData->Password, $hashMethod, $userData->Name)) {
+            if ($throw) {
+                $validation = new \Garden\Schema\Validation();
+                $validation->addError('password', t('The password you entered is incorrect.'), 401);
+                throw new \Garden\Schema\ValidationException($validation);
+            }
             return false;
         }
 

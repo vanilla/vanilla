@@ -1870,14 +1870,17 @@ class Gdn_Controller extends Gdn_Pluggable {
                 $logNotAdding = $debug ? "console.log('Modern browser detected. No polyfills necessary');" : "";
 
                 // Add the polyfill loader.
-                $scriptContent = "var supportsAllFeatures = window.Promise && window.fetch && window.Symbol;" .
-                    "if (!supportsAllFeatures) {" .
-                        $logAdding .
-                        "var head = document.getElementsByTagName('head')[0];" .
-                        "var script = document.createElement('script');" .
-                        "script.src = '$polyfillFileUrl';" .
-                        "head.appendChild(script);" .
-                    "} else { $logNotAdding }";
+                $scriptContent =
+                    "var supportsAllFeatures = window.Promise && window.fetch && window.Symbol"
+                    ."&& window.CustomEvent && Element.prototype.remove && Element.prototype.closest"
+                    ."&& window.NodeList && NodeList.prototype.forEach;"
+                    ."if (!supportsAllFeatures) {"
+                        .$logAdding
+                        ."var head = document.getElementsByTagName('head')[0];"
+                        ."var script = document.createElement('script');"
+                        ."script.src = '$polyfillFileUrl';"
+                        ."head.appendChild(script);"
+                    ."} else { $logNotAdding }";
                 $this->Head->addScript(null, null, null, null, $scriptContent);
 
                 // Add the built addon javascript files.

@@ -164,15 +164,11 @@ if (!class_exists('HeadModule', false)) {
                 $attributes['defer'] = $options['defer'];
             }
 
-            if (isset($options['content'])) {
-                $content = $options['content'];
-            }
-
             foreach ($options as $key => $value) {
                 $attributes['_'.strtolower($key)] = $value;
             }
 
-            $this->addTag('script', $attributes, $content);
+            $this->addTag('script', $attributes);
         }
 
         /**

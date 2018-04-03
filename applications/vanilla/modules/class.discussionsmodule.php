@@ -69,6 +69,8 @@ class DiscussionsModule extends Gdn_Module {
 
         if ($categoryIDs) {
             $where['d.CategoryID'] = CategoryModel::filterCategoryPermissions($categoryIDs);
+        } else {
+            $where['d.CategoryID'] = CategoryModel::instance()->getVisibleCategoryIDs(['filterHideDiscussions' => true]);
         }
 
         $this->setData('Discussions', $discussionModel->get(0, $limit, $where));

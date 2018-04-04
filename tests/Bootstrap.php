@@ -16,7 +16,11 @@ use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerInterface;
 use Vanilla\Addon;
 use Vanilla\AddonManager;
+use Vanilla\Authenticator\PasswordAuthenticator;
 use Vanilla\InjectableInterface;
+use Vanilla\Models\AuthenticatorModel;
+use VanillaTests\Fixtures\MockAuthenticator;
+use VanillaTests\Fixtures\MockSSOAuthenticator;
 use VanillaTests\Fixtures\NullCache;
 
 /**
@@ -181,6 +185,9 @@ class Bootstrap {
             ->setShared(true)
             ->addAlias(Gdn::AliasDispatcher)
 
+            ->rule(AuthenticatorModel::class)
+            ->setShared(true)
+
             ->rule(\Garden\Web\Dispatcher::class)
             ->setShared(true)
             ->addCall('addRoute', ['route' => new \Garden\Container\Reference('@api-v2-route'), 'api-v2'])
@@ -213,6 +220,14 @@ class Bootstrap {
             ->rule(\WebScraper::class)
             ->setShared(true)
             ->addCall('setDisableFetch', [true]);
+        ;
+
+        /** @var AuthenticatorModel $authenticatorModel */
+        $authenticatorModel = $container->get(AuthenticatorModel::class);
+        $authenticatorModel
+            ->registerAuthenticatorClass(PasswordAuthenticator::class)
+            ->registerAuthenticatorClass(MockAuthenticator::class)
+            ->registerAuthenticatorClass(MockSSOAuthenticator::class)
         ;
     }
 

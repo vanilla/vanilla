@@ -56,9 +56,9 @@ abstract class Authenticator {
             'authenticatorID:s' => 'Authenticator instance\'s identifier.',
             'type:s' => 'Authenticator instance\'s type.',
             'name:s' => 'User friendly name of the authenticator.',
-            'getSignInUrl:s|n' => 'The configured sign in URL of the provider.',
-            'getRegisterUrl:s|n' => 'The configured register URL of the provider.',
-            'getSignOutUrl:s|n' => 'The configured sign out URL of the provider.',
+            'getSignInUrl:s|n' => 'The configured relative sign in URL of the provider.',
+            'getRegisterUrl:s|n' => 'The configured relative register URL of the provider.',
+            'getSignOutUrl:s|n' => 'The configured relative sign out URL of the provider.',
             'ui:o' => static::getUiSchema(),
             'isActive:b' => 'Whether or not the authenticator can be used.',
             'attributes:o' => 'Provider specific attributes',
@@ -67,7 +67,7 @@ abstract class Authenticator {
 
     /**
      * Information on this type of authenticator.
-     * Check Authenticator::getAuthenticatorTypeSchema() to know what is returned by this function.
+     * Check {@link getAuthenticatorTypeSchema()} to know what is returned by this function.
      *
      * @throws ValidationException
      * @return array
@@ -82,7 +82,7 @@ abstract class Authenticator {
     /**
      * Return authenticator type default information.
      * This method is intended to fill information so that child classes won't have to do it.
-     * Use getAuthenticatorTypeInfoImpl() to fill the "final" information.
+     * Use {@link getAuthenticatorTypeInfoImpl()} to fill the "final" information.
      *
      * @return array
      */
@@ -103,7 +103,7 @@ abstract class Authenticator {
      * - ui.photoUrl
      * - ui.backgroundColor
      *
-     * Any fields from getAuthenticatorTypeSchema() can be overridden from this method.
+     * Any fields from {@link getAuthenticatorTypeSchema()} can be overridden from this method.
      *
      * @return array
      */
@@ -153,8 +153,8 @@ abstract class Authenticator {
      */
      public static function getUiSchema(): Schema {
         return Schema::parse([
-            'url:s' => 'Local URL from which you can initiate the SignIn process with this authenticator',
-            'photoUrl:s' => 'The icon for the button.',
+            'url:s' => 'Local relative URL from which you can initiate the SignIn process with this authenticator',
+            'photoUrl:s' => 'The relative icon URL for the button.',
             'buttonName:s' => 'The display text to put in the button. Ex: "Sign in with Facebook"',
             'backgroundColor:s' => 'A css color code. (Hex color, rgb or rgba)',
         ]);
@@ -192,7 +192,7 @@ abstract class Authenticator {
      * Return authenticator default information.
      *
      * This method is intended to fill information so that child classes won't have to do it.
-     * Use getAuthenticatorInfoImpl() to fill the "final" information.
+     * Use {@link getAuthenticatorInfoImpl()} to fill the "final" information.
      *
      * @return array
      */
@@ -231,7 +231,7 @@ abstract class Authenticator {
      * Must be returned by this method:
      * - ui.buttonName
      *
-     * Any fields from getAuthenticatorSchema(), but fields from getAuthenticatorTypeInfo(), can be overridden from this method.
+     * Any fields from {@link getAuthenticatorSchema()}, but fields from {@link getAuthenticatorTypeInfo()}, can be overridden from this method.
      *
      * @return array
      */
@@ -247,21 +247,21 @@ abstract class Authenticator {
     }
 
     /**
-     * Returns the register in URL.
+     * Returns the relative register in URL.
      *
      * @return string|null
      */
     abstract public function getRegisterUrl();
 
     /**
-     * Returns the sign in URL.
+     * Returns the relative sign in URL.
      *
      * @return string|null
      */
     abstract public function getSignInUrl();
 
     /**
-     * Returns the sign out URL.
+     * Returns the relative sign out URL.
      *
      * @return string|null
      */

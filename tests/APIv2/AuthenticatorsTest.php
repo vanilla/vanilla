@@ -39,14 +39,14 @@ class AuthenticatorsTest extends AbstractAPIv2Test {
         /** @var AuthenticatorModel $authenticatorModel */
         $authenticatorModel = self::container()->get(AuthenticatorModel::class);
         self::$authenticators = $authenticatorModel->getAuthenticators();
-
-
     }
 
     /**
      * @inheritdoc
      */
     public function setUp() {
+        parent::setUp();
+
         if (!self::$authenticators) {
             $this->markTestSkipped('No Authenticator found.');
         }
@@ -68,12 +68,45 @@ class AuthenticatorsTest extends AbstractAPIv2Test {
     }
 
     /**
-     * Test GET /authenticators/:id
+     * Test GET /authenticators/:type/:id
      */
     public function testGetAuthenticators() {
+        $type = self::$authenticators[0]::getType();
         $id = self::$authenticators[0]->getID();
 
-        $response = $this->api()->get($this->baseUrl.'/'.$id);
+        $response = $this->api()->get($this->baseUrl.'/'.$type.'/'.$id);
+
+        $this->assertEquals(200, $response->getStatusCode());
+
+        $body = $response->getBody();
+        $this->assertIsAuthenticator($body);
+    }
+
+    /**
+     * Test GET /authenticators/ucfirst(:type)/ucfirst(:id)
+     */
+    public function testGetAuthenticatorsUCFirst() {
+        $type = ucfirst(self::$authenticators[0]::getType());
+        $id = ucfirst(self::$authenticators[0]->getID());
+
+        $response = $this->api()->get($this->baseUrl.'/'.$type.'/'.$id);
+
+        $this->assertEquals(200, $response->getStatusCode());
+
+        $body = $response->getBody();
+        $this->assertIsAuthenticator($body);
+    }
+
+    /**
+     * Test GET /authenticators/strtolower(:type)/strtolower(:id)
+     *
+     * This should be what is returned by the api in the URL fields.
+     */
+    public function testGetAuthenticatorsLowerCase() {
+        $type = strtolower(self::$authenticators[0]::getType());
+        $id = strtolower(self::$authenticators[0]->getID());
+
+        $response = $this->api()->get($this->baseUrl.'/'.$type.'/'.$id);
 
         $this->assertEquals(200, $response->getStatusCode());
 
@@ -103,9 +136,10 @@ class AuthenticatorsTest extends AbstractAPIv2Test {
      * Test PATCH /authenticators/:id
      */
     public function testPatchAuthenticator() {
+        $type = self::$authenticators[0]::getType();
         $id = self::$authenticators[0]->getID();
 
-        $response = $this->api()->patch($this->baseUrl.'/'.$id, [
+        $response = $this->api()->patch($this->baseUrl.'/'.$type.'/'.$id, [
             'isActive' => !self::$authenticators[0]->isActive(),
         ]);
 

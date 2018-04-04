@@ -34,7 +34,7 @@ class AutoConnectTest extends AbstractAPIv2Test {
     private $currentUser;
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     public static function setupBeforeClass() {
         parent::setupBeforeClass();

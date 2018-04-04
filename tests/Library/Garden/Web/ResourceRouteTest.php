@@ -11,6 +11,7 @@ use PHPUnit\Framework\TestCase;
 use Garden\Web\Action;
 use Garden\Web\ResourceRoute;
 use Garden\Web\Route;
+use VanillaTests\Fixtures\AddonsController;
 use VanillaTests\Fixtures\CommentsController;
 use VanillaTests\Fixtures\DiscussionsController;
 use VanillaTests\Fixtures\Request;
@@ -61,6 +62,7 @@ class ResourceRouteTest extends TestCase {
      * @return array Returns test data.
      */
     public function provideKnownRoutes() {
+        $ac = AddonsController::class;
         $dc = DiscussionsController::class;
         $cc = CommentsController::class;
 
@@ -74,6 +76,10 @@ class ResourceRouteTest extends TestCase {
             'get recent' => ['GET', '/discussions/recent?after=1', [$dc, 'get_recent'], ['query' => ['after' => '1']]],
             'get recent too long' => ['GET', '/discussions/recent/1', null],
             'get bookmarked' => ['GET', '/discussions/bookmarked', [$dc, 'get_bookmarked'], ['page' => '']],
+
+            'get string id' => ['GET', '/addons/editor', [$ac, 'get'], ['id' => 'editor']],
+            'patch string id' => ['PATCH', '/addons/editor', [$ac, 'patch'], ['id' => 'editor']],
+            'delete string id' => ['DELETE', '/addons/editor', [$ac, 'delete'], ['id' => 'editor']],
 
             'map body' => ['POST', '/discussions', [$dc, 'post'], ['body' => ['!']]],
             'map data' => ['PATCH', '/discussions/1', [$dc, 'patch'], ['id' => '1', 'data' => ['id' => '1', 0 => '!']]],

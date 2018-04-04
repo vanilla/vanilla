@@ -149,7 +149,7 @@ export function matchFakeEmoji(flag, subtext, shouldStartWithSpace) {
     }
 }
 
-export function initialize(editorElement, iframe?: HTMLIFrameElement) {
+export function initializeAtComplete(editorElement, iframe?: HTMLIFrameElement) {
 
     // Handle iframe situation
     const iframeWindow = iframe ? iframe.contentWindow : '';

@@ -9,7 +9,7 @@ import { log, logError, debug } from "@core/utility";
 import { _mountComponents } from "@core/internal";
 import gdn from "@core/gdn";
 import apiv2 from "@core/apiv2";
-import "@core/legacy/atwho";
+import "@core/legacy";
 
 // Inject the debug flag into the utility.
 debug(getMeta('debug', false));

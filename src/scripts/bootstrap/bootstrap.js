@@ -7,9 +7,16 @@
 import { onContent, getMeta, _executeReady } from "@core/application";
 import { log, logError, debug } from "@core/utility";
 import { _mountComponents } from "@core/internal";
+import gdn from "@core/gdn";
+import apiv2 from "@core/apiv2";
 
+// Inject the debug flag into the utility.
 debug(getMeta('debug', false));
 
+// Export the API to the global object.
+gdn.apiv2 = apiv2;
+
+// Mount all data-react components.
 onContent((e) => {
     _mountComponents(e.target);
 });

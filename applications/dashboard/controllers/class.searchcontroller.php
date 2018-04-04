@@ -25,11 +25,14 @@ class SearchController extends Gdn_Controller {
     /**
      * Object instantiation & form prep.
      */
-    public function __construct() {
+    public function __construct(SearchModel $searchModel = null) {
         parent::__construct();
 
-        // Object instantiation
-        $this->SearchModel = new SearchModel();
+        // Object instantiation.
+        if ($searchModel === null) {
+            $searchModel = new SearchModel();
+        }
+        $this->SearchModel = $searchModel;
         $form = Gdn::factory('Form');
 
         // Form prep

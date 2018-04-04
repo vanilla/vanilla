@@ -150,17 +150,20 @@ class DiscussionsController extends VanillaController {
         $where = [];
         if ($this->data('Followed')) {
             $followedCategories = array_keys($categoryModel->getFollowed(Gdn::session()->UserID));
-            $visibleCategories = CategoryModel::instance()->getVisibleCategoryIDs(['filterHideDiscussions' => true]);
-            if ($visibleCategories === true) {
+            $visibleCategoriesResult = CategoryModel::instance()->getVisibleCategoryIDs(['filterHideDiscussions' => true]);
+            if ($visibleCategoriesResult === true) {
                 $visibleFollowedCategories = $followedCategories;
             } else {
-                $visibleFollowedCategories = array_intersect($followedCategories, $visibleCategories);
+                $visibleFollowedCategories = array_intersect($followedCategories, $visibleCategoriesResult);
             }
             $where['d.CategoryID'] = $visibleFollowedCategories;
         } elseif ($categoryIDs) {
             $where['d.CategoryID'] = CategoryModel::filterCategoryPermissions($categoryIDs);
         } else {
-            $where['d.CategoryID'] = CategoryModel::instance()->getVisibleCategoryIDs(['filterHideDiscussions' => true]);
+            $visibleCategoriesResult = CategoryModel::instance()->getVisibleCategoryIDs(['filterHideDiscussions' => true]);
+            if ($visibleCategoriesResult !== true) {
+                $where['d.CategoryID'] = $visibleCategoriesResult;
+            }
         }
 
         // Get Discussion Count

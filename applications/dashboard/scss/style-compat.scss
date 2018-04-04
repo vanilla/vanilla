@@ -1,3 +1,6 @@
+// Variables
+@import "social/socialBackgrounds";
+
 // Compatibility
 @import "compatibility/mixins";
 @import "compatibility/utilities";
@@ -5,8 +8,9 @@
 @import "compatibility/categories";
 
 // This should always be added after style.css and not be overridden.
-
+@import "authenticate/authenticateUser";
 @import "new-features/followButton";
 @import "new-features/vanillaIcon";
 @import "new-features/selectBox";
-
+@import "new-features/formElements"; // For new pages with form ony
+@import "new-features/checkboxAndRadioButton"; // For new pages with form ony

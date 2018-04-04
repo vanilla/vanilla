@@ -1,3 +1,5 @@
+/* ------------------------------- *    Third Party Colors
+\* ------------------------------- */
 .sr-only {
   position: absolute;
   width: 1px;
@@ -29,6 +31,113 @@ body.isMobile .change-picture .change-picture-instructions {
 
 .categoryList-heading + .DataTableWrap > .categoryList-genericHeading {
   display: none;
+}
+
+.button .icon {
+  display: inline-block;
+  line-height: 100%;
+  vertical-align: middle;
+  margin: auto;
+}
+
+.icon {
+  display: inline-block;
+  width: 24px;
+  height: 24px;
+  vertical-align: middle;
+}
+
+.iconLarge {
+  display: inline-block;
+  width: 42px;
+  height: 42px;
+  vertical-align: middle;
+}
+
+body.Entry #Content,
+.Row {
+  width: 100%;
+  max-width: 100%;
+}
+
+.authenticateUser {
+  padding: 0 32px;
+  margin: auto;
+  width: 375px;
+}
+
+.authenticateUser .pageTitle {
+  text-align: center;
+  margin-bottom: 18px;
+}
+
+.ssoUser-photoCrop,
+.ssoUser-imageWrap {
+  display: block;
+  width: 100%;
+  max-width: 117px;
+}
+
+.ssoUser-photoCrop {
+  overflow: hidden;
+  border-radius: 50%;
+}
+
+.ssoUser-imageWrap {
+  position: relative;
+  margin: auto;
+}
+
+.ssoUser-icon {
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  display: block;
+  width: 48px;
+  height: 48px;
+  background-color: #fff;
+  border-style: solid;
+  border-width: 3px;
+  border-color: #fff;
+  border-radius: 50%;
+}
+
+.ssoUser-photo {
+  display: block;
+  max-width: 100%;
+  width: 100%;
+  height: auto;
+}
+
+.ssoUser-arrowDown {
+  display: block;
+  margin: 0 auto;
+}
+
+.ssoUser-frame {
+  position: relative;
+  text-align: center;
+}
+
+.ssoUser-name {
+  margin-top: 6px;
+}
+
+.rememberMeAndForgot {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  font-size: 12px;
+}
+
+.rememberMeAndForgot a {
+  font-size: inherit;
+  color: #0291db;
+}
+
+.rememberMeAndForgot-rememberMe {
+  flex-grow: 1;
+  padding-right: 6px;
 }
 
 .followButton {
@@ -177,6 +286,321 @@ body.Categories.isMobile .PageControls.Top {
 .ButtonGroup.discussion-sort-filter-module {
   display: flex;
   align-items: center;
+}
+
+.inputBlock {
+  display: block;
+  margin-bottom: 24px;
+}
+
+.inputBlock-labelText {
+  display: block;
+  font-weight: 600;
+  font-size: 14px;
+  margin-bottom: 6px;
+}
+
+.InputBox.inputText {
+  width: 100%;
+  padding: 6px 12px;
+  font-size: 14px;
+  height: 36px;
+  line-height: 24px;
+}
+
+.radioButton,
+.checkbox {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  white-space: nowrap;
+  margin: 0;
+  box-sizing: border-box;
+}
+
+.radioButton:hover .radioButton-input:not([disabled]) + .radioButton-disk,
+.radioButton:hover .radioButton-input:not([disabled]) + .checkbox-box,
+.radioButton:hover .checkbox-input:not([disabled]) + .radioButton-disk,
+.radioButton:hover .checkbox-input:not([disabled]) + .checkbox-box,
+.checkbox:hover .radioButton-input:not([disabled]) + .radioButton-disk,
+.checkbox:hover .radioButton-input:not([disabled]) + .checkbox-box,
+.checkbox:hover .checkbox-input:not([disabled]) + .radioButton-disk,
+.checkbox:hover .checkbox-input:not([disabled]) + .checkbox-box {
+  border-color: #afdcf4;
+}
+
+.radioButton:hover .radioButton-disk,
+.radioButton:hover .checkbox-box,
+.checkbox:hover .radioButton-disk,
+.checkbox:hover .checkbox-box {
+  background-color: #e6f4fb;
+}
+
+.radioButton .radioButton-input:not([disabled]):focus + .radioButton-disk,
+.radioButton .radioButton-input:not([disabled]):focus + .checkbox-box, .radioButton .radioButton-input:not([disabled]):active + .radioButton-disk,
+.radioButton .radioButton-input:not([disabled]):active + .checkbox-box,
+.radioButton .checkbox-input:not([disabled]):focus + .radioButton-disk,
+.radioButton .checkbox-input:not([disabled]):focus + .checkbox-box,
+.radioButton .checkbox-input:not([disabled]):active + .radioButton-disk,
+.radioButton .checkbox-input:not([disabled]):active + .checkbox-box,
+.checkbox .radioButton-input:not([disabled]):focus + .radioButton-disk,
+.checkbox .radioButton-input:not([disabled]):focus + .checkbox-box,
+.checkbox .radioButton-input:not([disabled]):active + .radioButton-disk,
+.checkbox .radioButton-input:not([disabled]):active + .checkbox-box,
+.checkbox .checkbox-input:not([disabled]):focus + .radioButton-disk,
+.checkbox .checkbox-input:not([disabled]):focus + .checkbox-box,
+.checkbox .checkbox-input:not([disabled]):active + .radioButton-disk,
+.checkbox .checkbox-input:not([disabled]):active + .checkbox-box {
+  border-color: #afdcf4;
+}
+
+.radioButton + .radioButton,
+.radioButton + .checkbox,
+.checkbox + .radioButton,
+.checkbox + .checkbox {
+  margin-top: 6px;
+}
+
+.radioButton-label,
+.checkbox-label {
+  line-height: 16px;
+  margin-left: 8px;
+  cursor: pointer;
+  box-sizing: border-box;
+}
+
+.radioButton-labelNote,
+.checkbox-labelNote {
+  display: inline-block;
+  font-size: 0.8em;
+  margin-left: 12px;
+  opacity: 0.7;
+  vertical-align: middle;
+}
+
+.radioButton-disk,
+.checkbox-box {
+  position: relative;
+  display: inline-block;
+  width: 16px;
+  height: 16px;
+  vertical-align: -0.18em;
+  cursor: pointer;
+  background-color: #fff;
+  box-sizing: border-box;
+  border-style: solid;
+  border-width: 1px;
+  border-color: #dddee0;
+  border-radius: 2px;
+}
+
+.radioButton-icon {
+  position: absolute;
+  display: block;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  max-height: 100%;
+  max-width: 100%;
+  margin: auto;
+  display: none;
+  width: 6px;
+  height: 6px;
+  margin: auto;
+}
+
+.checkbox-icon {
+  position: absolute;
+  display: block;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  max-height: 100%;
+  max-width: 100%;
+  margin: auto;
+  display: none;
+  width: 10px;
+  height: 10px;
+  margin: auto;
+}
+
+.checkbox-bar {
+  color: #0291db;
+  width: 8px;
+  height: 2px;
+}
+
+.radioButton-disk {
+  border-radius: 50%;
+}
+
+.radioButton-state,
+.checkbox-state {
+  color: #fff;
+}
+
+.radioButton-diskIcon {
+  width: 6px;
+  height: 6px;
+}
+
+.radioButton-input,
+.checkbox-input {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  border: 0;
+}
+
+.radioButton-input:checked + .radioButton-disk,
+.radioButton-input:checked + .checkbox-box,
+.checkbox-input:checked + .radioButton-disk,
+.checkbox-input:checked + .checkbox-box {
+  background-color: #0291db;
+  border-color: #0291db;
+}
+
+.radioButton-input:checked + .radioButton-disk .radioButton-diskIcon,
+.radioButton-input:checked + .radioButton-disk .checkbox-checkIcon,
+.radioButton-input:checked + .checkbox-box .radioButton-diskIcon,
+.radioButton-input:checked + .checkbox-box .checkbox-checkIcon,
+.checkbox-input:checked + .radioButton-disk .radioButton-diskIcon,
+.checkbox-input:checked + .radioButton-disk .checkbox-checkIcon,
+.checkbox-input:checked + .checkbox-box .radioButton-diskIcon,
+.checkbox-input:checked + .checkbox-box .checkbox-checkIcon {
+  display: block;
+}
+
+.radioButton-input[indeterminate] + .radioButton-disk,
+.radioButton-input[indeterminate] + .checkbox-box, .radioButton-input[indeterminate]:focus + .radioButton-disk,
+.radioButton-input[indeterminate]:focus + .checkbox-box, .radioButton-input[indeterminate]:checked + .radioButton-disk,
+.radioButton-input[indeterminate]:checked + .checkbox-box, .radioButton-input[indeterminate]:checked:focus + .radioButton-disk,
+.radioButton-input[indeterminate]:checked:focus + .checkbox-box, .radioButton-input.isIndeterminate + .radioButton-disk,
+.radioButton-input.isIndeterminate + .checkbox-box, .radioButton-input.isIndeterminate:focus + .radioButton-disk,
+.radioButton-input.isIndeterminate:focus + .checkbox-box, .radioButton-input.isIndeterminate:checked + .radioButton-disk,
+.radioButton-input.isIndeterminate:checked + .checkbox-box, .radioButton-input.isIndeterminate:checked:focus + .radioButton-disk,
+.radioButton-input.isIndeterminate:checked:focus + .checkbox-box,
+.checkbox-input[indeterminate] + .radioButton-disk,
+.checkbox-input[indeterminate] + .checkbox-box,
+.checkbox-input[indeterminate]:focus + .radioButton-disk,
+.checkbox-input[indeterminate]:focus + .checkbox-box,
+.checkbox-input[indeterminate]:checked + .radioButton-disk,
+.checkbox-input[indeterminate]:checked + .checkbox-box,
+.checkbox-input[indeterminate]:checked:focus + .radioButton-disk,
+.checkbox-input[indeterminate]:checked:focus + .checkbox-box,
+.checkbox-input.isIndeterminate + .radioButton-disk,
+.checkbox-input.isIndeterminate + .checkbox-box,
+.checkbox-input.isIndeterminate:focus + .radioButton-disk,
+.checkbox-input.isIndeterminate:focus + .checkbox-box,
+.checkbox-input.isIndeterminate:checked + .radioButton-disk,
+.checkbox-input.isIndeterminate:checked + .checkbox-box,
+.checkbox-input.isIndeterminate:checked:focus + .radioButton-disk,
+.checkbox-input.isIndeterminate:checked:focus + .checkbox-box {
+  background-color: #fff;
+  border-color: #dddee0;
+}
+
+.radioButton-input[indeterminate]:hover + .radioButton-disk,
+.radioButton-input[indeterminate]:hover + .checkbox-box, .radioButton-input[indeterminate]:active + .radioButton-disk,
+.radioButton-input[indeterminate]:active + .checkbox-box, .radioButton-input[indeterminate]:checked:hover + .radioButton-disk,
+.radioButton-input[indeterminate]:checked:hover + .checkbox-box, .radioButton-input[indeterminate]:checked:active + .radioButton-disk,
+.radioButton-input[indeterminate]:checked:active + .checkbox-box, .radioButton-input.isIndeterminate:hover + .radioButton-disk,
+.radioButton-input.isIndeterminate:hover + .checkbox-box, .radioButton-input.isIndeterminate:active + .radioButton-disk,
+.radioButton-input.isIndeterminate:active + .checkbox-box, .radioButton-input.isIndeterminate:checked:hover + .radioButton-disk,
+.radioButton-input.isIndeterminate:checked:hover + .checkbox-box, .radioButton-input.isIndeterminate:checked:active + .radioButton-disk,
+.radioButton-input.isIndeterminate:checked:active + .checkbox-box,
+.checkbox-input[indeterminate]:hover + .radioButton-disk,
+.checkbox-input[indeterminate]:hover + .checkbox-box,
+.checkbox-input[indeterminate]:active + .radioButton-disk,
+.checkbox-input[indeterminate]:active + .checkbox-box,
+.checkbox-input[indeterminate]:checked:hover + .radioButton-disk,
+.checkbox-input[indeterminate]:checked:hover + .checkbox-box,
+.checkbox-input[indeterminate]:checked:active + .radioButton-disk,
+.checkbox-input[indeterminate]:checked:active + .checkbox-box,
+.checkbox-input.isIndeterminate:hover + .radioButton-disk,
+.checkbox-input.isIndeterminate:hover + .checkbox-box,
+.checkbox-input.isIndeterminate:active + .radioButton-disk,
+.checkbox-input.isIndeterminate:active + .checkbox-box,
+.checkbox-input.isIndeterminate:checked:hover + .radioButton-disk,
+.checkbox-input.isIndeterminate:checked:hover + .checkbox-box,
+.checkbox-input.isIndeterminate:checked:active + .radioButton-disk,
+.checkbox-input.isIndeterminate:checked:active + .checkbox-box {
+  border-color: #afdcf4;
+}
+
+.radioButton-input[indeterminate] + .radioButton-disk,
+.radioButton-input[indeterminate] + .checkbox-box, .radioButton-input.isIndeterminate + .radioButton-disk,
+.radioButton-input.isIndeterminate + .checkbox-box,
+.checkbox-input[indeterminate] + .radioButton-disk,
+.checkbox-input[indeterminate] + .checkbox-box,
+.checkbox-input.isIndeterminate + .radioButton-disk,
+.checkbox-input.isIndeterminate + .checkbox-box {
+  background-color: #fff;
+}
+
+.radioButton-input[indeterminate] + .radioButton-disk .radioButton-diskIcon,
+.radioButton-input[indeterminate] + .radioButton-disk .checkbox-checkIcon,
+.radioButton-input[indeterminate] + .checkbox-box .radioButton-diskIcon,
+.radioButton-input[indeterminate] + .checkbox-box .checkbox-checkIcon, .radioButton-input.isIndeterminate + .radioButton-disk .radioButton-diskIcon,
+.radioButton-input.isIndeterminate + .radioButton-disk .checkbox-checkIcon,
+.radioButton-input.isIndeterminate + .checkbox-box .radioButton-diskIcon,
+.radioButton-input.isIndeterminate + .checkbox-box .checkbox-checkIcon,
+.checkbox-input[indeterminate] + .radioButton-disk .radioButton-diskIcon,
+.checkbox-input[indeterminate] + .radioButton-disk .checkbox-checkIcon,
+.checkbox-input[indeterminate] + .checkbox-box .radioButton-diskIcon,
+.checkbox-input[indeterminate] + .checkbox-box .checkbox-checkIcon,
+.checkbox-input.isIndeterminate + .radioButton-disk .radioButton-diskIcon,
+.checkbox-input.isIndeterminate + .radioButton-disk .checkbox-checkIcon,
+.checkbox-input.isIndeterminate + .checkbox-box .radioButton-diskIcon,
+.checkbox-input.isIndeterminate + .checkbox-box .checkbox-checkIcon {
+  display: none;
+}
+
+.radioButton-input[indeterminate] + .radioButton-disk .checkbox-bar,
+.radioButton-input[indeterminate] + .checkbox-box .checkbox-bar, .radioButton-input.isIndeterminate + .radioButton-disk .checkbox-bar,
+.radioButton-input.isIndeterminate + .checkbox-box .checkbox-bar,
+.checkbox-input[indeterminate] + .radioButton-disk .checkbox-bar,
+.checkbox-input[indeterminate] + .checkbox-box .checkbox-bar,
+.checkbox-input.isIndeterminate + .radioButton-disk .checkbox-bar,
+.checkbox-input.isIndeterminate + .checkbox-box .checkbox-bar {
+  display: block;
+}
+
+.radioButton-input.isDisabled:not(:checked) + .radioButton-disk,
+.radioButton-input.isDisabled:not(:checked) + .checkbox-box, .radioButton-input[disabled]:not(:checked) + .radioButton-disk,
+.radioButton-input[disabled]:not(:checked) + .checkbox-box,
+.checkbox-input.isDisabled:not(:checked) + .radioButton-disk,
+.checkbox-input.isDisabled:not(:checked) + .checkbox-box,
+.checkbox-input[disabled]:not(:checked) + .radioButton-disk,
+.checkbox-input[disabled]:not(:checked) + .checkbox-box {
+  background-color: #fff;
+}
+
+.radioButton-input.isDisabled ~ .radioButton-label,
+.radioButton-input.isDisabled ~ .checkbox-label,
+.radioButton-input.isDisabled + .radioButton-disk,
+.radioButton-input.isDisabled + .checkbox-box, .radioButton-input[disabled] ~ .radioButton-label,
+.radioButton-input[disabled] ~ .checkbox-label,
+.radioButton-input[disabled] + .radioButton-disk,
+.radioButton-input[disabled] + .checkbox-box,
+.checkbox-input.isDisabled ~ .radioButton-label,
+.checkbox-input.isDisabled ~ .checkbox-label,
+.checkbox-input.isDisabled + .radioButton-disk,
+.checkbox-input.isDisabled + .checkbox-box,
+.checkbox-input[disabled] ~ .radioButton-label,
+.checkbox-input[disabled] ~ .checkbox-label,
+.checkbox-input[disabled] + .radioButton-disk,
+.checkbox-input[disabled] + .checkbox-box {
+  pointer-events: none;
+  user-select: none;
+  cursor: default;
+  opacity: .5;
 }
 
 /*# sourceMappingURL=style-compat.css.map */

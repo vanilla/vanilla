@@ -1,5 +1,5 @@
 /**
- * Set at-who handler for legacy @mentions
+ * At-who setup for legacy @mentions.
  *
  * @author Adam Charron <adam.c@vanillaforums.com>
  * @copyright 2009-2018 Vanilla Forums Inc.

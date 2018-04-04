@@ -4,8 +4,8 @@
  * @license GPLv2
  */
 
+import {formatUrl, getMeta, setMeta} from "@core/application";
 import axios, {AxiosResponse} from "axios";
-import { formatUrl, getMeta, setMeta } from "@core/application";
 
 /**
  * Add the transient key to every request.

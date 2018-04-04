@@ -4,7 +4,7 @@
  * @license GPLv2
  */
 
-import * as domUtility from "../dom-utility";
+import * as domUtility from "../dom";
 
 const input = `<script>alert("Got you!")</script>`;
 const output = `&lt;script&gt;alert("Got you!")&lt;/script&gt;`;

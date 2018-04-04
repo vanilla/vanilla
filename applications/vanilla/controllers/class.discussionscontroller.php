@@ -150,15 +150,20 @@ class DiscussionsController extends VanillaController {
         $where = [];
         if ($this->data('Followed')) {
             $followedCategories = array_keys($categoryModel->getFollowed(Gdn::session()->UserID));
-            $visibleCategories = CategoryModel::instance()->getVisibleCategoryIDs(['filterHideDiscussions' => true]);
-            if ($visibleCategories === true) {
+            $visibleCategoriesResult = CategoryModel::instance()->getVisibleCategoryIDs(['filterHideDiscussions' => true]);
+            if ($visibleCategoriesResult === true) {
                 $visibleFollowedCategories = $followedCategories;
             } else {
-                $visibleFollowedCategories = array_intersect($followedCategories, $visibleCategories);
+                $visibleFollowedCategories = array_intersect($followedCategories, $visibleCategoriesResult);
             }
             $where['d.CategoryID'] = $visibleFollowedCategories;
         } elseif ($categoryIDs) {
             $where['d.CategoryID'] = CategoryModel::filterCategoryPermissions($categoryIDs);
+        } else {
+            $visibleCategoriesResult = CategoryModel::instance()->getVisibleCategoryIDs(['filterHideDiscussions' => true]);
+            if ($visibleCategoriesResult !== true) {
+                $where['d.CategoryID'] = $visibleCategoriesResult;
+            }
         }
 
         // Get Discussion Count
@@ -289,7 +294,9 @@ class DiscussionsController extends VanillaController {
         $this->setData('CountDiscussions', $countDiscussions);
 
         // Get Discussions
-        $this->DiscussionData = $discussionModel->getUnread($page, $limit);
+        $this->DiscussionData = $discussionModel->getUnread($page, $limit, [
+            'd.CategoryID' => CategoryModel::instance()->getVisibleCategoryIDs(['filterHideDiscussions' => true])
+        ]);
 
         $this->setData('Discussions', $this->DiscussionData, true);
         $this->setJson('Loading', $page.' to '.$limit);

@@ -5,16 +5,18 @@
         "entries": {
             "bootstrap-app": "./src/scripts/bootstrap/bootstrap.js",
             "bootstrap-admin": "./src/scripts/bootstrap/bootstrap.js",
-            "app": "./src/scripts/app/core-app.js"
+            "app": "./src/scripts/app/core-app.js",
+            "polyfills": "./src/scripts/bootstrap/polyfills"
         },
         "exports": {
             "*": [
                 "./src/scripts/api",
                 "./src/scripts/application",
+                "./src/scripts/apiv2",
                 "./src/scripts/gdn",
                 "./src/scripts/permissions",
                 "./src/scripts/utility",
-                "./src/scripts/dom-utility",
+                "./src/scripts/dom",
                 "./src/scripts/Components/DocumentTitle",
                 "./src/scripts/Main/NotFoundPage",
                 "axios",

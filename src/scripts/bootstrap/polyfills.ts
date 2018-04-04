@@ -4,12 +4,7 @@
  * @license GPLv2
  */
 
-// @ts-nocheck
-
-import Promise from "promise-polyfill";
-import setAsap from "setasap";
-
-import * as utility from "@core/utility";
+import "babel-polyfill";
 
 /**
  * Polyfill forEach on NodeList.
@@ -20,7 +15,7 @@ import * as utility from "@core/utility";
  * Polyfill included here is taken from Mozilla.
  * https://developer.mozilla.org/en-US/docs/Web/API/NodeList/forEach#Polyfill
  */
-function polyfillNodeListforEach() {
+function polyfillNodeListForEach() {
     if (window.NodeList && !NodeList.prototype.forEach) {
         NodeList.prototype.forEach = function forEach(callback, thisArg) {
             thisArg = thisArg || window;
@@ -92,21 +87,6 @@ function polyfillRemove() {
 }
 
 /**
- * Dynamically import a core-js polyfill.
- *
- * @returns {Promise<any>} - A Promise that resolves when core JS has been loaded.
- */
-function polyfillCoreJs() {
-    return import(/* webpackChunkName: "polyfill" */ "babel-polyfill")
-        .then(() => {
-            utility.log("Loading polyfills");
-        })
-        .catch(e => {
-            utility.log(e);
-        });
-}
-
-/**
  * Fixes CustomEvent in IE 9-11
  *
  * @see https://developer.mozilla.org/en-US/docs/Web/API/CustomEvent/CustomEvent
@@ -125,29 +105,10 @@ function polyfillCustomEvent() {
 
     CustomEvent.prototype = window.Event.prototype;
 
-    window.CustomEvent = CustomEvent;
+    window.CustomEvent = CustomEvent as any;
 }
 
-
-/**
- * Polyfills core-js and a few additional things.
- *
- * Feel free to add additional polyfills here if they're simple,
- * but only functionality present in the latest major version of Chrome, Firefox, and Safari
- * should be polyfilled.
- *
- * @returns {Promise<any>} - A Promise that resolves when all polyfills have been loaded.
- */
-export default function loadPolyfills() {
-
-    /**
-     * We need to polyfill promises in order to use webpack's dynamic imports
-     * to polyfill the other feature. It's small so ¯\_(ツ)_/¯.
-     */
-    if (!window.Promise) {
-        Promise._immediateFn = setAsap;
-        window.Promise = Promise;
-    }
-
-    return Promise.all([polyfillNodeListforEach(), polyfillCoreJs(), polyfillClosest(), polyfillRemove(), polyfillCustomEvent()]);
-}
+polyfillNodeListForEach();
+polyfillClosest();
+polyfillRemove();
+polyfillCustomEvent();

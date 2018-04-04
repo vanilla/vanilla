@@ -5,7 +5,7 @@
  */
 
 import { log } from "@core/utility";
-import ajax from "@core/api";
+import api from "@core/apiv2";
 
 /**
  * A callback for events on the FileUploader class.
@@ -124,7 +124,7 @@ export default class FileUploader {
         data.append("file", file, file.name);
         data.append("type", "image");
 
-        ajax.post("/media", data)
+        api.post("/media", data)
             .then(result => {
                 this.uploadSuccessCallback(file, result);
             }).catch(error => {

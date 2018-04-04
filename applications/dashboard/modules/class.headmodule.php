@@ -137,7 +137,6 @@ if (!class_exists('HeadModule', false)) {
          *  - numeric: This will be the script's sort.
          *  - string: This will hint the script (inline will inline the file in the page.
          *  - array: An array of options (ex. sort, hint, version).
-         *
          */
         public function addScript($src, $type = 'text/javascript', $addVersion = true, $options = []) {
             if (is_numeric($options)) {

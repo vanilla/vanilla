@@ -442,7 +442,8 @@ class DiscussionController extends VanillaController {
         }
 
         // Make sure that the user has access to the discussion.
-        $this->DiscussionModel->categoryPermission('Vanilla.Discussions.View', $Discussion['CategoryID']);
+        $categoryID = val('CategoryID', $Discussion);
+        $this->DiscussionModel->categoryPermission('Vanilla.Discussions.View', $categoryID);
 
         $Bookmark = $this->DiscussionModel->bookmark($DiscussionID, $UserID, $Bookmark);
 

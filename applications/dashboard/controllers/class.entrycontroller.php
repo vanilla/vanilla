@@ -69,6 +69,12 @@ class EntryController extends Gdn_Controller {
         $this->addCssFile('vanillicon.css', 'static');
         parent::initialize();
         Gdn_Theme::section('Entry');
+
+        if ($this->UserModel->isNameUnique() && !$this->UserModel->isEmailUnique()) {
+            $this->setData('RecoverPasswordLabelCode', 'Enter your username to continue.');
+        } else {
+            $this->setData('RecoverPasswordLabelCode', 'Enter your email to continue.');
+        }
     }
 
     /**
@@ -1730,7 +1736,10 @@ class EntryController extends Gdn_Controller {
      * @since 2.0.0
      */
     public function passwordRequest() {
-        Gdn::locale()->setTranslation('Email', t(UserModel::signinLabelCode()));
+        if (!$this->UserModel->isEmailUnique() && $this->UserModel->isNameUnique()) {
+            Gdn::locale()->setTranslation('Email', t('Usermame'));
+        }
+
         if ($this->Form->isPostBack() === true) {
             $this->Form->validateRule('Email', 'ValidateRequired');
 
@@ -1739,12 +1748,6 @@ class EntryController extends Gdn_Controller {
                     $email = $this->Form->getFormValue('Email');
                     if (!$this->UserModel->passwordRequest($email)) {
                         $this->Form->setValidationResults($this->UserModel->validationResults());
-                        Logger::event(
-                            'password_reset_failure',
-                            Logger::INFO,
-                            'Can\'t find account associated with email/username {Input}.',
-                            ['Input' => $email]
-                        );
                     }
                 } catch (Exception $ex) {
                     $this->Form->addError($ex->getMessage());
@@ -1752,12 +1755,6 @@ class EntryController extends Gdn_Controller {
                 if ($this->Form->errorCount() == 0) {
                     $this->Form->addError('Success!');
                     $this->View = 'passwordrequestsent';
-                    Logger::event(
-                        'password_reset_request',
-                        Logger::INFO,
-                        '{Input} has been sent a password reset email.',
-                        ['Input' => $email]
-                    );
                     $this->fireEvent('PasswordRequest', [
                         'Email' => $email
                     ]);
@@ -1765,12 +1762,6 @@ class EntryController extends Gdn_Controller {
             } else {
                 if ($this->Form->errorCount() == 0) {
                     $this->addCredentialErrorToForm("Couldn't find an account associated with that email/username.");
-                    Logger::event(
-                        'password_reset_failure',
-                        Logger::INFO,
-                        'Can\'t find account associated with email/username {Input}.',
-                        ['Input' => $this->Form->getValue('Email')]
-                    );
                 }
             }
         }

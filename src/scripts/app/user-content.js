@@ -4,8 +4,8 @@
  * @license https://opensource.org/licenses/GPL-2.0 GPL-2.0
  */
 
-import { delegateEvent } from "@core/dom-utility";
-import { setData, getData } from "@core/dom-utility";
+import { delegateEvent } from "@core/dom";
+import { setData, getData } from "@core/dom";
 import debounce from "lodash/debounce";
 import shave from 'shave';
 

@@ -5,7 +5,7 @@
  */
 
 import { BlockEmbed } from "quill/blots/block";
-import { setData, getData } from "@core/dom-utility";
+import { setData, getData } from "@core/dom";
 
 export default class RichLinkBlot extends BlockEmbed {
 

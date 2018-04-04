@@ -199,6 +199,34 @@ class AssetModel extends Gdn_Model {
     }
 
     /**
+     * Get the content for an inline polyfill script.
+     *
+     * @return string
+     */
+    public function getInlinePolyfillJSContent(): string {
+        $polyfillFileUrl = asset("/js/polyfills/core-polyfills.js", false, $addVersion);
+
+        $debug = c("Debug", false);
+        $logAdding = $debug ? "console.log('Older browser detected. Initiating polyfills.');" : "";
+        $logNotAdding = $debug ? "console.log('Modern browser detected. No polyfills necessary');" : "";
+
+        // Add the polyfill loader.
+        $scriptContent =
+            "var supportsAllFeatures = window.Promise && window.fetch && window.Symbol"
+            ."&& window.CustomEvent && Element.prototype.remove && Element.prototype.closest"
+            ."&& window.NodeList && NodeList.prototype.forEach;"
+            ."if (!supportsAllFeatures) {"
+            .$logAdding
+            ."var head = document.getElementsByTagName('head')[0];"
+            ."var script = document.createElement('script');"
+            ."script.src = '$polyfillFileUrl';"
+            ."head.appendChild(script);"
+            ."} else { $logNotAdding }";
+
+        return $scriptContent;
+    }
+
+    /**
      * Sorting callback
      *
      * @param $a

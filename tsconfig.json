@@ -1,13 +1,16 @@
 {
     "compilerOptions": {
-        "allowJs": true,
-        "checkJs": true,
-        "jsx": "preserve",
+        "jsx": "react",
         "lib": [
             "es2017",
             "dom",
             "dom.iterable"
         ],
+        "allowSyntheticDefaultImports": true,
+        "moduleResolution": "node",
+        "strictNullChecks": true,
+        "target": "es2017",
+        "module": "esnext",
         "baseUrl": ".",
         "paths": {
             "@core/*": ["./src/scripts/*"],

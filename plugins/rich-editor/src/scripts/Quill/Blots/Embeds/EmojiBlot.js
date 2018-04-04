@@ -5,7 +5,7 @@
  */
 
 import Embed from "quill/blots/embed";
-import { setData, getData } from "@core/dom-utility";
+import { setData, getData } from "@core/dom";
 import { parseEmoji, isEmojiSupported } from "@core/emoji-utility";
 
 export default class EmojiBlot extends Embed {

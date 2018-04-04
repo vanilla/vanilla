@@ -1,23 +1,21 @@
-type NormalCallback = () => void;
-type PromiseCallback = () => Promise<void>;
-
-declare type PromiseOrNormalCallback = NormalCallback | PromiseCallback;
+/* tslint:disable */
 
 interface Element {
     setAttribute(name: string, value: boolean): void;
     setAttribute(name: string, value: number): void;
 }
 
-interface NodeSelector {
-    querySelector<E extends HTMLElement = HTMLElement>(selectors: string): E | null;
-    querySelectorAll<E extends HTMLElement = HTMLElement>(selectors: string): NodeListOf<E>;
-}
-
 interface Window {
     Waypoint: any;
+    gdn: any;
+    Promise?: PromiseConstructor;
+    NodeList?: typeof NodeList;
+    Symbol?: SymbolConstructor;
+    CustomEvent?: typeof CustomEvent;
+    Event: typeof Event;
+    [key: string]: any;
 }
 
-interface EventTarget extends HTMLElement {};
-
-declare var gdn: any;
-
+declare interface AnyObject {
+    [key: string]: any;
+}

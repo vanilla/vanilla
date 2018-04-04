@@ -4,23 +4,29 @@
  * @license GPLv2
  */
 
-import loadPolyfills from "@core/bootstrap/polyfills";
 import { onContent, getMeta, _executeReady } from "@core/application";
-import * as utility from "@core/utility";
+import { log, logError, debug } from "@core/utility";
 import { _mountComponents } from "@core/internal";
+import gdn from "@core/gdn";
+import apiv2 from "@core/apiv2";
 
-utility.debug(getMeta('debug', false));
+// Inject the debug flag into the utility.
+debug(getMeta('debug', false));
 
+// Export the API to the global object.
+gdn.apiv2 = apiv2;
+
+// Mount all data-react components.
 onContent((e) => {
     _mountComponents(e.target);
 });
 
-loadPolyfills().then(() => {
-    utility.log("Bootstrapping");
-    _executeReady().then(() => {
-        utility.log("Bootstrapping complete.");
+log("Bootstrapping");
+_executeReady().then(() => {
+    log("Bootstrapping complete.");
 
-        const contentEvent = new CustomEvent('X-DOMContentReady', { bubbles: true, cancelable: false });
-        document.dispatchEvent(contentEvent);
-    });
+    const contentEvent = new CustomEvent('X-DOMContentReady', { bubbles: true, cancelable: false });
+    document.dispatchEvent(contentEvent);
+}).catch(error => {
+    logError(error);
 });

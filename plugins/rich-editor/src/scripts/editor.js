@@ -6,7 +6,7 @@
 
 import Quill from "./Quill/RegisteredQuill";
 import * as utility from "@core/utility";
-import { ensureHtmlElement } from "@core/dom-utility";
+import { ensureHtmlElement } from "@core/dom";
 
 const options = {
     theme: "vanilla",

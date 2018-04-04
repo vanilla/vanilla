@@ -4,7 +4,7 @@
  * @license https://opensource.org/licenses/GPL-2.0 GPL-2.0
  */
 
-import { setData, getData } from "@core/dom-utility";
+import { setData, getData } from "@core/dom";
 import { BlockEmbed } from "quill/blots/block";
 
 export default class ImageBlot extends BlockEmbed {

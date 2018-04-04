@@ -4,20 +4,20 @@
  * @module internal
  */
 
+import {addComponent, componentExists, getComponent} from "@core/application";
+import App from "@core/Main/App";
+import {logError} from "@core/utility";
 import React from 'react';
 import ReactDOM from 'react-dom';
-import {getComponent, componentExists, addComponent} from "@core/application";
-import {logError} from "@core/utility";
-import App from "@core/Main/App";
 
 /**
  * Mount all declared components on the dom.
  *
  * The page signifies that an element contains a component with the `data-react="<Component>"` attribute.
  *
- * @param {Element} parent The parent element to search. This element is not included in the search.
+ * @param parent - The parent element to search. This element is not included in the search.
  */
-export function _mountComponents(parent) {
+export function _mountComponents(parent: Element) {
     if (!componentExists('App')) {
         addComponent('App', App);
     }

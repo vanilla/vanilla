@@ -7,7 +7,7 @@
  */
 
 import { onContent, onReady } from "@core/application";
-import { initialize } from "./atwho";
+import { initializeAtComplete } from "./atwho";
 
 // Initialize legacy @mentions for all BodyBox elements.
 //
@@ -15,7 +15,7 @@ import { initialize } from "./atwho";
 // The advanced editor calls this function directly when in wysiwyg format, as it needs to
 // handle an iframe, and the editor instance needs to be referenced.
 if ($.fn.atwho) {
-    onReady(() => initialize(".BodyBox,.js-bodybox"));
-    onContent(() => initialize(".BodyBox,.js-bodybox"));
-    window.gdn.atCompleteInit = initialize;
+    onReady(() => initializeAtComplete(".BodyBox,.js-bodybox"));
+    onContent(() => initializeAtComplete(".BodyBox,.js-bodybox"));
+    window.gdn.atCompleteInit = initializeAtComplete;
 }

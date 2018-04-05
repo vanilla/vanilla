@@ -136,7 +136,7 @@ export class ParagraphToolbar extends React.PureComponent<IEditorContextProps, I
             >
                 <Icon/>
             </button>
-            <div id={this.menuID} className={this.getToolbarClasses()} style={this.getToolbarStyles()} ref={(ref) => this.toolbarNode = ref} role="menu">
+            <div id={this.menuID} className={this.getToolbarClasses()} style={this.getToolbarStyles()} ref={(ref) => this.toolbarNode = ref!} role="menu">
                 <Toolbar
                     quill={this.quill}
                     menuItems={initialToolbarItems}
@@ -166,7 +166,10 @@ export class ParagraphToolbar extends React.PureComponent<IEditorContextProps, I
         });
 
         if (parentElement && activeElement && parentElement.contains(activeElement)) {
-            document.getElementById(this.buttonID).focus();
+            const button = document.getElementById(this.buttonID);
+            if (button instanceof HTMLElement) {
+                button.focus();
+            }
         }
     }
 
@@ -178,7 +181,10 @@ export class ParagraphToolbar extends React.PureComponent<IEditorContextProps, I
     private escFunction = (event) => {
         if(event.keyCode === 27 && this.state.showMenu) {
             this.closeMenu(event);
-            document.getElementById(this.buttonID).focus();
+            const button = document.getElementById(this.buttonID);
+            if (button instanceof HTMLElement) {
+                button.focus();
+            }
         }
     }
 
@@ -306,7 +312,7 @@ export class ParagraphToolbar extends React.PureComponent<IEditorContextProps, I
         setImmediate(() => {
             const activeElement = document.activeElement;
             const paragraphMenu = document.getElementById(this.componentID);
-            if (activeElement !== paragraphMenu && !paragraphMenu.contains(activeElement)) {
+            if (paragraphMenu && activeElement !== paragraphMenu && !paragraphMenu.contains(activeElement)) {
                 this.closeMenu(event);
             }
         });

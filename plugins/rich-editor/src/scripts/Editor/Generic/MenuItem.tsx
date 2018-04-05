@@ -28,7 +28,7 @@ interface IProps {
     isLast: boolean;
     onClick: (event: React.MouseEvent<any>) => void;
     onBlur: (event?: React.FocusEvent<any>) => void;
-    role: string;
+    role?: string;
 }
 
 /**
@@ -78,7 +78,7 @@ export default class MenuItem extends React.Component<IProps> {
                 event.stopPropagation();
                 event.preventDefault();
                 if (this.props.isLast) {
-                    const firstSibling = this.domButton.parentElement.firstChild;
+                    const firstSibling = this.domButton.parentElement!.firstChild;
                     if (firstSibling instanceof HTMLElement) {
                         firstSibling.focus();
                     }
@@ -94,7 +94,7 @@ export default class MenuItem extends React.Component<IProps> {
                 event.stopPropagation();
                 event.preventDefault();
                 if (this.props.isFirst) {
-                    const lastSibling = this.domButton.parentElement.lastChild;
+                    const lastSibling = this.domButton.parentElement!.lastChild;
                     if (lastSibling instanceof HTMLElement) {
                         lastSibling.focus();
                     }

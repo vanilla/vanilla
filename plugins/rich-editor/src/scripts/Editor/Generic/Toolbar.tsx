@@ -20,7 +20,7 @@ interface IProps extends IEditorContextProps{
         [key: string]: IMenuItemData;
     };
     isHidden?: boolean;
-    onBlur?: (event: React.FocusEvent<any>) => void;
+    onBlur: (event: React.FocusEvent<any>) => void;
     itemRole?: string;
 }
 
@@ -144,7 +144,7 @@ export class Toolbar extends React.Component<IProps, IState> {
     private formatItem(itemKey) {
         const itemData = this.state[itemKey];
 
-        if ("formatter" in itemData) {
+        if (itemData.formatter) {
             itemData.formatter(itemData);
         } else {
             const formatName = itemData.formatName || itemKey;

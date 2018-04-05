@@ -18,6 +18,11 @@
             "@dashboard/*": ["./applications/dashboard/src/scripts/*"]
         }
     },
+    "include": [
+        "**/src/scripts/**/*.ts",
+        "**/src/scripts/**/*.tsx",
+        "global.ts"
+    ],
     "exclude": [
         "**/node_modules"
     ]

@@ -91,3 +91,11 @@
     cursor: default;
     opacity: .5;
 }
+
+@mixin singleLineEllipsis {
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    overflow-x: hidden;
+    max-width: 100%;
+}
+

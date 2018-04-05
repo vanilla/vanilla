@@ -67,7 +67,7 @@ class ResourceRoute extends Route {
 
 
         $this
-            ->setConstraint('id', ['regex' => '`^\d+$`', 'position' => 0])
+            ->setConstraint('id', ['position' => 0, 'notype' => ['regex' => '`^\d+$`']])
             ->setConstraint('page', '`^p\d+$`');
     }
 

@@ -240,7 +240,7 @@
             }
 
             var event = document.createEvent('CustomEvent');
-            event.initCustomEvent('X-DOMContentReady', true, false);
+            event.initCustomEvent('X-DOMContentReady', true, false, {});
             e.target.dispatchEvent(event);
         });
 

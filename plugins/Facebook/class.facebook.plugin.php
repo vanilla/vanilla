@@ -137,7 +137,8 @@ class FacebookPlugin extends Gdn_Plugin {
         }
 
         if (isset($sender->Data['Methods'])) {
-            $url = 'entry/facebook';
+            // pass the relative path, socialSigninButton handles the URL.
+            $url = '/entry/facebook';
 
             // Add the facebook method to the controller.
             $fbMethod = [
@@ -335,7 +336,7 @@ class FacebookPlugin extends Gdn_Plugin {
      */
     private function _getButton() {
         // pass the relative path, socialSigninButton handles the URL.
-        $url = 'entry/facebook';
+        $url = '/entry/facebook';
         return socialSigninButton('Facebook', $url, 'icon', ['rel' => 'nofollow']);
     }
 

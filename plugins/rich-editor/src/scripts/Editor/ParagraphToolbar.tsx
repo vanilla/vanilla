@@ -301,7 +301,7 @@ export class ParagraphToolbar extends React.PureComponent<IEditorContextProps, I
                 firstButton.focus();
             });
         }
-    };
+    }
 
     /**
      * Close if we lose focus on the component
@@ -316,7 +316,7 @@ export class ParagraphToolbar extends React.PureComponent<IEditorContextProps, I
                 this.closeMenu(event);
             }
         });
-    };
+    }
 
     /**
      * Get element containing menu items

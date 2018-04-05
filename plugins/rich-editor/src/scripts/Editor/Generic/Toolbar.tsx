@@ -90,6 +90,8 @@ export class Toolbar extends React.Component<IProps, IState> {
         const menuItems = menuItemList.map((itemName, key) => {
             const isActive = this.state[itemName].active;
 
+            const clickHandler = () => { this.formatItem(itemName); };
+
             return <MenuItem
                 propertyName={itemName}
                 label={t('richEditor.menu.' + itemName)}
@@ -97,7 +99,7 @@ export class Toolbar extends React.Component<IProps, IState> {
                 isActive={isActive}
                 isLast={key + 1 === menuItemList.length}
                 isFirst={key === 0}
-                onClick={() => { this.formatItem(itemName); } }
+                onClick={clickHandler}
                 onBlur={this.props.onBlur}
                 role={this.props.itemRole}
             />;

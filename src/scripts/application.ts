@@ -69,7 +69,7 @@ export function setMeta(key: string, value: any) {
  *
  * @returns Returns the translation or the default.
  */
-export function translate(str: string, defaultTranslation: string): string {
+export function translate(str: string, defaultTranslation?: string): string {
     // Codes that begin with @ are considered literals.
     if (str.substr(0, 1) === '@') {
         return str.substr(1);

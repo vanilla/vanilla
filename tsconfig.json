@@ -8,7 +8,7 @@
         ],
         "allowSyntheticDefaultImports": true,
         "moduleResolution": "node",
-        "strictNullChecks": true,
+        "strictNullChecks": false,
         "target": "es2017",
         "module": "esnext",
         "baseUrl": ".",

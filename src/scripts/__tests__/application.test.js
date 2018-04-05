@@ -28,6 +28,7 @@ describe("metaDataFunctions", () => {
         expect(application.getMeta("ui.bar.baz")).toBe("bam");
         expect(application.getMeta("ui.bar.bax", "de")).toBe("de");
         expect(application.getMeta("uiz.bar.bax", "de")).toBe("de");
+        expect(application.getMeta("ui.foo.bax", "de")).toBe("de");
     });
 
     it("dot syntax for nested setMeta values", () => {

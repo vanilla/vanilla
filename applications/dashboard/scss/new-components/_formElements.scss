@@ -1,13 +1,16 @@
 // This is only for new pages, with new form element markup.
 $lineHeight-base: 1.428571429;
-
+$fontSize-large: 16px !default;
+$fontSize-default: 14px !default;
+$fontSize-small: 12px !default;
 
 .inputBlock {
   display: block;
   margin-bottom: 24px;
 
   .checkbox {
-    display: block;
+    display: flex;
+    align-items: center;
   }
 
   &.hasError {
@@ -32,6 +35,8 @@ $lineHeight-base: 1.428571429;
 
 .inputBlock-error {
   color: #ff3933;
+  line-height: $lineHeight-base;
+  font-size: $fontSize-small;
 }
 
 .inputBlock-inputWrap {
@@ -48,16 +53,3 @@ $lineHeight-base: 1.428571429;
     margin-top: $baseUnit;
   }
 }
-
-
-
-
-
-
-
-
-
-
-
-
-

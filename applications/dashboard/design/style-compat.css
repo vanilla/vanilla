@@ -154,6 +154,11 @@ body.Entry #Content,
   margin-left: 12px;
 }
 
+.button.button-sso,
+.Button.button-sso {
+  background-image: none;
+}
+
 .button-ssoLabel {
   margin-left: 12px;
   font-size: 14px;
@@ -314,7 +319,8 @@ body.Categories.isMobile .PageControls.Top {
 }
 
 .inputBlock .checkbox {
-  display: block;
+  display: flex;
+  align-items: center;
 }
 
 .inputBlock.hasError .inputText {
@@ -336,6 +342,8 @@ body.Categories.isMobile .PageControls.Top {
 
 .inputBlock-error {
   color: #ff3933;
+  line-height: 1.428571429;
+  font-size: 12px;
 }
 
 .inputBlock-inputWrap {
@@ -363,6 +371,16 @@ body.Categories.isMobile .PageControls.Top {
   justify-content: center;
 }
 
+label.checkbox input.checkbox-input {
+  float: none;
+  margin: 0;
+}
+
+.checkbox-label {
+  margin-left: 6px;
+  line-height: inherit;
+}
+
 .button.button-fullWidth {
   width: 100%;
   max-width: 100%;
@@ -375,6 +393,10 @@ body.Categories.isMobile .PageControls.Top {
 
 .StrengthText.passwordStrength-gaugeLabel {
   margin-right: 0;
+}
+
+.passwordStrength.PasswordStrength {
+  padding: 0;
 }
 
 /*# sourceMappingURL=style-compat.css.map */

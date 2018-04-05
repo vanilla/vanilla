@@ -6,7 +6,6 @@ $authenticateUser-spacer: 18px !default;
 $authenticateUser-socialIcon_width: 42px !default;
 $authenticateUser-socialIcon_borderWidth: 3px !default;
 $authenticateUser-socialIcon_bg: #fff !default;
-$fontSize-small: 12px !default;
 $brand-color: #0291db !default;
 $baseUnit: 6px !default;
 $fontSize-large: 16px !default;
@@ -146,6 +145,11 @@ body.Entry #Content,
 .authenticateUser-ssoLabel {
     display: inline;
     margin-left: $baseUnit * 2;
+}
+
+.button.button-sso,
+.Button.button-sso {
+    background-image: none;
 }
 
 .button-ssoLabel {

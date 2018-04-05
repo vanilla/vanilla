@@ -16,6 +16,10 @@ use Vanilla\Addon;
  * Manages Assets.
  */
 class AssetModel extends Gdn_Model {
+    /**
+     * The number of seconds to wait after a deploy before switching the cache buster.
+     */
+    const CACHE_GRACE_PERIOD = 90;
 
     /** @var array List of CSS files to serve. */
     protected $_CssFiles = [];
@@ -204,7 +208,7 @@ class AssetModel extends Gdn_Model {
      * @return string
      */
     public function getInlinePolyfillJSContent(): string {
-        $polyfillFileUrl = asset("/js/polyfills/core-polyfills.js", false, $addVersion);
+        $polyfillFileUrl = asset("/js/polyfills/core-polyfills.js?h=".$this->cacheBuster(), false);
 
         $debug = c("Debug", false);
         $logAdding = $debug ? "console.log('Older browser detected. Initiating polyfills.');" : "";
@@ -512,6 +516,25 @@ class AssetModel extends Gdn_Model {
         }
 
         return md5(implode("\n", $keys));
+    }
+
+    /**
+     * Return a cache buster string.
+     *
+     * @return string Returns a string.
+     */
+    public function cacheBuster() {
+        if ($timestamp = c('Garden.Deployed')) {
+            $graced = $timestamp + static::CACHE_GRACE_PERIOD;
+            if (time() >= $graced) {
+                $timestamp = $graced;
+            }
+            $result = dechex($timestamp);
+        } else {
+            $result = APPLICATION_VERSION;
+        }
+
+        return $result;
     }
 
     /**

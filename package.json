@@ -27,7 +27,7 @@
         "@types/react-dom": "^16.0.4",
         "@vanillaforums/babel-preset": "^1.0.2",
         "@vanillaforums/eslint-config": "^1.2.2",
-        "@vanillaforums/tslint-config": "^1.0.2",
+        "@vanillaforums/tslint-config": "^1.0.3",
         "babel-core": "^6.26.0",
         "babel-eslint": "^8.2.1",
         "babel-jest": "^22.0.4",

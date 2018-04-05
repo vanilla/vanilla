@@ -1,6 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { getMeta } from "@core/application";
+import classNames from 'classnames';
 
 /**
  * A component for displaying and setting the document title.
@@ -17,8 +18,18 @@ import { getMeta } from "@core/application";
  */
 export default class DocumentTitle extends React.Component {
     static propTypes = {
-        title: PropTypes.string,
         children: PropTypes.node,
+        classNames: PropTypes.string,
+        title: PropTypes.string,
+    }
+
+    constructor(props) {
+        super(props);
+
+        this.classes = classNames(
+            'pageTitle',
+            {[this.props.classNames]: this.props.classNames}
+        );
     }
 
     componentDidMount() {
@@ -47,7 +58,7 @@ export default class DocumentTitle extends React.Component {
         if (this.props.children && this.props.children.length > 0) {
             return this.props.children;
         } else {
-            return <h1>{this.props.title}</h1>;
+            return <h1 className={this.classes}>{this.props.title}</h1>;
         }
     }
 }

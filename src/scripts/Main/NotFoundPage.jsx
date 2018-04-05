@@ -1,8 +1,8 @@
-import React from 'react';
+import DocumentTitle from '@core/Components/DocumentTitle';
 import PropTypes from "prop-types";
+import React from 'react';
 import { sprintf } from 'sprintf-js';
 import { t } from '@core/application';
-import DocumentTitle from '@core/Components/DocumentTitle';
 
 export default class NotFoundPage extends React.PureComponent {
 
@@ -27,7 +27,7 @@ NotFoundPage.defaultProps = {
 };
 
 NotFoundPage.propTypes = {
-    type: PropTypes.string,
-    title: PropTypes.string,
     message: PropTypes.string,
+    title: PropTypes.string,
+    type: PropTypes.string,
 };

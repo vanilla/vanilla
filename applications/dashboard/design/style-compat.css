@@ -11,6 +11,10 @@
   border: 0;
 }
 
+.isCentered {
+  text-align: center;
+}
+
 /** Hides the image cropper on mobile themes. This image cropper is not mobile compatible. */
 body.isMobile .box-crop .box-source {
   display: none;

@@ -31,7 +31,7 @@ interface IState {
 /**
  * Component for declaring a dynamic toolbar linked to a quill instance.
  */
-export class Toolbar extends React.PureComponent<IProps, IState> {
+export class Toolbar extends React.Component<IProps, IState> {
 
     private static defaultItems = {
         bold: {

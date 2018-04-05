@@ -240,8 +240,8 @@ export class EmojiPopover extends React.PureComponent {
                     scrollToRow={this.state.scrollTarget}
 
                     aria-readonly={null}
-                    aria-label={null}
-                    role={null}
+                    aria-label={""}
+                    role={""}
 
                     onScroll={this.handleEmojiScroll}
                     onSectionRendered={this.handleOnSectionRendered}

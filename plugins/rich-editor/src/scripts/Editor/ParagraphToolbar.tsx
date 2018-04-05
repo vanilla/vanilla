@@ -10,39 +10,57 @@ import { RangeStatic, Sources } from "quill";
 import Emitter from "quill/core/emitter";
 import { t } from "@core/application";
 import Toolbar from "./Generic/Toolbar";
-import { pilcrow as PilcrowIcon } from "./Icons";
+import * as Icons from "./Icons";
 import { closeEditorFlyouts, CLOSE_FLYOUT_EVENT } from "../Quill/utility";
 import { withEditor, IEditorContextProps } from "./ContextProvider";
 
-const menuItems = {
-    title: {
-        formatName: "header",
-        enableValue: 1,
-        active: false,
+const PARAGRAPH_ITEMS = {
+    header: {
+        1: {
+            name: "title",
+        },
+        2: {
+            name: "subtitle",
+        }
     },
-    subtitle: {
-        formatName: "header",
-        enableValue: 2,
-        active: false,
+    "blockquote-line": {
+        name: "blockquote",
     },
-    blockquote: {
-        formatName: "blockquote-line",
-        active: false,
+    "code-block": {
+        name: "codeBlock",
     },
-    codeBlock: {
-        formatName: "code-block",
-        active: false,
-    },
-    spoiler: {
-        formatName: "spoiler-line",
-        active: false,
+    "spoiler-line": {
+        name: "spoiler",
     },
 };
+
+const initialToolbarItems = {};
+
+
+// Parse our items that we use for detecting the active state into a format the toolbar can represent.
+for(const [formatName, contents] of Object.entries(PARAGRAPH_ITEMS)) {
+    if (formatName === "header") {
+        for(const [enableValue, headerContents] of Object.entries(contents)) {
+            initialToolbarItems[headerContents.name] = {
+                formatName,
+                enableValue,
+                active: false,
+            };
+        }
+    } else {
+        initialToolbarItems[(contents as any).name] = {
+            formatName,
+            enableValue: true,
+            active: false,
+        };
+    }
+}
 
 interface IState {
     range: RangeStatic;
     showMenu: boolean;
     showPilcrow: boolean;
+    activeFormatKey: string;
 }
 
 export class ParagraphToolbar extends React.PureComponent<IEditorContextProps, IState> {
@@ -73,6 +91,7 @@ export class ParagraphToolbar extends React.PureComponent<IEditorContextProps, I
                 index: 0,
                 length: 0,
             },
+            activeFormatKey: "pilcrow"
         };
     }
 
@@ -100,6 +119,8 @@ export class ParagraphToolbar extends React.PureComponent<IEditorContextProps, I
             pilcrowClasses += " isHidden";
         }
 
+        const Icon = Icons[this.state.activeFormatKey];
+
         return <div id={this.componentID} style={this.getPilcrowStyles()} className="richEditor-menu richEditorParagraphMenu">
             <button
                 type="button"
@@ -113,10 +134,15 @@ export class ParagraphToolbar extends React.PureComponent<IEditorContextProps, I
                 onClick={this.pilcrowClickHandler}
                 onKeyDown={this.handleKeyPress}
             >
-                <PilcrowIcon/>
+                <Icon/>
             </button>
             <div id={this.menuID} className={this.getToolbarClasses()} style={this.getToolbarStyles()} ref={(ref) => this.toolbarNode = ref} role="menu">
-                <Toolbar quill={this.quill} menuItems={menuItems} isHidden={!this.state.showMenu} checkForExternalFocus={this.checkForExternalFocus} itemRole="menuitem"/>
+                <Toolbar
+                    quill={this.quill}
+                    menuItems={initialToolbarItems}
+                    isHidden={!this.state.showMenu}
+                    onBlur={this.checkForExternalFocus} itemRole="menuitem"
+                />
                 <div role="presentation" className="richEditor-nubPosition">
                     <div className="richEditor-nub"/>
                 </div>
@@ -169,6 +195,25 @@ export class ParagraphToolbar extends React.PureComponent<IEditorContextProps, I
             if (typeof range.index !== "number") {
                 range = this.quill.getSelection();
             }
+
+
+            // Check which paragraph formatting items are ready.
+            const activeFormats = this.quill.getFormat(range);
+            let activeFormatKey = "pilcrow";
+            for(const [formatName, formatValue] of Object.entries(activeFormats)) {
+                if (formatName in PARAGRAPH_ITEMS) {
+                    let item = PARAGRAPH_ITEMS[formatName];
+
+                    // In case its a heading
+                    if (formatName === "header" && formatValue as string in item) {
+                        item = item[formatValue as string];
+                    }
+
+                    activeFormatKey = item.name;
+                }
+            }
+
+            this.setState({ activeFormatKey });
 
             if (range != null) {
                 this.setState({
@@ -256,6 +301,8 @@ export class ParagraphToolbar extends React.PureComponent<IEditorContextProps, I
      * Close if we lose focus on the component
      */
     private checkForExternalFocus = (event: React.FocusEvent<any>) => {
+        // See https://fb.me/react-event-pooling
+        event.persist();
         setImmediate(() => {
             const activeElement = document.activeElement;
             const paragraphMenu = document.getElementById(this.componentID);

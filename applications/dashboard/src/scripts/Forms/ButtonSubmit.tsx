@@ -22,9 +22,9 @@ export default class ButtonSubmit extends React.Component<IProps, IState> {
 
     constructor(props) {
         super(props);
-        this.type = "submit";
+        this.type = 'submit';
         UniqueID.enableUniqueIds(this);
-        this.ID = props.parentID + "-submitButton" + this.nextUniqueId();
+        this.ID = props.parentID + '-submitButton' + this.nextUniqueId();
         this.state = {
             disabled: props.disabled,
         };
@@ -39,7 +39,7 @@ export default class ButtonSubmit extends React.Component<IProps, IState> {
             this.props.className
         );
 
-        return <Button ID={this.ID} disabled={this.state.disabled} type="submit" content={this.props.content} className={componentClasses}>
+        return <Button ID={this.ID} disabled={this.state.disabled} type='submit' content={this.props.content} className={componentClasses}>
             {this.props.content}
         </Button>;
     }

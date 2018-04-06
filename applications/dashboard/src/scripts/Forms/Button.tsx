@@ -34,17 +34,17 @@ export default class Button extends React.Component<IProps, IState> {
         super(props);
 
         if (props.ID && props.parentID) {
-            throw new Error("You're not allowed to have both a parentID and an ID.");
+            throw new Error(`You're not allowed to have both a parentID and an ID.`);
         }
 
         if (props.parentID) {
             UniqueID.enableUniqueIds(this);
-            this.ID = props.parentID + "-button" + this.nextUniqueId();
+            this.ID = props.parentID + '-button' + this.nextUniqueId();
         } else {
             this.ID = props.ID;
         }
 
-        this.type = props.type || "button";
+        this.type = props.type || 'button';
         this.state = {
             disabled: props.disabled,
         };

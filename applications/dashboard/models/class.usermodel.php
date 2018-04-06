@@ -8,6 +8,8 @@
  * @since 2.0
  */
 
+use Garden\EventManager;
+
 /**
  * Handles user data.
  */
@@ -49,6 +51,9 @@ class UserModel extends Gdn_Model {
     /** Timeout for SSO */
     const SSO_TIMEOUT = 1200;
 
+    /** @var EventManager */
+    private $eventManager;
+
     /** @var */
     public $SessionColumns;
 
@@ -59,16 +64,38 @@ class UserModel extends Gdn_Model {
     public $UserMegaThreshold = 1000000;
 
     /**
-     * Class constructor. Defines the related database table name.
+     * @var bool
      */
-    public function __construct() {
+    private $nameUnique;
+
+    /**
+     * @var bool
+     */
+    private $emailUnique;
+
+    /**
+     * Class constructor. Defines the related database table name.
+     *
+     * @param EventManager $eventManager
+     */
+    public function __construct(EventManager $eventManager = null) {
         parent::__construct('User');
+
+        if ($eventManager === null) {
+            $this->eventManager = Gdn::getContainer()->get(EventManager::class);
+        } else {
+            $this->eventManager = $eventManager;
+        }
 
         $this->addFilterField([
             'Admin', 'Deleted', 'CountVisits', 'CountInvitations', 'CountNotifications', 'Preferences', 'Permissions',
             'LastIPAddress', 'AllIPAddresses', 'DateFirstVisit', 'DateLastActive', 'CountDiscussions', 'CountComments',
             'Score'
         ]);
+
+
+        $this->nameUnique = (bool)c('Garden.Registration.NameUnique', true);
+        $this->emailUnique = (bool)c('Garden.Registration.EmailUnique', true);
     }
 
     /**
@@ -1057,8 +1084,9 @@ class UserModel extends Gdn_Model {
      *
      * @param array $rows Results we need to associate user data with.
      * @param array $columns Database columns containing UserIDs to get data for.
+     * @param array $options Additional options. Passed to filter event.
      */
-    public function expandUsers(array &$rows, array $columns) {
+    public function expandUsers(array &$rows, array $columns, array $options = []) {
         // How are we supposed to lookup users by column if we don't have any columns?
         if (count($rows) === 0 || count($columns) === 0) {
             return;
@@ -1130,6 +1158,15 @@ class UserModel extends Gdn_Model {
             foreach ($rows as &$row) {
                 $populate($row);
             }
+        }
+
+        // Don't bother addons with whether or not this is a single row. Pack and unpack it here, as necessary.
+        if ($single) {
+            $rows = [$rows];
+        }
+        $rows = $this->eventManager->fireFilter('userModel_expandUsers', $rows, $options);
+        if ($single) {
+            $rows = reset($rows);
         }
     }
 
@@ -2178,8 +2215,8 @@ class UserModel extends Gdn_Model {
                     $confirmEmailRoleID = RoleModel::getDefaultRoles(RoleModel::TYPE_UNCONFIRMED);
                     if (!empty($confirmEmailRoleID)) {
                         // The confirm email role is set and it exists so go ahead with the email confirmation.
-                        $newKey = $this->confirmationCode();
-                        $emailKey = touchValue('EmailKey', $attributes, $newKey);
+                        $emailKey = $this->confirmationCode();
+                        setValue('EmailKey', $attributes, $emailKey);
                         $fields['Attributes'] = dbencode($attributes);
                         $fields['Confirmed'] = 0;
                     }
@@ -3298,7 +3335,7 @@ class UserModel extends Gdn_Model {
      * @param string $password
      * @return object|false Returns the user matching the credentials or **false** if the user doesn't validate.
      */
-    public function validateCredentials($email = '', $iD = 0, $password) {
+    public function validateCredentials($email = '', $iD = 0, $password, $throw = false) {
         $this->EventArguments['Credentials'] = ['Email' => $email, 'ID' => $iD, 'Password' => $password];
         $this->fireEvent('BeforeValidateCredentials');
 
@@ -3341,19 +3378,26 @@ class UserModel extends Gdn_Model {
             $dataSet = $this->SQL->get();
         }
 
-        if ($dataSet->numRows() < 1) {
+        if ($dataSet->numRows() < 1 || val('Deleted', $dataSet->firstRow())) {
+            if ($throw) {
+                $validation = new \Garden\Schema\Validation();
+                $validation->addError('username', sprintf(t('User not found.'), strtolower(t(UserModel::signinLabelCode()))), 404);
+                throw new \Garden\Schema\ValidationException($validation);
+            }
+
             return false;
         }
 
         $userData = $dataSet->firstRow();
-        // Check for a deleted user.
-        if (val('Deleted', $userData)) {
-            return false;
-        }
 
         $passwordHash = new Gdn_PasswordHash();
         $hashMethod = val('HashMethod', $userData);
         if (!$passwordHash->checkPassword($password, $userData->Password, $hashMethod, $userData->Name)) {
+            if ($throw) {
+                $validation = new \Garden\Schema\Validation();
+                $validation->addError('password', t('The password you entered is incorrect.'), 401);
+                throw new \Garden\Schema\ValidationException($validation);
+            }
             return false;
         }
 
@@ -4431,26 +4475,43 @@ class UserModel extends Gdn_Model {
     /**
      * Send forgot password email.
      *
-     * @param string $email
+     * @param string $input
+     * @param array $options
      * @return bool
      */
-    public function passwordRequest($email) {
-        if (!$email) {
+    public function passwordRequest($input, $options = []) {
+        $this->Validation->reset();
+        if (!$input) {
             return false;
         }
+        $log = $options['log'] ?? true;
 
-        $users = $this->getWhere(['Email' => $email])->resultObject();
-        if (count($users) == 0) {
+        $users = $this->getWhere(['Email' => $input])->resultObject();
+        if (empty($users)) {
+            // Don't allow username reset unless usernames are unique.
+            if (($this->isEmailUnique() || !$this->isNameUnique()) && filter_var($input, FILTER_VALIDATE_EMAIL) === false) {
+                $this->Validation->addValidationResult('Email', 'You must enter a valid email address.');
+                return false;
+            }
+
             // Check for the username.
-            $users = $this->getWhere(['Name' => $email])->resultObject();
+            $users = $this->getWhere(['Name' => $input])->resultObject();
         }
 
         $this->EventArguments['Users'] =& $users;
-        $this->EventArguments['Email'] = $email;
+        $this->EventArguments['Email'] = $input;
         $this->fireEvent('BeforePasswordRequest');
 
         if (count($users) == 0) {
-            $this->Validation->addValidationResult('Name', "Couldn't find an account associated with that email/username.");
+            $this->Validation->addValidationResult('', "Couldn't find an account associated with that email/username.");
+            if ($log) {
+                Logger::event(
+                    'password_reset_failure',
+                    Logger::INFO,
+                    'Can\'t find account associated with email/username {input}.',
+                    ['input' => $input]
+                );
+            }
             return false;
         }
 
@@ -4477,9 +4538,34 @@ class UserModel extends Gdn_Model {
 
             try {
                 $email->send();
-            } catch (Exception $e) {
+                if ($log) {
+                    Logger::event(
+                        'password_reset_request',
+                        Logger::INFO,
+                        '{email} has been sent a password reset email.',
+                        ['input' => $input, 'email' => $user->Email, 'forUserID' => $user->UserID]
+                    );
+                }
+            } catch (Exception $ex) {
+                if ($log) {
+                    if ($ex->getCode() === Gdn_Email::ERR_SKIPPED) {
+                        Logger::event(
+                            'password_reset_skipped',
+                            Logger::INFO,
+                            $ex->getMessage(),
+                            ['input' => $input, 'email' => $user->Email]
+                        );
+                    } else {
+                        Logger::event(
+                            'password_reset_failure',
+                            Logger::ERROR,
+                            'The password reset email to {email} failed to send.',
+                            ['input' => $input, 'email' => $user->Email]
+                        );
+                    }
+                }
                 if (debug()) {
-                    throw $e;
+                    throw $ex;
                 }
             }
 
@@ -4488,6 +4574,14 @@ class UserModel extends Gdn_Model {
 
         if ($noEmail) {
             $this->Validation->addValidationResult('Name', 'There is no email address associated with that account.');
+            if ($log) {
+                Logger::event(
+                    'password_reset_failure',
+                    Logger::INFO,
+                    'Can\'t find account associated with email/username {input}.',
+                    ['input' => $input]
+                );
+            }
             return false;
         }
         return true;
@@ -5026,5 +5120,45 @@ class UserModel extends Gdn_Model {
 
         $result = [$column, $direction];
         return $result;
+    }
+
+    /**
+     * Whether or not usernames have to be unique.
+     *
+     * @return bool Returns the setting.
+     */
+    public function isNameUnique() {
+        return $this->nameUnique;
+    }
+
+    /**
+     * Whether or not usernames have to be unique.
+     *
+     * @param bool $nameUnique The new setting.
+     * @return $this
+     */
+    public function setNameUnique(bool $nameUnique) {
+        $this->nameUnique = $nameUnique;
+        return $this;
+    }
+
+    /**
+     * Whether or not email addresses have to be unique.
+     *
+     * @return bool Returns the setting.
+     */
+    public function isEmailUnique() {
+        return $this->emailUnique;
+    }
+
+    /**
+     * Whether or not email addresses have to be unique.
+     *
+     * @param bool $emailUnique The new setting.
+     * @return $this
+     */
+    public function setEmailUnique(bool $emailUnique) {
+        $this->emailUnique = $emailUnique;
+        return $this;
     }
 }

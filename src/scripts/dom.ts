@@ -9,11 +9,11 @@ import * as utility from "@core/utility";
 /**
  * Use the browser's built-in functionality to quickly and safely escape a string.
  *
- * @param {string} str - The string to escape.
+ * @param str - The string to escape.
  *
- * @returns {string} - Escaped HTML.
+ * @returns Escaped HTML.
  */
-export function escapeHTML(str) {
+export function escapeHTML(str: string): string {
     const div = document.createElement("div");
     div.appendChild(document.createTextNode(str));
     return div.innerHTML;
@@ -23,23 +23,23 @@ export function escapeHTML(str) {
  * Use the browser's built-in functionality to quickly unescape a string.
  * UNSAFE with unsafe strings; only use on previously-escaped ones!
  *
- * @param {string} escapedString - A previously escaped string.
+ * @param escapedString - A previously escaped string.
  *
- * @returns {string} - The unescaped string.
+ * @returns The unescaped string.
  */
-export function unescapeHTML(escapedString) {
+export function unescapeHTML(escapedString: string): string {
     const div = document.createElement("div");
     div.innerHTML = escapedString;
     const child = div.childNodes[0];
-    return child ? child.nodeValue : "";
+    return child && child.nodeValue ? child.nodeValue : "";
 }
 
 /**
  * Add the hidden class and aria-hidden attribute to an Element.
  *
- * @param {HTMLElement} element - The DOM Element to modify.
+ * @param element - The DOM Element to modify.
  */
-export function hideElement(element) {
+export function hideElement(element: Element) {
     element.classList.add("u-isHidden");
     element.setAttribute("aria-hidden", "true");
 }
@@ -47,9 +47,9 @@ export function hideElement(element) {
 /**
  * Remove the hidden class and aria-hidden attribute to an Element.
  *
- * @param {HTMLElement} element - The DOM Element to modify.
+ * @param element - The DOM Element to modify.
  */
-export function unhideElement(element) {
+export function unhideElement(element: Element) {
     element.classList.remove("u-isHidden");
     element.removeAttribute("aria-hidden");
 }
@@ -57,11 +57,11 @@ export function unhideElement(element) {
 /**
  * Check if an element is visible or not.
  *
- * @param {HTMLElement} element - The element to check.
+ * @param element - The element to check.
  *
- * @returns {boolean} - The visibility.
+ * @returns The visibility.
  */
-export function elementIsVisible(element) {
+export function elementIsVisible(element: HTMLElement): boolean {
     return !!(element.offsetWidth || element.offsetHeight || element.getClientRects().length);
 }
 
@@ -70,14 +70,19 @@ const delegatedEventListeners = {};
 /**
  * Create an event listener using event delegation.
  *
- * @param {string} eventName - The Event to listen for.
- * @param {string} filterSelector - A CSS selector to match against.
- * @param {function} callback - The callback function. This gets passed the fired event.
- * @param {string=} scopeSelector - And element to scope the event listener to.
+ * @param eventName - The Event to listen for.
+ * @param filterSelector - A CSS selector to match against.
+ * @param callback - The callback function. This gets passed the fired event.
+ * @param scopeSelector - And element to scope the event listener to.
  *
- * @returns {string} - The hash of the event. Save this to use removeDelegatedEvent().
+ * @returns The hash of the event. Save this to use removeDelegatedEvent().
  */
-export function delegateEvent(eventName, filterSelector, callback, scopeSelector) {
+export function delegateEvent(
+    eventName: string,
+    filterSelector: string,
+    callback: () => void,
+    scopeSelector?: string
+): string | undefined {
     let functionKey = eventName + filterSelector + callback.toString();
 
     /** @type {Document | Element} */
@@ -87,7 +92,7 @@ export function delegateEvent(eventName, filterSelector, callback, scopeSelector
         scope = document.querySelector(scopeSelector);
 
         if (!scope) {
-            return;
+            throw new Error(`Unable to find element in the document for scopeSelector: ${scopeSelector}`);
         } else {
             functionKey += scopeSelector;
         }
@@ -122,9 +127,9 @@ export function delegateEvent(eventName, filterSelector, callback, scopeSelector
 /**
  * Remove a delegated event listener.
  *
- * @param {string} eventHash - The event hash passed from delegateEvent().
+ * @param eventHash - The event hash passed from delegateEvent().
  */
-export function removeDelegatedEvent(eventHash) {
+export function removeDelegatedEvent(eventHash: string) {
     const { scope, eventName, wrappedCallback } = delegatedEventListeners[eventHash];
     scope.removeEventListener(eventName, wrappedCallback);
     delete delegatedEventListeners[eventHash];
@@ -139,10 +144,10 @@ export function removeAllDelegatedEvents() {
 /**
  * Toggle any attribute on an element.
  *
- * @param {Element} element - The element to toggle on.
- * @param {string} attribute - The attribute to toggle.
+ * @param element - The element to toggle on.
+ * @param attribute - The attribute to toggle.
  */
-export function toggleAttribute(element, attribute) {
+export function toggleAttribute(element: Element, attribute: string) {
     const newValue = element.getAttribute(attribute) === "false";
     element.setAttribute(attribute, newValue);
 }
@@ -152,11 +157,11 @@ const dataMap = new WeakMap();
 /**
  * Set a piece of data specific to a DOM Element. Similar to `$.data`.
  *
- * @param {Element} element - The DOM Element to assosciate the data with.
- * @param {string} key - The key to assosciate the data with.
- * @param {string} value - The value to store.
+ * @param element - The DOM Element to assosciate the data with.
+ * @param key - The key to assosciate the data with.
+ * @param value - The value to store.
  */
-export function setData(element, key, value) {
+export function setData(element: Element, key: string, value: any) {
     const initialValue = dataMap.has(element) ? dataMap.get(element) : {};
     initialValue[key] = value;
 
@@ -166,13 +171,11 @@ export function setData(element, key, value) {
 /**
  * Get a piece of data specific to a DOM Element. Similar to `$.data`.
  *
- * @param {Element} element - The DOM Element to lookup.
- * @param {string} key - The key to lookup.
- * @param {any=} defaultValue - A value to use if the element or key aren't found.
- *
- * @return {any}
+ * @param element - The DOM Element to lookup.
+ * @param key - The key to lookup.
+ * @param defaultValue - A value to use if the element or key aren't found.
  */
-export function getData(element, key, defaultValue) {
+export function getData(element: Element, key: string, defaultValue?: any) {
     if (dataMap.has(element) && dataMap.get(element)[key]) {
         return dataMap.get(element)[key];
     }
@@ -184,11 +187,4 @@ export function getData(element, key, defaultValue) {
     }
 
     return defaultValue;
-}
-
-/**
- * Render a react component.
- */
-export function renderComponent() {
-
 }

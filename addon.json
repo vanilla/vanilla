@@ -4,29 +4,32 @@
         "process": "core",
         "entries": {
             "bootstrap-app": "./src/scripts/bootstrap/bootstrap.js",
-            "bootstrap-admin": "./src/scripts/bootstrap/bootstrap.js"
+            "bootstrap-admin": "./src/scripts/bootstrap/bootstrap.js",
+            "polyfills": "./src/scripts/bootstrap/polyfills"
         },
         "exports": {
-            "app": [
-                "./src/scripts/events",
+            "*": [
+                "./src/scripts/application",
+                "./src/scripts/apiv2",
                 "./src/scripts/gdn",
                 "./src/scripts/permissions",
                 "./src/scripts/utility",
-                "./src/scripts/dom-utility",
+                "./src/scripts/dom",
+                "./src/scripts/Components/DocumentTitle",
+                "./src/scripts/Main/NotFoundPage",
                 "axios",
+                "classnames",
+                "moment",
                 "react",
-                "react-dom"
+                "react-dom",
+                "react-redux",
+                "react-router-dom",
+                "redux",
+                "prop-types",
+                "sprintf-js"
             ],
-            "admin": [
-                "./src/scripts/events",
-                "./src/scripts/gdn",
-                "./src/scripts/permissions",
-                "./src/scripts/utility",
-                "./src/scripts/dom-utility",
-                "axios",
-                "react",
-                "react-dom"
-            ]
+            "app": [],
+            "admin": []
         }
     }
 }

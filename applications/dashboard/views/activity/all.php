@@ -8,6 +8,7 @@ $this->fireEvent('BeforeStatusForm');
 $Session = Gdn::session();
 if ($Session->checkPermission('Garden.Profiles.Edit')) {
     echo '<div class="FormWrapper FormWrapper-Condensed">';
+    echo '<h2 class="sr-only">'.t('Post Comment').'</h2>';
     echo $this->Form->open(['action' => url('/activity/post/'.$this->data('Filter')), 'class' => 'Activity']);
     echo $this->Form->errors();
     echo $this->Form->bodyBox('Comment', ['Wrap' => true]);
@@ -20,6 +21,7 @@ if ($Session->checkPermission('Garden.Profiles.Edit')) {
     echo '</div>';
 }
 echo '</div>';
+echo '<h2 class="sr-only">'.t('Activity List').'</h2>';
 echo '<ul class="DataList Activities">';
 
 $Activities = $this->data('Activities', []);

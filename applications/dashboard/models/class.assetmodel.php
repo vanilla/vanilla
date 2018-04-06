@@ -16,6 +16,10 @@ use Vanilla\Addon;
  * Manages Assets.
  */
 class AssetModel extends Gdn_Model {
+    /**
+     * The number of seconds to wait after a deploy before switching the cache buster.
+     */
+    const CACHE_GRACE_PERIOD = 90;
 
     /** @var array List of CSS files to serve. */
     protected $_CssFiles = [];
@@ -196,6 +200,34 @@ class AssetModel extends Gdn_Model {
         $result = array_merge($libs, $addons);
 
         return $result;
+    }
+
+    /**
+     * Get the content for an inline polyfill script.
+     *
+     * @return string
+     */
+    public function getInlinePolyfillJSContent(): string {
+        $polyfillFileUrl = asset("/js/polyfills/core-polyfills.js?h=".$this->cacheBuster(), false);
+
+        $debug = c("Debug", false);
+        $logAdding = $debug ? "console.log('Older browser detected. Initiating polyfills.');" : "";
+        $logNotAdding = $debug ? "console.log('Modern browser detected. No polyfills necessary');" : "";
+
+        // Add the polyfill loader.
+        $scriptContent =
+            "var supportsAllFeatures = window.Promise && window.fetch && window.Symbol"
+            ."&& window.CustomEvent && Element.prototype.remove && Element.prototype.closest"
+            ."&& window.NodeList && NodeList.prototype.forEach;"
+            ."if (!supportsAllFeatures) {"
+            .$logAdding
+            ."var head = document.getElementsByTagName('head')[0];"
+            ."var script = document.createElement('script');"
+            ."script.src = '$polyfillFileUrl';"
+            ."head.appendChild(script);"
+            ."} else { $logNotAdding }";
+
+        return $scriptContent;
     }
 
     /**
@@ -484,6 +516,25 @@ class AssetModel extends Gdn_Model {
         }
 
         return md5(implode("\n", $keys));
+    }
+
+    /**
+     * Return a cache buster string.
+     *
+     * @return string Returns a string.
+     */
+    public function cacheBuster() {
+        if ($timestamp = c('Garden.Deployed')) {
+            $graced = $timestamp + static::CACHE_GRACE_PERIOD;
+            if (time() >= $graced) {
+                $timestamp = $graced;
+            }
+            $result = dechex($timestamp);
+        } else {
+            $result = APPLICATION_VERSION;
+        }
+
+        return $result;
     }
 
     /**

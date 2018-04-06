@@ -662,14 +662,6 @@ class DiscussionModel extends Gdn_Model {
             unset($where['CategoryID']);
         }
 
-        // Determine category watching
-        if (!isset($where['d.CategoryID'])) {
-            $categoryIDs = CategoryModel::instance()->getVisibleCategoryIDs(['filterHideDiscussions' => true]);
-            if ($categoryIDs !== true) {
-                $where['d.CategoryID'] = $categoryIDs;
-            }
-        }
-
         $where = $this->combineWheres($this->getWheres(), $where);
 
         $orderBy = [];

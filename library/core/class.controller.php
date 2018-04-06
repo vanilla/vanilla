@@ -224,8 +224,9 @@ class Gdn_Controller extends Gdn_Pluggable {
             'definitionlist', 'deliverymethod', 'deliverytype', 'description', 'errormessages', 'fetchview',
             'fetchviewlocation', 'finalize', 'getasset', 'getimports', 'getjson', 'getstatusmessage', 'image',
             'informmessage', 'intitialize', 'isinternal', 'jsfiles', 'json', 'jsontarget', 'masterview', 'pagename',
-            'permission', 'removecssfile', 'render', 'xrender', 'renderasset', 'renderdata', 'renderexception', 'rendermaster',
-            'sendheaders', 'setdata', 'setformsaved', 'setheader', 'setjson', 'setlastmodified', 'statuscode', 'title'
+            'permission', 'removecssfile', 'render', 'xrender', 'renderasset', 'renderdata', 'renderexception',
+            'rendermaster', 'renderreact', 'sendheaders', 'setdata', 'setformsaved', 'setheader', 'setjson',
+            'setlastmodified', 'statuscode', 'title'
         ];
         $this->MasterView = '';
         $this->ModuleSortContainer = '';
@@ -619,6 +620,23 @@ class Gdn_Controller extends Gdn_Pluggable {
             $this->_Definitions['debug'] = true;
         }
 
+        // These items are added in a controlled matter for newer client-side apps so are nested.
+        $this->_Definitions += [
+            'context' => [], 'ui' => []
+        ];
+
+        $this->_Definitions['context'] += [
+            'host' => Gdn::request()->domain(),
+            'basePath' => rtrim('/'.trim(Gdn::request()->webRoot(), '/'), '/'),
+            'assetPath' => rtrim('/'.trim(Gdn::request()->assetRoot(), '/'), '/'),
+        ];
+        $this->_Definitions['ui'] += [
+            'siteName' => c('Garden.Title'),
+            'siteTitle' => c('Garden.HomepageTitle', c('Garden.Title')),
+            'locale' => Gdn::locale()->current(),
+            'inputFormat' => strtolower(c('Garden.InputFormatter')),
+        ];
+
         // Output a JavaScript object with all the definitions.
         $result = 'gdn=window.gdn||{};'.
             'gdn.meta='.json_encode($this->_Definitions).';'.
@@ -788,6 +806,9 @@ class Gdn_Controller extends Gdn_Pluggable {
 
                 $basePath = val('SearchPath', $pluginInfo);
                 $applicationFolder = val('Folder', $pluginInfo);
+            } elseif ($applicationFolder === 'core') {
+                $basePath = PATH_ROOT;
+                $applicationFolder = 'resources';
             } else {
                 $basePath = PATH_APPLICATIONS;
                 $applicationFolder = strtolower($applicationFolder);
@@ -1585,6 +1606,16 @@ class Gdn_Controller extends Gdn_Pluggable {
     }
 
     /**
+     * Render a page that hosts a react component.
+     */
+    public function renderReact() {
+        if (!$this->data('hasPanel')) {
+            $this->CssClass .= ' NoPanel';
+        }
+        $this->render('react', '', 'core');
+    }
+
+    /**
      *
      *
      * @param $value
@@ -1826,16 +1857,19 @@ class Gdn_Controller extends Gdn_Pluggable {
 
                 $this->Head->addScript('', 'text/javascript', false, ['content' => $this->definitionList(false)]);
 
-                $busta = trim(assetVersion('', ''), '.');
+                $busta = $AssetModel->cacheBuster();
 
                 // Add the client-side translations.
                 // This is done in the controller rather than the asset model because the translations are not linked to compiled code.
                 $this->Head->addScript(url('/api/v2/locales/'.rawurlencode(Gdn::locale()->current())."/translations?js=1&x-cache=1&h=$busta", true), 'text/javascript', false, ['defer' => 'true']);
 
+                $polyfillContent = $AssetModel->getInlinePolyfillJSContent();
+                $this->Head->addScript(null, null, false, ["content" => $polyfillContent]);
+
                 // Add the built addon javascript files.
                 $addonJs = $AssetModel->getAddonJsFiles($ThemeType, $this->MasterView === 'admin' ? 'admin' : 'app', $ETag);
                 foreach ($addonJs as $path) {
-                    $this->Head->addScript(asset($path)."?h=$busta", 'text/javascript', false, ['defer' => 'true']);
+                    $this->Head->addScript($path."?h=$busta", 'text/javascript', false, ['defer' => 'true']);
                 }
 
                 foreach ($this->_JsFiles as $Index => $JsInfo) {

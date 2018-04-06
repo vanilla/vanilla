@@ -5,7 +5,7 @@
  * @license GPLv2
  */
 
-namespace Vanilla\Dashboard\Controllers;
+namespace Vanilla\Dashboard\Controllers\API;
 
 use Garden\Schema\Schema;
 use Vanilla\Web\Controller;

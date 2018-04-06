@@ -11,6 +11,7 @@ use PHPUnit\Framework\TestCase;
 use Vanilla\Utility\CamelCaseScheme;
 use VanillaTests\InternalClient;
 use VanillaTests\SiteTestTrait;
+use VanillaTests\TestLogger;
 
 abstract class AbstractAPIv2Test extends TestCase {
     use SiteTestTrait;
@@ -29,6 +30,11 @@ abstract class AbstractAPIv2Test extends TestCase {
      * @var array Fields that are getting formatted using the format column.
      */
     protected $formattedFields = ['body'];
+
+    /**
+     * @var TestLogger
+     */
+    protected $logger;
 
     /**
      * Whether to start a session on setUp() or not.
@@ -52,6 +58,8 @@ abstract class AbstractAPIv2Test extends TestCase {
             $this->api->setTransientKey(md5(now()));
         }
 
+        $this->logger = new TestLogger();
+        \Logger::addLogger($this->logger);
     }
 
     /**
@@ -60,6 +68,8 @@ abstract class AbstractAPIv2Test extends TestCase {
     public function tearDown() {
         parent::tearDown();
         $this->api = null;
+        \Logger::removeLogger($this->logger);
+        $this->logger = null;
     }
 
     /**
@@ -131,5 +141,15 @@ abstract class AbstractAPIv2Test extends TestCase {
         $result = $this->api()->get(str_replace('/api/v2', '', $matches[1]));
         $this->assertEquals(200, $result->getStatusCode());
         $this->assertEquals(1, count($result->getBody()));
+    }
+
+    /**
+     * Assert that something was logged.
+     *
+     * @param array $filter The log filter.
+     */
+    public function assertLog($filter = []) {
+        $item = $this->logger->search($filter);
+        $this->assertNotNull($item, "Could not find expected log: ".json_encode($filter));
     }
 }

@@ -194,6 +194,20 @@
         });
     });
 
+    function accessibleButtonsInit() {
+        $(document).delegate("[role=button]", 'keydown', function(event) {
+            var $button = $(this);
+            var ENTER_KEY = 13;
+            var SPACE_KEY = 32;
+            var isActiveElement = document.activeElement === $button[0];
+            var isSpaceOrEnter = event.keyCode === ENTER_KEY || event.keyCode === SPACE_KEY;
+            if (isActiveElement && isSpaceOrEnter) {
+                event.preventDefault();
+                $button.click();
+            }
+        });
+    }
+
     $(document).on("contentLoad", function(e) {
         // Setup AJAX filtering for flat category module.
         // Find each flat category module container, if any.
@@ -232,8 +246,21 @@
             });
         });
 
+        // A vanilla JS event wrapper for the contentLoad event so that the new framework can handle it.
+        $(document).on("contentLoad", function(e) {
+            // Don't fire on initial document ready.
+            if (e.target === document) {
+                return;
+            }
+
+            var event = document.createEvent('CustomEvent');
+            event.initCustomEvent('X-DOMContentReady', true, false, {});
+            e.target.dispatchEvent(event);
+        });
+
         // Set up accessible flyouts
         $('.ToggleFlyout, .editor-dropdown, .ButtonGroup').accessibleFlyoutsInit();
+        accessibleButtonsInit();
     });
 })(window, jQuery);
 
@@ -2228,7 +2255,7 @@ $.fn.extend({
 
     setFlyoutAttributes: function () {
         $(this).each(function(){
-            var $handle = $(this).find('.FlyoutButton, .Handle, .editor-action:not(.editor-action-separator)');
+            var $handle = $(this).find('.FlyoutButton, .Button-Options, .Handle, .editor-action:not(.editor-action-separator)');
             var $flyout = $(this).find('.Flyout, .Dropdown');
             var isOpen = $flyout.is(':visible');
 
@@ -2242,7 +2269,7 @@ $.fn.extend({
 
         $context.each(function(){
 
-            $context.find('.FlyoutButton, .Handle, .editor-action:not(.editor-action-separator)').each(function (){
+            $context.find('.FlyoutButton, .Button-Options, .Handle, .editor-action:not(.editor-action-separator)').each(function (){
                 $(this)
                     .attr('tabindex', '0')
                     .attr('role', 'button')
@@ -2259,7 +2286,7 @@ $.fn.extend({
                 });
             });
         });
-    }
+    },
 });
 
 })(jQuery);

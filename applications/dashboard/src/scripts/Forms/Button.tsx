@@ -5,7 +5,7 @@ import * as PropTypes from "prop-types";
 import UniqueID from "react-html-id";
 
 interface IBaseProps {
-    className: string;
+    className?: string;
     type: string;
     content: string | Node;
     disabled: boolean;

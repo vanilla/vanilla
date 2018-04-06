@@ -8,7 +8,7 @@ import UniqueID from "react-html-id";
 interface IProps {
     content: string | Node;
     parentID: string;
-    className: string;
+    className?: string;
 }
 
 interface IState {

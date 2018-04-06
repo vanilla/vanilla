@@ -64,7 +64,7 @@ export default class RequestPasswordPage extends React.Component<IState> {
                 {pageTitle}
                 <p className="authenticateUser-paragraph">{t('A message has been sent to your email address with password reset instructions.')}</p>
                 <RememberPassword/>
-            </div;
+            </div>;
         } else {
             return <div className="authenticateUserCol">
                 {pageTitle}

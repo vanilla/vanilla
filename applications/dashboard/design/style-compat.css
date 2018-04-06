@@ -40,7 +40,7 @@ body.isMobile .change-picture .change-picture-instructions {
 .authenticateUserCol {
   padding: 0 26px;
   margin: auto;
-  width: 363px;
+  width: 385px;
   max-width: 100%;
   box-sizing: border-box;
 }
@@ -321,6 +321,11 @@ body.Categories.isMobile .PageControls.Top {
   color: #ff3933;
 }
 
+.inputBlock-errors,
+.inputBlock-labelAndDescription {
+  display: block;
+}
+
 .inputBlock-labelText {
   display: block;
   font-weight: 600;
@@ -333,6 +338,7 @@ body.Categories.isMobile .PageControls.Top {
 }
 
 .inputBlock-error {
+  display: block;
   color: #ff3933;
   line-height: 1.428571429;
   font-size: 12px;
@@ -351,6 +357,10 @@ body.Categories.isMobile .PageControls.Top {
 
 .inputBlock-labelNote + .inputBlock-inputWrap {
   margin-top: 6px;
+}
+
+.authenticateUser-paragraph.isError {
+  color: #ff3933;
 }
 
 .checkbox-box {

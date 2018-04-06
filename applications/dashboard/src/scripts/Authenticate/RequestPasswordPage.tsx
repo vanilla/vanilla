@@ -7,10 +7,13 @@ import React from 'react';
 import UniqueID from "react-html-id";
 import RememberPassword from "./RememberPassword";
 import ButtonSubmit from "../Forms/ButtonSubmit";
+import Paragraph from "../Forms/Paragraph";
+import InputTextBlock from "../Forms/InputTextBlock";
 
 interface IState {
-    isEditable: string;
-    emailSent: string;
+    isEditable: boolean;
+    emailSent: boolean;
+    errors?: string[];
 }
 
 export default class RequestPasswordPage extends React.Component<IState> {
@@ -29,7 +32,7 @@ export default class RequestPasswordPage extends React.Component<IState> {
 
         this.state = {
             isEditable: true,
-            emailSent: false
+            emailSent: false,
         };
 
     }
@@ -62,13 +65,15 @@ export default class RequestPasswordPage extends React.Component<IState> {
         if (this.state.emailSent) {
             return <div className="authenticateUserCol">
                 {pageTitle}
-                <p className="authenticateUser-paragraph">{t('A message has been sent to your email address with password reset instructions.')}</p>
+                <Paragraph content={t('A message has been sent to your email address with password reset instructions.')} className="authenticateUser-paragraph" />
                 <RememberPassword/>
             </div>;
         } else {
             return <div className="authenticateUserCol">
                 {pageTitle}
+                <Paragraph content={t('Enter your email address or username to continue.')} className="authenticateUser-paragraph" />
                 <form onSubmit={this.handleSubmit}>
+                    <InputTextBlock parentID={this.ID} label={t('Email/Username')} required={true} errors={this.state.errors}/>
                     <ButtonSubmit parentID={this.ID} content={t('Request a new password')}/>
                 </form>
                 <RememberPassword/>

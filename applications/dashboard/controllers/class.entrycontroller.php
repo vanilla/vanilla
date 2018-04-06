@@ -1135,10 +1135,10 @@ class EntryController extends Gdn_Controller {
                 throw new Exception();
             }
 
-            // Try to load the authenticator
+            // Try to load the Authenticator
             $authenticator = Gdn::authenticator()->authenticateWith($authenticationSchemeAlias);
 
-            // Try to grab the authenticator data
+            // Try to grab the Authenticator data
             $payload = $authenticator->getHandshake();
             if ($payload === false) {
                 Gdn::request()->withURI('dashboard/entry/auth/password');

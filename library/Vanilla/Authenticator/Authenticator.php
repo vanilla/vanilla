@@ -15,7 +15,9 @@ use Garden\Web\RequestInterface;
 abstract class Authenticator {
 
     /**
-     * Identifier of this authenticator instance.
+     * Identifier of this Authenticator instance.
+     *
+     * If the Authenticator {@link isUnique()} the ID should match the {@link getType}.
      *
      * Extending classes will most likely require to have a dependency on RequestInterface so that they can
      * fetch the ID from the URL and throw an exception if it is not found or invalid.
@@ -24,7 +26,7 @@ abstract class Authenticator {
      */
     private $authenticatorID;
 
-    /** @var bool Determine if this authenticator is active or not. */
+    /** @var bool Determine if this Authenticator is active or not. */
     private $active = true;
 
     /**
@@ -35,6 +37,10 @@ abstract class Authenticator {
      * @param string $authenticatorID
      */
     public function __construct($authenticatorID) {
+        if (static::isUnique() && $authenticatorID !== self::getType()) {
+            throw new \Exception('Unique Authenticators must have getID() === getType()');
+        }
+
         $this->authenticatorID = $authenticatorID;
 
         $classParts = explode('\\', static::class);
@@ -54,19 +60,20 @@ abstract class Authenticator {
     public static function getAuthenticatorSchema(): Schema {
         return Schema::parse([
             'authenticatorID:s' => 'Authenticator instance\'s identifier.',
-            'type:s' => 'Authenticator instance\'s type.',
-            'name:s' => 'User friendly name of the authenticator.',
+            'type' => null,
+            'name' => null,
             'getSignInUrl:s|n' => 'The configured relative sign in URL of the provider.',
             'getRegisterUrl:s|n' => 'The configured relative register URL of the provider.',
             'getSignOutUrl:s|n' => 'The configured relative sign out URL of the provider.',
             'ui:o' => static::getUiSchema(),
-            'isActive:b' => 'Whether or not the authenticator can be used.',
+            'isActive:b' => 'Whether or not the Authenticator can be used.',
+            'isUnique' => null,
             'attributes:o' => 'Provider specific attributes',
-        ]);
+        ])->merge(self::getAuthenticatorTypeSchema());
     }
 
     /**
-     * Information on this type of authenticator.
+     * Information on this type of Authenticator.
      * Check {@link getAuthenticatorTypeSchema()} to know what is returned by this function.
      *
      * @throws ValidationException
@@ -80,7 +87,7 @@ abstract class Authenticator {
     }
 
     /**
-     * Return authenticator type default information.
+     * Return Authenticator type default information.
      * This method is intended to fill information so that child classes won't have to do it.
      * Use {@link getAuthenticatorTypeInfoImpl()} to fill the "final" information.
      *
@@ -97,7 +104,7 @@ abstract class Authenticator {
     }
 
     /**
-     * Return essential non-default authenticator type information.
+     * Return essential non-default Authenticator type information.
      *
      * Must be returned by this method:
      * - ui.photoUrl
@@ -110,19 +117,19 @@ abstract class Authenticator {
     abstract protected static function getAuthenticatorTypeInfoImpl(): array;
 
     /**
-     * Get the authenticator type schema.
+     * Get the Authenticator type schema.
      *
      * @return Schema
      */
     public static function getAuthenticatorTypeSchema(): Schema {
         return Schema::parse([
             'type:s' => 'Authenticator instance\'s type.',
-            'name:s' => 'User friendly name of the authenticator.',
+            'name:s' => 'User friendly name of the Authenticator.',
             'ui:o'  => Schema::parse([
                 'photoUrl' => null,
                 'backgroundColor' => null,
             ])->add(static::getUiSchema()),
-            'isUnique:b' => 'Whether one or more authenticators of this type can be created.',
+            'isUnique:b' => 'Whether this Authenticator can have multiple instances or not. Unique authenticators have authenticatorID equal to their type.',
         ]);
     }
 
@@ -147,13 +154,13 @@ abstract class Authenticator {
     }
 
     /**
-     * Get the authenticator UI information schema.
+     * Get the Authenticator UI information schema.
      *
      * @return Schema
      */
      public static function getUiSchema(): Schema {
         return Schema::parse([
-            'url:s' => 'Local relative URL from which you can initiate the SignIn process with this authenticator',
+            'url:s' => 'Local relative URL from which you can initiate the SignIn process with this Authenticator',
             'photoUrl:s' => 'The relative icon URL for the button.',
             'buttonName:s' => 'The display text to put in the button. Ex: "Sign in with Facebook"',
             'backgroundColor:s' => 'A css color code. (Hex color, rgb or rgba)',
@@ -161,7 +168,7 @@ abstract class Authenticator {
     }
 
     /**
-     * Tell whether this type of authenticator can have multiple instance or not.
+     * Tell whether this type of Authenticator can have multiple instance or not.
      *
      * @return bool
      */
@@ -189,7 +196,7 @@ abstract class Authenticator {
     }
 
     /**
-     * Return authenticator default information.
+     * Return Authenticator default information.
      *
      * This method is intended to fill information so that child classes won't have to do it.
      * Use {@link getAuthenticatorInfoImpl()} to fill the "final" information.
@@ -211,7 +218,7 @@ abstract class Authenticator {
     }
 
     /**
-     * Get all the authenticator information.
+     * Get all the Authenticator information.
      *
      * @throws ValidationException
      * @return array
@@ -226,7 +233,7 @@ abstract class Authenticator {
     }
 
     /**
-     * Return essential non-default authenticator information.
+     * Return essential non-default Authenticator information.
      *
      * Must be returned by this method:
      * - ui.buttonName
@@ -238,7 +245,7 @@ abstract class Authenticator {
     abstract protected function getAuthenticatorInfoImpl(): array;
 
     /**
-     * Getter of the authenticator's ID.
+     * Getter of the Authenticator's ID.
      *
      * @return string
      */

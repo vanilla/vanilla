@@ -7,6 +7,7 @@
 
 namespace Vanilla\Authenticator;
 
+use Exception;
 use Garden\Schema\Schema;
 use Garden\Web\RequestInterface;
 use Vanilla\Models\SSOData;
@@ -14,21 +15,21 @@ use Vanilla\Models\SSOData;
 abstract class SSOAuthenticator extends Authenticator {
 
     /**
-     * Determine whether the authenticator can automatically link users by email.
+     * Determine whether the Authenticator can automatically link users by email.
      *
      * @var bool
      */
     private $autoLinkUser = false;
 
     /**
-     * Whether or not, using the authenticator, the user can link his account from the profile page.'
+     * Whether or not, using the Authenticator, the user can link his account from the profile page.'
      *
      * @var bool
      */
     private $linkSession = false;
 
     /**
-     * Tells whether the data returned by this authenticator is authoritative or not.
+     * Tells whether the data returned by this Authenticator is authoritative or not.
      * User info/roles can only be synchronized by trusted authenticators.
      *
      * @var bool
@@ -36,7 +37,7 @@ abstract class SSOAuthenticator extends Authenticator {
     private $signIn = false;
 
     /**
-     * Tells whether the data returned by this authenticator is authoritative or not.
+     * Tells whether the data returned by this Authenticator is authoritative or not.
      * User info/roles can only be synchronized by trusted authenticators.
      *
      * @var bool
@@ -46,6 +47,7 @@ abstract class SSOAuthenticator extends Authenticator {
     /**
      * Authenticator constructor.
      *
+     * @throws Exception
      * @param string $authenticatorID Currently maps to "UserAuthenticationProvider.AuthenticationKey".
      */
     public function __construct($authenticatorID) {
@@ -78,10 +80,10 @@ abstract class SSOAuthenticator extends Authenticator {
         return parent::getAuthenticatorSchema()->merge(
             Schema::parse([
                 'sso:o' => Schema::parse([
-                    'canSignIn:b' => 'Whether or not the authenticator can be used to sign in.',
-                    'canLinkSession:b' => 'Whether or not, using the authenticator, the user can link his account from the profile page.',
-                    'isTrusted:b' => 'Whether or not the authenticator is trusted to synchronize user information.',
-                    'canAutoLinkUser:b' => 'Whether or not the authenticator can automatically link the incoming user information to an existing user account.',
+                    'canSignIn:b' => 'Whether or not the Authenticator can be used to sign in.',
+                    'canLinkSession:b' => 'Whether or not, using the Authenticator, the user can link his account from the profile page.',
+                    'isTrusted:b' => 'Whether or not the Authenticator is trusted to synchronize user information.',
+                    'canAutoLinkUser:b' => 'Whether or not the Authenticator can automatically link the incoming user information to an existing user account.',
                 ])
             ])
         );
@@ -107,6 +109,14 @@ abstract class SSOAuthenticator extends Authenticator {
 
         return $this;
     }
+
+    /**
+     * Tell whether a user is linked or not to this Authenticator.
+     *
+     * @param int $userID
+     * @return bool
+     */
+    abstract public function isUserLinked(int $userID): bool;
 
     /**
      * Getter of linkSession.

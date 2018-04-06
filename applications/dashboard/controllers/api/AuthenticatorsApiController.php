@@ -39,18 +39,20 @@ class AuthenticatorsApiController extends AbstractApiController  {
     }
 
     /**
-     * Get an authenticator.
+     * Get an Authenticator.
      *
      * @throws NotFoundException
      * @param string $type
      * @param string $id
      * @return Authenticator
      */
-    public function authenticator(string $type, string $id): Authenticator {
+    public function getAuthenticator(string $type, string $id): Authenticator {
         try {
             $authenticator = $this->authenticatorModel->getAuthenticator($type, $id);
         } catch (Exception $e) {
             Logger::log(Logger::DEBUG, 'authenticator_not_found', [
+                'authenticatorType' => $type,
+                'authenticatorID' => $id,
                 'exception' => [
                     'message' => $e->getMessage(),
                     'code' => $e->getCode(),
@@ -66,7 +68,42 @@ class AuthenticatorsApiController extends AbstractApiController  {
     }
 
     /**
-     * Get the full authenticator schema.
+     * Get an Authenticator by its ID.
+     *
+     * @throws NotFoundException
+     * @param string $id
+     * @return Authenticator
+     */
+    public function getAuthenticatorByID(string $id): Authenticator {
+        try {
+            $authenticator = $this->authenticatorModel->getAuthenticatorByID($id);
+        } catch (Exception $e) {
+            Logger::log(Logger::DEBUG, 'authenticator_not_found', [
+                'authenticatorType' => null,
+                'authenticatorID' => $id,
+                'exception' => [
+                    'message' => $e->getMessage(),
+                    'code' => $e->getCode(),
+                    'file' => $e->getFile(),
+                    'line' => $e->getLine(),
+                ]
+            ]);
+
+            throw new NotFoundException('Authenticator');
+        }
+
+        return $authenticator;
+    }
+
+    /**
+     * @return AuthenticatorModel
+     */
+    public function getAuthenticatorModel() {
+        return $this->authenticatorModel;
+    }
+
+    /**
+     * Get the full Authenticator schema.
      *
      * @return Schema
      */
@@ -75,7 +112,7 @@ class AuthenticatorsApiController extends AbstractApiController  {
             $this->fullSchema = $this->schema(
                 // Use the SSOAuthenticator schema but make the sso attribute optional.
                 Schema::parse([
-                    'resourceUrl:s' => 'API URL to get the authenticator',
+                    'resourceUrl:s' => 'API URL to get the Authenticator',
                     'sso?',
                 ])->merge(SSOAuthenticator::getAuthenticatorSchema()),
                 'Authenticator'
@@ -86,35 +123,35 @@ class AuthenticatorsApiController extends AbstractApiController  {
     }
 
     /**
-     * Get an ID-only authenticator record schema.
+     * Get an ID-only Authenticator record schema.
      *
      * @return Schema Returns a schema object.
      */
     public function idParamSchema() {
         if ($this->idParamSchema === null) {
             $this->idParamSchema = Schema::parse([
-                'authenticatorID:s' => 'The authenticator ID.',
+                'authenticatorID:s' => 'The Authenticator ID.',
             ]);
         }
         return $this->schema($this->idParamSchema, 'in');
     }
 
     /**
-     * Get a Type-only authenticator record schema.
+     * Get a Type-only Authenticator record schema.
      *
      * @return Schema Returns a schema object.
      */
     public function typeParamSchema(): Schema {
         if ($this->typeParamSchema === null) {
             $this->typeParamSchema = Schema::parse([
-                'type:s' => 'The authenticator type.',
+                'type:s' => 'The Authenticator type.',
             ]);
         }
         return $this->schema($this->typeParamSchema, 'in');
     }
 
     /**
-     * GET an authenticator.
+     * GET an Authenticator.
      *
      * @param string $type
      * @param string $id
@@ -125,10 +162,10 @@ class AuthenticatorsApiController extends AbstractApiController  {
 
         $this->typeParamSchema();
         $this->idParamSchema();
-        $this->schema([], ['AuthenticatorGet', 'in'])->setDescription('Get an authenticator.');
+        $this->schema([], ['AuthenticatorGet', 'in'])->setDescription('Get an Authenticator.');
         $out = $this->schema($this->fullSchema(), 'out');
 
-        $authenticator = $this->authenticator($type, $id);
+        $authenticator = $this->getAuthenticator($type, $id);
 
         $result = $this->normalizeOutput($authenticator);
 
@@ -158,39 +195,48 @@ class AuthenticatorsApiController extends AbstractApiController  {
     }
 
     /**
-     * Normalize an authenticator to match the Schema definition.
+     * Normalize an Authenticator to match the Schema definition.
      *
      * @param Authenticator $authenticator
+     * @param array $options Not used right now.
      * @return array Return a Schema record.
      */
-    protected function normalizeOutput(Authenticator $authenticator): array {
+    public function normalizeOutput(Authenticator $authenticator, $options = []): array {
         $record = $authenticator->getAuthenticatorInfo();
         $record['authenticatorID'] = strtolower($record['authenticatorID']);
         $record['type'] = strtolower($record['type']);
         $record['resourceUrl'] = strtolower(url('/api/v2/authenticators/'.$authenticator::getType().'/'.$authenticator->getID()));
 
+        // Not used here specifically but it is used from /authenticate/authenticators.
+        if (is_a($authenticator, SSOAuthenticator::class)) {
+            /** @var SSOAuthenticator $ssoAuthenticator */
+            $ssoAuthenticator = $authenticator;
+            if ($this->getSession()->isValid()) {
+                $record['isUserLinked'] = $ssoAuthenticator->isUserLinked($this->getSession()->UserID);
+            }
+        }
+
         return $record;
     }
 
     /**
-     * Update an authenticator.
+     * Update an Authenticator.
      *
-     * @param string $type
-     * @param string $id
+     * @param string $authenticatorID
      * @param array $body
      * @return array
      */
-    public function patch(string $type, string $id, array $body): array {
+    public function patch(string $authenticatorID, array $body): array {
         $this->permission('Garden.Setting.Manage');
 
         $this->idParamSchema();
         $in = $this->schema(
             Schema::parse(['isActive'])->add($this->fullSchema()),
             ['AuthenticatorPatch', 'in']
-        )->setDescription('Update an authenticator.');
+        )->setDescription('Update an Authenticator.');
         $out = $this->schema($this->fullSchema(), 'out');
 
-        $authenticator = $this->authenticator($type, $id);
+        $authenticator = $this->getAuthenticatorByID($authenticatorID);
 
         $body = $in->validate($body);
 

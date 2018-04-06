@@ -35,7 +35,7 @@ class PasswordAuthenticator extends Authenticator {
     protected static function getAuthenticatorTypeInfoImpl(): array {
         return [
             'ui' => [
-                'photoUrl' => '/applications/dashboard/design/images/password-authenticator.svg',
+                'photoUrl' => '/applications/dashboard/design/images/password-Authenticator.svg',
                 'backgroundColor' => '#0291db',
             ],
         ];

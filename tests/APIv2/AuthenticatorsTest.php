@@ -136,10 +136,9 @@ class AuthenticatorsTest extends AbstractAPIv2Test {
      * Test PATCH /authenticators/:id
      */
     public function testPatchAuthenticator() {
-        $type = self::$authenticators[0]::getType();
         $id = self::$authenticators[0]->getID();
 
-        $response = $this->api()->patch($this->baseUrl.'/'.$type.'/'.$id, [
+        $response = $this->api()->patch($this->baseUrl.'/'.$id, [
             'isActive' => !self::$authenticators[0]->isActive(),
         ]);
 

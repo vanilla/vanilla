@@ -69,8 +69,10 @@ class NoEmailTest extends AbstractAPIv2Test {
      */
     public function testAuthenticate() {
         $postData = [
-            'authenticatorType' => $this->authenticator::getType(),
-            'authenticatorID' => $this->authenticator->getID(),
+            'authenticate' => [
+                'authenticatorType' => $this->authenticator::getType(),
+                'authenticatorID' => $this->authenticator->getID(),
+            ],
         ];
 
         $result = $this->api()->post(
@@ -88,7 +90,7 @@ class NoEmailTest extends AbstractAPIv2Test {
 
         // The user should have been created and linked
         $result = $this->api()->get(
-            $this->baseUrl.'/'.$this->authenticator::getType().'/'.$this->authenticator->getID()
+            $this->baseUrl.'/authenticators/'.$this->authenticator->getID()
         );
 
         $this->assertEquals(200, $result->getStatusCode());
@@ -96,8 +98,8 @@ class NoEmailTest extends AbstractAPIv2Test {
         $body = $result->getBody();
 
         $this->assertInternalType('array', $body);
-        $this->assertArrayHasKey('linked', $body);
-        $this->assertEquals(true, $body['linked']);
+        $this->assertArrayHasKey('isUserLinked', $body);
+        $this->assertEquals(true, $body['isUserLinked']);
 
     }
 }

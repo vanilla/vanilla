@@ -1654,55 +1654,65 @@ if (!function_exists('getRecord')) {
      * @throws Gdn_UserException Throws an exception when {@link $recordType} is unknown.
      */
     function getRecord($recordType, $id, $throw = false) {
-        $row = false;
+        $recordType = strtolower($recordType);
 
-        switch (strtolower($recordType)) {
+        /** @var \Garden\Container\Container $container */
+        $container = Gdn::getContainer();
+
+        switch ($recordType) {
             case 'discussion':
-                $model = new DiscussionModel();
-                $row = $model->getID($id);
-                $row->Url = discussionUrl($row);
-                $row->ShareUrl = $row->Url;
-                if ($row) {
-                    return (array)$row;
+                /** @var DiscussionModel $discussionModel */
+                $discussionModel = $container->get(DiscussionModel::class);
+                $row = $discussionModel->getID($id, DATASET_TYPE_ARRAY);
+                if (!$discussionModel->canView($row)) {
+                    throw permissionException();
                 }
+                $row['Url'] = discussionUrl($row);
+                $row['ShareUrl'] = $row->Url;
                 break;
             case 'comment':
-                $model = new CommentModel();
-                $row = $model->getID($id, DATASET_TYPE_ARRAY);
+                /** @var CommentModel $commentModel */
+                $commentModel = $container->get(CommentModel::class);
+                $row = $commentModel->getID($id, DATASET_TYPE_ARRAY);
                 if ($row) {
-                    $row['Url'] = url("/discussion/comment/$id#Comment_$id", true);
+                    /** @var DiscussionModel $discussionModel */
+                    $discussionModel = $container->get(DiscussionModel::class);
+                    $row['Url'] = url("/discussion/comment/{$id}#Comment_{$id}", true);
 
-                    $model = new DiscussionModel();
-                    $discussion = $model->getID($row['DiscussionID']);
+                    $discussion = $discussionModel->getID($row['DiscussionID'], DATASET_TYPE_ARRAY);
                     if ($discussion) {
+                        if (!$discussionModel->canView($discussion)) {
+                            throw permissionException();
+                        }
                         $discussion->Url = discussionUrl($discussion);
                         $row['ShareUrl'] = $row['Url'];
-                        $row['Name'] = $discussion->Name;
-                        $row['Discussion'] = (array)$discussion;
+                        $row['Name'] = $discussion['Name'];
+                        $row['Discussion'] = $discussion;
                     }
-                    return $row;
                 }
                 break;
             case 'activity':
-                $model = new ActivityModel();
-                $row = $model->getID($id, DATASET_TYPE_ARRAY);
+                /** @var ActivityModel $activityModel */
+                $activityModel = $container->get(CommentModel::class);
+                $row = $activityModel->getID($id, DATASET_TYPE_ARRAY);
+                if (!$activityModel->canView($row)) {
+                    throw permissionException();
+                }
                 if ($row) {
                     $row['Name'] = formatString($row['HeadlineFormat'], $row);
                     $row['Body'] = $row['Story'];
-                    return $row;
                 }
                 break;
             default:
                 throw new Gdn_UserException('Unknown record type requested.');
         }
 
-        if ($throw) {
-            throw notFoundException();
-        } else {
-            return false;
+        if (!$row && $throw) {
+            throw notFoundException($recordType);
         }
-    }
 
+        return $row;
+    }
 }
 
 if (!function_exists('getValueR')) {

@@ -50,7 +50,7 @@ export default class QuillEmbedModule extends Module {
      *
      * @param url - The URL to scrape.
      */
-    private scrapeMedia(url: string) {
+    public scrapeMedia(url: string) {
         const formData = new FormData();
         formData.append("url", url);
 

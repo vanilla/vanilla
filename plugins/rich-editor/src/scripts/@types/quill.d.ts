@@ -1,3 +1,14 @@
+/* tslint:disable */
+
+import {
+    EditorChangeHandler,
+    EventEmitter,
+    SelectionCallback,
+    SelectionChangeHandler,
+    TextCallback,
+    TextChangeHandler
+} from "quill/core";
+
 declare module "quill/core" {
     // Type definitions for Quill 1.3
     // Project: https://github.com/quilljs/quill/
@@ -31,11 +42,6 @@ declare module "quill/core" {
     export interface OptionalAttributes {
         attributes?: StringMap;
     }
-
-    export type TextChangeHandler = (delta: DeltaStatic, oldContents: DeltaStatic, source: Sources) => any;
-    export type SelectionChangeHandler = (range: RangeStatic, oldRange: RangeStatic, source: Sources) => any;
-    export type EditorChangeHandler = ((name: "text-change", delta: DeltaStatic, oldContents: DeltaStatic, source: Sources) => any)
-        | ((name: "selection-change", range: RangeStatic, oldRange: RangeStatic, source: Sources) => any);
 
     export interface KeyboardStatic {
         addBinding(key: Key, callback: (range: RangeStatic, context: any) => void): void;
@@ -125,26 +131,57 @@ declare module "quill/core" {
         length: number;
     }
 
-    export interface EventEmitter {
-        on(eventName: "text-change", handler: TextChangeHandler): EventEmitter;
-        on(eventName: "selection-change", handler: SelectionChangeHandler): EventEmitter;
-        on(eventName: "editor-change", handler: EditorChangeHandler): EventEmitter;
-        once(eventName: "text-change", handler: TextChangeHandler): EventEmitter;
-        once(eventName: "selection-change", handler: SelectionChangeHandler): EventEmitter;
-        once(eventName: "editor-change", handler: EditorChangeHandler): EventEmitter;
-        off(eventName: "text-change", handler: TextChangeHandler): EventEmitter;
-        off(eventName: "selection-change", handler: SelectionChangeHandler): EventEmitter;
-        off(eventName: "editor-change", handler: EditorChangeHandler): EventEmitter;
+    export type TextChangeHandler = (delta: DeltaStatic, oldContents: DeltaStatic, source: Sources) => any;
+    export type SelectionChangeHandler = (range: RangeStatic, oldRange: RangeStatic, source: Sources) => any;
+    export type EditorChangeHandler = ((name: "text-change", delta: DeltaStatic, oldContents: DeltaStatic, source: Sources) => any)
+        | ((name: "selection-change", range: RangeStatic, oldRange: RangeStatic, source: Sources) => any);
+    export type ScrollEventHandler = (source: Sources, context: object) => any;
+
+    type TextCallback = (eventName: "text-change", handler: TextChangeHandler) => EventEmitter;
+    type SelectionCallback = (eventName: "selection-change", handler: SelectionChangeHandler) => EventEmitter;
+    type ChangeCallback = (eventName: "editor-change", handler: EditorChangeHandler) => EventEmitter;
+    type ScrollEventCallback = (eventName: "scroll-optimize" | "scroll-before-update" | "scroll-update", handler: ScrollEventHandler) => EventEmitter;
+
+    export class EventEmitter {
+        static events: {
+            EDITOR_CHANGE: 'editor-change';
+            SCROLL_BEFORE_UPDATE: 'scroll-before-update';
+            SCROLL_OPTIMIZE: 'scroll-optimize';
+            SCROLL_UPDATE: 'scroll-update';
+            SELECTION_CHANGE: 'selection-change';
+            TEXT_CHANGE: 'text-change';
+        }
+
+        static sources: {
+            API: 'api',
+            SILENT: 'silent',
+            USER: 'user'
+        }
+
+        on: TextCallback;
+        once: TextCallback;
+        off: TextCallback;
+
+        on: SelectionCallback;
+        once: SelectionCallback;
+        off: SelectionCallback;
+
+        on: ChangeCallback;
+        once: ChangeCallback;
+        off: ChangeCallback;
+
+        on: ScrollEventCallback;
+        once: ScrollEventCallback;
+        off: ScrollEventCallback;
     }
 
-    export class Quill implements EventEmitter {
-        /**
-         * @private Internal API
-         */
+    class Quill extends EventEmitter {
+
         root: HTMLDivElement;
         clipboard: ClipboardStatic;
         scroll: Container;
         container: HTMLDivElement;
+
         constructor(container: string | Element, options?: QuillOptionsStatic);
         deleteText(index: number, length: number, source?: Sources): DeltaStatic;
         disable(): void;
@@ -204,18 +241,8 @@ declare module "quill/core" {
         getLine(index: number): [any, number];
         getLines(index?: number, length?: number): any[];
         getLines(range: RangeStatic): any[];
-
-        // EventEmitter methods
-        on(eventName: "text-change", handler: TextChangeHandler): EventEmitter;
-        on(eventName: "selection-change", handler: SelectionChangeHandler): EventEmitter;
-        on(eventName: "editor-change", handler: EditorChangeHandler): EventEmitter;
-        once(eventName: "text-change", handler: TextChangeHandler): EventEmitter;
-        once(eventName: "selection-change", handler: SelectionChangeHandler): EventEmitter;
-        once(eventName: "editor-change", handler: EditorChangeHandler): EventEmitter;
-        off(eventName: "text-change", handler: TextChangeHandler): EventEmitter;
-        off(eventName: "selection-change", handler: SelectionChangeHandler): EventEmitter;
-        off(eventName: "editor-change", handler: EditorChangeHandler): EventEmitter;
     }
+
 
     export type BlotConstructor<T extends Blot> = {
         blotName: string;

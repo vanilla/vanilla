@@ -4,7 +4,7 @@
  * @license https://opensource.org/licenses/GPL-2.0 GPL-2.0
  */
 
-import BlockEmbed from "quill/blots/block";
+import { BlockEmbed } from "quill/blots/block";
 
 export default class FocusableEmbedBlot extends BlockEmbed {
 

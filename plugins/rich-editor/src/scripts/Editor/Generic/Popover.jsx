@@ -18,7 +18,7 @@ export class Popover extends React.PureComponent {
         accessibleDescription: PropTypes.string.isRequired,
         isVisible: PropTypes.bool.isRequired,
         body: PropTypes.element.isRequired,
-        closeMenu: PropTypes.func.isRequired,
+        closeMenuHandler: PropTypes.func.isRequired,
         id: PropTypes.string,
         footer: PropTypes.element,
         additionalHeaderContent: PropTypes.element,
@@ -81,7 +81,7 @@ export class Popover extends React.PureComponent {
                 <div id={this.props.popoverDescriptionID} className="sr-only">
                     {this.props.accessibleDescription}
                 </div>
-                <button type="button" onClick={this.props.closeMenu} className="Close richEditor-close">
+                <button type="button" onClick={this.props.closeMenuHandler} className="Close richEditor-close">
                     <span className="Close-x" aria-hidden="true">×</span>
                     <span className="sr-only">{t('Close')}</span>
                 </button>

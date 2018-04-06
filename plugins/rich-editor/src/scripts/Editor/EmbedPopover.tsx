@@ -5,21 +5,39 @@
  */
 
 import React from "react";
-import * as PropTypes from "prop-types";
 import { t } from "@core/application";
-import { withEditor, editorContextTypes } from "./ContextProvider";
+import { withEditor, IEditorContextProps } from "./ContextProvider";
 import Popover from "./Generic/Popover";
+import QuillEmbedModule from "../Quill/EmbedModule";
 
-export class EmbedPopover extends React.PureComponent {
+interface IProps extends IEditorContextProps {
+    isVisible: boolean;
+    closeMenuHandler: React.MouseEventHandler<any>;
+    blurHandler?: React.FocusEventHandler<any>;
+    popoverTitleID: string;
+    popoverDescriptionID: string;
+    targetTitleOnOpen: string;
+    id: string;
+}
 
-    static propTypes = {
-        ...editorContextTypes,
-        isVisible: PropTypes.bool.isRequired,
-        closeMenu: PropTypes.func.isRequired,
-        blurHandler: PropTypes.func.isRequired,
+interface IState {
+    url: string;
+}
+
+class EmbedPopover extends React.PureComponent<IProps, IState> {
+
+    public state = {
+        url: "",
     };
 
-    render() {
+    private embedModule: QuillEmbedModule;
+
+    public constructor(props) {
+        super(props);
+        this.embedModule = props.quill.getModule("embed");
+    }
+
+    public render() {
         const title = t("Insert Media");
         const description = t("Insert an embedded web page, or video into your message.");
 
@@ -27,7 +45,7 @@ export class EmbedPopover extends React.PureComponent {
             <p id="tempId-insertMediaMenu-p" className="insertMedia-description">
                 {t('Paste the URL of the media you want.')}
             </p>
-            <input className="InputBox" placeholder="http://" />
+            <input className="InputBox" placeholder="http://" value={this.state.url} onChange={this.inputChangeHandler}/>
         </React.Fragment>;
 
         const footer = <React.Fragment>
@@ -36,11 +54,12 @@ export class EmbedPopover extends React.PureComponent {
             </a>
 
             <input
-                type="submit"
+                type="button"
                 className="Button Primary insertMedia-insert"
                 value={('Insert')}
                 aria-label={('Insert Media')}
                 onBlur={this.props.blurHandler}
+                onClick={this.buttonClickHandler}
             />
         </React.Fragment>;
 
@@ -51,12 +70,38 @@ export class EmbedPopover extends React.PureComponent {
             body={body}
             footer={footer}
             additionalClassRoot="insertMedia"
-            closeMenu={this.props.closeMenu}
+            closeMenuHandler={this.props.closeMenuHandler}
             isVisible={this.props.isVisible}
             popoverTitleID={this.props.popoverTitleID}
             popoverDescriptionID={this.props.popoverDescriptionID}
             targetTitleOnOpen={this.props.targetTitleOnOpen}
         />;
+    }
+
+    private clearInput() {
+        this.setState({
+            url: "",
+        });
+    }
+
+    /**
+     * Handle a submit button click.
+     *
+     * @param {React.SyntheticEvent} event - The button press event.
+     */
+    private buttonClickHandler = (event) => {
+        event.preventDefault();
+        this.clearInput();
+        this.embedModule.scrapeMedia(this.state.url);
+    }
+
+    /**
+     * Control the inputs value.
+     *
+     * @param {React.ChangeEvent} event - The change event.
+     */
+    private inputChangeHandler = (event) => {
+        this.setState({url: event.target.value});
     }
 }
 

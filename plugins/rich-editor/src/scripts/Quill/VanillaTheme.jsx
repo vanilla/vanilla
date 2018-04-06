@@ -52,6 +52,10 @@ export default class VanillaTheme extends ThemeBase {
 
         this.options.modules.embed = true;
 
+        this.quill.embed = this.addModule("embed");
+    }
+
+    init() {
         // Mount react components
         this.mountToolbar();
         this.mountEmojiMenu();

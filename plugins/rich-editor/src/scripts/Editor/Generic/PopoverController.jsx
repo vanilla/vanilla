@@ -140,7 +140,7 @@ export class PopoverController extends React.Component {
                 id={this.popoverID}
                 isVisible={this.state.isVisible}
                 blurHandler={this.checkForExternalFocus}
-                closeMenu={this.closeMenu}
+                closeMenuHandler={this.closeMenu}
                 popoverTitleID={this.popoverTitleID}
                 popoverDescriptionID={this.popoverDescriptionID}
                 targetTitleOnOpen={this.props.targetTitleOnOpen}

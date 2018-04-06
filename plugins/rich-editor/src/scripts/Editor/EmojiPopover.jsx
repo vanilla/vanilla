@@ -40,7 +40,7 @@ export class EmojiPopover extends React.PureComponent {
     static propTypes = {
         ...editorContextTypes,
         isVisible: PropTypes.bool.isRequired,
-        closeMenu: PropTypes.func.isRequired,
+        closeMenuHandler: PropTypes.func.isRequired,
         blurHandler: PropTypes.func.isRequired,
         popoverTitleID: PropTypes.string.isRequired,
         popoverDescriptionID: PropTypes.string.isRequired,
@@ -126,7 +126,7 @@ export class EmojiPopover extends React.PureComponent {
             result = <EmojiButton
                 isSelectedButton={isSelectedButton}
                 style={style}
-                closeMenu={this.props.closeMenu}
+                closeMenuHandler={this.props.closeMenuHandler}
                 key={"emoji-" + emojiData.hexcode}
                 emojiData={emojiData}
                 index={pos}
@@ -240,8 +240,8 @@ export class EmojiPopover extends React.PureComponent {
                     scrollToRow={this.state.scrollTarget}
 
                     aria-readonly={null}
-                    aria-label={null}
-                    role={null}
+                    aria-label={""}
+                    role={""}
 
                     onScroll={this.handleEmojiScroll}
                     onSectionRendered={this.handleOnSectionRendered}
@@ -295,7 +295,7 @@ export class EmojiPopover extends React.PureComponent {
             body={body}
             footer={footer}
             additionalClassRoot="insertEmoji"
-            closeMenu={this.props.closeMenu}
+            closeMenuHandler={this.props.closeMenuHandler}
             isVisible={this.props.isVisible}
             popoverTitleID={this.props.popoverTitleID}
             popoverDescriptionID={this.props.popoverDescriptionID}

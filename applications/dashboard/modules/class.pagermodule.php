@@ -199,7 +199,6 @@ class PagerModule extends Gdn_Module {
             }
 
             $this->_PropertiesDefined = true;
-            $this->addRelLinks(Gdn::controller());
 
             Gdn::controller()->EventArguments['Pager'] = $this;
             Gdn::controller()->fireEvent('PagerInit');
@@ -334,6 +333,8 @@ class PagerModule extends Gdn_Module {
 
         // Urls with url-encoded characters will break sprintf, so we need to convert them for backwards compatibility.
         $this->Url = str_replace(['%1$s', '%2$s', '%s'], '{Page}', $this->Url);
+
+        $this->addRelLinks(Gdn::controller());
 
         if ($this->TotalRecords === false) {
             return $this->toStringPrevNext($type);

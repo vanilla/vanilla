@@ -6,36 +6,34 @@
 
 import React from "react";
 import * as PropTypes from "prop-types";
+import { RangeStatic } from "quill";
 import Quill from "quill/core";
 import LinkBlot from "quill/formats/link";
 import { t } from "@core/application";
 import MenuItem from "./MenuItem";
 import * as quillUtilities from "../../Quill/utility";
-import { withEditor, editorContextTypes } from "../ContextProvider";
+import { withEditor, IEditorContextProps } from "../ContextProvider";
+import { IMenuItemData } from "./MenuItem";
 
-/**
- * @typedef {Object} MenuItemData
- * @property {boolean} active - Whether the given item should be lit up.
- * @property {string} [value] - A value if applicable.
- * @property {string} [formatName] - The name of the format if it is different than the item's key.
- * @property {Object} [enableValue] - The value to use to enable this item.
- * @property {function} [formatter] - A custom handler to run in addition to the default handler.
- */
+interface IProps extends IEditorContextProps{
+    menuItems?: {
+        [key: string]: IMenuItemData;
+    };
+    isHidden?: boolean;
+    onBlur: (event: React.FocusEvent<any>) => void;
+    itemRole?: string;
+}
+
+interface IState {
+    [key: string]: IMenuItemData;
+}
 
 /**
  * Component for declaring a dynamic toolbar linked to a quill instance.
  */
-export class Toolbar extends React.PureComponent {
+export class Toolbar extends React.Component<IProps, IState> {
 
-    static propTypes = {
-        ...editorContextTypes,
-        menuItems: PropTypes.object,
-        isHidden: PropTypes.bool,
-        checkForExternalFocus: PropTypes.func,
-        itemRole: PropTypes.string,
-    };
-
-    static defaultItems = {
+    private static defaultItems = {
         bold: {
             active: false,
         },
@@ -53,15 +51,8 @@ export class Toolbar extends React.PureComponent {
         },
     };
 
-    /** @type {Quill} */
-    quill;
+    private quill: Quill;
 
-    /** @type {Object<string, MenuItemData>} */
-    state;
-
-    /**
-     * @inheritDoc
-     */
     constructor(props) {
         super(props);
 
@@ -71,19 +62,7 @@ export class Toolbar extends React.PureComponent {
         this.quill = props.quill;
     }
 
-    /**
-     * Handle quill changes. Used to detect selection changes.
-     *
-     * @param {string} type - The change type.
-     * @param {RangeStatic} range - The new selection range.
-     */
-    quillChangeHandler = (type, range) => {
-        if (!this.props.isHidden) {
-            this.update(range);
-        }
-    };
-
-    componentWillReceiveProps(nextProps) {
+    public componentWillReceiveProps(nextProps) {
         if (this.props.isHidden && !nextProps.isHidden) {
             const [range] = this.quill.selection.getRange();
             this.update(range);
@@ -91,19 +70,9 @@ export class Toolbar extends React.PureComponent {
     }
 
     /**
-     * React to quill optimizations passes.
-     */
-    quillOptimizeHandler = () => {
-        if (!this.props.isHidden) {
-            const [range] = this.quill.selection.getRange();
-            this.update(range);
-        }
-    };
-
-    /**
      * Attach some quill listeners.
      */
-    componentWillMount() {
+    public componentWillMount() {
         this.quill.on(Quill.events.EDITOR_CHANGE, this.quillChangeHandler);
         this.quill.on(Quill.events.SCROLL_OPTIMIZE, this.quillOptimizeHandler);
     }
@@ -111,50 +80,17 @@ export class Toolbar extends React.PureComponent {
     /**
      * Be sure to remove the listeners when the component unmounts.
      */
-    componentWillUnmount() {
+    public componentWillUnmount() {
         this.quill.off(Quill.events.EDITOR_CHANGE, this.quillChangeHandler);
         this.quill.off(Quill.events.SCROLL_OPTIMIZE, this.quillOptimizeHandler);
     }
 
-    /**
-     * Handle key presses
-     * @param {Object} menuItemData
-     * @param {React.SyntheticEvent} event
-     */
-    handleKeyPress = (menuItemData, event) => {
-        switch (event.key) {
-        case "ArrowRight":
-        case "ArrowDown":
-            event.stopPropagation();
-            event.preventDefault();
-            if (menuItemData) {
-                //test
-            }
-            const nextSibling = this.domButton.nextSibling;
-            if (nextSibling) {
-                nextSibling.focus();
-            }
-            break;
-        case "ArrowUp":
-        case "ArrowLeft":
-            event.stopPropagation();
-            event.preventDefault();
-            const previousSibling = this.domButton.previousSibling;
-            if (previousSibling) {
-                previousSibling.focus();
-            }
-            break;
-        }
-    }
-
-    /**
-     * @inheritDoc
-     */
-    render() {
+    public render() {
         const menuItemList = Object.keys(this.state);
-        const checkForExternalFocus = this.props.checkForExternalFocus;
         const menuItems = menuItemList.map((itemName, key) => {
             const isActive = this.state[itemName].active;
+
+            const clickHandler = () => { this.formatItem(itemName); };
 
             return <MenuItem
                 propertyName={itemName}
@@ -163,9 +99,8 @@ export class Toolbar extends React.PureComponent {
                 isActive={isActive}
                 isLast={key + 1 === menuItemList.length}
                 isFirst={key === 0}
-                clickHandler={(event) => {this.formatItem(itemName, event)}}
-                checkForExternalFocus={checkForExternalFocus}
-                onKeyDown={(event) => {this.handleKeyPress(itemName, event)}}
+                onClick={clickHandler}
+                onBlur={this.props.onBlur}
                 role={this.props.itemRole}
             />;
         });
@@ -179,6 +114,28 @@ export class Toolbar extends React.PureComponent {
         );
     }
 
+    /**
+     * Handle quill changes. Used to detect selection changes.
+     *
+     * @param type - The change type.
+     * @param range - The new selection range.
+     */
+    private quillChangeHandler = (type: string, range: RangeStatic) => {
+        if (!this.props.isHidden) {
+            this.update(range);
+        }
+    }
+
+    /**
+     * React to quill optimizations passes.
+     */
+    private quillOptimizeHandler = () => {
+        if (!this.props.isHidden) {
+            const [range] = this.quill.selection.getRange();
+            this.update(range);
+        }
+    }
+
     /** MARK: Click handlers */
 
     /**
@@ -186,10 +143,10 @@ export class Toolbar extends React.PureComponent {
      *
      * @param {string} itemKey - The key of the item that was clicked.
      */
-    formatItem(itemKey) {
+    private formatItem(itemKey) {
         const itemData = this.state[itemKey];
 
-        if ("formatter" in itemData) {
+        if (itemData.formatter) {
             itemData.formatter(itemData);
         } else {
             const formatName = itemData.formatName || itemKey;
@@ -205,15 +162,15 @@ export class Toolbar extends React.PureComponent {
         }
 
         this.update();
-    };
+    }
 
 
     /**
      * Update all toolbar items' states.
      *
-     * @param {Object=} range - A quill range object. Defaults to currently selected range.
+     * @param range - A quill range object. Defaults to currently selected range.
      */
-    update(range = null) {
+    private update(range?: RangeStatic) {
         if (!range) {
             return;
         }
@@ -237,11 +194,11 @@ export class Toolbar extends React.PureComponent {
     /**
      * Handle the simple on/off inline formats (eg. bold, italic).
      *
-     * @param {string} itemKey - The key of the item.
-     * @param {Object} itemData - The item to modify.
-     * @param {Object} range - The range to update.
+     * @param itemKey - The key of the item.
+     * @param itemData - The item to modify.
+     * @param range - The range to update.
      */
-    updateBooleanFormat(itemKey, itemData, range) {
+    private updateBooleanFormat(itemKey: string, itemData: IMenuItemData, range: RangeStatic) {
         let newActiveState = false;
         if (range !== null) {
             const formats = this.quill.getFormat(range);

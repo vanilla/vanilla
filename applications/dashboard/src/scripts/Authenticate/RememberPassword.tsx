@@ -1,0 +1,9 @@
+import { t } from '@core/application';
+import React from 'react';
+import { Link } from 'react-router-dom';
+
+export default class RememberPassword extends React.Component {
+    public render() {
+        return <p className="authenticateUser-paragraph isCentered">{t('Remember your password?')} <Link to="/authenticate/signin">{t('Sign In')}</Link></p>;
+    }
+}

@@ -3747,6 +3747,10 @@ react-dom@^16.2.0:
     object-assign "^4.1.1"
     prop-types "^15.6.0"
 
+react-html-id@^0.1.2:
+  version "0.1.2"
+  resolved "https://registry.yarnpkg.com/react-html-id/-/react-html-id-0.1.2.tgz#15d9adc4837d55dd27476056a08d02a26bd39c05"
+
 react-redux@^5.0.7:
   version "5.0.7"
   resolved "https://registry.yarnpkg.com/react-redux/-/react-redux-5.0.7.tgz#0dc1076d9afb4670f993ffaef44b8f8c1155a4c8"

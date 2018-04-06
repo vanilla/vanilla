@@ -21,7 +21,7 @@ export default class DocumentTitle extends React.Component {
         children: PropTypes.node,
         classNames: PropTypes.string,
         title: PropTypes.string,
-    }
+    };
 
     constructor(props) {
         super(props);

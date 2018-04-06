@@ -211,7 +211,6 @@ if (!function_exists('getDiscussionOptions')) :
      */
     function getDiscussionOptions($discussion = null) {
         $options = [];
-        $timeLeft = Gdn_Model::editContentTimeout($discussion, $timeLeft);
 
         $sender = Gdn::controller();
         $session = Gdn::session();
@@ -427,7 +426,6 @@ if (!function_exists('getCommentOptions')) :
      */
     function getCommentOptions($comment) {
         $options = [];
-        $timeLeft = Gdn_Model::editContentTimeout($comment, $timeLeft);
 
         if (!is_numeric(val('CommentID', $comment))) {
             return $options;
@@ -442,6 +440,9 @@ if (!function_exists('getCommentOptions')) :
         // Can the user edit the comment?
         $canEdit = CommentModel::canEdit($comment, $timeLeft, $discussion);
         if ($canEdit) {
+            if ($timeLeft) {
+                $timeLeft = ' ('.Gdn_Format::seconds($timeLeft).')';
+            }
             $options['EditComment'] = [
                 'Label' => t('Edit').$timeLeft,
                 'Url' => '/post/editcomment/'.$comment->CommentID,

@@ -159,9 +159,9 @@ class LogModel extends Gdn_Pluggable {
     /**
      * Purge entries from the log and clean associated records if needed.
      *
-     * @param int[] $logIDs
+     * @param int[]|string $logIDs
      */
-    public function deleteIDs(array $logIDs) {
+    public function deleteIDs($logIDs) {
         // Get the log entries.
         $logs = $this->getIDs($logIDs);
         $models = [];

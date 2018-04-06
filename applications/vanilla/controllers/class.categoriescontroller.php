@@ -427,6 +427,8 @@ class CategoriesController extends VanillaController {
             }
 
             $countDiscussions = $discussionModel->getCount($wheres);
+            $this->checkPageRange($offset, $countDiscussions);
+
             if ($maxPages && $maxPages * $limit < $countDiscussions) {
                 $countDiscussions = $maxPages * $limit;
             }

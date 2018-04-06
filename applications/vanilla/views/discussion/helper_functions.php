@@ -211,6 +211,7 @@ if (!function_exists('getDiscussionOptions')) :
      */
     function getDiscussionOptions($discussion = null) {
         $options = [];
+        $timeLeft = Gdn_Model::editContentTimeout($discussion, $timeLeft);
 
         $sender = Gdn::controller();
         $session = Gdn::session();
@@ -426,6 +427,7 @@ if (!function_exists('getCommentOptions')) :
      */
     function getCommentOptions($comment) {
         $options = [];
+        $timeLeft = Gdn_Model::editContentTimeout($comment, $timeLeft);
 
         if (!is_numeric(val('CommentID', $comment))) {
             return $options;

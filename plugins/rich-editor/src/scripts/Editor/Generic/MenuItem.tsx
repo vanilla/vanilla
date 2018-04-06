@@ -5,7 +5,6 @@
  */
 
 import React from "react";
-import * as PropTypes from "prop-types";
 import classnames from "classnames";
 import { t } from "@core/application";
 import * as Icons from "../Icons";
@@ -49,9 +48,7 @@ export default class MenuItem extends React.Component<IProps> {
     public render() {
         const { propertyName, isActive, onClick } = this.props;
         const Icon = Icons[propertyName];
-        const buttonClasses = classnames("richEditor-button", "richEditor-menuItem", {
-            isActive: isActive || false,
-        });
+        const buttonClasses = classnames("richEditor-button", "richEditor-menuItem", { isActive });
 
         return <button
             ref={(ref: HTMLButtonElement) => { this.domButton = ref; }}

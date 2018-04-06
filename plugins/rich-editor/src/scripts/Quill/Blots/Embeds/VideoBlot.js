@@ -4,7 +4,7 @@
  * @license https://opensource.org/licenses/GPL-2.0 GPL-2.0
  */
 
-import { BlockEmbed } from "quill/blots/block";
+import FocusableEmbedBlot from "../Abstract/FocusableEmbedBlot";
 import { t } from "@core/application";
 import { setData, getData } from "@core/dom";
 
@@ -24,7 +24,7 @@ function simplifyFraction(numerator, denominator){
     };
 }
 
-export default class VideoBlot extends BlockEmbed {
+export default class VideoBlot extends FocusableEmbedBlot {
 
     static blotName = 'embed-video';
     static className = 'embed-video';

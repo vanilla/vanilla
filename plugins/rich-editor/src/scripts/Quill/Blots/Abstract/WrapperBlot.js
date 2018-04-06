@@ -7,7 +7,6 @@
 import Container from "quill/blots/container";
 import Parchment from "parchment";
 import ClassFormatBlot from "./ClassFormatBlot";
-import { wrappedBlot } from "../../utility";
 
 /**
  * A Blot implementing functions necessary to wrap another Blot as a "Dump" DOM Element.
@@ -20,6 +19,9 @@ export default class WrapperBlot extends Container {
     static scope = Parchment.Scope.BLOCK_BLOT;
     static tagName = "div";
     static allowedChildren = [WrapperBlot];
+
+    /** @type {Node} */
+    domNode;
 
     /**
      * We want to NOT return the format of this Blot. This blot should never be created on its own. Only through its
@@ -58,6 +60,101 @@ export default class WrapperBlot extends Container {
             next.remove();
         }
     }
+}
+
+
+/**
+ * Higher-order function to create a "wrapped" blot.
+ *
+ * Takes an existing Blot class and implements methods necessary to properly instantiate and cleanup it's parent Blot.
+ * the passed Blot class must implement the static property parentName, which should reference a register Blot that is
+ * and instance of WrapperBlot.
+ *
+ * @param {BlotConstructor} BlotConstructor - The Blot constructor to wrap.
+ *
+ * @returns {BlotConstructor} -
+ */
+export function wrappedBlot(BlotConstructor) {
+    return class extends BlotConstructor {
+
+        constructor(domNode) {
+            super(domNode);
+
+            if (!this.constructor.parentName) {
+                throw new Error("Attempted to instantiate wrapped Blot without setting static value parentName");
+            }
+        }
+
+        attach() {
+            super.attach();
+            if (this.parent.constructor.blotName !== this.statics.parentName) {
+                const Wrapper = Parchment.create(this.statics.parentName);
+
+                if (!(Wrapper instanceof WrapperBlot)) {
+                    throw new Error("The provided static parentName did not instantiate an instance of a WrapperBlot.");
+                }
+
+                this.wrap(Wrapper);
+            }
+        }
+
+        /**
+         * If this is the only child blot we want to delete the parent with it.
+         */
+        remove() {
+            if (this.prev == null && this.next == null) {
+                this.parent.remove();
+            } else {
+                super.remove();
+            }
+        }
+
+
+        /**
+         * Delete this blot it has no children. Wrap it if it doesn't have it's proper parent name.
+         *
+         * @param {Object} context - A shared context that is passed through all updated Blots.
+         */
+        optimize(context) {
+            super.optimize(context);
+            if (this.children.length === 0) {
+                this.remove();
+            }
+        }
+
+        /**
+         * Replace this blot with another blot.
+         *
+         * @param {string} name - The name of the replacement Blot.
+         * @param {any} value - The value for the replacement Blot.
+         */
+        replaceWith(name, value) {
+            const topLevelWrapper = this.getWrapperBlot();
+            const immediateWrapper = this.parent;
+
+            immediateWrapper.children.forEach(child => {
+                child.replaceWithIntoScroll(name, value, topLevelWrapper);
+            });
+            topLevelWrapper.remove();
+        }
+
+        /**
+         * Replace this ContainerBlot with another one.
+         *
+         * Then attach that new Blot to the scroll in before the passed insertBefore Blot.
+         * This is needed because we a normal replaceWith doesn't work (cyclicly recreates it's parents).
+         *
+         * @param {string} name - The name of the Blot to replace this one with.
+         * @param {string} value - The initial value of the new blot.
+         * @param {Blot} insertBefore - The Blot to insert this blot before in the ScrollBlot.
+         */
+        replaceWithIntoScroll(name, value, insertBefore) {
+            const newBlot = Parchment.create(name, value);
+            this.moveChildren(newBlot);
+
+            newBlot.insertInto(this.scroll, insertBefore);
+        }
+    };
 }
 
 /**

@@ -4,13 +4,10 @@
  * @license https://opensource.org/licenses/GPL-2.0 GPL-2.0
  */
 
-import { onReady } from "@core/application";
 import { mountEditor } from "./editor";
 
-onReady(() => {
-    setupEditor();
-    setupCommentEditForm();
-});
+setupEditor();
+setupCommentEditForm();
 
 /**
  * Set up the new discussion form if it exists.

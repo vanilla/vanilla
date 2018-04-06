@@ -5,9 +5,9 @@
  */
 
 import { setData, getData } from "@core/dom";
-import { BlockEmbed } from "quill/blots/block";
+import FocusableEmbedBlot from "../Abstract/FocusableEmbedBlot";
 
-export default class ImageBlot extends BlockEmbed {
+export default class ImageBlot extends FocusableEmbedBlot {
 
     static blotName = 'embed-image';
     static className = 'embed-image';

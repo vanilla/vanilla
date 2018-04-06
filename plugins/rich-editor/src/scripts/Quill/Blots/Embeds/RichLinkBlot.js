@@ -4,10 +4,10 @@
  * @license https://opensource.org/licenses/GPL-2.0 GPL-2.0
  */
 
-import { BlockEmbed } from "quill/blots/block";
+import FocusableEmbedBlot from "../Abstract/FocusableEmbedBlot";
 import { setData, getData } from "@core/dom";
 
-export default class RichLinkBlot extends BlockEmbed {
+export default class RichLinkBlot extends FocusableEmbedBlot {
 
     static lineHeight = false;
     static blotName = 'embed-link';

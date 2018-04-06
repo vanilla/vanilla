@@ -4,10 +4,10 @@
  * @license https://opensource.org/licenses/GPL-2.0 GPL-2.0
  */
 
-import { BlockEmbed } from "quill/blots/block";
 import { t } from "@core/application";
+import FocusableEmbedBlot from "../Abstract/FocusableEmbedBlot";
 
-export default class LoadingBlot extends BlockEmbed {
+export default class LoadingBlot extends FocusableEmbedBlot {
 
     static blotName = 'embed-loading';
     static className = 'embed-loading';

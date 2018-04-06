@@ -4,9 +4,9 @@
  * @license https://opensource.org/licenses/GPL-2.0 GPL-2.0
  */
 
-import { BlockEmbed } from "quill/blots/block";
+import FocusableEmbedBlot from "../Abstract/FocusableEmbedBlot";
 
-export default class ErrorBlot extends BlockEmbed {
+export default class ErrorBlot extends FocusableEmbedBlot {
 
     static blotName = 'embed-error';
     static className = 'embed-error';

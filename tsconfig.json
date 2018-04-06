@@ -1,6 +1,7 @@
 {
     "compilerOptions": {
         "jsx": "react",
+        "allowJs": true,
         "lib": [
             "es2017",
             "dom",
@@ -19,11 +20,10 @@
         }
     },
     "include": [
-        "**/src/scripts/**/*.ts",
-        "**/src/scripts/**/*.tsx",
+        "src/scripts/**/*",
         "global.ts"
     ],
     "exclude": [
-        "**/node_modules"
+        "node_modules",
     ]
 }

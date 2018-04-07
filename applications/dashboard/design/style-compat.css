@@ -933,6 +933,7 @@ body.Categories.isMobile .PageControls.Top {
 
 .embed {
   display: block;
+  user-select: none;
 }
 
 .embedLoader-icon {

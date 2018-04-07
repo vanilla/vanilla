@@ -26,7 +26,7 @@ interface IProps {
     isFirst: boolean;
     isLast: boolean;
     onClick: (event: React.MouseEvent<any>) => void;
-    onBlur: (event?: React.FocusEvent<any>) => void;
+    onBlur?: (event?: React.FocusEvent<any>) => void;
     role?: string;
 }
 

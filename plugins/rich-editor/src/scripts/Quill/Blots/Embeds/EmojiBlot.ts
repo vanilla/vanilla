@@ -14,8 +14,8 @@ export default class EmojiBlot extends Embed {
     static blotName = 'emoji';
     static tagName = 'span';
 
-    static create(data) {
-        const node = super.create();
+    public static create(data) {
+        const node = super.create(data) as HTMLElement;
         if (isEmojiSupported()) {
             node.innerHTML = data.emojiChar;
             node.classList.add("nativeEmoji");
@@ -26,7 +26,7 @@ export default class EmojiBlot extends Embed {
         return node;
     }
 
-    static value(node) {
+    public static value(node) {
         return getData(node, "data");
     }
 }

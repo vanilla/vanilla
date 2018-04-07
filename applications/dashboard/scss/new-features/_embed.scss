@@ -19,6 +19,7 @@ $embed-spacing: 6px !default;
 
 .embed {
     display: block;
+    user-select: none;
 }
 
 .embedLoader-icon {

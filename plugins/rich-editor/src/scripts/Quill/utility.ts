@@ -7,7 +7,7 @@
 import Emitter from "quill/core/emitter";
 import Parchment from "parchment";
 import WrapperBlot from "./Blots/Abstract/WrapperBlot";
-import { RangeStatic, Quill as QuillType, Blot, BlotConstructor } from "quill/core";
+import QuillType, { RangeStatic, Blot, BlotConstructor } from "quill/core";
 
 /**
  * @typedef {Object} BoundaryStatic

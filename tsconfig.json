@@ -23,7 +23,7 @@
     "include": [
         "src/scripts/**/*",
         "plugins/rich-editor/src/scripts/**/*",
-        "@types/**/*",
+        "**/@types/**/*.ts",
         "global.ts"
     ]
 }

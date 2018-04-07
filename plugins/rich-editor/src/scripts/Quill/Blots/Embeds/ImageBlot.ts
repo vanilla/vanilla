@@ -9,12 +9,12 @@ import FocusableEmbedBlot from "../Abstract/FocusableEmbedBlot";
 
 export default class ImageBlot extends FocusableEmbedBlot {
 
-    static blotName = 'embed-image';
-    static className = 'embed-image';
-    static tagName = 'div';
+    public static blotName = 'embed-image';
+    public static className = 'embed-image';
+    public static tagName = 'div';
 
-    static create(data) {
-        const node = super.create();
+    public static create(data) {
+        const node = super.create(data) as HTMLElement;
         node.classList.add('embed');
         node.classList.add('embed-image');
         node.classList.add('embedImage');
@@ -30,7 +30,7 @@ export default class ImageBlot extends FocusableEmbedBlot {
         return node;
     }
 
-    static value(node) {
+    public static value(node) {
         return getData(node, "data");
     }
 }

@@ -131,7 +131,7 @@ export class Toolbar extends React.Component<IProps, IState> {
      */
     private quillOptimizeHandler = () => {
         if (!this.props.isHidden) {
-            const [range] = this.quill.selection.getRange();
+            const range = this.quill.getSelection();
             this.update(range);
         }
     }

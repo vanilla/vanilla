@@ -237,7 +237,7 @@ export class ParagraphToolbar extends React.PureComponent<IEditorContextProps, I
         let numLines = 0;
 
         if (range) {
-            numLines = this.quill.getLines(range.index || 0, range.length || 0);
+            numLines = this.quill.getLines(range.index || 0, range.length || 0).length;
         }
 
         if (numLines <= 1 && !this.state.showPilcrow) {
@@ -252,7 +252,7 @@ export class ParagraphToolbar extends React.PureComponent<IEditorContextProps, I
     }
 
     private getPilcrowStyles() {
-        const bounds = this.quill.getBounds(this.state.range);
+        const bounds = this.quill.getBounds(this.state.range.index, this.state.range.length);
 
         // This is the pixel offset from the top needed to make things align correctly.
         const offset = 9 + 2;
@@ -263,7 +263,7 @@ export class ParagraphToolbar extends React.PureComponent<IEditorContextProps, I
     }
 
     private getToolbarClasses() {
-        const bounds = this.quill.getBounds(this.state.range);
+        const bounds = this.quill.getBounds(this.state.range.index, this.state.range.length);
         let classes = "richEditor-toolbarContainer richEditor-paragraphToolbarContainer";
 
         if (bounds.top > 30) {

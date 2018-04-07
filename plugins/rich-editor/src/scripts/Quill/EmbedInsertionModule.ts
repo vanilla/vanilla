@@ -4,7 +4,6 @@
  * @license https://opensource.org/licenses/GPL-2.0 GPL-2.0
  */
 
-// Quill
 import Module from "quill/core/module";
 import { closeEditorFlyouts } from "./utility";
 import Parchment from "parchment";
@@ -30,7 +29,7 @@ interface IMediaScrapeResult {
 /**
  * A Quill module for managing insertion of embeds/loading/error states.
  */
-export default class QuillEmbedModule extends Module {
+export default class EmbedInsertionModule extends Module {
 
     private quill: Quill;
     private currentUploads: Map<File | string, Blot> = new Map();
@@ -70,20 +69,20 @@ export default class QuillEmbedModule extends Module {
                         break;
                 }
             }).catch(error => {
-            if (error.response && error.response.data && error.response.data.message) {
-                const message = error.response.data.message;
+                if (error.response && error.response.data && error.response.data.message) {
+                    const message = error.response.data.message;
 
-                if (message.startsWith("Failed to load URL")) {
-                    this.createErrorEmbed(url, new Error(t("There was an error processing that embed link.")));
-                    return;
-                } else {
-                    this.createErrorEmbed(url, new Error(message));
-                    return;
+                    if (message.startsWith("Failed to load URL")) {
+                        this.createErrorEmbed(url, new Error(t("There was an error processing that embed link.")));
+                        return;
+                    } else {
+                        this.createErrorEmbed(url, new Error(message));
+                        return;
+                    }
                 }
-            }
 
-            this.createErrorEmbed(url, error);
-        });
+                this.createErrorEmbed(url, error);
+            });
     }
 
     /**

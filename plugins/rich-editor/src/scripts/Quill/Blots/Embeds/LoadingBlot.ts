@@ -9,12 +9,13 @@ import FocusableEmbedBlot from "../Abstract/FocusableEmbedBlot";
 
 export default class LoadingBlot extends FocusableEmbedBlot {
 
-    static blotName = 'embed-loading';
-    static className = 'embed-loading';
-    static tagName = 'div';
+    public static blotName = 'embed-loading';
+    public static className = 'embed-loading';
+    public static tagName = 'div';
 
-    static create() {
-        const node = super.create();
+    public static create(value: any) {
+        const node = super.create(value) as HTMLElement;
+
         node.classList.add('embed');
         node.classList.add('embed-loading');
         node.setAttribute('role', 'alert');
@@ -31,23 +32,25 @@ export default class LoadingBlot extends FocusableEmbedBlot {
         return node;
     }
 
-    static value() {
+    public static value() {
         return;
     }
+
+    private deleteCallback?: () => void;
 
     /**
      * Register a callback for when the blot is detached.
      *
      * @param {function} callback - The callback to call.
      */
-    registerDeleteCallback(callback) {
+    public registerDeleteCallback(callback) {
         this.deleteCallback = callback;
     }
 
     /**
      * Call the delete callback if set when detaching.
      */
-    detach() {
+    public detach() {
         if (this.deleteCallback) {
             this.deleteCallback();
         }

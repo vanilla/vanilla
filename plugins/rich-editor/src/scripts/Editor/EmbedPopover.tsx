@@ -8,7 +8,7 @@ import React from "react";
 import { t } from "@core/application";
 import { withEditor, IEditorContextProps } from "./ContextProvider";
 import Popover from "./Generic/Popover";
-import QuillEmbedModule from "../Quill/EmbedModule";
+import EmbedInsertionModule from "../Quill/EmbedInsertionModule";
 
 interface IProps extends IEditorContextProps {
     isVisible: boolean;
@@ -30,11 +30,11 @@ class EmbedPopover extends React.PureComponent<IProps, IState> {
         url: "",
     };
 
-    private embedModule: QuillEmbedModule;
+    private embedModule: EmbedInsertionModule;
 
     public constructor(props) {
         super(props);
-        this.embedModule = props.quill.getModule("embed");
+        this.embedModule = props.quill.getModule("embed/insertion");
     }
 
     public render() {

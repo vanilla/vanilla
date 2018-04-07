@@ -50,9 +50,7 @@ export default class VanillaTheme extends ThemeBase {
             ...keyboardBindings.bindings,
         };
 
-        this.options.modules.embed = true;
-
-        this.quill.embed = this.addModule("embed");
+        this.quill.embed = this.addModule("embed/insertion");
     }
 
     init() {

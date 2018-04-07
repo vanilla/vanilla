@@ -9,15 +9,15 @@ import { setData, getData } from "@core/dom";
 
 export default class RichLinkBlot extends FocusableEmbedBlot {
 
-    static lineHeight = false;
-    static blotName = 'embed-link';
-    static className = 'embed-link';
-    static tagName = 'a';
-    static PROTOCOL_WHITELIST = ['http', 'https', 'mailto', 'tel'];
+    public static lineHeight = false;
+    public static blotName = 'embed-link';
+    public static className = 'embed-link';
+    public static tagName = 'a';
+    public static PROTOCOL_WHITELIST = ['http', 'https', 'mailto', 'tel'];
 
-    static create(data) {
+    public static create(data) {
         // console.log("Video Data: ", data);
-        const node = super.create();
+        const node = super.create(data) as HTMLElement;
         node.classList.add('embed');
         node.classList.add('embed-link');
         node.classList.add('embedLink');
@@ -26,14 +26,14 @@ export default class RichLinkBlot extends FocusableEmbedBlot {
         node.setAttribute('target', '_blank');
         node.setAttribute('rel', 'noopener noreferrer');
 
-        let title = false;
+        let title;
         if (data.name) {
             title = document.createElement('h3');
             title.classList.add('embedLink-title');
             title.innerHTML = data.name;
         }
 
-        let userPhoto = false
+        let userPhoto;
         if (data.userPhoto) {
             userPhoto = document.createElement('span');
             userPhoto.classList.add('embedLink-userPhoto');
@@ -41,7 +41,7 @@ export default class RichLinkBlot extends FocusableEmbedBlot {
             userPhoto.innerHTML = '<img src="' + data.userPhoto + '" alt="' + data.userName + '" class="ProfilePhoto ProfilePhotoMedium" />';
         }
 
-        let source = false;
+        let source;
         if (data.source) {
             source = document.createElement('span');
             source.classList.add('embedLink-source');
@@ -49,7 +49,7 @@ export default class RichLinkBlot extends FocusableEmbedBlot {
             source.innerHTML = data.source;
         }
 
-        let linkImage = false;
+        let linkImage;
         if (data.linkImage) {
             linkImage = document.createElement('div');
             linkImage.classList.add('embedLink-image');
@@ -57,14 +57,14 @@ export default class RichLinkBlot extends FocusableEmbedBlot {
             linkImage.setAttribute('style', 'background-image: url(' + data.linkImage + ');');
         }
 
-        let userName = false;
+        let userName;
         if (data.userName) {
             userName = document.createElement('span');
             userName.classList.add('embedLink-userName');
             userName.innerHTML = data.userName;
         }
 
-        let dateTime = false;
+        let dateTime;
         if (data.timestamp) {
             dateTime = document.createElement('time');
             dateTime.classList.add('embedLink-dateTime');
@@ -124,12 +124,12 @@ export default class RichLinkBlot extends FocusableEmbedBlot {
         return node;
     }
 
-    static sanitize(url) {
-        return sanitize(url, this.PROTOCOL_WHITELIST) ? url : this.SANITIZED_URL;
+    public static value(node) {
+        return getData(node, "data");
     }
 
-    static value(node) {
-        return getData(node, "data");
+    private static sanitize(url) {
+        return sanitize(url, this.PROTOCOL_WHITELIST) ? url : "TODO FIX THIS LATER";
     }
 }
 

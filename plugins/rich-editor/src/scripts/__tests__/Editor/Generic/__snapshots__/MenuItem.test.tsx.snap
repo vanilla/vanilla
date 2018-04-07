@@ -5,11 +5,11 @@ ShallowWrapper {
   "length": 1,
   Symbol(enzyme.__root__): [Circular],
   Symbol(enzyme.__unrendered__): <MenuItem
-    clickHandler={[Function]}
     isActive={true}
     isFirst={false}
     isLast={false}
     label="Bold"
+    onClick={[Function]}
     propertyName="bold"
   />,
   Symbol(enzyme.__renderer__): Object {

@@ -46,7 +46,7 @@ export function isEmojiSupported() {
  * Returns either native emoji or fallback image
  *
  * @param {emojiChar} Emoji Character
- * @returns {string|HTMLImageElement} - The emoji
+ * @returns {string} - The emoji
  */
 export function parseEmoji(emojiChar) {
     if(browserSupportsEmoji) {

@@ -1,14 +1,5 @@
 /* tslint:disable */
 
-import {
-    EditorChangeHandler,
-    EventEmitter,
-    SelectionCallback,
-    SelectionChangeHandler,
-    TextCallback,
-    TextChangeHandler
-} from "quill/core";
-
 declare module "quill/core" {
     // Type definitions for Quill 1.3
     // Project: https://github.com/quilljs/quill/
@@ -158,21 +149,21 @@ declare module "quill/core" {
             USER: 'user'
         }
 
-        on: TextCallback;
-        once: TextCallback;
-        off: TextCallback;
-
-        on: SelectionCallback;
-        once: SelectionCallback;
-        off: SelectionCallback;
-
-        on: ChangeCallback;
-        once: ChangeCallback;
-        off: ChangeCallback;
-
-        on: ScrollEventCallback;
-        once: ScrollEventCallback;
-        off: ScrollEventCallback;
+        on: (
+            eventName:
+                "text-change" | "editor-change" | "selection-change" | "scroll-optimize" | "scroll-before-update" | "scroll-update",
+            handler: TextChangeHandler | SelectionChangeHandler | EditorChangeHandler | ScrollEventHandler
+        ) => EventEmitter;
+        once: (
+            eventName:
+                "text-change" | "editor-change" | "selection-change" | "scroll-optimize" | "scroll-before-update" | "scroll-update",
+            handler: TextChangeHandler | SelectionChangeHandler | EditorChangeHandler | ScrollEventHandler
+        ) => EventEmitter;
+        off: (
+            eventName:
+                "text-change" | "editor-change" | "selection-change" | "scroll-optimize" | "scroll-before-update" | "scroll-update",
+            handler: TextChangeHandler | SelectionChangeHandler | EditorChangeHandler | ScrollEventHandler
+        ) => EventEmitter;
     }
 
     class Quill extends EventEmitter {
@@ -256,9 +247,13 @@ declare module "quill/core" {
 
 declare module "quill/blots/block" {
     import Block from "parchment/dist/src/blot/block";
-    import BlockEmbed from "parchment/dist/src/blot/embed";
+    import Embed from "parchment/dist/src/blot/embed";
+    import { Blot } from "quill/core";
 
-    export { BlockEmbed };
+
+    export class BlockEmbed extends Embed implements Blot {
+        bitch: true;
+    }
     export default Block;
 }
 
@@ -288,6 +283,51 @@ declare module "quill/core/theme";
 declare module "quill/modules/clipboard";
 declare module "quill/modules/formula";
 declare module "quill/modules/history";
-declare module "quill/modules/keyboard";
+declare module "quill/modules/keyboard" {
+    import Module from "quill/core/module";
+    import { RangeStatic } from "quill";
+
+    interface Keys {
+        BACKSPACE: 8;
+        TAB: 9;
+        ENTER: 13;
+        ESCAPE: 27;
+        LEFT: 37;
+        UP: 38;
+        RIGHT: 39;
+        DOWN: 40;
+        DELETE: 46;
+    }
+
+    export interface KeyBinding {
+        key: string | number;
+        shiftKey?: boolean;
+        metaKey?: boolean;
+        ctrlKey?: boolean;
+        altKey?: boolean;
+    }
+
+    type Formats = string[] | {
+        [key: string]: string | boolean | number;
+    };
+
+    interface Context {
+        collapsed?: boolean;
+        format?: Formats;
+        offset?: number;
+        empty?: boolean;
+        prefix?: RegExp;
+        suffix?: RegExp;
+    }
+
+    type KeyboardHandler = (selectedRange: RangeStatic) => boolean | null | undefined | void; // False to prevent default.
+
+    export default class KeyboardModule extends Module {
+        public static keys: Keys;
+        addBinding(key: KeyBinding | string | number, context: Context, handler: KeyboardHandler): void;
+    }
+
+
+}
 declare module "quill/modules/syntax";
 declare module "quill/modules/toolbar";

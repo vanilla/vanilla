@@ -1,0 +1,23 @@
+// This is only for new pages, with new form element markup.
+
+.checkbox-box {
+  display: none; // for old themes
+}
+
+.button-ssoContents {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+label.checkbox {
+  input.checkbox-input {
+    float: none;
+    margin: 0;
+  }
+}
+
+.checkbox-label {
+  margin-left: 6px;
+  line-height: inherit;
+}

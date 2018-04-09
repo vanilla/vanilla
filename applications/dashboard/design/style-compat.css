@@ -1,3 +1,5 @@
+/* ------------------------------- *    Third Party Colors
+\* ------------------------------- */
 .sr-only {
   position: absolute;
   width: 1px;
@@ -29,6 +31,138 @@ body.isMobile .change-picture .change-picture-instructions {
 
 .categoryList-heading + .DataTableWrap > .categoryList-genericHeading {
   display: none;
+}
+
+body.Entry #Content,
+.Row {
+  width: 100%;
+  max-width: 100%;
+}
+
+.authenticateUserCol {
+  padding: 0 26px;
+  margin: auto;
+  width: 363px;
+  max-width: 100%;
+  box-sizing: border-box;
+}
+
+.authenticateUserCol .pageTitle {
+  text-align: center;
+  margin-bottom: 18px;
+}
+
+.authenticateUserCol .button.button-fullWidth {
+  margin-bottom: 18px;
+}
+
+.authenticateUserCol .icon {
+  display: inline-block;
+  width: 24px;
+  height: 24px;
+  vertical-align: middle;
+}
+
+.authenticateUserCol .iconLarge {
+  width: 42px;
+  height: 42px;
+}
+
+.authenticateUser-photoCrop,
+.authenticateUser-imageWrap {
+  display: block;
+  width: 100%;
+  max-width: 117px;
+}
+
+.authenticateUser-photoCrop {
+  overflow: hidden;
+  border-radius: 50%;
+}
+
+.authenticateUser-imageWrap {
+  position: relative;
+  margin: auto;
+}
+
+.authenticateUser-icon {
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  display: block;
+  width: 42px;
+  height: 42px;
+  background-color: #fff;
+  border-style: solid;
+  border-width: 3px;
+  border-color: #fff;
+  border-radius: 50%;
+}
+
+.authenticateUser-photo {
+  display: block;
+  max-width: 100%;
+  width: 100%;
+  height: auto;
+}
+
+.authenticateUser-arrowDown {
+  display: block;
+  margin: 18px auto;
+  opacity: 0.6;
+}
+
+.authenticateUser-name {
+  font-size: 16px;
+  font-weight: 600;
+  text-align: center;
+}
+
+.authenticateUser-userName {
+  font-size: 12px;
+  opacity: 0.6;
+  text-align: center;
+}
+
+.rememberMeAndForgot {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  font-size: 12px;
+}
+
+.rememberMeAndForgot a {
+  font-size: inherit;
+  color: #0291db;
+}
+
+.rememberMeAndForgot-rememberMe {
+  flex-grow: 1;
+  padding-right: 6px;
+}
+
+.authenticateUser-divider {
+  text-align: center;
+}
+
+.authenticateUser-footer {
+  text-align: center;
+}
+
+.authenticateUser-ssoLabel {
+  display: inline;
+  margin-left: 12px;
+}
+
+.button.button-sso,
+.Button.button-sso {
+  background-image: none;
+}
+
+.button-ssoLabel {
+  margin-left: 12px;
+  font-size: 14px;
+  font-weight: normal;
 }
 
 .followButton {
@@ -177,6 +311,92 @@ body.Categories.isMobile .PageControls.Top {
 .ButtonGroup.discussion-sort-filter-module {
   display: flex;
   align-items: center;
+}
+
+.inputBlock {
+  display: block;
+  margin-bottom: 24px;
+}
+
+.inputBlock .checkbox {
+  display: flex;
+  align-items: center;
+}
+
+.inputBlock.hasError .inputText {
+  border-color: #ff3933;
+  background-color: #ffebeb;
+  color: #ff3933;
+}
+
+.inputBlock-labelText {
+  display: block;
+  font-weight: 600;
+  margin-bottom: 6px;
+  line-height: 1.428571429;
+}
+
+.InputBox.inputText {
+  width: 100%;
+}
+
+.inputBlock-error {
+  color: #ff3933;
+  line-height: 1.428571429;
+  font-size: 12px;
+}
+
+.inputBlock-inputWrap {
+  display: block;
+}
+
+.inputBlock-labelNote {
+  display: block;
+  font-size: 12px;
+  line-height: 1.428571429;
+  opacity: .6;
+}
+
+.inputBlock-labelNote + .inputBlock-inputWrap {
+  margin-top: 6px;
+}
+
+.checkbox-box {
+  display: none;
+}
+
+.button-ssoContents {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+label.checkbox input.checkbox-input {
+  float: none;
+  margin: 0;
+}
+
+.checkbox-label {
+  margin-left: 6px;
+  line-height: inherit;
+}
+
+.button.button-fullWidth {
+  width: 100%;
+  max-width: 100%;
+}
+
+.passwordStrength-bar {
+  position: relative;
+  width: 100%;
+}
+
+.StrengthText.passwordStrength-gaugeLabel {
+  margin-right: 0;
+}
+
+.passwordStrength.PasswordStrength {
+  padding: 0;
 }
 
 /*# sourceMappingURL=style-compat.css.map */

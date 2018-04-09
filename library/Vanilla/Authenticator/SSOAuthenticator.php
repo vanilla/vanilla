@@ -7,6 +7,7 @@
 
 namespace Vanilla\Authenticator;
 
+use Exception;
 use Garden\Schema\Schema;
 use Garden\Web\RequestInterface;
 use Vanilla\Models\SSOData;
@@ -46,6 +47,7 @@ abstract class SSOAuthenticator extends Authenticator {
     /**
      * Authenticator constructor.
      *
+     * @throws Exception
      * @param string $authenticatorID Currently maps to "UserAuthenticationProvider.AuthenticationKey".
      */
     public function __construct($authenticatorID) {
@@ -107,6 +109,14 @@ abstract class SSOAuthenticator extends Authenticator {
 
         return $this;
     }
+
+    /**
+     * Tell whether a user is linked or not to this authenticator.
+     *
+     * @param int $userID
+     * @return bool
+     */
+    abstract public function isUserLinked(int $userID): bool;
 
     /**
      * Getter of linkSession.

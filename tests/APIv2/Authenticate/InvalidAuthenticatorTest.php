@@ -7,6 +7,7 @@
 
 namespace VanillaTests\APIv2\Authenticate;
 
+use Exception;
 use VanillaTests\APIv2\AbstractAPIv2Test;
 
 /**
@@ -24,13 +25,15 @@ class InvalidAuthenticatorTest extends AbstractAPIv2Test {
     /**
      * Test POST /authenticate with an invalid authenticator
      *
-     * @expectedException \Exception
-     * @expectedExceptionMessage invalidAuthenticator not found.
+     * @expectedException Exception
+     * @expectedExceptionMessage Authenticator not found.
      */
     public function testAuthenticate() {
         $postData = [
-            'authenticatorType' => 'invalid',
-            'authenticatorID' => '',
+            'authenticate' => [
+                'authenticatorType' => 'invalid',
+                'authenticatorID' => 'invalid',
+            ],
         ];
 
         $this->api()->post(

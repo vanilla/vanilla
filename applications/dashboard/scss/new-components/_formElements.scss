@@ -1,0 +1,55 @@
+// This is only for new pages, with new form element markup.
+$lineHeight-base: 1.428571429;
+$fontSize-large: 16px !default;
+$fontSize-default: 14px !default;
+$fontSize-small: 12px !default;
+
+.inputBlock {
+  display: block;
+  margin-bottom: 24px;
+
+  .checkbox {
+    display: flex;
+    align-items: center;
+  }
+
+  &.hasError {
+    .inputText {
+      border-color: #ff3933;
+      background-color: #ffebeb;
+      color: #ff3933;
+    }
+  }
+}
+
+.inputBlock-labelText {
+  display: block;
+  font-weight: 600;
+  margin-bottom: 6px;
+  line-height: $lineHeight-base;
+}
+
+.InputBox.inputText {
+  width: 100%;
+}
+
+.inputBlock-error {
+  color: #ff3933;
+  line-height: $lineHeight-base;
+  font-size: $fontSize-small;
+}
+
+.inputBlock-inputWrap {
+  display: block;
+}
+
+.inputBlock-labelNote {
+  display: block;
+  font-size: 12px;
+  line-height: $lineHeight-base;
+  opacity: .6;
+
+  + .inputBlock-inputWrap {
+    margin-top: $baseUnit;
+  }
+}

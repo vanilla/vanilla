@@ -1,0 +1,159 @@
+
+$authenticateUser-column_width: 311px !default;
+$authenticateUser-column_horizontalPadding: 26px !default;
+$authenticateUser-userImage_width: 117px !default;
+$authenticateUser-spacer: 18px !default;
+$authenticateUser-socialIcon_width: 42px !default;
+$authenticateUser-socialIcon_borderWidth: 3px !default;
+$authenticateUser-socialIcon_bg: #fff !default;
+$brand-color: #0291db !default;
+$baseUnit: 6px !default;
+$fontSize-large: 16px !default;
+$fontSize-default: 14px !default;
+$fontSize-small: 12px !default;
+$authenticateUserName-opacity: .6 !default;
+$authenticateUserArrowDown-opacity: .6 !default;
+$icon_size: 24px !default;
+$icon-large_size: 42px !default;
+
+// Dev, do not commit
+body.Entry #Content,
+.Row {
+    width: 100%;
+    max-width: 100%;
+}
+
+// End dev
+
+
+.authenticateUserCol {
+    padding: 0 $authenticateUser-column_horizontalPadding;
+    margin: auto;
+    width: #{$authenticateUser-column_width + $authenticateUser-column_horizontalPadding * 2};
+    max-width: 100%;
+    box-sizing: border-box;
+
+    .pageTitle {
+        text-align: center;
+        margin-bottom: $authenticateUser-spacer;
+    }
+
+    .button.button-fullWidth {
+        margin-bottom: $authenticateUser-spacer;
+    }
+
+    .icon {
+        display: inline-block;
+        width: $icon_size;
+        height: $icon_size;
+        vertical-align: middle;
+    }
+
+    .iconLarge {
+        width: $icon-large_size;
+        height: $icon-large_size;
+    }
+}
+
+.authenticateUser-photoCrop,
+.authenticateUser-imageWrap {
+    display: block;
+    width: 100%;
+    max-width: $authenticateUser-userImage_width;
+
+}
+
+
+.authenticateUser-photoCrop {
+    overflow: hidden;
+    border-radius: 50%;
+}
+
+.authenticateUser-imageWrap {
+    position: relative;
+    margin: auto;
+}
+
+.authenticateUser-icon {
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    display: block;
+    width: $authenticateUser-socialIcon_width;
+    height: $authenticateUser-socialIcon_width;
+    background-color: $authenticateUser-socialIcon_bg;
+    border: {
+        style: solid;
+        width: $authenticateUser-socialIcon_borderWidth;
+        color: $authenticateUser-socialIcon_bg;
+        radius: 50%;
+    }
+
+}
+
+.authenticateUser-photo {
+    display: block;
+    max-width: 100%;
+    width: 100%;
+    height: auto;
+}
+
+
+.authenticateUser-arrowDown {
+    display: block;
+    margin: $authenticateUser-spacer auto;
+    opacity: $authenticateUserArrowDown-opacity;
+}
+
+.authenticateUser-name {
+    font-size: $fontSize-large;
+    font-weight: 600;
+    text-align: center;
+}
+
+.authenticateUser-userName {
+    font-size: $fontSize-small;
+    opacity: $authenticateUserName-opacity;
+    text-align: center;
+}
+
+.rememberMeAndForgot {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    font-size: $fontSize-small;
+
+    a {
+        font-size: inherit;
+        color: $brand-color;
+    }
+}
+
+.rememberMeAndForgot-rememberMe {
+    flex-grow: 1;
+    padding-right: $baseUnit;
+}
+
+.authenticateUser-divider {
+    text-align: center;
+}
+
+.authenticateUser-footer {
+    text-align: center;
+}
+
+.authenticateUser-ssoLabel {
+    display: inline;
+    margin-left: $baseUnit * 2;
+}
+
+.button.button-sso,
+.Button.button-sso {
+    background-image: none;
+}
+
+.button-ssoLabel {
+    margin-left: 12px;
+    font-size: 14px;
+    font-weight: normal;
+}

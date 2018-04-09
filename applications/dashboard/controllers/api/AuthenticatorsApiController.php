@@ -208,6 +208,7 @@ class AuthenticatorsApiController extends AbstractApiController  {
         $record['type'] = strtolower($record['type']);
         $record['resourceUrl'] = strtolower(url('/api/v2/authenticators/'.$authenticator::getType().'/'.$authenticator->getID()));
 
+        // Convert URLs from relative to absolute.
         foreach (['signInUrl', 'registerUrl', 'signOutUrl', 'ui.photoUrl', 'resourceUrl'] as $field) {
             $value = valr($field, $record, null);
             if ($value !== null) {

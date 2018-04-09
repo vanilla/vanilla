@@ -48,7 +48,7 @@ class AuthenticatorModel {
     }
 
     /**
-     * Register an Authenticator class.
+     * Register an authenticator class.
      * Necessary only for authenticators that are not in an addon.
      *
      * @param string $authenticatorClass
@@ -61,7 +61,7 @@ class AuthenticatorModel {
     }
 
     /**
-     * Un-register an Authenticator class.
+     * Un-register an authenticator class.
      *
      * @param string $authenticatorClass
      * @return self
@@ -73,13 +73,16 @@ class AuthenticatorModel {
     }
 
     /**
-     * Get an Authenticator.
+     * Get an authenticator.
      *
      * @param string $authenticatorType
      * @param string $authenticatorID
      * @return Authenticator
+     *
      * @throws NotFoundException
      * @throws ServerException
+     * @throws \Garden\Container\ContainerException
+     * @throws \Garden\Container\NotFoundException
      */
     public function getAuthenticator(string $authenticatorType, string $authenticatorID) {
         if (empty($authenticatorType)) {
@@ -131,6 +134,11 @@ class AuthenticatorModel {
      *
      * @param string $authenticatorID
      * @return Authenticator
+     *
+     * @throws NotFoundException
+     * @throws ServerException
+     * @throws \Garden\Container\ContainerException
+     * @throws \Garden\Container\NotFoundException
      */
     public function getAuthenticatorByID(string $authenticatorID) {
         $uniqueAuthenticators = $this->getUniqueAuthenticatorIDs();
@@ -151,7 +159,7 @@ class AuthenticatorModel {
      *
      * @return Authenticator[]
      */
-    public function getAuthenticators() {
+    public function getAuthenticators(): array {
         $authenticatorClasses = $this->getAuthenticatorClasses();
         $authenticators = [];
         foreach ($authenticatorClasses as $authenticatorClass) {
@@ -188,7 +196,7 @@ class AuthenticatorModel {
      *
      * @return array
      */
-    public function getUniqueAuthenticatorIDs() {
+    public function getUniqueAuthenticatorIDs(): array {
         $ids = [];
         foreach ($this->getAuthenticatorClasses() as $class) {
             /** @var Authenticator $class */
@@ -205,7 +213,7 @@ class AuthenticatorModel {
      *
      * @return array
      */
-    public function getAuthenticatorClasses() {
+    public function getAuthenticatorClasses(): array {
         $authenticatorClasses = array_unique(
             $this->addonManager->findClasses('*Authenticator') + array_keys($this->authenticatorClasses)
         );

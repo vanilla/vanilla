@@ -197,7 +197,7 @@ class SSOModel {
             throw new ServerException('Expected an SSOAuthenticator');
         }
         if (!$ssoAuthenticator->isActive()) {
-            throw new ServerException('The Authenticator is not active.');
+            throw new ServerException('The authenticator is not active.');
         }
 
         if (!$user) {
@@ -253,7 +253,7 @@ class SSOModel {
                 // Synchronize user's roles.
                 $syncRoles = $this->config->get('Garden.SSO.SyncRoles', false);
 
-                // Override $syncRoles if the Authenticator is trusted.
+                // Override $syncRoles if the authenticator is trusted.
                 if ($ssoAuthenticator->isTrusted()) {
                     // Synchronize user's roles only on registration.
                     $syncRolesOnlyRegistration = $this->config->get('Garden.SSO.SyncRolesOnRegistrationOnly', false);

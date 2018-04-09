@@ -198,10 +198,11 @@ class AuthenticatorsApiController extends AbstractApiController  {
      * Normalize an Authenticator to match the Schema definition.
      *
      * @param Authenticator $authenticator
-     * @param array $options Not used right now.
      * @return array Return a Schema record.
+     *
+     * @throws \Garden\Schema\ValidationException
      */
-    public function normalizeOutput(Authenticator $authenticator, $options = []): array {
+    public function normalizeOutput(Authenticator $authenticator): array {
         $record = $authenticator->getAuthenticatorInfo();
         $record['authenticatorID'] = strtolower($record['authenticatorID']);
         $record['type'] = strtolower($record['type']);

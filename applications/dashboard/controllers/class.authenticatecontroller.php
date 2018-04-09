@@ -104,10 +104,10 @@ class AuthenticateController extends Gdn_Controller {
     }
 
     /**
-     * Do an authentication using the specified Authenticator.
+     * Do an authentication using the specified authenticator.
      *
-     * @param string $authenticatorType The Authenticator's type.
-     * @param string $authenticatorID The Authenticator's instance ID.
+     * @param string $authenticatorType The authenticator's type.
+     * @param string $authenticatorID The authenticator's instance ID.
      * @throws Exception
      */
     public function index($authenticatorType = '', $authenticatorID = '') {

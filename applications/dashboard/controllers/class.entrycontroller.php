@@ -111,7 +111,7 @@ class EntryController extends Gdn_Controller {
         // Allow hijacking auth type
         $authenticationSchemeAlias = $this->EventArguments['AuthenticationSchemeAlias'];
 
-        // Attempt to set Authenticator with requested method or fallback to default
+        // Attempt to set authenticator with requested method or fallback to default
         try {
             $authenticator = Gdn::authenticator()->authenticateWith($authenticationSchemeAlias);
         } catch (Exception $e) {
@@ -1135,10 +1135,10 @@ class EntryController extends Gdn_Controller {
                 throw new Exception();
             }
 
-            // Try to load the Authenticator
+            // Try to load the authenticator
             $authenticator = Gdn::authenticator()->authenticateWith($authenticationSchemeAlias);
 
-            // Try to grab the Authenticator data
+            // Try to grab the authenticator data
             $payload = $authenticator->getHandshake();
             if ($payload === false) {
                 Gdn::request()->withURI('dashboard/entry/auth/password');

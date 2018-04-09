@@ -155,6 +155,9 @@ class LinkUserTest extends AbstractAPIv2Test {
         $this->assertEquals($this->currentUser['userID'], $body['userID']);
     }
 
+    /**
+     * Test DELETE /authenticate/authenticators/:id
+     */
     public function testUnlinkUser() {
         $userID = $this->testLinkUserWithUserID();
 

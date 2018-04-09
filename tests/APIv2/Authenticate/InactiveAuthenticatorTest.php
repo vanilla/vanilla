@@ -47,7 +47,7 @@ class InactiveAuthenticatorTest extends AbstractAPIv2Test {
 
     /**
      * @expectedException Exception
-     * @expectedExceptionMessage The Authenticator is not active.
+     * @expectedExceptionMessage The authenticator is not active.
      */
     public function testInactiveAuth() {
         $postData = [

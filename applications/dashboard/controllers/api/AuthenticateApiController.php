@@ -89,7 +89,7 @@ class AuthenticateApiController extends AbstractApiController {
     }
 
     /**
-     * Unlink a user from the specified Authenticator.
+     * Unlink a user from the specified authenticator.
      * If no user is specified it will unlink the current user.
      *
      * @param string $authenticatorType
@@ -101,12 +101,12 @@ class AuthenticateApiController extends AbstractApiController {
         $this->permission();
 
         $this->schema([
-            'authenticatorType:s' => 'The Authenticator type that will be used.',
+            'authenticatorType:s' => 'The authenticator type that will be used.',
             'authenticatorID:s?' => 'Authenticator instance\'s identifier.',
         ]);
         $in = $this->schema([
-            'userID:i?' => 'UserID to unlink Authenticator from. Defaults to the current user\'s id',
-        ], 'in')->setDescription('Delete the link between an Authenticator and a user.');
+            'userID:i?' => 'UserID to unlink authenticator from. Defaults to the current user\'s id',
+        ], 'in')->setDescription('Delete the link between an authenticator and a user.');
         $this->schema([], 'out');
 
         $in->validate($query);
@@ -170,7 +170,7 @@ class AuthenticateApiController extends AbstractApiController {
             'type' => null,
             'name' => null,
             'ui' => null,
-            'isUserLinked:b?' => 'Whether or not the user is linked to that Authenticator.',
+            'isUserLinked:b?' => 'Whether or not the user is linked to that authenticator.',
         ])->merge(SSOAuthenticator::getAuthenticatorSchema());
     }
 
@@ -182,7 +182,7 @@ class AuthenticateApiController extends AbstractApiController {
      * @return Authenticator
      */
     public function index_authenticators(array $query) {
-         $this->permission();
+        $this->permission();
 
         $in = $this->schema([
             'isSSO:b?' => 'Filters authenticators depending on if they are SSO authenticators or not.',
@@ -232,7 +232,7 @@ class AuthenticateApiController extends AbstractApiController {
     }
 
     /**
-     * Authenticate a user using the specified Authenticator.
+     * Authenticate a user using the specified authenticator.
      *
      * @throws Exception If the authentication process fails.
      * @throws NotFoundException If the $authenticatorType is not found.
@@ -244,14 +244,14 @@ class AuthenticateApiController extends AbstractApiController {
 
         $in = $this->schema([
             'authenticate' => [
-                'authenticatorType:s' => 'The Authenticator type that will be used.',
+                'authenticatorType:s' => 'The authenticator type that will be used.',
                 'authenticatorID:s' => 'Authenticator instance\'s identifier.',
             ],
             'persist:b' => [
                 'default' => false,
                 'description' => 'Set the persist option on the cookie when it is set.',
             ],
-        ])->setDescription('Authenticate a user using a specific Authenticator.');
+        ])->setDescription('Authenticate a user using a specific authenticator.');
         $out = $this->schema(Schema::parse([
             'authenticationStep:s' => [
                 'description' => 'Tells whether the user is now authenticated or if additional step(s) are required.',
@@ -338,7 +338,7 @@ class AuthenticateApiController extends AbstractApiController {
     }
 
     /**
-     * Link a user to an Authenticator using an authSessionID.
+     * Link a user to an authenticator using an authSessionID.
      *
      * @throws ClientException
      * @throws Exception
@@ -382,7 +382,7 @@ class AuthenticateApiController extends AbstractApiController {
                 'email:s?' => 'User email.',
             ], 'in')
             ->addValidator('', $validator)
-            ->setDescription('Link a user to an Authenticator using the authSessionID and some other information. Required: userID + password or name + email + password.');
+            ->setDescription('Link a user to an authenticator using the authSessionID and some other information. Required: userID + password or name + email + password.');
         $out = $this->schema($this->getUserFragmentSchema(), 'out');
 
         $in->validate($body);
@@ -474,8 +474,8 @@ class AuthenticateApiController extends AbstractApiController {
 
         if ($ssoDataSchema === null) {
             $ssoDataSchema = $this->schema([
-                'authenticatorType:s' => 'Name of the Authenticator that was used to create this object.',
-                'authenticatorID:s' => 'ID of the Authenticator instance that was used to create this object.',
+                'authenticatorType:s' => 'Name of the authenticator that was used to create this object.',
+                'authenticatorID:s' => 'ID of the authenticator instance that was used to create this object.',
                 'uniqueID:s' => 'Unique ID of the user supplied by the provider.',
                 'user:o' => [
                     'email:s?' => 'Email of the user.',

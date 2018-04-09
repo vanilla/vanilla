@@ -62,9 +62,9 @@ abstract class Authenticator {
             'authenticatorID:s' => 'Authenticator instance\'s identifier.',
             'type' => null,
             'name' => null,
-            'getSignInUrl:s|n' => 'The configured relative sign in URL of the provider.',
-            'getRegisterUrl:s|n' => 'The configured relative register URL of the provider.',
-            'getSignOutUrl:s|n' => 'The configured relative sign out URL of the provider.',
+            'signInUrl:s|n' => 'The configured relative sign in URL of the provider.',
+            'registerUrl:s|n' => 'The configured relative register URL of the provider.',
+            'signOutUrl:s|n' => 'The configured relative sign out URL of the provider.',
             'ui:o' => static::getUiSchema(),
             'isActive:b' => 'Whether or not the Authenticator can be used.',
             'isUnique' => null,
@@ -206,9 +206,9 @@ abstract class Authenticator {
     protected function getAuthenticatorDefaultInfo(): array {
         return [
             'authenticatorID' => $this->getID(),
-            'getSignInUrl' => $this->getSignInUrl(),
-            'getRegisterUrl' => $this->getRegisterUrl(),
-            'getSignOutUrl' => $this->getSignOutUrl(),
+            'signInUrl' => $this->getSignInUrl(),
+            'registerUrl' => $this->getRegisterUrl(),
+            'signOutUrl' => $this->getSignOutUrl(),
             'ui' => [
                 'url' => strtolower(url('/authenticate/signin/'.static::getType().'/'.$this->getID())),
             ],

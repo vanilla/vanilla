@@ -3,10 +3,10 @@ import { formatUrl, t } from '@core/application';
 import React from 'react';
 import { withRouter, BrowserRouter, Route } from 'react-router-dom';
 import Paragraph from '../../Forms/Paragraph';
-import UniqueID from "react-html-id";
 import InputTextBlock from "../../Forms/InputTextBlock";
 import PasswordTextBlock from "../../Forms/PasswordTextBlock";
 import ButtonSubmit from "../../Forms/ButtonSubmit";
+import {getUniqueID} from '@core/Interfaces/componentIDs';
 
 interface IProps {
     isEditable?: boolean;
@@ -21,19 +21,11 @@ interface IState {
 
 class PasswordPage extends React.Component<IProps, IState> {
     public ID: string;
-    public nextUniqueId: () => string;
-    public parentID: string;
     public ssoMethods: any[];
 
     constructor(props) {
         super(props);
-        if (!props.ID) {
-            UniqueID.enableUniqueIds(this);
-            this.ID = 'SignInPage-' + this.nextUniqueId();
-        } else {
-            this.ID = props.ID;
-        }
-
+        this.ID = getUniqueID(props, 'signInForm');
         this.state = {
             isEditable: props.isEditable || true,
             errors: props.errors || [],

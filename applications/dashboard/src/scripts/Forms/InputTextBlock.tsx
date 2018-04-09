@@ -3,10 +3,9 @@ import React from 'react';
 import classNames from 'classnames';
 import ErrorMessages from "./ErrorMessages";
 import Paragraph from "./Paragraph";
-import {getUniqueID, IComponentID} from "../componentIDs";
+import {getUniqueID, IComponentID} from '@core/Interfaces/componentIDs';
 
 export interface IInputTextProps extends IComponentID{
-    parentID: string;
     className?: string;
     label: string;
     labelNote?: string;
@@ -33,13 +32,11 @@ export default class InputTextBlock extends React.Component<IInputTextProps, ISt
     public ID: string;
     public errorID: string;
     public labelID: string;
-    public nextUniqueId: () => string;
     public type: string;
 
     constructor(props) {
         super(props);
         this.ID = getUniqueID(props, "inputText");
-
         this.labelID = this.ID + "-label";
         this.errorID = this.ID + "-errors";
         this.type = props.type || 'text';

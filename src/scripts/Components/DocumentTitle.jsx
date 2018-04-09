@@ -2,6 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { getMeta } from "@core/application";
 import classNames from 'classnames';
+import {getUniqueID, IComponentID } from '@core/Interfaces/componentIDs';
 
 /**
  * A component for displaying and setting the document title.
@@ -16,7 +17,7 @@ import classNames from 'classnames';
  *     <h1>Page Title</h1>
  * </DocumentTitle>
  */
-export default class DocumentTitle extends React.Component {
+export default class DocumentTitle extends React.Component<IComponentID> {
     static propTypes = {
         children: PropTypes.node,
         classNames: PropTypes.string,

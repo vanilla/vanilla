@@ -2,19 +2,21 @@ import { t } from '@core/application';
 import React from 'react';
 import Paragraph from '../../Forms/Paragraph';
 import Or from '../../Forms/Or';
+import {getUniqueID, IComponentID} from '@core/Interfaces/componentIDs';
 
-interface IProps {
+interface IProps extends IComponentID {
     includeOr?: boolean;
 }
 
 export default class SSOMethods extends React.Component<IProps> {
     public methods: any[];
     public includeOr: boolean;
+    public ID: string;
 
     constructor(props) {
         super(props);
-
-        this.includeOr = !!props.includeOr;
+        this.ID = getUniqueID(props, 'SSOMethods', true);
+        this.includeOr = props.includeOr || true;
 
         this.methods = [{
             authenticatorID: "facebookID",
@@ -107,7 +109,7 @@ export default class SSOMethods extends React.Component<IProps> {
             });
 
             return <div className="ssoMethods">
-                <Paragraph content={t('Sign in with one of the following:')} />
+                <Paragraph parentID={this.ID} content={t('Sign in with one of the following:')} />
                 {ssoMethods}
                 {or}
             </div>;

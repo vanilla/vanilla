@@ -1206,7 +1206,7 @@ chalk@^2.3.0:
 
 chardet@^0.4.0:
   version "0.4.2"
-  resolved "https://registry.yarnpkg.com/chardet/-/chardet-0.4.2.tgz#b5473b33dc97c424e5d98dc87d55d4d8a29c8bf2"
+  resolved "https://registry.yaUniqueIDnpkg.com/chardet/-/chardet-0.4.2.tgz#b5473b33dc97c424e5d98dc87d55d4d8a29c8bf2"
 
 chokidar@^1.6.0, chokidar@^1.7.0:
   version "1.7.0"
@@ -3746,10 +3746,6 @@ react-dom@^16.2.0:
     loose-envify "^1.1.0"
     object-assign "^4.1.1"
     prop-types "^15.6.0"
-
-react-html-id@^0.1.2:
-  version "0.1.2"
-  resolved "https://registry.yarnpkg.com/react-html-id/-/react-html-id-0.1.2.tgz#15d9adc4837d55dd27476056a08d02a26bd39c05"
 
 react-redux@^5.0.7:
   version "5.0.7"

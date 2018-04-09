@@ -3,11 +3,10 @@ import React from 'react';
 import classNames from 'classnames';
 import * as PropTypes from "prop-types";
 import Button from "./Button";
-import UniqueID from "react-html-id";
+import {getUniqueID, IComponentID} from '@core/Interfaces/componentIDs';
 
-interface IProps {
+interface IProps extends IComponentID {
     content: string | Node;
-    parentID: string;
     className?: string;
 }
 
@@ -17,14 +16,11 @@ interface IState {
 
 export default class ButtonSubmit extends React.Component<IProps, IState> {
     public ID: string;
-    public type: string;
-    public nextUniqueId: () => string;
+
 
     constructor(props) {
         super(props);
-        this.type = 'submit';
-        UniqueID.enableUniqueIds(this);
-        this.ID = props.parentID + '-submitButton' + this.nextUniqueId();
+        this.ID = getUniqueID(props, 'submitButton');
         this.state = {
             disabled: props.disabled,
         };

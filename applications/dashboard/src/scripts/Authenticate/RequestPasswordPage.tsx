@@ -4,14 +4,13 @@ import DocumentTitle from '@core/Components/DocumentTitle';
 import * as PropTypes from "prop-types";
 import { Link } from 'react-router-dom';
 import React from 'react';
-import UniqueID from "react-html-id";
-
+import { getUniqueID, IComponentID } from '@core/Interfaces/componentIDs';
 import ButtonSubmit from "../Forms/ButtonSubmit";
 import Paragraph from "../Forms/Paragraph";
 import InputTextBlock from "../Forms/InputTextBlock";
 import RememberPasswordLink from "./components/RememberPasswordLink";
 
-interface IProps {
+interface IProps extends IComponentID{
     isEditable: boolean;
     emailSent: boolean;
     errors?: string[];
@@ -25,17 +24,10 @@ interface IState {
 
 export default class RequestPasswordPage extends React.Component<IState, IProps> {
     public ID: string;
-    public nextUniqueId: () => string;
-    public parentID: string;
 
     constructor(props) {
         super(props);
-        if (!props.ID) {
-            UniqueID.enableUniqueIds(this);
-            this.ID = 'RequestPasswordPage-' + this.nextUniqueId();
-        } else {
-            this.ID = props.ID;
-        }
+        this.ID = getUniqueID(props, 'RequestPasswordPage');
 
         this.state = {
             isEditable: props.isEditable || true,
@@ -69,7 +61,7 @@ export default class RequestPasswordPage extends React.Component<IState, IProps>
     }
 
     public render() {
-        const pageTitle = <DocumentTitle classNames="isCentered" title={t('Recover Password')}/>;
+        const pageTitle = <DocumentTitle parentID={this.ID} className="isCentered" title={t('Recover Password')}/>;
         if (this.state.emailSent) {
             return <div className="authenticateUserCol">
                 {pageTitle}
@@ -80,7 +72,7 @@ export default class RequestPasswordPage extends React.Component<IState, IProps>
             return <div className="authenticateUserCol">
                 {pageTitle}
                 <Paragraph content={t('Enter your email address or username to continue.')} className="authenticateUser-paragraph" />
-                <form onSubmit={this.handleSubmit}>
+                <form id={this.ID} onSubmit={this.handleSubmit} aria-labelledby={t('')}>
                     <InputTextBlock parentID={this.ID} label={t('Email/Username')} required={true} errors={this.state.errors}/>
                     <ButtonSubmit parentID={this.ID} content={t('Request a new password')}/>
                 </form>

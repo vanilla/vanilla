@@ -160,6 +160,10 @@ body.isMobile .change-picture .change-picture-instructions {
   box-sizing: border-box;
 }
 
+.button.Button.button-sso {
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.3);
+}
+
 .button-ssoLabel {
   margin-left: 12px;
   font-size: 14px;

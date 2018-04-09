@@ -4,7 +4,7 @@ import DocumentTitle from '@core/Components/DocumentTitle';
 import * as PropTypes from "prop-types";
 import { Link } from 'react-router-dom';
 import React from 'react';
-import { getUniqueID, IComponentID } from '@core/Interfaces/componentIDs';
+import { getUniqueIDFromPrefix, IComponentID } from '@core/Interfaces/componentIDs';
 import ButtonSubmit from "../Forms/ButtonSubmit";
 import Paragraph from "../Forms/Paragraph";
 import InputTextBlock from "../Forms/InputTextBlock";
@@ -24,10 +24,12 @@ interface IState {
 
 export default class RecoverPasswordPage extends React.Component<IState, IProps> {
     public ID: string;
+    public pageTitleID: string;
 
     constructor(props) {
         super(props);
-        this.ID = getUniqueID(props, 'RecoverPasswordPage');
+        this.ID = getUniqueIDFromPrefix('RecoverPasswordPage');
+        this.pageTitleID = this.ID + '-pageTitle';
 
         this.state = {
             isEditable: props.isEditable || true,
@@ -61,15 +63,15 @@ export default class RecoverPasswordPage extends React.Component<IState, IProps>
     }
 
     public render() {
-        const pageTitle = <DocumentTitle parentID={this.ID} className="isCentered" title={t('Recover Password')}/>;
+        const pageTitle = <DocumentTitle id={this.pageTitleID} className="isCentered" title={t('Recover Password')}/>;
         if (this.state.emailSent) {
-            return <div className="authenticateUserCol">
+            return <div id={this.ID} className="authenticateUserCol">
                 {pageTitle}
                 <Paragraph content={t('A message has been sent to your email address with password reset instructions.')} className="authenticateUser-paragraph" />
                 <RememberPasswordLink/>
             </div>;
         } else {
-            return <div className="authenticateUserCol">
+            return <div id={this.ID} className="authenticateUserCol">
                 {pageTitle}
                 <Paragraph content={t('Enter your email address or username to continue.')} className="authenticateUser-paragraph" />
                 <form id={this.ID} onSubmit={this.handleSubmit} aria-labelledby={t('')}>

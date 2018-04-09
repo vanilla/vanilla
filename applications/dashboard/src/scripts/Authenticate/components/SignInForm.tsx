@@ -19,7 +19,7 @@ interface IState {
     redirectTo?: string;
 }
 
-class PasswordPage extends React.Component<IProps, IState> {
+class SignInForm extends React.Component<IProps, IState> {
     public ID: string;
     public ssoMethods: any[];
 
@@ -59,11 +59,9 @@ class PasswordPage extends React.Component<IProps, IState> {
 
 
     public render() {
-
-
         if (this.state.redirectTo) {
             return <BrowserRouter>
-                <Route path={this.state.redirectTo} component={PasswordPage} />
+                <Route path={this.state.redirectTo} component={SignInForm} />
             </BrowserRouter>;
         } else {
             return <form className="signInForm">
@@ -76,10 +74,10 @@ class PasswordPage extends React.Component<IProps, IState> {
                     errors={this.state.errors}
                 />
                 <PasswordTextBlock parentID={this.ID} label={t('Password')} placeholder={t('Enter Password')} required={true} errors={this.state.errors}/>
-                <ButtonSubmit parentID={this.ID} content={t('Request a new password')}/>
+                <ButtonSubmit parentID={this.ID} content={t('Sign In')}/>
             </form>;
         }
     }
 }
 
-export default withRouter(PasswordPage);
+export default withRouter(SignInForm);

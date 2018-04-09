@@ -4,14 +4,19 @@ import DocumentTitle from '@core/Components/DocumentTitle';
 import SignInForm from "./components/SignInForm";
 import CreateAnAccountLink from "./components/CreateAnAccountLink";
 import SSOMethods from "./components/SSOMethods";
-import { getUniqueID } from '@core/Interfaces/componentIDs';
+import { getUniqueIDFromPrefix } from '@core/Interfaces/componentIDs';
 
-export default class PasswordPage extends React.Component {
+export default class SignInPage extends React.Component {
     public ID: string;
+    public pageTitleID: string;
+
 
     constructor(props) {
         super(props);
-        this.ID = getUniqueID(props, 'SignInPage');
+
+        this.ID = getUniqueIDFromPrefix('SignInPage');
+        window.console.log("generated id: ", this.ID);
+        this.pageTitleID = this.ID + '-pageTitle';
         this.state = {
             isEditable: props.isEditable || true,
             errors: props.errors || [],
@@ -20,8 +25,8 @@ export default class PasswordPage extends React.Component {
 
 
     public render() {
-        const pageTitle = <DocumentTitle parentID={this.ID} classNames="isCentered" title={t('Sign In')}/>;
-        return <div className="authenticateUserCol">
+        const pageTitle = <DocumentTitle id={this.pageTitleID} classNames="isCentered" title={t('Sign In')}/>;
+        return <div id={this.ID} className="authenticateUserCol">
             {pageTitle}
             <SSOMethods parentID={this.ID} />
             <SignInForm parentID={this.ID}/>

@@ -1,8 +1,7 @@
-import React from 'react';
-import PropTypes from 'prop-types';
-import { getMeta } from "@core/application";
 import classNames from 'classnames';
-import {getUniqueID, IComponentID } from '@core/Interfaces/componentIDs';
+import { getMeta } from "@core/application";
+import PropTypes from 'prop-types';
+import React from 'react';
 
 /**
  * A component for displaying and setting the document title.
@@ -17,10 +16,11 @@ import {getUniqueID, IComponentID } from '@core/Interfaces/componentIDs';
  *     <h1>Page Title</h1>
  * </DocumentTitle>
  */
-export default class DocumentTitle extends React.Component<IComponentID> {
+export default class DocumentTitle extends React.Component {
     static propTypes = {
         children: PropTypes.node,
         classNames: PropTypes.string,
+        id: PropTypes.string,
         title: PropTypes.string,
     };
 
@@ -59,7 +59,7 @@ export default class DocumentTitle extends React.Component<IComponentID> {
         if (this.props.children && this.props.children.length > 0) {
             return this.props.children;
         } else {
-            return <h1 className={this.classes}>{this.props.title}</h1>;
+            return <h1 id={this.props.id} className={this.classes}>{this.props.title}</h1>;
         }
     }
 }

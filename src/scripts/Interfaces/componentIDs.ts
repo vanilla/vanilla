@@ -5,16 +5,25 @@ export interface IComponentID {
     ID?: string;
 }
 
+export function getUniqueIDFromPrefix(uniqueSuffix:string) {
+    return uniqueSuffix + uniqueid() as string;
+}
+
 export function getUniqueID(props:IComponentID, uniqueSuffix:string, allowNoID?:boolean|undefined):any {
-    if ((!props.ID && !props.parentID) && (props.ID && props.parentID) && !allowNoID) {
-        throw new Error(`You must have *either* ID or parentID`);
+    let id:any = null;
+
+    if (!allowNoID) {
+        if ((!props.ID && !props.parentID) || (props.ID && props.parentID)) {
+            throw new Error(`You must have *either* ID or parentID`);
+        }
     }
 
     if (props.parentID) {
-        return props.parentID + "-" + uniqueSuffix + uniqueid();
+        id = props.parentID + "-" + uniqueSuffix + uniqueid() as string;
     } else if (props.ID) {
-        return props.ID as string;
-    } else {
-        return null;
+        id = props.ID as string;
     }
+
+    return id;
+
 }

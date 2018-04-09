@@ -16,6 +16,7 @@ $authenticateUserArrowDown-opacity: .6 !default;
 $icon_size: 24px !default;
 $icon-large_size: 42px !default;
 $authenticateMethod-width: 200px !default;
+$authenticateMethod-button_boxShadow: 0 1px 3px 0 rgba(0, 0, 0, .3) !default;
 
 .authenticateUserCol {
     padding: 0 $authenticateUser-column_horizontalPadding;
@@ -146,6 +147,10 @@ $authenticateMethod-width: 200px !default;
         justify-content: center;
         background-image: none;
         box-sizing: border-box;
+    }
+
+    &.button-sso {
+        box-shadow: $authenticateMethod-button_boxShadow;
     }
 }
 

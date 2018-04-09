@@ -208,6 +208,13 @@ class AuthenticatorsApiController extends AbstractApiController  {
         $record['type'] = strtolower($record['type']);
         $record['resourceUrl'] = strtolower(url('/api/v2/authenticators/'.$authenticator::getType().'/'.$authenticator->getID()));
 
+        foreach (['signInUrl', 'registerUrl', 'signOutUrl', 'ui.photoUrl', 'resourceUrl'] as $field) {
+            $value = valr($field, $record, null);
+            if ($value !== null) {
+                setvalr($field, $record, url($value, true));
+            }
+        }
+
         // Not used here specifically but it is used from /authenticate/authenticators.
         if (is_a($authenticator, SSOAuthenticator::class)) {
             /** @var SSOAuthenticator $ssoAuthenticator */

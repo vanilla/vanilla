@@ -9,28 +9,39 @@ import ButtonSubmit from "../../Forms/ButtonSubmit";
 import {getUniqueID} from '@core/Interfaces/componentIDs';
 
 interface IProps {
-    isEditable?: boolean;
+    editable?: boolean;
     errors?: string[];
+    ssoMethods?: any[];
 }
 
 interface IState {
-    isEditable: boolean;
+    editable: boolean;
     errors?: string[];
     redirectTo?: string;
+    active: boolean;
+    passwordAuthenticator?: any[];
 }
 
 class SignInForm extends React.Component<IProps, IState> {
+    public passwordAuthenticator: any[];
     public ID: string;
-    public ssoMethods: any[];
+
 
     constructor(props) {
         super(props);
         this.ID = getUniqueID(props, 'signInForm');
         this.state = {
-            isEditable: props.isEditable || true,
+            editable: props.editable || true,
             errors: props.errors || [],
+            active: false
         };
 
+        if (props.ssoMethods) {
+            props.ssoMethods.map((method, index) => {
+                window.console.log("SignInForm method: ", method);
+                // if matches passwordAuthenticator, set as passwordAuthenticator
+            });
+        }
     }
 
     // // Disable button when in submit state
@@ -55,7 +66,9 @@ class SignInForm extends React.Component<IProps, IState> {
     //         });
     //     };
     }
+    public componentDidMount() {
 
+    }
 
 
     public render() {

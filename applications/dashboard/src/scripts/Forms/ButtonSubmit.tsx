@@ -8,6 +8,7 @@ import {getUniqueID, IComponentID} from '@core/Interfaces/componentIDs';
 interface IProps extends IComponentID {
     content: string | Node;
     className?: string;
+    disabled?: boolean;
 }
 
 interface IState {

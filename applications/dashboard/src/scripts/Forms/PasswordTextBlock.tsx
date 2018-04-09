@@ -1,26 +1,10 @@
 import React from 'react';
 import classNames from 'classnames';
-import InputTextBlock from "./InputTextBlock";
+import {IInputTextProps, default as InputTextBlock} from "./InputTextBlock";
 import UniqueID from "react-html-id";
 import { t } from '@core/application';
 
-interface IProps {
-    parentID: string;
-    className?: string;
-    label: string;
-    labelNote?: string;
-    inputClassNames?: string;
-    labelID?: string;
-    value?: string;
-    placeholder?: string;
-    valid?: boolean;
-    descriptionID?: string;
-    required?: boolean;
-    errors?: string[];
-    disabled?: boolean;
-}
-
-export default class PasswordTextBlock extends React.Component<IProps> {
+export default class PasswordTextBlock extends React.Component<IInputTextProps> {
     private type: string;
     private placeholder: string;
 
@@ -31,5 +15,6 @@ export default class PasswordTextBlock extends React.Component<IProps> {
 
     public render() {
         return <InputTextBlock {...this.props} type="password" />;
+
     }
 }

@@ -1,11 +1,11 @@
 import { t } from '@core/application';
 import React from 'react';
 import classNames from 'classnames';
-import UniqueID from "react-html-id";
 import ErrorMessages from "./ErrorMessages";
 import Paragraph from "./Paragraph";
+import {getUniqueID, IComponentID} from "../componentIDs";
 
-interface IBaseProps {
+export interface IInputTextProps extends IComponentID{
     parentID: string;
     className?: string;
     label: string;
@@ -22,16 +22,6 @@ interface IBaseProps {
     disabled?: boolean;
 }
 
-interface IFirst extends IBaseProps {
-    parentID: string;
-}
-
-interface ISecond extends IBaseProps {
-    ID: string;
-}
-
-type IProps = IFirst | ISecond;
-
 interface IState {
     disabled: boolean;
     valid?: boolean;
@@ -39,7 +29,7 @@ interface IState {
     errors?: string[];
 }
 
-export default class InputTextBlock extends React.Component<IProps, IState> {
+export default class InputTextBlock extends React.Component<IInputTextProps, IState> {
     public ID: string;
     public errorID: string;
     public labelID: string;
@@ -48,17 +38,7 @@ export default class InputTextBlock extends React.Component<IProps, IState> {
 
     constructor(props) {
         super(props);
-
-        if (props.ID && props.parentID) {
-            throw new Error(`You're not allowed to have both a parentID and an ID.`);
-        }
-
-        if (props.parentID) {
-            UniqueID.enableUniqueIds(this);
-            this.ID = props.parentID + '-inputText' + this.nextUniqueId();
-        } else {
-            this.ID = props.ID;
-        }
+        this.ID = getUniqueID(props, "inputText");
 
         this.labelID = this.ID + "-label";
         this.errorID = this.ID + "-errors";

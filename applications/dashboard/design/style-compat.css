@@ -33,12 +33,6 @@ body.isMobile .change-picture .change-picture-instructions {
   display: none;
 }
 
-body.Entry #Content,
-.Row {
-  width: 100%;
-  max-width: 100%;
-}
-
 .authenticateUserCol {
   padding: 0 26px;
   margin: auto;

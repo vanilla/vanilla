@@ -16,16 +16,6 @@ $authenticateUserArrowDown-opacity: .6 !default;
 $icon_size: 24px !default;
 $icon-large_size: 42px !default;
 
-// Dev, do not commit
-body.Entry #Content,
-.Row {
-    width: 100%;
-    max-width: 100%;
-}
-
-// End dev
-
-
 .authenticateUserCol {
     padding: 0 $authenticateUser-column_horizontalPadding;
     margin: auto;

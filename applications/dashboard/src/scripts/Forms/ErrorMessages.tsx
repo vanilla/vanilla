@@ -1,6 +1,6 @@
 import React from 'react';
 import classNames from 'classnames';
-import UniqueID from "react-html-id";
+import {getUniqueID, IComponentID} from '@core/Interfaces/componentIDs';
 
 interface IProps {
     id?: string;
@@ -9,6 +9,13 @@ interface IProps {
 }
 
 export default class ErrorMessages extends React.Component<IProps> {
+    public ID: string;
+
+    constructor(props) {
+        super(props);
+        this.ID = getUniqueID(props, 'errorMessages', true);
+    }
+
     public render() {
         const errors = this.props.errors;
         if (errors && errors.length > 0) {
@@ -20,7 +27,7 @@ export default class ErrorMessages extends React.Component<IProps> {
                 return <span key={ index } className="inputBlock-error">{error}</span>;
             });
 
-            return <span id={this.props.id} className={componentClasses}>
+            return <span id={this.ID} className={componentClasses}>
                 {errorList}
             </span>;
         } else {

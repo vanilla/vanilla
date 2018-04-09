@@ -2,7 +2,7 @@ import React from 'react';
 import classNames from 'classnames';
 import {getUniqueID, IComponentID} from '@core/Interfaces/componentIDs';
 
-interface IProps extends IComponentID{
+interface IProps extends IComponentID {
     className?: string;
     hasError?: boolean;
     content: string | Node | null | undefined;

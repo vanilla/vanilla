@@ -15,6 +15,7 @@ $authenticateUserName-opacity: .6 !default;
 $authenticateUserArrowDown-opacity: .6 !default;
 $icon_size: 24px !default;
 $icon-large_size: 42px !default;
+$authenticateMethod-width: 200px !default;
 
 .authenticateUserCol {
     padding: 0 $authenticateUser-column_horizontalPadding;
@@ -137,13 +138,33 @@ $icon-large_size: 42px !default;
     margin-left: $baseUnit * 2;
 }
 
-.button.button-sso,
-.Button.button-sso {
-    background-image: none;
+.button.Button {
+    &.Primary.buttonCTA,
+    &.button-sso {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background-image: none;
+        box-sizing: border-box;
+    }
 }
 
 .button-ssoLabel {
     margin-left: 12px;
     font-size: 14px;
     font-weight: normal;
+}
+
+.ssoMethod-icon {
+    width: $icon_size;
+    height: auto;
+}
+
+.button-ssoContents {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    flex-wrap: wrap;
+    width: $authenticateMethod-width;
+    max-width: 100%;
 }

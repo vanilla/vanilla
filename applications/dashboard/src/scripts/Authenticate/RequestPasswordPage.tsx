@@ -5,10 +5,17 @@ import * as PropTypes from "prop-types";
 import { Link } from 'react-router-dom';
 import React from 'react';
 import UniqueID from "react-html-id";
-import RememberPassword from "./RememberPassword";
+
 import ButtonSubmit from "../Forms/ButtonSubmit";
 import Paragraph from "../Forms/Paragraph";
 import InputTextBlock from "../Forms/InputTextBlock";
+import RememberPasswordLink from "./components/RememberPasswordLink";
+
+interface IProps {
+    isEditable: boolean;
+    emailSent: boolean;
+    errors?: string[];
+}
 
 interface IState {
     isEditable: boolean;
@@ -16,7 +23,7 @@ interface IState {
     errors?: string[];
 }
 
-export default class RequestPasswordPage extends React.Component<IState> {
+export default class RequestPasswordPage extends React.Component<IState, IProps> {
     public ID: string;
     public nextUniqueId: () => string;
     public parentID: string;
@@ -31,8 +38,9 @@ export default class RequestPasswordPage extends React.Component<IState> {
         }
 
         this.state = {
-            isEditable: true,
-            emailSent: false,
+            isEditable: props.isEditable || true,
+            emailSent: props.emailSent || false,
+            errors: props.errors || [],
         };
 
     }
@@ -66,7 +74,7 @@ export default class RequestPasswordPage extends React.Component<IState> {
             return <div className="authenticateUserCol">
                 {pageTitle}
                 <Paragraph content={t('A message has been sent to your email address with password reset instructions.')} className="authenticateUser-paragraph" />
-                <RememberPassword/>
+                <RememberPasswordLink/>
             </div>;
         } else {
             return <div className="authenticateUserCol">
@@ -76,7 +84,7 @@ export default class RequestPasswordPage extends React.Component<IState> {
                     <InputTextBlock parentID={this.ID} label={t('Email/Username')} required={true} errors={this.state.errors}/>
                     <ButtonSubmit parentID={this.ID} content={t('Request a new password')}/>
                 </form>
-                <RememberPassword/>
+                <RememberPasswordLink/>
             </div>;
         }
     }

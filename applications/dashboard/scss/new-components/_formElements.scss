@@ -20,6 +20,10 @@ $fontSize-small: 12px !default;
             color: #ff3933;
         }
     }
+
+    ::-ms-clear { // IE fix
+        display: none;
+    }
 }
 
 .inputBlock-errors,
@@ -64,4 +68,8 @@ $fontSize-small: 12px !default;
     &.isError {
         color: #ff3933;
     }
+}
+
+.inputBlock-inputText {
+    box-sizing: border-box;
 }

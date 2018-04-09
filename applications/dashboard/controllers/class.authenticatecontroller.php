@@ -240,6 +240,10 @@ class AuthenticateController extends Gdn_Controller {
         $this->renderReact();
     }
 
+    public function requestPassword() {
+        $this->renderReact();
+    }
+
     public function signin() {
         $this->renderReact();
     }

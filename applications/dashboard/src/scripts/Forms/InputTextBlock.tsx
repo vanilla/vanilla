@@ -14,10 +14,11 @@ interface IBaseProps {
     type?: string;
     labelID?: string;
     value?: string;
+    placeholder?: string;
     valid?: boolean;
     descriptionID?: string;
     required?: boolean;
-    errors?: string;
+    errors?: string[];
     disabled?: boolean;
 }
 
@@ -54,7 +55,7 @@ export default class InputTextBlock extends React.Component<IProps, IState> {
 
         if (props.parentID) {
             UniqueID.enableUniqueIds(this);
-            this.ID = props.parentID + '-button' + this.nextUniqueId();
+            this.ID = props.parentID + '-inputText' + this.nextUniqueId();
         } else {
             this.ID = props.ID;
         }
@@ -105,6 +106,7 @@ export default class InputTextBlock extends React.Component<IProps, IState> {
                     type={this.type}
                     disabled={this.state.disabled}
                     required={this.props.required}
+                    placeholder={this.props.placeholder}
                     aria-invalid={hasErrors}
                     aria-describedby={describedBy}
                     aria-labelledby={this.labelID}

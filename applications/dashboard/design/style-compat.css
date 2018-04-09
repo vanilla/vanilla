@@ -152,15 +152,32 @@ body.isMobile .change-picture .change-picture-instructions {
   margin-left: 12px;
 }
 
-.button.button-sso,
-.Button.button-sso {
+.button.Button.Primary.buttonCTA, .button.Button.button-sso {
+  display: flex;
+  align-items: center;
+  justify-content: center;
   background-image: none;
+  box-sizing: border-box;
 }
 
 .button-ssoLabel {
   margin-left: 12px;
   font-size: 14px;
   font-weight: normal;
+}
+
+.ssoMethod-icon {
+  width: 24px;
+  height: auto;
+}
+
+.button-ssoContents {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  flex-wrap: wrap;
+  width: 200px;
+  max-width: 100%;
 }
 
 .followButton {
@@ -321,6 +338,10 @@ body.Categories.isMobile .PageControls.Top {
   color: #ff3933;
 }
 
+.inputBlock ::-ms-clear {
+  display: none;
+}
+
 .inputBlock-errors,
 .inputBlock-labelAndDescription {
   display: block;
@@ -363,14 +384,12 @@ body.Categories.isMobile .PageControls.Top {
   color: #ff3933;
 }
 
-.checkbox-box {
-  display: none;
+.inputBlock-inputText {
+  box-sizing: border-box;
 }
 
-.button-ssoContents {
-  display: flex;
-  align-items: center;
-  justify-content: center;
+.checkbox-box {
+  display: none;
 }
 
 label.checkbox input.checkbox-input {

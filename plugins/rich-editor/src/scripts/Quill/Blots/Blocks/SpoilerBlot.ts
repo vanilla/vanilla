@@ -4,26 +4,30 @@
  * @license https://opensource.org/licenses/GPL-2.0 GPL-2.0
  */
 
-import WrapperBlot, { ContentBlot, LineBlot } from "../Abstract/WrapperBlot";
+ /* tslint:disable:max-classes-per-file */
+
+import WrapperBlot from "../Abstract/WrapperBlot";
+import ContentBlot from "../Abstract/ContentBlot";
+import LineBlot from "../Abstract/LineBlot";
 import { t } from "@core/application";
 
 /**
  * Represent a single line of a Spoiler.
  */
 export default class SpoilerLineBlot extends LineBlot {
-    static blotName = "spoiler-line";
-    static className = "spoiler-line";
-    static tagName = 'p';
-    static parentName = "spoiler-content";
+    public static blotName = "spoiler-line";
+    public static className = "spoiler-line";
+    public static tagName = 'p';
+    public static parentName = "spoiler-content";
 }
 
 /**
  * Represents the full content area of a spoiler.
  */
 export class SpoilerContentBlot extends ContentBlot {
-    static className = 'spoiler-content';
-    static blotName = 'spoiler-content';
-    static parentName = 'spoiler';
+    public static className = 'spoiler-content';
+    public static blotName = 'spoiler-content';
+    public static parentName = 'spoiler';
 }
 
 const spoilerButton = `
@@ -50,39 +54,14 @@ const spoilerButton = `
  * through a SpoilerLineBlot.
  */
 export class SpoilerWrapperBlot extends WrapperBlot {
-    static className = 'spoiler';
-    static blotName = 'spoiler';
-    static allowedChildren = [...WrapperBlot.allowedChildren];
+    public static className = 'spoiler';
+    public static blotName = 'spoiler';
+    public static allowedChildren = [...WrapperBlot.allowedChildren];
 
-    static create() {
-        const node = super.create();
+    public static create(value) {
+        const node = super.create(value);
         node.classList.add("isShowingSpoiler");
         return node;
-    }
-
-    /**
-     * Attach the toggle button to the spoiler, and set it's event listener.
-     */
-    attachToggleButton() {
-        const node = document.createElement("div");
-        node.setAttribute("contenteditable", false);
-        node.classList.add("spoiler-buttonContainer");
-        node.innerHTML = spoilerButton;
-        this.domNode.appendChild(node);
-    }
-
-    attach() {
-        super.attach();
-    }
-
-    /**
-     * Remove the blot's toggleButton with it.
-     */
-    remove() {
-        if (this.toggleButton) {
-            this.toggleButton.remove();
-        }
-        super.remove();
     }
 
     constructor(domNode) {
@@ -90,7 +69,22 @@ export class SpoilerWrapperBlot extends WrapperBlot {
         this.attachToggleButton();
     }
 
-    optimize(context) {
+    /**
+     * Attach the toggle button to the spoiler, and set it's event listener.
+     */
+    public attachToggleButton() {
+        const node = document.createElement("div");
+        node.setAttribute("contenteditable", false);
+        node.classList.add("spoiler-buttonContainer");
+        node.innerHTML = spoilerButton;
+        this.domNode.appendChild(node);
+    }
+
+    public attach() {
+        super.attach();
+    }
+
+    public optimize(context) {
         super.optimize(context);
     }
 }

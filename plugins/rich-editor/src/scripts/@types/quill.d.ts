@@ -8,7 +8,8 @@ declare module "quill/core" {
     //                 James Garbutt <https://github.com/43081j>
     // Definitions: https://github.com/DefinitelyTyped/DefinitelyTyped
 
-    import { Blot, Parent } from 'parchment/dist/src/blot/abstract/blot';
+    // import { Parent } from 'parchment/dist/src/blot/abstract/blot';
+    import Blot from "parchment/dist/src/blot/abstract/shadow";
     import Container from 'parchment/dist/src/blot/abstract/container';
 
     /**
@@ -86,29 +87,6 @@ declare module "quill/core" {
         transform(index: number, priority?: boolean): number;
         transform(other: DeltaStatic, priority: boolean): DeltaStatic;
         transformPosition(index: number, priority?: boolean): number;
-    }
-
-    export class Delta implements DeltaStatic {
-        constructor(ops?: DeltaOperation[] | { ops: DeltaOperation[] });
-        ops?: DeltaOperation[];
-        retain(length: number, attributes?: StringMap): DeltaStatic;
-        delete(length: number): DeltaStatic;
-        filter(predicate: (op: DeltaOperation) => boolean): DeltaOperation[];
-        forEach(predicate: (op: DeltaOperation) => void): void;
-        insert(text: any, attributes?: StringMap): DeltaStatic;
-        map<T>(predicate: (op: DeltaOperation) => T): T[];
-        partition(predicate: (op: DeltaOperation) => boolean): [DeltaOperation[], DeltaOperation[]];
-        reduce<T>(predicate: (acc: T, curr: DeltaOperation, idx: number, arr: DeltaOperation[]) => T, initial: T): T;
-        chop(): DeltaStatic;
-        length(): number;
-        slice(start?: number, end?: number): DeltaStatic;
-        compose(other: DeltaStatic): DeltaStatic;
-        concat(other: DeltaStatic): DeltaStatic;
-        diff(other: DeltaStatic, index?: number): DeltaStatic;
-        eachLine(predicate: (line: DeltaStatic, attributes: StringMap, idx: number) => any, newline?: string): DeltaStatic;
-        transform(index: number): number;
-        transform(other: DeltaStatic, priority: boolean): DeltaStatic;
-        transformPosition(index: number): number;
     }
 
     export interface RangeStatic {
@@ -192,10 +170,10 @@ declare module "quill/core" {
          * @deprecated Remove in 2.0. Use clipboard.dangerouslyPasteHTML(html: string, source: Sources): void;
          */
         pasteHTML(html: string, source?: Sources): string;
-        setContents(delta: DeltaStatic, source?: Sources): DeltaStatic;
+        setContents(delta: DeltaStatic | DeltaOperation[], source?: Sources): DeltaStatic;
         setText(text: string, source?: Sources): DeltaStatic;
         update(source?: Sources): void;
-        updateContents(delta: DeltaStatic, source?: Sources): DeltaStatic;
+        updateContents(delta: DeltaStatic | DeltaOperation[], source?: Sources): DeltaStatic;
 
         format(name: string, value: any, source?: Sources): DeltaStatic;
         formatLine(index: number, length: number, source?: Sources): DeltaStatic;
@@ -234,13 +212,7 @@ declare module "quill/core" {
         getLines(range: RangeStatic): any[];
     }
 
-
-    export type BlotConstructor<T extends Blot> = {
-        blotName: string;
-        new(node: Node): T;
-    }
-
-    export { Blot, Parent };
+    export { Container, Blot };
 
     export default Quill;
 }
@@ -251,15 +223,18 @@ declare module "quill/blots/block" {
     import { Blot } from "quill/core";
 
 
-    export class BlockEmbed extends Embed implements Blot {
-        bitch: true;
-    }
+    export class BlockEmbed extends Embed {}
     export default Block;
 }
 
 declare module "quill/blots/inline" {
     import Inline from "parchment/dist/src/blot/inline";
     export default Inline;
+}
+
+declare module "quill/blots/container" {
+    import Container from "parchment/dist/src/blot/abstract/container";
+    export default Container;
 }
 
 declare module "quill/blots/embed" {
@@ -278,6 +253,14 @@ declare module "quill/core/module" {
     export default class Module {
         constructor(quill: Quill, options: object)
     }
+}
+
+declare module "quill/formats/code" {
+    import Inline from "quill/blots/inline";
+    import Block from "quill/blots/block";
+
+    export class Code extends Inline {}
+    export default class CodeBlock extends Block {}
 }
 declare module "quill/core/theme";
 declare module "quill/modules/clipboard";

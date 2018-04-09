@@ -11,21 +11,13 @@ import Block from "quill/blots/block";
  */
 export default class ClassFormatBlot extends Block {
 
-    static create() {
-        const domNode = super.create();
+    public static create(value) {
+        const domNode = super.create(value) as HTMLElement;
 
         if (this.className) {
             domNode.classList.add(this.className);
         }
         return domNode;
-    }
-
-    constructor(domNode) {
-        super(domNode);
-
-        if (!this.constructor.className) {
-            throw new Error("Attempted to initialize a ClassFormatBlot without setting the static className");
-        }
     }
 
     /**
@@ -37,21 +29,29 @@ export default class ClassFormatBlot extends Block {
      *
      * @returns {boolean} Whether or a not a DOM Node represents this format.
      */
-    static formats(domNode) {
+    public static formats(domNode) {
         const classMatch = this.className && domNode.classList.contains(this.className);
         const tagMatch = domNode.tagName.toLowerCase() === this.tagName.toLowerCase();
 
         return this.className ? classMatch && tagMatch : tagMatch;
     }
 
+    constructor(domNode) {
+        super(domNode);
+
+        if (!this.statics.className) {
+            throw new Error("Attempted to initialize a ClassFormatBlot without setting the static className");
+        }
+    }
+
     /**
      * Get the formats out of the Blot instance's DOM Node.
      *
-     * @returns {Object} - The Formats for the Blot.
+     * @returns The Formats for the Blot.
      */
-    formats() {
+    public formats() {
         return {
-            [this.constructor.blotName]: this.constructor.formats(this.domNode),
+            [this.statics.blotName]: this.statics.formats(this.domNode),
         };
     }
 }

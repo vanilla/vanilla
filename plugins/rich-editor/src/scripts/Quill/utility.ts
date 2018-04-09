@@ -5,9 +5,10 @@
  */
 
 import Emitter from "quill/core/emitter";
+import Quill, { RangeStatic, Blot } from "quill/core";
+import Delta from "quill-delta";
 import Parchment from "parchment";
-import WrapperBlot from "./Blots/Abstract/WrapperBlot";
-import QuillType, { RangeStatic, Blot, BlotConstructor } from "quill/core";
+import LineBlot from "./Blots/Abstract/LineBlot";
 
 /**
  * @typedef {Object} BoundaryStatic
@@ -93,7 +94,7 @@ export function expandRange(
  * @param range - The range to check.
  * @param blotConstructor - A class constructor for a blot.
  */
-export function rangeContainsBlot(quill: QuillType, range: RangeStatic, blotConstructor: any): boolean {
+export function rangeContainsBlot(quill: Quill, range: RangeStatic, blotConstructor: any): boolean {
     const blots = quill.scroll.descendants(blotConstructor, range.index, range.length);
     return blots.length > 0;
 }
@@ -107,7 +108,7 @@ export function rangeContainsBlot(quill: QuillType, range: RangeStatic, blotCons
  * @param blotConstructor - A class constructor for a blot.
  */
 export function disableAllBlotsInRange<T extends Blot>(
-    quill: QuillType,
+    quill: Quill,
     range: RangeStatic,
     blotConstructor: {
         new(): T;
@@ -152,4 +153,88 @@ export function closeEditorFlyouts(firingKey: string) {
     });
 
     document.dispatchEvent(event);
+}
+
+/**
+ * Determine if a Blot is the first Blot in the scroll (or first through descendant blots).
+ *
+ * @example Both of the following are valid.
+ *
+ * Scroll -> Blot
+ * Scroll -> Container -> Container -> Container -> Blot
+ *
+ * @param blot - the blot to check.
+ * @param quill - Your quill instance.
+ *
+ * @returns Whether or not the blot is in the first position.
+ */
+export function isBlotFirstInScroll(blot: Blot, quill: Quill) {
+    const isFirstBlotInBlot = (childBlot, parentBlot) => {
+        // Bail out if there are not more children.
+        if (!parentBlot.children || !parentBlot.children.head) {
+            return false;
+        }
+
+        // We found our match.
+        if (childBlot === parentBlot.children.head) {
+            return true;
+        }
+
+        // Recurse through children.
+        return isFirstBlotInBlot(childBlot, parentBlot.children.head);
+    };
+
+    return isFirstBlotInBlot(blot, quill.scroll);
+}
+
+/**
+ * Strips the formatting from the first blot in your quill instance.
+ *
+ * @param quill - Your quill instance
+ */
+export function stripFormattingFromFirstBlot(quill: Quill) {
+    const [firstBlot] = quill.getLine(0);
+    const blotName = (firstBlot.constructor as any).blotName;
+
+    const delta = new Delta()
+        .retain(firstBlot.length(), { [blotName]: false });
+    quill.updateContents(delta, Emitter.sources.USER);
+}
+
+/**
+ * Normalize blots to what we consider a top level block.
+ *
+ * @param blot - The blot to normalize.
+ *
+ * Currently this means:
+ * - LineBlot -> WrapperBlot
+ */
+export function normalizeBlotIntoBlock(blot: Blot) {
+    if (blot instanceof LineBlot) {
+        return blot.getWrapper(true);
+    }
+}
+
+/**
+ * Insert a new line at the end of the current Blot and trim excess newlines.
+ *
+ * @param range - The range that was altered.
+ * @param deleteAmount - The amount of lines to trim.
+ */
+export function insertNewLineAfterBlotAndTrim(quill, range: RangeStatic, deleteAmount = 1) {
+    const [line, offset] = quill.getLine(range.index);
+
+    const newBlot = Parchment.create("block", "");
+    const thisBlot = line;
+
+    const nextBlot = thisBlot.next;
+    newBlot.insertInto(quill.scroll, nextBlot);
+
+    // Now we need to clean up that extra newline.
+    const positionUpToPreviousNewline = range.index + line.length() - offset;
+    const deleteDelta = new Delta()
+        .retain(positionUpToPreviousNewline - deleteAmount)
+        .delete(deleteAmount);
+    quill.updateContents(deleteDelta, Emitter.sources.USER);
+    quill.setSelection(positionUpToPreviousNewline - deleteAmount, Emitter.sources.USER);
 }

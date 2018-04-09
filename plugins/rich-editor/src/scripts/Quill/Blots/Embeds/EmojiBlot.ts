@@ -10,9 +10,9 @@ import { parseEmoji, isEmojiSupported } from "@core/emoji-utility";
 
 export default class EmojiBlot extends Embed {
 
-    static className = 'safeEmoji';
-    static blotName = 'emoji';
-    static tagName = 'span';
+    public static className = 'safeEmoji';
+    public static blotName = 'emoji';
+    public static tagName = 'span';
 
     public static create(data) {
         const node = super.create(data) as HTMLElement;

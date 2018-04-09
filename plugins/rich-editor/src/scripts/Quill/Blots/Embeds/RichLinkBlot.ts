@@ -16,7 +16,6 @@ export default class RichLinkBlot extends FocusableEmbedBlot {
     public static PROTOCOL_WHITELIST = ['http', 'https', 'mailto', 'tel'];
 
     public static create(data) {
-        // console.log("Video Data: ", data);
         const node = super.create(data) as HTMLElement;
         node.classList.add('embed');
         node.classList.add('embed-link');

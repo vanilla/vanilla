@@ -17,6 +17,8 @@ abstract class Authenticator {
     /**
      * Identifier of this authenticator instance.
      *
+     * If the authenticator {@link isUnique()} the ID should match the {@link getType}.
+     *
      * Extending classes will most likely require to have a dependency on RequestInterface so that they can
      * fetch the ID from the URL and throw an exception if it is not found or invalid.
      *
@@ -35,6 +37,10 @@ abstract class Authenticator {
      * @param string $authenticatorID
      */
     public function __construct($authenticatorID) {
+        if (static::isUnique() && $authenticatorID !== self::getType()) {
+            throw new \Exception('Unique Authenticators must have getID() === getType()');
+        }
+
         $this->authenticatorID = $authenticatorID;
 
         $classParts = explode('\\', static::class);
@@ -54,15 +60,16 @@ abstract class Authenticator {
     public static function getAuthenticatorSchema(): Schema {
         return Schema::parse([
             'authenticatorID:s' => 'Authenticator instance\'s identifier.',
-            'type:s' => 'Authenticator instance\'s type.',
-            'name:s' => 'User friendly name of the authenticator.',
+            'type' => null,
+            'name' => null,
             'getSignInUrl:s|n' => 'The configured relative sign in URL of the provider.',
             'getRegisterUrl:s|n' => 'The configured relative register URL of the provider.',
             'getSignOutUrl:s|n' => 'The configured relative sign out URL of the provider.',
             'ui:o' => static::getUiSchema(),
-            'isActive:b' => 'Whether or not the authenticator can be used.',
+            'isActive:b' => 'Whether or not the Authenticator can be used.',
+            'isUnique' => null,
             'attributes:o' => 'Provider specific attributes',
-        ]);
+        ])->merge(self::getAuthenticatorTypeSchema());
     }
 
     /**
@@ -122,7 +129,7 @@ abstract class Authenticator {
                 'photoUrl' => null,
                 'backgroundColor' => null,
             ])->add(static::getUiSchema()),
-            'isUnique:b' => 'Whether one or more authenticators of this type can be created.',
+            'isUnique:b' => 'Whether this authenticator can have multiple instances or not. Unique authenticators have authenticatorID equal to their type.',
         ]);
     }
 

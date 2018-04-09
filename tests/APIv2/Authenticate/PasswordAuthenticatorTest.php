@@ -16,7 +16,7 @@ class PasswordAuthenticatorTest extends AbstractAPIv2Test {
     private $baseUrl = '/authenticate';
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     public function setUp() {
         parent::setUp();
@@ -54,8 +54,10 @@ class PasswordAuthenticatorTest extends AbstractAPIv2Test {
         $this->assertNoSession();
 
         $this->api()->post("{$this->baseUrl}", [
-            'authenticatorType' => 'password',
-            'authenticatorID' => 'password',
+            'authenticate' => [
+                'authenticatorType' => 'password',
+                'authenticatorID' => 'password',
+            ],
             'username' => $this->currentUser['name'],
             'password' => $this->currentUser['password']
         ]);
@@ -70,8 +72,10 @@ class PasswordAuthenticatorTest extends AbstractAPIv2Test {
         $this->assertNoSession();
 
         $this->api()->post("{$this->baseUrl}", [
-            'authenticatorType' => 'password',
-            'authenticatorID' => 'password',
+            'authenticate' => [
+                'authenticatorType' => 'password',
+                'authenticatorID' => 'password',
+            ],
             'username' => $this->currentUser['email'],
             'password' => $this->currentUser['password']
         ]);
@@ -87,8 +91,10 @@ class PasswordAuthenticatorTest extends AbstractAPIv2Test {
      */
     public function testPostPasswordNotFound() {
         $this->api()->post("{$this->baseUrl}", [
-            'authenticatorType' => 'password',
-            'authenticatorID' => 'password',
+            'authenticate' => [
+                'authenticatorType' => 'password',
+                'authenticatorID' => 'password',
+            ],
             'username' => $this->currentUser['email'].'!!!!',
             'password' => $this->currentUser['password']
         ]);
@@ -102,8 +108,10 @@ class PasswordAuthenticatorTest extends AbstractAPIv2Test {
      */
     public function testPostPasswordIncorrect() {
         $this->api()->post("{$this->baseUrl}", [
-            'authenticatorType' => 'password',
-            'authenticatorID' => 'password',
+            'authenticate' => [
+                'authenticatorType' => 'password',
+                'authenticatorID' => 'password',
+            ],
             'username' => $this->currentUser['email'],
             'password' => $this->currentUser['password'].'!!!'
         ]);

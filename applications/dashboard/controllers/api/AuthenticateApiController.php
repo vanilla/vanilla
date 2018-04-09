@@ -1,7 +1,8 @@
 <?php
 /**
+ * @author Alexandre (DaazKu) Chouinard <alexandre.c@vanillaforums.com>
  * @copyright 2009-2018 Vanilla Forums Inc.
- * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
+ * @license https://opensource.org/licenses/GPL-2.0 GPL-2.0
  */
 
 use Garden\Schema\Schema;
@@ -10,11 +11,12 @@ use Garden\Web\Exception\ClientException;
 use Garden\Web\Exception\NotFoundException;
 use Garden\Web\Exception\ServerException;
 use Garden\Web\RequestInterface;
+use Vanilla\ApiUtils;
+use Vanilla\Authenticator\Authenticator;
 use Vanilla\Authenticator\SSOAuthenticator;
 use Vanilla\Exception\PermissionException;
-use Vanilla\Models\SSOModel;
 use Vanilla\Models\AuthenticatorModel;
-use Vanilla\ApiUtils;
+use Vanilla\Models\SSOModel;
 
 /**
  * API Controller for the `/authenticate` resource.
@@ -23,8 +25,8 @@ class AuthenticateApiController extends AbstractApiController {
 
     const SESSION_ID_EXPIRATION = 1200; // 20 minutes
 
-    /** @var AuthenticatorModel */
-    private $authenticatorModel;
+    /** @var AuthenticatorsApiController */
+    private $authenticatorApiController;
 
     /** @var Gdn_Configuration */
     private $config;
@@ -44,6 +46,7 @@ class AuthenticateApiController extends AbstractApiController {
     /**
      * AuthenticationController constructor.
      *
+     * @param AuthenticatorsApiController $authenticatorApiController
      * @param Gdn_Configuration $config
      * @param RequestInterface $request
      * @param SessionModel $sessionModel
@@ -51,14 +54,14 @@ class AuthenticateApiController extends AbstractApiController {
      * @param UserModel $userModel
      */
     public function __construct(
-        AuthenticatorModel $authenticatorModel,
+        AuthenticatorsApiController $authenticatorApiController,
         Gdn_Configuration $config,
         RequestInterface $request,
         SessionModel $sessionModel,
         SSOModel $ssoModel,
         UserModel $userModel
     ) {
-        $this->authenticatorModel = $authenticatorModel;
+        $this->authenticatorApiController = $authenticatorApiController;
         $this->config = $config;
         $this->request = $request;
         $this->sessionModel = $sessionModel;
@@ -89,12 +92,12 @@ class AuthenticateApiController extends AbstractApiController {
      * Unlink a user from the specified authenticator.
      * If no user is specified it will unlink the current user.
      *
-     * @param string $authenticator
+     * @param string $authenticatorType
      * @param string $authenticatorID
      * @param array $query The query string as an array.
      * @throws Exception
      */
-    public function delete($authenticator, $authenticatorID = '', array $query) {
+    public function delete_authenticators($authenticatorType, $authenticatorID = '', array $query) {
         $this->permission();
 
         $this->schema([
@@ -102,7 +105,7 @@ class AuthenticateApiController extends AbstractApiController {
             'authenticatorID:s?' => 'Authenticator instance\'s identifier.',
         ]);
         $in = $this->schema([
-            'userID:i?' => 'UserID to unlink authenticator from.',
+            'userID:i?' => 'UserID to unlink authenticator from. Defaults to the current user\'s id',
         ], 'in')->setDescription('Delete the link between an authenticator and a user.');
         $this->schema([], 'out');
 
@@ -116,7 +119,7 @@ class AuthenticateApiController extends AbstractApiController {
             $userID = $this->getSession()->UserID;
         }
 
-        $authenticatorInstance = $this->authenticatorModel->getAuthenticator($authenticator, $authenticatorID);
+        $authenticatorInstance = $this->authenticatorApiController->getAuthenticatorModel()->getAuthenticator($authenticatorType, $authenticatorID);
 
         $data = [];
         $this->userModel->getDelete(
@@ -127,128 +130,123 @@ class AuthenticateApiController extends AbstractApiController {
     }
 
     /**
-     * Delete a session.
+     * Get an active authenticator.
      *
-     * @param string $authSessionID
-     */
-    public function delete_session($authSessionID) {
-        $this->permission();
-
-        $this->schema([
-            'authSessionID:s' => 'Identifier of the authentication session.',
-        ], 'in')->setDescription('Delete an authentication session.');
-        $this->schema([], 'out');
-
-        $this->sessionModel->deleteID($authSessionID);
-    }
-
-    /**
-     * Tell if a user is linked to an authenticator or not.
-     *
-     * @param string $authenticator
+     * @throws NotFoundException
      * @param string $authenticatorID
-     * @param array $query
-     * @return bool
+     * @return array
      */
-    public function get($authenticator, $authenticatorID = '', array $query) {
+    public function get_authenticators(string $authenticatorID) {
         $this->permission();
 
-        $this->schema([
-            'authenticatorType:s' => 'The authenticator type that will be used.',
-            'authenticatorID:s?' => 'Authenticator instance\'s identifier.',
-        ], 'in');
-        $in = $this->schema([
-            'userID:i?' => 'UserID of the user to check against the authenticator. Defaults to the current user.',
-        ])->setDescription('Tells whether the user is linked to the authenticator or not.');
-        $out = $this->schema(['linked:b' => 'Whether the user is linked to the authenticator or not.'], 'out');
+        $this->schema(
+            Schema::parse(['authenticatorID'])->merge($this->getAuthenticatorPublicSchema()),
+            'in'
+        )->setDescription('Get an active authenticator.');
+        $out = $this->schema($this->getAuthenticatorPublicSchema(), 'out');
 
-        $in->validate($query);
+        $authenticator = $this->authenticatorApiController->getAuthenticatorByID($authenticatorID);
 
-        if (isset($query['UserID'])) {
-            $this->permission('Garden.Users.Edit');
-            $userID = $query['UserID'];
-        } else {
-            $this->permission('Garden.SignIn.Allow');
-            $userID = $this->getSession()->UserID;
+        if (!$authenticator->isActive()) {
+            throw new ClientException('Authenticator is not active.');
+        }
+        if (is_a($authenticator, SSOAuthenticator::class) && !$authenticator->canSignIn()) {
+            throw new ClientException('Authenticator does not allow authentication.');
         }
 
-        $authenticatorInstance = $this->authenticatorModel->getAuthenticator($authenticator, $authenticatorID);
+        $result = $this->authenticatorApiController->normalizeOutput($authenticator);
 
-        return $out->validate([
-            'linked' => (bool)$this->userModel->getAuthenticationByUser($userID, $authenticatorInstance->getID())
-        ]);
+        return $out->validate($result);
     }
 
     /**
-     * Get a session.
+     * Authenticator schema with whitelisted fields.
      *
-     * @param string $authSessionID
-     * @param array $query
-     * @return array
-     * @throws Exception
+     * @return Schema
      */
-    public function get_session($authSessionID, array $query) {
+    public function getAuthenticatorPublicSchema() {
+        return Schema::parse([
+            'authenticatorID' => null,
+            'type' => null,
+            'name' => null,
+            'ui' => null,
+            'isUserLinked:b?' => 'Whether or not the user is linked to that authenticator.',
+        ])->merge(SSOAuthenticator::getAuthenticatorSchema());
+    }
+
+    /**
+     * List authenticators that can be used to authenticate.
+     *
+     * @throws Exception
+     * @param array $query
+     * @return Authenticator
+     */
+    public function index_authenticators(array $query) {
         $this->permission();
 
-        $this->schema([
-            'authSessionID:s' => 'Identifier of the authentication session.',
-        ], 'in');
         $in = $this->schema([
-            'expand:b?' => 'Expand associated records.',
-        ], 'in')->setDescription('Get the content of an authentication session.');
-        $out = $this->schema([
-            'authSessionID:s' => 'Identifier of the authentication session.',
-            'dateInserted:dt' => 'When the session was created.',
-            'dateExpires:dt' => 'When the session expires.',
-            'attributes' => Schema::parse([
-                'ssoData:o' => $this->ssoDataSchema(), // This should do a sparse validation
-                'linkUser:o?' => Schema::parse([
-                    'existingUsers:a' => Schema::parse([
-                        'userID:i' => 'The userID of the participant.',
-                        'user:o?' => $this->getUserFragmentSchema(),
-                    ])->setDescription('User that matches the SSOData and can be used to connect the user.'),
-                ])->setDescription('Information needed for the "linkUser" step.'),
-            ]),
-        ], 'out');
+            'isSSO:b?' => 'Filters authenticators depending on if they are SSO authenticators or not.',
+            'isUserLinked:b?' => 'Filter authenticators based on whether a user is linked to it or not. Users can only be linked to SSO authenticators.'
+        ], 'in')->setDescription('List active authenticators.');
+        $out = $this->schema([':a', $this->getAuthenticatorPublicSchema()], 'out');
 
         $query = $in->validate($query);
 
-        $sessionData = $this->sessionModel->getID($authSessionID, DATASET_TYPE_ARRAY);
-        if ($this->sessionModel->isExpired($sessionData)) {
-            throw new ClientException('The session has expired.');
-        }
+        $isUserLinked = $query['isUserLinked'] ?? null;
+        $isSSO = $query['isSSO'] ?? null;
 
-        if (!empty($query['expand']) && isset($sessionData['Attributes']['linkUser']['existingUsers'])) {
-            $this->userModel->expandUsers($sessionData['Attributes']['linkUser']['existingUsers'], ['UserID']);
-        }
+        $filter = function($authenticator) use ($isUserLinked, $isSSO) {
+            /** @var Authenticator $authenticator */
+            // Must be active!
+            if (!$authenticator->isActive()) {
+                return false;
+            }
 
-        $sessionData['authSessionID'] = $sessionData['SessionID'];
+            $ssoAuthenticator = null;
+            if (is_a($authenticator, SSOAuthenticator::class)) {
+                /** @var SSOAuthenticator $ssoAuthenticator */
+                $ssoAuthenticator = $authenticator;
 
-        $cleanedSessionData = $out->validate($sessionData);
+                if ($isSSO === false) {
+                    return false;
+                }
 
-        // We need to add back the ssoData since it was cleaned and we want to preserve any extra information.
-        if (isset($cleanedSessionData['attributes']['ssoData'])) {
-            $ssoData = ApiUtils::convertOutputKeys($sessionData['Attributes']['ssoData']);
-            $cleanedSessionData['attributes']['ssoData'] = $ssoData;
-        }
+                // Must be able to sign in with the SSO plugin!
+                if (!$ssoAuthenticator->canSignIn()) {
+                    return false;
+                }
 
-        return $cleanedSessionData;
+                if (isset($isUserLinked) && !$authenticator->isUserLinked($this->getSession()->UserID)) {
+                    return false;
+                }
+            }
+
+            return true;
+        };
+
+        $authenticators = array_filter($this->authenticatorApiController->getAuthenticatorModel()->getAuthenticators(), $filter);
+
+        $result = array_map([$this->authenticatorApiController, 'normalizeOutput'], $authenticators);
+
+        return $out->validate($result);
     }
 
     /**
      * Authenticate a user using the specified authenticator.
      *
-     * @param array $body
-     * @throws Exception If the authentication process fails
+     * @throws Exception If the authentication process fails.
      * @throws NotFoundException If the $authenticatorType is not found.
+     * @param array $body
      * @return array
      */
     public function post(array $body) {
         $this->permission();
 
         $in = $this->schema([
-            'authenticatorType:s' => 'The authenticator type that will be used.',
-            'authenticatorID:s?' => 'Authenticator instance\'s identifier.',
+            'authenticate' => [
+                'authenticatorType:s' => 'The authenticator type that will be used.',
+                'authenticatorID:s' => 'Authenticator instance\'s identifier.',
+            ],
             'persist:b' => [
                 'default' => false,
                 'description' => 'Set the persist option on the cookie when it is set.',
@@ -265,14 +263,14 @@ class AuthenticateApiController extends AbstractApiController {
 
         $body = $in->validate($body);
 
-        $authenticatorType = $body['authenticatorType'];
-        $authenticatorID = isset($body['authenticatorID']) ? $body['authenticatorID'] : null;
+        $authenticatorType = $body['authenticate']['authenticatorType'];
+        $authenticatorID = $body['authenticate']['authenticatorID'];
 
         if ($this->getSession()->isValid()) {
             throw new ClientException('Cannot authenticate while already logged in.', 403);
         }
 
-        $authenticatorInstance = $this->authenticatorModel->getAuthenticator($authenticatorType, $authenticatorID);
+        $authenticatorInstance = $this->authenticatorApiController->getAuthenticator($authenticatorType, $authenticatorID);
 
         $sso = is_a($authenticatorInstance, SSOAuthenticator::class);
         if ($sso) {
@@ -434,6 +432,39 @@ class AuthenticateApiController extends AbstractApiController {
     }
 
     /**
+     * Authenticate a user with username/email and password.
+     *
+     * @param array $body The username/password to sign in.
+     * @return array Returns the signed in user.
+     * @throws \Exception Throws all exceptions to be dispatched as error responses.
+     */
+    public function post_password(array $body): array {
+        $this->permission();
+
+        $in = $this->schema([
+            'username:s' => 'The user\'s username or email address.',
+            'password:s' => 'The user\'s password.',
+            'persist:b' => [
+                'description' => 'Whether the session should persist past the browser closing.',
+                'default' => false,
+            ],
+        ])->setDescription('Authenticate a user with username/email and password.');
+        $out = $this->schema($this->getUserFragmentSchema(), 'out');
+
+        $body = $in->validate($body);
+
+        $result = $this->post([
+            'authenticate' => [
+                'authenticatorType' => 'password',
+                'authenticatorID' => 'password',
+            ],
+            'persist' => $body['persist'] ?? false,
+        ]);
+
+        return $out->validate($result['user']);
+    }
+
+    /**
      * Get the SSOData schema.
      *
      * @return Schema
@@ -461,36 +492,5 @@ class AuthenticateApiController extends AbstractApiController {
         }
 
         return $ssoDataSchema;
-    }
-
-    /**
-     * Authenticate a user with username/email and password.
-     *
-     * @param array $body The username/password to sign in.
-     * @return array Returns the signed in user.
-     * @throws \Exception Throws all exceptions to be dispatched as error responses.
-     */
-    public function post_password(array $body): array {
-        $this->permission();
-
-        $in = $this->schema([
-            'username:s' => 'The user\'s username or email address.',
-            'password:s' => 'The user\'s password.',
-            'persist:b' => [
-                'description' => 'Whether the session should persist past the browser closing.',
-                'default' => false,
-            ],
-        ])->setDescription('Authenticate a user with username/email and password.');
-        $out = $this->schema($this->getUserFragmentSchema(), 'out');
-
-        $body = $in->validate($body);
-
-        $result = $this->post([
-            'authenticatorType' => 'password',
-            'authenticatorID' => 'password',
-            'persist' => $body['persist'] ?? false,
-        ]);
-
-        return $out->validate($result['user']);
     }
 }

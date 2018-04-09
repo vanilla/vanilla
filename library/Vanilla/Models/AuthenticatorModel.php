@@ -7,9 +7,9 @@
 
 namespace Vanilla\Models;
 
-
 use Exception;
 use Gdn_AuthenticationProviderModel;
+use Gdn_Session;
 use Garden\Container\Container;
 use Garden\Web\Exception\ServerException;
 use Garden\Web\Exception\NotFoundException;
@@ -37,7 +37,11 @@ class AuthenticatorModel {
      * @param Gdn_AuthenticationProviderModel $authenticationProviderModel
      * @param Container $container
      */
-    public function __construct(AddonManager $addonManager, Gdn_AuthenticationProviderModel $authenticationProviderModel, Container $container) {
+    public function __construct(
+        AddonManager $addonManager,
+        Gdn_AuthenticationProviderModel $authenticationProviderModel,
+        Container $container
+    ) {
         $this->addonManager = $addonManager;
         $this->authenticationProviderModel = $authenticationProviderModel;
         $this->container = $container;
@@ -74,8 +78,11 @@ class AuthenticatorModel {
      * @param string $authenticatorType
      * @param string $authenticatorID
      * @return Authenticator
+     *
      * @throws NotFoundException
      * @throws ServerException
+     * @throws \Garden\Container\ContainerException
+     * @throws \Garden\Container\NotFoundException
      */
     public function getAuthenticator(string $authenticatorType, string $authenticatorID) {
         if (empty($authenticatorType)) {
@@ -87,7 +94,7 @@ class AuthenticatorModel {
         /** @var Authenticator $authenticatorInstance */
         $authenticatorInstance = null;
 
-        // Get authenticator classes.
+        // Get Authenticator classes.
         $authenticatorClasses = array_filter($this->getAuthenticatorClasses(), function($class) use ($authenticatorClassName) {
             return preg_match("/(?:^|\\\\)$authenticatorClassName$/i", $class);
         });
@@ -122,11 +129,37 @@ class AuthenticatorModel {
     }
 
     /**
-     * Get authenticator instances.
+     * Get an Authenticator by its ID.
+     * Unique authenticators will always be returned first if there is a conflict.
+     *
+     * @param string $authenticatorID
+     * @return Authenticator
+     *
+     * @throws NotFoundException
+     * @throws ServerException
+     * @throws \Garden\Container\ContainerException
+     * @throws \Garden\Container\NotFoundException
+     */
+    public function getAuthenticatorByID(string $authenticatorID) {
+        $uniqueAuthenticators = $this->getUniqueAuthenticatorIDs();
+
+        // Unique authenticators have type === id
+        if (in_array($authenticatorID, $uniqueAuthenticators)) {
+            $type = $authenticatorID;
+        } else {
+            $authenticatorData = $this->authenticationProviderModel->getID($authenticatorID, DATASET_TYPE_ARRAY);
+            $type = $authenticatorData['AuthenticationSchemeAlias'] ?? null;
+        }
+
+        return $this->getAuthenticator($type, $authenticatorID);
+    }
+
+    /**
+     * Get Authenticator instances.
      *
      * @return Authenticator[]
      */
-    public function getAuthenticators() {
+    public function getAuthenticators(): array {
         $authenticatorClasses = $this->getAuthenticatorClasses();
         $authenticators = [];
         foreach ($authenticatorClasses as $authenticatorClass) {
@@ -139,7 +172,7 @@ class AuthenticatorModel {
 
             if ($authenticatorsInfo) {
                 foreach ($authenticatorsInfo as $authenticatorInfo) {
-                    // Check if the container can find the authenticator.
+                    // Check if the container can find the Authenticator.
                     try {
                         $authenticatorInstance = $this->getAuthenticator($authenticatorInfo['AuthenticationSchemeAlias'], $authenticatorInfo['AuthenticationKey']);
                         $authenticators[] = $authenticatorInstance;
@@ -159,11 +192,28 @@ class AuthenticatorModel {
     }
 
     /**
-     * Get available authenticator classes.
+     * Get the list of ID of unique authenticators.
      *
      * @return array
      */
-    public function getAuthenticatorClasses() {
+    public function getUniqueAuthenticatorIDs(): array {
+        $ids = [];
+        foreach ($this->getAuthenticatorClasses() as $class) {
+            /** @var Authenticator $class */
+            if ($class::isUnique()) {
+                $ids[] = $class::getType();
+            }
+        }
+
+        return $ids;
+    }
+
+    /**
+     * Get available Authenticator classes.
+     *
+     * @return array
+     */
+    public function getAuthenticatorClasses(): array {
         $authenticatorClasses = array_unique(
             $this->addonManager->findClasses('*Authenticator') + array_keys($this->authenticatorClasses)
         );

@@ -61,10 +61,18 @@ class LinkUserTest extends AbstractAPIv2Test {
 
         $session = $this->container()->get(\Gdn_Session::class);
         $session->end();
+
+        $this->assertNoSession();
+    }
+
+    public function tearDown() {
+        parent::tearDown();
     }
 
     /**
      * Test POST /authenticate/link-user by sending userid + password.
+     *
+     * @return int userID
      */
     public function testLinkUserWithUserID() {
         $authSessionID = $this->createAuthSessionID();
@@ -87,6 +95,8 @@ class LinkUserTest extends AbstractAPIv2Test {
         $this->assertInternalType('array', $body);
         $this->assertArrayHasKey('userID', $body);
         $this->assertEquals($this->currentUser['userID'], $body['userID']);
+
+        return $body['userID'];
     }
 
     /**
@@ -146,14 +156,49 @@ class LinkUserTest extends AbstractAPIv2Test {
     }
 
     /**
+     * Test DELETE /authenticate/authenticators/:id
+     */
+    public function testUnlinkUser() {
+        $userID = $this->testLinkUserWithUserID();
+
+        // Authenticate
+        $this->api()->post($this->baseUrl, [
+            'authenticate' => [
+                'authenticatorType' => $this->authenticator::getType(),
+                'authenticatorID' => $this->authenticator->getID(),
+            ],
+        ]);
+
+        $this->assertSessionUserID($userID);
+
+        // Check if the user is linked.
+        $result = $this->api()->get($this->baseUrl.'/authenticators/'.$this->authenticator->getID());
+        $this->assertEquals(200, $result->getStatusCode());
+        $authenticatorData = $result->getBody();
+        $this->assertTrue($authenticatorData['isUserLinked']);
+
+        // Unlink
+        $this->api()->delete($this->baseUrl.'/authenticators/'.$this->authenticator->getID());
+
+        // Check if the user is linked.
+        $result = $this->api()->get($this->baseUrl.'/authenticators/'.$this->authenticator->getID());
+        $this->assertEquals(200, $result->getStatusCode());
+        $authenticatorData = $result->getBody();
+        $this->assertFalse($authenticatorData['isUserLinked']);
+
+    }
+
+    /**
      * Create an authSessionID by posting to /authenticate
      *
      * @return mixed
      */
     protected function createAuthSessionID() {
         $postData = [
-            'authenticatorType' => $this->authenticator::getType(),
-            'authenticatorID' => $this->authenticator->getID(),
+            'authenticate' => [
+                'authenticatorType' => $this->authenticator::getType(),
+                'authenticatorID' => $this->authenticator->getID(),
+            ],
         ];
 
         $result = $this->api()->post(
@@ -172,5 +217,29 @@ class LinkUserTest extends AbstractAPIv2Test {
         $this->assertArrayHasKey('authSessionID', $body);
 
         return $body['authSessionID'];
+    }
+
+    /**
+     * Assert that there is not currently a user in the session.
+     */
+    public function assertNoSession() {
+        /* @var \Gdn_Session $session */
+        $session = $this->container()->get(\Gdn_Session::class);
+        $this->assertEquals(0, $session->UserID);
+    }
+
+    /**
+     * Assert that a given user has a session.
+     *
+     * @param int|null $expected The expected user or **null** for the current user.
+     */
+    public function assertSessionUserID(int $expected = null) {
+        if ($expected === null) {
+            $expected = $this->currentUser['userID'];
+        }
+
+        /* @var \Gdn_Session $session */
+        $session = $this->container()->get(\Gdn_Session::class);
+        $this->assertEquals($expected, $session->UserID);
     }
 }

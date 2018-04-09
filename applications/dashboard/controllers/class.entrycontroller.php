@@ -111,7 +111,7 @@ class EntryController extends Gdn_Controller {
         // Allow hijacking auth type
         $authenticationSchemeAlias = $this->EventArguments['AuthenticationSchemeAlias'];
 
-        // Attempt to set Authenticator with requested method or fallback to default
+        // Attempt to set authenticator with requested method or fallback to default
         try {
             $authenticator = Gdn::authenticator()->authenticateWith($authenticationSchemeAlias);
         } catch (Exception $e) {

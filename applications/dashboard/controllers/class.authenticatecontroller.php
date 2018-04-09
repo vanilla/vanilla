@@ -139,6 +139,20 @@ class AuthenticateController extends Gdn_Controller {
         }
     }
 
+    /**
+     *
+     */
+    public function recoverpassword() {
+        $this->renderReact();
+    }
+
+    /**
+     * Sign In Page
+     */
+    public function signin() {
+        $this->renderReact();
+    }
+
 //    /**
 //     * Create a connection between a provider and a vanilla user.
 //     *

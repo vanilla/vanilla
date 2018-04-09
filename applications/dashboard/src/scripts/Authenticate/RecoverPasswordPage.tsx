@@ -22,12 +22,12 @@ interface IState {
     errors?: string[];
 }
 
-export default class RequestPasswordPage extends React.Component<IState, IProps> {
+export default class RecoverPasswordPage extends React.Component<IState, IProps> {
     public ID: string;
 
     constructor(props) {
         super(props);
-        this.ID = getUniqueID(props, 'RequestPasswordPage');
+        this.ID = getUniqueID(props, 'RecoverPasswordPage');
 
         this.state = {
             isEditable: props.isEditable || true,

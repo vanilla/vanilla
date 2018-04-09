@@ -56,4 +56,17 @@ class VanillaController extends Gdn_Controller {
             $this->permission($permission, $fullMatch, 'Category', $categoryID);
         }
     }
+
+    /**
+     * Check to see if we've gone off the end of the page.
+     *
+     * @param int $offset The offset requested.
+     * @param int $totalCount The total count of records.
+     * @throws Exception Throws an exception if the offset is past the last page.
+     */
+    protected function checkPageRange(int $offset, int $totalCount) {
+        if ($offset > 0 && $offset >= $totalCount) {
+            throw notFoundException();
+        }
+    }
 }

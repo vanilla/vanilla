@@ -34,7 +34,7 @@ class AutoConnectTest extends AbstractAPIv2Test {
     private $currentUser;
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     public static function setupBeforeClass() {
         parent::setupBeforeClass();
@@ -88,8 +88,10 @@ class AutoConnectTest extends AbstractAPIv2Test {
         }
 
         $postData = [
-            'authenticatorType' => $this->authenticator::getType(),
-            'authenticatorID' => $this->authenticator->getID(),
+            'authenticate' => [
+                'authenticatorType' => $this->authenticator::getType(),
+                'authenticatorID' => $this->authenticator->getID(),
+            ],
         ];
 
         $result = $this->api()->post(
@@ -115,7 +117,7 @@ class AutoConnectTest extends AbstractAPIv2Test {
         $this->api()->setUserID($this->currentUser['userID']);
 
         $result = $this->api()->get(
-            $this->baseUrl.'/'.$this->authenticator::getType().'/'.$this->authenticator->getID()
+            $this->baseUrl.'/authenticators/'.$this->authenticator->getID()
         );
 
         $this->assertEquals(200, $result->getStatusCode());
@@ -123,8 +125,8 @@ class AutoConnectTest extends AbstractAPIv2Test {
         $body = $result->getBody();
 
         $this->assertInternalType('array', $body);
-        $this->assertArrayHasKey('linked', $body);
-        $this->assertEquals($expectedResults['isUserLinked'], $body['linked']);
+        $this->assertArrayHasKey('isUserLinked', $body);
+        $this->assertEquals($expectedResults['isUserLinked'], $body['isUserLinked']);
     }
 
     /**

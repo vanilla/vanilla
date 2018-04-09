@@ -14,6 +14,8 @@ use Vanilla\Web\WebLinking;
  * Builds a pager control related to a dataset.
  */
 class PagerModule extends Gdn_Module {
+    const PREV_NEXT_CLASS = 'PrevNextPager';
+    const NUMBERED_CLASS = 'NumberedPager';
 
     /** @var WebLinking */
     private $webLinking;
@@ -119,6 +121,10 @@ class PagerModule extends Gdn_Module {
     private function addRelLinks(Gdn_Controller $controller) {
         static $pending = true;
 
+        if ($this->TotalRecords !== false && $this->Offset >= $this->TotalRecords) {
+            return;
+        }
+
         // Make sure this only happens once.
         if ($pending === true) {
             /** @var HeadModule $head */
@@ -193,7 +199,6 @@ class PagerModule extends Gdn_Module {
             }
 
             $this->_PropertiesDefined = true;
-            $this->addRelLinks(Gdn::controller());
 
             Gdn::controller()->EventArguments['Pager'] = $this;
             Gdn::controller()->fireEvent('PagerInit');
@@ -329,11 +334,11 @@ class PagerModule extends Gdn_Module {
         // Urls with url-encoded characters will break sprintf, so we need to convert them for backwards compatibility.
         $this->Url = str_replace(['%1$s', '%2$s', '%s'], '{Page}', $this->Url);
 
+        $this->addRelLinks(Gdn::controller());
+
         if ($this->TotalRecords === false) {
             return $this->toStringPrevNext($type);
         }
-
-        $this->CssClass = concatSep(' ', $this->CssClass, 'NumberedPager');
 
         // Get total page count, allowing override
         $pageCount = ceil($this->TotalRecords / $this->Limit);
@@ -341,6 +346,15 @@ class PagerModule extends Gdn_Module {
         $this->fireEvent('BeforePagerSetsCount');
         $this->_PageCount = $pageCount;
         $currentPage = pageNumber($this->Offset, $this->Limit);
+
+        // If the pager is on a pager greater than the count then just display a previous button.
+        if ($currentPage > 1 && $currentPage > $pageCount) {
+            return sprintf(
+                $this->Wrapper,
+                attribute(['class' => concatSep(' ', $this->CssClass, static::PREV_NEXT_CLASS)]),
+                $this->previousLink($pageCount + 1)
+            );
+        }
 
         // Show $Range pages on either side of current
         $range = c('Garden.Modules.PagerRange', 3);
@@ -433,7 +447,7 @@ class PagerModule extends Gdn_Module {
             }
         }
 
-        return $pager == '' ? '' : sprintf($this->Wrapper, attribute(['id' => $clientID, 'class' => $this->CssClass]), $pager);
+        return $pager == '' ? '' : sprintf($this->Wrapper, attribute(['id' => $clientID, 'class' => concatSep(' ', $this->CssClass, static::NUMBERED_CLASS)]), $pager);
     }
 
     /**
@@ -443,14 +457,13 @@ class PagerModule extends Gdn_Module {
      * @return string
      */
     public function toStringPrevNext($type = 'more') {
-        $this->CssClass = concatSep(' ', $this->CssClass, 'PrevNextPager');
         $currentPage = pageNumber($this->Offset, $this->Limit);
 
         $pager = '';
 
         if ($currentPage > 1) {
             $pageParam = 'p'.($currentPage - 1);
-            $pager .= anchor(t('Previous'), $this->pageUrl($currentPage - 1), 'Previous', ['rel' => 'prev']);
+            $pager .= $this->previousLink($currentPage);
         }
 
         $hasNext = true;
@@ -470,7 +483,11 @@ class PagerModule extends Gdn_Module {
             $pager = $this->HtmlBefore.$pager;
         }
 
-        return $pager == '' ? '' : sprintf($this->Wrapper, attribute(['id' => $clientID, 'class' => $this->CssClass]), $pager);
+        return $pager == '' ? '' : sprintf(
+            $this->Wrapper,
+            attribute(['id' => $clientID, 'class' => concatSep(' ', $this->CssClass, static::PREV_NEXT_CLASS)]),
+            $pager
+        );
     }
 
     /**
@@ -571,5 +588,13 @@ class PagerModule extends Gdn_Module {
      */
     public function hasMorePages() {
         return $this->TotalRecords > $this->Offset + $this->Limit;
+    }
+
+    /**
+     * @param $currentPage
+     * @return string
+     */
+    private function previousLink($currentPage): string {
+        return anchor(t('Previous'), $this->pageUrl($currentPage - 1), 'Previous', ['rel' => 'prev']);
     }
 }

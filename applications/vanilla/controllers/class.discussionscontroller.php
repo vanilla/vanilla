@@ -169,6 +169,8 @@ class DiscussionsController extends VanillaController {
         // Get Discussion Count
         $CountDiscussions = $DiscussionModel->getCount($where);
 
+        $this->checkPageRange($Offset, $CountDiscussions);
+
         if ($MaxPages) {
             $CountDiscussions = min($MaxPages * $Limit, $CountDiscussions);
         }

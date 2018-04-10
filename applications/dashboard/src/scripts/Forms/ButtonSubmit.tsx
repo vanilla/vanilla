@@ -12,10 +12,10 @@ interface IProps extends IComponentID {
 }
 
 export default class ButtonSubmit extends React.Component<IProps> {
-    public ID: string;
     public static defaultProps = {
         disabled: false,
     };
+    public ID: string;
 
     constructor(props) {
         super(props);

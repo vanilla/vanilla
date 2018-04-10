@@ -10,13 +10,12 @@ interface IProps extends IComponentID {
     disabled: boolean;
 }
 
-
 export default class Button extends React.Component<IProps> {
-    public ID: string;
-    public type: string;
     public static defaultProps = {
         disabled: false,
     };
+    public ID: string;
+    public type: string;
 
     constructor(props) {
         super(props);

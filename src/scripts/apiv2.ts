@@ -22,6 +22,18 @@ function addTransientKey(data, headers: any) {
     return data;
 }
 
+const requestTransformers = [
+    addTransientKey,
+];
+
+const api = axios.create({
+    baseURL: formatUrl("/api/v2/"),
+    // transformRequest: requestTransformers,
+});
+// api.defaults.headers.post['Content-Type'] = 'application/json';
+api.defaults.headers.post['X-Transient-Key'] = getMeta('TransientKey');
+api.interceptors.response.use(handleResponse);
+
 /**
  * Intercept all responses and do some data processing.
  *
@@ -33,18 +45,9 @@ function addTransientKey(data, headers: any) {
 function handleResponse(response: AxiosResponse) {
     if ('x-csrf-token' in response.headers) {
         setMeta('TransientKey', response.headers['x-csrf-token']);
+        api.defaults.headers.post['X-Transient-Key'] = getMeta('TransientKey');
     }
     return response;
 }
-
-const requestTransformers = [
-    addTransientKey,
-];
-
-const api = axios.create({
-    baseURL: formatUrl("/api/v2/"),
-    transformRequest: requestTransformers,
-});
-api.interceptors.response.use(handleResponse);
 
 export default api;

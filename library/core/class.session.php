@@ -433,8 +433,9 @@ class Gdn_Session {
         $userModel = Gdn::authenticator()->getUserModel();
         $this->UserID = $userID !== false ? $userID : Gdn::authenticator()->getIdentity();
         $this->User = false;
+        $this->loadTransientKey();
 
-        // Now retrieve user information
+        // Now retrieve user information.
         if ($this->UserID > 0) {
             // Instantiate a UserModel to get session info
             $this->User = $userModel->getSession($this->UserID);
@@ -604,6 +605,8 @@ class Gdn_Session {
                 $currentTKInvalid = $this->transientKey() != $cookie['TransientKey'];
                 if ($userValid && $signatureValid && $currentTKInvalid) {
                     $result = $this->transientKey($cookie['TransientKey'], false);
+                } else {
+                    $result = $this->transientKey();
                 }
             }
         }

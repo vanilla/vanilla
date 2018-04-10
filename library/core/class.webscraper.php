@@ -29,7 +29,7 @@ class WebScraper {
      */
     public function __construct() {
         // Add some default sites.
-        $this->registerType('getty', ['embed.gettyimages.com'], [$this, 'lookupGetty']);
+        $this->registerType('getty', ['gettyimages.com', 'gettyimages.ca'], [$this, 'lookupGetty']);
         $this->registerType('imgur', ['imgur.com'], [$this, 'lookupImgur']);
         $this->registerType('instagram', ['instagram.com', 'instagr.am'], [$this, 'lookupInstagram']);
         $this->registerType('pinterest', ['pinterest.com', 'pinterest.ca'], [$this, 'lookupPinterest']);
@@ -356,7 +356,7 @@ class WebScraper {
      */
     private function lookupGetty($url) {
         preg_match(
-            '/https?:\/\/embed.gettyimages\.com\/embed\/(?<mediaID>[\d]+)/i',
+            '/https?:\/\/(?:(?:www|embed).)?gettyimages\.c(?:a|om)\/(?:embed|detail)\/(?<mediaID>[\d]+)/i',
             $url,
             $matches
         );

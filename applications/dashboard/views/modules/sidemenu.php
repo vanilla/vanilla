@@ -1,10 +1,10 @@
 <?php if (!defined('APPLICATION')) exit();
-$this->CheckPermissions();
+$this->checkPermissions();
 
 // Loop through all the groups.
 foreach ($this->Items as $Item) {
     // Output the group.
-    echo '<div class="Box Group '.GetValue('class', $Item['Attributes']).'">';
+    echo '<div class="Box Group '.getValue('class', $Item['Attributes']).'">';
     if ($Item['Text'] != '')
         echo "\n", '<h4>',
         isset($Item['Url']) ? anchor($Item['Text'], $Item['Url']) : $Item['Text'],
@@ -15,7 +15,7 @@ foreach ($this->Items as $Item) {
 
         // Loop through all the links in the group.
         foreach ($Item['Links'] as $Link) {
-            echo "\n  <li".Attribute($Link['Attributes']).">",
+            echo "\n  <li".attribute($Link['Attributes']).">",
             anchor($Link['Text'], $Link['Url']),
             '</li>';
         }

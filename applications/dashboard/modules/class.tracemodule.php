@@ -2,7 +2,7 @@
 /**
  * Trace module.
  *
- * @copyright 2009-2017 Vanilla Forums Inc.
+ * @copyright 2009-2018 Vanilla Forums Inc.
  * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
  * @package Dashboard
  * @since 2.0
@@ -26,16 +26,16 @@ class TraceModule extends Gdn_Module {
 
     public function toString() {
         try {
-            $Traces = trace();
-            if (!$Traces) {
+            $traces = trace();
+            if (!$traces) {
                 return '';
             }
 
-            $this->setData('Traces', $Traces);
+            $this->setData('Traces', $traces);
 
             return $this->fetchView();
-        } catch (Exception $Ex) {
-            return $Ex->getMessage();
+        } catch (Exception $ex) {
+            return $ex->getMessage();
         }
     }
 }

@@ -1,6 +1,6 @@
 <?php
 /**
- * @copyright 2009-2017 Vanilla Forums Inc.
+ * @copyright 2009-2018 Vanilla Forums Inc.
  * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
  * @package vanilla-smarty
  * @since 2.0
@@ -9,20 +9,20 @@
 /**
  *
  *
- * @param array $Params The parameters passed into the function.
- * @param string $Content
- * @param object $Smarty The smarty object rendering the template.
- * @param bool $Repeat
+ * @param array $params The parameters passed into the function.
+ * @param string $content
+ * @param object $smarty The smarty object rendering the template.
+ * @param bool $repeat
  * @return string The url.
  */
-function smarty_block_permission($Params, $Content, &$Smarty, &$Repeat) {
+function smarty_block_permission($params, $content, &$smarty, &$repeat) {
     // Only output on the closing tag.
-    if (!$Repeat){
-        if (isset($Content)) {
-            $Require = val('require', $Params);
-            $HasPermission = Gdn::session()->checkPermission($Require);
-            if ($HasPermission) {
-                return $Content;
+    if (!$repeat){
+        if (isset($content)) {
+            $require = val('require', $params);
+            $hasPermission = Gdn::session()->checkPermission($require);
+            if ($hasPermission) {
+                return $content;
 
             }
         }

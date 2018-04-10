@@ -2,7 +2,7 @@
 /**
  * Default user-facing text strings.
  *
- * @copyright 2009-2017 Vanilla Forums Inc.
+ * @copyright 2009-2018 Vanilla Forums Inc.
  * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
  * @package Dashboard
  */
@@ -14,8 +14,8 @@ if (!function_exists('FormatPossessive')) {
      * @param string The word to format.
      * @return string
      */
-    function formatPossessive($Word) {
-        return substr($Word, -1) == 's' ? $Word."'" : $Word."'s";
+    function formatPossessive($word) {
+        return substr($word, -1) == 's' ? $word."'" : $word."'s";
     }
 }
 
@@ -40,7 +40,9 @@ $Definition['ValidateTime'] = '%s is not a valid time.';
 $Definition['ValidateTimestamp'] = '%s is not a valid timestamp.';
 $Definition['ValidateUsername'] = 'Usernames must be 3-20 characters and consist of letters, numbers, and underscores.';
 $Definition['ValidateLength'] = '%1$s is %2$s characters too long.';
-$Definition['ValidateMinLength'] = '%1$s is %2$s characters too short.';
+$Definition['ValidateMinLength'] = '%1$s is %2$s characters too short.'; // Deprecated
+$Definition['ValidateMinLengthSingular'] = '%1$s is %2$s character too short.';
+$Definition['ValidateMinLengthPlural'] = '%1$s is %2$s characters too short.';
 $Definition['ValidateEnum'] = '%s is not valid.';
 $Definition['ValidateOneOrMoreArrayItemRequired'] = 'You must select at least one %s.';
 $Definition['ValidateConnection'] = 'The connection parameters you specified failed to open a connection to the database. The database reported the following error: <code>%s</code>';

@@ -1,7 +1,7 @@
 <?php
 /**
  * @author Todd Burry <todd@vanillaforums.com>
- * @copyright 2009-2017 Vanilla Forums Inc.
+ * @copyright 2009-2018 Vanilla Forums Inc.
  * @license GPLv2
  */
 
@@ -67,7 +67,7 @@ class ResourceRoute extends Route {
 
 
         $this
-            ->setConstraint('id', ['regex' => '`^\d+$`', 'position' => 0])
+            ->setConstraint('id', ['position' => 0, 'notype' => ['regex' => '`^\d+$`']])
             ->setConstraint('page', '`^p\d+$`');
     }
 
@@ -87,15 +87,26 @@ class ResourceRoute extends Route {
         $pathArgs = explode('/', $pathPart);
 
         // First look for the controller.
-        $controllerSlug = $this->filterName(array_shift($pathArgs));
-        $controllerClass = $this->classLocator->findClass(sprintf($this->controllerPattern, $controllerSlug));
-        if ($controllerClass === null) {
+        $resource = array_shift($pathArgs);
+        $controllerSlug = $this->filterName($resource);
+        foreach ((array)$this->controllerPattern as $controllerPattern) {
+            $controllerClass = $this->classLocator->findClass(sprintf($controllerPattern, $controllerSlug));
+            if ($controllerClass) {
+                break;
+            }
+        }
+        if (!isset($controllerClass)) {
             return null;
         }
 
         // Now look for a method.
         $controller = $this->createInstance($controllerClass);
         $result = $this->findAction($controller, $request, $pathArgs);
+
+        if ($result !== null) {
+            $result->setMeta('resource', $resource);
+        }
+
         return $result;
     }
 
@@ -150,6 +161,8 @@ class ResourceRoute extends Route {
 
                 if ($callbackArgs !== null) {
                     $result = new Action($callback, $callbackArgs);
+                    $result->setMeta('method', $request->getMethod());
+                    $result->setMeta('action', $result->getCallback()[1]);
                     return $result;
                 }
             }
@@ -190,7 +203,7 @@ class ResourceRoute extends Route {
      * @return callable|null Returns the method callback or null if it doesn't.
      */
     private function findMethod($controller, $methodName) {
-        $regex = '`^(get|post|patch|put|options|delete)(_|$)`i';
+        $regex = '`^(get|index|post|patch|put|options|delete)(_|$)`i';
 
         // Getters and setters aren't found.
         if (!(preg_match($regex, $methodName) || strcasecmp($methodName, 'index') === 0)) {
@@ -300,8 +313,6 @@ class ResourceRoute extends Route {
         return $defaults;
     }
 
-
-
     /**
      * Split a function into its regular parameters and mapped parameters.
      *
@@ -370,22 +381,32 @@ class ResourceRoute extends Route {
         if (isset($pathArgs[0])) {
             $name = lcfirst($this->filterName($pathArgs[0]));
             $result[] = ["{$method}_{$name}", 0];
+
+            if ($method === 'get') {
+                $result[] = ["index_{$name}", 0];
+            }
         }
         if (isset($pathArgs[1])) {
             $name = lcfirst($this->filterName($pathArgs[1]));
             $result[] = ["{$method}_{$name}", 1];
+
+            if ($method === 'get') {
+                $result[] = ["index_{$name}", 1];
+            }
         }
 
         $result[] = [$method, null];
 
         if ($method === 'get') {
             $result[] = ['index', null];
+        } elseif ($method === 'post' && !empty($pathArgs)) {
+            // This is a bit of a kludge to allow POST to be used against the usual PATCH method to allow for
+            // multipart/form-data on PATCH (edit) endpoints.
+            $result[] = ['patch', null];
         }
 
         return $result;
     }
-
-
 
     /**
      * Get the classLocator.

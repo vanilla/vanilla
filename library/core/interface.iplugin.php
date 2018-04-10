@@ -2,7 +2,7 @@
 /**
  * Plugin interface
  *
- * @copyright 2009-2017 Vanilla Forums Inc.
+ * @copyright 2009-2018 Vanilla Forums Inc.
  * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
  * @package Core
  * @since 2.0
@@ -34,7 +34,7 @@ interface Gdn_IPlugin {
      * if they do not exist.
      */
 
-    // public function OnLoad()    - Called as the plugin is instantiated (each page load)
-    // public function OnDisable() - Called as the plugin is disabled
-    // public function CleanUp()   - Called as the plugin is removed
+    // public function onLoad()    - Called as the plugin is instantiated (each page load)
+    // public function onDisable() - Called as the plugin is disabled
+    // public function cleanUp()   - Called as the plugin is removed
 }

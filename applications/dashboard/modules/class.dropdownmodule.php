@@ -31,7 +31,7 @@
  *
  * Here is an example menu creation:
  *
- * $dropdown = new DropdownModule('my-dropdown');
+ * $dropdown = new dropdownModule('my-dropdown');
  * $dropdown->setTrigger('A New Name')
  * ->addLink('Link 1', '#') // automatically creates key: item1
  * ->addDivider() // automatically creates key: item2
@@ -84,15 +84,15 @@ class DropdownModule extends Gdn_Module {
      * - **cssClass**: string - CSS class for the trigger.
      * - **icon**: string - Icon for the trigger.
      */
-    private $trigger = array('type' => 'button',
+    private $trigger = ['type' => 'button',
                             'text' => '',
                             'cssClass' => '',
-                            'icon' => 'caret-down');
+                            'icon' => 'caret-down'];
 
     /**
      * @var array Allowed trigger types.
      */
-    private $triggerTypes = array('button', 'anchor');
+    private $triggerTypes = ['button', 'anchor'];
 
     /**
      * @var string A potential CSS class of the dropdown menu wrapper container.

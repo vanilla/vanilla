@@ -2,7 +2,7 @@
 /**
  * Manages default info, error, and site status pages.
  *
- * @copyright 2009-2017 Vanilla Forums Inc.
+ * @copyright 2009-2018 Vanilla Forums Inc.
  * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
  * @package Dashboard
  * @since 2.0
@@ -58,9 +58,9 @@ class HomeController extends Gdn_Controller {
 
         $this->setData('_NoMessages', true);
 
-        $Code = $this->data('Code', 400);
+        $code = $this->data('Code', 400);
         $this->clearNavigationPreferences();
-        safeheader("HTTP/1.0 $Code ".Gdn_Controller::GetStatusMessage($Code), true, $Code);
+        safeheader("HTTP/1.0 $code ".Gdn_Controller::getStatusMessage($code), true, $code);
         Gdn_Theme::section('Error');
 
         $this->render();
@@ -94,7 +94,7 @@ class HomeController extends Gdn_Controller {
             safeHeader("HTTP/1.0 404", true, 404);
             $this->render();
         } else {
-            $this->RenderException(NotFoundException());
+            $this->renderException(notFoundException());
         }
     }
 
@@ -116,7 +116,7 @@ class HomeController extends Gdn_Controller {
      */
     public function leaving($target = '') {
         $this->setData('Target', $target);
-        $this->title('Leaving');
+        $this->title(t('Leaving'));
         $this->removeCssFile('admin.css');
         $this->addCssFile('style.css');
         $this->addCssFile('vanillicon.css', 'static');
@@ -189,14 +189,14 @@ class HomeController extends Gdn_Controller {
      * @see HomeController::sanitize()
      */
     protected function sanitizeData() {
-        $fields = array('Exception', 'Message', 'Description');
+        $fields = ['Exception', 'Message', 'Description'];
 
         $method = $this->data('_Filter', 'safe');
         switch ($method) {
             case 'none':
                 return;
             case 'filter':
-                $callback = array('Gdn_Format', 'htmlFilter');
+                $callback = ['Gdn_Format', 'htmlFilter'];
                 break;
             case 'safe':
             default:
@@ -234,7 +234,7 @@ class HomeController extends Gdn_Controller {
             safeHeader("HTTP/1.0 401", true, 401);
             $this->render();
         } else {
-            $this->RenderException(permissionException());
+            $this->renderException(permissionException());
         }
     }
 }

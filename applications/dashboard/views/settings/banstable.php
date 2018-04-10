@@ -1,17 +1,17 @@
 <?php if (!defined('APPLICATION')) exit(); ?>
 <div class="toolbar">
 <?php
-PagerModule::write(array('Sender' => $this, 'Limit' => 20, 'CurrentRecords' => count($this->data('Bans')), 'View' => 'pager-dashboard'));
+PagerModule::write(['Sender' => $this, 'Limit' => 20, 'CurrentRecords' => count($this->data('Bans')), 'View' => 'pager-dashboard']);
 ?>
 </div>
 <div class="table-wrap">
     <table id="Log" class="table-data js-tj">
         <thead>
         <tr>
-            <th class="column-lg"><?php echo t('Ban Item', 'Item'); ?></th>
+            <th class="column-lg"><?php echo t('Ban Item', 'Rule'); ?></th>
             <th><?php echo t('Ban Type', 'Type'); ?></th>
-            <th class="column-sm"><?php echo t('User Count', 'Users'); ?></th>
-            <th class="column-sm"><?php echo '<span title="'.t('Number of blocked registrations').'">', t('Blocked'), '</span>'; ?></th>
+            <th class="column-sm"><?php echo '<span title="'.t('Number of affected users').'">'.t('User Count', 'Users').'</span>'; ?></th>
+            <th class="column-sm"><?php echo '<span title="'.t('Number of blocked registrations').'">'.t('Blocked').'</span>'; ?></th>
             <th class="UsernameCell"><?php echo t('Added By'); ?></th>
             <th class="column-lg"><?php echo t('Notes'); ?></th>
             <th class="options"></th>
@@ -26,7 +26,7 @@ PagerModule::write(array('Sender' => $this, 'Limit' => 20, 'CurrentRecords' => c
                 <td><?php echo t($Row['BanType']); ?></td>
                 <td>
                     <?php
-                    echo anchor($Row['CountUsers'], '/dashboard/user?Filter='.urlencode($this->_BanFilter($Row)));
+                    echo anchor($Row['CountUsers'], '/dashboard/user/banned?Filter='.urlencode($this->_BanFilter($Row)));
                     ?>
                 </td>
                 <td>

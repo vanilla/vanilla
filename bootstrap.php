@@ -9,54 +9,11 @@ if (!defined('APPLICATION')) exit();
 /**
  * Bootstrap.
  *
- * @copyright 2009-2017 Vanilla Forums Inc.
+ * @copyright 2009-2018 Vanilla Forums Inc.
  * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
  * @package Core
  * @since 2.0
  */
-
-/**
- * Bootstrap Before
- *
- * This file gives developers the opportunity to hook into Garden before any
- * real work has been done. Nothing has been included yet, aside from this file.
- * No Garden features are available yet.
- */
-if (file_exists(PATH_ROOT.'/conf/bootstrap.before.php')) {
-    require_once PATH_ROOT.'/conf/bootstrap.before.php';
-}
-
-/**
- * Define Core Constants
- *
- * Garden depends on the presence of a certain base set of defines that allow it
- * to be aware of its own place within the system. These are conditionally
- * defined here, in case they've already been set by a zealous bootstrap.before.
- */
-
-// Path to the primary configuration file.
-if (!defined('PATH_CONF')) {
-    define('PATH_CONF', PATH_ROOT.'/conf');
-}
-
-// Include default constants if none were defined elsewhere.
-if (!defined('VANILLA_CONSTANTS')) {
-    include PATH_CONF.'/constants.php';
-} else {
-    deprecated("Defining your own VANILLA_CONSTANTS is deprecated.");
-}
-
-// Make sure a default time zone is set.
-// Do NOT edit this. See config `Garden.GuestTimeZone`.
-date_default_timezone_set('UTC');
-
-// Make sure the mb_* functions are utf8.
-if (function_exists('mb_internal_encoding')) {
-    mb_internal_encoding('UTF-8');
-}
-
-// Include the core autoloader.
-require_once __DIR__.'/vendor/autoload.php';
 
 // Guard against broken cache files.
 if (!class_exists('Gdn')) {
@@ -106,10 +63,17 @@ $dic->setInstance('Garden\Container\Container', $dic)
     ->setShared(true)
     ->addAlias('ApplicationManager')
 
+    ->rule(Garden\Web\Cookie::class)
+    ->setShared(true)
+    ->addAlias('Cookie')
+
     // PluginManager
     ->rule('Gdn_PluginManager')
     ->setShared(true)
     ->addAlias('PluginManager')
+
+    ->rule(SsoUtils::class)
+    ->setShared(true)
 
     // ThemeManager
     ->rule('Gdn_ThemeManager')
@@ -190,12 +154,20 @@ $dic->setInstance('Garden\Container\Container', $dic)
 
     ->rule('@api-v2-route')
     ->setClass(\Garden\Web\ResourceRoute::class)
-    ->setConstructorArgs(['/api/v2/', '%sApiController'])
+    ->setConstructorArgs(['/api/v2/', '*\\%sApiController'])
+    ->addCall('setMeta', ['CONTENT_TYPE', 'application/json; charset=utf-8'])
+
+    ->rule('@view-application/json')
+    ->setClass(\Vanilla\Web\JsonView::class)
+    ->setShared(true)
 
     ->rule(\Garden\ClassLocator::class)
     ->setClass(\Vanilla\VanillaClassLocator::class)
 
     ->rule('Gdn_Model')
+    ->setShared(true)
+
+    ->rule(\Vanilla\Models\AuthenticatorModel::class)
     ->setShared(true)
 
     ->rule('Gdn_IPlugin')
@@ -220,7 +192,16 @@ $dic->setInstance('Garden\Container\Container', $dic)
     ->setClass('BBCode')
     ->setShared(true)
 
+    ->rule('HtmlFormatter')
+    ->setClass(VanillaHtmlFormatter::class)
+    ->addAlias(VanillaHtmlFormatter::class)
+    ->setShared(true)
+
     ->rule('Smarty')
+    ->setShared(true)
+
+    ->rule('WebLinking')
+    ->setClass(\Vanilla\Web\WebLinking::class)
     ->setShared(true)
 
     ->rule('ViewHandler.tpl')
@@ -273,6 +254,10 @@ $dic->call(function (
         exit();
     }
 
+    /** Authenticators */
+    /** @var \Vanilla\Models\AuthenticatorModel $authenticatorModel */
+    $authenticatorModel = $dic->get(\Vanilla\Models\AuthenticatorModel::class);
+    $authenticatorModel->registerAuthenticatorClass(\Vanilla\Authenticator\PasswordAuthenticator::class);
 
     /**
      * Extension Managers
@@ -330,7 +315,7 @@ $dic->call(function (
         /* @var Addon $addon */
         if ($bootstrapPath = $addon->getSpecial('bootstrap')) {
             $bootstrapPath = $addon->path($bootstrapPath);
-            include $bootstrapPath;
+            include_once $bootstrapPath;
         }
     }
 
@@ -343,6 +328,13 @@ $dic->call(function (
 
     // Now that all of the events have been bound, fire an event that allows plugins to modify the container.
     $eventManager->fire('container_init', $dic);
+});
+
+// Send out cookie headers.
+register_shutdown_function(function() use ($dic) {
+    $dic->call(function(Garden\Web\Cookie $cookie) {
+        $cookie->flush();
+    });
 });
 
 /**

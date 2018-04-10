@@ -2,7 +2,7 @@
 /**
  * Message module.
  *
- * @copyright 2009-2017 Vanilla Forums Inc.
+ * @copyright 2009-2018 Vanilla Forums Inc.
  * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
  * @package Dashboard
  * @since 2.0
@@ -19,14 +19,14 @@ class MessageModule extends Gdn_Module {
     /**
      *
      *
-     * @param string $Sender
-     * @param bool $Message
+     * @param string $sender
+     * @param bool $message
      */
-    public function __construct($Sender = '', $Message = false) {
-        parent::__construct($Sender);
+    public function __construct($sender = '', $message = false) {
+        parent::__construct($sender);
 
         $this->_ApplicationFolder = 'dashboard';
-        $this->_Message = $Message;
+        $this->_Message = $message;
     }
 
     /**

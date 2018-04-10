@@ -3,7 +3,7 @@ $Session = Gdn::session();
 ?>
 <h1><?php echo t('Manage Applicants'); ?></h1>
 <?php
-echo $this->Form->open(array('action' => url('/dashboard/user/applicants')));
+echo $this->Form->open(['action' => url('/dashboard/user/applicants')]);
 echo $this->Form->errors();
 $NumApplicants = $this->UserData->numRows();
 
@@ -29,7 +29,7 @@ if ($NumApplicants == 0) : ?>
             <?php
             foreach ($this->UserData->result() as $User) :
                 $this->EventArguments['User'] = $User;
-                $this->EventArguments['ApplicantMeta'] = array();
+                $this->EventArguments['ApplicantMeta'] = [];
                 $this->fireEvent("ApplicantInfo"); ?>
                 <tr class="ApplicantMeta">
                     <td>
@@ -60,7 +60,7 @@ if ($NumApplicants == 0) : ?>
                         <div class="btn-group">
                         <?php
                         echo anchor(dashboardSymbol('checkmark'), '/user/approve/'.$User->UserID, 'ApproveApplicant btn btn-icon', ['aria-label' => t('Approve'), 'title' => t('Approve')]);
-                        echo anchor(dashboardSymbol('delete'), '/user/decline/'.$User->UserID.'/'.$Session->TransientKey(), 'DeclineApplicant btn btn-icon', ['aria-label' => t('Decline'), 'title' => t('Decline')]);
+                        echo anchor(dashboardSymbol('delete'), '/user/decline/'.$User->UserID.'/'.$Session->transientKey(), 'DeclineApplicant btn btn-icon', ['aria-label' => t('Decline'), 'title' => t('Decline')]);
                         ?>
                         </div>
                     </td>

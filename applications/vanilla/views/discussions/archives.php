@@ -16,6 +16,7 @@ require_once $this->fetchViewLocation('helper_functions');
 </div>
 
 <?php
+echo '<h2 class="sr-only">'.t('Discussion List').'</h2>';
 if (c('Vanilla.Discussions.Layout') == 'table'):
     if (!function_exists('WriteDiscussionHeading'))
         require_once $this->fetchViewLocation('table_functions');
@@ -24,13 +25,13 @@ if (c('Vanilla.Discussions.Layout') == 'table'):
         <table class="DataTable DiscussionsTable">
             <thead>
             <?php
-            WriteDiscussionHeading();
+            writeDiscussionHeading();
             ?>
             </thead>
             <tbody>
             <?php
             foreach ($this->DiscussionData->result() as $Discussion) {
-                WriteDiscussionRow($Discussion, $this, Gdn::session(), false);
+                writeDiscussionRow($Discussion, $this, Gdn::session(), false);
             }
             ?>
             </tbody>

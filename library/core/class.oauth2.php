@@ -1,7 +1,7 @@
 <?php
 /**
  * @author Patrick Kelly <patrick.k@vanillaforums.com>
- * @copyright 2009-2017 Vanilla Forums Inc.
+ * @copyright 2009-2018 Vanilla Forums Inc.
  * @license http://www.opensource.org/licenses/gpl-2.0.php GPLv2
  * @package Core
  * @since 2.0
@@ -24,8 +24,11 @@
  */
 class Gdn_OAuth2 extends Gdn_Plugin {
 
-    /** @var string token provider by authenticator  */
+    /** @var string token provided by authenticator  */
     protected $accessToken;
+
+    /** @var array response to token request by authenticator  */
+    protected $accessTokenResponse;
 
     /** @var string key for GDN_UserAuthenticationProvider table  */
     protected $providerKey = null;
@@ -152,7 +155,19 @@ class Gdn_OAuth2 extends Gdn_Plugin {
 
         // If there is no token passed, try to retrieve one from the user's attributes.
         if ($this->accessToken === null && Gdn::session()->UserID) {
-            $this->accessToken = valr($this->getProviderKey().'.AccessToken', Gdn::session()->User->Attributes);
+            // If this workflow uses a RefreshToken, regenerate the access token using the RefreshToken, otherwise use the stored AccessToken.
+            $refreshToken = valr($this->getProviderKey().'.RefreshToken', Gdn::session()->User->Attributes);
+            if ($refreshToken) {
+                $response = $this->requestAccessToken($refreshToken, true);
+                // save the new refresh_token if there is one and it is different from the existing one.
+                if (val('refresh_token', $response) !== $refreshToken) {
+                    $userModel = New UserModel();
+                    $userModel->saveAttribute(Gdn::session()->UserID, [$this->getProviderKey() => ['RefreshToken' => val('refresh_token', $response)]]);
+                }
+                $this->accessToken = val('access_token', $response);
+            } else {
+                $this->accessToken = valr($this->getProviderKey().'.AccessToken', Gdn::session()->User->Attributes);
+            }
         }
 
         return $this->accessToken;
@@ -325,8 +340,8 @@ class Gdn_OAuth2 extends Gdn_Plugin {
      */
     protected function getSettingsFormFields() {
         $formFields = [
-            'RegisterUrl' => ['LabelCode' => 'Register Url', 'Description' => 'Enter the endpoint to be appended to the base domain to direct a user to register.'],
-            'SignOutUrl' => ['LabelCode' => 'Sign Out Url', 'Description' => 'Enter the endpoint to be appended to the base domain to log a user out.'],
+            'RegisterUrl' => ['LabelCode' => 'Register Url', 'Description' => 'Enter the endpoint to direct a user to register.'],
+            'SignOutUrl' => ['LabelCode' => 'Sign Out Url', 'Description' => 'Enter the endpoint to log a user out.'],
             'AcceptedScope' => ['LabelCode' => 'Request Scope', 'Description' => 'Enter the scope to be sent with Token Requests.'],
             'ProfileKeyEmail' => ['LabelCode' => 'Email', 'Description' => 'The Key in the JSON array to designate Emails'],
             'ProfileKeyPhoto' => ['LabelCode' => 'Photo', 'Description' => 'The Key in the JSON array to designate Photo.'],
@@ -393,7 +408,7 @@ class Gdn_OAuth2 extends Gdn_Plugin {
         $form->setModel($model);
         $sender->Form = $form;
 
-        if (!$form->AuthenticatedPostBack()) {
+        if (!$form->authenticatedPostBack()) {
             $form->setData($provider);
         } else {
             $form->setFormValue('AuthenticationSchemeAlias', 'oauth2');
@@ -403,9 +418,8 @@ class Gdn_OAuth2 extends Gdn_Plugin {
             $sender->Form->validateRule('AssociationSecret', 'ValidateRequired', 'You must provide a Secret');
             $sender->Form->validateRule('AuthorizeUrl', 'isUrl', 'You must provide a complete URL in the Authorize Url field.');
             $sender->Form->validateRule('TokenUrl', 'isUrl', 'You must provide a complete URL in the Token Url field.');
-            if (!$sender->Form->getFormValue('IsDefault')) {
-                $sender->Form->setFormValue('IsDefault', 0);
-            }
+            $sender->Form->validateRule('ProfileUrl', 'isUrl', 'You must provide a complete URL in the Profile Url field.');
+
             // To satisfy the AuthenticationProviderModel, create a BaseUrl.
             $baseUrlParts = parse_url($form->getValue('AuthorizeUrl'));
             $baseUrl = (val('scheme', $baseUrlParts) && val('host', $baseUrlParts)) ? val('scheme', $baseUrlParts).'://'.val('host', $baseUrlParts) : null;
@@ -427,6 +441,12 @@ class Gdn_OAuth2 extends Gdn_Plugin {
             'AuthorizeUrl' =>  ['LabelCode' => 'Authorize Url', 'Description' => 'Enter the endpoint to be appended to the base domain to retrieve the authorization token for a user.'],
             'TokenUrl' => ['LabelCode' => 'Token Url', 'Description' => 'Enter the endpoint to be appended to the base domain to retrieve the authorization token for a user.'],
             'ProfileUrl' => ['LabelCode' => 'Profile Url', 'Description' => 'Enter the endpoint to be appended to the base domain to retrieve a user\'s profile.']
+            'AssociationKey' =>  ['LabelCode' => 'Client ID', 'Description' => 'Unique ID of the authentication application.'],
+            'AssociationSecret' =>  ['LabelCode' => 'Secret', 'Description' => 'Secret provided by the authentication provider.'],
+            'AuthorizeUrl' =>  ['LabelCode' => 'Authorize Url', 'Description' => 'URL where users sign-in with the authentication provider.'],
+            'TokenUrl' => ['LabelCode' => 'Token Url', 'Description' => 'Endpoint to retrieve the authorization token for a user.'],
+            'ProfileUrl' => ['LabelCode' => 'Profile Url', 'Description' => 'Endpoint to retrieve a user\'s profile.'],
+            'BearerToken' => ['LabelCode' => 'Authorization Code in Header', 'Description' => 'When requesting the profile, pass the access token in the HTTP header. i.e Authorization: Bearer [accesstoken]', 'Control' => 'checkbox']
         ];
 
         $formFields = $formFields + $this->getSettingsFormFields();
@@ -437,10 +457,12 @@ class Gdn_OAuth2 extends Gdn_Plugin {
 
         $sender->setHighlightRoute();
         if (!$sender->data('Title')) {
-            $sender->setData('Title', sprintf(T('%s Settings'), 'Oauth2 SSO'));
+            $sender->setData('Title', sprintf(t('%s Settings'), 'Oauth2 SSO'));
         }
 
-        // Create send the possible redirect URLs that will be required by Oculus and display them in the dashboard.
+        $view = ($this->settingsView) ? $this->settingsView : 'plugins/oauth2';
+
+        // Create and send the possible redirect URLs that will be required by the authenticating server and display them in the dashboard.
         // Use Gdn::Request instead of convience function so that we can return http and https.
         $redirectUrls = Gdn::request()->url('/entry/'. $this->providerKey, true, true);
         $sender->setData('redirectUrls', $redirectUrls);
@@ -571,15 +593,18 @@ class Gdn_OAuth2 extends Gdn_Plugin {
      * Create a controller to handle entry request.
      *
      * @param Gdn_Controller $sender.
-     * @param $code string Retrieved from the response of the authentication provider, used to fetch an authentication token.
-     * @param $state string Values passed by us and returned in the response of the authentication provider.
+     * @param string $code Retrieved from the response of the authentication provider, used to fetch an authentication token.
+     * @param string $state Values passed by us and returned in the response of the authentication provider.
      *
      * @throws Exception.
      * @throws Gdn_UserException.
      */
-    public function entryEndpoint($sender, $code, $state) {
+    public function entryEndpoint($sender, $code, $state = '') {
         if ($error = $sender->Request->get('error')) {
             throw new Gdn_UserException($error);
+        }
+        if (empty($code)) {
+            throw new Gdn_UserException('The code parameter is either not set or empty.');
         }
 
         $this->provider = Gdn_AuthenticationProviderModel::getProviderByKey($sender->RequestMethod);
@@ -623,8 +648,11 @@ class Gdn_OAuth2 extends Gdn_Plugin {
                     'UniqueID' => $profile['id']]);
 
                 // Save the information as attributes.
+                // If a client has passed a refresh_token, store it as the access_token in the attributes
+                // for future requests, if not, store the access_token.
                 $attributes = [
-                    'AccessToken' => $response['access_token'],
+                    'RefreshToken' => val('refresh_token', $response),
+                    'AccessToken' => val('access_token', $response, val('refresh_token', $response)),
                     'Profile' => $profile
                 ];
 
@@ -634,20 +662,20 @@ class Gdn_OAuth2 extends Gdn_Plugin {
                 $sender->EventArguments['User'] = $sender->User;
                 $sender->fireEvent('AfterConnection');
 
-                redirect(userUrl($user, '', 'connections'));
+                redirectTo(userUrl($user, '', 'connections'));
                 break;
             case 'entry':
             default:
 
-                // This is an sso request, we need to redispatch to /entry/connect/[providerKey] which is Base_ConnectData_Handler() in this class.
-                Gdn::session()->stash($this->getProviderKey(), ['AccessToken' => $response['access_token'], 'Profile' => $profile]);
+                // This is an sso request, we need to redispatch to /entry/connect/[providerKey] which is base_ConnectData_Handler() in this class.
+                Gdn::session()->stash($this->getProviderKey(), ['AccessToken' => val('access_token', $response), 'RefreshToken' => val('refresh_token', $response), 'Profile' => $profile]);
                 $url = '/entry/connect/'.$this->getProviderKey();
 
                 //pass the target if there is one so that the user will be redirected to where the request originated.
                 if ($target = val('target', $state)) {
                     $url .= '?Target='.urlencode($target);
                 }
-                redirect($url);
+                redirectTo($url);
                 break;
         }
     }
@@ -671,12 +699,14 @@ class Gdn_OAuth2 extends Gdn_Plugin {
         }
         $profile = val('Profile', $savedProfile);
         $accessToken = val('AccessToken', $savedProfile);
+        $refreshToken = val('RefreshToken', $savedProfile);
 
         trace($profile, 'Profile');
         trace($accessToken, 'Access Token');
+        trace($refreshToken, 'Refresh Token');
 
         /* @var Gdn_Form $form */
-        $form = $sender->Form; //new Gdn_Form();
+        $form = $sender->Form; //new gdn_Form();
 
         // Create a form and populate it with values from the profile.
         $originaFormValues = $form->formValues();
@@ -688,6 +718,7 @@ class Gdn_OAuth2 extends Gdn_Plugin {
         $attributes = [];
         $attributes[$this->getProviderKey()] = [
             'AccessToken' => $accessToken,
+            'RefreshToken' => $refreshToken,
             'Profile' => $profile
         ];
         $form->setFormValue('Attributes', $attributes);
@@ -710,27 +741,38 @@ class Gdn_OAuth2 extends Gdn_Plugin {
      * Request access token from provider.
      *
      * @param string $code code returned from initial handshake with provider.
-     *
+     * @param bool $refresh if we are using the stored RefreshToken to request a new AccessToken
      * @return mixed Result of the API call to the provider, usually JSON.
      */
     public function requestAccessToken($code, $providerKey = null) {
         $provider = $this->provider($providerKey);
         $uri = val('TokenUrl', $provider);
 
-        $defaultParams = [
-            'code' => $code,
-            'client_id' => val('AssociationKey', $provider),
+        //When requesting the AccessToken using the RefreshToken the params are different.
+        if ($refresh) {
+            $defaultParams = [
+                'refresh_token' => $code,
+                'grant_type' => 'refresh_token'
+            ];
+        } else {
+            $defaultParams = [
+                'code' => $code,
+                'client_id' => val('AssociationKey', $provider),
             'redirect_uri' => url('/entry/'. $this->getProviderKey($providerKey), true),
-            'client_secret' => val('AssociationSecret', $provider),
-            'grant_type' => 'authorization_code',
-            'scope' => val('AcceptedScope', $provider)
-        ];
+                'client_secret' => val('AssociationSecret', $provider),
+                'grant_type' => 'authorization_code',
+                'scope' => val('AcceptedScope', $provider)
+            ];
+        }
 
-        $post = array_merge($defaultParams, $this->requestAccessTokenParams);
+        // Merge any parameters inherited parameters, remove any empty parameters before sending them in the request.
+        $post = array_filter(array_merge($defaultParams, $this->requestAccessTokenParams));
 
         $this->log('Before calling API to request access token', ['requestAccessToken' => ['targetURI' => $uri, 'post' => $post]]);
 
-        return $this->api($uri, 'POST', $post, $this->getAccessTokenRequestOptions());
+        $this->accessTokenResponse = $this->api($uri, 'POST', $post, $this->getAccessTokenRequestOptions());
+
+        return $this->accessTokenResponse;
     }
 
 
@@ -751,7 +793,7 @@ class Gdn_OAuth2 extends Gdn_Plugin {
             val('ProfileKeyUniqueID', $provider, 'user_id') => 'UniqueID'
         ];
 
-        $profile = arrayTranslate($rawProfile, $translatedKeys, true);
+        $profile = self::translateArrayMulti($rawProfile, $translatedKeys, true);
 
         $profile['Provider'] = $this->providerKey;
 
@@ -767,13 +809,30 @@ class Gdn_OAuth2 extends Gdn_Plugin {
     public function getProfile($providerKey = null) {
         $provider = $this->provider($providerKey);
         $uri = $this->requireVal('ProfileUrl', $provider, 'provider');
-        $defaultParams = array(
-            'access_token' => $this->accessToken()
-        );
-        $requestParams = array_merge($defaultParams, $this->requestProfileParams);
+        $defaultParams = [];
+        $defaultOptions = [];
+
+        // Send the Access Token as an Authorization header, depending on the client workflow.
+        if (val('BearerToken', $provider)) {
+            $defaultOptions = [
+                'Authorization-Header-Message' => 'Bearer '.$this->accessToken()
+            ];
+        }
+
+        // Merge with any other Header options being set by child classes.
+        $requestOptions = array_filter(array_merge($defaultOptions, $this->getProfileRequestOptions()));
+
+        // Send the Access Token is a Get parameter, depending on the client workflow.
+        if (!val('BearerToken', $provider)) {
+            $defaultParams = [
+                'access_token' => $this->accessToken()
+            ];
+        }
+        // Merge any inherited parameters and remove any empty parameters before sending them in the request.
+        $requestParams = array_filter(array_merge($defaultParams, $this->requestProfileParams));
 
         // Request the profile from the Authentication Provider
-        $rawProfile = $this->api($uri, 'GET', $requestParams, $this->getProfileRequestOptions());
+        $rawProfile = $this->api($uri, 'GET', $requestParams, $requestOptions);
 
         // Translate the keys of the profile sent to match the keys we are looking for.
         $profile = $this->translateProfileResults($rawProfile);
@@ -886,7 +945,7 @@ class Gdn_OAuth2 extends Gdn_Plugin {
      *
      * @throws Exception.
      */
-    function requireVal($key, $arr, $context = null) {
+    public static function requireVal($key, $arr, $context = null) {
         $result = val($key, $arr);
         if (!$result) {
             throw new \Exception("Key {$key} missing from {$context} collection.", 500);
@@ -895,6 +954,58 @@ class Gdn_OAuth2 extends Gdn_Plugin {
     }
 
 
+    /**
+     * Allow admins to use dot notation to map values from multi-dimensional arrays.
+     *
+     * @param array $array The array from which we will extract values.
+     * @param array $mappings The map of keys where we will find the values in $array and the new keys we will assign to them.
+     * @param bool|false $addRemaining Tack on all the unmapped values of $array.
+     * @return array An array with the keys passed in $mappings with corresponding values from $array and all the remaining values of $array.
+     */
+    public static function translateArrayMulti($array, $mappings, $addRemaining = false) {
+        $array = (array)$array;
+        $result = [];
+        foreach ($mappings as $index => $value) {
+            if (is_numeric($index)) {
+                $key = $value;
+                $newKey = $value;
+            } else {
+                $key = $index;
+                $newKey = $value;
+            }
+
+            if ($newKey === null) {
+                unset($array[$key]);
+                continue;
+            }
+
+            if (valr($key, $array)) {
+                $result[$newKey] = valr($key, $array);
+                if (isset($array[$key])) {
+                    unset($array[$key]);
+                }
+            } else {
+                $result[$newKey] = null;
+            }
+        }
+
+        if ($addRemaining) {
+            foreach ($array as $key => $value) {
+                if (!isset($result[$key])) {
+                    $result[$key] = $value;
+                }
+            }
+        }
+        return $result;
+    }
+
+
+    /**
+     * When DB_Logger is turned on, log SSO data.
+     * 
+     * @param $message
+     * @param $data
+     */
     public function log($message, $data) {
         if (c('Vanilla.SSO.Debug')) {
             Logger::event(

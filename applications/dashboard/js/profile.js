@@ -82,3 +82,18 @@ jQuery(document).ready(function($) {
         }
     });
 });
+
+$(document).on("contentLoad", function(e) {
+    // Set Up Copy To Clipboard
+    $('.js-copyToClipboard', e.target).each(function(){
+        if (Clipboard && Clipboard.isSupported()) {
+            $(this).show();
+            var copyMessage = $(this).data('copymessage');
+            var clipboard = new Clipboard(this, {
+                target: function(trigger) {
+                    gdn.informMessage(copyMessage);
+                }
+            });
+        }
+    });
+});

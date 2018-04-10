@@ -1,14 +1,15 @@
 <?php
 /**
  * @author Todd Burry <todd@vanillaforums.com>
- * @copyright 2009-2017 Vanilla Forums Inc.
+ * @copyright 2009-2018 Vanilla Forums Inc.
  * @license Proprietary
  */
 
 namespace VanillaTests\Library\Core;
 
+use PHPUnit\Framework\TestCase;
 
-class GeneralFunctionsTest extends \PHPUnit_Framework_TestCase {
+class GeneralFunctionsTest extends TestCase {
 
     /**
      * Test {@link urlMatch()}.
@@ -30,15 +31,13 @@ class GeneralFunctionsTest extends \PHPUnit_Framework_TestCase {
      * @dataProvider provideJsonEncodeCheckedTests
      */
     public function testJsonEncodeChecked($data, $expectException) {
-        if ($expectException && PHP_VERSION_ID < 50500) {
-            if (version_compare(\PHPUnit_Runner_Version::id(), '5.0', '<')) {
-                $this->setExpectedException('Exception');
-            } else {
-                $this->expectException('Exception');
-            }
+        if ($expectException) {
+            $this->expectException('Exception');
         }
 
-        jsonEncodeChecked($data);
+        $encodedData = jsonEncodeChecked($data);
+
+        $this->assertNotFalse($encodedData);
     }
 
     /**

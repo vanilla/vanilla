@@ -2,22 +2,24 @@
 $Session = Gdn::session();
 $User = $Session->User;
 $CssClass = '';
+$transientKey = Gdn::session()->transientKey();
+
 if ($this->CssClass)
     $CssClass .= ' '.$this->CssClass;
 
 $DashboardCount = 0;
 $ModerationCount = 0;
 // Spam & Moderation Queue
-if ($Session->checkPermission(array('Garden.Settings.Manage', 'Garden.Moderation.Manage', 'Moderation.Spam.Manage', 'Moderation.ModerationQueue.Manage'), false)) {
+if ($Session->checkPermission(['Garden.Settings.Manage', 'Garden.Moderation.Manage', 'Moderation.Spam.Manage', 'Moderation.ModerationQueue.Manage'], false)) {
     $LogModel = new LogModel();
-    //$SpamCount = $LogModel->GetOperationCount('spam');
-    $ModerationCount = $LogModel->GetOperationCount('moderate,pending');
+    //$SpamCount = $LogModel->getOperationCount('spam');
+    $ModerationCount = $LogModel->getOperationCount('moderate,pending');
     $DashboardCount += $ModerationCount;
 }
 // Applicant Count
 if ($Session->checkPermission('Garden.Users.Approve')) {
     $RoleModel = new RoleModel();
-    $ApplicantCount = $RoleModel->GetApplicantCount();
+    $ApplicantCount = $RoleModel->getApplicantCount();
     $DashboardCount += $ApplicantCount;
 } else {
     $ApplicantCount = null;
@@ -36,8 +38,8 @@ if ($Session->isValid()):
     $CountNotifications = $User->CountNotifications;
     $CNotifications = is_numeric($CountNotifications) && $CountNotifications > 0 ? '<span class="Alert NotificationsAlert">'.$CountNotifications.'</span>' : '';
 
-    echo '<span class="ToggleFlyout" rel="/profile/notificationspopin">';
-    echo anchor(sprite('SpNotifications', 'Sprite Sprite16').Wrap(t('Notifications'), 'em').$CNotifications, userUrl($User), 'MeButton FlyoutButton js-clear-notifications', array('title' => t('Notifications')));
+    echo '<span class="ToggleFlyout" rel="/profile/notificationspopin?TransientKey='.htmlspecialchars(urlencode($transientKey)).'">';
+    echo anchor(sprite('SpNotifications', 'Sprite Sprite16', t('Notifications')).$CNotifications, userUrl($User), 'MeButton FlyoutButton js-clear-notifications', ['title' => t('Notifications'), 'tabindex' => '0', "role" => "button", "aria-haspopup" => "true"]);
     echo sprite('SpFlyoutHandle', 'Arrow');
     echo '<div class="Flyout FlyoutMenu"></div></span>';
 
@@ -46,7 +48,7 @@ if ($Session->isValid()):
         $CountInbox = val('CountUnreadConversations', Gdn::session()->User);
         $CInbox = is_numeric($CountInbox) && $CountInbox > 0 ? ' <span class="Alert">'.$CountInbox.'</span>' : '';
         echo '<span class="ToggleFlyout" rel="/messages/popin">';
-        echo anchor(sprite('SpInbox', 'Sprite Sprite16').Wrap(t('Inbox'), 'em').$CInbox, '/messages/all', 'MeButton FlyoutButton', array('title' => t('Inbox')));
+        echo anchor(sprite('SpInbox', 'Sprite Sprite16', t('Inbox')).$CInbox, '/messages/all', 'MeButton FlyoutButton', ['title' => t('Inbox'), 'tabindex' => '0', "role" => "button", "aria-haspopup" => "true"]);
         echo sprite('SpFlyoutHandle', 'Arrow');
         echo '<div class="Flyout FlyoutMenu"></div></span>';
     }
@@ -54,7 +56,7 @@ if ($Session->isValid()):
     // Bookmarks
     if (Gdn::addonManager()->lookupAddon('Vanilla')) {
         echo '<span class="ToggleFlyout" rel="/discussions/bookmarkedpopin">';
-        echo anchor(sprite('SpBookmarks', 'Sprite Sprite16').Wrap(t('Bookmarks'), 'em'), '/discussions/bookmarked', 'MeButton FlyoutButton', array('title' => t('Bookmarks')));
+        echo anchor(sprite('SpBookmarks', 'Sprite Sprite16', t('Bookmarks')), '/discussions/bookmarked', 'MeButton FlyoutButton', ['title' => t('Bookmarks'), 'tabindex' => '0', "role" => "button", "aria-haspopup" => "true"]);
         echo sprite('SpFlyoutHandle', 'Arrow');
         echo '<div class="Flyout FlyoutMenu"></div></span>';
     }
@@ -62,9 +64,9 @@ if ($Session->isValid()):
     // Profile Settings & Logout
     $dropdown = new DropdownModule();
     $dropdown->setData('DashboardCount', $DashboardCount);
-    $triggerIcon = '<span class="Sprite Sprite16 SpOptions"></span>';
     $triggerTitle = t('Account Options');
-    $dropdown->setTrigger(wrap($triggerTitle, 'em'), 'anchor', 'MeButton FlyoutButton', $triggerIcon, '/profile/edit', ['title' => $triggerTitle]);
+    $triggerIcon = sprite('SpOptions', 'Sprite Sprite16', $triggerTitle);
+    $dropdown->setTrigger('', 'anchor', 'MeButton FlyoutButton', $triggerIcon, '/profile/edit', ['title' => $triggerTitle, 'tabindex' => '0', "role" => "button", "aria-haspopup" => "true"]);
     $editModifiers['listItemCssClasses'] = ['EditProfileWrap', 'link-editprofile'];
     $preferencesModifiers['listItemCssClasses'] = ['EditProfileWrap', 'link-preferences'];
 
@@ -88,7 +90,7 @@ if ($Session->isValid()):
     $dropdown->addLinkIf($modPermission, t('Moderation Queue'), '/dashboard/log/moderation', 'moderation.moderation', '', [], $modModifiers);
     $dropdown->addLinkIf($dashboardPermission, t('Dashboard'), '/dashboard/settings', 'dashboard.dashboard', '', [], $dashboardModifiers);
 
-    $dropdown->addLink(t('Sign Out'), SignOutUrl(), 'entry.signout', '', [], $signoutModifiers);
+    $dropdown->addLink(t('Sign Out'), signOutUrl(), 'entry.signout', '', [], $signoutModifiers);
 
     $this->EventArguments['Dropdown'] = &$dropdown;
     $this->fireEvent('FlyoutMenu');
@@ -102,10 +104,10 @@ else:
 
     echo '<div class="SignInLinks">';
 
-    echo anchor(t('Sign In'), SignInUrl($this->_Sender->SelfUrl), (SignInPopup() ? ' SignInPopup' : ''), array('rel' => 'nofollow'));
-    $Url = RegisterUrl($this->_Sender->SelfUrl);
+    echo anchor(t('Sign In'), signInUrl($this->_Sender->SelfUrl), (signInPopup() ? ' SignInPopup' : ''), ['rel' => 'nofollow']);
+    $Url = registerUrl($this->_Sender->SelfUrl);
     if (!empty($Url))
-        echo Bullet(' ').anchor(t('Register'), $Url, 'ApplyButton', array('rel' => 'nofollow')).' ';
+        echo bullet(' ').anchor(t('Register'), $Url, 'ApplyButton', ['rel' => 'nofollow']).' ';
     echo '</div>';
 
     echo ' <div class="SignInIcons">';

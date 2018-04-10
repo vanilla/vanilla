@@ -1,7 +1,7 @@
 <?php
 /**
  * @author Todd Burry <todd@vanillaforums.com>
- * @copyright 2009-2017 Vanilla Forums Inc.
+ * @copyright 2009-2018 Vanilla Forums Inc.
  * @license GPLv2
  */
 
@@ -81,18 +81,22 @@ class AddonModel implements LoggerAwareInterface {
      * @param array $options Additional options.
      *
      * - **themeType**: Specify "mobile" for the mobile theme.
+     * @return Returns an array of all of the addons that were enabled.
      */
     public function enable(Addon $addon, array $options = []) {
         $this->validateEnable($addon, $options);
 
         // Enable this addon's requirements.
         $requirements = $this->addonManager->lookupRequirements($addon, AddonManager::REQ_DISABLED);
+        $requiredAddons = [];
         foreach ($requirements as $addonKey => $row) {
-            $requiredAddon = $this->addonManager->lookupAddon($addonKey);
+            $requiredAddons[] = $requiredAddon = $this->addonManager->lookupAddon($addonKey);
             $this->enableInternal($requiredAddon, $options);
         }
 
         $this->enableInternal($addon, $options);
+
+        return array_merge([$addon], array_reverse($requiredAddons));
     }
 
     /**
@@ -107,14 +111,27 @@ class AddonModel implements LoggerAwareInterface {
         $validation = new Validation();
 
         if (!$options['force'] && $this->isEnabledConfig($addon, $options)) {
-            $validation->addError('enabled', 'The {addonName} {addonType} is already enabled.', ['addonName' => $addon->getName(), 'addonType' => $addon->getType()]);
+            $validation->addError(
+                'enabled',
+                'The {addonName} {addonType} is already enabled.',
+                ['addonName' => $addon->getName(), 'addonType' => $addon->getType()]
+            );
             throw new ValidationException($validation);
         }
 
         try {
             $this->addonManager->checkRequirements($addon, true);
         } catch (\Exception $ex) {
-            $validation->addError('requirements', $ex->getMessage());
+            $validation->addError('requirements', $ex->getMessage(), $ex->getCode());
+        }
+
+        try {
+            $this->addonManager->checkConflicts($addon, true);
+        } catch (\Exception $ex) {
+            $validation->addError('conflicts', $ex->getMessage(), $ex->getCode());
+        }
+
+        if (!$validation->isValid()) {
             throw new ValidationException($validation);
         }
 
@@ -140,16 +157,16 @@ class AddonModel implements LoggerAwareInterface {
                 if ($addon->getInfoValue('oldType') === 'application') {
                     $enabled = $this->config->get('EnabledApplications.'.$addon->getRawKey());
                 } else {
-                    $enabled = $this->config->get('EnabledPlugins.'.$addon->getKey());
+                    $enabled = $this->config->get('EnabledPlugins.'.$addon->getRawKey());
                 }
                 break;
             case Addon::TYPE_LOCALE:
-                $enabled = $this->config->get('EnabledLocales.'.$addon->getKey());
+                $enabled = $this->config->get('EnabledLocales.'.$addon->getRawKey());
                 break;
             case Addon::TYPE_THEME:
                 $options += ['themeType' => ''];
 
-                $enabled = $this->config->saveToConfig('Garden.'.ucfirst($options['themeType']).'Theme');
+                $enabled = $this->config->get($this->getThemeConfigKey($options['themeType'])) === $addon->getKey();
                 break;
         }
         return !empty($enabled);
@@ -167,11 +184,22 @@ class AddonModel implements LoggerAwareInterface {
         $wasEnabled = $this->isEnabledConfig($addon, $options);
 
         $this->addonManager->startAddon($addon);
+
+        // Load bootstrap file.
+        if ($bootstrap = $addon->getSpecial('bootstrap')) {
+            include_once $addon->path($bootstrap, Addon::PATH_FULL);
+        }
+
         $this->runSetup($addon);
+        $this->enableInConfig($addon, true, $options);
         if ($pluginClass = $addon->getPluginClass()) {
             $this->events->bindClass($pluginClass, $addon->getPriority());
+
+            // Fire some main events on the plugin.
+            if (!$wasEnabled) {
+                $this->callBootstrapEvents($pluginClass);
+            }
         }
-        $this->enableInConfig($addon, true, $options);
 
         if (!$wasEnabled) {
             $this->logger->info(
@@ -179,6 +207,19 @@ class AddonModel implements LoggerAwareInterface {
                 ['event' => 'addon_enabled', 'addonKey' => $addon->getKey(), 'addonType' => $addon->getType()]
             );
         }
+    }
+
+    /**
+     * Call the bootstrap style events on a plugin.
+     *
+     * This method is used when a plugin is enabled so that it can do what it can initialize after the bootstrap has happened.
+     *
+     * @param string $pluginClass The name of the plugin class.
+     */
+    private function callBootstrapEvents($pluginClass) {
+        $instance = $this->container->get($pluginClass);
+
+        $this->events->fireClass($instance, 'container_init', $this->container);
     }
 
     /**
@@ -190,7 +231,9 @@ class AddonModel implements LoggerAwareInterface {
         // Look for a setup method.
         $called = $this->callPluginMethod($addon, 'setup');
 
-        if (($structure = $addon->getSpecial('structure')) && (!$called || !in_array($structure, get_included_files()))) {
+        // @TODO This if is a kludge because Vanilla's core applications are inconsistent.
+        // Once the InstallModel is in use this code can be cleaned up by manual structure inclusion in addons.
+        if (($structure = $addon->getSpecial('structure')) && (!$called || !in_array($addon->path($structure, Addon::PATH_FULL), get_included_files())) || $addon->getKey() === 'dashboard') {
             $this->logger->info(
                 "Executing structure for {addonKey}.",
                 ['event' => 'addon_structure', 'addonKey' => $addon->getKey(), 'structureType' => 'file']
@@ -282,25 +325,26 @@ class AddonModel implements LoggerAwareInterface {
                 if ($addon->getInfoValue('oldType') === 'application') {
                     $this->config->saveToConfig(
                         'EnabledApplications.'.$addon->getRawKey(),
-                        $enabled ? trim($addon->getSubdir(), '/') : null,
+                        $enabled ? trim(basename($addon->getSubdir()), '/') : null,
                         ['RemoveEmpty' => true]
                     );
                 } else {
-                    $this->config->saveToConfig('EnabledPlugins.'.$addon->getKey(), $enabled);
+                    $this->config->saveToConfig('EnabledPlugins.'.$addon->getRawKey(), $enabled);
                 }
                 break;
             case Addon::TYPE_LOCALE:
                 $this->config->saveToConfig(
-                    'EnabledLocales.'.$addon->getKey(),
+                    'EnabledLocales.'.$addon->getRawKey(),
                     $enabled ? $addon->getInfoValue('locale') : null,
                     ['RemoveEmpty' => true]
                 );
                 break;
             case Addon::TYPE_THEME:
                 $options += ['themeType' => ''];
+                $configKey = $this->getThemeConfigKey($options['themeType']);
 
                 $this->config->saveToConfig(
-                    'Garden.'.ucfirst($options['themeType']).'Theme',
+                    $configKey,
                     $enabled ? $addon->getKey() : null,
                     ['RemoveEmpty' => true]
                 );
@@ -388,5 +432,109 @@ class AddonModel implements LoggerAwareInterface {
      */
     public function getAddonManager() {
         return $this->addonManager;
+    }
+
+    public function splitID($addonID) {
+        return Addon::splitGlobalKey($addonID);
+    }
+
+    /**
+     * Lookup addons based on filter criteria.
+     *
+     * @param array $where The filter.
+     * @return Addon[] Returns an array of addons.
+     */
+    public function getWhere(array $where = []) {
+        $where += [
+            'enabled' => null,
+            'type' => null,
+            'addonID' => null,
+            'hidden' => false,
+            'deprecated' => null,
+            'themeType' => 'desktop'
+        ];
+
+        $am = $this->getAddonManager();
+
+        // Do a bit of optimization depending on the filter.
+        if ($where['addonID']) {
+            list($key, $type) = Addon::splitGlobalKey($where['addonID']);
+            $addons = [$am->lookupByType($key, $type)];
+        } elseif ($where['enabled'] && $where['type'] === Addon::TYPE_THEME) {
+            $addons = [$am->lookupTheme($this->getThemeKey($where['themeType']))];
+        } elseif (!empty($where['enabled'])) {
+            $addons = $am->getEnabled();
+            // Add the theme again because getEnabled() doesn't currently work with the mobile theme.
+            if ($theme = $am->lookupTheme($this->getThemeKey($where['themeType']))) {
+                $addons[$theme->getType().'/'.$theme->getKey()] = $theme;
+            }
+
+            $addons = array_values($addons);
+        } elseif (!empty($where['type'])) {
+            $addons = array_values($am->lookupAllByType($where['type']));
+        } else {
+            $addons = array_merge(
+                array_values($am->lookupAllByType(Addon::TYPE_ADDON)),
+                array_values($am->lookupAllByType(Addon::TYPE_THEME)),
+                array_values($am->lookupAllByType(Addon::TYPE_LOCALE))
+            );
+        }
+
+        $addons = array_filter($addons, function (Addon $addon = null) use ($where, $am) {
+            if ($addon === null) {
+                return false;
+            }
+
+            if (isset($where['type']) && $addon->getType() !== $where['type']) {
+                return false;
+            }
+            if (isset($where['enabled'])) {
+                if ($addon->getType() === Addon::TYPE_THEME && $addon->getKey() !== $this->getThemeKey($where['themeType'])) {
+                    return false;
+                } elseif ($addon->getType() !== Addon::TYPE_THEME && $where['enabled'] !== $am->isEnabled($addon->getKey(), $addon->getType())) {
+                    return false;
+                }
+            }
+            if (isset($where['hidden']) && $where['hidden'] !== $addon->getInfoValue('hidden', false)) {
+                return false;
+            }
+            if (isset($where['deprecated']) && $where['deprecated'] !== $addon->getInfoValue('deprecated', false)) {
+                return false;
+            } elseif (!isset($where['deprecated']) && $addon->getInfoValue('deprecated') && !$am->isEnabled($addon->getKey(), $addon->getType())) {
+                return false;
+            }
+            return true;
+        });
+
+        return $addons;
+    }
+
+    /**
+     * Get the current theme key.
+     *
+     * @param string $type They type of theme, one of **desktop** or **mobile**.
+     * @return string Returns an addon key for a theme.
+     */
+    public function getThemeKey($type = '') {
+        if ($type === 'mobile') {
+            $r = $this->config->get('Garden.MobileTheme', AddonManager::DEFAULT_MOBILE_THEME);
+        } else {
+            $r = $this->config->get('Garden.Theme', AddonManager::DEFAULT_DESKTOP_THEME);
+        }
+        return $r;
+    }
+
+    /**
+     * Get the config key for a given theme.
+     *
+     * @param string $type The type of theme, either **dekstop** or **mobile**.
+     * @return string Returns a config key.
+     */
+    private function getThemeConfigKey($type = '') {
+        if (strcasecmp($type, 'desktop') === 0) {
+            $type = '';
+        }
+        $r = 'Garden.'.ucfirst($type).'Theme';
+        return $r;
     }
 }

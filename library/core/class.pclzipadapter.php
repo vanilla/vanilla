@@ -18,50 +18,50 @@ class PclZipAdapter {
         }
     }
 
-    public function deleteName($Name) {
-        $Index = $this->_Names[$Name]['index'];
-        $this->PclZip->deleteByIndex($Index);
+    public function deleteName($name) {
+        $index = $this->_Names[$name]['index'];
+        $this->PclZip->deleteByIndex($index);
     }
 
-    public function extractTo($Path, $Names) {
-        $Indexes = array();
+    public function extractTo($path, $names) {
+        $indexes = [];
         // Convert the name(s) to indexes.
-        foreach ((array)$Names as $Name) {
-            if (!isset($this->_Names[$Name])) {
+        foreach ((array)$names as $name) {
+            if (!isset($this->_Names[$name])) {
                 continue;
             }
-            $Indexes[] = $this->_Names[$Name]['index'];
+            $indexes[] = $this->_Names[$name]['index'];
         }
-        $IndexesStr = implode(',', $Indexes);
-        $Result = $this->PclZip->extractByIndex($IndexesStr, $Path);
-        return $Result != 0;
+        $indexesStr = implode(',', $indexes);
+        $result = $this->PclZip->extractByIndex($indexesStr, $path);
+        return $result != 0;
     }
 
-    public function open($Path) {
-        $this->PclZip = new PclZip($Path);
-        $Result = $this->_Contents = $this->PclZip->listContent();
-        if (!$Result) {
+    public function open($path) {
+        $this->PclZip = new PclZip($path);
+        $result = $this->_Contents = $this->PclZip->listContent();
+        if (!$result) {
             return ZipArchive::ER_READ;
         }
-        $this->_Names = array();
-        foreach ($this->_Contents as $Content) {
-            $this->_Names[$Content['filename']] = $Content;
+        $this->_Names = [];
+        foreach ($this->_Contents as $content) {
+            $this->_Names[$content['filename']] = $content;
         }
         $this->numFiles = count($this->_Contents);
         return TRUE;
     }
 
-    public function statIndex($Index) {
-        $Content = $this->_Contents[$Index];
-        $Result = array(
-            'name' => $Content['filename'],
-            'index' => $Content['index'],
-            'crc' => $Content['crc'],
-            'size' => $Content['size'],
-            'mtime' => $Content['mtime'],
-            'comp_size' => $Content['compressed_size'],
+    public function statIndex($index) {
+        $content = $this->_Contents[$index];
+        $result = [
+            'name' => $content['filename'],
+            'index' => $content['index'],
+            'crc' => $content['crc'],
+            'size' => $content['size'],
+            'mtime' => $content['mtime'],
+            'comp_size' => $content['compressed_size'],
             'comp_method' => FALSE
-        );
-        return $Result;
+        ];
+        return $result;
     }
 }

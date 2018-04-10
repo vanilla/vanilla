@@ -8,21 +8,23 @@ $this->fireEvent('BeforeStatusForm');
 $Session = Gdn::session();
 if ($Session->checkPermission('Garden.Profiles.Edit')) {
     echo '<div class="FormWrapper FormWrapper-Condensed">';
-    echo $this->Form->open(array('action' => url('/activity/post/'.$this->data('Filter')), 'class' => 'Activity'));
+    echo '<h2 class="sr-only">'.t('Post Comment').'</h2>';
+    echo $this->Form->open(['action' => url('/activity/post/'.$this->data('Filter')), 'class' => 'Activity']);
     echo $this->Form->errors();
-    echo $this->Form->bodyBox('Comment', array('Wrap' => true));
+    echo $this->Form->bodyBox('Comment', ['Wrap' => true]);
 
     echo '<div class="Buttons">';
-    echo $this->Form->button('Share', array('class' => 'Button Primary'));
+    echo $this->Form->button('Share', ['class' => 'Button Primary']);
     echo '</div>';
 
     echo $this->Form->close();
     echo '</div>';
 }
 echo '</div>';
+echo '<h2 class="sr-only">'.t('Activity List').'</h2>';
 echo '<ul class="DataList Activities">';
 
-$Activities = $this->data('Activities', array());
+$Activities = $this->data('Activities', []);
 if (count($Activities) > 0) {
     include($this->fetchViewLocation('activities', 'activity', 'dashboard'));
 } else {
@@ -34,4 +36,4 @@ if (count($Activities) > 0) {
 echo '</ul>';
 
 if (count($Activities) > 0)
-    PagerModule::write(array('CurrentRecords' => count($Activities)));
+    PagerModule::write(['CurrentRecords' => count($Activities)]);

@@ -15,7 +15,7 @@
             <?php
             if ($Activity['Photo']) {
                 $PhotoAnchor = anchor(
-                    img($Activity['Photo'], array('class' => 'ProfilePhoto PhotoWrapMedium')),
+                    img($Activity['Photo'], ['class' => 'ProfilePhoto PhotoWrapMedium']),
                     $Activity['PhotoUrl'], 'PhotoWrap PhotoWrapMedium');
             } else {
                 $PhotoAnchor = '';
@@ -32,7 +32,7 @@
     <?php endforeach; ?>
         <li class="Item Center">
             <?php
-            echo anchor(sprintf(t('All %s'), t('Notifications')), '/profile/notifications');
+            echo anchor(t('All Notifications'), '/profile/notifications');
             ?>
         </li>
     <?php else: ?>

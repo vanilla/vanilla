@@ -1,11 +1,11 @@
-<?php return array(
+<?php return [
     'name' => 'Little Emoji',
     'author' => 'Todd Burry',
     'description' => 'Inspired by the the original 15px smileys seen on forums and still favored by emoticon enthusiasts everywhere. Now with anti-aliasing technology.',
     'format' => '<img class="emoji" src="{src}" title="{name}" alt="{name}" srcset="{dir}/{basename}@2x{ext} 2x" />',
     'icon' => 'little-icon.png',
     'emoji' =>
-        array(
+        [
             -1 => '-1.png',
             '+1' => '+1.png',
             'angry' => 'angry.png',
@@ -53,9 +53,9 @@
             'waving' => 'waving.png',
             'wink' => 'wink.png',
             'winky' => 'winky.png',
-        ),
+        ],
     'aliases' =>
-        array(
+        [
             ':)' => 'smile',
             ':D' => 'grin',
             ':(' => 'frown',
@@ -78,9 +78,9 @@
             '=)' => 'smiley',
             '>_<' => 'rage',
             ':3' => 'blush',
-        ),
+        ],
     'editor' =>
-        array(
+        [
             ':)' => 'smile',
             ':D' => 'smiley',
             ';)' => 'wink',
@@ -93,9 +93,9 @@
             '<3' => 'heart',
             'o:)' => 'innocent',
             '>:)' => 'naughty',
-        ),
+        ],
     'archive' =>
-        array(
+        [
             'broken_heart' => 'heartbreak.png',
             'dizzy_face' => 'dizzy.png',
             'grinning' => 'grin.png',
@@ -104,20 +104,20 @@
             'smiling_imp' => 'naughty.png',
             'sob' => 'bawling.png',
             'stuck_out_tongue' => 'tongue.png',
-        ),
+        ],
     'minSize' =>
-        array(
+        [
             'w' => 15,
             'h' => 18,
-        ),
+        ],
     'maxSize' =>
-        array(
+        [
             'w' => 22,
             'h' => 18,
-        ),
+        ],
     'sizes' =>
-        array(
+        [
             0 => 1,
             1 => 2,
-        ),
-);
+        ],
+];

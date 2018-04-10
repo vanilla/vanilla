@@ -1,7 +1,7 @@
 <?php
 /**
  * @author Todd Burry <todd@vanillaforums.com>
- * @copyright 2009-2017 Vanilla Forums Inc.
+ * @copyright 2009-2018 Vanilla Forums Inc.
  * @license Proprietary
  */
 
@@ -57,7 +57,7 @@ class TestLogger implements LoggerInterface {
      * @param array $context
      * @return null
      */
-    public function log($level, $message, array $context = array()) {
+    public function log($level, $message, array $context = []) {
         $msg = $this->replaceContext($message, $context);
         $this->logs[] = "$level $msg";
         $this->last = [$level, $message, $context];

@@ -35,7 +35,7 @@ if ($this->InvitationData->numRows() > 0) {
         <tbody>
         <?php
         $Session = Gdn::session();
-        foreach ($this->InvitationData->Format('Text')->result() as $Invitation) {
+        foreach ($this->InvitationData->format('Text')->result() as $Invitation) {
             ?>
             <tr class="js-invitation" data-id="<?php echo $Invitation->InvitationID ?>">
                 <td><?php

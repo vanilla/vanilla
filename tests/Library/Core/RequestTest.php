@@ -1,17 +1,18 @@
 <?php
 /**
- * @copyright 2009-2017 Vanilla Forums Inc.
+ * @copyright 2009-2018 Vanilla Forums Inc.
  * @license GPLv2
  */
 
 namespace VanillaTests\Library\Core;
 
+use PHPUnit\Framework\TestCase;
 use Gdn_Request;
 
 /**
  * Test the {@link Gdn_Request} class.
  */
-class RequestTest extends \PHPUnit_Framework_TestCase {
+class RequestTest extends TestCase {
 
     public function provideUrls() {
         return [
@@ -61,6 +62,42 @@ class RequestTest extends \PHPUnit_Framework_TestCase {
         $this->assertSame($req->getBody(), $req->getRequestArguments(Gdn_Request::INPUT_POST));
     }
 
+    /**
+     * Test that submitted files are properly merged into the POST array.
+     */
+    public function testFilesAsPost() {
+        // Backup the superglobals.
+        $post = $_POST;
+        $files = $_FILES;
+
+        $_FILES = [
+            'MyFile' => [
+                'error' => UPLOAD_ERR_OK,
+                'name' => 'MyFile.txt',
+                'size' => 10,
+                'tmp_name' => '/tmp/php/php123',
+                'type' => 'text/plain'
+            ],
+            'Foo' => [
+                'error' => UPLOAD_ERR_OK,
+                'name' => 'bar.jpg',
+                'size' => 1024,
+                'tmp_name' => '/tmp/php/php456',
+                'type' => 'image/jpeg'
+            ]
+        ];
+        $_POST = ['Foo' => 'Bar'];
+
+        $request = Gdn_Request::create()->fromEnvironment();
+
+        // Put everything back like we found it.
+        $_POST = $post;
+        $_FILES = $files;
+
+        $this->assertInstanceOf(\Vanilla\UploadedFile::class, $request->post('MyFile'));
+        $this->assertNotInstanceOf(\Vanilla\UploadedFile::class, $request->post('Foo'), 'POST value overwritten by file.');
+    }
+
     public function testGetUrl() {
         $request = new Gdn_Request();
         $request->setScheme('http');
@@ -72,6 +109,79 @@ class RequestTest extends \PHPUnit_Framework_TestCase {
         $request->setQuery(['foo' => 'bar']);
 
         $this->assertSame('http://localhost:8080/root-dir/path/to/resource.json?foo=bar', $request->getUrl());
+    }
+
+    public function testGetHeaders() {
+        $server = [
+            'CONTENT_TYPE' => 'application/json',
+            'HTTP_HOST' => 'localhost',
+            'HTTP_CACHE_CONTROL' => 'no-cache'
+        ];
+        $expectedHeaders = [
+            'Content-Type' => 'application/json',
+            'Host' => 'localhost',
+            'Cache-Control' => 'no-cache'
+        ];
+
+        $request = new Gdn_Request();
+        $request->setRequestArguments(Gdn_Request::INPUT_SERVER, $server);
+
+        $this->assertEquals($expectedHeaders, $request->getHeaders());
+    }
+
+    public function testGetHeader() {
+        $server = [
+            'CONTENT_TYPE' => 'application/json',
+            'HTTP_CACHE_CONTROL' => 'no-cache',
+        ];
+
+        $request = new Gdn_Request();
+        $request->setRequestArguments(Gdn_Request::INPUT_SERVER, $server);
+
+        $this->assertEquals('application/json', $request->getHeader('CONTENT_TYPE'));
+        $this->assertEquals('application/json', $request->getHeader('Content-Type'));
+        $this->assertEquals('application/json', $request->getHeader('content-type'));
+
+        $this->assertEquals('no-cache', $request->getHeader('HTTP_CACHE_CONTROL'));
+        $this->assertEquals('no-cache', $request->getHeader('CACHE_CONTROL'));
+        $this->assertEquals('no-cache', $request->getHeader('Cache-Control'));
+        $this->assertEquals('no-cache', $request->getHeader('cache-control'));
+    }
+
+    public function testGetHeaderLine() {
+        $server = [
+            'CONTENT_LENGTH' => '',
+            'CONTENT_TYPE' => 'application/json',
+            'HTTP_ACCEPT' => ['application/json', 'application/xml']
+        ];
+
+        $request = new Gdn_Request();
+        $request->setRequestArguments(Gdn_Request::INPUT_SERVER, $server);
+
+        $this->assertEquals('', $request->getHeaderLine('Content-Length'));
+        $this->assertEquals('application/json', $request->getHeaderLine('Content-Type'));
+        $this->assertEquals('application/json,application/xml', $request->getHeaderLine('Accept'));
+    }
+
+    public function testHasHeader() {
+        $server = [
+            'CONTENT_TYPE' => 'application/json',
+            'HTTP_CACHE_CONTROL' => 'no-cache',
+        ];
+
+        $request = new Gdn_Request();
+        $request->setRequestArguments(Gdn_Request::INPUT_SERVER, $server);
+
+        $this->assertTrue($request->hasHeader('CONTENT_TYPE'));
+        $this->assertTrue($request->hasHeader('Content-Type'));
+        $this->assertTrue($request->hasHeader('content-type'));
+
+        $this->assertTrue($request->hasHeader('HTTP_CACHE_CONTROL'));
+        $this->assertTrue($request->hasHeader('CACHE_CONTROL'));
+        $this->assertTrue($request->hasHeader('Cache-Control'));
+        $this->assertTrue($request->hasHeader('cache-control'));
+
+        $this->assertFalse($request->hasHeader('Auth'));
     }
 
     public function testHostEquivalence() {
@@ -124,6 +234,40 @@ class RequestTest extends \PHPUnit_Framework_TestCase {
     }
 
     /**
+     * Verify files with the UPLOAD_ERR_NO_FILE error are not added to the translated files array.
+     */
+    public function testNoFileRemoval() {
+        $post = $_POST;
+        $files = $_FILES;
+
+        $_FILES = [
+            'MyFile' => [
+                'error' => UPLOAD_ERR_OK,
+                'name' => 'MyFile.txt',
+                'size' => 10,
+                'tmp_name' => '/tmp/php/php123',
+                'type' => 'text/plain'
+            ],
+            'NoFile' => [
+                'error' => UPLOAD_ERR_NO_FILE,
+                'name' => 'bar.jpg',
+                'size' => 1024,
+                'tmp_name' => '/tmp/php/php456',
+                'type' => 'image/jpeg'
+            ]
+        ];
+
+        $request = Gdn_Request::create()->fromEnvironment();
+
+        // Put everything back like we found it.
+        $_POST = $post;
+        $_FILES = $files;
+
+        $this->assertInstanceOf(\Vanilla\UploadedFile::class, $request->post('MyFile'));
+        $this->assertFalse($request->post('NoFile', false), 'Nonexistent file was not removed.');
+    }
+
+    /**
      * The {@link Gdn_Request::path()} and {@link Gdn_Request::getPath()} methods should be compatible.
      */
     public function testPathEquivalence() {
@@ -154,6 +298,54 @@ class RequestTest extends \PHPUnit_Framework_TestCase {
 
         $req->port(8080);
         $this->assertSame($req->getPort(), $req->port());
+    }
+
+    /**
+     * Test that the files array is normalized when merged into the POST array.
+     */
+    public function testPostFileNormalization() {
+        // Backup the superglobals.
+        $files = $_FILES;
+
+        // This format represents what might come in from a form using input fields named "MyForm[Details][Avatars][]"
+        $_FILES = [
+            'MyForm' => [
+                'tmp_name' => [
+                    'Details' => [
+                        'Avatar' => ['/tmp/php/abc123', '/tmp/php/xyz890']
+                    ]
+                ],
+                'name' => [
+                    'Details' => [
+                        'Avatar' => ['AvatarOne', 'AvatarTwo']
+                    ]
+                ],
+                'size' => [
+                    'Details' => [
+                        'Avatar' => [100, 110]
+                    ]
+                ],
+                'type' => [
+                    'Details' => [
+                        'Avatar' => ['image/jpeg', 'image/jpeg']
+                    ]
+                ],
+                'error' => [
+                    'Details' => [
+                        'Avatar' => [UPLOAD_ERR_OK, UPLOAD_ERR_OK]
+                    ]
+                ]
+            ]
+        ];
+
+        $request = Gdn_Request::create()->fromEnvironment();
+
+        // Put everything back like we found it.
+        $_FILES = $files;
+
+        $formFiles = $request->post('MyForm');
+        $this->assertInstanceOf(\Vanilla\UploadedFile::class, $formFiles['Details']['Avatar'][0]);
+        $this->assertInstanceOf(\Vanilla\UploadedFile::class, $formFiles['Details']['Avatar'][1]);
     }
 
     public function testQueryEquivalence() {
@@ -258,6 +450,9 @@ class RequestTest extends \PHPUnit_Framework_TestCase {
     }
 
     public function testUrlEquivalence() {
+        // Simulate that rewrite is ON
+        $_SERVER['X_REWRITE'] = 1;
+
         $req = new Gdn_Request();
 
         $req->setScheme('http');

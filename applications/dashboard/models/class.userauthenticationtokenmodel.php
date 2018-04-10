@@ -2,7 +2,7 @@
 /**
  * Manage user authentication tokens.
  *
- * @copyright 2009-2017 Vanilla Forums Inc.
+ * @copyright 2009-2018 Vanilla Forums Inc.
  * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
  */
 
@@ -23,7 +23,11 @@ class UserAuthenticationTokenModel extends Gdn_Model {
     public function insert($fields) {
         $this->prune();
 
-        return parent::insert($fields);
+        if (!isset($fields['Timestamp'])) {
+            $fields['Timestamp'] = date(MYSQL_DATE_FORMAT);
+        }
+
+        return parent::insert($fields) !== false;
     }
 
     /**

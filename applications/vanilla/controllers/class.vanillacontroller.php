@@ -2,7 +2,7 @@
 /**
  * Vanilla controller
  *
- * @copyright 2009-2017 Vanilla Forums Inc.
+ * @copyright 2009-2018 Vanilla Forums Inc.
  * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
  * @package Vanilla
  * @since 2.0
@@ -54,6 +54,19 @@ class VanillaController extends Gdn_Controller {
             $categoryID = is_numeric($category) ? $category : val('CategoryID', $category);
 
             $this->permission($permission, $fullMatch, 'Category', $categoryID);
+        }
+    }
+
+    /**
+     * Check to see if we've gone off the end of the page.
+     *
+     * @param int $offset The offset requested.
+     * @param int $totalCount The total count of records.
+     * @throws Exception Throws an exception if the offset is past the last page.
+     */
+    protected function checkPageRange(int $offset, int $totalCount) {
+        if ($offset > 0 && $offset >= $totalCount) {
+            throw notFoundException();
         }
     }
 }

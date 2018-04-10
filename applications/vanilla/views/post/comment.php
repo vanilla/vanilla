@@ -24,11 +24,11 @@ $this->fireEvent('BeforeCommentForm');
             <div class="Form-Body">
                 <div class="FormWrapper FormWrapper-Condensed">
                     <?php
-                    echo $this->Form->open(array('id' => 'Form_Comment'));
+                    echo $this->Form->open(['id' => 'Form_Comment']);
                     echo $this->Form->errors();
                     $this->fireEvent('BeforeBodyField');
 
-                    echo $this->Form->bodyBox('Body', array('Table' => 'Comment', 'tabindex' => 1, 'FileUpload' => true));
+                    echo $this->Form->bodyBox('Body', ['Table' => 'Comment', 'FileUpload' => true]);
 
                     echo '<div class="CommentOptions List Inline">';
                     $this->fireEvent('AfterBodyField');
@@ -36,25 +36,27 @@ $this->fireEvent('BeforeCommentForm');
 
                     echo "<div class=\"Buttons\">\n";
                     $this->fireEvent('BeforeFormButtons');
-                    $CancelText = t('Home');
-                    $CancelClass = 'Back';
-                    if (!$NewOrDraft || $Editing) {
-                        $CancelText = t('Cancel');
-                        $CancelClass = 'Cancel';
-                    }
 
-                    echo '<span class="'.$CancelClass.'">';
-                    echo anchor($CancelText, '/');
-                    $CategoryID = $this->data('Discussion.CategoryID');
-                    if (c('Vanilla.Categories.Use', true) && $CategoryID) {
-                        $Category = CategoryModel::categories($CategoryID);
-                        if ($Category) {
-                            echo ' <span class="Bullet">•</span> '.anchor(htmlspecialchars($Category['Name']), categoryUrl($Category));
-                        }
-                    }
-                    echo '</span>';
+                    // Keep commented for now but if you stumble on this in a year you can just remove it :).
+//                    $CancelText = t('Home');
+//                    $CancelClass = 'Back';
+//                    if (!$NewOrDraft || $Editing) {
+//                        $CancelText = t('Cancel');
+//                        $CancelClass = 'Cancel';
+//                    }
+//
+//                    echo '<span class="'.$CancelClass.'">';
+//                    echo anchor($CancelText, '/');
+//                    $CategoryID = $this->data('Discussion.CategoryID');
+//                    if (c('Vanilla.Categories.Use', true) && $CategoryID) {
+//                        $Category = CategoryModel::categories($CategoryID);
+//                        if ($Category) {
+//                            echo ' <span class="Bullet">•</span> '.anchor(htmlspecialchars($Category['Name']), categoryUrl($Category));
+//                        }
+//                    }
+//                    echo '</span>';
 
-                    $ButtonOptions = array('class' => 'Button Primary CommentButton');
+                    $ButtonOptions = ['class' => 'Button Primary CommentButton'];
                     $ButtonOptions['tabindex'] = 1;
 
                     if (!$Editing && $Session->isValid()) {
@@ -69,7 +71,7 @@ $this->fireEvent('BeforeCommentForm');
                         echo $this->Form->button($Editing ? 'Save Comment' : 'Post Comment', $ButtonOptions);
                     } else {
                         $AllowSigninPopup = c('Garden.SignIn.Popup');
-                        $Attributes = array('tabindex' => '-1');
+                        $Attributes = ['tabindex' => '-1'];
                         if (!$AllowSigninPopup) {
                             $Attributes['target'] = '_parent';
                         }

@@ -2,7 +2,7 @@
 /**
  * Manages the social plugins.
  *
- * @copyright 2009-2017 Vanilla Forums Inc.
+ * @copyright 2009-2018 Vanilla Forums Inc.
  * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
  * @package Dashboard
  * @since 2.1
@@ -14,7 +14,7 @@
 class SocialController extends DashboardController {
 
     /** @var array Models to automatically instantiate. */
-    public $Uses = array('Form', 'Database');
+    public $Uses = ['Form', 'Database'];
 
     /**
      * Runs before every call to this controller.
@@ -28,7 +28,7 @@ class SocialController extends DashboardController {
      * Default method.
      */
     public function index() {
-        redirect('social/manage');
+        redirectTo('social/manage');
     }
 
     /**
@@ -39,8 +39,8 @@ class SocialController extends DashboardController {
         $this->title("Social Connect Addons");
         $this->setHighlightRoute('/social/manage');
 
-        $Connections = $this->getConnections();
-        $this->setData('Connections', $Connections);
+        $connections = $this->getConnections();
+        $this->setData('Connections', $connections);
 
         $this->render();
     }

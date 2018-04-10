@@ -10,7 +10,7 @@
         <li class="form-group">
             <?php echo $this->Form->labelWrap('Category to Use', 'Plugins.Flagging.CategoryID'); ?>
             <div class="input-wrap">
-                <?php echo $this->Form->CategoryDropDown('Plugins.Flagging.CategoryID', array('Value' => c('Plugins.Flagging.CategoryID'))); ?>
+                <?php echo $this->Form->categoryDropDown('Plugins.Flagging.CategoryID', ['Value' => c('Plugins.Flagging.CategoryID')]); ?>
             </div>
         </li>
         <li class="form-group">
@@ -43,8 +43,8 @@ if (!count($this->FlaggedItems)) {
                 $multipleReportsString = '<div class="info italic">'.sprintf(t('Flagged by %s users.'), $numComplaintsInThread).'</div>';
                 $flaggedBy = ($numComplaintsInThread > 1) ? $multipleReportsString : '';
                 foreach ($FlaggedList as $FlagIndex => $Flag) {
-                    $type = ucfirst($Flag['ForeignType']);
-                    $flaggedBy .= sprintf(t('<strong>%s</strong> on %s'), anchor($Flag['InsertName'], "profile/{$Flag['InsertUserID']}/{$Flag['InsertName']}"), $Flag['DateInserted']).' '.t('said:');
+                    $type = htmlentities(ucfirst($Flag['ForeignType']));
+                    $flaggedBy .= sprintf(t('<strong>%s</strong> on %s'), anchor(htmlspecialchars($Flag['InsertName']), userUrl(['UserID' => $Flag['InsertUserID'], 'Name' => $Flag['InsertName']])), $Flag['DateInserted']).' '.t('said:');
                     $flaggedBy .= '<div class="FlaggedReason">'.Gdn_Format::text($Flag['Comment']).'</div>';
                 }
                 $options = anchor(t('Take Action'), $Flag['ForeignURL'], 'btn btn-primary');

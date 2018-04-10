@@ -7,6 +7,10 @@
 *.md    text eol=lf
 *.yml   text eol=lf
 
+# Mark built files as binary
+*.map binary
+composer.lock binary
+
 # Skip files on archive
 .editorconfig export-ignore
 .gitattributes export-ignore

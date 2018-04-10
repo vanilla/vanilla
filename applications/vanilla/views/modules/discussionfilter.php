@@ -20,33 +20,38 @@ if ($Session->isValid()) {
 }
 
 if (!function_exists('FilterCountString')) {
-    function filterCountString($Count, $Url = '') {
-        $Count = CountString($Count, $Url);
-        return $Count != '' ? '<span class="Aside">'.$Count.'</span>' : '';
+    function filterCountString($count, $url = '') {
+        $count = countString($count, $url);
+        return $count != '' ? '<span class="Aside">'.$count.'</span>' : '';
     }
 }
 if (c('Vanilla.Discussions.ShowCounts', true)) {
-    $Bookmarked .= FilterCountString($CountBookmarks, '/discussions/UserBookmarkCount');
-    $MyDiscussions .= FilterCountString($CountDiscussions);
-    $MyDrafts .= FilterCountString($CountDrafts);
+    $Bookmarked .= filterCountString($CountBookmarks, '/discussions/UserBookmarkCount');
+    $MyDiscussions .= filterCountString($CountDiscussions);
+    $MyDrafts .= filterCountString($CountDrafts);
 }
 ?>
 <div class="BoxFilter BoxDiscussionFilter">
-    <ul class="FilterMenu">
+    <span class="sr-only BoxFilter-HeadingWrap">
+        <h2 class="BoxFilter-Heading">
+            <?php echo t('Quick Links'); ?>
+        </h2>
+    </span>
+    <ul role="nav" class="FilterMenu">
         <?php
         $Controller->fireEvent('BeforeDiscussionFilters');
         //      if (c('Vanilla.Categories.ShowTabs')) {
         if (c('Vanilla.Categories.Use')) {
             $CssClass = 'AllCategories';
-            if (strtolower($Controller->ControllerName) == 'categoriescontroller' && in_array(strtolower($Controller->RequestMethod), array('index', 'all'))) {
+            if (strtolower($Controller->ControllerName) == 'categoriescontroller' && in_array(strtolower($Controller->RequestMethod), ['index', 'all'])) {
                 $CssClass .= ' Active';
             }
 
             echo '<li class="'.$CssClass.'">'.anchor(sprite('SpAllCategories').' '.t('All Categories', 'Categories'), '/categories').'</li> ';
         }
         ?>
-        <li class="Discussions<?php echo strtolower($Controller->ControllerName) == 'discussionscontroller' && strtolower($Controller->RequestMethod) == 'index' ? ' Active' : ''; ?>"><?php echo Gdn_Theme::Link('forumroot', sprite('SpDiscussions').' '.t('Recent Discussions')); ?></li>
-        <?php echo Gdn_Theme::Link('activity', sprite('SpActivity').' '.t('Activity'), '<li class="Activities"><a href="%url" class="%class">%text</a></li>'); ?>
+        <li class="Discussions<?php echo strtolower($Controller->ControllerName) == 'discussionscontroller' && strtolower($Controller->RequestMethod) == 'index' ? ' Active' : ''; ?>"><?php echo Gdn_Theme::link('forumroot', sprite('SpDiscussions').' '.t('Recent Discussions')); ?></li>
+        <?php echo Gdn_Theme::link('activity', sprite('SpActivity').' '.t('Activity'), '<li class="Activities"><a href="%url" class="%class">%text</a></li>'); ?>
         <?php if ($CountBookmarks > 0 || $Controller->RequestMethod == 'bookmarked') { ?>
             <li class="MyBookmarks<?php echo $Controller->RequestMethod == 'bookmarked' ? ' Active' : ''; ?>"><?php echo anchor(sprite('SpBookmarks').' '.$Bookmarked, '/discussions/bookmarked'); ?></li>
         <?php

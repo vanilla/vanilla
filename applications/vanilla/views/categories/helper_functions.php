@@ -21,36 +21,36 @@ if (!function_exists('CategoryPhoto')):
      *
      * @since 2.1
      */
-    function categoryPhoto($Row) {
-        $PhotoUrl = val('PhotoUrl', $Row);
+    function categoryPhoto($row) {
+        $photoUrl = val('PhotoUrl', $row);
 
-        if ($PhotoUrl) {
-            $Result = anchor(
-                '<img src="'.$PhotoUrl.'" class="CategoryPhoto" alt="'.htmlspecialchars(val('Name', $Row)).'" />',
-                CategoryUrl($Row, '', '//'),
+        if ($photoUrl) {
+            $result = anchor(
+                '<img src="'.$photoUrl.'" class="CategoryPhoto" alt="'.htmlspecialchars(val('Name', $row)).'" />',
+                categoryUrl($row, '', '//'),
                 'Item-Icon PhotoWrap PhotoWrap-Category');
         } else {
-            $Result = anchor(
+            $result = anchor(
                 '<span class="sr-only">'.t('Expand for more options.').'</span>',
-                CategoryUrl($Row, '', '//'),
+                categoryUrl($row, '', '//'),
                 'Item-Icon PhotoWrap PhotoWrap-Category Hidden NoPhoto');
         }
 
-        return $Result;
+        return $result;
     }
 
 endif;
 
 if (!function_exists('CategoryString')):
 
-    function categoryString($Rows) {
-        $Result = '';
-        foreach ($Rows as $Row) {
-            if ($Result)
-                $Result .= '<span class="Comma">, </span>';
-            $Result .= anchor(htmlspecialchars($Row['Name']), $Row['Url']);
+    function categoryString($rows) {
+        $result = '';
+        foreach ($rows as $row) {
+            if ($result)
+                $result .= '<span class="Comma">, </span>';
+            $result .= anchor(htmlspecialchars($row['Name']), $row['Url']);
         }
-        return $Result;
+        return $result;
     }
 endif;
 
@@ -70,11 +70,18 @@ if (!function_exists('getOptions')):
         $categoryID = val('CategoryID', $category);
 
         $dropdown = new DropdownModule('dropdown', '', 'OptionsMenu');
-        $tk = urlencode(Gdn::session()->TransientKey());
-        $hide = (int)!val('Following', $category);
+        $tk = urlencode(Gdn::session()->transientKey());
+        $followed = val('Followed', $category);
 
         $dropdown->addLink(t('Mark Read'), "/category/markread?categoryid={$categoryID}&tkey={$tk}", 'mark-read');
-        $dropdown->addLink(t($hide ? 'Unmute' : 'Mute'), "/category/follow?categoryid={$categoryID}&value={$hide}&tkey={$tk}", 'hide');
+
+        if (c('Vanilla.EnableCategoryFollowing') && val('DisplayAs', $category) == 'Discussions') {
+            $dropdown->addLink(
+                t($followed ? 'Unfollow' : 'Follow'),
+                "/category/followed?tkey={$tk}&categoryid={$categoryID}&value=" . ($followed ? 0 : 1),
+                'hide'
+            );
+        }
 
         // Allow plugins to add options
         $sender->EventArguments['CategoryOptionsDropdown'] = &$dropdown;
@@ -86,42 +93,42 @@ if (!function_exists('getOptions')):
 endif;
 
 if (!function_exists('MostRecentString')):
-    function mostRecentString($Row) {
-        if (!$Row['LastTitle'])
+    function mostRecentString($row) {
+        if (!$row['LastTitle'])
             return '';
 
-        $R = '';
+        $r = '';
 
-        $R .= '<span class="MostRecent">';
-        $R .= '<span class="MLabel">'.t('Most recent:').'</span> ';
-        $R .= anchor(
-            SliceString(Gdn_Format::text($Row['LastTitle']), 150),
-            $Row['LastUrl'],
+        $r .= '<span class="MostRecent">';
+        $r .= '<span class="MLabel">'.t('Most recent:').'</span> ';
+        $r .= anchor(
+            sliceString(Gdn_Format::text($row['LastTitle']), 150),
+            $row['LastUrl'],
             'LatestPostTitle');
 
-        if (val('LastName', $Row)) {
-            $R .= ' ';
+        if (val('LastName', $row)) {
+            $r .= ' ';
 
-            $R .= '<span class="MostRecentBy">'.t('by').' ';
-            $R .= userAnchor($Row, 'UserLink', 'Last');
-            $R .= '</span>';
+            $r .= '<span class="MostRecentBy">'.t('by').' ';
+            $r .= userAnchor($row, 'UserLink', 'Last');
+            $r .= '</span>';
         }
 
-        if (val('LastDateInserted', $Row)) {
-            $R .= ' ';
+        if (val('LastDateInserted', $row)) {
+            $r .= ' ';
 
-            $R .= '<span class="MostRecentOn">';
-            $R .= t('on').' ';
-            $R .= anchor(
-                Gdn_Format::date($Row['LastDateInserted'], 'html'),
-                $Row['LastUrl'],
+            $r .= '<span class="MostRecentOn">';
+            $r .= t('on').' ';
+            $r .= anchor(
+                Gdn_Format::date($row['LastDateInserted'], 'html'),
+                $row['LastUrl'],
                 'CommentDate');
-            $R .= '</span>';
+            $r .= '</span>';
         }
 
-        $R .= '</span>';
+        $r .= '</span>';
 
-        return $R;
+        return $r;
     }
 endif;
 
@@ -139,6 +146,7 @@ if (!function_exists('writeListItem')):
         $cssClass = cssClass($category);
         $writeChildren = getWriteChildrenMethod($category, $depth);
         $rssIcon = '';
+        $headingLevel = $depth + 2;
 
         if (val('DisplayAs', $category) === 'Discussions') {
             $rssImage = img('applications/dashboard/design/images/rss.gif', ['alt' => t('RSS Feed')]);
@@ -147,7 +155,7 @@ if (!function_exists('writeListItem')):
 
         if (val('DisplayAs', $category) === 'Heading') : ?>
             <li id="Category_<?php echo $categoryID; ?>" class="CategoryHeading <?php echo $cssClass; ?>">
-                <div class="ItemContent Category">
+                <div role="heading" aria-level="<?php echo $headingLevel; ?>" class="ItemContent Category">
                     <div class="Options"><?php echo getOptions($category); ?></div>
                     <?php echo Gdn_Format::text(val('Name', $category)); ?>
                 </div>
@@ -163,9 +171,9 @@ if (!function_exists('writeListItem')):
                     <div class="Options">
                         <?php echo getOptions($category) ?>
                     </div>
-                    <?php echo CategoryPhoto($category); ?>
-                    <div class="TitleWrap">
-                        <?php echo anchor(Gdn_Format::text(val('Name', $category)), CategoryUrl($category), 'Title');
+                    <?php echo categoryPhoto($category); ?>
+                    <div role="heading" aria-level="<?php echo $headingLevel; ?>" class="TitleWrap">
+                        <?php echo anchor(Gdn_Format::text(val('Name', $category)), categoryUrl($category), 'Title');
                         Gdn::controller()->fireEvent('AfterCategoryTitle');
                         ?>
                     </div>
@@ -176,22 +184,22 @@ if (!function_exists('writeListItem')):
                         <span class="MItem RSS"><?php echo $rssIcon ?></span>
                         <span class="MItem DiscussionCount">
                             <?php echo sprintf(
-                                PluralTranslate(
+                                pluralTranslate(
                                     val('CountAllDiscussions', $category),
                                     '%s discussion html',
                                     '%s discussions html',
                                     t('%s discussion'),
                                     t('%s discussions')
-                                ), BigPlural(val('CountAllDiscussions', $category), '%s discussion')) ?>
+                                ), bigPlural(val('CountAllDiscussions', $category), '%s discussion')) ?>
                         </span>
                         <span class="MItem CommentCount">
                             <?php echo sprintf(
-                                PluralTranslate(
+                                pluralTranslate(
                                     val('CountAllComments', $category), '%s comment html',
                                     '%s comments html',
                                     t('%s comment'),
                                     t('%s comments')
-                                ), BigPlural(val('CountAllComments', $category), '%s comment')); ?>
+                                ), bigPlural(val('CountAllComments', $category), '%s comment')); ?>
                         </span>
 
                         <?php if (val('LastTitle', $category) != '') : ?>
@@ -205,7 +213,7 @@ if (!function_exists('writeListItem')):
                         if ($writeChildren === 'list'): ?>
                             <div class="ChildCategories">
                                 <?php echo wrap(t('Child Categories').': ', 'b'); ?>
-                                <?php echo CategoryString($children, $depth + 1); ?>
+                                <?php echo categoryString($children, $depth + 1); ?>
                             </div>
                         <?php endif; ?>
                     </div>
@@ -226,13 +234,13 @@ if (!function_exists('WriteTableHead')):
     function writeTableHead() {
         ?>
         <tr>
-            <td class="CategoryName">
-                <div class="Wrap"><?php echo CategoryHeading(); ?></div>
+            <td class="CategoryName" role="columnheader">
+                <div class="Wrap"><?php echo categoryHeading(); ?></div>
             </td>
-            <td class="BigCount CountDiscussions">
+            <td class="BigCount CountDiscussions" role="columnheader">
                 <div class="Wrap"><?php echo t('Discussions'); ?></div>
             </td>
-            <td class="BigCount CountComments">
+            <td class="BigCount CountComments" role="columnheader">
                 <div class="Wrap"><?php echo t('Comments'); ?></div>
             </td>
             <td class="BlockColumn LatestPost">
@@ -245,34 +253,35 @@ endif;
 
 if (!function_exists('WriteTableRow')):
 
-    function writeTableRow($Row, $Depth = 1) {
-        $Children = $Row['Children'];
-        $WriteChildren = getWriteChildrenMethod($Row, $Depth);
-        $H = 'h'.($Depth + 1);
+    function writeTableRow($row, $depth = 1) {
+        $children = $row['Children'];
+        $writeChildren = getWriteChildrenMethod($row, $depth);
+        $h = 'h'.($depth + 1);
+        $level = 3;
         ?>
-        <tr class="<?php echo CssClass($Row); ?>">
+        <tr class="<?php echo cssClass($row); ?>">
             <td class="CategoryName">
                 <div class="Wrap">
                     <?php
-                    echo '<div class="Options">'.getOptions($Row).'</div>';
+                    echo '<div class="Options">'.getOptions($row).'</div>';
 
-                    echo CategoryPhoto($Row);
+                    echo categoryPhoto($row);
 
-                    echo "<{$H}>";
-                    $safeName = htmlspecialchars($Row['Name']);
-                    echo $Row['DisplayAs'] === 'Heading' ? $safeName : anchor($safeName, $Row['Url']);
-                    Gdn::controller()->EventArguments['Category'] = $Row;
+                    echo "<{$h} aria-level='".$level."'>";
+                    $safeName = htmlspecialchars($row['Name']);
+                    echo $row['DisplayAs'] === 'Heading' ? $safeName : anchor($safeName, $row['Url']);
+                    Gdn::controller()->EventArguments['Category'] = $row;
                     Gdn::controller()->fireEvent('AfterCategoryTitle');
-                    echo "</{$H}>";
+                    echo "</{$h}>";
                     ?>
                     <div class="CategoryDescription">
-                        <?php echo $Row['Description']; ?>
+                        <?php echo $row['Description']; ?>
                     </div>
-                    <?php if ($WriteChildren === 'list'): ?>
+                    <?php if ($writeChildren === 'list'): ?>
                         <div class="ChildCategories">
                             <?php
                             echo wrap(t('Child Categories').': ', 'b');
-                            echo categoryString($Children, $Depth + 1);
+                            echo categoryString($children, $depth + 1);
                             ?>
                         </div>
                     <?php endif; ?>
@@ -282,7 +291,7 @@ if (!function_exists('WriteTableRow')):
                 <div class="Wrap">
                     <?php
                     //            echo "({$Row['CountDiscussions']})";
-                    echo BigPlural($Row['CountAllDiscussions'], '%s discussion');
+                    echo bigPlural($row['CountAllDiscussions'], '%s discussion');
                     ?>
                 </div>
             </td>
@@ -290,37 +299,37 @@ if (!function_exists('WriteTableRow')):
                 <div class="Wrap">
                     <?php
                     //            echo "({$Row['CountComments']})";
-                    echo BigPlural($Row['CountAllComments'], '%s comment');
+                    echo bigPlural($row['CountAllComments'], '%s comment');
                     ?>
                 </div>
             </td>
             <td class="BlockColumn LatestPost">
                 <div class="Block Wrap">
-                    <?php if ($Row['LastTitle']): ?>
+                    <?php if ($row['LastTitle']): ?>
                         <?php
-                        echo userPhoto($Row, array('Size' => 'Small', 'Px' => 'Last'));
+                        echo userPhoto($row, ['Size' => 'Small', 'Px' => 'Last']);
                         echo anchor(
-                            SliceString(Gdn_Format::text($Row['LastTitle']), 100),
-                            $Row['LastUrl'],
+                            sliceString(Gdn_Format::text($row['LastTitle']), 100),
+                            $row['LastUrl'],
                             'BlockTitle LatestPostTitle',
-                            array('title' => html_entity_decode($Row['LastTitle'])));
+                            ['title' => html_entity_decode($row['LastTitle'])]);
                         ?>
                         <div class="Meta">
                             <?php
-                            echo userAnchor($Row, 'UserLink MItem', 'Last');
+                            echo userAnchor($row, 'UserLink MItem', 'Last');
                             ?>
                             <span class="Bullet">•</span>
                             <?php
                             echo anchor(
-                                Gdn_Format::date($Row['LastDateInserted'], 'html'),
-                                $Row['LastUrl'],
+                                Gdn_Format::date($row['LastDateInserted'], 'html'),
+                                $row['LastUrl'],
                                 'CommentDate MItem');
 
-                            if (isset($Row['LastCategoryID'])) {
-                                $LastCategory = CategoryModel::categories($Row['LastCategoryID']);
+                            if (isset($row['LastCategoryID'])) {
+                                $lastCategory = CategoryModel::categories($row['LastCategoryID']);
 
                                 echo ' <span>',
-                                sprintf('in %s', anchor($LastCategory['Name'], CategoryUrl($LastCategory, '', '//'))),
+                                sprintf('in %s', anchor($lastCategory['Name'], categoryUrl($lastCategory, '', '//'))),
                                 '</span>';
 
                             }
@@ -331,9 +340,9 @@ if (!function_exists('WriteTableRow')):
             </td>
         </tr>
         <?php
-        if ($WriteChildren === 'items') {
-            foreach ($Children as $ChildRow) {
-                WriteTableRow($ChildRow, $Depth + 1);
+        if ($writeChildren === 'items') {
+            foreach ($children as $childRow) {
+                writeTableRow($childRow, $depth + 1);
             }
         }
     }
@@ -347,8 +356,14 @@ if (!function_exists('writeCategoryList')):
      * @param int $depth
      */
     function writeCategoryList($categories, $depth = 1) {
+        if (empty($categories)) {
+            echo '<div class="Empty">'.t('No categories were found.').'</div>';
+            return;
+        }
+
         ?>
         <div class="DataListWrap">
+            <h2 class="sr-only"><?php echo t('Category List'); ?></h2>
             <ul class="DataList CategoryList">
                 <?php
                 foreach ($categories as $category) {
@@ -363,6 +378,11 @@ endif;
 
 if (!function_exists('writeCategoryTable')):
     function writeCategoryTable($categories, $depth = 1, $inTable = false) {
+        if (empty($categories)) {
+            echo '<div class="Empty">'.t('No categories were found.').'</div>';
+            return;
+        }
+
         foreach ($categories as $category) {
             $displayAs = val('DisplayAs', $category);
             $urlCode = $category['UrlCode'];
@@ -376,13 +396,14 @@ if (!function_exists('writeCategoryTable')):
                 }
                 ?>
                 <div id="CategoryGroup-<?php echo $urlCode; ?>" class="CategoryGroup <?php echo $class; ?>">
-                    <h2 class="H"><?php echo $name; ?></h2>
+                    <h2 class="H categoryList-heading"><?php echo $name; ?></h2>
                     <?php writeCategoryTable($category['Children'], $depth + 1, $inTable); ?>
                 </div>
                 <?php
             else :
                 if (!$inTable) { ?>
                     <div class="DataTableWrap">
+                        <h2 class="sr-only categoryList-genericHeading"><?php echo t('Category List') ?></h2>
                         <table class="DataTable CategoryTable">
                             <thead>
                             <?php writeTableHead(); ?>
@@ -423,5 +444,43 @@ if (!function_exists('getWriteChildrenMethod')):
         }
 
         return $writeChildren;
+    }
+endif;
+
+if (!function_exists('followButton')) :
+    /**
+     *
+     * Writes the Follow/following button
+     *
+     * @param int $categoryID
+     * @return string
+     */
+    function followButton($categoryID) {
+        $output = ' ';
+        $userID = Gdn::session()->UserID;
+        $category = CategoryModel::categories($categoryID);
+
+        if (c('Vanilla.EnableCategoryFollowing') && $userID && $category && $category['DisplayAs'] == 'Discussions') {
+            $categoryModel = new CategoryModel();
+            $following = $categoryModel->isFollowed($userID, $categoryID);
+
+            $iconTitle = t('Follow');
+
+            $icon = <<<EOT
+                <svg xmlns="http://www.w3.org/2000/svg" class="followButton-icon" viewBox="0 0 16 16" aria-hidden="true">
+                    <title>{$iconTitle}</title>  
+                    <path d="M7.568,14.317a.842.842,0,0,1-1.684,0,4.21,4.21,0,0,0-4.21-4.21h0a.843.843,0,0,1,0-1.685A5.9,5.9,0,0,1,7.568,14.317Zm4.21,0a.842.842,0,0,1-1.684,0A8.421,8.421,0,0,0,1.673,5.9h0a.842.842,0,0,1,0-1.684,10.1,10.1,0,0,1,10.105,10.1Zm4.211,0a.842.842,0,0,1-1.684,0A12.633,12.633,0,0,0,1.673,1.683.842.842,0,0,1,1.673,0,14.315,14.315,0,0,1,15.989,14.315ZM1.673,16a1.684,1.684,0,1,1,1.684-1.684h0A1.684,1.684,0,0,1,1.673,16Z" transform="translate(0.011 0.001)" style="fill: currentColor;"/>
+                </svg>
+EOT;
+
+            $text = $following ? t('Following') : t('Follow');
+            $output .= anchor(
+                $icon.$text,
+                "/category/followed/{$categoryID}/".Gdn::session()->transientKey(),
+                'Hijack followButton'.($following ? ' TextColor isFollowing' : ''),
+                ['title' => $text, 'aria-pressed' => $following ? 'true' : 'false', 'role' => 'button', 'tabindex' => '0']
+            );
+        }
+        return $output;
     }
 endif;

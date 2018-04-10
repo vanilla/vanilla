@@ -2,7 +2,7 @@
 /**
  * InThisDiscussion plugin.
  *
- * @copyright 2009-2017 Vanilla Forums Inc.
+ * @copyright 2009-2018 Vanilla Forums Inc.
  * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
  * @package InThisDiscussion
  */
@@ -15,23 +15,23 @@ class VanillaInThisDiscussionPlugin extends Gdn_Plugin {
     /**
      * Setup settings page.
      *
-     * @param $Sender
+     * @param $sender
      */
-    public function settingsController_inThisDiscussion_create($Sender) {
-        $Sender->permission('Garden.Settings.Manage');
-        $Sender->setData('Title', t('In This Discussion Settings'));
-        $Sender->setHighlightRoute('dashboard/settings/plugins');
+    public function settingsController_inThisDiscussion_create($sender) {
+        $sender->permission('Garden.Settings.Manage');
+        $sender->setData('Title', t('In This Discussion Settings'));
+        $sender->setHighlightRoute('dashboard/settings/plugins');
 
-        $Conf = new ConfigurationModule($Sender);
-        $Conf->initialize(array(
-            'Plugins.VanillaInThisDiscussion.Limit' => array(
+        $conf = new ConfigurationModule($sender);
+        $conf->initialize([
+            'Plugins.VanillaInThisDiscussion.Limit' => [
                 'Description' => t('User Limit'),
                 'Default' => 20,
                 'LabelCode' => t('Enter a limit for the number of users displayed')
-            )
-        ));
+            ]
+        ]);
 
-        $Conf->renderAll();
+        $conf->renderAll();
     }
 
     /**

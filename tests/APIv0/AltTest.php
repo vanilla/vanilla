@@ -1,20 +1,18 @@
 <?php
 /**
  * @author Todd Burry <todd@vanillaforums.com>
- * @copyright 2009-2017 Vanilla Forums Inc.
+ * @copyright 2009-2018 Vanilla Forums Inc.
  * @license GPLv2
  */
 
 namespace VanillaTests\APIv0;
 
-use Garden\Http\HttpClient;
-use Garden\Http\HttpResponse;
-use PDO;
+use PHPUnit\Framework\TestCase;
 
 /**
  * Tests an alternate install method.
  */
-class AltTest extends \PHPUnit_Framework_TestCase {
+class AltTest extends TestCase {
     /** @var APIv0  $api */
     protected static $api;
 
@@ -28,6 +26,8 @@ class AltTest extends \PHPUnit_Framework_TestCase {
 
     /**
      * Test an alternate install method.
+     *
+     * @large
      */
     public function testAltInstall() {
         $this->api()->uninstall();
@@ -61,7 +61,6 @@ class AltTest extends \PHPUnit_Framework_TestCase {
                 'Conversations' => 'conversations',
             ],
             'EnabledPlugins' => [
-                'HtmLawed' => true,
                 'vanillicon' => true,
                 'Facebook' => true,
                 'Twitter' => true,
@@ -73,7 +72,7 @@ class AltTest extends \PHPUnit_Framework_TestCase {
                 'Title' => get_called_class(),
                 'Domain' => parse_url($api->getBaseUrl(), PHP_URL_HOST),
                 'Cookie' => [
-                    'Salt' => '',
+                    'Salt' => 'salt',
                     'Name' => 'vf_'.strtolower(get_called_class()).'_ENDTX',
                     'Domain' => '',
                 ],

@@ -5,8 +5,8 @@
 </head>
 <body id="{$BodyID}" class="{$BodyClass}">
 <div id="Frame">
-    <div class="Banner">
-        <ul>
+    <div class="Banner" role="banner">
+        <ul role="navigation">
             {home_link}
             {profile_link}
             {inbox_link}
@@ -21,11 +21,11 @@
         <div class="BreadcrumbsWrapper">
             {breadcrumbs homelink="0"}
         </div>
-        <div id="Content">
+        <div id="Content" role="main">
             {asset name="Content"}
         </div>
     </div>
-    <div id="Foot">
+    <div id="Foot" role="contentinfo">
         <div class="FootMenu">
             {nomobile_link wrap="span"}
             {dashboard_link wrap="span"}

@@ -2,7 +2,7 @@
 /**
  * Conversations model.
  *
- * @copyright 2009-2017 Vanilla Forums Inc.
+ * @copyright 2009-2018 Vanilla Forums Inc.
  * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
  * @package Conversations
  * @since 2.0
@@ -26,8 +26,8 @@ abstract class ConversationsModel extends Gdn_Model {
      * @since 2.2
      * @access public
      */
-    public function __construct($Name = '') {
-        parent::__construct($Name);
+    public function __construct($name = '') {
+        parent::__construct($name);
         $this->floodGate = FloodControlHelper::configure($this, 'Conversations', $this->Name);
     }
 
@@ -52,8 +52,8 @@ abstract class ConversationsModel extends Gdn_Model {
         $session = Gdn::session();
 
         // Validate $type
-        if (!in_array($type, array('Conversation', 'ConversationMessage'))) {
-            trigger_error(ErrorMessage(sprintf('Spam check type unknown: %s', $type), $this->Name, 'checkForSpam'), E_USER_ERROR);
+        if (!in_array($type, ['Conversation', 'ConversationMessage'])) {
+            trigger_error(errorMessage(sprintf('Spam check type unknown: %s', $type), $this->Name, 'checkForSpam'), E_USER_ERROR);
         }
 
         $storageObject = FloodControlHelper::configure($this, 'Conversations', $type);
@@ -61,37 +61,115 @@ abstract class ConversationsModel extends Gdn_Model {
     }
 
     /**
-     * Get all the members of a conversation from the $ConversationID.
+     * Get all the members (deleted or no) of a conversation from the $conversationID.
      *
-     * @param int $ConversationID The conversation ID.
+     * @param int|array $conversationID The conversation ID or a where clause for GDN_UserConversation.
+     * @param bool $idsOnly The returns only the userIDs or everything from UserConversation.
+     * @param bool $limit
+     * @param bool $offset
+     * @param bool|null $active **true** for active participants, **false** for users who have left the conversation and **null** for everyone.
      *
-     * @return array Array of user IDs.
+     * @return array Array of users or userIDs depending on $idsOnly's value.
      */
-    public function getConversationMembers($ConversationID) {
-        $ConversationMembers = array();
+    public function getConversationMembers($conversationID, $idsOnly = true, $limit = false, $offset = false, $active = null) {
+        $conversationMembers = [];
 
-        $UserConversation = new Gdn_Model('UserConversation');
-        $UserMembers = $UserConversation->getWhere(array(
-            'ConversationID' => $ConversationID
-        ))->resultArray();
+        $userConversation = new Gdn_Model('UserConversation');
+        if (is_array($conversationID)) {
+            $where = $conversationID;
+        } else {
+            $where = ['ConversationID' => $conversationID];
+        }
+        if ($active === true) {
+            $where['Deleted'] = 0;
+        } elseif ($active === false) {
+            $where['Deleted'] = 1;
+        }
+        $userMembers = $userConversation->getWhere($where, 'UserID', 'asc', $limit, $offset)->resultArray();
 
-        if (is_array($UserMembers) && count($UserMembers)) {
-            $ConversationMembers = array_column($UserMembers, 'UserID');
+        if (is_array($userMembers) && count($userMembers)) {
+            if ($idsOnly) {
+                $conversationMembers = array_column($userMembers, 'UserID');
+            } else {
+                $conversationMembers = Gdn_DataSet::index($userMembers, 'UserID');
+            }
         }
 
-        return $ConversationMembers;
+        return $conversationMembers;
+    }
+
+    /**
+     * Get the count of all the members of a conversation from the $conversationID.
+     *
+     * @param int $conversationID The conversation ID.
+     * @param bool|null $active **true** for active participants, **false** for users who have left the conversation and **null** for everyone.
+     *
+     * @return array Array of users or userIDs depending on $idsOnly's value.
+     */
+    public function getConversationMembersCount($conversationID, $active = null) {
+        $userConversation = new Gdn_Model('UserConversation');
+
+        $where = ['ConversationID' => $conversationID];
+
+        if ($active === true) {
+            $where['Deleted'] = 0;
+        } elseif ($active === false) {
+            $where['Deleted'] = 1;
+        }
+
+        return $userConversation->getCount($where);
     }
 
     /**
      * Check if user posting to the conversation is already a member.
      *
-     * @param int $ConversationID The conversation ID.
-     * @param int $UserID The user id.
+     * @param int $conversationID The conversation ID.
+     * @param int $userID The user id.
      *
      * @return bool
      */
-    public function validConversationMember($ConversationID, $UserID) {
-        $ConversationMembers = $this->getConversationMembers($ConversationID);
-        return (in_array($UserID, $ConversationMembers));
+    public function validConversationMember($conversationID, $userID) {
+        $conversationMembers = $this->getConversationMembers($conversationID);
+        return (in_array($userID, $conversationMembers));
+    }
+
+    /**
+     * Notify users when a new message is created.
+     *
+     * @param array|object $conversation
+     * @param array|object $message
+     * @param array $notifyUserIDs
+     */
+    protected function notifyUsers($conversation, $message, $notifyUserIDs) {
+        $conversation = (array)$conversation;
+        $message = (array)$message;
+
+        $activity = [
+            'ActivityType' => 'ConversationMessage',
+            'ActivityUserID' => $message['InsertUserID'],
+            'HeadlineFormat' => t('HeadlineFormat.ConversationMessage', '{ActivityUserID,User} sent you a <a href="{Url,html}">message</a>'),
+            'RecordType' => 'Conversation',
+            'RecordID' => $conversation['ConversationID'],
+            'Story' => $message['Body'],
+            'ActionText' => t('Reply'),
+            'Format' => val('Format', $message, c('Garden.InputFormatter')),
+            'Route' => "/messages/{$conversation['ConversationID']}#Message_{$message['MessageID']}"
+        ];
+
+        $subject = val('subject', $conversation);
+        if ($subject) {
+            $activity['Story'] = sprintf(t('Re: %s'), $subject).'<br>'.$body;
+        }
+
+        $activityModel = new ActivityModel();
+        foreach ($notifyUserIDs as $userID) {
+            if ($message['InsertUserID'] == $userID) {
+                continue; // Don't notify self.
+            }
+
+            $activity['NotifyUserID'] = $userID;
+            $activityModel->queue($activity, 'ConversationMessage');
+        }
+        $activityModel->saveQueue();
     }
 }

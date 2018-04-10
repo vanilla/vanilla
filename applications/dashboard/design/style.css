@@ -5,10 +5,6 @@
   clear: both;
 }
 
-.PageControls .discussion-sort-filter-module {
-  margin-left: 10px;
-}
-
 /* ================================================================ Reset CSS */
 html, body, div, span, applet, object, iframe,
 h1, h2, h3, h4, h5, h6, p, blockquote, pre,
@@ -31,7 +27,7 @@ table, caption, tbody, tfoot, thead, tr, th, td {
 
 /* remember to define focus styles! */
 :focus {
-  outline: 0;
+  outline-style: auto;
 }
 
 body {
@@ -586,6 +582,7 @@ div.FileUpload .CurrentImage {
   opacity: 0;
   filter: alpha(opacity=0);
   -webkit-transform: translate(-300px, 0) scale(4);
+      -ms-transform: translate(-300px, 0) scale(4);
           transform: translate(-300px, 0) scale(4);
   direction: ltr;
   cursor: pointer;
@@ -2208,7 +2205,7 @@ blockquote.Quote, blockquote.UserQuote {
   border-left: 4px solid #eee;
   border-left: 4px solid rgba(0, 0, 0, 0.1);
   min-width: 200px;
-  overflow-y: auto;
+  overflow-y: initial;
 }
 
 .Message small {
@@ -5439,8 +5436,7 @@ div.token-input-dropdown ul li.token-input-selected-dropdown-item {
 /**
  * Text formatting alignment
  */
-.AlignLeft, .bbcode_left {
-  float: left;
+.AlignLeft {
   margin: 0 10px 10px 0;
   text-align: left;
 }
@@ -5451,9 +5447,16 @@ div.token-input-dropdown ul li.token-input-selected-dropdown-item {
   text-align: center;
 }
 
-.AlignRight, .bbcode_right {
-  float: right;
+.AlignRight {
   margin: 0 0 10px 10px;
+  text-align: right;
+}
+
+.bbcode_left {
+  text-align: left;
+}
+
+.bbcode_right {
   text-align: right;
 }
 
@@ -6196,12 +6199,15 @@ img.jcrop-preview {
 
 .flex {
   display: -webkit-box;
+  display: -webkit-flex;
   display: -ms-flexbox;
   display: flex;
   -webkit-box-pack: justify;
+  -webkit-justify-content: space-between;
       -ms-flex-pack: justify;
           justify-content: space-between;
   -webkit-box-align: center;
+  -webkit-align-items: center;
       -ms-flex-align: center;
           align-items: center;
 }
@@ -6215,28 +6221,33 @@ img.jcrop-preview {
 }
 
 .flex-wrap {
-  -ms-flex-wrap: wrap;
-      flex-wrap: wrap;
+  -webkit-flex-wrap: wrap;
+      -ms-flex-wrap: wrap;
+          flex-wrap: wrap;
 }
 
 .shrink {
-  -ms-flex-negative: 1;
-      flex-shrink: 1;
+  -webkit-flex-shrink: 1;
+      -ms-flex-negative: 1;
+          flex-shrink: 1;
 }
 
 .grow {
   -webkit-box-flex: 1;
+  -webkit-flex-grow: 1;
       -ms-flex-positive: 1;
           flex-grow: 1;
 }
 
 .no-shrink {
-  -ms-flex-negative: 0;
-      flex-shrink: 0;
+  -webkit-flex-shrink: 0;
+      -ms-flex-negative: 0;
+          flex-shrink: 0;
 }
 
 .no-grow {
   -webkit-box-flex: 0;
+  -webkit-flex-grow: 0;
       -ms-flex-positive: 0;
           flex-grow: 0;
 }

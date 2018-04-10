@@ -1,18 +1,19 @@
 <?php
 /**
  * @author Vanilla Forums Inc.
- * @copyright 2009-2017 Vanilla Forums Inc.
+ * @copyright 2009-2018 Vanilla Forums Inc.
  * @license GPLv2
  */
 
 namespace VanillaTests\Library\Garden\Web;
 
+use PHPUnit\Framework\TestCase;
 use Garden\Web\Cookie;
 
 /**
  * Test the {@link ResourceRoute} class.
  */
-class CookieTest extends \PHPUnit_Framework_TestCase {
+class CookieTest extends TestCase {
 
     /**
      * Parse a Cookie header into its individual cookie key-value pairs.
@@ -58,6 +59,36 @@ class CookieTest extends \PHPUnit_Framework_TestCase {
             'complex' => ['foo', 'bar', 500, '/site', 'vanillaforums.com', true, true]
         ];
         return $data;
+    }
+
+    /**
+     * Provide parameters for calculating a cookie's expiry.
+     */
+    public function provideExpiry() {
+        $currentTimestamp = time();
+        $data = [
+            'Twenty-four hours' => [86400, ($currentTimestamp + 86400), $currentTimestamp],
+            'One year' => [31536000, ($currentTimestamp + 31536000), $currentTimestamp],
+            'Maximum' => [Cookie::EXPIRE_THRESHOLD, ($currentTimestamp + Cookie::EXPIRE_THRESHOLD), $currentTimestamp]
+        ];
+        $absoluteTimestamp = (Cookie::EXPIRE_THRESHOLD + 1);
+        $absoluteDateTime = date('F j, Y H:i:s e', $absoluteTimestamp);
+        $data[$absoluteDateTime] = [$absoluteTimestamp, $absoluteTimestamp, $currentTimestamp];
+        return $data;
+    }
+
+    /**
+     * Test calculating a cookie's expiry, relative to the current timestamp.
+     *
+     * @param int $expiry The integer offset or timestamp value.
+     * @param int $expected The expected expiry, expressed as a timestamp.
+     * @param int $timestamp The timestamp to be used as an offset for relative expiry values.
+     * @dataProvider provideExpiry
+     */
+    public function testCalculateExpiry($expiry, $expected, $timestamp) {
+        $cookie = new Cookie();
+        $actual = $cookie->calculateExpiry($expiry, $timestamp);
+        $this->assertEquals($expected, $actual);
     }
 
     /**
@@ -168,14 +199,12 @@ class CookieTest extends \PHPUnit_Framework_TestCase {
         $data = $this->cookieDecode($cookie->makeCookieHeader());
         $this->assertSame($value, $data[$name]);
 
-        $testExpire  = $cookie->calculateExpiry($expire);
         $testPath = $path === null ? $cookie->getPath() : $path;
         $testDomain = $domain === null ? $cookie->getDomain() : $domain;
 
         $result = $cookie->makeNewCookieCalls();
         $this->assertArrayHasKey($name, $result);
         $this->assertEquals($value, $result[$name][0]);
-        $this->assertEquals($testExpire, $result[$name][1]);
         $this->assertEquals($testPath, $result[$name][2]);
         $this->assertEquals($testDomain, $result[$name][3]);
         $this->assertEquals($secure, $result[$name][4]);

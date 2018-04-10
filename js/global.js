@@ -193,6 +193,75 @@
             });
         });
     });
+
+    function accessibleButtonsInit() {
+        $(document).delegate("[role=button]", 'keydown', function(event) {
+            var $button = $(this);
+            var ENTER_KEY = 13;
+            var SPACE_KEY = 32;
+            var isActiveElement = document.activeElement === $button[0];
+            var isSpaceOrEnter = event.keyCode === ENTER_KEY || event.keyCode === SPACE_KEY;
+            if (isActiveElement && isSpaceOrEnter) {
+                event.preventDefault();
+                $button.click();
+            }
+        });
+    }
+
+    $(document).on("contentLoad", function(e) {
+        // Setup AJAX filtering for flat category module.
+        // Find each flat category module container, if any.
+        $(".BoxFlatCategory", e.target).each(function(index, value){
+            // Setup the constants we'll need to perform the lookup for this module instance.
+            var container = value;
+            var categoryID = $("input[name=CategoryID]", container).val();
+            var limit = parseInt($("input[name=Limit]", container).val());
+
+            // If we don't even have a category, don't bother setting up filtering.
+            if (typeof categoryID === "undefined") {
+                return;
+            }
+
+            // limit was parsed as an int when originally defined.  If it isn't a valid value now, default to 10.
+            if (isNaN(limit) || limit < 1) {
+                limit = 10;
+            }
+
+            // Anytime someone types something into the search box in this instance's container...
+            $(container).on("keyup", ".SearchForm .InputBox", function(filterEvent) {
+                var url = gdn.url("module/flatcategorymodule/vanilla");
+
+                // ...perform an AJAX request, replacing the current category data with the result's data.
+                jQuery.get(
+                    gdn.url("module/flatcategorymodule/vanilla"),
+                    {
+                        categoryID: categoryID,
+                        filter: filterEvent.target.value,
+                        limit: limit
+                    },
+                    function(data, textStatus, jqXHR) {
+                        $(".FlatCategoryResult", container).replaceWith($(".FlatCategoryResult", data));
+                    }
+                )
+            });
+        });
+
+        // A vanilla JS event wrapper for the contentLoad event so that the new framework can handle it.
+        $(document).on("contentLoad", function(e) {
+            // Don't fire on initial document ready.
+            if (e.target === document) {
+                return;
+            }
+
+            var event = document.createEvent('CustomEvent');
+            event.initCustomEvent('X-DOMContentReady', true, false, {});
+            e.target.dispatchEvent(event);
+        });
+
+        // Set up accessible flyouts
+        $('.ToggleFlyout, .editor-dropdown, .ButtonGroup').accessibleFlyoutsInit();
+        accessibleButtonsInit();
+    });
 })(window, jQuery);
 
 // Stuff to fire on document.ready().
@@ -329,6 +398,24 @@ jQuery(document).ready(function($) {
         return false;
     });
 
+    /**
+     * Add `rel='noopener'` to everything on the page.
+     *
+     * If you really need the linked page to have window.opener, set the `data-allow-opener='true'` on your link.
+     */
+    $("a[target='_blank']")
+        .filter(":not([rel*='noopener']):not([data-allow-opener='true'])")
+        .each(function() {
+            var $this = $(this);
+            var rel = $this.attr("rel");
+
+            if (rel) {
+                $this.attr("rel", rel + " noopener");
+            } else {
+                $this.attr("rel", "noopener");
+            }
+        });
+
     // This turns any anchor with the "Popup" class into an in-page pop-up (the
     // view of the requested in-garden link will be displayed in a popup on the
     // current screen).
@@ -440,14 +527,14 @@ jQuery(document).ready(function($) {
     );
 
     // If a page loads with a hidden redirect url, go there after a few moments.
-    var redirectUrl = gdn.getMeta('RedirectUrl', '');
+    var redirectTo = gdn.getMeta('RedirectTo', '');
     var checkPopup = gdn.getMeta('CheckPopup', false);
-    if (redirectUrl !== '') {
+    if (redirectTo !== '') {
         if (checkPopup && window.opener) {
-            window.opener.location = redirectUrl;
+            window.opener.location = redirectTo;
             window.close();
         } else {
-            document.location = redirectUrl;
+            document.location = redirectTo;
         }
     }
 
@@ -725,7 +812,7 @@ jQuery(document).ready(function($) {
     var hijackClick = function(e) {
         var $elem = $(this);
         var $parent = $(this).closest('.Item');
-        var $flyout = $elem.closest('.ToggleFlyout');
+        var $toggleFlyout = $elem.closest('.ToggleFlyout');
         var href = $elem.attr('href');
         var progressClass = $elem.hasClass('Bookmark') ? 'Bookmarking' : 'InProgress';
 
@@ -747,7 +834,11 @@ jQuery(document).ready(function($) {
                 $elem.attr('href', href);
 
                 // If we are in a flyout, close it.
-                $flyout.removeClass('Open').find('.Flyout').hide();
+                $toggleFlyout
+                    .removeClass('Open')
+                    .find('.Flyout')
+                    .hide()
+                    .setFlyoutAttributes();
             },
             error: function(xhr) {
                 gdn.informError(xhr);
@@ -758,9 +849,9 @@ jQuery(document).ready(function($) {
                 var informed = gdn.inform(json);
                 gdn.processTargets(json.Targets, $elem, $parent);
                 // If there is a redirect url, go to it.
-                if (json.RedirectUrl) {
+                if (json.RedirectTo) {
                     setTimeout(function() {
-                            window.location.replace(json.RedirectUrl);
+                            window.location.replace(json.RedirectTo);
                         },
                         informed ? 3000 : 0);
                 }
@@ -774,21 +865,28 @@ jQuery(document).ready(function($) {
 
     // Activate ToggleFlyout and ButtonGroup menus
     $(document).delegate('.ButtonGroup > .Handle', 'click', function() {
-        var buttonGroup = $(this).closest('.ButtonGroup');
-        if (buttonGroup.hasClass('Open')) {
-            // Close
-            $('.ButtonGroup').removeClass('Open');
-        } else {
-            // Close all other open button groups
-            $('.ButtonGroup').removeClass('Open');
+        var $buttonGroup = $(this).closest('.ButtonGroup');
+        if (!$buttonGroup.hasClass('Open')) {
+            $('.ButtonGroup')
+                .removeClass('Open')
+                .setFlyoutAttributes();
+
             // Open this one
-            buttonGroup.addClass('Open');
+            $buttonGroup
+                .addClass('Open')
+                .setFlyoutAttributes();
+        } else {
+            $('.ButtonGroup')
+                .removeClass('Open')
+                .setFlyoutAttributes();
         }
         return false;
     });
-    var lastOpen = null;
-    $(document).delegate('.ToggleFlyout', 'click', function(e) {
 
+    var lastOpen = null;
+
+    $(document).delegate('.ToggleFlyout', 'click', function(e) {
+        var $toggleFlyout = $(this);
         var $flyout = $('.Flyout', this);
         var isHandle = false;
 
@@ -823,14 +921,17 @@ jQuery(document).ready(function($) {
             if (lastOpen !== null) {
                 $('.Flyout', lastOpen).hide();
                 $(lastOpen).removeClass('Open').closest('.Item').removeClass('Open');
+                $toggleFlyout.setFlyoutAttributes();
             }
 
             $(this).addClass('Open').closest('.Item').addClass('Open');
             $flyout.show();
             lastOpen = this;
+            $toggleFlyout.setFlyoutAttributes();
         } else {
             $flyout.hide();
             $(this).removeClass('Open').closest('.Item').removeClass('Open');
+            $toggleFlyout.setFlyoutAttributes();
         }
 
         if (isHandle)
@@ -844,6 +945,7 @@ jQuery(document).ready(function($) {
 
         $('.ToggleFlyout').removeClass('Open').closest('.Item').removeClass('Open');
         $('.Flyout').hide();
+        $(this).closest('.ToggleFlyout').setFlyoutAttributes();
     });
 
     $(document).delegate(document, 'click', function() {
@@ -851,7 +953,10 @@ jQuery(document).ready(function($) {
             $('.Flyout', lastOpen).hide();
             $(lastOpen).removeClass('Open').closest('.Item').removeClass('Open');
         }
-        $('.ButtonGroup').removeClass('Open');
+
+        $('.ButtonGroup')
+            .removeClass('Open')
+            .setFlyoutAttributes();
     });
 
     // Add a spinner onclick of buttons with this class
@@ -1009,7 +1114,7 @@ jQuery(document).ready(function($) {
 
                 // If the message is dismissable, add a close button
                 if (css.indexOf('Dismissable') > 0)
-                    message = '<a class="Close"><span>&times;</span></a>' + message;
+                    message = '<a href="#" onclick="return false;" tabindex="0" class="Close"><span>&times;</span></a>' + message;
 
                 message = '<div class="InformMessage">' + message + '</div>';
                 // Insert any transient keys into the message (prevents csrf attacks in follow-on action urls).
@@ -1308,6 +1413,11 @@ jQuery(document).ready(function($) {
         }
     });
 
+    // If we are not inside an iframe, focus the email input on the signin page.
+    if ($('#Form_User_SignIn').length && window.top.location === window.location) {
+        $('#Form_Email').focus();
+    }
+
     // Convert date fields to datepickers
     if ($.fn.datepicker) {
         $('input.DatePicker').datepicker({
@@ -1338,7 +1448,7 @@ jQuery(document).ready(function($) {
 
 
         // Verify we have a valid videoid
-        var pattern = /^[\w-]+(\?autoplay\=1)(\&start=[\w-]+)?$/;
+        var pattern = /^[\w-]+(\?autoplay\=1)(\&start=[\w-]+)?(\&rel=.)?$/;
         if (!pattern.test(videoid)) {
             return false;
         }
@@ -1817,37 +1927,60 @@ jQuery(document).ready(function($) {
                     // string as well as spaces. Spaces make things more
                     // complicated.
                     matcher: function(flag, subtext, should_start_with_space) {
-                        var match, regexp;
-                        flag = flag.replace(/[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g, "\\$&");
 
-                        if (should_start_with_space) {
-                            flag = '(?:^|\\s)' + flag;
+                        // Split the string at the lines to allow for a simpler regex.
+                        var lines = subtext.split("\n");
+                        var lastLine = lines[lines.length - 1];
+
+                        // If you change this you MUST change the regex in src/scripts/__tests__/legacy.test.js !!!
+                        /**
+                         * Put together the non-excluded characters.
+                         *
+                         * @param {boolean} excludeWhiteSpace - Whether or not to exclude whitespace characters.
+                         *
+                         * @returns {string} A Regex string.
+                         */
+                        function nonExcludedCharacters(excludeWhiteSpace) {
+                            var excluded = '[^' +
+                                '"' + // Quote character
+                                '\\u0000-\\u001f\\u007f-\\u009f' + // Control characters
+                                '\\u2028';// Line terminator
+
+                            if (excludeWhiteSpace) {
+                                excluded += '\\s';
+                            }
+
+                            excluded += "]";
+                            return excluded;
                         }
 
-                        // Note: adding whitespace to regex makes the query in
-                        // remote_filter and before_insert callbacks throw
-                        // undefined when not accounted for, so optional
-                        // assigments added to each.
-                        //regexp = new RegExp(flag + '([A-Za-z0-9_\+\-]*)$|' + flag + '([^\\x00-\\xff]*)$', 'gi');
-                        // Note: this does make the searching a bit more loose,
-                        // but it's the only way, as spaces make searching
-                        // more ambiguous.
-                        // \xA0 non-breaking space
-                        // Skip \n which is \x0A and threat is as EOL
-                        //https://developer.mozilla.org/en/docs/Web/JavaScript/Reference/Global_Objects/RegExp#character-classes
-                        var whiteSpaceNoLineFeed = '\\f\\r\\t\\v\​\u00a0\\u1680​\\u180e'; //\u2000​-\u200a​\u2028\u2029\u202f\u205f​\u3000\ufeff  <- was throwing error.
-                        regexp = new RegExp(flag + '\"?(['+whiteSpaceNoLineFeed+'A-Za-z0-9_\+\-]*)\"?(?:\\n|$)|' + flag + '\"?([^\\x00-\\x09\\x0B-\\xff]*)\"?(?:\\n|$)', 'gi');
+                        var regexStr =
+                            '@' + // @ Symbol triggers the match
+                            '(' +
+                            // One or more non-greedy characters that aren't excluded. White is allowed, but a starting quote is required.
+                            '"(' + nonExcludedCharacters(false) + '+?)"?' +
 
-                        match = regexp.exec(subtext);
+                                '|' + // Or
+                            // One or more non-greedy characters that aren't exluded. Whitespace is excluded.
+                            '(' + nonExcludedCharacters(true) + '+?)"?' +
+
+                            ')' +
+                            '(?:\\n|$)'; // Newline terminates.
+
+                        // Determined by at.who library
+                        if (should_start_with_space) {
+                            regexStr = '(?:^|\\s)' + regexStr;
+                        }
+                        var regex = new RegExp(regexStr, 'gi');
+                        var match = regex.exec(lastLine);
                         if (match) {
-                            // Store the original matching string to check against
-                            // quotation marks after the at symbol, to prevent
-                            // double insertions of the at symbol. This will be
-                            // used in the before_insert callback.
                             this.raw_at_match = match[0];
 
-                            return match[2] || match[1];
+                            // Return either of the matching groups (quoted or unquoted).
+                            return match[2] ||  match[1];
                         } else {
+
+                            // No match
                             return null;
                         }
                     }
@@ -2097,53 +2230,63 @@ if (typeof String.prototype.trim !== 'function') {
     };
 }
 
-// jQuery UI .effect() replacement using CSS classes.
-jQuery.fn.effect = function(name) {
-    var that = this;
-    name = name + '-effect';
+(function ($) {
 
-    return this
-        .addClass(name)
-        .one('animationend webkitAnimationEnd', function () {
-            that.removeClass(name);
+$.fn.extend({
+    // jQuery UI .effect() replacement using CSS classes.
+    effect: function(name) {
+        var that = this;
+        name = name + '-effect';
+
+        return this
+            .addClass(name)
+            .one('animationend webkitAnimationEnd', function () {
+                that.removeClass(name);
+            });
+    },
+
+    accessibleFlyoutHandle: function (isOpen) {
+        $(this).attr('aria-expanded', isOpen.toString());
+    },
+
+    accessibleFlyout: function (isOpen) {
+        $(this).attr('aria-hidden', (!isOpen).toString());
+    },
+
+    setFlyoutAttributes: function () {
+        $(this).each(function(){
+            var $handle = $(this).find('.FlyoutButton, .Button-Options, .Handle, .editor-action:not(.editor-action-separator)');
+            var $flyout = $(this).find('.Flyout, .Dropdown');
+            var isOpen = $flyout.is(':visible');
+
+            $handle.accessibleFlyoutHandle(isOpen);
+            $flyout.accessibleFlyout(isOpen);
         });
-};
+    },
 
-// Setup AJAX filtering for flat category module.
-$(document).on("contentLoad", function(e) {
-    // Find each flat category module container, if any.
-    $(".BoxFlatCategory", e.target).each(function(index, value){
-        // Setup the constants we'll need to perform the lookup for this module instance.
-        var container = value;
-        var categoryID = $("input[name=CategoryID]", container).val();
-        var limit = parseInt($("input[name=Limit]", container).val());
+    accessibleFlyoutsInit: function () {
+        var $context = $(this);
 
-        // If we don't even have a category, don't bother setting up filtering.
-        if (typeof categoryID === "undefined") {
-            return;
-        }
+        $context.each(function(){
 
-        // limit was parsed as an int when originally defined.  If it isn't a valid value now, default to 10.
-        if (isNaN(limit) || limit < 1) {
-            limit = 10;
-        }
+            $context.find('.FlyoutButton, .Button-Options, .Handle, .editor-action:not(.editor-action-separator)').each(function (){
+                $(this)
+                    .attr('tabindex', '0')
+                    .attr('role', 'button')
+                    .attr('aria-haspopup', 'true');
 
-        // Anytime someone types something into the search box in this instance's container...
-        $(container).on("keyup", ".SearchForm .InputBox", function(filterEvent) {
-            var url = gdn.url("module/flatcategorymodule/vanilla");
+                $(this).accessibleFlyoutHandle(false);
+            });
 
-            // ...perform an AJAX request, replacing the current category data with the result's data.
-            jQuery.get(
-                gdn.url("module/flatcategorymodule/vanilla"),
-                {
-                    categoryID: categoryID,
-                    filter: filterEvent.target.value,
-                    limit: limit
-                },
-                function(data, textStatus, jqXHR) {
-                    $(".FlatCategoryResult", container).replaceWith($(".FlatCategoryResult", data));
-                }
-            )
+            $context.find('.Flyout, .Dropdown').each(function (){
+                $(this).accessibleFlyout(false);
+
+                $(this).find('a').each(function() {
+                    $(this).attr('tabindex', '0');
+                });
+            });
         });
-    });
+    },
 });
+
+})(jQuery);

@@ -5,6 +5,7 @@ $Configuration = [];
 
 // Auto-enable some addons.
 $Configuration['EnabledPlugins']['stubcontent'] = true;
+$Configuration['EnabledPlugins']['swagger-ui'] = true;
 $Configuration['EnabledApplications']['Dashboard'] = 'dashboard';
 
 // Database defaults.
@@ -28,7 +29,6 @@ $Configuration['Cache']['Filecache']['Store']  = PATH_CACHE.'/Filecache';
 
 // Technical content stuff.
 $Configuration['Garden']['ContentType'] = 'text/html';
-$Configuration['Garden']['Charset'] = 'utf-8';
 $Configuration['Garden']['Locale'] = 'en';
 $Configuration['Garden']['LocaleCodeset'] = 'UTF8';
 
@@ -91,9 +91,9 @@ $Configuration['Garden']['VanillaUrl'] = 'https://open.vanillaforums.com';
 // File handling.
 $Configuration['Garden']['CanProcessImages'] = false;
 $Configuration['Garden']['Upload']['MaxFileSize'] = '50M';
-$Configuration['Garden']['Upload']['AllowedFileExtensions'] = ['txt', 'jpg', 'jpeg', 'gif', 'png', 'bmp', 'tiff', 'ico', 'zip', 'gz', 'tar.gz', 'tgz', 'psd', 'ai', 'fla', 'pdf', 'doc', 'xls', 'ppt', 'docx', 'xlsx', 'log', 'rar', '7z'];
-$Configuration['Garden']['Profile']['MaxHeight'] = 1200;
-$Configuration['Garden']['Profile']['MaxWidth'] = 800;
+$Configuration['Garden']['Upload']['AllowedFileExtensions'] = ['txt', 'jpg', 'jpeg', 'gif', 'png', 'bmp', 'tiff', 'ico', 'zip', 'gz', 'tar.gz', 'tgz', 'psd', 'ai', 'fla', 'pdf', 'doc', 'xls', 'ppt', 'docx', 'xlsx', 'pptx', 'log', 'rar', '7z'];
+$Configuration['Garden']['Profile']['MaxHeight'] = 560;
+$Configuration['Garden']['Profile']['MaxWidth'] = 560;
 $Configuration['Garden']['Thumbnail']['Size'] = 120;
 
 // Appearance.

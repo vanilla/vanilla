@@ -36,7 +36,7 @@ echo heading(t('Manage Routes'), t('Add Route'), 'dashboard/routes/add', 'js-mod
                     echo anchor(dashboardSymbol('edit'), '/dashboard/routes/edit/'.trim($RouteData['Key'], '='), 'js-modal btn btn-icon', ['aria-label' => t('Edit'), 'title' => t('Edit')]);
                     if (!$Reserved) {
                         $attr = ['aria-label' => t('Delete'), 'title' => t('Delete')];
-                        echo anchor(dashboardSymbol('delete'), '/routes/delete/'.trim($RouteData['Key'], '=').'/'.$Session->TransientKey(), 'js-modal-confirm btn btn-icon', $attr);
+                        echo anchor(dashboardSymbol('delete'), '/routes/delete/'.trim($RouteData['Key'], '=').'/'.$Session->transientKey(), 'js-modal-confirm btn btn-icon', $attr);
                     }
                     ?>
                     </div>

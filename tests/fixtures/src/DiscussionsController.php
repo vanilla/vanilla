@@ -1,7 +1,7 @@
 <?php
 /**
  * @author Todd Burry <todd@vanillaforums.com>
- * @copyright 2009-2017 Vanilla Forums Inc.
+ * @copyright 2009-2018 Vanilla Forums Inc.
  * @license GPLv2
  */
 
@@ -105,5 +105,21 @@ class DiscussionsController {
     }
 
     public function get_article($path, $page = '') {
+    }
+
+    public function index_sub() {
+
+    }
+
+    public function get_sub($arg) {
+
+    }
+
+    public function get_idsub($id, $id2) {
+
+    }
+
+    public function index_idsub($id) {
+
     }
 }

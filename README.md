@@ -3,10 +3,6 @@ You cannot clone this repo right into a web directory - it requires a build step
 
 ![Vanilla](http://images.v-cdn.net/vanilla-black-logo-400.svg)
 
-[![Build Status](https://api.travis-ci.org/vanilla/vanilla.svg?branch=master)](https://travis-ci.org/vanilla/vanilla)
-[![PR Stats](http://issuestats.com/github/vanilla/vanilla/badge/pr?style=flat-round)](http://issuestats.com/github/vanilla/vanilla)
-[![Issue Stats](http://issuestats.com/github/vanilla/vanilla/badge/issue?style=flat-round)](http://issuestats.com/github/vanilla/vanilla)
-
 ## Howdy, Stranger!
 
 Vanilla was born out of the desire to create flexible, customizable, and downright entertaining
@@ -30,7 +26,7 @@ Vanilla is free, open source software distributed under the GNU GPL2.
 We accept and encourage contributions from our community and sometimes give hugs in return.
 You can join us on the [Vanilla Community Forums](https://open.vanillaforums.com/discussions) to be part of that discussion.
 
-The latest stable release is always [listed here](https://open.vanillaforums.com/addon/vanilla-core). Currently, it is the `release/2.3` branch.
+The latest stable release is always [listed here](https://open.vanillaforums.com/addon/vanilla-core). Currently, it is the `release/2.5` branch.
 
 New plugins and themes can be listed in the [Official Addon Directory](https://open.vanillaforums.com/addon/).
 We encourage addon developers to release their code under the GPL as well, but do not require it.
@@ -48,23 +44,24 @@ If you professionally run a large community or enterprise forum, our cloud solut
 
 We strongly recommend:
 
-*  **PHP 7.0** or higher.
+*  **PHP 7.1** or higher.
 *  MySQL 5.6 or higher (or Percona/MariaDB equivalent).
 
-If your server is not running PHP 7.0 or higher, **you should address this soon**. While PHP 5.6 will receive security patches thru 2018, Vanilla may end support for it prior to that.
+If your server is not running PHP 7.1 or higher, **you should address this soon**. While PHP 7.0 will receive security patches until December 2018, Vanilla may end support for it prior to that.
 
 Our _minimum_ requirements are now:
 
-* PHP 5.6 or newer.
+* PHP 7.0 or newer.
 * PHP extensions mbstring (`--enable-mbstring`), cURL (`--with-curl`), and PDO (on by default).
 * To [import into Vanilla](#migrating-to-vanilla) you need MySQLi (`--with-mysqli`).
 * To use our social plugins you need [OpenSSL](http://php.net/manual/en/openssl.installation.php).
 * MySQL 5.0 or newer (or Percona/MariaDB equivalent).
+* MySQL strict mode [disabled](https://www.liquidweb.com/kb/how-to-disable-mysql-strict-mode/).
 
 Vanilla ships with a `.htaccess` file required for Apache support. Using nginx or IIS may require additional configuration.
 
 On the client side, Vanilla should run & look good in just about any modern browser.
-Still using IE? How exotic. You'll want IE8 or greater. IE7 *might* work if you squint hard and click gently, but we make no promises.
+Still using IE? How exotic. You'll want IE11 or greater. IE8 *might* work if you squint hard and click gently, but we make no promises.
 
 We've been natively mobile since before it was cool. Vanilla ships with a mobile-optimized theme enabled
 by default for all smartphones & tablets. Heck, it even works on the PlayStation Vita.
@@ -92,7 +89,7 @@ Please consider using maintenance mode before running database updates if your d
 
 If your forum still uses URLs including `?p=`:
 
-Support for this URL structure is ending after 2.3 in favor of "pretty" URLs so it's time to make the switch. First, confirm your server is setup to handle rewrites. On Apache, using the `.htaccess` file provided will accomplish this. Additional setup is required on nginx and other platforms. Test whether it is working by visiting `/discussions` - if you see a discussions list (rather than a 404), it is likely setup correctly. Then, open `conf/config.php` and find the line with `$Configuration['Garden']['RewriteUrls'] = false;` and **delete the entire line**. Your site should immediately switch to "pretty" URL paths instead of using the 'p' parameter. If there is a problem, re-add the line to your config and do further troubleshooting.
+Support for this URL structure ended after 2.3 in favor of "pretty" URLs so it's time to make the switch. First, confirm your server is setup to handle rewrites. On Apache, using the `.htaccess` file provided will accomplish this. Additional setup is required on nginx and other platforms. Test whether it is working by visiting `/discussions` - if you see a discussions list (rather than a 404), it is likely setup correctly. Then, open `conf/config.php` and find the line with `$Configuration['Garden']['RewriteUrls'] = false;` and **delete the entire line**. Your site should immediately switch to "pretty" URL paths instead of using the 'p' parameter. If there is a problem, re-add the line to your config and do further troubleshooting.
 
 To upgrade from **2.1 or earlier**:
 
@@ -138,7 +135,7 @@ The creators of git flow released a [short intro video](http://vimeo.com/1601841
 The `master` branch is production-ready for our cloud product but is not yet vetted for open source release (alternate platforms & configurations).
 Reviewed, stable changes land against `master` via pull-request.
 
-Our open source release branches are named by version number, e.g. `release/2.3`.
+Our open source release branches are named by version number, e.g. `release/2.5`.
 We begin release branches with a beta (b1) designation and progress them thru release candidate to stable.
 All open source releases (included pre-releases) are tagged.
 
@@ -149,7 +146,7 @@ We'll work on releasing an updated version as quickly as possible.
 Please do not email non-security issues; use the [issue tracker](https://github.com/vanilla/vanilla/issues) instead.
 
 ## Legal Stuff
-Copyright &copy; 2009-2017 Vanilla Forums Inc.
+Copyright &copy; 2009-2018 Vanilla Forums Inc.
 
 Vanilla Forums is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License
 as published by the Free Software Foundation, either version 2 of the License, or (at your option) any later version.

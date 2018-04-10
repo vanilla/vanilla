@@ -1,16 +1,18 @@
 <?php
 /**
  * @author Todd Burry <todd@vanillaforums.com>
- * @copyright 2009-2017 Vanilla Forums Inc.
+ * @copyright 2009-2018 Vanilla Forums Inc.
  * @license GPLv2
  */
 
 namespace VanillaTests\Library\Core;
 
+use PHPUnit\Framework\TestCase;
+
 /**
  * Test some of the functions in functions.render.php.
  */
-class RenderFunctionsTest extends \PHPUnit_Framework_TestCase {
+class RenderFunctionsTest extends TestCase {
     /**
      * Make sure the render functions are included.
      */
@@ -45,7 +47,7 @@ class RenderFunctionsTest extends \PHPUnit_Framework_TestCase {
             'FirstUserID' => 234,
             'FirstName' => 'Barry'
         ];
-        
+
         $user = userBuilder($userRow, ['First', 'Insert']);
         $this->assertSame(234, $user->UserID);
         $this->assertSame('Barry', $user->Name);

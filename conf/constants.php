@@ -2,7 +2,7 @@
 /**
  * Framework constants.
  *
- * @copyright 2009-2017 Vanilla Forums Inc.
+ * @copyright 2009-2018 Vanilla Forums Inc.
  * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
  * @package Core
  * @since 2.0
@@ -66,7 +66,7 @@ define('TRACE_WARNING', 'Warning');
 define('TRACE_NOTICE', 'Notice');
 
 // Environment
-define('ENVIRONMENT_PHP_VERSION', '5.3.0');
+define('ENVIRONMENT_PHP_VERSION', '7.0');
 
 if (!defined('E_USER_DEPRECATED')) {
     define('E_USER_DEPRECATED', E_USER_WARNING);

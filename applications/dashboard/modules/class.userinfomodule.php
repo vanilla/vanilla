@@ -2,7 +2,7 @@
 /**
  * User Info module.
  *
- * @copyright 2009-2017 Vanilla Forums Inc.
+ * @copyright 2009-2018 Vanilla Forums Inc.
  * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
  * @package Dashboard
  * @since 2.0
@@ -22,12 +22,12 @@ class UserInfoModule extends Gdn_Module {
     /**
      *
      *
-     * @param string $Sender
+     * @param string $sender
      */
-    public function __construct($Sender = '') {
+    public function __construct($sender = '') {
         $this->User = false;
-        $this->Path(__FILE__);
-        parent::__construct($Sender);
+        $this->path(__FILE__);
+        parent::__construct($sender);
     }
 
     public function assetTarget() {
@@ -35,9 +35,9 @@ class UserInfoModule extends Gdn_Module {
     }
 
     public function loadData() {
-        $UserID = Gdn::controller()->data('Profile.UserID', Gdn::session()->UserID);
-        $this->User = Gdn::userModel()->getID($UserID);
-        $this->Roles = Gdn::userModel()->GetRoles($UserID)->resultArray();
+        $userID = Gdn::controller()->data('Profile.UserID', Gdn::session()->UserID);
+        $this->User = Gdn::userModel()->getID($userID);
+        $this->Roles = Gdn::userModel()->getRoles($userID)->resultArray();
         // Hide personal info roles
         if (!checkPermission('Garden.PersonalInfo.View')) {
             $this->Roles = array_filter($this->Roles, 'RoleModel::FilterPersonalInfo');
@@ -46,11 +46,11 @@ class UserInfoModule extends Gdn_Module {
 
     public function toString() {
         if (!$this->User) {
-            $this->LoadData();
+            $this->loadData();
         }
 
         if (is_object($this->User)) {
-            return parent::ToString();
+            return parent::toString();
         }
 
         return '';

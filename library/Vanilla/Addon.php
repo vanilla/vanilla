@@ -1,7 +1,7 @@
 <?php
 /**
  * @author Todd Burry <todd@vanillaforums.com>
- * @copyright 2009-2017 Vanilla Forums Inc.
+ * @copyright 2009-2018 Vanilla Forums Inc.
  * @license GPLv2
  */
 
@@ -139,10 +139,14 @@ class Addon {
 
         // Look for an addon.json file.
         if (file_exists("$dir/addon.json")) {
-            $info = json_decode(file_get_contents("$dir/addon.json"), true);
+            $addonJSON = file_get_contents("$dir/addon.json");
+            if (!$addonJSON) {
+                throw new \Exception("The addon at $subdir has an unreadable addon.json file.");
+            }
 
+            $info = json_decode($addonJSON, true);
             if (empty($info)) {
-                throw new \Exception("The addon at $subdir has an empty info array.");
+                throw new \Exception("The addon at $subdir has invalid JSON in addon.json.");
             }
 
             // Kludge that sets oldType until we unify applications and plugins into addon.
@@ -152,7 +156,9 @@ class Addon {
 
                 // Kludge that sets keyRaw until we use key everywhere.
                 if ($info['oldType'] === 'application') {
-                    $info['keyRaw'] = $info['name'];
+                    if (!isset($info['keyRaw'])) {
+                        $info['keyRaw'] = $info['name'];
+                    }
                 } else {
                     if ($addonFolder !== $info['key']) {
                         $info['keyRaw'] = $addonFolder;
@@ -574,14 +580,14 @@ class Addon {
                 $foundNamespace = false;
             } elseif ($i - 2 >= 0 && $tokens[$i - 2][0] == T_CLASS && $tokens[$i - 1][0] == T_WHITESPACE && $token[0] == T_STRING) {
                 if ($i - 4 >= 0 && $tokens[$i - 4][0] == T_ABSTRACT) {
-                    $classes[$ii][] = array('name' => $token[1], 'type' => 'ABSTRACT CLASS');
+                    $classes[$ii][] = ['name' => $token[1], 'type' => 'ABSTRACT CLASS'];
                 } else {
-                    $classes[$ii][] = array('name' => $token[1], 'type' => 'CLASS');
+                    $classes[$ii][] = ['name' => $token[1], 'type' => 'CLASS'];
                 }
             } elseif ($i - 2 >= 0 && $tokens[$i - 2][0] == T_INTERFACE && $tokens[$i - 1][0] == T_WHITESPACE && $token[0] == T_STRING) {
-                $classes[$ii][] = array('name' => $token[1], 'type' => 'INTERFACE');
+                $classes[$ii][] = ['name' => $token[1], 'type' => 'INTERFACE'];
             } elseif ($i - 2 >= 0 && $tokens[$i - 2][0] == T_TRAIT && $tokens[$i - 1][0] == T_WHITESPACE && $token[0] == T_STRING) {
-                $classes[$ii][] = array('name' => $token[1], 'type' => 'TRAIT');
+                $classes[$ii][] = ['name' => $token[1], 'type' => 'TRAIT'];
             }
         }
         error_reporting($er);
@@ -598,7 +604,7 @@ class Addon {
 
                 $ns = trim($ns);
                 if (!empty($classes[$k + 1])) {
-                    $final[$k] = array('namespace' => $ns, 'classes' => $classes[$k + 1]);
+                    $final[$k] = ['namespace' => $ns, 'classes' => $classes[$k + 1]];
                 }
             }
             $classes = $final;
@@ -641,7 +647,7 @@ class Addon {
                 $locale = self::canonicalizeLocale(basename(dirname($localePath)));
                 $result[$locale][] = $localePath;
 
-                $properPath = "/locale/$locale.php";
+                $properPath = $this->path("/locale/$locale.php", self::PATH_ADDON);
                 trigger_error("Locales in $localePath is deprecated. Use $properPath instead.", E_USER_DEPRECATED);
             }
         }
@@ -656,7 +662,7 @@ class Addon {
      * @return string Returns the canonicalized version of the locale code.
      */
     private static function canonicalizeLocale($locale) {
-        $locale = str_replace(array('-', '@'), array('_', '__'), $locale);
+        $locale = str_replace(['-', '@'], ['_', '__'], $locale);
         $parts = explode('_', $locale, 2);
         if (isset($parts[1])) {
             $parts[1] = strtoupper($parts[1]);
@@ -756,9 +762,21 @@ class Addon {
             }
         }
 
+        if (preg_match('`-(addon|theme|locale)$`', $rawKey)) {
+            $issues['invalid-key-suffix'] = "The addon key cannot end with -addon, -theme, or -locale.";
+        }
+
         if (!empty($this->special['otherPlugins'])) {
             $plugins = implode(', ', array_merge([$this->special['plugin']], $this->special['otherPlugins']));
             $issues['multiple-plugins'] = "The addon should have at most one plugin class ($plugins).";
+        }
+
+        if (isset($this->info['require']) && !is_array($this->info['require'])) {
+            $issues['invalid-require'] = "The require key must be an array.";
+        }
+
+        if (isset($this->info['conflict']) && !is_array($this->info['conflict'])) {
+            $issues['invalid-conflict'] = "The conflict key must be an array.";
         }
 
         if ($trigger) {
@@ -778,7 +796,7 @@ class Addon {
         if ($count = count($issues)) {
             $subdir = $this->getSubdir();
 
-            trigger_error("The addon in $subdir has $count issues.", E_USER_NOTICE);
+            trigger_error("The addon in $subdir has $count issue(s).", E_USER_NOTICE);
             foreach ($issues as $issue) {
                 trigger_error($issue, E_USER_NOTICE);
             }
@@ -794,6 +812,37 @@ class Addon {
      */
     public function getKey() {
         return empty($this->info['key']) ? '' : $this->info['key'];
+    }
+
+    /**
+     * Get the global key of an addon.
+     *
+     * This method allows addons of all types to be keyed in a global namespace.
+     *
+     * Addons of type "addon" use their key as their global key. All other types have the "-<type>" suffix.
+     *
+     * @return string Returns a string key.
+     */
+    public function getGlobalKey(): string {
+        if ($this->getType() === Addon::TYPE_ADDON) {
+            return $this->getKey();
+        } else {
+            return $this->getKey().'-'.$this->getType();
+        }
+    }
+
+    /**
+     * Split a global key into an addon key and type.
+     *
+     * @param string $key They key to split.
+     * @return string[2] Returns an array in the form [key, type].
+     */
+    public static function splitGlobalKey(string $key): array {
+        if (preg_match('`^(.+)-(locale|theme)$`', $key, $m)) {
+            return [$m[1], $m[2]];
+        } else {
+            return [$key, Addon::TYPE_ADDON];
+        }
     }
 
     /**
@@ -999,7 +1048,9 @@ class Addon {
             $req += ['op' => '==', 'v' => '0.0', 'logic' => ',', 'v2' => '999999'];
             $op = $req['op'];
 
-            if ($op === '-') {
+            if ($req['v'] === '*') {
+                $valid = true;
+            } elseif ($op === '-') {
                 $valid = version_compare($version, $req['v'], '>=') && version_compare($version, $req['v2'], '<=');
             } else {
                 $valid = version_compare($version, $req['v'], $op);
@@ -1070,6 +1121,19 @@ class Addon {
      */
     public function getRequirements() {
         $result = $this->getInfoValue('require', []);
+        if (!is_array($result)) {
+            return [];
+        }
+        return $result;
+    }
+
+    /**
+     * Get addons that conflict with this addon.
+     *
+     * @return array Returns an array in the form addonKey => version.
+     */
+    public function getConflicts() {
+        $result = $this->getInfoValue('conflict', []);
         if (!is_array($result)) {
             return [];
         }
@@ -1176,16 +1240,16 @@ class Addon {
      *
      * This is a case insensitive lookup.
      *
-     * @param string $fqClassName Fully qualified class name.
+     * @param string $fullClassName Fully qualified class name.
      * @param string $relative One of the **Addon::PATH*** constants.
      * @return string Returns the path or an empty string of the class isn't found.
      */
-    public function getClassPath($fqClassName, $relative = self::PATH_FULL) {
-        $classInfo = self::parseFullyQualifiedClass($fqClassName);
+    public function getClassPath($fullClassName, $relative = self::PATH_FULL) {
+        $classInfo = self::parseFullyQualifiedClass($fullClassName);
         $key = strtolower($classInfo['className']);
         if (array_key_exists($key, $this->classes)) {
             foreach($this->classes[$key] as $classData) {
-                if ($classInfo['namespace'] === $classData['namespace']) {
+                if (strtolower($classInfo['namespace']) === strtolower($classData['namespace'])) {
                     $path = $this->path($classData['path'], $relative);
                     return $path;
                 }
@@ -1217,17 +1281,17 @@ class Addon {
     /**
      * Parse a fully qualified class name and return the namespace and className of it.
      *
-     * @param string $fqClassName Fully qualified class name.
+     * @param string $fullClassName Fully qualified class name.
      * @return array ['namespace' => $namespace, 'className' => $className]
      */
-    public static function parseFullyQualifiedClass($fqClassName) {
-        $lastNamespaceSeparatorPos = strrpos($fqClassName, '\\');
+    public static function parseFullyQualifiedClass($fullClassName) {
+        $lastNamespaceSeparatorPos = strrpos($fullClassName, '\\');
         if ($lastNamespaceSeparatorPos === false) {
             $namespace = '';
-            $className = $fqClassName;
+            $className = $fullClassName;
         } else {
-            $namespace = substr($fqClassName, 0, $lastNamespaceSeparatorPos+1);
-            $className = substr($fqClassName, $lastNamespaceSeparatorPos+1);
+            $namespace = substr($fullClassName, 0, $lastNamespaceSeparatorPos+1);
+            $className = substr($fullClassName, $lastNamespaceSeparatorPos+1);
         }
 
         return [

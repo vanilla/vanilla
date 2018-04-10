@@ -17,30 +17,39 @@
         <ini name="memory_limit" value="-1"/>
         <ini name="date.timezone" value="America/Montreal"/>
 
-        <env name="baseurl" value="http://vanilla.test:8080" />
-        <env name="dbname" value="vanilla_test"/>
-        <env name="dbuser" value="travis" />
-        <env name="dbpass" value="" />
+        <env name="TEST_BASEURL" value="http://vanilla.test:8080" />
+        <env name="TEST_DB_NAME" value="vanilla_test"/>
+        <env name="TEST_DB_USER" value="travis" />
+        <env name="TEST_DB_PASSWORD" value="" />
     </php>
 
     <testsuites>
         <testsuite name="Library">
             <directory suffix="Test.php">./tests/Library/</directory>
         </testsuite>
+        <testsuite name="Models">
+            <directory suffix="Test.php">./tests/Models</directory>
+            <directory suffix="Test.php">./applications/*/tests/Models</directory>
+            <directory suffix="Test.php">./plugins/*/tests/Models</directory>
+        </testsuite>
         <testsuite name="APIv0">
             <directory suffix="Test.php">./tests/APIv0</directory>
         </testsuite>
         <testsuite name="APIv2">
             <directory suffix="Test.php">./tests/APIv2</directory>
+            <directory suffix="Test.php">./applications/*/tests/APIv2</directory>
+            <directory suffix="Test.php">./plugins/*/tests/APIv2</directory>
         </testsuite>
     </testsuites>
 
     <filter>
         <whitelist addUncoveredFilesFromWhitelist="false">
+            <directory suffix=".php">applications/conversations</directory>
+            <directory suffix=".php">applications/dashboard</directory>
+            <directory suffix=".php">applications/vanilla</directory>
+
             <directory suffix=".php">library</directory>
-            <exclude>
-                <directory suffix=".php">library/vendors</directory>
-            </exclude>
+
         </whitelist>
     </filter>
 </phpunit>

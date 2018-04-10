@@ -19,7 +19,7 @@
             </div>
         </div>
     </div>
-    <div class="Banner">
+    <div role="banner" class="Banner">
         <div class="Row">
             <strong class="SiteTitle"><a href="{link path="/"}">{logo}</a></strong>
             <!--
@@ -28,9 +28,9 @@
             <!-- <div class="AdSpace">Advertising Space</div> -->
         </div>
     </div>
-    <div id="Head">
+    <div id="Head" role="navigation">
         <div class="Row">
-            <div class="SiteSearch">{searchbox}</div>
+            <div class="SiteSearch" role="search">{searchbox}</div>
             <ul class="SiteMenu">
                 {dashboard_link}
                 {discussions_link}
@@ -49,14 +49,14 @@
     </div>
     <div id="Body">
         <div class="Row">
-            <div class="Column PanelColumn" id="Panel">
+            <div role="complementary" class="Column PanelColumn" id="Panel">
                 {module name="MeModule"}
                 {asset name="Panel"}
             </div>
-            <div class="Column ContentColumn" id="Content">{asset name="Content"}</div>
+            <div class="Column ContentColumn" id="Content" role="main">{asset name="Content"}</div>
         </div>
     </div>
-    <div id="Foot">
+    <div id="Foot" role="contentinfo">
         <div class="Row">
             <a href="{vanillaurl}" class="PoweredByVanilla">Powered by Vanilla</a>
             {asset name="Foot"}

@@ -5,31 +5,31 @@ $Url = $PageInfo['Url'];
 
 $Title = val('Title', $PageInfo, '');
 if ($Title == '') {
-    $Title = formatString(t('Undefined discussion subject.'), array('Url' => $Url));
+    $Title = formatString(t('Undefined discussion subject.'), ['Url' => $Url]);
 } else {
     if ($Strip = c('Vanilla.Embed.StripPrefix')) {
         $Title = stringBeginsWith($Title, $Strip, true, true);
     }
 
     if ($Strip = c('Vanilla.Embed.StripSuffix')) {
-        $Title = StringEndsWith($Title, $Strip, true, true);
+        $Title = stringEndsWith($Title, $Strip, true, true);
     }
 }
 $Title = trim($Title);
 
 $Description = val('Description', $PageInfo, '');
-$Images = val('Images', $PageInfo, array());
-$Body = formatString(t('EmbeddedDiscussionFormat'), array(
+$Images = val('Images', $PageInfo, []);
+$Body = formatString(t('EmbeddedDiscussionFormat'), [
     'Title' => htmlspecialchars($Title),
     'Excerpt' => htmlspecialchars($Description),
-    'Image' => (count($Images) > 0 ? img(val(0, $Images), array('class' => 'LeftAlign')) : ''),
+    'Image' => (count($Images) > 0 ? img(val(0, $Images), ['class' => 'LeftAlign']) : ''),
     'Url' => htmlspecialchars($Url)
-));
+]);
 if ($Body == '') {
     $Body = $ForeignUrl;
 }
 if ($Body == '') {
-    $Body = formatString(t('EmbeddedNoBodyFormat.'), array('Url' => $Url));
+    $Body = formatString(t('EmbeddedNoBodyFormat.'), ['Url' => $Url]);
 }
 
 echo '<h1>'.Gdn_Format::text($Title).'</h1>';

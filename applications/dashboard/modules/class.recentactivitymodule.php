@@ -2,7 +2,7 @@
 /**
  * Recent activity module.
  *
- * @copyright 2009-2017 Vanilla Forums Inc.
+ * @copyright 2009-2018 Vanilla Forums Inc.
  * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
  * @package Dashboard
  * @since 2.0
@@ -22,14 +22,14 @@ class RecentActivityModule extends Gdn_Module {
 
     public $Limit = 5;
 
-    public function getData($Limit = false) {
-        if (!$Limit) {
-            $Limit = $this->Limit;
+    public function getData($limit = false) {
+        if (!$limit) {
+            $limit = $this->Limit;
         }
 
-        $ActivityModel = new ActivityModel();
-        $Data = $ActivityModel->getWhere(array('NotifyUserID' => ActivityModel::NOTIFY_PUBLIC), '', '', $Limit, 0);
-        $this->ActivityData = $Data;
+        $activityModel = new ActivityModel();
+        $data = $activityModel->getWhere(['NotifyUserID' => ActivityModel::NOTIFY_PUBLIC], '', '', $limit, 0);
+        $this->ActivityData = $data;
     }
 
     public function assetTarget() {
@@ -49,8 +49,8 @@ class RecentActivityModule extends Gdn_Module {
             $this->getData();
         }
 
-        $Data = $this->ActivityData;
-        if (is_object($Data) && $Data->numRows() > 0) {
+        $data = $this->ActivityData;
+        if (is_object($data) && $data->numRows() > 0) {
             return parent::toString();
         }
 

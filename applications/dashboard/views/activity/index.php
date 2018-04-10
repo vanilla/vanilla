@@ -12,4 +12,4 @@ if (count($this->data('Activities')) > 0) {
 echo '</ul>';
 
 if (count($this->data('Activities')) > 0)
-    PagerModule::write(array('CurrentRecords' => count($this->data('Activities'))));
+    PagerModule::write(['CurrentRecords' => count($this->data('Activities'))]);

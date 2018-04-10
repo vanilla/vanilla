@@ -2,7 +2,7 @@
 /**
  * Discussion filters module
  *
- * @copyright 2009-2017 Vanilla Forums Inc.
+ * @copyright 2009-2018 Vanilla Forums Inc.
  * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
  * @package Vanilla
  * @since 2.0
@@ -13,8 +13,8 @@
  */
 class DiscussionFilterModule extends Gdn_Module {
 
-    public function __construct($Sender) {
-        parent::__construct($Sender, 'Vanilla');
+    public function __construct($sender) {
+        parent::__construct($sender, 'Vanilla');
     }
 
     public function assetTarget() {
@@ -22,6 +22,6 @@ class DiscussionFilterModule extends Gdn_Module {
     }
 
     public function toString() {
-        return parent::ToString();
+        return parent::toString();
     }
 }

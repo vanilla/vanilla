@@ -1,22 +1,25 @@
 <?php
 /**
  * @author Todd Burry <todd@vanillaforums.com>
- * @copyright 2009-2017 Vanilla Forums Inc.
+ * @copyright 2009-2018 Vanilla Forums Inc.
  * @license GPLv2
  */
 
 namespace VanillaTests\Library\Garden\Web;
 
+use PHPUnit\Framework\TestCase;
 use Garden\Web\Action;
 use Garden\Web\ResourceRoute;
 use Garden\Web\Route;
+use VanillaTests\Fixtures\AddonsController;
+use VanillaTests\Fixtures\CommentsController;
 use VanillaTests\Fixtures\DiscussionsController;
 use VanillaTests\Fixtures\Request;
 
 /**
  * Test the {@link ResourceRoute} class.
  */
-class ResourceRouteTest extends \PHPUnit_Framework_TestCase {
+class ResourceRouteTest extends TestCase {
     /**
      * Create a new {@link ResourceRoute} initialized for testing with fixtures.
      */
@@ -59,7 +62,9 @@ class ResourceRouteTest extends \PHPUnit_Framework_TestCase {
      * @return array Returns test data.
      */
     public function provideKnownRoutes() {
+        $ac = AddonsController::class;
         $dc = DiscussionsController::class;
+        $cc = CommentsController::class;
 
         $r = [
             'index' => ['GET', '/discussions', [$dc, 'index'], ['page' => '']],
@@ -72,15 +77,32 @@ class ResourceRouteTest extends \PHPUnit_Framework_TestCase {
             'get recent too long' => ['GET', '/discussions/recent/1', null],
             'get bookmarked' => ['GET', '/discussions/bookmarked', [$dc, 'get_bookmarked'], ['page' => '']],
 
+            'get string id' => ['GET', '/addons/editor', [$ac, 'get'], ['id' => 'editor']],
+            'patch string id' => ['PATCH', '/addons/editor', [$ac, 'patch'], ['id' => 'editor']],
+            'delete string id' => ['DELETE', '/addons/editor', [$ac, 'delete'], ['id' => 'editor']],
+
             'map body' => ['POST', '/discussions', [$dc, 'post'], ['body' => ['!']]],
             'map data' => ['PATCH', '/discussions/1', [$dc, 'patch'], ['id' => '1', 'data' => ['id' => '1', 0 => '!']]],
+            'post and patch' => ['POST', '/discussions/1', [$dc, 'patch'], ['id' => '1', 'data' => ['id' => '1', 0 => '!']]],
 
             'no mapping' => ['POST', '/discussions/no-map/a/b/c?f=b', [$dc, 'post_noMap'], ['query' => 'a', 'body' => 'b', 'data' => 'c']],
+
+            // Nested get and index
+            'index /sub' => ['GET', '/discussions/sub', [$dc, 'index_sub'], []],
+            'get /sub/:arg' => ['GET', '/discussions/sub/abc', [$dc, 'get_sub'], ['arg' => 'abc']],
+            'index /:id/idsub' => ['GET', '/discussions/123/idsub', [$dc, 'index_idsub'], ['id' => '123']],
+            'get /:id/idsub/:id2' => ['GET', '/discussions/123/idsub/abc', [$dc, 'get_idsub'], ['id' => '123', 'id2' => 'abc']],
+
+            // Integer type hints.
+            'index comments' => ['GET', '/comments/p1', [$cc, 'index'], ['param' => 'p1']],
+            'get comments/:id' => ['GET', '/comments/1', [$cc, 'get'], ['id' => '1']],
+            'get comments/archives' => ['GET', '/comments/archives', [$cc, 'index_archives']],
+            'get comments/:id/archives' => ['GET', '/comments/1/archives', [$cc, 'get_archives'], ['id' => '1']],
 
             // Special routes are special.
             'bad index' => ['GET', '/discussions/index', null],
             'bad get' => ['GET', '/discussions/get/123', null],
-            'bad post' => ['PATCH', '/discussions/post', null]
+            'bad post' => ['PATCH', '/discussions/post', null],
         ];
 
         return $r;
@@ -225,7 +247,7 @@ class ResourceRouteTest extends \PHPUnit_Framework_TestCase {
     /**
      * Test that correct casing on method names is enforced.
      *
-     * @expectedException \PHPUnit_Framework_Error_Notice
+     * @expectedException \PHPUnit\Framework\Error\Notice
      */
     public function testMethodCaseSensitivity() {
 //        post_noMap($query, $body, $data)

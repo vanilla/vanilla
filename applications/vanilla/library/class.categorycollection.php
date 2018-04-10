@@ -1,7 +1,7 @@
 <?php
 /**
  * @author Todd Burry <todd@vanillaforums.com>
- * @copyright 2009-2017 Vanilla Forums Inc.
+ * @copyright 2009-2018 Vanilla Forums Inc.
  * @license GPLv2
  */
 
@@ -122,6 +122,7 @@ class CategoryCollection {
         $this->categories = [];
         $this->categorySlugs = [];
         $this->cache->increment(self::$CACHE_CATEGORY.'inc', 1, [Gdn_Cache::FEATURE_INITIAL => 1]);
+        $this->cacheInc = null;
     }
 
     /**
@@ -179,7 +180,8 @@ class CategoryCollection {
             if (isset($this->categories[$id])) {
                 return $this->categories[$id];
             } else {
-                $category = $this->cache->get($this->cacheKey(self::$CACHE_CATEGORY, $id));
+                $cacheKey = $this->cacheKey(self::$CACHE_CATEGORY, $id);
+                $category = $this->cache->get($cacheKey);
 
                 if (!empty($category)) {
                     $this->calculateDynamic($category);
@@ -350,12 +352,14 @@ class CategoryCollection {
         }
         if (!empty($keys)) {
             $cacheCategories = $this->cache->get($keys);
-            foreach ($cacheCategories as $key => $category) {
-                $this->calculateDynamic($category);
-                $this->categories[(int)$category['CategoryID']] = $category;
-                $this->categorySlugs[strtolower($category['UrlCode'])] = (int)$category['CategoryID'];
+            if (!empty($cacheCategories)) {
+                foreach ($cacheCategories as $key => $category) {
+                    $this->calculateDynamic($category);
+                    $this->categories[(int)$category['CategoryID']] = $category;
+                    $this->categorySlugs[strtolower($category['UrlCode'])] = (int)$category['CategoryID'];
 
-                $categories[(int)$category['CategoryID']] = $category;
+                    $categories[(int)$category['CategoryID']] = $category;
+                }
             }
         }
 
@@ -397,8 +401,8 @@ class CategoryCollection {
      * @param int $parentID The ID of the parent category.
      * @param array $options An array of options to affect the fetching.
      *
-     * - maxdepth: The maximum depth of the tree.
-     * - collapsed: Stop when looking at a category of a certain type.
+     * - maxDepth: The maximum depth of the tree.
+     * - collapseCategories: Stop when looking at a categories that contain categories.
      * - permission: The permission to use when looking at the tree.
      * @return array
      */

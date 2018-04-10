@@ -2,7 +2,7 @@
 /**
  * Profile options module.
  *
- * @copyright 2009-2017 Vanilla Forums Inc.
+ * @copyright 2009-2018 Vanilla Forums Inc.
  * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
  * @package Dashboard
  * @since 2.0
@@ -58,7 +58,7 @@ class ProfileOptionsModule extends Gdn_Module {
 
         foreach($profileOptions as $option) {
             if (val('Text', $option) && val('Url', $option)) {
-                $this->profileOptionsDropdown->addLink(val('Text', $option), val('Url', $option), slugify(val('Text', $option)), val('CssClass', $option, ''));
+                $this->profileOptionsDropdown->addLink(val('Text', $option), val('Url', $option), NavModule::textToKey(val('Text', $option)), val('CssClass', $option, ''));
             }
         }
 

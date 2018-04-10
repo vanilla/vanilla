@@ -1,19 +1,28 @@
 <?php
 /**
  * @author Todd Burry <todd@vanillaforums.com>
- * @copyright 2009-2017 Vanilla Forums Inc.
- * @license Proprietary
+ * @copyright 2009-2018 Vanilla Forums Inc.
+ * @license GPLv2
  */
 
 namespace Garden\Web;
 
+use Gdn;
+use Gdn_Locale;
+use Garden\Schema\ValidationException;
+use Garden\Web\Exception\HttpException;
 use Garden\Web\Exception\NotFoundException;
 use Garden\Web\Exception\Pass;
+use Interop\Container\ContainerInterface;
+use Vanilla\Permissions;
 
 class Dispatcher {
 
+    /** @var Gdn_Locale */
+    private $locale;
+
     /**
-     * @var Route[]
+     * @var array
      */
     private $routes;
 
@@ -21,6 +30,22 @@ class Dispatcher {
      * @var string|array|callable
      */
     private $allowedOrigins;
+
+    /**
+     * @var ContainerInterface $container
+     */
+    private $container;
+
+    /**
+     * Dispatcher constructor.
+     *
+     * @param Gdn_Locale $locale
+     * @param ContainerInterface $container The container is used to fetch view handlers.
+     */
+    public function __construct(Gdn_Locale $locale, ContainerInterface $container) {
+        $this->locale = $locale;
+        $this->container = $container;
+    }
 
     /**
      * Add a route to the routes list.
@@ -78,10 +103,34 @@ class Dispatcher {
                     // Hold the action in case another route succeeds.
                     $ex = $action;
                 } elseif ($action !== null) {
-                    ob_start();
-                    $actionResponse = $action();
-                    $ob = ob_get_clean();
+                    // KLUDGE: Check for CSRF here because we can only do a global check for new dispatches.
+                    // Once we can test properly then a route can be added that checks for CSRF on all requests.
+                    if ($request->getMethod() === 'POST' && $request instanceof \Gdn_Request) {
+                        /* @var \Gdn_Request $request */
+                        try {
+                            $request->isAuthenticatedPostBack(true);
+                        } catch (\Exception $ex) {
+                            Gdn::session()->getPermissions()->addBan(
+                                Permissions::BAN_CSRF,
+                                [
+                                    'msg' => $this->locale->translate('Invalid CSRF token.', 'Invalid CSRF token. Please try again.'),
+                                    'code' => 403
+                                ]
+                            );
+                        }
+                    }
+
+                    try {
+                        ob_start();
+                        $actionResponse = $action();
+                    } finally {
+                        $ob = ob_get_clean();
+                    }
                     $response = $this->makeResponse($actionResponse, $ob);
+                    if (is_object($action) && method_exists($action, 'getMetaArray')) {
+                        $this->mergeMeta($response, $action->getMetaArray());
+                    }
+                    $this->mergeMeta($response, $route->getMetaArray());
                     break;
                 }
             } catch (Pass $pass) {
@@ -89,6 +138,11 @@ class Dispatcher {
                 continue;
             } catch (\Exception $dispatchEx) {
                 $response = $this->makeResponse($dispatchEx);
+                $this->mergeMeta($response, $route->getMetaArray());
+                break;
+            } catch (\Error $dispatchError) {
+                $response = $this->makeResponse($dispatchError);
+                $this->mergeMeta($response, $route->getMetaArray());
                 break;
             }
         }
@@ -101,11 +155,56 @@ class Dispatcher {
                 // This is temporary. Only use internally.
                 $response->setMeta('noMatch', true);
             }
+        } else {
+            if ($response->getMeta('status', null) === null) {
+                switch ($request->getMethod()) {
+                    case 'GET':
+                    case 'PATCH':
+                    case 'PUT':
+                        $response->setStatus(200);
+                        break;
+                    case 'POST':
+                        $response->setStatus(201);
+                        break;
+                    case 'DELETE':
+                        $response->setStatus(204);
+                        break;
+                }
+            }
         }
 
         $this->addAccessControl($response, $request);
 
         return $response;
+    }
+
+    /**
+     * Merge the given meta array on top or below a data object's meta array.
+     *
+     * Meta information is used to pass information such as additional headers, page title, template name, etc. to views.
+     * The meta information comes from several sources:
+     *
+     * 1. Controllers can set custom information during their **method** invocation.
+     * 2. Routes can add meta information to **actions** when they match that is specific to the action.
+     * 3. The **routes** themselves can set default meta information for any response that matches.
+     *
+     * The meta information is merged with the above priority so actions can't override controllers and routes can't override actions.
+     *
+     * @param Data $data The data to merge with.
+     * @param array|null $meta The meta to merge.
+     * @param bool $replace Whether to replace existing items or not.
+     */
+    private function mergeMeta(Data $data, array $meta = null, $replace = false) {
+        if (empty($meta)) {
+            return;
+        }
+
+        if ($replace) {
+            $result = array_replace_recursive($data->getMetaArray(), $meta);
+        } else {
+            $result = array_replace_recursive($meta, $data->getMetaArray());
+        }
+        $data->setMetaArray($result);
     }
 
     /**
@@ -117,7 +216,8 @@ class Dispatcher {
      */
     public function handle(RequestInterface $request) {
         $response = $this->dispatch($request);
-        $response->render();
+
+        $this->render($request, $response);
     }
 
     /**
@@ -133,9 +233,27 @@ class Dispatcher {
         } elseif (is_array($raw) || is_string($raw)) {
             // This is an array of response data.
             $result = new Data($raw);
-        } elseif ($raw instanceof \Exception) {
-            $data = $raw instanceof \JsonSerializable ? $raw->jsonSerialize() : ['message' => $raw->getMessage(), 'status' => $raw->getCode()];
-            $result = new Data($data, $raw->getCode());
+        } elseif ($raw instanceof \Exception || $raw instanceof \Error) {
+
+            // Let's not mask errors when in debug mode!
+            if ($raw instanceof \Error && debug())  {
+                throw $raw;
+            }
+
+            // Make sure that there's a "proper" conversion from non-HTTP to HTTP exceptions since
+            // errors in the 2xx ranges are treated as success.
+            // ValidationException status code are compatible with HTTP codes.
+            $errorCode = $raw->getCode();
+            if (!$raw instanceof HttpException && !$raw instanceof ValidationException) {
+                $errorCode = 500;
+            }
+
+            $data = $raw instanceof \JsonSerializable ? $raw->jsonSerialize() : ['message' => $raw->getMessage()];
+            $result = new Data($data, $errorCode);
+            // Provide stack trace as meta information.
+            $result->setMeta('errorTrace', $raw->getTraceAsString());
+
+            $this->mergeMeta($result, ['template' => 'error-page']);
         } elseif ($raw instanceof \JsonSerializable) {
             $result = new Data((array)$raw->jsonSerialize());
         } elseif (!empty($ob)) {
@@ -165,6 +283,8 @@ class Dispatcher {
             if ($request->hasHeader('Access-Control-Request-Headers')) {
                 $response->setHeader('Access-Control-Allow-Headers', 'Authorization, Content-Type');
             }
+
+            $response->setHeader('Access-Control-Max-Age', strtotime('1 hour'));
         }
     }
 
@@ -188,11 +308,11 @@ class Dispatcher {
 
         if ($this->allowedOrigins === '*') {
             return '*';
+        } elseif (is_callable($this->allowedOrigins) && call_user_func($this->allowedOrigins, $origin)) {
+            return $origin;
         } elseif (is_string($this->allowedOrigins) && in_array($this->allowedOrigins, [$host, $hostAndScheme], true)) {
             return $origin;
         } elseif (is_array($this->allowedOrigins) && (in_array($host, $this->allowedOrigins) || in_array($hostAndScheme, $this->allowedOrigins))) {
-            return $origin;
-        } elseif (is_callable($this->allowedOrigins) && call_user_func($this->allowedOrigins, $origin)) {
             return $origin;
         }
         return '';
@@ -222,5 +342,36 @@ class Dispatcher {
     public function setAllowedOrigins($origins) {
         $this->allowedOrigins = $origins;
         return $this;
+    }
+
+    /**
+     * Finalize the request and render the response.
+     *
+     * This method is public for the sake of refactoring with the old dispatcher, but should be protected once the old
+     * dispatcher is removed.
+     *
+     * @param RequestInterface $request The initial request.
+     * @param Data $response The response data.
+     */
+    public function render(RequestInterface $request, Data $response) {
+        $contentType = $response->getHeader('Content-Type', $request->getHeader('Accept'));
+        if (preg_match('`([a-z]+/[a-z0-9.-]+)`i', $contentType, $m)) {
+            $contentType = strtolower($m[1]);
+        } else {
+            $contentType = 'application/json';
+        }
+
+        // Check to see if there is a view handler.
+        $viewKey = "@view-$contentType";
+
+        if ($this->container->has($viewKey)) {
+            /* @var ViewInterface $view */
+            $view = $this->container->get($viewKey);
+
+            $view->render($response);
+        } else {
+            // The default is JSON which may need to change.
+            $response->render();
+        }
     }
 }

@@ -4,7 +4,7 @@
  *
  * Use the AssetModel_StyleCss_Handler event to include CSS files in your plugin.
  *
- * @copyright 2009-2017 Vanilla Forums Inc.
+ * @copyright 2009-2018 Vanilla Forums Inc.
  * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
  * @package Dashboard
  * @since 2.1
@@ -16,12 +16,26 @@ use Vanilla\Addon;
  * Manages Assets.
  */
 class AssetModel extends Gdn_Model {
+    /**
+     * The number of seconds to wait after a deploy before switching the cache buster.
+     */
+    const CACHE_GRACE_PERIOD = 90;
 
     /** @var array List of CSS files to serve. */
-    protected $_CssFiles = array();
+    protected $_CssFiles = [];
 
      /** @var string */
     public $UrlPrefix = '';
+
+    /**
+     * @var \Vanilla\AddonManager
+     */
+    private $addonManager;
+
+    public function __construct(\Vanilla\AddonManager $addonManager) {
+        parent::__construct();
+        $this->addonManager = $addonManager;
+    }
 
     /**
      * Get list of CSS anchor files
@@ -93,6 +107,7 @@ class AssetModel extends Gdn_Model {
         // Include theme customizations last so that they override everything else.
         switch ($basename) {
             case 'style':
+                $this->addCssFile(asset('/applications/dashboard/design/style-compat.css', true), false, ['Sort' => -9.999]);
                 $this->addCssFile('custom.css', false, ['Sort' => 1000]);
 
                 if (Gdn::controller()->Theme && Gdn::controller()->ThemeOptions) {
@@ -136,6 +151,83 @@ class AssetModel extends Gdn_Model {
         usort($paths, ['AssetModel', '_comparePath']);
 
         return $paths;
+    }
+
+    public function getAddonJsFiles($themeType, $basename, $eTag) {
+        $basename = $basename === 'style' ? 'app' : $basename;
+
+        if (c("HotReload.Enabled", false)) {
+            return [
+                "http://127.0.0.1:3030/$basename-hot-bundle.js"
+            ];
+        }
+
+        if (!in_array($basename, ['app', 'admin'], true)) {
+            trigger_error("Unknown core js basename: $basename");
+            return [];
+        }
+
+        // Add the lib.
+        $libs = [
+            "/js/$basename/lib-core-$basename.js"
+        ];
+
+        $addons = [];
+
+        $core = "/js/$basename/core-$basename.js";
+        if (file_exists(PATH_ROOT."/$core")) {
+            $addons[] = $core;
+        }
+
+        // Loop through the enabled addons and get their javascript.
+        foreach ($this->addonManager->getEnabled() as $addon) {
+            /* @var Addon $addon */
+            if ($addon->getType() !== Addon::TYPE_ADDON) {
+                continue;
+            }
+
+            $build = $addon->getInfoValue('build', []);
+            if (!empty($build['exports'][$basename])) {
+                $libs[] = $addon->path("/js/$basename/lib-".$addon->getKey()."-$basename.js", Addon::PATH_ADDON);
+            }
+            if (!empty($build['entries'][$basename])) {
+                $addons[] = $addon->path("/js/$basename/".$addon->getKey()."-$basename.js", Addon::PATH_ADDON);
+            }
+        }
+
+        // Add the bootstrap after everything else.
+        $addons[] = "/js/bootstrap-$basename/core-bootstrap-$basename.js";
+        $result = array_merge($libs, $addons);
+
+        return $result;
+    }
+
+    /**
+     * Get the content for an inline polyfill script.
+     *
+     * @return string
+     */
+    public function getInlinePolyfillJSContent(): string {
+        $polyfillFileUrl = asset("/js/polyfills/core-polyfills.js?h=".$this->cacheBuster(), false);
+
+        $debug = c("Debug", false);
+        $logAdding = $debug ? "console.log('Older browser detected. Initiating polyfills.');" : "";
+        $logNotAdding = $debug ? "console.log('Modern browser detected. No polyfills necessary');" : "";
+
+        // Add the polyfill loader.
+        $scriptContent =
+            "var supportsAllFeatures = window.Promise && window.fetch && window.Symbol"
+            ."&& window.CustomEvent && Element.prototype.remove && Element.prototype.closest"
+            ."&& window.NodeList && NodeList.prototype.forEach;"
+            ."if (!supportsAllFeatures) {"
+            .$logAdding
+            ."var head = document.getElementsByTagName('head')[0];"
+            ."var script = document.createElement('script');"
+            ."script.src = '$polyfillFileUrl';"
+            ."head.appendChild(script);"
+            ."} else { $logNotAdding }";
+
+        return $scriptContent;
     }
 
     /**
@@ -193,7 +285,7 @@ class AssetModel extends Gdn_Model {
         }
 
         // 3. Check the theme.
-        $theme = Gdn::ThemeManager()->ThemeFromType($themeType);
+        $theme = Gdn::themeManager()->themeFromType($themeType);
         if ($theme) {
             $path = "/$theme/design/$filename";
             $paths[] = [PATH_THEMES.$path, "/themes{$path}"];
@@ -416,7 +508,7 @@ class AssetModel extends Gdn_Model {
      * @return string
      */
     public function resourceHash($resources) {
-        $keys = array();
+        $keys = [];
 
         foreach ($resources as $key => $options) {
            $version = val('version', $options, '');
@@ -424,6 +516,25 @@ class AssetModel extends Gdn_Model {
         }
 
         return md5(implode("\n", $keys));
+    }
+
+    /**
+     * Return a cache buster string.
+     *
+     * @return string Returns a string.
+     */
+    public function cacheBuster() {
+        if ($timestamp = c('Garden.Deployed')) {
+            $graced = $timestamp + static::CACHE_GRACE_PERIOD;
+            if (time() >= $graced) {
+                $timestamp = $graced;
+            }
+            $result = dechex($timestamp);
+        } else {
+            $result = APPLICATION_VERSION;
+        }
+
+        return $result;
     }
 
     /**
@@ -460,7 +571,7 @@ class AssetModel extends Gdn_Model {
         $result = ['php'];
         foreach ($knownExts as $ext) {
             $handler = "ViewHandler.$ext";
-            if (Gdn::factory()->exists($handler)) {
+            if (Gdn::factoryExists($handler)) {
                 $result[] = $ext;
             }
         }

@@ -2,7 +2,7 @@
 
 /**
  * @author Todd Burry <todd@vanillaforums.com>
- * @copyright 2009-2017 Vanilla Forums Inc.
+ * @copyright 2009-2018 Vanilla Forums Inc.
  * @license GPLv2
  */
 
@@ -24,7 +24,7 @@ class AccessTokenModel extends Gdn_Model {
      */
     public function __construct($secret = '') {
         parent::__construct('AccessToken');
-        $this->PrimaryKey = 'Token';
+        $this->PrimaryKey = 'AccessTokenID';
         $this->secret = $secret ?: c('Garden.Cookie.Salt');
 
         $this->setPruneAfter('1 day')
@@ -41,7 +41,11 @@ class AccessTokenModel extends Gdn_Model {
      * @return string Returns a signed access token.
      */
     public function issue($userID, $expires = '1 month', $type = 'system', $scope = []) {
-        $expireDate = Gdn_Format::toDateTime($this->toTimestamp($expires));
+        if ($expires instanceof  DateTimeInterface) {
+            $expireDate = $expires->format(MYSQL_DATE_FORMAT);
+        } else {
+            $expireDate = Gdn_Format::toDateTime($this->toTimestamp($expires));
+        }
         $token = $this->insert([
             'UserID' => $userID,
             'Type' => $type,
@@ -60,16 +64,25 @@ class AccessTokenModel extends Gdn_Model {
     /**
      * Revoke an already issued token.
      *
-     * @param string $token The token or access token to revoke.
+     * @param string|int $token The token, access or numeric ID token to revoke.
      * @return bool Returns true if the token was revoked or false otherwise.
      */
     public function revoke($token) {
-        $token = $this->trim($token);
+        $id = false;
+        if (filter_var($token, FILTER_VALIDATE_INT)) {
+            $id = $token;
+        } else {
+            $token = $this->trim($token);
+            $row = $this->getToken($token);
+            if ($row) {
+                $id = $row['AccessTokenID'];
+            }
+        }
 
-        $this->setField($token, [
-            'DateExpires' => Gdn_Format::toDateTime(strtotime('-1 hour')),
-            'Attributes' => ['revoked' => true]
+        $this->setField($id, [
+            'DateExpires' => Gdn_Format::toDateTime(strtotime('-1 hour'))
         ]);
+        $this->setAttribute($id, 'revoked', true);
         return $this->Database->LastInfo['RowCount'] > 0;
     }
 
@@ -88,6 +101,30 @@ class AccessTokenModel extends Gdn_Model {
                 $row[$field] = empty($row[$field]) ? null : json_encode($row[$field], JSON_UNESCAPED_SLASHES);
             }
         }
+    }
+
+    /**
+     * Get an access token by its numeric ID.
+     *
+     * @param int $accessTokenID
+     * @param string $datasetType
+     * @param array $options
+     * @return array|bool
+     */
+    public function getID($accessTokenID, $datasetType = DATASET_TYPE_ARRAY, $options = []) {
+        $row = $this->getWhere(['AccessTokenID' => $accessTokenID])->firstRow($datasetType);
+        return $row;
+    }
+
+    /**
+     * Fetch an access token row using the token.
+     *
+     * @param mixed $token
+     * @return array|bool
+     */
+    public function getToken($token) {
+        $row = $this->getWhere(['Token' => $token])->firstRow(DATASET_TYPE_ARRAY);
+        return $row;
     }
 
     /**
@@ -158,20 +195,20 @@ class AccessTokenModel extends Gdn_Model {
     /**
      * {@inheritdoc}
      */
-    public function update($Fields, $Where = false, $Limit = false) {
-        $this->encodeRow($Fields);
-        return parent::update($Fields, $Where, $Limit);
+    public function update($fields, $where = false, $limit = false) {
+        $this->encodeRow($fields);
+        return parent::update($fields, $where, $limit);
     }
 
     /**
      * {@inheritdoc}
      */
-    public function setField($RowID, $Property, $Value = false) {
-        if (!is_array($Property)) {
-            $Property = array($Property => $Value);
+    public function setField($rowID, $property, $value = false) {
+        if (!is_array($property)) {
+            $property = [$property => $value];
         }
-        $this->encodeRow($Property);
-        parent::setField($RowID, $Property);
+        $this->encodeRow($property);
+        parent::setField($rowID, $property);
     }
 
     /**
@@ -247,7 +284,7 @@ class AccessTokenModel extends Gdn_Model {
 
         $token = $this->trim($accessToken);
 
-        $row = $this->getID($token, DATASET_TYPE_ARRAY);
+        $row = $this->getToken($token);
 
         if (!$row) {
             return $this->tokenError('Access token not found.', 401, $throw);
@@ -363,8 +400,8 @@ class AccessTokenModel extends Gdn_Model {
     /**
      * {@inheritdoc}
      */
-    public function getWhere($Where = false, $OrderFields = '', $OrderDirection = 'asc', $Limit = false, $Offset = false) {
-        $result = parent::getWhere($Where, $OrderFields, $OrderDirection, $Limit, $Offset);
+    public function getWhere($where = false, $orderFields = '', $orderDirection = 'asc', $limit = false, $offset = false) {
+        $result = parent::getWhere($where, $orderFields, $orderDirection, $limit, $offset);
         array_walk($result->result(), [$this, 'decodeRow']);
 
         return $result;
@@ -402,5 +439,28 @@ class AccessTokenModel extends Gdn_Model {
      */
     private static function base64urlDecode($str) {
         return base64_decode(strtr($str, '-_', '+/'));
+    }
+
+    /**
+     * Save an attribute on an access token row.
+     *
+     * @param int $accessTokenID
+     * @param string $key
+     * @param mixed $value
+     * @return array|bool
+     */
+    public function setAttribute($accessTokenID, $key, $value) {
+        $row = $this->getID($accessTokenID, DATASET_TYPE_ARRAY);
+        $result = false;
+        if ($row) {
+            $attributes = array_key_exists('Attributes', $row) ? $row['Attributes'] : [];
+            $attributes[$key] = $value;
+            $this->update(
+                ['Attributes' => $attributes],
+                ['AccessTokenID' => $accessTokenID],
+            1);
+            $result = $this->getID($accessTokenID);
+        }
+        return $result;
     }
 }

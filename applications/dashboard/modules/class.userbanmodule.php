@@ -2,7 +2,7 @@
 /**
  * SignedIn module.
  *
- * @copyright 2009-2017 Vanilla Forums Inc.
+ * @copyright 2009-2018 Vanilla Forums Inc.
  * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
  * @package Dashboard
  * @since 2.0
@@ -41,7 +41,7 @@ class UserBanModule extends GDN_Module {
 
         $banned = val('Banned', $user);
         $bits = BanModel::explodeBans($banned);
-        $reasons = array();
+        $reasons = [];
 
         foreach ($bits as $bit) {
             if (($bit & $this->ExcludeBans) === 0) {
@@ -86,7 +86,7 @@ class UserBanModule extends GDN_Module {
         if (empty($this->Data['Reasons'])) {
             return '';
         } else {
-            return parent::ToString();
+            return parent::toString();
         }
     }
 }

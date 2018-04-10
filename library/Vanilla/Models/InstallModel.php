@@ -1,7 +1,7 @@
 <?php
 /**
  * @author Todd Burry <todd@vanillaforums.com>
- * @copyright 2009-2017 Vanilla Forums Inc.
+ * @copyright 2009-2018 Vanilla Forums Inc.
  * @license GPLv2
  */
 
@@ -17,11 +17,20 @@ use PDO;
  * Handles installing Vanilla.
  */
 class InstallModel {
+    /** @var array  */
+    protected static $DEFAULT_ADDONS = ['vanilla', 'conversations', 'stubcontent'];
+
+    /** @var \Gdn_Configuration  */
     protected $config;
 
+    /** @var AddonModel  */
     protected $addonModel;
 
+    /** @var ContainerInterface  */
     protected $container;
+
+    /** @var \Gdn_Session  */
+    protected $session;
 
     /**
      * InstallModel constructor.
@@ -30,17 +39,25 @@ class InstallModel {
      * @param AddonModel $addonModel The addon model dependency used to enable installation addons.
      * @param ContainerInterface $container The container used to create additional dependencies once they are enabled.
      */
-    public function __construct(\Gdn_Configuration $config, AddonModel $addonModel, ContainerInterface $container) {
+    public function __construct(
+        \Gdn_Configuration $config,
+        AddonModel $addonModel,
+        ContainerInterface $container,
+        \Gdn_Session $session
+    ) {
         $this->config = $config;
         $this->addonModel = $addonModel;
         $this->container = $container;
+        $this->session = $session;
     }
 
     /**
      * Install Vanilla.
      *
-     * @param array $data Database installation information.
      * @see InstallModel::getSchema()
+     * @throws \Exception
+     * @param array $data Database installation information.
+     * @return array
      */
     public function install(array $data) {
         $data = $this->validate($data);
@@ -85,12 +102,21 @@ class InstallModel {
             'Password' => $data['admin']['password']
         ]);
 
-        // Run through the default addons.
-        $data += ['addons' => ['vanilla', 'conversations']];
+        // Make sure that we install the addons as the admin user.
+        if (!$this->session->isValid()) {
+            $oldConfigValue = $this->config->get('Garden.Installed');
+            $this->config->set('Garden.Installed', true);
+            $this->session->start($adminUserID, false);
+            $this->config->set('Garden.Installed', $oldConfigValue);
+        }
+
+        // Run through the addons.
+        $data += ['addons' => static::$DEFAULT_ADDONS];
 
         foreach ($data['addons'] as $addonKey) {
             $addon = $this->addonModel->getAddonManager()->lookupAddon($addonKey);
-            $this->addonModel->enable($addon);
+            // TODO: Once we are using this addon model we can remove the force and tweak the config defaults.
+            $this->addonModel->enable($addon, ['force' => true]);
         }
 
         // Now that all of the addons are are enabled we should set the default roles.
@@ -128,8 +154,8 @@ class InstallModel {
             throw new ValidationException($validation);
         }
 
-        if (PHP_VERSION_ID < 50600) {
-            $validation->addError('', 'PHP {version} or higher is required.', ['version' => '5.6']);
+        if (PHP_VERSION_ID < 70000) {
+            $validation->addError('', 'PHP {version} or higher is required.', ['version' => '7.0']);
         }
 
         if (!class_exists(\PDO::class)) {
@@ -240,42 +266,42 @@ class InstallModel {
     private function validateDatabaseConnection(array $dbInfo) {
         try {
             $this->createPDO($dbInfo);
-        } catch (\PDOException $Exception) {
+        } catch (\PDOException $exception) {
             $validation = new Validation();
-            switch ($Exception->getCode()) {
+            switch ($exception->getCode()) {
                 case 1044:
                     $validation->addError(
                         '',
                         'The database user you specified does not have permission to access the database. Have you created the database yet? The database reported: {dbMessage}.',
-                        ['dbMessage' => strip_tags($Exception->getMessage())]
+                        ['dbMessage' => strip_tags($exception->getMessage())]
                     );
                     break;
                 case 1045:
                     $validation->addError(
                         '',
                         'Failed to connect to the database with the username and password you entered. Did you mistype them? The database reported: {dbMessage}.',
-                        ['dbMessage' => strip_tags($Exception->getMessage())]
+                        ['dbMessage' => strip_tags($exception->getMessage())]
                     );
                     break;
                 case 1049:
                     $validation->addError(
                         '',
                         'It appears as though the database you specified does not exist yet. Have you created it yet? Did you mistype the name? The database reported: {dbMessage}.',
-                        ['dbMessage' => strip_tags($Exception->getMessage())]
+                        ['dbMessage' => strip_tags($exception->getMessage())]
                     );
                     break;
                 case 2005:
                     $validation->addError(
                         '',
                         "Are you sure you've entered the correct database host name? Maybe you mistyped it? The database reported: {dbMessage}.",
-                        ['dbMessage' => strip_tags($Exception->getMessage())]
+                        ['dbMessage' => strip_tags($exception->getMessage())]
                     );
                     break;
                 default:
                     $validation->addError(
                         '',
                         'The connection parameters you specified failed to open a connection to the database. The database reported: {dbMessage}.',
-                        ['dbMessage' => strip_tags($Exception->getMessage())]
+                        ['dbMessage' => strip_tags($exception->getMessage())]
                     );
                     break;
             }
@@ -346,7 +372,7 @@ class InstallModel {
             $this->getDatabaseDsn($info),
             $info['user'],
             $info['password'],
-            [PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION]
+            [PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION, PDO::ATTR_PERSISTENT => false]
         );
 
         return $pdo;

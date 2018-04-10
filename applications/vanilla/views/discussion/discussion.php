@@ -1,6 +1,6 @@
 <?php
 /**
- * @copyright 2009-2017 Vanilla Forums Inc.
+ * @copyright 2009-2018 Vanilla Forums Inc.
  * @license http://www.opensource.org/licenses/gpl-2.0.php GPLv2
  */
 
@@ -10,10 +10,10 @@ if (!defined('APPLICATION')) {
 $UserPhotoFirst = c('Vanilla.Comment.UserPhotoFirst', true);
 
 $Discussion = $this->data('Discussion');
-$Author = Gdn::userModel()->getID($Discussion->InsertUserID); // UserBuilder($Discussion, 'Insert');
+$Author = Gdn::userModel()->getID($Discussion->InsertUserID); // userBuilder($Discussion, 'Insert');
 
 // Prep event args.
-$CssClass = CssClass($Discussion, false);
+$CssClass = cssClass($Discussion, false);
 $this->EventArguments['Discussion'] = &$Discussion;
 $this->EventArguments['Author'] = &$Author;
 $this->EventArguments['CssClass'] = &$CssClass;
@@ -43,8 +43,8 @@ $this->fireEvent('BeforeDiscussionDisplay');
             </span>
             <span class="AuthorInfo">
                 <?php
-                echo wrapIf(htmlspecialchars(val('Title', $Author)), 'span', array('class' => 'MItem AuthorTitle'));
-                echo wrapIf(htmlspecialchars(val('Location', $Author)), 'span', array('class' => 'MItem AuthorLocation'));
+                echo wrapIf(htmlspecialchars(val('Title', $Author)), 'span', ['class' => 'MItem AuthorTitle']);
+                echo wrapIf(htmlspecialchars(val('Location', $Author)), 'span', ['class' => 'MItem AuthorLocation']);
                 $this->fireEvent('AuthorInfo');
                 ?>
             </span>
@@ -52,16 +52,16 @@ $this->fireEvent('BeforeDiscussionDisplay');
             <div class="Meta DiscussionMeta">
             <span class="MItem DateCreated">
                 <?php
-                echo anchor(Gdn_Format::date($Discussion->DateInserted, 'html'), $Discussion->Url, 'Permalink', array('rel' => 'nofollow'));
+                echo anchor(Gdn_Format::date($Discussion->DateInserted, 'html'), $Discussion->Url, 'Permalink', ['rel' => 'nofollow']);
                 ?>
             </span>
                 <?php
-                echo dateUpdated($Discussion, array('<span class="MItem">', '</span>'));
+                echo dateUpdated($Discussion, ['<span class="MItem">', '</span>']);
                 ?>
                 <?php
                 // Include source if one was set
                 if ($Source = val('Source', $Discussion)) {
-                    echo ' '.wrap(sprintf(t('via %s'), t($Source.' Source', $Source)), 'span', array('class' => 'MItem MItem-Source')).' ';
+                    echo ' '.wrap(sprintf(t('via %s'), t($Source.' Source', $Source)), 'span', ['class' => 'MItem MItem-Source']).' ';
                 }
                 // Category
                 if (c('Vanilla.Categories.Use')) {
@@ -73,7 +73,7 @@ $this->fireEvent('BeforeDiscussionDisplay');
 
                 // Include IP Address if we have permission
                 if ($Session->checkPermission('Garden.PersonalInfo.View')) {
-                    echo wrap(ipAnchor($Discussion->InsertIPAddress), 'span', array('class' => 'MItem IPAddress'));
+                    echo wrap(ipAnchor($Discussion->InsertIPAddress), 'span', ['class' => 'MItem IPAddress']);
                 }
 
                 $this->fireEvent('DiscussionInfo');
@@ -84,7 +84,7 @@ $this->fireEvent('BeforeDiscussionDisplay');
         <?php $this->fireEvent('BeforeDiscussionBody'); ?>
         <div class="Item-BodyWrap">
             <div class="Item-Body">
-                <div class="Message">
+                <div class="Message userContent">
                     <?php
                     echo formatBody($Discussion);
                     ?>

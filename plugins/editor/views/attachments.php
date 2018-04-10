@@ -22,8 +22,8 @@ $editorkey = $this->data('_editorkey');
          $viewerCssClass .= ' in-body';
       }
 
-      $pathParse = Gdn_Upload::Parse($attachment['Path']);
-      $thumbPathParse = Gdn_Upload::Parse($attachment['ThumbPath']);
+      $pathParse = Gdn_Upload::parse($attachment['Path']);
+      $thumbPathParse = Gdn_Upload::parse($attachment['ThumbPath']);
 
       $filePreviewCss = ($attachment['ThumbPath'])
          ? '<i class="file-preview img" style="background-image: url('.$thumbPathParse['Url'].')"></i>'
@@ -36,7 +36,7 @@ $editorkey = $this->data('_editorkey');
          <input type="hidden" name="MediaIDs[]" value="<?php echo $attachment['MediaID']; ?>" disabled="disabled"/>
          <?php echo $filePreviewCss; ?>
          <div class="file-data">
-            <a class="filename" data-type="<?php echo $attachment['Type']; ?>"
+            <a class="filename" data-type="<?php echo htmlspecialchars($attachment['Type']); ?>"
                href="<?php echo $pathParse['Url'] ?>"
                target="_blank"
                 <?php
@@ -51,7 +51,7 @@ $editorkey = $this->data('_editorkey');
                 >
                 <?php echo htmlspecialchars($attachment['Name']); ?>
             </a>
-            <span class="meta"><?php echo Gdn_Format::Bytes($attachment['Size'], 1); ?></span>
+            <span class="meta"><?php echo Gdn_Format::bytes($attachment['Size'], 1); ?></span>
          </div>
          <span class="editor-file-remove" title="<?php echo t('Remove'); ?>"></span>
          <span class="editor-file-reattach" title="<?php echo t('Click to re-attach'); ?>"></span>

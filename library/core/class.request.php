@@ -4,12 +4,13 @@
  *
  * @author Todd Burry <todd@vanillaforums.com>
  * @author Tim Gunter <tim@vanillaforums.com>
- * @copyright 2009-2017 Vanilla Forums Inc.
+ * @copyright 2009-2018 Vanilla Forums Inc.
  * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
  * @package Core
  * @since 2.0
  */
 use Garden\Web\RequestInterface;
+use Vanilla\UploadedFile;
 
 /**
  * Represents a Request to the application, typically from the browser but potentially generated internally, in a format
@@ -66,6 +67,9 @@ class Gdn_Request implements RequestInterface {
 
     /** HTTP request method. */
     const METHOD_OPTIONS = 'OPTIONS';
+
+    /** Special cases in $_SERVER that are also considered headers. */
+    const SPECIAL_HEADERS = ['CONTENT_TYPE', 'CONTENT_LENGTH', 'PHP_AUTH_USER', 'PHP_AUTH_PW', 'PHP_AUTH_DIGEST', 'AUTH_TYPE'];
 
     /** @var bool Whether or not _ParseRequest has been called yet. */
     protected $_HaveParsedRequest = false;
@@ -124,11 +128,11 @@ class Gdn_Request implements RequestInterface {
      * Gets/Sets the domain from the current url. e.g. "http://localhost" in
      * "http://localhost/this/that/garden/index.php?/controller/action/"
      *
-     * @param $Domain optional value to set
+     * @param $domain optional value to set
      * @return string | null
      */
-    public function domain($Domain = null) {
-        return $this->_parsedRequestElement('Domain', $Domain);
+    public function domain($domain = null) {
+        return $this->_parsedRequestElement('Domain', $domain);
     }
 
     /**
@@ -191,7 +195,7 @@ class Gdn_Request implements RequestInterface {
     }
 
     /**
-     * Convenience method for accessing unparsed environment data via Request(ELEMENT) method calls.
+     * Convenience method for accessing unparsed environment data via request(ELEMENT) method calls.
      *
      * @return string
      */
@@ -208,7 +212,7 @@ class Gdn_Request implements RequestInterface {
     /**
      * This method allows requests to export their internal data.
      *
-     * Mostly used in conjunction with FromImport()
+     * Mostly used in conjunction with fromImport()
      *
      * @param $export Data group to export
      * @return mixed
@@ -230,13 +234,32 @@ class Gdn_Request implements RequestInterface {
      * Gets/Sets the optional filename (ContentDisposition) of the output.
      *
      * As with the case above (OutputFormat), this value depends heavily on there being a filename
-     * at the end of the URI. In the example above, Filename() would return 'cashflow2009.pdf'.
+     * at the end of the URI. In the example above, filename() would return 'cashflow2009.pdf'.
      *
      * @param $filename Optional Filename to set.
      * @return string
      */
     public function filename($filename = null) {
         return $this->_parsedRequestElement('Filename', $filename);
+    }
+
+    /**
+     * Convert a header key from HTTP_HEADER_NAME format to Header-Name.
+     *
+     * @param string $key A header key.
+     * @return string The formatted header key.
+     */
+    private function formatHeaderKey($key) {
+        $key = $this->headerKey($key);
+        if (substr($key, 0, 5) == 'HTTP_') {
+            $key = substr($key, 5);
+        }
+        $key = strtolower($key);
+        $key = str_replace('_', '-', $key);
+        $key = preg_replace_callback('/(?<=^|\-)[a-z]/', function ($m) {
+            return strtoupper($m[0]);
+        }, $key);
+        return $key;
     }
 
     /**
@@ -326,24 +349,48 @@ class Gdn_Request implements RequestInterface {
     }
 
     /**
-     * Get a header value.
-     *
-     * @param string $header The name of the header.
-     * @param mixed $default The default value if the header does not exist.
-     * @return mixed Returns the header value or {@link $default}.
+     * {@inheritdoc}
      */
-    public function getHeader($header, $default = null) {
-        return $this->getValueFrom(self::INPUT_SERVER, $this->headerKey($header), $default);
+    public function getHeader($header) {
+        return $this->getValueFrom(self::INPUT_SERVER, $this->headerKey($header), '');
     }
 
     /**
-     * Checks if a header exists by the given case-insensitive name.
-     *
-     * @param string $header Case-insensitive header name.
-     * @return bool Returns **true** if the header exists or **false** otherwise.
+     * {@inheritdoc}
+     */
+    public function getHeaderLine($name) {
+        $value = $this->getHeader($name);
+        if (empty($value)) {
+            $value = '';
+        } elseif (is_array($value)) {
+            $value = implode(',', $value);
+        }
+        return $value;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getHeaders() {
+        $server = $this->getRequestArguments(self::INPUT_SERVER);
+
+        $headers = [];
+        foreach ($server as $name => $val) {
+            if (substr($name, 0, 5) != 'HTTP_' && !in_array($name, self::SPECIAL_HEADERS)) {
+                continue;
+            }
+
+            $name = $this->formatHeaderKey($name);
+            $headers[$name] = $val;
+        }
+        return $headers;
+    }
+
+    /**
+     * {@inheritdoc}
      */
     public function hasHeader($header) {
-        return $this->getHeader($header, null) !== null;
+        return !empty($this->getHeader($header));
     }
 
     /**
@@ -354,7 +401,7 @@ class Gdn_Request implements RequestInterface {
      */
     private function headerKey($name) {
         $key = strtoupper(str_replace('-', '_', $name));
-        if ($key !== 'CONTENT_TYPE') {
+        if (substr($key, 0, 5) != 'HTTP_' && !in_array($key, self::SPECIAL_HEADERS)) {
             $key = 'HTTP_'.$key;
         }
         return $key;
@@ -600,7 +647,7 @@ class Gdn_Request implements RequestInterface {
             return false;
         }
 
-        $transientKey = Gdn::request()->post('TransientKey', false);
+        $transientKey = $this->post('TransientKey', $this->post('transientKey', $this->getHeader('X-Transient-Key')));
         $result = Gdn::session()->validateTransientKey($transientKey, false);
 
         if (!$result && $throw) {
@@ -880,7 +927,7 @@ class Gdn_Request implements RequestInterface {
         if (preg_match('/^(.+)\.([^.]{1,4})$/', $lastParam, $match)) {
             $this->outputFormat($match[2]);
             $this->filename($match[0]);
-            //$this->Path(implode('/',array_slice($UrlParts, 0, -1)));
+            //$this->path(implode('/',array_slice($UrlParts, 0, -1)));
         }
 
         /**
@@ -1005,9 +1052,9 @@ class Gdn_Request implements RequestInterface {
         // Construct the path and query.
         $result = $this->path();
 
-//      $Filename = $this->Filename();
+//      $Filename = $this->filename();
 //      if ($Filename && $Filename != 'default')
-//         $Result .= ConcatSep('/', $Result, $Filename);
+//         $Result .= concatSep('/', $Result, $Filename);
         $get = $this->getRequestArguments(self::INPUT_GET);
         if (count($get) > 0) {
             // mosullivan 2011-05-04 - There is a bug in this code that causes a qs
@@ -1092,6 +1139,73 @@ class Gdn_Request implements RequestInterface {
     }
 
     /**
+     * Parse a PHP file array into a normalized array of UploadedFile objects.
+     *
+     * @param array $files A file array (e.g. $_FILES).
+     * @return array
+     */
+    private function parseFiles(array $files) {
+        /**
+         * Normalize a multidimensional upload array (e.g. my-form[details][avatars][]).
+         *
+         * @param array $files
+         * @return array
+         */
+        $normalizeArray = function(array $files) use (&$getUpload) {
+            $result = [];
+            foreach ($files['tmp_name'] as $key => $val) {
+                // Consolidate the attributes and push them down the tree.
+                $upload = $getUpload([
+                    'error' => $files['error'][$key],
+                    'name' => $files['name'][$key],
+                    'size' => $files['size'][$key],
+                    'tmp_name' => $files['tmp_name'][$key],
+                    'type' => $files['type'][$key]
+                ]);
+                if ($upload instanceof UploadedFile && $upload->getError() === UPLOAD_ERR_NO_FILE) {
+                    continue;
+                }
+                $result[$key] = $upload;
+            }
+            return $result;
+        };
+
+        /**
+         * Create an instance of UploadedFile, or an array of instances, from a file array.
+         *
+         * @param array $value
+         * @return array|UploadedFile
+         */
+        $getUpload = function(array $value) use (&$normalizeArray) {
+            if (is_array($value['tmp_name'])) {
+                // We need to go deeper.
+                $result = $normalizeArray($value);
+            } else {
+                $result = new UploadedFile(
+                    Gdn::getContainer()->get(Gdn_Upload::class),
+                    $value['tmp_name'],
+                    $value['size'],
+                    $value['error'],
+                    $value['name'],
+                    $value['type']
+                );
+            }
+
+            return $result;
+        };
+
+        $result = [];
+        foreach ($files as $key => $value) {
+            $upload = $getUpload($value);
+            if ($upload instanceof UploadedFile && $upload->getError() === UPLOAD_ERR_NO_FILE) {
+                continue;
+            }
+            $result[$key] = $upload;
+        }
+        return $result;
+    }
+
+    /**
      * Attach an array of request arguments to the request.
      *
      * @param int $paramsType type of data to import. One of the self::INPUT_* constants
@@ -1105,7 +1219,7 @@ class Gdn_Request implements RequestInterface {
                 break;
 
             case self::INPUT_POST:
-                $argumentData = $this->decodePost($_POST, $_SERVER, 'php://input');
+                $argumentData = $this->decodePost($_POST, $_SERVER, 'php://input', $_FILES);
                 break;
 
             case self::INPUT_SERVER:
@@ -1139,7 +1253,7 @@ class Gdn_Request implements RequestInterface {
      * @param array $server Usually the {@link $_SERVER} super-global.
      * @param string $inputFile Usually **php://input** for the raw input stream.
      */
-    private function decodePost($post, $server, $inputFile = 'php://input') {
+    private function decodePost($post, $server, $inputFile = 'php://input', $files = null) {
         $contentType = !isset($server['CONTENT_TYPE']) ? 'application/x-www-form-urlencoded' : $server['CONTENT_TYPE'];
 
         if (stripos($contentType, 'application/json') !== false || stripos($contentType, 'text/plain') !== false) {
@@ -1151,6 +1265,12 @@ class Gdn_Request implements RequestInterface {
             }
         } else {
             $result = $post;
+        }
+
+        // Add data from the PHP files array.
+        if (is_array($files)) {
+            $fileData = $this->parseFiles($files);
+            $result = array_merge($fileData, $result);
         }
 
         return $result;
@@ -1419,6 +1539,7 @@ class Gdn_Request implements RequestInterface {
         }
         static $rewrite = null;
         if ($rewrite === null) {
+            // Garden.RewriteUrls is maintained for compatibility but X_REWRITE is what really need to be used.
             $rewrite = val('X_REWRITE', $_SERVER, c('Garden.RewriteUrls', true));
         }
 

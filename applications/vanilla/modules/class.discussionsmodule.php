@@ -2,7 +2,7 @@
 /**
  * Discussions module
  *
- * @copyright 2009-2017 Vanilla Forums Inc.
+ * @copyright 2009-2018 Vanilla Forums Inc.
  * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
  * @package Vanilla
  * @since 2.0
@@ -65,12 +65,15 @@ class DiscussionsModule extends Gdn_Module {
         $discussionModel = new DiscussionModel();
 
         $categoryIDs = $this->getCategoryIDs();
-        $where = array('Announce' => 'all');
+        $where = ['Announce' => 'all'];
 
         if ($categoryIDs) {
             $where['d.CategoryID'] = CategoryModel::filterCategoryPermissions($categoryIDs);
         } else {
-            $discussionModel->Watching = true;
+            $visibleCategoriesResult = CategoryModel::instance()->getVisibleCategoryIDs(['filterHideDiscussions' => true]);
+            if ($visibleCategoriesResult !== true) {
+                $where['d.CategoryID'] = $visibleCategoriesResult;
+            }
         }
 
         $this->setData('Discussions', $discussionModel->get(0, $limit, $where));
@@ -82,12 +85,12 @@ class DiscussionsModule extends Gdn_Module {
 
     public function toString() {
         if (!$this->data('Discussions')) {
-            $this->GetData();
+            $this->getData();
         }
 
         require_once Gdn::controller()->fetchViewLocation('helper_functions', 'Discussions', 'Vanilla');
 
-        return parent::ToString();
+        return parent::toString();
     }
 
     /**

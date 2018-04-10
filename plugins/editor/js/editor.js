@@ -345,6 +345,7 @@
             $('.editor-dropdown').each(function(i, el) {
                 $(el).removeClass('editor-dropdown-open');
                 $(el).find('.wysihtml5-command-dialog-opened').removeClass('wysihtml5-command-dialog-opened');
+                $(this).setFlyoutAttributes();
             });
         };
 
@@ -365,7 +366,8 @@
             $('.editor-dropdown .editor-action')
                 .off('click.dd')
                 .on('click.dd', function(e) {
-                    var parentEl = $(e.target).parent();
+
+                    var $parentEl = $(e.target).closest('.editor-dropdown');
 
                     // Again, tackling with clash from multiple codebases.
                     $('.editor-insert-dialog').each(function(i, el) {
@@ -374,13 +376,12 @@
                         }, 0);
                     });
 
-                    if (parentEl.hasClass('editor-dropdown')
-                        && parentEl.hasClass('editor-dropdown-open')) {
-                        parentEl.removeClass('editor-dropdown-open');
-                        //$(parentEl).find('.wysihtml5-command-dialog-opened').removeClass('wysihtml5-command-dialog-opened');
+                    if ($parentEl.hasClass('editor-dropdown') && $parentEl.hasClass('editor-dropdown-open')) {
+                        $parentEl.removeClass('editor-dropdown-open');
+                        //$($parentEl).find('.wysihtml5-command-dialog-opened').removeClass('wysihtml5-command-dialog-opened');
                     } else {
                         // clear other opened dropdowns before opening this one
-                        $(parentEl).parent('.editor').find('.editor-dropdown-open').each(function(i, el) {
+                        $($parentEl).parent('.editor').find('.editor-dropdown-open').each(function(i, el) {
                             $(el).removeClass('editor-dropdown-open');
                             $(el).find('.wysihtml5-command-dialog-opened').removeClass('wysihtml5-command-dialog-opened');
                         });
@@ -389,21 +390,30 @@
                         // to HTML code view, then do not allow dropdowns. CSS pointer-
                         // events should have taken care of this, but JS still fires the
                         // event regardless, so disable them here as well.
-                        if (!parentEl.hasClass('wysihtml5-commands-disabled')) {
-                            parentEl.addClass('editor-dropdown-open');
+                        if (!$parentEl.hasClass('wysihtml5-commands-disabled')) {
+                            $parentEl.addClass('editor-dropdown-open');
 
                             // if has input, focus and move caret to end of text
-                            var inputBox = parentEl.find('.InputBox');
+                            var inputBox = $parentEl.find('.InputBox');
                             if (inputBox.length) {
                                 editorSelectAllInput(inputBox[0]);
                             }
                         }
                     }
+
+                    $parentEl.setFlyoutAttributes();
+
+                }).on('keypress', function(e){
+                    var key = e.keyCode || e.which;
+                    if (key == 13 || key == 32) {
+                        $(this).trigger('click.dd');
+                    }
                 });
 
             // Handle Enter key
             $('.editor-dropdown').find('.InputBox').on('keydown', function(e) {
-                if (e.which == 13) {
+                var key = e.keyCode || e.which;
+                if (key === 13 || key === 32) {
                     // Cancel enter key submissions on these values.
                     if (this.value == ''
                         || this.value == 'http://'
@@ -438,6 +448,7 @@
                     $('.editor-dropdown').each(function(i, el) {
                         $(el).removeClass('editor-dropdown-open');
                         $(el).find('.wysihtml5-command-dialog-opened').removeClass('wysihtml5-command-dialog-opened');
+                        $(el).setFlyoutAttributes();
                     });
                 });
         };
@@ -1106,8 +1117,10 @@
                         if (!result.error) {
                             var payload = result.payload;
 
-                            // If photo, insert directly into editor area.
-                            if (payload.upload_type === 'image') {
+                            var imgTag = buildImgTag(payload.original_url, format);
+
+                            // If we uploaded an image and we have an image tag, insert directly into editor area.
+                            if (payload.upload_type === 'image' && imgTag) {
                                 // Determine max height for sample. They can resize it
                                 // afterwards.
                                 var maxHeight = (payload.original_height >= 400)
@@ -1122,8 +1135,6 @@
                                 if (editorWidth < payloadWidth) {
                                     payloadHeight = (editorWidth * payload.original_height) / payload.original_width;
                                 }
-
-                                var imgTag = buildImgTag(payload.original_url, format);
 
                                 if (handleIframe) {
                                     editor.focus();
@@ -1270,8 +1281,11 @@
                     }
 
                     // Now clear input and close dropdown
-                    $(this).closest('.editor-dropdown-open').removeClass('editor-dropdown-open');
+                    var $dropDown = $(this).closest('.editor-dropdown-open');
+                    $dropDown.removeClass('editor-dropdown-open');
+                    $dropDown.setFlyoutAttributes();
                     $(this).val('');
+
                 }
             });
         };
@@ -1285,27 +1299,30 @@
             // iOS keyboard does not push content up initially,
             // thus blocking the actual content. Typing (spaces, newlines) also
             // jump the page up, so keep it in view.
-            if (window.parent.location != window.location
-                && (/ipad|iphone|ipod/i).test(navigator.userAgent)) {
+            if (window.parent.location != window.location && (/ipad|iphone|ipod/i).test(navigator.userAgent)) {
 
                 var contentEditable = $(editor.composer.iframe).contents().find('body');
                 contentEditable.attr('autocorrect', 'off');
                 contentEditable.attr('autocapitalize', 'off');
 
-                var iOSscrollFrame = $(window.parent.document).find('#vanilla-iframe').contents();
-                var iOSscrollTo = $(iOSscrollFrame).find('#' + editor.config.toolbar).closest('form').find('.Buttons');
+                try {
+                    var iOSscrollFrame = $(window.parent.document).find('#vanilla-iframe').contents();
+                    var iOSscrollTo = $(iOSscrollFrame).find('#' + editor.config.toolbar).closest('form').find('.Buttons');
 
-                contentEditable.on('keydown keyup', function(e) {
-                    Vanilla.scrollTo(iOSscrollTo);
-                    editor.focus();
-                });
-
-                editor.on('focus', function() {
-                    //var postButton = $('#'+editor.config.toolbar).parents('form').find('.CommentButton');
-                    setTimeout(function() {
+                    contentEditable.on('keydown keyup', function(e) {
                         Vanilla.scrollTo(iOSscrollTo);
-                    }, 1);
-                });
+                        editor.focus();
+                    });
+
+                    editor.on('focus', function() {
+                        //var postButton = $('#'+editor.config.toolbar).parents('form').find('.CommentButton');
+                        setTimeout(function() {
+                            Vanilla.scrollTo(iOSscrollTo);
+                        }, 1);
+                    });
+                } catch (e) {
+                    // "window.parent unsupported for iFrames in your browser"
+                }
             }
         }
 
@@ -1608,8 +1625,10 @@
                                             // after the insertion, and insert a break, because that will set the
                                             // caret to after the latest insertion.
                                             if ($(composer.element.lastChild).hasClass('Spoiler')) {
+                                                var bookmark = composer.selection.getBookmark();
                                                 composer.selection.setAfter(composer.element.lastChild);
                                                 composer.commands.exec("insertHTML", "<p><br></p>");
+                                                composer.selection.setBookmark(bookmark);
                                             }
                                         },
 
@@ -1632,8 +1651,10 @@
                                         exec: function(composer, command) {
                                             wysihtml5.commands.formatBlock.exec(composer, "formatBlock", "div", "Quote", REG_EXP);
                                             if ($(composer.element.lastChild).hasClass('Quote')) {
+                                                var bookmark = composer.selection.getBookmark();
                                                 composer.selection.setAfter(composer.element.lastChild);
                                                 composer.commands.exec("insertHTML", "<p><br></p>");
+                                                composer.selection.setBookmark(bookmark);
                                             }
                                         },
 
@@ -1686,6 +1707,13 @@
                                                 code.appendChild(selectedNodes);
                                                 range.insertNode(pre);
                                                 composer.selection.selectNode(code);
+
+                                                if ($(composer.element.lastChild).hasClass('CodeBlock')) {
+                                                    var bookmark = composer.selection.getBookmark();
+                                                    composer.selection.setAfter(composer.element.lastChild);
+                                                    composer.commands.exec("insertHTML", "<p><br></p>");
+                                                    composer.selection.setBookmark(bookmark);
+                                                }
                                             }
                                         },
                                         state: function(composer) {
@@ -1791,11 +1819,11 @@
         // jQuery chaining
         return this;
     };
-}(jQuery));
 
-$(document).on('contentLoad', function(e) {
-    $('.BodyBox,.js-bodybox', e.target).setAsEditor();
-});
+    $(document).on('contentLoad', function(e) {
+        $('.BodyBox,.js-bodybox', e.target).setAsEditor();
+    });
+}(jQuery));
 
 /*
  * This is an example of hooking into the custom parse event, to enable

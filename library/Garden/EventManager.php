@@ -107,12 +107,12 @@ class EventManager {
      * public function eventName_handler($arg1, $arg2, ...) { ... }
      *
      * // Add/override a method called with Event::callUserFuncArray().
-     * public function ClassName_methodName($sender, $arg1, $arg2) { ... }
-     * public function ClassName_methodName_create($sender, $arg1, $arg2) { ... } // deprecated
+     * public function className_methodName($sender, $arg1, $arg2) { ... }
+     * public function className_methodName_create($sender, $arg1, $arg2) { ... } // deprecated
      *
      * // Call the handler before or after a method called with Event::callUserFuncArray().
-     * public function ClassName_methodName_before($sender, $arg1, $arg2) { ... }
-     * public function ClassName_methodName_after($sender, $arg1, $arg2) { ... }
+     * public function className_methodName_before($sender, $arg1, $arg2) { ... }
+     * public function className_methodName_after($sender, $arg1, $arg2) { ... }
      * ```
      *
      * @param mixed $class The class name or an object instance.
@@ -228,6 +228,33 @@ class EventManager {
     }
 
     /**
+     * Fire an event handler, but only on a class.
+     *
+     * @param string|object $class The class or instance to fire on.
+     * @param string $event The name of event.
+     * @param mixed ...$args The event arguments.
+     * @return mixed|null Returns the result of the event handler or **null** if no event handler was found.
+     */
+    public function fireClass($class, $event, ...$args) {
+        $handlers = $this->getHandlers($event);
+
+        if (empty($handlers)) {
+            return null;
+        }
+
+        foreach ($handlers as $callback) {
+            if (!is_array($callback)) {
+                continue;
+            }
+            $instance = $callback[0];
+
+            if ($instance === $class || (is_string($class) && is_object($instance) && is_a($instance, $class))) {
+                call_user_func_array($callback, $args);
+            }
+        }
+    }
+
+    /**
      * Fire an event.
      *
      * @param string $event The name of the event.
@@ -275,6 +302,15 @@ class EventManager {
             return $this->fire($event, ...$args);
         }
         return [];
+    }
+
+    /**
+     * Get all of handlers.
+     *
+     * @return array Returns all the handlers.
+     */
+    public function getAllHandlers() {
+        return $this->handlers;
     }
 
     /**

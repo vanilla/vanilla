@@ -137,12 +137,14 @@ jQuery(document).ready(function($) {
 
     if (inIframe) {
         // DO NOT set the parent location if this is a page of embedded comments!!
-        if (path != '~' && !isEmbeddedComments)
+        if (path != '~' && !isEmbeddedComments) {
             remotePostMessage('location:' + encodePath(path), '*');
+        }
 
         // Unembed if in the dashboard, in an iframe, and not forcing dashboard embed
-        if (inDashboard && !forceEmbedDashboard)
+        if (inDashboard && !forceEmbedDashboard) {
             remotePostMessage('unembed', '*');
+        }
 
         setHeight = function(explicitHeight) {
             // Offset height can be influenced by CSS styling, like height. A
@@ -164,6 +166,7 @@ jQuery(document).ready(function($) {
             remotePostMessage('scrollto:' + $('div.Popup').offset().top, '*');
         });
 
+        // Scroll to the top of the iframe when we change page.
         $(window).unload(function() {
             remotePostMessage('unload', '*');
         });
@@ -213,8 +216,6 @@ jQuery(document).ready(function($) {
                     }
                 }
                 return;
-            } else {
-                remotePostMessage('scrollto:0', '*');
             }
         });
     }

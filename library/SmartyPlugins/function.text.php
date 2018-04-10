@@ -1,6 +1,6 @@
 <?php
 /**
- * @copyright 2009-2017 Vanilla Forums Inc.
+ * @copyright 2009-2018 Vanilla Forums Inc.
  * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
  * @package vanilla-smarty
  * @since 2.0
@@ -15,7 +15,7 @@
  * @param Smarty The smarty object rendering the template.
  * @return The text.
  */
-function smarty_function_text($Params, &$Smarty) {
-    $Result = Gdn_Theme::text(val('code', $Params, ''), val('default', $Params, ''));
-	return $Result;
+function smarty_function_text($params, &$smarty) {
+    $result = Gdn_Theme::text(val('code', $params, ''), val('default', $params, ''));
+	return $result;
 }

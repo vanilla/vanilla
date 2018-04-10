@@ -11,6 +11,7 @@
     "icon": "google_social_connect.png",
     "key": "googleplus",
     "type": "addon",
+    "documentationUrl": "https://docs.vanillaforums.com/help/sso/social-connect/#google-plus",
     "authors": [
         {
             "name": "Todd Burry",

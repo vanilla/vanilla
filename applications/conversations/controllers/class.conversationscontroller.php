@@ -2,7 +2,7 @@
 /**
  * Conversations controller.
  *
- * @copyright 2009-2017 Vanilla Forums Inc.
+ * @copyright 2009-2018 Vanilla Forums Inc.
  * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
  * @package Conversations
  * @since 2.0
@@ -17,7 +17,7 @@ class ConversationsController extends Gdn_Controller {
      *
      * @return array
      */
-    public function getSettingsPages(&$Menu) {
+    public function getSettingsPages(&$menu) {
         // There are no configuration pages for Conversations
     }
 
@@ -41,7 +41,7 @@ class ConversationsController extends Gdn_Controller {
     public function initialize() {
         // You've got to be signed in to send private messages.
         if (!Gdn::session()->isValid()) {
-            redirect('/entry/signin?Target='.urlencode($this->SelfUrl));
+            redirectTo('/entry/signin?Target='.urlencode($this->SelfUrl));
         }
 
         if ($this->deliveryType() == DELIVERY_TYPE_ALL) {

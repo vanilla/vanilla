@@ -8,7 +8,7 @@ if ($SortOrder === FALSE)
     $SortOrder = Gdn::config('Garden.ProfileTabOrder');
 
 if (!is_array($SortOrder))
-    $SortOrder = array();
+    $SortOrder = [];
 
 // Make sure that all tabs are present in $SortOrder
 foreach ($this->ProfileTabs as $TabCode => $TabInfo) {
@@ -24,9 +24,9 @@ foreach ($this->ProfileTabs as $TabCode => $TabInfo) {
             $CssClass = $TabCode == $this->_CurrentTab ? 'Active ' : '';
             // array_key_exists: Just in case a method was removed but is still present in sortorder
             if (array_key_exists($TabCode, $this->ProfileTabs)) {
-                $TabInfo = val($TabCode, $this->ProfileTabs, array());
+                $TabInfo = val($TabCode, $this->ProfileTabs, []);
                 $CssClass .= val('CssClass', $TabInfo, '');
-                echo '<li'.($CssClass == '' ? '' : ' class="'.$CssClass.'"').'>'.anchor(val('TabHtml', $TabInfo, $TabCode), val('TabUrl', $TabInfo), array('class' => 'TabLink'))."</li>\r\n";
+                echo '<li'.($CssClass == '' ? '' : ' class="'.$CssClass.'"').'>'.anchor(val('TabHtml', $TabInfo, $TabCode), val('TabUrl', $TabInfo), ['class' => 'TabLink'])."</li>\r\n";
             }
         }
         ?>

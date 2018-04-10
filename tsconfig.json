@@ -1,0 +1,24 @@
+{
+    "compilerOptions": {
+        "jsx": "react",
+        "lib": [
+            "es2017",
+            "dom",
+            "dom.iterable"
+        ],
+        "allowSyntheticDefaultImports": true,
+        "moduleResolution": "node",
+        "strictNullChecks": true,
+        "target": "es2017",
+        "module": "esnext",
+        "baseUrl": ".",
+        "paths": {
+            "@core/*": ["./src/scripts/*"],
+            "@vanilla/*": ["./applications/vanilla/src/scripts/*"],
+            "@dashboard/*": ["./applications/dashboard/src/scripts/*"]
+        }
+    },
+    "exclude": [
+        "**/node_modules"
+    ]
+}

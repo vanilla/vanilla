@@ -30,4 +30,5 @@ namespace Deeply\Nested {
 
 namespace Deeply {
     class MultiClassPluginHelper {}
+    class TestClass {}
 }

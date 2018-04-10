@@ -1,14 +1,16 @@
 <?php if (!defined('APPLICATION')) exit();
 $Session = Gdn::session();
 include_once $this->fetchViewLocation('helper_functions', 'discussions', 'vanilla');
+include_once $this->fetchViewLocation('helper_functions', 'categories', 'vanilla');
 
 echo '<h1 class="H HomepageTitle">'.
-    AdminCheck(NULL, array('', ' ')).
+    adminCheck(NULL, ['', ' ']).
     $this->data('Title').
+    followButton($this->data('Category.CategoryID')).
     '</h1>';
 
-$Description = $this->data('Category.Description', $this->Description());
-echo wrapIf(Gdn_Format::htmlFilter($Description), 'div', array('class' => 'P PageDescription'));
+$Description = $this->data('Category.Description', $this->description());
+echo wrapIf(Gdn_Format::htmlFilter($Description), 'div', ['class' => 'P PageDescription']);
 
 $this->fireEvent('AfterPageTitle');
 
@@ -31,18 +33,23 @@ if ($subtreeView) {
 
 $this->fireEvent('AfterCategorySubtree');
 
-$PagerOptions = array('Wrapper' => '<span class="PagerNub">&#160;</span><div %1$s>%2$s</div>', 'RecordCount' => $this->data('CountDiscussions'), 'CurrentRecords' => $this->data('Discussions')->numRows());
+$PagerOptions = ['Wrapper' => '<span class="PagerNub">&#160;</span><div %1$s>%2$s</div>', 'RecordCount' => $this->data('CountDiscussions'), 'CurrentRecords' => $this->data('Discussions')->numRows()];
 if ($this->data('_PagerUrl'))
     $PagerOptions['Url'] = $this->data('_PagerUrl');
 
 echo '<div class="PageControls Top">';
 PagerModule::write($PagerOptions);
-echo Gdn_Theme::Module('NewDiscussionModule', $this->data('_NewDiscussionProperties', array('CssClass' => 'Button Action Primary')));
+echo Gdn_Theme::module('NewDiscussionModule', $this->data('_NewDiscussionProperties', ['CssClass' => 'Button Action Primary']));
+// Avoid displaying in a category's list of discussions.
+if ($this->data('EnableFollowingFilter')) {
+    echo discussionFilters();
+}
 $this->fireEvent('PageControls');
 echo '</div>';
 
 if ($this->DiscussionData->numRows() > 0 || (isset($this->AnnounceData) && is_object($this->AnnounceData) && $this->AnnounceData->numRows() > 0)) {
     ?>
+    <h2 class="sr-only"><?php echo t('Discussion List'); ?></h2>
     <ul class="DataList Discussions">
         <?php include($this->fetchViewLocation('discussions', 'Discussions', 'Vanilla')); ?>
     </ul>
@@ -50,7 +57,7 @@ if ($this->DiscussionData->numRows() > 0 || (isset($this->AnnounceData) && is_ob
 
     echo '<div class="PageControls Bottom">';
     PagerModule::write($PagerOptions);
-    echo Gdn_Theme::Module('NewDiscussionModule', $this->data('_NewDiscussionProperties', array('CssClass' => 'Button Action Primary')));
+    echo Gdn_Theme::module('NewDiscussionModule', $this->data('_NewDiscussionProperties', ['CssClass' => 'Button Action Primary']));
     echo '</div>';
 
 } else {

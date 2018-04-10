@@ -3,7 +3,7 @@
  * Dummy class
  *
  * @author Todd Burry <todd@vanillaforums.com>
- * @copyright 2009-2017 Vanilla Forums Inc.
+ * @copyright 2009-2018 Vanilla Forums Inc.
  * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
  * @package Core
  * @since 2.0
@@ -17,19 +17,19 @@
  */
 class Gdn_Dummy {
 
-    public function __call($Name, $Arguments) {
+    public function __call($name, $arguments) {
         return $this;
     }
 
-    public static function __callStatic($Name, $Arguments) {
+    public static function __callStatic($name, $arguments) {
         return self::getInstance();
     }
 
-    public function __get($Name) {
+    public function __get($name) {
         return $this;
     }
 
-    public function __set($Name, $Value) {
+    public function __set($name, $value) {
         return $this;
     }
 

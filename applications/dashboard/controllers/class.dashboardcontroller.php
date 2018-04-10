@@ -2,7 +2,7 @@
 /**
  * Master application controller for Dashboard, extended by most others.
  *
- * @copyright 2009-2017 Vanilla Forums Inc.
+ * @copyright 2009-2018 Vanilla Forums Inc.
  * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
  * @package Dashboard
  * @since 2.0
@@ -43,7 +43,7 @@ class DashboardController extends Gdn_Controller {
         $this->addJsFile('jquery.autosize.min.js');
         $this->addJsFile('global.js');
 
-        if (in_array($this->ControllerName, array('profilecontroller', 'activitycontroller'))) {
+        if (in_array($this->ControllerName, ['profilecontroller', 'activitycontroller'])) {
             $this->addCssFile('style.css');
             $this->addCssFile('vanillicon.css', 'static');
         } else {

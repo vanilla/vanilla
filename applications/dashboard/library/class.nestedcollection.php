@@ -223,7 +223,7 @@ trait NestedCollection {
      * @throws Exception
      */
     public function addDivider($key = '', $cssClass = '', $sort = []) {
-        $divider['key'] = $key;
+        $divider = ['key' => $key];
         if ($sort) {
             $divider['sort'] = $sort;
         }
@@ -293,11 +293,11 @@ trait NestedCollection {
      * @throws Exception
      */
     public function addGroup($text = '', $key = '', $cssClass = '', $sort = [], $modifiers = []) {
-        $group = array(
+        $group = [
             'text' => $text,
             'key' => $key,
             'cssClass' => $cssClass
-        );
+        ];
 
         if ($sort) {
             $group['sort'] = $sort;
@@ -359,11 +359,11 @@ trait NestedCollection {
      * @throws Exception
      */
     public function addLink($text, $url, $key = '', $cssClass = '', $sort = [], $modifiers = [], $disabled = false) {
-        $link = array(
+        $link = [
             'text' => $text,
             'url' => $url,
             'key' => $key,
-        );
+        ];
 
         if ($sort) {
             $link['sort'] = $sort;
@@ -459,7 +459,7 @@ trait NestedCollection {
                 // This is a group.
                 if (!array_key_exists($key_part, $items)) {
                     // The group doesn't exist so lazy-create it.
-                    $items[$key_part] = array('type' => 'group', 'text' => '', 'items' => [], '_sort' => count($items));
+                    $items[$key_part] = ['type' => 'group', 'text' => '', 'items' => [], '_sort' => count($items)];
                 } elseif ($items[$key_part]['type'] !== 'group') {
                     throw new \Exception("$key_part is not a group", 500);
                 } elseif (!array_key_exists('items', $items[$key_part])) {
@@ -663,7 +663,7 @@ trait NestedCollection {
      */
     private function objectToArray($obj, array $blackList = [], array $whiteList = []) {
         if (is_array($obj) || is_object($obj)) {
-            $result = array();
+            $result = [];
             foreach ($obj as $key => $value) {
                 if (!in_array($key, $blackList) && (empty($whiteList) || in_array($key, $whiteList))) {
                     $result[$key] = $this->objectToArray($value);
@@ -718,7 +718,7 @@ trait NestedCollection {
                 $newItems = array_merge($newItems, $this->flattenArray($subItems));
                 if ($this->forceDivider && $index + 1 < $itemslength) {
                     // Add hr after group but not the last one
-                    $newItems[] = array('type' => 'divider');
+                    $newItems[] = ['type' => 'divider'];
                 }
             }
             $index++;

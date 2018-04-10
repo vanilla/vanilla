@@ -34,6 +34,7 @@ class SignInForm extends React.Component<IProps, IState> {
         this.ID = uniqueIDFromPrefix('signInForm');
         this.handleSubmit = this.handleSubmit.bind(this);
         this.handleTextChange = this.handleTextChange.bind(this);
+        this.handleErrors = this.handleErrors.bind(this);
 
         this.state = {
             editable: true,
@@ -52,63 +53,51 @@ class SignInForm extends React.Component<IProps, IState> {
             this.setState({
                 password: value,
                 globalError: null,
-            }, this.checkIfSubmitIsEnabled);
+                passwordErrors: [],
+            });
         } if (type === 'text') {
             this.setState({
                 username: value,
                 globalError: null,
-            }, this.checkIfSubmitIsEnabled);
+                usernameErrors: [],
+            });
         }
     }
 
-    public normalizeErorrs = (e) => {
+    public handleErrors = (e) => {
+        const errors = get(e, 'response.data.errors', []);
+        const generalError = get(e, 'response.data.message', false);
+        const catchAllErrorMessage = t('An error has occured, please try again.');
+        const hasFieldSpecificErrors =  errors.length > 0;
 
-        // Reset Errors
-        this.setState({
+        const newState:any = {
+            editable: true,
             globalError: null,
             passwordErrors: [],
             usernameErrors: []
-        }, () => {
-            logError(e.response);
-            const errors = get(e, 'response.data.errors', []);
-            const generalError = get(e, 'response.data.message', false);
-            const globalErrorMessage = t('An error has occured, please try again.');
-            const hasFieldSpecificErrors =  errors.length > 0;
+        };
 
-            if (generalError || hasFieldSpecificErrors) {
-                if (hasFieldSpecificErrors) { // Field Errors
+        if (generalError || hasFieldSpecificErrors) {
+            if (hasFieldSpecificErrors) { // Field Errors
+                logError('SignInForm Errors', errors);
+                errors.map((error, index) => {
+                    error.timestamp = new Date().getTime(); // Timestamp to make sure state changes, even if the message is the same
+                    const targetError = error.field + 'Errors';
 
-                    const newState = {
-                        editable: true,
-                    };
-
-                    errors.map((error, index) => {
-                        error.timestamp = new Date().getTime(); // Timestamp to make sure state changes, even if the message is the same
-                        const targetError = error.field + 'Errors';
-
-                        if (newState[targetError]) {
-                            newState[targetError] = [...newState[targetError], error];
-                        } else {
-                            newState[targetError] = [];
-                            newState[targetError].push(error);
-                        }
-                    });
-
-                    this.setState(newState);
-                    this.checkIfSubmitIsEnabled();
-
-                } else { // Global message
-                    this.setState({
-                        globalError: generalError,
-                    });
-                }
-            } else { // Something went really wrong. Add default message to tell the user there's a problem.
-                this.setState({
-                    globalError: globalErrorMessage,
+                    if (newState[targetError]) {
+                        newState[targetError] = [...newState[targetError], error];
+                    } else {
+                        newState[targetError] = [];
+                        newState[targetError].push(error);
+                    }
                 });
+            } else { // Global message
+                newState['globalError'] = generalError;
             }
-        });
-
+        } else { // Something went really wrong. Add default message to tell the user there's a problem.
+            newState['globalError'] = catchAllErrorMessage;
+        }
+        this.setState(newState);
     }
 
     public handleSubmit = (event) => {
@@ -124,17 +113,7 @@ class SignInForm extends React.Component<IProps, IState> {
         }).then((r) => {
             window.location.href = get(this, 'props.location.query.target', '/');
         }).catch((e) => {
-            this.setState({
-                editable: true,
-            }, () => {
-                this.normalizeErorrs(e);
-            });
-        });
-    }
-
-    public checkIfSubmitIsEnabled = () => {
-        this.setState({
-            submitEnabled: this.state.editable && this.state.password.length > 0 && this.state.username.length > 0,
+            this.handleErrors(e);
         });
     }
 
@@ -166,7 +145,7 @@ class SignInForm extends React.Component<IProps, IState> {
                     value={this.state.password}
                     onChange={this.handleTextChange}
                 />
-                <ButtonSubmit parentID={this.ID} disabled={this.state.submitEnabled} content={t('Sign In')}/>
+                <ButtonSubmit parentID={this.ID} disabled={!this.state.editable || this.state.password.length == 0 || this.state.username.length === 0} content={t('Sign In')}/>
                 <CreateAnAccountLink/>
             </form>;
         }

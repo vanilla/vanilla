@@ -24,7 +24,6 @@ export interface IInputTextProps extends IComponentID{
 
 interface IState {
     ID: string;
-    errors?: string[];
 }
 
 
@@ -32,16 +31,15 @@ export default class InputTextBlock extends React.Component<IInputTextProps, ISt
     public static defaultProps = {
         value: '',
         disabled: false,
-        type: 'text'
+        type: 'text',
+        errors: []
     };
 
     constructor(props) {
         super(props);
         this.state = {
             ID: uniqueID(props, "inputText"),
-            errors: this.props.errors || [],
         };
-        this.onChange = this.onChange.bind(this);
     }
 
     get labelID():string {
@@ -50,13 +48,6 @@ export default class InputTextBlock extends React.Component<IInputTextProps, ISt
 
     get errorID():string {
         return this.state.ID + "-errors";
-    }
-
-    public onChange(event):any {
-        this.setState({
-            errors: [], // clear errors on text change
-        });
-        this.props.onChange(event);
     }
 
     public render() {
@@ -99,10 +90,10 @@ export default class InputTextBlock extends React.Component<IInputTextProps, ISt
                     aria-invalid={hasErrors}
                     aria-describedby={describedBy}
                     aria-labelledby={this.labelID}
-                    onChange={this.onChange}
+                    onChange={this.props.onChange}
                 />
             </span>
-            <ErrorMessages id={this.errorID} errors={this.state.errors}/>
+            <ErrorMessages id={this.errorID} errors={this.props.errors}/>
         </label>;
     }
 }

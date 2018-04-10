@@ -5,7 +5,7 @@ import {uniqueID, IComponentID} from '@core/Interfaces/componentIDs';
 interface IProps {
     id?: string;
     className?: string;
-    errors?: string[];
+    errors?: any[];
 }
 
 export default class ErrorMessages extends React.Component<IProps> {
@@ -23,7 +23,7 @@ export default class ErrorMessages extends React.Component<IProps> {
                 'inputBlock-errors',
                 this.props.className
             );
-            const errorList = errors.map((error, index) => {
+            const errorList = errors.map((error:any, index) => {
                 return <span key={ index } className="inputBlock-error">{error.message}</span>;
             });
 

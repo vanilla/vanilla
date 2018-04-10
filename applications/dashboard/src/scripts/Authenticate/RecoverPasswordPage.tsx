@@ -43,7 +43,8 @@ export default class RecoverPasswordPage extends React.Component<IComponentID, I
         this.setState({
             email: value,
             globalError: null,
-        }, this.checkIfSubmitIsEnabled);
+            errors: [],
+        });
     }
 
     // Disable button when in submit state
@@ -74,13 +75,6 @@ export default class RecoverPasswordPage extends React.Component<IComponentID, I
         });
     }
 
-
-    public checkIfSubmitIsEnabled = () => {
-        this.setState({
-            submitEnabled: this.state.editable && this.state.email.length > 0,
-        });
-    }
-
     public normalizeErorrs = (e) => {
         // Reset Errors
         this.setState({
@@ -96,6 +90,8 @@ export default class RecoverPasswordPage extends React.Component<IComponentID, I
             if (generalError || hasFieldSpecificErrors) {
                 if (hasFieldSpecificErrors) { // Field Errors
 
+                    logError('SignInForm Errors', errors);
+
                     const newState = {
                         editable: true,
                         errors: []
@@ -107,7 +103,7 @@ export default class RecoverPasswordPage extends React.Component<IComponentID, I
                     });
 
                     this.setState(newState);
-                    this.checkIfSubmitIsEnabled();
+
 
                 } else { // Global message
                     this.setState({
@@ -146,7 +142,7 @@ export default class RecoverPasswordPage extends React.Component<IComponentID, I
                         value={this.state.email}
                         onChange={this.handleTextChange}
                     />
-                    <ButtonSubmit parentID={this.ID} disabled={!this.state.submitEnabled} content={t('Request a new password')}/>
+                    <ButtonSubmit parentID={this.ID} disabled={!this.state.editable || this.state.email.length === 0} content={t('Request a new password')}/>
                 </form>
                 <RememberPasswordLink/>
             </div>;

@@ -118,11 +118,10 @@ class SignInForm extends React.Component<IProps, IState> {
             editable: false
         });
 
-        const formData = new FormData();
-        formData.append('username', this.state.username);
-        formData.append('password', this.state.password);
-
-        apiv2.post('/authenticate/password', formData).then((r) => {
+        apiv2.post('/authenticate/password', {
+            'username': this.state.username,
+            'password': this.state.password,
+        }).then((r) => {
             window.location.href = get(this, 'props.location.query.target', '/');
         }).catch((e) => {
             this.setState({

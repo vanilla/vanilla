@@ -12,7 +12,7 @@ export interface IInputTextProps extends IComponentID{
     inputClassNames?: string;
     type?: string;
     labelID?: string;
-    value?: string;
+    value: string;
     placeholder?: string;
     valid?: boolean;
     descriptionID?: string;
@@ -24,6 +24,7 @@ export interface IInputTextProps extends IComponentID{
 
 interface IState {
     ID: string;
+    errors?: string[];
 }
 
 
@@ -38,7 +39,9 @@ export default class InputTextBlock extends React.Component<IInputTextProps, ISt
         super(props);
         this.state = {
             ID: uniqueID(props, "inputText"),
+            errors: this.props.errors || [],
         };
+        this.onChange = this.onChange.bind(this);
     }
 
     get labelID():string {
@@ -47,6 +50,13 @@ export default class InputTextBlock extends React.Component<IInputTextProps, ISt
 
     get errorID():string {
         return this.state.ID + "-errors";
+    }
+
+    public onChange(event):any {
+        this.setState({
+            errors: [], // clear errors on text change
+        });
+        this.props.onChange(event);
     }
 
     public render() {
@@ -89,10 +99,10 @@ export default class InputTextBlock extends React.Component<IInputTextProps, ISt
                     aria-invalid={hasErrors}
                     aria-describedby={describedBy}
                     aria-labelledby={this.labelID}
-                    onChange={this.props.onChange}
+                    onChange={this.onChange}
                 />
             </span>
-            <ErrorMessages id={this.errorID} errors={this.props.errors}/>
+            <ErrorMessages id={this.errorID} errors={this.state.errors}/>
         </label>;
     }
 }

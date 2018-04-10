@@ -45,19 +45,19 @@ class SignInForm extends React.Component<IProps, IState> {
     }
 
     public handleTextChange = (event) => {
-        const type = event.target.type;
-        const value = event.target.value;
+        const type:string = get(event, 'target.type', '');
+        const value:string = get(event, 'target.value', '');
 
         if (type === 'password') {
             this.setState({
                 password: value,
                 globalError: null,
-            }, this.isSubmitEnabled);
-        } else {
+            }, this.checkIfSubmitIsEnabled);
+        } if (type === 'text') {
             this.setState({
                 username: value,
                 globalError: null,
-            }, this.isSubmitEnabled);
+            }, this.checkIfSubmitIsEnabled);
         }
     }
 
@@ -95,7 +95,7 @@ class SignInForm extends React.Component<IProps, IState> {
                     });
 
                     this.setState(newState);
-                    this.isSubmitEnabled();
+                    this.checkIfSubmitIsEnabled();
 
                 } else { // Global message
                     this.setState({
@@ -132,7 +132,7 @@ class SignInForm extends React.Component<IProps, IState> {
         });
     }
 
-    public isSubmitEnabled = () => {
+    public checkIfSubmitIsEnabled = () => {
         this.setState({
             submitEnabled: this.state.editable && this.state.password.length > 0 && this.state.username.length > 0,
         });

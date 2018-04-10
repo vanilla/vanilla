@@ -83,6 +83,8 @@ class AuthenticateController extends Gdn_Controller {
      * {@inheritdoc}
      */
     public function initialize() {
+        gdn::session()->ensureTransientKey();
+
         // Set up head
         $this->Head = new HeadModule($this);
 

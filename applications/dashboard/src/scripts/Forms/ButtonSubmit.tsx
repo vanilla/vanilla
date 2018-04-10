@@ -3,7 +3,7 @@ import React from 'react';
 import classNames from 'classnames';
 import * as PropTypes from "prop-types";
 import Button from "./Button";
-import {getUniqueID, IComponentID} from '@core/Interfaces/componentIDs';
+import {uniqueID, IComponentID} from '@core/Interfaces/componentIDs';
 
 interface IProps extends IComponentID {
     content: string | Node;
@@ -21,7 +21,7 @@ export default class ButtonSubmit extends React.Component<IProps, IState> {
 
     constructor(props) {
         super(props);
-        this.ID = getUniqueID(props, 'submitButton');
+        this.ID = uniqueID(props, 'submitButton');
         this.state = {
             disabled: props.disabled,
         };

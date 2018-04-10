@@ -2,7 +2,7 @@ import { t } from '@core/application';
 import React from 'react';
 import Paragraph from '../../Forms/Paragraph';
 import Or from '../../Forms/Or';
-import {getUniqueID, IComponentID} from '@core/Interfaces/componentIDs';
+import {uniqueID, IComponentID} from '@core/Interfaces/componentIDs';
 
 interface IProps extends IComponentID {
     includeOr?: boolean;
@@ -21,7 +21,7 @@ export default class SSOMethods extends React.Component<IProps, IState> {
 
     constructor(props) {
         super(props);
-        this.ID = getUniqueID(props, 'SSOMethods', true);
+        this.ID = uniqueID(props, 'SSOMethods', true);
         this.includeOr = props.includeOr || true;
 
         this.state = {

@@ -1,6 +1,6 @@
 import React from 'react';
 import classNames from 'classnames';
-import {getUniqueID, IComponentID} from '@core/Interfaces/componentIDs';
+import {uniqueID, IComponentID} from '@core/Interfaces/componentIDs';
 
 interface IProps {
     id?: string;
@@ -13,7 +13,7 @@ export default class ErrorMessages extends React.Component<IProps> {
 
     constructor(props) {
         super(props);
-        this.ID = getUniqueID(props, 'errorMessages', true);
+        this.ID = uniqueID(props, 'errorMessages', true);
     }
 
     public render() {

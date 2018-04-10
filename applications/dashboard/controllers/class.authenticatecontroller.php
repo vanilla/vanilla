@@ -149,7 +149,7 @@ class AuthenticateController extends Gdn_Controller {
     /**
      * Sign In Page
      */
-    public function signin() {
+    public function password() {
         $this->renderReact();
     }
 

@@ -3,7 +3,7 @@ import React from 'react';
 import classNames from 'classnames';
 import ErrorMessages from "./ErrorMessages";
 import Paragraph from "./Paragraph";
-import {getUniqueID, IComponentID} from '@core/Interfaces/componentIDs';
+import {uniqueID, IComponentID} from '@core/Interfaces/componentIDs';
 
 export interface IInputTextProps extends IComponentID{
     className?: string;
@@ -19,34 +19,35 @@ export interface IInputTextProps extends IComponentID{
     required?: boolean;
     errors?: string[];
     disabled?: boolean;
+    onChange?: any;
 }
 
 interface IState {
-    disabled: boolean;
-    valid?: boolean;
-    value?: string;
-    errors?: string[];
+    ID: string;
 }
 
+
 export default class InputTextBlock extends React.Component<IInputTextProps, IState> {
-    public ID: string;
-    public errorID: string;
-    public labelID: string;
-    public type: string;
+    public static defaultProps = {
+        value: '',
+        disabled: false,
+        type: 'text'
+    };
 
     constructor(props) {
         super(props);
-        this.ID = getUniqueID(props, "inputText");
-        this.labelID = this.ID + "-label";
-        this.errorID = this.ID + "-errors";
-        this.type = props.type || 'text';
         this.state = {
-            value: props.value || '',
-            disabled: props.disabled || false,
-            errors: props.errors,
+            ID: uniqueID(props, "inputText"),
         };
     }
 
+    get labelID():string {
+        return this.state.ID + "-label";
+    }
+
+    get errorID():string {
+        return this.state.ID + "-errors";
+    }
 
     public render() {
         const componentClasses = classNames(
@@ -61,7 +62,7 @@ export default class InputTextBlock extends React.Component<IInputTextProps, ISt
             this.props.inputClassNames
         );
 
-        const hasErrors = this.state.errors && this.state.errors.length > 0;
+        const hasErrors = this.props.errors && this.props.errors.length > 0;
 
         let describedBy;
         if (hasErrors) {
@@ -78,18 +79,20 @@ export default class InputTextBlock extends React.Component<IInputTextProps, ISt
 
             <span className="inputBlock-inputWrap">
                 <input
-                    id={this.ID}
+                    id={this.state.ID}
                     className={inputClasses}
-                    type={this.type}
-                    disabled={this.state.disabled}
+                    value={this.props.value}
+                    type={this.props.type}
+                    disabled={this.props.disabled}
                     required={this.props.required}
                     placeholder={this.props.placeholder}
                     aria-invalid={hasErrors}
                     aria-describedby={describedBy}
                     aria-labelledby={this.labelID}
+                    onChange={this.props.onChange}
                 />
             </span>
-            <ErrorMessages id={this.errorID} errors={this.state.errors}/>
+            <ErrorMessages id={this.errorID} errors={this.props.errors}/>
         </label>;
     }
 }

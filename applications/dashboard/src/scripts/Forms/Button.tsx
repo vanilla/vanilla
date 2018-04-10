@@ -1,7 +1,7 @@
 import { t } from '@core/application';
 import React from 'react';
 import classNames from 'classnames';
-import { getUniqueID, IComponentID } from '@core/Interfaces/componentIDs';
+import { uniqueID, IComponentID } from '@core/Interfaces/componentIDs';
 
 interface IProps extends IComponentID {
     className?: string;
@@ -20,7 +20,7 @@ export default class Button extends React.Component<IProps, IState> {
 
     constructor(props) {
         super(props);
-        this.ID = getUniqueID(props, 'button');
+        this.ID = uniqueID(props, 'button');
         this.type = props.type || 'button';
         this.state = {
             disabled: props.disabled,

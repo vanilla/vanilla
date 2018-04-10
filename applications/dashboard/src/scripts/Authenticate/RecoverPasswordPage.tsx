@@ -4,7 +4,7 @@ import { log } from "@core/utility";
 import DocumentTitle from '@core/Components/DocumentTitle';
 import { Link } from 'react-router-dom';
 import React from 'react';
-import { getUniqueIDFromPrefix, IComponentID } from '@core/Interfaces/componentIDs';
+import { uniqueIDFromPrefix, IComponentID } from '@core/Interfaces/componentIDs';
 import ButtonSubmit from "../Forms/ButtonSubmit";
 import Paragraph from "../Forms/Paragraph";
 import InputTextBlock from "../Forms/InputTextBlock";
@@ -29,7 +29,7 @@ export default class RecoverPasswordPage extends React.Component<IProps, IState>
 
     constructor(props) {
         super(props);
-        this.ID = getUniqueIDFromPrefix('RecoverPasswordPage');
+        this.ID = uniqueIDFromPrefix('RecoverPasswordPage');
         this.pageTitleID = this.ID + '-pageTitle';
 
         this.state = {

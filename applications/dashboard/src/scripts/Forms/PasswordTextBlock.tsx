@@ -2,7 +2,7 @@ import React from 'react';
 import classNames from 'classnames';
 import {IInputTextProps, default as InputTextBlock} from "./InputTextBlock";
 import { t } from '@core/application';
-import {getUniqueID, IComponentID} from '@core/Interfaces/componentIDs';
+import {uniqueID, IComponentID} from '@core/Interfaces/componentIDs';
 
 export default class PasswordTextBlock extends React.Component<IInputTextProps> {
     private type: string;

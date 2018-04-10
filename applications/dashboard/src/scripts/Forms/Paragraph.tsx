@@ -1,10 +1,10 @@
 import React from 'react';
 import classNames from 'classnames';
-import {getUniqueID, IComponentID} from '@core/Interfaces/componentIDs';
+import {uniqueID, IComponentID} from '@core/Interfaces/componentIDs';
 
 interface IProps extends IComponentID {
     className?: string;
-    hasError?: boolean;
+    isError?: boolean;
     content: string | Node | null | undefined;
 }
 
@@ -13,16 +13,26 @@ export default class Paragraph extends React.Component<IProps> {
 
     constructor(props) {
         super(props);
-        this.ID = getUniqueID(props, 'Paragraph', true);
+        this.ID = uniqueID(props, 'Paragraph', true);
     }
 
     public render() {
         if (this.props.content) {
             const componentClasses = classNames(
-                {'isError' : this.props.hasError},
+                {'isError' : this.props.isError},
                 this.props.className
             );
-            return <p id={this.props.ID} className={componentClasses}>{this.props.content}</p>;
+
+            let accessibilityProps = {};
+
+            if (this.props.isError) {
+                accessibilityProps = {
+                    'aria-live': 'assertive',
+                    'role': 'alert',
+                };
+            }
+
+            return <p id={this.props.ID} className={componentClasses} {...accessibilityProps}>{this.props.content}</p>;
         } else {
             return null;
         }

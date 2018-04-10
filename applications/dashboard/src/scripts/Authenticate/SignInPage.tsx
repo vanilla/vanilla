@@ -5,7 +5,7 @@ import DocumentTitle from '@core/Components/DocumentTitle';
 import SignInForm from "./components/SignInForm";
 import CreateAnAccountLink from "./components/CreateAnAccountLink";
 import SSOMethods from "./components/SSOMethods";
-import { getUniqueIDFromPrefix } from '@core/Interfaces/componentIDs';
+import { uniqueIDFromPrefix } from '@core/Interfaces/componentIDs';
 import apiv2 from "@core/apiv2";
 
 interface IState {
@@ -22,7 +22,7 @@ export default class SignInPage extends React.Component<{}, IState> {
 
     constructor(props) {
         super(props);
-        this.ID = getUniqueIDFromPrefix('SignInPage');
+        this.ID = uniqueIDFromPrefix('SignInPage');
         this.pageTitleID = this.ID + '-pageTitle';
         this.state = {
             loginFormActive: false,
@@ -35,24 +35,24 @@ export default class SignInPage extends React.Component<{}, IState> {
         apiv2.get('/authenticate/authenticators')
             .then((response) => {
                 log('RecoverPasswordPage - authenticators response: ', response);
-                if (response.statusText === "OK") {
-                    if (response.data) {
-                        const externalMethods:any[] = [];
-                        response.data.map((method, index) => {
-                            log('SignInForm method: ', method);
-                            if (method.authenticatorID === 'password') {
-                                this.setState({
-                                    passwordAuthenticator: method,
-                                    loginFormActive: true,
-                                });
-                            } else {
-                                externalMethods.push(method);
-                            }
-                        });
-                        this.setState({
-                            ssoMethods: externalMethods,
-                        });
-                    }
+                if (response.data) {
+                    const externalMethods:any[] = [];
+                    response.data.map((method, index) => {
+                        log('SignInForm method: ', method);
+                        if (method.authenticatorID === 'password') {
+                            this.setState({
+                                passwordAuthenticator: method,
+                                loginFormActive: true,
+                            });
+                        } else {
+                            externalMethods.push(method);
+                        }
+                    });
+                    this.setState({
+                        ssoMethods: externalMethods,
+                    });
+                } else {
+                    logError('Error in RecoverPasswordPage - no response.data');
                 }
             }).catch((error) => {
                 logError('Error in RecoverPasswordPage - authenticators response: ', error);

@@ -5,11 +5,11 @@ export interface IComponentID {
     ID?: string;
 }
 
-export function getUniqueIDFromPrefix(uniqueSuffix:string) {
+export function uniqueIDFromPrefix(uniqueSuffix:string) {
     return uniqueSuffix + uniqueid() as string;
 }
 
-export function getUniqueID(props:IComponentID, uniqueSuffix:string, allowNoID?:boolean|undefined):any {
+export function uniqueID(props:IComponentID, uniqueSuffix:string, allowNoID?:boolean|undefined):any {
     let id:any = null;
 
     if (!allowNoID) {
@@ -25,5 +25,4 @@ export function getUniqueID(props:IComponentID, uniqueSuffix:string, allowNoID?:
     }
 
     return id;
-
 }

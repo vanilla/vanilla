@@ -209,9 +209,11 @@ export function stripFormattingFromFirstBlot(quill: Quill) {
  * Currently this means:
  * - LineBlot -> WrapperBlot
  */
-export function normalizeBlotIntoBlock(blot: Blot) {
-    if (blot instanceof LineBlot) {
-        return blot.getWrapper(true);
+export function normalizeBlotIntoBlock(blot: Blot): Blot {
+    if ((blot as any).getWrapper) {
+        return (blot as any).getWrapper(true);
+    } else {
+        return blot;
     }
 }
 

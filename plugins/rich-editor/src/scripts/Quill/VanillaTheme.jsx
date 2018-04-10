@@ -49,11 +49,12 @@ export default class VanillaTheme extends ThemeBase {
             ...this.options.modules.keyboard.bindings,
             ...keyboardBindings.bindings,
         };
-
-        this.quill.embed = this.addModule("embed/insertion");
     }
 
     init() {
+        this.quill.embed = this.addModule("embed/insertion");
+        this.quill.embedFocus = this.addModule("embed/focus");
+
         // Mount react components
         this.mountToolbar();
         this.mountEmojiMenu();

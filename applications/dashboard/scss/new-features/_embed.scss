@@ -20,6 +20,16 @@ $embed-spacing: 6px !default;
 .embed {
     display: block;
     user-select: none;
+    transition: 0.2s ease border;
+    border: 2px transparent solid;
+
+    &:hover {
+        border-color: rgba(#0291DB, 0.5);
+    }
+
+    &:focus {
+        border-color: #0291DB;
+    }
 }
 
 .embedLoader-icon {

@@ -32,6 +32,7 @@ import CodeBlockBlot from "./Blots/Blocks/CodeBlockBlot";
 
 // Custom Modules/Themes
 import VanillaTheme from "./VanillaTheme";
+import EmbedFocusModule from "./EmbedFocusModule";
 import EmbedInsertionModule from "./EmbedInsertionModule";
 
 Quill.register({
@@ -64,6 +65,7 @@ Quill.register({
     'formats/indent': Indent,
     'themes/vanilla': VanillaTheme,
     'modules/embed/insertion': EmbedInsertionModule,
+    'modules/embed/focus': EmbedFocusModule,
 }, true);
 
 export default Quill;

@@ -934,6 +934,16 @@ body.Categories.isMobile .PageControls.Top {
 .embed {
   display: block;
   user-select: none;
+  transition: 0.2s ease border;
+  border: 2px transparent solid;
+}
+
+.embed:hover {
+  border-color: rgba(2, 145, 219, 0.5);
+}
+
+.embed:focus {
+  border-color: #0291DB;
 }
 
 .embedLoader-icon {

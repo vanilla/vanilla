@@ -102,15 +102,15 @@ const delegatedEventListeners = {};
 export function delegateEvent(
     eventName: string,
     filterSelector: string,
-    callback: () => void,
-    scopeSelector?: string
+    callback: (event: Event, triggeringElement: HTMLElement) => boolean | void,
+    scopeSelector?: string | HTMLElement
 ): string | undefined {
     let functionKey = eventName + filterSelector + callback.toString();
 
     /** @type {Document | Element} */
     let scope;
 
-    if (scopeSelector) {
+    if (typeof scopeSelector === "string") {
         scope = document.querySelector(scopeSelector);
 
         if (!scope) {
@@ -118,6 +118,8 @@ export function delegateEvent(
         } else {
             functionKey += scopeSelector;
         }
+    } else if (scopeSelector instanceof HTMLElement) {
+        scope = scopeSelector;
     } else {
         scope = document;
     }
@@ -132,7 +134,7 @@ export function delegateEvent(
             if (match) {
 
                 // Call the callback with the matching element as the context.
-                callback.call(match, event);
+                return callback.call(match, event, match);
             }
         };
 

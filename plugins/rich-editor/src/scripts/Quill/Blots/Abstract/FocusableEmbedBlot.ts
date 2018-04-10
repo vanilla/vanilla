@@ -10,6 +10,11 @@ export default class FocusableEmbedBlot extends BlockEmbed {
 
     public domNode: HTMLElement;
 
+    constructor(domNode) {
+        super(domNode);
+        this.domNode.setAttribute("contenteditable", false);
+    }
+
     public focus() {
         this.domNode.focus();
     }

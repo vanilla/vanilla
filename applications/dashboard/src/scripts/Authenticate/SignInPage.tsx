@@ -9,10 +9,11 @@ import { getUniqueIDFromPrefix } from '@core/Interfaces/componentIDs';
 import apiv2 from "@core/apiv2";
 
 interface IState {
-    editable: boolean;
+    loginFormActive: boolean;
     errors?: string[];
     redirectTo?: string;
     ssoMethods?: any[];
+    passwordAuthenticator?: any;
 }
 
 export default class SignInPage extends React.Component<{}, IState> {
@@ -24,7 +25,7 @@ export default class SignInPage extends React.Component<{}, IState> {
         this.ID = getUniqueIDFromPrefix('SignInPage');
         this.pageTitleID = this.ID + '-pageTitle';
         this.state = {
-            editable: false,
+            loginFormActive: false,
             errors: [],
         };
     }
@@ -35,10 +36,23 @@ export default class SignInPage extends React.Component<{}, IState> {
             .then((response) => {
                 log('RecoverPasswordPage - authenticators response: ', response);
                 if (response.statusText === "OK") {
-                    this.setState({
-                        ssoMethods: response.data,
-                        editable: true,
-                    });
+                    if (response.data) {
+                        const externalMethods:any[] = [];
+                        response.data.map((method, index) => {
+                            log('SignInForm method: ', method);
+                            if (method.authenticatorID === 'password') {
+                                this.setState({
+                                    passwordAuthenticator: method,
+                                    loginFormActive: true,
+                                });
+                            } else {
+                                externalMethods.push(method);
+                            }
+                        });
+                        this.setState({
+                            ssoMethods: externalMethods,
+                        });
+                    }
                 }
             }).catch((error) => {
                 logError('Error in RecoverPasswordPage - authenticators response: ', error);
@@ -52,8 +66,7 @@ export default class SignInPage extends React.Component<{}, IState> {
         return <div id={this.ID} className="authenticateUserCol">
             {pageTitle}
             <SSOMethods parentID={this.ID} ssoMethods={this.state.ssoMethods} />
-            <SignInForm parentID={this.ID} ssoMethods={this.state.ssoMethods}/>
-            <CreateAnAccountLink/>
+            <SignInForm parentID={this.ID} passwordAuthenticator={this.state.passwordAuthenticator}/>
         </div>;
     }
 }

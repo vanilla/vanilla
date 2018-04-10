@@ -7,11 +7,12 @@ import InputTextBlock from "../../Forms/InputTextBlock";
 import PasswordTextBlock from "../../Forms/PasswordTextBlock";
 import ButtonSubmit from "../../Forms/ButtonSubmit";
 import {getUniqueID} from '@core/Interfaces/componentIDs';
+import CreateAnAccountLink from "./CreateAnAccountLink";
 
 interface IProps {
     editable?: boolean;
     errors?: string[];
-    ssoMethods?: any[];
+    passwordAuthenticator?: any;
 }
 
 interface IState {
@@ -19,13 +20,10 @@ interface IState {
     errors?: string[];
     redirectTo?: string;
     active: boolean;
-    passwordAuthenticator?: any[];
 }
 
 class SignInForm extends React.Component<IProps, IState> {
-    public passwordAuthenticator: any[];
     public ID: string;
-
 
     constructor(props) {
         super(props);
@@ -35,13 +33,6 @@ class SignInForm extends React.Component<IProps, IState> {
             errors: props.errors || [],
             active: false
         };
-
-        if (props.ssoMethods) {
-            props.ssoMethods.map((method, index) => {
-                window.console.log("SignInForm method: ", method);
-                // if matches passwordAuthenticator, set as passwordAuthenticator
-            });
-        }
     }
 
     // // Disable button when in submit state
@@ -72,23 +63,29 @@ class SignInForm extends React.Component<IProps, IState> {
 
 
     public render() {
-        if (this.state.redirectTo) {
-            return <BrowserRouter>
-                <Route path={this.state.redirectTo} component={SignInForm} />
-            </BrowserRouter>;
+        if (this.props.passwordAuthenticator) {
+            if (this.state.redirectTo) {
+                return <BrowserRouter>
+                    <Route path={this.state.redirectTo} component={SignInForm} />
+                </BrowserRouter>;
+            } else {
+                window.console.log("passwordAuthenticator: ", this.props.passwordAuthenticator);
+                return <form className="signInForm" method="post" action={this.props.passwordAuthenticator.signInUrl}>
+                    <InputTextBlock
+                        parentID={this.ID}
+                        label={t('Email/Username')}
+                        placeholder={t('Enter Username')}
+                        required={true}
+                        disabled={!this.state.editable}
+                        errors={this.state.errors}
+                    />
+                    <PasswordTextBlock parentID={this.ID} disabled={!this.state.editable} label={t('Password')} placeholder={t('Enter Password')} required={true} errors={this.state.errors}/>
+                    <ButtonSubmit parentID={this.ID} disabled={!this.state.editable} content={t('Sign In')}/>
+                    <CreateAnAccountLink link={this.props.passwordAuthenticator.registerUrl}/>
+                </form>;
+            }
         } else {
-            return <form className="signInForm">
-
-                <InputTextBlock
-                    parentID={this.ID}
-                    label={t('Email/Username')}
-                    placeholder={t('Enter Username')}
-                    required={true}
-                    errors={this.state.errors}
-                />
-                <PasswordTextBlock parentID={this.ID} label={t('Password')} placeholder={t('Enter Password')} required={true} errors={this.state.errors}/>
-                <ButtonSubmit parentID={this.ID} content={t('Sign In')}/>
-            </form>;
+            return null;
         }
     }
 }

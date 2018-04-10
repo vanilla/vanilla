@@ -34,6 +34,7 @@ import CodeBlockBlot from "./Blots/Blocks/CodeBlockBlot";
 import VanillaTheme from "./VanillaTheme";
 import EmbedFocusModule from "./EmbedFocusModule";
 import EmbedInsertionModule from "./EmbedInsertionModule";
+import HistoryModule from "./HistoryModule";
 
 Quill.register({
     // Block formats
@@ -66,6 +67,7 @@ Quill.register({
     'themes/vanilla': VanillaTheme,
     'modules/embed/insertion': EmbedInsertionModule,
     'modules/embed/focus': EmbedFocusModule,
+    'modules/history': HistoryModule,
 }, true);
 
 export default Quill;

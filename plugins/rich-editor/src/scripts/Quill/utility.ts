@@ -240,3 +240,37 @@ export function insertNewLineAfterBlotAndTrim(quill, range: RangeStatic, deleteA
     quill.updateContents(deleteDelta, Emitter.sources.USER);
     quill.setSelection(positionUpToPreviousNewline - deleteAmount, Emitter.sources.USER);
 }
+
+/**
+ * Insert a newline at the end of the scroll. This is done through a delta like this because otherwise it gets optimized away :(
+ *
+ * @param quill - The quill instance.
+ */
+export function insertNewLineAtEndOfScroll(quill: Quill) {
+    // const index = quill.
+    const newContents = [
+        ...(quill.getContents().ops || []),
+        {
+            insert: "\n",
+        },
+    ];
+    quill.setContents(newContents);
+    quill.setSelection(quill.scroll.length(), 0);
+}
+
+/**
+ * Insert a newline at the start of the scroll. This is done through a delta like this because otherwise it gets optimized away :(
+ *
+ * @param quill - The quill instance.
+ */
+export function insertNewLineAtStartOfScroll(quill: Quill) {
+    // const index = quill.
+    const newContents = [
+        {
+            insert: "\n",
+        },
+        ...(quill.getContents().ops || []),
+    ];
+    quill.setContents(newContents);
+    quill.setSelection(0, 0);
+}

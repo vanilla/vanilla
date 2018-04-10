@@ -11,10 +11,13 @@ import Emitter from "quill/core/emitter";
 import {
     isBlotFirstInScroll,
     stripFormattingFromFirstBlot,
-    insertNewLineAfterBlotAndTrim
+    insertNewLineAfterBlotAndTrim,
+    insertNewLineAtEndOfScroll,
+    insertNewLineAtStartOfScroll,
 } from "./utility";
 import LineBlot from "./Blots/Abstract/LineBlot";
 import CodeBlockBlot from "./Blots/Blocks/CodeBlockBlot";
+import FocusableEmbedBlot from "./Blots/Abstract/FocusableEmbedBlot";
 import Parchment from "parchment";
 
 export default class KeyboardBindings {
@@ -296,7 +299,8 @@ export default class KeyboardBindings {
         const isFirstLineSelected = selection.index === 0;
         const selectionIsEntireScroll = isFirstLineSelected;
         const blotMatches = line instanceof LineBlot
-            || line instanceof CodeBlockBlot;
+            || line instanceof CodeBlockBlot
+            || line instanceof FocusableEmbedBlot;
 
         if ((rangeStartsBeforeSelection || rangeEndsAfterSelection || selectionIsEntireScroll) && blotMatches) {
             let delta = new Delta();
@@ -328,14 +332,7 @@ export default class KeyboardBindings {
         const cursorAtFirstPosition = range.index === 0;
 
         if (cursorAtFirstPosition) {
-            // const index = quill.
-            const newContents = [
-                {
-                    insert: "\n",
-                },
-                ...(this.quill.getContents().ops || [])
-            ];
-            this.quill.setContents(newContents);
+            insertNewLineAtStartOfScroll(this.quill);
         }
 
         return true;
@@ -351,15 +348,7 @@ export default class KeyboardBindings {
     private insertNewlineAfterRange(range: RangeStatic) {
         const isAtLastPosition = range.index + 1 === this.quill.scroll.length();
         if (isAtLastPosition) {
-            // const index = quill.
-            const newContents = [
-                ...(this.quill.getContents().ops || []),
-                {
-                    insert: "\n",
-                },
-            ];
-            this.quill.setContents(newContents);
-            this.quill.setSelection(range.index + 1, 0);
+            insertNewLineAtEndOfScroll(this.quill);
         }
 
         return true;

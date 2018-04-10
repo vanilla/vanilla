@@ -23,14 +23,37 @@ export default class ImageBlot extends FocusableEmbedBlot {
         image.classList.add('embedImage-img');
         image.setAttribute('src', data.url);
         image.setAttribute('alt', data.alt || '');
+        image.setAttribute("tabindex", -1);
 
         node.appendChild(image);
-
-        setData(node, "data", data);
         return node;
     }
 
     public static value(node) {
-        return getData(node, "data");
+        const image = node.querySelector(".embedImage-img");
+
+        if (image instanceof HTMLElement) {
+            return {
+                url: image.getAttribute("src"),
+                alt: image.getAttribute("alt") || "",
+            };
+        }
+    }
+
+    private imageElement?: HTMLElement;
+
+    constructor(domNode) {
+        super(domNode);
+        this.imageElement = domNode.querySelector(".embedImage-img");
+    }
+
+    public focus() {
+        if (this.imageElement) {
+            console.log("focus");
+            console.log(this.imageElement);
+            this.imageElement.focus();
+        } else {
+            console.log("Focus failed");
+        }
     }
 }

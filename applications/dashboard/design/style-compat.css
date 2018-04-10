@@ -934,16 +934,6 @@ body.Categories.isMobile .PageControls.Top {
 .embed {
   display: block;
   user-select: none;
-  transition: 0.2s ease border;
-  border: 2px transparent solid;
-}
-
-.embed:hover {
-  border-color: rgba(2, 145, 219, 0.5);
-}
-
-.embed:focus {
-  border-color: #0291DB;
 }
 
 .embedLoader-icon {
@@ -1072,6 +1062,19 @@ body.Categories.isMobile .PageControls.Top {
   margin: auto;
 }
 
+.embedImage-img {
+  transition: 0.2s ease border;
+  border: 2px transparent solid;
+}
+
+.embedImage-img:hover {
+  border-color: rgba(2, 145, 219, 0.5);
+}
+
+.embedImage-img:focus {
+  border-color: #0291DB;
+}
+
 .embedVideo {
   position: relative;
   display: block;
@@ -1153,11 +1156,21 @@ body.Categories.isMobile .PageControls.Top {
   display: block;
   background: #ffffff;
   box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.3);
+  transition: 0.2s ease border;
+  border: 2px transparent solid;
 }
 
 .embedLink, .embedLink:hover, .embedLink:focus {
   color: inherit;
   text-decoration: none !important;
+}
+
+.embedLink:hover {
+  border-color: rgba(2, 145, 219, 0.5);
+}
+
+.embedLink:focus {
+  border-color: #0291DB;
 }
 
 .embedLink-body {

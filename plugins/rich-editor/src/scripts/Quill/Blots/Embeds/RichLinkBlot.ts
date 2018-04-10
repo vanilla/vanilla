@@ -21,6 +21,7 @@ export default class RichLinkBlot extends FocusableEmbedBlot {
         node.classList.add('embed-link');
         node.classList.add('embedLink');
         node.setAttribute('href', this.sanitize(data.url));
+        node.setAttribute("tabindex", -1);
 
         node.setAttribute('target', '_blank');
         node.setAttribute('rel', 'noopener noreferrer');
@@ -37,7 +38,7 @@ export default class RichLinkBlot extends FocusableEmbedBlot {
             userPhoto = document.createElement('span');
             userPhoto.classList.add('embedLink-userPhoto');
             userPhoto.classList.add('PhotoWrap');
-            userPhoto.innerHTML = '<img src="' + data.userPhoto + '" alt="' + data.userName + '" class="ProfilePhoto ProfilePhotoMedium" />';
+            userPhoto.innerHTML = '<img src="' + data.userPhoto + '" alt="' + data.userName + '" class="ProfilePhoto ProfilePhotoMedium" tabindex=-1 />';
         }
 
         let source;

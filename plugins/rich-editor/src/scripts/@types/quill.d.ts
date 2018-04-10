@@ -1,14 +1,12 @@
+/**
+ * @author Adam (charrondev) Charron <adam.c@vanillaforums.com>
+ * @copyright 2009-2018 Vanilla Forums Inc.
+ * @license https://opensource.org/licenses/GPL-2.0 GPL-2.0
+ */
+
 /* tslint:disable */
 
 declare module "quill/core" {
-    // Type definitions for Quill 1.3
-    // Project: https://github.com/quilljs/quill/
-    // Definitions by: Sumit <https://github.com/sumitkm>
-    //                 Guillaume <https://github.com/guillaume-ro-fr>
-    //                 James Garbutt <https://github.com/43081j>
-    // Definitions: https://github.com/DefinitelyTyped/DefinitelyTyped
-
-    // import { Parent } from 'parchment/dist/src/blot/abstract/blot';
     import Blot from "parchment/dist/src/blot/abstract/shadow";
     import Container from 'parchment/dist/src/blot/abstract/container';
 
@@ -237,6 +235,11 @@ declare module "quill/blots/container" {
     export default Container;
 }
 
+declare module "quill/blots/scroll" {
+    import Scroll from "parchment/dist/src/blot/scroll";
+    export default Scroll;
+}
+
 declare module "quill/blots/embed" {
     import Embed from "parchment/dist/src/blot/embed";
     export default Embed;
@@ -251,7 +254,7 @@ declare module "quill/core/emitter";
 declare module "quill/core/module" {
     import Quill from "quill/core";
     export default class Module {
-        constructor(quill: Quill, options: object)
+        constructor(public quill: Quill, public options: object)
     }
 }
 
@@ -265,7 +268,14 @@ declare module "quill/formats/code" {
 declare module "quill/core/theme";
 declare module "quill/modules/clipboard";
 declare module "quill/modules/formula";
-declare module "quill/modules/history";
+declare module "quill/modules/history" {
+    import Module from "quill/core/module";
+
+    export default class History extends Module {
+        public undo(): void;
+        public redo(): void;
+    }
+};
 declare module "quill/modules/keyboard" {
     import Module from "quill/core/module";
     import { RangeStatic } from "quill";

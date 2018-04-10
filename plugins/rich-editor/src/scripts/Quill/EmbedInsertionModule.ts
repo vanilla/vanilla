@@ -31,13 +31,12 @@ interface IMediaScrapeResult {
  */
 export default class EmbedInsertionModule extends Module {
 
-    private quill: Quill;
     private currentUploads: Map<File | string, Blot> = new Map();
     private lastSelection: RangeStatic = { index: 0, length: 0 };
     private pauseSelectionTracking = false;
     private fileUploader: FileUploader;
 
-    constructor(quill, options = {}) {
+    constructor(public quill: Quill, options = {}) {
         super(quill, options);
         this.quill = quill;
         this.setupImageUploads();

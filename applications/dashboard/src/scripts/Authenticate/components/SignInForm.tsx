@@ -9,7 +9,7 @@ import ButtonSubmit from "../../Forms/ButtonSubmit";
 import { uniqueIDFromPrefix } from '@core/Interfaces/componentIDs';
 import CreateAnAccountLink from "./CreateAnAccountLink";
 import Paragraph from "../../Forms/Paragraph";
-import { get } from "lodash/get";
+import get from "lodash/get";
 
 interface IProps {
     location?: any;
@@ -22,7 +22,7 @@ interface IState {
     password: string;
     passwordErrors?: string[];
     redirectTo?: string | null;
-    genericError?: string | null;
+    globalError?: string | null;
     submitEnabled: boolean;
 }
 
@@ -51,50 +51,64 @@ class SignInForm extends React.Component<IProps, IState> {
         if (type === 'password') {
             this.setState({
                 password: value,
-                genericError: null,
+                globalError: null,
             }, this.isSubmitEnabled);
         } else {
             this.setState({
                 username: value,
-                genericError: null,
+                globalError: null,
             }, this.isSubmitEnabled);
         }
     }
 
-    public normalizeErorrs = (errors) => {
-        log("Errors: ", errors);
+    public normalizeErorrs = (e) => {
 
         // Reset Errors
         this.setState({
-            genericError: null,
+            globalError: null,
             passwordErrors: [],
             usernameErrors: []
-        });
+        }, () => {
+            logError(e.response);
+            const errors = get(e, 'response.data.errors', []);
+            const generalError = get(e, 'response.data.message', false);
+            const globalErrorMessage = t('An error has occured, please try again.');
+            const hasFieldSpecificErrors =  errors.length > 0;
 
-        // if ()
-        // field: "username", code: "missingfield", "message": "password is required"
-        // message
+            if (generalError || hasFieldSpecificErrors) {
+                if (hasFieldSpecificErrors) { // Field Errors
 
-        const genericErrorMessage = t('An error has occured, please try again.');
-        const hasFieldSpecificErrors = errors && errors.errors && errors.errors.length > 0;
-        const hasGenericError = errors && errors.message;
+                    const newState = {
+                        editable: true,
+                    };
 
-        if (hasGenericError || hasFieldSpecificErrors) {
-            if (hasFieldSpecificErrors) { // Field Errors
-                errors.errors.map((error, index) => {
-                    error.timestamp = new Date().getTime(); // Timestamp to make sure state changes, even if the message is the same
-                    this.state[error.field + 'Errors'].push(error);
-                });
-            } else { // Global message
+                    errors.map((error, index) => {
+                        error.timestamp = new Date().getTime(); // Timestamp to make sure state changes, even if the message is the same
+                        const targetError = error.field + 'Errors';
+
+                        if (newState[targetError]) {
+                            newState[targetError] = [...newState[targetError], error];
+                        } else {
+                            newState[targetError] = [];
+                            newState[targetError].push(error);
+                        }
+                    });
+
+                    this.setState(newState);
+                    this.isSubmitEnabled();
+
+                } else { // Global message
+                    this.setState({
+                        globalError: generalError,
+                    });
+                }
+            } else { // Something went really wrong. Add default message to tell the user there's a problem.
                 this.setState({
-                    genericError: errors.message,
+                    globalError: globalErrorMessage,
                 });
             }
-        } else { // Something went really wrong. Add default message to tell the user there's a problem.
-            this.setState({
-                genericError: genericErrorMessage,
-            });
-        }
+        });
+
     }
 
     public handleSubmit = (event) => {
@@ -104,17 +118,17 @@ class SignInForm extends React.Component<IProps, IState> {
             editable: false
         });
 
-        apiv2.post('/authenticate/password', {
-            username: this.state.username,
-            password: this.state.password,
-        }).then((r) => {
+        const formData = new FormData();
+        formData.append('username', this.state.username);
+        formData.append('password', this.state.password);
+
+        apiv2.post('/authenticate/password', formData).then((r) => {
             window.location.href = get(this, 'props.location.query.target', '/');
         }).catch((e) => {
-            logError("Sign In Form error loggin in: ", e.response.data);
             this.setState({
                 editable: true,
             }, () => {
-                this.normalizeErorrs(e.errors);
+                this.normalizeErorrs(e);
             });
         });
     }
@@ -132,7 +146,7 @@ class SignInForm extends React.Component<IProps, IState> {
             </BrowserRouter>;
         } else {
             return <form id={this.ID} className="signInForm" method="post" onSubmit={this.handleSubmit} noValidate>
-                <Paragraph parentID={this.ID} className="authenticateUser-paragraph" content={this.state.genericError} isError={true} />
+                <Paragraph parentID={this.ID} className="authenticateUser-paragraph" content={this.state.globalError} isError={true} />
                 <InputTextBlock
                     parentID={this.ID}
                     label={t('Email/Username')}

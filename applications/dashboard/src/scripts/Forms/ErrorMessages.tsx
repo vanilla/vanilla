@@ -24,7 +24,7 @@ export default class ErrorMessages extends React.Component<IProps> {
                 this.props.className
             );
             const errorList = errors.map((error, index) => {
-                return <span key={ index } className="inputBlock-error">{error}</span>;
+                return <span key={ index } className="inputBlock-error">{error.message}</span>;
             });
 
             return <span id={this.ID} className={componentClasses}>

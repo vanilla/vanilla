@@ -180,7 +180,7 @@ function writeAddonMedia($addonName, $addonInfo, $isEnabled, $addonType, $filter
         $label = sprintf(t('Enable %s'), $screenName);
     }
 
-    $url = '/settings/'.$addonType.'/'.$action.'/'.$addonName;
+    $url = '/settings/'.$addonType.'/'.$action.'/'.val('Key', $addonInfo, $addonInfo['KeyRaw']);
 
     $media->setToggle(slugify($addonName), $isEnabled, $url, $label);
 

@@ -10,11 +10,10 @@ interface IProps extends IComponentID {
     disabled: boolean;
 }
 
-interface IState {
-    disabled: boolean;
-}
-
-export default class Button extends React.Component<IProps, IState> {
+export default class Button extends React.Component<IProps> {
+    public static defaultProps = {
+        disabled: false,
+    };
     public ID: string;
     public type: string;
 
@@ -22,9 +21,6 @@ export default class Button extends React.Component<IProps, IState> {
         super(props);
         this.ID = uniqueID(props, 'button');
         this.type = props.type || 'button';
-        this.state = {
-            disabled: props.disabled,
-        };
     }
 
 
@@ -35,7 +31,7 @@ export default class Button extends React.Component<IProps, IState> {
             this.props.className
         );
 
-        return <button id={this.ID} disabled={this.state.disabled} type={this.type} className={componentClasses}>
+        return <button id={this.ID} disabled={this.props.disabled} type={this.type} className={componentClasses}>
             {this.props.content}
         </button>;
     }

@@ -8,23 +8,18 @@ import {uniqueID, IComponentID} from '@core/Interfaces/componentIDs';
 interface IProps extends IComponentID {
     content: string | Node;
     className?: string;
-    disabled?: boolean;
-}
-
-interface IState {
     disabled: boolean;
 }
 
-export default class ButtonSubmit extends React.Component<IProps, IState> {
+export default class ButtonSubmit extends React.Component<IProps> {
+    public static defaultProps = {
+        disabled: false,
+    };
     public ID: string;
-
 
     constructor(props) {
         super(props);
         this.ID = uniqueID(props, 'submitButton');
-        this.state = {
-            disabled: props.disabled,
-        };
     }
 
     public render() {
@@ -36,7 +31,7 @@ export default class ButtonSubmit extends React.Component<IProps, IState> {
             this.props.className
         );
 
-        return <Button ID={this.ID} disabled={this.state.disabled} type='submit' content={this.props.content} className={componentClasses}>
+        return <Button ID={this.ID} disabled={this.props.disabled} type='submit' content={this.props.content} className={componentClasses}>
             {this.props.content}
         </Button>;
     }

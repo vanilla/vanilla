@@ -128,7 +128,6 @@ class SignInForm extends React.Component<IProps, IState> {
                 <InputTextBlock
                     parentID={this.ID}
                     label={t('Email/Username')}
-                    placeholder={t('Enter Username')}
                     required={true}
                     disabled={!this.state.editable}
                     errors={this.state.usernameErrors}
@@ -138,7 +137,6 @@ class SignInForm extends React.Component<IProps, IState> {
                 <PasswordTextBlock
                     parentID={this.ID}
                     label={t('Password')}
-                    placeholder={t('Enter Password')}
                     required={true}
                     disabled={!this.state.editable}
                     errors={this.state.passwordErrors}

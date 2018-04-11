@@ -135,7 +135,6 @@ export default class RecoverPasswordPage extends React.Component<IComponentID, I
                     <InputTextBlock
                         parentID={this.ID}
                         label={t('Email/Username')}
-                        placeholder={t('Enter Email')}
                         required={true}
                         disabled={!this.state.editable}
                         errors={this.state.errors}

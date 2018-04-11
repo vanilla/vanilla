@@ -1,15 +1,16 @@
 import apiv2 from "@core/apiv2";
 import { formatUrl, t } from '@core/application';
 import React from 'react';
-import { withRouter, BrowserRouter, Route } from 'react-router-dom';
+import { withRouter, BrowserRouter, Route, Link } from 'react-router-dom';
 import { log, logError, debug } from "@core/utility";
 import InputTextBlock from "../../Forms/InputTextBlock";
+import Checkbox from "../../Forms/Checkbox";
 import PasswordTextBlock from "../../Forms/PasswordTextBlock";
 import ButtonSubmit from "../../Forms/ButtonSubmit";
 import { uniqueIDFromPrefix } from '@core/Interfaces/componentIDs';
-import CreateAnAccountLink from "./CreateAnAccountLink";
 import Paragraph from "../../Forms/Paragraph";
 import get from "lodash/get";
+import RememberPasswordLink from "./RememberPasswordLink";
 
 interface IProps {
     location?: any;
@@ -24,6 +25,7 @@ interface IState {
     redirectTo?: string | null;
     globalError?: string | null;
     submitEnabled: boolean;
+    rememberMe: boolean;
 }
 
 class SignInForm extends React.Component<IProps, IState> {
@@ -34,6 +36,7 @@ class SignInForm extends React.Component<IProps, IState> {
         this.ID = uniqueIDFromPrefix('signInForm');
         this.handleSubmit = this.handleSubmit.bind(this);
         this.handleTextChange = this.handleTextChange.bind(this);
+        this.handleCheckBoxChange = this.handleCheckBoxChange.bind(this);
         this.handleErrors = this.handleErrors.bind(this);
 
         this.state = {
@@ -42,6 +45,7 @@ class SignInForm extends React.Component<IProps, IState> {
             password: '',
             redirectTo: null,
             submitEnabled: false,
+            rememberMe: true,
         };
     }
 
@@ -62,6 +66,13 @@ class SignInForm extends React.Component<IProps, IState> {
                 usernameErrors: [],
             });
         }
+    }
+
+    public handleCheckBoxChange = (event) => {
+        const value:boolean = get(event, 'target.checked', false);
+        this.setState({
+            rememberMe: value
+        });
     }
 
     public handleErrors = (e) => {
@@ -110,8 +121,11 @@ class SignInForm extends React.Component<IProps, IState> {
         apiv2.post('/authenticate/password', {
             'username': this.state.username,
             'password': this.state.password,
+            'persist': this.state.rememberMe,
         }).then((r) => {
-            window.location.href = get(this, 'props.location.query.target', '/');
+            const search = get(this, 'props.location.search', '/');
+            const params = new URLSearchParams(search);
+            window.location.href = formatUrl(params.get('target') || '/');
         }).catch((e) => {
             this.handleErrors(e);
         });
@@ -143,8 +157,18 @@ class SignInForm extends React.Component<IProps, IState> {
                     value={this.state.password}
                     onChange={this.handleTextChange}
                 />
+                <div className="inputBlock">
+                    <div className="rememberMeAndForgot">
+                        <span className="rememberMeAndForgot-rememberMe">
+                            <Checkbox parentID={this.ID} label={t('Keep me signed in')} onChange={this.handleCheckBoxChange} checked={this.state.rememberMe}/>
+                        </span>
+                        <span className="rememberMeAndForgot-forgot">
+                            <Link to="/authenticate/recoverpassword">{t('Forgot password?')}</Link>
+                        </span>
+                    </div>
+                </div>
                 <ButtonSubmit parentID={this.ID} disabled={!this.state.editable || this.state.password.length === 0 || this.state.username.length === 0} content={t('Sign In')}/>
-                <CreateAnAccountLink/>
+                <RememberPasswordLink/>
             </form>;
         }
     }

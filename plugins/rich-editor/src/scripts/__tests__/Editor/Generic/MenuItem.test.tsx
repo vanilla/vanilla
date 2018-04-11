@@ -3,7 +3,7 @@ import { shallow } from "enzyme";
 import MenuItem from "../../../Editor/Generic/MenuItem";
 
 test("matches snapshot", () => {
-    const clickHandler = () => {};
+    const clickHandler = () => undefined;
     const item = shallow(
         <MenuItem onClick={clickHandler} propertyName="bold" label="Bold" isActive={true} isFirst={false} isLast={false}/>
     );

@@ -5,7 +5,7 @@ import {uniqueID, IComponentID} from '@core/Interfaces/componentIDs';
 interface IProps extends IComponentID {
     className?: string;
     isError?: boolean;
-    content?: string | Node;
+    content?: string | Node | null;
 }
 
 export default class Paragraph extends React.Component<IProps> {

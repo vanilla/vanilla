@@ -5,21 +5,17 @@
  */
 
 import {formatUrl, getMeta, setMeta} from "@core/application";
-import axios, {AxiosResponse} from "axios";
+import axios, {AxiosRequestConfig, AxiosResponse} from "axios";
 
 /**
  * Add the transient key to every request.
  *
- * @see {AxiosTransformer}
- *
- * @param {FormData} data The data from the request.
- * @param {any} headers The request header config.
- *
- * @returns {string|Buffer|ArrayBuffer|FormData|Stream} - Must
+ * @param {AxiosRequestConfig} request The request being submitted.
+ * @returns {AxiosRequestConfig} Returns the transformed request.
  */
-function addTransientKey(data, headers: any) {
-    headers.post['X-Transient-Key'] = getMeta('TransientKey');
-    return data;
+function handleRequest(request: AxiosRequestConfig): AxiosRequestConfig {
+    request.headers['X-Transient-Key'] = getMeta('TransientKey');
+    return request;
 }
 
 /**
@@ -37,14 +33,10 @@ function handleResponse(response: AxiosResponse) {
     return response;
 }
 
-const requestTransformers = [
-    addTransientKey,
-];
-
 const api = axios.create({
     baseURL: formatUrl("/api/v2/"),
-    transformRequest: requestTransformers,
 });
+api.interceptors.request.use(handleRequest);
 api.interceptors.response.use(handleResponse);
 
 export default api;

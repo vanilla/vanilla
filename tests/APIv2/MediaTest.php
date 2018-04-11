@@ -199,34 +199,6 @@ class MediaTest extends AbstractAPIv2Test {
                 ]
             ],
             [
-                'https://smashcast.tv/foobar',
-                'smashcast',
-                [
-                    'name' => null,
-                    'body' => null,
-                    'photoUrl' => null,
-                    'height' => null,
-                    'width' => null,
-                    'attributes' => [
-                        'channelID' => 'foobar'
-                    ],
-                ]
-            ],
-            [
-                'https://www.smashcast.tv/foobar',
-                'smashcast',
-                [
-                    'name' => null,
-                    'body' => null,
-                    'photoUrl' => null,
-                    'height' => null,
-                    'width' => null,
-                    'attributes' => [
-                        'channelID' => 'foobar'
-                    ],
-                ]
-            ],
-            [
                 'https://example.com/image.bmp',
                 'image',
                 [
@@ -660,7 +632,6 @@ class MediaTest extends AbstractAPIv2Test {
         $urls = [
             ['https://vine.co/v/abc123', 'vine'],
             ['https://embed.gettyimages.com/embed/1234567890', 'getty'],
-            ['https://www.smashcast.tv/example', 'smashcast'],
             ['https://imgur.com/example', 'imgur'],
             ['https://imgur.com/example.jpg', 'imgur'],
             ['https://i.imgur.com/example', 'imgur'],

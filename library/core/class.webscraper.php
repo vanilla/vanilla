@@ -29,11 +29,10 @@ class WebScraper {
      */
     public function __construct() {
         // Add some default sites.
-        $this->registerType('getty', ['embed.gettyimages.com'], [$this, 'lookupGetty']);
+        $this->registerType('getty', ['gettyimages.com', 'gettyimages.ca'], [$this, 'lookupGetty']);
         $this->registerType('imgur', ['imgur.com'], [$this, 'lookupImgur']);
         $this->registerType('instagram', ['instagram.com', 'instagr.am'], [$this, 'lookupInstagram']);
         $this->registerType('pinterest', ['pinterest.com', 'pinterest.ca'], [$this, 'lookupPinterest']);
-        $this->registerType('smashcast', ['hitbox.tv', 'smashcast.tv'], [$this, 'lookupSmashcast']);
         $this->registerType('soundcloud', ['soundcloud.com'], [$this, 'lookupSoundcloud']);
         $this->registerType('twitch', ['twitch.tv'], [$this, 'lookupTwitch']);
         $this->registerType('twitter', ['twitter.com'], [$this, 'lookupTwitter']);
@@ -368,7 +367,7 @@ class WebScraper {
      */
     private function lookupGetty(string $url): array {
         preg_match(
-            '/https?:\/\/embed.gettyimages\.com\/embed\/(?<mediaID>[\d]+)/i',
+            '/https?:\/\/(?:(?:www|embed).)?gettyimages\.c(?:a|om)\/(?:embed|detail)\/(?<mediaID>[\d]+)/i',
             $url,
             $matches
         );
@@ -484,41 +483,6 @@ class WebScraper {
         $data['width'] = $width;
         $data['height'] = $height;
         $data['attributes'] = ['pinID' => $pinID];
-
-        return $data;
-    }
-
-    /**
-     * Grab info from Smashcast.tv (formerly Hitbox.tv).
-     *
-     * @param string $url
-     * @return array
-     * @throws Exception if there was an error encountered while getting the page's info.
-     */
-    private function lookupSmashcast($url): array {
-        preg_match(
-            '/https?:\/\/(?:www\.)?(smashcast|hitbox)\.tv\/(?<channelID>[\w\-]+)/i',
-            $url,
-            $matches
-        );
-        $channelID = $matches['channelID'] ?: null;
-
-        // Get basic info from the page markup.
-        $data = $this->fetchPageInfo($url);
-
-        // Fix templating tags in OpenGraph data.
-        foreach ($data as $key => &$value) {
-            $cleanTags = ['name', 'body', 'photoUrl'];
-            if (in_array($key, $cleanTags) && preg_match('/{{[^\s]+ \|\| \'(?<content>.*)\'}}/', $value, $matches)) {
-                $value = $matches['content'];
-            }
-        }
-
-        list($width, $height) = $this->getMediaSize($data, 'video');
-        $data['width'] = $width;
-        $data['height'] = $height;
-
-        $data['attributes'] = ['channelID' => $channelID];
 
         return $data;
     }

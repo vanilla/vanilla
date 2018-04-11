@@ -8,11 +8,13 @@ import React from "react";
 import Quill from "quill/core";
 import { RangeStatic, Sources } from "quill";
 import Emitter from "quill/core/emitter";
+import Parchment from "parchment";
 import { t } from "@core/application";
 import Toolbar from "./Generic/Toolbar";
 import * as Icons from "./Icons";
 import { closeEditorFlyouts, CLOSE_FLYOUT_EVENT } from "../Quill/utility";
 import { withEditor, IEditorContextProps } from "./ContextProvider";
+import FocusableEmbedBlot from "../Quill/Blots/Abstract/FocusableEmbedBlot";
 
 const PARAGRAPH_ITEMS = {
     header: {
@@ -60,6 +62,7 @@ interface IState {
     range: RangeStatic;
     showMenu: boolean;
     showPilcrow: boolean;
+    isEmbedFocused: boolean;
     activeFormatKey: string;
 }
 
@@ -71,6 +74,7 @@ export class ParagraphToolbar extends React.PureComponent<IEditorContextProps, I
     private componentID: string;
     private menuID: string;
     private buttonID: string;
+    private selfRef: Element;
 
     /**
      * @inheritDoc
@@ -86,6 +90,7 @@ export class ParagraphToolbar extends React.PureComponent<IEditorContextProps, I
         this.buttonID = this.ID + "-button";
         this.state = {
             showPilcrow: true,
+            isEmbedFocused: false,
             showMenu: false,
             range: {
                 index: 0,
@@ -115,7 +120,8 @@ export class ParagraphToolbar extends React.PureComponent<IEditorContextProps, I
 
     public render() {
         let pilcrowClasses = "richEditor-button richEditorParagraphMenu-handle";
-        if (!this.state.showPilcrow) {
+
+        if (!this.state.showPilcrow || this.state.isEmbedFocused) {
             pilcrowClasses += " isHidden";
         }
 
@@ -202,28 +208,29 @@ export class ParagraphToolbar extends React.PureComponent<IEditorContextProps, I
                 range = this.quill.getSelection();
             }
 
-
             // Check which paragraph formatting items are ready.
-            const activeFormats = this.quill.getFormat(range);
-            let activeFormatKey = "pilcrow";
-            for(const [formatName, formatValue] of Object.entries(activeFormats)) {
-                if (formatName in PARAGRAPH_ITEMS) {
-                    let item = PARAGRAPH_ITEMS[formatName];
-
-                    // In case its a heading
-                    if (formatName === "header" && formatValue as string in item) {
-                        item = item[formatValue as string];
-                    }
-
-                    activeFormatKey = item.name;
-                }
-            }
-
-            this.setState({ activeFormatKey });
-
             if (range != null) {
+                const activeFormats = this.quill.getFormat(range);
+                let activeFormatKey = "pilcrow";
+                for(const [formatName, formatValue] of Object.entries(activeFormats)) {
+                    if (formatName in PARAGRAPH_ITEMS) {
+                        let item = PARAGRAPH_ITEMS[formatName];
+
+                        // In case its a heading
+                        if (formatName === "header" && formatValue as string in item) {
+                            item = item[formatValue as string];
+                        }
+
+                        activeFormatKey = item.name;
+                    }
+                }
+
+                const [descendantAtIndex] = this.quill.scroll.descendant(FocusableEmbedBlot as any, range.index);
+
                 this.setState({
                     range,
+                    activeFormatKey,
+                    isEmbedFocused: !!descendantAtIndex,
                 });
             }
         }
@@ -237,7 +244,7 @@ export class ParagraphToolbar extends React.PureComponent<IEditorContextProps, I
         let numLines = 0;
 
         if (range) {
-            numLines = this.quill.getLines(range.index || 0, range.length || 0);
+            numLines = this.quill.getLines(range.index || 0, range.length || 0).length;
         }
 
         if (numLines <= 1 && !this.state.showPilcrow) {
@@ -252,7 +259,7 @@ export class ParagraphToolbar extends React.PureComponent<IEditorContextProps, I
     }
 
     private getPilcrowStyles() {
-        const bounds = this.quill.getBounds(this.state.range);
+        const bounds = this.quill.getBounds(this.state.range.index, this.state.range.length);
 
         // This is the pixel offset from the top needed to make things align correctly.
         const offset = 9 + 2;
@@ -263,7 +270,7 @@ export class ParagraphToolbar extends React.PureComponent<IEditorContextProps, I
     }
 
     private getToolbarClasses() {
-        const bounds = this.quill.getBounds(this.state.range);
+        const bounds = this.quill.getBounds(this.state.range.index, this.state.range.length);
         let classes = "richEditor-toolbarContainer richEditor-paragraphToolbarContainer";
 
         if (bounds.top > 30) {

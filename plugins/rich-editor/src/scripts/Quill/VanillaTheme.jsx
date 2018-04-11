@@ -17,6 +17,7 @@ import ParagraphToolbar from "../Editor/ParagraphToolbar";
 import EmojiPicker from "../Editor/EmojiPicker";
 import EmbedDialogue from "../Editor/EmbedDialogue";
 import EditorProvider from "../Editor/ContextProvider";
+import EmbedFocusModule from "./EmbedFocusModule";
 
 export default class VanillaTheme extends ThemeBase {
 
@@ -44,13 +45,19 @@ export default class VanillaTheme extends ThemeBase {
         this.quill.root.addEventListener("focusin", closeEditorFlyouts);
 
         // Add keyboard bindings to options.
+        const embedFocus = new EmbedFocusModule(this.quill, this.options);
+
         const keyboardBindings = new KeyboardBindings(this.quill);
         this.options.modules.keyboard.bindings = {
             ...this.options.modules.keyboard.bindings,
             ...keyboardBindings.bindings,
+            ...embedFocus.earlyKeyBoardBindings,
         };
 
-        this.options.modules.embed = true;
+    }
+
+    init() {
+        this.quill.embed = this.addModule("embed/insertion");
 
         // Mount react components
         this.mountToolbar();

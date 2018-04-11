@@ -19,7 +19,7 @@ export class EmojiButton extends React.Component {
     static propTypes = {
         ...editorContextTypes,
         emojiData: PropTypes.object.isRequired,
-        closeMenu: PropTypes.func.isRequired,
+        closeMenuHandler: PropTypes.func.isRequired,
         style: PropTypes.object.isRequired,
         index: PropTypes.number.isRequired,
         rowIndex: PropTypes.number.isRequired,
@@ -44,7 +44,7 @@ export class EmojiButton extends React.Component {
             emojiChar: this.emojiChar,
         }, Quill.sources.USER);
         this.props.quill.setSelection(range.index + 1, Quill.sources.SILENT);
-        this.props.closeMenu(event);
+        this.props.closeMenuHandler(event);
     }
 
     /**

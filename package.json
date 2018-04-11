@@ -33,7 +33,7 @@
         "@types/react-dom": "^16.0.4",
         "@vanillaforums/babel-preset": "^1.0.2",
         "@vanillaforums/eslint-config": "^1.2.2",
-        "@vanillaforums/tslint-config": "^1.0.3",
+        "@vanillaforums/tslint-config": "^1.0.4",
         "babel-core": "^6.26.0",
         "babel-eslint": "^8.2.1",
         "babel-jest": "^22.0.4",
@@ -53,8 +53,8 @@
     "scripts": {
         "test": "cross-env NODE_ENV=test BABEL_ENV=test jest",
         "test:watch": "cross-env NODE_ENV=test BABEL_ENV=test jest --watch",
-        "lint:ts": "tslint -c tslint.json -e **/node_modules/** -p tsconfig.json -t stylish",
-        "lint:ts:fix": "tslint -c tslint.json -e **/node_modules/** -p tsconfig.json -t stylish --fix"
+        "lint:ts": "tslint -c tslint.json -e '**/node_modules/**' -e '**/src/**/*.{js,jsx}' -p tsconfig.json -t stylish",
+        "lint:ts:fix": "tslint -c tslint.json -e '**/node_modules/**' -e '**/src/**/*.{js,jsx}' -p tsconfig.json -t stylish --fix"
     },
     "jest": {
         "testPathIgnorePatterns": [

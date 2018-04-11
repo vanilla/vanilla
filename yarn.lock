@@ -133,9 +133,9 @@
   version "1.2.2"
   resolved "https://registry.yarnpkg.com/@vanillaforums/eslint-config/-/eslint-config-1.2.2.tgz#451366deb985f69fbb404fddb72418cc682cfa60"
 
-"@vanillaforums/tslint-config@^1.0.3":
-  version "1.0.3"
-  resolved "https://registry.yarnpkg.com/@vanillaforums/tslint-config/-/tslint-config-1.0.3.tgz#f7352970fa8992b80fff84c8c62720a55ba627ce"
+"@vanillaforums/tslint-config@^1.0.4":
+  version "1.0.4"
+  resolved "https://registry.yarnpkg.com/@vanillaforums/tslint-config/-/tslint-config-1.0.4.tgz#1e718c929fc589e381e1e674c9a95e1e7484cfc1"
   dependencies:
     tslint-config-prettier "^1.10.0"
     tslint-react "^3.5.1"

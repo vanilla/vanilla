@@ -4,18 +4,18 @@
  * @license https://opensource.org/licenses/GPL-2.0 GPL-2.0
  */
 
-import { BlockEmbed } from "quill/blots/block";
+import FocusableEmbedBlot from "../Abstract/FocusableEmbedBlot";
 import { t } from "@core/application";
 import { setData, getData } from "@core/dom";
 
 function simplifyFraction(numerator, denominator){
-    let gcd = (a, b) => {
-        return b ? gcd(b, a%b) : a;
+    const findGCD = (a, b) => {
+        return b ? findGCD(b, a%b) : a;
     };
-    gcd = gcd(numerator, denominator);
+    const gcd = findGCD(numerator, denominator);
 
-    numerator = numerator/gcd;
-    denominator = denominator/gcd;
+    numerator = numerator / gcd;
+    denominator = denominator / gcd;
 
     return {
         numerator,
@@ -24,15 +24,14 @@ function simplifyFraction(numerator, denominator){
     };
 }
 
-export default class VideoBlot extends BlockEmbed {
+export default class VideoBlot extends FocusableEmbedBlot {
 
-    static blotName = 'embed-video';
-    static className = 'embed-video';
-    static tagName = 'div';
+    public static blotName = 'embed-video';
+    public static className = 'embed-video';
+    public static tagName = 'div';
 
-    static create(data) {
-        // console.log("Video Data: ", data);
-        const node = super.create();
+    public static create(data) {
+        const node = super.create(data) as HTMLElement;
         node.classList.add('embed');
         node.classList.add('embed-video');
         node.classList.add('embedVideo');
@@ -72,7 +71,7 @@ export default class VideoBlot extends BlockEmbed {
         return node;
     }
 
-    static value(node) {
+    public static value(node) {
         return getData(node, "data");
     }
 }

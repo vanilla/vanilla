@@ -16,9 +16,24 @@ $embedded-linkTitle_lineHeight: 1.5 !default;
 $embedded-linkImage_width: 225px !default;
 $embedVideo_width: 640px;
 $embed-spacing: 6px !default;
+$embed-focus-color: #0291DB;
+
+@mixin embedFocusStyles {
+    transition: 0.2s ease border;
+    border: 2px transparent solid;
+
+    &:hover {
+        border-color: rgba($embed-focus-color, 0.5);
+    }
+
+    &:focus {
+        border-color: $embed-focus-color;
+    }
+}
 
 .embed {
     display: block;
+    user-select: none;
 }
 
 .embedLoader-icon {
@@ -141,6 +156,10 @@ $embed-spacing: 6px !default;
     margin: auto;
 }
 
+.embedImage-img {
+    @include embedFocusStyles();
+}
+
 // Video
 
 .embedVideo {
@@ -229,6 +248,8 @@ $embed-spacing: 6px !default;
         color: inherit;
         text-decoration: none !important;
     }
+
+    @include embedFocusStyles();
 }
 
 .embedLink-body {

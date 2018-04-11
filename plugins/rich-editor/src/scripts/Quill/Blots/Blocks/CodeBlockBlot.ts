@@ -8,12 +8,12 @@ import CodeBlock from "quill/formats/code";
 
 export default class CodeBlockBlot extends CodeBlock {
 
-    static blotName = 'code-block';
-    static tagName = 'code';
-    static className = 'code-block';
+    public static blotName = 'code-block';
+    public static tagName = 'code';
+    public static className = 'code-block';
 
-    static create() {
-        const domNode = super.create();
+    public static create(value) {
+        const domNode = super.create(value) as HTMLElement;
         domNode.setAttribute('spellcheck', false);
         domNode.classList.add('code');
         domNode.classList.add('isBlock');

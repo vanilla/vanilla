@@ -32,7 +32,9 @@ import CodeBlockBlot from "./Blots/Blocks/CodeBlockBlot";
 
 // Custom Modules/Themes
 import VanillaTheme from "./VanillaTheme";
-import EmbedModule from "./EmbedModule";
+import EmbedFocusModule from "./EmbedFocusModule";
+import EmbedInsertionModule from "./EmbedInsertionModule";
+import HistoryModule from "./HistoryModule";
 
 Quill.register({
     // Block formats
@@ -63,7 +65,9 @@ Quill.register({
     // Other
     'formats/indent': Indent,
     'themes/vanilla': VanillaTheme,
-    'modules/embed': EmbedModule,
+    'modules/embed/insertion': EmbedInsertionModule,
+    'modules/embed/focus': EmbedFocusModule,
+    'modules/history': HistoryModule,
 }, true);
 
 export default Quill;

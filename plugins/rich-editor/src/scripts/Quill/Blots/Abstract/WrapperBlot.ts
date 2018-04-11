@@ -7,7 +7,7 @@
 import Container from "quill/blots/container";
 import Parchment from "parchment";
 import ClassFormatBlot from "./ClassFormatBlot";
-import { wrappedBlot } from "../../utility";
+import withWrapper from "./withWrapper";
 
 /**
  * A Blot implementing functions necessary to wrap another Blot as a "Dump" DOM Element.
@@ -17,15 +17,16 @@ import { wrappedBlot } from "../../utility";
 export default class WrapperBlot extends Container {
 
     // This cannot be Parchment.Scope.BLOCK or it will match and attributor and break pasting.
-    static scope = Parchment.Scope.BLOCK_BLOT;
-    static tagName = "div";
-    static allowedChildren = [WrapperBlot];
+    public static scope = Parchment.Scope.BLOCK_BLOT;
+    public static tagName = "div";
+    public static allowedChildren = [WrapperBlot];
+    public static className: string;
 
     /**
      * We want to NOT return the format of this Blot. This blot should never be created on its own. Only through its
      * child blot. Always return undefined.
      */
-    static formats() {
+    public static formats() {
         return;
     }
 
@@ -34,8 +35,8 @@ export default class WrapperBlot extends Container {
      *
      * @returns {Node} - The DOM Node for the Blot.
      */
-    static create() {
-        const domNode = super.create();
+    public static create(value) {
+        const domNode = super.create(value) as HTMLElement;
 
         if (this.className) {
             domNode.classList.add(this.className);
@@ -43,52 +44,26 @@ export default class WrapperBlot extends Container {
         return domNode;
     }
 
+    /** @type {Node} */
+    public domNode;
+
     /**
      * Join the children elements together where possible.
      *
      * @param {any} context -
      */
-    optimize(context) {
+    public optimize(context) {
         super.optimize(context);
         const next = this.next;
-        if (next != null && next.prev === this &&
-            next.constructor.blotName === this.constructor.blotName &&
-            next.domNode.tagName === this.domNode.tagName) {
+        if (next instanceof WrapperBlot
+            && next.prev === this
+            && next.statics.blotName === (this.constructor as any).blotName
+            && next.domNode.tagName === this.domNode.tagName
+        ) {
             next.moveChildren(this);
             next.remove();
         }
     }
 }
 
-/**
- * A Content blot is both a WrappedBlot and a WrapperBlot.
- */
-const ContentBlot = wrappedBlot(WrapperBlot);
 
-/**
- * A Line blot is responsible for recreating it's wrapping Blots.
- *
- * Always has a WrapperBlot around it.
- */
-class TempLineBlot extends ClassFormatBlot {
-
-    /**
-     * @returns {ContentBlot} - The parent blot of this Blot.
-     */
-    getContentBlot() {
-        return this.parent;
-    }
-
-    /**
-     * @returns {WrapperBlot} - The parent blot of this Blot.
-     */
-    getWrapperBlot() {
-        return this.parent.parent;
-    }
-}
-
-export const LineBlot = wrappedBlot(TempLineBlot);
-
-ContentBlot.allowedChildren = [LineBlot];
-
-export { ContentBlot };

@@ -4,16 +4,16 @@
  * @license https://opensource.org/licenses/GPL-2.0 GPL-2.0
  */
 
-import { BlockEmbed } from "quill/blots/block";
+import FocusableEmbedBlot from "../Abstract/FocusableEmbedBlot";
 
-export default class ErrorBlot extends BlockEmbed {
+export default class ErrorBlot extends FocusableEmbedBlot {
 
-    static blotName = 'embed-error';
-    static className = 'embed-error';
-    static tagName = 'div';
+    public static blotName = 'embed-error';
+    public static className = 'embed-error';
+    public static tagName = 'div';
 
-    static create(data) {
-        const node = super.create();
+    public static create(data) {
+        const node = super.create(data) as HTMLElement;
         node.classList.add('embed');
         node.setAttribute('role', 'alert');
 
@@ -45,7 +45,7 @@ export default class ErrorBlot extends BlockEmbed {
         return node;
     }
 
-    static value() {
+    public static value() {
         return;
     }
 }

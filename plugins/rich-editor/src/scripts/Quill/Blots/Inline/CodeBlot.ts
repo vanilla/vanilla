@@ -7,9 +7,9 @@
 import { Code } from "quill/formats/code";
 
 export default class CodeBlot extends Code {
-    static blotName = 'code-inline';
-    static tagName = 'code';
-    static className = 'code-inline';
+    public static blotName = 'code-inline';
+    public static tagName = 'code';
+    public static className = 'code-inline';
 
     constructor(domNode) {
         super(domNode);

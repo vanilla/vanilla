@@ -24,7 +24,7 @@ function initializeEditor(bodybox, container) {
     }
 
     quill.on("text-change", () => {
-        bodybox.value = JSON.stringify(quill.getContents()["ops"]);
+        bodybox.value = JSON.stringify(quill.getContents().ops);
     });
 
     bodybox.addEventListener("paste", (event) => {

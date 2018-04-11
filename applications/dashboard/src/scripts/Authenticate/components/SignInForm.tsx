@@ -168,7 +168,6 @@ class SignInForm extends React.Component<IProps, IState> {
                     </div>
                 </div>
                 <ButtonSubmit parentID={this.ID} disabled={!this.state.editable || this.state.password.length === 0 || this.state.username.length === 0} content={t('Sign In')}/>
-                <RememberPasswordLink/>
             </form>;
         }
     }

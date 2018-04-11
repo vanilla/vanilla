@@ -32,9 +32,8 @@ export default class SignInPage extends React.Component<{}, IState> {
     }
 
     public render() {
-        const pageTitle = <DocumentTitle id={this.pageTitleID} classNames="isCentered" title={t('Sign In')}/>;
         return <div id={this.ID} className="authenticateUserCol">
-            {pageTitle}
+            <DocumentTitle id={this.pageTitleID} classNames="isCentered" title={t('Sign In')}/>
             <SignInForm parentID={this.ID}/>
         </div>;
     }

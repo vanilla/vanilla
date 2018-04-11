@@ -70,12 +70,12 @@ export default class RecoverPasswordPage extends React.Component<IComponentID, I
             this.setState({
                 editable: true,
             }, () => {
-                this.normalizeErorrs(e);
+                this.normalizeErrors(e);
             });
         });
     }
 
-    public normalizeErorrs = (e) => {
+    public normalizeErrors = (e) => {
         // Reset Errors
         this.setState({
             globalError: null,
@@ -84,7 +84,7 @@ export default class RecoverPasswordPage extends React.Component<IComponentID, I
             logError(e.response);
             const errors = get(e, 'response.data.errors', []);
             const generalError = get(e, 'response.data.message', false);
-            const globalErrorMessage = t('An error has occured, please try again.');
+            const fallbackErrorMessage = t('An error has occured, please try again.');
             const hasFieldSpecificErrors =  errors.length > 0;
 
             if (generalError || hasFieldSpecificErrors) {
@@ -92,14 +92,14 @@ export default class RecoverPasswordPage extends React.Component<IComponentID, I
 
                     logError('SignInForm Errors', errors);
 
-                    const newState = {
+                    const newState:any = {
                         editable: true,
                         errors: []
                     };
 
                     errors.map((error:any, index) => {
                         error.timestamp = new Date().getTime(); // Timestamp to make sure state changes, even if the message is the same
-                        newState.errors.push(error as never);
+                        newState.errors.push(error);
                     });
 
                     this.setState(newState);
@@ -112,7 +112,7 @@ export default class RecoverPasswordPage extends React.Component<IComponentID, I
                 }
             } else { // Something went really wrong. Add default message to tell the user there's a problem.
                 this.setState({
-                    globalError: globalErrorMessage,
+                    globalError: fallbackErrorMessage,
                 });
             }
         });

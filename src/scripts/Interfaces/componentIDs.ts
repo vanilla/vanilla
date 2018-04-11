@@ -9,7 +9,7 @@ export function uniqueIDFromPrefix(uniqueSuffix:string) {
     return uniqueSuffix + uniqueid() as string;
 }
 
-export function uniqueID(props:IComponentID, uniqueSuffix:string, allowNoID?:boolean|undefined):any {
+export function uniqueID(props:IComponentID, uniqueSuffix:string, allowNoID?:boolean):any {
     let id:any = null;
 
     if (!allowNoID) {

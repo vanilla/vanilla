@@ -26,11 +26,6 @@ export default class DocumentTitle extends React.Component {
 
     constructor(props) {
         super(props);
-
-        this.classes = classNames(
-            'pageTitle',
-            {[this.props.classNames]: this.props.classNames}
-        );
     }
 
     componentDidMount() {
@@ -56,6 +51,11 @@ export default class DocumentTitle extends React.Component {
     }
 
     render() {
+        this.classes = classNames(
+            'pageTitle',
+            {[this.props.classNames]: this.props.classNames}
+        );
+
         if (this.props.children && this.props.children.length > 0) {
             return this.props.children;
         } else {

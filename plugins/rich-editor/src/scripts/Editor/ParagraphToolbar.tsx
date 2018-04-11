@@ -14,6 +14,7 @@ import Toolbar from "./Generic/Toolbar";
 import * as Icons from "./Icons";
 import { closeEditorFlyouts, CLOSE_FLYOUT_EVENT } from "../Quill/utility";
 import { withEditor, IEditorContextProps } from "./ContextProvider";
+import FocusableEmbedBlot from "../Quill/Blots/Abstract/FocusableEmbedBlot";
 
 const PARAGRAPH_ITEMS = {
     header: {
@@ -61,7 +62,7 @@ interface IState {
     range: RangeStatic;
     showMenu: boolean;
     showPilcrow: boolean;
-    isQuillFocused: boolean;
+    isEmbedFocused: boolean;
     activeFormatKey: string;
 }
 
@@ -73,6 +74,7 @@ export class ParagraphToolbar extends React.PureComponent<IEditorContextProps, I
     private componentID: string;
     private menuID: string;
     private buttonID: string;
+    private selfRef: Element;
 
     /**
      * @inheritDoc
@@ -88,7 +90,7 @@ export class ParagraphToolbar extends React.PureComponent<IEditorContextProps, I
         this.buttonID = this.ID + "-button";
         this.state = {
             showPilcrow: true,
-            isQuillFocused: true,
+            isEmbedFocused: false,
             showMenu: false,
             range: {
                 index: 0,
@@ -103,8 +105,6 @@ export class ParagraphToolbar extends React.PureComponent<IEditorContextProps, I
      */
     public componentDidMount() {
         this.quill.on(Emitter.events.EDITOR_CHANGE, this.handleEditorChange);
-        this.quill.root.addEventListener("focus", this.focusHandler);
-        this.quill.root.addEventListener("blur", this.blurHandler);
         document.addEventListener("keydown", this.escFunction, false);
         document.addEventListener(CLOSE_FLYOUT_EVENT, this.closeMenu);
     }
@@ -114,8 +114,6 @@ export class ParagraphToolbar extends React.PureComponent<IEditorContextProps, I
      */
     public componentWillUnmount() {
         this.quill.off(Emitter.events.EDITOR_CHANGE, this.handleEditorChange);
-        this.quill.root.removeEventListener("focus", this.focusHandler);
-        this.quill.root.removeEventListener("blur", this.blurHandler);
         document.removeEventListener("keydown", this.escFunction, false);
         document.removeEventListener(CLOSE_FLYOUT_EVENT, this.closeMenu);
     }
@@ -123,7 +121,7 @@ export class ParagraphToolbar extends React.PureComponent<IEditorContextProps, I
     public render() {
         let pilcrowClasses = "richEditor-button richEditorParagraphMenu-handle";
 
-        if (!this.state.showPilcrow || !this.state.isQuillFocused) {
+        if (!this.state.showPilcrow || this.state.isEmbedFocused) {
             pilcrowClasses += " isHidden";
         }
 
@@ -157,9 +155,6 @@ export class ParagraphToolbar extends React.PureComponent<IEditorContextProps, I
             </div>
         </div>;
     }
-
-    private focusHandler = () => this.setState({ isQuillFocused: true });
-    private blurHandler = () => this.setState({ isQuillFocused: false });
 
     /**
      * Close the menu.
@@ -230,9 +225,12 @@ export class ParagraphToolbar extends React.PureComponent<IEditorContextProps, I
                     }
                 }
 
+                const [descendantAtIndex] = this.quill.scroll.descendant(FocusableEmbedBlot as any, range.index);
+
                 this.setState({
                     range,
                     activeFormatKey,
+                    isEmbedFocused: !!descendantAtIndex,
                 });
             }
         }

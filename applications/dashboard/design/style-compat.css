@@ -336,6 +336,10 @@ body.Categories.isMobile .PageControls.Top {
   align-items: center;
 }
 
+.inputBlock.inputBlock-tighter {
+  margin-top: -12px;
+}
+
 .inputBlock.hasError .inputText {
   border-color: #ff3933;
   background-color: #ffebeb;

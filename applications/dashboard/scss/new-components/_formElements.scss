@@ -13,6 +13,10 @@ $fontSize-small: 12px !default;
         align-items: center;
     }
 
+    &.inputBlock-tighter {
+        margin-top: -12px;
+    }
+
     &.hasError {
         .inputText {
             border-color: #ff3933;

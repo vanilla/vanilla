@@ -157,7 +157,7 @@ class SignInForm extends React.Component<IProps, IState> {
                     value={this.state.password}
                     onChange={this.handleTextChange}
                 />
-                <div className="inputBlock">
+                <div className="inputBlock inputBlock-tighter">
                     <div className="rememberMeAndForgot">
                         <span className="rememberMeAndForgot-rememberMe">
                             <Checkbox parentID={this.ID} label={t('Keep me signed in')} onChange={this.handleCheckBoxChange} checked={this.state.rememberMe}/>

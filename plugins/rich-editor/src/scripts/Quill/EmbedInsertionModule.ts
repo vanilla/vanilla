@@ -189,21 +189,24 @@ export default class EmbedInsertionModule extends Module {
      */
     private createLoadingEmbed = (lookupKey: any) => {
         this.pauseSelectionTracking = true;
-        this.quill.insertEmbed(this.lastSelection.index, "embed-loading", {}, Emitter.sources.USER);
-        const [blot] = this.quill.scroll.descendant(
-            (testBlot) => testBlot instanceof EmbedLoadingBlot,
-            this.lastSelection.index
-        );
+        const loadingBlot: EmbedLoadingBlot = Parchment.create("embed-loading", {}) as EmbedLoadingBlot;
+        const referenceBlot = this.quill.scroll.split(this.lastSelection.index);
+        if (referenceBlot === this.quill.scroll) {
+            this.quill.scroll.appendChild(loadingBlot);
+        } else {
+            loadingBlot.insertInto(this.quill.scroll, referenceBlot);
+        }
+        this.quill.update(Emitter.sources.USER);
 
         this.quill.setSelection(this.lastSelection.index + 1, 0);
 
-        blot.registerDeleteCallback(() => {
+        loadingBlot.registerDeleteCallback(() => {
             if (this.currentUploads.has(lookupKey)) {
                 this.currentUploads.delete(lookupKey);
             }
         });
 
-        this.currentUploads.set(lookupKey, blot);
+        this.currentUploads.set(lookupKey, loadingBlot);
         this.pauseSelectionTracking = false;
     }
 

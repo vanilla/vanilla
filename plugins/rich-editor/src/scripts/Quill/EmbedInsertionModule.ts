@@ -190,12 +190,9 @@ export default class EmbedInsertionModule extends Module {
     private createLoadingEmbed = (lookupKey: any) => {
         this.pauseSelectionTracking = true;
         const loadingBlot: EmbedLoadingBlot = Parchment.create("embed-loading", {}) as EmbedLoadingBlot;
-        const referenceBlot = this.quill.scroll.split(this.lastSelection.index);
-        if (referenceBlot === this.quill.scroll) {
-            this.quill.scroll.appendChild(loadingBlot);
-        } else {
-            loadingBlot.insertInto(this.quill.scroll, referenceBlot);
-        }
+        const [currentLine] = this.quill.getLine(this.lastSelection.index);
+        const referenceBlot = currentLine.split(this.lastSelection.index);
+        loadingBlot.insertInto(this.quill.scroll, referenceBlot);
         this.quill.update(Emitter.sources.USER);
 
         this.quill.setSelection(this.lastSelection.index + 1, 0);

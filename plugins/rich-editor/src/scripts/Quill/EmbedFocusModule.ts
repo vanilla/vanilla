@@ -152,6 +152,7 @@ export default class EmbedFocusModule extends Module {
         const blotForActiveElement = this.getEmbedBlotForFocusedElement();
         const focusItemIsEmbedBlot = blotForActiveElement instanceof FocusableEmbedBlot;
         if (blotForActiveElement && focusItemIsEmbedBlot) {
+            event.preventDefault();
             const offset = blotForActiveElement.offset();
             blotForActiveElement.remove();
             this.quill.update(Quill.sources.USER);

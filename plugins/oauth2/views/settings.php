@@ -30,30 +30,41 @@ echo heading(sprintf(t('%s Settings'), 'OAuth2'), t('Add Connection'), '/setting
     <table class="table-data js-tj">
         <thead>
         <tr>
-            <th><?php echo t('Client ID'); ?></th>
             <th><?php echo t('Site Name'); ?></th>
-            <th class="column-md"><?php echo t('Authentication URL'); ?></th>
-            <th><?php echo t('Test') ?></th>
-            <th class="column-sm"></th>
+            <th><?php echo t('Slug'); ?></th>
+            <th><?php echo t('Client ID'); ?></th>
+            <th class="column-sm"><?php echo t('Active') ?></th>
+            <th class="column-sm"><?php echo t('Options') ?></th>
         </tr>
         </thead>
         <tbody>
-        <?php foreach ($this->Data('Providers') as $Provider): ?>
-            <tr>
-                <td><?php echo htmlspecialchars($Provider['AuthenticationKey']); ?></td>
-                <td><?php echo htmlspecialchars($Provider['Name']); ?></td>
-                <td><?php echo htmlspecialchars($Provider['AuthenticateUrl']); ?></td>
-                <td>
+        <?php foreach ($this->Data('ProviderKeys') as $providerKey): ?>
+            <?php $provider = Gdn_AuthenticationProviderModel::getProviderByKey($providerKey)?>
+            <tr id="provider_<?php echo $provider['AuthenticationKey'] ?>">
+                <td><?php echo htmlspecialchars($provider['Name']); ?></td>
+                <td><?php echo htmlspecialchars($provider['AuthenticationKey']); ?></td>
+                <td><?php echo htmlspecialchars($provider['AssociationKey']); ?></td>
+                <td class="toggle-container">
                     <?php
-                    echo anchor(t('Test URL'), str_replace('=?', '=test', JsConnectPlugin::connectUrl($Provider, TRUE)));
+                    if ($provider['Active']) {
+                        $state = 'on';
+                        $url = '/oauth2/state/'.$provider['AuthenticationKey'].'/disabled';
+                    } else {
+                        $state = 'off';
+                        $url = '/oauth2/state/'.$provider['AuthenticationKey'].'/active';
+                    }
+                    echo wrap(
+                        anchor('<div class="toggle-well"></div><div class="toggle-slider"></div>', $url, 'Hijack'),
+                        'span',
+                        ['class' => "toggle-wrap toggle-wrap-$state"]
+                    );
                     ?>
-                    <div class="JsConnectContainer UserInfo"></div>
                 </td>
-                <td class="options">
+                <td class="options column-sm">
                     <div class="btn-group">
                         <?php
-                        echo anchor(dashboardSymbol('edit'), '/settings/oauth2/addedit?connectionKey='.urlencode($Provider['AuthenticationKey']), 'js-modal btn btn-icon', ['aria-label' => t('Edit'), 'title' => t('Edit')]);
-                        echo anchor(dashboardSymbol('delete'), '/settings/oauth2/delete?connectionKey='.urlencode($Provider['AuthenticationKey']), 'js-modal-confirm js-hijack btn btn-icon', ['aria-label' => t('Delete'), 'title' => t('Delete')]);
+                        echo anchor(dashboardSymbol('edit'), '/settings/oauth2/addedit?connectionKey='.urlencode($provider['AuthenticationKey']), 'js-modal btn btn-icon', ['aria-label' => t('Edit'), 'title' => t('Edit')]);
+                        echo anchor(dashboardSymbol('delete'), '/settings/oauth2/delete?connectionKey='.urlencode($provider['AuthenticationKey']), 'js-modal-confirm js-hijack btn btn-icon', ['aria-label' => t('Delete'), 'title' => t('Delete')]);
                         ?>
                     </div>
                 </td>

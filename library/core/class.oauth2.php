@@ -31,7 +31,7 @@ class Gdn_OAuth2 extends Gdn_Plugin {
     protected $accessTokenResponse;
 
     /** @var string key for GDN_UserAuthenticationProvider table  */
-    protected $providerKey = null;
+    protected $providerKey = 'OAuth2';
 
     /** @var  string passing scope to authenticator */
     protected $scope;
@@ -83,7 +83,7 @@ class Gdn_OAuth2 extends Gdn_Plugin {
      */
     public function structure() {
         // Make sure we have the OAuth2 provider.
-        $provider = $this->provider($providerKey);
+        $provider = $this->provider($this->providerKey);
         if (!val('AuthenticationKey', $provider)) {
             $model = new Gdn_AuthenticationProviderModel();
             $provider = [
@@ -277,26 +277,25 @@ class Gdn_OAuth2 extends Gdn_Plugin {
 
     /**
      *  Return all the information saved in provider table.
-     *
+     * @param $providerKey
      * @return array Stored provider data (secret, client_id, etc.).
      */
     public function provider($providerKey = null) {
         if ($providerKey) {
             $this->provider = Gdn_AuthenticationProviderModel::getProviderByKey($providerKey);
         }
-
         return $this->provider;
     }
 
 
+    /**
+     * Get the AuthenticationKey of all the OAuth2 providers.
+     *
+     * @return array Provider keys that have the 'oauth2' AuthenticationSchemeAlias.
+     */
     public function getAllProviderKeys() {
         $allProviders = Gdn::sql()->getWhere('UserAuthenticationProvider', ['AuthenticationSchemeAlias' => 'oauth2'])->resultArray();
         return array_column($allProviders, 'AuthenticationKey');
-    }
-
-
-    public function getAllProviders() {
-        return Gdn::sql()->getWhere('UserAuthenticationProvider', ['AuthenticationSchemeAlias' => 'oauth2'])->resultArray();
     }
 
 
@@ -387,8 +386,8 @@ class Gdn_OAuth2 extends Gdn_Plugin {
         }
 
         $view = $this->settingsView;
-        $providers = $this->getAllProviders();
-        $sender->setData('Providers', $providers);
+        $providerKeys = $this->getAllProviderKeys();
+        $sender->setData('ProviderKeys', $providerKeys);
         $sender->render('settings', '', $view);
     }
 
@@ -412,7 +411,6 @@ class Gdn_OAuth2 extends Gdn_Plugin {
             $form->setData($provider);
         } else {
             $form->setFormValue('AuthenticationSchemeAlias', 'oauth2');
-            $sender->Form->validateRule('Name', 'ValidateName', 'You must provide a Name containing only letters, numbers, spaces, and underscores.');
             $sender->Form->validateRule('AuthenticationKey', 'ValidateSlug', 'You must provide a Connection Key containing only letters, numbers, and underscores.');
             $sender->Form->validateRule('AssociationKey', 'ValidateRequired', 'You must provide a unique AccountID.');
             $sender->Form->validateRule('AssociationSecret', 'ValidateRequired', 'You must provide a Secret');
@@ -440,12 +438,7 @@ class Gdn_OAuth2 extends Gdn_Plugin {
             'AssociationSecret' =>  ['LabelCode' => 'Secret', 'Description' => 'Enter the secret provided by the authentication provider.'],
             'AuthorizeUrl' =>  ['LabelCode' => 'Authorize Url', 'Description' => 'Enter the endpoint to be appended to the base domain to retrieve the authorization token for a user.'],
             'TokenUrl' => ['LabelCode' => 'Token Url', 'Description' => 'Enter the endpoint to be appended to the base domain to retrieve the authorization token for a user.'],
-            'ProfileUrl' => ['LabelCode' => 'Profile Url', 'Description' => 'Enter the endpoint to be appended to the base domain to retrieve a user\'s profile.']
-            'AssociationKey' =>  ['LabelCode' => 'Client ID', 'Description' => 'Unique ID of the authentication application.'],
-            'AssociationSecret' =>  ['LabelCode' => 'Secret', 'Description' => 'Secret provided by the authentication provider.'],
-            'AuthorizeUrl' =>  ['LabelCode' => 'Authorize Url', 'Description' => 'URL where users sign-in with the authentication provider.'],
-            'TokenUrl' => ['LabelCode' => 'Token Url', 'Description' => 'Endpoint to retrieve the authorization token for a user.'],
-            'ProfileUrl' => ['LabelCode' => 'Profile Url', 'Description' => 'Endpoint to retrieve a user\'s profile.'],
+            'ProfileUrl' => ['LabelCode' => 'Profile Url', 'Description' => 'Enter the endpoint to be appended to the base domain to retrieve a user\'s profile.'],
             'BearerToken' => ['LabelCode' => 'Authorization Code in Header', 'Description' => 'When requesting the profile, pass the access token in the HTTP header. i.e Authorization: Bearer [accesstoken]', 'Control' => 'checkbox']
         ];
 
@@ -1018,17 +1011,8 @@ class Gdn_OAuth2 extends Gdn_Plugin {
     }
 }
 
-if (!function_exists('ValidateName')) {
-    function validateName($value) {
-        $minlength = 3;
-        $maxlength = 20;
-        $regex = "/[A-zÀ-ÿ\s\d-_]{{$minlength},{$maxlength}}$/";
-        return (preg_match($regex, trim($value)) === 1);
-    }
-}
-
 if (!function_exists('ValidateNameExists')) {
-    function validateName($value) {
+    function validateNameExists($value) {
         $exists = Gdn::sql()->getWhere('UserAuthenticationProvider', ['Name' => $value, 'Active' => 1])->resultArray();
         if ($exists) {
             return false;

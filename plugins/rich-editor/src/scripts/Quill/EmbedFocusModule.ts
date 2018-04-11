@@ -152,11 +152,17 @@ export default class EmbedFocusModule extends Module {
         const blotForActiveElement = this.getEmbedBlotForFocusedElement();
         const focusItemIsEmbedBlot = blotForActiveElement instanceof FocusableEmbedBlot;
         if (blotForActiveElement && focusItemIsEmbedBlot) {
-            const delta = new Delta()
-                .retain(blotForActiveElement.offset())
-                .delete(1);
+            const offset = blotForActiveElement.offset();
+            blotForActiveElement.remove();
+            this.quill.update(Quill.sources.USER);
 
-            this.quill.updateContents(delta, Quill.sources.USER);
+            const [potentialNewEmbedToFocus] = this.quill.scroll.descendant(FocusableEmbedBlot as any, offset);
+            if (potentialNewEmbedToFocus) {
+                this.focusEmbedBlot(potentialNewEmbedToFocus as any);
+            } else {
+                this.quill.setSelection(offset, 0, Quill.sources.USER);
+            }
+
             return false;
         }
 
@@ -205,7 +211,7 @@ export default class EmbedFocusModule extends Module {
      * - Set focus on that embed.
      */
     private handleArrowKeyAwayFromQuill = (event: KeyboardEvent) => {
-        if (!this.isKeyCodeArrowKey(event.keyCode)) {
+        if (!this.isKeyCodeArrowKey(event.keyCode) || event.shiftKey) {
             return true;
         }
 

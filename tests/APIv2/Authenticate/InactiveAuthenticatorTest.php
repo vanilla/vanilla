@@ -7,8 +7,7 @@
 
 namespace VanillaTests\APIv2\Authenticate;
 
-use Prophecy\Exception\Exception;
-use Vanilla\Models\SSOData;
+use Exception;
 use VanillaTests\APIv2\AbstractAPIv2Test;
 use VanillaTests\Fixtures\MockSSOAuthenticator;
 
@@ -52,8 +51,10 @@ class InactiveAuthenticatorTest extends AbstractAPIv2Test {
      */
     public function testInactiveAuth() {
         $postData = [
-            'authenticatorType' => $this->authenticator::getType(),
-            'authenticatorID' => $this->authenticator->getID(),
+            'authenticate' => [
+                'authenticatorType' => $this->authenticator::getType(),
+                'authenticatorID' => $this->authenticator->getID(),
+            ],
         ];
 
         $this->api()->post('/authenticate', $postData);

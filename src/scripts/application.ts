@@ -5,7 +5,7 @@
  */
 import gdn from "@core/gdn";
 import { PromiseOrNormalCallback } from "@core/utility";
-import { ComponentClass, ComponentElement } from "react";
+import { ComponentClass } from "react";
 
 /**
  * Get a piece of metadata passed from the server.
@@ -24,10 +24,10 @@ export function getMeta(key: string, defaultValue?: any) {
     let haystack = gdn.meta;
 
     for (const part of parts) {
-        haystack = haystack[part];
-        if (haystack === undefined) {
+        if (!haystack.hasOwnProperty(part)) {
             return defaultValue;
         }
+        haystack = haystack[part];
     }
     return haystack;
 }
@@ -39,10 +39,6 @@ export function getMeta(key: string, defaultValue?: any) {
  * @param value - The value to set.
  */
 export function setMeta(key: string, value: any) {
-    if (gdn.meta === null || typeof gdn.meta !== 'object') {
-        gdn.meta = {};
-    }
-
     const parts = key.split('.');
     const last = parts.pop();
 
@@ -69,7 +65,7 @@ export function setMeta(key: string, value: any) {
  *
  * @returns Returns the translation or the default.
  */
-export function translate(str: string, defaultTranslation: string): string {
+export function translate(str: string, defaultTranslation?: string): string {
     // Codes that begin with @ are considered literals.
     if (str.substr(0, 1) === '@') {
         return str.substr(1);

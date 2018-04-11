@@ -4,9 +4,9 @@
  * @module internal
  */
 
-import {addComponent, componentExists, getComponent} from "@core/application";
+import { addComponent, componentExists, getComponent } from "@core/application";
 import App from "@core/Main/App";
-import {logError} from "@core/utility";
+import { logError } from "@core/utility";
 import React from 'react';
 import ReactDOM from 'react-dom';
 

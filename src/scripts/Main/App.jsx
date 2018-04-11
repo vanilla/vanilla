@@ -16,7 +16,7 @@ export default class App extends React.PureComponent {
 
         routes.push(<Route key="@not-found" component={NotFoundPage} />);
 
-        return <Router basename={getMeta('basePath', '')}>
+        return <Router basename={getMeta('context.basePath', '')}>
             <Switch>{routes}</Switch>
         </Router>;
     }

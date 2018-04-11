@@ -22,8 +22,8 @@ interface IState {
     usernameErrors?: string[];
     password: string;
     passwordErrors?: string[];
-    redirectTo?: string | null;
-    globalError?: string | null;
+    redirectTo?: string;
+    globalError?: string;
     submitEnabled: boolean;
     rememberMe: boolean;
 }

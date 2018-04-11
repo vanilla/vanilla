@@ -17,7 +17,7 @@ interface IState {
     errors?: string[];
     email: string;
     submitEnabled: boolean;
-    globalError?: string | null;
+    globalError?: string;
 }
 
 export default class RecoverPasswordPage extends React.Component<IComponentID, IState> {

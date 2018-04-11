@@ -50,7 +50,7 @@ class WebScraper {
      * @return array
      * @throws Exception if there was an error encountered while getting the page's info.
      */
-    private function fetchPageInfo($url) {
+    private function fetchPageInfo(string $url): array {
         $result = [
             'url' => $url,
             'name' => null,
@@ -80,7 +80,7 @@ class WebScraper {
      *
      * @return bool
      */
-    public function getDisableFetch() {
+    public function getDisableFetch(): bool {
         return $this->disableFetch;
     }
 
@@ -92,7 +92,7 @@ class WebScraper {
      * @return string|null
      * @throws Exception if errors encountered during processing.
      */
-    public function getPageInfo($url, $forceRefresh = false) {
+    public function getPageInfo(string $url, bool $forceRefresh = false) {
         $urlKey = md5($url);
         $cacheKey = "WebScraper.{$urlKey}";
         $info = null;
@@ -122,9 +122,9 @@ class WebScraper {
      *
      * @param array $pageInfo
      * @return array
-     * @throws Exception
+     * @throws Exception if the URL is invalid.
      */
-    private function getSizeFromPhotoUrl(array $pageInfo) {
+    private function getSizeFromPhotoUrl(array $pageInfo): array {
         $width = null;
         $height = null;
 
@@ -143,7 +143,7 @@ class WebScraper {
      * @throws InvalidArgumentException if the URL is invalid.
      * @throws Exception if the type does not have a valid "domains" value.
      */
-    private function getTypeFromUrl($url) {
+    private function getTypeFromUrl(string $url): string {
         $urlDomain = parse_url($url, PHP_URL_HOST);
         if ($urlDomain === false) {
             throw new InvalidArgumentException('Invalid URL.');
@@ -196,7 +196,7 @@ class WebScraper {
      *
      * @return array
      */
-    private function getTypes() {
+    private function getTypes(): array {
         return $this->types;
     }
 
@@ -207,7 +207,7 @@ class WebScraper {
      * @return array
      * @throws Exception if the URL is invalid.
      */
-    private function getImageSize($url) {
+    private function getImageSize(string $url): array {
         $size = [null, null];
 
         if (!$this->disableFetch) {
@@ -235,7 +235,7 @@ class WebScraper {
      * @throws InvalidArgumentException if the type is invalid.
      * @throws Exception if unable to find a lookup function for the type.
      */
-    private function getInfoByType($type, $url) {
+    private function getInfoByType(string $type, string $url): array {
         if ($type === self::TYPE_DEFAULT) {
             $data = $this->lookupDefault($url);
         } elseif ($type === self::TYPE_IMAGE) {
@@ -251,8 +251,6 @@ class WebScraper {
         }
 
         $defaults = [
-            'url' => $url,
-            'type' => $type,
             'name' => null,
             'body' => null,
             'photoUrl' => null,
@@ -260,8 +258,10 @@ class WebScraper {
             'width' => null,
             'attributes' => []
         ];
-
         $result = array_merge($defaults, $data);
+        $result['url'] = $url;
+        $result['type'] = $type;
+
         return $result;
     }
 
@@ -275,7 +275,7 @@ class WebScraper {
      * @return array
      * @throws InvalidArgumentException if an invalid type is specified.
      */
-    private function getMediaSize(array $pageInfo, $type, $defaultWidth = null, $defaultHeight = null) {
+    private function getMediaSize(array $pageInfo, string $type, int $defaultWidth = null, int $defaultHeight = null): array {
         $validTypes = ['image', 'video'];
         if (!in_array($type, $validTypes)) {
             throw new InvalidArgumentException("Invalid type: {$type}");
@@ -299,11 +299,12 @@ class WebScraper {
     /**
      * Get oEmbed data from a URL.
      *
-     * @param $url
+     * @param string $url
      * @return array
      * @throws Exception if the URL is invalid.
+     * @throws Exception if the URL failed to load.
      */
-    private function getOembed($url) {
+    private function getOembed(string $url): array {
         $result = [];
 
         if (!$this->disableFetch) {
@@ -326,12 +327,19 @@ class WebScraper {
             if (is_array($response)) {
                 $validAttributes = ['type', 'version', 'title', 'author_name', 'author_url', 'provider_name', 'provider_url',
                     'cache_age', 'thumbnail_url', 'thumbnail_width', 'thumbnail_height'];
-                $oembed = array_intersect_key($response, array_combine($validAttributes, $validAttributes));
 
-                $result['name'] = val('title', $oembed, null);
-                $result['photoUrl'] = val('thumbnail_url', $oembed, null);
-                $result['width'] = val('thumbnail_width', $oembed, null);
-                $result['height'] = val('thumbnail_height', $oembed, null);
+                $type = $response['type'] ?? null;
+                switch ($type) {
+                    case 'photo':
+                    case 'video':
+                    case 'rich':
+                        $validAttributes = array_merge(['url', 'width', 'height'], $validAttributes);
+                        break;
+                }
+
+                // Make it easier to compare by key.
+                $validAttributes = array_combine($validAttributes, $validAttributes);
+                $result = array_intersect_key($response, $validAttributes);
             }
         }
 
@@ -339,12 +347,13 @@ class WebScraper {
     }
 
     /**
-     * Gather general information about a document..
+     * Gather general information about a document.
      *
      * @param string $url
      * @return array
+     * @throws Exception if there was an error encountered while getting the page's info.
      */
-    private function lookupDefault($url) {
+    private function lookupDefault(string $url): array {
         $result = $this->fetchPageInfo($url);
         return $result;
     }
@@ -354,8 +363,10 @@ class WebScraper {
      *
      * @param string $url
      * @return array
+     * @throws Exception if the URL is invalid.
+     * @throws Exception if the URL failed to load.
      */
-    private function lookupGetty($url) {
+    private function lookupGetty(string $url): array {
         preg_match(
             '/https?:\/\/embed.gettyimages\.com\/embed\/(?<mediaID>[\d]+)/i',
             $url,
@@ -366,19 +377,24 @@ class WebScraper {
         $data = [];
         if ($mediaID) {
             $oembed = $this->getOembed("http://embed.gettyimages.com/oembed?url=http%3a%2f%2fgty.im%2f{$mediaID}");
-            $data = array_merge($data, $oembed);
+            $data = array_merge($data, $this->normalizeOembed($oembed));
         }
 
-        $data['attributes'] = ['mediaID' => $mediaID];
+        $attributes = $data['attributes'] ?? [];
+        $attributes['mediaID'] = $mediaID;
+        $data['attributes'] = $attributes;
 
         return $data;
     }
 
     /**
+     * Grab info for a standard image.
+     *
      * @param string $url
      * @return array
+     * @throws Exception if the URL is invalid.
      */
-    private function lookupImage($url) {
+    private function lookupImage(string $url): array {
         list($width, $height) = $this->getImageSize($url);
         $data = [
             'photoUrl' => $url,
@@ -390,10 +406,12 @@ class WebScraper {
 
     /**
      * Grab info from an Imgur embed.
-     * @param $url
+     *
+     * @param string $url
      * @return array
+     * @throws Exception if there was an error encountered while getting the page's info.
      */
-    private function lookupImgur($url) {
+    private function lookupImgur(string $url): array {
         preg_match(
             '/https?:\/\/([im]\.)?imgur\.com\/(?<mediaID>[a-z0-9]+)(\.(?<ext>.{1,3}))?/i',
             $url,
@@ -418,10 +436,13 @@ class WebScraper {
 
     /**
      * Grab info from Instagram.
-     * @param $url
+     *
+     * @param string $url
      * @return array
+     * @throws Exception if the URL is invalid.
+     * @throws Exception if there was an error encountered while getting the page's info.
      */
-    private function lookupInstagram($url) {
+    private function lookupInstagram(string $url): array {
         preg_match(
             '/https?:\/\/(?:www\.)?instagr(?:\.am|am\.com)\/p\/(?<mediaID>[\w-]+)/i',
             $url,
@@ -443,10 +464,12 @@ class WebScraper {
     /**
      * Grab info from Pinterest.
      *
-     * @param $url
+     * @param string $url
      * @return array
+     * @throws Exception if the URL is invalid.
+     * @throws Exception if there was an error encountered while getting the page's info.
      */
-    private function lookupPinterest($url) {
+    private function lookupPinterest($url): array {
         preg_match(
             '/https?:\/\/(?:www\.)?pinterest\.(ca|com)\/pin\/(?<pinID>[\d]+)/i',
             $url,
@@ -470,8 +493,9 @@ class WebScraper {
      *
      * @param string $url
      * @return array
+     * @throws Exception if there was an error encountered while getting the page's info.
      */
-    private function lookupSmashcast($url) {
+    private function lookupSmashcast($url): array {
         preg_match(
             '/https?:\/\/(?:www\.)?(smashcast|hitbox)\.tv\/(?<channelID>[\w\-]+)/i',
             $url,
@@ -502,17 +526,19 @@ class WebScraper {
     /**
      * Grab info from SoundCloud.
      *
-     * @param $url
+     * @param string $url
      * @return array
+     * @throws Exception if the URL is invalid.
+     * @throws Exception if there was an error encountered while getting the page's info.
      */
-    private function lookupSoundcloud($url) {
+    private function lookupSoundCloud(string $url): array {
         preg_match(
-            '/https?:(?:www\.)?\/\/soundcloud\.com\/(?<user>[\w=?&;+-_]*)\/(?<track>[\w=?&;+-_]*)/i',
+            '/https?:(?:www\.)?\/\/soundcloud\.com\/(?<user>[\w=?&;+-_]*)\/(?<trackID>[\w=?&;+-_]*)/i',
             $url,
             $matches
         );
         $user = $matches['user'] ?: null;
-        $track = $matches['track'] ?: null;
+        $track = $matches['trackID'] ?: null;
 
         // Get basic info from the page markup.
         $data = $this->fetchPageInfo($url);
@@ -531,10 +557,12 @@ class WebScraper {
     /**
      * Grab info from Twitch.tv.
      *
-     * @param $url
+     * @param string $url
      * @return array
+     * @throws Exception if the URL is invalid.
+     * @throws Exception if there was an error encountered while getting the page's info.
      */
-    private function lookupTwitch($url) {
+    private function lookupTwitch(string $url): array {
         preg_match(
             '/https?:\/\/(?:www\.)?twitch\.tv\/(?<channel>[\w]+)/i',
             $url,
@@ -557,10 +585,12 @@ class WebScraper {
     /**
      * Grab info from Twitter.
      *
-     * @param $url
+     * @param string $url
      * @return array
+     * @throws Exception if the URL is invalid.
+     * @throws Exception if there was an error encountered while getting the page's info.
      */
-    private function lookupTwitter($url) {
+    private function lookupTwitter(string $url): array {
         preg_match(
             '/https?:\/\/(?:www\.)?twitter\.com\/(?:#!\/)?(?:[^\/]+)\/status(?:es)?\/(?<statusID>[\d]+)/i',
             $url,
@@ -583,10 +613,12 @@ class WebScraper {
     /**
      * Grab info from Vimeo.
      *
-     * @param $url
+     * @param string $url
      * @return array
+     * @throws Exception if the URL is invalid.
+     * @throws Exception if there was an error encountered while getting the page's info.
      */
-    private function lookupVimeo($url) {
+    private function lookupVimeo(string $url): array {
         preg_match(
             '/https?:\/\/(?:www\.)?vimeo\.com\/(?:channels\/[a-z0-9]+\/)?(?<videoID>\d+)/i',
             $url,
@@ -624,10 +656,12 @@ class WebScraper {
     /**
      * Grab info from Vine.
      *
-     * @param $url
+     * @param string $url
      * @return array
+     * @throws Exception if the URL is invalid.
+     * @throws Exception if the URL failed to load.
      */
-    private function lookupVine($url) {
+    private function lookupVine(string $url): array {
         preg_match(
             '/https?:\/\/(?:www\.)?vine\.co\/(?:v\/)?(?<videoID>[\w]+)/i',
             $url,
@@ -639,9 +673,11 @@ class WebScraper {
         $data = [];
 
         $oembed = $this->getOembed("https://vine.co/oembed.json?url=https%3A%2F%2Fvine.co%2Fv%2F{$videoID}");
-        $data = array_merge($data, $oembed);
+        $data = array_merge($data, $this->normalizeOembed($oembed));
 
-        $data['attributes'] = ['videoID' => $videoID];
+        $attributes = $data['attributes'] ?? [];
+        $attributes['videoID'] = $videoID;
+        $data['attributes'] = $attributes;
 
         return $data;
     }
@@ -649,10 +685,12 @@ class WebScraper {
     /**
      * Grab info from Wistia.
      *
-     * @param $url
+     * @param string $url
      * @return array
+     * @throws Exception if the URL is invalid.
+     * @throws Exception if there was an error encountered while getting the page's info.
      */
-    private function lookupWistia($url) {
+    private function lookupWistia(string $url): array {
         // Try the wvideo-style URL.
         $wvideo = preg_match(
             '/https?:\/\/(?:[A-za-z0-9\-]+\.)?(?:wistia\.com|wi\.st)\/.*?\?wvideo=(?<videoID>[A-za-z0-9]+)([\?&]wtime=(?<time>((\d)+m)?((\d)+s)?))?/i',
@@ -690,8 +728,10 @@ class WebScraper {
      *
      * @param string $url
      * @return array
+     * @throws Exception if the URL is invalid.
+     * @throws Exception if the URL failed to load.
      */
-    private function lookupYouTube($url) {
+    private function lookupYouTube(string $url): array {
         // Get info from the URL.
         preg_match(
             '/https?:\/\/(?:(?:www.)|(?:m.))?(?:(?:youtube.(ca|com))|(?:youtu.be))\/(?:(?:playlist?)|(?:(?:watch\?v=)?(?P<videoId>[\w-]{11})))(?:\?|\&)?(?:list=(?P<listId>[\w-]*))?(?:t=(?:(?P<minutes>\d*)m)?(?P<seconds>\d*)s)?(?:#t=(?P<start>\d*))?/i',
@@ -714,14 +754,52 @@ class WebScraper {
         $data = [];
 
         $oembed = $this->getOembed("https://www.youtube.com/oembed?url=https%3A%2F%2Fwww.youtube.com%2Fwatch%3Fv%3D{$videoID}");
-        $data = array_merge($data, $oembed);
+        $data = array_merge($data, $this->normalizeOembed($oembed));
 
-        $data['attributes'] = [
-            'videoID' => $videoID,
-            'listID' => array_key_exists('listId', $urlParts) ? $urlParts['listId'] : null,
-            'start' => $start
-        ];
+        $listID = $urlParts['listId'] ?? null;
+        $attributes = $data['attributes'] ?? [];
+        $attributes['videoID'] = $videoID;
+        $attributes['listID'] = $listID ?: null;
+        $attributes['start'] = $start;
+        $data['attributes'] = $attributes;
+
         return $data;
+    }
+
+    /**
+     * Normalize oEmbed fields.
+     *
+     * @param array $oembed
+     * @return array
+     */
+    private function normalizeOembed(array $oembed): array {
+        // Simple renaming.
+        $fields = ['name' => 'title', 'photoUrl' => 'thumbnail_url'];
+        foreach ($fields as $new => $original) {
+            $val = $oembed[$original] ?? null;
+            $oembed[$new] = $val;
+            unset($oembed[$original]);
+        }
+
+        $attributes = [];
+
+        foreach (['width', 'height'] as $sizeAttribute) {
+            $thumbField = "thumbnail_{$sizeAttribute}";
+            $primary = $oembed[$sizeAttribute] ?? null;
+            $thumb = $oembed[$thumbField] ?? null;
+            if ($primary && $thumb) {
+                $attributes[$thumbField] = $thumb;
+            } elseif ($thumb) {
+                $primary = $thumb;
+            }
+            $oembed[$sizeAttribute] = $primary;
+            unset($oembed[$thumbField]);
+        }
+
+        if (!empty($attributes)) {
+            $oembed['attributes'] = $attributes;
+        }
+        return $oembed;
     }
 
     /**
@@ -732,7 +810,7 @@ class WebScraper {
      * @param callable $callback
      * @return self
      */
-    public function registerType($type, array $domains, callable $callback) {
+    public function registerType(string $type, array $domains, callable $callback): self {
         $this->types[$type] = [
             'domains' => $domains,
             'callback' => $callback
@@ -747,7 +825,7 @@ class WebScraper {
      * @param bool $disableFetch
      * @return self
      */
-    public function setDisableFetch($disableFetch) {
+    public function setDisableFetch(bool $disableFetch): self {
         $this->disableFetch = boolval($disableFetch);
         return $this;
     }

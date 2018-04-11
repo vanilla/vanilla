@@ -8,6 +8,7 @@ import BaseHistoryModule from "quill/modules/history";
 import Parchment from "parchment";
 import { delegateEvent } from "@core/dom";
 import KeyboardModule from "quill/modules/keyboard";
+import FocusableEmbedBlot from "./Blots/Abstract/FocusableEmbedBlot";
 
 const SHORTKEY = /Mac/i.test(navigator.platform) ? 'metaKey' : 'ctrlKey';
 
@@ -15,6 +16,8 @@ const SHORTKEY = /Mac/i.test(navigator.platform) ? 'metaKey' : 'ctrlKey';
  * A custom history module to allow redo/undo to work while an Embed is focused.
  */
 export default class HistoryModule extends BaseHistoryModule {
+
+    private lastFocusedEmbedBlot?: FocusableEmbedBlot;
 
     constructor(quill, options) {
         super(quill, options);

@@ -49,11 +49,7 @@ export default class ImageBlot extends FocusableEmbedBlot {
 
     public focus() {
         if (this.imageElement) {
-            console.log("focus");
-            console.log(this.imageElement);
             this.imageElement.focus();
-        } else {
-            console.log("Focus failed");
         }
     }
 }

@@ -257,11 +257,13 @@ export default class EmbedFocusModule extends Module {
         const position = blotForActiveElement.offset();
         const isEndOfScroll = position + blotForActiveElement.length() === this.quill.scroll.length();
         const isStartOfScroll = position === 0;
-        if (isStartOfScroll) {
+        const isUpOrLeft = [KeyboardModule.keys.LEFT, KeyboardModule.keys.UP].includes(event.keyCode as any);
+        const isDownOrRight = [KeyboardModule.keys.RIGHT, KeyboardModule.keys.DOWN].includes(event.keyCode as any);
+        if (isStartOfScroll && isUpOrLeft) {
             event.preventDefault();
             insertNewLineAtStartOfScroll(this.quill);
             return false;
-        } else if (isEndOfScroll) {
+        } else if (isEndOfScroll && isDownOrRight) {
             event.preventDefault();
             insertNewLineAtEndOfScroll(this.quill);
             return false;

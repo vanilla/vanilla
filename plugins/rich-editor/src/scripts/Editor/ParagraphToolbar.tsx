@@ -8,6 +8,7 @@ import React from "react";
 import Quill from "quill/core";
 import { RangeStatic, Sources } from "quill";
 import Emitter from "quill/core/emitter";
+import Parchment from "parchment";
 import { t } from "@core/application";
 import Toolbar from "./Generic/Toolbar";
 import * as Icons from "./Icons";
@@ -60,6 +61,7 @@ interface IState {
     range: RangeStatic;
     showMenu: boolean;
     showPilcrow: boolean;
+    isQuillFocused: boolean;
     activeFormatKey: string;
 }
 
@@ -86,6 +88,7 @@ export class ParagraphToolbar extends React.PureComponent<IEditorContextProps, I
         this.buttonID = this.ID + "-button";
         this.state = {
             showPilcrow: true,
+            isQuillFocused: true,
             showMenu: false,
             range: {
                 index: 0,
@@ -100,6 +103,8 @@ export class ParagraphToolbar extends React.PureComponent<IEditorContextProps, I
      */
     public componentDidMount() {
         this.quill.on(Emitter.events.EDITOR_CHANGE, this.handleEditorChange);
+        this.quill.root.addEventListener("focus", this.focusHandler);
+        this.quill.root.addEventListener("blur", this.blurHandler);
         document.addEventListener("keydown", this.escFunction, false);
         document.addEventListener(CLOSE_FLYOUT_EVENT, this.closeMenu);
     }
@@ -109,13 +114,16 @@ export class ParagraphToolbar extends React.PureComponent<IEditorContextProps, I
      */
     public componentWillUnmount() {
         this.quill.off(Emitter.events.EDITOR_CHANGE, this.handleEditorChange);
+        this.quill.root.removeEventListener("focus", this.focusHandler);
+        this.quill.root.removeEventListener("blur", this.blurHandler);
         document.removeEventListener("keydown", this.escFunction, false);
         document.removeEventListener(CLOSE_FLYOUT_EVENT, this.closeMenu);
     }
 
     public render() {
         let pilcrowClasses = "richEditor-button richEditorParagraphMenu-handle";
-        if (!this.state.showPilcrow) {
+
+        if (!this.state.showPilcrow || !this.state.isQuillFocused) {
             pilcrowClasses += " isHidden";
         }
 
@@ -149,6 +157,9 @@ export class ParagraphToolbar extends React.PureComponent<IEditorContextProps, I
             </div>
         </div>;
     }
+
+    private focusHandler = () => this.setState({ isQuillFocused: true });
+    private blurHandler = () => this.setState({ isQuillFocused: false });
 
     /**
      * Close the menu.
@@ -202,9 +213,7 @@ export class ParagraphToolbar extends React.PureComponent<IEditorContextProps, I
                 range = this.quill.getSelection();
             }
 
-
             // Check which paragraph formatting items are ready.
-
             if (range != null) {
                 const activeFormats = this.quill.getFormat(range);
                 let activeFormatKey = "pilcrow";

@@ -274,6 +274,8 @@ declare module "quill/modules/history" {
     export default class History extends Module {
         public undo(): void;
         public redo(): void;
+        public change(source, dest): void;
+        public record(changeDelta, oldDelta): void;
     }
 };
 declare module "quill/modules/keyboard" {

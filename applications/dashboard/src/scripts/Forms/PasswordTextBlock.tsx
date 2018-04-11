@@ -14,6 +14,6 @@ export default class PasswordTextBlock extends React.Component<IInputTextProps> 
     }
 
     public render() {
-        return <InputTextBlock {...this.props} autocomplete="off" type="password" />;
+        return <InputTextBlock {...this.props} type="password" />;
     }
 }

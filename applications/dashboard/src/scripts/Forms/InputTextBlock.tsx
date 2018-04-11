@@ -20,7 +20,6 @@ export interface IInputTextProps extends IComponentID{
     errors?: string[];
     disabled?: boolean;
     onChange?: any;
-    autocomplete?: string;
 }
 
 interface IState {
@@ -34,7 +33,6 @@ export default class InputTextBlock extends React.Component<IInputTextProps, ISt
         disabled: false,
         type: 'text',
         errors: [],
-        autocomplete: "off",
     };
 
     constructor(props) {
@@ -87,8 +85,6 @@ export default class InputTextBlock extends React.Component<IInputTextProps, ISt
                     value={this.props.value}
                     type={this.props.type}
                     disabled={this.props.disabled}
-                    // @ts-ignore
-                    autocomplete={this.props.autocomplete}
                     required={this.props.required}
                     placeholder={this.props.placeholder}
                     aria-invalid={hasErrors}

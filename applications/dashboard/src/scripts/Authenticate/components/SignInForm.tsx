@@ -92,10 +92,10 @@ class SignInForm extends React.Component<IProps, IState> {
                     }
                 });
             } else { // Global message
-                newState['globalError'] = generalError;
+                newState.globalError = generalError;
             }
         } else { // Something went really wrong. Add default message to tell the user there's a problem.
-            newState['globalError'] = catchAllErrorMessage;
+            newState.globalError = catchAllErrorMessage;
         }
         this.setState(newState);
     }
@@ -145,7 +145,7 @@ class SignInForm extends React.Component<IProps, IState> {
                     value={this.state.password}
                     onChange={this.handleTextChange}
                 />
-                <ButtonSubmit parentID={this.ID} disabled={!this.state.editable || this.state.password.length == 0 || this.state.username.length === 0} content={t('Sign In')}/>
+                <ButtonSubmit parentID={this.ID} disabled={!this.state.editable || this.state.password.length === 0 || this.state.username.length === 0} content={t('Sign In')}/>
                 <CreateAnAccountLink/>
             </form>;
         }

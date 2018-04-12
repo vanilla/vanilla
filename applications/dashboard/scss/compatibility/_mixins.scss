@@ -85,6 +85,13 @@
     user-select: none;
 }
 
+@mixin resetButton() {
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+    border: 0;
+}
+
 @mixin disabledInput {
     pointer-events: none;
     user-select: none;
@@ -98,4 +105,3 @@
     overflow-x: hidden;
     max-width: 100%;
 }
-

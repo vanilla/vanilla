@@ -77,3 +77,23 @@ describe("hashString", () => {
         expect(utility.hashString(str1)).not.toBe(utility.hashString(str2));
     });
 });
+
+test("isInstanceOfOneOf", () => {
+    /* tslint:disable:max-classes-per-file */
+    class Thing1 {}
+    class Thing2 {}
+    class Thing3 {}
+    class Thing4 {}
+
+    const classes = [
+        Thing1,
+        Thing2,
+        Thing3,
+        Thing4,
+    ];
+
+    const thing2 = new Thing4();
+
+    expect(utility.isInstanceOfOneOf(thing2, classes)).toBe(true);
+    expect(utility.isInstanceOfOneOf(5, classes)).not.toBe(true);
+});

@@ -5,6 +5,7 @@
         "entries": {
             "bootstrap-app": "./src/scripts/bootstrap/bootstrap.js",
             "bootstrap-admin": "./src/scripts/bootstrap/bootstrap.js",
+            "app": "./src/scripts/app/core-app.js",
             "polyfills": "./src/scripts/bootstrap/polyfills"
         },
         "exports": {
@@ -20,12 +21,12 @@
                 "axios",
                 "classnames",
                 "moment",
+                "prop-types",
                 "react",
                 "react-dom",
                 "react-redux",
                 "react-router-dom",
                 "redux",
-                "prop-types",
                 "sprintf-js"
             ],
             "app": [],

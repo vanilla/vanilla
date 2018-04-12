@@ -1,0 +1,18 @@
+[
+    { "insert": "Bulleted 1" },
+    { "attributes": { "list": "bullet" }, "insert": "\n" },
+    { "insert": "Bulleted 2" },
+    { "attributes": { "list": "bullet" }, "insert": "\n" },
+    { "insert": "Bulleted 3 (indented 1)" },
+    { "attributes": { "indent": 1, "list": "bullet" }, "insert": "\n" },
+    { "insert": "Bulleted 4 (indented 3)" },
+    { "attributes": { "indent": 3, "list": "bullet" }, "insert": "\n" },
+    { "insert": "\nNumbered 1" },
+    { "attributes": { "list": "ordered" }, "insert": "\n" },
+    { "insert": "Numbered 2" },
+    { "attributes": { "list": "ordered" }, "insert": "\n" },
+    { "insert": "Numbered 3 (indented 1)" },
+    { "attributes": { "indent": 1, "list": "ordered" }, "insert": "\n" },
+    { "insert": "Numbered 4 (indented 3)" },
+    { "attributes": { "indent": 3, "list": "ordered" }, "insert": "\n" }
+]

@@ -1,0 +1,9 @@
+[
+    { "insert": { "emoji": { "emojiChar": "🤩" } } },
+    { "insert": { "emoji": { "emojiChar": "😗" } } },
+    { "insert": " " },
+    { "insert": { "emoji": { "emojiChar": "😏" } } },
+    { "insert": "\n" },
+    { "insert": { "emoji": { "emojiChar": "😮" } } },
+    { "insert": "\n" }
+]

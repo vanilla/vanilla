@@ -1,0 +1,12 @@
+[
+    { "insert": "Test First Spoiler " },
+    { "attributes": { "link": "link" }, "insert": "Linkhere" },
+    { "attributes": { "spoiler-line": true }, "insert": "\n" },
+    { "attributes": { "bold": true }, "insert": "bold" },
+    { "insert": " Second Line" },
+    { "attributes": { "spoiler-line": true }, "insert": "\n" },
+    { "insert": "asdasdf\nasdfasdfasdf" },
+    { "attributes": { "bold": true }, "insert": "asdfasdf" },
+    { "insert": "\nTest Second Spoiler" },
+    { "attributes": { "spoiler-line": true }, "insert": "\n" }
+]

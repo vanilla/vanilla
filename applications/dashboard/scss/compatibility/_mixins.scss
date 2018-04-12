@@ -91,3 +91,17 @@
     appearance: none;
     border: 0;
 }
+
+@mixin disabledInput {
+    pointer-events: none;
+    user-select: none;
+    cursor: default;
+    opacity: .5;
+}
+
+@mixin singleLineEllipsis {
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    overflow-x: hidden;
+    max-width: 100%;
+}

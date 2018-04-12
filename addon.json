@@ -10,7 +10,6 @@
         },
         "exports": {
             "*": [
-                "./src/scripts/api",
                 "./src/scripts/application",
                 "./src/scripts/apiv2",
                 "./src/scripts/gdn",

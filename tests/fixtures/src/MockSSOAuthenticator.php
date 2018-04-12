@@ -1,4 +1,9 @@
 <?php
+/**
+ * @author Alexandre (DaazKu) Chouinard <alexandre.c@vanillaforums.com>
+ * @copyright 2009-2018 Vanilla Forums Inc.
+ * @license https://opensource.org/licenses/GPL-2.0 GPL-2.0
+ */
 
 namespace VanillaTests\Fixtures;
 
@@ -6,6 +11,9 @@ use Garden\Web\RequestInterface;
 use Vanilla\Authenticator\SSOAuthenticator;
 use Vanilla\Models\SSOData;
 
+/**
+ * Class MockSSOAuthenticator
+ */
 class MockSSOAuthenticator extends SSOAuthenticator {
 
     /** @var SSOData */
@@ -14,12 +22,18 @@ class MockSSOAuthenticator extends SSOAuthenticator {
     /**
      * MockSSOAuthenticator constructor.
      *
+     * @throws \Exception
      * @param $uniqueID
      * @param $userData
      * @param $extraData
      */
-    public function __construct($uniqueID, $userData = [], $extraData = []) {
+    public function __construct($uniqueID = null, $userData = [], $extraData = []) {
         parent::__construct('MockSSO');
+
+        if ($uniqueID === null) {
+            $uniqueID = uniqid('MockSSOUserID_');
+        }
+
         $this
             ->setData(new SSOData(
                 self::getType(),
@@ -112,5 +126,11 @@ class MockSSOAuthenticator extends SSOAuthenticator {
         return null;
     }
 
-
+    /**
+     * @inheritDoc
+     */
+    public function isUserLinked(int $userID): bool {
+        $userModel = new \UserModel();
+        return (bool)$userModel->getAuthenticationByUser($userID, $this->getID());
+    }
 }

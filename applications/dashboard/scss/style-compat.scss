@@ -1,4 +1,6 @@
 // This CSS file should always be added after style.css and not be overridden.
+// Variables
+@import "social/socialBackgrounds";
 
 // Compatibility
 @import "compatibility/mixins";
@@ -8,12 +10,19 @@
 @import "compatibility/buttons";
 @import "compatibility/categories";
 
-// New Features
-@import "new-features/mixins";
-@import "new-features/richEditor";
-@import "new-features/followButton";
-@import "new-features/vanillaIcon";
-@import "new-features/selectBox";
-@import "new-features/spoiler";
-@import "new-features/embed";
-@import "new-features/emoji";
+// This should always be added after style.css and not be overridden.
+@import "new-components/authenticateUser";
+@import "new-components/followButton";
+@import "new-components/vanillaIcon";
+@import "new-components/selectBox";
+@import "new-components/formElements"; // For new pages with form ony
+@import "new-components/checkboxAndRadioButton"; // For new pages with form ony
+@import "new-components/buttons"; // For new pages with form ony
+@import "new-components/passwordStrength"; // For new pages with form ony
+
+// Editor
+@import "editor/mixins";
+@import "editor/richEditor";
+@import "editor/spoiler";
+@import "editor/embed";
+@import "editor/emoji";

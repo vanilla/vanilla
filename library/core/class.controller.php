@@ -1857,7 +1857,7 @@ class Gdn_Controller extends Gdn_Pluggable {
 
                 $this->Head->addScript('', 'text/javascript', false, ['content' => $this->definitionList(false)]);
 
-                $busta = trim(assetVersion('', ''), '.');
+                $busta = $AssetModel->cacheBuster();
 
                 // Add the client-side translations.
                 // This is done in the controller rather than the asset model because the translations are not linked to compiled code.

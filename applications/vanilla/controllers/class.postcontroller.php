@@ -635,7 +635,7 @@ class PostController extends VanillaController {
         // Check permissions
         if ($Discussion && $Editing) {
             // Make sure that content can (still) be edited.
-            if (!$this->CommentModel::canEdit($this->Comment)) {
+            if (!CommentModel::canEdit($this->Comment)) {
                 throw permissionException('Vanilla.Comments.Edit');
             }
 

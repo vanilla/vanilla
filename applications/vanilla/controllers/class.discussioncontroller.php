@@ -121,13 +121,13 @@ class DiscussionController extends VanillaController {
 
                 // (((67 comments / 10 perpage) = 6.7) rounded down = 6) * 10 perpage = offset 60;
                 $this->Offset = floor($CountCommentWatch / $Limit) * $Limit;
-            }
-            if ($ActualResponses <= $Limit) {
-                $this->Offset = 0;
-            }
 
-            if ($this->Offset == $ActualResponses) {
-                $this->Offset -= $Limit;
+                if ($this->Offset >= $ActualResponses) {
+                    $this->Offset = $ActualResponses - $Limit;
+                }
+                if ($ActualResponses <= $Limit) {
+                    $this->Offset = 0;
+                }
             }
         } else {
             if ($this->Offset == '') {
@@ -155,7 +155,7 @@ class DiscussionController extends VanillaController {
         // Set the canonical url to have the proper page title.
         $this->canonicalUrl(discussionUrl($this->Discussion, pageNumber($this->Offset, $Limit, 0, false)));
 
-//      url(concatSep('/', 'discussion/'.$this->Discussion->DiscussionID.'/'. Gdn_Format::url($this->Discussion->Name), pageNumber($this->Offset, $Limit, TRUE, Gdn::session()->UserID != 0)), true), Gdn::session()->UserID == 0);
+        $this->checkPageRange($this->Offset, $ActualResponses);
 
         // Load the comments
         $this->setData('Comments', $this->CommentModel->getByDiscussion($DiscussionID, $Limit, $this->Offset));
@@ -742,7 +742,7 @@ class DiscussionController extends VanillaController {
                 }
 
                 // Make sure that content can (still) be edited.
-                if (!$this->CommentModel->canEdit($comment)) {
+                if (!CommentModel::canEdit($comment)) {
                     $this->categoryPermission($discussion->CategoryID, 'Vanilla.Comments.Delete');
                 }
 

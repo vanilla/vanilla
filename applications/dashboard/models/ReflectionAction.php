@@ -162,7 +162,35 @@ class ReflectionAction {
             }
 
             // Default the call args.
-            $this->args[$param->getName()] = $param->isDefaultValueAvailable() ? $param->getDefaultValue() : ($param->isArray() ? [] : null);
+            if ($param->isDefaultValueAvailable()) {
+                $arg = $param->getDefaultValue();
+            } elseif ($param->isArray()) {
+                $arg = [];
+            } elseif ($param->hasType()) {
+                $type = $param->getType();
+                switch (strtolower($type->__toString())) {
+                    case 'bool':
+                        $arg = false;
+                        $schemaType = 'boolean';
+                        break;
+                    case 'int':
+                        $arg = 0;
+                        $schemaType = 'integer';
+                        break;
+                    case 'float':
+                        $arg = 0.0;
+                        $schemaType = 'float';
+                        break;
+                    case 'string':
+                        $arg = '';
+                        break;
+                    default:
+                        $arg = null;
+                }
+            } else {
+                $arg = null;
+            }
+            $this->args[$param->getName()] = $arg;
 
             $p = null;
             if ($this->route->isMapped($param, Route::MAP_BODY)) {
@@ -170,6 +198,9 @@ class ReflectionAction {
                 $p = ['name' => $param->getName(), 'in' => 'body', 'required' => true];
             } elseif (!$param->getClass() && !$this->route->isMapped($param)) {
                 $p = ['name' => $param->getName(), 'in' => 'path', 'required' => true];
+                if (isset($schemaType)) {
+                    $p['type'] = $schemaType;
+                }
 
                 $constraint = (array)$this->route->getConstraint($param->getName()) + ['position' => '*'];
 
@@ -297,7 +328,7 @@ class ReflectionAction {
 
                     if (isset($allInArr['required']) && in_array($name, $allInArr['required'])) {
                         $param['required'] = true;
-                    } else if (isset($param['required'])) {
+                    } elseif (isset($param['required'])) {
                         unset($param['required']);
                     }
                 }

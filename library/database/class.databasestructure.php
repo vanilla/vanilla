@@ -328,6 +328,7 @@ abstract class Gdn_DatabaseStructure extends Gdn_Pluggable {
      *
      * @param $engine
      * @param bool $checkAvailability
+     * @return $this
      */
     public function engine($engine, $checkAvailability = true) {
         trigger_error(errorMessage('The selected database engine does not perform the requested task.', $this->ClassName, 'Engine'), E_USER_ERROR);
@@ -338,7 +339,7 @@ abstract class Gdn_DatabaseStructure extends Gdn_Pluggable {
      * Load the schema for this table from the database.
      *
      * @param string $tableName The name of the table to get or blank to get the schema for the current table.
-     * @return Gdn_DatabaseStructure $this
+     * @return $this
      */
     public function get($tableName = '') {
         if ($tableName) {
@@ -367,7 +368,7 @@ abstract class Gdn_DatabaseStructure extends Gdn_Pluggable {
      *
      * @param string $name The name of the column.
      * @param string $type The data type of the column.
-     * @return Gdn_DatabaseStructure $this.
+     * @return $this
      */
     public function primaryKey($name, $type = 'int') {
         $column = $this->_createColumn($name, $type, false, null, 'primary');
@@ -519,6 +520,7 @@ abstract class Gdn_DatabaseStructure extends Gdn_Pluggable {
      *
      * @param string $name The name of the table.
      * @param string $characterEncoding The default character encoding to specify for this table.
+     * @return $this
      */
     public function table($name = '', $characterEncoding = '') {
         if (!$name) {
@@ -664,7 +666,7 @@ abstract class Gdn_DatabaseStructure extends Gdn_Pluggable {
     /**
      * Reset the internal state of this object so that it can be reused.
      *
-     * @return Gdn_DatabaseStructure $this
+     * @return $this
      */
     public function reset() {
         $this->_CharacterEncoding = '';
@@ -682,7 +684,7 @@ abstract class Gdn_DatabaseStructure extends Gdn_Pluggable {
      *
      * @param string $message A human readable string for the issue.
      * @param string $sql The SQL that didn't happen.
-     * @return Gdn_DatabaseStructure Returns **this** for chaining.
+     * @return $this
      */
     protected function addIssue($message, $sql) {
         $this->issues[] = ['table' => $this->tableName(), 'message' => $message, 'sql' => $sql];

@@ -94,7 +94,7 @@ $Configuration['Garden']['Upload']['MaxFileSize'] = '50M';
 $Configuration['Garden']['Upload']['AllowedFileExtensions'] = ['txt', 'jpg', 'jpeg', 'gif', 'png', 'bmp', 'tiff', 'ico', 'zip', 'gz', 'tar.gz', 'tgz', 'psd', 'ai', 'fla', 'pdf', 'doc', 'xls', 'ppt', 'docx', 'xlsx', 'pptx', 'log', 'rar', '7z'];
 $Configuration['Garden']['Profile']['MaxHeight'] = 560;
 $Configuration['Garden']['Profile']['MaxWidth'] = 560;
-$Configuration['Garden']['Thumbnail']['Size'] = 120;
+$Configuration['Garden']['Thumbnail']['Size'] = 200;
 
 // Appearance.
 $Configuration['Garden']['Theme'] = 'default';

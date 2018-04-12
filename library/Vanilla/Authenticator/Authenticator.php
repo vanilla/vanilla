@@ -161,9 +161,10 @@ abstract class Authenticator {
      public static function getUiSchema(): Schema {
         return Schema::parse([
             'url:s' => 'Local relative URL from which you can initiate the SignIn process with this authenticator',
-            'photoUrl:s' => 'The relative icon URL for the button.',
             'buttonName:s' => 'The display text to put in the button. Ex: "Sign in with Facebook"',
-            'backgroundColor:s' => 'A css color code. (Hex color, rgb or rgba)',
+            'photoUrl:s|n' => 'The relative icon URL for the button.',
+            'backgroundColor:s|n' => 'A css color code for the background. (Hex color, rgb or rgba)',
+            'foregroundColor:s|n' => 'A css color code for the foreground. (Hex color, rgb or rgba)',
         ]);
     }
 

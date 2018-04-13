@@ -1789,6 +1789,8 @@ class EntryController extends Gdn_Controller {
      * @param string $passwordResetKey Authenticate with unique, 1-time code sent via email.
      */
     public function passwordReset($userID = '', $passwordResetKey = '') {
+        safeHeader('Referrer-Policy: no-referrer');
+
         $session = Gdn::session();
 
         // Prevent the token from being leaked by referrer!

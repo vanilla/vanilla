@@ -31,7 +31,7 @@ echo heading(sprintf(t('%s Settings'), 'OAuth2'), t('Add Connection'), '/setting
         <thead>
         <tr>
             <th><?php echo t('Site Name'); ?></th>
-            <th><?php echo t('Slug'); ?></th>
+            <th><?php echo t('Connection Key'); ?></th>
             <th><?php echo t('Client ID'); ?></th>
             <th class="column-sm"><?php echo t('Active') ?></th>
             <th class="column-sm"><?php echo t('Options') ?></th>

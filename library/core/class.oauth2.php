@@ -31,7 +31,7 @@ class Gdn_OAuth2 extends Gdn_Plugin {
     protected $accessTokenResponse;
 
     /** @var string key for GDN_UserAuthenticationProvider table  */
-    protected $providerKey = 'OAuth2';
+    protected $providerKey = 'oauth2';
 
     /** @var  string passing scope to authenticator */
     protected $scope;
@@ -90,6 +90,7 @@ class Gdn_OAuth2 extends Gdn_Plugin {
                 'AuthenticationKey' => $this->providerKey,
                 'AuthenticationSchemeAlias' => $this->providerKey,
                 'Name' => $this->providerKey,
+                'Active' => 0,
                 'AcceptedScope' => 'profile',
                 'ProfileKeyEmail' => 'email', // Can be overwritten in settings, the key the authenticator uses for email in response.
                 'ProfileKeyPhoto' => 'picture',
@@ -280,9 +281,14 @@ class Gdn_OAuth2 extends Gdn_Plugin {
      * @param $providerKey
      * @return array Stored provider data (secret, client_id, etc.).
      */
-    public function provider($providerKey = null) {
-        if ($providerKey) {
-            $this->provider = Gdn_AuthenticationProviderModel::getProviderByKey($providerKey);
+    public function provider() {
+        if (!$this->provider) {
+            $this->provider = Gdn_AuthenticationProviderModel::getProviderByKey($this->providerKey);
+        }
+
+        // If no connection key is provided, return the first Oauth2 provider in the AuthenticationProvider table.
+        if (!$this->provider) {
+            $this->provider = Gdn_AuthenticationProviderModel::getProviderByScheme('oauth2');
         }
         return $this->provider;
     }
@@ -335,18 +341,19 @@ class Gdn_OAuth2 extends Gdn_Plugin {
     /**
      * Allow child class to over-ride or add form fields to settings.
      *
+     * @param array $defaults The default form data.
      * @return array Form fields to appear in settings dashboard.
      */
-    protected function getSettingsFormFields() {
+    protected function getSettingsFormFields($defaults = []) {
         $formFields = [
             'RegisterUrl' => ['LabelCode' => 'Register Url', 'Description' => 'Enter the endpoint to direct a user to register.'],
             'SignOutUrl' => ['LabelCode' => 'Sign Out Url', 'Description' => 'Enter the endpoint to log a user out.'],
-            'AcceptedScope' => ['LabelCode' => 'Request Scope', 'Description' => 'Enter the scope to be sent with Token Requests.'],
-            'ProfileKeyEmail' => ['LabelCode' => 'Email', 'Description' => 'The Key in the JSON array to designate Emails'],
-            'ProfileKeyPhoto' => ['LabelCode' => 'Photo', 'Description' => 'The Key in the JSON array to designate Photo.'],
-            'ProfileKeyName' => ['LabelCode' => 'Display Name', 'Description' => 'The Key in the JSON array to designate Display Name.'],
-            'ProfileKeyFullName' => ['LabelCode' => 'Full Name', 'Description' => 'The Key in the JSON array to designate Full Name.'],
-            'ProfileKeyUniqueID' => ['LabelCode' => 'User ID', 'Description' => 'The Key in the JSON array to designate UserID.']
+            'AcceptedScope' => ['LabelCode' => 'Request Scope', 'Description' => 'Enter the scope to be sent with Token Requests.', 'Options' => ['value' => val('AcceptedScope', $defaults,'profile')]],
+            'ProfileKeyEmail' => ['LabelCode' => 'Email', 'Description' => 'The Key in the JSON array to designate Emails', 'Options' => ['value' => val('ProfileKeyEmail', $defaults,'email')]],
+            'ProfileKeyPhoto' => ['LabelCode' => 'Photo', 'Description' => 'The Key in the JSON array to designate Photo.', 'Options' => ['value' => val('ProfileKeyPhoto', $defaults,'picture')]],
+            'ProfileKeyName' => ['LabelCode' => 'Display Name', 'Description' => 'The Key in the JSON array to designate Display Name.', 'Options' => ['value' => val('ProfileKeyName', $defaults,'displayname')]],
+            'ProfileKeyFullName' => ['LabelCode' => 'Full Name', 'Description' => 'The Key in the JSON array to designate Full Name.', 'Options' => ['value' => val('ProfileKeyFullName', $defaults,'name')]],
+            'ProfileKeyUniqueID' => ['LabelCode' => 'User ID', 'Description' => 'The Key in the JSON array to designate UserID.', 'Options' => ['value' => val('ProfileKeyUniqueID', $defaults,'user_id')]]
         ];
         return $formFields;
     }
@@ -384,10 +391,11 @@ class Gdn_OAuth2 extends Gdn_Plugin {
         } else {
             $sender->Form->setData($configurationModel->Data);
         }
-
+        $sender->addSideMenu();
         $view = $this->settingsView;
         $providerKeys = $this->getAllProviderKeys();
         $sender->setData('ProviderKeys', $providerKeys);
+        $sender->addJsFile('oauth2settings.js', 'plugins/oauth2');
         $sender->render('settings', '', $view);
     }
 
@@ -411,7 +419,7 @@ class Gdn_OAuth2 extends Gdn_Plugin {
             $form->setData($provider);
         } else {
             $form->setFormValue('AuthenticationSchemeAlias', 'oauth2');
-            $sender->Form->validateRule('AuthenticationKey', 'ValidateSlug', 'You must provide a Connection Key containing only letters, numbers, and underscores.');
+            $sender->Form->validateRule('AuthenticationKey', 'validateConnectionKey', 'You must provide a Connection Key containing only letters, numbers, and underscores.');
             $sender->Form->validateRule('AssociationKey', 'ValidateRequired', 'You must provide a unique AccountID.');
             $sender->Form->validateRule('AssociationSecret', 'ValidateRequired', 'You must provide a Secret');
             $sender->Form->validateRule('AuthorizeUrl', 'isUrl', 'You must provide a complete URL in the Authorize Url field.');
@@ -442,7 +450,7 @@ class Gdn_OAuth2 extends Gdn_Plugin {
             'BearerToken' => ['LabelCode' => 'Authorization Code in Header', 'Description' => 'When requesting the profile, pass the access token in the HTTP header. i.e Authorization: Bearer [accesstoken]', 'Control' => 'checkbox']
         ];
 
-        $formFields = $formFields + $this->getSettingsFormFields();
+        $formFields = $formFields + $this->getSettingsFormFields($sender->Form->formData());
 
         $formFields['IsDefault'] = ['LabelCode' => 'Make this connection your default signin method.', 'Control' => 'checkbox'];
 
@@ -1011,39 +1019,11 @@ class Gdn_OAuth2 extends Gdn_Plugin {
     }
 }
 
-if (!function_exists('ValidateNameExists')) {
-    function validateNameExists($value) {
-        $exists = Gdn::sql()->getWhere('UserAuthenticationProvider', ['Name' => $value, 'Active' => 1])->resultArray();
-        if ($exists) {
-            return false;
-        }
-
-        return true;
-    }
-}
-
-if (!function_exists('ValidateSlug')) {
-    function validateSlug($value) {
+if (!function_exists('validateConnectionKey')) {
+    function validateConnectionKey($value) {
         $minlength = 3;
         $maxlength = 20;
         $regex = "/\S[A-z-_\d]{{$minlength},{$maxlength}}$/";
         return preg_match($regex, trim($value)) === 1;
-    }
-}
-
-if (!function_exists('ValidateSlugExists')) {
-    function validateName($value) {
-        $minlength = 3;
-        $maxlength = 20;
-        $regex = "/[A-zÀ-ÿ\s\d-_]{{$minlength},{$maxlength}}$/";
-        if (preg_match($regex, trim($value)) !== 1) {
-            return false;
-        }
-        $exists = Gdn::sql()->getWhere('UserAuthenticationProvider', ['Name' => $value, 'Active' => 1])->resultArray();
-        if ($exists) {
-            return false;
-        }
-
-        return true;
     }
 }

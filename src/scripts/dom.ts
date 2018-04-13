@@ -65,6 +65,28 @@ export function elementIsVisible(element: HTMLElement): boolean {
     return !!(element.offsetWidth || element.offsetHeight || element.getClientRects().length);
 }
 
+/**
+ * Get the form data out of a form element.
+ *
+ * @param {Element} formElement - The element to get the data out of.
+ *
+ * @returns {Object}
+ */
+export function getFormData(formElement) {
+    if (!(formElement instanceof HTMLFormElement)) {
+        return {};
+    }
+
+    const data = new FormData(formElement);
+    const result = {};
+
+    for (const [key, value] of data.entries()) {
+        result[key] = value;
+    }
+
+    return result;
+}
+
 const delegatedEventListeners = {};
 
 /**
@@ -80,15 +102,15 @@ const delegatedEventListeners = {};
 export function delegateEvent(
     eventName: string,
     filterSelector: string,
-    callback: () => void,
-    scopeSelector?: string
+    callback: (event: Event, triggeringElement: HTMLElement) => boolean | void,
+    scopeSelector?: string | HTMLElement
 ): string | undefined {
     let functionKey = eventName + filterSelector + callback.toString();
 
     /** @type {Document | Element} */
     let scope;
 
-    if (scopeSelector) {
+    if (typeof scopeSelector === "string") {
         scope = document.querySelector(scopeSelector);
 
         if (!scope) {
@@ -96,6 +118,8 @@ export function delegateEvent(
         } else {
             functionKey += scopeSelector;
         }
+    } else if (scopeSelector instanceof HTMLElement) {
+        scope = scopeSelector;
     } else {
         scope = document;
     }
@@ -110,7 +134,7 @@ export function delegateEvent(
             if (match) {
 
                 // Call the callback with the matching element as the context.
-                callback.call(match, event);
+                return callback.call(match, event, match);
             }
         };
 
@@ -187,4 +211,24 @@ export function getData(element: Element, key: string, defaultValue?: any) {
     }
 
     return defaultValue;
+}
+
+/**
+ * Get an HTML element from a CSS selector or DOM Node.
+ *
+ * @param {string|Node} selectorOrElement - A CSS selector or an HTML element.
+ *
+ * @throws {Error} - If no element was found.
+ * @returns {HTMLElement} - An HTMLElement no matter what.
+ */
+export function ensureHtmlElement(selectorOrElement) {
+    if (typeof selectorOrElement === "string") {
+        selectorOrElement = document.querySelector(selectorOrElement);
+    }
+
+    if (!(selectorOrElement instanceof HTMLElement)) {
+        throw new Error(`HTMLElement could not be found for ${selectorOrElement}.`);
+    }
+
+    return selectorOrElement;
 }

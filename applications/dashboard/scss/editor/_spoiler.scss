@@ -1,0 +1,133 @@
+$spoiler-borderColor: #aaadb1 !default;
+$spoiler-borderRadius: 2px !default;
+$spoiler-bg: #fff8d9 !default;
+$spoiler-fontSize: 16px !default;
+$spoiler-horizontalPadding: 18px !default;
+$spoiler-icon_size: 24px !default;
+$buttonSpoiler-fg: #555a62 !default;
+$buttonSpoiler-bg: transparent !default;
+$buttonSpoiler-hover_fg: #f52c6e !default;
+$buttonSpoiler-hover_bg: transparent !default;
+$buttonSpoiler-focus_fg: #f52c6e !default;
+$buttonSpoiler-focus_bg: transparent !default;
+
+$buttonSpoiler: (
+    default: (
+        border: 0,
+        border-radius: 0,
+        color: $buttonSpoiler-fg,
+        background-color: $buttonSpoiler-bg,
+        text-align: left
+    ),
+    hover: (
+        color: $buttonSpoiler-hover_fg,
+        background-color: $buttonSpoiler-hover_bg,
+    ),
+    focus: (
+        color: $buttonSpoiler-focus_fg,
+        background-color: $buttonSpoiler-focus_bg
+    )
+) !default;
+
+.spoiler {
+    border: {
+        style: solid;
+        color: $spoiler-borderColor;
+        width: 1px;
+        radius: $spoiler-borderRadius;
+    }
+    background-color: $spoiler-bg;
+
+    .spoiler-chevronUp {
+        display: none;
+    }
+
+    .spoiler-content {
+        display: none;
+    }
+
+    &.isShowingSpoiler {
+        .spoiler-content {
+            display: block;
+        }
+
+        .spoiler-chevronUp {
+            display: inline-block;
+        }
+
+        .spoiler-chevronDown {
+            display: none;
+        }
+    }
+}
+
+.spoiler-chevronUp,
+.spoiler-chevronDown {
+    width: 8px;
+    height: 4px;
+    display: inline-block;
+    margin-left: 6px;
+    vertical-align: .2em;
+}
+
+.button-spoiler {
+    @include generateButtonClass($buttonSpoiler, false);
+    @include noSelect;
+    width: 100%;
+    max-width: 100%;
+    font-size: $spoiler-fontSize;
+    min-height: $spoiler-icon_size * 2;
+    padding: 0 $spoiler-horizontalPadding;
+    outline: 0;
+    cursor: pointer;
+    text-align: center;
+    opacity: 1;
+}
+
+.spoiler-warningMain {
+    position: relative;
+    display: flex;
+    box-sizing: border-box;
+    justify-content: center;
+    padding: 0 $spoiler-icon_size;
+    width: 100%;
+    line-height: 1;
+}
+
+.spoiler-icon {
+    position: relative;
+    width: $spoiler-icon_size;
+    height: $spoiler-icon_size;
+    margin-right: 12px;
+}
+
+.spoiler-chevron {
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    width: $spoiler-icon_size * 1.5;
+    height: $spoiler-icon_size * 2;
+    display: flex;
+    align-items: center;
+}
+
+.spoiler-warningAfter,
+.spoiler-warningBefore
+{
+    margin: 0;
+    padding: 0;
+}
+
+.spoiler-warningBefore {
+    margin-right: 6px;
+}
+
+.spoiler-content {
+    padding: 0 $spoiler-horizontalPadding $spoiler-horizontalPadding $spoiler-horizontalPadding;
+}
+
+.spoiler-buttonContainer {
+    white-space: normal;
+    user-select: none;
+}

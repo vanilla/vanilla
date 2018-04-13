@@ -1789,7 +1789,16 @@ class EntryController extends Gdn_Controller {
      * @param string $passwordResetKey Authenticate with unique, 1-time code sent via email.
      */
     public function passwordReset($userID = '', $passwordResetKey = '') {
+        $session = Gdn::session();
+
+        // Prevent the token from being leaked by referrer!
         $passwordResetKey = trim($passwordResetKey);
+        if ($passwordResetKey) {
+            $session->stash('passwordResetKey', $passwordResetKey);
+            redirectTo("/entry/passwordreset/$userID");
+        }
+
+        $passwordResetKey = $session->stash('passwordResetKey', '', false);
         $this->UserModel->addPasswordStrength($this);
 
         if (!is_numeric($userID)

@@ -16,8 +16,7 @@ interface IState {
 }
 
 export default class Button extends React.Component<IProps, IState> {
-    private labelDom;
-
+    
     public static defaultProps = {
         disabled: false,
     };

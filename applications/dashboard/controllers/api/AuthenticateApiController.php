@@ -172,7 +172,6 @@ class AuthenticateApiController extends AbstractApiController {
             'name' => null,
             'ui' => null,
             'sso?' => Schema::parse([
-                'canSignIn' => null,
                 'canAutoLinkUser' => null,
             ])->add(SSOAuthenticator::getAuthenticatorSchema()->getField('properties.sso')),
             'isUserLinked:b?' => 'Whether or not the user is linked to that authenticator.',

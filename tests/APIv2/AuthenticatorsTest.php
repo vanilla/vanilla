@@ -69,7 +69,6 @@ class AuthenticatorsTest extends AbstractAPIv2Test {
         $this->assertArrayHasKey('backgroundColor', $record['ui']);
         $this->assertArrayHasKey('foregroundColor', $record['ui']);
 
-        $this->assertInternalType('array', $record['ui']);
         $this->assertArrayHasKey('isActive', $record);
         $this->assertInternalType('bool', $record['isActive']);
 

@@ -15,6 +15,7 @@ use Garden\Web\Exception\ServerException;
 use Garden\Web\Exception\NotFoundException;
 use Vanilla\AddonManager;
 use Vanilla\Authenticator\Authenticator;
+use Vanilla\Authenticator\ShimAuthenticator;
 
 class AuthenticatorModel {
 
@@ -95,7 +96,7 @@ class AuthenticatorModel {
         $authenticatorInstance = null;
 
         // Get Authenticator classes.
-        $authenticatorClasses = array_filter($this->getAuthenticatorClasses(), function($class) use ($authenticatorClassName) {
+        $authenticatorClasses = array_filter($this->getAuthenticatorClasses(true), function($class) use ($authenticatorClassName) {
             return preg_match("/(?:^|\\\\)$authenticatorClassName$/i", $class);
         });
 
@@ -157,10 +158,11 @@ class AuthenticatorModel {
     /**
      * Get Authenticator instances.
      *
+     * @param bool $includeShims
      * @return Authenticator[]
      */
-    public function getAuthenticators(): array {
-        $authenticatorClasses = $this->getAuthenticatorClasses();
+    public function getAuthenticators($includeShims = false): array {
+        $authenticatorClasses = $this->getAuthenticatorClasses($includeShims);
         $authenticators = [];
         foreach ($authenticatorClasses as $authenticatorClass) {
             try {
@@ -211,14 +213,19 @@ class AuthenticatorModel {
     /**
      * Get available Authenticator classes.
      *
+     * @param bool $includeShims
      * @return array
      */
-    public function getAuthenticatorClasses(): array {
+    public function getAuthenticatorClasses($includeShims = false): array {
         $authenticatorClasses = array_unique(
-            $this->addonManager->findClasses('*Authenticator') + array_keys($this->authenticatorClasses)
+            array_merge($this->addonManager->findClasses('*Authenticator'), array_keys($this->authenticatorClasses))
         );
 
-        return array_filter($authenticatorClasses, function($authenticatorClass) {
+        return array_filter($authenticatorClasses, function($authenticatorClass) use ($includeShims) {
+            if (!$includeShims && is_subclass_of($authenticatorClass, ShimAuthenticator::class, true)) {
+                return false;
+            }
+
             $result = is_subclass_of($authenticatorClass, Authenticator::class, true);
             return $result;
         });

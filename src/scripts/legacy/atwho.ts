@@ -158,7 +158,7 @@ export function initializeAtComplete(editorElement, iframe?: HTMLIFrameElement) 
     // Handle iframe situation
     const iframeWindow = iframe ? iframe.contentWindow : "";
 
-    function remoteDataHandler(query, callback) {
+    const remoteDataHandler = (query, callback) => {
         // Do this because of undefined when adding spaces to
         // matcher callback, as it will be monitoring changes.
         query = query || "";
@@ -215,7 +215,7 @@ export function initializeAtComplete(editorElement, iframe?: HTMLIFrameElement) 
                 }
             }
 
-            function filterSuccessHandler(data) {
+            const filterSuccessHandler = data => {
                 if (Array.isArray(data)) {
                     data.forEach(result => {
                         if (typeof result === "object" && typeof result.name === "string") {
@@ -240,7 +240,7 @@ export function initializeAtComplete(editorElement, iframe?: HTMLIFrameElement) 
                 } else {
                     atEmpty[query] = query;
                 }
-            }
+            };
 
             // Produce the suggestions based on data either
             // cached or retrieved.
@@ -265,7 +265,7 @@ export function initializeAtComplete(editorElement, iframe?: HTMLIFrameElement) 
                 }
             }
         }
-    }
+    };
 
     /**
      * Pre-insert handler for atwho.

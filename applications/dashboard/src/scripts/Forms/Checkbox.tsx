@@ -11,15 +11,25 @@ interface IProps extends IComponentID {
     label: string;
 }
 
-export default class Button extends React.Component<IProps> {
+interface IState {
+    ID: string;
+}
+
+export default class Button extends React.Component<IProps, IState> {
+    
     public static defaultProps = {
         disabled: false,
     };
-    public ID: string;
 
     constructor(props) {
         super(props);
-        this.ID = uniqueID(props, 'checkbox');
+        this.state = {
+            ID: uniqueID(props, "checkbox"),
+        };
+    }
+
+    get labelID():string {
+        return this.state.ID + "-label";
     }
 
     public render() {
@@ -28,8 +38,8 @@ export default class Button extends React.Component<IProps> {
             this.props.className
         );
 
-        return <label id={this.ID} className={componentClasses}>
-            <input className="checkbox-input" type="checkbox" onChange={this.props.onChange} checked={this.props.checked}/>
+        return <label id={this.state.ID} className={componentClasses}>
+            <input className="checkbox-input" aria-labelledby={this.labelID} type="checkbox" onChange={this.props.onChange} checked={this.props.checked}/>
             <span className="checkbox-box" aria-hidden="true">
                 <span className="checkbox-state">
                     <svg className="checkbox-icon checkbox-checkIcon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 10 10">
@@ -38,7 +48,7 @@ export default class Button extends React.Component<IProps> {
                     </svg>
                 </span>
             </span>
-            <span className="checkbox-label">{this.props.label}</span>
+            <span id={this.labelID} className="checkbox-label">{this.props.label}</span>
         </label>;
     }
 }

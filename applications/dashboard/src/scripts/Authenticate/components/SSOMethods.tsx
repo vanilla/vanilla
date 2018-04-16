@@ -12,6 +12,7 @@ interface IProps extends IComponentID {
 interface IState {
     editable: boolean;
     passwordAuthenticators?: any[];
+    longestText: number;
 }
 
 export default class SSOMethods extends React.Component<IProps, IState> {
@@ -27,6 +28,7 @@ export default class SSOMethods extends React.Component<IProps, IState> {
         this.state = {
             editable: false,
             passwordAuthenticators: props.passwordAuthenticators,
+            longestText: 0,
         };
 
     }
@@ -35,16 +37,23 @@ export default class SSOMethods extends React.Component<IProps, IState> {
         window.console.log("do sign in");
     }
 
+    public getLabelStylesLength ():any {
+        return {
+            minWidth: `calc(36px + ${this.state.longestText + 2}ex)`
+        };
+    }
+
     public render() {
         if (!this.state.passwordAuthenticators || this.state.passwordAuthenticators.length === 0) {
             return null;
         } else {
-            let longestText = 0;
             const or = this.includeOr ? <Or/> : null;
             const ssoMethods = this.state.passwordAuthenticators.map((method, index) => {
                 const nameLength = t(method.ui.buttonName).length;
-                if ( nameLength > longestText) {
-                    longestText = nameLength;
+                if ( nameLength > this.state.longestText) {
+                    this.setState({
+                        longestText: nameLength,
+                    });
                 }
 
                 const methodStyles = {
@@ -52,22 +61,18 @@ export default class SSOMethods extends React.Component<IProps, IState> {
                     color: method.ui.foregroundColor,
                 };
 
-                const labelStyles = {
-                    minWidth: `calc(36px + ${longestText + 2}ex)`
-                };
-
                 const buttonClick = () => {
                     this.handleClick(method);
                 };
 
-                return <button type="button" key={ index } onClick={buttonClick} className="BigButton button Button button-sso button-fullWidth bg-facebook" style={methodStyles}>
-                    <span className="button-ssoContents" style={labelStyles}>
+                return <a href={method.ui.url} key={ index } onClick={buttonClick} className="BigButton button Button button-sso button-fullWidth bg-facebook" style={methodStyles}>
+                    <span className="button-ssoContents" style={this.getLabelStylesLength()}>
                         <img src={method.ui.photoUrl} className="ssoMethod-icon" aria-hidden={true} />
                         <span className="button-ssoLabel">
                             {t(method.ui.buttonName)}
                         </span>
                     </span>
-                </button>;
+                </a>;
             });
 
             return <div className="ssoMethods">

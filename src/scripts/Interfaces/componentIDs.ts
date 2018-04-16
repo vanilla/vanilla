@@ -14,7 +14,7 @@ export function uniqueID(props:IComponentID, uniqueSuffix:string, allowNoID?:boo
 
     if (!allowNoID) {
         if ((!props.ID && !props.parentID) || (props.ID && props.parentID)) {
-            throw new Error(`You must have *either* ID or parentID`);
+            throw new Error(`You must have *either* 'id' or 'parentID'`);
         }
     }
 

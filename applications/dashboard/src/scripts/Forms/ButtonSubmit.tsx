@@ -1,7 +1,6 @@
 import { t } from '@core/application';
 import React from 'react';
 import classNames from 'classnames';
-import * as PropTypes from "prop-types";
 import Button from "./Button";
 import {uniqueID, IComponentID} from '@core/Interfaces/componentIDs';
 

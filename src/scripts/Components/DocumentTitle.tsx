@@ -15,15 +15,29 @@ import { getMeta } from "@core/application";
  * </DocumentTitle>
  */
 export default class DocumentTitle extends React.Component<IProps> {
-    componentDidMount() {
+    public componentDidMount() {
         document.title = this.getHeadTitle(this.props);
     }
 
-    componentWillUpdate(nextProps: IProps) {
+    public componentWillUpdate(nextProps: IProps) {
         document.title = this.getHeadTitle(nextProps);
     }
 
-    getHeadTitle(props: IProps) {
+    public render() {
+        if (this.props.children) {
+            return this.props.children;
+        } else {
+            return <h1>{this.props.title}</h1>;
+        }
+    }
+
+    /**
+     * Calculate the status bar title from the props.
+     *
+     * @param {IProps} props The props used to calculate the title.
+     * @returns {string} Returns the title as a string.
+     */
+    private getHeadTitle(props: IProps) {
         const siteTitle: string = getMeta('ui.siteName', '');
         const parts: string[] = [];
 
@@ -35,14 +49,6 @@ export default class DocumentTitle extends React.Component<IProps> {
         }
 
         return parts.join(' - ');
-    }
-
-    render() {
-        if (this.props.children) {
-            return this.props.children;
-        } else {
-            return <h1>{this.props.title}</h1>;
-        }
     }
 }
 

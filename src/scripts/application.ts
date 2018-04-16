@@ -156,7 +156,7 @@ const _routes: any[] = [];
  *
  * @param routes An array of routes to add.
  */
-export function addRoutes(routes: React.ReactElement<RouteProps>[]) {
+export function addRoutes(routes: Array<React.ReactElement<RouteProps>>) {
     if (!Array.isArray(routes)) {
         _routes.push(routes);
     } else {
@@ -169,7 +169,7 @@ export function addRoutes(routes: React.ReactElement<RouteProps>[]) {
  *
  * @returns Returns an array of routes.
  */
-export function getRoutes(): React.ReactElement<RouteProps>[] {
+export function getRoutes(): Array<React.ReactElement<RouteProps>> {
     return _routes;
 }
 

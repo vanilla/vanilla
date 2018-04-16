@@ -9,7 +9,7 @@ import NotFoundPage from "@core/Main/NotFoundPage";
  * This component renders the top-level pages that have been registered with {@link module:application.addRoutes}.
  */
 export default class App extends React.PureComponent {
-    render() {
+    public render() {
         const routes = getRoutes().map((route: React.ReactElement<RouteProps>) => {
             return <route.type key={route.key || route.props.path + (route.props.exact ? '!' : '')} {...route.props} />;
         });

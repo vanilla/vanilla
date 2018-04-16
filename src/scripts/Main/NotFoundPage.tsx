@@ -4,23 +4,23 @@ import { t } from '@core/application';
 import DocumentTitle from '@core/Components/DocumentTitle';
 
 export default class NotFoundPage extends React.PureComponent<IProps> {
-    static defaultProps = {
+    public static defaultProps = {
         type: "Page",
     };
 
-    get title() {
-        return this.props.title || sprintf(t('%s Not Found'), t(this.props.type));
-    }
-
-    get message() {
-        return this.props.message || sprintf(t('The %s you were looking for could not be found.'), t(this.props.type.toLowerCase()));
-    }
-
-    render() {
+    public render() {
         return <div className="Center SplashInfo">
             <DocumentTitle title={this.title}/>
             <div>{this.message}</div>
         </div>;
+    }
+
+    private get title() {
+        return this.props.title || sprintf(t('%s Not Found'), t(this.props.type));
+    }
+
+    private get message() {
+        return this.props.message || sprintf(t('The %s you were looking for could not be found.'), t(this.props.type.toLowerCase()));
     }
 }
 

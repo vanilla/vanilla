@@ -37,24 +37,19 @@ $this->fireEvent('BeforeCommentForm');
                     echo "<div class=\"Buttons\">\n";
                     $this->fireEvent('BeforeFormButtons');
 
-                    // Keep commented for now but if you stumble on this in a year you can just remove it :).
-//                    $CancelText = t('Home');
-//                    $CancelClass = 'Back';
-//                    if (!$NewOrDraft || $Editing) {
-//                        $CancelText = t('Cancel');
-//                        $CancelClass = 'Cancel';
-//                    }
-//
-//                    echo '<span class="'.$CancelClass.'">';
-//                    echo anchor($CancelText, '/');
-//                    $CategoryID = $this->data('Discussion.CategoryID');
-//                    if (c('Vanilla.Categories.Use', true) && $CategoryID) {
-//                        $Category = CategoryModel::categories($CategoryID);
-//                        if ($Category) {
-//                            echo ' <span class="Bullet">•</span> '.anchor(htmlspecialchars($Category['Name']), categoryUrl($Category));
-//                        }
-//                    }
-//                    echo '</span>';
+                    $CancelText = t('Home');
+                    $CancelClass = 'Back';
+                    if (!$NewOrDraft || $Editing) {
+                        $CancelText = t('Cancel');
+                        $CancelClass = 'Cancel';
+                    }
+
+                    echo '<span class="'.$CancelClass.'">';
+                    echo anchor($CancelText, '/');
+                    if ($this->data('Editor.BackLink')) {
+                        echo ' <span class="Bullet">•</span> '.$this->data('Editor.BackLink') ;
+                    }
+                    echo '</span>';
 
                     $ButtonOptions = ['class' => 'Button Primary CommentButton'];
                     $ButtonOptions['tabindex'] = 1;

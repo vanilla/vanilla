@@ -3,9 +3,9 @@
     "build": {
         "process": "core",
         "entries": {
-            "bootstrap-app": "./src/scripts/bootstrap/bootstrap.js",
-            "bootstrap-admin": "./src/scripts/bootstrap/bootstrap.js",
-            "app": "./src/scripts/app/core-app.js",
+            "bootstrap-app": "./src/scripts/bootstrap/bootstrap",
+            "bootstrap-admin": "./src/scripts/bootstrap/bootstrap",
+            "app": "./src/scripts/app/core-app",
             "polyfills": "./src/scripts/bootstrap/polyfills"
         },
         "exports": {

@@ -1,6 +1,6 @@
 import React from 'react';
 import { getRoutes, getMeta } from "@core/application";
-import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
+import { BrowserRouter as Router, Route, RouteProps, Switch } from "react-router-dom";
 import NotFoundPage from "@core/Main/NotFoundPage";
 
 /**
@@ -10,7 +10,7 @@ import NotFoundPage from "@core/Main/NotFoundPage";
  */
 export default class App extends React.PureComponent {
     render() {
-        const routes = getRoutes().map((route) => {
+        const routes = getRoutes().map((route: React.ReactElement<RouteProps>) => {
             return <route.type key={route.key || route.props.path + (route.props.exact ? '!' : '')} {...route.props} />;
         });
 

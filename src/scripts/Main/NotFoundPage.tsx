@@ -1,10 +1,12 @@
 import React from 'react';
-import PropTypes from "prop-types";
 import { sprintf } from 'sprintf-js';
 import { t } from '@core/application';
 import DocumentTitle from '@core/Components/DocumentTitle';
 
-export default class NotFoundPage extends React.PureComponent {
+export default class NotFoundPage extends React.PureComponent<IProps> {
+    static defaultProps = {
+        type: "Page",
+    };
 
     get title() {
         return this.props.title || sprintf(t('%s Not Found'), t(this.props.type));
@@ -22,12 +24,8 @@ export default class NotFoundPage extends React.PureComponent {
     }
 }
 
-NotFoundPage.defaultProps = {
-    type: "Page",
-};
-
-NotFoundPage.propTypes = {
-    type: PropTypes.string,
-    title: PropTypes.string,
-    message: PropTypes.string,
-};
+interface IProps {
+    type: string;
+    title?: string;
+    message?: string;
+}

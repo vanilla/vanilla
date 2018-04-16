@@ -2657,19 +2657,13 @@ class UserModel extends Gdn_Model {
         $sql->reset();
 
         // Get all users that matches the IP address.
-        $userIDs = [];
-
         $sql
             ->select('UserID')
             ->from('UserIP')
             ->where('IPAddress', inet_pton($ip));
 
         $matchingUserIDs = $sql->get()->resultArray();
-        if(!empty($matchingUserIDs)) {
-            foreach ($matchingUserIDs as $matchingUserID) {
-                $userIDs[] = valr('UserID', $matchingUserID);
-            }
-        }
+        $userIDs = array_column($matchingUserIDs, 'UserID');
 
         // Add these users to search query.
         $this->SQL

@@ -35,10 +35,9 @@ export default class SignInPage extends React.Component<{}, IState> {
     }
 
     public componentDidMount() {
-        log('SignInPage - /authenticate/authenticators');
         apiv2.get('/authenticate/authenticators')
             .then((response) => {
-                log('RecoverPasswordPage - authenticators response: ', response);
+                log('SignIn Page - authenticators response: ', response);
                 if (response.data) {
 
 

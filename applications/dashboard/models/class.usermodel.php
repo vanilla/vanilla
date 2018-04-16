@@ -2563,6 +2563,7 @@ class UserModel extends Gdn_Model {
         // Check for an IP address.
         if (preg_match('`\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}`', $keywords)) {
             $ipAddress = $keywords;
+            $optimize = false;
             $this->addIpFilters($ipAddress, ['LastIPAddress']);
         } elseif (strtolower($keywords) == 'banned') {
             $this->SQL->where('u.Banned >', 0);
@@ -2656,16 +2657,23 @@ class UserModel extends Gdn_Model {
         $sql->reset();
 
         // Get all users that matches the IP address.
+        $userIDs = [];
+
         $sql
             ->select('UserID')
             ->from('UserIP')
             ->where('IPAddress', inet_pton($ip));
 
         $matchingUserIDs = $sql->get()->resultArray();
+        if(!empty($matchingUserIDs)) {
+            foreach ($matchingUserIDs as $matchingUserID) {
+                $userIDs[] = valr('UserID', $matchingUserID);
+            }
+        }
 
         // Add these users to search query.
         $this->SQL
-            ->orWhereIn('u.UserID', $matchingUserIDs);
+            ->orWhereIn('u.UserID', $userIDs);
 
         // Check the user table ip fields.
         $allowedFields = ['LastIPAddress', 'InsertIPAddress', 'UpdateIPAddress'];

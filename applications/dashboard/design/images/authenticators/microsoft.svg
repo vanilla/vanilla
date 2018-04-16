@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+  <title>Microsoft</title>
+  <path d="M3,3h9q0,4.5,0,9H3V3" style="fill: #f25022"/>
+  <path d="M12,3h9q0,4.5,0,9H12q0-4.5,0-9" style="fill: #80ba01"/>
+  <path d="M3,12q4.5,0,9,0v9H3V12" style="fill: #02a4ef"/>
+  <path d="M12,12h9v9H12q0-4.5,0-9" style="fill: #ffb902"/>
+</svg>

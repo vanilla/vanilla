@@ -92,14 +92,14 @@ function polyfillRemove() {
  * @see https://developer.mozilla.org/en-US/docs/Web/API/CustomEvent/CustomEvent
  */
 function polyfillCustomEvent() {
-    if ( typeof window.CustomEvent === "function" ) {
+    if (typeof window.CustomEvent === "function") {
         return;
     }
 
-    function CustomEvent ( event, params ) {
+    function CustomEvent(event, params) {
         params = params || { bubbles: false, cancelable: false, detail: undefined };
-        const evt = document.createEvent( 'CustomEvent' );
-        evt.initCustomEvent( event, params.bubbles, params.cancelable, params.detail );
+        const evt = document.createEvent("CustomEvent");
+        evt.initCustomEvent(event, params.bubbles, params.cancelable, params.detail);
         return evt;
     }
 

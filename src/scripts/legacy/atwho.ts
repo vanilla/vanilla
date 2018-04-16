@@ -18,10 +18,10 @@ const atEmpty = {};
 let rawMatch: string | undefined;
 
 // Set minimum characters to type for @mentions to fire
-const minCharacters = getMeta('mentionMinChars', 2);
+const minCharacters = getMeta("mentionMinChars", 2);
 
 // Max suggestions to show in dropdown.
-const maxSuggestions = getMeta('mentionSuggestionCount', 5);
+const maxSuggestions = getMeta("mentionSuggestionCount", 5);
 
 // Server response limit. This should match the limit set in
 // *UserController->TagSearch* and UserModel->TagSearch
@@ -38,24 +38,27 @@ interface IEmojiData {
     format?: string;
 }
 
-const emojiData: IEmojiData = getMeta('emoji', {});
+const emojiData: IEmojiData = getMeta("emoji", {});
 const emojis = emojiData.emoji || {};
-const emojiFormat = emojiData.format || '';
-const emojiAssetPath = emojiData.assetPath || '';
+const emojiFormat = emojiData.format || "";
+const emojiAssetPath = emojiData.assetPath || "";
 
 const emojiList = Object.entries(emojis).map(([index, emojiImageUrl]) => {
-    const parts = emojiImageUrl.split('.');
+    const parts = emojiImageUrl.split(".");
 
-    return {'name': index, 'filename': emojiImageUrl, 'basename': parts[0], 'ext': '.' + parts[1]};
+    return { name: index, filename: emojiImageUrl, basename: parts[0], ext: "." + parts[1] };
 });
 
 const emojiContentTemplate = emojiFormat
-    .replace(/{(.+?)}/g, '$${$1}')
-    .replace('%1$s', '${src}')
-    .replace('%2$s', '${name}')
-    .replace('${src}', emojiAssetPath + '/${filename}')
-    .replace('${dir}', emojiAssetPath);
-const emojiTemplate = '<li data-value=":${name}:" class="at-suggest-emoji"><span class="emoji-wrap">' + emojiContentTemplate + '</span> <span class="emoji-name">${name}</span></li>';
+    .replace(/{(.+?)}/g, "$${$1}")
+    .replace("%1$s", "${src}")
+    .replace("%2$s", "${name}")
+    .replace("${src}", emojiAssetPath + "/${filename}")
+    .replace("${dir}", emojiAssetPath);
+const emojiTemplate =
+    '<li data-value=":${name}:" class="at-suggest-emoji"><span class="emoji-wrap">' +
+    emojiContentTemplate +
+    '</span> <span class="emoji-name">${name}</span></li>';
 
 /**
  * Custom matching to allow quotation marks in the matching string as well as spaces.
@@ -66,7 +69,7 @@ const emojiTemplate = '<li data-value=":${name}:" class="at-suggest-emoji"><span
  * @param shouldStartWithSpace - Should the pattern include a test for a whitespace prefix?
  * @returns Matching string if successful.  Null on failure to match.
  */
-export function matchAtMention(flag: string, subtext: string, shouldStartWithSpace: boolean): string|null {
+export function matchAtMention(flag: string, subtext: string, shouldStartWithSpace: boolean): string | null {
     // Split the string at the lines to allow for a simpler regex.
     const lines = subtext.split("\n");
     const lastLine = lines[lines.length - 1];
@@ -80,13 +83,14 @@ export function matchAtMention(flag: string, subtext: string, shouldStartWithSpa
      * @returns {string} A Regex string.
      */
     function nonExcludedCharacters(excludeWhiteSpace) {
-        let excluded = '[^' +
+        let excluded =
+            "[^" +
             '"' + // Quote character
-            '\\u0000-\\u001f\\u007f-\\u009f' + // Control characters
-            '\\u2028';// Line terminator
+            "\\u0000-\\u001f\\u007f-\\u009f" + // Control characters
+            "\\u2028"; // Line terminator
 
         if (excludeWhiteSpace) {
-            excluded += '\\s';
+            excluded += "\\s";
         }
 
         excluded += "]";
@@ -94,31 +98,32 @@ export function matchAtMention(flag: string, subtext: string, shouldStartWithSpa
     }
 
     let regexStr =
-        '@' + // @ Symbol triggers the match
-        '(' +
+        "@" + // @ Symbol triggers the match
+        "(" +
         // One or more non-greedy characters that aren't excluded. White is allowed, but a starting quote is required.
-        '"(' + nonExcludedCharacters(false) + '+?)"?' +
-
-        '|' + // Or
+        '"(' +
+        nonExcludedCharacters(false) +
+        '+?)"?' +
+        "|" + // Or
         // One or more non-greedy characters that aren't exluded. Whitespace is excluded.
-        '(' + nonExcludedCharacters(true) + '+?)"?' +
-
-        ')' +
-        '(?:\\n|$)'; // Newline terminates.
+        "(" +
+        nonExcludedCharacters(true) +
+        '+?)"?' +
+        ")" +
+        "(?:\\n|$)"; // Newline terminates.
 
     // Determined by at.who library
     if (shouldStartWithSpace) {
-        regexStr = '(?:^|\\s)' + regexStr;
+        regexStr = "(?:^|\\s)" + regexStr;
     }
-    const regex = new RegExp(regexStr, 'gi');
+    const regex = new RegExp(regexStr, "gi");
     const match = regex.exec(lastLine);
     if (match) {
         rawMatch = match[0];
 
         // Return either of the matching groups (quoted or unquoted).
-        return match[2] ||  match[1];
+        return match[2] || match[1];
     } else {
-
         // No match
         return null;
     }
@@ -135,11 +140,11 @@ export function matchAtMention(flag: string, subtext: string, shouldStartWithSpa
 export function matchFakeEmoji(flag, subtext, shouldStartWithSpace) {
     flag = flag.replace(/[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g, "\\$&");
     if (shouldStartWithSpace) {
-        flag = '(?:^|\\s)' + flag;
+        flag = "(?:^|\\s)" + flag;
     }
 
     // Some browsers append a linefeed to the end of subtext.  We need to allow for it.
-    const regexp = new RegExp(flag + '([A-Za-z0-9_\+\-]*|[^\\x00-\\xff]*)(?:\\n)?$', 'gi');
+    const regexp = new RegExp(flag + "([A-Za-z0-9_+-]*|[^\\x00-\\xff]*)(?:\\n)?$", "gi");
     const match = regexp.exec(subtext);
 
     if (match) {
@@ -150,18 +155,16 @@ export function matchFakeEmoji(flag, subtext, shouldStartWithSpace) {
 }
 
 export function initializeAtComplete(editorElement, iframe?: HTMLIFrameElement) {
-
     // Handle iframe situation
-    const iframeWindow = iframe ? iframe.contentWindow : '';
+    const iframeWindow = iframe ? iframe.contentWindow : "";
 
     function remoteDataHandler(query, callback) {
         // Do this because of undefined when adding spaces to
         // matcher callback, as it will be monitoring changes.
-        query = query || '';
+        query = query || "";
 
         // Only all query strings greater than min_characters
         if (query.length >= minCharacters) {
-
             // If the cache array contains less than LIMIT 30
             // (according to server logic), then there's no
             // point sending another request to server, as there
@@ -173,7 +176,7 @@ export function initializeAtComplete(editorElement, iframe?: HTMLIFrameElement) 
             // matching array has less than the server limit of
             // matches, which means there are no more, so save the
             // additional server request from being sent.
-            let filterString = '';
+            let filterString = "";
 
             // Loop through string and find first closest match in
             // the cache, and if a match, check if more filtering
@@ -181,9 +184,7 @@ export function initializeAtComplete(editorElement, iframe?: HTMLIFrameElement) 
             for (let i = 0, l = query.length; i < l; i++) {
                 filterString = query.slice(0, -i);
 
-                if (atCache[filterString]
-                    && atCache[filterString].length < serverLimit) {
-
+                if (atCache[filterString] && atCache[filterString].length < serverLimit) {
                     // Add this other query to empty array, so that it
                     // will not fire off another request.
                     atEmpty[query] = query;
@@ -207,7 +208,7 @@ export function initializeAtComplete(editorElement, iframe?: HTMLIFrameElement) 
                     // See if cached empty results match the start
                     // of the latest query. If so, then no point
                     // sending new request, as it will return empty.
-                    if (query.match(new RegExp('^' + key + '+')) !== null) {
+                    if (query.match(new RegExp("^" + key + "+")) !== null) {
                         isQueryEmpty = true;
                         break;
                     }
@@ -216,10 +217,11 @@ export function initializeAtComplete(editorElement, iframe?: HTMLIFrameElement) 
 
             function filterSuccessHandler(data) {
                 if (Array.isArray(data)) {
-                    data.forEach((result) => {
+                    data.forEach(result => {
                         if (typeof result === "object" && typeof result.name === "string") {
                             // Convert special characters to safely insert into template.
-                            result.name = result.name.replace(/&/g, "&amp;")
+                            result.name = result.name
+                                .replace(/&/g, "&amp;")
                                 .replace(/</g, "&lt;")
                                 .replace(/>/g, "&gt;")
                                 .replace(/"/g, "&quot;")
@@ -243,10 +245,14 @@ export function initializeAtComplete(editorElement, iframe?: HTMLIFrameElement) 
             // Produce the suggestions based on data either
             // cached or retrieved.
             if (shouldContinueFiltering && !isQueryEmpty && !atCache[query]) {
-                $.getJSON(formatUrl('/user/tagsearch'), {
-                    "q": query,
-                    "limit": serverLimit
-                }, filterSuccessHandler);
+                $.getJSON(
+                    formatUrl("/user/tagsearch"),
+                    {
+                        q: query,
+                        limit: serverLimit,
+                    },
+                    filterSuccessHandler,
+                );
             } else {
                 // If no point filtering more as the parent filter
                 // has not been maxed out with responses, use the
@@ -273,7 +279,7 @@ export function initializeAtComplete(editorElement, iframe?: HTMLIFrameElement) 
         // the suggestion is made in, and then constructing
         // it based on that. Optional assignment for undefined
         // matcher callback results.
-        let username = $li.data('value') || '';
+        let username = $li.data("value") || "";
         // Pop off the flag--usually @ or :
         username = username.slice(1, username.length);
 
@@ -296,7 +302,7 @@ export function initializeAtComplete(editorElement, iframe?: HTMLIFrameElement) 
         // This is needed for checking quotation mark directly
         // after at character, and preventing another at character
         // from being inserted into the page.
-        const raw_at_match = rawMatch || '';
+        const raw_at_match = rawMatch || "";
 
         const atQuote = /.?@(["'])/.test(raw_at_match);
 
@@ -322,25 +328,25 @@ export function initializeAtComplete(editorElement, iframe?: HTMLIFrameElement) 
         if (!query) {
             return li;
         }
-        const regexp = new RegExp(">\\s*(\\w*)(" + query.replace("+", "\\+") + ")(\\w*)\\s*(\\s+.+)?<", 'ig');
+        const regexp = new RegExp(">\\s*(\\w*)(" + query.replace("+", "\\+") + ")(\\w*)\\s*(\\s+.+)?<", "ig");
         // Capture group 4 for possible spaces
         return li.replace(regexp, (str, $1, $2, $3, $4) => {
             // Weird Chrome behaviour, so check for undefined, then
             // set to empty string if so.
-            if (typeof $3 === 'undefined') {
-                $3 = '';
+            if (typeof $3 === "undefined") {
+                $3 = "";
             }
-            if (typeof $4 === 'undefined') {
-                $4 = '';
+            if (typeof $4 === "undefined") {
+                $4 = "";
             }
 
-            return '> ' + $1 + '<strong>' + $2 + '</strong>' + $3 + $4 + ' <';
+            return "> " + $1 + "<strong>" + $2 + "</strong>" + $3 + $4 + " <";
         });
     }
 
     $(editorElement)
         .atwho({
-            at: '@',
+            at: "@",
             tpl: '<li data-value="@${name}" data-id="${id}">${name}</li>',
             limit: maxSuggestions,
             callbacks: {
@@ -349,10 +355,10 @@ export function initializeAtComplete(editorElement, iframe?: HTMLIFrameElement) 
                 highlighter: highlightHandler,
                 matcher: matchAtMention,
             },
-            cWindow: iframeWindow
+            cWindow: iframeWindow,
         })
         .atwho({
-            at: ':',
+            at: ":",
             tpl: emojiTemplate,
             insert_tpl: "${atwho-data-value}",
             callbacks: {
@@ -361,7 +367,7 @@ export function initializeAtComplete(editorElement, iframe?: HTMLIFrameElement) 
             },
             limit: maxSuggestions,
             data: emojiList,
-            cWindow: iframeWindow
+            cWindow: iframeWindow,
         });
 
     /**
@@ -372,8 +378,7 @@ export function initializeAtComplete(editorElement, iframe?: HTMLIFrameElement) 
      * @param offset - The pixel offsets inside of the iframe.
      * @param context - Context from the contenteditable inside of the iframe.
      */
-    function iframeAtWhoRepositionHandler(event: any, offset: any, context: any){
-
+    function iframeAtWhoRepositionHandler(event: any, offset: any, context: any) {
         // Actual suggestion box that will appear.
         const suggestionElement = context.view.$el;
 
@@ -381,13 +386,13 @@ export function initializeAtComplete(editorElement, iframe?: HTMLIFrameElement) 
         const $inputor = context.$inputor;
 
         // Display it below the text.
-        const lineHeight = parseInt($inputor.css('line-height'), 10);
+        const lineHeight = parseInt($inputor.css("line-height"), 10);
 
         // offset contains the top left values of the offset to the iframe
         // we need to convert that to main window coordinates
         const iframeOffset = $(iframe).offset();
         let leftCoordinate = (iframeOffset ? iframeOffset.left : 0) + offset.left;
-        let topCoordinate =  iframeOffset ? iframeOffset.top : 0;
+        let topCoordinate = iframeOffset ? iframeOffset.top : 0;
         let selectHeight = 0;
 
         // In wysiwyg mode, the suggestbox follows the typing, which
@@ -395,17 +400,17 @@ export function initializeAtComplete(editorElement, iframe?: HTMLIFrameElement) 
         // Either @ or : for now.
         const at = context.at;
         const { text } = context.query;
-        const fontMirror = $('.BodyBox,.js-bodybox');
-        const font = fontMirror.css('font-size') + ' ' + fontMirror.css('font-family');
+        const fontMirror = $(".BodyBox,.js-bodybox");
+        const font = fontMirror.css("font-size") + " " + fontMirror.css("font-family");
 
         // Get font width
         const fontWidth = (at + text).width(font) - 2;
 
-        if (at === '@') {
+        if (at === "@") {
             leftCoordinate -= fontWidth;
         }
 
-        if (at === ':') {
+        if (at === ":") {
             leftCoordinate -= 2;
         }
 
@@ -429,8 +434,7 @@ export function initializeAtComplete(editorElement, iframe?: HTMLIFrameElement) 
         if (iAvailableSpace >= selectHeight) {
             // Enough space below
             topCoordinate = topCoordinate + offset.top + selectHeight - scrollPosition;
-        }
-        else {
+        } else {
             // Place it above instead
             // @todo should check if this is more space than below
             topCoordinate = topCoordinate + offset.top - scrollPosition;
@@ -439,11 +443,10 @@ export function initializeAtComplete(editorElement, iframe?: HTMLIFrameElement) 
         // Move the select box
         const newOffset = {
             left: leftCoordinate,
-            top: topCoordinate
+            top: topCoordinate,
         };
         $(suggestionElement).offset(newOffset);
     }
-
 
     // Only necessary for iframe.
     // Based on work here: https://github.com/ichord/At.js/issues/124

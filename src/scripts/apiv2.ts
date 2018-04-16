@@ -4,8 +4,8 @@
  * @license GPLv2
  */
 
-import {formatUrl, getMeta, setMeta} from "@core/application";
-import axios, {AxiosRequestConfig, AxiosResponse} from "axios";
+import { formatUrl, getMeta, setMeta } from "@core/application";
+import axios, { AxiosRequestConfig, AxiosResponse } from "axios";
 
 /**
  * Add the transient key to every request.
@@ -14,7 +14,7 @@ import axios, {AxiosRequestConfig, AxiosResponse} from "axios";
  * @returns {AxiosRequestConfig} Returns the transformed request.
  */
 function handleRequest(request: AxiosRequestConfig): AxiosRequestConfig {
-    request.headers['X-Transient-Key'] = getMeta('TransientKey');
+    request.headers["X-Transient-Key"] = getMeta("TransientKey");
     return request;
 }
 
@@ -27,8 +27,8 @@ function handleRequest(request: AxiosRequestConfig): AxiosRequestConfig {
  * @returns {AxiosResponse} Returns the response.
  */
 function handleResponse(response: AxiosResponse) {
-    if ('x-csrf-token' in response.headers) {
-        setMeta('TransientKey', response.headers['x-csrf-token']);
+    if ("x-csrf-token" in response.headers) {
+        setMeta("TransientKey", response.headers["x-csrf-token"]);
     }
     return response;
 }

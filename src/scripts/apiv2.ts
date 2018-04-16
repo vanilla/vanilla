@@ -5,34 +5,18 @@
  */
 
 import {formatUrl, getMeta, setMeta} from "@core/application";
-import axios, {AxiosResponse} from "axios";
+import axios, {AxiosRequestConfig, AxiosResponse} from "axios";
 
 /**
  * Add the transient key to every request.
  *
- * @see {AxiosTransformer}
- *
- * @param {FormData} data The data from the request.
- * @param {any} headers The request header config.
- *
- * @returns {string|Buffer|ArrayBuffer|FormData|Stream} - Must
+ * @param {AxiosRequestConfig} request The request being submitted.
+ * @returns {AxiosRequestConfig} Returns the transformed request.
  */
-function addTransientKey(data, headers: any) {
-    headers.post['X-Transient-Key'] = getMeta('TransientKey');
-    return data;
+function handleRequest(request: AxiosRequestConfig): AxiosRequestConfig {
+    request.headers['X-Transient-Key'] = getMeta('TransientKey');
+    return request;
 }
-
-const requestTransformers = [
-    addTransientKey,
-];
-
-const api = axios.create({
-    baseURL: formatUrl("/api/v2/"),
-    // transformRequest: requestTransformers,
-});
-// api.defaults.headers.post['Content-Type'] = 'application/json';
-api.defaults.headers.post['X-Transient-Key'] = getMeta('TransientKey');
-api.interceptors.response.use(handleResponse);
 
 /**
  * Intercept all responses and do some data processing.
@@ -45,9 +29,14 @@ api.interceptors.response.use(handleResponse);
 function handleResponse(response: AxiosResponse) {
     if ('x-csrf-token' in response.headers) {
         setMeta('TransientKey', response.headers['x-csrf-token']);
-        api.defaults.headers.post['X-Transient-Key'] = getMeta('TransientKey');
     }
     return response;
 }
+
+const api = axios.create({
+    baseURL: formatUrl("/api/v2/"),
+});
+api.interceptors.request.use(handleRequest);
+api.interceptors.response.use(handleResponse);
 
 export default api;

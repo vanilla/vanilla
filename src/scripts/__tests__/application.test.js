@@ -38,7 +38,7 @@ describe("metaDataFunctions", () => {
 });
 
 describe("translate", () => {
-    gdn.translations['foo'] = 'bar';
+    gdn.translations.foo = 'bar';
 
     it("Translates a string", () => {
         expect(application.translate('foo')).toBe('bar');

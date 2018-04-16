@@ -137,7 +137,6 @@ class ReflectionAction {
 
         if (strcasecmp($httpMethod, 'index') === 0) {
             $httpMethod = 'GET';
-            $subpath = '';
         }
 
         // Check against the controller pattern.

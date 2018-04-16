@@ -136,3 +136,18 @@ describe("removing delegated events", () => {
         expect(callback2.mock.calls.length).toBe(0);
     })
 });
+
+describe("getFormData", () => {
+    beforeEach(() => {
+        document.body.innerHTML = `
+            <form>
+                <input type="text" name="foo" value="foo">
+            </form>
+        `
+    });
+
+    it ("can get get data out of a form", () => {
+        const form = document.querySelector("form");
+        expect(domUtility.getFormData(form)).toEqual({foo: "foo"});
+    })
+});

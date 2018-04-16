@@ -14,17 +14,19 @@
         "module": "esnext",
         "baseUrl": ".",
         "paths": {
+            "*": [
+                "node_modules/*"
+            ],
             "@core/*": ["./src/scripts/*"],
             "@vanilla/*": ["./applications/vanilla/src/scripts/*"],
             "@dashboard/*": ["./applications/dashboard/src/scripts/*"]
-        }
+        },
+        "skipLibCheck": true
     },
     "include": [
-        "**/src/scripts/**/*.ts",
-        "**/src/scripts/**/*.tsx",
+        "src/scripts/**/*",
+        "plugins/rich-editor/src/scripts/**/*",
+        "**/@types/**/*.ts",
         "global.ts"
-    ],
-    "exclude": [
-        "**/node_modules"
     ]
 }

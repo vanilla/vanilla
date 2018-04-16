@@ -1,0 +1,17 @@
+.safeEmoji { // All emoji
+    display: inline;
+    font-family: "Segoe UI Emoji", sans-serif;
+}
+
+.nativeEmoji { // Real Emojis
+    font-family: "Segoe UI Emoji", sans-serif; // Helps with IE
+}
+
+.fallBackEmoji { // Image Emoji
+    display: inline-block;
+    height: 1em;
+    width: 1em;
+    margin: 0 .05em 0 .1em;
+    vertical-align: -0.1em;
+    user-select: none;
+}

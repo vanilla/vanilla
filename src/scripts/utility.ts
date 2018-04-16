@@ -122,7 +122,23 @@ export function hashString(str: string): number {
     return str.split("").reduce(hashReduce, 0);
 }
 
+
+interface IClass {
+    new(): any;
+}
+
+export function isInstanceOfOneOf(needle: any, haystack: IClass[]) {
+    for(const classItem of haystack) {
+        if (needle instanceof classItem) {
+            return true;
+        }
+    }
+
+    return false;
+}
+
 /**
  * Re-exported from sprintf-js https://www.npmjs.com/package/sprintf-js
  */
 // export const sprintf = sprintfJs.sprintf;
+

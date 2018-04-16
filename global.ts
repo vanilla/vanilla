@@ -5,6 +5,10 @@ interface Element {
     setAttribute(name: string, value: number): void;
 }
 
+interface JQuery {
+    atwho?: any; // The at-who library.
+}
+
 interface Window {
     Waypoint: any;
     gdn: any;
@@ -13,6 +17,7 @@ interface Window {
     Symbol?: SymbolConstructor;
     CustomEvent?: typeof CustomEvent;
     Event: typeof Event;
+
     [key: string]: any;
 }
 

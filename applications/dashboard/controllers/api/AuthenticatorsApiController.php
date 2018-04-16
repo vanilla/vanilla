@@ -197,7 +197,7 @@ class AuthenticatorsApiController extends AbstractApiController  {
     /**
      * Normalize an Authenticator to match the Schema definition.
      *
-     * @param Authenticator $authenticator
+     * @param Authenticator|array $authenticator
      * @return array Return a Schema record.
      *
      * @throws \Garden\Schema\ValidationException
@@ -213,6 +213,19 @@ class AuthenticatorsApiController extends AbstractApiController  {
             $value = valr($field, $record, null);
             if ($value !== null) {
                 setvalr($field, $record, url($value, true));
+            }
+        }
+
+        // Pad some fields with default values.
+        $fieldDefaults = [
+            'ui.photoUrl' => url('/applications/dashboard/design/images/authenticators/sign_in.svg', true),
+            'ui.backgroundColor' => '#0291db',
+            'ui.foregroundColor' => '#fff',
+        ];
+        foreach($fieldDefaults as $field => $defaultValue) {
+            $value = valr($field, $record, null);
+            if ($value === null) {
+                setvalr($field, $record, $defaultValue);
             }
         }
 

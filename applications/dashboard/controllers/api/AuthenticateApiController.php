@@ -171,7 +171,7 @@ class AuthenticateApiController extends AbstractApiController {
             'isUnique' => null,
             'name' => null,
             'ui' => null,
-            'sso' => Schema::parse([
+            'sso?' => Schema::parse([
                 'canSignIn' => null,
                 'canAutoLinkUser' => null,
             ])->add(SSOAuthenticator::getAuthenticatorSchema()->getField('properties.sso')),
@@ -229,7 +229,7 @@ class AuthenticateApiController extends AbstractApiController {
             return true;
         };
 
-        $authenticators = array_filter($this->authenticatorApiController->getAuthenticatorModel()->getAuthenticators(), $filter);
+        $authenticators = array_filter($this->authenticatorApiController->getAuthenticatorModel()->getAuthenticators(true), $filter);
 
         $result = array_map([$this->authenticatorApiController, 'normalizeOutput'], $authenticators);
 

@@ -58,18 +58,20 @@ abstract class Authenticator {
      * @return Schema
      */
     public static function getAuthenticatorSchema(): Schema {
-        return Schema::parse([
-            'authenticatorID:s' => 'Authenticator instance\'s identifier.',
-            'type' => null,
-            'name' => null,
-            'signInUrl:s|n' => 'The configured relative sign in URL of the provider.',
-            'registerUrl:s|n' => 'The configured relative register URL of the provider.',
-            'signOutUrl:s|n' => 'The configured relative sign out URL of the provider.',
-            'ui:o' => static::getUiSchema(),
-            'isActive:b' => 'Whether or not the Authenticator can be used.',
-            'isUnique' => null,
-            'attributes:o' => 'Provider specific attributes',
-        ])->merge(self::getAuthenticatorTypeSchema());
+        return self::getAuthenticatorTypeSchema()->merge(
+            Schema::parse([
+                'authenticatorID:s' => 'Authenticator instance\'s identifier.',
+                'type' => null,
+                'name' => null,
+                'signInUrl:s|n' => 'The configured relative sign in URL of the provider.',
+                'registerUrl:s|n' => 'The configured relative register URL of the provider.',
+                'signOutUrl:s|n' => 'The configured relative sign out URL of the provider.',
+                'ui:o' => static::getUiSchema(),
+                'isActive:b' => 'Whether or not the Authenticator can be used.',
+                'isUnique' => null,
+                'attributes:o' => 'Provider specific attributes',
+            ])
+        );
     }
 
     /**
@@ -109,6 +111,7 @@ abstract class Authenticator {
      * Must be returned by this method:
      * - ui.photoUrl
      * - ui.backgroundColor
+     * - ui.foregroundColor
      *
      * Any fields from {@link getAuthenticatorTypeSchema()} can be overridden from this method.
      *
@@ -128,6 +131,7 @@ abstract class Authenticator {
             'ui:o'  => Schema::parse([
                 'photoUrl' => null,
                 'backgroundColor' => null,
+                'foregroundColor' => null,
             ])->add(static::getUiSchema()),
             'isUnique:b' => 'Whether this authenticator can have multiple instances or not. Unique authenticators have authenticatorID equal to their type.',
         ]);

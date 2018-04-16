@@ -54,8 +54,14 @@ class AuthenticatorsTest extends AbstractAPIv2Test {
 
         $this->assertArrayHasKey('authenticatorID', $record);
         $this->assertArrayHasKey('type', $record);
+
         $this->assertArrayHasKey('ui', $record);
         $this->assertInternalType('array', $record['ui']);
+        $this->assertArrayHasKey('url', $record['ui']);
+        $this->assertArrayHasKey('buttonName', $record['ui']);
+        $this->assertArrayHasKey('backgroundColor', $record['ui']);
+        $this->assertArrayHasKey('foregroundColor', $record['ui']);
+
 
         // Authenticators returned through /authenticate/authenticators have to be active.
         $this->assertArrayHasKey('isActive', $record);

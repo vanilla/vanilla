@@ -3,10 +3,7 @@ import { t } from '@core/application';
 import { log, logError, debug } from "@core/utility";
 import DocumentTitle from '@core/Components/DocumentTitle';
 import SignInForm from "./components/SignInForm";
-// import CreateAnAccountLink from "./components/CreateAnAccountLink";
-// import SSOMethods from "./components/SSOMethods";
 import { uniqueIDFromPrefix } from '@core/Interfaces/componentIDs';
-import apiv2 from "@core/apiv2";
 import {uniqueID, IComponentID} from '@core/Interfaces/componentIDs';
 
 interface IState {

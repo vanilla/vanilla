@@ -1,7 +1,6 @@
 import { t } from '@core/application';
 import React from 'react';
 import Paragraph from '../../Forms/Paragraph';
-import Or from '../../Forms/Or';
 import {uniqueID, IComponentID} from '@core/Interfaces/componentIDs';
 
 interface IProps extends IComponentID {

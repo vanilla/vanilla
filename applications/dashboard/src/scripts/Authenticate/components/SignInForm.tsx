@@ -10,7 +10,6 @@ import ButtonSubmit from "../../Forms/ButtonSubmit";
 import { uniqueIDFromPrefix } from '@core/Interfaces/componentIDs';
 import Paragraph from "../../Forms/Paragraph";
 import get from "lodash/get";
-import RememberPasswordLink from "./RememberPasswordLink";
 
 interface IProps {
     location?: any;

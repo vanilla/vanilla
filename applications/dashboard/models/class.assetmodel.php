@@ -169,12 +169,12 @@ class AssetModel extends Gdn_Model {
 
         // Add the lib.
         $libs = [
-            "/js/$basename/lib-core-$basename.js"
+            "/js/$basename/lib-core-$basename.min.js"
         ];
 
         $addons = [];
 
-        $core = "/js/$basename/core-$basename.js";
+        $core = "/js/$basename/core-$basename.min.js";
         if (file_exists(PATH_ROOT."/$core")) {
             $addons[] = $core;
         }
@@ -188,15 +188,15 @@ class AssetModel extends Gdn_Model {
 
             $build = $addon->getInfoValue('build', []);
             if (!empty($build['exports'][$basename])) {
-                $libs[] = $addon->path("/js/$basename/lib-".$addon->getKey()."-$basename.js", Addon::PATH_ADDON);
+                $libs[] = $addon->path("/js/$basename/lib-".$addon->getKey()."-$basename.min.js", Addon::PATH_ADDON);
             }
             if (!empty($build['entries'][$basename])) {
-                $addons[] = $addon->path("/js/$basename/".$addon->getKey()."-$basename.js", Addon::PATH_ADDON);
+                $addons[] = $addon->path("/js/$basename/".$addon->getKey()."-$basename.min.js", Addon::PATH_ADDON);
             }
         }
 
         // Add the bootstrap after everything else.
-        $addons[] = "/js/bootstrap-$basename/core-bootstrap-$basename.js";
+        $addons[] = "/js/$basename/core-bootstrap-$basename.min.js";
         $result = array_merge($libs, $addons);
 
         return $result;

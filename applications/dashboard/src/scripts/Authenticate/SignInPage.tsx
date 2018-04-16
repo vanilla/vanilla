@@ -8,12 +8,13 @@ import SSOMethods from "./components/SSOMethods";
 import { uniqueIDFromPrefix } from '@core/Interfaces/componentIDs';
 import apiv2 from "@core/apiv2";
 import {uniqueID, IComponentID} from '@core/Interfaces/componentIDs';
+import Or from "../Forms/Or";
 
 interface IState {
     loginFormActive: boolean;
     errors?: string[];
     redirectTo?: string;
-    ssoMethods?: any[];
+    ssoMethods: any[];
     passwordAuthenticator?: any;
     ID: string;
 }
@@ -27,6 +28,7 @@ export default class SignInPage extends React.Component<{}, IState> {
             ID: uniqueIDFromPrefix("SignInPage"),
             loginFormActive: false,
             errors: [],
+            ssoMethods: [],
         };
     }
 
@@ -39,26 +41,12 @@ export default class SignInPage extends React.Component<{}, IState> {
             .then((response) => {
                 log('SignIn Page - authenticators response: ', response);
                 if (response.data) {
-
-
-
-                    // const externalMethods:any[] = [];
-                    // response.data.map((method, index) => {
-                    //     log('SignInForm method: ', method);
-                    //     if (method.authenticatorID === 'password') {
-                    //         this.setState({
-                    //             passwordAuthenticator: method,
-                    //             loginFormActive: true,
-                    //         });
-                    //     } else {
-                    //         externalMethods.push(method);
-                    //     }
-                    // });
-
-                    const ssoMethods = response.data;
-                    delete ssoMethods.password; //remove default
-                    this.setState({
-                        ssoMethods: ssoMethods,
+                    response.data.map((method, index) => {
+                        if (method.authenticatorID != 'password') {
+                            this.setState(prevState => ({
+                                ssoMethods: [...prevState.ssoMethods as any[], method],
+                            }));
+                        }
                     });
                 } else {
                     logError('Error in RecoverPasswordPage - no response.data');
@@ -71,9 +59,11 @@ export default class SignInPage extends React.Component<{}, IState> {
 
 
     public render() {
+        const or = this.state.ssoMethods.length > 0 ? <Or/> : null;
         return <div id={this.state.ID} className="authenticateUserCol">
             <DocumentTitle id={this.titleID} classNames="isCentered" title={t('Sign In')}/>
             <SSOMethods parentID={this.state.ID} ssoMethods={this.state.ssoMethods} />
+            {or}
             <SignInForm parentID={this.state.ID}/>
         </div>;
     }

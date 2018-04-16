@@ -3,6 +3,7 @@ $authenticateUser-column_width: 334px !default;
 $authenticateUser-column_horizontalPadding: 26px !default;
 $authenticateUser-userImage_width: 117px !default;
 $authenticateUser-spacer: 18px !default;
+$authenticateUser-ssoButton_margin: 12px !default;
 $authenticateUser-socialIcon_width: 42px !default;
 $authenticateUser-socialIcon_borderWidth: 3px !default;
 $authenticateUser-socialIcon_bg: #fff !default;
@@ -32,6 +33,10 @@ $authenticateMethod-button_boxShadow: 0 1px 3px 0 rgba(0, 0, 0, .3) !default;
 
     .button.button-fullWidth {
         margin-bottom: $authenticateUser-spacer;
+
+        &.button-sso {
+            margin-bottom: $authenticateUser-ssoButton_margin;
+        }
     }
 
     .icon {
@@ -142,11 +147,14 @@ $authenticateMethod-button_boxShadow: 0 1px 3px 0 rgba(0, 0, 0, .3) !default;
 .button.Button {
     &.Primary.buttonCTA,
     &.button-sso {
+        user-select: none;
         display: flex;
         align-items: center;
         justify-content: center;
         background-image: none;
         box-sizing: border-box;
+        text-decoration: none !important;
+
     }
 
     &.button-sso {
@@ -172,4 +180,8 @@ $authenticateMethod-button_boxShadow: 0 1px 3px 0 rgba(0, 0, 0, .3) !default;
     flex-wrap: wrap;
     width: $authenticateMethod-width;
     max-width: 100%;
+}
+
+.ssoMethods {
+    margin-bottom: #{$authenticateUser-spacer - $authenticateUser-ssoButton_margin};
 }

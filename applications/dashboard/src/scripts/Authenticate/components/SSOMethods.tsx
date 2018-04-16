@@ -5,50 +5,42 @@ import Or from '../../Forms/Or';
 import {uniqueID, IComponentID} from '@core/Interfaces/componentIDs';
 
 interface IProps extends IComponentID {
-    includeOr?: boolean;
     ssoMethods?: any[];
 }
 
 interface IState {
-    editable: boolean;
-    passwordAuthenticators?: any[];
     longestText: number;
 }
 
 export default class SSOMethods extends React.Component<IProps, IState> {
-    public ssoMethods: any[];
-    public includeOr: boolean;
     public ID: string;
 
     constructor(props) {
         super(props);
         this.ID = uniqueID(props, 'SSOMethods', true);
-        this.includeOr = props.includeOr || true;
 
         this.state = {
-            editable: false,
-            passwordAuthenticators: props.passwordAuthenticators,
             longestText: 0,
         };
 
+        this.handleClick = this.handleClick.bind(this);
     }
 
-    public handleClick (method):any {
-        window.console.log("do sign in");
+    public handleClick = (method):any => {
+        window.console.log("Click!: ", method);
     }
 
     public getLabelStylesLength ():any {
         return {
-            minWidth: `calc(36px + ${this.state.longestText + 2}ex)`
+            minWidth: `calc(36px + ${this.state.longestText}ex)`
         };
     }
 
     public render() {
-        if (!this.state.passwordAuthenticators || this.state.passwordAuthenticators.length === 0) {
+        if (!this.props.ssoMethods || this.props.ssoMethods.length === 0) {
             return null;
         } else {
-            const or = this.includeOr ? <Or/> : null;
-            const ssoMethods = this.state.passwordAuthenticators.map((method, index) => {
+            const ssoMethods = this.props.ssoMethods.map((method, index) => {
                 const nameLength = t(method.ui.buttonName).length;
                 if ( nameLength > this.state.longestText) {
                     this.setState({
@@ -65,7 +57,7 @@ export default class SSOMethods extends React.Component<IProps, IState> {
                     this.handleClick(method);
                 };
 
-                return <a href={method.ui.url} key={ index } onClick={buttonClick} className="BigButton button Button button-sso button-fullWidth bg-facebook" style={methodStyles}>
+                return <a href={method.ui.url} key={ index } onClick={buttonClick} className="BigButton button Button button-sso button-fullWidth" style={methodStyles}>
                     <span className="button-ssoContents" style={this.getLabelStylesLength()}>
                         <img src={method.ui.photoUrl} className="ssoMethod-icon" aria-hidden={true} />
                         <span className="button-ssoLabel">
@@ -78,7 +70,6 @@ export default class SSOMethods extends React.Component<IProps, IState> {
             return <div className="ssoMethods">
                 <Paragraph parentID={this.ID} content={t('Sign in with one of the following:')} />
                 {ssoMethods}
-                {or}
             </div>;
         }
     }

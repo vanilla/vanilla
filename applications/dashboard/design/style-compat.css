@@ -111,6 +111,10 @@ button.Close {
   margin-bottom: 18px;
 }
 
+.authenticateUserCol .button.button-fullWidth.button-sso {
+  margin-bottom: 12px;
+}
+
 .authenticateUserCol .icon {
   display: inline-block;
   width: 24px;
@@ -210,11 +214,13 @@ button.Close {
 }
 
 .button.Button.Primary.buttonCTA, .button.Button.button-sso {
+  user-select: none;
   display: flex;
   align-items: center;
   justify-content: center;
   background-image: none;
   box-sizing: border-box;
+  text-decoration: none !important;
 }
 
 .button.Button.button-sso {
@@ -239,6 +245,10 @@ button.Close {
   flex-wrap: wrap;
   width: 200px;
   max-width: 100%;
+}
+
+.ssoMethods {
+  margin-bottom: 6px;
 }
 
 .followButton {

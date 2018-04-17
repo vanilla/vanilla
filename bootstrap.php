@@ -169,6 +169,7 @@ $dic->setInstance('Garden\Container\Container', $dic)
 
     ->rule(\Vanilla\Models\AuthenticatorModel::class)
     ->setShared(true)
+    ->addCall('registerAuthenticatorClass', [\Vanilla\Authenticator\PasswordAuthenticator::class])
 
     ->rule('Gdn_IPlugin')
     ->setShared(true)
@@ -210,10 +211,6 @@ $dic->setInstance('Garden\Container\Container', $dic)
 
     ->rule('Gdn_Form')
     ->addAlias('Form')
-
-    ->rule(\Vanilla\Models\AuthenticatorModel::class)
-    ->setShared(true)
-    ->addCall('registerAuthenticatorClass', [\Vanilla\Authenticator\PasswordAuthenticator::class])
 ;
 
 // Run through the bootstrap with dependencies.

@@ -187,6 +187,9 @@ class Bootstrap {
 
             ->rule(AuthenticatorModel::class)
             ->setShared(true)
+            ->addCall('registerAuthenticatorClass', [PasswordAuthenticator::class])
+            ->addCall('registerAuthenticatorClass', [MockAuthenticator::class])
+            ->addCall('registerAuthenticatorClass', [MockSSOAuthenticator::class])
 
             ->rule(\Garden\Web\Dispatcher::class)
             ->setShared(true)
@@ -220,14 +223,6 @@ class Bootstrap {
             ->rule(\WebScraper::class)
             ->setShared(true)
             ->addCall('setDisableFetch', [true]);
-        ;
-
-        /** @var AuthenticatorModel $authenticatorModel */
-        $authenticatorModel = $container->get(AuthenticatorModel::class);
-        $authenticatorModel
-            ->registerAuthenticatorClass(PasswordAuthenticator::class)
-            ->registerAuthenticatorClass(MockAuthenticator::class)
-            ->registerAuthenticatorClass(MockSSOAuthenticator::class)
         ;
     }
 

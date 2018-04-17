@@ -19,8 +19,8 @@ class LinkEmbedBlot extends AbstractBlockEmbedBlot {
      * @inheritDoc
      */
     protected function renderContent(array $data): string {
-        $url = \htmlentities(val("url", $data, ""), \ENT_QUOTES);
-        $imageUrl = \htmlentities(val("linkImage", $data, ""), \ENT_QUOTES);
+        $url = htmlentities(val("url", $data, ""), \ENT_QUOTES);
+        $imageUrl = htmlentities(val("linkImage", $data, ""), \ENT_QUOTES);
         $excerpt = val("excerpt", $data, "");
 
         $excerptHtml = "<div class=\"embedLink-excerpt\">$excerpt</div>";

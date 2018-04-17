@@ -35,7 +35,7 @@ class TextBlot extends AbstractBlot {
      * @inheritDoc
      */
     public static function matches(array $operations): bool {
-        return \is_string(val("insert", $operations[0]));
+        return is_string(val("insert", $operations[0]));
     }
 
     /**
@@ -45,11 +45,11 @@ class TextBlot extends AbstractBlot {
         parent::__construct($currentOperation, $previousOperation, $nextOperation);
 
         $insert = val("insert", $this->currentOperation, "");
-        $this->content = \htmlentities($insert, \ENT_QUOTES);
+        $this->content = htmlentities($insert, \ENT_QUOTES);
 
         if (preg_match("/\\n$/", $this->content)) {
             $this->currentOperation[BlotGroup::BREAK_MARKER] = true;
-            $this->content = \rtrim($this->content, "\n");
+            $this->content = rtrim($this->content, "\n");
         }
     }
 
@@ -66,7 +66,7 @@ class TextBlot extends AbstractBlot {
             }
         }
 
-        $this->closingTags = \array_reverse($this->closingTags);
+        $this->closingTags = array_reverse($this->closingTags);
 
         $result = "";
         foreach($this->openingTags as $tag) {
@@ -85,7 +85,7 @@ class TextBlot extends AbstractBlot {
      * @inheritDoc
      */
     public function shouldClearCurrentGroup(BlotGroup $group): bool {
-        return \array_key_exists(BlotGroup::BREAK_MARKER, $this->currentOperation);
+        return array_key_exists(BlotGroup::BREAK_MARKER, $this->currentOperation);
     }
 
     /**
@@ -152,8 +152,8 @@ class TextBlot extends AbstractBlot {
             return "<br>";
         }
 
-        if (\preg_match("/^\\n.+/", $this->content)) {
-            return \preg_replace("/^\\n/", "<br></p><p>", $input);
+        if (preg_match("/^\\n.+/", $this->content)) {
+            return preg_replace("/^\\n/", "<br></p><p>", $input);
         } else {
             return $input;
         }

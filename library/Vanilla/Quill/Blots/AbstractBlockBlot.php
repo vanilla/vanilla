@@ -46,10 +46,10 @@ abstract class AbstractBlockBlot extends TextBlot {
 
         if ($this->isOwnGroup()) {
             $this->shouldClearCurrentGroup = true;
-        } elseif (\stringBeginsWith($this->content, "\n")) {
+        } elseif (stringBeginsWith($this->content, "\n")) {
             $this->content = \ltrim($this->content, "\n");
             $this->shouldClearCurrentGroup = true;
-        } elseif (\array_key_exists(BlotGroup::BREAK_MARKER, $this->currentOperation)) {
+        } elseif (array_key_exists(BlotGroup::BREAK_MARKER, $this->currentOperation)) {
             $this->shouldClearCurrentGroup = true;
         } else {
             $this->shouldClearCurrentGroup = false;
@@ -68,7 +68,7 @@ abstract class AbstractBlockBlot extends TextBlot {
             $value = valr("attributes.$lookupKey", $op);
 
             if (
-                (\is_array($expected) && \in_array($value, $expected))
+                (is_array($expected) && in_array($value, $expected))
                 || $value === $expected
             ) {
                 $found = true;

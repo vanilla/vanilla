@@ -62,7 +62,7 @@ class BlotGroup {
         }
 
         $blot = $this->blots[0];
-        return \get_class($blot) === TextBlot::class && $this->blots[0]->getContent() === "";
+        return get_class($blot) === TextBlot::class && $this->blots[0]->getContent() === "";
     }
 
     /**
@@ -81,7 +81,7 @@ class BlotGroup {
         $lastBlot = $this->blots[count($this->blots) - 1];
 
         if ($needsExactMatch) {
-            return \get_class($lastBlot) === $blotClass;
+            return get_class($lastBlot) === $blotClass;
         }
 
         return $lastBlot instanceof $blotClass;

@@ -45,7 +45,7 @@ abstract class AbstractLineBlot extends AbstractBlockBlot {
         $class = static::getAttributeKey();
         $result = "";
         if ($this->nextOperation) {
-            $extraNewLines = \substr_count($this->nextOperation["insert"], "\n") - 1;
+            $extraNewLines = substr_count($this->nextOperation["insert"], "\n") - 1;
             for ($i = 0; $i < $extraNewLines; $i++) {
                 $result .= "<p class=\"$class\"><br></p>";
             }

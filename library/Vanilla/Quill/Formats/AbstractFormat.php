@@ -56,7 +56,7 @@ abstract class AbstractFormat extends AbstractBlot {
 
         foreach($operations as $op) {
             $attributes = val("attributes", $op, []);
-            if (\array_key_exists(static::getAttributeLookupKey(), $attributes)) {
+            if (array_key_exists(static::getAttributeLookupKey(), $attributes)) {
                 $result = true;
             }
         }

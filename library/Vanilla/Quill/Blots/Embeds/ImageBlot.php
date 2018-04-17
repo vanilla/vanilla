@@ -19,7 +19,7 @@ class ImageBlot extends AbstractBlockEmbedBlot {
      * @inheritDoc
      */
     protected function renderContent(array $data): string {
-        $imageUrl = \htmlentities(val("url", $data, ""), \ENT_QUOTES);
+        $imageUrl = htmlentities(val("url", $data, ""), \ENT_QUOTES);
         $altText = val("alt", $data, "");
 
         $result =   "<div class=\"embed-image embed embedImage\">";

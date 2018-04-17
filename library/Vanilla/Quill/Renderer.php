@@ -62,8 +62,8 @@ class Renderer {
         foreach($this->operations as $opIndex => $op) {
             // Determine if this is a plain text insert with no attributes.
             $isBareInsertOperation =
-                !\array_key_exists("attributes", $op)
-                && \array_key_exists("insert", $op)
+                !array_key_exists("attributes", $op)
+                && array_key_exists("insert", $op)
                 && is_string($op["insert"]);
 
             // Other types of inserts should not get split, they need special handling inside of their blot.
@@ -111,7 +111,7 @@ class Renderer {
      * Parse the operations into an array of Groups.
      */
     private function parse() {
-        $operationLength = \count($this->operations);
+        $operationLength = count($this->operations);
         $group = new BlotGroup();
 
         for($i = 0; $i < $operationLength; $i++) {

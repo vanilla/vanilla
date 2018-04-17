@@ -5,7 +5,8 @@
  */
 import gdn from "@core/gdn";
 import { PromiseOrNormalCallback } from "@core/utility";
-import { ComponentClass } from "react";
+import React, { ComponentClass } from "react";
+import { RouteProps } from "react-router-dom";
 
 /**
  * Get a piece of metadata passed from the server.
@@ -155,7 +156,7 @@ const _routes: any[] = [];
  *
  * @param routes An array of routes to add.
  */
-export function addRoutes(routes: JSX.Element[]) {
+export function addRoutes(routes: Array<React.ReactElement<RouteProps>>) {
     if (!Array.isArray(routes)) {
         _routes.push(routes);
     } else {
@@ -168,7 +169,7 @@ export function addRoutes(routes: JSX.Element[]) {
  *
  * @returns Returns an array of routes.
  */
-export function getRoutes(): JSX.Element[] {
+export function getRoutes(): Array<React.ReactElement<RouteProps>> {
     return _routes;
 }
 

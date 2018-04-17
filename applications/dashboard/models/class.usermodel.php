@@ -2662,10 +2662,11 @@ class UserModel extends Gdn_Model {
             ->where('IPAddress', inet_pton($ip));
 
         $matchingUserIDs = $sql->get()->resultArray();
+        $userIDs = array_column($matchingUserIDs, 'UserID');
 
         // Add these users to search query.
         $this->SQL
-            ->orWhereIn('u.UserID', $matchingUserIDs);
+            ->orWhereIn('u.UserID', $userIDs);
 
         // Check the user table ip fields.
         $allowedFields = ['LastIPAddress', 'InsertIPAddress', 'UpdateIPAddress'];

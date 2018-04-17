@@ -238,6 +238,14 @@ class PostController extends VanillaController {
             $this->deliveryType(Gdn::request()->getValue('DeliveryType', $this->_DeliveryType));
             if ($draftID == 0) {
                 $draftID = $this->Form->getFormValue('DraftID', 0);
+                if ($draftID) {
+                    $draftObject = $this->DraftModel->getID($draftID, DATASET_TYPE_ARRAY);
+                    if (!$draftObject) {
+                        throw notFoundException('Draft');
+                    } elseif ((val('InsertUserID', $draftObject) != $Session->UserID) && !checkPermission('Garden.Community.Manage')) {
+                        throw permissionException('Garden.Community.Manage');
+                    }
+                }
             } else {
                 if ($draftID != $formValues['DraftID']) {
                     throw new Exception('DraftID mismatch.');

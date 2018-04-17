@@ -122,7 +122,7 @@
   dependencies:
     csstype "^2.0.0"
 
-"@vanillaforums/babel-preset@^1.0.2":
+"@vanillaforums/babel-preset@^1.0.3":
   version "1.0.3"
   resolved "https://registry.yarnpkg.com/@vanillaforums/babel-preset/-/babel-preset-1.0.3.tgz#157bcc8bb2d9a078fa80b9b9b4db4c3f69032705"
   dependencies:
@@ -137,10 +137,11 @@
   version "1.2.2"
   resolved "https://registry.yarnpkg.com/@vanillaforums/eslint-config/-/eslint-config-1.2.2.tgz#451366deb985f69fbb404fddb72418cc682cfa60"
 
-"@vanillaforums/tslint-config@^1.0.4":
-  version "1.0.4"
-  resolved "https://registry.yarnpkg.com/@vanillaforums/tslint-config/-/tslint-config-1.0.4.tgz#1e718c929fc589e381e1e674c9a95e1e7484cfc1"
+"@vanillaforums/tslint-config@^1.1.1":
+  version "1.1.1"
+  resolved "https://registry.yarnpkg.com/@vanillaforums/tslint-config/-/tslint-config-1.1.1.tgz#9e014be842a6c7e081080f52138e5442c0e7f278"
   dependencies:
+    tslint "^5.9.1"
     tslint-config-prettier "^1.10.0"
     tslint-react "^3.5.1"
     typescript "^2.7.0"

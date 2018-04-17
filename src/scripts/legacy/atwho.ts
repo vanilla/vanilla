@@ -302,9 +302,9 @@ export function initializeAtComplete(editorElement, iframe?: HTMLIFrameElement) 
         // This is needed for checking quotation mark directly
         // after at character, and preventing another at character
         // from being inserted into the page.
-        const raw_at_match = rawMatch || "";
+        const rawAtMatch = rawMatch || "";
 
-        const atQuote = /.?@(["'])/.test(raw_at_match);
+        const atQuote = /.?@(["'])/.test(rawAtMatch);
 
         // If atQuote is false, then insert the at character,
         // otherwise it means the user typed a quotation mark

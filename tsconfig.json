@@ -1,7 +1,6 @@
 {
     "compilerOptions": {
         "jsx": "react",
-        "allowJs": true,
         "lib": [
             "es2017",
             "dom",
@@ -22,12 +21,17 @@
             "@vanilla/*": ["./applications/vanilla/src/scripts/*"],
             "@dashboard/*": ["./applications/dashboard/src/scripts/*"]
         },
+        "typeRoots": [
+            "node_modules/@types"
+        ],
         "skipLibCheck": true
     },
     "include": [
-        "src/scripts/**/*",
-        "plugins/rich-editor/src/scripts/**/*",
+        "**/src/scripts/**/*.ts",
         "**/@types/**/*.ts",
         "global.ts"
+    ],
+    "exclude": [
+        "**/*.js"
     ]
 }

@@ -2443,17 +2443,18 @@ EOT;
     /**
      * Format text from Rich editor input.
      *
-     * @param $mixed
-     * @return mixed|string
+     * @param string $delta A JSON encoded array of Quill deltas.
+     *
+     * @throws Exception - When the deltas could not be JSON decoded.
+     * @return string - The rendered HTML output.
      */
-    public static function rich($mixed) {
-        $operations = json_decode($mixed, true);
+    public static function rich(string $deltas): string {
+        $operations = json_decode($deltas, true);
+
+        if (json_last_error() !== JSON_ERROR_NONE) {
+            throw new Exception("JSON decoding of rich post content has failed.");
+        }
         $renderer = new Vanilla\Quill\Renderer($operations);
         return $renderer->render();
-
-        // Always filter after basic parsing.
-        // Wysiwyg editors are already formatted HTML. Don't try to doubly encode its code blocks.
-//        $filterOptions = ['codeBlockEntities' => false];
-//        return Gdn_Format::htmlFilter($mixed, $filterOptions);
     }
 }

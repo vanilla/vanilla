@@ -170,6 +170,9 @@ $dic->setInstance('Garden\Container\Container', $dic)
     ->rule(\Vanilla\Models\AuthenticatorModel::class)
     ->setShared(true)
 
+    ->rule(SearchModel::class)
+    ->setShared(true)
+
     ->rule('Gdn_IPlugin')
     ->setShared(true)
 

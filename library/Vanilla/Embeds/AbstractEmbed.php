@@ -7,14 +7,20 @@
 namespace Vanilla\Embeds;
 
 use Exception;
+use Garden\Http\HttpRequest;
+use Garden\Http\HttpResponse;
+use Vanilla\InjectableInterface;
 
 /**
  * Basic embed class.
  */
-abstract class AbstractEmbed {
+abstract class AbstractEmbed implements InjectableInterface {
 
     /** @var bool Allow access to local resources? */
     private $allowLocal = false;
+
+    /** @var HttpRequest HTTP request interface. */
+    private $httpRequest;
 
     /** @var string[] Valid domains for this embed type. */
     protected $domains = [];
@@ -84,6 +90,24 @@ abstract class AbstractEmbed {
             $result[] = 'file';
         }
 
+        return $result;
+    }
+
+    /**
+     * Send an HTTP request.
+     *
+     * @param string $method The HTTP method of the request.
+     * @param string $url The URL where the request will be sent.
+     * @param string|array $body The body of the request.
+     * @param array $headers An array of http headers to be sent with the request.
+     * @return HttpResponse
+     */
+    protected function httpRequest(string $url = '', $body = '', array $headers = [], string $method = HttpRequest::METHOD_GET): HttpResponse {
+        $this->httpRequest->setMethod(strtoupper($method));
+        $this->httpRequest->setUrl($url);
+        $this->httpRequest->setBody($body);
+        $this->httpRequest->setHeaders($headers);
+        $result = $this->httpRequest->send();
         return $result;
     }
 
@@ -172,21 +196,17 @@ abstract class AbstractEmbed {
             throw new Exception('Invalid URL.', 400);
         }
 
-        $request = new ProxyRequest();
-        $rawResponse = $request->request([
-            'URL' => $url,
-            'Redirects' => true,
-        ]);
-        if ($request->status() !== 200) {
-            throw new Exception("Failed to load URL: {$url}");
+        $response = $this->httpRequest($url);
+        if (!$response->isSuccessful()) {
+            throw new Exception('Failed to load oEmbed URL');
         }
 
-        $response = json_decode($rawResponse, true);
-        if (is_array($response)) {
+        $responseBody = $response->getBody();
+        if (is_array($responseBody)) {
             $validAttributes = ['type', 'version', 'title', 'author_name', 'author_url', 'provider_name', 'provider_url',
                 'cache_age', 'thumbnail_url', 'thumbnail_width', 'thumbnail_height'];
 
-            $type = $response['type'] ?? null;
+            $type = $responseBody['type'] ?? null;
             switch ($type) {
                 case 'photo':
                 case 'video':
@@ -197,19 +217,19 @@ abstract class AbstractEmbed {
 
             // Make it easier to compare by key.
             $validAttributes = array_combine($validAttributes, $validAttributes);
-            $result = array_intersect_key($response, $validAttributes);
+            $result = array_intersect_key($responseBody, $validAttributes);
         }
 
         return $result;
     }
 
     /**
-     * Generate markup to render this embed.
+     * Generate markup to render this embed, based on provided data.
      *
      * @param array $data Structured data for this embed type.
      * @return string Embed code.
      */
-    abstract function renderContent(array $data): string;
+    abstract function renderData(array $data): string;
 
     /**
      * Set whether or not access is allowed to local resources.
@@ -220,5 +240,12 @@ abstract class AbstractEmbed {
     public function setAllowLocal(bool $allowLocal) {
         $this->allowLocal = $allowLocal;
         return $this;
+    }
+
+    /**
+     * @param HttpRequest $httpRequest
+     */
+    public function setDependencies(HttpRequest $httpRequest) {
+        $this->httpRequest = $httpRequest;
     }
 }

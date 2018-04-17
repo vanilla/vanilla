@@ -351,7 +351,7 @@ class MediaApiController extends AbstractApiController {
 
         $body = $in->validate($body);
 
-        $pageInfo = $this->embedManager->matchUrl($body['url']);
+        $pageInfo = $this->embedManager->matchUrl($body['url'], $body['force']);
 
         $result = $out->validate($pageInfo);
         return $result;

@@ -6,12 +6,24 @@
 
 namespace Vanilla\Embeds;
 
+use Exception;
+use Gdn_Cache;
 use InvalidArgumentException;
 
 /**
  * Manage scraping embed data and generating markup.
  */
 class EmbedManager {
+
+    /** Page info caching expiry (24 hours). */
+    const CACHE_EXPIRY = 24 * 60 * 60;
+
+    /** Default scrape type. */
+    const TYPE_DEFAULT = 'site';
+
+    /** @var Gdn_Cache Caching interface. */
+    private $cache;
+
     /** @var AbstractEmbed The default embed type. */
     private $defaultEmbed;
 
@@ -19,25 +31,48 @@ class EmbedManager {
     private $embeds = [];
 
     /**
-     * Is the provided domain associated with the embed type?
+     * EmbedManager constructor.
      *
-     * @param string $domain The domain to test.
-     * @param AbstractEmbed $embed An embed object to test against.
-     * @return bool
+     * @param Gdn_Cache $cache
      */
-    private function isEmbedDomain(string $domain, AbstractEmbed $embed): bool {
-        $result = false;
-        foreach ($embed->getDomains() as $testDomain) {
-
-        }
-        return $result;
+    public function __construct(Gdn_Cache $cache) {
+        $this->cache = $cache;
     }
 
     /**
-     * @param string $url
+     * Add a new embed type.
+     *
+     * @param AbstractEmbed $embed
+     * @return $this
      */
-    public function matchUrl(string $url) {
-        // Parse the URL and find the embed for the domain.
+    public function addEmbed(AbstractEmbed $embed) {
+        $type = $embed->getType();
+        $this->embeds[$type] = $embed;
+        return $this;
+    }
+
+    /**
+     * Get the default embed type.
+     *
+     * @return AbstractEmbed Returns the defaultEmbed.
+     * @throws Exception if no default embed type has been configured.
+     */
+    public function getDefaultEmbed(): AbstractEmbed {
+        if ($this->defaultEmbed === null) {
+            throw new Exception('Default embed type not configured.');
+        }
+        return $this->defaultEmbed;
+    }
+
+    /**
+     * Is the provided domain associated with the embed type?
+     *
+     * @param string $url The target URL.
+     * @return AbstractEmbed
+     * @throws InvalidArgumentException if the URL is not valid.
+     * @throws Exception if a default embed type is needed, but hasn't been configured.
+     */
+    private function getEmbedByUrl(string $url): AbstractEmbed {
         $domain = parse_url($url, PHP_URL_HOST);
 
         if (!$domain) {
@@ -46,20 +81,62 @@ class EmbedManager {
 
         // No specific embed so use the default web scrape embed.
         foreach ($this->embeds as $testEmbed) {
-            if ($this->isEmbedDomain($domain, $testEmbed)) {
-                $embed = $testEmbed;
-                break;
+            foreach ($testEmbed->getDomains() as $testDomain) {
+                if ($domain === $testDomain || stringEndsWith($testDomain, ".{$testDomain}")) {
+                    $embed = $testEmbed;
+                    break 2;
+                }
             }
         }
 
-        /* @var AbstractEmbed $embed */
-        $embed = null;
+        if (!isset($embed)) {
+            $embed = $this->getDefaultEmbed();
+        }
 
-        $data = $embed->matchUrl($url);
+        return $embed;
+    }
 
-        if ($data === null) {
-            // The specific embed scraper didn't match the URL so use the default.
-            $data = $this->defaultEmbed->matchUrl($url);
+    /**
+     * Return structured data from a URL.
+     *
+     * @param string $url Embed URL.
+     * @param bool $forceRefresh Should the cache be disregarded?
+     * @return array
+     * @throws InvalidArgumentException if the URL is not valid.
+     * @throws Exception if a default embed type is needed, but hasn't been configured.
+     */
+    public function matchUrl(string $url, bool $forceRefresh = false): array {
+        $cacheKey = 'EmbedManager.'.md5($url);
+        $data = null;
+
+        // If not forcing a refresh, attempt to load page data from the cache.
+        if (!$forceRefresh) {
+            $data = $this->cache->get($cacheKey);
+            if ($data === Gdn_Cache::CACHEOP_FAILURE) {
+                unset($data);
+            }
+        }
+
+        if (!isset($data)) {
+            $embed = $this->getEmbedByUrl($url);
+            $type = $embed->getType();
+            $data = $embed->matchUrl($url);
+
+            $defaults = [
+                'name' => null,
+                'body' => null,
+                'photoUrl' => null,
+                'height' => null,
+                'width' => null,
+                'attributes' => []
+            ];
+            $data = is_array($data) ? array_merge($defaults, $data) : $defaults;
+            $data['url'] = $url;
+            $data['type'] = $type;
+        }
+
+        if ($data) {
+            $this->cache->store($cacheKey, $data, [Gdn_Cache::FEATURE_EXPIRY => self::CACHE_EXPIRY]);
         }
 
         return $data;
@@ -70,28 +147,17 @@ class EmbedManager {
      *
      * @param array $data
      * @return string
+     * @throws Exception if a default embed type is needed, but hasn't been configured.
      */
     public function renderData(array $data): string {
-    }
+        $type = $data['type'] ?? null;
+        if (!array_key_exists($type, $this->embeds) && $type !== $this->getDefaultEmbed()->getType()) {
+            throw new InvalidArgumentException('Invalid embed type.');
+        }
+        $embed = $this->embeds[$type] ?? $this->getDefaultEmbed();
 
-    /**
-     * Add a new embed type.
-     *
-     * @param AbstractEmbed $embed
-     * @return $this
-     */
-    public function addEmbed(AbstractEmbed $embed) {
-        $this->embeds[] = $embed;
-        return $this;
-    }
-
-    /**
-     * Get the default embed type.
-     *
-     * @return AbstractEmbed Returns the defaultEmbed.
-     */
-    public function getDefaultEmbed(): AbstractEmbed {
-        return $this->defaultEmbed;
+        $result = $embed->renderData($data);
+        return $result;
     }
 
     /**

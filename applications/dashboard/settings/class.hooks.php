@@ -36,6 +36,7 @@ class DashboardHooks extends Gdn_Plugin {
             ->addCall('passProperty', ['Menu', new Reference('MenuModule')])
 
             ->rule(Vanilla\Embeds\EmbedManager::class)
+            ->addCall('setDefaultEmbed', [$dic->get(Vanilla\Embeds\SiteEmbed::class)])
             ->addCall('addEmbed', [$dic->get(Vanilla\Embeds\YouTubeEmbed::class)])
             ;
     }

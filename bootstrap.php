@@ -211,8 +211,7 @@ $dic->setInstance('Garden\Container\Container', $dic)
     ->rule('Gdn_Form')
     ->addAlias('Form')
 
-    ->rule('EmbedManager')
-    ->setClass(Vanilla\Embeds\EmbedManager::class)
+    ->rule(Vanilla\Embeds\EmbedManager::class)
     ->setShared(true)
 ;
 

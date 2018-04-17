@@ -12,6 +12,13 @@ class EmojiBlot extends AbstractInlineEmbedBlot {
     /**
      * @inheritDoc
      */
+    protected static function getInsertKey(): string {
+        return "insert.emoji.emojiChar";
+    }
+
+    /**
+     * @inheritDoc
+     */
     protected static function getContainerHTMLTag(): string {
         return "span";
     }
@@ -23,12 +30,5 @@ class EmojiBlot extends AbstractInlineEmbedBlot {
         return [
             "class" => "safeEmoji nativeEmoji"
         ];
-    }
-
-    /**
-     * @inheritDoc
-     */
-    protected static function getInsertKey(): string {
-        return "insert.emoji.emojiChar";
     }
 }

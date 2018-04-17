@@ -22,7 +22,7 @@ class Renderer {
     /**
      * The blot types to check for. Not all blot types are used at the top level.
      */
-    const BLOTS = [
+    private $blotClasses = [
         Blots\CodeBlockBlot::class,
         Blots\SpoilerLineBlot::class,
         Blots\BlockquoteLineBlot::class,
@@ -128,7 +128,7 @@ class Renderer {
                 $nextOp = $this->operations[$i + 1];
             }
 
-            foreach(self::BLOTS as $blot) {
+            foreach($this->blotClasses as $blot) {
 
                 // Find the matching blot type for the current, last, and next operation.
                 if ($blot::matches([$currentOp, $nextOp])) {

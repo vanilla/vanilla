@@ -12,6 +12,13 @@ class Italic extends AbstractFormat {
     /**
      * @inheritDoc
      */
+    protected static function getAttributeLookupKey(): string {
+        return "italic";
+    }
+
+    /**
+     * @inheritDoc
+     */
     protected function getBlackListedNestedFormats(): array {
         return [
             Bold::class,
@@ -25,12 +32,5 @@ class Italic extends AbstractFormat {
      */
     protected function getTagName(): string {
         return "em";
-    }
-
-    /**
-     * @inheritDoc
-     */
-    protected static function getAttributeLookupKey(): string {
-        return "italic";
     }
 }

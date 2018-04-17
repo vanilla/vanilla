@@ -12,6 +12,13 @@ class Bold extends AbstractFormat {
     /**
      * @inheritDoc
      */
+    protected static function getAttributeLookupKey(): string {
+        return "bold";
+    }
+
+    /**
+     * @inheritDoc
+     */
     protected function getBlackListedNestedFormats(): array {
         return [
             Link::class,
@@ -24,12 +31,5 @@ class Bold extends AbstractFormat {
      */
     protected function getTagName(): string {
         return "strong";
-    }
-
-    /**
-     * @inheritDoc
-     */
-    protected static function getAttributeLookupKey(): string {
-        return "bold";
     }
 }

@@ -12,6 +12,13 @@ class Strike extends AbstractFormat {
     /**
      * @inheritDoc
      */
+    protected static function getAttributeLookupKey(): string {
+        return "strike";
+    }
+
+    /**
+     * @inheritDoc
+     */
     protected function getBlackListedNestedFormats(): array {
         return [
             Link::class,
@@ -25,12 +32,5 @@ class Strike extends AbstractFormat {
      */
     protected function getTagName(): string {
         return "s";
-    }
-
-    /**
-     * @inheritDoc
-     */
-    protected static function getAttributeLookupKey(): string {
-        return "strike";
     }
 }

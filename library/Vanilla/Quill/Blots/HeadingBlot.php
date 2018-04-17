@@ -7,9 +7,21 @@
 
 namespace Vanilla\Quill\Blots;
 
-use Vanilla\Quill\BlotGroup;
-
 class HeadingBlot extends AbstractBlockBlot {
+
+    /**
+     * @inheritDoc
+     */
+    protected static function getAttributeKey(): string {
+        return "header";
+    }
+
+    /**
+     * @inheritDoc
+     */
+    protected static function getMatchingAttributeValue() {
+        return [1, 2, 3, 4, 5, 6];
+    }
 
     /**
      * @inheritDoc
@@ -28,24 +40,9 @@ class HeadingBlot extends AbstractBlockBlot {
     /**
      * @inheritDoc
      */
-    public static function isOwnGroup(): bool {
+    public function isOwnGroup(): bool {
         return true;
     }
-
-    /**
-     * @inheritDoc
-     */
-    protected static function getAttributeKey(): string {
-        return "header";
-    }
-
-    /**
-     * @inheritDoc
-     */
-    protected static function getMatchingAttributeValue() {
-        return [1, 2, 3, 4, 5, 6];
-    }
-
 
     /**
      * Get the heading level for the blot.

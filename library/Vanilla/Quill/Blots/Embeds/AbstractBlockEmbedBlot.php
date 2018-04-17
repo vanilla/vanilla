@@ -32,6 +32,13 @@ abstract class AbstractBlockEmbedBlot extends AbstractBlot {
     /**
      * @inheritDoc
      */
+    public static function matches(array $operations): bool {
+        return (boolean) valr(static::getInsertKey(), $operations[0]);
+    }
+
+    /**
+     * @inheritDoc
+     */
     public function __construct(array $currentOperation, array $previousOperation, array $nextOperation) {
         parent::__construct($currentOperation, $previousOperation, $nextOperation);
     }
@@ -62,13 +69,6 @@ abstract class AbstractBlockEmbedBlot extends AbstractBlot {
     /**
      * @inheritDoc
      */
-    public static function matches(array $operations): bool {
-        return (boolean) valr(static::getInsertKey(), $operations[0]);
-    }
-
-    /**
-     * @inheritDoc
-     */
     public function getGroupOpeningTag(): string {
         return "";
     }
@@ -79,6 +79,4 @@ abstract class AbstractBlockEmbedBlot extends AbstractBlot {
     public function getGroupClosingTag(): string {
         return "";
     }
-
-
 }

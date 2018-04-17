@@ -51,6 +51,22 @@ abstract class AbstractFormat extends AbstractBlot {
     /**
      * @inheritDoc
      */
+    public static function matches(array $operations): bool {
+        $result = false;
+
+        foreach($operations as $op) {
+            $attributes = val("attributes", $op, []);
+            if (\array_key_exists(static::getAttributeLookupKey(), $attributes)) {
+                $result = true;
+            }
+        }
+
+        return $result;
+    }
+
+    /**
+     * @inheritDoc
+     */
     public function hasConsumedNextOp(): bool {
         return false;
     }
@@ -67,23 +83,6 @@ abstract class AbstractFormat extends AbstractBlot {
      */
     public function shouldClearCurrentGroup(BlotGroup $group): bool {
         return false;
-    }
-
-
-    /**
-     * @inheritDoc
-     */
-    public static function matches(array $operations): bool {
-        $result = false;
-
-        foreach($operations as $op) {
-            $attributes = val("attributes", $op, []);
-            if (\array_key_exists(static::getAttributeLookupKey(), $attributes)) {
-                $result = true;
-            }
-        }
-
-        return $result;
     }
 
     /**

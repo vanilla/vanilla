@@ -21,13 +21,6 @@ abstract class AbstractListBlot extends AbstractBlockBlot {
     /**
      * @inheritDoc
      */
-    public static function isOwnGroup(): bool {
-        return false;
-    }
-
-    /**
-     * @inheritDoc
-     */
     protected static function getAttributeKey(): string {
         return "list";
     }
@@ -37,6 +30,13 @@ abstract class AbstractListBlot extends AbstractBlockBlot {
      */
     protected static function getMatchingAttributeValue() {
         return static::getListType();
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function isOwnGroup(): bool {
+        return false;
     }
 
     /**

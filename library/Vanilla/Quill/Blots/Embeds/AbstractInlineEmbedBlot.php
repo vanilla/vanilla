@@ -29,6 +29,13 @@ abstract class AbstractInlineEmbedBlot extends AbstractBlot {
     abstract protected static function getInsertKey(): string;
 
     /**
+     * @inheritDoc
+     */
+    public static function matches(array $operations): bool {
+        return valr(static::getInsertKey(), $operations[0]);
+    }
+
+    /**
      * Get the class for the wrapping HTML tag. This will generally not be a
      *
      * @return string
@@ -86,12 +93,5 @@ abstract class AbstractInlineEmbedBlot extends AbstractBlot {
      */
     public function hasConsumedNextOp(): bool {
         return false;
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public static function matches(array $operations): bool {
-        return valr(static::getInsertKey(), $operations[0]);
     }
 }

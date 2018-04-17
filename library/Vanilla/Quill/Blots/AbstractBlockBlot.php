@@ -20,7 +20,7 @@ abstract class AbstractBlockBlot extends TextBlot {
      *
      * @return bool
      */
-    abstract public static function isOwnGroup(): bool;
+    abstract public function isOwnGroup(): bool;
 
     /**
      * Get the attribute key to check for matches on.

@@ -26,7 +26,7 @@ abstract class AbstractLineBlot extends AbstractBlockBlot {
     /**
      * @inheritDoc
      */
-    public static function isOwnGroup(): bool {
+    public function isOwnGroup(): bool {
         return false;
     }
 

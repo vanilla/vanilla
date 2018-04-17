@@ -12,6 +12,13 @@ class Code extends AbstractFormat {
     /**
      * @inheritDoc
      */
+    protected static function getAttributeLookupKey(): string {
+        return "code-inline";
+    }
+
+    /**
+     * @inheritDoc
+     */
     protected function getBlackListedNestedFormats(): array {
         return [];
     }
@@ -21,13 +28,6 @@ class Code extends AbstractFormat {
      */
     protected function getTagName(): string {
         return "code";
-    }
-
-    /**
-     * @inheritDoc
-     */
-    protected static function getAttributeLookupKey(): string {
-        return "code-inline";
     }
 
     /**

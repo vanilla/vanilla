@@ -12,6 +12,13 @@ class Link extends AbstractFormat {
     /**
      * @inheritDoc
      */
+    protected static function getAttributeLookupKey(): string {
+        return "link";
+    }
+
+    /**
+     * @inheritDoc
+     */
     protected function getBlackListedNestedFormats(): array {
         return [
             Code::class,
@@ -23,13 +30,6 @@ class Link extends AbstractFormat {
      */
     protected function getTagName(): string {
         return "a";
-    }
-
-    /**
-     * @inheritDoc
-     */
-    protected static function getAttributeLookupKey(): string {
-        return "link";
     }
 
     /**

@@ -31,7 +31,7 @@ class BlotGroup {
      *
      * Blots that can determine the surrounding tag over the other blot types.
      */
-    const OVERRIDING_BLOTS = [
+    private $overridingBlots = [
         HeadingBlot::class,
         CodeBlockBlot::class,
         AbstractListBlot::class,
@@ -194,7 +194,7 @@ class BlotGroup {
     private function getBlotForSurroundingTags(): AbstractBlot {
         $blot = $this->blots[0];
 
-        foreach(static::OVERRIDING_BLOTS as $overridingBlot) {
+        foreach($this->overridingBlots as $overridingBlot) {
             $index = $this->getIndexForBlotOfType($overridingBlot);
             if ($index >= 0) {
                 $blot = $this->blots[$index];

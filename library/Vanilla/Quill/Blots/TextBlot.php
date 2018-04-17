@@ -23,13 +23,20 @@ class TextBlot extends AbstractBlot {
     /**
      * The inline formats to use.
      */
-    const FORMATS = [
+    private $formatClasses = [
         Formats\Link::class,
         Formats\Bold::class,
         Formats\Italic::class,
         Formats\Code::class,
         Formats\Strike::class,
     ];
+
+    /**
+     * @inheritDoc
+     */
+    public static function matches(array $operations): bool {
+        return \is_string(val("insert", $operations[0]));
+    }
 
     /**
      * @inheritDoc
@@ -46,19 +53,11 @@ class TextBlot extends AbstractBlot {
         }
     }
 
-
-    /**
-     * @inheritDoc
-     */
-    public static function matches(array $operations): bool {
-        return \is_string(val("insert", $operations[0]));
-    }
-
     /**
      * @inheritDoc
      */
     public function render(): string {
-        foreach(self::FORMATS as $format) {
+        foreach($this->formatClasses as $format) {
             if ($format::matches([$this->currentOperation])) {
                 /** @var Formats\AbstractFormat $formatInstance */
                 $formatInstance = new $format($this->currentOperation, $this->previousOperation, $this->nextOperation);
@@ -71,12 +70,12 @@ class TextBlot extends AbstractBlot {
 
         $result = "";
         foreach($this->openingTags as $tag) {
-            $result .= self::renderOpeningTag($tag);
+            $result .= $this->renderOpeningTag($tag);
         }
 
         $result .= $this->createLineBreaks($this->content);
         foreach($this->closingTags as $tag) {
-            $result .= self::renderClosingTag($tag);
+            $result .= $this->renderClosingTag($tag);
         }
 
         return $result;
@@ -98,7 +97,7 @@ class TextBlot extends AbstractBlot {
      *
      * @return string;
      */
-    private static function renderOpeningTag(array $tag): string {
+    private function renderOpeningTag(array $tag): string {
         $tagName = val("tag", $tag);
 
         if (!$tagName) {
@@ -128,7 +127,7 @@ class TextBlot extends AbstractBlot {
      *
      * @return string;
      */
-    private static function renderClosingTag(array $tag): string {
+    private function renderClosingTag(array $tag): string {
         $closingTag = val("tag", $tag);
 
         if (!$closingTag) {

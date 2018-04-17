@@ -11,7 +11,7 @@ class CodeBlockBlot extends AbstractBlockBlot {
     /**
      * @inheritDoc
      */
-    public static function isOwnGroup(): bool {
+    public function isOwnGroup(): bool {
         return false;
     }
 

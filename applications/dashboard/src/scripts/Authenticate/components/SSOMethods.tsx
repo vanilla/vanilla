@@ -23,12 +23,6 @@ export default class SSOMethods extends React.Component<IProps, IState> {
         };
     }
 
-    public getLabelStylesLength ():any {
-        return {
-            minWidth: `calc(36px + ${this.state.longestText}ex)`
-        };
-    }
-
     public render() {
         if (!this.props.ssoMethods || this.props.ssoMethods.length === 0) {
             return null;
@@ -47,11 +41,12 @@ export default class SSOMethods extends React.Component<IProps, IState> {
                 };
 
                 return <a href={method.ui.url} key={ index } className="BigButton button Button button-sso button-fullWidth" style={methodStyles}>
-                    <span className="button-ssoContents" style={this.getLabelStylesLength()}>
+                    <span className="button-ssoContents">
                         <img src={method.ui.photoUrl} className="ssoMethod-icon" aria-hidden={true} />
                         <span className="button-ssoLabel">
                             {t(method.ui.buttonName)}
                         </span>
+                        <span className="ssoMethod-icon ssoMethod-iconSpacer" aria-hidden="true"></span>
                     </span>
                 </a>;
             });

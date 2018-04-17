@@ -2454,7 +2454,9 @@ EOT;
         if (json_last_error() !== JSON_ERROR_NONE) {
             throw new Exception("JSON decoding of rich post content has failed.");
         }
-        $renderer = new Vanilla\Quill\Renderer();
+
+        /** @var \Vanilla\Quill\Renderer $renderer */
+        $renderer = Gdn::getContainer()->get(\Vanilla\Quill\Renderer::class);
         return $renderer->render($operations);
     }
 }

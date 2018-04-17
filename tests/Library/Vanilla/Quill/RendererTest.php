@@ -8,6 +8,7 @@
 namespace VanillaTests\Library\Vanilla\Quill;
 
 use PHPUnit\Framework\TestCase;
+use Vanilla\Quill\Parser;
 use Vanilla\Quill\Renderer;
 use Vanilla\Quill\Blots;
 
@@ -42,9 +43,10 @@ class RendererTest extends TestCase {
 
         $json = \json_decode($input, true);
 
-        $parser = new Renderer();
+        $parser = new Parser();
+        $renderer = new Renderer($parser);
 
-        $output = $parser->render($json);
+        $output = $renderer->render($json);
         $this->assertEquals($expectedOutput, $output);
     }
 

@@ -253,7 +253,7 @@ class DiscussionsApiController extends AbstractApiController {
         $dbRecord['Bookmarked'] = (bool)$dbRecord['Bookmarked'];
         $dbRecord['Url'] = discussionUrl($dbRecord);
         $this->formatField($dbRecord, 'Body', $dbRecord['Format']);
-        $row['Attributes'] = new \Vanilla\Attributes($row['Attributes']);
+        $dbRecord['Attributes'] = new \Vanilla\Attributes($dbRecord['Attributes']);
 
         if ($this->getSession()->User) {
             $dbRecord['unread'] = $dbRecord['CountUnreadComments'] !== 0

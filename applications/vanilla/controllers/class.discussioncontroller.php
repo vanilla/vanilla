@@ -95,7 +95,7 @@ class DiscussionController extends VanillaController {
         }
 
         $this->setData('Category', $Category);
-        $this->setData('Editor.BackLink', anchor($Category['Name'], categoryUrl($Category)));
+        $this->setData('Editor.BackLink', anchor(htmlspecialchars($Category['Name']), categoryUrl($Category)));
 
         if ($CategoryCssClass = val('CssClass', $Category)) {
             Gdn_Theme::section($CategoryCssClass);

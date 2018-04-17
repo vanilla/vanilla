@@ -183,5 +183,5 @@ $authenticateMethod-button_boxShadow: 0 1px 3px 0 rgba(0, 0, 0, .3) !default;
 }
 
 .ssoMethods {
-    margin-bottom: #{$authenticateUser-spacer - $authenticateUser-ssoButton_margin};
+    margin-bottom: $authenticateUser-spacer;
 }

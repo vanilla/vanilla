@@ -21,12 +21,6 @@ export default class SSOMethods extends React.Component<IProps, IState> {
         this.state = {
             longestText: 0,
         };
-
-        this.handleClick = this.handleClick.bind(this);
-    }
-
-    public handleClick = (method):any => {
-        window.console.log("Click!: ", method);
     }
 
     public getLabelStylesLength ():any {
@@ -52,11 +46,7 @@ export default class SSOMethods extends React.Component<IProps, IState> {
                     color: method.ui.foregroundColor,
                 };
 
-                const buttonClick = () => {
-                    this.handleClick(method);
-                };
-
-                return <a href={method.ui.url} key={ index } onClick={buttonClick} className="BigButton button Button button-sso button-fullWidth" style={methodStyles}>
+                return <a href={method.ui.url} key={ index } className="BigButton button Button button-sso button-fullWidth" style={methodStyles}>
                     <span className="button-ssoContents" style={this.getLabelStylesLength()}>
                         <img src={method.ui.photoUrl} className="ssoMethod-icon" aria-hidden={true} />
                         <span className="button-ssoLabel">

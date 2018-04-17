@@ -50,19 +50,6 @@ class VanillaStatsPlugin extends Gdn_Plugin {
     }
 
     /**
-     * Override the default dashboard page with the new stats one.
-     *
-     * @param Gdn_Dispatcher $sender
-     */
-    public function gdn_dispatcher_beforeDispatch_handler($sender) {
-        $enabled = c('Garden.Analytics.Enabled', true);
-
-        if ($enabled) {
-            Gdn::pluginManager()->registerNewMethod('VanillaStatsPlugin', 'StatsDashboard', 'SettingsController', 'home');
-        }
-    }
-
-    /**
      *
      *
      * @param $jsonResponse

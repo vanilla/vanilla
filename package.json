@@ -34,6 +34,7 @@
         "@types/react-dom": "^16.0.4",
         "@vanillaforums/babel-preset": "^1.0.3",
         "@vanillaforums/eslint-config": "^1.2.2",
+        "@vanillaforums/prettier-config": "^1.0.0",
         "@vanillaforums/tslint-config": "^1.1.1",
         "babel-core": "^6.26.0",
         "babel-eslint": "^8.2.1",

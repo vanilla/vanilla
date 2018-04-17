@@ -137,6 +137,10 @@
   version "1.2.2"
   resolved "https://registry.yarnpkg.com/@vanillaforums/eslint-config/-/eslint-config-1.2.2.tgz#451366deb985f69fbb404fddb72418cc682cfa60"
 
+"@vanillaforums/prettier-config@^1.0.0":
+  version "1.0.0"
+  resolved "https://registry.yarnpkg.com/@vanillaforums/prettier-config/-/prettier-config-1.0.0.tgz#e08bae366a888ac130d90a9f9d0eeaf48f0f0f1d"
+
 "@vanillaforums/tslint-config@^1.1.1":
   version "1.1.1"
   resolved "https://registry.yarnpkg.com/@vanillaforums/tslint-config/-/tslint-config-1.1.1.tgz#9e014be842a6c7e081080f52138e5442c0e7f278"

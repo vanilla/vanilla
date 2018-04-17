@@ -12,11 +12,11 @@ interface IState {
 }
 
 export default class SSOMethods extends React.Component<IProps, IState> {
-    public ID: string;
+    public id: string;
 
     constructor(props) {
         super(props);
-        this.ID = uniqueID(props, 'SSOMethods', true);
+        this.id = uniqueID(props, 'SSOMethods', true);
 
         this.state = {
             longestText: 0,
@@ -52,7 +52,7 @@ export default class SSOMethods extends React.Component<IProps, IState> {
             });
 
             return <div className="ssoMethods">
-                <Paragraph parentID={this.ID} content={t('Sign in with one of the following:')} />
+                <Paragraph parentID={this.id} content={t('Sign in with one of the following:')} />
                 {ssoMethods}
             </div>;
         }

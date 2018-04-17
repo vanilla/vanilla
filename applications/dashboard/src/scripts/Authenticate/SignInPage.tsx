@@ -15,7 +15,7 @@ interface IState {
     redirectTo?: string;
     ssoMethods: any[];
     passwordAuthenticator?: any;
-    ID: string;
+    id: string;
 }
 
 export default class SignInPage extends React.Component<{}, IState> {
@@ -24,7 +24,7 @@ export default class SignInPage extends React.Component<{}, IState> {
     constructor(props) {
         super(props);
         this.state = {
-            ID: uniqueIDFromPrefix("SignInPage"),
+            id: uniqueIDFromPrefix("SignInPage"),
             loginFormActive: false,
             errors: [],
             ssoMethods: [],
@@ -32,7 +32,7 @@ export default class SignInPage extends React.Component<{}, IState> {
     }
 
     get titleID():string {
-        return this.state.ID + "-pageTitle";
+        return this.state.id + "-pageTitle";
     }
 
     public componentDidMount() {
@@ -59,11 +59,11 @@ export default class SignInPage extends React.Component<{}, IState> {
 
     public render() {
         const or = this.state.ssoMethods.length > 0 ? <Or/> : null;
-        return <div id={this.state.ID} className="authenticateUserCol">
+        return <div id={this.state.id} className="authenticateUserCol">
             <DocumentTitle id={this.titleID} classNames="isCentered" title={t('Sign In')}/>
-            <SSOMethods parentID={this.state.ID} ssoMethods={this.state.ssoMethods} />
+            <SSOMethods parentID={this.state.id} ssoMethods={this.state.ssoMethods} />
             {or}
-            <SignInForm parentID={this.state.ID}/>
+            <SignInForm parentID={this.state.id}/>
         </div>;
     }
 }

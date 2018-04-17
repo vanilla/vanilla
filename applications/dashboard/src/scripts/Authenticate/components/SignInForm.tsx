@@ -29,11 +29,11 @@ interface IState {
 }
 
 class SignInForm extends React.Component<IProps, IState> {
-    public ID: string;
+    public id: string;
 
     constructor(props) {
         super(props);
-        this.ID = uniqueIDFromPrefix('signInForm');
+        this.id = uniqueIDFromPrefix('signInForm');
         this.handleSubmit = this.handleSubmit.bind(this);
         this.handleTextChange = this.handleTextChange.bind(this);
         this.handleCheckBoxChange = this.handleCheckBoxChange.bind(this);
@@ -137,10 +137,10 @@ class SignInForm extends React.Component<IProps, IState> {
                 <Route path={this.state.redirectTo} component={SignInForm} />
             </BrowserRouter>;
         } else {
-            return <form id={this.ID} className="signInForm" method="post" onSubmit={this.handleSubmit} noValidate>
-                <Paragraph parentID={this.ID} className="authenticateUser-paragraph" content={this.state.globalError} isError={true} />
+            return <form id={this.id} className="signInForm" method="post" onSubmit={this.handleSubmit} noValidate>
+                <Paragraph parentID={this.id} className="authenticateUser-paragraph" content={this.state.globalError} isError={true} />
                 <InputTextBlock
-                    parentID={this.ID}
+                    parentID={this.id}
                     label={t('Email/Username')}
                     required={true}
                     disabled={!this.state.editable}
@@ -149,7 +149,7 @@ class SignInForm extends React.Component<IProps, IState> {
                     onChange={this.handleTextChange}
                 />
                 <PasswordTextBlock
-                    parentID={this.ID}
+                    parentID={this.id}
                     label={t('Password')}
                     required={true}
                     disabled={!this.state.editable}
@@ -160,14 +160,14 @@ class SignInForm extends React.Component<IProps, IState> {
                 <div className="inputBlock inputBlock-tighter">
                     <div className="rememberMeAndForgot">
                         <span className="rememberMeAndForgot-rememberMe">
-                            <Checkbox parentID={this.ID} label={t('Keep me signed in')} onChange={this.handleCheckBoxChange} checked={this.state.rememberMe}/>
+                            <Checkbox parentID={this.id} label={t('Keep me signed in')} onChange={this.handleCheckBoxChange} checked={this.state.rememberMe}/>
                         </span>
                         <span className="rememberMeAndForgot-forgot">
                             <Link to="/authenticate/recoverpassword">{t('Forgot your password?')}</Link>
                         </span>
                     </div>
                 </div>
-                <ButtonSubmit parentID={this.ID} disabled={!this.state.editable || this.state.password.length === 0 || this.state.username.length === 0} content={t('Sign In')}/>
+                <ButtonSubmit parentID={this.id} disabled={!this.state.editable || this.state.password.length === 0 || this.state.username.length === 0} content={t('Sign In')}/>
                 {/*<CreateAnAccountLink/>*/}
             </form>;
         }

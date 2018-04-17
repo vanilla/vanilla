@@ -11,7 +11,7 @@ interface IProps extends IComponentID {
 }
 
 interface IState {
-    ID: string;
+    id: string;
 }
 
 export default class Button extends React.Component<IProps, IState> {
@@ -23,7 +23,7 @@ export default class Button extends React.Component<IProps, IState> {
     constructor(props) {
         super(props);
         this.state = {
-            ID: uniqueID(props, "button"),
+            id: uniqueID(props, "button"),
         };
     }
 
@@ -35,7 +35,7 @@ export default class Button extends React.Component<IProps, IState> {
             this.props.className
         );
 
-        return <button id={this.state.ID} disabled={this.props.disabled} type={this.props.type} className={componentClasses}>
+        return <button id={this.state.id} disabled={this.props.disabled} type={this.props.type} className={componentClasses}>
             {this.props.content}
         </button>;
     }

@@ -12,27 +12,27 @@ interface IState {
     redirectTo?: string;
     passwordAuthenticator?: any;
     genericError?: string;
-    ID: string;
+    id: string;
 }
 
 export default class SignInPage extends React.Component<{}, IState> {
     constructor(props) {
         super(props);
         this.state = {
-            ID: uniqueIDFromPrefix("PasswordPage"),
+            id: uniqueIDFromPrefix("PasswordPage"),
             loginFormActive: false,
             errors: [],
         };
     }
 
     get titleID():string {
-        return this.state.ID + "-pageTitle";
+        return this.state.id + "-pageTitle";
     }
 
     public render() {
-        return <div id={ this.state.ID } className="authenticateUserCol">
+        return <div id={ this.state.id } className="authenticateUserCol">
             <DocumentTitle id={ this.titleID } classNames="isCentered" title={t('Sign In')}/>
-            <SignInForm parentID={this.state.ID}/>
+            <SignInForm parentID={this.state.id}/>
         </div>;
     }
 }

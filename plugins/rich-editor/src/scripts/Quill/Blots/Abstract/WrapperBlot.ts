@@ -15,7 +15,6 @@ import withWrapper from "./withWrapper";
  * The wrapped blots should additionally use the `wrappedBlot` Higher-order function in `quill-utilities`.
  */
 export default class WrapperBlot extends Container {
-
     // This cannot be Parchment.Scope.BLOCK or it will match and attributor and break pasting.
     public static scope = Parchment.Scope.BLOCK_BLOT;
     public static tagName = "div";
@@ -55,15 +54,14 @@ export default class WrapperBlot extends Container {
     public optimize(context) {
         super.optimize(context);
         const next = this.next;
-        if (next instanceof WrapperBlot
-            && next.prev === this
-            && next.statics.blotName === (this.constructor as any).blotName
-            && next.domNode.tagName === this.domNode.tagName
+        if (
+            next instanceof WrapperBlot &&
+            next.prev === this &&
+            next.statics.blotName === (this.constructor as any).blotName &&
+            next.domNode.tagName === this.domNode.tagName
         ) {
             next.moveChildren(this);
             next.remove();
         }
     }
 }
-
-

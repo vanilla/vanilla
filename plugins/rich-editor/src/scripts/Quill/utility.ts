@@ -69,7 +69,7 @@ export function convertBoundaryToRange(boundary?: IBoundary): RangeStatic | unde
 export function expandRange(
     range: RangeStatic,
     startRange?: RangeStatic,
-    endRange?: RangeStatic
+    endRange?: RangeStatic,
 ): RangeStatic | undefined {
     // Convert everything to start/end instead of index/length.
     const boundary = convertRangeToBoundary(range);
@@ -111,8 +111,8 @@ export function disableAllBlotsInRange<T extends Blot>(
     quill: Quill,
     range: RangeStatic,
     blotConstructor: {
-        new(): T;
-    }
+        new (): T;
+    },
 ) {
     const currentBlots = quill.scroll.descendants(blotConstructor, range.index, range.length);
     const firstBlot = currentBlots[0];
@@ -130,8 +130,7 @@ export function disableAllBlotsInRange<T extends Blot>(
     const finalRange = expandRange(range, startRange, endRange);
 
     if (finalRange) {
-    quill.formatText(finalRange.index, finalRange.length, 'link', false, Emitter.sources.USER);
-
+        quill.formatText(finalRange.index, finalRange.length, "link", false, Emitter.sources.USER);
     }
 }
 
@@ -196,8 +195,7 @@ export function stripFormattingFromFirstBlot(quill: Quill) {
     const [firstBlot] = quill.getLine(0);
     const blotName = (firstBlot.constructor as any).blotName;
 
-    const delta = new Delta()
-        .retain(firstBlot.length(), { [blotName]: false });
+    const delta = new Delta().retain(firstBlot.length(), { [blotName]: false });
     quill.updateContents(delta, Emitter.sources.USER);
 }
 
@@ -234,9 +232,7 @@ export function insertNewLineAfterBlotAndTrim(quill, range: RangeStatic, deleteA
 
     // Now we need to clean up that extra newline.
     const positionUpToPreviousNewline = range.index + line.length() - offset;
-    const deleteDelta = new Delta()
-        .retain(positionUpToPreviousNewline - deleteAmount)
-        .delete(deleteAmount);
+    const deleteDelta = new Delta().retain(positionUpToPreviousNewline - deleteAmount).delete(deleteAmount);
     quill.updateContents(deleteDelta, Emitter.sources.USER);
     quill.setSelection(positionUpToPreviousNewline - deleteAmount, Emitter.sources.USER);
 }

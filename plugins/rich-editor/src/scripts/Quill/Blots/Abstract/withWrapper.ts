@@ -17,7 +17,6 @@ export interface IWrappable extends Container {
  */
 export default function withWrapper(blotConstructor: typeof Container) {
     class BlotWithWrapper extends blotConstructor {
-
         public parent: WrapperBlot;
 
         constructor(domNode) {
@@ -50,7 +49,6 @@ export default function withWrapper(blotConstructor: typeof Container) {
                 super.remove();
             }
         }
-
 
         /**
          * Delete this blot it has no children. Wrap it if it doesn't have it's proper parent name.

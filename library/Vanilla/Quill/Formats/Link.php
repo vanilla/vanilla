@@ -12,7 +12,7 @@ class Link extends AbstractFormat {
     /**
      * @inheritDoc
      */
-    protected static function getBlackListedNestedFormats(): array {
+    protected function getBlackListedNestedFormats(): array {
         return [
             Code::class,
         ];
@@ -21,7 +21,7 @@ class Link extends AbstractFormat {
     /**
      * @inheritDoc
      */
-    protected static function getTagName(): string {
+    protected function getTagName(): string {
         return "a";
     }
 

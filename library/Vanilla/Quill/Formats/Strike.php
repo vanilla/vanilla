@@ -12,7 +12,7 @@ class Strike extends AbstractFormat {
     /**
      * @inheritDoc
      */
-    protected static function getBlackListedNestedFormats(): array {
+    protected function getBlackListedNestedFormats(): array {
         return [
             Link::class,
             Code::class,
@@ -23,7 +23,7 @@ class Strike extends AbstractFormat {
     /**
      * @inheritDoc
      */
-    protected static function getTagName(): string {
+    protected function getTagName(): string {
         return "s";
     }
 

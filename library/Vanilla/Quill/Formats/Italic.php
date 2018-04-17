@@ -12,7 +12,7 @@ class Italic extends AbstractFormat {
     /**
      * @inheritDoc
      */
-    protected static function getBlackListedNestedFormats(): array {
+    protected function getBlackListedNestedFormats(): array {
         return [
             Bold::class,
             Link::class,
@@ -23,7 +23,7 @@ class Italic extends AbstractFormat {
     /**
      * @inheritDoc
      */
-    protected static function getTagName(): string {
+    protected function getTagName(): string {
         return "em";
     }
 

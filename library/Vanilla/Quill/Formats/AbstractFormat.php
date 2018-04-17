@@ -21,6 +21,13 @@ use Vanilla\Quill\Blots\TextBlot;
 abstract class AbstractFormat extends AbstractBlot {
 
     /**
+     * Get the string of the attribute key in the insert that determines if the blot applies or not. This key should lead to a boolean value in the attributes array of the insert.
+     *
+     * @return string
+     */
+    abstract protected static function getAttributeLookupKey(): string;
+
+    /**
      * Get the formats allowed that cannot be "nested" inside this one.
      *
      * If a format is set here, and is also present on the before/after/current operation, then this format will
@@ -32,21 +39,14 @@ abstract class AbstractFormat extends AbstractBlot {
      *
      * @return array
      */
-    abstract protected static function getBlackListedNestedFormats(): array;
+    abstract protected function getBlackListedNestedFormats(): array;
 
     /**
      * Get the name of the HTML tag for this blot.
      *
      * @return string
      */
-    abstract protected static function getTagName(): string;
-
-    /**
-     * Get the string of the attribute key in the insert that determines if the blot applies or not. This key should lead to a boolean value in the attributes array of the insert.
-     *
-     * @return string
-     */
-    abstract protected static function getAttributeLookupKey(): string;
+    abstract protected function getTagName(): string;
 
     /**
      * @inheritDoc

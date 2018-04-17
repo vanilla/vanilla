@@ -12,14 +12,14 @@ class Code extends AbstractFormat {
     /**
      * @inheritDoc
      */
-    protected static function getBlackListedNestedFormats(): array {
+    protected function getBlackListedNestedFormats(): array {
         return [];
     }
 
     /**
      * @inheritDoc
      */
-    protected static function getTagName(): string {
+    protected function getTagName(): string {
         return "code";
     }
 

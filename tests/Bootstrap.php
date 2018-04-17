@@ -194,7 +194,7 @@ class Bootstrap {
 
             ->rule('@api-v2-route')
             ->setClass(\Garden\Web\ResourceRoute::class)
-            ->setConstructorArgs(['/api/v2/', '%sApiController'])
+            ->setConstructorArgs(['/api/v2/', '*\\%sApiController'])
             ->addCall('setConstraint', ['locale', ['position' => 0]])
             ->addCall('setMeta', ['CONTENT_TYPE', 'application/json; charset=utf-8'])
 

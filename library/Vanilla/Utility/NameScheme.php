@@ -31,9 +31,11 @@ abstract class NameScheme {
         $result = [];
         foreach ($array as $key => $value) {
             $key = $this->convert($key);
-            if (is_array($value)) {
-                if (!in_array($key, $keysSkipRecursion)) {
+            if (!in_array($key, $keysSkipRecursion)) {
+                if (is_array($value)) {
                     $value = $this->convertArrayKeys($value);
+                } elseif ($value instanceof \ArrayObject) {
+                    $value->exchangeArray($this->convertArrayKeys($value->getArrayCopy()));
                 }
             }
             $result[$key] = $value;

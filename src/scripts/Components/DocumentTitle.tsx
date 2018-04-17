@@ -34,10 +34,10 @@ export default class DocumentTitle extends React.Component<IProps> {
     /**
      * Calculate the status bar title from the props.
      *
-     * @param {IProps} props The props used to calculate the title.
-     * @returns {string} Returns the title as a string.
+     * @param props - The props used to calculate the title.
+     * @returns Returns the title as a string.
      */
-    private getHeadTitle(props: IProps) {
+    private getHeadTitle(props: IProps): string {
         const siteTitle: string = getMeta('ui.siteName', '');
         const parts: string[] = [];
 

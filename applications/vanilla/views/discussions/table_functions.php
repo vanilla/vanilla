@@ -74,8 +74,18 @@ if (!function_exists('writeDiscussionRow')) :
         $discussion->CountPages = ceil($discussion->CountComments / $sender->CountCommentsPerPage);
 
         $firstPageUrl = discussionUrl($discussion, 1);
-        $lastComment = CommentModel::instance()->getID($discussion->LastCommentID);
-        $lastPageUrl = $lastComment ? commentUrl($lastComment) : $firstPageUrl;
+
+        if (isset($discussion->LastCommentID)) {
+            $lastComment = [
+                'CommentID' => $discussion->LastCommentID,
+                'DiscussionID' => $discussion->DiscussionID,
+                'CategoryID' => $discussion->CategoryID,
+            ];
+
+            $lastPageUrl = commentUrl($lastComment);
+        } else {
+            $lastPageUrl = $firstPageUrl;
+        }
         ?>
         <tr id="Discussion_<?php echo $discussion->DiscussionID; ?>" class="<?php echo $cssClass; ?>">
             <?php $sender->fireEvent('BeforeDiscussionContent'); ?>

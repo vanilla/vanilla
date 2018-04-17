@@ -21,7 +21,7 @@ export function getMeta(key: string, defaultValue?: any) {
         return defaultValue;
     }
 
-    const parts = key.split('.');
+    const parts = key.split(".");
     let haystack = gdn.meta;
 
     for (const part of parts) {
@@ -40,7 +40,7 @@ export function getMeta(key: string, defaultValue?: any) {
  * @param value - The value to set.
  */
 export function setMeta(key: string, value: any) {
-    const parts = key.split('.');
+    const parts = key.split(".");
     const last = parts.pop();
 
     if (!last) {
@@ -50,7 +50,7 @@ export function setMeta(key: string, value: any) {
     let haystack = gdn.meta;
 
     for (const part of parts) {
-        if (haystack[part] === null || typeof haystack[part] !== 'object') {
+        if (haystack[part] === null || typeof haystack[part] !== "object") {
             haystack[part] = {};
         }
         haystack = haystack[part];
@@ -68,7 +68,7 @@ export function setMeta(key: string, value: any) {
  */
 export function translate(str: string, defaultTranslation?: string): string {
     // Codes that begin with @ are considered literals.
-    if (str.substr(0, 1) === '@') {
+    if (str.substr(0, 1) === "@") {
         return str.substr(1);
     }
 
@@ -217,5 +217,5 @@ export function _executeReady(): Promise<any[]> {
  * @param {function} callback - The callback to execute.
  */
 export function onContent(callback) {
-    document.addEventListener('X-DOMContentReady', callback);
+    document.addEventListener("X-DOMContentReady", callback);
 }

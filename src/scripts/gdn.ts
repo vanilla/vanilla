@@ -14,15 +14,15 @@ interface IGdn {
 /** The gdn object may be set in an inline script in the head of the document. */
 const gdn = window.gdn || {};
 
-if (!('meta' in gdn)) {
+if (!("meta" in gdn)) {
     gdn.meta = {};
 }
 
-if (!('permissions' in gdn)) {
+if (!("permissions" in gdn)) {
     gdn.permissions = {};
 }
 
-if (!('translations' in gdn)) {
+if (!("translations" in gdn)) {
     gdn.translations = {};
 }
 

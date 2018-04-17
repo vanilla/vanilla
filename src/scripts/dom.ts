@@ -103,7 +103,7 @@ export function delegateEvent(
     eventName: string,
     filterSelector: string,
     callback: (event: Event, triggeringElement: HTMLElement) => boolean | void,
-    scopeSelector?: string | HTMLElement
+    scopeSelector?: string | HTMLElement,
 ): string | undefined {
     let functionKey = eventName + filterSelector + callback.toString();
 
@@ -132,7 +132,6 @@ export function delegateEvent(
             const match = filterSelector ? event.target.closest(filterSelector) : event.target;
 
             if (match) {
-
                 // Call the callback with the matching element as the context.
                 return callback.call(match, event, match);
             }

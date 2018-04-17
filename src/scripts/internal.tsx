@@ -5,7 +5,6 @@
  */
 
 import { addComponent, componentExists, getComponent } from "@core/application";
-import * as app from "./application";
 import App from "@core/Main/App";
 import { logError } from "@core/utility";
 import React from 'react';
@@ -35,25 +34,4 @@ export function _mountComponents(parent: Element) {
             logError("Could not find component %s.", name);
         }
     });
-
-    _mountEmbeds(parent);
-}
-
-function _mountEmbeds(parent: Element) {
-    const nodes = parent.querySelectorAll('[data-embed]');
-
-    Array.prototype.forEach.call(nodes, (node) => {
-        const data = JSON.parse(node.getAttribute('data-embed'));
-        const type = data.renderType || data.type;
-
-        // Extract all other data attributes to get the data for the embed.
-        const embed = getEmbed(type);
-
-        if (embed) {
-            embed(node, data);
-        } else {
-            logError("Could not find embed of type %s.", type);
-        }
-    });
-
 }

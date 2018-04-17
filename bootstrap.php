@@ -210,6 +210,10 @@ $dic->setInstance('Garden\Container\Container', $dic)
 
     ->rule('Gdn_Form')
     ->addAlias('Form')
+
+    ->rule('EmbedManager')
+    ->setClass(Vanilla\Embeds\EmbedManager::class)
+    ->setShared(true)
 ;
 
 // Run through the bootstrap with dependencies.

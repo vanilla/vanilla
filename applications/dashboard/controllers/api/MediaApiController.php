@@ -7,6 +7,7 @@
 use Garden\Schema\Schema;
 use Garden\Web\Exception\NotFoundException;
 use Vanilla\ApiUtils;
+use Vanilla\Embeds\EmbedManager;
 use Vanilla\ImageResizer;
 use Vanilla\UploadedFile;
 use Vanilla\UploadedFileSchema;
@@ -22,18 +23,18 @@ class MediaApiController extends AbstractApiController {
     /** @var MediaModel */
     private $mediaModel;
 
-    /** @var WebScraper */
-    private $webScraper;
+    /** @var EmbedManager */
+    private $embedManager;
 
     /**
      * MediaApiController constructor.
      *
      * @param MediaModel $mediaModel
-     * @param WebScraper $webScraper
+     * @param EmbedManager $embedManager
      */
-    public function __construct(MediaModel $mediaModel, WebScraper $webScraper) {
+    public function __construct(MediaModel $mediaModel, EmbedManager $embedManager) {
         $this->mediaModel = $mediaModel;
-        $this->webScraper = $webScraper;
+        $this->embedManager = $embedManager;
     }
 
     /**
@@ -350,7 +351,7 @@ class MediaApiController extends AbstractApiController {
 
         $body = $in->validate($body);
 
-        $pageInfo = $this->webScraper->getPageInfo($body['url'], $body['force']);
+        $pageInfo = $this->embedManager->matchUrl($body['url']);
 
         $result = $out->validate($pageInfo);
         return $result;

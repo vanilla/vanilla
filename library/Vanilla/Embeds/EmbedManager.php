@@ -1,25 +1,36 @@
 <?php
 /**
- * @author Todd Burry <todd@vanillaforums.com>
  * @copyright 2009-2018 Vanilla Forums Inc.
  * @license Proprietary
  */
 
 namespace Vanilla\Embeds;
 
-use Garden\Container\Container;
+use InvalidArgumentException;
 
 /**
- * Embeds go through
+ * Manage scraping embed data and generating markup.
  */
 class EmbedManager {
-    /**
-     * @var AbstractEmbed
-     */
+    /** @var AbstractEmbed The default embed type. */
     private $defaultEmbed;
 
-    public function __construct(Container $container) {
-        $this->addEmbed(new TwitterEmbed());
+    /** @var AbstractEmbed[] Available embed types. */
+    private $embeds = [];
+
+    /**
+     * Is the provided domain associated with the embed type?
+     *
+     * @param string $domain The domain to test.
+     * @param AbstractEmbed $embed An embed object to test against.
+     * @return bool
+     */
+    private function isEmbedDomain(string $domain, AbstractEmbed $embed): bool {
+        $result = false;
+        foreach ($embed->getDomains() as $testDomain) {
+
+        }
+        return $result;
     }
 
     /**
@@ -28,9 +39,18 @@ class EmbedManager {
     public function matchUrl(string $url) {
         // Parse the URL and find the embed for the domain.
         $domain = parse_url($url, PHP_URL_HOST);
-        // Error here.
+
+        if (!$domain) {
+            throw new InvalidArgumentException('Invalid URL.');
+        }
 
         // No specific embed so use the default web scrape embed.
+        foreach ($this->embeds as $testEmbed) {
+            if ($this->isEmbedDomain($domain, $testEmbed)) {
+                $embed = $testEmbed;
+                break;
+            }
+        }
 
         /* @var AbstractEmbed $embed */
         $embed = null;
@@ -45,30 +65,42 @@ class EmbedManager {
         return $data;
     }
 
-    public function renderData(array $data) {
-
-    }
-
-    public function addEmbed(AbstractEmbed $embed) {
-
+    /**
+     * Given structured data, generate markup for an embed.
+     *
+     * @param array $data
+     * @return string
+     */
+    public function renderData(array $data): string {
     }
 
     /**
-     * Get the defaultEmbed.
+     * Add a new embed type.
      *
-     * @return mixed Returns the defaultEmbed.
+     * @param AbstractEmbed $embed
+     * @return $this
      */
-    public function getDefaultEmbed(): mixed {
+    public function addEmbed(AbstractEmbed $embed) {
+        $this->embeds[] = $embed;
+        return $this;
+    }
+
+    /**
+     * Get the default embed type.
+     *
+     * @return AbstractEmbed Returns the defaultEmbed.
+     */
+    public function getDefaultEmbed(): AbstractEmbed {
         return $this->defaultEmbed;
     }
 
     /**
      * Set the defaultEmbed.
      *
-     * @param mixed $defaultEmbed
+     * @param AbstractEmbed $defaultEmbed
      * @return $this
      */
-    public function setDefaultEmbed(mixed $defaultEmbed) {
+    public function setDefaultEmbed(AbstractEmbed $defaultEmbed) {
         $this->defaultEmbed = $defaultEmbed;
         return $this;
     }

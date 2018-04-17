@@ -1,5 +1,6 @@
 // This is only for new pages, with new form element markup.
 
+
 .checkbox-box {
   display: none; // for old themes
 }
@@ -13,6 +14,7 @@ label.checkbox {
 }
 
 .checkbox-label {
+  user-select: none;
   margin-left: 6px;
   line-height: inherit;
 }

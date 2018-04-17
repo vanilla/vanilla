@@ -111,6 +111,10 @@ button.Close {
   margin-bottom: 18px;
 }
 
+.authenticateUserCol .button.button-fullWidth.button-sso {
+  margin-bottom: 12px;
+}
+
 .authenticateUserCol .icon {
   display: inline-block;
   width: 24px;
@@ -210,11 +214,13 @@ button.Close {
 }
 
 .button.Button.Primary.buttonCTA, .button.Button.button-sso {
+  user-select: none;
   display: flex;
   align-items: center;
   justify-content: center;
   background-image: none;
   box-sizing: border-box;
+  text-decoration: none !important;
 }
 
 .button.Button.button-sso {
@@ -223,8 +229,10 @@ button.Close {
 
 .button-ssoLabel {
   margin-left: 12px;
+  margin-right: 12px;
   font-size: 14px;
   font-weight: normal;
+  text-shadow: none;
 }
 
 .ssoMethod-icon {
@@ -232,13 +240,23 @@ button.Close {
   height: auto;
 }
 
+.ssoMethod-icon.ssoMethod-iconSpacer {
+  display: block;
+  visibility: hidden;
+  height: 24px;
+}
+
 .button-ssoContents {
   display: flex;
   align-items: center;
-  justify-content: flex-start;
+  justify-content: space-between;
   flex-wrap: wrap;
-  width: 200px;
+  width: 100%;
   max-width: 100%;
+}
+
+.ssoMethods {
+  margin-bottom: 18px;
 }
 
 .followButton {
@@ -463,6 +481,7 @@ label.checkbox input.checkbox-input {
 }
 
 .checkbox-label {
+  user-select: none;
   margin-left: 6px;
   line-height: inherit;
 }

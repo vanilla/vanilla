@@ -12,11 +12,11 @@ interface IProps extends IComponentID {
 }
 
 interface IState {
-    ID: string;
+    id: string;
 }
 
 export default class Button extends React.Component<IProps, IState> {
-    
+
     public static defaultProps = {
         disabled: false,
     };
@@ -24,12 +24,12 @@ export default class Button extends React.Component<IProps, IState> {
     constructor(props) {
         super(props);
         this.state = {
-            ID: uniqueID(props, "checkbox"),
+            id: uniqueID(props, "checkbox"),
         };
     }
 
     get labelID():string {
-        return this.state.ID + "-label";
+        return this.state.id + "-label";
     }
 
     public render() {
@@ -38,7 +38,7 @@ export default class Button extends React.Component<IProps, IState> {
             this.props.className
         );
 
-        return <label id={this.state.ID} className={componentClasses}>
+        return <label id={this.state.id} className={componentClasses}>
             <input className="checkbox-input" aria-labelledby={this.labelID} type="checkbox" onChange={this.props.onChange} checked={this.props.checked}/>
             <span className="checkbox-box" aria-hidden="true">
                 <span className="checkbox-state">

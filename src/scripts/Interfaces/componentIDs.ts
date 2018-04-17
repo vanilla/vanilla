@@ -2,7 +2,7 @@ import uniqueid from "lodash/uniqueid";
 
 export interface IComponentID {
     parentID?: string;
-    ID?: string;
+    id?: string;
 }
 
 export function uniqueIDFromPrefix(uniqueSuffix:string) {
@@ -13,15 +13,15 @@ export function uniqueID(props:IComponentID, uniqueSuffix:string, allowNoID?:boo
     let id:any = null;
 
     if (!allowNoID) {
-        if ((!props.ID && !props.parentID) || (props.ID && props.parentID)) {
-            throw new Error(`You must have *either* ID or parentID`);
+        if ((!props.id && !props.parentID) || (props.id && props.parentID)) {
+            throw new Error(`You must have *either* 'id' or 'parentID'`);
         }
     }
 
     if (props.parentID) {
         id = props.parentID + "-" + uniqueSuffix + uniqueid() as string;
-    } else if (props.ID) {
-        id = props.ID as string;
+    } else if (props.id) {
+        id = props.id as string;
     }
 
     return id;

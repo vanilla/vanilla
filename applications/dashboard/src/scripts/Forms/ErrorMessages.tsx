@@ -9,11 +9,11 @@ interface IProps {
 }
 
 export default class ErrorMessages extends React.Component<IProps> {
-    public ID: string;
+    public id: string;
 
     constructor(props) {
         super(props);
-        this.ID = uniqueID(props, 'errorMessages', true);
+        this.id = uniqueID(props, 'errorMessages', true);
     }
 
     public render() {
@@ -27,7 +27,7 @@ export default class ErrorMessages extends React.Component<IProps> {
                 return <span key={ index } className="inputBlock-error">{error.message}</span>;
             });
 
-            return <span id={this.ID} className={componentClasses}>
+            return <span id={this.id} className={componentClasses}>
                 {errorList}
             </span>;
         } else {

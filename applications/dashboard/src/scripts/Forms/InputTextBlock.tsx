@@ -23,7 +23,7 @@ export interface IInputTextProps extends IComponentID{
 }
 
 interface IState {
-    ID: string;
+    id: string;
 }
 
 
@@ -38,16 +38,16 @@ export default class InputTextBlock extends React.Component<IInputTextProps, ISt
     constructor(props) {
         super(props);
         this.state = {
-            ID: uniqueID(props, "inputText"),
+            id: uniqueID(props, "inputText"),
         };
     }
 
     get labelID():string {
-        return this.state.ID + "-label";
+        return this.state.id + "-label";
     }
 
     get errorID():string {
-        return this.state.ID + "-errors";
+        return this.state.id + "-errors";
     }
 
     public render() {
@@ -80,7 +80,7 @@ export default class InputTextBlock extends React.Component<IInputTextProps, ISt
 
             <span className="inputBlock-inputWrap">
                 <input
-                    id={this.state.ID}
+                    id={this.state.id}
                     className={inputClasses}
                     value={this.props.value}
                     type={this.props.type}

@@ -9,11 +9,11 @@ interface IProps extends IComponentID {
 }
 
 export default class Paragraph extends React.Component<IProps> {
-    public ID: string;
+    public id: string;
 
     constructor(props) {
         super(props);
-        this.ID = uniqueID(props, 'Paragraph', true);
+        this.id = uniqueID(props, 'Paragraph', true);
     }
 
     public render() {
@@ -32,7 +32,7 @@ export default class Paragraph extends React.Component<IProps> {
                 };
             }
 
-            return <p id={this.props.ID} className={componentClasses} {...accessibilityProps}>{this.props.content}</p>;
+            return <p id={this.props.id} className={componentClasses} {...accessibilityProps}>{this.props.content}</p>;
         } else {
             return null;
         }

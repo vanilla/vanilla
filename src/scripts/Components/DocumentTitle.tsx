@@ -1,5 +1,4 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import { getMeta } from "@core/application";
 
 /**
@@ -15,23 +14,32 @@ import { getMeta } from "@core/application";
  *     <h1>Page Title</h1>
  * </DocumentTitle>
  */
-export default class DocumentTitle extends React.Component {
-    static propTypes = {
-        title: PropTypes.string,
-        children: PropTypes.node,
-    }
-
-    componentDidMount() {
+export default class DocumentTitle extends React.Component<IProps> {
+    public componentDidMount() {
         document.title = this.getHeadTitle(this.props);
     }
 
-    componentWillUpdate(nextProps) {
+    public componentWillUpdate(nextProps: IProps) {
         document.title = this.getHeadTitle(nextProps);
     }
 
-    getHeadTitle(props) {
-        const siteTitle = getMeta('ui.siteName', '');
-        const parts = [];
+    public render() {
+        if (this.props.children) {
+            return this.props.children;
+        } else {
+            return <h1>{this.props.title}</h1>;
+        }
+    }
+
+    /**
+     * Calculate the status bar title from the props.
+     *
+     * @param props - The props used to calculate the title.
+     * @returns Returns the title as a string.
+     */
+    private getHeadTitle(props: IProps): string {
+        const siteTitle: string = getMeta('ui.siteName', '');
+        const parts: string[] = [];
 
         if (props.title && props.title.length > 0) {
             parts.push(props.title);
@@ -42,12 +50,9 @@ export default class DocumentTitle extends React.Component {
 
         return parts.join(' - ');
     }
+}
 
-    render() {
-        if (this.props.children && this.props.children.length > 0) {
-            return this.props.children;
-        } else {
-            return <h1>{this.props.title}</h1>;
-        }
-    }
+interface IProps {
+    title: string;
+    children?: React.ReactNode;
 }

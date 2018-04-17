@@ -84,7 +84,7 @@ export default class RecoverPasswordPage extends React.Component<IComponentID, I
             logError(e.response);
             const errors = get(e, 'response.data.errors', []);
             const generalError = get(e, 'response.data.message', false);
-            const fallbackErrorMessage = t('An error has occured, please try again.');
+            const fallbackErrorMessage = t('An error has occurred, please try again.');
             const hasFieldSpecificErrors =  errors.length > 0;
 
             if (generalError || hasFieldSpecificErrors) {
@@ -129,7 +129,7 @@ export default class RecoverPasswordPage extends React.Component<IComponentID, I
         } else {
             return <div id={this.ID} className="authenticateUserCol">
                 {pageTitle}
-                <Paragraph content={t('Enter your email address or username to continue.')} className="authenticateUser-paragraph" />
+                <Paragraph content={t('RecoverPasswordLabelCode', 'Enter your email to continue.')} className="authenticateUser-paragraph" />
                 <form id={this.ID} onSubmit={this.handleSubmit} aria-labelledby={this.pageTitleID} noValidate>
                     <Paragraph parentID={this.ID} className="authenticateUser-paragraph" content={this.state.globalError} isError={true} />
                     <InputTextBlock

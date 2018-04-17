@@ -10,6 +10,7 @@ import ButtonSubmit from "../../Forms/ButtonSubmit";
 import { uniqueIDFromPrefix } from '@core/Interfaces/componentIDs';
 import Paragraph from "../../Forms/Paragraph";
 import get from "lodash/get";
+import CreateAnAccountLink from "./CreateAnAccountLink";
 
 interface IProps {
     location?: any;
@@ -77,7 +78,7 @@ class SignInForm extends React.Component<IProps, IState> {
     public handleErrors = (e) => {
         const errors = get(e, 'response.data.errors', []);
         const generalError = get(e, 'response.data.message', false);
-        const catchAllErrorMessage = t('An error has occured, please try again.');
+        const catchAllErrorMessage = t('An error has occurred, please try again.');
         const hasFieldSpecificErrors =  errors.length > 0;
 
         const newState:any = {
@@ -162,11 +163,12 @@ class SignInForm extends React.Component<IProps, IState> {
                             <Checkbox parentID={this.ID} label={t('Keep me signed in')} onChange={this.handleCheckBoxChange} checked={this.state.rememberMe}/>
                         </span>
                         <span className="rememberMeAndForgot-forgot">
-                            <Link to="/authenticate/recoverpassword">{t('Forgot password?')}</Link>
+                            <Link to="/authenticate/recoverpassword">{t('Forgot your password?')}</Link>
                         </span>
                     </div>
                 </div>
                 <ButtonSubmit parentID={this.ID} disabled={!this.state.editable || this.state.password.length === 0 || this.state.username.length === 0} content={t('Sign In')}/>
+                {/*<CreateAnAccountLink/>*/}
             </form>;
         }
     }

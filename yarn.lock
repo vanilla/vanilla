@@ -161,12 +161,11 @@
   resolved "https://registry.yarnpkg.com/@vanillaforums/eslint-config/-/eslint-config-1.2.2.tgz#451366deb985f69fbb404fddb72418cc682cfa60"
 
 "@vanillaforums/tslint-config@^1.0.4":
-  version "1.0.4"
-  resolved "https://registry.yarnpkg.com/@vanillaforums/tslint-config/-/tslint-config-1.0.4.tgz#1e718c929fc589e381e1e674c9a95e1e7484cfc1"
+  version "1.1.4"
+  resolved "https://registry.yarnpkg.com/@vanillaforums/tslint-config/-/tslint-config-1.1.4.tgz#3e58f0548eef1e35557d5aa4165950d71b221456"
   dependencies:
     tslint-config-prettier "^1.10.0"
     tslint-react "^3.5.1"
-    typescript "^2.7.0"
 
 abab@^1.0.4:
   version "1.0.4"
@@ -5499,9 +5498,15 @@ tslint@^5.9.1:
     tslib "^1.8.0"
     tsutils "^2.12.1"
 
-tsutils@^2.12.1, tsutils@^2.13.1:
+tsutils@^2.12.1:
   version "2.26.0"
   resolved "https://registry.yarnpkg.com/tsutils/-/tsutils-2.26.0.tgz#706240d63bcf1ae1797d1716738d6c6be0d0848b"
+  dependencies:
+    tslib "^1.8.1"
+
+tsutils@^2.13.1:
+  version "2.26.1"
+  resolved "https://registry.yarnpkg.com/tsutils/-/tsutils-2.26.1.tgz#9e4a0cb9ff173863f34c22a961969081270d1878"
   dependencies:
     tslib "^1.8.1"
 
@@ -5533,7 +5538,7 @@ typedarray@^0.0.6:
   version "0.0.6"
   resolved "https://registry.yarnpkg.com/typedarray/-/typedarray-0.0.6.tgz#867ac74e3864187b1d3d47d996a78ec5c8830777"
 
-typescript@^2.7.0, typescript@^2.8.1:
+typescript@^2.8.1:
   version "2.8.1"
   resolved "https://registry.yarnpkg.com/typescript/-/typescript-2.8.1.tgz#6160e4f8f195d5ba81d4876f9c0cc1fbc0820624"
 

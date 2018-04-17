@@ -134,7 +134,6 @@ export function componentExists(name: string): boolean {
     return _components[name.toLowerCase()] !== undefined;
 }
 
-
 /**
  * Get a component from the component registry.
  *

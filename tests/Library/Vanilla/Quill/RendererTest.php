@@ -42,9 +42,9 @@ class RendererTest extends TestCase {
 
         $json = \json_decode($input, true);
 
-        $parser = new Renderer($json);
+        $parser = new Renderer();
 
-        $output = $parser->render();
+        $output = $parser->render($json);
         $this->assertEquals($expectedOutput, $output);
     }
 

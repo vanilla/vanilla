@@ -36,30 +36,13 @@ class Renderer {
         Blots\TextBlot::class,
     ];
 
-    /** @var array[] */
-    private $operations = [];
-
-    /** @var BlotGroup[]  */
-    private $groups = [];
-
-    /**
-     * Parser constructor.
-     *
-     * @param array $operations
-     */
-    public function __construct(array $operations) {
-        $this->operations = $operations;
-        $this->splitPlainTextNewlines();
-        $this->parse();
-    }
-
     /**
      * Split operations with newlines inside of them into their own operations.
      */
-    private function splitPlainTextNewlines() {
+    private function splitPlainTextNewlines($operations) {
         $newOperations = [];
 
-        foreach($this->operations as $opIndex => $op) {
+        foreach($operations as $opIndex => $op) {
             // Determine if this is a plain text insert with no attributes.
             $isBareInsertOperation =
                 !array_key_exists("attributes", $op)
@@ -92,40 +75,45 @@ class Renderer {
                     $newOperations[] = $insert;
                 }
 
-                $isNotLastOperation = $opIndex < count($this->operations) - 1;
+                $isNotLastOperation = $opIndex < count($operations) - 1;
                 $isNewLineOnly = $newOperations[count($newOperations) - 1]["insert"] === "";
 
                 // Set a marker on the next blot if the last piece is a newline.
                 if ($isNotLastOperation && $isNewLineOnly) {
-                    $this->operations[$opIndex + 1][BlotGroup::BREAK_MARKER] = true;
+                    $operations[$opIndex + 1][BlotGroup::BREAK_MARKER] = true;
                 }
             } else {
                 $newOperations[] = $op;
             }
         }
 
-        $this->operations = $newOperations;
+        return $newOperations;
     }
 
     /**
      * Parse the operations into an array of Groups.
      */
-    private function parse() {
-        $operationLength = count($this->operations);
+    private function parse(array $operations): array {
+        /** @var BlotGroup[]  */
+        $groups = [];
+
+        $operations = $this->splitPlainTextNewlines($operations);
+
+        $operationLength = count($operations);
         $group = new BlotGroup();
 
         for($i = 0; $i < $operationLength; $i++) {
 
             $previousOp = [];
-            $currentOp = $this->operations[$i];
+            $currentOp = $operations[$i];
             $nextOp = [];
 
             if ($i > 0) {
-                $previousOp = $this->operations[$i - 1];
+                $previousOp = $operations[$i - 1];
             }
 
             if ($i < $operationLength - 1) {
-                $nextOp = $this->operations[$i + 1];
+                $nextOp = $operations[$i + 1];
             }
 
             foreach($this->blotClasses as $blot) {
@@ -137,7 +125,7 @@ class Renderer {
 
                     // Ask the blot if it should close the current group.
                     if ($blotInstance->shouldClearCurrentGroup($group)) {
-                        $this->groups[] = $group;
+                        $groups[] = $group;
                         $group = new BlotGroup();
                     }
 
@@ -150,7 +138,7 @@ class Renderer {
 
                     // Some block type blots get a group all to themselves.
                     if ($blotInstance instanceof Blots\AbstractBlockBlot && $blotInstance->isOwnGroup()) {
-                        $this->groups[] = $group;
+                        $groups[] = $group;
                         $group = new BlotGroup();
                     }
 
@@ -158,7 +146,8 @@ class Renderer {
                 }
             }
         }
-       $this->groups[] = $group;
+        $groups[] = $group;
+        return $groups;
     }
 
     /**
@@ -166,20 +155,21 @@ class Renderer {
      *
      * @return string
      */
-    public function render(): string {
+    public function render(array $operations): string {
+        $groups = $this->parse($operations);
         $result = "";
         $previousGroupEndsWithBlockEmbed = false;
         $previousGroupIsBreakOnly = false;
-        foreach ($this->groups as $index => $group) {
+        foreach ($groups as $index => $group) {
             $skip = false;
-            $isLastPosition = $index === count($this->groups) - 1;
+            $isLastPosition = $index === count($groups) - 1;
 
             if ($group->isBreakOnlyGroup()) {
 
                 if ($previousGroupIsBreakOnly) {
                     // Skip if the this is last Break in a series of 2+ breaks.
                     if (!$isLastPosition) {
-                        $nextGroup = $this->groups[$index + 1];
+                        $nextGroup = $groups[$index + 1];
                         if (!$nextGroup->isBreakOnlyGroup()) {
                             $skip = true;
                         }

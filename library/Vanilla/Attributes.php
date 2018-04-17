@@ -1,14 +1,21 @@
 <?php
 /**
  * @author Todd Burry <todd@vanillaforums.com>
- * @copyright 2009-2017 Vanilla Forums Inc.
+ * @copyright 2009-2018 Vanilla Forums Inc.
  * @license GPLv2
  */
 
 namespace Vanilla;
 
-
+/**
+ * A container for API attributes.
+ */
 class Attributes extends \ArrayObject implements \JsonSerializable {
+    /**
+     * Attributes constructor.
+     *
+     * @param array|string|null $input The initial attributes.
+     */
     public function __construct($input = null) {
         if (is_string($input)) {
             $input = dbdecode($input);
@@ -21,14 +28,18 @@ class Attributes extends \ArrayObject implements \JsonSerializable {
 
 
     /**
-     * Specify data which should be serialized to JSON
+     * Specify data which should be serialized to JSON.
+     *
      * @link http://php.net/manual/en/jsonserializable.jsonserialize.php
      * @return mixed data which can be serialized by <b>json_encode</b>,
      * which is a value of any type other than a resource.
      * @since 5.4.0
      */
-    function jsonSerialize() {
-        $r = (object)$this->getArrayCopy();
+    public function jsonSerialize() {
+        $r = $this->getArrayCopy();
+        if (empty($r)) {
+            $r = (object)$r;
+        }
         return $r;
     }
 }

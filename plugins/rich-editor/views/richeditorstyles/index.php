@@ -4,7 +4,31 @@
     </p>
     <div class="richEditor-frame InputBox">
         <div class="js-richText">
-            <div class="ql-editor richEditor-text userContent" data-gramm="false" contenteditable="true" data-placeholder="Create a new post..."></div>
+            <div class="ql-editor richEditor-text userContent" data-gramm="false" contenteditable="true" data-placeholder="Create a new post...">
+
+                <span class="atMention">
+                    <span class="atMention-menuPosition">
+                        <ul class="atMention-items MenuItems">
+                            <li class="richEditor-menuItem atMention-item" role="menuitem">
+                                <button class="atMention-suggestion">
+                                    <span class="atMention-user">
+                                        <span class="PhotoWrap atMention-photoWrap">
+                                            <img src="https://secure.gravatar.com/avatar/b0420af06d6fecc16fc88a88cbea8218/?default=https%3A%2F%2Fvanillicon.com%2Fb0420af06d6fecc16fc88a88cbea8218_200.png&amp;rating=g&amp;size=120" alt="Linc" class="atMention-photo ProfilePhoto">
+                                        </span>
+                                        <span class="atMention-userName">
+                                            <mark class="atMention-mark">Fra</mark>nkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkk
+                                        </span>
+                                    </span>
+                                </button>
+                            </li>
+                        </ul>
+                    </span>
+                    <span class="atMention-text">
+                        Fra
+                    </span>
+                </span>
+
+            </div>
         </div>
         <div class="richEditor-menu richEditorParagraphMenu">
             <button class="richEditor-button richEditorParagraphMenu-handle" type="button" aria-haspopup="menu" aria-expanded="false" aria-controls="tempId-paragraphLevelMenu-toggle">
@@ -59,6 +83,31 @@
 </div>
 
 <hr/>
+
+<h2>@mentions</h2>
+
+<span class="atMention">
+    <span class="atMention-menuPosition">
+        <ul class="atMention-items MenuItems">
+            <li class="richEditor-menuItem atMention-item" role="menuitem">
+                <button class="atMention-suggestion">
+                    <span class="atMention-user">
+                        <span class="PhotoWrap atMention-photoWrap">
+                            <img src="https://secure.gravatar.com/avatar/b0420af06d6fecc16fc88a88cbea8218/?default=https%3A%2F%2Fvanillicon.com%2Fb0420af06d6fecc16fc88a88cbea8218_200.png&amp;rating=g&amp;size=120" alt="Linc" class="atMention-photo ProfilePhoto">
+                        </span>
+                        <span class="atMention-userName">
+                            <mark class="atMention-mark">Fra</mark>nkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkk
+                        </span>
+                    </span>
+                </button>
+            </li>
+        </ul>
+    </span>
+    <span class="atMention-text">
+        Fra
+    </span>
+</span>
+
 
 <h2>Paragraph Level Formatting Menu</h2>
 

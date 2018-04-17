@@ -11,7 +11,7 @@ use Vanilla\Quill\Blots;
 use Vanilla\Quill\Blots\AbstractBlot;
 
 /**
- * Class for rendering quill deltas into HTML.
+ * Class for rendering parsing Quill Deltas into BlotGroups.
  *
  * @see https://github.com/quilljs/delta Information on quill deltas.
  *
@@ -92,6 +92,8 @@ class Parser {
 
     /**
      * Parse the operations into an array of Groups.
+     *
+     * @return BlotGroup[]
      */
     public function parse(array $operations): array {
         /** @var BlotGroup[]  */

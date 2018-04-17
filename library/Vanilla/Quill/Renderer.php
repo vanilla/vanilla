@@ -8,12 +8,11 @@
 namespace Vanilla\Quill;
 
 use Vanilla\Quill\Blots;
-use Vanilla\Quill\Blots\AbstractBlot;
 
 /**
- * Class for rendering quill deltas into HTML.
+ * Class for rendering BlotGroups into HTML
  *
- * @see https://github.com/quilljs/delta Information on quill deltas.
+ * @see BlotGroup
  *
  * @package Vanilla\Quill
  */
@@ -27,7 +26,7 @@ class Renderer {
     }
 
     /**
-     * Render operations into HTML. Be sure to do filtering/sanitation after this!
+     * Render operations into HTML.
      *
      * @return string
      */

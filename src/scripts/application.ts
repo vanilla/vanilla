@@ -136,32 +136,6 @@ export function componentExists(name: string): boolean {
 
 
 /**
- * Translate a string into the current locale.
- *
- * @param str - The string to translate.
- * @param defaultTranslation - The default translation to use.
- *
- * @returns Returns the translation or the default.
- */
-
- export function printf(str: string, defaultTranslation?: string): string {
-    // Codes that begin with @ are considered literals.
-    if (str.substr(0, 1) === '@') {
-        return str.substr(1);
-    }
-
-    if (gdn.translations[str] !== undefined) {
-        return gdn.translations[str];
-    }
-
-    return defaultTranslation !== undefined ? defaultTranslation : str;
-}
-
-
-
-
-
-/**
  * Get a component from the component registry.
  *
  * @param name The name of the component.

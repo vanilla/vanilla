@@ -603,33 +603,19 @@ $embedded-quote_fg: #A3A3A3 !default;
     display: inline;
 }
 
-.atMention-menuPosition {
-    position: relative;
-    display: inline-block;
-    line-height: 1em;
-    overflow: visible;
-
-    &.isTop {
-        vertical-align: top;
-
-        .atMention-items {
-            top: 100%;
-        }
-    }
-
-    &.isBottom {
-        vertical-align: bottom;
-
-        .atMention-items {
-            bottom: 100%;
-        }
-    }
-}
 
 .atMention-items {
     position: absolute;
     max-width: 100vw;
     width: 400px;
+
+    &.isTop {
+        top: 0;
+    }
+
+    &.isBottom {
+        bottom: 0;
+    }
 
     &.isLeft {
         left: 0;

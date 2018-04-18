@@ -1,9 +1,9 @@
 import * as React from "react";
-import { t } from '@core/application';
+import { t } from "@core/application";
 import { log, logError, debug } from "@core/utility";
-import DocumentTitle from '@core/Components/DocumentTitle';
+import DocumentTitle from "@core/Components/DocumentTitle";
 import PasswordForm from "./Components/PasswordForm";
-import {uniqueIDFromPrefix, getOptionalID, IOptionalComponentID} from '@core/Interfaces/componentIDs';
+import { uniqueIDFromPrefix, getOptionalID, IOptionalComponentID } from "@core/Interfaces/componentIDs";
 
 interface IState {
     loginFormActive: boolean;
@@ -33,11 +33,15 @@ export default class SignInPage extends React.Component<{}, IState> {
     }
 
     public render() {
-        return <div className="authenticateUserCol">
-            <DocumentTitle title={t('Sign In')}>
-                <h1 id={this.titleID} className="isCentered">{t('Sign In')}</h1>
-            </DocumentTitle>
-            <PasswordForm/>
-        </div>;
+        return (
+            <div className="authenticateUserCol">
+                <DocumentTitle title={t("Sign In")}>
+                    <h1 id={this.titleID} className="isCentered">
+                        {t("Sign In")}
+                    </h1>
+                </DocumentTitle>
+                <PasswordForm />
+            </div>
+        );
     }
 }

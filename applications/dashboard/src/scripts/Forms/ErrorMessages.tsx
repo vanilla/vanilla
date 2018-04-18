@@ -1,8 +1,8 @@
-import React, {ReactNode} from 'react';
-import classNames from 'classnames';
-import {uniqueIDFromPrefix, getRequiredID, IRequiredComponentID} from '@core/Interfaces/componentIDs';
+import React, { ReactNode } from "react";
+import classNames from "classnames";
+import { uniqueIDFromPrefix, getRequiredID, IRequiredComponentID } from "@core/Interfaces/componentIDs";
 
-interface IProps extends IRequiredComponentID{
+interface IProps extends IRequiredComponentID {
     className?: string;
     errors: string | string[];
 }
@@ -12,36 +12,39 @@ interface IState {
 }
 
 export default class ErrorMessages extends React.Component<IProps, IState> {
-    static defaultProps = {
+    public static defaultProps = {
         errors: [],
     };
 
     constructor(props) {
         super(props);
         this.state = {
-            id: getRequiredID(props, 'errorMessages') as string,
-        }
+            id: getRequiredID(props, "errorMessages") as string,
+        };
     }
 
     public render() {
         let errors = this.props.errors;
         if (typeof this.props.errors === "string") {
-            errors = [this.props.errors]
+            errors = [this.props.errors];
         }
 
         if (errors.length > 0) {
-            const componentClasses = classNames(
-                'inputBlock-errors',
-                this.props.className
-            );
+            const componentClasses = classNames("inputBlock-errors", this.props.className);
 
-            const errorList = (errors as any).map((error:any, index) => {
-                return <span key={ index } className="inputBlock-error">{error.message}</span>;
+            const errorList = (errors as any).map((error: any, index) => {
+                return (
+                    <span key={index} className="inputBlock-error">
+                        {error.message}
+                    </span>
+                );
             });
 
-            return <span id={this.state.id} className={componentClasses}>
-                {errorList}
-            </span>;
+            return (
+                <span id={this.state.id} className={componentClasses}>
+                    {errorList}
+                </span>
+            );
         } else {
             return null;
         }

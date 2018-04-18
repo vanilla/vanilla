@@ -1,6 +1,6 @@
-import { t } from '@core/application';
-import React from 'react';
-import Paragraph from '../../Forms/Paragraph';
+import { t } from "@core/application";
+import React from "react";
+import Paragraph from "../../Forms/Paragraph";
 
 interface IProps {
     ssoMethods?: any[];
@@ -27,21 +27,28 @@ export default class SSOMethods extends React.Component<IProps, IState> {
                     backgroundColor: method.ui.backgroundColor,
                     color: method.ui.foregroundColor,
                 };
-                return <a href={method.ui.url} key={ index } className="BigButton button Button button-sso button-fullWidth" style={methodStyles}>
-                    <span className="button-ssoContents">
-                        <img src={method.ui.photoUrl} className="ssoMethod-icon" aria-hidden={true} />
-                        <span className="button-ssoLabel">
-                            {t(method.ui.buttonName)}
+                return (
+                    <a
+                        href={method.ui.url}
+                        key={index}
+                        className="BigButton button Button button-sso button-fullWidth"
+                        style={methodStyles}
+                    >
+                        <span className="button-ssoContents">
+                            <img src={method.ui.photoUrl} className="ssoMethod-icon" aria-hidden={true} />
+                            <span className="button-ssoLabel">{t(method.ui.buttonName)}</span>
+                            <span className="ssoMethod-icon ssoMethod-iconSpacer" aria-hidden="true" />
                         </span>
-                        <span className="ssoMethod-icon ssoMethod-iconSpacer" aria-hidden="true"></span>
-                    </span>
-                </a>;
+                    </a>
+                );
             });
 
-            return <div className="ssoMethods">
-                <Paragraph content={t('Sign in with one of the following:')} />
-                {ssoMethods}
-            </div>;
+            return (
+                <div className="ssoMethods">
+                    <Paragraph content={t("Sign in with one of the following:")} />
+                    {ssoMethods}
+                </div>
+            );
         }
     }
 }

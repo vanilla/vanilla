@@ -1,9 +1,9 @@
-import { t } from '@core/application';
-import React from 'react';
-import classNames from 'classnames';
-import {uniqueIDFromPrefix, getOptionalID, IOptionalComponentID} from '@core/Interfaces/componentIDs';
+import { t } from "@core/application";
+import React from "react";
+import classNames from "classnames";
+import { uniqueIDFromPrefix, getOptionalID, IOptionalComponentID } from "@core/Interfaces/componentIDs";
 
-interface IProps extends IOptionalComponentID{
+interface IProps extends IOptionalComponentID {
     className?: string;
     type: string;
     content: string | Node;
@@ -19,7 +19,7 @@ export default class Button extends React.Component<IProps, IState> {
     public static defaultProps = {
         id: false,
         disabled: false,
-        type: 'button',
+        type: "button",
         prefix: "button",
     };
 
@@ -30,21 +30,18 @@ export default class Button extends React.Component<IProps, IState> {
         };
     }
 
-
     public render() {
-        const componentClasses = classNames(
-            'button',
-            'Button',
-            this.props.className
-        );
+        const componentClasses = classNames("button", "Button", this.props.className);
 
-        return <button
-            id={this.state.id}
-            disabled={this.props.disabled}
-            type={this.props.type}
-            className={componentClasses}
-        >
-            {this.props.content}
-        </button>;
+        return (
+            <button
+                id={this.state.id}
+                disabled={this.props.disabled}
+                type={this.props.type}
+                className={componentClasses}
+            >
+                {this.props.content}
+            </button>
+        );
     }
 }

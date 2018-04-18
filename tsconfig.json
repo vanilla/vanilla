@@ -23,14 +23,19 @@
             "@dashboard/*": ["./applications/dashboard/src/scripts/*"]
         },
         "typeRoots": [
-            "node_modules/@types"
+            "node_modules/@types",
+            "applications/*/node_modules/@types",
+            "plugins/*/node_modules/@types",
+            "plugins/*/src/scripts/@types"
         ],
         "skipLibCheck": true
     },
     "include": [
-        "**/*.ts"
+        "**/*.ts",
+        "**/*.tsx"
     ],
     "exclude": [
-        "**/*.js"
+        "**/*.js",
+        "**/*.jsx"
     ]
 }

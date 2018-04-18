@@ -129,8 +129,6 @@ export default class RecoverPasswordPage extends React.Component<IOptionalCompon
                 <RememberPasswordLink/>
             </div>;
         } else {
-
-
             return <div className="authenticateUserCol">
                 {pageTitle}
                 <Paragraph content={t('RecoverPasswordLabelCode', 'Enter your email to continue.')} className="authenticateUser-paragraph" />

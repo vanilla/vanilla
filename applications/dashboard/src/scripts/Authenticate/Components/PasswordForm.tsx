@@ -5,7 +5,6 @@ import { withRouter, BrowserRouter, Route, Link } from 'react-router-dom';
 import { log, logError, debug } from "@core/utility";
 import InputTextBlock from "../../Forms/InputTextBlock";
 import Checkbox from "../../Forms/Checkbox";
-import PasswordTextBlock from "../../Forms/PasswordTextBlock";
 import ButtonSubmit from "../../Forms/ButtonSubmit";
 import Paragraph from "../../Forms/Paragraph";
 import get from "lodash/get";
@@ -13,13 +12,15 @@ import { IRequiredComponentID, getRequiredID } from '@core/Interfaces/componentI
 
 interface IProps {
     location?: any;
+    password: string;
+    username: string;
 }
 
 interface IState extends IRequiredComponentID {
     editable: boolean;
-    username: string;
+    usernameRef?: InputTextBlock;
     usernameErrors: string[];
-    password: string;
+    passwordRef?: InputTextBlock;
     passwordErrors: string[];
     redirectTo?: string | null;
     globalError?: string | null;
@@ -28,6 +29,9 @@ interface IState extends IRequiredComponentID {
 }
 
 class PasswordForm extends React.Component<IProps, IState> {
+
+    private username: InputTextBlock;
+    private password: InputTextBlock;
 
     constructor(props) {
         super(props);
@@ -39,8 +43,6 @@ class PasswordForm extends React.Component<IProps, IState> {
         this.state = {
             id: getRequiredID(props, 'passwordForm'),
             editable: true,
-            username: '',
-            password: '',
             redirectTo: null,
             submitEnabled: false,
             rememberMe: true,
@@ -51,17 +53,15 @@ class PasswordForm extends React.Component<IProps, IState> {
 
     public handleTextChange = (event) => {
         const type:string = get(event, 'target.type', '');
-        const value:string = get(event, 'target.value', '');
+        // const value:string = get(event, 'target.value', '');
 
         if (type === 'password') {
             this.setState({
-                password: value,
                 globalError: null,
                 passwordErrors: [],
             });
         } if (type === 'text') {
             this.setState({
-                username: value,
                 globalError: null,
                 usernameErrors: [],
             });
@@ -119,8 +119,8 @@ class PasswordForm extends React.Component<IProps, IState> {
         });
 
         apiv2.post('/authenticate/password', {
-            'username': this.state.username,
-            'password': this.state.password,
+            'username': this.username.value,
+            'password': this.password.value,
             'persist': this.state.rememberMe,
         }).then((r) => {
             const search = get(this, 'props.location.search', '/');
@@ -154,16 +154,19 @@ class PasswordForm extends React.Component<IProps, IState> {
                     required={true}
                     disabled={!this.state.editable}
                     errors={this.state.usernameErrors}
-                    value={this.state.username}
+                    defaultValue={this.props.username}
                     onChange={this.handleTextChange}
+                    ref={ username => this.username = username as InputTextBlock }
                 />
-                <PasswordTextBlock
+                <InputTextBlock
                     label={t('Password')}
                     required={true}
                     disabled={!this.state.editable}
                     errors={this.state.passwordErrors}
-                    value={this.state.password}
+                    defaultValue={this.props.password}
                     onChange={this.handleTextChange}
+                    type="password"
+                    ref={ password => this.password = password as InputTextBlock }
                 />
                 <div className="inputBlock inputBlock-tighter">
                     <div className="rememberMeAndForgot">
@@ -180,7 +183,7 @@ class PasswordForm extends React.Component<IProps, IState> {
                     </div>
                 </div>
                 <ButtonSubmit
-                    disabled={!this.state.editable || this.state.password.length === 0 || this.state.username.length === 0}
+                    disabled={!this.state.editable}
                     content={t('Sign In')}
                 />
                 {/*<p className="authenticateUser-paragraph isCentered">{t('Not registered?')} <Link to="/entry/signup">{t('Create an Account')}</Link></p>*/}

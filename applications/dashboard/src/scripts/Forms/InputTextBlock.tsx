@@ -13,11 +13,11 @@ export interface IInputTextProps extends IRequiredComponentID {
     inputClassNames?: string;
     type?: string;
     labelID?: string;
-    value: string;
+    value?: string;
+    defaultValue?: string;
     placeholder?: string;
     valid?: boolean;
     descriptionID?: string;
-    defaultValue?: string;
     required?: boolean;
     errors?: string | string[];
     disabled?: boolean;
@@ -32,10 +32,11 @@ export default class InputTextBlock extends React.Component<IInputTextProps, ISt
     public static defaultProps = {
         disabled: false,
         type: 'text',
-        errors: []
+        errors: [],
+        onChange: () => {},
     };
 
-    private inputDom: HTMLInputElement | null;
+    private inputDom: HTMLInputElement;
 
     public constructor(props) {
         super(props);
@@ -101,6 +102,7 @@ export default class InputTextBlock extends React.Component<IInputTextProps, ISt
                 <input
                     id={this.state.id}
                     className={inputClasses}
+                    defaultValue={this.props.defaultValue}
                     value={this.props.value}
                     type={this.props.type}
                     disabled={this.props.disabled}
@@ -110,8 +112,7 @@ export default class InputTextBlock extends React.Component<IInputTextProps, ISt
                     aria-describedby={describedBy}
                     aria-labelledby={this.labelID}
                     onChange={(e) => this.handleInputChange(e)}
-                    defaultValue={this.props.defaultValue}
-                    ref={inputDom => this.inputDom = inputDom}
+                    ref={ inputDom => this.inputDom = inputDom as HTMLInputElement }
                 />
             </span>
             <ErrorMessages id={this.errorID} errors={this.props.errors as string | string[]}/>

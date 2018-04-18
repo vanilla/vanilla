@@ -2381,7 +2381,7 @@ PASSWORDMETER;
      * Returns the provided fieldname with improper characters stripped.
      *
      * PHP doesn't allow "." in variable names from external sources such as a
-     * HTML form. Some Vanilla components however rely on variable names such
+     * HTML form. Some Vanilla Components however rely on variable names such
      * as "a.b.c". So we need to escape them for backwards compatibility.
      *
      * Replaces e.g. "\" with "\\", "-dot-" with "\\-dot-" and "." with "-dot-".

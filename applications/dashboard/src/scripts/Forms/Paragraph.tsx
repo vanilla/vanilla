@@ -1,19 +1,23 @@
 import React from 'react';
 import classNames from 'classnames';
-import {uniqueID, IComponentID} from '@core/Interfaces/componentIDs';
+import {uniqueIDFromPrefix, getOptionalID, IOptionalComponentID} from '@core/Interfaces/componentIDs';
 
-interface IProps extends IComponentID {
+interface IProps extends IOptionalComponentID {
     className?: string;
     isError?: boolean;
     content?: string | Node | null;
 }
 
 export default class Paragraph extends React.Component<IProps> {
+    public static defaultProps = {
+        id: false,
+    };
+
     public id: string;
 
     constructor(props) {
         super(props);
-        this.id = uniqueID(props, 'Paragraph', true);
+        this.id = getOptionalID(props, 'Paragraph') as string;
     }
 
     public render() {
@@ -32,7 +36,7 @@ export default class Paragraph extends React.Component<IProps> {
                 };
             }
 
-            return <p id={this.props.id} className={componentClasses} {...accessibilityProps}>{this.props.content}</p>;
+            return <p id={this.id} className={componentClasses} {...accessibilityProps}>{this.props.content}</p>;
         } else {
             return null;
         }

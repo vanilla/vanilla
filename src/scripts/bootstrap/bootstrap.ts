@@ -21,7 +21,7 @@ debug(getMeta('debug', false));
 // Export the API to the global object.
 gdn.apiv2 = apiv2;
 
-// Mount all data-react components.
+// Mount all data-react Components.
 onContent((e) => {
     _mountComponents(e.target);
 });

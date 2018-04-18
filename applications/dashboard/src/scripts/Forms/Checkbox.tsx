@@ -1,9 +1,10 @@
 import { t } from '@core/application';
 import React from 'react';
 import classNames from 'classnames';
-import { uniqueID, IComponentID } from '@core/Interfaces/componentIDs';
+import {uniqueIDFromPrefix, getOptionalID, IOptionalComponentID} from '@core/Interfaces/componentIDs';
 
-interface IProps extends IComponentID {
+interface IProps extends IOptionalComponentID {
+    id?: string,
     className?: string;
     checked: boolean;
     disabled?: boolean;
@@ -19,12 +20,13 @@ export default class Button extends React.Component<IProps, IState> {
 
     public static defaultProps = {
         disabled: false,
+        id: false,
     };
 
     constructor(props) {
         super(props);
         this.state = {
-            id: uniqueID(props, "checkbox"),
+            id: getOptionalID(props, "checkbox") as string,
         };
     }
 

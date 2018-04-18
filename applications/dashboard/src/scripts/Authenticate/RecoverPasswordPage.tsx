@@ -2,9 +2,8 @@ import apiv2 from "@core/apiv2";
 import { t } from '@core/application';
 import { log, logError, debug } from "@core/utility";
 import DocumentTitle from '@core/Components/DocumentTitle';
-import { Link } from 'react-router-dom';
 import React from 'react';
-import { uniqueIDFromPrefix, IComponentID } from '@core/Interfaces/componentIDs';
+import {uniqueIDFromPrefix, getOptionalID, IOptionalComponentID} from '@core/Interfaces/componentIDs';
 import ButtonSubmit from "../Forms/ButtonSubmit";
 import Paragraph from "../Forms/Paragraph";
 import InputTextBlock from "../Forms/InputTextBlock";
@@ -20,7 +19,7 @@ interface IState {
     globalError?: string | null;
 }
 
-export default class RecoverPasswordPage extends React.Component<IComponentID, IState> {
+export default class RecoverPasswordPage extends React.Component<IOptionalComponentID, IState> {
     public id: string;
     public pageTitleID: string;
 
@@ -119,7 +118,10 @@ export default class RecoverPasswordPage extends React.Component<IComponentID, I
     }
 
     public render() {
-        const pageTitle = <DocumentTitle id={this.pageTitleID} className="isCentered" title={t('Recover Password')}/>;
+        const pageTitle = <DocumentTitle title={t('Recover Password')}>
+            <h1 id={this.pageTitleID} className="isCentered">{t('Recover Password')}</h1>
+        </DocumentTitle>;
+
         if (this.state.emailSent) {
             return <div id={this.id} className="authenticateUserCol">
                 {pageTitle}
@@ -127,13 +129,14 @@ export default class RecoverPasswordPage extends React.Component<IComponentID, I
                 <RememberPasswordLink/>
             </div>;
         } else {
-            return <div id={this.id} className="authenticateUserCol">
+
+
+            return <div className="authenticateUserCol">
                 {pageTitle}
                 <Paragraph content={t('RecoverPasswordLabelCode', 'Enter your email to continue.')} className="authenticateUser-paragraph" />
                 <form id={this.id} onSubmit={this.handleSubmit} aria-labelledby={this.pageTitleID} noValidate>
-                    <Paragraph parentID={this.id} className="authenticateUser-paragraph" content={this.state.globalError} isError={true} />
+                    <Paragraph className="authenticateUser-paragraph" content={this.state.globalError} isError={true} />
                     <InputTextBlock
-                        parentID={this.id}
                         label={t('Email/Username')}
                         required={true}
                         disabled={!this.state.editable}
@@ -141,7 +144,7 @@ export default class RecoverPasswordPage extends React.Component<IComponentID, I
                         value={this.state.email}
                         onChange={this.handleTextChange}
                     />
-                    <ButtonSubmit parentID={this.id} disabled={!this.state.editable || this.state.email.length === 0} content={t('Request a new password')}/>
+                    <ButtonSubmit disabled={!this.state.editable || this.state.email.length === 0} content={t('Request a new password')}/>
                 </form>
                 <RememberPasswordLink/>
             </div>;

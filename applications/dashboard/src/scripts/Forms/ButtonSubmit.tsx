@@ -2,23 +2,21 @@ import { t } from '@core/application';
 import React from 'react';
 import classNames from 'classnames';
 import Button from "./Button";
-import {uniqueID, IComponentID} from '@core/Interfaces/componentIDs';
+import {uniqueIDFromPrefix, getOptionalID, IOptionalComponentID} from '@core/Interfaces/componentIDs';
 
-interface IProps extends IComponentID {
+interface IProps extends IOptionalComponentID {
     content: string | Node;
     className?: string;
     disabled: boolean;
 }
 
-export default class ButtonSubmit extends React.Component<IProps> {
+export default class ButtonSubmit extends React.Component<IProps, IOptionalComponentID> {
     public static defaultProps = {
         disabled: false,
     };
-    public id: string;
 
     constructor(props) {
         super(props);
-        this.id = uniqueID(props, 'submitButton');
     }
 
     public render() {
@@ -30,7 +28,14 @@ export default class ButtonSubmit extends React.Component<IProps> {
             this.props.className
         );
 
-        return <Button id={this.id} disabled={this.props.disabled} type='submit' content={this.props.content} className={componentClasses}>
+        return <Button
+            id={this.props.id}
+            disabled={this.props.disabled}
+            type='submit'
+            content={this.props.content}
+            className={componentClasses}
+            prefix='submitButton'
+        >
             {this.props.content}
         </Button>;
     }

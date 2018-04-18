@@ -2,9 +2,8 @@ import * as React from "react";
 import { t } from '@core/application';
 import { log, logError, debug } from "@core/utility";
 import DocumentTitle from '@core/Components/DocumentTitle';
-import SignInForm from "./components/SignInForm";
-import { uniqueIDFromPrefix } from '@core/Interfaces/componentIDs';
-import {uniqueID, IComponentID} from '@core/Interfaces/componentIDs';
+import PasswordForm from "./Components/PasswordForm";
+import {uniqueIDFromPrefix, getOptionalID, IOptionalComponentID} from '@core/Interfaces/componentIDs';
 
 interface IState {
     loginFormActive: boolean;
@@ -16,6 +15,10 @@ interface IState {
 }
 
 export default class SignInPage extends React.Component<{}, IState> {
+    public static defaultProps = {
+        id: false,
+    };
+
     constructor(props) {
         super(props);
         this.state = {
@@ -25,14 +28,16 @@ export default class SignInPage extends React.Component<{}, IState> {
         };
     }
 
-    get titleID():string {
+    get titleID(): string {
         return this.state.id + "-pageTitle";
     }
 
     public render() {
-        return <div id={ this.state.id } className="authenticateUserCol">
-            <DocumentTitle id={ this.titleID } classNames="isCentered" title={t('Sign In')}/>
-            <SignInForm parentID={this.state.id}/>
+        return <div className="authenticateUserCol">
+            <DocumentTitle title={t('Sign In')}>
+                <h1 id={this.titleID} className="isCentered">{t('Sign In')}</h1>
+            </DocumentTitle>
+            <PasswordForm/>
         </div>;
     }
 }

@@ -1,9 +1,8 @@
 import { t } from '@core/application';
 import React from 'react';
 import Paragraph from '../../Forms/Paragraph';
-import {uniqueID, IComponentID} from '@core/Interfaces/componentIDs';
 
-interface IProps extends IComponentID {
+interface IProps {
     ssoMethods?: any[];
 }
 
@@ -12,12 +11,8 @@ interface IState {
 }
 
 export default class SSOMethods extends React.Component<IProps, IState> {
-    public id: string;
-
     constructor(props) {
         super(props);
-        this.id = uniqueID(props, 'SSOMethods', true);
-
         this.state = {
             longestText: 0,
         };
@@ -28,18 +23,10 @@ export default class SSOMethods extends React.Component<IProps, IState> {
             return null;
         } else {
             const ssoMethods = this.props.ssoMethods.map((method, index) => {
-                const nameLength = t(method.ui.buttonName).length;
-                if ( nameLength > this.state.longestText) {
-                    this.setState({
-                        longestText: nameLength,
-                    });
-                }
-
                 const methodStyles = {
                     backgroundColor: method.ui.backgroundColor,
                     color: method.ui.foregroundColor,
                 };
-
                 return <a href={method.ui.url} key={ index } className="BigButton button Button button-sso button-fullWidth" style={methodStyles}>
                     <span className="button-ssoContents">
                         <img src={method.ui.photoUrl} className="ssoMethod-icon" aria-hidden={true} />
@@ -52,7 +39,7 @@ export default class SSOMethods extends React.Component<IProps, IState> {
             });
 
             return <div className="ssoMethods">
-                <Paragraph parentID={this.id} content={t('Sign in with one of the following:')} />
+                <Paragraph content={t('Sign in with one of the following:')} />
                 {ssoMethods}
             </div>;
         }

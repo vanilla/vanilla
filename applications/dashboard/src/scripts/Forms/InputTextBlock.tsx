@@ -2,10 +2,11 @@ import { t } from '@core/application';
 import React from 'react';
 import classNames from 'classnames';
 import ErrorMessages from "./ErrorMessages";
+import { log, logError, debug } from "@core/utility";
 import Paragraph from "./Paragraph";
-import {uniqueID, IComponentID} from '@core/Interfaces/componentIDs';
+import {uniqueIDFromPrefix, getRequiredID, IRequiredComponentID} from '@core/Interfaces/componentIDs';
 
-export interface IInputTextProps extends IComponentID{
+export interface IInputTextProps extends IRequiredComponentID {
     className?: string;
     label: string;
     labelNote?: string;
@@ -16,8 +17,9 @@ export interface IInputTextProps extends IComponentID{
     placeholder?: string;
     valid?: boolean;
     descriptionID?: string;
+    defaultValue?: string;
     required?: boolean;
-    errors?: string[];
+    errors?: string | string[];
     disabled?: boolean;
     onChange?: any;
 }
@@ -26,28 +28,45 @@ interface IState {
     id: string;
 }
 
-
 export default class InputTextBlock extends React.Component<IInputTextProps, IState> {
     public static defaultProps = {
-        value: '',
         disabled: false,
         type: 'text',
-        errors: [],
+        errors: []
     };
 
-    constructor(props) {
+    private inputDom: HTMLInputElement | null;
+
+    public constructor(props) {
         super(props);
         this.state = {
-            id: uniqueID(props, "inputText"),
+            id: getRequiredID(props, "inputText") as string,
         };
     }
 
-    get labelID():string {
+    private handleInputChange(e) {
+        // Clear error state.
+        this.props.onChange(e);
+    }
+
+    private get labelID():string {
         return this.state.id + "-label";
     }
 
-    get errorID():string {
+    private get errorID():string {
         return this.state.id + "-errors";
+    }
+
+    public get value(): any {
+        return this.inputDom ? this.inputDom.value : '';
+    }
+
+    public set value(value) {
+        if (this.inputDom) {
+            this.inputDom.value = value;
+        } else {
+            throw new Error("inputDom does not exist");
+        }
     }
 
     public render() {
@@ -63,7 +82,7 @@ export default class InputTextBlock extends React.Component<IInputTextProps, ISt
             this.props.inputClassNames
         );
 
-        const hasErrors = this.props.errors && this.props.errors.length > 0;
+        const hasErrors = !!this.props.errors && this.props.errors.length > 0;
 
         let describedBy;
         if (hasErrors) {
@@ -75,7 +94,7 @@ export default class InputTextBlock extends React.Component<IInputTextProps, ISt
                 <span className="inputBlock-labelText">
                     {this.props.label}
                 </span>
-                <Paragraph className='inputBlock-labelNote' content={this.props.labelNote}/>
+                <Paragraph id={false} className='inputBlock-labelNote' content={this.props.labelNote}/>
             </span>
 
             <span className="inputBlock-inputWrap">
@@ -90,10 +109,12 @@ export default class InputTextBlock extends React.Component<IInputTextProps, ISt
                     aria-invalid={hasErrors}
                     aria-describedby={describedBy}
                     aria-labelledby={this.labelID}
-                    onChange={this.props.onChange}
+                    onChange={(e) => this.handleInputChange(e)}
+                    defaultValue={this.props.defaultValue}
+                    ref={inputDom => this.inputDom = inputDom}
                 />
             </span>
-            <ErrorMessages id={this.errorID} errors={this.props.errors}/>
+            <ErrorMessages id={this.errorID} errors={this.props.errors as string | string[]}/>
         </label>;
     }
 }

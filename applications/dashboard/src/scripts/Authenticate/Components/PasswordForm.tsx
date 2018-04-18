@@ -7,45 +7,45 @@ import InputTextBlock from "../../Forms/InputTextBlock";
 import Checkbox from "../../Forms/Checkbox";
 import PasswordTextBlock from "../../Forms/PasswordTextBlock";
 import ButtonSubmit from "../../Forms/ButtonSubmit";
-import { uniqueIDFromPrefix } from '@core/Interfaces/componentIDs';
 import Paragraph from "../../Forms/Paragraph";
 import get from "lodash/get";
-import CreateAnAccountLink from "./CreateAnAccountLink";
+import { IRequiredComponentID, getRequiredID } from '@core/Interfaces/componentIDs';
 
 interface IProps {
     location?: any;
 }
 
-interface IState {
+interface IState extends IRequiredComponentID {
     editable: boolean;
     username: string;
-    usernameErrors?: string[];
+    usernameErrors: string[];
     password: string;
-    passwordErrors?: string[];
+    passwordErrors: string[];
     redirectTo?: string | null;
     globalError?: string | null;
     submitEnabled: boolean;
     rememberMe: boolean;
 }
 
-class SignInForm extends React.Component<IProps, IState> {
-    public id: string;
+class PasswordForm extends React.Component<IProps, IState> {
 
     constructor(props) {
         super(props);
-        this.id = uniqueIDFromPrefix('signInForm');
         this.handleSubmit = this.handleSubmit.bind(this);
         this.handleTextChange = this.handleTextChange.bind(this);
         this.handleCheckBoxChange = this.handleCheckBoxChange.bind(this);
         this.handleErrors = this.handleErrors.bind(this);
 
         this.state = {
+            id: getRequiredID(props, 'passwordForm'),
             editable: true,
             username: '',
             password: '',
             redirectTo: null,
             submitEnabled: false,
             rememberMe: true,
+            passwordErrors: [],
+            usernameErrors: [],
         };
     }
 
@@ -90,7 +90,7 @@ class SignInForm extends React.Component<IProps, IState> {
 
         if (generalError || hasFieldSpecificErrors) {
             if (hasFieldSpecificErrors) { // Field Errors
-                logError('SignInForm Errors', errors);
+                logError('PasswordForm Errors', errors);
                 errors.map((error, index) => {
                     error.timestamp = new Date().getTime(); // Timestamp to make sure state changes, even if the message is the same
                     const targetError = error.field + 'Errors';
@@ -131,16 +131,25 @@ class SignInForm extends React.Component<IProps, IState> {
         });
     }
 
+    public get formDescriptionID() {
+        return this.state.id + "-description"
+    }
+
     public render() {
         if (this.state.redirectTo) {
             return <BrowserRouter>
-                <Route path={this.state.redirectTo} component={SignInForm} />
+                <Route path={this.state.redirectTo} component={PasswordForm} />
             </BrowserRouter>;
         } else {
-            return <form id={this.id} className="signInForm" method="post" onSubmit={this.handleSubmit} noValidate>
-                <Paragraph parentID={this.id} className="authenticateUser-paragraph" content={this.state.globalError} isError={true} />
+
+            let formDescribedBy;
+            if (this.state.globalError) {
+                formDescribedBy = this.formDescriptionID;
+            }
+
+            return <form id={this.state.id} aria-describedby={formDescribedBy} className="passwordForm" method="post" onSubmit={this.handleSubmit} noValidate>
+                <Paragraph id={this.formDescriptionID} className="authenticateUser-paragraph" content={this.state.globalError} isError={true} />
                 <InputTextBlock
-                    parentID={this.id}
                     label={t('Email/Username')}
                     required={true}
                     disabled={!this.state.editable}
@@ -149,7 +158,6 @@ class SignInForm extends React.Component<IProps, IState> {
                     onChange={this.handleTextChange}
                 />
                 <PasswordTextBlock
-                    parentID={this.id}
                     label={t('Password')}
                     required={true}
                     disabled={!this.state.editable}
@@ -160,18 +168,25 @@ class SignInForm extends React.Component<IProps, IState> {
                 <div className="inputBlock inputBlock-tighter">
                     <div className="rememberMeAndForgot">
                         <span className="rememberMeAndForgot-rememberMe">
-                            <Checkbox parentID={this.id} label={t('Keep me signed in')} onChange={this.handleCheckBoxChange} checked={this.state.rememberMe}/>
+                            <Checkbox
+                                label={t('Keep me signed in')}
+                                onChange={this.handleCheckBoxChange}
+                                checked={this.state.rememberMe}
+                            />
                         </span>
                         <span className="rememberMeAndForgot-forgot">
                             <Link to="/authenticate/recoverpassword">{t('Forgot your password?')}</Link>
                         </span>
                     </div>
                 </div>
-                <ButtonSubmit parentID={this.id} disabled={!this.state.editable || this.state.password.length === 0 || this.state.username.length === 0} content={t('Sign In')}/>
-                {/*<CreateAnAccountLink/>*/}
+                <ButtonSubmit
+                    disabled={!this.state.editable || this.state.password.length === 0 || this.state.username.length === 0}
+                    content={t('Sign In')}
+                />
+                {/*<p className="authenticateUser-paragraph isCentered">{t('Not registered?')} <Link to="/entry/signup">{t('Create an Account')}</Link></p>*/}
             </form>;
         }
     }
 }
 
-export default withRouter(SignInForm);
+export default withRouter(PasswordForm);

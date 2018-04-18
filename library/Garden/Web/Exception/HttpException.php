@@ -100,7 +100,7 @@ abstract class HttpException extends \Exception implements \JsonSerializable {
      * @param int $code An HTTP status code.
      * @param string $message The error message or an empty string to use the default message for the code.
      * @param array $context An array of context variables that can be used to render a more detailed response.
-     * @return HttpException Returns the new ex exception.
+     * @return HttpException Returns the new exception.
      */
     public static function createFromStatus(int $code, string $message = '', array $context = []): HttpException {
         // Try for a specific error message.

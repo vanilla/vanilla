@@ -1,4 +1,4 @@
-import React from 'react';
+import React from "react";
 import { getMeta } from "@core/application";
 
 /**
@@ -38,7 +38,7 @@ export default class DocumentTitle extends React.Component<IProps> {
      * @returns Returns the title as a string.
      */
     private getHeadTitle(props: IProps): string {
-        const siteTitle: string = getMeta('ui.siteName', '');
+        const siteTitle: string = getMeta("ui.siteName", "");
         const parts: string[] = [];
 
         if (props.title && props.title.length > 0) {
@@ -48,7 +48,7 @@ export default class DocumentTitle extends React.Component<IProps> {
             parts.push(siteTitle);
         }
 
-        return parts.join(' - ');
+        return parts.join(" - ");
     }
 }
 

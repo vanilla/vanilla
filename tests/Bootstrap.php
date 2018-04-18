@@ -188,6 +188,9 @@ class Bootstrap {
             ->rule(AuthenticatorModel::class)
             ->setShared(true)
 
+            ->rule(SearchModel::class)
+            ->setShared(true)
+
             ->rule(\Garden\Web\Dispatcher::class)
             ->setShared(true)
             ->addCall('addRoute', ['route' => new \Garden\Container\Reference('@api-v2-route'), 'api-v2'])

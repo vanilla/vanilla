@@ -10,9 +10,10 @@
         "allowSyntheticDefaultImports": true,
         "moduleResolution": "node",
         "strictNullChecks": true,
-        "target": "es2017",
+        "target": "es5",
         "module": "esnext",
         "baseUrl": ".",
+        "downlevelIteration": true,
         "paths": {
             "*": [
                 "node_modules/*"
@@ -21,12 +22,15 @@
             "@vanilla/*": ["./applications/vanilla/src/scripts/*"],
             "@dashboard/*": ["./applications/dashboard/src/scripts/*"]
         },
+        "typeRoots": [
+            "node_modules/@types"
+        ],
         "skipLibCheck": true
     },
     "include": [
-        "src/scripts/**/*",
-        "plugins/rich-editor/src/scripts/**/*",
-        "**/@types/**/*.ts",
-        "global.ts"
+        "**/*.ts"
+    ],
+    "exclude": [
+        "**/*.js"
     ]
 }

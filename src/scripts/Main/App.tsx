@@ -1,4 +1,4 @@
-import React from 'react';
+import React from "react";
 import { getRoutes, getMeta } from "@core/application";
 import { BrowserRouter as Router, Route, RouteProps, Switch } from "react-router-dom";
 import NotFoundPage from "@core/Main/NotFoundPage";
@@ -11,13 +11,15 @@ import NotFoundPage from "@core/Main/NotFoundPage";
 export default class App extends React.PureComponent {
     public render() {
         const routes = getRoutes().map((route: React.ReactElement<RouteProps>) => {
-            return <route.type key={route.key || route.props.path + (route.props.exact ? '!' : '')} {...route.props} />;
+            return <route.type key={route.key || route.props.path + (route.props.exact ? "!" : "")} {...route.props} />;
         });
 
         routes.push(<Route key="@not-found" component={NotFoundPage} />);
 
-        return <Router basename={getMeta('context.basePath', '')}>
-            <Switch>{routes}</Switch>
-        </Router>;
+        return (
+            <Router basename={getMeta("context.basePath", "")}>
+                <Switch>{routes}</Switch>
+            </Router>
+        );
     }
 }

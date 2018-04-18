@@ -12,14 +12,19 @@ use \Vanilla\Authenticator\ShimAuthenticator;
  */
 class GooglePlusAuthenticator extends ShimAuthenticator {
 
+    /** @var GooglePlusPlugin */
+    private $googlePlusPlugin;
+
     /**
      * GoogleAuthenticator constructor.
      *
-     * @param string $authenticatorID
+     * @param GooglePlusPlugin $googlePlusPlugin
      *
      * @throws \Garden\Schema\ValidationException
      */
-    public function __construct(string $authenticatorID) {
+    public function __construct(GooglePlusPlugin $googlePlusPlugin) {
+        $this->googlePlusPlugin = $googlePlusPlugin;
+
         parent::__construct('GooglePlus');
     }
 
@@ -34,6 +39,13 @@ class GooglePlusAuthenticator extends ShimAuthenticator {
                 'foregroundColor' => '#000',
             ]
         ];
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function isActive(): bool {
+        return $this->googlePlusPlugin->isConfigured();
     }
 
     /**

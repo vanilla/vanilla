@@ -232,6 +232,9 @@ class AuthenticateApiController extends AbstractApiController {
 
         $result = array_map([$this->authenticatorApiController, 'normalizeOutput'], $authenticators);
 
+        // Reset keys otherwise the array could be interpreted as an associative array (read object) by $out->validate.
+        $result = array_values($result);
+
         return $out->validate($result);
     }
 

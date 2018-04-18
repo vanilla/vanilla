@@ -7,23 +7,22 @@
 import FocusableEmbedBlot from "../Abstract/FocusableEmbedBlot";
 
 export default class ErrorBlot extends FocusableEmbedBlot {
-
-    public static blotName = 'embed-error';
-    public static className = 'embed-error';
-    public static tagName = 'div';
+    public static blotName = "embed-error";
+    public static className = "embed-error";
+    public static tagName = "div";
 
     public static create(data) {
         const node = super.create(data) as HTMLElement;
-        node.classList.add('embed');
-        node.setAttribute('role', 'alert');
+        node.classList.add("embed");
+        node.setAttribute("role", "alert");
 
-        const errors = document.createElement('ul');
-        errors.classList.add('embedLoader-errors');
+        const errors = document.createElement("ul");
+        errors.classList.add("embedLoader-errors");
         errors.setAttribute("contenteditable", false);
 
-        data.errors.forEach(function insertError (i) {
-            const error = document.createElement('li');
-            error.classList.add('embedLoader-error');
+        data.errors.forEach(function insertError(i) {
+            const error = document.createElement("li");
+            error.classList.add("embedLoader-error");
             error.innerHTML = `<svg class="embedLoader-icon embedLoader-warningIcon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
                                 <path d="M11.651,3.669,2.068,21.75H21.234Zm.884-1,10,18.865A1,1,0,0,1,21.649,23h-20a1,1,0,0,1-.884-1.468l10-18.865a1,1,0,0,1,1.768,0Zm.231,13.695H10.547L10.2,10h2.9Zm-2.535,2.354a1.24,1.24,0,0,1,.363-.952,1.493,1.493,0,0,1,1.056-.34,1.445,1.445,0,0,1,1.039.34,1.26,1.26,0,0,1,.353.952,1.223,1.223,0,0,1-.366.944A1.452,1.452,0,0,1,11.65,20a1.5,1.5,0,0,1-1.042-.34A1.206,1.206,0,0,1,10.231,18.716Z" style="fill: currentColor;"/>
                             </svg>

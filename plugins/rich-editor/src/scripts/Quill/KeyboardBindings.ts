@@ -21,13 +21,11 @@ import FocusableEmbedBlot from "./Blots/Abstract/FocusableEmbedBlot";
 import Parchment from "parchment";
 
 export default class KeyboardBindings {
-
-    private static MULTI_LINE_BLOTS = ['spoiler-line', 'blockquote-line', 'code-block'];
+    private static MULTI_LINE_BLOTS = ["spoiler-line", "blockquote-line", "code-block"];
 
     private bindings = {};
 
     constructor(private quill: Quill) {
-
         // Keyboard behaviours
         this.resetDefaultBindings();
         this.addBlockNewLineHandlers();
@@ -53,7 +51,6 @@ export default class KeyboardBindings {
      * Add custom handlers for backspace inside of Blots.
      */
     private addBlockBackspaceHandlers() {
-
         this.bindings["Block Backspace With Selection"] = {
             key: KeyboardModule.keys.BACKSPACE,
             collapsed: false,
@@ -156,7 +153,7 @@ export default class KeyboardBindings {
         insertNewLineAfterBlotAndTrim(this.quill, range);
 
         return false;
-    }
+    };
 
     /**
      * Special handling for the ENTER key for Code Blocks.
@@ -187,7 +184,7 @@ export default class KeyboardBindings {
         insertNewLineAfterBlotAndTrim(this.quill, range, 2);
 
         return false;
-    }
+    };
 
     /**
      * Add keyboard options.bindings that allow the user to
@@ -216,7 +213,7 @@ export default class KeyboardBindings {
      * @returns False to prevent default.
      */
     private handleMultiLineBackspace(range: RangeStatic) {
-        const [ line ] = this.quill.getLine(range.index);
+        const [line] = this.quill.getLine(range.index);
 
         // Check if this is an empty multi-line blot
         const hasSiblings = line.prev || line.next;
@@ -230,9 +227,7 @@ export default class KeyboardBindings {
             return true;
         }
 
-        const delta = new Delta()
-            .retain(range.index)
-            .retain(1, {[line.constructor.blotName]: false});
+        const delta = new Delta().retain(range.index).retain(1, { [line.constructor.blotName]: false });
         this.quill.updateContents(delta, Emitter.sources.USER);
         return false;
     }
@@ -245,7 +240,7 @@ export default class KeyboardBindings {
      * @returns False to prevent default.
      */
     private handleCodeBlockBackspace(range: RangeStatic) {
-        const [ line ] = this.quill.getLine(range.index);
+        const [line] = this.quill.getLine(range.index);
 
         // Check if this is an empty code block.
         const { textContent } = line.domNode;
@@ -254,9 +249,7 @@ export default class KeyboardBindings {
             return true;
         }
 
-        const delta = new Delta()
-            .retain(range.index)
-            .retain(1, {"code-block": false});
+        const delta = new Delta().retain(range.index).retain(1, { "code-block": false });
         this.quill.updateContents(delta, Emitter.sources.USER);
 
         return false;
@@ -279,7 +272,7 @@ export default class KeyboardBindings {
         stripFormattingFromFirstBlot(this.quill);
         // Return false to prevent default behaviour.
         return false;
-    }
+    };
 
     /**
      * Delete the entire first Blot if the whole thing and something else is selected.
@@ -298,9 +291,8 @@ export default class KeyboardBindings {
         const rangeEndsAfterSelection = range.index + range.length > selection.index + selection.length;
         const isFirstLineSelected = selection.index === 0;
         const selectionIsEntireScroll = isFirstLineSelected;
-        const blotMatches = line instanceof LineBlot
-            || line instanceof CodeBlockBlot
-            || line instanceof FocusableEmbedBlot;
+        const blotMatches =
+            line instanceof LineBlot || line instanceof CodeBlockBlot || line instanceof FocusableEmbedBlot;
 
         if ((rangeStartsBeforeSelection || rangeEndsAfterSelection || selectionIsEntireScroll) && blotMatches) {
             let delta = new Delta();
@@ -319,7 +311,7 @@ export default class KeyboardBindings {
         }
 
         return true;
-    }
+    };
 
     /**
      * Insert a normal newline before the current range.

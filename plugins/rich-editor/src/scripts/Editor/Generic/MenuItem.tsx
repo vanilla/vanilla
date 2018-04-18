@@ -34,14 +34,13 @@ interface IProps {
  * Component for a single item in a EditorToolbar.
  */
 export default class MenuItem extends React.Component<IProps> {
-
     private onBlur: (event?: React.FocusEvent<any>) => void;
     private buttonRole: string;
     private domButton: HTMLElement;
 
     constructor(props) {
         super(props);
-        this.onBlur = (props.isLast && props.onBlur) ? props.onBlur : () => undefined;
+        this.onBlur = props.isLast && props.onBlur ? props.onBlur : () => undefined;
         this.buttonRole = props.role || "button";
     }
 
@@ -50,19 +49,23 @@ export default class MenuItem extends React.Component<IProps> {
         const Icon = Icons[propertyName];
         const buttonClasses = classnames("richEditor-button", "richEditor-menuItem", { isActive });
 
-        return <button
-            ref={(ref: HTMLButtonElement) => { this.domButton = ref; }}
-            className={buttonClasses}
-            type="button"
-            aria-label={t('richEditor.menu.' + this.props.propertyName)}
-            role={this.props.role}
-            aria-pressed={this.props.isActive}
-            onClick={onClick}
-            onBlur={this.onBlur}
-            onKeyDown={this.handleKeyPress}
-        >
-            <Icon />
-        </button>;
+        return (
+            <button
+                ref={(ref: HTMLButtonElement) => {
+                    this.domButton = ref;
+                }}
+                className={buttonClasses}
+                type="button"
+                aria-label={t("richEditor.menu." + this.props.propertyName)}
+                role={this.props.role}
+                aria-pressed={this.props.isActive}
+                onClick={onClick}
+                onBlur={this.onBlur}
+                onKeyDown={this.handleKeyPress}
+            >
+                <Icon />
+            </button>
+        );
     }
 
     /**
@@ -103,5 +106,5 @@ export default class MenuItem extends React.Component<IProps> {
                 }
                 break;
         }
-    }
+    };
 }

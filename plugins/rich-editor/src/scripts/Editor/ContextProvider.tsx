@@ -25,7 +25,6 @@ export interface IEditorContextProps {
 }
 
 export default class EditorContextProvider extends React.PureComponent<IProps> {
-
     public static childContextTypes = editorContextTypes;
 
     public getChildContext() {
@@ -49,7 +48,7 @@ export default class EditorContextProvider extends React.PureComponent<IProps> {
  */
 export function withEditor(Component) {
     function ComponentWithEditor(props, context) {
-        return <Component { ...context } { ...props } />;
+        return <Component {...context} {...props} />;
     }
     (ComponentWithEditor as any).contextTypes = editorContextTypes;
 

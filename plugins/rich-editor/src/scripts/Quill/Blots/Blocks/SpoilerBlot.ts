@@ -4,7 +4,7 @@
  * @license https://opensource.org/licenses/GPL-2.0 GPL-2.0
  */
 
- /* tslint:disable:max-classes-per-file */
+/* tslint:disable:max-classes-per-file */
 
 import WrapperBlot from "../Abstract/WrapperBlot";
 import ContentBlot from "../Abstract/ContentBlot";
@@ -17,7 +17,7 @@ import { t } from "@core/application";
 export default class SpoilerLineBlot extends LineBlot {
     public static blotName = "spoiler-line";
     public static className = "spoiler-line";
-    public static tagName = 'p';
+    public static tagName = "p";
     public static parentName = "spoiler-content";
 }
 
@@ -25,9 +25,9 @@ export default class SpoilerLineBlot extends LineBlot {
  * Represents the full content area of a spoiler.
  */
 export class SpoilerContentBlot extends ContentBlot {
-    public static className = 'spoiler-content';
-    public static blotName = 'spoiler-content';
-    public static parentName = 'spoiler';
+    public static className = "spoiler-content";
+    public static blotName = "spoiler-content";
+    public static parentName = "spoiler";
 }
 
 const spoilerButton = `
@@ -54,8 +54,8 @@ const spoilerButton = `
  * through a SpoilerLineBlot.
  */
 export class SpoilerWrapperBlot extends WrapperBlot {
-    public static className = 'spoiler';
-    public static blotName = 'spoiler';
+    public static className = "spoiler";
+    public static blotName = "spoiler";
     public static allowedChildren = [...WrapperBlot.allowedChildren];
 
     public static create(value) {

@@ -31,7 +31,6 @@ interface IMediaScrapeResult {
  * A Quill module for managing insertion of embeds/loading/error states.
  */
 export default class EmbedInsertionModule extends Module {
-
     private currentUploads: Map<File | string, Blot> = new Map();
     private lastSelection: RangeStatic = { index: 0, length: 0 };
     private pauseSelectionTracking = false;
@@ -57,9 +56,10 @@ export default class EmbedInsertionModule extends Module {
 
         this.createLoadingEmbed(url);
 
-        api.post("/media/scrape", formData)
+        api
+            .post("/media/scrape", formData)
             .then(result => {
-                switch(result.data.type) {
+                switch (result.data.type) {
                     case "site":
                         this.createSiteEmbed(result.data);
                         break;
@@ -70,7 +70,8 @@ export default class EmbedInsertionModule extends Module {
                         this.createErrorEmbed(url, new Error(t("That type of embed is not currently supported.")));
                         break;
                 }
-            }).catch(error => {
+            })
+            .catch(error => {
                 if (error.response && error.response.data && error.response.data.message) {
                     const message = error.response.data.message;
 
@@ -91,7 +92,6 @@ export default class EmbedInsertionModule extends Module {
      * Create a video embed.
      */
     private createVideoEmbed(scrapeResult: IMediaScrapeResult) {
-
         const linkEmbed = Parchment.create("embed-video", scrapeResult);
         const completedBlot = this.currentUploads.get(scrapeResult.url);
 
@@ -107,22 +107,14 @@ export default class EmbedInsertionModule extends Module {
      * Create a site embed.
      */
     private createSiteEmbed(scrapeResult: IMediaScrapeResult) {
-        const {
+        const { url, photoUrl, name, body } = scrapeResult;
+
+        const linkEmbed = Parchment.create("embed-link", {
             url,
-            photoUrl,
             name,
-            body,
-        } = scrapeResult;
-
-
-        const linkEmbed = Parchment.create("embed-link",
-            {
-                url,
-                name,
-                linkImage: photoUrl,
-                excerpt: body,
-            }
-        );
+            linkImage: photoUrl,
+            excerpt: body,
+        });
         const completedBlot = this.currentUploads.get(url);
 
         // The loading blot may have been undone/deleted since we created it.
@@ -134,19 +126,12 @@ export default class EmbedInsertionModule extends Module {
     }
 
     private createExternalImageEmbed(scrapeResult: IMediaScrapeResult) {
-        const {
-            url,
-            photoUrl,
-            name,
-        } = scrapeResult;
+        const { url, photoUrl, name } = scrapeResult;
 
-
-        const linkEmbed = Parchment.create("embed-image",
-            {
-                url: photoUrl,
-                alt: name,
-            }
-        );
+        const linkEmbed = Parchment.create("embed-image", {
+            url: photoUrl,
+            alt: name,
+        });
         const completedBlot = this.currentUploads.get(url);
 
         // The loading blot may have been undone/deleted since we created it.
@@ -180,7 +165,7 @@ export default class EmbedInsertionModule extends Module {
         }
 
         this.currentUploads.delete(lookupKey);
-    }
+    };
 
     /**
      * Place an loading embed into the document and keep a reference to it.
@@ -205,7 +190,7 @@ export default class EmbedInsertionModule extends Module {
 
         this.currentUploads.set(lookupKey, loadingBlot);
         this.pauseSelectionTracking = false;
-    }
+    };
 
     /**
      * Setup a selection listener for quill.
@@ -230,20 +215,16 @@ export default class EmbedInsertionModule extends Module {
                 this.lastSelection = range;
             }
         }
-    }
+    };
 
     /**
      * Setup image upload listeners and handlers.
      */
     private setupImageUploads() {
-        this.fileUploader = new FileUploader(
-            this.createLoadingEmbed,
-            this.onImageUploadSuccess,
-            this.createErrorEmbed,
-        );
+        this.fileUploader = new FileUploader(this.createLoadingEmbed, this.onImageUploadSuccess, this.createErrorEmbed);
 
-        this.quill.root.addEventListener('drop', this.fileUploader.dropHandler, false);
-        this.quill.root.addEventListener('paste', this.fileUploader.pasteHandler, false);
+        this.quill.root.addEventListener("drop", this.fileUploader.dropHandler, false);
+        this.quill.root.addEventListener("paste", this.fileUploader.pasteHandler, false);
         this.setupImageUploadButton();
     }
 
@@ -263,7 +244,7 @@ export default class EmbedInsertionModule extends Module {
         }
 
         this.currentUploads.delete(file);
-    }
+    };
 
     /**
      * Setup the the fake file input for image uploads.

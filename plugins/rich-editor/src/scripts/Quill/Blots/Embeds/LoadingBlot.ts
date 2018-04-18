@@ -8,23 +8,22 @@ import { t } from "@core/application";
 import FocusableEmbedBlot from "../Abstract/FocusableEmbedBlot";
 
 export default class LoadingBlot extends FocusableEmbedBlot {
-
-    public static blotName = 'embed-loading';
-    public static className = 'embed-loading';
-    public static tagName = 'div';
+    public static blotName = "embed-loading";
+    public static className = "embed-loading";
+    public static tagName = "div";
 
     public static create(value: any) {
         const node = super.create(value) as HTMLElement;
 
-        node.classList.add('embed');
-        node.classList.add('embed-loading');
-        node.setAttribute('role', 'alert');
+        node.classList.add("embed");
+        node.classList.add("embed-loading");
+        node.setAttribute("role", "alert");
 
         node.innerHTML = `<div class='embedLoader'>
                             <div class='embedLoader-box'>
                                 <div class='embedLoader-loader'>
                                     <span class='sr-only'>
-                                        ${t('Loading...')}
+                                        ${t("Loading...")}
                                     </span>
                                 </div>
                             </div>

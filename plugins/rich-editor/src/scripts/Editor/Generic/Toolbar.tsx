@@ -15,7 +15,7 @@ import * as quillUtilities from "../../Quill/utility";
 import { withEditor, IEditorContextProps } from "../ContextProvider";
 import { IMenuItemData } from "./MenuItem";
 
-interface IProps extends IEditorContextProps{
+interface IProps extends IEditorContextProps {
     menuItems?: {
         [key: string]: IMenuItemData;
     };
@@ -32,7 +32,6 @@ interface IState {
  * Component for declaring a dynamic toolbar linked to a quill instance.
  */
 export class Toolbar extends React.Component<IProps, IState> {
-
     private static defaultItems = {
         bold: {
             active: false,
@@ -90,26 +89,28 @@ export class Toolbar extends React.Component<IProps, IState> {
         const menuItems = menuItemList.map((itemName, key) => {
             const isActive = this.state[itemName].active;
 
-            const clickHandler = () => { this.formatItem(itemName); };
+            const clickHandler = () => {
+                this.formatItem(itemName);
+            };
 
-            return <MenuItem
-                propertyName={itemName}
-                label={t('richEditor.menu.' + itemName)}
-                key={key}
-                isActive={isActive}
-                isLast={key + 1 === menuItemList.length}
-                isFirst={key === 0}
-                onClick={clickHandler}
-                onBlur={this.props.onBlur}
-                role={this.props.itemRole}
-            />;
+            return (
+                <MenuItem
+                    propertyName={itemName}
+                    label={t("richEditor.menu." + itemName)}
+                    key={key}
+                    isActive={isActive}
+                    isLast={key + 1 === menuItemList.length}
+                    isFirst={key === 0}
+                    onClick={clickHandler}
+                    onBlur={this.props.onBlur}
+                    role={this.props.itemRole}
+                />
+            );
         });
 
         return (
             <div className="richEditor-menu" role="menu">
-                <div className="richEditor-menuItems MenuItems">
-                    {menuItems}
-                </div>
+                <div className="richEditor-menuItems MenuItems">{menuItems}</div>
             </div>
         );
     }
@@ -124,7 +125,7 @@ export class Toolbar extends React.Component<IProps, IState> {
         if (!this.props.isHidden) {
             this.update(range);
         }
-    }
+    };
 
     /**
      * React to quill optimizations passes.
@@ -134,7 +135,7 @@ export class Toolbar extends React.Component<IProps, IState> {
             const range = this.quill.getSelection();
             this.update(range);
         }
-    }
+    };
 
     /** MARK: Click handlers */
 
@@ -163,7 +164,6 @@ export class Toolbar extends React.Component<IProps, IState> {
 
         this.update();
     }
-
 
     /**
      * Update all toolbar items' states.

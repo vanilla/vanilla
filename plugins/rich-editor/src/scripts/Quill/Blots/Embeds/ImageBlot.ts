@@ -8,21 +8,20 @@ import { setData, getData } from "@core/dom";
 import FocusableEmbedBlot from "../Abstract/FocusableEmbedBlot";
 
 export default class ImageBlot extends FocusableEmbedBlot {
-
-    public static blotName = 'embed-image';
-    public static className = 'embed-image';
-    public static tagName = 'div';
+    public static blotName = "embed-image";
+    public static className = "embed-image";
+    public static tagName = "div";
 
     public static create(data) {
         const node = super.create(data) as HTMLElement;
-        node.classList.add('embed');
-        node.classList.add('embed-image');
-        node.classList.add('embedImage');
+        node.classList.add("embed");
+        node.classList.add("embed-image");
+        node.classList.add("embedImage");
 
-        const image = document.createElement('img');
-        image.classList.add('embedImage-img');
-        image.setAttribute('src', data.url);
-        image.setAttribute('alt', data.alt || '');
+        const image = document.createElement("img");
+        image.classList.add("embedImage-img");
+        image.setAttribute("src", data.url);
+        image.setAttribute("alt", data.alt || "");
         image.setAttribute("tabindex", -1);
 
         node.appendChild(image);

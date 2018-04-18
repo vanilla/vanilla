@@ -13,17 +13,17 @@ import LineBlot from "../Abstract/LineBlot";
 export default class BlockquoteLineBlot extends LineBlot {
     public static blotName = "blockquote-line";
     public static className = "blockquote-line";
-    public static tagName = 'p';
+    public static tagName = "p";
     public static parentName = "blockquote-content";
 }
 
 export class BlockquoteContentBlot extends ContentBlot {
-    public static className = 'blockquote-content';
-    public static blotName = 'blockquote-content';
-    public static parentName = 'blockquote';
+    public static className = "blockquote-content";
+    public static blotName = "blockquote-content";
+    public static parentName = "blockquote";
 }
 
 export class BlockquoteWrapperBlot extends WrapperBlot {
-    public static className = 'blockquote';
-    public static blotName = 'blockquote';
+    public static className = "blockquote";
+    public static blotName = "blockquote";
 }

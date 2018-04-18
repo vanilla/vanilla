@@ -1,4 +1,4 @@
-import uniqueId from "lodash/uniqueid";
+import uniqueId from "lodash/uniqueId";
 
 // Optional ID
 export interface IOptionalComponentID {

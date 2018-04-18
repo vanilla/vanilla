@@ -312,7 +312,7 @@ class VanillaHooks implements Gdn_IPlugin {
             return;
         }
 
-        if (in_array($Sender->RequestMethod, ['discussion', 'editdiscussion', 'question'])) {
+        if (in_array($Sender->RequestMethod, ['discussion', 'editdiscussion', 'question', 'idea'])) {
             // Setup, get most popular tags
             $TagModel = TagModel::instance();
             $Tags = $TagModel->getWhere(['Type' => array_keys($TagModel->defaultTypes())], 'CountDiscussions', 'desc', c('Vanilla.Tagging.ShowLimit', 50))->result(DATASET_TYPE_ARRAY);

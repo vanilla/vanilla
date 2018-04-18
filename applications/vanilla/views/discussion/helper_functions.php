@@ -438,7 +438,7 @@ if (!function_exists('getCommentOptions')) :
         $categoryID = val('CategoryID', $discussion);
 
         // Can the user edit the comment?
-        $canEdit = CommentModel::canEdit($comment, $timeLeft);
+        $canEdit = CommentModel::canEdit($comment, $timeLeft, $discussion);
         if ($canEdit) {
             if ($timeLeft) {
                 $timeLeft = ' ('.Gdn_Format::seconds($timeLeft).')';

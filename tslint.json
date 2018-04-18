@@ -1,6 +1,5 @@
 {
     "extends": [
         "@vanillaforums/tslint-config"
-    ],
-    "defaultSeverity": "warning"
+    ]
 }

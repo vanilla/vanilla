@@ -20,7 +20,7 @@
     "build": {
         "process": "core",
         "entries": {
-            "app": "./src/scripts/dashboard-app.tsx"
+            "app": "./src/scripts/dashboard-app"
         }
     }
 }

@@ -70,6 +70,14 @@ export default class InputTextBlock extends React.Component<IInputTextProps, ISt
         }
     }
 
+    public focus() {
+        this.inputDom.focus();
+    }
+
+    public select() {
+        this.inputDom.select();
+    }
+
     public render() {
         const componentClasses = classNames(
             'inputBlock',

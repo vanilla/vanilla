@@ -22,6 +22,7 @@ interface IState {
 export default class RecoverPasswordPage extends React.Component<IOptionalComponentID, IState> {
     public id: string;
     public pageTitleID: string;
+    public email: InputTextBlock;
 
     constructor(props) {
         super(props);
@@ -70,6 +71,7 @@ export default class RecoverPasswordPage extends React.Component<IOptionalCompon
                 editable: true,
             }, () => {
                 this.normalizeErrors(e);
+                this.email.select();
             });
         });
     }
@@ -141,6 +143,7 @@ export default class RecoverPasswordPage extends React.Component<IOptionalCompon
                         errors={this.state.errors}
                         value={this.state.email}
                         onChange={this.handleTextChange}
+                        ref={ email => this.email = email as InputTextBlock }
                     />
                     <ButtonSubmit disabled={!this.state.editable || this.state.email.length === 0} content={t('Request a new password')}/>
                 </form>

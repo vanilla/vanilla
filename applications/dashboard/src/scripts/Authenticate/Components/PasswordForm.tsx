@@ -53,7 +53,6 @@ class PasswordForm extends React.Component<IProps, IState> {
 
     public handleTextChange = (event) => {
         const type:string = get(event, 'target.type', '');
-        // const value:string = get(event, 'target.value', '');
 
         if (type === 'password') {
             this.setState({
@@ -108,7 +107,19 @@ class PasswordForm extends React.Component<IProps, IState> {
         } else { // Something went really wrong. Add default message to tell the user there's a problem.
             newState.globalError = catchAllErrorMessage;
         }
-        this.setState(newState);
+        this.setState(newState, () => {
+            const hasGlobalError = !!this.state.globalError;
+            const hasPasswordError = this.state.passwordErrors.length > 0;
+            const hasUsernameError = this.state.usernameErrors.length > 0;
+
+            if (hasGlobalError && !hasPasswordError && !hasUsernameError) {
+                this.username.select();
+            } else if (hasUsernameError) {
+                this.username.select();
+            } else if (hasPasswordError) {
+                this.password.select();
+            }
+        });
     }
 
     public handleSubmit = (event) => {

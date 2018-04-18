@@ -438,8 +438,7 @@ if (!function_exists('getCommentOptions')) :
         $categoryID = val('CategoryID', $discussion);
 
         // Can the user edit the comment?
-        $commentModel = new CommentModel();
-        $canEdit = $commentModel->canEdit($comment);
+        $canEdit = CommentModel::canEdit($comment, $timeLeft, $discussion);
         if ($canEdit) {
             $options['EditComment'] = [
                 'Label' => t('Edit').$timeLeft,

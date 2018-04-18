@@ -10,7 +10,6 @@ import Block from "quill/blots/block";
  * A Block Blot implementing class matching functionality and representation in the outputted delta.
  */
 export default class ClassFormatBlot extends Block {
-
     public static create(value) {
         const domNode = super.create(value) as HTMLElement;
 

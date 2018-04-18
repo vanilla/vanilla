@@ -23,7 +23,7 @@ const PARAGRAPH_ITEMS = {
         },
         2: {
             name: "subtitle",
-        }
+        },
     },
     "blockquote-line": {
         name: "blockquote",
@@ -38,11 +38,10 @@ const PARAGRAPH_ITEMS = {
 
 const initialToolbarItems = {};
 
-
 // Parse our items that we use for detecting the active state into a format the toolbar can represent.
-for(const [formatName, contents] of Object.entries(PARAGRAPH_ITEMS)) {
+for (const [formatName, contents] of Object.entries(PARAGRAPH_ITEMS)) {
     if (formatName === "header") {
-        for(const [enableValue, headerContents] of Object.entries(contents)) {
+        for (const [enableValue, headerContents] of Object.entries(contents)) {
             initialToolbarItems[headerContents.name] = {
                 formatName,
                 enableValue,
@@ -67,7 +66,6 @@ interface IState {
 }
 
 export class ParagraphToolbar extends React.PureComponent<IEditorContextProps, IState> {
-
     private quill: Quill;
     private toolbarNode: HTMLElement;
     private ID: string;
@@ -96,7 +94,7 @@ export class ParagraphToolbar extends React.PureComponent<IEditorContextProps, I
                 index: 0,
                 length: 0,
             },
-            activeFormatKey: "pilcrow"
+            activeFormatKey: "pilcrow",
         };
     }
 
@@ -127,33 +125,46 @@ export class ParagraphToolbar extends React.PureComponent<IEditorContextProps, I
 
         const Icon = Icons[this.state.activeFormatKey];
 
-        return <div id={this.componentID} style={this.getPilcrowStyles()} className="richEditor-menu richEditorParagraphMenu">
-            <button
-                type="button"
-                id={this.buttonID}
-                aria-label={t('richEditor.menu.paragraph')}
-                aria-controls={this.menuID}
-                aria-expanded={this.state.showMenu}
-                disabled={!this.state.showPilcrow}
-                className={pilcrowClasses}
-                aria-haspopup="menu"
-                onClick={this.pilcrowClickHandler}
-                onKeyDown={this.handleKeyPress}
+        return (
+            <div
+                id={this.componentID}
+                style={this.getPilcrowStyles()}
+                className="richEditor-menu richEditorParagraphMenu"
             >
-                <Icon/>
-            </button>
-            <div id={this.menuID} className={this.getToolbarClasses()} style={this.getToolbarStyles()} ref={(ref) => this.toolbarNode = ref!} role="menu">
-                <Toolbar
-                    quill={this.quill}
-                    menuItems={initialToolbarItems}
-                    isHidden={!this.state.showMenu}
-                    onBlur={this.checkForExternalFocus} itemRole="menuitem"
-                />
-                <div role="presentation" className="richEditor-nubPosition">
-                    <div className="richEditor-nub"/>
+                <button
+                    type="button"
+                    id={this.buttonID}
+                    aria-label={t("richEditor.menu.paragraph")}
+                    aria-controls={this.menuID}
+                    aria-expanded={this.state.showMenu}
+                    disabled={!this.state.showPilcrow}
+                    className={pilcrowClasses}
+                    aria-haspopup="menu"
+                    onClick={this.pilcrowClickHandler}
+                    onKeyDown={this.handleKeyPress}
+                >
+                    <Icon />
+                </button>
+                <div
+                    id={this.menuID}
+                    className={this.getToolbarClasses()}
+                    style={this.getToolbarStyles()}
+                    ref={ref => (this.toolbarNode = ref!)}
+                    role="menu"
+                >
+                    <Toolbar
+                        quill={this.quill}
+                        menuItems={initialToolbarItems}
+                        isHidden={!this.state.showMenu}
+                        onBlur={this.checkForExternalFocus}
+                        itemRole="menuitem"
+                    />
+                    <div role="presentation" className="richEditor-nubPosition">
+                        <div className="richEditor-nub" />
+                    </div>
                 </div>
             </div>
-        </div>;
+        );
     }
 
     /**
@@ -177,22 +188,22 @@ export class ParagraphToolbar extends React.PureComponent<IEditorContextProps, I
                 button.focus();
             }
         }
-    }
+    };
 
     /**
      * Handle the escape key.
      *
      * @param {React.KeyboardEvent} event - A synthetic keyboard event.
      */
-    private escFunction = (event) => {
-        if(event.keyCode === 27 && this.state.showMenu) {
+    private escFunction = event => {
+        if (event.keyCode === 27 && this.state.showMenu) {
             this.closeMenu(event);
             const button = document.getElementById(this.buttonID);
             if (button instanceof HTMLElement) {
                 button.focus();
             }
         }
-    }
+    };
 
     /**
      * Handle changes from the editor.
@@ -212,12 +223,12 @@ export class ParagraphToolbar extends React.PureComponent<IEditorContextProps, I
             if (range != null) {
                 const activeFormats = this.quill.getFormat(range);
                 let activeFormatKey = "pilcrow";
-                for(const [formatName, formatValue] of Object.entries(activeFormats)) {
+                for (const [formatName, formatValue] of Object.entries(activeFormats)) {
                     if (formatName in PARAGRAPH_ITEMS) {
                         let item = PARAGRAPH_ITEMS[formatName];
 
                         // In case its a heading
-                        if (formatName === "header" && formatValue as string in item) {
+                        if (formatName === "header" && (formatValue as string) in item) {
                             item = item[formatValue as string];
                         }
 
@@ -256,7 +267,7 @@ export class ParagraphToolbar extends React.PureComponent<IEditorContextProps, I
                 showPilcrow: false,
             });
         }
-    }
+    };
 
     private getPilcrowStyles() {
         const bounds = this.quill.getBounds(this.state.range.index, this.state.range.length);
@@ -302,13 +313,13 @@ export class ParagraphToolbar extends React.PureComponent<IEditorContextProps, I
         });
         closeEditorFlyouts(this.constructor.name);
         const menu = document.getElementById(this.menuID);
-        const firstButton = menu ? menu.querySelector('.richEditor-button') : false;
+        const firstButton = menu ? menu.querySelector(".richEditor-button") : false;
         if (firstButton instanceof HTMLElement) {
             setImmediate(() => {
                 firstButton.focus();
             });
         }
-    }
+    };
 
     /**
      * Close if we lose focus on the component
@@ -323,7 +334,7 @@ export class ParagraphToolbar extends React.PureComponent<IEditorContextProps, I
                 this.closeMenu(event);
             }
         });
-    }
+    };
 
     /**
      * Get element containing menu items
@@ -331,48 +342,54 @@ export class ParagraphToolbar extends React.PureComponent<IEditorContextProps, I
     private getMenuContainer = () => {
         const parentElement = document.getElementById(this.menuID);
         if (parentElement) {
-            const menu = parentElement.querySelector('.richEditor-menuItems');
+            const menu = parentElement.querySelector(".richEditor-menuItems");
             if (menu) {
                 return menu;
             }
         }
         return false;
-    }
+    };
 
     /**
      * Handle key presses
      */
     private handleKeyPress = (event: React.KeyboardEvent<any>) => {
         switch (event.key) {
-        case "ArrowUp":
-            event.preventDefault();
-            this.setState({
-                showMenu: true,
-            }, () => {
-                setImmediate(() => {
-                    const menu = this.getMenuContainer();
-                    if (menu instanceof HTMLElement && menu.firstChild instanceof HTMLElement) {
-                        menu.firstChild.focus();
-                    }
-                });
-            });
-            break;
-        case "ArrowDown":
-            event.preventDefault();
-            this.setState({
-                showMenu: true,
-            }, () => {
-                setImmediate(() => {
-                    const menu = this.getMenuContainer();
-                    if (menu instanceof HTMLElement && menu.lastChild instanceof HTMLElement) {
-                        menu.lastChild.focus();
-                    }
-                });
-            });
-            break;
+            case "ArrowUp":
+                event.preventDefault();
+                this.setState(
+                    {
+                        showMenu: true,
+                    },
+                    () => {
+                        setImmediate(() => {
+                            const menu = this.getMenuContainer();
+                            if (menu instanceof HTMLElement && menu.firstChild instanceof HTMLElement) {
+                                menu.firstChild.focus();
+                            }
+                        });
+                    },
+                );
+                break;
+            case "ArrowDown":
+                event.preventDefault();
+                this.setState(
+                    {
+                        showMenu: true,
+                    },
+                    () => {
+                        setImmediate(() => {
+                            const menu = this.getMenuContainer();
+                            if (menu instanceof HTMLElement && menu.lastChild instanceof HTMLElement) {
+                                menu.lastChild.focus();
+                            }
+                        });
+                    },
+                );
+                break;
         }
         closeEditorFlyouts(this.constructor.name);
-    }
+    };
 }
 
 export default withEditor(ParagraphToolbar);

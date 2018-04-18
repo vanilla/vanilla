@@ -7,7 +7,6 @@
 import { BlockEmbed } from "quill/blots/block";
 
 export default class FocusableEmbedBlot extends BlockEmbed {
-
     public domNode: HTMLElement;
 
     constructor(domNode) {

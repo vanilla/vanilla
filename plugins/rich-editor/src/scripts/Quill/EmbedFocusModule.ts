@@ -12,11 +12,7 @@ import Module from "quill/core/module";
 import { RangeStatic } from "quill/core";
 import { delegateEvent } from "@core/dom";
 import FocusableEmbedBlot from "./Blots/Abstract/FocusableEmbedBlot";
-import {
-    normalizeBlotIntoBlock,
-    insertNewLineAtEndOfScroll,
-    insertNewLineAtStartOfScroll,
-} from "./utility";
+import { normalizeBlotIntoBlock, insertNewLineAtEndOfScroll, insertNewLineAtStartOfScroll } from "./utility";
 
 /**
  * A module for managing focus of Embeds. For this to work for a new Embed,
@@ -25,7 +21,6 @@ import {
  * @see {FocusableEmbedBlot}
  */
 export default class EmbedFocusModule extends Module {
-
     private keyboard: KeyboardModule;
 
     /** The previous selection */
@@ -33,7 +28,6 @@ export default class EmbedFocusModule extends Module {
         index: 0,
         length: 0,
     };
-
 
     /**
      * Some keyboard bindings need to run before quill's own event listeners. Events here are added to Quill's
@@ -63,13 +57,18 @@ export default class EmbedFocusModule extends Module {
             }
         });
 
-        delegateEvent("click", ".js-richText .embed", (event, clickedElement) => {
-            const embed = Parchment.find(clickedElement);
-            if (embed instanceof FocusableEmbedBlot) {
-                this.focusEmbedBlot(embed);
-                event.preventDefault();
-            }
-        }, this.quill.container);
+        delegateEvent(
+            "click",
+            ".js-richText .embed",
+            (event, clickedElement) => {
+                const embed = Parchment.find(clickedElement);
+                if (embed instanceof FocusableEmbedBlot) {
+                    this.focusEmbedBlot(embed);
+                    event.preventDefault();
+                }
+            },
+            this.quill.container,
+        );
 
         this.quill.container.addEventListener("keydown", this.keyDownListener);
     }
@@ -107,7 +106,7 @@ export default class EmbedFocusModule extends Module {
         }
 
         return true;
-    }
+    };
 
     /**
      * Keydown listener on the current quill instance.
@@ -128,7 +127,7 @@ export default class EmbedFocusModule extends Module {
         return exclusiveHandlers.reduce((shouldContinue, currentHandler) => {
             return shouldContinue ? currentHandler(event) : false;
         }, true);
-    }
+    };
 
     /**
      * Handle delete and backspace presses while an Embed is focussed.
@@ -168,7 +167,7 @@ export default class EmbedFocusModule extends Module {
         }
 
         return true;
-    }
+    };
 
     /**
      * Handle enter presses while an embed is selected
@@ -198,7 +197,7 @@ export default class EmbedFocusModule extends Module {
         }
 
         return true;
-    }
+    };
 
     /**
      * Handle arrow keys if the quill document has focus.
@@ -220,7 +219,7 @@ export default class EmbedFocusModule extends Module {
             const [currentBlot] = this.quill.getLine(this.quill.getSelection().index);
             const blotToMoveTo = this.findBlotToMoveTo(currentBlot, event.keyCode);
 
-            if ((blotToMoveTo instanceof FocusableEmbedBlot)) {
+            if (blotToMoveTo instanceof FocusableEmbedBlot) {
                 this.focusEmbedBlot(blotToMoveTo);
                 event.preventDefault();
                 return false;
@@ -228,7 +227,7 @@ export default class EmbedFocusModule extends Module {
         }
 
         return true;
-    }
+    };
 
     /**
      * Handle arrow keys while an embed is Focused.
@@ -298,7 +297,7 @@ export default class EmbedFocusModule extends Module {
         }
 
         return false;
-    }
+    };
 
     /**
      * Detect if an keyCode is of an arrow key.
@@ -353,28 +352,28 @@ export default class EmbedFocusModule extends Module {
      * @param keyCode The keycode that was pressed.
      */
     private findBlotToMoveTo(currentBlot: Blot, keyCode: number) {
-        switch(keyCode) {
-        case KeyboardModule.keys.DOWN:
-            return currentBlot.next as Blot;
-        case KeyboardModule.keys.UP:
-            return currentBlot.prev as Blot;
-        case KeyboardModule.keys.RIGHT:
-            // -1 needed for because end of blot is non-inclusive.
-            const endOfBlot = currentBlot.offset() + currentBlot.length() - 1;
-            const currentBlotOffset = currentBlot.offset();
-            const currentBlotLength = currentBlot.length();
-            const currentSelection = this.quill.getSelection();
-            if (this.quill.getSelection().index === endOfBlot) {
-                // If we're at the end of the line.
-                return currentBlot.next;
-            }
-            break;
-        case KeyboardModule.keys.LEFT:
-            if (this.quill.getSelection().index === currentBlot.offset()) {
-                // If we're at the start of the line.
-                return currentBlot.prev;
-            }
-            break;
+        switch (keyCode) {
+            case KeyboardModule.keys.DOWN:
+                return currentBlot.next as Blot;
+            case KeyboardModule.keys.UP:
+                return currentBlot.prev as Blot;
+            case KeyboardModule.keys.RIGHT:
+                // -1 needed for because end of blot is non-inclusive.
+                const endOfBlot = currentBlot.offset() + currentBlot.length() - 1;
+                const currentBlotOffset = currentBlot.offset();
+                const currentBlotLength = currentBlot.length();
+                const currentSelection = this.quill.getSelection();
+                if (this.quill.getSelection().index === endOfBlot) {
+                    // If we're at the end of the line.
+                    return currentBlot.next;
+                }
+                break;
+            case KeyboardModule.keys.LEFT:
+                if (this.quill.getSelection().index === currentBlot.offset()) {
+                    // If we're at the start of the line.
+                    return currentBlot.prev;
+                }
+                break;
         }
     }
 }

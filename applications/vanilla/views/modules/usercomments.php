@@ -20,7 +20,7 @@ if (sizeof($this->data('Comments'))) {
                     ?></div>
                 <div class="Meta">
                 <span class="MItem"><?php echo t('Comment in', 'in').' '; ?>
-                    <b><?php echo anchor(Gdn_Format::text($comment->DiscussionName), $permalink); ?></b></span>
+                    <b><?php echo anchor(Gdn_Format::text($comment->DiscussionName), $permalink, '', ['rel' => 'nofollow']); ?></b></span>
                     <span class="MItem"><?php printf(t('Comment by %s'), userAnchor($user)); ?></span>
                     <span
                         class="MItem"><?php echo anchor(Gdn_Format::date($comment->DateInserted), $permalink); ?></span>

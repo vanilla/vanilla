@@ -1609,18 +1609,29 @@ class CommentModel extends Gdn_Model {
             $this->_Where = $value;
         }
     }
+
     /**
      * Determines whether or not the current user can edit a comment.
      *
      * @param object|array $comment The comment to examine.
      * @param int &$timeLeft Sets the time left to edit or 0 if not applicable.
+     * @param array|null $discussion The discussion row associated with this comment.
      * @return bool Returns true if the user can edit or false otherwise.
      */
-    public static function canEdit($comment, &$timeLeft = 0) {
-        $discussionModel = new DiscussionModel();
-        $discussion = $discussionModel->getID(val('DiscussionID', $comment));        $category = CategoryModel::categories(val('CategoryID', $discussion));
+    public static function canEdit($comment, &$timeLeft = 0, $discussion = null) {
+        // Guests can't edit.
+        if (Gdn::session()->UserID === 0) {
+            return false;
+        }
 
-        // Users with global edit permission can edit.
+        // Only attempt to fetch the discussion if we weren't provided one.
+        if ($discussion === null) {
+            $discussionModel = new DiscussionModel();
+            $discussion = $discussionModel->getID(val('DiscussionID', $comment));
+        }
+
+        // Can the current user edit all comments in this category?
+        $category = CategoryModel::categories(val('CategoryID', $discussion));
         if (CategoryModel::checkPermission($category, 'Vanilla.Comments.Edit')) {
             return true;
         }
@@ -1629,7 +1640,7 @@ class CommentModel extends Gdn_Model {
         if (val('Closed', $discussion)) {
             return false;
         }
-        
+
         // Non-mods can't edit if they aren't the author.
         if (Gdn::session()->UserID != val('InsertUserID', $comment)) {
             return false;

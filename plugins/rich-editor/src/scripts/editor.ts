@@ -27,13 +27,13 @@ function initializeEditor(bodybox, container) {
         bodybox.value = JSON.stringify(quill.getContents().ops);
     });
 
-    bodybox.addEventListener("paste", (event) => {
+    bodybox.addEventListener("paste", event => {
         event.stopPropagation();
         event.preventDefault();
 
         // Get pasted data via clipboard API
         const clipboardData = event.clipboardData || window.clipboardData;
-        const pastedData = clipboardData.getData('Text');
+        const pastedData = clipboardData.getData("Text");
         const delta = JSON.parse(pastedData);
         quill.setContents(delta);
     });
@@ -46,7 +46,7 @@ function initializeEditor(bodybox, container) {
  */
 export function mountEditor(containerSelector) {
     const container = ensureHtmlElement(containerSelector);
-    const bodybox = container.closest("form").querySelector(".BodyBox");
+    const bodybox = container.closest("form")!.querySelector(".BodyBox");
 
     if (!bodybox) {
         throw new Error("Could not find the BodyBox to mount editor to.");

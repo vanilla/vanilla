@@ -9,22 +9,15 @@ import { t } from "@core/application";
 import { withEditor, IEditorContextProps } from "./ContextProvider";
 import Popover from "./Generic/Popover";
 import EmbedInsertionModule from "../Quill/EmbedInsertionModule";
+import { IPopoverProps } from "./Generic/Popover";
 
-interface IProps extends IEditorContextProps {
-    isVisible: boolean;
-    closeMenuHandler: React.MouseEventHandler<any>;
-    blurHandler?: React.FocusEventHandler<any>;
-    popoverTitleID: string;
-    popoverDescriptionID: string;
-    targetTitleOnOpen: string;
-    id: string;
-}
+interface IProps extends IPopoverProps {}
 
 interface IState {
     url: string;
 }
 
-class EmbedPopover extends React.PureComponent<IProps, IState> {
+export class EmbedPopover extends React.PureComponent<IProps, IState> {
     public state = {
         url: "",
     };
@@ -47,7 +40,7 @@ class EmbedPopover extends React.PureComponent<IProps, IState> {
                 </p>
                 <input
                     className="InputBox"
-                    placeholder="http://"
+                    placeholder={t("http://")}
                     value={this.state.url}
                     onChange={this.inputChangeHandler}
                 />
@@ -83,7 +76,6 @@ class EmbedPopover extends React.PureComponent<IProps, IState> {
                 isVisible={this.props.isVisible}
                 popoverTitleID={this.props.popoverTitleID}
                 popoverDescriptionID={this.props.popoverDescriptionID}
-                targetTitleOnOpen={this.props.targetTitleOnOpen}
             />
         );
     }

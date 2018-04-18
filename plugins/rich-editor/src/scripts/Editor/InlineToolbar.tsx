@@ -5,7 +5,7 @@
  */
 
 import React from "react";
-import Quill from "quill/core";
+import Quill, { RangeStatic, Sources } from "quill/core";
 import Emitter from "quill/core/emitter";
 import Keyboard from "quill/modules/keyboard";
 import LinkBlot from "quill/formats/link";
@@ -13,28 +13,25 @@ import { t } from "@core/application";
 import SelectionPositionToolbar from "./SelectionPositionToolbarContainer";
 import Toolbar from "./Generic/Toolbar";
 import * as quillUtilities from "../Quill/utility";
-import { withEditor, editorContextTypes } from "./ContextProvider";
+import { withEditor, IEditorContextProps } from "./ContextProvider";
+import { IMenuItemData } from "./Generic/MenuItem";
 
-export class InlineToolbar extends React.Component {
-    static propTypes = {
-        ...editorContextTypes,
-    };
+interface IProps extends IEditorContextProps {}
 
-    /** @type {Quill} */
-    quill;
+interface IState {
+    showLink: boolean;
+    ignoreSelectionReset: boolean;
+    previousRange: RangeStatic;
+    value: string;
+    isUrlInputVisible: boolean;
+    isMenuVisible: boolean;
+}
 
-    /**
-     * @type {Object}
-     * @property {boolean} showLink
-     * @property {boolean} ignoreSelectionReset
-     */
-    state;
+export class InlineToolbar extends React.Component<IProps, IState> {
+    private quill: Quill;
+    private linkInput: HTMLElement;
 
-    /** @type {HTMLElement} */
-    linkInput;
-
-    /** @type {Object<string, MenuItemData>} */
-    menuItems = {
+    private menuItems = {
         bold: {
             active: false,
         },
@@ -67,16 +64,60 @@ export class InlineToolbar extends React.Component {
         this.state = {
             showLink: false,
             value: "",
-            previousRange: {},
+            ignoreSelectionReset: false,
+            previousRange: {
+                index: 0,
+                length: 0,
+            },
             isUrlInputVisible: false,
             isMenuVisible: false,
         };
     }
 
+    public render() {
+        const alertMessage = this.state.showLink ? null : (
+            <span aria-live="assertive" role="alert" className="sr-only">
+                {t("Inline Menu Available")}
+            </span>
+        );
+        return (
+            <div>
+                <SelectionPositionToolbar
+                    setVisibility={this.setVisibilityOfMenu}
+                    forceVisibility={this.state.showLink ? "hidden" : "ignore"}
+                >
+                    {alertMessage}
+                    <Toolbar menuItems={this.menuItems} onBlur={this.toolbarBlurHandler} />
+                </SelectionPositionToolbar>
+                <SelectionPositionToolbar
+                    setVisibility={this.setVisibilityOfUrlInput}
+                    forceVisibility={this.state.showLink ? "visible" : "hidden"}
+                >
+                    <div className="richEditor-menu FlyoutMenu insertLink" role="dialog" aria-label={t("Insert Url")}>
+                        <input
+                            value={this.state.value}
+                            onChange={this.onLinkInputChange}
+                            ref={ref => (this.linkInput = ref as HTMLElement)}
+                            onKeyDown={this.onLinkKeyDown}
+                            className="InputBox insertLink-input"
+                            placeholder={t("Paste or type a link…")}
+                        />
+                        <button type="button" onClick={this.onCloseClick} className="Close richEditor-close">
+                            <span className="Close-x" aria-hidden="true">
+                                {t("×")}
+                            </span>
+                            <span className="sr-only">{t("Close")}</span>
+                        </button>
+                    </div>
+                </SelectionPositionToolbar>
+            </div>
+        );
+    }
+
     /**
      * Mount quill listeners.
      */
-    componentDidMount() {
+    public componentDidMount() {
         this.quill.on(Emitter.events.EDITOR_CHANGE, this.handleEditorChange);
         document.addEventListener("keydown", this.escFunction, false);
         document.addEventListener(quillUtilities.CLOSE_FLYOUT_EVENT, this.clearLinkInput);
@@ -102,37 +143,37 @@ export class InlineToolbar extends React.Component {
     /**
      * Be sure to remove the listeners when the component unmounts.
      */
-    componentWillUnmount() {
+    public componentWillUnmount() {
         this.quill.off(Quill.events.EDITOR_CHANGE, this.handleEditorChange);
         document.removeEventListener("keydown", this.escFunction, false);
         document.removeEventListener(quillUtilities.CLOSE_FLYOUT_EVENT, this.clearLinkInput);
     }
 
     /**
-     * Close the menu.
-     *
-     * @param {Event} event -
+     * This is a no-op for now.
      */
-    escFunction = (event) => {
-        if(event.keyCode === 27 && (this.state.isMenuVisible || this.state.isUrlInputVisible)) {
+    private toolbarBlurHandler = (event: React.FocusEvent<any>) => {
+        return;
+    };
+
+    /**
+     * Close the menu.
+     */
+    private escFunction = (event: KeyboardEvent) => {
+        if (event.keyCode === 27 && (this.state.isMenuVisible || this.state.isUrlInputVisible)) {
             this.setState({
                 value: "",
                 showLink: false,
             });
             const range = this.quill.getSelection(true);
-            this.quill.setSelection((range.length + range.index), 0, Emitter.sources.USER);
+            this.quill.setSelection(range.length + range.index, 0, Emitter.sources.USER);
         }
     };
 
     /**
      * Handle changes from the editor.
-     *
-     * @param {string} type - The event type. See {quill/core/emitter}
-     * @param {RangeStatic} range - The new range.
-     * @param {RangeStatic} oldRange - The old range.
-     * @param {Sources} source - The source of the change.
      */
-    handleEditorChange = (type, range, oldRange, source) => {
+    private handleEditorChange = (type: string, range: RangeStatic, oldRange: RangeStatic, source: Sources) => {
         if (type !== Emitter.events.SELECTION_CHANGE) {
             return;
         }
@@ -144,13 +185,12 @@ export class InlineToolbar extends React.Component {
         }
     };
 
-
     /**
      * Special formatting for the link blot.
      *
-     * @param {MenuItemData} menuItemData - The current state of the menu item.
+     * @param menuItemData - The current state of the menu item.
      */
-    linkFormatter(menuItemData) {
+    private linkFormatter(menuItemData: IMenuItemData) {
         if (menuItemData.active) {
             const range = this.quill.getSelection();
             quillUtilities.disableAllBlotsInRange(this.quill, range, LinkBlot);
@@ -165,25 +205,28 @@ export class InlineToolbar extends React.Component {
      *
      * We need to temporarily stop ignore selection changes for the link menu (it will lose selection).
      */
-    focusLinkInput() {
-        this.setState({
-            showLink: true,
-            ignoreSelectionReset: true,
-            previousRange: this.quill.getSelection(),
-        }, () => {
-            this.linkInput.focus();
-            setTimeout(() => {
-                this.setState({
-                    ignoreSelectionReset: false,
-                });
-            }, 100);
-        });
+    private focusLinkInput() {
+        this.setState(
+            {
+                showLink: true,
+                ignoreSelectionReset: true,
+                previousRange: this.quill.getSelection(),
+            },
+            () => {
+                this.linkInput.focus();
+                setTimeout(() => {
+                    this.setState({
+                        ignoreSelectionReset: false,
+                    });
+                }, 100);
+            },
+        );
     }
 
     /**
      * Clear the link menu's input content and hide the link menu..
      */
-    clearLinkInput = () => {
+    private clearLinkInput = () => {
         this.setState({
             value: "",
             showLink: false,
@@ -192,14 +235,12 @@ export class InlineToolbar extends React.Component {
 
     /**
      * Handle key-presses for the link toolbar.
-     *
-     * @param {React.KeyboardEvent} event - The key-press event.
      */
-    onLinkKeyDown = (event) => {
+    private onLinkKeyDown = (event: React.KeyboardEvent<any>) => {
         if (Keyboard.match(event.nativeEvent, "enter")) {
             event.preventDefault();
-            const value = event.target.value || "";
-            this.quill.format('link', value, Emitter.sources.USER);
+            const value = (event.target as HTMLInputElement).value || "";
+            this.quill.format("link", value, Emitter.sources.USER);
             this.clearLinkInput();
         }
 
@@ -211,10 +252,8 @@ export class InlineToolbar extends React.Component {
 
     /**
      * Handle clicks on the link menu's close button.
-     *
-     * @param {React.MouseEvent} event - The click event.
      */
-    onCloseClick = (event) => {
+    private onCloseClick = (event: React.MouseEvent<any>) => {
         event.preventDefault();
         this.clearLinkInput();
         this.quill.setSelection(this.state.previousRange, Emitter.sources.USER);
@@ -222,20 +261,15 @@ export class InlineToolbar extends React.Component {
 
     /**
      * Handle changes to the the close menu's input.
-     *
-     * @param {React.SyntheticEvent} event
      */
-    onLinkInputChange = (event) => {
-        this.setState({value: event.target.value});
+    private onLinkInputChange = (event: React.ChangeEvent<any>) => {
+        this.setState({ value: event.target.value });
     };
-
 
     /**
      * Set visibility of url input
-     *
-     * @param {bool} isVisible
      */
-    setVisibilityOfUrlInput = (isVisible) => {
+    private setVisibilityOfUrlInput = (isVisible: boolean) => {
         this.setState({
             isUrlInputVisible: isVisible,
         });
@@ -243,43 +277,12 @@ export class InlineToolbar extends React.Component {
 
     /**
      * Set visibility of url input
-     *
-     * @param {bool} isVisible
      */
-    setVisibilityOfMenu = (isVisible) => {
+    private setVisibilityOfMenu = (isVisible: boolean) => {
         this.setState({
             isMenuVisible: isVisible,
         });
     };
-
-    /**
-     * @inheritDoc
-     */
-    render() {
-        const alertMessage = this.state.showLink ? null : <span aria-live="assertive" role="alert" className="sr-only">{t('Inline Menu Available')}</span>;
-        return <div>
-            <SelectionPositionToolbar setVisibility={this.setVisibilityOfMenu.bind(this)} quill={this.quill} forceVisibility={this.state.showLink ? "hidden" : "ignore"}>
-                {alertMessage}
-                <Toolbar quill={this.quill} menuItems={this.menuItems}/>
-            </SelectionPositionToolbar>
-            <SelectionPositionToolbar setVisibility={this.setVisibilityOfUrlInput.bind(this)} quill={this.quill} forceVisibility={this.state.showLink ? "visible" : "hidden"}>
-                <div className="richEditor-menu FlyoutMenu insertLink" role="dialog" aria-label={t("Insert Url")}>
-                    <input
-                        value={this.state.value}
-                        onChange={this.onLinkInputChange}
-                        ref={(ref) => this.linkInput = ref}
-                        onKeyDown={this.onLinkKeyDown}
-                        className="InputBox insertLink-input"
-                        placeholder={t("Paste or type a link…")}
-                    />
-                    <button type="button" onClick={this.onCloseClick} className="Close richEditor-close">
-                        <span className="Close-x" aria-hidden="true">×</span>
-                        <span className="sr-only">{t('Close')}</span>
-                    </button>
-                </div>
-            </SelectionPositionToolbar>
-        </div>;
-    }
 }
 
-export default withEditor(InlineToolbar);
+export default withEditor<IProps>(InlineToolbar);

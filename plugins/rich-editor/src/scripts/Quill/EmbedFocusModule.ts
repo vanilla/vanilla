@@ -21,6 +21,12 @@ import { normalizeBlotIntoBlock, insertNewLineAtEndOfScroll, insertNewLineAtStar
  * @see {FocusableEmbedBlot}
  */
 export default class EmbedFocusModule extends Module {
+    /**
+     * Some keyboard bindings need to run before quill's own event listeners. Events here are added to Quill's
+     * KeyboardModule and run before its built in listeners.
+     */
+    public earlyKeyBoardBindings = {};
+
     private keyboard: KeyboardModule;
 
     /** The previous selection */
@@ -30,19 +36,13 @@ export default class EmbedFocusModule extends Module {
     };
 
     /**
-     * Some keyboard bindings need to run before quill's own event listeners. Events here are added to Quill's
-     * KeyboardModule and run before its built in listeners.
-     */
-    private earlyKeyBoardBindings = {};
-
-    /**
      * Whether or not an early keyboard binding has prevented default.
      * Quill doesn't stop event propagation or give the event in the handler.
      */
     private hasHandledDelete = false;
 
     constructor(quill: Quill, options = {}) {
-        super(quill as any, options);
+        super(quill, options);
 
         // This needs to be exported in set in the quill options, before the keyboard module is instantiated, so that it's handler runs before quill's delete handler. Otherwise we can't prevent default.
         this.earlyKeyBoardBindings["Backspace over Blot"] = {

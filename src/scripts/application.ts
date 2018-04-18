@@ -1,5 +1,5 @@
 /**
- * Application functions for interop between components in different packages.
+ * Application functions for interop between Components in different packages.
  *
  * @module application
  */
@@ -110,13 +110,13 @@ export function formatUrl(path: string): string {
 }
 
 /**
- * @type {Object} The currently registered components.
+ * @type {Object} The currently registered Components.
  * @private
  */
 const _components = {};
 
 /**
- * Register a component in the components registry.
+ * Register a component in the Components registry.
  *
  * @param name The name of the component.
  * @param component The component to register.

@@ -16,6 +16,10 @@ em {
   border: 0;
 }
 
+.isCentered {
+  text-align: center;
+}
+
 .isHidden {
   display: none !important;
 }
@@ -93,7 +97,7 @@ button.Close {
 .authenticateUserCol {
   padding: 0 26px;
   margin: auto;
-  width: 363px;
+  width: 386px;
   max-width: 100%;
   box-sizing: border-box;
 }
@@ -105,6 +109,10 @@ button.Close {
 
 .authenticateUserCol .button.button-fullWidth {
   margin-bottom: 18px;
+}
+
+.authenticateUserCol .button.button-fullWidth.button-sso {
+  margin-bottom: 12px;
 }
 
 .authenticateUserCol .icon {
@@ -205,15 +213,50 @@ button.Close {
   margin-left: 12px;
 }
 
-.button.button-sso,
-.Button.button-sso {
+.button.Button.Primary.buttonCTA, .button.Button.button-sso {
+  user-select: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   background-image: none;
+  box-sizing: border-box;
+  text-decoration: none !important;
+}
+
+.button.Button.button-sso {
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.3);
 }
 
 .button-ssoLabel {
   margin-left: 12px;
+  margin-right: 12px;
   font-size: 14px;
   font-weight: normal;
+  text-shadow: none;
+}
+
+.ssoMethod-icon {
+  width: 24px;
+  height: auto;
+}
+
+.ssoMethod-icon.ssoMethod-iconSpacer {
+  display: block;
+  visibility: hidden;
+  height: 24px;
+}
+
+.button-ssoContents {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  width: 100%;
+  max-width: 100%;
+}
+
+.ssoMethods {
+  margin-bottom: 18px;
 }
 
 .followButton {
@@ -235,12 +278,6 @@ button.Close {
   height: 14px;
   margin-right: 5px;
   vertical-align: sub;
-}
-
-.vanillaIcon {
-  display: inline-block;
-  width: 24px;
-  height: 24px;
 }
 
 .selectBox {
@@ -374,10 +411,23 @@ body.Categories.isMobile .PageControls.Top {
   align-items: center;
 }
 
+.inputBlock.inputBlock-tighter {
+  margin-top: -12px;
+}
+
 .inputBlock.hasError .inputText {
   border-color: #ff3933;
   background-color: #ffebeb;
   color: #ff3933;
+}
+
+.inputBlock ::-ms-clear {
+  display: none;
+}
+
+.inputBlock-errors,
+.inputBlock-labelAndDescription {
+  display: block;
 }
 
 .inputBlock-labelText {
@@ -392,6 +442,7 @@ body.Categories.isMobile .PageControls.Top {
 }
 
 .inputBlock-error {
+  display: block;
   color: #ff3933;
   line-height: 1.428571429;
   font-size: 12px;
@@ -412,14 +463,16 @@ body.Categories.isMobile .PageControls.Top {
   margin-top: 6px;
 }
 
-.checkbox-box {
-  display: none;
+.authenticateUser-paragraph.isError {
+  color: #ff3933;
 }
 
-.button-ssoContents {
-  display: flex;
-  align-items: center;
-  justify-content: center;
+.inputBlock-inputText {
+  box-sizing: border-box;
+}
+
+.checkbox-box {
+  display: none;
 }
 
 label.checkbox input.checkbox-input {
@@ -428,6 +481,7 @@ label.checkbox input.checkbox-input {
 }
 
 .checkbox-label {
+  user-select: none;
   margin-left: 6px;
   line-height: inherit;
 }

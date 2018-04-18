@@ -11,7 +11,7 @@ import React from "react";
 import ReactDOM from "react-dom";
 
 /**
- * Mount all declared components on the dom.
+ * Mount all declared Components on the dom.
  *
  * The page signifies that an element contains a component with the `data-react="<Component>"` attribute.
  *

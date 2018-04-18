@@ -5,51 +5,75 @@ $fontSize-default: 14px !default;
 $fontSize-small: 12px !default;
 
 .inputBlock {
-  display: block;
-  margin-bottom: 24px;
+    display: block;
+    margin-bottom: 24px;
 
-  .checkbox {
-    display: flex;
-    align-items: center;
-  }
-
-  &.hasError {
-    .inputText {
-      border-color: #ff3933;
-      background-color: #ffebeb;
-      color: #ff3933;
+    .checkbox {
+        display: flex;
+        align-items: center;
     }
-  }
+
+    &.inputBlock-tighter {
+        margin-top: -12px;
+    }
+
+    &.hasError {
+        .inputText {
+            border-color: #ff3933;
+            background-color: #ffebeb;
+            color: #ff3933;
+        }
+    }
+
+    ::-ms-clear { // IE fix
+        display: none;
+    }
+}
+
+.inputBlock-errors,
+.inputBlock-labelAndDescription {
+    display: block;
 }
 
 .inputBlock-labelText {
-  display: block;
-  font-weight: 600;
-  margin-bottom: 6px;
-  line-height: $lineHeight-base;
+    display: block;
+    font-weight: 600;
+    margin-bottom: 6px;
+    line-height: $lineHeight-base;
 }
 
 .InputBox.inputText {
-  width: 100%;
+    width: 100%;
 }
 
 .inputBlock-error {
-  color: #ff3933;
-  line-height: $lineHeight-base;
-  font-size: $fontSize-small;
+    display: block;
+    color: #ff3933;
+    line-height: $lineHeight-base;
+    font-size: $fontSize-small;
 }
 
 .inputBlock-inputWrap {
-  display: block;
+    display: block;
 }
 
 .inputBlock-labelNote {
-  display: block;
-  font-size: 12px;
-  line-height: $lineHeight-base;
-  opacity: .6;
+    display: block;
+    font-size: 12px;
+    line-height: $lineHeight-base;
+    opacity: .6;
 
-  + .inputBlock-inputWrap {
-    margin-top: $baseUnit;
-  }
+    + .inputBlock-inputWrap {
+        margin-top: $baseUnit;
+    }
+}
+
+.authenticateUser-paragraph {
+    &.isError {
+        color: #ff3933;
+    }
+}
+
+.inputBlock-inputText {
+    box-sizing: border-box;
 }

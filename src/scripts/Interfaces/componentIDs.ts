@@ -1,4 +1,4 @@
-import uniqueid from "lodash/uniqueid";
+import uniqueId from "lodash/uniqueid";
 
 // Optional ID
 export interface IOptionalComponentID {
@@ -11,7 +11,7 @@ export interface IRequiredComponentID {
 }
 
 export function uniqueIDFromPrefix(suffix: string) {
-    return (suffix + uniqueid()) as string;
+    return (suffix + uniqueId()) as string;
 }
 
 export function getRequiredID(props: IRequiredComponentID, suffix: string) {

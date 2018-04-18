@@ -88,30 +88,8 @@ class ActivityController extends Gdn_Controller {
         $this->ActivityData = $this->ActivityModel->getWhere(['ActivityID' => $activityID]);
 
         // Check visibility.
-        $userid = val('NotifyUserID', $this->ActivityData->firstRow());
-        switch ($userid) {
-            case ActivityModel::NOTIFY_PUBLIC:
-                // Carry on!
-                break;
-
-            case ActivityModel::NOTIFY_MODS:
-                if (!checkPermission('Garden.Moderation.Manage')) {
-                    throw permissionException();
-                }
-                break;
-
-            case ActivityModel::NOTIFY_ADMIN:
-                if (!checkPermission('Garden.Settings.Manage')) {
-                    throw permissionException();
-                }
-                break;
-
-            default:
-                // Actual userid.
-                if (!checkPermission('Garden.Community.Manage') && Gdn::session()->UserID !== $userid) {
-                    throw permissionException();
-                }
-                break;
+        if (!$this->ActivityModel->canView($this->ActivityData->firstRow())) {
+            throw permissionException();
         }
 
         $this->setData('Comments', $this->ActivityModel->getComments([$activityID]));

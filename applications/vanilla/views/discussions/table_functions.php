@@ -159,7 +159,7 @@ if (!function_exists('writeDiscussionRow')) :
                         echo userPhoto($last, ['Size' => 'Small']);
                         echo userAnchor($last, 'UserLink BlockTitle');
                         echo '<div class="Meta">';
-                        echo anchor(Gdn_Format::date($discussion->LastDate, 'html'), $lastPageUrl, 'CommentDate MItem');
+                        echo anchor(Gdn_Format::date($discussion->LastDate, 'html'), $lastPageUrl, 'CommentDate MItem', ['rel' => 'nofollow']);
                         echo '</div>';
                     } else {
                         echo '&nbsp;';

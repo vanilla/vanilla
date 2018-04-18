@@ -169,11 +169,7 @@ class ProfileController extends Gdn_Controller {
         }
 
         // Set the canonical Url.
-        if (is_numeric($this->User->Name) || Gdn_Format::url($this->User->Name) != strtolower($this->User->Name)) {
-            $this->canonicalUrl(url('profile/'.$this->User->UserID.'/'.Gdn_Format::url($this->User->Name), true));
-        } else {
-            $this->canonicalUrl(url('profile/'.strtolower($this->User->Name), true));
-        }
+        $this->canonicalUrl(userUrl($this->User));
 
         $this->render();
     }

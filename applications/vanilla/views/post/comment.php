@@ -28,7 +28,7 @@ $this->fireEvent('BeforeCommentForm');
                     echo $this->Form->errors();
                     $this->fireEvent('BeforeBodyField');
 
-                    echo $this->Form->bodyBox('Body', ['Table' => 'Comment', 'FileUpload' => true]);
+                    echo $this->Form->bodyBox('Body', ['Table' => 'Comment', 'FileUpload' => true, 'placeholder' => t('Type your comment'), 'title' => t('Type your comment')]);
 
                     echo '<div class="CommentOptions List Inline">';
                     $this->fireEvent('AfterBodyField');

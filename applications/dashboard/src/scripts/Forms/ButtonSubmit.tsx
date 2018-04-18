@@ -7,7 +7,7 @@ import {uniqueIDFromPrefix, getOptionalID, IOptionalComponentID} from '@core/Int
 interface IProps extends IOptionalComponentID {
     content: string | Node;
     className?: string;
-    disabled: boolean;
+    disabled?: boolean;
 }
 
 export default class ButtonSubmit extends React.Component<IProps, IOptionalComponentID> {

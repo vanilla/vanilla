@@ -7,7 +7,7 @@ interface IProps extends IOptionalComponentID{
     className?: string;
     type: string;
     content: string | Node;
-    disabled: boolean;
+    disabled?: boolean;
     prefix: string;
 }
 

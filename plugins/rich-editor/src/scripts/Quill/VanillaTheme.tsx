@@ -5,6 +5,7 @@
  */
 
 // Quill
+import Quill, { QuillOptionsStatic, Blot } from "quill/core";
 import ThemeBase from "quill/core/theme";
 import { closeEditorFlyouts } from "./utility";
 import KeyboardBindings from "./KeyboardBindings";
@@ -20,29 +21,26 @@ import EditorProvider from "../Editor/ContextProvider";
 import EmbedFocusModule from "./EmbedFocusModule";
 
 export default class VanillaTheme extends ThemeBase {
-
-    /** @var {Quill} */
-    quill;
-
-    /** @var A File:Blot map. */
-    currentUploads = new Map();
+    private currentUploads: Map<File | string, Blot>;
+    private jsBodyBoxContainer: Element;
 
     /**
      * Constructor.
      *
-     * @param {Quill} quill - The quill instance the theme is applying to.
-     * @param {QuillOptionsStatic} options - The current options for the instance.
+     * @param quill - The quill instance the theme is applying to.
+     * @param options - The current options for the instance.
      */
-    constructor(quill, options) {
+    constructor(quill: Quill, options: QuillOptionsStatic) {
         const themeOptions = {
             ...options,
             placeholder: "Create a new post...",
         };
 
         super(quill, themeOptions);
+        this.currentUploads = new Map();
         this.quill.root.classList.add("richEditor-text");
         this.quill.root.classList.add("userContent");
-        this.quill.root.addEventListener("focusin", closeEditorFlyouts);
+        this.quill.root.addEventListener("focusin", () => closeEditorFlyouts());
 
         // Add keyboard bindings to options.
         const embedFocus = new EmbedFocusModule(this.quill, this.options);
@@ -54,10 +52,15 @@ export default class VanillaTheme extends ThemeBase {
             ...embedFocus.earlyKeyBoardBindings,
         };
 
+        // Find the editor root.
+        this.jsBodyBoxContainer = this.quill.container.closest(".richEditor") as Element;
+        if (!this.jsBodyBoxContainer) {
+            throw new Error("Could not find .richEditor to mount editor components into.");
+        }
     }
 
-    init() {
-        this.quill.embed = this.addModule("embed/insertion");
+    public init() {
+        (this.quill as any).embed = this.addModule("embed/insertion");
 
         // Mount react components
         this.mountToolbar();
@@ -69,49 +72,49 @@ export default class VanillaTheme extends ThemeBase {
     /**
      * Mount an inline toolbar (react component).
      */
-    mountToolbar() {
-        const container = this.quill.container.closest(".richEditor").querySelector(".js-InlineEditorToolbar");
+    private mountToolbar() {
+        const container = this.jsBodyBoxContainer.querySelector(".js-InlineEditorToolbar");
         ReactDOM.render(
             <EditorProvider quill={this.quill}>
-                <InlineToolbar/>
+                <InlineToolbar />
             </EditorProvider>,
-            container
+            container,
         );
     }
 
     /**
      * Mount the paragraph formatting toolbar (react component).
      */
-    mountParagraphMenu() {
-        const container = this.quill.container.closest(".richEditor").querySelector(".js-ParagraphEditorToolbar");
+    private mountParagraphMenu() {
+        const container = this.jsBodyBoxContainer.querySelector(".js-ParagraphEditorToolbar");
         ReactDOM.render(
             <EditorProvider quill={this.quill}>
-                <ParagraphToolbar/>
+                <ParagraphToolbar />
             </EditorProvider>,
-            container
+            container,
         );
     }
 
     /**
      * Mount Emoji Menu (react component).
      */
-    mountEmojiMenu() {
-        const container = this.quill.container.closest(".richEditor").querySelector(".js-emojiHandle");
+    private mountEmojiMenu() {
+        const container = this.jsBodyBoxContainer.querySelector(".js-emojiHandle");
         ReactDOM.render(
             <EditorProvider quill={this.quill}>
-                <EmojiPicker/>
+                <EmojiPicker />
             </EditorProvider>,
-            container
+            container,
         );
     }
 
-    mountEmbedDialogue() {
-        const container = this.quill.container.closest(".richEditor").querySelector(".js-EmbedDialogue");
+    private mountEmbedDialogue() {
+        const container = this.jsBodyBoxContainer.querySelector(".js-EmbedDialogue");
         ReactDOM.render(
             <EditorProvider quill={this.quill}>
                 <EmbedDialogue />
             </EditorProvider>,
-            container
+            container,
         );
     }
 }

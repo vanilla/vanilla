@@ -220,4 +220,4 @@ export class Toolbar extends React.Component<IProps, IState> {
     }
 }
 
-export default withEditor(Toolbar);
+export default withEditor<IProps>(Toolbar);

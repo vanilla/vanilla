@@ -10,13 +10,19 @@ import EmojiPopover from "./EmojiPopover";
 import * as Icons from "./Icons";
 
 export default class EmojiPicker extends React.Component {
-
     /**
      * @inheritDoc
      */
-    render() {
+    public render() {
         const icon = Icons.emoji();
 
-        return <PopoverController PopoverComponentClass={EmojiPopover} targetTitleOnOpen={true} icon={icon} classNameRoot="emojiPicker"/>;
+        return (
+            <PopoverController
+                PopoverComponentClass={EmojiPopover as any}
+                targetTitleOnOpen={true}
+                icon={icon}
+                classNameRoot="emojiPicker"
+            />
+        );
     }
 }

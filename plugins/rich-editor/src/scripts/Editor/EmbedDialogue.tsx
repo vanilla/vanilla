@@ -10,13 +10,14 @@ import EmbedPopover from "./EmbedPopover";
 import * as Icons from "./Icons";
 
 export default class EmbedDialogue extends React.Component {
-
     /**
      * @inheritDoc
      */
-    render() {
+    public render() {
         const icon = Icons.embed();
 
-        return <PopoverController PopoverComponentClass={EmbedPopover} icon={icon} classNameRoot="embedDialogue"/>;
+        return (
+            <PopoverController PopoverComponentClass={EmbedPopover as any} icon={icon} classNameRoot="embedDialogue" />
+        );
     }
 }

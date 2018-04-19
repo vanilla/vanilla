@@ -7,37 +7,25 @@
 import React from "react";
 import * as PropTypes from "prop-types";
 import debounce from "lodash/debounce";
-import Quill from "quill/core";
+import Quill, { RangeStatic } from "quill/core";
 import Emitter from "quill/core/emitter";
-import { Range } from "quill/core/selection";
 import { CLOSE_FLYOUT_EVENT } from "../Quill/utility";
-import { withEditor, editorContextTypes } from "./ContextProvider";
+import { withEditor, IEditorContextProps } from "./ContextProvider";
 
-export class SelectionPositionToolbarContainer extends React.Component {
-    static propTypes = {
-        ...editorContextTypes,
-        children: PropTypes.node.isRequired,
-        forceVisibility: PropTypes.string.isRequired,
-        setVisibility: PropTypes.func.isRequired,
-    };
+interface IProps extends IEditorContextProps {
+    forceVisibility: string;
+    setVisibility(value: boolean): void;
+}
 
-    /** @type {Quill} */
-    quill;
+interface IState {
+    range: RangeStatic | null;
+    hideSelf: boolean;
+}
 
-    /**
-     * @type {Object}
-     * @property {RangeStatic} - The current quill selected text range..
-     */
-    state;
-
-    /** @type {HTMLElement} */
-    selfNode;
-
-    /** @type {HTMLElement} */
-    nub;
-
-    /** @type {number} */
-    resizeListener;
+export class SelectionPositionToolbarContainer extends React.Component<IProps, IState> {
+    private quill: Quill;
+    private selfNode: HTMLElement;
+    private nub: HTMLElement;
 
     /**
      * @inheritDoc
@@ -56,10 +44,50 @@ export class SelectionPositionToolbarContainer extends React.Component {
         this.handleEditorChange = this.handleEditorChange.bind(this);
     }
 
+    public render() {
+        const x = this.getXCoordinates();
+        const y = this.getYCoordinates();
+        let toolbarStyles: React.CSSProperties = {
+            visibility: "hidden",
+            position: "absolute",
+        };
+        let nubStyles = {};
+        let classes = "richEditor-inlineToolbarContainer richEditor-toolbarContainer ";
+
+        if (
+            (x && y && !this.state.hideSelf && this.props.forceVisibility === "ignore") ||
+            this.props.forceVisibility === "visible"
+        ) {
+            toolbarStyles = {
+                position: "absolute",
+                top: y ? y.toolbarPosition : 0,
+                left: x ? x.toolbarPosition : 0,
+                zIndex: 5,
+                visibility: "visible",
+            };
+
+            nubStyles = {
+                left: x ? x.nubPosition : 0,
+                top: y ? y.nubPosition : 0,
+            };
+
+            classes += y && y.nubPointsDown ? "isUp" : "isDown";
+        }
+
+        return (
+            <div className={classes} style={toolbarStyles} ref={ref => (this.selfNode = ref as HTMLElement)}>
+                {this.props.children}
+                <div style={nubStyles} className="richEditor-nubPosition" ref={nub => (this.nub = nub as HTMLElement)}>
+                    <div className="richEditor-nub" />
+                </div>
+            </div>
+        );
+    }
+
     /**
      * Mount quill listeners.
      */
-    componentDidMount() {
+    public componentDidMount() {
         this.quill.on(Emitter.events.EDITOR_CHANGE, this.handleEditorChange);
         document.addEventListener(CLOSE_FLYOUT_EVENT, this.hideSelf);
         window.addEventListener("resize", this.windowResizeListener);
@@ -68,10 +96,10 @@ export class SelectionPositionToolbarContainer extends React.Component {
     /**
      * Be sure to remove the listeners when the component unmounts.
      */
-    componentWillUnmount() {
+    public componentWillUnmount() {
         this.quill.off(Quill.events.EDITOR_CHANGE, this.handleEditorChange);
         document.removeEventListener(CLOSE_FLYOUT_EVENT, this.hideSelf);
-        window.removeEventListener(this.windowResizeListener);
+        window.removeEventListener("resize", this.windowResizeListener);
     }
 
     /**
@@ -79,16 +107,16 @@ export class SelectionPositionToolbarContainer extends React.Component {
      *
      * @returns {Function} - The debounced update function.
      */
-    windowResizeListener = () => debounce(this.forceUpdate, 200);
+    private windowResizeListener = () => debounce(this.forceUpdate, 200);
 
-    unHideSelf = () => {
+    private unHideSelf = () => {
         this.setState({
             hideSelf: false,
         });
         this.props.setVisibility(true);
     };
 
-    hideSelf = () => {
+    private hideSelf = () => {
         this.setState({
             hideSelf: true,
         });
@@ -105,7 +133,7 @@ export class SelectionPositionToolbarContainer extends React.Component {
      * @param {RangeStatic} oldRange - The old range.
      * @param {Sources} source - The source of the change.
      */
-    handleEditorChange(type, range, oldRange, source) {
+    private handleEditorChange(type, range, oldRange, source) {
         if (type !== Emitter.events.SELECTION_CHANGE) {
             return;
         }
@@ -120,7 +148,6 @@ export class SelectionPositionToolbarContainer extends React.Component {
                 });
                 this.unHideSelf();
             }
-
         } else {
             if (this.props.forceVisibility === "visible") {
                 return;
@@ -137,7 +164,7 @@ export class SelectionPositionToolbarContainer extends React.Component {
      *
      * @returns {BoundsStatic} The current quill bounds.
      */
-    getBounds() {
+    private getBounds() {
         const { range } = this.state;
         if (!range) {
             return null;
@@ -147,14 +174,13 @@ export class SelectionPositionToolbarContainer extends React.Component {
         let bounds;
 
         if (numLines.length === 1) {
-            bounds = this.quill.getBounds(range);
+            bounds = this.quill.getBounds(range.index, range.length);
         } else {
-
             // If multi-line we want to position at the center of the last line's selection.
             const lastLine = numLines[numLines.length - 1];
             const index = this.quill.getIndex(lastLine);
             const length = Math.min(lastLine.length() - 1, range.index + range.length - index);
-            bounds = this.quill.getBounds(new Range(index, length));
+            bounds = this.quill.getBounds(index, length);
         }
 
         return bounds;
@@ -169,7 +195,7 @@ export class SelectionPositionToolbarContainer extends React.Component {
      * @property {number} toolbarPosition
      * @property {number} nubPosition
      */
-    getXCoordinates() {
+    private getXCoordinates() {
         const bounds = this.getBounds();
         if (!bounds) {
             return null;
@@ -203,7 +229,7 @@ export class SelectionPositionToolbarContainer extends React.Component {
      * @property {number} nubPosition
      * @property {boolean} nubPointsDown
      */
-    getYCoordinates() {
+    private getYCoordinates() {
         const bounds = this.getBounds();
         if (!bounds) {
             return null;
@@ -227,44 +253,6 @@ export class SelectionPositionToolbarContainer extends React.Component {
             nubPointsDown,
         };
     }
-
-    /**
-     * @inheritDoc
-     */
-    render() {
-        const x = this.getXCoordinates();
-        const y = this.getYCoordinates();
-        let toolbarStyles = {
-            visibility: "hidden",
-            position: "absolute",
-        };
-        let nubStyles = {};
-        let classes = "richEditor-inlineToolbarContainer richEditor-toolbarContainer ";
-
-        if (x && y && !this.state.hideSelf && this.props.forceVisibility === "ignore" || this.props.forceVisibility === "visible") {
-            toolbarStyles = {
-                position: "absolute",
-                top: y ? y.toolbarPosition : 0,
-                left: x ? x.toolbarPosition : 0,
-                zIndex: 5,
-                visibility: "visible",
-            };
-
-            nubStyles = {
-                left: x ? x.nubPosition : 0,
-                top: y ? y.nubPosition : 0,
-            };
-
-            classes += y && y.nubPointsDown ? "isUp" : "isDown";
-        }
-
-        return <div className={classes} style={toolbarStyles} ref={(ref) => this.selfNode = ref}>
-            {this.props.children}
-            <div style={nubStyles} className="richEditor-nubPosition" ref={(nub) => this.nub = nub}>
-                <div className="richEditor-nub"/>
-            </div>
-        </div>;
-    }
 }
 
-export default withEditor(SelectionPositionToolbarContainer);
+export default withEditor<IProps>(SelectionPositionToolbarContainer);

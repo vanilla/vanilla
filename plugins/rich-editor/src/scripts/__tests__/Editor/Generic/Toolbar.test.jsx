@@ -15,7 +15,7 @@ test("matches snapshot", () => {
     expect(toolbar).toMatchSnapshot();
 });
 
-test("generates correct number of <EditorMenuItem /> components", () => {
+test("generates correct number of <EditorMenuItem /> Components", () => {
     const menuItems = {
         foo: {
             active: false,

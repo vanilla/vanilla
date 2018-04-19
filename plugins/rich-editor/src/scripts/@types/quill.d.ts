@@ -9,6 +9,7 @@
 declare module "quill/core" {
     import Blot from "parchment/dist/src/blot/abstract/shadow";
     import Container from "parchment/dist/src/blot/abstract/container";
+    import ClipboardModule from "quill/modules/clipboard";
 
     /**
      * A stricter type definition would be:
@@ -36,12 +37,6 @@ declare module "quill/core" {
     export interface KeyboardStatic {
         addBinding(key: Key, callback: (range: RangeStatic, context: any) => void): void;
         addBinding(key: Key, context: any, callback: (range: RangeStatic, context: any) => void): void;
-    }
-
-    export interface ClipboardStatic {
-        addMatcher(selectorOrNodeType: string | number, callback: (node: any, delta: DeltaStatic) => DeltaStatic): void;
-        dangerouslyPasteHTML(html: string, source?: Sources): void;
-        dangerouslyPasteHTML(index: number, html: string, source?: Sources): void;
     }
 
     export interface QuillOptionsStatic {
@@ -166,7 +161,7 @@ declare module "quill/core" {
 
     class Quill extends EventEmitter {
         root: HTMLDivElement;
-        clipboard: ClipboardStatic;
+        clipboard: ClipboardModule;
         scroll: Container;
         container: HTMLDivElement;
         options: AnyObject;
@@ -293,7 +288,18 @@ declare module "quill/core/theme" {
         addModule(moduleKey: string);
     }
 }
-declare module "quill/modules/clipboard";
+declare module "quill/modules/clipboard" {
+    import { DeltaStatic, Sources } from "quill/core";
+    import Module from "quill/core/module";
+    export default class ClipboardModule extends Module {
+        addMatcher(
+            selectorOrNodeType: string | number,
+            callback: (node: any, delta: DeltaStatic) => DeltaStatic | undefined,
+        ): void;
+        dangerouslyPasteHTML(html: string, source?: Sources): void;
+        dangerouslyPasteHTML(index: number, html: string, source?: Sources): void;
+    }
+}
 declare module "quill/modules/formula";
 declare module "quill/modules/history" {
     import Module from "quill/core/module";

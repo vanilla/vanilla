@@ -27,8 +27,6 @@ export default class EmbedFocusModule extends Module {
      */
     public earlyKeyBoardBindings = {};
 
-    private keyboard: KeyboardModule;
-
     /** The previous selection */
     private lastSelection: RangeStatic = {
         index: 0,

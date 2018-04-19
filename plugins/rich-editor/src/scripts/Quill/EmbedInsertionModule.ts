@@ -35,14 +35,12 @@ export default class EmbedInsertionModule extends Module {
     private lastSelection: RangeStatic = { index: 0, length: 0 };
     private pauseSelectionTracking = false;
     private fileUploader: FileUploader;
-    private keyboard: KeyboardModule;
 
     constructor(public quill: Quill, options = {}) {
         super(quill, options);
         this.quill = quill;
         this.setupImageUploads();
         this.setupSelectionListener();
-        this.keyboard = quill.getModule("keyboard");
     }
 
     /**

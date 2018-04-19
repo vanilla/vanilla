@@ -7,25 +7,25 @@
 import { addComponent, componentExists, getComponent } from "@core/application";
 import App from "@core/Main/App";
 import { logError } from "@core/utility";
-import React from 'react';
-import ReactDOM from 'react-dom';
+import React from "react";
+import ReactDOM from "react-dom";
 
 /**
- * Mount all declared components on the dom.
+ * Mount all declared Components on the dom.
  *
  * The page signifies that an element contains a component with the `data-react="<Component>"` attribute.
  *
  * @param parent - The parent element to search. This element is not included in the search.
  */
 export function _mountComponents(parent: Element) {
-    if (!componentExists('App')) {
-        addComponent('App', App);
+    if (!componentExists("App")) {
+        addComponent("App", App);
     }
 
-    const nodes = parent.querySelectorAll('[data-react]');
+    const nodes = parent.querySelectorAll("[data-react]");
 
-    Array.prototype.forEach.call(nodes, (node) => {
-        const name = node.getAttribute('data-react');
+    Array.prototype.forEach.call(nodes, node => {
+        const name = node.getAttribute("data-react");
         const Component = getComponent(name);
 
         if (Component) {

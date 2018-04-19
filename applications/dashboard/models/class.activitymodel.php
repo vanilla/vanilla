@@ -104,6 +104,41 @@ class ActivityModel extends Gdn_Model {
     }
 
     /**
+     * Can the current user view the activity?
+     *
+     * @param array $activity
+     * @return bool
+     */
+    public function canView(array $activity): bool {
+        $result = false;
+
+        $userid = val('NotifyUserID', $activity);
+        switch ($userid) {
+            case ActivityModel::NOTIFY_PUBLIC:
+                $result = true;
+                break;
+            case ActivityModel::NOTIFY_MODS:
+                if (checkPermission('Garden.Moderation.Manage')) {
+                    $result = true;
+                }
+                break;
+            case ActivityModel::NOTIFY_ADMIN:
+                if (checkPermission('Garden.Settings.Manage')) {
+                    $result = true;
+                }
+                break;
+            default:
+                // Actual userid.
+                if (checkPermission('Garden.Community.Manage') && Gdn::session()->UserID === $userid) {
+                    $result = true;
+                }
+                break;
+        }
+
+        return $result;
+    }
+
+    /**
      *
      *
      * @param $data

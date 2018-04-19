@@ -13,14 +13,19 @@ use \Vanilla\Authenticator\ShimAuthenticator;
  */
 class OAuth2Authenticator extends ShimAuthenticator {
 
+    /** @var OAuth2Plugin */
+    private $oAuth2Plugin;
+
     /**
      * OAuth2Authenticator constructor.
      *
-     * @param string $authenticatorID
+     * @param OAuth2Plugin $oAuth2Plugin
      *
      * @throws \Garden\Schema\ValidationException
      */
-    public function __construct(string $authenticatorID) {
+    public function __construct(OAuth2Plugin $oAuth2Plugin) {
+        $this->oAuth2Plugin = $oAuth2Plugin;
+
         parent::__construct('OAuth2');
     }
 
@@ -35,6 +40,13 @@ class OAuth2Authenticator extends ShimAuthenticator {
                 'foregroundColor' => null,
             ]
         ];
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function isActive(): bool {
+        return $this->oAuth2Plugin->isConfigured();
     }
 
     /**

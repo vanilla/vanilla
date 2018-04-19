@@ -12,15 +12,19 @@ use \Vanilla\Authenticator\ShimAuthenticator;
  */
 class TwitterAuthenticator extends ShimAuthenticator {
 
+    /** @var TwitterPlugin */
+    private $twitterPlugin;
 
     /**
      * TwitterAuthenticator constructor.
      *
-     * @param string $authenticatorID
+     * @param TwitterPlugin $twitterPlugin
      *
      * @throws \Garden\Schema\ValidationException
      */
-    public function __construct(string $authenticatorID) {
+    public function __construct(TwitterPlugin $twitterPlugin) {
+        $this->twitterPlugin = $twitterPlugin;
+
         parent::__construct('Twitter');
     }
 
@@ -35,6 +39,13 @@ class TwitterAuthenticator extends ShimAuthenticator {
                 'foregroundColor' => '#fff',
             ]
         ];
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function isActive(): bool {
+        return $this->twitterPlugin->socialSignIn();
     }
 
     /**

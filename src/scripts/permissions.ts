@@ -10,7 +10,7 @@ import gdn from "@core/gdn";
  * Determine if all of the provided permissions are present.
  */
 export function hasPermission(permissions: string | string[], id: number | null) {
-    if (typeof permissions === 'string') {
+    if (typeof permissions === "string") {
         permissions = [permissions];
     }
 
@@ -77,7 +77,7 @@ export function isBanned(permissions: string[] = []): boolean {
  * that a ban with that name is ignored.
  */
 function getBan(permissions: string[] = []): object | null {
-    permissions = permissions.map((str) => str.toLowerCase());
+    permissions = permissions.map(str => str.toLowerCase());
     const bans = gdn.permissions.bans || {};
 
     for (const name of bans) {
@@ -87,7 +87,7 @@ function getBan(permissions: string[] = []): object | null {
             // The permission check is overriding the ban.
             continue;
         } else if (ban.except) {
-            const except = typeof ban.except === 'string' ? [ban.except] : ban.except;
+            const except = typeof ban.except === "string" ? [ban.except] : ban.except;
 
             // There is an exception, so see if any of those permissions apply.
             let has = false;
@@ -114,9 +114,9 @@ function getBan(permissions: string[] = []): object | null {
 function hasInternal(permission: string, id: number | null = null): boolean | null {
     const permissions = gdn.permissions.permissions || {};
 
-    if (permission === 'admin') {
+    if (permission === "admin") {
         return !!gdn.permissions.isAdmin;
-    } else if (permission.substr(0, 1) === '!') {
+    } else if (permission.substr(0, 1) === "!") {
         // This is a ban so skip it.
         return null;
     } else if (permissions[permission] === true) {

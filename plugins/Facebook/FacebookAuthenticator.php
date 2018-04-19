@@ -12,19 +12,24 @@ use \Vanilla\Authenticator\ShimAuthenticator;
  */
 class FacebookAuthenticator extends ShimAuthenticator {
 
+    /** @var FacebookPlugin */
+    private $facebookPlugin;
+
     /**
      * FacebookAuthenticator constructor.
      *
-     * @param string $authenticatorID
+     * @param FacebookPlugin $facebookPlugin
      *
      * @throws \Garden\Schema\ValidationException
      */
-    public function __construct(string $authenticatorID) {
+    public function __construct(FacebookPlugin $facebookPlugin) {
+        $this->facebookPlugin = $facebookPlugin;
+
         parent::__construct('Facebook');
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     protected static function getAuthenticatorTypeInfoImpl(): array {
         return [
@@ -37,7 +42,14 @@ class FacebookAuthenticator extends ShimAuthenticator {
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
+     */
+    public function isActive(): bool {
+        return $this->facebookPlugin->socialSignIn();
+    }
+
+    /**
+     * @inheritdoc
      */
     public static function isUnique(): bool {
         return true;

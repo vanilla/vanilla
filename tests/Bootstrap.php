@@ -187,6 +187,12 @@ class Bootstrap {
 
             ->rule(AuthenticatorModel::class)
             ->setShared(true)
+            ->addCall('registerAuthenticatorClass', [PasswordAuthenticator::class])
+            ->addCall('registerAuthenticatorClass', [MockAuthenticator::class])
+            ->addCall('registerAuthenticatorClass', [MockSSOAuthenticator::class])
+
+            ->rule(SearchModel::class)
+            ->setShared(true)
 
             ->rule(\Garden\Web\Dispatcher::class)
             ->setShared(true)
@@ -227,14 +233,6 @@ class Bootstrap {
             ->addCall('addEmbed', [$container->get(\Vanilla\Embeds\YouTubeEmbed::class)])
             ->addCall('addEmbed', [$container->get(\Vanilla\Embeds\VimeoEmbed::class)])
             ->addCall('setNetworkEnabled', [false])
-        ;
-
-        /** @var AuthenticatorModel $authenticatorModel */
-        $authenticatorModel = $container->get(AuthenticatorModel::class);
-        $authenticatorModel
-            ->registerAuthenticatorClass(PasswordAuthenticator::class)
-            ->registerAuthenticatorClass(MockAuthenticator::class)
-            ->registerAuthenticatorClass(MockSSOAuthenticator::class)
         ;
     }
 

@@ -1456,7 +1456,7 @@ class Gdn_Request implements RequestInterface {
      * @return Gdn_Request
      */
     public function setUrl($url) {
-        // Parse a url and set its components.
+        // Parse a url and set its Components.
         $components = parse_url($url);
 
         if ($components === false) {

@@ -35,13 +35,6 @@ class YouTubeEmbed extends AbstractEmbed {
             parse_str($queryString, $query);
         }
         $fragment = parse_url($url, PHP_URL_FRAGMENT);
-        /*
-        preg_match(
-            '/https?:\/\/(?:(?:www.)|(?:m.))?(?:(?:youtube.(ca|com))|(?:youtu.be))\/(?:(?:playlist?)|(?:(?:watch\?v=)?(?P<videoId>[\w-]{11})))(?:\?|\&)?(?:list=(?P<listId>[\w-]*))?(?:t=(?:(?P<minutes>\d*)m)?(?P<seconds>\d*)s)?(?:#t=(?P<start>\d*))?/i',
-            $url,
-            $urlParts
-        );
-        */
 
         $videoID = preg_match('/^\/?(?P<videoID>[\w-]{11})$/', $path, $pathParts) ? $pathParts['videoID'] : $query['v'] ?? null;
 
@@ -55,24 +48,28 @@ class YouTubeEmbed extends AbstractEmbed {
             $start = ($minutes * 60) + $seconds;
         }
 
-        $oembed = $this->oembed("https://www.youtube.com/oembed?url=https%3A%2F%2Fwww.youtube.com%2Fwatch%3Fv%3D{$videoID}");
-        if (!empty($oembed)) {
-            $data = $this->normalizeOembed($oembed);
-
-            $attributes = $data['attributes'] ?? [];
-            $attributes['videoID'] = $videoID;
-            $attributes['listID'] = $query['listID'] ?? null;
-            $attributes['start'] = $start;
-            $rel = $query['rel'] ?? null;
-            if ($rel !== null) {
-                $attributes['rel'] = (bool)$rel;
+        if ($this->isNetworkEnabled()) {
+            $oembed = $this->oembed("https://www.youtube.com/oembed?url=https%3A%2F%2Fwww.youtube.com%2Fwatch%3Fv%3D{$videoID}");
+            if (!empty($oembed)) {
+                $data = $this->normalizeOembed($oembed);
             }
-
-
-            $data['attributes'] = $attributes;
-        } else {
-            $data = null;
         }
+
+        $data = $data ?? [];
+        $attributes = $data['attributes'] ?? [];
+        if ($videoID) {
+            $attributes['videoID'] = $videoID;
+        }
+        if ($start) {
+            $attributes['start'] = $start;
+        }
+        if (array_key_exists('listID', $query)) {
+            $attributes['listID'] = $query['listID'];
+        }
+        if (array_key_exists('rel', $query)) {
+            $attributes['rel'] = (bool)$query['rel'];
+        }
+        $data['attributes'] = $attributes;
 
         return $data;
     }

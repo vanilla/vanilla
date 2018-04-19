@@ -18,8 +18,8 @@ class EmbedManager {
     /** Page info caching expiry (24 hours). */
     const CACHE_EXPIRY = 24 * 60 * 60;
 
-    /** Default scrape type. */
-    const TYPE_DEFAULT = 'site';
+    /** Valid image extensions. */
+    const IMAGE_EXTENSIONS = ['bmp', 'gif', 'jpeg', 'jpg', 'png', 'svg', 'tif', 'tiff'];
 
     /** @var Gdn_Cache Caching interface. */
     private $cache;
@@ -27,16 +27,24 @@ class EmbedManager {
     /** @var AbstractEmbed The default embed type. */
     private $defaultEmbed;
 
+    /** @var bool Allow network requests (e.g. HTTP)? */
+    private $networkEnabled = true;
+
     /** @var AbstractEmbed[] Available embed types. */
     private $embeds = [];
+
+    /** @var ImageEmbed Generic image embed. */
+    private $imageEmbed;
 
     /**
      * EmbedManager constructor.
      *
      * @param Gdn_Cache $cache
+     * @param ImageEmbed $imageEmbed
      */
-    public function __construct(Gdn_Cache $cache) {
+    public function __construct(Gdn_Cache $cache, ImageEmbed $imageEmbed) {
         $this->cache = $cache;
+        $this->imageEmbed = $imageEmbed;
     }
 
     /**
@@ -82,7 +90,7 @@ class EmbedManager {
         // No specific embed so use the default web scrape embed.
         foreach ($this->embeds as $testEmbed) {
             foreach ($testEmbed->getDomains() as $testDomain) {
-                if ($domain === $testDomain || stringEndsWith($testDomain, ".{$testDomain}")) {
+                if ($domain === $testDomain || stringEndsWith($domain, ".{$testDomain}")) {
                     $embed = $testEmbed;
                     break 2;
                 }
@@ -90,10 +98,41 @@ class EmbedManager {
         }
 
         if (!isset($embed)) {
-            $embed = $this->getDefaultEmbed();
+            if ($this->isImageUrl($url)) {
+                $embed = $this->imageEmbed;
+            } else {
+                $embed = $this->getDefaultEmbed();
+            }
         }
 
         return $embed;
+    }
+
+    /**
+     * Is this an image URL?
+     *
+     * @param string $url Target URL.
+     * @return bool
+     */
+    private function isImageUrl(string $url): bool {
+        $result = false;
+
+        $path = parse_url($url, PHP_URL_PATH);
+        if ($path !== false) {
+            $extension = pathinfo($path, PATHINFO_EXTENSION);
+            $result = $extension && in_array(strtolower($extension), self::IMAGE_EXTENSIONS);
+        }
+
+        return $result;
+    }
+
+    /**
+     * Should network requests be available to embed objects?
+     *
+     * @return bool
+     */
+    public function isNetworkEnabled(): bool {
+        return $this->networkEnabled;
     }
 
     /**
@@ -111,16 +150,19 @@ class EmbedManager {
 
         // If not forcing a refresh, attempt to load page data from the cache.
         if (!$forceRefresh) {
-            $data = $this->cache->get($cacheKey);
-            if ($data === Gdn_Cache::CACHEOP_FAILURE) {
-                unset($data);
+            $cachedData = $this->cache->get($cacheKey);
+            if ($cachedData !== Gdn_Cache::CACHEOP_FAILURE) {
+                $data = $cachedData;
             }
         }
 
-        if (!isset($data)) {
+        if ($data === null) {
             $embed = $this->getEmbedByUrl($url);
             $type = $embed->getType();
+            $embedNetworkEnabled = $embed->isNetworkEnabled();
+            $embed->setNetworkEnabled($this->networkEnabled);
             $data = $embed->matchUrl($url);
+            $embed->setNetworkEnabled($embedNetworkEnabled);
 
             $defaults = [
                 'name' => null,
@@ -151,10 +193,18 @@ class EmbedManager {
      */
     public function renderData(array $data): string {
         $type = $data['type'] ?? null;
-        if (!array_key_exists($type, $this->embeds) && $type !== $this->getDefaultEmbed()->getType()) {
+
+        if (array_key_exists($type, $this->embeds)) {
+            $embed = $this->embeds[$type];
+        } elseif ($type === $this->imageEmbed->getType()) {
+            $embed = $this->imageEmbed;
+        } elseif ($type === $this->getDefaultEmbed()->getType()) {
+            $embed = $this->getDefaultEmbed();
+        }
+
+        if (empty($embed)) {
             throw new InvalidArgumentException('Invalid embed type.');
         }
-        $embed = $this->embeds[$type] ?? $this->getDefaultEmbed();
 
         $result = $embed->renderData($data);
         return $result;
@@ -168,6 +218,17 @@ class EmbedManager {
      */
     public function setDefaultEmbed(AbstractEmbed $defaultEmbed) {
         $this->defaultEmbed = $defaultEmbed;
+        return $this;
+    }
+
+    /**
+     * Set whether or not embed objects should be able to use the network to gather additional data.
+     *
+     * @param bool $networkEnabled Should network requests be available to embed objects?
+     * @return $this
+     */
+    public function setNetworkEnabled(bool $networkEnabled) {
+        $this->networkEnabled = $networkEnabled;
         return $this;
     }
 }

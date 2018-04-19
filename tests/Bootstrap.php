@@ -219,7 +219,14 @@ class Bootstrap {
 
             ->rule(\WebScraper::class)
             ->setShared(true)
-            ->addCall('setDisableFetch', [true]);
+            ->addCall('setDisableFetch', [true])
+
+            ->rule(\Vanilla\Embeds\EmbedManager::class)
+            ->setShared(true)
+            ->addCall('setDefaultEmbed', [$container->get(\Vanilla\Embeds\LinkEmbed::class)])
+            ->addCall('addEmbed', [$container->get(\Vanilla\Embeds\YouTubeEmbed::class)])
+            ->addCall('addEmbed', [$container->get(\Vanilla\Embeds\VimeoEmbed::class)])
+            ->addCall('setNetworkEnabled', [false])
         ;
 
         /** @var AuthenticatorModel $authenticatorModel */

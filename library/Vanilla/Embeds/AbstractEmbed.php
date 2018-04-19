@@ -25,6 +25,9 @@ abstract class AbstractEmbed implements InjectableInterface {
     /** @var string[] Valid domains for this embed type. */
     protected $domains = [];
 
+    /** @var bool Allow network requests (e.g. HTTP)? */
+    private $networkEnabled = true;
+
     /** @var string Rendered type of this embed (e.g. video, image). */
     protected $renderType;
 
@@ -83,7 +86,7 @@ abstract class AbstractEmbed implements InjectableInterface {
      *
      * @return string[]
      */
-    public function getUrlSchemas() {
+    public function getUrlSchemes() {
         $result = ['http', 'https'];
 
         if ($this->allowLocal) {
@@ -133,6 +136,15 @@ abstract class AbstractEmbed implements InjectableInterface {
         }
 
         return $size;
+    }
+
+    /**
+     * Should network requests be available?
+     *
+     * @return bool
+     */
+    public function isNetworkEnabled(): bool {
+        return $this->networkEnabled;
     }
 
     /**
@@ -247,5 +259,16 @@ abstract class AbstractEmbed implements InjectableInterface {
      */
     public function setDependencies(HttpRequest $httpRequest) {
         $this->httpRequest = $httpRequest;
+    }
+
+    /**
+     * Set whether or not network requests should be available for gathering additional data.
+     *
+     * @param bool $networkEnabled Should network requests be available?
+     * @return $this
+     */
+    public function setNetworkEnabled(bool $networkEnabled) {
+        $this->networkEnabled = $networkEnabled;
+        return $this;
     }
 }

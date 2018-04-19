@@ -12,6 +12,7 @@
  */
 
 use Garden\EventManager;
+use Vanilla\Renderer;
 
 /**
  * Output formatter.
@@ -37,7 +38,7 @@ class Gdn_Format {
 
     /** @var array  */
     protected static $SanitizedFormats = [
-        'html', 'bbcode', 'wysiwyg', 'text', 'textex', 'markdown'
+        'html', 'bbcode', 'wysiwyg', 'text', 'textex', 'markdown', 'rich'
     ];
 
     /**
@@ -2437,5 +2438,25 @@ EOT;
 
             return $sanitized;
         }
+    }
+
+    /**
+     * Format text from Rich editor input.
+     *
+     * @param string $delta A JSON encoded array of Quill deltas.
+     *
+     * @throws Exception - When the deltas could not be JSON decoded.
+     * @return string - The rendered HTML output.
+     */
+    public static function rich(string $deltas): string {
+        $operations = json_decode($deltas, true);
+
+        if (json_last_error() !== JSON_ERROR_NONE) {
+            throw new Exception("JSON decoding of rich post content has failed.");
+        }
+
+        /** @var \Vanilla\Quill\Renderer $renderer */
+        $renderer = Gdn::getContainer()->get(\Vanilla\Quill\Renderer::class);
+        return $renderer->render($operations);
     }
 }

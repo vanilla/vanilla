@@ -153,7 +153,6 @@ export class ParagraphToolbar extends React.PureComponent<IEditorContextProps, I
                     role="menu"
                 >
                     <Toolbar
-                        quill={this.quill}
                         menuItems={initialToolbarItems}
                         isHidden={!this.state.showMenu}
                         onBlur={this.checkForExternalFocus}

@@ -144,7 +144,7 @@ export const CLOSE_FLYOUT_EVENT = "editor:close-flyouts";
  * @param firingKey - A key to fire the event with. This will be attached to the event so that you do some
  * filtering when setting up you listeners.
  */
-export function closeEditorFlyouts(firingKey: string) {
+export function closeEditorFlyouts(firingKey?: string) {
     const event = new CustomEvent(CLOSE_FLYOUT_EVENT, {
         detail: {
             firingKey,

@@ -22,8 +22,7 @@ import Parchment from "parchment";
 
 export default class KeyboardBindings {
     private static MULTI_LINE_BLOTS = ["spoiler-line", "blockquote-line", "code-block"];
-
-    private bindings = {};
+    public bindings = {};
 
     constructor(private quill: Quill) {
         // Keyboard behaviours

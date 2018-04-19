@@ -7,7 +7,7 @@ import gdn from "@core/gdn";
 import { PromiseOrNormalCallback } from "@core/utility";
 import React, { ComponentClass } from "react";
 import { RouteProps } from "react-router-dom";
-import isUrl from "validator/lib/isUrl";
+import isUrl from "validator/lib/isURL";
 
 /**
  * Get a piece of metadata passed from the server.

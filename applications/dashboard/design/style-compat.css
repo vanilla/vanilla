@@ -623,11 +623,14 @@ label.checkbox input.checkbox-input {
   margin-left: auto;
 }
 
+.atMentionList-suggestion,
 .iconButton,
 .richEditor-button {
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  overflow-x: hidden;
+  max-width: 100%;
   position: relative;
-  -webkit-appearance: none;
-  -moz-appearance: none;
   appearance: none;
   border: 0;
   padding: 0;
@@ -686,57 +689,6 @@ label.checkbox input.checkbox-input {
   height: 24px;
   width: 24px;
   opacity: 0.6;
-}
-
-.atMention {
-  width: 200px;
-}
-
-.atMention-items {
-  width: 100%;
-}
-
-.atMention-items.MenuItems {
-  position: relative;
-  top: auto;
-  left: auto;
-  right: auto;
-  bottom: auto;
-  display: block;
-}
-
-.atMention-user {
-  display: flex;
-  align-items: center;
-  width: 100%;
-  box-sizing: border-box;
-  overflow: hidden;
-}
-
-.atMention-photoWrap {
-  margin-right: 10px;
-}
-
-.atMention-photo {
-  width: 30px;
-  height: 30px;
-}
-
-.atMention-userName {
-  flex-grow: 1;
-  overflow: hidden;
-  white-space: nowrap;
-  text-overflow: ellipsis;
-  max-width: calc(100% - 40px);
-}
-
-.atMention-mark {
-  padding: 0;
-  font-weight: 600;
-}
-
-.atMention-photo {
-  display: block;
 }
 
 .insertLink.FlyoutMenu {
@@ -1079,6 +1031,69 @@ label.checkbox input.checkbox-input {
   padding: 0;
   width: 24px;
   size: 24px;
+}
+
+.atMentionList {
+  position: absolute;
+  width: 200px;
+}
+
+.atMentionList-items.MenuItems {
+  display: block;
+  padding: 3px 0;
+}
+
+.atMentionList-item.isSelected .atMentionList-suggestion {
+  background-color: #f4f3f5;
+}
+
+.atMentionList-suggestion {
+  cursor: pointer;
+}
+
+.atMentionList-user {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  box-sizing: border-box;
+  overflow: hidden;
+  padding-top: 3px;
+  padding-right: 6px;
+  padding-bottom: 3px;
+  padding-left: 6px;
+}
+
+.atMentionList-photoWrap {
+  margin-right: 10px;
+}
+
+.atMentionList-photo {
+  width: 30px;
+  height: 30px;
+}
+
+.atMentionList-userName {
+  display: block;
+  flex-grow: 1;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  max-width: calc(100% - 40px);
+}
+
+.atMentionList-mark {
+  padding: 0;
+  font-weight: 600;
+}
+
+.atMentionList-photo {
+  display: block;
+}
+
+.atMention {
+  user-select: all;
+  color: inherit;
+  font-weight: 600;
 }
 
 .spoiler {

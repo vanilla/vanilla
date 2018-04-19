@@ -13,6 +13,10 @@ $richEditor-atMention_width: 200px !default;
 $richEditor-atMentionAvatar_width: 30px !default;
 $richEditor-atMentionAvatar_margin: 10px !default;
 $richEditor-atMentionMark_weight: 600 !default;
+$richEditor-atMentionLink_weight: 600 !default;
+$richEditor-atMentionUser_paddingHorizontal: 6px !default;
+$richEditor-atMentionUser_paddingVertical: 3px !default;
+$richEditor-atMentionSelected_bg: #f4f3f5;
 $richEditor-insertLink_width: 387px !default;
 $richEditor-insertPopover_paddingVertical: 12px !default;
 $richEditor-insertPopover_paddingHorizontal: 12px !default;
@@ -148,11 +152,11 @@ $embedded-quote_fg: #A3A3A3 !default;
 }
 
 // button reset
+.atMentionList-suggestion,
 .iconButton,
 .richEditor-button {
+    @include singleLineEllipsis;
     position: relative;
-    -webkit-appearance: none;
-    -moz-appearance: none;
     appearance: none;
     border: 0;
     padding: 0;
@@ -216,59 +220,6 @@ $embedded-quote_fg: #A3A3A3 !default;
     height: $richEditor-icon_size;
     width: $richEditor-icon_size;
     opacity: $richEditor-icon_opacity;
-}
-
-// @mention menu
-.atMention {
-    width: $richEditor-atMention_width;
-}
-
-.atMention-items {
-    width: 100%;
-
-
-    &.MenuItems { // Temporary
-        position: relative;
-        top: auto;
-        left: auto;
-        right: auto;
-        bottom: auto;
-        display: block;
-    }
-}
-
-.atMention-user {
-    display: flex;
-    align-items: center;
-    width: 100%;
-    box-sizing: border-box;
-    overflow: hidden;
-}
-
-.atMention-photoWrap {
-    margin-right: $richEditor-atMentionAvatar_margin;
-}
-
-.atMention-photo {
-    width: $richEditor-atMentionAvatar_width;
-    height: $richEditor-atMentionAvatar_width;
-}
-
-.atMention-userName {
-    flex-grow: 1;
-    overflow: hidden;
-    white-space: nowrap;
-    text-overflow: ellipsis;
-    max-width: calc(100% - #{$richEditor-atMentionAvatar_margin + $richEditor-atMentionAvatar_width});
-}
-
-.atMention-mark {
-    padding: 0;
-    font-weight: $richEditor-atMentionMark_weight;
-}
-
-.atMention-photo {
-    display: block;
 }
 
 // Link Menu
@@ -647,4 +598,81 @@ $embedded-quote_fg: #A3A3A3 !default;
     padding: 0;
     width: $richEditor-icon_size;
     size: $richEditor-icon_size;
+}
+
+
+// @mentions
+.atMentionList {
+    position: absolute;
+    width: $richEditor-atMention_width;
+}
+
+
+.atMentionList-items {
+    &.MenuItems {
+        display: block;
+        padding: $richEditor-atMentionUser_paddingVertical 0;
+    }
+}
+
+.atMentionList-item {
+    &.isSelected {
+        .atMentionList-suggestion {
+            background-color: $richEditor-atMentionSelected_bg;
+        }
+    }
+}
+
+.atMentionList-suggestion {
+    cursor: pointer;
+}
+
+.atMentionList-user {
+    display: flex;
+    align-items: center;
+    width: 100%;
+    box-sizing: border-box;
+    overflow: hidden;
+    padding: {
+        top: $richEditor-atMentionUser_paddingVertical;
+        right: $richEditor-atMentionUser_paddingHorizontal;
+        bottom: $richEditor-atMentionUser_paddingVertical;
+        left: $richEditor-atMentionUser_paddingHorizontal;
+    }
+}
+
+.atMentionList-photoWrap {
+    margin-right: $richEditor-atMentionAvatar_margin;
+}
+
+.atMentionList-photo {
+    width: $richEditor-atMentionAvatar_width;
+    height: $richEditor-atMentionAvatar_width;
+}
+
+.atMentionList-userName {
+    display: block;
+    flex-grow: 1;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    max-width: calc(100% - #{$richEditor-atMentionAvatar_margin + $richEditor-atMentionAvatar_width});
+}
+
+.atMentionList-mark {
+    padding: 0;
+    font-weight: $richEditor-atMentionMark_weight;
+}
+
+.atMentionList-photo {
+    display: block;
+}
+
+
+
+// Rendered link
+.atMention  {
+    user-select: all;
+    color: inherit;
+    font-weight: $richEditor-atMentionLink_weight;
 }

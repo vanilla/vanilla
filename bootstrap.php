@@ -169,6 +169,10 @@ $dic->setInstance('Garden\Container\Container', $dic)
 
     ->rule(\Vanilla\Models\AuthenticatorModel::class)
     ->setShared(true)
+    ->addCall('registerAuthenticatorClass', [\Vanilla\Authenticator\PasswordAuthenticator::class])
+
+    ->rule(SearchModel::class)
+    ->setShared(true)
 
     ->rule('Gdn_IPlugin')
     ->setShared(true)
@@ -259,11 +263,6 @@ $dic->call(function (
         safeHeader('Location: '.$request->url('dashboard/setup', true));
         exit();
     }
-
-    /** Authenticators */
-    /** @var \Vanilla\Models\AuthenticatorModel $authenticatorModel */
-    $authenticatorModel = $dic->get(\Vanilla\Models\AuthenticatorModel::class);
-    $authenticatorModel->registerAuthenticatorClass(\Vanilla\Authenticator\PasswordAuthenticator::class);
 
     /**
      * Extension Managers

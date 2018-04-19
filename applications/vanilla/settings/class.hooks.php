@@ -684,7 +684,7 @@ class VanillaHooks implements Gdn_IPlugin {
      * @since 2.0.0
      * @package Vanilla
      *
-     * @param object $sender ProfileController.
+     * @param ProfileController $sender
      */
     public function profileController_addProfileTabs_handler($sender) {
         if (is_object($sender->User) && $sender->User->UserID > 0) {
@@ -696,8 +696,8 @@ class VanillaHooks implements Gdn_IPlugin {
                 $discussionsLabel .= '<span class="Aside">'.countString(getValueR('User.CountDiscussions', $sender, null), "/profile/count/discussions?userid=$userID").'</span>';
                 $commentsLabel .= '<span class="Aside">'.countString(getValueR('User.CountComments', $sender, null), "/profile/count/comments?userid=$userID").'</span>';
             }
-            $sender->addProfileTab(t('Discussions'), 'profile/discussions/'.$sender->User->UserID.'/'.rawurlencode($sender->User->Name), 'Discussions', $discussionsLabel);
-            $sender->addProfileTab(t('Comments'), 'profile/comments/'.$sender->User->UserID.'/'.rawurlencode($sender->User->Name), 'Comments', $commentsLabel);
+            $sender->addProfileTab(t('Discussions'), userUrl($sender->User, '', 'discussions'), 'Discussions', $discussionsLabel);
+            $sender->addProfileTab(t('Comments'), userUrl($sender->User, '', 'comments'), 'Comments', $commentsLabel);
             // Add the discussion tab's CSS and Javascript.
             $sender->addJsFile('jquery.gardenmorepager.js');
             $sender->addJsFile('discussions.js', 'vanilla');

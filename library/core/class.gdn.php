@@ -15,7 +15,7 @@
  * Framework superobject.
  *
  * Static object that provides an anchor and namespace for many framework
- * components, such as Controller, Dispatcher, Config, Database, etc.
+ * Components, such as Controller, Dispatcher, Config, Database, etc.
  */
 class Gdn {
 

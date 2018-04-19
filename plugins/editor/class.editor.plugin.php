@@ -529,7 +529,7 @@ class EditorPlugin extends Gdn_Plugin {
     }
 
     /**
-     * Placed these components everywhere due to some Web sites loading the
+     * Placed these Components everywhere due to some Web sites loading the
      * editor in some areas where the values were not yet injected into HTML.
      */
     public function base_render_before($sender) {
@@ -1483,7 +1483,7 @@ class EditorPlugin extends Gdn_Plugin {
         $model = new MediaModel();
         $media = $model->getID($mediaID, DATASET_TYPE_ARRAY);
 
-        if (!$media) {
+        if (!$media || val('InsertUserID', $media) != Gdn::session()->UserID) {
             throw notFoundException('File');
         }
 

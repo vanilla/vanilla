@@ -61,6 +61,7 @@ class MockAuthenticator extends Authenticator {
             'ui' => [
                 'photoUrl' => 'http://www.example.com/image.jpg',
                 'backgroundColor' => '#ffffff',
+                'foregroundColor' => '#000000',
             ],
         ];
     }

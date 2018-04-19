@@ -1,8 +1,9 @@
 
-$authenticateUser-column_width: 311px !default;
+$authenticateUser-column_width: 334px !default;
 $authenticateUser-column_horizontalPadding: 26px !default;
 $authenticateUser-userImage_width: 117px !default;
 $authenticateUser-spacer: 18px !default;
+$authenticateUser-ssoButton_margin: 12px !default;
 $authenticateUser-socialIcon_width: 42px !default;
 $authenticateUser-socialIcon_borderWidth: 3px !default;
 $authenticateUser-socialIcon_bg: #fff !default;
@@ -15,6 +16,8 @@ $authenticateUserName-opacity: .6 !default;
 $authenticateUserArrowDown-opacity: .6 !default;
 $icon_size: 24px !default;
 $icon-large_size: 42px !default;
+$authenticateMethod-button_boxShadow: 0 1px 3px 0 rgba(0, 0, 0, .3) !default;
+$authenticateMethod-button_horizontalMargin: 12px !default;
 
 .authenticateUserCol {
     padding: 0 $authenticateUser-column_horizontalPadding;
@@ -30,6 +33,10 @@ $icon-large_size: 42px !default;
 
     .button.button-fullWidth {
         margin-bottom: $authenticateUser-spacer;
+
+        &.button-sso {
+            margin-bottom: $authenticateUser-ssoButton_margin;
+        }
     }
 
     .icon {
@@ -137,13 +144,53 @@ $icon-large_size: 42px !default;
     margin-left: $baseUnit * 2;
 }
 
-.button.button-sso,
-.Button.button-sso {
-    background-image: none;
+.button.Button {
+    &.Primary.buttonCTA,
+    &.button-sso {
+        user-select: none;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background-image: none;
+        box-sizing: border-box;
+        text-decoration: none !important;
+    }
+
+    &.button-sso {
+        box-shadow: $authenticateMethod-button_boxShadow;
+    }
 }
 
 .button-ssoLabel {
-    margin-left: 12px;
+    margin: {
+        left: $authenticateMethod-button_horizontalMargin;
+        right: $authenticateMethod-button_horizontalMargin;
+    }
     font-size: 14px;
     font-weight: normal;
+    text-shadow: none;
+}
+
+.ssoMethod-icon {
+    width: $icon_size;
+    height: auto;
+
+    &.ssoMethod-iconSpacer {
+        display: block;
+        visibility: hidden;
+        height: $icon_size;
+    }
+}
+
+.button-ssoContents {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    width: 100%;
+    max-width: 100%;
+}
+
+.ssoMethods {
+    margin-bottom: $authenticateUser-spacer;
 }

@@ -1,11 +1,12 @@
 /**
- * Application functions for interop between components in different packages.
+ * Application functions for interop between Components in different packages.
  *
  * @module application
  */
 import gdn from "@core/gdn";
 import { PromiseOrNormalCallback } from "@core/utility";
-import { ComponentClass } from "react";
+import React, { ComponentClass } from "react";
+import { RouteProps } from "react-router-dom";
 
 /**
  * Get a piece of metadata passed from the server.
@@ -20,7 +21,7 @@ export function getMeta(key: string, defaultValue?: any) {
         return defaultValue;
     }
 
-    const parts = key.split('.');
+    const parts = key.split(".");
     let haystack = gdn.meta;
 
     for (const part of parts) {
@@ -39,7 +40,7 @@ export function getMeta(key: string, defaultValue?: any) {
  * @param value - The value to set.
  */
 export function setMeta(key: string, value: any) {
-    const parts = key.split('.');
+    const parts = key.split(".");
     const last = parts.pop();
 
     if (!last) {
@@ -49,7 +50,7 @@ export function setMeta(key: string, value: any) {
     let haystack = gdn.meta;
 
     for (const part of parts) {
-        if (haystack[part] === null || typeof haystack[part] !== 'object') {
+        if (haystack[part] === null || typeof haystack[part] !== "object") {
             haystack[part] = {};
         }
         haystack = haystack[part];
@@ -67,7 +68,7 @@ export function setMeta(key: string, value: any) {
  */
 export function translate(str: string, defaultTranslation?: string): string {
     // Codes that begin with @ are considered literals.
-    if (str.substr(0, 1) === '@') {
+    if (str.substr(0, 1) === "@") {
         return str.substr(1);
     }
 
@@ -109,13 +110,13 @@ export function formatUrl(path: string): string {
 }
 
 /**
- * @type {Object} The currently registered components.
+ * @type {Object} The currently registered Components.
  * @private
  */
 const _components = {};
 
 /**
- * Register a component in the components registry.
+ * Register a component in the Components registry.
  *
  * @param name The name of the component.
  * @param component The component to register.
@@ -155,7 +156,7 @@ const _routes: any[] = [];
  *
  * @param routes An array of routes to add.
  */
-export function addRoutes(routes: JSX.Element[]) {
+export function addRoutes(routes: Array<React.ReactElement<RouteProps>>) {
     if (!Array.isArray(routes)) {
         _routes.push(routes);
     } else {
@@ -168,7 +169,7 @@ export function addRoutes(routes: JSX.Element[]) {
  *
  * @returns Returns an array of routes.
  */
-export function getRoutes(): JSX.Element[] {
+export function getRoutes(): Array<React.ReactElement<RouteProps>> {
     return _routes;
 }
 
@@ -216,5 +217,5 @@ export function _executeReady(): Promise<any[]> {
  * @param {function} callback - The callback to execute.
  */
 export function onContent(callback) {
-    document.addEventListener('X-DOMContentReady', callback);
+    document.addEventListener("X-DOMContentReady", callback);
 }

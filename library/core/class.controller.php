@@ -1785,7 +1785,7 @@ class Gdn_Controller extends Gdn_Pluggable {
         if (in_array($this->_DeliveryType, [DELIVERY_TYPE_ALL])) {
             $this->MasterView = $this->masterView();
 
-            // Only get css & ui components if this is NOT a syndication request
+            // Only get css & ui Components if this is NOT a syndication request
             if ($this->SyndicationMethod == SYNDICATION_NONE && is_object($this->Head)) {
 
                 $CssAnchors = AssetModel::getAnchors();

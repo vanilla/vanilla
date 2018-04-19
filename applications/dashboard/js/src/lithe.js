@@ -5,13 +5,13 @@
    * Lithe Core JS library
    *
    * The {Lithe} object contains properties and functions required by the rest
-   * of the Lithe components.
+   * of the Lithe Components.
    *
    * @author Kasper Isager <kasper@vanillaforums.com>
    */
   window.Lithe = window.Lithe || {
     /**
-     * Classes for use with toggleable components.
+     * Classes for use with toggleable Components.
      *
      * Can be overridden anywhere at any time:
      *     Lithe.openClass = 'foo';
@@ -22,7 +22,7 @@
     lastOpen    : $('is-open'),
 
     /**
-     * Clear Lithe components
+     * Clear Lithe Components
      *
      * @this {Lithe}
      */
@@ -134,7 +134,7 @@
     }
   };
 
-  // Clear components on document click
+  // Clear Components on document click
   $(document).on('click', Lithe.clear);
 
 }(jQuery, window, document));

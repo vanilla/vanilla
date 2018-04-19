@@ -54,19 +54,18 @@ class AuthenticatorsTest extends AbstractAPIv2Test {
 
         $this->assertArrayHasKey('authenticatorID', $record);
         $this->assertArrayHasKey('type', $record);
+
         $this->assertArrayHasKey('ui', $record);
         $this->assertInternalType('array', $record['ui']);
-
-        // Authenticators returned through /authenticate/authenticators have to be active.
-        $this->assertArrayHasKey('isActive', $record);
-        $this->assertInternalType('bool', $record['isActive']);
-        $this->assertTrue($record['isActive']);
+        $this->assertArrayHasKey('url', $record['ui']);
+        $this->assertArrayHasKey('buttonName', $record['ui']);
+        $this->assertArrayHasKey('backgroundColor', $record['ui']);
+        $this->assertArrayHasKey('foregroundColor', $record['ui']);;
 
         // They also have to enable SignIn.
         if (isset($record['sso'])) {
-            $this->assertArrayHasKey('canSignIn', $record['sso']);
-            $this->assertInternalType('bool', $record['sso']['canSignIn']);
-            $this->assertTrue($record['sso']['canSignIn']);
+            $this->assertArrayHasKey('canAutoLinkUser', $record['sso']);
+            $this->assertInternalType('bool', $record['sso']['canAutoLinkUser']);
         }
     }
 

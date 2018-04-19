@@ -16,22 +16,24 @@ import apiv2 from "@core/apiv2";
 import "@core/legacy";
 
 // Inject the debug flag into the utility.
-debug(getMeta('debug', false));
+debug(getMeta("debug", false));
 
 // Export the API to the global object.
 gdn.apiv2 = apiv2;
 
 // Mount all data-react components.
-onContent((e) => {
+onContent(e => {
     _mountComponents(e.target);
 });
 
 log("Bootstrapping");
-_executeReady().then(() => {
-    log("Bootstrapping complete.");
+_executeReady()
+    .then(() => {
+        log("Bootstrapping complete.");
 
-    const contentEvent = new CustomEvent('X-DOMContentReady', { bubbles: true, cancelable: false });
-    document.dispatchEvent(contentEvent);
-}).catch(error => {
-    logError(error);
-});
+        const contentEvent = new CustomEvent("X-DOMContentReady", { bubbles: true, cancelable: false });
+        document.dispatchEvent(contentEvent);
+    })
+    .catch(error => {
+        logError(error);
+    });

@@ -24,3 +24,5 @@ interface Window {
 declare interface AnyObject {
     [key: string]: any;
 }
+
+declare module "*.json";

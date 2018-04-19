@@ -457,6 +457,10 @@ if (!class_exists('HeadModule', false)) {
                 $this->addTag('meta', ['name' => 'description', 'property' => 'og:description', 'content' => $description]);
             }
 
+            if ($robots = $this->_Sender->data('_robots')) {
+                $this->addTag('meta', ['name' => 'robots', 'content' => $robots]);
+            }
+
             $hasRelevantImage = false;
 
             // Default to the site logo if there were no images provided by the controller.

@@ -168,10 +168,14 @@ class AuthenticateApiController extends AbstractApiController {
         return Schema::parse([
             'authenticatorID' => null,
             'type' => null,
+            'isUnique' => null,
             'name' => null,
             'ui' => null,
+            'sso?' => Schema::parse([
+                'canAutoLinkUser' => null,
+            ])->add(SSOAuthenticator::getAuthenticatorSchema()->getField('properties.sso')),
             'isUserLinked:b?' => 'Whether or not the user is linked to that authenticator.',
-        ])->merge(SSOAuthenticator::getAuthenticatorSchema());
+        ])->add(SSOAuthenticator::getAuthenticatorSchema());
     }
 
     /**
@@ -188,7 +192,7 @@ class AuthenticateApiController extends AbstractApiController {
             'isSSO:b?' => 'Filters authenticators depending on if they are SSO authenticators or not.',
             'isUserLinked:b?' => 'Filter authenticators based on whether a user is linked to it or not. Users can only be linked to SSO authenticators.'
         ], 'in')->setDescription('List active authenticators.');
-        $out = $this->schema([':a', $this->getAuthenticatorPublicSchema()], 'out');
+        $out = $this->schema([':a' => $this->getAuthenticatorPublicSchema()], 'out');
 
         $query = $in->validate($query);
 
@@ -224,9 +228,12 @@ class AuthenticateApiController extends AbstractApiController {
             return true;
         };
 
-        $authenticators = array_filter($this->authenticatorApiController->getAuthenticatorModel()->getAuthenticators(), $filter);
+        $authenticators = array_filter($this->authenticatorApiController->getAuthenticatorModel()->getAuthenticators(true), $filter);
 
         $result = array_map([$this->authenticatorApiController, 'normalizeOutput'], $authenticators);
+
+        // Reset keys otherwise the array could be interpreted as an associative array (read object) by $out->validate.
+        $result = array_values($result);
 
         return $out->validate($result);
     }

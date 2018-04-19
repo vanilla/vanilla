@@ -139,8 +139,10 @@ abstract class ConversationsModel extends Gdn_Model {
      * @param array|object $conversation
      * @param array|object $message
      * @param array $notifyUserIDs
+     * @param array $options
      */
-    protected function notifyUsers($conversation, $message, $notifyUserIDs) {
+    protected function notifyUsers($conversation, $message, $notifyUserIDs, $options = [])
+    {
         $conversation = (array)$conversation;
         $message = (array)$message;
 
@@ -155,6 +157,15 @@ abstract class ConversationsModel extends Gdn_Model {
             'Format' => val('Format', $message, c('Garden.InputFormatter')),
             'Route' => "/messages/{$conversation['ConversationID']}#Message_{$message['MessageID']}"
         ];
+
+        if (isset($options['Invite'])) {
+            $isInvite = val('Invite', $options);
+            if ($isInvite) {
+                $activity['ActionText'] = t('Join');
+                $activity['Route'] = $options['Url'];
+            }
+
+        }
 
         $subject = val('subject', $conversation);
         if ($subject) {

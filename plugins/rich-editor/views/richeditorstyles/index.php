@@ -77,7 +77,7 @@
         >
             <li
               id="[idOfAtMentionMenu-item1]"
-              class="richEditor-menuItem atMentionList-item isSelected"
+              class="richEditor-menuItem atMentionList-item isActive"
               role="option"
               aria-selected="true"
             >

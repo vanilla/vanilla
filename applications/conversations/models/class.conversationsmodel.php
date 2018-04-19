@@ -158,13 +158,12 @@ abstract class ConversationsModel extends Gdn_Model {
             'Route' => "/messages/{$conversation['ConversationID']}#Message_{$message['MessageID']}"
         ];
 
-        if (isset($options['Invite'])) {
-            $isInvite = val('Invite', $options);
-            if ($isInvite) {
-                $activity['ActionText'] = t('Join');
-                $activity['Route'] = $options['Url'];
-            }
+        if (isset($options['Url']) && !empty($options['Url'])) {
+            $activity['Route'] = $options['Url'];
+        }
 
+        if (isset($options['ActionText']) && !empty($options['ActionText'])) {
+            $activity['ActionText'] = t($options['ActionText']);
         }
 
         $subject = val('subject', $conversation);

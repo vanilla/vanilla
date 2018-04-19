@@ -4,31 +4,7 @@
     </p>
     <div class="richEditor-frame InputBox">
         <div class="js-richText">
-            <div class="ql-editor richEditor-text userContent" data-gramm="false" contenteditable="true" data-placeholder="Create a new post...">
-
-                <span class="atMention">
-                    <span class="atMention-menuPosition">
-                        <ul class="atMention-items MenuItems">
-                            <li class="richEditor-menuItem atMention-item" role="menuitem">
-                                <button class="atMention-suggestion">
-                                    <span class="atMention-user">
-                                        <span class="PhotoWrap atMention-photoWrap">
-                                            <img src="https://secure.gravatar.com/avatar/b0420af06d6fecc16fc88a88cbea8218/?default=https%3A%2F%2Fvanillicon.com%2Fb0420af06d6fecc16fc88a88cbea8218_200.png&amp;rating=g&amp;size=120" alt="Linc" class="atMention-photo ProfilePhoto">
-                                        </span>
-                                        <span class="atMention-userName">
-                                            <mark class="atMention-mark">Fra</mark>nkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkk
-                                        </span>
-                                    </span>
-                                </button>
-                            </li>
-                        </ul>
-                    </span>
-                    <span class="atMention-text">
-                        Fra
-                    </span>
-                </span>
-
-            </div>
+            <div class="ql-editor richEditor-text userContent" data-gramm="false" contenteditable="true" data-placeholder="Create a new post..."></div>
         </div>
         <div class="richEditor-menu richEditorParagraphMenu">
             <button class="richEditor-button richEditorParagraphMenu-handle" type="button" aria-haspopup="menu" aria-expanded="false" aria-controls="tempId-paragraphLevelMenu-toggle">
@@ -84,29 +60,139 @@
 
 <hr/>
 
-<h2>@mentions</h2>
+<h2>@mentions - Component (in editor)</h2>
 
-<span class="atMention">
-    <span class="atMention-menuPosition">
-        <ul class="atMention-items MenuItems">
-            <li class="richEditor-menuItem atMention-item" role="menuitem">
-                <button class="atMention-suggestion">
-                    <span class="atMention-user">
-                        <span class="PhotoWrap atMention-photoWrap">
-                            <img src="https://secure.gravatar.com/avatar/b0420af06d6fecc16fc88a88cbea8218/?default=https%3A%2F%2Fvanillicon.com%2Fb0420af06d6fecc16fc88a88cbea8218_200.png&amp;rating=g&amp;size=120" alt="Linc" class="atMention-photo ProfilePhoto">
+<h3>List</h3>
+
+
+<div style="position: relative; height: 200px;"> <!-- Div for styleguide only -->
+
+
+    <span class="atMentionList">
+        <ul
+          id="[idOfAtMentionMenu]"
+          aria-label="{t('@mention user list')}"
+          class="atMentionList-items MenuItems"
+          role="listbox"
+        >
+            <li
+              id="[idOfAtMentionMenu-item1]"
+              class="richEditor-menuItem atMentionList-item isSelected"
+              role="option"
+              aria-selected="true"
+            >
+                <button class="atMentionList-suggestion">
+                    <span class="atMentionList-user">
+                        <span class="PhotoWrap atMentionList-photoWrap">
+                            <img src="https://secure.gravatar.com/avatar/b0420af06d6fecc16fc88a88cbea8218/?default=https%3A%2F%2Fvanillicon.com%2Fb0420af06d6fecc16fc88a88cbea8218_200.png&amp;rating=g&amp;size=120" alt="Linc" class="atMentionList-photo ProfilePhoto">
                         </span>
-                        <span class="atMention-userName">
-                            <mark class="atMention-mark">Fra</mark>nkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkk
+                        <span class="atMentionList-userName">
+                            <mark class="atMentionList-mark">Fra</mark>nkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkk
+                        </span>
+                    </span>
+                </button>
+            </li>
+            <li
+              id="[idOfAtMentionMenu-item2]"
+              class="richEditor-menuItem atMentionList-item"
+              role="option"
+              aria-selected="false"
+            >
+                <button class="atMentionList-suggestion">
+                    <span class="atMentionList-user">
+                        <span class="PhotoWrap atMentionList-photoWrap">
+                            <img src="https://secure.gravatar.com/avatar/b0420af06d6fecc16fc88a88cbea8218/?default=https%3A%2F%2Fvanillicon.com%2Fb0420af06d6fecc16fc88a88cbea8218_200.png&amp;rating=g&amp;size=120" alt="Linc" class="atMentionList-photo ProfilePhoto">
+                        </span>
+                        <span class="atMentionList-userName">
+                            <mark class="atMentionList-mark">Fra</mark>nkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkk
+                        </span>
+                    </span>
+                </button>
+            </li>
+            <li
+              id="[idOfAtMentionMenu-item3]"
+              class="richEditor-menuItem atMentionList-item"
+              role="option"
+              aria-selected="false"
+            >
+                <button class="atMentionList-suggestion">
+                    <span class="atMentionList-user">
+                        <span class="PhotoWrap atMentionList-photoWrap">
+                            <img src="https://secure.gravatar.com/avatar/b0420af06d6fecc16fc88a88cbea8218/?default=https%3A%2F%2Fvanillicon.com%2Fb0420af06d6fecc16fc88a88cbea8218_200.png&amp;rating=g&amp;size=120" alt="Linc" class="atMentionList-photo ProfilePhoto">
+                        </span>
+                        <span class="atMentionList-userName">
+                            <mark class="atMentionList-mark">Fra</mark>nkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkk
+                        </span>
+                    </span>
+                </button>
+            </li>
+            <li
+              id="[idOfAtMentionMenu-item4]"
+              class="richEditor-menuItem atMentionList-item"
+              role="option"
+              aria-selected="false"
+            >
+                <button class="atMentionList-suggestion">
+                    <span class="atMentionList-user">
+                        <span class="PhotoWrap atMentionList-photoWrap">
+                            <img src="https://secure.gravatar.com/avatar/b0420af06d6fecc16fc88a88cbea8218/?default=https%3A%2F%2Fvanillicon.com%2Fb0420af06d6fecc16fc88a88cbea8218_200.png&amp;rating=g&amp;size=120" alt="Linc" class="atMentionList-photo ProfilePhoto">
+                        </span>
+                        <span class="atMentionList-userName">
+                            <mark class="atMentionList-mark">Fra</mark>nkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkk
+                        </span>
+                    </span>
+                </button>
+            </li>
+            <li
+              id="[idOfAtMentionMenu-item5]"
+              class="richEditor-menuItem atMentionList-item"
+              role="option"
+              aria-selected="false"
+            >
+                <button class="atMentionList-suggestion">
+                    <span class="atMentionList-user">
+                        <span class="PhotoWrap atMentionList-photoWrap">
+                            <img src="https://secure.gravatar.com/avatar/b0420af06d6fecc16fc88a88cbea8218/?default=https%3A%2F%2Fvanillicon.com%2Fb0420af06d6fecc16fc88a88cbea8218_200.png&amp;rating=g&amp;size=120" alt="Linc" class="atMentionList-photo ProfilePhoto">
+                        </span>
+                        <span class="atMentionList-userName">
+                            <mark class="atMentionList-mark">Fra</mark>nkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkk
                         </span>
                     </span>
                 </button>
             </li>
         </ul>
     </span>
-    <span class="atMention-text">
+</div>
+
+<h3>Edit</h3>
+<span
+      id="[idOfAtMentionComboBox]"
+      class="atMentionComboBox"
+      role="combobox"
+      aria-haspopup="listbox"
+      aria-owns="[idOfAtMentionMenu]"
+      aria-expanded="true"
+      aria-activedescendant="[idOfAtMentionMenu-item1]"
+>
+    <span
+      role="textbox"
+      aria-label="{t('@mention a user')}"
+      aria-autocomplete="both"
+      aria-controls="[idOfAtMentionMenu]"
+      aria-activedescendant="[idOfAtMentionMenu-item]"
+    >
         Fra
     </span>
 </span>
+
+
+<h3>Rendered</h3>
+
+<a href="#" class="atMention">
+    @someUser
+</a>
+
+<hr/>
 
 
 <h2>Paragraph Level Formatting Menu</h2>
@@ -203,39 +289,6 @@
                     <path d="M9.108,12.272a.731.731,0,0,0,.909.08l1.078.9a2.094,2.094,0,0,1-2.889.087l-2.4-2.019A2.089,2.089,0,0,1,5.443,8.4L6.892,6.679a2.088,2.088,0,0,1,2.942-.144l2.4,2.019a2.089,2.089,0,0,1,.362,2.924l-.1.114-1.073-.9.1-.114a.705.705,0,0,0-.192-.95l-2.4-2.019a.7.7,0,0,0-.968-.026L6.516,9.3a.7.7,0,0,0,.191.95Zm9.085,1.293a2.088,2.088,0,0,1,.362,2.924l-1.448,1.722a2.088,2.088,0,0,1-2.942.144l-2.4-2.019a2.1,2.1,0,0,1-.409-2.86l1.077.9a.73.73,0,0,0,.235.883l2.4,2.019a.7.7,0,0,0,.968.026l1.448-1.722a.7.7,0,0,0-.192-.95l-2.4-2.019a.7.7,0,0,0-.967-.026l-.1.115-1.072-.9.1-.115a2.087,2.087,0,0,1,2.942-.144ZM10.028,10.6a.466.466,0,0,1,.658-.057l3.664,3.082a.467.467,0,0,1,.057.658l-.308.366a.466.466,0,0,1-.658.057L9.776,11.626a.469.469,0,0,1-.057-.659Z" style="fill: currentColor;"/>
                 </svg>
             </button>
-        </li>
-    </ul>
-</div>
-
-<hr/>
-
-<h2>@mention menu</h2>
-<div class="richEditor-menu atMention" role="dialog" aria-label="<?php echo t('Insert @Mention User Link') ?>">
-    <ul class="atMention-items MenuItems" role="menu">
-        <li class="richEditor-menuItem atMention-item" role="menuitem">
-            <a href="#" class="atMention-link">
-                <span class="atMention-user">
-                    <span class="PhotoWrap atMention-photoWrap">
-                        <img src="https://secure.gravatar.com/avatar/b0420af06d6fecc16fc88a88cbea8218/?default=https%3A%2F%2Fvanillicon.com%2Fb0420af06d6fecc16fc88a88cbea8218_200.png&amp;rating=g&amp;size=120" alt="Linc" class="atMention-photo ProfilePhoto"/>
-                    </span>
-                    <span class="atMention-userName">
-                        <mark class="atMention-mark">Fra</mark>nkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkz
-                    </span>
-                </span>
-            </a>
-        </li>
-
-        <li class="richEditor-menuItem atMention-item" role="menuitem">
-            <a href="#" class="atMention-link">
-                <span class="atMention-user">
-                    <span class="PhotoWrap atMention-photoWrap">
-                        <img src="https://secure.gravatar.com/avatar/b0420af06d6fecc16fc88a88cbea8218/?default=https%3A%2F%2Fvanillicon.com%2Fb0420af06d6fecc16fc88a88cbea8218_200.png&amp;rating=g&amp;size=120" alt="Linc" class="atMention-photo ProfilePhoto"/>
-                    </span>
-                    <span class="atMention-userName">
-                        <mark class="atMention-mark">Fra</mark>nk
-                    </span>
-                </span>
-            </a>
         </li>
     </ul>
 </div>

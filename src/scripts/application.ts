@@ -86,21 +86,20 @@ export function translate(str: string, defaultTranslation?: string): string {
 export const t = translate;
 
 /**
- * Determine if a string is an allowed URL. Some domains may be whitelisted or blacklisted.
+ * Determine if a string is an allowed URL.
+ *
+ * In the future this may be extended to check if we want to whitelist/blacklist various URLs.
  *
  * @param input - The string to check.
  */
 export function isAllowedUrl(input: string): boolean {
-    // TODO: Check for allowed/whitelisted/blacklisted urls here.
+    // Options https://github.com/chriso/validator.js#validators
     const options = {
         protocols: ["http", "https", "ftp"],
         require_tld: true,
         require_protocol: true,
         require_host: true,
         require_valid_protocol: true,
-        allow_underscores: false,
-        host_whitelist: false,
-        host_blacklist: false,
         allow_trailing_dot: false,
         allow_protocol_relative_urls: false,
     };

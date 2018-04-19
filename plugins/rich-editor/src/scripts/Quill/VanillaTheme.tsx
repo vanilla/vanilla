@@ -44,8 +44,7 @@ export default class VanillaTheme extends ThemeBase {
 
         // Add keyboard bindings to options.
         this.addModule("embed/insertion");
-        this.addModule("embed/focus");
-        const embedFocus = new EmbedFocusModule(this.quill, this.options);
+        const embedFocus = this.addModule("embed/focus");
         const keyboardBindings = new KeyboardBindings(this.quill);
         this.options.modules.keyboard.bindings = {
             ...this.options.modules.keyboard.bindings,

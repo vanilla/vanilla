@@ -647,8 +647,20 @@ class Gdn_Request implements RequestInterface {
             return false;
         }
 
-        $transientKey = $this->post('TransientKey', $this->post('transientKey', $this->getHeader('X-Transient-Key')));
-        $result = Gdn::session()->validateTransientKey($transientKey, false);
+        if (
+            // https://www.owasp.org/index.php/Cross-Site_Request_Forgery_(CSRF)_Prevention_Cheat_Sheet#Protecting_REST_Services:_Use_of_Custom_Request_Headers
+            $this->hasHeader('X-Requested-With') &&
+            // https://www.owasp.org/index.php/Cross-Site_Request_Forgery_(CSRF)_Prevention_Cheat_Sheet#Identifying_Source_Origin
+            $this->getHost() === parse_url($this->getHeader('Referer'), PHP_URL_HOST) &&
+            (!$this->hasHeader('Origin') || $this->getHost() === parse_url($this->getHeader('Origin'), PHP_URL_HOST))
+        ) {
+            // Check Origin, Referer, and X-Requested-With.
+            $result = true;
+        } else {
+            // Check a submitted transient key.
+            $transientKey = $this->post('TransientKey', $this->post('transientKey', $this->getHeader('X-Transient-Key')));
+            $result = Gdn::session()->validateTransientKey($transientKey, false);
+        }
 
         if (!$result && $throw) {
             throw new Gdn_UserException(t('Invalid CSRF token.', 'Invalid CSRF token. Please try again.'), 403);

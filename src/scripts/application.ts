@@ -95,7 +95,7 @@ export const t = translate;
 export function isAllowedUrl(input: string): boolean {
     // Options https://github.com/chriso/validator.js#validators
     const options = {
-        protocols: ["http", "https", "ftp"],
+        protocols: ["http", "https"],
         require_tld: true,
         require_protocol: true,
         require_host: true,

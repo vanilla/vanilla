@@ -1219,6 +1219,19 @@ label.checkbox input.checkbox-input {
   user-select: none;
 }
 
+.embed-focusableElement {
+  transition: 0.2s ease outline;
+  outline: 2px transparent solid;
+}
+
+.embed-focusableElement:hover {
+  outline-color: rgba(2, 145, 219, 0.5);
+}
+
+.embed-focusableElement:focus {
+  outline-color: #0291DB;
+}
+
 .embedLoader-icon {
   display: inline-block;
   width: 24px;
@@ -1345,19 +1358,6 @@ label.checkbox input.checkbox-input {
   margin: auto;
 }
 
-.embedImage-img {
-  transition: 0.2s ease border;
-  border: 2px transparent solid;
-}
-
-.embedImage-img:hover {
-  border-color: rgba(2, 145, 219, 0.5);
-}
-
-.embedImage-img:focus {
-  border-color: #0291DB;
-}
-
 .embedVideo {
   position: relative;
   display: block;
@@ -1439,21 +1439,11 @@ label.checkbox input.checkbox-input {
   display: block;
   background: #ffffff;
   box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.3);
-  transition: 0.2s ease border;
-  border: 2px transparent solid;
 }
 
 .embedLink, .embedLink:hover, .embedLink:focus {
   color: inherit;
   text-decoration: none !important;
-}
-
-.embedLink:hover {
-  border-color: rgba(2, 145, 219, 0.5);
-}
-
-.embedLink:focus {
-  border-color: #0291DB;
 }
 
 .embedLink-body {

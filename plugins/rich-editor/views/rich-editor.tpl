@@ -3,6 +3,7 @@
         {t c="richEditor.description.title"}
         {t c="richEditor.description.paragraphMenu"}
         {t c="richEditor.description.inlineMenu"}
+        {t c="richEditor.description.embed"}
     </p>
     <div class="richEditor-frame InputBox">
         <div class="js-richText">

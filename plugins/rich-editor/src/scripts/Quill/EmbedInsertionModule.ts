@@ -150,11 +150,16 @@ export default class EmbedInsertionModule extends Module {
         logError(error.message);
 
         if (lookupKey == null) {
-            this.quill.insertEmbed(this.lastSelection.index, "embed-error", { errors: [error] }, Emitter.sources.USER);
+            this.quill.insertEmbed(
+                this.lastSelection.index,
+                "embed-error",
+                { message: error.message },
+                Emitter.sources.USER,
+            );
             return;
         }
 
-        const errorBlot = Parchment.create("embed-error", { errors: [error] });
+        const errorBlot = Parchment.create("embed-error", { message: error.message });
         const loadingBlot = this.currentUploads.get(lookupKey);
 
         // The loading blot may have been undone/deleted since we created it.

@@ -680,57 +680,62 @@ $embedded-quote_fg: #A3A3A3 !default;
 
 // Handle gutter for paragraph menu
 
-// New Discussions
-.Section-PostDiscussion {
-    #DiscussionForm {
-        select {
-            max-width: 100%;
-        }
 
-        .FormWrapper {
-            padding: {
-                left: $richEditor-pilcrow_gutter;
+
+body.hasRichEditor {
+    // New Discussions
+    &.Section-PostDiscussion {
+        #DiscussionForm {
+            select {
+                max-width: 100%;
             }
 
-            .richEditor {
-                padding-left: $richEditor-pilcrow_gutter;
+            .FormWrapper {
+                padding: {
+                    left: $richEditor-pilcrow_gutter;
+                }
+
+                .richEditor {
+                    padding-left: $richEditor-pilcrow_gutter;
+                }
             }
         }
     }
-}
 
-// Comment
-.CommentForm {
-    .CommentFormWrap {
+
+    // Comment
+    .CommentForm {
+        .CommentFormWrap {
+            .Form-HeaderWrap {
+                display: none;
+            }
+
+            .FormWrapper {
+                padding-left: 0;
+            }
+        }
+    }
+
+    // Activity
+    .DataListWrap {
+        .FormWrapper.FormWrapper-Condensed {
+            padding-left: 0;
+        }
+    }
+
+    // New Message
+    #MessageForm,
+    #ConversationForm {
         .Form-HeaderWrap {
             display: none;
         }
 
         .FormWrapper {
-            padding-left: 0;
-        }
-    }
-}
+            padding-left: $richEditor-pilcrow_gutter;
 
-// Activity
-.DataListWrap {
-    .FormWrapper.FormWrapper-Condensed {
-        padding-left: 0;
-    }
-}
-
-// New Message
-#MessageForm,
-#ConversationForm {
-    .Form-HeaderWrap {
-        display: none;
-    }
-
-    .FormWrapper {
-        padding-left: $richEditor-pilcrow_gutter;
-
-        .richEditor {
-            padding-left: 0;
+            .richEditor {
+                padding-left: 0;
+            }
         }
     }
 }

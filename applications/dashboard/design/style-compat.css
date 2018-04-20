@@ -1096,42 +1096,42 @@ label.checkbox input.checkbox-input {
   font-weight: 600;
 }
 
-.Section-PostDiscussion #DiscussionForm select {
+body.hasRichEditor.Section-PostDiscussion #DiscussionForm select {
   max-width: 100%;
 }
 
-.Section-PostDiscussion #DiscussionForm .FormWrapper {
+body.hasRichEditor.Section-PostDiscussion #DiscussionForm .FormWrapper {
   padding-left: 36px;
 }
 
-.Section-PostDiscussion #DiscussionForm .FormWrapper .richEditor {
+body.hasRichEditor.Section-PostDiscussion #DiscussionForm .FormWrapper .richEditor {
   padding-left: 36px;
 }
 
-.CommentForm .CommentFormWrap .Form-HeaderWrap {
+body.hasRichEditor .CommentForm .CommentFormWrap .Form-HeaderWrap {
   display: none;
 }
 
-.CommentForm .CommentFormWrap .FormWrapper {
+body.hasRichEditor .CommentForm .CommentFormWrap .FormWrapper {
   padding-left: 0;
 }
 
-.DataListWrap .FormWrapper.FormWrapper-Condensed {
+body.hasRichEditor .DataListWrap .FormWrapper.FormWrapper-Condensed {
   padding-left: 0;
 }
 
-#MessageForm .Form-HeaderWrap,
-#ConversationForm .Form-HeaderWrap {
+body.hasRichEditor #MessageForm .Form-HeaderWrap,
+body.hasRichEditor #ConversationForm .Form-HeaderWrap {
   display: none;
 }
 
-#MessageForm .FormWrapper,
-#ConversationForm .FormWrapper {
+body.hasRichEditor #MessageForm .FormWrapper,
+body.hasRichEditor #ConversationForm .FormWrapper {
   padding-left: 36px;
 }
 
-#MessageForm .FormWrapper .richEditor,
-#ConversationForm .FormWrapper .richEditor {
+body.hasRichEditor #MessageForm .FormWrapper .richEditor,
+body.hasRichEditor #ConversationForm .FormWrapper .richEditor {
   padding-left: 0;
 }
 

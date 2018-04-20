@@ -504,6 +504,32 @@ label.checkbox input.checkbox-input {
   padding: 0;
 }
 
+.pageHeading {
+  display: flex;
+  width: 100%;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.pageHeading .pageHeading-title {
+  display: block;
+  margin-top: 0;
+  margin-bottom: 0;
+}
+
+.pageHeading-main {
+  position: relative;
+  display: block;
+  max-width: 100%;
+  flex-grow: 1;
+}
+
+.pageHeading-actions {
+  display: flex;
+  align-self: center;
+  max-width: 100%;
+}
+
 @keyframes spinnerLoader {
   0% {
     transform: rotate(73deg);

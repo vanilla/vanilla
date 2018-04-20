@@ -14,10 +14,11 @@
 @import "new-components/authenticateUser";
 @import "new-components/followButton";
 @import "new-components/selectBox";
-@import "new-components/formElements"; // For new pages with form ony
-@import "new-components/checkboxAndRadioButton"; // For new pages with form ony
-@import "new-components/buttons"; // For new pages with form ony
-@import "new-components/passwordStrength"; // For new pages with form ony
+@import "new-components/formElements"; // For new authentication pages
+@import "new-components/checkboxAndRadioButton"; // For new forms only
+@import "new-components/buttons"; // For new authentication pages
+@import "new-components/passwordStrength"; // For new authentication pages
+@import "new-components/_pageHeading.scss";
 
 // Editor
 @import "editor/mixins";

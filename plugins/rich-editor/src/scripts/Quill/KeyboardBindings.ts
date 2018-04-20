@@ -110,8 +110,9 @@ export default class KeyboardBindings {
             return true;
         }
 
-        const textContent = line.domNode.textContent || "";
-        if (isAllowedUrl(textContent.trim())) {
+        let textContent = line.domNode.textContent || "";
+        textContent = textContent.trim();
+        if (isAllowedUrl(textContent)) {
             const embedInsertionModule: EmbedInsertionModule = this.quill.getModule("embed/insertion");
             const index = line.offset();
             this.quill.deleteText(index, line.length());

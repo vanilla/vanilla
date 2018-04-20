@@ -13,9 +13,6 @@ if (!$CancelUrl) {
     if ($this->deliveryType() == DELIVERY_TYPE_ALL) {
         echo wrap($this->data('Title'), 'h1', ['class' => 'H']);
     }
-
-
-
     echo '<div class="FormWrapper">';
     echo $this->Form->open();
     echo $this->Form->errors();

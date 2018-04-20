@@ -115,9 +115,9 @@ export default class KeyboardBindings {
         if (isAllowedUrl(textContent)) {
             const embedInsertionModule: EmbedInsertionModule = this.quill.getModule("embed/insertion");
             const index = line.offset();
-            this.quill.deleteText(index, line.length());
-            this.quill.insertText(index, "\n");
-            this.quill.setSelection(index, 0);
+            this.quill.deleteText(index, line.length(), Quill.sources.USER);
+            this.quill.insertText(index, "\n", Quill.sources.USER);
+            this.quill.setSelection(index, 0, Quill.sources.USER);
             embedInsertionModule.scrapeMedia(textContent);
             return false;
         }

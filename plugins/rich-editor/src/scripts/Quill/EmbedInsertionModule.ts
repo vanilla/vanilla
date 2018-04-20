@@ -178,11 +178,19 @@ export default class EmbedInsertionModule extends Module {
         loadingBlot.insertInto(this.quill.scroll, referenceBlot);
         this.quill.update(Emitter.sources.USER);
 
-        this.quill.setSelection(this.lastSelection.index + 1, 0);
+        const newSelection = {
+            index: this.lastSelection.index + 2,
+            length: 0,
+        };
+        this.quill.setSelection(newSelection, Quill.sources.USER);
 
         loadingBlot.registerDeleteCallback(() => {
             if (this.currentUploads.has(lookupKey)) {
                 this.currentUploads.delete(lookupKey);
+                this.quill.update();
+
+                // Restore the selection.
+                this.quill.setSelection(newSelection, Quill.sources.USER);
             }
         });
 

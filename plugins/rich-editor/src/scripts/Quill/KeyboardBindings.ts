@@ -15,9 +15,13 @@ import {
     insertNewLineAtEndOfScroll,
     insertNewLineAtStartOfScroll,
 } from "./utility";
+import { isAllowedUrl } from "@core/application";
 import LineBlot from "./Blots/Abstract/LineBlot";
 import CodeBlockBlot from "./Blots/Blocks/CodeBlockBlot";
 import FocusableEmbedBlot from "./Blots/Abstract/FocusableEmbedBlot";
+import EmbedInsertionModule from "./EmbedInsertionModule";
+import LinkBlot from "quill/formats/link";
+import BlockBlot from "quill/blots/block";
 import Parchment from "parchment";
 
 export default class KeyboardBindings {
@@ -30,6 +34,7 @@ export default class KeyboardBindings {
         this.addBlockNewLineHandlers();
         this.addBlockArrowKeyHandlers();
         this.addBlockBackspaceHandlers();
+        this.addLinkTransformKeyboardBindings();
     }
 
     /**
@@ -45,6 +50,80 @@ export default class KeyboardBindings {
         this.bindings["embed left"] = false;
         this.bindings["embed right"] = false;
     }
+
+    private addLinkTransformKeyboardBindings() {
+        this.bindings["transform text to embed"] = {
+            key: KeyboardModule.keys.ENTER,
+            collapsed: true,
+            handler: this.transformLinkOnlyLineToEmbed,
+        };
+    }
+
+    /**
+     * Convert the last word of a line that is formatted like a link into an actual link.
+     */
+    private transformTextToLink = (range: RangeStatic) => {
+        const line: Blot = this.quill.getLine(range.index)[0];
+        const lineStart = line.offset();
+        const textUntilSpace = this.quill.getText(lineStart, range.index);
+        const results = textUntilSpace.match(/\s([^\s]+)$|^([^\s]+)$/);
+        if (!results) {
+            return true;
+        }
+
+        const lastWord = results[1] || results[2];
+        const lineIndex = results.index || 0;
+        let index = lineStart + lineIndex;
+        const length = lastWord.length;
+
+        if (results[1]) {
+            // Javascript has no lookbehinds so the space is part of the match. We need to adjust things to compensate.
+            index += 1;
+        }
+
+        const isAlreadyLink = this.quill.scroll.descendants(LinkBlot, index, length).length > 0;
+
+        if (isAllowedUrl(lastWord) && !isAlreadyLink) {
+            this.quill.formatText(index, length, { link: lastWord }, Quill.sources.USER);
+        }
+        return true;
+    };
+
+    /**
+     * Transform plain text of a link alone on its own line with no other formatting into a link embed.
+     */
+    private transformLinkOnlyLineToEmbed = (range: RangeStatic) => {
+        const line: Blot = this.quill.getLine(range.index)[0];
+
+        // Bail out if we weren't at the end of the line.
+        if (range.index < line.offset() + line.length() - 1) {
+            return true;
+        }
+
+        // Bail out if blot isn't a plain Block.
+        if (line.statics.blotName !== "block") {
+            return true;
+        }
+
+        // Bail out if the blot contents are not plian text.
+        if ((line as BlockBlot).children.length > 1 || (line as any).children.head.statics.blotName !== "text") {
+            return true;
+        }
+
+        let textContent = line.domNode.textContent || "";
+        textContent = textContent.trim();
+        if (isAllowedUrl(textContent)) {
+            const embedInsertionModule: EmbedInsertionModule = this.quill.getModule("embed/insertion");
+            const index = line.offset();
+            this.quill.deleteText(index, line.length(), Quill.sources.USER);
+            this.quill.insertText(index, "\n", Quill.sources.USER);
+            this.quill.setSelection(index, 0, Quill.sources.USER);
+            embedInsertionModule.scrapeMedia(textContent);
+            return false;
+        }
+
+        return true;
+    };
 
     /**
      * Add custom handlers for backspace inside of Blots.

@@ -43,8 +43,8 @@ export default class VanillaTheme extends ThemeBase {
         this.quill.root.addEventListener("focusin", () => closeEditorFlyouts());
 
         // Add keyboard bindings to options.
-        const embedFocus = new EmbedFocusModule(this.quill, this.options);
-
+        this.addModule("embed/insertion");
+        const embedFocus = this.addModule("embed/focus");
         const keyboardBindings = new KeyboardBindings(this.quill);
         this.options.modules.keyboard.bindings = {
             ...this.options.modules.keyboard.bindings,
@@ -60,8 +60,6 @@ export default class VanillaTheme extends ThemeBase {
     }
 
     public init() {
-        (this.quill as any).embed = this.addModule("embed/insertion");
-
         // Mount react components
         this.mountToolbar();
         this.mountEmojiMenu();

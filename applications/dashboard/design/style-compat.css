@@ -700,7 +700,7 @@ label.checkbox input.checkbox-input {
 }
 
 .richEditor-upload {
-  display: none;
+  display: none !important;
 }
 
 .embedBar {
@@ -1120,6 +1120,45 @@ label.checkbox input.checkbox-input {
   user-select: all;
   color: inherit;
   font-weight: 600;
+}
+
+body.hasRichEditor.Section-PostDiscussion #DiscussionForm select {
+  max-width: 100%;
+}
+
+body.hasRichEditor.Section-PostDiscussion #DiscussionForm .FormWrapper {
+  padding-left: 36px;
+}
+
+body.hasRichEditor.Section-PostDiscussion #DiscussionForm .FormWrapper .richEditor {
+  padding-left: 0;
+}
+
+body.hasRichEditor .CommentForm .CommentFormWrap .Form-HeaderWrap {
+  display: none;
+}
+
+body.hasRichEditor .CommentForm .CommentFormWrap .FormWrapper {
+  padding-left: 0;
+}
+
+body.hasRichEditor .DataListWrap .FormWrapper.FormWrapper-Condensed {
+  padding-left: 0;
+}
+
+body.hasRichEditor #MessageForm .Form-HeaderWrap,
+body.hasRichEditor #ConversationForm .Form-HeaderWrap {
+  display: none;
+}
+
+body.hasRichEditor #MessageForm .FormWrapper,
+body.hasRichEditor #ConversationForm .FormWrapper {
+  padding-left: 36px;
+}
+
+body.hasRichEditor #MessageForm .FormWrapper .richEditor,
+body.hasRichEditor #ConversationForm .FormWrapper .richEditor {
+  padding-left: 0;
 }
 
 .spoiler {

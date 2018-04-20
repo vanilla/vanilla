@@ -67,7 +67,7 @@ HTML;
 
         $result = <<<HTML
 <a class="embed-link embed embedLink" href="{$urlEncoded}" target="_blank" rel="noopener noreferrer">
-    <article class="embedLink-body">    
+    <article class="embedLink-body">
         {$image}
         <div class="embedLink-main">
             <div class="embedLink-header">

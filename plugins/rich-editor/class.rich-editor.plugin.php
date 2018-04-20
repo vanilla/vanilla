@@ -35,7 +35,7 @@ class RichEditorPlugin extends Gdn_Plugin {
         if (inSection("Dashboard")) {
             return;
         }
-
+        $sender->CssClass .= ' hasRichEditor';
         $sender->addDefinition("editor", "RichEditor");
     }
 

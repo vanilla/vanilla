@@ -267,12 +267,13 @@ class CategoriesController extends VanillaController {
                 'EnableFollowingFilter' => &$enableFollowingFilter
             ]);
 
+            $saveFollowing = Gdn::request()->get('save') && Gdn::session()->validateTransientKey(Gdn::request()->get('TransientKey', ''));
             $followed = paramPreference(
                 'followed',
                 'FollowedCategories',
                 'Vanilla.SaveFollowingPreference',
                 null,
-                Gdn::request()->get('save')
+                $saveFollowing
             );
         } else {
             $enableFollowingFilter = $followed = false;

@@ -1105,7 +1105,7 @@ body.hasRichEditor.Section-PostDiscussion #DiscussionForm .FormWrapper {
 }
 
 body.hasRichEditor.Section-PostDiscussion #DiscussionForm .FormWrapper .richEditor {
-  padding-left: 36px;
+  padding-left: 0;
 }
 
 body.hasRichEditor .CommentForm .CommentFormWrap .Form-HeaderWrap {

@@ -18,7 +18,6 @@ it("unescapes html", () => {
 });
 
 describe("delegateEvent", () => {
-
     beforeEach(() => {
         domUtility.removeAllDelegatedEvents();
 
@@ -38,20 +37,20 @@ describe("delegateEvent", () => {
 
     test("A event can be registered successfully", () => {
         const callback = jest.fn();
-        domUtility.delegateEvent("click", null, callback);
+        domUtility.delegateEvent("click", "", callback);
 
-        const button = document.querySelector(".filterSelector");
+        const button = document.querySelector(".filterSelector") as HTMLElement;
         button.click();
         expect(callback.mock.calls.length).toBe(1);
     });
 
     test("identical events will not be registered twice", () => {
         const callback = jest.fn();
-        domUtility.delegateEvent("click", null, callback);
-        domUtility.delegateEvent("click", null, callback);
-        domUtility.delegateEvent("click", null, callback);
+        domUtility.delegateEvent("click", "", callback);
+        domUtility.delegateEvent("click", "", callback);
+        domUtility.delegateEvent("click", "", callback);
 
-        const button = document.querySelector(".filterSelector");
+        const button = document.querySelector(".filterSelector") as HTMLElement;
         button.click();
         expect(callback.mock.calls.length).toBe(1);
     });
@@ -64,7 +63,7 @@ describe("delegateEvent", () => {
         });
 
         test("events can be delegated to their filterSelector", () => {
-            document.querySelectorAll(".filterSelector").forEach(button => {
+            document.querySelectorAll(".filterSelector").forEach((button: HTMLElement) => {
                 button.click();
             });
             expect(callback.mock.calls.length).toBe(2);
@@ -73,24 +72,23 @@ describe("delegateEvent", () => {
         test("delegated events only match their filterSelector", () => {
             callback.mockReset();
 
-            document.querySelectorAll(".altFilterSelector").forEach(button => {
+            document.querySelectorAll(".altFilterSelector").forEach((button: HTMLElement) => {
                 button.click();
-            })
+            });
 
             expect(callback.mock.calls.length).toBe(0);
-        })
+        });
     });
-
 
     describe("delegation scoping works", () => {
         const callback = jest.fn();
 
         beforeEach(() => {
-            domUtility.delegateEvent("click", null, callback, ".scope1");
+            domUtility.delegateEvent("click", "", callback, ".scope1");
         });
 
         test("events can be scoped to their scopeSelector", () => {
-            document.querySelectorAll(".scope1 button").forEach(button => {
+            document.querySelectorAll(".scope1 button").forEach((button: HTMLElement) => {
                 button.click();
             });
             expect(callback.mock.calls.length).toBe(2);
@@ -99,42 +97,43 @@ describe("delegateEvent", () => {
         test("delegated events only match their scopeSelector", () => {
             callback.mockReset();
 
-            document.querySelectorAll(".scope2 button").forEach(button => {
+            document.querySelectorAll(".scope2 button").forEach((button: HTMLElement) => {
                 button.click();
-            })
+            });
 
             expect(callback.mock.calls.length).toBe(0);
-        })
+        });
     });
 });
 
 describe("removing delegated events", () => {
     const callback1 = jest.fn();
     const callback2 = jest.fn();
-    let eventHandler1, eventHandler2;
+    let eventHandler1;
+    let eventHandler2;
 
     beforeEach(() => {
         callback1.mockReset();
         callback2.mockReset();
-        eventHandler1 = domUtility.delegateEvent("click", null, callback1);
+        eventHandler1 = domUtility.delegateEvent("click", "", callback1);
         eventHandler2 = domUtility.delegateEvent("click", ".scope1", callback2, ".filterSelector");
     });
 
     it("can remove a single event", () => {
         domUtility.removeDelegatedEvent(eventHandler1);
-        document.querySelector(".scope1 .filterSelector").click();
+        (document.querySelector(".scope1 .filterSelector") as HTMLElement).click();
 
         expect(callback1.mock.calls.length).toBe(0);
         expect(callback2.mock.calls.length).toBe(1);
-    })
+    });
 
     it("can remove all events", () => {
         domUtility.removeAllDelegatedEvents();
-        document.querySelector(".scope1 .filterSelector").click();
+        (document.querySelector(".scope1 .filterSelector") as HTMLElement).click();
 
         expect(callback1.mock.calls.length).toBe(0);
         expect(callback2.mock.calls.length).toBe(0);
-    })
+    });
 });
 
 describe("getFormData", () => {
@@ -143,11 +142,11 @@ describe("getFormData", () => {
             <form>
                 <input type="text" name="foo" value="foo">
             </form>
-        `
+        `;
     });
 
-    it ("can get get data out of a form", () => {
+    it("can get get data out of a form", () => {
         const form = document.querySelector("form");
-        expect(domUtility.getFormData(form)).toEqual({foo: "foo"});
-    })
+        expect(domUtility.getFormData(form)).toEqual({ foo: "foo" });
+    });
 });

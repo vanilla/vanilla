@@ -1222,6 +1222,7 @@ label.checkbox input.checkbox-input {
 .embed-focusableElement {
   transition: 0.2s ease outline;
   outline: 2px transparent solid;
+  cursor: pointer;
 }
 
 .embed-focusableElement:hover {

@@ -26,6 +26,7 @@ $embed-focus-color: #0291DB;
 .embed-focusableElement {
     transition: 0.2s ease outline;
     outline: 2px transparent solid;
+    cursor: pointer;
 
     &:hover {
         outline-color: rgba($embed-focus-color, 0.5);

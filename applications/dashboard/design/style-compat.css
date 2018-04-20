@@ -1529,6 +1529,7 @@ body.hasRichEditor #ConversationForm .FormWrapper .richEditor {
   left: 0;
   background-size: cover;
   background-repeat: no-repeat;
+  background-position: 50% 50%;
   width: 225px;
   height: 100%;
 }

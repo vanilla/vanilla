@@ -508,6 +508,7 @@ label.checkbox input.checkbox-input {
   display: flex;
   width: 100%;
   align-items: center;
+  flex-wrap: wrap;
 }
 
 .pageHeading .pageHeading-title {
@@ -526,6 +527,7 @@ label.checkbox input.checkbox-input {
 .pageHeading-actions {
   display: flex;
   align-self: center;
+  max-width: 100%;
 }
 
 @keyframes spinnerLoader {

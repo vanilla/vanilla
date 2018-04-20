@@ -8,33 +8,26 @@ import Delta from "quill-delta";
 import Quill from "../../Quill/RegisteredQuill";
 import KeyboardBindings from "../../Quill/KeyboardBindings";
 
-const LINE_FORMATS = [
-    "blockquote-line",
-    "spoiler-line",
-];
+const LINE_FORMATS = ["blockquote-line", "spoiler-line"];
 
-const MULTI_LINE_FORMATS = [
-    ...LINE_FORMATS,
-    "code-block",
-];
+const MULTI_LINE_FORMATS = [...LINE_FORMATS, "code-block"];
 
 describe("KeyboardBindings", () => {
+    let quill: Quill;
 
-    /** @type {Quill} */
-    let quill = "";
-
-    /** @type {KeyboardBindings} */
-    let keyboardBindings = new KeyboardBindings();
+    let keyboardBindings: KeyboardBindings;
 
     beforeAll(() => {
         document.body.innerHTML = `<form><div class="js-richText"></div></form>`;
 
         const container = document.querySelector(".js-richText");
 
-        quill = new Quill(container);
+        quill = new Quill(container as HTMLElement);
 
         // Selection doesn't work in JSDom.
-        quill.setSelection = () => {};
+        quill.setSelection = () => {
+            return;
+        };
         keyboardBindings = new KeyboardBindings(quill);
     });
 
@@ -69,7 +62,7 @@ describe("KeyboardBindings", () => {
     }
 
     describe("handleMultilineEnter", () => {
-        LINE_FORMATS.forEach((format) => {
+        LINE_FORMATS.forEach(format => {
             test(format, () => testMultilineEnterFor(format));
         });
     });
@@ -163,13 +156,13 @@ describe("KeyboardBindings", () => {
         }
 
         describe("insertNewLineBeforeRange", () => {
-            MULTI_LINE_FORMATS.forEach((format) => {
+            MULTI_LINE_FORMATS.forEach(format => {
                 test(format, () => testInsertNewlineBefore(format));
             });
         });
 
         describe("insertNewLineAfterRange", () => {
-            MULTI_LINE_FORMATS.forEach((format) => {
+            MULTI_LINE_FORMATS.forEach(format => {
                 test(format, () => testInsertNewlineAfter(format));
             });
         });
@@ -178,11 +171,7 @@ describe("KeyboardBindings", () => {
     /** DELETING THINGS */
 
     function testBackspaceToClearEmptyFor(blotName) {
-        const contents = [
-            { insert: "123\n" },
-            { attributes: { [blotName]: true }, insert: "\n" },
-            { insert: "45\n" },
-        ];
+        const contents = [{ insert: "123\n" }, { attributes: { [blotName]: true }, insert: "\n" }, { insert: "45\n" }];
 
         quill.setContents(contents);
 
@@ -202,17 +191,13 @@ describe("KeyboardBindings", () => {
     }
 
     describe("back space to delete empty blot", () => {
-        MULTI_LINE_FORMATS.forEach((format) => {
+        MULTI_LINE_FORMATS.forEach(format => {
             test(format, () => testBackspaceToClearEmptyFor(format));
         });
     });
 
     function testBackSpaceAtStartFor(blotName) {
-        const contents = [
-            { insert: "123" },
-            { attributes: { [blotName]: true }, insert: "\n" },
-            { insert: "45\n" },
-        ];
+        const contents = [{ insert: "123" }, { attributes: { [blotName]: true }, insert: "\n" }, { insert: "45\n" }];
 
         quill.setContents(contents);
 
@@ -228,7 +213,7 @@ describe("KeyboardBindings", () => {
     }
 
     describe("back space to clear first blot formatting", () => {
-        MULTI_LINE_FORMATS.forEach((format) => {
+        MULTI_LINE_FORMATS.forEach(format => {
             test(format, () => testBackSpaceAtStartFor(format));
         });
     });

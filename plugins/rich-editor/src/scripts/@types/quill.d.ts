@@ -360,3 +360,5 @@ declare module "quill/modules/keyboard" {
 }
 declare module "quill/modules/syntax";
 declare module "quill/modules/toolbar";
+declare module "quill/formats/*";
+declare module "quill-delta";

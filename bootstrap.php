@@ -201,6 +201,12 @@ $dic->setInstance('Garden\Container\Container', $dic)
     ->addAlias(VanillaHtmlFormatter::class)
     ->setShared(true)
 
+    ->rule(\Vanilla\Quill\Renderer::class)
+    ->setShared(true)
+
+    ->rule(\Vanilla\Quill\Parser::class)
+    ->setShared(true)
+
     ->rule('Smarty')
     ->setShared(true)
 

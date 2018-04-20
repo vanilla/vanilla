@@ -520,7 +520,7 @@ label.checkbox input.checkbox-input {
 .pageHeading-main {
   position: relative;
   display: block;
-  width: 100%;
+  max-width: 100%;
   flex-grow: 1;
 }
 

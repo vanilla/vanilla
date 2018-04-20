@@ -15,6 +15,7 @@ $Definition['richEditor.menu.paragraph'] = 'Paragraph Style Menu';
 $Definition['richEditor.menu.spoiler'] = 'Spoiler';
 $Definition['richEditor.menu.subheading'] = 'Subheading';
 $Definition['richEditor.menu.strike'] = 'Strike Through';
+$Definition['richEditor.embed.description'] = 'This is an embedded item that is a part of the editor\'s content and can be navigated to or deleted like any other editor content.';
 
 $Definition['Emoji Categories'] = 'Emoji Categories';
 $Definition['Get Help on Inserting Media'] = 'Get Help on Inserting Media';

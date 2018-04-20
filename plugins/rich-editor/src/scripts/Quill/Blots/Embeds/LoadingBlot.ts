@@ -6,6 +6,7 @@
 
 import { t } from "@core/application";
 import FocusableEmbedBlot from "../Abstract/FocusableEmbedBlot";
+import uniqueId from "lodash/uniqueId";
 
 export default class LoadingBlot extends FocusableEmbedBlot {
     public static blotName = "embed-loading";
@@ -14,25 +15,25 @@ export default class LoadingBlot extends FocusableEmbedBlot {
 
     public static create(value: any) {
         const node = super.create(value) as HTMLElement;
+        const descriptionId = uniqueId("embedLoader-description");
 
         node.classList.add("embed");
         node.classList.add("embed-loading");
-        node.setAttribute("role", "alert");
+        node.classList.remove(FocusableEmbedBlot.FOCUS_CLASS);
 
         node.innerHTML = `<div class='embedLoader'>
-                            <div class='embedLoader-box'>
-                                <div class='embedLoader-loader'>
-                                    <span class='sr-only'>
-                                        ${t("Loading...")}
-                                    </span>
-                                </div>
+                            <div class='embedLoader-box ${
+                                FocusableEmbedBlot.FOCUS_CLASS
+                            }' aria-describedby='${descriptionId}' aria-label='${t("Loading...")}'>
+                                <span id="${descriptionId}" class='sr-only'>${t("richEditor.embed.description")}</span>
+                                <div class='embedLoader-loader'></div>
                             </div>
                         </div>`;
         return node;
     }
 
     public static value() {
-        return;
+        return {};
     }
 
     private deleteCallback?: () => void;

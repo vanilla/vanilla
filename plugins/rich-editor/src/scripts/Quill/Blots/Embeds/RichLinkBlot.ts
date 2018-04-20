@@ -20,7 +20,6 @@ export default class RichLinkBlot extends FocusableEmbedBlot {
         node.classList.add("embed-link");
         node.classList.add("embedLink");
         node.setAttribute("href", this.sanitize(data.url));
-        node.setAttribute("tabindex", -1);
 
         node.setAttribute("target", "_blank");
         node.setAttribute("rel", "noopener noreferrer");

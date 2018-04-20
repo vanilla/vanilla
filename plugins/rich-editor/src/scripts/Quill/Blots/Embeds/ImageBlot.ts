@@ -13,16 +13,17 @@ export default class ImageBlot extends FocusableEmbedBlot {
     public static tagName = "div";
 
     public static create(data) {
-        const node = super.create(data) as HTMLElement;
+        const node = super.create(data);
         node.classList.add("embed");
         node.classList.add("embed-image");
         node.classList.add("embedImage");
+        node.classList.remove(FocusableEmbedBlot.FOCUS_CLASS);
 
         const image = document.createElement("img");
         image.classList.add("embedImage-img");
+        image.classList.add(FocusableEmbedBlot.FOCUS_CLASS);
         image.setAttribute("src", data.url);
         image.setAttribute("alt", data.alt || "");
-        image.setAttribute("tabindex", -1);
 
         node.appendChild(image);
         return node;
@@ -36,19 +37,6 @@ export default class ImageBlot extends FocusableEmbedBlot {
                 url: image.getAttribute("src"),
                 alt: image.getAttribute("alt") || "",
             };
-        }
-    }
-
-    private imageElement?: HTMLElement;
-
-    constructor(domNode) {
-        super(domNode);
-        this.imageElement = domNode.querySelector(".embedImage-img");
-    }
-
-    public focus() {
-        if (this.imageElement) {
-            this.imageElement.focus();
         }
     }
 }

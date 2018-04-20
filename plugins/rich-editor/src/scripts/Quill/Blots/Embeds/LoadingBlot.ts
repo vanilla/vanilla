@@ -25,8 +25,7 @@ export default class LoadingBlot extends FocusableEmbedBlot {
                             <div class='embedLoader-box ${
                                 FocusableEmbedBlot.FOCUS_CLASS
                             }' aria-describedby='${descriptionId}' aria-label='${t("Loading...")}'>
-                                <span id="${descriptionId}" class='sr-only'>${t("richEditor.embed.description")}</span>
-                                <div class='embedLoader-loader'></div>
+                                <div class='embedLoader-loader' id="${descriptionId}"></div>
                             </div>
                         </div>`;
         return node;

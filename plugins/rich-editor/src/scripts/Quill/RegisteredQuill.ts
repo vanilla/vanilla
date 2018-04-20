@@ -35,7 +35,6 @@ import VanillaTheme from "./VanillaTheme";
 import EmbedFocusModule from "./EmbedFocusModule";
 import EmbedInsertionModule from "./EmbedInsertionModule";
 import HistoryModule from "./HistoryModule";
-import ClipboardModule from "./ClipboardModule";
 
 Quill.register(
     {
@@ -70,7 +69,6 @@ Quill.register(
         "modules/embed/insertion": EmbedInsertionModule,
         "modules/embed/focus": EmbedFocusModule,
         "modules/history": HistoryModule,
-        "modules/clipboard": ClipboardModule,
     },
     true,
 );

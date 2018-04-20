@@ -52,14 +52,6 @@ export default class KeyboardBindings {
     }
 
     private addLinkTransformKeyboardBindings() {
-        const SPACE_KEY = 32;
-
-        this.bindings["transform text to link"] = {
-            key: SPACE_KEY,
-            collapsed: true,
-            handler: this.transformTextToLink,
-        };
-
         this.bindings["transform text to embed"] = {
             key: KeyboardModule.keys.ENTER,
             collapsed: true,
@@ -119,7 +111,7 @@ export default class KeyboardBindings {
         }
 
         const textContent = line.domNode.textContent || "";
-        if (isAllowedUrl(textContent)) {
+        if (isAllowedUrl(textContent.trim())) {
             const embedInsertionModule: EmbedInsertionModule = this.quill.getModule("embed/insertion");
             const index = line.offset();
             this.quill.deleteText(index, line.length());

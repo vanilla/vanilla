@@ -9,7 +9,7 @@ import Quill, { RangeStatic, Sources } from "quill/core";
 import Emitter from "quill/core/emitter";
 import Keyboard from "quill/modules/keyboard";
 import LinkBlot from "quill/formats/link";
-import { t } from "@core/application";
+import { t, isAllowedUrl } from "@core/application";
 import SelectionPositionToolbar from "./SelectionPositionToolbarContainer";
 import Toolbar from "./Generic/Toolbar";
 import * as quillUtilities from "../Quill/utility";
@@ -123,21 +123,15 @@ export class InlineToolbar extends React.Component<IProps, IState> {
         document.addEventListener(quillUtilities.CLOSE_FLYOUT_EVENT, this.clearLinkInput);
 
         // Add a key binding for the link popup.
-        this.quill.options.modules.keyboard.bindings.link = {
-            key: "k",
-            metaKey: true,
-            handler: () => {
-                const range = this.quill.getSelection();
-                if (range.length) {
-                    if (quillUtilities.rangeContainsBlot(this.quill, range, LinkBlot)) {
-                        quillUtilities.disableAllBlotsInRange(this.quill, range, LinkBlot);
-                        this.clearLinkInput();
-                    } else {
-                        this.focusLinkInput();
-                    }
-                }
+        const keyboard: Keyboard = this.quill.getModule("keyboard");
+        keyboard.addBinding(
+            {
+                key: "k",
+                metaKey: true,
             },
-        };
+            {},
+            this.commandKHandler,
+        );
     }
 
     /**
@@ -148,6 +142,26 @@ export class InlineToolbar extends React.Component<IProps, IState> {
         document.removeEventListener("keydown", this.escFunction, false);
         document.removeEventListener(quillUtilities.CLOSE_FLYOUT_EVENT, this.clearLinkInput);
     }
+
+    private commandKHandler = () => {
+        const range = this.quill.getSelection();
+        if (range.length) {
+            if (quillUtilities.rangeContainsBlot(this.quill, range, LinkBlot)) {
+                quillUtilities.disableAllBlotsInRange(this.quill, range, LinkBlot);
+                this.clearLinkInput();
+                this.quill.update(Quill.sources.USER);
+            } else {
+                const currentText = this.quill.getText(range.index, range.length);
+                this.focusLinkInput();
+
+                if (isAllowedUrl(currentText)) {
+                    this.setState({
+                        value: currentText,
+                    });
+                }
+            }
+        }
+    };
 
     /**
      * This is a no-op for now.
@@ -241,6 +255,7 @@ export class InlineToolbar extends React.Component<IProps, IState> {
             event.preventDefault();
             const value = (event.target as HTMLInputElement).value || "";
             this.quill.format("link", value, Emitter.sources.USER);
+            this.quill.setSelection(this.state.previousRange, Emitter.sources.USER);
             this.clearLinkInput();
         }
 

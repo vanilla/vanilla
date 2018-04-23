@@ -86,6 +86,18 @@ class Request implements RequestInterface {
     }
 
     /**
+     * Set a header on the request.
+     *
+     * @param string $header The header to set.
+     * @param string $value The value of the header.
+     * @return $this
+     */
+    public function setHeader(string $header, string $value) {
+        $this->headers[$header] = $value;
+        return $this;
+    }
+
+    /**
      * {@inheritdoc}
      */
     public function getHeaderLine($name) {

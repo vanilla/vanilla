@@ -345,6 +345,34 @@ class Dispatcher {
     }
 
     /**
+     * Call an array of middlewares on a request and return the result.
+     *
+     * This methods dynamically composes the middlewares so that they can be called against a core handler that may change.
+     *
+     * @param RequestInterface $request The request to handle.
+     * @param array $middlewares The middlewares to apply to the handler.
+     * @param callable $core The core request handler (inner middleware).
+     * @return Data Returns the response from the core handler passed through the middleware.
+     */
+    public static function callMiddlewares(RequestInterface $request, array $middlewares, callable $core): Data {
+        $makeNext = function (array $middlewares, callable $core, int $index) use (&$makeNext): callable {
+            if ($index >= count($middlewares)) {
+                return $core;
+            } else {
+                return function (RequestInterface $request) use ($middlewares, $core, $index, $makeNext): Data {
+                    $next = $makeNext($middlewares, $core, $index + 1);
+                    $response = call_user_func($middlewares[$index], $request, $next);
+
+                    return $response;
+                };
+            }
+        };
+
+        $fn = $makeNext($middlewares, $core, 0);
+        return $fn($request);
+    }
+
+    /**
      * Finalize the request and render the response.
      *
      * This method is public for the sake of refactoring with the old dispatcher, but should be protected once the old

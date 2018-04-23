@@ -38,6 +38,219 @@ export default class KeyboardBindings {
     }
 
     /**
+     * Special handling for the ENTER key for Mutliline Blots.
+     *
+     * @if
+     * If there is 1 trailing newline line after the first line,
+     * and the user is on the last line,
+     * and the user types ENTER,
+     *
+     * @then
+     * Enter a newline after the Blot,
+     * move the cursor there,
+     * and trim the trailing newlines from the Blot.
+     *
+     * @param range - The range when the enter key is pressed.
+     *
+     * @returns False to prevent default.
+     */
+    public handleMultilineEnter = (range: RangeStatic) => {
+        const [line] = this.quill.getLine(range.index);
+
+        const contentBlot = line.getWrapper();
+        if (line !== contentBlot.children.tail) {
+            return true;
+        }
+
+        const { textContent } = line.domNode;
+        const currentLineIsEmpty = textContent === "";
+        if (!currentLineIsEmpty) {
+            return true;
+        }
+
+        const previousLine = line.prev;
+        if (!previousLine) {
+            return true;
+        }
+
+        insertNewLineAfterBlotAndTrim(this.quill, range);
+
+        return false;
+    };
+
+    /**
+     * Special handling for the ENTER key for Code Blocks.
+     *
+     * @if
+     * If there are 2 tailing newlines after the first line,
+     * and the user is on the last line,
+     * and the user types ENTER,
+     *
+     * @then
+     * Enter a newline after the Blot,
+     * move the cursor there,
+     * and trim the trailing newlines from the Blot.
+     *
+     * @param range - The range when the enter key is pressed.
+     *
+     * @returns False to prevent default.
+     */
+    public handleCodeBlockEnter = (range: RangeStatic) => {
+        const [line] = this.quill.getLine(range.index);
+
+        const { textContent } = line.domNode;
+        const currentLineIsEmpty = /\n\n\n$/.test(textContent);
+        if (!currentLineIsEmpty) {
+            return true;
+        }
+
+        insertNewLineAfterBlotAndTrim(this.quill, range, 2);
+
+        return false;
+    };
+
+    /**
+     * Handle backspacing for multi-line blots.
+     *
+     * @param range - The range that was altered.
+     *
+     * @returns False to prevent default.
+     */
+    public handleMultiLineBackspace(range: RangeStatic) {
+        const [line] = this.quill.getLine(range.index);
+
+        // Check if this is an empty multi-line blot
+        const hasSiblings = line.prev || line.next;
+
+        if (hasSiblings) {
+            return true;
+        }
+
+        const contentBlot = line.getWrapper();
+        if (contentBlot.domNode.textContent !== "") {
+            return true;
+        }
+
+        const delta = new Delta().retain(range.index).retain(1, { [line.constructor.blotName]: false });
+        this.quill.updateContents(delta, Emitter.sources.USER);
+        return false;
+    }
+
+    /**
+     * Handle backspacing for CodeBlock blots.
+     *
+     * @param range - The range that was altered.
+     *
+     * @returns False to prevent default.
+     */
+    public handleCodeBlockBackspace(range: RangeStatic) {
+        const [line] = this.quill.getLine(range.index);
+
+        // Check if this is an empty code block.
+        const { textContent } = line.domNode;
+
+        if (textContent !== "\n") {
+            return true;
+        }
+
+        const delta = new Delta().retain(range.index).retain(1, { "code-block": false });
+        this.quill.updateContents(delta, Emitter.sources.USER);
+
+        return false;
+    }
+
+    /**
+     * Strips the formatting from the first Blot if it is a block-quote, code-block, or spoiler.
+     *
+     * @param range - The range that was altered.
+     *
+     * @returns False to prevent default.
+     */
+    public handleBlockStartDelete = (range: RangeStatic) => {
+        const [line] = this.quill.getLine(range.index);
+
+        if (!isBlotFirstInScroll(line, this.quill)) {
+            return true;
+        }
+
+        stripFormattingFromFirstBlot(this.quill);
+        // Return false to prevent default behaviour.
+        return false;
+    };
+
+    /**
+     * Insert a normal newline before the current range.
+     *
+     * @param range - A Quill range.
+     *
+     * @returns false to prevent default.
+     */
+    public insertNewlineBeforeRange(range: RangeStatic) {
+        const cursorAtFirstPosition = range.index === 0;
+
+        if (cursorAtFirstPosition) {
+            insertNewLineAtStartOfScroll(this.quill);
+        }
+
+        return true;
+    }
+
+    /**
+     * Insert a normal newline after the current range.
+     *
+     * @param range - A Quill range.
+     *
+     * @returns false to prevent default.
+     */
+    public insertNewlineAfterRange(range: RangeStatic) {
+        const isAtLastPosition = range.index + 1 === this.quill.scroll.length();
+        if (isAtLastPosition) {
+            insertNewLineAtEndOfScroll(this.quill);
+        }
+
+        return true;
+    }
+
+    /**
+     * Delete the entire first Blot if the whole thing and something else is selected.
+     *
+     * We want deleting all of the content of the Blot to be different from the deleting the whole document or a large part of it.
+     *
+     * @param range - The range that was altered.
+     *
+     * @returns False to prevent default.
+     */
+    private clearFirstPositionMultiLineBlot = (range: RangeStatic) => {
+        const [line] = this.quill.getLine(range.index);
+        const selection = this.quill.getSelection();
+
+        const rangeStartsBeforeSelection = range.index < selection.index;
+        const rangeEndsAfterSelection = range.index + range.length > selection.index + selection.length;
+        const isFirstLineSelected = selection.index === 0;
+        const selectionIsEntireScroll = isFirstLineSelected;
+        const blotMatches =
+            line instanceof LineBlot || line instanceof CodeBlockBlot || line instanceof FocusableEmbedBlot;
+
+        if ((rangeStartsBeforeSelection || rangeEndsAfterSelection || selectionIsEntireScroll) && blotMatches) {
+            let delta = new Delta();
+
+            const newSelection = range;
+
+            if (isFirstLineSelected) {
+                delta = delta.insert("\n");
+                newSelection.length += 1;
+            }
+
+            this.quill.updateContents(delta, Emitter.sources.USER);
+            this.quill.setSelection(newSelection);
+            stripFormattingFromFirstBlot(this.quill);
+            this.quill.setSelection(newSelection);
+        }
+
+        return true;
+    };
+
+    /**
      * Nullify the tab key and remove a weird code block binding for consistency.
      */
     private resetDefaultBindings() {
@@ -88,6 +301,25 @@ export default class KeyboardBindings {
         }
         return true;
     };
+
+    /**
+     * Add keyboard options.bindings that allow the user to
+     */
+    private addBlockNewLineHandlers() {
+        this.bindings["MutliLine Enter"] = {
+            key: KeyboardModule.keys.ENTER,
+            collapsed: true,
+            format: ["spoiler-line", "blockquote-line"],
+            handler: this.handleMultilineEnter,
+        };
+
+        this.bindings["CodeBlock Enter"] = {
+            key: KeyboardModule.keys.ENTER,
+            collapsed: true,
+            format: ["code-block"],
+            handler: this.handleCodeBlockEnter,
+        };
+    }
 
     /**
      * Transform plain text of a link alone on its own line with no other formatting into a link embed.
@@ -190,237 +422,5 @@ export default class KeyboardBindings {
             key: KeyboardModule.keys.RIGHT,
             handler: this.insertNewlineAfterRange,
         };
-    }
-
-    /**
-     * Special handling for the ENTER key for Mutliline Blots.
-     *
-     * @if
-     * If there is 1 trailing newline line after the first line,
-     * and the user is on the last line,
-     * and the user types ENTER,
-     *
-     * @then
-     * Enter a newline after the Blot,
-     * move the cursor there,
-     * and trim the trailing newlines from the Blot.
-     *
-     * @param range - The range when the enter key is pressed.
-     *
-     * @returns False to prevent default.
-     */
-    private handleMultilineEnter = (range: RangeStatic) => {
-        const [line] = this.quill.getLine(range.index);
-
-        const contentBlot = line.getWrapper();
-        if (line !== contentBlot.children.tail) {
-            return true;
-        }
-
-        const { textContent } = line.domNode;
-        const currentLineIsEmpty = textContent === "";
-        if (!currentLineIsEmpty) {
-            return true;
-        }
-
-        const previousLine = line.prev;
-        if (!previousLine) {
-            return true;
-        }
-
-        insertNewLineAfterBlotAndTrim(this.quill, range);
-
-        return false;
-    };
-
-    /**
-     * Special handling for the ENTER key for Code Blocks.
-     *
-     * @if
-     * If there are 2 tailing newlines after the first line,
-     * and the user is on the last line,
-     * and the user types ENTER,
-     *
-     * @then
-     * Enter a newline after the Blot,
-     * move the cursor there,
-     * and trim the trailing newlines from the Blot.
-     *
-     * @param range - The range when the enter key is pressed.
-     *
-     * @returns False to prevent default.
-     */
-    private handleCodeBlockEnter = (range: RangeStatic) => {
-        const [line] = this.quill.getLine(range.index);
-
-        const { textContent } = line.domNode;
-        const currentLineIsEmpty = /\n\n\n$/.test(textContent);
-        if (!currentLineIsEmpty) {
-            return true;
-        }
-
-        insertNewLineAfterBlotAndTrim(this.quill, range, 2);
-
-        return false;
-    };
-
-    /**
-     * Add keyboard options.bindings that allow the user to
-     */
-    private addBlockNewLineHandlers() {
-        this.bindings["MutliLine Enter"] = {
-            key: KeyboardModule.keys.ENTER,
-            collapsed: true,
-            format: ["spoiler-line", "blockquote-line"],
-            handler: this.handleMultilineEnter,
-        };
-
-        this.bindings["CodeBlock Enter"] = {
-            key: KeyboardModule.keys.ENTER,
-            collapsed: true,
-            format: ["code-block"],
-            handler: this.handleCodeBlockEnter,
-        };
-    }
-
-    /**
-     * Handle backspacing for multi-line blots.
-     *
-     * @param range - The range that was altered.
-     *
-     * @returns False to prevent default.
-     */
-    private handleMultiLineBackspace(range: RangeStatic) {
-        const [line] = this.quill.getLine(range.index);
-
-        // Check if this is an empty multi-line blot
-        const hasSiblings = line.prev || line.next;
-
-        if (hasSiblings) {
-            return true;
-        }
-
-        const contentBlot = line.getWrapper();
-        if (contentBlot.domNode.textContent !== "") {
-            return true;
-        }
-
-        const delta = new Delta().retain(range.index).retain(1, { [line.constructor.blotName]: false });
-        this.quill.updateContents(delta, Emitter.sources.USER);
-        return false;
-    }
-
-    /**
-     * Handle backspacing for CodeBlock blots.
-     *
-     * @param range - The range that was altered.
-     *
-     * @returns False to prevent default.
-     */
-    private handleCodeBlockBackspace(range: RangeStatic) {
-        const [line] = this.quill.getLine(range.index);
-
-        // Check if this is an empty code block.
-        const { textContent } = line.domNode;
-
-        if (textContent !== "\n") {
-            return true;
-        }
-
-        const delta = new Delta().retain(range.index).retain(1, { "code-block": false });
-        this.quill.updateContents(delta, Emitter.sources.USER);
-
-        return false;
-    }
-
-    /**
-     * Strips the formatting from the first Blot if it is a block-quote, code-block, or spoiler.
-     *
-     * @param range - The range that was altered.
-     *
-     * @returns False to prevent default.
-     */
-    private handleBlockStartDelete = (range: RangeStatic) => {
-        const [line] = this.quill.getLine(range.index);
-
-        if (!isBlotFirstInScroll(line, this.quill)) {
-            return true;
-        }
-
-        stripFormattingFromFirstBlot(this.quill);
-        // Return false to prevent default behaviour.
-        return false;
-    };
-
-    /**
-     * Delete the entire first Blot if the whole thing and something else is selected.
-     *
-     * We want deleting all of the content of the Blot to be different from the deleting the whole document or a large part of it.
-     *
-     * @param range - The range that was altered.
-     *
-     * @returns False to prevent default.
-     */
-    private clearFirstPositionMultiLineBlot = (range: RangeStatic) => {
-        const [line] = this.quill.getLine(range.index);
-        const selection = this.quill.getSelection();
-
-        const rangeStartsBeforeSelection = range.index < selection.index;
-        const rangeEndsAfterSelection = range.index + range.length > selection.index + selection.length;
-        const isFirstLineSelected = selection.index === 0;
-        const selectionIsEntireScroll = isFirstLineSelected;
-        const blotMatches =
-            line instanceof LineBlot || line instanceof CodeBlockBlot || line instanceof FocusableEmbedBlot;
-
-        if ((rangeStartsBeforeSelection || rangeEndsAfterSelection || selectionIsEntireScroll) && blotMatches) {
-            let delta = new Delta();
-
-            const newSelection = range;
-
-            if (isFirstLineSelected) {
-                delta = delta.insert("\n");
-                newSelection.length += 1;
-            }
-
-            this.quill.updateContents(delta, Emitter.sources.USER);
-            this.quill.setSelection(newSelection);
-            stripFormattingFromFirstBlot(this.quill);
-            this.quill.setSelection(newSelection);
-        }
-
-        return true;
-    };
-
-    /**
-     * Insert a normal newline before the current range.
-     *
-     * @param range - A Quill range.
-     *
-     * @returns false to prevent default.
-     */
-    private insertNewlineBeforeRange(range: RangeStatic) {
-        const cursorAtFirstPosition = range.index === 0;
-
-        if (cursorAtFirstPosition) {
-            insertNewLineAtStartOfScroll(this.quill);
-        }
-
-        return true;
-    }
-
-    /**
-     * Insert a normal newline after the current range.
-     *
-     * @param range - A Quill range.
-     *
-     * @returns false to prevent default.
-     */
-    private insertNewlineAfterRange(range: RangeStatic) {
-        const isAtLastPosition = range.index + 1 === this.quill.scroll.length();
-        if (isAtLastPosition) {
-            insertNewLineAtEndOfScroll(this.quill);
-        }
-
-        return true;
     }
 }

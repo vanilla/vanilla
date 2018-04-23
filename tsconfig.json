@@ -28,7 +28,8 @@
             "plugins/*/node_modules/@types",
             "plugins/*/src/scripts/@types"
         ],
-        "skipLibCheck": true
+        "skipLibCheck": true,
+        "sourceMap": true
     },
     "include": [
         "**/*.ts",

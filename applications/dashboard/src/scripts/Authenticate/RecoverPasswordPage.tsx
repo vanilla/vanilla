@@ -7,7 +7,7 @@ import { uniqueIDFromPrefix, getOptionalID, IOptionalComponentID } from "@core/I
 import ButtonSubmit from "../Forms/ButtonSubmit";
 import Paragraph from "../Forms/Paragraph";
 import InputTextBlock from "../Forms/InputTextBlock";
-import RememberPasswordLink from "./components/RememberPasswordLink";
+import RememberPasswordLink from "./Components/RememberPasswordLink";
 import get from "lodash/get";
 
 interface IState {

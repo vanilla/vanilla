@@ -9,7 +9,7 @@ namespace Vanilla\Embeds;
 /**
  * Vimeo embed.
  */
-class VimeoEmbed extends AbstractEmbed {
+class VimeoEmbed extends Embed {
 
     const DEFAULT_HEIGHT = 270;
 

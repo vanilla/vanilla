@@ -222,13 +222,11 @@ $dic->setInstance('Garden\Container\Container', $dic)
     ->addAlias('Form')
 
     ->rule(Vanilla\Embeds\EmbedManager::class)
-    ->setShared(true)
-
-    ->rule(Vanilla\Embeds\EmbedManager::class)
     ->addCall('setDefaultEmbed', [new Reference(Vanilla\Embeds\LinkEmbed::class)])
     ->addCall('addEmbed', [new Reference(Vanilla\Embeds\YouTubeEmbed::class)])
     ->addCall('addEmbed', [new Reference(Vanilla\Embeds\VimeoEmbed::class)])
     ->addCall('addEmbed', [new Reference(Vanilla\Embeds\ImageEmbed::class), Vanilla\Embeds\EmbedManager::PRIORITY_LOW])
+    ->setShared(true)
 ;
 
 // Run through the bootstrap with dependencies.

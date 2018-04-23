@@ -11,7 +11,7 @@ use Garden\Http\HttpRequest;
 /**
  * Generic image embed.
  */
-class ImageEmbed extends AbstractEmbed {
+class ImageEmbed extends Embed {
 
     /** Valid image extensions. */
     const IMAGE_EXTENSIONS = ['bmp', 'gif', 'jpeg', 'jpg', 'png', 'svg', 'tif', 'tiff'];

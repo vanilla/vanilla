@@ -11,7 +11,7 @@ use InvalidArgumentException;
 /**
  * YouTube embed.
  */
-class YouTubeEmbed extends AbstractEmbed {
+class YouTubeEmbed extends Embed {
 
     const DEFAULT_HEIGHT = 270;
 

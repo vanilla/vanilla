@@ -11,7 +11,7 @@ use Exception;
 /**
  * Generic link embed.
  */
-class LinkEmbed extends AbstractEmbed {
+class LinkEmbed extends Embed {
 
     /**
      * LinkEmbed constructor.

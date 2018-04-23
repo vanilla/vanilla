@@ -30,13 +30,13 @@ class EmbedManager {
     /** @var Gdn_Cache Caching interface. */
     private $cache;
 
-    /** @var AbstractEmbed The default embed type. */
+    /** @var Embed The default embed type. */
     private $defaultEmbed;
 
     /** @var bool Allow network requests (e.g. HTTP)? */
     private $networkEnabled = true;
 
-    /** @var AbstractEmbed[] Available embed types. */
+    /** @var array Available embed types. */
     private $embeds = [];
 
     /**
@@ -52,11 +52,11 @@ class EmbedManager {
     /**
      * Add a new embed type.
      *
-     * @param AbstractEmbed $embed
+     * @param Embed $embed
      * @param int $priority
      * @return $this
      */
-    public function addEmbed(AbstractEmbed $embed, int $priority = null) {
+    public function addEmbed(Embed $embed, int $priority = null) {
         $priority = $priority ?: self::PRIORITY_NORMAL;
         $type = $embed->getType();
         $this->embeds[$type] = [
@@ -72,7 +72,7 @@ class EmbedManager {
     /**
      * Get the default embed type.
      *
-     * @return AbstractEmbed|null Returns the defaultEmbed.
+     * @return Embed|null Returns the defaultEmbed.
      * @throws Exception if no default embed type has been configured.
      */
     public function getDefaultEmbed() {
@@ -83,11 +83,11 @@ class EmbedManager {
      * Is the provided domain associated with the embed type?
      *
      * @param string $url The target URL.
-     * @return AbstractEmbed
+     * @return Embed
      * @throws InvalidArgumentException if the URL is not valid.
      * @throws Exception if a default embed type is needed, but hasn't been configured.
      */
-    private function getEmbedByUrl(string $url): AbstractEmbed {
+    private function getEmbedByUrl(string $url): Embed {
         $domain = parse_url($url, PHP_URL_HOST);
 
         if (!$domain) {
@@ -96,7 +96,7 @@ class EmbedManager {
 
         reset($this->embeds);
         foreach ($this->embeds as $type => $registeredEmbed) {
-            /** @var AbstractEmbed $testEmbed */
+            /** @var Embed $testEmbed */
             $testEmbed = $registeredEmbed['embed'];
             if ($testEmbed->canHandle($domain, $url)) {
                 $embed = $testEmbed;
@@ -196,10 +196,10 @@ class EmbedManager {
     /**
      * Set the defaultEmbed.
      *
-     * @param AbstractEmbed $defaultEmbed
+     * @param Embed $defaultEmbed
      * @return $this
      */
-    public function setDefaultEmbed(AbstractEmbed $defaultEmbed) {
+    public function setDefaultEmbed(Embed $defaultEmbed) {
         $this->defaultEmbed = $defaultEmbed;
         return $this;
     }

@@ -14,7 +14,7 @@ use Vanilla\InjectableInterface;
 /**
  * Basic embed class.
  */
-abstract class AbstractEmbed implements InjectableInterface {
+abstract class Embed implements InjectableInterface {
 
     /** @var bool Allow access to local resources? */
     private $allowFileScheme = false;
@@ -38,7 +38,7 @@ abstract class AbstractEmbed implements InjectableInterface {
     protected $type;
 
     /**
-     * AbstractEmbed constructor.
+     * Embed constructor.
      *
      * @param string $type
      * @param string $renderType

@@ -1,3 +1,7 @@
+/**
+ * This is here for PHPStorm path resolving only.
+ */
+
 const path = require("path");
 
 module.exports = {

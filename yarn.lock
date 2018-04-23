@@ -152,6 +152,10 @@
   version "1.1.0"
   resolved "https://registry.yarnpkg.com/@types/sprintf-js/-/sprintf-js-1.1.0.tgz#6850a98382b517c4a4d0401c63f2b0be76cee092"
 
+"@types/validator@^9.4.0":
+  version "9.4.0"
+  resolved "https://registry.yarnpkg.com/@types/validator/-/validator-9.4.0.tgz#a4a80a31d3e4e094806ec446557808423379858d"
+
 "@vanillaforums/babel-preset@^1.0.4":
   version "1.0.5"
   resolved "https://registry.yarnpkg.com/@vanillaforums/babel-preset/-/babel-preset-1.0.5.tgz#ef10e8589b604bee06412d97189414199322d3f2"
@@ -171,9 +175,9 @@
   version "1.0.0"
   resolved "https://registry.yarnpkg.com/@vanillaforums/prettier-config/-/prettier-config-1.0.0.tgz#e08bae366a888ac130d90a9f9d0eeaf48f0f0f1d"
 
-"@vanillaforums/tslint-config@^1.1.5":
-  version "1.1.5"
-  resolved "https://registry.yarnpkg.com/@vanillaforums/tslint-config/-/tslint-config-1.1.5.tgz#3fbbe5523a7664a6a56f5a3b55325fe61df116bf"
+"@vanillaforums/tslint-config@^1.1.8":
+  version "1.1.8"
+  resolved "https://registry.yarnpkg.com/@vanillaforums/tslint-config/-/tslint-config-1.1.8.tgz#3df21c51330bf9b6204ae9fdf7c02e21e6078970"
   dependencies:
     tslint-config-prettier "^1.10.0"
     tslint-react "^3.5.1"
@@ -5667,6 +5671,10 @@ validate-npm-package-license@^3.0.1:
   dependencies:
     spdx-correct "^3.0.0"
     spdx-expression-parse "^3.0.0"
+
+validator@^9.4.1:
+  version "9.4.1"
+  resolved "https://registry.yarnpkg.com/validator/-/validator-9.4.1.tgz#abf466d398b561cd243050112c6ff1de6cc12663"
 
 value-equal@^0.4.0:
   version "0.4.0"

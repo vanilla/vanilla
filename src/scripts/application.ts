@@ -7,6 +7,7 @@ import gdn from "@core/gdn";
 import { PromiseOrNormalCallback } from "@core/utility";
 import React, { ComponentClass } from "react";
 import { RouteProps } from "react-router-dom";
+import isUrl from "validator/lib/isURL";
 
 /**
  * Get a piece of metadata passed from the server.
@@ -83,6 +84,27 @@ export function translate(str: string, defaultTranslation?: string): string {
  * The t function is an alias for translate.
  */
 export const t = translate;
+
+/**
+ * Determine if a string is an allowed URL.
+ *
+ * In the future this may be extended to check if we want to whitelist/blacklist various URLs.
+ *
+ * @param input - The string to check.
+ */
+export function isAllowedUrl(input: string): boolean {
+    // Options https://github.com/chriso/validator.js#validators
+    const options = {
+        protocols: ["http", "https"],
+        require_tld: true,
+        require_protocol: true,
+        require_host: true,
+        require_valid_protocol: true,
+        allow_trailing_dot: false,
+        allow_protocol_relative_urls: false,
+    };
+    return isUrl(input, options);
+}
 
 /**
  * Format a URL in the format passed from the controller.

@@ -91,6 +91,13 @@ class InternalClient extends HttpClient {
         return $result;
     }
 
+    /**
+     * Handle a non 200 series response from the API.
+     *
+     * @param HttpResponse $response The response to process.
+     * @param array $options Options from the request invocation.
+     * @throws \Exception Throws an exception representing the error.
+     */
     public function handleErrorResponse(HttpResponse $response, $options = []) {
         if ($this->val('throw', $options, $this->throwExceptions)) {
             $body = $response->getBody();

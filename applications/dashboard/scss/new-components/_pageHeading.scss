@@ -1,0 +1,28 @@
+.pageHeading {
+    display: flex;
+    width: 100%;
+    align-items: center;
+    flex-wrap: wrap;
+
+    .pageHeading-title {
+        display: block;
+        margin: {
+            top: 0;
+            bottom: 0;
+        }
+    }
+}
+
+.pageHeading-main {
+    position: relative;
+    display: block;
+    max-width: 100%;
+    flex-grow: 1;
+}
+
+.pageHeading-actions {
+    display: flex;
+    align-self: center;
+    max-width: 100%;
+}
+

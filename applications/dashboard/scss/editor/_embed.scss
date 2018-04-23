@@ -18,22 +18,23 @@ $embedVideo_width: 640px;
 $embed-spacing: 6px !default;
 $embed-focus-color: #0291DB;
 
-@mixin embedFocusStyles {
-    transition: 0.2s ease border;
-    border: 2px transparent solid;
-
-    &:hover {
-        border-color: rgba($embed-focus-color, 0.5);
-    }
-
-    &:focus {
-        border-color: $embed-focus-color;
-    }
-}
-
 .embed {
     display: block;
     user-select: none;
+}
+
+.embed-focusableElement {
+    transition: 0.2s ease outline;
+    outline: 2px transparent solid;
+    cursor: pointer;
+
+    &:hover {
+        outline-color: rgba($embed-focus-color, 0.5);
+    }
+
+    &:focus {
+        outline-color: $embed-focus-color;
+    }
 }
 
 .embedLoader-icon {
@@ -156,10 +157,6 @@ $embed-focus-color: #0291DB;
     margin: auto;
 }
 
-.embedImage-img {
-    @include embedFocusStyles();
-}
-
 // Video
 
 .embedVideo {
@@ -248,8 +245,6 @@ $embed-focus-color: #0291DB;
         color: inherit;
         text-decoration: none !important;
     }
-
-    @include embedFocusStyles();
 }
 
 .embedLink-body {
@@ -270,6 +265,7 @@ $embed-focus-color: #0291DB;
     left: 0;
     background-size: cover;
     background-repeat: no-repeat;
+    background-position: 50% 50%;
     width: $embedded-linkImage_width;
     height: 100%;
 

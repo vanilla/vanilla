@@ -22,9 +22,15 @@ if (Element.prototype.closest) {
 // https://github.com/facebook/jest/issues/2028
 polyfillClosest();
 
-document.getSelection = () => {
+function getSelection() {
     return {
-        removeAllRanges: () => {},
-        getRangeAt: () => {},
+        removeAllRanges: () => {
+            return;
+        },
+        getRangeAt: () => {
+            return;
+        },
     };
-};
+}
+
+document.getSelection = getSelection as any;

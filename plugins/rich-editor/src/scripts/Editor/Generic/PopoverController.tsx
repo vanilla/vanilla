@@ -5,84 +5,91 @@
  */
 
 import React from "react";
-import Quill from "quill/core";
 import * as PropTypes from "prop-types";
+import uniqueId from "lodash/uniqueId";
 import { closeEditorFlyouts, CLOSE_FLYOUT_EVENT } from "../../Quill/utility";
 import { withEditor, IEditorContextProps } from "../ContextProvider";
-import { IPopoverProps } from "./Popover";
+
+export interface IPopoverControllerChildParameters {
+    initialFocusRef: React.RefObject<any>;
+    blurHandler: React.FocusEventHandler<any>;
+    isVisible: boolean;
+    closeMenuHandler(event?: React.SyntheticEvent<any>);
+}
 
 interface IProps extends IEditorContextProps {
-    PopoverComponentClass: React.ComponentClass<IPopoverProps>;
     classNameRoot: string;
     icon: JSX.Element;
-    targetTitleOnOpen?: boolean;
+    children: (props: IPopoverControllerChildParameters) => JSX.Element;
+    onClose?: () => void;
 }
 
 interface IState {
     isVisible: boolean;
 }
 
-export class PopoverController extends React.PureComponent<IProps, IState> {
-    private quill: Quill;
-    private controllerID: string;
-    private popoverID: string;
-    private buttonID: string;
-    private popoverTitleID: string;
-    private popoverDescriptionID: string;
-    private targetTitleOnOpen: boolean;
+export default class PopoverController extends React.PureComponent<IProps, IState> {
+    private popoverContainerId: string;
+
+    private initalFocusRef: React.RefObject<any>;
+    private buttonRef: React.RefObject<HTMLButtonElement>;
+    private controllerRef: React.RefObject<HTMLDivElement>;
 
     constructor(props) {
         super(props);
 
-        this.quill = props.quill;
+        this.controllerRef = React.createRef();
+        this.initalFocusRef = React.createRef();
+        this.buttonRef = React.createRef();
 
         this.state = {
             isVisible: false,
         };
 
-        this.controllerID = props.classNameRoot + "-" + props.editorID;
-        this.popoverID = props.classNameRoot + "-popover-" + props.editorID;
-        this.buttonID = props.classNameRoot + "-button-" + props.editorID;
-        this.popoverTitleID = props.classNameRoot + "-popoverTitle-" + props.editorID;
-        this.popoverDescriptionID = props.classNameRoot + "-popoverDescription-" + props.editorID;
-        this.targetTitleOnOpen = !!props.targetTitleOnOpen;
+        this.popoverContainerId = uniqueId("richEditor-popover-");
     }
 
     public render() {
         return (
-            <div id={this.controllerID} className={this.props.classNameRoot}>
+            <div className={this.props.classNameRoot} ref={this.controllerRef}>
                 <button
-                    id={this.buttonID}
                     onClick={this.togglePopover}
-                    onBlur={this.checkForExternalFocus}
+                    onBlur={this.blurHandler}
                     className="richEditor-button"
                     type="button"
-                    aria-controls={this.props.editorID}
+                    aria-controls={this.popoverContainerId}
                     aria-expanded={this.state.isVisible}
                     aria-haspopup="true"
+                    ref={this.buttonRef}
                 >
                     {this.props.icon}
                 </button>
-                <this.props.PopoverComponentClass
-                    id={this.popoverID}
-                    isVisible={this.state.isVisible}
-                    blurHandler={this.checkForExternalFocus}
-                    closeMenuHandler={this.closeMenu}
-                    popoverTitleID={this.popoverTitleID}
-                    popoverDescriptionID={this.popoverDescriptionID}
-                />
+                <div id={this.popoverContainerId}>
+                    {this.props.children({
+                        blurHandler: this.blurHandler,
+                        closeMenuHandler: this.closeMenuHandler,
+                        initialFocusRef: this.initalFocusRef,
+                        isVisible: this.state.isVisible,
+                    })}
+                </div>
             </div>
         );
     }
 
+    public componentDidUpdate(prevProps: IProps, prevState: IState) {
+        if (!prevState.isVisible && this.state.isVisible && this.initalFocusRef.current) {
+            this.initalFocusRef.current.focus();
+        }
+    }
+
     public componentDidMount() {
         document.addEventListener("keydown", this.handleEscapeKey, false);
-        document.addEventListener(CLOSE_FLYOUT_EVENT, this.closeMenu);
+        document.addEventListener(CLOSE_FLYOUT_EVENT, this.closeMenuHandler);
     }
 
     public componentWillUnmount() {
         document.removeEventListener("keydown", this.handleEscapeKey, false);
-        document.removeEventListener(CLOSE_FLYOUT_EVENT, this.closeMenu);
+        document.removeEventListener(CLOSE_FLYOUT_EVENT, this.closeMenuHandler);
     }
 
     /**
@@ -93,7 +100,7 @@ export class PopoverController extends React.PureComponent<IProps, IState> {
     private handleEscapeKey = event => {
         if (this.state.isVisible) {
             if (event.code === "Escape") {
-                this.closeMenu(event);
+                this.closeMenuHandler(event);
             }
         }
     };
@@ -103,19 +110,18 @@ export class PopoverController extends React.PureComponent<IProps, IState> {
      *
      * @param {React.FocusEvent} event - A synthetic event.
      */
-    private checkForExternalFocus = event => {
+    private blurHandler = event => {
         // https://reactjs.org/docs/events.html#event-pooling
         event.persist();
 
         setImmediate(() => {
-            const activeElement = document.activeElement;
-            const emojiPickerElement = document.getElementById(this.popoverID);
+            const { activeElement } = document;
             if (
-                activeElement.id !== this.controllerID &&
-                emojiPickerElement &&
-                !emojiPickerElement.contains(activeElement)
+                activeElement !== this.controllerRef.current &&
+                this.controllerRef.current &&
+                !this.controllerRef.current.contains(activeElement)
             ) {
-                this.closeMenu(event);
+                this.closeMenuHandler(event);
             }
         });
     };
@@ -125,44 +131,32 @@ export class PopoverController extends React.PureComponent<IProps, IState> {
      */
     private togglePopover = () => {
         closeEditorFlyouts(this.constructor.name);
-        const titleID = this.popoverTitleID;
 
-        this.setState(
-            {
-                isVisible: !this.state.isVisible,
-            },
-            () => {
-                if (this.targetTitleOnOpen && this.state.isVisible) {
-                    setImmediate(() => {
-                        const title = document.getElementById(titleID);
-                        title && title.focus();
-                    });
-                }
-            },
-        );
+        this.setState((prevState: IState) => {
+            return { isVisible: !prevState.isVisible };
+        });
     };
 
     /**
      * Closes menu
      * @param {SyntheticEvent} event - The fired event. This could be a custom event.
      */
-    private closeMenu = event => {
+    private closeMenuHandler = event => {
         if (event.detail && event.detail.firingKey && event.detail.firingKey === this.constructor.name) {
             return;
         }
 
-        const activeElement = document.activeElement;
-        const parentElement = document.getElementById(this.controllerID);
+        this.props.onClose && this.props.onClose();
+
+        const { activeElement } = document;
+        const parentElement = this.controllerRef.current;
 
         this.setState({
             isVisible: false,
         });
 
         if (parentElement && parentElement.contains(activeElement)) {
-            const button = document.getElementById(this.buttonID);
-            button && button.focus();
+            this.buttonRef.current && this.buttonRef.current.focus();
         }
     };
 }
-
-export default withEditor<IProps>(PopoverController);

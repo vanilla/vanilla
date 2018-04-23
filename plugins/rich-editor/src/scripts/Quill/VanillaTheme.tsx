@@ -15,8 +15,8 @@ import React from "react";
 import ReactDOM from "react-dom";
 import InlineToolbar from "../Editor/InlineToolbar";
 import ParagraphToolbar from "../Editor/ParagraphToolbar";
-import EmojiPicker from "../Editor/EmojiPicker";
-import EmbedDialogue from "../Editor/EmbedDialogue";
+import EmojiPopover from "../Editor/EmojiPopover";
+import EmbedPopover from "../Editor/EmbedPopover";
 import EditorProvider from "../Editor/ContextProvider";
 import EmbedFocusModule from "./EmbedFocusModule";
 
@@ -64,7 +64,7 @@ export default class VanillaTheme extends ThemeBase {
         this.mountToolbar();
         this.mountEmojiMenu();
         this.mountParagraphMenu();
-        this.mountEmbedDialogue();
+        this.mountEmbedPopover();
     }
 
     /**
@@ -100,17 +100,17 @@ export default class VanillaTheme extends ThemeBase {
         const container = this.jsBodyBoxContainer.querySelector(".js-emojiHandle");
         ReactDOM.render(
             <EditorProvider quill={this.quill}>
-                <EmojiPicker />
+                <EmojiPopover />
             </EditorProvider>,
             container,
         );
     }
 
-    private mountEmbedDialogue() {
+    private mountEmbedPopover() {
         const container = this.jsBodyBoxContainer.querySelector(".js-EmbedDialogue");
         ReactDOM.render(
             <EditorProvider quill={this.quill}>
-                <EmbedDialogue />
+                <EmbedPopover />
             </EditorProvider>,
             container,
         );

@@ -27,6 +27,7 @@ class EmbedManagerTest extends TestCase {
         $embedManager->setDefaultEmbed(new LinkEmbed())
             ->addEmbed(new YouTubeEmbed())
             ->addEmbed(new VimeoEmbed())
+            ->addEmbed(new ImageEmbed(), EmbedManager::PRIORITY_LOW)
             ->setNetworkEnabled(false);
         return $embedManager;
     }

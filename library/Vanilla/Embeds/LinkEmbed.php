@@ -1,7 +1,7 @@
 <?php
 /**
  * @copyright 2009-2018 Vanilla Forums Inc.
- * @license GPLv2
+ * @license GPL-2.0
  */
 
 namespace Vanilla\Embeds;
@@ -13,7 +13,12 @@ use Exception;
  */
 class LinkEmbed extends AbstractEmbed {
 
-    protected $type = 'link';
+    /**
+     * LinkEmbed constructor.
+     */
+    public function __construct() {
+        parent::__construct('link', 'link');
+    }
 
     /**
      * @inheritdoc

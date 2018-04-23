@@ -1,7 +1,7 @@
 <?php
 /**
  * @copyright 2009-2018 Vanilla Forums Inc.
- * @license GPLv2
+ * @license GPL-2.0
  */
 
 namespace Vanilla\Embeds;
@@ -18,10 +18,14 @@ class YouTubeEmbed extends AbstractEmbed {
     const DEFAULT_WIDTH = 480;
 
     /** @inheritdoc */
-    protected $type = 'youtube';
-
-    /** @inheritdoc */
     protected $domains = ['youtube.com', 'youtube.ca', 'youtu.be'];
+
+    /**
+     * YouTubeEmbed constructor.
+     */
+    public function __construct() {
+        parent::__construct('youtube', 'video');
+    }
 
     /**
      * @inheritdoc

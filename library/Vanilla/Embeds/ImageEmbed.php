@@ -1,17 +1,66 @@
 <?php
 /**
  * @copyright 2009-2018 Vanilla Forums Inc.
- * @license GPLv2
+ * @license GPL-2.0
  */
 
 namespace Vanilla\Embeds;
+
+use Garden\Http\HttpRequest;
 
 /**
  * Generic image embed.
  */
 class ImageEmbed extends AbstractEmbed {
 
-    protected $type = 'image';
+    /** Valid image extensions. */
+    const IMAGE_EXTENSIONS = ['bmp', 'gif', 'jpeg', 'jpg', 'png', 'svg', 'tif', 'tiff'];
+
+    /**
+     * ImageEmbed constructor.
+     */
+    public function __construct() {
+        parent::__construct('image', 'image');
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function canHandle(string $domain, string $url = null): bool {
+        $result = $this->isImageUrl($url);
+        return $result;
+    }
+
+    /**
+     * Is this an image URL?
+     *
+     * @param string $url Target URL.
+     * @return bool
+     */
+    private function isImageUrl(string $url): bool {
+        $result = false;
+
+        // Attempt to determine if this looks like an image URL.
+        $path = parse_url($url, PHP_URL_PATH);
+        if ($path !== false) {
+            $extension = pathinfo($path, PATHINFO_EXTENSION);
+            $result = $extension && in_array(strtolower($extension), self::IMAGE_EXTENSIONS);
+        }
+
+        // It's possible this is an extension-less image. Try a HEAD request to get the content type.
+        if ($result === false && $this->isNetworkEnabled()) {
+            $head = $this->httpRequest($url, '', [], HttpRequest::METHOD_HEAD);
+            if ($head->getStatusCode() === 200) {
+                $contentType = $head->getHeaderLines('content-type');
+                $contentType = reset($contentType);
+                if ($contentType && substr($contentType, 0, 6) === 'image/') {
+                    $result = true;
+                }
+            }
+        }
+
+        return $result;
+    }
 
     /**
      * @inheritdoc

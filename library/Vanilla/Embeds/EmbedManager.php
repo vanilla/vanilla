@@ -1,7 +1,7 @@
 <?php
 /**
  * @copyright 2009-2018 Vanilla Forums Inc.
- * @license Proprietary
+ * @license GPL-2.0
  */
 
 namespace Vanilla\Embeds;
@@ -18,8 +18,14 @@ class EmbedManager {
     /** Page info caching expiry (24 hours). */
     const CACHE_EXPIRY = 24 * 60 * 60;
 
-    /** Valid image extensions. */
-    const IMAGE_EXTENSIONS = ['bmp', 'gif', 'jpeg', 'jpg', 'png', 'svg', 'tif', 'tiff'];
+    /** @var int High embed prioritization. */
+    const PRIORITY_HIGH = 100;
+
+    /** @var int Normal embed prioritization. */
+    const PRIORITY_NORMAL = 50;
+
+    /** @var int Low embed prioritization. */
+    const PRIORITY_LOW = 25;
 
     /** @var Gdn_Cache Caching interface. */
     private $cache;
@@ -33,42 +39,43 @@ class EmbedManager {
     /** @var AbstractEmbed[] Available embed types. */
     private $embeds = [];
 
-    /** @var ImageEmbed Generic image embed. */
-    private $imageEmbed;
-
     /**
      * EmbedManager constructor.
      *
      * @param Gdn_Cache $cache
      * @param ImageEmbed $imageEmbed
      */
-    public function __construct(Gdn_Cache $cache, ImageEmbed $imageEmbed) {
+    public function __construct(Gdn_Cache $cache) {
         $this->cache = $cache;
-        $this->imageEmbed = $imageEmbed;
     }
 
     /**
      * Add a new embed type.
      *
      * @param AbstractEmbed $embed
+     * @param int $priority
      * @return $this
      */
-    public function addEmbed(AbstractEmbed $embed) {
+    public function addEmbed(AbstractEmbed $embed, int $priority = null) {
+        $priority = $priority ?: self::PRIORITY_NORMAL;
         $type = $embed->getType();
-        $this->embeds[$type] = $embed;
+        $this->embeds[$type] = [
+            'priority' => $priority,
+            'embed' => $embed
+        ];
+        uasort($this->embeds, function(array $valA, array $valB) {
+            return $valB['priority'] <=> $valA['priority'];
+        });
         return $this;
     }
 
     /**
      * Get the default embed type.
      *
-     * @return AbstractEmbed Returns the defaultEmbed.
+     * @return AbstractEmbed|null Returns the defaultEmbed.
      * @throws Exception if no default embed type has been configured.
      */
-    public function getDefaultEmbed(): AbstractEmbed {
-        if ($this->defaultEmbed === null) {
-            throw new Exception('Default embed type not configured.');
-        }
+    public function getDefaultEmbed() {
         return $this->defaultEmbed;
     }
 
@@ -87,43 +94,21 @@ class EmbedManager {
             throw new InvalidArgumentException('Invalid URL.');
         }
 
-        // No specific embed so use the default web scrape embed.
-        foreach ($this->embeds as $testEmbed) {
-            foreach ($testEmbed->getDomains() as $testDomain) {
-                if ($domain === $testDomain || stringEndsWith($domain, ".{$testDomain}")) {
-                    $embed = $testEmbed;
-                    break 2;
-                }
+        reset($this->embeds);
+        foreach ($this->embeds as $type => $registeredEmbed) {
+            /** @var AbstractEmbed $testEmbed */
+            $testEmbed = $registeredEmbed['embed'];
+            if ($testEmbed->canHandle($domain, $url)) {
+                $embed = $testEmbed;
             }
         }
 
-        if (!isset($embed)) {
-            if ($this->isImageUrl($url)) {
-                $embed = $this->imageEmbed;
-            } else {
-                $embed = $this->getDefaultEmbed();
-            }
+        // No specific embed so use the default web scrape embed.
+        if (!isset($embed) && ($embed = $this->getDefaultEmbed()) === null) {
+            throw new Exception('Unable to locate an handler for the URL.');
         }
 
         return $embed;
-    }
-
-    /**
-     * Is this an image URL?
-     *
-     * @param string $url Target URL.
-     * @return bool
-     */
-    private function isImageUrl(string $url): bool {
-        $result = false;
-
-        $path = parse_url($url, PHP_URL_PATH);
-        if ($path !== false) {
-            $extension = pathinfo($path, PATHINFO_EXTENSION);
-            $result = $extension && in_array(strtolower($extension), self::IMAGE_EXTENSIONS);
-        }
-
-        return $result;
     }
 
     /**
@@ -195,11 +180,9 @@ class EmbedManager {
         $type = $data['type'] ?? null;
 
         if (array_key_exists($type, $this->embeds)) {
-            $embed = $this->embeds[$type];
-        } elseif ($type === $this->imageEmbed->getType()) {
-            $embed = $this->imageEmbed;
-        } elseif ($type === $this->getDefaultEmbed()->getType()) {
-            $embed = $this->getDefaultEmbed();
+            $embed = $this->embeds[$type]['embed'];
+        } elseif (($defaultEmbed = $this->getDefaultEmbed()) && $type === $defaultEmbed->getType()) {
+            $embed = $defaultEmbed;
         }
 
         if (empty($embed)) {

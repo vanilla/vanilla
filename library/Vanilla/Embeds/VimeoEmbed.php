@@ -1,7 +1,7 @@
 <?php
 /**
  * @copyright 2009-2018 Vanilla Forums Inc.
- * @license GPLv2
+ * @license GPL-2.0
  */
 
 namespace Vanilla\Embeds;
@@ -20,6 +20,13 @@ class VimeoEmbed extends AbstractEmbed {
 
     /** @inheritdoc */
     protected $domains = ['vimeo.com'];
+
+    /**
+     * VimeoEmbed constructor.
+     */
+    public function __construct() {
+        parent::__construct('vimeo', 'video');
+    }
 
     /**
      * @inheritdoc

@@ -1,7 +1,7 @@
 <?php
 /**
  * @copyright 2009-2018 Vanilla Forums Inc.
- * @license GPLv2
+ * @license GPL-2.0
  */
 
 namespace Vanilla\Embeds;
@@ -17,7 +17,7 @@ use Vanilla\InjectableInterface;
 abstract class AbstractEmbed implements InjectableInterface {
 
     /** @var bool Allow access to local resources? */
-    private $allowLocal = false;
+    private $allowFileScheme = false;
 
     /** @var HttpRequest HTTP request interface. */
     private $httpRequest;
@@ -38,12 +38,41 @@ abstract class AbstractEmbed implements InjectableInterface {
     protected $type;
 
     /**
+     * AbstractEmbed constructor.
+     *
+     * @param string $type
+     * @param string $renderType
+     */
+    public function __construct(string $type, string $renderType) {
+        $this->type = $type;
+        $this->renderType = $renderType;
+    }
+
+    /**
+     * Is this embed type equipped to handle the site?
+     *
+     * @param string $domain The target domain.
+     * @param string $url Full URL.
+     * @return bool
+     */
+    public function canHandle(string $domain, string $url = null): bool {
+        $result = false;
+        foreach ($this->getDomains() as $testDomain) {
+            if ($domain === $testDomain || stringEndsWith($domain, ".{$testDomain}")) {
+                $result = true;
+                break;
+            }
+        }
+        return $result;
+    }
+
+    /**
      * Get whether or not we're allowing access to local resources.
      *
      * @return bool
      */
-    public function getAllowLocal(): bool {
-        return $this->allowLocal;
+    public function getAllowFileScheme(): bool {
+        return $this->allowFileScheme;
     }
 
     /**
@@ -89,7 +118,7 @@ abstract class AbstractEmbed implements InjectableInterface {
     public function getUrlSchemes() {
         $result = ['http', 'https'];
 
-        if ($this->allowLocal) {
+        if ($this->allowFileScheme) {
             $result[] = 'file';
         }
 
@@ -246,11 +275,11 @@ abstract class AbstractEmbed implements InjectableInterface {
     /**
      * Set whether or not access is allowed to local resources.
      *
-     * @param bool $allowLocal
+     * @param bool $allowFileScheme
      * @return $this
      */
-    public function setAllowLocal(bool $allowLocal) {
-        $this->allowLocal = $allowLocal;
+    public function setAllowFileScheme(bool $allowFileScheme) {
+        $this->allowFileScheme = $allowFileScheme;
         return $this;
     }
 

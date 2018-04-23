@@ -122,14 +122,14 @@ class ActivityModel extends Gdn_Model {
                     $result = true;
                 }
                 break;
-            case ActivityModel::NOTIFY_ADMIN:
+            case ActivityModel::NOTIFY_ADMINS:
                 if (checkPermission('Garden.Settings.Manage')) {
                     $result = true;
                 }
                 break;
             default:
                 // Actual userid.
-                if (checkPermission('Garden.Community.Manage') && Gdn::session()->UserID === $userid) {
+                if (Gdn::session()->UserID === $userid || checkPermission('Garden.Community.Manage')) {
                     $result = true;
                 }
                 break;

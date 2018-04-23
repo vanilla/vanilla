@@ -175,9 +175,9 @@
   version "1.0.0"
   resolved "https://registry.yarnpkg.com/@vanillaforums/prettier-config/-/prettier-config-1.0.0.tgz#e08bae366a888ac130d90a9f9d0eeaf48f0f0f1d"
 
-"@vanillaforums/tslint-config@^1.1.5":
-  version "1.1.5"
-  resolved "https://registry.yarnpkg.com/@vanillaforums/tslint-config/-/tslint-config-1.1.5.tgz#3fbbe5523a7664a6a56f5a3b55325fe61df116bf"
+"@vanillaforums/tslint-config@^1.1.8":
+  version "1.1.8"
+  resolved "https://registry.yarnpkg.com/@vanillaforums/tslint-config/-/tslint-config-1.1.8.tgz#3df21c51330bf9b6204ae9fdf7c02e21e6078970"
   dependencies:
     tslint-config-prettier "^1.10.0"
     tslint-react "^3.5.1"

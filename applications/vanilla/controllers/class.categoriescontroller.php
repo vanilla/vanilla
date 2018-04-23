@@ -550,7 +550,8 @@ class CategoriesController extends VanillaController {
                 if (empty($ancestor)) {
                     throw new Gdn_UserException("Invalid category ID: {$Category}");
                 }
-                $flatTree = $this->CategoryModel->getTreeAsFlat($ancestor['CategoryID']);
+                $tree = $this->CategoryModel->getTree($ancestor['CategoryID']);
+                $flatTree = CategoryModel::flattenTree($tree);
                 $filterIDs = array_column($flatTree, 'CategoryID');
             } else {
                 $filterIDs = null;

@@ -504,6 +504,32 @@ label.checkbox input.checkbox-input {
   padding: 0;
 }
 
+.pageHeading {
+  display: flex;
+  width: 100%;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.pageHeading .pageHeading-title {
+  display: block;
+  margin-top: 0;
+  margin-bottom: 0;
+}
+
+.pageHeading-main {
+  position: relative;
+  display: block;
+  max-width: 100%;
+  flex-grow: 1;
+}
+
+.pageHeading-actions {
+  display: flex;
+  align-self: center;
+  max-width: 100%;
+}
+
 @keyframes spinnerLoader {
   0% {
     transform: rotate(73deg);
@@ -674,7 +700,7 @@ label.checkbox input.checkbox-input {
 }
 
 .richEditor-upload {
-  display: none;
+  display: none !important;
 }
 
 .embedBar {
@@ -1096,6 +1122,45 @@ label.checkbox input.checkbox-input {
   font-weight: 600;
 }
 
+body.hasRichEditor.Section-PostDiscussion #DiscussionForm select {
+  max-width: 100%;
+}
+
+body.hasRichEditor.Section-PostDiscussion #DiscussionForm .FormWrapper {
+  padding-left: 36px;
+}
+
+body.hasRichEditor.Section-PostDiscussion #DiscussionForm .FormWrapper .richEditor {
+  padding-left: 0;
+}
+
+body.hasRichEditor .CommentForm .CommentFormWrap .Form-HeaderWrap {
+  display: none;
+}
+
+body.hasRichEditor .CommentForm .CommentFormWrap .FormWrapper {
+  padding-left: 0;
+}
+
+body.hasRichEditor .DataListWrap .FormWrapper.FormWrapper-Condensed {
+  padding-left: 0;
+}
+
+body.hasRichEditor #MessageForm .Form-HeaderWrap,
+body.hasRichEditor #ConversationForm .Form-HeaderWrap {
+  display: none;
+}
+
+body.hasRichEditor #MessageForm .FormWrapper,
+body.hasRichEditor #ConversationForm .FormWrapper {
+  padding-left: 36px;
+}
+
+body.hasRichEditor #MessageForm .FormWrapper .richEditor,
+body.hasRichEditor #ConversationForm .FormWrapper .richEditor {
+  padding-left: 0;
+}
+
 .spoiler {
   border-style: solid;
   border-color: #aaadb1;
@@ -1217,6 +1282,20 @@ label.checkbox input.checkbox-input {
 .embed {
   display: block;
   user-select: none;
+}
+
+.embed-focusableElement {
+  transition: 0.2s ease outline;
+  outline: 2px transparent solid;
+  cursor: pointer;
+}
+
+.embed-focusableElement:hover {
+  outline-color: rgba(2, 145, 219, 0.5);
+}
+
+.embed-focusableElement:focus {
+  outline-color: #0291DB;
 }
 
 .embedLoader-icon {
@@ -1345,19 +1424,6 @@ label.checkbox input.checkbox-input {
   margin: auto;
 }
 
-.embedImage-img {
-  transition: 0.2s ease border;
-  border: 2px transparent solid;
-}
-
-.embedImage-img:hover {
-  border-color: rgba(2, 145, 219, 0.5);
-}
-
-.embedImage-img:focus {
-  border-color: #0291DB;
-}
-
 .embedVideo {
   position: relative;
   display: block;
@@ -1439,21 +1505,11 @@ label.checkbox input.checkbox-input {
   display: block;
   background: #ffffff;
   box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.3);
-  transition: 0.2s ease border;
-  border: 2px transparent solid;
 }
 
 .embedLink, .embedLink:hover, .embedLink:focus {
   color: inherit;
   text-decoration: none !important;
-}
-
-.embedLink:hover {
-  border-color: rgba(2, 145, 219, 0.5);
-}
-
-.embedLink:focus {
-  border-color: #0291DB;
 }
 
 .embedLink-body {
@@ -1473,6 +1529,7 @@ label.checkbox input.checkbox-input {
   left: 0;
   background-size: cover;
   background-repeat: no-repeat;
+  background-position: 50% 50%;
   width: 225px;
   height: 100%;
 }

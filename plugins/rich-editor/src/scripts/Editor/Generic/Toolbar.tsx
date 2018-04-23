@@ -25,7 +25,10 @@ interface IProps extends IEditorContextProps {
 }
 
 interface IState {
-    [key: string]: IMenuItemData;
+    range: RangeStatic;
+    menuItems: {
+        [key: string]: IMenuItemData;
+    };
 }
 
 /**
@@ -55,16 +58,32 @@ export class Toolbar extends React.Component<IProps, IState> {
     constructor(props) {
         super(props);
 
-        this.state = props.menuItems || Toolbar.defaultItems;
+        this.state = {
+            range: {
+                index: 0,
+                length: 0,
+            },
+            menuItems: props.menuItems || Toolbar.defaultItems,
+        };
 
         // Quill can directly on the class as it won't ever change in a single instance.
         this.quill = props.quill;
     }
 
+    public shouldComponentUpdate(nextProps) {
+        if (nextProps.isHidden) {
+            return false;
+        }
+
+        return true;
+    }
+
     public componentWillReceiveProps(nextProps) {
         if (this.props.isHidden && !nextProps.isHidden) {
-            const range = this.quill.getSelection();
-            this.update(range);
+            this.setState({
+                range: this.quill.getSelection(),
+            });
+            this.update();
         }
     }
 
@@ -85,9 +104,16 @@ export class Toolbar extends React.Component<IProps, IState> {
     }
 
     public render() {
-        const menuItemList = Object.keys(this.state);
+        const menuItemList = Object.keys(this.state.menuItems);
+        const numberOfActiveItems = Object.values(this.state.menuItems)
+            .filter(item => !item.isFallback)
+            .reduce((accumulator, currentItem) => {
+                return currentItem.active ? accumulator + 1 : accumulator;
+            }, 0);
+
         const menuItems = menuItemList.map((itemName, key) => {
-            const isActive = this.state[itemName].active;
+            const isActive = this.state.menuItems[itemName].active;
+            const isActiveFallback = (numberOfActiveItems === 0 && this.state.menuItems[itemName].isFallback) || false;
 
             const clickHandler = () => {
                 this.formatItem(itemName);
@@ -97,8 +123,8 @@ export class Toolbar extends React.Component<IProps, IState> {
                 <MenuItem
                     propertyName={itemName}
                     label={t("richEditor.menu." + itemName)}
-                    key={key}
-                    isActive={isActive}
+                    key={itemName}
+                    isActive={isActive || isActiveFallback}
                     isLast={key + 1 === menuItemList.length}
                     isFirst={key === 0}
                     onClick={clickHandler}
@@ -115,6 +141,22 @@ export class Toolbar extends React.Component<IProps, IState> {
         );
     }
 
+    private setMenuState(
+        menuState: {
+            [key: string]: IMenuItemData;
+        },
+        callback?: () => void,
+    ) {
+        this.setState(prevState => {
+            return {
+                menuItems: {
+                    ...prevState.menuItems,
+                    ...menuState,
+                },
+            };
+        }, callback);
+    }
+
     /**
      * Handle quill changes. Used to detect selection changes.
      *
@@ -122,8 +164,11 @@ export class Toolbar extends React.Component<IProps, IState> {
      * @param range - The new selection range.
      */
     private quillChangeHandler = (type: string, range: RangeStatic) => {
+        if (range && range.index) {
+            this.setState({ range });
+        }
         if (!this.props.isHidden) {
-            this.update(range);
+            this.update();
         }
     };
 
@@ -133,7 +178,7 @@ export class Toolbar extends React.Component<IProps, IState> {
     private quillOptimizeHandler = () => {
         if (!this.props.isHidden) {
             const range = this.quill.getSelection();
-            this.update(range);
+            this.update();
         }
     };
 
@@ -145,7 +190,7 @@ export class Toolbar extends React.Component<IProps, IState> {
      * @param {string} itemKey - The key of the item that was clicked.
      */
     private formatItem(itemKey) {
-        const itemData = this.state[itemKey];
+        const itemData = this.state.menuItems[itemKey];
 
         if (itemData.formatter) {
             itemData.formatter(itemData);
@@ -170,12 +215,13 @@ export class Toolbar extends React.Component<IProps, IState> {
      *
      * @param range - A quill range object. Defaults to currently selected range.
      */
-    private update(range?: RangeStatic) {
+    private update() {
+        const { range } = this.state;
         if (!range) {
             return;
         }
 
-        for (const [itemKey, itemData] of Object.entries(this.state)) {
+        for (const [itemKey, itemData] of Object.entries(this.state.menuItems)) {
             if (itemKey === "link") {
                 const newState = {
                     [itemKey]: {
@@ -183,11 +229,11 @@ export class Toolbar extends React.Component<IProps, IState> {
                         active: quillUtilities.rangeContainsBlot(this.quill, range, LinkBlot),
                     },
                 };
-                this.setState(newState);
+                this.setMenuState(newState);
                 continue;
             }
 
-            this.updateBooleanFormat(itemKey, itemData, range);
+            this.updateBooleanFormat(itemKey, itemData);
         }
     }
 
@@ -198,7 +244,8 @@ export class Toolbar extends React.Component<IProps, IState> {
      * @param itemData - The item to modify.
      * @param range - The range to update.
      */
-    private updateBooleanFormat(itemKey: string, itemData: IMenuItemData, range: RangeStatic) {
+    private updateBooleanFormat(itemKey: string, itemData: IMenuItemData) {
+        const { range } = this.state;
         let newActiveState = false;
         if (range !== null) {
             const formats = this.quill.getFormat(range);
@@ -216,7 +263,7 @@ export class Toolbar extends React.Component<IProps, IState> {
             },
         };
 
-        this.setState(newState);
+        this.setMenuState(newState);
     }
 }
 

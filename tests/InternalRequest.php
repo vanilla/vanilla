@@ -140,6 +140,11 @@ class InternalRequest extends HttpRequest implements RequestInterface {
         ob_end_clean();
         $_COOKIE = $cookieStash;
 
+        if ($ex = $data->getMeta('exception')) {
+            /* @var \Throwable $ex */
+            $data->setMeta('errorTrace', $ex->getTraceAsString());
+        }
+
         $response = new HttpResponse(
             $data->getStatus(),
             array_merge($data->getHeaders(), ['X-Data-Meta' => json_encode($data->getMetaArray())])

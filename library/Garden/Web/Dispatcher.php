@@ -251,7 +251,7 @@ class Dispatcher {
             $data = $raw instanceof \JsonSerializable ? $raw->jsonSerialize() : ['message' => $raw->getMessage()];
             $result = new Data($data, $errorCode);
             // Provide stack trace as meta information.
-            $result->setMeta('errorTrace', $raw->getTraceAsString());
+            $result->setMeta('exception', $raw);
 
             $this->mergeMeta($result, ['template' => 'error-page']);
         } elseif ($raw instanceof \JsonSerializable) {

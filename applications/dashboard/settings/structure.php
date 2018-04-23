@@ -331,6 +331,9 @@ $Construct->table('AnalyticsLocal')
     ->column('EmbedViews', 'int', true)
     ->set(false, false);
 
+$uploadPermission = 'Garden.Uploads.Add';
+$uploadPermissionExists = $Construct->table('Permission')->columnExists($uploadPermission);
+
 // Only Create the permission table if we are using Garden's permission model.
 $PermissionModel = Gdn::permissionModel();
 $PermissionModel->Database = $Database;
@@ -369,7 +372,8 @@ $PermissionModel->define([
     'Garden.PersonalInfo.View' => 'Garden.Moderation.Manage',
     'Garden.AdvancedNotifications.Allow',
     'Garden.Community.Manage' => 'Garden.Settings.Manage',
-    'Garden.Tokens.Add' => 'Garden.Settings.Manage'
+    'Garden.Tokens.Add' => 'Garden.Settings.Manage',
+    $uploadPermission => 1
 ]);
 
 $PermissionModel->undefine([
@@ -381,6 +385,24 @@ $PermissionModel->undefine([
     'Garden.Themes.Manage',
     'Garden.Messages.Manage'
 ]);
+
+// Revoke the new upload permission from existing applicant, unconfirmed and guest roles.
+if ($uploadPermissionExists === false) {
+    $revokeTypes = [RoleModel::TYPE_APPLICANT, RoleModel::TYPE_UNCONFIRMED, RoleModel::TYPE_GUEST];
+
+    foreach ($revokeTypes as $revokeType) {
+        $revokeRoles = $RoleModel->getByType($revokeType)->resultArray();
+        foreach ($revokeRoles as $revokeRole) {
+            $revokePermissions = $PermissionModel->getRolePermissions($revokeRole['RoleID']);
+            foreach ($revokePermissions as $revokePermission) {
+                $PermissionModel->save([
+                    'PermissionID' => $revokePermission['PermissionID'],
+                    $uploadPermission => 0
+                ]);
+            }
+        }
+    }
+}
 
 // Invitation Table
 $Construct->table('Invitation')

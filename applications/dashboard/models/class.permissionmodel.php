@@ -117,6 +117,7 @@ class PermissionModel extends Gdn_Model {
             [
                 'Garden.Activity.View' => 1,
                 'Garden.Profiles.View' => 1,
+                'Garden.Uploads.Add' => 0
             ]
         );
         $this->addDefault(
@@ -125,7 +126,8 @@ class PermissionModel extends Gdn_Model {
                 'Garden.SignIn.Allow' => 1,
                 'Garden.Activity.View' => 1,
                 'Garden.Profiles.View' => 1,
-                'Garden.Email.View' => 1
+                'Garden.Email.View' => 1,
+                'Garden.Uploads.Add' => 0
             ]
         );
         $this->addDefault(
@@ -134,7 +136,8 @@ class PermissionModel extends Gdn_Model {
                 'Garden.SignIn.Allow' => 1,
                 'Garden.Activity.View' => 1,
                 'Garden.Profiles.View' => 1,
-                'Garden.Email.View' => 1
+                'Garden.Email.View' => 1,
+                'Garden.Uploads.Add' => 0
             ]
         );
         $this->addDefault(
@@ -147,7 +150,8 @@ class PermissionModel extends Gdn_Model {
                 'Garden.PersonalInfo.View' => 1,
                 'Garden.Profiles.View' => 1,
                 'Garden.Profiles.Edit' => 1,
-                'Garden.Email.View' => 1
+                'Garden.Email.View' => 1,
+                'Garden.Uploads.Add' => 1
             ]
         );
         $this->addDefault(
@@ -170,7 +174,8 @@ class PermissionModel extends Gdn_Model {
                 'Garden.AdvancedNotifications.Allow' => 1,
                 'Garden.Email.View' => 1,
                 'Garden.Curation.Manage' => 1,
-                'Garden.Moderation.Manage' => 1
+                'Garden.Moderation.Manage' => 1,
+                'Garden.Uploads.Add' => 1
             ]
         );
         $this->addDefault(
@@ -180,7 +185,8 @@ class PermissionModel extends Gdn_Model {
                 'Garden.Activity.View' => 1,
                 'Garden.Profiles.View' => 1,
                 'Garden.Profiles.Edit' => 1,
-                'Garden.Email.View' => 1
+                'Garden.Email.View' => 1,
+                'Garden.Uploads.Add' => 1
             ]
         );
 

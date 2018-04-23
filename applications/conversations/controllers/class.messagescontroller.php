@@ -367,13 +367,14 @@ class MessagesController extends ConversationsController {
         }
 
         $this->Conversation = $this->ConversationModel->getID($conversationID);
-        $this->Conversation->Participants = $this->ConversationModel->getRecipients($conversationID);
-        $this->setData('Conversation', $this->Conversation);
-
         // Bad conversation? Redirect
         if ($this->Conversation === false) {
             throw notFoundException('Conversation');
         }
+        $this->Conversation->Participants = $this->ConversationModel->getRecipients($conversationID);
+        $this->setData('Conversation', $this->Conversation);
+
+
 
         // Get limit
         if ($limit == '' || !is_numeric($limit) || $limit < 0) {

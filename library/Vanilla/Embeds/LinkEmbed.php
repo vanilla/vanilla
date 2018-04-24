@@ -7,16 +7,23 @@
 namespace Vanilla\Embeds;
 
 use Exception;
+use Vanilla\PageInfo;
 
 /**
  * Generic link embed.
  */
 class LinkEmbed extends Embed {
 
+    /** @var PageInfo */
+    private $pageInfo;
+
     /**
      * LinkEmbed constructor.
+     *
+     * @param PageInfo $pageInfo
      */
-    public function __construct() {
+    public function __construct(PageInfo $pageInfo) {
+        $this->pageInfo = $pageInfo;
         parent::__construct('link', 'link');
     }
 
@@ -33,11 +40,7 @@ class LinkEmbed extends Embed {
         ];
 
         if ($this->isNetworkEnabled()) {
-            $pageInfo = fetchPageInfo($url, 3, false, true);
-
-            if ($pageInfo['Exception']) {
-                throw new Exception($pageInfo['Exception']);
-            }
+            $pageInfo = $this->pageInfo->fetch($url);
 
             $result['name'] = $pageInfo['Title'] ?: null;
             $result['body'] = $pageInfo['Description'] ?: null;

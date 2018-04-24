@@ -7,35 +7,28 @@
 import React from "react";
 import * as PropTypes from "prop-types";
 import classNames from "classnames";
+import uniqueId from "lodash/uniqueId";
 import { t } from "@core/application";
-import { withEditor, IEditorContextProps } from "../ContextProvider";
 
-interface IGenericPopoverProps extends IEditorContextProps {
+interface IProps {
     title: string;
     accessibleDescription: string;
     isVisible: boolean;
     body: JSX.Element;
     footer?: JSX.Element;
     additionalHeaderContent?: JSX.Element;
-    popoverTitleID: string;
-    popoverDescriptionID: string;
     alertMessage?: string;
-    id: string;
     additionalClassRoot?: string;
     className?: string;
-    closeMenuHandler(event?: React.MouseEvent<any>);
+    titleRef?: React.Ref<any>;
+    titleId?: string;
+    descriptionId?: string;
+    onCloseClick(event?: React.MouseEvent<any>);
 }
 
-export interface IPopoverProps extends IEditorContextProps {
-    isVisible: boolean;
-    closeMenuHandler: React.MouseEventHandler<any>;
-    blurHandler?: React.FocusEventHandler<any>;
-    popoverTitleID: string;
-    popoverDescriptionID: string;
-    id: string;
-}
+export default class Popover extends React.Component<IProps> {
+    private id = uniqueId("insertPopover-");
 
-export class Popover extends React.PureComponent<IGenericPopoverProps> {
     public render() {
         const { additionalClassRoot } = this.props;
 
@@ -64,24 +57,27 @@ export class Popover extends React.PureComponent<IGenericPopoverProps> {
             </span>
         ) : null;
 
+        const descriptionId = this.props.descriptionId || this.id + "-description";
+        const titleId = this.props.titleId || this.id + "-title";
+
         return (
             <div
                 className={classes}
                 role="dialog"
-                aria-describedby={this.props.popoverDescriptionID}
+                aria-describedby={descriptionId}
                 aria-hidden={!this.props.isVisible}
-                aria-labelledby={this.props.popoverTitleID}
-                id={this.props.id}
+                aria-labelledby={titleId}
+                id={this.id}
             >
                 {alertMessage}
                 <div className={headerClasses}>
-                    <h2 id={this.props.popoverTitleID} tabIndex={-1} className="H popover-title">
+                    <h2 id={titleId} tabIndex={-1} className="H popover-title" ref={this.props.titleRef}>
                         {this.props.title}
                     </h2>
-                    <div id={this.props.popoverDescriptionID} className="sr-only">
+                    <div id={descriptionId} className="sr-only">
                         {this.props.accessibleDescription}
                     </div>
-                    <button type="button" onClick={this.props.closeMenuHandler} className="Close richEditor-close">
+                    <button type="button" onClick={this.props.onCloseClick} className="Close richEditor-close">
                         <span className="Close-x" aria-hidden="true">
                             {t("×")}
                         </span>
@@ -98,5 +94,3 @@ export class Popover extends React.PureComponent<IGenericPopoverProps> {
         );
     }
 }
-
-export default withEditor<IGenericPopoverProps>(Popover);

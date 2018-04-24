@@ -120,28 +120,35 @@ class Dispatcher {
                         }
                     }
 
-                    try {
-                        ob_start();
-                        $actionResponse = $action();
-                    } finally {
-                        $ob = ob_get_clean();
-                    }
-                    $response = $this->makeResponse($actionResponse, $ob);
-                    if (is_object($action) && method_exists($action, 'getMetaArray')) {
-                        $this->mergeMeta($response, $action->getMetaArray());
-                    }
-                    $this->mergeMeta($response, $route->getMetaArray());
+                    $fn = function (RequestInterface $request) use ($route, $action): Data {
+                        if (is_object($action) && method_exists($action, 'replaceRequest')) {
+                            $action->replaceRequest($request);
+                        }
+
+                        try {
+                            ob_start();
+                            $actionResponse = $action();
+                        } finally {
+                            $ob = ob_get_clean();
+                        }
+                        $response = $this->makeResponse($actionResponse, $ob);
+                        if (is_object($action) && method_exists($action, 'getMetaArray')) {
+                            $this->mergeMeta($response, $action->getMetaArray());
+                        }
+                        $this->mergeMeta($response, $route->getMetaArray());
+
+                        return $response;
+                    };
+
+                    $response = static::callMiddlewares($request, $route->getMiddlewares(), $fn);
+
                     break;
                 }
             } catch (Pass $pass) {
                 // Pass to the next route.
                 continue;
-            } catch (\Exception $dispatchEx) {
+            } catch (\Throwable $dispatchEx) {
                 $response = $this->makeResponse($dispatchEx);
-                $this->mergeMeta($response, $route->getMetaArray());
-                break;
-            } catch (\Error $dispatchError) {
-                $response = $this->makeResponse($dispatchError);
                 $this->mergeMeta($response, $route->getMetaArray());
                 break;
             }

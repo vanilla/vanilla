@@ -80,4 +80,19 @@ class Action {
         $result = call_user_func_array($this->callback, $this->args);
         return $result;
     }
+
+    /**
+     * Replace any argument that has been mapped to the request with another request.
+     *
+     * Since middleware may spawn an entirely new request object it is necessary to check before the the action is called.
+     *
+     * @param RequestInterface $request The request to replace.
+     */
+    public function replaceRequest(RequestInterface $request) {
+        foreach ($this->args as $key => $value) {
+            if ($value instanceof  RequestInterface && $value !== $request) {
+                $this->args[$key] = $request;
+            }
+        }
+    }
 }

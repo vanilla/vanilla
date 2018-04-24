@@ -41,11 +41,12 @@ class LinkEmbed extends Embed {
 
         if ($this->isNetworkEnabled()) {
             $pageInfo = $this->pageInfo->fetch($url);
+            $images = $pageInfo['Images'] ?? [];
 
             $result['name'] = $pageInfo['Title'] ?: null;
             $result['body'] = $pageInfo['Description'] ?: null;
-            $result['photoUrl'] = !empty($pageInfo['Images']) ? reset($pageInfo['Images']) : null;
-            $result['media'] = $pageInfo['Media'];
+            $result['photoUrl'] = !empty($images) ? reset($images) : null;
+            $result['media'] = !empty($images) ? ['image' => $images] : [];
         }
 
         return $result;

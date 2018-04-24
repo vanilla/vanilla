@@ -393,6 +393,7 @@ class MediaTest extends AbstractAPIv2Test {
      * @param bool $networkEnabled
      * @throws \Garden\Container\ContainerException
      * @throws \Garden\Container\NotFoundException
+     * @large
      */
     public function testScrape($url, $type, array $info, $networkEnabled = false) {
         // Fetching is disabled by default in tests. Should it be enabled for this test?

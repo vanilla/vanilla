@@ -24,8 +24,12 @@ import VideoBlot from "./Blots/Embeds/VideoBlot";
 import LinkEmbedBlot from "./Blots/Embeds/RichLinkBlot";
 import EmbedLoadingBlot from "./Blots/Embeds/LoadingBlot";
 import EmbedErrorBlot from "./Blots/Embeds/ErrorBlot";
+import MentionBlot from "./Blots/Embeds/MentionBlot";
+import MentionComboBoxBlot from "./Blots/Embeds/MentionComboBoxBlot";
+import MentionAutoCompleteBlot from "./Blots/Embeds/MentionAutoCompleteBlot";
 
 // Custom Block Blots
+import BlockBlot from "./Blots/Blocks/BlockBlot";
 import SpoilerLineBlot, { SpoilerWrapperBlot, SpoilerContentBlot } from "./Blots/Blocks/SpoilerBlot";
 import BlockquoteLineBlot, { BlockquoteWrapperBlot, BlockquoteContentBlot } from "./Blots/Blocks/BlockquoteBlot";
 import CodeBlockBlot from "./Blots/Blocks/CodeBlockBlot";
@@ -39,6 +43,7 @@ import HistoryModule from "./HistoryModule";
 Quill.register(
     {
         // Block formats
+        "blots/block": BlockBlot,
         "formats/blockquote/line": BlockquoteLineBlot,
         "formats/blockquote/content": BlockquoteContentBlot,
         "formats/blockquote/wrapper": BlockquoteWrapperBlot,
@@ -54,6 +59,9 @@ Quill.register(
         "formats/loading-embed": EmbedLoadingBlot,
         "formats/link-embed": LinkEmbedBlot,
         "formats/error-embed": EmbedErrorBlot,
+        "formats/mention": MentionBlot,
+        "formats/mention-combobox": MentionComboBoxBlot,
+        "formats/mention-autocomplete": MentionAutoCompleteBlot,
 
         // Inline formats
         "formats/bold": Bold,
@@ -72,5 +80,8 @@ Quill.register(
     },
     true,
 );
+
+const Block = Quill.import("blots/block");
+Block.allowedChildren = [...Block.allowedChildren, MentionComboBoxBlot];
 
 export default Quill;

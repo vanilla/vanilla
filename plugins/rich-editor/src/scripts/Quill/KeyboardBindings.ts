@@ -294,7 +294,7 @@ export default class KeyboardBindings {
             index += 1;
         }
 
-        const isAlreadyLink = this.quill.scroll.descendants(LinkBlot, index, length).length > 0;
+        const isAlreadyLink = this.quill.scroll.descendants(blot => blot instanceof LinkBlot, index, length).length > 0;
 
         if (isAllowedUrl(lastWord) && !isAlreadyLink) {
             this.quill.formatText(index, length, { link: lastWord }, Quill.sources.USER);

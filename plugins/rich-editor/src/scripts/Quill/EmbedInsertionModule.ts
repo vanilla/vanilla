@@ -58,7 +58,7 @@ export default class EmbedInsertionModule extends Module {
             .post("/media/scrape", formData)
             .then(result => {
                 switch (result.data.type) {
-                    case "site":
+                    case "link":
                         this.createSiteEmbed(result.data);
                         break;
                     case "image":

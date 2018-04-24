@@ -5,8 +5,8 @@
  */
 
 import Delta from "quill-delta";
-import Quill from "../../Quill/RegisteredQuill";
-import KeyboardBindings from "../../Quill/KeyboardBindings";
+import Quill from "../RegisteredQuill";
+import KeyboardBindings from "../KeyboardBindings";
 
 const LINE_FORMATS = ["blockquote-line", "spoiler-line"];
 

@@ -5,16 +5,13 @@
  */
 
 import Emitter from "quill/core/emitter";
-import Quill, { RangeStatic, Blot } from "quill/core";
+import Quill, { RangeStatic, Blot, Container } from "quill/core";
 import Delta from "quill-delta";
 import Parchment from "parchment";
 import LineBlot from "./Blots/Abstract/LineBlot";
-
-/**
- * @typedef {Object} BoundaryStatic
- * @property {number} start
- * @property {number} end
- */
+import TextBlot from "quill/blots/text";
+import MentionComboBoxBlot from "./Blots/Embeds/MentionComboBoxBlot";
+import { matchAtMention } from "@core/utility";
 
 interface IBoundary {
     start: number;
@@ -107,14 +104,8 @@ export function rangeContainsBlot(quill: Quill, range: RangeStatic, blotConstruc
  * @param range - The range to check.
  * @param blotConstructor - A class constructor for a blot.
  */
-export function disableAllBlotsInRange<T extends Blot>(
-    quill: Quill,
-    range: RangeStatic,
-    blotConstructor: {
-        new (): T;
-    },
-) {
-    const currentBlots = quill.scroll.descendants(blotConstructor, range.index, range.length);
+export function disableAllBlotsInRange(quill: Quill, range: RangeStatic, blotConstructor: typeof Blot) {
+    const currentBlots = quill.scroll.descendants(blotConstructor as any, range.index, range.length) as Blot[];
     const firstBlot = currentBlots[0];
     const lastBlot = currentBlots[currentBlots.length - 1];
 
@@ -260,7 +251,6 @@ export function insertNewLineAtEndOfScroll(quill: Quill) {
  * @param quill - The quill instance.
  */
 export function insertNewLineAtStartOfScroll(quill: Quill) {
-    // const index = quill.
     const newContents = [
         {
             insert: "\n",
@@ -269,4 +259,64 @@ export function insertNewLineAtStartOfScroll(quill: Quill) {
     ];
     quill.setContents(newContents);
     quill.setSelection(0, 0);
+}
+
+/**
+ * Get a Blot at a given index.
+ *
+ * @param quill - The Quill instance.
+ * @param index - The index to look at.
+ * @param blotClass - Optionally a blot class to filter by.
+ */
+export function getBlotAtIndex<T extends Blot>(
+    quill: Quill,
+    index: number,
+    blotClass?: { new (value?: any): T },
+): T | null {
+    const condition = blotClass ? blot => blot instanceof blotClass : blot => true;
+    return quill.scroll.descendant(condition, index)[0] as T;
+}
+
+const MIN_MENTION_LENGTH = 1;
+
+/**
+ * Get the range of text to convert to a mention.
+ *
+ * @returns A range if a mention was matched, or null if one was not.
+ */
+export function getMentionRange(quill: Quill, selection?: RangeStatic): RangeStatic | null {
+    if (!selection) {
+        selection = quill.getSelection();
+    }
+
+    // Get details about our current leaf (likely a TextBlot).
+    // This breaks the text to search every time there is a different DOM Node. Eg. A format, link, line break.
+    const [leaf] = quill.getLeaf(selection.index);
+    const leafOffset = leaf.offset(quill.scroll);
+    const length = selection.index - leafOffset;
+    const leafContentBeforeCursor = quill.getText(leafOffset, length);
+
+    // See if the leaf's content contains an `@`.
+    const leafAtSignIndex = leafContentBeforeCursor.lastIndexOf("@");
+    if (leafAtSignIndex === -1) {
+        return null;
+    }
+    const mentionIndex = leafOffset + leafAtSignIndex;
+    const potentialMention = leafContentBeforeCursor.substring(leafAtSignIndex);
+
+    const usernameLength = potentialMention.length - 1;
+    const meetsLengthRequirements = usernameLength >= MIN_MENTION_LENGTH;
+    if (!meetsLengthRequirements) {
+        return null;
+    }
+
+    const isValidMention = matchAtMention(potentialMention);
+    if (!isValidMention) {
+        return null;
+    }
+
+    return {
+        index: mentionIndex,
+        length: potentialMention.length,
+    };
 }

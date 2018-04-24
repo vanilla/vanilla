@@ -353,7 +353,7 @@ declare module "quill/modules/keyboard" {
     type KeyboardHandler = (selectedRange: RangeStatic) => boolean | null | undefined | void; // False to prevent default.
 
     export default class KeyboardModule extends Module {
-        public static match(event: KeyboardEvent, binding: KeyBinding | string);
+        public static match(event: KeyboardEvent, binding: KeyBinding | string | number);
         public static keys: Keys;
         addBinding(key: KeyBinding | string | number, context: Context, handler: KeyboardHandler): void;
     }

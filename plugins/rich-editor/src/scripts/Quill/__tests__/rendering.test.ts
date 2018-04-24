@@ -4,7 +4,7 @@
  * @license GPLv2
  */
 
-import Quill from "../../Quill/RegisteredQuill";
+import Quill from "../RegisteredQuill";
 import * as fs from "fs";
 import * as path from "path";
 

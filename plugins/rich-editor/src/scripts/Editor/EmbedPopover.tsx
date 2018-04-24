@@ -125,7 +125,7 @@ export class EmbedPopover extends React.PureComponent<IProps, IState> {
         if (KeyboardModule.match(event.nativeEvent, "enter")) {
             event.preventDefault();
             event.stopPropagation();
-            this.submitUrl();
+            this.state.isInputValid && this.submitUrl();
         }
     };
 
@@ -150,7 +150,8 @@ export class EmbedPopover extends React.PureComponent<IProps, IState> {
      * Normalize the URL with a prepended http if there isn't one.
      */
     private normalizeUrl(url: string) {
-        return url.match(/$https?:\/\//) ? url : "http://" + url;
+        const result = url.match(/^https?:\/\//) ? url : "http://" + url;
+        return result;
     }
 }
 

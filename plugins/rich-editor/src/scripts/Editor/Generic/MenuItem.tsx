@@ -17,6 +17,7 @@ export interface IMenuItemData {
     formatName?: string;
     formatter?: FormatterCallback;
     enableValue?: object;
+    isFallback?: boolean;
 }
 
 interface IProps {

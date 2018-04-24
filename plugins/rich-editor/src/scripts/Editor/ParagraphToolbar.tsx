@@ -5,7 +5,7 @@
  */
 
 import React from "react";
-import Quill from "quill/core";
+import Quill, { Blot } from "quill/core";
 import { RangeStatic, Sources } from "quill";
 import Emitter from "quill/core/emitter";
 import Parchment from "parchment";
@@ -14,6 +14,7 @@ import Toolbar from "./Generic/Toolbar";
 import * as Icons from "./Icons";
 import { closeEditorFlyouts, CLOSE_FLYOUT_EVENT } from "../Quill/utility";
 import { withEditor, IEditorContextProps } from "./ContextProvider";
+import { IMenuItemData } from "./Generic/MenuItem";
 import FocusableEmbedBlot from "../Quill/Blots/Abstract/FocusableEmbedBlot";
 
 const PARAGRAPH_ITEMS = {
@@ -36,27 +37,6 @@ const PARAGRAPH_ITEMS = {
     },
 };
 
-const initialToolbarItems = {};
-
-// Parse our items that we use for detecting the active state into a format the toolbar can represent.
-for (const [formatName, contents] of Object.entries(PARAGRAPH_ITEMS)) {
-    if (formatName === "header") {
-        for (const [enableValue, headerContents] of Object.entries(contents)) {
-            initialToolbarItems[headerContents.name] = {
-                formatName,
-                enableValue,
-                active: false,
-            };
-        }
-    } else {
-        initialToolbarItems[(contents as any).name] = {
-            formatName,
-            enableValue: true,
-            active: false,
-        };
-    }
-}
-
 interface IState {
     range: RangeStatic;
     showMenu: boolean;
@@ -73,6 +53,9 @@ export class ParagraphToolbar extends React.PureComponent<IEditorContextProps, I
     private menuID: string;
     private buttonID: string;
     private selfRef: Element;
+    private toolbarItems: {
+        [key: string]: IMenuItemData;
+    };
 
     /**
      * @inheritDoc
@@ -96,6 +79,7 @@ export class ParagraphToolbar extends React.PureComponent<IEditorContextProps, I
             },
             activeFormatKey: "pilcrow",
         };
+        this.initializeToolbarValues();
     }
 
     /**
@@ -153,7 +137,7 @@ export class ParagraphToolbar extends React.PureComponent<IEditorContextProps, I
                     role="menu"
                 >
                     <Toolbar
-                        menuItems={initialToolbarItems}
+                        menuItems={this.toolbarItems}
                         isHidden={!this.state.showMenu}
                         onBlur={this.checkForExternalFocus}
                         itemRole="menuitem"
@@ -164,6 +148,48 @@ export class ParagraphToolbar extends React.PureComponent<IEditorContextProps, I
                 </div>
             </div>
         );
+    }
+
+    private initializeToolbarValues() {
+        const initialToolbarItems: any = {};
+
+        // Parse our items that we use for detecting the active state into a format the toolbar can represent.
+        for (const [formatName, contents] of Object.entries(PARAGRAPH_ITEMS)) {
+            if (formatName === "header") {
+                for (const [enableValue, headerContents] of Object.entries(contents)) {
+                    initialToolbarItems[headerContents.name] = {
+                        formatName,
+                        enableValue: parseInt(enableValue, 10),
+                        active: false,
+                    };
+                }
+            } else {
+                initialToolbarItems[(contents as any).name] = {
+                    formatName,
+                    enableValue: true,
+                    active: false,
+                };
+            }
+        }
+
+        const pilcrow = {
+            formatName: "pilcrow",
+            active: true,
+            enableValue: null,
+            isFallback: true,
+            formatter: () => {
+                // We have to grab the current line directly and work with it because quill doesn't properly unformat the code block otherwise.
+                const blot: Blot = this.quill.getLine(this.state.range.index)[0];
+                blot.replaceWith("block");
+                this.quill.update(Quill.sources.USER);
+                this.quill.setSelection(this.state.range, Quill.sources.USER);
+            },
+        };
+
+        this.toolbarItems = {
+            pilcrow,
+            ...initialToolbarItems,
+        };
     }
 
     /**

@@ -7,6 +7,7 @@
 use Garden\Schema\Schema;
 use Garden\Web\Exception\NotFoundException;
 use Vanilla\ApiUtils;
+use Vanilla\Embeds\EmbedManager;
 use Vanilla\ImageResizer;
 use Vanilla\UploadedFile;
 use Vanilla\UploadedFileSchema;
@@ -22,18 +23,18 @@ class MediaApiController extends AbstractApiController {
     /** @var MediaModel */
     private $mediaModel;
 
-    /** @var WebScraper */
-    private $webScraper;
+    /** @var EmbedManager */
+    private $embedManager;
 
     /**
      * MediaApiController constructor.
      *
      * @param MediaModel $mediaModel
-     * @param WebScraper $webScraper
+     * @param EmbedManager $embedManager
      */
-    public function __construct(MediaModel $mediaModel, WebScraper $webScraper) {
+    public function __construct(MediaModel $mediaModel, EmbedManager $embedManager) {
         $this->mediaModel = $mediaModel;
-        $this->webScraper = $webScraper;
+        $this->embedManager = $embedManager;
     }
 
     /**
@@ -337,8 +338,7 @@ class MediaApiController extends AbstractApiController {
             'url:s'	=> 'The URL that was scraped.',
             'type:s' => [
                 'description' => 'The type of site. This determines how the embed is rendered.',
-                'enum' => ['getty', 'image', 'imgur', 'instagram', 'pinterest', 'site', 'soundcloud',
-                'twitch', 'twitter', 'vimeo', 'vine', 'wistia', 'youtube']
+                'enum' => ['image', 'link', 'vimeo', 'youtube']
             ],
             'name:s|n' => 'The title of the page/item/etc. if any.',
             'body:s|n' => 'A paragraph summarizing the content, if any. This is not what is what gets rendered to the page.',
@@ -350,7 +350,7 @@ class MediaApiController extends AbstractApiController {
 
         $body = $in->validate($body);
 
-        $pageInfo = $this->webScraper->getPageInfo($body['url'], $body['force']);
+        $pageInfo = $this->embedManager->matchUrl($body['url'], $body['force']);
 
         $result = $out->validate($pageInfo);
         return $result;

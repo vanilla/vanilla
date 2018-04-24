@@ -9,9 +9,9 @@ namespace VanillaTests\APIv2;
 
 use Gdn_Upload;
 use Garden\Http\HttpResponse;
+use Vanilla\Embeds\EmbedManager;
 use Vanilla\UploadedFile;
 use VanillaTests\Fixtures\Uploader;
-use WebScraper;
 
 /**
  * Test the /api/v2/media endpoints.
@@ -173,7 +173,7 @@ class MediaTest extends AbstractAPIv2Test {
         $urls = [
             [
                 "{$testBaseUrl}/tests/fixtures/html/og.htm",
-                'site',
+                'link',
                 [
                     'name' => 'Online Community Software and Customer Forum Software by Vanilla Forums',
                     'body' => 'Engage your customers with a vibrant and modern online customer community forum. A customer community helps to increases loyalty, reduce support costs and deliver feedback.',
@@ -183,20 +183,6 @@ class MediaTest extends AbstractAPIv2Test {
                     'attributes' => []
                 ],
                 true
-            ],
-            [
-                'https://embed.gettyimages.com/embed/1234567890',
-                'getty',
-                [
-                    'name' => null,
-                    'body' => null,
-                    'photoUrl' => null,
-                    'height' => null,
-                    'width' => null,
-                    'attributes' => [
-                        'mediaID' => '1234567890'
-                    ],
-                ]
             ],
             [
                 'https://example.com/image.bmp',
@@ -295,133 +281,6 @@ class MediaTest extends AbstractAPIv2Test {
                 ]
             ],
             [
-                'https://i.imgur.com/foobar.gifv',
-                'imgur',
-                [
-                    'name' => null,
-                    'body' => null,
-                    'photoUrl' => null,
-                    'height' => null,
-                    'width' => null,
-                    'attributes' => [
-                        'mediaID' => 'foobar'
-                    ],
-                ]
-            ],
-            [
-                'https://www.instagram.com/p/foo-bar',
-                'instagram',
-                [
-                    'name' => null,
-                    'body' => null,
-                    'photoUrl' => null,
-                    'height' => null,
-                    'width' => null,
-                    'attributes' => [
-                        'mediaID' => 'foo-bar'
-                    ],
-                ]
-            ],
-            [
-                'https://instagram.com/p/foo-bar',
-                'instagram',
-                [
-                    'name' => null,
-                    'body' => null,
-                    'photoUrl' => null,
-                    'height' => null,
-                    'width' => null,
-                    'attributes' => [
-                        'mediaID' => 'foo-bar'
-                    ],
-                ]
-            ],
-            [
-                'https://instagr.am/p/foo-bar',
-                'instagram',
-                [
-                    'name' => null,
-                    'body' => null,
-                    'photoUrl' => null,
-                    'height' => null,
-                    'width' => null,
-                    'attributes' => [
-                        'mediaID' => 'foo-bar'
-                    ],
-                ]
-            ],
-            [
-                'https://www.pinterest.com/pin/1234567890',
-                'pinterest',
-                [
-                    'name' => null,
-                    'body' => null,
-                    'photoUrl' => null,
-                    'height' => null,
-                    'width' => null,
-                    'attributes' => [
-                        'pinID' => '1234567890'
-                    ],
-                ]
-            ],
-            [
-                'https://pinterest.com/pin/1234567890',
-                'pinterest',
-                [
-                    'name' => null,
-                    'body' => null,
-                    'photoUrl' => null,
-                    'height' => null,
-                    'width' => null,
-                    'attributes' => [
-                        'pinID' => '1234567890'
-                    ],
-                ]
-            ],
-            [
-                'https://soundcloud.com/example-user/foo-bar',
-                'soundcloud',
-                [
-                    'name' => null,
-                    'body' => null,
-                    'photoUrl' => null,
-                    'height' => null,
-                    'width' => null,
-                    'attributes' => [
-                        'user' => 'example-user',
-                        'track' => 'foo-bar'
-                    ],
-                ]
-            ],
-            [
-                'https://twitch.tv/foobar',
-                'twitch',
-                [
-                    'name' => null,
-                    'body' => null,
-                    'photoUrl' => null,
-                    'height' => null,
-                    'width' => null,
-                    'attributes' => [
-                        'channel' => 'foobar'
-                    ],
-                ]
-            ],
-            [
-                'https://twitter.com/example-user/status/1234567890',
-                'twitter',
-                [
-                    'name' => null,
-                    'body' => null,
-                    'photoUrl' => null,
-                    'height' => null,
-                    'width' => null,
-                    'attributes' => [
-                        'statusID' => '1234567890'
-                    ],
-                ]
-            ],
-            [
                 'https://vimeo.com/1234567890',
                 'vimeo',
                 [
@@ -436,125 +295,6 @@ class MediaTest extends AbstractAPIv2Test {
                 ]
             ],
             [
-                'https://vine.co/v/hzxpjd6b9d9',
-                'vine',
-                [
-                    'name' => null,
-                    'body' => null,
-                    'photoUrl' => null,
-                    'height' => null,
-                    'width' => null,
-                    'attributes' => [
-                        'videoID' => 'hzxpjd6b9d9'
-                    ],
-                ]
-            ],
-            [
-                'https://example.wistia.com/medias/foobar',
-                'wistia',
-                [
-                    'name' => null,
-                    'body' => null,
-                    'photoUrl' => null,
-                    'height' => null,
-                    'width' => null,
-                    'attributes' => [
-                        'videoID' => 'foobar',
-                        'time' => null
-                    ],
-                ]
-            ],
-            [
-                'https://example.wistia.com/?wvideo=foobar',
-                'wistia',
-                [
-                    'name' => null,
-                    'body' => null,
-                    'photoUrl' => null,
-                    'height' => null,
-                    'width' => null,
-                    'attributes' => [
-                        'videoID' => 'foobar',
-                        'time' => null
-                    ],
-                ]
-            ],
-            [
-                'https://example.wi.st/?wvideo=foobar',
-                'wistia',
-                [
-                    'name' => null,
-                    'body' => null,
-                    'photoUrl' => null,
-                    'height' => null,
-                    'width' => null,
-                    'attributes' => [
-                        'videoID' => 'foobar',
-                        'time' => null
-                    ],
-                ]
-            ],
-            [
-                'https://example.wistia.com/medias/foobar',
-                'wistia',
-                [
-                    'name' => null,
-                    'body' => null,
-                    'photoUrl' => null,
-                    'height' => null,
-                    'width' => null,
-                    'attributes' => [
-                        'videoID' => 'foobar',
-                        'time' => null
-                    ],
-                ]
-            ],
-            [
-                'https://example.wi.st/medias/foobar',
-                'wistia',
-                [
-                    'name' => null,
-                    'body' => null,
-                    'photoUrl' => null,
-                    'height' => null,
-                    'width' => null,
-                    'attributes' => [
-                        'videoID' => 'foobar',
-                        'time' => null
-                    ],
-                ]
-            ],
-            [
-                'https://example.wistia.com/?wvideo=foobar&wtime=3m30s',
-                'wistia',
-                [
-                    'name' => null,
-                    'body' => null,
-                    'photoUrl' => null,
-                    'height' => null,
-                    'width' => null,
-                    'attributes' => [
-                        'videoID' => 'foobar',
-                        'time' => '3m30s'
-                    ],
-                ]
-            ],
-            [
-                'https://example.wistia.com/medias/foobar?wtime=3m30s',
-                'wistia',
-                [
-                    'name' => null,
-                    'body' => null,
-                    'photoUrl' => null,
-                    'height' => null,
-                    'width' => null,
-                    'attributes' => [
-                        'videoID' => 'foobar',
-                        'time' => '3m30s'
-                    ],
-                ]
-            ],
-            [
                 'https://www.youtube.com/watch?v=9bZkp7q19f0',
                 'youtube',
                 [
@@ -564,9 +304,7 @@ class MediaTest extends AbstractAPIv2Test {
                     'height' => null,
                     'width' => null,
                     'attributes' => [
-                        'videoID' => '9bZkp7q19f0',
-                        'listID' => null,
-                        'start' => null,
+                        'videoID' => '9bZkp7q19f0'
                     ],
                 ]
             ],
@@ -580,9 +318,7 @@ class MediaTest extends AbstractAPIv2Test {
                     'height' => null,
                     'width' => null,
                     'attributes' => [
-                        'videoID' => '9bZkp7q19f0',
-                        'listID' => null,
-                        'start' => null,
+                        'videoID' => '9bZkp7q19f0'
                     ],
                 ]
             ],
@@ -597,7 +333,6 @@ class MediaTest extends AbstractAPIv2Test {
                     'width' => null,
                     'attributes' => [
                         'videoID' => '9bZkp7q19f0',
-                        'listID' => null,
                         'start' => 182,
                     ],
                 ]
@@ -613,7 +348,6 @@ class MediaTest extends AbstractAPIv2Test {
                     'width' => null,
                     'attributes' => [
                         'videoID' => '9bZkp7q19f0',
-                        'listID' => null,
                         'start' => 182,
                     ],
                 ]
@@ -630,13 +364,6 @@ class MediaTest extends AbstractAPIv2Test {
      */
     public function provideTypeUrls() {
         $urls = [
-            ['https://vine.co/v/abc123', 'vine'],
-            ['https://embed.gettyimages.com/embed/1234567890', 'getty'],
-            ['https://imgur.com/example', 'imgur'],
-            ['https://imgur.com/example.jpg', 'imgur'],
-            ['https://i.imgur.com/example', 'imgur'],
-            ['https://m.imgur.com/example', 'imgur'],
-            ['https://www.pinterest.com/pin/1234567890', 'pinterest'],
             ['https://vimeo.com/251083506', 'vimeo'],
             ['https://youtube.com/watch?v=example', 'youtube'],
             ['https://youtube.ca/watch?v=example', 'youtube']
@@ -653,7 +380,7 @@ class MediaTest extends AbstractAPIv2Test {
      */
     public function tearDown() {
         // Make sure fetching page info is re-disabled, after every test.
-        $this->setDisableFetch(true);
+        $this->setNetworkEnabled(false);
     }
 
     /**
@@ -663,14 +390,14 @@ class MediaTest extends AbstractAPIv2Test {
      * @param array $url
      * @param string $type
      * @param array $info
-     * @param bool $enableFetch
+     * @param bool $networkEnabled
      * @throws \Garden\Container\ContainerException
      * @throws \Garden\Container\NotFoundException
      */
-    public function testScrape($url, $type, array $info, $enableFetch = false) {
+    public function testScrape($url, $type, array $info, $networkEnabled = false) {
         // Fetching is disabled by default in tests. Should it be enabled for this test?
-        if ($enableFetch) {
-            $this->setDisableFetch(false);
+        if ($networkEnabled) {
+            $this->setNetworkEnabled($networkEnabled);
         }
         $result = $this->api()->post('media/scrape', ['url' => $url]);
         $this->assertEquals(201, $result->getStatusCode());
@@ -704,15 +431,15 @@ class MediaTest extends AbstractAPIv2Test {
     }
 
     /**
-     * Set the "disable fetch" flag of the web scraper to avoid attempting to download documents.
+     * Set the "network enabled" flag of the embed manager to allow (or disallow) embed objects using network requests.
      *
-     * @param bool $disableFetch
+     * @param bool $networkEnabled
      * @throws \Garden\Container\ContainerException
      * @throws \Garden\Container\NotFoundException
      */
-    private function setDisableFetch($disableFetch) {
-        /** @var WebScraper $webScraper */
-        $webScraper = static::container()->get(WebScraper::class);
-        $webScraper->setDisableFetch($disableFetch);
+    private function setNetworkEnabled($networkEnabled) {
+        /** @var EmbedManager $embedManager */
+        $embedManager = static::container()->get(EmbedManager::class);
+        $embedManager->setNetworkEnabled($networkEnabled);
     }
 }

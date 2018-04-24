@@ -329,10 +329,7 @@ class CommentsApiController extends AbstractApiController {
         $this->formatField($dbRecord, 'Body', $dbRecord['Format']);
         $dbRecord['Url'] = commentUrl($dbRecord);
 
-        if (!is_array($dbRecord['Attributes'])) {
-            $attributes = dbdecode($dbRecord['Attributes']);
-            $dbRecord['Attributes'] = is_array($attributes) ? $attributes : [];
-        }
+        $dbRecord['Attributes'] = new \Vanilla\Attributes($dbRecord['Attributes']);
 
         $schemaRecord = ApiUtils::convertOutputKeys($dbRecord);
 

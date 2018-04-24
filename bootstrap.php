@@ -320,7 +320,10 @@ $dic->call(function (
         /* @var Addon $addon */
         if ($bootstrapPath = $addon->getSpecial('bootstrap')) {
             $bootstrapPath = $addon->path($bootstrapPath);
-            include_once $bootstrapPath;
+            $fn = include_once $bootstrapPath;
+            if (is_callable($fn)) {
+                $dic->call($fn);
+            }
         }
     }
 

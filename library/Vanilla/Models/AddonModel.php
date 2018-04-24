@@ -187,7 +187,10 @@ class AddonModel implements LoggerAwareInterface {
 
         // Load bootstrap file.
         if ($bootstrap = $addon->getSpecial('bootstrap')) {
-            include_once $addon->path($bootstrap, Addon::PATH_FULL);
+            $fn = include_once $addon->path($bootstrap, Addon::PATH_FULL);
+            if (is_callable($fn)) {
+                $this->container->call($fn);
+            }
         }
 
         $this->runSetup($addon);

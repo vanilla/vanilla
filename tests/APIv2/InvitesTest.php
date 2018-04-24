@@ -52,6 +52,7 @@ class InvitesTest extends AbstractResourceTest {
     /**
      * {@inheritdoc}
      * @requires function InvitationsApiController::get_edit
+     * @group ignore
      */
     public function testGetEdit($record = null) {
         $this->fail(__METHOD__.' needs to be implemented.');
@@ -60,6 +61,7 @@ class InvitesTest extends AbstractResourceTest {
     /**
      * {@inheritdoc}
      * @requires function InvitationsApiController::get_edit
+     * @group ignore
      */
     public function testGetEditFields() {
         $this->fail(__METHOD__.' needs to be implemented.');

@@ -105,7 +105,8 @@ class ApplicantsTest extends AbstractResourceTest {
 
     /**
      * {@inheritdoc}
-     * @requires function ApplicationsApiController::get_edit
+     * @requires function ApplicantsApiController::get_edit
+     * @group ignore
      */
     public function testGetEdit($record = null) {
         $this->fail(__METHOD__.' needs to be implemented.');
@@ -113,7 +114,8 @@ class ApplicantsTest extends AbstractResourceTest {
 
     /**
      * {@inheritdoc}
-     * @requires function ApplicationsApiController::get_edit
+     * @requires function ApplicantsApiController::get_edit
+     * @group ignore
      */
     public function testGetEditFields() {
         $this->fail(__METHOD__.' needs to be implemented.');
@@ -121,6 +123,7 @@ class ApplicantsTest extends AbstractResourceTest {
 
     /**
      * {@inheritdoc}
+     * @group ignore
      */
     public function testPatchFull() {
         $this->markTestSkipped();
@@ -129,6 +132,7 @@ class ApplicantsTest extends AbstractResourceTest {
     /**
      * {@inheritdoc}
      * @dataProvider providePatchFields
+     * @group ignore
      */
     public function testPatchSparse($field) {
         $this->markTestSkipped();

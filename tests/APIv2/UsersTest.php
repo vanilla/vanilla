@@ -12,6 +12,7 @@ use VanillaTests\Fixtures\Uploader;
  * Test the /api/v2/users endpoints.
  */
 class UsersTest extends AbstractResourceTest {
+    use TestPutFieldTrait;
 
     /** @var int A value to ensure new records are unique. */
     protected static $recordCounter = 1;

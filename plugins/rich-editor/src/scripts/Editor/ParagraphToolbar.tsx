@@ -5,7 +5,7 @@
  */
 
 import React from "react";
-import Quill from "quill/core";
+import Quill, { Blot } from "quill/core";
 import { RangeStatic, Sources } from "quill";
 import Emitter from "quill/core/emitter";
 import Parchment from "parchment";
@@ -172,19 +172,16 @@ export class ParagraphToolbar extends React.PureComponent<IEditorContextProps, I
             }
         }
 
-        const formatsToDisable = Object.values(initialToolbarItems).map((item: IMenuItemData) => item.formatName);
-        const formatMap: any = {};
-        formatsToDisable.forEach(format => {
-            formatMap[format!] = false;
-        });
-
         const pilcrow = {
             formatName: "pilcrow",
             active: true,
             enableValue: null,
             isFallback: true,
             formatter: () => {
-                this.quill.formatLine(this.state.range.index, this.state.range.length, formatMap, Quill.sources.USER);
+                // We have to grab the current line directly and work with it because quill doesn't properly unformat the code block otherwise.
+                const blot: Blot = this.quill.getLine(this.state.range.index)[0];
+                blot.replaceWith("block");
+                this.quill.update(Quill.sources.USER);
             },
         };
 

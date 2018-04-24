@@ -111,7 +111,7 @@ export function close() {
 export function pilcrow() {
     return (
         <svg className="richEditorInline-icon" viewBox="0 0 24 24">
-            <title>{t("¶")}</title>
+            <title>{t("richEditor.menu.pilcrow")}</title>
             <path
                 fill="currentColor"
                 fillRule="evenodd"

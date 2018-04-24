@@ -666,6 +666,7 @@ class MediaTest extends AbstractAPIv2Test {
      * @param bool $enableFetch
      * @throws \Garden\Container\ContainerException
      * @throws \Garden\Container\NotFoundException
+     * @large
      */
     public function testScrape($url, $type, array $info, $enableFetch = false) {
         // Fetching is disabled by default in tests. Should it be enabled for this test?

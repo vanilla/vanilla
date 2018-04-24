@@ -182,6 +182,7 @@ export class ParagraphToolbar extends React.PureComponent<IEditorContextProps, I
                 const blot: Blot = this.quill.getLine(this.state.range.index)[0];
                 blot.replaceWith("block");
                 this.quill.update(Quill.sources.USER);
+                this.quill.setSelection(this.state.range, Quill.sources.USER);
             },
         };
 

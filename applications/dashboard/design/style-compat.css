@@ -661,6 +661,8 @@ label.checkbox input.checkbox-input {
   border: 0;
   padding: 0;
   background: none;
+  width: 100%;
+  text-align: left;
 }
 
 .richEditor-button {

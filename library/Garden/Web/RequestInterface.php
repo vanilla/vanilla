@@ -40,6 +40,14 @@ interface RequestInterface {
     public function getQuery();
 
     /**
+     * Set the query for the request.
+     *
+     * @param array $value The new query.
+     * @return $this
+     */
+    public function setQuery(array $value);
+
+    /**
      * Get the body of the request.
      *
      * @return mixed
@@ -67,6 +75,15 @@ interface RequestInterface {
      * @return string Returns the header value or an empty string.
      */
     public function getHeader($header);
+
+    /**
+     * Set a header value.
+     *
+     * @param string $header The name of the header.
+     * @param mixed $value The new value.
+     * @return $this
+     */
+    public function setHeader(string $header, $value);
 
     /**
      * Get a header's value(s) as a string.

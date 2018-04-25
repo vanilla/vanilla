@@ -53,6 +53,14 @@ class Request implements RequestInterface {
         return $this->query;
     }
 
+    /**
+     * {@inheritdoc}
+     */
+    public function setQuery(array $value) {
+        $this->query = $value;
+        return $this;
+    }
+
     public function getBody() {
         return $this->body;
     }
@@ -89,10 +97,10 @@ class Request implements RequestInterface {
      * Set a header on the request.
      *
      * @param string $header The header to set.
-     * @param string $value The value of the header.
+     * @param mixed $value The value of the header.
      * @return $this
      */
-    public function setHeader(string $header, string $value) {
+    public function setHeader(string $header, $value) {
         $this->headers[$header] = $value;
         return $this;
     }

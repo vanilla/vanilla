@@ -97,6 +97,19 @@ class InternalRequest extends HttpRequest implements RequestInterface {
     }
 
     /**
+     * {@inheritdoc}
+     */
+    public function setQuery(array $value) {
+        list($url, $query) = explode('?', $this->getUrl(), 1) + ['', ''];
+
+        if (empty($value)) {
+            $this->setUrl($url);
+        } else {
+            $this->setUrl($url.'?'.http_build_query($value));
+        }
+    }
+
+    /**
      * Convert this request into a legacy request.
      *
      * Many objects still depend on the Gdn_Request so we must add it to the container.

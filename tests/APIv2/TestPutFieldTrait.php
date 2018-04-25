@@ -47,5 +47,5 @@ trait TestPutFieldTrait {
      */
     abstract function api();
 
-    abstract function assertEquals($expected, $actual, $message = '');
+    abstract function assertEquals($expected, $actual, $message = '', $delta = 0.0, $maxDepth = 10, $canonicalize = false, $ignoreCase = false);
 }

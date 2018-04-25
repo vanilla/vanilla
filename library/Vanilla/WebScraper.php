@@ -14,7 +14,7 @@ use Garden\Http\HttpRequest;
 use Garden\Http\HttpResponse;
 use InvalidArgumentException;
 
-class PageInfo {
+class WebScraper {
 
     /** @var HttpRequest */
     private $httpRequest;
@@ -38,7 +38,7 @@ class PageInfo {
      * @return array Structured page information.
      * @throws Exception
      */
-    public function fetch(string $url): array {
+    public function pageInfo(string $url): array {
         $info = [
             'Title' => '',
             'Description' => '',

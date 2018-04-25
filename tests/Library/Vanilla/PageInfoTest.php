@@ -9,7 +9,7 @@ namespace VanillaTests\Library\Vanilla;
 use Exception;
 use Garden\Http\HttpRequest;
 use PHPUnit\Framework\TestCase;
-use VanillaTests\Fixtures\PageInfo;
+use VanillaTests\Fixtures\WebScraper;
 
 class PageInfoTest extends TestCase {
 
@@ -60,10 +60,10 @@ class PageInfoTest extends TestCase {
      * @dataProvider provideFetchData
      */
     public function testFetch(string $file, array $expected) {
-        $pageInfo = new PageInfo(new HttpRequest());
+        $pageInfo = new WebScraper(new HttpRequest());
         $url = 'file://'.self::HTML_DIR."/{$file}";
         $expected['Url'] = $url;
-        $result = $pageInfo->fetch($url);
+        $result = $pageInfo->pageInfo($url);
         $this->assertEquals($expected, $result);
     }
 }

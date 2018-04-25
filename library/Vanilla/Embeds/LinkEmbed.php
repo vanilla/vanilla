@@ -7,23 +7,23 @@
 namespace Vanilla\Embeds;
 
 use Exception;
-use Vanilla\PageInfo;
+use Vanilla\WebScraper;
 
 /**
  * Generic link embed.
  */
 class LinkEmbed extends Embed {
 
-    /** @var PageInfo */
-    private $pageInfo;
+    /** @var WebScraper */
+    private $webScraper;
 
     /**
      * LinkEmbed constructor.
      *
-     * @param PageInfo $pageInfo
+     * @param WebScraper $webScraper
      */
-    public function __construct(PageInfo $pageInfo) {
-        $this->pageInfo = $pageInfo;
+    public function __construct(WebScraper $webScraper) {
+        $this->webScraper = $webScraper;
         parent::__construct('link', 'link');
     }
 
@@ -40,7 +40,7 @@ class LinkEmbed extends Embed {
         ];
 
         if ($this->isNetworkEnabled()) {
-            $pageInfo = $this->pageInfo->fetch($url);
+            $pageInfo = $this->webScraper->pageInfo($url);
             $images = $pageInfo['Images'] ?? [];
 
             $result['name'] = $pageInfo['Title'] ?: null;

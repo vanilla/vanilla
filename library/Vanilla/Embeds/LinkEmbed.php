@@ -7,16 +7,23 @@
 namespace Vanilla\Embeds;
 
 use Exception;
+use Vanilla\WebScraper;
 
 /**
  * Generic link embed.
  */
 class LinkEmbed extends Embed {
 
+    /** @var WebScraper */
+    private $webScraper;
+
     /**
      * LinkEmbed constructor.
+     *
+     * @param WebScraper $webScraper
      */
-    public function __construct() {
+    public function __construct(WebScraper $webScraper) {
+        $this->webScraper = $webScraper;
         parent::__construct('link', 'link');
     }
 
@@ -33,16 +40,13 @@ class LinkEmbed extends Embed {
         ];
 
         if ($this->isNetworkEnabled()) {
-            $pageInfo = fetchPageInfo($url, 3, false, true);
-
-            if ($pageInfo['Exception']) {
-                throw new Exception($pageInfo['Exception']);
-            }
+            $pageInfo = $this->webScraper->pageInfo($url);
+            $images = $pageInfo['Images'] ?? [];
 
             $result['name'] = $pageInfo['Title'] ?: null;
             $result['body'] = $pageInfo['Description'] ?: null;
-            $result['photoUrl'] = !empty($pageInfo['Images']) ? reset($pageInfo['Images']) : null;
-            $result['media'] = $pageInfo['Media'];
+            $result['photoUrl'] = !empty($images) ? reset($images) : null;
+            $result['media'] = !empty($images) ? ['image' => $images] : [];
         }
 
         return $result;

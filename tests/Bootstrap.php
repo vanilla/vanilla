@@ -223,10 +223,6 @@ class Bootstrap {
             ->setClass(\Vanilla\Web\WebLinking::class)
             ->setShared(true)
 
-            ->rule(\WebScraper::class)
-            ->setShared(true)
-            ->addCall('setDisableFetch', [true])
-
             ->rule(\Vanilla\Embeds\EmbedManager::class)
             ->addCall('setDefaultEmbed', [new Reference(\Vanilla\Embeds\LinkEmbed::class)])
             ->addCall('addEmbed', [new Reference(\Vanilla\Embeds\YouTubeEmbed::class)])

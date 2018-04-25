@@ -7,12 +7,14 @@
 namespace VanillaTests\Library\Vanilla\Embeds;
 
 use Exception;
+use Garden\Http\HttpRequest;
 use PHPUnit\Framework\TestCase;
 use Vanilla\Embeds\EmbedManager;
 use Vanilla\Embeds\LinkEmbed;
 use Vanilla\Embeds\ImageEmbed;
 use Vanilla\Embeds\YouTubeEmbed;
 use Vanilla\Embeds\VimeoEmbed;
+use VanillaTests\Fixtures\WebScraper;
 use VanillaTests\Fixtures\NullCache;
 
 class EmbedManagerTest extends TestCase {
@@ -24,7 +26,7 @@ class EmbedManagerTest extends TestCase {
      */
     private function createEmbedManager(): EmbedManager {
         $embedManager = new EmbedManager(new NullCache(), new ImageEmbed);
-        $embedManager->setDefaultEmbed(new LinkEmbed())
+        $embedManager->setDefaultEmbed(new LinkEmbed(new WebScraper(new HttpRequest())))
             ->addEmbed(new YouTubeEmbed())
             ->addEmbed(new VimeoEmbed())
             ->addEmbed(new ImageEmbed(), EmbedManager::PRIORITY_LOW)

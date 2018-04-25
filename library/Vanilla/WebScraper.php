@@ -47,7 +47,7 @@ class WebScraper {
 
         $response = $this->getUrl($url);
 
-        if ($response->isResponseClass('2xx') === false) {
+        if (!$response->isResponseClass('2xx')) {
             throw new Exception('Unable to get URL contents.');
         }
 

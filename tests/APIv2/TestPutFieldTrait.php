@@ -38,7 +38,7 @@ trait TestPutFieldTrait {
     }
 
     abstract function providePutFields();
-    abstract function testPost();
+    abstract function testPost($record = null, array $extra = []);
 
     /**
      * Get the API client for internal requests.

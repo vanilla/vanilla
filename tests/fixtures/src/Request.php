@@ -13,12 +13,22 @@ use Garden\Web\RequestInterface;
  * A mock request object for testing.
  */
 class Request implements RequestInterface {
+    private $scheme = 'http';
+    private $host = 'example.com';
     private $method;
+    private $root;
     private $path;
     private $query = [];
     private $body = [];
     private $headers = [];
 
+    /**
+     * Request constructor.
+     *
+     * @param string $path The path of the request.
+     * @param string $method The HTTP method.
+     * @param array $data The query for **GET** requests or the body for other requests.
+     */
     public function __construct($path = '/', $method = 'GET', array $data = []) {
         $query = [];
 
@@ -34,21 +44,54 @@ class Request implements RequestInterface {
             $body = $data;
         }
 
+        $this->root = '';
         $this->path = '/'.ltrim($path, '/');
         $this->method = $method;
         $this->query = $query;
         $this->body = $body;
     }
 
-
+    /**
+     * {@inheritdoc}
+     */
     public function getPath() {
         return $this->path;
     }
 
+    /**
+     * Set the path of the request.
+     *
+     * @param string $path The new path.
+     * @return $this
+     */
+    public function setPath($path) {
+        $this->path = '/'.ltrim($path, '/');
+        return $this;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function getMethod() {
         return $this->method;
     }
 
+    /**
+     * Set the HTTP method used to do the request.
+     *
+     * Any string can be given here, but it will be converted to uppercase.
+     *
+     * @param string $method The HTTP method.
+     * @return $this
+     */
+    public function setMethod($method) {
+        $this->method = $method;
+        return $this;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function getQuery() {
         return $this->query;
     }
@@ -61,12 +104,40 @@ class Request implements RequestInterface {
         return $this;
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function getBody() {
         return $this->body;
     }
 
+    /**
+     * Set the body of the message.
+     *
+     * @param string|array $body The new body of the message.
+     * @return $this
+     */
+    public function setBody($body) {
+        $this->body = $body;
+        return $this;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function getScheme() {
-        return 'http';
+        return $this->scheme;
+    }
+
+    /**
+     * Set the scheme of the request.
+     *
+     * @param string $scheme One of "http" or "https".
+     * @return $this
+     */
+    public function setScheme($scheme) {
+        $this->scheme = $scheme;
+        return $this;
     }
 
     /**
@@ -75,22 +146,39 @@ class Request implements RequestInterface {
      * @return string
      */
     public function getHost() {
-        return 'example.com';
-    }
-
-    public function getRoot() {
-        return '';
+        return $this->host;
     }
 
     /**
-     * Get a header value.
+     * Set the hostname of the request.
      *
-     * @param string $header The name of the header.
-     * @param mixed $default The default value if the header does not exist.
-     * @return mixed Returns the header value or {@link $default}.
+     * @param string $host The new hostname.
+     * @return $this
      */
-    public function getHeader($header, $default = null) {
-        return isset($this->headers[$header]) ? $this->headers[$header] : $default;
+    public function setHost($host) {
+        $this->host = $host;
+        return $this;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getRoot() {
+        return $this->root;
+    }
+
+    /**
+     * Set the root path of the request.
+     *
+     * @param string $root The new root path of the request.
+     * @return $this
+     */
+    public function setRoot($root) {
+        $root = trim($root, '/');
+        $root = $root ? '' : "/$root";
+        $this->root = $root;
+
+        return $this;
     }
 
     /**
@@ -106,16 +194,14 @@ class Request implements RequestInterface {
     }
 
     /**
-     * {@inheritdoc}
+     * Get a header value.
+     *
+     * @param string $header The name of the header.
+     * @param mixed $default The default value if the header does not exist.
+     * @return mixed Returns the header value or {@link $default}.
      */
-    public function getHeaderLine($name) {
-        $value = $this->getHeader($name);
-        if (empty($value)) {
-            $value = '';
-        } elseif (is_array($value)) {
-            $value = implode(',', $value);
-        }
-        return $value;
+    public function getHeader($header, $default = null) {
+        return isset($this->headers[$header]) ? $this->headers[$header] : $default;
     }
 
     /**

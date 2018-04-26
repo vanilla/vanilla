@@ -25,25 +25,17 @@ class InternalRequest extends HttpRequest implements RequestInterface {
     private $container;
 
     public function __construct(
-        Dispatcher $dispatcher, Container $container,
-        $method = self::METHOD_GET, $url = '', $body = '', array $headers = [], array $options = []
+        Dispatcher $dispatcher,
+        Container $container,
+        $method = self::METHOD_GET,
+        $url = '',
+        $body = '',
+        array $headers = [],
+        array $options = []
     ) {
         parent::__construct($method, $url, $body, $headers, $options);
         $this->dispatcher = $dispatcher;
         $this->container = $container;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getHeaderLine($name) {
-        $value = $this->getHeaderLines($name);
-        if (empty($value)) {
-            $value = '';
-        } else {
-            $value = implode(',', $value);
-        }
-        return $value;
     }
 
     /**
@@ -58,34 +50,6 @@ class InternalRequest extends HttpRequest implements RequestInterface {
      */
     public function getScheme() {
         return parse_url($this->url, PHP_URL_SCHEME);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getRoot() {
-        $root = trim(parse_url($this->container->get('@baseUrl'), PHP_URL_PATH), '/');
-        $root = $root ? "/$root" : '';
-        return $root;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getPath() {
-        $path = parse_url($this->getUrl(), PHP_URL_PATH);
-        $root = $this->getRoot();
-
-        if (strpos($path, $root) === 0) {
-            $testPath = substr($path, strlen($root));
-            if (empty($testPath)) {
-                $path = '/';
-            } elseif ($testPath[0] = '/') {
-                $path = $testPath;
-            }
-        }
-
-        return $path;
     }
 
     /**
@@ -110,24 +74,8 @@ class InternalRequest extends HttpRequest implements RequestInterface {
     }
 
     /**
-     * Convert this request into a legacy request.
-     *
-     * Many objects still depend on the Gdn_Request so we must add it to the container.
-     *
-     * @return \Gdn_Request
+     * {@inheritdoc}
      */
-    private function convertToLegacyRequest() {
-        $request = new \Gdn_Request();
-
-        $request->setUrl($this->getUrl());
-        $request->setMethod($this->getMethod());
-        if (!empty($this->getBody())) {
-            $request->setBody($this->getBody());
-        }
-
-        return $request;
-    }
-
     public function send() {
         $this->container->setInstance(\Gdn_Request::class, $this->convertToLegacyRequest());
 
@@ -149,7 +97,7 @@ class InternalRequest extends HttpRequest implements RequestInterface {
         $data = $this->dispatcher->dispatch($this);
         // Render the view in case it updates the Data object.
         ob_start();
-            $this->dispatcher->render($this->container->get(\Gdn_Request::class), $data);
+        $this->dispatcher->render($this->container->get(\Gdn_Request::class), $data);
         ob_end_clean();
         $_COOKIE = $cookieStash;
 
@@ -169,6 +117,55 @@ class InternalRequest extends HttpRequest implements RequestInterface {
         return $response;
     }
 
+    /**
+     * Convert this request into a legacy request.
+     *
+     * Many objects still depend on the Gdn_Request so we must add it to the container.
+     *
+     * @return \Gdn_Request
+     */
+    private function convertToLegacyRequest() {
+        $request = new \Gdn_Request();
+
+        $request->setUrl($this->getUrl());
+        $request->setMethod($this->getMethod());
+        if (!empty($this->getBody())) {
+            $request->setBody($this->getBody());
+        }
+
+        return $request;
+    }
+
+    /**
+     * Set the hostname of the request.
+     *
+     * @param string $host The new hostname.
+     * @return $this
+     */
+    public function setHost($host) {
+        $url = static::buildUrl(array_replace(parse_url($this->getUrl()), ['host' => $host]));
+        $this->setUrl($url);
+        return $this;
+    }
+
+    /**
+     * Build a full URL based on parts from **parse_url()**.
+     *
+     * @param array $parts The URL parts to build.
+     * @return string
+     */
+    protected static function buildUrl(array $parts) {
+        $result = (!empty($parts['scheme']) ? $parts['scheme'].'://' : '')
+            .(!empty($parts['user']) ? $parts['user'].(!empty($parts['pass']) ? ':'.$parts['pass'] : '').'@' : '')
+            .(!empty($parts['host']) ? $parts['host'] : '')
+            .(!empty($parts['port']) ? ':'.$parts['port'] : '')
+            .(!empty($parts['path']) ? $parts['path'] : '')
+            .(!empty($parts['query']) ? '?'.$parts['query'] : '')
+            .(!empty($parts['fragment']) ? '#'.$parts['fragment'] : '');
+
+        return $result;
+    }
+
 //    public function handleErrorResponse(HttpResponse $response, $options = []) {
 //        if ($this->val('throw', $options, $this->throwExceptions)) {
 //            $body = $response->getBody();
@@ -180,4 +177,81 @@ class InternalRequest extends HttpRequest implements RequestInterface {
 //            throw new \Exception($message, $response->getStatusCode());
 //        }
 //    }
+
+    /**
+     * Set the path of the request.
+     *
+     * @param string $path The new path.
+     * @return $this
+     */
+    public function setPath($path) {
+        $path = ltrim($path, '/');
+        if (!empty($path)) {
+            $path = "/$path";
+        }
+
+        $url = static::buildUrl(array_replace(parse_url($this->getUrl()), ['path' => $this->getRoot().$path]));
+        $this->setUrl($url);
+        return $this;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getRoot() {
+        $root = trim(parse_url($this->container->get('@baseUrl'), PHP_URL_PATH), '/');
+        $root = $root ? "/$root" : '';
+        return $root;
+    }
+
+    /**
+     * Set the scheme of the request.
+     *
+     * @param string $scheme One of "http" or "https".
+     * @return $this
+     */
+    public function setScheme($scheme) {
+        $url = static::buildUrl(array_replace(parse_url($this->getUrl()), ['scheme' => strtoupper($scheme)]));
+        $this->setUrl($url);
+        return $this;
+    }
+
+    /**
+     * Set the root path of the request.
+     *
+     * @param string $root The new root path of the request.
+     * @return $this
+     */
+    public function setRoot($root) {
+        $root = trim($root, '/');
+        $root = $root ? '' : "/$root";
+        $path = $this->getPath();
+
+        $url = static::buildUrl(array_replace(parse_url($this->getUrl()), ['path' => $root.$path]));
+        $this->setUrl($url);
+
+        $baseUrl = static::buildUrl(array_replace(parse_url($this->container->get('@baseUrl')), ['path' => $root]));
+        $this->container->setInstance('@baseUrl', $baseUrl);
+
+        $this->root = $root;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getPath() {
+        $path = parse_url($this->getUrl(), PHP_URL_PATH);
+        $root = $this->getRoot();
+
+        if (strpos($path, $root) === 0) {
+            $testPath = substr($path, strlen($root));
+            if (empty($testPath)) {
+                $path = '/';
+            } elseif ($testPath[0] = '/') {
+                $path = $testPath;
+            }
+        }
+
+        return $path;
+    }
 }

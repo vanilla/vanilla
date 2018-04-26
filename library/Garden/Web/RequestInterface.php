@@ -83,7 +83,7 @@ interface RequestInterface {
      * @param mixed $value The new value.
      * @return $this
      */
-    public function setHeader(string $header, $value);
+    public function setHeader($header, $value);
 
     /**
      * Get a header's value(s) as a string.

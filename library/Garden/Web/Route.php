@@ -293,7 +293,7 @@ abstract class Route {
      * Match the route to a request.
      *
      * @param RequestInterface $request The request to match against.
-     * @return mixed Returns match information or **null** if the route doesn't match.
+     * @return callable Returns the action corresponding to the route match or **null** if the route doesn't match.
      */
     abstract public function match(RequestInterface $request);
 

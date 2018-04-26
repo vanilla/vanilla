@@ -17,6 +17,7 @@ use Interop\Container\ContainerInterface;
 use Vanilla\Permissions;
 
 class Dispatcher {
+    use MiddlewareAwareTrait;
 
     /** @var Gdn_Locale */
     private $locale;
@@ -42,7 +43,10 @@ class Dispatcher {
      * @param Gdn_Locale $locale
      * @param ContainerInterface $container The container is used to fetch view handlers.
      */
-    public function __construct(Gdn_Locale $locale, ContainerInterface $container) {
+    public function __construct(Gdn_Locale $locale = null, ContainerInterface $container = null) {
+        $this->middleware = function (RequestInterface $request): Data {
+            return $this->dispatchInternal($request);
+        };
         $this->locale = $locale;
         $this->container = $container;
     }
@@ -87,13 +91,26 @@ class Dispatcher {
     /**
      * Dispatch a request and return a response.
      *
+     * This method applies all added middleware and dispatches the inner request.
+     *
+     * @param RequestInterface $request The request to handle.
+     * @return Data Returns the response as a data object.
+     */
+    public function dispatch(RequestInterface $request) {
+        $result = $this->callMiddleware($request);
+        return $result;
+    }
+
+    /**
+     * Internal representation of the dispatch.
+     *
      * This method currently returns a {@link Data} object that will be directly rendered. This really only for API calls
      * and will be changed in the future. If you use this method now you'll have to refactor later.
      *
      * @param RequestInterface $request The request to handle.
      * @return Data Returns the response as a data object.
      */
-    public function dispatch(RequestInterface $request) {
+    protected function dispatchInternal(RequestInterface $request) {
         $ex = null;
 
         foreach ($this->routes as $route) {
@@ -240,7 +257,7 @@ class Dispatcher {
         } elseif (is_array($raw) || is_string($raw)) {
             // This is an array of response data.
             $result = new Data($raw);
-        } elseif ($raw instanceof \Exception || $raw instanceof \Error) {
+        } elseif ($raw instanceof \Throwable) {
 
             // Let's not mask errors when in debug mode!
             if ($raw instanceof \Error && debug())  {

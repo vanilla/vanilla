@@ -162,6 +162,10 @@ class LogModel extends Gdn_Pluggable {
      * @param int[]|string $logIDs
      */
     public function deleteIDs($logIDs) {
+        if (is_string($logIDs)) {
+            $logIDs = explode(',', $logIDs);
+        }
+
         // Get the log entries.
         $logs = $this->getIDs($logIDs);
         $models = [];

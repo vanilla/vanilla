@@ -28,6 +28,7 @@ class HomeController extends Gdn_Controller {
         $this->addJsFile('global.js');
         $this->addCssFile('admin.css');
         $this->MasterView = 'empty';
+        $this->canonicalUrl('');
         parent::initialize();
     }
 

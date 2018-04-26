@@ -446,7 +446,7 @@ class Gdn_Controller extends Gdn_Pluggable {
      */
     public function canonicalUrl($value = null) {
         if ($value === null) {
-            if ($this->_CanonicalUrl) {
+            if ($this->_CanonicalUrl || $this->_CanonicalUrl === '') {
                 return $this->_CanonicalUrl;
             } else {
                 $parts = [];

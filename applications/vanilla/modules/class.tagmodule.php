@@ -103,14 +103,14 @@ class TagModule extends Gdn_Module {
 
         $this->autoContext();
 
-//        $discussion = DiscussionModel::instance()->getID($this->ParentID);
+        $discussion = DiscussionModel::instance()->getID($this->ParentID);
         $tagCacheKey = "TagModule-{$this->ParentType}-{$this->ParentID}";
         switch ($this->ParentType) {
             case 'Discussion':
                 $tags = TagModel::instance()->getDiscussionTags($this->ParentID, false);
-//                if ($discussion->Type == 'Idea') {
-//                    $tags = $this->filterIdeaStatusTags($tags);
-//                }
+                if ($discussion->Type == 'Idea') {
+                    $tags = $this->filterIdeaStatusTags($tags);
+                }
                 break;
             case 'Category':
                 $tagQuery->join('TagDiscussion td', 't.TagID = td.TagID')
@@ -161,13 +161,11 @@ class TagModule extends Gdn_Module {
     public function filterIdeaStatusTags($tags) {
 
         $discussionTagIDs = array_column($tags,'TagID');
-        $where =[
-            'Type' => ''
-        ];
+
         $filteredTags = Gdn::sql()->select('*')
-            ->from('Tag t')
-            ->where($where)
-            ->whereIn('TagID',$discussionTagIDs)
+            ->from('Tag')
+            ->whereIn('TagID', $discussionTagIDs)
+            ->where('Type <>', 'Status')
             ->orderBy('CountDiscussions', 'desc')
             ->get()
             ->resultArray();

@@ -358,7 +358,7 @@ class Gdn_Request implements RequestInterface {
     /**
      * {@inheritdoc}
      */
-    public function setHeader(string $header, $value) {
+    public function setHeader($header, $value) {
         $this->setValueOn(self::INPUT_SERVER, $this->headerKey($header), $value);
         return $this;
     }

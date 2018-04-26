@@ -100,7 +100,7 @@ class Request implements RequestInterface {
      * @param mixed $value The value of the header.
      * @return $this
      */
-    public function setHeader(string $header, $value) {
+    public function setHeader($header, $value) {
         $this->headers[$header] = $value;
         return $this;
     }

@@ -314,4 +314,95 @@ class DashboardNavModule extends SiteNavModule {
         $this->fireAs(get_called_class())->fireEvent('render');
         return parent::toString();
     }
+
+    /**
+     * Get all of the sections and menus in the dashboard.
+     *
+     * @return array Returns a nested array of menus.
+     * @throws Exception Throws an exception if the module isn't configured properly.
+     */
+    public function getMenus() {
+        static $fetched = false;
+
+        // The init event must be fired first in order to put things in their proper order.
+        if (!self::isInitStaticFired()) {
+            self::setInitStaticFired(true);
+            $this->fireEvent('init');
+        }
+
+        if (!$fetched) {
+            $navAdapter = new NestedCollectionAdapter($this);
+            $this->EventArguments['SideMenu'] = $navAdapter;
+            $this->fireEvent('GetAppSettingsMenuItems');
+
+            $this->fireAs(get_called_class())->fireEvent('render');
+            $fetched = true;
+        }
+
+        $rawSections = $this->getSectionsInfo();
+        $items = DashboardNavModule::getSectionItems();
+
+        $menus = [];
+        foreach ($rawSections as $s) {
+            $menu = [
+                'name' => $s['title'],
+                'key' => $sectionID = strtolower($s['section']),
+                'description' => $s['description'],
+            ];
+            if (!empty($s['empty'])) {
+                $menu['url'] = $s['url'];
+            }
+
+            $groups = [];
+            if (isset($items[$sectionID])) {
+                $rawSection = $items[$sectionID];
+
+                foreach ($rawSection['groups'] as $g) {
+                    $section = [
+                        'key' => $g['key'],
+                        'name' => $g['text'] ?? '',
+                        'links' => [],
+                    ];
+
+                    $groups[$section['key']] = $section;
+                }
+
+                $this->sortItems($rawSection['links']);
+                foreach ($rawSection['links'] as $k => $l) {
+                    list($groupID, $linkID) = explode('.', $k);
+                    $link = [
+                        'name' => strip_tags($l['text']),
+                        'key' => $linkID,
+                        'url' => $l['url'],
+                        'react' => false,
+                    ];
+
+                    if (!empty($l['modifiers']['badge'])) {
+                        $link['badge'] = [
+                            'type' => 'text',
+                            'text' => $l['modifiers']['badge'],
+                        ];
+                    } elseif (!empty($l['modifiers']['popinRel'])) {
+                        $link['badge'] = [
+                            'type' => 'view',
+                            'url' => $l['modifiers']['popinRel'],
+                        ];
+                    }
+
+                    $groups[$groupID]['links'][] = $link;
+                }
+
+                // Remove sections with no links.
+                $groups = array_filter($groups, function ($s) {
+                    return !empty($s['links']);
+                });
+            }
+            if (!empty($groups) || !empty($menu['url'])) {
+                $menu['groups'] = array_values($groups);
+                $menus[] = $menu;
+            }
+        }
+
+        return $menus;
+    }
 }

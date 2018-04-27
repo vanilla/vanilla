@@ -140,7 +140,7 @@ class ReflectionAction {
         }
 
         // Check against the controller pattern.
-        if (preg_match("`(?:^|\\\\)$resourceRegex$`i", $controller, $m)) {
+        if (preg_match("`$resourceRegex$`i", $controller, $m)) {
             $resource = $m[1];
         } else {
             throw new \InvalidArgumentException("The controller is not an API controller.", 500);

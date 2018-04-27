@@ -24,7 +24,10 @@ if (!function_exists('renderDashboardNav')) {
                             echo icon(val('icon', $item)).' ';
                         }
                         echo val('text', $item);
-                        if (val('popinRel', $item)) {
+
+                        if (!empty($item['badge'])) {
+                            echo ' <span class="badge">'.htmlspecialchars($item['badge']).'</span >';
+                        } elseif (val('popinRel', $item)) {
                             echo ' <span class="Popin badge" rel="'.val('popinRel', $item).'"></span >';
                         }
                         ?>

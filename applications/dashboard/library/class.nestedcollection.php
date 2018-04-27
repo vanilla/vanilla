@@ -539,29 +539,34 @@ trait NestedCollection {
     /**
      * Recursive function to sort the items in a given array.
      *
-     * @param array $items The items to sort.
+     * @param array &$items The items to sort.
      */
-    private function sortItems(&$items) {
-        foreach($items as &$item) {
+    protected function sortItems(&$items) {
+        $i = 0;
+        foreach ($items as &$item) {
+            $item += ['_sort' => $i++];
             if (val('items', $item)) {
                 $this->sortItems($item['items']);
             }
         }
-        uasort($items, function($a, $b) use ($items) {
+
+        uasort($items, function ($a, $b) use ($items) {
             $sort_a = $this->sortItemsOrder($a, $items);
             $sort_b = $this->sortItemsOrder($b, $items);
 
-            if ($sort_a > $sort_b)
+            if ($sort_a > $sort_b) {
                 return 1;
-            elseif ($sort_a < $sort_b)
+            } elseif ($sort_a < $sort_b) {
                 return -1;
-            else
+            } else {
                 return 0;
+            }
         });
     }
 
     /**
      * Get the sort order of an item in the items array.
+     *
      * This function looks at the following keys:
      * - **sort (numeric)**: A specific numeric sort was provided.
      * - **sort array('before|after', 'key')**: You can specify that the item is before or after another item.
@@ -580,7 +585,7 @@ trait NestedCollection {
             if (is_numeric($item['sort'])) {
                 // This is a numeric sort
                 return $item['sort'] * 10000 + $default_sort;
-            } elseif (is_array($item['sort']) && $depth < 10) {
+            } elseif (is_array($item['sort']) && !empty($item['sort']) && $depth < 10) {
                 // This sort is before or after another depth.
                 $op = array_keys($item['sort'])[0];
                 $key = $item['sort'][$op];

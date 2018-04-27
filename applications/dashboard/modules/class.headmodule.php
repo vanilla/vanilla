@@ -423,15 +423,13 @@ if (!class_exists('HeadModule', false)) {
             if (method_exists($this->_Sender, 'CanonicalUrl') && !c('Garden.Modules.NoCanonicalUrl', false)) {
                 $canonicalUrl = $this->_Sender->canonicalUrl();
 
-                if (!isUrl($canonicalUrl)) {
+                if (!empty($canonicalUrl) && !isUrl($canonicalUrl)) {
                     $canonicalUrl = Gdn::router()->reverseRoute($canonicalUrl);
+                    $this->_Sender->canonicalUrl($canonicalUrl);
                 }
-
-                $this->_Sender->canonicalUrl($canonicalUrl);
-//            $CurrentUrl = url('', true);
-//            if ($CurrentUrl != $CanonicalUrl) {
-                $this->addTag('link', ['rel' => 'canonical', 'href' => $canonicalUrl]);
-//            }
+                if ($canonicalUrl) {
+                    $this->addTag('link', ['rel' => 'canonical', 'href' => $canonicalUrl]);
+                }
             }
 
             // Include facebook open-graph meta information.

@@ -2,7 +2,7 @@
 /**
  * @author Todd Burry <todd@vanillaforums.com>
  * @copyright 2009-2018 Vanilla Forums Inc.
- * @license Proprietary
+ * @license GPLv2
  */
 
 namespace Garden\Web;
@@ -17,13 +17,44 @@ interface RequestInterface {
     public function getHost();
 
     /**
+     * Set the hostname of the request.
+     *
+     * @param string $host The new hostname.
+     * @return $this
+     */
+    public function setHost($host);
+
+    /**
      * Get the method used to do the request.
      *
      * @return string
      */
     public function getMethod();
 
+    /**
+     * Set the HTTP method used to do the request.
+     *
+     * Any string can be given here, but it will be converted to uppercase.
+     *
+     * @param string $method The HTTP method.
+     * @return $this
+     */
+    public function setMethod($method);
+
+    /**
+     * Get the root folder of the request.
+     *
+     * @return string Returns the root as a string.
+     */
     public function getRoot();
+
+    /**
+     * Set the root path of the request.
+     *
+     * @param string $root The new root path of the request.
+     * @return $this
+     */
+    public function setRoot($root);
 
     /**
      * Get the path of the request.
@@ -33,11 +64,27 @@ interface RequestInterface {
     public function getPath();
 
     /**
+     * Set the path of the request.
+     *
+     * @param string $path The new path.
+     * @return $this
+     */
+    public function setPath($path);
+
+    /**
      * Get the query of the request.
      *
-     * @return mixed
+     * @return array
      */
     public function getQuery();
+
+    /**
+     * Set the query for the request.
+     *
+     * @param array $value The new query.
+     * @return $this
+     */
+    public function setQuery(array $value);
 
     /**
      * Get the body of the request.
@@ -47,11 +94,27 @@ interface RequestInterface {
     public function getBody();
 
     /**
+     * Set the body of the message.
+     *
+     * @param string|array $body The new body of the message.
+     * @return $this
+     */
+    public function setBody($body);
+
+    /**
      * Get the scheme of the request.
      *
      * @return string Either http or https.
      */
     public function getScheme();
+
+    /**
+     * Set the scheme of the request.
+     *
+     * @param string $scheme One of "http" or "https".
+     * @return $this
+     */
+    public function setScheme($scheme);
 
     /**
      * Get all headers from the request.
@@ -69,12 +132,13 @@ interface RequestInterface {
     public function getHeader($header);
 
     /**
-     * Get a header's value(s) as a string.
+     * Set a header value.
      *
-     * @param string $name The name of the header.
-     * @return string A header's value(s). Multiple values are returned as a CSV string.
+     * @param string $header The name of the header.
+     * @param mixed $value The new value.
+     * @return $this
      */
-    public function getHeaderLine($name);
+    public function setHeader($header, $value);
 
     /**
      * Checks if a header exists by the given case-insensitive name.

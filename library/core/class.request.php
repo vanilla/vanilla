@@ -358,6 +358,14 @@ class Gdn_Request implements RequestInterface {
     /**
      * {@inheritdoc}
      */
+    public function setHeader($header, $value) {
+        $this->setValueOn(self::INPUT_SERVER, $this->headerKey($header), $value);
+        return $this;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function getHeaderLine($name) {
         $value = $this->getHeader($name);
         if (empty($value)) {
@@ -1291,10 +1299,10 @@ class Gdn_Request implements RequestInterface {
     /**
      * Set the POST body for the request.
      *
-     * @param array $body
+     * @param $body
      * @return self
      */
-    public function setBody(array $body) {
+    public function setBody($body) {
         $this->setRequestArguments(self::INPUT_POST, $body);
         return $this;
     }

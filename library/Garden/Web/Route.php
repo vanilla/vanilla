@@ -25,6 +25,11 @@ abstract class Route {
     const MAP_REQUEST = 0x10; // map to the entire request
 
     /**
+     * @var callable[] An array of middleware callbacks that will be applied if the route is matched.
+     */
+    private $middlewares = [];
+
+    /**
      * Route constructor.
      */
     public function __construct() {
@@ -288,7 +293,7 @@ abstract class Route {
      * Match the route to a request.
      *
      * @param RequestInterface $request The request to match against.
-     * @return mixed Returns match information or **null** if the route doesn't match.
+     * @return callable Returns the action corresponding to the route match or **null** if the route doesn't match.
      */
     abstract public function match(RequestInterface $request);
 
@@ -314,5 +319,25 @@ abstract class Route {
                 return filter_var($value, FILTER_VALIDATE_FLOAT) !== false;
         }
         return true;
+    }
+
+    /**
+     * Add a middleware callback to the route.
+     *
+     * @param callable $middleware The middleware to add.
+     * @return $this
+     */
+    public function addMiddleware(callable $middleware) {
+        array_unshift($this->middlewares, $middleware);
+        return $this;
+    }
+
+    /**
+     * Get the middlewares that have been added to the route.
+     *
+     * @return callable[] Returns an array of middleware.
+     */
+    public function getMiddlewares() {
+        return $this->middlewares;
     }
 }

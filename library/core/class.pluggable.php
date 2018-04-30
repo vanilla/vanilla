@@ -183,9 +183,11 @@ abstract class Gdn_Pluggable {
 
         // Make sure that $ActualMethodName exists before continuing:
         if (!method_exists($this, $actualMethodName)) {
+            $className = get_called_class();
+
             // Make sure that a plugin is not handling the call
-            if (!Gdn::pluginManager()->hasNewMethod($this->ClassName, $referenceMethodName)) {
-                trigger_error(errorMessage('The "'.$this->ClassName.'" object does not have a "'.$actualMethodName.'" method.', $this->ClassName, $actualMethodName), E_USER_ERROR);
+            if (!Gdn::pluginManager()->hasNewMethod($className, $referenceMethodName)) {
+                trigger_error(errorMessage('The "'.$className.'" object does not have a "'.$actualMethodName.'" method.', $this->ClassName, $actualMethodName), E_USER_ERROR);
             }
         }
 

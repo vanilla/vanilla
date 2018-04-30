@@ -197,7 +197,7 @@ class AddonManagerTest extends TestCase {
         $path = $addon->path($subpath);
         $fileContents = file_get_contents($path);
         if (preg_match('`function userPhoto`i', $fileContents)) {
-            $this->markTestSkipped("We can't test classes that redeclare userPhoto(). $path");
+            $this->markTestIncomplete("We can't test classes that redeclare userPhoto(). $path");
             return;
         }
 

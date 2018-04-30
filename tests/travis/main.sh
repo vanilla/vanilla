@@ -21,8 +21,8 @@ else
 fi
 
 if [ "$DO_LINT" = true ]; then
-    ./vendor/bin/phpunit -c phpunit.xml.dist --coverage-clover=coverage.clover
+    ./vendor/bin/phpunit -c phpunit.xml.dist --coverage-clover=coverage.clover --exclude-group=ignore
 else
     echo "Skipping code coverage..."
-    ./vendor/bin/phpunit -c phpunit.xml.dist
+    ./vendor/bin/phpunit -c phpunit.xml.dist --exclude-group=ignore
 fi

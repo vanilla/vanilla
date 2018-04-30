@@ -54,4 +54,16 @@ class TwitterAuthenticator extends ShimAuthenticator {
     public static function isUnique(): bool {
         return true;
     }
+
+    /**
+     * {@link Authenticator::getAuthenticatorInfoImpl()}
+     */
+    protected function getAuthenticatorInfoImpl(): array {
+        return [
+            'ui' => [
+                'url' => '/entry/twauthorize',
+                'buttonName' => 'Sign in with Twitter',
+            ],
+        ];
+    }
 }

@@ -578,6 +578,9 @@ class EditorPlugin extends Gdn_Plugin {
         $c->addDefinition('textHelpText', t('editor.TextHelpText', 'You are using plain text in your post.'));
         $c->addDefinition('editorWysiwygCSS', $cssPath);
         $c->addDefinition('canUpload', $this->canUpload());
+        $c->addDefinition('fileErrorSize', t('editor.fileErrorSize', 'File size is too large.'));
+        $c->addDefinition('fileErrorFormat', t('editor.fileErrorFormat', 'File format is not allowed.'));
+        $c->addDefinition('fileErrorSizeFormat', t('editor.fileErrorSizeFormat', 'File size is too large and format is not allowed.'));
 
         $additionalDefinitions = [];
         $this->EventArguments['definitions'] = &$additionalDefinitions;

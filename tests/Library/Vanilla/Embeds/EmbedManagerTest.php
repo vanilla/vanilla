@@ -12,6 +12,7 @@ use PHPUnit\Framework\TestCase;
 use Vanilla\Embeds\EmbedManager;
 use Vanilla\Embeds\LinkEmbed;
 use Vanilla\Embeds\ImageEmbed;
+use Vanilla\Embeds\TwitterEmbed;
 use Vanilla\Embeds\YouTubeEmbed;
 use Vanilla\Embeds\VimeoEmbed;
 use VanillaTests\Fixtures\WebScraper;
@@ -27,6 +28,7 @@ class EmbedManagerTest extends TestCase {
     private function createEmbedManager(): EmbedManager {
         $embedManager = new EmbedManager(new NullCache(), new ImageEmbed);
         $embedManager->setDefaultEmbed(new LinkEmbed(new WebScraper(new HttpRequest())))
+            ->addEmbed(new TwitterEmbed())
             ->addEmbed(new YouTubeEmbed())
             ->addEmbed(new VimeoEmbed())
             ->addEmbed(new ImageEmbed(), EmbedManager::PRIORITY_LOW)
@@ -78,6 +80,21 @@ class EmbedManagerTest extends TestCase {
         </div>
     </article>
 </a>'
+            ],
+            [
+                [
+                    "url" => "https://twitter.com/jack/status/20",
+                    "type" => "twitter",
+                    "name" => null,
+                    "body" => null,
+                    "photoUrl" => null,
+                    "height" => null,
+                    "width" => null,
+                    "attributes" => [
+                        "statusID" => "20"
+                    ]
+                ],
+                '<div class="twitter-card" data-tweeturl="https://twitter.com/jack/status/20" data-tweetid="20"><a href="https://twitter.com/jack/status/20" class="tweet-url" rel="nofollow">https://twitter.com/jack/status/20</a></div>'
             ],
             [
                 [

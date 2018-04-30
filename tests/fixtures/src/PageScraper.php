@@ -7,9 +7,9 @@
 namespace VanillaTests\Fixtures;
 
 /**
- * A PageInfo class, limited to local files.
+ * A PageScraper class, limited to local files.
  */
-class WebScraper extends \Vanilla\WebScraper {
+class PageScraper extends \Vanilla\PageScraper {
     /** @inheritDoc */
     protected $validSchemes = ['file'];
 }

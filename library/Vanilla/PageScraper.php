@@ -14,7 +14,7 @@ use Garden\Http\HttpRequest;
 use Garden\Http\HttpResponse;
 use InvalidArgumentException;
 
-class WebScraper {
+class PageScraper {
 
     /** @var HttpRequest */
     private $httpRequest;

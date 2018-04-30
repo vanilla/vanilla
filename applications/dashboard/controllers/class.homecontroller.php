@@ -135,6 +135,7 @@ class HomeController extends Gdn_Controller {
         $this->clearNavigationPreferences();
         safeHeader("HTTP/1.0 503", true, 503);
         $this->setData('UpdateMode', true);
+        Gdn_Theme::section('Error');
         $this->render();
     }
 

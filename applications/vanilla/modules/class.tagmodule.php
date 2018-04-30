@@ -103,14 +103,18 @@ class TagModule extends Gdn_Module {
 
         $this->autoContext();
 
-        $discussion = DiscussionModel::instance()->getID($this->ParentID);
+        $this->EventArguments['tags'] = TagModel::instance()->getDiscussionTags($this->ParentID, false);
+        $this->EventArguments['_TagData'] = &$this->_TagData;
+        $this->fireEvent('getData');
+
+        if($this->_TagData) {
+            return;
+        }
+
         $tagCacheKey = "TagModule-{$this->ParentType}-{$this->ParentID}";
         switch ($this->ParentType) {
             case 'Discussion':
                 $tags = TagModel::instance()->getDiscussionTags($this->ParentID, false);
-                if ($discussion->Type == 'Idea') {
-                    $tags = $this->filterIdeaStatusTags($tags);
-                }
                 break;
             case 'Category':
                 $tagQuery->join('TagDiscussion td', 't.TagID = td.TagID')
@@ -156,21 +160,6 @@ class TagModule extends Gdn_Module {
      */
     public function assetTarget() {
         return 'Panel';
-    }
-
-    public function filterIdeaStatusTags($tags) {
-
-        $discussionTagIDs = array_column($tags,'TagID');
-
-        $filteredTags = Gdn::sql()->select('*')
-            ->from('Tag')
-            ->whereIn('TagID', $discussionTagIDs)
-            ->where('Type <>', 'Status')
-            ->orderBy('CountDiscussions', 'desc')
-            ->get()
-            ->resultArray();
-
-        return $filteredTags;
     }
 
     /**

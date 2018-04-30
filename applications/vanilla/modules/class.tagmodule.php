@@ -103,10 +103,9 @@ class TagModule extends Gdn_Module {
 
         $this->autoContext();
 
-        $this->EventArguments['tags'] = TagModel::instance()->getDiscussionTags($this->ParentID, false);
+        $this->EventArguments['id'] = $this->ParentID;
         $this->EventArguments['_TagData'] = &$this->_TagData;
         $this->fireEvent('getData');
-
         if($this->_TagData) {
             return;
         }

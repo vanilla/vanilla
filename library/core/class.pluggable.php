@@ -181,13 +181,16 @@ abstract class Gdn_Pluggable {
             $referenceMethodName = $methodName; // No x prefix
         }
 
+        $className = \Garden\EventManager::classBasename($this->ClassName ?: get_called_class());
+
         // Make sure that $ActualMethodName exists before continuing:
         if (!method_exists($this, $actualMethodName)) {
-            $className = get_called_class();
-
             // Make sure that a plugin is not handling the call
             if (!Gdn::pluginManager()->hasNewMethod($className, $referenceMethodName)) {
-                trigger_error(errorMessage('The "'.$className.'" object does not have a "'.$actualMethodName.'" method.', $this->ClassName, $actualMethodName), E_USER_ERROR);
+                throw new \BadMethodCallException(
+                    "The \"$className\" object does not have a \"$actualMethodName\" method.",
+                    501
+                );
             }
         }
 
@@ -195,36 +198,23 @@ abstract class Gdn_Pluggable {
         $this->EventArguments = $arguments;
 
         // Call the "Before" event handlers
-        Gdn::pluginManager()->callEventHandlers($this, $this->ClassName, $referenceMethodName, 'Before');
+        Gdn::pluginManager()->callEventHandlers($this, $className, $referenceMethodName, 'Before');
 
         // Call this object's method
-        if (Gdn::pluginManager()->hasMethodOverride($this->ClassName, $referenceMethodName)) {
+        if (Gdn::pluginManager()->hasMethodOverride($className, $referenceMethodName)) {
             // The method has been overridden
             $this->HandlerType = HANDLER_TYPE_OVERRIDE;
             $return = Gdn::pluginManager()->callMethodOverride($this, $this->ClassName, $referenceMethodName);
-        } elseif (Gdn::pluginManager()->hasNewMethod($this->ClassName, $referenceMethodName)) {
+        } elseif (Gdn::pluginManager()->hasNewMethod($className, $referenceMethodName)) {
             $this->HandlerType = HANDLER_TYPE_NEW;
-            $return = Gdn::pluginManager()->callNewMethod($this, $this->ClassName, $referenceMethodName);
+            $return = Gdn::pluginManager()->callNewMethod($this, $className, $referenceMethodName);
         } else {
-            // The method has not been overridden
-            $count = count($arguments);
-            if ($count == 0) {
-                $return = $this->$actualMethodName();
-            } elseif ($count == 1) {
-                $return = $this->$actualMethodName($arguments[0]);
-            } elseif ($count == 2) {
-                $return = $this->$actualMethodName($arguments[0], $arguments[1]);
-            } elseif ($count == 3) {
-                $return = $this->$actualMethodName($arguments[0], $arguments[1], $arguments[2]);
-            } elseif ($count == 4) {
-                $return = $this->$actualMethodName($arguments[0], $arguments[1], $arguments[2], $arguments[3]);
-            } else {
-                $return = $this->$actualMethodName($arguments[0], $arguments[1], $arguments[2], $arguments[3], $arguments[4]);
-            }
+            // The method has not been overridden.
+            $return = call_user_func_array([$this, $actualMethodName], $arguments);
         }
 
         // Call the "After" event handlers
-        Gdn::pluginManager()->callEventHandlers($this, $this->ClassName, $referenceMethodName, 'After');
+        Gdn::pluginManager()->callEventHandlers($this, $className, $referenceMethodName, 'After');
 
         return $return;
     }

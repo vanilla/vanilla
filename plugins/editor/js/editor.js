@@ -1072,24 +1072,20 @@
                                     editorDropdownsClose();
                                 } else {
                                     // File dropped is not allowed!
-                                    var message = 'File ';
-
-                                    if (!validFile) {
-                                        message += 'is not allowed';
+                                    var message;
+                                    if (!validSize && !validFile) {
+                                        message = gdn.definition('fileErrorSizeFormat', 'editor') + ' (max ' + maxUploadSize + ' bytes)';
                                     }
 
                                     if (!validSize) {
-                                        if (!validFile) {
-                                            message += ' and ';
-                                        }
-                                        message += 'is too large (max ' + maxUploadSize + ' bytes)';
+                                        message = gdn.definition('fileErrorSize', 'editor') + ' (max ' + maxUploadSize + ' bytes)';
                                     }
 
-                                    if (fileAlreadyExists) {
-                                        message += 'is already in this post. It will not be uploaded again';
+                                    if (!validFile) {
+                                        message = gdn.definition('fileErrorFormat', 'editor');
                                     }
 
-                                    gdn.informMessage(message + '.');
+                                    gdn.informMessage(message);
                                 }
                             });
                         }

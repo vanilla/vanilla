@@ -103,10 +103,12 @@ class TagModule extends Gdn_Module {
 
         $this->autoContext();
 
-        $this->EventArguments['id'] = $this->ParentID;
-        $this->EventArguments['_TagData'] = &$this->_TagData;
+        $tagData = null;
+        $this->EventArguments['ParentID'] = $this->ParentID;
+        $this->EventArguments['tagData'] = &$tagData;
         $this->fireEvent('getData');
-        if($this->_TagData) {
+        if(is_array($tagData)) {
+            $this->_TagData = new Gdn_DataSet($tagData, DATASET_TYPE_ARRAY);
             return;
         }
 

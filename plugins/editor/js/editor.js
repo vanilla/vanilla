@@ -1073,16 +1073,18 @@
                                 } else {
                                     // File dropped is not allowed!
                                     var message;
+
                                     if (!validSize && !validFile) {
                                         message = gdn.definition('fileErrorSizeFormat', 'editor') + ' (max ' + maxUploadSize + ' bytes)';
-                                    }
+                                    } else {
+                                        
+                                        if (!validSize) {
+                                            message = gdn.definition('fileErrorSize', 'editor') + ' (max ' + maxUploadSize + ' bytes)';
+                                        }
 
-                                    if (!validSize) {
-                                        message = gdn.definition('fileErrorSize', 'editor') + ' (max ' + maxUploadSize + ' bytes)';
-                                    }
-
-                                    if (!validFile) {
-                                        message = gdn.definition('fileErrorFormat', 'editor');
+                                        if (!validFile) {
+                                            message = gdn.definition('fileErrorFormat', 'editor');
+                                        }
                                     }
 
                                     gdn.informMessage(message);

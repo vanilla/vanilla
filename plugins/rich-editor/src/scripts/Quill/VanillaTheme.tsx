@@ -42,12 +42,11 @@ export default class VanillaTheme extends ThemeBase {
 
         // Add keyboard bindings to options.
         this.addModule("embed/insertion");
-        const embedFocus = this.addModule("embed/focus");
+        this.addModule("embed/focus");
         const keyboardBindings = new KeyboardBindings(this.quill);
         this.options.modules.keyboard.bindings = {
             ...this.options.modules.keyboard.bindings,
             ...keyboardBindings.bindings,
-            ...embedFocus.earlyKeyBoardBindings,
         };
 
         // Find the editor root.
@@ -63,7 +62,7 @@ export default class VanillaTheme extends ThemeBase {
         // Mount react components
         this.mountToolbar();
         this.mountParagraphMenu();
-        this.mountEmbedPopover();
+        // this.mountEmbedPopover();
     }
 
     /**

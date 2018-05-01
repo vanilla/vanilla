@@ -260,8 +260,6 @@ export default class KeyboardBindings {
         this.bindings["outdent code-block"] = false;
         this.bindings["remove tab"] = false;
         this.bindings["code exit"] = false;
-        this.bindings["embed left"] = false;
-        this.bindings["embed right"] = false;
     }
 
     private addLinkTransformKeyboardBindings() {

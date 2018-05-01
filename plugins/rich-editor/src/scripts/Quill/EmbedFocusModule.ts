@@ -21,32 +21,14 @@ import { normalizeBlotIntoBlock, insertNewLineAtEndOfScroll, insertNewLineAtStar
  * @see {FocusableEmbedBlot}
  */
 export default class EmbedFocusModule extends Module {
-    /**
-     * Some keyboard bindings need to run before quill's own event listeners. Events here are added to Quill's
-     * KeyboardModule and run before its built in listeners.
-     */
-    public earlyKeyBoardBindings = {};
-
     /** The previous selection */
     private lastSelection: RangeStatic = {
         index: 0,
         length: 0,
     };
 
-    /**
-     * Whether or not an early keyboard binding has prevented default.
-     * Quill doesn't stop event propagation or give the event in the handler.
-     */
-    private hasHandledDelete = false;
-
     constructor(quill: Quill, options = {}) {
         super(quill, options);
-
-        // This needs to be exported in set in the quill options, before the keyboard module is instantiated, so that it's handler runs before quill's delete handler. Otherwise we can't prevent default.
-        this.earlyKeyBoardBindings["Backspace over Blot"] = {
-            key: KeyboardModule.keys.BACKSPACE,
-            handler: this.earlyQuillDeleteListener,
-        };
 
         // Add event listeners.
         quill.on("selection-change", (range, oldRange, source) => {
@@ -68,7 +50,7 @@ export default class EmbedFocusModule extends Module {
             this.quill.container,
         );
 
-        this.quill.container.addEventListener("keydown", this.keyDownListener);
+        this.quill.root.addEventListener("keydown", this.keyDownListener);
     }
 
     /**
@@ -84,19 +66,16 @@ export default class EmbedFocusModule extends Module {
      * - Set focus on the previous embed Blot.
      * - Prevent handleDeleteOnEmbed on from running.
      */
-    private earlyQuillDeleteListener = () => {
+    private handleDeleteOnQuill = (event: KeyboardEvent) => {
+        if (!this.isKeyCodeDelete(event.keyCode)) {
+            return true;
+        }
         const [currentBlot] = this.quill.getLine(this.quill.getSelection().index);
         const previousBlot = currentBlot.prev;
         const isPreviousBlotEmbed = previousBlot instanceof FocusableEmbedBlot;
         const isCurrentBlotEmpty = currentBlot.domNode.textContent === "";
 
         if (isPreviousBlotEmbed && isCurrentBlotEmpty) {
-            this.hasHandledDelete = true;
-
-            // This is kind of ugly but I can't think of a better way to handle it. There is no way to know in the context of `handleDeleteOnEmbed` otherwise if quill has prevented default (it doesn't stop propagation).
-            setTimeout(() => {
-                this.hasHandledDelete = false;
-            }, 0);
             (currentBlot as Blot).remove();
             this.quill.update(Quill.sources.USER);
             this.focusEmbedBlot(previousBlot);
@@ -117,6 +96,7 @@ export default class EmbedFocusModule extends Module {
         const exclusiveHandlers = [
             this.handleArrowKeyFromEmbed,
             this.handleArrowKeyAwayFromQuill,
+            this.handleDeleteOnQuill,
             this.handleDeleteOnEmbed,
             this.handleEnterOnEmbed,
         ];
@@ -139,10 +119,6 @@ export default class EmbedFocusModule extends Module {
      */
     private handleDeleteOnEmbed = (event: KeyboardEvent) => {
         if (!this.isKeyCodeDelete(event.keyCode)) {
-            return true;
-        }
-
-        if (this.hasHandledDelete) {
             return true;
         }
 

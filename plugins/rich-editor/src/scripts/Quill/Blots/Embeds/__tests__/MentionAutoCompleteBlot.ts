@@ -7,7 +7,7 @@
 import Quill from "../../../RegisteredQuill";
 import Parchment from "parchment";
 import MentionAutoCompleteBlot from "../MentionAutoCompleteBlot";
-import { IMentionData } from "../../../../Editor/MentionItem";
+import { IMentionData } from "../../../../Editor/MentionSuggestion";
 
 test("finalize", () => {
     const quill = new Quill(document.body);

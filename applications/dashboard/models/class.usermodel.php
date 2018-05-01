@@ -2173,6 +2173,9 @@ class UserModel extends Gdn_Model {
         if (array_key_exists('Email', $formPostValues) && val('ValidateEmail', $settings, true)) {
             $this->Validation->applyRule('Email', 'Email');
         }
+        if (val('ValidateName', $settings, true)) {
+            $this->Validation->applyRule('Name', 'Username');
+        }
 
         if ($this->validate($formPostValues, $insert) && $uniqueValid) {
             // All fields on the form that need to be validated (including non-schema field rules defined above)
@@ -3038,8 +3041,13 @@ class UserModel extends Gdn_Model {
         $this->defineSchema();
 
         // Add & apply any extra validation rules.
+        $this->Validation->addRule('UsernameBlacklist', 'function:validateAgainstUsernameBlacklist');
+        $this->Validation->applyRule('Name', 'UsernameBlacklist');
         if (val('ValidateEmail', $options, true)) {
             $this->Validation->applyRule('Email', 'Email');
+        }
+        if (val('ValidateName', $options, true)) {
+            $this->Validation->applyRule('Name', 'Username');
         }
 
         // TODO: DO I NEED THIS?!

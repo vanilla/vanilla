@@ -254,9 +254,14 @@ class Gdn_AuthenticationProviderModel extends Gdn_Model {
 
             $fields = $this->Validation->validationFields();
             if ($insert === false) {
-                $primaryKeyVal = $row[$this->PrimaryKey];
-                $this->update($fields, [$this->PrimaryKey => $primaryKeyVal]);
+                if ($settings['checkExisting'] ?? false) {
+                    $fields = array_diff_assoc($fields, $row);
+                }
 
+                if (!empty($fields)) {
+                    $primaryKeyVal = $row[$this->PrimaryKey];
+                    $this->update($fields, [$this->PrimaryKey => $primaryKeyVal]);
+                }
             } else {
                 $primaryKeyVal = $this->insert($fields);
             }

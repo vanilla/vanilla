@@ -152,4 +152,16 @@ abstract class AbstractAPIv2Test extends TestCase {
         $item = $this->logger->search($filter);
         $this->assertNotNull($item, "Could not find expected log: ".json_encode($filter));
     }
+
+    /**
+     * Generate a random valid username.
+     *
+     * @param string $prefix
+     * @return string
+     */
+    protected static function randomUsername(string $prefix = ''): string {
+        $uniqueID = preg_replace('/[^0-9A-Z_]/i', '_', uniqid($prefix, true));
+        $result = substr($uniqueID, 0, 20);
+        return $result;
+    }
 }

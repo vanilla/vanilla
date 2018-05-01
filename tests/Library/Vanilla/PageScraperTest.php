@@ -9,19 +9,19 @@ namespace VanillaTests\Library\Vanilla;
 use Exception;
 use Garden\Http\HttpRequest;
 use PHPUnit\Framework\TestCase;
-use VanillaTests\Fixtures\WebScraper;
+use VanillaTests\Fixtures\PageScraper;
 
-class PageInfoTest extends TestCase {
+class PageScraperTest extends TestCase {
 
     /** @var string Directory of test HTML files. */
     const HTML_DIR = PATH_ROOT.'/tests/fixtures/html';
 
     /**
-     * Provide data for testing the PageInfo::fetch method.
+     * Provide data for testing the PageScraper::pageInfo method.
      *
      * @return array
      */
-    public function provideFetchData(): array {
+    public function provideInfoData(): array {
         $data = [
             [
                 'og.htm',
@@ -52,18 +52,18 @@ class PageInfoTest extends TestCase {
     }
 
     /**
-     * Test the PageInfo::fetch method.
+     * Test the PageInfo::pageInfo method.
      *
      * @param string $file
      * @param array $expected
      * @throws Exception if there was an error loading the file.
-     * @dataProvider provideFetchData
+     * @dataProvider provideInfoData
      */
     public function testFetch(string $file, array $expected) {
-        $pageInfo = new WebScraper(new HttpRequest());
+        $pageScraper = new PageScraper(new HttpRequest());
         $url = 'file://'.self::HTML_DIR."/{$file}";
         $expected['Url'] = $url;
-        $result = $pageInfo->pageInfo($url);
+        $result = $pageScraper->pageInfo($url);
         $this->assertEquals($expected, $result);
     }
 }

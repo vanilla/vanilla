@@ -703,6 +703,8 @@ class UpdateModel extends Gdn_Model {
 
                     try {
                         call_user_func([$plugin, 'structure']);
+                    } catch (BadMethodCallException $ex) {
+                        // The structure method could not be called, probably because it wasn't public.
                     } catch (\Exception $ex) {
                         if (debug()) {
                             throw $ex;

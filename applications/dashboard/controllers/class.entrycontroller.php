@@ -477,6 +477,16 @@ class EntryController extends Gdn_Controller {
             }
         }
 
+        // Validate username fields, in order of relevancy.
+        foreach (['ConnectName', 'Name'] as $usernameField) {
+            if ($this->Form->getFormValue($usernameField, null) !== null) {
+                $this->Form->validateRule($usernameField, 'function:validateAgainstUsernameBlacklist');
+                $this->Form->validateRule($usernameField, 'ValidateUsername');
+                // Only validate the most relevant field.
+                break;
+            }
+        }
+
         // Make sure the minimum required data has been provided by the connection.
         if (!$this->Form->getFormValue('Provider')) {
             $this->Form->addError('ValidateRequired', t('Provider'));
@@ -806,11 +816,6 @@ class EntryController extends Gdn_Controller {
                     if (c('Garden.Registration.NameUnique')) {
                         // Check to see if there is already a user with the given name.
                         $user = $userModel->getWhere(['Name' => $connectName])->firstRow(DATASET_TYPE_ARRAY);
-                    }
-
-                    if (!$user) {
-                        // Using a new username, so validate it.
-                        $this->Form->validateRule('ConnectName', 'ValidateUsername');
                     }
                 }
             } else {

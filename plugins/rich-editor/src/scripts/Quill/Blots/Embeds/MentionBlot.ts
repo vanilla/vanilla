@@ -8,6 +8,9 @@ import EmbedBlot from "quill/blots/embed";
 import { formatUrl } from "@core/application";
 import { IMentionData } from "../../../Editor/MentionSuggestion";
 
+/**
+ * A blot that represents a completed mention.
+ */
 export default class MentionBlot extends EmbedBlot {
     public static blotName = "mention";
     public static className = "atMention";

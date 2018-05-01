@@ -11,6 +11,14 @@ import TextBlot from "quill/blots/text";
 import Parchment from "parchment";
 import MentionAutoCompleteBlot from "./MentionAutoCompleteBlot";
 
+/**
+ * A Blot to wrap the MentionAutoCompleteBlot.
+ *
+ * @see {MentionAutoCompleteBlot}
+ *
+ * The MentionAutoCompleteBlot is responsible for wrapping itself.
+ * Do not instantiate this Blot on its own.
+ */
 export default class MentionComboBoxBlot extends Container {
     public static blotName = "mention-combobox";
     public static className = "atMentionComboBox";

@@ -62,7 +62,7 @@ export default class VanillaTheme extends ThemeBase {
         // Mount react components
         this.mountToolbar();
         this.mountParagraphMenu();
-        // this.mountEmbedPopover();
+        this.mountEmbedPopover();
     }
 
     /**

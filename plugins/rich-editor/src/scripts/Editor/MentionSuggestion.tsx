@@ -22,6 +22,9 @@ export interface IMentionProps extends IMentionData {
     onClick(event: React.MouseEvent<any>);
 }
 
+/**
+ * A single Suggestion in a MentionList
+ */
 export default function MentionSuggestion(props: IMentionProps) {
     const { isActive, matchedString, photoUrl, name, onClick, userID, uniqueID, onMouseEnter } = props;
 
@@ -64,13 +67,16 @@ export default function MentionSuggestion(props: IMentionProps) {
     );
 }
 
+/**
+ * An item in the mention list for when no results are found.
+ */
 export function MentionSuggestionNotFound(props) {
     const classes = classNames("richEditor-menuItem", "atMentionList-item");
 
     return (
         <li className={classes} role="option">
-            <button type="button" className="atMentionList-suggestion">
-                <span className="atMentionList-user">{t("No results found")}</span>
+            <button disabled type="button" className="atMentionList-suggestion">
+                <span className="atMentionList-noResults">{t("No results found")}</span>
             </button>
         </li>
     );

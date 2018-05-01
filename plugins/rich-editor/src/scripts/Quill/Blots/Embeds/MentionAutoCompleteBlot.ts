@@ -9,8 +9,17 @@ import MentionBlot from "./MentionBlot";
 import { IMentionData } from "../../../Editor/MentionSuggestion";
 import { t } from "@core/application";
 
-const count = 0;
-
+/**
+ * A Blot to represent text that is being matched for an autocomplete.
+ *
+ * This and the MentionComboBoxBlot are used for accessibility primarily and
+ * don't current represent and visual changes.
+ *
+ * It's final state is as a MentionBlot.
+ *
+ * @see {MentionBlot}
+ * @see {MentionComboBoxBlot}
+ */
 export default class MentionAutoCompleteBlot extends Inline {
     public static blotName = "mention-autocomplete";
     public static className = "atMentionAutoComplete";
@@ -26,6 +35,9 @@ export default class MentionAutoCompleteBlot extends Inline {
         domNode.setAttribute("aria-label", t("@mention a user"));
     }
 
+    /**
+     * Wrap this Blot in a MentionComboBoxBlot for accessibility purposes.
+     */
     public attach() {
         super.attach();
         if (

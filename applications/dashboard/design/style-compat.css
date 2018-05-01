@@ -1120,7 +1120,6 @@ label.checkbox input.checkbox-input {
 }
 
 .atMention {
-  user-select: all;
   color: inherit;
   font-weight: 600;
 }

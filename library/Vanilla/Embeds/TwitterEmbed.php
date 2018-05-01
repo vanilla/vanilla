@@ -49,11 +49,14 @@ class TwitterEmbed extends Embed {
      */
     public function renderData(array $data): string {
         $attributes = $data['attributes'] ?? [];
-        $statusID = $attributes['statusID'] ?? null;
+        $statusID = $attributes['statusID'] ?? '';
         $url = $data['url'] ?? '';
 
+        $encodedStatusID = htmlspecialchars($statusID);
+        $encodedUrl = htmlspecialchars($url);
+
         $result = <<<HTML
-<div class="twitter-card" data-tweeturl="{$url}" data-tweetid="{$statusID}"><a href="{$url}" class="tweet-url" rel="nofollow">{$url}</a></div>
+<div class="twitter-card" data-tweeturl="{$encodedUrl}" data-tweetid="{$encodedStatusID}"><a href="{$encodedUrl}" class="tweet-url" rel="nofollow">{$encodedUrl}</a></div>
 HTML;
         return $result;
     }

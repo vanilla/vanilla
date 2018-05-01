@@ -796,8 +796,8 @@ class Gdn_MySQLStructure extends Gdn_DatabaseStructure {
             if ($column->Type !== 'timestamp') {
                 $return .= " default ".self::_quoteValue($column->Default);
             } else {
-                if (in_array(strtolower($column->Default), ['current_timestamp', 'current_timestamp()'])) {
-                    $return .= " default ".$column->Default;
+                if (in_array(strtolower($column->Default), ['current_timestamp', 'current_timestamp()', true])) {
+                    $return .= " default current_timestamp";
                 }
             }
         }

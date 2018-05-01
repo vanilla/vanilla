@@ -6,7 +6,7 @@
 
 import EmbedBlot from "quill/blots/embed";
 import { formatUrl } from "@core/application";
-import { IMentionData } from "../../../Editor/MentionItem";
+import { IMentionData } from "../../../Editor/MentionSuggestion";
 
 export default class MentionBlot extends EmbedBlot {
     public static blotName = "mention";

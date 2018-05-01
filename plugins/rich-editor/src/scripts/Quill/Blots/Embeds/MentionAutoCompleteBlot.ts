@@ -4,13 +4,9 @@
  * @license https://opensource.org/licenses/GPL-2.0 GPL-2.0
  */
 
-import { Blot } from "quill/core";
 import Inline from "quill/blots/inline";
-import Container from "quill/blots/container";
-import Parchment from "parchment";
-import withWrapper from "../Abstract/withWrapper";
 import MentionBlot from "./MentionBlot";
-import { IMentionData } from "../../../Editor/MentionItem";
+import { IMentionData } from "../../../Editor/MentionSuggestion";
 import { t } from "@core/application";
 
 const count = 0;
@@ -36,10 +32,7 @@ export default class MentionAutoCompleteBlot extends Inline {
             this.statics.requiredContainer &&
             (this.parent as any).statics.blotName !== this.statics.requiredContainer
         ) {
-            console.log("wrapping");
             this.wrap(this.statics.requiredContainer);
-        } else {
-            console.log("no wrapping", this.statics.requiredContainer);
         }
     }
 
@@ -55,17 +48,12 @@ export default class MentionAutoCompleteBlot extends Inline {
     }
 
     /**
-     * If this is the only child blot we want to delete the parent with it.
+     * Be sure to unwrap this Blot into its parent before replacing itself
+     * or it will recurse ifinitelely trying to recreate its requiredContainer
      */
-    public remove() {
-        // this.parent.remove();
-        super.remove();
-    }
-
     public replaceWith(name, value?) {
         this.moveChildren(this.parent, this.next);
         this.remove();
-        // this.parent.unwrap();
         return this.parent.replaceWith(name, value);
     }
 
@@ -78,17 +66,17 @@ export default class MentionAutoCompleteBlot extends Inline {
         return this.replaceWith("mention", result) as MentionBlot;
     }
 
+    /**
+     * Remove the combobox and turn the blot into plaintext.
+     */
     public cancel() {
-        console.log(this.domNode.innerHTML);
         return this.replaceWith("inline", this.domNode.innerHTML);
     }
 
-    // public optimize(context: { [key: string]: any }): void {
-
-    // }
-
+    /**
+     * Inject accessibility attributes into the autocomplete and it's parent combobox.
+     */
     public injectAccessibilityAttributes(data: IComboBoxAccessibilityOptions) {
-        // Inject accessibility attributes into the autocomplete and it's parent combobox.
         this.domNode.setAttribute("aria-controls", data.mentionListID);
         this.domNode.setAttribute("aria-activedescendant", data.activeItemID);
         this.parent.domNode.setAttribute("id", data.ID);

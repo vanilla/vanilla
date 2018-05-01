@@ -8,10 +8,8 @@ import Container from "quill/blots/container";
 import Inline from "quill/blots/inline";
 import Embed from "quill/blots/embed";
 import TextBlot from "quill/blots/text";
-import Quill from "quill/core";
 import Parchment from "parchment";
 import MentionAutoCompleteBlot from "./MentionAutoCompleteBlot";
-// import { t } from "@core/application";
 
 export default class MentionComboBoxBlot extends Container {
     public static blotName = "mention-combobox";

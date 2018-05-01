@@ -18,7 +18,7 @@ import ParagraphToolbar from "../Editor/ParagraphToolbar";
 import EmojiPopover from "../Editor/EmojiPopover";
 import EmbedPopover from "../Editor/EmbedPopover";
 import EditorProvider from "../Editor/ContextProvider";
-import MentionToolbar from "../Editor/MentionToolbar";
+import MentionModule from "../Editor/MentionModule";
 
 export default class VanillaTheme extends ThemeBase {
     private jsBodyBoxContainer: Element;
@@ -55,7 +55,7 @@ export default class VanillaTheme extends ThemeBase {
         if (!this.jsBodyBoxContainer) {
             throw new Error("Could not find .richEditor to mount editor components into.");
         }
-        this.mountMentionToolbar();
+        this.mountMentionModule();
         this.mountEmojiMenu();
     }
 
@@ -115,11 +115,11 @@ export default class VanillaTheme extends ThemeBase {
         );
     }
 
-    private mountMentionToolbar() {
-        const container = this.jsBodyBoxContainer.querySelector(".js-MentionToolbar");
+    private mountMentionModule() {
+        const container = this.jsBodyBoxContainer.querySelector(".js-MentionModule");
         ReactDOM.render(
             <EditorProvider quill={this.quill}>
-                <MentionToolbar />
+                <MentionModule />
             </EditorProvider>,
             container,
         );

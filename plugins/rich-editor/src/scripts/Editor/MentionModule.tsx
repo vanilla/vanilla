@@ -24,7 +24,7 @@ import Toolbar from "./Generic/Toolbar";
 import { withEditor, IEditorContextProps } from "./ContextProvider";
 import { IMenuItemData } from "./Generic/MenuItem";
 import MentionList from "./MentionList";
-import { IMentionData } from "./MentionItem";
+import { IMentionData } from "./MentionSuggestion";
 
 interface IProps extends IEditorContextProps {}
 
@@ -41,7 +41,7 @@ interface IState {
 
 const mentionCache: Map<string, AxiosResponse | null> = new Map();
 
-export class MentionToolbar extends React.PureComponent<IProps, IState> {
+export class MentionModule extends React.PureComponent<IProps, IState> {
     private quill: Quill;
     private ID = uniqueId("mentionList-");
     private comboBoxID = uniqueId("mentionComboBox-");
@@ -81,18 +81,20 @@ export class MentionToolbar extends React.PureComponent<IProps, IState> {
         const styles = this.getStyles();
 
         return (
-            <div style={styles}>
-                <MentionList
-                    onItemClick={this.onItemClick}
-                    mentionData={this.state.suggestions}
-                    matchedString={this.state.username}
-                    activeItemId={this.state.activeItemID}
-                    id={this.ID}
-                />
-            </div>
+            <MentionList
+                onItemClick={this.onItemClick}
+                mentionData={this.state.suggestions}
+                matchedString={this.state.username}
+                activeItemId={this.state.activeItemID}
+                id={this.ID}
+                style={styles}
+            />
         );
     }
 
+    /**
+     * Get styles to absolute position the results next to the current text.
+     */
     private getStyles(): React.CSSProperties {
         const { startIndex, inActiveMention, hasApiResponse } = this.state;
         const quillBounds = this.quill.getBounds(startIndex);
@@ -232,12 +234,17 @@ export class MentionToolbar extends React.PureComponent<IProps, IState> {
      * Watch for selection change events in quill. We need to clear the mention list if we have text selected or their is no selection.
      */
     private onSelectionChange = (range: RangeStatic, oldRange: RangeStatic, sources) => {
-        if (sources === Quill.sources.SILENT) {
+        if (sources === Quill.sources.SILENT || !this.state.inActiveMention || !this.state.hasApiResponse) {
             return;
         }
 
         if (!range || range.length > 0) {
             return this.resetMentionState();
+        }
+
+        // Bail out if we're in a mention in progress.
+        if (getBlotAtIndex(this.quill, range.index, MentionAutoCompleteBlot)) {
+            return;
         }
 
         // Clear the mention the new selection doesn't match.
@@ -341,4 +348,4 @@ export class MentionToolbar extends React.PureComponent<IProps, IState> {
     };
 }
 
-export default withEditor<IProps>(MentionToolbar);
+export default withEditor<IProps>(MentionModule);

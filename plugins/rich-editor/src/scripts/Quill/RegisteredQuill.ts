@@ -81,7 +81,11 @@ Quill.register(
     true,
 );
 
-const Block = Quill.import("blots/block");
-Block.allowedChildren = [...Block.allowedChildren, MentionComboBoxBlot];
+const blotsAllowingMentionComboBox = ["blots/block", "formats/bold", "formats/italic", "formats/strike"];
+
+blotsAllowingMentionComboBox.forEach(blotLookup => {
+    const BlotClass = Quill.import(blotLookup);
+    BlotClass.allowedChildren = [...BlotClass.allowedChildren, MentionComboBoxBlot];
+});
 
 export default Quill;

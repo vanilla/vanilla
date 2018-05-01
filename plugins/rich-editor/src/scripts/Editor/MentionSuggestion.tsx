@@ -22,8 +22,8 @@ export interface IMentionProps extends IMentionData {
     onClick(event: React.MouseEvent<any>);
 }
 
-export default function MentionItem(props: IMentionProps) {
-    const { isActive, matchedString, photoUrl, name, onClick, userID } = props;
+export default function MentionSuggestion(props: IMentionProps) {
+    const { isActive, matchedString, photoUrl, name, onClick, userID, uniqueID, onMouseEnter } = props;
 
     const classes = classNames("richEditor-menuItem", "atMentionList-item", {
         isActive,
@@ -45,12 +45,12 @@ export default function MentionItem(props: IMentionProps) {
 
     return (
         <li
-            id={props.uniqueID}
+            id={uniqueID}
             className={classes}
             role="option"
             aria-selected={isActive}
-            onClick={props.onClick}
-            onMouseEnter={props.onMouseEnter}
+            onClick={onClick}
+            onMouseEnter={onMouseEnter}
         >
             <button type="button" className="atMentionList-suggestion">
                 <span className="atMentionList-user">
@@ -64,7 +64,7 @@ export default function MentionItem(props: IMentionProps) {
     );
 }
 
-export function NoResultMentionItem(props) {
+export function MentionSuggestionNotFound(props) {
     const classes = classNames("richEditor-menuItem", "atMentionList-item");
 
     return (

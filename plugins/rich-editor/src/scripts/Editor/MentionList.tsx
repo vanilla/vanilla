@@ -6,10 +6,9 @@
 
 import React from "react";
 import classNames from "classnames";
-import Quill, { RangeStatic, Blot } from "quill/core";
-import MentionItem, { NoResultMentionItem, IMentionData } from "./MentionItem";
 import { withEditor, IEditorContextProps } from "./ContextProvider";
 import MentionBlot from "../Quill/Blots/Embeds/MentionBlot";
+import MentionSuggestion, { IMentionData, MentionSuggestionNotFound } from "./MentionSuggestion";
 
 interface IProps extends IEditorContextProps {
     mentionData: IMentionData[];
@@ -17,47 +16,35 @@ interface IProps extends IEditorContextProps {
     id: string;
     activeItemId: string | null;
     onItemClick: React.MouseEventHandler<any>;
+    style?: React.CSSProperties;
 }
 
-export class MentionList extends React.Component<IProps> {
-    private quill: Quill;
+export default function MentionList(props: IProps) {
+    const { activeItemId, style, id, onItemClick, matchedString, mentionData } = props;
 
-    constructor(props) {
-        super(props);
-        this.quill = props.quill;
-    }
+    const hasResults = mentionData.length > 0;
+    const classes = classNames("atMentionList-items", "MenuItems");
 
-    public render() {
-        const { activeItemId } = this.props;
-
-        const hasResults = this.props.mentionData.length > 0;
-        const classes = classNames("atMentionList-items", "MenuItems");
-
-        const list = (
-            <span className="atMentionList">
-                <ul id={this.props.id} aria-label="{t('@mention user list')}" className={classes} role="listbox">
-                    {hasResults ? (
-                        this.props.mentionData.map(mentionItem => {
-                            const isActive = mentionItem.uniqueID === activeItemId;
-                            return (
-                                <MentionItem
-                                    {...mentionItem}
-                                    key={mentionItem.name}
-                                    onClick={this.props.onItemClick}
-                                    isActive={isActive}
-                                    matchedString={this.props.matchedString}
-                                />
-                            );
-                        })
-                    ) : (
-                        <NoResultMentionItem />
-                    )}
-                </ul>
-            </span>
-        );
-
-        return list;
-    }
+    return (
+        <span style={style} className="atMentionList">
+            <ul id={id} aria-label="{t('@mention user list')}" className={classes} role="listbox">
+                {hasResults ? (
+                    mentionData.map(mentionItem => {
+                        const isActive = mentionItem.uniqueID === activeItemId;
+                        return (
+                            <MentionSuggestion
+                                {...mentionItem}
+                                key={mentionItem.name}
+                                onClick={onItemClick}
+                                isActive={isActive}
+                                matchedString={matchedString}
+                            />
+                        );
+                    })
+                ) : (
+                    <MentionSuggestionNotFound />
+                )}
+            </ul>
+        </span>
+    );
 }
-
-export default withEditor<IProps>(MentionList);

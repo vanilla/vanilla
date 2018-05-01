@@ -1076,6 +1076,7 @@ label.checkbox input.checkbox-input {
 }
 
 .atMentionList-suggestion {
+  width: 100%;
   cursor: pointer;
 }
 

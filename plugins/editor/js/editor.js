@@ -1077,7 +1077,7 @@
                                     if (!validSize && !validFile) {
                                         message = gdn.definition('fileErrorSizeFormat', 'editor') + ' (max ' + maxUploadSize + ' bytes)';
                                     } else {
-                                        
+
                                         if (!validSize) {
                                             message = gdn.definition('fileErrorSize', 'editor') + ' (max ' + maxUploadSize + ' bytes)';
                                         }

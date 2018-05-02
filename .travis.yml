@@ -12,7 +12,6 @@ before_script:
   - phpenv config-rm xdebug.ini
   - composer self-update
   - composer install --optimize-autoloader
-  - composer require phpunit/phpunit ~5
   - tests/travis/setup.sh
   - yarn install --pure-lockfile
 

@@ -204,7 +204,7 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
      * @param string $name The name to convert.
      * @return string Returns the filtered name.
      */
-    private function filterName($name) {
+    protected function filterName($name) {
         if (empty($name) || $name[0] === '-' || substr($name, -1) === '-' || preg_match('`--`', $name)) {
             return $name;
         }
@@ -846,7 +846,7 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
         $controller->ReflectArgs = $args;
 
 
-        $canonicalUrl = $this->makeCanonicalUrl($controller, $method, $args);
+        $canonicalUrl = url($this->makeCanonicalUrl($controller, $method, $args), true);
         $canonicalUrlOld = $this->makeCanonicalUrlOld($controller);
         if ($canonicalUrl !== $canonicalUrlOld) {
             trigger_error("Canonical URL $canonicalUrl !== $canonicalUrlOld.", E_USER_NOTICE);
@@ -910,7 +910,7 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
      * @param $array $args The reflected arguments.
      * @return string Returns a URL.
      */
-    private function makeCanonicalUrl($controller, \ReflectionFunctionAbstract $method, $args): string {
+    protected function makeCanonicalUrl($controller, \ReflectionFunctionAbstract $method, $args): string {
         $parts = [];
 
         $controllerName = stringEndsWith(\Garden\EventManager::classBasename(get_class($controller)), 'Controller', true, true);
@@ -929,6 +929,19 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
             $parts[] = $methodName;
         }
 
+        // Remove empty parameters from the parts.
+        $defaults = [];
+        foreach ($method->getParameters() as $param) {
+            if ($param->isDefaultValueAvailable()) {
+                $defaults[strtolower($param->getName())] = $param->getDefaultValue();
+            }
+
+            if (strcasecmp($param->getName(), 'page') === 0 && empty($defaults['page'])) {
+                $defaults['page'] = 'p1';
+            }
+        }
+
+
         $args = array_change_key_case($args);
 
         // Add args after known names to the querystring.
@@ -938,7 +951,9 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
             if (is_object($value)) {
                 continue;
             } elseif (in_array($key, ['search', 'query']) || $split) {
-                $query[$key] = $value;
+                if (!empty($value) && $value != ($defaults[$key] ?? '')) {
+                    $query[$key] = $value;
+                }
                 $split = true;
             } elseif (is_numeric($key)) {
                 break;
@@ -947,14 +962,6 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
             }
         }
         $query = array_filter($query);
-
-        // Remove empty parameters from the parts.
-        $defaults = [];
-        foreach ($method->getParameters() as $param) {
-            if ($param->isDefaultValueAvailable()) {
-                $defaults[strtolower($param->getName())] = $param->getDefaultValue();
-            }
-        }
 
         // Remove empty or default path parameters from the end.
         $keys = array_reverse(array_keys($parts));
@@ -972,9 +979,8 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
             ksort($query);
             $path .= '?'.http_build_query($query);
         }
-        $result = url($path, true);
 
-        return $result;
+        return '/'.$path;
     }
 
     /**
@@ -983,7 +989,7 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
      * @param string $str The string to convert.
      * @return string Returns a dash-case string.
      */
-    private function dashCase(string $str): string {
+    protected function dashCase(string $str): string {
         if (preg_match_all('`((?:[A-Z]|^)[A-Z]*[a-z0-9]*)`', $str, $m)) {
             $result = implode('-', array_map('strtolower', $m[1]));
         } else {

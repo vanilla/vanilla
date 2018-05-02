@@ -99,18 +99,10 @@ export default class MentionAutoCompleteBlot extends Inline {
         domNode.setAttribute("aria-controls", data.suggestionListID);
 
         if (data.activeItemID) {
-            // If there is an activedescendant
-            parentNode.setAttribute("aria-activedescendant", data.activeItemID);
             domNode.setAttribute("aria-activedescendant", data.activeItemID);
-
-            // Remove the labelled by
             domNode.removeAttribute("aria-describeby");
         } else {
             domNode.setAttribute("aria-describedby", data.noResultsID);
-
-            // Remove active attributes.
-            parentNode.setAttribute("aria-expanded", false);
-            parentNode.removeAttribute("aria-activedescendant");
             domNode.removeAttribute("aria-activedescendant");
         }
     }

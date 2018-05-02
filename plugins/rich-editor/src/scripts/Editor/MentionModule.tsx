@@ -238,10 +238,13 @@ export class MentionModule extends React.PureComponent<IProps, IState> {
             return;
         }
 
-        const suggestions = response.data.map((data: IMentionData) => {
+        const suggestions = response.data.map((data: IMentionData, index) => {
             data.uniqueID = this.generateIdForMentionData(data);
             data.onMouseEnter = () => {
-                this.setState({ activeItemID: data.uniqueID }, this.injectComboBoxAccessibility);
+                this.setState(
+                    { activeItemID: data.uniqueID, activeItemIndex: index },
+                    this.injectComboBoxAccessibility,
+                );
             };
             return data;
         });

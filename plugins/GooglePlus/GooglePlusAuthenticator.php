@@ -62,7 +62,7 @@ class GooglePlusAuthenticator extends ShimAuthenticator {
         return [
             'ui' => [
                 'url' => '/entry/googlePlusAuthRedirect',
-                'buttonName' => 'Sign in with Google',
+                'buttonName' => sprintft('Sign In with %s', 'Google'),
             ],
         ];
     }

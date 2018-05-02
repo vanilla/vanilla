@@ -62,7 +62,7 @@ class TwitterAuthenticator extends ShimAuthenticator {
         return [
             'ui' => [
                 'url' => '/entry/twauthorize',
-                'buttonName' => 'Sign in with Twitter',
+                'buttonName' => sprintft('Sign In with %s', self::getType()),
             ],
         ];
     }

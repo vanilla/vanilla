@@ -128,24 +128,24 @@ export class MentionModule extends React.PureComponent<IProps, IState> {
      * Keydown listener for ARIA compliance with
      */
     private keyDownListener = (event: KeyboardEvent) => {
-        if (this.quill.hasFocus() && this.state.inActiveMention) {
-            const { activeItemIndex, suggestions } = this.state;
+        const { activeItemIndex, suggestions, inActiveMention, hasApiResponse } = this.state;
+        if ((this.quill.hasFocus() && !inActiveMention) || !hasApiResponse) {
+            // Quill doesn't properly trigger update the range until after enter is pressed, which triggers out text change listener with the wrong range. Manually handle this for now.
+            if (Keyboard.match(event, Keyboard.keys.ENTER)) {
+                this.cancelActiveMention();
+                this.quill.insertText(this.quill.getSelection().index, "\n", Quill.sources.API);
+                event.preventDefault();
+            }
+            return;
+        }
+
+        if (this.quill.hasFocus() && inActiveMention) {
             let newIndex;
             let newItemID;
             const firstIndex = 0;
             const nextIndex = activeItemIndex + 1;
             const prevIndex = activeItemIndex - 1;
             const lastIndex = suggestions.length - 1;
-
-            if (!this.state.inActiveMention || !this.state.hasApiResponse) {
-                // Quill doesn't properly trigger update the range until after enter is pressed, which triggers out text change listener with the wrong range. Manually handle this for now.
-                if (Keyboard.match(event, Keyboard.keys.ENTER)) {
-                    this.cancelActiveMention();
-                    this.quill.insertText(this.quill.getSelection().index, "\n", Quill.sources.API);
-                    event.preventDefault();
-                }
-                return;
-            }
 
             switch (true) {
                 case Keyboard.match(event, Keyboard.keys.DOWN):

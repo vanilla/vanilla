@@ -104,8 +104,14 @@ export function rangeContainsBlot(quill: Quill, range: RangeStatic, blotConstruc
  * @param range - The range to check.
  * @param blotConstructor - A class constructor for a blot.
  */
-export function disableAllBlotsInRange(quill: Quill, range: RangeStatic, blotConstructor: typeof Blot) {
-    const currentBlots = quill.scroll.descendants(blotConstructor as any, range.index, range.length) as Blot[];
+export function disableAllBlotsInRange<T extends Blot>(
+    quill: Quill,
+    range: RangeStatic,
+    blotConstructor: {
+        new (): T;
+    },
+) {
+    const currentBlots = quill.scroll.descendants(blotConstructor, range.index, range.length);
     const firstBlot = currentBlots[0];
     const lastBlot = currentBlots[currentBlots.length - 1];
 

@@ -61,8 +61,8 @@ class GooglePlusAuthenticator extends ShimAuthenticator {
     protected function getAuthenticatorInfoImpl(): array {
         return [
             'ui' => [
-                'url' => '/entry/connect/googlePlusAuthRedirect',
-                'buttonName' => 'Sign in with Google',
+                'url' => '/entry/googlePlusAuthRedirect',
+                'buttonName' => sprintft('Sign In with %s', 'Google'),
             ],
         ];
     }

@@ -211,7 +211,7 @@ if (!function_exists('WriteDiscussion')) :
                     }
 
                     if ($sender->data('_ShowCategoryLink', true) && $category && c('Vanilla.Categories.Use') &&
-                        CategoryModel::checkPermission(val('CategoryID', $discussion), 'Vanilla.Discussions.View')) {
+                        CategoryModel::checkPermission($category, 'Vanilla.Discussions.View')) {
 
                         echo wrap(
                             anchor(htmlspecialchars($discussion->Category),

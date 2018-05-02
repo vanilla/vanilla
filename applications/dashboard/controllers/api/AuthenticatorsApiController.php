@@ -211,7 +211,7 @@ class AuthenticatorsApiController extends AbstractApiController  {
         // Convert URLs from relative to absolute.
         foreach (['signInUrl', 'registerUrl', 'signOutUrl', 'ui.url', 'ui.photoUrl', 'resourceUrl'] as $field) {
             $value = valr($field, $record, null);
-            if ($value !== null) {
+            if ($value !== null && !preg_match('#^(https?:)?//#i')) {
                 setvalr($field, $record, url($value, true));
             }
         }

@@ -498,10 +498,8 @@ class EntryController extends Gdn_Controller {
             return;
         }
 
-        $isTrustedProvider = $this->data('Trusted');
-
         // Check if we need to sync roles
-        if (($isTrustedProvider || c('Garden.SSO.SyncRoles')) && $this->Form->getFormValue('Roles', null) !== null) {
+        if (($this->data('Trusted') || c('Garden.SSO.SyncRoles')) && $this->Form->getFormValue('Roles', null) !== null) {
             $saveRoles = $saveRolesRegister = true;
 
             // Translate the role names to IDs.
@@ -547,12 +545,7 @@ class EntryController extends Gdn_Controller {
                 }
 
                 // Synchronize the user's data.
-                $userModel->save($data, [
-                    'NoConfirmEmail' => true,
-                    'FixUnique' => true,
-                    'SaveRoles' => $saveRoles,
-                    'ValidateName' => !$isTrustedProvider
-                ]);
+                $userModel->save($data, ['NoConfirmEmail' => true, 'FixUnique' => true, 'SaveRoles' => $saveRoles]);
                 $this->EventArguments['UserID'] = $userID;
                 $this->fireEvent('AfterConnectSave');
             }
@@ -632,12 +625,7 @@ class EntryController extends Gdn_Controller {
                                 }
 
                                 // Update the user.
-                                $userModel->save($data, [
-                                    'NoConfirmEmail' => true,
-                                    'FixUnique' => true,
-                                    'SaveRoles' => $saveRoles,
-                                    'ValidateName' => !$isTrustedProvider
-                                ]);
+                                $userModel->save($data, ['NoConfirmEmail' => true, 'FixUnique' => true, 'SaveRoles' => $saveRoles]);
                                 $this->EventArguments['UserID'] = $userID;
                                 $this->fireEvent('AfterConnectSave');
                             }
@@ -737,8 +725,7 @@ class EntryController extends Gdn_Controller {
                     'CheckCaptcha' => false,
                     'ValidateEmail' => false,
                     'NoConfirmEmail' => !$userProvidedEmail || !UserModel::requireConfirmEmail(),
-                    'SaveRoles' => $saveRolesRegister,
-                    'ValidateName' => !$isTrustedProvider
+                    'SaveRoles' => $saveRolesRegister
                 ];
                 $user = $this->Form->formValues();
                 $user['Password'] = randomString(16); // Required field.
@@ -820,6 +807,11 @@ class EntryController extends Gdn_Controller {
                         // Check to see if there is already a user with the given name.
                         $user = $userModel->getWhere(['Name' => $connectName])->firstRow(DATASET_TYPE_ARRAY);
                     }
+
+                    if (!$user) {
+                        // Using a new username, so validate it.
+                        $this->Form->validateRule('ConnectName', 'ValidateUsername');
+                    }
                 }
             } else {
                 // The user selected an existing user.
@@ -865,8 +857,7 @@ class EntryController extends Gdn_Controller {
                 $userID = $userModel->register($user, [
                     'CheckCaptcha' => false,
                     'NoConfirmEmail' => !$userProvidedEmail || !UserModel::requireConfirmEmail(),
-                    'SaveRoles' => $saveRolesRegister,
-                    'ValidateName' => !$isTrustedProvider
+                    'SaveRoles' => $saveRolesRegister
                 ]);
                 $user['UserID'] = $userID;
 

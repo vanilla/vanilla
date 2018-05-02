@@ -166,7 +166,7 @@ abstract class Authenticator {
         return Schema::parse([
             'url:s' => 'Local relative URL from which you can initiate the SignIn process with this authenticator',
             'buttonName:s' => 'The display text to put in the button. Ex: "Sign in with Facebook"',
-            'photoUrl:s|n' => 'The relative icon URL for the button.',
+            'photoUrl:s|n' => 'The icon URL for the button.',
             'backgroundColor:s|n' => 'A css color code for the background. (Hex color, rgb or rgba)',
             'foregroundColor:s|n' => 'A css color code for the foreground. (Hex color, rgb or rgba)',
         ]);

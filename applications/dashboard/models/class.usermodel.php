@@ -2078,6 +2078,7 @@ class UserModel extends Gdn_Model {
      * - HashPassword - Hash the provided password on update. Default true.
      * - FixUnique - Try to resolve conflicts with unique constraints on Name and Email. Default false.
      * - ValidateEmail - Make sure the provided email addresses is formatted properly. Default true.
+     * - ValidateName - Make sure the provided name is valid. Blacklisted names will always be blocked.
      * - NoConfirmEmail - Disable email confirmation. Default false.
      *
      */

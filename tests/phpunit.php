@@ -2,13 +2,13 @@
 
 use Garden\Container\Container;
 
-// Alias classes for some limited PHPUnit v6 compatibility with v5. To be removed when PHPUnit v5 support is dropped.
+// Alias classes for some limited PHPUnit v5 compatibility with v6.
 $classCompatibility = [
-    'PHPUnit_Framework_Error_Notice' => 'PHPUnit\\Framework\\Error\\Notice',
+    'PHPUnit\\Framework\\TestCase' => 'PHPUnit_Framework_TestCase', // See https://github.com/php-fig/log/pull/52
 ];
-foreach ($classCompatibility as $legacyClass => $class) {
-    if (class_exists($legacyClass) && !class_exists($class)) {
-        class_alias($legacyClass, $class);
+foreach ($classCompatibility as $class => $legacyClass) {
+    if (!class_exists($legacyClass) && class_exists($class)) {
+        class_alias($class, $legacyClass);
     }
 }
 

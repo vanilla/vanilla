@@ -73,7 +73,6 @@ class EmbedManager {
      * Get the default embed type.
      *
      * @return Embed|null Returns the defaultEmbed.
-     * @throws Exception if no default embed type has been configured.
      */
     public function getDefaultEmbed() {
         return $this->defaultEmbed;
@@ -109,6 +108,19 @@ class EmbedManager {
         }
 
         return $embed;
+    }
+
+    /**
+     * Get all valid embed types.
+     *
+     * @return array
+     */
+    public function getTypes() {
+        $types = array_keys($this->embeds);
+        if ($default = $this->getDefaultEmbed()) {
+            $types[] = $default->getType();
+        }
+        return $types;
     }
 
     /**

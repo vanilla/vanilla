@@ -205,7 +205,7 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
      * @return string Returns the filtered name.
      */
     private function filterName($name) {
-        if (empty($name) || $name[0] === '-' || substr($name, -1) === '-') {
+        if (empty($name) || $name[0] === '-' || substr($name, -1) === '-' || preg_match('`--`', $name)) {
             return $name;
         }
 

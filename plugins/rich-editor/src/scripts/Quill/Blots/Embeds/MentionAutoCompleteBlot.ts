@@ -33,6 +33,7 @@ export default class MentionAutoCompleteBlot extends Inline {
     constructor(domNode) {
         super(domNode);
         domNode.setAttribute("aria-label", t("@mention a user"));
+        domNode.setAttribute("aria-autocomplete", "list");
     }
 
     /**
@@ -93,14 +94,13 @@ export default class MentionAutoCompleteBlot extends Inline {
         const parentNode = this.parent.domNode;
 
         parentNode.setAttribute("id", data.ID);
-        domNode.setAttribute("aria-invalid", data.activeItemID === null);
+        parentNode.setAttribute("aria-expanded", !!data.suggestionListID);
+        parentNode.setAttribute("aria-owns", data.suggestionListID);
+        domNode.setAttribute("aria-controls", data.suggestionListID);
 
         if (data.activeItemID) {
             // If there is an activedescendant
-            parentNode.setAttribute("aria-owns", data.suggestionListID);
             parentNode.setAttribute("aria-activedescendant", data.activeItemID);
-            parentNode.setAttribute("aria-expanded", true);
-            domNode.setAttribute("aria-controls", data.suggestionListID);
             domNode.setAttribute("aria-activedescendant", data.activeItemID);
 
             // Remove the labelled by

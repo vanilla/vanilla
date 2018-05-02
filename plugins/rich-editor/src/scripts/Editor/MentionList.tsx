@@ -29,9 +29,14 @@ export default function MentionList(props: IProps) {
 
     return (
         <span style={style} className="atMentionList">
-            {hasResults ? (
-                <ul id={id} aria-label={t("@mention user suggestions")} className={classes} role="listbox">
-                    {mentionData.map(mentionItem => {
+            <ul
+                id={id}
+                aria-label={t("@mention user suggestions")}
+                className={classes + (hasResults ? "" : " isHidden")}
+                role="listbox"
+            >
+                {hasResults &&
+                    mentionData.map(mentionItem => {
                         const isActive = mentionItem.uniqueID === activeItemId;
                         return (
                             <MentionSuggestion
@@ -43,12 +48,10 @@ export default function MentionList(props: IProps) {
                             />
                         );
                     })}
-                </ul>
-            ) : (
-                <div id={id} className={classes}>
-                    <MentionSuggestionNotFound id={props.noResultsID} />
-                </div>
-            )}
+            </ul>
+            <div className={classes + (hasResults ? " isHidden" : "")}>
+                <MentionSuggestionNotFound id={props.noResultsID} />
+            </div>
         </span>
     );
 }

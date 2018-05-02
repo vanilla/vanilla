@@ -17,18 +17,7 @@ class AuthenticatorsTest extends AbstractAPIv2Test {
     private static $authenticators;
 
     /** @var string */
-    private $baseUrl;
-
-    /**
-     * AuthenticatorsTest constructor.
-     *
-     * @param null $name
-     * @param array $data
-     * @param string $dataName
-     */
-    public function __construct($name = null, array $data = [], $dataName = '') {
-        $this->baseUrl = '/authenticators';
-    }
+    protected $baseUrl = '/authenticators';
 
     /**
      * @inheritdoc

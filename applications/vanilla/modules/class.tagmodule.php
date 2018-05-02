@@ -102,7 +102,7 @@ class TagModule extends Gdn_Module {
         $tagQuery = Gdn::sql();
 
         $this->autoContext();
-
+        //Allow addon to manipulate the data being rendered
         $tagData = null;
         $this->EventArguments['ParentID'] = $this->ParentID;
         $this->EventArguments['tagData'] = &$tagData;

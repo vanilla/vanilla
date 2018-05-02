@@ -2815,6 +2815,7 @@ class UserModel extends Gdn_Model {
      *
      * @param array $formPostValues
      * @param array $options
+     *  - ValidateName - Make sure the provided name is valid. Blacklisted names will always be blocked.
      * @return int UserID.
      */
     public function insertForInvite($formPostValues, $options = []) {
@@ -2870,6 +2871,10 @@ class UserModel extends Gdn_Model {
 
         $inviteUserID = $invitation->InsertUserID;
         $formPostValues['Email'] = $invitation->Email;
+
+        if (val('ValidateName', $options, true)) {
+            $this->Validation->applyRule('Name', 'Username');
+        }
 
         if ($this->validate($formPostValues, true)) {
             // Check for spam.
@@ -2950,6 +2955,7 @@ class UserModel extends Gdn_Model {
      * @param array $options
      *  - ValidateSpam
      *  - CheckCaptcha
+     *  - ValidateName - Make sure the provided name is valid. Blacklisted names will always be blocked.
      * @return int UserID.
      */
     public function insertForApproval($formPostValues, $options = []) {
@@ -2974,6 +2980,10 @@ class UserModel extends Gdn_Model {
         }
 
         $this->addInsertFields($formPostValues);
+
+        if (val('ValidateName', $options, true)) {
+            $this->Validation->applyRule('Name', 'Username');
+        }
 
         if ($this->validate($formPostValues, true)) {
 
@@ -3023,6 +3033,7 @@ class UserModel extends Gdn_Model {
      * @param array $formPostValues
      * @param bool $checkCaptcha
      * @param array $options
+     *  - ValidateName - Make sure the provided name is valid. Blacklisted names will always be blocked.
      * @return bool|int|string
      * @throws Exception
      */

@@ -19,6 +19,7 @@ use Vanilla\AddonManager;
 use Vanilla\Authenticator\PasswordAuthenticator;
 use Vanilla\InjectableInterface;
 use Vanilla\Models\AuthenticatorModel;
+use Vanilla\Models\SSOModel;
 use VanillaTests\Fixtures\MockAuthenticator;
 use VanillaTests\Fixtures\MockSSOAuthenticator;
 use VanillaTests\Fixtures\NullCache;
@@ -191,7 +192,12 @@ class Bootstrap {
             ->addCall('registerAuthenticatorClass', [MockAuthenticator::class])
             ->addCall('registerAuthenticatorClass', [MockSSOAuthenticator::class])
 
+            ->rule(MockSSOAuthenticator::class)
+
             ->rule(SearchModel::class)
+            ->setShared(true)
+
+            ->rule(SSOModel::class)
             ->setShared(true)
 
             ->rule(\Garden\Web\Dispatcher::class)

@@ -1071,6 +1071,10 @@ label.checkbox input.checkbox-input {
   padding: 3px 0;
 }
 
+.atMentionList-items.isHidden {
+  display: none;
+}
+
 .atMentionList-item.isActive .atMentionList-suggestion {
   background-color: #f4f3f5;
 }

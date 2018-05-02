@@ -615,6 +615,10 @@ $embedded-quote_fg: #A3A3A3 !default;
         display: block;
         padding: $richEditor-atMentionUser_paddingVertical 0;
     }
+
+    &.isHidden {
+        display: none;
+    }
 }
 
 .atMentionList-item {

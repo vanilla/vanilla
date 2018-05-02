@@ -13,6 +13,7 @@ import Emitter from "quill/core/emitter";
 import uniqueId from "lodash/uniqueId";
 import Keyboard from "quill/modules/keyboard";
 import LinkBlot from "quill/formats/link";
+import axios from "axios";
 import { logError } from "@core/utility";
 import { getMentionRange, getBlotAtIndex } from "../Quill/utility";
 import api from "@core/apiv2";
@@ -41,11 +42,16 @@ interface IState {
 
 const mentionCache: Map<string, AxiosResponse | null> = new Map();
 
+/**
+ * Module for inserting, removing, and editing at-mentions.
+ */
 export class MentionModule extends React.PureComponent<IProps, IState> {
     private quill: Quill;
     private ID = uniqueId("mentionList-");
+    private noResultsID = uniqueId("mentionList-noResults-");
     private comboBoxID = uniqueId("mentionComboBox-");
     private isConvertingMention = false;
+    private apiCancelSource = axios.CancelToken.source();
 
     constructor(props: IProps) {
         super(props);
@@ -87,6 +93,7 @@ export class MentionModule extends React.PureComponent<IProps, IState> {
                 matchedString={this.state.username}
                 activeItemId={this.state.activeItemID}
                 id={this.ID}
+                noResultsID={this.noResultsID}
                 style={styles}
             />
         );
@@ -130,6 +137,16 @@ export class MentionModule extends React.PureComponent<IProps, IState> {
             const prevIndex = activeItemIndex - 1;
             const lastIndex = suggestions.length - 1;
 
+            if (!this.state.inActiveMention || !this.state.hasApiResponse) {
+                // Quill doesn't properly trigger update the range until after enter is pressed, which triggers out text change listener with the wrong range. Manually handle this for now.
+                if (Keyboard.match(event, Keyboard.keys.ENTER)) {
+                    this.cancelActiveMention();
+                    this.quill.insertText(this.quill.getSelection().index, "\n", Quill.sources.API);
+                    event.preventDefault();
+                }
+                return;
+            }
+
             switch (true) {
                 case Keyboard.match(event, Keyboard.keys.DOWN):
                     newIndex = activeItemIndex === lastIndex ? firstIndex : nextIndex;
@@ -157,13 +174,38 @@ export class MentionModule extends React.PureComponent<IProps, IState> {
                     event.preventDefault();
                     break;
                 case Keyboard.match(event, Keyboard.keys.ESCAPE):
-                    this.resetMentionState();
+                    this.cancelActiveMention();
                     event.preventDefault();
                     break;
             }
         }
     };
 
+    /**
+     * Generate an ID for a mention suggestion.
+     */
+    private generateIdForMentionData(data: IMentionData) {
+        return this.props.editorID + "-mentionItem-" + data.userID;
+    }
+
+    /**
+     * Inject accessibility attributes into the current MentionAutoComplete and ComboBox.
+     */
+    private injectComboBoxAccessibility = () => {
+        const { autoCompleteBlot, activeItemID } = this.state;
+        if (autoCompleteBlot) {
+            autoCompleteBlot.injectAccessibilityAttributes({
+                ID: this.comboBoxID,
+                activeItemID,
+                suggestionListID: this.ID,
+                noResultsID: this.noResultsID,
+            });
+        }
+    };
+
+    /**
+     * Make an API request for mention suggestions. These results are cached by the lookup username.
+     */
     private lookupMention(username: string) {
         if (mentionCache.has(username)) {
             return this.handleMentionResponse(mentionCache.get(username)!);
@@ -180,28 +222,13 @@ export class MentionModule extends React.PureComponent<IProps, IState> {
         };
 
         api
-            .get("/users/by-names/", { params })
+            .get("/users/by-names/", { params, cancelToken: this.apiCancelSource.token })
             .then(response => {
                 mentionCache.set(username, response);
                 return this.handleMentionResponse(response);
             })
             .catch(logError);
     }
-
-    private generateIdForMentionData(data: IMentionData) {
-        return this.props.editorID + "-mentionItem-" + data.userID;
-    }
-
-    private injectComboBoxAccessibility = () => {
-        const { autoCompleteBlot, activeItemID } = this.state;
-        if (autoCompleteBlot) {
-            autoCompleteBlot.injectAccessibilityAttributes({
-                ID: this.comboBoxID,
-                activeItemID,
-                mentionListID: this.ID,
-            });
-        }
-    };
 
     /**
      * Handle mention responses from the API.
@@ -222,7 +249,7 @@ export class MentionModule extends React.PureComponent<IProps, IState> {
         this.setState(
             {
                 suggestions,
-                activeItemID: suggestions.length > 0 ? suggestions[0].uniqueID : "",
+                activeItemID: suggestions.length > 0 ? suggestions[0].uniqueID : null,
                 activeItemIndex: 0,
                 hasApiResponse: true,
             },
@@ -231,35 +258,11 @@ export class MentionModule extends React.PureComponent<IProps, IState> {
     }
 
     /**
-     * Watch for selection change events in quill. We need to clear the mention list if we have text selected or their is no selection.
-     */
-    private onSelectionChange = (range: RangeStatic, oldRange: RangeStatic, sources) => {
-        if (sources === Quill.sources.SILENT || !this.state.inActiveMention || !this.state.hasApiResponse) {
-            return;
-        }
-
-        if (!range || range.length > 0) {
-            return this.resetMentionState();
-        }
-
-        // Bail out if we're in a mention in progress.
-        if (getBlotAtIndex(this.quill, range.index, MentionAutoCompleteBlot)) {
-            return;
-        }
-
-        // Clear the mention the new selection doesn't match.
-        const mentionRange = getMentionRange(this.quill, range);
-        if (mentionRange === null && !this.isConvertingMention) {
-            return this.resetMentionState();
-        }
-    };
-
-    /**
      * Reset the component's mention state. Also clears the current combobox.
      *
      * @param clearComboBox - Whether or not to clear the current combobox. An situation where you would not want to do this is if it is already deleted or it has already been detached from quill.
      */
-    private resetMentionState(clearComboBox = true) {
+    private cancelActiveMention(clearComboBox = true) {
         if (this.state.autoCompleteBlot && clearComboBox && !this.isConvertingMention) {
             this.isConvertingMention = true;
             const selection = this.quill.getSelection();
@@ -294,8 +297,30 @@ export class MentionModule extends React.PureComponent<IProps, IState> {
         this.quill.update(Quill.sources.SILENT);
         this.quill.insertText(start + 1, " ", Quill.sources.SILENT);
         this.quill.setSelection(start + 2, 0, Quill.sources.SILENT);
-        this.resetMentionState();
+        this.cancelActiveMention();
     }
+
+    /**
+     * Watch for selection change events in quill. We need to clear the mention list if we have text selected or their is no selection.
+     */
+    private onSelectionChange = (range: RangeStatic, oldRange: RangeStatic, sources) => {
+        if (sources !== Quill.sources.USER || !this.state.inActiveMention || !this.state.hasApiResponse) {
+            return;
+        }
+
+        if (!range || range.length > 0) {
+            return this.cancelActiveMention();
+        }
+
+        // The range is updated before the text content, so we need to step back one character sometimes.
+        const lookupIndex = range.index - 1;
+        const autoCompleteBlot = getBlotAtIndex(this.quill, range.index, MentionAutoCompleteBlot);
+        const mentionRange = getMentionRange(this.quill, range.index, true);
+
+        if (!autoCompleteBlot && !mentionRange) {
+            return this.cancelActiveMention();
+        }
+    };
 
     /**
      * A quill text change event listener.
@@ -311,19 +336,19 @@ export class MentionModule extends React.PureComponent<IProps, IState> {
         }
 
         // Clear the mention if there is no selection.
-        const range = this.quill.getSelection();
-        if (range == null || range.index == null) {
-            return this.resetMentionState(false);
+        const selection = this.quill.getSelection();
+        if (selection == null || selection.index == null) {
+            return this.cancelActiveMention(false);
         }
 
-        // Clear the mention the new selection doesn't match.
-        const mentionRange = getMentionRange(this.quill, range);
-        if (mentionRange === null) {
-            return this.resetMentionState();
+        let autoCompleteBlot = getBlotAtIndex(this.quill, selection.index, MentionAutoCompleteBlot);
+        const mentionRange = getMentionRange(this.quill);
+
+        if (!mentionRange) {
+            return this.cancelActiveMention();
         }
 
         // Create a autoCompleteBlot if it doesn't already exist.
-        let autoCompleteBlot = getBlotAtIndex(this.quill, range.index - 1, MentionAutoCompleteBlot);
         if (!autoCompleteBlot) {
             this.quill.formatText(
                 mentionRange.index,
@@ -332,10 +357,10 @@ export class MentionModule extends React.PureComponent<IProps, IState> {
                 true,
                 Quill.sources.API,
             );
-            this.quill.setSelection(range.index, 0, Quill.sources.API);
+            this.quill.setSelection(selection.index, 0, Quill.sources.API);
 
             // Get the autoCompleteBlot
-            autoCompleteBlot = getBlotAtIndex(this.quill, range.index - 1, MentionAutoCompleteBlot)!;
+            autoCompleteBlot = getBlotAtIndex(this.quill, selection.index - 1, MentionAutoCompleteBlot)!;
         }
 
         this.setState({

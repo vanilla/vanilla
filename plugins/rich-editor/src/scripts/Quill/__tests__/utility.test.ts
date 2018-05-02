@@ -86,7 +86,7 @@ describe("getMentionRange", () => {
 
         validIndexes.forEach(index => {
             test(description + index, () => {
-                expect(utility.getMentionRange(quill, { index, length: 0 })).toEqual({ index: 0, length: index });
+                expect(utility.getMentionRange(quill, index)).toEqual({ index: 0, length: index });
             });
         });
     });
@@ -105,7 +105,7 @@ describe("getMentionRange", () => {
 
         validIndexes.forEach(index => {
             test(description + index, () => {
-                expect(utility.getMentionRange(quill, { index, length: 0 })).toEqual({ index: 2, length: index - 2 });
+                expect(utility.getMentionRange(quill, index)).toEqual({ index: 2, length: index - 2 });
             });
         });
     });
@@ -128,7 +128,7 @@ describe("getMentionRange", () => {
 
         validIndexes.forEach(index => {
             test(description + index, () => {
-                expect(utility.getMentionRange(quill, { index, length: 0 })).toEqual({ index: 6, length: index - 6 });
+                expect(utility.getMentionRange(quill, index)).toEqual({ index: 6, length: index - 6 });
             });
         });
     });

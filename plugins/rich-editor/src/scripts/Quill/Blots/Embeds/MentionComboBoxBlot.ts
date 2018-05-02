@@ -30,7 +30,6 @@ export default class MentionComboBoxBlot extends Container {
         super(domNode);
         domNode.setAttribute("role", "combobox");
         domNode.setAttribute("aria-haspopup", "listbox");
-        domNode.setAttribute("aria-expanded", true);
     }
 
     /**

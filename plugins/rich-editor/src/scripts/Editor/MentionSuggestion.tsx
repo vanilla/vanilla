@@ -70,14 +70,12 @@ export default function MentionSuggestion(props: IMentionProps) {
 /**
  * An item in the mention list for when no results are found.
  */
-export function MentionSuggestionNotFound(props) {
-    const classes = classNames("richEditor-menuItem", "atMentionList-item");
-
+export function MentionSuggestionNotFound(props: { id: string }) {
     return (
-        <li className={classes} role="option">
-            <button disabled type="button" className="atMentionList-suggestion">
-                <span className="atMentionList-noResults">{t("No results found")}</span>
-            </button>
-        </li>
+        <span className="richEditor-menuItem atMentionList-item">
+            <span id={props.id} className="atMentionList-noResults">
+                {t("No results found")}
+            </span>
+        </span>
     );
 }

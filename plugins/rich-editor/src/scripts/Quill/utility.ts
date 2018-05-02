@@ -282,18 +282,25 @@ const MIN_MENTION_LENGTH = 1;
 /**
  * Get the range of text to convert to a mention.
  *
+ * @param quill - A quill instance.
+ * @param currentIndex - The current position in the document..
+ *
  * @returns A range if a mention was matched, or null if one was not.
  */
-export function getMentionRange(quill: Quill, selection?: RangeStatic): RangeStatic | null {
-    if (!selection) {
-        selection = quill.getSelection();
+export function getMentionRange(
+    quill: Quill,
+    currentIndex?: number,
+    ignoreTrailingNewline = false,
+): RangeStatic | null {
+    if (!currentIndex) {
+        currentIndex = quill.getSelection().index;
     }
 
     // Get details about our current leaf (likely a TextBlot).
     // This breaks the text to search every time there is a different DOM Node. Eg. A format, link, line break.
-    const [leaf] = quill.getLeaf(selection.index);
+    const [leaf] = quill.getLeaf(currentIndex);
     const leafOffset = leaf.offset(quill.scroll);
-    const length = selection.index - leafOffset;
+    const length = currentIndex - leafOffset;
     const leafContentBeforeCursor = quill.getText(leafOffset, length);
 
     // See if the leaf's content contains an `@`.
@@ -302,7 +309,10 @@ export function getMentionRange(quill: Quill, selection?: RangeStatic): RangeSta
         return null;
     }
     const mentionIndex = leafOffset + leafAtSignIndex;
-    const potentialMention = leafContentBeforeCursor.substring(leafAtSignIndex);
+    let potentialMention = leafContentBeforeCursor.substring(leafAtSignIndex);
+    if (ignoreTrailingNewline) {
+        potentialMention = potentialMention.replace("\n", "");
+    }
 
     const usernameLength = potentialMention.length - 1;
     const meetsLengthRequirements = usernameLength >= MIN_MENTION_LENGTH;

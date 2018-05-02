@@ -9,11 +9,13 @@ import classNames from "classnames";
 import { withEditor, IEditorContextProps } from "./ContextProvider";
 import MentionBlot from "../Quill/Blots/Embeds/MentionBlot";
 import MentionSuggestion, { IMentionData, MentionSuggestionNotFound } from "./MentionSuggestion";
+import { t } from "@core/application";
 
 interface IProps extends IEditorContextProps {
     mentionData: IMentionData[];
     matchedString: string;
     id: string;
+    noResultsID: string;
     activeItemId: string | null;
     onItemClick: React.MouseEventHandler<any>;
     style?: React.CSSProperties;
@@ -27,9 +29,9 @@ export default function MentionList(props: IProps) {
 
     return (
         <span style={style} className="atMentionList">
-            <ul id={id} aria-label="{t('@mention user list')}" className={classes} role="listbox">
-                {hasResults ? (
-                    mentionData.map(mentionItem => {
+            {hasResults ? (
+                <ul id={id} aria-label={t("@mention user suggestions")} className={classes} role="listbox">
+                    {mentionData.map(mentionItem => {
                         const isActive = mentionItem.uniqueID === activeItemId;
                         return (
                             <MentionSuggestion
@@ -40,11 +42,13 @@ export default function MentionList(props: IProps) {
                                 matchedString={matchedString}
                             />
                         );
-                    })
-                ) : (
-                    <MentionSuggestionNotFound />
-                )}
-            </ul>
+                    })}
+                </ul>
+            ) : (
+                <div id={id} className={classes}>
+                    <MentionSuggestionNotFound id={props.noResultsID} />
+                </div>
+            )}
         </span>
     );
 }

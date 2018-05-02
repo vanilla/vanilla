@@ -89,16 +89,36 @@ export default class MentionAutoCompleteBlot extends Inline {
      * Inject accessibility attributes into the autocomplete and it's parent combobox.
      */
     public injectAccessibilityAttributes(data: IComboBoxAccessibilityOptions) {
-        this.domNode.setAttribute("aria-controls", data.mentionListID);
-        this.domNode.setAttribute("aria-activedescendant", data.activeItemID);
-        this.parent.domNode.setAttribute("id", data.ID);
-        this.parent.domNode.setAttribute("aria-owns", data.mentionListID);
-        this.parent.domNode.setAttribute("aria-activedescendant", data.activeItemID);
+        const domNode = this.domNode;
+        const parentNode = this.parent.domNode;
+
+        parentNode.setAttribute("id", data.ID);
+        domNode.setAttribute("aria-invalid", data.activeItemID === null);
+
+        if (data.activeItemID) {
+            // If there is an activedescendant
+            parentNode.setAttribute("aria-owns", data.suggestionListID);
+            parentNode.setAttribute("aria-activedescendant", data.activeItemID);
+            parentNode.setAttribute("aria-expanded", true);
+            domNode.setAttribute("aria-controls", data.suggestionListID);
+            domNode.setAttribute("aria-activedescendant", data.activeItemID);
+
+            // Remove the labelled by
+            domNode.removeAttribute("aria-describeby");
+        } else {
+            domNode.setAttribute("aria-describedby", data.noResultsID);
+
+            // Remove active attributes.
+            parentNode.setAttribute("aria-expanded", false);
+            parentNode.removeAttribute("aria-activedescendant");
+            domNode.removeAttribute("aria-activedescendant");
+        }
     }
 }
 
 interface IComboBoxAccessibilityOptions {
     ID: string;
-    mentionListID: string;
-    activeItemID: string;
+    suggestionListID: string;
+    noResultsID: string;
+    activeItemID: string | null;
 }

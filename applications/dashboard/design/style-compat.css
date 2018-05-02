@@ -1128,6 +1128,7 @@ label.checkbox input.checkbox-input {
 .atMention {
   color: inherit;
   font-weight: 600;
+  user-select: all;
 }
 
 body.hasRichEditor.Section-PostDiscussion #DiscussionForm select {

@@ -681,6 +681,7 @@ $embedded-quote_fg: #A3A3A3 !default;
 .atMention  {
     color: inherit;
     font-weight: $richEditor-atMentionLink_weight;
+    user-select: all;
 }
 
 // Handle gutter for paragraph menu

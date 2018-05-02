@@ -43,10 +43,10 @@ class LinkUserTest extends AbstractAPIv2Test {
     public function setUp() {
         parent::setUp();
 
-        $uniqueID = uniqid('lu_');
+        $uniqueID = self::randomUsername('lu');
         $userData = [
-            'name' => 'Authenticate_'.$uniqueID,
-            'email' => 'authenticate_'.$uniqueID.'@example.com',
+            'name' => $uniqueID,
+            'email' => $uniqueID.'@example.com',
             'password' => 'pwd_'.$uniqueID,
         ];
 

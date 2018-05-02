@@ -21,10 +21,10 @@ class PasswordAuthenticatorTest extends AbstractAPIv2Test {
     public function setUp() {
         parent::setUp();
 
-        $uniqueID = uniqid('ac_');
+        $uniqueID = self::randomUsername('pa');
         $userData = [
-            'name' => 'pa_'.$uniqueID,
-            'email' => 'pa_'.$uniqueID.'@example.com',
+            'name' => $uniqueID,
+            'email' => $uniqueID.'@example.com',
             'password' => 'pwd_'.$uniqueID,
         ];
 

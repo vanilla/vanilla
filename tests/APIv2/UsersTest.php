@@ -70,7 +70,7 @@ class UsersTest extends AbstractResourceTest {
     private function registrationFields(array $extra = []) {
         static $inc = 0;
 
-        $name = 'vanilla-'.$inc++;
+        $name = 'vanilla_'.$inc++;
         $fields = [
             'email' => "{$name}@example.com",
             'name' => $name,
@@ -87,6 +87,9 @@ class UsersTest extends AbstractResourceTest {
      */
     protected function modifyRow(array $row) {
         $row = parent::modifyRow($row);
+        if (array_key_exists('name', $row)) {
+            $row['name'] = substr(md5($row['name']), 0, 20);
+        }
         foreach ($this->patchFields as $key) {
             $value = $row[$key];
             switch ($key) {

@@ -2078,6 +2078,7 @@ class UserModel extends Gdn_Model {
      * - HashPassword - Hash the provided password on update. Default true.
      * - FixUnique - Try to resolve conflicts with unique constraints on Name and Email. Default false.
      * - ValidateEmail - Make sure the provided email addresses is formatted properly. Default true.
+     * - ValidateName - Make sure the provided name is valid. Blacklisted names will always be blocked.
      * - NoConfirmEmail - Disable email confirmation. Default false.
      *
      */
@@ -2172,6 +2173,9 @@ class UserModel extends Gdn_Model {
         // Add & apply any extra validation rules:
         if (array_key_exists('Email', $formPostValues) && val('ValidateEmail', $settings, true)) {
             $this->Validation->applyRule('Email', 'Email');
+        }
+        if (val('ValidateName', $settings, true)) {
+            $this->Validation->applyRule('Name', 'Username');
         }
 
         if ($this->validate($formPostValues, $insert) && $uniqueValid) {
@@ -2811,6 +2815,7 @@ class UserModel extends Gdn_Model {
      *
      * @param array $formPostValues
      * @param array $options
+     *  - ValidateName - Make sure the provided name is valid. Blacklisted names will always be blocked.
      * @return int UserID.
      */
     public function insertForInvite($formPostValues, $options = []) {
@@ -2866,6 +2871,10 @@ class UserModel extends Gdn_Model {
 
         $inviteUserID = $invitation->InsertUserID;
         $formPostValues['Email'] = $invitation->Email;
+
+        if (val('ValidateName', $options, true)) {
+            $this->Validation->applyRule('Name', 'Username');
+        }
 
         if ($this->validate($formPostValues, true)) {
             // Check for spam.
@@ -2946,6 +2955,7 @@ class UserModel extends Gdn_Model {
      * @param array $options
      *  - ValidateSpam
      *  - CheckCaptcha
+     *  - ValidateName - Make sure the provided name is valid. Blacklisted names will always be blocked.
      * @return int UserID.
      */
     public function insertForApproval($formPostValues, $options = []) {
@@ -2970,6 +2980,10 @@ class UserModel extends Gdn_Model {
         }
 
         $this->addInsertFields($formPostValues);
+
+        if (val('ValidateName', $options, true)) {
+            $this->Validation->applyRule('Name', 'Username');
+        }
 
         if ($this->validate($formPostValues, true)) {
 
@@ -3019,6 +3033,7 @@ class UserModel extends Gdn_Model {
      * @param array $formPostValues
      * @param bool $checkCaptcha
      * @param array $options
+     *  - ValidateName - Make sure the provided name is valid. Blacklisted names will always be blocked.
      * @return bool|int|string
      * @throws Exception
      */
@@ -3038,8 +3053,13 @@ class UserModel extends Gdn_Model {
         $this->defineSchema();
 
         // Add & apply any extra validation rules.
+        $this->Validation->addRule('UsernameBlacklist', 'function:validateAgainstUsernameBlacklist');
+        $this->Validation->applyRule('Name', 'UsernameBlacklist');
         if (val('ValidateEmail', $options, true)) {
             $this->Validation->applyRule('Email', 'Email');
+        }
+        if (val('ValidateName', $options, true)) {
+            $this->Validation->applyRule('Name', 'Username');
         }
 
         // TODO: DO I NEED THIS?!

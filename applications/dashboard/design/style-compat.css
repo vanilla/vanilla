@@ -1080,12 +1080,14 @@ label.checkbox input.checkbox-input {
   cursor: pointer;
 }
 
-.atMentionList-user {
+.atMentionList-user,
+.atMentionList-noResults {
   display: flex;
   align-items: center;
   width: 100%;
   box-sizing: border-box;
   overflow: hidden;
+  line-height: 30px;
   padding-top: 3px;
   padding-right: 6px;
   padding-bottom: 3px;

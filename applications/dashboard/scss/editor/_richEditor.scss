@@ -630,12 +630,14 @@ $embedded-quote_fg: #A3A3A3 !default;
     cursor: pointer;
 }
 
-.atMentionList-user {
+.atMentionList-user,
+.atMentionList-noResults {
     display: flex;
     align-items: center;
     width: 100%;
     box-sizing: border-box;
     overflow: hidden;
+    line-height: $richEditor-atMentionAvatar_width;
     padding: {
         top: $richEditor-atMentionUser_paddingVertical;
         right: $richEditor-atMentionUser_paddingHorizontal;

@@ -11,7 +11,7 @@ const api = axios.create({
     baseURL: formatUrl("/api/v2/"),
     headers: {
         common: {
-            'X-Requested-With': 'vanilla',
+            "X-Requested-With": "vanilla",
         },
     },
 });

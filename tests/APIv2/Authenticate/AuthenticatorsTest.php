@@ -64,6 +64,11 @@ class AuthenticatorsTest extends AbstractAPIv2Test {
 
         // They also have to enable SignIn.
         if (isset($record['sso'])) {
+            $this->assertArrayHasKey('canSignIn', $record['sso']);
+            $this->assertInternalType('bool', $record['sso']['canSignIn']);
+            // Must be true or something is wrong.
+            $this->assertTrue($record['sso']['canSignIn']);
+
             $this->assertArrayHasKey('canAutoLinkUser', $record['sso']);
             $this->assertInternalType('bool', $record['sso']['canAutoLinkUser']);
         }

@@ -75,6 +75,7 @@ class AutoConnectTest extends AbstractAPIv2Test {
      * Test POST /authenticate with different configuration combination.
      *
      * @param $configurations
+     * @param $authenticatorProperties
      * @param $expectedResults
      *
      * @dataProvider provider

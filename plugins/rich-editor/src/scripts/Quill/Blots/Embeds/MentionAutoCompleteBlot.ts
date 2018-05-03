@@ -94,7 +94,7 @@ export default class MentionAutoCompleteBlot extends Inline {
         const parentNode = this.parent.domNode;
 
         parentNode.setAttribute("id", data.ID);
-        parentNode.setAttribute("aria-expanded", !!data.suggestionListID);
+        parentNode.setAttribute("aria-expanded", !!data.activeItemID);
         parentNode.setAttribute("aria-owns", data.suggestionListID);
         domNode.setAttribute("aria-controls", data.suggestionListID);
 

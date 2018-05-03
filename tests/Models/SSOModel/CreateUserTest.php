@@ -59,8 +59,6 @@ class SSOModelCreateUserTest extends TestCase {
         parent::tearDown();
     }
 
-    private static $i = -1;
-
     /**
      * Create a user using SSOModel.
      *
@@ -76,7 +74,6 @@ class SSOModelCreateUserTest extends TestCase {
      * @throws \Garden\Container\NotFoundException
      */
     public function testCreateUser($configurations, $ssoDataArray, $options, $expectedResult) {
-        self::$i++;
         /** @var \Gdn_Configuration $config */
         $config = self::container()->get(\Gdn_Configuration::class);
 

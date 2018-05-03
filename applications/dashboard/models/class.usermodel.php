@@ -2335,9 +2335,12 @@ class UserModel extends Gdn_Model {
                     // Define the other required fields:
                     $fields['Email'] = $email;
 
+                    // Make sure that the user is assigned to at least the default role(s).
+                    if (!is_array($roleIDs)) {
+                        $roleIDs = RoleModel::getDefaultRoles(RoleModel::TYPE_MEMBER);
+                    }
                     $fields['Roles'] = $roleIDs;
-                    // Make sure that the user is assigned to one or more roles:
-                    $saveRoles = false;
+                    $saveRoles = false; // insertInternal will take care of updating the roles.
 
                     // And insert the new user.
                     $userID = $this->insertInternal($fields, $settings);
@@ -2364,6 +2367,7 @@ class UserModel extends Gdn_Model {
                             'HeadlineFormat' => t('HeadlineFormat.AddUser', '{ActivityUserID,user} added an account for {RegardingUserID,user}.')]);
                     }
                 }
+
                 // Now update the role settings if necessary.
                 if ($saveRoles) {
                     // If no RoleIDs were provided, use the system defaults

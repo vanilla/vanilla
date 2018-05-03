@@ -105,12 +105,14 @@ class TagModule extends Gdn_Module {
         //Allow addon to manipulate the data being rendered
         $tagData = null;
         $this->EventArguments['ParentID'] = $this->ParentID;
+        $this->EventArguments['ParentID'] = $this->ParentType;
         $this->EventArguments['tagData'] = &$tagData;
         $this->fireEvent('getData');
         if ($tagData !== null) {
-            if (is_array($tagData))
-            $this->_TagData = new Gdn_DataSet($tagData, DATASET_TYPE_ARRAY);
-            return;
+            if (is_array($tagData)) {
+                $this->_TagData = new Gdn_DataSet($tagData, DATASET_TYPE_ARRAY);
+                return;
+            }
         }
 
         $tagCacheKey = "TagModule-{$this->ParentType}-{$this->ParentID}";

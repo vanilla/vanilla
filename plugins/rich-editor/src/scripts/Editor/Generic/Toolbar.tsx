@@ -7,7 +7,7 @@
 import React from "react";
 import * as PropTypes from "prop-types";
 import { RangeStatic } from "quill";
-import Quill from "quill/core";
+import Quill, { Sources } from "quill/core";
 import LinkBlot from "quill/formats/link";
 import { t } from "@core/application";
 import MenuItem from "./MenuItem";
@@ -91,16 +91,14 @@ export class Toolbar extends React.Component<IProps, IState> {
      * Attach some quill listeners.
      */
     public componentWillMount() {
-        this.quill.on(Quill.events.EDITOR_CHANGE, this.quillChangeHandler);
-        this.quill.on(Quill.events.SCROLL_OPTIMIZE, this.quillOptimizeHandler);
+        this.quill.on(Quill.events.SELECTION_CHANGE, this.handleSelectionChange);
     }
 
     /**
      * Be sure to remove the listeners when the component unmounts.
      */
     public componentWillUnmount() {
-        this.quill.off(Quill.events.EDITOR_CHANGE, this.quillChangeHandler);
-        this.quill.off(Quill.events.SCROLL_OPTIMIZE, this.quillOptimizeHandler);
+        this.quill.off(Quill.events.SELECTION_CHANGE, this.handleSelectionChange);
     }
 
     public render() {
@@ -158,28 +156,15 @@ export class Toolbar extends React.Component<IProps, IState> {
     }
 
     /**
-     * Handle quill changes. Used to detect selection changes.
-     *
-     * @param type - The change type.
-     * @param range - The new selection range.
+     * Handle selection changes.
      */
-    private quillChangeHandler = (type: string, range: RangeStatic) => {
-        if (range && range.index) {
-            this.setState({ range });
+    private handleSelectionChange = (range: RangeStatic, oldRange: RangeStatic, source: Sources) => {
+        if (this.props.isHidden || source === Quill.sources.SILENT) {
+            return;
         }
-        if (!this.props.isHidden) {
-            this.update();
-        }
-    };
 
-    /**
-     * React to quill optimizations passes.
-     */
-    private quillOptimizeHandler = () => {
-        if (!this.props.isHidden) {
-            const range = this.quill.getSelection();
-            this.update();
-        }
+        this.setState({ range });
+        this.update();
     };
 
     /** MARK: Click handlers */

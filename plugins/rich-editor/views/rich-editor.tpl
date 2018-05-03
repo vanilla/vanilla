@@ -11,6 +11,7 @@
         </div>
         <div class="js-InlineEditorToolbar"></div>
         <div class="js-ParagraphEditorToolbar"></div>
+        <div class="js-MentionModule"></div>
         <div class="richEditor-menu embedBar">
             <ul class="richEditor-menuItems" role="menubar" aria-label="{t c="Inline Level Formatting Menu"}">
                 <li class="richEditor-menuItem" role="menuitem">

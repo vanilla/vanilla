@@ -5,16 +5,13 @@
  */
 
 import Emitter from "quill/core/emitter";
-import Quill, { RangeStatic, Blot } from "quill/core";
+import Quill, { RangeStatic, Blot, Container, BoundsStatic } from "quill/core";
 import Delta from "quill-delta";
 import Parchment from "parchment";
 import LineBlot from "./Blots/Abstract/LineBlot";
-
-/**
- * @typedef {Object} BoundaryStatic
- * @property {number} start
- * @property {number} end
- */
+import TextBlot from "quill/blots/text";
+import MentionComboBoxBlot from "./Blots/Embeds/MentionComboBoxBlot";
+import { matchAtMention } from "@core/utility";
 
 interface IBoundary {
     start: number;
@@ -260,7 +257,6 @@ export function insertNewLineAtEndOfScroll(quill: Quill) {
  * @param quill - The quill instance.
  */
 export function insertNewLineAtStartOfScroll(quill: Quill) {
-    // const index = quill.
     const newContents = [
         {
             insert: "\n",
@@ -269,4 +265,74 @@ export function insertNewLineAtStartOfScroll(quill: Quill) {
     ];
     quill.setContents(newContents);
     quill.setSelection(0, 0);
+}
+
+/**
+ * Get a Blot at a given index.
+ *
+ * @param quill - The Quill instance.
+ * @param index - The index to look at.
+ * @param blotClass - Optionally a blot class to filter by.
+ */
+export function getBlotAtIndex<T extends Blot>(
+    quill: Quill,
+    index: number,
+    blotClass?: { new (value?: any): T },
+): T | null {
+    const condition = blotClass ? blot => blot instanceof blotClass : blot => true;
+    return quill.scroll.descendant(condition, index)[0] as T;
+}
+
+const MIN_MENTION_LENGTH = 1;
+
+/**
+ * Get the range of text to convert to a mention.
+ *
+ * @param quill - A quill instance.
+ * @param currentIndex - The current position in the document..
+ *
+ * @returns A range if a mention was matched, or null if one was not.
+ */
+export function getMentionRange(
+    quill: Quill,
+    currentIndex?: number,
+    ignoreTrailingNewline = false,
+): RangeStatic | null {
+    if (!currentIndex) {
+        currentIndex = quill.getSelection().index;
+    }
+
+    // Get details about our current leaf (likely a TextBlot).
+    // This breaks the text to search every time there is a different DOM Node. Eg. A format, link, line break.
+    const [leaf] = quill.getLeaf(currentIndex);
+    const leafOffset = leaf.offset(quill.scroll);
+    const length = currentIndex - leafOffset;
+    const leafContentBeforeCursor = quill.getText(leafOffset, length);
+
+    // See if the leaf's content contains an `@`.
+    const leafAtSignIndex = leafContentBeforeCursor.lastIndexOf("@");
+    if (leafAtSignIndex === -1) {
+        return null;
+    }
+    const mentionIndex = leafOffset + leafAtSignIndex;
+    let potentialMention = leafContentBeforeCursor.substring(leafAtSignIndex);
+    if (ignoreTrailingNewline) {
+        potentialMention = potentialMention.replace("\n", "");
+    }
+
+    const usernameLength = potentialMention.length - 1;
+    const meetsLengthRequirements = usernameLength >= MIN_MENTION_LENGTH;
+    if (!meetsLengthRequirements) {
+        return null;
+    }
+
+    const isValidMention = matchAtMention(potentialMention);
+    if (!isValidMention) {
+        return null;
+    }
+
+    return {
+        index: mentionIndex,
+        length: potentialMention.length,
+    };
 }

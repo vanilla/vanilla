@@ -4,12 +4,12 @@
  * @license https://opensource.org/licenses/GPL-2.0 GPL-2.0
  */
 
-import Block from "quill/blots/block";
+import BlockBlot from "../Blocks/BlockBlot";
 
 /**
  * A Block Blot implementing class matching functionality and representation in the outputted delta.
  */
-export default class ClassFormatBlot extends Block {
+export default class ClassFormatBlot extends BlockBlot {
     public static create(value) {
         const domNode = super.create(value) as HTMLElement;
 

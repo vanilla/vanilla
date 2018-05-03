@@ -40,3 +40,8 @@ $Definition['activities'] = 'Activities';
 $Definition['objects'] = 'Objects';
 $Definition['symbols'] = 'Symbols';
 $Definition['flags'] = 'Flags';
+
+// Mentions
+$Definition['@mention user suggestions'] = '@mention user suggestions';
+$Definition['@mention a user'] = '@mention a user';
+$Definition['No results found'] = 'No results found';

@@ -44,17 +44,21 @@ export default class EditorContextProvider extends React.PureComponent<IProps> {
 /**
  * Map a quill context to props.
  *
- * @param {React.Component} Component - The component to map.
+ * @param {React.Component} WrappedComponent - The component to map.
  *
  * @returns {ComponentWithEditor} - A component with a quill context injected as props.
  */
 export function withEditor<T extends IEditorContextProps>(
-    Component: React.ComponentClass<T>,
+    WrappedComponent: React.ComponentClass<T>,
 ): React.ComponentClass<Omit<T, keyof IProps>> {
     function ComponentWithEditor(props, context) {
-        return <Component {...context} {...props} />;
+        return <WrappedComponent {...context} {...props} />;
     }
     (ComponentWithEditor as any).contextTypes = editorContextTypes;
+    const displayName = WrappedComponent.displayName || WrappedComponent.name || "Component";
+
+    // the func used to compute this HOC's displayName from the wrapped component's displayName.
+    (ComponentWithEditor as any).displayName = `withEditor(${displayName})`;
 
     return ComponentWithEditor as any;
 }

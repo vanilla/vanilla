@@ -18,10 +18,9 @@ import ParagraphToolbar from "../Editor/ParagraphToolbar";
 import EmojiPopover from "../Editor/EmojiPopover";
 import EmbedPopover from "../Editor/EmbedPopover";
 import EditorProvider from "../Editor/ContextProvider";
-import EmbedFocusModule from "./EmbedFocusModule";
+import MentionModule from "../Editor/MentionModule";
 
 export default class VanillaTheme extends ThemeBase {
-    private currentUploads: Map<File | string, Blot>;
     private jsBodyBoxContainer: Element;
 
     /**
@@ -37,19 +36,17 @@ export default class VanillaTheme extends ThemeBase {
         };
 
         super(quill, themeOptions);
-        this.currentUploads = new Map();
         this.quill.root.classList.add("richEditor-text");
         this.quill.root.classList.add("userContent");
         this.quill.root.addEventListener("focusin", () => closeEditorFlyouts());
 
         // Add keyboard bindings to options.
         this.addModule("embed/insertion");
-        const embedFocus = this.addModule("embed/focus");
+        this.addModule("embed/focus");
         const keyboardBindings = new KeyboardBindings(this.quill);
         this.options.modules.keyboard.bindings = {
             ...this.options.modules.keyboard.bindings,
             ...keyboardBindings.bindings,
-            ...embedFocus.earlyKeyBoardBindings,
         };
 
         // Find the editor root.
@@ -57,12 +54,13 @@ export default class VanillaTheme extends ThemeBase {
         if (!this.jsBodyBoxContainer) {
             throw new Error("Could not find .richEditor to mount editor components into.");
         }
+        this.mountMentionModule();
+        this.mountEmojiMenu();
     }
 
     public init() {
         // Mount react components
         this.mountToolbar();
-        this.mountEmojiMenu();
         this.mountParagraphMenu();
         this.mountEmbedPopover();
     }
@@ -111,6 +109,16 @@ export default class VanillaTheme extends ThemeBase {
         ReactDOM.render(
             <EditorProvider quill={this.quill}>
                 <EmbedPopover />
+            </EditorProvider>,
+            container,
+        );
+    }
+
+    private mountMentionModule() {
+        const container = this.jsBodyBoxContainer.querySelector(".js-MentionModule");
+        ReactDOM.render(
+            <EditorProvider quill={this.quill}>
+                <MentionModule />
             </EditorProvider>,
             container,
         );

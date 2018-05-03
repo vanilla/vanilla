@@ -260,8 +260,6 @@ export default class KeyboardBindings {
         this.bindings["outdent code-block"] = false;
         this.bindings["remove tab"] = false;
         this.bindings["code exit"] = false;
-        this.bindings["embed left"] = false;
-        this.bindings["embed right"] = false;
     }
 
     private addLinkTransformKeyboardBindings() {
@@ -294,7 +292,7 @@ export default class KeyboardBindings {
             index += 1;
         }
 
-        const isAlreadyLink = this.quill.scroll.descendants(LinkBlot, index, length).length > 0;
+        const isAlreadyLink = this.quill.scroll.descendants(blot => blot instanceof LinkBlot, index, length).length > 0;
 
         if (isAllowedUrl(lastWord) && !isAlreadyLink) {
             this.quill.formatText(index, length, { link: lastWord }, Quill.sources.USER);

@@ -104,7 +104,7 @@ class SSOModelLinkUserFromSession extends TestCase {
     }
 
     /**
-     * Link a user using its credentials.
+     * Link a user using the current session.
      */
     public function testLinkUser() {
         $user = self::$users['default'];
@@ -124,4 +124,21 @@ class SSOModelLinkUserFromSession extends TestCase {
         }
     }
 
+    /**
+     * Try to link a user using the session while there's no user signed in.
+     *
+     * @expectedException \Garden\Web\Exception\ForbiddenException
+     * @expectedExceptionMessage Cannot link user from session while not signed in.
+     */
+    public function testLinkUserWNoSession() {
+        $user = self::$users['default'];
+
+        /** @var \Gdn_Session $session */
+        $session = self::container()->get(\Gdn_Session::class);
+        $session->end();
+
+        self::$ssoModel->linkUserFromSession(
+            $this->createSSOData($user['Name'], $user['Email'])
+        );
+    }
 }

@@ -2200,17 +2200,19 @@ class UserModel extends Gdn_Model {
 
             // Check for email confirmation.
             if (self::requireConfirmEmail() && !val('NoConfirmEmail', $settings)) {
+                $emailIsSet = isset($fields['Email']);
+                $emailIsNotConfirmed = array_key_exists('Confirmed', $fields) && $fields['Confirmed'] == 0;
+                $validSession = Gdn::session()->isValid();
+
+                $currentUserEmailIsBeingChanged =
+                    $validSession
+                    && $userID == Gdn::session()->UserID
+                    && $fields['Email'] != Gdn::session()->User->Email
+                    && !Gdn::session()->checkPermission('Garden.Users.Edit')
+                ;
+
                 // Email address has changed
-                if (isset($fields['Email']) && (
-                        array_key_exists('Confirmed', $fields) &&
-                        $fields['Confirmed'] == 0 ||
-                        (
-                            $userID == Gdn::session()->UserID &&
-                            $fields['Email'] != Gdn::session()->User->Email &&
-                            !Gdn::session()->checkPermission('Garden.Users.Edit')
-                        )
-                    )
-                ) {
+                if ($emailIsSet && ($emailIsNotConfirmed || $currentUserEmailIsBeingChanged)) {
                     $attributes = val('Attributes', Gdn::session()->User);
                     if (is_string($attributes)) {
                         $attributes = dbdecode($attributes);

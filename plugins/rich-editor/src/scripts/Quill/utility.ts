@@ -5,7 +5,7 @@
  */
 
 import Emitter from "quill/core/emitter";
-import Quill, { RangeStatic, Blot, Container } from "quill/core";
+import Quill, { RangeStatic, Blot, Container, BoundsStatic } from "quill/core";
 import Delta from "quill-delta";
 import Parchment from "parchment";
 import LineBlot from "./Blots/Abstract/LineBlot";

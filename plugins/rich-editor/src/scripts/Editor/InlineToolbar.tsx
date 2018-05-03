@@ -118,7 +118,7 @@ export class InlineToolbar extends React.Component<IProps, IState> {
      * Mount quill listeners.
      */
     public componentDidMount() {
-        this.quill.on(Emitter.events.EDITOR_CHANGE, this.handleEditorChange);
+        this.quill.on(Quill.events.SELECTION_CHANGE, this.handleSelectionChange);
         document.addEventListener("keydown", this.escFunction, false);
         document.addEventListener(quillUtilities.CLOSE_FLYOUT_EVENT, this.clearLinkInput);
 
@@ -138,7 +138,7 @@ export class InlineToolbar extends React.Component<IProps, IState> {
      * Be sure to remove the listeners when the component unmounts.
      */
     public componentWillUnmount() {
-        this.quill.off(Quill.events.EDITOR_CHANGE, this.handleEditorChange);
+        this.quill.off(Quill.events.SELECTION_CHANGE, this.handleSelectionChange);
         document.removeEventListener("keydown", this.escFunction, false);
         document.removeEventListener(quillUtilities.CLOSE_FLYOUT_EVENT, this.clearLinkInput);
     }
@@ -187,11 +187,7 @@ export class InlineToolbar extends React.Component<IProps, IState> {
     /**
      * Handle changes from the editor.
      */
-    private handleEditorChange = (type: string, range: RangeStatic, oldRange: RangeStatic, source: Sources) => {
-        if (type !== Emitter.events.SELECTION_CHANGE) {
-            return;
-        }
-
+    private handleSelectionChange = (range: RangeStatic, oldRange: RangeStatic, source: Sources) => {
         if (range && range.length > 0 && source === Emitter.sources.USER) {
             this.clearLinkInput();
         } else if (!this.state.ignoreSelectionReset) {

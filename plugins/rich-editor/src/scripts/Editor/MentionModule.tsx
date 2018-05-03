@@ -81,39 +81,17 @@ export class MentionModule extends React.PureComponent<IProps, IState> {
     }
 
     public render() {
-        if (!this.state.inActiveMention || !this.state.hasApiResponse) {
-            return null;
-        }
-        const styles = this.getStyles();
-
         return (
             <MentionList
                 onItemClick={this.onItemClick}
                 mentionData={this.state.suggestions}
                 matchedString={this.state.username}
                 activeItemId={this.state.activeItemID}
+                isVisible={this.state.inActiveMention && this.state.hasApiResponse}
                 id={this.ID}
                 noResultsID={this.noResultsID}
-                style={styles}
             />
         );
-    }
-
-    /**
-     * Get styles to absolute position the results next to the current text.
-     */
-    private getStyles(): React.CSSProperties {
-        const { startIndex, inActiveMention, hasApiResponse } = this.state;
-        const quillBounds = this.quill.getBounds(startIndex);
-        const offset = 3;
-
-        return {
-            position: "absolute",
-            top: quillBounds.bottom + offset,
-            left: quillBounds.left,
-            zIndex: 1,
-            display: inActiveMention && hasApiResponse ? "block" : "none",
-        };
     }
 
     /**

@@ -45,9 +45,10 @@ interface IProps extends IEditorContextProps {
 interface IState {
     selectionIndex: number | null;
     selectionLength: number | null;
+    quillWidth: number;
 }
 
-class QuillFlyoutBounds extends React.Component<IProps, IState> {
+class QuillFlyoutBounds extends React.PureComponent<IProps, IState> {
     private quill: Quill;
 
     constructor(props) {
@@ -59,6 +60,7 @@ class QuillFlyoutBounds extends React.Component<IProps, IState> {
         this.state = {
             selectionIndex: null,
             selectionLength: null,
+            quillWidth: this.quill.root.offsetWidth,
         };
     }
 
@@ -84,24 +86,6 @@ class QuillFlyoutBounds extends React.Component<IProps, IState> {
         window.addEventListener("resize", this.windowResizeListener);
     }
 
-    public shouldComponentUpdate(nextProps: IProps, nextState: IState) {
-        const stateToCheck = ["selectionIndex", "selectionLength"];
-        const propsToCheck = ["flyoutHeight", "flyoutWidth", "nubHeight", "isVisible"];
-        for (const stateKey of stateToCheck) {
-            if (this.state[stateKey] !== nextState[stateKey]) {
-                return true;
-            }
-        }
-
-        for (const propKey of propsToCheck) {
-            if (this.props[propKey] !== nextProps[propKey]) {
-                return true;
-            }
-        }
-
-        return false;
-    }
-
     /**
      * Be sure to remove the listeners when the component unmounts.
      */
@@ -113,7 +97,12 @@ class QuillFlyoutBounds extends React.Component<IProps, IState> {
     /**
      * Force update on window resize.
      */
-    private windowResizeListener = () => debounce(this.forceUpdate, 200);
+    private windowResizeListener = () => {
+        const debouncedWidthUpdate = debounce(() => {
+            this.setState({ quillWidth: this.quill.root.offsetWidth });
+        }, 200);
+        debouncedWidthUpdate();
+    };
 
     /**
      * Handle changes from the editor.
@@ -129,7 +118,7 @@ class QuillFlyoutBounds extends React.Component<IProps, IState> {
             return;
         }
         let selection: RangeStatic | null = this.quill.getSelection();
-        if (this.props.selectionTransformer) {
+        if (this.props.selectionTransformer && selection) {
             selection = this.props.selectionTransformer(selection);
         }
 
@@ -185,7 +174,7 @@ class QuillFlyoutBounds extends React.Component<IProps, IState> {
             return null;
         }
 
-        const quillWidth = this.quill.root.offsetWidth;
+        const quillWidth = this.state.quillWidth;
         const { flyoutWidth } = this.props;
 
         const start = bounds.left;
@@ -209,7 +198,7 @@ class QuillFlyoutBounds extends React.Component<IProps, IState> {
             };
         } else {
             const inset = 6;
-            const min = start + inset;
+            const min = start;
             const max = quillWidth - flyoutWidth - inset;
             const position = Math.min(max, Math.max(min, start));
 

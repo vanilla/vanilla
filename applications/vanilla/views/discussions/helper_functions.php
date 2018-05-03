@@ -210,7 +210,9 @@ if (!function_exists('WriteDiscussion')) :
                         echo '</span> ';
                     }
 
-                    if ($sender->data('_ShowCategoryLink', true) && c('Vanilla.Categories.Use') && $category) {
+                    if ($sender->data('_ShowCategoryLink', true) && $category && c('Vanilla.Categories.Use') &&
+                        CategoryModel::checkPermission($category, 'Vanilla.Discussions.View')) {
+
                         echo wrap(
                             anchor(htmlspecialchars($discussion->Category),
                             categoryUrl($discussion->CategoryUrlCode)),

@@ -53,8 +53,8 @@ abstract class ShimAuthenticator extends Authenticator {
     protected function getAuthenticatorInfoImpl(): array {
         return [
             'ui' => [
-                'url' => '/entry/connect/'.strtolower(self::getType()),
-                'buttonName' => 'Sign in with '.self::getType(),
+                'url' => '/entry/'.strtolower(self::getType()),
+                'buttonName' => sprintft('Sign In with %s', self::getType()),
             ],
         ];
     }

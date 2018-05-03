@@ -209,16 +209,23 @@ class AuthenticatorsApiController extends AbstractApiController  {
         $record['resourceUrl'] = strtolower(url('/api/v2/authenticators/'.$authenticator::getType().'/'.$authenticator->getID()));
 
         // Convert URLs from relative to absolute.
-        foreach (['signInUrl', 'registerUrl', 'signOutUrl', 'ui.photoUrl', 'resourceUrl'] as $field) {
+        foreach (['signInUrl', 'registerUrl', 'signOutUrl', 'ui.url', 'resourceUrl'] as $field) {
             $value = valr($field, $record, null);
-            if ($value !== null) {
+            if ($value !== null && !preg_match('#^(https?:)?//#i', $value)) {
                 setvalr($field, $record, url($value, true));
+            }
+        }
+        // Convert asset URLs from relative to absolute.
+        foreach (['ui.photoUrl'] as $field) {
+            $value = valr($field, $record, null);
+            if ($value !== null && !preg_match('#^(https?:)?//#i', $value)) {
+                setvalr($field, $record, asset($value, true));
             }
         }
 
         // Pad some fields with default values.
         $fieldDefaults = [
-            'ui.photoUrl' => url('/applications/dashboard/design/images/authenticators/sign_in.svg', true),
+            'ui.photoUrl' => asset('/applications/dashboard/design/images/authenticators/sign_in.svg', true),
             'ui.backgroundColor' => '#0291db',
             'ui.foregroundColor' => '#fff',
         ];

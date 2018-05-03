@@ -48,7 +48,7 @@
         "vanilla/nbbc": "~2.1"
     },
     "require-dev": {
-        "phpunit/phpunit": "~5.0"
+        "phpunit/phpunit": "~6.0"
     },
     "provide": {
         "ext-gd": "*"

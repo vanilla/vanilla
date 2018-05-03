@@ -31,6 +31,10 @@ endif;
 if (!function_exists('writeDiscussionRow')) :
     /**
      * Writes a discussion in table row format.
+     *
+     * @param object $discussion The discussion to write.
+     * @param DiscussionsController $sender The controller rendering the view.
+     * @param Gdn_Session $sender The sender
      */
     function writeDiscussionRow($discussion, $sender, $session) {
         if (!property_exists($sender, 'CanEditDiscussions')) {
@@ -105,7 +109,7 @@ if (!function_exists('writeDiscussionRow')) :
 
                     writeMiniPager($discussion);
                     echo newComments($discussion);
-                    if ($sender->data('_ShowCategoryLink', true)) {
+                    if ($sender->data('_ShowCategoryLink', true) && CategoryModel::checkPermission(val('CategoryID', $discussion), 'Vanilla.Discussions.View')) {
                         echo categoryLink($discussion, ' '.t('in').' ');
                     }
                     // Other stuff that was in the standard view that you may want to display:

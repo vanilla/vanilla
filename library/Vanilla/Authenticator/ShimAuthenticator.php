@@ -43,7 +43,7 @@ abstract class ShimAuthenticator extends Authenticator {
     /**
      * {@link Authenticator::validateAuthentication()}
      */
-    public function validateAuthentication(\Garden\Web\RequestInterface $request) {
+    public function validateAuthenticationImpl(\Garden\Web\RequestInterface $request) {
         throw new ServerException('Method not implemented', 501);
     }
 

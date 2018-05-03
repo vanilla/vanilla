@@ -90,6 +90,7 @@ abstract class Authenticator {
 
     /**
      * Return authenticator type default information.
+     *
      * This method is intended to fill information so that child classes won't have to do it.
      * Use {@link getAuthenticatorTypeInfoImpl()} to fill the "final" information.
      *
@@ -106,7 +107,7 @@ abstract class Authenticator {
     }
 
     /**
-     * Return essential non-default authenticator type information.
+     * {@link getAuthenticatorTypeInfo} implementation.
      *
      * Must be returned by this method:
      * - ui.photoUrl
@@ -147,7 +148,7 @@ abstract class Authenticator {
     }
 
     /**
-     * Default getName implementation.
+     * Default {@link getType} implementation.
      *
      * @return string
      */
@@ -192,9 +193,9 @@ abstract class Authenticator {
      * Setter of active.
      *
      * @param bool $active
-     * @return self
+     * @return $this
      */
-    public function setActive(bool $active): self {
+    public function setActive(bool $active) {
         $this->active = $active;
 
         return $this;
@@ -238,7 +239,7 @@ abstract class Authenticator {
     }
 
     /**
-     * Return essential non-default authenticator information.
+     * {@link getAuthenticatorInfo} implementation.
      *
      * Must be returned by this method:
      * - ui.buttonName
@@ -286,5 +287,20 @@ abstract class Authenticator {
      * @param RequestInterface $request
      * @return array The user's information.
      */
-     abstract public function validateAuthentication(RequestInterface $request);
+    final public function validateAuthentication(RequestInterface $request) {
+         if (!$this->isActive()) {
+             throw new Exception('Cannot authenticate with an inactive authenticator.');
+         }
+
+         return $this->validateAuthenticationImpl($request);
+     }
+
+    /**
+     * {@link ValidateAuthentication} implementation.
+     *
+     * @throws Exception Reason why the authentication failed.
+     * @param RequestInterface $request
+     * @return array The user's information.
+     */
+     abstract public function validateAuthenticationImpl(RequestInterface $request);
 }

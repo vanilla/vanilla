@@ -87,7 +87,7 @@ class MockAuthenticator extends Authenticator {
     /**
      * @inheritDoc
      */
-    public function validateAuthentication(RequestInterface $request) {
+    public function validateAuthenticationImpl(RequestInterface $request) {
         return $this->data;
     }
 }

@@ -366,7 +366,7 @@ class AuthenticateApiController extends AbstractApiController {
             'username:s' => 'The user\'s username or email address.',
             'password:s' => 'The user\'s password.',
             'persist:b' => [
-                'description' => 'Whether the session should Garden.SignIn.Allowpersist past the browser closing.',
+                'description' => 'Whether the session should persist past the browser closing.',
                 'default' => false,
             ],
         ])->setDescription('Authenticate a user with username/email and password.');

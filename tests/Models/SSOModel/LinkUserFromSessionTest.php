@@ -14,9 +14,9 @@ use VanillaTests\Fixtures\MockSSOAuthenticator;
 use VanillaTests\SiteTestTrait;
 
 /**
- * Class SSOModelLinkUserFromCredentials.
+ * Class LinkUserFromSessionTest.
  */
-class SSOModelLinkUserFromSession extends TestCase {
+class LinkUserFromSessionTest extends TestCase {
     use SiteTestTrait {
         SiteTestTrait::setUpBeforeClass as siteSetUpBeforeClass;
     }

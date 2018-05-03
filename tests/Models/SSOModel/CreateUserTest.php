@@ -16,9 +16,9 @@ use VanillaTests\SetsGeneratorTrait;
 use VanillaTests\SiteTestTrait;
 
 /**
- * Class SSOModelTest.
+ * Class CreateUserTest.
  */
-class SSOModelCreateUserTest extends TestCase {
+class CreateUserTest extends TestCase {
     use SiteTestTrait;
     use SetsGeneratorTrait;
 

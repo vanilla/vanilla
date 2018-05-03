@@ -15,7 +15,7 @@ use VanillaTests\InvokeMethodTrait;
 /**
  * Class SSOModelLinkUserFromCredentials.
  */
-class GetUserBy extends TestCase {
+class GetUserByTest extends TestCase {
     use SiteTestTrait {
         SiteTestTrait::setUpBeforeClass as siteSetUpBeforeClass;
     }

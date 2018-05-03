@@ -661,6 +661,8 @@ label.checkbox input.checkbox-input {
   border: 0;
   padding: 0;
   background: none;
+  width: 100%;
+  text-align: left;
 }
 
 .richEditor-button {
@@ -1069,20 +1071,27 @@ label.checkbox input.checkbox-input {
   padding: 3px 0;
 }
 
+.atMentionList-items.isHidden {
+  display: none;
+}
+
 .atMentionList-item.isActive .atMentionList-suggestion {
   background-color: #f4f3f5;
 }
 
 .atMentionList-suggestion {
+  width: 100%;
   cursor: pointer;
 }
 
-.atMentionList-user {
+.atMentionList-user,
+.atMentionList-noResults {
   display: flex;
   align-items: center;
   width: 100%;
   box-sizing: border-box;
   overflow: hidden;
+  line-height: 30px;
   padding-top: 3px;
   padding-right: 6px;
   padding-bottom: 3px;
@@ -1117,9 +1126,9 @@ label.checkbox input.checkbox-input {
 }
 
 .atMention {
-  user-select: all;
   color: inherit;
   font-weight: 600;
+  user-select: all;
 }
 
 body.hasRichEditor.Section-PostDiscussion #DiscussionForm select {

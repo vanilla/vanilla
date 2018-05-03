@@ -192,8 +192,6 @@ class Bootstrap {
             ->addCall('registerAuthenticatorClass', [MockAuthenticator::class])
             ->addCall('registerAuthenticatorClass', [MockSSOAuthenticator::class])
 
-            ->rule(MockSSOAuthenticator::class)
-
             ->rule(SearchModel::class)
             ->setShared(true)
 

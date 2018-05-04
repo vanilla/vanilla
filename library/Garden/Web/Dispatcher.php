@@ -97,7 +97,11 @@ class Dispatcher {
      * @return Data Returns the response as a data object.
      */
     public function dispatch(RequestInterface $request) {
-        $result = $this->callMiddleware($request);
+        try {
+            $result = $this->callMiddleware($request);
+        } catch (\Exception $ex) {
+            $result = $this->makeResponse($ex);
+        }
         return $result;
     }
 

@@ -8,6 +8,7 @@
 namespace Vanilla\Web;
 
 use Garden\Web\Exception\ClientException;
+use Garden\Web\Exception\NotFoundException;
 use Garden\Web\RequestInterface;
 
 /**
@@ -101,7 +102,9 @@ class SmartIDMiddleware {
     public function fetchValue(string $table, string $pk, array $where) {
         $data = $this->sql->select($pk)->getWhere($table, $where);
 
-        if ($data->count() > 1) {
+        if ((int)$data->count() === 0) {
+            throw new NotFoundException("Smart ID not found.");
+        } elseif ($data->count() > 1) {
             throw new ClientException('More than one record matches smart ID: '.implodeAssoc(': ', ', ', $where), 409);
         }
 

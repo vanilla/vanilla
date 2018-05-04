@@ -7,7 +7,7 @@
  */
 
 import { formatUrl, getMeta } from "@core/application";
-import { log } from "@core/utility";
+import { log, matchAtMention as _matchAtMention } from "@core/utility";
 
 // Store cache results in an outer scoped variable., so all instances share the same data
 // and can build the cache together.
@@ -61,72 +61,21 @@ const emojiTemplate =
     '</span> <span class="emoji-name">${name}</span></li>';
 
 /**
- * Custom matching to allow quotation marks in the matching string as well as spaces.
- * Spaces make things more complicated.
+ * Match an @mention
  *
  * @param flag - The character sequence used to trigger this match (e.g. :).
  * @param subtext - The string to be tested.
  * @param shouldStartWithSpace - Should the pattern include a test for a whitespace prefix?
- * @returns Matching string if successful.  Null on failure to match.
+ * @returns Matching string if successful. Null on failure to match.
  */
 export function matchAtMention(flag: string, subtext: string, shouldStartWithSpace: boolean): string | null {
-    // Split the string at the lines to allow for a simpler regex.
-    const lines = subtext.split("\n");
-    const lastLine = lines[lines.length - 1];
-
-    // If you change this you MUST change the regex in src/scripts/__tests__/legacy.test.js !!!
-    /**
-     * Put together the non-excluded characters.
-     *
-     * @param {boolean} excludeWhiteSpace - Whether or not to exclude whitespace characters.
-     *
-     * @returns {string} A Regex string.
-     */
-    function nonExcludedCharacters(excludeWhiteSpace) {
-        let excluded =
-            "[^" +
-            '"' + // Quote character
-            "\\u0000-\\u001f\\u007f-\\u009f" + // Control characters
-            "\\u2028"; // Line terminator
-
-        if (excludeWhiteSpace) {
-            excluded += "\\s";
-        }
-
-        excluded += "]";
-        return excluded;
-    }
-
-    let regexStr =
-        "@" + // @ Symbol triggers the match
-        "(" +
-        // One or more non-greedy characters that aren't excluded. White is allowed, but a starting quote is required.
-        '"(' +
-        nonExcludedCharacters(false) +
-        '+?)"?' +
-        "|" + // Or
-        // One or more non-greedy characters that aren't exluded. Whitespace is excluded.
-        "(" +
-        nonExcludedCharacters(true) +
-        '+?)"?' +
-        ")" +
-        "(?:\\n|$)"; // Newline terminates.
-
-    // Determined by at.who library
-    if (shouldStartWithSpace) {
-        regexStr = "(?:^|\\s)" + regexStr;
-    }
-    const regex = new RegExp(regexStr, "gi");
-    const match = regex.exec(lastLine);
+    const match = _matchAtMention(subtext, shouldStartWithSpace);
     if (match) {
-        rawMatch = match[0];
-
-        // Return either of the matching groups (quoted or unquoted).
-        return match[2] || match[1];
-    } else {
-        // No match
-        return null;
+        rawMatch = match.rawMatch;
+        return match.match;
     }
+
+    return null;
 }
 
 /**

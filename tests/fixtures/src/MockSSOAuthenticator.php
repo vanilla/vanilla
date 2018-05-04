@@ -134,4 +134,11 @@ class MockSSOAuthenticator extends SSOAuthenticator {
         $userModel = new \UserModel();
         return (bool)$userModel->getAuthenticationByUser($userID, $this->getID());
     }
+
+    /**
+     * @inheritdoc
+     */
+    public function setTrusted(bool $trusted) {
+        return parent::setTrusted($trusted);
+    }
 }

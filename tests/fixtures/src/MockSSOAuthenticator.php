@@ -67,9 +67,9 @@ class MockSSOAuthenticator extends SSOAuthenticator {
      * Setter of data.
      *
      * @param SSOData $data
-     * @return self
+     * @return $this
      */
-    public function setData(SSOData $data): self {
+    public function setData(SSOData $data) {
         $this->data = $data;
 
         return $this;

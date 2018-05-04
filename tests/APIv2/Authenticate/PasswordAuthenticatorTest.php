@@ -125,6 +125,32 @@ class PasswordAuthenticatorTest extends AbstractAPIv2Test {
         ]);
     }
 
+   /**
+     * /authenticate with password/password should not work if the PasswordAuthenticator is inactive.
+     *
+     * @expectedException \Exception
+     * @expectedExceptionMessage Cannot authenticate with an inactive authenticator.
+     */
+    public function testPostPasswordInactive() {
+        $this->assertNoSession();
+
+        /** @var \Gdn_Configuration $config */
+        $config = $this->container()->get(\Gdn_Configuration::class);
+        $config->set('Garden.SignIn.DisablePassword', true, true, false);
+        try {
+            $this->api()->post("{$this->baseUrl}", [
+                'authenticate' => [
+                    'authenticatorType' => 'password',
+                    'authenticatorID' => 'password',
+                ],
+                'username' => $this->currentUser['email'],
+                'password' => $this->currentUser['password']
+            ]);
+        } finally {
+            $config->set('Garden.SignIn.DisablePassword', false, true, false);
+        }
+    }
+
     /**
      * An incorrect password should return 401.
      *

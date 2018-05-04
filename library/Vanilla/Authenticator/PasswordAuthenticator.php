@@ -8,6 +8,7 @@
 namespace Vanilla\Authenticator;
 
 use Garden\Web\RequestInterface;
+use Gdn_Configuration;
 use UserModel;
 
 /**
@@ -15,18 +16,25 @@ use UserModel;
  */
 class PasswordAuthenticator extends Authenticator {
 
+    /** @var Gdn_Configuration */
+    private $config;
+
     /** @var UserModel */
     private $userModel;
 
     /**
      * PasswordAuthenticator constructor.
      *
+     * @param Gdn_Configuration $config
      * @param UserModel $userModel
+     *
+     * @throws \Garden\Schema\ValidationException
      */
-    public function __construct(UserModel $userModel) {
-        parent::__construct('Password');
-
+    public function __construct(Gdn_Configuration $config, UserModel $userModel) {
+        $this->config = $config;
         $this->userModel = $userModel;
+
+        parent::__construct('Password');
     }
 
     /**
@@ -63,6 +71,22 @@ class PasswordAuthenticator extends Authenticator {
     /**
      * @inheritdoc
      */
+    public function setActive(bool $active) {
+        $this->config->set('Garden.SignIn.DisablePassword', !$active);
+
+        return $this;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function isActive(): bool {
+        return !$this->config->get('Garden.SignIn.DisablePassword', false);
+    }
+
+    /**
+     * @inheritdoc
+     */
     public function getRegisterUrl() {
         return '/entry/register';
     }
@@ -84,9 +108,13 @@ class PasswordAuthenticator extends Authenticator {
     /**
      * @inheritdoc
      */
-    public function validateAuthentication(RequestInterface $request) {
+    public function validateAuthenticationImpl(RequestInterface $request) {
         $body = $request->getBody();
-        return (array)$this->userModel->validateCredentials($body['username'] ?? null, 0, $body['password'] ?? null, true);
+        $user = $this->userModel->validateCredentials($body['username'] ?? null, 0, $body['password'] ?? null, true);
+        if ($user) {
+            $user = (array)$user;
+        }
+        return $user;
     }
 
 }

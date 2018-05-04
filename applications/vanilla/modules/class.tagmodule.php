@@ -102,6 +102,17 @@ class TagModule extends Gdn_Module {
         $tagQuery = Gdn::sql();
 
         $this->autoContext();
+        // Allow addon to manipulate the data being rendered.
+        $tagData = null;
+        $this->EventArguments['ParentID'] = $this->ParentID;
+        $this->EventArguments['ParentType'] = $this->ParentType;
+        $this->EventArguments['tagData'] = &$tagData;
+        $this->fireEvent('getData');
+        
+        if (is_array($tagData)) {
+            $this->_TagData = new Gdn_DataSet($tagData, DATASET_TYPE_ARRAY);
+            return;
+        }
 
         $tagCacheKey = "TagModule-{$this->ParentType}-{$this->ParentID}";
         switch ($this->ParentType) {

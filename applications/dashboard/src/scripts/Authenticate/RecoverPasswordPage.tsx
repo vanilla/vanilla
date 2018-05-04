@@ -19,7 +19,12 @@ interface IState {
     globalError?: string | null;
 }
 
-export default class RecoverPasswordPage extends React.Component<IOptionalComponentID, IState> {
+interface IProps extends IOptionalComponentID {
+    globalError?: string;
+    errors?: string[];
+}
+
+export default class RecoverPasswordPage extends React.Component<IProps, IState> {
     public id: string;
     public pageTitleID: string;
     public email: InputTextBlock;
@@ -35,6 +40,8 @@ export default class RecoverPasswordPage extends React.Component<IOptionalCompon
             emailSent: false,
             submitEnabled: false,
             email: "",
+            globalError: props.globalError,
+            errors: props.errors,
         };
     }
 

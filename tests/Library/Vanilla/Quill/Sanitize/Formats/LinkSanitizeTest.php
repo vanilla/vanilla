@@ -7,8 +7,26 @@
 namespace VanillaTests\Library\Vanilla\Quill\Sanitize\Formats;
 
 use VanillaTests\Library\Vanilla\Quill\Sanitize\SanitizeTest;
+use VanillaTests\Library\Vanilla\Quill\Sanitize\TestAttributesTrait;
 
 class LinkSanitizeTest extends SanitizeTest {
+
+    use TestAttributesTrait;
+
+    /**
+     * @inheritdoc
+     */
+    protected function attributeOperations(): array {
+        $operations = [
+            [
+                [
+                    "insert" => "Hello world.",
+                    "attributes" => ["link" => "#VALUE#"]
+                ]
+            ]
+        ];
+        return $operations;
+    }
 
     /**
      * @inheritdoc
@@ -17,7 +35,7 @@ class LinkSanitizeTest extends SanitizeTest {
         $operations = [
             [
                 "insert" => $content,
-                "attributes" => [ "link" => "https://vanillaforums.com" ]
+                "attributes" => ["link" => "https://vanillaforums.com"]
             ]
         ];
         return $operations;

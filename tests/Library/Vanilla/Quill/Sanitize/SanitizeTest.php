@@ -50,17 +50,29 @@ abstract class SanitizeTest extends TestCase {
     }
 
     /**
+     * Test sanitizing the content of a blot.
+     *
      * @param string $badContents
      * @throws Exception if unable to retrieve an instance of the renderer.
      * @dataProvider provideBadContent
      */
     public function testSanitizeBadContent(string $badContents) {
+        $operations = $this->insertContentOperations($badContents);
+        // The contents should've been removed or encoded.
+        $this->assertSanitized($operations, $badContents);
+    }
+
+    /**
+     * @param array $operations
+     * @param string $badValue
+     * @throws Exception if unable to retrieve an instance of the renderer.
+     */
+    protected function assertSanitized(array $operations, string $badValue) {
         /** @var Renderer $renderer */
         $renderer = $this->getRenderer();
-        $operations = $this->insertContentOperations($badContents);
         $result = $renderer->render($operations);
 
         // The contents should've been removed or encoded.
-        $this->assertNotContains($badContents, $result);
+        $this->assertNotContains($badValue, $result);
     }
 }

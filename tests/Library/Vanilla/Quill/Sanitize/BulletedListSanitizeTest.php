@@ -8,6 +8,27 @@ namespace VanillaTests\Library\Vanilla\Quill\Sanitize;
 
 class BulletedListSanitizeTest extends SanitizeTest {
 
+    use TestAttributesTrait;
+
+    /**
+     * @inheritdoc
+     */
+    protected function attributeOperations(): array {
+        $result = [
+            [
+                ["insert" => "Hello world."],
+                [
+                    "attributes" => [
+                        "list" => "bullet",
+                        "indent" => "#VALUE#"
+                    ],
+                    "insert" => "\n"
+                ]
+            ]
+        ];
+        return $result;
+    }
+
     /**
      * @inheritdoc
      */
@@ -15,7 +36,7 @@ class BulletedListSanitizeTest extends SanitizeTest {
         $operations = [
             ["insert" => $content],
             [
-                "attributes" => ["list" => "bullet" ],
+                "attributes" => ["list" => "bullet"],
                 "insert" => "\n"
             ]
         ];

@@ -8,6 +8,24 @@ namespace VanillaTests\Library\Vanilla\Quill\Sanitize;
 
 class HeadingSanitizeTest extends SanitizeTest {
 
+    use TestAttributesTrait;
+
+    /**
+     * @inheritdoc
+     */
+    protected function attributeOperations(): array {
+        $result = [
+            [
+                ["insert" => "Hello world."],
+                [
+                    "attributes" => ["header" => "#VALUE#"],
+                    "insert" => "\n"
+                ]
+            ]
+        ];
+        return $result;
+    }
+
     /**
      * @inheritdoc
      */

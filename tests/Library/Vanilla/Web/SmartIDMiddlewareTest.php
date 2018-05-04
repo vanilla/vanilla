@@ -7,10 +7,11 @@
 
 namespace VanillaTests\Library\Vanilla\Web;
 
-
 use Garden\Web\Data;
+use Garden\Web\Exception\ForbiddenException;
 use Garden\Web\RequestInterface;
 use PHPUnit\Framework\TestCase;
+use Vanilla\Web\SmartIDMiddleware;
 use Vanilla\Web\UserSmartIDResolver;
 use VanillaTests\Fixtures\Request;
 
@@ -18,7 +19,15 @@ use VanillaTests\Fixtures\Request;
  * Test the **SmartIDMiddleware** class.
  */
 class SmartIDMiddlewareTest extends TestCase {
+    /**
+     * @var SmartIDMiddleware
+     */
     protected $middleware;
+
+    /**
+     * @var UserSmartIDResolver
+     */
+    protected $userResolver;
 
     /**
      * Create a configured test middleware for each test.
@@ -27,7 +36,7 @@ class SmartIDMiddlewareTest extends TestCase {
         $this->middleware =  new TestSmartIDMiddleware();
         $this->middleware->addSmartID('CategoryID', 'categories', ['name', 'urlcode'], 'Category');
 
-        $usr = new UserSmartIDResolver();
+        $usr = $this->userResolver = new UserSmartIDResolver();
         $usr->setEmailEnabled(true)
             ->setViewEmail(true);
         $this->middleware->addSmartID('UserID', 'users', '*', $usr);
@@ -131,5 +140,91 @@ class SmartIDMiddlewareTest extends TestCase {
         ];
 
         return $r;
+    }
+
+    /**
+     * The base path should limit the scope of the middleware.
+     */
+    public function testBasePath() {
+        $this->middleware->setBasePath('/api/');
+        $r = new Request('/categories/$name:foo');
+
+        $r = $this->callMiddleware($r);
+        $this->assertEquals('/categories/$name:foo', $r->getPath());
+
+        $r2 = new Request('/api/categories/$name:foo');
+        $r2 = $this->callMiddleware($r2);
+        $this->assertEquals('/api/categories/(Category.CategoryID.name:foo)', $r2->getPath());
+    }
+
+    /**
+     * Email smart IDs should fail if email addresses are not enabled.
+     *
+     * @expectedException \Garden\Web\Exception\ForbiddenException
+     */
+    public function testNoEmail() {
+        $this->userResolver
+            ->setViewEmail(true)
+            ->setEmailEnabled(false);
+
+        $this->callMiddleware(new Request('/users/$email:foo@bar.com'));
+    }
+
+    /**
+     * Email smart IDs should fail if email addresses are not enabled.
+     *
+     * @expectedException \Vanilla\Exception\PermissionException
+     */
+    public function testNoEmailPermission() {
+        $this->userResolver
+            ->setViewEmail(false)
+            ->setEmailEnabled(true);
+
+        $this->callMiddleware(new Request('/users/$email:foo@bar.com'));
+    }
+
+    /**
+     * Column names are whitelisted.
+     *
+     * @expectedException \Garden\Web\Exception\ClientException
+     */
+    public function testBadColumn() {
+        $this->callMiddleware(new Request('/categories/$foo:bar'));
+    }
+
+    /**
+     * The directory before the smart ID must be in the whitelist.
+     *
+     * @expectedException \Garden\Web\Exception\ClientException
+     */
+    public function testBadResource() {
+        $this->callMiddleware(new Request('/foo/$bar:baz'));
+    }
+
+    /**
+     * Path smart IDs must have a resource before them.
+     *
+     * @expectedException \Garden\Web\Exception\ClientException
+     */
+    public function testNoResource() {
+        $this->callMiddleware(new Request('/$foo:bar'));
+    }
+
+    /**
+     * The columns must be an array or "*".
+     *
+     * @expectedException \InvalidArgumentException
+     */
+    public function testBadColumns() {
+        $this->middleware->addSmartID('FooID', 'foo', 'bar', 'Baz');
+    }
+
+    /**
+     * The resolver must be a string or callable.
+     *
+     * @expectedException \InvalidArgumentException
+     */
+    public function testBadResolver() {
+        $this->middleware->addSmartID('FooID', 'foo', '*', 123);
     }
 }

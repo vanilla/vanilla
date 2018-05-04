@@ -99,8 +99,13 @@ class SmartIDMiddleware {
      * @return mixed Returns the value of the smart ID or **0** if it was not found.
      */
     public function fetchValue(string $table, string $pk, array $where) {
-        $result = $this->sql->select($pk)->getWhere($table, $where)->value($pk, 0);
-        return $result;
+        $data = $this->sql->select($pk)->getWhere($table, $where);
+
+        if ($data->count() > 1) {
+            throw new ClientException('More than one record matches smart ID: '.implodeAssoc(': ', ', ', $where), 409);
+        }
+
+        return $data->value($pk, 0);
     }
 
     /**

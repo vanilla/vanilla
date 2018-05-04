@@ -158,7 +158,17 @@ $dic->setInstance('Garden\Container\Container', $dic)
     ->setConstructorArgs(['/api/v2/'])
     ->addCall('addSmartID', ['CategoryID', 'categories', ['name', 'urlcode'], 'Category'])
     ->addCall('addSmartID', ['RoleID', 'roles', ['name'], 'Role'])
-    ->addCall('addSmartID', ['UserID', 'users', '*', new Reference(\Vanilla\Web\UserSmartIDResolver::class)])
+    ->addCall('addSmartID', ['UserID', 'users', '*', new Reference('@user-smart-id-resolver')])
+
+    ->rule('@user-smart-id-resolver')
+    ->setFactory(function (Container $dic) {
+        /* @var \Vanilla\Web\UserSmartIDResolver $uid */
+        $uid = $dic->get(\Vanilla\Web\UserSmartIDResolver::class);
+        $uid->setEmailEnabled(!$dic->get(Gdn_Configuration::class)->get('Garden.Registration.NoEmail'))
+            ->setViewEmail($dic->get(\Gdn_Session::class)->checkPermission('Garden.PersonalInfo.View'));
+
+        return $uid;
+    })
 
     ->rule('@api-v2-route')
     ->setClass(\Garden\Web\ResourceRoute::class)

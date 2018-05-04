@@ -164,6 +164,27 @@ class PasswordAuthenticatorTest extends AbstractAPIv2Test {
     }
 
     /**
+     * A banned user should not be able to log in.
+     *
+     * @expectedException \Exception
+     * @expectedExceptionCode 401
+     */
+    public function testUserBanned() {
+        /** @var \UserModel $userModel */
+        $userModel = $this->container()->get(\UserModel::class);
+        $userModel->ban($this->currentUser['userID'], ['AddActivity' => false]);
+
+        $this->api()->post("{$this->baseUrl}", [
+            'authenticate' => [
+                'authenticatorType' => 'password',
+                'authenticatorID' => 'password',
+            ],
+            'username' => $this->currentUser['email'],
+            'password' => $this->currentUser['password'],
+        ]);
+    }
+
+    /**
      * A user should be able to sign in with their email and password.
      */
     public function testValidEmailPassword() {

@@ -8,7 +8,6 @@
 namespace VanillaTests\Library\Vanilla\Web;
 
 use Garden\Web\Data;
-use Garden\Web\Exception\ForbiddenException;
 use Garden\Web\RequestInterface;
 use PHPUnit\Framework\TestCase;
 use Vanilla\Web\SmartIDMiddleware;
@@ -81,6 +80,7 @@ class SmartIDMiddlewareTest extends TestCase {
             ['/categories/$urlCode:foo', '/categories/(Category.CategoryID.urlcode:foo)'],
             ['/users/$name:baz', '/users/(User.UserID.name:baz)'],
             ['/users/$foozbook:123', '/users/(UserAuthentication.UserID.providerKey:foozbook.foreignUserKey:123)'],
+            ['/users/$query:userID?userID=$name:baz', '/users/(User.UserID.name:baz)'],
         ];
 
         return array_column($r, null, 0);
@@ -208,6 +208,15 @@ class SmartIDMiddlewareTest extends TestCase {
      */
     public function testNoResource() {
         $this->callMiddleware(new Request('/$foo:bar'));
+    }
+
+    /**
+     * Query substitution smart IDs must be in the querystring.
+     *
+     * @expectedException \Garden\Web\Exception\ClientException
+     */
+    public function testInvalidQueryField() {
+        $this->callMiddleware(new Request('/$query:bar'));
     }
 
     /**

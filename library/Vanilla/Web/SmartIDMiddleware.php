@@ -139,12 +139,20 @@ class SmartIDMiddleware {
         $prev = '';
         foreach ($parts as &$part) {
             if ($part && $part[0] === static::SMART) {
-                if (empty($prev)) {
+                if (substr($part, 1, 6) === 'query:') {
+                    // This is a special query string substitution.
+                    $field = substr($part, 7);
+                    if (!isset($request->getQuery()[$field])) {
+                        throw new ClientException("Invalid query field for smart ID: '$field'.", 400);
+                    }
+                    $replaced = $request->getQuery()[$field];
+                } elseif (empty($prev)) {
                     throw new ClientException("No resource specified for smart ID: $part.", 400);
                 } elseif (!isset($this->resources[$prev])) {
                     throw new ClientException("Invalid resource for smart ID: $prev/$part.", 400);
+                } else {
+                    $replaced = $this->replaceSmartID($this->resources[$prev], $part);
                 }
-                $replaced = $this->replaceSmartID($this->resources[$prev], $part);
                 $part = $replaced;
             }
 

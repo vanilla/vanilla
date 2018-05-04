@@ -16,7 +16,6 @@ export default class RichLinkBlot extends FocusableEmbedBlot {
 
     public static create(data) {
         const node = super.create(data) as HTMLElement;
-        node.classList.add("embed");
         node.classList.add("embed-link");
         node.classList.add("embedLink");
         node.setAttribute("href", this.sanitize(data.url));

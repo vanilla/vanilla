@@ -17,7 +17,6 @@ export default class LoadingBlot extends FocusableEmbedBlot {
         const node = super.create(value) as HTMLElement;
         const descriptionId = uniqueId("embedLoader-description");
 
-        node.classList.add("embed");
         node.classList.add("embed-loading");
         node.classList.remove(FocusableEmbedBlot.FOCUS_CLASS);
 

@@ -14,7 +14,6 @@ export default class ImageBlot extends FocusableEmbedBlot {
 
     public static create(data) {
         const node = super.create(data);
-        node.classList.add("embed");
         node.classList.add("embed-image");
         node.classList.add("embedImage");
         node.classList.remove(FocusableEmbedBlot.FOCUS_CLASS);

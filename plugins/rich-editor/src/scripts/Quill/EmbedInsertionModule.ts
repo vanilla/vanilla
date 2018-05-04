@@ -15,17 +15,7 @@ import { t } from "@core/application";
 import Quill, { RangeStatic, Blot } from "quill/core";
 import Emitter from "quill/core/emitter";
 import api from "@core/apiv2";
-
-interface IMediaScrapeResult {
-    attributes: any[];
-    type: string;
-    url: string;
-    body: string | null;
-    name: string | null;
-    photoUrl: string | null;
-    height: string | null;
-    width: string | null;
-}
+import { IEmbedData } from "@core/embeds";
 
 /**
  * A Quill module for managing insertion of embeds/loading/error states.
@@ -65,7 +55,8 @@ export default class EmbedInsertionModule extends Module {
                         this.createExternalImageEmbed(result.data);
                         break;
                     default:
-                        this.createErrorEmbed(url, new Error(t("That type of embed is not currently supported.")));
+                        // this.createErrorEmbed(url, new Error(t("That type of embed is not currently supported.")));
+                        this.createExternalEmbed(result.data);
                         break;
                 }
             })
@@ -89,7 +80,7 @@ export default class EmbedInsertionModule extends Module {
     /**
      * Create a video embed.
      */
-    private createVideoEmbed(scrapeResult: IMediaScrapeResult) {
+    private createVideoEmbed(scrapeResult: IEmbedData) {
         const linkEmbed = Parchment.create("embed-video", scrapeResult);
         const completedBlot = this.currentUploads.get(scrapeResult.url);
 
@@ -104,7 +95,7 @@ export default class EmbedInsertionModule extends Module {
     /**
      * Create a site embed.
      */
-    private createSiteEmbed(scrapeResult: IMediaScrapeResult) {
+    private createSiteEmbed(scrapeResult: IEmbedData) {
         const { url, photoUrl, name, body } = scrapeResult;
 
         const linkEmbed = Parchment.create("embed-link", {
@@ -123,7 +114,22 @@ export default class EmbedInsertionModule extends Module {
         this.currentUploads.delete(url);
     }
 
-    private createExternalImageEmbed(scrapeResult: IMediaScrapeResult) {
+    /**
+     * Create a site embed.
+     */
+    private createExternalEmbed(scrapeResult: IEmbedData) {
+        const externalEmbed = Parchment.create("embed-external", scrapeResult);
+        const completedBlot = this.currentUploads.get(scrapeResult.url);
+
+        // The loading blot may have been undone/deleted since we created it.
+        if (completedBlot) {
+            completedBlot.replaceWith(externalEmbed);
+        }
+
+        this.currentUploads.delete(scrapeResult.url);
+    }
+
+    private createExternalImageEmbed(scrapeResult: IEmbedData) {
         const { url, photoUrl, name } = scrapeResult;
 
         const linkEmbed = Parchment.create("embed-image", {

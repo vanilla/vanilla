@@ -8,7 +8,7 @@ import React from "react";
 import * as PropTypes from "prop-types";
 import Quill from "quill/core";
 import classNames from "classnames";
-import { parseEmoji } from "@core/emoji-utility";
+import { convertToSafeEmojiCharacters } from "@core/dom";
 import { withEditor, IEditorContextProps } from "./ContextProvider";
 
 interface IProps extends IEditorContextProps {
@@ -54,7 +54,10 @@ export class EmojiButton extends React.Component<IProps> {
                 type="button"
                 onClick={this.insertEmojiBlot}
             >
-                <span className="safeEmoji" dangerouslySetInnerHTML={{ __html: parseEmoji(this.emojiChar) }} />
+                <span
+                    className="safeEmoji"
+                    dangerouslySetInnerHTML={{ __html: convertToSafeEmojiCharacters(this.emojiChar) }}
+                />
             </button>
         );
     }

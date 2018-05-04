@@ -12,7 +12,12 @@ import Module from "quill/core/module";
 import { RangeStatic } from "quill/core";
 import { delegateEvent } from "@core/dom";
 import FocusableEmbedBlot from "./Blots/Abstract/FocusableEmbedBlot";
-import { normalizeBlotIntoBlock, insertNewLineAtEndOfScroll, insertNewLineAtStartOfScroll } from "./utility";
+import {
+    normalizeBlotIntoBlock,
+    insertNewLineAtEndOfScroll,
+    insertNewLineAtStartOfScroll,
+    getBlotAtIndex,
+} from "./utility";
 
 /**
  * A module for managing focus of Embeds. For this to work for a new Embed,
@@ -27,6 +32,9 @@ export default class EmbedFocusModule extends Module {
         length: 0,
     };
 
+    private paragraphMenuHandle: HTMLElement;
+    private inlineToolbarFirstItem: HTMLElement;
+
     constructor(quill: Quill, options = {}) {
         super(quill, options);
 
@@ -37,6 +45,11 @@ export default class EmbedFocusModule extends Module {
             }
         });
 
+        this.quill.root.closest(".richEditor")!.addEventListener("keydown", this.keyDownListener);
+        window.quill = quill;
+    }
+
+    private setupEmbedClickHandler() {
         delegateEvent(
             "click",
             ".js-richText .embed",
@@ -49,8 +62,6 @@ export default class EmbedFocusModule extends Module {
             },
             this.quill.container,
         );
-
-        this.quill.root.addEventListener("keydown", this.keyDownListener);
     }
 
     /**
@@ -76,6 +87,7 @@ export default class EmbedFocusModule extends Module {
         const isCurrentBlotEmpty = currentBlot.domNode.textContent === "";
 
         if (isPreviousBlotEmbed && isCurrentBlotEmpty) {
+            this.setupEmbedClickHandler();
             (currentBlot as Blot).remove();
             this.quill.update(Quill.sources.USER);
             this.focusEmbedBlot(previousBlot);
@@ -89,11 +101,13 @@ export default class EmbedFocusModule extends Module {
      * Keydown listener on the current quill instance.
      */
     private keyDownListener = (event: KeyboardEvent) => {
-        if (!this.quill.container.contains(document.activeElement)) {
+        if (!this.quill.container.closest(".richEditor")!.contains(document.activeElement)) {
             return;
         }
 
         const exclusiveHandlers = [
+            this.handleTab,
+            this.handleShiftTab,
             this.handleArrowKeyFromEmbed,
             this.handleArrowKeyAwayFromQuill,
             this.handleDeleteOnQuill,
@@ -105,6 +119,89 @@ export default class EmbedFocusModule extends Module {
         return exclusiveHandlers.reduce((shouldContinue, currentHandler) => {
             return shouldContinue ? currentHandler(event) : false;
         }, true);
+    };
+
+    private handleTab = (event: KeyboardEvent) => {
+        if (
+            !KeyboardModule.match(event, {
+                key: KeyboardModule.keys.TAB,
+                shiftKey: false,
+            })
+        ) {
+            return true;
+        }
+
+        const blotForActiveElement = this.getEmbedBlotForFocusedElement();
+        const focusItemIsEmbedBlot = blotForActiveElement instanceof FocusableEmbedBlot;
+        if (this.quill.hasFocus() || focusItemIsEmbedBlot) {
+            event.preventDefault();
+            const paragraphMenuHandle = this.quill.root
+                .closest(".richEditor")!
+                .querySelector(".richEditorParagraphMenu-handle") as HTMLElement;
+            const inlineToolbarFirstItem = this.quill.root
+                .closest(".richEditor")!
+                .querySelector(".richEditor-inlineToolbarContainer .richEditor-menuItem:first-child") as HTMLElement;
+            const emojiPickerButton = this.quill.root
+                .closest(".richEditor")!
+                .querySelector(".emojiPicker > .richEditor-button") as HTMLElement;
+
+            const selection = this.quill.getSelection();
+            if (!focusItemIsEmbedBlot) {
+                if (selection.length > 0) {
+                    inlineToolbarFirstItem.focus();
+                } else {
+                    paragraphMenuHandle.focus();
+                }
+            } else {
+                emojiPickerButton.focus();
+            }
+            return false;
+        }
+
+        return true;
+    };
+
+    private handleShiftTab = (event: KeyboardEvent) => {
+        if (
+            !KeyboardModule.match(event, {
+                key: KeyboardModule.keys.TAB,
+                shiftKey: true,
+            })
+        ) {
+            return true;
+        }
+
+        const paragraphMenuHandle = this.quill.root
+            .closest(".richEditor")!
+            .querySelector(".richEditorParagraphMenu-handle") as HTMLElement;
+        const inlineToolbarFirstItem = this.quill.root
+            .closest(".richEditor")!
+            .querySelector(".richEditor-inlineToolbarContainer .richEditor-menuItem:first-child") as HTMLElement;
+        const emojiPickerButton = this.quill.root
+            .closest(".richEditor")!
+            .querySelector(".emojiPicker > .richEditor-button") as HTMLElement;
+
+        const definiteLastItemIsFocused = [paragraphMenuHandle, inlineToolbarFirstItem].includes(
+            document.activeElement as HTMLElement,
+        );
+        const emojiPickerIsConditionallyFocused =
+            document.activeElement === emojiPickerButton && paragraphMenuHandle.classList.contains("isHidden");
+
+        if (definiteLastItemIsFocused || emojiPickerIsConditionallyFocused) {
+            event.preventDefault();
+            const selection = this.quill.getSelection();
+            const documentLength = this.quill.scroll.length();
+            const newIndex = selection ? selection.index + selection.length : documentLength - 1;
+            const lastEmbedBlot = getBlotAtIndex(this.quill, newIndex, FocusableEmbedBlot);
+            if (lastEmbedBlot) {
+                this.focusEmbedBlot(lastEmbedBlot);
+            } else {
+                this.quill.focus();
+                this.quill.setSelection(newIndex, 0, Quill.sources.USER);
+            }
+        }
+
+        return true;
     };
 
     /**

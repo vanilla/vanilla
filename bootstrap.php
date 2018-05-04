@@ -151,6 +151,14 @@ $dic->setInstance('Garden\Container\Container', $dic)
         return new \Garden\Web\PreflightRoute('/api/v2', true);
     })])
     ->addCall('setAllowedOrigins', ['isTrustedDomain'])
+    ->addCall('addMiddleware', [new Reference('@smart-id-middleware')])
+
+    ->rule('@smart-id-middleware')
+    ->setClass(\Vanilla\Web\SmartIDMiddleware::class)
+    ->setConstructorArgs(['/api/v2/'])
+    ->addCall('addSmartID', ['CategoryID', 'categories', ['name', 'urlcode'], 'Category'])
+    ->addCall('addSmartID', ['RoleID', 'roles', ['name'], 'Role'])
+    ->addCall('addSmartID', ['UserID', 'users', '*', new Reference(\Vanilla\Web\UserSmartIDResolver::class)])
 
     ->rule('@api-v2-route')
     ->setClass(\Garden\Web\ResourceRoute::class)

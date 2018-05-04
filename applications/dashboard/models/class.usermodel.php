@@ -2200,17 +2200,19 @@ class UserModel extends Gdn_Model {
 
             // Check for email confirmation.
             if (self::requireConfirmEmail() && !val('NoConfirmEmail', $settings)) {
+                $emailIsSet = isset($fields['Email']);
+                $emailIsNotConfirmed = array_key_exists('Confirmed', $fields) && $fields['Confirmed'] == 0;
+                $validSession = Gdn::session()->isValid();
+
+                $currentUserEmailIsBeingChanged =
+                    $validSession
+                    && $userID == Gdn::session()->UserID
+                    && $fields['Email'] != Gdn::session()->User->Email
+                    && !Gdn::session()->checkPermission('Garden.Users.Edit')
+                ;
+
                 // Email address has changed
-                if (isset($fields['Email']) && (
-                        array_key_exists('Confirmed', $fields) &&
-                        $fields['Confirmed'] == 0 ||
-                        (
-                            $userID == Gdn::session()->UserID &&
-                            $fields['Email'] != Gdn::session()->User->Email &&
-                            !Gdn::session()->checkPermission('Garden.Users.Edit')
-                        )
-                    )
-                ) {
+                if ($emailIsSet && ($emailIsNotConfirmed || $currentUserEmailIsBeingChanged)) {
                     $attributes = val('Attributes', Gdn::session()->User);
                     if (is_string($attributes)) {
                         $attributes = dbdecode($attributes);
@@ -2335,9 +2337,12 @@ class UserModel extends Gdn_Model {
                     // Define the other required fields:
                     $fields['Email'] = $email;
 
+                    // Make sure that the user is assigned to at least the default role(s).
+                    if (!is_array($roleIDs)) {
+                        $roleIDs = RoleModel::getDefaultRoles(RoleModel::TYPE_MEMBER);
+                    }
                     $fields['Roles'] = $roleIDs;
-                    // Make sure that the user is assigned to one or more roles:
-                    $saveRoles = false;
+                    $saveRoles = false; // insertInternal will take care of updating the roles.
 
                     // And insert the new user.
                     $userID = $this->insertInternal($fields, $settings);
@@ -2364,6 +2369,7 @@ class UserModel extends Gdn_Model {
                             'HeadlineFormat' => t('HeadlineFormat.AddUser', '{ActivityUserID,user} added an account for {RegardingUserID,user}.')]);
                     }
                 }
+
                 // Now update the role settings if necessary.
                 if ($saveRoles) {
                     // If no RoleIDs were provided, use the system defaults

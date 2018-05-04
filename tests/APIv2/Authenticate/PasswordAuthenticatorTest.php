@@ -37,6 +37,9 @@ class PasswordAuthenticatorTest extends AbstractAPIv2Test {
         $session->end();
     }
 
+    /**
+     * A user should be able to sign in through /authenticate/password
+     */
     public function testPostPasswordShortcut() {
         $this->assertNoSession();
 
@@ -47,7 +50,29 @@ class PasswordAuthenticatorTest extends AbstractAPIv2Test {
 
         $this->assertSessionUserID();
     }
-        /**
+
+    /**
+     * /authenticate/password should work even if the PasswordAuthenticator is inactive.
+     */
+    public function testPostPasswordShortcutAlwaysOn() {
+        $this->assertNoSession();
+
+        /** @var \Gdn_Configuration $config */
+        $config = $this->container()->get(\Gdn_Configuration::class);
+        $config->set('Garden.SignIn.DisablePassword', true, true, false);
+        try {
+            $this->api()->post("{$this->baseUrl}/password", [
+                'username' => $this->currentUser['email'],
+                'password' => $this->currentUser['password']
+            ]);
+        } finally {
+            $config->set('Garden.SignIn.DisablePassword', false, true, false);
+        }
+
+        $this->assertSessionUserID();
+    }
+
+    /**
      * A user should be able to sign in with their username and password.
      */
     public function testPostPasswordName() {
@@ -119,6 +144,9 @@ class PasswordAuthenticatorTest extends AbstractAPIv2Test {
 
     /**
      * Assert that there is not currently a user in the session.
+     *
+     * @throws \Garden\Container\ContainerException
+     * @throws \Garden\Container\NotFoundException
      */
     public function assertNoSession() {
         /* @var \Gdn_Session $session */
@@ -130,6 +158,9 @@ class PasswordAuthenticatorTest extends AbstractAPIv2Test {
      * Assert that a given user has a session.
      *
      * @param int|null $expected The expected user or **null** for the current user.
+     *
+     * @throws \Garden\Container\ContainerException
+     * @throws \Garden\Container\NotFoundException
      */
     public function assertSessionUserID(int $expected = null) {
         if ($expected === null) {

@@ -223,6 +223,8 @@ class SmartIDMiddleware {
 
         if ($changed) {
             return $arr;
+        } else {
+            return false;
         }
     }
 

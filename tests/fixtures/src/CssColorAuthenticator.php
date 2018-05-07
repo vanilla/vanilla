@@ -35,22 +35,16 @@ class CssColorAuthenticator extends Authenticator {
      * Set the current cssColor
      *
      * @param $color
-     *
-     * @return static
      */
     public static function setCssColor($color) {
         self::$cssColor = $color;
-        return new static;
     }
 
     /**
      * Reset the current cssColor.
-     *
-     * @return static
      */
     public static function resetColor() {
-        self::$cssColor = self::DEFAULT_CSS_COLOR;
-        return new static;
+        self::$cssColor = self::DEFAULT_CSS_COLOR
     }
 
     /**

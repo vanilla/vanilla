@@ -85,7 +85,7 @@ class SSOModel {
      * @param array $options
      *    - useSSOData: Whether or not use the name/email supplied in the SSOData object. Defaults true.
      *    - name: Name to use to try to create the user.
-     *    - email: Email to use to try to reate the user.
+     *    - email: Email to use to try to create the user.
      *
      * @return array $user
      *

@@ -7,6 +7,7 @@
 
 use Garden\Schema\Schema;
 use Garden\Schema\ValidationField;
+use Garden\Web\Data;
 use Garden\Web\Exception\ClientException;
 use Garden\Web\Exception\NotFoundException;
 use Garden\Web\Exception\ServerException;
@@ -127,6 +128,136 @@ class AuthenticateApiController extends AbstractApiController {
     }
 
     /**
+     * Delete an authentication session.
+     *
+     * @param string $authSessionID
+     *
+     * @throws \Garden\Web\Exception\NotFoundException
+     */
+    public function delete_linkUser(string $authSessionID) {
+        $this->schema([
+            'authSessionID:s' => 'Identifier of the authentication session.',
+        ], 'in')->setDescription('Delete an authentication session.');
+        $this->schema([], 'out');
+
+        $sessionData = $this->sessionModel->getID($authSessionID, DATASET_TYPE_ARRAY);
+        if (!$sessionData) {
+            throw new NotFoundException('AuthSessionID');
+        }
+
+        $this->sessionModel->deleteID($authSessionID);
+    }
+
+    /**
+     * Fill authenticator information into a response.
+     *
+     * @param array $response
+     * @param \Vanilla\Models\SSOData $ssoData
+     *
+     * @return array
+     * @throws \Garden\Schema\ValidationException
+     * @throws \Garden\Web\Exception\NotFoundException
+     */
+    private function fillAuthenticator(array $response, SSOData $ssoData) {
+        $response['authenticator'] = $this->authenticatorApiController->normalizeOutput(
+            $this->authenticatorApiController->getAuthenticator($ssoData->getAuthenticatorType(), $ssoData->getAuthenticatorID())
+        );
+
+        return $response;
+    }
+
+    /**
+     * Fill configuration information into a response.
+     *
+     * @param array $response
+     *
+     * @return array
+     */
+    private function fillConfig(array $response) {
+        $response['config'] = [
+            'nameUnique' => $this->config->get('Garden.Registration.NameUnique'),
+            'emailUnique' => $this->config->get('Garden.Registration.EmailUnique'),
+            'noEmail' => $this->config->get('Garden.Registration.NoEmail'),
+        ];
+
+        return $response;
+    }
+
+    /**
+     * Fill SSO User information into a response.
+     *
+     * @param $response
+     * @param \Vanilla\Models\SSOData $ssoData
+     *
+     * @return array
+     */
+    private function fillSSOUser(array $response, SSOData $ssoData) {
+        $response['ssoUser'] = array_filter([
+            'uniqueID' => $ssoData->getUniqueID(),
+            'name' => $ssoData->getUserValue('name'),
+            'email' => $ssoData->getUserValue('email'),
+            'photoUrl' => $ssoData->getUserValue('photoUrl'),
+            'fullName' => $ssoData->getExtraValue('fullName'),
+            'defaultName' => $ssoData->getExtraValue('defaultName'),
+        ]);
+
+        return $response;
+    }
+
+    /**
+     * Authenticator schema with whitelisted fields.
+     *
+     * @return Schema
+     */
+    public function getAuthenticatorPublicSchema() {
+        $schema = Schema::parse([
+            'authenticatorID' => null,
+            'type' => null,
+            'isUnique' => null,
+            'name' => null,
+            'ui' => null,
+            'isUserLinked:b?' => 'Whether or not the user is linked to that authenticator.',
+        ])
+            ->add(SSOAuthenticator::getAuthenticatorSchema())
+            ->merge(
+                Schema::parse([
+                    'sso?' => [
+                        'canSignIn' => null,
+                        'canAutoLinkUser' => null,
+                    ]
+                ])->add(SSOAuthenticator::getAuthenticatorSchema()->getField('properties.sso'))
+            )
+        ;
+
+        return $schema;
+    }
+
+    /**
+     * Get the linkUser output schema.
+     *
+     * @return Schema
+     */
+    public function getLinkUserOutputSchema() {
+        return Schema::parse([
+            'ssoUser' => [
+                'uniqueID:s' => 'Unique ID of the user supplied by the provider.',
+                'name:s?' => 'The name of the user supplied by the provider.',
+                'email:s?' => 'The name of the user supplied by the provider.',
+                'photoUrl:s?' => 'The photo url of the user supplied by the provider.',
+                'fullName:s?' => 'Field used to help identify the user.',
+                'defaultName:s?' => 'Field used to help identify the user.',
+            ],
+            'authenticator' => $this->getAuthenticatorPublicSchema(),
+            'config:o' => [
+                'nameUnique:b' => "Whether users' name are unique or not.",
+                'emailUnique:b' => "Whether users' email are unique or not.",
+                'noEmail:b' => "Whether users are allowed to not have an email or not.",
+            ],
+            'targetUrl:s?' => 'The sanitized URL to redirect to after a successful authentication.',
+        ]);
+    }
+
+    /**
      * Get an active authenticator.
      *
      * @param string $authenticatorID
@@ -162,31 +293,33 @@ class AuthenticateApiController extends AbstractApiController {
     }
 
     /**
-     * Authenticator schema with whitelisted fields.
+     * Get information about an authentication session.
      *
-     * @return Schema
+     * @param string $authSessionID
+     *
+     * @return mixed
+     * @throws \Garden\Schema\ValidationException
+     * @throws \Garden\Web\Exception\ClientException
      */
-    public function getAuthenticatorPublicSchema() {
-        $schema = Schema::parse([
-            'authenticatorID' => null,
-            'type' => null,
-            'isUnique' => null,
-            'name' => null,
-            'ui' => null,
-            'isUserLinked:b?' => 'Whether or not the user is linked to that authenticator.',
-        ])
-            ->add(SSOAuthenticator::getAuthenticatorSchema())
-            ->merge(
-                Schema::parse([
-                    'sso?' => [
-                        'canSignIn' => null,
-                        'canAutoLinkUser' => null,
-                    ]
-                ])->add(SSOAuthenticator::getAuthenticatorSchema()->getField('properties.sso'))
-            )
-        ;
+    public function get_linkUser(string $authSessionID) {
+        $this->schema([
+            'authSessionID:s' => 'Identifier of the authentication session.',
+        ], 'in')->setDescription('Get information about an authentication session.');
+        $out = $this->schema($this->getLinkUserOutputSchema(), 'out');
 
-        return $schema;
+        $session = $this->sessionModel->getID($authSessionID, DATASET_TYPE_ARRAY);
+        if ($this->sessionModel->isExpired($session)) {
+            throw new NotFoundException('AuthenticationSession');
+        }
+        $sessionData = $session['Attributes'];
+
+        $ssoData = SSOData::fromArray($sessionData['ssoData']);
+
+        $response = $this->fillSSOUser([], $ssoData);
+        $response = $this->fillAuthenticator($response, $ssoData);
+        $response = $this->fillConfig($response);
+
+        return $out->validate($response);
     }
 
     /**
@@ -348,6 +481,182 @@ class AuthenticateApiController extends AbstractApiController {
         }
 
         return $out->validate($response);
+    }
+
+    /**
+     * Link a user to an authenticator using an authSessionID.
+     *
+     * @throws ClientException
+     * @throws Exception
+     *
+     * @param array $body
+     * @return Data
+     */
+    public function post_linkUser(array $body) {
+        $this->permission();
+
+        // Custom validator
+        $validator = function($data, ValidationField $field) {
+            if ($field->getValidation()->getErrors()) {
+                return true;
+            }
+
+            if ($data['method'] === 'register') {
+                $agreeToTerms = $data['agreeToTerms'];
+
+                if (!$agreeToTerms) {
+                    $field->getValidation()->addError(
+                        'agreeToTerms',
+                        'You must agree to the terms of service.',
+                        ['status' => 400]
+                    );
+                }
+            } else if ($data['method'] === 'password') {
+                $hasUsername = (bool)($data['username'] ?? false);
+                $hasUserID = (bool)($data['userID'] ?? false);
+                $hasPassword = (bool)($data['password'] ?? false);
+
+                if (!$hasUsername && !$hasUserID) {
+                    $field->getValidation()->addError(
+                        'username',
+                        'Username/email is required.',
+                        ['status' => 400]
+                    );
+                }
+                if (!$hasPassword) {
+                    $field->getValidation()->addError(
+                        'password',
+                        'Password is required.',
+                        ['status' => 400]
+                    );
+                }
+            } else if ($data['method'] === 'session') {
+                if (!$this->getSession()->isValid()) {
+                    $field->getValidation()->addError(
+                        '',
+                        'Cannot use method "session" while not signed in.',
+                        ['status' => 422]
+                    );
+                }
+            } else {
+                throw new Exception('Undefined method.');
+            }
+        };
+
+        $in = $this
+            ->schema([
+                'authSessionID:s' => 'Identifier of the authentication session.',
+                'method:s' => [
+                    'enum' => ['register', 'password', 'session'],
+                    'description' => 'Link method.',
+                ],
+                'useAuthSession:b' => [
+                    'default' => true,
+                    'description' => 'Use the user information from the authSessionID. ie. email, name...',
+                ],
+                'name:s?' => 'Name of the new user. Override info from useAuthSession is provided. Method: register.',
+                'email:s?' => 'Email of the new user. Override info from useAuthSession is provided. Method: register.',
+                'agreeToTerms:b?' => 'Agree to terms of service. Method: register.',
+                'userID:i?' => 'Identifier of the user to link to. Method: password.',
+                'username:s?' => 'The user\'s name or email to link to. Method: password.',
+                'password:s?' => 'Password of the user to link to. Method: password.',
+                'persist:b' => [
+                    'default' => false,
+                    'description' => 'Whether the session should persist past the browser closing.',
+                ],
+                'targetUrl:s?' => 'The sanitized URL to redirect to after a successful authentication.',
+            ], 'in')
+            ->addValidator('', $validator)
+            ->setDescription('Link a user to an authenticator using the authSessionID and some other information. Required: userID + password or name + email + password.')
+        ;
+        $out = $this->schema(
+            Schema::parse([
+                'user?' => $this->getUserFragmentSchema(),
+                'message:s?' => 'Global error message.',
+                'errors:a?' => 'List of errors.',
+                'ssoUser?' => null,
+                'authenticator?' => null,
+                'config?' => null,
+                'targetUrl?' => null,
+            ])->merge($this->getLinkUserOutputSchema()),
+            'out'
+        );
+
+        $response = [];
+        $statusCode = 201;
+        try {
+            $body = $in->validate($body);
+        } catch (\Garden\Schema\ValidationException $e) {
+            $statusCode = $e->getValidation()->getStatus();
+            $response['errors'] = $e->getValidation()->getErrors();
+            $response['message'] = $e->getMessage();
+        }
+
+        if (($body['userID'] ?? false) && ($body['username'] ?? false)) {
+            throw new ClientException('Only one of userID or username should be specified, not both.', 400);
+        }
+
+        $session = $this->sessionModel->getID($body['authSessionID'], DATASET_TYPE_ARRAY);
+        if ($this->sessionModel->isExpired($session)) {
+            throw new ClientException('Your SSO session has expired.', 401);
+        }
+        $sessionData = $session['Attributes'];
+
+        $ssoData = SSOData::fromArray($sessionData['ssoData']);
+
+        if (!isset($response['errors'])) {
+            switch ($body['method']) {
+                case 'register':
+                    $options = [
+                        'useSSOData' => $body['useAuthSession'],
+                    ];
+                    if (isset($body['name'])) {
+                        $options['name'] = $body['name'];
+                    }
+                    if (isset($body['email'])) {
+                        $options['email'] = $body['email'];
+                    }
+                    $user = $this->ssoModel->createUser($ssoData, $options);
+                    break;
+                case 'password':
+                    $userIdentifierType = null;
+                    $userIdentifier = null;
+                    if ($body['userID'] ?? false) {
+                        $userIdentifierType = 'userID';
+                        $userIdentifier = $body['userID'];
+                    } else if ($body['username'] ?? false) {
+                        $userIdentifier = $body['username'];
+                        if (filter_var($userIdentifier, FILTER_VALIDATE_EMAIL)) {
+                            $userIdentifierType = 'email';
+                        } else {
+                            $userIdentifierType = 'name';
+                        }
+                    }
+
+                    $user = $this->ssoModel->linkUserFromCredentials($ssoData, $userIdentifierType, $userIdentifier, $body['password']);
+                    break;
+                case 'session':
+                    $user = $this->ssoModel->linkUserFromSession($ssoData);
+                    break;
+                default:
+                    throw new Exception('Undefined method.');
+                    break;
+            }
+            $this->userModel->expandUsers($user, ['UserID']);
+            $response['user'] = $user['User'];
+
+            if ($body['method'] !== 'session') {
+                $this->getSession()->start($user['UserID'], true, $body['persist']);
+            }
+        } else {
+            $response = $this->fillSSOUser($response, $ssoData);
+            $response = $this->fillAuthenticator($response, $ssoData);
+            $response = $this->fillConfig($response);
+        }
+
+        $result = $out->validate($response);
+
+        return new Data($result, ['status' => $statusCode]);
     }
 
     /**

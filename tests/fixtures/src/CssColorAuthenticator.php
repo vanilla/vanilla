@@ -112,6 +112,3 @@ class CssColorAuthenticator extends Authenticator {
         throw new \Exception('Not implemented');
     }
 }
- {
-
-}

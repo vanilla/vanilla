@@ -19,7 +19,7 @@ export async function renderer(node: HTMLElement, data: IEmbedData) {
     const image = document.createElement("img");
     image.classList.add("embedImage-img");
     image.classList.add(FocusableEmbedBlot.FOCUS_CLASS);
-    image.setAttribute("src", data.photoUrl || "");
+    image.setAttribute("src", data.url || "");
     image.setAttribute("alt", data.name || "");
 
     node.appendChild(image);

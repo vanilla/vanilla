@@ -5,25 +5,31 @@
  */
 
 import { IEmbedData, renderEmbed } from "@core/embeds";
+import AsyncLoadingEmbedBlot from "../Abstract/AsyncLoadingEmbedBlot";
 import FocusableEmbedBlot from "../Abstract/FocusableEmbedBlot";
 import { setData, getData } from "@core/dom";
+import LoadingBlot from "./LoadingBlot";
 
-export default class ExternalEmbedBlot extends FocusableEmbedBlot {
+export default class ExternalEmbedBlot extends AsyncLoadingEmbedBlot {
     public static blotName = "embed-external";
     public static className = "embed-external";
     public static tagName = "div";
 
-    public static create(data: IEmbedData) {
-        const node = super.create(data);
+    public static async createAsync(dataPromise: Promise<IEmbedData>): Promise<ExternalEmbedBlot> {
+        const data = await dataPromise;
+        const rootNode = document.createElement("div");
         const embedNode = document.createElement("div");
-        node.classList.add("embedExternal");
-        node.classList.remove(FocusableEmbedBlot.FOCUS_CLASS);
+        rootNode.classList.add("embed");
+        rootNode.classList.add(this.className);
+        rootNode.classList.add("embedExternal");
         embedNode.classList.add("embedExternal-content");
         embedNode.classList.add(FocusableEmbedBlot.FOCUS_CLASS);
-        renderEmbed(embedNode, data);
-        node.appendChild(embedNode!);
-        setData(node, "data", data);
-        return node;
+        rootNode.appendChild(embedNode);
+
+        setData(rootNode, "data", data);
+
+        const finalNode = await renderEmbed(embedNode, data);
+        return new ExternalEmbedBlot(rootNode);
     }
 
     public static value(node) {

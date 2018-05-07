@@ -15,7 +15,8 @@ import { t } from "@core/application";
 import Quill, { RangeStatic, Blot } from "quill/core";
 import Emitter from "quill/core/emitter";
 import api from "@core/apiv2";
-import { IEmbedData } from "@core/embeds";
+import { IEmbedData, renderEmbed } from "@core/embeds";
+import ExternalEmbedBlot from "./Blots/Embeds/ExternalEmbedBlot";
 
 /**
  * A Quill module for managing insertion of embeds/loading/error states.
@@ -49,15 +50,12 @@ export default class EmbedInsertionModule extends Module {
             .then(result => {
                 switch (result.data.type) {
                     case "link":
-                        this.createSiteEmbed(result.data);
-                        break;
+                        return this.createSiteEmbed(result.data);
                     case "image":
-                        this.createExternalImageEmbed(result.data);
-                        break;
+                        return this.createExternalImageEmbed(result.data);
                     default:
                         // this.createErrorEmbed(url, new Error(t("That type of embed is not currently supported.")));
-                        this.createExternalEmbed(result.data);
-                        break;
+                        return this.createExternalEmbed(result.data);
                 }
             })
             .catch(error => {
@@ -65,11 +63,12 @@ export default class EmbedInsertionModule extends Module {
                     const message = error.response.data.message;
 
                     if (message.startsWith("Failed to load URL")) {
-                        this.createErrorEmbed(url, new Error(t("There was an error processing that embed link.")));
-                        return;
+                        return this.createErrorEmbed(
+                            url,
+                            new Error(t("There was an error processing that embed link.")),
+                        );
                     } else {
-                        this.createErrorEmbed(url, new Error(message));
-                        return;
+                        return this.createErrorEmbed(url, new Error(message));
                     }
                 }
 
@@ -118,15 +117,15 @@ export default class EmbedInsertionModule extends Module {
      * Create a site embed.
      */
     private createExternalEmbed(scrapeResult: IEmbedData) {
-        const externalEmbed = Parchment.create("embed-external", scrapeResult);
         const completedBlot = this.currentUploads.get(scrapeResult.url);
+        return ExternalEmbedBlot.createAsync(scrapeResult).then(externalEmbed => {
+            // The loading blot may have been undone/deleted since we created it.
+            if (completedBlot) {
+                completedBlot.replaceWith(externalEmbed);
+            }
 
-        // The loading blot may have been undone/deleted since we created it.
-        if (completedBlot) {
-            completedBlot.replaceWith(externalEmbed);
-        }
-
-        this.currentUploads.delete(scrapeResult.url);
+            this.currentUploads.delete(scrapeResult.url);
+        });
     }
 
     private createExternalImageEmbed(scrapeResult: IEmbedData) {

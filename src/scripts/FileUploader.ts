@@ -17,9 +17,9 @@ export default class FileUploader {
     public static IMAGE_REGEX = /^image\/(gif|jpe?g|png)/i;
 
     /**
-     * @param uploadStartCallback - The callback to fire when an uploaded has been initiated for some files.
+     * @param uploadCallback - The callback to fire when an uploaded has been initiated for some files.
      */
-    constructor(private uploadStartCallback: (resultPromise: Promise<any>) => void) {}
+    constructor(private uploadCallback: (resultPromise: Promise<any>) => void) {}
 
     /**
      * A filter for use with [].filter
@@ -87,7 +87,7 @@ export default class FileUploader {
             const error = new Error(
                 `Unable to upload an image of type ${file.type}. Supported formats included .gif, .jpg and .png`,
             );
-            this.uploadStartCallback(Promise.reject(error));
+            this.uploadCallback(Promise.reject(error));
 
             return;
         }
@@ -101,6 +101,6 @@ export default class FileUploader {
             return result.data;
         });
 
-        this.uploadStartCallback(resultPromise);
+        this.uploadCallback(resultPromise);
     }
 }

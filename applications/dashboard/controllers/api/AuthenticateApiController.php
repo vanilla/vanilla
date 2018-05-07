@@ -186,6 +186,9 @@ class AuthenticateApiController extends AbstractApiController {
             )
         ;
 
+        $schema->setField('properties.ui.properties.url.format', 'uri');
+        $schema->setField('properties.ui.properties.photoUrl.format', 'uri');
+
         return $schema;
     }
 

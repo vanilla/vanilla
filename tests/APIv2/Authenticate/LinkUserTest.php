@@ -89,7 +89,7 @@ class LinkUserTest extends AbstractAPIv2Test {
     }
 
     /**
-     * Test POST /authenticate/link-user
+     * Test POST /authenticate/link-user ith method = password, using userID.
      */
     public function testPostLinkUserMethodPasswordWUserID() {
         $authSessionID = $this->createAuthSessionID();
@@ -105,7 +105,7 @@ class LinkUserTest extends AbstractAPIv2Test {
     }
 
     /**
-     * Test POST /authenticate/link-user
+     * Test POST /authenticate/link-user ith method = password, using name.
      */
     public function testPostLinkUserMethodPasswordWName() {
         $authSessionID = $this->createAuthSessionID();
@@ -121,7 +121,7 @@ class LinkUserTest extends AbstractAPIv2Test {
     }
 
     /**
-     * Test POST /authenticate/link-user
+     * Test POST /authenticate/link-user with method = password, using email.
      */
     public function testPostLinkUserMethodPasswordWEmail() {
         $authSessionID = $this->createAuthSessionID();
@@ -137,7 +137,7 @@ class LinkUserTest extends AbstractAPIv2Test {
     }
 
     /**
-     * Test POST /authenticate/link-user
+     * Test POST /authenticate/link-user with method = register.
      */
     public function testPostLinkUserMethodRegister() {
         $authSessionID = $this->createAuthSessionID();
@@ -152,7 +152,7 @@ class LinkUserTest extends AbstractAPIv2Test {
     }
 
     /**
-     * Test POST /authenticate/link-user
+     * Test POST /authenticate/link-user with method = session.
      */
     public function testPostLinkUserMethodSession() {
         $authSessionID = $this->createAuthSessionID();
@@ -172,7 +172,7 @@ class LinkUserTest extends AbstractAPIv2Test {
     }
 
     /**
-     * Test POST /authenticate/link-user
+     * Test POST /authenticate/link-user with method = register and AgreeToTerm = false. 
      *
      * @expectedException \Exception
      * @expectedExceptionMessage You must agree to the terms of service.

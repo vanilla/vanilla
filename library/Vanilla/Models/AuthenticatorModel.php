@@ -183,14 +183,18 @@ class AuthenticatorModel {
                     try {
                         $authenticatorInstance = $this->getAuthenticator($authenticatorInfo['AuthenticationSchemeAlias'], $authenticatorInfo['AuthenticationKey']);
                         $authenticators[] = $authenticatorInstance;
-                    } catch (Exception $e) {}
+                    } catch (Exception $e) {
+                        throw new ServerException('Error while trying to instanciate authenticator '.$authenticatorClass, 500, ['AuthenticatorError' => $e]);
+                    }
                     $authenticatorInstance = null;
                 }
             } else {
                 try {
                     $authenticatorInstance = $this->container->get($authenticatorClass);
                     $authenticators[] = $authenticatorInstance;
-                } catch (Exception $e) {}
+                } catch (Exception $e) {
+                    throw new ServerException('Error while trying to instanciate authenticator '.$authenticatorClass, 500, ['AuthenticatorError' => $e]);
+                }
 
             }
         }

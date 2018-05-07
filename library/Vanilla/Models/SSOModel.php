@@ -438,7 +438,7 @@ class SSOModel {
             // We want to link to the currently logged user.
             if ($body['linkToSession'] ?? false) {
                 if (!$this->session->isValid()) {
-                    throw new ForbiddenException('Cannot link user to session while not signed in.');
+                    throw new ClientException('Cannot link user to session while not signed in.', 401);
                 }
                 if (!$allowConnect) {
                     throw new ForbiddenException('This site is not configured to allow user linking.');
@@ -488,6 +488,10 @@ class SSOModel {
         if ($user) {
             $this->session->start($user['UserID'], $options['setCookie'] ?? true, $options['persistCookie'] ?? false);
             $this->userModel->fireEvent('AfterSignIn');
+
+            if (!$this->session->isValid()) {
+                throw new ClientException('The session could not be started.', 401);
+            }
 
             // Allow user's synchronization
             $syncInfo = $this->config->get('Garden.Registration.ConnectSynchronize', true);

@@ -9,6 +9,7 @@ use Garden\Schema\Schema;
 use Garden\Schema\ValidationField;
 use Garden\Web\Data;
 use Garden\Web\Exception\ClientException;
+use Garden\Web\Exception\HttpException;
 use Garden\Web\Exception\NotFoundException;
 use Garden\Web\Exception\ServerException;
 use Garden\Web\RequestInterface;
@@ -149,6 +150,20 @@ class AuthenticateApiController extends AbstractApiController {
     }
 
     /**
+     * Make sure that the session is started and throw a relevant error message if that's not the case.
+     *
+     * @throws \Garden\Web\Exception\HttpException
+     * @throws \Vanilla\Exception\PermissionException
+     */
+    private function ensureSessionIsValid() {
+        if (!$this->getSession()->isValid()) {
+            $this->permission(); // This will throw if there's a ban reason.
+
+            throw HttpException::createFromStatus(401, 'The session could not be started.');
+        }
+    }
+
+    /**
      * Fill authenticator information into a response.
      *
      * @param array $response
@@ -283,8 +298,11 @@ class AuthenticateApiController extends AbstractApiController {
         if (!$authenticator->isActive()) {
             throw new ClientException('Authenticator is not active.');
         }
-        if (is_a($authenticator, SSOAuthenticator::class) && !$authenticator->canSignIn()) {
-            throw new ClientException('Authenticator does not allow authentication.');
+        if (is_a($authenticator, SSOAuthenticator::class)) {
+            /** @var SSOAuthenticator $authenticator */
+            if (!$authenticator->canSignIn()) {
+                throw new ClientException('Authenticator does not allow authentication.');
+            }
         }
 
         $result = $this->authenticatorApiController->normalizeOutput($authenticator);
@@ -364,7 +382,7 @@ class AuthenticateApiController extends AbstractApiController {
                     return false;
                 }
 
-                if (isset($isUserLinked) && !$authenticator->isUserLinked($this->getSession()->UserID)) {
+                if (isset($isUserLinked) && !$ssoAuthenticator->isUserLinked($this->getSession()->UserID)) {
                     return false;
                 }
             }
@@ -426,6 +444,8 @@ class AuthenticateApiController extends AbstractApiController {
 
         $authenticatorInstance = $this->authenticatorApiController->getAuthenticator($authenticatorType, $authenticatorID);
 
+        $user = null;
+        $ssoData = null;
         $sso = is_a($authenticatorInstance, SSOAuthenticator::class);
         if ($sso) {
             /** @var SSOAuthenticator $authenticatorInstance */
@@ -435,15 +455,22 @@ class AuthenticateApiController extends AbstractApiController {
                 throw new ServerException("Unknown error while authenticating with $authenticatorType.", 500);
             }
 
-            $user = $this->ssoModel->sso($ssoData, [
-                'linkToSession' => $body['method'] === 'session',
-                'setCookie' => $body['method'] !== 'linkUser',
-                'persist' => $body['persist'],
-            ]);
+            try {
+                 $user = $this->ssoModel->sso($ssoData, [
+                    'linkToSession' => $body['method'] === 'session',
+                    'setCookie' => $body['method'] !== 'linkUser',
+                    'persist' => $body['persist'],
+                ]);
+            } catch(ClientException $e) {
+                if ($e->getCode() === 401) {
+                    $this->ensureSessionIsValid(); // This will throw a more relevant error message.
+                    throw $e; // Fallback to the original error if the session is valid. Should not happen tho.
+                }
+            }
         } else {
             $user = $authenticatorInstance->validateAuthentication($this->request);
             if ($user) {
-                $this->getSession()->start($user['UserID'], true, $body['persist']);
+                $this->startSession($user['UserID'], $body['persist']);
             }
         }
 
@@ -541,6 +568,8 @@ class AuthenticateApiController extends AbstractApiController {
             } else {
                 throw new Exception('Undefined method.');
             }
+
+            return count($field->getValidation()->getErrors()) === 0;
         };
 
         $in = $this
@@ -646,7 +675,7 @@ class AuthenticateApiController extends AbstractApiController {
             $response['user'] = $user['User'];
 
             if ($body['method'] !== 'session') {
-                $this->getSession()->start($user['UserID'], true, $body['persist']);
+                $this->startSession($user['UserID'], $body['persist']);
             }
         } else {
             $response = $this->fillSSOUser($response, $ssoData);
@@ -698,5 +727,20 @@ class AuthenticateApiController extends AbstractApiController {
         $this->config->set('Garden.SignIn.DisablePassword', $oldConfig, true, false);
 
         return $out->validate($result['user']);
+    }
+
+    /**
+     * Start a session an throw an error if there's a problem.
+     *
+     * @param $userID
+     * @param $persist
+     *
+     * @throws \Garden\Web\Exception\HttpException
+     */
+    private function startSession($userID, $persist) {
+        $this->getSession()->start($userID, true, $persist);
+        $this->userModel->fireEvent('AfterSignIn');
+
+        $this->ensureSessionIsValid();
     }
 }

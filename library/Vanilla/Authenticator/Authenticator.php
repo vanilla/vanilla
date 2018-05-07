@@ -285,7 +285,7 @@ abstract class Authenticator {
      *
      * @throws Exception Reason why the authentication failed.
      * @param RequestInterface $request
-     * @return array The user's information.
+     * @return mixed The user's information.
      */
     final public function validateAuthentication(RequestInterface $request) {
          if (!$this->isActive()) {

@@ -313,7 +313,6 @@ class AuthenticateApiController extends AbstractApiController {
         }
         $sessionData = $session['Attributes'];
 
-
         $ssoData = SSOData::fromArray($sessionData['ssoData']);
 
         $response = $this->fillSSOUser([], $ssoData);

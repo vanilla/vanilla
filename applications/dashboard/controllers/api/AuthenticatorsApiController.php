@@ -112,11 +112,20 @@ class AuthenticatorsApiController extends AbstractApiController  {
             $this->fullSchema = $this->schema(
                 // Use the SSOAuthenticator schema but make the sso attribute optional.
                 Schema::parse([
-                    'resourceUrl:s' => 'API URL to get the Authenticator',
+                    'resourceUrl:s' => [
+                        'description' => 'API URL to get the Authenticator',
+                        'format' => 'uri',
+                    ],
                     'sso?',
                 ])->merge(SSOAuthenticator::getAuthenticatorSchema()),
                 'Authenticator'
             );
+
+            $this->fullSchema->setField('properties.ui.properties.url.format', 'uri');
+            $this->fullSchema->setField('properties.ui.properties.photoUrl.format', 'uri');
+            $this->fullSchema->setField('properties.signInUrl.format', 'uri');
+            $this->fullSchema->setField('properties.registerUrl.format', 'uri');
+            $this->fullSchema->setField('properties.signOutUrl.format', 'uri');
         }
 
         return $this->fullSchema;
@@ -155,7 +164,12 @@ class AuthenticatorsApiController extends AbstractApiController  {
      *
      * @param string $type
      * @param string $id
+     *
      * @return array
+     * @throws \Garden\Schema\ValidationException
+     * @throws \Garden\Web\Exception\HttpException
+     * @throws \Garden\Web\Exception\NotFoundException
+     * @throws \Vanilla\Exception\PermissionException
      */
     public function get(string $type, string $id): array {
         $this->permission('Garden.Setting.Manage');
@@ -176,6 +190,10 @@ class AuthenticatorsApiController extends AbstractApiController  {
      * List authenticators.
      *
      * @return Data
+     * @throws \Garden\Schema\ValidationException
+     * @throws \Garden\Web\Exception\HttpException
+     * @throws \Garden\Web\Exception\ServerException
+     * @throws \Vanilla\Exception\PermissionException
      */
     public function index(): Data {
         $this->permission('Garden.Setting.Manage');
@@ -253,7 +271,12 @@ class AuthenticatorsApiController extends AbstractApiController  {
      *
      * @param string $authenticatorID
      * @param array $body
+     *
      * @return array
+     * @throws \Garden\Schema\ValidationException
+     * @throws \Garden\Web\Exception\HttpException
+     * @throws \Garden\Web\Exception\NotFoundException
+     * @throws \Vanilla\Exception\PermissionException
      */
     public function patch(string $authenticatorID, array $body): array {
         $this->permission('Garden.Setting.Manage');

@@ -72,31 +72,23 @@ export default class FileUploader {
                 event.preventDefault();
                 // Currently only 1 file is supported.
                 const mainFile = files[0];
-                this.uploadFile(mainFile);
+                this.uploadFile(mainFile!);
             }
         }
     };
 
     /**
-     * Handle an image of the wrong type being uploaded.
-     *
-     * @param type - The type of the image the user tried to upload.
-     */
-    public handleBadImageType(type: string) {
-        const error = new Error(
-            `Unable to upload an image of type ${type}. Supported formats included .gif, .jpg and .png`,
-        );
-        this.uploadFailureCallback(null, error);
-    }
-
-    /**
      * Upload a file using Vanilla's API v2.
      *
-     * @param {File} file - The file to upload.
+     * @param file - The file to upload.
      */
-    public uploadFile(file) {
+    public uploadFile(file: File) {
         if (!this.imageFilter(file)) {
-            this.handleBadImageType(file.type);
+            const error = new Error(
+                `Unable to upload an image of type ${file.type}. Supported formats included .gif, .jpg and .png`,
+            );
+            this.uploadStartCallback(Promise.reject(error));
+
             return;
         }
 
@@ -106,7 +98,7 @@ export default class FileUploader {
 
         const resultPromise = api.post("/media", data).then(result => {
             result.data.type = "image";
-            return result;
+            return result.data;
         });
 
         this.uploadStartCallback(resultPromise);

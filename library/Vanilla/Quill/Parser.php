@@ -30,6 +30,7 @@ class Parser {
         Blots\BulletedListBlot::class,
         Blots\OrderedListBlot::class,
         Blots\Embeds\EmojiBlot::class,
+        Blots\Embeds\ExternalBlot::class,
         Blots\Embeds\ImageBlot::class,
         Blots\Embeds\VideoBlot::class,
         Blots\Embeds\LinkEmbedBlot::class,

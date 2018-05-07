@@ -335,7 +335,9 @@ class Bootstrap {
      * @param Container $container The container to clean up.
      */
     public static function cleanup(Container $container) {
-        \CategoryModel::$Categories = null;
+        if (class_exists(\CategoryModel::class)) {
+            \CategoryModel::$Categories = null;
+        }
 
         if ($container->hasInstance(AddonManager::class)) {
             /* @var AddonManager $addonManager */

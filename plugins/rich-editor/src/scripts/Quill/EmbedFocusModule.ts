@@ -32,8 +32,10 @@ export default class EmbedFocusModule extends Module {
         length: 0,
     };
 
+    private editorRoot: HTMLElement;
     private paragraphMenuHandle: HTMLElement;
     private inlineToolbarFirstItem: HTMLElement;
+    private emojiPickerButton: HTMLElement;
 
     constructor(quill: Quill, options = {}) {
         super(quill, options);
@@ -44,8 +46,11 @@ export default class EmbedFocusModule extends Module {
                 this.lastSelection = range;
             }
         });
+        this.setupEmbedClickHandler();
+        this.editorRoot = this.quill.root.closest(".richEditor") as HTMLElement;
 
-        this.quill.root.closest(".richEditor")!.addEventListener("keydown", this.keyDownListener);
+        this.quill.root.addEventListener("keydown", this.keyDownListener);
+        this.editorRoot.addEventListener("keydown", this.tabListener);
         window.quill = quill;
     }
 
@@ -87,7 +92,6 @@ export default class EmbedFocusModule extends Module {
         const isCurrentBlotEmpty = currentBlot.domNode.textContent === "";
 
         if (isPreviousBlotEmbed && isCurrentBlotEmpty) {
-            this.setupEmbedClickHandler();
             (currentBlot as Blot).remove();
             this.quill.update(Quill.sources.USER);
             this.focusEmbedBlot(previousBlot);
@@ -106,8 +110,6 @@ export default class EmbedFocusModule extends Module {
         }
 
         const exclusiveHandlers = [
-            this.handleTab,
-            this.handleShiftTab,
             this.handleArrowKeyFromEmbed,
             this.handleArrowKeyAwayFromQuill,
             this.handleDeleteOnQuill,
@@ -121,6 +123,31 @@ export default class EmbedFocusModule extends Module {
         }, true);
     };
 
+    /**
+     * Keydown listener on the current quill instance.
+     */
+    private tabListener = (event: KeyboardEvent) => {
+        if (!this.quill.container.closest(".richEditor")!.contains(document.activeElement)) {
+            return;
+        }
+
+        const exclusiveHandlers = [this.handleTab, this.handleShiftTab];
+
+        // Run all of the event listeners until one returns false;
+        return exclusiveHandlers.reduce((shouldContinue, currentHandler) => {
+            return shouldContinue ? currentHandler(event) : false;
+        }, true);
+    };
+
+    private ensureEditorElements() {
+        this.paragraphMenuHandle = this.editorRoot.querySelector(".richEditorParagraphMenu-handle") as HTMLElement;
+        this.inlineToolbarFirstItem = this.editorRoot.querySelector(
+            ".richEditor-inlineToolbarContainer .richEditor-menuItem:first-child",
+        ) as HTMLElement;
+        this.emojiPickerButton = this.editorRoot.querySelector(".emojiPicker > .richEditor-button") as HTMLElement;
+        return this.paragraphMenuHandle && this.inlineToolbarFirstItem && this.emojiPickerButton;
+    }
+
     private handleTab = (event: KeyboardEvent) => {
         if (
             !KeyboardModule.match(event, {
@@ -131,29 +158,23 @@ export default class EmbedFocusModule extends Module {
             return true;
         }
 
+        if (!this.ensureEditorElements()) {
+            return true;
+        }
+
         const blotForActiveElement = this.getEmbedBlotForFocusedElement();
         const focusItemIsEmbedBlot = blotForActiveElement instanceof FocusableEmbedBlot;
         if (this.quill.hasFocus() || focusItemIsEmbedBlot) {
             event.preventDefault();
-            const paragraphMenuHandle = this.quill.root
-                .closest(".richEditor")!
-                .querySelector(".richEditorParagraphMenu-handle") as HTMLElement;
-            const inlineToolbarFirstItem = this.quill.root
-                .closest(".richEditor")!
-                .querySelector(".richEditor-inlineToolbarContainer .richEditor-menuItem:first-child") as HTMLElement;
-            const emojiPickerButton = this.quill.root
-                .closest(".richEditor")!
-                .querySelector(".emojiPicker > .richEditor-button") as HTMLElement;
-
             const selection = this.quill.getSelection();
             if (!focusItemIsEmbedBlot) {
                 if (selection.length > 0) {
-                    inlineToolbarFirstItem.focus();
+                    this.inlineToolbarFirstItem.focus();
                 } else {
-                    paragraphMenuHandle.focus();
+                    this.paragraphMenuHandle.focus();
                 }
             } else {
-                emojiPickerButton.focus();
+                this.emojiPickerButton.focus();
             }
             return false;
         }
@@ -171,21 +192,16 @@ export default class EmbedFocusModule extends Module {
             return true;
         }
 
-        const paragraphMenuHandle = this.quill.root
-            .closest(".richEditor")!
-            .querySelector(".richEditorParagraphMenu-handle") as HTMLElement;
-        const inlineToolbarFirstItem = this.quill.root
-            .closest(".richEditor")!
-            .querySelector(".richEditor-inlineToolbarContainer .richEditor-menuItem:first-child") as HTMLElement;
-        const emojiPickerButton = this.quill.root
-            .closest(".richEditor")!
-            .querySelector(".emojiPicker > .richEditor-button") as HTMLElement;
+        if (!this.ensureEditorElements()) {
+            return true;
+        }
 
-        const definiteLastItemIsFocused = [paragraphMenuHandle, inlineToolbarFirstItem].includes(
+        const definiteLastItemIsFocused = [this.paragraphMenuHandle, this.inlineToolbarFirstItem].includes(
             document.activeElement as HTMLElement,
         );
         const emojiPickerIsConditionallyFocused =
-            document.activeElement === emojiPickerButton && paragraphMenuHandle.classList.contains("isHidden");
+            document.activeElement === this.emojiPickerButton &&
+            this.paragraphMenuHandle.classList.contains("isHidden");
 
         if (definiteLastItemIsFocused || emojiPickerIsConditionallyFocused) {
             event.preventDefault();

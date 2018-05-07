@@ -19,11 +19,7 @@ import CodeInlineBlot from "./Blots/Inline/CodeBlot";
 
 // Custom Embed Blots
 import EmojiBlot from "./Blots/Embeds/EmojiBlot";
-import ImageBlot from "./Blots/Embeds/ImageBlot";
-import VideoBlot from "./Blots/Embeds/VideoBlot";
-import LinkEmbedBlot from "./Blots/Embeds/RichLinkBlot";
 import ExternalEmbedBlot from "./Blots/Embeds/ExternalEmbedBlot";
-import EmbedLoadingBlot from "./Blots/Embeds/LoadingBlot";
 import EmbedErrorBlot from "./Blots/Embeds/ErrorBlot";
 import MentionBlot from "./Blots/Embeds/MentionBlot";
 import MentionComboBoxBlot from "./Blots/Embeds/MentionComboBoxBlot";
@@ -55,11 +51,7 @@ Quill.register(
         "formats/header": Header,
         "formats/list": List,
         "formats/list/item": ListItem,
-        "formats/image-embed": ImageBlot,
-        "formats/video-placeholder": VideoBlot,
-        "formats/loading-embed": EmbedLoadingBlot,
-        "formats/link-embed": LinkEmbedBlot,
-        "formats/error-embed": EmbedErrorBlot,
+        "formats/embed-error": EmbedErrorBlot,
         "formats/embed-external": ExternalEmbedBlot,
         "formats/mention": MentionBlot,
         "formats/mention-combobox": MentionComboBoxBlot,

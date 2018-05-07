@@ -43,106 +43,39 @@ export default class EmbedInsertionModule extends Module {
         const formData = new FormData();
         formData.append("url", url);
 
-        this.createLoadingEmbed(url);
+        // this.createLoadingEmbed(url);
 
-        api
-            .post("/media/scrape", formData)
-            .then(result => {
-                switch (result.data.type) {
-                    case "link":
-                        return this.createSiteEmbed(result.data);
-                    case "image":
-                        return this.createExternalImageEmbed(result.data);
-                    default:
-                        // this.createErrorEmbed(url, new Error(t("That type of embed is not currently supported.")));
-                        return this.createExternalEmbed(result.data);
-                }
-            })
-            .catch(error => {
-                if (error.response && error.response.data && error.response.data.message) {
-                    const message = error.response.data.message;
+        const responseData = api.post("/media/scrape", formData).then(result => result.data);
 
-                    if (message.startsWith("Failed to load URL")) {
-                        return this.createErrorEmbed(
-                            url,
-                            new Error(t("There was an error processing that embed link.")),
-                        );
-                    } else {
-                        return this.createErrorEmbed(url, new Error(message));
-                    }
-                }
+        this.createEmbed(responseData);
 
-                this.createErrorEmbed(url, error);
-            });
-    }
+        // .then(result => {
+        //     switch (result.data.type) {
+        //         case "link":
+        //             return this.createSiteEmbed(result.data);
+        //         case "image":
+        //             return this.createExternalImageEmbed(result.data);
+        //         default:
+        //             // this.createErrorEmbed(url, new Error(t("That type of embed is not currently supported.")));
+        //             return this.createExternalEmbed(result.data);
+        //     }
+        // })
+        // .catch(error => {
+        //     if (error.response && error.response.data && error.response.data.message) {
+        //         const message = error.response.data.message;
 
-    /**
-     * Create a video embed.
-     */
-    private createVideoEmbed(scrapeResult: IEmbedData) {
-        const linkEmbed = Parchment.create("embed-video", scrapeResult);
-        const completedBlot = this.currentUploads.get(scrapeResult.url);
+        //         if (message.startsWith("Failed to load URL")) {
+        //             return this.createErrorEmbed(
+        //                 url,
+        //                 new Error(t("There was an error processing that embed link.")),
+        //             );
+        //         } else {
+        //             return this.createErrorEmbed(url, new Error(message));
+        //         }
+        //     }
 
-        // The loading blot may have been undone/deleted since we created it.
-        if (completedBlot) {
-            completedBlot.replaceWith(linkEmbed);
-        }
-
-        this.currentUploads.delete(scrapeResult.url);
-    }
-
-    /**
-     * Create a site embed.
-     */
-    private createSiteEmbed(scrapeResult: IEmbedData) {
-        const { url, photoUrl, name, body } = scrapeResult;
-
-        const linkEmbed = Parchment.create("embed-link", {
-            url,
-            name,
-            linkImage: photoUrl,
-            excerpt: body,
-        });
-        const completedBlot = this.currentUploads.get(url);
-
-        // The loading blot may have been undone/deleted since we created it.
-        if (completedBlot) {
-            completedBlot.replaceWith(linkEmbed);
-        }
-
-        this.currentUploads.delete(url);
-    }
-
-    /**
-     * Create a site embed.
-     */
-    private createExternalEmbed(scrapeResult: IEmbedData) {
-        const completedBlot = this.currentUploads.get(scrapeResult.url);
-        return ExternalEmbedBlot.createAsync(scrapeResult).then(externalEmbed => {
-            // The loading blot may have been undone/deleted since we created it.
-            if (completedBlot) {
-                completedBlot.replaceWith(externalEmbed);
-            }
-
-            this.currentUploads.delete(scrapeResult.url);
-        });
-    }
-
-    private createExternalImageEmbed(scrapeResult: IEmbedData) {
-        const { url, photoUrl, name } = scrapeResult;
-
-        const linkEmbed = Parchment.create("embed-image", {
-            url: photoUrl,
-            alt: name,
-        });
-        const completedBlot = this.currentUploads.get(url);
-
-        // The loading blot may have been undone/deleted since we created it.
-        if (completedBlot) {
-            completedBlot.replaceWith(linkEmbed);
-        }
-
-        this.currentUploads.delete(url);
+        //     this.createErrorEmbed(url, error);
+        // });
     }
 
     /**
@@ -180,12 +113,11 @@ export default class EmbedInsertionModule extends Module {
      *
      * @param lookupKey - The lookup key for the loading embed.
      */
-    private createLoadingEmbed = (lookupKey: any) => {
-        this.pauseSelectionTracking = true;
-        const loadingBlot: EmbedLoadingBlot = Parchment.create("embed-loading", {}) as EmbedLoadingBlot;
+    private createEmbed = (dataPromise: any) => {
+        const externalEmbed = Parchment.create("embed-external", dataPromise) as ExternalEmbedBlot;
         const [currentLine] = this.quill.getLine(this.lastSelection.index);
         const referenceBlot = currentLine.split(this.lastSelection.index);
-        loadingBlot.insertInto(this.quill.scroll, referenceBlot);
+        externalEmbed.insertInto(this.quill.scroll, referenceBlot);
         this.quill.update(Emitter.sources.USER);
 
         const newSelection = {
@@ -193,19 +125,6 @@ export default class EmbedInsertionModule extends Module {
             length: 0,
         };
         this.quill.setSelection(newSelection, Quill.sources.USER);
-
-        loadingBlot.registerDeleteCallback(() => {
-            if (this.currentUploads.has(lookupKey)) {
-                this.currentUploads.delete(lookupKey);
-                this.quill.update();
-
-                // Restore the selection.
-                this.quill.setSelection(newSelection, Quill.sources.USER);
-            }
-        });
-
-        this.currentUploads.set(lookupKey, loadingBlot);
-        this.pauseSelectionTracking = false;
     };
 
     /**
@@ -237,7 +156,7 @@ export default class EmbedInsertionModule extends Module {
      * Setup image upload listeners and handlers.
      */
     private setupImageUploads() {
-        this.fileUploader = new FileUploader(this.createLoadingEmbed, this.onImageUploadSuccess, this.createErrorEmbed);
+        this.fileUploader = new FileUploader(this.createEmbed);
 
         this.quill.root.addEventListener("drop", this.fileUploader.dropHandler, false);
         this.quill.root.addEventListener("paste", this.fileUploader.pasteHandler, false);

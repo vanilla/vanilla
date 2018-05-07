@@ -172,7 +172,7 @@ class LinkUserTest extends AbstractAPIv2Test {
     }
 
     /**
-     * Test POST /authenticate/link-user with method = register and AgreeToTerm = false. 
+     * Test POST /authenticate/link-user with method = register and agreeToTerm = false. 
      *
      * @expectedException \Exception
      * @expectedExceptionMessage You must agree to the terms of service.

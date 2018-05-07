@@ -37,9 +37,13 @@ emojis.map((data, key) => {
 
 const emojiGroupLength = Object.values(emojiGroups).length;
 
-interface IProps extends IEditorContextProps, IPopoverControllerChildParameters {}
+interface IProps extends IEditorContextProps, IPopoverControllerChildParameters {
+    contentID: string;
+}
 
 interface IState {
+    id: string;
+    contentID: string;
     scrollTarget: number;
     firstEmojiOfGroup: number;
     overscanRowCount: number;
@@ -55,6 +59,8 @@ export class EmojiPicker extends React.PureComponent<IProps, IState> {
     constructor(props) {
         super(props);
         this.state = {
+            id: props.id,
+            contentID: props.contentID,
             scrollTarget: 0,
             firstEmojiOfGroup: 0,
             overscanRowCount: 20,
@@ -65,6 +71,14 @@ export class EmojiPicker extends React.PureComponent<IProps, IState> {
 
         this.categoryPickerID = "emojiPicker-categories-" + props.editorID;
     }
+
+    get descriptionID(): string {
+        return this.state.id + "-description";
+    }
+    get titleID(): string {
+        return this.state.id + "-title";
+    }
+
     public render() {
         const title = t("Smileys & Faces");
         const description = [
@@ -144,6 +158,9 @@ export class EmojiPicker extends React.PureComponent<IProps, IState> {
 
         return (
             <Popover
+                id={this.state.id}
+                descriptionID={this.descriptionID}
+                titleID={this.titleID}
                 title={title}
                 accessibleDescription={description}
                 alertMessage={this.state.alertMessage}

@@ -8,8 +8,20 @@ import React from "react";
 import EmojiPicker from "./EmojiPicker";
 import PopoverController, { IPopoverControllerChildParameters } from "./Generic/PopoverController";
 import * as Icons from "./Icons";
+import { getRequiredID, IRequiredComponentID } from "@core/Interfaces/componentIDs";
 
-export default class EmojiPopover extends React.Component {
+export default class EmojiPopover extends React.Component<IRequiredComponentID, IRequiredComponentID> {
+    public constructor(props) {
+        super(props);
+        this.state = {
+            id: getRequiredID(props, "emojiPopover"),
+        };
+    }
+
+    get contentID(): string {
+        return this.state.id + "-contents";
+    }
+
     /**
      * @inheritDoc
      */
@@ -17,9 +29,9 @@ export default class EmojiPopover extends React.Component {
         const icon = Icons.emoji();
 
         return (
-            <PopoverController classNameRoot="emojiPicker" icon={icon}>
+            <PopoverController id={this.state.id} contentID={this.contentID} classNameRoot="emojiPicker" icon={icon}>
                 {(options: IPopoverControllerChildParameters) => {
-                    return <EmojiPicker {...options} />;
+                    return <EmojiPicker {...options} id={this.contentID} />;
                 }}
             </PopoverController>
         );

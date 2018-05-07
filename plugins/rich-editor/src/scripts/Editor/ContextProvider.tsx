@@ -37,7 +37,7 @@ export default class EditorContextProvider extends React.PureComponent<IProps> {
     }
 
     public render() {
-        return <div>{this.props.children}</div>;
+        return <div className="contextProvider">{this.props.children}</div>;
     }
 }
 

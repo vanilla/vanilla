@@ -4,22 +4,29 @@
  * @license GPLv2
  */
 
-import * as domUtility from "../dom";
+import {
+    escapeHTML,
+    unescapeHTML,
+    removeAllDelegatedEvents,
+    delegateEvent,
+    removeDelegatedEvent,
+    getFormData,
+} from "@core/dom";
 
 const input = `<script>alert("Got you!")</script>`;
 const output = `&lt;script&gt;alert("Got you!")&lt;/script&gt;`;
 
 it("escapes html", () => {
-    expect(domUtility.escapeHTML(input)).toBe(output);
+    expect(escapeHTML(input)).toBe(output);
 });
 
 it("unescapes html", () => {
-    expect(domUtility.unescapeHTML(output)).toBe(input);
+    expect(unescapeHTML(output)).toBe(input);
 });
 
 describe("delegateEvent", () => {
     beforeEach(() => {
-        domUtility.removeAllDelegatedEvents();
+        removeAllDelegatedEvents();
 
         document.body.innerHTML = `
             <div>
@@ -37,7 +44,7 @@ describe("delegateEvent", () => {
 
     test("A event can be registered successfully", () => {
         const callback = jest.fn();
-        domUtility.delegateEvent("click", "", callback);
+        delegateEvent("click", "", callback);
 
         const button = document.querySelector(".filterSelector") as HTMLElement;
         button.click();
@@ -46,9 +53,9 @@ describe("delegateEvent", () => {
 
     test("identical events will not be registered twice", () => {
         const callback = jest.fn();
-        domUtility.delegateEvent("click", "", callback);
-        domUtility.delegateEvent("click", "", callback);
-        domUtility.delegateEvent("click", "", callback);
+        delegateEvent("click", "", callback);
+        delegateEvent("click", "", callback);
+        delegateEvent("click", "", callback);
 
         const button = document.querySelector(".filterSelector") as HTMLElement;
         button.click();
@@ -59,7 +66,7 @@ describe("delegateEvent", () => {
         const callback = jest.fn();
 
         beforeEach(() => {
-            domUtility.delegateEvent("click", ".filterSelector", callback);
+            delegateEvent("click", ".filterSelector", callback);
         });
 
         test("events can be delegated to their filterSelector", () => {
@@ -84,7 +91,7 @@ describe("delegateEvent", () => {
         const callback = jest.fn();
 
         beforeEach(() => {
-            domUtility.delegateEvent("click", "", callback, ".scope1");
+            delegateEvent("click", "", callback, ".scope1");
         });
 
         test("events can be scoped to their scopeSelector", () => {
@@ -115,12 +122,12 @@ describe("removing delegated events", () => {
     beforeEach(() => {
         callback1.mockReset();
         callback2.mockReset();
-        eventHandler1 = domUtility.delegateEvent("click", "", callback1);
-        eventHandler2 = domUtility.delegateEvent("click", ".scope1", callback2, ".filterSelector");
+        eventHandler1 = delegateEvent("click", "", callback1);
+        eventHandler2 = delegateEvent("click", ".scope1", callback2, ".filterSelector");
     });
 
     it("can remove a single event", () => {
-        domUtility.removeDelegatedEvent(eventHandler1);
+        removeDelegatedEvent(eventHandler1);
         (document.querySelector(".scope1 .filterSelector") as HTMLElement).click();
 
         expect(callback1.mock.calls.length).toBe(0);
@@ -128,7 +135,7 @@ describe("removing delegated events", () => {
     });
 
     it("can remove all events", () => {
-        domUtility.removeAllDelegatedEvents();
+        removeAllDelegatedEvents();
         (document.querySelector(".scope1 .filterSelector") as HTMLElement).click();
 
         expect(callback1.mock.calls.length).toBe(0);
@@ -147,6 +154,6 @@ describe("getFormData", () => {
 
     it("can get get data out of a form", () => {
         const form = document.querySelector("form");
-        expect(domUtility.getFormData(form)).toEqual({ foo: "foo" });
+        expect(getFormData(form)).toEqual({ foo: "foo" });
     });
 });

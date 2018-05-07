@@ -1468,69 +1468,6 @@ jQuery(document).ready(function($) {
         return Youtube($container);
     });
 
-
-    /**
-     * Twitter card embedding.
-     *
-     * IIFE named just for clarity. Note: loading the Twitter widget JS
-     * asynchronously, and tying it into a promise, which will guarantee the
-     * script and its code is excuted before attempting to run the specific
-     * Twitter code. There used to be conflicts if another Twitter widget was
-     * included in the page, or if the connection was slow, resulting in
-     * `window.twttr` being undefined. The promise guarantees this won't happen.
-     */
-    var twitterCardEmbed = (function() {
-        'use strict';
-
-        // Call to transform all tweet URLs into embedded cards. Expose to global
-        // scope for backwards compatibility, as it might be being used elsewhere.
-        window.tweets = function() {
-            $('.twitter-card').each(function(i, el) {
-                if (!$(el).hasClass('twitter-card-loaded')) {
-                    var card = $(el),
-                        tweetUrl = card.attr('data-tweeturl'),
-                        tweetID = card.attr('data-tweetid'),
-                        cardref = card.get(0);
-
-                    // Candidate found, prepare transition.
-                    card.addClass('twitter-card-preload');
-
-                    window.twttr.widgets.createTweet(tweetID, cardref, function(iframe) {
-                        card.find('.tweet-url').remove();
-                        // Fade it in.
-                        card.addClass('twitter-card-loaded');
-                    }, {
-                        conversation: 'none'
-                    });
-                }
-            });
-        };
-
-        // Check for the existence of any Twitter card candidates.
-        if ($('div.twitter-card').length) {
-            $.when(
-                $.getScript('//platform.twitter.com/widgets.js')
-            ).done(function() {
-                    // The promise returned successfully (script loaded and executed),
-                    // so convert tweets already on page.
-                    window.twttr.ready(window.tweets);
-
-                    // Attach event for embed whenever new comments are posted, so they
-                    // are automatically loaded. Currently works for new comments,
-                    // and new private messages.
-                    var newPostTriggers = [
-                        'CommentAdded',
-                        'MessageAdded'
-                    ];
-
-                    $(document).on(newPostTriggers.join(' '), function(e, data) {
-                        window.twttr.ready(window.tweets);
-                    });
-                });
-        }
-    }());
-
-
     /**
      * GitHub commit embedding
      *

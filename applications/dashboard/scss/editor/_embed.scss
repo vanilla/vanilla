@@ -212,6 +212,7 @@ $embed-focus-color: #0291DB;
     @include absolute-fullSizeOfParent;
     background-size: cover;
     background-repeat: no-repeat;
+    background-position: center;
     cursor: pointer;
 }
 
@@ -231,6 +232,20 @@ $embed-focus-color: #0291DB;
     stroke: rgba(0, 0, 0, 0.1);
 }
 
+// External Embed
+.embedExternal {
+    display: flex;
+    justify-content: center;
+}
+
+.embedExternal-content {
+    display: inline-block;
+}
+
+.richEditor .twitter-tweet {
+    pointer-events: none;
+    margin: 0 !important;
+}
 
 // Embed link
 .embedLink {

@@ -9,7 +9,7 @@
  */
 
 import { onContent, onReady } from "@core/application";
-import { initializeAtComplete } from "./atwho";
+import { initializeAtComplete } from "@core/legacy/atwho";
 
 // Initialize legacy @mentions for all BodyBox elements.
 if ($.fn.atwho) {

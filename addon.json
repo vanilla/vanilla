@@ -3,10 +3,10 @@
     "build": {
         "process": "core",
         "entries": {
-            "bootstrap-app": "./src/scripts/bootstrap/bootstrap",
-            "bootstrap-admin": "./src/scripts/bootstrap/bootstrap",
             "app": "./src/scripts/app/core-app",
-            "polyfills": "./src/scripts/bootstrap/polyfills"
+            "polyfills": "./src/scripts/bootstrap/polyfills",
+            "bootstrap-app": "./src/scripts/bootstrap/bootstrap",
+            "bootstrap-admin": "./src/scripts/bootstrap/bootstrap"
         },
         "exports": {
             "*": [

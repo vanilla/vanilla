@@ -5,6 +5,7 @@
  */
 
 import * as utility from "@core/utility";
+import twemoji from "twemoji";
 
 /**
  * Use the browser's built-in functionality to quickly and safely escape a string.
@@ -107,7 +108,6 @@ export function delegateEvent(
 ): string | undefined {
     let functionKey = eventName + filterSelector + callback.toString();
 
-    /** @type {Document | Element} */
     let scope;
 
     if (typeof scopeSelector === "string") {
@@ -230,4 +230,91 @@ export function ensureHtmlElement(selectorOrElement) {
     }
 
     return selectorOrElement;
+}
+
+// Test Char for Emoji 5.0
+const testChar = "\uD83E\uDD96"; // U+1F996 T-Rex -> update test character with new emoji version support.
+
+let emojiSupportedCache: boolean | null = null;
+
+export function isEmojiSupported() {
+    if (emojiSupportedCache !== null) {
+        return emojiSupportedCache;
+    }
+
+    if (process.env.NODE_ENV !== "test") {
+        // Test environment
+        const canvas = document.createElement("canvas");
+        if (canvas.getContext && canvas.getContext("2d")) {
+            const pixelRatio = window.devicePixelRatio || 1;
+            const offset = 12 * pixelRatio;
+            const ctx = canvas.getContext("2d");
+            ctx!.fillStyle = "#f00";
+            ctx!.textBaseline = "top";
+            ctx!.font = "32px Arial";
+            ctx!.fillText(testChar, 0, 0);
+            emojiSupportedCache = ctx!.getImageData(offset, offset, 1, 1).data[0] !== 0;
+        } else {
+            emojiSupportedCache = false;
+        }
+    } else {
+        emojiSupportedCache = true;
+    }
+
+    return emojiSupportedCache;
+}
+
+const emojiOptions = {
+    className: "fallBackEmoji",
+    size: "72x72",
+};
+
+/**
+ * Returns either native emoji or fallback image
+ *
+ * @param stringOrNode - A DOM Node or string to convert.
+ */
+export function convertToSafeEmojiCharacters(stringOrNode: string | Node) {
+    if (isEmojiSupported()) {
+        return stringOrNode;
+    }
+    return twemoji.parse(stringOrNode, emojiOptions);
+}
+
+// A weakmap so we can store multiple load callbacks per script.
+const loadEventCallbacks: WeakMap<Node, Array<(event) => void>> = new WeakMap();
+
+/**
+ * Dynamically load a javascript file.
+ */
+export function ensureScript(scriptUrl: string) {
+    return new Promise(resolve => {
+        const existingScript: HTMLScriptElement | null = document.querySelector(`script[src='${scriptUrl}']`);
+        if (existingScript) {
+            if (loadEventCallbacks.has(existingScript)) {
+                // Add another resolveCallback into the weakmap.
+                const callbacks = loadEventCallbacks.get(existingScript);
+                callbacks && callbacks.push(resolve);
+            } else {
+                // Script is already loaded. Resolve immediately.
+                resolve();
+            }
+        } else {
+            // The script doesn't exist. Lets create it.
+            const head = document.getElementsByTagName("head")[0];
+            const script = document.createElement("script");
+            script.type = "text/javascript";
+            script.src = scriptUrl;
+
+            loadEventCallbacks.set(script, [resolve]);
+
+            script.onload = event => {
+                const callbacks = loadEventCallbacks.get(script);
+                callbacks && callbacks.forEach(callback => callback(event));
+                loadEventCallbacks.delete(script);
+            };
+
+            head.appendChild(script);
+        }
+    });
 }

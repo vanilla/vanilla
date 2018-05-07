@@ -1491,6 +1491,7 @@ body.hasRichEditor #ConversationForm .FormWrapper .richEditor {
   width: 100%;
   background-size: cover;
   background-repeat: no-repeat;
+  background-position: center;
   cursor: pointer;
 }
 
@@ -1508,6 +1509,20 @@ body.hasRichEditor #ConversationForm .FormWrapper .richEditor {
 
 .embedVideo-playIconPath {
   stroke: rgba(0, 0, 0, 0.1);
+}
+
+.embedExternal {
+  display: flex;
+  justify-content: center;
+}
+
+.embedExternal-content {
+  display: inline-block;
+}
+
+.richEditor .twitter-tweet {
+  pointer-events: none;
+  margin: 0 !important;
 }
 
 .embedLink {

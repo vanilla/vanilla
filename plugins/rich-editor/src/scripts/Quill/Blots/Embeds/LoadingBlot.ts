@@ -33,26 +33,4 @@ export default class LoadingBlot extends FocusableEmbedBlot {
     public static value() {
         return {};
     }
-
-    private deleteCallback?: () => void;
-
-    /**
-     * Register a callback for when the blot is detached.
-     *
-     * @param {function} callback - The callback to call.
-     */
-    public registerDeleteCallback(callback) {
-        this.deleteCallback = callback;
-    }
-
-    /**
-     * Call the delete callback if set when detaching.
-     */
-    public detach() {
-        if (this.deleteCallback) {
-            this.deleteCallback();
-        }
-
-        super.detach();
-    }
 }

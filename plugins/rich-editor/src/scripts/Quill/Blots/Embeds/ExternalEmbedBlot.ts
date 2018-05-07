@@ -8,6 +8,7 @@ import { setData, getData } from "@core/dom";
 import LoadingBlot from "../Embeds/LoadingBlot";
 import { IEmbedData, renderEmbed } from "@core/embeds";
 import FocusableEmbedBlot from "../Abstract/FocusableEmbedBlot";
+import ErrorBlot from "./ErrorBlot";
 
 const DATA_KEY = "__loading-data__";
 
@@ -34,22 +35,26 @@ export default class ExternalEmbedBlot extends FocusableEmbedBlot {
         return node as HTMLElement;
     }
 
-    public static async createAsync(dataPromise: Promise<IEmbedData> | IEmbedData): Promise<ExternalEmbedBlot> {
-        const data = await dataPromise;
-        const rootNode = document.createElement("div");
-        const embedNode = document.createElement("div");
-        rootNode.setAttribute("contenteditable", false);
-        rootNode.classList.add("embed");
-        rootNode.classList.add(this.className);
-        rootNode.classList.add("embedExternal");
-        embedNode.classList.add("embedExternal-content");
-        embedNode.classList.add(this.FOCUS_CLASS);
-        rootNode.appendChild(embedNode);
+    public static async createAsync(dataPromise: Promise<IEmbedData> | IEmbedData): Promise<FocusableEmbedBlot> {
+        try {
+            const data = await dataPromise;
+            const rootNode = document.createElement("div");
+            const embedNode = document.createElement("div");
+            rootNode.setAttribute("contenteditable", false);
+            rootNode.classList.add("embed");
+            rootNode.classList.add(this.className);
+            rootNode.classList.add("embedExternal");
+            embedNode.classList.add("embedExternal-content");
+            embedNode.classList.add(this.FOCUS_CLASS);
+            rootNode.appendChild(embedNode);
 
-        setData(rootNode, "data", data);
+            setData(rootNode, "data", data);
 
-        const finalNode = await renderEmbed(embedNode, data);
-        return new ExternalEmbedBlot(rootNode);
+            const finalNode = await renderEmbed(embedNode, data);
+            return new ExternalEmbedBlot(rootNode);
+        } catch (e) {
+            return new ErrorBlot(ErrorBlot.create(e));
+        }
     }
 
     public static value(node) {

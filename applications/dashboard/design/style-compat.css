@@ -781,6 +781,11 @@ label.checkbox input.checkbox-input {
 }
 
 .popover-title {
+  word-break: break-all;
+  word-break: break-word;
+  text-overflow: ellipsis;
+  overflow-x: hidden;
+  max-width: 100%;
   margin: 0;
   max-width: calc(100% - 39px);
   min-height: 27px;
@@ -837,6 +842,8 @@ label.checkbox input.checkbox-input {
   width: 39px;
   height: 39px;
   font-size: 24px;
+  text-align: center;
+  overflow: hidden;
 }
 
 .richEditor ~ .TextBoxWrapper {
@@ -1004,6 +1011,7 @@ label.checkbox input.checkbox-input {
 .userContent code,
 .userContent a,
 .userContent p {
+  word-break: break-all;
   word-break: break-word;
   text-overflow: ellipsis;
   line-height: 1.5;

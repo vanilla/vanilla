@@ -198,20 +198,22 @@ abstract class Authenticator {
                         continue;
                     }
                     if ($index === 4) {
+                        // It's an rgba. If this value is valid then everything is valid.
                         return $value === '0' || $value === '1' || preg_match('/^0.\d{1,2}$/', $value);
                     }
-                    if (!filter_var($value, FILTER_VALIDATE_INT, ['options' => ['min_range' => 0, 'max_range' => 255]])) {
+                    if (filter_var($value, FILTER_VALIDATE_INT, ['options' => ['min_range' => 0, 'max_range' => 255]]) === false) {
                         return false;
                     }
                 }
 
+                // It's an rgb and everything matched. Let's just "make sure" by ensuring that there was 4 matches.
                 return count($matches) === 4;
             };
 
             if (preg_match('/^#(?:[0-9A-F]{3}){1,2}$/i', $data)) {
                 $valid = true;
             } else {
-                if (preg_match('/^rgb\((\d+),\s(\d+),\s(\d+)\)$/', $data, $matches) || preg_match('/^rgba\((\d+),\s?(\d+),\s?(\d+),\s?([^\s)]+?)\)$/', $data, $matches)) {
+                if (preg_match('/^rgb\((\d+),\s?(\d+),\s?(\d+)\)$/', $data, $matches) || preg_match('/^rgba\((\d+),\s?(\d+),\s?(\d+),\s?([^\s)]+?)\)$/', $data, $matches)) {
                     $valid = $rgbaValuesValidator($matches);
                 } else {
                     $valid = false;

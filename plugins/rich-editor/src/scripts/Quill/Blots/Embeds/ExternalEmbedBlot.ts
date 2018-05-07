@@ -5,12 +5,18 @@
  */
 
 import { setData, getData } from "@core/dom";
+import Parchment from "parchment";
+import uniqueId from "lodash/uniqueId";
 import LoadingBlot from "../Embeds/LoadingBlot";
 import { IEmbedData, renderEmbed } from "@core/embeds";
 import FocusableEmbedBlot from "../Abstract/FocusableEmbedBlot";
 import ErrorBlot from "./ErrorBlot";
+import { t } from "@core/application";
+import Quill, { Blot } from "quill/core";
 
-const DATA_KEY = "__loading-data__";
+const loadingDataKey = "__loading-data__";
+
+const loaderKeys = new Set();
 
 export default class ExternalEmbedBlot extends FocusableEmbedBlot {
     public static readonly FOCUS_CLASS = "embed-focusableElement";
@@ -23,53 +29,58 @@ export default class ExternalEmbedBlot extends FocusableEmbedBlot {
      */
     public static create(data: any): any {
         const node = LoadingBlot.create(data);
-        setData(node, DATA_KEY, data);
+        setData(node, loadingDataKey, data);
         return node;
     }
 
     public static createNode(data: any) {
-        const node = document.createElement("div");
-        node.setAttribute("contenteditable", false);
-        node.classList.add("embed");
-        node.classList.add(this.FOCUS_CLASS);
-        return node as HTMLElement;
+        return FocusableEmbedBlot.create(data);
     }
 
-    public static async createAsync(dataPromise: Promise<IEmbedData> | IEmbedData): Promise<FocusableEmbedBlot> {
+    public static async createAsync(dataPromise: Promise<IEmbedData> | IEmbedData): Promise<Blot> {
+        let data;
         try {
-            const data = await dataPromise;
-            const rootNode = document.createElement("div");
+            data = await dataPromise;
+            const rootNode = this.createNode(data);
             const embedNode = document.createElement("div");
-            rootNode.setAttribute("contenteditable", false);
-            rootNode.classList.add("embed");
-            rootNode.classList.add(this.className);
+            const descriptionNode = document.createElement("span");
             rootNode.classList.add("embedExternal");
+            rootNode.classList.remove(this.FOCUS_CLASS);
+            descriptionNode.innerHTML = t("richEditor.externalEmbed.description");
+            descriptionNode.classList.add("sr-only");
+            descriptionNode.id = uniqueId("richEditor-embed-description-");
+
             embedNode.classList.add("embedExternal-content");
             embedNode.classList.add(this.FOCUS_CLASS);
+            embedNode.setAttribute("aria-label", "External embed content - " + data.type);
+            embedNode.setAttribute("aria-describedby", descriptionNode.id);
+
             rootNode.appendChild(embedNode);
+            rootNode.appendChild(descriptionNode);
 
-            setData(rootNode, "data", data);
-
-            const finalNode = await renderEmbed(embedNode, data);
-            return new ExternalEmbedBlot(rootNode);
+            await renderEmbed(embedNode, data);
+            setData(rootNode, loadingDataKey, data);
+            return new ExternalEmbedBlot(rootNode, false);
         } catch (e) {
             return new ErrorBlot(ErrorBlot.create(e));
         }
     }
 
     public static value(node) {
-        return getData(node, "data");
+        return getData(node, loadingDataKey, "loading");
     }
 
-    constructor(domNode) {
+    constructor(domNode, needsSetup = true) {
         super(domNode);
-        const loadingData = getData(domNode, DATA_KEY, null);
+        const loadingData = getData(domNode, loadingDataKey, false);
 
-        if (loadingData) {
+        if (loadingData && needsSetup) {
             // This is intentionally a floating promise. We want to immediately return the loading blot if this was created using ExternalEmbedBlot.create(), in which case a loading blot will be returned immediately, but will be replaced with a final blot later.
             // tslint:disable-next-line:no-floating-promises
             this.statics.createAsync(loadingData).then(blot => {
-                this.replaceWith(blot);
+                if (this.domNode.parentNode && this.scroll) {
+                    this.replaceWith(blot);
+                }
             });
         }
     }

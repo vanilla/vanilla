@@ -58,7 +58,7 @@ export default class EmbedInsertionModule extends Module {
             index: this.lastSelection.index + 2,
             length: 0,
         };
-        this.quill.setSelection(newSelection, Quill.sources.USER);
+        // this.quill.setSelection(newSelection, Quill.sources.USER);
     };
 
     /**

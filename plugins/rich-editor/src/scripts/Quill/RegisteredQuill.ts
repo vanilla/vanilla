@@ -36,6 +36,7 @@ import VanillaTheme from "./VanillaTheme";
 import EmbedFocusModule from "./EmbedFocusModule";
 import EmbedInsertionModule from "./EmbedInsertionModule";
 import HistoryModule from "./HistoryModule";
+import LoadingBlot from "./Blots/Embeds/LoadingBlot";
 
 Quill.register(
     {
@@ -52,6 +53,7 @@ Quill.register(
         "formats/list": List,
         "formats/list/item": ListItem,
         "formats/embed-error": EmbedErrorBlot,
+        "formats/embed-loading": LoadingBlot,
         "formats/embed-external": ExternalEmbedBlot,
         "formats/mention": MentionBlot,
         "formats/mention-combobox": MentionComboBoxBlot,

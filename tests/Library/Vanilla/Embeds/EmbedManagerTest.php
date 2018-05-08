@@ -111,16 +111,17 @@ class EmbedManagerTest extends TestCase {
                         "videoID" => "9bZkp7q19f0"
                     ]
                 ],
-                '<span class="VideoWrap">
-    <span class="Video YouTube" data-youtube="youtube-9bZkp7q19f0?autoplay=1">
-        <span class="VideoPreview">
-            <a href="https://www.youtube.com/watch?v=9bZkp7q19f0">
-                <img src="https://img.youtube.com/vi/9bZkp7q19f0/0.jpg" width="480" height="270" border="0" />
-            </a>
-        </span>
-        <span class="VideoPlayer"></span>
-    </span>
-</span>'
+                '<div class="embed-video embed embedVideo">
+    <div class="embedVideo-ratio is16by9" style="">
+        <button type="button" data-url="https://www.youtube.com/embed/9bZkp7q19f0?feature=oembed&amp;autoplay=1" aria-label="YouTube" class="embedVideo-playButton iconButton js-playVideo" style="background-image: url(https://img.youtube.com/vi/9bZkp7q19f0/0.jpg);">
+            <svg class="embedVideo-playIcon" xmlns="http://www.w3.org/2000/svg" viewBox="-1 -1 24 24">
+                <title>Play Video</title>
+                <path class="embedVideo-playIconPath embedVideo-playIconPath-circle" style="fill: currentColor; stroke-width: .3;" d="M11,0A11,11,0,1,0,22,11,11,11,0,0,0,11,0Zm0,20.308A9.308,9.308,0,1,1,20.308,11,9.308,9.308,0,0,1,11,20.308Z"></path>
+                <polygon class="embedVideo-playIconPath embedVideo-playIconPath-triangle" style="fill: currentColor; stroke-width: .3;" points="8.609 6.696 8.609 15.304 16.261 11 8.609 6.696"></polygon>
+            </svg>
+        </button>
+    </div>
+</div>'
             ],
             [
                 [
@@ -137,7 +138,17 @@ class EmbedManagerTest extends TestCase {
                         "videoID" => "264197456"
                     ]
                 ],
-                '<iframe src="https://player.vimeo.com/video/264197456" width="640" height="272" frameborder="0" webkitallowfullscreen mozallowfullscreen allowfullscreen></iframe>'
+                '<div class="embed-video embed embedVideo">
+    <div class="embedVideo-ratio" style="padding-top: 42.5%;">
+        <button type="button" data-url="https://player.vimeo.com/video/264197456?autoplay=1" aria-label="Vimeo" class="embedVideo-playButton iconButton js-playVideo" style="background-image: url(https://i.vimeocdn.com/video/694532899_640.jpg);">
+            <svg class="embedVideo-playIcon" xmlns="http://www.w3.org/2000/svg" viewBox="-1 -1 24 24">
+                <title>Play Video</title>
+                <path class="embedVideo-playIconPath embedVideo-playIconPath-circle" style="fill: currentColor; stroke-width: .3;" d="M11,0A11,11,0,1,0,22,11,11,11,0,0,0,11,0Zm0,20.308A9.308,9.308,0,1,1,20.308,11,9.308,9.308,0,0,1,11,20.308Z"></path>
+                <polygon class="embedVideo-playIconPath embedVideo-playIconPath-triangle" style="fill: currentColor; stroke-width: .3;" points="8.609 6.696 8.609 15.304 16.261 11 8.609 6.696"></polygon>
+            </svg>
+        </button>
+    </div>
+</div>'
             ]
         ];
         return $data;

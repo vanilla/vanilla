@@ -23,6 +23,7 @@ class Parser {
      * The blot types to check for. Not all blot types are used at the top level.
      */
     private $blotClasses = [
+        Blots\Embeds\ExternalBlot::class,
         Blots\CodeBlockBlot::class,
         Blots\SpoilerLineBlot::class,
         Blots\BlockquoteLineBlot::class,
@@ -30,7 +31,6 @@ class Parser {
         Blots\BulletedListBlot::class,
         Blots\OrderedListBlot::class,
         Blots\Embeds\EmojiBlot::class,
-        Blots\Embeds\ExternalBlot::class,
         Blots\TextBlot::class,
     ];
 

@@ -90,6 +90,6 @@ abstract class AbstractBlockBlot extends TextBlot {
      * @inheritDoc
      */
     public function hasConsumedNextOp(): bool {
-        return true;
+        return $this::matches([$this->nextOperation]) && !$this::matches([$this->currentOperation]);
     }
 }

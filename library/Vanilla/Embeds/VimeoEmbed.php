@@ -9,7 +9,7 @@ namespace Vanilla\Embeds;
 /**
  * Vimeo embed.
  */
-class VimeoEmbed extends Embed {
+class VimeoEmbed extends VideoEmbed {
 
     const DEFAULT_HEIGHT = 270;
 
@@ -66,14 +66,11 @@ class VimeoEmbed extends Embed {
         $videoID = $attributes['videoID'] ?? null;
         $height = $data['height'] ?? self::DEFAULT_HEIGHT;
         $width = $data['width'] ?? self::DEFAULT_WIDTH;
+        $name = $data['name'] ?? '';
+        $photoURL = $data['photoUrl'] ?? '';
+        $embedUrl = "https://player.vimeo.com/video/{$videoID}?autoplay=1";
 
-        $videoIDEncoded = htmlspecialchars($videoID);
-        $heightEncoded = htmlspecialchars($height);
-        $widthEncoded = htmlspecialchars($width);
-
-        $result = <<<HTML
-<iframe src="https://player.vimeo.com/video/{$videoIDEncoded}" width="{$widthEncoded}" height="{$heightEncoded}" frameborder="0" webkitallowfullscreen mozallowfullscreen allowfullscreen></iframe>
-HTML;
+        $result = $this->videoCode($embedUrl, $name, $photoURL, $width, $height);
         return $result;
     }
 }

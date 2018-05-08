@@ -135,7 +135,8 @@ class EmbedManagerTest extends TestCase {
                     "attributes" => [
                         "thumbnail_width" => 640,
                         "thumbnail_height" => 272,
-                        "videoID" => "264197456"
+                        "videoID" => "264197456",
+                        "embedUrl" => "https://player.vimeo.com/video/264197456?autoplay=1",
                     ]
                 ],
                 '<div class="embed-video embed embedVideo">

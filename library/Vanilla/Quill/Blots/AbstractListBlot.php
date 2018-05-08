@@ -45,7 +45,7 @@ abstract class AbstractListBlot extends AbstractBlockBlot {
     public function render(): string {
         $classString = "";
         $indentLevel = valr("attributes.indent", $this->currentOperation)
-            || valr("attributes.indent", $this->nextOperation);
+            ?: valr("attributes.indent", $this->nextOperation);
         if ($indentLevel && filter_var($indentLevel, FILTER_VALIDATE_INT) !== false) {
             $classString = " class=\"ql-indent-$indentLevel\"";
         }

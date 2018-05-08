@@ -105,3 +105,11 @@
     overflow-x: hidden;
     max-width: 100%;
 }
+
+@mixin longWordEllipsis {
+    word-break: break-all;
+    word-break: break-word;
+    text-overflow: ellipsis;
+    overflow-x: hidden;
+    max-width: 100%;
+}

@@ -295,6 +295,7 @@ $embedded-quote_fg: #A3A3A3 !default;
 }
 
 .popover-title {
+    @include longWordEllipsis;
     margin: 0;
     max-width: calc(100% - #{$richEditor-menuButton_size});
     min-height: #{$richEditor-menuButton_size - $richEditor-insertPopover_paddingVertical};
@@ -355,6 +356,8 @@ $embedded-quote_fg: #A3A3A3 !default;
     width: $richEditor-menuButton_size;
     height: $richEditor-menuButton_size;
     font-size: $richEditor-icon_size;
+    text-align: center;
+    overflow: hidden;
 }
 
 .richEditor ~ .TextBoxWrapper {
@@ -540,6 +543,7 @@ $embedded-quote_fg: #A3A3A3 !default;
     a,
     p
     {
+        word-break: break-all;
         word-break: break-word;
         text-overflow: ellipsis;
         line-height: 1.5;

@@ -32,6 +32,13 @@ interface IState extends IRequiredComponentID {
 }
 
 class PasswordForm extends React.Component<IProps, IState> {
+    public static getDerivedStateFromProps(nextProps, prevState) {
+        prevState.usernameErrors = nextProps.usernameErrors;
+        prevState.passwordErrors = nextProps.passwordErrors;
+        prevState.globalError = nextProps.globalError;
+        return prevState;
+    }
+
     private username: InputTextBlock;
     private password: InputTextBlock;
 
@@ -89,7 +96,7 @@ class PasswordForm extends React.Component<IProps, IState> {
         if (globalError || hasFieldSpecificErrors) {
             if (hasFieldSpecificErrors) {
                 globalError = ""; // Only show global error if all fields are error free
-                log("PasswordForm Errors", errors);
+                logError("PasswordForm Errors", errors);
                 errors.forEach((error, index) => {
                     error.timestamp = new Date().getTime(); // Timestamp to make sure state changes, even if the message is the same
                     if (error.field === "password") {

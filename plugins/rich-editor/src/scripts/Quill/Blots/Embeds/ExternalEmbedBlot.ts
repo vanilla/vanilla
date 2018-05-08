@@ -70,6 +70,8 @@ export default class ExternalEmbedBlot extends FocusableEmbedBlot {
         return getData(node, loadingDataKey, "loading");
     }
 
+    private loadCallback?: () => void;
+
     constructor(domNode, needsSetup = true) {
         super(domNode);
         const loadingData = getData(domNode, loadingDataKey, false);
@@ -79,28 +81,17 @@ export default class ExternalEmbedBlot extends FocusableEmbedBlot {
             // tslint:disable-next-line:no-floating-promises
             this.statics.createAsync(loadingData).then(blot => {
                 if (this.domNode.parentNode && this.scroll) {
-                    const selection = this.quill.getSelection();
                     this.replaceWith(blot);
-
-                    // This LOVELY null selection then setImmediate call are needed because the Twitter embed
-                    // seems to resolve it's promise before it's fully rendered. As a result the paragraph menu
-                    // position would get set based on the unrendered twitter card height.
-                    this.quill.setSelection(null as any, Quill.sources.USER);
-                    setImmediate(() => {
-                        this.quill.setSelection(selection, Quill.sources.USER);
-                    });
+                    if (this.loadCallback) {
+                        this.loadCallback();
+                        this.loadCallback = undefined;
+                    }
                 }
             });
         }
     }
 
-    /**
-     * Get a reference to the Quill instance from inside of the blot.
-     *
-     * Be careful not to use this before attach() is called or their will be no
-     * scroll blot yet.
-     */
-    get quill(): Quill {
-        return Quill.find(this.scroll.domNode.parentNode!);
+    public registerLoadCallback(callback: () => void) {
+        this.loadCallback = callback;
     }
 }

@@ -49,13 +49,22 @@ export default class EmbedInsertionModule extends Module {
         const externalEmbed = Parchment.create("embed-external", dataPromise) as ExternalEmbedBlot;
         const [currentLine] = this.quill.getLine(this.lastSelection.index);
         const referenceBlot = currentLine.split(this.lastSelection.index);
+        const newSelection = {
+            index: this.lastSelection.index + 2,
+            length: 0,
+        };
         externalEmbed.insertInto(this.quill.scroll, referenceBlot);
-
-        // const newSelection = {
-        //     index: this.lastSelection.index + 1,
-        //     length: 0,
-        // };
-        // this.quill.setSelection(newSelection, Quill.sources.USER);
+        externalEmbed.registerLoadCallback(() => {
+            // This LOVELY null selection then setImmediate call are needed because the Twitter embed
+            // seems to resolve it's promise before it's fully rendered. As a result the paragraph menu
+            // position would get set based on the unrendered twitter card height.
+            this.quill.setSelection(null as any, Quill.sources.USER);
+            setImmediate(() => {
+                this.quill.setSelection(newSelection, Quill.sources.USER);
+            });
+        });
+        this.quill.update(Quill.sources.USER);
+        this.quill.setSelection(newSelection, Quill.sources.USER);
     };
 
     /**

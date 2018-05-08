@@ -12,9 +12,11 @@ import LinkBlot from "quill/formats/link";
 import { t, isAllowedUrl } from "@core/application";
 import SelectionPositionToolbar from "./SelectionPositionToolbarContainer";
 import Toolbar from "./Generic/Toolbar";
-import * as quillUtilities from "../Quill/utility";
 import { withEditor, IEditorContextProps } from "./ContextProvider";
 import { IMenuItemData } from "./Generic/MenuItem";
+import CodeBlot from "../Quill/Blots/Inline/CodeBlot";
+import { rangeContainsBlot, CLOSE_FLYOUT_EVENT, disableAllBlotsInRange } from "../Quill/utility";
+import CodeBlockBlot from "../Quill/Blots/Blocks/CodeBlockBlot";
 
 interface IProps extends IEditorContextProps {}
 
@@ -80,18 +82,31 @@ export class InlineToolbar extends React.Component<IProps, IState> {
                 {t("Inline Menu Available")}
             </span>
         );
+        const restrictedFormats = this.restrictedFormats;
+        let formatMenuVisibility = this.state.showLink ? "hidden" : "ignore";
+        let linkMenuVisibility = this.state.showLink ? "visible" : "hidden";
+
+        if (this.inCodeBlock) {
+            formatMenuVisibility = "hidden";
+            linkMenuVisibility = "hidden";
+        }
+
         return (
             <div>
                 <SelectionPositionToolbar
                     setVisibility={this.setVisibilityOfMenu}
-                    forceVisibility={this.state.showLink ? "hidden" : "ignore"}
+                    forceVisibility={formatMenuVisibility}
                 >
                     {alertMessage}
-                    <Toolbar menuItems={this.menuItems} onBlur={this.toolbarBlurHandler} />
+                    <Toolbar
+                        restrictedFormats={restrictedFormats}
+                        menuItems={this.menuItems}
+                        onBlur={this.toolbarBlurHandler}
+                    />
                 </SelectionPositionToolbar>
                 <SelectionPositionToolbar
                     setVisibility={this.setVisibilityOfUrlInput}
-                    forceVisibility={this.state.showLink ? "visible" : "hidden"}
+                    forceVisibility={linkMenuVisibility}
                 >
                     <div className="richEditor-menu FlyoutMenu insertLink" role="dialog" aria-label={t("Insert Url")}>
                         <input
@@ -120,7 +135,7 @@ export class InlineToolbar extends React.Component<IProps, IState> {
     public componentDidMount() {
         this.quill.on(Quill.events.SELECTION_CHANGE, this.handleSelectionChange);
         document.addEventListener("keydown", this.escFunction, false);
-        document.addEventListener(quillUtilities.CLOSE_FLYOUT_EVENT, this.clearLinkInput);
+        document.addEventListener(CLOSE_FLYOUT_EVENT, this.clearLinkInput);
 
         // Add a key binding for the link popup.
         const keyboard: Keyboard = this.quill.getModule("keyboard");
@@ -140,14 +155,36 @@ export class InlineToolbar extends React.Component<IProps, IState> {
     public componentWillUnmount() {
         this.quill.off(Quill.events.SELECTION_CHANGE, this.handleSelectionChange);
         document.removeEventListener("keydown", this.escFunction, false);
-        document.removeEventListener(quillUtilities.CLOSE_FLYOUT_EVENT, this.clearLinkInput);
+        document.removeEventListener(CLOSE_FLYOUT_EVENT, this.clearLinkInput);
+    }
+
+    private get restrictedFormats(): string[] | null {
+        const selection = this.quill.getSelection();
+        if (!selection) {
+            return null;
+        }
+
+        const formats = this.quill.getFormat(selection);
+        if (rangeContainsBlot(this.quill, selection, CodeBlot)) {
+            return Object.keys(this.menuItems).filter(key => key !== "code");
+        } else {
+            return null;
+        }
+    }
+
+    private get inCodeBlock(): boolean {
+        const selection = this.quill.getSelection();
+        if (!selection) {
+            return false;
+        }
+        return rangeContainsBlot(this.quill, selection, CodeBlockBlot);
     }
 
     private commandKHandler = () => {
         const range = this.quill.getSelection();
         if (range.length) {
-            if (quillUtilities.rangeContainsBlot(this.quill, range, LinkBlot)) {
-                quillUtilities.disableAllBlotsInRange(this.quill, range, LinkBlot);
+            if (rangeContainsBlot(this.quill, range, LinkBlot)) {
+                disableAllBlotsInRange(this.quill, range, LinkBlot);
                 this.clearLinkInput();
                 this.quill.update(Quill.sources.USER);
             } else {
@@ -203,7 +240,7 @@ export class InlineToolbar extends React.Component<IProps, IState> {
     private linkFormatter(menuItemData: IMenuItemData) {
         if (menuItemData.active) {
             const range = this.quill.getSelection();
-            quillUtilities.disableAllBlotsInRange(this.quill, range, LinkBlot);
+            disableAllBlotsInRange(this.quill, range, LinkBlot);
             this.clearLinkInput();
         } else {
             this.focusLinkInput();

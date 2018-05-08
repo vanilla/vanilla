@@ -5,11 +5,13 @@
  */
 
 import { Code } from "quill/formats/code";
+import Text from "quill/blots/text";
 
 export default class CodeBlot extends Code {
     public static blotName = "code-inline";
     public static tagName = "code";
     public static className = "code-inline";
+    // public static allowedChildren = [Text];
 
     constructor(domNode) {
         super(domNode);

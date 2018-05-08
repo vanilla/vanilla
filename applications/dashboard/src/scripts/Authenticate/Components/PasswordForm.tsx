@@ -90,7 +90,7 @@ class PasswordForm extends React.Component<IProps, IState> {
             if (hasFieldSpecificErrors) {
                 globalError = ""; // Only show global error if all fields are error free
                 log("PasswordForm Errors", errors);
-                errors.map((error, index) => {
+                errors.forEach((error, index) => {
                     error.timestamp = new Date().getTime(); // Timestamp to make sure state changes, even if the message is the same
                     if (error.field === "password") {
                         passwordErrors = [...passwordErrors, error];

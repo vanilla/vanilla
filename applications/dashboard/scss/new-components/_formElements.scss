@@ -51,6 +51,17 @@ $fontSize-small: 12px !default;
     color: #ff3933;
     line-height: $lineHeight-base;
     font-size: $fontSize-small;
+    margin-top: 3px;
+    word-break: break-all;
+    word-break: break-word;
+
+    &:first-letter {
+        text-transform: capitalize;
+    }
+
+    + .inputBlock-error {
+        margin-top: 6px;
+    }
 }
 
 .inputBlock-inputWrap {
@@ -69,6 +80,10 @@ $fontSize-small: 12px !default;
 }
 
 .authenticateUser-paragraph {
+    word-break: break-all;
+    word-break: break-word;
+
+
     &.isError {
         color: #ff3933;
     }

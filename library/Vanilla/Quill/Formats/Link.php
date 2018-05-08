@@ -37,7 +37,7 @@ class Link extends AbstractFormat {
      */
     protected function getAttributes(): array {
         return [
-            "href" => $this->currentOperation["attributes"]["link"],
+            "href" => htmlspecialchars($this->currentOperation["attributes"]["link"]),
             "target" => "_blank",
         ];
     }

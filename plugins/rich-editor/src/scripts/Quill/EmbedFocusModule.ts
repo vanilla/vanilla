@@ -139,15 +139,39 @@ export default class EmbedFocusModule extends Module {
         }, true);
     };
 
+    /**
+     * Ensure that we have references to certain editor elements that we may want to focus.
+     *
+     * This is necessary because they are not mounted yet when this class is constructed.
+     */
     private ensureEditorElements() {
-        this.paragraphMenuHandle = this.editorRoot.querySelector(".richEditorParagraphMenu-handle") as HTMLElement;
-        this.inlineToolbarFirstItem = this.editorRoot.querySelector(
-            ".richEditor-inlineToolbarContainer .richEditor-menuItem:first-child",
-        ) as HTMLElement;
-        this.emojiPickerButton = this.editorRoot.querySelector(".emojiPicker > .richEditor-button") as HTMLElement;
+        if (!this.paragraphMenuHandle) {
+            this.paragraphMenuHandle = this.editorRoot.querySelector(".richEditorParagraphMenu-handle") as HTMLElement;
+        }
+
+        if (!this.inlineToolbarFirstItem) {
+            this.inlineToolbarFirstItem = this.editorRoot.querySelector(
+                ".richEditor-inlineToolbarContainer .richEditor-menuItem:first-child",
+            ) as HTMLElement;
+        }
+
+        if (!this.emojiPickerButton) {
+            this.emojiPickerButton = this.editorRoot.querySelector(".emojiPicker > .richEditor-button") as HTMLElement;
+        }
+
         return this.paragraphMenuHandle && this.inlineToolbarFirstItem && this.emojiPickerButton;
     }
 
+    /**
+     * Manually handle tab presses.
+     *
+     * Because it can be next to impossible to control focus once it shifts into an embedded iframe
+     * or shadow dom root, the EmbedFocusManager is now manually handling all tab and shift-tab shortcuts
+     * to move focus between the various editor elements.
+     *
+     * Once you are outside of the editor there is nothing to worry about.
+     * This only affects while the cursor is in the editor or inside of an embed blot.
+     */
     private handleTab = (event: KeyboardEvent) => {
         if (
             !KeyboardModule.match(event, {
@@ -166,6 +190,7 @@ export default class EmbedFocusModule extends Module {
         const focusItemIsEmbedBlot = blotForActiveElement instanceof FocusableEmbedBlot;
         if (this.quill.hasFocus() || focusItemIsEmbedBlot) {
             event.preventDefault();
+            // Focus the next available editor ui component.
             const selection = this.quill.getSelection();
             if (!focusItemIsEmbedBlot) {
                 if (selection.length > 0) {
@@ -182,6 +207,16 @@ export default class EmbedFocusModule extends Module {
         return true;
     };
 
+    /**
+     * Manually handle tab presses.
+     *
+     * Because it can be next to impossible to control focus once it shifts into an embedded iframe
+     * or shadow dom root, the EmbedFocusManager is now manually handling all tab and shift-tab shortcuts
+     * to move focus between the various editor elements.
+     *
+     * Once you are outside of the editor there is nothing to worry about.
+     * This only affects while the cursor is in the editor or inside of an embed blot.
+     */
     private handleShiftTab = (event: KeyboardEvent) => {
         if (
             !KeyboardModule.match(event, {
@@ -205,6 +240,7 @@ export default class EmbedFocusModule extends Module {
 
         if (definiteLastItemIsFocused || emojiPickerIsConditionallyFocused) {
             event.preventDefault();
+            // Focus the last item in the editor whether it is normal text or an embed blot.
             const selection = this.quill.getSelection();
             const documentLength = this.quill.scroll.length();
             const newIndex = selection ? selection.index + selection.length : documentLength - 1;

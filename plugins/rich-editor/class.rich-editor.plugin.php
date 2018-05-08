@@ -37,7 +37,7 @@ class RichEditorPlugin extends Gdn_Plugin {
     }
 
     /**
-     * Add the style script to the head
+     * Load JS
      *
      * @param Gdn_Controller $sender
      * @return void
@@ -46,22 +46,41 @@ class RichEditorPlugin extends Gdn_Plugin {
         if (inSection("Dashboard")) {
             return;
         }
-
-        // Check to see if we need to add a class on the body for the rich editor.
-        $form = val('Form', $sender, false);
-        if ($form) {
-            $formData = $form->formData();
-            if ($formData) {
-                if (val('Format', $formData) === "Rich" || val('Body', $formData, false) === null) { // New Discussion or edit discussion
-                    $sender->CssClass .= ' hasRichEditor';
-                }
-            } elseif ($sender->CommentModel) { // New Comments should be using Rich Editor
-                $sender->CssClass .= ' hasRichEditor';
-            }
-        }
-
         $sender->addDefinition("editor", "RichEditor");
     }
+
+    /**
+     * Check to see if we should be using the Rich Editor
+     * @param Gdn_Controller $sender
+     */
+    public function isRichFormat($sender):bool {
+        $form = val('Form', $sender, $sender); // May already be "Form" object
+        $data = $form->formData();
+        return strcmp(val('Format', $data, "Rich"), "Rich") === 0;
+    }
+
+
+    /**
+     *
+     * @param Gdn_Controller $sender
+     */
+    public function base_beforeCommentForm_handler($sender) {
+        if ($this->isRichFormat($sender)) {
+            $sender->CssClass .= ' hasRichEditor';
+        }
+    }
+
+    /**
+     *
+     * @param Gdn_Controller $sender
+     * @throws Exception
+     */
+    public function postController_render_before($sender) {
+        if ($this->isRichFormat($sender)) {
+            $sender->CssClass .= ' hasRichEditor';
+        }
+    }
+
 
     /**
      * Attach editor anywhere 'BodyBox' is used.
@@ -71,17 +90,10 @@ class RichEditorPlugin extends Gdn_Plugin {
      * @param Gdn_Form $sender
      */
     public function gdn_form_beforeBodyBox_handler($sender, $args) {
-
-        $data = [];
-        if ($sender->formData()) {
-            $data = $sender->formData();
-        }
-
-        if (val('Format', $data) === "Rich") {
+        if ($this->isRichFormat($sender)) {
             /** @var Gdn_Controller $controller */
             $controller = Gdn::controller();
             $editorID = $this->getEditorID();
-
             $controller->setData('editorData', [
                 'editorID' => $editorID,
                 'editorDescriptionID' => 'richEditor-'.$editorID.'-description',
@@ -92,4 +104,5 @@ class RichEditorPlugin extends Gdn_Plugin {
             $args['BodyBox'] = $controller->fetchView('rich-editor', '', 'plugins/rich-editor');
         }
     }
+
 }

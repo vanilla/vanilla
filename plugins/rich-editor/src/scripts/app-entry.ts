@@ -14,8 +14,9 @@ setupCommentEditForm();
  */
 function setupEditor() {
     const discussionFormContainer = document.querySelectorAll(".js-richText");
-
-    discussionFormContainer.forEach(mountEditor);
+    if (discussionFormContainer.length > 0) {
+        discussionFormContainer.forEach(mountEditor);
+    }
 }
 
 /**
@@ -24,7 +25,7 @@ function setupEditor() {
 function setupCommentEditForm() {
     $(document).on("EditCommentFormLoaded", (event, container) => {
         const $commentFormContainer = $(container).find(".js-richText");
-        if ($commentFormContainer) {
+        if ($commentFormContainer.length > 0) {
             mountEditor($commentFormContainer[0]);
         }
     });

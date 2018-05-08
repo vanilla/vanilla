@@ -24,16 +24,19 @@ $embed-focus-color: #0291DB;
 }
 
 .embed-focusableElement {
-    transition: 0.2s ease outline;
-    outline: 2px transparent solid;
+    transition: 0.2s ease box-shadow;
     cursor: pointer;
 
+    &.embed-twitter {
+        border-radius: 4px;
+    }
+
     &:hover {
-        outline-color: rgba($embed-focus-color, 0.5);
+        box-shadow: 0 0 0 2px rgba($embed-focus-color, 0.5);
     }
 
     &:focus {
-        outline-color: $embed-focus-color;
+        box-shadow: 0 0 0 2px $embed-focus-color;
     }
 }
 

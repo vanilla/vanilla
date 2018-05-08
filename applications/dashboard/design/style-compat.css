@@ -1294,17 +1294,20 @@ body.hasRichEditor #ConversationForm .FormWrapper .richEditor {
 }
 
 .embed-focusableElement {
-  transition: 0.2s ease outline;
-  outline: 2px transparent solid;
+  transition: 0.2s ease box-shadow;
   cursor: pointer;
 }
 
+.embed-focusableElement.embed-twitter {
+  border-radius: 4px;
+}
+
 .embed-focusableElement:hover {
-  outline-color: rgba(2, 145, 219, 0.5);
+  box-shadow: 0 0 0 2px rgba(2, 145, 219, 0.5);
 }
 
 .embed-focusableElement:focus {
-  outline-color: #0291DB;
+  box-shadow: 0 0 0 2px #0291DB;
 }
 
 .embedLoader-icon {

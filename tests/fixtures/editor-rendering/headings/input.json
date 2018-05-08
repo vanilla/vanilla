@@ -1,4 +1,5 @@
 [
+    { "attributes": { "header": 1 }, "insert": "\n"},
     { "insert": "h1" },
     { "attributes": { "header": 1 }, "insert": "\n" },
     { "insert": "h2" },

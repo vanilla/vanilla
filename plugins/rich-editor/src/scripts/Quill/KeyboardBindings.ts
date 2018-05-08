@@ -14,6 +14,7 @@ import {
     insertNewLineAfterBlotAndTrim,
     insertNewLineAtEndOfScroll,
     insertNewLineAtStartOfScroll,
+    rangeContainsBlot,
 } from "./utility";
 import { isAllowedUrl } from "@core/application";
 import LineBlot from "./Blots/Abstract/LineBlot";
@@ -23,10 +24,11 @@ import EmbedInsertionModule from "./EmbedInsertionModule";
 import LinkBlot from "quill/formats/link";
 import BlockBlot from "quill/blots/block";
 import Parchment from "parchment";
+import CodeBlot from "./Blots/Inline/CodeBlot";
 
 export default class KeyboardBindings {
     private static MULTI_LINE_BLOTS = ["spoiler-line", "blockquote-line", "code-block"];
-    public bindings = {};
+    public bindings: any = {};
 
     constructor(private quill: Quill) {
         // Keyboard behaviours
@@ -35,6 +37,7 @@ export default class KeyboardBindings {
         this.addBlockArrowKeyHandlers();
         this.addBlockBackspaceHandlers();
         this.addLinkTransformKeyboardBindings();
+        this.overwriteFormatHandlers();
     }
 
     /**
@@ -354,6 +357,36 @@ export default class KeyboardBindings {
 
         return true;
     };
+
+    /**
+     * Overwrite quill's built in format handlers.
+     */
+    private overwriteFormatHandlers() {
+        this.bindings.bold = this.makeFormatHandler("bold");
+        this.bindings.italic = this.makeFormatHandler("italic");
+        this.bindings.underline = this.makeFormatHandler("underline");
+    }
+
+    /**
+     * Create a keyboard shortcut to enable/disable a format. These differ from Quill's built in
+     * keyboard shortcuts because they do not work if the selection contains a code-block or inline-code.
+     */
+    private makeFormatHandler(format) {
+        return {
+            key: format[0].toUpperCase(),
+            shortKey: true,
+            handler: (range, context) => {
+                if (
+                    rangeContainsBlot(this.quill, range, CodeBlockBlot) ||
+                    rangeContainsBlot(this.quill, range, CodeBlot)
+                ) {
+                    return;
+                }
+
+                this.quill.format(format, !context.format[format], Quill.sources.USER);
+            },
+        };
+    }
 
     /**
      * Add custom handlers for backspace inside of Blots.

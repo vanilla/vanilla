@@ -8,6 +8,8 @@ import { BlockEmbed } from "quill/blots/block";
 
 export default class FocusableEmbedBlot extends BlockEmbed {
     public static readonly FOCUS_CLASS = "embed-focusableElement";
+    public static tagName = "div";
+    public static className = "embed";
 
     public static create(value) {
         const node = super.create(value) as HTMLElement;
@@ -21,6 +23,7 @@ export default class FocusableEmbedBlot extends BlockEmbed {
     constructor(domNode) {
         super(domNode);
         this.getFocusableElement().setAttribute("tabindex", -1);
+        domNode.classList.add("embed");
     }
 
     public focus() {

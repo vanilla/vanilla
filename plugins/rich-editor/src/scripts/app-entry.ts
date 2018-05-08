@@ -5,7 +5,15 @@
  */
 
 import { mountEditor } from "./editor";
+import initImageEmbed from "./embeds/image";
+import initTwitterEmbed from "./embeds/twitter";
+import initVideoEmbed from "./embeds/video";
+import initLinkEmbed from "./embeds/link";
 
+initImageEmbed();
+initTwitterEmbed();
+initVideoEmbed();
+initLinkEmbed();
 setupEditor();
 setupCommentEditForm();
 

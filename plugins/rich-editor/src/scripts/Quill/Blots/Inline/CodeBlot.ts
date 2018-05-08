@@ -17,5 +17,6 @@ export default class CodeBlot extends Code {
         domNode.classList.add("code");
         domNode.classList.add("code-inline");
         domNode.classList.add("isInline");
+        domNode.setAttribute("spellcheck", false);
     }
 }

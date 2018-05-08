@@ -270,9 +270,6 @@ class Gdn_Form extends Gdn_Pluggable {
         touchValue('Wrap', $attributes, true);
         touchValue('class', $attributes, '');
         $attributes['class'] .= ' '.$this->getStyle('bodybox');
-        if (!array_key_exists("ImageUpload", $attributes) && !array_key_exists("FileUpload", $attributes)) {
-            $attributes["ImageUpload"] = true;
-        }
 
         $this->setValue('Format', val('Format', $attributes, $this->getValue('Format', Gdn_Format::defaultFormat())));
 

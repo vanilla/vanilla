@@ -326,7 +326,7 @@ class EditorPlugin extends Gdn_Plugin {
         $allowedEditorActions = $this->getAllowedEditorActions();
         $allowedEditorActions['emoji'] = Emoji::instance()->hasEditorList();
         $fileUpload = val('FileUpload', $attributes);
-        $imageUpload = $fileUpload || val('ImageUpload', $attributes);
+        $imageUpload = $fileUpload || val('ImageUpload', $attributes, true);
         if (($fileUpload || $imageUpload) && $this->canUpload()) {
             $allowedEditorActions['fileuploads'] = $fileUpload;
             $allowedEditorActions['imageuploads'] = $imageUpload;

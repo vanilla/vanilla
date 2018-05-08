@@ -943,6 +943,15 @@ class Gdn_Controller extends Gdn_Pluggable {
     }
 
     /**
+     * Get the current Head.
+     *
+     * @return mixed
+     */
+    public function getHead() {
+        return $this->Head;
+    }
+
+    /**
      *
      */
     public function getImports() {

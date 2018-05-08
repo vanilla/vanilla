@@ -111,6 +111,28 @@ class EmbedManager {
     }
 
     /**
+     * Given an embed type, get its necessary client-side scripts.
+     *
+     * @param string $type
+     * @return array
+     */
+    public function getScripts(string $type): array {
+        $scripts = [];
+
+        if (array_key_exists($type, $this->embeds)) {
+            $embed = $this->embeds[$type]['embed'];
+        } elseif (($defaultEmbed = $this->getDefaultEmbed()) && $type === $defaultEmbed->getType()) {
+            $embed = $defaultEmbed;
+        }
+
+        if ($embed instanceof Embed) {
+            $scripts = $embed->getScripts();
+        }
+
+        return $scripts;
+    }
+
+    /**
      * Get all valid embed types.
      *
      * @return array

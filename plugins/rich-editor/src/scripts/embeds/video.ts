@@ -13,6 +13,10 @@ export default function init() {
     registerEmbed("vimeo", renderer);
 }
 
+/**
+ * Render a video embed in the editor. The JS for handling playing/stopping these videos
+ * lives in @core/app/user-content.
+ */
 export async function renderer(node: HTMLElement, data: IEmbedData) {
     node.classList.add("embed-video");
     node.classList.add("embedVideo");

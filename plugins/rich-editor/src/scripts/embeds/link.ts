@@ -10,6 +10,9 @@ export default function init() {
     registerEmbed("link", renderer);
 }
 
+/**
+ * Render a link embed in the editor.
+ */
 export async function renderer(node: HTMLElement, data: IEmbedData) {
     node.classList.add("embed-link");
     node.classList.add("embedLink");

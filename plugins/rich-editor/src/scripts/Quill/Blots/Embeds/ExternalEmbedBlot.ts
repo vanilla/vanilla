@@ -19,14 +19,10 @@ const loadingDataKey = "__loading-data__";
 const loaderKeys = new Set();
 
 export default class ExternalEmbedBlot extends FocusableEmbedBlot {
-    public static readonly FOCUS_CLASS = "embed-focusableElement";
     public static blotName = "embed-external";
     public static className = "embed-external";
     public static tagName = "div";
 
-    /**
-     * @throws Always throws an error because this blot must be created asynchronously.
-     */
     public static create(data: any): any {
         const node = LoadingBlot.create(data);
         setData(node, loadingDataKey, data);
@@ -37,6 +33,10 @@ export default class ExternalEmbedBlot extends FocusableEmbedBlot {
         return FocusableEmbedBlot.create(data);
     }
 
+    /**
+     * Asynchronously create an embed blot. Feel free take your time, a loading indicator will be displayed
+     * until this function resolves. It's also responsible for handling errors, and will return an error blot instead if one occurs.
+     */
     public static async createAsync(dataPromise: Promise<IEmbedData> | IEmbedData): Promise<Blot> {
         let data;
         try {
@@ -79,9 +79,28 @@ export default class ExternalEmbedBlot extends FocusableEmbedBlot {
             // tslint:disable-next-line:no-floating-promises
             this.statics.createAsync(loadingData).then(blot => {
                 if (this.domNode.parentNode && this.scroll) {
+                    const selection = this.quill.getSelection();
                     this.replaceWith(blot);
+
+                    // This LOVELY null selection then setImmediate call are needed because the Twitter embed
+                    // seems to resolve it's promise before it's fully rendered. As a result the paragraph menu
+                    // position would get set based on the unrendered twitter card height.
+                    this.quill.setSelection(null as any, Quill.sources.USER);
+                    setImmediate(() => {
+                        this.quill.setSelection(selection, Quill.sources.USER);
+                    });
                 }
             });
         }
+    }
+
+    /**
+     * Get a reference to the Quill instance from inside of the blot.
+     *
+     * Be careful not to use this before attach() is called or their will be no
+     * scroll blot yet.
+     */
+    get quill(): Quill {
+        return Quill.find(this.scroll.domNode.parentNode!);
     }
 }

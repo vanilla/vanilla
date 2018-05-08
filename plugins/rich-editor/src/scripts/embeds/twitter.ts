@@ -12,6 +12,9 @@ export default function init() {
     registerEmbed("twitter", renderer);
 }
 
+/**
+ * Render a twitter embed in the editor. Ensure it's library exists before hand.
+ */
 export async function renderer(element: HTMLElement, data: IEmbedData) {
     await ensureScript("//platform.twitter.com/widgets.js");
 

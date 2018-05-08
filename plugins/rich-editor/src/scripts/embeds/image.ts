@@ -11,6 +11,9 @@ export default function init() {
     registerEmbed("image", renderer);
 }
 
+/**
+ * Render an image embed in the editor.
+ */
 export async function renderer(node: HTMLElement, data: IEmbedData) {
     node.classList.add("embed-image");
     node.classList.add("embedImage");

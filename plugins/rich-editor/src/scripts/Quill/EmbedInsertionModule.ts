@@ -11,6 +11,7 @@ import FileUploader from "@core/FileUploader";
 import Quill, { RangeStatic, Blot, Sources } from "quill/core";
 import api from "@core/apiv2";
 import ExternalEmbedBlot from "./Blots/Embeds/ExternalEmbedBlot";
+import { IEmbedData } from "@core/embeds";
 
 /**
  * A Quill module for managing insertion of embeds/loading/error states.
@@ -35,29 +36,25 @@ export default class EmbedInsertionModule extends Module {
         const formData = new FormData();
         formData.append("url", url);
 
-        // this.createLoadingEmbed(url);
-
         const responseData = api.post("/media/scrape", formData).then(result => result.data);
-
         this.createEmbed(responseData);
     }
 
     /**
-     * Place an loading embed into the document and keep a reference to it.
+     * Create an async embed. The embed will be responsible for handling it's loading state and error states.
      *
-     * @param lookupKey - The lookup key for the loading embed.
+     * @param dataPromise - A promise that will either return the data needed for rendering, or throw an error.
      */
-    private createEmbed = (dataPromise: any) => {
+    private createEmbed = (dataPromise: Promise<IEmbedData>) => {
         const externalEmbed = Parchment.create("embed-external", dataPromise) as ExternalEmbedBlot;
         const [currentLine] = this.quill.getLine(this.lastSelection.index);
         const referenceBlot = currentLine.split(this.lastSelection.index);
         externalEmbed.insertInto(this.quill.scroll, referenceBlot);
-        this.quill.update(Quill.sources.USER);
 
-        const newSelection = {
-            index: this.lastSelection.index + 2,
-            length: 0,
-        };
+        // const newSelection = {
+        //     index: this.lastSelection.index + 1,
+        //     length: 0,
+        // };
         // this.quill.setSelection(newSelection, Quill.sources.USER);
     };
 

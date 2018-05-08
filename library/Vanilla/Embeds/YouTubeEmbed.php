@@ -73,7 +73,7 @@ class YouTubeEmbed extends VideoEmbed {
         if (array_key_exists('rel', $query)) {
             $attributes['rel'] = (bool)$query['rel'];
         }
-        $attributes['embedUrl'] = $this->getEmbedUrl($attributes);
+        $attributes['embedUrl'] = $this->embedUrl($attributes);
         $data['attributes'] = $attributes;
 
         return $data;
@@ -88,13 +88,13 @@ class YouTubeEmbed extends VideoEmbed {
         $width = $data['width'] ?? self::DEFAULT_WIDTH;
         $name = $data['name'] ?? '';
         $videoID = $attributes['videoID'] ?? null;
-        $embedUrl = $this->getEmbedUrl($attributes);
+        $embedUrl = $attributes['embedUrl'] ?? $this->embedUrl($attributes);
         $photoUrl = "https://img.youtube.com/vi/{$videoID}/0.jpg";
 
         return $this->videoCode($embedUrl, $name, $photoUrl, $width, $height);
     }
 
-    private function getEmbedUrl(array $attributes) {
+    private function embedUrl(array $attributes) {
         $listID = $attributes['listID'] ?? null;
         $start = $attributes['start'] ?? null;
         $videoID = $attributes['videoID'] ?? null;

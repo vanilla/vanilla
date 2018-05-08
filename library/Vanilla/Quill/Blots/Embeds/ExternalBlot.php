@@ -27,23 +27,6 @@ class ExternalBlot extends AbstractBlockEmbedBlot {
     }
 
     /**
-     * Add client-side scripts to the current controller.
-     *
-     * @param array $scripts
-     */
-    private function addScripts(array $scripts) {
-        /** @var Gdn_Controller $controller */
-        $controller = Gdn::getContainer()->get(Gdn_Controller::class);
-        $head = $controller->getHead();
-
-        if ($head instanceof HeadModule) {
-            foreach ($scripts as $script) {
-                $head->addScript($script, 'text/javascript', false, ['defer' => 'true']);
-            }
-        }
-    }
-
-    /**
      * @inheritDoc
      */
     protected static function getInsertKey(): string {
@@ -60,11 +43,6 @@ class ExternalBlot extends AbstractBlockEmbedBlot {
             $rendered = <<<HTML
 <div contenteditable="false" class="embed embed-external embedExternal"><div class="embedExternal-content embed-focusableElement embed-{$type}">{$embedRendered}</div></div>
 HTML;
-
-            $scripts = $this->embedManager->getScripts($type);
-            if ($scripts) {
-                $this->addScripts($scripts);
-            }
         } catch (\Exception $e) {
             $rendered = ''; // Silently fail.
         }

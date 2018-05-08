@@ -25,6 +25,13 @@ interface IProps extends IOptionalComponentID {
 }
 
 export default class RecoverPasswordPage extends React.Component<IProps, IState> {
+
+    public static getDerivedStateFromProps(nextProps, prevState) {
+        prevState.globalError = nextProps.globalError;
+        prevState.errors = nextProps.errors;
+        return prevState;
+    }
+
     public id: string;
     public pageTitleID: string;
     public email: InputTextBlock;

@@ -52,7 +52,7 @@ class RichEditorPlugin extends Gdn_Plugin {
         if ($form) {
             $formData = $form->formData();
             if ($formData) {
-                if (val('Format', $formData) === "Rich") { // New Discussion or edit discussion
+                if (val('Format', $formData) === "Rich" || val('Body', $formData, false) === null) { // New Discussion or edit discussion
                     $sender->CssClass .= ' hasRichEditor';
                 }
             } elseif ($sender->CommentModel) { // New Comments should be using Rich Editor

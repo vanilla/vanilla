@@ -12,6 +12,7 @@ test("matches snapshot", () => {
             isActive={true}
             isFirst={false}
             isLast={false}
+            disabled={false}
         />,
     );
 
@@ -28,6 +29,7 @@ test("click handler is called", () => {
             isActive={true}
             isFirst={false}
             isLast={false}
+            disabled={false}
         />,
     );
     item.find(".richEditor-button").simulate("click");

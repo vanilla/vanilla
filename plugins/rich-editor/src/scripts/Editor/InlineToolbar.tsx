@@ -46,6 +46,7 @@ export class InlineToolbar extends React.Component<IProps, IState> {
         code: {
             formatName: "code-inline",
             active: false,
+            formatter: this.codeFormatter.bind(this),
         },
         link: {
             active: false,
@@ -158,20 +159,34 @@ export class InlineToolbar extends React.Component<IProps, IState> {
         document.removeEventListener(CLOSE_FLYOUT_EVENT, this.clearLinkInput);
     }
 
+    /**
+     * Get the restricted formats for the format toolbar.
+     *
+     * Should exclude everything else if inline code is selected.
+     */
     private get restrictedFormats(): string[] | null {
-        const selection = this.quill.getSelection();
-        if (!selection) {
-            return null;
-        }
-
-        const formats = this.quill.getFormat(selection);
-        if (rangeContainsBlot(this.quill, selection, CodeBlot)) {
+        if (this.inCodeInline) {
             return Object.keys(this.menuItems).filter(key => key !== "code");
         } else {
             return null;
         }
     }
 
+    /**
+     * Determine if the current selection contains an inline code format.
+     */
+    private get inCodeInline(): boolean {
+        const selection = this.quill.getSelection();
+        if (!selection) {
+            return false;
+        }
+
+        return rangeContainsBlot(this.quill, selection, CodeBlot);
+    }
+
+    /**
+     * Determine if the current selection contains a code block.
+     */
     private get inCodeBlock(): boolean {
         const selection = this.quill.getSelection();
         if (!selection) {
@@ -180,9 +195,12 @@ export class InlineToolbar extends React.Component<IProps, IState> {
         return rangeContainsBlot(this.quill, selection, CodeBlockBlot);
     }
 
+    /**
+     * Handle create-link keyboard shortcut.
+     */
     private commandKHandler = () => {
         const range = this.quill.getSelection();
-        if (range.length) {
+        if (range.length && !this.inCodeInline && !this.inCodeBlock) {
             if (rangeContainsBlot(this.quill, range, LinkBlot)) {
                 disableAllBlotsInRange(this.quill, range, LinkBlot);
                 this.clearLinkInput();
@@ -245,6 +263,15 @@ export class InlineToolbar extends React.Component<IProps, IState> {
         } else {
             this.focusLinkInput();
         }
+    }
+
+    /**
+     * Be sure to strip out all other formats before formatting as code.
+     */
+    private codeFormatter() {
+        const selection = this.quill.getSelection();
+        this.quill.removeFormat(selection.index, selection.length, Quill.sources.API);
+        this.quill.formatText(selection.index, selection.length, "code-inline", Quill.sources.USER);
     }
 
     /**

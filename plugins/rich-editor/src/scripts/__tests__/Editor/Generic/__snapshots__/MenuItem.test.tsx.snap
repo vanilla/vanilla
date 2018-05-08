@@ -5,6 +5,7 @@ ShallowWrapper {
   "length": 1,
   Symbol(enzyme.__root__): [Circular],
   Symbol(enzyme.__unrendered__): <MenuItem
+    disabled={false}
     isActive={true}
     isFirst={false}
     isLast={false}
@@ -28,6 +29,7 @@ ShallowWrapper {
       "aria-pressed": true,
       "children": <bold />,
       "className": "richEditor-button richEditor-menuItem isActive",
+      "disabled": false,
       "onBlur": [Function],
       "onClick": [Function],
       "onKeyDown": [Function],
@@ -56,6 +58,7 @@ ShallowWrapper {
         "aria-pressed": true,
         "children": <bold />,
         "className": "richEditor-button richEditor-menuItem isActive",
+        "disabled": false,
         "onBlur": [Function],
         "onClick": [Function],
         "onKeyDown": [Function],

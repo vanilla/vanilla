@@ -136,6 +136,22 @@ export function isInstanceOfOneOf(needle: any, haystack: IClass[]) {
     return false;
 }
 
+export function simplifyFraction(numerator: number, denominator: number) {
+    const findGCD = (a, b) => {
+        return b ? findGCD(b, a % b) : a;
+    };
+    const gcd = findGCD(numerator, denominator);
+
+    numerator = numerator / gcd;
+    denominator = denominator / gcd;
+
+    return {
+        numerator,
+        denominator,
+        shorthand: denominator + ":" + numerator,
+    };
+}
+
 interface IMentionMatch {
     match: string;
     rawMatch: string;

@@ -24,16 +24,19 @@ $embed-focus-color: #0291DB;
 }
 
 .embed-focusableElement {
-    transition: 0.2s ease outline;
-    outline: 2px transparent solid;
+    transition: 0.2s ease box-shadow;
     cursor: pointer;
 
+    &.embed-twitter {
+        border-radius: 4px;
+    }
+
     &:hover {
-        outline-color: rgba($embed-focus-color, 0.5);
+        box-shadow: 0 0 0 2px rgba($embed-focus-color, 0.5);
     }
 
     &:focus {
-        outline-color: $embed-focus-color;
+        box-shadow: 0 0 0 2px $embed-focus-color;
     }
 }
 
@@ -212,7 +215,17 @@ $embed-focus-color: #0291DB;
     @include absolute-fullSizeOfParent;
     background-size: cover;
     background-repeat: no-repeat;
+    background-position: center;
     cursor: pointer;
+    overflow: hidden;
+
+    &::before {
+        $bg: rgba(#000, 0.4);
+        content: "";
+        display: block;
+        @include absolute-fullSizeOfParent;
+        background: linear-gradient(to bottom, $bg, $bg);
+    }
 }
 
 .embedVideo-playIcon {
@@ -231,6 +244,23 @@ $embed-focus-color: #0291DB;
     stroke: rgba(0, 0, 0, 0.1);
 }
 
+// External Embed
+.embedExternal {
+    display: flex;
+    justify-content: center;
+}
+
+.embedExternal-content {
+    display: inline-block;
+}
+
+.twitter-tweet {
+    margin: 0 !important;
+}
+
+.richEditor .twitter-tweet {
+    pointer-events: none;
+}
 
 // Embed link
 .embedLink {

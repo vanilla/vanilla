@@ -290,7 +290,8 @@ class MediaTest extends AbstractAPIv2Test {
                     'height' => null,
                     'width' => null,
                     'attributes' => [
-                        'videoID' => '1234567890'
+                        'videoID' => '1234567890',
+                        'embedUrl' => 'https://player.vimeo.com/video/1234567890?autoplay=1'
                     ],
                 ]
             ],
@@ -304,7 +305,8 @@ class MediaTest extends AbstractAPIv2Test {
                     'height' => null,
                     'width' => null,
                     'attributes' => [
-                        'videoID' => '9bZkp7q19f0'
+                        'videoID' => '9bZkp7q19f0',
+                        'embedUrl' => 'https://www.youtube.com/embed/9bZkp7q19f0?feature=oembed&autoplay=1',
                     ],
                 ]
             ],
@@ -318,7 +320,8 @@ class MediaTest extends AbstractAPIv2Test {
                     'height' => null,
                     'width' => null,
                     'attributes' => [
-                        'videoID' => '9bZkp7q19f0'
+                        'videoID' => '9bZkp7q19f0',
+                        'embedUrl' => 'https://www.youtube.com/embed/9bZkp7q19f0?feature=oembed&autoplay=1',
                     ],
                 ]
             ],
@@ -334,6 +337,7 @@ class MediaTest extends AbstractAPIv2Test {
                     'attributes' => [
                         'videoID' => '9bZkp7q19f0',
                         'start' => 182,
+                        'embedUrl' => 'https://www.youtube.com/embed/9bZkp7q19f0?feature=oembed&autoplay=1&start=182',
                     ],
                 ]
             ],
@@ -349,6 +353,7 @@ class MediaTest extends AbstractAPIv2Test {
                     'attributes' => [
                         'videoID' => '9bZkp7q19f0',
                         'start' => 182,
+                        'embedUrl' => 'https://www.youtube.com/embed/9bZkp7q19f0?feature=oembed&autoplay=1&start=182',
                     ],
                 ]
             ]

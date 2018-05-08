@@ -54,7 +54,8 @@ class HeadingBlot extends AbstractBlockBlot {
      * @throws \Exception if the level is not a valid integer.
      */
     private function getHeadingLevel(): int {
-        $level = valr("attributes.header", $this->nextOperation);
+        $level = valr("attributes.header", $this->currentOperation)
+            ?: valr("attributes.header", $this->nextOperation);
         if (!in_array($level, self::$validLevels)) {
             throw new \Exception("Invalid heading level");
         }

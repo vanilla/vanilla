@@ -245,9 +245,12 @@ $embed-focus-color: #0291DB;
     display: inline-block;
 }
 
+.twitter-tweet {
+    margin: 0 !important;
+}
+
 .richEditor .twitter-tweet {
     pointer-events: none;
-    margin: 0 !important;
 }
 
 // Embed link

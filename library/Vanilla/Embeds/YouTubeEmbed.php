@@ -73,6 +73,7 @@ class YouTubeEmbed extends VideoEmbed {
         if (array_key_exists('rel', $query)) {
             $attributes['rel'] = (bool)$query['rel'];
         }
+        $attributes['embedUrl'] = $this->getEmbedUrl($attributes);
         $data['attributes'] = $attributes;
 
         return $data;
@@ -82,32 +83,30 @@ class YouTubeEmbed extends VideoEmbed {
      * @inheritdoc
      */
     public function renderData(array $data): string {
+        $attributes = $data['attributes'] ?? [];
         $height = $data['height'] ?? self::DEFAULT_HEIGHT;
         $width = $data['width'] ?? self::DEFAULT_WIDTH;
         $name = $data['name'] ?? '';
+        $videoID = $attributes['videoID'] ?? null;
+        $embedUrl = $this->getEmbedUrl($attributes);
+        $photoUrl = "https://img.youtube.com/vi/{$videoID}/0.jpg";
 
-        $attributes = $data['attributes'] ?? [];
+        return $this->videoCode($embedUrl, $name, $photoUrl, $width, $height);
+    }
+
+    private function getEmbedUrl(array $attributes) {
         $listID = $attributes['listID'] ?? null;
         $start = $attributes['start'] ?? null;
         $videoID = $attributes['videoID'] ?? null;
         $rel = $attributes['rel'] ?? null;
 
-        $attrHeight = htmlspecialchars($height);
-        $attrWidth = htmlspecialchars($width);
-
-        if ($listID) {
-            if ($videoID) {
-                $embedUrl = "https://www.youtube.com/embed/{$videoID}?list={$listID}";
+        if ($listID !== null) {
+            if ($videoID !== null) {
+                return "https://www.youtube.com/embed/{$videoID}?list={$listID}";
             } else {
-                $embedUrl = "https://www.youtube.com/embed/videoseries?list={$listID}";
+                return "https://www.youtube.com/embed/videoseries?list={$listID}";
             }
-
-            $attrEmbedUrl = htmlspecialchars($embedUrl);
-
-            $result = <<<HTML
-<iframe width="{$attrWidth}" height="{$attrHeight}" src="{$attrEmbedUrl}" frameborder="0" allowfullscreen></iframe>
-HTML;
-        } elseif ($videoID) {
+        } elseif ($videoID !== null) {
             $params = "feature=oembed&autoplay=1";
             // Show related videos?
             if ($rel !== null) {
@@ -118,14 +117,9 @@ HTML;
                 $params .= "&start={$start}";
             }
 
-            $embedUrl = "https://www.youtube.com/embed/{$videoID}?{$params}";
-            $photoUrl = "https://img.youtube.com/vi/{$videoID}/0.jpg";
-
-            $result = $this->videoCode($embedUrl, $name, $photoUrl, $width, $height);
+            return "https://www.youtube.com/embed/{$videoID}?{$params}";
         } else {
             throw new InvalidArgumentException('Unable to generate YouTube markup.');
         }
-
-        return $result;
     }
 }

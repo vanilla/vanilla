@@ -217,6 +217,15 @@ $embed-focus-color: #0291DB;
     background-repeat: no-repeat;
     background-position: center;
     cursor: pointer;
+    overflow: hidden;
+
+    &::before {
+        $bg: rgba(#000, 0.4);
+        content: "";
+        display: block;
+        @include absolute-fullSizeOfParent;
+        background: linear-gradient(to bottom, $bg, $bg);
+    }
 }
 
 .embedVideo-playIcon {

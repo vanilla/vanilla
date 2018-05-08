@@ -53,6 +53,7 @@ class VimeoEmbed extends VideoEmbed {
                 $data['attributes'] = [];
             }
             $data['attributes']['videoID'] = $matches['videoID'];
+            $data['attributes']['embedUrl'] = "https://player.vimeo.com/video/{$matches['videoID']}?autoplay=1";
         }
 
         return $data;
@@ -63,12 +64,11 @@ class VimeoEmbed extends VideoEmbed {
      */
     public function renderData(array $data): string {
         $attributes = $data['attributes'] ?? [];
-        $videoID = $attributes['videoID'] ?? null;
+        $embedUrl = $attributes['embedUrl'] ?? '';
         $height = $data['height'] ?? self::DEFAULT_HEIGHT;
         $width = $data['width'] ?? self::DEFAULT_WIDTH;
         $name = $data['name'] ?? '';
         $photoURL = $data['photoUrl'] ?? '';
-        $embedUrl = "https://player.vimeo.com/video/{$videoID}?autoplay=1";
 
         $result = $this->videoCode($embedUrl, $name, $photoURL, $width, $height);
         return $result;

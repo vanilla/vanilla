@@ -14,6 +14,9 @@ interface IProps {
     location?: any;
     password: string;
     username: string;
+    globalError?: string;
+    passwordErrors?: string[];
+    usernameErrors?: string[];
 }
 
 interface IState extends IRequiredComponentID {
@@ -29,6 +32,13 @@ interface IState extends IRequiredComponentID {
 }
 
 class PasswordForm extends React.Component<IProps, IState> {
+    public static getDerivedStateFromProps(nextProps, prevState) {
+        prevState.usernameErrors = nextProps.usernameErrors;
+        prevState.passwordErrors = nextProps.passwordErrors;
+        prevState.globalError = nextProps.globalError;
+        return prevState;
+    }
+
     private username: InputTextBlock;
     private password: InputTextBlock;
 
@@ -45,8 +55,9 @@ class PasswordForm extends React.Component<IProps, IState> {
             redirectTo: null,
             submitEnabled: false,
             rememberMe: true,
-            passwordErrors: [],
-            usernameErrors: [],
+            usernameErrors: props.usernameErrors || [],
+            passwordErrors: props.passwordErrors || [],
+            globalError: props.globalError,
         };
     }
 
@@ -75,55 +86,61 @@ class PasswordForm extends React.Component<IProps, IState> {
     };
 
     public handleErrors = e => {
-        const errors = get(e, "response.data.errors", []);
-        const generalError = get(e, "response.data.message", false);
         const catchAllErrorMessage = t("An error has occurred, please try again.");
+        let globalError = get(e, "response.data.message", false);
+        const errors = get(e, "response.data.errors", []);
         const hasFieldSpecificErrors = errors.length > 0;
+        let passwordErrors: string[] = [];
+        let usernameErrors: string[] = [];
 
-        const newState: any = {
-            editable: true,
-            globalError: null,
-            passwordErrors: [],
-            usernameErrors: [],
-        };
-
-        if (generalError || hasFieldSpecificErrors) {
+        if (globalError || hasFieldSpecificErrors) {
             if (hasFieldSpecificErrors) {
-                // Field Errors
+                globalError = ""; // Only show global error if all fields are error free
                 logError("PasswordForm Errors", errors);
-                errors.map((error, index) => {
+                errors.forEach((error, index) => {
                     error.timestamp = new Date().getTime(); // Timestamp to make sure state changes, even if the message is the same
-                    const targetError = error.field + "Errors";
-
-                    if (newState[targetError]) {
-                        newState[targetError] = [...newState[targetError], error];
+                    if (error.field === "password") {
+                        passwordErrors = [...passwordErrors, error];
+                    } else if (error.field === "username") {
+                        usernameErrors = [...usernameErrors, error];
                     } else {
-                        newState[targetError] = [];
-                        newState[targetError].push(error);
+                        // Unhandled error
+                        globalError = catchAllErrorMessage;
+                        logError("PasswordForm - Unhandled error field", error);
                     }
                 });
-            } else {
-                // Global message
-                newState.globalError = generalError;
             }
         } else {
             // Something went really wrong. Add default message to tell the user there's a problem.
-            newState.globalError = catchAllErrorMessage;
+            logError("PasswordForm - Failure to handle errors from response -", e);
+            globalError = catchAllErrorMessage;
         }
-        this.setState(newState, () => {
-            const hasGlobalError = !!this.state.globalError;
-            const hasPasswordError = this.state.passwordErrors.length > 0;
-            const hasUsernameError = this.state.usernameErrors.length > 0;
-
-            if (hasGlobalError && !hasPasswordError && !hasUsernameError) {
-                this.username.select();
-            } else if (hasUsernameError) {
-                this.username.select();
-            } else if (hasPasswordError) {
-                this.password.select();
-            }
-        });
+        this.setErrors(globalError, passwordErrors, usernameErrors);
     };
+
+    public setErrors(globalError, passwordErrors: string[], usernameErrors: string[]) {
+        this.setState(
+            {
+                editable: true,
+                passwordErrors,
+                usernameErrors,
+                globalError,
+            },
+            () => {
+                const hasGlobalError = !!this.state.globalError;
+                const hasPasswordError = this.state.passwordErrors.length > 0;
+                const hasUsernameError = this.state.usernameErrors.length > 0;
+
+                if (hasGlobalError && !hasPasswordError && !hasUsernameError) {
+                    this.username.select();
+                } else if (hasUsernameError) {
+                    this.username.select();
+                } else if (hasPasswordError) {
+                    this.password.select();
+                }
+            },
+        );
+    }
 
     public handleSubmit = event => {
         event.preventDefault();

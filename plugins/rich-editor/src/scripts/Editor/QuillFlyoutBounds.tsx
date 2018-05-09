@@ -124,7 +124,7 @@ class QuillFlyoutBounds extends React.PureComponent<IProps, IState> {
 
         if (selection && selection.length > 0) {
             const content = this.quill.getText(selection.index, selection.length);
-            const isNewLinesOnly = /(\n){1,}/.test(content);
+            const isNewLinesOnly = !content.match(/[^\n]/);
 
             if (!isNewLinesOnly) {
                 this.setState({ selectionIndex: selection.index, selectionLength: selection.length });

@@ -304,7 +304,16 @@ declare module "quill/modules/formula";
 declare module "quill/modules/history" {
     import Module from "quill/core/module";
 
+    interface UndoItem {
+        undo: any;
+        redo: any;
+    }
+
     export default class History extends Module {
+        protected stack: {
+            undo: UndoItem[];
+        };
+        protected ignoreChange: boolean;
         public undo(): void;
         public redo(): void;
         public change(source, dest): void;

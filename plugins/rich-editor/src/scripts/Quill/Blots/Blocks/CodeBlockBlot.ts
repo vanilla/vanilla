@@ -5,11 +5,15 @@
  */
 
 import CodeBlock from "quill/formats/code";
+import Text from "quill/blots/text";
+import Break from "quill/blots/break";
+import Cursor from "quill/blots/cursor";
 
 export default class CodeBlockBlot extends CodeBlock {
     public static blotName = "code-block";
     public static tagName = "code";
     public static className = "code-block";
+    public static allowedChildren = [Text, Break, Cursor];
 
     public static create(value) {
         const domNode = super.create(value) as HTMLElement;

@@ -169,6 +169,10 @@ export class ParagraphToolbar extends React.PureComponent<IEditorContextProps, I
                     enableValue: true,
                     active: false,
                 };
+
+                if (formatName === "code-block") {
+                    initialToolbarItems[(contents as any).name].formatter = this.codeFormatter;
+                }
             }
         }
 
@@ -191,6 +195,16 @@ export class ParagraphToolbar extends React.PureComponent<IEditorContextProps, I
             ...initialToolbarItems,
         };
     }
+
+    /**
+     * Be sure to strip out all other formats before formatting as code.
+     */
+    private codeFormatter = () => {
+        const selection = this.quill.getSelection();
+        const [line] = this.quill.getLine(selection.index);
+        this.quill.removeFormat(line.offset(), line.length(), Quill.sources.API);
+        this.quill.formatLine(line.offset(), line.length(), "code-block", Quill.sources.USER);
+    };
 
     /**
      * Close the menu.

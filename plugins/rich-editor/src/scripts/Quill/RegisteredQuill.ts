@@ -77,7 +77,13 @@ Quill.register(
     true,
 );
 
-const blotsAllowingMentionComboBox = ["blots/block", "formats/bold", "formats/italic", "formats/strike"];
+const blotsAllowingMentionComboBox = [
+    "blots/block",
+    "formats/header",
+    "formats/bold",
+    "formats/italic",
+    "formats/strike",
+];
 
 blotsAllowingMentionComboBox.forEach(blotLookup => {
     const BlotClass = Quill.import(blotLookup);

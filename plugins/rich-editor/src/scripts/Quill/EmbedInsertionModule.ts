@@ -5,35 +5,19 @@
  */
 
 import Module from "quill/core/module";
-import KeyboardModule from "quill/modules/keyboard";
 import { closeEditorFlyouts } from "./utility";
 import Parchment from "parchment";
-import EmbedLoadingBlot from "./Blots/Embeds/LoadingBlot";
 import FileUploader from "@core/FileUploader";
-import { logError } from "@core/utility";
-import { t } from "@core/application";
-import Quill, { RangeStatic, Blot } from "quill/core";
-import Emitter from "quill/core/emitter";
+import Quill, { RangeStatic, Blot, Sources } from "quill/core";
 import api from "@core/apiv2";
-
-interface IMediaScrapeResult {
-    attributes: any[];
-    type: string;
-    url: string;
-    body: string | null;
-    name: string | null;
-    photoUrl: string | null;
-    height: string | null;
-    width: string | null;
-}
+import ExternalEmbedBlot from "./Blots/Embeds/ExternalEmbedBlot";
+import { IEmbedData } from "@core/embeds";
 
 /**
  * A Quill module for managing insertion of embeds/loading/error states.
  */
 export default class EmbedInsertionModule extends Module {
-    private currentUploads: Map<File | string, Blot> = new Map();
     private lastSelection: RangeStatic = { index: 0, length: 0 };
-    private pauseSelectionTracking = false;
     private fileUploader: FileUploader;
 
     constructor(public quill: Quill, options = {}) {
@@ -52,162 +36,42 @@ export default class EmbedInsertionModule extends Module {
         const formData = new FormData();
         formData.append("url", url);
 
-        this.createLoadingEmbed(url);
-
-        api
-            .post("/media/scrape", formData)
-            .then(result => {
-                switch (result.data.type) {
-                    case "link":
-                        this.createSiteEmbed(result.data);
-                        break;
-                    case "image":
-                        this.createExternalImageEmbed(result.data);
-                        break;
-                    default:
-                        this.createErrorEmbed(url, new Error(t("That type of embed is not currently supported.")));
-                        break;
-                }
-            })
-            .catch(error => {
-                if (error.response && error.response.data && error.response.data.message) {
-                    const message = error.response.data.message;
-
-                    if (message.startsWith("Failed to load URL")) {
-                        this.createErrorEmbed(url, new Error(t("There was an error processing that embed link.")));
-                        return;
-                    } else {
-                        this.createErrorEmbed(url, new Error(message));
-                        return;
-                    }
-                }
-
-                this.createErrorEmbed(url, error);
-            });
+        const responseData = api.post("/media/scrape", formData).then(result => result.data);
+        this.createEmbed(responseData);
     }
 
     /**
-     * Create a video embed.
-     */
-    private createVideoEmbed(scrapeResult: IMediaScrapeResult) {
-        const linkEmbed = Parchment.create("embed-video", scrapeResult);
-        const completedBlot = this.currentUploads.get(scrapeResult.url);
-
-        // The loading blot may have been undone/deleted since we created it.
-        if (completedBlot) {
-            completedBlot.replaceWith(linkEmbed);
-        }
-
-        this.currentUploads.delete(scrapeResult.url);
-    }
-
-    /**
-     * Create a site embed.
-     */
-    private createSiteEmbed(scrapeResult: IMediaScrapeResult) {
-        const { url, photoUrl, name, body } = scrapeResult;
-
-        const linkEmbed = Parchment.create("embed-link", {
-            url,
-            name,
-            linkImage: photoUrl,
-            excerpt: body,
-        });
-        const completedBlot = this.currentUploads.get(url);
-
-        // The loading blot may have been undone/deleted since we created it.
-        if (completedBlot) {
-            completedBlot.replaceWith(linkEmbed);
-        }
-
-        this.currentUploads.delete(url);
-    }
-
-    private createExternalImageEmbed(scrapeResult: IMediaScrapeResult) {
-        const { url, photoUrl, name } = scrapeResult;
-
-        const linkEmbed = Parchment.create("embed-image", {
-            url: photoUrl,
-            alt: name,
-        });
-        const completedBlot = this.currentUploads.get(url);
-
-        // The loading blot may have been undone/deleted since we created it.
-        if (completedBlot) {
-            completedBlot.replaceWith(linkEmbed);
-        }
-
-        this.currentUploads.delete(url);
-    }
-
-    /**
-     * Transform an loading embed into an error embed.
+     * Create an async embed. The embed will be responsible for handling it's loading state and error states.
      *
-     * @param lookupKey - The lookup key for the loading embed.
-     * @param error - The error thrown from the bad upload.
+     * @param dataPromise - A promise that will either return the data needed for rendering, or throw an error.
      */
-    private createErrorEmbed = (lookupKey: any, error: Error) => {
-        logError(error.message);
-
-        if (lookupKey == null) {
-            this.quill.insertEmbed(
-                this.lastSelection.index,
-                "embed-error",
-                { message: error.message },
-                Emitter.sources.USER,
-            );
-            return;
-        }
-
-        const errorBlot = Parchment.create("embed-error", { message: error.message });
-        const loadingBlot = this.currentUploads.get(lookupKey);
-
-        // The loading blot may have been undone/deleted since we created it.
-        if (loadingBlot) {
-            loadingBlot.replaceWith(errorBlot);
-        }
-
-        this.currentUploads.delete(lookupKey);
-    };
-
-    /**
-     * Place an loading embed into the document and keep a reference to it.
-     *
-     * @param lookupKey - The lookup key for the loading embed.
-     */
-    private createLoadingEmbed = (lookupKey: any) => {
-        this.pauseSelectionTracking = true;
-        const loadingBlot: EmbedLoadingBlot = Parchment.create("embed-loading", {}) as EmbedLoadingBlot;
+    private createEmbed = (dataPromise: Promise<IEmbedData>) => {
+        const externalEmbed = Parchment.create("embed-external", dataPromise) as ExternalEmbedBlot;
         const [currentLine] = this.quill.getLine(this.lastSelection.index);
         const referenceBlot = currentLine.split(this.lastSelection.index);
-        loadingBlot.insertInto(this.quill.scroll, referenceBlot);
-        this.quill.update(Emitter.sources.USER);
-
         const newSelection = {
             index: this.lastSelection.index + 2,
             length: 0,
         };
-        this.quill.setSelection(newSelection, Quill.sources.USER);
-
-        loadingBlot.registerDeleteCallback(() => {
-            if (this.currentUploads.has(lookupKey)) {
-                this.currentUploads.delete(lookupKey);
-                this.quill.update();
-
-                // Restore the selection.
+        externalEmbed.insertInto(this.quill.scroll, referenceBlot);
+        externalEmbed.registerLoadCallback(() => {
+            // This LOVELY null selection then setImmediate call are needed because the Twitter embed
+            // seems to resolve it's promise before it's fully rendered. As a result the paragraph menu
+            // position would get set based on the unrendered twitter card height.
+            this.quill.setSelection(null as any, Quill.sources.USER);
+            setImmediate(() => {
                 this.quill.setSelection(newSelection, Quill.sources.USER);
-            }
+            });
         });
-
-        this.currentUploads.set(lookupKey, loadingBlot);
-        this.pauseSelectionTracking = false;
+        this.quill.update(Quill.sources.USER);
+        this.quill.setSelection(newSelection, Quill.sources.USER);
     };
 
     /**
      * Setup a selection listener for quill.
      */
     private setupSelectionListener() {
-        this.quill.on(Emitter.events.EDITOR_CHANGE, this.handleEditorChange);
+        this.quill.on(Quill.events.EDITOR_CHANGE, this.handleEditorChange);
     }
 
     /**
@@ -216,8 +80,12 @@ export default class EmbedInsertionModule extends Module {
      * @param type - The event type. See {quill/core/emitter}
      * @param range - The new range.
      */
-    private handleEditorChange = (type: string, range: RangeStatic) => {
-        if (range && !this.pauseSelectionTracking) {
+    private handleEditorChange = (type: string, range: RangeStatic, oldRange: RangeStatic, source: Sources) => {
+        if (
+            range &&
+            (type === Quill.events.SELECTION_CHANGE || type === Quill.events.TEXT_CHANGE) &&
+            source !== Quill.sources.SILENT
+        ) {
             if (typeof range.index !== "number") {
                 range = this.quill.getSelection();
             }
@@ -232,30 +100,11 @@ export default class EmbedInsertionModule extends Module {
      * Setup image upload listeners and handlers.
      */
     private setupImageUploads() {
-        this.fileUploader = new FileUploader(this.createLoadingEmbed, this.onImageUploadSuccess, this.createErrorEmbed);
-
+        this.fileUploader = new FileUploader(this.createEmbed);
         this.quill.root.addEventListener("drop", this.fileUploader.dropHandler, false);
         this.quill.root.addEventListener("paste", this.fileUploader.pasteHandler, false);
         this.setupImageUploadButton();
     }
-
-    /**
-     * Handler for a successful image upload.
-     *
-     * @param file - The file being uploaded.
-     * @param response - The axios response from the api request.
-     */
-    private onImageUploadSuccess = (file: File, response: any) => {
-        const imageEmbed = Parchment.create("embed-image", { url: response.data.url });
-        const completedBlot = this.currentUploads.get(file);
-
-        // The loading blot may have been undone/deleted since we created it.
-        if (completedBlot) {
-            completedBlot.replaceWith(imageEmbed);
-        }
-
-        this.currentUploads.delete(file);
-    };
 
     /**
      * Setup the the fake file input for image uploads.

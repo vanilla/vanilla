@@ -440,6 +440,9 @@ if (!function_exists('getCommentOptions')) :
         // Can the user edit the comment?
         $canEdit = CommentModel::canEdit($comment, $timeLeft, $discussion);
         if ($canEdit) {
+            if ($timeLeft) {
+                $timeLeft = ' ('.Gdn_Format::seconds($timeLeft).')';
+            }
             $options['EditComment'] = [
                 'Label' => t('Edit').$timeLeft,
                 'Url' => '/post/editcomment/'.$comment->CommentID,

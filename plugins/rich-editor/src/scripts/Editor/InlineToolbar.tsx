@@ -119,7 +119,7 @@ export class InlineToolbar extends React.Component<IProps, IState> {
      * Mount quill listeners.
      */
     public componentDidMount() {
-        this.quill.on(Quill.events.SELECTION_CHANGE, this.handleSelectionChange);
+        this.quill.on(Quill.events.EDITOR_CHANGE, this.handleEditorChange);
         document.addEventListener("keydown", this.escFunction, false);
         document.addEventListener("click", event => {
             const editorRoot = this.quill.root.closest(".richEditor")!;
@@ -149,7 +149,7 @@ export class InlineToolbar extends React.Component<IProps, IState> {
      * Be sure to remove the listeners when the component unmounts.
      */
     public componentWillUnmount() {
-        this.quill.off(Quill.events.SELECTION_CHANGE, this.handleSelectionChange);
+        this.quill.off(Quill.events.EDITOR_CHANGE, this.handleEditorChange);
         document.removeEventListener("keydown", this.escFunction, false);
         document.removeEventListener(CLOSE_FLYOUT_EVENT, this.clearLinkInput);
     }
@@ -252,8 +252,9 @@ export class InlineToolbar extends React.Component<IProps, IState> {
     /**
      * Handle changes from the editor.
      */
-    private handleSelectionChange = (range: RangeStatic, oldRange: RangeStatic, source: Sources) => {
-        if (this.ignoreSelectionChange) {
+    private handleEditorChange = (type: string, range: RangeStatic, oldRange: RangeStatic, source: Sources) => {
+        const isTextOrSelectionChange = type === Quill.events.SELECTION_CHANGE || type === Quill.events.TEXT_CHANGE;
+        if (source === Quill.sources.SILENT || !isTextOrSelectionChange || this.ignoreSelectionChange) {
             return;
         }
 

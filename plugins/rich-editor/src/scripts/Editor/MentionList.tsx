@@ -48,13 +48,6 @@ class MentionList extends React.PureComponent<IProps, IState> {
         this.quill = props.quill;
     }
 
-    public componentDidMount() {
-        this.setState({
-            flyoutWidth: this.flyoutRef.current ? this.flyoutRef.current.offsetWidth : null,
-            flyoutHeight: this.flyoutRef.current ? this.flyoutRef.current.offsetHeight : null,
-        });
-    }
-
     public render() {
         const { activeItemId, id, onItemClick, matchedString, mentionData, noResultsID, isVisible } = this.props;
 
@@ -121,6 +114,21 @@ class MentionList extends React.PureComponent<IProps, IState> {
         );
     }
 
+    public componentDidMount() {
+        this.setState({
+            flyoutWidth: this.flyoutRef.current ? this.flyoutRef.current.offsetWidth : null,
+            flyoutHeight: this.flyoutRef.current ? this.flyoutRef.current.offsetHeight : null,
+        });
+        this.quill.on(Quill.events.EDITOR_CHANGE, this.handleEditorChange);
+    }
+
+    /**
+     * Be sure to remove the listeners when the component unmounts.
+     */
+    public componentWillUnmount() {
+        this.quill.off(Quill.events.EDITOR_CHANGE, this.handleEditorChange);
+    }
+
     /**
      * Handle changes from the editor.
      */
@@ -134,7 +142,8 @@ class MentionList extends React.PureComponent<IProps, IState> {
         if (source === Quill.sources.SILENT || !isTextOrSelectionChange) {
             return;
         }
-        const selection: RangeStatic | null = getMentionRange(this.quill, this.quill.getSelection().index);
+        const range = this.quill.getSelection();
+        const selection: RangeStatic | null = range ? getMentionRange(this.quill, range.index) : null;
 
         if (selection && selection.length > 0) {
             const content = this.quill.getText(selection.index, selection.length);

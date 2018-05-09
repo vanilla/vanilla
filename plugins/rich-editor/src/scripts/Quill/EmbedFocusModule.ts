@@ -192,7 +192,7 @@ export default class EmbedFocusModule extends Module {
             // Focus the next available editor ui component.
             const selection = this.quill.getSelection();
             if (!focusItemIsEmbedBlot) {
-                if (selection.length > 0) {
+                if (selection && selection.length > 0) {
                     this.inlineToolbarFirstActiveItem.focus();
                 } else {
                     this.paragraphMenuHandle.focus();

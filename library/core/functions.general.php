@@ -923,6 +923,8 @@ if (!function_exists('fetchPageInfo')) {
                 'Timeout' => $timeout,
                 'Cookies' => $sendCookies,
                 'Redirects' => true,
+                // Make sure that the redirect is on http/https
+                'ProtocolMask' => CURLPROTO_HTTP | CURLPROTO_HTTPS,
             ]);
 
             if (!$request->status()) {

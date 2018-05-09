@@ -34,7 +34,7 @@ export default class EmbedFocusModule extends Module {
 
     private editorRoot: HTMLElement;
     private paragraphMenuHandle: HTMLElement;
-    private inlineToolbarFirstItem: HTMLElement;
+    private inlineToolbarFirstActiveItem: HTMLElement;
     private emojiPickerButton: HTMLElement;
 
     constructor(quill: Quill, options = {}) {
@@ -149,17 +149,16 @@ export default class EmbedFocusModule extends Module {
             this.paragraphMenuHandle = this.editorRoot.querySelector(".richEditorParagraphMenu-handle") as HTMLElement;
         }
 
-        if (!this.inlineToolbarFirstItem) {
-            this.inlineToolbarFirstItem = this.editorRoot.querySelector(
-                ".richEditor-inlineToolbarContainer .richEditor-menuItem:first-child",
-            ) as HTMLElement;
-        }
+        // Not cached because it could
+        this.inlineToolbarFirstActiveItem = this.editorRoot.querySelector(
+            ".richEditor-inlineToolbarContainer .richEditor-menuItem:not([disabled])",
+        ) as HTMLElement;
 
         if (!this.emojiPickerButton) {
             this.emojiPickerButton = this.editorRoot.querySelector(".emojiPicker > .richEditor-button") as HTMLElement;
         }
 
-        return this.paragraphMenuHandle && this.inlineToolbarFirstItem && this.emojiPickerButton;
+        return this.paragraphMenuHandle && this.inlineToolbarFirstActiveItem && this.emojiPickerButton;
     }
 
     /**
@@ -194,7 +193,7 @@ export default class EmbedFocusModule extends Module {
             const selection = this.quill.getSelection();
             if (!focusItemIsEmbedBlot) {
                 if (selection.length > 0) {
-                    this.inlineToolbarFirstItem.focus();
+                    this.inlineToolbarFirstActiveItem.focus();
                 } else {
                     this.paragraphMenuHandle.focus();
                 }
@@ -231,7 +230,7 @@ export default class EmbedFocusModule extends Module {
             return true;
         }
 
-        const definiteLastItemIsFocused = [this.paragraphMenuHandle, this.inlineToolbarFirstItem].includes(
+        const definiteLastItemIsFocused = [this.paragraphMenuHandle, this.inlineToolbarFirstActiveItem].includes(
             document.activeElement as HTMLElement,
         );
         const emojiPickerIsConditionallyFocused =

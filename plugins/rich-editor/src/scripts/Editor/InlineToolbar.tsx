@@ -21,17 +21,17 @@ import CodeBlockBlot from "../Quill/Blots/Blocks/CodeBlockBlot";
 interface IProps extends IEditorContextProps {}
 
 interface IState {
-    showLink: boolean;
-    ignoreSelectionReset: boolean;
-    previousRange: RangeStatic;
-    value: string;
-    isUrlInputVisible: boolean;
-    isMenuVisible: boolean;
+    cachedRange: RangeStatic | null;
+    linkValue: string;
+    showFormatMenu: boolean;
+    showLinkMenu: boolean;
 }
 
 export class InlineToolbar extends React.Component<IProps, IState> {
     private quill: Quill;
     private linkInput: HTMLElement;
+    private ignoreSelectionChange = false;
+    private selfRef: React.RefObject<any> = React.createRef();
 
     private menuItems = {
         bold: {
@@ -65,39 +65,27 @@ export class InlineToolbar extends React.Component<IProps, IState> {
         this.quill = props.quill;
 
         this.state = {
-            showLink: false,
-            value: "",
-            ignoreSelectionReset: false,
-            previousRange: {
+            linkValue: "",
+            cachedRange: {
                 index: 0,
                 length: 0,
             },
-            isUrlInputVisible: false,
-            isMenuVisible: false,
+            showFormatMenu: false,
+            showLinkMenu: false,
         };
     }
 
     public render() {
-        const alertMessage = this.state.showLink ? null : (
+        const alertMessage = this.state.showFormatMenu ? (
             <span aria-live="assertive" role="alert" className="sr-only">
                 {t("Inline Menu Available")}
             </span>
-        );
+        ) : null;
         const restrictedFormats = this.restrictedFormats;
-        let formatMenuVisibility = this.state.showLink ? "hidden" : "ignore";
-        let linkMenuVisibility = this.state.showLink ? "visible" : "hidden";
-
-        if (this.inCodeBlock) {
-            formatMenuVisibility = "hidden";
-            linkMenuVisibility = "hidden";
-        }
 
         return (
-            <div>
-                <SelectionPositionToolbar
-                    setVisibility={this.setVisibilityOfMenu}
-                    forceVisibility={formatMenuVisibility}
-                >
+            <div ref={this.selfRef}>
+                <SelectionPositionToolbar selection={this.state.cachedRange} isVisible={this.state.showFormatMenu}>
                     {alertMessage}
                     <Toolbar
                         restrictedFormats={restrictedFormats}
@@ -105,13 +93,10 @@ export class InlineToolbar extends React.Component<IProps, IState> {
                         onBlur={this.toolbarBlurHandler}
                     />
                 </SelectionPositionToolbar>
-                <SelectionPositionToolbar
-                    setVisibility={this.setVisibilityOfUrlInput}
-                    forceVisibility={linkMenuVisibility}
-                >
+                <SelectionPositionToolbar selection={this.state.cachedRange} isVisible={this.state.showLinkMenu}>
                     <div className="richEditor-menu FlyoutMenu insertLink" role="dialog" aria-label={t("Insert Url")}>
                         <input
-                            value={this.state.value}
+                            value={this.state.linkValue}
                             onChange={this.onLinkInputChange}
                             ref={ref => (this.linkInput = ref as HTMLElement)}
                             onKeyDown={this.onLinkKeyDown}
@@ -136,6 +121,16 @@ export class InlineToolbar extends React.Component<IProps, IState> {
     public componentDidMount() {
         this.quill.on(Quill.events.SELECTION_CHANGE, this.handleSelectionChange);
         document.addEventListener("keydown", this.escFunction, false);
+        document.addEventListener("click", event => {
+            const editorRoot = this.quill.root.closest(".richEditor")!;
+            if (event.target instanceof Node && !editorRoot.contains(event.target)) {
+                this.setState({
+                    showFormatMenu: false,
+                    showLinkMenu: false,
+                    cachedRange: null,
+                });
+            }
+        });
         document.addEventListener(CLOSE_FLYOUT_EVENT, this.clearLinkInput);
 
         // Add a key binding for the link popup.
@@ -199,19 +194,19 @@ export class InlineToolbar extends React.Component<IProps, IState> {
      * Handle create-link keyboard shortcut.
      */
     private commandKHandler = () => {
-        const range = this.quill.getSelection();
-        if (range.length && !this.inCodeInline && !this.inCodeBlock) {
-            if (rangeContainsBlot(this.quill, range, LinkBlot)) {
-                disableAllBlotsInRange(this.quill, range, LinkBlot);
+        const { cachedRange, showFormatMenu, showLinkMenu } = this.state;
+        if (cachedRange && cachedRange.length && !showLinkMenu && !this.inCodeInline && !this.inCodeBlock) {
+            if (rangeContainsBlot(this.quill, cachedRange, LinkBlot)) {
+                disableAllBlotsInRange(this.quill, cachedRange, LinkBlot);
                 this.clearLinkInput();
                 this.quill.update(Quill.sources.USER);
             } else {
-                const currentText = this.quill.getText(range.index, range.length);
+                const currentText = this.quill.getText(cachedRange.index, cachedRange.length);
                 this.focusLinkInput();
 
                 if (isAllowedUrl(currentText)) {
                     this.setState({
-                        value: currentText,
+                        linkValue: currentText,
                     });
                 }
             }
@@ -229,24 +224,50 @@ export class InlineToolbar extends React.Component<IProps, IState> {
      * Close the menu.
      */
     private escFunction = (event: KeyboardEvent) => {
-        if (event.keyCode === 27 && (this.state.isMenuVisible || this.state.isUrlInputVisible)) {
-            this.setState({
-                value: "",
-                showLink: false,
-            });
-            const range = this.quill.getSelection(true);
-            this.quill.setSelection(range.length + range.index, 0, Emitter.sources.USER);
+        if (event.keyCode === 27) {
+            if (this.state.showLinkMenu) {
+                event.preventDefault();
+                this.clearLinkInput();
+            } else if (this.state.showFormatMenu) {
+                event.preventDefault();
+                this.setState({
+                    linkValue: "",
+                    showLinkMenu: false,
+                    showFormatMenu: false,
+                });
+                const range = this.quill.getSelection(true);
+                this.quill.setSelection(range.length + range.index, 0, Emitter.sources.USER);
+            }
         }
+    };
+
+    /**
+     * Handle clicks on the link menu's close button.
+     */
+    private onCloseClick = (event: React.MouseEvent<any>) => {
+        event.preventDefault();
+        this.clearLinkInput();
     };
 
     /**
      * Handle changes from the editor.
      */
     private handleSelectionChange = (range: RangeStatic, oldRange: RangeStatic, source: Sources) => {
+        if (this.ignoreSelectionChange) {
+            return;
+        }
+
         if (range && range.length > 0 && source === Emitter.sources.USER) {
-            this.clearLinkInput();
-        } else if (!this.state.ignoreSelectionReset) {
-            this.clearLinkInput();
+            this.setState({
+                cachedRange: range,
+                showFormatMenu: !this.inCodeBlock,
+            });
+        } else {
+            this.setState({
+                cachedRange: null,
+                showFormatMenu: false,
+                showLinkMenu: false,
+            });
         }
     };
 
@@ -280,30 +301,30 @@ export class InlineToolbar extends React.Component<IProps, IState> {
      * We need to temporarily stop ignore selection changes for the link menu (it will lose selection).
      */
     private focusLinkInput() {
+        this.ignoreSelectionChange = true;
         this.setState(
             {
-                showLink: true,
-                ignoreSelectionReset: true,
-                previousRange: this.quill.getSelection(),
+                showLinkMenu: true,
+                showFormatMenu: false,
             },
             () => {
                 this.linkInput.focus();
                 setTimeout(() => {
-                    this.setState({
-                        ignoreSelectionReset: false,
-                    });
+                    this.ignoreSelectionChange = false;
                 }, 100);
             },
         );
     }
 
     /**
-     * Clear the link menu's input content and hide the link menu..
+     * Clear the link menu's input content and hide the link menu.
      */
     private clearLinkInput = () => {
+        this.state.cachedRange && this.quill.setSelection(this.state.cachedRange, Emitter.sources.USER);
+
         this.setState({
-            value: "",
-            showLink: false,
+            linkValue: "",
+            showLinkMenu: false,
         });
     };
 
@@ -313,50 +334,16 @@ export class InlineToolbar extends React.Component<IProps, IState> {
     private onLinkKeyDown = (event: React.KeyboardEvent<any>) => {
         if (Keyboard.match(event.nativeEvent, "enter")) {
             event.preventDefault();
-            const value = (event.target as HTMLInputElement).value || "";
-            this.quill.format("link", value, Emitter.sources.USER);
-            this.quill.setSelection(this.state.previousRange, Emitter.sources.USER);
+            this.quill.format("link", this.state.linkValue, Emitter.sources.USER);
             this.clearLinkInput();
         }
-
-        if (Keyboard.match(event.nativeEvent, "escape")) {
-            this.clearLinkInput();
-            this.quill.setSelection(this.state.previousRange, Emitter.sources.USER);
-        }
-    };
-
-    /**
-     * Handle clicks on the link menu's close button.
-     */
-    private onCloseClick = (event: React.MouseEvent<any>) => {
-        event.preventDefault();
-        this.clearLinkInput();
-        this.quill.setSelection(this.state.previousRange, Emitter.sources.USER);
     };
 
     /**
      * Handle changes to the the close menu's input.
      */
     private onLinkInputChange = (event: React.ChangeEvent<any>) => {
-        this.setState({ value: event.target.value });
-    };
-
-    /**
-     * Set visibility of url input
-     */
-    private setVisibilityOfUrlInput = (isVisible: boolean) => {
-        this.setState({
-            isUrlInputVisible: isVisible,
-        });
-    };
-
-    /**
-     * Set visibility of url input
-     */
-    private setVisibilityOfMenu = (isVisible: boolean) => {
-        this.setState({
-            isMenuVisible: isVisible,
-        });
+        this.setState({ linkValue: event.target.value });
     };
 }
 

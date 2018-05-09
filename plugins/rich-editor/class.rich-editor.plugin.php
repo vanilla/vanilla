@@ -37,19 +37,6 @@ class RichEditorPlugin extends Gdn_Plugin {
     }
 
     /**
-     * Load JS
-     *
-     * @param Gdn_Controller $sender
-     * @return void
-     */
-    public function base_render_before($sender) {
-        if (inSection("Dashboard")) {
-            return;
-        }
-        $sender->addDefinition("editor", "RichEditor");
-    }
-
-    /**
      * Check to see if we should be using the Rich Editor
      * @param Gdn_Controller $sender
      */
@@ -58,7 +45,6 @@ class RichEditorPlugin extends Gdn_Plugin {
         $data = $form->formData();
         return strcmp(val('Format', $data, "Rich"), "Rich") === 0;
     }
-
 
     /**
      *

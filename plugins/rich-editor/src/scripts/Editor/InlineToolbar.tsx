@@ -121,17 +121,7 @@ export class InlineToolbar extends React.Component<IProps, IState> {
     public componentDidMount() {
         this.quill.on(Quill.events.EDITOR_CHANGE, this.handleEditorChange);
         document.addEventListener("keydown", this.escFunction, false);
-        document.addEventListener("click", event => {
-            const editorRoot = this.quill.root.closest(".richEditor")!;
-            if (event.target instanceof Node && !editorRoot.contains(event.target)) {
-                this.setState({
-                    showFormatMenu: false,
-                    showLinkMenu: false,
-                    cachedRange: null,
-                });
-            }
-        });
-        document.addEventListener(CLOSE_FLYOUT_EVENT, this.clearLinkInput);
+        document.addEventListener(CLOSE_FLYOUT_EVENT, this.reset);
 
         // Add a key binding for the link popup.
         const keyboard: Keyboard = this.quill.getModule("keyboard");
@@ -151,7 +141,7 @@ export class InlineToolbar extends React.Component<IProps, IState> {
     public componentWillUnmount() {
         this.quill.off(Quill.events.EDITOR_CHANGE, this.handleEditorChange);
         document.removeEventListener("keydown", this.escFunction, false);
-        document.removeEventListener(CLOSE_FLYOUT_EVENT, this.clearLinkInput);
+        document.removeEventListener(CLOSE_FLYOUT_EVENT, this.reset);
     }
 
     /**
@@ -230,15 +220,20 @@ export class InlineToolbar extends React.Component<IProps, IState> {
                 this.clearLinkInput();
             } else if (this.state.showFormatMenu) {
                 event.preventDefault();
-                this.setState({
-                    linkValue: "",
-                    showLinkMenu: false,
-                    showFormatMenu: false,
-                });
+                this.reset();
                 const range = this.quill.getSelection(true);
                 this.quill.setSelection(range.length + range.index, 0, Emitter.sources.USER);
             }
         }
+    };
+
+    private reset = () => {
+        this.setState({
+            linkValue: "",
+            showLinkMenu: false,
+            showFormatMenu: false,
+            cachedRange: null,
+        });
     };
 
     /**

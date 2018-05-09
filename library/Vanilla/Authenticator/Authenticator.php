@@ -10,6 +10,7 @@ namespace Vanilla\Authenticator;
 use Exception;
 use Garden\Schema\Schema;
 use Garden\Schema\ValidationException;
+use Garden\Schema\ValidationField;
 use Garden\Web\RequestInterface;
 
 abstract class Authenticator {
@@ -129,11 +130,15 @@ abstract class Authenticator {
         return Schema::parse([
             'type:s' => 'Authenticator instance\'s type.',
             'name:s' => 'User friendly name of the authenticator.',
-            'ui:o'  => Schema::parse([
-                'photoUrl' => null,
-                'backgroundColor' => null,
-                'foregroundColor' => null,
-            ])->add(static::getUiSchema()),
+            'ui:o' => Schema::parse([
+                    'photoUrl' => null,
+                    'backgroundColor' => null,
+                    'foregroundColor' => null,
+                ])
+                ->addValidator('backgroundColor', self::getCSSColorValidator())
+                ->addValidator('foregroundColor', self::getCSSColorValidator())
+                ->add(static::getUiSchema())
+            ,
             'isUnique:b' => 'Whether this authenticator can have multiple instances or not. Unique authenticators have authenticatorID equal to their type.',
         ]);
     }
@@ -165,12 +170,64 @@ abstract class Authenticator {
      */
      public static function getUiSchema(): Schema {
         return Schema::parse([
-            'url:s' => 'Local relative URL from which you can initiate the SignIn process with this authenticator',
-            'buttonName:s' => 'The display text to put in the button. Ex: "Sign in with Facebook"',
-            'photoUrl:s|n' => 'The icon URL for the button.',
-            'backgroundColor:s|n' => 'A css color code for the background. (Hex color, rgb or rgba)',
-            'foregroundColor:s|n' => 'A css color code for the foreground. (Hex color, rgb or rgba)',
-        ]);
+                'url:s' => 'Local relative URL from which you can initiate the SignIn process with this authenticator',
+                'buttonName:s' => 'The display text to put in the button. Ex: "Sign in with Facebook"',
+                'photoUrl:s|n' => 'The icon URL for the button.',
+                'backgroundColor:s|n' => 'A css color code for the background. (Hex color, rgb or rgba)',
+                'foregroundColor:s|n' => 'A css color code for the foreground. (Hex color, rgb or rgba)',
+            ])
+            ->addValidator('backgroundColor', self::getCSSColorValidator())
+            ->addValidator('foregroundColor', self::getCSSColorValidator())
+        ;
+    }
+
+    /**
+     * The validation function used to validate UI CSS colors.
+     *
+     * @return \Closure
+     */
+    protected static function getCSSColorValidator() {
+        return function($data, ValidationField $field) {
+            if ($data === null) {
+                return true;
+            }
+
+            $rgbaValuesValidator = function ($matches) {
+                foreach ($matches as $index => $value) {
+                    if ($index === 0) {
+                        continue;
+                    }
+                    if ($index === 4) {
+                        // It's an rgba. If this value is valid then everything is valid.
+                        return $value === '0' || $value === '1' || preg_match('/^0.\d{1,2}$/', $value);
+                    }
+                    if (filter_var($value, FILTER_VALIDATE_INT, ['options' => ['min_range' => 0, 'max_range' => 255]]) === false) {
+                        return false;
+                    }
+                }
+
+                // It's an rgb and everything matched. Let's just "make sure" by ensuring that there was 4 matches.
+                return count($matches) === 4;
+            };
+
+            if (preg_match('/^#(?:[0-9A-F]{3}){1,2}$/i', $data)) {
+                $valid = true;
+            } else {
+                if (preg_match('/^rgb\((\d+),\s?(\d+),\s?(\d+)\)$/', $data, $matches) || preg_match('/^rgba\((\d+),\s?(\d+),\s?(\d+),\s?([^\s)]+?)\)$/', $data, $matches)) {
+                    $valid = $rgbaValuesValidator($matches);
+                } else {
+                    $valid = false;
+                }
+            }
+
+            if (!$valid) {
+                $field->addError('invalidCssColor', [
+                    'messageCode' => 'The css color must match of one of the following format: #rgb, #rrggbb, rgb(r, g, b) or rgba(r, g, b, a.00)',
+                ]);
+            }
+
+            return $valid;
+        };
     }
 
     /**

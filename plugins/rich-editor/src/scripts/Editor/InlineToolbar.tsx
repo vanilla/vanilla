@@ -285,10 +285,18 @@ export class InlineToolbar extends React.Component<IProps, IState> {
     /**
      * Be sure to strip out all other formats before formatting as code.
      */
-    private codeFormatter() {
-        const selection = this.quill.getSelection();
-        this.quill.removeFormat(selection.index, selection.length, Quill.sources.API);
-        this.quill.formatText(selection.index, selection.length, "code-inline", Quill.sources.USER);
+    private codeFormatter(menuItemData: IMenuItemData) {
+        if (!this.state.cachedRange) {
+            return;
+        }
+        this.quill.removeFormat(this.state.cachedRange.index, this.state.cachedRange.length, Quill.sources.API);
+        this.quill.formatText(
+            this.state.cachedRange.index,
+            this.state.cachedRange.length,
+            "code-inline",
+            !menuItemData.active,
+            Quill.sources.USER,
+        );
     }
 
     /**

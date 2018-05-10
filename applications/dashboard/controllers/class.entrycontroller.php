@@ -1903,6 +1903,7 @@ class EntryController extends Gdn_Controller {
             Gdn::session()->start($userID);
         }
 
+        $this->setData('UserID', $userID);
         $this->setData('EmailConfirmed', $emailConfirmed);
         $this->setData('Email', $user->Email);
         $this->render();

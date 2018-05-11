@@ -9,7 +9,9 @@
  */
 
 /**
- * Class Gdn_ErrorException
+ * This class is for internal use within the global error handler only. Don't use this class elsewhere.
+ *
+ * An extension of the **ErrorException** that includes context variables.
  */
 class Gdn_ErrorException extends ErrorException {
 

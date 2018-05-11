@@ -1,3 +1,8 @@
+/**
+ * @copyright 2009-2018 Vanilla Forums Inc.
+ * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
+ */
+
 import { createStore, applyMiddleware, compose } from "redux";
 import { createEpicMiddleware } from "redux-observable";
 import { getRootReducer } from "./rootReducer";

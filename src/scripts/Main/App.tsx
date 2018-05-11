@@ -1,9 +1,14 @@
+/**
+ * @copyright 2009-2018 Vanilla Forums Inc.
+ * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
+ */
+
 import React from "react";
 import { getRoutes, getMeta } from "@core/application";
 import { BrowserRouter as Router, Route, RouteProps, Switch } from "react-router-dom";
 import NotFoundPage from "@core/Main/NotFoundPage";
 import { Provider } from "react-redux";
-import { getStore } from "./store";
+import { getStore } from "./redux/store";
 
 /**
  * The root application component.

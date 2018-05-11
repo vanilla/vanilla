@@ -1,7 +1,12 @@
+/**
+ * @copyright 2009-2018 Vanilla Forums Inc.
+ * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
+ */
+
 import { combineReducers } from "redux";
 
 // reducers from each module
-import authenticate from "@dashboard/Authenticate/state/reducer";
+import authenticate from "./reducers/authenticateReducer";
 
 /**
  * Merge all reducers into one.

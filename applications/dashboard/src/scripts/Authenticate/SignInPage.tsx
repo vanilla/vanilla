@@ -1,8 +1,13 @@
+/**
+ * @copyright 2009-2018 Vanilla Forums Inc.
+ * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
+ */
+
 import * as React from "react";
 import { connect } from "react-redux";
 import { t } from "@core/application";
 import DocumentTitle from "@core/Components/DocumentTitle";
-import { authenticatorsGet } from "./state/actions";
+import { authenticatorsGet } from "@core/Main/redux/actions/authenticateActions";
 import PasswordForm from "./Components/PasswordForm";
 import SSOMethods from "./Components/SSOMethods";
 import { getRequiredID, IRequiredComponentID } from "@core/Interfaces/componentIDs";

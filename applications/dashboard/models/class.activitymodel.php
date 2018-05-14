@@ -109,7 +109,7 @@ class ActivityModel extends Gdn_Model {
      * @param array $activity
      * @return bool
      */
-    public function canView(array $activity): bool {
+    public function canView(array $activity) {
         $result = false;
 
         $userid = val('NotifyUserID', $activity);
@@ -135,7 +135,7 @@ class ActivityModel extends Gdn_Model {
                 break;
         }
 
-        return $result;
+        return (bool)$result;
     }
 
     /**

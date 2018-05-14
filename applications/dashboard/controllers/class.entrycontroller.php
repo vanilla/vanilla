@@ -452,6 +452,7 @@ class EntryController extends Gdn_Controller {
         }
 
         // Allow a provider to not send an email address but require one be manually entered.
+        $userProvidedEmail = false;
         if (!UserModel::noEmail()) {
             $emailProvided = $this->Form->getFormValue('Email');
             $emailRequested = $this->Form->getFormValue('EmailVisible');
@@ -461,6 +462,7 @@ class EntryController extends Gdn_Controller {
 
                 if ($isPostBack) {
                     $this->Form->setFormValue('Email', val('Email', $currentData));
+                    $userProvidedEmail = true;
                 }
             }
             if ($isPostBack && $emailRequested) {
@@ -716,7 +718,7 @@ class EntryController extends Gdn_Controller {
                 $registerOptions = [
                     'CheckCaptcha' => false,
                     'ValidateEmail' => false,
-                    'NoConfirmEmail' => true,
+                    'NoConfirmEmail' => !$userProvidedEmail || !UserModel::requireConfirmEmail(),
                     'SaveRoles' => $saveRolesRegister
                 ];
                 $user = $this->Form->formValues();
@@ -848,7 +850,7 @@ class EntryController extends Gdn_Controller {
                 $user['HashMethod'] = 'Random';
                 $userID = $userModel->register($user, [
                     'CheckCaptcha' => false,
-                    'NoConfirmEmail' => true,
+                    'NoConfirmEmail' => !$userProvidedEmail || !UserModel::requireConfirmEmail(),
                     'SaveRoles' => $saveRolesRegister
                 ]);
                 $user['UserID'] = $userID;

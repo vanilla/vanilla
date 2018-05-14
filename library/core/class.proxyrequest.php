@@ -207,6 +207,7 @@ class ProxyRequest {
      *     'Redirected'           => FALSE,      // Is this a redirected request?
      *     'Debug'                => FALSE,      // Debug output
      *     'Simulate'             => FALSE       // Don't actually request, just set up
+     *     'ProtocolMask'         => Mask of CURLPROTO_* values
      *
      * @param array /string $options URL, or array options
      * @param array $queryParams GET/POST parameters
@@ -257,6 +258,7 @@ class ProxyRequest {
         }
 
         $requestMethod = val('Method', $options);
+
         $forceHost = val('Host', $options);
         $followRedirects = val('Redirects', $options);
         $connectTimeout = val('ConnectTimeout', $options);
@@ -272,6 +274,7 @@ class ProxyRequest {
         $redirected = val('Redirected', $options);
         $debug = val('Debug', $options, false);
         $simulate = val('Simulate', $options);
+        $protocolMask = val('ProtocolMask', $options);
 
         $oldVolume = $this->Loud;
         if ($debug) {
@@ -454,6 +457,10 @@ class ProxyRequest {
             $this->action(" Using SSL");
             curl_setopt($handler, CURLOPT_SSL_VERIFYPEER, !$sSLNoVerify);
             curl_setopt($handler, CURLOPT_SSL_VERIFYHOST, $sSLNoVerify ? 0 : 2);
+        }
+
+        if ($protocolMask) {
+            curl_setopt($handler, CURLOPT_PROTOCOLS, $protocolMask);
         }
 
         if ($timeout > 0) {

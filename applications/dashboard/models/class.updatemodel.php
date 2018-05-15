@@ -162,7 +162,7 @@ class UpdateModel extends Gdn_Model {
                         'AddonKey' => 'vanilla',
                         'AddonTypeID' => ADDON_TYPE_CORE,
                         'Name' => 'Vanilla',
-                        'Description' => 'Vanilla is an open-source, standards-compliant, multi-lingual, fully extensible discussion forum for the web. Anyone who has web-space that meets the requirements can download and use Vanilla for free!',
+                        'Description' => 'Vanilla is a powerfully simple discussion forum you can easily customize to make as unique as your community.',
                         'Version' => $version,
                         'License' => 'GPLv2',
                         'Path' => $entry['Path']];
@@ -179,7 +179,7 @@ class UpdateModel extends Gdn_Model {
                         'AddonKey' => 'porter',
                         'AddonTypeID' => ADDON_TYPE_CORE,
                         'Name' => 'Vanilla Porter',
-                        'Description' => 'Drop this script in your existing site and navigate to it in your web browser to export your existing forum data to the Vanilla 2 import format.',
+                        'Description' => 'Migrate your legacy forum to Vanilla for the first time. Drop this script in your existing site and navigate to it in your web browser to export your legacy forum data.',
                         'Version' => $version,
                         'License' => 'GPLv2',
                         'Path' => $entry['Path']];

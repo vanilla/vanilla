@@ -448,7 +448,7 @@ class Gdn_Validation {
      *
      * @param string $name The name of the rule to be added.
      * @param string|callable $rule The rule to be added.
-     * @param bool $filter Whether or not the rule filters the value.
+     * @param bool $filter Whether or not the rule filters the value. This is ignored when the rule is a callback.
      */
     public function addRule(string $name, $rule, bool $filter = false) {
         $this->_Rules[$name] = $rule;
@@ -635,7 +635,10 @@ class Gdn_Validation {
 
         // Loop through the fields that should be validated
         foreach ($fields as $fieldName => $fieldValue) {
-            $this->validateField($fieldValue, $fieldName, $postedFields, $fieldRules);
+            $valid = $this->validateField($fieldValue, $fieldName, $postedFields, $fieldRules);
+            if (!$valid instanceof Invalid) {
+                $fields[$fieldName] = $valid;
+            }
         }
         $this->_ValidationFields = $fields;
         return count($this->_ValidationResults) === 0;
@@ -725,15 +728,15 @@ class Gdn_Validation {
      * @param mixed $fieldValue The value of the field.
      * @param string $fieldName The name of the field.
      * @param array $row The entire row of data.
-     * @param array $fieldRules The full array of rules.
+     * @param array $allRules The full array of rules.
      * @return mixed|Invalid Returns the valid value, piossibly filtered or an instance of **Invalid** if validation fails.
      */
-    private function validateField($fieldValue, string $fieldName, $row, array $fieldRules) {
-        if (!isset($fieldRules[$fieldName]) || !is_array($fieldRules[$fieldName])) {
+    private function validateField($fieldValue, string $fieldName, $row, array $allRules) {
+        if (!isset($allRules[$fieldName]) || !is_array($allRules[$fieldName])) {
             return $fieldValue;
         }
 
-        $rules = $fieldRules[$fieldName];
+        $rules = $allRules[$fieldName];
 
         // Get the field info for the field.
         $fieldInfo = ['Name' => $fieldName];
@@ -758,15 +761,17 @@ class Gdn_Validation {
                             throw new \Exception("Specified validation function could not be found: $function", 500);
                         }
 
-                        $validationResult = call_user_func($function, $fieldValue, $fieldInfo, $row);
-                        if ($validationResult !== true) {
-                            $errorCode = $this->customErrors["$fieldName.$ruleName"] ?? ($validationResult === false ? $function : $validationResult);
+                        $valid = call_user_func($function, $fieldValue, $fieldInfo, $row);
+                        if (($filter && $valid instanceof Invalid) || (!$filter && $valid !== true)) {
+                            $errorCode = $this->customErrors["$fieldName.$ruleName"] ?? ($valid === false ? $function : $valid);
                             $this->addValidationResult($fieldName, $errorCode);
-
+                            $valid = new Invalid($errorCode);
                             if ($ruleName === 'Required') {
                                 // If a required validation failed then skip other rules.
                                 break 2;
                             }
+                        } elseif (!$filter) {
+                            $valid = $fieldValue;
                         }
                         break;
                     case 'regex':
@@ -774,20 +779,26 @@ class Gdn_Validation {
                         if (validateRegex($fieldValue, $regex) !== true) {
                             $errorCode = $this->customErrors["$fieldName.$ruleName"] ?? 'Regex';
                             $this->addValidationResult($fieldName, $errorCode);
+                            $valid = new Invalid($errorCode);
                         }
                         break;
                     default:
                         trigger_error("Unknown rule type: $ruleType.", E_USER_NOTICE);
                 }
             } elseif (is_callable($rule)) {
-                $validValue = call_user_func($rule, $fieldValue, $fieldInfo, $row);
-                if ($validValue instanceof Invalid) {
-                    $errorCode = $this->customErrors["$fieldName.$ruleName"] ?? ($validValue->getMessageCode() ?: $ruleName);
+                $valid = call_user_func($rule, $fieldValue, $fieldInfo, $row);
+                if ($valid instanceof Invalid) {
+                    $errorCode = $this->customErrors["$fieldName.$ruleName"] ?? ($valid->getMessageCode() ?: $ruleName);
                     $this->addValidationResult($fieldName, $errorCode);
                 }
             } else {
                 trigger_error("Unknown validator format for rule: $ruleName.", E_USER_NOTICE);
             }
+
+            if ($filter && !$valid instanceof Invalid) {
+                $fieldValue = $valid;
+            }
         }
+        return $fieldValue;
     }
 }

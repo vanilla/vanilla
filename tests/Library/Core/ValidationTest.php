@@ -49,12 +49,14 @@ class ValidationTest extends TestCase {
         $this->assertCount(1, $results);
     }
 
-    public function testCallbackValidator() {
-
-
-    }
-
-    protected function testBasicCallback($value, $valid) {
+    /**
+     * Test a basic callback validator.
+     *
+     * @param mixed $value The value to test.
+     * @param int|Invalid $valid The expected result of the callback.
+     * @dataProvider provideBasicCallbackTests
+     */
+    public function testBasicCallback($value, $valid) {
         $val = new Gdn_Validation(null, true);
         $val->addRule('test', function ($value) {
             $filtered = filter_var($value, FILTER_VALIDATE_INT);
@@ -75,6 +77,21 @@ class ValidationTest extends TestCase {
             $this->assertTrue($validated);
             $this->assertSame($valid, $val->validationFields()['v']);
         }
+    }
+
+    /**
+     * Provide test data for **testBasicCallback()**.
+     *
+     * @return array Returns a data provider.
+     */
+    public function provideBasicCallbackTests() {
+        $r = [
+            [123, 123],
+            ['456', 456],
+            ['foo', Invalid::emptyMessage()],
+        ];
+
+        return array_column($r, null, 0);
     }
 
     /**

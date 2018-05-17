@@ -3,11 +3,6 @@ You cannot clone this repo right into a web directory - it requires a build step
 
 ![Vanilla](http://images.v-cdn.net/vanilla-black-logo-400.svg)
 
-[![Build Status](https://img.shields.io/travis/vanilla/vanilla/master.svg)](https://travis-ci.org/vanilla/vanilla)
-[![Contributors](https://img.shields.io/github/contributors/vanilla/vanilla.svg)](https://github.com/vanilla/vanilla/graphs/contributors)
-[![Last Commit](https://img.shields.io/github/last-commit/vanilla/vanilla/master.svg)](https://github.com/vanilla/vanilla/commits/master)
-[![Commit Activity](https://img.shields.io/github/commit-activity/y/vanilla/vanilla.svg)](https://github.com/vanilla/vanilla/graphs/commit-activity)
-
 ## Howdy, Stranger!
 
 Vanilla was born out of the desire to create flexible, customizable, and downright entertaining

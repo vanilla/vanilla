@@ -86,9 +86,9 @@ Please consider using [maintenance mode](#using-maintenance-mode) before running
 
 1. Backup your database, `.htaccess` and `conf/config.php` file somewhere safe.
 1. Upload the new release's files so they overwrite the old ones.
-1. Delete all files in `/cache`.
+1. Delete all files in `/cache` (except `.htaccess` if you use Apache).
 1. Follow all version-specific instructions below. It is **critcal** you delete the listed files.
-1. Go to `example.com/utility/update` to run any database updates needed. (404? See next paragraph.) If it fails, try it a second times by refreshing the page.
+1. Go to `example.com/utility/update` to run any database updates needed. (404? See next paragraph.) If it fails, try it a second time by refreshing the page.
 
 If you run into a problem, see [Getting Help](#getting-help) below.
 
@@ -103,7 +103,7 @@ If you run into a problem, see [Getting Help](#getting-help) below.
 
 If your forum still uses URLs including `?p=`, support for this URL structure has ended. Follow these steps to switch to the simpler format:
 
-1. Confirm your server is setup to handle rewrites. On Apache, using the `.htaccess` file provided will accomplish this. Additional setup is required on nginx and other platforms. 
+1. Confirm your server is setup to handle rewrites. On Apache, using the `.htaccess` file provided will accomplish this. Additional setup is required on [nginx](https://docs.vanillaforums.com/developer/backend/server-nginx/) and other platforms. 
 2. Test whether it is working by visiting `/discussions` - if you see a discussions list (rather than a 404), it is likely setup correctly. 
 3. Open `/conf/config.php` and find the line with `$Configuration['Garden']['RewriteUrls'] = false;` and **delete the entire line**. 
 

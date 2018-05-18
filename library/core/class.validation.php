@@ -90,7 +90,7 @@ class Gdn_Validation {
         $this->addRule('Boolean', 'function:ValidateBoolean');
         $this->addRule('Decimal', 'function:ValidateDecimal');
         $this->addRule('String', 'function:ValidateString');
-        $this->addRule('Time', 'function:ValidateTime');
+        $this->addRule('Time', 'function:ValidateTime', true);
         $this->addRule('Timestamp', 'function:ValidateDate');
         $this->addRule('Length', 'function:ValidateLength');
         $this->addRule('Enum', 'function:ValidateEnum');
@@ -451,6 +451,11 @@ class Gdn_Validation {
      * @param bool $filter Whether or not the rule filters the value. This is ignored when the rule is a callback.
      */
     public function addRule(string $name, $rule, bool $filter = false) {
+        // Callback rules are always filtered.
+        if (!is_string($rule) && is_callable($rule)) {
+            $filter = true;
+        }
+
         $this->_Rules[$name] = $rule;
 
         $this->rules[$name] = [$rule, $filter];
@@ -539,6 +544,10 @@ class Gdn_Validation {
      * @deprecated
      */
     public static function validateRule($value, $fieldName, $rule, $customError = false) {
+        if (!is_string($rule) && is_callable($rule)) {
+            return static::validateRuleCallback($value, $fieldName, $rule, $customError);
+        }
+
         // Figure out the type of rule.
         if (is_string($rule)) {
             if (stringBeginsWith($rule, 'regex:', true)) {
@@ -571,6 +580,32 @@ class Gdn_Validation {
             }
         } else {
             return sprintf('Validation does not exist: %s.', $ruleName);
+        }
+    }
+
+    /**
+     * Validate a single callback rule.
+     *
+     * This method is just here for feature parity during refactoring and should be considered deprecated.
+     *
+     * @param mixed $value The value to validate.
+     * @param string $fieldName The name of the field to validate.
+     * @param callable $callback The validation callback.
+     * @param bool|string $customError The error to return if validation fails.
+     * @return bool|string Returns **true** on success and **false** or an error string on failure.
+     * @deprecated
+     */
+    private static function validateRuleCallback($value, $fieldName, callable $callback, $customError = false) {
+        $field = new ArrayObject([
+            'Name' => $fieldName,
+        ], ArrayObject::ARRAY_AS_PROPS);
+
+        $valid = call_user_func($callback, $value, $field, [$fieldName => $value]);
+
+        if ($valid instanceof Invalid) {
+            return $customError;
+        } else {
+            return $valid;
         }
     }
 
@@ -750,6 +785,7 @@ class Gdn_Validation {
                 continue;
             }
             list($rule, $filter) = $this->rules[$ruleName];
+            $valid = $fieldValue;
 
             if (is_string($rule)) {
                 list($ruleType, $ruleValue) = explode(':', $rule, 2) + ['', ''];
@@ -763,15 +799,13 @@ class Gdn_Validation {
 
                         $valid = call_user_func($function, $fieldValue, $fieldInfo, $row);
                         if (($filter && $valid instanceof Invalid) || (!$filter && $valid !== true)) {
-                            $errorCode = $this->customErrors["$fieldName.$ruleName"] ?? ($valid === false ? $function : $valid);
+                            $errorCode = $this->customErrors["$fieldName.$ruleName"] ?? $this->defaultErrorCode($valid, $function);
                             $this->addValidationResult($fieldName, $errorCode);
                             $valid = new Invalid($errorCode);
                             if ($ruleName === 'Required') {
                                 // If a required validation failed then skip other rules.
                                 break 2;
                             }
-                        } elseif (!$filter) {
-                            $valid = $fieldValue;
                         }
                         break;
                     case 'regex':
@@ -793,6 +827,7 @@ class Gdn_Validation {
                 }
             } else {
                 trigger_error("Unknown validator format for rule: $ruleName.", E_USER_NOTICE);
+                $valid = $fieldValue;
             }
 
             if ($filter && !$valid instanceof Invalid) {
@@ -800,5 +835,19 @@ class Gdn_Validation {
             }
         }
         return $fieldValue;
+    }
+
+    /**
+     * Determine the default error code for a validation failure.
+     *
+     * @param mixed|Invalid $invalid The invalid result.
+     * @param string $default The default error code.
+     * @return string Returns the default error code.
+     */
+    private function defaultErrorCode($invalid, $default) {
+        if ($invalid instanceof Invalid && !empty($invalid->getMessageCode())) {
+            return $invalid->getMessageCode();
+        }
+        return $default;
     }
 }

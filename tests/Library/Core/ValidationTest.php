@@ -23,10 +23,6 @@ class ValidationTest extends TestCase {
      * @dataProvider provideValidTypes
      */
     public function testValidType($type, $value) {
-        if (in_array($type, ['time'], true)) {
-            $this->markTestIncomplete("The $type type has not been implemented.");
-        }
-
         $val = new Gdn_Validation(['v' => (object)['Type' => $type, 'AllowNull' => true, 'Enum' => ['foo', 'bar']]], true);
         $r = $val->validate(['v' => $value]);
         $this->assertTrue($r);
@@ -66,7 +62,7 @@ class ValidationTest extends TestCase {
             } else {
                 return $filtered;
             }
-        }, true);
+        });
         $val->applyRule('v', 'test');
 
         $validated = $val->validate(['v' => $value]);

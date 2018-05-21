@@ -3004,7 +3004,7 @@ if (!function_exists('reflectArgs')) {
     /**
      * Reflect the arguments on a callback and returns them as an associative array.
      *
-     * @param callback $callback A callback to the function.
+     * @param callback|ReflectionFunctionAbstract $callback A callback to the function.
      * @param array $args1 An array of arguments.
      * @param array $args2 An optional other array of arguments.
      * @return array The arguments in an associative array, in order ready to be passed to call_user_func_array().
@@ -3025,14 +3025,16 @@ if (!function_exists('reflectArgs')) {
 
         if (is_string($callback)) {
             $meth = new ReflectionFunction($callback);
-            $methName = $meth;
+        } elseif ($callback instanceof ReflectionFunctionAbstract) {
+            $meth = $callback;
         } else {
             $meth = new ReflectionMethod($callback[0], $callback[1]);
-            if (is_string($callback[0])) {
-                $methName = $callback[0].'::'.$meth->getName();
-            } else {
-                $methName = get_class($callback[0]).'->'.$meth->getName();
-            }
+        }
+
+        if ($meth instanceof ReflectionMethod) {
+            $methName = $meth->getDeclaringClass()->getName().'::'.$meth->getName();
+        } else {
+            $methName = $meth->getName();
         }
 
         $methArgs = $meth->getParameters();

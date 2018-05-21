@@ -562,7 +562,12 @@ class Gdn_Form extends Gdn_Pluggable {
         if (is_array($safeCategoryData)) {
             foreach ($safeCategoryData as $categoryID => $category) {
                 $depth = val('Depth', $category, 0);
-                $disabled = (($depth == 1 && $doHeadings) || !$category['AllowDiscussions'] || val('DisplayAs', $category) != 'Discussions');
+                $isDraft = false;
+                $draftID = $this->HiddenInputs['DraftID'];
+                if (isset($draftID) && $draftID > 0) {
+                    $isDraft = true;
+                }
+                $disabled = (($depth == 1 && $doHeadings && !$isDraft) || !$category['AllowDiscussions'] || val('DisplayAs', $category) != 'Discussions');
                 $selected = in_array($categoryID, $value) && $hasValue;
                 if ($forceCleanSelection && $depth > 1) {
                     $selected = true;

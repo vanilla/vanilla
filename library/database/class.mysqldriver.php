@@ -27,8 +27,10 @@ class Gdn_MySQLDriver extends Gdn_SQLDriver {
      *
      * @param $string
      * @return string
+     * @deprecated
      */
     public function backtick($string) {
+        deprecated('backtick', 'escapeIdentifier');
         return '`'.trim($string, '`').'`';
     }
 
@@ -92,8 +94,7 @@ class Gdn_MySQLDriver extends Gdn_SQLDriver {
      * @return string
      */
     public function escapeIdentifier($refExpr) {
-        // The MySql back tick syntax is the default escape sequence so nothing needs to be done.
-        return $refExpr;
+        return '`'.str_replace('`', '``', $refExpr).'`';
     }
 
     /**
@@ -137,7 +138,7 @@ class Gdn_MySQLDriver extends Gdn_SQLDriver {
      */
     public function fetchTableSchema($table) {
         // Format the table name.
-        $table = $this->escapeSql($this->Database->DatabasePrefix.$table);
+        $table = $this->escapeIdentifier($this->Database->DatabasePrefix.$table);
         $dataSet = $this->query($this->fetchColumnSql($table));
         $schema = [];
 
@@ -282,7 +283,7 @@ class Gdn_MySQLDriver extends Gdn_SQLDriver {
             if (array_key_exists(0, $data)) {
                 // This is a big insert with a bunch of rows.
                 $keys = array_keys($data[0]);
-                $keys = array_map([$this, 'Backtick'], $keys);
+                $keys = array_map([$this, 'escapeIdentifier'], $keys);
                 $sql .= "\n(".implode(', ', $keys).') '
                     ."\nvalues ";
 
@@ -295,7 +296,6 @@ class Gdn_MySQLDriver extends Gdn_SQLDriver {
                 }
             } else {
                 $keys = array_keys($data);
-                $keys = array_map([$this, 'Backtick'], $keys);
                 $sql .= "\n(".implode(', ', $keys).') '
                     ."\nvalues (".implode(', ', array_values($data)).')';
             }

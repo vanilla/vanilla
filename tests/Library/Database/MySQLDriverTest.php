@@ -7,10 +7,12 @@
 
 namespace VanillaTests\Library\Database;
 
-use PHPUnit\Framework\Error\Error;
 use PHPUnit\Framework\TestCase;
 use VanillaTests\SiteTestTrait;
 
+/**
+ * Tests for the **Gdn_MySQLDriver** class.
+ */
 class MySQLDriverTest extends TestCase {
     use SiteTestTrait;
 
@@ -33,7 +35,7 @@ class MySQLDriverTest extends TestCase {
         $sql->reset();
         $this->sql = $sql;
 
-        $dump = function() {
+        $dump = function () {
             $r =  [
                 'where' => $this->_Wheres,
             ];
@@ -41,6 +43,14 @@ class MySQLDriverTest extends TestCase {
             return $r;
         };
         $this->dump = \Closure::bind($dump, $this->sql, $this->sql);
+    }
+
+    /**
+     * Make sure the SQL object isn't polluted.
+     */
+    public function tearDown() {
+        $this->sql->reset();
+        parent::tearDown();
     }
 
     /**
@@ -66,9 +76,9 @@ class MySQLDriverTest extends TestCase {
      */
     public function testFieldEscape() {
         $sql = $this->sql
-            ->where(["1=b(5) and 1" => "world"])
+            ->where(["1=sleep(1) and 1" => "world"])
             ->getDelete('Foo', $this->dumpSql()['where']);
 
-        $this->assertContains('`1=b(5) and 1`', $sql);
+        $this->assertContains('`1=sleep(1) and 1`', $sql);
     }
 }

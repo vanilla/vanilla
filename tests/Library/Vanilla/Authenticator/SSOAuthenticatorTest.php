@@ -8,10 +8,12 @@
 namespace VanillaTests\Library\Vanilla;
 
 use PHPUnit\Framework\TestCase;
+use VanillaTests\BootstrapTrait;
 use VanillaTests\Fixtures\MockSSOAuthenticator;
 
 
 class SSOAuthenticatorTest extends TestCase {
+    use BootstrapTrait;
 
     /**
      * Test that an authenticator with minimal/properly implemented methods will instantiate.

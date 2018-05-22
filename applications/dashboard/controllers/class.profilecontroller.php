@@ -277,10 +277,13 @@ class ProfileController extends Gdn_Controller {
 
         $invitationModel = new InvitationModel();
 
-        $invitationModel->delete($invitationID);
-        $this->informMessage(t('The invitation was removed successfully.'));
-
-        $this->jsonTarget(".js-invitation[data-id=\"{$invitationID}\"]", '', 'SlideUp');
+        $result = $invitationModel->deleteID($invitationID);
+        if ($result) {
+            $this->informMessage(t('The invitation was removed successfully.'));
+            $this->jsonTarget(".js-invitation[data-id=\"{$invitationID}\"]", '', 'SlideUp');
+        } else {
+            $this->informMessage(t('Unable to remove the invitation.'));
+        }
 
         $this->render('Blank', 'Utility');
     }
@@ -1415,9 +1418,8 @@ EOT;
         }
 
         $invitationModel = new InvitationModel();
-        $session = Gdn::session();
         try {
-            $valid = $invitationModel->delete($invitationID, $this->UserModel);
+            $valid = $invitationModel->deleteID($invitationID);
             if ($valid) {
                 $this->informMessage(t('The invitation was removed successfully.'));
                 $this->jsonTarget(".js-invitation[data-id=\"{$invitationID}\"]", '', 'SlideUp');

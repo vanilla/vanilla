@@ -5,14 +5,22 @@
  */
 
 import React from "react";
-import * as PropTypes from "prop-types";
 import classNames from "classnames";
-import uniqueId from "lodash/uniqueId";
+import { getRequiredID, IRequiredComponentID } from "@core/Interfaces/componentIDs";
 import { t } from "@core/application";
 
+interface IState {
+    id: string;
+    descriptionID?: string;
+    titleID: string;
+}
+
 interface IProps {
+    id: string;
+    titleID: string;
+    descriptionID?: string;
     title: string;
-    accessibleDescription: string;
+    accessibleDescription?: string;
     isVisible: boolean;
     body: JSX.Element;
     footer?: JSX.Element;
@@ -21,13 +29,18 @@ interface IProps {
     additionalClassRoot?: string;
     className?: string;
     titleRef?: React.Ref<any>;
-    titleId?: string;
-    descriptionId?: string;
     onCloseClick(event?: React.MouseEvent<any>);
 }
 
-export default class Popover extends React.Component<IProps> {
-    private id = uniqueId("insertPopover-");
+export default class Popover extends React.Component<IProps, IState> {
+    constructor(props) {
+        super(props);
+        this.state = {
+            id: props.id,
+            descriptionID: props.descriptionID,
+            titleID: props.titleID,
+        };
+    }
 
     public render() {
         const { additionalClassRoot } = this.props;
@@ -57,26 +70,27 @@ export default class Popover extends React.Component<IProps> {
             </span>
         ) : null;
 
-        const descriptionId = this.props.descriptionId || this.id + "-description";
-        const titleId = this.props.titleId || this.id + "-title";
+        const screenReaderDescription = this.props.accessibleDescription ? (
+            <div id={this.state.descriptionID} className="sr-only">
+                {this.props.accessibleDescription}
+            </div>
+        ) : null;
 
         return (
             <div
+                id={this.state.id}
+                aria-describedby={this.state.descriptionID}
+                aria-labelledby={this.state.titleID}
                 className={classes}
                 role="dialog"
-                aria-describedby={descriptionId}
                 aria-hidden={!this.props.isVisible}
-                aria-labelledby={titleId}
-                id={this.id}
             >
                 {alertMessage}
                 <div className={headerClasses}>
-                    <h2 id={titleId} tabIndex={-1} className="H popover-title" ref={this.props.titleRef}>
+                    <h2 id={this.props.titleID} tabIndex={-1} className="H popover-title" ref={this.props.titleRef}>
                         {this.props.title}
                     </h2>
-                    <div id={descriptionId} className="sr-only">
-                        {this.props.accessibleDescription}
-                    </div>
+                    {screenReaderDescription}
                     <button type="button" onClick={this.props.onCloseClick} className="Close richEditor-close">
                         <span className="Close-x" aria-hidden="true">
                             {t("×")}

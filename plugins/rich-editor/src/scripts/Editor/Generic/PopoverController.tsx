@@ -5,12 +5,12 @@
  */
 
 import React from "react";
-import * as PropTypes from "prop-types";
-import uniqueId from "lodash/uniqueId";
 import { closeEditorFlyouts, CLOSE_FLYOUT_EVENT } from "../../Quill/utility";
 import { withEditor, IEditorContextProps } from "../ContextProvider";
+import { getRequiredID, uniqueIDFromPrefix, IRequiredComponentID } from "@core/Interfaces/componentIDs";
 
 export interface IPopoverControllerChildParameters {
+    id: string;
     initialFocusRef: React.RefObject<any>;
     blurHandler: React.FocusEventHandler<any>;
     isVisible: boolean;
@@ -18,6 +18,7 @@ export interface IPopoverControllerChildParameters {
 }
 
 interface IProps extends IEditorContextProps {
+    id: string;
     classNameRoot: string;
     icon: JSX.Element;
     children: (props: IPopoverControllerChildParameters) => JSX.Element;
@@ -25,53 +26,54 @@ interface IProps extends IEditorContextProps {
 }
 
 interface IState {
+    id: string;
     isVisible: boolean;
 }
 
 export default class PopoverController extends React.PureComponent<IProps, IState> {
-    private popoverContainerId: string;
-
     private initalFocusRef: React.RefObject<any>;
     private buttonRef: React.RefObject<HTMLButtonElement>;
     private controllerRef: React.RefObject<HTMLDivElement>;
 
     constructor(props) {
         super(props);
-
         this.controllerRef = React.createRef();
         this.initalFocusRef = React.createRef();
         this.buttonRef = React.createRef();
 
         this.state = {
+            id: getRequiredID(props, "popover"),
             isVisible: false,
         };
+    }
 
-        this.popoverContainerId = uniqueId("richEditor-popover-");
+    get componentID(): string {
+        return this.state.id + "-contents";
     }
 
     public render() {
         return (
             <div className={this.props.classNameRoot} ref={this.controllerRef}>
                 <button
+                    id={this.state.id}
                     onClick={this.togglePopover}
                     onBlur={this.blurHandler}
                     className="richEditor-button"
                     type="button"
-                    aria-controls={this.popoverContainerId}
+                    aria-controls={this.componentID}
                     aria-expanded={this.state.isVisible}
                     aria-haspopup="true"
                     ref={this.buttonRef}
                 >
                     {this.props.icon}
                 </button>
-                <div id={this.popoverContainerId}>
-                    {this.props.children({
-                        blurHandler: this.blurHandler,
-                        closeMenuHandler: this.closeMenuHandler,
-                        initialFocusRef: this.initalFocusRef,
-                        isVisible: this.state.isVisible,
-                    })}
-                </div>
+                {this.props.children({
+                    id: this.componentID,
+                    initialFocusRef: this.initalFocusRef,
+                    blurHandler: this.blurHandler,
+                    isVisible: this.state.isVisible,
+                    closeMenuHandler: this.closeMenuHandler,
+                })}
             </div>
         );
     }

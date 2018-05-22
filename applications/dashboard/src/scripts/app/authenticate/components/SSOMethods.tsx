@@ -5,7 +5,7 @@
 
 import { t } from "@dashboard/application";
 import React from "react";
-import Paragraph from "@dashboard/components/Forms/Paragraph";
+import Paragraph from "@dashboard/components/forms/Paragraph";
 
 interface IProps {
     ssoMethods?: any[];

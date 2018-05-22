@@ -5,10 +5,10 @@
 
 import * as React from "react";
 import { t } from "@dashboard/application";
-import { log, logError, debug } from "@dashboard/utility";
-import DocumentTitle from "@dashboard/Components/DocumentTitle";
-import PasswordForm from "./Components/PasswordForm";
-import SSOMethods from "./Components/SSOMethods";
+import { log, logError } from "@dashboard/utility";
+import DocumentTitle from "@dashboard/components/DocumentTitle";
+import PasswordForm from "./components/PasswordForm";
+import SSOMethods from "./components/SSOMethods";
 import apiv2 from "@dashboard/apiv2";
 import { getRequiredID, IRequiredComponentID } from "@dashboard/componentIDs";
 import Or from "@dashboard/components/forms/Or";

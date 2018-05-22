@@ -5,10 +5,9 @@
 
 import * as React from "react";
 import { t } from "@dashboard/application";
-import { log, logError, debug } from "@dashboard/utility";
-import DocumentTitle from "@dashboard/Components/DocumentTitle";
+import DocumentTitle from "@dashboard/components/DocumentTitle";
 import PasswordForm from "./components/PasswordForm";
-import { uniqueIDFromPrefix, getOptionalID, IOptionalComponentID } from "@dashboard/componentIDs";
+import { uniqueIDFromPrefix } from "@dashboard/componentIDs";
 
 interface IState {
     loginFormActive: boolean;

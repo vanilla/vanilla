@@ -27,14 +27,8 @@
         },
         "exports": {
             "*": [
-                "./src/scripts/application",
-                "./src/scripts/apiv2",
-                "./src/scripts/gdn",
-                "./src/scripts/permissions",
-                "./src/scripts/utility",
-                "./src/scripts/dom",
-                "./src/scripts/Components/DocumentTitle",
-                "./src/scripts/Main/NotFoundPage",
+                "./src/scripts/*.",
+                "./src/scripts/components/**/*",
                 "axios",
                 "classnames",
                 "prop-types",

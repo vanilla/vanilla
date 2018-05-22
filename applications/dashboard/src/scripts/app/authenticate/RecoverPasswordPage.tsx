@@ -5,10 +5,10 @@
 
 import apiv2 from "@dashboard/apiv2";
 import { t } from "@dashboard/application";
-import { log, logError, debug } from "@dashboard/utility";
-import DocumentTitle from "@dashboard/Components/DocumentTitle";
+import { logError } from "@dashboard/utility";
+import DocumentTitle from "@dashboard/components/DocumentTitle";
 import React from "react";
-import { uniqueIDFromPrefix, getOptionalID, IOptionalComponentID } from "@dashboard/componentIDs";
+import { uniqueIDFromPrefix, IOptionalComponentID } from "@dashboard/componentIDs";
 import ButtonSubmit from "@dashboard/components/forms/ButtonSubmit";
 import Paragraph from "@dashboard/components/forms/Paragraph";
 import InputTextBlock from "@dashboard/components/forms/InputTextBlock";

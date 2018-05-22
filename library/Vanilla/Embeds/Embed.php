@@ -31,9 +31,6 @@ abstract class Embed implements InjectableInterface {
     /** @var string Rendered type of this embed (e.g. video, image). */
     protected $renderType;
 
-    /** @var string[] Client-side scripts for handling this embed type.  */
-    protected $scripts = [];
-
     /** @var string Primary type for this embed (e.g. youtube, twitter). */
     protected $type;
 
@@ -90,15 +87,6 @@ abstract class Embed implements InjectableInterface {
      */
     public function getRenderType(): string {
         return $this->renderType;
-    }
-
-    /**
-     * Get scripts for this embed type.
-     *
-     * @return array
-     */
-    public function getScripts(): array {
-        return $this->scripts;
     }
 
     /**

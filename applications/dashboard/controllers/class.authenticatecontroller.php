@@ -110,7 +110,7 @@ class AuthenticateController extends Gdn_Controller {
      *
      * @param string $authenticatorType The authenticator's type.
      * @param string $authenticatorID The authenticator's instance ID.
-     * @throws Exception
+     * @throws Exception Connect user feature is not implemented.
      */
     public function index($authenticatorType = '', $authenticatorID = '') {
         $persist = $this->request->getBody()['persist'] ?? ($this->request->getQuery()['persist'] ?? false);
@@ -126,7 +126,7 @@ class AuthenticateController extends Gdn_Controller {
         if ($response['authenticationStep'] === 'authenticated') {
             $redirectURL = (val('target', $this->request->getQuery(), '/'));
         } else {
-            throw new Gdn_ErrorException('Connect user feature is not implemented.');
+            throw new Exception('Connect user feature is not implemented.', 500);
 //            $target = val('target', $this->request->getQuery());
 //            if ($target) {
 //                $target = '&target='.$target;

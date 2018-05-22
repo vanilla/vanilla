@@ -120,7 +120,7 @@ $Configuration['Garden']['Html']['AllowedElements'] = "a, abbr, acronym, address
 $Configuration['Garden']['Search']['Mode'] = 'boolean'; // matchboolean, match, boolean, like
 $Configuration['Garden']['EditContentTimeout'] = 3600; // -1 means no timeout. 0 means immediate timeout. > 0 is in seconds. 60 * 60 = 3600 (aka 1hr)
 $Configuration['Garden']['Format']['Mentions'] = true;
-$Configuration['Garden']['Format']['Hashtags'] = true;
+$Configuration['Garden']['Format']['Hashtags'] = false;
 $Configuration['Garden']['Format']['YouTube'] = true;
 $Configuration['Garden']['Format']['Vimeo'] = true;
 $Configuration['Garden']['Format']['EmbedSize'] = 'normal'; // tiny/small/normal/big/huge or WIDTHxHEIGHT

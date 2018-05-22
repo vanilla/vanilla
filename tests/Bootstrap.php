@@ -20,6 +20,7 @@ use Vanilla\Authenticator\PasswordAuthenticator;
 use Vanilla\InjectableInterface;
 use Vanilla\Models\AuthenticatorModel;
 use Vanilla\Models\SSOModel;
+use Vanilla\Quill\Renderer;
 use VanillaTests\Fixtures\MockAuthenticator;
 use VanillaTests\Fixtures\MockSSOAuthenticator;
 use VanillaTests\Fixtures\NullCache;
@@ -234,6 +235,13 @@ class Bootstrap {
             ->addCall('addEmbed', [new Reference(\Vanilla\Embeds\VimeoEmbed::class)])
             ->addCall('addEmbed', [new Reference(\Vanilla\Embeds\ImageEmbed::class), \Vanilla\Embeds\EmbedManager::PRIORITY_LOW])
             ->addCall('setNetworkEnabled', [false])
+            ->setShared(true)
+
+            ->rule(\Vanilla\Quill\Parser::class)
+            ->setShared(true)
+
+            ->rule(\Vanilla\Quill\Renderer::class)
+            ->setConstructorArgs([new Reference(\Vanilla\Quill\Parser::class)])
             ->setShared(true)
         ;
     }

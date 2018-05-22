@@ -136,6 +136,94 @@ export function isInstanceOfOneOf(needle: any, haystack: IClass[]) {
     return false;
 }
 
+export function simplifyFraction(numerator: number, denominator: number) {
+    const findGCD = (a, b) => {
+        return b ? findGCD(b, a % b) : a;
+    };
+    const gcd = findGCD(numerator, denominator);
+
+    numerator = numerator / gcd;
+    denominator = denominator / gcd;
+
+    return {
+        numerator,
+        denominator,
+        shorthand: denominator + ":" + numerator,
+    };
+}
+
+interface IMentionMatch {
+    match: string;
+    rawMatch: string;
+}
+
+/**
+ * Custom matching to allow quotation marks in the matching string as well as spaces.
+ * Spaces make things more complicated.
+ *
+ * @param subtext - The string to be tested.
+ * @param shouldStartWithSpace - Should the pattern include a test for a whitespace prefix?
+ * @returns Matching string if successful.  Null on failure to match.
+ */
+export function matchAtMention(subtext: string, shouldStartWithSpace: boolean = false): IMentionMatch | null {
+    // Split the string at the lines to allow for a simpler regex.
+    const lines = subtext.split("\n");
+    const lastLine = lines[lines.length - 1];
+
+    // If you change this you MUST change the regex in src/scripts/__tests__/legacy.test.js !!!
+    /**
+     * Put together the non-excluded characters.
+     *
+     * @param {boolean} excludeWhiteSpace - Whether or not to exclude whitespace characters.
+     *
+     * @returns {string} A Regex string.
+     */
+    function nonExcludedCharacters(excludeWhiteSpace) {
+        let excluded =
+            "[^" +
+            '"' + // Quote character
+            "\\u0000-\\u001f\\u007f-\\u009f" + // Control characters
+            "\\u2028"; // Line terminator
+
+        if (excludeWhiteSpace) {
+            excluded += "\\s";
+        }
+
+        excluded += "]";
+        return excluded;
+    }
+
+    let regexStr =
+        "@" + // @ Symbol triggers the match
+        "(" +
+        // One or more non-greedy characters that aren't excluded. White is allowed, but a starting quote is required.
+        '"(' +
+        nonExcludedCharacters(false) +
+        '+?)"?' +
+        "|" + // Or
+        // One or more non-greedy characters that aren't exluded. Whitespace is excluded.
+        "(" +
+        nonExcludedCharacters(true) +
+        '+?)"?' +
+        ")" +
+        "(?:\\n|$)"; // Newline terminates.
+
+    // Determined by at.who library
+    if (shouldStartWithSpace) {
+        regexStr = "(?:^|\\s)" + regexStr;
+    }
+    const regex = new RegExp(regexStr, "gi");
+    const match = regex.exec(lastLine);
+    if (match) {
+        return {
+            rawMatch: match[0],
+            match: match[2] || match[1], // Return either of the matching groups (quoted or unquoted).
+        };
+    }
+
+    // No match
+    return null;
+}
 /**
  * Re-exported from sprintf-js https://www.npmjs.com/package/sprintf-js
  */

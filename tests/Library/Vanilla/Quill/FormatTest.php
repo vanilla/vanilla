@@ -78,8 +78,8 @@ class FormatTest extends TestCase {
     private $linkOpeningTag = [
         "tag" => "a",
         "attributes" => [
-            "target" => "_blank",
             "href" => "https://google.com",
+            "rel" => "nofollow",
         ],
     ];
 

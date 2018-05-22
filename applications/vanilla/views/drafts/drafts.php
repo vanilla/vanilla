@@ -10,7 +10,7 @@ foreach ($this->DraftData->resultArray() as $Draft) {
 
     $draftID = val('DraftID', $Draft);
     $discussionID = val('DiscussionID', $Draft);
-    $excerpt = sliceString(Gdn_Format::text(val('Body', $Draft)), 200);
+    $excerpt = htmlspecialchars(sliceString(Gdn_Format::plainText(val('Body', $Draft), val('Format', $Draft)), 200));
 
     $isDiscussion = (!is_numeric($discussionID) || $discussionID <= 0);
     $orphaned = !val('DiscussionExists', $Draft);
@@ -24,7 +24,7 @@ foreach ($this->DraftData->resultArray() as $Draft) {
                 echo anchor(t('Draft.Delete', '&times;'), $deleteUrl, 'Delete'); ?></div>
         <div class="ItemContent">
             <?php
-            $anchorText = Gdn_Format::text(val('Name', $Draft), false);
+            $anchorText = htmlspecialchars(val('Name', $Draft));
             if (!empty($anchorText)) {
                 echo anchor(wrap($anchorText, "span", ['class' => 'Draft-Title', 'role' => 'heading', 'aria-level' => '2']), $editUrl, 'Title DraftLink');
             } else {

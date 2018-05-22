@@ -32,11 +32,16 @@ const moduleNameMapper = {
 
 const babelConfig = JSON.parse(fs.readFileSync(path.resolve("./.babelrc")));
 
+const transformIgnorePatterns = fs.readdirSync(path.join(__dirname, "node_modules"))
+    .filter(dir => !dir.includes("quill"))
+    .map(dir => "node_modules\/" + dir);
+
 module.exports = {
     roots,
     moduleDirectories,
     moduleNameMapper,
     setupFiles,
+    transformIgnorePatterns,
     testPathIgnorePatterns: ["/node_modules/", "/fixtures/", "/bower_components/", "setup.ts"],
     watchPathIgnorePatterns: ["/fixtures/"],
     transform: {
@@ -44,7 +49,6 @@ module.exports = {
         "^.+\\.(js|jsx)$": require.resolve("babel-jest"),
         "^.+\\.svg?$": require.resolve("html-loader-jest"),
     },
-    transformIgnorePatterns: ["node_modules\/(?!(quill|parchment)\/)"],
     moduleFileExtensions: ["ts", "tsx", "js", "jsx"],
     testRegex: "\\.test\\.(ts|tsx)$",
     globals: {

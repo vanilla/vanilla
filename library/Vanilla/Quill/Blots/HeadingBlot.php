@@ -9,6 +9,9 @@ namespace Vanilla\Quill\Blots;
 
 class HeadingBlot extends AbstractBlockBlot {
 
+    /** @var array Valid heading levels. */
+    private static $validLevels = [1, 2, 3, 4, 5, 6];
+
     /**
      * @inheritDoc
      */
@@ -20,7 +23,7 @@ class HeadingBlot extends AbstractBlockBlot {
      * @inheritDoc
      */
     protected static function getMatchingAttributeValue() {
-        return [1, 2, 3, 4, 5, 6];
+        return self::$validLevels;
     }
 
     /**
@@ -48,8 +51,14 @@ class HeadingBlot extends AbstractBlockBlot {
      * Get the heading level for the blot.
      *
      * @return int
+     * @throws \Exception if the level is not a valid integer.
      */
     private function getHeadingLevel(): int {
-        return valr("attributes.header", $this->nextOperation);
+        $level = valr("attributes.header", $this->currentOperation)
+            ?: valr("attributes.header", $this->nextOperation);
+        if (!in_array($level, self::$validLevels)) {
+            throw new \Exception("Invalid heading level");
+        }
+        return $level;
     }
 }

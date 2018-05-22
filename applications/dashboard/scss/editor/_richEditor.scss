@@ -162,6 +162,8 @@ $embedded-quote_fg: #A3A3A3 !default;
     border: 0;
     padding: 0;
     background: none;
+    width: 100%;
+    text-align: left;
 }
 
 
@@ -293,6 +295,7 @@ $embedded-quote_fg: #A3A3A3 !default;
 }
 
 .popover-title {
+    @include longWordEllipsis;
     margin: 0;
     max-width: calc(100% - #{$richEditor-menuButton_size});
     min-height: #{$richEditor-menuButton_size - $richEditor-insertPopover_paddingVertical};
@@ -353,6 +356,8 @@ $embedded-quote_fg: #A3A3A3 !default;
     width: $richEditor-menuButton_size;
     height: $richEditor-menuButton_size;
     font-size: $richEditor-icon_size;
+    text-align: center;
+    overflow: hidden;
 }
 
 .richEditor ~ .TextBoxWrapper {
@@ -538,6 +543,7 @@ $embedded-quote_fg: #A3A3A3 !default;
     a,
     p
     {
+        word-break: break-all;
         word-break: break-word;
         text-overflow: ellipsis;
         line-height: 1.5;
@@ -608,11 +614,14 @@ $embedded-quote_fg: #A3A3A3 !default;
     width: $richEditor-atMention_width;
 }
 
-
 .atMentionList-items {
     &.MenuItems {
         display: block;
         padding: $richEditor-atMentionUser_paddingVertical 0;
+    }
+
+    &.isHidden {
+        display: none;
     }
 }
 
@@ -625,15 +634,18 @@ $embedded-quote_fg: #A3A3A3 !default;
 }
 
 .atMentionList-suggestion {
+    width: 100%;
     cursor: pointer;
 }
 
-.atMentionList-user {
+.atMentionList-user,
+.atMentionList-noResults {
     display: flex;
     align-items: center;
     width: 100%;
     box-sizing: border-box;
     overflow: hidden;
+    line-height: $richEditor-atMentionAvatar_width;
     padding: {
         top: $richEditor-atMentionUser_paddingVertical;
         right: $richEditor-atMentionUser_paddingHorizontal;
@@ -669,19 +681,14 @@ $embedded-quote_fg: #A3A3A3 !default;
     display: block;
 }
 
-
-
 // Rendered link
 .atMention  {
-    user-select: all;
     color: inherit;
     font-weight: $richEditor-atMentionLink_weight;
+    user-select: all;
 }
 
 // Handle gutter for paragraph menu
-
-
-
 body.hasRichEditor {
     // New Discussions
     &.Section-PostDiscussion {

@@ -6,14 +6,16 @@
 
 import { formatUrl } from "@core/application";
 import axios from "axios";
+import qs from "qs";
 
 const api = axios.create({
     baseURL: formatUrl("/api/v2/"),
     headers: {
         common: {
-            'X-Requested-With': 'vanilla',
+            "X-Requested-With": "vanilla",
         },
     },
+    paramsSerializer: params => qs.stringify(params, { indices: false }),
 });
 
 export default api;

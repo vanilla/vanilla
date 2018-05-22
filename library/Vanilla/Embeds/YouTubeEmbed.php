@@ -11,7 +11,7 @@ use InvalidArgumentException;
 /**
  * YouTube embed.
  */
-class YouTubeEmbed extends Embed {
+class YouTubeEmbed extends VideoEmbed {
 
     const DEFAULT_HEIGHT = 270;
 
@@ -73,6 +73,7 @@ class YouTubeEmbed extends Embed {
         if (array_key_exists('rel', $query)) {
             $attributes['rel'] = (bool)$query['rel'];
         }
+        $attributes['embedUrl'] = $this->embedUrl($attributes);
         $data['attributes'] = $attributes;
 
         return $data;
@@ -82,65 +83,43 @@ class YouTubeEmbed extends Embed {
      * @inheritdoc
      */
     public function renderData(array $data): string {
+        $attributes = $data['attributes'] ?? [];
         $height = $data['height'] ?? self::DEFAULT_HEIGHT;
         $width = $data['width'] ?? self::DEFAULT_WIDTH;
+        $name = $data['name'] ?? '';
+        $videoID = $attributes['videoID'] ?? null;
+        $embedUrl = $attributes['embedUrl'] ?? $this->embedUrl($attributes);
+        $photoUrl = "https://img.youtube.com/vi/{$videoID}/0.jpg";
 
-        $attributes = $data['attributes'] ?? [];
+        return $this->videoCode($embedUrl, $name, $photoUrl, $width, $height);
+    }
+
+    private function embedUrl(array $attributes) {
         $listID = $attributes['listID'] ?? null;
         $start = $attributes['start'] ?? null;
         $videoID = $attributes['videoID'] ?? null;
         $rel = $attributes['rel'] ?? null;
 
-        $attrHeight = htmlspecialchars($height);
-        $attrWidth = htmlspecialchars($width);
-
-        if ($listID) {
-            if ($videoID) {
-                $embedUrl = "https://www.youtube.com/embed/{$videoID}?list={$listID}";
+        if ($listID !== null) {
+            if ($videoID !== null) {
+                return "https://www.youtube.com/embed/{$videoID}?list={$listID}";
             } else {
-                $embedUrl = "https://www.youtube.com/embed/videoseries?list={$listID}";
+                return "https://www.youtube.com/embed/videoseries?list={$listID}";
             }
-
-            $attrEmbedUrl = htmlspecialchars($embedUrl);
-
-            $result = <<<HTML
-<iframe width="{$attrWidth}" height="{$attrHeight}" src="{$attrEmbedUrl}" frameborder="0" allowfullscreen></iframe>
-HTML;
-        } elseif ($videoID) {
-            $data = "{$videoID}?autoplay=1";
-            $embedUrl = "https://www.youtube.com/watch?v={$videoID}";
-            $imageUrl = "https://img.youtube.com/vi/{$videoID}/0.jpg";
-
+        } elseif ($videoID !== null) {
+            $params = "feature=oembed&autoplay=1";
             // Show related videos?
             if ($rel !== null) {
-                $data .= '&rel='.(int)$rel;
+                $params .= '&rel='.(int)$rel;
             }
             // Seek to start time.
             if ($start) {
-                $data .= "&start={$start}";
-                $embedUrl .= "#t={$start}";
+                $params .= "&start={$start}";
             }
 
-            $attrData = htmlspecialchars($data);
-            $attrEmbedUrl = htmlspecialchars($embedUrl);
-            $attrImageUrl = htmlspecialchars($imageUrl);
-
-            $result = <<<HTML
-<span class="VideoWrap">
-    <span class="Video YouTube" data-youtube="youtube-{$attrData}">
-        <span class="VideoPreview">
-            <a href="{$attrEmbedUrl}">
-                <img src="{$attrImageUrl}" width="{$attrWidth}" height="{$attrHeight}" border="0" />
-            </a>
-        </span>
-        <span class="VideoPlayer"></span>
-    </span>
-</span>
-HTML;
+            return "https://www.youtube.com/embed/{$videoID}?{$params}";
         } else {
             throw new InvalidArgumentException('Unable to generate YouTube markup.');
         }
-
-        return $result;
     }
 }

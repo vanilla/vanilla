@@ -118,7 +118,7 @@ class SetupController extends DashboardController {
                             ]);
                         }
                     } catch (Exception $ex) {
-                        $this->Form->addError($ex);
+                        // Do nothing so we don't block install for a non-critical addon.
                     }
                 }
 

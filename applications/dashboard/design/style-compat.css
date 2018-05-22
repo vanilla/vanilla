@@ -446,6 +446,17 @@ body.Categories.isMobile .PageControls.Top {
   color: #ff3933;
   line-height: 1.428571429;
   font-size: 12px;
+  margin-top: 3px;
+  word-break: break-all;
+  word-break: break-word;
+}
+
+.inputBlock-error:first-letter {
+  text-transform: capitalize;
+}
+
+.inputBlock-error + .inputBlock-error {
+  margin-top: 6px;
 }
 
 .inputBlock-inputWrap {
@@ -461,6 +472,11 @@ body.Categories.isMobile .PageControls.Top {
 
 .inputBlock-labelNote + .inputBlock-inputWrap {
   margin-top: 6px;
+}
+
+.authenticateUser-paragraph {
+  word-break: break-all;
+  word-break: break-word;
 }
 
 .authenticateUser-paragraph.isError {
@@ -661,6 +677,8 @@ label.checkbox input.checkbox-input {
   border: 0;
   padding: 0;
   background: none;
+  width: 100%;
+  text-align: left;
 }
 
 .richEditor-button {
@@ -779,6 +797,11 @@ label.checkbox input.checkbox-input {
 }
 
 .popover-title {
+  word-break: break-all;
+  word-break: break-word;
+  text-overflow: ellipsis;
+  overflow-x: hidden;
+  max-width: 100%;
   margin: 0;
   max-width: calc(100% - 39px);
   min-height: 27px;
@@ -835,6 +858,8 @@ label.checkbox input.checkbox-input {
   width: 39px;
   height: 39px;
   font-size: 24px;
+  text-align: center;
+  overflow: hidden;
 }
 
 .richEditor ~ .TextBoxWrapper {
@@ -1002,6 +1027,7 @@ label.checkbox input.checkbox-input {
 .userContent code,
 .userContent a,
 .userContent p {
+  word-break: break-all;
   word-break: break-word;
   text-overflow: ellipsis;
   line-height: 1.5;
@@ -1069,20 +1095,27 @@ label.checkbox input.checkbox-input {
   padding: 3px 0;
 }
 
+.atMentionList-items.isHidden {
+  display: none;
+}
+
 .atMentionList-item.isActive .atMentionList-suggestion {
   background-color: #f4f3f5;
 }
 
 .atMentionList-suggestion {
+  width: 100%;
   cursor: pointer;
 }
 
-.atMentionList-user {
+.atMentionList-user,
+.atMentionList-noResults {
   display: flex;
   align-items: center;
   width: 100%;
   box-sizing: border-box;
   overflow: hidden;
+  line-height: 30px;
   padding-top: 3px;
   padding-right: 6px;
   padding-bottom: 3px;
@@ -1117,9 +1150,9 @@ label.checkbox input.checkbox-input {
 }
 
 .atMention {
-  user-select: all;
   color: inherit;
   font-weight: 600;
+  user-select: all;
 }
 
 body.hasRichEditor.Section-PostDiscussion #DiscussionForm select {
@@ -1285,17 +1318,20 @@ body.hasRichEditor #ConversationForm .FormWrapper .richEditor {
 }
 
 .embed-focusableElement {
-  transition: 0.2s ease outline;
-  outline: 2px transparent solid;
+  transition: 0.2s ease box-shadow;
   cursor: pointer;
 }
 
+.embed-focusableElement.embed-twitter {
+  border-radius: 4px;
+}
+
 .embed-focusableElement:hover {
-  outline-color: rgba(2, 145, 219, 0.5);
+  box-shadow: 0 0 0 2px rgba(2, 145, 219, 0.5);
 }
 
 .embed-focusableElement:focus {
-  outline-color: #0291DB;
+  box-shadow: 0 0 0 2px #0291DB;
 }
 
 .embedLoader-icon {
@@ -1482,7 +1518,21 @@ body.hasRichEditor #ConversationForm .FormWrapper .richEditor {
   width: 100%;
   background-size: cover;
   background-repeat: no-repeat;
+  background-position: center;
   cursor: pointer;
+  overflow: hidden;
+}
+
+.embedVideo-playButton::before {
+  content: "";
+  display: block;
+  position: absolute;
+  display: block;
+  top: 0;
+  left: 0;
+  height: 100%;
+  width: 100%;
+  background: linear-gradient(to bottom, rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.4));
 }
 
 .embedVideo-playIcon {
@@ -1499,6 +1549,23 @@ body.hasRichEditor #ConversationForm .FormWrapper .richEditor {
 
 .embedVideo-playIconPath {
   stroke: rgba(0, 0, 0, 0.1);
+}
+
+.embedExternal {
+  display: flex;
+  justify-content: center;
+}
+
+.embedExternal-content {
+  display: inline-block;
+}
+
+.twitter-tweet {
+  margin: 0 !important;
+}
+
+.richEditor .twitter-tweet {
+  pointer-events: none;
 }
 
 .embedLink {

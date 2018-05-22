@@ -84,13 +84,6 @@ export class EmbedPopover extends React.PureComponent<IProps, IState> {
                     // We want it to be on the last element in the popover.
                     const footer = (
                         <React.Fragment>
-                            {/*<button*/}
-                            {/*onBlur={this.state.isInputValid ? undefined : blurHandler}*/}
-                            {/*className="insertMedia-help"*/}
-                            {/*aria-label={t("Get Help on Inserting Media")}*/}
-                            {/*>*/}
-                            {/*{t("Help")}*/}
-                            {/*</button>*/}
                             <input
                                 type="button"
                                 className="Button Primary insertMedia-insert"

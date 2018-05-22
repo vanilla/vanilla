@@ -59,6 +59,9 @@ class UtilityController extends DashboardController {
         if (Gdn::request()->isAuthenticatedPostBack()) {
             $tableID = Gdn::request()->post('TableID');
             if ($tableID) {
+                if (!preg_match('/^[A-Za-z0-9_]+$/', $tableID)) {
+                    throw new InvalidArgumentException('Invalid TableID.');
+                }
                 $rows = Gdn::request()->post($tableID);
                 if (is_array($rows)) {
                     $table = str_replace(['Table', '`'], '', $tableID);

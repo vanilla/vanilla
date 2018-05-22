@@ -43,22 +43,12 @@ export class EmbedPopover extends React.PureComponent<IProps, IState> {
         return this.state.id + "-description";
     }
 
-    get contentsID(): string {
-        return this.state.id + "-contents";
-    }
-
     public render() {
         const title = t("Insert Media");
         const Icon = <Icons.embed />;
 
         return (
-            <PopoverController
-                id={this.state.id}
-                contentID={this.contentsID}
-                classNameRoot="embedDialogue"
-                icon={Icon}
-                onClose={this.clearInput}
-            >
+            <PopoverController id={this.state.id} classNameRoot="embedDialogue" icon={Icon} onClose={this.clearInput}>
                 {(params: IPopoverControllerChildParameters) => {
                     const { initialFocusRef, closeMenuHandler, blurHandler, isVisible } = params;
 
@@ -98,7 +88,7 @@ export class EmbedPopover extends React.PureComponent<IProps, IState> {
 
                     return (
                         <Popover
-                            id={this.contentsID}
+                            id={params.id}
                             descriptionID={this.descriptionID}
                             titleID={this.titleID}
                             title={title}

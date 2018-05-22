@@ -19,7 +19,6 @@ export interface IPopoverControllerChildParameters {
 
 interface IProps extends IEditorContextProps {
     id: string;
-    contentID: string;
     classNameRoot: string;
     icon: JSX.Element;
     children: (props: IPopoverControllerChildParameters) => JSX.Element;
@@ -29,7 +28,6 @@ interface IProps extends IEditorContextProps {
 interface IState {
     id: string;
     isVisible: boolean;
-    contentID: string;
 }
 
 export default class PopoverController extends React.PureComponent<IProps, IState> {
@@ -46,11 +44,10 @@ export default class PopoverController extends React.PureComponent<IProps, IStat
         this.state = {
             id: getRequiredID(props, "popover"),
             isVisible: false,
-            contentID: props.contentID,
         };
     }
 
-    get componentID() {
+    get componentID(): string {
         return this.state.id + "-contents";
     }
 
@@ -71,11 +68,11 @@ export default class PopoverController extends React.PureComponent<IProps, IStat
                     {this.props.icon}
                 </button>
                 {this.props.children({
-                    id: this.state.contentID,
-                    blurHandler: this.blurHandler,
-                    closeMenuHandler: this.closeMenuHandler,
+                    id: this.componentID,
                     initialFocusRef: this.initalFocusRef,
+                    blurHandler: this.blurHandler,
                     isVisible: this.state.isVisible,
+                    closeMenuHandler: this.closeMenuHandler,
                 })}
             </div>
         );

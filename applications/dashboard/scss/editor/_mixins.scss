@@ -70,3 +70,57 @@ $spinnerOffset: 73deg;
     }
 }
 
+// Rich Editor
+@mixin mediaQuery-richEditor_mobile {
+    @media (max-width: $richEditor-mobileBreakPoint) {
+        @content;
+    }
+}
+
+@mixin mediaQuery-richEditor_notMobile {
+    @media (min-width: #{$richEditor-mobileBreakPoint}) {
+        @content;
+    }
+}
+
+@mixin richEditorMobileStyles {
+
+    .richEditor {
+        padding-left: 0;
+
+
+        &.isStickyMenu {
+            .richEditor-embedBar {
+                position: fixed;
+                bottom: 0;
+                left: 0;
+                width: 100%;
+                box-sizing: border-box;
+                margin: {
+                    left: $richEditor-mobile_spacing;
+                    right: $richEditor-mobile_spacing;
+                }
+            }
+        }
+    }
+
+    .richEditorParagraphMenu {
+        display: none !important;
+    }
+
+    .FormWrapper {
+        padding-left: 15px;
+        padding-right: 15px;
+    }
+
+
+}
+
+
+
+// Temp, do not commit
+@include mediaQuery-richEditor_mobile {
+    .Row {
+        width: 100% !important;
+    }
+}

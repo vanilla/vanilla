@@ -555,6 +555,12 @@ label.checkbox input.checkbox-input {
   }
 }
 
+@media (max-width: 700px) {
+  .Row {
+    width: 100% !important;
+  }
+}
+
 .richEditor {
   position: relative;
   display: block;
@@ -721,10 +727,11 @@ label.checkbox input.checkbox-input {
   display: none !important;
 }
 
-.embedBar {
+.richEditor-embedBar {
   display: block;
   width: 100%;
-  padding: 0;
+  margin-left: 18px;
+  margin-right: 18px;
 }
 
 .richEditorInline-icon {
@@ -1155,43 +1162,82 @@ label.checkbox input.checkbox-input {
   user-select: all;
 }
 
-body.hasRichEditor.Section-PostDiscussion #DiscussionForm select {
-  max-width: 100%;
+@media (min-width: 700px) {
+  body.hasRichEditor.Section-PostDiscussion #DiscussionForm select {
+    max-width: 100%;
+  }
+  body.hasRichEditor.Section-PostDiscussion #DiscussionForm .FormWrapper {
+    padding-left: 36px;
+  }
+  body.hasRichEditor.Section-PostDiscussion #DiscussionForm .FormWrapper .richEditor {
+    padding-left: 0;
+  }
+  body.hasRichEditor .CommentForm .CommentFormWrap .Form-HeaderWrap {
+    display: none;
+  }
+  body.hasRichEditor .CommentForm .CommentFormWrap .FormWrapper {
+    padding-left: 0;
+  }
+  body.hasRichEditor .DataListWrap .FormWrapper.FormWrapper-Condensed {
+    padding-left: 0;
+  }
+  body.hasRichEditor #MessageForm .Form-HeaderWrap,
+  body.hasRichEditor #ConversationForm .Form-HeaderWrap {
+    display: none;
+  }
+  body.hasRichEditor #MessageForm .FormWrapper,
+  body.hasRichEditor #ConversationForm .FormWrapper {
+    padding-left: 36px;
+  }
+  body.hasRichEditor #MessageForm .FormWrapper .richEditor,
+  body.hasRichEditor #ConversationForm .FormWrapper .richEditor {
+    padding-left: 0;
+  }
 }
 
-body.hasRichEditor.Section-PostDiscussion #DiscussionForm .FormWrapper {
-  padding-left: 36px;
-}
-
-body.hasRichEditor.Section-PostDiscussion #DiscussionForm .FormWrapper .richEditor {
+body.isMobile .richEditor {
   padding-left: 0;
 }
 
-body.hasRichEditor .CommentForm .CommentFormWrap .Form-HeaderWrap {
-  display: none;
+body.isMobile .richEditor.isStickyMenu .richEditor-embedBar {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  box-sizing: border-box;
+  margin-left: 18px;
+  margin-right: 18px;
 }
 
-body.hasRichEditor .CommentForm .CommentFormWrap .FormWrapper {
-  padding-left: 0;
+body.isMobile .richEditorParagraphMenu {
+  display: none !important;
 }
 
-body.hasRichEditor .DataListWrap .FormWrapper.FormWrapper-Condensed {
-  padding-left: 0;
+body.isMobile .FormWrapper {
+  padding-left: 15px;
+  padding-right: 15px;
 }
 
-body.hasRichEditor #MessageForm .Form-HeaderWrap,
-body.hasRichEditor #ConversationForm .Form-HeaderWrap {
-  display: none;
-}
-
-body.hasRichEditor #MessageForm .FormWrapper,
-body.hasRichEditor #ConversationForm .FormWrapper {
-  padding-left: 36px;
-}
-
-body.hasRichEditor #MessageForm .FormWrapper .richEditor,
-body.hasRichEditor #ConversationForm .FormWrapper .richEditor {
-  padding-left: 0;
+@media (max-width: 700px) {
+  .richEditor {
+    padding-left: 0;
+  }
+  .richEditor.isStickyMenu .richEditor-embedBar {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    box-sizing: border-box;
+    margin-left: 18px;
+    margin-right: 18px;
+  }
+  .richEditorParagraphMenu {
+    display: none !important;
+  }
+  .FormWrapper {
+    padding-left: 15px;
+    padding-right: 15px;
+  }
 }
 
 .spoiler {

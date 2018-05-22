@@ -1,0 +1,53 @@
+$richEditor-font_size: 16px !default;
+$richEditor-icon_size: 24px !default;
+$richEditor-menuButton_size: 39px !default;
+$richEditor-bg_color: white !default;
+$richEditor_leftPadding: 36px !default;
+$richEditor_minHeight: 200px !default;
+$richEditor_verticalPadding: 9px !default;
+$richEditor_padding: $richEditor_verticalPadding 12px !default;
+$richEditor-embedMenu_padding: 0 !default;
+$richEditor-icon_opacity: .6 !default;
+$richEditor-atMention_width: 200px !default;
+$richEditor-atMentionAvatar_width: 30px !default;
+$richEditor-atMentionAvatar_margin: 10px !default;
+$richEditor-atMentionMark_weight: 600 !default;
+$richEditor-atMentionLink_weight: 600 !default;
+$richEditor-atMentionUser_paddingHorizontal: 6px !default;
+$richEditor-atMentionUser_paddingVertical: 3px !default;
+$richEditor-atMentionSelected_bg: #f4f3f5;
+$richEditor-insertLink_width: 387px !default;
+$richEditor-insertPopover_paddingVertical: 12px !default;
+$richEditor-insertPopover_paddingHorizontal: 12px !default;
+$richEditor-insertPopover_maxHeight: 100vh !default;
+$richEditor-insertPopover_height: $richEditor-menuButton_size * 7.5 !default;
+$richEditor-emoji_width: 7 * $richEditor-menuButton_size + 2 * $richEditor-insertPopover_paddingHorizontal;
+$richEditor-nub_width: 12px !default;
+$richEditor-menu_borderWidth: 1px !default;
+$richEditor-menu_offset: $richEditor-nub_width !default;
+$richEditor-code_fontSize: .86em !default;
+$richEditor-inlineCode_verticalPadding: .07em !default;
+$richEditor-inlineCode_horizontalPadding: .5em !default;
+$richEditor-codeBlock_padding: 16px !default;
+$richEditor-code_fg: #000000 !default;
+$richEditor-inlineCode_borderRadius: 2;
+$richEditor-inlineCode_borderColor: #a3a3a3;
+$richEditor-pilcrow_offset: 9px!default;
+$richEditor-pilcrow_bg: #f6f8fa;
+$richEditor-pilcrow_fontSize: 14px;
+$richEditor-pilcrow_gutter: 36px;
+$richEditor-pilcrowAnimation_duration: 0.3s;
+$richEditor-emojiCategory_color: #737982;
+$richEditor-emojiCategory_hoverColor: #212327;
+$richEditor-emojiCategory_selectedBg: #aee4fe;
+$richEditor-emojiGroup_paddingLeft: 3px;
+
+$richEditor-videoPlayIcon_width: 80px;
+$richEditor-videoPlayIcon_hoverColor: #0291db;
+
+$embedImage_width: 640px;
+$embedded-quote_fg: #A3A3A3 !default;
+
+// Break Points
+$richEditor-mobile_spacing: 18px !default;
+$richEditor-mobileBreakPoint: 700px !default;

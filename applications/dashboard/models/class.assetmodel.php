@@ -79,7 +79,7 @@ class AssetModel extends Gdn_Model {
      * @return array
      * @throws Exception
      */
-    public function getCssFiles($themeType, $basename, $eTag, &$notFound = null) {
+    public function getCssFiles($themeType, $basename, $eTag, &$notFound = null, $currentTheme = null) {
         $notFound = [];
         $basename = strtolower($basename);
 
@@ -138,7 +138,7 @@ class AssetModel extends Gdn_Model {
                 $paths[] = [false, $folder, $options];
 
             } else {
-                list($path, $urlPath) = self::cssPath($filename, $folder, $themeType);
+                list($path, $urlPath) = self::cssPath($filename, $folder, $themeType, $currentTheme);
                 if ($path) {
                     $paths[] = [$path, $urlPath, $options];
                 } else {
@@ -258,7 +258,7 @@ class AssetModel extends Gdn_Model {
      * @param string $themeType mobile or desktop
      * @return array|bool
      */
-    public static function cssPath($filename, $folder = '', $themeType = '') {
+    public static function cssPath($filename, $folder = '', $themeType = '', $currentTheme = null) {
         if (!$themeType) {
             $themeType = isMobile() ? 'mobile' : 'desktop';
         }
@@ -286,6 +286,12 @@ class AssetModel extends Gdn_Model {
 
         // 3. Check the theme.
         $theme = Gdn::themeManager()->themeFromType($themeType);
+
+        // Let override theme dynamically
+        if (isset($currentTheme) && $currentTheme != $theme) {
+            $theme = $currentTheme;
+        }
+
         if ($theme) {
             $path = "/$theme/design/$filename";
             $paths[] = [PATH_THEMES.$path, "/themes{$path}"];

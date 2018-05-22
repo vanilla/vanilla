@@ -16,7 +16,6 @@ function getTestDirectoriesInDirectory(rootDir) {
 }
 
 const roots = [
-    path.resolve(__dirname, "src/scripts"), // Core
     ...getTestDirectoriesInDirectory("applications"),
     ...getTestDirectoriesInDirectory("plugins"),
 ];
@@ -25,7 +24,6 @@ const moduleDirectories = roots.map(root => path.normalize(path.join(root, "../.
 const setupFiles = roots.map(root => path.join(root, "__tests__/setup.ts")).filter(fs.existsSync);
 
 const moduleNameMapper = {
-    "@core/(.*)$": path.resolve(__dirname, "src/scripts/$1"),
     "@dashboard/(.*)$": path.resolve(__dirname, "applications/dashboard/src/scripts/$1"),
     "@vanilla/(.*)$": path.resolve(__dirname, "applications/vanilla/src/scripts/$1"),
 };

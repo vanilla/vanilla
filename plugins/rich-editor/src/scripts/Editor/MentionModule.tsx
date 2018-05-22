@@ -107,7 +107,7 @@ export class MentionModule extends React.PureComponent<IProps, IState> {
      */
     private keyDownListener = (event: KeyboardEvent) => {
         const { activeItemIndex, suggestions, inActiveMention, hasApiResponse } = this.state;
-        if ((this.quill.hasFocus() && !inActiveMention) || !hasApiResponse) {
+        if (this.quill.hasFocus() && inActiveMention && !hasApiResponse) {
             // Quill doesn't properly trigger update the range until after enter is pressed, which triggers out text change listener with the wrong range. Manually handle this for now.
             if (Keyboard.match(event, Keyboard.keys.ENTER)) {
                 this.cancelActiveMention();

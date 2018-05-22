@@ -29,6 +29,7 @@ interface IProps {
     onClick: (event: React.MouseEvent<any>) => void;
     onBlur?: (event?: React.FocusEvent<any>) => void;
     role?: string;
+    disabled: boolean;
 }
 
 /**
@@ -63,6 +64,7 @@ export default class MenuItem extends React.Component<IProps> {
                 onClick={onClick}
                 onBlur={this.onBlur}
                 onKeyDown={this.handleKeyPress}
+                disabled={this.props.disabled}
             >
                 <Icon />
             </button>

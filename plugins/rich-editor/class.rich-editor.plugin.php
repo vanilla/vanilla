@@ -19,6 +19,17 @@ class RichEditorPlugin extends Gdn_Plugin {
     }
 
     /**
+     * {@inheritDoc}
+     */
+    public function setup() {
+        $this->structure();
+    }
+
+    public function structure() {
+        saveToConfig('Garden.InputFormatter', 'Rich');
+    }
+
+    /**
      * @return int
      */
     public static function getEditorID(): int {
@@ -26,18 +37,36 @@ class RichEditorPlugin extends Gdn_Plugin {
     }
 
     /**
-     * Add the style script to the head
+     * Check to see if we should be using the Rich Editor
+     * @param Gdn_Controller $sender
+     */
+    public function isRichFormat($sender):bool {
+        $form = val('Form', $sender, $sender); // May already be "Form" object
+        $data = $form->formData();
+        return strcmp(val('Format', $data, "Rich"), "Rich") === 0;
+    }
+
+    /**
      *
      * @param Gdn_Controller $sender
-     * @return void
      */
-    public function base_render_before($sender) {
-        if (inSection("Dashboard")) {
-            return;
+    public function base_beforeCommentForm_handler($sender) {
+        if ($this->isRichFormat($sender)) {
+            $sender->CssClass .= ' hasRichEditor';
         }
-        $sender->CssClass .= ' hasRichEditor';
-        $sender->addDefinition("editor", "RichEditor");
     }
+
+    /**
+     *
+     * @param Gdn_Controller $sender
+     * @throws Exception
+     */
+    public function postController_render_before($sender) {
+        if ($this->isRichFormat($sender)) {
+            $sender->CssClass .= ' hasRichEditor';
+        }
+    }
+
 
     /**
      * Attach editor anywhere 'BodyBox' is used.
@@ -47,20 +76,19 @@ class RichEditorPlugin extends Gdn_Plugin {
      * @param Gdn_Form $sender
      */
     public function gdn_form_beforeBodyBox_handler($sender, $args) {
-        /** @var Gdn_Controller $controller */
-        $controller = Gdn::controller();
-        $editorID = $this->getEditorID();
+        if ($this->isRichFormat($sender)) {
+            /** @var Gdn_Controller $controller */
+            $controller = Gdn::controller();
+            $editorID = $this->getEditorID();
+            $controller->setData('editorData', [
+                'editorID' => $editorID,
+                'editorDescriptionID' => 'richEditor-'.$editorID.'-description',
+                'hasUploadPermission' => checkPermission('uploads.add'),
+            ]);
 
-        $controller->setData('editorData', [
-            'editorID' => $editorID,
-            'editorDescriptionID' => 'richEditor-'.$editorID.'-description',
-            'hasUploadPermission' => checkPermission('uploads.add'),
-        ]);
-
-        // Render the editor view.
-        $args['BodyBox'] = $controller->fetchView('rich-editor', '', 'plugins/rich-editor');
-
-        // Set the format on the form.
-        $sender->setValue('Format', 'Rich');
+            // Render the editor view.
+            $args['BodyBox'] = $controller->fetchView('rich-editor', '', 'plugins/rich-editor');
+        }
     }
+
 }

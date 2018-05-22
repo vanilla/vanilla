@@ -14,13 +14,11 @@ import { withEditor, IEditorContextProps } from "./ContextProvider";
 import QuillFlyoutBounds from "./QuillFlyoutBounds";
 
 interface IProps extends IEditorContextProps {
-    forceVisibility: string;
-    setVisibility(value: boolean): void;
+    selection: RangeStatic | null;
+    isVisible: boolean;
 }
 
 interface IState {
-    range: RangeStatic | null;
-    isHidden: boolean;
     flyoutWidth: number | null;
     flyoutHeight: number | null;
     nubHeight: number | null;
@@ -41,19 +39,23 @@ export class SelectionPositionToolbarContainer extends React.Component<IProps, I
         this.quill = props.quill;
 
         this.state = {
-            range: null,
-            isHidden: false,
             flyoutHeight: null,
             flyoutWidth: null,
             nubHeight: null,
         };
-        this.props.setVisibility(true);
     }
 
     public render() {
-        const { isHidden, range, ...flyoutProps } = this.state;
+        const { isVisible, selection } = this.props;
+        const selectionIndex = selection ? selection.index : null;
+        const selectionLength = selection ? selection.length : null;
         return (
-            <QuillFlyoutBounds {...flyoutProps} isActive={!isHidden}>
+            <QuillFlyoutBounds
+                {...this.state}
+                selectionIndex={selectionIndex}
+                selectionLength={selectionLength}
+                isActive={isVisible}
+            >
                 {({ x, y }) => {
                     let toolbarStyles: React.CSSProperties = {
                         visibility: "hidden",
@@ -62,10 +64,7 @@ export class SelectionPositionToolbarContainer extends React.Component<IProps, I
                     let nubStyles = {};
                     let classes = "richEditor-inlineToolbarContainer richEditor-toolbarContainer ";
 
-                    if (
-                        (x && y && !this.state.isHidden && this.props.forceVisibility === "ignore") ||
-                        this.props.forceVisibility === "visible"
-                    ) {
+                    if (x && y && isVisible) {
                         toolbarStyles = {
                             position: "absolute",
                             top: y ? y.position : 0,
@@ -98,50 +97,12 @@ export class SelectionPositionToolbarContainer extends React.Component<IProps, I
      * Mount quill listeners.
      */
     public componentDidMount() {
-        this.quill.on("selection-change", this.handleSelectionChange);
-        document.addEventListener(CLOSE_FLYOUT_EVENT, this.hideSelf);
         this.setState({
             flyoutWidth: this.flyoutRef.current ? this.flyoutRef.current.offsetWidth : null,
             flyoutHeight: this.flyoutRef.current ? this.flyoutRef.current.offsetHeight : null,
             nubHeight: this.nubRef.current ? this.nubRef.current.offsetHeight : null,
         });
     }
-
-    /**
-     * Be sure to remove the listeners when the component unmounts.
-     */
-    public componentWillUnmount() {
-        this.quill.off("selection-change", this.handleSelectionChange);
-        document.removeEventListener(CLOSE_FLYOUT_EVENT, this.hideSelf);
-    }
-
-    private showSelf = () => {
-        this.setState({
-            isHidden: false,
-        });
-        this.props.setVisibility(true);
-    };
-
-    private hideSelf = () => {
-        this.setState({
-            isHidden: true,
-        });
-        this.props.setVisibility(false);
-    };
-
-    /**
-     * Handle changes from the editor.
-     */
-    private handleSelectionChange = (range, oldRange, source) => {
-        if (range && range.length > 0 && source === Emitter.sources.USER) {
-            const content = this.quill.getText(range.index, range.length);
-            const isNewLinesOnly = /(\n){1,}/.test(content);
-
-            if (!isNewLinesOnly) {
-                this.showSelf();
-            }
-        }
-    };
 }
 
 export default withEditor<IProps>(SelectionPositionToolbarContainer);

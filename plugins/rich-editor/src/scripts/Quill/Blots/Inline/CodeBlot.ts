@@ -5,6 +5,7 @@
  */
 
 import { Code } from "quill/formats/code";
+import Text from "quill/blots/text";
 
 export default class CodeBlot extends Code {
     public static blotName = "code-inline";
@@ -16,5 +17,6 @@ export default class CodeBlot extends Code {
         domNode.classList.add("code");
         domNode.classList.add("code-inline");
         domNode.classList.add("isInline");
+        domNode.setAttribute("spellcheck", false);
     }
 }

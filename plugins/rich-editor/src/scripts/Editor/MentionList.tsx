@@ -12,7 +12,7 @@ import MentionSuggestion, { IMentionData, MentionSuggestionNotFound } from "./Me
 import { t } from "@core/application";
 import { getMentionRange } from "../Quill/utility";
 import QuillFlyoutBounds from "./QuillFlyoutBounds";
-import { RangeStatic } from "quill/core";
+import Quill, { RangeStatic, DeltaStatic, Sources } from "quill/core";
 
 interface IProps extends IEditorContextProps {
     mentionData: IMentionData[];
@@ -27,20 +27,25 @@ interface IProps extends IEditorContextProps {
 interface IState {
     flyoutWidth?: number | null;
     flyoutHeight?: number | null;
+    selectionIndex: number | null;
+    selectionLength: number | null;
 }
 
 class MentionList extends React.PureComponent<IProps, IState> {
     public state = {
         flyoutWidth: null,
         flyoutHeight: null,
+        selectionIndex: null,
+        selectionLength: null,
     };
     private flyoutRef: React.RefObject<any> = React.createRef();
+    private quill: Quill;
 
-    public componentDidMount() {
-        this.setState({
-            flyoutWidth: this.flyoutRef.current ? this.flyoutRef.current.offsetWidth : null,
-            flyoutHeight: this.flyoutRef.current ? this.flyoutRef.current.offsetHeight : null,
-        });
+    constructor(props) {
+        super(props);
+
+        // Quill can directly on the class as it won't ever change in a single instance.
+        this.quill = props.quill;
     }
 
     public render() {
@@ -51,12 +56,13 @@ class MentionList extends React.PureComponent<IProps, IState> {
 
         return (
             <QuillFlyoutBounds
-                selectionTransformer={this.selectionTransformer}
                 horizontalAlignment="start"
                 verticalAlignment="below"
                 flyoutWidth={this.state.flyoutWidth}
                 flyoutHeight={this.state.flyoutHeight}
                 isActive={isVisible}
+                selectionIndex={this.state.selectionIndex}
+                selectionLength={this.state.selectionLength}
             >
                 {({ x, y }) => {
                     const offset = 3;
@@ -108,8 +114,51 @@ class MentionList extends React.PureComponent<IProps, IState> {
         );
     }
 
-    private selectionTransformer = (range: RangeStatic) => {
-        return getMentionRange(this.props.quill!, range.index);
+    public componentDidMount() {
+        this.setState({
+            flyoutWidth: this.flyoutRef.current ? this.flyoutRef.current.offsetWidth : null,
+            flyoutHeight: this.flyoutRef.current ? this.flyoutRef.current.offsetHeight : null,
+        });
+        this.quill.on(Quill.events.EDITOR_CHANGE, this.handleEditorChange);
+    }
+
+    /**
+     * Be sure to remove the listeners when the component unmounts.
+     */
+    public componentWillUnmount() {
+        this.quill.off(Quill.events.EDITOR_CHANGE, this.handleEditorChange);
+    }
+
+    /**
+     * Handle changes from the editor.
+     */
+    private handleEditorChange = (
+        type: string,
+        rangeOrDelta: RangeStatic | DeltaStatic,
+        oldRangeOrDelta: RangeStatic | DeltaStatic,
+        source: Sources,
+    ) => {
+        const isTextOrSelectionChange = type === Quill.events.SELECTION_CHANGE || type === Quill.events.TEXT_CHANGE;
+        if (source === Quill.sources.SILENT || !isTextOrSelectionChange) {
+            return;
+        }
+        const range = this.quill.getSelection();
+        const selection: RangeStatic | null = range ? getMentionRange(this.quill, range.index) : null;
+
+        if (selection && selection.length > 0) {
+            const content = this.quill.getText(selection.index, selection.length);
+            const isNewLinesOnly = !content.match(/[^\n]/);
+
+            if (!isNewLinesOnly) {
+                this.setState({ selectionIndex: selection.index, selectionLength: selection.length });
+                return;
+            }
+        }
+
+        this.setState({
+            selectionIndex: null,
+            selectionLength: null,
+        });
     };
 }
 

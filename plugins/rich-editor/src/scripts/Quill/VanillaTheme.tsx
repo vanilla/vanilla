@@ -56,6 +56,8 @@ export default class VanillaTheme extends ThemeBase {
         }
         this.mountMentionModule();
         this.mountEmojiMenu();
+        this.documentClickListener = this.documentClickListener.bind(this);
+        document.addEventListener("click", this.documentClickListener);
     }
 
     public init() {
@@ -63,6 +65,12 @@ export default class VanillaTheme extends ThemeBase {
         this.mountToolbar();
         this.mountParagraphMenu();
         this.mountEmbedPopover();
+    }
+
+    private documentClickListener(event) {
+        if (event.target instanceof Node && !this.jsBodyBoxContainer.contains(event.target)) {
+            closeEditorFlyouts();
+        }
     }
 
     /**

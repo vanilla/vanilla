@@ -18,14 +18,22 @@ const SHORTKEY = /Mac/i.test(navigator.platform) ? "metaKey" : "ctrlKey";
 export default class HistoryModule extends BaseHistoryModule {
     private lastFocusedEmbedBlot?: FocusableEmbedBlot;
 
+    /**
+     * Add an undo handler for when an embed blot has focus.
+     */
     constructor(quill, options) {
+        options.userOnly = true;
         super(quill, options);
         delegateEvent(
             "keydown",
             ".embed",
             (event: KeyboardEvent, clickedElement) => {
-                const zKeyCode = "Z".charCodeAt(0);
-                if (event && event[SHORTKEY] && event.keyCode === zKeyCode) {
+                if (
+                    KeyboardModule.match(event, {
+                        key: "z",
+                        metaKey: true,
+                    })
+                ) {
                     if (event.shiftKey) {
                         this.redo();
                     } else {
@@ -35,5 +43,47 @@ export default class HistoryModule extends BaseHistoryModule {
             },
             this.quill.container,
         );
+    }
+
+    /**
+     * Occasionally perform a double undo.
+     *
+     * @see {needsDoubleUndo}
+     */
+    public change(source, dest) {
+        if (this.needsDoubleUndo()) {
+            this.ignoreChange = true;
+            super.change(source, dest);
+            super.change(source, dest);
+            this.ignoreChange = false;
+        }
+
+        super.change(source, dest);
+    }
+
+    /**
+     * This is SUPER hacky, but I couldn't find a better way to manage it.
+     *
+     * Certain operations (where we are async rendering a blot and it needs to return immediately anyways)
+     * require 2 undos. These inserts have an insert of a Promise.
+     *
+     * If a double undo is not performed the blot will continually re-resolve, and re-render itself, making
+     * undoing impossible.
+     */
+    private needsDoubleUndo(): boolean {
+        const lastUndo = this.stack.undo[this.stack.undo.length - 1];
+        if (!lastUndo) {
+            return false;
+        }
+
+        const lastUndoOps = lastUndo.undo.ops;
+
+        let containsAPromiseInsert = false;
+        lastUndoOps.forEach(op => {
+            if (op.insert && op.insert["embed-external"] && op.insert["embed-external"] instanceof Promise) {
+                containsAPromiseInsert = true;
+            }
+        });
+        return containsAPromiseInsert;
     }
 }

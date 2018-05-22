@@ -22,6 +22,7 @@ interface IProps extends IEditorContextProps {
     isHidden?: boolean;
     onBlur: (event: React.FocusEvent<any>) => void;
     itemRole?: string;
+    restrictedFormats?: null | string[];
 }
 
 interface IState {
@@ -110,6 +111,7 @@ export class Toolbar extends React.Component<IProps, IState> {
             }, 0);
 
         const menuItems = menuItemList.map((itemName, key) => {
+            const isDisabled = this.props.restrictedFormats ? this.props.restrictedFormats.includes(itemName) : false;
             const isActive = this.state.menuItems[itemName].active;
             const isActiveFallback = (numberOfActiveItems === 0 && this.state.menuItems[itemName].isFallback) || false;
 
@@ -122,7 +124,8 @@ export class Toolbar extends React.Component<IProps, IState> {
                     propertyName={itemName}
                     label={t("richEditor.menu." + itemName)}
                     key={itemName}
-                    isActive={isActive || isActiveFallback}
+                    disabled={isDisabled}
+                    isActive={!isDisabled && (isActive || isActiveFallback)}
                     isLast={key + 1 === menuItemList.length}
                     isFirst={key === 0}
                     onClick={clickHandler}
@@ -172,9 +175,9 @@ export class Toolbar extends React.Component<IProps, IState> {
     /**
      * Generic item click handler. This will defer to other handlers where available.
      *
-     * @param {string} itemKey - The key of the item that was clicked.
+     * @param itemKey - The key of the item that was clicked.
      */
-    private formatItem(itemKey) {
+    private formatItem(itemKey: string) {
         const itemData = this.state.menuItems[itemKey];
 
         if (itemData.formatter) {

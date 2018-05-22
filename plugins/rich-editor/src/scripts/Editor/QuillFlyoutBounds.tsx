@@ -40,11 +40,12 @@ interface IProps extends IEditorContextProps {
     horizontalAlignment?: HorizontalAlignment;
     verticalAlignment?: VerticalAlignment;
     isActive: boolean;
+    selection?: RangeStatic | null;
+    selectionIndex: number | null;
+    selectionLength: number | null;
 }
 
 interface IState {
-    selectionIndex: number | null;
-    selectionLength: number | null;
     quillWidth: number;
 }
 
@@ -58,8 +59,6 @@ class QuillFlyoutBounds extends React.PureComponent<IProps, IState> {
         this.quill = props.quill;
 
         this.state = {
-            selectionIndex: null,
-            selectionLength: null,
             quillWidth: this.quill.root.offsetWidth,
         };
     }
@@ -82,7 +81,6 @@ class QuillFlyoutBounds extends React.PureComponent<IProps, IState> {
      * Mount quill listeners.
      */
     public componentDidMount() {
-        this.quill.on(Emitter.events.EDITOR_CHANGE, this.handleEditorChange);
         window.addEventListener("resize", this.windowResizeListener);
     }
 
@@ -90,7 +88,6 @@ class QuillFlyoutBounds extends React.PureComponent<IProps, IState> {
      * Be sure to remove the listeners when the component unmounts.
      */
     public componentWillUnmount() {
-        this.quill.off(Quill.events.EDITOR_CHANGE, this.handleEditorChange);
         window.removeEventListener("resize", this.windowResizeListener);
     }
 
@@ -105,46 +102,12 @@ class QuillFlyoutBounds extends React.PureComponent<IProps, IState> {
     };
 
     /**
-     * Handle changes from the editor.
-     */
-    private handleEditorChange = (
-        type: string,
-        rangeOrDelta: RangeStatic | DeltaStatic,
-        oldRangeOrDelta: RangeStatic | DeltaStatic,
-        source: Sources,
-    ) => {
-        const isTextOrSelectionChange = type === Quill.events.SELECTION_CHANGE || type === Quill.events.TEXT_CHANGE;
-        if (source === Quill.sources.SILENT || !isTextOrSelectionChange) {
-            return;
-        }
-        let selection: RangeStatic | null = this.quill.getSelection();
-        if (this.props.selectionTransformer && selection) {
-            selection = this.props.selectionTransformer(selection);
-        }
-
-        if (selection && selection.length > 0) {
-            const content = this.quill.getText(selection.index, selection.length);
-            const isNewLinesOnly = /(\n){1,}/.test(content);
-
-            if (!isNewLinesOnly) {
-                this.setState({ selectionIndex: selection.index, selectionLength: selection.length });
-                return;
-            }
-        }
-
-        this.setState({
-            selectionIndex: null,
-            selectionLength: null,
-        });
-    };
-
-    /**
      * Get the bounds for the current range.
      *
      * @returns The current quill bounds.
      */
     private getBounds(): BoundsStatic | null {
-        const { selectionIndex, selectionLength } = this.state;
+        const { selectionIndex, selectionLength } = this.props;
         if (selectionIndex === null || selectionLength === null) {
             return null;
         }

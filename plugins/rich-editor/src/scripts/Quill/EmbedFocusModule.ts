@@ -12,7 +12,12 @@ import Module from "quill/core/module";
 import { RangeStatic } from "quill/core";
 import { delegateEvent } from "@core/dom";
 import FocusableEmbedBlot from "./Blots/Abstract/FocusableEmbedBlot";
-import { normalizeBlotIntoBlock, insertNewLineAtEndOfScroll, insertNewLineAtStartOfScroll } from "./utility";
+import {
+    normalizeBlotIntoBlock,
+    insertNewLineAtEndOfScroll,
+    insertNewLineAtStartOfScroll,
+    getBlotAtIndex,
+} from "./utility";
 
 /**
  * A module for managing focus of Embeds. For this to work for a new Embed,
@@ -27,6 +32,11 @@ export default class EmbedFocusModule extends Module {
         length: 0,
     };
 
+    private editorRoot: HTMLElement;
+    private paragraphMenuHandle: HTMLElement;
+    private inlineToolbarFirstActiveItem: HTMLElement;
+    private emojiPickerButton: HTMLElement;
+
     constructor(quill: Quill, options = {}) {
         super(quill, options);
 
@@ -36,7 +46,15 @@ export default class EmbedFocusModule extends Module {
                 this.lastSelection = range;
             }
         });
+        this.setupEmbedClickHandler();
+        this.editorRoot = this.quill.root.closest(".richEditor") as HTMLElement;
 
+        this.quill.root.addEventListener("keydown", this.keyDownListener);
+        this.editorRoot.addEventListener("keydown", this.tabListener);
+        window.quill = quill;
+    }
+
+    private setupEmbedClickHandler() {
         delegateEvent(
             "click",
             ".js-richText .embed",
@@ -49,8 +67,6 @@ export default class EmbedFocusModule extends Module {
             },
             this.quill.container,
         );
-
-        this.quill.root.addEventListener("keydown", this.keyDownListener);
     }
 
     /**
@@ -89,7 +105,7 @@ export default class EmbedFocusModule extends Module {
      * Keydown listener on the current quill instance.
      */
     private keyDownListener = (event: KeyboardEvent) => {
-        if (!this.quill.container.contains(document.activeElement)) {
+        if (!this.quill.container.closest(".richEditor")!.contains(document.activeElement)) {
             return;
         }
 
@@ -105,6 +121,138 @@ export default class EmbedFocusModule extends Module {
         return exclusiveHandlers.reduce((shouldContinue, currentHandler) => {
             return shouldContinue ? currentHandler(event) : false;
         }, true);
+    };
+
+    /**
+     * Keydown listener on the current quill instance.
+     */
+    private tabListener = (event: KeyboardEvent) => {
+        if (!this.quill.container.closest(".richEditor")!.contains(document.activeElement)) {
+            return;
+        }
+
+        const exclusiveHandlers = [this.handleTab, this.handleShiftTab];
+
+        // Run all of the event listeners until one returns false;
+        return exclusiveHandlers.reduce((shouldContinue, currentHandler) => {
+            return shouldContinue ? currentHandler(event) : false;
+        }, true);
+    };
+
+    /**
+     * Ensure that we have references to certain editor elements that we may want to focus.
+     *
+     * This is necessary because they are not mounted yet when this class is constructed.
+     */
+    private ensureEditorElements() {
+        if (!this.paragraphMenuHandle) {
+            this.paragraphMenuHandle = this.editorRoot.querySelector(".richEditorParagraphMenu-handle") as HTMLElement;
+        }
+
+        // Not cached because it could
+        this.inlineToolbarFirstActiveItem = this.editorRoot.querySelector(
+            ".richEditor-inlineToolbarContainer .richEditor-menuItem:not([disabled])",
+        ) as HTMLElement;
+
+        if (!this.emojiPickerButton) {
+            this.emojiPickerButton = this.editorRoot.querySelector(".emojiPicker > .richEditor-button") as HTMLElement;
+        }
+
+        return this.paragraphMenuHandle && this.inlineToolbarFirstActiveItem && this.emojiPickerButton;
+    }
+
+    /**
+     * Manually handle tab presses.
+     *
+     * Because it can be next to impossible to control focus once it shifts into an embedded iframe
+     * or shadow dom root, the EmbedFocusManager is now manually handling all tab and shift-tab shortcuts
+     * to move focus between the various editor elements.
+     *
+     * Once you are outside of the editor there is nothing to worry about.
+     * This only affects while the cursor is in the editor or inside of an embed blot.
+     */
+    private handleTab = (event: KeyboardEvent) => {
+        if (
+            !KeyboardModule.match(event, {
+                key: KeyboardModule.keys.TAB,
+                shiftKey: false,
+            })
+        ) {
+            return true;
+        }
+
+        if (!this.ensureEditorElements()) {
+            return true;
+        }
+
+        const blotForActiveElement = this.getEmbedBlotForFocusedElement();
+        const focusItemIsEmbedBlot = blotForActiveElement instanceof FocusableEmbedBlot;
+        if (this.quill.hasFocus() || focusItemIsEmbedBlot) {
+            event.preventDefault();
+            // Focus the next available editor ui component.
+            const selection = this.quill.getSelection();
+            if (!focusItemIsEmbedBlot) {
+                if (selection && selection.length > 0) {
+                    this.inlineToolbarFirstActiveItem.focus();
+                } else {
+                    this.paragraphMenuHandle.focus();
+                }
+            } else {
+                this.emojiPickerButton.focus();
+            }
+            return false;
+        }
+
+        return true;
+    };
+
+    /**
+     * Manually handle tab presses.
+     *
+     * Because it can be next to impossible to control focus once it shifts into an embedded iframe
+     * or shadow dom root, the EmbedFocusManager is now manually handling all tab and shift-tab shortcuts
+     * to move focus between the various editor elements.
+     *
+     * Once you are outside of the editor there is nothing to worry about.
+     * This only affects while the cursor is in the editor or inside of an embed blot.
+     */
+    private handleShiftTab = (event: KeyboardEvent) => {
+        if (
+            !KeyboardModule.match(event, {
+                key: KeyboardModule.keys.TAB,
+                shiftKey: true,
+            })
+        ) {
+            return true;
+        }
+
+        if (!this.ensureEditorElements()) {
+            return true;
+        }
+
+        const definiteLastItemIsFocused = [this.paragraphMenuHandle, this.inlineToolbarFirstActiveItem].includes(
+            document.activeElement as HTMLElement,
+        );
+        const emojiPickerIsConditionallyFocused =
+            document.activeElement === this.emojiPickerButton &&
+            this.paragraphMenuHandle.classList.contains("isHidden");
+
+        if (definiteLastItemIsFocused || emojiPickerIsConditionallyFocused) {
+            event.preventDefault();
+            // Focus the last item in the editor whether it is normal text or an embed blot.
+            const selection = this.quill.getSelection();
+            const documentLength = this.quill.scroll.length();
+            const newIndex = selection ? selection.index + selection.length : documentLength - 1;
+            const lastEmbedBlot = getBlotAtIndex(this.quill, newIndex, FocusableEmbedBlot);
+            if (lastEmbedBlot) {
+                this.focusEmbedBlot(lastEmbedBlot);
+            } else {
+                this.quill.focus();
+                this.quill.setSelection(newIndex, 0, Quill.sources.USER);
+            }
+        }
+
+        return true;
     };
 
     /**

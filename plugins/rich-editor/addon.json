@@ -24,7 +24,7 @@
     "build": {
         "process": "core",
         "entries": {
-            "app": "./src/scripts/app-entry"
+            "app": "./src/scripts/Entries/app"
         }
     }
 }

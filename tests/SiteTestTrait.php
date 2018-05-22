@@ -8,17 +8,15 @@
 namespace VanillaTests;
 
 use Garden\EventManager;
-use Garden\Container\Container;
-use Vanilla\Models\InstallModel;
 
 /**
  * Allow a class to test against
  */
 trait SiteTestTrait {
-    /**
-     * @var Container
-     */
-    protected static $container;
+    use BootstrapTrait {
+        setupBeforeClass as private bootstrapBeforeClass;
+        teardownAfterClass as private bootstrapAfterClass;
+    }
 
     /**
      * @var array
@@ -31,25 +29,12 @@ trait SiteTestTrait {
     protected static $addons = ['vanilla', 'conversations', 'stubcontent'];
 
     /**
-     * Create the container for the site.
-     *
-     * @return Container Returns a container.
-     */
-    protected static function createContainer() {
-        $folder = strtolower(EventManager::classBasename(get_called_class()));
-        $bootstrap = new Bootstrap("http://vanilla.test/$folder");
-
-        $container = new Container();
-        $bootstrap->run($container);
-
-        return $container;
-    }
-
-    /**
      * Install the site.
      */
     public static function setupBeforeClass() {
-        $dic = self::$container = static::createContainer();
+        static::bootstrapBeforeClass();
+
+        $dic = self::$container;
 
         /* @var TestInstallModel $installer */
         $installer = $dic->get(TestInstallModel::class);
@@ -71,15 +56,6 @@ trait SiteTestTrait {
      */
     public static function teardownAfterClass() {
         self::$addons = ['vanilla', 'conversations', 'stubcontent'];
-        Bootstrap::cleanup(self::container());
-    }
-
-    /**
-     * Get the container for the site info.
-     *
-     * @return Container Returns a container with site dependencies.
-     */
-    protected static function container() {
-        return self::$container;
+        static::bootstrapAfterClass();
     }
 }

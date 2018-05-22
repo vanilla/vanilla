@@ -12,12 +12,15 @@ use Garden\Web\RequestInterface;
 use PHPUnit\Framework\TestCase;
 use Vanilla\Web\SmartIDMiddleware;
 use Vanilla\Web\UserSmartIDResolver;
+use VanillaTests\BootstrapTrait;
 use VanillaTests\Fixtures\Request;
 
 /**
  * Test the **SmartIDMiddleware** class.
  */
 class SmartIDMiddlewareTest extends TestCase {
+    use BootstrapTrait;
+
     /**
      * @var SmartIDMiddleware
      */

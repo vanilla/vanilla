@@ -12,7 +12,7 @@
         <div class="js-InlineEditorToolbar"></div>
         <div class="js-ParagraphEditorToolbar"></div>
         <div class="js-MentionModule"></div>
-        <div class="richEditor-menu embedBar">
+        <div class="richEditor-menu richEditor-embedBar">
             <ul class="richEditor-menuItems" role="menubar" aria-label="{t c="Inline Level Formatting Menu"}">
                 <li class="richEditor-menuItem" role="menuitem">
                     <div class="js-emojiHandle emojiMenu">

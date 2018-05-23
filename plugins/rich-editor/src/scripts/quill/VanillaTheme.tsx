@@ -81,8 +81,8 @@ export default class VanillaTheme extends ThemeBase {
         const container = this.jsBodyBoxContainer.querySelector(".js-InlineEditorToolbar");
         ReactDOM.render(
             <EditorProvider quill={this.quill}>
-                <StickyMenuBar containerRef={this.jsBodyBoxContainer} />
                 <InlineToolbar />
+                <StickyMenuBar containerRef={this.jsBodyBoxContainer} />
             </EditorProvider>,
             container,
         );

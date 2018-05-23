@@ -17,6 +17,11 @@ interface IState {
 }
 
 export default class StickyMenuBar extends React.Component<IProps, IState> {
+    public static getDerivedStateFromProps(nextProps, prevState) {
+        prevState.containerRef = nextProps.containerRef;
+        return prevState;
+    }
+
     /**
      * @inheritDoc
      */

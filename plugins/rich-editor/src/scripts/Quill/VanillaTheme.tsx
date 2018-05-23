@@ -19,6 +19,7 @@ import EmojiPopover from "../Editor/EmojiPopover";
 import EmbedPopover from "../Editor/EmbedPopover";
 import EditorProvider from "../Editor/ContextProvider";
 import MentionModule from "../Editor/MentionModule";
+import StickyMenuBar from "../Editor/StickyMenuBar";
 
 export default class VanillaTheme extends ThemeBase {
     private jsBodyBoxContainer: Element;
@@ -80,6 +81,7 @@ export default class VanillaTheme extends ThemeBase {
         const container = this.jsBodyBoxContainer.querySelector(".js-InlineEditorToolbar");
         ReactDOM.render(
             <EditorProvider quill={this.quill}>
+                <StickyMenuBar containerRef={this.jsBodyBoxContainer} />
                 <InlineToolbar />
             </EditorProvider>,
             container,

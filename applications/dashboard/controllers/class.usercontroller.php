@@ -194,7 +194,7 @@ class UserController extends DashboardController {
                     $this->Form->setFormValue('HashMethod', 'Random');
                 }
 
-                $newUserID = $this->Form->save(['SaveRoles' => true, 'NoConfirmEmail' => true]);
+                $newUserID = $this->Form->save(['SaveRoles' => true, 'NoConfirmEmail' => true, 'ValidateName' => false]);
                 if ($newUserID !== false) {
                     $this->setData('UserID', $newUserID);
                     if ($noPassword) {
@@ -737,7 +737,7 @@ class UserController extends DashboardController {
                     $this->Form->setFormValue('Banned', $user['Banned'] | BanModel::BAN_MANUAL);
                 }
 
-                if ($this->Form->save(['SaveRoles' => true]) !== false) {
+                if ($this->Form->save(['SaveRoles' => true, 'ValidateName' => false]) !== false) {
                     if ($this->Form->getValue('ResetPassword', '') == 'Auto') {
                         $userModel->passwordRequest($user['Email']);
                         $userModel->setField($userID, 'HashMethod', 'Reset');

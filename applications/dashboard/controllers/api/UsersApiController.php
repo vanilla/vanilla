@@ -394,7 +394,7 @@ class UsersApiController extends AbstractApiController {
         $this->userByID($id);
         $userData = $this->normalizeInput($body);
         $userData['UserID'] = $id;
-        $settings = [];
+        $settings = ['ValidateName' => false];
         if (!empty($userData['RoleID'])) {
             $settings['SaveRoles'] = true;
         }
@@ -426,6 +426,7 @@ class UsersApiController extends AbstractApiController {
         $settings = [
             'NoConfirmEmail' => true,
             'SaveRoles' => array_key_exists('RoleID', $userData),
+            'ValidateName' => false
         ];
         $id = $this->userModel->save($userData, $settings);
         $this->validateModel($this->userModel);

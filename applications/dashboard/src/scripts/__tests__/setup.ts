@@ -4,7 +4,7 @@
  * @license GPLv2
  */
 
-import { polyfillClosest } from "../Entries/polyfills";
+import { polyfillClosest } from "../entries/polyfills";
 import "mutationobserver-shim";
 import Enzyme from "enzyme";
 import Adapter from "enzyme-adapter-react-16";

@@ -6,7 +6,7 @@
 
 namespace Vanilla\Embeds;
 
-use Exception;
+use Gdn_Format;
 use Vanilla\PageScraper;
 
 /**
@@ -62,9 +62,9 @@ class LinkEmbed extends Embed {
         $photoUrl = $data['photoUrl'] ?? null;
 
         if ($photoUrl) {
-            $photoUrlEncoded = htmlspecialchars($photoUrl);
+            $photoUrlEncoded = htmlspecialchars(Gdn_Format::cssSpecialChars($photoUrl));
         $image = <<<HTML
-<div class="embedLink-image" aria-hidden="true" style="background-image: url({$photoUrlEncoded});"></div>
+<div class="embedLink-image" aria-hidden="true" style="background-image: url('{$photoUrlEncoded}');"></div>
 HTML;
         } else {
             $image = '';

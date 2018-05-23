@@ -2459,4 +2459,25 @@ EOT;
         $renderer = Gdn::getContainer()->get(\Vanilla\Quill\Renderer::class);
         return $renderer->render($operations);
     }
+
+    /**
+     * Encode special CSS characters as hex.
+     *
+     * @param string $string
+     * @return mixed
+     */
+    public static function cssSpecialChars(string $string) {
+        static $specialChars = [
+            "\\" => "\\00005c", "!" => "\\000021", "\"" => "\\000022", "#" => "\\000023", "$" => "\\000024",
+            "%" => "\\000025", "&" => "\\000026", "'" => "\\000027", "(" => "\\000028", ")" => "\\000029",
+            "*" => "\\00002a", "+" => "\\00002b", "," => "\\00002c", "-" => "\\00002d", "." => "\\00002e",
+            "/" => "\\00002f", ":" => "\\00003a", ";" => "\\00003b", "<" => "\\00003c", "=" => "\\00003d",
+            ">" => "\\00003e", "?" => "\\00003f", "@" => "\\000040", "[" => "\\00005b", "]" => "\\00005d",
+            "^" => "\\00005e", "`" => "\\000060", "{" => "\\00007b", "|" => "\\00007c", "}" => "\\00007d",
+            "~" => "\\00007e",
+        ];
+
+        $result = str_replace(array_keys($specialChars), array_values($specialChars), $string);
+        return $result;
+    }
 }

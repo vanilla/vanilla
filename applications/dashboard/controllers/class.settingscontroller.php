@@ -2104,11 +2104,12 @@ class SettingsController extends DashboardController {
             $banRule['InsertName'] = val('Name', $userModel->getID(val('InsertUserID', $banRule)));
         }
 
+        $name = val('Name', $user);
         Gdn_Theme::section('Moderation');
         $this->setHighlightRoute('dashboard/settings/bans');
-        $this->setData('Title', sprintf(t('Ban rules matching %s'), val('Name', $user)));
+        $this->setData('Title', sprintf(t('Ban rules matching %s'), htmlspecialchars($name)));
         $this->setData('Bans', $matchingBans);
-        $emptyMessage = sprintf(t('There are no existing ban rules affecting user %s.'), val('Name', $user));
+        $emptyMessage = sprintf(t('There are no existing ban rules affecting user %s.'), htmlspecialchars($name));
         $this->setData('EmptyMessageBody', $emptyMessage);
     }
 

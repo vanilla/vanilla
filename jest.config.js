@@ -32,12 +32,17 @@ const moduleNameMapper = {
     "@vanilla/(.*)$": path.resolve(__dirname, "applications/vanilla/src/scripts/$1"),
 };
 
-const babelConfig = JSON.parse(fs.readFileSync(path.resolve(path.join(__dirname, "./.babelrc"))));
+const babelConfig = JSON.parse(fs.readFileSync(path.resolve(path.join(__dirname, ".babelrc"))));
 
 // We do NOT want to transform any node modules expcept for Quill.
-const transformIgnorePatterns = fs.readdirSync(path.join(__dirname, "node_modules"))
-    .filter(dir => !dir.includes("quill"))
-    .map(dir => "node_modules\/" + dir);
+let transformIgnorePatterns = moduleDirectories.map(moduleDir => {
+    return fs.readdirSync(moduleDir)
+        .filter(dir => !dir.includes("quill"))
+        .map(dir => "/node_modules/" + dir + "/");
+});
+
+// Flatten
+transformIgnorePatterns = [].concat.apply([], transformIgnorePatterns);
 
 module.exports = {
     roots,

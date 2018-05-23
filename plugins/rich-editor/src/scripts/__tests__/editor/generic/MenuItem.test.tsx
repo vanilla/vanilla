@@ -1,6 +1,12 @@
+/**
+ * @author Adam (charrondev) Charron <adam.c@vanillaforums.com>
+ * @copyright 2009-2018 Vanilla Forums Inc.
+ * @license https://opensource.org/licenses/GPL-2.0 GPL-2.0
+ */
+
 import React from "react";
 import { shallow } from "enzyme";
-import MenuItem from "../../../Editor/Generic/MenuItem";
+import MenuItem from "../../../editor/generic/MenuItem";
 
 test("matches snapshot", () => {
     const clickHandler = () => undefined;

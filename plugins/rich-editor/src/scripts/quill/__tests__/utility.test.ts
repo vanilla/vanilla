@@ -5,7 +5,7 @@
  */
 
 import * as utility from "../utility";
-import Quill from "../../Quill";
+import Quill from "../../quill";
 
 describe("Range/Boundary conversions", () => {
     it("converts range to boundary", () => {

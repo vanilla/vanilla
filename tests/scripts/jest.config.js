@@ -8,9 +8,11 @@ const fs = require("fs");
 const path = require("path");
 const glob = require("glob");
 
+const VANILLA_ROOT = path.resolve(path.join(__dirname, "../../"));
+
 function getTestDirectoriesInDirectory(rootDir) {
     return glob
-        .sync(path.join(__dirname, `${rootDir}/*/src/scripts/__tests__`))
+        .sync(path.join(VANILLA_ROOT, `${rootDir}/*/src/scripts/__tests__`))
         .map(fs.realpathSync) // Resolve symlinks
         .map(dir => dir.replace("/__tests__", "")); // Trim off the test ending
 }
@@ -24,12 +26,12 @@ const moduleDirectories = roots
     .map(root => path.normalize(path.join(root, "../../node_modules")));
 
 // Push in the root directory so we can resolve our testing utilities.
-moduleDirectories.unshift(path.join(__dirname, "./node_modules"))
+moduleDirectories.unshift(path.join(VANILLA_ROOT, "./node_modules"))
 const setupFiles = roots.map(root => path.join(root, "__tests__/setup.ts")).filter(fs.existsSync);
 
 const moduleNameMapper = {
-    "@dashboard/(.*)$": path.resolve(__dirname, "applications/dashboard/src/scripts/$1"),
-    "@vanilla/(.*)$": path.resolve(__dirname, "applications/vanilla/src/scripts/$1"),
+    "@dashboard/(.*)$": path.resolve(VANILLA_ROOT, "applications/dashboard/src/scripts/$1"),
+    "@vanilla/(.*)$": path.resolve(VANILLA_ROOT, "applications/vanilla/src/scripts/$1"),
 };
 
 const babelConfig = JSON.parse(fs.readFileSync(path.resolve(path.join(__dirname, ".babelrc"))));
@@ -63,6 +65,6 @@ module.exports = {
         "ts-jest": {
             babelConfig,
         },
-        "VANILLA_ROOT": path.resolve(__dirname),
+        VANILLA_ROOT,
     }
 };

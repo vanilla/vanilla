@@ -36,8 +36,8 @@
         "typescript": "^2.8.1"
     },
     "scripts": {
-        "test": "cross-env NODE_ENV=test jest",
-        "test:watch": "cross-env NODE_ENV=test jest --watch",
+        "test": "cross-env NODE_ENV=test jest --config=tests/scripts/jest.config.js",
+        "test:watch": "cross-env NODE_ENV=test jest --watch --config=tests/scripts/jest.config.js",
         "lint:ts": "tslint -c tslint.json -e '**/node_modules/**' -e '**/src/**/*.{js,jsx}' -p tsconfig.json -t stylish",
         "lint:ts:fix": "tslint -c tslint.json -e '**/node_modules/**' -e '**/src/**/*.{js,jsx}' -p tsconfig.json -t stylish --fix"
     }

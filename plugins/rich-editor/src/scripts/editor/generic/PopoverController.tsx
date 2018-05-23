@@ -7,7 +7,7 @@
 import React from "react";
 import { closeEditorFlyouts, CLOSE_FLYOUT_EVENT } from "../../quill/utility";
 import { withEditor, IEditorContextProps } from "../ContextProvider";
-import { getRequiredID, uniqueIDFromPrefix, IRequiredComponentID } from "@core/Interfaces/componentIDs";
+import { getRequiredID, uniqueIDFromPrefix, IRequiredComponentID } from "@dashboard/componentIDs";
 
 export interface IPopoverControllerChildParameters {
     id: string;

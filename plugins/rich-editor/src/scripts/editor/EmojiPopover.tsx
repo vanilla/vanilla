@@ -8,7 +8,7 @@ import React from "react";
 import EmojiPicker from "./EmojiPicker";
 import PopoverController, { IPopoverControllerChildParameters } from "./generic/PopoverController";
 import * as Icons from "./Icons";
-import { getRequiredID, IRequiredComponentID, IOptionalComponentID } from "@core/Interfaces/componentIDs";
+import { getRequiredID, IRequiredComponentID, IOptionalComponentID } from "@dashboard/componentIDs";
 
 export default class EmojiPopover extends React.Component<IOptionalComponentID, IRequiredComponentID> {
     public constructor(props) {

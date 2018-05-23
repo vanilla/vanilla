@@ -12,7 +12,7 @@ import Popover from "./generic/Popover";
 import PopoverController, { IPopoverControllerChildParameters } from "./generic/PopoverController";
 import EmbedInsertionModule from "../quill/EmbedInsertionModule";
 import * as Icons from "./Icons";
-import { getRequiredID, IRequiredComponentID } from "@core/Interfaces/componentIDs";
+import { getRequiredID, IRequiredComponentID } from "@dashboard/componentIDs";
 
 interface IProps extends IEditorContextProps {}
 

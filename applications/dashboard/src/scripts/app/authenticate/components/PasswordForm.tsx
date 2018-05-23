@@ -1,3 +1,8 @@
+/**
+ * @copyright 2009-2018 Vanilla Forums Inc.
+ * @license https://opensource.org/licenses/GPL-2.0 GPL-2.0
+ */
+
 import apiv2 from "@dashboard/apiv2";
 import { formatUrl, t } from "@dashboard/application";
 import React from "react";

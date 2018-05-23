@@ -20,7 +20,11 @@ const roots = [
     ...getTestDirectoriesInDirectory("plugins"),
 ];
 
-const moduleDirectories = roots.map(root => path.normalize(path.join(root, "../../node_modules")));
+const moduleDirectories = roots
+    .map(root => path.normalize(path.join(root, "../../node_modules")));
+
+// Push in the root directory so we can resolve our testing utilities.
+moduleDirectories.unshift(path.join(__dirname, "./node_modules"))
 const setupFiles = roots.map(root => path.join(root, "__tests__/setup.ts")).filter(fs.existsSync);
 
 const moduleNameMapper = {
@@ -28,8 +32,9 @@ const moduleNameMapper = {
     "@vanilla/(.*)$": path.resolve(__dirname, "applications/vanilla/src/scripts/$1"),
 };
 
-const babelConfig = JSON.parse(fs.readFileSync(path.resolve("./.babelrc")));
+const babelConfig = JSON.parse(fs.readFileSync(path.resolve(path.join(__dirname, "./.babelrc"))));
 
+// We do NOT want to transform any node modules expcept for Quill.
 const transformIgnorePatterns = fs.readdirSync(path.join(__dirname, "node_modules"))
     .filter(dir => !dir.includes("quill"))
     .map(dir => "node_modules\/" + dir);

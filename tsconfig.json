@@ -16,7 +16,8 @@
         "downlevelIteration": true,
         "paths": {
             "*": [
-                "node_modules/*"
+                "node_modules/*",
+                "applications/dashboard/node_modules/*"
             ],
             "@vanilla/*": ["./applications/vanilla/src/scripts/*"],
             "@dashboard/*": ["./applications/dashboard/src/scripts/*"]

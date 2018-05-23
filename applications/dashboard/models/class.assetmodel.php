@@ -168,16 +168,8 @@ class AssetModel extends Gdn_Model {
         }
 
         // Add the lib.
-        $libs = [
-            "/js/$basename/lib-core-$basename.min.js"
-        ];
-
+        $libs = [];
         $addons = [];
-
-        $core = "/js/$basename/core-$basename.min.js";
-        if (file_exists(PATH_ROOT."/$core")) {
-            $addons[] = $core;
-        }
 
         // Loop through the enabled addons and get their javascript.
         foreach ($this->addonManager->getEnabled() as $addon) {
@@ -187,16 +179,17 @@ class AssetModel extends Gdn_Model {
             }
 
             $build = $addon->getInfoValue('build', []);
-            if (!empty($build['exports'][$basename])) {
+            if (valr("exports.$basename", $build, null) !== null) {
                 $libs[] = $addon->path("/js/$basename/lib-".$addon->getKey()."-$basename.min.js", Addon::PATH_ADDON);
             }
-            if (!empty($build['entries'][$basename])) {
+            if (valr("entries.$basename", $build, null) !== null) {
                 $addons[] = $addon->path("/js/$basename/".$addon->getKey()."-$basename.min.js", Addon::PATH_ADDON);
             }
         }
 
         // Add the bootstrap after everything else.
-        $addons[] = "/js/$basename/core-bootstrap-$basename.min.js";
+        $dashboardAddon = $this->addonManager->lookupAddon("dashboard");
+        $addons[] = $dashboardAddon->path("/js/$basename/dashboard-bootstrap-$basename.min.js", Addon::PATH_ADDON);
         $result = array_merge($libs, $addons);
 
         return $result;

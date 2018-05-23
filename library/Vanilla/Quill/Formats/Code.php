@@ -36,6 +36,7 @@ class Code extends AbstractFormat {
     protected function getAttributes(): array {
         return [
             "class" => "code-inline code isInline",
+            "spellcheck" => "false",
         ];
     }
 }

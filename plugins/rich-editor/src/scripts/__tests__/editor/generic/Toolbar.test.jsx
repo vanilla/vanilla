@@ -1,8 +1,14 @@
+/**
+ * @author Adam (charrondev) Charron <adam.c@vanillaforums.com>
+ * @copyright 2009-2018 Vanilla Forums Inc.
+ * @license https://opensource.org/licenses/GPL-2.0 GPL-2.0
+ */
+
 import React from "react";
 import { mount, shallow } from "enzyme";
 import Quill from "quill/core";
-import EditorMenuItem from "../../../Editor/Generic/MenuItem";
-import { Toolbar } from "../../../Editor/Generic/Toolbar";
+import EditorMenuItem from "../../../editor/generic/MenuItem";
+import { Toolbar } from "../../../editor/generic/Toolbar";
 
 jest.mock('quill/core');
 

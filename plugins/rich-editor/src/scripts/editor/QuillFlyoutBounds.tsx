@@ -9,7 +9,7 @@ import * as PropTypes from "prop-types";
 import debounce from "lodash/debounce";
 import Quill, { RangeStatic, DeltaStatic, Sources, BoundsStatic } from "quill/core";
 import Emitter from "quill/core/emitter";
-import { CLOSE_FLYOUT_EVENT } from "../Quill/utility";
+import { CLOSE_FLYOUT_EVENT } from "../quill/utility";
 import { withEditor, IEditorContextProps } from "./ContextProvider";
 
 interface IXCoordinates {

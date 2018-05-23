@@ -4,9 +4,9 @@ import classNames from "classnames";
 import ErrorMessages from "./ErrorMessages";
 import { log, logError, debug } from "@core/utility";
 import Paragraph from "./Paragraph";
-import { uniqueIDFromPrefix, getRequiredID, IRequiredComponentID } from "@core/Interfaces/componentIDs";
+import { uniqueIDFromPrefix, getRequiredID, IOptionalComponentID } from "@core/Interfaces/componentIDs";
 
-export interface IInputTextProps extends IRequiredComponentID {
+export interface IInputTextProps extends IOptionalComponentID {
     className?: string;
     label: string;
     labelNote?: string;

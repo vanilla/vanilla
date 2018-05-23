@@ -6,7 +6,7 @@
 
 import React from "react";
 import Waypoint from "react-waypoint";
-import { log } from "@core/utility";
+import { log } from "@dashboard/utility";
 
 interface IProps {
     containerRef: Element;

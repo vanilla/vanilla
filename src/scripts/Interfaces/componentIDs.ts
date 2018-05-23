@@ -7,14 +7,14 @@ export interface IOptionalComponentID {
 
 // Requires ID
 export interface IRequiredComponentID {
-    id?: string;
+    id: string;
 }
 
 export function uniqueIDFromPrefix(suffix: string) {
     return (suffix + uniqueId()) as string;
 }
 
-export function getRequiredID(props: IRequiredComponentID, suffix: string) {
+export function getRequiredID(props: IRequiredComponentID, suffix: string): string {
     if (props.id) {
         return props.id;
     } else {

@@ -290,7 +290,7 @@ class MediaApiController extends AbstractApiController {
      * @return array
      */
     public function post(array $body) {
-        $this->permission('Garden.SignIn.Allow');
+        $this->permission('Garden.Uploads.Add');
 
         $uploadSchema = new UploadedFileSchema([
             'allowedExtensions' => array_values(ImageResizer::getTypeExt())

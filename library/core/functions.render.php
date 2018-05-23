@@ -421,15 +421,16 @@ if (!function_exists('categoryFilters')) {
         }
 
         $baseUrl = 'categories';
+        $transientKey = Gdn::session()->transientKey();
         $filters = [
             [
                 'name' => 'Following',
                 'param' => 'followed',
-                'extra' => ['save' => 1]
+                'extra' => ['save' => 1, 'TransientKey' => $transientKey]
             ]
         ];
 
-        $defaultParams = ['save' => 1];
+        $defaultParams = ['save' => 1, 'TransientKey' => $transientKey];
         if (Gdn::request()->get('followed')) {
             $defaultParams['followed'] = 0;
         }
@@ -722,15 +723,16 @@ if (!function_exists('discussionFilters')) {
         }
 
         $baseUrl = 'discussions';
+        $transientKey = Gdn::session()->transientKey();
         $filters = [
             [
                 'name' => 'Following',
                 'param' => 'followed',
-                'extra' => ['save' => 1]
+                'extra' => ['save' => 1, 'TransientKey' => $transientKey]
             ]
         ];
 
-        $defaultParams = ['save' => 1];
+        $defaultParams = ['save' => 1, 'TransientKey' => $transientKey];
         if (Gdn::request()->get('followed')) {
             $defaultParams['followed'] = 0;
         }

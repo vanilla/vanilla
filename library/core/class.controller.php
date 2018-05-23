@@ -1822,7 +1822,7 @@ class Gdn_Controller extends Gdn_Pluggable {
                     // style.css and admin.css deserve some custom processing.
                     if (in_array($CssFile, $CssAnchors)) {
                         // Grab all of the css files from the asset model.
-                        $CssFiles = $AssetModel->getCssFiles($ThemeType, ucfirst(substr($CssFile, 0, -4)), $ETag);
+                        $CssFiles = $AssetModel->getCssFiles($ThemeType, ucfirst(substr($CssFile, 0, -4)), $ETag, $_, $this->Theme);
                         foreach ($CssFiles as $Info) {
                             $this->Head->addCss($Info[1], 'all', true, $CssInfo);
                         }

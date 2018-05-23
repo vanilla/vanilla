@@ -730,7 +730,7 @@ class EditorPlugin extends Gdn_Plugin {
      * @throws Gdn_UserException
      */
     public function postController_editorUpload_create($sender, $args = []) {
-        $sender->permission('Garden.SignIn.Allow');
+        $sender->permission('Garden.Uploads.Add');
 
         // @Todo Move to a library/functions file.
         require 'generate_thumbnail.php';

@@ -86,7 +86,7 @@
     <div class="padded">You need to tell Vanilla where the comment counts are located in your page. To achieve this, add a <strong>vanilla-identifier</strong>
         attribute to the anchor linking to the comments. The vanilla-identifier is the same value used above when
         embedding the comments into the page.</div>
-    <pre id="anchor-code" class="CopyBox">&lt;a href="http://yourdomain.com/path/to/page/with/comments/#vanilla_comments" <strong>vanilla-identifier="embed-test"</strong>>Comments&lt;/a>
+    <pre id="anchor-code" class="CopyBox">&lt;a href="http://yourdomain.com/path/to/page/with/comments/#vanilla_comments" <strong>vanilla-identifier="your-content-identifier"</strong>>Comments&lt;/a>
     </pre>
     <div class="row form-group">
         <div class="info label-wrap-wide">Vanilla will then replace the content of the anchor (in this case, the word "Comments") with the number of

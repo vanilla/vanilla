@@ -2,6 +2,8 @@ import React from "react";
 import { getRoutes, getMeta } from "@core/application";
 import { BrowserRouter as Router, Route, RouteProps, Switch } from "react-router-dom";
 import NotFoundPage from "@core/Main/NotFoundPage";
+import { Provider } from "react-redux";
+import { getStore } from "./store";
 
 /**
  * The root application component.
@@ -17,9 +19,11 @@ export default class App extends React.PureComponent {
         routes.push(<Route key="@not-found" component={NotFoundPage} />);
 
         return (
-            <Router basename={getMeta("context.basePath", "")}>
-                <Switch>{routes}</Switch>
-            </Router>
+            <Provider store={getStore()}>
+                <Router basename={getMeta("context.basePath", "")}>
+                    <Switch>{routes}</Switch>
+                </Router>
+            </Provider>
         );
     }
 }

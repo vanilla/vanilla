@@ -5,6 +5,7 @@
 
 import { registerEmbed, IEmbedData } from "@dashboard/embeds";
 import { getData, setData } from "@dashboard/dom";
+import { cssSpecialChars } from "@dashboard/utility";
 import debounce from "lodash/debounce";
 import shave from "shave";
 
@@ -59,7 +60,7 @@ export async function renderLinkEmbed(node: HTMLElement, data: IEmbedData) {
         linkImage = document.createElement("div");
         linkImage.classList.add("embedLink-image");
         linkImage.setAttribute("aria-hidden", "true");
-        linkImage.setAttribute("style", "background-image: url(" + data.photoUrl + ");");
+        linkImage.setAttribute("style", "background-image: url('" + cssSpecialChars(data.photoUrl) + "');");
     }
 
     let userName;

@@ -51,10 +51,10 @@ class AutoConnectTest extends AbstractAPIv2Test {
     public function setUp() {
         parent::setUp();
 
-        $uniqueID = uniqid('ac_');
+        $uniqueID = self::randomUsername('ac');
         $userData = [
-            'name' => 'Authenticate_'.$uniqueID,
-            'email' => 'authenticate_'.$uniqueID.'@example.com',
+            'name' => $uniqueID,
+            'email' => $uniqueID.'@example.com',
             'password' => 'pwd_'.$uniqueID,
         ];
 
@@ -75,6 +75,7 @@ class AutoConnectTest extends AbstractAPIv2Test {
      * Test POST /authenticate with different configuration combination.
      *
      * @param $configurations
+     * @param $authenticatorProperties
      * @param $expectedResults
      *
      * @dataProvider provider

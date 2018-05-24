@@ -236,7 +236,8 @@ class StubContentPlugin extends Gdn_Plugin {
                     ], [
                         'ValidateEmail' => false,
                         'NoConfirmEmail' => true,
-                        'SaveRoles' => true
+                        'SaveRoles' => true,
+                        'ValidateName' => false
                     ]);
 
                     if ($rowID) {

@@ -27,7 +27,7 @@ class ApplicantsTest extends AbstractResourceTest {
      */
     public function record() {
         static $inc = 0;
-        $name = 'vanilla-'.($inc++);
+        $name = 'vanilla_'.($inc++);
         $record = [
             'email' => "{$name}@example.com",
             'name' => $name,

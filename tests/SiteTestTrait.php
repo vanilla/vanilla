@@ -7,9 +7,8 @@
 
 namespace VanillaTests;
 
-use Garden\EventManager;
 use Garden\Container\Container;
-use Vanilla\Models\InstallModel;
+use Garden\EventManager;
 
 /**
  * Allow a class to test against
@@ -48,7 +47,7 @@ trait SiteTestTrait {
     /**
      * Install the site.
      */
-    public static function setupBeforeClass() {
+    public static function setUpBeforeClass() {
         $dic = self::$container = static::createContainer();
 
         /* @var TestInstallModel $installer */

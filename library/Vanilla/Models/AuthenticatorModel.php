@@ -52,10 +52,15 @@ class AuthenticatorModel {
      * Register an authenticator class.
      * Necessary only for authenticators that are not in an addon.
      *
+     * @throws Exception
      * @param string $authenticatorClass
      * @return self
      */
     public function registerAuthenticatorClass(string $authenticatorClass): self {
+        if (!is_a($authenticatorClass, Authenticator::class, true)) {
+            throw new Exception($authenticatorClass.' is not an Authenticator.');
+        }
+
         $this->authenticatorClasses[$authenticatorClass] = true;
 
         return $this;
@@ -142,7 +147,7 @@ class AuthenticatorModel {
      * @throws \Garden\Container\NotFoundException
      */
     public function getAuthenticatorByID(string $authenticatorID) {
-        $uniqueAuthenticators = $this->getUniqueAuthenticatorIDs();
+        $uniqueAuthenticators = $this->getUniqueAuthenticatorIDs(true);
 
         // Unique authenticators have type === id
         if (in_array($authenticatorID, $uniqueAuthenticators)) {
@@ -178,14 +183,18 @@ class AuthenticatorModel {
                     try {
                         $authenticatorInstance = $this->getAuthenticator($authenticatorInfo['AuthenticationSchemeAlias'], $authenticatorInfo['AuthenticationKey']);
                         $authenticators[] = $authenticatorInstance;
-                    } catch (Exception $e) {}
+                    } catch (Exception $e) {
+                        throw new ServerException('Error while trying to instanciate authenticator '.$authenticatorClass, 500, ['AuthenticatorError' => $e]);
+                    }
                     $authenticatorInstance = null;
                 }
             } else {
                 try {
                     $authenticatorInstance = $this->container->get($authenticatorClass);
                     $authenticators[] = $authenticatorInstance;
-                } catch (Exception $e) {}
+                } catch (Exception $e) {
+                    throw new ServerException('Error while trying to instanciate authenticator '.$authenticatorClass, 500, ['AuthenticatorError' => $e]);
+                }
 
             }
         }
@@ -196,11 +205,12 @@ class AuthenticatorModel {
     /**
      * Get the list of ID of unique authenticators.
      *
+     * @param bool $includeShims
      * @return array
      */
-    public function getUniqueAuthenticatorIDs(): array {
+    public function getUniqueAuthenticatorIDs($includeShims = false): array {
         $ids = [];
-        foreach ($this->getAuthenticatorClasses() as $class) {
+        foreach ($this->getAuthenticatorClasses($includeShims) as $class) {
             /** @var Authenticator $class */
             if ($class::isUnique()) {
                 $ids[] = $class::getType();

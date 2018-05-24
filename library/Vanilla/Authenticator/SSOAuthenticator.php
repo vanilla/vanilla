@@ -102,9 +102,9 @@ abstract class SSOAuthenticator extends Authenticator {
      * Setter of autoLinkUser.
      *
      * @param bool $autoLinkUser
-     * @return self
+     * @return $this
      */
-    public function setAutoLinkUser(bool $autoLinkUser): self {
+    public function setAutoLinkUser(bool $autoLinkUser) {
         $this->autoLinkUser = $autoLinkUser;
 
         return $this;
@@ -131,9 +131,9 @@ abstract class SSOAuthenticator extends Authenticator {
      * Setter of linkSession.
      *
      * @param bool $linkSession
-     * @return self
+     * @return $this
      */
-    public function setLinkSession(bool $linkSession): self {
+    public function setLinkSession(bool $linkSession) {
         $this->linkSession = $linkSession;
 
         return $this;
@@ -152,9 +152,9 @@ abstract class SSOAuthenticator extends Authenticator {
      * Setter of signIn.
      *
      * @param bool $signIn
-     * @return self
+     * @return $this
      */
-    public function setSignIn(bool $signIn): self {
+    public function setSignIn(bool $signIn) {
         $this->signIn = $signIn;
 
         return $this;
@@ -171,9 +171,9 @@ abstract class SSOAuthenticator extends Authenticator {
      * Setter of trusted.
      *
      * @param bool $trusted
-     * @return self
+     * @return $this
      */
-    protected function setTrusted(bool $trusted): self {
+    protected function setTrusted(bool $trusted) {
         $this->trusted = $trusted;
 
         return $this;
@@ -186,7 +186,7 @@ abstract class SSOAuthenticator extends Authenticator {
      * @param RequestInterface $request
      * @return SSOData The user's information.
      */
-    final public function validateAuthentication(RequestInterface $request) {
+    final public function validateAuthenticationImpl(RequestInterface $request) {
         $ssoData = $this->sso($request);
         $ssoData->validate();
 

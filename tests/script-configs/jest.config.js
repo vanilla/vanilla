@@ -1,14 +1,16 @@
 /**
  * @author Adam Charron <adam.c@vanillaforums.com>
  * @copyright 2009-2018 Vanilla Forums Inc.
- * @license GPLv2
+ * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
  */
 
 const fs = require("fs");
 const path = require("path");
 const glob = require("glob");
+const verifyModuleInstallation = require("./verifyModules");
 
 const VANILLA_ROOT = path.resolve(path.join(__dirname, "../../"));
+const TEST_MODULES = path.join(VANILLA_ROOT, "tests/node_modules");
 
 function getTestDirectoriesInDirectory(rootDir) {
     return glob
@@ -25,10 +27,13 @@ const roots = [
 const moduleDirectories = roots
     .map(root => path.normalize(path.join(root, "../../node_modules")));
 
-// Push in the root directory so we can resolve our testing utilities.
-moduleDirectories.unshift(path.join(VANILLA_ROOT, "./node_modules"))
-const setupFiles = roots.map(root => path.join(root, "__tests__/setup.ts")).filter(fs.existsSync);
+// Push in the testing node_modules directories so we can resolve our testing utilities.
+moduleDirectories.unshift(path.resolve(VANILLA_ROOT, "tests/node_modules"))
 
+// Verify the node_modules have actually been installed everywhere.
+moduleDirectories.forEach(verifyModuleInstallation);
+
+const setupFiles = roots.map(root => path.join(root, "__tests__/setup.ts")).filter(fs.existsSync);
 const moduleNameMapper = {
     "@dashboard/(.*)$": path.resolve(VANILLA_ROOT, "applications/dashboard/src/scripts/$1"),
     "@vanilla/(.*)$": path.resolve(VANILLA_ROOT, "applications/vanilla/src/scripts/$1"),
@@ -45,6 +50,8 @@ let transformIgnorePatterns = moduleDirectories.map(moduleDir => {
 
 // Flatten
 transformIgnorePatterns = [].concat.apply([], transformIgnorePatterns);
+
+console.log(moduleDirectories);
 
 module.exports = {
     roots,

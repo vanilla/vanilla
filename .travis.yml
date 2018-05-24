@@ -9,10 +9,12 @@ addons:
 
 # Steps to prepare for build script execution.
 before_script:
+  # PHP
   - phpenv config-rm xdebug.ini
   - composer self-update
   - composer install --optimize-autoloader
   - tests/travis/setup.sh
+  # Node
   - yarn install --pure-lockfile
   - cd applications/dashboard
   - yarn install --pure-lockfile
@@ -22,7 +24,6 @@ before_script:
 cache:
   directories:
     - $HOME/.composer/cache/files
-    - $HOME/.yarn-cache
   yarn: true
 
 # No additional system dependencies to install. Skip the install step.
@@ -50,6 +51,8 @@ php:
   - 7.0
   - 7.1
   - 7.2
+# The version of node to test under
+  -
 
 # Steps of the build script.
 script:
@@ -60,5 +63,5 @@ script:
   - cat /tmp/error.log
   - cat /tmp/access.log
 
-# Run build in a Docker container.  Reduces time between commit and start of build.
+# Run build in a Docker container. Reduces time between commit and start of build.
 sudo: false

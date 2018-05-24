@@ -23,8 +23,9 @@
             "@dashboard/*": ["./applications/dashboard/src/scripts/*"]
         },
         "typeRoots": [
-            "node_modules/@types",
-            "applications/*/node_modules/@types",
+            "tests/node_modules/@types",
+            "applications/dashboard/node_modules/@types",
+            "applications/vanilla/node_modules/@types",
             "plugins/*/node_modules/@types",
             "plugins/*/src/scripts/@types"
         ],

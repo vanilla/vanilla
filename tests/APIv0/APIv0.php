@@ -7,6 +7,7 @@
 
 namespace VanillaTests\APIv0;
 
+use Garden\Container\Container;
 use Garden\Http\HttpClient;
 use Garden\Http\HttpResponse;
 use Gdn;
@@ -558,7 +559,9 @@ class APIv0 extends HttpClient {
      * Bootstrap some of the internal objects with this connection.
      */
     public function bootstrap() {
-        $dic = Gdn::getContainer();
+        $bootstrap = new \VanillaTests\Bootstrap();
+        $dic = new Container();
+        $bootstrap->run($dic);
 
         // Make the core applications available.
         $adm = new AddonManager(

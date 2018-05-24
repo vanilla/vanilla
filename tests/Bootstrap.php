@@ -19,6 +19,7 @@ use Vanilla\AddonManager;
 use Vanilla\Authenticator\PasswordAuthenticator;
 use Vanilla\InjectableInterface;
 use Vanilla\Models\AuthenticatorModel;
+use Vanilla\Models\SSOModel;
 use Vanilla\Quill\Renderer;
 use VanillaTests\Fixtures\MockAuthenticator;
 use VanillaTests\Fixtures\MockSSOAuthenticator;
@@ -195,6 +196,9 @@ class Bootstrap {
             ->rule(SearchModel::class)
             ->setShared(true)
 
+            ->rule(SSOModel::class)
+            ->setShared(true)
+
             ->rule(\Garden\Web\Dispatcher::class)
             ->setShared(true)
             ->addCall('addRoute', ['route' => new \Garden\Container\Reference('@api-v2-route'), 'api-v2'])
@@ -339,7 +343,9 @@ class Bootstrap {
      * @param Container $container The container to clean up.
      */
     public static function cleanup(Container $container) {
-        \CategoryModel::$Categories = null;
+        if (class_exists(\CategoryModel::class)) {
+            \CategoryModel::$Categories = null;
+        }
 
         if ($container->hasInstance(AddonManager::class)) {
             /* @var AddonManager $addonManager */

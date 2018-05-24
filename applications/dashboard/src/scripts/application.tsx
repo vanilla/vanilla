@@ -179,8 +179,8 @@ export function getComponent(name: string): ComponentClass | undefined {
  * @param parent - The parent element to search. This element is not included in the search.
  */
 export function _mountComponents(parent: Element) {
-    if (!componentExists("Router")) {
-        addComponent("Router", Router);
+    if (!componentExists("App")) {
+        addComponent("App", Router);
     }
 
     const nodes = parent.querySelectorAll("[data-react]").forEach(node => {

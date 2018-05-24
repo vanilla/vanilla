@@ -27,8 +27,10 @@
         },
         "exports": {
             "*": [
-                "./src/scripts/*.",
-                "./src/scripts/components/**/*",
+                "./src/scripts/*.ts",
+                "./src/scripts/*.tsx",
+                "./src/scripts/components/**/*.ts",
+                "./src/scripts/components/**/*.tsx",
                 "axios",
                 "classnames",
                 "prop-types",

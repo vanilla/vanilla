@@ -608,7 +608,7 @@ class UsersApiController extends AbstractApiController {
     public function post_confirmEmail ($id, array $body) {
         $this->permission('Garden.Users.Edit');
 
-        $in = $this->schema( ['emailKey:s' => ''])->setDescription('Code sent via email');
+        $in = $this->schema( ['emailKey:s' => 'key generated on registration'])->setDescription('Confirm new user email upon registration');
         $out = $this->schema(['emailConfirmed:b' => 'The current email confirmed value.'], 'out');
 
         $row = $this->userByID($id);
@@ -616,14 +616,14 @@ class UsersApiController extends AbstractApiController {
 
         $emailKey = '';
         $userData = $this->normalizeInput($body);
-        if (array_key_exists('emailKey', $userData)) {
-            $emailKey = $userData['emailKey'];
+        if (array_key_exists('EmailKey', $userData)) {
+            $emailKey = $userData['EmailKey'];
         }
 
         $this->userModel->confirmEmail($row, $emailKey);
-        $this->validateModel($this->userModel, true);
+        $this->validateModel($this->userModel);
 
-        $result = $out->validate($row);
+        $result = $out->validate($this->userByID($id));
         return $result;
     }
 

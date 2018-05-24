@@ -130,6 +130,24 @@ class UsersTest extends AbstractResourceTest {
     }
 
     /**
+     * Test confirm email endpoint
+     */
+    public function testConfirmEmail() {
+        $emailKey = [
+            'test123'
+        ];
+        $user = $this->testPost();
+
+        /** @var \UserModel $userModel */
+        $userModel = self::container()->get('UserModel');
+        $userModel->saveAttribute($user['userID'], 'EmailKey', 'test123');
+
+        $response = $this->api()->post("{$this->baseUrl}/{$user['userID']}/confirmEmail", [$emailKey]);
+        $this->assertEquals($response->getBody(), $user['emailConfirm']);
+
+    }
+
+    /**
      * {@inheritdoc}
      */
     public function testGetEdit($record = null) {

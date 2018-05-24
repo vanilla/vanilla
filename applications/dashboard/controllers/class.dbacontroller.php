@@ -115,8 +115,8 @@ class DbaController extends DashboardController {
             $this->setData('Result', $result);
         }
 
-        $this->setData('Title', "Fix url codes for $table.$column");
-        $this->_setJob($this->data('Title'));
+        $this->setData('Title', 'Fix URL Codes');
+        $this->_setJob("Fix url codes for $table.$column");
         $this->render('Job');
     }
 

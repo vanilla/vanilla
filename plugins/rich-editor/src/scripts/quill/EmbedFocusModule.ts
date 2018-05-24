@@ -40,14 +40,17 @@ export default class EmbedFocusModule extends Module {
     constructor(quill: Quill, options = {}) {
         super(quill, options);
 
+        this.editorRoot = this.quill.root.closest(".richEditor") as HTMLElement;
+
         // Add event listeners.
         quill.on("selection-change", (range, oldRange, source) => {
             if (range && range.index && source !== Quill.sources.SILENT) {
                 this.lastSelection = range;
             }
+
+            this.editorRoot.classList.toggle("isFocussed", !!range);
         });
         this.setupEmbedClickHandler();
-        this.editorRoot = this.quill.root.closest(".richEditor") as HTMLElement;
 
         this.quill.root.addEventListener("keydown", this.keyDownListener);
         this.editorRoot.addEventListener("keydown", this.tabListener);

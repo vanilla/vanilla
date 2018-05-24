@@ -555,10 +555,17 @@ label.checkbox input.checkbox-input {
   }
 }
 
-@media (max-width: 700px) {
-  .Row {
-    width: 100% !important;
-  }
+.Row {
+  width: 100% !important;
+}
+
+select {
+  max-width: 100%;
+}
+
+.column-content {
+  width: 100% !important;
+  margin: 0 !important;
 }
 
 .richEditor {
@@ -730,8 +737,7 @@ label.checkbox input.checkbox-input {
 .richEditor-embedBar {
   display: block;
   width: 100%;
-  margin-left: 18px;
-  margin-right: 18px;
+  margin: 0;
 }
 
 .richEditorInline-icon {
@@ -1195,18 +1201,52 @@ label.checkbox input.checkbox-input {
   }
 }
 
+body.isMobile .richEditor-embedBarScroll {
+  display: block;
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 39px;
+  pointer-events: none;
+  background: rgba(255, 165, 0, 0.5);
+}
+
 body.isMobile .richEditor {
   padding-left: 0;
 }
 
-body.isMobile .richEditor.isStickyMenu .richEditor-embedBar {
+body.isMobile .richEditor.isFocussed {
+  display: flex;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100vh;
+  align-items: center;
+  max-height: calc(100vh - 39px);
+  overflow: auto;
+  background: rgba(0, 0, 255, 0.25);
+  margin: 0 !important;
+}
+
+body.isMobile .richEditor.isSticky .richEditor-embedBar {
   position: fixed;
   bottom: 0;
   left: 0;
-  width: 100%;
+  width: calc(100% - 38px);
   box-sizing: border-box;
-  margin-left: 18px;
-  margin-right: 18px;
+  margin-left: 19px;
+  margin-right: 19px;
+  background: rgba(0, 0, 255, 0.5);
+}
+
+body.isMobile .richEditor.isSticky .richEditor-frame {
+  padding-bottom: 39px;
+}
+
+body.isMobile .richEditor.isSticky .embedDialogue {
+  position: static;
 }
 
 body.isMobile .richEditorParagraphMenu {
@@ -1214,29 +1254,59 @@ body.isMobile .richEditorParagraphMenu {
 }
 
 body.isMobile .FormWrapper {
-  padding-left: 15px;
-  padding-right: 15px;
+  padding-left: 18px;
+  padding-right: 18px;
 }
 
 @media (max-width: 700px) {
-  .richEditor {
-    padding-left: 0;
-  }
-  .richEditor.isStickyMenu .richEditor-embedBar {
-    position: fixed;
+  .richEditor-embedBarScroll {
+    display: block;
+    position: absolute;
     bottom: 0;
     left: 0;
     width: 100%;
+    height: 39px;
+    pointer-events: none;
+    background: rgba(255, 165, 0, 0.5);
+  }
+  .richEditor {
+    padding-left: 0;
+  }
+  .richEditor.isFocussed {
+    display: flex;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100vh;
+    align-items: center;
+    max-height: calc(100vh - 39px);
+    overflow: auto;
+    background: rgba(0, 0, 255, 0.25);
+    margin: 0 !important;
+  }
+  .richEditor.isSticky .richEditor-embedBar {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: calc(100% - 38px);
     box-sizing: border-box;
-    margin-left: 18px;
-    margin-right: 18px;
+    margin-left: 19px;
+    margin-right: 19px;
+    background: rgba(0, 0, 255, 0.5);
+  }
+  .richEditor.isSticky .richEditor-frame {
+    padding-bottom: 39px;
+  }
+  .richEditor.isSticky .embedDialogue {
+    position: static;
   }
   .richEditorParagraphMenu {
     display: none !important;
   }
   .FormWrapper {
-    padding-left: 15px;
-    padding-right: 15px;
+    padding-left: 18px;
+    padding-right: 18px;
   }
 }
 
@@ -1604,6 +1674,8 @@ body.isMobile .FormWrapper {
 
 .embedExternal-content {
   display: inline-block;
+  max-width: 100%;
+  overflow: hidden;
 }
 
 .twitter-tweet {

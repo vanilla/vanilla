@@ -164,10 +164,7 @@
 .richEditor-embedBar {
     display: block;
     width: 100%;
-    margin: {
-        left: $richEditor-mobile_spacing;
-        right: $richEditor-mobile_spacing;
-    }
+    margin: 0;
 }
 
 .richEditorInline-icon {

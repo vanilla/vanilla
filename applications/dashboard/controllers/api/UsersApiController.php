@@ -599,6 +599,35 @@ class UsersApiController extends AbstractApiController {
     }
 
     /**
+     * @param $id
+     * @param array $body
+     * @return array
+     * @throws Exception
+     * @throws NotFoundException if unable to find the user.
+     */
+    public function post_confirmEmail ($id, array $body) {
+        $this->permission('Garden.Users.Edit');
+
+        $in = $this->schema( ['emailKey:s' => ''])->setDescription('Code sent via email');
+        $out = $this->schema(['emailConfirmed:b' => 'The current email confirmed value.'], 'out');
+
+        $row = $this->userByID($id);
+        $body = $in->validate($body);
+
+        $emailKey = '';
+        $userData = $this->normalizeInput($body);
+        if (array_key_exists('emailKey', $userData)) {
+            $emailKey = $userData['emailKey'];
+        }
+
+        $this->userModel->confirmEmail($row, $emailKey);
+        $this->validateModel($this->userModel, true);
+
+        $result = $out->validate($row);
+        return $result;
+    }
+
+    /**
      * Verify a user.
      *
      * @param int $id The ID of the user.

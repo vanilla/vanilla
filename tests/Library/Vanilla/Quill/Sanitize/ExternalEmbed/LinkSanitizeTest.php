@@ -4,12 +4,12 @@
  * @license GPL-2.0
  */
 
-namespace VanillaTests\Library\Vanilla\Quill\Sanitize\Embed;
+namespace VanillaTests\Library\Vanilla\Quill\Sanitize\ExternalEmbed;
 
 use VanillaTests\Library\Vanilla\Quill\Sanitize\SanitizeTest;
 use VanillaTests\Library\Vanilla\Quill\Sanitize\CSSInjectionTrait;
 
-class ExternalSanitizeTest extends SanitizeTest {
+class LinkSanitizeTest extends SanitizeTest {
 
     use CSSInjectionTrait;
 

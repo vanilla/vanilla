@@ -9,8 +9,8 @@
         <div class="js-richText">
             <div class="ql-editor richEditor-text userContent" data-gramm="false" contenteditable="true" data-placeholder="Create a new post..."></div>
         </div>
-        <div class="js-InlineEditorToolbar"></div>
-        <div class="js-ParagraphEditorToolbar"></div>
+        <div class="js-InlineEditorToolbar u-hiddenOnFullScreenEditor"></div>
+        <div class="js-ParagraphEditorToolbar u-hiddenOnFullScreenEditor"></div>
         <div class="js-MentionModule"></div>
         <div class="richEditor-menu richEditor-embedBar">
             <ul class="richEditor-menuItems" role="menubar" aria-label="{t c="Inline Level Formatting Menu"}">

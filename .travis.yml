@@ -12,6 +12,8 @@ install:
 cache:
   directories:
     - "plugins/rich-editor/node_modules"
+    - "$TRAVIS_BUILD_DIR/vanilla/tests/node_modules"
+    - "$TRAVIS_BUILD_DIR/vanilla/applications/dashboard/node_modules"
   yarn: true
 
 # The project's primary programming language. This will affect default dependency availability.

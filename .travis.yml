@@ -1,5 +1,6 @@
 # Add dependencies whitelisted by Travis and setup a loopback hostname for testing.
 addons:
+  chrome: stable
   apt:
     packages:
       - nginx

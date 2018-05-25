@@ -555,6 +555,24 @@ label.checkbox input.checkbox-input {
   }
 }
 
+.Row {
+  width: 100% !important;
+}
+
+select {
+  max-width: 100%;
+}
+
+.column-content {
+  width: 100% !important;
+  margin: 0 !important;
+}
+
+*:focus {
+  outline: solid orange 2px !important;
+  outline-offset: -2px;
+}
+
 .richEditor {
   position: relative;
   display: block;
@@ -1208,6 +1226,10 @@ label.checkbox input.checkbox-input {
   display: none;
 }
 
+body.isMobile .richEditor-embedBar {
+  display: none;
+}
+
 body.isMobile .embedDialogue {
   position: static;
 }
@@ -1244,9 +1266,8 @@ body.isMobile .richEditor.isFocused {
   height: 100vh;
   align-items: center;
   max-height: 100vh;
-  overflow: auto;
-  z-index: 1001;
-  background: rgba(0, 0, 255, 0.9);
+  z-index: 2001;
+  box-sizing: border-box;
   margin: 0 !important;
 }
 
@@ -1260,6 +1281,7 @@ body.isMobile .richEditor.isFocused .richEditor-frame {
 body.isMobile .richEditor.isFocused .js-richText {
   display: block;
   position: relative;
+  margin-top: 39px;
   height: calc(100% - 39px);
 }
 
@@ -1276,13 +1298,19 @@ body.isMobile .richEditor.isFocused .richEditor-text {
 
 body.isMobile .richEditor.isFocused .richEditor-embedBar {
   position: absolute;
-  bottom: 0;
+  display: block;
+  top: 0;
   left: 0;
   width: 100%;
 }
 
 body.isMobile .richEditor.isFocused .u-visibleOnFullScreenEditor {
   display: block;
+}
+
+body.isMobile .richEditor.isFocused .richEditor-menu.insertPopover {
+  top: 100%;
+  bottom: auto;
 }
 
 body.isMobile .richEditorParagraphMenu {
@@ -1295,6 +1323,9 @@ body.isMobile .FormWrapper {
 }
 
 @media (max-width: 700px) {
+  .richEditor-embedBar {
+    display: none;
+  }
   .embedDialogue {
     position: static;
   }
@@ -1326,9 +1357,8 @@ body.isMobile .FormWrapper {
     height: 100vh;
     align-items: center;
     max-height: 100vh;
-    overflow: auto;
-    z-index: 1001;
-    background: rgba(0, 0, 255, 0.9);
+    z-index: 2001;
+    box-sizing: border-box;
     margin: 0 !important;
   }
   .richEditor.isFocused .richEditor-frame {
@@ -1340,6 +1370,7 @@ body.isMobile .FormWrapper {
   .richEditor.isFocused .js-richText {
     display: block;
     position: relative;
+    margin-top: 39px;
     height: calc(100% - 39px);
   }
   .richEditor.isFocused .richEditor-text {
@@ -1354,12 +1385,17 @@ body.isMobile .FormWrapper {
   }
   .richEditor.isFocused .richEditor-embedBar {
     position: absolute;
-    bottom: 0;
+    display: block;
+    top: 0;
     left: 0;
     width: 100%;
   }
   .richEditor.isFocused .u-visibleOnFullScreenEditor {
     display: block;
+  }
+  .richEditor.isFocused .richEditor-menu.insertPopover {
+    top: 100%;
+    bottom: auto;
   }
   .richEditorParagraphMenu {
     display: none !important;
@@ -1735,6 +1771,7 @@ body.isMobile .FormWrapper {
 .embedExternal-content {
   display: inline-block;
   max-width: 100%;
+  width: 100%;
   overflow: hidden;
 }
 

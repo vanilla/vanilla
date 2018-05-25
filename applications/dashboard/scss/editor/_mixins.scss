@@ -85,6 +85,10 @@ $spinnerOffset: 73deg;
 
 @mixin richEditorMobileStyles {
 
+    .richEditor-embedBar {
+        display: none;
+    }
+
     .embedDialogue {
         position: static;
     }
@@ -120,10 +124,8 @@ $spinnerOffset: 73deg;
             height: 100vh;
             align-items: center;
             max-height: 100vh;
-            overflow: auto;
-            z-index: 1001;
-
-            background: rgba(0, 0, 255, .9);
+            z-index: 2001;
+            box-sizing: border-box;
             margin: 0 !important;
 
             .richEditor-frame {
@@ -136,6 +138,7 @@ $spinnerOffset: 73deg;
             .js-richText {
                 display: block;
                 position: relative;
+                margin-top: $richEditor-menuButton_size;
                 height: calc(100% - #{$richEditor-menuButton_size});
             }
 
@@ -152,13 +155,19 @@ $spinnerOffset: 73deg;
 
             .richEditor-embedBar {
                 position: absolute;
-                bottom: 0;
+                display: block;
+                top: 0;
                 left: 0;
                 width: 100%;
             }
 
             .u-visibleOnFullScreenEditor {
                 display: block;
+            }
+
+            .richEditor-menu.insertPopover {
+                top: 100%;
+                bottom: auto;
             }
         }
 
@@ -176,3 +185,23 @@ $spinnerOffset: 73deg;
 
 
 
+// Temp, do not commit
+.Row {
+    width: 100% !important;
+}
+
+select {
+    max-width: 100%;
+}
+
+
+.column-content {
+    width: 100% !important;
+    margin: 0 !important;
+}
+
+
+*:focus {
+    outline: solid orange 2px !important;
+    outline-offset: -2px;
+}

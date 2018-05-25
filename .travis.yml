@@ -1,0 +1,30 @@
+# Cache Composer package files.
+cache:
+  directories:
+    - "plugins/rich-editor/node_modules"
+    - "$TRAVIS_BUILD_DIR/vanilla/tests/node_modules"
+    - "$TRAVIS_BUILD_DIR/vanilla/applications/dashboard/node_modules"
+  yarn: true
+
+# No additional system dependencies to install. Skip the install step.
+before_install:
+  - ./travis/install.sh
+
+# The project's primary programming language. This will affect default dependency availability.
+language: php
+
+# Configure the build.
+matrix:
+  fast_finish: true
+
+# The versions of PHP to test the project under.
+node:
+  - lts/*
+
+# Steps of the build script.
+script:
+  - cd vanilla
+  - ./vendor/bin/phpunit --exclude-group=large
+
+# Run build in a Docker container.  Reduces time between commit and start of build.
+sudo: false

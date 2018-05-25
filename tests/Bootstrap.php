@@ -186,6 +186,9 @@ class Bootstrap {
             ->setShared(true)
             ->addAlias(Gdn::AliasDispatcher)
 
+            ->rule(\Gdn_Validation::class)
+            ->addCall('addRule', ['BodyFormat', new Reference(\Vanilla\BodyFormatValidator::class)])
+
             ->rule(AuthenticatorModel::class)
             ->setShared(true)
             ->addCall('registerAuthenticatorClass', [PasswordAuthenticator::class])

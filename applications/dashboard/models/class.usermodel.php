@@ -76,10 +76,11 @@ class UserModel extends Gdn_Model {
     /**
      * Class constructor. Defines the related database table name.
      *
-     * @param EventManager $eventManager
+     * @param EventManager $eventManager The event manager dependency.
+     * @param Gdn_Validation $validation The validation dependency.
      */
-    public function __construct(EventManager $eventManager = null) {
-        parent::__construct('User');
+    public function __construct(EventManager $eventManager = null, Gdn_Validation $validation = null) {
+        parent::__construct('User', $validation);
 
         if ($eventManager === null) {
             $this->eventManager = Gdn::getContainer()->get(EventManager::class);

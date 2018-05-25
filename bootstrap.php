@@ -185,6 +185,9 @@ $dic->setInstance('Garden\Container\Container', $dic)
     ->rule('Gdn_Model')
     ->setShared(true)
 
+    ->rule(Gdn_Validation::class)
+    ->addCall('addRule', ['BodyFormat', new Reference(\Vanilla\BodyFormatValidator::class)])
+
     ->rule(\Vanilla\Models\AuthenticatorModel::class)
     ->setShared(true)
     ->addCall('registerAuthenticatorClass', [\Vanilla\Authenticator\PasswordAuthenticator::class])

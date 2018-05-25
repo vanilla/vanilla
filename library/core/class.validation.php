@@ -225,6 +225,10 @@ class Gdn_Validation {
                 $ruleNames[] = 'Format';
             }
 
+            if ($field === 'Body' && isset($this->_Schema['Format']) && $this->ruleExists('BodyFormat')) {
+                $ruleNames[] = 'BodyFormat';
+            }
+
             // Assign the rules to the field.
             // echo '<div>Field: '.$Field.'</div>';
             // print_r($RuleNames);
@@ -428,7 +432,7 @@ class Gdn_Validation {
      * When adding a callback it must have the following signature:
      *
      * ```
-     * function validator(mixed $value, ArrayObject $fieldInfo, array $row): mixed|Invalid
+     * function validator(mixed $value, object $fieldInfo, array $row): mixed|Invalid
      * ```
      *
      * Predefined rule names are:
@@ -450,7 +454,7 @@ class Gdn_Validation {
      * @param string|callable $rule The rule to be added.
      * @param bool $filter Whether or not the rule filters the value. This is ignored when the rule is a callback.
      */
-    public function addRule(string $name, $rule, bool $filter = false) {
+    public function addRule(string $name, $rule, bool $filter = null) {
         // Callback rules are always filtered.
         if (!is_string($rule) && is_callable($rule)) {
             $filter = true;
@@ -458,7 +462,17 @@ class Gdn_Validation {
 
         $this->_Rules[$name] = $rule;
 
-        $this->rules[$name] = [$rule, $filter];
+        $this->rules[$name] = [$rule, (bool)$filter];
+    }
+
+    /**
+     * Determine whether or not a rule exists.
+     *
+     * @param string $name The name of the rule.
+     * @return bool Returns **true** if the rule exists or **false** otherwise.
+     */
+    public function ruleExists(string $name) {
+        return !empty($this->rules[$name]);
     }
 
     /**

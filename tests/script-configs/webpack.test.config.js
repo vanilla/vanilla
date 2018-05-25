@@ -14,7 +14,7 @@ const VANILLA_ROOT = path.resolve(path.join(__dirname, "../../"));
 module.exports = {
     context: VANILLA_ROOT,
     mode: "development",
-    devtool: 'inline-source-map',
+    devtool: "inline-source-map",
     module: {
         rules: [
             {
@@ -47,7 +47,7 @@ module.exports = {
                                 VANILLA_ROOT,
                                 "tsconfig.json"
                             ),
-                            transpileOnly: true,
+                            transpileOnly: true
                         }
                     }
                 ]
@@ -61,11 +61,23 @@ module.exports = {
             path.join(VANILLA_ROOT, "tests/node_modules")
         ],
         alias: {
-            "@dashboard": path.resolve(VANILLA_ROOT, "applications/dashboard/src/scripts/"),
-            "@vanilla": path.resolve(VANILLA_ROOT, "applicatons/vanilla/src/scripts/")
+            "@dashboard": path.resolve(
+                VANILLA_ROOT,
+                "applications/dashboard/src/scripts/"
+            ),
+            "@vanilla": path.resolve(
+                VANILLA_ROOT,
+                "applicatons/vanilla/src/scripts/"
+            )
         },
         extensions: [".ts", ".tsx", ".js", ".jsx"]
     },
+    plugins: [
+        new webpack.SourceMapDevToolPlugin({
+            filename: null, // if no value is provided the sourcemap is inlined
+            test: /\.(ts|js)($|\?)/i // process .js and .ts files only
+        })
+    ],
 
     /**
      * We need to manually tell webpack where to resolve our loaders.

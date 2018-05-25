@@ -28,7 +28,7 @@ module.exports = function(config) {
         mime: {
             'text/x-typescript':  ['ts']
         },
-        browsers: ["ChromeHeadless"],
+        browsers: ["Chrome"],
         autoWatch: true,
         webpackMiddleware: {
             // webpack-dev-middleware configuration

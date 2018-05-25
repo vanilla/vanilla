@@ -25,7 +25,7 @@ module.exports = config => {
         mime: {
             "text/x-typescript": ["ts"],
         },
-        browsers: ["ChromeHeadless"],
+        browsers: ["ChromeHeadless", "ChromeHeadlessNoSandbox"],
         autoWatch: true,
         webpackMiddleware: {
             // webpack-dev-middleware configuration
@@ -35,5 +35,12 @@ module.exports = config => {
         webpack: webpackConfig,
         singleRun: false, // Karma captures browsers, runs the tests and exits
         concurrency: Infinity,
+        // you can define custom flags
+        customLaunchers: {
+            ChromeHeadlessNoSandbox: {
+                base: "ChromeHeadless",
+                flags: ["--no-sandbox"],
+            },
+        },
     });
 };

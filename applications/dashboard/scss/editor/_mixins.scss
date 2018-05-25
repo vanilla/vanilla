@@ -96,10 +96,14 @@ $spinnerOffset: 73deg;
         background: rgba(255, 165, 0, 0.5);
     }
 
+    .u-hiddenOnFullScreenEditor {
+        display: none !important;
+    }
+
     .richEditor {
         padding-left: 0;
 
-        &.isFocussed {
+        &.isFocused {
             display: flex;
             position: fixed;
             top: 0;
@@ -107,42 +111,78 @@ $spinnerOffset: 73deg;
             width: 100%;
             height: 100vh;
             align-items: center;
-            max-height: calc(100vh - #{$richEditor-menuButton_size});
+            max-height: 100vh;
             overflow: auto;
+            z-index: 1001;
 
-
-            background: rgba(0, 0, 255, 0.25);
+            background: rgba(0, 0, 255, .9);
             margin: 0 !important;
-        }
-
-
-        &.isSticky {
-            .richEditor-embedBar {
-                position: fixed;
-                bottom: 0;
-                left: 0;
-                width: calc(100% - #{$richEditor-mobile_spacing * 2 + $richEditor-menu_borderWidth * 2});
-                box-sizing: border-box;
-                margin: {
-                    left: #{$richEditor-mobile_spacing + $richEditor-menu_borderWidth};
-                    right: #{$richEditor-mobile_spacing + $richEditor-menu_borderWidth};
-                }
-
-                background: rgba(0, 0, 255, 0.5);
-            }
 
             .richEditor-frame {
-                padding-bottom: $richEditor-menuButton_size;
+                position: relative;
+                border: 0;
+                border-radius: 0;
+                height: 100vh;
+            }
+
+            .js-richText {
+                display: block;
+                position: relative;
+                height: calc(100% - #{$richEditor-menuButton_size});
             }
 
             .richEditor-text {
-
+                position: absolute;
+                top: 0;
+                left: 0;
+                height: 100%;
+                width: 100%;
+                min-height: 100%;
+                max-height: 100%;
+                overflow: auto;
             }
 
-            .embedDialogue {
-                position: static;
+            .richEditor-embedBar {
+                position: absolute;
+                bottom: 0;
+                left: 0;
+                width: 100%;
+            }
+
+            .u-visibleOnFullScreenEditor {
+                display: block;
             }
         }
+
+
+
+        //&.isSticky {
+        //    .richEditor-embedBar {
+        //        position: fixed;
+        //        bottom: 0;
+        //        left: 0;
+        //        width: calc(100% - #{$richEditor-mobile_spacing * 2 + $richEditor-menu_borderWidth * 2});
+        //        box-sizing: border-box;
+        //        margin: {
+        //            left: #{$richEditor-mobile_spacing + $richEditor-menu_borderWidth};
+        //            right: #{$richEditor-mobile_spacing + $richEditor-menu_borderWidth};
+        //        }
+        //
+        //        background: rgba(0, 0, 255, 0.5);
+        //    }
+        //
+        //    .richEditor-frame {
+        //        padding-bottom: $richEditor-menuButton_size;
+        //    }
+        //
+        //    .richEditor-text {
+        //
+        //    }
+        //
+        //    .embedDialogue {
+        //        position: static;
+        //    }
+        //}
     }
 
     .richEditorParagraphMenu {

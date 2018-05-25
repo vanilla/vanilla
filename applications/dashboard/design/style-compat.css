@@ -1201,6 +1201,10 @@ select {
   }
 }
 
+.u-visibleOnFullScreenEditor {
+  display: none;
+}
+
 body.isMobile .richEditor-embedBarScroll {
   display: block;
   position: absolute;
@@ -1212,11 +1216,15 @@ body.isMobile .richEditor-embedBarScroll {
   background: rgba(255, 165, 0, 0.5);
 }
 
+body.isMobile .u-hiddenOnFullScreenEditor {
+  display: none !important;
+}
+
 body.isMobile .richEditor {
   padding-left: 0;
 }
 
-body.isMobile .richEditor.isFocussed {
+body.isMobile .richEditor.isFocused {
   display: flex;
   position: fixed;
   top: 0;
@@ -1224,29 +1232,46 @@ body.isMobile .richEditor.isFocussed {
   width: 100%;
   height: 100vh;
   align-items: center;
-  max-height: calc(100vh - 39px);
+  max-height: 100vh;
   overflow: auto;
-  background: rgba(0, 0, 255, 0.25);
+  z-index: 1001;
+  background: rgba(0, 0, 255, 0.9);
   margin: 0 !important;
 }
 
-body.isMobile .richEditor.isSticky .richEditor-embedBar {
-  position: fixed;
+body.isMobile .richEditor.isFocused .richEditor-frame {
+  position: relative;
+  border: 0;
+  border-radius: 0;
+  height: 100vh;
+}
+
+body.isMobile .richEditor.isFocused .js-richText {
+  display: block;
+  position: relative;
+  height: calc(100% - 39px);
+}
+
+body.isMobile .richEditor.isFocused .richEditor-text {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 100%;
+  width: 100%;
+  min-height: 100%;
+  max-height: 100%;
+  overflow: auto;
+}
+
+body.isMobile .richEditor.isFocused .richEditor-embedBar {
+  position: absolute;
   bottom: 0;
   left: 0;
-  width: calc(100% - 38px);
-  box-sizing: border-box;
-  margin-left: 19px;
-  margin-right: 19px;
-  background: rgba(0, 0, 255, 0.5);
+  width: 100%;
 }
 
-body.isMobile .richEditor.isSticky .richEditor-frame {
-  padding-bottom: 39px;
-}
-
-body.isMobile .richEditor.isSticky .embedDialogue {
-  position: static;
+body.isMobile .richEditor.isFocused .u-visibleOnFullScreenEditor {
+  display: block;
 }
 
 body.isMobile .richEditorParagraphMenu {
@@ -1269,10 +1294,13 @@ body.isMobile .FormWrapper {
     pointer-events: none;
     background: rgba(255, 165, 0, 0.5);
   }
+  .u-hiddenOnFullScreenEditor {
+    display: none !important;
+  }
   .richEditor {
     padding-left: 0;
   }
-  .richEditor.isFocussed {
+  .richEditor.isFocused {
     display: flex;
     position: fixed;
     top: 0;
@@ -1280,26 +1308,41 @@ body.isMobile .FormWrapper {
     width: 100%;
     height: 100vh;
     align-items: center;
-    max-height: calc(100vh - 39px);
+    max-height: 100vh;
     overflow: auto;
-    background: rgba(0, 0, 255, 0.25);
+    z-index: 1001;
+    background: rgba(0, 0, 255, 0.9);
     margin: 0 !important;
   }
-  .richEditor.isSticky .richEditor-embedBar {
-    position: fixed;
+  .richEditor.isFocused .richEditor-frame {
+    position: relative;
+    border: 0;
+    border-radius: 0;
+    height: 100vh;
+  }
+  .richEditor.isFocused .js-richText {
+    display: block;
+    position: relative;
+    height: calc(100% - 39px);
+  }
+  .richEditor.isFocused .richEditor-text {
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 100%;
+    width: 100%;
+    min-height: 100%;
+    max-height: 100%;
+    overflow: auto;
+  }
+  .richEditor.isFocused .richEditor-embedBar {
+    position: absolute;
     bottom: 0;
     left: 0;
-    width: calc(100% - 38px);
-    box-sizing: border-box;
-    margin-left: 19px;
-    margin-right: 19px;
-    background: rgba(0, 0, 255, 0.5);
+    width: 100%;
   }
-  .richEditor.isSticky .richEditor-frame {
-    padding-bottom: 39px;
-  }
-  .richEditor.isSticky .embedDialogue {
-    position: static;
+  .richEditor.isFocused .u-visibleOnFullScreenEditor {
+    display: block;
   }
   .richEditorParagraphMenu {
     display: none !important;

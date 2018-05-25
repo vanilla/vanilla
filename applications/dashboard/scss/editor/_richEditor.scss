@@ -700,6 +700,10 @@
 }
 
 
+.u-visibleOnFullScreenEditor {
+    display: none;
+}
+
 // Mobile
 body.isMobile {
     @include richEditorMobileStyles();

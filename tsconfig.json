@@ -15,19 +15,18 @@
         "baseUrl": ".",
         "downlevelIteration": true,
         "paths": {
-            "*": [
-                "node_modules/*",
-                "applications/dashboard/node_modules/*"
-            ],
             "@vanilla/*": ["./applications/vanilla/src/scripts/*"],
-            "@dashboard/*": ["./applications/dashboard/src/scripts/*"]
+            "@dashboard/*": ["./applications/dashboard/src/scripts/*"],
+            "@testroot/*": ["./tests/javascript/*"],
+            "*": [
+                "./applications/dashboard/node_modules/*",
+                "./plugins/rich-editor/node_modules/*",
+                "./tests/node_modules/*"
+            ]
         },
         "typeRoots": [
-            "tests/node_modules/@types",
-            "applications/dashboard/node_modules/@types",
-            "applications/vanilla/node_modules/@types",
-            "plugins/*/node_modules/@types",
-            "plugins/*/src/scripts/@types"
+            "./applications/dashboard/node_modules/@types",
+            "./tests/node_modules/@types"
         ],
         "skipLibCheck": true,
         "sourceMap": true

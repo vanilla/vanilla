@@ -28,8 +28,9 @@ cache:
   directories:
     - $HOME/.composer/cache/files
     - $HOME/.yarn-cache
-    - tests/node_modules
-    - applications/dashboard/node_modules
+    - $TRAVIS_BUILD_DIR/tests/node_modules
+    - $TRAVIS_BUILD_DIR/applications/dashboard/node_modules
+    - $TRAVIS_BUILD_DIR/applications/dashboard/bower_components
   yarn: true
 
 # No additional system dependencies to install. Skip the install step.

@@ -80,29 +80,8 @@
     padding: 0;
 }
 
-.richEditor-menuItem {
-    display: block;
-    padding: 0;
-    margin: 0;
-
-    .richEditor-button,
-    &.richEditor-button {
-        height: $richEditor-menuButton_size;
-        width: $richEditor-menuButton_size;
-        font-size: #{$richEditor-menuButton_size * 24 / 39};
-        line-height: $richEditor-menuButton_size;
-
-        &.emojiChar-🇺🇳 {
-            font-size: 14px;
-        }
-    }
-
-    &.isRightAligned {
-        margin-left: auto;
-    }
-}
-
 // button reset
+.richEditor-nextInput,
 .atMentionList-suggestion,
 .iconButton,
 .richEditor-button {
@@ -154,6 +133,40 @@
         .richEditorInline-icon {
             opacity: 1;
         }
+    }
+}
+
+.richEditor-menuWideItem,
+.richEditor-menuItem {
+    display: block;
+    padding: 0;
+    margin: 0;
+
+    .richEditor-button,
+    &.richEditor-button {
+        height: $richEditor-menuButton_size;
+        width: $richEditor-menuButton_size;
+        font-size: #{$richEditor-menuButton_size * 24 / 39};
+        line-height: $richEditor-menuButton_size;
+
+        &.emojiChar-🇺🇳 {
+            font-size: 14px;
+        }
+    }
+
+    &.isRightAligned {
+        margin-left: auto;
+    }
+}
+
+.richEditor-nextInput {
+    height: $richEditor-menuButton_size;
+    line-height: $richEditor-menuButton_size;
+    font-size: $richEditor-embedMenuWideButton_fontSize;
+    color: inherit;
+    padding: {
+        left: $richEditor-embedMenuWideButton_padding;
+        right: $richEditor-embedMenuWideButton_padding;
     }
 }
 

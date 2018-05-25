@@ -6,7 +6,9 @@
  */
 
 import * as utility from "@dashboard/utility";
+import { logError } from "@dashboard/utility";
 import twemoji from "twemoji";
+import tabbable from "tabbable";
 
 /**
  * Use the browser's built-in functionality to quickly and safely escape a string.
@@ -318,4 +320,52 @@ export function ensureScript(scriptUrl: string) {
             head.appendChild(script);
         }
     });
+}
+
+export function getNextTabbableElement(
+    rootNode: Node = document,
+    goForward: boolean = true,
+    element: Node = document.activeElement,
+) {
+    if (element instanceof HTMLElement) {
+        const tabbables = tabbable(rootNode);
+        const currentTabIndex = tabbables.indexOf(element);
+        let targetIndex = goForward ? currentTabIndex + 1 : currentTabIndex - 1;
+        window.console.log("--currentTabIndex: ", currentTabIndex);
+
+        if (currentTabIndex > 0) {
+            window.console.log("tabbables: ", tabbables);
+            window.console.log("currentTabIndex: ", currentTabIndex);
+            window.console.log("targetIndex: ", targetIndex);
+
+            if (tabbables.length > 0) {
+                if (targetIndex < 0) {
+                    targetIndex = tabbables.length - 1;
+                } else if (targetIndex >= tabbables.length) {
+                    targetIndex = 0;
+                }
+
+                window.console.log("= targetIndex: ", targetIndex);
+                window.console.log("=  tabbables[targetIndex]: ", tabbables[targetIndex]);
+
+                return tabbables[targetIndex];
+            } else {
+                logError("No tabbable elements found in element: ", rootNode);
+                logError("currentTabIndex: ", currentTabIndex);
+                logError("tabbables: ", tabbables);
+                logError("element: ", element);
+                logError("targetIndex: ", targetIndex);
+            }
+        } else {
+            logError("Element does not exist in list of tabbable element: ");
+            logError("currentTabIndex: ", currentTabIndex);
+            logError("tabbables: ", tabbables);
+            logError("element: ", element);
+            logError("targetIndex: ", targetIndex);
+        }
+    } else {
+        logError("Unable to tab to next element, element given is not valid: ", element);
+    }
+
+    return element; // return same element as fallback
 }

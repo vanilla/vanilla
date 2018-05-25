@@ -555,19 +555,6 @@ label.checkbox input.checkbox-input {
   }
 }
 
-.Row {
-  width: 100% !important;
-}
-
-select {
-  max-width: 100%;
-}
-
-.column-content {
-  width: 100% !important;
-  margin: 0 !important;
-}
-
 .richEditor {
   position: relative;
   display: block;
@@ -657,27 +644,7 @@ select {
   padding: 0;
 }
 
-.richEditor-menuItem {
-  display: block;
-  padding: 0;
-  margin: 0;
-}
-
-.richEditor-menuItem .richEditor-button, .richEditor-menuItem.richEditor-button {
-  height: 39px;
-  width: 39px;
-  font-size: 24px;
-  line-height: 39px;
-}
-
-.richEditor-menuItem .richEditor-button.emojiChar-🇺🇳, .richEditor-menuItem.richEditor-button.emojiChar-🇺🇳 {
-  font-size: 14px;
-}
-
-.richEditor-menuItem.isRightAligned {
-  margin-left: auto;
-}
-
+.richEditor-nextInput,
 .atMentionList-suggestion,
 .iconButton,
 .richEditor-button {
@@ -728,6 +695,42 @@ select {
 
 .richEditor-button:hover .richEditorInline-icon, .richEditor-button:focus .richEditorInline-icon, .richEditor-button.isActive .richEditorInline-icon {
   opacity: 1;
+}
+
+.richEditor-menuWideItem,
+.richEditor-menuItem {
+  display: block;
+  padding: 0;
+  margin: 0;
+}
+
+.richEditor-menuWideItem .richEditor-button, .richEditor-menuWideItem.richEditor-button,
+.richEditor-menuItem .richEditor-button,
+.richEditor-menuItem.richEditor-button {
+  height: 39px;
+  width: 39px;
+  font-size: 24px;
+  line-height: 39px;
+}
+
+.richEditor-menuWideItem .richEditor-button.emojiChar-🇺🇳, .richEditor-menuWideItem.richEditor-button.emojiChar-🇺🇳,
+.richEditor-menuItem .richEditor-button.emojiChar-🇺🇳,
+.richEditor-menuItem.richEditor-button.emojiChar-🇺🇳 {
+  font-size: 14px;
+}
+
+.richEditor-menuWideItem.isRightAligned,
+.richEditor-menuItem.isRightAligned {
+  margin-left: auto;
+}
+
+.richEditor-nextInput {
+  height: 39px;
+  line-height: 39px;
+  font-size: 0.9em;
+  color: inherit;
+  padding-left: 9px;
+  padding-right: 9px;
 }
 
 .richEditor-upload {
@@ -1205,6 +1208,10 @@ select {
   display: none;
 }
 
+body.isMobile .embedDialogue {
+  position: static;
+}
+
 body.isMobile .richEditor-embedBarScroll {
   display: block;
   position: absolute;
@@ -1218,6 +1225,10 @@ body.isMobile .richEditor-embedBarScroll {
 
 body.isMobile .u-hiddenOnFullScreenEditor {
   display: none !important;
+}
+
+body.isMobile .insertPopover {
+  width: 100%;
 }
 
 body.isMobile .richEditor {
@@ -1284,6 +1295,9 @@ body.isMobile .FormWrapper {
 }
 
 @media (max-width: 700px) {
+  .embedDialogue {
+    position: static;
+  }
   .richEditor-embedBarScroll {
     display: block;
     position: absolute;
@@ -1296,6 +1310,9 @@ body.isMobile .FormWrapper {
   }
   .u-hiddenOnFullScreenEditor {
     display: none !important;
+  }
+  .insertPopover {
+    width: 100%;
   }
   .richEditor {
     padding-left: 0;

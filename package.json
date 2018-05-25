@@ -40,5 +40,9 @@
         "test:watch": "cross-env NODE_ENV=test jest --watch",
         "lint:ts": "tslint -c tslint.json -e '**/node_modules/**' -e '**/src/**/*.{js,jsx}' -p tsconfig.json -t stylish",
         "lint:ts:fix": "tslint -c tslint.json -e '**/node_modules/**' -e '**/src/**/*.{js,jsx}' -p tsconfig.json -t stylish --fix"
+    },
+    "dependencies": {
+        "tabbable": "^1.1.3",
+        "twemoji": "latest"
     }
 }

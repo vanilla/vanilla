@@ -7,6 +7,8 @@ $richEditor_minHeight: 200px !default;
 $richEditor_verticalPadding: 9px !default;
 $richEditor_padding: $richEditor_verticalPadding 12px !default;
 $richEditor-embedMenu_padding: 0 !default;
+$richEditor-embedMenuWideButton_padding: 9px;
+$richEditor-embedMenuWideButton_fontSize: .9em;
 $richEditor-icon_opacity: .6 !default;
 $richEditor-atMention_width: 200px !default;
 $richEditor-atMentionAvatar_width: 30px !default;
@@ -41,6 +43,7 @@ $richEditor-emojiCategory_color: #737982;
 $richEditor-emojiCategory_hoverColor: #212327;
 $richEditor-emojiCategory_selectedBg: #aee4fe;
 $richEditor-emojiGroup_paddingLeft: 3px;
+
 
 $richEditor-videoPlayIcon_width: 80px;
 $richEditor-videoPlayIcon_hoverColor: #0291db;

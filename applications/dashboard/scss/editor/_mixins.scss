@@ -85,6 +85,10 @@ $spinnerOffset: 73deg;
 
 @mixin richEditorMobileStyles {
 
+    .embedDialogue {
+        position: static;
+    }
+
     .richEditor-embedBarScroll {
         display: block;
         position: absolute;
@@ -98,6 +102,10 @@ $spinnerOffset: 73deg;
 
     .u-hiddenOnFullScreenEditor {
         display: none !important;
+    }
+
+    .insertPopover {
+        width: 100%;
     }
 
     .richEditor {
@@ -154,35 +162,6 @@ $spinnerOffset: 73deg;
             }
         }
 
-
-
-        //&.isSticky {
-        //    .richEditor-embedBar {
-        //        position: fixed;
-        //        bottom: 0;
-        //        left: 0;
-        //        width: calc(100% - #{$richEditor-mobile_spacing * 2 + $richEditor-menu_borderWidth * 2});
-        //        box-sizing: border-box;
-        //        margin: {
-        //            left: #{$richEditor-mobile_spacing + $richEditor-menu_borderWidth};
-        //            right: #{$richEditor-mobile_spacing + $richEditor-menu_borderWidth};
-        //        }
-        //
-        //        background: rgba(0, 0, 255, 0.5);
-        //    }
-        //
-        //    .richEditor-frame {
-        //        padding-bottom: $richEditor-menuButton_size;
-        //    }
-        //
-        //    .richEditor-text {
-        //
-        //    }
-        //
-        //    .embedDialogue {
-        //        position: static;
-        //    }
-        //}
     }
 
     .richEditorParagraphMenu {
@@ -196,19 +175,4 @@ $spinnerOffset: 73deg;
 }
 
 
-
-// Temp, do not commit
-.Row {
-    width: 100% !important;
-}
-
-select {
-    max-width: 100%;
-}
-
-
-.column-content {
-    width: 100% !important;
-    margin: 0 !important;
-}
 

@@ -2,14 +2,14 @@
 
 cd $TRAVIS_BUILD_DIR
 
-if [ ! -f "$TRAVIS_BUILD_DIR/vanilla" ]; then
-    mkdir "$TRAVIS_BUILD_DIR/vanilla"
-fi
-
+# This directory might already exist (from the cache) but its not a big deal.
+mkdir "$TRAVIS_BUILD_DIR/vanilla"
 cd "$TRAVIS_BUILD_DIR/vanilla"
+
+# Because cached files are already possibly here we can't do a clone.
 git init
 git remote add origin https://github.com/vanilla/vanilla
-git pull origin $TRAVIS_PULL_REQUEST_BRANCH
+git pull --depth 50 origin $TRAVIS_PULL_REQUEST_BRANCH
 
 # Symlink in the editor plugin
 cd "$TRAVIS_BUILD_DIR/vanilla/plugins"

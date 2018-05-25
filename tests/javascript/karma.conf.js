@@ -33,7 +33,7 @@ module.exports = config => {
             stats: "errors-only",
         },
         webpack: webpackConfig,
-        singleRun: false, // Karma captures browsers, runs the tests and exits
+        singleRun: true, // Karma captures browsers, runs the tests and exits
         concurrency: Infinity,
     });
 };

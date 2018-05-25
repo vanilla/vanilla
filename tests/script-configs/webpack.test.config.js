@@ -14,6 +14,7 @@ const VANILLA_ROOT = path.resolve(path.join(__dirname, "../../"));
 module.exports = {
     context: VANILLA_ROOT,
     mode: "development",
+    devtool: 'inline-source-map',
     module: {
         rules: [
             {
@@ -60,8 +61,8 @@ module.exports = {
             path.join(VANILLA_ROOT, "tests/node_modules")
         ],
         alias: {
-            "@dashboard": path.resolve(VANILLA_ROOT, "applications/dashboard/"),
-            "@vanilla": path.resolve(VANILLA_ROOT, "applicatons/vanilla")
+            "@dashboard": path.resolve(VANILLA_ROOT, "applications/dashboard/src/scripts/"),
+            "@vanilla": path.resolve(VANILLA_ROOT, "applicatons/vanilla/src/scripts/")
         },
         extensions: [".ts", ".tsx", ".js", ".jsx"]
     },

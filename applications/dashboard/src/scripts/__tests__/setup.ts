@@ -6,11 +6,11 @@
 
 import { polyfillClosest } from "../entries/polyfills";
 import "mutationobserver-shim";
-import Enzyme from "enzyme";
-import Adapter from "enzyme-adapter-react-16";
+// import Enzyme from "enzyme";
+// import Adapter from "enzyme-adapter-react-16";
 
 // Setup enzyme
-Enzyme.configure({ adapter: new Adapter() });
+// Enzyme.configure({ adapter: new Adapter() });
 
 // Because there is something weird happening in watch mode if this gets applied twice.
 // Likely the JSDOM references get deleted and need to be referenced.
@@ -29,7 +29,7 @@ function getSelection() {
         },
         getRangeAt: () => {
             return;
-        },
+        }
     };
 }
 

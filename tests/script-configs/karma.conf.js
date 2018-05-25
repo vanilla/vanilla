@@ -14,14 +14,14 @@ module.exports = function(config) {
         basePath: VANILLA_ROOT,
         frameworks: ["mocha", "chai"],
         files: [
-            "applications/*/src/scripts/__browsertests__/**/*.test.ts",
-            "plugins/*/src/scripts/__browsertests__/**/*.test.ts"
+            "applications/*/src/scripts/__tests__/**/*.test.ts",
+            "plugins/*/src/scripts/__tests__/**/*.test.ts",
         ],
         preprocessors: {
-            "applications/*/src/scripts/__browsertests__/**/*.test.ts": ["webpack"],
-            "plugins/*/src/scripts/__browsertests__/**/*.test.ts": ["webpack"],
+            "applications/*/src/scripts/__tests__/**/*.test.ts": ["webpack", "sourcemap"],
+            "plugins/*/src/scripts/__tests__/**/*.test.ts": ["webpack", "sourcemap"],
         },
-        reporters: ['progress', 'mocha'],
+        reporters: ['mocha'],
         logLevel: config.LOG_INFO,
         port: 9876, // karma web server port
         colors: true,

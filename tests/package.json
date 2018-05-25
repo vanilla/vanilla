@@ -48,9 +48,9 @@
     },
     "scripts": {
         "test:before": "node javascript/verifyModules.js",
-        "test": "karma start ./javascript/karma.conf.js",
+        "test": "karma start ./javascript/karma.conf.js --single-run",
         "test:jest": "yarn test:before && cross-env NODE_ENV=test jest --config=javascript/jest.config.js",
-        "test:watch": "cross-env NODE_ENV=test jest --watch --config=javascript/jest.config.js",
+        "test:watch": "karma start ./javascript/karma.conf.js",
         "lint:ts": "tslint -c tslint.json -e '**/node_modules/**' -e '**/src/**/*.{js,jsx}' -p tsconfig.json -t stylish",
         "lint:ts:fix": "tslint -c tslint.json -e '**/node_modules/**' -e '**/src/**/*.{js,jsx}' -p tsconfig.json -t stylish --fix"
     }

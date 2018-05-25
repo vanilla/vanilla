@@ -15,7 +15,9 @@ before_script:
   - composer install --optimize-autoloader
   - tests/travis/setup.sh
   # Node
+  - cd tests
   - yarn install --pure-lockfile
+  - cd ../
   - cd applications/dashboard
   - yarn install --pure-lockfile
   - cd ../..
@@ -57,7 +59,9 @@ php:
 # Steps of the build script.
 script:
   - tests/travis/main.sh
+  - cd tests
   - yarn run test
+  - cd ../
   - yarn run lint:ts
   - ls -lah ./conf
   - cat /tmp/error.log

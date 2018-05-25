@@ -73,9 +73,11 @@ module.exports = {
         extensions: [".ts", ".tsx", ".js", ".jsx"]
     },
     plugins: [
+        // For some reason karma-webpack doesn't pass along the sourcemaps properly for files with .ts extensions
+        // https://stackoverflow.com/a/39175635
         new webpack.SourceMapDevToolPlugin({
             filename: null, // if no value is provided the sourcemap is inlined
-            test: /\.(ts|js)($|\?)/i // process .js and .ts files only
+            test: /\.(ts|tsx|js|jsx)($|\?)/i // process .js and .ts files only
         })
     ],
 

@@ -41,15 +41,16 @@
         "react-dom": "^16.3.2",
         "sinon": "^5.0.10",
         "ts-loader": "^4.3.0",
+        "ts-node": "^6.0.5",
         "tslint": "^5.10.0",
         "typescript": "^2.8.3",
         "webpack": "^4.8.3"
     },
     "scripts": {
-        "test:before": "node script-configs/verifyModules.js",
-        "test": "karma start ./script-configs/karma.conf.js",
-        "test:jest": "yarn test:before && cross-env NODE_ENV=test jest --config=script-configs/jest.config.js",
-        "test:watch": "cross-env NODE_ENV=test jest --watch --config=script-configs/jest.config.js",
+        "test:before": "node javascript/verifyModules.js",
+        "test": "karma start ./javascript/karma.conf.js",
+        "test:jest": "yarn test:before && cross-env NODE_ENV=test jest --config=javascript/jest.config.js",
+        "test:watch": "cross-env NODE_ENV=test jest --watch --config=javascript/jest.config.js",
         "lint:ts": "tslint -c tslint.json -e '**/node_modules/**' -e '**/src/**/*.{js,jsx}' -p tsconfig.json -t stylish",
         "lint:ts:fix": "tslint -c tslint.json -e '**/node_modules/**' -e '**/src/**/*.{js,jsx}' -p tsconfig.json -t stylish --fix"
     }

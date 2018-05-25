@@ -3,7 +3,7 @@
 cd $TRAVIS_BUILD_DIR
 ls
 
-git clone --depth=50 --branch=master https://github.com/vanilla/vanilla vanilla
+git clone --depth=50 --branch=$TRAVIS_PULL_REQUEST_BRANCH https://github.com/vanilla/vanilla vanilla
 
 # Symlink in the editor plugin
 cd "$TRAVIS_BUILD_DIR/vanilla/plugins"

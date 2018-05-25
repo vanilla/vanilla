@@ -555,24 +555,6 @@ label.checkbox input.checkbox-input {
   }
 }
 
-.Row {
-  width: 100% !important;
-}
-
-select {
-  max-width: 100%;
-}
-
-.column-content {
-  width: 100% !important;
-  margin: 0 !important;
-}
-
-*:focus {
-  outline: solid orange 2px !important;
-  outline-offset: -2px;
-}
-
 .richEditor {
   position: relative;
   display: block;

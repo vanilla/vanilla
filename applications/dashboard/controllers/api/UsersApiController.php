@@ -187,7 +187,7 @@ class UsersApiController extends AbstractApiController {
      * @param array $query
      * @return array
      */
-    public function get_byNames(array $query) {
+    public function index_byNames(array $query) {
         $this->permission('Garden.SignIn.Allow');
 
         $in = $this->schema([
@@ -210,7 +210,7 @@ class UsersApiController extends AbstractApiController {
             ]
         ], 'in')->setDescription('Search for users by full or partial name matching.');
         $out = $this->schema([
-            ':a' => Schema::parse(['userID', 'name', 'photoUrl'])->add($this->userSchema())
+            ':a' => $this->getUserFragmentSchema(),
         ], 'out');
 
         $query = $in->validate($query);

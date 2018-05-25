@@ -59,7 +59,7 @@ export default class EmbedFocusModule extends Module {
         this.editorRoot.addEventListener("keydown", this.escapeMobileFullScreen);
         window.quill = quill;
     }
-    
+
     private setupEmbedClickHandler() {
         delegateEvent(
             "click",

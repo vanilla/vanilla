@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 
 cd $TRAVIS_BUILD_DIR
+ls
 
 git clone --depth=50 --branch=master https://github.com/vanilla/vanilla vanilla
 
@@ -15,3 +16,5 @@ yarn install --pure-lockfile
 cd "$TRAVIS_BUILD_DIR/vanilla/tests"
 yarn install --pure-lockfile
 cd "$TRAVIS_BUILD_DIR"
+cd ../
+ls

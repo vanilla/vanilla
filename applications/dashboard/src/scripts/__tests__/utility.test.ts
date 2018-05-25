@@ -4,12 +4,7 @@
  * @license GPLv2
  */
 
-import {
-    resolvePromisesSequentially,
-    matchAtMention,
-    hashString,
-    isInstanceOfOneOf
-} from "../utility";
+import { resolvePromisesSequentially, matchAtMention, hashString, isInstanceOfOneOf } from "../utility";
 import chai, { expect } from "chai";
 import asPromised from "chai-as-promised";
 chai.use(asPromised);
@@ -54,22 +49,15 @@ describe("resolvePromisesSequentially()", () => {
         const functions = [func1, func2, func3];
         const expectation = [1, 2, 3];
 
-        return expect(
-            resolvePromisesSequentially(functions)
-        ).to.eventually.deep.equal(expectation);
+        return expect(resolvePromisesSequentially(functions)).to.eventually.deep.equal(expectation);
     });
 
     it("passes the value of one promise to the next", () => {
-        const func = prev =>
-            Number.isInteger(prev)
-                ? Promise.resolve(prev + 1)
-                : Promise.resolve(0);
+        const func = prev => (Number.isInteger(prev) ? Promise.resolve(prev + 1) : Promise.resolve(0));
         const functions = [func, func, func];
         const expectation = [0, 1, 2];
 
-        return expect(
-            resolvePromisesSequentially(functions)
-        ).to.eventually.deep.equal(expectation);
+        return expect(resolvePromisesSequentially(functions)).to.eventually.deep.equal(expectation);
     });
 });
 
@@ -123,7 +111,7 @@ describe("matching @mentions", () => {
         const goodSubjects = {
             "@System": "System",
             "Sometext @System": "System",
-            "asdfasdf @joe": "joe"
+            "asdfasdf @joe": "joe",
         };
 
         testSubjectsAndMatches(goodSubjects);
@@ -135,7 +123,7 @@ describe("matching @mentions", () => {
             [`Something @"Séche"`]: "Séche",
             [`@"Umuüûū"`]: "Umuüûū",
             [`@Séche`]: "Séche", // Unquoted accent character
-            [`@Umuüûū"`]: 'Umuüûū"'
+            [`@Umuüûū"`]: 'Umuüûū"',
         };
 
         testSubjectsAndMatches(goodSubjects);
@@ -145,12 +133,12 @@ describe("matching @mentions", () => {
         const goodSubjects = {
             [`@"Someon asdf `]: "Someon asdf ",
             [`@"someone with a closed space"`]: "someone with a closed space",
-            [`@"What about multiple spaces?      `]: "What about multiple spaces?      "
+            [`@"What about multiple spaces?      `]: "What about multiple spaces?      ",
         };
 
         const badSubjects = {
             "@someone with non-wrapped spaces": null,
-            "@Some ": null
+            "@Some ": null,
         };
 
         testSubjectsAndMatches(goodSubjects);
@@ -163,11 +151,11 @@ describe("matching @mentions", () => {
                 @System`]: "System",
             [`
     Newline with special char
-                               @"Umuüûū"`]: "Umuüûū"
+                               @"Umuüûū"`]: "Umuüûū",
         };
 
         const badSubjects = {
-            [`@"Close on quote" other thing`]: null
+            [`@"Close on quote" other thing`]: null,
         };
 
         testSubjectsAndMatches(goodSubjects);

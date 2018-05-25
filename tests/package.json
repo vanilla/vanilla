@@ -51,7 +51,7 @@
         "test": "karma start ./javascript/karma.conf.js --single-run",
         "test:jest": "yarn test:before && cross-env NODE_ENV=test jest --config=javascript/jest.config.js",
         "test:watch": "karma start ./javascript/karma.conf.js",
-        "lint:ts": "tslint -c tslint.json -e '**/node_modules/**' -e '**/src/**/*.{js,jsx}' -p tsconfig.json -t stylish",
-        "lint:ts:fix": "tslint -c tslint.json -e '**/node_modules/**' -e '**/src/**/*.{js,jsx}' -p tsconfig.json -t stylish --fix"
+        "lint:ts": "tslint -c ../.tslint.js -e '../**/node_modules/**' -e '../**/src/**/*.{js,jsx}' -p ../tsconfig.json -t stylish",
+        "lint:ts:fix": "tslint -c ../.tslint.js -e '../**/node_modules/**' -e '../**/src/**/*.{js,jsx}' -p ../tsconfig.json -t stylish --fix"
     }
 }

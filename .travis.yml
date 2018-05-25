@@ -61,8 +61,8 @@ script:
   - tests/travis/main.sh
   - cd tests
   - yarn run test
-  - cd ../
   - yarn run lint:ts
+  - cd ../
   - ls -lah ./conf
   - cat /tmp/error.log
   - cat /tmp/access.log

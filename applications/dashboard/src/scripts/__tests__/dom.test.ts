@@ -10,7 +10,7 @@ import {
     removeAllDelegatedEvents,
     delegateEvent,
     removeDelegatedEvent,
-    getFormData
+    getFormData,
 } from "@dashboard/dom";
 import { expect } from "chai";
 import sinon from "sinon";
@@ -19,7 +19,6 @@ const input = `<script>alert("Got you!")</script>`;
 const output = `&lt;script&gt;alert("Got you!")&lt;/script&gt;`;
 
 it("escapes html", () => {
-    console.log(expect);
     expect(escapeHTML(input)).to.deep.equal(output);
 });
 
@@ -73,22 +72,18 @@ describe("delegateEvent", () => {
         });
 
         it("events can be delegated to their filterSelector", () => {
-            document
-                .querySelectorAll(".filterSelector")
-                .forEach((button: HTMLElement) => {
-                    button.click();
-                });
+            document.querySelectorAll(".filterSelector").forEach((button: HTMLElement) => {
+                button.click();
+            });
             sinon.assert.calledTwice(callback);
         });
 
         it("delegated events only match their filterSelector", () => {
             callback.resetHistory();
 
-            document
-                .querySelectorAll(".altFilterSelector")
-                .forEach((button: HTMLElement) => {
-                    button.click();
-                });
+            document.querySelectorAll(".altFilterSelector").forEach((button: HTMLElement) => {
+                button.click();
+            });
 
             sinon.assert.notCalled(callback);
         });
@@ -102,22 +97,18 @@ describe("delegateEvent", () => {
         });
 
         it("events can be scoped to their scopeSelector", () => {
-            document
-                .querySelectorAll(".scope1 button")
-                .forEach((button: HTMLElement) => {
-                    button.click();
-                });
+            document.querySelectorAll(".scope1 button").forEach((button: HTMLElement) => {
+                button.click();
+            });
             sinon.assert.calledTwice(callback);
         });
 
         it("delegated events only match their scopeSelector", () => {
             callback.resetHistory();
 
-            document
-                .querySelectorAll(".scope2 button")
-                .forEach((button: HTMLElement) => {
-                    button.click();
-                });
+            document.querySelectorAll(".scope2 button").forEach((button: HTMLElement) => {
+                button.click();
+            });
 
             sinon.assert.notCalled(callback);
         });
@@ -134,19 +125,12 @@ describe("removing delegated events", () => {
         callback1.resetHistory();
         callback2.resetHistory();
         eventHandler1 = delegateEvent("click", "", callback1);
-        eventHandler2 = delegateEvent(
-            "click",
-            ".scope1",
-            callback2,
-            ".filterSelector"
-        );
+        eventHandler2 = delegateEvent("click", ".scope1", callback2, ".filterSelector");
     });
 
     it("can remove a single event", () => {
         removeDelegatedEvent(eventHandler1);
-        (document.querySelector(
-            ".scope1 .filterSelector"
-        ) as HTMLElement).click();
+        (document.querySelector(".scope1 .filterSelector") as HTMLElement).click();
 
         sinon.assert.notCalled(callback1);
         sinon.assert.calledOnce(callback2);
@@ -154,9 +138,7 @@ describe("removing delegated events", () => {
 
     it("can remove all events", () => {
         removeAllDelegatedEvents();
-        (document.querySelector(
-            ".scope1 .filterSelector"
-        ) as HTMLElement).click();
+        (document.querySelector(".scope1 .filterSelector") as HTMLElement).click();
 
         sinon.assert.notCalled(callback1);
         sinon.assert.notCalled(callback2);

@@ -601,7 +601,7 @@ class UsersApiController extends AbstractApiController {
     /**
      * @param $id
      * @param array $body
-     * @return array
+     * @return array $result The response body
      * @throws Exception
      * @throws NotFoundException if unable to find the user.
      */

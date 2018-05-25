@@ -130,21 +130,34 @@ class UsersTest extends AbstractResourceTest {
     }
 
     /**
-     * Test confirm email endpoint
+     * Test confirm email is successful
      */
-    public function testConfirmEmail() {
-        $emailKey = [
-            'test123'
-        ];
+    public function testConfirmEmailSucceed() {
+        $emailKey = ['emailKey' => 'test123'];
         $user = $this->testPost();
 
         /** @var \UserModel $userModel */
         $userModel = self::container()->get('UserModel');
         $userModel->saveAttribute($user['userID'], 'EmailKey', 'test123');
 
-        $response = $this->api()->post("{$this->baseUrl}/{$user['userID']}/confirmEmail", [$emailKey]);
-        $this->assertEquals($response->getBody(), $user['emailConfirm']);
+        $response = $this->api()->post("{$this->baseUrl}/{$user['userID']}/confirmEmail", $emailKey);
+        $this->assertEquals($response->getBody(), ['emailConfirmed' => true]);
+    }
 
+    /**
+     * Test confirm email fails
+     *
+     * @expectedException \Exception
+     */
+    public function testConfirmEmailFail() {
+        $emailKey = ['emailKey' => '123test'];
+        $user = $this->testPost();
+
+        /** @var \UserModel $userModel */
+        $userModel = self::container()->get('UserModel');
+        $userModel->saveAttribute($user['userID'], 'EmailKey', 'test123');
+
+        $this->api()->post("{$this->baseUrl}/{$user['userID']}/confirmEmail", $emailKey);
     }
 
     /**

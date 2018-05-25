@@ -27,6 +27,9 @@ before_script:
 cache:
   directories:
     - $HOME/.composer/cache/files
+    - $HOME/.yarn-cache
+    - tests/node_modules
+    - applications/dashboard/node_modules
   yarn: true
 
 # No additional system dependencies to install. Skip the install step.

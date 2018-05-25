@@ -7,10 +7,10 @@
 import Quill, { Blot } from "quill/core";
 import Delta from "quill-delta";
 import Parchment from "parchment";
-import KeyboardModule from "quill/modules/keyboard";
+import KeyboardModule, { default as Keyboard } from "quill/modules/keyboard";
 import Module from "quill/core/module";
 import { RangeStatic } from "quill/core";
-import { delegateEvent } from "@dashboard/dom";
+import { delegateEvent, getNextTabbableElement } from "@dashboard/dom";
 import FocusableEmbedBlot from "./blots/abstract/FocusableEmbedBlot";
 import {
     normalizeBlotIntoBlock,
@@ -33,6 +33,7 @@ export default class EmbedFocusModule extends Module {
     };
 
     private editorRoot: HTMLElement;
+    private formWrapper: HTMLElement;
     private paragraphMenuHandle: HTMLElement;
     private inlineToolbarFirstActiveItem: HTMLElement;
     private emojiPickerButton: HTMLElement;
@@ -41,19 +42,21 @@ export default class EmbedFocusModule extends Module {
         super(quill, options);
 
         this.editorRoot = this.quill.root.closest(".richEditor") as HTMLElement;
+        this.formWrapper = this.editorRoot.closest(".FormWrapper") as HTMLElement;
 
         // Add event listeners.
         quill.on("selection-change", (range, oldRange, source) => {
             if (range && range.index && source !== Quill.sources.SILENT) {
                 this.lastSelection = range;
+                this.editorRoot.classList.toggle("isFocused", true);
             }
-
-            this.editorRoot.classList.toggle("isFocussed", !!range);
         });
         this.setupEmbedClickHandler();
+        this.setupMobileHandler();
 
         this.quill.root.addEventListener("keydown", this.keyDownListener);
         this.editorRoot.addEventListener("keydown", this.tabListener);
+        this.editorRoot.addEventListener("keydown", this.escapeMobileFullScreen);
         window.quill = quill;
     }
 
@@ -69,6 +72,28 @@ export default class EmbedFocusModule extends Module {
                 }
             },
             this.quill.container,
+        );
+    }
+
+    private setupMobileHandler() {
+        delegateEvent(
+            "click",
+            ".js-richText .richEditor-text",
+            (event, clickedElement) => {
+                this.editorRoot.classList.toggle("isFocused", true);
+            },
+            this.quill.container,
+        );
+
+        delegateEvent(
+            "click",
+            ".js-richEditor-next",
+            (event, clickedElement) => {
+                const nextEl = getNextTabbableElement(this.formWrapper, true, clickedElement);
+                nextEl.focus();
+                this.editorRoot.classList.toggle("isFocused", false);
+            },
+            this.editorRoot,
         );
     }
 
@@ -140,6 +165,15 @@ export default class EmbedFocusModule extends Module {
         return exclusiveHandlers.reduce((shouldContinue, currentHandler) => {
             return shouldContinue ? currentHandler(event) : false;
         }, true);
+    };
+
+    private escapeMobileFullScreen = (event: KeyboardEvent) => {
+        if (KeyboardModule.match(event, { key: KeyboardModule.keys.ESCAPE, shiftKey: false })) {
+            this.quill.root.focus();
+            const nextEl = getNextTabbableElement(this.formWrapper, true, this.quill.root);
+            nextEl.focus();
+            this.editorRoot.classList.toggle("isFocused", false);
+        }
     };
 
     /**

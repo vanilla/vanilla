@@ -19,7 +19,6 @@ import EmojiPopover from "../editor/EmojiPopover";
 import EmbedPopover from "../editor/EmbedPopover";
 import EditorProvider from "../editor/ContextProvider";
 import MentionModule from "../editor/MentionModule";
-import { log } from "@dashboard/utility";
 
 export default class VanillaTheme extends ThemeBase {
     private jsBodyBoxContainer: Element;
@@ -37,6 +36,7 @@ export default class VanillaTheme extends ThemeBase {
         };
 
         super(quill, themeOptions);
+        this.quill.root.setAttribute("tabIndex", "0");
         this.quill.root.classList.add("richEditor-text");
         this.quill.root.classList.add("userContent");
         this.quill.root.addEventListener("focusin", () => closeEditorFlyouts());

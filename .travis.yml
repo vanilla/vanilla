@@ -30,13 +30,11 @@ node_js:
 
 # Steps of the build script.
 script:
-  - ls vanilla/plugins/rich-editor
-  - ls vanilla/plugins
   - cd vanilla/tests
   - yarn test
 
 env:
-  - TEST_
+  - TEST_FILE_ROOTS = (plugins/rich-editor)
 
 # Run build in a Docker container.  Reduces time between commit and start of build.
 sudo: false

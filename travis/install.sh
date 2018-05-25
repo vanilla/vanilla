@@ -11,7 +11,7 @@ echo "";
 echo "Cloning the main vanilla repository..."
 git init
 git remote add origin https://github.com/vanilla/vanilla
-git pull --depth 50 origin $TRAVIS_PULL_REQUEST_BRANCH
+git pull --depth 50 origin master
 
 # Symlink in the editor plugin
 echo ""

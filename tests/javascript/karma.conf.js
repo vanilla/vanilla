@@ -9,7 +9,6 @@ const webpackConfig = require("./webpack.test.config");
 const VANILLA_ROOT = path.resolve(path.join(__dirname, "../../"));
 
 const TEST_FILE_ROOTS = process.env.TEST_FILE_ROOTS || ["applications/*", "plugins/*"];
-const TEST_SETUP_FILE = path.resolve(__dirname, "./test-setup.ts");
 
 const files = [];
 const preprocessors = {};
@@ -26,17 +25,8 @@ TEST_FILE_ROOTS.forEach(fileRoot => {
 
 module.exports = config => {
     config.set({
-        preprocessors: {
-            ...preprocessors,
-            [TEST_SETUP_FILE]: ["webpack", "sourcemap"],
-        },
-        files: [
-            {
-                pattern: TEST_SETUP_FILE,
-                included: true,
-            },
-            ...files,
-        ],
+        preprocessors,
+        files,
         // base path, that will be used to resolve files and exclude
         basePath: VANILLA_ROOT,
         frameworks: ["mocha", "chai"],

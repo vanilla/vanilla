@@ -599,28 +599,31 @@ class UsersApiController extends AbstractApiController {
     }
 
     /**
-     * @param $id
-     * @param array $body
-     * @return array $result The response body
+     * Confirm user email address after registration
+     *
+     * @param int $id The ID of the user.
+     * @param array $body The POST body.
      * @throws Exception
      * @throws NotFoundException if unable to find the user.
+     * @return array
      */
-    public function post_confirmEmail ($id, array $body) {
-        $this->permission('Garden.Users.Edit');
+    public function post_confirmEmail($id, array $body) {
+        $this->permission();
+        //$Configuration['Garden']['Registration']['ConfirmEmail'] = true;
 
-        $in = $this->schema( ['emailKey:s' => 'key generated on registration'])->setDescription('Confirm new user email upon registration');
-        $out = $this->schema(['emailConfirmed:b' => 'The current email confirmed value.'], 'out');
+        $this->idParamSchema('in');
+        $in = $this->schema( [
+            'confirmationCode:s' => 'Email confirmation code'
+        ])->setDescription('Confirm a users current email address by using a confirmation code');
+        $out = $this->schema(['userID:i', 'email:s', 'emailConfirmed:b'], 'out');
 
         $row = $this->userByID($id);
-        $body = $in->validate($body);
-
-        $emailKey = '';
-        $userData = $this->normalizeInput($body);
-        if (array_key_exists('EmailKey', $userData)) {
-            $emailKey = $userData['EmailKey'];
+        if ($row['Confirmed'] == 1){
+            throw new ClientException('This email has already been confirmed');
         }
 
-        $this->userModel->confirmEmail($row, $emailKey);
+        $body = $in->validate($body);
+        $this->userModel->confirmEmail($row, $body['confirmationCode']);
         $this->validateModel($this->userModel);
 
         $result = $out->validate($this->userByID($id));

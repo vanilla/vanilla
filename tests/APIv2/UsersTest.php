@@ -130,34 +130,38 @@ class UsersTest extends AbstractResourceTest {
     }
 
     /**
-     * Test confirm email is successful
+     * Test confirm email is successful.
      */
     public function testConfirmEmailSucceed() {
-        $emailKey = ['emailKey' => 'test123'];
-        $user = $this->testPost();
-
         /** @var \UserModel $userModel */
         $userModel = self::container()->get('UserModel');
-        $userModel->saveAttribute($user['userID'], 'EmailKey', 'test123');
 
-        $response = $this->api()->post("{$this->baseUrl}/{$user['userID']}/confirmEmail", $emailKey);
-        $this->assertEquals($response->getBody(), ['emailConfirmed' => true]);
+        $emailKey = ['confirmationCode' =>'test123'];
+
+        $user = $this->testPost();
+        $userModel->saveAttribute($user['userID'], 'EmailKey', $emailKey['confirmationCode']);
+
+        $response = $this->api()->post("{$this->baseUrl}/{$user['userID']}/confirm-email", $emailKey);
+
+        $user = $userModel->getID($user['userID']);
+        $this->assertEquals(1, $user->Confirmed);
     }
 
     /**
-     * Test confirm email fails
+     * Test confirm email fails.
      *
      * @expectedException \Exception
+     * @expectedExceptionMessage We couldn't confirm your email. Check the link in the email we sent you or try sending another confirmation email.
      */
     public function testConfirmEmailFail() {
-        $emailKey = ['emailKey' => '123test'];
-        $user = $this->testPost();
-
         /** @var \UserModel $userModel */
         $userModel = self::container()->get('UserModel');
-        $userModel->saveAttribute($user['userID'], 'EmailKey', 'test123');
 
-        $this->api()->post("{$this->baseUrl}/{$user['userID']}/confirmEmail", $emailKey);
+        $emailKey = ['confirmationCode' =>'test123'];;
+        $user = $this->testPost();
+        $userModel->saveAttribute($user['userID'], 'EmailKey', '123Test');
+
+        $this->api()->post("{$this->baseUrl}/{$user['userID']}/confirm-email", $emailKey);
     }
 
     /**

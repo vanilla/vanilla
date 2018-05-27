@@ -597,15 +597,15 @@ class UsersApiController extends AbstractApiController {
         $this->userModel->passwordRequest($body['email']);
         $this->validateModel($this->userModel, true);
     }
-
     /**
-     * Confirm user email address after registration
+     * Confirm a user email address after registration.
      *
      * @param int $id The ID of the user.
      * @param array $body The POST body.
-     * @throws Exception
+     * @throws ClientException if email has been confirmed.
+     * @throws Exception if confirmationCode doesn't match.
      * @throws NotFoundException if unable to find the user.
-     * @return array
+     * @return array the response body.
      */
     public function post_confirmEmail($id, array $body) {
         $this->permission();

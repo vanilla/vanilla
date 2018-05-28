@@ -199,8 +199,7 @@ export class MentionModule extends React.PureComponent<IProps, IState> {
             limit: 5,
         };
 
-        api
-            .get("/users/by-names/", { params, cancelToken: this.apiCancelSource.token })
+        api.get("/users/by-names/", { params, cancelToken: this.apiCancelSource.token })
             .then(response => {
                 mentionCache.set(username, response);
                 return this.handleMentionResponse(response);

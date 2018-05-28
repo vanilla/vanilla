@@ -4,8 +4,9 @@
  * @license https://opensource.org/licenses/GPL-2.0 GPL-2.0
  */
 
-import * as utility from "../utility";
-import Quill from "../../quill";
+import * as utility from "./utility";
+import Quill from "../quill";
+import { expect } from "chai";
 
 describe("Range/Boundary conversions", () => {
     it("converts range to boundary", () => {
@@ -18,7 +19,7 @@ describe("Range/Boundary conversions", () => {
             end: 13,
         };
 
-        expect(utility.convertRangeToBoundary(input)).toEqual(output);
+        expect(utility.convertRangeToBoundary(input)).deep.equals(output);
     });
 
     it("converts boundary to range", () => {
@@ -31,7 +32,7 @@ describe("Range/Boundary conversions", () => {
             length: 10,
         };
 
-        expect(utility.convertBoundaryToRange(input)).toEqual(output);
+        expect(utility.convertBoundaryToRange(input)).deep.equals(output);
     });
 });
 
@@ -52,7 +53,7 @@ describe("expandRange", () => {
             length: 11,
         };
 
-        expect(utility.expandRange(initialRange, startRange)).toEqual(expectedRange);
+        expect(utility.expandRange(initialRange, startRange)).deep.equals(expectedRange);
     });
 });
 
@@ -85,8 +86,8 @@ describe("getMentionRange", () => {
         };
 
         validIndexes.forEach(index => {
-            test(description + index, () => {
-                expect(utility.getMentionRange(quill, index)).toEqual({ index: 0, length: index });
+            it(description + index, () => {
+                expect(utility.getMentionRange(quill, index)).deep.equals({ index: 0, length: index });
             });
         });
     });
@@ -104,8 +105,8 @@ describe("getMentionRange", () => {
         const validIndexes = [4, 5, 6, 7];
 
         validIndexes.forEach(index => {
-            test(description + index, () => {
-                expect(utility.getMentionRange(quill, index)).toEqual({ index: 2, length: index - 2 });
+            it(description + index, () => {
+                expect(utility.getMentionRange(quill, index)).deep.equals({ index: 2, length: index - 2 });
             });
         });
     });
@@ -127,8 +128,8 @@ describe("getMentionRange", () => {
         const validIndexes = [8, 9, 10];
 
         validIndexes.forEach(index => {
-            test(description + index, () => {
-                expect(utility.getMentionRange(quill, index)).toEqual({ index: 6, length: index - 6 });
+            it(description + index, () => {
+                expect(utility.getMentionRange(quill, index)).deep.equals({ index: 6, length: index - 6 });
             });
         });
     });

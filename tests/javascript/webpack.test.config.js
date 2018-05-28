@@ -67,7 +67,6 @@ module.exports = {
             "@dashboard": path.resolve(VANILLA_ROOT, "applications/dashboard/src/scripts/"),
             "@vanilla": path.resolve(VANILLA_ROOT, "applications/vanilla/src/scripts/"),
             "@testroot": path.resolve(VANILLA_ROOT, "tests/javascript/"),
-
         },
         extensions: [".ts", ".tsx", ".js", ".jsx"],
     },

@@ -19,15 +19,10 @@
             "@dashboard/*": ["./applications/dashboard/src/scripts/*"],
             "@testroot/*": ["./tests/javascript/*"],
             "*": [
-                "./applications/dashboard/node_modules/*",
+                "./node_modules",
                 "./plugins/rich-editor/node_modules/*",
-                "./tests/node_modules/*"
             ]
         },
-        "typeRoots": [
-            "./applications/dashboard/node_modules/@types",
-            "./tests/node_modules/@types"
-        ],
         "skipLibCheck": true,
         "sourceMap": true
     },

@@ -7,8 +7,8 @@
 import React from "react";
 import { mount, shallow } from "@testroot/enzyme";
 import Quill from "quill/core";
-import EditorMenuItem from "../../../editor/generic/MenuItem";
-import { Toolbar } from "../../../editor/generic/Toolbar";
+import EditorMenuItem from "./MenuItem";
+import { Toolbar } from "./Toolbar";
 import { expect } from "chai";
 import sinon from "sinon";
 

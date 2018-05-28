@@ -8,7 +8,7 @@ import React from "react";
 import { expect } from "chai";
 import { shallow } from "@testroot/enzyme";
 import sinon from "sinon";
-import MenuItem from "../../../editor/generic/MenuItem";
+import MenuItem from "./MenuItem";
 
 describe("MenuItem", () => {
     it("has a working click handler", () => {

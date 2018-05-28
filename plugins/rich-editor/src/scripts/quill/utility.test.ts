@@ -4,8 +4,8 @@
  * @license https://opensource.org/licenses/GPL-2.0 GPL-2.0
  */
 
-import * as utility from "../utility";
-import Quill from "../../quill";
+import * as utility from "./utility";
+import Quill from "../quill";
 import { expect } from "chai";
 
 describe("Range/Boundary conversions", () => {

@@ -43,13 +43,13 @@ abstract class AbstractListBlot extends AbstractBlockBlot {
      * @inheritDoc
      */
     public function render(): string {
-        $classString = "richEditor-li richEditor-".$this::getListType().'Li';
+        $classString = "";
         $indentLevel = valr("attributes.indent", $this->currentOperation)
             ?: valr("attributes.indent", $this->nextOperation);
         if ($indentLevel && filter_var($indentLevel, FILTER_VALIDATE_INT) !== false) {
-            $classString .= " ql-indent-$indentLevel";
+            $classString = " class=\"ql-indent-$indentLevel\"";
         }
 
-        return "<li class='".trim($classString)."'>" . parent::render() . "</li>";
+        return "<li$classString>" . parent::render() . "</li>";
     }
 }

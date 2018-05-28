@@ -15,19 +15,14 @@
         "baseUrl": ".",
         "downlevelIteration": true,
         "paths": {
-            "*": [
-                "node_modules/*",
-                "applications/dashboard/node_modules/*"
-            ],
             "@vanilla/*": ["./applications/vanilla/src/scripts/*"],
-            "@dashboard/*": ["./applications/dashboard/src/scripts/*"]
+            "@dashboard/*": ["./applications/dashboard/src/scripts/*"],
+            "@testroot/*": ["./tests/javascript/*"],
+            "*": [
+                "./node_modules",
+                "./plugins/rich-editor/node_modules/*",
+            ]
         },
-        "typeRoots": [
-            "node_modules/@types",
-            "applications/*/node_modules/@types",
-            "plugins/*/node_modules/@types",
-            "plugins/*/src/scripts/@types"
-        ],
         "skipLibCheck": true,
         "sourceMap": true
     },

@@ -26,3 +26,4 @@ declare interface AnyObject {
 }
 
 declare module "*.json";
+declare module "*.html";

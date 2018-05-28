@@ -12,16 +12,18 @@ import {
     removeDelegatedEvent,
     getFormData,
 } from "@dashboard/dom";
+import { expect } from "chai";
+import sinon from "sinon";
 
 const input = `<script>alert("Got you!")</script>`;
 const output = `&lt;script&gt;alert("Got you!")&lt;/script&gt;`;
 
 it("escapes html", () => {
-    expect(escapeHTML(input)).toBe(output);
+    expect(escapeHTML(input)).to.deep.equal(output);
 });
 
 it("unescapes html", () => {
-    expect(unescapeHTML(output)).toBe(input);
+    expect(unescapeHTML(output)).to.deep.equal(input);
 });
 
 describe("delegateEvent", () => {
@@ -42,86 +44,86 @@ describe("delegateEvent", () => {
         `;
     });
 
-    test("A event can be registered successfully", () => {
-        const callback = jest.fn();
+    it("A event can be registered successfully", () => {
+        const callback = sinon.spy();
         delegateEvent("click", "", callback);
 
         const button = document.querySelector(".filterSelector") as HTMLElement;
         button.click();
-        expect(callback.mock.calls.length).toBe(1);
+        sinon.assert.calledOnce(callback);
     });
 
-    test("identical events will not be registered twice", () => {
-        const callback = jest.fn();
+    it("identical events will not be registered twice", () => {
+        const callback = sinon.spy();
         delegateEvent("click", "", callback);
         delegateEvent("click", "", callback);
         delegateEvent("click", "", callback);
 
         const button = document.querySelector(".filterSelector") as HTMLElement;
         button.click();
-        expect(callback.mock.calls.length).toBe(1);
+        sinon.assert.calledOnce(callback);
     });
 
     describe("delegation filtering works", () => {
-        const callback = jest.fn();
+        const callback = sinon.spy();
 
         beforeEach(() => {
             delegateEvent("click", ".filterSelector", callback);
         });
 
-        test("events can be delegated to their filterSelector", () => {
+        it("events can be delegated to their filterSelector", () => {
             document.querySelectorAll(".filterSelector").forEach((button: HTMLElement) => {
                 button.click();
             });
-            expect(callback.mock.calls.length).toBe(2);
+            sinon.assert.calledTwice(callback);
         });
 
-        test("delegated events only match their filterSelector", () => {
-            callback.mockReset();
+        it("delegated events only match their filterSelector", () => {
+            callback.resetHistory();
 
             document.querySelectorAll(".altFilterSelector").forEach((button: HTMLElement) => {
                 button.click();
             });
 
-            expect(callback.mock.calls.length).toBe(0);
+            sinon.assert.notCalled(callback);
         });
     });
 
     describe("delegation scoping works", () => {
-        const callback = jest.fn();
+        const callback = sinon.spy();
 
         beforeEach(() => {
             delegateEvent("click", "", callback, ".scope1");
         });
 
-        test("events can be scoped to their scopeSelector", () => {
+        it("events can be scoped to their scopeSelector", () => {
             document.querySelectorAll(".scope1 button").forEach((button: HTMLElement) => {
                 button.click();
             });
-            expect(callback.mock.calls.length).toBe(2);
+            sinon.assert.calledTwice(callback);
         });
 
-        test("delegated events only match their scopeSelector", () => {
-            callback.mockReset();
+        it("delegated events only match their scopeSelector", () => {
+            callback.resetHistory();
 
             document.querySelectorAll(".scope2 button").forEach((button: HTMLElement) => {
                 button.click();
             });
 
-            expect(callback.mock.calls.length).toBe(0);
+            sinon.assert.notCalled(callback);
         });
     });
 });
 
 describe("removing delegated events", () => {
-    const callback1 = jest.fn();
-    const callback2 = jest.fn();
+    const callback1 = sinon.spy();
+    const callback2 = sinon.spy();
     let eventHandler1;
     let eventHandler2;
 
     beforeEach(() => {
-        callback1.mockReset();
-        callback2.mockReset();
+        callback1.resetHistory();
+        callback2.resetHistory();
         eventHandler1 = delegateEvent("click", "", callback1);
         eventHandler2 = delegateEvent("click", ".scope1", callback2, ".filterSelector");
     });
@@ -130,16 +132,16 @@ describe("removing delegated events", () => {
         removeDelegatedEvent(eventHandler1);
         (document.querySelector(".scope1 .filterSelector") as HTMLElement).click();
 
-        expect(callback1.mock.calls.length).toBe(0);
-        expect(callback2.mock.calls.length).toBe(1);
+        sinon.assert.notCalled(callback1);
+        sinon.assert.calledOnce(callback2);
     });
 
     it("can remove all events", () => {
         removeAllDelegatedEvents();
         (document.querySelector(".scope1 .filterSelector") as HTMLElement).click();
 
-        expect(callback1.mock.calls.length).toBe(0);
-        expect(callback2.mock.calls.length).toBe(0);
+        sinon.assert.notCalled(callback1);
+        sinon.assert.notCalled(callback2);
     });
 });
 
@@ -154,6 +156,6 @@ describe("getFormData", () => {
 
     it("can get get data out of a form", () => {
         const form = document.querySelector("form");
-        expect(getFormData(form)).toEqual({ foo: "foo" });
+        expect(getFormData(form)).deep.equals({ foo: "foo" });
     });
 });

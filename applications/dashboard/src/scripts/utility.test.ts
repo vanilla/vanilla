@@ -4,7 +4,7 @@
  * @license GPLv2
  */
 
-import { resolvePromisesSequentially, matchAtMention, hashString, isInstanceOfOneOf } from "../utility";
+import { resolvePromisesSequentially, matchAtMention, hashString, isInstanceOfOneOf } from "./utility";
 import chai, { expect } from "chai";
 import asPromised from "chai-as-promised";
 chai.use(asPromised);

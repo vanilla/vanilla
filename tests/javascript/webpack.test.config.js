@@ -85,6 +85,6 @@ module.exports = {
      * We are expecting thirs tool to be used in a different directory than itself.
      */
     resolveLoader: {
-        modules: [path.join(VANILLA_ROOT, "tests/node_modules")],
+        modules: [path.join(VANILLA_ROOT, "node_modules")],
     },
 };

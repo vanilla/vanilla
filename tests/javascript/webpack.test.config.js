@@ -58,8 +58,7 @@ module.exports = {
     },
     resolve: {
         modules: [
-            path.join(VANILLA_ROOT, "applications/dashboard/node_modules"),
-            path.join(VANILLA_ROOT, "applications/vanilla/node_modules"),
+            path.join(VANILLA_ROOT, "node_modules"),
             path.join(VANILLA_ROOT, "plugins/rich-editor/node_modules"),
             path.join(VANILLA_ROOT, "tests/node_modules"),
         ],

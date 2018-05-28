@@ -608,8 +608,8 @@ class UsersApiController extends AbstractApiController {
      * @return array the response body.
      */
     public function post_confirmEmail($id, array $body) {
-        $this->permission();
-        
+        $this->permission(\Vanilla\Permissions::BAN_CSRF);
+
         $this->idParamSchema('in');
         $in = $this->schema( [
             'confirmationCode:s' => 'Email confirmation code'
@@ -617,7 +617,7 @@ class UsersApiController extends AbstractApiController {
         $out = $this->schema(['userID:i', 'email:s', 'emailConfirmed:b'], 'out');
 
         $row = $this->userByID($id);
-        if ($row['Confirmed'] == 1){
+        if ($row['Confirmed']) {
             throw new ClientException('This email has already been confirmed');
         }
 

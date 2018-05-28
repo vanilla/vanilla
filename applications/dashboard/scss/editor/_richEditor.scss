@@ -128,29 +128,31 @@ $embedded-quote_fg: #A3A3A3 !default;
     list-style: none;
     margin: 0;
     padding: 0;
-}
 
-.richEditor-menuItem {
-    display: block;
-    padding: 0;
-    margin: 0;
+    .richEditor-menuItem {
+        display: block;
+        padding: 0;
+        margin: 0;
 
-    .richEditor-button,
-    &.richEditor-button {
-        height: $richEditor-menuButton_size;
-        width: $richEditor-menuButton_size;
-        font-size: #{$richEditor-menuButton_size * 24 / 39};
-        line-height: $richEditor-menuButton_size;
+        .richEditor-button,
+        &.richEditor-button {
+            height: $richEditor-menuButton_size;
+            width: $richEditor-menuButton_size;
+            font-size: #{$richEditor-menuButton_size * 24 / 39};
+            line-height: $richEditor-menuButton_size;
 
-        &.emojiChar-🇺🇳 {
-            font-size: 14px;
+            &.emojiChar-🇺🇳 {
+                font-size: 14px;
+            }
+        }
+
+        &.isRightAligned {
+            margin-left: auto;
         }
     }
-
-    &.isRightAligned {
-        margin-left: auto;
-    }
 }
+
+
 
 // button reset
 .atMentionList-suggestion,

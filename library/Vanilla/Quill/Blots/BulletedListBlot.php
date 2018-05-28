@@ -20,7 +20,7 @@ class BulletedListBlot extends AbstractListBlot {
      * @inheritDoc
      */
     public function getGroupOpeningTag(): string {
-        return "<ul>";
+        return "<ul class='richEditor-ul'>";
     }
 
     /**

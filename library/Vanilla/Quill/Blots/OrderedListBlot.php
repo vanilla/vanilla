@@ -20,7 +20,7 @@ class OrderedListBlot extends AbstractListBlot {
      * @inheritDoc
      */
     public function getGroupOpeningTag(): string {
-        return "<ol>";
+        return "<ol class='richEditor-ol'>";
     }
 
     /**

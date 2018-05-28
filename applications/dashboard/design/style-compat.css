@@ -559,7 +559,7 @@ label.checkbox input.checkbox-input {
   position: relative;
   display: block;
   padding-left: 36px;
-  font-size: 16px;
+  font-size: 100%;
 }
 
 .richEditor-frame.InputBox {
@@ -1010,7 +1010,7 @@ label.checkbox input.checkbox-input {
 .userContent > *:not(:last-child) + h4,
 .userContent > *:not(:last-child) + h5,
 .userContent > *:not(:last-child) + h6 {
-  margin-top: 9.6px;
+  margin-top: 60%;
 }
 
 .userContent,

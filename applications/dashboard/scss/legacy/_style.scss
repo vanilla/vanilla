@@ -2224,6 +2224,7 @@ img.LeftAlign {
   margin-top: 4px;
 }
 
+.richEditor-li,
 .Message li {
   margin: 5px 0;
 }
@@ -2272,19 +2273,19 @@ mark {
   font-style: oblique;
 }
 
-.richEditor ul,
-.richEditor ol,
+.richEditor-ul,
+.richEditor-ol,
 .Message ul,
 .Message ol {
   margin: 1em 0 1em 3em;
 }
 
-.richEditor ol li,
+.richEditor-orderedLi,
 .Message ol li {
   list-style: decimal !important;
 }
 
-.richEditor ul li,
+.richEditor-bulletLi,
 .Message ul li {
   list-style: disc !important;
 }

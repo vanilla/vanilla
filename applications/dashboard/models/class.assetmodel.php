@@ -158,7 +158,7 @@ class AssetModel extends Gdn_Model {
 
         if (c("HotReload.Enabled", false)) {
             return [
-                "http://127.0.0.1:3030/$basename-hot-bundle.js"
+                "http://10.1.1.65:3030/$basename-hot-bundle.js"
             ];
         }
 

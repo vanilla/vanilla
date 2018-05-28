@@ -854,11 +854,11 @@ class DiscussionsController extends VanillaController {
     /**
      * Allows pages to opt-in to the category following filter.
      *
-     * @param string $selfURL
+     * @param string $url
      */
-    public function setCategoryFollowingList(string $selfURL = null) {
-        if ($selfURL) {
-            array_push($this->categoryFilterList, $selfURL);
+    public function setCategoryFollowingList(string $url = null) {
+        if ($url) {
+            array_push($this->categoryFilterList, $url);
         }
     }
 }

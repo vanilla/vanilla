@@ -5,9 +5,9 @@
  */
 
 import Delta from "quill-delta";
-import Quill from "../../Quill";
-import KeyboardBindings from "../KeyboardBindings";
-
+import Quill from "../quill";
+import KeyboardBindings from "./KeyboardBindings";
+import { expect } from "chai";
 const LINE_FORMATS = ["blockquote-line", "spoiler-line"];
 
 const MULTI_LINE_FORMATS = [...LINE_FORMATS, "code-block"];
@@ -17,7 +17,7 @@ describe("KeyboardBindings", () => {
 
     let keyboardBindings: KeyboardBindings;
 
-    beforeAll(() => {
+    before(() => {
         document.body.innerHTML = `<form><div class="js-richText"></div></form>`;
 
         const container = document.querySelector(".js-richText");
@@ -33,7 +33,7 @@ describe("KeyboardBindings", () => {
 
     /** CUSTOM ENTER KEY BEHAVIOUR */
 
-    function testMultilineEnterFor(blotName) {
+    function itMultilineEnterFor(blotName) {
         const delta = new Delta().insert("line\n\n", {
             [blotName]: true,
         });
@@ -58,16 +58,16 @@ describe("KeyboardBindings", () => {
                 insert: "\n",
             },
         ];
-        expect(quill.getContents().ops).toEqual(expectedResult);
+        expect(quill.getContents().ops).deep.equals(expectedResult);
     }
 
     describe("handleMultilineEnter", () => {
         LINE_FORMATS.forEach(format => {
-            test(format, () => testMultilineEnterFor(format));
+            it(format, () => itMultilineEnterFor(format));
         });
     });
 
-    test("handleCodeBlockEnter", () => {
+    it("handleCodeBlockEnter", () => {
         const delta = new Delta().insert("line\n\n\n", {
             "code-block": true,
         });
@@ -92,13 +92,13 @@ describe("KeyboardBindings", () => {
                 insert: "\n",
             },
         ];
-        expect(quill.getContents().ops).toEqual(expectedResult);
+        expect(quill.getContents().ops).deep.equals(expectedResult);
     });
 
     /** ARROW KEYS */
 
     describe("Newline escapes", () => {
-        function testInsertNewlineBefore(blotName) {
+        function itInsertNewlineBefore(blotName) {
             const delta = new Delta().insert("line\n\n", {
                 [blotName]: true,
             });
@@ -123,10 +123,10 @@ describe("KeyboardBindings", () => {
                 },
             ];
 
-            expect(quill.getContents().ops).toEqual(expectedResult);
+            expect(quill.getContents().ops).deep.equals(expectedResult);
         }
 
-        function testInsertNewlineAfter(blotName) {
+        function itInsertNewlineAfter(blotName) {
             const initialValue = [
                 { insert: "1" },
                 { attributes: { [blotName]: true }, insert: "\n\n\n" },
@@ -152,25 +152,25 @@ describe("KeyboardBindings", () => {
                 { insert: "\n" },
             ];
 
-            expect(quill.getContents().ops).toEqual(expectedResult);
+            expect(quill.getContents().ops).deep.equals(expectedResult);
         }
 
         describe("insertNewLineBeforeRange", () => {
             MULTI_LINE_FORMATS.forEach(format => {
-                test(format, () => testInsertNewlineBefore(format));
+                it(format, () => itInsertNewlineBefore(format));
             });
         });
 
         describe("insertNewLineAfterRange", () => {
             MULTI_LINE_FORMATS.forEach(format => {
-                test(format, () => testInsertNewlineAfter(format));
+                it(format, () => itInsertNewlineAfter(format));
             });
         });
     });
 
     /** DELETING THINGS */
 
-    function testBackspaceToClearEmptyFor(blotName) {
+    function itBackspaceToClearEmptyFor(blotName) {
         const contents = [{ insert: "123\n" }, { attributes: { [blotName]: true }, insert: "\n" }, { insert: "45\n" }];
 
         quill.setContents(contents);
@@ -187,16 +187,16 @@ describe("KeyboardBindings", () => {
         }
 
         const expectedResult = [{ insert: "123\n\n45\n" }];
-        expect(quill.getContents().ops).toEqual(expectedResult);
+        expect(quill.getContents().ops).deep.equals(expectedResult);
     }
 
     describe("back space to delete empty blot", () => {
         MULTI_LINE_FORMATS.forEach(format => {
-            test(format, () => testBackspaceToClearEmptyFor(format));
+            it(format, () => itBackspaceToClearEmptyFor(format));
         });
     });
 
-    function testBackSpaceAtStartFor(blotName) {
+    function itBackSpaceAtStartFor(blotName) {
         const contents = [{ insert: "123" }, { attributes: { [blotName]: true }, insert: "\n" }, { insert: "45\n" }];
 
         quill.setContents(contents);
@@ -209,12 +209,12 @@ describe("KeyboardBindings", () => {
         keyboardBindings.handleBlockStartDelete(selection);
 
         const expectedResult = [{ insert: "123\n45\n" }];
-        expect(quill.getContents().ops).toEqual(expectedResult);
+        expect(quill.getContents().ops).deep.equals(expectedResult);
     }
 
     describe("back space to clear first blot formatting", () => {
         MULTI_LINE_FORMATS.forEach(format => {
-            test(format, () => testBackSpaceAtStartFor(format));
+            it(format, () => itBackSpaceAtStartFor(format));
         });
     });
 });

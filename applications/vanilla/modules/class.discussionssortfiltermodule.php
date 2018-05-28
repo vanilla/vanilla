@@ -19,8 +19,6 @@
  */
 class DiscussionsSortFilterModule extends Gdn_Module {
 
-    const ACTIVE_CSS_CLASS = 'Active active';
-
     /** @var array The sorts to render. */
     protected $sorts;
 
@@ -120,7 +118,8 @@ class DiscussionsSortFilterModule extends Gdn_Module {
      */
     protected function getSortData() {
         $sortData = [];
-        foreach($this->sorts as $sort) {
+        $selectedElementKey = val('key', val($this->selectedSort, $this->sorts));
+        foreach($this->sorts as $key => $sort) {
             // Check to see if there's a category restriction.
             if ($categories = val('categories', $sort)) {
                 if (!in_array($this->categoryID, $categories)) {
@@ -133,12 +132,24 @@ class DiscussionsSortFilterModule extends Gdn_Module {
             $sortData[$key]['url'] = $this->getPagelessPath().$queryString;
             $sortData[$key]['rel'] = 'nofollow';
         }
-        if (val($this->selectedSort, $sortData)) {
-            $sortData[$this->selectedSort]['cssClass'] = self::ACTIVE_CSS_CLASS;
-            $sortData[$this->selectedSort]['active'] = true;
-        } elseif (val($sortKey = DiscussionModel::getDefaultSortKey(), $sortData)) {
-            $sortData[$sortKey]['cssClass'] = self::ACTIVE_CSS_CLASS;
+
+
+        if ($selectedElementKey === false) { // No currently selected filter
+            $defaultSort = DiscussionModel::getDefaultSortKey();
+            foreach($this->sorts as $key => $sort) {
+                if (val('key', $sort) === $defaultSort) {
+                    $selectedElementKey = $key;
+                    break;
+                }
+            }
+
+            if (empty($selectedElementKey)) { // could still not of matched, in which case we pick the first element
+                $first_key = key(reset($sortData));
+                $selectedElementKey = $first_key;
+            }
         }
+
+        $sortData[$selectedElementKey]['active'] = true;
 
         return $sortData;
     }

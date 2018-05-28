@@ -23,6 +23,10 @@
                 "./plugins/rich-editor/node_modules/*",
             ]
         },
+        "typeRoots": [
+            "@types",
+            "./node_modules/@types"
+        ],
         "skipLibCheck": true,
         "sourceMap": true
     },

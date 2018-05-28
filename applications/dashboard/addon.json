@@ -39,7 +39,8 @@
                 "react-redux",
                 "react-router-dom",
                 "redux",
-                "sprintf-js"
+                "sprintf-js",
+                "tabbable"
             ],
             "app": [],
             "admin": []

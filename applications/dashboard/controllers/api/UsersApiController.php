@@ -608,6 +608,8 @@ class UsersApiController extends AbstractApiController {
      * @return array the response body.
      */
     public function post_confirmEmail($id, array $body) {
+        $this->permission();
+        
         $this->idParamSchema('in');
         $in = $this->schema( [
             'confirmationCode:s' => 'Email confirmation code'

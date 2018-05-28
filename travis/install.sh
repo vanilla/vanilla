@@ -20,18 +20,12 @@ cd "$TRAVIS_BUILD_DIR/vanilla/plugins"
 ln -s ../../plugins/* ./
 
 echo ""
-echo "Installing node_modules for dashboard..."
-cd "$TRAVIS_BUILD_DIR/vanilla/applications/dashboard"
-yarn install --pure-lockfile
-
-echo ""
 echo "Installing node_modules for rich-editor..."
 cd "$TRAVIS_BUILD_DIR/vanilla/plugins/rich-editor"
 yarn install --pure-lockfile
 
 echo ""
-echo "Installing node_modules for tests..."
-cd "$TRAVIS_BUILD_DIR/vanilla/tests"
+echo "Installing node_modules for vanilla..."
+cd "$TRAVIS_BUILD_DIR/vanilla/"
 yarn install --pure-lockfile
 cd "$TRAVIS_BUILD_DIR"
-cd ../

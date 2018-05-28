@@ -14,7 +14,6 @@
         "@vanillaforums/tslint-config": "^1.1.8",
         "awesome-typescript-loader": "^5.0.0",
         "babel-core": "^6.26.3",
-        "babel-jest": "^23.0.0",
         "babel-loader": "^7.1.4",
         "chai": "^4.1.2",
         "chai-as-promised": "^7.1.1",
@@ -24,7 +23,6 @@
         "eslint": "^4.17.0",
         "eslint-plugin-react": "^7.6.1",
         "glob": "^7.1.2",
-        "html-loader-jest": "^0.2.1",
         "karma": "^2.0.2",
         "karma-chai": "^0.1.0",
         "karma-chrome-launcher": "^2.2.0",
@@ -50,7 +48,6 @@
     "scripts": {
         "test:before": "node javascript/verifyModules.js",
         "test": "karma start ./javascript/karma.conf.js --single-run",
-        "test:jest": "yarn test:before && cross-env NODE_ENV=test jest --config=javascript/jest.config.js",
         "test:watch": "karma start ./javascript/karma.conf.js",
         "lint:ts": "tslint -c ../.tslint.js -e '../**/node_modules/**' -e '../**/src/**/*.{js,jsx}' -p ../tsconfig.json -t stylish",
         "lint:ts:fix": "tslint -c ../.tslint.js -e '../**/node_modules/**' -e '../**/src/**/*.{js,jsx}' -p ../tsconfig.json -t stylish --fix"

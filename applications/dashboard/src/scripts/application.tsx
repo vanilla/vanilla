@@ -29,7 +29,7 @@ export function getMeta(key: string, defaultValue?: any) {
     const parts = key.split(".");
     let haystack = gdn.meta;
 
-    for (const part of parts) {
+    for (const part in parts) {
         if (!haystack.hasOwnProperty(part)) {
             return defaultValue;
         }

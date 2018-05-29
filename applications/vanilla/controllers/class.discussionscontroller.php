@@ -31,7 +31,7 @@ class DiscussionsController extends VanillaController {
     protected $categoryIDs;
 
     /** @var boolean Value indicating if the category-following filter should be displayed when rendering a view */
-    public $enableFollowingFilter;
+    public $enableFollowingFilter = false;
 
     /** @var array list of pages that opt in to the category following filter */
     private $categoryFilterList = ["discussions"];
@@ -351,7 +351,6 @@ class DiscussionsController extends VanillaController {
     public function initialize() {
         parent::initialize();
         $this->ShowOptions = true;
-        $this->enableFollowingFilter = false;
         $this->Menu->highlightRoute('/discussions');
         $this->addJsFile('discussions.js');
 
@@ -856,7 +855,7 @@ class DiscussionsController extends VanillaController {
      *
      * @param string $url
      */
-    public function setCategoryFollowingList(string $url = null) {
+    public function addCategoryFollowingUrl(string $url) {
         if ($url) {
             array_push($this->categoryFilterList, $url);
         }

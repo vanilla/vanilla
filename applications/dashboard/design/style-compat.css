@@ -681,14 +681,14 @@ label.checkbox input.checkbox-input {
   text-align: left;
 }
 
-.richEditor-embedButton {
-  height: 39px;
-}
-
 .richEditor-button {
   display: block;
   height: 24px;
   width: 24px;
+}
+
+.richEditor-button.richEditor-formatButton, .richEditor-button.richEditor-embedButton {
+  height: 39px;
 }
 
 .richEditor-button.emojiGroup {

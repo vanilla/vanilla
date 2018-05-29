@@ -117,14 +117,16 @@
 }
 
 
-.richEditor-embedButton {
-    height: $richEditor-menuButton_size;
-}
 
 .richEditor-button {
     display: block;
     height: $richEditor-icon_size;
     width: $richEditor-icon_size;
+
+    &.richEditor-formatButton,
+    &.richEditor-embedButton {
+        height: $richEditor-menuButton_size;
+    }
 
     &.emojiGroup {
         width: $richEditor-icon_size;
@@ -231,6 +233,8 @@
     right: auto;
     text-align: center;
     user-select: none;
+
+
 }
 
 .insertLink-input.InputBox {

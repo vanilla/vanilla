@@ -10,14 +10,16 @@ import Parchment from "parchment";
 import KeyboardModule from "quill/modules/keyboard";
 import Module from "quill/core/module";
 import { RangeStatic } from "quill/core";
-import { delegateEvent } from "@dashboard/dom";
+import { delegateEvent, getNextTabbableElement } from "@dashboard/dom";
 import FocusableEmbedBlot from "./blots/abstract/FocusableEmbedBlot";
 import {
     normalizeBlotIntoBlock,
     insertNewLineAtEndOfScroll,
     insertNewLineAtStartOfScroll,
     getBlotAtIndex,
+    rangeContainsBlot,
 } from "./utility";
+import MentionAutoCompleteBlot from "./blots/embeds/MentionAutoCompleteBlot";
 
 /**
  * A module for managing focus of Embeds. For this to work for a new Embed,
@@ -63,6 +65,7 @@ export default class EmbedFocusModule extends Module {
                 if (embed instanceof FocusableEmbedBlot) {
                     this.focusEmbedBlot(embed);
                     event.preventDefault();
+                    event.stopPropagation();
                 }
             },
             this.quill.container,
@@ -140,28 +143,6 @@ export default class EmbedFocusModule extends Module {
     };
 
     /**
-     * Ensure that we have references to certain editor elements that we may want to focus.
-     *
-     * This is necessary because they are not mounted yet when this class is constructed.
-     */
-    private ensureEditorElements() {
-        if (!this.paragraphMenuHandle) {
-            this.paragraphMenuHandle = this.editorRoot.querySelector(".richEditorParagraphMenu-handle") as HTMLElement;
-        }
-
-        // Not cached because it could
-        this.inlineToolbarFirstActiveItem = this.editorRoot.querySelector(
-            ".richEditor-inlineToolbarContainer .richEditor-menuItem:not([disabled])",
-        ) as HTMLElement;
-
-        if (!this.emojiPickerButton) {
-            this.emojiPickerButton = this.editorRoot.querySelector(".emojiPicker > .richEditor-button") as HTMLElement;
-        }
-
-        return this.paragraphMenuHandle && this.inlineToolbarFirstActiveItem && this.emojiPickerButton;
-    }
-
-    /**
      * Manually handle tab presses.
      *
      * Because it can be next to impossible to control focus once it shifts into an embedded iframe
@@ -181,26 +162,22 @@ export default class EmbedFocusModule extends Module {
             return true;
         }
 
-        if (!this.ensureEditorElements()) {
-            return true;
-        }
-
         const blotForActiveElement = this.getEmbedBlotForFocusedElement();
         const focusItemIsEmbedBlot = blotForActiveElement instanceof FocusableEmbedBlot;
         if (this.quill.hasFocus() || focusItemIsEmbedBlot) {
             event.preventDefault();
+            event.stopPropagation();
+
             // Focus the next available editor ui component.
-            const selection = this.quill.getSelection();
-            if (!focusItemIsEmbedBlot) {
-                if (selection && selection.length > 0) {
-                    this.inlineToolbarFirstActiveItem.focus();
-                } else {
-                    this.paragraphMenuHandle.focus();
-                }
-            } else {
-                this.emojiPickerButton.focus();
+            const nextElement = getNextTabbableElement({
+                root: this.editorRoot,
+                excludedRoots: [this.quill.root],
+                allowLooping: false,
+            });
+            if (nextElement) {
+                nextElement.focus();
+                return false;
             }
-            return false;
         }
 
         return true;
@@ -226,20 +203,19 @@ export default class EmbedFocusModule extends Module {
             return true;
         }
 
-        if (!this.ensureEditorElements()) {
+        const prevElement = getNextTabbableElement({
+            root: this.editorRoot.closest("form")!,
+            excludedRoots: [this.quill.root],
+            reverse: true,
+            allowLooping: false,
+        });
+
+        if (!prevElement) {
             return true;
         }
 
-        const definiteLastItemIsFocused = [this.paragraphMenuHandle, this.inlineToolbarFirstActiveItem].includes(
-            document.activeElement as HTMLElement,
-        );
-        const emojiPickerIsConditionallyFocused =
-            document.activeElement === this.emojiPickerButton &&
-            this.paragraphMenuHandle.classList.contains("isHidden");
-
-        if (definiteLastItemIsFocused || emojiPickerIsConditionallyFocused) {
-            event.preventDefault();
-            // Focus the last item in the editor whether it is normal text or an embed blot.
+        // We need to place the selection at the end of quill.
+        if (prevElement === this.quill.root) {
             const selection = this.quill.getSelection();
             const documentLength = this.quill.scroll.length();
             const newIndex = selection ? selection.index + selection.length : documentLength - 1;
@@ -247,12 +223,17 @@ export default class EmbedFocusModule extends Module {
             if (lastEmbedBlot) {
                 this.focusEmbedBlot(lastEmbedBlot);
             } else {
-                this.quill.focus();
-                this.quill.setSelection(newIndex, 0, Quill.sources.USER);
+                this.quill.setSelection(selection, Quill.sources.USER);
             }
+            event.preventDefault();
+            event.stopPropagation();
+            return false;
+        } else {
+            event.preventDefault();
+            event.stopPropagation();
+            prevElement.focus();
+            return false;
         }
-
-        return true;
     };
 
     /**
@@ -274,6 +255,7 @@ export default class EmbedFocusModule extends Module {
         const focusItemIsEmbedBlot = blotForActiveElement instanceof FocusableEmbedBlot;
         if (blotForActiveElement && focusItemIsEmbedBlot) {
             event.preventDefault();
+            event.stopPropagation();
             const offset = blotForActiveElement.offset();
             blotForActiveElement.remove();
             this.quill.update(Quill.sources.USER);
@@ -311,6 +293,7 @@ export default class EmbedFocusModule extends Module {
         const focusItemIsEmbedBlot = blotForActiveElement instanceof FocusableEmbedBlot;
         if (blotForActiveElement && focusItemIsEmbedBlot) {
             event.preventDefault();
+            event.stopPropagation();
             const newBlot = Parchment.create("block", "");
             newBlot.insertInto(this.quill.scroll, blotForActiveElement.next);
             this.quill.update(Quill.sources.USER);
@@ -338,12 +321,16 @@ export default class EmbedFocusModule extends Module {
         }
 
         if (document.activeElement === this.quill.root) {
-            const [currentBlot] = this.quill.getLine(this.quill.getSelection().index);
+            const selection = this.quill.getSelection();
+
+            // TODO: CHECK if we have an active @mention open here, and bail out if we do.
+            const [currentBlot] = this.quill.getLine(selection.index);
             const blotToMoveTo = this.findBlotToMoveTo(currentBlot, event.keyCode);
 
             if (blotToMoveTo instanceof FocusableEmbedBlot) {
                 this.focusEmbedBlot(blotToMoveTo);
                 event.preventDefault();
+                event.stopPropagation();
                 return false;
             }
         }
@@ -389,10 +376,12 @@ export default class EmbedFocusModule extends Module {
         const isDownOrRight = [KeyboardModule.keys.RIGHT, KeyboardModule.keys.DOWN].includes(event.keyCode as any);
         if (isStartOfScroll && isUpOrLeft) {
             event.preventDefault();
+            event.stopPropagation();
             insertNewLineAtStartOfScroll(this.quill);
             return false;
         } else if (isEndOfScroll && isDownOrRight) {
             event.preventDefault();
+            event.stopPropagation();
             insertNewLineAtEndOfScroll(this.quill);
             return false;
         }
@@ -404,6 +393,7 @@ export default class EmbedFocusModule extends Module {
         }
 
         event.preventDefault();
+        event.stopPropagation();
 
         if (blotToMoveTo instanceof FocusableEmbedBlot) {
             this.focusEmbedBlot(blotToMoveTo);

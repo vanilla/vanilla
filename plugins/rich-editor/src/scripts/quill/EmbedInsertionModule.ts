@@ -5,7 +5,6 @@
  */
 
 import Module from "quill/core/module";
-import { closeEditorFlyouts } from "./utility";
 import Parchment from "parchment";
 import FileUploader from "@dashboard/FileUploader";
 import Quill, { RangeStatic, Blot, Sources } from "quill/core";
@@ -115,7 +114,6 @@ export default class EmbedInsertionModule extends Module {
 
         if (fakeImageUpload && imageUpload instanceof HTMLInputElement) {
             fakeImageUpload.addEventListener("click", () => {
-                closeEditorFlyouts("imageUploadButton");
                 imageUpload.click();
             });
 

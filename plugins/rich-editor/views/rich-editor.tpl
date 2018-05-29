@@ -7,7 +7,7 @@
     </p>
     <div class="richEditor-frame InputBox">
         <div class="js-richText">
-            <div class="ql-editor richEditor-text userContent" data-gramm="false" contenteditable="true" data-placeholder="Create a new post..."></div>
+            <div class="ql-editor richEditor-text userContent" data-gramm="false" contenteditable="true" data-placeholder="Create a new post..." tabindex="0"></div>
         </div>
         <div class="js-InlineEditorToolbar"></div>
         <div class="js-ParagraphEditorToolbar"></div>

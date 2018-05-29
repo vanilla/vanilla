@@ -15,11 +15,10 @@ import Toolbar from "./generic/Toolbar";
 import { withEditor, IEditorContextProps } from "./ContextProvider";
 import { IMenuItemData } from "./generic/MenuItem";
 import CodeBlot from "../quill/blots/inline/CodeBlot";
-import { rangeContainsBlot, CLOSE_FLYOUT_EVENT, disableAllBlotsInRange } from "../quill/utility";
+import { rangeContainsBlot, disableAllBlotsInRange } from "../quill/utility";
 import CodeBlockBlot from "../quill/blots/blocks/CodeBlockBlot";
 
 interface IProps extends IEditorContextProps {
-    onBlur: React.FocusEventHandler<any>;
     currentSelection: RangeStatic | null;
     linkFormatter?: (menuItemData: IMenuItemData) => void;
 }
@@ -63,9 +62,7 @@ export class InlineToolbarItems extends React.Component<IProps, {}> {
     }
 
     public render() {
-        return (
-            <Toolbar restrictedFormats={this.restrictedFormats} menuItems={this.menuItems} onBlur={this.props.onBlur} />
-        );
+        return <Toolbar restrictedFormats={this.restrictedFormats} menuItems={this.menuItems} />;
     }
 
     /**

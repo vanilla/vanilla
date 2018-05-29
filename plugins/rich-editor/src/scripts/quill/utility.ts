@@ -144,26 +144,6 @@ export function disableAllBlotsInRange<T extends Blot>(
     }
 }
 
-export const CLOSE_FLYOUT_EVENT = "editor:close-flyouts";
-
-/**
- * Fires an event to close the editor flyouts.
- *
- * @todo replace this with a redux store.
- *
- * @param firingKey - A key to fire the event with. This will be attached to the event so that you do some
- * filtering when setting up you listeners.
- */
-export function closeEditorFlyouts(firingKey?: string) {
-    const event = new CustomEvent(CLOSE_FLYOUT_EVENT, {
-        detail: {
-            firingKey,
-        },
-    });
-
-    document.dispatchEvent(event);
-}
-
 /**
  * Determine if a Blot is the first Blot in the scroll (or first through descendant blots).
  *

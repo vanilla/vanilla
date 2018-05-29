@@ -5,9 +5,9 @@
  */
 
 import React from "react";
-import { closeEditorFlyouts, CLOSE_FLYOUT_EVENT } from "../../quill/utility";
 import { withEditor, IEditorContextProps } from "../ContextProvider";
 import { getRequiredID, uniqueIDFromPrefix, IRequiredComponentID } from "@dashboard/componentIDs";
+import { watchFocusInDomTree } from "@dashboard/dom";
 
 export interface IPopoverControllerChildParameters {
     id: string;
@@ -86,13 +86,18 @@ export default class PopoverController extends React.PureComponent<IProps, IStat
 
     public componentDidMount() {
         document.addEventListener("keydown", this.handleEscapeKey, false);
-        document.addEventListener(CLOSE_FLYOUT_EVENT, this.closeMenuHandler);
+        watchFocusInDomTree(this.controllerRef.current!, this.handleFocusChange);
     }
 
     public componentWillUnmount() {
         document.removeEventListener("keydown", this.handleEscapeKey, false);
-        document.removeEventListener(CLOSE_FLYOUT_EVENT, this.closeMenuHandler);
     }
+
+    private handleFocusChange = hasFocus => {
+        if (!hasFocus) {
+            this.setState({ isVisible: false });
+        }
+    };
 
     /**
      * Handle the escape key.
@@ -132,8 +137,6 @@ export default class PopoverController extends React.PureComponent<IProps, IStat
      * Toggle Menu menu
      */
     private togglePopover = () => {
-        closeEditorFlyouts(this.constructor.name);
-
         this.setState((prevState: IState) => {
             return { isVisible: !prevState.isVisible };
         });

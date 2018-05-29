@@ -15,7 +15,7 @@ import Toolbar from "./generic/Toolbar";
 import { withEditor, IEditorContextProps } from "./ContextProvider";
 import { IMenuItemData } from "./generic/MenuItem";
 import CodeBlot from "../quill/blots/inline/CodeBlot";
-import { rangeContainsBlot, CLOSE_FLYOUT_EVENT, disableAllBlotsInRange } from "../quill/utility";
+import { rangeContainsBlot, disableAllBlotsInRange } from "../quill/utility";
 import CodeBlockBlot from "../quill/blots/blocks/CodeBlockBlot";
 
 interface IProps {

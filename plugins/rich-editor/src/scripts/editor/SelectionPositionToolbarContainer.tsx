@@ -9,7 +9,6 @@ import * as PropTypes from "prop-types";
 import debounce from "lodash/debounce";
 import Quill, { RangeStatic } from "quill/core";
 import Emitter from "quill/core/emitter";
-import { CLOSE_FLYOUT_EVENT } from "../quill/utility";
 import { withEditor, IEditorContextProps } from "./ContextProvider";
 import QuillFlyoutBounds from "./QuillFlyoutBounds";
 

@@ -144,8 +144,8 @@ class DiscussionsSortFilterModule extends Gdn_Module {
             }
 
             if (empty($selectedElementKey)) { // could still not of matched, in which case we pick the first element
-                $first_key = key(reset($sortData));
-                $selectedElementKey = $first_key;
+                $firstKey = key(reset($sortData));
+                $selectedElementKey = $firstKey;
             }
         }
 

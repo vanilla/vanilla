@@ -78,7 +78,30 @@
     list-style: none;
     margin: 0;
     padding: 0;
+
+    .richEditor-menuItem {
+        display: block;
+        padding: 0;
+        margin: 0;
+
+        .richEditor-button,
+        &.richEditor-button {
+            height: $richEditor-menuButton_size;
+            width: $richEditor-menuButton_size;
+            font-size: #{$richEditor-menuButton_size * 24 / 39};
+            line-height: $richEditor-menuButton_size;
+
+            &.emojiChar-🇺🇳 {
+                font-size: 14px;
+            }
+        }
+
+        &.isRightAligned {
+            margin-left: auto;
+        }
+    }
 }
+
 
 // button reset
 .richEditor-nextInput,
@@ -177,7 +200,7 @@
 .richEditor-embedBar {
     display: block;
     width: 100%;
-    margin: 0;
+    padding: $richEditor-embedMenu_padding;
 }
 
 .richEditorInline-icon {
@@ -725,4 +748,3 @@ body.isMobile {
 @include mediaQuery-richEditor_mobile {
     @include richEditorMobileStyles();
 }
-

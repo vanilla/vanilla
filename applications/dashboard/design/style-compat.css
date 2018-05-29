@@ -644,6 +644,27 @@ label.checkbox input.checkbox-input {
   padding: 0;
 }
 
+.richEditor-menuItems .richEditor-menuItem {
+  display: block;
+  padding: 0;
+  margin: 0;
+}
+
+.richEditor-menuItems .richEditor-menuItem .richEditor-button, .richEditor-menuItems .richEditor-menuItem.richEditor-button {
+  height: 39px;
+  width: 39px;
+  font-size: 24px;
+  line-height: 39px;
+}
+
+.richEditor-menuItems .richEditor-menuItem .richEditor-button.emojiChar-🇺🇳, .richEditor-menuItems .richEditor-menuItem.richEditor-button.emojiChar-🇺🇳 {
+  font-size: 14px;
+}
+
+.richEditor-menuItems .richEditor-menuItem.isRightAligned {
+  margin-left: auto;
+}
+
 .richEditor-nextInput,
 .atMentionList-suggestion,
 .iconButton,
@@ -740,7 +761,7 @@ label.checkbox input.checkbox-input {
 .richEditor-embedBar {
   display: block;
   width: 100%;
-  margin: 0;
+  padding: 0;
 }
 
 .richEditorInline-icon {

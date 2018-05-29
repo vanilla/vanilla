@@ -9,12 +9,12 @@
         <div class="js-richText">
             <div class="ql-editor richEditor-text userContent" data-gramm="false" contenteditable="true" data-placeholder="Create a new post..."></div>
         </div>
-        <div class="js-InlineEditorToolbar"></div>
-        <div class="js-ParagraphEditorToolbar"></div>
+        <div class="js-InlineEditorToolbar u-hiddenOnFullScreenEditor"></div>
+        <div class="js-ParagraphEditorToolbar u-hiddenOnFullScreenEditor"></div>
         <div class="js-MentionModule"></div>
-        <div class="richEditor-menu embedBar">
+        <div class="richEditor-menu richEditor-embedBar">
             <ul class="richEditor-menuItems" role="menubar" aria-label="{t c="Inline Level Formatting Menu"}">
-                <li class="richEditor-menuItem" role="menuitem">
+                <li class="richEditor-menuItem u-hiddenOnFullScreenEditor" role="menuitem">
                     <div class="js-emojiHandle emojiMenu">
                         <button class="richEditor-button" type="button" aria-pressed="false">
                             <svg class="richEditorInline-icon" viewBox="0 0 24 24">
@@ -45,12 +45,9 @@
                         </button>
                     </div>
                 </li>
-                <li class="richEditor-menuItem isRightAligned" role="menuitem">
-                    <button class="richEditor-button" type="button" aria-pressed="false">
-                        <svg class="richEditorInline-icon" viewBox="0 0 24 24">
-                            <title>{t c="Help"}</title>
-                            <path fill="currentColor" d="M12,19 C15.8659932,19 19,15.8659932 19,12 C19,8.13400675 15.8659932,5 12,5 C8.13400675,5 5,8.13400675 5,12 C5,15.8659932 8.13400675,19 12,19 Z M12,20 C7.581722,20 4,16.418278 4,12 C4,7.581722 7.581722,4 12,4 C16.418278,4 20,7.581722 20,12 C20,16.418278 16.418278,20 12,20 Z M11.1336706,13.4973545 L11.1336706,13.1587302 C11.1336706,12.7707212 11.2042167,12.4479731 11.3453108,12.1904762 C11.486405,11.9329793 11.7333161,11.666668 12.0860516,11.3915344 C12.5058068,11.0599631 12.7765272,10.8024701 12.8982209,10.6190476 C13.0199146,10.4356252 13.0807606,10.2169325 13.0807606,9.96296296 C13.0807606,9.66666519 12.9819961,9.43915423 12.7844643,9.28042328 C12.5869324,9.12169233 12.3029847,9.04232804 11.9326124,9.04232804 C11.5975138,9.04232804 11.2871112,9.08994661 11.0013955,9.18518519 C10.7156798,9.28042376 10.437023,9.39506106 10.1654167,9.52910053 L9.72097222,8.5978836 C10.4370252,8.19929254 11.2042133,8 12.0225595,8 C12.713921,8 13.2624164,8.16931048 13.6680622,8.50793651 C14.0737079,8.84656254 14.2765278,9.31393 14.2765278,9.91005291 C14.2765278,10.1746045 14.2377275,10.4100519 14.1601257,10.6164021 C14.0825239,10.8227524 13.9652411,11.0193994 13.8082738,11.2063492 C13.6513065,11.393299 13.3805861,11.6366828 12.9961045,11.9365079 C12.6680605,12.1940048 12.448486,12.4074066 12.3373743,12.5767196 C12.2262627,12.7460326 12.1707077,12.9735435 12.1707077,13.2592593 L12.1707077,13.4973545 L11.1336706,13.4973545 Z M10.9167394,15.1851852 C10.9167394,14.6525547 11.1759961,14.3862434 11.6945172,14.3862434 C11.9484867,14.3862434 12.1424883,14.4559076 12.2765278,14.5952381 C12.4105672,14.7345686 12.477586,14.9312157 12.477586,15.1851852 C12.477586,15.4356274 12.4096854,15.6340381 12.2738823,15.7804233 C12.1380791,15.9268085 11.9449594,16 11.6945172,16 C11.444075,16 11.2518371,15.9285721 11.1177976,15.7857143 C10.9837581,15.6428564 10.9167394,15.4426821 10.9167394,15.1851852 Z"/>
-                        </svg>
+                <li class="richEditor-menuWideItem isRightAligned u-visibleOnFullScreenEditor" role="menuitem">
+                    <button class="richEditor-nextInput js-richEditor-next" title="{t c="Done writing Message, go to next field."}" aria-label="{t c="Done writing Message, go to next field."}" class="richEditor-textButton richEditor-done" type="button">
+                        {t c="Done"}
                     </button>
                 </li>
             </ul>

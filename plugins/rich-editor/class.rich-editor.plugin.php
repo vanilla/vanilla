@@ -27,6 +27,7 @@ class RichEditorPlugin extends Gdn_Plugin {
 
     public function structure() {
         saveToConfig('Garden.InputFormatter', 'Rich');
+        saveToConfig('Garden.MobileInputFormatter', 'Rich');
     }
 
     /**

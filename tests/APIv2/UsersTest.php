@@ -133,6 +133,42 @@ class UsersTest extends AbstractResourceTest {
     }
 
     /**
+     * Test confirm email is successful.
+     */
+    public function testConfirmEmailSucceed() {
+        /** @var \UserModel $userModel */
+        $userModel = self::container()->get('UserModel');
+
+        $emailKey = ['confirmationCode' =>'test123'];
+
+        $user = $this->testPost();
+        $userModel->saveAttribute($user['userID'], 'EmailKey', $emailKey['confirmationCode']);
+
+        $response = $this->api()->post("{$this->baseUrl}/{$user['userID']}/confirm-email", $emailKey);
+
+        $user = $userModel->getID($user['userID']);
+        $this->assertEquals(1, $user->Confirmed);
+    }
+
+    /**
+     * Test confirm email fails.
+     *
+     * @expectedException \Exception
+     * @expectedExceptionMessage We couldn't confirm your email.
+     * Check the link in the email we sent you or try sending another confirmation email.
+     */
+    public function testConfirmEmailFail() {
+        /** @var \UserModel $userModel */
+        $userModel = self::container()->get('UserModel');
+
+        $emailKey = ['confirmationCode' =>'test123'];;
+        $user = $this->testPost();
+        $userModel->saveAttribute($user['userID'], 'EmailKey', '123Test');
+
+        $this->api()->post("{$this->baseUrl}/{$user['userID']}/confirm-email", $emailKey);
+    }
+
+    /**
      * {@inheritdoc}
      */
     public function testGetEdit($record = null) {

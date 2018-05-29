@@ -18,7 +18,7 @@
             <!-- Paragraph level menu goes here -->
         </div>
 
-        <div class="richEditor-menu embedBar">
+        <div class="richEditor-menu richEditor-embedBar">
             <ul class="richEditor-menuItems" role="menubar" aria-label="<?php echo t('Inline Level Formatting Menu'); ?>">
                 <li class="richEditor-menuItem" role="menuitem">
                     <button class="richEditor-button" type="button" aria-pressed="false">

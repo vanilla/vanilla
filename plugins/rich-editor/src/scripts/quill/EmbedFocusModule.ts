@@ -18,6 +18,7 @@ import {
     insertNewLineAtStartOfScroll,
     getBlotAtIndex,
 } from "./utility";
+import { any } from "prop-types";
 
 /**
  * A module for managing focus of Embeds. For this to work for a new Embed,
@@ -89,7 +90,10 @@ export default class EmbedFocusModule extends Module {
             "click",
             ".js-richEditor-next",
             (event, clickedElement) => {
-                const nextEl = getNextTabbableElement(this.formWrapper, true, clickedElement);
+                const nextEl: any = getNextTabbableElement({
+                    root: this.formWrapper,
+                    fromElement: clickedElement,
+                });
                 nextEl.focus();
                 this.editorRoot.classList.toggle("isFocused", false);
             },
@@ -170,7 +174,10 @@ export default class EmbedFocusModule extends Module {
     private escapeMobileFullScreen = (event: KeyboardEvent) => {
         if (KeyboardModule.match(event, { key: KeyboardModule.keys.ESCAPE, shiftKey: false })) {
             this.quill.root.focus();
-            const nextEl = getNextTabbableElement(this.formWrapper, true, this.quill.root);
+            const nextEl: any = getNextTabbableElement({
+                root: this.formWrapper,
+                fromElement: this.quill.root,
+            });
             nextEl.focus();
             this.editorRoot.classList.toggle("isFocused", false);
         }

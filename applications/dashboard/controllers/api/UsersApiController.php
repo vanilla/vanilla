@@ -611,9 +611,9 @@ class UsersApiController extends AbstractApiController {
         $this->permission(\Vanilla\Permissions::BAN_CSRF);
 
         $this->idParamSchema('in');
-        $in = $this->schema( [
+        $in = $this->schema([
             'confirmationCode:s' => 'Email confirmation code'
-        ],'in')->setDescription('Confirm a users current email address by using a confirmation code');
+        ], 'in')->setDescription('Confirm a users current email address by using a confirmation code');
         $out = $this->schema(['userID:i', 'email:s', 'emailConfirmed:b'], 'out');
 
         $row = $this->userByID($id);

@@ -58,7 +58,7 @@ export default class PopoverController extends React.PureComponent<IProps, IStat
                     id={this.state.id}
                     onClick={this.togglePopover}
                     onBlur={this.blurHandler}
-                    className="richEditor-button"
+                    className="richEditor-button richEditor-embedButton"
                     type="button"
                     aria-controls={this.componentID}
                     aria-expanded={this.state.isVisible}

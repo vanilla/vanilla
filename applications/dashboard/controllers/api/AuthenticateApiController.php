@@ -415,7 +415,7 @@ class AuthenticateApiController extends AbstractApiController {
         $this->permission();
 
         $in = $this->schema([
-            'authenticate' => [
+            'authenticate:o' => [
                 'authenticatorType:s' => 'The authenticator type that will be used.',
                 'authenticatorID:s' => 'Authenticator instance\'s identifier.',
             ],

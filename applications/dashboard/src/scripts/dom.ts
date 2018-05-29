@@ -342,7 +342,8 @@ interface ITabbableOptions {
  * @property excludedElements - Elements to ignore.
  * @property excludedRoots - These element's children will be ignored.
  * @property reverse - True to get the previous element instead.
- * @property fromElement - The currently
+ * @property fromElement - The currently focused element.
+ * @property allowLooping - Whether or not the focus should loop around from beginning <-> end.
  */
 export function getNextTabbableElement(options?: Partial<ITabbableOptions>): HTMLElement | null {
     const defaultTabbableOptions: ITabbableOptions = {
@@ -354,6 +355,7 @@ export function getNextTabbableElement(options?: Partial<ITabbableOptions>): HTM
         allowLooping: true,
     };
 
+    // Merge the passed options and the defaults.
     const finalOptions = {
         ...defaultTabbableOptions,
         ...options,
@@ -404,11 +406,28 @@ export function getNextTabbableElement(options?: Partial<ITabbableOptions>): HTM
     return tabbables[targetIndex] || null;
 }
 
+/**
+ * Determine if the currently focused element is somewhere inside of (or the same as)
+ * a given Element.
+ *
+ * @param rootNode - The root node to look in.
+ */
 function domTreeHasFocus(rootNode: Element | null) {
     const { activeElement } = document;
     return rootNode && (activeElement === rootNode || rootNode.contains(activeElement));
 }
 
+/**
+ * Register a callback for focusin and focusin out events. The main improvement here over registering
+ * the listeners yourself is that the events fire for the whole tree as 1 item instead of as
+ * individual notes.
+ *
+ * This is particularly useful when you want to track focus leaving or enterring a component
+ * without caring about the individual contents inside.
+ *
+ * @param rootNode - The root dom node to watch on.
+ * @param callback - A callback for when the tree focuses and blurs.
+ */
 export function watchFocusInDomTree(rootNode: Element, callback: (hasFocus: boolean) => void) {
     rootNode.addEventListener(
         "blur",

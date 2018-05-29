@@ -91,7 +91,14 @@ export function expandRange(
  * @param range - The range to check.
  * @param blotConstructor - A class constructor for a blot.
  */
-export function rangeContainsBlot(quill: Quill, range: RangeStatic, blotConstructor: any): boolean {
+export function rangeContainsBlot(quill: Quill, blotConstructor: any, range: RangeStatic | null = null): boolean {
+    if (range === null) {
+        range = quill.getSelection();
+    }
+
+    if (!range) {
+        return false;
+    }
     const blots = quill.scroll.descendants(blotConstructor, range.index, range.length);
     return blots.length > 0;
 }
@@ -106,12 +113,18 @@ export function rangeContainsBlot(quill: Quill, range: RangeStatic, blotConstruc
  */
 export function disableAllBlotsInRange<T extends Blot>(
     quill: Quill,
-    range: RangeStatic,
-    blotConstructor: {
-        new (): T;
-    },
+    blotConstructor:
+        | {
+              new (): T;
+          }
+        | typeof Blot,
+    range: RangeStatic | null = null,
 ) {
-    const currentBlots = quill.scroll.descendants(blotConstructor, range.index, range.length);
+    if (range === null) {
+        range = quill.getSelection();
+    }
+
+    const currentBlots: Blot[] = quill.scroll.descendants(blotConstructor as any, range.index, range.length);
     const firstBlot = currentBlots[0];
     const lastBlot = currentBlots[currentBlots.length - 1];
 

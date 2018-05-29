@@ -45,15 +45,18 @@ class PageScraperTest extends TestCase {
                     'Description' => 'I am a standard description.',
                     'Images' => [],
                     'Attributes' => [
+                        'subtype' => 'discussion',
                         'discussion' => [
                             'title' => 'Welcome to awesome!',
                             'body' => 'There\'s nothing sweeter than a fresh new forum, ready to welcome your community.',
                             'insertUser' => [
                                 'name' => 'Vanilla Forums',
                                 'photoUrl' => 'https://images.v-cdn.net/stubcontent/vanilla_avatar.jpg',
-                            ]
+                                'url' => 'https://vanilla.localhost/profile/Vanilla%20Forums'
+                            ],
+                            'dateInserted' => '2018-04-20T21:06:41+00:00',
                         ]
-                    ]
+                    ],
                 ]
             ],
             [

@@ -43,12 +43,6 @@ class LinkEmbed extends Embed {
         if ($this->isNetworkEnabled()) {
             $pageInfo = $this->pageScraper->pageInfo($url);
             $images = $pageInfo['Images'] ?? [];
-            $type = $pageInfo['Type'] ?? null;
-
-            // Allow type to be overridden by scraper.
-            if ($type) {
-                $result['type'] = $type;
-            }
 
             $result['name'] = $pageInfo['Title'] ?: null;
             $result['body'] = $pageInfo['Description'] ?: null;

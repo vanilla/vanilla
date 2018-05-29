@@ -617,7 +617,7 @@ if (!class_exists('HeadModule', false)) {
          * @return array
          * @link https://json-ld.org
          */
-        public function setJsonLD(string $type, array $data, string $context = 'http://schema.org/'): array {
+        public function setJsonLD(string $type, array $data, string $context = 'https://schema.org'): array {
             $data['@context'] = $context;
             $data['@type'] = $type;
             return $this->jsonLD = $data;

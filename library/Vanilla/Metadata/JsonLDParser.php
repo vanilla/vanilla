@@ -42,24 +42,28 @@ class JsonLDParser implements Parser {
      */
     private function processDiscussionForumPosting(array $linkedData): array {
         $title = $linkedData['headline'] ?? '';
-        $body = $linkedData['description'] ?? '';
+        $body = $linkedData['description'] ?? $linkedData['articleBody'] ?? '';
         $insertUser = $linkedData['author'] ?? [];
         $dateInserted = $linkedData['dateCreated'] ?? '';
 
-        if ($dateInserted) {
-            $dateInserted = new DateTimeImmutable($dateInserted);
-        }
-
         $result = [
-            'Type' => 'discussion',
             'Attributes' => [
+                'subtype' => 'discussion',
                 'discussion' => [
                     'title' => $title,
                     'body' => $body,
-                    'dateInserted' => $dateInserted,
                 ]
             ]
         ];
+
+        if ($dateInserted) {
+            // Attempt to normalize the format.
+            try {
+                $dateInsertedDateTime = new DateTimeImmutable($dateInserted);
+                $result['Attributes']['discussion']['dateInserted'] = $dateInsertedDateTime->format('c');
+            } catch (\Exception $e) {
+            }
+        }
 
         // Author information.
         if (!empty($insertUser)) {
@@ -92,7 +96,7 @@ class JsonLDParser implements Parser {
         $context = $linkedData['@context'] ?? null;
         $type = $linkedData['@type'] ?? null;
 
-        if ($context === 'http://schema.org/' && $type === 'DiscussionForumPosting') {
+        if ($context === 'https://schema.org' && $type === 'DiscussionForumPosting') {
             $result = $this->processDiscussionForumPosting($linkedData);
         }
 

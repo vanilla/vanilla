@@ -162,7 +162,6 @@ class EmbedManager {
             $embed->setNetworkEnabled($embedNetworkEnabled);
 
             $defaults = [
-                'type' => $type,
                 'name' => null,
                 'body' => null,
                 'photoUrl' => null,
@@ -172,6 +171,7 @@ class EmbedManager {
             ];
             $data = is_array($data) ? array_merge($defaults, $data) : $defaults;
             $data['url'] = $url;
+            $data['type'] = $type;
         }
 
         if ($data) {

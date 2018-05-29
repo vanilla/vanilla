@@ -3220,7 +3220,7 @@ class DiscussionModel extends Gdn_Model {
             $user = Gdn::userModel()->getID($discussion['InsertUserID'], DATASET_TYPE_ARRAY);
             if ($user) {
                 $result["author"] = [
-                    "@context" => "http://schema.org/",
+                    "@context" => "https://schema.org",
                     "@type" => "Person",
                     "name" => $user['Name'],
                     "image" => userPhotoUrl($user),

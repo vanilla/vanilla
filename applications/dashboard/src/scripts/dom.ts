@@ -324,9 +324,11 @@ export function ensureScript(scriptUrl: string) {
 
 interface ITabbableOptions {
     root: Element;
+    excludedElements: Element[];
     excludedRoots: Element[];
     reverse: boolean;
     fromElement: Element;
+    allowLooping: boolean;
 }
 
 /**
@@ -337,16 +339,19 @@ interface ITabbableOptions {
  *
  * @param options
  * @property root - The root element to look in.
- * @property excludedRoots - Elements to ignore. These element's children will be ignored as well.
+ * @property excludedElements - Elements to ignore.
+ * @property excludedRoots - These element's children will be ignored.
  * @property reverse - True to get the previous element instead.
  * @property fromElement - The currently
  */
-export function getNextTabbableElement(options?: Partial<ITabbableOptions>): Element | null {
+export function getNextTabbableElement(options?: Partial<ITabbableOptions>): HTMLElement | null {
     const defaultTabbableOptions: ITabbableOptions = {
         root: document.documentElement,
+        excludedElements: [],
         excludedRoots: [],
         reverse: false,
         fromElement: document.activeElement,
+        allowLooping: true,
     };
 
     const finalOptions = {
@@ -359,10 +364,20 @@ export function getNextTabbableElement(options?: Partial<ITabbableOptions>): Ele
         return null;
     }
 
-    const tabbables = tabbable(finalOptions.root).filter((element: Element) => {
-        for (const root of finalOptions.excludedRoots) {
-            if (root === element || root.contains(element)) {
+    const tabbables = tabbable(finalOptions.root).filter((tabbableElement: Element) => {
+        // We want to excempt items that are the active item or a parent of the active item
+        // because otherwise we would not be able to tab away from them.
+        const elementIsActiveOrChildOfActive =
+            finalOptions.fromElement === tabbableElement || tabbableElement.contains(finalOptions.fromElement);
+
+        if (!elementIsActiveOrChildOfActive) {
+            if (finalOptions.excludedElements.includes(tabbableElement)) {
                 return false;
+            }
+            for (const excludedRoot of finalOptions.excludedRoots) {
+                if (excludedRoot !== tabbableElement && excludedRoot.contains(tabbableElement)) {
+                    return false;
+                }
             }
         }
 
@@ -377,12 +392,41 @@ export function getNextTabbableElement(options?: Partial<ITabbableOptions>): Ele
 
     let targetIndex = finalOptions.reverse ? currentTabIndex - 1 : currentTabIndex + 1;
 
-    // Loop over the beginning and ends
-    if (targetIndex < 0) {
-        targetIndex = tabbables.length - 1;
-    } else if (targetIndex >= tabbables.length) {
-        targetIndex = 0;
+    if (finalOptions.allowLooping) {
+        // Loop over the beginning and ends
+        if (targetIndex < 0) {
+            targetIndex = tabbables.length - 1;
+        } else if (targetIndex >= tabbables.length) {
+            targetIndex = 0;
+        }
     }
 
-    return tabbables[targetIndex];
+    return tabbables[targetIndex] || null;
+}
+
+function domTreeHasFocus(rootNode: Element | null) {
+    const { activeElement } = document;
+    return rootNode && (activeElement === rootNode || rootNode.contains(activeElement));
+}
+
+export function watchFocusInDomTree(rootNode: Element, callback: (hasFocus: boolean) => void) {
+    rootNode.addEventListener(
+        "blur",
+        (event: FocusEvent) => {
+            setImmediate(() => {
+                !domTreeHasFocus(rootNode) && callback(false);
+            });
+        },
+        true,
+    );
+
+    rootNode.addEventListener(
+        "focus",
+        (event: FocusEvent) => {
+            setImmediate(() => {
+                domTreeHasFocus(rootNode) && callback(true);
+            });
+        },
+        true,
+    );
 }

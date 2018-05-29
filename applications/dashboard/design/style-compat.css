@@ -1284,6 +1284,9 @@ body.isMobile .richEditor.isFocused .richEditor-embedBar {
   top: 0;
   left: 0;
   width: 100%;
+  border-bottom-color: #a3a3a3;
+  border-bottom-width: 1px;
+  border-bottom-style: solid;
 }
 
 body.isMobile .richEditor.isFocused .u-visibleOnFullScreenEditor {
@@ -1371,6 +1374,9 @@ body.isMobile .FormWrapper {
     top: 0;
     left: 0;
     width: 100%;
+    border-bottom-color: #a3a3a3;
+    border-bottom-width: 1px;
+    border-bottom-style: solid;
   }
   .richEditor.isFocused .u-visibleOnFullScreenEditor {
     display: block;
@@ -1801,6 +1807,17 @@ body.isMobile .FormWrapper {
 .embedLink-image + .embedLink-main {
   margin-left: auto;
   width: calc(100% - 225px);
+}
+
+@media (max-width: 550px) {
+  .embedLink-image {
+    position: relative;
+    width: 100%;
+    padding-top: 52.5%;
+  }
+  .embedLink-image + .embedLink-main {
+    width: 100%;
+  }
 }
 
 .embedLink-header {

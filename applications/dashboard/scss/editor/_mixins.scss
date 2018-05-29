@@ -83,6 +83,12 @@ $spinnerOffset: 73deg;
     }
 }
 
+@mixin mediaQuery-richEditor_embed {
+    @media (max-width: $richEditor-mobileEmbedBreakPoint) {
+        @content;
+    }
+}
+
 @mixin richEditorMobileStyles {
 
     .richEditor-embedBar {
@@ -159,6 +165,12 @@ $spinnerOffset: 73deg;
                 top: 0;
                 left: 0;
                 width: 100%;
+
+                border-bottom: {
+                    color: $richEditor-mobileEmbedMenu_borderColor;
+                    width: 1px;
+                    style: solid;
+                }
             }
 
             .u-visibleOnFullScreenEditor {

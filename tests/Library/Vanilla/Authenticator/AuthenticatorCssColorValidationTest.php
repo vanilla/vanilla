@@ -15,9 +15,9 @@ use VanillaTests\Bootstrap;
 use VanillaTests\Fixtures\CssColorAuthenticator;
 
 /**
- * Class AuthenticatorCssColorValidation.
+ * Class AuthenticatorCssColorValidationTest.
  */
-class AuthenticatorCssColorValidation extends TestCase {
+class AuthenticatorCssColorValidationTest extends TestCase {
 
     /** @var Bootstrap */
     private static $bootstrap;

@@ -237,6 +237,11 @@ class Bootstrap {
             ->addCall('setNetworkEnabled', [false])
             ->setShared(true)
 
+            ->rule(\Vanilla\PageScraper::class)
+            ->addCall('registerMetadataParser', [new Reference(\Vanilla\Metadata\Parser\OpenGraphParser::class)])
+            ->addCall('registerMetadataParser', [new Reference(\Vanilla\Metadata\Parser\JsonLDParser::class)])
+            ->setShared(true)
+
             ->rule(\Vanilla\Quill\Parser::class)
             ->setShared(true)
 

@@ -13,11 +13,15 @@ use Exception;
 use Garden\Http\HttpRequest;
 use Garden\Http\HttpResponse;
 use InvalidArgumentException;
+use Vanilla\Metadata\Parser\Parser;
 
 class PageScraper {
 
     /** @var HttpRequest */
     private $httpRequest;
+
+    /** @var array */
+    private $metadataParsers = [];
 
     /** @var array Valid URL schemes. */
     protected $validSchemes = ['http', 'https'];
@@ -39,12 +43,6 @@ class PageScraper {
      * @throws Exception
      */
     public function pageInfo(string $url): array {
-        $info = [
-            'Title' => '',
-            'Description' => '',
-            'Images' => []
-        ];
-
         $response = $this->getUrl($url);
 
         if (!$response->isResponseClass('2xx')) {
@@ -57,12 +55,13 @@ class PageScraper {
         if ($loadResult === false) {
             throw new Exception('Failed to load document for parsing.');
         }
-        $meta = $document->getElementsByTagName('meta');
 
-        $openGraph = $this->parseOpengraphMeta($meta);
-        if ($openGraph) {
-            $info = array_merge($info, $openGraph);
-        }
+        $metaData = $this->parseMetaData($document);
+        $info = array_merge([
+            'Title' => '',
+            'Description' => '',
+            'Images' => []
+        ], $metaData);
 
         if (empty($info['Title'])) {
             $titleTags = $document->getElementsByTagName('title');
@@ -73,7 +72,8 @@ class PageScraper {
         }
 
         if (empty($info['Description'])) {
-            $description = $this->parseDescription($document, $meta);
+            $metaTags = $document->getElementsByTagName('meta');
+            $description = $this->parseDescription($document, $metaTags);
             if ($description) {
                 $info['Description'] = $description;
             }
@@ -154,53 +154,29 @@ class PageScraper {
     }
 
     /**
-     * Parse meta tags for OpenGraph info.
+     * Iterate through the configured metadata parsers and gather document information.
      *
-     * @param DOMNodeList $meta A list of meta tags in the document.
+     * @param DOMDocument $document
      * @return array
      */
-    private function parseOpenGraphMeta(DOMNodeList $meta): array {
+    private function parseMetaData(DOMDocument $document): array {
         $result = [];
-        $ogTags = [];
-
-        /** @var DOMElement $tag */
-        foreach ($meta as $tag) {
-            if ($tag->hasAttribute('property') === false) {
-                continue;
-            } elseif (substr($tag->getAttribute('property'), 0, 3) !== 'og:') {
-                continue;
-            }
-
-            $property = $tag->getAttribute('property');
-            $content = $tag->getAttribute('content');
-            $ogTags[] = [
-                'property' => $property,
-                'content' => $content
-            ];
-
-            if ($property === 'og:title') {
-                $result['Title'] = $content;
-            } elseif ($property === 'og:description') {
-                $result['Description'] = $content;
-            }
+        /** @var Parser $parser */
+        foreach ($this->metadataParsers as $parser) {
+            $parsed = $parser->parse($document);
+            $result = array_merge($result, $parsed);
         }
-
-        // Harvest those OpenGraph images.
-        foreach ($ogTags as $node) {
-            $property = $node['property'];
-            $content = $node['content'];
-            if ($property == 'og:image') {
-                // Only allow valid URLs.
-                if (filter_var($content, FILTER_VALIDATE_URL) === false) {
-                    continue;
-                }
-                if (!array_key_exists('Images', $result)) {
-                    $result['Images'] = [];
-                }
-                $result['Images'][] = $content;
-            }
-        }
-
         return $result;
+    }
+
+    /**
+     * Register a parser for document metadata.
+     *
+     * @param Metadata\Parser\Parser $parser
+     * @return array
+     */
+    public function registerMetadataParser(Parser $parser) {
+        $this->metadataParsers[] = $parser;
+        return $this->metadataParsers;
     }
 }

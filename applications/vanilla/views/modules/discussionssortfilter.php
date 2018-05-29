@@ -7,20 +7,11 @@
             $foundActiveLink = false;
 
             foreach ($this->getSortData() as $sort) {
-                $isActive = val('active', $sort);
                 $sortLinks[] = [
                     'name' => val('name', $sort),
                     'url' => url('/'.val('url', $sort)),
-                    'active' => $isActive,
+                    'active' => val('active', $sort),
                 ];
-
-                if ($isActive) {
-                    $foundActiveLink = true;
-                }
-            }
-
-            if(!$foundActiveLink) {
-                $sortLinks[0]['active'] = true;
             }
 
             echo linkDropDown($sortLinks, 'selectBox-discussionsSortFilter', 'Sort');

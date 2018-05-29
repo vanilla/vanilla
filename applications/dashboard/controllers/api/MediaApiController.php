@@ -336,10 +336,7 @@ class MediaApiController extends AbstractApiController {
         ], 'in');
         $out = $this->schema([
             'url:s'	=> 'The URL that was scraped.',
-            'type:s' => [
-                'description' => 'The type of site. This determines how the embed is rendered.',
-                'enum' => $this->embedManager->getTypes()
-            ],
+            'type:s' => 'The type of site. This determines how the embed is rendered.',
             'name:s|n' => 'The title of the page/item/etc. if any.',
             'body:s|n' => 'A paragraph summarizing the content, if any. This is not what is what gets rendered to the page.',
             'photoUrl:s|n' => 'A photo that goes with the content.',

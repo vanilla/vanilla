@@ -7,6 +7,7 @@
 namespace Vanilla\Metadata\Parser;
 
 use DOMDocument;
+use DateTimeImmutable;
 
 class JsonLDParser implements Parser {
 
@@ -43,25 +44,37 @@ class JsonLDParser implements Parser {
         $title = $linkedData['headline'] ?? '';
         $body = $linkedData['description'] ?? '';
         $insertUser = $linkedData['author'] ?? [];
+        $dateInserted = $linkedData['dateCreated'] ?? '';
+
+        if ($dateInserted) {
+            $dateInserted = new DateTimeImmutable($dateInserted);
+        }
 
         $result = [
+            'Type' => 'discussion',
             'Attributes' => [
                 'discussion' => [
                     'title' => $title,
-                    'body' => $body
+                    'body' => $body,
+                    'dateInserted' => $dateInserted,
                 ]
             ]
         ];
 
         // Author information.
         if (!empty($insertUser)) {
-            $result['Attributes']['discussion']['insertUser'] = [];
-            if (array_key_exists('name', $insertUser) && is_string($insertUser['name'])) {
-                $result['Attributes']['discussion']['insertUser']['name'] = $insertUser['name'];
+            $userFragment = [];
+            $userAttributes = [
+                'name' => 'name',
+                'image' => 'photoUrl',
+                'url' => 'url'
+            ];
+            foreach ($userAttributes as $authorAttribute => $userAttribute) {
+                if (array_key_exists($authorAttribute, $insertUser) && is_scalar($insertUser[$authorAttribute])) {
+                    $userFragment[$userAttribute] = $insertUser[$authorAttribute];
+                }
             }
-            if (array_key_exists('image', $insertUser) && is_string($insertUser['image'])) {
-                $result['Attributes']['discussion']['insertUser']['photoUrl'] = $insertUser['image'];
-            }
+            $result['Attributes']['discussion']['insertUser'] = $userFragment;
         }
 
         return $result;

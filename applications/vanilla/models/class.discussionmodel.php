@@ -3206,12 +3206,14 @@ class DiscussionModel extends Gdn_Model {
      */
     public function structuredData(array $discussion): array {
         $name = $discussion['Name'] ?? '';
+        $dateInserted = $discussion['DateInserted'] ?? '';
         $body = Gdn_Format::reduceWhiteSpaces(Gdn_Format::plainText($discussion['Body'] ?? '', $discussion['Format'] ?? 'Html'));
 
         $result = [
             "headline" => $name,
             "description" => sliceParagraph($body, 160),
-            "discussionUrl" => discussionUrl($discussion)
+            "discussionUrl" => discussionUrl($discussion),
+            "dateCreated" => $dateInserted
         ];
 
         if (array_key_exists('InsertUserID', $discussion) && $discussion['InsertUserID']) {
@@ -3221,7 +3223,8 @@ class DiscussionModel extends Gdn_Model {
                     "@context" => "http://schema.org/",
                     "@type" => "Person",
                     "name" => $user['Name'],
-                    "image" => userPhotoUrl($user)
+                    "image" => userPhotoUrl($user),
+                    "url" => url(userUrl($user), true)
                 ];
             }
         }

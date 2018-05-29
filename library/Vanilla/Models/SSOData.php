@@ -13,7 +13,7 @@ namespace Vanilla\Models;
 class SSOData implements \JsonSerializable {
 
     /** @var array $userFields */
-    private static $userFields = ['name', 'email', 'photo', 'roles'];
+    private static $userFields = ['name', 'email', 'photoUrl', 'roles'];
 
     /** @var string Maps to "GDN_UserAuthenticationProvider.AuthenticationSchemeAlias" */
     private $authenticatorType;
@@ -70,9 +70,9 @@ class SSOData implements \JsonSerializable {
      * Setter of authenticatorType.
      *
      * @param string $authenticatorType
-     * @return self
+     * @return $this
      */
-    public function setAuthenticatorType(string $authenticatorType): self {
+    public function setAuthenticatorType(string $authenticatorType) {
         $this->authenticatorType = $authenticatorType;
 
         return $this;
@@ -109,9 +109,9 @@ class SSOData implements \JsonSerializable {
      * Setter of uniqueID.
      *
      * @param string $uniqueID
-     * @return self
+     * @return $this
      */
-    public function setUniqueID(string $uniqueID): self {
+    public function setUniqueID(string $uniqueID) {
         $this->uniqueID = $uniqueID;
 
         return $this;
@@ -137,9 +137,9 @@ class SSOData implements \JsonSerializable {
      *
      * @param $key
      * @param $value
-     * @return self
+     * @return $this
      */
-    public function setUserValue($key, $value): self {
+    public function setUserValue($key, $value) {
         if (in_array($key, self::$userFields)) {
             $this->user[$key] = $value;
         }
@@ -170,9 +170,9 @@ class SSOData implements \JsonSerializable {
      *
      * @param $key
      * @param $value
-     * @return self
+     * @return $this
      */
-    public function setExtraValue($key, $value): self {
+    public function setExtraValue($key, $value) {
         $this->extra[$key] = $value;
         return $this;
     }
@@ -213,9 +213,10 @@ class SSOData implements \JsonSerializable {
     /**
      * Create an SSOData object from an array of data.
      *
-     * @throws \ErrorException if the SSOData object is not valid.
      * @param array $array
+     *
      * @return SSOData
+     * @throws \Exception
      */
     public static function fromArray(array $array): SSOData {
         $ssoData = new SSOData(

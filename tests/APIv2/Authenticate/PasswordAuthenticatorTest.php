@@ -16,15 +16,45 @@ class PasswordAuthenticatorTest extends AbstractAPIv2Test {
     private $baseUrl = '/authenticate';
 
     /**
+     * Assert that there is not currently a user in the session.
+     *
+     * @throws \Garden\Container\ContainerException
+     * @throws \Garden\Container\NotFoundException
+     */
+    public function assertNoSession() {
+        /* @var \Gdn_Session $session */
+        $session = $this->container()->get(\Gdn_Session::class);
+        $this->assertEquals(0, $session->UserID);
+    }
+
+    /**
+     * Assert that a given user has a session.
+     *
+     * @param int|null $expected The expected user or **null** for the current user.
+     *
+     * @throws \Garden\Container\ContainerException
+     * @throws \Garden\Container\NotFoundException
+     */
+    public function assertSessionUserID(int $expected = null) {
+        if ($expected === null) {
+            $expected = $this->currentUser['userID'];
+        }
+
+        /* @var \Gdn_Session $session */
+        $session = $this->container()->get(\Gdn_Session::class);
+        $this->assertEquals($expected, $session->UserID);
+    }
+
+    /**
      * @inheritdoc
      */
     public function setUp() {
         parent::setUp();
 
-        $uniqueID = uniqid('ac_');
+        $uniqueID = self::randomUsername('pa');
         $userData = [
-            'name' => 'pa_'.$uniqueID,
-            'email' => 'pa_'.$uniqueID.'@example.com',
+            'name' => $uniqueID,
+            'email' => $uniqueID.'@example.com',
             'password' => 'pwd_'.$uniqueID,
         ];
 
@@ -33,11 +63,15 @@ class PasswordAuthenticatorTest extends AbstractAPIv2Test {
         $userFragment = $usersAPIController->post($userData)->getData();
         $this->currentUser = array_merge($userFragment, $userData);
 
+        /** @var \Gdn_Session $session */
         $session = $this->container()->get(\Gdn_Session::class);
         $session->end();
     }
 
-    public function testPostPasswordShortcut() {
+    /**
+     * A user should be able to sign in through /authenticate/password
+     */
+    public function testEndpointPasswordShortcut() {
         $this->assertNoSession();
 
         $this->api()->post("{$this->baseUrl}/password", [
@@ -47,38 +81,24 @@ class PasswordAuthenticatorTest extends AbstractAPIv2Test {
 
         $this->assertSessionUserID();
     }
-        /**
-     * A user should be able to sign in with their username and password.
-     */
-    public function testPostPasswordName() {
-        $this->assertNoSession();
-
-        $this->api()->post("{$this->baseUrl}", [
-            'authenticate' => [
-                'authenticatorType' => 'password',
-                'authenticatorID' => 'password',
-            ],
-            'username' => $this->currentUser['name'],
-            'password' => $this->currentUser['password']
-        ]);
-
-        $this->assertSessionUserID();
-    }
 
     /**
-     * A user should be able to sign in with their email and password.
+     * /authenticate/password should work even if the PasswordAuthenticator is inactive.
      */
-    public function testPostPasswordEmail() {
+    public function testEndpointPasswordShortcutAlwaysOn() {
         $this->assertNoSession();
 
-        $this->api()->post("{$this->baseUrl}", [
-            'authenticate' => [
-                'authenticatorType' => 'password',
-                'authenticatorID' => 'password',
-            ],
-            'username' => $this->currentUser['email'],
-            'password' => $this->currentUser['password']
-        ]);
+        /** @var \Gdn_Configuration $config */
+        $config = $this->container()->get(\Gdn_Configuration::class);
+        $config->set('Garden.SignIn.DisablePassword', true, true, false);
+        try {
+            $this->api()->post("{$this->baseUrl}/password", [
+                'username' => $this->currentUser['email'],
+                'password' => $this->currentUser['password']
+            ]);
+        } finally {
+            $config->set('Garden.SignIn.DisablePassword', false, true, false);
+        }
 
         $this->assertSessionUserID();
     }
@@ -89,7 +109,7 @@ class PasswordAuthenticatorTest extends AbstractAPIv2Test {
      * @expectedException \Exception
      * @expectedExceptionCode 404
      */
-    public function testPostPasswordNotFound() {
+    public function testInvalidEmail() {
         $this->api()->post("{$this->baseUrl}", [
             'authenticate' => [
                 'authenticatorType' => 'password',
@@ -106,7 +126,7 @@ class PasswordAuthenticatorTest extends AbstractAPIv2Test {
      * @expectedException \Exception
      * @expectedExceptionCode 401
      */
-    public function testPostPasswordIncorrect() {
+    public function testInvalidPassword() {
         $this->api()->post("{$this->baseUrl}", [
             'authenticate' => [
                 'authenticatorType' => 'password',
@@ -118,26 +138,85 @@ class PasswordAuthenticatorTest extends AbstractAPIv2Test {
     }
 
     /**
-     * Assert that there is not currently a user in the session.
+     * /authenticate with password/password should not work if the PasswordAuthenticator is inactive.
+     *
+     * @expectedException \Exception
+     * @expectedExceptionMessage Cannot authenticate with an inactive authenticator.
      */
-    public function assertNoSession() {
-        /* @var \Gdn_Session $session */
-        $session = $this->container()->get(\Gdn_Session::class);
-        $this->assertEquals(0, $session->UserID);
+    public function testPasswordAuthenticatorInactive() {
+        $this->assertNoSession();
+
+        /** @var \Gdn_Configuration $config */
+        $config = $this->container()->get(\Gdn_Configuration::class);
+        $config->set('Garden.SignIn.DisablePassword', true, true, false);
+        try {
+            $this->api()->post("{$this->baseUrl}", [
+                'authenticate' => [
+                    'authenticatorType' => 'password',
+                    'authenticatorID' => 'password',
+                ],
+                'username' => $this->currentUser['email'],
+                'password' => $this->currentUser['password']
+            ]);
+        } finally {
+            $config->set('Garden.SignIn.DisablePassword', false, true, false);
+        }
     }
 
     /**
-     * Assert that a given user has a session.
+     * A banned user should not be able to log in.
      *
-     * @param int|null $expected The expected user or **null** for the current user.
+     * @expectedException \Exception
+     * @expectedExceptionCode 401
      */
-    public function assertSessionUserID(int $expected = null) {
-        if ($expected === null) {
-            $expected = $this->currentUser['userID'];
-        }
+    public function testUserBanned() {
+        /** @var \UserModel $userModel */
+        $userModel = $this->container()->get(\UserModel::class);
+        $userModel->ban($this->currentUser['userID'], ['AddActivity' => false]);
 
-        /* @var \Gdn_Session $session */
-        $session = $this->container()->get(\Gdn_Session::class);
-        $this->assertEquals($expected, $session->UserID);
+        $this->api()->post("{$this->baseUrl}", [
+            'authenticate' => [
+                'authenticatorType' => 'password',
+                'authenticatorID' => 'password',
+            ],
+            'username' => $this->currentUser['email'],
+            'password' => $this->currentUser['password'],
+        ]);
+    }
+
+    /**
+     * A user should be able to sign in with their email and password.
+     */
+    public function testValidEmailPassword() {
+        $this->assertNoSession();
+
+        $this->api()->post("{$this->baseUrl}", [
+            'authenticate' => [
+                'authenticatorType' => 'password',
+                'authenticatorID' => 'password',
+            ],
+            'username' => $this->currentUser['email'],
+            'password' => $this->currentUser['password']
+        ]);
+
+        $this->assertSessionUserID();
+    }
+
+    /**
+     * A user should be able to sign in with their username and password.
+     */
+    public function testValidNamePassword() {
+        $this->assertNoSession();
+
+        $this->api()->post("{$this->baseUrl}", [
+            'authenticate' => [
+                'authenticatorType' => 'password',
+                'authenticatorID' => 'password',
+            ],
+            'username' => $this->currentUser['name'],
+            'password' => $this->currentUser['password']
+        ]);
+
+        $this->assertSessionUserID();
     }
 }

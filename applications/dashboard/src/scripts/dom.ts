@@ -7,6 +7,8 @@
 
 import * as utility from "@dashboard/utility";
 import twemoji from "twemoji";
+import tabbable from "tabbable";
+import { logError } from "@dashboard/utility";
 
 /**
  * Use the browser's built-in functionality to quickly and safely escape a string.
@@ -318,4 +320,69 @@ export function ensureScript(scriptUrl: string) {
             head.appendChild(script);
         }
     });
+}
+
+interface ITabbableOptions {
+    root: Element;
+    excludedRoots: Element[];
+    reverse: boolean;
+    fromElement: Element;
+}
+
+/**
+ * Get the next tabbable item within a given tabindex.
+ *
+ * WARNING: Performance can be poor if you pass many excluded roots and do not
+ * sufficiently narrow the tree your are looking in.
+ *
+ * @param options
+ * @property root - The root element to look in.
+ * @property excludedRoots - Elements to ignore. These element's children will be ignored as well.
+ * @property reverse - True to get the previous element instead.
+ * @property fromElement - The currently
+ */
+export function getNextTabbableElement(options?: Partial<ITabbableOptions>): Element | null {
+    const defaultTabbableOptions: ITabbableOptions = {
+        root: document.documentElement,
+        excludedRoots: [],
+        reverse: false,
+        fromElement: document.activeElement,
+    };
+
+    const finalOptions = {
+        ...defaultTabbableOptions,
+        ...options,
+    } as ITabbableOptions;
+
+    if (!(finalOptions.fromElement instanceof HTMLElement)) {
+        logError("Unable to tab to next element, `fromElement` given is not valid: ", finalOptions.fromElement);
+        return null;
+    }
+
+    const tabbables = tabbable(finalOptions.root).filter((element: Element) => {
+        for (const root of finalOptions.excludedRoots) {
+            if (root === element || root.contains(element)) {
+                return false;
+            }
+        }
+
+        return true;
+    });
+
+    const currentTabIndex = tabbables.indexOf(finalOptions.fromElement);
+
+    if (currentTabIndex < 0) {
+        return null;
+    }
+
+    let targetIndex = finalOptions.reverse ? currentTabIndex - 1 : currentTabIndex + 1;
+
+    // Loop over the beginning and ends
+    if (targetIndex < 0) {
+        targetIndex = tabbables.length - 1;
+    } else if (targetIndex >= tabbables.length) {
+        targetIndex = 0;
+    }
+
+    return tabbables[targetIndex];
 }

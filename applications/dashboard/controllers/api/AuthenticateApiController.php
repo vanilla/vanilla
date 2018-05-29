@@ -7,15 +7,16 @@
 
 use Garden\Schema\Schema;
 use Garden\Schema\ValidationField;
+use Garden\Web\Data;
 use Garden\Web\Exception\ClientException;
+use Garden\Web\Exception\HttpException;
 use Garden\Web\Exception\NotFoundException;
 use Garden\Web\Exception\ServerException;
 use Garden\Web\RequestInterface;
-use Vanilla\ApiUtils;
 use Vanilla\Authenticator\Authenticator;
 use Vanilla\Authenticator\SSOAuthenticator;
 use Vanilla\Exception\PermissionException;
-use Vanilla\Models\AuthenticatorModel;
+use Vanilla\Models\SSOData;
 use Vanilla\Models\SSOModel;
 
 /**
@@ -92,16 +93,14 @@ class AuthenticateApiController extends AbstractApiController {
      * Unlink a user from the specified authenticator.
      * If no user is specified it will unlink the current user.
      *
-     * @param string $authenticatorType
      * @param string $authenticatorID
      * @param array $query The query string as an array.
      * @throws Exception
      */
-    public function delete_authenticators($authenticatorType, $authenticatorID = '', array $query) {
+    public function delete_authenticators($authenticatorID = '', array $query) {
         $this->permission();
 
         $this->schema([
-            'authenticatorType:s' => 'The authenticator type that will be used.',
             'authenticatorID:s?' => 'Authenticator instance\'s identifier.',
         ]);
         $in = $this->schema([
@@ -119,7 +118,7 @@ class AuthenticateApiController extends AbstractApiController {
             $userID = $this->getSession()->UserID;
         }
 
-        $authenticatorInstance = $this->authenticatorApiController->getAuthenticatorModel()->getAuthenticator($authenticatorType, $authenticatorID);
+        $authenticatorInstance = $this->authenticatorApiController->getAuthenticatorByID($authenticatorID);
 
         $data = [];
         $this->userModel->getDelete(
@@ -130,11 +129,163 @@ class AuthenticateApiController extends AbstractApiController {
     }
 
     /**
+     * Delete an authentication session.
+     *
+     * @param string $authSessionID
+     *
+     * @throws \Garden\Web\Exception\NotFoundException
+     */
+    public function delete_linkUser(string $authSessionID) {
+        $this->schema([
+            'authSessionID:s' => 'Identifier of the authentication session.',
+        ], 'in')->setDescription('Delete an authentication session.');
+        $this->schema([], 'out');
+
+        $sessionData = $this->sessionModel->getID($authSessionID, DATASET_TYPE_ARRAY);
+        if (!$sessionData) {
+            throw new NotFoundException('AuthSessionID');
+        }
+
+        $this->sessionModel->deleteID($authSessionID);
+    }
+
+    /**
+     * Make sure that the session is started and throw a relevant error message if that's not the case.
+     *
+     * @throws \Garden\Web\Exception\HttpException
+     * @throws \Vanilla\Exception\PermissionException
+     */
+    private function ensureSessionIsValid() {
+        if (!$this->getSession()->isValid()) {
+            $this->permission(); // This will throw if there's a ban reason.
+
+            throw HttpException::createFromStatus(401, 'The session could not be started.');
+        }
+    }
+
+    /**
+     * Fill authenticator information into a response.
+     *
+     * @param array $response
+     * @param \Vanilla\Models\SSOData $ssoData
+     *
+     * @return array
+     * @throws \Garden\Schema\ValidationException
+     * @throws \Garden\Web\Exception\NotFoundException
+     */
+    private function fillAuthenticator(array $response, SSOData $ssoData) {
+        $response['authenticator'] = $this->authenticatorApiController->normalizeOutput(
+            $this->authenticatorApiController->getAuthenticator($ssoData->getAuthenticatorType(), $ssoData->getAuthenticatorID())
+        );
+
+        return $response;
+    }
+
+    /**
+     * Fill configuration information into a response.
+     *
+     * @param array $response
+     *
+     * @return array
+     */
+    private function fillConfig(array $response) {
+        $response['config'] = [
+            'nameUnique' => $this->config->get('Garden.Registration.NameUnique'),
+            'emailUnique' => $this->config->get('Garden.Registration.EmailUnique'),
+            'noEmail' => $this->config->get('Garden.Registration.NoEmail'),
+        ];
+
+        return $response;
+    }
+
+    /**
+     * Fill SSO User information into a response.
+     *
+     * @param $response
+     * @param \Vanilla\Models\SSOData $ssoData
+     *
+     * @return array
+     */
+    private function fillSSOUser(array $response, SSOData $ssoData) {
+        $response['ssoUser'] = array_filter([
+            'uniqueID' => $ssoData->getUniqueID(),
+            'name' => $ssoData->getUserValue('name'),
+            'email' => $ssoData->getUserValue('email'),
+            'photoUrl' => $ssoData->getUserValue('photoUrl'),
+            'fullName' => $ssoData->getExtraValue('fullName'),
+            'defaultName' => $ssoData->getExtraValue('defaultName'),
+        ]);
+
+        return $response;
+    }
+
+    /**
+     * Authenticator schema with whitelisted fields.
+     *
+     * @return Schema
+     */
+    public function getAuthenticatorPublicSchema() {
+        $schema = Schema::parse([
+            'authenticatorID' => null,
+            'type' => null,
+            'isUnique' => null,
+            'name' => null,
+            'ui' => null,
+            'isUserLinked:b?' => 'Whether or not the user is linked to that authenticator.',
+        ])
+            ->add(SSOAuthenticator::getAuthenticatorSchema())
+            ->merge(
+                Schema::parse([
+                    'sso?' => [
+                        'canSignIn' => null,
+                        'canAutoLinkUser' => null,
+                    ]
+                ])->add(SSOAuthenticator::getAuthenticatorSchema()->getField('properties.sso'))
+            )
+        ;
+
+        $schema->setField('properties.ui.properties.url.format', 'uri');
+        $schema->setField('properties.ui.properties.photoUrl.format', 'uri');
+
+        return $schema;
+    }
+
+    /**
+     * Get the linkUser output schema.
+     *
+     * @return Schema
+     */
+    public function getLinkUserOutputSchema() {
+        return Schema::parse([
+            'ssoUser' => [
+                'uniqueID:s' => 'Unique ID of the user supplied by the provider.',
+                'name:s?' => 'The name of the user supplied by the provider.',
+                'email:s?' => 'The name of the user supplied by the provider.',
+                'photoUrl:s?' => 'The photo url of the user supplied by the provider.',
+                'fullName:s?' => 'Field used to help identify the user.',
+                'defaultName:s?' => 'Field used to help identify the user.',
+            ],
+            'authenticator' => $this->getAuthenticatorPublicSchema(),
+            'config:o' => [
+                'nameUnique:b' => "Whether users' name are unique or not.",
+                'emailUnique:b' => "Whether users' email are unique or not.",
+                'noEmail:b' => "Whether users are allowed to not have an email or not.",
+            ],
+            'targetUrl:s?' => 'The sanitized URL to redirect to after a successful authentication.',
+        ]);
+    }
+
+    /**
      * Get an active authenticator.
      *
-     * @throws NotFoundException
      * @param string $authenticatorID
      * @return array
+     *
+     * @throws ClientException
+     * @throws NotFoundException
+     * @throws PermissionException
+     * @throws \Garden\Schema\ValidationException
+     * @throws \Garden\Web\Exception\HttpException
      */
     public function get_authenticators(string $authenticatorID) {
         $this->permission();
@@ -150,8 +301,11 @@ class AuthenticateApiController extends AbstractApiController {
         if (!$authenticator->isActive()) {
             throw new ClientException('Authenticator is not active.');
         }
-        if (is_a($authenticator, SSOAuthenticator::class) && !$authenticator->canSignIn()) {
-            throw new ClientException('Authenticator does not allow authentication.');
+        if (is_a($authenticator, SSOAuthenticator::class)) {
+            /** @var SSOAuthenticator $authenticator */
+            if (!$authenticator->canSignIn()) {
+                throw new ClientException('Authenticator does not allow authentication.');
+            }
         }
 
         $result = $this->authenticatorApiController->normalizeOutput($authenticator);
@@ -160,22 +314,33 @@ class AuthenticateApiController extends AbstractApiController {
     }
 
     /**
-     * Authenticator schema with whitelisted fields.
+     * Get information about an authentication session.
      *
-     * @return Schema
+     * @param string $authSessionID
+     *
+     * @return mixed
+     * @throws \Garden\Schema\ValidationException
+     * @throws \Garden\Web\Exception\ClientException
      */
-    public function getAuthenticatorPublicSchema() {
-        return Schema::parse([
-            'authenticatorID' => null,
-            'type' => null,
-            'isUnique' => null,
-            'name' => null,
-            'ui' => null,
-            'sso?' => Schema::parse([
-                'canAutoLinkUser' => null,
-            ])->add(SSOAuthenticator::getAuthenticatorSchema()->getField('properties.sso')),
-            'isUserLinked:b?' => 'Whether or not the user is linked to that authenticator.',
-        ])->add(SSOAuthenticator::getAuthenticatorSchema());
+    public function get_linkUser(string $authSessionID) {
+        $this->schema([
+            'authSessionID:s' => 'Identifier of the authentication session.',
+        ], 'in')->setDescription('Get information about an authentication session.');
+        $out = $this->schema($this->getLinkUserOutputSchema(), 'out');
+
+        $session = $this->sessionModel->getID($authSessionID, DATASET_TYPE_ARRAY);
+        if ($this->sessionModel->isExpired($session)) {
+            throw new NotFoundException('AuthenticationSession');
+        }
+        $sessionData = $session['Attributes'];
+
+        $ssoData = SSOData::fromArray($sessionData['ssoData']);
+
+        $response = $this->fillSSOUser([], $ssoData);
+        $response = $this->fillAuthenticator($response, $ssoData);
+        $response = $this->fillConfig($response);
+
+        return $out->validate($response);
     }
 
     /**
@@ -220,7 +385,7 @@ class AuthenticateApiController extends AbstractApiController {
                     return false;
                 }
 
-                if (isset($isUserLinked) && !$authenticator->isUserLinked($this->getSession()->UserID)) {
+                if (isset($isUserLinked) && !$ssoAuthenticator->isUserLinked($this->getSession()->UserID)) {
                     return false;
                 }
             }
@@ -258,6 +423,12 @@ class AuthenticateApiController extends AbstractApiController {
                 'default' => false,
                 'description' => 'Set the persist option on the cookie when it is set.',
             ],
+            'method:s' => [
+                'enum' => ['signIn', 'linkUser', 'session'],
+                'default' => 'signIn',
+                'description' => 'Authentication method.',
+            ],
+            'targetUrl:s?' => 'The raw URL to redirect to after a successful authentication.',
         ])->setDescription('Authenticate a user using a specific authenticator.');
         $out = $this->schema(Schema::parse([
             'authenticationStep:s' => [
@@ -266,6 +437,7 @@ class AuthenticateApiController extends AbstractApiController {
             ],
             'user?' => $this->getUserFragmentSchema(),
             'authSessionID:s?' => 'Identifier of the authentication session. Returned if more steps are required to complete the authentication.',
+            'targetUrl:s?' => 'The sanitized URL to redirect to after a successful authentication.',
         ]), 'out');
 
         $body = $in->validate($body);
@@ -273,12 +445,10 @@ class AuthenticateApiController extends AbstractApiController {
         $authenticatorType = $body['authenticate']['authenticatorType'];
         $authenticatorID = $body['authenticate']['authenticatorID'];
 
-        if ($this->getSession()->isValid()) {
-            throw new ClientException('Cannot authenticate while already logged in.', 403);
-        }
-
         $authenticatorInstance = $this->authenticatorApiController->getAuthenticator($authenticatorType, $authenticatorID);
 
+        $user = null;
+        $ssoData = null;
         $sso = is_a($authenticatorInstance, SSOAuthenticator::class);
         if ($sso) {
             /** @var SSOAuthenticator $authenticatorInstance */
@@ -288,29 +458,23 @@ class AuthenticateApiController extends AbstractApiController {
                 throw new ServerException("Unknown error while authenticating with $authenticatorType.", 500);
             }
 
-            $user = $this->ssoModel->sso($ssoData, [
-                'persist' => $body['persist'],
-            ]);
-
-            // Allows registration without an email address.
-            $noEmail = $this->config->get('Garden.Registration.NoEmail', false);
-
-            // Specifies whether Emails are unique or not.
-            $emailUnique = !$noEmail && $this->config->get('Garden.Registration.EmailUnique', true);
-
-            // Specifies whether Names are unique or not.
-            $nameUnique = $this->config->get('Garden.Registration.NameUnique', true);
-
-            // Allows SSO connections to link a VanillaUser to a ForeignUser.
-            $allowConnect = $this->config->get('Garden.Registration.AllowConnect', true);
-
-            $sessionData = [
-                'ssoData' => $ssoData,
-            ];
+            try {
+                 $user = $this->ssoModel->sso($ssoData, [
+                    'linkToSession' => $body['method'] === 'session',
+                    'setCookie' => $body['method'] !== 'linkUser',
+                    'persist' => $body['persist'],
+                ]);
+            } catch(ClientException $e) {
+                if ($e->getCode() === 401) {
+                    $this->ensureSessionIsValid(); // This will throw a more relevant error message.
+                    throw $e; // Fallback to the original error if the session is valid. Should not happen tho.
+                }
+            }
         } else {
             $user = $authenticatorInstance->validateAuthentication($this->request);
-
-            $this->getSession()->start($user['UserID'], true, $body['persist']);
+            if ($user) {
+                $this->startSession($user['UserID'], $body['persist']);
+            }
         }
 
         if ($user) {
@@ -321,24 +485,29 @@ class AuthenticateApiController extends AbstractApiController {
                 'authenticationStep' => 'authenticated',
                 'user' => $properlyExpanded['User'],
             ];
-        // We could not authenticate or autoconnect so they will need to do a manual connect.
+        // We could not authenticate or autoconnect them so they will need to do a manual connect.
         } else if ($sso) {
-            if ($allowConnect) {
-                $existingUserIDs = $this->ssoModel->findMatchingUserIDs($ssoData, $emailUnique, $nameUnique);
-                if (!empty($existingUserIDs)) {
-                    $sessionData['linkUser'] = [
-                        'existingUsers' => $existingUserIDs,
-                    ];
-                }
-            }
+            $sessionData = [
+                'ssoData' => $ssoData,
+                'persist' => $body['persist'],
+                'method' => $body['method'],
+                'targetUrl' => $body['targetUrl'] ?? null,
+            ];
+
+            // Store all the information needed for the next authentication step.
+            $sessionData = $this->createSession($sessionData);
+
             $response = [
                 'authenticationStep' => 'linkUser',
+                'authSessionID' => $sessionData,
             ];
+        } else {
+            throw new ServerException('Authentication failed.');
         }
 
-        if ($response['authenticationStep'] === 'linkUser') {
-            // Store all the information needed for the next authentication step.
-            $response['authSessionID'] = $this->createSession($sessionData);
+        // Make sure the target has been sanitized.
+        if (isset($body['targetUrl'])) {
+            $response['targetUrl'] = safeURL($body['targetUrl']);
         }
 
         return $out->validate($response);
@@ -351,95 +520,181 @@ class AuthenticateApiController extends AbstractApiController {
      * @throws Exception
      *
      * @param array $body
-     * @return array
+     * @return Data
      */
     public function post_linkUser(array $body) {
         $this->permission();
 
-        if (!$this->config->get('Garden.Registration.AllowConnect', true)) {
-            throw new PermissionException('Garden.Registration.AllowConnect');
-        }
-
         // Custom validator
-        $validator = function ($data, ValidationField $field) {
-            $hasPassword = !empty($data['password']);
-
-            if ($hasPassword) {
-                $valid = !empty($data['userID']);
-            }
-            if (!$valid && $hasPassword) {
-                $valid = !empty($data['name']) && !empty($data['email']);
+        $validator = function($data, ValidationField $field) {
+            if ($field->getValidation()->getErrors()) {
+                return true;
             }
 
-            if (!$valid) {
-                $field->addError('missingField', [
-                    'messageCode' => 'You must specify either userID + password or name + email + password.',
-                    'required' => true,
-                ]);
+            if ($data['method'] === 'register') {
+                $agreeToTerms = $data['agreeToTerms'];
+
+                if (!$agreeToTerms) {
+                    $field->getValidation()->addError(
+                        'agreeToTerms',
+                        'You must agree to the terms of service.',
+                        ['status' => 400]
+                    );
+                }
+            } else if ($data['method'] === 'password') {
+                $hasUsername = (bool)($data['username'] ?? false);
+                $hasUserID = (bool)($data['userID'] ?? false);
+                $hasPassword = (bool)($data['password'] ?? false);
+
+                if (!$hasUsername && !$hasUserID) {
+                    $field->getValidation()->addError(
+                        'username',
+                        'Username/email is required.',
+                        ['status' => 400]
+                    );
+                }
+                if (!$hasPassword) {
+                    $field->getValidation()->addError(
+                        'password',
+                        'Password is required.',
+                        ['status' => 400]
+                    );
+                }
+            } else if ($data['method'] === 'session') {
+                if (!$this->getSession()->isValid()) {
+                    $field->getValidation()->addError(
+                        '',
+                        'Cannot use method "session" while not signed in.',
+                        ['status' => 422]
+                    );
+                }
+            } else {
+                throw new Exception('Undefined method.');
             }
 
-            return $valid;
+            return count($field->getValidation()->getErrors()) === 0;
         };
 
-        $in = $this->schema([
+        $in = $this
+            ->schema([
                 'authSessionID:s' => 'Identifier of the authentication session.',
-                'password:s' => 'Password of the user.',
-                'userID:i?' => 'Identifier of the user.',
-                'name:s?' => 'User name.',
-                'email:s?' => 'User email.',
+                'method:s' => [
+                    'enum' => ['register', 'password', 'session'],
+                    'description' => 'Link method.',
+                ],
+                'useAuthSession:b' => [
+                    'default' => true,
+                    'description' => 'Use the user information from the authSessionID. ie. email, name...',
+                ],
+                'name:s?' => 'Name of the new user. Override info from useAuthSession is provided. Method: register.',
+                'email:s?' => 'Email of the new user. Override info from useAuthSession is provided. Method: register.',
+                'agreeToTerms:b?' => 'Agree to terms of service. Method: register.',
+                'userID:i?' => 'Identifier of the user to link to. Method: password.',
+                'username:s?' => 'The user\'s name or email to link to. Method: password.',
+                'password:s?' => 'Password of the user to link to. Method: password.',
+                'persist:b' => [
+                    'default' => false,
+                    'description' => 'Whether the session should persist past the browser closing.',
+                ],
+                'targetUrl:s?' => 'The sanitized URL to redirect to after a successful authentication.',
             ], 'in')
             ->addValidator('', $validator)
-            ->setDescription('Link a user to an authenticator using the authSessionID and some other information. Required: userID + password or name + email + password.');
-        $out = $this->schema($this->getUserFragmentSchema(), 'out');
+            ->setDescription('Link a user to an authenticator using the authSessionID and some other information. Required: userID + password or name + email + password.')
+        ;
+        $out = $this->schema(
+            Schema::parse([
+                'user?' => $this->getUserFragmentSchema(),
+                'message:s?' => 'Global error message.',
+                'errors:a?' => 'List of errors.',
+                'ssoUser?' => null,
+                'authenticator?' => null,
+                'config?' => null,
+                'targetUrl?' => null,
+            ])->merge($this->getLinkUserOutputSchema()),
+            'out'
+        );
 
-        $in->validate($body);
-
-        $sessionData = $this->sessionModel->getID($body['authSessionID'], DATASET_TYPE_ARRAY);
-        if ($this->sessionModel->isExpired($sessionData)) {
-            throw new Exception('The session has expired.');
+        $response = [];
+        $statusCode = 201;
+        try {
+            $body = $in->validate($body);
+        } catch (\Garden\Schema\ValidationException $e) {
+            $statusCode = $e->getValidation()->getStatus();
+            $response['errors'] = $e->getValidation()->getErrors();
+            $response['message'] = $e->getMessage();
         }
 
-        if (!empty($body['userID'])) {
-            $userID = $body['userID'];
-        } else {
-            $this->userModel->SQL->select('UserID');
-            $userResults = $this->userModel->getWhere([
-                'Name' => $body['name'],
-                'Email' => $body['email'],
-            ])->resultArray();
+        if (($body['userID'] ?? false) && ($body['username'] ?? false)) {
+            throw new ClientException('Only one of userID or username should be specified, not both.', 400);
+        }
 
-            if (count($userResults) > 1) {
-                throw new ClientException('More than one user has the same Email and Name combination.');
-            } else if (count($userResults) === 0) {
-                throw new ClientException('No user was found with the supplied information.');
+        $session = $this->sessionModel->getID($body['authSessionID'], DATASET_TYPE_ARRAY);
+        if ($this->sessionModel->isExpired($session)) {
+            throw new ClientException('Your SSO session has expired.', 401);
+        }
+        $sessionData = $session['Attributes'];
+
+        $ssoData = SSOData::fromArray($sessionData['ssoData']);
+
+        if (!isset($response['errors'])) {
+            switch ($body['method']) {
+                case 'register':
+                    $options = [
+                        'useSSOData' => $body['useAuthSession'],
+                    ];
+                    if (isset($body['name'])) {
+                        $options['name'] = $body['name'];
+                    }
+                    if (isset($body['email'])) {
+                        $options['email'] = $body['email'];
+                    }
+                    $user = $this->ssoModel->createUser($ssoData, $options);
+                    break;
+                case 'password':
+                    $userIdentifierType = null;
+                    $userIdentifier = null;
+                    if ($body['userID'] ?? false) {
+                        $userIdentifierType = 'userID';
+                        $userIdentifier = $body['userID'];
+                    } else if ($body['username'] ?? false) {
+                        $userIdentifier = $body['username'];
+                        if (filter_var($userIdentifier, FILTER_VALIDATE_EMAIL)) {
+                            $userIdentifierType = 'email';
+                        } else {
+                            $userIdentifierType = 'name';
+                        }
+                    }
+
+                    $user = $this->ssoModel->linkUserFromCredentials($ssoData, $userIdentifierType, $userIdentifier, $body['password']);
+                    break;
+                case 'session':
+                    $user = $this->ssoModel->linkUserFromSession($ssoData);
+                    break;
+                default:
+                    throw new Exception('Undefined method.');
+                    break;
             }
+            $this->userModel->expandUsers($user, ['UserID']);
+            $response['user'] = $user['User'];
 
-            $userID = $userResults[0]['UserID'];
+            if ($body['method'] !== 'session') {
+                $this->startSession($user['UserID'], $body['persist']);
+            }
+        } else {
+            $response = $this->fillSSOUser($response, $ssoData);
+            $response = $this->fillAuthenticator($response, $ssoData);
+            $response = $this->fillConfig($response);
         }
 
-        $tmp = ['UserID' => $userID];
-        $this->userModel->expandUsers($tmp, ['UserID']);
-        $user = $tmp['User'];
+        $result = $out->validate($response);
 
-        $passwordHash = new Gdn_PasswordHash();
-        $linkValid = $passwordHash->checkPassword($body['password'], $user['Password'], $user['HashMethod']);
-        if (!$linkValid) {
-            throw new ClientException('The password verification failed.');
-        }
-
-        $this->userModel->saveAuthentication([
-            'UserID' => $user['UserID'],
-            'Provider' => $sessionData['Attributes']['ssoData']['authenticatorID'],
-            'UniqueID' => $sessionData['Attributes']['ssoData']['uniqueID'],
-        ]);
-        // Clean the session.
-        $this->sessionModel->deleteID($sessionData['SessionID']);
-
-        return $out->validate($user);
+        return new Data($result, ['status' => $statusCode]);
     }
 
     /**
      * Authenticate a user with username/email and password.
+     *
+     * This endpoint always work even if the password authenticator is "inactive".
      *
      * @param array $body The username/password to sign in.
      * @return array Returns the signed in user.
@@ -460,6 +715,10 @@ class AuthenticateApiController extends AbstractApiController {
 
         $body = $in->validate($body);
 
+        // Make sure that the PasswordAuthenticator is "active" for this call.
+        $oldConfig = $this->config->get('Garden.SignIn.DisablePassword', false);
+        $this->config->set('Garden.SignIn.DisablePassword', false, true, false);
+
         $result = $this->post([
             'authenticate' => [
                 'authenticatorType' => 'password',
@@ -468,36 +727,23 @@ class AuthenticateApiController extends AbstractApiController {
             'persist' => $body['persist'] ?? false,
         ]);
 
+        $this->config->set('Garden.SignIn.DisablePassword', $oldConfig, true, false);
+
         return $out->validate($result['user']);
     }
 
     /**
-     * Get the SSOData schema.
+     * Start a session an throw an error if there's a problem.
      *
-     * @return Schema
+     * @param $userID
+     * @param $persist
+     *
+     * @throws \Garden\Web\Exception\HttpException
      */
-    public function ssoDataSchema() {
-        static $ssoDataSchema;
+    private function startSession($userID, $persist) {
+        $this->getSession()->start($userID, true, $persist);
+        $this->userModel->fireEvent('AfterSignIn');
 
-        if ($ssoDataSchema === null) {
-            $ssoDataSchema = $this->schema([
-                'authenticatorType:s' => 'Name of the authenticator that was used to create this object.',
-                'authenticatorID:s' => 'ID of the authenticator instance that was used to create this object.',
-                'uniqueID:s' => 'Unique ID of the user supplied by the provider.',
-                'user:o' => [
-                    'email:s?' => 'Email of the user.',
-                    'name:s?' => 'Name of the user.',
-                    'photo:s?' => 'Photo of the user.',
-                    'roles:a?' => [
-                        'description' => 'One or more role name.',
-                        'items' => ['type' => 'string'],
-                        'style' => 'form',
-                    ],
-                ],
-                'extra:o' => 'Any other information.',
-            ], 'SSOData')->setDescription('SSOAuthenticator\'s supplied information.');
-        }
-
-        return $ssoDataSchema;
+        $this->ensureSessionIsValid();
     }
 }

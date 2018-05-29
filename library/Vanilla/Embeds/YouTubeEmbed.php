@@ -46,10 +46,14 @@ class YouTubeEmbed extends VideoEmbed {
         $start = null;
         if (preg_match('/t=(?P<start>\d+)/', $fragment, $timeParts)) {
             $start = $timeParts['start'];
-        } elseif (array_key_exists('t', $query) && preg_match('/((?P<minutes>\d*)m)?((?P<seconds>\d*)s)?/', $query['t'], $timeParts)) {
-            $minutes = $timeParts['minutes'] ? (int)$timeParts['minutes'] : 0;
-            $seconds = $timeParts['seconds'] ? (int)$timeParts['seconds'] : 0;
-            $start = ($minutes * 60) + $seconds;
+        } elseif (array_key_exists('t', $query) && preg_match('/^(?:(?P<ticks>\d+)|(?:(?P<minutes>\d*)m)?(?:(?P<seconds>\d*)s)?)$/', $query['t'], $timeParts)) {
+            if (array_key_exists('ticks', $timeParts) && $timeParts['ticks'] !== '') {
+                $start = $timeParts['ticks'];
+            } else {
+                $minutes = $timeParts['minutes'] ? (int)$timeParts['minutes'] : 0;
+                $seconds = $timeParts['seconds'] ? (int)$timeParts['seconds'] : 0;
+                $start = ($minutes * 60) + $seconds;
+            }
         }
 
         if ($this->isNetworkEnabled()) {

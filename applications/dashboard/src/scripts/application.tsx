@@ -11,7 +11,6 @@ import { RouteProps } from "react-router-dom";
 import gdn from "@dashboard/gdn";
 import { PromiseOrNormalCallback, logError } from "@dashboard/utility";
 import isUrl from "validator/lib/isURL";
-import Router from "./components/Router";
 
 /**
  * Get a piece of metadata passed from the server.
@@ -179,10 +178,6 @@ export function getComponent(name: string): ComponentClass | undefined {
  * @param parent - The parent element to search. This element is not included in the search.
  */
 export function _mountComponents(parent: Element) {
-    if (!componentExists("Router")) {
-        addComponent("Router", Router);
-    }
-
     const nodes = parent.querySelectorAll("[data-react]").forEach(node => {
         const name = node.getAttribute("data-react") || "";
         const Component = getComponent(name);

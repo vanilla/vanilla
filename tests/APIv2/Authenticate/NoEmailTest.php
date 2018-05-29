@@ -52,9 +52,9 @@ class NoEmailTest extends AbstractAPIv2Test {
         parent::setUp();
 
 
-        $uniqueID = uniqid('ne_');
+        $uniqueID = self::randomUsername('ne');
         $this->currentUser = [
-            'name' => 'Authenticate_'.$uniqueID,
+            'name' => $uniqueID,
         ];
 
         $this->authenticator = new MockSSOAuthenticator($uniqueID, $this->currentUser);

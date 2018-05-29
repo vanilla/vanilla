@@ -4,10 +4,13 @@
  * @license GPLv2
  */
 
-import { resolvePromisesSequentially, matchAtMention, hashString, isInstanceOfOneOf } from "../utility";
+import { resolvePromisesSequentially, matchAtMention, hashString, isInstanceOfOneOf } from "./utility";
+import chai, { expect } from "chai";
+import asPromised from "chai-as-promised";
+chai.use(asPromised);
 
 describe("resolvePromisesSequentially()", () => {
-    it("resolves promises in order", () => {
+    it("resolves promises in order", async () => {
         const order: number[] = [];
 
         const func1 = () => {
@@ -28,11 +31,8 @@ describe("resolvePromisesSequentially()", () => {
         const functions = [func1, func2, func3];
         const expectation = [1, 2, 3];
 
-        expect.assertions(1);
-
-        return resolvePromisesSequentially(functions).then(() => {
-            expect(order).toEqual(expectation);
-        });
+        await resolvePromisesSequentially(functions);
+        expect(order).to.deep.equal(expectation);
     });
 
     it("returns all of the results in order", () => {
@@ -49,9 +49,7 @@ describe("resolvePromisesSequentially()", () => {
         const functions = [func1, func2, func3];
         const expectation = [1, 2, 3];
 
-        expect.assertions(1);
-
-        return expect(resolvePromisesSequentially(functions)).resolves.toEqual(expectation);
+        return expect(resolvePromisesSequentially(functions)).to.eventually.deep.equal(expectation);
     });
 
     it("passes the value of one promise to the next", () => {
@@ -59,27 +57,27 @@ describe("resolvePromisesSequentially()", () => {
         const functions = [func, func, func];
         const expectation = [0, 1, 2];
 
-        return expect(resolvePromisesSequentially(functions)).resolves.toEqual(expectation);
+        return expect(resolvePromisesSequentially(functions)).to.eventually.deep.equal(expectation);
     });
 });
 
 describe("hashString", () => {
-    test("the same string always results in the same value", () => {
+    it("the same string always results in the same value", () => {
         const str =
             "a; lksdjfl;aska;lskd fjaskl;dfj al;skdjfalsjkdfa;lksdjfl;kasdjflksaf;kbfjal;skdfbjanv;slkdfjbals;dkjfslkadfj;alsdjf;oiawjef;oiawbejvf;ioawbevf;aoiwebfjaov;wifebvl";
-        expect(hashString(str)).toBe(hashString(str));
+        expect(hashString(str)).eq(hashString(str));
     });
 
-    test("different strings hash to different values", () => {
+    it("different strings hash to different values", () => {
         const str1 = "a;slkdfjl;askdjfkl;asdjfkl;asjdfl;";
         const str2 =
             "a;sldkfjal;skdfjl;kasjdfl;k;laksjdf;laksjdf;laksjdf;lkajsd;lkfjaskl;dfjals;kdfjnal;skdjbfl;kasbdjfv;laskjbdfal;skdjfalv;skdjfalskdbjnfav;bslkdfjnalv;ksdfjbalskdfbjalvsk.dfjbalsv;kdbfjalsv;kdfjbadklsfjals";
 
-        expect(hashString(str1)).not.toBe(hashString(str2));
+        expect(hashString(str1)).not.eq(hashString(str2));
     });
 });
 
-test("isInstanceOfOneOf", () => {
+it("isInstanceOfOneOf", () => {
     /* tslint:disable:max-classes-per-file */
     class Thing1 {}
     class Thing2 {}
@@ -90,19 +88,19 @@ test("isInstanceOfOneOf", () => {
 
     const thing2 = new Thing4();
 
-    expect(isInstanceOfOneOf(thing2, classes)).toBe(true);
-    expect(isInstanceOfOneOf(5, classes)).not.toBe(true);
+    expect(isInstanceOfOneOf(thing2, classes)).eq(true);
+    expect(isInstanceOfOneOf(5, classes)).not.eq(true);
 });
 
 function testSubjectsAndMatches(subjectsAndMatches: object) {
     Object.entries(subjectsAndMatches).map(([subject, match]) => {
-        test(subject, () => {
+        it(subject, () => {
             const result = matchAtMention(subject, true);
 
             if (result === null) {
-                expect(result).toBe(match);
+                expect(result).eq(match);
             } else {
-                expect(result.match).toBe(match);
+                expect(result.match).eq(match);
             }
         });
     });

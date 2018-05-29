@@ -2078,6 +2078,7 @@ class UserModel extends Gdn_Model {
      * - HashPassword - Hash the provided password on update. Default true.
      * - FixUnique - Try to resolve conflicts with unique constraints on Name and Email. Default false.
      * - ValidateEmail - Make sure the provided email addresses is formatted properly. Default true.
+     * - ValidateName - Make sure the provided name is valid. Blacklisted names will always be blocked.
      * - NoConfirmEmail - Disable email confirmation. Default false.
      *
      */
@@ -2173,6 +2174,9 @@ class UserModel extends Gdn_Model {
         if (array_key_exists('Email', $formPostValues) && val('ValidateEmail', $settings, true)) {
             $this->Validation->applyRule('Email', 'Email');
         }
+        if (val('ValidateName', $settings, true)) {
+            $this->Validation->applyRule('Name', 'Username');
+        }
 
         if ($this->validate($formPostValues, $insert) && $uniqueValid) {
             // All fields on the form that need to be validated (including non-schema field rules defined above)
@@ -2196,17 +2200,19 @@ class UserModel extends Gdn_Model {
 
             // Check for email confirmation.
             if (self::requireConfirmEmail() && !val('NoConfirmEmail', $settings)) {
+                $emailIsSet = isset($fields['Email']);
+                $emailIsNotConfirmed = array_key_exists('Confirmed', $fields) && $fields['Confirmed'] == 0;
+                $validSession = Gdn::session()->isValid();
+
+                $currentUserEmailIsBeingChanged =
+                    $validSession
+                    && $userID == Gdn::session()->UserID
+                    && $fields['Email'] != Gdn::session()->User->Email
+                    && !Gdn::session()->checkPermission('Garden.Users.Edit')
+                ;
+
                 // Email address has changed
-                if (isset($fields['Email']) && (
-                        array_key_exists('Confirmed', $fields) &&
-                        $fields['Confirmed'] == 0 ||
-                        (
-                            $userID == Gdn::session()->UserID &&
-                            $fields['Email'] != Gdn::session()->User->Email &&
-                            !Gdn::session()->checkPermission('Garden.Users.Edit')
-                        )
-                    )
-                ) {
+                if ($emailIsSet && ($emailIsNotConfirmed || $currentUserEmailIsBeingChanged)) {
                     $attributes = val('Attributes', Gdn::session()->User);
                     if (is_string($attributes)) {
                         $attributes = dbdecode($attributes);
@@ -2331,9 +2337,12 @@ class UserModel extends Gdn_Model {
                     // Define the other required fields:
                     $fields['Email'] = $email;
 
+                    // Make sure that the user is assigned to at least the default role(s).
+                    if (!is_array($roleIDs)) {
+                        $roleIDs = RoleModel::getDefaultRoles(RoleModel::TYPE_MEMBER);
+                    }
                     $fields['Roles'] = $roleIDs;
-                    // Make sure that the user is assigned to one or more roles:
-                    $saveRoles = false;
+                    $saveRoles = false; // insertInternal will take care of updating the roles.
 
                     // And insert the new user.
                     $userID = $this->insertInternal($fields, $settings);
@@ -2360,6 +2369,7 @@ class UserModel extends Gdn_Model {
                             'HeadlineFormat' => t('HeadlineFormat.AddUser', '{ActivityUserID,user} added an account for {RegardingUserID,user}.')]);
                     }
                 }
+
                 // Now update the role settings if necessary.
                 if ($saveRoles) {
                     // If no RoleIDs were provided, use the system defaults
@@ -2811,6 +2821,7 @@ class UserModel extends Gdn_Model {
      *
      * @param array $formPostValues
      * @param array $options
+     *  - ValidateName - Make sure the provided name is valid. Blacklisted names will always be blocked.
      * @return int UserID.
      */
     public function insertForInvite($formPostValues, $options = []) {
@@ -2866,6 +2877,10 @@ class UserModel extends Gdn_Model {
 
         $inviteUserID = $invitation->InsertUserID;
         $formPostValues['Email'] = $invitation->Email;
+
+        if (val('ValidateName', $options, true)) {
+            $this->Validation->applyRule('Name', 'Username');
+        }
 
         if ($this->validate($formPostValues, true)) {
             // Check for spam.
@@ -2946,6 +2961,7 @@ class UserModel extends Gdn_Model {
      * @param array $options
      *  - ValidateSpam
      *  - CheckCaptcha
+     *  - ValidateName - Make sure the provided name is valid. Blacklisted names will always be blocked.
      * @return int UserID.
      */
     public function insertForApproval($formPostValues, $options = []) {
@@ -2970,6 +2986,10 @@ class UserModel extends Gdn_Model {
         }
 
         $this->addInsertFields($formPostValues);
+
+        if (val('ValidateName', $options, true)) {
+            $this->Validation->applyRule('Name', 'Username');
+        }
 
         if ($this->validate($formPostValues, true)) {
 
@@ -3019,6 +3039,7 @@ class UserModel extends Gdn_Model {
      * @param array $formPostValues
      * @param bool $checkCaptcha
      * @param array $options
+     *  - ValidateName - Make sure the provided name is valid. Blacklisted names will always be blocked.
      * @return bool|int|string
      * @throws Exception
      */
@@ -3038,8 +3059,13 @@ class UserModel extends Gdn_Model {
         $this->defineSchema();
 
         // Add & apply any extra validation rules.
+        $this->Validation->addRule('UsernameBlacklist', 'function:validateAgainstUsernameBlacklist');
+        $this->Validation->applyRule('Name', 'UsernameBlacklist');
         if (val('ValidateEmail', $options, true)) {
             $this->Validation->applyRule('Email', 'Email');
+        }
+        if (val('ValidateName', $options, true)) {
+            $this->Validation->applyRule('Name', 'Username');
         }
 
         // TODO: DO I NEED THIS?!

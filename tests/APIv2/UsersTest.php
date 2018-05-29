@@ -70,7 +70,7 @@ class UsersTest extends AbstractResourceTest {
     private function registrationFields(array $extra = []) {
         static $inc = 0;
 
-        $name = 'vanilla-'.$inc++;
+        $name = 'vanilla_'.$inc++;
         $fields = [
             'email' => "{$name}@example.com",
             'name' => $name,
@@ -87,6 +87,9 @@ class UsersTest extends AbstractResourceTest {
      */
     protected function modifyRow(array $row) {
         $row = parent::modifyRow($row);
+        if (array_key_exists('name', $row)) {
+            $row['name'] = substr(md5($row['name']), 0, 20);
+        }
         foreach ($this->patchFields as $key) {
             $value = $row[$key];
             switch ($key) {
@@ -127,6 +130,42 @@ class UsersTest extends AbstractResourceTest {
 
         $user = $this->api()->get("{$this->baseUrl}/{$userID}")->getBody();
         $this->assertStringEndsWith('/applications/dashboard/design/images/defaulticon.png', $user['photoUrl']);
+    }
+
+    /**
+     * Test confirm email is successful.
+     */
+    public function testConfirmEmailSucceed() {
+        /** @var \UserModel $userModel */
+        $userModel = self::container()->get('UserModel');
+
+        $emailKey = ['confirmationCode' =>'test123'];
+
+        $user = $this->testPost();
+        $userModel->saveAttribute($user['userID'], 'EmailKey', $emailKey['confirmationCode']);
+
+        $response = $this->api()->post("{$this->baseUrl}/{$user['userID']}/confirm-email", $emailKey);
+
+        $user = $userModel->getID($user['userID']);
+        $this->assertEquals(1, $user->Confirmed);
+    }
+
+    /**
+     * Test confirm email fails.
+     *
+     * @expectedException \Exception
+     * @expectedExceptionMessage We couldn't confirm your email.
+     * Check the link in the email we sent you or try sending another confirmation email.
+     */
+    public function testConfirmEmailFail() {
+        /** @var \UserModel $userModel */
+        $userModel = self::container()->get('UserModel');
+
+        $emailKey = ['confirmationCode' =>'test123'];;
+        $user = $this->testPost();
+        $userModel->saveAttribute($user['userID'], 'EmailKey', '123Test');
+
+        $this->api()->post("{$this->baseUrl}/{$user['userID']}/confirm-email", $emailKey);
     }
 
     /**

@@ -7,6 +7,7 @@
 
 namespace VanillaTests\APIv2\Authenticate;
 
+use PHPUnit\Runner\Exception;
 use VanillaTests\APIv2\AbstractAPIv2Test;
 use VanillaTests\Fixtures\MockSSOAuthenticator;
 
@@ -15,17 +16,18 @@ use VanillaTests\Fixtures\MockSSOAuthenticator;
  */
 class LinkUserTest extends AbstractAPIv2Test {
 
-    private $baseUrl = '/authenticate';
+    private $baseUrl = '/authenticate/link-user';
 
     /**
      * @var MockSSOAuthenticator
      */
     private $authenticator;
 
-    /**
-     * @var array
-     */
+    /** @var array */
     private $currentUser;
+
+    /** @var string */
+    private $userPassword = 'trustno1';
 
     /**
      * {@inheritdoc}
@@ -43,11 +45,11 @@ class LinkUserTest extends AbstractAPIv2Test {
     public function setUp() {
         parent::setUp();
 
-        $uniqueID = uniqid('lu_');
+        $uniqueID = self::randomUsername('lu');
         $userData = [
-            'name' => 'Authenticate_'.$uniqueID,
-            'email' => 'authenticate_'.$uniqueID.'@example.com',
-            'password' => 'pwd_'.$uniqueID,
+            'name' => $uniqueID,
+            'email' => $uniqueID.'@example.com',
+            'password' => $this->userPassword,
         ];
 
         /** @var \UsersApiController $usersAPIController */
@@ -56,6 +58,7 @@ class LinkUserTest extends AbstractAPIv2Test {
         $this->currentUser = array_merge($userFragment, $userData);
 
         $this->authenticator = new MockSSOAuthenticator($uniqueID, $userData);
+        $this->authenticator->setTrusted(false);
 
         $this->container()->setInstance('MockSSOAuthenticator', $this->authenticator);
 
@@ -65,135 +68,149 @@ class LinkUserTest extends AbstractAPIv2Test {
         $this->assertNoSession();
     }
 
-    public function tearDown() {
-        parent::tearDown();
+    /**
+     * Test GET /authenticate/link-user/:authSessionID
+     */
+    public function testGetLinkUser() {
+        $authSessionID = $this->createAuthSessionID();
+
+        $result = $this->api()->get($this->baseUrl.'/'.$authSessionID);
+
+        $this->assertEquals(200, $result->getStatusCode());
+
+        $body = $result->getBody();
+
+        $this->assertInternalType('array', $body);
+        $this->assertArrayHasKey('ssoUser', $body);
+        $this->assertArrayHasKey('authenticator', $body);
+        $this->assertArrayHasKey('config', $body);
+
+        return $authSessionID;
     }
 
     /**
-     * Test POST /authenticate/link-user by sending userid + password.
-     *
-     * @return int userID
+     * Test POST /authenticate/link-user ith method = password, using userID.
      */
-    public function testLinkUserWithUserID() {
+    public function testPostLinkUserMethodPasswordWUserID() {
         $authSessionID = $this->createAuthSessionID();
 
-        $postData = [
+        $result = $this->api()->post($this->baseUrl, [
             'authSessionID' => $authSessionID,
+            'method' => 'password',
             'userID' => $this->currentUser['userID'],
-            'password' => $this->currentUser['password'],
-        ];
-
-        $result = $this->api()->post(
-            $this->baseUrl.'/link-user',
-            $postData
-        );
-
-        $this->assertEquals(201, $result->getStatusCode());
-
-        $body = $result->getBody();
-
-        $this->assertInternalType('array', $body);
-        $this->assertArrayHasKey('userID', $body);
-        $this->assertEquals($this->currentUser['userID'], $body['userID']);
-
-        return $body['userID'];
-    }
-
-    /**
-     * Test POST /authenticate/link-user by sending name + email + password.
-     */
-    public function testLinkUserWithNameEmail() {
-        $authSessionID = $this->createAuthSessionID();
-
-        $postData = [
-            'authSessionID' => $authSessionID,
-            'name' => $this->currentUser['name'],
-            'email' => $this->currentUser['email'],
-            'password' => $this->currentUser['password'],
-        ];
-
-        $result = $this->api()->post(
-            $this->baseUrl.'/link-user',
-            $postData
-        );
-
-        $this->assertEquals(201, $result->getStatusCode());
-
-        $body = $result->getBody();
-
-        $this->assertInternalType('array', $body);
-        $this->assertArrayHasKey('userID', $body);
-        $this->assertEquals($this->currentUser['userID'], $body['userID']);
-    }
-
-    /**
-     * Test POST /authenticate/link-user with a wrong password.
-     *
-     * @expectedException \Exception
-     * @expectedExceptionMessage The password verification failed.
-     */
-    public function testLinkUserWrongPassword() {
-        $authSessionID = $this->createAuthSessionID();
-
-        $postData = [
-            'authSessionID' => $authSessionID,
-            'userID' => $this->currentUser['userID'],
-            'password' => uniqid(),
-        ];
-
-        $result = $this->api()->post(
-            $this->baseUrl.'/link-user',
-            $postData
-        );
-
-        $this->assertEquals(201, $result->getStatusCode());
-
-        $body = $result->getBody();
-
-        $this->assertInternalType('array', $body);
-        $this->assertArrayHasKey('userID', $body);
-        $this->assertEquals($this->currentUser['userID'], $body['userID']);
-    }
-
-    /**
-     * Test DELETE /authenticate/authenticators/:id
-     */
-    public function testUnlinkUser() {
-        $userID = $this->testLinkUserWithUserID();
-
-        // Authenticate
-        $this->api()->post($this->baseUrl, [
-            'authenticate' => [
-                'authenticatorType' => $this->authenticator::getType(),
-                'authenticatorID' => $this->authenticator->getID(),
-            ],
+            'password' => $this->userPassword,
         ]);
 
-        $this->assertSessionUserID($userID);
+        $this->assertLinkSuccess($result);
+    }
 
-        // Check if the user is linked.
-        $result = $this->api()->get($this->baseUrl.'/authenticators/'.$this->authenticator->getID());
-        $this->assertEquals(200, $result->getStatusCode());
-        $authenticatorData = $result->getBody();
-        $this->assertTrue($authenticatorData['isUserLinked']);
+    /**
+     * Test POST /authenticate/link-user ith method = password, using name.
+     */
+    public function testPostLinkUserMethodPasswordWName() {
+        $authSessionID = $this->createAuthSessionID();
 
-        // Unlink
-        $this->api()->delete($this->baseUrl.'/authenticators/'.$this->authenticator->getID());
+        $result = $this->api()->post($this->baseUrl, [
+            'authSessionID' => $authSessionID,
+            'method' => 'password',
+            'username' => $this->currentUser['name'],
+            'password' => $this->userPassword,
+        ]);
 
-        // Check if the user is linked.
-        $result = $this->api()->get($this->baseUrl.'/authenticators/'.$this->authenticator->getID());
-        $this->assertEquals(200, $result->getStatusCode());
-        $authenticatorData = $result->getBody();
-        $this->assertFalse($authenticatorData['isUserLinked']);
+        $this->assertLinkSuccess($result);
+    }
 
+    /**
+     * Test POST /authenticate/link-user with method = password, using email.
+     */
+    public function testPostLinkUserMethodPasswordWEmail() {
+        $authSessionID = $this->createAuthSessionID();
+
+        $result = $this->api()->post($this->baseUrl, [
+            'authSessionID' => $authSessionID,
+            'method' => 'password',
+            'username' => $this->currentUser['email'],
+            'password' => $this->userPassword,
+        ]);
+
+        $this->assertLinkSuccess($result);
+    }
+
+    /**
+     * Test POST /authenticate/link-user with method = register.
+     */
+    public function testPostLinkUserMethodRegister() {
+        $authSessionID = $this->createAuthSessionID();
+
+        $result = $this->api()->post($this->baseUrl, [
+            'authSessionID' => $authSessionID,
+            'method' => 'register',
+            'name' => 'NewUser',
+            'email' => 'NewUser@example.com',
+            'agreeToTerms' => true,
+        ]);
+    }
+
+    /**
+     * Test POST /authenticate/link-user with method = session.
+     */
+    public function testPostLinkUserMethodSession() {
+        $authSessionID = $this->createAuthSessionID();
+
+        /* @var \Gdn_Session $session */
+        $session = $this->container()->get(\Gdn_Session::class);
+        $session->start($this->currentUser['userID']);
+
+        $this->assertSessionUserID($this->currentUser['userID']);
+
+        $result = $this->api()->post($this->baseUrl, [
+            'authSessionID' => $authSessionID,
+            'method' => 'session',
+        ]);
+
+        $this->assertLinkSuccess($result);
+    }
+
+    /**
+     * Test POST /authenticate/link-user with method = register and agreeToTerm = false. 
+     *
+     * @expectedException \Exception
+     * @expectedExceptionMessage You must agree to the terms of service.
+     */
+    public function testPostLinkUserMethodRegisterWAgreeToTermFalse() {
+        $authSessionID = $this->createAuthSessionID();
+
+        $result = $this->api()->post($this->baseUrl, [
+            'authSessionID' => $authSessionID,
+            'method' => 'register',
+            'name' => 'NewUser',
+            'email' => 'NewUser@example.com',
+            'agreeToTerms' => false,
+        ]);
+    }
+
+    /**
+     * Test DELETE /authenticate/link-user/:authSessionID
+     *
+     * @depends testGetLinkUser
+     * @expectedException \Exception
+     * @expectedExceptionMessage AuthenticationSession not found.
+     */
+    public function testDeleteLinkUser() {
+        $authSessionID = $this->createAuthSessionID();
+
+        $result = $this->api()->delete($this->baseUrl.'/'.$authSessionID);
+        $this->assertEquals(204, $result->getStatusCode());
+
+        $this->api()->get($this->baseUrl.'/'.$authSessionID);
     }
 
     /**
      * Create an authSessionID by posting to /authenticate
      *
-     * @return mixed
+     * @return string
      */
-    protected function createAuthSessionID() {
+    private function createAuthSessionID() {
         $postData = [
             'authenticate' => [
                 'authenticatorType' => $this->authenticator::getType(),
@@ -202,7 +219,7 @@ class LinkUserTest extends AbstractAPIv2Test {
         ];
 
         $result = $this->api()->post(
-            $this->baseUrl,
+            '/authenticate',
             $postData
         );
 
@@ -216,13 +233,35 @@ class LinkUserTest extends AbstractAPIv2Test {
         $this->assertEquals('linkUser', $body['authenticationStep']);
         $this->assertArrayHasKey('authSessionID', $body);
 
+        $this->assertNoSession();
+
         return $body['authSessionID'];
+    }
+
+    /**
+     * Assert that linking was successful.
+     *
+     * @param $result
+     *
+     * @throws \Garden\Container\ContainerException
+     * @throws \Garden\Container\NotFoundException
+     */
+    private function assertLinkSuccess($result) {
+        $this->assertEquals(201, $result->getStatusCode());
+        $body = $result->getBody();
+
+        $this->assertInternalType('array', $body);
+        $this->assertEquals(1, count($body));
+        $this->assertArrayHasKey('user', $body);
+        $this->assertEquals($this->currentUser['userID'], $body['user']['userID']);
+
+        $this->assertSessionUserID($this->currentUser['userID']);
     }
 
     /**
      * Assert that there is not currently a user in the session.
      */
-    public function assertNoSession() {
+    private function assertNoSession() {
         /* @var \Gdn_Session $session */
         $session = $this->container()->get(\Gdn_Session::class);
         $this->assertEquals(0, $session->UserID);
@@ -232,8 +271,11 @@ class LinkUserTest extends AbstractAPIv2Test {
      * Assert that a given user has a session.
      *
      * @param int|null $expected The expected user or **null** for the current user.
+     *
+     * @throws \Garden\Container\ContainerException
+     * @throws \Garden\Container\NotFoundException
      */
-    public function assertSessionUserID(int $expected = null) {
+    private function assertSessionUserID(int $expected = null) {
         if ($expected === null) {
             $expected = $this->currentUser['userID'];
         }

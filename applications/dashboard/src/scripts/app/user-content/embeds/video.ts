@@ -43,7 +43,7 @@ export async function videoRenderer(node: HTMLElement, data: IEmbedData) {
             ratioContainer.classList.add("is1by1");
             break;
         default:
-            ratioContainer.style.paddingTop = (data.height || 3) / (data.width || 4) * 100 + "%";
+            ratioContainer.style.paddingTop = ((data.height || 3) / (data.width || 4)) * 100 + "%";
     }
 
     const playIcon = `<svg class="embedVideo-playIcon" xmlns="http://www.w3.org/2000/svg" viewBox="-1 -1 24 24"><title>${t(

@@ -67,9 +67,9 @@ class MockSSOAuthenticator extends SSOAuthenticator {
      * Setter of data.
      *
      * @param SSOData $data
-     * @return self
+     * @return $this
      */
-    public function setData(SSOData $data): self {
+    public function setData(SSOData $data) {
         $this->data = $data;
 
         return $this;
@@ -133,5 +133,12 @@ class MockSSOAuthenticator extends SSOAuthenticator {
     public function isUserLinked(int $userID): bool {
         $userModel = new \UserModel();
         return (bool)$userModel->getAuthenticationByUser($userID, $this->getID());
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function setTrusted(bool $trusted) {
+        return parent::setTrusted($trusted);
     }
 }

@@ -84,7 +84,7 @@ abstract class VideoEmbed extends Embed {
         $result = <<<HTML
 <div class="embed-video embed embedVideo">
     <div class="{$containerAttr['class']}" style="{$containerAttr['style']}">
-        <button type="button" data-url="{$attr['url']}" aria-label="{$attr['name']}" class="embedVideo-playButton iconButton js-playVideo" style="background-image: url({$attr['photoUrl']});">
+        <button type="button" data-url="{$attr['url']}" aria-label="{$attr['name']}" class="embedVideo-playButton iconButton js-playVideo" style="background-image: url({$attr['photoUrl']});" title="{$attr['name']}">
             <svg class="embedVideo-playIcon" xmlns="http://www.w3.org/2000/svg" viewBox="-1 -1 24 24">
                 <title>Play Video</title>
                 <path class="embedVideo-playIconPath embedVideo-playIconPath-circle" style="fill: currentColor; stroke-width: .3;" d="M11,0A11,11,0,1,0,22,11,11,11,0,0,0,11,0Zm0,20.308A9.308,9.308,0,1,1,20.308,11,9.308,9.308,0,0,1,11,20.308Z"></path>

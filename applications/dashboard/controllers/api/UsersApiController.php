@@ -122,11 +122,12 @@ class UsersApiController extends AbstractApiController {
             'bypassSpam:b' => 'Should submissions from this user bypass SPAM checks?',
             'banned:i' => 'Is the user banned?',
             'dateInserted:dt' => 'When the user was created.',
+            'dateLastActive:dt|n' => 'Time the user was last active.',
             'dateUpdated:dt|n' => 'When the user was last updated.',
             'roles:a?' => $this->schema([
                 'roleID:i' => 'ID of the role.',
                 'name:s' => 'Name of the role.'
-            ], 'RoleFragment')
+            ], 'RoleFragment'),
         ]);
         return $schema;
     }
@@ -186,7 +187,7 @@ class UsersApiController extends AbstractApiController {
      * @param array $query
      * @return array
      */
-    public function get_byNames(array $query) {
+    public function index_byNames(array $query) {
         $this->permission('Garden.SignIn.Allow');
 
         $in = $this->schema([
@@ -209,7 +210,7 @@ class UsersApiController extends AbstractApiController {
             ]
         ], 'in')->setDescription('Search for users by full or partial name matching.');
         $out = $this->schema([
-            ':a' => Schema::parse(['userID', 'name', 'photoUrl'])->add($this->userSchema())
+            ':a' => $this->getUserFragmentSchema(),
         ], 'out');
 
         $query = $in->validate($query);
@@ -394,7 +395,7 @@ class UsersApiController extends AbstractApiController {
         $this->userByID($id);
         $userData = $this->normalizeInput($body);
         $userData['UserID'] = $id;
-        $settings = [];
+        $settings = ['ValidateName' => false];
         if (!empty($userData['RoleID'])) {
             $settings['SaveRoles'] = true;
         }
@@ -423,12 +424,10 @@ class UsersApiController extends AbstractApiController {
         $body = $in->validate($body);
 
         $userData = $this->normalizeInput($body);
-        if (!array_key_exists('RoleID', $userData)) {
-            $userData['RoleID'] = RoleModel::getDefaultRoles(RoleModel::TYPE_MEMBER);
-        }
         $settings = [
             'NoConfirmEmail' => true,
-            'SaveRoles' => true
+            'SaveRoles' => array_key_exists('RoleID', $userData),
+            'ValidateName' => false
         ];
         $id = $this->userModel->save($userData, $settings);
         $this->validateModel($this->userModel);
@@ -597,6 +596,37 @@ class UsersApiController extends AbstractApiController {
         $this->userModel->passwordRequest($body['email']);
         $this->validateModel($this->userModel, true);
     }
+    /**
+     * Confirm a user email address after registration.
+     *
+     * @param int $id The ID of the user.
+     * @param array $body The POST body.
+     * @throws ClientException if email has been confirmed.
+     * @throws Exception if confirmationCode doesn't match.
+     * @throws NotFoundException if unable to find the user.
+     * @return array the response body.
+     */
+    public function post_confirmEmail($id, array $body) {
+        $this->permission(\Vanilla\Permissions::BAN_CSRF);
+
+        $this->idParamSchema('in');
+        $in = $this->schema([
+            'confirmationCode:s' => 'Email confirmation code'
+        ], 'in')->setDescription('Confirm a users current email address by using a confirmation code');
+        $out = $this->schema(['userID:i', 'email:s', 'emailConfirmed:b'], 'out');
+
+        $row = $this->userByID($id);
+        if ($row['Confirmed']) {
+            throw new ClientException('This email has already been confirmed');
+        }
+
+        $body = $in->validate($body);
+        $this->userModel->confirmEmail($row, $body['confirmationCode']);
+        $this->validateModel($this->userModel);
+
+        $result = $out->validate($this->userByID($id));
+        return $result;
+    }
 
     /**
      * Verify a user.
@@ -762,7 +792,7 @@ class UsersApiController extends AbstractApiController {
     public function userSchema($type = '') {
         if ($this->userSchema === null) {
             $schema = Schema::parse(['userID', 'name', 'email', 'photoUrl', 'emailConfirmed',
-                'showEmail', 'bypassSpam', 'banned', 'dateInserted', 'dateUpdated', 'roles?']);
+                'showEmail', 'bypassSpam', 'banned', 'dateInserted', 'dateLastActive', 'dateUpdated', 'roles?']);
             $schema = $schema->add($this->fullSchema());
             $this->userSchema = $this->schema($schema, 'User');
         }

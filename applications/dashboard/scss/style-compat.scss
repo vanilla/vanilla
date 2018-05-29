@@ -21,6 +21,7 @@
 @import "new-components/_pageHeading.scss";
 
 // Editor
+@import "editor/variables";
 @import "editor/mixins";
 @import "editor/richEditor";
 @import "editor/spoiler";

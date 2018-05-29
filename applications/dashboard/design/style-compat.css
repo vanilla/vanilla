@@ -644,27 +644,28 @@ label.checkbox input.checkbox-input {
   padding: 0;
 }
 
-.richEditor-menuItem {
+.richEditor-menuItems .richEditor-menuItem {
   display: block;
   padding: 0;
   margin: 0;
 }
 
-.richEditor-menuItem .richEditor-button, .richEditor-menuItem.richEditor-button {
+.richEditor-menuItems .richEditor-menuItem .richEditor-button, .richEditor-menuItems .richEditor-menuItem.richEditor-button {
   height: 39px;
   width: 39px;
   font-size: 24px;
   line-height: 39px;
 }
 
-.richEditor-menuItem .richEditor-button.emojiChar-🇺🇳, .richEditor-menuItem.richEditor-button.emojiChar-🇺🇳 {
+.richEditor-menuItems .richEditor-menuItem .richEditor-button.emojiChar-🇺🇳, .richEditor-menuItems .richEditor-menuItem.richEditor-button.emojiChar-🇺🇳 {
   font-size: 14px;
 }
 
-.richEditor-menuItem.isRightAligned {
+.richEditor-menuItems .richEditor-menuItem.isRightAligned {
   margin-left: auto;
 }
 
+.richEditor-nextInput,
 .atMentionList-suggestion,
 .iconButton,
 .richEditor-button {
@@ -717,11 +718,47 @@ label.checkbox input.checkbox-input {
   opacity: 1;
 }
 
+.richEditor-menuWideItem,
+.richEditor-menuItem {
+  display: block;
+  padding: 0;
+  margin: 0;
+}
+
+.richEditor-menuWideItem .richEditor-button, .richEditor-menuWideItem.richEditor-button,
+.richEditor-menuItem .richEditor-button,
+.richEditor-menuItem.richEditor-button {
+  height: 39px;
+  width: 39px;
+  font-size: 24px;
+  line-height: 39px;
+}
+
+.richEditor-menuWideItem .richEditor-button.emojiChar-🇺🇳, .richEditor-menuWideItem.richEditor-button.emojiChar-🇺🇳,
+.richEditor-menuItem .richEditor-button.emojiChar-🇺🇳,
+.richEditor-menuItem.richEditor-button.emojiChar-🇺🇳 {
+  font-size: 14px;
+}
+
+.richEditor-menuWideItem.isRightAligned,
+.richEditor-menuItem.isRightAligned {
+  margin-left: auto;
+}
+
+.richEditor-nextInput {
+  height: 39px;
+  line-height: 39px;
+  font-size: 0.9em;
+  color: inherit;
+  padding-left: 9px;
+  padding-right: 9px;
+}
+
 .richEditor-upload {
   display: none !important;
 }
 
-.embedBar {
+.richEditor-embedBar {
   display: block;
   width: 100%;
   padding: 0;
@@ -1155,43 +1192,227 @@ label.checkbox input.checkbox-input {
   user-select: all;
 }
 
-body.hasRichEditor.Section-PostDiscussion #DiscussionForm select {
-  max-width: 100%;
+@media (min-width: 700px) {
+  body.hasRichEditor.Section-PostDiscussion #DiscussionForm select {
+    max-width: 100%;
+  }
+  body.hasRichEditor.Section-PostDiscussion #DiscussionForm .FormWrapper {
+    padding-left: 36px;
+  }
+  body.hasRichEditor.Section-PostDiscussion #DiscussionForm .FormWrapper .richEditor {
+    padding-left: 0;
+  }
+  body.hasRichEditor .CommentForm .CommentFormWrap .Form-HeaderWrap {
+    display: none;
+  }
+  body.hasRichEditor .CommentForm .CommentFormWrap .FormWrapper {
+    padding-left: 0;
+  }
+  body.hasRichEditor .DataListWrap .FormWrapper.FormWrapper-Condensed {
+    padding-left: 0;
+  }
+  body.hasRichEditor #MessageForm .Form-HeaderWrap,
+  body.hasRichEditor #ConversationForm .Form-HeaderWrap {
+    display: none;
+  }
+  body.hasRichEditor #MessageForm .FormWrapper,
+  body.hasRichEditor #ConversationForm .FormWrapper {
+    padding-left: 36px;
+  }
+  body.hasRichEditor #MessageForm .FormWrapper .richEditor,
+  body.hasRichEditor #ConversationForm .FormWrapper .richEditor {
+    padding-left: 0;
+  }
 }
 
-body.hasRichEditor.Section-PostDiscussion #DiscussionForm .FormWrapper {
-  padding-left: 36px;
-}
-
-body.hasRichEditor.Section-PostDiscussion #DiscussionForm .FormWrapper .richEditor {
-  padding-left: 0;
-}
-
-body.hasRichEditor .CommentForm .CommentFormWrap .Form-HeaderWrap {
+.u-visibleOnFullScreenEditor {
   display: none;
 }
 
-body.hasRichEditor .CommentForm .CommentFormWrap .FormWrapper {
-  padding-left: 0;
-}
-
-body.hasRichEditor .DataListWrap .FormWrapper.FormWrapper-Condensed {
-  padding-left: 0;
-}
-
-body.hasRichEditor #MessageForm .Form-HeaderWrap,
-body.hasRichEditor #ConversationForm .Form-HeaderWrap {
+body.isMobile .richEditor-embedBar {
   display: none;
 }
 
-body.hasRichEditor #MessageForm .FormWrapper,
-body.hasRichEditor #ConversationForm .FormWrapper {
-  padding-left: 36px;
+body.isMobile .embedDialogue {
+  position: static;
 }
 
-body.hasRichEditor #MessageForm .FormWrapper .richEditor,
-body.hasRichEditor #ConversationForm .FormWrapper .richEditor {
+body.isMobile .richEditor-embedBarScroll {
+  display: block;
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 39px;
+  pointer-events: none;
+  background: rgba(255, 165, 0, 0.5);
+}
+
+body.isMobile .u-hiddenOnFullScreenEditor {
+  display: none !important;
+}
+
+body.isMobile .insertPopover {
+  width: 100%;
+}
+
+body.isMobile .richEditor {
   padding-left: 0;
+}
+
+body.isMobile .richEditor.isFocused {
+  display: flex;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100vh;
+  align-items: center;
+  max-height: 100vh;
+  z-index: 2001;
+  box-sizing: border-box;
+  margin: 0 !important;
+}
+
+body.isMobile .richEditor.isFocused .richEditor-frame {
+  position: relative;
+  border: 0;
+  border-radius: 0;
+  height: 100vh;
+}
+
+body.isMobile .richEditor.isFocused .js-richText {
+  display: block;
+  position: relative;
+  margin-top: 39px;
+  height: calc(100% - 39px);
+}
+
+body.isMobile .richEditor.isFocused .richEditor-text {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 100%;
+  width: 100%;
+  min-height: 100%;
+  max-height: 100%;
+  overflow: auto;
+}
+
+body.isMobile .richEditor.isFocused .richEditor-embedBar {
+  position: absolute;
+  display: block;
+  top: 0;
+  left: 0;
+  width: 100%;
+  border-bottom-color: #a3a3a3;
+  border-bottom-width: 1px;
+  border-bottom-style: solid;
+}
+
+body.isMobile .richEditor.isFocused .u-visibleOnFullScreenEditor {
+  display: block;
+}
+
+body.isMobile .richEditor.isFocused .richEditor-menu.insertPopover {
+  top: 100%;
+  bottom: auto;
+}
+
+body.isMobile .richEditorParagraphMenu {
+  display: none !important;
+}
+
+body.isMobile .FormWrapper {
+  padding-left: 18px;
+  padding-right: 18px;
+}
+
+@media (max-width: 700px) {
+  .richEditor-embedBar {
+    display: none;
+  }
+  .embedDialogue {
+    position: static;
+  }
+  .richEditor-embedBarScroll {
+    display: block;
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 39px;
+    pointer-events: none;
+    background: rgba(255, 165, 0, 0.5);
+  }
+  .u-hiddenOnFullScreenEditor {
+    display: none !important;
+  }
+  .insertPopover {
+    width: 100%;
+  }
+  .richEditor {
+    padding-left: 0;
+  }
+  .richEditor.isFocused {
+    display: flex;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100vh;
+    align-items: center;
+    max-height: 100vh;
+    z-index: 2001;
+    box-sizing: border-box;
+    margin: 0 !important;
+  }
+  .richEditor.isFocused .richEditor-frame {
+    position: relative;
+    border: 0;
+    border-radius: 0;
+    height: 100vh;
+  }
+  .richEditor.isFocused .js-richText {
+    display: block;
+    position: relative;
+    margin-top: 39px;
+    height: calc(100% - 39px);
+  }
+  .richEditor.isFocused .richEditor-text {
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 100%;
+    width: 100%;
+    min-height: 100%;
+    max-height: 100%;
+    overflow: auto;
+  }
+  .richEditor.isFocused .richEditor-embedBar {
+    position: absolute;
+    display: block;
+    top: 0;
+    left: 0;
+    width: 100%;
+    border-bottom-color: #a3a3a3;
+    border-bottom-width: 1px;
+    border-bottom-style: solid;
+  }
+  .richEditor.isFocused .u-visibleOnFullScreenEditor {
+    display: block;
+  }
+  .richEditor.isFocused .richEditor-menu.insertPopover {
+    top: 100%;
+    bottom: auto;
+  }
+  .richEditorParagraphMenu {
+    display: none !important;
+  }
+  .FormWrapper {
+    padding-left: 18px;
+    padding-right: 18px;
+  }
 }
 
 .spoiler {
@@ -1558,6 +1779,9 @@ body.hasRichEditor #ConversationForm .FormWrapper .richEditor {
 
 .embedExternal-content {
   display: inline-block;
+  max-width: 100%;
+  width: 100%;
+  overflow: hidden;
 }
 
 .twitter-tweet {
@@ -1604,6 +1828,17 @@ body.hasRichEditor #ConversationForm .FormWrapper .richEditor {
 .embedLink-image + .embedLink-main {
   margin-left: auto;
   width: calc(100% - 225px);
+}
+
+@media (max-width: 550px) {
+  .embedLink-image {
+    position: relative;
+    width: 100%;
+    padding-top: 52.5%;
+  }
+  .embedLink-image + .embedLink-main {
+    width: 100%;
+  }
 }
 
 .embedLink-header {

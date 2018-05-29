@@ -39,6 +39,7 @@
                 "react-redux",
                 "react-router-dom",
                 "redux",
+                "redux-observable",
                 "sprintf-js",
                 "tabbable"
             ],

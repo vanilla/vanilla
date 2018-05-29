@@ -14,6 +14,8 @@ $embedded-fontWeight_bold: bold !default;
 $embedded-linkTitle_fontSize: 14px !default;
 $embedded-linkTitle_lineHeight: 1.5 !default;
 $embedded-linkImage_width: 225px !default;
+$embedded-linkImage_mobileHeight: 52.5%;
+$embedded-linkImage_mobileWidth: 100px !default;
 $embedVideo_width: 640px;
 $embed-spacing: 6px !default;
 $embed-focus-color: #0291DB;
@@ -252,6 +254,9 @@ $embed-focus-color: #0291DB;
 
 .embedExternal-content {
     display: inline-block;
+    max-width: 100%;
+    width: 100%;
+    overflow: hidden;
 }
 
 .twitter-tweet {
@@ -303,6 +308,17 @@ $embed-focus-color: #0291DB;
     + .embedLink-main {
         margin-left: auto;
         width: calc(100% - #{$embedded-linkImage_width});
+    }
+
+    @include mediaQuery-richEditor_embed {
+        position: relative;
+        width: 100%;
+        padding-top: $embedded-linkImage_mobileHeight;
+
+
+        + .embedLink-main {
+            width: 100%;
+        }
     }
 }
 

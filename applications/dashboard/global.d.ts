@@ -27,4 +27,5 @@ declare interface AnyObject {
 
 declare module "*.json";
 declare module "*.html";
+declare module "twemoji";
 declare module "tabbable";

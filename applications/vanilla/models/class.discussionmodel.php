@@ -3196,4 +3196,35 @@ class DiscussionModel extends Gdn_Model {
             'wheres' => [], 'group' => 'default'
         ];
     }
+
+    /**
+     * Get structured data about a discussion and its related records.
+     *
+     * @param array $discussion
+     * @return array
+     * @link http://schema.org/DiscussionForumPosting
+     */
+    public function structuredData(array $discussion): array {
+        $name = $discussion['Name'] ?? '';
+        $body = Gdn_Format::reduceWhiteSpaces(Gdn_Format::plainText($discussion['Body'] ?? '', $discussion['Format'] ?? 'Html'));
+
+        $result = [
+            "headline" => $name,
+            "description" => sliceParagraph($body, 160),
+            "discussionUrl" => discussionUrl($discussion)
+        ];
+
+        if (array_key_exists('InsertUserID', $discussion) && $discussion['InsertUserID']) {
+            $user = Gdn::userModel()->getID($discussion['InsertUserID'], DATASET_TYPE_ARRAY);
+            if ($user) {
+                $result["author"] = [
+                    "@context" => "http://schema.org/",
+                    "@type" => "Person",
+                    "name" => $user['Name'],
+                    "image" => userPhotoUrl($user)
+                ];
+            }
+        }
+        return $result;
+    }
 }

@@ -5,46 +5,43 @@
  * @license https://opensource.org/licenses/GPL-2.0 GPL-2.0
  */
 
-namespace VanillaTests\Fixtures;
+namespace VanillaTests\Fixtures\Authenticator;
 
 use Garden\Web\RequestInterface;
 use Vanilla\Authenticator\SSOAuthenticator;
 use Vanilla\Models\SSOData;
+use Vanilla\Models\AuthenticatorModel;
 
 /**
  * Class MockSSOAuthenticator
  */
 class MockSSOAuthenticator extends SSOAuthenticator {
 
-    /** @var SSOData */
-    protected $data;
-
     /**
      * MockSSOAuthenticator constructor.
      *
-     * @throws \Exception
-     * @param $uniqueID
-     * @param $userData
-     * @param $extraData
+     * @param \Vanilla\Models\AuthenticatorModel $authenticatorModel
+     *
+     * @throws \Garden\Schema\ValidationException
+     * @throws \Garden\Web\Exception\NotFoundException
      */
-    public function __construct($uniqueID = null, $userData = [], $extraData = []) {
-        parent::__construct('MockSSO');
+    public function __construct(AuthenticatorModel $authenticatorModel) {
+        parent::__construct('MockSSO', $authenticatorModel);
+    }
 
-        if ($uniqueID === null) {
-            $uniqueID = uniqid('MockSSOUserID_');
-        }
+    protected function setAuthenticatorInfo(array $data) {
+        $data['attributes'] = $data['attributes'] ?? [];
+        $data['attributes']['SSOData'] = $data['attributes']['SSOData'] ?? [];
+        $data['attributes']['SSOData']['uniqueID'] = $data['attributes']['SSOData']['uniqueID'] ?? uniqid('MockSSOUserID_');
 
-        $this
-            ->setData(new SSOData(
-                self::getType(),
-                $this->getID(),
-                $uniqueID,
-                $userData,
-                $extraData
-            ))
-            ->setTrusted(true)
-            ->setSignIn(true)
-        ;
+        // Defaults to canSignIn
+        $data['sso']['canSignIn'] = $data['sso']['canSignIn'] ?? true;
+        // Defaults to isTrusted
+        $data['sso']['isTrusted'] = $data['sso']['isTrusted'] ?? true;
+
+        parent::setAuthenticatorInfo($data);
+
+        $this->attributes['SSOData'] = SSOData::fromArray($this->attributes['SSOData'] ?? []);
     }
 
     /**
@@ -55,24 +52,10 @@ class MockSSOAuthenticator extends SSOAuthenticator {
     }
 
     /**
-     * Getter of data.
-     *
-     * @return SSOData
+     * @return \Vanilla\Models\SSOData
      */
-    public function getData() {
-        return $this->data;
-    }
-
-    /**
-     * Setter of data.
-     *
-     * @param SSOData $data
-     * @return $this
-     */
-    public function setData(SSOData $data) {
-        $this->data = $data;
-
-        return $this;
+    protected function getData() {
+        return $this->attributes['SSOData'];
     }
 
     /**

@@ -11,7 +11,7 @@ use Garden\Schema\ValidationException;
 use PHPUnit\Framework\TestCase;
 use Vanilla\Models\SSOData;
 use Vanilla\Models\SSOModel;
-use VanillaTests\Fixtures\MockSSOAuthenticator;
+use VanillaTests\Fixtures\Authenticator\MockSSOAuthenticator;
 use VanillaTests\SetsGeneratorTrait;
 use VanillaTests\SiteTestTrait;
 

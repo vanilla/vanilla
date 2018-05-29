@@ -28,6 +28,10 @@ class CategoriesController extends VanillaController {
     /** @var object Category object. */
     public $Category;
 
+    /** @var boolean Value indicating if the category-following filter should be displayed when rendering a view */
+    public $enableFollowingFilter = false;
+
+
     /**
      * @var \Closure $categoriesCompatibilityCallback A backwards-compatible callback to get `$this->data('Categories')`.
      */
@@ -261,10 +265,10 @@ class CategoriesController extends VanillaController {
 
         if ($this->CategoryModel->followingEnabled()) {
             // Only use the following filter on the root category level.
-            $enableFollowingFilter = $categoryIdentifier === '';
+            $this->enableFollowingFilter = $categoryIdentifier === '';
             $this->fireEvent('EnableFollowingFilter', [
                 'CategoryIdentifier' => $categoryIdentifier,
-                'EnableFollowingFilter' => &$enableFollowingFilter
+                'EnableFollowingFilter' => &$this->enableFollowingFilter
             ]);
 
             $followed = paramPreference(
@@ -275,9 +279,9 @@ class CategoriesController extends VanillaController {
                 Gdn::request()->get('save')
             );
         } else {
-            $enableFollowingFilter = $followed = false;
+            $this->enableFollowingFilter = $followed = false;
         }
-        $this->setData('EnableFollowingFilter', $enableFollowingFilter);
+        $this->setData('EnableFollowingFilter', $this->enableFollowingFilter);
         $this->setData('Followed', $followed);
 
         if ($categoryIdentifier == '') {

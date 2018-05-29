@@ -28,7 +28,7 @@ class CategoriesController extends VanillaController {
     /** @var object Category object. */
     public $Category;
 
-    /** @var boolean Value indicating if the category-following filter should be displayed when rendering a view */
+    /** @var bool Value indicating if the category-following filter should be displayed when rendering a view */
     public $enableFollowingFilter = false;
 
 

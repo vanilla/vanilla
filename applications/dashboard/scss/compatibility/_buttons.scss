@@ -10,34 +10,3 @@ button.Close {
     padding: 0;
 }
 
-
-// Jump to buttons
-.accessibility-jumpTo {
-    @include resetButton;
-    border: 0;
-    clip: rect(0 0 0 0);
-    height: 1px;
-    margin: -1px;
-    overflow: hidden;
-    padding: 0;
-    position: absolute;
-    width: 1px;
-
-    &:focus {
-        position: absolute;
-        top: 50px;
-        left: 0;
-        text-align: left;
-        background-color: white;
-        color: black;
-        display: block;
-        font-size: 14px;
-        clip: auto;
-        margin: 0;
-        height: auto;
-        padding: 0 12px;
-        width: 100%;
-        z-index: 2;
-        transform: translateY(-100%);
-    }
-}

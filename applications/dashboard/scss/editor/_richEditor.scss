@@ -139,23 +139,21 @@
 
     &:focus {
         z-index: 2;
-        outline: {
-            width: $richEditor-outline_width;
-            offset: #{$richEditor-outline_offset};
-            color: $richEditor-outline_color;
-        }
+        @include editorButtonFocusStyles;
     }
 
     &:hover,
     &:focus,
     &.isActive {
+        .Close-x,
         .richEditorButton-icon {
             opacity: 1;
         }
     }
 
+    &:hover,
     &.isActive {
-        background-color: $richEditor-selected_bg;
+        @include editorButtonActiveStyles;
     }
 }
 
@@ -211,6 +209,11 @@
     opacity: $richEditor-icon_opacity;
 }
 
+.Close-x {
+    opacity: $richEditor-icon_opacity;
+    cursor: pointer;
+}
+
 // Link Menu
 .insertLink.FlyoutMenu {
     display: flex;
@@ -234,7 +237,13 @@
     text-align: center;
     user-select: none;
 
+    &:hover {
+        @include editorButtonActiveStyles;
+    }
 
+    &:focus {
+        @include editorButtonFocusStyles;
+    }
 }
 
 .insertLink-input.InputBox {
@@ -578,9 +587,8 @@
         color: $richEditor-emojiCategory_hoverColor;
     }
 
-
     &.isSelected {
-        background-color: $richEditor-selected_bg;
+        @include editorButtonActiveStyles;
     }
 
     + .emojiGroup {

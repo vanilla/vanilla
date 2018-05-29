@@ -71,7 +71,7 @@ class EmbedManagerTest extends TestCase {
                 ],
                 '<a class="embed-link embed embedLink" href="https://vanillaforums.com" target="_blank" rel="noopener noreferrer">
     <article class="embedLink-body">
-        <div class="embedLink-image" aria-hidden="true" style="background-image: url(https://vanillaforums.com/images/metaIcons/vanillaForums.png);"></div>
+        <div class="embedLink-image" aria-hidden="true" style="background-image: url(\'https\00003a\00002f\00002fvanillaforums\00002ecom\00002fimages\00002fmetaIcons\00002fvanillaForums\00002epng\');"></div>
         <div class="embedLink-main">
             <div class="embedLink-header">
                 <h3 class="embedLink-title">Online Community Software and Customer Forum Software by Vanilla Forums</h3>

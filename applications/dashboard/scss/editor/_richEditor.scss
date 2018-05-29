@@ -86,7 +86,6 @@
 
         .richEditor-button,
         &.richEditor-button {
-            height: $richEditor-menuButton_size;
             width: $richEditor-menuButton_size;
             font-size: #{$richEditor-menuButton_size * 24 / 39};
             line-height: $richEditor-menuButton_size;
@@ -101,7 +100,6 @@
         }
     }
 }
-
 
 // button reset
 .richEditor-nextInput,
@@ -119,6 +117,10 @@
 }
 
 
+.richEditor-embedButton {
+    height: $richEditor-menuButton_size;
+}
+
 .richEditor-button {
     display: block;
     height: $richEditor-icon_size;
@@ -129,33 +131,29 @@
         height: $richEditor-icon_size;
     }
 
-    &.richEditorParagraphMenu-handle {
-        background: transparent;
-        transition: opacity $richEditor-pilcrowAnimation_duration ease;
-
-        &.isHidden {
-            opacity: 0;
-        }
-
-        .richEditorInline-icon {
-            opacity: 1;
-        }
-    }
-
     &:not(:disabled) {
         cursor: pointer;
     }
 
     &:focus {
         z-index: 2;
+        outline: {
+            width: $richEditor-outline_width;
+            offset: #{$richEditor-outline_offset};
+            color: $richEditor-outline_color;
+        }
     }
 
     &:hover,
     &:focus,
     &.isActive {
-        .richEditorInline-icon {
+        .richEditorButton-icon {
             opacity: 1;
         }
+    }
+
+    &.isActive {
+        background-color: $richEditor-selected_bg;
     }
 }
 
@@ -167,7 +165,7 @@
 
     .richEditor-button,
     &.richEditor-button {
-        height: $richEditor-menuButton_size;
+        //height: $richEditor-menuButton_size;
         width: $richEditor-menuButton_size;
         font-size: #{$richEditor-menuButton_size * 24 / 39};
         line-height: $richEditor-menuButton_size;
@@ -203,7 +201,7 @@
     padding: $richEditor-embedMenu_padding;
 }
 
-.richEditorInline-icon {
+.richEditorButton-icon {
     display: block;
     margin: auto;
     height: $richEditor-icon_size;
@@ -556,6 +554,8 @@
 
 .richEditor-button {
     user-select: none;
+    cursor: pointer;
+
 }
 
 // Emoji Groups
@@ -576,7 +576,7 @@
 
 
     &.isSelected {
-        background-color: $richEditor-emojiCategory_selectedBg;
+        background-color: $richEditor-selected_bg;
     }
 
     + .emojiGroup {

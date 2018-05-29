@@ -651,7 +651,6 @@ label.checkbox input.checkbox-input {
 }
 
 .richEditor-menuItems .richEditor-menuItem .richEditor-button, .richEditor-menuItems .richEditor-menuItem.richEditor-button {
-  height: 39px;
   width: 39px;
   font-size: 24px;
   line-height: 39px;
@@ -682,6 +681,10 @@ label.checkbox input.checkbox-input {
   text-align: left;
 }
 
+.richEditor-embedButton {
+  height: 39px;
+}
+
 .richEditor-button {
   display: block;
   height: 24px;
@@ -693,29 +696,23 @@ label.checkbox input.checkbox-input {
   height: 24px;
 }
 
-.richEditor-button.richEditorParagraphMenu-handle {
-  background: transparent;
-  transition: opacity 0.3s ease;
-}
-
-.richEditor-button.richEditorParagraphMenu-handle.isHidden {
-  opacity: 0;
-}
-
-.richEditor-button.richEditorParagraphMenu-handle .richEditorInline-icon {
-  opacity: 1;
-}
-
 .richEditor-button:not(:disabled) {
   cursor: pointer;
 }
 
 .richEditor-button:focus {
   z-index: 2;
+  outline-width: 2px;
+  outline-offset: -2px;
+  outline-color: #0291DB;
 }
 
-.richEditor-button:hover .richEditorInline-icon, .richEditor-button:focus .richEditorInline-icon, .richEditor-button.isActive .richEditorInline-icon {
+.richEditor-button:hover .richEditorButton-icon, .richEditor-button:focus .richEditorButton-icon, .richEditor-button.isActive .richEditorButton-icon {
   opacity: 1;
+}
+
+.richEditor-button.isActive {
+  background-color: #aee4fe;
 }
 
 .richEditor-menuWideItem,
@@ -728,7 +725,6 @@ label.checkbox input.checkbox-input {
 .richEditor-menuWideItem .richEditor-button, .richEditor-menuWideItem.richEditor-button,
 .richEditor-menuItem .richEditor-button,
 .richEditor-menuItem.richEditor-button {
-  height: 39px;
   width: 39px;
   font-size: 24px;
   line-height: 39px;
@@ -764,12 +760,12 @@ label.checkbox input.checkbox-input {
   padding: 0;
 }
 
-.richEditorInline-icon {
+.richEditorButton-icon {
   display: block;
   margin: auto;
   height: 24px;
   width: 24px;
-  opacity: 0.6;
+  opacity: 0.7;
 }
 
 .insertLink.FlyoutMenu {
@@ -1088,6 +1084,7 @@ label.checkbox input.checkbox-input {
 
 .richEditor-button {
   user-select: none;
+  cursor: pointer;
 }
 
 .emojiGroups {
@@ -1305,7 +1302,7 @@ body.isMobile .richEditor.isFocused .richEditor-embedBar {
   top: 0;
   left: 0;
   width: 100%;
-  border-bottom-color: #a3a3a3;
+  border-bottom-color: #0291db;
   border-bottom-width: 1px;
   border-bottom-style: solid;
 }
@@ -1395,7 +1392,7 @@ body.isMobile .FormWrapper {
     top: 0;
     left: 0;
     width: 100%;
-    border-bottom-color: #a3a3a3;
+    border-bottom-color: #0291db;
     border-bottom-width: 1px;
     border-bottom-style: solid;
   }

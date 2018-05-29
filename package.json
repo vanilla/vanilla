@@ -23,6 +23,7 @@
         "setasap": "2.0.1",
         "shave": "2.1.3",
         "sprintf-js": "1.1.1",
+        "tabbable": "1.1.3",
         "twemoji": "2.5.1",
         "validator": "10.2.0"
     },

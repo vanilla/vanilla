@@ -246,6 +246,11 @@ $dic->setInstance('Garden\Container\Container', $dic)
     ->addCall('addEmbed', [new Reference(Vanilla\Embeds\VimeoEmbed::class)])
     ->addCall('addEmbed', [new Reference(Vanilla\Embeds\ImageEmbed::class), Vanilla\Embeds\EmbedManager::PRIORITY_LOW])
     ->setShared(true)
+
+    ->rule(Vanilla\PageScraper::class)
+    ->addCall('registerMetadataParser', [new Reference(Vanilla\Metadata\Parser\OpenGraphParser::class)])
+    ->addCall('registerMetadataParser', [new Reference(Vanilla\Metadata\Parser\JsonLDParser::class)])
+    ->setShared(true)
 ;
 
 // Run through the bootstrap with dependencies.

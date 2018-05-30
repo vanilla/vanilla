@@ -36,7 +36,8 @@ class LinkEmbed extends Embed {
             'name' => null,
             'body' => null,
             'photoUrl' => null,
-            'media' => []
+            'media' => [],
+            'attributes' => [],
         ];
 
         if ($this->isNetworkEnabled()) {
@@ -47,6 +48,7 @@ class LinkEmbed extends Embed {
             $result['body'] = $pageInfo['Description'] ?: null;
             $result['photoUrl'] = !empty($images) ? reset($images) : null;
             $result['media'] = !empty($images) ? ['image' => $images] : [];
+            $result['attributes'] = $pageInfo['Attributes'] ?? [];
         }
 
         return $result;

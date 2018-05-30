@@ -10,11 +10,26 @@ use Exception;
 use Garden\Http\HttpRequest;
 use PHPUnit\Framework\TestCase;
 use VanillaTests\Fixtures\PageScraper;
+use Vanilla\Metadata\Parser\OpenGraphParser;
+use Vanilla\Metadata\Parser\JsonLDParser;
 
 class PageScraperTest extends TestCase {
 
     /** @var string Directory of test HTML files. */
     const HTML_DIR = PATH_ROOT.'/tests/fixtures/html';
+
+    /**
+     * Grab a new testable instance of PageScraper.
+     *
+     * @return PageScraper
+     */
+    private function pageScraper() {
+        // Create the test instance. Register the metadata handlers.
+        $pageScraper = new PageScraper(new HttpRequest());
+        $pageScraper->registerMetadataParser(new OpenGraphParser());
+        $pageScraper->registerMetadataParser(new JsonLDParser());
+        return $pageScraper;
+    }
 
     /**
      * Provide data for testing the PageScraper::pageInfo method.
@@ -23,6 +38,35 @@ class PageScraperTest extends TestCase {
      */
     public function provideInfoData(): array {
         $data = [
+            [
+                'jsonld.htm',
+                [
+                    'Title' => 'I am a standard title.',
+                    'Description' => 'I am a standard description.',
+                    'Images' => [],
+                    'Attributes' => [
+                        'subtype' => 'discussion',
+                        'discussion' => [
+                            'title' => 'Welcome to awesome!',
+                            'body' => 'There\'s nothing sweeter than a fresh new forum, ready to welcome your community.',
+                            'insertUser' => [
+                                'name' => 'Vanilla Forums',
+                                'photoUrl' => 'https://images.v-cdn.net/stubcontent/vanilla_avatar.jpg',
+                                'url' => 'https://vanilla.localhost/profile/Vanilla%20Forums'
+                            ],
+                            'dateInserted' => '2018-04-20T21:06:41+00:00',
+                        ]
+                    ],
+                ]
+            ],
+            [
+                'no-description.htm',
+                [
+                    'Title' => 'I am a standard title.',
+                    'Description' => 'I am a description. Instead of being part of the document head, I am inside the page contents. This is not ideal and is only a fallback for pages without proper meta descriptors.',
+                    'Images' => []
+                ]
+            ],
             [
                 'og.htm',
                 [
@@ -36,14 +80,6 @@ class PageScraperTest extends TestCase {
                 [
                     'Title' => 'I am a standard title.',
                     'Description' => 'I am a standard description.',
-                    'Images' => []
-                ]
-            ],
-            [
-                'no-description.htm',
-                [
-                    'Title' => 'I am a standard title.',
-                    'Description' => 'I am a description. Instead of being part of the document head, I am inside the page contents. This is not ideal and is only a fallback for pages without proper meta descriptors.',
                     'Images' => []
                 ]
             ]
@@ -60,7 +96,7 @@ class PageScraperTest extends TestCase {
      * @dataProvider provideInfoData
      */
     public function testFetch(string $file, array $expected) {
-        $pageScraper = new PageScraper(new HttpRequest());
+        $pageScraper = $this->pageScraper();
         $url = 'file://'.self::HTML_DIR."/{$file}";
         $expected['Url'] = $url;
         $result = $pageScraper->pageInfo($url);

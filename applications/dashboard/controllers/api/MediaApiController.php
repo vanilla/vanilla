@@ -333,7 +333,7 @@ class MediaApiController extends AbstractApiController {
                 'default' => false,
                 'description' => 'Force the scrape even if the result is cached.'
             ]
-        ], 'in');
+        ], 'in')->setDescription('Scrape information from a URL.');
         $out = $this->schema([
             'url:s'	=> 'The URL that was scraped.',
             'type:s' => [

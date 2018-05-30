@@ -4,10 +4,18 @@
  * @license GPLv2
  */
 
-import { resolvePromisesSequentially, matchAtMention, hashString, isInstanceOfOneOf } from "./utility";
+import { resolvePromisesSequentially, matchAtMention, hashString, isInstanceOfOneOf, cssSpecialChars } from "./utility";
 import chai, { expect } from "chai";
 import asPromised from "chai-as-promised";
 chai.use(asPromised);
+
+describe("cssSpecialChars", () => {
+    it("all CSS special characters are escaped", () => {
+        const raw = "\\!\"#$%&'()*+,-./:;<=>?@[]^`{|}~";
+        const escaped = "\\00005c\\000021\\000022\\000023\\000024\\000025\\000026\\000027\\000028\\000029\\00002a\\00002b\\00002c\\00002d\\00002e\\00002f\\00003a\\00003b\\00003c\\00003d\\00003e\\00003f\\000040\\00005b\\00005d\\00005e\\000060\\00007b\\00007c\\00007d\\00007e";
+        expect(cssSpecialChars(raw)).eq(escaped);
+    });
+});
 
 describe("resolvePromisesSequentially()", () => {
     it("resolves promises in order", async () => {

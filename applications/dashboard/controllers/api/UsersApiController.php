@@ -596,6 +596,37 @@ class UsersApiController extends AbstractApiController {
         $this->userModel->passwordRequest($body['email']);
         $this->validateModel($this->userModel, true);
     }
+    /**
+     * Confirm a user email address after registration.
+     *
+     * @param int $id The ID of the user.
+     * @param array $body The POST body.
+     * @throws ClientException if email has been confirmed.
+     * @throws Exception if confirmationCode doesn't match.
+     * @throws NotFoundException if unable to find the user.
+     * @return array the response body.
+     */
+    public function post_confirmEmail($id, array $body) {
+        $this->permission(\Vanilla\Permissions::BAN_CSRF);
+
+        $this->idParamSchema('in');
+        $in = $this->schema([
+            'confirmationCode:s' => 'Email confirmation code'
+        ], 'in')->setDescription('Confirm a users current email address by using a confirmation code');
+        $out = $this->schema(['userID:i', 'email:s', 'emailConfirmed:b'], 'out');
+
+        $row = $this->userByID($id);
+        if ($row['Confirmed']) {
+            throw new ClientException('This email has already been confirmed');
+        }
+
+        $body = $in->validate($body);
+        $this->userModel->confirmEmail($row, $body['confirmationCode']);
+        $this->validateModel($this->userModel);
+
+        $result = $out->validate($this->userByID($id));
+        return $result;
+    }
 
     /**
      * Verify a user.

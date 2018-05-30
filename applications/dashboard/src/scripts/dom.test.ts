@@ -12,6 +12,7 @@ import {
     removeDelegatedEvent,
     getFormData,
     getNextTabbableElement,
+    watchFocusInDomTree,
 } from "@dashboard/dom";
 import { expect } from "chai";
 import sinon from "sinon";
@@ -27,7 +28,7 @@ it("unescapes html", () => {
     expect(unescapeHTML(output)).to.deep.equal(input);
 });
 
-describe("delegateEvent", () => {
+describe("delegateEvent()", () => {
     beforeEach(() => {
         removeAllDelegatedEvents();
 
@@ -65,7 +66,7 @@ describe("delegateEvent", () => {
         sinon.assert.calledOnce(callback);
     });
 
-    describe("delegation filtering works", () => {
+    describe("delegation filtering works()", () => {
         const callback = sinon.spy();
 
         beforeEach(() => {
@@ -116,7 +117,7 @@ describe("delegateEvent", () => {
     });
 });
 
-describe("removing delegated events", () => {
+describe("removeDelegatedEvent() && removeAllDelegatedEvents()", () => {
     const callback1 = sinon.spy();
     const callback2 = sinon.spy();
     let eventHandler1;
@@ -146,7 +147,7 @@ describe("removing delegated events", () => {
     });
 });
 
-describe("getFormData", () => {
+describe("getFormData()", () => {
     beforeEach(() => {
         document.body.innerHTML = `
             <form>
@@ -161,7 +162,7 @@ describe("getFormData", () => {
     });
 });
 
-describe("getNextTabbableElement", () => {
+describe("getNextTabbableElement()", () => {
     it("can find a tabbable element", () => {
         document.body.innerHTML = `
         <div>
@@ -216,7 +217,7 @@ describe("getNextTabbableElement", () => {
         expect(nextItem).eq(item1);
     });
 
-    it("can restrict elements", () => {
+    it("can exclude elements", () => {
         document.body.innerHTML = `
         <div>
             <button id="item1"></button>
@@ -231,9 +232,80 @@ describe("getNextTabbableElement", () => {
         const item4 = document.getElementById("item4")!;
 
         item2.focus();
-        const nextItem = getNextTabbableElement({ excludedRoots: [item3, item4] });
+        const nextItem = getNextTabbableElement({ excludedElements: [item3, item4] });
 
         expect(nextItem).eq(item1);
+    });
+
+    it("can exclude roots", () => {
+        document.body.innerHTML = `
+        <div>
+            <button id="item1"></button>
+            <button id="item2"></button>
+            <div id="root1"><button id="item3"></button></div>
+            <button id="item4"></button>
+        </div>`;
+
+        const item1 = document.getElementById("item1")!;
+        const item2 = document.getElementById("item2")!;
+        const root1 = document.getElementById("root1")!;
+        const item4 = document.getElementById("item4")!;
+
+        item2.focus();
+        const nextItem = getNextTabbableElement({ excludedRoots: [root1], excludedElements: [item4] });
+
+        expect(nextItem).eq(item1);
+    });
+
+    it("excluding a root doesn't exclude the element", () => {
+        document.body.innerHTML = `
+        <div>
+            <button id="item1"></button>
+            <button id="item2"></button>
+            <div tabindex="0" id="root1"><button id="item3"></button></div>
+            <button id="item4"></button>
+        </div>`;
+
+        const root1 = document.getElementById("root1")!;
+        const item1 = document.getElementById("item1")!;
+        const item2 = document.getElementById("item2")!;
+        const item4 = document.getElementById("item4")!;
+
+        item2.focus();
+        const nextItem = getNextTabbableElement({ excludedRoots: [root1] });
+        expect(nextItem).eq(root1);
+    });
+
+    it("the currently selected root isn't excluded", () => {
+        document.body.innerHTML = `
+        <div>
+            <div tabindex="0" id="root1"><button id="item1"></button></div>
+            <button id="item2"></button>
+        </div>`;
+
+        const item1 = document.getElementById("item1")!;
+        const item2 = document.getElementById("item2")!;
+        const root1 = document.getElementById("root1")!;
+
+        item1.focus();
+        const nextItem = getNextTabbableElement({ excludedRoots: [root1] });
+        expect(nextItem).eq(item2);
+    });
+
+    it("the currently selected item cannot be excluded", () => {
+        document.body.innerHTML = `
+        <div>
+            <div tabindex="0" id="root1"><button id="item1"></button></div>
+            <button id="item2"></button>
+        </div>`;
+
+        const item1 = document.getElementById("item1")!;
+        const item2 = document.getElementById("item2")!;
+        const root1 = document.getElementById("root1")!;
+
+        root1.focus();
+        const nextItem = getNextTabbableElement({ excludedRoots: [root1], excludedElements: [root1] });
+        expect(nextItem).eq(item2);
     });
 
     it("can find focus from an arbitrary element", () => {
@@ -265,6 +337,22 @@ describe("getNextTabbableElement", () => {
         const nextItem = getNextTabbableElement();
 
         expect(nextItem).eq(item1);
+    });
+
+    it("can prevent looping", () => {
+        document.body.innerHTML = `
+        <div>
+            <button id="item1"></button>
+            <button id="item2"></button>
+        </div>`;
+
+        const item1 = document.getElementById("item1")!;
+        const item2 = document.getElementById("item2")!;
+
+        item2.focus();
+        const nextItem = getNextTabbableElement({ allowLooping: false });
+
+        expect(nextItem).eq(null);
     });
 
     it("can handle all options at once", () => {
@@ -301,9 +389,79 @@ describe("getNextTabbableElement", () => {
             root: treeRoot,
             fromElement: item3,
             reverse: true,
-            excludedRoots: [tree1, itemExcluded],
+            excludedRoots: [tree1],
+            excludedElements: [itemExcluded],
         });
 
         expect(nextItem).eq(item5);
+    });
+});
+
+describe("watchFocusInDomTree()", () => {
+    beforeEach(() => {
+        document.body.innerHTML = `
+        <div>
+            <div tabindex="0" id="root1">
+                <button id="item1"></button>
+                <button id="item2"></button>
+            </div>
+            <button id="item3"></button>
+        </div>`;
+    });
+
+    it("notifies about focus entering", () => {
+        const spy = sinon.spy();
+        const root1 = document.getElementById("root1")!;
+        const item2 = document.getElementById("item2")!;
+        const item3 = document.getElementById("item3")!;
+
+        watchFocusInDomTree(root1, spy);
+
+        root1.focus();
+        expect(spy.calledOnceWith(true));
+        item3.focus();
+
+        spy.resetHistory();
+        item2.focus();
+        expect(spy.calledOnceWith(true));
+    });
+
+    it("notifies about focus leaving", () => {
+        const spy = sinon.spy();
+        const root1 = document.getElementById("root1")!;
+        const item2 = document.getElementById("item2")!;
+        const item3 = document.getElementById("item3")!;
+
+        watchFocusInDomTree(root1, spy);
+
+        root1.focus();
+        spy.resetHistory();
+        item3.focus();
+        expect(spy.calledOnceWith(false));
+
+        item2.focus();
+        spy.resetHistory();
+        item3.focus();
+        expect(spy.calledOnceWith(false));
+    });
+
+    it("does not notify about focus leaving into itself", () => {
+        const spy = sinon.spy();
+        const root1 = document.getElementById("root1")!;
+        const item1 = document.getElementById("item1")!;
+        const item2 = document.getElementById("item2")!;
+        const item3 = document.getElementById("item3")!;
+
+        watchFocusInDomTree(root1, spy);
+
+        root1.focus();
+        spy.resetHistory();
+        item1.focus();
+        expect(spy.calledOnceWith(false));
+
+        item1.focus();
+        spy.resetHistory();
+        item2.focus();
+        expect(spy.calledOnceWith(false));
     });
 });

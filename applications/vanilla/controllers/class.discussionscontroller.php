@@ -30,6 +30,8 @@ class DiscussionsController extends VanillaController {
     /** @var array Limit the discussions to just this list of categories, checked for view permission. */
     protected $categoryIDs;
 
+    /** @var boolean Value indicating whether to show the category following filter */
+    public $enableFollowingFilter = false;
 
     /**
      * "Table" layout for discussions. Mimics more traditional forum discussion layout.
@@ -120,7 +122,6 @@ class DiscussionsController extends VanillaController {
 
         $this->setData('Breadcrumbs', [['Name' => t('Recent Discussions'), 'Url' => '/discussions']]);
 
-
         $categoryModel = new CategoryModel();
         $followingEnabled = $categoryModel->followingEnabled();
         if ($followingEnabled) {
@@ -132,10 +133,13 @@ class DiscussionsController extends VanillaController {
                 null,
                 $saveFollowing
             );
+            if ($this->SelfUrl === "discussions") {
+                $this->enableFollowingFilter = true;
+            }
         } else {
             $followed = false;
         }
-        $this->setData('EnableFollowingFilter', $followingEnabled);
+        $this->setData('EnableFollowingFilter', $this->enableFollowingFilter);
         $this->setData('Followed', $followed);
 
         // Set criteria & get discussions data

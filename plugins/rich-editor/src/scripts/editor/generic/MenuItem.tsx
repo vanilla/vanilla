@@ -49,7 +49,9 @@ export default class MenuItem extends React.Component<IProps> {
     public render() {
         const { propertyName, isActive, onClick } = this.props;
         const Icon = Icons[propertyName];
-        const buttonClasses = classnames("richEditor-button", "richEditor-menuItem", { isActive });
+        const buttonClasses = classnames("richEditor-button", "richEditor-formatButton", "richEditor-menuItem", {
+            isActive,
+        });
 
         return (
             <button

@@ -12,7 +12,7 @@ use PHPUnit\Framework\TestCase;
 use Vanilla\Authenticator\Authenticator;
 use Vanilla\Models\AuthenticatorModel;
 use VanillaTests\Bootstrap;
-use VanillaTests\Fixtures\CssColorAuthenticator;
+use VanillaTests\Fixtures\Authenticator\CssColorAuthenticator;
 
 /**
  * Class AuthenticatorCssColorValidation.

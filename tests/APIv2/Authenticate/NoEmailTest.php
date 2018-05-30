@@ -7,8 +7,10 @@
 
 namespace VanillaTests\APIv2\Authenticate;
 
+use Vanilla\Models\AuthenticatorModel;
+use Vanilla\Models\SSOData;
 use VanillaTests\APIv2\AbstractAPIv2Test;
-use VanillaTests\Fixtures\MockSSOAuthenticator;
+use VanillaTests\Fixtures\Authenticator\MockSSOAuthenticator;
 
 /**
  * Test the /api/v2/authenticate endpoints.
@@ -37,9 +39,7 @@ class NoEmailTest extends AbstractAPIv2Test {
      */
     public static function setupBeforeClass() {
         parent::setupBeforeClass();
-        self::container()
-            ->rule(MockSSOAuthenticator::class)
-            ->setAliasOf('MockSSOAuthenticator');
+        self::container()->rule(MockSSOAuthenticator::class);
 
         self::$config = self::container()->get('Config');
     }
@@ -57,7 +57,15 @@ class NoEmailTest extends AbstractAPIv2Test {
             'name' => $uniqueID,
         ];
 
-        $this->authenticator = new MockSSOAuthenticator($uniqueID, $this->currentUser);
+        /** @var \Vanilla\Models\AuthenticatorModel $authenticatorModel */
+        $authenticatorModel = $this->container()->get(AuthenticatorModel::class);
+
+        $authType = MockSSOAuthenticator::getType();
+        $this->authenticator = $authenticatorModel->createSSOAuthenticatorInstance([
+            'authenticatorID' => $authType,
+            'type' => $authType,
+            'SSOData' => json_decode(json_encode(new SSOData($authType, $authType, $uniqueID, $this->currentUser)), true),
+        ]);
 
         $this->container()->setInstance('MockSSOAuthenticator', $this->authenticator);
 

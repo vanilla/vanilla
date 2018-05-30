@@ -8,7 +8,7 @@
 namespace VanillaTests\Library\Vanilla;
 
 use PHPUnit\Framework\TestCase;
-use VanillaTests\Fixtures\MockAuthenticator;
+use VanillaTests\Fixtures\Authenticator\MockAuthenticator;
 
 
 class AuthenticatorTest extends TestCase {

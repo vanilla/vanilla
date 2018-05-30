@@ -356,7 +356,10 @@
     font-size: $richEditor-icon_size;
     text-align: center;
     overflow: hidden;
-    outline-offset: #{$richEditor-outline_offset + $richEditor-border_width};
+
+    &:focus {
+        outline-offset: $richEditor-emojiOutline_offset;
+    }
 }
 
 .richEditor ~ .TextBoxWrapper {

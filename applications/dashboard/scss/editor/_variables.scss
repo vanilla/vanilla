@@ -47,6 +47,8 @@ $richEditor-selected_bg: rgba(174, 228, 254, 0.2);
 $richEditor-border_width: 1px;
 $richEditor-outline_width: 2px;
 $richEditor-outline_offset: -$richEditor-outline_width;
+$richEditor-emojiOutline_offset: -$richEditor-outline_width - $richEditor-border_width;
+
 $richEditor-outline_color: #0291DB;
 
 $richEditor-videoPlayIcon_width: 80px;

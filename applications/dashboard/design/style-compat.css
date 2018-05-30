@@ -878,7 +878,10 @@ label.checkbox input.checkbox-input {
   font-size: 24px;
   text-align: center;
   overflow: hidden;
-  outline-offset: -1px;
+}
+
+.richEditor-insertEmoji:focus {
+  outline-offset: -3px;
 }
 
 .richEditor ~ .TextBoxWrapper {

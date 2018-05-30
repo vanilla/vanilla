@@ -76,8 +76,14 @@
     justify-content: flex-start;
     flex-wrap: nowrap;
     list-style: none;
-    margin: 0;
     padding: 0;
+    width: calc(100% + #{2 * $richEditor-border_width});
+    margin: {
+        top: 0;
+        right: 0;
+        left: -$richEditor-border_width;
+        bottom: -$richEditor-border_width;
+    }
 
     .richEditor-menuItem {
         display: block;
@@ -143,15 +149,13 @@
     }
 
     &:hover,
-    &:focus,
-    &.isActive {
+    &:focus {
         .Close-x,
         .richEditorButton-icon {
             opacity: 1;
         }
     }
 
-    &:hover,
     &.isActive {
         @include editorButtonActiveStyles;
     }
@@ -236,10 +240,6 @@
     right: auto;
     text-align: center;
     user-select: none;
-
-    &:hover {
-        @include editorButtonActiveStyles;
-    }
 
     &:focus {
         @include editorButtonFocusStyles;
@@ -582,10 +582,6 @@
 
 .emojiGroup {
     color: $richEditor-emojiCategory_color;
-
-    &:hover {
-        color: $richEditor-emojiCategory_hoverColor;
-    }
 
     &.isSelected {
         @include editorButtonActiveStyles;

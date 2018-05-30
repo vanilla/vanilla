@@ -607,8 +607,12 @@ label.checkbox input.checkbox-input {
   justify-content: flex-start;
   flex-wrap: nowrap;
   list-style: none;
-  margin: 0;
   padding: 0;
+  width: calc(100% + 2px);
+  margin-top: 0;
+  margin-right: 0;
+  margin-left: -1px;
+  margin-bottom: -1px;
 }
 
 .richEditor-menuItems .richEditor-menuItem {
@@ -649,6 +653,10 @@ label.checkbox input.checkbox-input {
 }
 
 .richEditor-button {
+  border-style: solid;
+  border-width: 1px;
+  border-color: transparent;
+  outline: 0;
   display: block;
   height: 24px;
   width: 24px;
@@ -669,19 +677,20 @@ label.checkbox input.checkbox-input {
 
 .richEditor-button:focus {
   z-index: 2;
-  outline-width: 2px;
-  outline-offset: -2px;
-  outline-color: #0291DB;
+  border-color: rgba(2, 145, 219, 0.4);
+  transition-property: border;
+  transition-duration: 0;
+  transition-delay: 0.2s;
+  transition-timing-function: ease-in;
 }
 
 .richEditor-button:hover .Close-x,
 .richEditor-button:hover .richEditorButton-icon, .richEditor-button:focus .Close-x,
-.richEditor-button:focus .richEditorButton-icon, .richEditor-button.isActive .Close-x,
-.richEditor-button.isActive .richEditorButton-icon {
+.richEditor-button:focus .richEditorButton-icon {
   opacity: 1;
 }
 
-.richEditor-button:hover, .richEditor-button.isActive {
+.richEditor-button.isActive {
   background-color: rgba(174, 228, 254, 0.2);
 }
 
@@ -753,6 +762,10 @@ label.checkbox input.checkbox-input {
 }
 
 .richEditor-close.Close {
+  border-style: solid;
+  border-width: 1px;
+  border-color: transparent;
+  outline: 0;
   position: relative;
   display: block;
   width: 39px;
@@ -764,14 +777,12 @@ label.checkbox input.checkbox-input {
   user-select: none;
 }
 
-.richEditor-close.Close:hover {
-  background-color: rgba(174, 228, 254, 0.2);
-}
-
 .richEditor-close.Close:focus {
-  outline-width: 2px;
-  outline-offset: -2px;
-  outline-color: #0291DB;
+  border-color: rgba(2, 145, 219, 0.4);
+  transition-property: border;
+  transition-duration: 0;
+  transition-delay: 0.2s;
+  transition-timing-function: ease-in;
 }
 
 .insertLink-input.InputBox {
@@ -1081,10 +1092,6 @@ label.checkbox input.checkbox-input {
 
 .emojiGroup {
   color: #737982;
-}
-
-.emojiGroup:hover {
-  color: #212327;
 }
 
 .emojiGroup.isSelected {
@@ -1402,6 +1409,7 @@ body.isMobile .FormWrapper {
   -moz-appearance: none;
   appearance: none;
   border: 0;
+  outline: 0;
   border: 0;
   clip: rect(0 0 0 0);
   height: 1px;
@@ -1413,9 +1421,11 @@ body.isMobile .FormWrapper {
 }
 
 .accessibility-jumpTo:focus {
-  outline-width: 2px;
-  outline-offset: -2px;
-  outline-color: #0291DB;
+  border-color: rgba(2, 145, 219, 0.4);
+  transition-property: border;
+  transition-duration: 0;
+  transition-delay: 0.2s;
+  transition-timing-function: ease-in;
   position: absolute;
   top: 50px;
   left: 0;

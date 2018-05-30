@@ -49,6 +49,8 @@ class AuthenticatorModel {
     /** @var array */
     private $memoryData = [];
 
+    private $authenticatorInstances = [];
+
     /** @var array Map of DB fields to Authenticator fields. */
     private $dbToAuthenticator = [
         'AuthenticationKey' => 'authenticatorID',
@@ -135,6 +137,10 @@ class AuthenticatorModel {
             throw new NotFoundException('Authenticator does not exist.');
         }
 
+        if (isset($this->authenticatorInstances[$authenticatorType][$authenticatorID])) {
+            return $this->authenticatorInstances[$authenticatorType][$authenticatorID];
+        }
+
         $authenticatorClassName = $authenticatorType.'Authenticator';
 
         /** @var Authenticator $authenticatorInstance */
@@ -170,6 +176,8 @@ class AuthenticatorModel {
         } catch (Exception $e) {
             $authenticatorInstance = $this->container->get($fullyQualifiedAuthenticationClass);
         }
+
+        $this->authenticatorInstances[$authenticatorType][$authenticatorID] = $authenticatorInstance;
 
         return $authenticatorInstance;
     }
@@ -237,7 +245,7 @@ class AuthenticatorModel {
                 // Only try this for non SSOAuthenticator since we should have info in the DB for these.
                 if (!is_a($authenticatorClass, SSOAuthenticator::class, true)) {
                     try {
-                        $authenticatorInstance = $this->container->get($authenticatorClass);
+                        $authenticatorInstance = $this->getAuthenticator($authenticatorClass::getType(), $authenticatorClass::getType());
                         $authenticators[] = $authenticatorInstance;
                     } catch (Exception $e) {
                         throw new ServerException('Error while trying to instanciate authenticator '.$authenticatorClass, 500, ['AuthenticatorError' => $e]);
@@ -364,6 +372,7 @@ class AuthenticatorModel {
             $this->loadFromMemory = false;
         }
 
+        // Force a save at this point.
         return $this->saveSSOAuthenticatorData($authenticator) ? $authenticator : false;
     }
 
@@ -484,5 +493,7 @@ class AuthenticatorModel {
             'AuthenticationKey' => $authenticator->getID(),
             'AuthenticationSchemeAlias' => $authenticator::getType(),
         ]);
+
+        unset($this->authenticatorInstances[$authenticator->getType()][$authenticator->getID()]);
     }
 }

@@ -256,6 +256,7 @@
 // Insert Media
 .insertPopover {
     position: relative;
+    overflow: hidden;
     z-index: 6;
 
     .InputBox {
@@ -355,6 +356,7 @@
     font-size: $richEditor-icon_size;
     text-align: center;
     overflow: hidden;
+    outline-offset: #{$richEditor-outline_offset + $richEditor-border_width};
 }
 
 .richEditor ~ .TextBoxWrapper {

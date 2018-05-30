@@ -782,6 +782,7 @@ label.checkbox input.checkbox-input {
 
 .insertPopover {
   position: relative;
+  overflow: hidden;
   z-index: 6;
 }
 
@@ -877,6 +878,7 @@ label.checkbox input.checkbox-input {
   font-size: 24px;
   text-align: center;
   overflow: hidden;
+  outline-offset: -1px;
 }
 
 .richEditor ~ .TextBoxWrapper {

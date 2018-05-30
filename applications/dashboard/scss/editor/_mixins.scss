@@ -180,6 +180,7 @@ $spinnerOffset: 73deg;
             .richEditor-menu.insertPopover {
                 top: 100%;
                 bottom: auto;
+                overflow: hidden;
             }
         }
 

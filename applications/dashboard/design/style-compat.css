@@ -653,10 +653,6 @@ label.checkbox input.checkbox-input {
 }
 
 .richEditor-button {
-  border-style: solid;
-  border-width: 1px;
-  border-color: transparent;
-  outline: 0;
   display: block;
   height: 24px;
   width: 24px;
@@ -677,11 +673,9 @@ label.checkbox input.checkbox-input {
 
 .richEditor-button:focus {
   z-index: 2;
-  border-color: rgba(2, 145, 219, 0.4);
-  transition-property: border;
-  transition-duration: 0;
-  transition-delay: 0.2s;
-  transition-timing-function: ease-in;
+  outline-width: 2px;
+  outline-offset: -2px;
+  outline-color: #0291DB;
 }
 
 .richEditor-button:hover .Close-x,
@@ -762,10 +756,6 @@ label.checkbox input.checkbox-input {
 }
 
 .richEditor-close.Close {
-  border-style: solid;
-  border-width: 1px;
-  border-color: transparent;
-  outline: 0;
   position: relative;
   display: block;
   width: 39px;
@@ -778,11 +768,9 @@ label.checkbox input.checkbox-input {
 }
 
 .richEditor-close.Close:focus {
-  border-color: rgba(2, 145, 219, 0.4);
-  transition-property: border;
-  transition-duration: 0;
-  transition-delay: 0.2s;
-  transition-timing-function: ease-in;
+  outline-width: 2px;
+  outline-offset: -2px;
+  outline-color: #0291DB;
 }
 
 .insertLink-input.InputBox {
@@ -1306,6 +1294,7 @@ body.isMobile .richEditor.isFocused .u-visibleOnFullScreenEditor {
 body.isMobile .richEditor.isFocused .richEditor-menu.insertPopover {
   top: 100%;
   bottom: auto;
+  overflow: hidden;
 }
 
 body.isMobile .richEditorParagraphMenu {
@@ -1394,6 +1383,7 @@ body.isMobile .FormWrapper {
   .richEditor.isFocused .richEditor-menu.insertPopover {
     top: 100%;
     bottom: auto;
+    overflow: hidden;
   }
   .richEditorParagraphMenu {
     display: none !important;
@@ -1409,7 +1399,6 @@ body.isMobile .FormWrapper {
   -moz-appearance: none;
   appearance: none;
   border: 0;
-  outline: 0;
   border: 0;
   clip: rect(0 0 0 0);
   height: 1px;
@@ -1421,11 +1410,9 @@ body.isMobile .FormWrapper {
 }
 
 .accessibility-jumpTo:focus {
-  border-color: rgba(2, 145, 219, 0.4);
-  transition-property: border;
-  transition-duration: 0;
-  transition-delay: 0.2s;
-  transition-timing-function: ease-in;
+  outline-width: 2px;
+  outline-offset: -2px;
+  outline-color: #0291DB;
   position: absolute;
   top: 50px;
   left: 0;

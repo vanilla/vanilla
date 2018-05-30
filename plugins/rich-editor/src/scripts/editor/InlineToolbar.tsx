@@ -28,6 +28,8 @@ interface IState {
     inputValue: string;
     showFormatMenu: boolean;
     showLinkMenu: boolean;
+    hasFocus: boolean;
+    quillHasFocus: boolean;
 }
 
 export class InlineToolbar extends React.Component<IProps, IState> {
@@ -51,6 +53,8 @@ export class InlineToolbar extends React.Component<IProps, IState> {
                 index: 0,
                 length: 0,
             },
+            hasFocus: false,
+            quillHasFocus: false,
             showFormatMenu: false,
             showLinkMenu: false,
         };
@@ -63,13 +67,21 @@ export class InlineToolbar extends React.Component<IProps, IState> {
             </span>
         ) : null;
 
+        const hasFocus = this.state.hasFocus || this.state.quillHasFocus;
+
         return (
             <div ref={this.selfRef}>
-                <SelectionPositionToolbar selection={this.state.cachedRange} isVisible={this.state.showFormatMenu}>
+                <SelectionPositionToolbar
+                    selection={this.state.cachedRange}
+                    isVisible={this.state.showFormatMenu && hasFocus}
+                >
                     {alertMessage}
                     <InlineToolbarItems currentSelection={this.state.cachedRange} linkFormatter={this.linkFormatter} />
                 </SelectionPositionToolbar>
-                <SelectionPositionToolbar selection={this.state.cachedRange} isVisible={this.state.showLinkMenu}>
+                <SelectionPositionToolbar
+                    selection={this.state.cachedRange}
+                    isVisible={this.state.showLinkMenu && hasFocus}
+                >
                     <InlineToolbarLinkInput
                         inputRef={this.linkInput}
                         inputValue={this.state.inputValue}
@@ -86,9 +98,10 @@ export class InlineToolbar extends React.Component<IProps, IState> {
      * Mount quill listeners.
      */
     public componentDidMount() {
-        this.quill.on(Quill.events.EDITOR_CHANGE, this.handleEditorChange);
         document.addEventListener("keydown", this.escFunction, false);
+        this.quill.on(Quill.events.EDITOR_CHANGE, this.handleEditorChange);
         watchFocusInDomTree(this.selfRef.current!, this.handleFocusChange);
+        watchFocusInDomTree(this.quill.root!, this.handleQuillFocusChange);
 
         // Add a key binding for the link popup.
         const keyboard: Keyboard = this.quill.getModule("keyboard");
@@ -111,9 +124,11 @@ export class InlineToolbar extends React.Component<IProps, IState> {
     }
 
     private handleFocusChange = hasFocus => {
-        if (!hasFocus) {
-            this.reset();
-        }
+        this.setState({ hasFocus });
+    };
+
+    private handleQuillFocusChange = hasFocus => {
+        this.setState({ quillHasFocus: hasFocus });
     };
 
     /**

@@ -257,7 +257,7 @@ class AuthenticateApiController extends AbstractApiController {
      */
     public function getLinkUserOutputSchema() {
         return Schema::parse([
-            'ssoUser' => [
+            'ssoUser:o' => [
                 'uniqueID:s' => 'Unique ID of the user supplied by the provider.',
                 'name:s?' => 'The name of the user supplied by the provider.',
                 'email:s?' => 'The name of the user supplied by the provider.',
@@ -605,7 +605,12 @@ class AuthenticateApiController extends AbstractApiController {
             Schema::parse([
                 'user?' => $this->getUserFragmentSchema(),
                 'message:s?' => 'Global error message.',
-                'errors:a?' => 'List of errors.',
+                'errors:a?' => [
+                    'items' => [
+                        'type'  => 'object',
+                    ],
+                    'description' => 'List of errors.',
+                ],
                 'ssoUser?' => null,
                 'authenticator?' => null,
                 'config?' => null,

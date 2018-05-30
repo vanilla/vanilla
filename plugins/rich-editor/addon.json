@@ -15,7 +15,8 @@
         }
     ],
     "require": {
-        "vanilla": ">=2.5"
+        "vanilla": ">=2.5",
+        "dashboard": ">= 2.6"
     },
     "conflict": {
         "Quotes": "*",

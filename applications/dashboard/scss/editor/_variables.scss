@@ -9,7 +9,7 @@ $richEditor_padding: $richEditor_verticalPadding 12px !default;
 $richEditor-embedMenu_padding: 0 !default;
 $richEditor-embedMenuWideButton_padding: 9px;
 $richEditor-embedMenuWideButton_fontSize: .9em;
-$richEditor-icon_opacity: .6 !default;
+$richEditor-icon_opacity: .7 !default;
 $richEditor-atMention_width: 200px !default;
 $richEditor-atMentionAvatar_width: 30px !default;
 $richEditor-atMentionAvatar_margin: 10px !default;
@@ -41,10 +41,15 @@ $richEditor-pilcrow_gutter: 36px;
 $richEditor-pilcrowAnimation_duration: 0.3s;
 $richEditor-emojiCategory_color: #737982;
 $richEditor-emojiCategory_hoverColor: #212327;
-$richEditor-emojiCategory_selectedBg: #aee4fe;
 $richEditor-emojiGroup_paddingLeft: 3px;
-$richEditor-mobileEmbedMenu_borderColor: #a3a3a3;
+$richEditor-mobileEmbedMenu_borderColor: #0291db;
+$richEditor-selected_bg: rgba(174, 228, 254, 0.2);
+$richEditor-border_width: 1px;
+$richEditor-outline_width: 2px;
+$richEditor-outline_offset: -$richEditor-outline_width;
+$richEditor-emojiOutline_offset: -$richEditor-outline_width - $richEditor-border_width;
 
+$richEditor-outline_color: #0291DB;
 
 $richEditor-videoPlayIcon_width: 80px;
 $richEditor-videoPlayIcon_hoverColor: #0291db;

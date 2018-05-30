@@ -180,6 +180,7 @@ $spinnerOffset: 73deg;
             .richEditor-menu.insertPopover {
                 top: 100%;
                 bottom: auto;
+                overflow: hidden;
             }
         }
 
@@ -193,4 +194,17 @@ $spinnerOffset: 73deg;
         padding-left: $richEditor-mobile_spacing;
         padding-right: $richEditor-mobile_spacing;
     }
+}
+
+
+@mixin editorButtonFocusStyles() {
+    outline: {
+        width: $richEditor-outline_width;
+        offset: #{$richEditor-outline_offset};
+        color: $richEditor-outline_color;
+    }
+}
+
+@mixin editorButtonActiveStyles() {
+    background-color: $richEditor-selected_bg;
 }

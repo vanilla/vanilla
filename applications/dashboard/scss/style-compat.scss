@@ -18,12 +18,13 @@
 @import "new-components/checkboxAndRadioButton"; // For new forms only
 @import "new-components/buttons"; // For new authentication pages
 @import "new-components/passwordStrength"; // For new authentication pages
-@import "new-components/_pageHeading.scss";
+@import "new-components/pageHeading";
 
 // Editor
 @import "editor/variables";
 @import "editor/mixins";
 @import "editor/richEditor";
+@import "editor/accessibility";
 @import "editor/spoiler";
 @import "editor/embed";
 @import "editor/emoji";

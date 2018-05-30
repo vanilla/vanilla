@@ -553,6 +553,18 @@ class Gdn_Form extends Gdn_Pluggable {
         // Show root categories as headings (ie. you can't post in them)?
         $doHeadings = val('Headings', $options, c('Vanilla.Categories.DoHeadings'));
 
+        // If DoHeadings is enabled check if post is a draft so that children,
+        // so that children categories won't be considered a top-level
+        // category and disabled.
+        $isDraft = false;
+        if ($doHeadings) {
+            $draftID = $this->HiddenInputs['DraftID'];
+            $discussionID = $this->HiddenInputs['DiscussionID'];
+            if ($draftID && $discussionID == "") {
+                $isDraft = true;
+            }
+        }
+
         // If making headings disabled and there was no default value for
         // selection, make sure to select the first non-disabled value, or the
         // browser will auto-select the first disabled option.
@@ -562,7 +574,7 @@ class Gdn_Form extends Gdn_Pluggable {
         if (is_array($safeCategoryData)) {
             foreach ($safeCategoryData as $categoryID => $category) {
                 $depth = val('Depth', $category, 0);
-                $disabled = (($depth == 1 && $doHeadings) || !$category['AllowDiscussions'] || val('DisplayAs', $category) != 'Discussions');
+                $disabled = (($depth == 1 && $doHeadings && !$isDraft) || !$category['AllowDiscussions'] || val('DisplayAs', $category) != 'Discussions');
                 $selected = in_array($categoryID, $value) && $hasValue;
                 if ($forceCleanSelection && $depth > 1) {
                     $selected = true;

@@ -108,7 +108,8 @@ abstract class SSOAuthenticator extends Authenticator {
     }
 
     /**
-     *
+     * Take an array of data matching {@link AuthenticatorModel::getAuthenticatorInfo()} and assign the values to this
+     * authenticator's property. Extending classes might want to redefine this function to add extra functionalities to it.
      *
      * @param array $data
      *

@@ -48,9 +48,9 @@ export default class EditorContextProvider extends React.PureComponent<IProps> {
  *
  * @returns {ComponentWithEditor} - A component with a quill context injected as props.
  */
-export function withEditor<T extends IEditorContextProps>(
+export function withEditor<T extends IEditorContextProps = IEditorContextProps>(
     WrappedComponent: React.ComponentClass<T>,
-): React.ComponentClass<Omit<T, keyof IProps>> {
+): React.ComponentClass<T> {
     function ComponentWithEditor(props, context) {
         return <WrappedComponent {...context} {...props} />;
     }

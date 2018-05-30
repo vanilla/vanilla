@@ -102,20 +102,12 @@ export class EmojiPicker extends React.PureComponent<IProps, IState> {
                     const isSelected = this.state.selectedGroup === groupKey;
                     const buttonClasses = classNames("richEditor-button", "emojiGroup", { isSelected });
 
-                    let onBlur = (event: React.FocusEvent<any>) => {
-                        return;
-                    };
-                    if (groupKey + 1 === emojiGroupLength) {
-                        onBlur = this.props.blurHandler;
-                    }
-
                     const onClick = event => this.handleCategoryClick(event, groupKey);
 
                     return (
                         <button
                             type="button"
                             onClick={onClick}
-                            onBlur={onBlur}
                             aria-current={isSelected}
                             aria-label={t("Jump to emoji category: ") + t(groupName)}
                             key={"emojiGroup-" + groupName}

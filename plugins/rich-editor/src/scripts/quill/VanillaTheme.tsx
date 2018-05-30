@@ -7,7 +7,6 @@
 // Quill
 import Quill, { QuillOptionsStatic, Blot } from "quill/core";
 import ThemeBase from "quill/core/theme";
-import { closeEditorFlyouts } from "./utility";
 import KeyboardBindings from "./KeyboardBindings";
 
 // React
@@ -39,7 +38,7 @@ export default class VanillaTheme extends ThemeBase {
         this.quill.root.setAttribute("tabIndex", "0");
         this.quill.root.classList.add("richEditor-text");
         this.quill.root.classList.add("userContent");
-        this.quill.root.addEventListener("focusin", () => closeEditorFlyouts());
+        this.quill.root.setAttribute("tabindex", 0);
 
         // Add keyboard bindings to options.
         this.addModule("embed/insertion");
@@ -57,8 +56,6 @@ export default class VanillaTheme extends ThemeBase {
         }
         this.mountMentionModule();
         this.mountEmojiMenu();
-        this.documentClickListener = this.documentClickListener.bind(this);
-        document.addEventListener("click", this.documentClickListener);
     }
 
     public init() {
@@ -66,12 +63,6 @@ export default class VanillaTheme extends ThemeBase {
         this.mountToolbar();
         this.mountParagraphMenu();
         this.mountEmbedPopover();
-    }
-
-    private documentClickListener(event) {
-        if (event.target instanceof Node && !this.jsBodyBoxContainer.contains(event.target)) {
-            closeEditorFlyouts();
-        }
     }
 
     /**

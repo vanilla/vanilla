@@ -12,10 +12,11 @@ import Parchment from "parchment";
 import { t } from "@dashboard/application";
 import Toolbar from "./generic/Toolbar";
 import * as Icons from "./Icons";
-import { closeEditorFlyouts, CLOSE_FLYOUT_EVENT } from "../quill/utility";
 import { withEditor, IEditorContextProps } from "./ContextProvider";
 import { IMenuItemData } from "./generic/MenuItem";
 import FocusableEmbedBlot from "../quill/blots/abstract/FocusableEmbedBlot";
+import { watchFocusInDomTree } from "@dashboard/dom";
+import { createEditorFlyoutEscapeListener } from "../quill/utility";
 
 const PARAGRAPH_ITEMS = {
     header: {
@@ -52,7 +53,8 @@ export class ParagraphToolbar extends React.PureComponent<IEditorContextProps, I
     private componentID: string;
     private menuID: string;
     private buttonID: string;
-    private selfRef: Element;
+    private selfRef: React.RefObject<HTMLDivElement> = React.createRef();
+    private buttonRef: React.RefObject<HTMLButtonElement> = React.createRef();
     private toolbarItems: {
         [key: string]: IMenuItemData;
     };
@@ -87,8 +89,10 @@ export class ParagraphToolbar extends React.PureComponent<IEditorContextProps, I
      */
     public componentDidMount() {
         this.quill.on(Emitter.events.EDITOR_CHANGE, this.handleEditorChange);
-        document.addEventListener("keydown", this.escFunction, false);
-        document.addEventListener(CLOSE_FLYOUT_EVENT, this.closeMenu);
+        watchFocusInDomTree(this.selfRef.current!, this.handleFocusChange);
+        createEditorFlyoutEscapeListener(this.selfRef.current!, this.buttonRef.current!, () => {
+            this.setState({ showMenu: false });
+        });
     }
 
     /**
@@ -96,8 +100,6 @@ export class ParagraphToolbar extends React.PureComponent<IEditorContextProps, I
      */
     public componentWillUnmount() {
         this.quill.off(Emitter.events.EDITOR_CHANGE, this.handleEditorChange);
-        document.removeEventListener("keydown", this.escFunction, false);
-        document.removeEventListener(CLOSE_FLYOUT_EVENT, this.closeMenu);
     }
 
     public render() {
@@ -114,10 +116,12 @@ export class ParagraphToolbar extends React.PureComponent<IEditorContextProps, I
                 id={this.componentID}
                 style={this.getPilcrowStyles()}
                 className="richEditor-menu richEditorParagraphMenu"
+                ref={this.selfRef}
             >
                 <button
                     type="button"
                     id={this.buttonID}
+                    ref={this.buttonRef}
                     aria-label={t("richEditor.menu.paragraph")}
                     aria-controls={this.menuID}
                     aria-expanded={this.state.showMenu}
@@ -136,12 +140,7 @@ export class ParagraphToolbar extends React.PureComponent<IEditorContextProps, I
                     ref={ref => (this.toolbarNode = ref!)}
                     role="menu"
                 >
-                    <Toolbar
-                        menuItems={this.toolbarItems}
-                        isHidden={!this.state.showMenu}
-                        onBlur={this.checkForExternalFocus}
-                        itemRole="menuitem"
-                    />
+                    <Toolbar menuItems={this.toolbarItems} isHidden={!this.state.showMenu} itemRole="menuitem" />
                     <div role="presentation" className="richEditor-nubPosition">
                         <div className="richEditor-nub" />
                     </div>
@@ -149,6 +148,12 @@ export class ParagraphToolbar extends React.PureComponent<IEditorContextProps, I
             </div>
         );
     }
+
+    private handleFocusChange = hasFocus => {
+        if (!hasFocus) {
+            this.setState({ showMenu: false });
+        }
+    };
 
     private initializeToolbarValues() {
         const initialToolbarItems: any = {};
@@ -200,48 +205,10 @@ export class ParagraphToolbar extends React.PureComponent<IEditorContextProps, I
      * Be sure to strip out all other formats before formatting as code.
      */
     private codeFormatter = () => {
-        const selection = this.quill.getSelection();
+        const selection = this.quill.getSelection(true);
         const [line] = this.quill.getLine(selection.index);
         this.quill.removeFormat(line.offset(), line.length(), Quill.sources.API);
         this.quill.formatLine(line.offset(), line.length(), "code-block", Quill.sources.USER);
-    };
-
-    /**
-     * Close the menu.
-     */
-    private closeMenu = (event: any) => {
-        if (event.detail && event.detail.firingKey === this.constructor.name) {
-            return;
-        }
-
-        const activeElement = document.activeElement;
-        const parentElement = document.getElementById(this.componentID);
-
-        this.setState({
-            showMenu: false,
-        });
-
-        if (parentElement && activeElement && parentElement.contains(activeElement)) {
-            const button = document.getElementById(this.buttonID);
-            if (button instanceof HTMLElement) {
-                button.focus();
-            }
-        }
-    };
-
-    /**
-     * Handle the escape key.
-     *
-     * @param {React.KeyboardEvent} event - A synthetic keyboard event.
-     */
-    private escFunction = event => {
-        if (event.keyCode === 27 && this.state.showMenu) {
-            this.closeMenu(event);
-            const button = document.getElementById(this.buttonID);
-            if (button instanceof HTMLElement) {
-                button.focus();
-            }
-        }
     };
 
     /**
@@ -350,7 +317,6 @@ export class ParagraphToolbar extends React.PureComponent<IEditorContextProps, I
         this.setState({
             showMenu: !this.state.showMenu,
         });
-        closeEditorFlyouts(this.constructor.name);
         const menu = document.getElementById(this.menuID);
         const firstButton = menu ? menu.querySelector(".richEditor-button") : false;
         if (firstButton instanceof HTMLElement) {
@@ -358,21 +324,6 @@ export class ParagraphToolbar extends React.PureComponent<IEditorContextProps, I
                 firstButton.focus();
             });
         }
-    };
-
-    /**
-     * Close if we lose focus on the component
-     */
-    private checkForExternalFocus = (event: React.FocusEvent<any>) => {
-        // See https://fb.me/react-event-pooling
-        event.persist();
-        setImmediate(() => {
-            const activeElement = document.activeElement;
-            const paragraphMenu = document.getElementById(this.componentID);
-            if (paragraphMenu && activeElement !== paragraphMenu && !paragraphMenu.contains(activeElement)) {
-                this.closeMenu(event);
-            }
-        });
     };
 
     /**
@@ -427,7 +378,6 @@ export class ParagraphToolbar extends React.PureComponent<IEditorContextProps, I
                 );
                 break;
         }
-        closeEditorFlyouts(this.constructor.name);
     };
 }
 

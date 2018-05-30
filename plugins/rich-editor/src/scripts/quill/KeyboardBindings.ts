@@ -377,8 +377,8 @@ export default class KeyboardBindings {
             shortKey: true,
             handler: (range, context) => {
                 if (
-                    rangeContainsBlot(this.quill, range, CodeBlockBlot) ||
-                    rangeContainsBlot(this.quill, range, CodeBlot)
+                    rangeContainsBlot(this.quill, CodeBlockBlot, range) ||
+                    rangeContainsBlot(this.quill, CodeBlot, range)
                 ) {
                     return;
                 }

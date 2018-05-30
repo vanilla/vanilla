@@ -135,6 +135,7 @@ export class MentionModule extends React.PureComponent<IProps, IState> {
                     });
                     this.injectComboBoxAccessibility();
                     event.preventDefault();
+                    event.stopPropagation();
                     break;
                 case Keyboard.match(event, Keyboard.keys.UP):
                     newIndex = activeItemIndex === firstIndex ? lastIndex : prevIndex;
@@ -145,15 +146,18 @@ export class MentionModule extends React.PureComponent<IProps, IState> {
                     });
                     this.injectComboBoxAccessibility();
                     event.preventDefault();
+                    event.stopPropagation();
                     break;
                 case Keyboard.match(event, Keyboard.keys.ENTER):
                 case Keyboard.match(event, Keyboard.keys.TAB):
                     this.confirmActiveMention();
                     event.preventDefault();
+                    event.stopPropagation();
                     break;
                 case Keyboard.match(event, Keyboard.keys.ESCAPE):
                     this.cancelActiveMention();
                     event.preventDefault();
+                    event.stopPropagation();
                     break;
             }
         }

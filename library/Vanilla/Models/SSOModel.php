@@ -436,7 +436,7 @@ class SSOModel {
             $allowConnect = $this->config->get('Garden.Registration.AllowConnect', true);
 
             // We want to link to the currently logged user.
-            if ($body['linkToSession'] ?? false) {
+            if ($options['linkToSession'] ?? false) {
                 if (!$this->session->isValid()) {
                     throw new ClientException('Cannot link user to session while not signed in.', 401);
                 }

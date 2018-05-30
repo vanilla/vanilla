@@ -3207,11 +3207,11 @@ class DiscussionModel extends Gdn_Model {
     public function structuredData(array $discussion): array {
         $name = $discussion['Name'] ?? '';
         $dateInserted = $discussion['DateInserted'] ?? '';
-        $body = Gdn_Format::reduceWhiteSpaces(Gdn_Format::plainText($discussion['Body'] ?? '', $discussion['Format'] ?? 'Html'));
+        $body = Gdn_Format::reduceWhiteSpaces(Gdn_Format::excerpt($discussion['Body'] ?? '', $discussion['Format'] ?? 'Html'));
 
         $result = [
             "headline" => $name,
-            "description" => sliceParagraph($body, 160),
+            "description" => sliceString($body, 500),
             "discussionUrl" => discussionUrl($discussion),
             "dateCreated" => $dateInserted
         ];

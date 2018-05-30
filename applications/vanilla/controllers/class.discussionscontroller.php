@@ -30,12 +30,8 @@ class DiscussionsController extends VanillaController {
     /** @var array Limit the discussions to just this list of categories, checked for view permission. */
     protected $categoryIDs;
 
-    /** @var boolean Value indicating if the category-following filter should be displayed when rendering a view */
+    /** @var boolean Value indicating whether to show the category following filter */
     public $enableFollowingFilter = false;
-
-    /** @var array list of pages that opt in to the category following filter */
-    private $categoryFilterList = ["discussions"];
-
 
     /**
      * "Table" layout for discussions. Mimics more traditional forum discussion layout.
@@ -136,7 +132,7 @@ class DiscussionsController extends VanillaController {
                 null,
                 Gdn::request()->get('save')
             );
-            if (in_array($this->SelfUrl, $this->categoryFilterList)) {
+            if ($this->SelfUrl === "discussions") {
                 $this->enableFollowingFilter = true;
             }
         } else {
@@ -848,16 +844,5 @@ class DiscussionsController extends VanillaController {
 
         $this->View = c('Vanilla.Discussions.Layout') == 'table' && $this->SyndicationMethod == SYNDICATION_NONE ? 'table' : 'index';
         $this->render($this->View, 'discussions', 'vanilla');
-    }
-
-    /**
-     * Allows pages to opt-in to the category following filter.
-     *
-     * @param string $url
-     */
-    public function addCategoryFollowingUrl(string $url) {
-        if ($url) {
-            array_push($this->categoryFilterList, $url);
-        }
     }
 }

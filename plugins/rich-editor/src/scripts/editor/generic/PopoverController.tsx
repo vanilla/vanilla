@@ -8,11 +8,11 @@ import React from "react";
 import { withEditor, IEditorContextProps } from "../ContextProvider";
 import { getRequiredID, uniqueIDFromPrefix, IRequiredComponentID } from "@dashboard/componentIDs";
 import { watchFocusInDomTree } from "@dashboard/dom";
+import { createEditorFlyoutEscapeListener } from "../../quill/utility";
 
 export interface IPopoverControllerChildParameters {
     id: string;
     initialFocusRef: React.RefObject<any>;
-    blurHandler: React.FocusEventHandler<any>;
     isVisible: boolean;
     closeMenuHandler(event?: React.SyntheticEvent<any>);
 }
@@ -57,7 +57,6 @@ export default class PopoverController extends React.PureComponent<IProps, IStat
                 <button
                     id={this.state.id}
                     onClick={this.togglePopover}
-                    onBlur={this.blurHandler}
                     className="richEditor-button"
                     type="button"
                     aria-controls={this.componentID}
@@ -70,7 +69,6 @@ export default class PopoverController extends React.PureComponent<IProps, IStat
                 {this.props.children({
                     id: this.componentID,
                     initialFocusRef: this.initalFocusRef,
-                    blurHandler: this.blurHandler,
                     isVisible: this.state.isVisible,
                     closeMenuHandler: this.closeMenuHandler,
                 })}
@@ -85,52 +83,14 @@ export default class PopoverController extends React.PureComponent<IProps, IStat
     }
 
     public componentDidMount() {
-        document.addEventListener("keydown", this.handleEscapeKey, false);
         watchFocusInDomTree(this.controllerRef.current!, this.handleFocusChange);
-    }
-
-    public componentWillUnmount() {
-        document.removeEventListener("keydown", this.handleEscapeKey, false);
+        createEditorFlyoutEscapeListener(this.controllerRef.current!, this.buttonRef.current!, this.closeMenuHandler);
     }
 
     private handleFocusChange = hasFocus => {
         if (!hasFocus) {
             this.setState({ isVisible: false });
         }
-    };
-
-    /**
-     * Handle the escape key.
-     *
-     * @param {React.KeyboardEvent} event - A synthetic keyboard event.
-     */
-    private handleEscapeKey = event => {
-        if (this.state.isVisible) {
-            if (event.code === "Escape") {
-                this.closeMenuHandler(event);
-            }
-        }
-    };
-
-    /**
-     * Close if we lose focus on the component.
-     *
-     * @param {React.FocusEvent} event - A synthetic event.
-     */
-    private blurHandler = event => {
-        // https://reactjs.org/docs/events.html#event-pooling
-        event.persist();
-
-        setImmediate(() => {
-            const { activeElement } = document;
-            if (
-                activeElement !== this.controllerRef.current &&
-                this.controllerRef.current &&
-                !this.controllerRef.current.contains(activeElement)
-            ) {
-                this.closeMenuHandler(event);
-            }
-        });
     };
 
     /**
@@ -144,7 +104,7 @@ export default class PopoverController extends React.PureComponent<IProps, IStat
 
     /**
      * Closes menu
-     * @param {SyntheticEvent} event - The fired event. This could be a custom event.
+     * @param event - The fired event. This could be a custom event.
      */
     private closeMenuHandler = event => {
         if (event.detail && event.detail.firingKey && event.detail.firingKey === this.constructor.name) {

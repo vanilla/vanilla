@@ -16,6 +16,7 @@ import { withEditor, IEditorContextProps } from "./ContextProvider";
 import { IMenuItemData } from "./generic/MenuItem";
 import FocusableEmbedBlot from "../quill/blots/abstract/FocusableEmbedBlot";
 import { watchFocusInDomTree } from "@dashboard/dom";
+import { createEditorFlyoutEscapeListener } from "../quill/utility";
 
 const PARAGRAPH_ITEMS = {
     header: {
@@ -53,6 +54,7 @@ export class ParagraphToolbar extends React.PureComponent<IEditorContextProps, I
     private menuID: string;
     private buttonID: string;
     private selfRef: React.RefObject<HTMLDivElement> = React.createRef();
+    private buttonRef: React.RefObject<HTMLButtonElement> = React.createRef();
     private toolbarItems: {
         [key: string]: IMenuItemData;
     };
@@ -87,8 +89,10 @@ export class ParagraphToolbar extends React.PureComponent<IEditorContextProps, I
      */
     public componentDidMount() {
         this.quill.on(Emitter.events.EDITOR_CHANGE, this.handleEditorChange);
-        document.addEventListener("keydown", this.escFunction, false);
         watchFocusInDomTree(this.selfRef.current!, this.handleFocusChange);
+        createEditorFlyoutEscapeListener(this.selfRef.current!, this.buttonRef.current!, () => {
+            this.setState({ showMenu: false });
+        });
     }
 
     /**
@@ -96,7 +100,6 @@ export class ParagraphToolbar extends React.PureComponent<IEditorContextProps, I
      */
     public componentWillUnmount() {
         this.quill.off(Emitter.events.EDITOR_CHANGE, this.handleEditorChange);
-        document.removeEventListener("keydown", this.escFunction, false);
     }
 
     public render() {
@@ -118,6 +121,7 @@ export class ParagraphToolbar extends React.PureComponent<IEditorContextProps, I
                 <button
                     type="button"
                     id={this.buttonID}
+                    ref={this.buttonRef}
                     aria-label={t("richEditor.menu.paragraph")}
                     aria-controls={this.menuID}
                     aria-expanded={this.state.showMenu}
@@ -205,40 +209,6 @@ export class ParagraphToolbar extends React.PureComponent<IEditorContextProps, I
         const [line] = this.quill.getLine(selection.index);
         this.quill.removeFormat(line.offset(), line.length(), Quill.sources.API);
         this.quill.formatLine(line.offset(), line.length(), "code-block", Quill.sources.USER);
-    };
-
-    /**
-     * Close the menu.
-     */
-    private closeMenu = () => {
-        const activeElement = document.activeElement;
-        const parentElement = document.getElementById(this.componentID);
-
-        this.setState({
-            showMenu: false,
-        });
-
-        if (parentElement && activeElement && parentElement.contains(activeElement)) {
-            const button = document.getElementById(this.buttonID);
-            if (button instanceof HTMLElement) {
-                button.focus();
-            }
-        }
-    };
-
-    /**
-     * Handle the escape key.
-     *
-     * @param {React.KeyboardEvent} event - A synthetic keyboard event.
-     */
-    private escFunction = event => {
-        if (event.keyCode === 27 && this.state.showMenu) {
-            this.closeMenu();
-            const button = document.getElementById(this.buttonID);
-            if (button instanceof HTMLElement) {
-                button.focus();
-            }
-        }
     };
 
     /**

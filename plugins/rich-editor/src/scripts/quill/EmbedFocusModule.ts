@@ -174,7 +174,9 @@ export default class EmbedFocusModule extends Module {
     };
 
     private escapeMobileFullScreen = (event: KeyboardEvent) => {
-        if (KeyboardModule.match(event, { key: KeyboardModule.keys.ESCAPE, shiftKey: false })) {
+        const position = window.getComputedStyle(this.editorRoot).getPropertyValue("position");
+        const editorIsFullscreen = this.editorRoot.classList.contains("isFocused") && position === "fixed";
+        if (editorIsFullscreen && KeyboardModule.match(event, { key: KeyboardModule.keys.ESCAPE, shiftKey: false })) {
             this.quill.root.focus();
             const nextEl: any = getNextTabbableElement({
                 root: this.formWrapper,

@@ -35,7 +35,7 @@ describe("Toolbar", () => {
                 active: false,
             },
         };
-        const toolbar = shallow(<Toolbar quill={quill as any} menuItems={menuItems} onBlur={noop} />);
+        const toolbar = shallow(<Toolbar quill={quill as any} menuItems={menuItems} />);
 
         expect(toolbar.find(EditorMenuItem).length).eq(4);
     });

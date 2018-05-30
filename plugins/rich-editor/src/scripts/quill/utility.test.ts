@@ -8,6 +8,8 @@ import * as utility from "./utility";
 import Quill from "../quill";
 import { expect } from "chai";
 
+const prettyNewline = (contents: string) => contents.replace(/\n/g, "↵ ");
+
 describe("Range/Boundary conversions", () => {
     it("converts range to boundary", () => {
         const input = {
@@ -77,7 +79,7 @@ describe("getMentionRange", () => {
             },
         ]);
 
-        const description = "\n" + quill.getText() + "\nIndex: ";
+        const description = quill.getText() + "- Index: ";
         const validIndexes = [2, 3, 4, 5, 6, 7, 8];
 
         const expected = {
@@ -86,7 +88,7 @@ describe("getMentionRange", () => {
         };
 
         validIndexes.forEach(index => {
-            it(description + index, () => {
+            it(prettyNewline(description) + index, () => {
                 expect(utility.getMentionRange(quill, index)).deep.equals({ index: 0, length: index });
             });
         });
@@ -100,12 +102,12 @@ describe("getMentionRange", () => {
                 insert: " @Some",
             },
         ]);
-        const description = "\n" + quill.getText() + "\nIndex: ";
+        const description = quill.getText() + "- Index: ";
 
         const validIndexes = [4, 5, 6, 7];
 
         validIndexes.forEach(index => {
-            it(description + index, () => {
+            it(prettyNewline(description) + index, () => {
                 expect(utility.getMentionRange(quill, index)).deep.equals({ index: 2, length: index - 2 });
             });
         });
@@ -123,12 +125,12 @@ describe("getMentionRange", () => {
             },
         ]);
 
-        const description = "\n" + quill.getText() + "\nIndex: ";
+        const description = quill.getText() + "- Index: ";
 
         const validIndexes = [8, 9, 10];
 
         validIndexes.forEach(index => {
-            it(description + index, () => {
+            it(prettyNewline(description) + index, () => {
                 expect(utility.getMentionRange(quill, index)).deep.equals({ index: 6, length: index - 6 });
             });
         });

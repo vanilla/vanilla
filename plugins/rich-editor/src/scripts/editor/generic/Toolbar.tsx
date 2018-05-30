@@ -20,7 +20,6 @@ interface IProps extends IEditorContextProps {
         [key: string]: IMenuItemData;
     };
     isHidden?: boolean;
-    onBlur: (event: React.FocusEvent<any>) => void;
     itemRole?: string;
     restrictedFormats?: null | string[];
 }
@@ -129,7 +128,6 @@ export class Toolbar extends React.Component<IProps, IState> {
                     isLast={key + 1 === menuItemList.length}
                     isFirst={key === 0}
                     onClick={clickHandler}
-                    onBlur={this.props.onBlur}
                     role={this.props.itemRole}
                 />
             );

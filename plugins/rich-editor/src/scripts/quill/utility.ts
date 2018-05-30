@@ -6,6 +6,7 @@
 
 import Emitter from "quill/core/emitter";
 import Quill, { RangeStatic, Blot, Container, BoundsStatic } from "quill/core";
+import KeyboardModule from "quill/modules/keyboard";
 import Delta from "quill-delta";
 import Parchment from "parchment";
 import LineBlot from "./blots/abstract/LineBlot";
@@ -91,7 +92,14 @@ export function expandRange(
  * @param range - The range to check.
  * @param blotConstructor - A class constructor for a blot.
  */
-export function rangeContainsBlot(quill: Quill, range: RangeStatic, blotConstructor: any): boolean {
+export function rangeContainsBlot(quill: Quill, blotConstructor: any, range: RangeStatic | null = null): boolean {
+    if (range === null) {
+        range = quill.getSelection();
+    }
+
+    if (!range) {
+        return false;
+    }
     const blots = quill.scroll.descendants(blotConstructor, range.index, range.length);
     return blots.length > 0;
 }
@@ -106,12 +114,18 @@ export function rangeContainsBlot(quill: Quill, range: RangeStatic, blotConstruc
  */
 export function disableAllBlotsInRange<T extends Blot>(
     quill: Quill,
-    range: RangeStatic,
-    blotConstructor: {
-        new (): T;
-    },
+    blotConstructor:
+        | {
+              new (): T;
+          }
+        | typeof Blot,
+    range: RangeStatic | null = null,
 ) {
-    const currentBlots = quill.scroll.descendants(blotConstructor, range.index, range.length);
+    if (range === null) {
+        range = quill.getSelection();
+    }
+
+    const currentBlots: Blot[] = quill.scroll.descendants(blotConstructor as any, range.index, range.length);
     const firstBlot = currentBlots[0];
     const lastBlot = currentBlots[currentBlots.length - 1];
 
@@ -129,26 +143,6 @@ export function disableAllBlotsInRange<T extends Blot>(
     if (finalRange) {
         quill.formatText(finalRange.index, finalRange.length, "link", false, Emitter.sources.USER);
     }
-}
-
-export const CLOSE_FLYOUT_EVENT = "editor:close-flyouts";
-
-/**
- * Fires an event to close the editor flyouts.
- *
- * @todo replace this with a redux store.
- *
- * @param firingKey - A key to fire the event with. This will be attached to the event so that you do some
- * filtering when setting up you listeners.
- */
-export function closeEditorFlyouts(firingKey?: string) {
-    const event = new CustomEvent(CLOSE_FLYOUT_EVENT, {
-        detail: {
-            firingKey,
-        },
-    });
-
-    document.dispatchEvent(event);
 }
 
 /**
@@ -335,4 +329,28 @@ export function getMentionRange(
         index: mentionIndex,
         length: potentialMention.length,
     };
+}
+
+/**
+ * Register an keyboard listener for the escape key.
+ *
+ * @param root - The element to watch for the escape listener in.
+ * @param returnElement - The element to return to when escape is pressed.
+ */
+export function createEditorFlyoutEscapeListener(
+    root: HTMLElement,
+    returnElement: HTMLElement,
+    callback: (event: KeyboardEvent) => void = () => {
+        return;
+    },
+) {
+    root.addEventListener("keydown", (event: KeyboardEvent) => {
+        if (KeyboardModule.match(event, { key: KeyboardModule.keys.ESCAPE, shiftKey: false })) {
+            if (root.contains(document.activeElement)) {
+                event.preventDefault();
+                returnElement.focus();
+                callback(event);
+            }
+        }
+    });
 }

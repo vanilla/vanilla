@@ -50,7 +50,7 @@ export class EmbedPopover extends React.PureComponent<IProps, IState> {
         return (
             <PopoverController id={this.state.id} classNameRoot="embedDialogue" icon={Icon} onClose={this.clearInput}>
                 {(params: IPopoverControllerChildParameters) => {
-                    const { initialFocusRef, closeMenuHandler, blurHandler, isVisible } = params;
+                    const { initialFocusRef, closeMenuHandler, isVisible } = params;
 
                     const body = (
                         <React.Fragment>
@@ -80,7 +80,6 @@ export class EmbedPopover extends React.PureComponent<IProps, IState> {
                                 value={"Insert"}
                                 disabled={!this.state.isInputValid}
                                 aria-label={"Insert Media"}
-                                onBlur={this.state.isInputValid ? blurHandler : undefined}
                                 onClick={this.buttonClickHandler}
                             />
                         </React.Fragment>

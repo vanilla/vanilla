@@ -741,8 +741,10 @@ class EditorPlugin extends Gdn_Plugin {
 
         $mimeType = $fileData['type'];
         $allowedMimeTypes = $this->getAllowedMimeTypes();
+        // If mimetype is not in the allowedMimeTypes list, set it to application/octet-stream
+        // before saving it to the database.
         if (!in_array($mimeType, $allowedMimeTypes)) {
-            throw new Gdn_UserException('Invalid file type.');
+            $fileData['type'] = 'application/octet-stream';
         }
 
         $discussionID = ($sender->Request->post('DiscussionID')) ? $sender->Request->post('DiscussionID') : '';

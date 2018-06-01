@@ -1560,7 +1560,7 @@ class Gdn_Request implements RequestInterface {
         static $rewrite = null;
         if ($rewrite === null) {
             // Garden.RewriteUrls is maintained for compatibility but X_REWRITE is what really need to be used.
-            $rewrite = val('X_REWRITE', $_SERVER, c('Garden.RewriteUrls', true));
+            $rewrite = val('X_REWRITE', $_SERVER, c('Garden.RewriteUrls', false));
         }
 
         if (!$allowSSL) {

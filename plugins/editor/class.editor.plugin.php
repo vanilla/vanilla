@@ -741,8 +741,7 @@ class EditorPlugin extends Gdn_Plugin {
 
         $mimeType = $fileData['type'];
         $allowedMimeTypes = $this->getAllowedMimeTypes();
-        // If mimetype is not in the allowedMimeTypes list, set it to application/octet-stream
-        // before saving it to the database.
+        // When a MIME type fails validation, we set it to "application/octet-stream" to prevent a malicious type.
         if (!in_array($mimeType, $allowedMimeTypes)) {
             $fileData['type'] = 'application/octet-stream';
         }

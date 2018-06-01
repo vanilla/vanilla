@@ -412,9 +412,17 @@ export function getNextTabbableElement(options?: Partial<ITabbableOptions>): HTM
  *
  * @param rootNode - The root node to look in.
  */
-function domTreeHasFocus(rootNode: Element | null) {
-    const { activeElement } = document;
-    return rootNode && (activeElement === rootNode || rootNode.contains(activeElement));
+function checkDomTreeHasFocus(rootNode: Element | null, event: FocusEvent, callback: (hasFocus: boolean) => void) {
+    setTimeout(() => {
+        const activeElement =
+            (event.relatedTarget as Element) || // Chrome (The actual standard)
+            (event as any).explicitOriginalTarget || // Firefox + Safari
+            document.activeElement; // IE11
+
+        const hasFocus = rootNode && (activeElement === rootNode || rootNode.contains(activeElement));
+
+        callback(!!hasFocus);
+    }, 0);
 }
 
 /**
@@ -432,18 +440,22 @@ export function watchFocusInDomTree(rootNode: Element, callback: (hasFocus: bool
     rootNode.addEventListener(
         "blur",
         (event: FocusEvent) => {
-            setImmediate(() => {
-                !domTreeHasFocus(rootNode) && callback(false);
+            checkDomTreeHasFocus(rootNode, event, hasFocus => {
+                if (!hasFocus) {
+                    callback(false);
+                }
             });
         },
         true,
     );
 
     rootNode.addEventListener(
-        "focus",
+        "focusin",
         (event: FocusEvent) => {
-            setImmediate(() => {
-                domTreeHasFocus(rootNode) && callback(true);
+            checkDomTreeHasFocus(rootNode, event, hasFocus => {
+                if (hasFocus) {
+                    callback(true);
+                }
             });
         },
         true,

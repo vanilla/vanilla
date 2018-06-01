@@ -120,7 +120,12 @@ export default class EmbedFocusModule extends Module {
         if (!this.isKeyCodeDelete(event.keyCode)) {
             return true;
         }
-        const [currentBlot] = this.quill.getLine(this.quill.getSelection().index);
+        const selection = this.quill.getSelection();
+        if (!selection) {
+            return true;
+        }
+
+        const [currentBlot] = this.quill.getLine(selection.index);
         const previousBlot = currentBlot.prev;
         const isPreviousBlotEmbed = previousBlot instanceof FocusableEmbedBlot;
         const isCurrentBlotEmpty = currentBlot.domNode.textContent === "";
@@ -161,6 +166,9 @@ export default class EmbedFocusModule extends Module {
      * Keydown listener on the current quill instance.
      */
     private tabListener = (event: KeyboardEvent) => {
+        if (document.activeElement === document.body || document.activeElement === null) {
+            console.log("WTF");
+        }
         if (!this.quill.container.closest(".richEditor")!.contains(document.activeElement)) {
             return;
         }

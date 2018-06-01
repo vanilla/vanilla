@@ -25,12 +25,19 @@ TEST_FILE_ROOTS.forEach(fileRoot => {
 
 module.exports = config => {
     config.set({
-        preprocessors,
-        files,
+        preprocessors: {
+            ...preprocessors,
+            "tests/javascript/test-setup.ts": ["webpack", "sourcemap"],
+        },
+        files: ["tests/javascript/test-setup.ts"],
         // base path, that will be used to resolve files and exclude
         basePath: VANILLA_ROOT,
         frameworks: ["mocha", "chai"],
         reporters: ["mocha"],
+        // reporter options
+        mochaReporter: {
+            output: "minimal",
+        },
         logLevel: config.LOG_INFO,
         port: 9876, // karma web server port
         colors: true,
@@ -50,8 +57,8 @@ module.exports = config => {
         // you can define custom flags
         customLaunchers: {
             ChromeHeadlessNoSandbox: {
-                base: "ChromeHeadless",
-                flags: ["--no-sandbox"],
+                base: "Chrome",
+                flags: ["--no-sandbox", '--remote-debugging-port=9333'],
             },
         },
     });

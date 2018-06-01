@@ -9,6 +9,7 @@ const fs = require("fs");
 const webpack = require("webpack");
 const chalk = require("chalk");
 const glob = require("glob");
+const TsconfigPathsPlugin = require("tsconfig-paths-webpack-plugin");
 
 const VANILLA_ROOT = path.resolve(path.join(__dirname, "../../"));
 
@@ -39,13 +40,25 @@ module.exports = {
             {
                 test: /\.tsx?$/,
                 exclude: ["node_modules"],
-                include: [/\/src\/scripts/],
+                include: [/\/src\/scripts/, /test-setup/],
                 use: [
                     {
-                        loader: "ts-loader",
+                        loader: "awesome-typescript-loader?downLevelIteration=true&target=es2018",
                         options: {
-                            configFile: path.resolve(VANILLA_ROOT, "tsconfig.json"),
-                            transpileOnly: true,
+                            useBabel: true,
+                            useCache: true,
+                            configFileName: path.resolve(VANILLA_ROOT, "tsconfig.json"),
+                            forceIsolatedModules: true,
+                            babelOptions: {
+                                babelrc: false,
+                                presets: ["@vanillaforums/babel-preset"],
+                            },
+                            // transpileOnly: true,
+                            // compilerOptions: {
+                            //     // Down leveling iteration totally screws up our sourcemaps.
+                            //     downlevelIteration: false,
+                            //     target: "es2015",
+                            // },
                         },
                     },
                 ],

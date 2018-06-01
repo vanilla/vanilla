@@ -65,6 +65,7 @@ $embed-focus-color: #0291DB;
     width: $embedLoader_width;
     height: $embedLoader_width;
     margin: auto;
+    overflow: hidden;
 }
 
 .embedLoader-loader {
@@ -73,7 +74,6 @@ $embed-focus-color: #0291DB;
 
 
 // Loading Error
-
 .embedLoader-errors {
     display: flex;
     flex-direction: column;
@@ -250,13 +250,16 @@ $embed-focus-color: #0291DB;
 .embedExternal {
     display: flex;
     justify-content: center;
+    align-items: center;
 }
 
 .embedExternal-content {
     display: inline-block;
     max-width: 100%;
-    width: 100%;
     overflow: hidden;
+    > * {
+        margin: auto !important;
+    }
 }
 
 .twitter-tweet {

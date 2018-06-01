@@ -1559,7 +1559,11 @@ class Gdn_Request implements RequestInterface {
         }
         static $rewrite = null;
         if ($rewrite === null) {
-            // Garden.RewriteUrls is maintained for compatibility but X_REWRITE is what really need to be used.
+            /**
+             * X_REWRITE is used to determine whether rewriting URLs is supported by the server. The Garden.RewriteUrls
+             * config is only supported for backwards compatibility. This value should not be true by default, because
+             * rewriting may be unavailable (e.g. during installation when .htaccess.dist has not yet been renamed).
+             */
             $rewrite = val('X_REWRITE', $_SERVER, c('Garden.RewriteUrls', false));
         }
 

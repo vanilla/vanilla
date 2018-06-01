@@ -9,6 +9,7 @@
         "@types/mocha": "^5.2.0",
         "@types/quill": "^1.3.6",
         "@types/react": "^16.3.10",
+        "@types/react-virtualized": "^9.18.3",
         "@vanillaforums/babel-preset": "^1.0.5"
     }
 }

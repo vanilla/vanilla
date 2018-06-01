@@ -53,12 +53,6 @@ module.exports = {
                                 babelrc: false,
                                 presets: ["@vanillaforums/babel-preset"],
                             },
-                            // transpileOnly: true,
-                            // compilerOptions: {
-                            //     // Down leveling iteration totally screws up our sourcemaps.
-                            //     downlevelIteration: false,
-                            //     target: "es2015",
-                            // },
                         },
                     },
                 ],

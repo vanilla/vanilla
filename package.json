@@ -40,7 +40,6 @@
         "@types/react": "16.3.14",
         "@types/react-dom": "16.0.5",
         "@types/react-router-dom": "4.2.6",
-        "@types/react-virtualized": "9.18.3",
         "@types/sinon": "5.0.0",
         "@types/sprintf-js": "1.1.0",
         "@types/validator": "9.4.1",

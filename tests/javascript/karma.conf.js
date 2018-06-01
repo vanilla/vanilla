@@ -57,8 +57,12 @@ module.exports = config => {
         // you can define custom flags
         customLaunchers: {
             ChromeHeadlessNoSandbox: {
+                base: "ChromeHeadless",
+                flags: ["--no-sandbox"],
+            },
+            ChromeDebug: {
                 base: "Chrome",
-                flags: ["--no-sandbox", '--remote-debugging-port=9333'],
+                flags: ["--remote-debugging-port=9333"],
             },
         },
     });

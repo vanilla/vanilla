@@ -81,6 +81,7 @@
     "scripts": {
         "test": "karma start ./tests/javascript/karma.conf.js --single-run",
         "test:watch": "karma start ./tests/javascript/karma.conf.js",
+        "test:debug": "karma start ./tests/javascript/karma.conf.js --browsers ChromeDebug",
         "lint:ts": "tslint -c ./.tslint.js -e './**/node_modules/**' -e './**/src/**/*.{js,jsx}' -p ./tsconfig.json -t stylish",
         "lint:ts:fix": "tslint -c ./.tslint.js -e './**/node_modules/**' -e './**/src/**/*.{js,jsx}' -p ./tsconfig.json -t stylish --fix"
     }

@@ -154,6 +154,7 @@ export class EmojiPicker extends React.PureComponent<IProps, IState> {
                 descriptionID={this.descriptionID}
                 titleID={this.titleID}
                 title={title}
+                titleRef={this.props.initialFocusRef}
                 accessibleDescription={description}
                 alertMessage={this.state.alertMessage}
                 additionalHeaderContent={extraHeadingContent}

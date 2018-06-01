@@ -44,7 +44,7 @@ export default class EmbedInsertionModule extends Module {
      *
      * @param dataPromise - A promise that will either return the data needed for rendering, or throw an error.
      */
-    private createEmbed = (dataPromise: Promise<IEmbedData>) => {
+    public createEmbed = (dataPromise: Promise<IEmbedData>, callback?: () => void) => {
         const externalEmbed = Parchment.create("embed-external", dataPromise) as ExternalEmbedBlot;
         const [currentLine] = this.quill.getLine(this.lastSelection.index);
         const referenceBlot = currentLine.split(this.lastSelection.index);
@@ -60,6 +60,7 @@ export default class EmbedInsertionModule extends Module {
             this.quill.setSelection(null as any, Quill.sources.USER);
             setImmediate(() => {
                 this.quill.setSelection(newSelection, Quill.sources.USER);
+                callback && callback();
             });
         });
         this.quill.update(Quill.sources.USER);

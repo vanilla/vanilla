@@ -67,7 +67,7 @@ export class InlineToolbar extends React.Component<IProps, IState> {
             </span>
         ) : null;
 
-        const hasFocus = this.state.hasFocus || this.state.quillHasFocus;
+        const hasFocus = !!(this.state.hasFocus || this.state.cachedRange);
 
         return (
             <div ref={this.selfRef}>
@@ -101,7 +101,6 @@ export class InlineToolbar extends React.Component<IProps, IState> {
         document.addEventListener("keydown", this.escFunction, false);
         this.quill.on(Quill.events.EDITOR_CHANGE, this.handleEditorChange);
         watchFocusInDomTree(this.selfRef.current!, this.handleFocusChange);
-        watchFocusInDomTree(this.quill.root!, this.handleQuillFocusChange);
 
         // Add a key binding for the link popup.
         const keyboard: Keyboard = this.quill.getModule("keyboard");
@@ -124,11 +123,11 @@ export class InlineToolbar extends React.Component<IProps, IState> {
     }
 
     private handleFocusChange = hasFocus => {
-        this.setState({ hasFocus });
-    };
-
-    private handleQuillFocusChange = hasFocus => {
-        this.setState({ quillHasFocus: hasFocus });
+        if (this.state.hasFocus && !hasFocus) {
+            this.reset();
+        } else if (hasFocus) {
+            this.setState({ hasFocus });
+        }
     };
 
     /**
@@ -191,6 +190,7 @@ export class InlineToolbar extends React.Component<IProps, IState> {
             showLinkMenu: false,
             showFormatMenu: false,
             cachedRange: null,
+            hasFocus: false,
         });
     };
 
@@ -216,12 +216,8 @@ export class InlineToolbar extends React.Component<IProps, IState> {
                 cachedRange: range,
                 showFormatMenu: !rangeContainsBlot(this.quill, CodeBlockBlot),
             });
-        } else {
-            this.setState({
-                cachedRange: null,
-                showFormatMenu: false,
-                showLinkMenu: false,
-            });
+        } else if (!this.state.hasFocus) {
+            this.reset();
         }
     };
 

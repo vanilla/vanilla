@@ -212,7 +212,7 @@ export class Toolbar extends React.Component<IProps, IState> {
                 const newState = {
                     [itemKey]: {
                         ...itemData,
-                        active: quillUtilities.rangeContainsBlot(this.quill, range, LinkBlot),
+                        active: quillUtilities.rangeContainsBlot(this.quill, LinkBlot, range),
                     },
                 };
                 this.setMenuState(newState);

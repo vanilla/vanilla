@@ -77,8 +77,12 @@ export default class PopoverController extends React.PureComponent<IProps, IStat
     }
 
     public componentDidUpdate(prevProps: IProps, prevState: IState) {
-        if (!prevState.isVisible && this.state.isVisible && this.initalFocusRef.current) {
-            this.initalFocusRef.current.focus();
+        if (!prevState.isVisible && this.state.isVisible) {
+            if (this.initalFocusRef.current) {
+                this.initalFocusRef.current.focus();
+            } else if (this.buttonRef.current) {
+                this.buttonRef.current.focus();
+            }
         }
     }
 

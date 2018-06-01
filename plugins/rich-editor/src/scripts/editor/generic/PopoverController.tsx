@@ -92,7 +92,6 @@ export default class PopoverController extends React.PureComponent<IProps, IStat
     }
 
     private handleFocusChange = hasFocus => {
-        console.log("New focus state!!!", hasFocus);
         if (!hasFocus) {
             this.setState({ isVisible: false });
         }

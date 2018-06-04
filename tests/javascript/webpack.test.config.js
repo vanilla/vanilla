@@ -9,7 +9,6 @@ const fs = require("fs");
 const webpack = require("webpack");
 const chalk = require("chalk");
 const glob = require("glob");
-const TsconfigPathsPlugin = require("tsconfig-paths-webpack-plugin");
 
 const VANILLA_ROOT = path.resolve(path.join(__dirname, "../../"));
 

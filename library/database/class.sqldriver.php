@@ -451,7 +451,7 @@ abstract class Gdn_SQLDriver {
      * @paran bool $check Check to see if the field is already quoted.
      * @return string Returns an escaped expression.
      */
-    protected function escapeFieldReference(string $refExpr, bool $check = true): string {
+    protected function escapeFieldReference($refExpr, $check = true) {
         if ($check && preg_match('/^`[^`]+`$/', $refExpr)) {
             return $refExpr;
         }
@@ -471,7 +471,7 @@ abstract class Gdn_SQLDriver {
      * @param array $arr The array to escape.
      * @return array
      */
-    protected function escapeKeys(callable $callback, array $arr) {
+    protected function escapeKeys($callback, $arr) {
         $result = [];
         foreach ($arr as $key => $value) {
             $result[$callback($key)] = $value;
@@ -1751,7 +1751,7 @@ abstract class Gdn_SQLDriver {
      * @param string $string The quoted identifier.
      * @return string Returns the unquoted identifer.
      */
-    public function unescapeIdentifier(string $string): string {
+    public function unescapeIdentifier($string): string {
         return preg_replace_callback('/(`+)/', function ($m) {
             return str_repeat('`', intdiv(strlen($m[1]), 2));
         }, $string);

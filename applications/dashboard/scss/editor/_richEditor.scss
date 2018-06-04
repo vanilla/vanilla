@@ -757,16 +757,7 @@
 
 .richEditor-embedBarMobileBorder {
     display: none;
-
-    &.InputBox-borderWidth {
-        border: {
-            style: solid;
-            right: 0;
-            bottom: 0;
-            left: 0;
-        }
-    }
-
+    border-style: solid;
 }
 
 // Mobile

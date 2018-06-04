@@ -1214,13 +1214,7 @@ label.checkbox input.checkbox-input {
 
 .richEditor-embedBarMobileBorder {
   display: none;
-}
-
-.richEditor-embedBarMobileBorder.InputBox-borderWidth {
   border-style: solid;
-  border-right: 0;
-  border-bottom: 0;
-  border-left: 0;
 }
 
 body.isMobile .embedDialogue {
@@ -1243,6 +1237,9 @@ body.isMobile .richEditor-embedBar {
   position: absolute;
   top: 0;
   left: 0;
+  width: 100%;
+  box-sizing: border-box;
+  background: #fff;
 }
 
 body.isMobile .richEditor-menu.insertPopover {
@@ -1251,13 +1248,30 @@ body.isMobile .richEditor-menu.insertPopover {
   width: calc(100% - 2px);
 }
 
+body.isMobile .richEditor-embedBarMobileBorder {
+  display: block;
+}
+
 body.isMobile .FormWrapper {
   padding-left: 18px;
   padding-right: 18px;
 }
 
-body.isMobile .richEditor-embedBarMobileBorder {
-  display: block;
+body.isMobile .FormWrapper.isPastEditorTop .richEditor-embedBar {
+  position: fixed;
+  width: calc(100% - 36px);
+  margin-right: 18px;
+  margin-left: 18px;
+}
+
+body.isMobile .FormWrapper.isPastEditorTop .richEditor-embedBarMobileBorder {
+  border-top-width: 0;
+}
+
+body.isMobile .FormWrapper:not(.isPastEditorTop) .richEditor-embedBarMobileBorder {
+  border-top-width: 0;
+  border-right-width: 0;
+  border-left-width: 0;
 }
 
 @media (max-width: 700px) {
@@ -1277,18 +1291,35 @@ body.isMobile .richEditor-embedBarMobileBorder {
     position: absolute;
     top: 0;
     left: 0;
+    width: 100%;
+    box-sizing: border-box;
+    background: #fff;
   }
   .richEditor-menu.insertPopover {
     margin-top: -1px;
     bottom: auto;
     width: calc(100% - 2px);
   }
+  .richEditor-embedBarMobileBorder {
+    display: block;
+  }
   .FormWrapper {
     padding-left: 18px;
     padding-right: 18px;
   }
-  .richEditor-embedBarMobileBorder {
-    display: block;
+  .FormWrapper.isPastEditorTop .richEditor-embedBar {
+    position: fixed;
+    width: calc(100% - 36px);
+    margin-right: 18px;
+    margin-left: 18px;
+  }
+  .FormWrapper.isPastEditorTop .richEditor-embedBarMobileBorder {
+    border-top-width: 0;
+  }
+  .FormWrapper:not(.isPastEditorTop) .richEditor-embedBarMobileBorder {
+    border-top-width: 0;
+    border-right-width: 0;
+    border-left-width: 0;
   }
 }
 

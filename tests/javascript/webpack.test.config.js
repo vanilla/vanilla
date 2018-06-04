@@ -39,7 +39,7 @@ module.exports = {
             {
                 test: /\.tsx?$/,
                 exclude: ["node_modules"],
-                include: [/\/src\/scripts/, /test-setup/],
+                include: [/\/src\/scripts/],
                 use: [
                     {
                         loader: "awesome-typescript-loader?downLevelIteration=true&target=es2018",

@@ -46,7 +46,7 @@
         "@vanillaforums/babel-preset": "1.0.5",
         "@vanillaforums/prettier-config": "1.0.0",
         "@vanillaforums/tslint-config": "1.1.8",
-        "awesome-typescript-loader": "5.0.0-1",
+        "awesome-typescript-loader": "5.0.0",
         "babel-core": "6.26.3",
         "babel-loader": "7.1.4",
         "chai": "4.1.2",
@@ -74,7 +74,7 @@
         "ts-node": "6.0.5",
         "tslint": "5.10.0",
         "typescript": "2.8.3",
-        "webpack": "4.9.1"
+        "webpack": "4.10.2"
     },
     "scripts": {
         "test": "karma start ./tests/javascript/karma.conf.js --single-run",

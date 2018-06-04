@@ -17,19 +17,19 @@ TEST_FILE_ROOTS.forEach(fileRoot => {
     const { normalize, join } = path;
     const tsPath = normalize(join(fileRoot, "src/scripts/**/*.test.ts"));
     const tsxPath = normalize(join(fileRoot, "src/scripts/**/*.test.tsx"));
+    const setupPath = normalize(join(fileRoot, "src/scripts/__tests__/setup.ts"));
+
 
     files.push(tsPath, tsxPath);
     preprocessors[tsPath] = ["webpack", "sourcemap"];
     preprocessors[tsxPath] = ["webpack", "sourcemap"];
+    preprocessors[setupPath] = ["webpack", "sourcemap"];
 });
 
 module.exports = config => {
     config.set({
-        preprocessors: {
-            ...preprocessors,
-            "tests/javascript/test-setup.ts": ["webpack", "sourcemap"],
-        },
-        files: ["tests/javascript/test-setup.ts"],
+        preprocessors,
+        files,
         // base path, that will be used to resolve files and exclude
         basePath: VANILLA_ROOT,
         frameworks: ["mocha", "chai"],

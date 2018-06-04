@@ -151,8 +151,6 @@ export default class VanillaTheme extends ThemeBase {
                 onPositionChange={data => {
                     this.handleStickyMenuBottom(data);
                 }}
-
-                alert(unStickyEmbed.offsetHeight);
                 bottomOffset={-(unStickyEmbed.offsetHeight || 39)}
             />,
             unStickyEmbed,

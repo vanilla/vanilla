@@ -1753,7 +1753,12 @@ abstract class Gdn_SQLDriver {
      */
     public function unescapeIdentifier($string) {
         return preg_replace_callback('/(`+)/', function ($m) {
-            return str_repeat('`', intdiv(strlen($m[1]), 2));
+            // http://php.net/manual/en/function.intdiv.php#117626
+            // This was/is an intdiv call in PHP7.0 +
+            $a = strlen($m[1]);
+            $b = 2;
+            $intdiv = ($a - $a % $b) / $b;
+            return str_repeat('`', $intdiv);
         }, $string);
     }
 

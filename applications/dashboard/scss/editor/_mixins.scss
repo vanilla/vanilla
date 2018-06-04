@@ -113,17 +113,32 @@ $spinnerOffset: 73deg;
         width: 100%;
         box-sizing: border-box;
         background: #fff;
+        transition-property: transform, opacity;
+        transition-timing-function: ease-out;
+        transition-duration: .1s;
     }
 
 
     .richEditor-menu.insertPopover {
         margin-top: -$richEditor-border_width;
         bottom: auto;
-        width: calc(100% - #{$richEditor-border_width * 2});
+        width: calc(100% + #{$richEditor-border_width * 2});
     }
 
     .richEditor-embedBarMobileBorder {
         display: block;
+    }
+
+    .js-RichEditorUnstickyEmbed,
+    .js-RichEditorStickyEmbed {
+        display: block;
+    }
+
+    .js-RichEditorUnstickyEmbed {
+        display: block;
+        position: absolute;
+        bottom: #{($richEditor-menuButton_size * 2) + $richEditor_verticalPadding + ($richEditor-lineHeight * $richEditor-font_size)};
+        width: 1px;
     }
 
     .FormWrapper {
@@ -144,6 +159,13 @@ $spinnerOffset: 73deg;
                 border: {
                     top-width: 0;
                 }
+            }
+        }
+
+        &.isPastEditorBottom {
+            .richEditor-embedBar {
+                opacity: 0;
+                transform: translateY(-55%);
             }
         }
 

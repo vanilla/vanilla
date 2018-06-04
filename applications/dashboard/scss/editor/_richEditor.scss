@@ -578,7 +578,7 @@
         word-break: break-all;
         word-break: break-word;
         text-overflow: ellipsis;
-        line-height: 1.5;
+        line-height: $richEditor-lineHeight;
     }
 
     iframe,
@@ -781,6 +781,11 @@
 .richEditor-embedBarMobileBorder {
     display: none;
     border-style: solid;
+}
+
+.js-RichEditorUnstickyEmbed,
+.js-RichEditorStickyEmbed {
+    display: none;
 }
 
 // Mobile

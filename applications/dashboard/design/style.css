@@ -6012,6 +6012,18 @@ Styleguide Attachments
   border: 1px solid rgba(0, 0, 0, 0.4);
 }
 
+.InputBox-borderWidth {
+  border-top-width: 1px;
+  border-right-width: 1px;
+  border-bottom-width: 1px;
+  border-left-width: 1px;
+}
+
+.InputBox-borderColor {
+  border-color: #999;
+  border-color: rgba(0, 0, 0, 0.4);
+}
+
 .jcrop-holder {
   direction: ltr;
   text-align: left;

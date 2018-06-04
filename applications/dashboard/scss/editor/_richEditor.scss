@@ -203,6 +203,13 @@
     display: block;
     width: 100%;
     padding: $richEditor-embedMenu_padding;
+    border: {
+        top-width: 0;
+        right-width: 0;
+        bottom-width: 0;
+        left-width: 0;
+        style: solid;
+    }
 }
 
 .richEditorButton-icon {
@@ -748,9 +755,18 @@
     }
 }
 
-
-.u-visibleOnFullScreenEditor {
+.richEditor-embedBarMobileBorder {
     display: none;
+
+    &.InputBox-borderWidth {
+        border: {
+            style: solid;
+            right: 0;
+            bottom: 0;
+            left: 0;
+        }
+    }
+
 }
 
 // Mobile

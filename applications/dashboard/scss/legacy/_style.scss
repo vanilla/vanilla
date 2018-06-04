@@ -6016,3 +6016,19 @@ Styleguide Attachments
   border: 1px solid #999;
   border: 1px solid rgba(0, 0, 0, 0.4);
 }
+
+
+// OOCSS classes for compatibility
+.InputBox-borderWidth {
+    border: {
+        top-width: 1px;
+        right-width: 1px;
+        bottom-width: 1px;
+        left-width: 1px;
+    }
+}
+
+.InputBox-borderColor {
+     border-color: #999;
+     border-color: rgba(0, 0, 0, 0.4);
+ }

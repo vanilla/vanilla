@@ -50,7 +50,7 @@ $richEditor-outline_width: 1px;
 $richEditor-emojiOutline_offset: -#{$richEditor-outline_width + 2};
 $richEditor-embedButton_offset: - $richEditor-outline_width;
 $richEditor-paragraphMenuButton_offset: - $richEditor-outline_width + 1;
-$richEditor-text_offset: - $richEditor-outline_width - $richEditor-border_width;
+$richEditor-text_offset: 0;
 
 
 

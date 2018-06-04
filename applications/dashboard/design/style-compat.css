@@ -703,11 +703,10 @@ label.checkbox input.checkbox-input {
 }
 
 .richEditor-text:focus {
-  outline-offset: -2px;
-  outline-style: auto;
+  outline-offset: 0;
+  outline-style: solid;
   outline-width: 1px;
   outline-color: rgba(2, 145, 219, 0.6);
-  z-index: 1;
 }
 
 .ql-clipboard {
@@ -791,10 +790,16 @@ label.checkbox input.checkbox-input {
   display: block;
   height: 24px;
   width: 24px;
+  -webkit-user-select: none;
+     -moz-user-select: none;
+      -ms-user-select: none;
+          user-select: none;
+  cursor: pointer;
 }
 
 .richEditor-button.richEditor-formatButton, .richEditor-button.richEditor-embedButton {
   height: 39px;
+  color: inherit;
 }
 
 .richEditor-button.emojiGroup {
@@ -996,6 +1001,10 @@ label.checkbox input.checkbox-input {
   max-width: -webkit-calc(100% - 39px);
   max-width: calc(100% - 39px);
   min-height: 27px;
+}
+
+.popover-title:focus {
+  outline: 0;
 }
 
 .insertMedia-footer {

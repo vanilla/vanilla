@@ -111,12 +111,19 @@ class DbaController extends DashboardController {
         $this->permission('Garden.Settings.Manage');
 
         if ($this->Request->isAuthenticatedPostBack()) {
+            if (!$this->Model->isValidDatabaseIdentifier($table)) {
+                throw new Exception('Invalid table.');
+            }
+            if (!$this->Model->isValidDatabaseIdentifier($column)) {
+                throw new Exception('Invalid column.');
+            }
+
             $result = $this->Model->fixUrlCodes($table, $column);
             $this->setData('Result', $result);
         }
 
-        $this->setData('Title', "Fix url codes for $table.$column");
-        $this->_setJob($this->data('Title'));
+        $this->setData('Title', 'Fix URL Codes');
+        $this->_setJob("Fix url codes for $table.$column");
         $this->render('Job');
     }
 
@@ -129,6 +136,10 @@ class DbaController extends DashboardController {
         $this->permission('Garden.Settings.Manage');
 
         if ($this->Request->isAuthenticatedPostBack() && $table) {
+            if (!$this->Model->isValidDatabaseIdentifier($table)) {
+                throw new Exception('Invalid table.');
+            }
+
             $this->Model->fixInsertUserID($table);
 
             $this->setData(

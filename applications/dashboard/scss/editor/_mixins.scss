@@ -114,8 +114,8 @@ $spinnerOffset: 73deg;
         box-sizing: border-box;
         background: #fff;
         transition-property: transform, opacity;
-        transition-timing-function: ease-out;
-        transition-duration: .1s;
+        transition-timing-function: $richEditor-mobileEmbedMenu_transitionTiming;
+        transition-duration: $richEditor-mobileEmbedMenu_transitionDuration;
     }
 
 

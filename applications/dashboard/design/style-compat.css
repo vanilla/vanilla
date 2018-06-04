@@ -1492,8 +1492,8 @@ body.isMobile .richEditor-embedBar {
           transition-property: transform, opacity;
   -webkit-transition-timing-function: ease-out;
           transition-timing-function: ease-out;
-  -webkit-transition-duration: .1s;
-          transition-duration: .1s;
+  -webkit-transition-duration: 0.15s;
+          transition-duration: 0.15s;
 }
 
 body.isMobile .richEditor-menu.insertPopover {
@@ -1573,8 +1573,8 @@ body.isMobile .FormWrapper:not(.isPastEditorTop) .richEditor-embedBarMobileBorde
             transition-property: transform, opacity;
     -webkit-transition-timing-function: ease-out;
             transition-timing-function: ease-out;
-    -webkit-transition-duration: .1s;
-            transition-duration: .1s;
+    -webkit-transition-duration: 0.15s;
+            transition-duration: 0.15s;
   }
   .richEditor-menu.insertPopover {
     margin-top: -1px;

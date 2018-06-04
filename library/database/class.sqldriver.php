@@ -1318,7 +1318,10 @@ abstract class Gdn_SQLDriver {
     public function mapAliases($tableString) {
         if (preg_match('`^([^\s]+?)(?:\s+(?:as\s+)?([a-z_][a-z0-9_]*))?$`i', trim($tableString), $m)) {
             $tableName = $m[1];
-            $alias = $m[2] ?? $tableName;
+            $alias = $m[2];
+            if ($alias === null){
+                $alias = $tableName;
+            }
 
             return $this->escapeIdentifier($this->Database->DatabasePrefix.$tableName).' '.$this->escapeIdentifier($alias);
         } else {
@@ -1438,7 +1441,10 @@ abstract class Gdn_SQLDriver {
         foreach ($fields as $parts) {
             if (preg_match('`^([^\s]+?)(?:\s+?(asc|desc))?$`i', trim($parts), $m)) {
                 $field = $m[1];
-                $direction = $m[2] ?? 'asc';
+                $direction = $m[2];
+                if ($direction === null) {
+                    $direction = 'asc';
+                }
 
                 $this->_OrderBys[] = $this->escapeFieldReference($field).' '.$direction;
             } else {

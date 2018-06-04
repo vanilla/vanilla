@@ -1757,7 +1757,7 @@ abstract class Gdn_SQLDriver {
      * @param string $string The quoted identifier.
      * @return string Returns the unquoted identifer.
      */
-    public function unescapeIdentifier($string): string {
+    public function unescapeIdentifier($string) {
         return preg_replace_callback('/(`+)/', function ($m) {
             return str_repeat('`', intdiv(strlen($m[1]), 2));
         }, $string);

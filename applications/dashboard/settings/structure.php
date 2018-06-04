@@ -639,7 +639,7 @@ if ($Construct->tableExists('Tag') && $TagCategoryColumnExists) {
         ->from('Tag')
         ->groupBy('Name')
         ->groupBy('CategoryID')
-        ->having('count(TagID) >', 1)
+        ->having('count(TagID) >', 1, false)
         ->get()->resultArray();
 
     foreach ($DupTags as $Row) {

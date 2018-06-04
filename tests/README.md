@@ -16,33 +16,31 @@ The `Library` testsuite is actual unit testing. For more thorough results, you m
 
 ### `Library` requirements
 
-1.  PHPUnit must be [installed](https://github.com/sebastianbergmann/phpunit#installation).
+1. PHPUnit must be [installed](https://github.com/sebastianbergmann/phpunit#installation).
 
-1.  All of the developer dependencies are installed with `composer install`.
+1. All of the developer dependencies are installed with `composer install`.
 
 ### `APIv0` & `APIv2` Requirements
 
-1.  PHPUnit must be [installed](https://github.com/sebastianbergmann/phpunit#installation).
+1. PHPUnit must be [installed](https://github.com/sebastianbergmann/phpunit#installation).
 
-1.  All of the developer dependencies are installed with `composer install`.
+1. All of the developer dependencies are installed with `composer install`.
 
-1.  Your localhost MySQL server must have a user named `travis` with a blank password and permission to
-    create and drop databases. The only database that the tests use is `vanilla_test`.
+1. Your localhost MySQL server must have a user named `travis` with a blank password and permission to
+create and drop databases. The only database that the tests use is `vanilla_test`.
 
-1.  Your copy of Vanilla must respond to `http://vanilla.test:8080`.
+1. Your copy of Vanilla must respond to `http://vanilla.test:8080`.
+    - You can use the nginx template in `tests/travis/templates/nginx/sites-enabled/default-site.tpl.conf` as a guideline.
+    - Pay particular attention to the `/cgi-bin` mapping
+    - If you are on Apache, the default `.htaccess` file should work for you.
 
--   You can use the nginx template in `tests/travis/templates/nginx/sites-enabled/default-site.tpl.conf` as a guideline.
--   Pay particular attention to the `/cgi-bin` mapping
--   If you are on Apache, the default `.htaccess` file should work for you.
-
-1.  You must put `tests/travis/templates/vanilla/conf/bootstrap.before.php` in your `conf/` folder.
-
--   This will ensure that the unit tests use their own config and cache path.
+1. You must put `tests/travis/templates/vanilla/conf/bootstrap.before.php` in your `conf/` folder.
+    - This will ensure that the unit tests use their own config and cache path.
 
 ### Running
 
-1.  Go to your Vanilla install directory.
-1.  `phpunit -c phpunit.xml.dist`
+1. Go to your Vanilla install directory.
+1. `phpunit -c phpunit.xml.dist`
 
 It is possible to run only a single test suite by using the flag `--testsuite <SUITE_NAME>`.
 
@@ -54,8 +52,8 @@ and bypass the web server requirements below.
 Vanilla's JS tests are written in typescript and live directly next to the source files that they test.
 Any file matching the following pattern is considered a unit test and will be run:
 
--   `applications/*/src/scripts/**/*.(ts|tsx)`
--   `plugins/*/src/scripts/**/*.(ts|tsx)`
+- `applications/*/src/scripts/**/*.(ts|tsx)`
+- `plugins/*/src/scripts/**/*.(ts|tsx)`
 
 ### Requirements
 
@@ -71,8 +69,8 @@ If you have additional plugins symlinked into vanilla that have their own tests 
 
 ### Running the tests
 
-1.  Make sure you are in the root of your vanilla installation.
-1.  Run `yarn test`.
+1. Make sure you are in the root of your vanilla installation.
+1. Run `yarn test`.
 
 Tests can also be run in watch mode by running `yarn test:watch`.
 
@@ -119,13 +117,13 @@ provided in the test browser.
 
 To debug directory in the browser:
 
-1.  Click the `Debug` button, located in the top right hand corner of the test browser.
-1.  Open the [Chrome Dev Tools](https://developers.google.com/web/tools/chrome-devtools/). This can be done by right clicking the
-    contents of the page and clicking `inspect` or by navigating the menu `View -> Developer -> View -> Developer Tools`.
-1.  Navigate to the `Sources` tab in the developer tools.
-1.  Locate the file you wish to debug in the file tree in the left panel.
-1.  Place a breakpoint.
-1.  Refresh the page.
+1. Click the `Debug` button, located in the top right hand corner of the test browser.
+1. Open the [Chrome Dev Tools](https://developers.google.com/web/tools/chrome-devtools/). This can be done by right clicking the
+ contents of the page and clicking `inspect` or by navigating the menu `View -> Developer -> View -> Developer Tools`.
+1. Navigate to the `Sources` tab in the developer tools.
+1. Locate the file you wish to debug in the file tree in the left panel.
+1. Place a breakpoint.
+1. Refresh the page.
 
 **Note About the File Tree**
 The file tree is generated from source maps and can be found under the `webpack://` "directory". Of the subdirectrories below the primary one you likely care about is `.` which represents the vanilla root. If you are debugging an addon that is symlinked into vanilla, it will not appear under the vanilla root. Instead it will appear as a relative path to the root of your installation based on its actual resolved path. This will likely look something like this: `../my-addon-repo/plugins/my-plugin/src/scripts` or possibly even a longer relative path starting with `../../` or `../../../` depending on your setup.

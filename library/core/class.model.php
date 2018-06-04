@@ -395,7 +395,7 @@ class Gdn_Model extends Gdn_Pluggable {
                     $value = empty($value) ? null : dbencode($value);
                 }
 
-                $quotedFields[$this->SQL->quoteIdentifier(trim($name, '`'))] = $value;
+                $quotedFields[$name] = $value;
             }
 
             $result = $this->SQL->insert($this->Name, $quotedFields);
@@ -436,7 +436,7 @@ class Gdn_Model extends Gdn_Pluggable {
                     $value = empty($value) ? null : dbencode($value);
                 }
 
-                $quotedFields[$this->SQL->quoteIdentifier(trim($name, '`'))] = $value;
+                $quotedFields[$name] = $value;
             }
 
             $result = $this->SQL->put($this->Name, $quotedFields, $where, $limit);

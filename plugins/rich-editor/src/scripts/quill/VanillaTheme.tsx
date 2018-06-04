@@ -18,9 +18,12 @@ import EmojiPopover from "../editor/EmojiPopover";
 import EmbedPopover from "../editor/EmbedPopover";
 import EditorProvider from "../editor/ContextProvider";
 import MentionModule from "../editor/MentionModule";
+import Waypoint from "react-waypoint";
 
 export default class VanillaTheme extends ThemeBase {
     private jsBodyBoxContainer: Element;
+    private jsFormElement: Element;
+    private jsEmbedMenu: Element;
 
     /**
      * Constructor.
@@ -51,6 +54,8 @@ export default class VanillaTheme extends ThemeBase {
 
         // Find the editor root.
         this.jsBodyBoxContainer = this.quill.container.closest(".richEditor") as Element;
+        this.jsFormElement = this.jsBodyBoxContainer.closest(".FormWrapper") as Element;
+        this.jsEmbedMenu = this.jsBodyBoxContainer.querySelector(".richEditor-embedBar") as Element;
         if (!this.jsBodyBoxContainer) {
             throw new Error("Could not find .richEditor to mount editor components into.");
         }
@@ -63,6 +68,7 @@ export default class VanillaTheme extends ThemeBase {
         this.mountToolbar();
         this.mountParagraphMenu();
         this.mountEmbedPopover();
+        this.mountStickyEmbedMenu();
     }
 
     /**
@@ -111,6 +117,45 @@ export default class VanillaTheme extends ThemeBase {
                 <EmbedPopover />
             </EditorProvider>,
             container,
+        );
+    }
+
+    private handleStickyMenuTop(data) {
+        const pastWaypoint = data.waypointTop < 0;
+
+        this.jsFormElement.classList.toggle("isPastEditorTop", pastWaypoint);
+        this.jsEmbedMenu.classList.toggle("InputBox-borderWidth", pastWaypoint);
+        this.jsEmbedMenu.classList.toggle("InputBox-borderColor", pastWaypoint);
+    }
+
+    private handleStickyMenuBottom(data) {
+        const pastWaypoint = data.waypointTop < 0;
+        this.jsFormElement.classList.toggle("isPastEditorBottom", pastWaypoint);
+    }
+
+    private mountStickyEmbedMenu() {
+        const stickyEmbed = this.jsBodyBoxContainer.querySelector(".js-RichEditorStickyEmbed");
+        const unStickyEmbed = this.jsBodyBoxContainer.querySelector(".js-RichEditorUnstickyEmbed");
+
+        ReactDOM.render(
+            <Waypoint
+                onPositionChange={data => {
+                    this.handleStickyMenuTop(data);
+                }}
+            />,
+            stickyEmbed,
+        );
+
+        ReactDOM.render(
+            <Waypoint
+                onPositionChange={data => {
+                    this.handleStickyMenuBottom(data);
+                }}
+
+                alert(unStickyEmbed.offsetHeight);
+                bottomOffset={-(unStickyEmbed.offsetHeight || 39)}
+            />,
+            unStickyEmbed,
         );
     }
 

@@ -54,7 +54,6 @@ export default class EmbedFocusModule extends Module {
             }
         });
         this.setupEmbedClickHandler();
-        this.setupMobileHandler();
 
         this.quill.root.addEventListener("keydown", this.keyDownListener);
         this.editorRoot.addEventListener("keydown", this.tabListener);
@@ -75,31 +74,6 @@ export default class EmbedFocusModule extends Module {
                 }
             },
             this.quill.container,
-        );
-    }
-
-    private setupMobileHandler() {
-        delegateEvent(
-            "click",
-            ".js-richText .richEditor-text",
-            (event, clickedElement) => {
-                this.editorRoot.classList.toggle("isFocused", true);
-            },
-            this.quill.container,
-        );
-
-        delegateEvent(
-            "click",
-            ".js-richEditor-next",
-            (event, clickedElement) => {
-                const nextEl: any = getNextTabbableElement({
-                    root: this.formWrapper,
-                    fromElement: clickedElement,
-                });
-                nextEl.focus();
-                this.editorRoot.classList.toggle("isFocused", false);
-            },
-            this.editorRoot,
         );
     }
 

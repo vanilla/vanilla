@@ -12,7 +12,7 @@ namespace Vanilla\Embeds;
 class InstagramEmbed extends Embed {
 
     /** @inheritdoc */
-    protected $domains = ['instagram.com', 'http://instagr.am'];
+    protected $domains = ['https://www.instagram.com', 'http://instagr.am', 'instagram.com', 'http://instagram.com', 'www.instagram.com'];
 
     /**
      * InstagramEmbed constructor.
@@ -27,13 +27,13 @@ class InstagramEmbed extends Embed {
     public function matchUrl(string $url) {
         $data = null;
 
-//        if ($this->isNetworkEnabled()) {
-//            $oembed = $this->oembed("https://api.instagram.com/oembed?url=" . urlencode($url));
-//            if ($oembed) {
-//                $oembed = $this->normalizeOembed($oembed);
-//                $data = $oembed;
-//            }
-//        }
+        if ($this->isNetworkEnabled()) {
+            $oembed = $this->oembed("https://api.instagram.com/oembed?url=" . urlencode($url));
+            if ($oembed) {
+                $oembed = $this->normalizeOembed($oembed);
+                $oembedData = $oembed;
+            }
+        }
 
         preg_match(
             '/https?:\/\/(?:www\.)?instagr(?:\.am|am\.com)\/p\/(?<postID>[\w-]+)/i',
@@ -47,6 +47,11 @@ class InstagramEmbed extends Embed {
             }
             $data['attributes']['postID'] = $matches['postID'];
         }
+
+        $data['attributes']['url'] = $matches[0];
+        $data['width'] = $oembedData['width'];
+        $data['height'] = $oembedData['height'];
+
             return $data;
     }
 
@@ -54,11 +59,11 @@ class InstagramEmbed extends Embed {
      * @inheritdoc
      */
     public function renderData(array $data): string {
-
-
+        $encodedUrl = htmlspecialchars($data['attributes']['postID']);
         $result = <<<HTML
 <div class="instagram-video VideoWrap">
-   <iframe src="https://instagram.com/p/{$data['attributes']['postID']}/embed/" width="412" height="510" frameborder="0" scrolling="no" allowtransparency="true"></iframe>
+   <iframe src="https://instagram.com/p/{$encodedUrl}/embed/"  width="412" height="510" frameborder="0" scrolling="no" allowtransparency="true"></iframe>
+</div>
 HTML;
 
        return $result;

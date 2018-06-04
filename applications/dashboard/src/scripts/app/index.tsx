@@ -20,6 +20,7 @@ import "./user-content/embeds/image";
 import "./user-content/embeds/link";
 import "./user-content/embeds/twitter";
 import "./user-content/embeds/video";
+import "./user-content/embeds/instagram";
 
 addComponent("App", Router);
 

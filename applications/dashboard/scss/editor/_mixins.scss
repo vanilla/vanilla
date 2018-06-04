@@ -162,11 +162,12 @@ $spinnerOffset: 73deg;
 }
 
 
-@mixin editorButtonFocusStyles() {
+@mixin editorButtonFocusStyles($offset: -$richEditor-outline_width) {
     outline: {
         width: $richEditor-outline_width;
-        offset: #{$richEditor-outline_offset};
+        offset: #{$offset};
         color: $richEditor-outline_color;
+        style: solid;
     }
 }
 

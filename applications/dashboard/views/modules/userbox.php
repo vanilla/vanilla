@@ -8,10 +8,11 @@ if ($User):
     echo '<div class="Email">';
 
     // Only show the email address if allowed.
-    if (val('UserID', $User) == Gdn::session()->UserID || Gdn::session()->checkPermission('Garden.PersonalInfo.View'))
-        echo val('Email', $User, '');
-    else
+    if (val('UserID', $User) == Gdn::session()->UserID || Gdn::session()->checkPermission('Garden.PersonalInfo.View')) {
+        echo htmlspecialchars(val('Email', $User, ''));
+    } else {
         echo '&nbsp;';
+    }
 
     echo '</div>';
     echo '</div>';

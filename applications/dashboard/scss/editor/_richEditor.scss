@@ -56,12 +56,12 @@
     white-space: pre-wrap !important; // Needed for spaces around embed blots to work properly!
 
     &:focus {
-        outline-offset: -2px;
-        outline-style: auto;
-        outline-width: 5px;
-        outline-color: Highlight;
-        outline-color: -webkit-focus-ring-color;
-        z-index: 1;
+        outline: {
+            offset: $richEditor-text_offset;
+            style: solid;
+            width: $richEditor-outline_width;
+            color: $richEditor-outline_color;
+        }
     }
 }
 
@@ -77,7 +77,7 @@
     flex-wrap: nowrap;
     list-style: none;
     padding: 0;
-    width: calc(100% + #{2 * $richEditor-border_width});
+    width: calc(100% - #{2 * $richEditor-border_width});
     margin: {
         top: 0;
         right: 0;
@@ -128,10 +128,14 @@
     display: block;
     height: $richEditor-icon_size;
     width: $richEditor-icon_size;
+    user-select: none;
+    cursor: pointer;
+
 
     &.richEditor-formatButton,
     &.richEditor-embedButton {
         height: $richEditor-menuButton_size;
+        color: inherit;
     }
 
     &.emojiGroup {
@@ -156,8 +160,21 @@
         }
     }
 
+
     &.isActive {
         @include editorButtonActiveStyles;
+    }
+
+    &.richEditor-embedButton {
+        &:focus {
+            @include editorButtonFocusStyles($richEditor-embedButton_offset);
+        }
+    }
+
+    &.richEditor-formatButton {
+        &:focus {
+            @include editorButtonFocusStyles($richEditor-paragraphMenuButton_offset);
+        }
     }
 }
 
@@ -169,7 +186,6 @@
 
     .richEditor-button,
     &.richEditor-button {
-        //height: $richEditor-menuButton_size;
         width: $richEditor-menuButton_size;
         font-size: #{$richEditor-menuButton_size * 24 / 39};
         line-height: $richEditor-menuButton_size;
@@ -221,6 +237,7 @@
 }
 
 .Close-x {
+    display: block;
     opacity: $richEditor-icon_opacity;
     cursor: pointer;
 }
@@ -247,6 +264,8 @@
     right: auto;
     text-align: center;
     user-select: none;
+    background: transparent;
+    cursor: pointer;
 
     &:focus {
         @include editorButtonFocusStyles;
@@ -304,6 +323,10 @@
     margin: 0;
     max-width: calc(100% - #{$richEditor-menuButton_size});
     min-height: #{$richEditor-menuButton_size - $richEditor-insertPopover_paddingVertical};
+
+    &:focus {
+        outline: 0;
+    }
 }
 
 .insertMedia-footer {

@@ -166,10 +166,7 @@ export default class EmbedFocusModule extends Module {
      * Keydown listener on the current quill instance.
      */
     private tabListener = (event: KeyboardEvent) => {
-        if (document.activeElement === document.body || document.activeElement === null) {
-            console.log("WTF");
-        }
-        if (!this.quill.container.closest(".richEditor")!.contains(document.activeElement)) {
+        if (!this.editorRoot!.contains(document.activeElement)) {
             return;
         }
 
@@ -226,7 +223,9 @@ export default class EmbedFocusModule extends Module {
                 root: this.editorRoot,
                 excludedRoots: [this.quill.root],
                 allowLooping: false,
+                fromElement: this.quill.root, // Always move as if from the quill root.
             });
+
             if (nextElement) {
                 nextElement.focus();
                 return false;
@@ -269,14 +268,12 @@ export default class EmbedFocusModule extends Module {
 
         // We need to place the selection at the end of quill.
         if (prevElement === this.quill.root) {
-            const selection = this.quill.getSelection();
-            const documentLength = this.quill.scroll.length();
-            const newIndex = selection ? selection.index + selection.length : documentLength - 1;
-            const lastEmbedBlot = getBlotAtIndex(this.quill, newIndex, FocusableEmbedBlot);
+            const lastIndex = this.quill.scroll.length() - 1;
+            const lastEmbedBlot = getBlotAtIndex(this.quill, lastIndex, FocusableEmbedBlot);
             if (lastEmbedBlot) {
                 this.focusEmbedBlot(lastEmbedBlot);
             } else {
-                this.quill.setSelection(selection, Quill.sources.USER);
+                this.quill.setSelection(lastIndex, 0, Quill.sources.USER);
             }
             event.preventDefault();
             event.stopPropagation();

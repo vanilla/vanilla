@@ -360,4 +360,17 @@ class DBAModel extends Gdn_Model {
             return [0, 0];
         }
     }
+
+    /**
+     * Perform basic validation on a database identifier name.
+     *
+     * @link https://dev.mysql.com/doc/refman/5.6/en/identifiers.html Identifier name specification.
+     * @param string $string A value to be used as a database identifier.
+     * @return bool True if valid, otherwise false.
+     */
+    public function isValidDatabaseIdentifier($string) {
+        // Sticking to ASCII.
+        $result = (bool)preg_match('/^(?![0-9]+$)[0-9a-zA-Z$_]+$/', $string);
+        return $result;
+    }
 }

@@ -23,7 +23,7 @@ import MentionAutoCompleteBlot from "./blots/embeds/MentionAutoCompleteBlot";
 
 /**
  * A module for managing focus of Embeds. For this to work for a new Embed,
- * ensure that you're embed extends FocusEmbedBlot
+ * ensure that your embed extends FocusEmbedBlot
  *
  * @see {FocusableEmbedBlot}
  */
@@ -59,7 +59,14 @@ export default class EmbedFocusModule extends Module {
         this.quill.root.addEventListener("keydown", this.keyDownListener);
         this.editorRoot.addEventListener("keydown", this.tabListener);
         this.editorRoot.addEventListener("keydown", this.escapeMobileFullScreen);
-        window.quill = quill;
+    }
+
+    public get inActiveMention() {
+        const fullDocumentRange = {
+            index: 0,
+            length: this.quill.scroll.length() - 1,
+        };
+        return rangeContainsBlot(this.quill, MentionAutoCompleteBlot, fullDocumentRange);
     }
 
     public escapeMobileFullScreen = (event: KeyboardEvent) => {
@@ -85,23 +92,13 @@ export default class EmbedFocusModule extends Module {
      *
      * Once you are outside of the editor there is nothing to worry about.
      * This only affects while the cursor is in the editor or inside of an embed blot.
+     *
+     * @returns true if the event was handled.
      */
-    public handleTab = (event: KeyboardEvent) => {
-        if (
-            !KeyboardModule.match(event, {
-                key: KeyboardModule.keys.TAB,
-                shiftKey: false,
-            })
-        ) {
-            return true;
-        }
-
+    public handleTab = (): boolean => {
         const blotForActiveElement = this.getEmbedBlotForFocusedElement();
         const focusItemIsEmbedBlot = blotForActiveElement instanceof FocusableEmbedBlot;
         if (this.quill.hasFocus() || focusItemIsEmbedBlot) {
-            event.preventDefault();
-            event.stopPropagation();
-
             // Focus the next available editor ui component.
             const nextElement = getNextTabbableElement({
                 root: this.editorRoot,
@@ -112,11 +109,11 @@ export default class EmbedFocusModule extends Module {
 
             if (nextElement) {
                 nextElement.focus();
-                return false;
+                return true;
             }
         }
 
-        return true;
+        return false;
     };
 
     /**
@@ -128,17 +125,10 @@ export default class EmbedFocusModule extends Module {
      *
      * Once you are outside of the editor there is nothing to worry about.
      * This only affects while the cursor is in the editor or inside of an embed blot.
+     *
+     * @returns true if the event was handled.
      */
-    public handleShiftTab = (event: KeyboardEvent) => {
-        if (
-            !KeyboardModule.match(event, {
-                key: KeyboardModule.keys.TAB,
-                shiftKey: true,
-            })
-        ) {
-            return true;
-        }
-
+    public handleShiftTab = () => {
         const prevElement = getNextTabbableElement({
             root: this.editorRoot.closest("form")!,
             excludedRoots: [this.quill.root],
@@ -147,7 +137,7 @@ export default class EmbedFocusModule extends Module {
         });
 
         if (!prevElement) {
-            return true;
+            return false;
         }
 
         // We need to place the selection at the end of quill.
@@ -159,15 +149,11 @@ export default class EmbedFocusModule extends Module {
             } else {
                 this.quill.setSelection(lastIndex, 0, Quill.sources.USER);
             }
-            event.preventDefault();
-            event.stopPropagation();
-            return false;
         } else {
-            event.preventDefault();
-            event.stopPropagation();
             prevElement.focus();
-            return false;
         }
+
+        return true;
     };
 
     /**
@@ -180,31 +166,17 @@ export default class EmbedFocusModule extends Module {
      * @then
      * - Delete the embed blot.
      */
-    public handleDeleteOnEmbed = (event: KeyboardEvent) => {
-        if (!this.isKeyCodeDelete(event.keyCode)) {
-            return true;
+    public handleDeleteOnEmbed = (blotForActiveElement: FocusableEmbedBlot) => {
+        const offset = blotForActiveElement.offset();
+        blotForActiveElement.remove();
+        this.quill.update(Quill.sources.USER);
+
+        const [potentialNewEmbedToFocus] = this.quill.scroll.descendant(FocusableEmbedBlot as any, offset);
+        if (potentialNewEmbedToFocus) {
+            this.focusEmbedBlot(potentialNewEmbedToFocus as any);
+        } else {
+            this.quill.setSelection(offset, 0, Quill.sources.USER);
         }
-
-        const blotForActiveElement = this.getEmbedBlotForFocusedElement();
-        const focusItemIsEmbedBlot = blotForActiveElement instanceof FocusableEmbedBlot;
-        if (blotForActiveElement && focusItemIsEmbedBlot) {
-            event.preventDefault();
-            event.stopPropagation();
-            const offset = blotForActiveElement.offset();
-            blotForActiveElement.remove();
-            this.quill.update(Quill.sources.USER);
-
-            const [potentialNewEmbedToFocus] = this.quill.scroll.descendant(FocusableEmbedBlot as any, offset);
-            if (potentialNewEmbedToFocus) {
-                this.focusEmbedBlot(potentialNewEmbedToFocus as any);
-            } else {
-                this.quill.setSelection(offset, 0, Quill.sources.USER);
-            }
-
-            return false;
-        }
-
-        return true;
     };
 
     /**
@@ -217,63 +189,17 @@ export default class EmbedFocusModule extends Module {
      * @then
      * - Insert a newline after the embed.
      */
-    public handleEnterOnEmbed = (event: KeyboardEvent) => {
-        if (event.keyCode !== KeyboardModule.keys.ENTER) {
-            return true;
-        }
-
-        // Only works for items scoped within itself.
-        const blotForActiveElement = this.getEmbedBlotForFocusedElement();
-        const focusItemIsEmbedBlot = blotForActiveElement instanceof FocusableEmbedBlot;
-        if (blotForActiveElement && focusItemIsEmbedBlot) {
-            event.preventDefault();
-            event.stopPropagation();
-            const newBlot = Parchment.create("block", "");
-            newBlot.insertInto(this.quill.scroll, blotForActiveElement.next);
-            this.quill.update(Quill.sources.USER);
-            this.quill.setSelection(blotForActiveElement.offset() + 1, 0, Quill.sources.USER);
-            return false;
-        }
-
-        return true;
-    };
-
-    /**
-     * Handle arrow keys if the quill document has focus.
-     *
-     * @if
-     * - An arrow key is pressed
-     * - The quill document has focus
-     * - The next or previous item in the document is an Embed
-     *
-     * @then
-     * - Set focus on that embed.
-     */
-    public handleArrowKeyAwayFromQuill = (event: KeyboardEvent) => {
-        if (!this.isKeyCodeArrowKey(event.keyCode) || event.shiftKey) {
-            return true;
-        }
-
-        if (document.activeElement === this.quill.root) {
-            const selection = this.quill.getSelection();
-
-            // TODO: CHECK if we have an active @mention open here, and bail out if we do.
-            const [currentBlot] = this.quill.getLine(selection.index);
-            const blotToMoveTo = this.findBlotToMoveTo(currentBlot, event.keyCode);
-
-            if (blotToMoveTo instanceof FocusableEmbedBlot) {
-                this.focusEmbedBlot(blotToMoveTo);
-                event.preventDefault();
-                event.stopPropagation();
-                return false;
-            }
-        }
-
-        return true;
+    public handleEnterOnEmbed = (blotForActiveElement: FocusableEmbedBlot) => {
+        const newBlot = Parchment.create("block", "");
+        newBlot.insertInto(this.quill.scroll, blotForActiveElement.next);
+        this.quill.update(Quill.sources.USER);
+        this.quill.setSelection(blotForActiveElement.offset() + 1, 0, Quill.sources.USER);
     };
 
     /**
      * Handle arrow keys while an embed is Focused.
+     *
+     * @returns true if the event was handled
      *
      * @if
      * - And Embed is Focused
@@ -292,45 +218,30 @@ export default class EmbedFocusModule extends Module {
      * @else
      * - Move the focus to the next or previous text content.
      */
-    public handleArrowKeyFromEmbed = (event: KeyboardEvent) => {
-        if (!this.isKeyCodeArrowKey(event.keyCode)) {
-            return true;
-        }
-
-        const blotForActiveElement = this.getEmbedBlotForFocusedElement();
-        if (!(blotForActiveElement instanceof FocusableEmbedBlot)) {
-            return true;
-        }
-
+    public handleArrowKeyFromEmbed = (directionKeyCode: number, blotForActiveElement: FocusableEmbedBlot): boolean => {
         // Check if we are at the beginning or end of the scroll.
         const position = blotForActiveElement.offset();
         const isEndOfScroll = position + blotForActiveElement.length() === this.quill.scroll.length();
         const isStartOfScroll = position === 0;
-        const isUpOrLeft = [KeyboardModule.keys.LEFT, KeyboardModule.keys.UP].includes(event.keyCode as any);
-        const isDownOrRight = [KeyboardModule.keys.RIGHT, KeyboardModule.keys.DOWN].includes(event.keyCode as any);
+        const isUpOrLeft = [KeyboardModule.keys.LEFT, KeyboardModule.keys.UP].includes(directionKeyCode as any);
+        const isDownOrRight = [KeyboardModule.keys.RIGHT, KeyboardModule.keys.DOWN].includes(directionKeyCode as any);
         if (isStartOfScroll && isUpOrLeft) {
-            event.preventDefault();
-            event.stopPropagation();
             insertNewLineAtStartOfScroll(this.quill);
-            return false;
+            return true;
         } else if (isEndOfScroll && isDownOrRight) {
-            event.preventDefault();
-            event.stopPropagation();
             insertNewLineAtEndOfScroll(this.quill);
-            return false;
-        }
-
-        // Check if we have a blot to move to.
-        const blotToMoveTo = this.findBlotToMoveTo(blotForActiveElement, event.keyCode);
-        if (!blotToMoveTo) {
             return true;
         }
 
-        event.preventDefault();
-        event.stopPropagation();
+        // Check if we have a blot to move to.
+        const blotToMoveTo = this.findEmbedBlotToFocus(blotForActiveElement, directionKeyCode);
+        if (!blotToMoveTo) {
+            return false;
+        }
 
         if (blotToMoveTo instanceof FocusableEmbedBlot) {
             this.focusEmbedBlot(blotToMoveTo);
+            return true;
         } else {
             // We want to mimic normal movement behaviour as if our Blot was text, so
             // We check if we need to put the cursor in the middle of the next or previous line.
@@ -340,9 +251,8 @@ export default class EmbedFocusModule extends Module {
             const shouldUsePreviousIndex = previousIndex >= newElementStart && previousIndex < newElementEnd;
             const newIndex = shouldUsePreviousIndex ? previousIndex : newElementStart;
             this.quill.setSelection(newIndex, 0);
+            return true;
         }
-
-        return false;
     };
 
     /**
@@ -372,7 +282,7 @@ export default class EmbedFocusModule extends Module {
      * @param currentBlot The blot to check.
      * @param keyCode The keycode that was pressed.
      */
-    public findBlotToMoveTo(currentBlot: Blot, keyCode: number) {
+    public findEmbedBlotToFocus(currentBlot: Blot, keyCode: number) {
         switch (keyCode) {
             case KeyboardModule.keys.DOWN:
                 return currentBlot.next as Blot;
@@ -442,6 +352,8 @@ export default class EmbedFocusModule extends Module {
     /**
      * This needs to be exported in set in the quill options, before the keyboard module is instantiated.
      *
+     * @returns true if the event was handled
+     *
      * @if
      * - Backspace is pressed
      * - The current Blot is an empty Blot.
@@ -452,16 +364,8 @@ export default class EmbedFocusModule extends Module {
      * - Set focus on the previous embed Blot.
      * - Prevent handleDeleteOnEmbed on from running.
      */
-    private handleDeleteOnQuill = (event: KeyboardEvent) => {
-        if (!this.isKeyCodeDelete(event.keyCode)) {
-            return true;
-        }
-        const selection = this.quill.getSelection();
-        if (!selection) {
-            return true;
-        }
-
-        const [currentBlot] = this.quill.getLine(selection.index);
+    private handleDeleteOnQuill = (): boolean => {
+        const [currentBlot] = this.quill.getLine(this.quill.getSelection().index);
         const previousBlot = currentBlot.prev;
         const isPreviousBlotEmbed = previousBlot instanceof FocusableEmbedBlot;
         const isCurrentBlotEmpty = currentBlot.domNode.textContent === "";
@@ -470,10 +374,10 @@ export default class EmbedFocusModule extends Module {
             (currentBlot as Blot).remove();
             this.quill.update(Quill.sources.USER);
             this.focusEmbedBlot(previousBlot);
-            return false;
+            return true;
         }
 
-        return true;
+        return false;
     };
 
     /**
@@ -484,18 +388,53 @@ export default class EmbedFocusModule extends Module {
             return;
         }
 
-        const exclusiveHandlers = [
-            this.handleArrowKeyFromEmbed,
-            this.handleArrowKeyAwayFromQuill,
-            this.handleDeleteOnQuill,
-            this.handleDeleteOnEmbed,
-            this.handleEnterOnEmbed,
-        ];
+        const selection = this.quill.getSelection();
+        const blotForActiveElement = this.getEmbedBlotForFocusedElement();
+        const [currentLineBlot] = this.quill.getLine(selection.index);
+        const blotToMoveTo = this.findEmbedBlotToFocus(currentLineBlot, event.keyCode);
 
-        // Run all of the event listeners until one returns false;
-        return exclusiveHandlers.reduce((shouldContinue, currentHandler) => {
-            return shouldContinue ? currentHandler(event) : false;
-        }, true);
+        if (this.isKeyCodeArrowKey(event.keyCode) && !event.shiftKey && !this.inActiveMention) {
+            if (blotForActiveElement instanceof FocusableEmbedBlot) {
+                const eventWasHandled = this.handleArrowKeyFromEmbed(event.keyCode, blotForActiveElement);
+
+                if (eventWasHandled) {
+                    event.preventDefault();
+                    event.stopPropagation();
+                    return;
+                }
+            }
+
+            if (document.activeElement === this.quill.root && blotToMoveTo instanceof FocusableEmbedBlot) {
+                event.preventDefault();
+                event.stopPropagation();
+                return this.focusEmbedBlot(blotToMoveTo);
+            }
+        }
+
+        if (this.isKeyCodeDelete(event.keyCode)) {
+            if (blotForActiveElement instanceof FocusableEmbedBlot) {
+                event.preventDefault();
+                event.stopPropagation();
+                return this.handleDeleteOnEmbed(blotForActiveElement);
+            }
+
+            if (selection) {
+                const eventWasHandled = this.handleDeleteOnQuill();
+                if (eventWasHandled) {
+                    event.preventDefault();
+                    event.stopPropagation();
+                    return;
+                }
+            }
+        }
+
+        if (event.keyCode === KeyboardModule.keys.ENTER) {
+            if (blotForActiveElement instanceof FocusableEmbedBlot) {
+                event.preventDefault();
+                event.stopPropagation();
+                return this.handleEnterOnEmbed(blotForActiveElement);
+            }
+        }
     };
 
     /**
@@ -506,12 +445,20 @@ export default class EmbedFocusModule extends Module {
             return;
         }
 
-        const exclusiveHandlers = [this.handleTab, this.handleShiftTab];
+        let eventWasHandled = false;
 
-        // Run all of the event listeners until one returns false;
-        return exclusiveHandlers.reduce((shouldContinue, currentHandler) => {
-            return shouldContinue ? currentHandler(event) : false;
-        }, true);
+        if (KeyboardModule.match(event, KeyboardModule.keys.TAB)) {
+            if (event.shiftKey) {
+                eventWasHandled = this.handleShiftTab();
+            } else {
+                eventWasHandled = this.handleTab();
+            }
+        }
+
+        if (eventWasHandled) {
+            event.preventDefault();
+            event.stopPropagation();
+        }
     };
 
     /**

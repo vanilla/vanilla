@@ -18,7 +18,7 @@ import ErrorBlot from "./ErrorBlot";
 
 const imageData: IEmbedData = {
     type: "image",
-    url: "/some-image-url.jpg",
+    url: "",
     name: "Pizza gif",
     body: null,
     photoUrl: null,

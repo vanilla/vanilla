@@ -120,8 +120,19 @@ export default class VanillaTheme extends ThemeBase {
         );
     }
 
-    private handleStickyMenuTop(data) {
-        const pastWaypoint = data.waypointTop < 0;
+    private handleStickyMenuTop(data, offset) {
+        window.console.log("data: ", data);
+
+        const pastWaypoint = data.currentPosition === "above";
+        const offset = offset || "0px";
+
+        window.console.log("pastWaypoint: ", pastWaypoint);
+
+        if (pastWaypoint) {
+            this.jsEmbedMenu.style.top = offset;
+        } else {
+            this.jsEmbedMenu.style.removeProperty("top");
+        }
 
         this.jsFormElement.classList.toggle("isPastEditorTop", pastWaypoint);
         this.jsEmbedMenu.classList.toggle("InputBox-borderWidth", pastWaypoint);
@@ -129,19 +140,21 @@ export default class VanillaTheme extends ThemeBase {
     }
 
     private handleStickyMenuBottom(data) {
-        const pastWaypoint = data.waypointTop < 0;
+        const pastWaypoint = data.currentPosition === "above";
         this.jsFormElement.classList.toggle("isPastEditorBottom", pastWaypoint);
     }
 
     private mountStickyEmbedMenu() {
         const stickyEmbed = this.jsBodyBoxContainer.querySelector(".js-RichEditorStickyEmbed");
         const unStickyEmbed = this.jsBodyBoxContainer.querySelector(".js-RichEditorUnstickyEmbed");
+        const offset = "63px";
 
         ReactDOM.render(
             <Waypoint
                 onPositionChange={data => {
-                    this.handleStickyMenuTop(data);
+                    this.handleStickyMenuTop(data, offset);
                 }}
+                topOffset={offset}
             />,
             stickyEmbed,
         );
@@ -151,6 +164,7 @@ export default class VanillaTheme extends ThemeBase {
                 onPositionChange={data => {
                     this.handleStickyMenuBottom(data);
                 }}
+                topOffset={offset}
             />,
             unStickyEmbed,
         );

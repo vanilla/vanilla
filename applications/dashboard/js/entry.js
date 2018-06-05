@@ -3,7 +3,7 @@
 jQuery(document).ready(function($) {
 
     // Check to see if the selected email is valid
-    $('#Register input[name$=Email], body.register input[name$=Email]').blur(function() {
+    $('#Register input[name=Email], body.register input[name=Email]').blur(function() {
         var email = $(this).val();
         if (email != '') {
             var checkUrl = gdn.url('/user/emailavailable');
@@ -26,7 +26,7 @@ jQuery(document).ready(function($) {
     });
 
     // Check to see if the selected username is valid
-    $('#Register input[name$=Name], body.register input[name$=Name]').blur(function() {
+    $('#Register input[name=Name], body.register input[name=Name]').blur(function() {
         var name = $(this).val();
         if (name != '') {
             var checkUrl = gdn.url('/user/usernameavailable/' + encodeURIComponent(name));
@@ -58,7 +58,7 @@ jQuery(document).ready(function($) {
             return;
         }
         var fineprint = $('#Form_ConnectName').siblings('.FinePrint');
-        var selectedName = $('input[name$=UserSelect]:checked').val();
+        var selectedName = $('input[name=UserSelect]:checked').val();
         if (!selectedName || selectedName == 'other') {
             var name = $('#Form_ConnectName').val();
             if (typeof(name) == 'string' && name != '') {
@@ -94,10 +94,10 @@ jQuery(document).ready(function($) {
 
     checkConnectName();
     $('#Form_ConnectName').keyup(checkConnectName);
-    $('input[name$=UserSelect]').click(checkConnectName);
+    $('input[name=UserSelect]').click(checkConnectName);
 
     // Check to see if passwords match
-    $('input[name$=PasswordMatch]').blur(function() {
+    $('input[name=PasswordMatch]').blur(function() {
         var $pwmatch = $(this);
         var $pw = $pwmatch.closest('form').find('input[name=Password]');
 

@@ -11,8 +11,16 @@ registerEmbed("instagram", renderInstagram);
 export async function renderInstagram(element: HTMLElement, data: IEmbedData) {
     element.classList.add("embed-image");
     element.classList.add("embedImage");
-    element.innerHTML = `<iframe src="https://instagram.com/p/${data.attributes.postID}/embed/" width=${
-        data.width
-    } height=${data.height} frameborder="0" scrolling="no" allowtransparency="true"></iframe>
-        </div>`;
+
+    // set height to 510 as we currently set it in class.format
+    var height = data.height ? data.height : 510;
+    var width = data.width ? data.width : 412;
+
+    const iframe = document.createElement("iframe");
+    iframe.classList.add("embedImage-img");
+    iframe.setAttribute("width", width);
+    iframe.setAttribute("height", height);
+    iframe.setAttribute("src", `https://instagram.com/p/${data.attributes.postID}/embed/`);
+
+    element.appendChild(iframe);
 }

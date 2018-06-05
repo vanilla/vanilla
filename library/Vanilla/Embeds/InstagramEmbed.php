@@ -12,13 +12,13 @@ namespace Vanilla\Embeds;
 class InstagramEmbed extends Embed {
 
     /** @inheritdoc */
-    protected $domains = ['https://www.instagram.com', 'http://instagr.am', 'instagram.com', 'http://instagram.com', 'www.instagram.com'];
+    protected $domains = ['instagram.com', 'instagr.am'];
 
     /**
      * InstagramEmbed constructor.
      */
     public function __construct() {
-        parent::__construct('instagram', 'video');
+        parent::__construct('instagram', 'image');
     }
 
     /**
@@ -28,41 +28,47 @@ class InstagramEmbed extends Embed {
         $data = null;
 
         if ($this->isNetworkEnabled()) {
-            $oembed = $this->oembed("https://api.instagram.com/oembed?url=" . urlencode($url));
-            if ($oembed) {
-                $oembed = $this->normalizeOembed($oembed);
-                $oembedData = $oembed;
-            }
+            // The oembed is used only to pull the width and height of the object.
+            $oembedData = $this->oembed("https://api.instagram.com/oembed?url=" . urlencode($url));
         }
-
+        // extract postID from the instagram post.
         preg_match(
             '/https?:\/\/(?:www\.)?instagr(?:\.am|am\.com)\/p\/(?<postID>[\w-]+)/i',
             $url,
             $matches
         );
+
+        $data = $data ?: [];
         if (array_key_exists('postID', $matches)) {
-            $data = $data ?: [];
             if (!array_key_exists('attributes', $data)) {
                 $data['attributes'] = [];
             }
             $data['attributes']['postID'] = $matches['postID'];
         }
 
-        $data['attributes']['url'] = $matches[0];
-        $data['width'] = $oembedData['width'];
-        $data['height'] = $oembedData['height'];
+        if (array_key_exists('width', $oembedData)) {
+            $data['width'] = $oembedData['width'] ?? '';
+        }
 
-            return $data;
+        if (array_key_exists('height', $oembedData)) {
+            $data['height'] = $oembedData['height'] ?? '';
+        }
+
+        return $data;
     }
 
     /**
      * @inheritdoc
      */
     public function renderData(array $data): string {
-        $encodedUrl = htmlspecialchars($data['attributes']['postID']);
+        $instagramPostID = $data['attributes']['postID'] ?? '';
+        $instagramPostID = htmlspecialchars($instagramPostID);
+        $width = $data['width'] ?? 412;
+        $height = $data['height'] ?? 510;
+
         $result = <<<HTML
-<div class="instagram-video VideoWrap">
-   <iframe src="https://instagram.com/p/{$encodedUrl}/embed/"  width="412" height="510" frameborder="0" scrolling="no" allowtransparency="true"></iframe>
+<div class="embed-image embed embedImage">
+   <iframe class="embedImage-img" src="https://instagram.com/p/{$instagramPostID}/embed/"  width="$width" height="$height" frameborder="0" scrolling="no" allowtransparency="true"></iframe>
 </div>
 HTML;
 

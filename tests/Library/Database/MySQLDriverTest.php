@@ -85,8 +85,10 @@ class MySQLDriverTest extends TestCase {
     public function provideAliasData() {
         return [
             ["Test t", "`GDN_Test` `t`"],
+            ["Test as t", "`GDN_Test` `t`"],
             ["Test", "`GDN_Test` `Test`"],
             ["Test t", "GDN_Test t", false],
+            ["Test as t", "GDN_Test t", false],
             ["Test", "GDN_Test Test", false],
         ];
     }

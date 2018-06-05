@@ -96,6 +96,7 @@ The `sourceMapPathOverrides` is optional, but is necessary if you wish to debug 
             "name": "Attach Karma Chrome",
             "address": "localhost",
             "port": 9333,
+            "webRoot": "${workspaceFolder}",
             "pathMapping": {
                 "/": "${workspaceRoot}",
                 "/base/": "${workspaceRoot}/"

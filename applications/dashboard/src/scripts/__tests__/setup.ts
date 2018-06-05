@@ -4,5 +4,11 @@
  * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
  */
 
-const dashboardTestsContext = (require as any).context("../", true, /.test.(ts|tsx)$/);
-dashboardTestsContext.keys().forEach(dashboardTestsContext);
+import Enzyme from "enzyme";
+import Adapter from "enzyme-adapter-react-16";
+import { importAll } from "@testroot/utility";
+
+// Setup enzyme
+Enzyme.configure({ adapter: new Adapter() });
+
+importAll((require as any).context("..", true, /.test.(ts|tsx)$/));

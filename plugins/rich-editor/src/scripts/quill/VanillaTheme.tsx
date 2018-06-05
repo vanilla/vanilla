@@ -23,9 +23,9 @@ import smoothscroll from "smoothscroll-polyfill";
 
 export default class VanillaTheme extends ThemeBase {
     private jsBodyBoxContainer: Element;
-    private jsFormElement: Element;
-    private jsEmbedMenu: Element;
-    private jsMobileCheck: Element;
+    private jsFormElement: HTMLElement;
+    private jsEmbedMenu: HTMLElement;
+    private jsMobileCheck: HTMLElement;
 
     /**
      * Constructor.
@@ -56,9 +56,9 @@ export default class VanillaTheme extends ThemeBase {
 
         // Find the editor root.
         this.jsBodyBoxContainer = this.quill.container.closest(".richEditor") as Element;
-        this.jsFormElement = this.jsBodyBoxContainer.closest(".FormWrapper") as Element;
-        this.jsEmbedMenu = this.jsBodyBoxContainer.querySelector(".richEditor-embedBar") as Element;
-        this.jsMobileCheck = this.jsBodyBoxContainer.querySelector(".js-RichEditorMobileCheck") as Element;
+        this.jsFormElement = this.jsBodyBoxContainer.closest(".FormWrapper") as HTMLElement;
+        this.jsEmbedMenu = this.jsBodyBoxContainer.querySelector(".richEditor-embedBar") as HTMLElement;
+        this.jsMobileCheck = this.jsBodyBoxContainer.querySelector(".js-RichEditorMobileCheck") as HTMLElement;
         if (!this.jsBodyBoxContainer) {
             throw new Error("Could not find .richEditor to mount editor components into.");
         }

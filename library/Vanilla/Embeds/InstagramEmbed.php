@@ -26,7 +26,7 @@ class InstagramEmbed extends Embed {
      */
     public function matchUrl(string $url) {
         $data = null;
-
+        $oembedData= [];
         if ($this->isNetworkEnabled()) {
             // The oembed is used only to pull the width and height of the object.
             $oembedData = $this->oembed("https://api.instagram.com/oembed?url=" . urlencode($url));
@@ -67,8 +67,8 @@ class InstagramEmbed extends Embed {
         $height = $data['height'] ?? 510;
 
         $result = <<<HTML
-<div class="embed-image embed embedImage">
-   <iframe class="embedImage-img" src="https://instagram.com/p/{$instagramPostID}/embed/"  width="$width" height="$height" frameborder="0" scrolling="no" allowtransparency="true"></iframe>
+<div class="embed embedInstagram">
+   <iframe class="embedInstagram-ifr" src="https://instagram.com/p/{$instagramPostID}/embed/"  width="$width" height="$height" frameborder="0" scrolling="no" allowtransparency="true"></iframe>
 </div>
 HTML;
 

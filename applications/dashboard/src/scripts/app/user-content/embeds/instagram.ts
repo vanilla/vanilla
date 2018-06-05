@@ -9,15 +9,14 @@ import { registerEmbed, IEmbedData } from "@dashboard/embeds";
 registerEmbed("instagram", renderInstagram);
 
 export async function renderInstagram(element: HTMLElement, data: IEmbedData) {
-    element.classList.add("embed-image");
-    element.classList.add("embedImage");
+    element.classList.add("embedInstagram");
 
     // set height to 510 as we currently set it in class.format
     const height = data.height ? data.height : 510;
     const width = data.width ? data.width : 412;
 
     const iframe = document.createElement("iframe");
-    iframe.classList.add("embedImage-img");
+    iframe.classList.add("embedInstagram-ifr");
     iframe.setAttribute("width", width);
     iframe.setAttribute("height", height);
     iframe.setAttribute("src", `https://instagram.com/p/${data.attributes.postID}/embed/`);

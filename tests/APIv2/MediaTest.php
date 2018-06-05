@@ -356,7 +356,23 @@ class MediaTest extends AbstractAPIv2Test {
                         'embedUrl' => 'https://www.youtube.com/embed/9bZkp7q19f0?feature=oembed&autoplay=1&start=182',
                     ],
                 ]
+            ],
+            [
+                "https://www.instagram.com/p/bNd86MSFv6/",
+                'instagram',
+                [
+                    'name' => null,
+                    'body' => null,
+                    'photoUrl' => null,
+                    'height' => null,
+                    'width' => null,
+                    'attributes' => [
+                        'postID' => 'bNd86MSFv6',
+                    ],
+                ]
             ]
+
+
         ];
 
         return $urls;

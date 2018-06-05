@@ -592,16 +592,17 @@ abstract class Gdn_SQLDriver {
      *    user
      *    user, user u2, role
      *    array("user u", "user u2", "role")
+     * @param boolean $escape Whether or not the from query should be escaped.
      *
      * @return Gdn_SQLDriver $this
      **/
-    public function from($from) {
+    public function from($from, $escape = true) {
         if (!is_array($from)) {
             $from = [$from];
         }
 
         foreach ($from as $part) {
-            $this->_Froms[] = $this->mapAliases($part);
+            $this->_Froms[] = $this->mapAliases($part, $escape);
         }
 
         return $this;
@@ -1313,14 +1314,19 @@ abstract class Gdn_SQLDriver {
      * specification with any table prefix prepended.
      *
      * @param string $tableString The string specification of the table. ie. "tbl_User as u" or "user u".
+     * @param boolean $escape Whether or not to escape the tables and aliases.
      * @return string
      */
-    public function mapAliases($tableString) {
+    public function mapAliases($tableString, $escape = true) {
         if (preg_match('`^([^\s]+?)(?:\s+(?:as\s+)?([a-z_][a-z0-9_]*))?$`i', trim($tableString), $m)) {
             $tableName = $m[1];
             $alias = $m[2] ?? $tableName;
 
-            return $this->escapeIdentifier($this->Database->DatabasePrefix.$tableName).' '.$this->escapeIdentifier($alias);
+            $fullTableName = $this->Database->DatabasePrefix.$tableName;
+            $escapedTableName = $escape ? $this->escapeIdentifier($fullTableName) : $fullTableName;
+            $escapedAlias = $escape ? $this->escapeIdentifier($alias) : $alias;
+
+            return $escapedTableName.' '.$escapedAlias;
         } else {
             throw new \InvalidArgumentException("Unknown table expression: $tableString", 500);
         }

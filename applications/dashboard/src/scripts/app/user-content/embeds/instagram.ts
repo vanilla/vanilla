@@ -13,8 +13,8 @@ export async function renderInstagram(element: HTMLElement, data: IEmbedData) {
     element.classList.add("embedImage");
 
     // set height to 510 as we currently set it in class.format
-    var height = data.height ? data.height : 510;
-    var width = data.width ? data.width : 412;
+    const height = data.height ? data.height : 510;
+    const width = data.width ? data.width : 412;
 
     const iframe = document.createElement("iframe");
     iframe.classList.add("embedImage-img");

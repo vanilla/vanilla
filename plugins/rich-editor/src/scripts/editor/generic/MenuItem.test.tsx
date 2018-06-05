@@ -6,7 +6,7 @@
 
 import React from "react";
 import { expect } from "chai";
-import { shallow } from "@testroot/enzyme";
+import { shallow } from "enzyme";
 import sinon from "sinon";
 import MenuItem from "./MenuItem";
 

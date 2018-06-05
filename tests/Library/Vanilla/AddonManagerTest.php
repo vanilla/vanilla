@@ -7,7 +7,7 @@
 
 namespace VanillaTests\Library\Vanilla;
 
-use PHPUnit\Framework\TestCase;
+use VanillaTests\SharedBootstrapTestCase;
 use Test\OldApplication\Controllers\Api\NewApiController;
 use Test\OldApplication\Controllers\ArchiveController;
 use Test\OldApplication\Controllers\HiddenController;
@@ -17,7 +17,7 @@ use Vanilla\Addon;
 use VanillaTests\Fixtures\TestAddonManager;
 
 
-class AddonManagerTest extends TestCase {
+class AddonManagerTest extends SharedBootstrapTestCase {
 
     private static $types = [Addon::TYPE_ADDON, Addon::TYPE_THEME, Addon::TYPE_LOCALE];
 

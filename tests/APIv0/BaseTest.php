@@ -9,9 +9,9 @@ namespace VanillaTests\APIv0;
 
 
 use Garden\Http\HttpResponse;
-use PHPUnit\Framework\TestCase;
+use VanillaTests\SharedBootstrapTestCase;
 
-abstract class BaseTest extends TestCase {
+abstract class BaseTest extends SharedBootstrapTestCase {
     /** @var APIv0  $api */
     protected static $api;
 
@@ -19,6 +19,7 @@ abstract class BaseTest extends TestCase {
      * Make sure there is a fresh copy of Vanilla for the class' tests.
      */
     public static function setUpBeforeClass() {
+        parent::setUpBeforeClass();
         $api = new APIv0();
 
         $api->uninstall();
@@ -35,6 +36,7 @@ abstract class BaseTest extends TestCase {
     public static function tearDownAfterClass() {
         self::$api->uninstall();
         self::$api->terminate();
+        parent::tearDownAfterClass();
     }
 
     /**

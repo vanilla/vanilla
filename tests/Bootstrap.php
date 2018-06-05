@@ -20,7 +20,6 @@ use Vanilla\Authenticator\PasswordAuthenticator;
 use Vanilla\InjectableInterface;
 use Vanilla\Models\AuthenticatorModel;
 use Vanilla\Models\SSOModel;
-use Vanilla\Quill\Renderer;
 use VanillaTests\Fixtures\MockAuthenticator;
 use VanillaTests\Fixtures\MockSSOAuthenticator;
 use VanillaTests\Fixtures\NullCache;
@@ -40,7 +39,7 @@ class Bootstrap {
      *
      * @param string $baseUrl The base URL of the installation.
      */
-    public function __construct($baseUrl = 'http://vanilla.test') {
+    public function __construct($baseUrl) {
         $this->baseUrl = str_replace('\\', '/', $baseUrl);
     }
 
@@ -346,13 +345,25 @@ class Bootstrap {
      * Clean up a container and remove its global references.
      *
      * @param Container $container The container to clean up.
+     *
+     * @throws \Garden\Container\ContainerException
+     * @throws \Garden\Container\NotFoundException
      */
     public static function cleanup(Container $container) {
-        if (class_exists(\CategoryModel::class)) {
-            \CategoryModel::$Categories = null;
-        }
+        self::cleanUpContainer($container);
+        self::cleanUpGlobals();
+    }
 
-        if ($container->hasInstance(AddonManager::class)) {
+    /**
+     * Clean up container.
+     *
+     * @param \Garden\Container\Container $container
+     *
+     * @throws \Garden\Container\ContainerException
+     * @throws \Garden\Container\NotFoundException
+     */
+    public static function cleanUpContainer(Container $container) {
+       if ($container->hasInstance(AddonManager::class)) {
             /* @var AddonManager $addonManager */
 
             $addonManager = $container->get(AddonManager::class);
@@ -360,13 +371,18 @@ class Bootstrap {
         }
 
         $container->clearInstances();
+    }
 
-        if ($GLOBALS['dic'] === $container) {
-            unset($GLOBALS['dic']);
+    /**
+     * Clean up global variables.
+     */
+    public static function cleanUpGlobals() {
+        if (class_exists(\CategoryModel::class)) {
+            \CategoryModel::$Categories = null;
         }
-        if (Gdn::getContainer() === $container) {
-            Gdn::setContainer(null);
-        }
+
+        unset($GLOBALS['dic']);
+        Gdn::setContainer(new NullContainer());
     }
 
     /**

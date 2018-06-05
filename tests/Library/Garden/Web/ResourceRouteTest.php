@@ -7,7 +7,7 @@
 
 namespace VanillaTests\Library\Garden\Web;
 
-use PHPUnit\Framework\TestCase;
+use VanillaTests\SharedBootstrapTestCase;
 use Garden\Web\Action;
 use Garden\Web\ResourceRoute;
 use Garden\Web\Route;
@@ -19,7 +19,7 @@ use VanillaTests\Fixtures\Request;
 /**
  * Test the {@link ResourceRoute} class.
  */
-class ResourceRouteTest extends TestCase {
+class ResourceRouteTest extends SharedBootstrapTestCase {
     /**
      * Create a new {@link ResourceRoute} initialized for testing with fixtures.
      */

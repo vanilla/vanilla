@@ -20,7 +20,7 @@ TEST_FILE_ROOTS.forEach(fileRoot => {
     const setupPath = normalize(join(fileRoot, "src/scripts/__tests__/setup.ts"));
 
 
-    files.push(tsPath, tsxPath);
+    files.push(setupPath);
     preprocessors[tsPath] = ["webpack", "sourcemap"];
     preprocessors[tsxPath] = ["webpack", "sourcemap"];
     preprocessors[setupPath] = ["webpack", "sourcemap"];

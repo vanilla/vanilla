@@ -643,6 +643,7 @@ label.checkbox input.checkbox-input {
   background: white;
   height: auto;
   padding: 0;
+  overflow: hidden;
 }
 
 .richEditor-menu {

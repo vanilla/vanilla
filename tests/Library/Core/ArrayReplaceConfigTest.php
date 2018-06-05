@@ -7,12 +7,12 @@
 
 namespace VanillaTests\Library\Core;
 
-use PHPUnit\Framework\TestCase;
+use VanillaTests\SharedBootstrapTestCase;
 
 /**
  * Tests for the **arrayReplaceConfig** function.
  */
-class ArrayReplaceConfigTest extends TestCase {
+class ArrayReplaceConfigTest extends SharedBootstrapTestCase {
 
     /**
      * An empty default should return the override.

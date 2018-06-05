@@ -7,12 +7,12 @@
 
 namespace VanillaTests\Library\Core;
 
-use PHPUnit\Framework\TestCase;
+use VanillaTests\SharedBootstrapTestCase;
 
 /**
  * Test array functions.
  */
-class ArrayFunctionsTest extends TestCase {
+class ArrayFunctionsTest extends SharedBootstrapTestCase {
 
     /**
      * Test {@link flattenArray()}.

@@ -8,7 +8,7 @@
 namespace VanillaTests\Models\SSOModel;
 
 use Garden\Schema\ValidationException;
-use PHPUnit\Framework\TestCase;
+use VanillaTests\SharedBootstrapTestCase;
 use Vanilla\Models\SSOData;
 use Vanilla\Models\SSOModel;
 use VanillaTests\Fixtures\MockSSOAuthenticator;
@@ -18,7 +18,7 @@ use VanillaTests\SiteTestTrait;
 /**
  * Class CreateUserTest.
  */
-class CreateUserTest extends TestCase {
+class CreateUserTest extends SharedBootstrapTestCase {
     use SiteTestTrait;
     use SetsGeneratorTrait;
 

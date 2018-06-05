@@ -7,10 +7,10 @@
 
 namespace VanillaTests\Library\Vanilla\Utility;
 
-use PHPUnit\Framework\TestCase;
+use VanillaTests\SharedBootstrapTestCase;
 use Vanilla\Web\WebLinking;
 
-class WebLinkingTest extends TestCase {
+class WebLinkingTest extends SharedBootstrapTestCase {
 
     /** @var WebLinking */
     private $webLinking;

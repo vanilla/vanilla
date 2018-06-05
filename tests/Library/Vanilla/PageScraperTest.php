@@ -8,12 +8,12 @@ namespace VanillaTests\Library\Vanilla;
 
 use Exception;
 use Garden\Http\HttpRequest;
-use PHPUnit\Framework\TestCase;
+use VanillaTests\SharedBootstrapTestCase;
 use VanillaTests\Fixtures\PageScraper;
 use Vanilla\Metadata\Parser\OpenGraphParser;
 use Vanilla\Metadata\Parser\JsonLDParser;
 
-class PageScraperTest extends TestCase {
+class PageScraperTest extends SharedBootstrapTestCase {
 
     /** @var string Directory of test HTML files. */
     const HTML_DIR = PATH_ROOT.'/tests/fixtures/html';

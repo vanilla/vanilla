@@ -8,13 +8,13 @@
 namespace VanillaTests\Library\Vanilla;
 
 use PHPUnit\Framework\TestCase;
-use VanillaTests\BootstrapTrait;
 use Vanilla\Models\AuthenticatorModel;
 use Vanilla\Models\SSOData;
 use VanillaTests\Fixtures\Authenticator\MockSSOAuthenticator;
+use VanillaTests\SiteTestTrait;
 
 class SSOAuthenticatorTest extends TestCase {
-    use BootstrapTrait;
+    use SiteTestTrait;
 
     /** @var AuthenticatorModel */
     private $authenticatorModel;

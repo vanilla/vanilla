@@ -8,25 +8,21 @@
 namespace VanillaTests\Model;
 
 use PHPUnit\Framework\TestCase;
-use Garden\Container\Container;
-use VanillaTests\Bootstrap;
+use VanillaTests\BootstrapTrait;
 use VanillaTests\TestInstallModel;
 
 /**
  * Test basic Vanilla installation.
  */
 class InstallTest extends TestCase {
+    use BootstrapTrait;
+
     /**
      * Test installing Vanilla with the {@link \Vanilla\Models\InstallModel}.
      */
     public function testInstall() {
-        $bootstrap = new Bootstrap();
-        $dic = new Container();
-        $bootstrap->run($dic);
-
-
         /* @var TestInstallModel $installer */
-        $installer = $dic->get(TestInstallModel::class);
+        $installer = self::container()->get(TestInstallModel::class);
 
         $installer->uninstall();
         $result = $installer->install([

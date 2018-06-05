@@ -7,23 +7,17 @@
 
 namespace VanillaTests\Library\Vanilla;
 
-use Garden\Container\Container;
 use PHPUnit\Framework\TestCase;
 use Vanilla\Authenticator\Authenticator;
 use Vanilla\Models\AuthenticatorModel;
-use VanillaTests\Bootstrap;
+use VanillaTests\BootstrapTrait;
 use VanillaTests\Fixtures\Authenticator\CssColorAuthenticator;
 
 /**
  * Class AuthenticatorCssColorValidation.
  */
 class AuthenticatorCssColorValidation extends TestCase {
-
-    /** @var Bootstrap */
-    private static $bootstrap;
-
-    /** @var Container */
-    private static $container;
+    use BootstrapTrait;
 
     /** @var AuthenticatorModel */
     private static $authenticatorModel;
@@ -32,14 +26,9 @@ class AuthenticatorCssColorValidation extends TestCase {
      * @inheritdoc
      */
     public static function setUpBeforeClass() {
-        parent::setUpBeforeClass();
+        BootstrapTrait::setUpBeforeClass();
 
-        // Set up the dependency injection container.
-        self::$container = $container = new Container();
-        self::$bootstrap = new Bootstrap();
-        self::$bootstrap->run($container);
-
-        self::$authenticatorModel = self::$container->get(AuthenticatorModel::class);
+        self::$authenticatorModel = self::container()->get(AuthenticatorModel::class);
         self::$authenticatorModel->registerAuthenticatorClass(CssColorAuthenticator::class);
     }
 
@@ -47,9 +36,7 @@ class AuthenticatorCssColorValidation extends TestCase {
      * @inheritdoc
      */
     public static function tearDownAfterClass() {
-        self::$bootstrap->cleanup(self::$container);
-
-        parent::tearDownAfterClass();
+        BootstrapTrait::tearDownAfterClass();
     }
 
     /**

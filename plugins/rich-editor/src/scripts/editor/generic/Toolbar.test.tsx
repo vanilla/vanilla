@@ -5,7 +5,7 @@
  */
 
 import React from "react";
-import { mount, shallow } from "@testroot/enzyme";
+import { mount, shallow } from "enzyme";
 import Quill from "quill/core";
 import EditorMenuItem from "./MenuItem";
 import { Toolbar } from "./Toolbar";

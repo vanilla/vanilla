@@ -10,8 +10,10 @@ use Exception;
 use Gdn;
 use PHPUnit\Framework\TestCase;
 use Vanilla\Quill\Renderer;
+use VanillaTests\BootstrapTrait;
 
 abstract class SanitizeTest extends TestCase {
+    use BootstrapTrait;
 
     /**
      * @param string $content

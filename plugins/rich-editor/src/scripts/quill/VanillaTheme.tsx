@@ -19,11 +19,13 @@ import EmbedPopover from "../editor/EmbedPopover";
 import EditorProvider from "../editor/ContextProvider";
 import MentionModule from "../editor/MentionModule";
 import Waypoint from "react-waypoint";
+import smoothscroll from "smoothscroll-polyfill";
 
 export default class VanillaTheme extends ThemeBase {
     private jsBodyBoxContainer: Element;
     private jsFormElement: Element;
     private jsEmbedMenu: Element;
+    private jsMobileCheck: Element;
 
     /**
      * Constructor.
@@ -56,11 +58,13 @@ export default class VanillaTheme extends ThemeBase {
         this.jsBodyBoxContainer = this.quill.container.closest(".richEditor") as Element;
         this.jsFormElement = this.jsBodyBoxContainer.closest(".FormWrapper") as Element;
         this.jsEmbedMenu = this.jsBodyBoxContainer.querySelector(".richEditor-embedBar") as Element;
+        this.jsMobileCheck = this.jsBodyBoxContainer.querySelector(".js-RichEditorMobileCheck") as Element;
         if (!this.jsBodyBoxContainer) {
             throw new Error("Could not find .richEditor to mount editor components into.");
         }
         this.mountMentionModule();
         this.mountEmojiMenu();
+        smoothscroll.polyfill();
     }
 
     public init() {
@@ -121,12 +125,8 @@ export default class VanillaTheme extends ThemeBase {
     }
 
     private handleStickyMenuTop(data, offset) {
-        window.console.log("data: ", data);
-
         const pastWaypoint = data.currentPosition === "above";
         const offset = offset || "0px";
-
-        window.console.log("pastWaypoint: ", pastWaypoint);
 
         if (pastWaypoint) {
             this.jsEmbedMenu.style.top = offset;
@@ -142,6 +142,10 @@ export default class VanillaTheme extends ThemeBase {
     private handleStickyMenuBottom(data) {
         const pastWaypoint = data.currentPosition === "above";
         this.jsFormElement.classList.toggle("isPastEditorBottom", pastWaypoint);
+    }
+
+    private isMobile() {
+        return this.jsMobileCheck.offsetWidth === 0;
     }
 
     private mountStickyEmbedMenu() {

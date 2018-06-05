@@ -1466,6 +1466,12 @@ label.checkbox input.checkbox-input {
   display: none;
 }
 
+.js-RichEditorMobileCheck {
+  position: relative;
+  width: 100px;
+  height: 0;
+}
+
 body.isMobile .embedDialogue {
   position: static;
 }
@@ -1550,6 +1556,10 @@ body.isMobile .FormWrapper:not(.isPastEditorTop) .richEditor-embedBarMobileBorde
   border-left-width: 0;
 }
 
+body.isMobile .js-RichEditorMobileCheck {
+  width: 1px;
+}
+
 @media (max-width: 700px) {
   .embedDialogue {
     position: static;
@@ -1620,6 +1630,9 @@ body.isMobile .FormWrapper:not(.isPastEditorTop) .richEditor-embedBarMobileBorde
     border-top-width: 0;
     border-right-width: 0;
     border-left-width: 0;
+  }
+  .js-RichEditorMobileCheck {
+    width: 1px;
   }
 }
 

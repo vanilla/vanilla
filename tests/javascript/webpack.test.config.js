@@ -42,7 +42,7 @@ module.exports = {
                 include: [/\/src\/scripts/, /tests\/javascript/],
                 use: [
                     {
-                        loader: "awesome-typescript-loader?downLevelIteration=true&target=es2018",
+                        loader: "awesome-typescript-loader",
                         options: {
                             useBabel: true,
                             useCache: true,

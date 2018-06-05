@@ -126,10 +126,10 @@ export default class VanillaTheme extends ThemeBase {
 
     private handleStickyMenuTop(data, offset) {
         const pastWaypoint = data.currentPosition === "above";
-        const offset = offset || "0px";
+        const topOffset = offset || "0px";
 
         if (pastWaypoint) {
-            this.jsEmbedMenu.style.top = offset;
+            this.jsEmbedMenu.style.top = topOffset;
         } else {
             this.jsEmbedMenu.style.removeProperty("top");
         }

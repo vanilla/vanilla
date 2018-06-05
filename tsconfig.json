@@ -19,8 +19,8 @@
             "@dashboard/*": ["./applications/dashboard/src/scripts/*"],
             "@testroot/*": ["./tests/javascript/*"],
             "*": [
-                "./node_modules",
-                "./plugins/rich-editor/node_modules/*",
+                "./node_modules/*",
+                "./plugins/rich-editor/node_modules/*"
             ]
         },
         "typeRoots": [
@@ -28,7 +28,8 @@
             "./node_modules/@types"
         ],
         "skipLibCheck": true,
-        "sourceMap": true
+        "sourceMap": true,
+        "inlineSourceMap": false,
     },
     "include": [
         "**/*.ts",

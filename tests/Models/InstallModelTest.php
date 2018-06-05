@@ -18,13 +18,23 @@ class InstallTest extends TestCase {
     use BootstrapTrait;
 
     /**
+     * @inheritdoc
+     */
+    public static function tearDownAfterClass() {
+        /* @var TestInstallModel $installer */
+        $installer = self::container()->get(TestInstallModel::class);
+        $installer->uninstall();
+
+        BootstrapTrait::tearDownAfterClass();
+    }
+
+    /**
      * Test installing Vanilla with the {@link \Vanilla\Models\InstallModel}.
      */
     public function testInstall() {
         /* @var TestInstallModel $installer */
         $installer = self::container()->get(TestInstallModel::class);
 
-        $installer->uninstall();
         $result = $installer->install([
             'site' => ['title' => __METHOD__]
         ]);

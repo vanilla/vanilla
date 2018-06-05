@@ -156,7 +156,7 @@ describe("getFormData()", () => {
         `;
     });
 
-    it("can get get data out of a form", () => {
+    it("can get data out of a form", () => {
         const form = document.querySelector("form");
         expect(getFormData(form)).deep.equals({ foo: "foo" });
     });

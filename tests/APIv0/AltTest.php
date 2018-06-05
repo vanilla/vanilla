@@ -7,12 +7,12 @@
 
 namespace VanillaTests\APIv0;
 
-use PHPUnit\Framework\TestCase;
+use VanillaTests\SharedBootstrapTestCase;
 
 /**
  * Tests an alternate install method.
  */
-class AltTest extends TestCase {
+class AltTest extends SharedBootstrapTestCase {
     /** @var APIv0  $api */
     protected static $api;
 
@@ -20,6 +20,7 @@ class AltTest extends TestCase {
      * Make sure there is a fresh copy of Vanilla for the class' tests.
      */
     public static function setUpBeforeClass() {
+        parent::setUpBeforeClass();
         $api = new APIv0();
         self::$api = $api;
     }

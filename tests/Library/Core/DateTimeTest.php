@@ -7,12 +7,12 @@
 
 namespace VanillaTests\Library\Core;
 
-use PHPUnit\Framework\TestCase;
+use VanillaTests\SharedBootstrapTestCase;
 use DateTime;
 use DateTimeZone;
 
 
-class DateTimeTest extends TestCase {
+class DateTimeTest extends SharedBootstrapTestCase {
 
     /**
      * Test that different named timezones in the same place produce equivalent dates.

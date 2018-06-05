@@ -7,13 +7,13 @@
 
 namespace VanillaTests\Library\Vanilla;
 
-use PHPUnit\Framework\TestCase;
+use VanillaTests\SharedBootstrapTestCase;
 use Vanilla\ImageResizer;
 
 /**
  * Tests for the **ImageResizer** class.
  */
-class ImageResizerTest extends TestCase {
+class ImageResizerTest extends SharedBootstrapTestCase {
     protected static $cachePath = PATH_ROOT.'/tests/cache/image-resizer';
 
     /**

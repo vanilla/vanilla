@@ -8,13 +8,13 @@
 namespace VanillaTests\Library\Vanilla;
 
 use Garden\Schema\Schema;
-use PHPUnit\Framework\TestCase;
+use VanillaTests\SharedBootstrapTestCase;
 use Vanilla\ApiUtils;
 
 /**
  * Class ApiUtilsTest
  */
-class ApiUtilsTest extends TestCase {
+class ApiUtilsTest extends SharedBootstrapTestCase {
 
     /**
      * @param Schema $schema

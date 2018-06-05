@@ -7,13 +7,13 @@
 
 namespace VanillaTests\Library\Vanilla\Quill;
 
-use PHPUnit\Framework\TestCase;
+use VanillaTests\SharedBootstrapTestCase;
 use Vanilla\Quill\Parser;
 use Vanilla\Quill\Renderer;
 use Vanilla\Quill\Blots;
 
 
-class RendererTest extends TestCase {
+class RendererTest extends SharedBootstrapTestCase {
 
     /**
      * Replace all zero-width whitespace in a string.

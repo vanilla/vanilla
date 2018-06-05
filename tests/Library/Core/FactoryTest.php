@@ -7,14 +7,14 @@
 
 namespace Library\Core;
 
-use PHPUnit\Framework\TestCase;
+use VanillaTests\SharedBootstrapTestCase;
 use Gdn;
 use VanillaTests\Fixtures\Tuple;
 
 /**
  * Tests for the {@link Gdn_Factory}.
  */
-class FactoryTest extends TestCase {
+class FactoryTest extends SharedBootstrapTestCase {
     const TUPLE = 'VanillaTests\Fixtures\Tuple';
 
     /**

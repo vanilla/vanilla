@@ -7,12 +7,12 @@
 
 namespace VanillaTests\Library\Core;
 
-use PHPUnit\Framework\TestCase;
+use VanillaTests\SharedBootstrapTestCase;
 
 /**
  * Test some of the global functions that operate (or mostly operate) on arrays.
  */
-class DbEncodeDecodeTest extends TestCase {
+class DbEncodeDecodeTest extends SharedBootstrapTestCase {
 
     /**
      * Test encoding/decoding an array.

@@ -51,15 +51,17 @@ class AuthenticatorCssColorValidation extends TestCase {
     /**
      * Test valid/supported css colors.
      *
-     * @param $color
-     *
      * @dataProvider validCssColorsProvider
+     *
+     * @param $color
      *
      * @throws \Garden\Container\ContainerException
      * @throws \Garden\Container\NotFoundException
      * @throws \Garden\Schema\ValidationException
+     * @throws \Garden\Web\Exception\ClientException
      * @throws \Garden\Web\Exception\NotFoundException
      * @throws \Garden\Web\Exception\ServerException
+     *
      */
     public function testValidColors($color = null) {
         CssColorAuthenticator::setCssColor($color);
@@ -74,15 +76,17 @@ class AuthenticatorCssColorValidation extends TestCase {
     /**
      * Test invalid/unsupported css colors.
      *
-     * @param $color
-     *
      * @dataProvider invalidCssColorsProvider
      * @expectedException  \Garden\Schema\ValidationException
      *
+     * @param $color
+     *
      * @throws \Garden\Container\ContainerException
      * @throws \Garden\Container\NotFoundException
+     * @throws \Garden\Web\Exception\ClientException
      * @throws \Garden\Web\Exception\NotFoundException
      * @throws \Garden\Web\Exception\ServerException
+     *
      */
     public function testInvalidColors($color = null) {
         CssColorAuthenticator::setCssColor($color);

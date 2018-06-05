@@ -50,8 +50,7 @@ export function renderEmbed(element: HTMLElement, data: IEmbedData, inEditor = t
     element.classList.add("embed-" + data.type);
 
     if (!data.type) {
-        logError("The embed type was not provided.");
-        return;
+        throw new Error("The embed type was not provided.");
     }
 
     const render = data.type && embedRenderers[data.type];
@@ -59,7 +58,6 @@ export function renderEmbed(element: HTMLElement, data: IEmbedData, inEditor = t
     if (render) {
         return render(element, data, inEditor);
     } else {
-        logError("Could not find a renderer for the embed type - " + data.type);
-        return;
+        throw new Error("Could not find a renderer for the embed type - " + data.type);
     }
 }

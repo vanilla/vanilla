@@ -371,8 +371,6 @@ class MediaTest extends AbstractAPIv2Test {
                     ],
                 ]
             ]
-
-
         ];
 
         return $urls;

@@ -10,6 +10,7 @@ use Exception;
 use Garden\Http\HttpRequest;
 use PHPUnit\Framework\TestCase;
 use Vanilla\Embeds\EmbedManager;
+use Vanilla\Embeds\InstagramEmbed;
 use Vanilla\Embeds\LinkEmbed;
 use Vanilla\Embeds\ImageEmbed;
 use Vanilla\Embeds\TwitterEmbed;
@@ -31,6 +32,7 @@ class EmbedManagerTest extends TestCase {
             ->addEmbed(new TwitterEmbed())
             ->addEmbed(new YouTubeEmbed())
             ->addEmbed(new VimeoEmbed())
+            ->addEmbed(new InstagramEmbed())
             ->addEmbed(new ImageEmbed(), EmbedManager::PRIORITY_LOW)
             ->setNetworkEnabled(false);
         return $embedManager;
@@ -80,6 +82,23 @@ class EmbedManagerTest extends TestCase {
         </div>
     </article>
 </a>'
+            ],
+            [
+                [
+                    "url" =>"https://www.instagram.com/p/bNd86MSFv6/",
+                    "type" =>"instagram",
+                    'name' => null,
+                    'body' => null,
+                    'photoUrl' => null,
+                    'height' => 510,
+                    'width' => 658,
+                    'attributes' => [
+                        'postID' => 'bNd86MSFv6',
+                    ],
+                ],
+      '<div class="embed embedInstagram">
+   <iframe class="embedInstagram-ifr" src="https://instagram.com/p/bNd86MSFv6/embed/"  width="658" height="510" frameborder="0" scrolling="no" allowtransparency="true"></iframe>
+</div>'
             ],
             [
                 [

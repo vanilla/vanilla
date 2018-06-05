@@ -151,7 +151,7 @@ class SearchModel extends Gdn_Model {
         // Perform the search by unioning all of the sql together.
         $sql = $this->SQL
             ->select()
-            ->from('_TBL_ s')
+            ->from('_TBL_ s', false)
             ->orderBy('s.DateInserted', 'desc')
             ->limit($limit, $offset)
             ->getSelect();

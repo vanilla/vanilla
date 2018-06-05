@@ -23,7 +23,6 @@ import FocusableEmbedBlot from "./blots/abstract/FocusableEmbedBlot";
 import EmbedInsertionModule from "./EmbedInsertionModule";
 import LinkBlot from "quill/formats/link";
 import BlockBlot from "quill/blots/block";
-import Parchment from "parchment";
 import CodeBlot from "./blots/inline/CodeBlot";
 
 export default class KeyboardBindings {

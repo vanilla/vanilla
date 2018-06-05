@@ -5,21 +5,13 @@
  */
 
 import Quill, { Blot } from "quill/core";
-import Delta from "quill-delta";
 import Parchment from "parchment";
-import KeyboardModule, { default as Keyboard } from "quill/modules/keyboard";
+import KeyboardModule from "quill/modules/keyboard";
 import Module from "quill/core/module";
 import { RangeStatic } from "quill/core";
 import { delegateEvent, getNextTabbableElement } from "@dashboard/dom";
 import FocusableEmbedBlot from "./blots/abstract/FocusableEmbedBlot";
-import {
-    normalizeBlotIntoBlock,
-    insertNewLineAtEndOfScroll,
-    insertNewLineAtStartOfScroll,
-    getBlotAtIndex,
-    rangeContainsBlot,
-} from "./utility";
-import MentionAutoCompleteBlot from "./blots/embeds/MentionAutoCompleteBlot";
+import { insertNewLineAtEndOfScroll, insertNewLineAtStartOfScroll, getBlotAtIndex } from "./utility";
 
 /**
  * A module for managing focus of Embeds. For this to work for a new Embed,
@@ -34,11 +26,8 @@ export default class EmbedFocusModule extends Module {
         length: 0,
     };
 
-    private editorRoot: HTMLElement;
-    private formWrapper: HTMLElement;
-    private paragraphMenuHandle: HTMLElement;
-    private inlineToolbarFirstActiveItem: HTMLElement;
-    private emojiPickerButton: HTMLElement;
+    private editorRoot?: HTMLElement;
+    private formWrapper?: HTMLElement;
 
     constructor(quill: Quill, options = {}) {
         super(quill, options);
@@ -48,7 +37,7 @@ export default class EmbedFocusModule extends Module {
 
         // Add event listeners.
         quill.on("selection-change", (range, oldRange, source) => {
-            if (range && range.index && source !== Quill.sources.SILENT) {
+            if (range && range.index && source !== Quill.sources.SILENT && this.editorRoot) {
                 this.lastSelection = range;
                 this.editorRoot.classList.toggle("isFocused", true);
             }
@@ -70,6 +59,9 @@ export default class EmbedFocusModule extends Module {
     }
 
     public escapeMobileFullScreen = (event: KeyboardEvent) => {
+        if (!this.editorRoot) {
+            return;
+        }
         const position = window.getComputedStyle(this.editorRoot).getPropertyValue("position");
         const editorIsFullscreen = this.editorRoot.classList.contains("isFocused") && position === "fixed";
         if (editorIsFullscreen && KeyboardModule.match(event, { key: KeyboardModule.keys.ESCAPE, shiftKey: false })) {
@@ -157,7 +149,7 @@ export default class EmbedFocusModule extends Module {
     };
 
     /**
-     * Handle delete and backspace presses while an Embed is focussed.
+     * Handle delete and backspace presses while an Embed is focused.
      *
      * @if
      * - Backspace or Delete is pressed
@@ -291,9 +283,6 @@ export default class EmbedFocusModule extends Module {
             case KeyboardModule.keys.RIGHT:
                 // -1 needed for because end of blot is non-inclusive.
                 const endOfBlot = currentBlot.offset() + currentBlot.length() - 1;
-                const currentBlotOffset = currentBlot.offset();
-                const currentBlotLength = currentBlot.length();
-                const currentSelection = this.quill.getSelection();
                 if (this.quill.getSelection().index === endOfBlot) {
                     // If we're at the end of the line.
                     return currentBlot.next;

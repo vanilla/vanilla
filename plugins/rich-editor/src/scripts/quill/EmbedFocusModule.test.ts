@@ -13,16 +13,38 @@ describe("EmbedFocusModule", () => {
     let quill: Quill;
     let embedFocusModule: EmbedFocusModule;
     before(() => {
-        document.body.innerHTML = `<div class="FormWrapper">
-            <div class="richEditor">
-                <div id="quill"></div>
-                <button id="button1"></button>
+        document.body.innerHTML = `<div>
+            <div class="FormWrapper"><div id="quillNoEditor"></div></div>
+            <div class="richEditor"><div id="quillNoForm"></div></div>
+            <div class="FormWrapper">
+                <div class="richEditor">
+                    <div id="quill"></div>
+                    <button id="button1"></button>
+                </div>
             </div>
         </div>`;
 
         Quill.register("formats/embed-external", ExternalEmbedBlot, true);
         quill = new Quill("#quill");
         embedFocusModule = new EmbedFocusModule(quill);
+    });
+
+    it("throws an error if it can't find its needed surrounding HTML", () => {
+        const createNoEditor = () => {
+            const badQuill = new Quill("#quillNoEditor");
+            const badFocusModule = new EmbedFocusModule(badQuill);
+        };
+
+        const createNoForm = () => {
+            const badQuill = new Quill("#quillNoForm");
+            const badFocusModule = new EmbedFocusModule(badQuill);
+        };
+        expect(createNoEditor).to.throw();
+        expect(createNoForm).to.throw();
+    });
+
+    it("adds a tabindex 0 on the root element", () => {
+        expect(quill.root.getAttribute("tabindex")).eq("0");
     });
 
     describe("handleTab", () => {

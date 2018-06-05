@@ -11,7 +11,8 @@ import Module from "quill/core/module";
 import { RangeStatic } from "quill/core";
 import { delegateEvent, getNextTabbableElement } from "@dashboard/dom";
 import FocusableEmbedBlot from "./blots/abstract/FocusableEmbedBlot";
-import { insertNewLineAtEndOfScroll, insertNewLineAtStartOfScroll, getBlotAtIndex } from "./utility";
+import { insertNewLineAtEndOfScroll, insertNewLineAtStartOfScroll, getBlotAtIndex, rangeContainsBlot } from "./utility";
+import MentionAutoCompleteBlot from "./blots/embeds/MentionAutoCompleteBlot";
 
 /**
  * A module for managing focus of Embeds. For this to work for a new Embed,
@@ -26,18 +27,35 @@ export default class EmbedFocusModule extends Module {
         length: 0,
     };
 
-    private editorRoot?: HTMLElement;
-    private formWrapper?: HTMLElement;
+    private editorRoot: HTMLElement;
+    private formWrapper: HTMLElement;
 
+    /**
+     * @param quill - The quill instance to tie into.
+     * @param options - The quill options.
+     *
+     * @throws If the necessary surrounding HTML cannot be located.
+     */
     constructor(quill: Quill, options = {}) {
         super(quill, options);
 
         this.editorRoot = this.quill.root.closest(".richEditor") as HTMLElement;
         this.formWrapper = this.editorRoot.closest(".FormWrapper") as HTMLElement;
 
+        if (!this.editorRoot) {
+            throw new Error("Cannot initialize the EmbedFocusModule without an editorRoot (.richEditor class)");
+        }
+
+        if (!this.formWrapper) {
+            throw new Error("Cannot initialize the EmbedFocusModule without an FormWrapper (.FormWrapper class)");
+        }
+
+        // Add a tabindex onto the contenteditable so that our utilities know it is focusable.
+        this.quill.root.setAttribute("tabindex", 0);
+
         // Add event listeners.
         quill.on("selection-change", (range, oldRange, source) => {
-            if (range && range.index && source !== Quill.sources.SILENT && this.editorRoot) {
+            if (range && range.index && source !== Quill.sources.SILENT) {
                 this.lastSelection = range;
                 this.editorRoot.classList.toggle("isFocused", true);
             }
@@ -59,9 +77,6 @@ export default class EmbedFocusModule extends Module {
     }
 
     public escapeMobileFullScreen = (event: KeyboardEvent) => {
-        if (!this.editorRoot) {
-            return;
-        }
         const position = window.getComputedStyle(this.editorRoot).getPropertyValue("position");
         const editorIsFullscreen = this.editorRoot.classList.contains("isFocused") && position === "fixed";
         if (editorIsFullscreen && KeyboardModule.match(event, { key: KeyboardModule.keys.ESCAPE, shiftKey: false })) {
@@ -122,7 +137,7 @@ export default class EmbedFocusModule extends Module {
      */
     public handleShiftTab = () => {
         const prevElement = getNextTabbableElement({
-            root: this.editorRoot.closest("form")!,
+            root: this.formWrapper,
             excludedRoots: [this.quill.root],
             reverse: true,
             allowLooping: false,

@@ -81,4 +81,23 @@ class MySQLDriverTest extends TestCase {
 
         $this->assertContains('`1=sleep(1) and 1`', $sql);
     }
+
+    public function provideAliasData() {
+        return [
+            ["Test t", "`GDN_Test` `t`"],
+            ["Test", "`GDN_Test` `Test`"],
+            ["Test t", "GDN_Test t", false],
+            ["Test", "GDN_Test Test", false],
+        ];
+    }
+
+    /**
+     * Test the alias mapping in the SQL driver.
+     *
+     * @dataProvider provideAliasData
+     */
+    public function testMapAliases($input, $expected, $escape = true) {
+        $aliases = $this->sql->mapAliases($input, $escape);
+        $this->assertSame($aliases, $expected);
+    }
 }

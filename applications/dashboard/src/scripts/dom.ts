@@ -324,9 +324,11 @@ export function ensureScript(scriptUrl: string) {
 
 interface ITabbableOptions {
     root: Element;
+    excludedElements: Element[];
     excludedRoots: Element[];
     reverse: boolean;
     fromElement: Element;
+    allowLooping: boolean;
 }
 
 /**
@@ -337,18 +339,23 @@ interface ITabbableOptions {
  *
  * @param options
  * @property root - The root element to look in.
- * @property excludedRoots - Elements to ignore. These element's children will be ignored as well.
+ * @property excludedElements - Elements to ignore.
+ * @property excludedRoots - These element's children will be ignored.
  * @property reverse - True to get the previous element instead.
- * @property fromElement - The currently
+ * @property fromElement - The currently focused element.
+ * @property allowLooping - Whether or not the focus should loop around from beginning <-> end.
  */
-export function getNextTabbableElement(options?: Partial<ITabbableOptions>): Element | null {
+export function getNextTabbableElement(options?: Partial<ITabbableOptions>): HTMLElement | null {
     const defaultTabbableOptions: ITabbableOptions = {
         root: document.documentElement,
+        excludedElements: [],
         excludedRoots: [],
         reverse: false,
         fromElement: document.activeElement,
+        allowLooping: true,
     };
 
+    // Merge the passed options and the defaults.
     const finalOptions = {
         ...defaultTabbableOptions,
         ...options,
@@ -359,10 +366,20 @@ export function getNextTabbableElement(options?: Partial<ITabbableOptions>): Ele
         return null;
     }
 
-    const tabbables = tabbable(finalOptions.root).filter((element: Element) => {
-        for (const root of finalOptions.excludedRoots) {
-            if (root === element || root.contains(element)) {
+    const tabbables = tabbable(finalOptions.root).filter((tabbableElement: Element) => {
+        // We want to excempt items that are the active item or a parent of the active item
+        // because otherwise we would not be able to tab away from them.
+        const elementIsActiveOrChildOfActive =
+            finalOptions.fromElement === tabbableElement || tabbableElement.contains(finalOptions.fromElement);
+
+        if (!elementIsActiveOrChildOfActive) {
+            if (finalOptions.excludedElements.includes(tabbableElement)) {
                 return false;
+            }
+            for (const excludedRoot of finalOptions.excludedRoots) {
+                if (excludedRoot !== tabbableElement && excludedRoot.contains(tabbableElement)) {
+                    return false;
+                }
             }
         }
 
@@ -377,12 +394,70 @@ export function getNextTabbableElement(options?: Partial<ITabbableOptions>): Ele
 
     let targetIndex = finalOptions.reverse ? currentTabIndex - 1 : currentTabIndex + 1;
 
-    // Loop over the beginning and ends
-    if (targetIndex < 0) {
-        targetIndex = tabbables.length - 1;
-    } else if (targetIndex >= tabbables.length) {
-        targetIndex = 0;
+    if (finalOptions.allowLooping) {
+        // Loop over the beginning and ends
+        if (targetIndex < 0) {
+            targetIndex = tabbables.length - 1;
+        } else if (targetIndex >= tabbables.length) {
+            targetIndex = 0;
+        }
     }
 
-    return tabbables[targetIndex];
+    return tabbables[targetIndex] || null;
+}
+
+/**
+ * Determine if the currently focused element is somewhere inside of (or the same as)
+ * a given Element.
+ *
+ * @param rootNode - The root node to look in.
+ */
+function checkDomTreeHasFocus(rootNode: Element | null, event: FocusEvent, callback: (hasFocus: boolean) => void) {
+    setTimeout(() => {
+        const activeElement =
+            (event.relatedTarget as Element) || // Chrome (The actual standard)
+            (event as any).explicitOriginalTarget || // Firefox + Safari
+            document.activeElement; // IE11
+
+        const hasFocus = rootNode && (activeElement === rootNode || rootNode.contains(activeElement));
+
+        callback(!!hasFocus);
+    }, 0);
+}
+
+/**
+ * Register a callback for focusin and focusin out events. The main improvement here over registering
+ * the listeners yourself is that the events fire for the whole tree as 1 item instead of as
+ * individual notes.
+ *
+ * This is particularly useful when you want to track focus leaving or enterring a component
+ * without caring about the individual contents inside.
+ *
+ * @param rootNode - The root dom node to watch on.
+ * @param callback - A callback for when the tree focuses and blurs.
+ */
+export function watchFocusInDomTree(rootNode: Element, callback: (hasFocus: boolean) => void) {
+    rootNode.addEventListener(
+        "blur",
+        (event: FocusEvent) => {
+            checkDomTreeHasFocus(rootNode, event, hasFocus => {
+                if (!hasFocus) {
+                    callback(false);
+                }
+            });
+        },
+        true,
+    );
+
+    rootNode.addEventListener(
+        "focusin",
+        (event: FocusEvent) => {
+            checkDomTreeHasFocus(rootNode, event, hasFocus => {
+                if (hasFocus) {
+                    callback(true);
+                }
+            });
+        },
+        true,
+    );
 }

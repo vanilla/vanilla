@@ -56,12 +56,12 @@
     white-space: pre-wrap !important; // Needed for spaces around embed blots to work properly!
 
     &:focus {
-        outline-offset: -2px;
-        outline-style: auto;
-        outline-width: 5px;
-        outline-color: Highlight;
-        outline-color: -webkit-focus-ring-color;
-        z-index: 1;
+        outline: {
+            offset: $richEditor-text_offset;
+            style: solid;
+            width: $richEditor-outline_width;
+            color: $richEditor-outline_color;
+        }
     }
 }
 
@@ -76,8 +76,14 @@
     justify-content: flex-start;
     flex-wrap: nowrap;
     list-style: none;
-    margin: 0;
     padding: 0;
+    width: calc(100% - #{2 * $richEditor-border_width});
+    margin: {
+        top: 0;
+        right: 0;
+        left: -$richEditor-border_width;
+        bottom: -$richEditor-border_width;
+    }
 
     .richEditor-menuItem {
         display: block;
@@ -86,7 +92,6 @@
 
         .richEditor-button,
         &.richEditor-button {
-            height: $richEditor-menuButton_size;
             width: $richEditor-menuButton_size;
             font-size: #{$richEditor-menuButton_size * 24 / 39};
             line-height: $richEditor-menuButton_size;
@@ -101,7 +106,6 @@
         }
     }
 }
-
 
 // button reset
 .richEditor-nextInput,
@@ -119,27 +123,24 @@
 }
 
 
+
 .richEditor-button {
     display: block;
     height: $richEditor-icon_size;
     width: $richEditor-icon_size;
+    user-select: none;
+    cursor: pointer;
+
+
+    &.richEditor-formatButton,
+    &.richEditor-embedButton {
+        height: $richEditor-menuButton_size;
+        color: inherit;
+    }
 
     &.emojiGroup {
         width: $richEditor-icon_size;
         height: $richEditor-icon_size;
-    }
-
-    &.richEditorParagraphMenu-handle {
-        background: transparent;
-        transition: opacity $richEditor-pilcrowAnimation_duration ease;
-
-        &.isHidden {
-            opacity: 0;
-        }
-
-        .richEditorInline-icon {
-            opacity: 1;
-        }
     }
 
     &:not(:disabled) {
@@ -148,13 +149,31 @@
 
     &:focus {
         z-index: 2;
+        @include editorButtonFocusStyles;
     }
 
     &:hover,
-    &:focus,
-    &.isActive {
-        .richEditorInline-icon {
+    &:focus {
+        .Close-x,
+        .richEditorButton-icon {
             opacity: 1;
+        }
+    }
+
+
+    &.isActive {
+        @include editorButtonActiveStyles;
+    }
+
+    &.richEditor-embedButton {
+        &:focus {
+            @include editorButtonFocusStyles($richEditor-embedButton_offset);
+        }
+    }
+
+    &.richEditor-formatButton {
+        &:focus {
+            @include editorButtonFocusStyles($richEditor-paragraphMenuButton_offset);
         }
     }
 }
@@ -167,7 +186,6 @@
 
     .richEditor-button,
     &.richEditor-button {
-        height: $richEditor-menuButton_size;
         width: $richEditor-menuButton_size;
         font-size: #{$richEditor-menuButton_size * 24 / 39};
         line-height: $richEditor-menuButton_size;
@@ -203,12 +221,18 @@
     padding: $richEditor-embedMenu_padding;
 }
 
-.richEditorInline-icon {
+.richEditorButton-icon {
     display: block;
     margin: auto;
     height: $richEditor-icon_size;
     width: $richEditor-icon_size;
     opacity: $richEditor-icon_opacity;
+}
+
+.Close-x {
+    display: block;
+    opacity: $richEditor-icon_opacity;
+    cursor: pointer;
 }
 
 // Link Menu
@@ -233,6 +257,12 @@
     right: auto;
     text-align: center;
     user-select: none;
+    background: transparent;
+    cursor: pointer;
+
+    &:focus {
+        @include editorButtonFocusStyles;
+    }
 }
 
 .insertLink-input.InputBox {
@@ -245,6 +275,7 @@
 // Insert Media
 .insertPopover {
     position: relative;
+    overflow: hidden;
     z-index: 6;
 
     .InputBox {
@@ -285,6 +316,10 @@
     margin: 0;
     max-width: calc(100% - #{$richEditor-menuButton_size});
     min-height: #{$richEditor-menuButton_size - $richEditor-insertPopover_paddingVertical};
+
+    &:focus {
+        outline: 0;
+    }
 }
 
 .insertMedia-footer {
@@ -344,6 +379,10 @@
     font-size: $richEditor-icon_size;
     text-align: center;
     overflow: hidden;
+
+    &:focus {
+        outline-offset: $richEditor-emojiOutline_offset;
+    }
 }
 
 .richEditor ~ .TextBoxWrapper {
@@ -556,6 +595,8 @@
 
 .richEditor-button {
     user-select: none;
+    cursor: pointer;
+
 }
 
 // Emoji Groups
@@ -570,13 +611,8 @@
 .emojiGroup {
     color: $richEditor-emojiCategory_color;
 
-    &:hover {
-        color: $richEditor-emojiCategory_hoverColor;
-    }
-
-
     &.isSelected {
-        background-color: $richEditor-emojiCategory_selectedBg;
+        @include editorButtonActiveStyles;
     }
 
     + .emojiGroup {

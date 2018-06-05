@@ -276,6 +276,10 @@ class DiscussionController extends VanillaController {
             }
         }
 
+        $this->Head->setJsonLD(
+            'DiscussionForumPosting',
+            $this->DiscussionModel->structuredData((array)$this->Discussion)
+        );
         $this->render();
     }
 

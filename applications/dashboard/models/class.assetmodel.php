@@ -157,8 +157,9 @@ class AssetModel extends Gdn_Model {
         $basename = $basename === 'style' ? 'app' : $basename;
 
         if (c("HotReload.Enabled", false)) {
+            $ip = c("HotReload.IP", "127.0.0.1");
             return [
-                "http://127.0.0.1:3030/$basename-hot-bundle.js"
+                "http://$ip:3030/$basename-hot-bundle.js"
             ];
         }
 

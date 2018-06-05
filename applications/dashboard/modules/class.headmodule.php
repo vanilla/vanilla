@@ -48,6 +48,9 @@ if (!class_exists('HeadModule', false)) {
         /** @var bool  */
         private $_MobileAddressBarColorSet = false;
 
+        /** @var array JSON Linking Data */
+        private $jsonLD = [];
+
         /**
          *
          *
@@ -500,6 +503,10 @@ if (!class_exists('HeadModule', false)) {
                 }
             }
 
+            if ($this->jsonLD) {
+                $this->addTag('script', ['type' => 'application/ld+json'], json_encode($this->jsonLD));
+            }
+
             $this->fireEvent('BeforeToString');
 
             $tags = $this->_Tags;
@@ -590,6 +597,30 @@ if (!class_exists('HeadModule', false)) {
             }
 
             return $head;
+        }
+
+        /**
+         * Get current JSON LD data.
+         *
+         * @return array
+         */
+        public function getJsonLD(): array {
+            return $this->jsonLD;
+        }
+
+        /**
+         * Set JSON LD data.
+         *
+         * @param string $type Document type.
+         * @param array $data Metadata attributes for the document.
+         * @param string $context Metadata schema context.
+         * @return array
+         * @link https://json-ld.org
+         */
+        public function setJsonLD(string $type, array $data, string $context = 'https://schema.org'): array {
+            $data['@context'] = $context;
+            $data['@type'] = $type;
+            return $this->jsonLD = $data;
         }
     }
 }

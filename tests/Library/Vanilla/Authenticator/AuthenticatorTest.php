@@ -9,9 +9,10 @@ namespace VanillaTests\Library\Vanilla;
 
 use PHPUnit\Framework\TestCase;
 use VanillaTests\Fixtures\Authenticator\MockAuthenticator;
-
+use VanillaTests\BootstrapTrait;
 
 class AuthenticatorTest extends TestCase {
+    use BootstrapTrait;
 
     /**
      * Test that an authenticator with minimal/properly implemented methods will instantiate.

@@ -67,8 +67,6 @@ class NoEmailTest extends AbstractAPIv2Test {
             'SSOData' => json_decode(json_encode(new SSOData($authType, $authType, $uniqueID, $this->currentUser)), true),
         ]);
 
-        $this->container()->setInstance('MockSSOAuthenticator', $this->authenticator);
-
         $this->container()->get('Config')->set('Garden.Registration.NoEmail', true);
     }
 

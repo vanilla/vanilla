@@ -48,8 +48,6 @@ class AuthenticatorsTest extends AbstractAPIv2Test {
             'SSOData' => json_decode(json_encode(new SSOData($authType, $authType, $uniqueID)), true),
         ]);
 
-//        $this->container()->setInstance('MockSSOAuthenticator', $this->authenticator);
-
         $session = $this->container()->get(\Gdn_Session::class);
         $session->end();
     }

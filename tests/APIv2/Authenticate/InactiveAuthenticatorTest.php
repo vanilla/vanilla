@@ -48,8 +48,6 @@ class InactiveAuthenticatorTest extends AbstractAPIv2Test {
         ]);
         $this->authenticator->setActive(false);
 
-        $this->container()->setInstance('MockSSOAuthenticator', $this->authenticator);
-
         $session = $this->container()->get(\Gdn_Session::class);
         $session->end();
     }

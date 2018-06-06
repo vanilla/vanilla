@@ -67,8 +67,6 @@ class LinkUserTest extends AbstractAPIv2Test {
         ]);
         $this->authenticator->setTrusted(false);
 
-        $this->container()->setInstance('MockSSOAuthenticator', $this->authenticator);
-
         $session = $this->container()->get(\Gdn_Session::class);
         $session->end();
 

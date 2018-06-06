@@ -4,6 +4,7 @@
     "license": "GPL-2.0",
     "private": true,
     "dependencies": {
+        "@types/react-virtualized": "9.18.3",
         "axios": "0.18.0",
         "babel-polyfill": "6.26.0",
         "classnames": "2.2.5",

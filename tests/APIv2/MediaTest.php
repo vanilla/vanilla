@@ -357,20 +357,6 @@ class MediaTest extends AbstractAPIv2Test {
                     ],
                 ]
             ],
-            [
-                "https://www.instagram.com/p/bNd86MSFv6/",
-                'instagram',
-                [
-                    'name' => null,
-                    'body' => null,
-                    'photoUrl' => null,
-                    'height' => null,
-                    'width' => null,
-                    'attributes' => [
-                        'postID' => 'bNd86MSFv6',
-                    ],
-                ]
-            ]
         ];
 
         return $urls;
@@ -385,7 +371,8 @@ class MediaTest extends AbstractAPIv2Test {
         $urls = [
             ['https://vimeo.com/251083506', 'vimeo'],
             ['https://youtube.com/watch?v=example', 'youtube'],
-            ['https://youtube.ca/watch?v=example', 'youtube']
+            ['https://youtube.ca/watch?v=example', 'youtube'],
+            ['https://www.instagram.com/p/BizC-PPFK1m', 'instagram'],
         ];
 
         return $urls;

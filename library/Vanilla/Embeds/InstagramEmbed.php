@@ -25,35 +25,17 @@ class InstagramEmbed extends Embed {
      * @inheritdoc
      */
     public function matchUrl(string $url) {
-        $data = null;
+        $data = [];
         $oembedData= [];
+
         if ($this->isNetworkEnabled()) {
             // The oembed is used only to pull the width and height of the object.
-            $oembedData = $this->oembed("https://api.instagram.com/oembed?url=" . urlencode($url));
-        }
-        // extract postID from the instagram post.
-        preg_match(
-            '/https?:\/\/(?:www\.)?instagr(?:\.am|am\.com)\/p\/(?<postID>[\w-]+)/i',
-            $url,
-            $matches
-        );
+            $oembedData = $this->oembed("https://api.instagram.com/oembed?url=" . urlencode($url)."&omitscript=true");
 
-        $data = $data ?: [];
-        if (array_key_exists('postID', $matches)) {
-            if (!array_key_exists('attributes', $data)) {
-                $data['attributes'] = [];
+            if (array_key_exists('html', $oembedData)) {
+                $data = $this->parseResponseHtml($oembedData['html']);
             }
-            $data['attributes']['postID'] = $matches['postID'];
         }
-
-        if (array_key_exists('width', $oembedData)) {
-            $data['width'] = $oembedData['width'] ?? '';
-        }
-
-        if (array_key_exists('height', $oembedData)) {
-            $data['height'] = $oembedData['height'] ?? '';
-        }
-
         return $data;
     }
 
@@ -61,17 +43,49 @@ class InstagramEmbed extends Embed {
      * @inheritdoc
      */
     public function renderData(array $data): string {
-        $instagramPostID = $data['attributes']['postID'] ?? '';
-        $instagramPostID = htmlspecialchars($instagramPostID);
-        $width = $data['width'] ?? 412;
-        $height = $data['height'] ?? 510;
+        $instagramPermalink = $data['attributes']['permaLink'] ?? '';
+        $instgramVersion = $data['attributes']['versionNumber'] ?? '';
+
+        $dataInstgrmPermalink =  htmlspecialchars($instagramPermalink);
+        $dataInstgrmVersion = htmlspecialchars($instgramVersion);
 
         $result = <<<HTML
 <div class="embed embedInstagram">
-   <iframe class="embedInstagram-ifr" src="https://instagram.com/p/{$instagramPostID}/embed/"  width="$width" height="$height" frameborder="0" scrolling="no" allowtransparency="true"></iframe>
+    <blockquote class="instagram-media" data-instgrm-captioned data-instgrm-permalink="{$dataInstgrmPermalink}" data-instgrm-version="{$dataInstgrmVersion}"/>
 </div>
 HTML;
 
        return $result;
+    }
+
+    /**
+     * Parses the oembed repsonse html for permalink and other data.
+     *
+     * @param string $html
+     * @return array $data
+     */
+    public function parseResponseHtml(string $html): array {
+        $data =[];
+
+        preg_match(
+            '/data-instgrm-permalink="(?<permalink>https?:\/\/(?:www\.)?instagr(?:\.am|am\.com)\/p\/([\w-]+))/i',
+            $html,
+            $permalink
+        );
+        if ($permalink) {
+            $data['attributes']['permaLink'] = $permalink['permalink'];
+        }
+
+        preg_match( '/(?<isCaptioned>data-instgrm-captioned)/i', $html,$isCaptioned);
+        if ($isCaptioned) {
+            $data['attributes']['isCaptioned'] = true;
+        }
+
+        preg_match( '/data-instgrm-version="(?<versionNumber>\d+)"/i', $html,$versionNumber);
+        if ($versionNumber) {
+            $data['attributes']['versionNumber'] = $versionNumber['versionNumber'];
+        }
+
+        return $data;
     }
 }

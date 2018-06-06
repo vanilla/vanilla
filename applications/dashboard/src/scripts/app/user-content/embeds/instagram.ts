@@ -4,22 +4,44 @@
  */
 
 import { registerEmbed, IEmbedData } from "@dashboard/embeds";
+import { ensureScript } from "@dashboard/dom";
+import { onContent } from "@dashboard/application";
 
-// Setup image embeds.
+// Setup instagram embeds.
+onContent(convertInstagramEmbeds);
 registerEmbed("instagram", renderInstagram);
 
-export async function renderInstagram(element: HTMLElement, data: IEmbedData) {
-    element.classList.add("embedInstagram");
+/**
+ * Renders posted instagram embeds.
+ */
+async function convertInstagramEmbeds() {
+    await ensureScript("//platform.instagram.com/en_US/embeds.js");
+    window.instgrm.Embeds.process();
+}
 
-    // set height to 510 as we currently set it in class.format
-    const height = data.height ? data.height : 510;
-    const width = data.width ? data.width : 412;
+/**
+ * Render a single instagram embed.
+ */
+export async function renderInstagram(element: Element, data: IEmbedData) {
+    await ensureScript("//platform.instagram.com/en_US/embeds.js");
 
-    const iframe = document.createElement("iframe");
-    iframe.classList.add("embedInstagram-ifr");
-    iframe.setAttribute("width", width);
-    iframe.setAttribute("height", height);
-    iframe.setAttribute("src", `https://instagram.com/p/${data.attributes.postID}/embed/`);
+    if (!window.instgrm) {
+        throw new Error("The Instagram post failed to load");
+    }
 
-    element.appendChild(iframe);
+    // Ensure we have a status id to look up.
+    if (data.attributes.permaLink == null) {
+        throw new Error("Attempted to embed a Instagram post failed link is invalid");
+    }
+
+    const blockQuote = document.createElement("blockquote");
+    blockQuote.classList.add("instagram-media");
+    blockQuote.dataset.instgrmPermalink = data.attributes.permaLink;
+    blockQuote.dataset.instgrmVersion = data.attributes.versionNumber;
+    blockQuote.dataset.instgrmCaptioned = data.attributes.isCaptioned;
+
+    element.appendChild(blockQuote);
+    setImmediate(() => {
+        window.instgrm.Embeds.process();
+    });
 }

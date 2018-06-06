@@ -85,19 +85,21 @@ class EmbedManagerTest extends TestCase {
             ],
             [
                 [
-                    "url" =>"https://www.instagram.com/p/bNd86MSFv6/",
+                    "url" =>"https://www.instagram.com/p/BizC-PPFK1m",
                     "type" =>"instagram",
                     'name' => null,
                     'body' => null,
                     'photoUrl' => null,
-                    'height' => 510,
-                    'width' => 658,
+                    'height' => null,
+                    'width' => null,
                     'attributes' => [
-                        'postID' => 'bNd86MSFv6',
+                        'permaLink' => 'https://www.instagram.com/p/BizC-PPFK1m',
+                        'isCaptioned' => true,
+                        'versionNumber' => "8"
                     ],
                 ],
-      '<div class="embed embedInstagram">
-   <iframe class="embedInstagram-ifr" src="https://instagram.com/p/bNd86MSFv6/embed/"  width="658" height="510" frameborder="0" scrolling="no" allowtransparency="true"></iframe>
+'<div class="embed embedInstagram">
+    <blockquote class="instagram-media" data-instgrm-captioned data-instgrm-permalink="https://www.instagram.com/p/BizC-PPFK1m" data-instgrm-version="8"/>
 </div>'
             ],
             [

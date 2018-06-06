@@ -58,8 +58,6 @@ class SwaggerModel {
 
     private $exclude = [
         OpenApiApiController::class,
-//        \AuthenticateApiController::class,
-        \AuthenticatorsApiController::class,
     ];
 
     /**

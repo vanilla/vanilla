@@ -16,7 +16,7 @@ import { withEditor, IEditorContextProps } from "./ContextProvider";
 import { IMenuItemData } from "./generic/MenuItem";
 import FocusableEmbedBlot from "../quill/blots/abstract/FocusableEmbedBlot";
 import { watchFocusInDomTree } from "@dashboard/dom";
-import { createEditorFlyoutEscapeListener } from "../quill/utility";
+import { createEditorFlyoutEscapeListener, getBlotAtIndex } from "../quill/utility";
 
 const PARAGRAPH_ITEMS = {
     header: {
@@ -88,7 +88,7 @@ export class ParagraphToolbar extends React.PureComponent<IEditorContextProps, I
      * Mount quill listeners.
      */
     public componentDidMount() {
-        this.quill.on(Emitter.events.EDITOR_CHANGE, this.handleEditorChange);
+        this.quill.on(Quill.events.SELECTION_CHANGE, this.handleSelectionChange);
         watchFocusInDomTree(this.selfRef.current!, this.handleFocusChange);
         createEditorFlyoutEscapeListener(this.selfRef.current!, this.buttonRef.current!, () => {
             this.setState({ showMenu: false });
@@ -99,7 +99,7 @@ export class ParagraphToolbar extends React.PureComponent<IEditorContextProps, I
      * Be sure to remove the listeners when the component unmounts.
      */
     public componentWillUnmount() {
-        this.quill.off(Emitter.events.EDITOR_CHANGE, this.handleEditorChange);
+        this.quill.off(Emitter.events.SELECTION_CHANGE, this.handleSelectionChange);
     }
 
     public render() {
@@ -219,50 +219,41 @@ export class ParagraphToolbar extends React.PureComponent<IEditorContextProps, I
      * @param oldRange - The old range.
      * @param source - The source of the change.
      */
-    private handleEditorChange = (type: string, range: RangeStatic, oldRange: RangeStatic, source: Sources) => {
-        if (range) {
-            if (typeof range.index !== "number") {
-                range = this.quill.getSelection();
-            }
+    private handleSelectionChange = (range: RangeStatic | null, oldRange: RangeStatic, source: Sources) => {
+        if (source === Quill.sources.SILENT) {
+            return;
+        }
 
-            // Check which paragraph formatting items are ready.
-            if (range != null) {
-                const activeFormats = this.quill.getFormat(range);
-                let activeFormatKey = "pilcrow";
-                for (const [formatName, formatValue] of Object.entries(activeFormats)) {
-                    if (formatName in PARAGRAPH_ITEMS) {
-                        let item = PARAGRAPH_ITEMS[formatName];
+        if (range === null) {
+            return this.setState({ showPilcrow: false, showMenu: false });
+        }
 
-                        // In case its a heading
-                        if (formatName === "header" && (formatValue as string) in item) {
-                            item = item[formatValue as string];
-                        }
+        // Check which paragraph formatting items are ready.
+        const activeFormats = this.quill.getFormat(range);
+        let activeFormatKey = "pilcrow";
+        for (const [formatName, formatValue] of Object.entries(activeFormats)) {
+            if (formatName in PARAGRAPH_ITEMS) {
+                let item = PARAGRAPH_ITEMS[formatName];
 
-                        activeFormatKey = item.name;
-                    }
+                // In case its a heading
+                if (formatName === "header" && (formatValue as string) in item) {
+                    item = item[formatValue as string];
                 }
 
-                const [descendantAtIndex] = this.quill.scroll.descendant(FocusableEmbedBlot as any, range.index);
-
-                this.setState({
-                    range,
-                    activeFormatKey,
-                    isEmbedFocused: !!descendantAtIndex,
-                });
+                activeFormatKey = item.name;
             }
         }
 
-        if (source !== Quill.sources.SILENT) {
-            this.setState({
-                showMenu: false,
-            });
-        }
+        const potentialEmbedBlot = getBlotAtIndex(this.quill, range.index, FocusableEmbedBlot);
+
+        this.setState({
+            range,
+            activeFormatKey,
+            isEmbedFocused: !!potentialEmbedBlot,
+        });
 
         let numLines = 0;
-
-        if (range) {
-            numLines = this.quill.getLines(range.index || 0, range.length || 0).length;
-        }
+        numLines = this.quill.getLines(range.index || 0, range.length || 0).length;
 
         if (numLines <= 1 && !this.state.showPilcrow) {
             this.setState({
@@ -306,7 +297,7 @@ export class ParagraphToolbar extends React.PureComponent<IEditorContextProps, I
             zIndex: -1,
         };
 
-        return this.state.showMenu ? {} : hiddenStyles;
+        return this.state.showMenu && !this.state.isEmbedFocused ? {} : hiddenStyles;
     }
 
     /**

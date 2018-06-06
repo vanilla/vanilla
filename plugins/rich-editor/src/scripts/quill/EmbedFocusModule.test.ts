@@ -5,18 +5,34 @@
  */
 
 import EmbedFocusModule from "./EmbedFocusModule";
-import Quill from "quill/core";
+import Quill, { Blot } from "quill/core";
+import Delta from "quill-delta";
 import ExternalEmbedBlot from "./blots/embeds/ExternalEmbedBlot";
 import { expect } from "chai";
+import { IEmbedData } from "@dashboard/embeds";
+import KeyboardModule from "quill/modules/keyboard";
+import FocusableEmbedBlot from "./blots/abstract/FocusableEmbedBlot";
+
+const stubEmbedData: IEmbedData = {
+    type: "stub",
+    url: "",
+    attributes: [],
+};
 
 describe("EmbedFocusModule", () => {
     let quill: Quill;
     let embedFocusModule: EmbedFocusModule;
+
+    before(() => {
+        Quill.register("formats/embed-external", ExternalEmbedBlot, true);
+    });
+
     beforeEach(() => {
         document.body.innerHTML = `<div>
             <div class="FormWrapper"><div id="quillNoEditor"></div></div>
             <div class="richEditor"><div id="quillNoForm"></div></div>
             <div class="FormWrapper">
+                <button id="buttonBefore"></button>
                 <div class="richEditor">
                     <div id="quill"></div>
                     <button id="button1"></button>
@@ -24,7 +40,6 @@ describe("EmbedFocusModule", () => {
             </div>
         </div>`;
 
-        Quill.register("formats/embed-external", ExternalEmbedBlot, true);
         quill = new Quill("#quill");
         embedFocusModule = new EmbedFocusModule(quill);
     });
@@ -54,46 +69,201 @@ describe("EmbedFocusModule", () => {
             expect(wasHandled).eq(true);
         });
 
-        it("handles a tab keypress if the focused item is a FocusableEmbedBlot in the current quill instance");
+        it("handles a tab keypress if the focused item is a FocusableEmbedBlot in the current quill instance", async () => {
+            const blot = await ExternalEmbedBlot.createAsync(stubEmbedData);
+            quill.scroll.insertBefore(blot);
+            blot.focus();
 
-        it("tabs to the next tabbable element if conditions were met");
+            const wasHandled = embedFocusModule.handleTab();
+            expect(wasHandled).eq(true);
+        });
 
-        it(
-            "does not handle a tab keypress if the focused item is not quill or a FocusableEmbedBlot in the quill instance",
-        );
+        it("tabs to the next tabbable element outside the editor if conditions were met", async () => {
+            // Inserting a couple of focusable items in the editor.
+            const blot = await ExternalEmbedBlot.createAsync(stubEmbedData);
+            const blot2 = await ExternalEmbedBlot.createAsync(stubEmbedData);
+            const button1 = document.getElementById("button1")!;
+            quill.scroll.insertBefore(blot);
+            quill.scroll.insertBefore(blot2);
+            blot.focus();
 
-        it("will not tab to a focusable element inside of the editor that is not a FocusableEmbedBlot");
+            embedFocusModule.handleTab();
+            expect(document.activeElement === button1).eq(true);
+        });
+
+        it("does not handle a tab keypress if the focused item is not quill or a FocusableEmbedBlot in the quill instance", () => {
+            const button1 = document.getElementById("button1")!;
+            button1.focus();
+
+            const wasHandled = embedFocusModule.handleTab();
+            expect(wasHandled).eq(false);
+        });
     });
 
     describe("handleTabShiftTab()", () => {
-        it("will place focus on any element inside of the editor or the editor itself");
+        // We want natural tabbing here.
+        it("will not handle the keypress if the editor root is focused", () => {
+            quill.focus();
+            const wasHandled = embedFocusModule.handleShiftTab();
+            expect(wasHandled).eq(false);
+        });
 
-        it("will not handle the keypress if quill is focused");
+        // It could be tabbable element inside. We do __not__ want focus to move back to the editor. It already "is".
+        it("will handle the keypress if an element inside of the editor is focused", async () => {
+            const blot = await ExternalEmbedBlot.createAsync(stubEmbedData);
+            quill.scroll.insertBefore(blot);
+            blot.focus();
 
-        it("will handle the keypress if an element inside of the editor is focused");
-
-        it("will place focus and selection on quill if the last element in the editor is text");
-
-        it("will place focus on a FocusableEmbedBlot if it is the last element in the editor");
+            const wasHandled = embedFocusModule.handleShiftTab();
+            expect(wasHandled).eq(true);
+        });
     });
 
-    // SUPER TODO: -> Move these methods onto the EmbedFocusBlot itself.
-    // TODO: rename to deleteEmbed
-    describe("handleDeleteOnEmbed()", () => {
-        it("will delete the currently active embed");
+    describe("focusLastLine()", () => {
+        it("will place focus and selection on quill if the last element in the editor is text", async () => {
+            const embed = await ExternalEmbedBlot.createAsync(stubEmbedData);
+            quill.scroll.insertBefore(embed);
+            const test = quill.insertText(quill.scroll.length(), "test");
 
-        it("triggers a quill update");
+            embedFocusModule.focusLastLine();
 
-        it("places the selection at the same position if it will be text");
+            expect(quill.hasFocus()).eq(true);
+            expect(quill.getSelection().index, "The quill selection was incorrect").eq(quill.scroll.length() - 1);
+        });
 
-        it("places the focuses an embed blot if it will be in the original position");
+        it("will place focus on a FocusableEmbedBlot if it is the last element in the editor", async () => {
+            const embed = await ExternalEmbedBlot.createAsync(stubEmbedData);
+            quill.scroll.insertBefore(embed);
+            const test = quill.insertText(0, "test");
+
+            embedFocusModule.focusLastLine();
+
+            expect(embed.domNode.contains(document.activeElement) || document.activeElement === embed.domNode).eq(true);
+            expect(quill.getSelection().index, "The quill selection was incorrect").eq(quill.scroll.length() - 1);
+        });
+    });
+    describe("focusFirstLine", () => {
+        it("will place focus and selection on quill if the first element in the editor is text", async () => {
+            const test = quill.insertText(0, "test");
+            const embed = await ExternalEmbedBlot.createAsync(stubEmbedData);
+            quill.scroll.insertBefore(embed);
+
+            embedFocusModule.focusFirstLine();
+
+            expect(quill.hasFocus()).eq(true);
+            expect(quill.getSelection().index, "The quill selection was incorrect").eq(0);
+        });
+
+        it("will place focus on a FocusableEmbedBlot if it is the first element in the editor", async () => {
+            const embed = await ExternalEmbedBlot.createAsync(stubEmbedData);
+            quill.scroll.insertBefore(embed);
+            const test = quill.insertText(quill.scroll.length(), "test");
+
+            embedFocusModule.focusFirstLine();
+
+            expect(embed.domNode.contains(document.activeElement) || document.activeElement === embed.domNode).eq(true);
+            expect(quill.getSelection().index, "The quill selection was incorrect").eq(1);
+        });
     });
 
-    // TODO: rename to insertNewlineAfterEmbed
-    describe("handleEnterOnEmbed()", () => {
-        it("inserts a newline after the selected element");
+    describe("handleArrowKeyFromEmbed()", () => {
+        let embed: FocusableEmbedBlot;
+
+        beforeEach(async () => {
+            embed = await ExternalEmbedBlot.createAsync(stubEmbedData);
+            quill.scroll.insertBefore(embed);
+            embed.focus();
+        });
+        [KeyboardModule.keys.UP, KeyboardModule.keys.LEFT].forEach(key => {
+            it("can insert a newline at the beginning of the scroll", async () => {
+                embedFocusModule.handleArrowKeyFromEmbed(key, embed);
+                expect(quill.scroll.children.head.domNode.textContent).eq("");
+            });
+        });
+
+        [KeyboardModule.keys.RIGHT, KeyboardModule.keys.DOWN].forEach(key => {
+            it("can insert a newline at the end of the scroll", async () => {
+                embedFocusModule.handleArrowKeyFromEmbed(key, embed);
+                expect(quill.scroll.children.tail.domNode.textContent).eq("");
+            });
+        });
     });
 
-    // TODO: move a large portion of this code onto the EmbedFocusBlot itself.
-    describe("handleArrowKeyFromEmbed()", () => {});
+    describe("arrowToBlot()", () => {
+        it("focuses a FocusableEmbedBlot", async () => {
+            const embed = await ExternalEmbedBlot.createAsync(stubEmbedData);
+            quill.scroll.insertBefore(embed);
+
+            embedFocusModule.arrowToBlot(embed);
+        });
+
+        it("places selection at the start of a line of text by default", async () => {
+            const embed = await ExternalEmbedBlot.createAsync(stubEmbedData);
+            quill.scroll.insertBefore(embed);
+            quill.insertText(quill.scroll.length(), "test");
+            embed.focus();
+
+            const expectedPosition = embed.next.offset(quill.scroll);
+
+            embedFocusModule.arrowToBlot(embed.next as Blot);
+            expect(quill.getSelection().index).eq(expectedPosition);
+        });
+
+        it("can use previous selection history to place a selection in the previous position", async () => {
+            const embed = await ExternalEmbedBlot.createAsync(stubEmbedData);
+            quill.scroll.insertBefore(embed);
+            quill.insertText(quill.scroll.length(), "test");
+            embed.focus();
+            const expectedPosition = 5;
+            quill.setSelection(expectedPosition, 0, Quill.sources.USER);
+            embed.focus();
+
+            embedFocusModule.arrowToBlot(embed.next as Blot, true);
+            expect(quill.getSelection().index).eq(expectedPosition);
+        });
+
+        it("can ignore previous selection history to place selections only at the start of a line", async () => {
+            const embed = await ExternalEmbedBlot.createAsync(stubEmbedData);
+            quill.scroll.insertBefore(embed);
+            quill.insertText(quill.scroll.length(), "test");
+            embed.focus();
+            const ignorePosition = 5;
+            quill.setSelection(ignorePosition, 0, Quill.sources.USER);
+            embed.focus();
+
+            const expectedPosition = embed.next.offset(quill.scroll);
+            embedFocusModule.arrowToBlot(embed.next as Blot, false);
+            expect(quill.getSelection().index).eq(expectedPosition);
+        });
+    });
+
+    describe("handleDeleteOnQuill()", () => {
+        it("handles the keypress only if quill is focused", () => {
+            const button1 = document.getElementById("button1")!;
+            button1.focus();
+
+            const wasHandled = embedFocusModule.handleDeleteOnQuill();
+            expect(wasHandled).eq(false);
+        });
+
+        it("handles delete only if the current line is empty and the previous blot is a FocusableEmbedBlot", async () => {
+            const embed = await ExternalEmbedBlot.createAsync(stubEmbedData);
+            quill.scroll.insertBefore(embed);
+            const test = quill.insertText(quill.scroll.length(), "\n");
+            quill.setSelection(quill.scroll.length() - 1, 0);
+            let wasHandled = embedFocusModule.handleDeleteOnQuill();
+            expect(wasHandled).eq(true);
+
+            quill.insertText(quill.scroll.length(), "test");
+            quill.setSelection(3, 0);
+            wasHandled = embedFocusModule.handleDeleteOnQuill();
+            expect(wasHandled).eq(false);
+
+            quill.setContents([]);
+            quill.insertText(quill.scroll.length(), "\n\n\n\n\n");
+            quill.setSelection(3, 0);
+            wasHandled = embedFocusModule.handleDeleteOnQuill();
+            expect(wasHandled).eq(false);
+        });
+    });
 });

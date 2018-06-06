@@ -32,6 +32,7 @@ export default class VanillaTheme extends ThemeBase {
         const themeOptions = {
             ...options,
             placeholder: "Create a new post...",
+            scrollingContainer: "body",
         };
 
         super(quill, themeOptions);

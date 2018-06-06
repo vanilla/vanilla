@@ -14,7 +14,6 @@ import FocusableEmbedBlot from "./blots/abstract/FocusableEmbedBlot";
  * A custom history module to allow redo/undo to work while an Embed is focused.
  */
 export default class HistoryModule extends BaseHistoryModule {
-
     /**
      * Add an undo handler for when an embed blot has focus.
      */

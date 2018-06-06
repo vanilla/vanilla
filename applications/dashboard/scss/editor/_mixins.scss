@@ -102,86 +102,18 @@ $spinnerOffset: 73deg;
         padding-left: 0;
     }
 
-    .richEditor-textWrap {
-        margin-top: $richEditor-menuButton_size;
-    }
-
-    .richEditor-embedBar {
-        position: absolute;
-        top: 0;
-        left: 0;
-        width: 100%;
-        box-sizing: border-box;
-        background: #fff;
-        transition-property: transform, opacity;
-        transition-timing-function: $richEditor-mobileEmbedMenu_transitionTiming;
-        transition-duration: $richEditor-mobileEmbedMenu_transitionDuration;
-    }
-
-
     .richEditor-menu.insertPopover {
-        margin-top: -$richEditor-border_width;
-        bottom: auto;
-        width: calc(100% + #{$richEditor-border_width * 2});
+        left: 0;
+        width: calc(100% + #{$richEditor-border_width * 4});
     }
 
     .richEditor-embedBarMobileBorder {
         display: block;
     }
 
-    .js-RichEditorUnstickyEmbed,
-    .js-RichEditorStickyEmbed {
-        display: block;
-    }
-
-    .js-RichEditorUnstickyEmbed {
-        display: block;
-        position: absolute;
-        bottom: #{($richEditor-menuButton_size * 2) + $richEditor_verticalPadding + ($richEditor-lineHeight * $richEditor-font_size)};
-        width: 1px;
-    }
-
     .FormWrapper {
         padding-left: $richEditor-mobile_spacing;
         padding-right: $richEditor-mobile_spacing;
-
-        &.isPastEditorTop {
-            .richEditor-embedBar {
-                position: fixed;
-                width: calc(100% - #{$richEditor-mobile_spacing * 2});
-                margin: {
-                    right: $richEditor-mobile_spacing;
-                    left: $richEditor-mobile_spacing;
-                }
-            }
-
-            .richEditor-embedBarMobileBorder {
-                border: {
-                    top-width: 0;
-                }
-            }
-        }
-
-        &.isPastEditorBottom {
-            .richEditor-embedBar {
-                opacity: 0;
-                transform: translateY(-55%);
-            }
-        }
-
-        &:not(.isPastEditorTop) {
-            .richEditor-embedBarMobileBorder {
-                border: {
-                    top-width: 0;
-                    right-width: 0;
-                    left-width: 0;
-                }
-            }
-        }
-    }
-
-    .js-RichEditorMobileCheck {
-        width: 1px;
     }
 }
 

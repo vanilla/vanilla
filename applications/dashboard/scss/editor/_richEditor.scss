@@ -784,17 +784,6 @@
     border-style: solid;
 }
 
-.js-RichEditorUnstickyEmbed,
-.js-RichEditorStickyEmbed {
-    display: none;
-}
-
-.js-RichEditorMobileCheck {
-    position: relative;
-    width: 100px;
-    height: 0;
-}
-
 // Mobile
 body.isMobile {
     @include richEditorMobileStyles();

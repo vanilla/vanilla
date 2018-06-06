@@ -1461,17 +1461,6 @@ label.checkbox input.checkbox-input {
   border-style: solid;
 }
 
-.js-RichEditorUnstickyEmbed,
-.js-RichEditorStickyEmbed {
-  display: none;
-}
-
-.js-RichEditorMobileCheck {
-  position: relative;
-  width: 100px;
-  height: 0;
-}
-
 body.isMobile .embedDialogue {
   position: static;
 }
@@ -1484,80 +1473,19 @@ body.isMobile .richEditor {
   padding-left: 0;
 }
 
-body.isMobile .richEditor-textWrap {
-  margin-top: 39px;
-}
-
-body.isMobile .richEditor-embedBar {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  box-sizing: border-box;
-  background: #fff;
-  -webkit-transition-property: -webkit-transform, opacity;
-          transition-property: transform, opacity;
-  -webkit-transition-timing-function: ease-out;
-          transition-timing-function: ease-out;
-  -webkit-transition-duration: 0.15s;
-          transition-duration: 0.15s;
-}
-
 body.isMobile .richEditor-menu.insertPopover {
-  margin-top: -1px;
-  bottom: auto;
-  width: -webkit-calc(100% + 2px);
-  width: calc(100% + 2px);
+  left: 0;
+  width: -webkit-calc(100% + 4px);
+  width: calc(100% + 4px);
 }
 
 body.isMobile .richEditor-embedBarMobileBorder {
   display: block;
 }
 
-body.isMobile .js-RichEditorUnstickyEmbed,
-body.isMobile .js-RichEditorStickyEmbed {
-  display: block;
-}
-
-body.isMobile .js-RichEditorUnstickyEmbed {
-  display: block;
-  position: absolute;
-  bottom: 111px;
-  width: 1px;
-}
-
 body.isMobile .FormWrapper {
   padding-left: 18px;
   padding-right: 18px;
-}
-
-body.isMobile .FormWrapper.isPastEditorTop .richEditor-embedBar {
-  position: fixed;
-  width: -webkit-calc(100% - 36px);
-  width: calc(100% - 36px);
-  margin-right: 18px;
-  margin-left: 18px;
-}
-
-body.isMobile .FormWrapper.isPastEditorTop .richEditor-embedBarMobileBorder {
-  border-top-width: 0;
-}
-
-body.isMobile .FormWrapper.isPastEditorBottom .richEditor-embedBar {
-  opacity: 0;
-  -webkit-transform: translateY(-55%);
-      -ms-transform: translateY(-55%);
-          transform: translateY(-55%);
-}
-
-body.isMobile .FormWrapper:not(.isPastEditorTop) .richEditor-embedBarMobileBorder {
-  border-top-width: 0;
-  border-right-width: 0;
-  border-left-width: 0;
-}
-
-body.isMobile .js-RichEditorMobileCheck {
-  width: 1px;
 }
 
 @media (max-width: 700px) {
@@ -1570,69 +1498,17 @@ body.isMobile .js-RichEditorMobileCheck {
   .richEditor {
     padding-left: 0;
   }
-  .richEditor-textWrap {
-    margin-top: 39px;
-  }
-  .richEditor-embedBar {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    box-sizing: border-box;
-    background: #fff;
-    -webkit-transition-property: -webkit-transform, opacity;
-            transition-property: transform, opacity;
-    -webkit-transition-timing-function: ease-out;
-            transition-timing-function: ease-out;
-    -webkit-transition-duration: 0.15s;
-            transition-duration: 0.15s;
-  }
   .richEditor-menu.insertPopover {
-    margin-top: -1px;
-    bottom: auto;
-    width: -webkit-calc(100% + 2px);
-    width: calc(100% + 2px);
+    left: 0;
+    width: -webkit-calc(100% + 4px);
+    width: calc(100% + 4px);
   }
   .richEditor-embedBarMobileBorder {
     display: block;
   }
-  .js-RichEditorUnstickyEmbed,
-  .js-RichEditorStickyEmbed {
-    display: block;
-  }
-  .js-RichEditorUnstickyEmbed {
-    display: block;
-    position: absolute;
-    bottom: 111px;
-    width: 1px;
-  }
   .FormWrapper {
     padding-left: 18px;
     padding-right: 18px;
-  }
-  .FormWrapper.isPastEditorTop .richEditor-embedBar {
-    position: fixed;
-    width: -webkit-calc(100% - 36px);
-    width: calc(100% - 36px);
-    margin-right: 18px;
-    margin-left: 18px;
-  }
-  .FormWrapper.isPastEditorTop .richEditor-embedBarMobileBorder {
-    border-top-width: 0;
-  }
-  .FormWrapper.isPastEditorBottom .richEditor-embedBar {
-    opacity: 0;
-    -webkit-transform: translateY(-55%);
-        -ms-transform: translateY(-55%);
-            transform: translateY(-55%);
-  }
-  .FormWrapper:not(.isPastEditorTop) .richEditor-embedBarMobileBorder {
-    border-top-width: 0;
-    border-right-width: 0;
-    border-left-width: 0;
-  }
-  .js-RichEditorMobileCheck {
-    width: 1px;
   }
 }
 

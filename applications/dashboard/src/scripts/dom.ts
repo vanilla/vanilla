@@ -9,6 +9,7 @@ import * as utility from "@dashboard/utility";
 import twemoji from "twemoji";
 import tabbable from "tabbable";
 import { logError } from "@dashboard/utility";
+import { element } from "prop-types";
 
 /**
  * Use the browser's built-in functionality to quickly and safely escape a string.
@@ -460,4 +461,17 @@ export function watchFocusInDomTree(rootNode: Element, callback: (hasFocus: bool
         },
         true,
     );
+}
+
+/**
+ * Vanilla's default way to handle sticky headers
+ */
+export function stickyHeader() {
+    const header = document.querySelector(".js-scrollVisibility");
+    if (header !== null) {
+        // nothing found
+        console.log("gotcha: ", element);
+    } else {
+        console.log("no header");
+    }
 }

@@ -64,14 +64,14 @@ abstract class Authenticator {
      * @return Schema
      */
     public static function getAuthenticatorSchema(): Schema {
-        return self::getAuthenticatorTypeSchema()->merge(
+        return static::getAuthenticatorTypeSchema()->merge(
             Schema::parse([
                 'authenticatorID:s' => 'Authenticator instance\'s identifier.',
                 'type' => null,
                 'name' => null,
-                'signInUrl:s|n' => 'The configured relative sign in URL of the provider.',
-                'registerUrl:s|n' => 'The configured relative register URL of the provider.',
-                'signOutUrl:s|n' => 'The configured relative sign out URL of the provider.',
+                'signInUrl:s' => 'The configured sign in URL of the provider.',
+                'signOutUrl:s|n' => 'The configured sign out URL of the provider.',
+                'registerUrl:s|n' => 'The configured register URL of the provider.',
                 'ui:o' => static::getUiSchema(),
                 'isActive:b' => 'Whether or not the Authenticator can be used.',
                 'isUnique' => null,
@@ -293,7 +293,6 @@ abstract class Authenticator {
         $typeInfo = static::getAuthenticatorTypeInfo();
 
         return static::getAuthenticatorSchema()->validate(array_replace_recursive($defaults, $instanceInfo, $typeInfo));
-
     }
 
     /**

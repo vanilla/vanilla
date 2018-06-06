@@ -39,13 +39,19 @@ module.exports = {
             {
                 test: /\.tsx?$/,
                 exclude: ["node_modules"],
-                include: [/\/src\/scripts/],
+                include: [/\/src\/scripts/, /tests\/javascript/],
                 use: [
                     {
-                        loader: "ts-loader",
+                        loader: "awesome-typescript-loader",
                         options: {
-                            configFile: path.resolve(VANILLA_ROOT, "tsconfig.json"),
-                            transpileOnly: true,
+                            useBabel: true,
+                            useCache: true,
+                            configFileName: path.resolve(VANILLA_ROOT, "tsconfig.json"),
+                            forceIsolatedModules: true,
+                            babelOptions: {
+                                babelrc: false,
+                                presets: ["@vanillaforums/babel-preset"],
+                            },
                         },
                     },
                 ],

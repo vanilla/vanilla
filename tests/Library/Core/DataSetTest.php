@@ -7,13 +7,13 @@
 
 namespace VanillaTests\Library\Core;
 
-use PHPUnit\Framework\TestCase;
+use VanillaTests\SharedBootstrapTestCase;
 use Gdn_DataSet;
 
 /**
  * Test the {@link Gdn_DataSet} class.
  */
-class DataSetTest extends TestCase {
+class DataSetTest extends SharedBootstrapTestCase {
     /**
      * A basic test of newing up a dataset.
      */

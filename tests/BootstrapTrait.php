@@ -11,16 +11,18 @@ use Garden\Container\Container;
 use Garden\EventManager;
 
 trait BootstrapTrait {
-    /**
-     * @var Container
-     */
-    protected static $container;
+
+    /** @var Bootstrap */
+    private static $bootstrap;
+
+    /** @var Container */
+    private static $container;
 
     /**
      * Bootstrap the site.
      */
-    public static function setupBeforeClass() {
-        self::$container = static::createContainer();
+    public static function setUpBeforeClass() {
+        self::createContainer();
     }
 
     /**
@@ -29,20 +31,29 @@ trait BootstrapTrait {
      * @return Container Returns a container.
      */
     protected static function createContainer() {
-        $folder = strtolower(EventManager::classBasename(get_called_class()));
-        $bootstrap = new Bootstrap("http://vanilla.test/$folder");
+        $folder = static::getBootstrapFolderName();
+        self::$bootstrap = new Bootstrap("http://vanilla.test/$folder");
 
-        $container = new Container();
-        $bootstrap->run($container);
+        self::$container = new Container();
+        self::$bootstrap->run(self::$container);
 
-        return $container;
+        return self::$container;
+    }
+
+    /**
+     * Get the folder name to construct Bootstrap.
+     *
+     * @return string
+     */
+    protected static function getBootstrapFolderName() {
+        return strtolower(EventManager::classBasename(get_called_class()));
     }
 
     /**
      * Cleanup the container after testing is done.
      */
-    public static function teardownAfterClass() {
-        Bootstrap::cleanup(self::container());
+    public static function tearDownAfterClass() {
+        Bootstrap::cleanup(self::$container);
     }
 
     /**
@@ -52,5 +63,14 @@ trait BootstrapTrait {
      */
     protected static function container() {
         return self::$container;
+    }
+
+    /**
+     * Get the Bootstrap.
+     *
+     * @return Bootstrap
+     */
+    protected static function bootstrap() {
+        return self::$bootstrap;
     }
 }

@@ -7,13 +7,13 @@
 
 namespace VanillaTests\Library\Core;
 
-use PHPUnit\Framework\TestCase;
+use VanillaTests\SharedBootstrapTestCase;
 use Gdn_PasswordHash;
 
 /**
  * Test the the {@link Gdn_PasswordHash} class.
  */
-class PasswordTest extends TestCase {
+class PasswordTest extends SharedBootstrapTestCase {
 
     /**
      * Make sure an empty password fails.

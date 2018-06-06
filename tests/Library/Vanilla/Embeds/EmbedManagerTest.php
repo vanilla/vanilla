@@ -8,7 +8,7 @@ namespace VanillaTests\Library\Vanilla\Embeds;
 
 use Exception;
 use Garden\Http\HttpRequest;
-use PHPUnit\Framework\TestCase;
+use VanillaTests\SharedBootstrapTestCase;
 use Vanilla\Embeds\EmbedManager;
 use Vanilla\Embeds\LinkEmbed;
 use Vanilla\Embeds\ImageEmbed;
@@ -18,7 +18,7 @@ use Vanilla\Embeds\VimeoEmbed;
 use VanillaTests\Fixtures\PageScraper;
 use VanillaTests\Fixtures\NullCache;
 
-class EmbedManagerTest extends TestCase {
+class EmbedManagerTest extends SharedBootstrapTestCase {
 
     /**
      * Create a new EmbedManager instance.

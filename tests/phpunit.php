@@ -1,6 +1,6 @@
 <?php
 
-use Garden\Container\Container;
+use VanillaTests\NullContainer;
 
 // Alias classes for some limited PHPUnit v5 compatibility with v6.
 $classCompatibility = [
@@ -33,9 +33,8 @@ foreach ($files as $file) {
 // ===========================================================================
 require PATH_ROOT.'/environment.php';
 
-// Set up the dependency injection container.
-$bootstrap = new \VanillaTests\Bootstrap();
-$bootstrap->run(new Container());
+// This effectively disable the auto instanciation of a new container when calling Gdn::getContainer();
+Gdn::setContainer(new NullContainer());
 
 // Clear the test cache.
 \Gdn_FileSystem::removeFolder(PATH_ROOT.'/tests/cache');

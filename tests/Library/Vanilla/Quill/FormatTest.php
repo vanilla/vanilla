@@ -7,12 +7,12 @@
 
 namespace VanillaTests\Library\Vanilla\Quill;
 
-use PHPUnit\Framework\TestCase;
+use VanillaTests\SharedBootstrapTestCase;
 use Vanilla\Quill\Formats\Bold;
 use Vanilla\Quill\Formats\Italic;
 use Vanilla\Quill\Formats\Link;
 
-class FormatTest extends TestCase {
+class FormatTest extends SharedBootstrapTestCase {
 
     private $boldOperation = [
         "insert" => "bold",

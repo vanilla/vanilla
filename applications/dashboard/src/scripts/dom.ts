@@ -81,12 +81,12 @@ export function getFormData(formElement) {
         return {};
     }
 
-    const data = new FormData(formElement);
+    const data = new FormData(formElement) as any;
     const result = {};
 
-    for (const [key, value] of data.entries()) {
+    data.forEach((key, value) => {
         result[key] = value;
-    }
+    });
 
     return result;
 }

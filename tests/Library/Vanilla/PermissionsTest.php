@@ -6,10 +6,10 @@
 
 namespace VanillaTests\Library\Vanilla;
 
-use PHPUnit\Framework\TestCase;
+use VanillaTests\SharedBootstrapTestCase;
 use Vanilla\Permissions;
 
-class PermissionsTest extends TestCase {
+class PermissionsTest extends SharedBootstrapTestCase {
 
     public function testAdd() {
         $permissions = new Permissions();

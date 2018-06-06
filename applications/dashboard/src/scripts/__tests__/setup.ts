@@ -6,9 +6,9 @@
 
 import Enzyme from "enzyme";
 import Adapter from "enzyme-adapter-react-16";
+import { importAll } from "@testroot/utility";
 
 // Setup enzyme
 Enzyme.configure({ adapter: new Adapter() });
 
-export { default } from "enzyme";
-export * from "enzyme";
+importAll((require as any).context("..", true, /.test.(ts|tsx)$/));

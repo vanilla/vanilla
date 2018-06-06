@@ -8,8 +8,10 @@
 namespace VanillaTests\APIv2\Authenticate;
 
 use Exception;
+use Vanilla\Models\AuthenticatorModel;
+use Vanilla\Models\SSOData;
 use VanillaTests\APIv2\AbstractAPIv2Test;
-use VanillaTests\Fixtures\MockSSOAuthenticator;
+use VanillaTests\Fixtures\Authenticator\MockSSOAuthenticator;
 
 /**
  * Class InactiveAuthenticatorTest
@@ -24,9 +26,7 @@ class InactiveAuthenticatorTest extends AbstractAPIv2Test {
      */
     public static function setupBeforeClass() {
         parent::setupBeforeClass();
-        self::container()
-            ->rule(MockSSOAuthenticator::class)
-            ->setAliasOf('MockSSOAuthenticator');
+        self::container()->rule(MockSSOAuthenticator::class);
     }
 
     /**
@@ -35,11 +35,18 @@ class InactiveAuthenticatorTest extends AbstractAPIv2Test {
     public function setUp() {
         parent::setUp();
 
-        $uniqueID = uniqid('inactv_auth_');
-        $this->authenticator = new MockSSOAuthenticator($uniqueID);
-        $this->authenticator->setActive(false);
 
-        $this->container()->setInstance('MockSSOAuthenticator', $this->authenticator);
+        /** @var \Vanilla\Models\AuthenticatorModel $authenticatorModel */
+        $authenticatorModel = $this->container()->get(AuthenticatorModel::class);
+
+        $uniqueID = uniqid('inactv_auth_');
+        $authType = MockSSOAuthenticator::getType();
+        $this->authenticator = $authenticatorModel->createSSOAuthenticatorInstance([
+            'authenticatorID' => $authType,
+            'type' => $authType,
+            'SSOData' => json_decode(json_encode(new SSOData($authType, $authType, $uniqueID)), true),
+        ]);
+        $this->authenticator->setActive(false);
 
         $session = $this->container()->get(\Gdn_Session::class);
         $session->end();

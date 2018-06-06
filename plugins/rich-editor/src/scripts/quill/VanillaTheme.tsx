@@ -18,14 +18,10 @@ import EmojiPopover from "../editor/EmojiPopover";
 import EmbedPopover from "../editor/EmbedPopover";
 import EditorProvider from "../editor/ContextProvider";
 import MentionModule from "../editor/MentionModule";
-import Waypoint from "react-waypoint";
-import smoothscroll from "smoothscroll-polyfill";
 
 export default class VanillaTheme extends ThemeBase {
     private jsBodyBoxContainer: Element;
     private jsFormElement: HTMLElement;
-    private jsEmbedMenu: HTMLElement;
-    private jsMobileCheck: HTMLElement;
 
     /**
      * Constructor.
@@ -57,14 +53,11 @@ export default class VanillaTheme extends ThemeBase {
         // Find the editor root.
         this.jsBodyBoxContainer = this.quill.container.closest(".richEditor") as Element;
         this.jsFormElement = this.jsBodyBoxContainer.closest(".FormWrapper") as HTMLElement;
-        this.jsEmbedMenu = this.jsBodyBoxContainer.querySelector(".richEditor-embedBar") as HTMLElement;
-        this.jsMobileCheck = this.jsBodyBoxContainer.querySelector(".js-RichEditorMobileCheck") as HTMLElement;
         if (!this.jsBodyBoxContainer) {
             throw new Error("Could not find .richEditor to mount editor components into.");
         }
         this.mountMentionModule();
         this.mountEmojiMenu();
-        smoothscroll.polyfill();
     }
 
     public init() {
@@ -72,7 +65,6 @@ export default class VanillaTheme extends ThemeBase {
         this.mountToolbar();
         this.mountParagraphMenu();
         this.mountEmbedPopover();
-        this.mountStickyEmbedMenu();
     }
 
     /**
@@ -121,56 +113,6 @@ export default class VanillaTheme extends ThemeBase {
                 <EmbedPopover />
             </EditorProvider>,
             container,
-        );
-    }
-
-    private handleStickyMenuTop(data, offset) {
-        const pastWaypoint = data.currentPosition === "above";
-        const topOffset = offset || "0px";
-
-        if (pastWaypoint) {
-            this.jsEmbedMenu.style.top = topOffset;
-        } else {
-            this.jsEmbedMenu.style.removeProperty("top");
-        }
-
-        this.jsFormElement.classList.toggle("isPastEditorTop", pastWaypoint);
-        this.jsEmbedMenu.classList.toggle("InputBox-borderWidth", pastWaypoint);
-        this.jsEmbedMenu.classList.toggle("InputBox-borderColor", pastWaypoint);
-    }
-
-    private handleStickyMenuBottom(data) {
-        const pastWaypoint = data.currentPosition === "above";
-        this.jsFormElement.classList.toggle("isPastEditorBottom", pastWaypoint);
-    }
-
-    private isMobile() {
-        return this.jsMobileCheck.offsetWidth === 0;
-    }
-
-    private mountStickyEmbedMenu() {
-        const stickyEmbed = this.jsBodyBoxContainer.querySelector(".js-RichEditorStickyEmbed");
-        const unStickyEmbed = this.jsBodyBoxContainer.querySelector(".js-RichEditorUnstickyEmbed");
-        const offset = "63px";
-
-        ReactDOM.render(
-            <Waypoint
-                onPositionChange={data => {
-                    this.handleStickyMenuTop(data, offset);
-                }}
-                topOffset={offset}
-            />,
-            stickyEmbed,
-        );
-
-        ReactDOM.render(
-            <Waypoint
-                onPositionChange={data => {
-                    this.handleStickyMenuBottom(data);
-                }}
-                topOffset={offset}
-            />,
-            unStickyEmbed,
         );
     }
 

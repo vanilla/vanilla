@@ -447,7 +447,7 @@ function checkDomTreeHasFocus(rootNode: Element | null, event: FocusEvent, callb
             // We will only invalidate based on something actually getting focus.
             callback(!!hasFocus);
         }
-    }, 5);
+    }, 0);
 }
 
 /**

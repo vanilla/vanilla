@@ -208,33 +208,6 @@ describe("FocusModule", () => {
             embedFocusModule.arrowToBlot(embed.next as Blot);
             expect(quill.getSelection().index).eq(expectedPosition);
         });
-
-        it("can use previous selection history to place a selection in the previous position", async () => {
-            const embed = await ExternalEmbedBlot.createAsync(stubEmbedData);
-            quill.scroll.insertBefore(embed);
-            quill.insertText(quill.scroll.length(), "test");
-            embed.focus();
-            const expectedPosition = 5;
-            quill.setSelection(expectedPosition, 0, Quill.sources.USER);
-            embed.focus();
-
-            embedFocusModule.arrowToBlot(embed.next as Blot, true);
-            expect(quill.getSelection().index).eq(expectedPosition);
-        });
-
-        it("can ignore previous selection history to place selections only at the start of a line", async () => {
-            const embed = await ExternalEmbedBlot.createAsync(stubEmbedData);
-            quill.scroll.insertBefore(embed);
-            quill.insertText(quill.scroll.length(), "test");
-            embed.focus();
-            const ignorePosition = 5;
-            quill.setSelection(ignorePosition, 0, Quill.sources.USER);
-            embed.focus();
-
-            const expectedPosition = embed.next.offset(quill.scroll);
-            embedFocusModule.arrowToBlot(embed.next as Blot, false);
-            expect(quill.getSelection().index).eq(expectedPosition);
-        });
     });
 
     describe("handleDeleteOnQuill()", () => {

@@ -238,10 +238,7 @@ export default class EmbedFocusModule extends Module {
         // Check if we have a blot to move to.
         const blotToMoveTo = this.getNextBlotFromArrowKey(blotForActiveElement, directionKeyCode);
         if (blotToMoveTo) {
-            const useSelectionHistory = [KeyboardModule.keys.UP, KeyboardModule.keys.DOWN].includes(
-                directionKeyCode as any,
-            );
-            this.arrowToBlot(blotToMoveTo, useSelectionHistory);
+            this.arrowToBlot(blotToMoveTo);
             return true;
         }
 
@@ -260,18 +257,14 @@ export default class EmbedFocusModule extends Module {
      * @param blotToMoveTo The next blot to move towards.
      * @param useSelectionHistory Whether or not to use previous selection history to try and restore a selection position.
      */
-    public arrowToBlot(blotToMoveTo: Blot, useSelectionHistory: boolean = false) {
+    public arrowToBlot(blotToMoveTo: Blot) {
         if (blotToMoveTo instanceof FocusableEmbedBlot) {
             blotToMoveTo.focus();
         } else {
             // We want to mimic normal movement behaviour as if our Blot was text, so
             // We check if we need to put the cursor in the middle of the next or previous line.
             const newElementStart = blotToMoveTo.offset(this.quill.scroll);
-            const newElementEnd = newElementStart + blotToMoveTo.length();
-            const previousIndex = this.lastSelection.index;
-            const shouldUsePreviousIndex = previousIndex >= newElementStart && previousIndex < newElementEnd;
-            const newIndex = useSelectionHistory && shouldUsePreviousIndex ? previousIndex : newElementStart;
-            this.quill.setSelection(newIndex, 0);
+            this.quill.setSelection(newElementStart, 0);
         }
     }
 
@@ -428,7 +421,6 @@ export default class EmbedFocusModule extends Module {
                 }
                 // If we're in quill and moving to an embed blot we need to focus it.
             } else if (this.quill.hasFocus() && blotToMoveTo instanceof FocusableEmbedBlot) {
-                console.log("Trry to focus embed");
                 event.preventDefault();
                 event.stopPropagation();
                 blotToMoveTo.focus();

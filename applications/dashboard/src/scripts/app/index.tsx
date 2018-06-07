@@ -29,7 +29,3 @@ addRoutes([
     <Route exact path="/authenticate/password" component={PasswordPage} />,
     <Route exact path="/authenticate/recoverpassword" component={RecoverPasswordPage} />,
 ]);
-
-delegateEvent("click", "button, input[type='button']", (event, triggeringElement) => {
-    triggeringElement.focus();
-});

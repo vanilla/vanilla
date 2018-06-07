@@ -625,13 +625,8 @@ label.checkbox input.checkbox-input {
   height: 63px;
 }
 
-.stickyHeader.isAtTop, .stickyHeader.isAtTop.isFixed {
+.stickyHeader.isAtTop {
   position: relative;
-}
-
-.stickyHeader.isFixed {
-  position: fixed;
-  top: 0;
 }
 
 .stickyHeader.isScrollingDown {

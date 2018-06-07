@@ -467,66 +467,32 @@ export function watchFocusInDomTree(rootNode: Element, callback: (hasFocus: bool
  * Sticky header handling
  */
 function handleStickyHeaderState(element, data) {
-    const goingDown = data.lastScrollPos < data.currentScrollPos;
+    const goingDown = data.lastScrollPos <= data.currentScrollPos;
     const isAtTopOfPage = data.currentScrollPos === 0;
     const elementHeight = element.offsetHeight;
-    const isPastHeader = element.offsetTop + elementHeight <= data.currentScrollPos;
-    const offsetPos = data.currentScrollPos - elementHeight;
-    const currentElementTop = parseInt(element.style.top);
-    const waypoint = currentElementTop != "" ? currentElementTop : false;
+    const isPastHeader =
+        element.style.position != "fixed" && element.offsetTop + elementHeight <= data.currentScrollPos;
+    const elementTop = element.style.top != "" ? parseInt(element.style.top) : false;
 
     element.classList.toggle("isScrollingDown", goingDown);
     element.classList.toggle("isScrollingUp", !goingDown);
     element.classList.toggle("isAtTop", isAtTopOfPage);
 
-    // element.offsetHeight
     if (goingDown) {
-        // console.log("data.currentScrollPos:", data.currentScrollPos);
-        // console.log("element.offsetTop:", element.offsetTop);
-        // console.log("isPastHeader: ", isPastHeader);
-
-        // element.style.top = `${offsetPos}px`;
-        // element.setAttribute("data-waypoint", offsetPos);
-
-        if (isAtTopOfPage) {
-            element.style.top = "";
-            element.classList.remove("isFixed");
+        element.style.position = "";
+        if (isPastHeader) {
+            element.style.top = `${data.currentScrollPos - elementHeight}px`;
         } else {
-            element.classList.remove("isFixed");
-            if (isPastHeader) {
-                element.style.top = `${offsetPos}px`;
-                // console.log("hereee 1");
-            } else {
-                if (waypoint > 0) {
-                    // console.log("hereee 2");
-                    element.style.top = `${element.scrollTop}px`;
-                    element.setAttribute("data-waypoint", element.scrollTop);
-                } else {
-                    // console.log("hereee 3");
-                }
+            if (!elementTop) {
+                element.style.top = `${data.currentScrollPos}px`;
             }
         }
     } else {
-        // going up
-
-        console.log("waypoint: ", waypoint);
-        console.log("data.currentScrollPos: ", data.currentScrollPos);
-
-        if (waypoint && data.currentScrollPos <= waypoint) {
+        // going UP
+        if (data.currentScrollPos <= elementTop) {
             element.style.top = "";
-            element.classList.add("isFixed");
+            element.style.position = "fixed";
         }
-    }
-
-    // console.log("lastScrollPos: ", data.lastScrollPos);
-    // console.log("currentScrollPos: ", data.currentScrollPos);
-    // console.log("goingDown: ", goingDown);
-
-    if (data.callback) {
-        data.callback({
-            goingDown,
-            isAtTopOfPage,
-        });
     }
 }
 
@@ -552,17 +518,13 @@ export function stickyHeader(callback?: Function) {
                     window.requestAnimationFrame(data => {
                         lastScrollPos = currentScrollPos;
                         currentScrollPos = window.scrollY;
-
                         handleStickyHeaderState(header, {
                             currentScrollPos,
                             lastScrollPos,
-                            callback: data => {
-                                // window.console.log("callback data: ", data);
-                            },
                         });
                     });
                 },
-                400,
+                50,
                 {
                     leading: true,
                 },

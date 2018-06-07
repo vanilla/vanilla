@@ -47,15 +47,7 @@
     height: 63px; // temporary, don't commit
 
     &.isAtTop {
-        &,
-        &.isFixed {
-            position: relative;
-        }
-    }
-
-    &.isFixed {
-        position: fixed;
-        top: 0;
+        position: relative;
     }
 
     &.isScrollingDown {

@@ -6,7 +6,6 @@
         {t c="richEditor.description.embed"}
     </p>
     <div class="richEditor-frame InputBox">
-        <div class="js-RichEditorStickyEmbed"></div>
         <div class="richEditor-textWrap js-richText">
             <div class="ql-editor richEditor-text userContent" data-gramm="false" contenteditable="true" data-placeholder="Create a new post..." tabindex="0"></div>
         </div>

@@ -31,7 +31,7 @@ export default class ClipboardModule extends ClipboardBase {
             this.quill.setSelection((delta.length() - range.length) as any, Quill.sources.SILENT);
 
             // THIS IS WHAT IS DIFFERENT
-            document.documentElement.scrollTop = document.body.scrollTop = 1000;
+            document.documentElement.scrollTop = document.body.scrollTop = scrollTop;
             this.quill.focus();
         }, 1);
     }

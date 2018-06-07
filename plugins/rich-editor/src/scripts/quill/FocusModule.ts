@@ -55,7 +55,7 @@ export default class EmbedFocusModule extends Module {
 
         // Track user selection events.
         quill.on("selection-change", (range, oldRange, source) => {
-            if (range && source === Quill.sources.USER) {
+            if (range && source !== Quill.sources.SILENT) {
                 this.lastSelection = range;
                 this.editorRoot.classList.toggle("isFocused", true);
             }
@@ -345,13 +345,13 @@ export default class EmbedFocusModule extends Module {
             case KeyboardModule.keys.RIGHT:
                 // -1 needed for because end of blot is non-inclusive.
                 const endOfBlot = currentBlot.offset() + currentBlot.length() - 1;
-                if (this.quill.getSelection().index === endOfBlot) {
+                if (this.lastSelection.index === endOfBlot) {
                     // If we're at the end of the line.
                     return currentBlot.next as Blot;
                 }
                 break;
             case KeyboardModule.keys.LEFT:
-                if (this.quill.getSelection().index === currentBlot.offset()) {
+                if (this.lastSelection.index === currentBlot.offset()) {
                     // If we're at the start of the line.
                     return currentBlot.prev as Blot;
                 }
@@ -427,7 +427,8 @@ export default class EmbedFocusModule extends Module {
                     return;
                 }
                 // If we're in quill and moving to an embed blot we need to focus it.
-            } else if (document.activeElement === this.quill.root && blotToMoveTo instanceof FocusableEmbedBlot) {
+            } else if (this.quill.hasFocus() && blotToMoveTo instanceof FocusableEmbedBlot) {
+                console.log("Trry to focus embed");
                 event.preventDefault();
                 event.stopPropagation();
                 blotToMoveTo.focus();

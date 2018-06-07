@@ -4,7 +4,7 @@
  * @license https://opensource.org/licenses/GPL-2.0 GPL-2.0
  */
 
-import EmbedFocusModule from "./EmbedFocusModule";
+import FocusModule from "./FocusModule";
 import Quill, { Blot } from "quill/core";
 import Delta from "quill-delta";
 import ExternalEmbedBlot from "./blots/embeds/ExternalEmbedBlot";
@@ -19,9 +19,9 @@ const stubEmbedData: IEmbedData = {
     attributes: [],
 };
 
-describe("EmbedFocusModule", () => {
+describe("FocusModule", () => {
     let quill: Quill;
-    let embedFocusModule: EmbedFocusModule;
+    let embedFocusModule: FocusModule;
 
     before(() => {
         Quill.register("formats/embed-external", ExternalEmbedBlot, true);
@@ -41,18 +41,18 @@ describe("EmbedFocusModule", () => {
         </div>`;
 
         quill = new Quill("#quill");
-        embedFocusModule = new EmbedFocusModule(quill);
+        embedFocusModule = new FocusModule(quill);
     });
 
     it("throws an error if it can't find its needed surrounding HTML", () => {
         const createNoEditor = () => {
             const badQuill = new Quill("#quillNoEditor");
-            const badFocusModule = new EmbedFocusModule(badQuill);
+            const badFocusModule = new FocusModule(badQuill);
         };
 
         const createNoForm = () => {
             const badQuill = new Quill("#quillNoForm");
-            const badFocusModule = new EmbedFocusModule(badQuill);
+            const badFocusModule = new FocusModule(badQuill);
         };
         expect(createNoEditor).to.throw();
         expect(createNoForm).to.throw();

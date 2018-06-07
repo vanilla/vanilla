@@ -88,7 +88,7 @@ export class ParagraphToolbar extends React.PureComponent<IEditorContextProps, I
      * Mount quill listeners.
      */
     public componentDidMount() {
-        this.quill.on(Quill.events.SELECTION_CHANGE, this.handleSelectionChange);
+        this.quill.on(Quill.events.EDITOR_CHANGE, this.handleEditorChange);
         watchFocusInDomTree(this.selfRef.current!, this.handleFocusChange);
         createEditorFlyoutEscapeListener(this.selfRef.current!, this.buttonRef.current!, () => {
             this.setState({ showMenu: false });
@@ -99,7 +99,7 @@ export class ParagraphToolbar extends React.PureComponent<IEditorContextProps, I
      * Be sure to remove the listeners when the component unmounts.
      */
     public componentWillUnmount() {
-        this.quill.off(Emitter.events.SELECTION_CHANGE, this.handleSelectionChange);
+        this.quill.off(Emitter.events.EDITOR_CHANGE, this.handleEditorChange);
     }
 
     public render() {
@@ -219,10 +219,8 @@ export class ParagraphToolbar extends React.PureComponent<IEditorContextProps, I
      * @param oldRange - The old range.
      * @param source - The source of the change.
      */
-    private handleSelectionChange = (range: RangeStatic | null, oldRange: RangeStatic, source: Sources) => {
-        if (source === Quill.sources.SILENT) {
-            return;
-        }
+    private handleEditorChange = (type, range: RangeStatic | null, oldRange: RangeStatic, source: Sources) => {
+        range = this.quill.getSelection();
 
         if (range === null) {
             return this.setState({ showPilcrow: false, showMenu: false });

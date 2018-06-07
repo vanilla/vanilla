@@ -140,9 +140,6 @@ export default class EmbedFocusModule extends Module {
      * Keydown listener on the current quill instance.
      */
     private tabListener = (event: KeyboardEvent) => {
-        if (document.activeElement === document.body || document.activeElement === null) {
-            console.log("WTF");
-        }
         if (!this.quill.container.closest(".richEditor")!.contains(document.activeElement)) {
             return;
         }

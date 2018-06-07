@@ -22,6 +22,9 @@ use Vanilla\Authenticator\ShimAuthenticator;
 use Vanilla\Authenticator\SSOAuthenticator;
 use Vanilla\Utility\ModelUtils;
 
+/**
+ * Class AuthenticatorModel
+ */
 class AuthenticatorModel {
 
     /** @var Gdn_AuthenticationProviderModel */
@@ -52,7 +55,7 @@ class AuthenticatorModel {
     private $authenticatorInstances = [];
 
     /** @var array Map of DB fields to Authenticator fields. */
-    private $dbToAuthenticator = [
+    private $dbToAuthenticatorFields = [
         'AuthenticationKey' => 'authenticatorID',
         'AuthenticationSchemeAlias' => 'type',
         'Name' => 'name',
@@ -64,7 +67,7 @@ class AuthenticatorModel {
     ];
 
     /** @var array Flipped version of $dbToAuthenticator. */
-    private $authenticatorToDb;
+    private $authenticatorToDbFields;
 
     /**
      * AuthenticatorModel constructor.
@@ -80,7 +83,7 @@ class AuthenticatorModel {
         Gdn_AuthenticationProviderModel $authenticationProviderModel,
         Container $container
     ) {
-        $this->authenticatorToDb = array_flip($this->dbToAuthenticator);
+        $this->authenticatorToDbFields = array_flip($this->dbToAuthenticatorFields);
 
         $this->addonManager = $addonManager;
         $this->authenticationProviderModel = $authenticationProviderModel;
@@ -237,18 +240,27 @@ class AuthenticatorModel {
                         $authenticatorInstance = $this->getAuthenticator($authenticatorInfo['AuthenticationSchemeAlias'], $authenticatorInfo['AuthenticationKey']);
                         $authenticators[] = $authenticatorInstance;
                     } catch (Exception $e) {
-                        throw new ServerException('Error while trying to instanciate authenticator '.$authenticatorClass, 500, ['AuthenticatorError' => $e]);
+                        throw new ServerException('Error while trying to instanciate authenticator '.$authenticatorClass, 500, [
+                            'authenticatorError' => $e,
+                            'authenticatorType' => $authenticatorInfo['AuthenticationSchemeAlias'],
+                            'authenticatorID' => $authenticatorInfo['AuthenticationKey'],
+                        ]);
                     }
                     $authenticatorInstance = null;
                 }
             } else {
                 // Only try this for non SSOAuthenticator since we should have info in the DB for these.
                 if (!is_a($authenticatorClass, SSOAuthenticator::class, true)) {
+                    $type = $authenticatorClass::getType();
                     try {
-                        $authenticatorInstance = $this->getAuthenticator($authenticatorClass::getType(), $authenticatorClass::getType());
+                        $authenticatorInstance = $this->getAuthenticator($type,$type);
                         $authenticators[] = $authenticatorInstance;
                     } catch (Exception $e) {
-                        throw new ServerException('Error while trying to instanciate authenticator '.$authenticatorClass, 500, ['AuthenticatorError' => $e]);
+                        throw new ServerException('Error while trying to instanciate authenticator '.$authenticatorClass, 500, [
+                            'authenticatorError' => $e,
+                            'authenticatorType' => $type,
+                            'authenticatorID' => $type,
+                        ]);
                     }
                 }
 
@@ -330,6 +342,7 @@ class AuthenticatorModel {
     public function createSSOAuthenticatorInstance(array $data) {
         $validation = new Validation();
 
+        /** @var SSOAuthenticator $authenticatorClass */
         $authenticatorClass = null;
         $authenticatorType = $data['type'] ?? false;
         if (!$authenticatorType) {
@@ -354,6 +367,18 @@ class AuthenticatorModel {
 
             if ($authenticatorData) {
                 $validation->addError('authenticatorID', '{field} already exists.', ['status' => 422]);
+            }
+        }
+
+        foreach ($authenticatorClass::getRequiredFields() as $dotDelimitedField) {
+            if (!arrayPathExists(explode('.', $dotDelimitedField), $data)) {
+                $validation->addError(
+                    $dotDelimitedField,
+                    '{field} is required when creating an instance of {ssoAuthenticator}',
+                    [
+                        'ssoAuthenticator' => $authenticatorClass,
+                    ]
+                );
             }
         }
 
@@ -422,13 +447,13 @@ class AuthenticatorModel {
                 $authenticatorData['Attributes'] = dbdecode($authenticatorData['Attributes']);
 
                 // Filter out unused fields.
-                $authenticatorData = array_intersect_key($authenticatorData, $this->dbToAuthenticator);
+                $authenticatorData = array_intersect_key($authenticatorData, $this->dbToAuthenticatorFields);
 
                 // Convert array keys.
                 foreach($schemaProperties as $name => $definition) {
-                    if (array_key_exists($name, $this->authenticatorToDb) && array_key_exists($this->authenticatorToDb[$name], $authenticatorData)) {
-                        $authenticatorData[$name] = $authenticatorData[$this->authenticatorToDb[$name]];
-                        unset($authenticatorData[$this->authenticatorToDb[$name]]);
+                    if (array_key_exists($name, $this->authenticatorToDbFields) && array_key_exists($this->authenticatorToDbFields[$name], $authenticatorData)) {
+                        $authenticatorData[$name] = $authenticatorData[$this->authenticatorToDbFields[$name]];
+                        unset($authenticatorData[$this->authenticatorToDbFields[$name]]);
                     }
                 }
 
@@ -461,20 +486,31 @@ class AuthenticatorModel {
      * @throws \Garden\Schema\ValidationException
      */
     public function saveSSOAuthenticatorData(SSOAuthenticator $authenticator) {
-        $data = $authenticator->getAuthenticatorInfo();
+        $rawData = $authenticator->getAuthenticatorInfo();
 
-        foreach ($this->authenticatorToDb as $from => $to) {
+        $data = [];
+        foreach ($authenticator::getConfigurableFields() as $dotDelimitedField) {
+            if (arrayPathExists(explode('.', $dotDelimitedField), $rawData, $value)) {
+                setvalr($dotDelimitedField, $data, $value);
+            }
+        }
+
+        // Sparse validation to make sure all data is proper.
+        $authenticator::getAuthenticatorSchema()->validate($data, true);
+
+        foreach ($this->authenticatorToDbFields as $from => $to) {
             if (array_key_exists($from, $data)) {
                 $data[$to] = $data[$from];
                 unset($data[$from]);
             }
         }
 
-
-        // Move everything out of attributes since AuthenticationProviderModel will put anything not matching the schema back in Attributes.
+        // Move everything out of Attributes since AuthenticationProviderModel will put anything not matching the schema back in Attributes.
         // (It's gonna overwrite it)
-        $data = array_merge($data, $data['Attributes']);
-        unset($data['Attributes']);
+        if (isset($data['Attributes'])) {
+            $data = array_merge($data, $data['Attributes']);
+            unset($data['Attributes']);
+        }
 
         if ($this->authenticationProviderModel->save($data) === false) {
             ModelUtils::validationResultToValidationException($this->authenticationProviderModel, $this->locale);
@@ -495,5 +531,21 @@ class AuthenticatorModel {
         ]);
 
         unset($this->authenticatorInstances[$authenticator->getType()][$authenticator->getID()]);
+    }
+
+    /**
+     * Tells whether a user is linked to an authenticator or not.
+     *
+     * @param string $authenticatorType
+     * @param string $authenticatorID
+     * @param $userID
+     *
+     * @return bool
+     */
+    public function isUserLinkedToSSOAuthenticator(string $authenticatorType, string $authenticatorID, int $userID) {
+        return (bool)$this->authenticationProviderModel->SQL->getWhere(
+            'UserAuthentication',
+            ['UserID' => $userID, 'ProviderKey' => $authenticatorID]
+        )->firstRow(DATASET_TYPE_ARRAY);
     }
 }

@@ -68,7 +68,7 @@ class MockAuthenticator extends Authenticator {
      * @inheritDoc
      */
     public function getSignInUrl() {
-        return null;
+        return '/MockAuthenticatorSignIn';
     }
 
     /**

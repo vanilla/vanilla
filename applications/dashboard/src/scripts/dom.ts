@@ -471,8 +471,8 @@ function handleStickyHeaderState(element, data) {
     const isAtTopOfPage = data.currentScrollPos === 0;
     const elementHeight = element.offsetHeight;
     const isPastHeader =
-        element.style.position != "fixed" && element.offsetTop + elementHeight <= data.currentScrollPos;
-    const elementTop = element.style.top != "" ? parseInt(element.style.top) : false;
+        element.style.position !== "fixed" && element.offsetTop + elementHeight <= data.currentScrollPos;
+    const elementTop = element.style.top !== "" ? parseInt(element.style.top, 10) : false;
 
     element.classList.toggle("isScrollingDown", goingDown);
     element.classList.toggle("isScrollingUp", !goingDown);
@@ -499,17 +499,15 @@ function handleStickyHeaderState(element, data) {
 /**
  * Vanilla's default way to handle sticky headers
  */
-export function stickyHeader(callback?: Function) {
+export function stickyHeader() {
     const header = document.querySelector(".stickyHeader");
     if (header !== null) {
         let currentScrollPos = document.documentElement.scrollTop || 0;
         let lastScrollPos = -1;
-        let waypoint = -1;
 
         handleStickyHeaderState(header, {
             currentScrollPos,
             lastScrollPos,
-            waypoint,
         });
 
         window.addEventListener("scroll", e => {
@@ -524,7 +522,7 @@ export function stickyHeader(callback?: Function) {
                         });
                     });
                 },
-                50,
+                200,
                 {
                     leading: true,
                 },

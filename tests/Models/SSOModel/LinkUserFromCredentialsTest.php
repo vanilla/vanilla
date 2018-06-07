@@ -10,7 +10,7 @@ namespace VanillaTests\Models\SSOModel;
 use VanillaTests\SharedBootstrapTestCase;
 use Vanilla\Models\SSOData;
 use Vanilla\Models\SSOModel;
-use VanillaTests\Fixtures\MockSSOAuthenticator;
+use VanillaTests\Fixtures\Authenticator\MockSSOAuthenticator;
 use VanillaTests\SiteTestTrait;
 
 /**

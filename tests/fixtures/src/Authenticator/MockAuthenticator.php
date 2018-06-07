@@ -1,12 +1,20 @@
 <?php
+/**
+ * @author Alexandre (DaazKu) Chouinard <alexandre.c@vanillaforums.com>
+ * @copyright 2009-2018 Vanilla Forums Inc.
+ * @license https://opensource.org/licenses/GPL-2.0 GPL-2.0
+ */
 
-namespace VanillaTests\Fixtures;
+namespace VanillaTests\Fixtures\Authenticator;
 
 use Garden\Web\RequestInterface;
 use Vanilla\Authenticator\Authenticator;
 use Vanilla\Authenticator\Exception;
 
 class MockAuthenticator extends Authenticator {
+
+    /** @var bool */
+    protected $active = true;
 
     /** @var array */
     protected $data = [];
@@ -17,6 +25,23 @@ class MockAuthenticator extends Authenticator {
     public function __construct() {
         parent::__construct('Mock');
     }
+
+    /**
+     * @inheritDoc
+     */
+    public function isActive(): bool {
+        return $this->active;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function setActive(bool $active) {
+        $this->active = $active;
+
+        return $this;
+    }
+
 
     /**
      * @return array
@@ -43,7 +68,7 @@ class MockAuthenticator extends Authenticator {
      * @inheritDoc
      */
     public function getSignInUrl() {
-        return null;
+        return '/MockAuthenticatorSignIn';
     }
 
     /**

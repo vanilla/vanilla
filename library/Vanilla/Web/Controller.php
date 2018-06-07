@@ -12,14 +12,13 @@ use Garden\Schema\Schema;
 use Garden\Schema\Validation;
 use Garden\Schema\ValidationException;
 use Garden\Web\Exception\HttpException;
-use Gdn_Session as SessionInterface;
 use Gdn_Locale as LocaleInterface;
+use Gdn_Session as SessionInterface;
 use Gdn_Upload as Upload;
-use Gdn_Validation as DataValidation;
 use Vanilla\Exception\PermissionException;
 use Vanilla\InjectableInterface;
 use Vanilla\UploadedFile;
-use Vanilla\Utility\CamelCaseScheme;
+use Vanilla\Utility\ModelUtils;
 
 /**
  * The controller base class.
@@ -258,31 +257,6 @@ abstract class Controller implements InjectableInterface {
      * @return Validation
      */
     public function validateModel($model, $throw = true) {
-        $validation = new Validation();
-        $caseScheme = new CamelCaseScheme();
-
-        if (property_exists($model, 'Validation') && $model->Validation instanceof DataValidation) {
-            $results = $model->Validation->results();
-            $results = $caseScheme->convertArrayKeys($results);
-            foreach ($results as $field => $errors) {
-                foreach ($errors as $error) {
-                    $message = trim(sprintf(
-                        $this->locale->translate($error),
-                        $this->locale->translate($field)
-                    ), '.').'.';
-                    $validation->addError(
-                        $field,
-                        $error,
-                        ['message' => $message]
-                    );
-                }
-            }
-        }
-
-        if ($throw && $validation->getErrorCount() > 0 ) {
-            throw new ValidationException($validation);
-        }
-
-        return $validation;
+        return ModelUtils::validationResultToValidationException($model, $this->locale, $throw);
     }
 }

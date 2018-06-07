@@ -30,6 +30,7 @@ node_js:
 script:
   - cd vanilla
   - yarn test
+  - yarn lint:ts
 
 env:
   - TEST_FILE_ROOTS = (plugins/rich-editor)

@@ -10,7 +10,6 @@ import { IEmbedData } from "@dashboard/embeds";
 import ExternalEmbedBlot from "./ExternalEmbedBlot";
 import { expect } from "chai";
 import LoadingBlot from "./LoadingBlot";
-import { filterQuillHTML } from "../../test-utilities";
 import sinon from "sinon";
 import { registerEmbed } from "@dashboard/embeds";
 import "@dashboard/app/user-content/embeds/image";

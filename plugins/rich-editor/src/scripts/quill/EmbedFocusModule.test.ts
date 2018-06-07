@@ -102,10 +102,10 @@ describe("EmbedFocusModule", () => {
 
     describe("handleTabShiftTab()", () => {
         // We want natural tabbing here.
-        it("will not handle the keypress if the editor root is focused", () => {
+        it("will handle the keypress if the editor root is focused", () => {
             quill.focus();
             const wasHandled = embedFocusModule.handleShiftTab();
-            expect(wasHandled).eq(false);
+            expect(wasHandled).eq(true);
         });
 
         // It could be tabbable element inside. We do __not__ want focus to move back to the editor. It already "is".
@@ -156,13 +156,13 @@ describe("EmbedFocusModule", () => {
 
         it("will place focus on a FocusableEmbedBlot if it is the first element in the editor", async () => {
             const embed = await ExternalEmbedBlot.createAsync(stubEmbedData);
-            quill.scroll.insertBefore(embed);
+            quill.scroll.insertBefore(embed, quill.scroll.children.tail);
             const test = quill.insertText(quill.scroll.length(), "test");
 
             embedFocusModule.focusFirstLine();
 
             expect(embed.domNode.contains(document.activeElement) || document.activeElement === embed.domNode).eq(true);
-            expect(quill.getSelection().index, "The quill selection was incorrect").eq(1);
+            expect(quill.getSelection().index, "The quill selection was incorrect").eq(0);
         });
     });
 

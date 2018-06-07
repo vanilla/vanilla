@@ -55,7 +55,7 @@ export default class EmbedFocusModule extends Module {
 
         // Add event listeners.
         quill.on("selection-change", (range, oldRange, source) => {
-            if (range && source !== Quill.sources.SILENT) {
+            if (range && source === Quill.sources.USER) {
                 this.lastSelection = range;
                 this.editorRoot.classList.toggle("isFocused", true);
             }
@@ -419,7 +419,6 @@ export default class EmbedFocusModule extends Module {
             if (document.activeElement === this.quill.root && blotToMoveTo instanceof FocusableEmbedBlot) {
                 event.preventDefault();
                 event.stopPropagation();
-                console.log("stopping propagation");
                 blotToMoveTo.focus();
             }
         }

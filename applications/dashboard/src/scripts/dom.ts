@@ -426,9 +426,10 @@ function checkDomTreeWasClicked(rootNode: Element | null, clickedElement: Elemen
 function checkDomTreeHasFocus(rootNode: Element | null, event: FocusEvent, callback: (hasFocus: boolean) => void) {
     setTimeout(() => {
         const possibleTargets = [
+            // NEEDS TO COME FIRST, because safari will populate relatedTarget on focusin, and its not what we're looking for.
+            document.activeElement, // IE11, Safari.
             event.relatedTarget as Element, // Chrome (The actual standard)
             (event as any).explicitOriginalTarget, // Firefox
-            document.activeElement, // IE11, Safari,
         ];
 
         let activeElement = null;
@@ -446,7 +447,7 @@ function checkDomTreeHasFocus(rootNode: Element | null, event: FocusEvent, callb
             // We will only invalidate based on something actually getting focus.
             callback(!!hasFocus);
         }
-    }, 0);
+    }, 5);
 }
 
 /**

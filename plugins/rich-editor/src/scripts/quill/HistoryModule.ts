@@ -9,7 +9,8 @@ import { delegateEvent } from "@dashboard/dom";
 import KeyboardModule from "quill/modules/keyboard";
 
 /**
- * A custom history module to allow redo/undo to work while an Embed is focused.
+ * A custom history module to allow redo/undo to work while an Embed is focused
+ * and hack around the fact that Quill doesn't have first class support for asynchronusly rendering things.
  */
 export default class HistoryModule extends BaseHistoryModule {
     /**
@@ -39,9 +40,8 @@ export default class HistoryModule extends BaseHistoryModule {
     }
 
     /**
-     * Occasionally perform a double undo.
-     *
-     * @see {needsDoubleUndo}
+     * Occasionally perform a double undo/redo. This is to prevent the undo stack from getting trashed
+     * by promises that don't resolve in an orderly fashion.
      */
     public change(source: "undo" | "redo", dest) {
         if (source === "undo" && this.needsDoubleUndo()) {
@@ -97,8 +97,10 @@ export default class HistoryModule extends BaseHistoryModule {
      * Certain operations (where we are async rendering a blot and it needs to return immediately anyways)
      * require 2 undos. These inserts have an insert of a Promise.
      *
-     * If a double undo is not performed the blot will continually re-resolve, and re-render itself, making
+     * If a double redo is not performed the blot will continually re-resolve, and re-render itself, making
      * undoing impossible.
+     *
+     * Unfornunately the redo stack is totally trashed after we redo one of the promise based items.
      */
     private needsDoubleRedo(): boolean {
         const lastRedo = this.stack.redo[this.stack.redo.length - 1];

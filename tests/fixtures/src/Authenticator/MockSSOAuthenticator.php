@@ -7,10 +7,11 @@
 
 namespace VanillaTests\Fixtures\Authenticator;
 
+use Garden\Schema\Schema;
 use Garden\Web\RequestInterface;
 use Vanilla\Authenticator\SSOAuthenticator;
-use Vanilla\Models\SSOData;
 use Vanilla\Models\AuthenticatorModel;
+use Vanilla\Models\SSOData;
 
 /**
  * Class MockSSOAuthenticator
@@ -29,15 +30,39 @@ class MockSSOAuthenticator extends SSOAuthenticator {
         parent::__construct('MockSSO', $authenticatorModel);
     }
 
+    /**
+     * @inheritdoc
+     */
+    public static function getAuthenticatorSchema(): Schema {
+        $schema = parent::getAuthenticatorSchema();
+
+        $defaults = [
+            'properties.name' => 'MockSSO',
+            'properties.isActive' => true,
+            'properties.signInUrl' => '/MockSSOSignInPage',
+            'properties.sso.properties.canSignIn' => true,
+            'properties.sso.properties.isTrusted' => true,
+            'properties.sso.properties.canAutoLinkUser' => false,
+            'properties.sso.properties.canLinkSession' => false,
+        ];
+
+        foreach ($defaults as $fieldPath => $defaultValue) {
+            $field = $schema->getField($fieldPath);
+            $field['default'] = $defaultValue;
+            unset($field['x-instance-required']);
+            $schema->setField($fieldPath, $field);
+        }
+
+        return $schema;
+    }
+
+    /**
+     * @inheritdoc
+     */
     protected function setAuthenticatorInfo(array $data) {
         $data['attributes'] = $data['attributes'] ?? [];
         $data['attributes']['SSOData'] = $data['attributes']['SSOData'] ?? [];
         $data['attributes']['SSOData']['uniqueID'] = $data['attributes']['SSOData']['uniqueID'] ?? uniqid('MockSSOUserID_');
-
-        // Defaults to canSignIn
-        $data['sso']['canSignIn'] = $data['sso']['canSignIn'] ?? true;
-        // Defaults to isTrusted
-        $data['sso']['isTrusted'] = $data['sso']['isTrusted'] ?? true;
 
         parent::setAuthenticatorInfo($data);
 
@@ -87,35 +112,6 @@ class MockSSOAuthenticator extends SSOAuthenticator {
                 'buttonName' => 'Sign in with MockAuthenticator',
             ]
         ];
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public function getRegisterUrl() {
-        return null;
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public function getSignInUrl() {
-        return null;
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public function getSignOutUrl() {
-        return null;
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public function isUserLinked(int $userID): bool {
-        $userModel = new \UserModel();
-        return (bool)$userModel->getAuthenticationByUser($userID, $this->getID());
     }
 
     /**

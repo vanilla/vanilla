@@ -59,7 +59,7 @@ abstract class Authenticator {
     }
 
     /**
-     * Get this authenticate Schema.
+     * Get this Authenticator schema.
      *
      * @return Schema
      */

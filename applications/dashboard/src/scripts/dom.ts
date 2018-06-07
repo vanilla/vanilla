@@ -473,13 +473,12 @@ function handleStickyHeaderState(element, data) {
     const wayPointPosition = data.currentScrollPos - elementHeight;
     const isPastHeader = element.offsetTop + elementHeight <= data.currentScrollPos;
     const offsetPos = data.currentScrollPos - elementHeight;
-
-    // const isScrolledPastHeader = data.currentScrollPos >= offsetPos;
-
     const hasWaypoint = element.hasAttribute("data-waypoint");
     const waypoint = hasWaypoint ? element.getAttribute("data-waypoint") : -1;
+    const pastWaypoint = waypoint >= data.currentScrollPos;
 
     element.classList.toggle("isScrollingDown", goingDown);
+    element.classList.toggle("isScrollingUp", !goingDown);
     // element.classList.toggle("isFixed", !goingDown)
     element.classList.toggle("isAtTop", isAtTopOfPage);
 
@@ -489,38 +488,33 @@ function handleStickyHeaderState(element, data) {
         console.log("element.offsetTop:", element.offsetTop);
         console.log("isPastHeader: ", isPastHeader);
 
-        if (isPastHeader) {
-            if (isAtTopOfPage) {
-                element.style.top = "";
-            } else {
+        // element.style.top = `${offsetPos}px`;
+        // element.setAttribute("data-waypoint", offsetPos);
+
+        if (isAtTopOfPage) {
+            element.style.top = "";
+            element.removeAttribute("data-waypoint");
+            element.classList.remove("isFixed");
+        } else {
+            console.log("isPastHeader: ", isPastHeader);
+            element.classList.remove("isFixed");
+
+            if (isPastHeader) {
                 element.style.top = `${offsetPos}px`;
+                element.setAttribute("data-waypoint", offsetPos);
+            } else {
+                if (!hasWaypoint) {
+                    element.style.top = element.scrollTop;
+                    element.setAttribute("data-waypoint", element.scrollTop);
+                }
             }
         }
-
-        // if (isScrolledPastHeader) {
-        //     element.style.top = `${offsetPos}px`;
-        //     if (!hasWaypoint) {
-        //         element.setAttribute("data-waypoint", offsetPos);
-        //     }
-        // } else {
-        // }
-        // if (element.style.top === "") {
-        //     element.style.top = `${data.currentScrollPos}px`;
-        //     console.log("here with: ", element.style.top);
-        // } else if(isScrolledPastHeader) {
-        //
-        // }
     } else {
-        // console.log("Going UP");
-        // if (hasWaypoint) {
-        //     const beforeWaypoint = data.currentScrollPos >= waypoint;
-        //
-        //     element.classList.toggle("isFixed", !beforeWaypoint);
-        // if (beforeWaypoint) {
-        //     element.style.top = "";
-        // }
-        // }
-        // element.style.top = "";
+        // going up
+        if (pastWaypoint) {
+            element.style.top = "";
+            element.classList.add("isFixed");
+        }
     }
 
     // console.log("lastScrollPos: ", data.lastScrollPos);

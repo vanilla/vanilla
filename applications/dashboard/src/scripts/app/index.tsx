@@ -20,7 +20,6 @@ import "./user-content/embeds/image";
 import "./user-content/embeds/link";
 import "./user-content/embeds/twitter";
 import "./user-content/embeds/video";
-import { delegateEvent } from "@dashboard/dom";
 
 addComponent("App", Router);
 

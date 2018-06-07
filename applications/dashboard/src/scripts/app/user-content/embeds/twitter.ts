@@ -53,13 +53,7 @@ async function convertTwitterEmbeds() {
  */
 export async function renderTweet(element: Element, data: IEmbedData) {
     // Ensure the twitter library is loaded.
-    try {
-        await ensureScript("//platform.twitter.com/widgets.js");
-    } catch (error) {
-        throw new Error(
-            "The script necessary to embed twitter failed to load. This could be due to a network timeout but is likely caused by tracking protection being enabled.",
-        );
-    }
+    await ensureScript("//platform.twitter.com/widgets.js");
 
     if (!window.twttr) {
         throw new Error("The Twitter widget failed to load.");

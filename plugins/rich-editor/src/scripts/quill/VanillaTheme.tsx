@@ -21,7 +21,6 @@ import MentionModule from "../editor/MentionModule";
 
 export default class VanillaTheme extends ThemeBase {
     private jsBodyBoxContainer: Element;
-    private jsFormElement: HTMLElement;
 
     /**
      * Constructor.
@@ -52,7 +51,6 @@ export default class VanillaTheme extends ThemeBase {
 
         // Find the editor root.
         this.jsBodyBoxContainer = this.quill.container.closest(".richEditor") as Element;
-        this.jsFormElement = this.jsBodyBoxContainer.closest(".FormWrapper") as HTMLElement;
         if (!this.jsBodyBoxContainer) {
             throw new Error("Could not find .richEditor to mount editor components into.");
         }

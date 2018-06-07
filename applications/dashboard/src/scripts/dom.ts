@@ -8,8 +8,8 @@
 import * as utility from "@dashboard/utility";
 import twemoji from "twemoji";
 import tabbable from "tabbable";
-import { logError } from "@dashboard/utility";
-import { element } from "prop-types";
+import { logError, log } from "@dashboard/utility";
+import debounce from "lodash/debounce";
 
 /**
  * Use the browser's built-in functionality to quickly and safely escape a string.
@@ -464,14 +464,106 @@ export function watchFocusInDomTree(rootNode: Element, callback: (hasFocus: bool
 }
 
 /**
+ * Sticky header handling
+ */
+function handleStickyHeaderState(element, data) {
+    const goingDown = data.lastScrollPos < data.currentScrollPos;
+    const isAtTopOfPage = data.currentScrollPos === 0;
+    const elementHeight = element.offsetHeight;
+    const offsetPos = data.currentScrollPos - elementHeight;
+    const isScrolledPastHeader = data.currentScrollPos >= offsetPos;
+    const hasWaypoint = element.hasAttribute("data-waypoint");
+    const waypoint = hasWaypoint ? element.getAttribute("data-waypoint") : -1;
+
+    element.classList.toggle("isScrollingDown", goingDown);
+    // element.classList.toggle("isFixed", !goingDown)
+    element.classList.toggle("isAtTop", isAtTopOfPage);
+
+    // element.offsetHeight
+    if (goingDown) {
+        console.log("Going DOWN isScrolledPastHeader: ", isScrolledPastHeader);
+
+        if (isScrolledPastHeader) {
+            element.style.top = `${offsetPos}px`;
+            if (!hasWaypoint) {
+                element.setAttribute("data-waypoint", offsetPos);
+            }
+        } else {
+        }
+
+        // if (element.style.top === "") {
+        //     element.style.top = `${data.currentScrollPos}px`;
+        //     console.log("here with: ", element.style.top);
+        // } else if(isScrolledPastHeader) {
+        //
+        // }
+    } else {
+        console.log("Going UP");
+
+        // if (hasWaypoint) {
+        //     const beforeWaypoint = data.currentScrollPos >= waypoint;
+        //
+        //     element.classList.toggle("isFixed", !beforeWaypoint);
+
+        // if (beforeWaypoint) {
+        //     element.style.top = "";
+        // }
+        // }
+
+        // element.style.top = "";
+    }
+
+    // console.log("lastScrollPos: ", data.lastScrollPos);
+    // console.log("currentScrollPos: ", data.currentScrollPos);
+    // console.log("goingDown: ", goingDown);
+
+    if (data.callback) {
+        data.callback({
+            goingDown,
+            isAtTopOfPage,
+        });
+    }
+}
+
+/**
  * Vanilla's default way to handle sticky headers
  */
-export function stickyHeader() {
-    const header = document.querySelector(".js-scrollVisibility");
+export function stickyHeader(callback?: Function) {
+    const header = document.querySelector(".stickyHeader");
     if (header !== null) {
-        // nothing found
-        console.log("gotcha: ", element);
+        let currentScrollPos = document.documentElement.scrollTop || 0;
+        let lastScrollPos = -1;
+        let waypoint = -1;
+
+        handleStickyHeaderState(header, {
+            currentScrollPos,
+            lastScrollPos,
+            waypoint,
+        });
+
+        window.addEventListener("scroll", e => {
+            debounce(
+                () => {
+                    window.requestAnimationFrame(data => {
+                        lastScrollPos = currentScrollPos;
+                        currentScrollPos = window.scrollY;
+
+                        handleStickyHeaderState(header, {
+                            currentScrollPos,
+                            lastScrollPos,
+                            callback: data => {
+                                window.console.log("callback data: ", data);
+                            },
+                        });
+                    });
+                },
+                400,
+                {
+                    leading: true,
+                },
+            )();
+        });
     } else {
-        console.log("no header");
+        utility.log("No sticky header found");
     }
 }

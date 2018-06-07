@@ -471,7 +471,7 @@ describe("watchFocusInDomTree()", () => {
 // describe("stickyHeader()", () => {
 //     beforeEach(() => {
 //         document.body.innerHTML = `<div id="root" style="height: 200vh;">
-//             <div class="js-scrollVisibility">Header</div>
+//             <div class="stickyHeader">Header</div>
 //         </div>`;
 //     });
 //

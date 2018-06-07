@@ -10,7 +10,6 @@
     background: $richEditor-bg_color;
     height: auto;
     padding: 0;
-    overflow: hidden;
 }
 
 .richEditor-menu {
@@ -779,10 +778,6 @@
     }
 }
 
-.richEditor-embedBarMobileBorder {
-    display: none;
-    border-style: solid;
-}
 
 // Mobile
 body.isMobile {

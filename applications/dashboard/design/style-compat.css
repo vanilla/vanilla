@@ -609,6 +609,35 @@ label.checkbox input.checkbox-input {
   max-width: 100%;
 }
 
+.stickyHeaderWrap {
+  position: relative;
+  display: block;
+  width: 100%;
+  height: 63px;
+}
+
+.stickyHeader {
+  position: relative;
+  width: 100%;
+  left: 0;
+  display: block;
+  z-index: 100;
+  height: 63px;
+}
+
+.stickyHeader.isAtTop, .stickyHeader.isAtTop.isFixed {
+  position: relative;
+}
+
+.stickyHeader.isFixed {
+  position: fixed;
+  top: 0;
+}
+
+.stickyHeader.isScrollingDown {
+  position: absolute;
+}
+
 @-webkit-keyframes spinnerLoader {
   0% {
     -webkit-transform: rotate(73deg);
@@ -643,7 +672,6 @@ label.checkbox input.checkbox-input {
   background: white;
   height: auto;
   padding: 0;
-  overflow: hidden;
 }
 
 .richEditor-menu {
@@ -1454,11 +1482,6 @@ label.checkbox input.checkbox-input {
   body.hasRichEditor #ConversationForm .FormWrapper .richEditor {
     padding-left: 0;
   }
-}
-
-.richEditor-embedBarMobileBorder {
-  display: none;
-  border-style: solid;
 }
 
 body.isMobile .embedDialogue {

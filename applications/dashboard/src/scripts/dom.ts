@@ -470,48 +470,49 @@ function handleStickyHeaderState(element, data) {
     const goingDown = data.lastScrollPos < data.currentScrollPos;
     const isAtTopOfPage = data.currentScrollPos === 0;
     const elementHeight = element.offsetHeight;
-    const wayPointPosition = data.currentScrollPos - elementHeight;
     const isPastHeader = element.offsetTop + elementHeight <= data.currentScrollPos;
     const offsetPos = data.currentScrollPos - elementHeight;
-    const hasWaypoint = element.hasAttribute("data-waypoint");
-    const waypoint = hasWaypoint ? element.getAttribute("data-waypoint") : -1;
-    const pastWaypoint = waypoint >= data.currentScrollPos;
+    const currentElementTop = parseInt(element.style.top);
+    const waypoint = currentElementTop != "" ? currentElementTop : false;
 
     element.classList.toggle("isScrollingDown", goingDown);
     element.classList.toggle("isScrollingUp", !goingDown);
-    // element.classList.toggle("isFixed", !goingDown)
     element.classList.toggle("isAtTop", isAtTopOfPage);
 
     // element.offsetHeight
     if (goingDown) {
-        console.log("data.currentScrollPos:", data.currentScrollPos);
-        console.log("element.offsetTop:", element.offsetTop);
-        console.log("isPastHeader: ", isPastHeader);
+        // console.log("data.currentScrollPos:", data.currentScrollPos);
+        // console.log("element.offsetTop:", element.offsetTop);
+        // console.log("isPastHeader: ", isPastHeader);
 
         // element.style.top = `${offsetPos}px`;
         // element.setAttribute("data-waypoint", offsetPos);
 
         if (isAtTopOfPage) {
             element.style.top = "";
-            element.removeAttribute("data-waypoint");
             element.classList.remove("isFixed");
         } else {
-            console.log("isPastHeader: ", isPastHeader);
             element.classList.remove("isFixed");
-
             if (isPastHeader) {
                 element.style.top = `${offsetPos}px`;
-                element.setAttribute("data-waypoint", offsetPos);
+                // console.log("hereee 1");
             } else {
-                if (!hasWaypoint) {
-                    element.style.top = element.scrollTop;
+                if (waypoint > 0) {
+                    // console.log("hereee 2");
+                    element.style.top = `${element.scrollTop}px`;
                     element.setAttribute("data-waypoint", element.scrollTop);
+                } else {
+                    // console.log("hereee 3");
                 }
             }
         }
     } else {
         // going up
-        if (pastWaypoint) {
+
+        console.log("waypoint: ", waypoint);
+        console.log("data.currentScrollPos: ", data.currentScrollPos);
+
+        if (waypoint && data.currentScrollPos <= waypoint) {
             element.style.top = "";
             element.classList.add("isFixed");
         }

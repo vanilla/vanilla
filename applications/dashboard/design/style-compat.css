@@ -613,7 +613,6 @@ label.checkbox input.checkbox-input {
   position: relative;
   display: block;
   width: 100%;
-  height: 63px;
 }
 
 .stickyHeader {
@@ -622,7 +621,6 @@ label.checkbox input.checkbox-input {
   left: 0;
   display: block;
   z-index: 100;
-  height: 63px;
 }
 
 .stickyHeader.isAtTop {

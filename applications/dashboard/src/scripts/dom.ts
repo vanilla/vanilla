@@ -467,7 +467,7 @@ export function watchFocusInDomTree(rootNode: Element, callback: (hasFocus: bool
  * Sticky header handling
  */
 function handleStickyHeaderState(element, data) {
-    const goingDown = data.lastScrollPos <= data.currentScrollPos;
+    const goingDown = data.lastScrollPos < data.currentScrollPos;
     const isAtTopOfPage = data.currentScrollPos === 0;
     const elementHeight = element.offsetHeight;
     const isPastHeader =
@@ -502,7 +502,7 @@ function handleStickyHeaderState(element, data) {
 export function stickyHeader() {
     const header = document.querySelector(".stickyHeader");
     if (header !== null) {
-        let currentScrollPos = document.documentElement.scrollTop || 0;
+        let currentScrollPos = Math.max(window.scrollY, 0);
         let lastScrollPos = -1;
 
         handleStickyHeaderState(header, {
@@ -515,7 +515,7 @@ export function stickyHeader() {
                 () => {
                     window.requestAnimationFrame(data => {
                         lastScrollPos = currentScrollPos;
-                        currentScrollPos = window.scrollY;
+                        currentScrollPos = Math.max(window.scrollY, 0);
                         handleStickyHeaderState(header, {
                             currentScrollPos,
                             lastScrollPos,

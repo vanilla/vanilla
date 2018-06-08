@@ -20,7 +20,7 @@ class SoundCloudEmbed extends Embed {
     public function __construct() {
         parent::__construct('soundcloud', 'image');
     }
-//https://soundcloud.com/octobersveryown/drake-im-upset
+
     /**
      * @inheritdoc
      *
@@ -36,7 +36,7 @@ class SoundCloudEmbed extends Embed {
                 $data = $this->parseResponseHtml($oembedData['html']);
             }
         }
-
+        $data['attributes']['url'] = htmlspecialchars("https://w.soundcloud.com/player/?url=https://api.soundcloud.com/tracks/");
         $data['height'] = $oembedData['height'];
 
         return $data;
@@ -47,29 +47,36 @@ class SoundCloudEmbed extends Embed {
      *
      */
     public function renderData(array $data): string {
+        $height = htmlspecialchars($data['height']);
+        $track = htmlspecialchars($data['attributes']['track']);
+        $showArtwork = htmlspecialchars($data['attributes']['showArtwork']);
+        $visual = htmlspecialchars($data['attributes']['visual']);
+        $url = htmlspecialchars($data['attributes']['url']);
+
         $result = <<<HTML
-<div class="embed-image embed embedImage">
-<iframe width="100%" height="{$data['height']}" scrolling="no" frameborder="no" 
-    src="https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/tracks/{$data['attributes']['track']}&show_artwork={$data['attributes']['showArtwork']}&visual=true"></iframe>
-</div>
+<iframe width="100%" height="{$height}" scrolling="no" frameborder="no" 
+    src="{$url}{$track}&show_artwork={$showArtwork}&visual={$visual}">
+</iframe>
 HTML;
-
          return $result;
-
-
     }
 
     public function parseResponseHtml(string $html): array {
         $data = [];
         preg_match('/(visual=(?<visual>true))/i', $html,$showVisual );
-        $data['attributes']['visual'] = $showVisual['visual'];
-        preg_match('/(show_artwork=(?<artwork>true))i', $html,$showArtwork );
-        $data['attributes']['showArtwork'] = $showArtwork['artwork'];
+        if ($showVisual) {
+            $data['attributes']['visual'] = $showVisual['visual'];
+        }
+        preg_match('/(show_artwork=(?<artwork>true))/i', $html,$showArtwork );
+        if ($showArtwork) {
+            $data['attributes']['showArtwork'] = $showArtwork['artwork'];
+        }
         preg_match('/(?<=2F)(?<track>\d+)(&)/', $html, $trackNumber);
-        $data['attributes']['track'] = $trackNumber['track'];
+        if ($trackNumber) {
+            $data['attributes']['track'] = $trackNumber['track'];
+        }
 
         return $data;
-
     }
 
 }

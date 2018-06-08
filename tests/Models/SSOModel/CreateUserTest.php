@@ -8,11 +8,12 @@
 namespace VanillaTests\Models\SSOModel;
 
 use Garden\Schema\ValidationException;
-use VanillaTests\SharedBootstrapTestCase;
+use Vanilla\Models\AuthenticatorModel;
 use Vanilla\Models\SSOData;
 use Vanilla\Models\SSOModel;
-use VanillaTests\Fixtures\MockSSOAuthenticator;
+use VanillaTests\Fixtures\Authenticator\MockSSOAuthenticator;
 use VanillaTests\SetsGeneratorTrait;
+use VanillaTests\SharedBootstrapTestCase;
 use VanillaTests\SiteTestTrait;
 
 /**
@@ -69,9 +70,12 @@ class CreateUserTest extends SharedBootstrapTestCase {
      * @param $options
      * @param $expectedResult
      *
-     * @throws \ErrorException
      * @throws \Garden\Container\ContainerException
      * @throws \Garden\Container\NotFoundException
+     * @throws \Garden\Schema\ValidationException
+     * @throws \Garden\Web\Exception\ClientException
+     * @throws \Garden\Web\Exception\NotFoundException
+     * @throws \Garden\Web\Exception\ServerException
      */
     public function testCreateUser($configurations, $ssoDataArray, $options, $expectedResult) {
         /** @var \Gdn_Configuration $config */
@@ -81,13 +85,27 @@ class CreateUserTest extends SharedBootstrapTestCase {
             $config->set($name, $value);
         }
 
+        $ssoData = SSOData::fromArray($ssoDataArray);
+
+        /** @var \Vanilla\Models\AuthenticatorModel $authenticatorModel */
+        $authenticatorModel = $this->container()->get(AuthenticatorModel::class);
+        $authenticator = $authenticatorModel->createSSOAuthenticatorInstance([
+            'authenticatorID' => $ssoData->getAuthenticatorID(),
+            'type' => $ssoData->getAuthenticatorType(),
+            'SSOData' => json_decode(json_encode($ssoData), true),
+        ]);
+
         if (isset($expectedResult['exception'])) {
             $this->expectException($expectedResult['exception']);
         }
 
-        $result = self::$ssoModel->createUser(SSOData::fromArray($ssoDataArray), $options);
+        try {
+            $result = self::$ssoModel->createUser($ssoData, $options);
+            $expectedResult['dataCallback']($result);
+        } finally {
+            $authenticatorModel->deleteSSOAuthenticatorInstance($authenticator);
+        }
 
-        $expectedResult['dataCallback']($result);
     }
 
 

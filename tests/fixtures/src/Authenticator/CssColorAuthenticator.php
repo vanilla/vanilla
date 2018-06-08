@@ -5,7 +5,7 @@
  * @license https://opensource.org/licenses/GPL-2.0 GPL-2.0
  */
 
-namespace VanillaTests\Fixtures;
+namespace VanillaTests\Fixtures\Authenticator;
 
 use Garden\Web\RequestInterface;
 use Vanilla\Authenticator\Authenticator;
@@ -17,6 +17,9 @@ use Vanilla\Authenticator\Exception;
 class CssColorAuthenticator extends Authenticator {
 
     const DEFAULT_CSS_COLOR = '#FFFFFF';
+
+    /** @var bool */
+    protected $active = true;
 
     /** @var array */
     protected $data = [];
@@ -32,6 +35,22 @@ class CssColorAuthenticator extends Authenticator {
     }
 
     /**
+     * @inheritDoc
+     */
+    public function isActive(): bool {
+        return $this->active;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function setActive(bool $active) {
+        $this->active = $active;
+
+        return $this;
+    }
+
+    /**
      * Set the current cssColor
      *
      * @param $color
@@ -44,7 +63,7 @@ class CssColorAuthenticator extends Authenticator {
      * Reset the current cssColor.
      */
     public static function resetColor() {
-        self::$cssColor = self::DEFAULT_CSS_COLOR
+        self::$cssColor = self::DEFAULT_CSS_COLOR;
     }
 
     /**

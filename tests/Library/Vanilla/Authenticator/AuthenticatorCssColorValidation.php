@@ -7,23 +7,17 @@
 
 namespace VanillaTests\Library\Vanilla;
 
-use Garden\Container\Container;
-use VanillaTests\SharedBootstrapTestCase;
+use PHPUnit\Framework\TestCase;
 use Vanilla\Authenticator\Authenticator;
 use Vanilla\Models\AuthenticatorModel;
-use VanillaTests\Bootstrap;
-use VanillaTests\Fixtures\CssColorAuthenticator;
+use VanillaTests\BootstrapTrait;
+use VanillaTests\Fixtures\Authenticator\CssColorAuthenticator;
 
 /**
  * Class AuthenticatorCssColorValidation.
  */
-class AuthenticatorCssColorValidation extends SharedBootstrapTestCase {
-
-    /** @var Bootstrap */
-    private static $bootstrap;
-
-    /** @var Container */
-    private static $container;
+class AuthenticatorCssColorValidation extends TestCase {
+    use BootstrapTrait;
 
     /** @var AuthenticatorModel */
     private static $authenticatorModel;
@@ -32,14 +26,9 @@ class AuthenticatorCssColorValidation extends SharedBootstrapTestCase {
      * @inheritdoc
      */
     public static function setUpBeforeClass() {
-        parent::setUpBeforeClass();
+        BootstrapTrait::setUpBeforeClass();
 
-        // Set up the dependency injection container.
-        self::$container = $container = new Container();
-        self::$bootstrap = new Bootstrap();
-        self::$bootstrap->run($container);
-
-        self::$authenticatorModel = self::$container->get(AuthenticatorModel::class);
+        self::$authenticatorModel = self::container()->get(AuthenticatorModel::class);
         self::$authenticatorModel->registerAuthenticatorClass(CssColorAuthenticator::class);
     }
 
@@ -47,9 +36,7 @@ class AuthenticatorCssColorValidation extends SharedBootstrapTestCase {
      * @inheritdoc
      */
     public static function tearDownAfterClass() {
-        self::$bootstrap->cleanup(self::$container);
-
-        parent::tearDownAfterClass();
+        BootstrapTrait::tearDownAfterClass();
     }
 
     /**
@@ -64,15 +51,17 @@ class AuthenticatorCssColorValidation extends SharedBootstrapTestCase {
     /**
      * Test valid/supported css colors.
      *
-     * @param $color
-     *
      * @dataProvider validCssColorsProvider
+     *
+     * @param $color
      *
      * @throws \Garden\Container\ContainerException
      * @throws \Garden\Container\NotFoundException
      * @throws \Garden\Schema\ValidationException
+     * @throws \Garden\Web\Exception\ClientException
      * @throws \Garden\Web\Exception\NotFoundException
      * @throws \Garden\Web\Exception\ServerException
+     *
      */
     public function testValidColors($color = null) {
         CssColorAuthenticator::setCssColor($color);
@@ -87,15 +76,17 @@ class AuthenticatorCssColorValidation extends SharedBootstrapTestCase {
     /**
      * Test invalid/unsupported css colors.
      *
-     * @param $color
-     *
      * @dataProvider invalidCssColorsProvider
      * @expectedException  \Garden\Schema\ValidationException
      *
+     * @param $color
+     *
      * @throws \Garden\Container\ContainerException
      * @throws \Garden\Container\NotFoundException
+     * @throws \Garden\Web\Exception\ClientException
      * @throws \Garden\Web\Exception\NotFoundException
      * @throws \Garden\Web\Exception\ServerException
+     *
      */
     public function testInvalidColors($color = null) {
         CssColorAuthenticator::setCssColor($color);

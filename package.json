@@ -30,6 +30,7 @@
         "validator": "10.2.0"
     },
     "devDependencies": {
+        "@types/react-virtualized": "9.18.3",
         "@types/chai": "4.1.3",
         "@types/chai-as-promised": "7.1.0",
         "@types/classnames": "2.2.3",
@@ -80,7 +81,7 @@
         "test": "karma start ./tests/javascript/karma.conf.js --single-run",
         "test:watch": "karma start ./tests/javascript/karma.conf.js",
         "test:debug": "karma start ./tests/javascript/karma.conf.js --browsers ChromeDebug",
-        "lint:ts": "tslint -c ./.tslint.js -e './**/node_modules/**' -e './**/src/**/*.{js,jsx}' -p ./tsconfig.json -t stylish",
-        "lint:ts:fix": "tslint -c ./.tslint.js -e './**/node_modules/**' -e './**/src/**/*.{js,jsx}' -p ./tsconfig.json -t stylish --fix"
+        "lint:ts": "tslint -c ./tslint.json -e './**/node_modules/**' -e './**/src/**/*.{js,jsx}' -p ./tsconfig.json -t stylish",
+        "lint:ts:fix": "tslint -c ./tslint.json -e './**/node_modules/**' -e './**/src/**/*.{js,jsx}' -p ./tsconfig.json -t stylish --fix"
     }
 }

@@ -200,7 +200,7 @@ class SSOData implements \JsonSerializable {
 
         $invalidProperties = [];
         foreach ($required as $name) {
-            if ($this->$name === null) {
+            if ($this->$name === '') {
                 $invalidProperties[] = $name;
             }
         }
@@ -220,9 +220,9 @@ class SSOData implements \JsonSerializable {
      */
     public static function fromArray(array $array): SSOData {
         $ssoData = new SSOData(
-            array_key_exists('authenticatorType', $array) ? $array['authenticatorType'] : null,
-            array_key_exists('authenticatorID', $array) ? $array['authenticatorID'] : null,
-            array_key_exists('uniqueID', $array) ? $array['uniqueID'] : null,
+            array_key_exists('authenticatorType', $array) ? $array['authenticatorType'] : '',
+            array_key_exists('authenticatorID', $array) ? $array['authenticatorID'] : '',
+            array_key_exists('uniqueID', $array) ? $array['uniqueID'] : '',
             array_key_exists('user', $array) ? $array['user'] : [],
             array_key_exists('extra', $array) ? $array['extra'] : []
         );

@@ -7,9 +7,10 @@
 
 namespace VanillaTests\APIv2\Authenticate;
 
+use Vanilla\Models\AuthenticatorModel;
 use Vanilla\Models\SSOData;
 use VanillaTests\APIv2\AbstractAPIv2Test;
-use VanillaTests\Fixtures\MockSSOAuthenticator;
+use VanillaTests\Fixtures\Authenticator\MockSSOAuthenticator;
 
 /**
  * Test the /api/v2/authenticate endpoints.
@@ -38,9 +39,7 @@ class AutoConnectTest extends AbstractAPIv2Test {
      */
     public static function setupBeforeClass() {
         parent::setupBeforeClass();
-        self::container()
-            ->rule(MockSSOAuthenticator::class)
-            ->setAliasOf('MockSSOAuthenticator');
+        self::container()->rule(MockSSOAuthenticator::class);
 
         self::$config = self::container()->get('Config');
     }
@@ -63,12 +62,28 @@ class AutoConnectTest extends AbstractAPIv2Test {
         $userFragment = $usersAPIController->post($userData)->getData();
         $this->currentUser = array_merge($userFragment, $userData);
 
-        $this->authenticator = new MockSSOAuthenticator($uniqueID, $userData);
+        /** @var \Vanilla\Models\AuthenticatorModel $authenticatorModel */
+        $authenticatorModel = $this->container()->get(AuthenticatorModel::class);
 
-        $this->container()->setInstance('MockSSOAuthenticator', $this->authenticator);
+        $authType = MockSSOAuthenticator::getType();
+        $this->authenticator = $authenticatorModel->createSSOAuthenticatorInstance([
+            'authenticatorID' => $authType,
+            'type' => $authType,
+            'SSOData' => json_decode(json_encode(new SSOData($authType, $authType, $uniqueID, $userData)), true),
+        ]);
 
         $session = $this->container()->get(\Gdn_Session::class);
         $session->end();
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function tearDown() {
+        /** @var \Vanilla\Models\AuthenticatorModel $authenticatorModel */
+        $authenticatorModel = $this->container()->get(AuthenticatorModel::class);
+
+        $authenticatorModel->deleteSSOAuthenticatorInstance($this->authenticator);
     }
 
     /**

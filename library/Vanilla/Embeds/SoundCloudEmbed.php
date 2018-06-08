@@ -26,7 +26,8 @@ class SoundCloudEmbed extends Embed {
      *
      */
     function matchUrl(string $url) {
-        $data = null;
+        $data = [];
+        $oembedData =[];
         $encodedUrl = urlencode($url);
 
         if ($this->isNetworkEnabled()) {
@@ -36,8 +37,12 @@ class SoundCloudEmbed extends Embed {
                 $data = $this->parseResponseHtml($oembedData['html']);
             }
         }
+
         $data['attributes']['url'] = htmlspecialchars("https://w.soundcloud.com/player/?url=https://api.soundcloud.com/tracks/");
-        $data['height'] = $oembedData['height'];
+
+        if (array_key_exists('height', $oembedData)) {
+            $data['height'] = $oembedData['height'];
+        }
 
         return $data;
     }
@@ -54,16 +59,18 @@ class SoundCloudEmbed extends Embed {
         $url = htmlspecialchars($data['attributes']['url']);
 
         $result = <<<HTML
+<div class="embed embedSoundCloud">
 <iframe width="100%" height="{$height}" scrolling="no" frameborder="no" 
     src="{$url}{$track}&show_artwork={$showArtwork}&visual={$visual}">
 </iframe>
+</div>
 HTML;
          return $result;
     }
 
     /**
      *  Parses the oembed repsonse html for permalink and other data.
-     * 
+     *
      * @param string $html
      * @return array $data
      */

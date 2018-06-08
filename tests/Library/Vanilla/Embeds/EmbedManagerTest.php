@@ -8,8 +8,10 @@ namespace VanillaTests\Library\Vanilla\Embeds;
 
 use Exception;
 use Garden\Http\HttpRequest;
+use Vanilla\Embeds\SoundCloudEmbed;
 use VanillaTests\SharedBootstrapTestCase;
 use Vanilla\Embeds\EmbedManager;
+use Vanilla\Embeds\InstagramEmbed;
 use Vanilla\Embeds\LinkEmbed;
 use Vanilla\Embeds\ImageEmbed;
 use Vanilla\Embeds\TwitterEmbed;
@@ -31,6 +33,8 @@ class EmbedManagerTest extends SharedBootstrapTestCase {
             ->addEmbed(new TwitterEmbed())
             ->addEmbed(new YouTubeEmbed())
             ->addEmbed(new VimeoEmbed())
+            ->addEmbed(new InstagramEmbed())
+            ->addEmbed(new SoundCloudEmbed())
             ->addEmbed(new ImageEmbed(), EmbedManager::PRIORITY_LOW)
             ->setNetworkEnabled(false);
         return $embedManager;
@@ -80,6 +84,46 @@ class EmbedManagerTest extends SharedBootstrapTestCase {
         </div>
     </article>
 </a>'
+            ],
+            [
+                [
+                    "url" =>"https://www.instagram.com/p/BizC-PPFK1m",
+                    "type" =>"instagram",
+                    'name' => null,
+                    'body' => null,
+                    'photoUrl' => null,
+                    'height' => null,
+                    'width' => null,
+                    'attributes' => [
+                        'permaLink' => 'https://www.instagram.com/p/BizC-PPFK1m',
+                        'isCaptioned' => true,
+                        'versionNumber' => "8"
+                    ],
+                ],
+'<div class="embed embedInstagram">
+    <blockquote class="instagram-media" data-instgrm-captioned data-instgrm-permalink="https://www.instagram.com/p/BizC-PPFK1m" data-instgrm-version="8"/>
+</div>'
+            ],            [
+                [
+                    "url" =>"https://soundcloud.com/syrebralvibes/the-eden-project-circles",
+                    "type" =>"soundcloud",
+                    'name' => null,
+                    'body' => null,
+                    'photoUrl' => null,
+                    'height' => 400,
+                    'width' => null,
+                    'attributes' => [
+                        'visual' => "true",
+                        'showArtwork' => "true",
+                        'track' => "2F174656930",
+                        'url' => "https://w.soundcloud.com/player/?url=https://api.soundcloud.com/tracks/"
+                    ],
+                ],
+'<div class="embed embedSoundCloud">
+<iframe width="100%" height="400" scrolling="no" frameborder="no" 
+    src="https://w.soundcloud.com/player/?url=https://api.soundcloud.com/tracks/2F174656930&show_artwork=true&visual=true">
+</iframe>
+</div>'
             ],
             [
                 [

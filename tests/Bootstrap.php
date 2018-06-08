@@ -20,8 +20,8 @@ use Vanilla\Authenticator\PasswordAuthenticator;
 use Vanilla\InjectableInterface;
 use Vanilla\Models\AuthenticatorModel;
 use Vanilla\Models\SSOModel;
-use VanillaTests\Fixtures\MockAuthenticator;
-use VanillaTests\Fixtures\MockSSOAuthenticator;
+use VanillaTests\Fixtures\Authenticator\MockAuthenticator;
+use VanillaTests\Fixtures\Authenticator\MockSSOAuthenticator;
 use VanillaTests\Fixtures\NullCache;
 
 /**
@@ -232,6 +232,8 @@ class Bootstrap {
             ->addCall('addEmbed', [new Reference(\Vanilla\Embeds\TwitterEmbed::class)])
             ->addCall('addEmbed', [new Reference(\Vanilla\Embeds\YouTubeEmbed::class)])
             ->addCall('addEmbed', [new Reference(\Vanilla\Embeds\VimeoEmbed::class)])
+            ->addCall('addEmbed', [new Reference(\Vanilla\Embeds\InstagramEmbed::class)])
+            ->addCall('addEmbed', [new Reference(\Vanilla\Embeds\SoundCloudEmbed::class)])
             ->addCall('addEmbed', [new Reference(\Vanilla\Embeds\ImageEmbed::class), \Vanilla\Embeds\EmbedManager::PRIORITY_LOW])
             ->addCall('setNetworkEnabled', [false])
             ->setShared(true)

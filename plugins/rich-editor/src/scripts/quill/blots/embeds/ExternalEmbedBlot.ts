@@ -37,7 +37,9 @@ export default class ExternalEmbedBlot extends FocusableEmbedBlot {
      * Asynchronously create an embed blot. Feel free take your time, a loading indicator will be displayed
      * until this function resolves. It's also responsible for handling errors, and will return an error blot instead if one occurs.
      */
-    public static async createAsync(dataPromise: Promise<IEmbedData> | IEmbedData): Promise<Blot> {
+    public static async createAsync(
+        dataPromise: Promise<IEmbedData> | IEmbedData,
+    ): Promise<ExternalEmbedBlot | ErrorBlot> {
         let data;
         try {
             data = await dataPromise;

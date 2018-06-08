@@ -29,7 +29,6 @@ interface IState {
     showFormatMenu: boolean;
     showLinkMenu: boolean;
     hasFocus: boolean;
-    quillHasFocus: boolean;
 }
 
 export class InlineToolbar extends React.Component<IProps, IState> {
@@ -54,7 +53,6 @@ export class InlineToolbar extends React.Component<IProps, IState> {
                 length: 0,
             },
             hasFocus: false,
-            quillHasFocus: false,
             showFormatMenu: false,
             showLinkMenu: false,
         };
@@ -67,7 +65,7 @@ export class InlineToolbar extends React.Component<IProps, IState> {
             </span>
         ) : null;
 
-        const hasFocus = !!(this.state.hasFocus || this.state.cachedRange);
+        const hasFocus = !!(this.state.hasFocus || (this.state.cachedRange && this.quill.hasFocus()));
 
         return (
             <div ref={this.selfRef}>
@@ -127,6 +125,8 @@ export class InlineToolbar extends React.Component<IProps, IState> {
             this.reset();
         } else if (hasFocus) {
             this.setState({ hasFocus });
+        } else {
+            this.forceUpdate();
         }
     };
 
@@ -169,20 +169,18 @@ export class InlineToolbar extends React.Component<IProps, IState> {
                 this.clearLinkInput();
             } else if (this.state.showFormatMenu) {
                 event.preventDefault();
-                this.reset();
+                this.reset(true);
             }
         }
     };
 
-    private reset = () => {
-        if (this.state.cachedRange) {
-            const { activeElement } = document;
+    private reset = (clearSelection: boolean = false) => {
+        if (clearSelection && this.state.cachedRange) {
             this.quill.setSelection(
                 this.state.cachedRange.length + this.state.cachedRange.index,
                 0,
                 Emitter.sources.USER,
             );
-            (activeElement as any).focus();
         }
 
         this.setState({

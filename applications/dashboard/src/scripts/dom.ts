@@ -81,12 +81,12 @@ export function getFormData(formElement) {
         return {};
     }
 
-    const data = new FormData(formElement);
+    const data = new FormData(formElement) as any;
     const result = {};
 
-    for (const [key, value] of data.entries()) {
+    data.forEach((key, value) => {
         result[key] = value;
-    }
+    });
 
     return result;
 }
@@ -291,7 +291,7 @@ const loadEventCallbacks: WeakMap<Node, Array<(event) => void>> = new WeakMap();
  * Dynamically load a javascript file.
  */
 export function ensureScript(scriptUrl: string) {
-    return new Promise(resolve => {
+    return new Promise((resolve, reject) => {
         const existingScript: HTMLScriptElement | null = document.querySelector(`script[src='${scriptUrl}']`);
         if (existingScript) {
             if (loadEventCallbacks.has(existingScript)) {
@@ -308,6 +308,13 @@ export function ensureScript(scriptUrl: string) {
             const script = document.createElement("script");
             script.type = "text/javascript";
             script.src = scriptUrl;
+            script.onerror = err => {
+                reject(err);
+            };
+
+            setTimeout(() => {
+                reject(`Loading of the script ${scriptUrl} has timed out.`);
+            }, 10000);
 
             loadEventCallbacks.set(script, [resolve]);
 
@@ -406,15 +413,41 @@ export function getNextTabbableElement(options?: Partial<ITabbableOptions>): HTM
     return tabbables[targetIndex] || null;
 }
 
+function checkDomTreeWasClicked(rootNode: Element | null, clickedElement: Element) {
+    return rootNode && clickedElement && (rootNode.contains(clickedElement as Element) || rootNode === clickedElement);
+}
+
 /**
  * Determine if the currently focused element is somewhere inside of (or the same as)
  * a given Element.
  *
  * @param rootNode - The root node to look in.
  */
-function domTreeHasFocus(rootNode: Element | null) {
-    const { activeElement } = document;
-    return rootNode && (activeElement === rootNode || rootNode.contains(activeElement));
+function checkDomTreeHasFocus(rootNode: Element | null, event: FocusEvent, callback: (hasFocus: boolean) => void) {
+    setTimeout(() => {
+        const possibleTargets = [
+            // NEEDS TO COME FIRST, because safari will populate relatedTarget on focusin, and its not what we're looking for.
+            document.activeElement, // IE11, Safari.
+            event.relatedTarget as Element, // Chrome (The actual standard)
+            (event as any).explicitOriginalTarget, // Firefox
+        ];
+
+        let activeElement = null;
+        for (const target of possibleTargets) {
+            if (target && target !== document.body) {
+                activeElement = target;
+                break;
+            }
+        }
+
+        if (activeElement !== null) {
+            const hasFocus =
+                rootNode && activeElement && (activeElement === rootNode || rootNode.contains(activeElement));
+
+            // We will only invalidate based on something actually getting focus.
+            callback(!!hasFocus);
+        }
+    }, 0);
 }
 
 /**
@@ -430,22 +463,30 @@ function domTreeHasFocus(rootNode: Element | null) {
  */
 export function watchFocusInDomTree(rootNode: Element, callback: (hasFocus: boolean) => void) {
     rootNode.addEventListener(
-        "blur",
+        "focusout",
         (event: FocusEvent) => {
-            setImmediate(() => {
-                !domTreeHasFocus(rootNode) && callback(false);
+            checkDomTreeHasFocus(rootNode, event, hasFocus => {
+                !hasFocus && callback(false);
             });
         },
         true,
     );
 
     rootNode.addEventListener(
-        "focus",
+        "focusin",
         (event: FocusEvent) => {
-            setImmediate(() => {
-                domTreeHasFocus(rootNode) && callback(true);
+            checkDomTreeHasFocus(rootNode, event, hasFocus => {
+                hasFocus && callback(true);
             });
         },
         true,
     );
+
+    document.addEventListener("click", event => {
+        const triggeringElement = event.target as Element;
+        const wasClicked = checkDomTreeWasClicked(rootNode, triggeringElement);
+        if (!wasClicked) {
+            callback(false);
+        }
+    });
 }

@@ -7,13 +7,13 @@
 
 namespace VanillaTests\Library\Vanilla;
 
-use PHPUnit\Framework\TestCase;
+use VanillaTests\SharedBootstrapTestCase;
 use Vanilla\Attributes;
 
 /**
  * Tests for the **Attributes** class.
  */
-class AttributesTest extends TestCase {
+class AttributesTest extends SharedBootstrapTestCase {
     /**
      * Empty attributes should encode as a JSON object.
      */

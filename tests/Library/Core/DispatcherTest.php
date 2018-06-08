@@ -7,11 +7,11 @@
 
 namespace VanillaTests\Library\Core;
 
-use PHPUnit\Framework\TestCase;
+use VanillaTests\SharedBootstrapTestCase;
 use VanillaTests\Fixtures\FooBarController;
 use VanillaTests\Fixtures\UnitTestGdnDispatcher;
 
-class DispatcherTest extends TestCase {
+class DispatcherTest extends SharedBootstrapTestCase {
 
     /**
      * Test **Gdn_Dispatcher::filterName()**.

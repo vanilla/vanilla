@@ -7,16 +7,16 @@
 
 namespace VanillaTests\Models\SSOModel;
 
-use PHPUnit\Framework\TestCase;
+use VanillaTests\SharedBootstrapTestCase;
 use Vanilla\Models\SSOData;
 use Vanilla\Models\SSOModel;
-use VanillaTests\Fixtures\MockSSOAuthenticator;
+use VanillaTests\Fixtures\Authenticator\MockSSOAuthenticator;
 use VanillaTests\SiteTestTrait;
 
 /**
  * Class LinkUserFromCredentialsTest.
  */
-class LinkUserFromCredentialsTest extends TestCase {
+class LinkUserFromCredentialsTest extends SharedBootstrapTestCase {
     use SiteTestTrait {
         SiteTestTrait::setUpBeforeClass as siteSetUpBeforeClass;
     }

@@ -10,11 +10,13 @@ use PHPUnit\Framework\TestCase;
 use Gdn_Upload;
 use Vanilla\UploadedFile;
 use Vanilla\UploadedFileSchema;
+use VanillaTests\BootstrapTrait;
 
 /**
  * Tests for the **UploadedFileSchema** class.
  */
 class UploadedFileSchemaTest extends TestCase {
+    use BootstrapTrait;
 
     /**
      * Test an upload possessing an invalid file extension.

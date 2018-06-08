@@ -8,6 +8,7 @@
 namespace Vanilla\Authenticator;
 
 use Garden\Web\Exception\ServerException;
+use \Garden\Web\RequestInterface;
 
 
 /**
@@ -15,40 +16,51 @@ use Garden\Web\Exception\ServerException;
  */
 abstract class ShimAuthenticator extends Authenticator {
 
+    /**
+     * ShimAuthenticator constructor.
+     *
+     * @param string $authenticatorID
+     *
+     * @throws \Garden\Schema\ValidationException
+     */
     public function __construct(string $authenticatorID) {
         parent::__construct($authenticatorID);
     }
 
     /**
-     * {@link Authenticator::getRegisterUrl()}
+     * @inheritdoc
      */
     public function getRegisterUrl() {
         return null;
     }
 
     /**
-     * {@link Authenticator::getSignInUrl()}
+     * @inheritdoc
      */
     public function getSignInUrl() {
         return null;
     }
 
     /**
-     * {@link Authenticator::getSignOutUrl()}
+     * @inheritdoc
      */
     public function getSignOutUrl() {
         return null;
     }
 
-    /**
-     * {@link Authenticator::validateAuthentication()}
-     */
-    public function validateAuthenticationImpl(\Garden\Web\RequestInterface $request) {
-        throw new ServerException('Method not implemented', 501);
+    public function setActive(bool $active) {
+        throw new ServerException('Method not implemented.', 501);
     }
 
     /**
-     * {@link Authenticator::getAuthenticatorInfoImpl()}
+     * @inheritdoc
+     */
+    public function validateAuthenticationImpl(RequestInterface $request) {
+        throw new ServerException('Method not implemented.', 501);
+    }
+
+    /**
+     * @inheritdoc
      */
     protected function getAuthenticatorInfoImpl(): array {
         return [

@@ -7,12 +7,12 @@
 
 namespace VanillaTests\Library\Vanilla\Quill;
 
-use PHPUnit\Framework\TestCase;
+use VanillaTests\SharedBootstrapTestCase;
 use Vanilla\Quill\BlotGroup;
 use Vanilla\Quill\Blots\HeadingBlot;
 use Vanilla\Quill\Blots\TextBlot;
 
-class BlockTest extends TestCase {
+class BlockTest extends SharedBootstrapTestCase {
     public function testMakeEmptyBlock() {
         $block = BlotGroup::makeEmptyGroup();
 

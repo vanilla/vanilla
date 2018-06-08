@@ -40,7 +40,6 @@
         "@types/react": "16.3.14",
         "@types/react-dom": "16.0.5",
         "@types/react-router-dom": "4.2.6",
-        "@types/react-virtualized": "9.18.3",
         "@types/sinon": "5.0.0",
         "@types/sprintf-js": "1.1.0",
         "@types/validator": "9.4.1",
@@ -75,12 +74,13 @@
         "ts-node": "6.0.5",
         "tslint": "5.10.0",
         "typescript": "2.8.3",
-        "webpack": "4.9.1"
+        "webpack": "4.10.2"
     },
     "scripts": {
         "test": "karma start ./tests/javascript/karma.conf.js --single-run",
         "test:watch": "karma start ./tests/javascript/karma.conf.js",
-        "lint:ts": "tslint -c ./.tslint.js -e './**/node_modules/**' -e './**/src/**/*.{js,jsx}' -p ./tsconfig.json -t stylish",
-        "lint:ts:fix": "tslint -c ./.tslint.js -e './**/node_modules/**' -e './**/src/**/*.{js,jsx}' -p ./tsconfig.json -t stylish --fix"
+        "test:debug": "karma start ./tests/javascript/karma.conf.js --browsers ChromeDebug",
+        "lint:ts": "tslint -c ./tslint.json -e './**/node_modules/**' -e './**/src/**/*.{js,jsx}' -p ./tsconfig.json -t stylish",
+        "lint:ts:fix": "tslint -c ./tslint.json -e './**/node_modules/**' -e './**/src/**/*.{js,jsx}' -p ./tsconfig.json -t stylish --fix"
     }
 }

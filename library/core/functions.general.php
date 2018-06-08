@@ -132,6 +132,43 @@ if (!function_exists('arrayKeyExistsI')) {
     }
 }
 
+if (!function_exists('arrayPathExists')) {
+    /**
+     * Whether a sequence of keys (path) exists or not in an array.
+     *
+     * This function should only be used if isset($array[$key1][$key2]) cannot be used because the value could be null.
+     *
+     * @param array $keys The sequence of keys (path) to test against the array.
+     * @param array $array The array to search.
+     * @param mixed $value The path value.
+     *
+     * @return bool Returns true if the path exists in the array or false otherwise.
+     */
+    function arrayPathExists(array $keys, array $array, &$value = null) {
+        if (!count($keys) || !count($array)) {
+            return false;
+        }
+
+        $target = $array;
+        do {
+            $key = array_shift($keys);
+
+            if (array_key_exists($key, $target)) {
+                $target = $target[$key];
+            } else {
+                return false;
+            }
+        } while (($countKeys = count($keys)) && is_array($target));
+
+        $found = $countKeys === 0;
+        if ($found) {
+            $value = $target;
+        }
+
+        return $found;
+    }
+}
+
 if (!function_exists('arrayReplaceConfig')) {
     /**
      * Replaces elements from an override array into a default array recursively, overwriting numeric arrays entirely.
@@ -3516,7 +3553,7 @@ if (!function_exists('safeURL')) {
      *
      * "Safe" means that the domain of the URL is trusted.
      *
-     * @param $destination Destination URL or path.
+     * @param string $destination Destination URL or path.
      * @return string The destination if safe, /home/leaving?Target=$destination if not.
      */
     function safeURL($destination) {

@@ -10,14 +10,14 @@ namespace VanillaTests\Library\Garden\Web;
 use Garden\Web\Data;
 use Garden\Web\Dispatcher;
 use Garden\Web\RequestInterface;
-use PHPUnit\Framework\TestCase;
+use VanillaTests\SharedBootstrapTestCase;
 use VanillaTests\Fixtures\Request;
 use VanillaTests\Fixtures\ExactRoute;
 
 /**
  * Test methods on the Dispatcher class.
  */
-class DispatcherTest extends TestCase {
+class DispatcherTest extends SharedBootstrapTestCase {
     /**
      * Test Dispatcher::callMiddlewares().
      */

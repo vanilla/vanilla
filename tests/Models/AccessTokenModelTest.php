@@ -7,14 +7,14 @@
 
 namespace VanillaTests\Models;
 
-use PHPUnit\Framework\TestCase;
+use VanillaTests\SharedBootstrapTestCase;
 use AccessTokenModel;
 use VanillaTests\SiteTestTrait;
 
 /**
  * Test the {@link AccessTokenModel}.
  */
-class AccessTokenModelTest extends TestCase {
+class AccessTokenModelTest extends SharedBootstrapTestCase {
     use SiteTestTrait;
 
     /**

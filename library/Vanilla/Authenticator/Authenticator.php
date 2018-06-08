@@ -13,6 +13,13 @@ use Garden\Schema\ValidationException;
 use Garden\Schema\ValidationField;
 use Garden\Web\RequestInterface;
 
+/**
+ * Class Authenticator
+ *
+ * Authenticators should be fetching their data on instanciation.
+ * Thus, extending classes will most likely require to have a dependency on some other classes like Gdn_Configuration
+ * or something that gives them access to the Database.
+ */
 abstract class Authenticator {
 
     /**
@@ -20,21 +27,19 @@ abstract class Authenticator {
      *
      * If the authenticator {@link isUnique()} the ID should match the {@link getType}.
      *
-     * Extending classes will most likely require to have a dependency on RequestInterface so that they can
-     * fetch the ID from the URL and throw an exception if it is not found or invalid.
-     *
      * @var string
      */
     private $authenticatorID;
 
-    /** @var bool Determine if this authenticator is active or not. */
-    private $active = true;
+    /** @var array Any extra attributes */
+    protected $attributes = [];
 
     /**
      * Authenticator constructor.
      *
      * @throws Exception
      * @throws ValidationException
+     *
      * @param string $authenticatorID
      */
     public function __construct($authenticatorID) {
@@ -54,23 +59,23 @@ abstract class Authenticator {
     }
 
     /**
-     * Get this authenticate Schema.
+     * Get this Authenticator schema.
      *
      * @return Schema
      */
     public static function getAuthenticatorSchema(): Schema {
-        return self::getAuthenticatorTypeSchema()->merge(
+        return static::getAuthenticatorTypeSchema()->merge(
             Schema::parse([
                 'authenticatorID:s' => 'Authenticator instance\'s identifier.',
                 'type' => null,
                 'name' => null,
-                'signInUrl:s|n' => 'The configured relative sign in URL of the provider.',
-                'registerUrl:s|n' => 'The configured relative register URL of the provider.',
-                'signOutUrl:s|n' => 'The configured relative sign out URL of the provider.',
+                'signInUrl:s' => 'The configured sign in URL of the provider.',
+                'signOutUrl:s|n' => 'The configured sign out URL of the provider.',
+                'registerUrl:s|n' => 'The configured register URL of the provider.',
                 'ui:o' => static::getUiSchema(),
                 'isActive:b' => 'Whether or not the Authenticator can be used.',
                 'isUnique' => null,
-                'attributes:o' => 'Provider specific attributes',
+                'attributes:o' => 'Authenticator specific attributes',
             ])
         );
     }
@@ -98,7 +103,8 @@ abstract class Authenticator {
      * @return array
      */
     protected static function getAuthenticatorTypeDefaultInfo(): array {
-        $type =  static::getType();
+        $type = static::getType();
+
         return [
             'type' => $type,
             'name' => ucfirst($type),
@@ -131,10 +137,10 @@ abstract class Authenticator {
             'type:s' => 'Authenticator instance\'s type.',
             'name:s' => 'User friendly name of the authenticator.',
             'ui:o' => Schema::parse([
-                    'photoUrl' => null,
-                    'backgroundColor' => null,
-                    'foregroundColor' => null,
-                ])
+                'photoUrl' => null,
+                'backgroundColor' => null,
+                'foregroundColor' => null,
+            ])
                 ->addValidator('backgroundColor', self::getCSSColorValidator())
                 ->addValidator('foregroundColor', self::getCSSColorValidator())
                 ->add(static::getUiSchema())
@@ -160,6 +166,7 @@ abstract class Authenticator {
     private static function getTypeImpl() {
         // return Type from "{Type}Authenticator"
         $classParts = explode('\\', static::class);
+
         return (string)substr(array_pop($classParts), 0, -strlen('Authenticator'));
     }
 
@@ -168,17 +175,16 @@ abstract class Authenticator {
      *
      * @return Schema
      */
-     public static function getUiSchema(): Schema {
+    public static function getUiSchema(): Schema {
         return Schema::parse([
-                'url:s' => 'Local relative URL from which you can initiate the SignIn process with this authenticator',
-                'buttonName:s' => 'The display text to put in the button. Ex: "Sign in with Facebook"',
-                'photoUrl:s|n' => 'The icon URL for the button.',
-                'backgroundColor:s|n' => 'A css color code for the background. (Hex color, rgb or rgba)',
-                'foregroundColor:s|n' => 'A css color code for the foreground. (Hex color, rgb or rgba)',
-            ])
+            'url:s' => 'Local relative URL from which you can initiate the SignIn process with this authenticator',
+            'buttonName:s' => 'The display text to put in the button. Ex: "Sign in with Facebook"',
+            'photoUrl:s|n' => 'The icon URL for the button.',
+            'backgroundColor:s|n' => 'A css color code for the background. (Hex color, rgb or rgba)',
+            'foregroundColor:s|n' => 'A css color code for the foreground. (Hex color, rgb or rgba)',
+        ])
             ->addValidator('backgroundColor', self::getCSSColorValidator())
-            ->addValidator('foregroundColor', self::getCSSColorValidator())
-        ;
+            ->addValidator('foregroundColor', self::getCSSColorValidator());
     }
 
     /**
@@ -187,7 +193,7 @@ abstract class Authenticator {
      * @return \Closure
      */
     protected static function getCSSColorValidator() {
-        return function($data, ValidationField $field) {
+        return function ($data, ValidationField $field) {
             if ($data === null) {
                 return true;
             }
@@ -242,21 +248,16 @@ abstract class Authenticator {
      *
      * @return bool
      */
-    public function isActive(): bool {
-        return $this->active;
-    }
+    abstract public function isActive(): bool;
 
     /**
      * Setter of active.
      *
      * @param bool $active
+     *
      * @return $this
      */
-    public function setActive(bool $active) {
-        $this->active = $active;
-
-        return $this;
-    }
+    abstract public function setActive(bool $active);
 
     /**
      * Return authenticator default information.
@@ -276,7 +277,7 @@ abstract class Authenticator {
                 'url' => strtolower(url('/authenticate/signin/'.static::getType().'/'.$this->getID())),
             ],
             'isActive' => $this->isActive(),
-            'attributes' => [],
+            'attributes' => $this->attributes,
         ];
     }
 
@@ -292,7 +293,6 @@ abstract class Authenticator {
         $typeInfo = static::getAuthenticatorTypeInfo();
 
         return static::getAuthenticatorSchema()->validate(array_replace_recursive($defaults, $instanceInfo, $typeInfo));
-
     }
 
     /**
@@ -341,23 +341,27 @@ abstract class Authenticator {
      * Validate an authentication by using the request's data.
      *
      * @throws Exception Reason why the authentication failed.
+     *
      * @param RequestInterface $request
+     *
      * @return mixed The user's information.
      */
     final public function validateAuthentication(RequestInterface $request) {
-         if (!$this->isActive()) {
-             throw new Exception('Cannot authenticate with an inactive authenticator.');
-         }
+        if (!$this->isActive()) {
+            throw new Exception('Cannot authenticate with an inactive authenticator.');
+        }
 
-         return $this->validateAuthenticationImpl($request);
-     }
+        return $this->validateAuthenticationImpl($request);
+    }
 
     /**
      * {@link ValidateAuthentication} implementation.
      *
      * @throws Exception Reason why the authentication failed.
+     *
      * @param RequestInterface $request
+     *
      * @return array The user's information.
      */
-     abstract public function validateAuthenticationImpl(RequestInterface $request);
+    abstract public function validateAuthenticationImpl(RequestInterface $request);
 }

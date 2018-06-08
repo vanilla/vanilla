@@ -7,12 +7,12 @@
 
 namespace VanillaTests\Library\Core;
 
-use PHPUnit\Framework\TestCase;
+use VanillaTests\SharedBootstrapTestCase;
 
 /**
  * Test array functions.
  */
-class ArrayFunctionsTest extends TestCase {
+class ArrayFunctionsTest extends SharedBootstrapTestCase {
 
     /**
      * Test {@link flattenArray()}.
@@ -39,5 +39,74 @@ class ArrayFunctionsTest extends TestCase {
         ];
 
         return $r;
+    }
+
+    /**
+     * Test {@link testArrayPathExists()}.
+     *
+     * @dataProvider provideArrayPathExistsTests
+     *
+     * @param $keys
+     * @param $array
+     * @param $expectedResult
+     * @param $expectedValue
+     *
+     * @param $expected
+     */
+    public function testArrayPathExists($keys, $array, $expectedResult, $expectedValue) {
+        $this->assertEquals($expectedResult, arrayPathExists($keys, $array, $value));
+        $this->assertEquals($expectedValue, $value);
+    }
+
+    /**
+     * Provide test data for {@link arrayPathExists()}.
+     *
+     * @return array Returns an array of test data.
+     */
+    public function provideArrayPathExistsTests() {
+        return [
+            'noKeys' => [
+                [],
+                ['a' => ['aa' => null]],
+                false,
+                null,
+            ],
+            'noKeysWithNullTypeIndexOnFirstLevel' => [
+                [],
+                [null => true],
+                false,
+                null,
+            ],
+            'nullStringKeyWithNullTypeIndex' => [
+                ['a', 'null'],
+                ['a' => [null => null]],
+                false,
+                null,
+            ],
+            'nestedIsNotAnArray' => [
+                ['a', 'b', 'c'],
+                ['a' => ['b' => true, 'd' => ['c']]],
+                false,
+                null,
+            ],
+            'nullTypeKeyWithNullTypeIndex' => [
+                ['a', null],
+                ['a' => [null => null]],
+                true,
+                null,
+            ],
+            'nullStringKeyWithNullStringIndex' => [
+                ['a', 'null'],
+                ['a' => ['null' => 'Something']],
+                true,
+                'Something',
+            ],
+            'deeplyNested' => [
+                ['a', 'aa', 'aaa', 'aaaa'],
+                ['a' => ['aa' => ['aaa' => ['aaaa' => []]]]],
+                true,
+                [],
+            ],
+        ];
     }
 }

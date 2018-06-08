@@ -6,12 +6,12 @@
 
 namespace VanillaTests\Library\Vanilla;
 
-use PHPUnit\Framework\TestCase;
+use VanillaTests\SharedBootstrapTestCase;
 use DateTimeImmutable;
 use Garden\Schema\Schema;
 use Vanilla\DateFilterSchema;
 
-class DateFilterSchemaTest extends TestCase {
+class DateFilterSchemaTest extends SharedBootstrapTestCase {
 
     /**
      * Provide invalid date filter strings to test error conditions.

@@ -6,15 +6,15 @@
         {t c="richEditor.description.embed"}
     </p>
     <div class="richEditor-frame InputBox">
-        <div class="js-richText">
+        <div class="richEditor-textWrap js-richText">
             <div class="ql-editor richEditor-text userContent" data-gramm="false" contenteditable="true" data-placeholder="Create a new post..." tabindex="0"></div>
         </div>
-        <div class="js-InlineEditorToolbar u-hiddenOnFullScreenEditor"></div>
-        <div class="js-ParagraphEditorToolbar u-hiddenOnFullScreenEditor"></div>
+        <div class="js-InlineEditorToolbar u-richEditorHiddenOnMobile"></div>
+        <div class="js-ParagraphEditorToolbar u-richEditorHiddenOnMobile"></div>
         <div class="js-MentionModule"></div>
         <div class="richEditor-menu richEditor-embedBar">
             <ul class="richEditor-menuItems" role="menubar" aria-label="{t c="Inline Level Formatting Menu"}">
-                <li class="richEditor-menuItem u-hiddenOnFullScreenEditor" role="menuitem">
+                <li class="richEditor-menuItem u-richEditorHiddenOnMobile" role="menuitem">
                     <div class="js-emojiHandle emojiMenu">
                         <button class="richEditor-button richEditor-embedButton" type="button" aria-pressed="false">
                             <svg class="richEditorButton-icon" viewBox="0 0 24 24">
@@ -44,11 +44,6 @@
                             </svg>
                         </button>
                     </div>
-                </li>
-                <li class="richEditor-menuWideItem isRightAligned u-visibleOnFullScreenEditor" role="menuitem">
-                    <button class="richEditor-nextInput js-richEditor-next" title="{t c="Done writing Message, go to next field."}" aria-label="{t c="Done writing Message, go to next field."}" class="richEditor-textButton richEditor-done" type="button">
-                        {t c="Done"}
-                    </button>
                 </li>
             </ul>
         </div>

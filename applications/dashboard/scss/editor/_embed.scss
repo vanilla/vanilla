@@ -16,7 +16,10 @@ $embedded-linkTitle_lineHeight: 1.5 !default;
 $embedded-linkImage_width: 225px !default;
 $embedded-linkImage_mobileHeight: 52.5%;
 $embedded-linkImage_mobileWidth: 100px !default;
-$embedVideo_width: 640px;
+$embed_width: 640px;
+$embedVideo_width: $embed_width;
+$embedInstagram_width: $embed_width;
+$embedSoundCloud_width: $embed_width;
 $embed-spacing: 6px !default;
 $embed-focus-color: #0291DB;
 
@@ -248,13 +251,19 @@ $embed-focus-color: #0291DB;
 // Instagram:
 
 .embedExternal-content.embed-instagram {
-    width: $embedVideo_width;
+    width: $embedInstagram_width;
 }
 
 .instagram-media { // styles come from Instagram JS
     margin-bottom: 0 !important;
     width: 100% !important;
 }
+
+// SoundCloud:
+.embedExternal-content.embed-soundcloud {
+    width: $embedSoundCloud_width;
+}
+
 
 // External Embed
 .embedExternal {

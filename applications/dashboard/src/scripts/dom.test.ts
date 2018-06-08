@@ -519,19 +519,3 @@ describe("watchFocusInDomTree()", () => {
         expect(spy.calledOnceWith(false));
     });
 });
-
-
-// describe("stickyHeader()", () => {
-//     beforeEach(() => {
-//         document.body.innerHTML = `<div id="root" style="height: 200vh;">
-//             <div class="stickyHeader">Header</div>
-//         </div>`;
-//     });
-//
-//     it("initializes Vanilla's default sticky header", () => {
-//         //window.scrollBy
-//         //window.scrollTo
-//     });
-//
-//
-// });

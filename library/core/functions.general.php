@@ -1730,7 +1730,7 @@ if (!function_exists('getRecord')) {
                 break;
             case 'activity':
                 /** @var ActivityModel $activityModel */
-                $activityModel = $container->get(CommentModel::class);
+                $activityModel = $container->get(ActivityModel::class);
                 $row = $activityModel->getID($id, DATASET_TYPE_ARRAY);
                 if (!$activityModel->canView($row)) {
                     throw permissionException();

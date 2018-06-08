@@ -16,6 +16,11 @@ registerEmbed("instagram", renderInstagram);
  */
 async function convertInstagramEmbeds() {
     await ensureScript("//platform.instagram.com/en_US/embeds.js");
+
+    if (!window.instgrm) {
+        throw new Error("The Instagram post failed to load");
+    }
+
     window.instgrm.Embeds.process();
 }
 

@@ -12,6 +12,7 @@ import SignInPage from "./authenticate/SignInPage";
 import PasswordPage from "./authenticate/PasswordPage";
 import RecoverPasswordPage from "./authenticate/RecoverPasswordPage";
 import Router from "@dashboard/components/Router";
+import { stickyHeader } from "@dashboard/dom";
 
 // These imports are all responsible for initializing themselves.
 import "./user-content/emoji";
@@ -29,3 +30,5 @@ addRoutes([
     <Route exact path="/authenticate/password" component={PasswordPage} />,
     <Route exact path="/authenticate/recoverpassword" component={RecoverPasswordPage} />,
 ]);
+
+stickyHeader();

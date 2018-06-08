@@ -232,6 +232,7 @@ class Bootstrap {
             ->addCall('addEmbed', [new Reference(\Vanilla\Embeds\TwitterEmbed::class)])
             ->addCall('addEmbed', [new Reference(\Vanilla\Embeds\YouTubeEmbed::class)])
             ->addCall('addEmbed', [new Reference(\Vanilla\Embeds\VimeoEmbed::class)])
+            ->addCall('addEmbed', [new Reference(\Vanilla\Embeds\InstagramEmbed::class)])
             ->addCall('addEmbed', [new Reference(\Vanilla\Embeds\ImageEmbed::class), \Vanilla\Embeds\EmbedManager::PRIORITY_LOW])
             ->addCall('setNetworkEnabled', [false])
             ->setShared(true)

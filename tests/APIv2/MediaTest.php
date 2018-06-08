@@ -356,7 +356,7 @@ class MediaTest extends AbstractAPIv2Test {
                         'embedUrl' => 'https://www.youtube.com/embed/9bZkp7q19f0?feature=oembed&autoplay=1&start=182',
                     ],
                 ]
-            ]
+            ],
         ];
 
         return $urls;
@@ -371,7 +371,8 @@ class MediaTest extends AbstractAPIv2Test {
         $urls = [
             ['https://vimeo.com/251083506', 'vimeo'],
             ['https://youtube.com/watch?v=example', 'youtube'],
-            ['https://youtube.ca/watch?v=example', 'youtube']
+            ['https://youtube.ca/watch?v=example', 'youtube'],
+            ['https://www.instagram.com/p/BizC-PPFK1m', 'instagram'],
         ];
 
         return $urls;

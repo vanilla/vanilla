@@ -10,6 +10,7 @@ use Exception;
 use Garden\Http\HttpRequest;
 use VanillaTests\SharedBootstrapTestCase;
 use Vanilla\Embeds\EmbedManager;
+use Vanilla\Embeds\InstagramEmbed;
 use Vanilla\Embeds\LinkEmbed;
 use Vanilla\Embeds\ImageEmbed;
 use Vanilla\Embeds\TwitterEmbed;
@@ -31,6 +32,7 @@ class EmbedManagerTest extends SharedBootstrapTestCase {
             ->addEmbed(new TwitterEmbed())
             ->addEmbed(new YouTubeEmbed())
             ->addEmbed(new VimeoEmbed())
+            ->addEmbed(new InstagramEmbed())
             ->addEmbed(new ImageEmbed(), EmbedManager::PRIORITY_LOW)
             ->setNetworkEnabled(false);
         return $embedManager;
@@ -80,6 +82,25 @@ class EmbedManagerTest extends SharedBootstrapTestCase {
         </div>
     </article>
 </a>'
+            ],
+            [
+                [
+                    "url" =>"https://www.instagram.com/p/BizC-PPFK1m",
+                    "type" =>"instagram",
+                    'name' => null,
+                    'body' => null,
+                    'photoUrl' => null,
+                    'height' => null,
+                    'width' => null,
+                    'attributes' => [
+                        'permaLink' => 'https://www.instagram.com/p/BizC-PPFK1m',
+                        'isCaptioned' => true,
+                        'versionNumber' => "8"
+                    ],
+                ],
+'<div class="embed embedInstagram">
+    <blockquote class="instagram-media" data-instgrm-captioned data-instgrm-permalink="https://www.instagram.com/p/BizC-PPFK1m" data-instgrm-version="8"/>
+</div>'
             ],
             [
                 [

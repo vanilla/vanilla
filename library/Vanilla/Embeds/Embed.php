@@ -233,7 +233,7 @@ abstract class Embed implements InjectableInterface {
         $responseBody = $response->getBody();
         if (is_array($responseBody)) {
             $validAttributes = ['type', 'version', 'title', 'author_name', 'author_url', 'provider_name', 'provider_url',
-                'cache_age', 'thumbnail_url', 'thumbnail_width', 'thumbnail_height'];
+                'cache_age', 'thumbnail_url', 'thumbnail_width', 'thumbnail_height', 'html'];
 
             $type = $responseBody['type'] ?? null;
             switch ($type) {

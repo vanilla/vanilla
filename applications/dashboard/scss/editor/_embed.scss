@@ -163,8 +163,7 @@ $embed-focus-color: #0291DB;
 }
 
 // Video
-
-.embedVideo {
+.embedExternal-content.embedVideo {
     position: relative;
     display: block;
     width: $embedVideo_width;
@@ -244,6 +243,17 @@ $embed-focus-color: #0291DB;
 
 .embedVideo-playIconPath {
     stroke: rgba(0, 0, 0, 0.1);
+}
+
+// Instagram:
+
+.embedExternal-content.embed-instagram {
+    width: $embedVideo_width;
+}
+
+.instagram-media { // styles come from Instagram JS
+    margin-bottom: 0 !important;
+    width: 100% !important;
 }
 
 // External Embed

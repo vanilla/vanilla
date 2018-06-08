@@ -1,5 +1,6 @@
 $richEditor-font_size: 16px !default;
 $richEditor-icon_size: 24px !default;
+$richEditor-lineHeight: 1.5 !default;
 $richEditor-menuButton_size: 39px !default;
 $richEditor-bg_color: white !default;
 $richEditor_leftPadding: 36px !default;
@@ -43,6 +44,8 @@ $richEditor-emojiCategory_color: #737982;
 $richEditor-emojiCategory_hoverColor: #212327;
 $richEditor-emojiGroup_paddingLeft: 3px;
 $richEditor-mobileEmbedMenu_borderColor: #0291db;
+$richEditor-mobileEmbedMenu_transitionDuration: .15s;
+$richEditor-mobileEmbedMenu_transitionTiming: ease-out;
 $richEditor-selected_bg: rgba(174, 228, 254, 0.2);
 $richEditor-border_width: 1px;
 $richEditor-outline_width: 1px;

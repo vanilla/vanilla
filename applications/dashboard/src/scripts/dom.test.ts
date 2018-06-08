@@ -13,6 +13,7 @@ import {
     getFormData,
     getNextTabbableElement,
     watchFocusInDomTree,
+    stickyHeader,
 } from "@dashboard/dom";
 import { expect } from "chai";
 import sinon from "sinon";

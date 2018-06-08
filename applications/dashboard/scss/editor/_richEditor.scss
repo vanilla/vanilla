@@ -571,7 +571,7 @@
         word-break: break-all;
         word-break: break-word;
         text-overflow: ellipsis;
-        line-height: 1.5;
+        line-height: $richEditor-lineHeight;
     }
 
     iframe,
@@ -771,10 +771,6 @@
     }
 }
 
-
-.u-visibleOnFullScreenEditor {
-    display: none;
-}
 
 // Mobile
 body.isMobile {

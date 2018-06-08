@@ -61,6 +61,13 @@ HTML;
          return $result;
     }
 
+    /**
+     *  Parses the oembed repsonse html for permalink and other data.
+     * 
+     * @param string $html
+     * @return array $data
+     */
+
     public function parseResponseHtml(string $html): array {
         $data = [];
         preg_match('/(visual=(?<visual>true))/i', $html,$showVisual );

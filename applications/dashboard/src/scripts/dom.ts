@@ -551,7 +551,7 @@ export function stickyHeader() {
                         });
                     });
                 },
-                200,
+                100,
                 {
                     leading: true,
                 },

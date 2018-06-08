@@ -312,6 +312,7 @@ declare module "quill/modules/history" {
     export default class History extends Module {
         protected stack: {
             undo: UndoItem[];
+            redo: UndoItem[];
         };
         protected ignoreChange: boolean;
         public undo(): void;

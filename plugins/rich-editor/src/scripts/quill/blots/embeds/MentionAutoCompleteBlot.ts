@@ -4,6 +4,7 @@
  * @license https://opensource.org/licenses/GPL-2.0 GPL-2.0
  */
 
+import Quill from "quill/core";
 import Inline from "quill/blots/inline";
 import MentionBlot from "./MentionBlot";
 import { IMentionData } from "../../../editor/MentionSuggestion";
@@ -76,14 +77,16 @@ export default class MentionAutoCompleteBlot extends Inline {
      * @param result The new MentionBlot
      */
     public finalize(result: IMentionData) {
-        return this.replaceWith("mention", result) as MentionBlot;
+        this.replaceWith("mention", result);
+        this.quill && this.quill.update(Quill.sources.USER);
     }
 
     /**
      * Remove the combobox and turn the blot into plaintext.
      */
     public cancel() {
-        return this.replaceWith("inline", this.domNode.innerHTML);
+        this.replaceWith("inline", this.domNode.innerHTML);
+        this.quill && this.quill.update(Quill.sources.USER);
     }
 
     /**
@@ -105,6 +108,19 @@ export default class MentionAutoCompleteBlot extends Inline {
             domNode.setAttribute("aria-describedby", data.noResultsID);
             domNode.removeAttribute("aria-activedescendant");
         }
+    }
+
+    /**
+     * Get the attached quill instance.
+     *
+     * This will _NOT_ work before attach() is called.
+     */
+    private get quill(): Quill | null {
+        if (!this.scroll || !this.scroll.domNode.parentNode) {
+            return null;
+        }
+
+        return Quill.find(this.scroll.domNode.parentNode!);
     }
 }
 

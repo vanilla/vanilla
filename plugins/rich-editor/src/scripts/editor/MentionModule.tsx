@@ -251,7 +251,6 @@ export class MentionModule extends React.PureComponent<IProps, IState> {
             this.isConvertingMention = true;
             const selection = this.quill.getSelection();
             this.state.autoCompleteBlot.cancel();
-            this.quill.update(Quill.sources.SILENT);
             this.quill.setSelection(selection, Quill.sources.SILENT);
         }
         this.setState({
@@ -278,7 +277,6 @@ export class MentionModule extends React.PureComponent<IProps, IState> {
         const start = autoCompleteBlot.offset(this.quill.scroll);
 
         autoCompleteBlot.finalize(activeSuggestion);
-        this.quill.update(Quill.sources.SILENT);
         this.quill.insertText(start + 1, " ", Quill.sources.SILENT);
         this.quill.setSelection(start + 2, 0, Quill.sources.SILENT);
         this.cancelActiveMention();

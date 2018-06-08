@@ -46,12 +46,10 @@ export default class HistoryModule extends BaseHistoryModule {
     public change(source: "undo" | "redo", dest) {
         if (source === "undo" && this.needsDoubleUndo()) {
             this.ignoreChange = true;
-            console.log("double undo");
             super.change(source, dest);
             super.change(source, dest);
             this.ignoreChange = false;
         } else if (source === "redo" && this.needsDoubleRedo()) {
-            console.log("double redo");
             this.ignoreChange = true;
             super.change(source, dest);
             super.change(source, dest);

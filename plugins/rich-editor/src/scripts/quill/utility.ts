@@ -5,14 +5,12 @@
  */
 
 import Emitter from "quill/core/emitter";
-import Quill, { RangeStatic, Blot, Container, BoundsStatic } from "quill/core";
+import Quill, { RangeStatic, Blot } from "quill/core";
 import KeyboardModule from "quill/modules/keyboard";
 import Delta from "quill-delta";
 import Parchment from "parchment";
-import LineBlot from "./blots/abstract/LineBlot";
-import TextBlot from "quill/blots/text";
-import MentionComboBoxBlot from "./blots/embeds/MentionComboBoxBlot";
 import { matchAtMention } from "@dashboard/utility";
+import FocusableEmbedBlot from "./blots/abstract/FocusableEmbedBlot";
 
 interface IBoundary {
     start: number;

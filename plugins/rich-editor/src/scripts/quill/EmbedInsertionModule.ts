@@ -7,7 +7,7 @@
 import Module from "quill/core/module";
 import Parchment from "parchment";
 import FileUploader from "@dashboard/FileUploader";
-import Quill, { RangeStatic, Blot, Sources } from "quill/core";
+import Quill, { RangeStatic, Sources } from "quill/core";
 import api from "@dashboard/apiv2";
 import ExternalEmbedBlot from "./blots/embeds/ExternalEmbedBlot";
 import { IEmbedData } from "@dashboard/embeds";

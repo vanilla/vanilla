@@ -32,13 +32,12 @@ export default class VanillaTheme extends ThemeBase {
         const themeOptions = {
             ...options,
             placeholder: "Create a new post...",
+            scrollingContainer: "body",
         };
 
         super(quill, themeOptions);
-        this.quill.root.setAttribute("tabIndex", "0");
         this.quill.root.classList.add("richEditor-text");
         this.quill.root.classList.add("userContent");
-        this.quill.root.setAttribute("tabindex", 0);
 
         // Add keyboard bindings to options.
         this.addModule("embed/insertion");

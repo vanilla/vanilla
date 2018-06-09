@@ -4,12 +4,12 @@
  */
 
 import { registerEmbed, IEmbedData, FOCUS_CLASS } from "@dashboard/embeds";
-import { ensureScript } from "@dashboard/dom";
 
-// Setup image embeds.
+// Setup soundcloud embeds.
 registerEmbed("soundcloud", soundCloudRenderer);
 
 /**
+ * Renders soundcloud embeds.
  */
 export async function soundCloudRenderer(element: HTMLElement, data: IEmbedData) {
     const height = data.height ? data.height : "";

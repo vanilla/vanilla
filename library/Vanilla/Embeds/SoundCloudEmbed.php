@@ -32,7 +32,6 @@ class SoundCloudEmbed extends Embed {
 
         if ($this->isNetworkEnabled()) {
             $oembedData = $this->oembed("https://soundcloud.com/oembed?url=" . $encodedUrl . "&format=json");
-
             if (array_key_exists('html', $oembedData)) {
                 $data = $this->parseResponseHtml($oembedData['html']);
             }
@@ -74,7 +73,6 @@ HTML;
      * @param string $html
      * @return array $data
      */
-
     public function parseResponseHtml(string $html): array {
         $data = [];
         preg_match('/(visual=(?<visual>true))/i', $html,$showVisual );
@@ -89,8 +87,6 @@ HTML;
         if ($trackNumber) {
             $data['attributes']['track'] = $trackNumber['track'];
         }
-
         return $data;
     }
-
 }

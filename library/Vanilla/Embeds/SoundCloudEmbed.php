@@ -1,29 +1,28 @@
 <?php
 /**
- * Created by PhpStorm.
- * User: chris
- * Date: 2018-06-05
- * Time: 5:55 PM
+ * @copyright 2009-2018 Vanilla Forums Inc.
+ * @license GPL-2.0
  */
 
 namespace Vanilla\Embeds;
 
-
+/**
+ * Soundcloud Embed.
+ */
 class SoundCloudEmbed extends Embed {
-
-    /** @inheritdoc */
-    protected $type = 'soundcloud';
 
     /** @inheritdoc */
     protected $domains = ['soundcloud.com'];
 
+    /**
+     * SoundCloudEmbed constructor.
+     */
     public function __construct() {
-        parent::__construct('soundcloud', 'image');
+        parent::__construct('soundcloud', 'audio');
     }
 
     /**
      * @inheritdoc
-     *
      */
     function matchUrl(string $url) {
         $data = [];
@@ -36,31 +35,26 @@ class SoundCloudEmbed extends Embed {
                 $data = $this->parseResponseHtml($oembedData['html']);
             }
         }
-
-        $data['attributes']['url'] = htmlspecialchars("https://w.soundcloud.com/player/?url=https://api.soundcloud.com/tracks/");
-
         if (array_key_exists('height', $oembedData)) {
             $data['height'] = $oembedData['height'];
         }
 
         return $data;
     }
-
     /**
      * @inheritdoc
-     *
      */
     public function renderData(array $data): string {
         $height = htmlspecialchars($data['height']);
         $track = htmlspecialchars($data['attributes']['track']);
         $showArtwork = htmlspecialchars($data['attributes']['showArtwork']);
         $visual = htmlspecialchars($data['attributes']['visual']);
-        $url = htmlspecialchars($data['attributes']['url']);
+        $url = htmlspecialchars("https://w.soundcloud.com/player/?url=https://api.soundcloud.com/tracks/");
 
         $result = <<<HTML
 <div class="embed embedSoundCloud">
 <iframe width="100%" height="{$height}" scrolling="no" frameborder="no" 
-    src="{$url}{$track}&show_artwork={$showArtwork}&visual={$visual}">
+    src="{$url}{$track}&amp;show_artwork={$showArtwork}&amp;visual={$visual}">
 </iframe>
 </div>
 HTML;
@@ -68,24 +62,26 @@ HTML;
     }
 
     /**
-     *  Parses the oembed repsonse html for permalink and other data.
+     * Parses the oembed repsonse html for permalink and other data.
      *
      * @param string $html
      * @return array $data
      */
-    public function parseResponseHtml(string $html): array {
+    private function parseResponseHtml(string $html): array {
         $data = [];
-        preg_match('/(visual=(?<visual>true))/i', $html,$showVisual );
+        preg_match('/(visual=(?<visual>true))/i', $html, $showVisual);
         if ($showVisual) {
             $data['attributes']['visual'] = $showVisual['visual'];
         }
-        preg_match('/(show_artwork=(?<artwork>true))/i', $html,$showArtwork );
+        preg_match('/(show_artwork=(?<artwork>true))/i', $html, $showArtwork);
         if ($showArtwork) {
             $data['attributes']['showArtwork'] = $showArtwork['artwork'];
         }
         preg_match('/(?<=2F)(?<track>\d+)(&)/', $html, $trackNumber);
         if ($trackNumber) {
             $data['attributes']['track'] = $trackNumber['track'];
+        } else {
+            throw new Exception('Invalid Track Number.', 400);
         }
         return $data;
     }

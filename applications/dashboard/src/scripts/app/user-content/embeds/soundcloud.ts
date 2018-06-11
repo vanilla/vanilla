@@ -12,22 +12,29 @@ registerEmbed("soundcloud", soundCloudRenderer);
  * Renders soundcloud embeds.
  */
 export async function soundCloudRenderer(element: HTMLElement, data: IEmbedData) {
-    const height = data.height ? data.height : "";
+    const height = data.height ? data.height.toString() : "";
+    const showArtwork = data.attributes.showArtwork ? data.attributes.showArtwork : "false";
+    const visual = data.attributes.visual ? data.attributes.visual : "false";
+
+    // Ensure this is a track.
+    if (data.attributes.track == null) {
+        throw new Error("Soundcloud embed fail, the track could not be found");
+    }
 
     const iframe = document.createElement("iframe");
     iframe.setAttribute("id", "sc-widget");
     iframe.setAttribute("width", "100%");
-    iframe.setAttribute("height", height.toString());
+    iframe.setAttribute("height", height);
     iframe.setAttribute("scrolling", "no");
     iframe.setAttribute("frameborder", "no");
     iframe.setAttribute(
         "src",
-        data.attributes.url +
+        "https://w.soundcloud.com/player/?url=https://api.soundcloud.com/tracks/" +
             data.attributes.track +
             "&visual=" +
-            data.attributes.visual +
+            showArtwork +
             "&show_artwork=" +
-            data.attributes.showArtwork,
+            visual,
     );
     element.appendChild(iframe);
 }

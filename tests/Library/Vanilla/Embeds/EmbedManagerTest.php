@@ -105,23 +105,23 @@ class EmbedManagerTest extends SharedBootstrapTestCase {
 </div>'
             ],            [
                 [
-                    "url" =>"https://soundcloud.com/syrebralvibes/the-eden-project-circles",
-                    "type" =>"soundcloud",
-                    'name' => null,
-                    'body' => null,
-                    'photoUrl' => null,
-                    'height' => 400,
-                    'width' => null,
-                    'attributes' => [
-                        'visual' => "true",
-                        'showArtwork' => "true",
-                        'track' => "2F174656930",
-                        'url' => "https://w.soundcloud.com/player/?url=https://api.soundcloud.com/tracks/"
+                    "url" => "https://soundcloud.com/syrebralvibes/the-eden-project-circles",
+                    "type" => "soundcloud",
+                    "name" => null,
+                    "body" => null,
+                    "photoUrl" => null,
+                    "height" => 400,
+                    "width" => null,
+                    "attributes" => [
+                        "visual" => "true",
+                        "showArtwork" => "true",
+                        "track" => "2F174656930",
+                        "url" => "https://w.soundcloud.com/player/?url=https://api.soundcloud.com/tracks/"
                     ],
                 ],
 '<div class="embed embedSoundCloud">
 <iframe width="100%" height="400" scrolling="no" frameborder="no" 
-    src="https://w.soundcloud.com/player/?url=https://api.soundcloud.com/tracks/2F174656930&show_artwork=true&visual=true">
+    src="https://w.soundcloud.com/player/?url=https://api.soundcloud.com/tracks/2F174656930&amp;show_artwork=true&amp;visual=true">
 </iframe>
 </div>'
             ],

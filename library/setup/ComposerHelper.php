@@ -18,13 +18,11 @@ class ComposerHelper {
      * Clear the addon manager cache.
      */
     private static function clearAddonManagerCache() {
-        $cacheDir = realpath(__DIR__.'/../../cache');
-
         $paths = array_merge(
-            [$cacheDir.'/addon.php'],
-            glob($cacheDir.'/locale/*.php'),
-            glob($cacheDir.'/theme/*.php'),
-            glob($cacheDir.'/*-index.php')
+            [PATH_CACHE.'/addon.php'],
+            glob(PATH_CACHE.'/locale/*.php'),
+            glob(PATH_CACHE.'/theme/*.php'),
+            glob(PATH_CACHE.'/*-index.php')
         );
         foreach ($paths as $path) {
             if (file_exists($path)) {

@@ -225,7 +225,7 @@ class AuthenticatorModel {
         $authenticatorClasses = $this->getAuthenticatorClasses($includeShims);
         $authenticators = [];
         foreach ($authenticatorClasses as $authenticatorClass) {
-            $authenticators = array_merge($authenticators, $this->getAuthenticatorsByType($authenticatorClass, $includeShims));
+            $authenticators = array_merge($authenticators, $this->getAuthenticatorsByClass($authenticatorClass, $includeShims));
         }
 
         return $authenticators;

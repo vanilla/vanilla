@@ -8,9 +8,13 @@
 namespace Vanilla\VanillaConnect;
 
 use Exception;
+use Firebase\JWT\JWT;
 use Garden\Schema\Schema;
+use Garden\Web\Cookie;
 use Garden\Web\RequestInterface;
+use Gdn_Configuration;
 use SsoUtils;
+use UserAuthenticationNonceModel;
 use Vanilla\Authenticator\SSOAuthenticator;
 use Vanilla\Models\AuthenticatorModel;
 use Vanilla\Models\SSOData;
@@ -23,11 +27,20 @@ class VanillaConnectAuthenticator extends SSOAuthenticator {
     /** Signing algorithm for JWT tokens. */
     const JWT_ALGORITHM = 'HS256';
 
+    /** @var Cookie $cookie */
+    private $cookie;
+
+    /** @var string */
+    private $cookieName;
+
+    /** @var string */
+    private $cookieSalt;
+
     /** @var RequestInterface */
     private $request;
 
-    /** @var SsoUtils */
-    private $ssoUtils;
+    /** @var UserAuthenticationNonceModel */
+    private $nonceModel;
 
     /** @var VanillaConnect */
     private $vanillaConnect;
@@ -39,17 +52,25 @@ class VanillaConnectAuthenticator extends SSOAuthenticator {
      *
      * @param string $authenticatorID
      * @param AuthenticatorModel $authenticatorModel
+     * @param Gdn_Configuration $config
+     * @param Cookie $cookie
      * @param RequestInterface $request
-     * @param SSOUtils $ssoUtils
+     * @param UserAuthenticationNonceModel $nonceModel
      */
     public function __construct(
         $authenticatorID,
         AuthenticatorModel $authenticatorModel,
+        Gdn_Configuration $config,
+        Cookie $cookie,
         RequestInterface $request,
-        SsoUtils $ssoUtils
+        UserAuthenticationNonceModel $nonceModel
     ) {
-        $this->ssoUtils = $ssoUtils;
+        $this->nonceModel = $nonceModel;
         $this->request = $request;
+
+        $this->cookie = $cookie;
+        $this->cookieName = $config->get('Garden.Cookie.Name', 'Vanilla').'-vanillaconnectnonce';
+        $this->cookieSalt = $config->get('Garden.Cookie.Salt');
 
         parent::__construct($authenticatorID, $authenticatorModel);
     }
@@ -219,13 +240,32 @@ class VanillaConnectAuthenticator extends SSOAuthenticator {
     }
 
     /**
+     * Generate a nonce.
+     *
+     * @return string
+     */
+    private function generateNonce() {
+        $nonce = uniqid(VanillaConnect::NAME.'_');
+        $this->nonceModel->insert(['Nonce' => $nonce, 'Token' => VanillaConnect::NAME]);
+        $iat = time();
+        $expiration = $iat + VanillaConnect::TIMEOUT;
+        $jwt = JWT::encode([
+            'nonce' => $nonce,
+            'exp' => $expiration,
+            'iat' => $iat,
+        ], $this->cookieSalt, self::JWT_ALGORITHM);
+        $this->cookie->set($this->cookieName, $jwt, VanillaConnect::TIMEOUT);
+        return $nonce;
+    }
+
+    /**
      * @inheritdoc
      */
     public function initSSOAuthentication() {
         list($url, $target) = $this->extractTargetFromURL(parent::getSignInUrl());
         $url .= (strpos($url, '?') === false ? '?' : '&');
         $url .= 'jwt='.$this->vanillaConnect->createRequestAuthJWT(
-            $this->ssoUtils->getStateToken(),
+            $this->generateNonce(),
             [
                 'redirect' => $this->getRedirectURL($target),
                 'authenticatorID' => $this->getID(),
@@ -248,8 +288,83 @@ class VanillaConnectAuthenticator extends SSOAuthenticator {
             throw new Exception("An error occurred during the JWT validation.\n".print_r($this->vanillaConnect->getErrors(), true));
         }
 
-        $this->ssoUtils->verifyStateToken(self::getType().'-'.$this->getID().'-'.'sso', $claim['jti']);
+        $this->validateNonce($claim['jti']);
 
         return $this->claimToSSOData($claim);
+    }
+
+    /**
+     * Validate that the nonce exists and is not expired.
+     *
+     * @throws Exception
+     *
+     * @param string $nonce
+     */
+    private function validateNonce($nonce) {
+        $nonceData = $this->nonceModel->getWhere(['Nonce' => $nonce])->firstRow(DATASET_TYPE_ARRAY);
+        if (!$nonceData) {
+            throw new Exception('Non-existent nonce supplied.');
+        }
+
+        // Consume the nonce.
+        $this->nonceModel->delete(['Nonce' => $nonce, 'Token' => VanillaConnect::NAME]);
+
+        if (strtotime($nonceData['Timestamp']) < time() - VanillaConnect::TIMEOUT) {
+            throw new Exception('The nonce has expired.');
+        }
+        $jwt = $this->cookie->get($this->cookieName);
+        if ($jwt) {
+            try {
+                $decoded = (array)JWT::decode($jwt, $this->cookieSalt, [self::JWT_ALGORITHM]);
+                $cookiedNonce = $decoded['nonce'] ?? null;
+            } catch (Exception $e) {}
+        }
+        if (!$cookiedNonce || $cookiedNonce !== $nonce) {
+            throw new Exception('Nonce does not match cookied value.');
+        }
+    }
+
+
+    /**
+     * Validate a push sso JWT.
+     *
+     * @throws Exception
+     *
+     * @param string $jwt JSON Web Token
+     * @return SSOData
+     */
+    public function validatePushSSOAuthentication($jwt) {
+        if (!$this->vanillaConnect->validateResponse($jwt, $claim)) {
+            throw new Exception("An error occurred during the JWT validation.\n".print_r($this->vanillaConnect->getErrors(), true));
+        }
+        if (!isset($claim['aud'])) {
+            throw new Exception("Missing 'aud' item from JWT's claim.");
+        }
+        if ($claim['aud'] !== 'pushsso') {
+            throw new Exception('Invalid JWT audience.');
+        }
+        $this->validateReverseNonce($claim['nonce']);
+        return $this->claimToSSOData($claim);
+    }
+    /**
+     * Validate and store the reverse nonce.
+     *
+     * @throws Exception If anything goes wrong.
+     *
+     * @param string $nonce
+     */
+    private function validateReverseNonce($nonce) {
+        $noncePrefix = VanillaConnect::NAME.'_rn_';
+        if (substr($nonce, 0, strlen($noncePrefix)) !== $noncePrefix) {
+            throw new Exception('Invalid reverse nonce format.');
+        }
+        $nonceData = $this->nonceModel->getWhere(['Nonce' => $nonce])->firstRow(DATASET_TYPE_ARRAY);
+        if ($nonceData) {
+            throw new Exception('The reverse nonce has already been defined.');
+        }
+        $this->nonceModel->insert([
+            'Nonce' => $nonce,
+            'Token' => VanillaConnect::NAME,
+        ]);
     }
 }

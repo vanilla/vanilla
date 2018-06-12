@@ -14,7 +14,7 @@ registerEmbed("imgur", renderImgur);
 /**
  * Renders posted imgur embeds.
  */
-async function convertImgurEmbeds() {
+export async function convertImgurEmbeds() {
     const images = Array.from(document.querySelectorAll(".imgur-embed-pub"));
     if (images.length > 0) {
         await ensureScript("//s.imgur.com/min/embed.js");
@@ -40,7 +40,7 @@ export async function renderImgur(element: Element, data: IEmbedData) {
     await ensureScript("//s.imgur.com/min/embed.js");
 
     const url = "imgur.com/" + data.attributes.postID;
-    const isAlbum = false;
+    const isAlbum = data.attributes.isAlbum;
     const dataSet = isAlbum ? "a/" + data.attributes.postID : data.attributes.postID;
 
     if (!window.imgurEmbed) {
@@ -52,6 +52,9 @@ export async function renderImgur(element: Element, data: IEmbedData) {
     blockQuote.setAttribute("lang", "en");
     blockQuote.dataset.id = dataSet;
     blockQuote.setAttribute("href", url);
-    convertImgurEmbeds();
+
     element.appendChild(blockQuote);
+    setImmediate(() => {
+        convertImgurEmbeds().then();
+    });
 }

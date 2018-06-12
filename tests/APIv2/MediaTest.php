@@ -374,6 +374,7 @@ class MediaTest extends AbstractAPIv2Test {
             ['https://youtube.ca/watch?v=example', 'youtube'],
             ['https://www.instagram.com/p/BizC-PPFK1m', 'instagram'],
             ['https://soundcloud.com/syrebralvibes/the-eden-project-circles', 'soundcloud'],
+            ['https://imgur.com/gallery/10HROiq', 'imgur'],
         ];
 
         return $urls;

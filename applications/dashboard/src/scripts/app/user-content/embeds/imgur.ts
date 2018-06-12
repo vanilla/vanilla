@@ -14,7 +14,7 @@ registerEmbed("imgur", renderImgur);
 /**
  * Renders posted imgur embeds.
  */
-export async function convertImgurEmbeds() {
+async function convertImgurEmbeds() {
     const images = Array.from(document.querySelectorAll(".imgur-embed-pub"));
     if (images.length > 0) {
         await ensureScript("//s.imgur.com/min/embed.js");
@@ -24,7 +24,8 @@ export async function convertImgurEmbeds() {
         }
 
         if (window.imgurEmbed.createIframe) {
-            for (let i = 0; i < images.length; i++) {
+            const imagesLength = images.length;
+            for (let i = 0; i < imagesLength; i++) {
                 window.imgurEmbed.createIframe();
             }
         } else {
@@ -55,6 +56,6 @@ export async function renderImgur(element: Element, data: IEmbedData) {
 
     element.appendChild(blockQuote);
     setImmediate(() => {
-        convertImgurEmbeds().then();
+        void convertImgurEmbeds();
     });
 }

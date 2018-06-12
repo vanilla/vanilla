@@ -1,16 +1,4 @@
-@function stripDollarSign($hayStack) {
-    $index: str-index($hayStack, "$");
-
-    @if $index and $index == 1 {
-        @return str-slice($hayStack, 2, str-length($hayStack));
-    }
-
-    @return $hayStack;
-}
-
-@mixin sassToCss($varName, $varVal) {
-    --#{stripDollarSign($varName)}: $varVal;
-}
+@import "core/core-mixins";
 
 /* -------------------------------------------------------------- *\
     Utility Variables

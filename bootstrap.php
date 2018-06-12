@@ -245,6 +245,7 @@ $dic->setInstance('Garden\Container\Container', $dic)
     ->addCall('addEmbed', [new Reference(Vanilla\Embeds\YouTubeEmbed::class)])
     ->addCall('addEmbed', [new Reference(Vanilla\Embeds\VimeoEmbed::class)])
     ->addCall('addEmbed', [new Reference(Vanilla\Embeds\InstagramEmbed::class)])
+    ->addCall('addEmbed', [new Reference(Vanilla\Embeds\ImgurEmbed::class)])
     ->addCall('addEmbed', [new Reference(Vanilla\Embeds\ImageEmbed::class), Vanilla\Embeds\EmbedManager::PRIORITY_LOW])
     ->setShared(true)
 

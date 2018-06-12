@@ -625,14 +625,14 @@ if (!function_exists('flattenArray')) {
     function flattenArray($sep, $array) {
         $result = [];
 
-        $fn = function ($array, $px = '') use ($sep, &$fn, &$result) {
+        $fn = function ($array, $previousLevel = null) use ($sep, &$fn, &$result) {
             foreach ($array as $key => $value) {
-                $px = $px ? "{$px}{$sep}{$key}" : $key;
+                $currentLevel = $previousLevel ? "{$previousLevel}{$sep}{$key}" : $key;
 
                 if (is_array($value)) {
-                    $fn($value, $px);
+                    $fn($value, $currentLevel);
                 } else {
-                    $result[$px] = $value;
+                    $result[$currentLevel] = $value;
                 }
             }
         };

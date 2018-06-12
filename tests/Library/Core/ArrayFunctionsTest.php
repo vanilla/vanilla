@@ -35,7 +35,19 @@ class ArrayFunctionsTest extends SharedBootstrapTestCase {
         $r = [
             'threeDeep' => [['a' => ['b' => ['c' => 'foo']]], ['a.b.c' => 'foo']],
             'emptyArray' => [[], []],
-            'emptyArrayElement' => [['a' => 1, 'b' => []], ['a' => 1]]
+            'emptyArrayElement' => [['a' => 1, 'b' => []], ['a' => 1]],
+            'realWorldExample' => [
+                [
+                    'a' => [
+                        'b' => ['c' => 'foo'],
+                        'd' => ['e' => 'bar'],
+                    ],
+                ],
+                [
+                    'a.b.c' => 'foo',
+                    'a.d.e' => 'bar'
+                ]
+            ],
         ];
 
         return $r;

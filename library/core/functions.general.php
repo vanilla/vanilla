@@ -643,6 +643,45 @@ if (!function_exists('flattenArray')) {
     }
 }
 
+if (!function_exists('unflattenArray')) {
+
+    /**
+     * Convert a flattened array into a multi dimensional array.
+     *
+     * See {@link flattenArray}
+     *
+     * @param string $sep The string used to separate keys.
+     * @param array $array The array to flatten.
+     * @return array|bool Returns the flattened array or false.
+     */
+    function unflattenArray($sep, $array) {
+        $result = [];
+
+        try {
+            foreach ($array as $flattenedKey => $value) {
+                $keys = explode($sep, $flattenedKey);
+
+                $target = &$result;
+                while (count($keys) > 1) {
+                    $key = array_shift($keys);
+                    if (!array_key_exists($key, $target)) {
+                        $target[$key] = [];
+                    }
+                    $target = &$target[$key];
+                }
+
+                $key = array_shift($keys);
+                $target[$key] = $value;
+                unset($target);
+            }
+        } catch (\Throwable $t) {
+            $result = false;
+        }
+
+        return $result;
+    }
+}
+
 if (!function_exists('safePrint')) {
     /**
      * Return/print human-readable and non casted information about a variable.

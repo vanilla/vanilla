@@ -30,7 +30,7 @@ class SoundCloudEmbed extends Embed {
         $encodedUrl = urlencode($url);
 
         if ($this->isNetworkEnabled()) {
-            $oembedData = $this->oembed("https://soundcloud.com/oembed?url=" . $encodedUrl . "&format=json");
+            $oembedData = $this->oembed("https://soundcloud.com/oembed?url=".$encodedUrl."&format=json");
             if (array_key_exists('html', $oembedData)) {
                 $data = $this->parseResponseHtml($oembedData['html']);
             }
@@ -81,7 +81,7 @@ HTML;
         if ($trackNumber) {
             $data['attributes']['track'] = $trackNumber['track'];
         } else {
-            throw new Exception('Invalid Track Number.', 400);
+            throw new Exception('Unable to get track ID.', 400);
         }
         return $data;
     }

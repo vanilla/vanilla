@@ -23,6 +23,7 @@ import "./user-content/embeds/twitter";
 import "./user-content/embeds/video";
 import "./user-content/embeds/instagram";
 import "./user-content/embeds/imgur";
+import "./user-content/embeds/soundcloud";
 
 addComponent("App", Router);
 

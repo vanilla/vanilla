@@ -15,10 +15,21 @@ registerEmbed("imgur", renderImgur);
  * Renders posted imgur embeds.
  */
 async function convertImgurEmbeds() {
-    await ensureScript("//s.imgur.com/min/embed.js");
+    const images = Array.from(document.querySelectorAll(".imgur-embed-pub"));
+    if (images.length > 0) {
+        await ensureScript("//s.imgur.com/min/embed.js");
 
-    if (!window.imgurEmbed) {
-        throw new Error("The Imgur post failed to load");
+        if (!window.imgurEmbed) {
+            throw new Error("The Imgur post failed to load");
+        }
+
+        if (window.imgurEmbed.createIframe) {
+            for (let i = 0; i < images.length; i++) {
+                window.imgurEmbed.createIframe();
+            }
+        } else {
+            window.imgurEmbed.tasks = images.length;
+        }
     }
 }
 
@@ -29,9 +40,8 @@ export async function renderImgur(element: Element, data: IEmbedData) {
     await ensureScript("//s.imgur.com/min/embed.js");
 
     const url = "imgur.com/" + data.attributes.postID;
-    console.log(data.attributes.postID);
-    const isAblum = data.attributes.isAblum;
-    const dataSet = isAblum ? "a/" + data.attributes.postID : data.attributes.postID;
+    const isAlbum = false;
+    const dataSet = isAlbum ? "a/" + data.attributes.postID : data.attributes.postID;
 
     if (!window.imgurEmbed) {
         throw new Error("The Imgur post failed to load");
@@ -42,6 +52,6 @@ export async function renderImgur(element: Element, data: IEmbedData) {
     blockQuote.setAttribute("lang", "en");
     blockQuote.dataset.id = dataSet;
     blockQuote.setAttribute("href", url);
-
+    convertImgurEmbeds();
     element.appendChild(blockQuote);
 }

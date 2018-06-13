@@ -48,18 +48,18 @@ $passwordStrength-bg                                 : mix($global-error_bg, $gl
     Third Party Colors
 \* -------------------------------------------------------------- */
 
-$global-color_facebook                               : #3b5998 !default;
-$global-color_twitter                                : #00b6f1 !default;
-$global-color_youTube                                : #b31217 !default;
-$global-color_pinterest                              : #cb2027 !default;
-$global-color_googlePlus                             : #df4a32 !default;
-$global-color_tumblr                                 : #2c4762 !default;
-$global-color_stumbleUpon                            : #eb4924 !default;
-$global-color_reddit                                 : #ff5700 !default;
-$global-color_vine                                   : #00b489 !default;
-$global-color_discord                                : #7289da !default;
-$global-color_instagram                              : #bc2a8d !default;
-$global-color_linkedIn                               : #007bb6 !default;
+$global-color_facebook                               : #3b5998;
+$global-color_twitter                                : #00b6f1;
+$global-color_youTube                                : #b31217;
+$global-color_pinterest                              : #cb2027;
+$global-color_googlePlus                             : #df4a32;
+$global-color_tumblr                                 : #2c4762;
+$global-color_stumbleUpon                            : #eb4924;
+$global-color_reddit                                 : #ff5700;
+$global-color_vine                                   : #00b489;
+$global-color_discord                                : #7289da;
+$global-color_instagram                              : #bc2a8d;
+$global-color_linkedIn                               : #007bb6;
 
 /* -------------------------------------------------------------- *\
     Typography
@@ -247,7 +247,13 @@ $buttonBranded: (
 \* -------------------------------------------------------------- */
 
 :root {
-    @include sassToCss("$utility-baseUnit", $utility-baseUnit);
+    // Basic Colors
+    @include sassToCss("$global-color_fg", $global-color_fg);
+    @include sassToCss("$global-color_bg", $global-color_bg);
+    @include sassToCss("$global-color_secondary", $global-color_secondary);
+    @include sassToCss("$global-color_primarySubtle", $global-color_primarySubtle);
+    @include sassToCss("$text-heading_fontFamily", $text-heading_fontFamily);
+    @include sassToCss("$text-body_fontFamily", $text-body_fontFamily);
 }
 
 

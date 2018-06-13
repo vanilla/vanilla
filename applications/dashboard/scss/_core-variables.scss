@@ -1,0 +1,259 @@
+@import "core/core-mixins";
+
+/* -------------------------------------------------------------- *\
+    Utility Variables
+\* -------------------------------------------------------------- */
+
+$utility-baseUnit                                    : 6px;
+$utility-baseUnitHalf                                : $utility-baseUnit / 2; // Derived
+$utility-third                                       : #{100% / 3};
+$utility-SVGEncoding                                 : "data:image/svg+xml,";
+
+/* -------------------------------------------------------------- *\
+    Globals
+\* -------------------------------------------------------------- */
+
+$global-color_black                                  : #000;
+$global-color_white                                  : #fff;
+$global-color_transparent                            : transparent;
+$global-color_fg                                     : #555a62 !default;
+$global-color_bg                                     : #fff !default;
+$global-color_primary                                : #0291db !default;
+$global-color_primarySubtle                          : rgba($global-color_primary, .02) !default; // Derived
+$global-color_secondary                              : darken($global-color_primary, 10%) !default; // Derived
+$global-color_warning                                : #ffce00 !default;
+
+$global-error_fg                                     : #ff3933 !default;
+$global-error_bg                                     : mix($global-error_fg, $global-color_bg, 10%) !default; // Derived
+
+$global-color_confirm                                : #60bd68 !default;
+$global-color_unresolved                             : mix($global-color_warning, $global-color_fg, 10%) !default; // Resolved
+
+$global-body_bg                                      : $global-color_bg !default; // Derived - color outside main content in margins
+
+$global_borderRadius                                 : 2px !default;
+
+/* -------------------------------------------------------------- *\
+    Password Strength Colors
+\* -------------------------------------------------------------- */
+
+$passwordStrength-level1_color                       : #c81818 !default;
+$passwordStrength-level2_color                       : #ff891d !default;
+$passwordStrength-level3_color                       : #ffac1d !default;
+$passwordStrength-level4_color                       : #5DB112 !default;
+$passwordStrength-level5_color                       : #27b30f !default;
+$passwordStrength-bg                                 : mix($global-error_bg, $global-error_fg, 80%) !default; // Derived
+
+/* -------------------------------------------------------------- *\
+    Third Party Colors
+\* -------------------------------------------------------------- */
+
+$global-color_facebook                               : #3b5998;
+$global-color_twitter                                : #00b6f1;
+$global-color_youTube                                : #b31217;
+$global-color_pinterest                              : #cb2027;
+$global-color_googlePlus                             : #df4a32;
+$global-color_tumblr                                 : #2c4762;
+$global-color_stumbleUpon                            : #eb4924;
+$global-color_reddit                                 : #ff5700;
+$global-color_vine                                   : #00b489;
+$global-color_discord                                : #7289da;
+$global-color_instagram                              : #bc2a8d;
+$global-color_linkedIn                               : #007bb6;
+
+/* -------------------------------------------------------------- *\
+    Typography
+\* -------------------------------------------------------------- */
+
+$global-title_fontSize                                 : 30px !default;
+$global-subTitle_fontSize                              : 18px !default;
+
+$global-large_fontSize                                 : 16px !default;
+$global-medium_fontSize                                : 14px !default;
+$global-small_fontSize                                 : 12px !default;
+
+$global-normal_fontWeight                              : 400 !default;
+$global-bold_fontWeight                                : 600 !default;
+
+$global-heading_offset                                 : .32em !default; // Offset font to make top of capital letters flush with top of container
+
+$global-base_lineHeight                                : #{20/14} !default;
+
+$global-heading_fontFamily                             : "Open Sans", HelveticaNeue-Light, "Segoe UI", "Helvetica Neue", Helvetica, Raleway, Arial, sans-serif !default;
+$global-heading_fontWeight                             : $global-bold_fontWeight !default; // Derived
+
+$global-body_fontFamily                                : "Open Sans", "Segoe UI", "Helvetica Neue", Helvetica, Raleway, Arial, sans-serif !default;
+$global-body_fontWeight                                : $global-normal_fontWeight !default; // Derived
+
+/* -------------------------------------------------------------- *\
+    Animation
+\* -------------------------------------------------------------- */
+
+$global-default_timing                               : .15s !default;
+$global-default_easing                               : ease-out !default;
+
+/* -------------------------------------------------------------- *\
+    Icons
+\* -------------------------------------------------------------- */
+
+$icon-default_size                                   : 24px !default;
+$icon-large_size                                     : 32px !default;
+
+
+/* -------------------------------------------------------------- *\
+    Layout
+\* -------------------------------------------------------------- */
+
+$global-gutter_size                                  : 40px;
+$global-main_width                                   : 1124px !default;
+$global-main_paddedWidth                             : $global-main_width + 2 * $global-gutter_size !default;  // Derived
+
+/* -------------------------------------------------------------- *\
+    Components
+\* -------------------------------------------------------------- */
+
+$component-spacing                                   : $utility-baseUnit * 3 !default; // Derived
+$component-spacing_half                              : $component-spacing / 2;  // Derived
+$component-spacing_quarter                           : $component-spacing / 4;  // Derived
+
+
+$component_bg                                        : mix($global-color_bg, $global-color_fg, 97%) !default;
+$component-titleBar_bg                               : mix($global-color_bg, $global-color_fg, 93%) !default;
+$component-body_bg                                   : $component_bg !default;
+$component-well_bg                                   : $global-color_bg !default;
+
+$component-separator                                 : $utility-baseUnit * 2;
+$component-spacing                                   : 27px;
+$component-spacing_half                              : $component-spacing / 2;
+$component-viewAll_bg                                : $component_bg !default;
+
+$component-titleBar_verticalPadding                  : $component-spacing_half;
+$component-titleBar_minHeight                        : 60px;
+$component-titleBar_countBg                          : mix($global-color_bg, $global-color_fg, 88%) !default;
+$component-titleBar_viewMoreColor                    : mix($global-color_bg, $global-color_fg, 60%) !default;
+
+
+/* -------------------------------------------------------------- *\
+    Form Elements
+\* -------------------------------------------------------------- */
+
+$global-formElement_height                           : $utility-baseUnit * 6 !default; // Derived
+$global-formElement_borderWidth                      : 1px !default;
+$global-formElement_giantInput_height                : 81px !default;
+$global-formElement_giantInput_fontSize              : $utility-baseUnit * 4 !default; // Derived
+$global-formElement_halfHeight                       : $global-formElement_height / 2 !default; // Derived
+$global-formElement_border_color                     : mix($global-color_fg, $global-color_bg, 24%) !default; // Derived
+$global-formElement_border_widthFull                 : $global-formElement_borderWidth * 2; // Derived
+$global-formElement_horizontalPadding                : $utility-baseUnit * 2 !default; // Derived
+$global-formElement_paddingVertical                  : $utility-baseUnit !default; // Derived
+$global-formElement_placeholderColor                 : mix($global-color_fg, $global-color_bg, 50%) !default; // Derived
+$global-formElement_maxWidth                         : 528px !default;
+$global-formElement_fg                               : mix($global-color_fg, $global-color_bg, 80%) !default; // Derived
+$global-formElement_bg                               : $global-color_bg !default; // Derived
+$global-formNote_fg                                  : mix($global-color_fg, $global-color_bg, 72%) !default; // Derived
+$global-formNoteLink_fg                              : $global-color_primary !default; // Derived
+
+$global-selectBox_height                             : $utility-baseUnit * 4 !default; // Derived
+
+$global-textArea_minHeight                           : 100px;
+$global-textArea_padding                             : $utility-baseUnit;
+
+$global-fileUpload_bg                                : $global-color_primary;
+$global-fileUpload_fg                                : $global-color_white;
+$global-fileUpload_hover_bg                          : mix($global-color_primary, $global-color_fg, 20%);
+
+
+/* -------------------------------------------------------------- *\
+    Buttons
+\* -------------------------------------------------------------- */
+
+// Global Button options
+
+$global-button_paddingTop                            : 2px !default;
+$global-button_paddingBottom                         : 3px !default;
+$global-button_paddingSide                           : $utility-baseUnit !default;
+$global-button_minWidth                              : 16 * $utility-baseUnit !default; // Derived
+
+$buttonBar_margin                                    : $utility-baseUnit * 2; // Derived
+
+// Basic Button
+
+$button-basic_fg                                     : $global-color_fg !default;
+$button-basic_bg                                     : $global-color_bg !default;
+$button-basic_border                                 : mix($global-color_fg, $global-color_bg, 24%) !default;
+
+$button-basic_hover_fg                               : $button-basic_fg !default;
+$button-basic_hover_bg                               : $global-color_bg !default;
+$button-basic_hover_border                           : mix($global-color_bg, $global-color_fg, 40%) !default;
+
+$button-basic_focus_fg                               : $global-color_fg !default;
+$button-basic_focus_bg                               : $button-basic_hover_bg !default;
+$button-basic_focus_border                           : rgba($global-color_primary, .8) !default;
+
+$button-basic: (
+    default: (
+        color: $button-basic_fg,
+        background-color: $button-basic_bg,
+        border-color: $button-basic_border
+    ),
+    hover: (
+        color: $button-basic_hover_fg,
+        background-color: $button-basic_hover_bg,
+        border-color: $button-basic_hover_border
+    ),
+    focus: (
+        color: $button-basic_focus_fg,
+        background-color: $button-basic_focus_bg,
+        border-color: $button-basic_focus_border
+    )
+);
+
+
+// Button Primary
+
+$button-primary_fg                                   : $global-color_white !default;
+$button-primary_bg                                   : $global-color_primary !default;
+$button-primary_border                               : $global-color_primary !default;
+
+$button-primary_hover_fg                             : $global-color_white !default;
+$button-primary_hover_bg                             : $global-color_secondary !default;
+$button-primary_hover_border                         : $global-color_secondary !default;
+
+$button-primary_focus_fg                             : $global-color_white !default;
+$button-primary_focus_bg                             : $global-color_secondary !default;
+$button-primary_focus_border                         : $global-color_secondary !default;
+
+$buttonBranded: (
+    default: (
+        color: $button-primary_fg,
+        background-color: $button-primary_bg,
+        border-color: $button-primary_border
+    ),
+    hover: (
+        color: $button-primary_hover_fg,
+        background-color: $button-primary_hover_bg,
+        border-color: $button-primary_hover_border
+    ),
+    focus: (
+        color: $button-primary_focus_fg,
+        background-color: $button-primary_focus_bg,
+        border-color: $button-primary_focus_border
+    )
+);
+
+
+///* -------------------------------------------------------------- *\
+//    Convert to CSS Variables
+//\* -------------------------------------------------------------- */
+//
+//:root {
+//    // Basic Colors
+//    @include sassToCss("$global-color_fg", $global-color_fg);
+//    @include sassToCss("$global-color_bg", $global-color_bg);
+//    @include sassToCss("$global-color_secondary", $global-color_secondary);
+//    @include sassToCss("$global-color_primarySubtle", $global-color_primarySubtle);
+//    @include sassToCss("$global-heading_fontFamily", $global-heading_fontFamily);
+//    @include sassToCss("$global-body_fontFamily", $global-body_fontFamily);
+//}
+//
+

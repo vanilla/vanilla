@@ -8,6 +8,7 @@ namespace VanillaTests\Library\Vanilla\Embeds;
 
 use Exception;
 use Garden\Http\HttpRequest;
+use Vanilla\Embeds\ImgurEmbed;
 use Vanilla\Embeds\SoundCloudEmbed;
 use VanillaTests\SharedBootstrapTestCase;
 use Vanilla\Embeds\EmbedManager;
@@ -34,6 +35,7 @@ class EmbedManagerTest extends SharedBootstrapTestCase {
             ->addEmbed(new YouTubeEmbed())
             ->addEmbed(new VimeoEmbed())
             ->addEmbed(new InstagramEmbed())
+            ->addEmbed(new ImgurEmbed())
             ->addEmbed(new SoundCloudEmbed())
             ->addEmbed(new ImageEmbed(), EmbedManager::PRIORITY_LOW)
             ->setNetworkEnabled(false);
@@ -87,8 +89,8 @@ class EmbedManagerTest extends SharedBootstrapTestCase {
             ],
             [
                 [
-                    "url" =>"https://www.instagram.com/p/BizC-PPFK1m",
-                    "type" =>"instagram",
+                    'url' =>'https://www.instagram.com/p/BizC-PPFK1m',
+                    'type' =>'instagram',
                     'name' => null,
                     'body' => null,
                     'photoUrl' => null,
@@ -103,7 +105,44 @@ class EmbedManagerTest extends SharedBootstrapTestCase {
 '<div class="embed embedInstagram">
     <blockquote class="instagram-media" data-instgrm-captioned data-instgrm-permalink="https://www.instagram.com/p/BizC-PPFK1m" data-instgrm-version="8"/>
 </div>'
-            ],            [
+            ],
+            [
+                [
+                    'url' =>'https://imgur.com/gallery/10HROiq',
+                    'type' =>'imgur',
+                    'name' => null,
+                    'body' => null,
+                    'photoUrl' => null,
+                    'height' => null,
+                    'width' => null,
+                    'attributes' => [
+                        'postID' => '10HROiq',
+                        'isAlbum' => false,
+                    ],
+                ],
+'<div class="embed embedImgur">
+    <blockquote class="imgur-embed-pub" lang="en" data-id="10HROiq"><a href="https://imgur.com/10HROiq"></a></blockquote>
+</div>'
+            ],
+            [
+                [
+                    'url' =>'https://imgur.com/gallery/OsirufX',
+                    'type' =>'imgur',
+                    'name' => null,
+                    'body' => null,
+                    'photoUrl' => null,
+                    'height' => null,
+                    'width' => null,
+                    'attributes' => [
+                        'postID' => 'OsirufX',
+                        'isAlbum' => true,
+                    ],
+                ],
+'<div class="embed embedImgur">
+    <blockquote class="imgur-embed-pub" lang="en" data-id="a/OsirufX"><a href="https://imgur.com/OsirufX"></a></blockquote>
+</div>'
+            ],
+            [
                 [
                     "url" => "https://soundcloud.com/syrebralvibes/the-eden-project-circles",
                     "type" => "soundcloud",

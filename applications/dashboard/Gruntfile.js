@@ -178,7 +178,6 @@ module.exports = function (grunt) {
         src: [
             'design/admin.css',
             'design/style.css',
-            'design/core-variables.css',
             'design/style-compat.css'
         ],
         options: {

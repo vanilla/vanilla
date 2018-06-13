@@ -9,7 +9,7 @@ namespace Vanilla\Embeds;
 use Exception;
 
 /**
- * Imgure Embed.
+ * Imgur Embed.
  */
 class ImgurEmbed extends Embed {
 
@@ -44,7 +44,6 @@ class ImgurEmbed extends Embed {
             if (array_key_exists('album', $matches) && $matches['album'] == 'a') {
                 $data['attributes']['isAlbum'] = true;
             }
-
 
         if (!$data['attributes']['isAlbum']) {
             // Get the json for th imgur post

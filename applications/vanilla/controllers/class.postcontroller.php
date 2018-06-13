@@ -148,8 +148,6 @@ class PostController extends VanillaController {
             $this->Form->addHidden('CategoryID', $this->Category->CategoryID);
             if (val('DisplayAs', $this->Category) == 'Discussions' && !$draftID) {
                 $this->ShowCategorySelector = false;
-            } else {
-                $this->Context = $categoryModel->getTree($this->CategoryID);
             }
         }
 

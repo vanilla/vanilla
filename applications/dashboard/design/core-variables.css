@@ -20,14 +20,4 @@
 \* -------------------------------------------------------------- */
 /* -------------------------------------------------------------- *    Buttons
 \* -------------------------------------------------------------- */
-/* -------------------------------------------------------------- *    Convert to CSS Variables
-\* -------------------------------------------------------------- */
-:root {
-  --global-color_fg: #555a62;
-  --global-color_bg: #fff;
-  --global-color_secondary: #0270a8;
-  --global-color_primarySubtle: rgba(2, 145, 219, 0.02);
-  --text-heading_fontFamily: "Open Sans", HelveticaNeue-Light, "Segoe UI", "Helvetica Neue", Helvetica, Raleway, Arial, sans-serif;
-  --text-body_fontFamily: "Open Sans", "Segoe UI", "Helvetica Neue", Helvetica, Raleway, Arial, sans-serif;
-}
 /*# sourceMappingURL=core-variables.css.map */

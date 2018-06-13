@@ -17,6 +17,6 @@ $vanillaMenu-iconFill_hover_opacity                  : .5 !default;
     Convert to CSS Variables
 \* -------------------------------------------------------------- */
 
-.vanillaHeader {
-    @include sassToCss("$utility-baseUnit", $utility-baseUnit);
-}
+//.vanillaHeader {
+//    @include sassToCss("$utility-baseUnit", $utility-baseUnit);
+//}

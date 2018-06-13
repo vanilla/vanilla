@@ -75,7 +75,7 @@ $text-small_fontSize                                 : 12px !default;
 $text-normal_fontWeight                              : 400 !default;
 $text-bold_fontWeight                                : 600 !default;
 
-$text-heading_offset                                 : .32em !default // Offset font to make top of capital letters flush with top of container
+$text-heading_offset                                 : .32em !default; // Offset font to make top of capital letters flush with top of container
 
 $text-base_lineHeight                                : #{20/14} !default;
 
@@ -242,18 +242,18 @@ $buttonBranded: (
 );
 
 
-/* -------------------------------------------------------------- *\
-    Convert to CSS Variables
-\* -------------------------------------------------------------- */
-
-:root {
-    // Basic Colors
-    @include sassToCss("$global-color_fg", $global-color_fg);
-    @include sassToCss("$global-color_bg", $global-color_bg);
-    @include sassToCss("$global-color_secondary", $global-color_secondary);
-    @include sassToCss("$global-color_primarySubtle", $global-color_primarySubtle);
-    @include sassToCss("$text-heading_fontFamily", $text-heading_fontFamily);
-    @include sassToCss("$text-body_fontFamily", $text-body_fontFamily);
-}
-
+///* -------------------------------------------------------------- *\
+//    Convert to CSS Variables
+//\* -------------------------------------------------------------- */
+//
+//:root {
+//    // Basic Colors
+//    @include sassToCss("$global-color_fg", $global-color_fg);
+//    @include sassToCss("$global-color_bg", $global-color_bg);
+//    @include sassToCss("$global-color_secondary", $global-color_secondary);
+//    @include sassToCss("$global-color_primarySubtle", $global-color_primarySubtle);
+//    @include sassToCss("$text-heading_fontFamily", $text-heading_fontFamily);
+//    @include sassToCss("$text-body_fontFamily", $text-body_fontFamily);
+//}
+//
 

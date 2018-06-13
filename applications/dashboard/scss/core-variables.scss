@@ -65,25 +65,25 @@ $global-color_linkedIn                               : #007bb6;
     Typography
 \* -------------------------------------------------------------- */
 
-$text-title_fontSize                                 : 30px !default;
-$text-subTitle_fontSize                              : 18px !default;
+$global-title_fontSize                                 : 30px !default;
+$global-subTitle_fontSize                              : 18px !default;
 
-$text-large_fontSize                                 : 16px !default;
-$text-medium_fontSize                                : 14px !default;
-$text-small_fontSize                                 : 12px !default;
+$global-large_fontSize                                 : 16px !default;
+$global-medium_fontSize                                : 14px !default;
+$global-small_fontSize                                 : 12px !default;
 
-$text-normal_fontWeight                              : 400 !default;
-$text-bold_fontWeight                                : 600 !default;
+$global-normal_fontWeight                              : 400 !default;
+$global-bold_fontWeight                                : 600 !default;
 
-$text-heading_offset                                 : .32em !default; // Offset font to make top of capital letters flush with top of container
+$global-heading_offset                                 : .32em !default; // Offset font to make top of capital letters flush with top of container
 
-$text-base_lineHeight                                : #{20/14} !default;
+$global-base_lineHeight                                : #{20/14} !default;
 
-$text-heading_fontFamily                             : "Open Sans", HelveticaNeue-Light, "Segoe UI", "Helvetica Neue", Helvetica, Raleway, Arial, sans-serif !default;
-$text-heading_fontWeight                             : $text-bold_fontWeight !default; // Derived
+$global-heading_fontFamily                             : "Open Sans", HelveticaNeue-Light, "Segoe UI", "Helvetica Neue", Helvetica, Raleway, Arial, sans-serif !default;
+$global-heading_fontWeight                             : $global-bold_fontWeight !default; // Derived
 
-$text-body_fontFamily                                : "Open Sans", "Segoe UI", "Helvetica Neue", Helvetica, Raleway, Arial, sans-serif !default;
-$text-body_fontWeight                                : $text-normal_fontWeight !default; // Derived
+$global-body_fontFamily                                : "Open Sans", "Segoe UI", "Helvetica Neue", Helvetica, Raleway, Arial, sans-serif !default;
+$global-body_fontWeight                                : $global-normal_fontWeight !default; // Derived
 
 /* -------------------------------------------------------------- *\
     Animation
@@ -252,8 +252,8 @@ $buttonBranded: (
 //    @include sassToCss("$global-color_bg", $global-color_bg);
 //    @include sassToCss("$global-color_secondary", $global-color_secondary);
 //    @include sassToCss("$global-color_primarySubtle", $global-color_primarySubtle);
-//    @include sassToCss("$text-heading_fontFamily", $text-heading_fontFamily);
-//    @include sassToCss("$text-body_fontFamily", $text-body_fontFamily);
+//    @include sassToCss("$global-heading_fontFamily", $global-heading_fontFamily);
+//    @include sassToCss("$global-body_fontFamily", $global-body_fontFamily);
 //}
 //
 

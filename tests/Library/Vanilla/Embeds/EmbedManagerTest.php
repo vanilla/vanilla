@@ -134,12 +134,12 @@ class EmbedManagerTest extends SharedBootstrapTestCase {
                     'height' => null,
                     'width' => null,
                     'attributes' => [
-                        'postID' => 'a/OsirufX',
-                        'isAlbum' => false,
+                        'postID' => 'OsirufX',
+                        'isAlbum' => true,
                     ],
                 ],
 '<div class="embed embedImgur">
-    <blockquote class="imgur-embed-pub" lang="en" data-id="a/OsirufX"><a href="https://imgur.com/a/OsirufX"></a></blockquote>
+    <blockquote class="imgur-embed-pub" lang="en" data-id="a/OsirufX"><a href="https://imgur.com/OsirufX"></a></blockquote>
 </div>'
             ],
             [

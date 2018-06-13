@@ -38,15 +38,9 @@ async function convertImgurEmbeds() {
  * Render a single imgur embed.
  */
 export async function renderImgur(element: Element, data: IEmbedData) {
-    await ensureScript("//s.imgur.com/min/embed.js");
-
     const url = "imgur.com/" + data.attributes.postID;
     const isAlbum = data.attributes.isAlbum;
     const dataSet = isAlbum ? "a/" + data.attributes.postID : data.attributes.postID;
-
-    if (!window.imgurEmbed) {
-        throw new Error("The Imgur post failed to load");
-    }
 
     const blockQuote = document.createElement("blockquote");
     blockQuote.classList.add("imgur-embed-pub");

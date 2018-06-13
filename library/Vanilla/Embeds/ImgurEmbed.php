@@ -6,8 +6,10 @@
 
 namespace Vanilla\Embeds;
 
+use Exception;
+
 /**
- * Instagram Embed.
+ * Imgure Embed.
  */
 class ImgurEmbed extends Embed {
 
@@ -28,7 +30,8 @@ class ImgurEmbed extends Embed {
         $data = [];
 
         if ($this->isNetworkEnabled()) {
-            preg_match('/https?:\/\/imgur\.com\/gallery\/(?<postID>[a-z0-9]+)/i', $url, $matches);
+            preg_match('/https?:\/\/(?:m.)?imgur\.com\/(?:(?<album>a|gallery)\/)?(?<postID>[a-z0-9]+)/i', $url, $matches);
+
             if (array_key_exists('postID', $matches)) {
                 if (!array_key_exists('attributes', $data)) {
                     $data['attributes'] = [];
@@ -37,16 +40,24 @@ class ImgurEmbed extends Embed {
             } else {
                 throw new Exception('Unable to get post ID.', 400);
             }
-        }
-        // Get the json for th imgur post
-        $jsonResponse = $this->httpRequest($url . ".json");
-        if ($jsonResponse->getStatusCode() == 200) {
-            $decodedResponse = json_decode($jsonResponse);
-            $isAlbum = val('is_album', $decodedResponse->data->image);
-            if ($isAlbum === null) {
-                throw new Exception('Unable to get album.', 400);
+
+            if (array_key_exists('album', $matches) && $matches['album'] == 'a') {
+                $data['attributes']['isAlbum'] = true;
             }
-            $data['attributes']['isAlbum'] = $isAlbum;
+
+
+        if (!$data['attributes']['isAlbum']) {
+            // Get the json for th imgur post
+            $jsonResponse = $this->httpRequest($url . ".json");
+            if ($jsonResponse->getStatusCode() == 200) {
+                $decodedResponse = json_decode($jsonResponse, true);
+                $isAlbum = $decodedResponse['data']['image']['is_album'] ?? null;
+                if ($isAlbum === null) {
+                    throw new Exception('Unable to get album.', 400);
+                }
+                    $data['attributes']['isAlbum'] = $isAlbum;
+                }
+            }
         }
 
         return $data;

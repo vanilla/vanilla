@@ -261,7 +261,7 @@ class VanillaConnectAuthenticator extends SSOAuthenticator {
     /**
      * @inheritdoc
      */
-    public function initSSOAuthentication() {
+    public function initiateAuthentication() {
         list($url, $target) = $this->extractTargetFromURL(parent::getSignInUrl());
         $url .= (strpos($url, '?') === false ? '?' : '&');
         $url .= 'jwt='.$this->vanillaConnect->createRequestAuthJWT(

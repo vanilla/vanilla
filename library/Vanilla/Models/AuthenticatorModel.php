@@ -129,8 +129,6 @@ class AuthenticatorModel {
      *
      * @return Authenticator
      *
-     * @throws \Garden\Container\ContainerException
-     * @throws \Garden\Container\NotFoundException
      * @throws \Garden\Web\Exception\ClientException
      * @throws \Garden\Web\Exception\NotFoundException
      * @throws \Garden\Web\Exception\ServerException
@@ -177,7 +175,11 @@ class AuthenticatorModel {
         try {
             $authenticatorInstance = $this->container->getArgs($fullyQualifiedAuthenticationClass, [$authenticatorID]);
         } catch (Exception $e) {
-            $authenticatorInstance = $this->container->get($fullyQualifiedAuthenticationClass);
+            try {
+                $authenticatorInstance = $this->container->get($fullyQualifiedAuthenticationClass);
+            } catch (Exception $e) {
+                throw new ServerException('The authenticator was not found or could not be instantiated.');
+            }
         }
 
         $this->authenticatorInstances[$authenticatorType][$authenticatorID] = $authenticatorInstance;
@@ -193,8 +195,6 @@ class AuthenticatorModel {
      *
      * @return Authenticator
      *
-     * @throws \Garden\Container\ContainerException
-     * @throws \Garden\Container\NotFoundException
      * @throws \Garden\Web\Exception\ClientException
      * @throws \Garden\Web\Exception\NotFoundException
      * @throws \Garden\Web\Exception\ServerException
@@ -225,46 +225,64 @@ class AuthenticatorModel {
         $authenticatorClasses = $this->getAuthenticatorClasses($includeShims);
         $authenticators = [];
         foreach ($authenticatorClasses as $authenticatorClass) {
-            $authenticatorsInfo = null;
-            try {
-                $authenticatorsInfo = $this->authenticationProviderModel->getProvidersByScheme($authenticatorClass::getType());
-            } catch (Exception $e) {}
+            $authenticators = array_merge($authenticators, $this->getAuthenticatorsByClass($authenticatorClass, $includeShims));
+        }
 
-            /** @var Authenticator $authenticatorInstance */
-            $authenticatorInstance = null;
+        return $authenticators;
+    }
 
-            if ($authenticatorsInfo) {
-                foreach ($authenticatorsInfo as $authenticatorInfo) {
-                    // Check if the container can find the Authenticator.
-                    try {
-                        $authenticatorInstance = $this->getAuthenticator($authenticatorInfo['AuthenticationSchemeAlias'], $authenticatorInfo['AuthenticationKey']);
-                        $authenticators[] = $authenticatorInstance;
-                    } catch (Exception $e) {
-                        throw new ServerException('Error while trying to instanciate authenticator '.$authenticatorClass, 500, [
-                            'authenticatorError' => $e,
-                            'authenticatorType' => $authenticatorInfo['AuthenticationSchemeAlias'],
-                            'authenticatorID' => $authenticatorInfo['AuthenticationKey'],
-                        ]);
-                    }
-                    $authenticatorInstance = null;
+    /**
+     * Get Authenticator instances.
+     *
+     * @param string $authenticatorClass
+     * @param bool $includeShims
+     *
+     * @return Authenticator[]
+     * @throws \Garden\Web\Exception\ServerException
+     */
+    public function getAuthenticatorsByClass(string $authenticatorClass, bool $includeShims = false): array {
+        if (!$includeShims && is_a($authenticatorClass, ShimAuthenticator::class, true)) {
+            return [];
+        }
+
+        $authenticatorsInfo = null;
+        $authenticators = [];
+        $authenticatorType = $authenticatorClass::getType();
+        try {
+            $authenticatorsInfo = $this->authenticationProviderModel->getProvidersByScheme($authenticatorType);
+        } catch (Exception $e) {
+        }
+
+        if ($authenticatorsInfo) {
+            foreach ($authenticatorsInfo as $authenticatorInfo) {
+                // Check if the container can find the Authenticator.
+                try {
+                    $authenticatorInstance = $this->getAuthenticator($authenticatorInfo['AuthenticationSchemeAlias'], $authenticatorInfo['AuthenticationKey']);
+                    $authenticators[] = $authenticatorInstance;
+                } catch (Exception $e) {
+                    throw new ServerException('Error while trying to instanciate authenticator '.$authenticatorClass, 500, [
+                        'authenticatorError' => $e,
+                        'authenticatorType' => $authenticatorType,
+                        'authenticatorID' => $authenticatorInfo['AuthenticationKey'],
+                    ]);
                 }
-            } else {
-                // Only try this for non SSOAuthenticator since we should have info in the DB for these.
-                if (!is_a($authenticatorClass, SSOAuthenticator::class, true)) {
-                    $type = $authenticatorClass::getType();
-                    try {
-                        $authenticatorInstance = $this->getAuthenticator($type,$type);
-                        $authenticators[] = $authenticatorInstance;
-                    } catch (Exception $e) {
-                        throw new ServerException('Error while trying to instanciate authenticator '.$authenticatorClass, 500, [
-                            'authenticatorError' => $e,
-                            'authenticatorType' => $type,
-                            'authenticatorID' => $type,
-                        ]);
-                    }
-                }
-
             }
+        } else {
+            // Only try this for non SSOAuthenticator since we should have info in the DB for these.
+            if (!is_a($authenticatorClass, SSOAuthenticator::class, true)) {
+
+                try {
+                    $authenticatorInstance = $this->getAuthenticator($authenticatorType, $authenticatorType);
+                    $authenticators[] = $authenticatorInstance;
+                } catch (Exception $e) {
+                    throw new ServerException('Error while trying to instanciate authenticator '.$authenticatorClass, 500, [
+                        'authenticatorError' => $e,
+                        'authenticatorType' => $authenticatorType,
+                        'authenticatorID' => $authenticatorType,
+                    ]);
+                }
+            }
+
         }
 
         return $authenticators;
@@ -332,8 +350,6 @@ class AuthenticatorModel {
      *
      * @return bool|\Vanilla\Authenticator\SSOAuthenticator
      *
-     * @throws \Garden\Container\ContainerException
-     * @throws \Garden\Container\NotFoundException
      * @throws \Garden\Schema\ValidationException
      * @throws \Garden\Web\Exception\ClientException
      * @throws \Garden\Web\Exception\NotFoundException
@@ -459,9 +475,16 @@ class AuthenticatorModel {
 
                 // Move property out of attributes.
                 foreach ($schemaProperties as $name => $definition) {
-                     if (!array_key_exists($name, $authenticatorData) && array_key_exists($name, $authenticatorData['attributes'])) {
+                    if (!array_key_exists($name, $authenticatorData) && array_key_exists($name, $authenticatorData['attributes'])) {
                         $authenticatorData[$name] = $authenticatorData['attributes'][$name];
                         unset($authenticatorData['attributes'][$name]);
+                    }
+
+                    // Convert empty string (from DB) to null if the schema allows null and the data is an empty string.
+                    if (is_array($definition['type']) && in_array('null', $definition['type'])) {
+                        if (array_key_exists($name, $authenticatorData) && $authenticatorData[$name] === '') {
+                            $authenticatorData[$name] = null;
+                        }
                     }
                 }
             } else {
@@ -494,9 +517,10 @@ class AuthenticatorModel {
                 setvalr($dotDelimitedField, $data, $value);
             }
         }
+        $data['type'] = $authenticator::getType();
 
         // Sparse validation to make sure all data is proper.
-        $authenticator::getAuthenticatorSchema()->validate($data, true);
+        $data = $authenticator::getAuthenticatorSchema()->validate($data, true);
 
         foreach ($this->authenticatorToDbFields as $from => $to) {
             if (array_key_exists($from, $data)) {
@@ -531,6 +555,21 @@ class AuthenticatorModel {
         ]);
 
         unset($this->authenticatorInstances[$authenticator->getType()][$authenticator->getID()]);
+    }
+
+    /**
+     * Delete an SSOAuthenticator instance.
+     *
+     * @param string $authenticatorType
+     * @param string $authenticatorID
+     */
+    public function deleteSSOAuthenticator(string $authenticatorType, string $authenticatorID) {
+        $this->authenticationProviderModel->delete([
+            'AuthenticationKey' => $authenticatorID,
+            'AuthenticationSchemeAlias' => $authenticatorType,
+        ]);
+
+        unset($this->authenticatorInstances[$authenticatorType][$authenticatorID]);
     }
 
     /**

@@ -39,7 +39,7 @@ class MockSSOAuthenticator extends SSOAuthenticator {
         $defaults = [
             'properties.name' => 'MockSSO',
             'properties.isActive' => true,
-            'properties.signInUrl' => '/MockSSOSignInPage',
+            'properties.signInUrl' => 'http://example.com/MockSSOSignInPage',
             'properties.sso.properties.canSignIn' => true,
             'properties.sso.properties.isTrusted' => true,
             'properties.sso.properties.canAutoLinkUser' => false,

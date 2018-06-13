@@ -222,10 +222,18 @@ class AuthenticatorsApiController extends AbstractApiController  {
      */
     public function normalizeOutput(Authenticator $authenticator): array {
         $record = $authenticator->getAuthenticatorInfo();
+
+        // Move non base data into attributes
+        $schemaProperties = SSOAuthenticator::getAuthenticatorSchema()->getSchemaArray()['properties'];
+        $diffs = array_diff_key($record, $schemaProperties);
+        foreach($diffs as $key => $value) {
+            $authenticatorData['attributes'][$key] = $value;
+            unset($authenticatorData[$key]);
+        }
+
         $record['authenticatorID'] = strtolower($record['authenticatorID']);
         $record['type'] = strtolower($record['type']);
         $record['resourceUrl'] = strtolower(url('/api/v2/authenticators/'.$authenticator::getType().'/'.$authenticator->getID()));
-
         // Convert URLs from relative to absolute.
         foreach (['signInUrl', 'registerUrl', 'signOutUrl', 'ui.url', 'resourceUrl'] as $field) {
             $value = valr($field, $record, null);

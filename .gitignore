@@ -42,6 +42,7 @@
 !/plugins/swagger-ui/
 !/plugins/Tagging/
 !/plugins/Twitter/
+!/plugins/vanillaconnect/
 !/plugins/VanillaStats/
 !/plugins/VanillaInThisDiscussion/
 !/plugins/vanillicon/

@@ -121,4 +121,43 @@ class ArrayFunctionsTest extends SharedBootstrapTestCase {
             ],
         ];
     }
+
+    /**
+     * Test {@link unflattenArray()}.
+     *
+     * @param array $array The input array to test.
+     * @param array $expected The expected flattened array.
+     * @dataProvider provideUnflattenArrayTests
+     */
+    public function testUnflattenArray($array, $expected) {
+        $value = unflattenArray('.', $array);
+        $this->assertEquals($expected, $value);
+    }
+
+    /**
+     * Provide test data for {@link unflattenArray()}.
+     *
+     * @return array Returns an array of test data.
+     */
+    public function provideUnflattenArrayTests() {
+        $r = [
+            'threeDeep' => [['a.b.c' => 'foo'], ['a' => ['b' => ['c' => 'foo']]]],
+            'emptyArray' => [[], []],
+            'realWorldExample' => [
+                [
+                    'a.b.c' => 'foo',
+                    'a.d.e' => 'bar'
+                ],
+                [
+                    'a' => [
+                        'b' => ['c' => 'foo'],
+                        'd' => ['e' => 'bar'],
+                    ],
+                ],
+            ],
+        ];
+
+        return $r;
+    }
+
 }

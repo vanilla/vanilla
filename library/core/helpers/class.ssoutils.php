@@ -27,6 +27,9 @@ class SsoUtils {
     /** @var string */
     private $cookieName;
 
+    /** @var string */
+    private $cookieSalt;
+
     /** @var Gdn_Session */
     private $session;
 

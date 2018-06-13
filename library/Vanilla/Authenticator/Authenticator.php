@@ -288,11 +288,11 @@ abstract class Authenticator {
      * @return array
      */
     final public function getAuthenticatorInfo(): array {
+        $typeInfo = static::getAuthenticatorTypeInfo();
         $defaults = $this->getAuthenticatorDefaultInfo();
         $instanceInfo = $this->getAuthenticatorInfoImpl();
-        $typeInfo = static::getAuthenticatorTypeInfo();
 
-        return static::getAuthenticatorSchema()->validate(array_replace_recursive($defaults, $instanceInfo, $typeInfo));
+        return static::getAuthenticatorSchema()->validate(array_replace_recursive($typeInfo, $defaults, $instanceInfo));
     }
 
     /**

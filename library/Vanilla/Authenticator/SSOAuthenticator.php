@@ -35,7 +35,11 @@ abstract class SSOAuthenticator extends Authenticator {
      */
     private $linkSession;
 
-    /** @var string  */
+    /**
+     * Override 'name' in the schema for that particular instance.
+     *
+     * @var string
+     */
     private $name;
 
     /**
@@ -104,26 +108,22 @@ abstract class SSOAuthenticator extends Authenticator {
                 'sso:o' => Schema::parse([
                     'canSignIn:b' => [
                         'description' => 'Whether or not the authenticator can be used to sign in.',
-                        'default' => false,
-                        'x-instance-required' => true,
+                        'default' => true,
                         'x-instance-configurable' => true,
                     ],
                     'canLinkSession:b'=> [
                         'description' => 'Whether or not, using the authenticator, the user can link his account from the profile page.',
                         'default' => false,
-                        'x-instance-required' => true,
                         'x-instance-configurable' => true,
                     ],
                     'isTrusted:b' => [
                         'description' => 'Whether or not the authenticator is trusted to synchronize user information.',
                         'default' => false,
-                        'x-instance-required' => true,
                         'x-instance-configurable' => true,
                     ],
                     'canAutoLinkUser:b' => [
                         'description' => 'Whether or not the authenticator can automatically link the incoming user information to an existing user account by using email address.',
                         'default' => false,
-                        'x-instance-required' => true,
                         'x-instance-configurable' => true,
                     ],
                 ])
@@ -134,7 +134,6 @@ abstract class SSOAuthenticator extends Authenticator {
         $schema->setField('properties.authenticatorID.x-instance-configurable', true);
 
         $schema->setField('properties.type.x-instance-required', true);
-        $schema->setField('properties.type.x-instance-configurable', true);
 
         $schema->setField('properties.isActive.x-instance-required', true);
         $schema->setField('properties.isActive.x-instance-configurable', true);
@@ -148,6 +147,11 @@ abstract class SSOAuthenticator extends Authenticator {
         $schema->setField('properties.signOutUrl.x-instance-configurable', true);
 
         $schema->setField('properties.registerUrl.x-instance-configurable', true);
+
+        // Make sure that the URLs are valid.
+        $schema->setField('properties.signInUrl.format', 'uri');
+        $schema->setField('properties.signOutUrl.format', 'uri');
+        $schema->setField('properties.registerUrl.format', 'uri');
 
         return $schema;
     }
@@ -256,6 +260,8 @@ abstract class SSOAuthenticator extends Authenticator {
         $this->setTrusted($data['sso']['isTrusted'] ?? false);
         $this->setAutoLinkUser($data['sso']['canAutoLinkUser'] ?? false);
 
+        $currentlyAccessibleProperties = get_object_vars($this);
+
         // Set data to appropriate target.
         foreach($data as $key => $value) {
             // Set through method name can{Something}.
@@ -265,19 +271,38 @@ abstract class SSOAuthenticator extends Authenticator {
             } else if (preg_match('/^is([A-Z].+)/', $key, $matches) && method_exists($this, 'set'.$matches[1])) {
                 $this->{'set'.$matches[1]}($value);
             // Set directly to variable.
-            } else if (property_exists($this, $key)) {
+            } else if (array_key_exists($key, $currentlyAccessibleProperties)) {
                 $this->{$key} = $value;
             }
         }
     }
 
     /**
+     * Mass update authenticator's data.
+     *
+     * @param array $data
+     *
+     * @throws \Garden\Schema\ValidationException
+     */
+    public function updateAuthenticatorInfo(array $data) {
+        $data = array_replace_recursive($this->getAuthenticatorInfo(), $data);
+        $data = static::getAuthenticatorSchema()->validate($data);
+
+        $this->saveState = false;
+        $this->setAuthenticatorInfo($data);
+        $this->saveState = true;
+
+        $this->authenticatorModel->saveSSOAuthenticatorData($this);
+    }
+
+    /**
      * @inheritdoc
      */
     final protected function getAuthenticatorDefaultInfo(): array {
-        return array_merge_recursive(
+        return array_replace_recursive(
             parent::getAuthenticatorDefaultInfo(),
             [
+                'name' => $this->getName(),
                 'sso' => [
                     'canSignIn' => $this->canSignIn(),
                     'canLinkSession' => $this->canLinkSession(),
@@ -478,6 +503,16 @@ abstract class SSOAuthenticator extends Authenticator {
      */
     public function getSignOutUrl() {
         return $this->signOutUrl;
+    }
+
+    /**
+     * Initiate the SSO Authentication process.
+     *
+     * This method can be redefined it there is anything that needs to be done before going to the provider's sign in page.
+     * Adding a nonce to the URL for example.
+     */
+    public function initiateAuthentication() {
+        redirectTo($this->getSignInUrl(), 302, false);
     }
 
     /**

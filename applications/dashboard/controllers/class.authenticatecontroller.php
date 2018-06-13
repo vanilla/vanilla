@@ -6,48 +6,40 @@
  */
 
 use Garden\Web\RequestInterface;
+use Vanilla\Models\AuthenticatorModel;
 use Vanilla\Models\SSOModel;
-use Vanilla\Models\SSOData;
 
 /**
  * Create /authenticate endpoint.
  */
 class AuthenticateController extends Gdn_Controller {
 
-    /**
-     * @var AuthenticateApiController
-     */
+    /** @var AuthenticateApiController */
     private $authenticateApiController;
 
-    /**
-     * @var Gdn_Form
-     */
+    /** @var AuthenticatorModel */
+    private $authenticatorModel;
+
+    /** @var Gdn_Form */
     private $form;
 
-    /**
-     * @var RequestInterface
-     */
+    /** @var RequestInterface */
     private $request;
 
-    /**
-     * @var SessionModel
-     */
+    /** @var SessionModel */
     private $sessionModel;
 
-    /**
-     * @var SSOModel
-     */
+    /** @var SSOModel */
     private $ssoModel;
 
-    /**
-     * @var UserModel
-     */
+    /** @var UserModel */
     private $userModel;
 
     /**
      * AuthenticateController constructor.
      *
      * @param AuthenticateApiController $authenticateApiController
+     * @param AuthenticatorModel $authenticatorModel
      * @param RequestInterface $request
      * @param SessionModel $sessionModel
      * @param SSOModel $ssoModel
@@ -55,6 +47,7 @@ class AuthenticateController extends Gdn_Controller {
      */
     public function __construct(
         AuthenticateApiController $authenticateApiController,
+        AuthenticatorModel $authenticatorModel,
         RequestInterface $request,
         SessionModel $sessionModel,
         SSOModel $ssoModel,
@@ -63,6 +56,7 @@ class AuthenticateController extends Gdn_Controller {
         parent::__construct();
 
         $this->authenticateApiController = $authenticateApiController;
+        $this->authenticatorModel = $authenticatorModel;
         $this->form = new Gdn_Form();
         $this->request = $request;
         $this->sessionModel = $sessionModel;
@@ -144,14 +138,29 @@ class AuthenticateController extends Gdn_Controller {
     /**
      *
      */
-    public function recoverpassword() {
+    public function recoverPassword() {
         $this->renderReact();
     }
 
     /**
      * Sign In Page
+     *
+     * @param string $authenticatorType
+     * @param string $authenticatorID
+     *
+     * @throws \Garden\Web\Exception\ClientException
+     * @throws \Garden\Web\Exception\NotFoundException
+     * @throws \Garden\Web\Exception\ServerException
      */
-    public function signin() {
+    public function signin($authenticatorType = '', $authenticatorID = '') {
+        if ($authenticatorType && $authenticatorID) {
+            $authenticator = $this->authenticatorModel->getAuthenticator($authenticatorType, $authenticatorID);
+            if (is_a($authenticator, \Vanilla\Authenticator\SSOAuthenticator::class)) {
+                $authenticator->initiateAuthentication();
+                return;
+            }
+        }
+
         $this->renderReact();
     }
 

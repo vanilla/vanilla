@@ -514,7 +514,7 @@ class Gdn_Database {
             $name = $this->Engine.'Driver';
             $this->_SQL = Gdn::factory($name);
             if (!$this->_SQL) {
-                $this->_SQL = new stdClass();
+                throw new Exception("Could not instantiate database driver '$name'.");
             }
             $this->_SQL->Database = $this;
         }

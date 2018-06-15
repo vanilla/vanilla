@@ -177,7 +177,7 @@ class AuthenticatorModel {
         } catch (Exception $e) {
             try {
                 $authenticatorInstance = $this->container->get($fullyQualifiedAuthenticationClass);
-            } catch (Exception $e) {
+            } catch (Exception $e2) {
                 throw new ServerException('The authenticator was not found or could not be instantiated.');
             }
         }

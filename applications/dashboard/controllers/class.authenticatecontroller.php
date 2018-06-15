@@ -106,33 +106,46 @@ class AuthenticateController extends Gdn_Controller {
      * @param string $authenticatorID The authenticator's instance ID.
      * @throws Exception Connect user feature is not implemented.
      */
-    public function index($authenticatorType = '', $authenticatorID = '') {
+    public function connect($authenticatorType = '', $authenticatorID = '') {
         $persist = $this->request->getBody()['persist'] ?? ($this->request->getQuery()['persist'] ?? false);
 
-        $response = $this->authenticateApiController->post([
-            'authenticate' => [
-                'authenticatorType' => $authenticatorType,
-                'authenticatorID' => $authenticatorID,
-            ],
-            'persist' => $persist,
-        ]);
+        $state = [];
 
-        if ($response['authenticationStep'] === 'authenticated') {
-            $redirectURL = (val('target', $this->request->getQuery(), '/'));
-        } else {
-            throw new Exception('Connect user feature is not implemented.', 500);
-//            $target = val('target', $this->request->getQuery());
-//            if ($target) {
-//                $target = '&target='.$target;
-//            }
-//            $redirectURL = "/authenticate/connectuser?authSessionID={$response['authSessionID']}{$target}";
+        try {
+            $response = $this->authenticateApiController->post([
+                'authenticate' => [
+                    'authenticatorType' => $authenticatorType,
+                    'authenticatorID' => $authenticatorID,
+                ],
+                'method' => 'signIn',
+                'persist' => $persist,
+            ]);
+
+            switch ($response['authenticationStep']) {
+                case 'authenticated':
+                    // The user successfully authenticated and the cookie is set. Redirect.
+                    redirectTo($respone['targetUrl'] ?? '/');
+                    break;
+                case 'linkUser':
+                    // The user has to be manually linked.
+                    $state['step'] = 'linkUser';
+                    $state['authSessionID'] = $response['authSessionID'];
+                    $state['linkUser'] = $this->authenticateApiController->get_linkUser($response['authSessionID']);
+                    break;
+                // case 'addInfo':
+                //     // The user successfully authenticated, but has to accept terms of service.
+                default:
+                    $state['step'] = 'error';
+                    $state['error'] = 'Unknown authentication step: '.$response['authenticationStep'];
+            }
+        } catch (\Exception $ex) {
+            $state['step'] = 'error';
+            $state['error'] = $ex->getMessage();
         }
 
-        if ($this->deliveryMethod() === DELIVERY_METHOD_JSON) {
-            $this->setRedirectTo($redirectURL);
-        } else {
-            redirectTo($redirectURL);
-        }
+        // Render the component routed to /authenticate/connect. It will get its data
+        $this->addDefinition('state', ['authetnicate' => $state]);
+        $this->renderReact();
     }
 
     /**

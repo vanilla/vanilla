@@ -38,7 +38,7 @@ abstract class ShimAuthenticator extends Authenticator {
      * @inheritdoc
      */
     public function getSignInUrl() {
-        return null;
+        return url('/entry/signin');
     }
 
     /**

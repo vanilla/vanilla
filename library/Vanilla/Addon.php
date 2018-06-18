@@ -496,14 +496,11 @@ class Addon {
     private function scanClassPaths() {
         $dirs = [
             '',
-            '/controllers',
-            '/Controllers',
+            '/[Cc]ontrollers',
             '/library',
             '/src',
-            '/models',
-            '/Models',
-            '/modules',
-            '/Modules',
+            '/[Mm]odels',
+            '/[Mm]odules',
             '/settings/class.hooks.php'
         ];
 

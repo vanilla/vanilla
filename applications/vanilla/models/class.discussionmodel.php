@@ -2060,7 +2060,7 @@ class DiscussionModel extends Gdn_Model {
                     $isValid = true;
                     $invalidReturnType = false;
                     $insertUserID = val('InsertUserID', $stored);
-                    $dateInserted=  val('DateInserted', $stored);
+                    $dateInserted = val('DateInserted', $stored);
                     $this->EventArguments['DiscussionData'] = array_merge($fields, ['DiscussionID' => $discussionID, 'InsertUserID' => $insertUserID,'DateInserted' => $dateInserted]);
                     $this->EventArguments['IsValid'] = &$isValid;
                     $this->EventArguments['InvalidReturnType'] = &$invalidReturnType;

@@ -36,6 +36,7 @@ module.exports = config => {
         // reporter options
         mochaReporter: {
             output: "minimal",
+            showDiff: true,
         },
         logLevel: config.LOG_INFO,
         port: 9876, // karma web server port

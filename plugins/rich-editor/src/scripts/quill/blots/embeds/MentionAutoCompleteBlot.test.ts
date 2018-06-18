@@ -7,7 +7,7 @@
 import Quill from "../../../quill";
 import Parchment from "parchment";
 import MentionAutoCompleteBlot from "./MentionAutoCompleteBlot";
-import { IMentionData } from "../../../editor/MentionSuggestion";
+import { IMentionData } from "../../../editor/mentions/MentionSuggestion";
 import { expect } from "chai";
 
 describe("[MentionAutoCompleteBlot]", () => {

@@ -17,7 +17,7 @@ import ParagraphToolbar from "../editor/ParagraphToolbar";
 import EmojiPopover from "../editor/EmojiPopover";
 import EmbedPopover from "../editor/EmbedPopover";
 import EditorProvider from "../editor/ContextProvider";
-import MentionModule from "../editor/MentionModule";
+import MentionModule from "../editor/mentions/MentionModule";
 
 export default class VanillaTheme extends ThemeBase {
     private jsBodyBoxContainer: Element;

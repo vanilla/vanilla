@@ -7,7 +7,7 @@
 import Quill from "quill/core";
 import Inline from "quill/blots/inline";
 import MentionBlot from "./MentionBlot";
-import { IMentionData } from "../../../editor/MentionSuggestion";
+import { IMentionData } from "../../../editor/mentions/MentionSuggestion";
 import { t } from "@dashboard/application";
 
 /**

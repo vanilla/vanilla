@@ -6,12 +6,11 @@
 
 import React from "react";
 import classNames from "classnames";
-import { withEditor, IEditorContextProps } from "./ContextProvider";
-import MentionBlot from "../quill/blots/embeds/MentionBlot";
+import { withEditor, IEditorContextProps } from "../ContextProvider";
 import MentionSuggestion, { IMentionData, MentionSuggestionNotFound } from "./MentionSuggestion";
 import { t } from "@dashboard/application";
-import { getMentionRange } from "../quill/utility";
-import QuillFlyoutBounds from "./QuillFlyoutBounds";
+import { getMentionRange } from "../../quill/utility";
+import QuillFlyoutBounds from "../QuillFlyoutBounds";
 import Quill, { RangeStatic, DeltaStatic, Sources } from "quill/core";
 
 interface IProps extends IEditorContextProps {

@@ -6,7 +6,7 @@
 
 import EmbedBlot from "quill/blots/embed";
 import { formatUrl } from "@dashboard/application";
-import { IMentionData } from "../../../editor/MentionSuggestion";
+import { IMentionData } from "../../../editor/mentions/MentionSuggestion";
 
 /**
  * A blot that represents a completed mention.

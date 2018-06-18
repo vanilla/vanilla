@@ -816,7 +816,10 @@ if (!function_exists('filtersDropDown')) {
      * @param string $label Text for the label to attach to the cont
      * @return string
      */
-    function filtersDropDown($baseUrl, array $filters = [], $extraClasses = '', $default = 'All', $defaultUrl = null, $label = 'View') {
+    function filtersDropDown($baseUrl, array $filters = [], $extraClasses = '', $default = null, $defaultUrl = null, $label = 'View') {
+        if ($default === null) {
+            $default = t('All');
+        }
         $output = '';
 
         if (c('Vanilla.EnableCategoryFollowing')) {
@@ -858,7 +861,7 @@ if (!function_exists('filtersDropDown')) {
             // Add the default link to the top of the list.
             array_unshift($links, [
                 'active' => $active === null,
-                'name' => t($default),
+                'name' => $default,
                 'url' => $defaultUrl ?: $baseUrl
             ]);
 

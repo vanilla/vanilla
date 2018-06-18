@@ -11,6 +11,7 @@ import { Route } from "react-router-dom";
 import SignInPage from "./authenticate/SignInPage";
 import PasswordPage from "./authenticate/PasswordPage";
 import RecoverPasswordPage from "./authenticate/RecoverPasswordPage";
+import ConnectPage from "@dashboard/app/authenticate/ConnectPage";
 import Router from "@dashboard/components/Router";
 import { stickyHeader } from "@dashboard/dom";
 
@@ -31,6 +32,7 @@ addRoutes([
     <Route exact path="/authenticate/signin" component={SignInPage} />,
     <Route exact path="/authenticate/password" component={PasswordPage} />,
     <Route exact path="/authenticate/recoverpassword" component={RecoverPasswordPage} />,
+    <Route path="/authenticate/connect" component={ConnectPage} />,
 ]);
 
 stickyHeader();

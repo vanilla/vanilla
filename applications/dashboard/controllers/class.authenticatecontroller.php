@@ -121,6 +121,10 @@ class AuthenticateController extends Gdn_Controller {
                 'persist' => $persist,
             ]);
 
+
+
+            trace($response);
+
             switch ($response['authenticationStep']) {
                 case 'authenticated':
                     // The user successfully authenticated and the cookie is set. Redirect.
@@ -131,6 +135,13 @@ class AuthenticateController extends Gdn_Controller {
                     $state['step'] = 'linkUser';
                     $state['authSessionID'] = $response['authSessionID'];
                     $state['linkUser'] = $this->authenticateApiController->get_linkUser($response['authSessionID']);
+
+                    if (!valr('linkUser.ssoUser.photoUrl', $state)) {
+                        setvalr('linkUser.ssoUser.photoUrl', $state, url('/applications/dashboard/design/images/authenticators/user.svg'));
+                    }
+
+
+
                     break;
                 // case 'addInfo':
                 //     // The user successfully authenticated, but has to accept terms of service.
@@ -144,7 +155,8 @@ class AuthenticateController extends Gdn_Controller {
         }
 
         // Render the component routed to /authenticate/connect. It will get its data
-        $this->addDefinition('state', ['authetnicate' => $state]);
+        trace($state);
+        $this->addDefinition('state', ['authenticate' => $state]);
         $this->renderReact();
     }
 

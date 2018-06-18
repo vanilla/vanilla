@@ -423,7 +423,7 @@ if (!function_exists('categoryFilters')) {
         $baseUrl = 'categories';
         $filters = [
             [
-                'name' => 'Following',
+                'name' => t('Following'),
                 'param' => 'followed',
                 'extra' => ['save' => 1]
             ]
@@ -724,7 +724,7 @@ if (!function_exists('discussionFilters')) {
         $baseUrl = 'discussions';
         $filters = [
             [
-                'name' => 'Following',
+                'name' => t('Following'),
                 'param' => 'followed',
                 'extra' => ['save' => 1]
             ]
@@ -858,7 +858,7 @@ if (!function_exists('filtersDropDown')) {
             // Add the default link to the top of the list.
             array_unshift($links, [
                 'active' => $active === null,
-                'name' => $default,
+                'name' => t($default),
                 'url' => $defaultUrl ?: $baseUrl
             ]);
 
@@ -1132,7 +1132,7 @@ if (!function_exists('linkDropDown')) {
         }
         $selectedLink = val($selectedKey, $links);
         $extraClasses = trim($extraClasses);
-        $linkName = t(val('name', $selectedLink));
+        $linkName = val('name', $selectedLink);
 
         $output .= <<<EOT
         <span class="ToggleFlyout selectBox {$extraClasses}">
@@ -1158,14 +1158,14 @@ EOT;
                         $output .= '      <polygon fill="currentColor" points="1.938,8.7 0.538,10.1 5.938,15.5 17.337,3.9 15.938,2.5 5.938,12.8"></polygon>';
                         $output .= '    </svg>';
                         $output .= '    <span class="selectBox-selectedText">';
-                        $output .=        t(val('name', $link));
+                        $output .=        val('name', $link);
                         $output .= '    </span>';
                         $output .= '  </a>';
                         $output .= '</li>';
                     } else {
                         $output .= '<li class="selectBox-item" role="presentation">';
                         $output .= '  <a href="'.val('url', $link).'" role="menuitem" class="dropdown-menu-link selectBox-link" tabindex="0" href="#">';
-                        $output .=      t(val('name', $link));
+                        $output .=      val('name', $link);
                         $output .= '  </a>';
                         $output .= '</li>';
                     }

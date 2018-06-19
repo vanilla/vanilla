@@ -6,7 +6,7 @@
 
 import React from "react";
 import { t } from "@dashboard/application";
-import store from "@dashboard/state/store";
+import getStore from "@dashboard/state/getStore";
 import { hasPermission } from "@dashboard/permissions";
 import { log, debug } from "@dashboard/utility";
 import Quill from "@rich-editor/quill";
@@ -84,7 +84,7 @@ export default class Editor extends React.Component<IProps, IState> {
         );
 
         return (
-            <ReduxProvider store={store}>
+            <ReduxProvider store={getStore()}>
                 <EditorProvider quill={this.quill}>
                     <div
                         className="richEditor"

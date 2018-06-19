@@ -30,7 +30,7 @@ interface IState {
     selectionLength: number | null;
 }
 
-class MentionList extends React.PureComponent<IProps, IState> {
+class MentionSuggestionList extends React.PureComponent<IProps, IState> {
     public state = {
         flyoutWidth: null,
         flyoutHeight: null,
@@ -161,4 +161,4 @@ class MentionList extends React.PureComponent<IProps, IState> {
     };
 }
 
-export default withEditor<IProps>(MentionList);
+export default withEditor<IProps>(MentionSuggestionList);

@@ -32,7 +32,7 @@ interface IState {
 /**
  * Component for declaring a dynamic toolbar linked to a quill instance.
  */
-export class Toolbar extends React.Component<IProps, IState> {
+export class MenuItems extends React.Component<IProps, IState> {
     private static defaultItems = {
         bold: {
             active: false,
@@ -61,7 +61,7 @@ export class Toolbar extends React.Component<IProps, IState> {
                 index: 0,
                 length: 0,
             },
-            menuItems: props.menuItems || Toolbar.defaultItems,
+            menuItems: props.menuItems || MenuItems.defaultItems,
         };
 
         // Quill can directly on the class as it won't ever change in a single instance.
@@ -251,4 +251,4 @@ export class Toolbar extends React.Component<IProps, IState> {
     }
 }
 
-export default withEditor<IProps>(Toolbar);
+export default withEditor<IProps>(MenuItems);

@@ -71,7 +71,7 @@ function loadUsers(username: string) {
             limit: USER_LIMIT,
         };
         return api
-            .get("/users/by-names/", { params, cancelToken: this.apiCancelSource.token })
+            .get("/users/by-names/", { params /*, cancelToken: this.apiCancelSource.token*/ })
             .then(response => {
                 if (response.status >= 500) {
                     throw new Error(response.data);

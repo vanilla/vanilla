@@ -6,8 +6,6 @@
 
 import { IMentionUser } from "@dashboard/apiv2";
 
-export type NodeStatus = "PENDING" | "SUCCESSFUL" | "FAILED";
-
 interface ISuccessValue {
     status: "SUCCESSFUL";
     users: IMentionUser[];
@@ -23,19 +21,19 @@ interface IPendingValue {
     status: "PENDING";
 }
 
-export type INodeValue = ISuccessValue | IFailureValue | IPendingValue;
+export type IMentionValue = ISuccessValue | IFailureValue | IPendingValue;
 
 export interface IMentionNode {
     children?: {
         [key: string]: IMentionNode;
     };
-    value?: INodeValue;
+    value?: IMentionValue;
 }
 
 export default class MentionTrie {
     private root: IMentionNode = {};
 
-    public insert(word: string, value: INodeValue): void {
+    public insert(word: string, value: IMentionValue): void {
         let current = this.root;
 
         for (let i = 0; i < word.length; i++) {
@@ -72,7 +70,7 @@ export default class MentionTrie {
         return node;
     }
 
-    public getValue(word?: string): INodeValue | null {
+    public getValue(word?: string): IMentionValue | null {
         const node = this.getNode(word);
         return (node && node.value) || null;
     }

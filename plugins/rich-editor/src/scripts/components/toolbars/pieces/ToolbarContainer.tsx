@@ -20,7 +20,7 @@ interface IState {
     nubHeight: number | null;
 }
 
-export class SelectionPositionContainer extends React.Component<IProps, IState> {
+export class ToolbarContainer extends React.Component<IProps, IState> {
     private quill: Quill;
     private flyoutRef: React.RefObject<any> = React.createRef();
     private nubRef: React.RefObject<any> = React.createRef();
@@ -101,4 +101,4 @@ export class SelectionPositionContainer extends React.Component<IProps, IState> 
     }
 }
 
-export default withEditor<IProps>(SelectionPositionContainer);
+export default withEditor<IProps>(ToolbarContainer);

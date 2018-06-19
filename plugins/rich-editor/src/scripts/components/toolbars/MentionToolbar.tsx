@@ -12,17 +12,23 @@ import Keyboard from "quill/modules/keyboard";
 import axios from "axios";
 import { withEditor, IEditorContextProps } from "@rich-editor/components/context";
 import MentionSuggestionList from "./pieces/MentionSuggestionList";
-import { IMentionSuggestionData } from "./pieces/MentionSuggestion";
 import { thunks as mentionThunks } from "@rich-editor/state/mentionActions";
 import MentionAutoCompleteBlot from "@rich-editor/quill/blots/embeds/MentionAutoCompleteBlot";
 import { getBlotAtIndex, getMentionRange } from "@rich-editor/quill/utility";
+import { Dispatch } from "redux";
+import IStoreState from "@rich-editor/state/IState";
+import { IMentionValue } from "@rich-editor/state/MentionTrie";
+import { IMentionUser } from "@dashboard/apiv2";
+import { connect } from "react-redux";
 
-interface IProps extends IEditorContextProps {}
+interface IProps extends IEditorContextProps {
+    lookupMentions: (username: string) => void;
+    currentSuggestions: IMentionValue | null;
+}
 
-interface IState {
+interface IMentionState {
     inActiveMention: boolean;
     autoCompleteBlot: MentionAutoCompleteBlot | null;
-    suggestions: IMentionSuggestionData[];
     username: string;
     startIndex: number;
     activeItemID: string;
@@ -35,13 +41,12 @@ const mentionCache: Map<string, AxiosResponse | null> = new Map();
 /**
  * Module for inserting, removing, and editing at-mentions.
  */
-export class MentionModule extends React.PureComponent<IProps, IState> {
+export class MentionToolbar extends React.PureComponent<IProps, IMentionState> {
     private quill: Quill;
     private ID = uniqueId("mentionList-");
     private noResultsID = uniqueId("mentionList-noResults-");
     private comboBoxID = uniqueId("mentionComboBox-");
     private isConvertingMention = false;
-    private apiCancelSource = axios.CancelToken.source();
 
     constructor(props: IProps) {
         super(props);
@@ -49,12 +54,11 @@ export class MentionModule extends React.PureComponent<IProps, IState> {
         this.state = {
             inActiveMention: false,
             autoCompleteBlot: null,
-            suggestions: [],
             username: "",
             startIndex: 0,
             activeItemID: "",
             activeItemIndex: 0,
-            hasApiResponse: false,
+            hasApiResponse: true,
         };
     }
 
@@ -71,16 +75,20 @@ export class MentionModule extends React.PureComponent<IProps, IState> {
     }
 
     public render() {
+        const { currentSuggestions } = this.props;
         return (
-            <MentionSuggestionList
-                onItemClick={this.onItemClick}
-                mentionData={this.state.suggestions}
-                matchedString={this.state.username}
-                activeItemId={this.state.activeItemID}
-                isVisible={this.state.inActiveMention && this.state.hasApiResponse}
-                id={this.ID}
-                noResultsID={this.noResultsID}
-            />
+            currentSuggestions &&
+            currentSuggestions.status === "SUCCESSFUL" && (
+                <MentionSuggestionList
+                    onItemClick={this.onItemClick}
+                    mentionData={this.transformSuggestions(currentSuggestions.users)}
+                    matchedString={this.state.username}
+                    activeItemId={this.state.activeItemID}
+                    isVisible={this.state.inActiveMention /*  && this.state.hasApiResponse */}
+                    id={this.ID}
+                    noResultsID={this.noResultsID}
+                />
+            )
         );
     }
 
@@ -96,7 +104,14 @@ export class MentionModule extends React.PureComponent<IProps, IState> {
      * Keydown listener for ARIA compliance with
      */
     private keyDownListener = (event: KeyboardEvent) => {
-        const { activeItemIndex, suggestions, inActiveMention, hasApiResponse } = this.state;
+        const { activeItemIndex, inActiveMention, hasApiResponse } = this.state;
+        const { currentSuggestions } = this.props;
+
+        if (!currentSuggestions || currentSuggestions.status !== "SUCCESSFUL") {
+            return;
+        }
+
+        // const suggestions =
         if (this.quill.hasFocus() && inActiveMention && !hasApiResponse) {
             // Quill doesn't properly trigger update the range until after enter is pressed, which triggers out text change listener with the wrong range. Manually handle this for now.
             if (Keyboard.match(event, Keyboard.keys.ENTER)) {
@@ -113,12 +128,12 @@ export class MentionModule extends React.PureComponent<IProps, IState> {
             const firstIndex = 0;
             const nextIndex = activeItemIndex + 1;
             const prevIndex = activeItemIndex - 1;
-            const lastIndex = suggestions.length - 1;
+            const lastIndex = currentSuggestions.users.length - 1;
 
             switch (true) {
                 case Keyboard.match(event, Keyboard.keys.DOWN):
                     newIndex = activeItemIndex === lastIndex ? firstIndex : nextIndex;
-                    newItemID = this.generateIdForMentionData(suggestions[newIndex]);
+                    newItemID = this.generateIdForMentionData(currentSuggestions.users[newIndex]);
                     this.setState({
                         activeItemID: newItemID,
                         activeItemIndex: newIndex,
@@ -129,7 +144,7 @@ export class MentionModule extends React.PureComponent<IProps, IState> {
                     break;
                 case Keyboard.match(event, Keyboard.keys.UP):
                     newIndex = activeItemIndex === firstIndex ? lastIndex : prevIndex;
-                    newItemID = this.generateIdForMentionData(suggestions[newIndex]);
+                    newItemID = this.generateIdForMentionData(currentSuggestions.users[newIndex]);
                     this.setState({
                         activeItemID: newItemID,
                         activeItemIndex: newIndex,
@@ -156,7 +171,7 @@ export class MentionModule extends React.PureComponent<IProps, IState> {
     /**
      * Generate an ID for a mention suggestion.
      */
-    private generateIdForMentionData(data: IMentionSuggestionData) {
+    private generateIdForMentionData(data: IMentionUser) {
         return this.props.editorID + "-mentionItem-" + data.userID;
     }
 
@@ -175,6 +190,21 @@ export class MentionModule extends React.PureComponent<IProps, IState> {
         }
     };
 
+    private transformSuggestions(suggestions: IMentionUser[]) {
+        return suggestions.map((data, index) => {
+            const uniqueID = this.generateIdForMentionData(data);
+            const onMouseEnter = () => {
+                this.setState({ activeItemID: uniqueID, activeItemIndex: index }, this.injectComboBoxAccessibility);
+            };
+
+            return {
+                ...data,
+                uniqueID,
+                onMouseEnter,
+            };
+        });
+    }
+
     /**
      * Handle mention responses from the API.
      */
@@ -183,23 +213,11 @@ export class MentionModule extends React.PureComponent<IProps, IState> {
             return;
         }
 
-        const suggestions = response.data.map((data: IMentionSuggestionData, index) => {
-            data.uniqueID = this.generateIdForMentionData(data);
-            data.onMouseEnter = () => {
-                this.setState(
-                    { activeItemID: data.uniqueID, activeItemIndex: index },
-                    this.injectComboBoxAccessibility,
-                );
-            };
-            return data;
-        });
-
         this.setState(
             {
-                suggestions,
-                activeItemID: suggestions.length > 0 ? suggestions[0].uniqueID : null,
-                activeItemIndex: 0,
-                hasApiResponse: true,
+                // activeItemID: suggestions.length > 0 ? suggestions[0].uniqueID : null, // todo reset this somewhere else.
+                activeItemIndex: 0, // TODO: reset this somewhere else.
+                hasApiResponse: true, // TODO remove this.
             },
             this.injectComboBoxAccessibility,
         );
@@ -221,7 +239,6 @@ export class MentionModule extends React.PureComponent<IProps, IState> {
             inActiveMention: false,
             autoCompleteBlot: null,
             username: "",
-            suggestions: [],
             hasApiResponse: false,
         });
         this.isConvertingMention = false;
@@ -231,13 +248,19 @@ export class MentionModule extends React.PureComponent<IProps, IState> {
      * Convert the active MentionAutoCompleteBlot into a MentionBlot.
      */
     private confirmActiveMention() {
-        const { autoCompleteBlot, suggestions, activeItemIndex } = this.state;
-        if (!(autoCompleteBlot instanceof MentionAutoCompleteBlot) || this.isConvertingMention) {
+        const { autoCompleteBlot, activeItemIndex } = this.state;
+        const { currentSuggestions } = this.props;
+        if (
+            !(autoCompleteBlot instanceof MentionAutoCompleteBlot) ||
+            this.isConvertingMention ||
+            !currentSuggestions ||
+            currentSuggestions.status !== "SUCCESSFUL"
+        ) {
             return;
         }
 
         this.isConvertingMention = true;
-        const activeSuggestion = suggestions[activeItemIndex];
+        const activeSuggestion = currentSuggestions.users[activeItemIndex];
         const start = autoCompleteBlot.offset(this.quill.scroll);
 
         autoCompleteBlot.finalize(activeSuggestion);
@@ -315,8 +338,24 @@ export class MentionModule extends React.PureComponent<IProps, IState> {
             username: autoCompleteBlot.username,
             startIndex: autoCompleteBlot.offset(this.quill.scroll),
         });
-        mentionThunks.loadUsers(autoCompleteBlot.username);
+        this.props.lookupMentions(autoCompleteBlot.username);
     };
 }
 
-export default withEditor<IProps>(MentionModule);
+function mapDispatchToProps(dispatch: Dispatch<any>) {
+    return { lookupMentions: username => dispatch(mentionThunks.loadUsers(username)) };
+}
+
+function mapStateToProps(state: IStoreState) {
+    const { lastSuccessfulUsername, currentUsername, usersTrie } = state.editor.mentions;
+    return {
+        currentSuggestions: lastSuccessfulUsername ? usersTrie.getValue(lastSuccessfulUsername) : null,
+    };
+}
+
+const withRedux = connect(
+    mapStateToProps,
+    mapDispatchToProps,
+);
+
+export default withRedux(withEditor<IProps>(MentionToolbar));

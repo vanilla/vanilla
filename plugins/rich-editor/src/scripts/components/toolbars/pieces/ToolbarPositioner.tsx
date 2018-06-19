@@ -46,7 +46,7 @@ interface IState {
     quillWidth: number;
 }
 
-class FlyoutBounds extends React.PureComponent<IProps, IState> {
+class ToolbarPositioner extends React.PureComponent<IProps, IState> {
     private quill: Quill;
 
     constructor(props) {
@@ -203,4 +203,4 @@ class FlyoutBounds extends React.PureComponent<IProps, IState> {
     }
 }
 
-export default withEditor<IProps>(FlyoutBounds);
+export default withEditor<IProps>(ToolbarPositioner);

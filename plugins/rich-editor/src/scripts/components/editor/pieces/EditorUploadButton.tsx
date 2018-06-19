@@ -14,7 +14,7 @@ import { isFileImage } from "@dashboard/utility";
 
 interface IProps extends IEditorContextProps {}
 
-export class UploadButton extends React.Component<IProps, {}> {
+export class EditorUploadButton extends React.Component<IProps, {}> {
     private inputRef: React.RefObject<HTMLInputElement> = React.createRef();
 
     public render() {
@@ -57,4 +57,4 @@ export class UploadButton extends React.Component<IProps, {}> {
     };
 }
 
-export default withEditor<IProps>(UploadButton);
+export default withEditor<IProps>(EditorUploadButton);

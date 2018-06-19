@@ -6,13 +6,17 @@
 
 import * as mentionActions from "./mentionActions";
 import MentionTrie from "./MentionTrie";
-import apiv2 from "@dashboard/apiv2";
+import { logError } from "@dashboard/utility";
 
 export interface IMentionState {
+    lastSuccessfulUsername: string | null;
+    currentUsername: string | null;
     usersTrie: MentionTrie;
 }
 
 export const initialState: IMentionState = {
+    lastSuccessfulUsername: null,
+    currentUsername: null,
     usersTrie: new MentionTrie(),
 };
 
@@ -23,7 +27,24 @@ export default function mentionReducer(state = initialState, action: mentionActi
             state.usersTrie.insert(username, {
                 status: "PENDING",
             });
-            return state;
+
+            // We want to invalidate the previous results unless:
+            // - The new string is longer than the old one
+            // - The new string is a superset of the old one.
+            let shouldKeepPreviousResults = false;
+            const previousSuccessfulName = state.lastSuccessfulUsername;
+            if (previousSuccessfulName != null && username.length > previousSuccessfulName.length) {
+                const newNameSubstring = username.substring(0, previousSuccessfulName.length);
+                if (newNameSubstring === previousSuccessfulName) {
+                    shouldKeepPreviousResults = true;
+                }
+            }
+
+            return {
+                ...state,
+                currentUsername: username,
+                lastSuccessfulUsername: shouldKeepPreviousResults ? state.lastSuccessfulUsername : null,
+            };
         }
         case mentionActions.LOAD_USERS_FAILURE: {
             const { username, error } = action.payload;
@@ -32,6 +53,7 @@ export default function mentionReducer(state = initialState, action: mentionActi
                 users: null,
                 error,
             });
+            logError(error);
             return state;
         }
         case mentionActions.LOAD_USERS_SUCCESS: {
@@ -40,7 +62,11 @@ export default function mentionReducer(state = initialState, action: mentionActi
                 status: "SUCCESSFUL",
                 users,
             });
-            return state;
+            return {
+                ...state,
+                lastSuccessfulUsername: username,
+                currentUsername: username === state.currentUsername ? null : state.currentUsername,
+            };
         }
         default:
             return state;

@@ -235,7 +235,14 @@ class PasswordForm extends React.Component<IProps, IState> {
                             </span>
                         </div>
                     </div>
-                    <ButtonSubmit disabled={!this.state.editable} content={t("Sign In")} />
+                    <ButtonSubmit
+                        disabled={
+                            !this.state.editable ||
+                            get(this, "username.value", "") === "" ||
+                            get(this, "password.value", "") === ""
+                        }
+                        content={t("Sign In")}
+                    />
                     {/*<p className="authenticateUser-paragraph isCentered">{t('Not registered?')} <Link to="/entry/signup">{t('Create an Account')}</Link></p>*/}
                 </form>
             );

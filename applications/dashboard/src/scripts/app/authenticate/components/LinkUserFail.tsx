@@ -8,12 +8,19 @@ import React from "react";
 import { withRouter, BrowserRouter, Route, Link } from "react-router-dom";
 import Paragraph from "@dashboard/components/forms/Paragraph";
 
-export default class LinkUserFail extends React.Component<{}, {}> {
+interface IProps {
+    message?: string;
+}
+
+export default class LinkUserFail extends React.Component<IProps, {}> {
     public render() {
+        const message = this.props.message ? this.props.message : t("There was an error!");
         return (
             <div className="authenticateUserCol">
-                <Paragraph className="authenticateUser-paragraph" content={t("There was an error!")} />
-                <Link to="/authenticate/signin">{t("Try again")}</Link>
+                <Paragraph className="authenticateUser-paragraph" content={message} />
+                <Link className="Button button button-fullWidth" to="/authenticate/signin">
+                    {t("Try again")}
+                </Link>
             </div>
         );
     }

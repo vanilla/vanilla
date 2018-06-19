@@ -15,8 +15,6 @@ interface IProps {
 
 export default class SsoUser extends React.Component<IProps, {}> {
     public render() {
-        log(t("SsoUser props: "), this.props);
-
         const userInfo: string[] = [];
         if (this.props.ssoUser.fullName) {
             userInfo.push(this.props.ssoUser.fullName as string);

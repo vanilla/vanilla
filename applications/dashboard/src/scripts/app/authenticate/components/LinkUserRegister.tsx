@@ -26,7 +26,7 @@ interface IProps {
     setParentState: any;
     acceptedTermsOfService?: boolean;
     rememberMe?: boolean;
-    termsOfServiceErrors?: string[];
+    termsOfServiceError?: string;
 }
 
 interface IState extends IRequiredComponentID {
@@ -39,7 +39,7 @@ interface IState extends IRequiredComponentID {
     submitEnabled: boolean;
     rememberMe: boolean;
     acceptedTermsOfService: boolean;
-    termsOfServiceErrors: string[];
+    termsOfServiceError?: string;
 }
 
 export default class SsoUser extends React.Component<IProps, IState> {
@@ -69,7 +69,7 @@ export default class SsoUser extends React.Component<IProps, IState> {
             emailErrors: props.emailErrors || [],
             usernameErrors: props.usernameErrors || [],
             globalError: props.globalError,
-            termsOfServiceErrors: props.termsOfServiceErrors || [],
+            termsOfServiceError: props.termsOfServiceError,
         };
     }
 
@@ -91,15 +91,13 @@ export default class SsoUser extends React.Component<IProps, IState> {
     };
 
     public handleTOSCheckChange = event => {
-        const value: boolean = get(event, "target.checked", false);
         this.setState({
-            acceptedTermsOfService: value,
+            acceptedTermsOfService: get(event, "target.checked", false),
         });
     };
     public handleRememberMeCheckChange = event => {
-        const value: boolean = get(event, "target.checked", false);
         this.setState({
-            rememberMe: value,
+            rememberMe: get(event, "target.checked", false),
         });
     };
 
@@ -172,17 +170,13 @@ export default class SsoUser extends React.Component<IProps, IState> {
 
         if (!this.state.acceptedTermsOfService) {
             this.setState({
-                termsOfServiceErrors: [t("You must agree to the terms of service.")],
+                termsOfServiceError: t("You must agree to the terms of service."),
             });
+        } else {
+            valid = true;
         }
 
-        if (this.state.acceptedTermsOfService && this.state.usernameErrors.length !== 0) {
-            if (!this.props.config.noEmail && this.state.usernameErrors.length !== 0) {
-                valid = true;
-            } else {
-                valid = true;
-            }
-        }
+        log(t("LinkUserRegister Form Valid?: "), valid);
 
         return valid;
     }
@@ -190,12 +184,16 @@ export default class SsoUser extends React.Component<IProps, IState> {
     public handleSubmit = event => {
         event.preventDefault();
 
-        if (this.validateForm) {
+        if (this.validateForm()) {
             this.setState({
                 editable: false,
             });
 
-            log(t("Handle Submit before api Call:"), event);
+            // log(t("Do submit:"), {
+            //     username: this.username.value,
+            //     email: this.email.value,
+            //     persist: this.state.rememberMe,
+            // });
 
             apiv2
                 .post("/authenticate/link-user", {
@@ -204,24 +202,30 @@ export default class SsoUser extends React.Component<IProps, IState> {
                     persist: this.state.rememberMe,
                 })
                 .then(r => {
-                    log(t("Yeah, you do need to handle it..."), r);
+                    log(t("Regular Response"), r);
                     // this.props.setParentState();
-
-                    this.setState({
-                        editable: true,
-                    });
-                })
-                .catch(e => {
-                    log(t("Catch Error: ", e));
-                    this.handleErrors(e);
+                    //
+                    // this.setState({
+                    //     editable: true,
+                    // });
                 });
+            // .catch(e => {
+            //     log(t("Catch Error: ", e));
+            //     //this.handleErrors(e);
+            // });
         }
+
+        // this.setState({
+        //     // delete me
+        //     editable: true,
+        // });
     };
 
     public render() {
         const emailField = this.props.config.noEmail ? null : (
             <InputTextBlock
                 label={t("Email")}
+                type="email"
                 required={true}
                 disabled={!this.state.editable}
                 errors={this.state.emailErrors}
@@ -237,8 +241,7 @@ export default class SsoUser extends React.Component<IProps, IState> {
                     <Paragraph content={t("Fill out the following information to complete your registration")} />
                     {emailField}
                     <InputTextBlock
-                        label={t("Email")}
-                        type="email"
+                        label={t("Username")}
                         required={true}
                         disabled={!this.state.editable}
                         errors={this.state.usernameErrors}
@@ -250,17 +253,20 @@ export default class SsoUser extends React.Component<IProps, IState> {
                         <Checkbox
                             dangerousLabel={this.props.termsOfServiceLabel}
                             onChange={this.handleTOSCheckChange}
-                            checked={this.state.rememberMe}
-                            defaultChecked={this.state.acceptedTermsOfService}
+                            checked={this.state.acceptedTermsOfService}
                             ref={termsOfServiceElement =>
                                 (this.termsOfServiceElement = termsOfServiceElement as Checkbox)
                             }
+                        />
+                        <Paragraph
+                            className="authenticateUser-paragraph"
+                            isError={true}
+                            content={this.state.termsOfServiceError}
                         />
                         <Checkbox
                             label={t("Keep me signed in")}
                             onChange={this.handleRememberMeCheckChange}
                             checked={this.state.rememberMe}
-                            defaultChecked={this.state.rememberMe}
                             ref={rememberMeElement => (this.rememberMeElement = rememberMeElement as Checkbox)}
                         />
                     </div>

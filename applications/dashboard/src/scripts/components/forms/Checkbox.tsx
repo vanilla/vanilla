@@ -11,12 +11,12 @@ import { uniqueIDFromPrefix, getOptionalID, IOptionalComponentID } from "@dashbo
 interface IProps extends IOptionalComponentID {
     id?: string;
     className?: string;
-    checked: boolean;
+    checked?: boolean;
     disabled?: boolean;
     onChange: any;
     label?: string;
     dangerousLabel?: string;
-    defaultChecked: boolean;
+    defaultChecked?: boolean;
 }
 
 interface IState {
@@ -57,7 +57,7 @@ export default class Checkbox extends React.Component<IProps, IState> {
                     type="checkbox"
                     onChange={this.props.onChange}
                     checked={this.props.checked}
-                    defaultChecked={this.props.defaultValue}
+                    defaultChecked={this.props.defaultChecked}
                 />
                 <span className="checkbox-box" aria-hidden="true">
                     <span className="checkbox-state">

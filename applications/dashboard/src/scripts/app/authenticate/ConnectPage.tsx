@@ -18,6 +18,7 @@ import SsoUser from "@dashboard/app/authenticate/components/ssoUser";
 import { authenticatorsSet } from "@dashboard/app/state/actions/authenticateActions";
 import Paragraph from "@dashboard/components/forms/Paragraph";
 import InputTextBlock from "@dashboard/components/forms/InputTextBlock";
+import get from "lodash/get";
 
 interface IProps {}
 
@@ -47,7 +48,8 @@ export default class ConnectPage extends React.Component<IProps, IState> {
 
     public render() {
         const stepClasses = classNames("authenticateConnect", "authenticateConnect-" + this.state.step);
-        const linkUser = this.state.linkUser || {};
+
+        const linkUser = get(this, "state.linkUser", {});
 
         let pageTitle;
         const content: JSX.Element[] = [];
@@ -56,7 +58,6 @@ export default class ConnectPage extends React.Component<IProps, IState> {
 
         switch (this.state.step) {
             case "linkUser":
-                log("In Link User linkUser: =======================: ", linkUser);
                 pageTitle = t("Your %s Account").replace("%s", linkUser.authenticator.name);
 
                 content.push(
@@ -89,7 +90,12 @@ export default class ConnectPage extends React.Component<IProps, IState> {
             default:
                 // Fail, unable to recover
                 pageTitle = t("Error Signing In");
-                content.push(<LinkUserFail key={uniqueIDFromPrefix("ConnectPage-linkUserFail")} />);
+                content.push(
+                    <LinkUserFail
+                        key={uniqueIDFromPrefix("ConnectPage-linkUserFail")}
+                        message={get(this, "state.error", null)}
+                    />,
+                );
         }
 
         log(t("ConnectPage.state: "), this.state);

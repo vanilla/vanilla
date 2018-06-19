@@ -123,7 +123,7 @@ class AuthenticateController extends Gdn_Controller {
 
 
 
-            trace($response);
+//            trace($response);
 
             switch ($response['authenticationStep']) {
                 case 'authenticated':
@@ -158,7 +158,7 @@ class AuthenticateController extends Gdn_Controller {
         }
 
         // Render the component routed to /authenticate/connect. It will get its data
-        trace($state);
+//        trace($state);
         $this->addDefinition('state', ['authenticate' => $state]);
         $this->renderReact();
     }

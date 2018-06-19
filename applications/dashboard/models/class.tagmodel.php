@@ -524,7 +524,7 @@ class TagModel extends Gdn_Model {
             $tags = array_map('trim', explode(',', $tag));
         }
 
-        $taggedDiscussions = $this->SQL
+        $taggedDiscussionIDs = $this->SQL
             ->select('td.DiscussionID')
             ->from('TagDiscussion td')
             ->join('Tag t', 't.TagID = td.TagID')
@@ -532,15 +532,18 @@ class TagModel extends Gdn_Model {
             ->limit($limit, $offset)
             ->get()->resultArray();
 
+        $taggedDiscussionIDs = array_column($taggedDiscussionIDs, 'DiscussionID');
+
         $discussionModel = new DiscussionModel();
         $discussions = $discussionModel->get(
-            $offset,
-            $limit,
+            0,
+            '',
             [
                 'Announce' => 'all',
-                'd.DiscussionID' => $taggedDiscussions,
+                'd.DiscussionID' => $taggedDiscussionIDs,
             ]
         );
+
         return $discussions;
     }
 

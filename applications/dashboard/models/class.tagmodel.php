@@ -523,19 +523,12 @@ class TagModel extends Gdn_Model {
         if (!is_array($tag)) {
             $tags = array_map('trim', explode(',', $tag));
         }
-        $tagIDs = Gdn::sql()
-            ->select('TagID')
-            ->from('Tag')
-            ->whereIn('Name', $tags)
-            ->get()->resultArray();
-
-        $tagIDs = array_column($tagIDs, 'TagID');
 
         $taggedDiscussions = Gdn::sql()
-            ->select('d.DiscussionID')
-            ->from('Discussion d')
-            ->join('TagDiscussion td', 'd.DiscussionID = td.DiscussionID')
-            ->whereIn('td.TagID', $tagIDs)
+            ->select('td.DiscussionID')
+            ->from('TagDiscussion td')
+            ->join('Tag t', 't.TagID = td.tagID')
+            ->whereIn('t.Name', $tags)
             ->limit($limit, $offset)
             ->get()->resultArray();
 
@@ -549,6 +542,64 @@ class TagModel extends Gdn_Model {
             ]
         );
         return $discussions;
+    }
+
+    /**
+     * @deprecated
+     *
+     * @param Gdn_SQLDriver $sql
+     */
+    public function setTagSql($sql, $tag, &$limit, &$offset = 0, $op = 'or') {
+        $sortField = 'd.DateLastComment';
+        $sortDirection = 'desc';
+        $tagSql = clone Gdn::sql();
+        if ($dateFrom = Gdn::request()->get('DateFrom')) {
+            // Find the discussion ID of the first discussion created on or after the date from.
+            $discussionIDFrom = $tagSql->getWhere('Discussion', ['DateInserted >= ' => $dateFrom], 'DiscussionID', 'asc', 1)->value('DiscussionID');
+            $sortField = 'd.DiscussionID';
+        }
+        if (!is_array($tag)) {
+            $tags = array_map('trim', explode(',', $tag));
+        }
+        $tagIDs = $tagSql
+            ->select('TagID')
+            ->from('Tag')
+            ->whereIn('Name', $tags)
+            ->get()->resultArray();
+        $tagIDs = array_column($tagIDs, 'TagID');
+        if ($op == 'and' && count($tags) > 1) {
+            $discussionIDs = $tagSql
+                ->select('DiscussionID')
+                ->select('TagID', 'count', 'CountTags')
+                ->from('TagDiscussion')
+                ->whereIn('TagID', $tagIDs)
+                ->groupBy('DiscussionID')
+                ->having('CountTags >=', count($tags))
+                ->limit($limit, $offset)
+                ->orderBy('DiscussionID', 'desc')
+                ->get()->resultArray();
+            $limit = '';
+            $offset = 0;
+            $discussionIDs = array_column($discussionIDs, 'DiscussionID');
+            $sql->whereIn('d.DiscussionID', $discussionIDs);
+            $sortField = 'd.DiscussionID';
+        } else {
+            $sql
+                ->join('TagDiscussion td', 'd.DiscussionID = td.DiscussionID')
+                ->limit($limit, $offset)
+                ->whereIn('td.TagID', $tagIDs);
+            if ($op == 'and') {
+                $sortField = 'd.DiscussionID';
+            }
+        }
+        // Set up the sort field and direction.
+        saveToConfig(
+            [
+                'Vanilla.Discussions.SortField' => $sortField,
+                'Vanilla.Discussions.SortDirection' => $sortDirection],
+            '',
+            false
+        );
     }
 
     /**

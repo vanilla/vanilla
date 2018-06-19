@@ -34,7 +34,8 @@ export default class EmbedInsertionModule extends Module {
         const formData = new FormData();
         formData.append("url", url);
 
-        const responseData = api.post("/media/scrape", formData).then(result => this.createEmbed(result.data));
+        const scrapePromise = api.post("/media/scrape", formData).then(result => result.data);
+        this.createEmbed(scrapePromise);
     }
 
     /**

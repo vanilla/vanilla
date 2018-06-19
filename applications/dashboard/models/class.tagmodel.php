@@ -524,7 +524,7 @@ class TagModel extends Gdn_Model {
             $tags = array_map('trim', explode(',', $tag));
         }
 
-        $taggedDiscussions = Gdn::sql()
+        $taggedDiscussions = $this->SQL
             ->select('td.DiscussionID')
             ->from('TagDiscussion td')
             ->join('Tag t', 't.TagID = td.tagID')

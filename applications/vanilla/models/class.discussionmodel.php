@@ -1009,7 +1009,7 @@ class DiscussionModel extends Gdn_Model {
         }
 
         // Allow for discussions to be archived
-        $dateLastCommentTimestamp = $discussion->DateLastComment ? Gdn_Format::toTimestamp($discussion->DateLastComment) : null;
+        $dateLastCommentTimestamp = Gdn_Format::toTimestamp($discussion->DateLastComment);
         if ($dateLastCommentTimestamp && $dateLastCommentTimestamp <= $archiveTimestamp) {
             $discussion->Closed = '1';
             if ($discussion->CountCommentWatch) {

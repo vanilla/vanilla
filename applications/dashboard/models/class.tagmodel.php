@@ -527,7 +527,7 @@ class TagModel extends Gdn_Model {
         $taggedDiscussions = $this->SQL
             ->select('td.DiscussionID')
             ->from('TagDiscussion td')
-            ->join('Tag t', 't.TagID = td.tagID')
+            ->join('Tag t', 't.TagID = td.TagID')
             ->whereIn('t.Name', $tags)
             ->limit($limit, $offset)
             ->get()->resultArray();
@@ -550,6 +550,7 @@ class TagModel extends Gdn_Model {
      * @param Gdn_SQLDriver $sql
      */
     public function setTagSql($sql, $tag, &$limit, &$offset = 0, $op = 'or') {
+        deprecated('TagModel->setTagSql()', 'TagModel->getDiscussions()', '2018-06-19');
         $sortField = 'd.DateLastComment';
         $sortDirection = 'desc';
         $tagSql = clone Gdn::sql();

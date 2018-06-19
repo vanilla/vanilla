@@ -18,7 +18,7 @@ export class ReducerRegistry {
     private reducers = {};
 
     public getReducers() {
-        return { ...this.reducers };
+        return this.reducers;
     }
 
     public register(name, reducer) {
@@ -28,7 +28,7 @@ export class ReducerRegistry {
         }
     }
 
-    setChangeListener(listener: ChangeEmitter) {
+    public setChangeListener(listener: ChangeEmitter) {
         this.emitChange = listener;
     }
 }

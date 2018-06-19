@@ -20,6 +20,8 @@ export function createAction<T extends string, P>(type: T, payload?: P) {
 }
 
 type FunctionType = (...args: any[]) => any;
-type ActionCreatorsMapObject = { [actionCreator: string]: FunctionType };
+interface IActionCreatorsMapObject {
+    [actionCreator: string]: FunctionType;
+}
 
-export type ActionsUnion<A extends ActionCreatorsMapObject> = ReturnType<A[keyof A]>;
+export type ActionsUnion<A extends IActionCreatorsMapObject> = ReturnType<A[keyof A]>;

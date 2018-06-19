@@ -23,7 +23,7 @@ const combine = reducers => {
 };
 
 // browser may have redux dev tools installed, if so integrate with it
-const composeEnhancers = window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__() || compose;
+const composeEnhancers = window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ || compose;
 const enhancer = composeEnhancers(applyMiddleware(...middleware));
 
 // Get our reducers.

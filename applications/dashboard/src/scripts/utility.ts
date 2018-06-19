@@ -240,7 +240,26 @@ export function matchAtMention(subtext: string, shouldStartWithSpace: boolean = 
     // No match
     return null;
 }
+
+/** This should mirror extensions allowed in Vanilla\ImageResizer.php */
+const IMAGE_REGEX = /^image\/(gif|jpe?g|png)/i;
+
 /**
- * Re-exported from sprintf-js https://www.npmjs.com/package/sprintf-js
+ * A filter for use with [].filter
+ *
+ * Matches only image image type files.
+ * @private
+ *
+ * @param file - A File object.
+ * @see https://developer.mozilla.org/en-US/docs/Web/API/File
+ *
+ * @returns Whether or not the file is an acceptable image
  */
-// export const sprintf = sprintfJs.sprintf;
+export function isFileImage(file: File): boolean {
+    if (IMAGE_REGEX.test(file.type)) {
+        return true;
+    }
+
+    log("Filtered out non-image file: ", file.name);
+    return false;
+}

@@ -13,7 +13,7 @@ import gdn from "@dashboard/gdn";
 /**
  * Determine if all of the provided permissions are present.
  */
-export function hasPermission(permissions: string | string[], id: number | null) {
+export function hasPermission(permissions: string | string[], id: number | null = null) {
     if (typeof permissions === "string") {
         permissions = [permissions];
     }

@@ -8,7 +8,7 @@ import { BrowserRouter, Route, RouteProps, Switch } from "react-router-dom";
 import { Provider } from "react-redux";
 import { getRoutes, getMeta } from "@dashboard/application";
 import NotFoundPage from "@dashboard/components/NotFoundPage";
-import store from "../state/store";
+import getStore from "../state/getStore";
 
 /**
  * The root application component.
@@ -24,7 +24,7 @@ export default class Router extends React.PureComponent {
         routes.push(<Route key="@not-found" component={NotFoundPage} />);
 
         return (
-            <Provider store={store}>
+            <Provider store={getStore()}>
                 <BrowserRouter basename={getMeta("context.basePath", "")}>
                     <Switch>{routes}</Switch>
                 </BrowserRouter>

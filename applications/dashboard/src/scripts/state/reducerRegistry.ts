@@ -18,7 +18,7 @@ export class ReducerRegistry {
     private reducers = {};
 
     public getReducers() {
-        return this.reducers;
+        return { ...this.reducers };
     }
 
     public register(name, reducer) {

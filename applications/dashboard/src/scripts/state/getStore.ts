@@ -5,11 +5,12 @@
 
 import { createStore, compose, applyMiddleware, combineReducers } from "redux";
 import reducerRegistry from "./reducerRegistry";
+import thunk from "redux-thunk";
 
 // there may be an initial state to import
 const initialState = window.__INITIAL_STATE__ || {};
 
-const middleware = [];
+const middleware = [thunk];
 
 // Preserve initial state for not-yet-loaded reducers
 const combine = reducers => {
@@ -27,14 +28,17 @@ const composeEnhancers = window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ || compose;
 const enhancer = composeEnhancers(applyMiddleware(...middleware));
 
 // Get our reducers.
-const reducer = combine(reducerRegistry.getReducers());
+const reducer = combineReducers(reducerRegistry.getReducers());
 
 // build the store, add devtools extension support if it's available
 const store = createStore(reducer, initialState, enhancer);
 
 // Replace the store's reducer whenever a new reducer is registered.
 reducerRegistry.setChangeListener(reducers => {
-    store.replaceReducer(combine(reducers));
+    store.replaceReducer(combineReducers(reducers));
+    store.dispatch({ type: "RESET" });
 });
 
-export default store;
+export default function getStore() {
+    return store;
+}

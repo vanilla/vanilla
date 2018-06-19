@@ -14,14 +14,16 @@ interface IProps extends IOptionalComponentID {
     checked: boolean;
     disabled?: boolean;
     onChange: any;
-    label: string;
+    label?: string;
+    dangerousLabel?: string;
+    defaultChecked: boolean;
 }
 
 interface IState {
     id: string;
 }
 
-export default class Button extends React.Component<IProps, IState> {
+export default class Checkbox extends React.Component<IProps, IState> {
     public static defaultProps = {
         disabled: false,
         id: false,
@@ -41,6 +43,12 @@ export default class Button extends React.Component<IProps, IState> {
     public render() {
         const componentClasses = classNames("checkbox", this.props.className);
 
+        let label = this.props.label as string | JSX.Element;
+
+        if (this.props.dangerousLabel) {
+            label = <span dangerouslySetInnerHTML={{ __html: this.props.dangerousLabel }} />;
+        }
+
         return (
             <label id={this.state.id} className={componentClasses}>
                 <input
@@ -49,6 +57,7 @@ export default class Button extends React.Component<IProps, IState> {
                     type="checkbox"
                     onChange={this.props.onChange}
                     checked={this.props.checked}
+                    defaultChecked={this.props.defaultValue}
                 />
                 <span className="checkbox-box" aria-hidden="true">
                     <span className="checkbox-state">
@@ -66,7 +75,7 @@ export default class Button extends React.Component<IProps, IState> {
                     </span>
                 </span>
                 <span id={this.labelID} className="checkbox-label">
-                    {this.props.label}
+                    {label}
                 </span>
             </label>
         );

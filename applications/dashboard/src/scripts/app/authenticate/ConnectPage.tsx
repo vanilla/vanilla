@@ -9,12 +9,15 @@ import { log, logError } from "@dashboard/utility";
 import DocumentTitle from "@dashboard/components/DocumentTitle";
 import apiv2 from "@dashboard/apiv2";
 import LinkUserFail from "@dashboard/app/authenticate/components/LinkUserFail";
+import LinkUserRegister from "@dashboard/app/authenticate/components/LinkUserRegister";
 import { IRequiredComponentID, uniqueIDFromPrefix } from "@dashboard/componentIDs";
 import classNames from "classnames";
 import { getMeta } from "@dashboard/application";
 import gdn from "@dashboard/gdn";
 import SsoUser from "@dashboard/app/authenticate/components/ssoUser";
 import { authenticatorsSet } from "@dashboard/app/state/actions/authenticateActions";
+import Paragraph from "@dashboard/components/forms/Paragraph";
+import InputTextBlock from "@dashboard/components/forms/InputTextBlock";
 
 interface IProps {}
 
@@ -30,6 +33,7 @@ export default class ConnectPage extends React.Component<IProps, IState> {
         super(props);
         const metaState = gdn.getMeta("state") || {};
         const authenticate = metaState.authenticate || {};
+        this.setState = this.setState.bind(this);
 
         this.state = {
             ...authenticate,
@@ -37,20 +41,42 @@ export default class ConnectPage extends React.Component<IProps, IState> {
         };
     }
 
+    public setState(state, callback) {
+        this.setState(state, callback);
+    }
+
     public render() {
         const stepClasses = classNames("authenticateConnect", "authenticateConnect-" + this.state.step);
         const linkUser = this.state.linkUser || {};
 
         let pageTitle;
-        let content;
+        const content: JSX.Element[] = [];
+
+        log(t("Rendering Connect Page: "));
 
         switch (this.state.step) {
             case "linkUser":
+                log("In Link User linkUser: =======================: ", linkUser);
                 pageTitle = t("Your %s Account").replace("%s", linkUser.authenticator.name);
-                content = <SsoUser ssoUser={linkUser.ssoUser} ui={linkUser.authenticator.ui} />;
 
-                log(t("content: "), content);
-                // content += <LinkUserRegister {...this.state.authenticate} />;
+                content.push(
+                    <SsoUser
+                        key={uniqueIDFromPrefix("ConnectPage-SSOUser")}
+                        ssoUser={linkUser.ssoUser}
+                        ui={linkUser.authenticator.ui}
+                    />,
+                );
+
+                content.push(
+                    <LinkUserRegister
+                        key={uniqueIDFromPrefix("ConnectPage-linkUserRegister")}
+                        setParentState={this.setState}
+                        config={linkUser.config}
+                        ssoUser={linkUser.ssoUser}
+                        termsOfServiceLabel={linkUser.authenticator.ui.termsOfServiceLabel}
+                    />,
+                );
+
                 break;
             //     case "password":
             //         content += ssoUser;
@@ -63,7 +89,7 @@ export default class ConnectPage extends React.Component<IProps, IState> {
             default:
                 // Fail, unable to recover
                 pageTitle = t("Error Signing In");
-                content = <LinkUserFail />;
+                content.push(<LinkUserFail key={uniqueIDFromPrefix("ConnectPage-linkUserFail")} />);
         }
 
         log(t("ConnectPage.state: "), this.state);

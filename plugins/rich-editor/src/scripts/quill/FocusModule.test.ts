@@ -6,7 +6,6 @@
 
 import FocusModule from "./FocusModule";
 import Quill, { Blot } from "quill/core";
-import Delta from "quill-delta";
 import ExternalEmbedBlot from "./blots/embeds/ExternalEmbedBlot";
 import { expect } from "chai";
 import { IEmbedData } from "@dashboard/embeds";

@@ -6,9 +6,9 @@
 
 import Module from "quill/core/module";
 import Parchment from "parchment";
-import FileUploader from "@dashboard/FileUploader";
 import Quill, { RangeStatic, Sources } from "quill/core";
-import api from "@dashboard/apiv2";
+import api, { uploadImage } from "@dashboard/apiv2";
+import { getPastedImage, getDraggedImage } from "@dashboard/dom";
 import ExternalEmbedBlot from "./blots/embeds/ExternalEmbedBlot";
 import { IEmbedData } from "@dashboard/embeds";
 
@@ -17,7 +17,6 @@ import { IEmbedData } from "@dashboard/embeds";
  */
 export default class EmbedInsertionModule extends Module {
     private lastSelection: RangeStatic = { index: 0, length: 0 };
-    private fileUploader: FileUploader;
 
     constructor(public quill: Quill, options = {}) {
         super(quill, options);
@@ -35,8 +34,7 @@ export default class EmbedInsertionModule extends Module {
         const formData = new FormData();
         formData.append("url", url);
 
-        const responseData = api.post("/media/scrape", formData).then(result => result.data);
-        this.createEmbed(responseData);
+        const responseData = api.post("/media/scrape", formData).then(result => this.createEmbed(result.data));
     }
 
     /**
@@ -44,8 +42,8 @@ export default class EmbedInsertionModule extends Module {
      *
      * @param dataPromise - A promise that will either return the data needed for rendering, or throw an error.
      */
-    public createEmbed = (dataPromise: Promise<IEmbedData>, callback?: () => void) => {
-        const externalEmbed = Parchment.create("embed-external", dataPromise) as ExternalEmbedBlot;
+    public createEmbed = (data: IEmbedData, callback?: () => void) => {
+        const externalEmbed = Parchment.create("embed-external", data) as ExternalEmbedBlot;
         const [currentLine] = this.quill.getLine(this.lastSelection.index);
         const referenceBlot = currentLine.split(this.lastSelection.index);
         const newSelection = {
@@ -96,35 +94,25 @@ export default class EmbedInsertionModule extends Module {
         }
     };
 
+    private pasteHandler = (event: ClipboardEvent) => {
+        const image = getPastedImage(event);
+        if (image) {
+            return uploadImage(image).then(this.createEmbed);
+        }
+    };
+
+    private dragHandler = (event: DragEvent) => {
+        const image = getDraggedImage(event);
+        if (image) {
+            return uploadImage(image).then(this.createEmbed);
+        }
+    };
+
     /**
      * Setup image upload listeners and handlers.
      */
     private setupImageUploads() {
-        this.fileUploader = new FileUploader(this.createEmbed);
-        this.quill.root.addEventListener("drop", this.fileUploader.dropHandler, false);
-        this.quill.root.addEventListener("paste", this.fileUploader.pasteHandler, false);
-        this.setupImageUploadButton();
-    }
-
-    /**
-     * Setup the the fake file input for image uploads.
-     */
-    private setupImageUploadButton() {
-        const fakeImageUpload = this.quill.container.closest(".richEditor")!.querySelector(".js-fakeFileUpload");
-        const imageUpload = this.quill.container.closest(".richEditor")!.querySelector(".js-fileUpload");
-
-        if (fakeImageUpload && imageUpload instanceof HTMLInputElement) {
-            fakeImageUpload.addEventListener("click", () => {
-                imageUpload.click();
-            });
-
-            imageUpload.addEventListener("change", () => {
-                const file = imageUpload.files && imageUpload.files[0];
-
-                if (file) {
-                    this.fileUploader.uploadFile(file);
-                }
-            });
-        }
+        this.quill.root.addEventListener("drop", this.dragHandler, false);
+        this.quill.root.addEventListener("paste", this.pasteHandler, false);
     }
 }

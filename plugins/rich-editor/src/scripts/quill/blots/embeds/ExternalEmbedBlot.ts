@@ -5,18 +5,14 @@
  */
 
 import { setData, getData } from "@dashboard/dom";
-import Parchment from "parchment";
 import uniqueId from "lodash/uniqueId";
 import LoadingBlot from "../embeds/LoadingBlot";
 import { IEmbedData, renderEmbed, FOCUS_CLASS } from "@dashboard/embeds";
 import FocusableEmbedBlot from "../abstract/FocusableEmbedBlot";
 import ErrorBlot from "./ErrorBlot";
 import { t } from "@dashboard/application";
-import Quill, { Blot } from "quill/core";
 
 const loadingDataKey = "__loading-data__";
-
-const loaderKeys = new Set();
 
 export default class ExternalEmbedBlot extends FocusableEmbedBlot {
     public static blotName = "embed-external";

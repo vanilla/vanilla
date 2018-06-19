@@ -5,16 +5,15 @@
  */
 
 import Quill from "../../../quill";
-import Parchment from "parchment";
 import MentionAutoCompleteBlot from "./MentionAutoCompleteBlot";
-import { IMentionData } from "../../../editor/mentions/MentionSuggestion";
 import { expect } from "chai";
+import { IMentionSuggestionData } from "@rich-editor/components/toolbars/pieces/MentionSuggestion";
 
 describe("[MentionAutoCompleteBlot]", () => {
     it("can be finalized.", () => {
         const quill = new Quill(document.body);
 
-        const data: IMentionData = {
+        const data: IMentionSuggestionData = {
             userID: 1,
             name: "complete",
             photoUrl: "https://github.com",

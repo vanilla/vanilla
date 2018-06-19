@@ -4,8 +4,7 @@
  */
 
 import ClassFormatBlot from "./ClassFormatBlot";
-import withWrapper, { IWrappable } from "./withWrapper";
-import WrapperBlot from "./WrapperBlot";
+import withWrapper from "./withWrapper";
 
 /**
  * A Line blot is responsible for recreating it's wrapping Blots.

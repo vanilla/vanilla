@@ -10,7 +10,6 @@ import KeyboardModule from "quill/modules/keyboard";
 import Delta from "quill-delta";
 import Parchment from "parchment";
 import { matchAtMention } from "@dashboard/utility";
-import FocusableEmbedBlot from "./blots/abstract/FocusableEmbedBlot";
 
 interface IBoundary {
     start: number;

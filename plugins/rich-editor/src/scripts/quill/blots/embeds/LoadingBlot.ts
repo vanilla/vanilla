@@ -6,7 +6,6 @@
 
 import { t } from "@dashboard/application";
 import FocusableEmbedBlot from "../abstract/FocusableEmbedBlot";
-import uniqueId from "lodash/uniqueId";
 import { FOCUS_CLASS } from "@dashboard/embeds";
 
 export default class LoadingBlot extends FocusableEmbedBlot {

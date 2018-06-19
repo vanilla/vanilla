@@ -8,6 +8,7 @@ namespace VanillaTests\Library\Vanilla\Embeds;
 
 use Exception;
 use Garden\Http\HttpRequest;
+use Vanilla\Embeds\GiphyEmbed;
 use Vanilla\Embeds\ImgurEmbed;
 use Vanilla\Embeds\SoundCloudEmbed;
 use VanillaTests\SharedBootstrapTestCase;
@@ -37,6 +38,7 @@ class EmbedManagerTest extends SharedBootstrapTestCase {
             ->addEmbed(new InstagramEmbed())
             ->addEmbed(new ImgurEmbed())
             ->addEmbed(new SoundCloudEmbed())
+            ->addEmbed(new GiphyEmbed())
             ->addEmbed(new ImageEmbed(), EmbedManager::PRIORITY_LOW)
             ->setNetworkEnabled(false);
         return $embedManager;
@@ -162,6 +164,26 @@ class EmbedManagerTest extends SharedBootstrapTestCase {
 <iframe width="100%" height="400" scrolling="no" frameborder="no" 
     src="https://w.soundcloud.com/player/?url=https://api.soundcloud.com/tracks/2F174656930&amp;show_artwork=true&amp;visual=true">
 </iframe>
+</div>'
+            ],
+            [
+                [
+                    "url" => "https://giphy.com/gifs/super-smash-bros-ultimate-jwSlQZnsymUW49NC3R",
+                    "type" => "giphy",
+                    "name" => null,
+                    "body" => null,
+                    "photoUrl" => null,
+                    "height" => 270,
+                    "width" => 480,
+                    "attributes" => [
+                        "postID" => "jwSlQZnsymUW49NC3R",
+                        "url" => "https://giphy.com/gifs/super-smash-bros-ultimate-jwSlQZnsymUW49NC3R"
+                    ],
+                ],
+'<div class="embed embedGiphy" style="width: 480px">
+    <div class="embedExternal-ratio" style="padding-bottom: 56.25%">
+        <iframe class="giphy-embed embedGiphy-iframe" src="https://giphy.com/embed/jwSlQZnsymUW49NC3R"></iframe>
+    </div>
 </div>'
             ],
             [

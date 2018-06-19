@@ -15,11 +15,10 @@ export async function giphyRenderer(element: HTMLElement, data: IEmbedData) {
         throw new Error("Giphy embed fail, the post could not be found");
     }
 
-    element.classList.add("embed");
     element.classList.add("embedGiphy");
     element.style.width = `${data.width}px` || "100%";
 
-    const paddingBottom = ((data.height || 1) / (data.width || 2)) * 100 + "%";
+    const paddingBottom = ((data.height || 1) / (data.width || 1)) * 100 + "%";
     const giphyWrapper = document.createElement("div");
     giphyWrapper.style.paddingBottom = paddingBottom;
     giphyWrapper.classList.add("embedExternal-ratio");

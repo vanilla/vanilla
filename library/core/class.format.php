@@ -1564,7 +1564,7 @@ EOT;
             case 'Vine':
                 return <<<EOT
 <div class="vine-video VideoWrap">
-   <iframe class="vine-embed" src="https://vine.co/v/{$matches[1]}/embed/simple" width="320" height="320" frameborder="0"></iframe><script async src="https://platform.vine.co/static/scripts/embed.js" charset="utf-8"></script>
+   <iframe class="vine-embed" src="https://vine.co/v/{$matches[1]}/embed/simple" width="320" height="320" frameborder="0"></iframe>
 </div>
 EOT;
                 break;

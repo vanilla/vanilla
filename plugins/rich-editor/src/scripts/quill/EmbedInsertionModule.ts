@@ -42,8 +42,8 @@ export default class EmbedInsertionModule extends Module {
      *
      * @param dataPromise - A promise that will either return the data needed for rendering, or throw an error.
      */
-    public createEmbed = (data: IEmbedData, callback?: () => void) => {
-        const externalEmbed = Parchment.create("embed-external", data) as ExternalEmbedBlot;
+    public createEmbed = (dataPromise: Promise<IEmbedData>, callback?: () => void) => {
+        const externalEmbed = Parchment.create("embed-external", dataPromise) as ExternalEmbedBlot;
         const [currentLine] = this.quill.getLine(this.lastSelection.index);
         const referenceBlot = currentLine.split(this.lastSelection.index);
         const newSelection = {
@@ -97,14 +97,16 @@ export default class EmbedInsertionModule extends Module {
     private pasteHandler = (event: ClipboardEvent) => {
         const image = getPastedImage(event);
         if (image) {
-            return uploadImage(image).then(this.createEmbed);
+            const imagePromise = uploadImage(image);
+            this.createEmbed(imagePromise);
         }
     };
 
     private dragHandler = (event: DragEvent) => {
         const image = getDraggedImage(event);
         if (image) {
-            return uploadImage(image).then(this.createEmbed);
+            const imagePromise = uploadImage(image);
+            this.createEmbed(imagePromise);
         }
     };
 

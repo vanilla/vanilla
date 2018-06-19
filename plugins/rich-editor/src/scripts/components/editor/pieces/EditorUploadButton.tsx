@@ -51,7 +51,8 @@ export class UploadButton extends React.Component<IProps, {}> {
             this.props.quill && (this.props.quill.getModule("embed/insertion") as EmbedInsertionModule);
 
         if (file && isFileImage(file) && embedInsertion) {
-            return uploadImage(file).then(embedInsertion.createEmbed);
+            const imagePromise = uploadImage(file);
+            embedInsertion.createEmbed(imagePromise);
         }
     };
 }

@@ -23,10 +23,11 @@ interface IProps {
     termsOfServiceLabel: string;
     config: any;
     ssoUser: any;
-    setParentState: any;
+    setErrorState: any;
     acceptedTermsOfService?: boolean;
     rememberMe?: boolean;
     termsOfServiceError?: string;
+    authSessionID: string;
 }
 
 interface IState extends IRequiredComponentID {
@@ -43,10 +44,6 @@ interface IState extends IRequiredComponentID {
 }
 
 export default class SsoUser extends React.Component<IProps, IState> {
-    public static getDerivedStateFromProps(nextProps, prevState) {
-        return { ...prevState, ...nextProps };
-    }
-
     private email: InputTextBlock;
     private username: InputTextBlock;
     private rememberMeElement: Checkbox;
@@ -102,42 +99,46 @@ export default class SsoUser extends React.Component<IProps, IState> {
     };
 
     public handleErrors = e => {
-        log(t("Handle errror: ", e));
-        if (e.status === 200) {
-            const catchAllErrorMessage = t("An error has occurred, please try again.");
-            let globalError = get(e, "response.data.message", false);
-            const errors = get(e, "response.data.errors", []);
-            const hasFieldSpecificErrors = errors.length > 0;
-            let emailErrors: string[] = [];
-            let usernameErrors: string[] = [];
+        const catchAllErrorMessage = t("An error has occurred, please try again.");
 
-            if (globalError || hasFieldSpecificErrors) {
-                if (hasFieldSpecificErrors) {
-                    globalError = ""; // Only show global error if all fields are error free
-                    logError("LinkUserRegister Errors", errors);
-                    errors.forEach((error, index) => {
-                        error.timestamp = new Date().getTime(); // Timestamp to make sure state changes, even if the message is the same
-                        if (error.field === "password") {
-                            emailErrors = [...emailErrors, error];
-                        } else if (error.field === "username") {
-                            usernameErrors = [...usernameErrors, error];
-                        } else {
-                            // Unhandled error
-                            globalError = catchAllErrorMessage;
-                            logError("LinkUserRegister - Unhandled error field", error);
-                        }
-                    });
-                }
-            } else {
-                // Something went really wrong. Add default message to tell the user there's a problem.
-                logError("LinkUserRegister - Failure to handle errors from response -", e);
-                globalError = catchAllErrorMessage;
-            }
-            this.setErrors(globalError, emailErrors, emailErrors);
+        window.console.log("e: ", e);
+
+        // this.setState({
+        //     editable: true,
+        // });
+
+        if (e.status === 200) {
+            // let globalError = get(e, "response.data.message", false);
+            // const errors = get(e, "response.data.errors", []);
+            // const hasFieldSpecificErrors = errors.length > 0;
+            // let emailErrors: string[] = [];
+            // let usernameErrors: string[] = [];
+            //
+            // if (globalError || hasFieldSpecificErrors) {
+            //     if (hasFieldSpecificErrors) {
+            //         globalError = ""; // Only show global error if all fields are error free
+            //         logError("LinkUserRegister Errors", errors);
+            //         errors.forEach((error, index) => {
+            //             error.timestamp = new Date().getTime(); // Timestamp to make sure state changes, even if the message is the same
+            //             if (error.field === "password") {
+            //                 emailErrors = [...emailErrors, error];
+            //             } else if (error.field === "username") {
+            //                 usernameErrors = [...usernameErrors, error];
+            //             } else {
+            //                 // Unhandled error
+            //                 globalError = catchAllErrorMessage;
+            //                 logError("LinkUserRegister - Unhandled error field", error);
+            //             }
+            //         });
+            //     }
+            // } else {
+            //     // Something went really wrong. Add default message to tell the user there's a problem.
+            //     logError("LinkUserRegister - Failure to handle errors from response -", e);
+            //     globalError = catchAllErrorMessage;
+            // }
+            // this.setErrors(globalError, emailErrors, emailErrors);
         } else {
-            this.props.setParentState({
-                step: "error",
-            });
+            this.props.setErrorState(e);
         }
     };
 
@@ -176,7 +177,9 @@ export default class SsoUser extends React.Component<IProps, IState> {
             valid = true;
         }
 
-        log(t("LinkUserRegister Form Valid?: "), valid);
+        if (!valid) {
+            log(t("LinkUserRegister Form Valid?: "), valid);
+        }
 
         return valid;
     }
@@ -197,28 +200,20 @@ export default class SsoUser extends React.Component<IProps, IState> {
 
             apiv2
                 .post("/authenticate/link-user", {
-                    username: this.username.value,
+                    authSessionID: this.props.authSessionID,
+                    method: "register",
+                    name: this.username.value,
                     email: this.email.value,
+                    agreeToTerms: this.state.acceptedTermsOfService,
                     persist: this.state.rememberMe,
                 })
                 .then(r => {
-                    log(t("Regular Response"), r);
-                    // this.props.setParentState();
-                    //
-                    // this.setState({
-                    //     editable: true,
-                    // });
+                    log(t("Pass"), r);
+                })
+                .catch(e => {
+                    this.handleErrors(e);
                 });
-            // .catch(e => {
-            //     log(t("Catch Error: ", e));
-            //     //this.handleErrors(e);
-            // });
         }
-
-        // this.setState({
-        //     // delete me
-        //     editable: true,
-        // });
     };
 
     public render() {

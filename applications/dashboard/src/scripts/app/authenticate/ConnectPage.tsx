@@ -25,6 +25,8 @@ interface IProps {}
 interface IState {
     step: string;
     linkUser: any;
+    error?: string;
+    authSessionID: string;
 }
 
 export default class ConnectPage extends React.Component<IProps, IState> {
@@ -34,16 +36,20 @@ export default class ConnectPage extends React.Component<IProps, IState> {
         super(props);
         const metaState = gdn.getMeta("state") || {};
         const authenticate = metaState.authenticate || {};
-        this.setState = this.setState.bind(this);
+        this.setErrorState = this.setErrorState.bind(this);
 
         this.state = {
             ...authenticate,
             step: authenticate.step || "fail",
+            authSessionID: authenticate.authSessionID,
         };
     }
 
-    public setState(state, callback) {
-        this.setState(state, callback);
+    public setErrorState(e) {
+        this.setState({
+            step: "error",
+            error: get(e, "message", t("An error has occurred, please try again.")),
+        });
     }
 
     public render() {
@@ -71,10 +77,11 @@ export default class ConnectPage extends React.Component<IProps, IState> {
                 content.push(
                     <LinkUserRegister
                         key={uniqueIDFromPrefix("ConnectPage-linkUserRegister")}
-                        setParentState={this.setState}
+                        setErrorState={this.setErrorState}
                         config={linkUser.config}
                         ssoUser={linkUser.ssoUser}
                         termsOfServiceLabel={linkUser.authenticator.ui.termsOfServiceLabel}
+                        authSessionID={this.state.authSessionID}
                     />,
                 );
 

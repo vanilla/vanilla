@@ -37,13 +37,6 @@ interface IState extends IRequiredComponentID {
 }
 
 class PasswordForm extends React.Component<IProps, IState> {
-    public static getDerivedStateFromProps(nextProps, prevState) {
-        prevState.usernameErrors = nextProps.usernameErrors;
-        prevState.passwordErrors = nextProps.passwordErrors;
-        prevState.globalError = nextProps.globalError;
-        return prevState;
-    }
-
     private username: InputTextBlock;
     private password: InputTextBlock;
 

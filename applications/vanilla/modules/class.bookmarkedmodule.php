@@ -42,12 +42,10 @@ class BookmarkedModule extends Gdn_Module {
                 $discussionModel = new DiscussionModel();
                 DiscussionModel::categoryPermissions();
 
-                $discussionModel->SQL->whereIn('d.DiscussionID', $bookmarkIDs);
-
                 $bookmarks = $discussionModel->get(
                     0,
                     $this->Limit,
-                    ['w.Bookmarked' => '1']
+                    ['d.DiscussionID' => $bookmarkIDs]
                 );
                 $this->setData('Bookmarks', $bookmarks);
             } else {

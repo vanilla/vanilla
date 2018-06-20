@@ -35,12 +35,14 @@ class GettyEmbed extends Embed {
                 $url,
                 $post
             );
+
             // The oembed is used only to pull the width and height of the object.
             $oembedData = $this->oembed("http://embed.gettyimages.com/oembed?url=http://gty.im/".$post['postID']);
 
             if ($oembedData) {
                 $data = $oembedData;
             }
+            $data['attributes'] = $this->parseResponseHtml($data['html']);
         }
         return $data;
     }
@@ -66,6 +68,38 @@ HTML;
     public function parseResponseHtml(string $html): array {
         $data =[];
 
+        preg_match(
+            '/id:\'(?<id>[a-zA-Z0-9-_]+)\'/i', $html,
+            $id
+        );
+        if ($id) {
+            $data['id'] = $id['id'];
+        }
+
+        preg_match( '/sig:\'(?<sig>[a-zA-Z0-9-_]+=)\'/i', $html,$sig);
+        if ($sig) {
+            $data['sig'] = $sig['sig'];
+        }
+
+        preg_match( '/items:\'(?<item>[0-9-]+)\'/i', $html,$item);
+        if ($item) {
+            $data['items'] = $item['item'];
+        }
+
+        preg_match( '/caption: (?<isCaption>true|false)/i', $html,$isCaptioned);
+        if ($isCaptioned) {
+            $data['isCaptioned'] = $isCaptioned['isCaptioned'];
+        }
+
+        preg_match( '/is360: (?<is360>true|false)/i', $html,$is360);
+        if ($is360) {
+            $data['is360'] = $is360['is360'];
+        }
+
+        preg_match( '/tld:\'(?<tld>[a-zA-Z]+)\'/i', $html,$tld);
+        if ($is360) {
+            $data['tld'] = $tld['tld'];
+        }
 
         return $data;
     }

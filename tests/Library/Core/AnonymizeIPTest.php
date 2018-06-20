@@ -18,6 +18,7 @@ class AnonymizeIPTest extends \PHPUnit\Framework\TestCase {
         $result = [
             ['8.8.8.8', '8.8.8.0'],
             ['2001:4860:4860::8888', '2001:4860:4860::'],
+            ['2001:db8:85a3:0:0:8a2e:0370:7334', '2001:db8:85a3::'],
             ['1', false],
         ];
         return $result;

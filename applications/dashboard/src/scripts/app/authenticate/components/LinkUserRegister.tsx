@@ -19,8 +19,8 @@ import ErrorOrLinkLabel from "@dashboard/app/authenticate/components/ErrorOrLink
 interface IProps {
     location?: any;
     globalError?: string;
-    usernameErrors?: string[];
-    emailErrors?: string[];
+    usernameError?: string;
+    emailError?: string;
     termsOfServiceLabel: string;
     config: any;
     ssoUser: any;
@@ -34,9 +34,9 @@ interface IProps {
 interface IState extends IRequiredComponentID {
     editable: boolean;
     usernameRef?: InputTextBlock;
-    usernameErrors?: string[];
+    usernameError: string | null;
     emailRef?: InputTextBlock | null;
-    emailErrors: string[];
+    emailError: string | null;
     globalError?: string | null;
     submitEnabled: boolean;
     rememberMe: boolean;
@@ -57,6 +57,7 @@ export default class SsoUser extends React.Component<IProps, IState> {
         this.handleTOSCheckChange = this.handleTOSCheckChange.bind(this);
         this.handleRememberMeCheckChange = this.handleRememberMeCheckChange.bind(this);
         this.handleErrors = this.handleErrors.bind(this);
+        this.getErrorStringFromErrorObject = this.getErrorStringFromErrorObject.bind(this);
 
         this.state = {
             id: getRequiredID(props, "linkUserRegister"),
@@ -64,8 +65,8 @@ export default class SsoUser extends React.Component<IProps, IState> {
             submitEnabled: false,
             rememberMe: props.rememberMe || false,
             acceptedTermsOfService: props.acceptedTermsOfService || false,
-            emailErrors: props.emailErrors || [],
-            usernameErrors: props.usernameErrors || [],
+            emailError: props.emailError,
+            usernameError: props.usernameError,
             globalError: props.globalError,
             termsOfServiceError: props.termsOfServiceError,
         };
@@ -77,13 +78,13 @@ export default class SsoUser extends React.Component<IProps, IState> {
         if (type === "email") {
             this.setState({
                 globalError: null,
-                emailErrors: [],
+                emailError: null,
             });
         }
         if (type === "text") {
             this.setState({
                 globalError: null,
-                usernameErrors: [],
+                usernameError: null,
             });
         }
     };
@@ -98,6 +99,17 @@ export default class SsoUser extends React.Component<IProps, IState> {
             rememberMe: get(event, "target.checked", false),
         });
     };
+
+    public getErrorStringFromErrorObject(errors) {
+        if (errors) {
+            const error = errors.map((e, index) => {
+                return get(e, "message", null);
+            });
+            return error.join(". ");
+        } else {
+            return null;
+        }
+    }
 
     public handleErrors = e => {
         const catchAllErrorMessage = t("An error has occurred, please try again.");
@@ -114,52 +126,58 @@ export default class SsoUser extends React.Component<IProps, IState> {
         //     editable: true,
         // });
 
-        // if (e.status === 200) {
-        //     // let globalError = get(e, "response.data.message", false);
-        //     // const errors = get(e, "response.data.errors", []);
-        //     // const hasFieldSpecificErrors = errors.length > 0;
-        //     // let emailErrors: string[] = [];
-        //     // let usernameErrors: string[] = [];
-        //     //
-        //     // if (globalError || hasFieldSpecificErrors) {
-        //     //     if (hasFieldSpecificErrors) {
-        //     //         globalError = ""; // Only show global error if all fields are error free
-        //     //         logError("LinkUserRegister Errors", errors);
-        //     //         errors.forEach((error, index) => {
-        //     //             error.timestamp = new Date().getTime(); // Timestamp to make sure state changes, even if the message is the same
-        //     //             if (error.field === "password") {
-        //     //                 emailErrors = [...emailErrors, error];
-        //     //             } else if (error.field === "username") {
-        //     //                 usernameErrors = [...usernameErrors, error];
-        //     //             } else {
-        //     //                 // Unhandled error
-        //     //                 globalError = catchAllErrorMessage;
-        //     //                 logError("LinkUserRegister - Unhandled error field", error);
-        //     //             }
-        //     //         });
-        //     //     }
-        //     // } else {
-        //     //     // Something went really wrong. Add default message to tell the user there's a problem.
-        //     //     logError("LinkUserRegister - Failure to handle errors from response -", e);
-        //     //     globalError = catchAllErrorMessage;
-        //     // }
-        //     // this.setErrors(globalError, emailErrors, emailErrors);
-        // } else {
-        //     this.props.setErrorState(e);
-        // }
+        let globalError = get(e, "response.data.message", false);
+        const errors = get(e, "response.data.errors", []);
+        const hasFieldSpecificErrors = errors.length > 0;
+        let emailError;
+        let usernameError;
+
+        if (globalError || hasFieldSpecificErrors) {
+            if (hasFieldSpecificErrors) {
+                globalError = ""; // Only show global error if all fields are error free
+                logError("LinkUserRegister Errors", errors);
+                errors.forEach((error, index) => {
+                    error.timestamp = new Date().getTime(); // Timestamp to make sure state changes, even if the message is the same
+                    const genericFieldError = t("This %s is already taken. Enter another %s ");
+                    if (error.field === "email") {
+                        if (error.code === "The email is taken.") {
+                            emailError = genericFieldError.split("%s").join("email");
+                        } else {
+                            emailError = error.message;
+                        }
+                    } else if (error.field === "name") {
+                        usernameError = error.message;
+                        if (error.code === "The username is taken.") {
+                            usernameError = genericFieldError.split("%s").join("username");
+                        } else {
+                            usernameError = error.message;
+                        }
+                    } else {
+                        // Unhandled error
+                        globalError = catchAllErrorMessage;
+                        logError("LinkUserRegister - Unhandled error field", error);
+                    }
+                });
+            }
+        } else {
+            // Something went really wrong. Add default message to tell the user there's a problem.
+            logError("LinkUserRegister - Failure to handle errors from response -", e);
+            globalError = catchAllErrorMessage;
+        }
+        this.setErrors(globalError, emailError, usernameError);
     };
 
-    public setErrors(globalError, emailErrors: string[], usernameErrors: string[]) {
+    public setErrors(globalError, emailError: string, usernameError: string) {
         this.setState(
             {
                 editable: true,
-                emailErrors,
-                usernameErrors,
                 globalError,
+                emailError,
+                usernameError,
             },
             () => {
                 const hasGlobalError = !!this.state.globalError;
-                const hasEmailError = this.state.emailErrors.length > 0 && !this.props.config.noEmail;
+                const hasEmailError = this.state.emailError && !this.props.config.noEmail;
                 const hasUsernameError = get(this, "state.usernameErrors", []).length > 0;
 
                 if (hasGlobalError && !hasEmailError && !hasUsernameError) {
@@ -230,10 +248,10 @@ export default class SsoUser extends React.Component<IProps, IState> {
 
     public render() {
         const errorComponentData = {
-            errors: this.props.usernameErrors,
+            errors: this.props.usernameError,
             linkOnClick: this.setComponentStep,
-            linkText: "Test Text",
         };
+        const linkText = t(" click here to enter your %s.");
 
         const emailField = this.props.config.noEmail ? null : (
             <InputTextBlock
@@ -242,7 +260,11 @@ export default class SsoUser extends React.Component<IProps, IState> {
                 required={true}
                 disabled={!this.state.editable}
                 errorComponent={ErrorOrLinkLabel}
-                errorComponentData={errorComponentData}
+                errorComponentData={{
+                    ...errorComponentData,
+                    linkText: linkText.replace("%s", t("email")),
+                    error: this.state.emailError,
+                }}
                 defaultValue={this.props.ssoUser.email}
                 onChange={this.handleTextChange}
                 ref={email => (this.email = email as InputTextBlock)}
@@ -259,7 +281,11 @@ export default class SsoUser extends React.Component<IProps, IState> {
                         required={true}
                         disabled={!this.state.editable}
                         errorComponent={ErrorOrLinkLabel}
-                        errorComponentData={errorComponentData}
+                        errorComponentData={{
+                            ...errorComponentData,
+                            linkText: linkText.replace("%s", t("password")),
+                            error: this.state.usernameError,
+                        }}
                         defaultValue={this.props.ssoUser.name}
                         onChange={this.handleTextChange}
                         ref={username => (this.username = username as InputTextBlock)}

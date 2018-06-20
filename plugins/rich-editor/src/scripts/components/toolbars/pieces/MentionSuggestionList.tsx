@@ -59,7 +59,7 @@ class MentionSuggestionList extends React.PureComponent<IProps, IState> {
                 verticalAlignment="below"
                 flyoutWidth={this.state.flyoutWidth}
                 flyoutHeight={this.state.flyoutHeight}
-                isActive={isVisible}
+                isActive={true}
                 selectionIndex={this.state.selectionIndex}
                 selectionLength={this.state.selectionLength}
             >
@@ -91,7 +91,7 @@ class MentionSuggestionList extends React.PureComponent<IProps, IState> {
                             >
                                 {hasResults &&
                                     mentionData.map(mentionItem => {
-                                        const isActive = mentionItem.uniqueID === activeItemId;
+                                        const isActive = mentionItem.domID === activeItemId;
                                         return (
                                             <MentionSuggestion
                                                 {...mentionItem}
@@ -103,7 +103,7 @@ class MentionSuggestionList extends React.PureComponent<IProps, IState> {
                                         );
                                     })}
                             </ul>
-                            <div className={classes + (hasResults ? " isHidden" : "")}>
+                            <div className={classes + (hasResults ? " isHidden" : "")} style={{ visibility: "hidden" }}>
                                 <MentionSuggestionNotFound id={noResultsID} />
                             </div>
                         </span>

@@ -317,7 +317,7 @@ export function getMentionRange(
         return null;
     }
 
-    const isValidMention = matchAtMention(potentialMention);
+    const isValidMention = matchAtMention(potentialMention, false, false);
     if (!isValidMention) {
         return null;
     }

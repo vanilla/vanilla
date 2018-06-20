@@ -4,11 +4,11 @@
  * @license https://opensource.org/licenses/GPL-2.0 GPL-2.0
  */
 
-import { IMentionUser } from "@dashboard/apiv2";
+import { IMentionSuggestionData } from "@rich-editor/components/toolbars/pieces/MentionSuggestion";
 
 interface ISuccessValue {
     status: "SUCCESSFUL";
-    users: IMentionUser[];
+    users: IMentionSuggestionData[];
 }
 
 interface IFailureValue {

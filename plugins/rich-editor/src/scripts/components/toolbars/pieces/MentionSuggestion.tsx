@@ -7,13 +7,12 @@
 import React from "react";
 import classNames from "classnames";
 import { t } from "@dashboard/application";
+import { IMentionUser } from "@dashboard/apiv2";
+import { splitStringLoosely } from "@dashboard/utility";
 
-export interface IMentionSuggestionData {
-    userID: number;
-    name: string;
-    photoUrl: string;
-    uniqueID: string;
-    onMouseEnter: React.MouseEventHandler<any>;
+export interface IMentionSuggestionData extends IMentionUser {
+    domID: string;
+    onMouseEnter?: React.MouseEventHandler<any>;
 }
 
 export interface IMentionProps extends IMentionSuggestionData {
@@ -26,15 +25,21 @@ export interface IMentionProps extends IMentionSuggestionData {
  * A single Suggestion in a MentionList
  */
 export default function MentionSuggestion(props: IMentionProps) {
-    const { isActive, matchedString, photoUrl, name, onClick, userID, uniqueID, onMouseEnter } = props;
+    const { isActive, matchedString, photoUrl, name, onClick, userID, domID, onMouseEnter } = props;
 
     const classes = classNames("richEditor-menuItem", "atMentionList-item", {
         isActive,
     });
 
     let matched = false;
-    const formattedName = name.split(new RegExp(`(${matchedString})`, "i")).map((piece, index) => {
-        if (piece.toLowerCase() === matchedString.toLowerCase() && !matched) {
+    const formattedName = splitStringLoosely(name, matchedString).map((piece, index) => {
+        const searchCollator = Intl.Collator("en", {
+            usage: "search",
+            sensitivity: "base",
+            ignorePunctuation: true,
+            numeric: true,
+        });
+        if (searchCollator.compare(piece, matchedString) === 0 && !matched) {
             matched = true;
             return (
                 <mark className="atMentionList-mark" key={index}>
@@ -48,7 +53,7 @@ export default function MentionSuggestion(props: IMentionProps) {
 
     return (
         <li
-            id={uniqueID}
+            id={domID}
             className={classes}
             role="option"
             aria-selected={isActive}

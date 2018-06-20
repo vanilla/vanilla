@@ -7,18 +7,46 @@
 import * as mentionActions from "./mentionActions";
 import MentionTrie from "./MentionTrie";
 import { logError } from "@dashboard/utility";
+import { IMentionSuggestionData } from "@rich-editor/components/toolbars/pieces/MentionSuggestion";
 
 export interface IMentionState {
     lastSuccessfulUsername: string | null;
     currentUsername: string | null;
     usersTrie: MentionTrie;
+    activeSuggestionID: string;
+    activeSuggestionIndex: number;
 }
 
 export const initialState: IMentionState = {
     lastSuccessfulUsername: null,
     currentUsername: null,
     usersTrie: new MentionTrie(),
+    activeSuggestionID: "",
+    activeSuggestionIndex: 0,
 };
+
+export function sortSuggestions(users: IMentionSuggestionData[], searchName: string) {
+    const looseCollator = Intl.Collator("en", {
+        usage: "sort",
+        sensitivity: "variant",
+        ignorePunctuation: true,
+        numeric: true,
+    });
+
+    return users.sort((userA, userB) => {
+        //  Return exact matches first.
+        if (userA.name.includes(searchName) && !userB.name.includes(searchName)) {
+            return -1;
+        }
+
+        if (userB.name.includes(searchName) && !userA.name.includes(searchName)) {
+            return 1;
+        }
+
+        // Then do a loose sort.
+        return looseCollator.compare(userA.name, userB.name);
+    });
+}
 
 export default function mentionReducer(state = initialState, action: mentionActions.ActionTypes): IMentionState {
     switch (action.type) {
@@ -53,19 +81,30 @@ export default function mentionReducer(state = initialState, action: mentionActi
                 users: null,
                 error,
             });
-            logError(error);
             return state;
         }
         case mentionActions.LOAD_USERS_SUCCESS: {
             const { username, users } = action.payload;
             state.usersTrie.insert(username, {
                 status: "SUCCESSFUL",
-                users,
+                users: sortSuggestions(users, username),
             });
+
+            const firstUserID = users.length > 0 ? users[0].domID : "";
             return {
                 ...state,
+                activeSuggestionID: firstUserID,
+                activeSuggestionIndex: 0,
                 lastSuccessfulUsername: username,
                 currentUsername: username === state.currentUsername ? null : state.currentUsername,
+            };
+        }
+        case mentionActions.SET_ACTIVE_SUGGESTION: {
+            const { suggestionID, suggestionIndex } = action.payload;
+            return {
+                ...state,
+                activeSuggestionID: suggestionID,
+                activeSuggestionIndex: suggestionIndex,
             };
         }
         default:

@@ -6,47 +6,45 @@
 
 import React from "react";
 import Quill, { RangeStatic, Sources, DeltaStatic } from "quill/core";
-import { AxiosResponse } from "axios";
 import uniqueId from "lodash/uniqueId";
+import debounce from "lodash/debounce";
 import Keyboard from "quill/modules/keyboard";
-import axios from "axios";
 import { withEditor, IEditorContextProps } from "@rich-editor/components/context";
 import MentionSuggestionList from "./pieces/MentionSuggestionList";
-import { thunks as mentionThunks } from "@rich-editor/state/mentionActions";
+import { thunks as mentionThunks, actions as mentionActions } from "@rich-editor/state/mentionActions";
 import MentionAutoCompleteBlot from "@rich-editor/quill/blots/embeds/MentionAutoCompleteBlot";
 import { getBlotAtIndex, getMentionRange } from "@rich-editor/quill/utility";
 import { Dispatch } from "redux";
 import IStoreState from "@rich-editor/state/IState";
 import { IMentionValue } from "@rich-editor/state/MentionTrie";
-import { IMentionUser } from "@dashboard/apiv2";
 import { connect } from "react-redux";
+import { IMentionSuggestionData } from "@rich-editor/components/toolbars/pieces/MentionSuggestion";
 
 interface IProps extends IEditorContextProps {
     lookupMentions: (username: string) => void;
+    setActiveItem: (itemID: string, itemIndex: number) => void;
     currentSuggestions: IMentionValue | null;
+    currentUsername: string;
+    lastSuccessfulUsername: string;
+    activeSuggestionID: string;
+    activeSuggestionIndex: number;
 }
 
 interface IMentionState {
     inActiveMention: boolean;
     autoCompleteBlot: MentionAutoCompleteBlot | null;
-    username: string;
-    startIndex: number;
-    activeItemID: string;
-    activeItemIndex: number;
-    hasApiResponse: boolean;
 }
-
-const mentionCache: Map<string, AxiosResponse | null> = new Map();
 
 /**
  * Module for inserting, removing, and editing at-mentions.
  */
-export class MentionToolbar extends React.PureComponent<IProps, IMentionState> {
+export class MentionToolbar extends React.Component<IProps, IMentionState> {
     private quill: Quill;
     private ID = uniqueId("mentionList-");
     private noResultsID = uniqueId("mentionList-noResults-");
     private comboBoxID = uniqueId("mentionComboBox-");
     private isConvertingMention = false;
+    private readonly MENTION_COMPLETION_CHARACTERS = [".", "!", "?", " ", "\n"];
 
     constructor(props: IProps) {
         super(props);
@@ -54,42 +52,49 @@ export class MentionToolbar extends React.PureComponent<IProps, IMentionState> {
         this.state = {
             inActiveMention: false,
             autoCompleteBlot: null,
-            username: "",
-            startIndex: 0,
-            activeItemID: "",
-            activeItemIndex: 0,
-            hasApiResponse: true,
         };
     }
 
     public componentDidMount() {
+        document.addEventListener("keydown", this.keyDownListener, true);
         this.quill.on("text-change", this.onTextChange);
         this.quill.on("selection-change", this.onSelectionChange);
-        this.quill.root.addEventListener("keydown", this.keyDownListener);
     }
 
     public componentWillUnmount() {
+        document.removeEventListener("keydown", this.keyDownListener, true);
         this.quill.off("text-change", this.onTextChange);
         this.quill.off("selection-change", this.onSelectionChange);
-        this.quill.root.removeEventListener("keydown", this.keyDownListener);
+    }
+
+    public componentDidUpdate() {
+        this.injectComboBoxAccessibility();
     }
 
     public render() {
-        const { currentSuggestions } = this.props;
+        const { currentSuggestions, lastSuccessfulUsername } = this.props;
+        const isActive = currentSuggestions && currentSuggestions.status === "SUCCESSFUL";
+        const data = currentSuggestions && currentSuggestions.status === "SUCCESSFUL" ? currentSuggestions.users : [];
+
         return (
-            currentSuggestions &&
-            currentSuggestions.status === "SUCCESSFUL" && (
-                <MentionSuggestionList
-                    onItemClick={this.onItemClick}
-                    mentionData={this.transformSuggestions(currentSuggestions.users)}
-                    matchedString={this.state.username}
-                    activeItemId={this.state.activeItemID}
-                    isVisible={this.state.inActiveMention /*  && this.state.hasApiResponse */}
-                    id={this.ID}
-                    noResultsID={this.noResultsID}
-                />
-            )
+            <MentionSuggestionList
+                onItemClick={this.onItemClick}
+                mentionData={this.addEventListeners(data)}
+                matchedString={lastSuccessfulUsername}
+                activeItemId={this.props.activeSuggestionID}
+                isVisible={!!isActive}
+                id={this.ID}
+                noResultsID={this.noResultsID}
+            />
         );
+    }
+
+    /**
+     * Determine if we have a valid API response.
+     */
+    private get hasApiResponse() {
+        const { currentSuggestions } = this.props;
+        return currentSuggestions && currentSuggestions.status === "SUCCESSFUL";
     }
 
     /**
@@ -104,20 +109,16 @@ export class MentionToolbar extends React.PureComponent<IProps, IMentionState> {
      * Keydown listener for ARIA compliance with
      */
     private keyDownListener = (event: KeyboardEvent) => {
-        const { activeItemIndex, inActiveMention, hasApiResponse } = this.state;
-        const { currentSuggestions } = this.props;
+        const { inActiveMention } = this.state;
+        const { currentSuggestions, activeSuggestionIndex } = this.props;
 
         if (!currentSuggestions || currentSuggestions.status !== "SUCCESSFUL") {
             return;
         }
 
-        // const suggestions =
-        if (this.quill.hasFocus() && inActiveMention && !hasApiResponse) {
-            // Quill doesn't properly trigger update the range until after enter is pressed, which triggers out text change listener with the wrong range. Manually handle this for now.
+        if (this.quill.hasFocus() && inActiveMention && !this.hasApiResponse) {
             if (Keyboard.match(event, Keyboard.keys.ENTER)) {
                 this.cancelActiveMention();
-                this.quill.insertText(this.quill.getSelection().index, "\n", Quill.sources.API);
-                event.preventDefault();
             }
             return;
         }
@@ -126,30 +127,22 @@ export class MentionToolbar extends React.PureComponent<IProps, IMentionState> {
             let newIndex;
             let newItemID;
             const firstIndex = 0;
-            const nextIndex = activeItemIndex + 1;
-            const prevIndex = activeItemIndex - 1;
+            const nextIndex = activeSuggestionIndex + 1;
+            const prevIndex = activeSuggestionIndex - 1;
             const lastIndex = currentSuggestions.users.length - 1;
 
             switch (true) {
                 case Keyboard.match(event, Keyboard.keys.DOWN):
-                    newIndex = activeItemIndex === lastIndex ? firstIndex : nextIndex;
-                    newItemID = this.generateIdForMentionData(currentSuggestions.users[newIndex]);
-                    this.setState({
-                        activeItemID: newItemID,
-                        activeItemIndex: newIndex,
-                    });
-                    this.injectComboBoxAccessibility();
+                    newIndex = activeSuggestionIndex === lastIndex ? firstIndex : nextIndex;
+                    newItemID = currentSuggestions.users[newIndex].domID;
+                    this.props.setActiveItem(newItemID, newIndex);
                     event.preventDefault();
                     event.stopPropagation();
                     break;
                 case Keyboard.match(event, Keyboard.keys.UP):
-                    newIndex = activeItemIndex === firstIndex ? lastIndex : prevIndex;
-                    newItemID = this.generateIdForMentionData(currentSuggestions.users[newIndex]);
-                    this.setState({
-                        activeItemID: newItemID,
-                        activeItemIndex: newIndex,
-                    });
-                    this.injectComboBoxAccessibility();
+                    newIndex = activeSuggestionIndex === firstIndex ? lastIndex : prevIndex;
+                    newItemID = currentSuggestions.users[newIndex].domID;
+                    this.props.setActiveItem(newItemID, newIndex);
                     event.preventDefault();
                     event.stopPropagation();
                     break;
@@ -169,58 +162,30 @@ export class MentionToolbar extends React.PureComponent<IProps, IMentionState> {
     };
 
     /**
-     * Generate an ID for a mention suggestion.
-     */
-    private generateIdForMentionData(data: IMentionUser) {
-        return this.props.editorID + "-mentionItem-" + data.userID;
-    }
-
-    /**
      * Inject accessibility attributes into the current MentionAutoComplete and ComboBox.
      */
     private injectComboBoxAccessibility = () => {
-        const { autoCompleteBlot, activeItemID } = this.state;
+        const { autoCompleteBlot } = this.state;
+        const { activeSuggestionID } = this.props;
         if (autoCompleteBlot) {
             autoCompleteBlot.injectAccessibilityAttributes({
                 ID: this.comboBoxID,
-                activeItemID,
+                activeItemID: activeSuggestionID,
                 suggestionListID: this.ID,
                 noResultsID: this.noResultsID,
             });
         }
     };
 
-    private transformSuggestions(suggestions: IMentionUser[]) {
+    private addEventListeners(suggestions: IMentionSuggestionData[]) {
         return suggestions.map((data, index) => {
-            const uniqueID = this.generateIdForMentionData(data);
             const onMouseEnter = () => {
-                this.setState({ activeItemID: uniqueID, activeItemIndex: index }, this.injectComboBoxAccessibility);
+                this.props.setActiveItem(data.domID, index);
             };
+            data.onMouseEnter = onMouseEnter;
 
-            return {
-                ...data,
-                uniqueID,
-                onMouseEnter,
-            };
+            return data;
         });
-    }
-
-    /**
-     * Handle mention responses from the API.
-     */
-    private handleMentionResponse(response: AxiosResponse | null) {
-        if (!response) {
-            return;
-        }
-
-        this.setState(
-            {
-                // activeItemID: suggestions.length > 0 ? suggestions[0].uniqueID : null, // todo reset this somewhere else.
-                activeItemIndex: 0, // TODO: reset this somewhere else.
-                hasApiResponse: true, // TODO remove this.
-            },
-            this.injectComboBoxAccessibility,
-        );
     }
 
     /**
@@ -238,8 +203,6 @@ export class MentionToolbar extends React.PureComponent<IProps, IMentionState> {
         this.setState({
             inActiveMention: false,
             autoCompleteBlot: null,
-            username: "",
-            hasApiResponse: false,
         });
         this.isConvertingMention = false;
     }
@@ -247,9 +210,9 @@ export class MentionToolbar extends React.PureComponent<IProps, IMentionState> {
     /**
      * Convert the active MentionAutoCompleteBlot into a MentionBlot.
      */
-    private confirmActiveMention() {
-        const { autoCompleteBlot, activeItemIndex } = this.state;
-        const { currentSuggestions } = this.props;
+    private confirmActiveMention(insertCharacter: string = " ") {
+        const { autoCompleteBlot } = this.state;
+        const { currentSuggestions, activeSuggestionIndex } = this.props;
         if (
             !(autoCompleteBlot instanceof MentionAutoCompleteBlot) ||
             this.isConvertingMention ||
@@ -260,11 +223,11 @@ export class MentionToolbar extends React.PureComponent<IProps, IMentionState> {
         }
 
         this.isConvertingMention = true;
-        const activeSuggestion = currentSuggestions.users[activeItemIndex];
+        const activeSuggestion = currentSuggestions.users[activeSuggestionIndex];
         const start = autoCompleteBlot.offset(this.quill.scroll);
 
         autoCompleteBlot.finalize(activeSuggestion);
-        this.quill.insertText(start + 1, " ", Quill.sources.SILENT);
+        this.quill.insertText(start + 1, insertCharacter, Quill.sources.SILENT);
         this.quill.setSelection(start + 2, 0, Quill.sources.SILENT);
         this.cancelActiveMention();
     }
@@ -273,7 +236,7 @@ export class MentionToolbar extends React.PureComponent<IProps, IMentionState> {
      * Watch for selection change events in quill. We need to clear the mention list if we have text selected or their is no selection.
      */
     private onSelectionChange = (range: RangeStatic, oldRange: RangeStatic, sources) => {
-        if (sources !== Quill.sources.USER || !this.state.inActiveMention || !this.state.hasApiResponse) {
+        if (sources !== Quill.sources.USER || !this.state.inActiveMention || !this.hasApiResponse) {
             return;
         }
 
@@ -332,24 +295,60 @@ export class MentionToolbar extends React.PureComponent<IProps, IMentionState> {
             autoCompleteBlot = getBlotAtIndex(this.quill, selection.index - 1, MentionAutoCompleteBlot)!;
         }
 
+        const lastOperation = delta.ops && delta.ops.length > 0 ? delta.ops[delta.ops.length - 1] : null;
+        if (
+            lastOperation &&
+            lastOperation.insert &&
+            this.MENTION_COMPLETION_CHARACTERS.includes(lastOperation.insert)
+        ) {
+            const { currentSuggestions } = this.props;
+            const users =
+                currentSuggestions && currentSuggestions.status === "SUCCESSFUL" ? currentSuggestions.users : [];
+
+            const isASingleExactMatch = users.length === 1 && this.props.lastSuccessfulUsername === users[0].name;
+            // Autocomplete the mention if certain conditions occur.
+
+            if (isASingleExactMatch) {
+                setImmediate(() => {
+                    this.confirmActiveMention(lastOperation.insert);
+                });
+                return;
+            }
+        }
+
         this.setState({
             autoCompleteBlot,
             inActiveMention: true,
-            username: autoCompleteBlot.username,
-            startIndex: autoCompleteBlot.offset(this.quill.scroll),
         });
         this.props.lookupMentions(autoCompleteBlot.username);
     };
 }
 
 function mapDispatchToProps(dispatch: Dispatch<any>) {
-    return { lookupMentions: username => dispatch(mentionThunks.loadUsers(username)) };
+    const mentionLookupFn = username => dispatch(mentionThunks.loadUsers(username));
+
+    return {
+        lookupMentions: debounce(mentionLookupFn, 50),
+        setActiveItem: (itemID: string, itemIndex: number) =>
+            dispatch(mentionActions.setActiveSuggestion(itemID, itemIndex)),
+    };
 }
 
 function mapStateToProps(state: IStoreState) {
-    const { lastSuccessfulUsername, currentUsername, usersTrie } = state.editor.mentions;
+    const {
+        lastSuccessfulUsername,
+        currentUsername,
+        usersTrie,
+        activeSuggestionID,
+        activeSuggestionIndex,
+    } = state.editor.mentions;
+
     return {
         currentSuggestions: lastSuccessfulUsername ? usersTrie.getValue(lastSuccessfulUsername) : null,
+        lastSuccessfulUsername,
+        currentUsername,
+        activeSuggestionID,
+        activeSuggestionIndex,
     };
 }
 

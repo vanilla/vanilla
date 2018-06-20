@@ -17,7 +17,8 @@ describe("[MentionAutoCompleteBlot]", () => {
             userID: 1,
             name: "complete",
             photoUrl: "https://github.com",
-            uniqueID: "asdf",
+            dateLastActive: "",
+            domID: "asdf",
             onMouseEnter: () => {
                 return;
             },

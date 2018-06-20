@@ -6,10 +6,11 @@
 
 import { Dispatch } from "redux";
 import { ActionsUnion, createAction } from "@dashboard/state/utility";
-import { IMentionUser } from "@dashboard/apiv2";
 import api from "@dashboard/apiv2";
 import IState from "@rich-editor/state/IState";
+import { IMentionSuggestionData } from "@rich-editor/components/toolbars/pieces/MentionSuggestion";
 
+export const SET_ACTIVE_SUGGESTION = "[mentions] set active suggestion";
 export const LOAD_USERS_REQUEST = "[mentions] load users request";
 export const LOAD_USERS_FAILURE = "[mentions] load users failure";
 export const LOAD_USERS_SUCCESS = "[mentions] load users success";
@@ -17,6 +18,31 @@ export const LOAD_USERS_SUCCESS = "[mentions] load users success";
 // The number of characters that we will lookup to try and invalidate a lookup early.
 const REASONABLE_INVALIDATION_SIZE = 3;
 const USER_LIMIT = 50;
+
+/**
+ * Filter users down to a list that matches the current
+ *
+ * @see https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Collator
+ *
+ * @param username
+ */
+export function filterSuggestions(users: IMentionSuggestionData[], searchName: string) {
+    const searchCollator = Intl.Collator("en", {
+        usage: "search",
+        sensitivity: "base",
+        ignorePunctuation: true,
+        numeric: true,
+    });
+
+    return users.filter((userSuggestion: IMentionSuggestionData) => {
+        if (userSuggestion.name.length < searchName.length) {
+            return false;
+        }
+
+        const suggestionNamePartial = userSuggestion.name.substring(0, searchName.length);
+        return searchCollator.compare(suggestionNamePartial, searchName) === 0;
+    });
+}
 
 /**
  * Make an API request for mention suggestions. These results are cached by the lookup username.
@@ -51,7 +77,9 @@ function loadUsers(username: string) {
                         if (partialLookup.users.length < USER_LIMIT) {
                             // The previous match already found the maximum amount of users that the server had
                             // Return the previous results.
-                            return dispatch(actions.loadUsersSuccess(username, partialLookup.users));
+                            return dispatch(
+                                actions.loadUsersSuccess(username, filterSuggestions(partialLookup.users, username)),
+                            );
                         }
                     }
                     case "FAILED":
@@ -77,6 +105,12 @@ function loadUsers(username: string) {
                     throw new Error(response.data);
                 }
 
+                // Add unique domIDs to each user.
+                const users = response.data.map(data => {
+                    data.domID = "mentionSuggestion" + data.userID;
+                    return data;
+                });
+
                 // Result is good. Lets GO!
                 dispatch(actions.loadUsersSuccess(username, response.data));
             })
@@ -87,8 +121,10 @@ function loadUsers(username: string) {
 export const actions = {
     loadUsersRequest: (username: string) => createAction(LOAD_USERS_REQUEST, { username }),
     loadUsersFailure: (username: string, error: Error) => createAction(LOAD_USERS_FAILURE, { username, error }),
-    loadUsersSuccess: (username: string, users: IMentionUser[]) =>
+    loadUsersSuccess: (username: string, users: IMentionSuggestionData[]) =>
         createAction(LOAD_USERS_SUCCESS, { username, users }),
+    setActiveSuggestion: (suggestionID: string, suggestionIndex: number) =>
+        createAction(SET_ACTIVE_SUGGESTION, { suggestionID, suggestionIndex }),
 };
 
 export const thunks = {

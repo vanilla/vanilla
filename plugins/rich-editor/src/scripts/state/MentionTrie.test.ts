@@ -4,14 +4,14 @@
  * @license https://opensource.org/licenses/GPL-2.0 GPL-2.0
  */
 
-import MentionTrie, { IMentionNode, INodeValue } from "./MentionTrie";
+import MentionTrie, { IMentionNode, IMentionValue } from "./MentionTrie";
 import { expect } from "chai";
 
-const PENDING_VALUE: INodeValue = {
+const PENDING_VALUE: IMentionValue = {
     status: "PENDING",
 };
 
-const SUCCESSFUL_VALUE: INodeValue = {
+const SUCCESSFUL_VALUE: IMentionValue = {
     status: "SUCCESSFUL",
     users: [],
 };

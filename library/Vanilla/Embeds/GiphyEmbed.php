@@ -16,8 +16,6 @@ class GiphyEmbed extends Embed {
     /** @inheritdoc */
     protected $domains = ['giphy.com', 'media.giphy.com', 'gph.is'];
 
-    const SHORT_LINK = 'gph.is';
-
     /**
      * giphyEmbed constructor.
      */
@@ -41,8 +39,8 @@ class GiphyEmbed extends Embed {
                 $data = $this->normalizeOembed($oembedData);
             }
 
-            // Obtain the real post ID from shortened link
-            if ($domain == self::SHORT_LINK) {
+            // Obtain the real post ID from media url provided by oembed call
+            if ($domain == 'gph.is') {
                 $post = $this->parseURL($data['url']);
             }
 

@@ -62,8 +62,9 @@ export default class ConnectPage extends React.Component<IProps, IState> {
 
         log(t("Rendering Connect Page: "));
 
-        switch (this.state.step) {
+        switch (get(this, "state.step", "unhandled_error")) {
             case "linkUser":
+                log(t("ConnectPage - link user: "), this.state);
                 pageTitle = t("Your %s Account").replace("%s", linkUser.authenticator.name);
 
                 content.push(
@@ -103,9 +104,8 @@ export default class ConnectPage extends React.Component<IProps, IState> {
                         message={get(this, "state.error", null)}
                     />,
                 );
+                logError("fail state: ", this.state);
         }
-
-        log(t("ConnectPage.state: "), this.state);
 
         return (
             <div className="authenticateConnect">

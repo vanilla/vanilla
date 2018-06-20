@@ -140,10 +140,10 @@ class AuthenticateController extends Gdn_Controller {
                         setvalr('linkUser.ssoUser.photoUrl', $state, url('/applications/dashboard/design/images/authenticators/user.svg'));
                     }
 
+                    // Terms of Service
                     $termsOfServiceUrl = c('Garden.TermsOfService', '#');
                     $termsOfServiceText = sprintf(t('I agree to the <a id="TermsOfService" class="Popup" target="terms" href="%s">terms of service</a>'), url($termsOfServiceUrl));
                     setvalr('linkUser.authenticator.ui.termsOfServiceLabel', $state, $termsOfServiceText);
-
 
                     break;
                 // case 'addInfo':

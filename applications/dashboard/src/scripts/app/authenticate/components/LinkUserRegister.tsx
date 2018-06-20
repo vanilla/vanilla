@@ -14,6 +14,7 @@ import { getRequiredID, IRequiredComponentID } from "@dashboard/componentIDs";
 import get from "lodash/get";
 import ButtonSubmit from "@dashboard/components/forms/ButtonSubmit";
 import Checkbox from "@dashboard/components/forms/Checkbox";
+import ErrorOrLinkLabel from "@dashboard/app/authenticate/components/ErrorOrLinkLabel";
 
 interface IProps {
     location?: any;
@@ -33,7 +34,7 @@ interface IProps {
 interface IState extends IRequiredComponentID {
     editable: boolean;
     usernameRef?: InputTextBlock;
-    usernameErrors: string[];
+    usernameErrors?: string[];
     emailRef?: InputTextBlock | null;
     emailErrors: string[];
     globalError?: string | null;
@@ -101,45 +102,51 @@ export default class SsoUser extends React.Component<IProps, IState> {
     public handleErrors = e => {
         const catchAllErrorMessage = t("An error has occurred, please try again.");
 
-        window.console.log("e: ", e);
+        const data = get(e, "response.data", false);
+
+        log("data: ", data);
+
+        if (data.errors) {
+            log("errors: ", data.errors);
+        }
 
         // this.setState({
         //     editable: true,
         // });
 
-        if (e.status === 200) {
-            // let globalError = get(e, "response.data.message", false);
-            // const errors = get(e, "response.data.errors", []);
-            // const hasFieldSpecificErrors = errors.length > 0;
-            // let emailErrors: string[] = [];
-            // let usernameErrors: string[] = [];
-            //
-            // if (globalError || hasFieldSpecificErrors) {
-            //     if (hasFieldSpecificErrors) {
-            //         globalError = ""; // Only show global error if all fields are error free
-            //         logError("LinkUserRegister Errors", errors);
-            //         errors.forEach((error, index) => {
-            //             error.timestamp = new Date().getTime(); // Timestamp to make sure state changes, even if the message is the same
-            //             if (error.field === "password") {
-            //                 emailErrors = [...emailErrors, error];
-            //             } else if (error.field === "username") {
-            //                 usernameErrors = [...usernameErrors, error];
-            //             } else {
-            //                 // Unhandled error
-            //                 globalError = catchAllErrorMessage;
-            //                 logError("LinkUserRegister - Unhandled error field", error);
-            //             }
-            //         });
-            //     }
-            // } else {
-            //     // Something went really wrong. Add default message to tell the user there's a problem.
-            //     logError("LinkUserRegister - Failure to handle errors from response -", e);
-            //     globalError = catchAllErrorMessage;
-            // }
-            // this.setErrors(globalError, emailErrors, emailErrors);
-        } else {
-            this.props.setErrorState(e);
-        }
+        // if (e.status === 200) {
+        //     // let globalError = get(e, "response.data.message", false);
+        //     // const errors = get(e, "response.data.errors", []);
+        //     // const hasFieldSpecificErrors = errors.length > 0;
+        //     // let emailErrors: string[] = [];
+        //     // let usernameErrors: string[] = [];
+        //     //
+        //     // if (globalError || hasFieldSpecificErrors) {
+        //     //     if (hasFieldSpecificErrors) {
+        //     //         globalError = ""; // Only show global error if all fields are error free
+        //     //         logError("LinkUserRegister Errors", errors);
+        //     //         errors.forEach((error, index) => {
+        //     //             error.timestamp = new Date().getTime(); // Timestamp to make sure state changes, even if the message is the same
+        //     //             if (error.field === "password") {
+        //     //                 emailErrors = [...emailErrors, error];
+        //     //             } else if (error.field === "username") {
+        //     //                 usernameErrors = [...usernameErrors, error];
+        //     //             } else {
+        //     //                 // Unhandled error
+        //     //                 globalError = catchAllErrorMessage;
+        //     //                 logError("LinkUserRegister - Unhandled error field", error);
+        //     //             }
+        //     //         });
+        //     //     }
+        //     // } else {
+        //     //     // Something went really wrong. Add default message to tell the user there's a problem.
+        //     //     logError("LinkUserRegister - Failure to handle errors from response -", e);
+        //     //     globalError = catchAllErrorMessage;
+        //     // }
+        //     // this.setErrors(globalError, emailErrors, emailErrors);
+        // } else {
+        //     this.props.setErrorState(e);
+        // }
     };
 
     public setErrors(globalError, emailErrors: string[], usernameErrors: string[]) {
@@ -153,7 +160,7 @@ export default class SsoUser extends React.Component<IProps, IState> {
             () => {
                 const hasGlobalError = !!this.state.globalError;
                 const hasEmailError = this.state.emailErrors.length > 0 && !this.props.config.noEmail;
-                const hasUsernameError = this.state.usernameErrors.length > 0;
+                const hasUsernameError = get(this, "state.usernameErrors", []).length > 0;
 
                 if (hasGlobalError && !hasEmailError && !hasUsernameError) {
                     this.username.select();
@@ -207,8 +214,9 @@ export default class SsoUser extends React.Component<IProps, IState> {
                     agreeToTerms: this.state.acceptedTermsOfService,
                     persist: this.state.rememberMe,
                 })
-                .then(r => {
-                    log(t("Pass"), r);
+                .then(e => {
+                    const data = get(e, "response.data", false);
+                    log(t("Pass with data: "), data);
                 })
                 .catch(e => {
                     this.handleErrors(e);
@@ -216,14 +224,25 @@ export default class SsoUser extends React.Component<IProps, IState> {
         }
     };
 
+    public setComponentStep(newState) {
+        this.setState({ ...newState });
+    }
+
     public render() {
+        const errorComponentData = {
+            errors: this.props.usernameErrors,
+            linkOnClick: this.setComponentStep,
+            linkText: "Test Text",
+        };
+
         const emailField = this.props.config.noEmail ? null : (
             <InputTextBlock
                 label={t("Email")}
                 type="email"
                 required={true}
                 disabled={!this.state.editable}
-                errors={this.state.emailErrors}
+                errorComponent={ErrorOrLinkLabel}
+                errorComponentData={errorComponentData}
                 defaultValue={this.props.ssoUser.email}
                 onChange={this.handleTextChange}
                 ref={email => (this.email = email as InputTextBlock)}
@@ -239,7 +258,8 @@ export default class SsoUser extends React.Component<IProps, IState> {
                         label={t("Username")}
                         required={true}
                         disabled={!this.state.editable}
-                        errors={this.state.usernameErrors}
+                        errorComponent={ErrorOrLinkLabel}
+                        errorComponentData={errorComponentData}
                         defaultValue={this.props.ssoUser.name}
                         onChange={this.handleTextChange}
                         ref={username => (this.username = username as InputTextBlock)}

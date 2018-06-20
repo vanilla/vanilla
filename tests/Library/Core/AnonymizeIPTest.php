@@ -12,6 +12,8 @@ namespace VanillaTests\Library\Core;
 class AnonymizeIPTest extends \PHPUnit\Framework\TestCase {
 
     /**
+     * Provide data for testing the anonymizeIP function.
+     *
      * @return array
      */
     public function provideIPAddresses(): array {
@@ -25,8 +27,10 @@ class AnonymizeIPTest extends \PHPUnit\Framework\TestCase {
     }
 
     /**
-     * @param string $ip
-     * @param string|bool $anonymized
+     * Test the anonymizeIP function.
+     *
+     * @param string $ip An IPv4 or IPv6 address.
+     * @param string|bool $anonymized The expected anonymized version of `$ip`.
      * @dataProvider provideIPAddresses
      */
     public function testAnonymization($ip, $anonymized) {

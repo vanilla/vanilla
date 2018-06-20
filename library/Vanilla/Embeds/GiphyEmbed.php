@@ -20,8 +20,17 @@ class GiphyEmbed extends Embed {
      * giphyEmbed constructor.
      */
     public function __construct() {
-        parent::__construct('giphy', 'image');
+        parent::__construct('giphy', 'gif');
     }
+
+    /**
+     * @inheritdoc
+     */
+    public function canHandle(string $domain, string $url = null): bool {
+        $result = ($domain == "media.giphy.com") ? true : false;
+        return $result;
+    }
+
 
     /**
      * @inheritdoc
@@ -40,7 +49,7 @@ class GiphyEmbed extends Embed {
                 throw new Exception('Unable to get post ID.', 400);
             }
 
-            $oembedData = $this->oembed("https://giphy.com/services/oembed?url=" . urlencode($url));
+            $oembedData = $this->oembed("https://giphy.com/services/oembed?url=".urlencode($url));
             if ($oembedData) {
                 $data = $this->normalizeOembed($oembedData);
             }
@@ -48,8 +57,6 @@ class GiphyEmbed extends Embed {
         if ($post) {
                 $data['attributes']['postID'] = $post['postID'];
             }
-            $data['type'] = "giphy";
-            $data['attributes']['url'] = $url;
         }
 
         return $data;
@@ -59,14 +66,20 @@ class GiphyEmbed extends Embed {
      * @inheritdoc
      */
     public function renderData(array $data): string {
-        $height = htmlspecialchars($data['height']) ?? 1;
-        $width = htmlspecialchars($data['width']) ?? 1;
-        $padding = ($height/$width) * 100;
-        $url = "https://giphy.com/embed/".$data['attributes']['postID'];
+        $height = $data['height'] ?? 1;
+        $encodedHeight = htmlspecialchars($height);
+
+        $width = $data['width'] ?? 1;
+        $encodedWidth = htmlspecialchars($width);
+
+        $padding = ($encodedHeight/$encodedWidth) * 100;
+
+        $postID = $data['attributes']['postID'] ?? '';
+        $url = "https://giphy.com/embed/".$postID;
         $encodedURL = htmlspecialchars($url);
 
         $result = <<<HTML
-<div class="embed embedGiphy" style="width: {$width}px">
+<div class="embed embedGiphy" style="width: {$encodedWidth}px">
     <div class="embedExternal-ratio" style="padding-bottom: {$padding}%">
         <iframe class="giphy-embed embedGiphy-iframe" src="{$encodedURL}"></iframe>
     </div>

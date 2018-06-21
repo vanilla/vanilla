@@ -31,7 +31,7 @@ class GettyEmbed extends Embed {
         if ($this->isNetworkEnabled()) {
 
             preg_match(
-                '/https?:\/\/www\.gettyimages\.(com|ca)\/[a-zA-Z0-9]+\/(?<postID>[0-9]+)/i',
+                '/https?:\/\/www\.gettyimages\.(com|ca).*?(?<postID>\d+)(?!.*\d)/i',
                 $url,
                 $post
             );
@@ -43,20 +43,26 @@ class GettyEmbed extends Embed {
                 $data = $oembedData;
             }
             $data['attributes'] = $this->parseResponseHtml($data['html']);
+            $data['attributes']['post'] = $post['postID'];
         }
         return $data;
     }
 
     /**
-     * @inheritdoc
+     * @inheritdocs
      */
     public function renderData(array $data): string {
 
+        $url = "//www.gettyimages.com/detail/".$data['attributes']['post'];
+        $encodedData = json_encode($data);
+
         $result = <<<HTML
-
+        <a id="{$data['attributes']['id']}" data-sig="{$data['attributes']['sig']}" data-h={$data['height']} data-w={$data['width']} 
+        data-items="{$data['attributes']['items']}" data-capt="{$data['attributes']['isCaptioned']}" data-tld="{$data['attributes']['tld']}" data-is360="{$data['attributes']['is360']}"
+        class='gie-single js-gettyEmbed' href="{$url}" target='_blank'> Embed from Getty Images</a>
 HTML;
-
        return $result;
+
     }
 
     /**
@@ -88,7 +94,7 @@ HTML;
 
         preg_match( '/caption: (?<isCaption>true|false)/i', $html,$isCaptioned);
         if ($isCaptioned) {
-            $data['isCaptioned'] = $isCaptioned['isCaptioned'];
+            $data['isCaptioned'] = $isCaptioned['isCaption'];
         }
 
         preg_match( '/is360: (?<is360>true|false)/i', $html,$is360);
@@ -97,10 +103,9 @@ HTML;
         }
 
         preg_match( '/tld:\'(?<tld>[a-zA-Z]+)\'/i', $html,$tld);
-        if ($is360) {
+        if ($tld) {
             $data['tld'] = $tld['tld'];
         }
-
         return $data;
     }
 }

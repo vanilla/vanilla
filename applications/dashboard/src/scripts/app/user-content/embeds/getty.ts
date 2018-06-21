@@ -5,34 +5,41 @@
 
 import { registerEmbed, IEmbedData } from "@dashboard/embeds";
 import { ensureScript } from "@dashboard/dom";
-import { onContent } from "@dashboard/application";
+import { onContent, onReady } from "@dashboard/application";
 
-// Setup getty embeds.
+// Setup getty embeds
+onReady(convertgettyEmbeds);
 onContent(convertgettyEmbeds);
 registerEmbed("getty", rendergetty);
 
 /**
  * Renders posted getty embeds.
  */
-async function convertgettyEmbeds(data) {
-    window.gie =
-        window.gie ||
-        function(c) {
-            (window.gie.q = window.gie.q || []).push(c);
-        };
-    if (window.gie) {
-        window.gie(function() {
-            window.gie.widgets.load({
-                id: data.attributes.id,
-                sig: data.attributes.sig,
-                w: data.width + "px",
-                h: data.height + "px",
-                items: "863162608",
-                caption: true,
-                tld: data.attributes.tld,
-                is360: false,
-            });
-        });
+async function convertgettyEmbeds() {
+    const gettyPosts = document.querySelectorAll(".js-gettyEmbed");
+    if (gettyPosts.length > 0) {
+        for (const post of gettyPosts) {
+            const url = post.getAttribute("href") || " ";
+            const id = post.getAttribute("id");
+            const sig = post.getAttribute("data-sig");
+            const height = Number(post.getAttribute("data-h")) || 1;
+            const width = Number(post.getAttribute("data-w")) || 1;
+            const items = post.getAttribute("data-items");
+            const capt = post.getAttribute("data-capt");
+            const tld = post.getAttribute("data-tld");
+            const i360 = post.getAttribute("data-is36");
+            const data: IEmbedData = {
+                type: "getty",
+                url,
+                height,
+                width,
+                attributes: { id, sig, items, capt, tld, i360 },
+            };
+            // setTimeout(() => {
+            await loadGettyImage(data);
+            // }, 500);
+            post.classList.remove("js-gettyEmbed");
+        }
     }
 }
 
@@ -40,20 +47,39 @@ async function convertgettyEmbeds(data) {
  * Render a single getty embed.
  */
 export async function rendergetty(element: HTMLElement, data: IEmbedData) {
-    //  const gettyClass = data.attributes.gettyClass;
-    await ensureScript("//embed-cdn.gettyimages.com/widgets.js");
-    const url = data.attributes.postID;
-
+    const url = data.attributes.post;
     const newlink = document.createElement("a");
     newlink.classList.add("gie-single");
-    newlink.setAttribute("href", "http://www.gettyimages.ca/detail/863162608");
+    newlink.setAttribute("href", "http://www.gettyimages.ca/detail/" + url);
     newlink.setAttribute("id", data.attributes.id);
-    newlink.setAttribute("target", "_blank");
 
     element.appendChild(newlink);
 
     setImmediate(() => {
-        void convertgettyEmbeds(data);
+        loadGettyImage(data);
     });
 }
-//<a id='y4YYMji7SNlvHTA09sjd3g' class='gie-single' href='http://www.gettyimages.ca/detail/863162608' target='_blank' style='color:#a7a7a7;text-decoration:none;font-weight:normal !important;border:none;display:inline-block;'>Embed from Getty Images</a><script>window.gie=window.gie||function(c){(gie.q=gie.q||[]).push(c)};gie(function(){gie.widgets.load({id:'y4YYMji7SNlvHTA09sjd3g',sig:'s7e8baosglgGoQlntBjZ0ZpZtGKWOrHJQVpf1O0CdYw=',w:'508px',h:'339px',items:'863162608',caption: true ,tld:'ca',is360: false })});</script><script src='//embed-cdn.gettyimages.com/widgets.js' charset='utf-8' async></script>
+
+async function loadGettyImage(data) {
+    const fallbackCallback = c => {
+        (window.gie.q = window.gie.q || []).push(c);
+    };
+    window.gie = window.gie || fallbackCallback;
+
+    window.gie(() => {
+        window.gie.widgets.load({
+            id: data.attributes.id,
+            sig: data.attributes.sig,
+            w: data.width + "px",
+            h: data.height + "px",
+            items: data.attributes.items,
+            caption: data.attributes.isCaptioned,
+            tld: data.attributes.tld,
+            is360: data.attributes.is360,
+        });
+    });
+
+    /// DO NOT IGNORE
+    /// This will turn totally sideways if window.gie is not populated before the script is initially loaded.
+    await ensureScript("//embed-cdn.gettyimages.com/widgets.js");
+}

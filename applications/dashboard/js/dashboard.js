@@ -553,7 +553,11 @@ var DashboardModal = (function() {
                 success: function(json) {
                     var body = json.Data;
                     var content = self.parseBody(body);
-                    $('#' + self.id).htmlTrigger(self.addContentToTemplate(content));
+                    $('#' + self.id)
+                        .htmlTrigger(self.addContentToTemplate(content))
+                        .find(".js-color-picker").each(function() {
+                        colorPicker.start($(this));
+                    });
                 }
             });
         },

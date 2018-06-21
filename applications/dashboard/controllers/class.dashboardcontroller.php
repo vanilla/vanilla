@@ -42,6 +42,7 @@ class DashboardController extends Gdn_Controller {
         $this->addJsFile('magnific-popup.min.js');
         $this->addJsFile('jquery.autosize.min.js');
         $this->addJsFile('global.js');
+        $this->addJsFile('colorpicker.js', 'dashboard');
 
         if (in_array($this->ControllerName, ['profilecontroller', 'activitycontroller'])) {
             $this->addCssFile('style.css');

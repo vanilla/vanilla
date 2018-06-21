@@ -84,18 +84,8 @@ export default function MentionSuggestion(props: IMentionProps) {
 }
 
 /**
- * An item in the mention list for when no results are found.
+ * A loading indicator suggestion.
  */
-export function MentionSuggestionNotFound(props: { id: string }) {
-    return (
-        <span className="richEditor-menuItem atMentionList-item">
-            <span id={props.id} className="atMentionList-noResults">
-                {t("No results found")}
-            </span>
-        </span>
-    );
-}
-
 export function MentionSuggestionLoading(props: IMentionLoadingProps) {
     const { loadingData, onMouseEnter, isActive } = props;
     const { domID } = loadingData;
@@ -111,6 +101,26 @@ export function MentionSuggestionLoading(props: IMentionLoadingProps) {
                         <img alt={name} className="atMentionList-photo ProfilePhoto" />
                     </span>
                     <span className="atMentionList-userName">{t("Loading...")}</span>
+                </span>
+            </button>
+        </li>
+    );
+}
+
+/**
+ * We need a dummy "spacer" suggestion so that we can get our initial measurements.
+ */
+export function MentionSuggestionSpacer() {
+    const classes = classNames("richEditor-menuItem", "atMentionList-item", "atMentionList-spacer");
+
+    return (
+        <li aria-hidden="true" className={classes} style={{ visibility: "hidden" }}>
+            <button type="button" className="atMentionList-suggestion">
+                <span className="atMentionList-user atMentionList-loader">
+                    <span className="PhotoWrap atMentionList-photoWrap">
+                        <img alt={name} className="atMentionList-photo ProfilePhoto" />
+                    </span>
+                    <span className="atMentionList-userName" />
                 </span>
             </button>
         </li>

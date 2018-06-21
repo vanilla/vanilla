@@ -57,12 +57,14 @@ export class MentionToolbar extends React.Component<IProps, IMentionState> {
 
     public componentDidMount() {
         document.addEventListener("keydown", this.keyDownListener, true);
+        document.addEventListener("click", this.onDocumentClick, false);
         this.quill.on("text-change", this.onTextChange);
         this.quill.on("selection-change", this.onSelectionChange);
     }
 
     public componentWillUnmount() {
         document.removeEventListener("keydown", this.keyDownListener, true);
+        document.removeEventListener("click", this.onDocumentClick, false);
         this.quill.off("text-change", this.onTextChange);
         this.quill.off("selection-change", this.onSelectionChange);
     }
@@ -253,6 +255,13 @@ export class MentionToolbar extends React.Component<IProps, IMentionState> {
         this.cancelActiveMention();
     }
 
+    private onDocumentClick = (event: MouseEvent) => {
+        console.log("Click");
+        if (!this.quill.root.contains(event.target as Node)) {
+            this.cancelActiveMention();
+        }
+    };
+
     /**
      * Watch for selection change events in quill. We need to clear the mention list if we have text selected or their is no selection.
      */
@@ -266,7 +275,6 @@ export class MentionToolbar extends React.Component<IProps, IMentionState> {
         }
 
         // The range is updated before the text content, so we need to step back one character sometimes.
-        const lookupIndex = range.index - 1;
         const autoCompleteBlot = getBlotAtIndex(this.quill, range.index, MentionAutoCompleteBlot);
         const mentionRange = getMentionRange(this.quill, range.index, true);
 

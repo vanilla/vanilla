@@ -9,9 +9,8 @@ import classNames from "classnames";
 import { withEditor, IEditorContextProps } from "@rich-editor/components/context";
 import MentionSuggestion, {
     IMentionProps,
-    MentionSuggestionNotFound,
     MentionSuggestionLoading,
-    IMentionSuggestionData,
+    MentionSuggestionSpacer,
 } from "./MentionSuggestion";
 import { t } from "@dashboard/application";
 import { getMentionRange } from "@rich-editor/quill/utility";
@@ -139,7 +138,7 @@ class MentionSuggestionList extends React.PureComponent<IProps, IState> {
                                 {hasResults && items}
                             </ul>
                             <div className={classes} style={{ visibility: "hidden" }}>
-                                <MentionSuggestionNotFound id={loaderID} />
+                                <MentionSuggestionSpacer />
                             </div>
                         </span>
                     );

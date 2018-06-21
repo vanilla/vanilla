@@ -60,6 +60,17 @@ describe("MentionTrie", () => {
 
             expect(trie.getNode()).to.deep.equal(expected);
         });
+
+        it("Does not invalidate a parent value with a child insertion", () => {
+            const trie = new MentionTrie();
+            trie.insert("t", PENDING_VALUE);
+            trie.insert("t", SUCCESSFUL_VALUE);
+            expect(trie.getValue("t")).deep.equals(SUCCESSFUL_VALUE);
+            trie.insert("te", PENDING_VALUE);
+            trie.insert("te", SUCCESSFUL_VALUE);
+            expect(trie.getValue("t")).deep.equals(SUCCESSFUL_VALUE);
+            expect(trie.getValue("te")).deep.equals(SUCCESSFUL_VALUE);
+        });
     });
 
     describe("getValue", () => {

@@ -152,7 +152,16 @@ export class MentionToolbar extends React.Component<IProps, IMentionState> {
                     event.stopPropagation();
                     break;
                 }
-                case Keyboard.match(event, Keyboard.keys.ENTER):
+                case Keyboard.match(event, Keyboard.keys.ENTER): {
+                    if (suggestions.users.length > 0 && !currentItemIsLoader) {
+                        this.confirmActiveMention();
+                        event.preventDefault();
+                        event.stopPropagation();
+                    } else {
+                        this.cancelActiveMention();
+                    }
+                    break;
+                }
                 case Keyboard.match(event, Keyboard.keys.TAB): {
                     if (!currentItemIsLoader) {
                         this.confirmActiveMention();
@@ -321,6 +330,7 @@ export class MentionToolbar extends React.Component<IProps, IMentionState> {
 
             if (isASingleExactMatch) {
                 setImmediate(() => {
+                    console.log("autoconfirm");
                     this.confirmActiveMention(lastOperation.insert);
                 });
                 return;

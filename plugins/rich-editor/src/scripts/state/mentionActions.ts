@@ -16,7 +16,7 @@ export const LOAD_USERS_FAILURE = "[mentions] load users failure";
 export const LOAD_USERS_SUCCESS = "[mentions] load users success";
 
 // The number of characters that we will lookup to try and invalidate a lookup early.
-const REASONABLE_INVALIDATION_SIZE = 3;
+const REASONABLE_INVALIDATION_SIZE = 5;
 const USER_LIMIT = 50;
 
 /**
@@ -42,6 +42,8 @@ export function filterSuggestions(users: IMentionSuggestionData[], searchName: s
     });
 }
 
+// export function should;
+
 /**
  * Make an API request for mention suggestions. These results are cached by the lookup username.
  */
@@ -64,27 +66,23 @@ function loadUsers(username: string) {
             }
         }
 
-        // Attempt a partial lookup to try and see if there will be no results without an API request.
-        if (username.length > REASONABLE_INVALIDATION_SIZE) {
-            const partialName = username.substring(0, REASONABLE_INVALIDATION_SIZE);
-            const partialLookup = usersTrie.getValue(partialName);
-
-            if (partialLookup != null) {
-                switch (partialLookup.status) {
-                    case "SUCCESSFUL": {
-                        if (partialLookup.users.length < USER_LIMIT) {
-                            // The previous match already found the maximum amount of users that the server had
-                            // Return the previous results.
-                            return dispatch(
-                                actions.loadUsersSuccess(username, filterSuggestions(partialLookup.users, username)),
-                            );
-                        }
+        // Attempt a partial lookup to try and see if we can get results without an API request
+        const partialLookup = usersTrie.getValueFromPartialsOfWord(username);
+        if (partialLookup != null) {
+            switch (partialLookup.status) {
+                case "SUCCESSFUL": {
+                    if (partialLookup.users.length < USER_LIMIT) {
+                        // The previous match already found the maximum amount of users that the server had
+                        // Return the previous results.
+                        return dispatch(
+                            actions.loadUsersSuccess(username, filterSuggestions(partialLookup.users, username)),
+                        );
                     }
-                    case "FAILED":
-                    // Previously failed. We still want to proceed to a real lookup so do nothing.
-                    case "PENDING":
-                    // We still want to proceed to a real lookup so do nothing.
                 }
+                case "FAILED":
+                // Previously failed. We still want to proceed to a real lookup so do nothing.
+                case "PENDING":
+                // We still want to proceed to a real lookup so do nothing.
             }
         }
 
@@ -110,7 +108,7 @@ function loadUsers(username: string) {
                 });
 
                 // Result is good. Lets GO!
-                dispatch(actions.loadUsersSuccess(username, response.data));
+                dispatch(actions.loadUsersSuccess(username, users));
             })
             .catch(error => dispatch(actions.loadUsersFailure(username, error)));
     };

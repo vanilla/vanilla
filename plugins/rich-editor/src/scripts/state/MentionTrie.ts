@@ -34,6 +34,7 @@ export interface IMentionNode {
  * A trie for storage of mention data.
  */
 export default class MentionTrie {
+    public MAX_PARTIAL_LOOKUP_ITERATIONS = 10;
     private root: IMentionNode = {};
 
     /**
@@ -94,5 +95,31 @@ export default class MentionTrie {
     public getValue(word: string): IMentionValue | null {
         const node = this.getNode(word);
         return (node && node.value) || null;
+    }
+
+    /**
+     * Lookup the value for a word using increasingly small substrings of the current string.
+     *
+     * Number of iterations is capped at MAX_PARTIAL_LOOKUP_ITERATIONS.
+     *
+     * ex. this.getValueFormPartials("test") will lookup for
+     * - "test",
+     * - "tes",
+     * - "te",
+     * - "t"
+     *
+     * And return immediately if it finds a result.
+     */
+    public getValueFromPartialsOfWord(word: string): IMentionValue | null {
+        const startingLength = Math.min(this.MAX_PARTIAL_LOOKUP_ITERATIONS, word.length);
+        for (let x = startingLength; x > 0; x--) {
+            const substring = word.substring(0, x);
+            const potentialValue = this.getValue(substring);
+            if (potentialValue != null) {
+                return potentialValue;
+            }
+        }
+
+        return null;
     }
 }

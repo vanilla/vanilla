@@ -6,6 +6,7 @@
 
 namespace Vanilla\Embeds;
 
+use Exception;
 /**
  * Getty Embed.
  */
@@ -26,7 +27,7 @@ class GettyEmbed extends Embed {
      */
     public function matchUrl(string $url) {
         $data = [];
-        $oembedData= [];
+
 
         if ($this->isNetworkEnabled()) {
 
@@ -35,8 +36,11 @@ class GettyEmbed extends Embed {
                 $url,
                 $post
             );
-
-            // The oembed is used only to pull the width and height of the object.
+            if (!$post) {
+                throw new Exception('Unable to get post ID.', 400);
+            }
+            
+            $oembedData= [];
             $oembedData = $this->oembed("http://embed.gettyimages.com/oembed?url=http://gty.im/".$post['postID']);
 
             if ($oembedData) {
@@ -49,17 +53,15 @@ class GettyEmbed extends Embed {
     }
 
     /**
-     * @inheritdocs
+     * @inheritdoc
      */
     public function renderData(array $data): string {
 
         $url = "//www.gettyimages.com/detail/".$data['attributes']['post'];
+        $encodedURL = htmlspecialchars($url);
         $encodedData = json_encode($data);
-
         $result = <<<HTML
-        <a id="{$data['attributes']['id']}" data-sig="{$data['attributes']['sig']}" data-h={$data['height']} data-w={$data['width']} 
-        data-items="{$data['attributes']['items']}" data-capt="{$data['attributes']['isCaptioned']}" data-tld="{$data['attributes']['tld']}" data-is360="{$data['attributes']['is360']}"
-        class='gie-single js-gettyEmbed' href="{$url}" target='_blank'> Embed from Getty Images</a>
+        <a id="{$data['attributes']['id']}" data-json={$encodedData} class='gie-single js-gettyEmbed' href="{$encodedURL}"> Embed from Getty Images</a>
 HTML;
        return $result;
 

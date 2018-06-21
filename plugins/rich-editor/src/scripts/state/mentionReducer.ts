@@ -5,17 +5,9 @@
  */
 
 import * as mentionActions from "./mentionActions";
-import MentionTrie from "./MentionTrie";
-import { logError } from "@dashboard/utility";
+import MentionTrie from "@rich-editor/state/MentionTrie";
 import { IMentionSuggestionData } from "@rich-editor/components/toolbars/pieces/MentionSuggestion";
-
-export interface IMentionState {
-    lastSuccessfulUsername: string | null;
-    currentUsername: string | null;
-    usersTrie: MentionTrie;
-    activeSuggestionID: string;
-    activeSuggestionIndex: number;
-}
+import { IMentionState } from "@rich-editor/state/IState";
 
 export const initialState: IMentionState = {
     lastSuccessfulUsername: null,

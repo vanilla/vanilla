@@ -18,16 +18,16 @@ import { Dispatch } from "redux";
 import IStoreState from "@rich-editor/state/IState";
 import { IMentionValue } from "@rich-editor/state/MentionTrie";
 import { connect } from "react-redux";
-import { IMentionSuggestionData } from "@rich-editor/components/toolbars/pieces/MentionSuggestion";
+import { IMentionSuggestionData, IMentionProps } from "@rich-editor/components/toolbars/pieces/MentionSuggestion";
 
 interface IProps extends IEditorContextProps {
     lookupMentions: (username: string) => void;
     setActiveItem: (itemID: string, itemIndex: number) => void;
-    currentSuggestions: IMentionValue | null;
-    currentUsername: string;
+    suggestions: IMentionValue | null;
     lastSuccessfulUsername: string;
     activeSuggestionID: string;
     activeSuggestionIndex: number;
+    showLoader: boolean;
 }
 
 interface IMentionState {
@@ -41,7 +41,7 @@ interface IMentionState {
 export class MentionToolbar extends React.Component<IProps, IMentionState> {
     private quill: Quill;
     private ID = uniqueId("mentionList-");
-    private noResultsID = uniqueId("mentionList-noResults-");
+    private loaderID = uniqueId("mentionList-noResults-");
     private comboBoxID = uniqueId("mentionComboBox-");
     private isConvertingMention = false;
     private readonly MENTION_COMPLETION_CHARACTERS = [".", "!", "?", " ", "\n"];
@@ -72,19 +72,20 @@ export class MentionToolbar extends React.Component<IProps, IMentionState> {
     }
 
     public render() {
-        const { currentSuggestions, lastSuccessfulUsername } = this.props;
-        const isActive = currentSuggestions && currentSuggestions.status === "SUCCESSFUL";
-        const data = currentSuggestions && currentSuggestions.status === "SUCCESSFUL" ? currentSuggestions.users : [];
+        const { suggestions, lastSuccessfulUsername, showLoader, activeSuggestionID } = this.props;
+        const isActive = suggestions && suggestions.status === "SUCCESSFUL";
+        const data = suggestions && suggestions.status === "SUCCESSFUL" ? suggestions.users : [];
 
         return (
             <MentionSuggestionList
                 onItemClick={this.onItemClick}
-                mentionData={this.addEventListeners(data)}
+                mentionProps={this.createMentionProps(data)}
                 matchedString={lastSuccessfulUsername}
-                activeItemId={this.props.activeSuggestionID}
-                isVisible={!!isActive}
+                activeItemId={activeSuggestionID}
+                isVisible={!!isActive || showLoader}
                 id={this.ID}
-                noResultsID={this.noResultsID}
+                loaderID={this.loaderID}
+                showLoader={showLoader}
             />
         );
     }
@@ -93,8 +94,8 @@ export class MentionToolbar extends React.Component<IProps, IMentionState> {
      * Determine if we have a valid API response.
      */
     private get hasApiResponse() {
-        const { currentSuggestions } = this.props;
-        return currentSuggestions && currentSuggestions.status === "SUCCESSFUL";
+        const { suggestions } = this.props;
+        return suggestions && suggestions.status === "SUCCESSFUL";
     }
 
     /**
@@ -110,9 +111,9 @@ export class MentionToolbar extends React.Component<IProps, IMentionState> {
      */
     private keyDownListener = (event: KeyboardEvent) => {
         const { inActiveMention } = this.state;
-        const { currentSuggestions, activeSuggestionIndex } = this.props;
+        const { suggestions, activeSuggestionIndex, activeSuggestionID, showLoader } = this.props;
 
-        if (!currentSuggestions || currentSuggestions.status !== "SUCCESSFUL") {
+        if (!suggestions || suggestions.status !== "SUCCESSFUL") {
             return;
         }
 
@@ -124,39 +125,48 @@ export class MentionToolbar extends React.Component<IProps, IMentionState> {
         }
 
         if (this.quill.hasFocus() && inActiveMention) {
-            let newIndex;
-            let newItemID;
             const firstIndex = 0;
             const nextIndex = activeSuggestionIndex + 1;
             const prevIndex = activeSuggestionIndex - 1;
-            const lastIndex = currentSuggestions.users.length - 1;
+            const lastIndex = showLoader ? suggestions.users.length : suggestions.users.length - 1;
+            const currentItemIsLoader = activeSuggestionID === this.loaderID;
+
+            const getIDFromIndex = (newIndex: number) => {
+                return showLoader && newIndex === lastIndex ? this.loaderID : suggestions.users[newIndex].domID;
+            };
 
             switch (true) {
-                case Keyboard.match(event, Keyboard.keys.DOWN):
-                    newIndex = activeSuggestionIndex === lastIndex ? firstIndex : nextIndex;
-                    newItemID = currentSuggestions.users[newIndex].domID;
+                case Keyboard.match(event, Keyboard.keys.DOWN): {
+                    const newIndex = activeSuggestionIndex === lastIndex ? firstIndex : nextIndex;
+                    const newItemID = getIDFromIndex(newIndex);
                     this.props.setActiveItem(newItemID, newIndex);
                     event.preventDefault();
                     event.stopPropagation();
                     break;
-                case Keyboard.match(event, Keyboard.keys.UP):
-                    newIndex = activeSuggestionIndex === firstIndex ? lastIndex : prevIndex;
-                    newItemID = currentSuggestions.users[newIndex].domID;
+                }
+                case Keyboard.match(event, Keyboard.keys.UP): {
+                    const newIndex = activeSuggestionIndex === firstIndex ? lastIndex : prevIndex;
+                    const newItemID = getIDFromIndex(newIndex);
                     this.props.setActiveItem(newItemID, newIndex);
                     event.preventDefault();
                     event.stopPropagation();
                     break;
+                }
                 case Keyboard.match(event, Keyboard.keys.ENTER):
-                case Keyboard.match(event, Keyboard.keys.TAB):
-                    this.confirmActiveMention();
-                    event.preventDefault();
-                    event.stopPropagation();
+                case Keyboard.match(event, Keyboard.keys.TAB): {
+                    if (!currentItemIsLoader) {
+                        this.confirmActiveMention();
+                        event.preventDefault();
+                        event.stopPropagation();
+                    }
                     break;
-                case Keyboard.match(event, Keyboard.keys.ESCAPE):
+                }
+                case Keyboard.match(event, Keyboard.keys.ESCAPE): {
                     this.cancelActiveMention();
                     event.preventDefault();
                     event.stopPropagation();
                     break;
+                }
             }
         }
     };
@@ -166,25 +176,27 @@ export class MentionToolbar extends React.Component<IProps, IMentionState> {
      */
     private injectComboBoxAccessibility = () => {
         const { autoCompleteBlot } = this.state;
-        const { activeSuggestionID } = this.props;
+        const { activeSuggestionID, activeSuggestionIndex } = this.props;
         if (autoCompleteBlot) {
             autoCompleteBlot.injectAccessibilityAttributes({
                 ID: this.comboBoxID,
                 activeItemID: activeSuggestionID,
                 suggestionListID: this.ID,
-                noResultsID: this.noResultsID,
+                activeItemIsLoader: activeSuggestionID === this.loaderID,
             });
         }
     };
 
-    private addEventListeners(suggestions: IMentionSuggestionData[]) {
+    private createMentionProps(suggestions: IMentionSuggestionData[]): Array<Partial<IMentionProps>> {
         return suggestions.map((data, index) => {
             const onMouseEnter = () => {
                 this.props.setActiveItem(data.domID, index);
             };
-            data.onMouseEnter = onMouseEnter;
 
-            return data;
+            return {
+                mentionData: data,
+                onMouseEnter,
+            };
         });
     }
 
@@ -212,18 +224,18 @@ export class MentionToolbar extends React.Component<IProps, IMentionState> {
      */
     private confirmActiveMention(insertCharacter: string = " ") {
         const { autoCompleteBlot } = this.state;
-        const { currentSuggestions, activeSuggestionIndex } = this.props;
+        const { suggestions, activeSuggestionIndex } = this.props;
         if (
             !(autoCompleteBlot instanceof MentionAutoCompleteBlot) ||
             this.isConvertingMention ||
-            !currentSuggestions ||
-            currentSuggestions.status !== "SUCCESSFUL"
+            !suggestions ||
+            suggestions.status !== "SUCCESSFUL"
         ) {
             return;
         }
 
         this.isConvertingMention = true;
-        const activeSuggestion = currentSuggestions.users[activeSuggestionIndex];
+        const activeSuggestion = suggestions.users[activeSuggestionIndex];
         const start = autoCompleteBlot.offset(this.quill.scroll);
 
         autoCompleteBlot.finalize(activeSuggestion);
@@ -301,9 +313,8 @@ export class MentionToolbar extends React.Component<IProps, IMentionState> {
             lastOperation.insert &&
             this.MENTION_COMPLETION_CHARACTERS.includes(lastOperation.insert)
         ) {
-            const { currentSuggestions } = this.props;
-            const users =
-                currentSuggestions && currentSuggestions.status === "SUCCESSFUL" ? currentSuggestions.users : [];
+            const { suggestions } = this.props;
+            const users = suggestions && suggestions.status === "SUCCESSFUL" ? suggestions.users : [];
 
             const isASingleExactMatch = users.length === 1 && this.props.lastSuccessfulUsername === users[0].name;
             // Autocomplete the mention if certain conditions occur.
@@ -343,12 +354,15 @@ function mapStateToProps(state: IStoreState) {
         activeSuggestionIndex,
     } = state.editor.mentions;
 
+    const currentNode = currentUsername && usersTrie.getValue(currentUsername);
+    const showLoader = currentNode && currentNode.status === "PENDING";
+
     return {
-        currentSuggestions: lastSuccessfulUsername ? usersTrie.getValue(lastSuccessfulUsername) : null,
+        suggestions: lastSuccessfulUsername ? usersTrie.getValue(lastSuccessfulUsername) : null,
         lastSuccessfulUsername,
-        currentUsername,
         activeSuggestionID,
         activeSuggestionIndex,
+        showLoader,
     };
 }
 

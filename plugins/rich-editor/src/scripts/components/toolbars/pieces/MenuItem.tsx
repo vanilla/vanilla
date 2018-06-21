@@ -37,13 +37,11 @@ interface IProps {
  */
 export default class MenuItem extends React.Component<IProps> {
     private onBlur: (event?: React.FocusEvent<any>) => void;
-    private buttonRole: string;
     private domButton: HTMLElement;
 
     constructor(props) {
         super(props);
         this.onBlur = props.isLast && props.onBlur ? props.onBlur : () => undefined;
-        this.buttonRole = props.role || "button";
     }
 
     public render() {

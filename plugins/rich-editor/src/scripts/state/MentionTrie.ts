@@ -30,9 +30,18 @@ export interface IMentionNode {
     value?: IMentionValue;
 }
 
+/**
+ * A trie for storage of mention data.
+ */
 export default class MentionTrie {
     private root: IMentionNode = {};
 
+    /**
+     * Insert a value into a node for the word. This will overwrite whatever value the node already has
+     *
+     * @param word - The location in the trie.
+     * @param value - The value for the node.
+     */
     public insert(word: string, value: IMentionValue): void {
         let current = this.root;
 
@@ -53,6 +62,13 @@ export default class MentionTrie {
         current.value = value;
     }
 
+    /**
+     * Get a node for a given word.
+     *
+     * If no word is passed the root node will be returned.
+     *
+     * @param word - The word to lookup.
+     */
     public getNode(word?: string): IMentionNode | null {
         let node = this.root;
         if (word === undefined) {
@@ -70,7 +86,12 @@ export default class MentionTrie {
         return node;
     }
 
-    public getValue(word?: string): IMentionValue | null {
+    /**
+     * Get the value out of a particular node.
+     *
+     * @param word - The word to lookup.
+     */
+    public getValue(word: string): IMentionValue | null {
         const node = this.getNode(word);
         return (node && node.value) || null;
     }

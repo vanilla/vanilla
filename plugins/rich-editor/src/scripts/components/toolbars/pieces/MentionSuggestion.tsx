@@ -12,20 +12,31 @@ import { splitStringLoosely } from "@dashboard/utility";
 
 export interface IMentionSuggestionData extends IMentionUser {
     domID: string;
-    onMouseEnter?: React.MouseEventHandler<any>;
 }
 
-export interface IMentionProps extends IMentionSuggestionData {
+interface IGenericMentionProps {
     matchedString: string;
     isActive: boolean;
-    onClick(event: React.MouseEvent<any>);
+    onMouseEnter?: React.MouseEventHandler<any>;
+    onClick?: React.MouseEventHandler<any>;
+}
+
+export interface IMentionProps extends IGenericMentionProps {
+    mentionData: IMentionSuggestionData;
+}
+
+export interface IMentionLoadingProps extends IGenericMentionProps {
+    loadingData: {
+        domID: string;
+    };
 }
 
 /**
  * A single Suggestion in a MentionList
  */
 export default function MentionSuggestion(props: IMentionProps) {
-    const { isActive, matchedString, photoUrl, name, onClick, userID, domID, onMouseEnter } = props;
+    const { isActive, matchedString, mentionData, onClick, onMouseEnter } = props;
+    const { photoUrl, name, domID } = mentionData;
 
     const classes = classNames("richEditor-menuItem", "atMentionList-item", {
         isActive,
@@ -82,5 +93,26 @@ export function MentionSuggestionNotFound(props: { id: string }) {
                 {t("No results found")}
             </span>
         </span>
+    );
+}
+
+export function MentionSuggestionLoading(props: IMentionLoadingProps) {
+    const { loadingData, onMouseEnter, isActive } = props;
+    const { domID } = loadingData;
+    const classes = classNames("richEditor-menuItem", "atMentionList-item", "atMentionList-loader", {
+        isActive,
+    });
+
+    return (
+        <li id={domID} className={classes} role="option" aria-selected={isActive} onMouseEnter={onMouseEnter}>
+            <button type="button" className="atMentionList-suggestion" disabled>
+                <span className="atMentionList-user atMentionList-loader">
+                    <span className="PhotoWrap atMentionList-photoWrap">
+                        <img alt={name} className="atMentionList-photo ProfilePhoto" />
+                    </span>
+                    <span className="atMentionList-userName">{t("Loading...")}</span>
+                </span>
+            </button>
+        </li>
     );
 }

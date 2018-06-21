@@ -19,12 +19,7 @@ describe("[MentionAutoCompleteBlot]", () => {
             photoUrl: "https://github.com",
             dateLastActive: "",
             domID: "asdf",
-            onMouseEnter: () => {
-                return;
-            },
         };
-
-        const newLine = { insert: "\n" };
 
         quill.setContents([
             {
@@ -34,7 +29,7 @@ describe("[MentionAutoCompleteBlot]", () => {
         ]);
 
         const blot = (quill.scroll as any).descendant(MentionAutoCompleteBlot, 0)[0] as MentionAutoCompleteBlot;
-        const finalized = blot.finalize(data);
+        blot.finalize(data);
 
         const expected = [{ insert: { mention: { name: "complete", userID: 1 } } }, { insert: "\n" }];
         quill.update();

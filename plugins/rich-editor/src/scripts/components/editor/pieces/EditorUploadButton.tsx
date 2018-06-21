@@ -20,7 +20,7 @@ export class EditorUploadButton extends React.Component<IProps, {}> {
     public render() {
         return (
             <button
-                className="richEditor-button richEditor-embedButton richEditor-buttonUpload js-fakeFileUpload"
+                className="richEditor-button richEditor-embedButton richEditor-buttonUpload"
                 type="button"
                 aria-pressed="false"
                 onClick={this.onFakeButtonClick}
@@ -29,7 +29,7 @@ export class EditorUploadButton extends React.Component<IProps, {}> {
                 <input
                     ref={this.inputRef}
                     onChange={this.onInputChange}
-                    className="js-fileUpload richEditor-upload"
+                    className="richEditor-upload"
                     type="file"
                     accept="image/gif, image/jpeg, image/jpg, image/png"
                 />

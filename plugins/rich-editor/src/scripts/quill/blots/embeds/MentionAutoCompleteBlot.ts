@@ -101,12 +101,12 @@ export default class MentionAutoCompleteBlot extends Inline {
         parentNode.setAttribute("aria-owns", data.suggestionListID);
         domNode.setAttribute("aria-controls", data.suggestionListID);
 
-        if (data.activeItemID) {
+        if (data.activeItemIsLoader) {
+            domNode.setAttribute("aria-label", t("Loading new @mention suggestions"));
+            domNode.removeAttribute("aria-activedescendant");
+        } else {
             domNode.setAttribute("aria-activedescendant", data.activeItemID);
             domNode.removeAttribute("aria-describeby");
-        } else {
-            domNode.setAttribute("aria-describedby", data.noResultsID);
-            domNode.removeAttribute("aria-activedescendant");
         }
     }
 
@@ -127,6 +127,6 @@ export default class MentionAutoCompleteBlot extends Inline {
 interface IComboBoxAccessibilityOptions {
     ID: string;
     suggestionListID: string;
-    noResultsID: string;
-    activeItemID: string | null;
+    activeItemIsLoader: boolean;
+    activeItemID: string;
 }

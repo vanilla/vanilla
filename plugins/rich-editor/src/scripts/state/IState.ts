@@ -6,7 +6,15 @@
  */
 
 import IBaseState from "@dashboard/state/IState";
-import { IMentionState } from "@rich-editor/state/mentionReducer";
+import MentionTrie from "@rich-editor/state/MentionTrie";
+
+export interface IMentionState {
+    lastSuccessfulUsername: string | null;
+    currentUsername: string | null;
+    usersTrie: MentionTrie;
+    activeSuggestionID: string;
+    activeSuggestionIndex: number;
+}
 
 export default interface IState extends IBaseState {
     editor: {

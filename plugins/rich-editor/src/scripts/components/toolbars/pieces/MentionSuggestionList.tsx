@@ -7,20 +7,26 @@
 import React from "react";
 import classNames from "classnames";
 import { withEditor, IEditorContextProps } from "@rich-editor/components/context";
-import MentionSuggestion, { IMentionSuggestionData, MentionSuggestionNotFound } from "./MentionSuggestion";
+import MentionSuggestion, {
+    IMentionProps,
+    MentionSuggestionNotFound,
+    MentionSuggestionLoading,
+    IMentionSuggestionData,
+} from "./MentionSuggestion";
 import { t } from "@dashboard/application";
 import { getMentionRange } from "@rich-editor/quill/utility";
 import ToolbarPositioner from "./ToolbarPositioner";
 import Quill, { RangeStatic, DeltaStatic, Sources } from "quill/core";
 
 interface IProps extends IEditorContextProps {
-    mentionData: IMentionSuggestionData[];
+    mentionProps: Array<Partial<IMentionProps>>;
     matchedString: string;
     id: string;
-    noResultsID: string;
+    loaderID: string;
     isVisible: boolean;
     activeItemId: string | null;
     onItemClick: React.MouseEventHandler<any>;
+    showLoader: boolean;
 }
 
 interface IState {
@@ -48,9 +54,18 @@ class MentionSuggestionList extends React.PureComponent<IProps, IState> {
     }
 
     public render() {
-        const { activeItemId, id, onItemClick, matchedString, mentionData, noResultsID, isVisible } = this.props;
+        const {
+            activeItemId,
+            id,
+            onItemClick,
+            matchedString,
+            mentionProps,
+            loaderID,
+            isVisible,
+            showLoader,
+        } = this.props;
 
-        const hasResults = mentionData.length > 0;
+        const hasResults = mentionProps.length > 0 || showLoader;
         const classes = classNames("atMentionList-items", "MenuItems");
 
         return (
@@ -59,12 +74,11 @@ class MentionSuggestionList extends React.PureComponent<IProps, IState> {
                 verticalAlignment="below"
                 flyoutWidth={this.state.flyoutWidth}
                 flyoutHeight={this.state.flyoutHeight}
-                isActive={true}
+                isActive={isVisible}
                 selectionIndex={this.state.selectionIndex}
                 selectionLength={this.state.selectionLength}
             >
                 {({ x, y }) => {
-                    const offset = 3;
                     let style: React.CSSProperties = {
                         visibility: "hidden",
                         position: "absolute",
@@ -81,6 +95,39 @@ class MentionSuggestionList extends React.PureComponent<IProps, IState> {
                         };
                     }
 
+                    const items = mentionProps.map(mentionProp => {
+                        if (mentionProp.mentionData == null) {
+                            return null;
+                        }
+                        const isActive = mentionProp.mentionData.domID === activeItemId;
+                        return (
+                            <MentionSuggestion
+                                mentionData={mentionProp.mentionData}
+                                key={mentionProp.mentionData.name}
+                                onMouseEnter={mentionProp.onMouseEnter}
+                                onClick={onItemClick}
+                                isActive={isActive}
+                                matchedString={matchedString}
+                            />
+                        );
+                    });
+
+                    if (showLoader) {
+                        const loadingData = {
+                            domID: this.props.loaderID,
+                        };
+                        const isActive = loadingData.domID === activeItemId;
+
+                        items.push(
+                            <MentionSuggestionLoading
+                                loadingData={loadingData}
+                                isActive={isActive}
+                                key="Loading"
+                                matchedString={matchedString}
+                            />,
+                        );
+                    }
+
                     return (
                         <span style={style} className="atMentionList" ref={this.flyoutRef}>
                             <ul
@@ -89,22 +136,10 @@ class MentionSuggestionList extends React.PureComponent<IProps, IState> {
                                 className={classes + (hasResults ? "" : " isHidden")}
                                 role="listbox"
                             >
-                                {hasResults &&
-                                    mentionData.map(mentionItem => {
-                                        const isActive = mentionItem.domID === activeItemId;
-                                        return (
-                                            <MentionSuggestion
-                                                {...mentionItem}
-                                                key={mentionItem.name}
-                                                onClick={onItemClick}
-                                                isActive={isActive}
-                                                matchedString={matchedString}
-                                            />
-                                        );
-                                    })}
+                                {hasResults && items}
                             </ul>
-                            <div className={classes + (hasResults ? " isHidden" : "")} style={{ visibility: "hidden" }}>
-                                <MentionSuggestionNotFound id={noResultsID} />
+                            <div className={classes} style={{ visibility: "hidden" }}>
+                                <MentionSuggestionNotFound id={loaderID} />
                             </div>
                         </span>
                     );

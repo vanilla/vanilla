@@ -20,11 +20,9 @@ const REASONABLE_INVALIDATION_SIZE = 3;
 const USER_LIMIT = 50;
 
 /**
- * Filter users down to a list that matches the current
+ * Filter users down to a list that loosely matches the current searchName
  *
  * @see https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Collator
- *
- * @param username
  */
 export function filterSuggestions(users: IMentionSuggestionData[], searchName: string) {
     const searchCollator = Intl.Collator("en", {

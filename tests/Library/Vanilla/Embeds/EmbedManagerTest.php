@@ -85,7 +85,7 @@ class EmbedManagerTest extends SharedBootstrapTestCase {
                         'postID' => "460707851",
                     ]
                 ],
-                '<a id="CdkwD1KlQeN8rV9xoKzSAg" data-json={"url":"https:\/\/www.gettyimages.ca\/license\/460707851","type":"getty","name":null,"body":null,"photoUrl":null,"height":337,"width":508,"attributes":{"id":"CdkwD1KlQeN8rV9xoKzSAg","sig":"OSznWQvhySQdibOA7WcaeKbc1T3SnuazaIvfwlTLyq0=","items":"460707851","isCaptioned":false,"is360":false,"tld":"com","postID":"460707851"}} class=\'gie-single js-gettyEmbed\' href="//www.gettyimages.com/detail/460707851"> Embed from Getty Images</a>'
+                '<a id="CdkwD1KlQeN8rV9xoKzSAg" data-json={"url":"https:\/\/www.gettyimages.ca\/license\/460707851","type":"getty","name":"","body":"","photoUrl":"","height":"337","width":"508","attributes":{"id":"CdkwD1KlQeN8rV9xoKzSAg","sig":"OSznWQvhySQdibOA7WcaeKbc1T3SnuazaIvfwlTLyq0=","items":"460707851","isCaptioned":"","is360":"","tld":"com","postID":"460707851"}} class=\'gie-single js-gettyEmbed\' href="//www.gettyimages.com/detail/460707851"> Embed from Getty Images</a>'
             ],
             [
                 [

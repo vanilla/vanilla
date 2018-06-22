@@ -9,24 +9,26 @@
  */
 
 /**
- * Class Gdn_ErrorException
+ * This class is for internal use within the global error handler only. Don't use this class elsewhere.
+ *
+ * An extension of the **ErrorException** that includes context variables.
  */
 class Gdn_ErrorException extends ErrorException {
 
-    /** @var string */
+    /** @var array */
     protected $_Context;
 
     /**
+     * Constructs the exception.
      *
-     *
-     * @param string $message
-     * @param int $errorNumber
-     * @param int $file
-     * @param string $line
-     * @param int $context
+     * @param string $message The Exception message to throw.
+     * @param int $code The Exception code.
+     * @param string $filename The filename where the exception is thrown.
+     * @param int $line The line number where the exception is thrown.
+     * @param array $context The currently defined variables.
      */
-    public function __construct($message, $errorNumber, $file, $line, $context) {
-        parent::__construct($message, $errorNumber, 0, $file, $line);
+    public function __construct($message = "", $code = 0, $filename = __FILE__, $line = __LINE__, $context = []) {
+        parent::__construct($message, $code, 0, $filename, $line);
         $this->_Context = $context;
     }
 
@@ -48,7 +50,7 @@ class Gdn_ErrorException extends ErrorException {
  * @param $file
  * @param $line
  * @param $arguments
- * @return bool|void
+ * @return bool|null
  * @throws Gdn_ErrorException
  */
 function gdn_ErrorHandler($errorNumber, $message, $file, $line, $arguments) {
@@ -56,7 +58,7 @@ function gdn_ErrorHandler($errorNumber, $message, $file, $line, $arguments) {
 
     // Don't do anything for @supressed errors.
     if ($errorReporting === 0) {
-        return;
+        return null;
     }
 
     if (($errorReporting & $errorNumber) !== $errorNumber) {
@@ -671,6 +673,7 @@ if (!function_exists('cleanErrorArguments')) {
      *
      * @param $var
      * @param array $blackList
+     * @deprecated
      */
     function cleanErrorArguments(&$var, $blackList = ['configuration', 'config', 'database', 'password']) {
         if (is_array($var)) {
@@ -689,6 +692,49 @@ if (!function_exists('cleanErrorArguments')) {
                 }
             }
         }
+    }
+}
+
+if (!function_exists('__cleanErrorArguments')) {
+    /**
+     * This is an internal function not to be used outside of error printing.
+     *
+     * @param $var
+     * @param array $blackList
+     */
+    function __cleanErrorArguments($var, $blackList = ['configuration', 'config', 'database', 'password']) {
+        $seen = [];
+
+        $fn = function ($var, int $nest = 0) use (&$fn, $blackList, &$seen) {
+            if (is_array($var)) {
+                $result = [];
+                foreach ($var as $key => $value) {
+                    if (in_array(strtolower($key), $blackList)) {
+                        $value = '**SECURITY**';
+                    } else {
+                        if (is_object($value) && !in_array($value, $seen, true)) {
+                            $seen[] = $value;
+                            $value = Gdn_Format::objectAsArray($value);
+                        }
+
+                        if (is_array($value)) {
+                            if ($nest < 10) {
+                                $value = $fn($value, $nest + 1);
+                            } else {
+                                $value = "**MAX NESTING**";
+                            }
+                        }
+                    }
+                    $result[$key] = $value;
+                }
+            } else {
+                $result = $var;
+            }
+            return $result;
+        };
+
+        $result = $fn($var);
+        return $result;
     }
 }
 

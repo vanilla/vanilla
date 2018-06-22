@@ -91,20 +91,26 @@
             }
         }
 
-        if (function_exists('CleanErrorArguments') && is_array($Arguments) && count($Arguments) > 0) {
+        if (function_exists('__cleanErrorArguments') && is_array($Arguments) && count($Arguments) > 0) {
             echo '<h3><strong>Variables in local scope:</strong></h3>
             <div class="PreContainer">';
             $Odd = FALSE;
-            cleanErrorArguments($Arguments);
-            foreach ($Arguments as $Key => $Value) {
-                // Don't echo the configuration array as it contains sensitive information
-                if (!in_array($Key, ['Config', 'Configuration'])) {
-                    echo '<pre'.($Odd === FALSE ? '' : ' class="Odd"').'><strong>['.$Key.']</strong> ';
-                    echo htmlentities(var_export($Value, true), ENT_COMPAT, 'UTF-8');
-                    echo "</pre>\r\n";
-                    $Odd = $Odd == TRUE ? FALSE : TRUE;
+            try {
+                $Arguments = __cleanErrorArguments($Arguments);
+
+                foreach ($Arguments as $Key => $Value) {
+                    // Don't echo the configuration array as it contains sensitive information
+                    if (!in_array($Key, ['Config', 'Configuration'])) {
+                        echo '<pre'.($Odd === FALSE ? '' : ' class="Odd"').'><strong>['.$Key.']</strong> ';
+                        echo htmlentities(var_export($Value, true), ENT_COMPAT, 'UTF-8');
+                        echo "</pre>\r\n";
+                        $Odd = $Odd == TRUE ? FALSE : TRUE;
+                    }
                 }
+            } catch (\Throwable $ex) {
+                echo "<pre>{$ex->getMessage()}</pre>";
             }
+
             echo "</div>\n";
         }
         ?>

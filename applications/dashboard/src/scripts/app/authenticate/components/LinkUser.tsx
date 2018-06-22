@@ -33,6 +33,7 @@ interface IProps {
     nameError?: string;
     password?: string;
     username?: string;
+    signInWithField?: string;
 }
 
 interface IState extends IRequiredComponentID {
@@ -48,6 +49,7 @@ interface IState extends IRequiredComponentID {
     emailError: string | null;
     password?: string;
     username?: string;
+    signInWithField?: string;
 }
 
 export default class LinkUser extends React.Component<IProps, IState> {
@@ -66,7 +68,10 @@ export default class LinkUser extends React.Component<IProps, IState> {
         this.handleRememberMeCheckChange = this.handleRememberMeCheckChange.bind(this);
         this.handleErrors = this.handleErrors.bind(this);
         this.setStepToRegister = this.setStepToRegister.bind(this);
-        this.setStepToPassword = this.setStepToPassword.bind(this);
+        this.setStepToPasswordWithEmail = this.setStepToPasswordWithEmail.bind(this);
+        this.setStepToPasswordWithUsername = this.setStepToPasswordWithUsername.bind(this);
+        this.setRememberMeCheck = this.setRememberMeCheck.bind(this);
+        this.setTermsOfServiceCheck = this.setTermsOfServiceCheck.bind(this);
 
         this.state = {
             id: getRequiredID(props, "linkUserRegister"),
@@ -82,6 +87,7 @@ export default class LinkUser extends React.Component<IProps, IState> {
             termsOfServiceLabel: props.termsOfServiceLabel,
             termsOfService: props.termsOfService || false,
             termsOfServiceError: props.termsOfServiceError,
+            signInWithField: props.signInWithField,
         };
     }
 
@@ -130,54 +136,40 @@ export default class LinkUser extends React.Component<IProps, IState> {
         const catchAllErrorMessage = t("An error has occurred, please try again.");
 
         const data = get(e, "response.data", false);
-
         log("data: ", data);
 
-        if (data.errors) {
-            log("errors: ", data.errors);
-        }
-
-        // this.setState({
-        //     editable: true,
-        // });
-
-        let globalError = get(e, "response.data.message", false);
+        let globalError = get(data, "message", false);
         const errors = get(e, "response.data.errors", []);
         const hasFieldSpecificErrors = errors.length > 0;
         let emailError;
         let nameError;
         let termsOfServiceError;
 
-        if (globalError || hasFieldSpecificErrors) {
-            if (hasFieldSpecificErrors) {
-                globalError = ""; // Only show global error if all fields are error free
-                errors.forEach((error, index) => {
-                    error.timestamp = new Date().getTime(); // Timestamp to make sure state changes, even if the message is the same
-                    const genericFieldError = t("This %s is already taken. Enter another %s ");
-                    if (error.field === "email") {
-                        if (error.code === "The email is taken.") {
-                            emailError = genericFieldError.split("%s").join("email");
-                        } else {
-                            emailError = error.message;
-                        }
-                    } else if (error.field === "name") {
-                        nameError = error.message;
-                        if (error.code === "The name is taken.") {
-                            nameError = genericFieldError.split("%s").join("name");
-                        } else {
-                            nameError = error.message;
-                        }
-                    } else if (error.field === "persist") {
-                        termsOfServiceError = error.message;
-                    } else if (error.field === "agreeToTerms") {
-                        termsOfServiceError = error.message;
+        if (hasFieldSpecificErrors) {
+            errors.forEach((error, index) => {
+                error.timestamp = new Date().getTime(); // Timestamp to make sure state changes, even if the message is the same
+                const genericFieldError = t("This %s is already taken. Enter another %s ");
+                if (error.field === "email") {
+                    if (error.code === "The email is taken.") {
+                        emailError = genericFieldError.split("%s").join("email");
                     } else {
-                        // Unhandled error
-                        globalError = catchAllErrorMessage;
-                        log("LinkUserRegister - Unhandled error field", error);
+                        emailError = error.message;
                     }
-                });
-            }
+                } else if (error.field === "name") {
+                    nameError = error.message;
+                    if (error.code === "The name is taken.") {
+                        nameError = genericFieldError.split("%s").join("name");
+                    } else {
+                        nameError = error.message;
+                    }
+                } else if (error.field === "agreeToTerms") {
+                    termsOfServiceError = error.message;
+                } else {
+                    // Unhandled error
+                    globalError = catchAllErrorMessage;
+                    log("LinkUserRegister - Unhandled error field", error);
+                }
+            });
         } else {
             // Something went really wrong. Add default message to tell the user there's a problem.
             logError("LinkUserRegister - Failure to handle errors from response -", e);
@@ -210,24 +202,6 @@ export default class LinkUser extends React.Component<IProps, IState> {
             },
         );
     }
-
-    // public validateForm(): boolean {
-    //     let valid = false;
-    //
-    //     if (!this.state.termsOfService) {
-    //         this.setState({
-    //             termsOfServiceError: t("You must agree to the terms of service."),
-    //         });
-    //     } else {
-    //         valid = true;
-    //     }
-    //
-    //     if (!valid) {
-    //         log(t("LinkUserRegister Form Valid?: "), valid);
-    //     }
-    //
-    //     return valid;
-    // }
 
     public handleSubmit = event => {
         event.preventDefault();
@@ -268,10 +242,19 @@ export default class LinkUser extends React.Component<IProps, IState> {
         });
     };
 
-    public setStepToPassword = e => {
+    public setStepToPasswordWithEmail = e => {
         e.preventDefault();
         this.setState({
             step: "password",
+            signInWithField: "email",
+        });
+    };
+
+    public setStepToPasswordWithUsername = e => {
+        e.preventDefault();
+        this.setState({
+            step: "password",
+            signInWithField: "name",
         });
     };
 
@@ -293,10 +276,6 @@ export default class LinkUser extends React.Component<IProps, IState> {
         log("Link User step: ", this.state.step);
 
         if (this.state.step === "register") {
-            const errorComponentData = {
-                errors: this.props.nameError,
-                linkOnClick: this.setStepToPassword,
-            };
             const linkText = t(" click here to enter your %s.");
 
             let emailField; // register step
@@ -310,7 +289,8 @@ export default class LinkUser extends React.Component<IProps, IState> {
                     disabled={!this.state.editable}
                     errorComponent={ErrorOrLinkLabel}
                     errorComponentData={{
-                        ...errorComponentData,
+                        errors: this.props.nameError,
+                        linkOnClick: this.setStepToPasswordWithEmail,
                         linkText: linkText.replace("%s", t("email")),
                         error: this.state.emailError,
                     }}
@@ -320,9 +300,14 @@ export default class LinkUser extends React.Component<IProps, IState> {
                 />
             );
 
+            const globalError: any = this.state.globalError ? (
+                <span dangerouslySetInnerHTML={{ __html: this.state.globalError }} />
+            ) : null;
+
             contents = (
                 <form className="linkUserRegisterForm" method="post" onSubmit={this.handleSubmit} noValidate>
                     <Paragraph content={t("Fill out the following information to complete your registration")} />
+                    <Paragraph className="authenticateUser-paragraph" content={globalError} isError={true} />
                     {emailField}
                     <InputTextBlock
                         label={t("Username")}
@@ -330,7 +315,8 @@ export default class LinkUser extends React.Component<IProps, IState> {
                         disabled={!this.state.editable}
                         errorComponent={ErrorOrLinkLabel}
                         errorComponentData={{
-                            ...errorComponentData,
+                            errors: this.props.nameError,
+                            linkOnClick: this.setStepToPasswordWithUsername,
                             linkText: linkText.replace("%s", t("password")),
                             error: this.state.nameError,
                         }}
@@ -340,6 +326,11 @@ export default class LinkUser extends React.Component<IProps, IState> {
                     />
 
                     <div className="inputBlock">
+                        <Checkbox
+                            label={t("Keep me signed in")}
+                            onChange={this.handleRememberMeCheckChange}
+                            checked={this.state.rememberMe}
+                        />
                         <Checkbox
                             dangerousLabel={this.props.termsOfServiceLabel}
                             onChange={this.handleTermsOfServiceCheckChange}
@@ -353,26 +344,28 @@ export default class LinkUser extends React.Component<IProps, IState> {
                             isError={true}
                             content={this.state.termsOfServiceError}
                         />
-                        <Checkbox
-                            label={t("Keep me signed in")}
-                            onChange={this.handleRememberMeCheckChange}
-                            checked={this.state.rememberMe}
-                        />
                     </div>
                     <ButtonSubmit disabled={!this.state.editable} content={t("Connect")} />
                 </form>
             );
         } else {
+            let userName;
+            if (this.state.signInWithField === "name") {
+                userName = this.name.value;
+            } else {
+                userName = get(this, "email.value", get(this.props, "ssoUser.email", ""));
+            }
+
             contents = (
                 <LinkUserSignIn
                     authSessionID={this.props.authSessionID}
                     setErrorState={this.setStepToError}
                     rememberMe={this.state.rememberMe}
-                    username={this.state.username}
+                    username={userName}
                     handleBackClick={this.setStepToRegister}
                     termsOfServiceError={this.state.termsOfServiceError}
                     termsOfServiceLabel={this.props.termsOfServiceLabel}
-                    termsOfService={this.props.termsOfService}
+                    termsOfService={this.state.termsOfService}
                     handleTermsOfServiceCheckChange={this.setTermsOfServiceCheck}
                     handleRememberMeCheckChange={this.setRememberMeCheck}
                 />

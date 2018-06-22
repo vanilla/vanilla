@@ -14,13 +14,10 @@ interface IProps {
     className: string;
     linkOnClick: any;
     linkText: string;
+    signInWithField: string;
 }
 
-interface IState {
-    errorMessage: string;
-}
-
-export default class ErrorOrLinkLabel extends React.Component<IProps, IState> {
+export default class ErrorOrLinkLabel extends React.Component<IProps> {
     public render() {
         if (this.props.error) {
             const componentClasses = classNames("errorOrLinkLabel", this.props.className);

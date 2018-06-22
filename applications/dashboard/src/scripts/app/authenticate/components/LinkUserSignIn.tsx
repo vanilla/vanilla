@@ -23,6 +23,7 @@ interface IProps {
     authSessionID: string;
     setErrorState: any;
     rememberMe?: boolean;
+    termsOfService?: boolean;
     globalError?: string;
     username?: string;
     usernameError?: string;
@@ -32,7 +33,6 @@ interface IProps {
 
     termsOfServiceError?: string;
     termsOfServiceLabel: string;
-    termsOfService?: boolean;
     handleTermsOfServiceCheckChange: any;
     handleRememberMeCheckChange: any;
 }
@@ -41,7 +41,6 @@ interface IState extends IRequiredComponentID {
     editable: boolean;
     globalError?: string | null;
     submitEnabled: boolean;
-    rememberMe: boolean;
     password?: string;
     passwordError: string | null;
     username?: string | null;
@@ -52,7 +51,6 @@ interface IState extends IRequiredComponentID {
 export default class LinkUserSignIn extends React.Component<IProps, IState> {
     private username: InputTextBlock;
     private password: InputTextBlock;
-    private rememberMe: Checkbox;
     private termsOfServiceElement: Checkbox;
 
     constructor(props) {
@@ -67,7 +65,6 @@ export default class LinkUserSignIn extends React.Component<IProps, IState> {
             editable: true,
             submitEnabled: false,
             globalError: props.globalError,
-            rememberMe: props.rememberMe || false,
             termsOfServiceError: props.termsOfServiceError,
             password: props.password,
             passwordError: props.passwordError || null,
@@ -80,7 +77,7 @@ export default class LinkUserSignIn extends React.Component<IProps, IState> {
         const type: string = get(event, "target.type", "");
         if (type === "text") {
             this.setState({
-                username: null,
+                globalError: null,
                 usernameError: null,
             });
         }
@@ -95,19 +92,8 @@ export default class LinkUserSignIn extends React.Component<IProps, IState> {
 
     public handleErrors = e => {
         const catchAllErrorMessage = t("An error has occurred, please try again.");
-
         const data = get(e, "response.data", false);
-
         log("data: ", data);
-
-        if (data.errors) {
-            log("errors: ", data.errors);
-        }
-
-        // this.setState({
-        //     editable: true,
-        // });
-
         let globalError = get(e, "response.data.message", false);
         const errors = get(e, "response.data.errors", []);
         const hasFieldSpecificErrors = errors.length > 0;
@@ -115,9 +101,8 @@ export default class LinkUserSignIn extends React.Component<IProps, IState> {
         let passwordError;
         let termsOfServiceError;
 
-        if (globalError || hasFieldSpecificErrors) {
+        if (hasFieldSpecificErrors) {
             if (hasFieldSpecificErrors) {
-                globalError = ""; // Only show global error if all fields are error free
                 errors.forEach((error, index) => {
                     error.timestamp = new Date().getTime(); // Timestamp to make sure state changes, even if the message is the same
                     const genericFieldError = t("This %s is already taken. Enter another %s ");
@@ -130,7 +115,7 @@ export default class LinkUserSignIn extends React.Component<IProps, IState> {
                     } else {
                         // Unhandled error
                         globalError = catchAllErrorMessage;
-                        logError("LinkUserRegister - Unhandled error field", error);
+                        logError("LinkUserSignIn - Unhandled error field", error);
                     }
                 });
             }
@@ -163,6 +148,8 @@ export default class LinkUserSignIn extends React.Component<IProps, IState> {
                 } else if (hasTermsOfServiceError) {
                     this.termsOfServiceElement.focus();
                 }
+
+                log("In LinkUserSignIn Error with: ", this.state);
             },
         );
     }
@@ -174,11 +161,14 @@ export default class LinkUserSignIn extends React.Component<IProps, IState> {
             editable: false,
         });
 
+        log("LinkUserSignIn props: ", this.props);
+        log("LinkUserSignIn state: ", this.state);
+
         apiv2
             .post("/authenticate/link-user", {
                 authSessionID: this.props.authSessionID,
-                agreeToTerms: this.props.termsOfService,
-                persist: this.props.termsOfService,
+                agreeToTerms: !!this.props.termsOfService,
+                persist: !!this.props.rememberMe,
                 method: "password",
                 username: this.username.value,
                 password: this.password.value,
@@ -195,15 +185,20 @@ export default class LinkUserSignIn extends React.Component<IProps, IState> {
     public handleTermsOfServiceCheckChange = event => {
         this.props.handleTermsOfServiceCheckChange(get(event, "target.checked", false));
     };
-    public handleRememberMeCheckChange = event => {
-        this.props.handleRememberMeCheckChange(get(event, "target.checked", false));
-    };
 
     public render() {
+        log("link user sign in props: ", this.props);
+        log("link user sign in state: ", this.state);
+
+        const globalError: any = this.state.globalError ? (
+            <span dangerouslySetInnerHTML={{ __html: this.state.globalError }} />
+        ) : null;
+
         return (
             <div className="linkUserRegister">
                 <form className="linkUserRegisterForm" method="post" onSubmit={this.handleSubmit} noValidate>
                     <Paragraph content={t("Sign in with your existing account to connect")} />
+                    <Paragraph className="authenticateUser-paragraph" content={globalError} isError={true} />
                     <InputTextBlock
                         label={t("Email / Username")}
                         required={true}
@@ -226,11 +221,14 @@ export default class LinkUserSignIn extends React.Component<IProps, IState> {
                     />
 
                     <div className="inputBlock">
-                        <RememberAndForgotPassword onChange={this.handleRememberMeCheckChange} />
+                        <RememberAndForgotPassword
+                            rememberMe={!!this.props.rememberMe}
+                            onChange={this.props.handleRememberMeCheckChange}
+                        />
                         <Checkbox
                             dangerousLabel={this.props.termsOfServiceLabel}
                             onChange={this.handleTermsOfServiceCheckChange}
-                            checked={this.props.termsOfService}
+                            checked={!!this.props.termsOfService}
                             ref={termsOfServiceElement =>
                                 (this.termsOfServiceElement = termsOfServiceElement as Checkbox)
                             }

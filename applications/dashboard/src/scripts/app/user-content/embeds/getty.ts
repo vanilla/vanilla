@@ -19,14 +19,7 @@ async function convertgettyEmbeds() {
     const gettyPosts = document.querySelectorAll(".js-gettyEmbed");
     if (gettyPosts.length > 0) {
         for (const post of gettyPosts) {
-            const url = post.getAttribute("href") || " ";
-            // const sig = post.getAttribute("data-sig");
-            // const height = Number(post.getAttribute("data-h")) || 1;
-            // const width = Number(post.getAttribute("data-w")) || 1;
-            // const items = post.getAttribute("data-items");
-            // const capt = post.getAttribute("data-capt");
-            // const tld = post.getAttribute("data-tld");
-            // const i360 = post.getAttribute("data-is36");
+            const url = post.getAttribute("href") || "";
             const jsonData = post.getAttribute("data-json") || "";
             const gettyPost = JSON.parse(jsonData);
             const id = gettyPost.attributes.id;
@@ -44,9 +37,7 @@ async function convertgettyEmbeds() {
                 width,
                 attributes: { id, sig, items, capt, tld, i360 },
             };
-            // setTimeout(() => {
             await loadGettyImage(data);
-            // }, 500);
             post.classList.remove("js-gettyEmbed");
         }
     }
@@ -57,12 +48,12 @@ async function convertgettyEmbeds() {
  */
 export async function rendergetty(element: HTMLElement, data: IEmbedData) {
     const url = data.attributes.post;
-    const newlink = document.createElement("a");
-    newlink.classList.add("gie-single");
-    newlink.setAttribute("href", "http://www.gettyimages.ca/detail/" + url);
-    newlink.setAttribute("id", data.attributes.id);
+    const newLink = document.createElement("a");
+    newLink.classList.add("gie-single");
+    newLink.setAttribute("href", "http://www.gettyimages.ca/detail/" + url);
+    newLink.setAttribute("id", data.attributes.id);
 
-    element.appendChild(newlink);
+    element.appendChild(newLink);
 
     setImmediate(() => {
         loadGettyImage(data);

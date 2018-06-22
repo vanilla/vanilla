@@ -28,9 +28,7 @@ class GettyEmbed extends Embed {
     public function matchUrl(string $url) {
         $data = [];
 
-
         if ($this->isNetworkEnabled()) {
-
             preg_match(
                 '/https?:\/\/www\.gettyimages\.(com|ca).*?(?<postID>\d+)(?!.*\d)/i',
                 $url,
@@ -39,16 +37,19 @@ class GettyEmbed extends Embed {
             if (!$post) {
                 throw new Exception('Unable to get post ID.', 400);
             }
-            
-            $oembedData= [];
+
             $oembedData = $this->oembed("http://embed.gettyimages.com/oembed?url=http://gty.im/".$post['postID']);
 
             if ($oembedData) {
                 $data = $oembedData;
             }
             $data['attributes'] = $this->parseResponseHtml($data['html']);
-            $data['attributes']['post'] = $post['postID'];
+
+            if ($post) {
+                $data['attributes']['postID'] = $post['postID'];
+            }
         }
+
         return $data;
     }
 
@@ -56,24 +57,27 @@ class GettyEmbed extends Embed {
      * @inheritdoc
      */
     public function renderData(array $data): string {
-
-        $url = "//www.gettyimages.com/detail/".$data['attributes']['post'];
+        $url = "//www.gettyimages.com/detail/".$data['attributes']['postID'];
         $encodedURL = htmlspecialchars($url);
+
+        array_walk_recursive($data, function(&$row) {
+            $row = htmlspecialchars($row);
+        });
         $encodedData = json_encode($data);
+
         $result = <<<HTML
-        <a id="{$data['attributes']['id']}" data-json={$encodedData} class='gie-single js-gettyEmbed' href="{$encodedURL}"> Embed from Getty Images</a>
+<a id="{$data['attributes']['id']}" data-json={$encodedData} class='gie-single js-gettyEmbed' href="{$encodedURL}"> Embed from Getty Images</a>
 HTML;
        return $result;
-
     }
 
     /**
-     * Parses the oembed repsonse html for permalink and other data.
+     * Parses the oembed response html for embed attributes.
      *
      * @param string $html
      * @return array $data
      */
-    public function parseResponseHtml(string $html): array {
+    private function parseResponseHtml(string $html): array {
         $data =[];
 
         preg_match(

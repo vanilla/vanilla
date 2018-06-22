@@ -375,6 +375,8 @@ class MediaTest extends AbstractAPIv2Test {
             ['https://www.instagram.com/p/BizC-PPFK1m', 'instagram'],
             ['https://soundcloud.com/syrebralvibes/the-eden-project-circles', 'soundcloud'],
             ['https://imgur.com/gallery/10HROiq', 'imgur'],
+            ['https://www.gettyimages.ca/license/905559076', 'getty'],
+            ['https://www.gettyimages.ca/event/denmark-v-australia-group-c-2018-fifa-world-cup-russia-775137961#denmarks-forward-pione-sisto-controls-the-ball-during-the-russia-2018-picture-id980320266', 'getty'],
         ];
 
         return $urls;

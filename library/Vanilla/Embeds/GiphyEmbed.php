@@ -14,13 +14,13 @@ use Exception;
 class GiphyEmbed extends Embed {
 
     /** @inheritdoc */
-    protected $domains = ['giphy.com', 'media.giphy.com', 'gph.is'];
+    protected $domains = ['giphy.com','gph.is'];
 
     /**
      * giphyEmbed constructor.
      */
     public function __construct() {
-        parent::__construct('giphy', 'gif');
+        parent::__construct('giphy', 'image');
     }
 
     /**
@@ -32,20 +32,20 @@ class GiphyEmbed extends Embed {
 
         if ($this->isNetworkEnabled()) {
 
-            $post = $this->parseURL($url);
+            $postID = $this->parseURL($url);
 
             $oembedData = $this->oembed("https://giphy.com/services/oembed?url=".urlencode($url));
             if ($oembedData) {
                 $data = $this->normalizeOembed($oembedData);
+
+                // Obtain the real post ID from media url provided by oembed call
+                if ($domain == 'gph.is') {
+                    $postID = $this->parseURL($data['url']);
+                }
             }
 
-            // Obtain the real post ID from media url provided by oembed call
-            if ($domain == 'gph.is') {
-                $post = $this->parseURL($data['url']);
-            }
-
-             if ($post) {
-                $data['attributes']['postID'] = $post['postID'];
+            if ($postID) {
+                $data['attributes']['postID'] = $postID;
             }
         }
 
@@ -57,12 +57,15 @@ class GiphyEmbed extends Embed {
      */
     public function renderData(array $data): string {
         $height = $data['height'] ?? 1;
-        $encodedHeight = htmlspecialchars($height);
-
         $width = $data['width'] ?? 1;
+        $encodedHeight = htmlspecialchars($height);
         $encodedWidth = htmlspecialchars($width);
 
-        $padding = ($encodedHeight/$encodedWidth) * 100;
+        if (is_numeric($height) && is_numeric($width)) {
+            $padding = ($encodedHeight / $encodedWidth) * 100;
+        } else {
+            $padding = 100;
+        }
 
         $postID = $data['attributes']['postID'] ?? '';
         $url = "https://giphy.com/embed/".$postID;
@@ -82,10 +85,10 @@ HTML;
      * Parses the posted url for the Post ID.
      *
      * @param string $url
-     * @return array $post
+     * @return string $postID
      * @throws Exception if post id is not found.
      */
-    private function parseURL($url): array {
+    private function parseURL($url): string {
         preg_match(
             '/https?:\/\/([a-zA-Z]+\.)?gi?phy?\.(com|is)\/(([\w]+\/)?(([\w]+-)*+)?(?<postID>[a-zA-Z0-9]+))(\/giphy.gif)?/i',
             $url,
@@ -96,6 +99,8 @@ HTML;
             throw new Exception('Unable to get post ID.', 400);
         }
 
-        return $post;
+        $postID  = $post['postID'];
+
+        return $postID;
     }
 }

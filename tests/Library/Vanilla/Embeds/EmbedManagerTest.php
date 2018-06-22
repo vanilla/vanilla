@@ -177,7 +177,6 @@ class EmbedManagerTest extends SharedBootstrapTestCase {
                     "width" => 480,
                     "attributes" => [
                         "postID" => "jwSlQZnsymUW49NC3R",
-                        "url" => "https://giphy.com/gifs/super-smash-bros-ultimate-jwSlQZnsymUW49NC3R"
                     ],
                 ],
 '<div class="embed embedGiphy" style="width: 480px">

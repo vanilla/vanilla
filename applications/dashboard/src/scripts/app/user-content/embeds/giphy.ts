@@ -14,9 +14,9 @@ export async function giphyRenderer(element: HTMLElement, data: IEmbedData) {
     if (data.attributes.postID == null) {
         throw new Error("Giphy embed fail, the post could not be found");
     }
-
+    const width = data.width + "px";
     element.classList.add("embedGiphy");
-    element.style.width = `${data.width}px` || "100%";
+    element.style.width = width || "100%";
 
     const paddingBottom = ((data.height || 1) / (data.width || 1)) * 100 + "%";
     const giphyWrapper = document.createElement("div");

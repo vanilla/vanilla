@@ -25,7 +25,7 @@ class GiphySanitizeTest extends SanitizeTest {
                         "photoUrl" => null,
                         "height" => $content,
                         "width" => $content,
-                        "attributes" => ["postID" => $content, "url" => $content]
+                        "attributes" => ["postID" => $content]
                     ]
                 ]
             ],

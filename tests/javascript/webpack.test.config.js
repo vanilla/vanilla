@@ -71,6 +71,7 @@ module.exports = {
         alias: {
             "@dashboard": path.resolve(VANILLA_ROOT, "applications/dashboard/src/scripts/"),
             "@vanilla": path.resolve(VANILLA_ROOT, "applications/vanilla/src/scripts/"),
+            "@rich-editor": path.resolve(VANILLA_ROOT, "plugins/rich-editor/src/scripts/"),
             "@testroot": path.resolve(VANILLA_ROOT, "tests/javascript/"),
         },
         extensions: [".ts", ".tsx", ".js", ".jsx"],

@@ -56,7 +56,7 @@ export async function rendergetty(element: HTMLElement, data: IEmbedData) {
     element.appendChild(newLink);
 
     setImmediate(() => {
-        loadGettyImage(data);
+        void loadGettyImage(data);
     });
 }
 

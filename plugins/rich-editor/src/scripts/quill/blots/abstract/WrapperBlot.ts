@@ -6,8 +6,6 @@
 
 import Container from "quill/blots/container";
 import Parchment from "parchment";
-import ClassFormatBlot from "./ClassFormatBlot";
-import withWrapper from "./withWrapper";
 
 /**
  * A Blot implementing functions necessary to wrap another Blot as a "Dump" DOM Element.

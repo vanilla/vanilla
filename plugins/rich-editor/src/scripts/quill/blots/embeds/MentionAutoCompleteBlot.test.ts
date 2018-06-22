@@ -5,26 +5,21 @@
  */
 
 import Quill from "../../../quill";
-import Parchment from "parchment";
 import MentionAutoCompleteBlot from "./MentionAutoCompleteBlot";
-import { IMentionData } from "../../../editor/MentionSuggestion";
 import { expect } from "chai";
+import { IMentionSuggestionData } from "@rich-editor/components/toolbars/pieces/MentionSuggestion";
 
 describe("[MentionAutoCompleteBlot]", () => {
     it("can be finalized.", () => {
         const quill = new Quill(document.body);
 
-        const data: IMentionData = {
+        const data: IMentionSuggestionData = {
             userID: 1,
             name: "complete",
             photoUrl: "https://github.com",
-            uniqueID: "asdf",
-            onMouseEnter: () => {
-                return;
-            },
+            dateLastActive: "",
+            domID: "asdf",
         };
-
-        const newLine = { insert: "\n" };
 
         quill.setContents([
             {
@@ -34,7 +29,7 @@ describe("[MentionAutoCompleteBlot]", () => {
         ]);
 
         const blot = (quill.scroll as any).descendant(MentionAutoCompleteBlot, 0)[0] as MentionAutoCompleteBlot;
-        const finalized = blot.finalize(data);
+        blot.finalize(data);
 
         const expected = [{ insert: { mention: { name: "complete", userID: 1 } } }, { insert: "\n" }];
         quill.update();

@@ -6,9 +6,9 @@
 
 import Quill from "quill/core";
 import Inline from "quill/blots/inline";
-import MentionBlot from "./MentionBlot";
-import { IMentionData } from "../../../editor/MentionSuggestion";
 import { t } from "@dashboard/application";
+import { IMentionSuggestionData } from "@rich-editor/components/toolbars/pieces/MentionSuggestion";
+import { IMentionUser } from "@dashboard/apiv2";
 
 /**
  * A Blot to represent text that is being matched for an autocomplete.
@@ -76,9 +76,9 @@ export default class MentionAutoCompleteBlot extends Inline {
      *
      * @param result The new MentionBlot
      */
-    public finalize(result: IMentionData) {
+    public finalize(result: IMentionUser) {
         this.replaceWith("mention", result);
-        this.quill && this.quill.update(Quill.sources.USER);
+        this.quill && this.quill.update(Quill.sources.API);
     }
 
     /**
@@ -86,7 +86,7 @@ export default class MentionAutoCompleteBlot extends Inline {
      */
     public cancel() {
         this.replaceWith("inline", this.domNode.innerHTML);
-        this.quill && this.quill.update(Quill.sources.USER);
+        this.quill && this.quill.update(Quill.sources.API);
     }
 
     /**
@@ -101,12 +101,12 @@ export default class MentionAutoCompleteBlot extends Inline {
         parentNode.setAttribute("aria-owns", data.suggestionListID);
         domNode.setAttribute("aria-controls", data.suggestionListID);
 
-        if (data.activeItemID) {
+        if (data.activeItemIsLoader) {
+            domNode.setAttribute("aria-label", t("Loading new @mention suggestions"));
+            domNode.removeAttribute("aria-activedescendant");
+        } else {
             domNode.setAttribute("aria-activedescendant", data.activeItemID);
             domNode.removeAttribute("aria-describeby");
-        } else {
-            domNode.setAttribute("aria-describedby", data.noResultsID);
-            domNode.removeAttribute("aria-activedescendant");
         }
     }
 
@@ -127,6 +127,6 @@ export default class MentionAutoCompleteBlot extends Inline {
 interface IComboBoxAccessibilityOptions {
     ID: string;
     suggestionListID: string;
-    noResultsID: string;
-    activeItemID: string | null;
+    activeItemIsLoader: boolean;
+    activeItemID: string;
 }

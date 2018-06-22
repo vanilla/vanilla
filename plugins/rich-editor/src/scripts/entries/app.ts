@@ -4,8 +4,11 @@
  * @license https://opensource.org/licenses/GPL-2.0 GPL-2.0
  */
 
-import { mountEditor } from "../editor";
+import reducerRegistry from "@dashboard/state/reducerRegistry";
+import editorReducer from "@rich-editor/state/editorReducer";
+import mountEditor from "@rich-editor/mountEditor";
 
+reducerRegistry.register("editor", editorReducer);
 setupEditor();
 setupCommentEditForm();
 
@@ -13,7 +16,7 @@ setupCommentEditForm();
  * Set up the new discussion form if it exists.
  */
 function setupEditor() {
-    const discussionFormContainer = document.querySelectorAll(".js-richText");
+    const discussionFormContainer = document.querySelectorAll(".richEditor");
     if (discussionFormContainer.length > 0) {
         discussionFormContainer.forEach(mountEditor);
     }
@@ -24,7 +27,7 @@ function setupEditor() {
  */
 function setupCommentEditForm() {
     $(document).on("EditCommentFormLoaded", (event, container) => {
-        const $commentFormContainer = $(container).find(".js-richText");
+        const $commentFormContainer = $(container).find(".richEditor");
         if ($commentFormContainer.length > 0) {
             mountEditor($commentFormContainer[0]);
         }

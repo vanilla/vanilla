@@ -39,6 +39,10 @@
   dependencies:
     csstype "^2.2.0"
 
+"@types/sinon@^5.0.1":
+  version "5.0.1"
+  resolved "https://registry.yarnpkg.com/@types/sinon/-/sinon-5.0.1.tgz#a15b36ec42f1f53166617491feabd1734cb03e21"
+
 "@vanillaforums/babel-preset@^1.0.5":
   version "1.0.5"
   resolved "https://registry.yarnpkg.com/@vanillaforums/babel-preset/-/babel-preset-1.0.5.tgz#ef10e8589b604bee06412d97189414199322d3f2"

@@ -5,13 +5,12 @@
  */
 
 import Parchment from "parchment";
-import Quill, { Blot } from "quill/core";
+import Quill from "quill/core";
 import { IEmbedData } from "@dashboard/embeds";
 import ExternalEmbedBlot from "./ExternalEmbedBlot";
 import { expect } from "chai";
 import LoadingBlot from "./LoadingBlot";
 import sinon from "sinon";
-import { registerEmbed } from "@dashboard/embeds";
 import "@dashboard/app/user-content/embeds/image";
 import ErrorBlot from "./ErrorBlot";
 

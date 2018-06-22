@@ -6,7 +6,7 @@
 
 import EmbedBlot from "quill/blots/embed";
 import { formatUrl } from "@dashboard/application";
-import { IMentionData } from "../../../editor/MentionSuggestion";
+import { IMentionSuggestionData } from "@rich-editor/components/toolbars/pieces/MentionSuggestion";
 
 /**
  * A blot that represents a completed mention.
@@ -16,7 +16,7 @@ export default class MentionBlot extends EmbedBlot {
     public static className = "atMention";
     public static tagName = "a";
 
-    public static create(data: IMentionData) {
+    public static create(data: IMentionSuggestionData) {
         const node = super.create(data) as HTMLLinkElement;
         node.textContent = "@" + data.name;
         node.dataset.userid = data.userID.toString();
@@ -26,7 +26,7 @@ export default class MentionBlot extends EmbedBlot {
         return node;
     }
 
-    public static value(node: HTMLLinkElement): Partial<IMentionData> {
+    public static value(node: HTMLLinkElement): Partial<IMentionSuggestionData> {
         return {
             name: node.dataset.username,
             userID: parseInt(node.dataset.userid || "", 10),

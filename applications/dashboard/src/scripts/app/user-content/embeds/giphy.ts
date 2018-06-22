@@ -16,7 +16,7 @@ export async function giphyRenderer(element: HTMLElement, data: IEmbedData) {
     }
     const width = data.width + "px";
     element.classList.add("embedGiphy");
-    element.style.width = width || "100%";
+    element.style.width = data.width ? width : "100%";
 
     const paddingBottom = ((data.height || 1) / (data.width || 1)) * 100 + "%";
     const giphyWrapper = document.createElement("div");

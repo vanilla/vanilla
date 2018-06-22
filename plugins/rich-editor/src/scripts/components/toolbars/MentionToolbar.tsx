@@ -256,7 +256,6 @@ export class MentionToolbar extends React.Component<IProps, IMentionState> {
     }
 
     private onDocumentClick = (event: MouseEvent) => {
-        console.log("Click");
         if (!this.quill.root.contains(event.target as Node)) {
             this.cancelActiveMention();
         }
@@ -338,7 +337,6 @@ export class MentionToolbar extends React.Component<IProps, IMentionState> {
 
             if (isASingleExactMatch) {
                 setImmediate(() => {
-                    console.log("autoconfirm");
                     this.confirmActiveMention(lastOperation.insert);
                 });
                 return;

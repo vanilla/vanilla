@@ -817,11 +817,7 @@ class DiscussionsController extends VanillaController {
         $this->AnnounceData = false;
         $this->setData('Announcements', [], true);
 
-        $discussionModel = new DiscussionModel();
-
-        $tagModel->setTagSql($discussionModel->SQL, $tag, $limit, $offset, $this->Request->get('op', 'or'));
-
-        $this->DiscussionData = $discussionModel->get($offset, $limit, ['Announce' => 'all']);
+        $this->DiscussionData = $tagModel->getDiscussions($tag, $limit, $offset);
 
         $this->setData('Discussions', $this->DiscussionData, true);
         $this->setJson('Loading', $offset.' to '.$limit);

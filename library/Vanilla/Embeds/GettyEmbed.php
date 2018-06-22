@@ -13,7 +13,7 @@ use Exception;
 class GettyEmbed extends Embed {
 
     /** @inheritdoc */
-    protected $domains = ['gettyimages.ca', 'gty.im'];
+    protected $domains = ['gettyimages.ca', 'gty.im', 'gettyimages.com'];
 
     /**
      * GettyEmbed constructor.

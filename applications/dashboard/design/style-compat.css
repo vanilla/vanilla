@@ -1995,6 +1995,11 @@ body.isMobile .FormWrapper {
   width: 640px;
 }
 
+.embed-getty {
+  width: 100%;
+  max-width: 640px;
+}
+
 .embedExternal {
   display: -webkit-box;
   display: -webkit-flex;

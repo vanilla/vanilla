@@ -1060,5 +1060,6 @@ class VanillaHooks implements Gdn_IPlugin {
         include(PATH_APPLICATIONS.DS.'vanilla'.DS.'settings'.DS.'structure.php');
 
         saveToConfig('Routes.DefaultController', 'discussions');
+        saveToConfig('EnabledPlugins.stubcontent', true);
     }
 }

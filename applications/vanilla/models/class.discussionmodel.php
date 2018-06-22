@@ -1009,7 +1009,8 @@ class DiscussionModel extends Gdn_Model {
         }
 
         // Allow for discussions to be archived
-        if ($discussion->DateLastComment && Gdn_Format::toTimestamp($discussion->DateLastComment) <= $archiveTimestamp) {
+        $dateLastCommentTimestamp = Gdn_Format::toTimestamp($discussion->DateLastComment);
+        if ($dateLastCommentTimestamp && $dateLastCommentTimestamp <= $archiveTimestamp) {
             $discussion->Closed = '1';
             if ($discussion->CountCommentWatch) {
                 $discussion->CountUnreadComments = $discussion->CountComments - $discussion->CountCommentWatch;
@@ -2058,7 +2059,9 @@ class DiscussionModel extends Gdn_Model {
 
                     $isValid = true;
                     $invalidReturnType = false;
-                    $this->EventArguments['DiscussionData'] = array_merge($fields, ['DiscussionID' => $discussionID]);
+                    $insertUserID = val('InsertUserID', $stored);
+                    $dateInserted = val('DateInserted', $stored);
+                    $this->EventArguments['DiscussionData'] = array_merge($fields, ['DiscussionID' => $discussionID, 'InsertUserID' => $insertUserID,'DateInserted' => $dateInserted]);
                     $this->EventArguments['IsValid'] = &$isValid;
                     $this->EventArguments['InvalidReturnType'] = &$invalidReturnType;
                     $this->fireEvent('AfterValidateDiscussion');

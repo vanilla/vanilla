@@ -29,6 +29,8 @@ export default class Checkbox extends React.Component<IProps, IState> {
         id: false,
     };
 
+    private checkboxRef;
+
     constructor(props) {
         super(props);
         this.state = {
@@ -38,6 +40,10 @@ export default class Checkbox extends React.Component<IProps, IState> {
 
     get labelID(): string {
         return this.state.id + "-label";
+    }
+
+    public focus() {
+        this.checkboxRef.focus();
     }
 
     public render() {
@@ -58,6 +64,7 @@ export default class Checkbox extends React.Component<IProps, IState> {
                     onChange={this.props.onChange}
                     checked={this.props.checked}
                     defaultChecked={this.props.defaultChecked}
+                    ref={checkboxRef => (this.checkboxRef = checkboxRef)}
                 />
                 <span className="checkbox-box" aria-hidden="true">
                     <span className="checkbox-state">

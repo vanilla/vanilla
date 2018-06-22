@@ -9,7 +9,7 @@ import { log, logError } from "@dashboard/utility";
 import DocumentTitle from "@dashboard/components/DocumentTitle";
 import apiv2 from "@dashboard/apiv2";
 import LinkUserFail from "@dashboard/app/authenticate/components/LinkUserFail";
-import LinkUserRegister from "@dashboard/app/authenticate/components/LinkUserRegister";
+import LinkUser from "@dashboard/app/authenticate/components/LinkUser";
 import { IRequiredComponentID, uniqueIDFromPrefix } from "@dashboard/componentIDs";
 import classNames from "classnames";
 import { getMeta } from "@dashboard/application";
@@ -30,8 +30,6 @@ interface IState {
 }
 
 export default class ConnectPage extends React.Component<IProps, IState> {
-    public static defaultProps = {};
-
     constructor(props) {
         super(props);
         const metaState = gdn.getMeta("state") || {};
@@ -71,13 +69,13 @@ export default class ConnectPage extends React.Component<IProps, IState> {
                     <SsoUser
                         key={uniqueIDFromPrefix("ConnectPage-SSOUser")}
                         ssoUser={linkUser.ssoUser}
-                        ui={linkUser.authenticator.ui}
+                        ui={get(linkUser, "authenticator.ui", {})}
                     />,
                 );
 
                 content.push(
-                    <LinkUserRegister
-                        key={uniqueIDFromPrefix("ConnectPage-linkUserRegister")}
+                    <LinkUser
+                        key={uniqueIDFromPrefix("ConnectPage-linkUser")}
                         setErrorState={this.setErrorState}
                         config={linkUser.config}
                         ssoUser={linkUser.ssoUser}
@@ -85,16 +83,7 @@ export default class ConnectPage extends React.Component<IProps, IState> {
                         authSessionID={this.state.authSessionID}
                     />,
                 );
-
                 break;
-            //     case "password":
-            //         content += ssoUser;
-            //         content += <LinkUserPassword {...this.state.authenticate} />;
-            //         break;
-            //     case "error":
-            //         // Handle errors
-            //         content = "Do Error";
-            //     // break;
             default:
                 // Fail, unable to recover
                 pageTitle = t("Error Signing In");

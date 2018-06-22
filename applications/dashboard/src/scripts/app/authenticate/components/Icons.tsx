@@ -20,3 +20,15 @@ export function arrowDown() {
         </svg>
     );
 }
+
+export function chevronLeft() {
+    return (
+        <svg className="icon ssoUser-arrowDown" viewBox="0 0 24 24" aria-label={t("‹")}>
+            <title>{t("‹")}</title>
+            <path
+                fill="currentcolor"
+                d="M14.9,7.7l-4.4,4.4l4.4,4.4c0.1,0.1,0.1,0.2,0.1,0.3c0,0.1,0,0.2-0.1,0.3l-0.6,0.6c-0.1,0.1-0.2,0.1-0.3,0.1s-0.2,0-0.3-0.1l-5.2-5.2c-0.1-0.1-0.1-0.2-0.1-0.3s0-0.2,0.1-0.3l5.2-5.2c0.1-0.1,0.2-0.1,0.3-0.1s0.2,0,0.3,0.1l0.6,0.6C15,7.2,15,7.3,15,7.4C15,7.5,15,7.6,14.9,7.7z"
+            />
+        </svg>
+    );
+}

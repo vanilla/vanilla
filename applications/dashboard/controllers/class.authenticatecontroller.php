@@ -108,6 +108,7 @@ class AuthenticateController extends Gdn_Controller {
      */
     public function connect($authenticatorType = '', $authenticatorID = '') {
         $persist = $this->request->getBody()['persist'] ?? ($this->request->getQuery()['persist'] ?? false);
+        $agreeToTerms = $this->request->getBody()['agreeToTerms'] ?? ($this->request->getQuery()['agreeToTerms'] ?? false);
 
         $state = [];
 
@@ -119,6 +120,7 @@ class AuthenticateController extends Gdn_Controller {
                 ],
                 'method' => 'signIn',
                 'persist' => $persist,
+                'agreeToTerms' => $agreeToTerms,
             ]);
 
 

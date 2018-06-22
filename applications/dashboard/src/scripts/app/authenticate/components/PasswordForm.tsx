@@ -14,6 +14,7 @@ import ButtonSubmit from "@dashboard/components/forms/ButtonSubmit";
 import Paragraph from "@dashboard/components/forms/Paragraph";
 import get from "lodash/get";
 import { IRequiredComponentID, getRequiredID } from "@dashboard/componentIDs";
+import RememberAndForgotPassword from "@dashboard/app/authenticate/components/RememberAndForgotPassword";
 
 interface IProps {
     location?: any;
@@ -44,7 +45,7 @@ class PasswordForm extends React.Component<IProps, IState> {
         super(props);
         this.handleSubmit = this.handleSubmit.bind(this);
         this.handleTextChange = this.handleTextChange.bind(this);
-        this.handleCheckBoxChange = this.handleCheckBoxChange.bind(this);
+        this.setRememberMe = this.setRememberMe.bind(this);
         this.handleErrors = this.handleErrors.bind(this);
 
         this.state = {
@@ -76,8 +77,7 @@ class PasswordForm extends React.Component<IProps, IState> {
         }
     };
 
-    public handleCheckBoxChange = event => {
-        const value: boolean = get(event, "target.checked", false);
+    public setRememberMe = value => {
         this.setState({
             rememberMe: value,
         });
@@ -214,28 +214,22 @@ class PasswordForm extends React.Component<IProps, IState> {
                         type="password"
                         ref={password => (this.password = password as InputTextBlock)}
                     />
-                    <div className="inputBlock inputBlock-tighter">
-                        <div className="rememberMeAndForgot">
-                            <span className="rememberMeAndForgot-rememberMe">
-                                <Checkbox
-                                    label={t("Keep me signed in")}
-                                    onChange={this.handleCheckBoxChange}
-                                    checked={this.state.rememberMe}
-                                />
-                            </span>
-                            <span className="rememberMeAndForgot-forgot">
-                                <Link to="/authenticate/recoverpassword">{t("Forgot your password?")}</Link>
-                            </span>
-                        </div>
-                    </div>
-                    <ButtonSubmit
-                        disabled={
-                            !this.state.editable ||
-                            get(this, "username.value", "") === "" ||
-                            get(this, "password.value", "") === ""
-                        }
-                        content={t("Sign In")}
-                    />
+                    <RememberAndForgotPassword onChange={this.setRememberMe} />
+                    {/*<div className="inputBlock inputBlock-tighter">*/}
+                    {/*<div className="rememberMeAndForgot">*/}
+                    {/*<span className="rememberMeAndForgot-rememberMe">*/}
+                    {/*<Checkbox*/}
+                    {/*label={t("Keep me signed in")}*/}
+                    {/*onChange={this.setRememberMe}*/}
+                    {/*checked={this.state.rememberMe}*/}
+                    {/*/>*/}
+                    {/*</span>*/}
+                    {/*<span className="rememberMeAndForgot-forgot">*/}
+                    {/*<Link to="/authenticate/recoverpassword">{t("Forgot your password?")}</Link>*/}
+                    {/*</span>*/}
+                    {/*</div>*/}
+                    {/*</div>*/}
+                    <ButtonSubmit disabled={!this.state.editable} content={t("Sign In")} />
                     {/*<p className="authenticateUser-paragraph isCentered">{t('Not registered?')} <Link to="/entry/signup">{t('Create an Account')}</Link></p>*/}
                 </form>
             );

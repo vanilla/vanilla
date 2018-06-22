@@ -34,7 +34,7 @@ export default class ErrorMessages extends React.Component<IProps, IState> {
             errors = [this.props.errors];
         }
 
-        if (errors.length > 0) {
+        if (errors && errors.length > 0) {
             const componentClasses = classNames("inputBlock-errors", this.props.className);
 
             const errorList = (errors as any).map((error: any, index) => {

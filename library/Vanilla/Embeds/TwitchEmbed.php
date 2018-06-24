@@ -5,13 +5,17 @@
  */
 
 namespace Vanilla\Embeds;
+
 use Exception;
 
 /**
  * Twitch Embed.
  */
-class TwitchEmbed extends Embed
-{
+class TwitchEmbed extends VideoEmbed {
+
+    const DEFAULT_HEIGHT = 300;
+
+    const DEFAULT_WIDTH = 400;
 
     /** @inheritdoc */
     protected $domains = ['www.twitch.tv', 'clips.twitch.tv', 'player.twitch.tv'];
@@ -32,36 +36,38 @@ class TwitchEmbed extends Embed
      */
     public function matchUrl(string $url)
     {
-        $domain = parse_url($url, PHP_URL_HOST);
         $data = [];
-
 
         if ($this->isNetworkEnabled()) {
             $videoID = $this->parseURL($url);
-
             if (!$videoID) {
-                throw new Exception
+                throw new Exception('Unable to find Twitch Post', 400);
             }
+            
             $oembedData = $this->oembed("https://api.twitch.tv/v4/oembed?url=" . urlencode($url));
-
+            if ($oembedData) {
+                $data = $oembedData;
+            }
             $queryInfo = $this->getQueryInformation($url);
             $embedUrl = $this->getEmbedUrl($videoID, $queryInfo);
+            $data['attributes']['videoID'] = $videoID;
+            $data['attributes']['embedUrl'] = $embedUrl;
         }
-
         return $data;
     }
 
     /**
      * @inheritdoc
      */
-    public function renderData(array $data): string
-    {
+    public function renderData(array $data): string {
+        $attributes = $data['attributes'] ?? [];
+        $embedUrl = $attributes['embedUrl'] ?? '';
+        $height = $data['height'] ?? self::DEFAULT_HEIGHT;
+        $width = $data['width'] ?? self::DEFAULT_WIDTH;
+        $name = $data['name'] ?? '';
+        $photoURL = $data['photoUrl'] ?? '';
 
-
-        $result = <<<HTML
-
-HTML;
-
+        $result = $this->videoCode($embedUrl, $name, $photoURL, $width, $height);
         return $result;
     }
 
@@ -73,7 +79,7 @@ HTML;
 
         if ($domain == "clips.twitch.tv") {
             $this->linkType = 'clip';
-            preg_match('\/(?<id>[a-zA_Z0-9_-]+)/i',$path,$clipID);
+            preg_match('/\/(?<id>[a-zA_Z0-9_-]+)/i',$path,$clipID);
             if ($clipID['id']) {
                 $videoID = $clipID['id'];
             }
@@ -100,13 +106,12 @@ HTML;
         return $query;
     }
 
-    private function getEmbedUrl($videoID, $queryInfo){
+    private function getEmbedUrl($videoID, $queryInfo) {
         $embedURL = '';
 
         $t = $queryInfo['t'];
         $autoplay = $queryInfo['autoplay'];
         $muted = $queryInfo['muted'];
-
 
         if ($this->linkType == 'clip' || $this->linkType == 'collections') {
             $embedURL = "https://clips.twitch.tv/embed?clip=".$videoID;
@@ -129,41 +134,4 @@ HTML;
         return $embedURL;
     }
 
-    private function embedUrl(array $attributes) {
-        $listID = $attributes['listID'] ?? null;
-        $start = $attributes['start'] ?? null;
-        $videoID = $attributes['videoID'] ?? null;
-        $rel = $attributes['rel'] ?? null;
-
-        if ($listID !== null) {
-            if ($videoID !== null) {
-                return "https://www.youtube.com/embed/{$videoID}?list={$listID}";
-            } else {
-                return "https://www.youtube.com/embed/videoseries?list={$listID}";
-            }
-        } elseif ($videoID !== null) {
-            $params = "feature=oembed&autoplay=1";
-            // Show related videos?
-            if ($rel !== null) {
-                $params .= '&rel=' . (int)$rel;
-            }
-            // Seek to start time.
-            if ($start) {
-                $params .= "&start={$start}";
-            }
-
-            return "https://www.youtube.com/embed/{$videoID}?{$params}";
-        } else {
-            throw new InvalidArgumentException('Unable to generate YouTube markup.');
-        }
-    }
-
-    //            https://clips.twitch.tv/SarcasticDependableCormorantBudStar
-    //https://clips.twitch.tv/embed?clip=SarcasticDependableCormorantBudStar
-
-    //            https://www.twitch.tv/iddqd
-    // src="https://player.twitch.tv/?channel=ninja"
-//            https://www.twitch.tv/videos/276279462?t=00h00m05s&autoplay=true&muted=true;
-    // src="https://player.twitch.tv/?autoplay=false&video=v276279462
-    //// https://player.twitch.tv/?autoplay=false&t=0-1h59m59s&video=v276279462
 }

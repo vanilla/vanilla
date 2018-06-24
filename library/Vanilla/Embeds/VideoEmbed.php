@@ -82,7 +82,7 @@ abstract class VideoEmbed extends Embed {
         $containerAttr = $this->videoContainerAttributes($width, $height);
 
         $result = <<<HTML
-<div class="embed-video embed embedVideo">
+<div class="embedExternal-content embed-focusableElement embed-video embed embedVideo">
     <div class="{$containerAttr['class']}" style="{$containerAttr['style']}">
         <button type="button" data-url="{$attr['url']}" aria-label="{$attr['name']}" class="embedVideo-playButton iconButton js-playVideo" style="background-image: url({$attr['photoUrl']});" title="{$attr['name']}">
             <svg class="embedVideo-playIcon" xmlns="http://www.w3.org/2000/svg" viewBox="-1 -1 24 24">

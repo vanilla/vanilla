@@ -18,6 +18,7 @@ class GettySanitizeTest extends SanitizeTest {
             [
                 "insert" => [
                     "embed-external" => [
+                        $content => "bad stuff",
                         "url" => null,
                         "type" => "getty",
                         "name" => null,
@@ -33,7 +34,7 @@ class GettySanitizeTest extends SanitizeTest {
                             'is360' => $content,
                             'tld'=> $content,
                             'postID' => $content,
-                            ]
+                        ],
                     ]
                 ]
             ],

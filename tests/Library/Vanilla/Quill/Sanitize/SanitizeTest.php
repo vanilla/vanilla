@@ -44,6 +44,7 @@ abstract class SanitizeTest extends TestCase {
      */
     public function provideBadContent(): array {
         $result = [
+            ["<script>"],
             ["<script src=http://xss.rocks/xss.js></script>"],
             ["<script src=\"http://xss.rocks/xss.js\"></script>"],
             ["'';!--\"<xss>=&{()}"]

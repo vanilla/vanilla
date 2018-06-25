@@ -207,7 +207,6 @@ class EmbedManagerTest extends SharedBootstrapTestCase {
                         "postID" => "jwSlQZnsymUW49NC3R",
                     ],
                 ],
-
 '<div class="embed embedGiphy" style="width: 480px">
     <div class="embedExternal-ratio" style="padding-bottom: 56.25%">
         <iframe class="giphy-embed embedGiphy-iframe" src="https://giphy.com/embed/jwSlQZnsymUW49NC3R"></iframe>

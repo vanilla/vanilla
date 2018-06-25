@@ -21,7 +21,7 @@ class TwitchEmbed extends VideoEmbed {
     protected $domains = ['www.twitch.tv', 'clips.twitch.tv'];
 
     /*** @var string */
-    private $linkType;
+    private $urlType;
 
     /**
      * TwitchEmbed constructor.
@@ -29,7 +29,7 @@ class TwitchEmbed extends VideoEmbed {
     public function __construct()
     {
         parent::__construct('twitch', 'video');
-        $this->linkType = '';
+        $this->urlType = '';
     }
 
     /**
@@ -40,7 +40,7 @@ class TwitchEmbed extends VideoEmbed {
         $data = [];
 
         if ($this->isNetworkEnabled()) {
-            $videoID = $this->parseURL($url);
+            $videoID = $this->getUrlInformation($url);
             if (!$videoID) {
                 throw new Exception('Unable to find Twitch Post', 400);
             }
@@ -51,6 +51,9 @@ class TwitchEmbed extends VideoEmbed {
             }
             $queryInfo = $this->getQueryInformation($url) ?? '';
             $embedUrl = $this->getEmbedUrl($videoID, $queryInfo);
+            if (!$embedUrl) {
+                throw new Exception('Unable to find Twitch Post', 400);
+            }
             $data['attributes']['videoID'] = $videoID;
             $data['attributes']['embedUrl'] = $embedUrl;
         }
@@ -61,10 +64,14 @@ class TwitchEmbed extends VideoEmbed {
      * @inheritdoc
      */
     public function renderData(array $data): string {
+
+        $convertedHeight = (int)$data['height'];
+        $convertedWidth  = (int)$data['width'];
+
         $attributes = $data['attributes'] ?? [];
         $embedUrl = $attributes['embedUrl'] ?? '';
-        $height = (int)$data['height'] ?? self::DEFAULT_HEIGHT;
-        $width = (int)$data['width'] ?? self::DEFAULT_WIDTH;
+        $height = ($convertedHeight) ? $convertedHeight : self::DEFAULT_HEIGHT;
+        $width = ($convertedWidth) ? $convertedWidth : self::DEFAULT_WIDTH;
         $name = $data['name'] ?? '';
         $photoURL = $data['photoUrl'] ?? '';
 
@@ -73,17 +80,19 @@ class TwitchEmbed extends VideoEmbed {
     }
 
     /**
-     * @param $url
-     * @return null
+     * Assigns the link type and retrieves the video id.
+     *
+     * @param $url $string
+     * @return string $videoID
      */
-    private function parseURL($url) {
+    private function getUrlInformation($url): string {
 
         $domain = parse_url($url, PHP_URL_HOST);
         $path = parse_url($url, PHP_URL_PATH);
         $videoID = null;
 
         if ($domain == "clips.twitch.tv") {
-            $this->linkType = 'clip';
+            $this->urlType = 'clip';
             preg_match('/\/(?<id>[a-zA_Z0-9_-]+)/i',$path,$clipID);
             if ($clipID['id']) {
                 $videoID = $clipID['id'];
@@ -93,9 +102,9 @@ class TwitchEmbed extends VideoEmbed {
         if ($domain == "www.twitch.tv") {
             preg_match('/(\/(?<isVideoOrCollection>\w+)\/)?(?<id>[a-zA-Z0-9]+)/i',$path, $linkType);
             if ($linkType['isVideoOrCollection']) {
-                $this->linkType = ($linkType['isVideoOrCollection'] == 'videos') ? 'video':'collection';
+                $this->urlType = ($linkType['isVideoOrCollection'] == 'videos') ? 'video':'collection';
             } else {
-                $this->linkType = 'channel';
+                $this->urlType = 'channel';
             }
             $videoID = $linkType['id'];
         }
@@ -103,10 +112,12 @@ class TwitchEmbed extends VideoEmbed {
     }
 
     /**
-     * @param $url
-     * @return array
+     * Gets any query string attached to link.
+     *
+     * @param  string $url
+     * @return array $query
      */
-    private function getQueryInformation($url) {
+    private function getQueryInformation($url): array {
         $query = [];
         $queryString = parse_url($url, PHP_URL_QUERY);
         if ($queryString) {
@@ -116,33 +127,37 @@ class TwitchEmbed extends VideoEmbed {
     }
 
     /**
-     * @param $videoID
-     * @param $queryInfo
-     * @return string
+     * Assigns a embed url based on the linktype and query string.
+     *
+     * @param string $videoID
+     * @param array $queryInfo
+     * @return string $embedUrl
      */
-    private function getEmbedUrl($videoID, $queryInfo) {
+    private function getEmbedUrl($videoID, $queryInfo): string {
         $embedURL = '';
-
         $t = $queryInfo['t'];
         $autoplay = $queryInfo['autoplay'];
         $muted = $queryInfo['muted'];
 
-        if ($this->linkType == 'clip' || $this->linkType == 'collections') {
+        if ($this->urlType == 'clip' ) {
             $embedURL = "https://clips.twitch.tv/embed?clip=".$videoID;
         }
-        if ($this->linkType == 'channel') {
+        if ($this->urlType == 'channel') {
             $embedURL = "https://player.twitch.tv/?channel=".$videoID;
         }
-        if ($this->linkType == 'video') {
+        if ($this->urlType == 'collection') {
+            $embedURL = "https://player.twitch.tv/?collection=".$videoID;
+        }
+        if ($this->urlType == 'video') {
             $embedURL = "https://player.twitch.tv/?video=v".$videoID;
             if ($autoplay) {
-                $embedURL .="&".$autoplay;
+                $embedURL .="&autoplay=".$autoplay;
             }
             if ($t) {
-                $embedURL .="&".$t;
+                $embedURL .="&t=".$t;
             }
             if ($muted) {
-               $embedURL .="&".$muted;
+               $embedURL .="&muted=".$muted;
             }
         }
         return $embedURL;

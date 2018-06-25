@@ -83,17 +83,20 @@ button.Close {
   display: none;
 }
 
+.authenticateConnect .pageTitle,
+.authenticateUserCol .pageTitle {
+  text-align: center;
+  display: block;
+  font-size: 30px;
+  margin-bottom: 36px;
+}
+
 .authenticateUserCol {
   padding: 0 26px;
   margin: auto;
   width: 386px;
   max-width: 100%;
   box-sizing: border-box;
-}
-
-.authenticateUserCol .pageTitle {
-  text-align: center;
-  margin-bottom: 18px;
 }
 
 .authenticateUserCol .button.button-fullWidth {
@@ -281,7 +284,15 @@ button.Close {
   height: auto;
   margin: auto;
   padding: 0;
+}
+
+.ssoUser-imageWrap.PhotoWrap {
+  border-radius: 50%;
   overflow: hidden;
+}
+
+.ssoUser-imageWrap.PhotoWrap::before {
+  display: none;
 }
 
 .ssoUser-info {

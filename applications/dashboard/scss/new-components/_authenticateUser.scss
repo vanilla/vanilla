@@ -15,17 +15,23 @@ $linkUser-provider_width: 45px;
 $linkUser-providerIcon_borderWidth: 3px;
 $linkUser-providerIcon_width: $icon-default_size;
 
+.authenticateConnect,
+.authenticateUserCol {
+    .pageTitle {
+        text-align: center;
+        display: block;
+        font-size: $global-title_fontSize;
+        margin-bottom: $authenticateUser-spacer * 2;
+    }
+}
+
+
 .authenticateUserCol {
     padding: 0 $authenticateUser-column_horizontalPadding;
     margin: auto;
     width: #{$authenticateUser-column_width + $authenticateUser-column_horizontalPadding * 2};
     max-width: 100%;
     box-sizing: border-box;
-
-    .pageTitle {
-        text-align: center;
-        margin-bottom: $authenticateUser-spacer;
-    }
 
     .button.button-fullWidth {
         margin-bottom: $authenticateUser-spacer;
@@ -190,10 +196,16 @@ $linkUser-providerIcon_width: $icon-default_size;
     height: auto;
     margin: auto;
     padding: 0;
-    overflow: hidden;
 }
 
+.ssoUser-imageWrap.PhotoWrap {
+    border-radius: 50%;
+    overflow: hidden;
 
+    &::before {
+        display: none;
+    }
+}
 
 .ssoUser-info {
     position: relative;

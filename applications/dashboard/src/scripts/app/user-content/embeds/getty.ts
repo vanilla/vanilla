@@ -67,7 +67,7 @@ async function loadGettyImages(data) {
     const fallbackCallback = c => {
         (window.gie.q = window.gie.q || []).push(c);
     };
-    //This is part of Getty's embed code, we need to ensure embeds are loaded and sent to their widget.js script.
+    // This is part of Getty's embed code, we need to ensure embeds are loaded and sent to their widget.js script.
     window.gie = window.gie || fallbackCallback;
 
     window.gie(() => {

@@ -25,7 +25,8 @@ class GettyEmbed extends Embed {
     /**
      * @inheritdoc
      */
-    public function matchUrl(string $url) {
+    public function matchUrl(string $url)
+    {
         $data = [];
 
         if ($this->isNetworkEnabled()) {
@@ -38,23 +39,17 @@ class GettyEmbed extends Embed {
                 throw new Exception('Unable to get post ID.', 400);
             }
 
-            $oembedData = $this->oembed("http://embed.gettyimages.com/oembed?url=http://gty.im/".$post['postID']);
-
+            $oembedData = $this->oembed("http://embed.gettyimages.com/oembed?url=http://gty.im/" . $post['postID']);
             if ($oembedData) {
                 $data = $oembedData;
-            }
+                $data['attributes'] = array_key_exists('html', $data) ? $this->parseResponseHtml($data['html']) : [];
 
-            $data['attributes'] = $data['attributes']?:[];
-
-            if (array_key_exists('html', $data)) {
-                $data['attributes'] = $this->parseResponseHtml($data['html']);
+                if (array_key_exists('postID', $post)) {
+                    $data['attributes']['postID'] = $post['postID'];
+                }
             }
-
-            if (array_key_exists('postID', $post)) {
-                $data['attributes']['postID'] = $post['postID'];
-            }
+            return $data;
         }
-        return $data;
     }
 
     /**
@@ -82,7 +77,7 @@ class GettyEmbed extends Embed {
         $encodedI360 = htmlspecialchars($i360);
 
         $result = <<<HTML
-<a id="{$encodeID}" data-height="{$encodedHeight}" data-width="{$encodedWidth}" data-sig="{$encodedSig}" data-items ="{$encodedItems}" data-capt="{$encodedCapt}" data-tld="{$encodedTld}" data-i360="{$encodedI360}" class="gie-single js-gettyEmbed" href="{$encodedURL}">Embed from Getty Images</a>
+<a id="{$encodeID}" data-height="{$encodedHeight}" data-width="{$encodedWidth}" data-sig="{$encodedSig}" data-items="{$encodedItems}" data-capt="{$encodedCapt}" data-tld="{$encodedTld}" data-i360="{$encodedI360}" class="gie-single js-gettyEmbed" href="{$encodedURL}">Embed from Getty Images</a>
 HTML;
        return $result;
     }

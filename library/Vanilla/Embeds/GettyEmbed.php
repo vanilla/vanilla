@@ -44,11 +44,13 @@ class GettyEmbed extends Embed {
                 $data = $oembedData;
             }
 
+            $data['attributes'] = $data['attributes']?:[];
+
             if (array_key_exists('html', $data)) {
                 $data['attributes'] = $this->parseResponseHtml($data['html']);
             }
 
-            if ($post) {
+            if (array_key_exists('postID', $post)) {
                 $data['attributes']['postID'] = $post['postID'];
             }
         }
@@ -61,12 +63,26 @@ class GettyEmbed extends Embed {
     public function renderData(array $data): string {
         $url = "//www.gettyimages.com/detail/".$data['attributes']['postID'];
         $encodedURL = htmlspecialchars($url);
-        $encodedData = json_encode($data);
-        $sanitizedData = htmlspecialchars($encodedData);
         $encodeID = htmlspecialchars($data['attributes']['id']);
 
+        $height = $data['height'] ?? '';
+        $sig = $data['attributes']['sig'] ?? '';
+        $width = $data['width'] ?? '';
+        $items = $data['attributes']['items'] ?? '';
+        $capt = $data['attributes']['isCaptioned']?? '';
+        $tld = $data['attributes']['tld'] ?? '';
+        $i360 = $data['attributes']['is360'] ?? '';
+
+        $encodedHeight = htmlspecialchars($height);
+        $encodedSig = htmlspecialchars($sig);
+        $encodedWidth = htmlspecialchars($width);
+        $encodedItems = htmlspecialchars($items);
+        $encodedCapt  = htmlspecialchars($capt);
+        $encodedTld = htmlspecialchars($tld);
+        $encodedI360 = htmlspecialchars($i360);
+
         $result = <<<HTML
-<a id="{$encodeID}" data-json={$sanitizedData} class='gie-single js-gettyEmbed' href="{$encodedURL}">Embed from Getty Images</a>
+<a id="{$encodeID}" data-height="{$encodedHeight}" data-width="{$encodedWidth}" data-sig="{$encodedSig}" data-items ="{$encodedItems}" data-capt="{$encodedCapt}" data-tld="{$encodedTld}" data-i360="{$encodedI360}" class="gie-single js-gettyEmbed" href="{$encodedURL}">Embed from Getty Images</a>
 HTML;
        return $result;
     }
@@ -84,25 +100,26 @@ HTML;
             $data['id'] = $id['id'];
         }
 
-        if (preg_match( '/sig:\'(?<sig>[a-zA-Z0-9-_]+=)\'/i', $html, $sig)) {
+        if (preg_match('/sig:\'(?<sig>[a-zA-Z0-9-_]+=)\'/i', $html, $sig)) {
             $data['sig'] = $sig['sig'];
         }
 
-        if (preg_match( '/items:\'(?<item>[0-9-]+)\'/i', $html, $item)) {
+        if (preg_match('/items:\'(?<item>[0-9-]+)\'/i', $html, $item)) {
             $data['items'] = $item['item'];
         }
 
-        if (preg_match( '/caption: (?<isCaption>true|false)/i', $html, $isCaptioned)) {
+        if (preg_match('/caption: (?<isCaption>true|false)/i', $html, $isCaptioned)) {
             $data['isCaptioned'] = $isCaptioned['isCaption'];
         }
 
-        if (preg_match( '/is360: (?<is360>true|false)/i', $html, $is360)) {
+        if (preg_match('/is360: (?<is360>true|false)/i', $html, $is360)) {
             $data['is360'] = $is360['is360'];
         }
 
-        if (preg_match( '/tld:\'(?<tld>[a-zA-Z]+)\'/i', $html, $tld)) {
+        if (preg_match('/tld:\'(?<tld>[a-zA-Z]+)\'/i', $html, $tld)) {
             $data['tld'] = $tld['tld'];
         }
         return $data;
     }
+
 }

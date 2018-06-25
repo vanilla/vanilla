@@ -87,7 +87,7 @@ class EmbedManagerTest extends SharedBootstrapTestCase {
                         'postID' => "460707851",
                     ]
                 ],
-                '<a id="CdkwD1KlQeN8rV9xoKzSAg" data-json={&quot;url&quot;:&quot;https:\/\/www.gettyimages.ca\/license\/460707851&quot;,&quot;type&quot;:&quot;getty&quot;,&quot;name&quot;:null,&quot;body&quot;:null,&quot;photoUrl&quot;:null,&quot;height&quot;:337,&quot;width&quot;:508,&quot;attributes&quot;:{&quot;id&quot;:&quot;CdkwD1KlQeN8rV9xoKzSAg&quot;,&quot;sig&quot;:&quot;OSznWQvhySQdibOA7WcaeKbc1T3SnuazaIvfwlTLyq0=&quot;,&quot;items&quot;:&quot;460707851&quot;,&quot;isCaptioned&quot;:false,&quot;is360&quot;:false,&quot;tld&quot;:&quot;com&quot;,&quot;postID&quot;:&quot;460707851&quot;}} class=\'gie-single js-gettyEmbed\' href="//www.gettyimages.com/detail/460707851">Embed from Getty Images</a>'
+                '<a id="CdkwD1KlQeN8rV9xoKzSAg" data-height="337" data-width="508" data-sig="OSznWQvhySQdibOA7WcaeKbc1T3SnuazaIvfwlTLyq0=" data-items ="460707851" data-capt="" data-tld="com" data-i360="" class="gie-single js-gettyEmbed" href="//www.gettyimages.com/detail/460707851">Embed from Getty Images</a>'
             ],
             [
                 [

@@ -20,16 +20,14 @@ async function convertGettyEmbeds() {
     if (gettyPosts.length > 0) {
         for (const post of gettyPosts) {
             const url = post.getAttribute("href") || "";
-            const jsonData = post.getAttribute("data-json") || "";
-            const gettyPost = JSON.parse(jsonData);
-            const id = gettyPost.attributes.id;
-            const height = gettyPost.height;
-            const sig = gettyPost.attributes.sig;
-            const width = gettyPost.width;
-            const items = gettyPost.attributes.items;
-            const capt = gettyPost.attributes.isCaptioned;
-            const tld = gettyPost.attributes.tld;
-            const i360 = gettyPost.attributes.is360;
+            const id = post.getAttribute("id");
+            const sig = post.getAttribute("data-sig");
+            const height = Number(post.getAttribute("data-height")) || 1;
+            const width = Number(post.getAttribute("data-width")) || 1;
+            const items = post.getAttribute("data-items");
+            const capt = post.getAttribute("data-capt");
+            const tld = post.getAttribute("data-tld");
+            const i360 = post.getAttribute("data-is360");
             const data: IEmbedData = {
                 type: "getty",
                 url,

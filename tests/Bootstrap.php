@@ -236,6 +236,7 @@ class Bootstrap {
             ->addCall('addEmbed', [new Reference(\Vanilla\Embeds\SoundCloudEmbed::class)])
             ->addCall('addEmbed', [new Reference(\Vanilla\Embeds\ImgurEmbed::class)])
             ->addCall('addEmbed', [new Reference(\Vanilla\Embeds\GettyEmbed::class)])
+            ->addCall('addEmbed', [new Reference(\Vanilla\Embeds\GiphyEmbed::class)])
             ->addCall('addEmbed', [new Reference(\Vanilla\Embeds\ImageEmbed::class), \Vanilla\Embeds\EmbedManager::PRIORITY_LOW])
             ->addCall('setNetworkEnabled', [false])
             ->setShared(true)

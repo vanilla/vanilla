@@ -173,7 +173,6 @@ $embed-focus-color: #0291DB;
     max-width: 100%;
     margin: auto;
 
-    iframe,
     .embedVideo-iframe {
         @include absolute-fullSizeOfParent;
     }
@@ -248,6 +247,20 @@ $embed-focus-color: #0291DB;
     stroke: rgba(0, 0, 0, 0.1);
 }
 
+
+.embedGiphy {
+    position: relative;
+    display: block;
+    max-width: 100%;
+    margin: auto;
+
+    .embedGiphy-iframe {
+        @include absolute-fullSizeOfParent;
+    }
+}
+
+
+
 // Instagram:
 
 .embedExternal-content.embed-instagram {
@@ -283,11 +296,28 @@ $embed-focus-color: #0291DB;
     }
 }
 
+.embedExternal-ratio {
+    position: relative;
+    display: block;
+    margin: 0;
+    width: 100%;
+    padding: {
+        left: 0;
+        right: 0;
+        bottom: 0;
+    };
+}
+
+.embedGiphy-iframe {
+    @include absolute-fullSizeOfParent;
+}
+
 .twitter-tweet {
     margin: 0 !important;
 }
 
-.richEditor .twitter-tweet {
+.richEditor .twitter-tweet,
+.richEditor iframe {
     pointer-events: none;
 }
 

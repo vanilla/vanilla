@@ -99,6 +99,7 @@ class EmbedManager {
             $testEmbed = $registeredEmbed['embed'];
             if ($testEmbed->canHandle($domain, $url)) {
                 $embed = $testEmbed;
+                break;
             }
         }
 

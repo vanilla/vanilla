@@ -561,3 +561,39 @@ export function stickyHeader() {
         utility.log("No sticky header found");
     }
 }
+
+/**
+ * Handler for an file being dragged and dropped.
+ *
+ * @param event - https://developer.mozilla.org/en-US/docs/Web/API/DragEvent
+ */
+export function getDraggedImage(event: DragEvent): File | undefined {
+    if (event.dataTransfer && event.dataTransfer.files && event.dataTransfer.files.length) {
+        event.preventDefault();
+        const files = Array.from(event.dataTransfer.files);
+
+        // Currently only 1 file is supported.
+        const mainFile = files[0];
+        return mainFile;
+    }
+}
+
+/**
+ * Handler for an file being pasted.
+ *
+ * @param event - https://developer.mozilla.org/en-US/docs/Web/API/DragEvent
+ */
+export function getPastedImage(event: ClipboardEvent): File | undefined | null {
+    if (event.clipboardData && event.clipboardData.items && event.clipboardData.items.length) {
+        const files = Array.from(event.clipboardData.items)
+            .map(item => (item.getAsFile ? item.getAsFile() : null))
+            .filter(Boolean);
+
+        if (files.length > 0) {
+            event.preventDefault();
+            // Currently only 1 file is supported.
+            const mainFile = files[0];
+            return mainFile;
+        }
+    }
+}

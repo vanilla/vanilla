@@ -375,6 +375,9 @@ class MediaTest extends AbstractAPIv2Test {
             ['https://www.instagram.com/p/BizC-PPFK1m', 'instagram'],
             ['https://soundcloud.com/syrebralvibes/the-eden-project-circles', 'soundcloud'],
             ['https://imgur.com/gallery/10HROiq', 'imgur'],
+            ['https://giphy.com/gifs/super-smash-bros-ultimate-jwSlQZnsymUW49NC3R', 'giphy'],
+            ['https://gph.is/2sTbvh0', 'giphy'],
+            ['https://media.giphy.com/media/2vqIyGV2S3HTGafbKo/giphy.gif', 'giphy'],
         ];
 
         return $urls;

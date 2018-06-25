@@ -18,12 +18,13 @@ class TwitchEmbed extends VideoEmbed {
     const DEFAULT_WIDTH = 400;
 
     /** @inheritdoc */
-    protected $domains = ['www.twitch.tv', 'clips.twitch.tv', 'player.twitch.tv'];
+    protected $domains = ['www.twitch.tv', 'clips.twitch.tv'];
 
+    /*** @var string */
     private $linkType;
 
     /**
-     * InstagramEmbed constructor.
+     * TwitchEmbed constructor.
      */
     public function __construct()
     {
@@ -46,9 +47,9 @@ class TwitchEmbed extends VideoEmbed {
             
             $oembedData = $this->oembed("https://api.twitch.tv/v4/oembed?url=" . urlencode($url));
             if ($oembedData) {
-                $data = $oembedData;
+                $data = $this->normalizeOembed($oembedData);
             }
-            $queryInfo = $this->getQueryInformation($url);
+            $queryInfo = $this->getQueryInformation($url) ?? '';
             $embedUrl = $this->getEmbedUrl($videoID, $queryInfo);
             $data['attributes']['videoID'] = $videoID;
             $data['attributes']['embedUrl'] = $embedUrl;
@@ -62,8 +63,8 @@ class TwitchEmbed extends VideoEmbed {
     public function renderData(array $data): string {
         $attributes = $data['attributes'] ?? [];
         $embedUrl = $attributes['embedUrl'] ?? '';
-        $height = $data['height'] ?? self::DEFAULT_HEIGHT;
-        $width = $data['width'] ?? self::DEFAULT_WIDTH;
+        $height = (int)$data['height'] ?? self::DEFAULT_HEIGHT;
+        $width = (int)$data['width'] ?? self::DEFAULT_WIDTH;
         $name = $data['name'] ?? '';
         $photoURL = $data['photoUrl'] ?? '';
 
@@ -71,8 +72,12 @@ class TwitchEmbed extends VideoEmbed {
         return $result;
     }
 
+    /**
+     * @param $url
+     * @return null
+     */
     private function parseURL($url) {
-        // Get info from the URL.
+
         $domain = parse_url($url, PHP_URL_HOST);
         $path = parse_url($url, PHP_URL_PATH);
         $videoID = null;
@@ -97,6 +102,10 @@ class TwitchEmbed extends VideoEmbed {
         return $videoID;
     }
 
+    /**
+     * @param $url
+     * @return array
+     */
     private function getQueryInformation($url) {
         $query = [];
         $queryString = parse_url($url, PHP_URL_QUERY);
@@ -106,6 +115,11 @@ class TwitchEmbed extends VideoEmbed {
         return $query;
     }
 
+    /**
+     * @param $videoID
+     * @param $queryInfo
+     * @return string
+     */
     private function getEmbedUrl($videoID, $queryInfo) {
         $embedURL = '';
 

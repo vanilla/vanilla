@@ -10,6 +10,7 @@ use Exception;
 use Garden\Http\HttpRequest;
 use Vanilla\Embeds\ImgurEmbed;
 use Vanilla\Embeds\SoundCloudEmbed;
+use Vanilla\Embeds\TwitchEmbed;
 use VanillaTests\SharedBootstrapTestCase;
 use Vanilla\Embeds\EmbedManager;
 use Vanilla\Embeds\InstagramEmbed;
@@ -37,6 +38,7 @@ class EmbedManagerTest extends SharedBootstrapTestCase {
             ->addEmbed(new InstagramEmbed())
             ->addEmbed(new ImgurEmbed())
             ->addEmbed(new SoundCloudEmbed())
+            ->addEmbed(new TwitchEmbed())
             ->addEmbed(new ImageEmbed(), EmbedManager::PRIORITY_LOW)
             ->setNetworkEnabled(false);
         return $embedManager;
@@ -162,6 +164,32 @@ class EmbedManagerTest extends SharedBootstrapTestCase {
 <iframe width="100%" height="400" scrolling="no" frameborder="no" 
     src="https://w.soundcloud.com/player/?url=https://api.soundcloud.com/tracks/2F174656930&amp;show_artwork=true&amp;visual=true">
 </iframe>
+</div>'
+            ],
+            [
+                [
+                    "url" => "https://www.twitch.tv/videos/276279462",
+                    "type" => "twitch",
+                    "name" => "20k Fortnite Friday Duos with @hysteria | 2 MINUTE STREAM DELAY",
+                    "body" => null,
+                    "photoUrl" => "https://static-cdn.jtvnw.net/s3_vods/8a24223c5b12ff7427a8_ninja_29190875424_893099877/thumb/thumb0-640x360.jpg",
+                    "height" => 281,
+                    "width" => 500,
+                    "attributes" => [
+                        "videoID" => "276279462",
+                        "embedUrl" => "https://player.twitch.tv/?video=v276279462",
+                    ],
+                ],
+'<div class="embedExternal-content embed-focusableElement embed-video embed embedVideo">
+    <div class="embedVideo-ratio" style="padding-top: 56.2%;">
+        <button type="button" data-url="https://player.twitch.tv/?video=v276279462" aria-label="20k Fortnite Friday Duos with @hysteria | 2 MINUTE STREAM DELAY" class="embedVideo-playButton iconButton js-playVideo" style="background-image: url(https://static-cdn.jtvnw.net/s3_vods/8a24223c5b12ff7427a8_ninja_29190875424_893099877/thumb/thumb0-640x360.jpg);" title="20k Fortnite Friday Duos with @hysteria | 2 MINUTE STREAM DELAY">
+            <svg class="embedVideo-playIcon" xmlns="http://www.w3.org/2000/svg" viewBox="-1 -1 24 24">
+                <title>Play Video</title>
+                <path class="embedVideo-playIconPath embedVideo-playIconPath-circle" style="fill: currentColor; stroke-width: .3;" d="M11,0A11,11,0,1,0,22,11,11,11,0,0,0,11,0Zm0,20.308A9.308,9.308,0,1,1,20.308,11,9.308,9.308,0,0,1,11,20.308Z"></path>
+                <polygon class="embedVideo-playIconPath embedVideo-playIconPath-triangle" style="fill: currentColor; stroke-width: .3;" points="8.609 6.696 8.609 15.304 16.261 11 8.609 6.696"></polygon>
+            </svg>
+        </button>
+    </div>
 </div>'
             ],
             [

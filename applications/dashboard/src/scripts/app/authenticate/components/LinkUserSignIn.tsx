@@ -30,6 +30,7 @@ interface IProps {
     password?: string;
     passwordError?: string;
     handleBackClick: any;
+    usernameLabel: string;
 
     termsOfServiceError?: string;
     termsOfServiceLabel: string;
@@ -200,7 +201,7 @@ export default class LinkUserSignIn extends React.Component<IProps, IState> {
                     <Paragraph content={t("Sign in with your existing account to connect")} />
                     <Paragraph className="authenticateUser-paragraph" content={globalError} isError={true} />
                     <InputTextBlock
-                        label={t("Email / Username")}
+                        label={this.props.usernameLabel}
                         required={true}
                         disabled={!this.state.editable}
                         errors={this.state.usernameError as string}

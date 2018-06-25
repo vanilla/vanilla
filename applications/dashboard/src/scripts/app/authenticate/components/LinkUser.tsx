@@ -353,10 +353,19 @@ export default class LinkUser extends React.Component<IProps, IState> {
             );
         } else {
             let userName;
-            if (get(this, "state.signInWithField", "") === "name") {
+            if (get(this, "state.signInWithField", "") === "name" && this.props.config.nameUnique) {
                 userName = get(this, "name.value", "");
             } else {
                 userName = get(this, "email.value", get(this.props, "ssoUser.email", ""));
+            }
+
+            let userNameLabel = t("Email"); // Fallback to e-mail only
+            if ((this.props.config.noEmail || !this.props.config.emailUnique) && this.props.config.nameUnique) {
+                // Only name is unique
+                userNameLabel = t("Username");
+            } else if (!this.props.config.noEmail && this.props.config.emailUnique && this.props.config.nameUnique) {
+                // Both email and username are unique
+                userNameLabel = t("Email / Username");
             }
 
             contents = (
@@ -365,6 +374,7 @@ export default class LinkUser extends React.Component<IProps, IState> {
                     setErrorState={this.setStepToError}
                     rememberMe={this.state.rememberMe}
                     username={userName}
+                    usernameLabel={userNameLabel}
                     handleBackClick={this.setStepToRegister}
                     termsOfServiceError={this.state.termsOfServiceError}
                     termsOfServiceLabel={this.props.termsOfServiceLabel}

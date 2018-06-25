@@ -63,9 +63,10 @@ class GettyEmbed extends Embed {
         $encodedURL = htmlspecialchars($url);
         $encodedData = json_encode($data);
         $sanitizedData = htmlspecialchars($encodedData);
+        $encodeID = htmlspecialchars($data['attributes']['id']);
 
         $result = <<<HTML
-<a id="{$data['attributes']['id']}" data-json={$sanitizedData} class='gie-single js-gettyEmbed' href="{$encodedURL}">Embed from Getty Images</a>
+<a id="{$encodeID}" data-json={$sanitizedData} class='gie-single js-gettyEmbed' href="{$encodedURL}">Embed from Getty Images</a>
 HTML;
        return $result;
     }

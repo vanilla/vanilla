@@ -61,7 +61,7 @@ export async function renderGetty(element: HTMLElement, data: IEmbedData) {
 }
 
 /**
- * Loads getty embed into a global object and getty's widget.js.
+ * Loads getty embeds into a global object and fire getty's widget.js.
  * @param data
  * @returns {Promise<void>}
  */

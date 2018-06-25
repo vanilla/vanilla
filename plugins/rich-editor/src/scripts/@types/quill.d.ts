@@ -303,10 +303,11 @@ declare module "quill/modules/clipboard" {
 declare module "quill/modules/formula";
 declare module "quill/modules/history" {
     import Module from "quill/core/module";
+    import { DeltaStatic } from "quill/core";
 
     interface UndoItem {
-        undo: any;
-        redo: any;
+        undo: DeltaStatic;
+        redo: DeltaStatic;
     }
 
     export default class History extends Module {
@@ -314,11 +315,13 @@ declare module "quill/modules/history" {
             undo: UndoItem[];
             redo: UndoItem[];
         };
+        protected lastRecorded: number;
         protected ignoreChange: boolean;
         public undo(): void;
         public redo(): void;
-        public change(source, dest): void;
-        public record(changeDelta, oldDelta): void;
+        public cutoff(): void;
+        public change(source: "undo" | "redo", dest: "undo" | "redo"): void;
+        public record(changeDelta: DeltaStatic, oldDelta: DeltaStatic): void;
     }
 }
 declare module "quill/modules/keyboard" {

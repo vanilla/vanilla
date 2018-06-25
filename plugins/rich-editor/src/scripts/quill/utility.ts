@@ -231,14 +231,9 @@ export function insertNewLineAfterBlotAndTrim(quill, range: RangeStatic, deleteA
  * @param quill - The quill instance.
  */
 export function insertNewLineAtEndOfScroll(quill: Quill) {
-    // const index = quill.
-    const newContents = [
-        ...(quill.getContents().ops || []),
-        {
-            insert: "\n",
-        },
-    ];
-    quill.setContents(newContents);
+    const newLineBlot = Parchment.create("block");
+    quill.scroll.appendChild(newLineBlot);
+    quill.update(Quill.sources.USER);
     quill.setSelection(quill.scroll.length(), 0);
 }
 
@@ -248,13 +243,9 @@ export function insertNewLineAtEndOfScroll(quill: Quill) {
  * @param quill - The quill instance.
  */
 export function insertNewLineAtStartOfScroll(quill: Quill) {
-    const newContents = [
-        {
-            insert: "\n",
-        },
-        ...(quill.getContents().ops || []),
-    ];
-    quill.setContents(newContents);
+    const newLineBlot = Parchment.create("block");
+    quill.scroll.insertBefore(newLineBlot, quill.scroll.children.head);
+    quill.update(Quill.sources.USER);
     quill.setSelection(0, 0);
 }
 

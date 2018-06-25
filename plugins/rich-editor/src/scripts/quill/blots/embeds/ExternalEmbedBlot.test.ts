@@ -9,10 +9,10 @@ import Quill from "quill/core";
 import { IEmbedData } from "@dashboard/embeds";
 import ExternalEmbedBlot from "./ExternalEmbedBlot";
 import { expect } from "chai";
-import LoadingBlot from "./LoadingBlot";
 import sinon from "sinon";
 import "@dashboard/app/user-content/embeds/image";
 import ErrorBlot from "./ErrorBlot";
+import LoadingBlot from "@rich-editor/quill/blots/embeds/LoadingBlot";
 
 const imageData: IEmbedData = {
     type: "image",
@@ -66,22 +66,6 @@ describe("ExternalEmbedBlot", () => {
                 sinon.assert.calledOnce(spy);
                 done();
             });
-        });
-
-        it("can be created asyncrounously for it's inital creation", async () => {
-            const dataPromise: Promise<IEmbedData> = new Promise(resolve => {
-                setTimeout(resolve(imageData), 1);
-            });
-
-            const embed = await ExternalEmbedBlot.createAsync(dataPromise);
-            expect(embed).instanceof(ExternalEmbedBlot);
-        });
-
-        it("It automatically catches errors and turns them into an Error blot", async () => {
-            const dataPromise: Promise<IEmbedData> = Promise.reject("Error!");
-
-            const embed = await ExternalEmbedBlot.createAsync(dataPromise);
-            expect(embed).instanceof(ErrorBlot);
         });
     });
 });

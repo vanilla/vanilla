@@ -4,15 +4,21 @@
  * @license https://opensource.org/licenses/GPL-2.0 GPL-2.0
  */
 
+import get from "lodash/get";
+import isEqual from "lodash/isEqual";
+import cloneDeep from "lodash/cloneDeep";
 import BaseHistoryModule from "quill/modules/history";
 import { delegateEvent } from "@dashboard/dom";
 import KeyboardModule from "quill/modules/keyboard";
+import { DeltaOperation, DeltaStatic } from "quill/core";
 
 /**
  * A custom history module to allow redo/undo to work while an Embed is focused
  * and hack around the fact that Quill doesn't have first class support for asynchronusly rendering things.
  */
 export default class HistoryModule extends BaseHistoryModule {
+    private readonly EMBED_KEY = "insert.embed-external";
+
     /**
      * Add an undo handler for when an embed blot has focus.
      */
@@ -38,29 +44,74 @@ export default class HistoryModule extends BaseHistoryModule {
             this.quill.container,
         );
     }
-
     /**
      * Occasionally perform a double undo/redo. This is to prevent the undo stack from getting trashed
      * by promises that don't resolve in an orderly fashion.
      */
     public change(source: "undo" | "redo", dest) {
+        // console.log("Before undos", this.stack.undo);
+        // console.log("Before redos", this.stack.redo);
         if (source === "undo" && this.needsDoubleUndo()) {
-            this.ignoreChange = true;
+            console.log("double undo");
             super.change(source, dest);
+            // super.change(source, dest);
             super.change(source, dest);
-            this.ignoreChange = false;
         } else if (source === "redo" && this.needsDoubleRedo()) {
-            this.ignoreChange = true;
+            console.log("Double redo");
             super.change(source, dest);
             super.change(source, dest);
-            this.ignoreChange = false;
         } else {
             super.change(source, dest);
         }
+
+        // console.log("After undos", this.stack.undo);
+        // console.log("After redos", this.stack.redo);
+    }
+    public record(changeDelta: DeltaStatic, oldDelta: DeltaStatic) {
+        // if (this.operationsContainKey(changeDelta.ops, this.EMBED_KEY)) {
+        //     this.cutoff();
+        // }
+
+        super.record(changeDelta, oldDelta);
+        window.stack = this.stack;
     }
 
-    public record(changeDelta, oldDelta) {
-        super.record(changeDelta, oldDelta);
+    private async shouldIgnoreDelta(undoDelta: DeltaStatic, redoDelta: DeltaStatic) {
+        // if (!undoDelta.ops) {
+        //     return false;
+        // }
+        // for (const [index, op] of undoDelta.ops.entries()) {
+        //     if (op.insert && op.insert["embed-external"] && op.insert["embed-external"].skipSetup) {
+        //         const { dataPromise, loaderData } = op.insert["embed-external"];
+        //         undoDelta.ops![index] = {
+        //             insert: {
+        //                 "embed-external": {
+        //                     loaderData,
+        //                     data: await dataPromise,
+        //                 },
+        //             },
+        //         };
+        //     }
+        // }
+        // console.log("UndoDelta", undoDelta);
+        // console.log("RedoDelta", redoDelta);
+        // const val = isEqual(undoDelta, redoDelta);
+        // console.log("should ignore", val);
+        // return val;
+    }
+
+    private operationsContainKey(ops: DeltaOperation[] | undefined, key: string) {
+        if (!ops) {
+            return false;
+        }
+
+        for (const op of ops) {
+            if (get(op, key, false)) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     /**
@@ -73,22 +124,14 @@ export default class HistoryModule extends BaseHistoryModule {
      * undoing impossible.
      */
     private needsDoubleUndo(): boolean {
-        const lastUndo = this.stack.undo[this.stack.undo.length - 1];
-        if (!lastUndo) {
-            return false;
-        }
+        const lastRedo = this.stack.undo[this.stack.undo.length - 1];
+        const secondToLastRedo = this.stack.undo[this.stack.undo.length - 2];
 
-        const lastUndoOps = lastUndo.undo.ops;
-
-        let containsAPromiseInsert = false;
-        lastUndoOps.forEach(op => {
-            if (op.insert && op.insert["embed-external"] && op.insert["embed-external"] instanceof Promise) {
-                containsAPromiseInsert = true;
-            }
-        });
-        return containsAPromiseInsert;
+        return (
+            (lastRedo && this.operationsContainKey(lastRedo.redo.ops, this.EMBED_KEY)) ||
+            (secondToLastRedo && this.operationsContainKey(secondToLastRedo.redo.ops, this.EMBED_KEY))
+        );
     }
-
     /**
      * This is SUPER hacky, but I couldn't find a better way to manage it.
      *
@@ -102,18 +145,11 @@ export default class HistoryModule extends BaseHistoryModule {
      */
     private needsDoubleRedo(): boolean {
         const lastRedo = this.stack.redo[this.stack.redo.length - 1];
-        if (!lastRedo) {
-            return false;
-        }
+        const secondToLastRedo = this.stack.redo[this.stack.redo.length - 2];
 
-        const lastRedoOps = lastRedo.undo.ops;
-
-        let containsAPromiseInsert = false;
-        lastRedoOps.forEach(op => {
-            if (op.insert && op.insert["embed-external"] && op.insert["embed-external"] instanceof Promise) {
-                containsAPromiseInsert = true;
-            }
-        });
-        return containsAPromiseInsert;
+        return (
+            (lastRedo && this.operationsContainKey(lastRedo.redo.ops, this.EMBED_KEY)) ||
+            (secondToLastRedo && this.operationsContainKey(secondToLastRedo.redo.ops, this.EMBED_KEY))
+        );
     }
 }

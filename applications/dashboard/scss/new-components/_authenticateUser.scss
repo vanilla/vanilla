@@ -1,3 +1,4 @@
+@import "../core-variables";
 
 $authenticateUser-column_width: 334px !default;
 $authenticateUser-column_horizontalPadding: 26px !default;
@@ -7,17 +8,14 @@ $authenticateUser-ssoButton_margin: 12px !default;
 $authenticateUser-socialIcon_width: 42px !default;
 $authenticateUser-socialIcon_borderWidth: 3px !default;
 $authenticateUser-socialIcon_bg: #fff !default;
-$brand-color: #0291db !default;
-$baseUnit: 6px !default;
-$fontSize-large: 16px !default;
-$fontSize-default: 14px !default;
-$fontSize-small: 12px !default;
 $authenticateUserName-opacity: .6 !default;
 $authenticateUserArrowDown-opacity: .6 !default;
-$icon_size: 24px !default;
-$icon-large_size: 42px !default;
 $authenticateMethod-button_boxShadow: 0 1px 3px 0 rgba(0, 0, 0, .3) !default;
 $authenticateMethod-button_horizontalMargin: 12px !default;
+$linkUser-profilePic_width: 120px;
+$linkUser-provider_width: 45px;
+$linkUser-providerIcon_borderWidth: 3px;
+$linkUser-providerIcon_width: $icon-default_size;
 
 .authenticateUserCol {
     padding: 0 $authenticateUser-column_horizontalPadding;
@@ -37,18 +35,6 @@ $authenticateMethod-button_horizontalMargin: 12px !default;
         &.button-sso {
             margin-bottom: $authenticateUser-ssoButton_margin;
         }
-    }
-
-    .icon {
-        display: inline-block;
-        width: $icon_size;
-        height: $icon_size;
-        vertical-align: middle;
-    }
-
-    .iconLarge {
-        width: $icon-large_size;
-        height: $icon-large_size;
     }
 }
 
@@ -103,13 +89,13 @@ $authenticateMethod-button_horizontalMargin: 12px !default;
 }
 
 .authenticateUser-name {
-    font-size: $fontSize-large;
+    font-size: $global-subTitle_fontSize;
     font-weight: 600;
     text-align: center;
 }
 
 .authenticateUser-userName {
-    font-size: $fontSize-small;
+    font-size: $global-small_fontSize;
     opacity: $authenticateUserName-opacity;
     text-align: center;
 }
@@ -118,17 +104,17 @@ $authenticateMethod-button_horizontalMargin: 12px !default;
     display: flex;
     flex-wrap: wrap;
     align-items: center;
-    font-size: $fontSize-small;
+    font-size: $global-small_fontSize;
 
     a {
         font-size: inherit;
-        color: $brand-color;
+        color: $global-color_primary;
     }
 }
 
 .rememberMeAndForgot-rememberMe {
     flex-grow: 1;
-    padding-right: $baseUnit;
+    padding-right: $utility-baseUnit;
 }
 
 .authenticateUser-divider {
@@ -141,7 +127,7 @@ $authenticateMethod-button_horizontalMargin: 12px !default;
 
 .authenticateUser-ssoLabel {
     display: inline;
-    margin-left: $baseUnit * 2;
+    margin-left: $utility-baseUnitDouble;
 }
 
 .button.Button {
@@ -172,13 +158,13 @@ $authenticateMethod-button_horizontalMargin: 12px !default;
 }
 
 .ssoMethod-icon {
-    width: $icon_size;
+    width: $icon-default_size;
     height: auto;
 
     &.ssoMethod-iconSpacer {
         display: block;
         visibility: hidden;
-        height: $icon_size;
+        height: $icon-default_size;
     }
 }
 
@@ -193,4 +179,84 @@ $authenticateMethod-button_horizontalMargin: 12px !default;
 
 .ssoMethods {
     margin-bottom: $authenticateUser-spacer;
+}
+
+.ssoUser-info,
+.ssoUser-imageWrap.PhotoWrap,
+.ProfilePhotoLarge.ssoUser-image {
+    display: block;
+    width: $linkUser-profilePic_width;
+    height: auto;
+    margin: auto;
+}
+
+.ssoUser-info {
+    position: relative;
+    text-align: center;
+}
+
+.ssoUser {
+    padding-bottom: $utility-baseUnitDouble;
+}
+
+.ssoUser-imageWrap {
+    overflow: hidden;
+    border-radius: 50%;
+}
+
+.ssoUser-provider {
+    position: absolute;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    bottom: 0;
+    right: 0;
+    width: $linkUser-provider_width - 2 * $linkUser-providerIcon_borderWidth;
+    height: $linkUser-provider_width - 2 * $linkUser-providerIcon_borderWidth;
+    overflow: hidden;
+    border: {
+        radius: 50%;
+        style: solid;
+        width: $linkUser-providerIcon_borderWidth;
+    }
+}
+
+.ssoUser-icon {
+    width: $linkUser-providerIcon_width;
+    height: auto;
+}
+
+.ssoUser-arrowDown{
+    display: block;
+    width: $icon-large_size;
+    height: auto;
+    margin: {
+        top: $utility-baseUnitDouble;
+        right: auto;
+        left: auto;
+    }
+}
+
+.ssoUser-namePrimary {
+    font-size: $global-subTitle_fontSize;
+    margin-top: 1em;
+    text-align: center;
+    color: inherit;
+}
+
+.ssoUser-nameSecondary {
+    font-size: $global-small_fontSize;
+    text-align: center;
+    color: inherit;
+    opacity: .7;
+    margin-top: $utility-baseUnit;
+}
+
+
+.authenticateUser-paragraph {
+    margin-bottom: $global-formElement_marginBottom;
+}
+
+.errorOrLinkLabel-message {
+    color: $global-error_fg;
 }

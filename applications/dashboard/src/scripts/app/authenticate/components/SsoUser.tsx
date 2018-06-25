@@ -26,22 +26,30 @@ export default class SsoUser extends React.Component<IProps, {}> {
             userInfo.push(this.props.ssoUser.defaultName as string);
         }
 
-        const nameFirstLine = <div className="ssoUser-name">{userInfo.pop()}</div>;
+        const nameFirstLine = <div className="ssoUser-namePrimary">{userInfo.pop()}</div>;
         let nameSecondLine: any = null;
         if (userInfo.length > 0) {
-            nameSecondLine = <div className="ssoUser-name">{userInfo.pop()}</div>;
+            nameSecondLine = <div className="ssoUser-nameSecondary">{userInfo.pop()}</div>;
         }
 
         return (
             <div className="ssoUser">
-                <div className="Photo PhotoWrap PhotoWrapLarge thumbnail-shadow ssoUser-imageWrap">
-                    <img
-                        aria-hidden="true"
-                        src={this.props.ssoUser.photoUrl}
-                        className="ssoUser-image ProfilePhotoLarge"
-                        alt={t("User: ") + nameFirstLine}
-                    />
-                    <div className="ssoUser-provider" style={{ backgroundColor: this.props.ui.backgroundColor }}>
+                <div className="ssoUser-info">
+                    <div className="Photo PhotoWrap PhotoWrapLarge thumbnail-shadow ssoUser-imageWrap">
+                        <img
+                            aria-hidden="true"
+                            src={this.props.ssoUser.photoUrl}
+                            className="ssoUser-image ProfilePhotoLarge"
+                            alt={t("User: ") + nameFirstLine}
+                        />
+                    </div>
+                    <div
+                        className="ssoUser-provider"
+                        style={{
+                            backgroundColor: this.props.ui.backgroundColor,
+                            borderColor: this.props.ui.foregroundColor,
+                        }}
+                    >
                         <img src={this.props.ui.photoUrl} className="ssoUser-icon" aria-hidden={true} />
                     </div>
                 </div>

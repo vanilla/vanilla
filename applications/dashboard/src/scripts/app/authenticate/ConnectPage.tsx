@@ -15,7 +15,6 @@ import classNames from "classnames";
 import { getMeta } from "@dashboard/application";
 import gdn from "@dashboard/gdn";
 import SsoUser from "@dashboard/app/authenticate/components/ssoUser";
-import { authenticatorsSet } from "@dashboard/app/state/actions/authenticateActions";
 import Paragraph from "@dashboard/components/forms/Paragraph";
 import InputTextBlock from "@dashboard/components/forms/InputTextBlock";
 import get from "lodash/get";
@@ -99,7 +98,7 @@ export default class ConnectPage extends React.Component<IProps, IState> {
         return (
             <div className="authenticateConnect">
                 <DocumentTitle title={pageTitle}>
-                    <h1 className="isCentered">{pageTitle}</h1>
+                    <h1 className="pageTitle isCentered">{pageTitle}</h1>
                 </DocumentTitle>
                 <div className="authenticateUserCol">
                     <div className={stepClasses}>{content}</div>

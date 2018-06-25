@@ -61,6 +61,28 @@ button.Close {
   display: none;
 }
 
+/* -------------------------------------------------------------- *    Utility Variables
+\* -------------------------------------------------------------- */
+/* -------------------------------------------------------------- *    Globals
+\* -------------------------------------------------------------- */
+/* -------------------------------------------------------------- *    Password Strength Colors
+\* -------------------------------------------------------------- */
+/* -------------------------------------------------------------- *    Third Party Colors
+\* -------------------------------------------------------------- */
+/* -------------------------------------------------------------- *    Typography
+\* -------------------------------------------------------------- */
+/* -------------------------------------------------------------- *    Animation
+\* -------------------------------------------------------------- */
+/* -------------------------------------------------------------- *    Icons
+\* -------------------------------------------------------------- */
+/* -------------------------------------------------------------- *    Layout
+\* -------------------------------------------------------------- */
+/* -------------------------------------------------------------- *    Components
+\* -------------------------------------------------------------- */
+/* -------------------------------------------------------------- *    Form Elements
+\* -------------------------------------------------------------- */
+/* -------------------------------------------------------------- *    Buttons
+\* -------------------------------------------------------------- */
 .authenticateUserCol {
   padding: 0 26px;
   margin: auto;
@@ -80,18 +102,6 @@ button.Close {
 
 .authenticateUserCol .button.button-fullWidth.button-sso {
   margin-bottom: 12px;
-}
-
-.authenticateUserCol .icon {
-  display: inline-block;
-  width: 24px;
-  height: 24px;
-  vertical-align: middle;
-}
-
-.authenticateUserCol .iconLarge {
-  width: 42px;
-  height: 42px;
 }
 
 .authenticateUser-photoCrop,
@@ -139,7 +149,7 @@ button.Close {
 }
 
 .authenticateUser-name {
-  font-size: 16px;
+  font-size: 18px;
   font-weight: 600;
   text-align: center;
 }
@@ -258,6 +268,90 @@ button.Close {
 
 .ssoMethods {
   margin-bottom: 18px;
+}
+
+.ssoUser-info,
+.ssoUser-imageWrap.PhotoWrap,
+.ProfilePhotoLarge.ssoUser-image {
+  display: block;
+  width: 120px;
+  height: auto;
+  margin: auto;
+}
+
+.ssoUser-info {
+  position: relative;
+  text-align: center;
+}
+
+.ssoUser {
+  padding-bottom: 12px;
+}
+
+.ssoUser-imageWrap {
+  overflow: hidden;
+  border-radius: 50%;
+}
+
+.ssoUser-provider {
+  position: absolute;
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-align: center;
+  -webkit-align-items: center;
+      -ms-flex-align: center;
+          align-items: center;
+  -webkit-box-pack: center;
+  -webkit-justify-content: center;
+      -ms-flex-pack: center;
+          justify-content: center;
+  bottom: 0;
+  right: 0;
+  width: 39px;
+  height: 39px;
+  overflow: hidden;
+  border-radius: 50%;
+  border-style: solid;
+  border-width: 3px;
+}
+
+.ssoUser-icon {
+  width: 24px;
+  height: auto;
+}
+
+.ssoUser-arrowDown {
+  display: block;
+  width: 42px;
+  height: auto;
+  margin-top: 12px;
+  margin-right: auto;
+  margin-left: auto;
+}
+
+.ssoUser-namePrimary {
+  font-size: 18px;
+  margin-top: 1em;
+  text-align: center;
+  color: inherit;
+}
+
+.ssoUser-nameSecondary {
+  font-size: 12px;
+  text-align: center;
+  color: inherit;
+  opacity: .7;
+  margin-top: 6px;
+}
+
+.authenticateUser-paragraph {
+  margin-bottom: 24px;
+}
+
+.errorOrLinkLabel-message {
+  color: #ff3933;
 }
 
 .followButton {
@@ -435,6 +529,28 @@ body.Categories.isMobile .PageControls.Top {
           align-items: center;
 }
 
+/* -------------------------------------------------------------- *    Utility Variables
+\* -------------------------------------------------------------- */
+/* -------------------------------------------------------------- *    Globals
+\* -------------------------------------------------------------- */
+/* -------------------------------------------------------------- *    Password Strength Colors
+\* -------------------------------------------------------------- */
+/* -------------------------------------------------------------- *    Third Party Colors
+\* -------------------------------------------------------------- */
+/* -------------------------------------------------------------- *    Typography
+\* -------------------------------------------------------------- */
+/* -------------------------------------------------------------- *    Animation
+\* -------------------------------------------------------------- */
+/* -------------------------------------------------------------- *    Icons
+\* -------------------------------------------------------------- */
+/* -------------------------------------------------------------- *    Layout
+\* -------------------------------------------------------------- */
+/* -------------------------------------------------------------- *    Components
+\* -------------------------------------------------------------- */
+/* -------------------------------------------------------------- *    Form Elements
+\* -------------------------------------------------------------- */
+/* -------------------------------------------------------------- *    Buttons
+\* -------------------------------------------------------------- */
 .inputBlock {
   display: block;
   margin-bottom: 24px;
@@ -451,8 +567,12 @@ body.Categories.isMobile .PageControls.Top {
           align-items: center;
 }
 
-.inputBlock.inputBlock-tighter {
-  margin-top: -12px;
+.inputBlock.inputBlock-tighterTop {
+  margin-top: -18px;
+}
+
+.inputBlock.hasNoBottomMargin {
+  margin-bottom: 0;
 }
 
 .inputBlock.hasError .inputText {
@@ -474,7 +594,7 @@ body.Categories.isMobile .PageControls.Top {
   display: block;
   font-weight: 600;
   margin-bottom: 6px;
-  line-height: 1.428571429;
+  line-height: 1.4285714286;
 }
 
 .InputBox.inputText {
@@ -484,7 +604,7 @@ body.Categories.isMobile .PageControls.Top {
 .inputBlock-error {
   display: block;
   color: #ff3933;
-  line-height: 1.428571429;
+  line-height: 1.4285714286;
   font-size: 12px;
   margin-top: 3px;
   word-break: break-all;
@@ -506,12 +626,8 @@ body.Categories.isMobile .PageControls.Top {
 .inputBlock-labelNote {
   display: block;
   font-size: 12px;
-  line-height: 1.428571429;
-  opacity: .6;
-}
-
-.inputBlock-labelNote + .inputBlock-inputWrap {
-  margin-top: 6px;
+  line-height: 1.4285714286;
+  margin-top: 3px;
 }
 
 .authenticateUser-paragraph {

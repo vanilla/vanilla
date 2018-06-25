@@ -157,7 +157,7 @@ export default class LinkUser extends React.Component<IProps, IState> {
                     }
                 } else if (error.field === "name") {
                     nameError = error.message;
-                    if (error.code === "The name is taken.") {
+                    if (error.code === "The username is taken.") {
                         nameError = genericFieldError.split("%s").join("name");
                     } else {
                         nameError = error.message;
@@ -306,7 +306,10 @@ export default class LinkUser extends React.Component<IProps, IState> {
 
             contents = (
                 <form className="linkUserRegisterForm" method="post" onSubmit={this.handleSubmit} noValidate>
-                    <Paragraph content={t("Fill out the following information to complete your registration")} />
+                    <Paragraph
+                        className="authenticateUser-paragraph"
+                        content={t("Fill out the following information to complete your registration")}
+                    />
                     <Paragraph className="authenticateUser-paragraph" content={globalError} isError={true} />
                     {emailField}
                     <InputTextBlock
@@ -325,7 +328,7 @@ export default class LinkUser extends React.Component<IProps, IState> {
                         ref={name => (this.name = name as InputTextBlock)}
                     />
 
-                    <div className="inputBlock">
+                    <div className="inputBlock inputBlock-tighterTop">
                         <Checkbox
                             label={t("Keep me signed in")}
                             onChange={this.handleRememberMeCheckChange}
@@ -350,7 +353,7 @@ export default class LinkUser extends React.Component<IProps, IState> {
             );
         } else {
             let userName;
-            if (this.state.signInWithField === "name") {
+            if (get(this, "state.signInWithField", "") === "name") {
                 userName = this.name.value;
             } else {
                 userName = get(this, "email.value", get(this.props, "ssoUser.email", ""));

@@ -28,7 +28,7 @@ export default class RememberAndForgotPassword extends React.Component<IProps> {
 
     public render() {
         return (
-            <div className="inputBlock inputBlock-tighter">
+            <div className="inputBlock inputBlock-tighterTop hasNoBottomMargin">
                 <div className="rememberMeAndForgot">
                     <div className="rememberMeAndForgot-rememberMe">
                         <Checkbox

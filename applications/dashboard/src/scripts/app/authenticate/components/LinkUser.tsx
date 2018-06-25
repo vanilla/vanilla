@@ -354,7 +354,7 @@ export default class LinkUser extends React.Component<IProps, IState> {
         } else {
             let userName;
             if (get(this, "state.signInWithField", "") === "name") {
-                userName = this.name.value;
+                userName = get(this, "name.value", "");
             } else {
                 userName = get(this, "email.value", get(this.props, "ssoUser.email", ""));
             }

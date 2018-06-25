@@ -11,7 +11,8 @@ import * as icons from "@dashboard/app/authenticate/components/Icons";
 
 interface IProps {
     onClick: any;
-    classNames: string;
+    classNames?: string;
+    iconClasses?: string;
     url?: string;
 }
 
@@ -21,10 +22,10 @@ export default class BackLink extends React.Component<IProps> {
     };
 
     public render() {
-        const buttonClasses = classNames("Button", "button", "backLink", this.props.classNames);
+        const buttonClasses = classNames("uiButton", "backLink", this.props.classNames);
         return (
             <a className={buttonClasses} onClick={this.props.onClick}>
-                {icons.chevronLeft()}
+                {icons.chevronLeft(this.props.iconClasses)}
                 <span className="backLink-label">{t("Back")}</span>
             </a>
         );

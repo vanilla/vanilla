@@ -220,7 +220,7 @@ export default class LinkUserSignIn extends React.Component<IProps, IState> {
                         ref={password => (this.password = password as InputTextBlock)}
                     />
 
-                    <div className="inputBlock">
+                    <div className="inputBlock inputBlock-tighterTop">
                         <RememberAndForgotPassword
                             rememberMe={!!this.props.rememberMe}
                             onChange={this.props.handleRememberMeCheckChange}
@@ -241,7 +241,11 @@ export default class LinkUserSignIn extends React.Component<IProps, IState> {
                     </div>
                     <ButtonSubmit disabled={!this.state.editable} content={t("Connect")} />
                 </form>
-                <BackLink classNames="linkUser-backLink" onClick={this.props.handleBackClick} />
+                <BackLink
+                    classNames="linkUser-backLink"
+                    iconClasses="backLink-icon"
+                    onClick={this.props.handleBackClick}
+                />
             </div>
         );
     }

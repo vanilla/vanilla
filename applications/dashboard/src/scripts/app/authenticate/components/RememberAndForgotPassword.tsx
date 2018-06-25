@@ -28,18 +28,16 @@ export default class RememberAndForgotPassword extends React.Component<IProps> {
 
     public render() {
         return (
-            <div className="inputBlock inputBlock-tighterTop hasNoBottomMargin">
-                <div className="rememberMeAndForgot">
-                    <div className="rememberMeAndForgot-rememberMe">
-                        <Checkbox
-                            label={t("Keep me signed in")}
-                            onChange={this.handleCheckBoxChange}
-                            checked={this.props.rememberMe}
-                        />
-                    </div>
-                    <div className="rememberMeAndForgot-forgot">
-                        <Link to="/authenticate/recoverpassword">{t("Forgot your password?")}</Link>
-                    </div>
+            <div className="rememberMeAndForgot">
+                <div className="rememberMeAndForgot-rememberMe">
+                    <Checkbox
+                        label={t("Keep me signed in")}
+                        onChange={this.handleCheckBoxChange}
+                        checked={this.props.rememberMe}
+                    />
+                </div>
+                <div className="rememberMeAndForgot-forgot">
+                    <Link to="/authenticate/recoverpassword">{t("Forgot your password?")}</Link>
                 </div>
             </div>
         );

@@ -55,7 +55,7 @@ export default class SsoUser extends React.Component<IProps, {}> {
                 </div>
                 {nameFirstLine}
                 {nameSecondLine}
-                {icons.arrowDown()}
+                {icons.arrowDown("ssoUser-arrowDown")}
             </div>
         );
     }

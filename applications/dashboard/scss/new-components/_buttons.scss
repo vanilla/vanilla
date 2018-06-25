@@ -4,6 +4,24 @@
     text-align: center;
 }
 
+// Link that really should be a button
+.uiButton {
+    font-size: $global-medium_fontSize;
+    margin-left: -$icon_default_size;
+    line-height: $global-base_lineHeight;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: flex-start;
+    justify-content: center;
+    color: inherit;
+
+    &:hover,
+    &:focus {
+        border: 0;
+        text-decoration: none;
+    }
+}
+
 ::-moz-focus-inner {
     border: 0;
 }

@@ -6,10 +6,12 @@
 
 import React from "react";
 import { t } from "@dashboard/application";
+import classNames from "classnames";
 
-export function arrowDown() {
+export function arrowDown(extraClasses = "") {
+    const svgClasses = classNames("icon", extraClasses);
     return (
-        <svg className="icon ssoUser-arrowDown" viewBox="0 0 24 24" aria-label={t("↓")}>
+        <svg className={svgClasses} viewBox="0 0 24 24" aria-label={t("↓")}>
             <title>{t("↓")}</title>
             <path
                 transform="rotate(90 12,12)"
@@ -21,9 +23,10 @@ export function arrowDown() {
     );
 }
 
-export function chevronLeft() {
+export function chevronLeft(extraClasses = "") {
+    const svgClasses = classNames("icon", extraClasses);
     return (
-        <svg className="icon ssoUser-arrowDown" viewBox="0 0 24 24" aria-label={t("‹")}>
+        <svg className={svgClasses} viewBox="0 0 24 24" aria-label={t("‹")}>
             <title>{t("‹")}</title>
             <path
                 fill="currentcolor"

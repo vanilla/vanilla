@@ -1,6 +1,4 @@
 // This is only for new pages, with new form element markup.
-@import "../core-variables";
-
 .inputBlock {
     display: block;
     margin-bottom: $global-formElement_marginBottom;
@@ -12,10 +10,6 @@
 
     &.inputBlock-tighterTop {
         margin-top: -#{$global-formElement_marginBottom - $utility-baseUnit};
-    }
-
-    &.hasNoBottomMargin {
-        margin-bottom: 0;
     }
 
     &.hasError {

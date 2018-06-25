@@ -6,7 +6,7 @@
 import { t } from "@dashboard/application";
 import React from "react";
 import classNames from "classnames";
-import { uniqueIDFromPrefix, getOptionalID, IOptionalComponentID } from "@dashboard/componentIDs";
+import { uniqueIDFromPrefix, getOptionalID, IOptionalComponentID, getRequiredID } from "@dashboard/componentIDs";
 
 interface IProps extends IOptionalComponentID {
     id?: string;
@@ -34,7 +34,7 @@ export default class Checkbox extends React.Component<IProps, IState> {
     constructor(props) {
         super(props);
         this.state = {
-            id: getOptionalID(props, "checkbox") as string,
+            id: getRequiredID(props, "checkbox") as string,
         };
     }
 

@@ -214,7 +214,9 @@ class PasswordForm extends React.Component<IProps, IState> {
                         type="password"
                         ref={password => (this.password = password as InputTextBlock)}
                     />
-                    <RememberAndForgotPassword onChange={this.setRememberMe} />
+                    <div className="inputBlock inputBlock-tighterTop">
+                        <RememberAndForgotPassword onChange={this.setRememberMe} />
+                    </div>
                     {/*<div className="inputBlock inputBlock-tighterTop">*/}
                     {/*<div className="rememberMeAndForgot">*/}
                     {/*<span className="rememberMeAndForgot-rememberMe">*/}

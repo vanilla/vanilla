@@ -1896,7 +1896,6 @@ body.isMobile .FormWrapper {
   margin: auto;
 }
 
-.embedExternal-content.embedVideo iframe,
 .embedExternal-content.embedVideo .embedVideo-iframe {
   position: absolute;
   display: block;
@@ -1982,6 +1981,22 @@ body.isMobile .FormWrapper {
   stroke: rgba(0, 0, 0, 0.1);
 }
 
+.embedGiphy {
+  position: relative;
+  display: block;
+  max-width: 100%;
+  margin: auto;
+}
+
+.embedGiphy .embedGiphy-iframe {
+  position: absolute;
+  display: block;
+  top: 0;
+  left: 0;
+  height: 100%;
+  width: 100%;
+}
+
 .embedExternal-content.embed-instagram {
   width: 640px;
 }
@@ -2024,11 +2039,31 @@ body.isMobile .FormWrapper {
   margin: auto !important;
 }
 
+.embedExternal-ratio {
+  position: relative;
+  display: block;
+  margin: 0;
+  width: 100%;
+  padding-left: 0;
+  padding-right: 0;
+  padding-bottom: 0;
+}
+
+.embedGiphy-iframe {
+  position: absolute;
+  display: block;
+  top: 0;
+  left: 0;
+  height: 100%;
+  width: 100%;
+}
+
 .twitter-tweet {
   margin: 0 !important;
 }
 
-.richEditor .twitter-tweet {
+.richEditor .twitter-tweet,
+.richEditor iframe {
   pointer-events: none;
 }
 

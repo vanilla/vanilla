@@ -57,6 +57,31 @@ if (!function_exists('absoluteSource')) {
     }
 }
 
+if (!function_exists('anonymizeIP')) {
+    /**
+     * Anonymize an IPv4 or IPv6 address.
+     *
+     * @param string $ip An IPv4 or IPv6 address.
+     * @return bool|string Anonymized IP address on success. False on failure.
+     */
+    function anonymizeIP(string $ip) {
+        $result = false;
+
+        if (filter_var($ip, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4 & FILTER_FLAG_IPV6)) {
+            // Need a packed version for bitwise operations.
+            $packed = inet_pton($ip);
+            if ($packed !== false) {
+                // Remove the last octet of an IPv4 address or the last 80 bits of an IPv6 address.
+                // IP v4 addresses are 32 bits (4 bytes). IP v6 addresses are 128 bits (16 bytes).
+                $mask = strlen($packed) == 4 ? inet_pton('255.255.255.0') : inet_pton('ffff:ffff:ffff::');
+                $result = inet_ntop($packed & $mask);
+            }
+        }
+
+        return $result;
+    }
+}
+
 if (!function_exists('arrayCombine')) {
     /**
      * PHP's array_combine has a limitation that doesn't allow array_combine to work if either of the arrays are empty.

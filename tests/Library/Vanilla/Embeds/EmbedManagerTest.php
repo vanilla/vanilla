@@ -87,7 +87,7 @@ class EmbedManagerTest extends SharedBootstrapTestCase {
                         'postID' => "460707851",
                     ]
                 ],
-                '<a id="CdkwD1KlQeN8rV9xoKzSAg" data-height="337" data-width="508" data-sig="OSznWQvhySQdibOA7WcaeKbc1T3SnuazaIvfwlTLyq0=" data-items ="460707851" data-capt="" data-tld="com" data-i360="" class="gie-single js-gettyEmbed" href="//www.gettyimages.com/detail/460707851">Embed from Getty Images</a>'
+                '<a id="CdkwD1KlQeN8rV9xoKzSAg" data-height="337" data-width="508" data-sig="OSznWQvhySQdibOA7WcaeKbc1T3SnuazaIvfwlTLyq0=" data-items="460707851" data-capt="" data-tld="com" data-i360="" class="gie-single js-gettyEmbed" href="//www.gettyimages.com/detail/460707851">Embed from Getty Images</a>'
             ],
             [
                 [

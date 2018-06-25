@@ -4,7 +4,14 @@
  * @license GPLv2
  */
 
-import { resolvePromisesSequentially, matchAtMention, hashString, isInstanceOfOneOf, cssSpecialChars } from "./utility";
+import {
+    resolvePromisesSequentially,
+    matchAtMention,
+    hashString,
+    isInstanceOfOneOf,
+    cssSpecialChars,
+    splitStringLoosely,
+} from "./utility";
 import chai, { expect } from "chai";
 import asPromised from "chai-as-promised";
 chai.use(asPromised);
@@ -70,7 +77,7 @@ describe("resolvePromisesSequentially()", () => {
     });
 });
 
-describe("hashString", () => {
+describe("hashString()", () => {
     it("the same string always results in the same value", () => {
         const str =
             "a; lksdjfl;aska;lskd fjaskl;dfj al;skdjfalsjkdfa;lksdjfl;kasdjflksaf;kbfjal;skdfbjanv;slkdfjbals;dkjfslkadfj;alsdjf;oiawjef;oiawbejvf;ioawbevf;aoiwebfjaov;wifebvl";
@@ -83,6 +90,26 @@ describe("hashString", () => {
             "a;sldkfjal;skdfjl;kasjdfl;k;laksjdf;laksjdf;laksjdf;lkajsd;lkfjaskl;dfjals;kdfjnal;skdjbfl;kasbdjfv;laskjbdfal;skdjfalv;skdjfalskdbjnfav;bslkdfjnalv;ksdfjbalskdfbjalvsk.dfjbalsv;kdbfjalsv;kdfjbadklsfjals";
 
         expect(hashString(str1)).not.eq(hashString(str2));
+    });
+});
+
+type ParamsResultTuple = [string, string, string[]];
+describe("splitStringLoosely()", () => {
+    const paramsAndResults: ParamsResultTuple[] = [
+        ["Test", "te", ["", "Te", "st"]],
+        ["Stéphane", "Stéph", ["", "Stéph", "ane"]],
+        ["Stéphane", "Stëph", ["", "Stéph", "ane"]],
+        ["Stéphane", "St", ["", "St", "éphane"]],
+        ["TestTest", "Te", ["", "Te", "st", "Te", "st"]],
+        ["Tæst", "T", ["", "T", "æs", "t", ""]],
+        ["Tæst", "Tæ", ["", "Tæ", "st"]],
+        ["Tææst", "Tææ", ["", "Tææ", "st"]],
+    ];
+
+    paramsAndResults.forEach(([fullString, subString, result], index) => {
+        it(`Case ${index}`, () => {
+            expect(splitStringLoosely(fullString, subString)).deep.equals(result);
+        });
     });
 });
 

@@ -27,7 +27,6 @@ import "./user-content/embeds/soundcloud";
 import "./user-content/embeds/getty";
 import "./user-content/embeds/giphy";
 
-
 addComponent("App", Router);
 
 addRoutes([

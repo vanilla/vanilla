@@ -8,14 +8,14 @@ import { ensureScript } from "@dashboard/dom";
 import { onContent, onReady } from "@dashboard/application";
 
 // Setup getty embeds
-onReady(convertgettyEmbeds);
-onContent(convertgettyEmbeds);
-registerEmbed("getty", rendergetty);
+onReady(convertGettyEmbeds);
+onContent(convertGettyEmbeds);
+registerEmbed("getty", renderGetty);
 
 /**
  * Renders posted getty embeds.
  */
-async function convertgettyEmbeds() {
+async function convertGettyEmbeds() {
     const gettyPosts = document.querySelectorAll(".js-gettyEmbed");
     if (gettyPosts.length > 0) {
         for (const post of gettyPosts) {
@@ -37,7 +37,7 @@ async function convertgettyEmbeds() {
                 width,
                 attributes: { id, sig, items, capt, tld, i360 },
             };
-            await loadGettyImage(data);
+            await loadGettyImages(data);
             post.classList.remove("js-gettyEmbed");
         }
     }
@@ -46,7 +46,7 @@ async function convertgettyEmbeds() {
 /**
  * Render a single getty embed.
  */
-export async function rendergetty(element: HTMLElement, data: IEmbedData) {
+export async function renderGetty(element: HTMLElement, data: IEmbedData) {
     const url = data.attributes.post;
     const newLink = document.createElement("a");
     newLink.classList.add("gie-single");
@@ -56,14 +56,20 @@ export async function rendergetty(element: HTMLElement, data: IEmbedData) {
     element.appendChild(newLink);
 
     setImmediate(() => {
-        void loadGettyImage(data);
+        void loadGettyImages(data);
     });
 }
 
-async function loadGettyImage(data) {
+/**
+ * Loads getty embed into a global object and getty's widget.js.
+ * @param data
+ * @returns {Promise<void>}
+ */
+async function loadGettyImages(data) {
     const fallbackCallback = c => {
         (window.gie.q = window.gie.q || []).push(c);
     };
+    //This is part of Getty's embed code, we need to ensure embeds are loaded and sent to their widget.js script.
     window.gie = window.gie || fallbackCallback;
 
     window.gie(() => {

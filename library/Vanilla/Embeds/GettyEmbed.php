@@ -43,13 +43,15 @@ class GettyEmbed extends Embed {
             if ($oembedData) {
                 $data = $oembedData;
             }
-            $data['attributes'] = $this->parseResponseHtml($data['html']);
+
+            if (array_key_exists('html', $data)) {
+                $data['attributes'] = $this->parseResponseHtml($data['html']);
+            }
 
             if ($post) {
                 $data['attributes']['postID'] = $post['postID'];
             }
         }
-
         return $data;
     }
 
@@ -59,14 +61,11 @@ class GettyEmbed extends Embed {
     public function renderData(array $data): string {
         $url = "//www.gettyimages.com/detail/".$data['attributes']['postID'];
         $encodedURL = htmlspecialchars($url);
-
-        array_walk_recursive($data, function(&$row) {
-            $row = htmlspecialchars($row);
-        });
         $encodedData = json_encode($data);
+        $sanitizedData = htmlspecialchars($encodedData);
 
         $result = <<<HTML
-<a id="{$data['attributes']['id']}" data-json={$encodedData} class='gie-single js-gettyEmbed' href="{$encodedURL}"> Embed from Getty Images</a>
+<a id="{$data['attributes']['id']}" data-json={$sanitizedData} class='gie-single js-gettyEmbed' href="{$encodedURL}">Embed from Getty Images</a>
 HTML;
        return $result;
     }
@@ -80,36 +79,27 @@ HTML;
     private function parseResponseHtml(string $html): array {
         $data =[];
 
-        preg_match(
-            '/id:\'(?<id>[a-zA-Z0-9-_]+)\'/i', $html,
-            $id
-        );
-        if ($id) {
+        if (preg_match('/id:\'(?<id>[a-zA-Z0-9-_]+)\'/i', $html, $id)) {
             $data['id'] = $id['id'];
         }
 
-        preg_match( '/sig:\'(?<sig>[a-zA-Z0-9-_]+=)\'/i', $html,$sig);
-        if ($sig) {
+        if (preg_match( '/sig:\'(?<sig>[a-zA-Z0-9-_]+=)\'/i', $html, $sig)) {
             $data['sig'] = $sig['sig'];
         }
 
-        preg_match( '/items:\'(?<item>[0-9-]+)\'/i', $html,$item);
-        if ($item) {
+        if (preg_match( '/items:\'(?<item>[0-9-]+)\'/i', $html, $item)) {
             $data['items'] = $item['item'];
         }
 
-        preg_match( '/caption: (?<isCaption>true|false)/i', $html,$isCaptioned);
-        if ($isCaptioned) {
+        if (preg_match( '/caption: (?<isCaption>true|false)/i', $html, $isCaptioned)) {
             $data['isCaptioned'] = $isCaptioned['isCaption'];
         }
 
-        preg_match( '/is360: (?<is360>true|false)/i', $html,$is360);
-        if ($is360) {
+        if (preg_match( '/is360: (?<is360>true|false)/i', $html, $is360)) {
             $data['is360'] = $is360['is360'];
         }
 
-        preg_match( '/tld:\'(?<tld>[a-zA-Z]+)\'/i', $html,$tld);
-        if ($tld) {
+        if (preg_match( '/tld:\'(?<tld>[a-zA-Z]+)\'/i', $html, $tld)) {
             $data['tld'] = $tld['tld'];
         }
         return $data;

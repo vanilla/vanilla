@@ -48,14 +48,16 @@ class TwitchEmbed extends VideoEmbed {
             $oembedData = $this->oembed("https://api.twitch.tv/v4/oembed?url=" . urlencode($url));
             if ($oembedData) {
                 $data = $this->normalizeOembed($oembedData);
+
+                $queryInfo = $this->getQueryInformation($url) ?? '';
+                $embedUrl = $this->getEmbedUrl($videoID, $queryInfo);
+                if (!$embedUrl) {
+                    throw new Exception('Unable to find Twitch Post', 400);
+                }
+                $data['attributes'] = $data['attributes'] ?: [];
+                $data['attributes']['videoID'] = $videoID;
+                $data['attributes']['embedUrl'] = $embedUrl;
             }
-            $queryInfo = $this->getQueryInformation($url) ?? '';
-            $embedUrl = $this->getEmbedUrl($videoID, $queryInfo);
-            if (!$embedUrl) {
-                throw new Exception('Unable to find Twitch Post', 400);
-            }
-            $data['attributes']['videoID'] = $videoID;
-            $data['attributes']['embedUrl'] = $embedUrl;
         }
         return $data;
     }
@@ -93,16 +95,16 @@ class TwitchEmbed extends VideoEmbed {
 
         if ($domain == "clips.twitch.tv") {
             $this->urlType = 'clip';
-            preg_match('/\/(?<id>[a-zA_Z0-9_-]+)/i',$path,$clipID);
+            preg_match('/\/(?<id>[a-zA_Z0-9_-]+)/i', $path,$clipID);
             if ($clipID['id']) {
                 $videoID = $clipID['id'];
             }
         }
 
         if ($domain == "www.twitch.tv") {
-            preg_match('/(\/(?<isVideoOrCollection>\w+)\/)?(?<id>[a-zA-Z0-9]+)/i',$path, $linkType);
+            preg_match('/(\/(?<isVideoOrCollection>\w+)\/)?(?<id>[a-zA-Z0-9]+)/i', $path, $linkType);
             if ($linkType['isVideoOrCollection']) {
-                $this->urlType = ($linkType['isVideoOrCollection'] == 'videos') ? 'video':'collection';
+                $this->urlType = ($linkType['isVideoOrCollection'] == 'videos') ? 'video' : 'collection';
             } else {
                 $this->urlType = 'channel';
             }
@@ -133,34 +135,64 @@ class TwitchEmbed extends VideoEmbed {
      * @param array $queryInfo
      * @return string $embedUrl
      */
-    private function getEmbedUrl($videoID, $queryInfo): string {
+    private function getEmbedUrl($videoID, $queryInfo = null): string {
         $embedURL = '';
-        $t = $queryInfo['t'];
-        $autoplay = $queryInfo['autoplay'];
-        $muted = $queryInfo['muted'];
+        if ($queryInfo) {
+            $t = $this->validateQueryTime($queryInfo['t']);
+            $autoplay = $this->verifyBool($queryInfo['autoplay']);
+            $muted = $this->verifyBool($queryInfo['muted']);
+        }
 
         if ($this->urlType == 'clip' ) {
             $embedURL = "https://clips.twitch.tv/embed?clip=".$videoID;
         }
+
         if ($this->urlType == 'channel') {
             $embedURL = "https://player.twitch.tv/?channel=".$videoID;
         }
+
         if ($this->urlType == 'collection') {
             $embedURL = "https://player.twitch.tv/?collection=".$videoID;
         }
+
         if ($this->urlType == 'video') {
             $embedURL = "https://player.twitch.tv/?video=v".$videoID;
             if ($autoplay) {
-                $embedURL .="&autoplay=".$autoplay;
+                $embedURL.="&autoplay=".$autoplay;
             }
             if ($t) {
-                $embedURL .="&t=".$t;
+                $embedURL.="&t=".$t;
             }
             if ($muted) {
-               $embedURL .="&muted=".$muted;
+               $embedURL.="&muted=".$muted;
             }
         }
         return $embedURL;
     }
 
+    /**
+     * Validates the time parameter of the query string is valid.
+     *
+     * @param string $time
+     * @return string $validTime
+     */
+    private function validateQueryTime($time): string {
+        $valideTime = '';
+        if (preg_match('/\b[0-9]{1,2}h[0-9]{1,2}m[0-9]{1,2}s/i', $time, $match)) {
+            $valideTime = $match[0];
+        }
+        return $valideTime;
+    }
+
+    /**
+     * Verifies if query parameter is true or false
+     * @param string $param
+     * @return string $param
+     */
+    private function verifyBool($param): string {
+        if ((!$param == "true")||(!$param == "false")) {
+            return '';
+        }
+        return $param;
+    }
 }

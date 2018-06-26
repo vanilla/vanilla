@@ -275,9 +275,7 @@ button.Close {
   margin-bottom: 18px;
 }
 
-.ssoUser-info,
-.ssoUser-imageWrap.PhotoWrap,
-.ProfilePhotoLarge.ssoUser-image {
+.ssoUser-info {
   display: block;
   position: relative;
   width: 120px;
@@ -286,12 +284,17 @@ button.Close {
   padding: 0;
 }
 
-.ssoUser-imageWrap.PhotoWrap {
+.ssoUser-image.PhotoWrap {
+  height: 117px;
+  width: 117px;
+  background-size: cover;
+  background-position: 50% 50%;
+  background-repeat: no-repeat;
   border-radius: 50%;
   overflow: hidden;
 }
 
-.ssoUser-imageWrap.PhotoWrap::before {
+.ssoUser-image.PhotoWrap::before {
   display: none;
 }
 
@@ -304,7 +307,7 @@ button.Close {
   padding-bottom: 12px;
 }
 
-.ssoUser-imageWrap {
+.ssoUser-image {
   overflow: hidden;
   border-radius: 50%;
 }

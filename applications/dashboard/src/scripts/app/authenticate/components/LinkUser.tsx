@@ -130,9 +130,9 @@ export default class LinkUser extends React.Component<IProps, IState> {
         if (hasFieldSpecificErrors) {
             errors.forEach(fieldError => {
                 fieldError.timestamp = new Date().getTime(); // Timestamp to make sure state changes, even if the message is the same
-                if (fieldError.field === "email") {
+                if (fieldError.field === "email" && fieldError.code === 409) {
                     emailError = [...emailError, fieldError];
-                } else if (fieldError.field === "name") {
+                } else if (fieldError.field === "name" && fieldError.code === 409) {
                     nameError = [...nameError, fieldError];
                 } else if (fieldError.field === "agreeToTerms") {
                     termsOfServiceError = [...termsOfServiceError, fieldError];

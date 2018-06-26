@@ -187,9 +187,7 @@ $linkUser-providerIcon_width: $icon-default_size;
     margin-bottom: $authenticateUser-spacer;
 }
 
-.ssoUser-info,
-.ssoUser-imageWrap.PhotoWrap,
-.ProfilePhotoLarge.ssoUser-image {
+.ssoUser-info {
     display: block;
     position: relative;
     width: $linkUser-profilePic_width;
@@ -198,7 +196,12 @@ $linkUser-providerIcon_width: $icon-default_size;
     padding: 0;
 }
 
-.ssoUser-imageWrap.PhotoWrap {
+.ssoUser-image.PhotoWrap {
+    height: $authenticateUser-userImage_width;
+    width: $authenticateUser-userImage_width;
+    background-size: cover;
+    background-position: 50% 50%;
+    background-repeat: no-repeat;
     border-radius: 50%;
     overflow: hidden;
 
@@ -216,7 +219,7 @@ $linkUser-providerIcon_width: $icon-default_size;
     padding-bottom: $utility-baseUnitDouble;
 }
 
-.ssoUser-imageWrap {
+.ssoUser-image {
     overflow: hidden;
     border-radius: 50%;
 }

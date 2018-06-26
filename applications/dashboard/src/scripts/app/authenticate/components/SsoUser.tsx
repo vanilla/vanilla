@@ -32,17 +32,15 @@ export default class SsoUser extends React.Component<IProps, {}> {
             nameSecondLine = <div className="ssoUser-nameSecondary">{userInfo.pop()}</div>;
         }
 
+        const userPhoto = `url(${this.props.ssoUser.photoUrl})`;
+
         return (
             <div className="ssoUser">
                 <div className="ssoUser-info">
-                    <div className="Photo PhotoWrap PhotoWrapLarge thumbnail-shadow ssoUser-imageWrap">
-                        <img
-                            aria-hidden="true"
-                            src={this.props.ssoUser.photoUrl}
-                            className="ssoUser-image ProfilePhotoLarge"
-                            alt={t("User: ") + nameFirstLine}
-                        />
-                    </div>
+                    <div
+                        className="Photo PhotoWrap PhotoWrapLarge thumbnail-shadow ssoUser-image"
+                        style={{ backgroundImage: userPhoto }}
+                    />
                     <div
                         className="ssoUser-provider"
                         style={{

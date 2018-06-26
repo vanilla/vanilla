@@ -24,6 +24,7 @@ import "./user-content/embeds/video";
 import "./user-content/embeds/instagram";
 import "./user-content/embeds/imgur";
 import "./user-content/embeds/soundcloud";
+import "./user-content/embeds/getty";
 import "./user-content/embeds/giphy";
 
 addComponent("App", Router);

@@ -60,13 +60,24 @@ class UsersApiController extends AbstractApiController {
      * @throws NotFoundException if the user could not be found.
      */
     public function delete($id) {
+        $in = $this->schema([
+            'deleteMethod:s?' => [
+                'description' => 'The deletion method / strategy.',
+                'enum' => ['keep', 'wipe', 'delete'],
+                'default' => 'delete',
+            ]
+        ], 'in');
+        $out = $this->schema([], 'out');
+
+        $query = $in->validate($query);
+        
         $this->permission('Garden.Users.Delete');
 
         $in = $this->idParamSchema()->setDescription('Delete a user.');
         $out = $this->schema([], 'out');
 
         $this->userByID($id);
-        $this->userModel->deleteID($id);
+        $this->userModel->deleteID($id, ['DeleteMethod' => $query['deleteMethod']]);
     }
 
     /**

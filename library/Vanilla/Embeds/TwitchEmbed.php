@@ -32,8 +32,7 @@ class TwitchEmbed extends VideoEmbed {
     /**
      * @inheritdoc
      */
-    public function matchUrl(string $url)
-    {
+    public function matchUrl(string $url) {
         $data = [];
         $oembedData =[];
         $videoID = $this->getUrlInformation($url);
@@ -49,15 +48,14 @@ class TwitchEmbed extends VideoEmbed {
             }
         }
 
-            $queryInfo = $this->getQueryInformation($url) ?? '';
-            $embedUrl = $this->getEmbedUrl($videoID, $queryInfo);
-            if (!$embedUrl) {
-                    throw new Exception('Unable to find Twitch Post', 400);
-            }
-
-            $data['attributes'] = $data['attributes'] ?? [];
-            $data['attributes']['videoID'] = $videoID;
-            $data['attributes']['embedUrl'] = $embedUrl;
+        $queryInfo = $this->getQueryInformation($url) ?? '';
+        $embedUrl = $this->getEmbedUrl($videoID, $queryInfo);
+        if (!$embedUrl) {
+            throw new Exception('Unable to find Twitch Post', 400);
+        }
+        $data['attributes'] = $data['attributes'] ?? [];
+        $data['attributes']['videoID'] = $videoID;
+        $data['attributes']['embedUrl'] = $embedUrl;
 
         return $data;
     }
@@ -85,6 +83,7 @@ class TwitchEmbed extends VideoEmbed {
      * Assigns the link type and retrieves the video id.
      *
      * @param string $url The posted url.
+     *
      * @return string $videoID The id of the posted media.
      */
     public function getUrlInformation(string $url): string {
@@ -117,6 +116,7 @@ class TwitchEmbed extends VideoEmbed {
      * Gets any query string attached to link.
      *
      * @param  string $url The posted url.
+     *
      * @return array $query The query parameters of the posted url.
      */
     private function getQueryInformation(string $url): array {
@@ -133,6 +133,7 @@ class TwitchEmbed extends VideoEmbed {
      *
      * @param string $videoID The id of the posted media.
      * @param array $queryInfo The query parameters of the posted url.
+     *
      * @return string $embedUrl The url used to generate the embed.
      */
     private function getEmbedUrl($videoID, $queryInfo = null): string {
@@ -145,10 +146,10 @@ class TwitchEmbed extends VideoEmbed {
                 $t = $this->filterQueryTime($queryInfo['t']);
             }
             if (array_key_exists('autoplay', $queryInfo)) {
-                $autoplay = $this->filtersBool($queryInfo['autoplay']);
+                $autoplay = $this->filtersBooleanString($queryInfo['autoplay']);
             }
             if (array_key_exists('muted', $queryInfo)) {
-                $muted = $this->filtersBool($queryInfo['muted']);
+                $muted = $this->filtersBooleanString($queryInfo['muted']);
             }
         }
 
@@ -183,6 +184,7 @@ class TwitchEmbed extends VideoEmbed {
      * Filters the time parameter of the query string to ensure the time is valid.
      *
      * @param string $time The time parameter from the query string.
+     *
      * @return string $validTime The filtered time string.
      */
     private function filterQueryTime($time): string {
@@ -195,10 +197,12 @@ class TwitchEmbed extends VideoEmbed {
 
     /**
      * Filters a query parameter to ensure it's true or false.
+     *
      * @param string $param Parameter from a query string.
+     *
      * @return string $param A filter parameter.
      */
-    public function filtersBool($param): string {
+    public function filtersBooleanString($param): string {
         $param = ($param === "true") ? $param : "false";
         return $param;
     }

@@ -39,7 +39,6 @@ export default class EmbedInsertionModule extends Module {
             loaderData: {
                 type: "link",
                 link: url,
-                loadedCount: 0,
             },
             dataPromise: scrapePromise,
         });
@@ -52,6 +51,7 @@ export default class EmbedInsertionModule extends Module {
         const externalEmbed = Parchment.create("embed-external", embedValue) as ExternalEmbedBlot;
         const [currentLine] = this.quill.getLine(this.lastSelection.index);
         const referenceBlot = currentLine.split(this.lastSelection.index);
+        this.quill.update(Quill.sources.SILENT);
         const newSelection = {
             index: this.lastSelection.index + 2,
             length: 0,
@@ -105,7 +105,7 @@ export default class EmbedInsertionModule extends Module {
         const image = getPastedImage(event);
         if (image) {
             const imagePromise = uploadImage(image);
-            this.createEmbed({ loaderData: { type: "image", loadedCount: 0 }, dataPromise: imagePromise });
+            this.createEmbed({ loaderData: { type: "image" }, dataPromise: imagePromise });
         }
     };
 
@@ -113,7 +113,7 @@ export default class EmbedInsertionModule extends Module {
         const image = getDraggedImage(event);
         if (image) {
             const imagePromise = uploadImage(image);
-            this.createEmbed({ loaderData: { type: "image", loadedCount: 0 }, dataPromise: imagePromise });
+            this.createEmbed({ loaderData: { type: "image" }, dataPromise: imagePromise });
         }
     };
 

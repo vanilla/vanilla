@@ -346,6 +346,7 @@ declare module "quill/modules/keyboard" {
         metaKey?: boolean;
         ctrlKey?: boolean;
         altKey?: boolean;
+        shortKey?: boolean;
     }
 
     type Formats =

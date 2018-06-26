@@ -33,15 +33,19 @@ export default class LoadingBlot extends FocusableEmbedBlot {
     }
 
     public static value(element: Element): IEmbedValue {
-        const data = getData(element, this.LOADER_DATA_KEY, null);
+        const storedValue = getData(element, this.LOADER_DATA_KEY, null);
 
-        if (!data) {
+        if (!storedValue) {
             throw new Error("A loading blot should have data set");
         }
 
-        data.skipSetup = true;
-
-        return data;
+        return {
+            ...storedValue,
+            loaderData: {
+                ...storedValue.loaderData,
+                skipSetup: storedValue.dataPromise ? true : false,
+            },
+        };
     }
 
     protected static readonly LOADER_DATA_KEY = "loadingDataKey";

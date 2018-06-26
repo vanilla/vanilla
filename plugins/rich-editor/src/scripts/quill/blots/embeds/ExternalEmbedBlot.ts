@@ -18,7 +18,7 @@ const DATA_KEY = "__embed-data__";
 interface ILoaderData {
     type: "image" | "link";
     link?: string;
-    loadedCount: number;
+    skipSetup?: boolean;
 }
 
 interface IEmbedUnloadedValue {
@@ -40,7 +40,6 @@ export default class ExternalEmbedBlot extends FocusableEmbedBlot {
     public static readonly LOADING_VALUE = { loading: true };
 
     public static create(value: IEmbedValue): HTMLElement {
-        console.error("Creating with value", value);
         const node = LoadingBlot.create(value);
         // value.loaderData.loadedCount++;
         return node;
@@ -82,9 +81,7 @@ export default class ExternalEmbedBlot extends FocusableEmbedBlot {
 
     constructor(domNode, value: IEmbedValue, needsSetup = true) {
         super(domNode);
-        console.error("Constructing with value", value);
-        if (!needsSetup || value.loaderData.loadedCount > 1) {
-            console.log("Skipping");
+        if (!needsSetup || value.loaderData.skipSetup) {
             return;
         }
 
@@ -109,8 +106,11 @@ export default class ExternalEmbedBlot extends FocusableEmbedBlot {
             }
             const embedNode = await ExternalEmbedBlot.createEmbedNode(data);
             const newValue: IEmbedValue = {
-                loaderData: value.loaderData,
                 data,
+                loaderData: {
+                    ...value.loaderData,
+                    skipSetup: false,
+                },
             };
 
             setData(embedNode, DATA_KEY, newValue);

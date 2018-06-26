@@ -43,7 +43,7 @@ export default class LoadingBlot extends FocusableEmbedBlot {
             ...storedValue,
             loaderData: {
                 ...storedValue.loaderData,
-                skipSetup: storedValue.dataPromise ? true : false,
+                loaded: false,
             },
         };
     }

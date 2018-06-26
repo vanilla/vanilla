@@ -18,7 +18,7 @@ const DATA_KEY = "__embed-data__";
 interface ILoaderData {
     type: "image" | "link";
     link?: string;
-    skipSetup?: boolean;
+    loaded?: boolean;
 }
 
 interface IEmbedUnloadedValue {
@@ -81,7 +81,7 @@ export default class ExternalEmbedBlot extends FocusableEmbedBlot {
 
     constructor(domNode, value: IEmbedValue, needsSetup = true) {
         super(domNode);
-        if (!needsSetup || value.loaderData.skipSetup) {
+        if (!needsSetup) {
             return;
         }
 
@@ -109,7 +109,7 @@ export default class ExternalEmbedBlot extends FocusableEmbedBlot {
                 data,
                 loaderData: {
                     ...value.loaderData,
-                    skipSetup: false,
+                    loaded: true,
                 },
             };
 

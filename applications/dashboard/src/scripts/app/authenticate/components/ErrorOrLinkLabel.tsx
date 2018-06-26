@@ -10,7 +10,7 @@ import classNames from "classnames";
 
 interface IProps {
     id: string;
-    error: string;
+    error: string[];
     className: string;
     linkOnClick: any;
     linkText: string;
@@ -24,7 +24,7 @@ export default class ErrorOrLinkLabel extends React.Component<IProps> {
 
             return (
                 <div id={this.props.id} className={componentClasses}>
-                    <span className="errorOrLinkLabel-message">{this.props.error}</span>
+                    <span className="errorOrLinkLabel-message">{this.props.error.join("")}</span>
                     <a href="#" tabIndex={0} onClick={this.props.linkOnClick} className="errorOrLinkLabel-link">
                         {this.props.linkText}
                     </a>

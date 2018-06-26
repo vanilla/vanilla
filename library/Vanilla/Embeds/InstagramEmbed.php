@@ -50,7 +50,7 @@ class InstagramEmbed extends Embed {
         $dataInstgrmVersion = htmlspecialchars($instgramVersion);
 
         $result = <<<HTML
-<div class="externalEmbed embedInstagram">
+<div class="js-embed externalEmbed embedInstagram">
     <blockquote class="instagram-media" data-instgrm-captioned data-instgrm-permalink="{$dataInstgrmPermalink}" data-instgrm-version="{$dataInstgrmVersion}"/>
 </div>
 HTML;

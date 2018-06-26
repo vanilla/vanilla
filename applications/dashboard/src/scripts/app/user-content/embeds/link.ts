@@ -20,8 +20,6 @@ window.addEventListener("resize", () => debounce(truncateEmbedLinks, 200)());
  * Render a a link embed.
  */
 export async function renderLinkEmbed(node: HTMLElement, data: IEmbedData) {
-    node.classList.add("embed-link");
-    node.classList.add("embedLink");
     node.setAttribute("href", data.url);
 
     node.setAttribute("target", "_blank");

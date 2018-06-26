@@ -51,17 +51,12 @@ export default class ConnectPage extends React.Component<IProps, IState> {
 
     public render() {
         const stepClasses = classNames("authenticateConnect", "authenticateConnect-" + this.state.step);
-
         const linkUser = get(this, "state.linkUser", {});
-
         let pageTitle;
         const content: JSX.Element[] = [];
 
-        log(t("Rendering Connect Page: "));
-
         switch (get(this, "state.step", "unhandled_error")) {
             case "linkUser":
-                log(t("ConnectPage - link user: "), this.state);
                 pageTitle = t("Your %s Account").replace("%s", linkUser.authenticator.name);
 
                 content.push(

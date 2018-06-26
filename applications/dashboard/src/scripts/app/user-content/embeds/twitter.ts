@@ -70,15 +70,15 @@ export async function renderTweet(element: Element, data: IEmbedData) {
 
         // Render the embed.
         const options = { conversation: "none" };
-        await window.twttr.widgets.createTweet(data.attributes.statusID, element, options);
+        window.twttr.widgets.createTweet(data.attributes.statusID, element, options).then(() => {
+            // Remove a url if there is one around.
+            const url = element.querySelector(".tweet-url");
+            if (url) {
+                url.remove();
+            }
 
-        // Remove a url if there is one around.
-        const url = element.querySelector(".tweet-url");
-        if (url) {
-            url.remove();
-        }
-
-        // Fade it in.
-        element.classList.add("twitter-card-loaded");
+            // Fade it in.
+            element.classList.add("twitter-card-loaded");
+        });
     }
 }

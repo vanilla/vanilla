@@ -70,10 +70,7 @@ export default class LoadingBlot extends FocusableEmbedBlot {
         div.classList.add("embedLinkLoader");
 
         const sanitizedText = escapeHTML(text);
-        div.innerHTML = `
-            <a href="#" class="embedLinkLoader-link ${FOCUS_CLASS}">${sanitizedText}</a>
-            <div class='embedLoader-loader'></div>
-        `;
+        div.innerHTML = `<a href="#" class="embedLinkLoader-link ${FOCUS_CLASS}">${sanitizedText}&nbsp;<span aria-hidden="true" class='embedLinkLoader-loader'></span></a>`;
         return div;
     }
 }

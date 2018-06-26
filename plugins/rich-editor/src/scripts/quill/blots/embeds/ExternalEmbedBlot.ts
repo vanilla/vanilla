@@ -33,7 +33,7 @@ interface IEmbedLoadedValue {
 }
 
 const WARNING_HTML = title => `
-<svg class="resolved2-unresolved" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16">
+<svg class="embedLinkLoader-failIcon" title="${title}" aria-label="${title}" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16">
     <title>${title}</title>
     <circle cx="8" cy="8" r="8" style="fill: #f5af15"/>
     <circle cx="8" cy="8" r="7.5" style="fill: none;stroke: #000;stroke-opacity: 0.122"/>
@@ -100,10 +100,9 @@ export default class ExternalEmbedBlot extends FocusableEmbedBlot {
 
         // In the future this message should point to a knowledge base article.
         const warningTitle = t("This embed could not be loaded in your browser.");
-        div.innerHTML = `
-            <a href="#" class="embedLinkLoader-link">${sanitizedText}</a>
-            <div class='embedLinkLoader-icon'>${WARNING_HTML(warningTitle)}</div>
-        `;
+        div.innerHTML = `<a href="#" class="embedLinkLoader-link">${sanitizedText}&nbsp;${WARNING_HTML(
+            warningTitle,
+        )}</a>`;
         return div;
     }
 

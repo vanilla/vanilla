@@ -12,6 +12,7 @@ use Vanilla\Embeds\GettyEmbed;
 use Vanilla\Embeds\GiphyEmbed;
 use Vanilla\Embeds\ImgurEmbed;
 use Vanilla\Embeds\SoundCloudEmbed;
+use Vanilla\Embeds\TwitchEmbed;
 use VanillaTests\SharedBootstrapTestCase;
 use Vanilla\Embeds\EmbedManager;
 use Vanilla\Embeds\InstagramEmbed;
@@ -26,6 +27,17 @@ use VanillaTests\Fixtures\NullCache;
 class EmbedManagerTest extends SharedBootstrapTestCase {
 
     /**
+     * @var string $svgHTML HTML for svg tag
+     */
+    private $svgHTML =
+        '<svg class="embedVideo-playIcon" xmlns="http://www.w3.org/2000/svg" viewBox="-1 -1 24 24">
+                <title>Play Video</title>
+                <path class="embedVideo-playIconPath embedVideo-playIconPath-circle" style="fill: currentColor; stroke-width: .3;" d="M11,0A11,11,0,1,0,22,11,11,11,0,0,0,11,0Zm0,20.308A9.308,9.308,0,1,1,20.308,11,9.308,9.308,0,0,1,11,20.308Z"></path>
+                <polygon class="embedVideo-playIconPath embedVideo-playIconPath-triangle" style="fill: currentColor; stroke-width: .3;" points="8.609 6.696 8.609 15.304 16.261 11 8.609 6.696"></polygon>
+            </svg>';
+
+    /**
+     *
      * Create a new EmbedManager instance.
      *
      * @return EmbedManager
@@ -39,6 +51,7 @@ class EmbedManagerTest extends SharedBootstrapTestCase {
             ->addEmbed(new InstagramEmbed())
             ->addEmbed(new ImgurEmbed())
             ->addEmbed(new SoundCloudEmbed())
+            ->addEmbed(new TwitchEmbed())
             ->addEmbed(new GettyEmbed())
             ->addEmbed(new GiphyEmbed())
             ->addEmbed(new ImageEmbed(), EmbedManager::PRIORITY_LOW)
@@ -191,6 +204,28 @@ class EmbedManagerTest extends SharedBootstrapTestCase {
             ],
             [
                 [
+                    "url" => "https://www.twitch.tv/videos/276279462",
+                    "type" => "twitch",
+                    "name" => "20k Fortnite Friday Duos with @hysteria | 2 MINUTE STREAM DELAY",
+                    "body" => null,
+                    "photoUrl" => "https://static-cdn.jtvnw.net/s3_vods/8a24223c5b12ff7427a8_ninja_29190875424_893099877/thumb/thumb0-640x360.jpg",
+                    "height" => 281,
+                    "width" => 500,
+                    "attributes" => [
+                        "videoID" => "276279462",
+                        "embedUrl" => "https://player.twitch.tv/?video=v276279462",
+                    ],
+                ],
+'<div class="embed-video embed embedVideo">
+    <div class="embedVideo-ratio" style="padding-top: 56.2%;">
+        <button type="button" data-url="https://player.twitch.tv/?video=v276279462" aria-label="20k Fortnite Friday Duos with @hysteria | 2 MINUTE STREAM DELAY" class="embedVideo-playButton iconButton js-playVideo" style="background-image: url(https://static-cdn.jtvnw.net/s3_vods/8a24223c5b12ff7427a8_ninja_29190875424_893099877/thumb/thumb0-640x360.jpg);" title="20k Fortnite Friday Duos with @hysteria | 2 MINUTE STREAM DELAY">
+            '.$this->svgHTML.'
+        </button>
+    </div>
+</div>'
+           ],
+            [
+                [
                     "url" => "https://giphy.com/gifs/super-smash-bros-ultimate-jwSlQZnsymUW49NC3R",
                     "type" => "giphy",
                     "name" => null,
@@ -241,11 +276,7 @@ class EmbedManagerTest extends SharedBootstrapTestCase {
                 '<div class="embed-video embed embedVideo">
     <div class="embedVideo-ratio is16by9" style="">
         <button type="button" data-url="https://www.youtube.com/embed/9bZkp7q19f0?feature=oembed&amp;autoplay=1" aria-label="YouTube" class="embedVideo-playButton iconButton js-playVideo" style="background-image: url(https://img.youtube.com/vi/9bZkp7q19f0/0.jpg);" title="YouTube">
-            <svg class="embedVideo-playIcon" xmlns="http://www.w3.org/2000/svg" viewBox="-1 -1 24 24">
-                <title>Play Video</title>
-                <path class="embedVideo-playIconPath embedVideo-playIconPath-circle" style="fill: currentColor; stroke-width: .3;" d="M11,0A11,11,0,1,0,22,11,11,11,0,0,0,11,0Zm0,20.308A9.308,9.308,0,1,1,20.308,11,9.308,9.308,0,0,1,11,20.308Z"></path>
-                <polygon class="embedVideo-playIconPath embedVideo-playIconPath-triangle" style="fill: currentColor; stroke-width: .3;" points="8.609 6.696 8.609 15.304 16.261 11 8.609 6.696"></polygon>
-            </svg>
+            '.$this->svgHTML.'
         </button>
     </div>
 </div>'
@@ -269,11 +300,7 @@ class EmbedManagerTest extends SharedBootstrapTestCase {
                 '<div class="embed-video embed embedVideo">
     <div class="embedVideo-ratio" style="padding-top: 42.5%;">
         <button type="button" data-url="https://player.vimeo.com/video/264197456?autoplay=1" aria-label="Vimeo" class="embedVideo-playButton iconButton js-playVideo" style="background-image: url(https://i.vimeocdn.com/video/694532899_640.jpg);" title="Vimeo">
-            <svg class="embedVideo-playIcon" xmlns="http://www.w3.org/2000/svg" viewBox="-1 -1 24 24">
-                <title>Play Video</title>
-                <path class="embedVideo-playIconPath embedVideo-playIconPath-circle" style="fill: currentColor; stroke-width: .3;" d="M11,0A11,11,0,1,0,22,11,11,11,0,0,0,11,0Zm0,20.308A9.308,9.308,0,1,1,20.308,11,9.308,9.308,0,0,1,11,20.308Z"></path>
-                <polygon class="embedVideo-playIconPath embedVideo-playIconPath-triangle" style="fill: currentColor; stroke-width: .3;" points="8.609 6.696 8.609 15.304 16.261 11 8.609 6.696"></polygon>
-            </svg>
+            '.$this->svgHTML.'
         </button>
     </div>
 </div>'

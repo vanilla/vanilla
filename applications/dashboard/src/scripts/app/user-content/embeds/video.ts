@@ -11,6 +11,7 @@ import { delegateEvent } from "@dashboard/dom";
 // Register the various video embeds.
 registerEmbed("youtube", videoRenderer);
 registerEmbed("vimeo", videoRenderer);
+registerEmbed("twitch", videoRenderer);
 
 // Setup the click handler for all videos in the page.
 delegateEvent("click", ".js-playVideo", handlePlayVideo);

@@ -19,6 +19,7 @@ use Vanilla\Exception\PermissionException;
 use Vanilla\InjectableInterface;
 use Vanilla\UploadedFile;
 use Vanilla\Utility\ModelUtils;
+use Vanilla\VanillaValidation;
 
 /**
  * The controller base class.
@@ -126,6 +127,7 @@ abstract class Controller implements InjectableInterface {
         } elseif ($schema instanceof Schema) {
             $schema = clone $schema;
         }
+        $schema->setValidationClass(VanillaValidation::class);
 
         // Fire an event for schema modification.
         if (!empty($id)) {

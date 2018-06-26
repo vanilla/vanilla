@@ -1,0 +1,117 @@
+$embedded-linkTitle_fontSize: $global-medium_fontSize !default;
+$embedded-linkTitle_lineHeight: $global-base_lineHeight !default;
+$embedded-linkImage_width: 225px !default;
+$embedded-linkImage_mobileHeight: 52.5% !default;
+$embedded-linkImage_mobileWidth: 100px !default;
+
+
+.embedLink {
+    display: block;
+    background: #ffffff;
+    box-shadow: 0 1px 3px 0 rgba(0,0,0,0.3);
+
+    &,
+    &:hover,
+    &:focus
+    {
+        color: inherit;
+        text-decoration: none !important;
+    }
+}
+
+.embedLink-body {
+    display: block;
+    position: relative;
+    overflow: hidden;
+}
+
+.embedLink-main {
+    padding: 18px;
+    box-sizing: border-box;
+
+}
+
+.embedLink-image {
+    position: absolute;
+    top: 0;
+    left: 0;
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-position: 50% 50%;
+    width: $embedded-linkImage_width;
+    height: 100%;
+
+    + .embedLink-main {
+        margin-left: auto;
+        width: calc(100% - #{$embedded-linkImage_width});
+    }
+
+    @include mediaQuery-richEditor_embed {
+        position: relative;
+        width: 100%;
+        padding-top: $embedded-linkImage_mobileHeight;
+
+
+        + .embedLink-main {
+            width: 100%;
+        }
+    }
+}
+
+
+.embedLink-header {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: flex-start;
+    font-size: $embedded-linkTitle_fontSize;
+    line-height: $embedded-linkTitle_lineHeight;
+    margin-bottom: $utility-baseUnit;
+}
+
+.embedLink-userName {
+    margin: 0 0 0 12px;
+    padding: 0;
+    color: #555A62;
+    font-weight: $embedded-fontWeight_bold;
+}
+
+.embedLink-dateTime {
+    font-size: .8em;
+    margin: 0 0 0 12px;
+    padding: 0;
+    color: #737373;
+}
+
+.embedLink-title {
+    display: block;
+    width: 100%;
+    margin: 0;
+    padding: 0;
+    font-size: $embedded-linkTitle_fontSize;
+    line-height: $embedded-linkTitle_lineHeight;
+    font-weight: $embedded-fontWeight_bold;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.embedLink-source {
+    font-size: #{$embedded-linkTitle_fontSize * .86};
+    color: rgba(85,90,98,0.72);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    margin: 0;
+}
+
+.embedLink-excerpt {
+    font-size: $embedded-linkTitle_fontSize;
+    color: #555A62;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    word-break: break-word;
+    max-width: 100%;
+    line-height: $embedded-linkTitle_lineHeight;
+    max-height: #{$embedded-linkTitle_lineHeight * $embedded-linkTitle_fontSize * 3};
+}

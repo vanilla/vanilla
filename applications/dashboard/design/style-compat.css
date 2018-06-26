@@ -1,4 +1,26 @@
 @charset "UTF-8";
+/* -------------------------------------------------------------- *    Utility Variables
+\* -------------------------------------------------------------- */
+/* -------------------------------------------------------------- *    Globals
+\* -------------------------------------------------------------- */
+/* -------------------------------------------------------------- *    Password Strength Colors
+\* -------------------------------------------------------------- */
+/* -------------------------------------------------------------- *    Third Party Colors
+\* -------------------------------------------------------------- */
+/* -------------------------------------------------------------- *    Typography
+\* -------------------------------------------------------------- */
+/* -------------------------------------------------------------- *    Animation
+\* -------------------------------------------------------------- */
+/* -------------------------------------------------------------- *    Icons
+\* -------------------------------------------------------------- */
+/* -------------------------------------------------------------- *    Layout
+\* -------------------------------------------------------------- */
+/* -------------------------------------------------------------- *    Components
+\* -------------------------------------------------------------- */
+/* -------------------------------------------------------------- *    Form Elements
+\* -------------------------------------------------------------- */
+/* -------------------------------------------------------------- *    Buttons
+\* -------------------------------------------------------------- */
 /* ------------------------------- *    Third Party Colors
 \* ------------------------------- */
 em {
@@ -90,8 +112,8 @@ button.Close {
 }
 
 .authenticateUserCol .iconLarge {
-  width: 42px;
-  height: 42px;
+  width: 32px;
+  height: 32px;
 }
 
 .authenticateUser-photoCrop,
@@ -1699,6 +1721,217 @@ body.isMobile .FormWrapper {
           user-select: none;
 }
 
+.externalEmbed {
+  display: block;
+  -webkit-user-select: none;
+     -moz-user-select: none;
+      -ms-user-select: none;
+          user-select: none;
+}
+
+.embed-focusableElement {
+  -webkit-transition: 0.2s ease box-shadow;
+          transition: 0.2s ease box-shadow;
+  cursor: pointer;
+}
+
+.embed-focusableElement.embed-twitter {
+  border-radius: 4px;
+}
+
+.embed-focusableElement:hover {
+  box-shadow: 0 0 0 2px rgba(2, 145, 219, 0.5);
+}
+
+.embed-focusableElement:focus {
+  box-shadow: 0 0 0 2px #0291db;
+}
+
+.userContent .embedLink-title {
+  margin: 0;
+}
+
+.userContent .embedLink-title:not(:last-child) {
+  margin: 0 0 6px;
+}
+
+.embed {
+  white-space: normal;
+}
+
+.embedImage {
+  display: block;
+  width: 640px;
+  max-width: 100%;
+  margin: auto;
+}
+
+.embedExternal-content.embedVideo {
+  position: relative;
+  display: block;
+  width: 640px;
+  max-width: 100%;
+  margin: auto;
+}
+
+.embedExternal-content.embedVideo .embedVideo-iframe {
+  position: absolute;
+  display: block;
+  top: 0;
+  left: 0;
+  height: 100%;
+  width: 100%;
+}
+
+.embedExternal-content.embedVideo:focus .embedVideo-playIcon, .embedExternal-content.embedVideo:hover .embedVideo-playIcon {
+  -webkit-transform: scale(1.1);
+      -ms-transform: scale(1.1);
+          transform: scale(1.1);
+}
+
+.embedVideo-ratio {
+  position: relative;
+  display: block;
+  background-color: #000000;
+  margin: 0;
+  width: 100%;
+  padding-left: 0;
+  padding-right: 0;
+  padding-bottom: 0;
+}
+
+.embedVideo-ratio.is21by9 {
+  padding-top: 42.8571428571%;
+}
+
+.embedVideo-ratio.is16by9 {
+  padding-top: 56.25%;
+}
+
+.embedVideo-ratio.is4by3 {
+  padding-top: 75%;
+}
+
+.embedVideo-ratio.is1by1 {
+  padding-top: 100%;
+}
+
+.embedVideo-playButton {
+  position: absolute;
+  display: block;
+  top: 0;
+  left: 0;
+  height: 100%;
+  width: 100%;
+  background-size: cover;
+  background-repeat: no-repeat;
+  background-position: center;
+  cursor: pointer;
+  overflow: hidden;
+}
+
+.embedVideo-playButton::before {
+  content: "";
+  display: block;
+  position: absolute;
+  display: block;
+  top: 0;
+  left: 0;
+  height: 100%;
+  width: 100%;
+  background: -webkit-linear-gradient(top, rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.4));
+  background: linear-gradient(to bottom, rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.4));
+}
+
+.embedVideo-playIcon {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  margin: auto;
+  width: 80px;
+  height: 80px;
+  color: white;
+}
+
+.embedVideo-playIconPath {
+  stroke: rgba(0, 0, 0, 0.1);
+}
+
+.embedGiphy {
+  position: relative;
+  display: block;
+  max-width: 100%;
+  margin: auto;
+}
+
+.embedGiphy .embedGiphy-iframe {
+  position: absolute;
+  display: block;
+  top: 0;
+  left: 0;
+  height: 100%;
+  width: 100%;
+}
+
+.embedExternal {
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-pack: center;
+  -webkit-justify-content: center;
+      -ms-flex-pack: center;
+          justify-content: center;
+  -webkit-box-align: center;
+  -webkit-align-items: center;
+      -ms-flex-align: center;
+          align-items: center;
+}
+
+.embedExternal-content {
+  display: inline-block;
+  max-width: 100%;
+  overflow: hidden;
+  -webkit-user-select: none;
+     -moz-user-select: none;
+      -ms-user-select: none;
+          user-select: none;
+}
+
+.embedExternal-content > * {
+  margin: auto !important;
+}
+
+.embedExternal-ratio {
+  position: relative;
+  display: block;
+  margin: 0;
+  width: 100%;
+  padding-left: 0;
+  padding-right: 0;
+  padding-bottom: 0;
+}
+
+.embedGiphy-iframe {
+  position: absolute;
+  display: block;
+  top: 0;
+  left: 0;
+  height: 100%;
+  width: 100%;
+}
+
+.twitter-tweet {
+  margin: 0 !important;
+}
+
+.richEditor .twitter-tweet,
+.richEditor iframe {
+  pointer-events: none;
+}
+
 .embed {
   display: block;
   -webkit-user-select: none;
@@ -2006,10 +2239,6 @@ body.isMobile .FormWrapper {
   width: 100% !important;
 }
 
-.embedExternal-content.embed-soundcloud {
-  width: 640px;
-}
-
 .embedExternal {
   display: -webkit-box;
   display: -webkit-flex;
@@ -2183,6 +2412,137 @@ body.isMobile .FormWrapper {
   max-width: 100%;
   line-height: 1.5;
   max-height: 63px;
+}
+
+.embedLink {
+  display: block;
+  background: #ffffff;
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.3);
+}
+
+.embedLink, .embedLink:hover, .embedLink:focus {
+  color: inherit;
+  text-decoration: none !important;
+}
+
+.embedLink-body {
+  display: block;
+  position: relative;
+  overflow: hidden;
+}
+
+.embedLink-main {
+  padding: 18px;
+  box-sizing: border-box;
+}
+
+.embedLink-image {
+  position: absolute;
+  top: 0;
+  left: 0;
+  background-size: cover;
+  background-repeat: no-repeat;
+  background-position: 50% 50%;
+  width: 225px;
+  height: 100%;
+}
+
+.embedLink-image + .embedLink-main {
+  margin-left: auto;
+  width: -webkit-calc(100% - 225px);
+  width: calc(100% - 225px);
+}
+
+@media (max-width: 550px) {
+  .embedLink-image {
+    position: relative;
+    width: 100%;
+    padding-top: 52.5%;
+  }
+  .embedLink-image + .embedLink-main {
+    width: 100%;
+  }
+}
+
+.embedLink-header {
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-flex-wrap: wrap;
+      -ms-flex-wrap: wrap;
+          flex-wrap: wrap;
+  -webkit-box-align: center;
+  -webkit-align-items: center;
+      -ms-flex-align: center;
+          align-items: center;
+  -webkit-box-pack: start;
+  -webkit-justify-content: flex-start;
+      -ms-flex-pack: start;
+          justify-content: flex-start;
+  font-size: 14px;
+  line-height: 1.5;
+  margin-bottom: 6px;
+}
+
+.embedLink-userName {
+  margin: 0 0 0 12px;
+  padding: 0;
+  color: #555A62;
+  font-weight: bold;
+}
+
+.embedLink-dateTime {
+  font-size: .8em;
+  margin: 0 0 0 12px;
+  padding: 0;
+  color: #737373;
+}
+
+.embedLink-title {
+  display: block;
+  width: 100%;
+  margin: 0;
+  padding: 0;
+  font-size: 14px;
+  line-height: 1.5;
+  font-weight: bold;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.embedLink-source {
+  font-size: 12.04px;
+  color: rgba(85, 90, 98, 0.72);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  margin: 0;
+}
+
+.embedLink-excerpt {
+  font-size: 14px;
+  color: #555A62;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  word-break: break-word;
+  max-width: 100%;
+  line-height: 1.5;
+  max-height: 63px;
+}
+
+.embedExternal-content.embed-soundcloud {
+  width: 640px;
+}
+
+.embedExternal-content.embed-instagram {
+  width: 640px;
+}
+
+.instagram-media {
+  margin-bottom: 0 !important;
+  width: 100% !important;
 }
 
 .safeEmoji {

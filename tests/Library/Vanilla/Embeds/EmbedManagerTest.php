@@ -160,7 +160,7 @@ class EmbedManagerTest extends SharedBootstrapTestCase {
                         "url" => "https://w.soundcloud.com/player/?url=https://api.soundcloud.com/tracks/"
                     ],
                 ],
-'<div class="embed embedSoundCloud">
+'<div class="externalEmbed embedSoundCloud">
 <iframe width="100%" height="400" scrolling="no" frameborder="no" 
     src="https://w.soundcloud.com/player/?url=https://api.soundcloud.com/tracks/2F174656930&amp;show_artwork=true&amp;visual=true">
 </iframe>

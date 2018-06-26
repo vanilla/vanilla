@@ -1,0 +1,108 @@
+$embedded-error_bg: rgba(255,57,52,0.12) !default;
+$embedded-icon_width: 24px !default;
+$embedded-fontWeight_bold: bold !default;
+
+$embed_width: 640px;
+$embedVideo_width: $embed_width;
+$embedInstagram_width: $embed_width;
+
+$embed-focus-color: $global-color_primary;
+
+.externalEmbed {
+    display: block;
+    user-select: none;
+}
+
+.embed-focusableElement {
+    transition: 0.2s ease box-shadow;
+    cursor: pointer;
+
+    &.embed-twitter {
+        border-radius: 4px;
+    }
+
+    &:hover {
+        box-shadow: 0 0 0 2px rgba($embed-focus-color, 0.5);
+    }
+
+    &:focus {
+        box-shadow: 0 0 0 2px $embed-focus-color;
+    }
+}
+
+.userContent { // Only in edit mode
+    .embedLink-title {
+        margin: 0;
+        &:not(:last-child) {
+            margin: 0 0 $utility-baseUnit;
+        }
+    }
+}
+
+.embed {
+    white-space: normal;
+}
+
+// Image
+
+
+
+
+.embedExternal {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.embedExternal-content {
+    display: inline-block;
+    max-width: 100%;
+    overflow: hidden;
+    user-select: none;
+
+    > * {
+        margin: auto !important;
+    }
+}
+
+.embedExternal-ratio {
+    position: relative;
+    display: block;
+    margin: 0;
+    width: 100%;
+    padding: {
+        left: 0;
+        right: 0;
+        bottom: 0;
+    };
+}
+
+.embedGiphy-iframe {
+    @include absolute-fullSizeOfParent;
+}
+
+.twitter-tweet {
+    margin: 0 !important;
+}
+
+.richEditor .twitter-tweet,
+.richEditor iframe {
+    pointer-events: none;
+}
+
+// Embed link
+
+
+
+
+// Generic
+@import "embedVideo";
+@import "embedImage";
+@import "embedLink";
+
+// Specific
+@import "embedTwitter";
+@import "embedSoundCloud";
+@import "embedInstagram";
+@import "embedGiphy";
+

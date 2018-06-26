@@ -1,0 +1,81 @@
+// Video
+.embedExternal-content.embedVideo {
+    position: relative;
+    display: block;
+    width: $embedVideo_width;
+    max-width: 100%;
+    margin: auto;
+
+    .embedVideo-iframe {
+        @include absolute-fullSizeOfParent;
+    }
+
+    &:focus,
+    &:hover {
+        .embedVideo-playIcon {
+            transform: scale(1.1);
+        }
+    }
+}
+
+.embedVideo-ratio {
+    position: relative;
+    display: block;
+    background-color: #000000;
+    margin: 0;
+    width: 100%;
+    padding: {
+        left: 0;
+        right: 0;
+        bottom: 0;
+    };
+
+    &.is21by9 {
+        padding-top: #{(9/21*100%)};
+    }
+
+    &.is16by9 {
+        padding-top: #{(9/16*100%)};
+    }
+
+    &.is4by3 {
+        padding-top: #{(3/4*100%)};
+    }
+
+    &.is1by1 {
+        padding-top: 100%;
+    }
+}
+
+.embedVideo-playButton {
+    @include absolute-fullSizeOfParent;
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-position: center;
+    cursor: pointer;
+    overflow: hidden;
+
+    &::before {
+        $bg: rgba(#000, 0.4);
+        content: "";
+        display: block;
+        @include absolute-fullSizeOfParent;
+        background: linear-gradient(to bottom, $bg, $bg);
+    }
+}
+
+.embedVideo-playIcon {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    margin: auto;
+    width: $richEditor-videoPlayIcon_width;
+    height: $richEditor-videoPlayIcon_width;
+    color: white;
+}
+
+.embedVideo-playIconPath {
+    stroke: rgba(0, 0, 0, 0.1);
+}

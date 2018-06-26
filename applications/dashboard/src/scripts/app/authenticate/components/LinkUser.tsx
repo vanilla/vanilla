@@ -149,6 +149,7 @@ export default class LinkUser extends React.Component<IProps, IState> {
             errors.forEach((error, index) => {
                 error.timestamp = new Date().getTime(); // Timestamp to make sure state changes, even if the message is the same
                 const genericFieldError = t("This %s is already taken. Enter another %s ");
+                const genericInvalidFieldError = t("This %s is not valid. Enter another %s ");
                 if (error.field === "email") {
                     if (error.code === "The email is taken.") {
                         emailError = genericFieldError.split("%s").join("email");
@@ -159,6 +160,8 @@ export default class LinkUser extends React.Component<IProps, IState> {
                     nameError = error.message;
                     if (error.code === "The username is taken.") {
                         nameError = genericFieldError.split("%s").join("name");
+                    } else if (error.field === "Username is not valid.") {
+                        nameError = genericInvalidFieldError.split("%s").join("name");
                     } else {
                         nameError = error.message;
                     }

@@ -30,7 +30,7 @@ export default class ClipboardModule extends ClipboardBase {
         const scrollTop = document.documentElement.scrollTop || document.body.scrollTop;
         this.container.focus();
         (this.quill as any).selection.update(Quill.sources.SILENT);
-        setTimeout(() => {
+        setImmediate(() => {
             delta = delta.concat((this as any).convert()).delete(range.length);
             this.quill.updateContents(delta, Quill.sources.USER);
             // range.length contributes to delta.length()
@@ -39,6 +39,6 @@ export default class ClipboardModule extends ClipboardBase {
             // THIS IS WHAT IS DIFFERENT
             document.documentElement.scrollTop = document.body.scrollTop = scrollTop;
             this.quill.focus();
-        }, 1);
+        });
     }
 }

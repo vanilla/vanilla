@@ -12,6 +12,7 @@ import ErrorBlot from "./ErrorBlot";
 import { t } from "@dashboard/application";
 import { logError } from "@dashboard/utility";
 import LoadingBlot from "@rich-editor/quill/blots/embeds/LoadingBlot";
+import { Blot } from "quill/core";
 
 const DATA_KEY = "__embed-data__";
 
@@ -23,13 +24,21 @@ interface ILoaderData {
 
 interface IEmbedUnloadedValue {
     loaderData: ILoaderData;
-    data: IEmbedData;
+    dataPromise: Promise<IEmbedData>;
 }
 
 interface IEmbedLoadedValue {
     loaderData: ILoaderData;
-    dataPromise: Promise<IEmbedData>;
+    data: IEmbedData;
 }
+
+const WARNING_HTML = title => `
+<svg class="resolved2-unresolved" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16">
+    <title>${title}</title>
+    <circle cx="8" cy="8" r="8" style="fill: #f5af15"/>
+    <circle cx="8" cy="8" r="7.5" style="fill: none;stroke: #000;stroke-opacity: 0.122"/>
+    <path d="M11,10.4V8h2v2.4L12.8,13H11.3Zm0,4h2v2H11Z" transform="translate(-4 -4)" style="fill: #fff"/>
+</svg>`;
 
 export type IEmbedValue = IEmbedLoadedValue | IEmbedUnloadedValue;
 
@@ -41,7 +50,6 @@ export default class ExternalEmbedBlot extends FocusableEmbedBlot {
 
     public static create(value: IEmbedValue): HTMLElement {
         const node = LoadingBlot.create(value);
-        // value.loaderData.loadedCount++;
         return node;
     }
 
@@ -55,7 +63,10 @@ export default class ExternalEmbedBlot extends FocusableEmbedBlot {
         }
     }
 
-    public static async createEmbedNode(data: IEmbedData) {
+    /**
+     * @throws {Error} If the rendering fails
+     */
+    public static async createSuccessfulEmbedElement(data: IEmbedData): Promise<Element> {
         const rootNode = FocusableEmbedBlot.create(data);
         const embedNode = document.createElement("div");
         const descriptionNode = document.createElement("span");
@@ -75,6 +86,25 @@ export default class ExternalEmbedBlot extends FocusableEmbedBlot {
 
         await renderEmbed(embedNode, data);
         return rootNode;
+    }
+
+    public static createErrorEmbedElement(text: string, message: string) {
+        const div = FocusableEmbedBlot.create();
+        div.classList.remove(FOCUS_CLASS);
+        div.classList.add("embed");
+        div.classList.add("embedLinkLoader");
+        div.classList.add("embedLinkLoader-error");
+        div.classList.add(FOCUS_CLASS);
+
+        const sanitizedText = escapeHTML(text);
+
+        // In the future this message should point to a knowledge base article.
+        const warningTitle = t("This embed could not be loaded in your browser.");
+        div.innerHTML = `
+            <a href="#" class="embedLinkLoader-link">${sanitizedText}</a>
+            <div class='embedLinkLoader-icon'>${WARNING_HTML(warningTitle)}</div>
+        `;
+        return div;
     }
 
     private loadCallback?: () => void;
@@ -97,37 +127,48 @@ export default class ExternalEmbedBlot extends FocusableEmbedBlot {
     public async replaceLoaderWithFinalForm(value: IEmbedValue) {
         let finalBlot: ExternalEmbedBlot | ErrorBlot;
 
-        try {
-            let data: IEmbedData;
-            if ("data" in value) {
-                data = value.data;
-            } else {
+        let data: IEmbedData | null = null;
+        if ("data" in value) {
+            data = value.data;
+        } else {
+            try {
                 data = await value.dataPromise;
+            } catch (e) {
+                logError(e);
+                return this.completeWithBlot(new ErrorBlot(ErrorBlot.create(e)));
             }
-            const embedNode = await ExternalEmbedBlot.createEmbedNode(data);
-            const newValue: IEmbedValue = {
-                data,
-                loaderData: {
-                    ...value.loaderData,
-                    loaded: true,
-                },
-            };
+        }
 
-            setData(embedNode, DATA_KEY, newValue);
-            finalBlot = new ExternalEmbedBlot(embedNode, newValue, false);
+        let embedElement: Element;
+        const newValue: IEmbedValue = {
+            data,
+            loaderData: {
+                ...value.loaderData,
+                loaded: true,
+            },
+        };
+
+        try {
+            embedElement = await ExternalEmbedBlot.createSuccessfulEmbedElement(data);
         } catch (e) {
             logError(e);
-            finalBlot = new ErrorBlot(ErrorBlot.create(e));
+            embedElement = ExternalEmbedBlot.createErrorEmbedElement(data.url, e.message);
         }
 
-        this.replaceWith(finalBlot);
-        if (this.loadCallback) {
-            this.loadCallback();
-            this.loadCallback = undefined;
-        }
+        setData(embedElement, DATA_KEY, newValue);
+        finalBlot = new ExternalEmbedBlot(embedElement, newValue, false);
+        this.completeWithBlot(finalBlot);
     }
 
     public registerLoadCallback(callback: () => void) {
         this.loadCallback = callback;
+    }
+
+    private completeWithBlot(blot: Blot) {
+        this.replaceWith(blot);
+        if (this.loadCallback) {
+            this.loadCallback();
+            this.loadCallback = undefined;
+        }
     }
 }

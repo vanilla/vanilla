@@ -8,7 +8,8 @@ import FocusableEmbedBlot from "../abstract/FocusableEmbedBlot";
 import { FOCUS_CLASS } from "@dashboard/embeds";
 import { escapeHTML, setData, getData } from "@dashboard/dom";
 import { IEmbedValue } from "@rich-editor/quill/blots/embeds/ExternalEmbedBlot";
-import { logError } from "@dashboard/utility";
+
+const LOADER_DATA_KEY = "loadingDataKey";
 
 export default class LoadingBlot extends FocusableEmbedBlot {
     public static blotName = "embed-loading";
@@ -28,12 +29,12 @@ export default class LoadingBlot extends FocusableEmbedBlot {
                 throw new Error("Could not determine loader type for embed blot.");
         }
 
-        setData(node, this.LOADER_DATA_KEY, value);
+        setData(node, LOADER_DATA_KEY, value);
         return node;
     }
 
     public static value(element: Element): IEmbedValue {
-        const storedValue = getData(element, this.LOADER_DATA_KEY, null);
+        const storedValue = getData(element, LOADER_DATA_KEY, null);
 
         if (!storedValue) {
             throw new Error("A loading blot should have data set");
@@ -48,12 +49,9 @@ export default class LoadingBlot extends FocusableEmbedBlot {
         };
     }
 
-    protected static readonly LOADER_DATA_KEY = "loadingDataKey";
-
     private static createImageLoader() {
         const div = super.create();
         div.classList.remove(FOCUS_CLASS);
-        div.setAttribute("data-loader", true);
         div.classList.add("embed");
         div.classList.add("embedLinkLoader");
         div.innerHTML = `<div class='embedLoader'>
@@ -68,10 +66,8 @@ export default class LoadingBlot extends FocusableEmbedBlot {
     private static createLinkLoader(text: string) {
         const div = super.create();
         div.classList.remove(FOCUS_CLASS);
-        div.setAttribute("data-loader", true);
         div.classList.add("embed");
         div.classList.add("embedLinkLoader");
-        div.classList.add("js-linkLoader");
 
         const sanitizedText = escapeHTML(text);
         div.innerHTML = `

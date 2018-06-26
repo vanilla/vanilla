@@ -378,6 +378,7 @@ class MediaTest extends AbstractAPIv2Test {
             ['https://giphy.com/gifs/super-smash-bros-ultimate-jwSlQZnsymUW49NC3R', 'giphy'],
             ['https://gph.is/2sTbvh0', 'giphy'],
             ['https://media.giphy.com/media/2vqIyGV2S3HTGafbKo/giphy.gif', 'giphy'],
+            ['https://vanillaforums-1.wistia.com/medias/vjidqnyg0a', 'wistia'],
         ];
 
         return $urls;

@@ -54,6 +54,7 @@ $Definition['ValidateBanned'] = 'That %s is not allowed.';
 $Definition['ValidateString'] = '%s is not a valid string.';
 $Definition['ValidateUrlStringRelaxed'] = '%s can not contain slashes, quotes or tag characters.';
 $Definition['ValidateUrl'] = 'The %s field is not a valid url.';
+$Definition['Validation Failed'] = 'Please review the errors below.';
 $Definition['ErrorPermission'] = 'Sorry, permission denied.';
 $Definition['InviteErrorPermission'] = 'Sorry, permission denied.';
 $Definition['PermissionRequired.Garden.Moderation.Manage'] = 'You need to be a moderator to do that.';

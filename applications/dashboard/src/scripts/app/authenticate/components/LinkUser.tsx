@@ -16,6 +16,7 @@ import ButtonSubmit from "@dashboard/components/forms/ButtonSubmit";
 import Checkbox from "@dashboard/components/forms/Checkbox";
 import ErrorOrLinkLabel from "@dashboard/app/authenticate/components/ErrorOrLinkLabel";
 import LinkUserSignIn from "./LinkUserSignIn";
+import ErrorMessages from "@dashboard/components/forms/ErrorMessages";
 
 interface IProps {
     step?: string;
@@ -27,10 +28,10 @@ interface IProps {
     rememberMe?: boolean;
     termsOfServiceLabel: string;
     termsOfService?: boolean;
-    termsOfServiceError?: string;
+    termsOfServiceError?: string[];
     globalError?: string;
-    emailError?: string;
-    nameError?: string;
+    emailError?: string[];
+    nameError?: string[];
     password?: string;
     username?: string;
     signInWithField?: string;
@@ -44,12 +45,13 @@ interface IState extends IRequiredComponentID {
     rememberMe: boolean;
     termsOfServiceLabel: string;
     termsOfService: boolean;
-    termsOfServiceError?: string;
-    nameError: string | null;
-    emailError: string | null;
+    termsOfServiceError: string[] | null;
+    nameError: string[] | null;
+    emailError: string[] | null;
     password?: string;
     username?: string;
     signInWithField?: string;
+    termsOfServiceId: string;
 }
 
 export default class LinkUser extends React.Component<IProps, IState> {
@@ -63,7 +65,6 @@ export default class LinkUser extends React.Component<IProps, IState> {
     constructor(props) {
         super(props);
         this.handleSubmit = this.handleSubmit.bind(this);
-        this.handleTextChange = this.handleTextChange.bind(this);
         this.handleTermsOfServiceCheckChange = this.handleTermsOfServiceCheckChange.bind(this);
         this.handleRememberMeCheckChange = this.handleRememberMeCheckChange.bind(this);
         this.handleErrors = this.handleErrors.bind(this);
@@ -78,35 +79,19 @@ export default class LinkUser extends React.Component<IProps, IState> {
             editable: true,
             submitEnabled: false,
             rememberMe: props.rememberMe || false,
-            emailError: props.emailError,
-            nameError: props.nameError,
+            emailError: props.emailError || [],
+            nameError: props.nameError || [],
             globalError: props.globalError,
             step: "register",
             password: props.password,
             username: props.username,
             termsOfServiceLabel: props.termsOfServiceLabel,
             termsOfService: props.termsOfService || false,
-            termsOfServiceError: props.termsOfServiceError,
+            termsOfServiceError: props.termsOfServiceError || [],
             signInWithField: props.signInWithField,
+            termsOfServiceId: getRequiredID(props, "termsOfService"),
         };
     }
-
-    public handleTextChange = event => {
-        const type: string = get(event, "target.type", "");
-        if (type === "email") {
-            // username
-            this.setState({
-                globalError: null,
-                emailError: null,
-            });
-        }
-        if (type === "text") {
-            this.setState({
-                globalError: null,
-                nameError: null,
-            });
-        }
-    };
 
     public handleTermsOfServiceCheckChange = event => {
         this.setState({
@@ -132,56 +117,38 @@ export default class LinkUser extends React.Component<IProps, IState> {
         });
     }
 
-    public handleErrors = e => {
-        const catchAllErrorMessage = t("An error has occurred, please try again.");
-
-        const data = get(e, "response.data", false);
+    public handleErrors = error => {
+        const data = error.response.data || {};
         log("data: ", data);
-
-        let globalError = get(data, "message", false);
-        const errors = get(e, "response.data.errors", []);
+        const globalError = data.message || t("An error has occurred, please try again.");
+        const errors = data.errors || [];
         const hasFieldSpecificErrors = errors.length > 0;
-        let emailError;
-        let nameError;
-        let termsOfServiceError;
+        let emailError: string[] = [];
+        let nameError: string[] = [];
+        let termsOfServiceError: string[] = [];
 
         if (hasFieldSpecificErrors) {
-            errors.forEach((error, index) => {
-                error.timestamp = new Date().getTime(); // Timestamp to make sure state changes, even if the message is the same
-                const genericFieldError = t("This %s is already taken. Enter another %s ");
-                const genericInvalidFieldError = t("This %s is not valid. Enter another %s ");
-                if (error.field === "email") {
-                    if (error.code === "The email is taken.") {
-                        emailError = genericFieldError.split("%s").join("email");
-                    } else {
-                        emailError = error.message;
-                    }
-                } else if (error.field === "name") {
-                    nameError = error.message;
-                    if (error.code === "The username is taken.") {
-                        nameError = genericFieldError.split("%s").join("name");
-                    } else if (error.code === "Username is not valid.") {
-                        nameError = genericInvalidFieldError.split("%s").join("name");
-                    } else {
-                        nameError = error.message;
-                    }
-                } else if (error.field === "agreeToTerms") {
-                    termsOfServiceError = error.message;
+            errors.forEach(fieldError => {
+                fieldError.timestamp = new Date().getTime(); // Timestamp to make sure state changes, even if the message is the same
+                if (fieldError.field === "email") {
+                    emailError = [...emailError, fieldError];
+                } else if (fieldError.field === "name") {
+                    nameError = [...nameError, fieldError];
+                } else if (fieldError.field === "agreeToTerms") {
+                    termsOfServiceError = [...termsOfServiceError, fieldError];
                 } else {
                     // Unhandled error
-                    globalError = catchAllErrorMessage;
-                    log("LinkUserRegister - Unhandled error field", error);
+                    log("LinkUserRegister - Unhandled error field", fieldError);
                 }
             });
         } else {
             // Something went really wrong. Add default message to tell the user there's a problem.
-            logError("LinkUserRegister - Failure to handle errors from response -", e);
-            globalError = catchAllErrorMessage;
+            logError("LinkUserRegister - Failure to handle errors from response -", error);
         }
         this.setErrors(globalError, emailError, nameError, termsOfServiceError);
     };
 
-    public setErrors(globalError, emailError: string, nameError: string, termsOfServiceError: string) {
+    public setErrors(globalError, emailError: string[], nameError: string[], termsOfServiceError: string[]) {
         this.setState(
             {
                 editable: true,
@@ -230,8 +197,8 @@ export default class LinkUser extends React.Component<IProps, IState> {
 
         apiv2
             .post("/authenticate/link-user", formData)
-            .then(e => {
-                const targetUrl = formatUrl(get(e, "response.targetUrl", "/"));
+            .then(response => {
+                const targetUrl = formatUrl(response.data.targetUrl || "/");
                 window.location.href = targetUrl;
             })
             .catch(e => {
@@ -273,13 +240,15 @@ export default class LinkUser extends React.Component<IProps, IState> {
         });
     };
 
+    public errorID(inputId): string {
+        return inputId + "-errors";
+    }
+
     public render() {
         let contents;
 
-        log("Link User step: ", this.state.step);
-
         if (this.state.step === "register") {
-            const linkText = t(" click here to enter your %s.");
+            const linkText = t(" click here to enter your password.");
 
             let emailField; // register step
 
@@ -290,15 +259,8 @@ export default class LinkUser extends React.Component<IProps, IState> {
                     type="email"
                     required={true}
                     disabled={!this.state.editable}
-                    errorComponent={ErrorOrLinkLabel}
-                    errorComponentData={{
-                        errors: this.props.nameError,
-                        linkOnClick: this.setStepToPasswordWithEmail,
-                        linkText: linkText.replace("%s", t("email")),
-                        error: this.state.emailError,
-                    }}
+                    errors={this.state.emailError as string[]}
                     defaultValue={this.props.ssoUser.email}
-                    onChange={this.handleTextChange}
                     ref={email => (this.email = email as InputTextBlock)}
                 />
             );
@@ -319,15 +281,8 @@ export default class LinkUser extends React.Component<IProps, IState> {
                         label={t("Username")}
                         required={true}
                         disabled={!this.state.editable}
-                        errorComponent={ErrorOrLinkLabel}
-                        errorComponentData={{
-                            errors: this.props.nameError,
-                            linkOnClick: this.setStepToPasswordWithUsername,
-                            linkText: linkText.replace("%s", t("password")),
-                            error: this.state.nameError,
-                        }}
+                        errors={this.state.nameError as string}
                         defaultValue={this.props.ssoUser.name}
-                        onChange={this.handleTextChange}
                         ref={name => (this.name = name as InputTextBlock)}
                     />
 
@@ -338,6 +293,7 @@ export default class LinkUser extends React.Component<IProps, IState> {
                             checked={this.state.rememberMe}
                         />
                         <Checkbox
+                            id={this.state.termsOfServiceId}
                             dangerousLabel={this.props.termsOfServiceLabel}
                             onChange={this.handleTermsOfServiceCheckChange}
                             checked={this.state.termsOfService}
@@ -345,10 +301,11 @@ export default class LinkUser extends React.Component<IProps, IState> {
                                 (this.termsOfServiceElement = termsOfServiceElement as Checkbox)
                             }
                         />
-                        <Paragraph
+
+                        <ErrorMessages
+                            id={this.errorID(this.state.termsOfServiceId)}
+                            errors={this.state.termsOfServiceError as string[]}
                             className="authenticateUser-paragraph"
-                            isError={true}
-                            content={this.state.termsOfServiceError}
                         />
                     </div>
                     <ButtonSubmit disabled={!this.state.editable} content={t("Connect")} />
@@ -363,12 +320,12 @@ export default class LinkUser extends React.Component<IProps, IState> {
             }
 
             let userNameLabel = t("Email"); // Fallback to e-mail only
-            if ((this.props.config.noEmail || !this.props.config.emailUnique) && this.props.config.nameUnique) {
+            if (this.props.config.noEmail || (!this.props.config.emailUnique && this.props.config.nameUnique)) {
                 // Only name is unique
                 userNameLabel = t("Username");
             } else if (!this.props.config.noEmail && this.props.config.emailUnique && this.props.config.nameUnique) {
                 // Both email and username are unique
-                userNameLabel = t("Email / Username");
+                userNameLabel = t("Email/Username");
             }
 
             contents = (
@@ -379,7 +336,7 @@ export default class LinkUser extends React.Component<IProps, IState> {
                     username={userName}
                     usernameLabel={userNameLabel}
                     handleBackClick={this.setStepToRegister}
-                    termsOfServiceError={this.state.termsOfServiceError}
+                    termsOfServiceError={this.state.termsOfServiceError as any}
                     termsOfServiceLabel={this.props.termsOfServiceLabel}
                     termsOfService={this.state.termsOfService}
                     handleTermsOfServiceCheckChange={this.setTermsOfServiceCheck}

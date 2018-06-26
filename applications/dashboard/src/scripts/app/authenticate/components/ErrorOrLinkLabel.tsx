@@ -25,7 +25,6 @@ export default class ErrorOrLinkLabel extends React.Component<IProps> {
             return (
                 <div id={this.props.id} className={componentClasses}>
                     <span className="errorOrLinkLabel-message">{this.props.error}</span>
-                    <span className="errorOrLinkLabel-separator">{t("or")}</span>
                     <a href="#" tabIndex={0} onClick={this.props.linkOnClick} className="errorOrLinkLabel-link">
                         {this.props.linkText}
                     </a>

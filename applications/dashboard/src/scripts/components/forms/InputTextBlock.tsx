@@ -27,8 +27,6 @@ export interface IInputTextProps extends IOptionalComponentID {
     errors?: string | string[];
     disabled?: boolean;
     onChange?: any;
-    errorComponent?: any;
-    errorComponentData?: any;
 }
 
 interface IState {
@@ -65,25 +63,6 @@ export default class InputTextBlock extends React.Component<IInputTextProps, ISt
             describedBy = this.errorID;
         }
 
-        let errorComponent: JSX.Element;
-        if (this.props.errorComponent) {
-            errorComponent = (
-                <this.props.errorComponent {...this.props.errorComponentData} id={this.errorID} className={noteClass} />
-            );
-
-            if (this.props.errors && this.props.errors.length > 0) {
-                throw Error("You can't use both 'errorComponent' and 'errors' props together.");
-            }
-        } else {
-            errorComponent = (
-                <ErrorMessages
-                    id={this.errorID}
-                    className={noteClass}
-                    errors={this.props.errors as string | string[]}
-                />
-            );
-        }
-
         return (
             <label className={componentClasses}>
                 <span id={this.labelID} className="inputBlock-labelAndDescription">
@@ -108,7 +87,11 @@ export default class InputTextBlock extends React.Component<IInputTextProps, ISt
                         ref={inputDom => (this.inputDom = inputDom as HTMLInputElement)}
                     />
                 </span>
-                {errorComponent}
+                <ErrorMessages
+                    id={this.errorID}
+                    className={noteClass}
+                    errors={this.props.errors as string | string[]}
+                />
             </label>
         );
     }
@@ -134,7 +117,9 @@ export default class InputTextBlock extends React.Component<IInputTextProps, ISt
     }
 
     private handleInputChange(e) {
-        this.props.onChange(e);
+        if (this.props.onChange) {
+            this.props.onChange(e);
+        }
     }
 
     private get labelID(): string {

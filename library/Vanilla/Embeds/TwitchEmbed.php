@@ -1,7 +1,7 @@
 <?php
 /**
  * @copyright 2009-2018 Vanilla Forums Inc.
- * @license GPL-2.0
+ * @license https://opensource.org/licenses/GPL-2.0 GPL-2.0
  */
 
 namespace Vanilla\Embeds;
@@ -9,7 +9,7 @@ namespace Vanilla\Embeds;
 use Exception;
 
 /**
- * Twitch Embed.
+ * Class for parsing twitch URLs, fetching twitch OEmbed data, and rendering server side HTML for a twitch video embed
  */
 class TwitchEmbed extends VideoEmbed {
 
@@ -20,12 +20,9 @@ class TwitchEmbed extends VideoEmbed {
     /** @inheritdoc */
     protected $domains = ['www.twitch.tv', 'clips.twitch.tv'];
 
-    /*** @var string */
+    /** @var string */
     private $urlType;
 
-    /**
-     * TwitchEmbed constructor.
-     */
     public function __construct()
     {
         parent::__construct('twitch', 'video');
@@ -38,27 +35,30 @@ class TwitchEmbed extends VideoEmbed {
     public function matchUrl(string $url)
     {
         $data = [];
+        $oembedData =[];
+        $videoID = $this->getUrlInformation($url);
+
+        if (!$videoID) {
+            throw new Exception('Unable to find Twitch Post', 400);
+        }
 
         if ($this->isNetworkEnabled()) {
-            $videoID = $this->getUrlInformation($url);
-            if (!$videoID) {
-                throw new Exception('Unable to find Twitch Post', 400);
-            }
-            
             $oembedData = $this->oembed("https://api.twitch.tv/v4/oembed?url=" . urlencode($url));
-            if ($oembedData) {
+            if (!empty($oembedData)) {
                 $data = $this->normalizeOembed($oembedData);
-
-                $queryInfo = $this->getQueryInformation($url) ?? '';
-                $embedUrl = $this->getEmbedUrl($videoID, $queryInfo);
-                if (!$embedUrl) {
-                    throw new Exception('Unable to find Twitch Post', 400);
-                }
-                $data['attributes'] = $data['attributes'] ?: [];
-                $data['attributes']['videoID'] = $videoID;
-                $data['attributes']['embedUrl'] = $embedUrl;
             }
         }
+
+            $queryInfo = $this->getQueryInformation($url) ?? '';
+            $embedUrl = $this->getEmbedUrl($videoID, $queryInfo);
+            if (!$embedUrl) {
+                    throw new Exception('Unable to find Twitch Post', 400);
+            }
+
+            $data['attributes'] = $data['attributes'] ?: [];
+            $data['attributes']['videoID'] = $videoID;
+            $data['attributes']['embedUrl'] = $embedUrl;
+
         return $data;
     }
 
@@ -84,10 +84,10 @@ class TwitchEmbed extends VideoEmbed {
     /**
      * Assigns the link type and retrieves the video id.
      *
-     * @param $url $string
-     * @return string $videoID
+     * @param string $url The posted url.
+     * @return string $videoID The id of the posted media.
      */
-    private function getUrlInformation($url): string {
+    public function getUrlInformation(string $url): string {
 
         $domain = parse_url($url, PHP_URL_HOST);
         $path = parse_url($url, PHP_URL_PATH);
@@ -116,10 +116,10 @@ class TwitchEmbed extends VideoEmbed {
     /**
      * Gets any query string attached to link.
      *
-     * @param  string $url
-     * @return array $query
+     * @param  string $url The posted url.
+     * @return array $query The query parameters of the posted url.
      */
-    private function getQueryInformation($url): array {
+    private function getQueryInformation(string $url): array {
         $query = [];
         $queryString = parse_url($url, PHP_URL_QUERY);
         if ($queryString) {
@@ -131,16 +131,22 @@ class TwitchEmbed extends VideoEmbed {
     /**
      * Assigns a embed url based on the linktype and query string.
      *
-     * @param string $videoID
-     * @param array $queryInfo
-     * @return string $embedUrl
+     * @param string $videoID The id of the posted media.
+     * @param array $queryInfo The query parameters of the posted url.
+     * @return string $embedUrl The url used to generate the embed.
      */
     private function getEmbedUrl($videoID, $queryInfo = null): string {
         $embedURL = '';
         if ($queryInfo) {
-            $t = $this->validateQueryTime($queryInfo['t']);
-            $autoplay = $this->verifyBool($queryInfo['autoplay']);
-            $muted = $this->verifyBool($queryInfo['muted']);
+            if (array_key_exists('t', $queryInfo)) {
+                $t = $this->filterQueryTime($queryInfo['t']);
+            }
+            if (array_key_exists('autoplay', $queryInfo)) {
+                $autoplay = $this->filtersBool($queryInfo['autoplay']);
+            }
+            if (array_key_exists('muted', $queryInfo)) {
+                $muted = $this->filtersBool($queryInfo['muted']);
+            }
         }
 
         if ($this->urlType == 'clip' ) {
@@ -171,28 +177,26 @@ class TwitchEmbed extends VideoEmbed {
     }
 
     /**
-     * Validates the time parameter of the query string is valid.
+     * Filters the time parameter of the query string to ensure the time is valid.
      *
-     * @param string $time
-     * @return string $validTime
+     * @param string $time The time parameter from the query string.
+     * @return string $validTime The filtered time string.
      */
-    private function validateQueryTime($time): string {
-        $valideTime = '';
+    private function filterQueryTime($time): string {
+        $validTime = '';
         if (preg_match('/\b[0-9]{1,2}h[0-9]{1,2}m[0-9]{1,2}s/i', $time, $match)) {
-            $valideTime = $match[0];
+            $validTime = $match[0];
         }
-        return $valideTime;
+        return $validTime;
     }
 
     /**
-     * Verifies if query parameter is true or false
-     * @param string $param
-     * @return string $param
+     * Filters a query parameter to ensure it's true or false.
+     * @param string $param Parameter from a query string.
+     * @return string $param A filter parameter.
      */
-    private function verifyBool($param): string {
-        if ((!$param == "true")||(!$param == "false")) {
-            return '';
-        }
+    public function filtersBool($param): string {
+        $param = ($param === "true") ? $param : "false";
         return $param;
     }
 }

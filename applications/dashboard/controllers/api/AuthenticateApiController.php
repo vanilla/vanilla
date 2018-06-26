@@ -625,8 +625,10 @@ class AuthenticateApiController extends AbstractApiController {
             $body = $in->validate($body);
         } catch (\Garden\Schema\ValidationException $e) {
             $statusCode = $e->getValidation()->getStatus();
-            $response['errors'] = $e->getValidation()->getErrors();
-            $response['message'] = $e->getMessage();
+
+            foreach ($e->jsonSerialize() as $key => $value) {
+                $response[$key] = $value;
+            }
         }
 
         if (($body['userID'] ?? false) && ($body['username'] ?? false)) {

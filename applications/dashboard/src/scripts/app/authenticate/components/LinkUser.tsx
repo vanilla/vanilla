@@ -160,7 +160,7 @@ export default class LinkUser extends React.Component<IProps, IState> {
                     nameError = error.message;
                     if (error.code === "The username is taken.") {
                         nameError = genericFieldError.split("%s").join("name");
-                    } else if (error.field === "Username is not valid.") {
+                    } else if (error.code === "Username is not valid.") {
                         nameError = genericInvalidFieldError.split("%s").join("name");
                     } else {
                         nameError = error.message;
@@ -231,8 +231,8 @@ export default class LinkUser extends React.Component<IProps, IState> {
         apiv2
             .post("/authenticate/link-user", formData)
             .then(e => {
-                const data = get(e, "response.data", false);
-                log(t("Pass with data: "), data);
+                const targetUrl = formatUrl(get(e, "response.targetUrl", "/"));
+                window.location.href = targetUrl;
             })
             .catch(e => {
                 this.handleErrors(e);

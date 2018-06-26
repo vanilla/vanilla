@@ -146,31 +146,31 @@ export default class LinkUser extends React.Component<IProps, IState> {
         let termsOfServiceError;
 
         if (hasFieldSpecificErrors) {
-            errors.forEach((error, index) => {
-                error.timestamp = new Date().getTime(); // Timestamp to make sure state changes, even if the message is the same
-                const genericFieldError = t("This %s is already taken. Enter another %s ");
-                const genericInvalidFieldError = t("This %s is not valid. Enter another %s ");
-                if (error.field === "email") {
-                    if (error.code === "The email is taken.") {
+            errors.forEach((fieldError, index) => {
+                fieldError.timestamp = new Date().getTime(); // Timestamp to make sure state changes, even if the message is the same
+                const genericFieldError = t("This %s is already taken. Enter another %s or");
+                const genericInvalidFieldError = t("This %s is not valid. Enter another %s or");
+                if (fieldError.field === "email") {
+                    if (fieldError.code === "The email is taken.") {
                         emailError = genericFieldError.split("%s").join("email");
                     } else {
-                        emailError = error.message;
+                        emailError = fieldError.message;
                     }
-                } else if (error.field === "name") {
-                    nameError = error.message;
-                    if (error.code === "The username is taken.") {
+                } else if (fieldError.field === "name") {
+                    nameError = fieldError.message;
+                    if (fieldError.code === "The username is taken.") {
                         nameError = genericFieldError.split("%s").join("name");
-                    } else if (error.code === "Username is not valid.") {
+                    } else if (fieldError.code === "Username is not valid.") {
                         nameError = genericInvalidFieldError.split("%s").join("name");
                     } else {
-                        nameError = error.message;
+                        nameError = fieldError.message;
                     }
-                } else if (error.field === "agreeToTerms") {
-                    termsOfServiceError = error.message;
+                } else if (fieldError.field === "agreeToTerms") {
+                    termsOfServiceError = fieldError.message;
                 } else {
                     // Unhandled error
                     globalError = catchAllErrorMessage;
-                    log("LinkUserRegister - Unhandled error field", error);
+                    log("LinkUserRegister - Unhandled error field", fieldError);
                 }
             });
         } else {
@@ -279,7 +279,7 @@ export default class LinkUser extends React.Component<IProps, IState> {
         log("Link User step: ", this.state.step);
 
         if (this.state.step === "register") {
-            const linkText = t(" click here to enter your %s.");
+            const linkText = t(" click here to enter your password.");
 
             let emailField; // register step
 
@@ -294,7 +294,7 @@ export default class LinkUser extends React.Component<IProps, IState> {
                     errorComponentData={{
                         errors: this.props.nameError,
                         linkOnClick: this.setStepToPasswordWithEmail,
-                        linkText: linkText.replace("%s", t("email")),
+                        linkText,
                         error: this.state.emailError,
                     }}
                     defaultValue={this.props.ssoUser.email}
@@ -323,7 +323,7 @@ export default class LinkUser extends React.Component<IProps, IState> {
                         errorComponentData={{
                             errors: this.props.nameError,
                             linkOnClick: this.setStepToPasswordWithUsername,
-                            linkText: linkText.replace("%s", t("password")),
+                            linkText,
                             error: this.state.nameError,
                         }}
                         defaultValue={this.props.ssoUser.name}
@@ -363,12 +363,12 @@ export default class LinkUser extends React.Component<IProps, IState> {
             }
 
             let userNameLabel = t("Email"); // Fallback to e-mail only
-            if ((this.props.config.noEmail || !this.props.config.emailUnique) && this.props.config.nameUnique) {
+            if (this.props.config.noEmail || (!this.props.config.emailUnique && this.props.config.nameUnique)) {
                 // Only name is unique
                 userNameLabel = t("Username");
             } else if (!this.props.config.noEmail && this.props.config.emailUnique && this.props.config.nameUnique) {
                 // Both email and username are unique
-                userNameLabel = t("Email / Username");
+                userNameLabel = t("Email/Username");
             }
 
             contents = (

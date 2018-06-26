@@ -3,9 +3,8 @@
  * @license https://opensource.org/licenses/GPL-2.0 GPL-2.0
  */
 
-import { formatUrl, t } from "@dashboard/application";
+import { t } from "@dashboard/application";
 import React from "react";
-import { withRouter, BrowserRouter, Route, Link } from "react-router-dom";
 import Paragraph from "@dashboard/components/forms/Paragraph";
 import { log, logError } from "@dashboard/utility";
 import InputTextBlock from "@dashboard/components/forms/InputTextBlock";
@@ -14,9 +13,7 @@ import { getRequiredID, IRequiredComponentID } from "@dashboard/componentIDs";
 import get from "lodash/get";
 import ButtonSubmit from "@dashboard/components/forms/ButtonSubmit";
 import Checkbox from "@dashboard/components/forms/Checkbox";
-import ErrorOrLinkLabel from "@dashboard/app/authenticate/components/ErrorOrLinkLabel";
 import RememberAndForgotPassword from "@dashboard/app/authenticate/components/RememberAndForgotPassword";
-import { chevronLeft } from "./Icons";
 import BackLink from "@dashboard/app/authenticate/components/BackLink";
 
 interface IProps {

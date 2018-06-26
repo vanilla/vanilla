@@ -20,6 +20,7 @@ $embed_width: 640px;
 $embedVideo_width: $embed_width;
 $embedInstagram_width: $embed_width;
 $embedSoundCloud_width: $embed_width;
+$embedGetty_width: $embed_width;
 $embed-spacing: 6px !default;
 $embed-focus-color: #0291DB;
 
@@ -277,6 +278,12 @@ $embed-focus-color: #0291DB;
     width: $embedSoundCloud_width;
 }
 
+// Getty
+
+.embed-getty {
+    width: 100%;
+    max-width: $embedGetty_width;
+}
 
 // External Embed
 .embedExternal {

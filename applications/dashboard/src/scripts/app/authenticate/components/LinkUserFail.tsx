@@ -18,7 +18,7 @@ export default class LinkUserFail extends React.Component<IProps, {}> {
         return (
             <div className="authenticateUserCol">
                 <Paragraph className="authenticateUser-paragraph" content={message} />
-                <Link className="Button button button-fullWidth" to="/authenticate/signin">
+                <Link className="button Button Primary buttonCTA BigButton button-fullWidth" to="/authenticate/signin">
                     {t("Try again")}
                 </Link>
             </div>

@@ -1,7 +1,7 @@
 {
     "_readme": [
         "This file locks the dependencies of your project to a known state",
-        "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
+        "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
     "content-hash": "b034b507629cf3cfd4dbd84d7341fb8d",
@@ -497,7 +497,7 @@
         },
         {
             "name": "symfony/yaml",
-            "version": "v3.4.11",
+            "version": "v3.4.12",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/yaml.git",
@@ -738,20 +738,23 @@
         },
         {
             "name": "vanilla/garden-schema",
-            "version": "v1.7.7",
+            "version": "v1.9",
             "source": {
                 "type": "git",
                 "url": "https://github.com/vanilla/garden-schema.git",
-                "reference": "009802b184cd4c66a65257ba8b429f1a444b610a"
+                "reference": "3370db6fe8a2987813a28e64e3afdf95cb3b9443"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/vanilla/garden-schema/zipball/009802b184cd4c66a65257ba8b429f1a444b610a",
-                "reference": "009802b184cd4c66a65257ba8b429f1a444b610a",
+                "url": "https://api.github.com/repos/vanilla/garden-schema/zipball/3370db6fe8a2987813a28e64e3afdf95cb3b9443",
+                "reference": "3370db6fe8a2987813a28e64e3afdf95cb3b9443",
                 "shasum": ""
             },
             "require": {
                 "php": ">=5.6.0"
+            },
+            "require-dev": {
+                "phpunit/phpunit": "^6"
             },
             "type": "library",
             "autoload": {
@@ -770,7 +773,7 @@
                 }
             ],
             "description": "A simple data validation and cleaning library based on JSON Schema.",
-            "time": "2018-05-25T14:30:29+00:00"
+            "time": "2018-06-26T20:36:25+00:00"
         },
         {
             "name": "vanilla/htmlawed",

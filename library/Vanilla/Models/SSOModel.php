@@ -164,11 +164,11 @@ class SSOModel {
                 $mapping = [
                     'The name you entered is already in use by another member.' => [
                         'code' => 'The name you entered is already in use by another member.',
-                        'status' => '409',
+                        'status' => 409,
                     ],
                     'The email you entered is in use by another member.' => [
                         'code' => 'The email you entered is in use by another member.',
-                        'status' => '409',
+                        'status' => 409,
                     ],
                 ];
 

@@ -5,7 +5,6 @@
  */
 
 import React, { MouseEvent, ChangeEvent } from "react";
-import { hasPermission } from "@dashboard/permissions";
 import * as Icons from "@rich-editor/components/icons";
 import EmbedInsertionModule from "@rich-editor/quill/EmbedInsertionModule";
 import { withEditor, IEditorContextProps } from "@rich-editor/components/context";
@@ -52,7 +51,12 @@ export class EditorUploadButton extends React.Component<IProps, {}> {
 
         if (file && isFileImage(file) && embedInsertion) {
             const imagePromise = uploadImage(file);
-            embedInsertion.createEmbed(imagePromise);
+            embedInsertion.createEmbed({
+                dataPromise: imagePromise,
+                loaderData: {
+                    type: "image",
+                },
+            });
         }
     };
 }

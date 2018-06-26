@@ -8,14 +8,20 @@ import FocusModule from "./FocusModule";
 import Quill, { Blot } from "quill/core";
 import Parchment from "parchment";
 import { expect } from "chai";
-import { IEmbedData } from "@dashboard/embeds";
 import KeyboardModule from "quill/modules/keyboard";
 import FocusableEmbedBlot from "./blots/abstract/FocusableEmbedBlot";
+import ExternalEmbedBlot, { IEmbedValue } from "./blots/embeds/ExternalEmbedBlot";
 
-const stubEmbedData: IEmbedData = {
-    type: "stub",
-    url: "",
-    attributes: [],
+const stubEmbedData: IEmbedValue = {
+    data: {
+        type: "stub",
+        url: "",
+        attributes: [],
+    },
+    loaderData: {
+        type: "link",
+        link: "adsfasd",
+    },
 };
 
 describe("FocusModule", () => {
@@ -69,7 +75,7 @@ describe("FocusModule", () => {
         });
 
         it("handles a tab keypress if the focused item is a FocusableEmbedBlot in the current quill instance", async () => {
-            const blot = Parchment.create("embed-external", stubEmbedData);
+            const blot = Parchment.create("embed-external", stubEmbedData) as ExternalEmbedBlot;
             quill.scroll.insertBefore(blot);
             blot.focus();
 
@@ -79,8 +85,8 @@ describe("FocusModule", () => {
 
         it("tabs to the next tabbable element outside the editor if conditions were met", async () => {
             // Inserting a couple of focusable items in the editor.
-            const blot = Parchment.create("embed-external", stubEmbedData);
-            const blot2 = Parchment.create("embed-external", stubEmbedData);
+            const blot = Parchment.create("embed-external", stubEmbedData) as ExternalEmbedBlot;
+            const blot2 = Parchment.create("embed-external", stubEmbedData) as ExternalEmbedBlot;
             const button1 = document.getElementById("button1")!;
             quill.scroll.insertBefore(blot);
             quill.scroll.insertBefore(blot2);
@@ -109,7 +115,7 @@ describe("FocusModule", () => {
 
         // It could be tabbable element inside. We do __not__ want focus to move back to the editor. It already "is".
         it("will handle the keypress if an element inside of the editor is focused", async () => {
-            const blot = Parchment.create("embed-external", stubEmbedData);
+            const blot = Parchment.create("embed-external", stubEmbedData) as ExternalEmbedBlot;
             quill.scroll.insertBefore(blot);
             blot.focus();
 
@@ -120,7 +126,7 @@ describe("FocusModule", () => {
 
     describe("focusLastLine()", () => {
         it("will place focus and selection on quill if the last element in the editor is text", async () => {
-            const embed = Parchment.create("embed-external", stubEmbedData);
+            const embed = Parchment.create("embed-external", stubEmbedData) as ExternalEmbedBlot;
             quill.scroll.insertBefore(embed);
             const test = quill.insertText(quill.scroll.length(), "test");
 
@@ -131,7 +137,7 @@ describe("FocusModule", () => {
         });
 
         it("will place focus on a FocusableEmbedBlot if it is the last element in the editor", async () => {
-            const embed = Parchment.create("embed-external", stubEmbedData);
+            const embed = Parchment.create("embed-external", stubEmbedData) as ExternalEmbedBlot;
             quill.scroll.insertBefore(embed);
             const test = quill.insertText(0, "test");
 
@@ -144,7 +150,7 @@ describe("FocusModule", () => {
     describe("focusFirstLine", () => {
         it("will place focus and selection on quill if the first element in the editor is text", async () => {
             const test = quill.insertText(0, "test");
-            const embed = Parchment.create("embed-external", stubEmbedData);
+            const embed = Parchment.create("embed-external", stubEmbedData) as ExternalEmbedBlot;
             quill.scroll.insertBefore(embed);
 
             embedFocusModule.focusFirstLine();
@@ -154,7 +160,7 @@ describe("FocusModule", () => {
         });
 
         it("will place focus on a FocusableEmbedBlot if it is the first element in the editor", async () => {
-            const embed = Parchment.create("embed-external", stubEmbedData);
+            const embed = Parchment.create("embed-external", stubEmbedData) as ExternalEmbedBlot;
             quill.scroll.insertBefore(embed, quill.scroll.children.tail);
             const test = quill.insertText(quill.scroll.length(), "test");
 
@@ -169,7 +175,7 @@ describe("FocusModule", () => {
         let embed: FocusableEmbedBlot;
 
         beforeEach(async () => {
-            embed = Parchment.create("embed-external", stubEmbedData);
+            embed = Parchment.create("embed-external", stubEmbedData) as ExternalEmbedBlot;
             quill.scroll.insertBefore(embed);
             embed.focus();
         });
@@ -190,14 +196,14 @@ describe("FocusModule", () => {
 
     describe("arrowToBlot()", () => {
         it("focuses a FocusableEmbedBlot", async () => {
-            const embed = Parchment.create("embed-external", stubEmbedData);
+            const embed = Parchment.create("embed-external", stubEmbedData) as ExternalEmbedBlot;
             quill.scroll.insertBefore(embed);
 
             embedFocusModule.arrowToBlot(embed);
         });
 
         it("places selection at the start of a line of text by default", async () => {
-            const embed = Parchment.create("embed-external", stubEmbedData);
+            const embed = Parchment.create("embed-external", stubEmbedData) as ExternalEmbedBlot;
             quill.scroll.insertBefore(embed);
             quill.insertText(quill.scroll.length(), "test");
             embed.focus();
@@ -219,7 +225,7 @@ describe("FocusModule", () => {
         });
 
         it("handles delete only if the current line is empty and the previous blot is a FocusableEmbedBlot", async () => {
-            const embed = Parchment.create("embed-external", stubEmbedData);
+            const embed = Parchment.create("embed-external", stubEmbedData) as ExternalEmbedBlot;
             quill.scroll.insertBefore(embed);
             const test = quill.insertText(quill.scroll.length(), "\n");
             quill.setSelection(quill.scroll.length() - 1, 0);

@@ -7,22 +7,27 @@
 import Parchment from "parchment";
 import Quill from "quill/core";
 import { IEmbedData } from "@dashboard/embeds";
-import ExternalEmbedBlot from "./ExternalEmbedBlot";
+import ExternalEmbedBlot, { IEmbedValue } from "./ExternalEmbedBlot";
 import { expect } from "chai";
 import sinon from "sinon";
 import "@dashboard/app/user-content/embeds/image";
 import ErrorBlot from "./ErrorBlot";
 import LoadingBlot from "@rich-editor/quill/blots/embeds/LoadingBlot";
 
-const imageData: IEmbedData = {
-    type: "image",
-    url: "",
-    name: "Pizza gif",
-    body: null,
-    photoUrl: null,
-    height: 500,
-    width: 500,
-    attributes: {},
+const imageData: IEmbedValue = {
+    data: {
+        type: "image",
+        url: "",
+        name: "Pizza gif",
+        body: null,
+        photoUrl: null,
+        height: 500,
+        width: 500,
+        attributes: {},
+    },
+    loaderData: {
+        type: "image",
+    },
 };
 
 describe("ExternalEmbedBlot", () => {
@@ -47,7 +52,7 @@ describe("ExternalEmbedBlot", () => {
         ];
 
         quill.setContents(insert);
-        expect(quill.root.querySelectorAll("." + LoadingBlot.className)).to.have.length(1);
+        expect(quill.root.querySelectorAll(".embedLoader-loader")).to.have.length(1);
     });
 
     describe("Async Creation", () => {
@@ -55,9 +60,16 @@ describe("ExternalEmbedBlot", () => {
             const dataPromise = new Promise(resolve => {
                 setTimeout(resolve(imageData), 1);
             });
+            const data: IEmbedValue = {
+                dataPromise: dataPromise as any,
+                loaderData: {
+                    type: "image",
+                },
+            };
+
             const spy = sinon.spy();
 
-            const externalEmbed = Parchment.create(ExternalEmbedBlot.blotName, dataPromise) as ExternalEmbedBlot;
+            const externalEmbed = Parchment.create(ExternalEmbedBlot.blotName, data) as ExternalEmbedBlot;
             externalEmbed.registerLoadCallback(spy);
             quill.scroll.insertBefore(externalEmbed);
 

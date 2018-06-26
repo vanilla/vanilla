@@ -88,7 +88,7 @@ export default class ExternalEmbedBlot extends FocusableEmbedBlot {
         return rootNode;
     }
 
-    public static createErrorEmbedElement(text: string, message: string) {
+    public static createErrorEmbedElement(text: string) {
         const div = FocusableEmbedBlot.create();
         div.classList.remove(FOCUS_CLASS);
         div.classList.add("embed");
@@ -152,7 +152,7 @@ export default class ExternalEmbedBlot extends FocusableEmbedBlot {
             embedElement = await ExternalEmbedBlot.createSuccessfulEmbedElement(data);
         } catch (e) {
             logError(e);
-            embedElement = ExternalEmbedBlot.createErrorEmbedElement(data.url, e.message);
+            embedElement = ExternalEmbedBlot.createErrorEmbedElement(data.url);
         }
 
         setData(embedElement, DATA_KEY, newValue);

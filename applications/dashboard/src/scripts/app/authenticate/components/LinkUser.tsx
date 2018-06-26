@@ -30,8 +30,8 @@ interface IProps {
     termsOfService?: boolean;
     termsOfServiceError?: string[];
     globalError?: string;
-    emailError?: string[];
-    nameError?: string[];
+    emailErrors?: string[];
+    nameErrors?: string[];
     password?: string;
     username?: string;
     signInWithField?: string;
@@ -46,12 +46,14 @@ interface IState extends IRequiredComponentID {
     termsOfServiceLabel: string;
     termsOfService: boolean;
     termsOfServiceError: string[] | null;
-    nameError: string[] | null;
-    emailError: string[] | null;
+    nameErrors: string[] | null;
+    emailErrors: string[] | null;
     password?: string;
     username?: string;
     signInWithField?: string;
     termsOfServiceId: string;
+    errorComponentEmail: any | null;
+    errorComponentUsername: any | null;
 }
 
 export default class LinkUser extends React.Component<IProps, IState> {
@@ -79,8 +81,8 @@ export default class LinkUser extends React.Component<IProps, IState> {
             editable: true,
             submitEnabled: false,
             rememberMe: props.rememberMe || false,
-            emailError: props.emailError || [],
-            nameError: props.nameError || [],
+            emailErrors: props.emailErrors || [],
+            nameErrors: props.nameErrors || [],
             globalError: props.globalError,
             step: "register",
             password: props.password,
@@ -90,6 +92,8 @@ export default class LinkUser extends React.Component<IProps, IState> {
             termsOfServiceError: props.termsOfServiceError || [],
             signInWithField: props.signInWithField,
             termsOfServiceId: getRequiredID(props, "termsOfService"),
+            errorComponentEmail: null,
+            errorComponentUsername: null,
         };
     }
 
@@ -119,21 +123,36 @@ export default class LinkUser extends React.Component<IProps, IState> {
 
     public handleErrors = error => {
         const data = error.response.data || {};
-        log("data: ", data);
         const globalError = data.message || t("An error has occurred, please try again.");
         const errors = data.errors || [];
         const hasFieldSpecificErrors = errors.length > 0;
-        let emailError: string[] = [];
-        let nameError: string[] = [];
+        let emailErrors: string[] = [];
+        let nameErrors: string[] = [];
         let termsOfServiceError: string[] = [];
+        const genericFieldError = t("This %s is already taken. Enter another %s or");
+        const genericInvalidFieldError = t("This %s is not valid. Enter another %s or");
+        let errorComponentEmail: any = null;
+        let errorComponentUsername: any = null;
+
+        log(data);
 
         if (hasFieldSpecificErrors) {
             errors.forEach(fieldError => {
                 fieldError.timestamp = new Date().getTime(); // Timestamp to make sure state changes, even if the message is the same
-                if (fieldError.field === "email" && fieldError.code === 409) {
-                    emailError = [...emailError, fieldError];
-                } else if (fieldError.field === "name" && fieldError.code === 409) {
-                    nameError = [...nameError, fieldError];
+                if (fieldError.field === "email") {
+                    if ((fieldError.status || data.status) === 409) {
+                        errorComponentEmail = ErrorOrLinkLabel;
+                        emailErrors = [genericFieldError.split("%s").join("email")];
+                    } else {
+                        emailErrors = [...emailErrors, fieldError];
+                    }
+                } else if (fieldError.field === "name") {
+                    if ((fieldError.status || data.status) === 409) {
+                        errorComponentUsername = ErrorOrLinkLabel;
+                        nameErrors = [genericFieldError.split("%s").join("name")];
+                    } else {
+                        nameErrors = [...nameErrors, fieldError];
+                    }
                 } else if (fieldError.field === "agreeToTerms") {
                     termsOfServiceError = [...termsOfServiceError, fieldError];
                 } else {
@@ -145,21 +164,37 @@ export default class LinkUser extends React.Component<IProps, IState> {
             // Something went really wrong. Add default message to tell the user there's a problem.
             logError("LinkUserRegister - Failure to handle errors from response -", error);
         }
-        this.setErrors(globalError, emailError, nameError, termsOfServiceError);
+        this.setErrors(
+            globalError,
+            emailErrors,
+            nameErrors,
+            termsOfServiceError,
+            errorComponentEmail,
+            errorComponentUsername,
+        );
     };
 
-    public setErrors(globalError, emailError: string[], nameError: string[], termsOfServiceError: string[]) {
+    public setErrors(
+        globalError,
+        emailErrors: string[],
+        nameErrors: string[],
+        termsOfServiceError: string[],
+        errorComponentEmail: any,
+        errorComponentUsername: any,
+    ) {
         this.setState(
             {
                 editable: true,
                 globalError,
-                emailError,
-                nameError,
+                emailErrors,
+                nameErrors,
                 termsOfServiceError,
+                errorComponentEmail,
+                errorComponentUsername,
             },
             () => {
-                const hasEmailError = this.state.emailError && !this.props.config.noEmail;
-                const hasNameError = this.state.nameError;
+                const hasEmailError = this.state.emailErrors && !this.props.config.noEmail;
+                const hasNameError = this.state.nameErrors;
                 const hasAgreeToTermsError = this.state.termsOfServiceError;
 
                 if (hasEmailError) {
@@ -169,6 +204,8 @@ export default class LinkUser extends React.Component<IProps, IState> {
                 } else if (hasAgreeToTermsError) {
                     this.termsOfServiceElement.focus();
                 }
+
+                log("Link user state: ", this.state);
             },
         );
     }
@@ -259,7 +296,14 @@ export default class LinkUser extends React.Component<IProps, IState> {
                     type="email"
                     required={true}
                     disabled={!this.state.editable}
-                    errors={this.state.emailError as string[]}
+                    errors={this.state.emailErrors as string[]}
+                    errorComponent={this.state.errorComponentEmail}
+                    errorComponentData={{
+                        errors: this.props.nameErrors,
+                        linkOnClick: this.setStepToPasswordWithEmail,
+                        linkText: linkText.replace("%s", t("email")),
+                        error: this.state.emailErrors,
+                    }}
                     defaultValue={this.props.ssoUser.email}
                     ref={email => (this.email = email as InputTextBlock)}
                 />
@@ -281,7 +325,14 @@ export default class LinkUser extends React.Component<IProps, IState> {
                         label={t("Username")}
                         required={true}
                         disabled={!this.state.editable}
-                        errors={this.state.nameError as string}
+                        errors={this.state.emailErrors as string[]}
+                        errorComponent={this.state.errorComponentUsername}
+                        errorComponentData={{
+                            errors: this.props.nameErrors,
+                            linkOnClick: this.setStepToPasswordWithUsername,
+                            linkText: linkText.replace("%s", t("password")),
+                            error: this.state.nameErrors,
+                        }}
                         defaultValue={this.props.ssoUser.name}
                         ref={name => (this.name = name as InputTextBlock)}
                     />

@@ -27,6 +27,8 @@ export interface IInputTextProps extends IOptionalComponentID {
     errors?: string | string[];
     disabled?: boolean;
     onChange?: any;
+    errorComponent?: any;
+    errorComponentData?: any;
 }
 
 interface IState {
@@ -63,6 +65,21 @@ export default class InputTextBlock extends React.Component<IInputTextProps, ISt
             describedBy = this.errorID;
         }
 
+        let errorComponent: JSX.Element;
+        if (this.props.errorComponent) {
+            errorComponent = (
+                <this.props.errorComponent {...this.props.errorComponentData} id={this.errorID} className={noteClass} />
+            );
+        } else {
+            errorComponent = (
+                <ErrorMessages
+                    id={this.errorID}
+                    className={noteClass}
+                    errors={this.props.errors as string | string[]}
+                />
+            );
+        }
+
         return (
             <label className={componentClasses}>
                 <span id={this.labelID} className="inputBlock-labelAndDescription">
@@ -87,11 +104,7 @@ export default class InputTextBlock extends React.Component<IInputTextProps, ISt
                         ref={inputDom => (this.inputDom = inputDom as HTMLInputElement)}
                     />
                 </span>
-                <ErrorMessages
-                    id={this.errorID}
-                    className={noteClass}
-                    errors={this.props.errors as string | string[]}
-                />
+                {errorComponent}
             </label>
         );
     }

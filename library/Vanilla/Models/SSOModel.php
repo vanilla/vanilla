@@ -21,6 +21,7 @@ use Gdn_Session;
 use UserModel;
 use Vanilla\Authenticator\SSOAuthenticator;
 use Vanilla\Utility\CapitalCaseScheme;
+use Vanilla\VanillaValidation;
 
 /**
  * Class SSOModel
@@ -117,7 +118,7 @@ class SSOModel {
         $email = $options['email'] ?? $email;
         $name = $options['name'] ?? $name;
 
-        $validation = new Validation();
+        $validation = new VanillaValidation();
 
         if (!$name) {
             $validation->addError(

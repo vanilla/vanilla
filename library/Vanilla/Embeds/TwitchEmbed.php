@@ -55,7 +55,7 @@ class TwitchEmbed extends VideoEmbed {
                     throw new Exception('Unable to find Twitch Post', 400);
             }
 
-            $data['attributes'] = $data['attributes'] ?: [];
+            $data['attributes'] = $data['attributes'] ?? [];
             $data['attributes']['videoID'] = $videoID;
             $data['attributes']['embedUrl'] = $embedUrl;
 
@@ -137,6 +137,9 @@ class TwitchEmbed extends VideoEmbed {
      */
     private function getEmbedUrl($videoID, $queryInfo = null): string {
         $embedURL = '';
+        $t ='';
+        $autoplay ='';
+        $muted ='';
         if ($queryInfo) {
             if (array_key_exists('t', $queryInfo)) {
                 $t = $this->filterQueryTime($queryInfo['t']);

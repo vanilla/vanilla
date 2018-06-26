@@ -259,7 +259,7 @@ export default class LinkUser extends React.Component<IProps, IState> {
                     type="email"
                     required={true}
                     disabled={!this.state.editable}
-                    errors={this.state.emailError as string}
+                    errors={this.state.emailError as string[]}
                     defaultValue={this.props.ssoUser.email}
                     ref={email => (this.email = email as InputTextBlock)}
                 />

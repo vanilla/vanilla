@@ -54,7 +54,7 @@ export default class ExternalEmbedBlot extends FocusableEmbedBlot {
     }
 
     public static value(element: Element) {
-        const isLoader = element.getAttribute("data-loader");
+        const isLoader = element.classList.contains(LoadingBlot.className);
         if (isLoader) {
             return LoadingBlot.value(element);
         } else {

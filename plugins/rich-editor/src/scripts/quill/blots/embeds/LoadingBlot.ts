@@ -13,7 +13,7 @@ const LOADER_DATA_KEY = "loadingDataKey";
 
 export default class LoadingBlot extends FocusableEmbedBlot {
     public static blotName = "embed-loading";
-    public static className = "embed-loading";
+    public static className = "js-embedLoader";
     public static tagName = "div";
 
     public static create(value: IEmbedValue) {

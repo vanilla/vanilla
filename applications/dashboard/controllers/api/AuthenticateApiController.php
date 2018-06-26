@@ -572,7 +572,7 @@ class AuthenticateApiController extends AbstractApiController {
                 throw new Exception('Undefined method.');
             }
 
-            return count($field->getValidation()->getErrors()) === 0;
+            return true;
         };
 
         $in = $this

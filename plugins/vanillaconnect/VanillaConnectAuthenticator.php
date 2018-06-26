@@ -285,7 +285,7 @@ class VanillaConnectAuthenticator extends SSOAuthenticator {
         }
 
         if (!$this->vanillaConnect->validateResponse($query['jwt'], $claim)) {
-            throw new Exception("An error occurred during the JWT validation.\n".print_r($this->vanillaConnect->getErrors(), true));
+            throw new Exception("An error occurred during token validation: ".implode(', ', $this->vanillaConnect->getErrors()));
         }
 
         $this->validateNonce($claim['jti']);

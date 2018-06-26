@@ -132,14 +132,14 @@ export default class LinkUser extends React.Component<IProps, IState> {
         });
     }
 
-    public handleErrors = e => {
+    public handleErrors = error => {
         const catchAllErrorMessage = t("An error has occurred, please try again.");
 
-        const data = get(e, "response.data", false);
+        const data = error.response.data;
         log("data: ", data);
 
         let globalError = get(data, "message", false);
-        const errors = get(e, "response.data.errors", []);
+        const errors = get(error, "response.data.errors", []);
         const hasFieldSpecificErrors = errors.length > 0;
         let emailError;
         let nameError;
@@ -230,8 +230,8 @@ export default class LinkUser extends React.Component<IProps, IState> {
 
         apiv2
             .post("/authenticate/link-user", formData)
-            .then(e => {
-                const targetUrl = formatUrl(get(e, "response.targetUrl", "/"));
+            .then(response => {
+                const targetUrl = formatUrl(response.data.targetUrl || "/");
                 window.location.href = targetUrl;
             })
             .catch(e => {

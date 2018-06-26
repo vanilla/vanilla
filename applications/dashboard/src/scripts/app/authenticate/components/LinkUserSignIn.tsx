@@ -15,6 +15,7 @@ import ButtonSubmit from "@dashboard/components/forms/ButtonSubmit";
 import Checkbox from "@dashboard/components/forms/Checkbox";
 import RememberAndForgotPassword from "@dashboard/app/authenticate/components/RememberAndForgotPassword";
 import BackLink from "@dashboard/app/authenticate/components/BackLink";
+import ErrorMessages from "@dashboard/components/forms/ErrorMessages";
 
 interface IProps {
     authSessionID: string;
@@ -123,7 +124,7 @@ export default class LinkUserSignIn extends React.Component<IProps, IState> {
             });
     };
 
-    public setErrors(globalError, usernameError: string[], passwordError: string[], termsOfServiceError: string) {
+    public setErrors(globalError, usernameError: string[], passwordError: string[], termsOfServiceError: string[]) {
         this.setState(
             {
                 editable: true,
@@ -152,6 +153,10 @@ export default class LinkUserSignIn extends React.Component<IProps, IState> {
         this.props.handleTermsOfServiceCheckChange(get(event, "target.checked", false));
     };
 
+    public errorID(inputId): string {
+        return inputId + "-errors";
+    }
+
     public render() {
         log("link user sign in props: ", this.props);
         log("link user sign in state: ", this.state);
@@ -169,7 +174,7 @@ export default class LinkUserSignIn extends React.Component<IProps, IState> {
                         label={this.props.usernameLabel}
                         required={true}
                         disabled={!this.state.editable}
-                        errors={this.state.usernameError as string}
+                        errors={this.state.usernameError as string[]}
                         defaultValue={this.props.username}
                         ref={username => (this.username = username as InputTextBlock)}
                     />
@@ -178,7 +183,7 @@ export default class LinkUserSignIn extends React.Component<IProps, IState> {
                         label={t("Password")}
                         required={true}
                         disabled={!this.state.editable}
-                        errors={this.state.passwordError as string}
+                        errors={this.state.passwordError as string[]}
                         defaultValue={this.props.password}
                         type="password"
                         ref={password => (this.password = password as InputTextBlock)}
@@ -197,10 +202,10 @@ export default class LinkUserSignIn extends React.Component<IProps, IState> {
                                 (this.termsOfServiceElement = termsOfServiceElement as Checkbox)
                             }
                         />
-                        <Paragraph
+                        <ErrorMessages
+                            id={this.errorID(this.state.id)}
                             className="authenticateUser-paragraph"
-                            isError={true}
-                            content={this.state.termsOfServiceError}
+                            errors={this.state.termsOfServiceError}
                         />
                     </div>
                     <ButtonSubmit disabled={!this.state.editable} content={t("Connect")} />

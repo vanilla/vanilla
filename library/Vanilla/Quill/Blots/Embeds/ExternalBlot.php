@@ -37,7 +37,7 @@ class ExternalBlot extends AbstractBlockEmbedBlot {
      * @inheritDoc
      */
     protected function renderContent(array $value): string {
-        $data = $value['data'] ?? [];
+        $data = $value['data'] ?? $value;
         $type = $data['type'] ?? '';
         try {
             $embedRendered = $this->embedManager->renderData($data);

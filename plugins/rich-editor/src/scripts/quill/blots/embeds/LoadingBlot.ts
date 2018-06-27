@@ -81,7 +81,6 @@ export default class LoadingBlot extends FocusableEmbedBlot {
     private static createLinkLoader(linkText: string) {
         const div = super.create();
         div.classList.remove(FOCUS_CLASS);
-        div.classList.add("embed");
         div.classList.add("embedLinkLoader");
 
         const sanitizedText = escapeHTML(linkText);

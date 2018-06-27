@@ -10,7 +10,7 @@ import { IEmbedData, renderEmbed, FOCUS_CLASS } from "@dashboard/embeds";
 import FocusableEmbedBlot from "../abstract/FocusableEmbedBlot";
 import ErrorBlot from "./ErrorBlot";
 import { t } from "@dashboard/application";
-import { logError } from "@dashboard/utility";
+import { logError, capitalizeFirstLetter } from "@dashboard/utility";
 import LoadingBlot from "@rich-editor/quill/blots/embeds/LoadingBlot";
 import { Blot } from "quill/core";
 
@@ -80,26 +80,38 @@ export default class ExternalEmbedBlot extends FocusableEmbedBlot {
      *
      * @throws {Error} If the rendering fails
      */
-    public static async createEmbedFromData(data: IEmbedData): Promise<Element> {
-        const rootNode = FocusableEmbedBlot.create(data);
-        const embedNode = document.createElement("div");
+    public static async createEmbedFromData(data: IEmbedData, loaderElement: Element | null): Promise<Element> {
+        const jsEmbed = FocusableEmbedBlot.create(data);
+        jsEmbed.classList.add("js-embed");
+        jsEmbed.classList.remove(FOCUS_CLASS);
+
         const descriptionNode = document.createElement("span");
-        rootNode.classList.add("embedExternal");
-        rootNode.classList.remove(FOCUS_CLASS);
         descriptionNode.innerHTML = t("richEditor.externalEmbed.description");
         descriptionNode.classList.add("sr-only");
         descriptionNode.id = uniqueId("richEditor-embed-description-");
 
-        embedNode.classList.add("embedExternal-content");
-        embedNode.classList.add(FOCUS_CLASS);
-        embedNode.setAttribute("aria-label", "External embed content - " + data.type);
-        embedNode.setAttribute("aria-describedby", descriptionNode.id);
+        const embedExternal = document.createElement("div");
+        embedExternal.classList.add("embedExternal");
+        embedExternal.classList.add("embed" + capitalizeFirstLetter(data.type));
 
-        rootNode.appendChild(embedNode);
-        rootNode.appendChild(descriptionNode);
+        const embedExternalContent = document.createElement("div");
+        embedExternalContent.classList.add(FOCUS_CLASS);
+        embedExternalContent.setAttribute("aria-label", "External embed content - " + data.type);
+        embedExternalContent.setAttribute("aria-describedby", descriptionNode.id);
+        embedExternalContent.classList.add("embedExternal-content");
+        embedExternalContent.tabIndex = -1;
 
-        await renderEmbed(embedNode, data);
-        return rootNode;
+        // Append these nodes.
+        loaderElement && jsEmbed.appendChild(loaderElement);
+        jsEmbed.appendChild(embedExternal);
+        jsEmbed.appendChild(descriptionNode);
+        embedExternal.appendChild(embedExternalContent);
+
+        void renderEmbed({ root: embedExternal, content: embedExternalContent }, data).then(() => {
+            // loaderElement && loaderElement.remove();
+        });
+
+        return jsEmbed;
     }
 
     /**
@@ -116,7 +128,7 @@ export default class ExternalEmbedBlot extends FocusableEmbedBlot {
     public static createEmbedWarningFallback(linkText: string) {
         const div = FocusableEmbedBlot.create();
         div.classList.remove(FOCUS_CLASS);
-        div.classList.add("embed");
+        div.classList.add("js-embed");
         div.classList.add("embedLinkLoader");
         div.classList.add("embedLinkLoader-error");
         div.classList.add(FOCUS_CLASS);
@@ -183,7 +195,8 @@ export default class ExternalEmbedBlot extends FocusableEmbedBlot {
         };
 
         try {
-            embedElement = await ExternalEmbedBlot.createEmbedFromData(data);
+            const loader = this.domNode.querySelector(".embedLinkLoader");
+            embedElement = await ExternalEmbedBlot.createEmbedFromData(data, loader);
         } catch (e) {
             logError(e);
             embedElement = ExternalEmbedBlot.createEmbedWarningFallback(data.url);

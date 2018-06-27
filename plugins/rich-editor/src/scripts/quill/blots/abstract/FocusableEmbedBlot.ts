@@ -17,7 +17,7 @@ import Parchment from "parchment";
  */
 export default class FocusableEmbedBlot extends BlockEmbed {
     public static tagName = "div";
-    public static className = "embed";
+    public static className = "js-embed";
     public static blotName = "embed-focusable";
 
     /**
@@ -35,7 +35,6 @@ export default class FocusableEmbedBlot extends BlockEmbed {
     constructor(domNode) {
         super(domNode);
         this.focusableElement.setAttribute("tabindex", -1);
-        domNode.classList.add("embed");
     }
 
     /**

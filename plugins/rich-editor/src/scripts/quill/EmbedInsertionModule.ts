@@ -57,16 +57,6 @@ export default class EmbedInsertionModule extends Module {
         };
         this.quill.update(Quill.sources.USER);
         externalEmbed.insertInto(this.quill.scroll, referenceBlot);
-        externalEmbed.registerLoadCallback(() => {
-            // This LOVELY null selection then setImmediate call are needed because the Twitter embed
-            // seems to resolve it's promise before it's fully rendered. As a result the paragraph menu
-            // position would get set based on the unrendered twitter card height.
-            this.quill.setSelection(null as any, Quill.sources.USER);
-            setImmediate(() => {
-                this.quill.setSelection(newSelection, Quill.sources.USER);
-                callback && callback();
-            });
-        });
         this.quill.update(Quill.sources.USER);
         this.quill.setSelection(newSelection, Quill.sources.USER);
     };

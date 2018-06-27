@@ -73,15 +73,15 @@ export async function renderTweet(rootElement: HTMLElement | null, contentElemen
 
         // Render the embed.
         const options = { conversation: "none" };
-        await window.twttr.widgets.createTweet(data.attributes.statusID, contentElement, options);
+        window.twttr.widgets.createTweet(data.attributes.statusID, contentElement, options).then(() => {
+            // Remove a url if there is one around.
+            const url = contentElement.querySelector(".tweet-url");
+            if (url) {
+                url.remove();
+            }
 
-        // Remove a url if there is one around.
-        const url = contentElement.querySelector(".tweet-url");
-        if (url) {
-            url.remove();
-        }
-
-        // Fade it in.
-        contentElement.classList.add("twitter-card-loaded");
+            // Fade it in.
+            contentElement.classList.add("twitter-card-loaded");
+        });
     }
 }

@@ -45,14 +45,18 @@ class InstagramEmbed extends Embed {
     public function renderData(array $data): string {
         $instagramPermalink = $data['attributes']['permaLink'] ?? '';
         $instgramVersion = $data['attributes']['versionNumber'] ?? '';
+        $url = $data["url"];
 
+        $encodedUrl = htmlspecialchars($url);
         $dataInstgrmPermalink =  htmlspecialchars($instagramPermalink);
         $dataInstgrmVersion = htmlspecialchars($instgramVersion);
 
         $result = <<<HTML
 <div class="embedExternal embedInstagram">
     <div class="embedExternal-content">
-        <blockquote class="instagram-media" data-instgrm-captioned data-instgrm-permalink="{$dataInstgrmPermalink}" data-instgrm-version="{$dataInstgrmVersion}"/>
+        <blockquote class="instagram-media" data-instgrm-captioned data-instgrm-permalink="{$dataInstgrmPermalink}" data-instgrm-version="{$dataInstgrmVersion}">
+            <a href="{$encodedUrl}">$encodedUrl</a>
+        </blockquote>
     </div>
 </div>
 HTML;

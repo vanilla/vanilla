@@ -89,7 +89,7 @@ class GettyEmbed extends Embed {
         data-capt="{$encodedCapt}"
         data-tld="{$encodedTld}"
         data-i360="{$encodedI360}">
-        Embed from Getty Images
+        $encodedURL
     </a>
 </div>
 HTML;

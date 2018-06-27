@@ -278,6 +278,7 @@ class SmokeTest extends BaseTest {
      *
      * @depends testRegisterBasic
      * @large
+     * @return array Single discussion.
      */
     public function testPostDiscussion() {
         $api = $this->api();
@@ -410,7 +411,7 @@ class SmokeTest extends BaseTest {
 
     /**
      * Test removing a bookmark from a discussion.
-     * 
+     *
      * @depends testRegisterBasic
      * @depends testPostDiscussion
      */

@@ -430,7 +430,6 @@ class SmokeTest extends BaseTest {
         $isBookMarked = $bookMarkedDiscussion['Discussion']['Bookmarked'];
         $this->assertEquals(1, $isBookMarked);
 
-
         $r = $api->post("/discussion/bookmark/{$discussionID}/{$user['tk']}");
         $statusCode = $r->getStatusCode();
         $this->assertEquals(200, $statusCode);

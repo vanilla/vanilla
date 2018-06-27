@@ -6,6 +6,7 @@
 
 $utility-baseUnit                                    : 6px;
 $utility-baseUnitHalf                                : $utility-baseUnit / 2; // Derived
+$utility-baseUnitDouble                              : $utility-baseUnit * 2; // Derived
 $utility-third                                       : #{100% / 3};
 $utility-SVGEncoding                                 : "data:image/svg+xml,";
 
@@ -77,7 +78,7 @@ $global-bold_fontWeight                                : 600 !default;
 
 $global-heading_offset                                 : .32em !default; // Offset font to make top of capital letters flush with top of container
 
-$global-base_lineHeight                                : #{20/14} !default;
+$global-base_lineHeight                                : (20/14) !default;
 
 $global-heading_fontFamily                             : "Open Sans", HelveticaNeue-Light, "Segoe UI", "Helvetica Neue", Helvetica, Raleway, Arial, sans-serif !default;
 $global-heading_fontWeight                             : $global-bold_fontWeight !default; // Derived

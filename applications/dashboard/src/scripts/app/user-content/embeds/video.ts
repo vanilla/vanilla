@@ -3,7 +3,7 @@
  * @license https://opensource.org/licenses/GPL-2.0 GPL-2.0
  */
 
-import { registerEmbed, IEmbedData } from "@dashboard/embeds";
+import { registerEmbed, IEmbedData, IEmbedElements } from "@dashboard/embeds";
 import { simplifyFraction } from "@dashboard/utility";
 import { t } from "@dashboard/application";
 import { delegateEvent } from "@dashboard/dom";
@@ -21,9 +21,9 @@ delegateEvent("click", ".js-playVideo", handlePlayVideo);
  * Render a video embed in the editor. The JS for handling playing/stopping these videos
  * lives in @dashboard/user-content.
  */
-export async function videoRenderer(node: HTMLElement, data: IEmbedData) {
-    node.classList.add("embed-video");
-    node.classList.add("embedVideo");
+export async function videoRenderer(elements: IEmbedElements, data: IEmbedData) {
+    const { root, content } = elements;
+    root.classList.add("embedVideo");
     data.name = data.name || "";
 
     const ratioContainer = document.createElement("div");
@@ -59,7 +59,7 @@ export async function videoRenderer(node: HTMLElement, data: IEmbedData) {
         data.photoUrl
     });">${playIcon}</button>`;
 
-    node.appendChild(ratioContainer);
+    content.appendChild(ratioContainer);
 }
 
 /**

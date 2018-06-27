@@ -3,7 +3,7 @@
  * @license https://opensource.org/licenses/GPL-2.0 GPL-2.0
  */
 
-import { registerEmbed, IEmbedData } from "@dashboard/embeds";
+import { registerEmbed, IEmbedData, IEmbedElements } from "@dashboard/embeds";
 import { getData, setData } from "@dashboard/dom";
 import { cssSpecialChars } from "@dashboard/utility";
 import debounce from "lodash/debounce";
@@ -19,13 +19,12 @@ window.addEventListener("resize", () => debounce(truncateEmbedLinks, 200)());
 /**
  * Render a a link embed.
  */
-export async function renderLinkEmbed(node: HTMLElement, data: IEmbedData) {
-    node.classList.add("embed-link");
-    node.classList.add("embedLink");
-    node.setAttribute("href", data.url);
+export async function renderLinkEmbed(elements: IEmbedElements, data: IEmbedData) {
+    const contentElement = elements.content;
+    contentElement.setAttribute("href", data.url);
 
-    node.setAttribute("target", "_blank");
-    node.setAttribute("rel", "noopener noreferrer");
+    contentElement.setAttribute("target", "_blank");
+    contentElement.setAttribute("rel", "noopener noreferrer");
 
     let title;
     if (data.name) {
@@ -124,7 +123,7 @@ export async function renderLinkEmbed(node: HTMLElement, data: IEmbedData) {
     article.appendChild(main);
 
     // Assemble component
-    node.appendChild(article);
+    contentElement.appendChild(article);
 }
 
 /**

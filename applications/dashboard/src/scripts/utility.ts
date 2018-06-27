@@ -288,3 +288,7 @@ export function isFileImage(file: File): boolean {
     log("Filtered out non-image file: ", file.name);
     return false;
 }
+
+export function capitalizeFirstLetter(str: string): string {
+    return str.charAt(0).toUpperCase() + str.slice(1);
+}

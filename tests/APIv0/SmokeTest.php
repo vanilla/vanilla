@@ -414,7 +414,7 @@ class SmokeTest extends BaseTest {
         $discussions = $this->api()->get('/discussions.json')->getBody();
         $discussion = $this->getSingleDiscussion($discussions);
         $discussionID = val('DiscussionID', $discussion);
-        $discussionName = val('Name', $discussion['Name']);
+        $discussionName = val('Name', $discussion);
 
         $r = $api->post(
             "/discussion/bookmark/{$discussionID}/{$user['tk']}"
@@ -440,7 +440,7 @@ class SmokeTest extends BaseTest {
         $discussions = $this->api()->get('/discussions.json')->getBody();
         $discussion = $this->getSingleDiscussion($discussions);
         $discussionID = val('DiscussionID', $discussion);
-        $discussionName = val('Name', $discussion['Name']);
+        $discussionName = val('Name', $discussion);
 
         $r = $api->post(
             "/discussion/bookmark/{$discussionID}/{$user['tk']}"

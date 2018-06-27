@@ -1775,6 +1775,7 @@ body.isMobile .FormWrapper {
 
 .embedLinkLoader {
   text-align: left;
+  display: block;
 }
 
 .embedLinkLoader-failIcon {
@@ -1816,21 +1817,30 @@ body.isMobile .FormWrapper {
   height: 1em;
 }
 
-.richEditor .embedExternal-content {
+.embedLinkLoader-link {
+  display: inline-block;
+  white-space: normal;
+}
+
+.richEditor .embedExternal-content,
+.richEditor .embedLinkLoader-link {
   -webkit-transition: 0.2s ease box-shadow;
           transition: 0.2s ease box-shadow;
   cursor: pointer;
 }
 
-.richEditor .embedExternal-content:hover {
+.richEditor .embedExternal-content:hover,
+.richEditor .embedLinkLoader-link:hover {
   box-shadow: 0 0 0 2px rgba(2, 145, 219, 0.5);
 }
 
-.richEditor .embedExternal-content:focus {
+.richEditor .embedExternal-content:focus,
+.richEditor .embedLinkLoader-link:focus {
   box-shadow: 0 0 0 2px #0291db;
 }
 
-.richEditor .embedExternal-content > * {
+.richEditor .embedExternal-content > *,
+.richEditor .embedLinkLoader-link > * {
   pointer-events: none;
   cursor: default;
 }
@@ -2076,11 +2086,6 @@ body.isMobile .FormWrapper {
   max-width: 100%;
   line-height: 1.4285714286;
   max-height: 60px;
-}
-
-.embedLinkLoader-link {
-  display: inline-block;
-  white-space: normal;
 }
 
 .embedLoader-icon {

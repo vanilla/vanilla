@@ -44,6 +44,7 @@
 // Embed Loaders
 .embedLinkLoader {
     text-align: left;
+    display: block;
 }
 
 .embedLinkLoader-failIcon {
@@ -61,10 +62,16 @@
     vertical-align: -0.14em;
 }
 
+.embedLinkLoader-link {
+    display: inline-block;
+    white-space: normal;
+}
+
 // Edit mode only
 
 .richEditor {
-    .embedExternal-content {
+    .embedExternal-content,
+    .embedLinkLoader-link {
         transition: 0.2s ease box-shadow;
         cursor: pointer;
 

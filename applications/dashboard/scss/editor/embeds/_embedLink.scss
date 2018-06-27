@@ -119,9 +119,3 @@ $embedLink-linkImage_bg: #ffffff !default;
     line-height: $embedLink-linkTitle_lineHeight;
     max-height: #{$embedLink-linkTitle_lineHeight * $embedLink-linkTitle_fontSize * 3};
 }
-
-.embedLinkLoader-link {
-    display: inline-block;
-    white-space: normal;
-}
-

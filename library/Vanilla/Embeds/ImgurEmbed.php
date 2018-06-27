@@ -74,7 +74,7 @@ class ImgurEmbed extends Embed {
 <div class="embedExternal embedImgur">
     <div class="embedExternal-content">
         <blockquote class="imgur-embed-pub" lang="en" data-id="{$dataID}"><a href="{$url}{$postID}"></a></blockquote>
-    <div>
+    </div>
 </div>
 HTML;
        return $result;

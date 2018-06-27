@@ -24,7 +24,7 @@ convertTwitterEmbeds().then();
  * @see library/Vanilla/Embeds/EmbedManager.php
  */
 async function convertTwitterEmbeds() {
-    const tweets = Array.from(document.querySelectorAll(".twitter-card"));
+    const tweets = Array.from(document.querySelectorAll(".js-twitterCard"));
     if (tweets.length > 0) {
         await ensureScript("//platform.twitter.com/widgets.js");
         if (window.twttr) {
@@ -67,10 +67,10 @@ export async function renderTweet(elements: IEmbedElements, data: IEmbedData) {
 
     // Check that we haven't already started to load this embed (In the case multiple onContents are fired off).
     if (
-        !contentElement.classList.contains("twitter-card-loaded") &&
-        !contentElement.classList.contains("twitter-card-preload")
+        !contentElement.classList.contains("js-twitterCardLoaded") &&
+        !contentElement.classList.contains("js-twitterCardPreload")
     ) {
-        contentElement.classList.add("twitter-card-preload");
+        contentElement.classList.add("js-twitterCardPreload");
 
         // Render the embed.
         const options = { conversation: "none" };
@@ -82,6 +82,6 @@ export async function renderTweet(elements: IEmbedElements, data: IEmbedData) {
         }
 
         // Fade it in.
-        contentElement.classList.add("twitter-card-loaded");
+        contentElement.classList.add("js-twitterCardLoaded");
     }
 }

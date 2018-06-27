@@ -110,6 +110,7 @@ export default class ExternalEmbedBlot extends FocusableEmbedBlot {
     public static createEmbedFromData(data: IEmbedData, loaderElement: Element | null): Element {
         const jsEmbed = FocusableEmbedBlot.create(data);
         jsEmbed.classList.add("js-embed");
+        jsEmbed.classList.add("embedResponsive");
         jsEmbed.classList.remove(FOCUS_CLASS);
 
         const descriptionNode = document.createElement("span");

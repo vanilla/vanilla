@@ -91,14 +91,12 @@ export default class ExternalEmbedBlot extends FocusableEmbedBlot {
         div.classList.add("embedExternal");
         div.classList.add("embedLinkLoader");
         div.classList.add("embedLinkLoader-error");
-        div.classList.add(FOCUS_CLASS);
-        div.setAttribute("tabindex", "-1");
 
         const sanitizedText = escapeHTML(linkText);
 
         // In the future this message should point to a knowledge base article.
         const warningTitle = t("This embed could not be loaded in your browser.");
-        div.innerHTML = `<a href="#" class="embedLinkLoader-link">${sanitizedText}&nbsp;${WARNING_HTML(
+        div.innerHTML = `<a href="#" class="embedLinkLoader-link ${FOCUS_CLASS}" tabindex="-1">${sanitizedText}&nbsp;${WARNING_HTML(
             warningTitle,
         )}</a>`;
         return div;

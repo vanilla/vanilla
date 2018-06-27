@@ -6,13 +6,10 @@
 
 import Parchment from "parchment";
 import Quill from "quill/core";
-import { IEmbedData } from "@dashboard/embeds";
 import ExternalEmbedBlot, { IEmbedValue } from "./ExternalEmbedBlot";
 import { expect } from "chai";
 import sinon from "sinon";
 import "@dashboard/app/user-content/embeds/image";
-import ErrorBlot from "./ErrorBlot";
-import LoadingBlot from "@rich-editor/quill/blots/embeds/LoadingBlot";
 
 const imageData: IEmbedValue = {
     data: {

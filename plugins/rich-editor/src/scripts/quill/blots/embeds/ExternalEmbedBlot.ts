@@ -42,17 +42,29 @@ const WARNING_HTML = title => `
 
 export type IEmbedValue = IEmbedLoadedValue | IEmbedUnloadedValue;
 
+/**
+ * The primary entrypoint for rendering embeds in Quill.
+ *
+ * If you're trying to render an embed, you likely want to use the {EmbedInsertionModule}.
+ */
 export default class ExternalEmbedBlot extends FocusableEmbedBlot {
     public static blotName = "embed-external";
     public static className = "embed-external";
     public static tagName = "div";
     public static readonly LOADING_VALUE = { loading: true };
 
+    /**
+     * Create the initial HTML for the external embed.
+     *
+     * An embed always starts with a loader (even if its only there for a second).
+     */
     public static create(value: IEmbedValue): HTMLElement {
-        const node = LoadingBlot.create(value);
-        return node;
+        return LoadingBlot.create(value);
     }
 
+    /**
+     * Get the loading value, otherwise get the primary value.
+     */
     public static value(element: Element) {
         const isLoader = element.classList.contains(LoadingBlot.className);
         if (isLoader) {
@@ -64,9 +76,11 @@ export default class ExternalEmbedBlot extends FocusableEmbedBlot {
     }
 
     /**
+     * Create a successful embed element.
+     *
      * @throws {Error} If the rendering fails
      */
-    public static async createSuccessfulEmbedElement(data: IEmbedData): Promise<Element> {
+    public static async createEmbedFromData(data: IEmbedData): Promise<Element> {
         const rootNode = FocusableEmbedBlot.create(data);
         const embedNode = document.createElement("div");
         const descriptionNode = document.createElement("span");
@@ -87,7 +101,18 @@ export default class ExternalEmbedBlot extends FocusableEmbedBlot {
         return rootNode;
     }
 
-    public static createErrorEmbedElement(text: string) {
+    /**
+     * Create an warning state for the embed element. This occurs when the data fetching has succeeded,
+     * but the browser rendering has not.
+     *
+     * In other words, the blot has all of the data in needs to render in another browser, but not the
+     * current one.
+     *
+     * A usual case for this is having tracking protection on in Firefox (twitter + instagram scripts blocked) .
+     *
+     * @param linkText - The text of the link that failed to be embeded.
+     */
+    public static createEmbedWarningFallback(linkText: string) {
         const div = FocusableEmbedBlot.create();
         div.classList.remove(FOCUS_CLASS);
         div.classList.add("js-embed");
@@ -95,7 +120,7 @@ export default class ExternalEmbedBlot extends FocusableEmbedBlot {
         div.classList.add("embedLinkLoader-error");
         div.classList.add(FOCUS_CLASS);
 
-        const sanitizedText = escapeHTML(text);
+        const sanitizedText = escapeHTML(linkText);
 
         // In the future this message should point to a knowledge base article.
         const warningTitle = t("This embed could not be loaded in your browser.");
@@ -107,13 +132,18 @@ export default class ExternalEmbedBlot extends FocusableEmbedBlot {
 
     private loadCallback?: () => void;
 
+    /**
+     * This should only ever be called internally (or through Parchment.create())
+     *
+     * @param domNode - The node to attach the blot to.
+     * @param value - The value the embed is being created with.
+     * @param needsSetup - Whether or not replace with a final form. This should be false only for internal use.
+     */
     constructor(domNode, value: IEmbedValue, needsSetup = true) {
         super(domNode);
-        if (!needsSetup) {
-            return;
+        if (needsSetup) {
+            void this.replaceLoaderWithFinalForm(value);
         }
-
-        void this.replaceLoaderWithFinalForm(value);
     }
 
     /**
@@ -133,7 +163,12 @@ export default class ExternalEmbedBlot extends FocusableEmbedBlot {
                 data = await value.dataPromise;
             } catch (e) {
                 logError(e);
-                return this.completeWithBlot(new ErrorBlot(ErrorBlot.create(e)));
+                this.replaceWith(new ErrorBlot(ErrorBlot.create(e)));
+                if (this.loadCallback) {
+                    this.loadCallback();
+                    this.loadCallback = undefined;
+                }
+                return;
             }
         }
 
@@ -147,26 +182,25 @@ export default class ExternalEmbedBlot extends FocusableEmbedBlot {
         };
 
         try {
-            embedElement = await ExternalEmbedBlot.createSuccessfulEmbedElement(data);
+            embedElement = await ExternalEmbedBlot.createEmbedFromData(data);
         } catch (e) {
             logError(e);
-            embedElement = ExternalEmbedBlot.createErrorEmbedElement(data.url);
+            embedElement = ExternalEmbedBlot.createEmbedWarningFallback(data.url);
         }
 
         setData(embedElement, DATA_KEY, newValue);
         finalBlot = new ExternalEmbedBlot(embedElement, newValue, false);
-        this.completeWithBlot(finalBlot);
-    }
-
-    public registerLoadCallback(callback: () => void) {
-        this.loadCallback = callback;
-    }
-
-    private completeWithBlot(blot: Blot) {
-        this.replaceWith(blot);
+        this.replaceWith(finalBlot);
         if (this.loadCallback) {
             this.loadCallback();
             this.loadCallback = undefined;
         }
+    }
+
+    /**
+     * Register a callback for when the blot has been finalized.
+     */
+    public registerLoadCallback(callback: () => void) {
+        this.loadCallback = callback;
     }
 }

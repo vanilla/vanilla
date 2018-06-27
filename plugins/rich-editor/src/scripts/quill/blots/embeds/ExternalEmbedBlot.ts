@@ -70,13 +70,12 @@ export default class ExternalEmbedBlot extends FocusableEmbedBlot {
         const rootNode = FocusableEmbedBlot.create(data);
         const embedNode = document.createElement("div");
         const descriptionNode = document.createElement("span");
-        rootNode.classList.add("embedExternal");
+        rootNode.classList.add("js-embed");
         rootNode.classList.remove(FOCUS_CLASS);
         descriptionNode.innerHTML = t("richEditor.externalEmbed.description");
         descriptionNode.classList.add("sr-only");
         descriptionNode.id = uniqueId("richEditor-embed-description-");
 
-        embedNode.classList.add("embedExternal-content");
         embedNode.classList.add(FOCUS_CLASS);
         embedNode.setAttribute("aria-label", "External embed content - " + data.type);
         embedNode.setAttribute("aria-describedby", descriptionNode.id);
@@ -91,7 +90,7 @@ export default class ExternalEmbedBlot extends FocusableEmbedBlot {
     public static createErrorEmbedElement(text: string) {
         const div = FocusableEmbedBlot.create();
         div.classList.remove(FOCUS_CLASS);
-        div.classList.add("embed");
+        div.classList.add("js-embed");
         div.classList.add("embedLinkLoader");
         div.classList.add("embedLinkLoader-error");
         div.classList.add(FOCUS_CLASS);

@@ -358,7 +358,7 @@ export default class EmbedFocusModule extends Module {
     private setupEmbedClickHandler() {
         delegateEvent(
             "click",
-            ".js-richText .embed",
+            ".js-embed",
             (event, clickedElement) => {
                 const embed = Parchment.find(clickedElement);
                 if (embed instanceof FocusableEmbedBlot) {

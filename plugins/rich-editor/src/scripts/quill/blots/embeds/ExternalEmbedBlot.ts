@@ -87,12 +87,12 @@ export default class ExternalEmbedBlot extends FocusableEmbedBlot {
      * @param linkText - The text of the link that failed to be embeded.
      */
     public static createEmbedWarningFallback(linkText: string) {
-        const div = FocusableEmbedBlot.create();
-        div.classList.remove(FOCUS_CLASS);
-        div.classList.add("js-embed");
+        const div = document.createElement("div");
+        div.classList.add("embedExternal");
         div.classList.add("embedLinkLoader");
         div.classList.add("embedLinkLoader-error");
         div.classList.add(FOCUS_CLASS);
+        div.setAttribute("tabindex", "-1");
 
         const sanitizedText = escapeHTML(linkText);
 
@@ -202,7 +202,7 @@ export default class ExternalEmbedBlot extends FocusableEmbedBlot {
         };
 
         const loader = this.domNode.querySelector(".embedLinkLoader");
-        const embedElement = await ExternalEmbedBlot.createEmbedFromData(data, loader);
+        const embedElement = ExternalEmbedBlot.createEmbedFromData(data, loader);
         setData(embedElement, DATA_KEY, newValue);
         finalBlot = new ExternalEmbedBlot(embedElement, newValue, false);
         this.replaceWith(finalBlot);

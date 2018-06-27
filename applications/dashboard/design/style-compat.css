@@ -1831,6 +1831,16 @@ body.isMobile .FormWrapper {
   cursor: default;
 }
 
+.richEditor .embedExternal-content:hover::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.2);
+}
+
 .embedVideo .embedExternal-content {
   position: relative;
   display: block;
@@ -1843,6 +1853,12 @@ body.isMobile .FormWrapper {
   -webkit-transform: scale(1.1);
       -ms-transform: scale(1.1);
           transform: scale(1.1);
+}
+
+.richEditor .embedVideo .embedExternal-content:focus .embedVideo-playIcon, .richEditor .embedVideo .embedExternal-content:hover .embedVideo-playIcon {
+  -webkit-transform: scale(1);
+      -ms-transform: scale(1);
+          transform: scale(1);
 }
 
 .embedVideo-iframe {

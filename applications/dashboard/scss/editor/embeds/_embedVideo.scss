@@ -18,6 +18,19 @@ $embedVideo_width: $embed_width;
     }
 }
 
+.richEditor { // No hover in edit mode
+    .embedVideo {
+        .embedExternal-content {
+            &:focus,
+            &:hover {
+                .embedVideo-playIcon {
+                    transform: scale(1);
+                }
+            }
+        }
+    }
+}
+
 .embedVideo-iframe {
     @include absolute-fullSizeOfParent;
 }
@@ -67,6 +80,8 @@ $embedVideo_width: $embed_width;
         background: linear-gradient(to bottom, $bg, $bg);
     }
 }
+
+
 
 .embedVideo-playIcon {
     position: absolute;

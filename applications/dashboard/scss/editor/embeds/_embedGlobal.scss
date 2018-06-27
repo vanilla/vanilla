@@ -81,26 +81,19 @@
 
 
 // Edit Mode changes
-//.userContent { // Only in edit mode
-//    .embedLink-title {
-//        margin: 0;
-//        &:not(:last-child) {
-//            margin: 0 0 $utility-baseUnit;
-//        }
-//    }
-
-    //.embedExternal-content {
-    //    &:hover {
-    //        &::after {
-    //            content: "";
-    //            position: absolute;
-    //            top: 0;
-    //            left: 0;
-    //            width: 100%;
-    //            height: 100%;
-    //            background-color: $embed-overlay_hover_color;
-    //        }
-    //    }
-    //}
-//}
+.richEditor { // Only in edit mode
+    .embedExternal-content {
+        &:hover {
+            &::after {
+                content: "";
+                position: absolute;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background-color: $embed-overlay_hover_color;
+            }
+        }
+    }
+}
 

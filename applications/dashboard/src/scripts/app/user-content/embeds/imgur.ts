@@ -3,7 +3,7 @@
  * @license https://opensource.org/licenses/GPL-2.0 GPL-2.0
  */
 
-import { registerEmbed, IEmbedData } from "@dashboard/embeds";
+import { registerEmbed, IEmbedData, IEmbedElements } from "@dashboard/embeds";
 import { ensureScript } from "@dashboard/dom";
 import { onContent } from "@dashboard/application";
 
@@ -37,7 +37,8 @@ async function convertImgurEmbeds() {
 /**
  * Render a single imgur embed.
  */
-export async function renderImgur(rootElement: HTMLElement, contentElement: HTMLElement, data: IEmbedData) {
+export async function renderImgur(elements: IEmbedElements, data: IEmbedData) {
+    const contentElement = elements.content;
     const url = "imgur.com/" + data.attributes.postID;
     const isAlbum = data.attributes.isAlbum;
     const dataSet = isAlbum ? "a/" + data.attributes.postID : data.attributes.postID;
@@ -49,7 +50,5 @@ export async function renderImgur(rootElement: HTMLElement, contentElement: HTML
     blockQuote.setAttribute("href", url);
 
     contentElement.appendChild(blockQuote);
-    setImmediate(() => {
-        void convertImgurEmbeds();
-    });
+    await convertImgurEmbeds();
 }

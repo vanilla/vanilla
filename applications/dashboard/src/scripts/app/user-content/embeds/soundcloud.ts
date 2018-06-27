@@ -3,7 +3,7 @@
  * @license https://opensource.org/licenses/GPL-2.0 GPL-2.0
  */
 
-import { registerEmbed, IEmbedData, FOCUS_CLASS } from "@dashboard/embeds";
+import { registerEmbed, IEmbedData, FOCUS_CLASS, IEmbedElements } from "@dashboard/embeds";
 
 // Setup soundcloud embeds.
 registerEmbed("soundcloud", soundCloudRenderer);
@@ -11,7 +11,8 @@ registerEmbed("soundcloud", soundCloudRenderer);
 /**
  * Renders soundcloud embeds.
  */
-export async function soundCloudRenderer(rootElement: HTMLElement, contentElement: HTMLElement, data: IEmbedData) {
+export async function soundCloudRenderer(elements: IEmbedElements, data: IEmbedData) {
+    const contentElement = elements.content;
     const showArtwork = data.attributes.showArtwork ? data.attributes.showArtwork : "false";
     const visual = data.attributes.visual ? data.attributes.visual : "false";
 

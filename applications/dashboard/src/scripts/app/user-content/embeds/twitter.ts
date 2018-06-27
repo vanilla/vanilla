@@ -5,7 +5,7 @@
 
 import { ensureScript } from "@dashboard/dom";
 import { onContent, onReady } from "@dashboard/application";
-import { registerEmbed, IEmbedData } from "@dashboard/embeds";
+import { registerEmbed, IEmbedData, IEmbedElements } from "@dashboard/embeds";
 import { logError } from "@dashboard/utility";
 
 // Setup twitter embeds
@@ -39,7 +39,7 @@ async function convertTwitterEmbeds() {
                     attributes: { statusID },
                 };
 
-                return renderTweet(null, contentElement as HTMLElement, renderData);
+                return renderTweet({ content: contentElement as HTMLElement, root: null as any }, renderData);
             });
 
             // Render all the pages twitter embeds at the same time.
@@ -51,7 +51,8 @@ async function convertTwitterEmbeds() {
 /**
  * Render a single twitter embed.
  */
-export async function renderTweet(rootElement: HTMLElement | null, contentElement: HTMLElement, data: IEmbedData) {
+export async function renderTweet(elements: IEmbedElements, data: IEmbedData) {
+    const contentElement = elements.content;
     // Ensure the twitter library is loaded.
     await ensureScript("//platform.twitter.com/widgets.js");
 
@@ -73,15 +74,14 @@ export async function renderTweet(rootElement: HTMLElement | null, contentElemen
 
         // Render the embed.
         const options = { conversation: "none" };
-        window.twttr.widgets.createTweet(data.attributes.statusID, contentElement, options).then(() => {
-            // Remove a url if there is one around.
-            const url = contentElement.querySelector(".tweet-url");
-            if (url) {
-                url.remove();
-            }
+        await window.twttr.widgets.createTweet(data.attributes.statusID, contentElement, options);
+        // Remove a url if there is one around.
+        const url = contentElement.querySelector(".tweet-url");
+        if (url) {
+            url.remove();
+        }
 
-            // Fade it in.
-            contentElement.classList.add("twitter-card-loaded");
-        });
+        // Fade it in.
+        contentElement.classList.add("twitter-card-loaded");
     }
 }

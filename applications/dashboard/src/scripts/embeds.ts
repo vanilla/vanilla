@@ -23,12 +23,12 @@ export interface IEmbedData {
     };
 }
 
-export type EmbedRenderer = (
-    rootElement: HTMLElement,
-    contentElement: HTMLElement,
-    data: IEmbedData,
-    inEditor: boolean,
-) => Promise<void>;
+export interface IEmbedElements {
+    root: HTMLElement;
+    content: HTMLElement;
+}
+
+export type EmbedRenderer = (elements: IEmbedElements, data: IEmbedData, inEditor: boolean) => Promise<void>;
 
 const embedRenderers: {
     [type: string]: EmbedRenderer;
@@ -51,15 +51,7 @@ export function registerEmbed(type: string, renderer: EmbedRenderer) {
 /**
  * Render an embed into a DOM node based on it's type.
  */
-export function renderEmbed(element: HTMLElement, data: IEmbedData, inEditor = true): undefined | Promise<void> {
-    element.classList.add("embedExternal");
-    element.classList.add("embed" + capitalizeFirstLetter(data.type));
-
-    const elementContents = document.createElement("div");
-    elementContents.classList.add("embedExternal-content");
-
-    element.appendChild(elementContents);
-
+export function renderEmbed(elements: IEmbedElements, data: IEmbedData, inEditor = true): Promise<void> {
     if (!data.type) {
         throw new Error("The embed type was not provided.");
     }
@@ -67,7 +59,7 @@ export function renderEmbed(element: HTMLElement, data: IEmbedData, inEditor = t
     const render = data.type && embedRenderers[data.type];
 
     if (render) {
-        return render(element, elementContents, data, inEditor);
+        return render(elements, data, inEditor);
     } else {
         throw new Error("Could not find a renderer for the embed type - " + data.type);
     }

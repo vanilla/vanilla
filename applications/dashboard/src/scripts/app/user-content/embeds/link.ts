@@ -3,7 +3,7 @@
  * @license https://opensource.org/licenses/GPL-2.0 GPL-2.0
  */
 
-import { registerEmbed, IEmbedData } from "@dashboard/embeds";
+import { registerEmbed, IEmbedData, IEmbedElements } from "@dashboard/embeds";
 import { getData, setData } from "@dashboard/dom";
 import { cssSpecialChars } from "@dashboard/utility";
 import debounce from "lodash/debounce";
@@ -19,7 +19,8 @@ window.addEventListener("resize", () => debounce(truncateEmbedLinks, 200)());
 /**
  * Render a a link embed.
  */
-export async function renderLinkEmbed(rootElement: HTMLElement, contentElement: HTMLElement, data: IEmbedData) {
+export async function renderLinkEmbed(elements: IEmbedElements, data: IEmbedData) {
+    const contentElement = elements.content;
     contentElement.setAttribute("href", data.url);
 
     contentElement.setAttribute("target", "_blank");

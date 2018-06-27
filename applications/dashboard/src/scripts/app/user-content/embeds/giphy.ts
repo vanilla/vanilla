@@ -3,14 +3,15 @@
  * @license https://opensource.org/licenses/GPL-2.0 GPL-2.0
  */
 
-import { registerEmbed, IEmbedData, FOCUS_CLASS } from "@dashboard/embeds";
+import { registerEmbed, IEmbedData, FOCUS_CLASS, IEmbedElements } from "@dashboard/embeds";
 
 registerEmbed("giphy", giphyRenderer);
 
 /**
  * Renders giphy embeds.
  */
-export async function giphyRenderer(rootElement: HTMLElement, contentElement: HTMLElement, data: IEmbedData) {
+export async function giphyRenderer(elements: IEmbedElements, data: IEmbedData) {
+    const contentElement = elements.content;
     if (data.attributes.postID == null) {
         throw new Error("Giphy embed fail, the post could not be found");
     }

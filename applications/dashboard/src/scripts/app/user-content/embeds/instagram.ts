@@ -3,7 +3,7 @@
  * @license https://opensource.org/licenses/GPL-2.0 GPL-2.0
  */
 
-import { registerEmbed, IEmbedData } from "@dashboard/embeds";
+import { registerEmbed, IEmbedData, IEmbedElements } from "@dashboard/embeds";
 import { ensureScript } from "@dashboard/dom";
 import { onContent } from "@dashboard/application";
 
@@ -27,7 +27,8 @@ async function convertInstagramEmbeds() {
 /**
  * Render a single instagram embed.
  */
-export async function renderInstagram(rootElement: HTMLElement, contentElement: HTMLElement, data: IEmbedData) {
+export async function renderInstagram(elements: IEmbedElements, data: IEmbedData) {
+    const contentElement = elements.content;
     await ensureScript("//platform.instagram.com/en_US/embeds.js");
 
     if (!window.instgrm) {
@@ -46,7 +47,5 @@ export async function renderInstagram(rootElement: HTMLElement, contentElement: 
     blockQuote.dataset.instgrmCaptioned = data.attributes.isCaptioned;
 
     contentElement.appendChild(blockQuote);
-    setImmediate(() => {
-        window.instgrm.Embeds.process();
-    });
+    await window.instgrm.Embeds.process();
 }

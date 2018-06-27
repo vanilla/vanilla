@@ -62,6 +62,23 @@ class SmokeTest extends BaseTest {
     }
 
     /**
+     * Get a single discussion from an array of Discussions.
+     *
+     * @param array $discussions
+     * @return array $discussion
+     * @throws \Exception
+     */
+    protected function getSingleDiscussion(array $discussions): array {
+        $discussions = val('Discussions', $discussions);
+        if (empty($discussions)) {
+            throw new \Exception("There are no discussions to post to.");
+        }
+        $discussion = reset($discussions);
+
+        return $discussion;
+    }
+
+    /**
      * Test registering a user with the basic method.
      *
      * @large
@@ -384,70 +401,55 @@ class SmokeTest extends BaseTest {
     }
 
     /**
-     * Test adding a bookmark to discussion.
+     * Test adding a bookmark to a discussion.
      *
      * @depends testRegisterBasic
      * @depends testPostDiscussion
      */
-
     public function testDiscussionAddBookMark() {
         $api = $this->api();
-
         $api->setUser($this->getTestUser());
         $user = $api->getUser();
 
-
         $discussions = $this->api()->get('/discussions.json')->getBody();
-        $discussions = val('Discussions', $discussions);
-        if (empty($discussions)) {
-            throw new \Exception("There are no discussions to post to.");
-        }
-        $discussion = reset($discussions);
+        $discussion = $this->getSingleDiscussion($discussions);
         $discussionID = val('DiscussionID', $discussion);
+        $discussionName = val('Name', $discussion['Name']);
 
         $r = $api->post(
             "/discussion/bookmark/{$discussionID}/{$user['tk']}"
         );
-
         $statusCode = $r->getStatusCode();
         $this->assertEquals(200, $statusCode);
 
-        $postedBookMark = $this->api()->get("/discussion/{$discussionID}/{$discussion['Name']}.json")->getBody();
+        $postedBookMark = $this->api()->get("/discussion/{$discussionID}/{$discussionName}.json")->getBody();
         $isBookMarked = $postedBookMark['Discussion']['Bookmarked'];
         $this->assertEquals( 1, $isBookMarked);
-
     }
 
     /**
      * Test removing a bookmark from a discussion.
+     *
      * @depends testDiscussionAddBookMark
      */
-
     public function testRemoveDiscussionBookMark() {
         $api = $this->api();
-
         $api->setUser($this->getTestUser());
         $user = $api->getUser();
 
-
         $discussions = $this->api()->get('/discussions.json')->getBody();
-        $discussions = val('Discussions', $discussions);
-        if (empty($discussions)) {
-            throw new \Exception("There are no discussions to post to.");
-        }
-        $discussion = reset($discussions);
+        $discussion = $this->getSingleDiscussion($discussions);
         $discussionID = val('DiscussionID', $discussion);
+        $discussionName = val('Name', $discussion['Name']);
 
         $r = $api->post(
             "/discussion/bookmark/{$discussionID}/{$user['tk']}"
         );
-
         $statusCode = $r->getStatusCode();
         $this->assertEquals(200, $statusCode);
 
-        $postedBookMark = $this->api()->get("/discussion/{$discussionID}/{$discussion['Name']}.json")->getBody();
+        $postedBookMark = $this->api()->get("/discussion/{$discussionID}/{$discussionName}.json")->getBody();
         $isBookMarked = $postedBookMark['Discussion']['Bookmarked'];
         $this->assertEquals( 0, $isBookMarked);
-
     }
 }

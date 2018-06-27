@@ -83,6 +83,14 @@ button.Close {
   display: none;
 }
 
+.authenticateConnect .pageTitle,
+.authenticateUserCol .pageTitle {
+  text-align: center;
+  display: block;
+  font-size: 30px;
+  margin-bottom: 36px;
+}
+
 .authenticateUserCol {
   padding: 0 26px;
   margin: auto;
@@ -91,29 +99,12 @@ button.Close {
   box-sizing: border-box;
 }
 
-.authenticateUserCol .pageTitle {
-  text-align: center;
-  margin-bottom: 18px;
-}
-
 .authenticateUserCol .button.button-fullWidth {
   margin-bottom: 18px;
 }
 
 .authenticateUserCol .button.button-fullWidth.button-sso {
   margin-bottom: 12px;
-}
-
-.authenticateUserCol .icon {
-  display: inline-block;
-  width: 24px;
-  height: 24px;
-  vertical-align: middle;
-}
-
-.authenticateUserCol .iconLarge {
-  width: 32px;
-  height: 32px;
 }
 
 .authenticateUser-photoCrop,
@@ -161,7 +152,7 @@ button.Close {
 }
 
 .authenticateUser-name {
-  font-size: 16px;
+  font-size: 18px;
   font-weight: 600;
   text-align: center;
 }
@@ -185,11 +176,13 @@ button.Close {
       -ms-flex-align: center;
           align-items: center;
   font-size: 12px;
+  line-height: 1.4285714286;
 }
 
 .rememberMeAndForgot a {
   font-size: inherit;
   color: #0291db;
+  line-height: inherit;
 }
 
 .rememberMeAndForgot-rememberMe {
@@ -280,6 +273,104 @@ button.Close {
 
 .ssoMethods {
   margin-bottom: 18px;
+}
+
+.ssoUser-info {
+  display: block;
+  position: relative;
+  width: 120px;
+  height: auto;
+  margin: auto;
+  padding: 0;
+}
+
+.ssoUser-image.PhotoWrap {
+  height: 117px;
+  width: 117px;
+  background-size: cover;
+  background-position: 50% 50%;
+  background-repeat: no-repeat;
+  border-radius: 50%;
+  overflow: hidden;
+}
+
+.ssoUser-image.PhotoWrap::before {
+  display: none;
+}
+
+.ssoUser-info {
+  position: relative;
+  text-align: center;
+}
+
+.ssoUser {
+  padding-bottom: 12px;
+}
+
+.ssoUser-image {
+  overflow: hidden;
+  border-radius: 50%;
+}
+
+.ssoUser-provider {
+  position: absolute;
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-align: center;
+  -webkit-align-items: center;
+      -ms-flex-align: center;
+          align-items: center;
+  -webkit-box-pack: center;
+  -webkit-justify-content: center;
+      -ms-flex-pack: center;
+          justify-content: center;
+  bottom: 0;
+  right: 0;
+  width: 39px;
+  height: 39px;
+  overflow: hidden;
+  border-radius: 50%;
+  border-style: solid;
+  border-width: 3px;
+}
+
+.ssoUser-icon {
+  width: 24px;
+  height: auto;
+}
+
+.ssoUser-arrowDown {
+  display: block;
+  width: 42px;
+  height: auto;
+  margin-top: 12px;
+  margin-right: auto;
+  margin-left: auto;
+}
+
+.ssoUser-namePrimary {
+  font-size: 18px;
+  margin-top: 1em;
+  text-align: center;
+  color: inherit;
+}
+
+.ssoUser-nameSecondary {
+  font-size: 12px;
+  text-align: center;
+  color: inherit;
+  opacity: .7;
+  margin-top: 6px;
+}
+
+.authenticateUser-paragraph {
+  margin-bottom: 24px;
+}
+
+.errorOrLinkLabel-message {
+  color: #ff3933;
 }
 
 .followButton {
@@ -473,8 +564,8 @@ body.Categories.isMobile .PageControls.Top {
           align-items: center;
 }
 
-.inputBlock.inputBlock-tighter {
-  margin-top: -12px;
+.inputBlock.inputBlock-tighterTop {
+  margin-top: -18px;
 }
 
 .inputBlock.hasError .inputText {
@@ -496,7 +587,7 @@ body.Categories.isMobile .PageControls.Top {
   display: block;
   font-weight: 600;
   margin-bottom: 6px;
-  line-height: 1.428571429;
+  line-height: 1.4285714286;
 }
 
 .InputBox.inputText {
@@ -506,7 +597,7 @@ body.Categories.isMobile .PageControls.Top {
 .inputBlock-error {
   display: block;
   color: #ff3933;
-  line-height: 1.428571429;
+  line-height: 1.4285714286;
   font-size: 12px;
   margin-top: 3px;
   word-break: break-all;
@@ -528,12 +619,8 @@ body.Categories.isMobile .PageControls.Top {
 .inputBlock-labelNote {
   display: block;
   font-size: 12px;
-  line-height: 1.428571429;
-  opacity: .6;
-}
-
-.inputBlock-labelNote + .inputBlock-inputWrap {
-  margin-top: 6px;
+  line-height: 1.4285714286;
+  margin-top: 3px;
 }
 
 .authenticateUser-paragraph {
@@ -553,6 +640,11 @@ body.Categories.isMobile .PageControls.Top {
   display: none;
 }
 
+label.checkbox {
+  line-height: 1.4285714286;
+  font-size: 12px;
+}
+
 label.checkbox input.checkbox-input {
   float: none;
   margin: 0;
@@ -564,12 +656,39 @@ label.checkbox input.checkbox-input {
       -ms-user-select: none;
           user-select: none;
   margin-left: 6px;
+  font-size: inherit;
   line-height: inherit;
 }
 
 .button.button-fullWidth {
   width: 100%;
   max-width: 100%;
+  text-align: center;
+}
+
+.uiButton {
+  font-size: 14px;
+  margin-left: -24px;
+  line-height: 1.4285714286;
+  cursor: pointer;
+  display: -webkit-inline-box;
+  display: -webkit-inline-flex;
+  display: -ms-inline-flexbox;
+  display: inline-flex;
+  -webkit-box-align: start;
+  -webkit-align-items: flex-start;
+      -ms-flex-align: start;
+          align-items: flex-start;
+  -webkit-box-pack: center;
+  -webkit-justify-content: center;
+      -ms-flex-pack: center;
+          justify-content: center;
+  color: inherit;
+}
+
+.uiButton:hover, .uiButton:focus {
+  border: 0;
+  text-decoration: none;
 }
 
 ::-moz-focus-inner {
@@ -651,6 +770,16 @@ label.checkbox input.checkbox-input {
 
 .stickyHeader.isScrollingDown {
   position: absolute;
+}
+
+.backLink-icon {
+  display: block;
+  width: 24px;
+  height: 24px;
+}
+
+.backLink-label {
+  line-height: 24px;
 }
 
 @-webkit-keyframes spinnerLoader {

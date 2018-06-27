@@ -39,21 +39,6 @@ $embedLoader-closeButton_opacity: .7 !default;
     @include spinnerLoader($embedLoader_spinner-width);
 }
 
-
-// Loading Error
-.embedLoader-errors {
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    min-height: $embedLoader_width;
-    margin:0;
-    padding: 0;
-    text-indent: 0;
-    list-style-type: none;
-
-    // todo: undo list styles
-}
-
 .embedLoader-error {
     display: flex;
     overflow: hidden;
@@ -63,6 +48,16 @@ $embedLoader-closeButton_opacity: .7 !default;
     box-shadow: $embedLoader-embedError-shadow;
     padding: $embedLoader-embedError-padding;
     background: $embedded-error_bg;
+    transition: 0.2s ease box-shadow;
+    cursor: pointer;
+
+    &:hover {
+        box-shadow: 0 0 0 2px rgba($embed-focus-color, 0.5);
+    }
+
+    &:focus {
+        box-shadow: 0 0 0 2px $embed-focus-color;
+    }
 
     + .embedLoader-error {
         margin-top: 12px;
@@ -76,9 +71,11 @@ $embedLoader-closeButton_opacity: .7 !default;
         opacity: $embedLoader-closeButton_opacity;
         width: $embedLoader-closeButton_width;
         height: $embedLoader-closeButton_width;
+        flex-basis: $embedLoader-closeButton_width;
         align-self: flex-start;
         margin: 0 0 0 auto;
         cursor: pointer;
+        position: relative;
 
         &,
         &:hover,
@@ -99,6 +96,12 @@ $embedLoader-closeButton_opacity: .7 !default;
         &:hover,
         &:focus {
             opacity: 1;
+        }
+
+        .embedLoader-icon {
+            position: absolute;
+            top: 0;
+            left: 0;
         }
     }
 }

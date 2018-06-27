@@ -2134,27 +2134,6 @@ body.isMobile .FormWrapper {
   height: 42px;
 }
 
-.embedLoader-errors {
-  display: -webkit-box;
-  display: -webkit-flex;
-  display: -ms-flexbox;
-  display: flex;
-  -webkit-box-orient: vertical;
-  -webkit-box-direction: normal;
-  -webkit-flex-direction: column;
-      -ms-flex-direction: column;
-          flex-direction: column;
-  -webkit-box-pack: center;
-  -webkit-justify-content: center;
-      -ms-flex-pack: center;
-          justify-content: center;
-  min-height: 135px;
-  margin: 0;
-  padding: 0;
-  text-indent: 0;
-  list-style-type: none;
-}
-
 .embedLoader-error {
   display: -webkit-box;
   display: -webkit-flex;
@@ -2170,6 +2149,17 @@ body.isMobile .FormWrapper {
   box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.3);
   padding: 15px;
   background: rgba(255, 57, 52, 0.12);
+  -webkit-transition: 0.2s ease box-shadow;
+          transition: 0.2s ease box-shadow;
+  cursor: pointer;
+}
+
+.embedLoader-error:hover {
+  box-shadow: 0 0 0 2px rgba(2, 145, 219, 0.5);
+}
+
+.embedLoader-error:focus {
+  box-shadow: 0 0 0 2px #0291db;
 }
 
 .embedLoader-error + .embedLoader-error {
@@ -2186,11 +2176,15 @@ body.isMobile .FormWrapper {
   opacity: 0.7;
   width: 24px;
   height: 24px;
+  -webkit-flex-basis: 24px;
+      -ms-flex-preferred-size: 24px;
+          flex-basis: 24px;
   -webkit-align-self: flex-start;
       -ms-flex-item-align: start;
           align-self: flex-start;
   margin: 0 0 0 auto;
   cursor: pointer;
+  position: relative;
 }
 
 .embedLoader-error .closeButton, .embedLoader-error .closeButton:hover, .embedLoader-error .closeButton:focus {
@@ -2210,6 +2204,12 @@ body.isMobile .FormWrapper {
 
 .embedLoader-error .closeButton:hover, .embedLoader-error .closeButton:focus {
   opacity: 1;
+}
+
+.embedLoader-error .closeButton .embedLoader-icon {
+  position: absolute;
+  top: 0;
+  left: 0;
 }
 
 .userContent .embedLoader-errorMessage {

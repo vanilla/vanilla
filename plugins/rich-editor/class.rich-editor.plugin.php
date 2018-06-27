@@ -88,7 +88,7 @@ class RichEditorPlugin extends Gdn_Plugin {
             ]);
 
             // Render the editor view.
-            $args['BodyBox'] = $controller->fetchView('rich-editor', '', 'plugins/rich-editor');
+            $args['BodyBox'] .= $controller->fetchView('rich-editor', '', 'plugins/rich-editor');
         }
     }
 

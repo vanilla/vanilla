@@ -4,116 +4,75 @@
  * @license https://opensource.org/licenses/GPL-2.0 GPL-2.0
  */
 
+import get from "lodash/get";
 import BaseHistoryModule from "quill/modules/history";
-import { delegateEvent } from "@dashboard/dom";
-import KeyboardModule from "quill/modules/keyboard";
+import { DeltaOperation, DeltaStatic } from "quill/core";
+import { FOCUS_CLASS } from "@dashboard/embeds";
+
+const SHORTKEY = /Mac/i.test(navigator.platform) ? "metaKey" : "ctrlKey";
 
 /**
  * A custom history module to allow redo/undo to work while an Embed is focused
  * and hack around the fact that Quill doesn't have first class support for asynchronusly rendering things.
  */
 export default class HistoryModule extends BaseHistoryModule {
+    private readonly EMBED_KEY = "insert.embed-external";
+    private readonly EMBED_CONFIRM_KEY = "insert.embed-external.loaderData.loaded";
+    private readonly Z_KEYCODE = 90;
+
     /**
      * Add an undo handler for when an embed blot has focus.
      */
     constructor(quill, options) {
-        super(quill, options);
-        delegateEvent(
-            "keydown",
-            ".embed",
-            (event: KeyboardEvent, clickedElement) => {
-                if (
-                    KeyboardModule.match(event, {
-                        key: "z",
-                        metaKey: true,
-                    })
-                ) {
-                    if (event.shiftKey) {
-                        this.redo();
-                    } else {
-                        this.undo();
-                    }
+        super(quill, {
+            ...options,
+            // usersOnly: true,
+        });
+        document.addEventListener("keydown", this.undoKeyboardListener, true);
+    }
+
+    public undoKeyboardListener = (event: KeyboardEvent) => {
+        // Quill's Keyboard.match() FAILS to match a shortkey + z for some reason. Just check it ourself.
+        if (event.keyCode === this.Z_KEYCODE && event[SHORTKEY]) {
+            if (document.activeElement.classList.contains(FOCUS_CLASS)) {
+                if (event.shiftKey) {
+                    this.redo();
+                } else {
+                    this.undo();
                 }
-            },
-            this.quill.container,
-        );
-    }
-
-    /**
-     * Occasionally perform a double undo/redo. This is to prevent the undo stack from getting trashed
-     * by promises that don't resolve in an orderly fashion.
-     */
-    public change(source: "undo" | "redo", dest) {
-        if (source === "undo" && this.needsDoubleUndo()) {
-            this.ignoreChange = true;
-            super.change(source, dest);
-            super.change(source, dest);
-            this.ignoreChange = false;
-        } else if (source === "redo" && this.needsDoubleRedo()) {
-            this.ignoreChange = true;
-            super.change(source, dest);
-            super.change(source, dest);
-            this.ignoreChange = false;
-        } else {
-            super.change(source, dest);
+            }
         }
-    }
+    };
 
-    public record(changeDelta, oldDelta) {
+    public record(changeDelta: DeltaStatic, oldDelta: DeltaStatic) {
+        if (this.operationsContainKey(changeDelta.ops, this.EMBED_KEY)) {
+            this.cutoff();
+        }
+
+        const undoDelta = this.quill.getContents().diff(oldDelta);
+        if (this.actionIsEmbedCompletion(undoDelta, changeDelta)) {
+            return;
+        }
         super.record(changeDelta, oldDelta);
     }
 
-    /**
-     * This is SUPER hacky, but I couldn't find a better way to manage it.
-     *
-     * Certain operations (where we are async rendering a blot and it needs to return immediately anyways)
-     * require 2 undos. These inserts have an insert of a Promise.
-     *
-     * If a double undo is not performed the blot will continually re-resolve, and re-render itself, making
-     * undoing impossible.
-     */
-    private needsDoubleUndo(): boolean {
-        const lastUndo = this.stack.undo[this.stack.undo.length - 1];
-        if (!lastUndo) {
-            return false;
-        }
-
-        const lastUndoOps = lastUndo.undo.ops;
-
-        let containsAPromiseInsert = false;
-        lastUndoOps.forEach(op => {
-            if (op.insert && op.insert["embed-external"] && op.insert["embed-external"] instanceof Promise) {
-                containsAPromiseInsert = true;
-            }
-        });
-        return containsAPromiseInsert;
+    public actionIsEmbedCompletion(undoDelta: DeltaStatic, redoDelta: DeltaStatic) {
+        const hasDeleteRecordOfLoadingEmbed = this.operationsContainKey(redoDelta.ops, this.EMBED_CONFIRM_KEY);
+        const hasAddRecordOfLoadingEmbed = this.operationsContainKey(undoDelta.ops, this.EMBED_CONFIRM_KEY);
+        return hasDeleteRecordOfLoadingEmbed || hasAddRecordOfLoadingEmbed;
     }
 
-    /**
-     * This is SUPER hacky, but I couldn't find a better way to manage it.
-     *
-     * Certain operations (where we are async rendering a blot and it needs to return immediately anyways)
-     * require 2 undos. These inserts have an insert of a Promise.
-     *
-     * If a double redo is not performed the blot will continually re-resolve, and re-render itself, making
-     * undoing impossible.
-     *
-     * Unfornunately the redo stack is totally trashed after we redo one of the promise based items.
-     */
-    private needsDoubleRedo(): boolean {
-        const lastRedo = this.stack.redo[this.stack.redo.length - 1];
-        if (!lastRedo) {
+    private operationsContainKey(ops: DeltaOperation[] | undefined, key: string) {
+        if (!ops) {
             return false;
         }
 
-        const lastRedoOps = lastRedo.undo.ops;
-
-        let containsAPromiseInsert = false;
-        lastRedoOps.forEach(op => {
-            if (op.insert && op.insert["embed-external"] && op.insert["embed-external"] instanceof Promise) {
-                containsAPromiseInsert = true;
+        for (const op of ops) {
+            if (get(op, key, false)) {
+                return true;
             }
-        });
-        return containsAPromiseInsert;
+        }
+
+        return false;
     }
 }

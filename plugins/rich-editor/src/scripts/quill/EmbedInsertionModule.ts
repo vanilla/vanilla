@@ -9,8 +9,7 @@ import Parchment from "parchment";
 import Quill, { RangeStatic, Sources } from "quill/core";
 import api, { uploadImage } from "@dashboard/apiv2";
 import { getPastedImage, getDraggedImage } from "@dashboard/dom";
-import ExternalEmbedBlot from "./blots/embeds/ExternalEmbedBlot";
-import { IEmbedData } from "@dashboard/embeds";
+import ExternalEmbedBlot, { IEmbedValue } from "./blots/embeds/ExternalEmbedBlot";
 
 /**
  * A Quill module for managing insertion of embeds/loading/error states.
@@ -35,22 +34,28 @@ export default class EmbedInsertionModule extends Module {
         formData.append("url", url);
 
         const scrapePromise = api.post("/media/scrape", formData).then(result => result.data);
-        this.createEmbed(scrapePromise);
+        this.createEmbed({
+            loaderData: {
+                type: "link",
+                link: url,
+            },
+            dataPromise: scrapePromise,
+        });
     }
 
     /**
      * Create an async embed. The embed will be responsible for handling it's loading state and error states.
-     *
-     * @param dataPromise - A promise that will either return the data needed for rendering, or throw an error.
      */
-    public createEmbed = (dataPromise: Promise<IEmbedData>, callback?: () => void) => {
-        const externalEmbed = Parchment.create("embed-external", dataPromise) as ExternalEmbedBlot;
+    public createEmbed = (embedValue: IEmbedValue, callback?: () => void) => {
+        const externalEmbed = Parchment.create("embed-external", embedValue) as ExternalEmbedBlot;
         const [currentLine] = this.quill.getLine(this.lastSelection.index);
         const referenceBlot = currentLine.split(this.lastSelection.index);
+        this.quill.update(Quill.sources.SILENT);
         const newSelection = {
             index: this.lastSelection.index + 2,
             length: 0,
         };
+        this.quill.update(Quill.sources.USER);
         externalEmbed.insertInto(this.quill.scroll, referenceBlot);
         externalEmbed.registerLoadCallback(() => {
             // This LOVELY null selection then setImmediate call are needed because the Twitter embed
@@ -99,7 +104,7 @@ export default class EmbedInsertionModule extends Module {
         const image = getPastedImage(event);
         if (image) {
             const imagePromise = uploadImage(image);
-            this.createEmbed(imagePromise);
+            this.createEmbed({ loaderData: { type: "image" }, dataPromise: imagePromise });
         }
     };
 
@@ -107,7 +112,7 @@ export default class EmbedInsertionModule extends Module {
         const image = getDraggedImage(event);
         if (image) {
             const imagePromise = uploadImage(image);
-            this.createEmbed(imagePromise);
+            this.createEmbed({ loaderData: { type: "image" }, dataPromise: imagePromise });
         }
     };
 

@@ -9,6 +9,9 @@ import { t } from "@dashboard/application";
 import uniqueId from "lodash/uniqueId";
 import { FOCUS_CLASS } from "@dashboard/embeds";
 
+/**
+ * A full error. Non-recoverable. A form should not be submitted while one of these is present.
+ */
 export default class ErrorBlot extends FocusableEmbedBlot {
     public static blotName = "embed-error";
     public static className = "embed-error";

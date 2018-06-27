@@ -1,4 +1,4 @@
-.js-embed {
+.embedResponsive {
     text-align: center;
 }
 
@@ -42,6 +42,10 @@
 }
 
 // Embed Loaders
+.embedLinkLoader {
+    text-align: left;
+}
+
 .embedLinkLoader-failIcon {
     display: inline-block;
     height: 1em;

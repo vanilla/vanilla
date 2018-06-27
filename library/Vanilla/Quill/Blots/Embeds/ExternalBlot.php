@@ -40,7 +40,7 @@ class ExternalBlot extends AbstractBlockEmbedBlot {
         $data = $value['data'] ?? $value;
         $type = $data['type'] ?? '';
         try {
-            $rendered = "<div class='js-embed'>".$this->embedManager->renderData($data)."</div>";
+            $rendered = "<div class='js-embed embedResponsive'>".$this->embedManager->renderData($data)."</div>";
         } catch (\Exception $e) {
             $rendered = ''; // Silently fail.
         }

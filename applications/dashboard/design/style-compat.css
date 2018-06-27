@@ -1717,7 +1717,7 @@ body.isMobile .FormWrapper {
           user-select: none;
 }
 
-.js-embed {
+.embedResponsive {
   text-align: center;
 }
 
@@ -1771,6 +1771,10 @@ body.isMobile .FormWrapper {
   padding-left: 0;
   padding-right: 0;
   padding-bottom: 0;
+}
+
+.embedLinkLoader {
+  text-align: left;
 }
 
 .embedLinkLoader-failIcon {
@@ -2072,6 +2076,11 @@ body.isMobile .FormWrapper {
   max-width: 100%;
   line-height: 1.4285714286;
   max-height: 60px;
+}
+
+.embedLinkLoader-link {
+  display: inline-block;
+  white-space: normal;
 }
 
 .embedLoader-icon {

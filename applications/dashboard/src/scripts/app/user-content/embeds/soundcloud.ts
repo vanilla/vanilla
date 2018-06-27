@@ -12,7 +12,6 @@ registerEmbed("soundcloud", soundCloudRenderer);
  * Renders soundcloud embeds.
  */
 export async function soundCloudRenderer(rootElement: HTMLElement, contentElement: HTMLElement, data: IEmbedData) {
-    const height = data.height ? data.height.toString() : "";
     const showArtwork = data.attributes.showArtwork ? data.attributes.showArtwork : "false";
     const visual = data.attributes.visual ? data.attributes.visual : "false";
 
@@ -24,7 +23,6 @@ export async function soundCloudRenderer(rootElement: HTMLElement, contentElemen
     const iframe = document.createElement("iframe");
     iframe.setAttribute("id", "sc-widget");
     iframe.setAttribute("width", "100%");
-    iframe.setAttribute("height", height);
     iframe.setAttribute("scrolling", "no");
     iframe.setAttribute("frameborder", "no");
     iframe.setAttribute(

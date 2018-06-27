@@ -1,5 +1,5 @@
 // Global
-@import "embedGlobalVarialbes";
+@import "embedGlobalVariables";
 @import "embedGlobal";
 
 // Generic
@@ -8,6 +8,7 @@
 @import "embedLink";
 
 // Specific
+@import "embedGetty";
 @import "embedImgur";
 @import "embedTwitter";
 @import "embedSoundCloud";

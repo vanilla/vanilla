@@ -1,12 +1,15 @@
+.js-embed {
+    text-align: center;
+}
+
 .embedExternal {
-    display: inline;
+    display: inline-flex;
     margin: auto;
     max-width: 100%;
     position: relative;
     justify-content: center;
     align-items: center;
     user-select: none;
-    overflow: hidden;
 }
 
 .embedExternal-content {
@@ -14,21 +17,11 @@
     margin: auto;
     user-select: none;
     width: $embed_width;
+    max-width: 100%;
+    text-align: center;
+
     > * {
         margin: auto !important;
-    }
-}
-
-.embed-focusableElement {
-    transition: 0.2s ease box-shadow;
-    cursor: pointer;
-
-    &:hover {
-        box-shadow: 0 0 0 2px rgba($embed-focus-color, 0.5);
-    }
-
-    &:focus {
-        box-shadow: 0 0 0 2px $embed-focus-color;
     }
 }
 
@@ -69,28 +62,50 @@
     vertical-align: -0.14em;
 }
 
+// Edit mode only
 
-// Edit Mode changes
-.userContent { // Only in edit mode
-    .embedLink-title {
-        margin: 0;
-        &:not(:last-child) {
-            margin: 0 0 $utility-baseUnit;
-        }
-    }
-
+.richEditor {
     .embedExternal-content {
+        transition: 0.2s ease box-shadow;
+        cursor: pointer;
+
         &:hover {
-            &::after {
-                content: "";
-                position: absolute;
-                top: 0;
-                left: 0;
-                width: 100%;
-                height: 100%;
-                background-color: $embed-overlay_hover_color;
-            }
+            box-shadow: 0 0 0 2px rgba($embed-focus-color, 0.5);
+        }
+
+        &:focus {
+            box-shadow: 0 0 0 2px $embed-focus-color;
+        }
+
+        > * {
+            pointer-events: none; // In edit mode, we never allow clicking into elements.
+            cursor: default;
         }
     }
 }
+
+
+// Edit Mode changes
+//.userContent { // Only in edit mode
+//    .embedLink-title {
+//        margin: 0;
+//        &:not(:last-child) {
+//            margin: 0 0 $utility-baseUnit;
+//        }
+//    }
+
+    //.embedExternal-content {
+    //    &:hover {
+    //        &::after {
+    //            content: "";
+    //            position: absolute;
+    //            top: 0;
+    //            left: 0;
+    //            width: 100%;
+    //            height: 100%;
+    //            background-color: $embed-overlay_hover_color;
+    //        }
+    //    }
+    //}
+//}
 

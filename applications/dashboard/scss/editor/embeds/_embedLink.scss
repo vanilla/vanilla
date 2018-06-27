@@ -7,16 +7,18 @@ $embedLink-linkImage_boxShadow: 0 1px 3px 0 rgba(0,0,0,0.3) !default;
 $embedLink-linkImage_bg: #ffffff !default;
 
 .embedLink {
-    display: block;
-    background: $embedLink-linkImage_bg;
-    box-shadow: $embedLink-linkImage_boxShadow;
+    .embedExternal-content {
+        display: block;
+        background: $embedLink-linkImage_bg;
+        box-shadow: $embedLink-linkImage_boxShadow;
 
-    &,
-    &:hover,
-    &:focus
-    {
-        color: inherit;
-        text-decoration: none !important;
+        &,
+        &:hover,
+        &:focus
+        {
+            color: inherit;
+            text-decoration: none !important;
+        }
     }
 }
 
@@ -24,6 +26,7 @@ $embedLink-linkImage_bg: #ffffff !default;
     display: block;
     position: relative;
     overflow: hidden;
+    text-align: left;
 }
 
 .embedLink-main {

@@ -573,18 +573,6 @@
         text-overflow: ellipsis;
         line-height: $richEditor-lineHeight;
     }
-
-    iframe,
-    .embedImage-img {
-        display: block;
-        position: relative;
-        margin: {
-            left: auto;
-            right: auto;
-        }
-        max-width: 100%;
-        max-height: 80vh;
-    }
 }
 
 .emoji { // old emoji support

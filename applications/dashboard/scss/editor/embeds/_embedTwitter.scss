@@ -1,17 +1,16 @@
-.embed-focusableElement {
-    &.embed-twitter {
+.embedTwitter {
+    .embedExternal-content {
+        width: auto;
+    }
+
+    &.embedTwitter {
         border-radius: 4px;
     }
 }
 
+// Shadow DOM
 .twitter-tweet {
-    margin: 0 !important;
+    margin: 0 auto !important;
+    min-width: 100% !important;
 }
 
-
-.richEditor {
-    .embedExternal-contents,
-    iframe {
-        pointer-events: none; // In edit mode, we never allow clicking into elements.
-    }
-}

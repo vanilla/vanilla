@@ -1,5 +1,6 @@
 $embedSoundCloud_width: $embed_width;
 
-.embedExternal-content.embed-soundcloud {
+.embedSoundcloud {
+    position: relative;
     width: $embedSoundCloud_width;
 }

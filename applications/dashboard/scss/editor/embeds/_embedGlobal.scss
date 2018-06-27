@@ -20,6 +20,10 @@
     max-width: 100%;
     text-align: center;
 
+    iframe {
+        display: block;
+    }
+
     > * {
         margin: auto !important;
     }
@@ -35,15 +39,6 @@
         right: 0;
         bottom: 0;
     };
-}
-
-.embedGiphy-iframe {
-    @include absolute-fullSizeOfParent;
-}
-
-
-.richEditor iframe {
-    pointer-events: none;
 }
 
 // Embed Loaders

@@ -1749,6 +1749,10 @@ body.isMobile .FormWrapper {
   text-align: center;
 }
 
+.embedExternal-content iframe {
+  display: block;
+}
+
 .embedExternal-content > * {
   margin: auto !important;
 }
@@ -1761,19 +1765,6 @@ body.isMobile .FormWrapper {
   padding-left: 0;
   padding-right: 0;
   padding-bottom: 0;
-}
-
-.embedGiphy-iframe {
-  position: absolute;
-  display: block;
-  top: 0;
-  left: 0;
-  height: 100%;
-  width: 100%;
-}
-
-.richEditor iframe {
-  pointer-events: none;
 }
 
 .embedLinkLoader-failIcon {

@@ -75,6 +75,7 @@ class GettyEmbed extends Embed {
         $encodedCapt  = htmlspecialchars($capt);
         $encodedTld = htmlspecialchars($tld);
         $encodedI360 = htmlspecialchars($i360);
+        $originalUrl = htmlspecialchars($data['url']);
 
         $result = <<<HTML
 <div class="embedExternal embedGetty">
@@ -89,7 +90,7 @@ class GettyEmbed extends Embed {
         data-capt="{$encodedCapt}"
         data-tld="{$encodedTld}"
         data-i360="{$encodedI360}">
-        $encodedURL
+        $originalUrl
     </a>
 </div>
 HTML;

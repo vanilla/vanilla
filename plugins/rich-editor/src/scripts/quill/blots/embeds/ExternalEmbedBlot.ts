@@ -76,47 +76,6 @@ export default class ExternalEmbedBlot extends FocusableEmbedBlot {
     }
 
     /**
-     * Create a successful embed element.
-     *
-     * @throws {Error} If the rendering fails
-     */
-    public static async createEmbedFromData(data: IEmbedData, loaderElement: Element | null): Promise<Element> {
-        const jsEmbed = FocusableEmbedBlot.create(data);
-        jsEmbed.classList.add("js-embed");
-        jsEmbed.classList.remove(FOCUS_CLASS);
-
-        const descriptionNode = document.createElement("span");
-        descriptionNode.innerHTML = t("richEditor.externalEmbed.description");
-        descriptionNode.classList.add("sr-only");
-        descriptionNode.id = uniqueId("richEditor-embed-description-");
-
-        const embedExternal = document.createElement("div");
-        embedExternal.classList.add("embedExternal");
-        embedExternal.classList.add("embed" + capitalizeFirstLetter(data.type));
-
-        const embedExternalContent = document.createElement("div");
-        embedExternalContent.classList.add(FOCUS_CLASS);
-        embedExternalContent.setAttribute("aria-label", "External embed content - " + data.type);
-        embedExternalContent.setAttribute("aria-describedby", descriptionNode.id);
-        embedExternalContent.classList.add("embedExternal-content");
-        embedExternalContent.tabIndex = -1;
-
-        // Append these nodes.
-        loaderElement && jsEmbed.appendChild(loaderElement);
-        jsEmbed.appendChild(embedExternal);
-        jsEmbed.appendChild(descriptionNode);
-        embedExternal.appendChild(embedExternalContent);
-
-        setImmediate(() => {
-            void renderEmbed({ root: embedExternal, content: embedExternalContent }, data).then(() => {
-                loaderElement && loaderElement.remove();
-            });
-        });
-
-        return jsEmbed;
-    }
-
-    /**
      * Create an warning state for the embed element. This occurs when the data fetching has succeeded,
      * but the browser rendering has not.
      *
@@ -145,6 +104,54 @@ export default class ExternalEmbedBlot extends FocusableEmbedBlot {
         return div;
     }
 
+    /**
+     * Create a successful embed element.
+     */
+    public static createEmbedFromData(data: IEmbedData, loaderElement: Element | null): Element {
+        const jsEmbed = FocusableEmbedBlot.create(data);
+        jsEmbed.classList.add("js-embed");
+        jsEmbed.classList.remove(FOCUS_CLASS);
+
+        const descriptionNode = document.createElement("span");
+        descriptionNode.innerHTML = t("richEditor.externalEmbed.description");
+        descriptionNode.classList.add("sr-only");
+        descriptionNode.id = uniqueId("richEditor-embed-description-");
+
+        const embedExternal = document.createElement("div");
+        embedExternal.classList.add("embedExternal");
+        embedExternal.classList.add("embed" + capitalizeFirstLetter(data.type));
+
+        const embedExternalContent = document.createElement("div");
+        embedExternalContent.classList.add(FOCUS_CLASS);
+        embedExternalContent.setAttribute("aria-label", "External embed content - " + data.type);
+        embedExternalContent.setAttribute("aria-describedby", descriptionNode.id);
+        embedExternalContent.classList.add("embedExternal-content");
+        embedExternalContent.tabIndex = -1;
+
+        // Append these nodes.
+        loaderElement && jsEmbed.appendChild(loaderElement);
+        jsEmbed.appendChild(embedExternal);
+        jsEmbed.appendChild(descriptionNode);
+        embedExternal.appendChild(embedExternalContent);
+
+        setImmediate(() => {
+            void renderEmbed({ root: embedExternal, content: embedExternalContent }, data)
+                .then(() => {
+                    loaderElement && loaderElement.remove();
+                })
+                .catch(e => {
+                    logError(e);
+                    const warning = ExternalEmbedBlot.createEmbedWarningFallback(data.url);
+                    embedExternal.remove();
+                    descriptionNode.remove();
+                    loaderElement && loaderElement.remove();
+                    jsEmbed.appendChild(warning);
+                });
+        });
+
+        return jsEmbed;
+    }
+
     private loadCallback?: () => void;
 
     /**
@@ -160,7 +167,6 @@ export default class ExternalEmbedBlot extends FocusableEmbedBlot {
             void this.replaceLoaderWithFinalForm(value);
         }
     }
-
     /**
      * Replace the embed's loader with it's final state. This could take the form of a registered embed,
      * or an error state.
@@ -187,7 +193,6 @@ export default class ExternalEmbedBlot extends FocusableEmbedBlot {
             }
         }
 
-        let embedElement: Element;
         const newValue: IEmbedValue = {
             data,
             loaderData: {
@@ -196,14 +201,8 @@ export default class ExternalEmbedBlot extends FocusableEmbedBlot {
             },
         };
 
-        try {
-            const loader = this.domNode.querySelector(".embedLinkLoader");
-            embedElement = await ExternalEmbedBlot.createEmbedFromData(data, loader);
-        } catch (e) {
-            logError(e);
-            embedElement = ExternalEmbedBlot.createEmbedWarningFallback(data.url);
-        }
-
+        const loader = this.domNode.querySelector(".embedLinkLoader");
+        const embedElement = await ExternalEmbedBlot.createEmbedFromData(data, loader);
         setData(embedElement, DATA_KEY, newValue);
         finalBlot = new ExternalEmbedBlot(embedElement, newValue, false);
         this.replaceWith(finalBlot);

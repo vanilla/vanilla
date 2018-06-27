@@ -64,7 +64,7 @@ export default class LoadingBlot extends FocusableEmbedBlot {
     private static createImageLoader() {
         const div = super.create();
         div.classList.remove(FOCUS_CLASS);
-        div.classList.add("embed");
+        div.classList.add("js-embed");
         div.classList.add("embedLinkLoader");
         div.innerHTML = `<div class='embedLoader'>
                             <div class='embedLoader-box ${FOCUS_CLASS}' aria-label='${t(
@@ -81,7 +81,7 @@ export default class LoadingBlot extends FocusableEmbedBlot {
     private static createLinkLoader(linkText: string) {
         const div = super.create();
         div.classList.remove(FOCUS_CLASS);
-        div.classList.add("embed");
+        div.classList.add("js-embed");
         div.classList.add("embedLinkLoader");
 
         const sanitizedText = escapeHTML(linkText);

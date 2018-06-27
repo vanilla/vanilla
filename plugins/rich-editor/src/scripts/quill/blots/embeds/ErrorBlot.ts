@@ -19,6 +19,7 @@ export default class ErrorBlot extends FocusableEmbedBlot {
 
     public static create(data) {
         const node = super.create(data) as HTMLElement;
+        node.classList.add("js-embed");
         const descriptionId = uniqueId("embedLoader-description");
         node.classList.remove(FOCUS_CLASS);
 

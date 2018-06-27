@@ -277,8 +277,8 @@ export default class EmbedFocusModule extends Module {
         }
 
         let activeElement = document.activeElement;
-        if (!activeElement.classList.contains("embed")) {
-            const closestEmbed = activeElement.closest(".embed");
+        if (!activeElement.classList.contains("js-embed")) {
+            const closestEmbed = activeElement.closest(".js-embed");
             if (!closestEmbed) {
                 return;
             }
@@ -358,7 +358,7 @@ export default class EmbedFocusModule extends Module {
     private setupEmbedClickHandler() {
         delegateEvent(
             "click",
-            ".js-richText .embed",
+            ".js-embed",
             (event, clickedElement) => {
                 const embed = Parchment.find(clickedElement);
                 if (embed instanceof FocusableEmbedBlot) {

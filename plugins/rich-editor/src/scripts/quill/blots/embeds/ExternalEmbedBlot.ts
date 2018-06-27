@@ -10,7 +10,7 @@ import { IEmbedData, renderEmbed, FOCUS_CLASS } from "@dashboard/embeds";
 import FocusableEmbedBlot from "../abstract/FocusableEmbedBlot";
 import ErrorBlot from "./ErrorBlot";
 import { t } from "@dashboard/application";
-import { logError } from "@dashboard/utility";
+import { logError, capitalizeFirstLetter } from "@dashboard/utility";
 import LoadingBlot from "@rich-editor/quill/blots/embeds/LoadingBlot";
 import { Blot } from "quill/core";
 
@@ -76,33 +76,6 @@ export default class ExternalEmbedBlot extends FocusableEmbedBlot {
     }
 
     /**
-     * Create a successful embed element.
-     *
-     * @throws {Error} If the rendering fails
-     */
-    public static async createEmbedFromData(data: IEmbedData): Promise<Element> {
-        const rootNode = FocusableEmbedBlot.create(data);
-        const embedNode = document.createElement("div");
-        const descriptionNode = document.createElement("span");
-        rootNode.classList.add("embedExternal");
-        rootNode.classList.remove(FOCUS_CLASS);
-        descriptionNode.innerHTML = t("richEditor.externalEmbed.description");
-        descriptionNode.classList.add("sr-only");
-        descriptionNode.id = uniqueId("richEditor-embed-description-");
-
-        embedNode.classList.add("embedExternal-content");
-        embedNode.classList.add(FOCUS_CLASS);
-        embedNode.setAttribute("aria-label", "External embed content - " + data.type);
-        embedNode.setAttribute("aria-describedby", descriptionNode.id);
-
-        rootNode.appendChild(embedNode);
-        rootNode.appendChild(descriptionNode);
-
-        await renderEmbed(embedNode, data);
-        return rootNode;
-    }
-
-    /**
      * Create an warning state for the embed element. This occurs when the data fetching has succeeded,
      * but the browser rendering has not.
      *
@@ -114,21 +87,68 @@ export default class ExternalEmbedBlot extends FocusableEmbedBlot {
      * @param linkText - The text of the link that failed to be embeded.
      */
     public static createEmbedWarningFallback(linkText: string) {
-        const div = FocusableEmbedBlot.create();
-        div.classList.remove(FOCUS_CLASS);
-        div.classList.add("embed");
+        const div = document.createElement("div");
+        div.classList.add("embedExternal");
         div.classList.add("embedLinkLoader");
         div.classList.add("embedLinkLoader-error");
-        div.classList.add(FOCUS_CLASS);
 
         const sanitizedText = escapeHTML(linkText);
 
         // In the future this message should point to a knowledge base article.
         const warningTitle = t("This embed could not be loaded in your browser.");
-        div.innerHTML = `<a href="#" class="embedLinkLoader-link">${sanitizedText}&nbsp;${WARNING_HTML(
+        div.innerHTML = `<a href="#" class="embedLinkLoader-link ${FOCUS_CLASS}" tabindex="-1">${sanitizedText}&nbsp;${WARNING_HTML(
             warningTitle,
         )}</a>`;
         return div;
+    }
+
+    /**
+     * Create a successful embed element.
+     */
+    public static createEmbedFromData(data: IEmbedData, loaderElement: Element | null): Element {
+        const jsEmbed = FocusableEmbedBlot.create(data);
+        jsEmbed.classList.add("js-embed");
+        jsEmbed.classList.add("embedResponsive");
+        jsEmbed.classList.remove(FOCUS_CLASS);
+
+        const descriptionNode = document.createElement("span");
+        descriptionNode.innerHTML = t("richEditor.externalEmbed.description");
+        descriptionNode.classList.add("sr-only");
+        descriptionNode.id = uniqueId("richEditor-embed-description-");
+
+        const embedExternal = document.createElement("div");
+        embedExternal.classList.add("embedExternal");
+        embedExternal.classList.add("embed" + capitalizeFirstLetter(data.type));
+
+        const embedExternalContent = document.createElement("div");
+        embedExternalContent.classList.add(FOCUS_CLASS);
+        embedExternalContent.setAttribute("aria-label", "External embed content - " + data.type);
+        embedExternalContent.setAttribute("aria-describedby", descriptionNode.id);
+        embedExternalContent.classList.add("embedExternal-content");
+        embedExternalContent.tabIndex = -1;
+
+        // Append these nodes.
+        loaderElement && jsEmbed.appendChild(loaderElement);
+        jsEmbed.appendChild(embedExternal);
+        jsEmbed.appendChild(descriptionNode);
+        embedExternal.appendChild(embedExternalContent);
+
+        setImmediate(() => {
+            void renderEmbed({ root: embedExternal, content: embedExternalContent }, data)
+                .then(() => {
+                    loaderElement && loaderElement.remove();
+                })
+                .catch(e => {
+                    logError(e);
+                    const warning = ExternalEmbedBlot.createEmbedWarningFallback(data.url);
+                    embedExternal.remove();
+                    descriptionNode.remove();
+                    loaderElement && loaderElement.remove();
+                    jsEmbed.appendChild(warning);
+                });
+        });
+
+        return jsEmbed;
     }
 
     private loadCallback?: () => void;
@@ -146,7 +166,6 @@ export default class ExternalEmbedBlot extends FocusableEmbedBlot {
             void this.replaceLoaderWithFinalForm(value);
         }
     }
-
     /**
      * Replace the embed's loader with it's final state. This could take the form of a registered embed,
      * or an error state.
@@ -173,7 +192,6 @@ export default class ExternalEmbedBlot extends FocusableEmbedBlot {
             }
         }
 
-        let embedElement: Element;
         const newValue: IEmbedValue = {
             data,
             loaderData: {
@@ -182,13 +200,8 @@ export default class ExternalEmbedBlot extends FocusableEmbedBlot {
             },
         };
 
-        try {
-            embedElement = await ExternalEmbedBlot.createEmbedFromData(data);
-        } catch (e) {
-            logError(e);
-            embedElement = ExternalEmbedBlot.createEmbedWarningFallback(data.url);
-        }
-
+        const loader = this.domNode.querySelector(".embedLinkLoader");
+        const embedElement = ExternalEmbedBlot.createEmbedFromData(data, loader);
         setData(embedElement, DATA_KEY, newValue);
         finalBlot = new ExternalEmbedBlot(embedElement, newValue, false);
         this.replaceWith(finalBlot);

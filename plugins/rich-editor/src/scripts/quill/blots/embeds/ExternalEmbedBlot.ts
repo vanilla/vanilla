@@ -107,8 +107,10 @@ export default class ExternalEmbedBlot extends FocusableEmbedBlot {
         jsEmbed.appendChild(descriptionNode);
         embedExternal.appendChild(embedExternalContent);
 
-        void renderEmbed({ root: embedExternal, content: embedExternalContent }, data).then(() => {
-            // loaderElement && loaderElement.remove();
+        setImmediate(() => {
+            void renderEmbed({ root: embedExternal, content: embedExternalContent }, data).then(() => {
+                loaderElement && loaderElement.remove();
+            });
         });
 
         return jsEmbed;

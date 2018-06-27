@@ -1,0 +1,114 @@
+$embedLoader_width: 135px !default;
+$embedLoader-box_bg: #FFFFFF !default;
+$embedLoader-box_boxShadow: 0 0 2px 0 rgba(0, 0, 0, .3) !default;
+$embedLoader_spinner-width: 42px !default;
+$embedLoader-spinner-color: $global-color_primary !default;
+$embedLoader-embedError-bg: rgba(255, 57, 52, .12) !default;
+$embedLoader-embedError-padding: 15px !default;
+$embedLoader-embedError-shadow: 0 1px 3px 0 rgba(0, 0, 0, .3) !default;
+$embedLoader-closeButton_width: 24px !default;
+$embedLoader-closeButton_opacity: .7 !default;
+
+.embedLoader-icon {
+    display: inline-block;
+    width: $icon-default_size;
+    height: $icon-default_size;
+    flex-basis: $icon-default_size;
+}
+
+// Loading embed
+
+.embedLoader {
+    display: block;
+    position: relative;
+}
+
+.embedLoader-box {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: $embedLoader-box_bg;
+    box-shadow: $embedLoader-box_boxShadow;
+    width: $embedLoader_width;
+    height: $embedLoader_width;
+    margin: auto;
+    overflow: hidden;
+}
+
+.embedLoader-loader {
+    @include spinnerLoader($embedLoader_spinner-width);
+}
+
+.embedLoader-error {
+    display: flex;
+    overflow: hidden;
+    align-items: center;
+    list-style: none;
+    margin:0;
+    box-shadow: $embedLoader-embedError-shadow;
+    padding: $embedLoader-embedError-padding;
+    background: $embedded-error_bg;
+    transition: 0.2s ease box-shadow;
+    cursor: pointer;
+
+    &:hover {
+        box-shadow: 0 0 0 2px rgba($embed-focus-color, 0.5);
+    }
+
+    &:focus {
+        box-shadow: 0 0 0 2px $embed-focus-color;
+    }
+
+    + .embedLoader-error {
+        margin-top: 12px;
+    }
+
+    .embedLoader-warningIcon {
+        align-self: flex-start;
+    }
+
+    .closeButton {
+        opacity: $embedLoader-closeButton_opacity;
+        width: $embedLoader-closeButton_width;
+        height: $embedLoader-closeButton_width;
+        flex-basis: $embedLoader-closeButton_width;
+        align-self: flex-start;
+        margin: 0 0 0 auto;
+        cursor: pointer;
+        position: relative;
+
+        &,
+        &:hover,
+        &:focus
+        {
+            background: none !important;
+            border: 0 !important;
+            color: inherit !important;
+            line-height: normal;
+            overflow: hidden;
+            padding: 0 !important;
+            -webkit-appearance: button !important; /* for input */
+            -webkit-user-select: none !important; /* for button */
+            -moz-user-select: none !important;
+            -ms-user-select: none !important;
+        }
+
+        &:hover,
+        &:focus {
+            opacity: 1;
+        }
+
+        .embedLoader-icon {
+            position: absolute;
+            top: 0;
+            left: 0;
+        }
+    }
+}
+
+.userContent {
+    .embedLoader-errorMessage {
+        max-width: calc(100% - #{$icon-default_size * 3});
+        padding-left: $icon-default_size;
+    }
+}

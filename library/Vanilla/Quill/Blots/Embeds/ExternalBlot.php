@@ -36,13 +36,11 @@ class ExternalBlot extends AbstractBlockEmbedBlot {
     /**
      * @inheritDoc
      */
-    protected function renderContent(array $data): string {
+    protected function renderContent(array $value): string {
+        $data = $value['data'] ?? $value;
         $type = $data['type'] ?? '';
         try {
-            $embedRendered = $this->embedManager->renderData($data);
-            $rendered = <<<HTML
-<div contenteditable="false" class="embed embed-external embedExternal"><div class="embedExternal-content embed-focusableElement embed-{$type}" contenteditable="false">{$embedRendered}</div></div>
-HTML;
+            $rendered = "<div class='js-embed embedResponsive'>".$this->embedManager->renderData($data)."</div>";
         } catch (\Exception $e) {
             $rendered = ''; // Silently fail.
         }

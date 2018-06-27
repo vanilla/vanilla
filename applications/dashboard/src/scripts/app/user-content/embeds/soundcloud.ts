@@ -3,7 +3,7 @@
  * @license https://opensource.org/licenses/GPL-2.0 GPL-2.0
  */
 
-import { registerEmbed, IEmbedData, FOCUS_CLASS } from "@dashboard/embeds";
+import { registerEmbed, IEmbedData, FOCUS_CLASS, IEmbedElements } from "@dashboard/embeds";
 
 // Setup soundcloud embeds.
 registerEmbed("soundcloud", soundCloudRenderer);
@@ -11,8 +11,8 @@ registerEmbed("soundcloud", soundCloudRenderer);
 /**
  * Renders soundcloud embeds.
  */
-export async function soundCloudRenderer(element: HTMLElement, data: IEmbedData) {
-    const height = data.height ? data.height.toString() : "";
+export async function soundCloudRenderer(elements: IEmbedElements, data: IEmbedData) {
+    const contentElement = elements.content;
     const showArtwork = data.attributes.showArtwork ? data.attributes.showArtwork : "false";
     const visual = data.attributes.visual ? data.attributes.visual : "false";
 
@@ -24,7 +24,6 @@ export async function soundCloudRenderer(element: HTMLElement, data: IEmbedData)
     const iframe = document.createElement("iframe");
     iframe.setAttribute("id", "sc-widget");
     iframe.setAttribute("width", "100%");
-    iframe.setAttribute("height", height);
     iframe.setAttribute("scrolling", "no");
     iframe.setAttribute("frameborder", "no");
     iframe.setAttribute(
@@ -36,5 +35,5 @@ export async function soundCloudRenderer(element: HTMLElement, data: IEmbedData)
             "&show_artwork=" +
             visual,
     );
-    element.appendChild(iframe);
+    contentElement.appendChild(iframe);
 }

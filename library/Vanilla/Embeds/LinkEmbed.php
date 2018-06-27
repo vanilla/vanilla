@@ -77,16 +77,18 @@ HTML;
         $bodyEncoded = htmlentities($body);
 
         $result = <<<HTML
-<a class="embed-link embed embedLink" href="{$urlEncoded}" target="_blank" rel="noopener noreferrer">
-    <article class="embedLink-body">
-        {$image}
-        <div class="embedLink-main">
-            <div class="embedLink-header">
-                <h3 class="embedLink-title">{$nameEncoded}</h3>
-                <div class="embedLink-excerpt">{$bodyEncoded}</div>
+<a class="embedExternal embedLink" href="{$urlEncoded}" rel="noopener noreferrer">
+    <div class="embedExternal-content">
+        <article class="embedLink-body">
+            {$image}
+            <div class="embedLink-main">
+                <div class="embedLink-header">
+                    <h3 class="embedLink-title">{$nameEncoded}</h3>
+                    <div class="embedLink-excerpt">{$bodyEncoded}</div>
+                </div>
             </div>
-        </div>
-    </article>
+        </article>
+    </div>
 </a>
 HTML;
 

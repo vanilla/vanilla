@@ -1,10 +1,11 @@
 .embedImage {
-    display: block;
-    width: $embedImage_width;
-    max-width: 100%;
-    margin: auto;
+    .embedExternal-content {
+        width: auto;
+        max-width: $embed_width;
+    }
 }
 
+.Message img .embedImage-img, // Compatibility
 .embedImage-img {
     display: block;
     position: relative;

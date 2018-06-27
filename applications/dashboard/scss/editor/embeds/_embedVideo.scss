@@ -1,23 +1,25 @@
 $embedVideo_width: $embed_width;
 
 // Video
-.embedExternal-content.embedVideo {
-    position: relative;
-    display: block;
-    width: $embedVideo_width;
-    max-width: 100%;
-    margin: auto;
+.embedVideo {
+    .embedExternal-content {
+        position: relative;
+        display: block;
+        width: $embedVideo_width;
+        max-width: 100%;
+        margin: auto;
 
-    .embedVideo-iframe {
-        @include absolute-fullSizeOfParent;
-    }
-
-    &:focus,
-    &:hover {
-        .embedVideo-playIcon {
-            transform: scale(1.1);
+        &:focus,
+        &:hover {
+            .embedVideo-playIcon {
+                transform: scale(1.1);
+            }
         }
     }
+}
+
+.embedVideo-iframe {
+    @include absolute-fullSizeOfParent;
 }
 
 .embedVideo-ratio {

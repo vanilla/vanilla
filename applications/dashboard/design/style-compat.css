@@ -1467,6 +1467,12 @@ label.checkbox input.checkbox-input {
   body.hasRichEditor .CommentForm .CommentFormWrap .FormWrapper {
     padding-left: 0;
   }
+  body.hasRichEditor .CommentForm .richEditor {
+    padding-left: 36px;
+  }
+  body.hasRichEditor .CommentForm .richEditor .richEditor {
+    padding-left: 0;
+  }
   body.hasRichEditor .DataListWrap .FormWrapper.FormWrapper-Condensed {
     padding-left: 0;
   }
@@ -1825,7 +1831,7 @@ body.isMobile .FormWrapper {
   cursor: default;
 }
 
-.embedExternal-content.embedVideo {
+.embedVideo .embedExternal-content {
   position: relative;
   display: block;
   width: 640px;
@@ -1833,19 +1839,19 @@ body.isMobile .FormWrapper {
   margin: auto;
 }
 
-.embedExternal-content.embedVideo .embedVideo-iframe {
+.embedVideo .embedExternal-content:focus .embedVideo-playIcon, .embedVideo .embedExternal-content:hover .embedVideo-playIcon {
+  -webkit-transform: scale(1.1);
+      -ms-transform: scale(1.1);
+          transform: scale(1.1);
+}
+
+.embedVideo-iframe {
   position: absolute;
   display: block;
   top: 0;
   left: 0;
   height: 100%;
   width: 100%;
-}
-
-.embedExternal-content.embedVideo:focus .embedVideo-playIcon, .embedExternal-content.embedVideo:hover .embedVideo-playIcon {
-  -webkit-transform: scale(1.1);
-      -ms-transform: scale(1.1);
-          transform: scale(1.1);
 }
 
 .embedVideo-ratio {
@@ -1918,13 +1924,12 @@ body.isMobile .FormWrapper {
   stroke: rgba(0, 0, 0, 0.1);
 }
 
-.embedImage {
-  display: block;
-  width: 640px;
-  max-width: 100%;
-  margin: auto;
+.embedImage .embedExternal-content {
+  width: auto;
+  max-width: 640px;
 }
 
+.Message img .embedImage-img,
 .embedImage-img {
   display: block;
   position: relative;
@@ -2206,6 +2211,10 @@ body.isMobile .FormWrapper {
 
 .embedGetty .embedExternal-content {
   width: auto;
+}
+
+.embedGetty .getty {
+  display: block;
 }
 
 .embedGiphy {

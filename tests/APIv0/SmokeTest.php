@@ -410,7 +410,7 @@ class SmokeTest extends BaseTest {
 
     /**
      * Test removing a bookmark from a discussion.
-
+     * 
      * @depends testRegisterBasic
      * @depends testPostDiscussion
      */

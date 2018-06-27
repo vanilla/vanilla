@@ -77,7 +77,7 @@ HTML;
         $bodyEncoded = htmlentities($body);
 
         $result = <<<HTML
-<a class="js-embed externalEmbed embedLink" href="{$urlEncoded}" target="_blank" rel="noopener noreferrer">
+<a class="js-embed embedExternal embedLink" href="{$urlEncoded}" target="_blank" rel="noopener noreferrer">
     <article class="embedLink-body">
         {$image}
         <div class="embedLink-main">

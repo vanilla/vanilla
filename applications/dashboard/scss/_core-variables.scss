@@ -6,6 +6,7 @@
 
 $utility-baseUnit                                    : 6px;
 $utility-baseUnitHalf                                : $utility-baseUnit / 2; // Derived
+$utility-baseUnitDouble                              : $utility-baseUnit * 2; // Derived
 $utility-third                                       : #{100% / 3};
 $utility-SVGEncoding                                 : "data:image/svg+xml,";
 

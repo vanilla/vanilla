@@ -1,0 +1,17 @@
+.embed-focusableElement {
+    &.embed-twitter {
+        border-radius: 4px;
+    }
+}
+
+.twitter-tweet {
+    margin: 0 !important;
+}
+
+
+.richEditor {
+    .embedExternal-contents,
+    iframe {
+        pointer-events: none; // In edit mode, we never allow clicking into elements.
+    }
+}

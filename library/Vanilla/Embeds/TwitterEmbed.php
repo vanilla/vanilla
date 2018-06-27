@@ -56,7 +56,7 @@ class TwitterEmbed extends Embed {
         $encodedUrl = htmlspecialchars($url);
 
         $result = <<<HTML
-<div class="js-embed externalEmbed embedTwitter twitter-card" data-tweeturl="{$encodedUrl}" data-tweetid="{$encodedStatusID}"><a href="{$encodedUrl}" class="tweet-url" rel="nofollow">{$encodedUrl}</a></div>
+<div class="js-embed embedExternal embedTwitter twitter-card" data-tweeturl="{$encodedUrl}" data-tweetid="{$encodedStatusID}"><a href="{$encodedUrl}" class="tweet-url" rel="nofollow">{$encodedUrl}</a></div>
 HTML;
         return $result;
     }

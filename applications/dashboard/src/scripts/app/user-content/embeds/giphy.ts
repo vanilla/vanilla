@@ -10,13 +10,13 @@ registerEmbed("giphy", giphyRenderer);
 /**
  * Renders giphy embeds.
  */
-export async function giphyRenderer(element: HTMLElement, data: IEmbedData) {
+export async function giphyRenderer(rootElement: HTMLElement, contentElement: HTMLElement, data: IEmbedData) {
     if (data.attributes.postID == null) {
         throw new Error("Giphy embed fail, the post could not be found");
     }
     const width = data.width + "px";
-    element.classList.add("embedGiphy");
-    element.style.width = data.width ? width : "100%";
+    contentElement.classList.add("embedGiphy");
+    contentElement.style.width = data.width ? width : "100%";
 
     const paddingBottom = ((data.height || 1) / (data.width || 1)) * 100 + "%";
     const giphyWrapper = document.createElement("div");
@@ -29,5 +29,5 @@ export async function giphyRenderer(element: HTMLElement, data: IEmbedData) {
     iframe.setAttribute("src", "https://giphy.com/embed/" + data.attributes.postID);
 
     giphyWrapper.appendChild(iframe);
-    element.appendChild(giphyWrapper);
+    contentElement.appendChild(giphyWrapper);
 }

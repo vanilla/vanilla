@@ -27,7 +27,7 @@ async function convertInstagramEmbeds() {
 /**
  * Render a single instagram embed.
  */
-export async function renderInstagram(element: Element, data: IEmbedData) {
+export async function renderInstagram(rootElement: HTMLElement, contentElement: HTMLElement, data: IEmbedData) {
     await ensureScript("//platform.instagram.com/en_US/embeds.js");
 
     if (!window.instgrm) {
@@ -45,7 +45,7 @@ export async function renderInstagram(element: Element, data: IEmbedData) {
     blockQuote.dataset.instgrmVersion = data.attributes.versionNumber;
     blockQuote.dataset.instgrmCaptioned = data.attributes.isCaptioned;
 
-    element.appendChild(blockQuote);
+    contentElement.appendChild(blockQuote);
     setImmediate(() => {
         window.instgrm.Embeds.process();
     });

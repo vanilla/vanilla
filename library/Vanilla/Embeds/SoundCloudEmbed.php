@@ -52,7 +52,7 @@ class SoundCloudEmbed extends Embed {
         $url = htmlspecialchars("https://w.soundcloud.com/player/?url=https://api.soundcloud.com/tracks/");
 
         $result = <<<HTML
-<div class="js-embed externalEmbed embedSoundCloud">
+<div class="js-embed embedExternal embedSoundCloud">
 <iframe width="100%" height="{$height}" scrolling="no" frameborder="no" 
     src="{$url}{$track}&amp;show_artwork={$showArtwork}&amp;visual={$visual}">
 </iframe>

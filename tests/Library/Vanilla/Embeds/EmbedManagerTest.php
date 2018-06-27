@@ -115,7 +115,7 @@ class EmbedManagerTest extends SharedBootstrapTestCase {
                     "width" => null,
                     "attributes" => []
                 ],
-                '<a class="js-embed externalEmbed embedLink" href="https://vanillaforums.com" target="_blank" rel="noopener noreferrer">
+                '<a class="js-embed embedExternal embedLink" href="https://vanillaforums.com" target="_blank" rel="noopener noreferrer">
     <article class="embedLink-body">
         <div class="embedLink-image" aria-hidden="true" style="background-image: url(\'https\00003a\00002f\00002fvanillaforums\00002ecom\00002fimages\00002fmetaIcons\00002fvanillaForums\00002epng\');"></div>
         <div class="embedLink-main">
@@ -142,7 +142,7 @@ class EmbedManagerTest extends SharedBootstrapTestCase {
                         'versionNumber' => "8"
                     ],
                 ],
-'<div class="js-embed externalEmbed embedInstagram">
+'<div class="js-embed embedExternal embedInstagram">
     <blockquote class="instagram-media" data-instgrm-captioned data-instgrm-permalink="https://www.instagram.com/p/BizC-PPFK1m" data-instgrm-version="8"/>
 </div>'
             ],
@@ -160,7 +160,7 @@ class EmbedManagerTest extends SharedBootstrapTestCase {
                         'isAlbum' => false,
                     ],
                 ],
-'<div class="js-embed externalEmbed embedImgur">
+'<div class="js-embed embedExternal embedImgur">
     <blockquote class="imgur-embed-pub" lang="en" data-id="10HROiq"><a href="https://imgur.com/10HROiq"></a></blockquote>
 </div>'
             ],
@@ -178,7 +178,7 @@ class EmbedManagerTest extends SharedBootstrapTestCase {
                         'isAlbum' => true,
                     ],
                 ],
-'<div class="js-embed externalEmbed embedImgur">
+'<div class="js-embed embedExternal embedImgur">
     <blockquote class="imgur-embed-pub" lang="en" data-id="a/OsirufX"><a href="https://imgur.com/OsirufX"></a></blockquote>
 </div>'
             ],
@@ -198,7 +198,7 @@ class EmbedManagerTest extends SharedBootstrapTestCase {
                         "url" => "https://w.soundcloud.com/player/?url=https://api.soundcloud.com/tracks/"
                     ],
                 ],
-'<div class="js-embed externalEmbed embedSoundCloud">
+'<div class="js-embed embedExternal embedSoundCloud">
 <iframe width="100%" height="400" scrolling="no" frameborder="no" 
     src="https://w.soundcloud.com/player/?url=https://api.soundcloud.com/tracks/2F174656930&amp;show_artwork=true&amp;visual=true">
 </iframe>
@@ -218,7 +218,7 @@ class EmbedManagerTest extends SharedBootstrapTestCase {
                         "embedUrl" => "https://player.twitch.tv/?video=v276279462",
                     ],
                 ],
-'<div class="js-embed externalEmbed embedVideo">
+'<div class="js-embed embedExternal embedVideo">
     <div class="embedVideo-ratio" style="padding-top: 56.2%;">
         <button type="button" data-url="https://player.twitch.tv/?video=v276279462" aria-label="20k Fortnite Friday Duos with @hysteria | 2 MINUTE STREAM DELAY" class="embedVideo-playButton iconButton js-playVideo" style="background-image: url(https://static-cdn.jtvnw.net/s3_vods/8a24223c5b12ff7427a8_ninja_29190875424_893099877/thumb/thumb0-640x360.jpg);" title="20k Fortnite Friday Duos with @hysteria | 2 MINUTE STREAM DELAY">
             '.$this->playButtonSVG.'
@@ -239,7 +239,7 @@ class EmbedManagerTest extends SharedBootstrapTestCase {
                         "postID" => "jwSlQZnsymUW49NC3R",
                     ],
                 ],
-'<div class="js-embed externalEmbed embedGiphy" style="width: 480px">
+'<div class="js-embed embedExternal embedGiphy" style="width: 480px">
     <div class="embedExternal-ratio" style="padding-bottom: 56.25%">
         <iframe class="giphy-embed embedGiphy-iframe" src="https://giphy.com/embed/jwSlQZnsymUW49NC3R"></iframe>
     </div>
@@ -275,7 +275,7 @@ class EmbedManagerTest extends SharedBootstrapTestCase {
                         "videoID" => "9bZkp7q19f0"
                     ]
                 ],
-                '<div class="js-embed externalEmbed embedVideo">
+                '<div class="js-embed embedExternal embedVideo">
     <div class="embedVideo-ratio is16by9" style="">
         <button type="button" data-url="https://www.youtube.com/embed/9bZkp7q19f0?feature=oembed&amp;autoplay=1" aria-label="YouTube" class="embedVideo-playButton iconButton js-playVideo" style="background-image: url(https://img.youtube.com/vi/9bZkp7q19f0/0.jpg);" title="YouTube">
             '.$this->playButtonSVG.'
@@ -299,7 +299,7 @@ class EmbedManagerTest extends SharedBootstrapTestCase {
                         "embedUrl" => "https://player.vimeo.com/video/264197456?autoplay=1",
                     ]
                 ],
-                '<div class="js-embed externalEmbed embedVideo">
+                '<div class="js-embed embedExternal embedVideo">
     <div class="embedVideo-ratio" style="padding-top: 42.5%;">
         <button type="button" data-url="https://player.vimeo.com/video/264197456?autoplay=1" aria-label="Vimeo" class="embedVideo-playButton iconButton js-playVideo" style="background-image: url(https://i.vimeocdn.com/video/694532899_640.jpg);" title="Vimeo">
             '.$this->playButtonSVG.'

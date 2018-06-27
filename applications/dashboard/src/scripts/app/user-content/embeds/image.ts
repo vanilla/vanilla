@@ -11,14 +11,14 @@ registerEmbed("image", imageRenderer);
 /**
  * Render an image embed in the editor.
  */
-export async function imageRenderer(element: HTMLElement, data: IEmbedData) {
-    element.classList.add("embed-image");
-    element.classList.add("embedImage");
+export async function imageRenderer(rootElement: HTMLElement, contentElement: HTMLElement, data: IEmbedData) {
+    rootElement.classList.add("embedExternal");
+    rootElement.classList.add("embedImage");
 
     const image = document.createElement("img");
     image.classList.add("embedImage-img");
     image.setAttribute("src", data.url || "");
     image.setAttribute("alt", data.name || "");
 
-    element.appendChild(image);
+    contentElement.appendChild(image);
 }

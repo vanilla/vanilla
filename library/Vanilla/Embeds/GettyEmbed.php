@@ -77,7 +77,7 @@ class GettyEmbed extends Embed {
         $encodedI360 = htmlspecialchars($i360);
 
         $result = <<<HTML
-<a id="{$encodeID}" class="js-embed externalEmbed embedGetty gie-single js-gettyEmbed" data-height="{$encodedHeight}" data-width="{$encodedWidth}" data-sig="{$encodedSig}" data-items="{$encodedItems}" data-capt="{$encodedCapt}" data-tld="{$encodedTld}" data-i360="{$encodedI360}" href="{$encodedURL}">Embed from Getty Images</a>
+<a id="{$encodeID}" class="js-embed embedExternal embedGetty gie-single js-gettyEmbed" data-height="{$encodedHeight}" data-width="{$encodedWidth}" data-sig="{$encodedSig}" data-items="{$encodedItems}" data-capt="{$encodedCapt}" data-tld="{$encodedTld}" data-i360="{$encodedI360}" href="{$encodedURL}">Embed from Getty Images</a>
 HTML;
        return $result;
     }

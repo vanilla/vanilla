@@ -11,7 +11,7 @@ registerEmbed("soundcloud", soundCloudRenderer);
 /**
  * Renders soundcloud embeds.
  */
-export async function soundCloudRenderer(element: HTMLElement, data: IEmbedData) {
+export async function soundCloudRenderer(rootElement: HTMLElement, contentElement: HTMLElement, data: IEmbedData) {
     const height = data.height ? data.height.toString() : "";
     const showArtwork = data.attributes.showArtwork ? data.attributes.showArtwork : "false";
     const visual = data.attributes.visual ? data.attributes.visual : "false";
@@ -36,5 +36,5 @@ export async function soundCloudRenderer(element: HTMLElement, data: IEmbedData)
             "&show_artwork=" +
             visual,
     );
-    element.appendChild(iframe);
+    contentElement.appendChild(iframe);
 }

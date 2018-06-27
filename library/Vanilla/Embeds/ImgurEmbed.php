@@ -71,7 +71,7 @@ class ImgurEmbed extends Embed {
        $url = htmlspecialchars("https://imgur.com/");
 
         $result = <<<HTML
-<div class="js-embed externalEmbed embedImgur">
+<div class="js-embed embedExternal embedImgur">
     <blockquote class="imgur-embed-pub" lang="en" data-id="{$dataID}"><a href="{$url}{$postID}"></a></blockquote>
 </div>
 HTML;

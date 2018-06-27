@@ -19,11 +19,11 @@ window.addEventListener("resize", () => debounce(truncateEmbedLinks, 200)());
 /**
  * Render a a link embed.
  */
-export async function renderLinkEmbed(node: HTMLElement, data: IEmbedData) {
-    node.setAttribute("href", data.url);
+export async function renderLinkEmbed(rootElement: HTMLElement, contentElement: HTMLElement, data: IEmbedData) {
+    contentElement.setAttribute("href", data.url);
 
-    node.setAttribute("target", "_blank");
-    node.setAttribute("rel", "noopener noreferrer");
+    contentElement.setAttribute("target", "_blank");
+    contentElement.setAttribute("rel", "noopener noreferrer");
 
     let title;
     if (data.name) {
@@ -122,7 +122,7 @@ export async function renderLinkEmbed(node: HTMLElement, data: IEmbedData) {
     article.appendChild(main);
 
     // Assemble component
-    node.appendChild(article);
+    contentElement.appendChild(article);
 }
 
 /**

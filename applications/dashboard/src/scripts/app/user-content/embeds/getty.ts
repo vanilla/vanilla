@@ -44,14 +44,14 @@ async function convertGettyEmbeds() {
 /**
  * Render a single getty embed.
  */
-export async function renderGetty(element: HTMLElement, data: IEmbedData) {
+export async function renderGetty(rootElement: HTMLElement, contentElement: HTMLElement, data: IEmbedData) {
     const url = data.attributes.post;
     const newLink = document.createElement("a");
     newLink.classList.add("gie-single");
     newLink.setAttribute("href", "http://www.gettyimages.ca/detail/" + url);
     newLink.setAttribute("id", data.attributes.id);
 
-    element.appendChild(newLink);
+    contentElement.appendChild(newLink);
 
     setImmediate(() => {
         void loadGettyImages(data);

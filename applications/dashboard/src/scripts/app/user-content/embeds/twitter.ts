@@ -28,10 +28,10 @@ async function convertTwitterEmbeds() {
     if (tweets.length > 0) {
         await ensureScript("//platform.twitter.com/widgets.js");
         if (window.twttr) {
-            const promises = tweets.map(element => {
+            const promises = tweets.map(contentElement => {
                 // Get embed data out of the data attributes.
-                const statusID = element.getAttribute("data-tweetid");
-                const url = element.getAttribute("data-tweeturl") || "";
+                const statusID = contentElement.getAttribute("data-tweetid");
+                const url = contentElement.getAttribute("data-tweeturl") || "";
 
                 const renderData: IEmbedData = {
                     type: "twitter",
@@ -39,7 +39,7 @@ async function convertTwitterEmbeds() {
                     attributes: { statusID },
                 };
 
-                return renderTweet(element, renderData);
+                return renderTweet(null, contentElement as HTMLElement, renderData);
             });
 
             // Render all the pages twitter embeds at the same time.
@@ -51,7 +51,7 @@ async function convertTwitterEmbeds() {
 /**
  * Render a single twitter embed.
  */
-export async function renderTweet(element: Element, data: IEmbedData) {
+export async function renderTweet(rootElement: HTMLElement | null, contentElement: HTMLElement, data: IEmbedData) {
     // Ensure the twitter library is loaded.
     await ensureScript("//platform.twitter.com/widgets.js");
 
@@ -65,20 +65,23 @@ export async function renderTweet(element: Element, data: IEmbedData) {
     }
 
     // Check that we haven't already started to load this embed (In the case multiple onContents are fired off).
-    if (!element.classList.contains("twitter-card-loaded") && !element.classList.contains("twitter-card-preload")) {
-        element.classList.add("twitter-card-preload");
+    if (
+        !contentElement.classList.contains("twitter-card-loaded") &&
+        !contentElement.classList.contains("twitter-card-preload")
+    ) {
+        contentElement.classList.add("twitter-card-preload");
 
         // Render the embed.
         const options = { conversation: "none" };
-        await window.twttr.widgets.createTweet(data.attributes.statusID, element, options);
+        await window.twttr.widgets.createTweet(data.attributes.statusID, contentElement, options);
 
         // Remove a url if there is one around.
-        const url = element.querySelector(".tweet-url");
+        const url = contentElement.querySelector(".tweet-url");
         if (url) {
             url.remove();
         }
 
         // Fade it in.
-        element.classList.add("twitter-card-loaded");
+        contentElement.classList.add("twitter-card-loaded");
     }
 }

@@ -21,8 +21,8 @@ delegateEvent("click", ".js-playVideo", handlePlayVideo);
  * Render a video embed in the editor. The JS for handling playing/stopping these videos
  * lives in @dashboard/user-content.
  */
-export async function videoRenderer(node: HTMLElement, data: IEmbedData) {
-    node.classList.add("embedVideo");
+export async function videoRenderer(rootNode: HTMLElement, node: HTMLElement, data: IEmbedData) {
+    rootNode.classList.add("embedVideo");
     data.name = data.name || "";
 
     const ratioContainer = document.createElement("div");

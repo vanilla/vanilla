@@ -37,7 +37,7 @@ async function convertImgurEmbeds() {
 /**
  * Render a single imgur embed.
  */
-export async function renderImgur(element: Element, data: IEmbedData) {
+export async function renderImgur(rootElement: HTMLElement, contentElement: HTMLElement, data: IEmbedData) {
     const url = "imgur.com/" + data.attributes.postID;
     const isAlbum = data.attributes.isAlbum;
     const dataSet = isAlbum ? "a/" + data.attributes.postID : data.attributes.postID;
@@ -48,7 +48,7 @@ export async function renderImgur(element: Element, data: IEmbedData) {
     blockQuote.dataset.id = dataSet;
     blockQuote.setAttribute("href", url);
 
-    element.appendChild(blockQuote);
+    contentElement.appendChild(blockQuote);
     setImmediate(() => {
         void convertImgurEmbeds();
     });

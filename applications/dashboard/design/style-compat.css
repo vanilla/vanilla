@@ -1721,49 +1721,11 @@ body.isMobile .FormWrapper {
           user-select: none;
 }
 
-.externalEmbed {
-  display: block;
-  -webkit-user-select: none;
-     -moz-user-select: none;
-      -ms-user-select: none;
-          user-select: none;
-}
-
-.embed-focusableElement {
-  -webkit-transition: 0.2s ease box-shadow;
-          transition: 0.2s ease box-shadow;
-  cursor: pointer;
-}
-
-.embed-focusableElement.embed-twitter {
-  border-radius: 4px;
-}
-
-.embed-focusableElement:hover {
-  box-shadow: 0 0 0 2px rgba(2, 145, 219, 0.5);
-}
-
-.embed-focusableElement:focus {
-  box-shadow: 0 0 0 2px #0291db;
-}
-
-.userContent .embedLink-title {
-  margin: 0;
-}
-
-.userContent .embedLink-title:not(:last-child) {
-  margin: 0 0 6px;
-}
-
-.embed {
-  white-space: normal;
-}
-
 .embedExternal {
-  display: -webkit-box;
-  display: -webkit-flex;
-  display: -ms-flexbox;
-  display: flex;
+  display: inline;
+  margin: auto;
+  max-width: 100%;
+  position: relative;
   -webkit-box-pack: center;
   -webkit-justify-content: center;
       -ms-flex-pack: center;
@@ -1772,20 +1734,39 @@ body.isMobile .FormWrapper {
   -webkit-align-items: center;
       -ms-flex-align: center;
           align-items: center;
-}
-
-.embedExternal-content {
-  display: inline-block;
-  max-width: 100%;
-  overflow: hidden;
   -webkit-user-select: none;
      -moz-user-select: none;
       -ms-user-select: none;
           user-select: none;
+  overflow: hidden;
+}
+
+.embedExternal-content {
+  position: relative;
+  margin: auto;
+  -webkit-user-select: none;
+     -moz-user-select: none;
+      -ms-user-select: none;
+          user-select: none;
+  width: 640px;
 }
 
 .embedExternal-content > * {
   margin: auto !important;
+}
+
+.embed-focusableElement {
+  -webkit-transition: 0.2s ease box-shadow;
+          transition: 0.2s ease box-shadow;
+  cursor: pointer;
+}
+
+.embed-focusableElement:hover {
+  box-shadow: 0 0 0 2px rgba(2, 145, 219, 0.5);
+}
+
+.embed-focusableElement:focus {
+  box-shadow: 0 0 0 2px #0291db;
 }
 
 .embedExternal-ratio {
@@ -1807,13 +1788,65 @@ body.isMobile .FormWrapper {
   width: 100%;
 }
 
-.twitter-tweet {
-  margin: 0 !important;
-}
-
-.richEditor .twitter-tweet,
 .richEditor iframe {
   pointer-events: none;
+}
+
+.embedLinkLoader-failIcon {
+  display: inline-block;
+  height: 1em;
+  width: 1em;
+  margin: 0;
+  vertical-align: -0.14em;
+  -webkit-user-select: none;
+     -moz-user-select: none;
+      -ms-user-select: none;
+          user-select: none;
+}
+
+.embedLinkLoader-loader {
+  -webkit-transition-duration: opacity;
+          transition-duration: opacity;
+  -webkit-transition-timing-function: ease-out;
+          transition-timing-function: ease-out;
+  display: block;
+  width: 1em;
+  height: 1em;
+  border-radius: 50%;
+  border-top: 3px solid #0291db;
+  border-right: 3px solid rgba(2, 145, 219, 0.2);
+  border-bottom: 3px solid rgba(2, 145, 219, 0.2);
+  border-left: 3px solid rgba(2, 145, 219, 0.2);
+  -webkit-transform: translateZ(0);
+          transform: translateZ(0);
+  -webkit-animation: spinnerLoader 0.7s infinite ease-in-out;
+          animation: spinnerLoader 0.7s infinite ease-in-out;
+  display: inline-block;
+  vertical-align: -0.14em;
+}
+
+.embedLinkLoader-loader::after {
+  border-radius: 50%;
+  width: 1em;
+  height: 1em;
+}
+
+.userContent .embedLink-title {
+  margin: 0;
+}
+
+.userContent .embedLink-title:not(:last-child) {
+  margin: 0 0 6px;
+}
+
+.userContent .embedExternal-content:hover::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.2);
 }
 
 .embedExternal-content.embedVideo {
@@ -1991,7 +2024,7 @@ body.isMobile .FormWrapper {
   margin: 0 0 0 12px;
   padding: 0;
   color: #555A62;
-  font-weight: bold;
+  font-weight: 600;
 }
 
 .embedLink-dateTime {
@@ -2008,7 +2041,7 @@ body.isMobile .FormWrapper {
   padding: 0;
   font-size: 14px;
   line-height: 1.4285714286;
-  font-weight: bold;
+  font-weight: 600;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -2034,12 +2067,29 @@ body.isMobile .FormWrapper {
   max-height: 60px;
 }
 
+.embedImgur {
+  width: auto;
+}
+
+.embed-focusableElement.embed-twitter {
+  border-radius: 4px;
+}
+
+.twitter-tweet {
+  margin: 0 !important;
+}
+
+.richEditor .embedExternal-contents,
+.richEditor iframe {
+  pointer-events: none;
+}
+
 .embedExternal-content.embed-soundcloud {
   width: 640px;
 }
 
-.embedExternal-content.embed-instagram {
-  width: 640px;
+.embedInstagram {
+  width: auto;
 }
 
 .instagram-media {

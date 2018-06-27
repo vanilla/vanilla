@@ -73,8 +73,10 @@ class GiphyEmbed extends Embed {
 
         $result = <<<HTML
 <div class="embedExternal embedGiphy" style="width: {$encodedWidth}px">
-    <div class="embedExternal-ratio" style="padding-bottom: {$padding}%">
-        <iframe class="giphy-embed embedGiphy-iframe" src="{$encodedURL}"></iframe>
+    <div class="embedExternal-content">
+        <div class="embedExternal-ratio" style="padding-bottom: {$padding}%">
+            <iframe class="giphy-embed embedGiphy-iframe" src="{$encodedURL}"></iframe>
+        </div>
     </div>
 </div>
 HTML;

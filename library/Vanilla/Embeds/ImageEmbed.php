@@ -98,8 +98,10 @@ class ImageEmbed extends Embed {
         $sourceEncoded = htmlspecialchars($source);
 
         $result = <<<HTML
-<div class="js-embed embedExternal embedImage">
-    <img class="embedImage-img" src="{$sourceEncoded}">
+<div class="embedExternal embedImage">
+    <div class="embedExternal-content">
+        <img class="embedImage-img" src="{$sourceEncoded}">
+    </div>
 </div>
 HTML;
         return $result;

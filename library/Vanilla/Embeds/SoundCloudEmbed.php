@@ -45,17 +45,18 @@ class SoundCloudEmbed extends Embed {
      * @inheritdoc
      */
     public function renderData(array $data): string {
-        $height = htmlspecialchars($data['height']);
         $track = htmlspecialchars($data['attributes']['track']);
         $showArtwork = htmlspecialchars($data['attributes']['showArtwork']);
         $visual = htmlspecialchars($data['attributes']['visual']);
         $url = htmlspecialchars("https://w.soundcloud.com/player/?url=https://api.soundcloud.com/tracks/");
 
         $result = <<<HTML
-<div class="js-embed embedExternal embedSoundCloud">
-<iframe width="100%" height="{$height}" scrolling="no" frameborder="no" 
-    src="{$url}{$track}&amp;show_artwork={$showArtwork}&amp;visual={$visual}">
-</iframe>
+<div class="embedExternal embedSoundCloud">
+    <div class="embedExternal-content">
+        <iframe width="100%" scrolling="no" frameborder="no"
+            src="{$url}{$track}&amp;show_artwork={$showArtwork}&amp;visual={$visual}">
+        </iframe>
+    </div>
 </div>
 HTML;
          return $result;

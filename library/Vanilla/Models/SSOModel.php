@@ -328,7 +328,7 @@ class SSOModel {
         $noEmail = $this->config->get('Garden.Registration.NoEmail', false);
 
         // Specifies whether Emails are unique or not.
-        $emailUnique = !$noEmail && $this->config->get('Garden.Registration.EmailUnique', true);
+        $emailUnique = !$noEmail && $this->config->get('Garden.Registration.EmailUnique', false);
 
         if (!$emailUnique) {
             throw new ClientException('Cannot get user by email due to current configurations.');
@@ -450,7 +450,7 @@ class SSOModel {
             $noEmail = $this->config->get('Garden.Registration.NoEmail', false);
 
             // Specifies whether Emails are unique or not.
-            $emailUnique = !$noEmail && $this->config->get('Garden.Registration.EmailUnique', true);
+            $emailUnique = !$noEmail && $this->config->get('Garden.Registration.EmailUnique', false);
 
             // Will automatically try to link users using the provided Email address if the Provider is "Trusted".
             $autoConnect = $emailUnique && $allowConnect && $ssoAuthenticator->canAutoLinkUser();

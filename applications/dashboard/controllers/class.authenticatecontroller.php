@@ -130,7 +130,7 @@ class AuthenticateController extends Gdn_Controller {
             switch ($response['authenticationStep']) {
                 case 'authenticated':
                     // The user successfully authenticated and the cookie is set. Redirect.
-                    redirectTo($respone['targetUrl'] ?? '/');
+                    redirectTo($response['targetUrl'] ?? '/');
                     break;
                 case 'linkUser':
                     // The user has to be manually linked.

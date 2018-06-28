@@ -313,6 +313,11 @@ jQuery(document).ready(function($) {
                     $(msg).afterTrigger(json.Data);
                     $(msg).hide();
                     $(document).trigger('EditCommentFormLoaded', [container]);
+
+                    // Dispatch a native event for things that don't use jquery
+                    var event = document.createEvent('CustomEvent');
+                    event.initCustomEvent('X-EditCommentFormLoaded', true, false, {});
+                    container[0].dispatchEvent(event);
                 },
                 complete: function() {
                     $(parent).find('span.TinyProgress').remove();

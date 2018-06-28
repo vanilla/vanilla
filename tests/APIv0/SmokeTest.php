@@ -391,6 +391,7 @@ class SmokeTest extends BaseTest {
      *
      * @depends testRegisterBasic
      * @depends testPostDiscussion
+     * @large
      */
     public function testDiscussionAddBookMark() {
         $api = $this->api();
@@ -414,6 +415,7 @@ class SmokeTest extends BaseTest {
      *
      * @depends testRegisterBasic
      * @depends testPostDiscussion
+     * @large
      */
     public function testRemoveDiscussionBookMark() {
         $api = $this->api();

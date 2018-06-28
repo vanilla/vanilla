@@ -264,7 +264,13 @@ jQuery(document).ready(function($) {
         $('div.Information').fadeOut('fast', function() {
             $(this).remove();
         });
-        $(sender).closest('form').trigger('clearCommentForm');
+        var $form = $(sender).closest('form');
+        $form.trigger('clearCommentForm');
+
+        // Dispatch a native event for things that don't use jquery
+        var event = document.createEvent('CustomEvent');
+        event.initCustomEvent('X-ClearCommentForm', true, false, {});
+        $form[0].dispatchEvent(event);
     }
 
     // Set up paging

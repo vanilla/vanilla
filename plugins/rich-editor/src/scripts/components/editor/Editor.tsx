@@ -130,6 +130,15 @@ export default class Editor extends React.Component<IProps, IState> {
         this.quill.on("text-change", () => {
             bodybox.value = JSON.stringify(this.quill.getContents().ops);
         });
+
+        // Listen for the legacy form event if applicable and clear the form.
+        const form = this.quill.container.closest("form");
+        if (form) {
+            form.addEventListener("X-ClearCommentForm", () => {
+                this.quill.setContents([]);
+                this.quill.setSelection(null as any, Quill.sources.USER);
+            });
+        }
     }
 
     /**

@@ -2272,8 +2272,12 @@ body.isMobile .FormWrapper {
   width: 100% !important;
 }
 
-.embedImgur {
+.embedImgur .embedExternal-content {
   width: auto;
+}
+
+.embedImgur iframe {
+  max-width: 100%;
 }
 
 .embedTwitter .embedExternal-content {

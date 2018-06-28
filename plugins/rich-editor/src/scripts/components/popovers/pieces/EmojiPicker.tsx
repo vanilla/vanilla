@@ -12,10 +12,7 @@ import * as Icons from "@rich-editor/components/icons";
 import Popover from "./Popover";
 import { IPopoverControllerChildParameters } from "./PopoverController";
 import { withEditor, IEditorContextProps } from "@rich-editor/components/context";
-
-// Emoji
-import emojis from "emojibase-data/en/data.json";
-import { groups as emojiGroups } from "emojibase-data/meta/groups.json";
+import { EMOJI_GROUPS, EMOJIS } from "./emojiData";
 import EmojiButton from "./EmojiButton";
 
 const buttonSize = 39;
@@ -27,7 +24,7 @@ const cellIndexesByGroupId = {};
 /**
  * Get start positions for each category
  */
-emojis.map((data, key) => {
+EMOJIS.forEach((data, key) => {
     const groupID = data.group;
     if (!(groupID in rowIndexesByGroupId)) {
         rowIndexesByGroupId[groupID] = Math.floor(key / colSize);
@@ -35,7 +32,7 @@ emojis.map((data, key) => {
     }
 });
 
-const emojiGroupLength = Object.values(emojiGroups).length;
+const emojiGroupLength = Object.values(EMOJI_GROUPS).length;
 
 interface IProps extends IEditorContextProps, IPopoverControllerChildParameters {
     contentID: string;
@@ -98,7 +95,7 @@ export class EmojiPicker extends React.PureComponent<IProps, IState> {
 
         const footer = (
             <div id={this.categoryPickerID} className="emojiGroups" aria-label={t("Emoji Categories")} tabIndex={-1}>
-                {Object.values(emojiGroups).map((groupName: string, groupKey) => {
+                {Object.values(EMOJI_GROUPS).map((groupName: string, groupKey) => {
                     const isSelected = this.state.selectedGroup === groupKey;
                     const buttonClasses = classNames("richEditor-button", "emojiGroup", { isSelected });
 
@@ -130,7 +127,7 @@ export class EmojiPicker extends React.PureComponent<IProps, IState> {
                         cellRenderer={this.cellRenderer}
                         columnCount={colSize}
                         columnWidth={buttonSize}
-                        rowCount={Math.ceil(emojis.length / colSize)}
+                        rowCount={Math.ceil(EMOJIS.length / colSize)}
                         rowHeight={buttonSize}
                         height={height}
                         width={width}
@@ -193,7 +190,7 @@ export class EmojiPicker extends React.PureComponent<IProps, IState> {
             rowStartIndex: event.rowStartIndex,
             lastRowIndex,
             selectedGroup,
-            alertMessage: t("In emoji category: ") + t(emojiGroups[selectedGroup]),
+            alertMessage: t("In emoji category: ") + t(EMOJI_GROUPS[selectedGroup]),
         });
     };
 
@@ -220,7 +217,7 @@ export class EmojiPicker extends React.PureComponent<IProps, IState> {
             scrollTarget: rowIndexesByGroupId[categoryID],
             firstEmojiOfGroup: cellIndexesByGroupId[categoryID],
             selectedGroup: categoryID,
-            alertMessage: t("Jumped to emoji category: ") + t(emojiGroups[categoryID]),
+            alertMessage: t("Jumped to emoji category: ") + t(EMOJI_GROUPS[categoryID]),
         });
     };
 
@@ -229,7 +226,7 @@ export class EmojiPicker extends React.PureComponent<IProps, IState> {
      */
     private cellRenderer = ({ columnIndex, rowIndex, style }) => {
         const pos = rowIndex * rowSize + columnIndex;
-        const emojiData = emojis[pos];
+        const emojiData = EMOJIS[pos];
         let result: JSX.Element | null = null;
         const isSelectedButton = this.state.firstEmojiOfGroup >= 0 && this.state.firstEmojiOfGroup === pos;
         if (emojiData) {
@@ -238,7 +235,7 @@ export class EmojiPicker extends React.PureComponent<IProps, IState> {
                     isSelectedButton={isSelectedButton}
                     style={style}
                     closeMenuHandler={this.props.closeMenuHandler}
-                    key={"emoji-" + emojiData.hexcode}
+                    key={"emoji-" + emojiData.emoji}
                     emojiData={emojiData}
                     index={pos}
                     rowIndex={rowIndex}

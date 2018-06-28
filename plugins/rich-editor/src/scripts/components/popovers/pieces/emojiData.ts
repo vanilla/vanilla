@@ -3,7 +3,10 @@
  *
  * This is significantly filtered. The original data sources are in the `emojibase-data` node module.
  * - `emojibase-data/en/data.json`
+ * Transformation applied: data.map(({emoji, group}) => {emoji, group});
+ *
  * - `emojibase-data/meta/groups.json`
+ * Transformation applied: Manually copying/pasting out the groups.
  *
  * @author Adam (charrondev) Charron <adam.c@vanillaforums.com>
  * @copyright 2009-2018 Vanilla Forums Inc.

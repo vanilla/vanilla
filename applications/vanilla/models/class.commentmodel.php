@@ -752,14 +752,11 @@ class CommentModel extends Gdn_Model {
             return;
         }
 
-        // Loop over these discussions and see if any are still unread.
-        $markAsRead = true;
+        // Loop over these discussions and exit if there are any unread discussions
         while ($discussion = $discussions->nextRow(DATASET_TYPE_ARRAY)) {
-            if ($discussion['Read']) {
-                continue;
+            if (!$discussion['Read']) {
+                return;
             }
-            $markAsRead = false;
-            break;
         }
 
         // Mark this category read if all the new content is read.

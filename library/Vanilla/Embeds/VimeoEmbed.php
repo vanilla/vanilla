@@ -6,6 +6,8 @@
 
 namespace Vanilla\Embeds;
 
+use Exception;
+
 /**
  * Vimeo embed.
  */
@@ -32,6 +34,7 @@ class VimeoEmbed extends VideoEmbed {
      * @inheritdoc
      */
     public function matchUrl(string $url) {
+
         $data = null;
 
         if ($this->isNetworkEnabled()) {
@@ -42,20 +45,29 @@ class VimeoEmbed extends VideoEmbed {
             }
         }
 
-        preg_match(
-            '/https?:\/\/(?:www\.)?vimeo\.com\/(?:channels\/[a-z0-9]+\/)?(?<videoID>\d+)/i',
-            $url,
-            $matches
-        );
-        if (array_key_exists('videoID', $matches)) {
-            $data = $data ?: [];
-            if (!array_key_exists('attributes', $data)) {
-                $data['attributes'] = [];
+        $path = parse_url($url, PHP_URL_PATH);
+        if ($path) {
+            preg_match(
+                '/(\/[a-zA-Z0-9]+\/)?([a-zA-Z0-9]+\/)?(?<videoID>[0-9]+)/i',
+                $path,
+                $matches
+            );
+            // urls without a numeric video will fail for the moment, until embed fall back modified.
+            // ie. https://vimeo.com/ondemand/yappie will fail.
+            if (!$matches['videoID']) {
+                throw new Exception('Unable to get video ID.', 400);
             }
-            $data['attributes']['videoID'] = $matches['videoID'];
-            $data['attributes']['embedUrl'] = "https://player.vimeo.com/video/{$matches['videoID']}?autoplay=1";
-        }
 
+
+            if (array_key_exists('videoID', $matches)) {
+                $data = $data ?: [];
+                if (!array_key_exists('attributes', $data)) {
+                    $data['attributes'] = [];
+                }
+                $data['attributes']['videoID'] = $matches['videoID'];
+                $data['attributes']['embedUrl'] = "https://player.vimeo.com/video/{$matches['videoID']}?autoplay=1";
+            }
+        }
         return $data;
     }
 

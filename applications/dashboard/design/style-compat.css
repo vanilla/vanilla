@@ -2239,12 +2239,13 @@ body.isMobile .FormWrapper {
   margin: auto;
 }
 
-.embedGetty .embedExternal-content {
-  width: auto;
-}
-
 .embedGetty .getty {
-  display: block;
+  position: absolute !important;
+  display: block !important;
+  top: 0;
+  left: 0;
+  height: 100%;
+  width: 100% !important;
 }
 
 .embedGiphy {

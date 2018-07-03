@@ -46,13 +46,17 @@ async function convertGettyEmbeds() {
  */
 export async function renderGetty(elements: IEmbedElements, data: IEmbedData) {
     const contentElement = elements.content;
+    const paddingBottom = ((data.height || 1) / (data.width || 1)) * 100 + "%";
     const url = data.attributes.post;
+    const gettyWrapper = document.createElement("div");
+    gettyWrapper.style.paddingBottom = paddingBottom;
+    gettyWrapper.classList.add("embedExternal-ratio");
     const newLink = document.createElement("a");
     newLink.classList.add("gie-single");
     newLink.setAttribute("href", "http://www.gettyimages.ca/detail/" + url);
     newLink.setAttribute("id", data.attributes.id);
-
-    contentElement.appendChild(newLink);
+    gettyWrapper.appendChild(newLink);
+    contentElement.appendChild(gettyWrapper);
 
     setImmediate(() => {
         void loadGettyImages(data);

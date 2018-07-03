@@ -2,22 +2,113 @@
 
 $inlineOperations = '[
     {
-        "insert":
-            "Quasar rich in mystery Apollonius of Perga concept of the number one rich in mystery! Apollonius of Perga, rogue, hearts of the stars, brain is the seed of intelligence dispassionate extraterrestrial observer finite but unbounded. Tingling of the spine kindling the energy hidden in matter gathered by gravity science Apollonius of Perga Euclid cosmic fugue gathered by gravity take root and flourish dream of the mind\'s eye descended from astronomers ship of the imagination vastness is bearable only through love with pretty stories for which there\'s little good evidence Orion\'s sword. Trillion a billion trillion Apollonius of Perga, not a sunrise but a galaxyrise the sky calls to us! Descended from astronomers?\n"
+        "insert": "Quasar rich in mystery Apollonius of Perga concept of the number one rich in mystery! Apollonius of Perga, rogue, hearts of the stars, brain is the seed of intelligence dispassionate extraterrestrial observer finite but unbounded. Tingling of the spine kindling the energy hidden in matter gathered by gravity science Apollonius of Perga Euclid cosmic fugue gathered by gravity take root and flourish dream of the mind\'s eye descended from astronomers ship of the imagination vastness is bearable only through love with pretty stories for which there\'s little good evidence Orion\'s sword. Trillion a billion trillion Apollonius of Perga, not a sunrise but a galaxyrise the sky calls to us! Descended from astronomers?\n"
     },
-    { "attributes": { "code-inline": true }, "insert": "Code Inline" },
-    { "insert": "\n" },
-    { "attributes": { "bold": true }, "insert": "Bold" },
-    { "insert": "\n" },
-    { "attributes": { "italic": true }, "insert": "italic" },
-    { "insert": "\n" },
-    { "attributes": { "italic": true, "bold": true }, "insert": "bold italic" },
-    { "insert": "\n" },
-    { "attributes": { "strike": true, "italic": true, "bold": true }, "insert": "bold italic strike" },
-    { "insert": "\n" },
     {
-        "attributes": { "strike": true, "italic": true, "bold": true, "link": "http://test.com" },
+        "attributes": {
+            "code-inline": true
+        },
+        "insert": "Code Inline"
+    },
+    {
+        "insert": "\n"
+    },
+    {
+        "attributes": {
+            "bold": true
+        },
+        "insert": "Bold"
+    },
+    {
+        "insert": "\n"
+    },
+    {
+        "attributes": {
+            "italic": true
+        },
+        "insert": "italic"
+    },
+    {
+        "insert": "\n"
+    },
+    {
+        "attributes": {
+            "italic": true,
+            "bold": true
+        },
+        "insert": "bold italic"
+    },
+    {
+        "insert": "\n"
+    },
+    {
+        "attributes": {
+            "strike": true,
+            "italic": true,
+            "bold": true
+        },
+        "insert": "bold italic strike"
+    },
+    {
+        "insert": "\n"
+    },
+    {
+        "attributes": {
+            "strike": true,
+            "italic": true,
+            "bold": true,
+            "link": "http://test.com"
+        },
         "insert": "bold italic strike link"
+    },
+    {
+        "insert": "\nSome text with a mention in it "
+    },
+    {
+        "insert": {
+            "mention": {
+                "name": "Alex Other Name",
+                "userID": 23
+            }
+        }
+    },
+    {
+        "insert": " Another mention "
+    },
+    {
+        "insert": {
+            "mention": {
+                "name": "System",
+                "userID": 1
+            }
+        }
+    },
+    {
+        "insert": ".\nSome text with emojis "
+    },
+    {
+        "insert": {
+            "emoji": {
+                "emojiChar": "🤗"
+            }
+        }
+    },
+    {
+        "insert": {
+            "emoji": {
+                "emojiChar": "🤔"
+            }
+        }
+    },
+    {
+        "insert": {
+            "emoji": {
+                "emojiChar": "🤣"
+            }
+        }
+    },
+    {
+        "insert": ".\n"
     }
 ]
 ';

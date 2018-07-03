@@ -2236,16 +2236,13 @@ body.isMobile .FormWrapper {
   position: relative;
   display: block;
   max-width: 100%;
+  width: 640px;
   margin: auto;
 }
 
 .embedGetty .getty {
-  position: absolute !important;
   display: block !important;
-  top: 0;
-  left: 0;
-  height: 100%;
-  width: 100% !important;
+  background-color: white;
 }
 
 .embedGiphy {

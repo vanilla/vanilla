@@ -1,7 +1,7 @@
 <?php
 /**
  * @copyright 2009-2018 Vanilla Forums Inc.
- * @license GPL-2.0
+ * @license https://opensource.org/licenses/GPL-2.0 GPL-2.0
  */
 
 namespace Vanilla\Embeds;
@@ -24,7 +24,7 @@ class SoundCloudEmbed extends Embed {
     /**
      * @inheritdoc
      */
-    function matchUrl(string $url) {
+    public function matchUrl(string $url) {
         $data = [];
         $oembedData =[];
         $encodedUrl = urlencode($url);
@@ -45,16 +45,17 @@ class SoundCloudEmbed extends Embed {
      * @inheritdoc
      */
     public function renderData(array $data): string {
-        $track = htmlspecialchars($data['attributes']['track']);
+
+        $postID = htmlspecialchars($data['attributes']['postID']);
         $showArtwork = htmlspecialchars($data['attributes']['showArtwork']);
         $visual = htmlspecialchars($data['attributes']['visual']);
-        $url = htmlspecialchars("https://w.soundcloud.com/player/?url=https://api.soundcloud.com/tracks/");
+        $url = htmlspecialchars($data['attributes']['embedUrl']);
 
         $result = <<<HTML
 <div class="embedExternal embedSoundCloud">
     <div class="embedExternal-content">
         <iframe width="100%" scrolling="no" frameborder="no"
-            src="{$url}{$track}&amp;show_artwork={$showArtwork}&amp;visual={$visual}">
+            src="{$url}{$postID}&amp;show_artwork={$showArtwork}&amp;visual={$visual}">
         </iframe>
     </div>
 </div>
@@ -65,7 +66,7 @@ HTML;
     /**
      * Parses the oembed repsonse html for permalink and other data.
      *
-     * @param string $html
+     * @param string $html The html snippet send from the oembed call.
      * @return array $data
      */
     private function parseResponseHtml(string $html): array {
@@ -78,12 +79,28 @@ HTML;
         if ($showArtwork) {
             $data['attributes']['showArtwork'] = $showArtwork['artwork'];
         }
-        preg_match('/(?<=2F)(?<track>\d+)(&)/', $html, $trackNumber);
+        preg_match('/(?<=%2Ftracks%2F)(?<track>\d+)(&)/', $html, $trackNumber);
+        preg_match('/(?<=2Fplaylists%2F)(?<playListID>[a-zA-Z0-9]+)(&)/', $html, $playList);
+        preg_match('/(?<=%2Fusers%2F)(?<userID>\d+)(&)/', $html, $user);
+
         if ($trackNumber) {
-            $data['attributes']['track'] = $trackNumber['track'];
+            $data['attributes']['postID'] = $trackNumber['track'] ?? "";
+            $data['attributes']['embedUrl'] = "https://w.soundcloud.com/player/?url=https://api.soundcloud.com/tracks/";
+        } elseif ($playList) {
+            $data['attributes']['postID'] = $playList['playListID'] ?? "";
+            $data['attributes']['embedUrl'] = "https://w.soundcloud.com/player/?url=https://api.soundcloud.com/playlists/";
+        } elseif ($user) {
+            $data['attributes']['postID'] = $user['userID'] ?? "";
+            $data['attributes']['embedUrl'] = "https://w.soundcloud.com/player/?url=https://api.soundcloud.com/users/";
         } else {
+            $data['attributes']['postID'] = "";
+            $data['attributes']['embedUrl'] = "";
+        }
+
+        if (!$data['attributes']['postID']) {
             throw new Exception('Unable to get track ID.', 400);
         }
+
         return $data;
     }
 }

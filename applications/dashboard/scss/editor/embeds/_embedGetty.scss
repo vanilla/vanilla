@@ -4,11 +4,8 @@
     max-width: 100%;
     margin: auto;
 
-    .embedExternal-content {
-        width: auto;
-    }
-
     .getty {
-        display: block;
+        display: block !important;
+        background-color: white;
     }
 }

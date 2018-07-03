@@ -26,10 +26,15 @@ function setupEditor() {
  * Set up the editor if the someone clicks edit on a form.
  */
 function setupCommentEditForm() {
-    $(document).on("EditCommentFormLoaded", (event, container) => {
-        const $commentFormContainer = $(container).find(".richEditor");
-        if ($commentFormContainer.length > 0) {
-            mountEditor($commentFormContainer[0]);
+    document.addEventListener("X-EditCommentFormLoaded", event => {
+        const container = event.target;
+        if (!(container instanceof Element)) {
+            return;
+        }
+
+        const richEditor = container.querySelector(".richEditor");
+        if (richEditor) {
+            mountEditor(richEditor);
         }
     });
 }

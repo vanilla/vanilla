@@ -32,6 +32,7 @@ export default class Editor extends React.Component<IProps, IState> {
     private hasUploadPermission: boolean;
     private quill: Quill;
     private quillMountRef: React.RefObject<HTMLDivElement> = React.createRef();
+    private allowPasteListener = true;
 
     constructor(props) {
         super(props);
@@ -130,6 +131,17 @@ export default class Editor extends React.Component<IProps, IState> {
         this.quill.on("text-change", () => {
             bodybox.value = JSON.stringify(this.quill.getContents().ops);
         });
+
+        // Listen for the legacy form event if applicable and clear the form.
+        const form = this.quill.container.closest("form");
+        if (form) {
+            form.addEventListener("X-ClearCommentForm", () => {
+                this.allowPasteListener = false;
+                this.quill.setContents([]);
+                this.quill.setSelection(null as any, Quill.sources.USER);
+                this.allowPasteListener = true;
+            });
+        }
     }
 
     /**
@@ -142,14 +154,16 @@ export default class Editor extends React.Component<IProps, IState> {
         if (debug()) {
             const { bodybox } = this.props;
             bodybox.addEventListener("paste", event => {
-                event.stopPropagation();
-                event.preventDefault();
+                if (this.allowPasteListener) {
+                    event.stopPropagation();
+                    event.preventDefault();
 
-                // Get pasted data via clipboard API
-                const clipboardData = event.clipboardData || window.clipboardData;
-                const pastedData = clipboardData.getData("Text");
-                const delta = JSON.parse(pastedData);
-                this.quill.setContents(delta);
+                    // Get pasted data via clipboard API
+                    const clipboardData = event.clipboardData || window.clipboardData;
+                    const pastedData = clipboardData.getData("Text");
+                    const delta = JSON.parse(pastedData);
+                    this.quill.setContents(delta);
+                }
             });
         }
     }

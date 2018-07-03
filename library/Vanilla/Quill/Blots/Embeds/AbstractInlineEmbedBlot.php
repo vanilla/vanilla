@@ -37,8 +37,6 @@ abstract class AbstractInlineEmbedBlot extends AbstractBlot {
 
     /**
      * Get the class for the wrapping HTML tag. This will generally not be a
-     *
-     * @return string
      */
     abstract protected function getContainerHMTLAttributes(): array;
 
@@ -60,24 +58,12 @@ abstract class AbstractInlineEmbedBlot extends AbstractBlot {
         foreach ($attributes as $attrKey => $attr) {
             $result .= " $attrKey=\"$attr\"";
         }
+
+        $sanitizedContent = htmlspecialchars($this->content);
         $result .= ">";
-        $result .= "<span contenteditable=\"false\">" . $this->content . "</span>";
+        $result .= "<span contenteditable=\"false\">" . $sanitizedContent . "</span>";
         $result .= "</" . static::getContainerHTMLTag() . ">";
 
-        return $result;
-    }
-
-    /**
-     * Render the content area of the blot. Try overriding this before overriding render().
-     *
-     * @see AbstractInlineEmbedBlot::render()
-     *
-     * @return string
-     */
-    protected function renderContent(): string {
-        $result = "<span contenteditable=\"false\">";
-        $result .= $this->content;
-        $result .= "</span>";
         return $result;
     }
 

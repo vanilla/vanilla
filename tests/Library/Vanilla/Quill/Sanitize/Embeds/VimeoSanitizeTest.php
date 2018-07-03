@@ -4,11 +4,11 @@
  * @license GPL-2.0
  */
 
-namespace VanillaTests\Library\Vanilla\Quill\Sanitize\ExternalEmbed;
+namespace VanillaTests\Library\Vanilla\Quill\Sanitize\Embeds;
 
 use VanillaTests\Library\Vanilla\Quill\Sanitize\SanitizeTest;
 
-class TwitterSanitizeTest extends SanitizeTest {
+class VimeoSanitizeTest extends SanitizeTest {
 
     /**
      * @inheritdoc
@@ -19,17 +19,22 @@ class TwitterSanitizeTest extends SanitizeTest {
                 "insert" => [
                     "embed-external" => [
                         "url" => $content,
-                        "type" => "twitter",
+                        "type" => "vimeo",
                         "name" => $content,
-                        "body" => $content,
+                        "body" => null,
                         "photoUrl" => $content,
                         "height" => null,
                         "width" => null,
-                        "attributes" => ["statusID" => $content]
+                        "attributes" => [
+                            "thumbnail_width" => $content,
+                            "thumbnail_height" => $content,
+                            "videoID" => $content,
+                            "embedUrl" => $content
+                        ]
                     ]
                 ]
             ],
-            ["insert" => "\n"]
+            ["insert" => "\n\n"]
         ];
 
         return $operations;

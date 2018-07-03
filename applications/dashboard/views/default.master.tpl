@@ -4,6 +4,7 @@
     {asset name="Head"}
 </head>
 <body id="{$BodyID}" class="{$BodyClass}">
+{block name="main"}
 <div id="Frame">
     <div class="Head" id="Head" role="banner">
         <div class="Row">
@@ -34,6 +35,7 @@
         </div>
     </div>
 </div>
+{/block}
 {event name="AfterBody"}
 </body>
 </html>

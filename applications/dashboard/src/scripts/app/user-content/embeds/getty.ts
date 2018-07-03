@@ -51,9 +51,8 @@ export async function renderGetty(elements: IEmbedElements, data: IEmbedData) {
     newLink.classList.add("gie-single");
     newLink.setAttribute("href", "http://www.gettyimages.ca/detail/" + url);
     newLink.setAttribute("id", data.attributes.id);
-
+    contentElement.style.width = `${data.width}px`;
     contentElement.appendChild(newLink);
-
     setImmediate(() => {
         void loadGettyImages(data);
     });

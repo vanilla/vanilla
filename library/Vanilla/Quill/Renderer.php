@@ -40,7 +40,6 @@ class Renderer {
             $isLastPosition = $index === count($groups) - 1;
 
             if ($group->isBreakOnlyGroup()) {
-
                 if ($previousGroupIsBreakOnly) {
                     // Skip if the this is last Break in a series of 2+ breaks.
                     if (!$isLastPosition) {

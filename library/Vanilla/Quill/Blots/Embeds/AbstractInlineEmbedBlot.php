@@ -45,7 +45,8 @@ abstract class AbstractInlineEmbedBlot extends AbstractBlot {
      */
     public function __construct(array $currentOperation, array $previousOperation, array $nextOperation) {
         parent::__construct($currentOperation, $previousOperation, $nextOperation);
-        $this->content = valr(static::getInsertKey(), $this->currentOperation);
+        $potentialContent = valr(static::getInsertKey(), $this->currentOperation);
+        $this->content = is_string($potentialContent) ? $potentialContent : "";
     }
 
     /**
@@ -61,7 +62,7 @@ abstract class AbstractInlineEmbedBlot extends AbstractBlot {
 
         $sanitizedContent = htmlspecialchars($this->content);
         $result .= ">";
-        $result .= "<span contenteditable=\"false\">" . $sanitizedContent . "</span>";
+        $result .= $sanitizedContent;
         $result .= "</" . static::getContainerHTMLTag() . ">";
 
         return $result;

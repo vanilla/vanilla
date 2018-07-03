@@ -40,13 +40,13 @@ class CodeBlockBlot extends AbstractBlockBlot {
      * @inheritDoc
      */
     public function getGroupOpeningTag(): string {
-        return '<code class="code-block code isBlock" spellcheck="false">';
+        return '<pre><code class="code-block code isBlock" spellcheck="false">';
     }
 
     /**
      * @inheritDoc
      */
     public function getGroupClosingTag(): string {
-        return "</code>";
+        return "</code></pre>";
     }
 }

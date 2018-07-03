@@ -10,8 +10,25 @@ namespace VanillaTests\Library\Vanilla\Quill;
 use VanillaTests\SharedBootstrapTestCase;
 use Vanilla\Quill\Parser;
 use Vanilla\Quill\Renderer;
+use voku\helper\HtmlMin;
 
 class RendererTest extends SharedBootstrapTestCase {
+
+    /** @var HtmlMin */
+    private $minifier;
+
+    public function __construct(string $name = null, array $data = [], string $dataName = '') {
+        parent::__construct($name, $data, $dataName);
+
+        $this->minifier = new HtmlMin();
+        $this->minifier->doRemoveSpacesBetweenTags()
+            ->doRemoveWhitespaceAroundTags()
+            ->doSortHtmlAttributes()
+            ->doRemoveOmittedHtmlTags(false)
+        ;
+
+//        $this->minifier->doOptimizeViaHtmlDomParser(false);
+    }
 
     /**
      * @dataProvider dataProvider
@@ -32,6 +49,7 @@ class RendererTest extends SharedBootstrapTestCase {
     }
 
     public function dataProvider() {
+
         return [
             ["inline-formatting"],
             ["paragraphs"],
@@ -82,8 +100,11 @@ class RendererTest extends SharedBootstrapTestCase {
      */
     private function normalizeHtml($html) {
         $html = $this->stripZeroWidthWhitespace($html);
-        $html = preg_replace('/\s+/', '', $html);
-
+        $html = $this->minifier->minify($html);
+        // Stub out SVGs
+        $html = preg_replace("/(<svg.*?<\/svg>)/", "<SVG />", $html);
+        $html = preg_replace("/\>\</", ">\n<", $html);
+        $html = preg_replace("/ \</", "<", $html);
         return $html;
     }
 }

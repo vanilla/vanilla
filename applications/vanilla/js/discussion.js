@@ -264,7 +264,13 @@ jQuery(document).ready(function($) {
         $('div.Information').fadeOut('fast', function() {
             $(this).remove();
         });
-        $(sender).closest('form').trigger('clearCommentForm');
+        var $form = $(sender).closest('form');
+        $form.trigger('clearCommentForm');
+
+        // Dispatch a native event for things that don't use jquery
+        var event = document.createEvent('CustomEvent');
+        event.initCustomEvent('X-ClearCommentForm', true, false, {});
+        $form[0].dispatchEvent(event);
     }
 
     // Set up paging
@@ -307,6 +313,11 @@ jQuery(document).ready(function($) {
                     $(msg).afterTrigger(json.Data);
                     $(msg).hide();
                     $(document).trigger('EditCommentFormLoaded', [container]);
+
+                    // Dispatch a native event for things that don't use jquery
+                    var event = document.createEvent('CustomEvent');
+                    event.initCustomEvent('X-EditCommentFormLoaded', true, false, {});
+                    container[0].dispatchEvent(event);
                 },
                 complete: function() {
                     $(parent).find('span.TinyProgress').remove();

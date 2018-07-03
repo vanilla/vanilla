@@ -10,10 +10,41 @@ namespace VanillaTests\Library\Vanilla\Quill;
 use VanillaTests\SharedBootstrapTestCase;
 use Vanilla\Quill\Parser;
 use Vanilla\Quill\Renderer;
-use Vanilla\Quill\Blots;
-
 
 class RendererTest extends SharedBootstrapTestCase {
+
+    /**
+     * @dataProvider dataProvider
+     */
+    public function testRender($dirname) {
+        $fixturePath = realpath(__DIR__."/../../../fixtures/editor-rendering/".$dirname);
+
+        $input = file_get_contents($fixturePath."/input.json");
+        $expectedOutput = trim(file_get_contents($fixturePath."/output.html"));
+
+        $json = \json_decode($input, true);
+
+        $parser = new Parser();
+        $renderer = new Renderer($parser);
+
+        $output = $renderer->render($json);
+        $this->assertHtmlStringEqualsHtmlString($expectedOutput, $output);
+    }
+
+    public function dataProvider() {
+        return [
+            ["inline-formatting"],
+            ["paragraphs"],
+            ["headings"],
+            ["lists"],
+            ["emoji"],
+            ["blockquote"],
+            ["spoiler"],
+            ["code-block"],
+            ["all"],
+            ["all-blocks"],
+        ];
+    }
 
     /**
      * Replace all zero-width whitespace in a string.
@@ -28,40 +59,31 @@ class RendererTest extends SharedBootstrapTestCase {
      * @return string
      */
     private function stripZeroWidthWhitespace(string $text): string {
-        return preg_replace( '/[\x{200B}-\x{200D}\x{FEFF}]/u', '', $text );
+        return preg_replace('/[\x{200B}-\x{200D}\x{FEFF}]/u', '', $text);
     }
 
     /**
-     * @dataProvider directoryProvider
+     * Assert that two strings of HTML are roughly similar. This doesn't work for code blocks.
      */
-    public function testRender($dirname) {
-        $fixturePath = realpath(__DIR__."/../../../fixtures/editor-rendering/".$dirname);
-
-        $input = file_get_contents($fixturePath . "/input.json");
-        $expectedOutput = trim(file_get_contents($fixturePath . "/output.html"));
-        $expectedOutput = $this->stripZeroWidthWhitespace($expectedOutput);
-
-        $json = \json_decode($input, true);
-
-        $parser = new Parser();
-        $renderer = new Renderer($parser);
-
-        $output = $renderer->render($json);
-        $this->assertEquals($expectedOutput, $output);
+    private function assertHtmlStringEqualsHtmlString($expected, $actual) {
+        $expected = $this->normalizeHtml($expected);
+        $actual = $this->normalizeHtml($actual);
+        $this->assertEquals($expected, $actual);
     }
 
-    public function directoryProvider() {
-        return [
-            ["inline-formatting"],
-            ["paragraphs"],
-            ["headings"],
-            ["lists"],
-            ["emoji"],
-            ["blockquote"],
-            ["spoiler"],
-            ["code-block"],
-            ["all"],
-            ["all-blocks"],
-        ];
+    /**
+     * Remove whitespace characters from an HTML String. This is good for rough matches.
+     *
+     * It is not capable of accurately testing code blocks or anything with white-space:pre.
+     *
+     * @param string $html The html to filter
+     *
+     * @return string
+     */
+    private function normalizeHtml($html) {
+        $html = $this->stripZeroWidthWhitespace($html);
+        $html = preg_replace('/\s+/', '', $html);
+
+        return $html;
     }
 }

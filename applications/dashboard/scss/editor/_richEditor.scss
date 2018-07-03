@@ -695,6 +695,10 @@
 .atMention  {
     color: inherit;
     font-weight: $richEditor-atMentionLink_weight;
+}
+
+// Only allow selection of the entire mention at once in the editor.
+.richEditor .atMention {
     user-select: all;
 }
 

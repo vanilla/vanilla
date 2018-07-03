@@ -31,6 +31,7 @@ class Parser {
         Blots\BulletedListBlot::class,
         Blots\OrderedListBlot::class,
         Blots\Embeds\EmojiBlot::class,
+        Blots\Embeds\MentionBlot::class,
         Blots\TextBlot::class,
     ];
 

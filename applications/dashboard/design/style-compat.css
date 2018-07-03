@@ -1445,6 +1445,9 @@ label.checkbox input.checkbox-input {
 .atMention {
   color: inherit;
   font-weight: 600;
+}
+
+.richEditor .atMention {
   -webkit-user-select: all;
      -moz-user-select: all;
       -ms-user-select: all;

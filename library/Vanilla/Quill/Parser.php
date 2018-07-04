@@ -9,13 +9,12 @@ namespace Vanilla\Quill;
 
 use Vanilla\Quill\Blots;
 use Vanilla\Quill\Blots\AbstractBlot;
+use Vanilla\Quill\Formats\AbstractFormat;
 
 /**
  * Class for rendering parsing Quill Deltas into BlotGroups.
  *
  * @see https://github.com/quilljs/delta Information on quill deltas.
- *
- * @package Vanilla\Quill
  */
 class Parser {
 
@@ -23,7 +22,9 @@ class Parser {
 
     private $blotClasses = [];
 
-    /** @var BlotGroup[]  */
+    private $formatClasses = [];
+
+    /** @var BlotGroup[] */
     private $groups = [];
 
     /** @var BlotGroup */
@@ -34,10 +35,26 @@ class Parser {
      *
      * @param string $blotClass The blot to register.
      *
+     * @see AbstractBlot
      * @return $this
      */
     public function addBlot(string $blotClass) {
         $this->blotClasses[] = $blotClass;
+
+        return $this;
+    }
+
+    /**
+     * Add a new embed type.
+     *
+     * @param string $formatClass The Format class to register.
+     *
+     * @see AbstractFormat
+     * @return $this
+     */
+    public function addFormat(string $formatClass) {
+        $this->formatClasses[] = $formatClass;
+
         return $this;
     }
 
@@ -47,7 +64,7 @@ class Parser {
     public function splitPlainTextNewlines($operations) {
         $newOperations = [];
 
-        foreach($operations as $opIndex => $op) {
+        foreach ($operations as $opIndex => $op) {
             // Determine if this is a plain text insert with no attributes.
             $isBareInsertOperation =
                 !array_key_exists("attributes", $op)
@@ -74,8 +91,8 @@ class Parser {
             $pieces = \explode("\n", $op["insert"]);
             if (count($pieces) > 1) {
                 // Create a new insert from the exploded piece.
-                foreach($pieces as $index => $piece) {
-                    $insert = ["insert" =>  $piece];
+                foreach ($pieces as $index => $piece) {
+                    $insert = ["insert" => $piece];
                     $insert[BlotGroup::BREAK_MARKER] = true;
                     $newOperations[] = $insert;
                 }
@@ -109,14 +126,14 @@ class Parser {
         $group = new BlotGroup();
 
         for ($i = 0; $i < $operationLength; $i++) {
-            $previousOp = $operations[$i -1] ?? [];
+            $previousOp = $operations[$i - 1] ?? [];
             $currentOp = $operations[$i];
             $nextOp = $operations[$i + 1] ?? [];
             $blotInstance = $this->getBlotForOperations($currentOp, $previousOp, $nextOp);
 
             // Ask the blot if it should close the current group.
             if ($blotInstance->shouldClearCurrentGroup($group)) {
-                $groups []= $group;
+                $groups [] = $group;
                 $group = new BlotGroup();
             }
 
@@ -124,7 +141,7 @@ class Parser {
 
             // Some block type blots get a group all to themselves.
             if ($blotInstance instanceof Blots\AbstractBlockBlot && $blotInstance->isOwnGroup()) {
-                $groups []= $group;
+                $groups [] = $group;
                 $group = new BlotGroup();
             }
 
@@ -133,12 +150,13 @@ class Parser {
                 $i++;
             }
         }
-        $groups []= $group;
+        $groups [] = $group;
+
         return $groups;
     }
 
     /**
-     * Get the blot the matching blot for a sequence of operations. Returns the default if no match is found.
+     * Get the matching blot for a sequence of operations. Returns the default if no match is found.
      */
     public function getBlotForOperations($currentOp, $previousOp, $nextOp): AbstractBlot {
         $blotClass = self::DEFAULT_BLOT;
@@ -151,5 +169,22 @@ class Parser {
         }
 
         return new $blotClass($currentOp, $previousOp, $nextOp);
+    }
+
+    /**
+     * Get the matching format for a sequence of operations if applicable.
+     *
+     * @returns AbstractFormat[] The formats matching the given operations.
+     */
+    public function getFormatsForOperations($currentOp, $previousOp, $nextOp): array {
+        $formats = [];
+        foreach ($this->formatClasses as $format) {
+            if ($format::matches([$currentOp])) {
+                /** @var Formats\AbstractFormat $formatInstance */
+                $formats[] = new $format($currentOp, $previousOp, $nextOp);
+            }
+        }
+
+        return $formats;
     }
 }

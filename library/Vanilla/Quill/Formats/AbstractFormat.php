@@ -95,7 +95,7 @@ abstract class AbstractFormat extends AbstractBlot {
     /**
      * @inheritDoc
      */
-    public function getOpeningTag(): array {
+    private function shouldRenderOpeningTag(): bool {
         $selfMatchesPrevious = static::matches([$this->previousOperation]);
         $matchesBlackListedFormat = false;
         foreach(static::getBlackListedNestedFormats() as $blackListedFormat) {
@@ -105,20 +105,35 @@ abstract class AbstractFormat extends AbstractBlot {
             }
         }
 
-        if (!$selfMatchesPrevious || $matchesBlackListedFormat) {
-            return [
-                "tag" => static::getTagName(),
-                "attributes" => $this->getAttributes(),
-            ];
+        return !$selfMatchesPrevious || $matchesBlackListedFormat;
+    }
+
+    /**
+     * Render the opening tags for the current blot.
+     */
+    public function renderOpeningTag(): string {
+        if (!$this->shouldRenderOpeningTag()) {
+            return "";
         }
 
-        return [];
+        $tagName = static::getTagName();
+        $attributes =  $this->getAttributes();
+
+        $result = "<".$tagName;
+        if ($attributes) {
+            foreach ($attributes as $attrKey => $attr) {
+                $result .= " $attrKey=\"$attr\"";
+            }
+        }
+
+        $result .= ">";
+        return $result;
     }
 
     /**
      * @inheritDoc
      */
-    public function getClosingTag(): array {
+    private function shouldRenderClosingTag(): bool {
         $selfMatchesNext = static::matches([$this->nextOperation]);
         $matchesBlackListedFormat = false;
         foreach(static::getBlackListedNestedFormats() as $blackListedFormat) {
@@ -127,12 +142,17 @@ abstract class AbstractFormat extends AbstractBlot {
                 break;
             }
         }
-        if (!$selfMatchesNext || $matchesBlackListedFormat) {
-            return [
-                "tag" => static::getTagName(),
-            ];
+        return !$selfMatchesNext || $matchesBlackListedFormat;
+    }
+
+    /**
+     * Render the closing tags for the current blot.
+     */
+    public function renderClosingTag(): string {
+        if (!$this->shouldRenderClosingTag()) {
+            return "";
         }
 
-        return [];
+        return "</".static::getTagName().">";
     }
 }

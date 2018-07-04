@@ -77,19 +77,19 @@ class EmbedManager {
      * @throws \Garden\Container\NotFoundException
      */
     public function addCoreEmbeds() {
-        $pageScraper = \Gdn::getContainer()->get(PageScraper::class);
-        $this->setDefaultEmbed(new LinkEmbed($pageScraper))
-            ->addEmbed(new TwitterEmbed)
-            ->addEmbed(new YouTubeEmbed)
-            ->addEmbed(new VimeoEmbed)
-            ->addEmbed(new InstagramEmbed)
-            ->addEmbed(new SoundCloudEmbed)
-            ->addEmbed(new ImgurEmbed)
-            ->addEmbed(new TwitchEmbed)
-            ->addEmbed(new GettyEmbed)
-            ->addEmbed(new GiphyEmbed)
-            ->addEmbed(new WistiaEmbed)
-            ->addEmbed(new ImageEmbed, self::PRIORITY_LOW);
+        $dic = \Gdn::getContainer();
+        $this->setDefaultEmbed( $dic->get(LinkEmbed::class))
+            ->addEmbed($dic->get(TwitterEmbed::class))
+            ->addEmbed($dic->get(YouTubeEmbed::class))
+            ->addEmbed($dic->get(VimeoEmbed::class))
+            ->addEmbed($dic->get(InstagramEmbed::class))
+            ->addEmbed($dic->get(SoundCloudEmbed::class))
+            ->addEmbed($dic->get(ImgurEmbed::class))
+            ->addEmbed($dic->get(TwitchEmbed::class))
+            ->addEmbed($dic->get(GettyEmbed::class))
+            ->addEmbed($dic->get(GiphyEmbed::class))
+            ->addEmbed($dic->get(WistiaEmbed::class))
+            ->addEmbed($dic->get(ImageEmbed::class), self::PRIORITY_LOW);
     }
 
     /**

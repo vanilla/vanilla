@@ -13,6 +13,14 @@ namespace Vanilla\Quill\Blots\Embeds;
 class MentionBlot extends AbstractInlineEmbedBlot {
 
     /**
+     * Prepend an @ onto the text content of the blot.
+     */
+    public function __construct(array $currentOperation, array $previousOperation, array $nextOperation) {
+        parent::__construct($currentOperation, $previousOperation, $nextOperation);
+        $this->content = "@".$this->content;
+    }
+
+    /**
      * @inheritDoc
      */
     protected static function getInsertKey(): string {

@@ -32,6 +32,11 @@ class VimeoEmbed extends VideoEmbed {
 
     /**
      * @inheritdoc
+     *
+     * The current regex supports the following Vimeo Urls.
+     * https://vimeo.com/277405526
+     * https://vimeo.com/channels/staffpicks/277826934
+     * https://vimeo.com/ondemand/nature365/113009024
      */
     public function matchUrl(string $url) {
 
@@ -57,7 +62,6 @@ class VimeoEmbed extends VideoEmbed {
             if (!$matches['videoID']) {
                 throw new Exception('Unable to get video ID.', 400);
             }
-
 
             if (array_key_exists('videoID', $matches)) {
                 $data = $data ?: [];

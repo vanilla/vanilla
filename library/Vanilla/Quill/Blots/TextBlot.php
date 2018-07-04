@@ -32,6 +32,8 @@ class TextBlot extends AbstractBlot {
         $this->parseFormats($this->currentOperation, $this->previousOperation, $this->nextOperation);
 
         $this->content = $this->currentOperation["insert"] ?? "";
+        // Sanitize
+        $this->content = htmlspecialchars($this->content);
 
         // If we still have a trailing newline it signifies the end of the group, even if we don't want to render it.
         // Strip off the newline character place a break marker.
@@ -45,7 +47,7 @@ class TextBlot extends AbstractBlot {
      * @inheritDoc
      */
     public function render(): string {
-        $sanitizedContent = $this->content === "" ? "<br>" : htmlspecialchars($this->content);
+        $sanitizedContent = $this->content === "" ? "<br>" : htmlentities($this->content, ENT_QUOTES);
         return $this->renderOpeningFormatTags().$sanitizedContent.$this->renderClosingFormatTags();
     }
 
@@ -61,20 +63,5 @@ class TextBlot extends AbstractBlot {
      */
     public function hasConsumedNextOp(): bool {
         return false;
-    }
-
-    /**
-     * @inheritDoc
-     */
-    protected function createLineBreaks(string $input): string {
-        if ($this->content === "") {
-            return "<br>";
-        }
-
-        if (preg_match("/^\\n.+/", $this->content)) {
-            return preg_replace("/^\\n/", "<br></p><p>", $input);
-        } else {
-            return $input;
-        }
     }
 }

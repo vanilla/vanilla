@@ -18,7 +18,7 @@ use Vanilla\Quill\Formats\AbstractFormat;
  */
 class Parser {
 
-    const DEFAULT_BLOT = Blots\TextBlot::class;
+    const DEFAULT_BLOT = Blots\NullBlot::class;
 
     /** @var string[] The registered blot classes */
     private $blotClasses = [];
@@ -51,6 +51,7 @@ class Parser {
             ->addBlot(Blots\HeadingBlot::class)
             ->addBlot(Blots\BulletedListBlot::class)
             ->addBlot(Blots\OrderedListBlot::class)
+            ->addBlot(Blots\TextBlot::class)
             ->addBlot(Blots\Embeds\MentionBlot::class)
             ->addBlot(Blots\Embeds\EmojiBlot::class)
             ->addFormat(Formats\Link::class)
@@ -180,7 +181,7 @@ class Parser {
             // Find the matching blot type for the current, last, and next operation.
             if ($blot::matches([$currentOp, $nextOp])) {
                 $blotClass = $blot;
-                /** @var AbstractBlot $blotInstance */
+                break;
             }
         }
 

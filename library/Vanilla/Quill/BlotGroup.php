@@ -49,7 +49,7 @@ class BlotGroup {
     public static function makeEmptyGroup(): BlotGroup {
         $group = new BlotGroup();
         $blot = new TextBlot(["insert" => ""], [], []);
-        $blot->setContent("<br>");
+        $blot->setContent("");
         $group->pushBlot($blot);
         return $group;
     }

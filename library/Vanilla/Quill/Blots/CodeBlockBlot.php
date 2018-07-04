@@ -30,7 +30,8 @@ class CodeBlockBlot extends AbstractBlockBlot {
 
         // Add newlines which live in the next operation.
         if ($this->nextOperation) {
-            $result .= $this->nextOperation["insert"];
+            $sanizizedNextInsert = htmlspecialchars($this->nextOperation["insert"]);
+            $result .= $sanizizedNextInsert;
         }
 
         return $result;

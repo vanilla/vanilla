@@ -247,6 +247,19 @@ class ImageResizer {
     }
 
     /**
+     * Return an extension-to-type map.
+     *
+     * @return array
+     */
+    public static function getExtType() {
+        $extType = array_flip(static::$typeExt);
+        if (array_key_exists('jpg', $extType)) {
+            $extType['jpeg'] = $extType['jpg'];
+        }
+        return $extType;
+    }
+
+    /**
      * Get the image type from a file extension.
      *
      * This is a convenience method for looking up an image based on a mapping of file extension names to image types.
@@ -258,11 +271,9 @@ class ImageResizer {
      */
     public function imageTypeFromExt($path) {
         $ext = strtolower(pathinfo($path, PATHINFO_EXTENSION));
-        if ($ext === 'jpeg') {
-            return IMAGETYPE_JPEG;
-        }
-        if ($type = array_search($ext, self::$typeExt)) {
-            return $type;
+        $extType = static::getExtType();
+        if (array_key_exists($ext, $extType)) {
+            return $extType[$ext];
         }
         throw new \InvalidArgumentException("Unknown image type for extension '$ext'.", 400);
     }

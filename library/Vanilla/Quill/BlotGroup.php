@@ -191,7 +191,7 @@ class BlotGroup {
      *
      * @return AbstractBlot
      */
-    private function getBlotForSurroundingTags(): AbstractBlot {
+    public function getBlotForSurroundingTags(): AbstractBlot {
         $blot = $this->blots[0];
 
         foreach($this->overridingBlots as $overridingBlot) {

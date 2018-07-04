@@ -19,26 +19,32 @@ use Vanilla\Quill\Blots\AbstractBlot;
  */
 class Parser {
 
+    const DEFAULT_BLOT = Blots\TextBlot::class;
+
+    private $blotClasses = [];
+
+    /** @var BlotGroup[]  */
+    private $groups = [];
+
+    /** @var BlotGroup */
+    private $currentGroup;
+
     /**
-     * The blot types to check for. Not all blot types are used at the top level.
+     * Add a new embed type.
+     *
+     * @param string $blotClass The blot to register.
+     *
+     * @return $this
      */
-    private $blotClasses = [
-        Blots\Embeds\ExternalBlot::class,
-        Blots\CodeBlockBlot::class,
-        Blots\SpoilerLineBlot::class,
-        Blots\BlockquoteLineBlot::class,
-        Blots\HeadingBlot::class,
-        Blots\BulletedListBlot::class,
-        Blots\OrderedListBlot::class,
-        Blots\Embeds\EmojiBlot::class,
-        Blots\Embeds\MentionBlot::class,
-        Blots\TextBlot::class,
-    ];
+    public function addBlot(string $blotClass) {
+        $this->blotClasses[] = $blotClass;
+        return $this;
+    }
 
     /**
      * Split operations with newlines inside of them into their own operations.
      */
-    private function splitPlainTextNewlines($operations) {
+    public function splitPlainTextNewlines($operations) {
         $newOperations = [];
 
         foreach($operations as $opIndex => $op) {
@@ -95,59 +101,55 @@ class Parser {
      * @return BlotGroup[]
      */
     public function parse(array $operations): array {
-        /** @var BlotGroup[]  */
-        $groups = [];
 
         $operations = $this->splitPlainTextNewlines($operations);
 
+        $groups = [];
         $operationLength = count($operations);
         $group = new BlotGroup();
 
-        for($i = 0; $i < $operationLength; $i++) {
-
-            $previousOp = [];
+        for ($i = 0; $i < $operationLength; $i++) {
+            $previousOp = $operations[$i -1] ?? [];
             $currentOp = $operations[$i];
-            $nextOp = [];
+            $nextOp = $operations[$i + 1] ?? [];
+            $blotInstance = $this->getBlotForOperations($currentOp, $previousOp, $nextOp);
 
-            if ($i > 0) {
-                $previousOp = $operations[$i - 1];
+            // Ask the blot if it should close the current group.
+            if ($blotInstance->shouldClearCurrentGroup($group)) {
+                $groups []= $group;
+                $group = new BlotGroup();
             }
 
-            if ($i < $operationLength - 1) {
-                $nextOp = $operations[$i + 1];
+            $group->pushBlot($blotInstance);
+
+            // Some block type blots get a group all to themselves.
+            if ($blotInstance instanceof Blots\AbstractBlockBlot && $blotInstance->isOwnGroup()) {
+                $groups []= $group;
+                $group = new BlotGroup();
             }
 
-            foreach($this->blotClasses as $blot) {
-
-                // Find the matching blot type for the current, last, and next operation.
-                if ($blot::matches([$currentOp, $nextOp])) {
-                    /** @var AbstractBlot $blotInstance */
-                    $blotInstance = new $blot($currentOp, $previousOp, $nextOp);
-
-                    // Ask the blot if it should close the current group.
-                    if ($blotInstance->shouldClearCurrentGroup($group)) {
-                        $groups[] = $group;
-                        $group = new BlotGroup();
-                    }
-
-                    $group->pushBlot($blotInstance);
-
-                    // Check with the blot if absorbed the next operation (some blots are made of 2 operations)
-                    if ($blotInstance->hasConsumedNextOp()) {
-                        $i++;
-                    }
-
-                    // Some block type blots get a group all to themselves.
-                    if ($blotInstance instanceof Blots\AbstractBlockBlot && $blotInstance->isOwnGroup()) {
-                        $groups[] = $group;
-                        $group = new BlotGroup();
-                    }
-
-                    break;
-                }
+            // Check with the blot if absorbed the next operation. If it did we don't want to iterate over it.
+            if ($blotInstance->hasConsumedNextOp()) {
+                $i++;
             }
         }
-        $groups[] = $group;
+        $groups []= $group;
         return $groups;
+    }
+
+    /**
+     * Get the blot the matching blot for a sequence of operations. Returns the default if no match is found.
+     */
+    public function getBlotForOperations($currentOp, $previousOp, $nextOp): AbstractBlot {
+        $blotClass = self::DEFAULT_BLOT;
+        foreach ($this->blotClasses as $blot) {
+            // Find the matching blot type for the current, last, and next operation.
+            if ($blot::matches([$currentOp, $nextOp])) {
+                $blotClass = $blot;
+                /** @var AbstractBlot $blotInstance */
+            }
+        }
+
+        return new $blotClass($currentOp, $previousOp, $nextOp);
     }
 }

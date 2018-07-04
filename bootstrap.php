@@ -224,6 +224,18 @@ $dic->setInstance('Garden\Container\Container', $dic)
 
     ->rule(\Vanilla\Quill\Parser::class)
     ->setShared(true)
+    ->addCall('addBlot', [\Vanilla\Quill\Blots\Embeds\ExternalBlot::class])
+    ->addCall('addBlot', [\Vanilla\Quill\Blots\CodeBlockBlot::class])
+    ->addCall('addBlot', [\Vanilla\Quill\Blots\SpoilerLineBlot::class])
+    ->addCall('addBlot', [\Vanilla\Quill\Blots\BlockquoteLineBlot::class])
+    ->addCall('addBlot', [\Vanilla\Quill\Blots\HeadingBlot::class])
+    ->addCall('addBlot', [\Vanilla\Quill\Blots\BulletedListBlot::class])
+    ->addCall('addBlot', [\Vanilla\Quill\Blots\OrderedListBlot::class])
+    ->addCall('addBlot', [\Vanilla\Quill\Blots\Embeds\MentionBlot::class])
+    ->addCall('addBlot', [\Vanilla\Quill\Blots\Embeds\EmojiBlot::class])
+
+    ->rule(\Vanilla\Quill\Parser::class)
+    ->setShared(true)
 
     ->rule('Smarty')
     ->setShared(true)

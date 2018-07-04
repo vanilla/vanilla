@@ -14,6 +14,7 @@ use Vanilla\Quill\Formats\AbstractFormat;
  * All blots extend AbstractBlot. Even formats. Blots map lightly to quill blots.
  *
  * This is pretty bare-bones so you likely want to extend TextBlot or AbstractFormat instead.
+ *
  * @see TextBlot
  * @see AbstractFormat
  * @see https://github.com/quilljs/parchment#blots Explanation of the JS implementation of quill (parchment) blots.

@@ -8,6 +8,7 @@ namespace VanillaTests\Library\Vanilla\Embeds;
 
 use Exception;
 use Garden\Http\HttpRequest;
+use Vanilla\Embeds\CodePenEmbed;
 use Vanilla\Embeds\GettyEmbed;
 use Vanilla\Embeds\GiphyEmbed;
 use Vanilla\Embeds\ImgurEmbed;
@@ -56,6 +57,7 @@ class EmbedManagerTest extends SharedBootstrapTestCase {
             ->addEmbed(new GettyEmbed())
             ->addEmbed(new GiphyEmbed())
             ->addEmbed(new WistiaEmbed())
+            ->addEmbed(new CodePenEmbed())
             ->addEmbed(new ImageEmbed(), EmbedManager::PRIORITY_LOW)
             ->setNetworkEnabled(false);
         return $embedManager;
@@ -68,6 +70,27 @@ class EmbedManagerTest extends SharedBootstrapTestCase {
      */
     public function provideRenderedData() {
         $data = [
+            [
+                [
+                    "url" => "https://codepen.io/slafleche/pen/qYrgVx",
+                    "type" => "codepen",
+                    "name" => null,
+                    "body" => null,
+                    "photoUrl" => null,
+                    "height" => 300,
+                    "width" => null,
+                    "attributes" => [
+                        "id" => "cp_embed_qYrgVx",
+                        "embedUrl" => "https://codepen.io/slafleche/embed/preview/qYrgVx?theme-id=0",
+                        "style" => "width: 100%; overflow: hidden;",
+                    ]
+                ],
+'<div class="embedExternal embedCodePen">
+    <div class="embedExternal-content">
+        <iframe class="cp_embed_iframe" scrolling="no" id="cp_embed_qYrgVx" height="300" src="https://codepen.io/slafleche/embed/preview/qYrgVx?theme-id=0" style="width: 100%; overflow: hidden;"></iframe>
+    </div>
+</div>',
+            ],
             [
                 [
                     "url" => "https://vanillaforums.com/images/metaIcons/vanillaForums.png",

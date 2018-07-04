@@ -26,7 +26,7 @@ class CodePenEmbed extends Embed {
      */
     public function matchUrl(string $url) {
         $data = [];
-        $oembedData =[];
+        $oembedData = [];
 
         if ($this->isNetworkEnabled()) {
             $oembedData = $this->oembed("https://codepen.io/api/oembed?url=".urlencode($url)."&format=json");

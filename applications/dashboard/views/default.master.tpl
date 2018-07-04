@@ -24,8 +24,7 @@
                 {module name="MeModule"}
                 {asset name="Panel"}
             </div>
-            <div class="Column ContentColumn" id="Content" role="main">
-            {asset name="Content"}</div>
+            <div class="Column ContentColumn" id="Content" role="main">{asset name="Content"}</div>
             {/block}
         </div>
     </div>

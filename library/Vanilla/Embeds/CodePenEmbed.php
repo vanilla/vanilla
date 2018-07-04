@@ -6,8 +6,6 @@
 
 namespace Vanilla\Embeds;
 
-use Exception;
-
 /**
  * CodePen Embed.
  */
@@ -50,7 +48,6 @@ class CodePenEmbed extends Embed {
      * @inheritdoc
      */
     public function renderData(array $data): string {
-
         $height = $data['height'] ?? '';
         $embedUrl = $data['attributes']['embedUrl'] ?? '';
         $style = $data['attributes']['style'] ?? '';

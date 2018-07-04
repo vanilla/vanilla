@@ -511,39 +511,57 @@ class TagModel extends Gdn_Model {
     }
 
     /**
+     * Get discussions by tag(s)
      *
-     *
-     * @param $tag
-     * @param $limit
-     * @param $offset
-     * @param string $op
+     * @param string|array $tag tag name(s)
+     * @param int $limit limit number of result
+     * @param int $offset start result at this offset
      * @return Gdn_DataSet
+     * @throws Exception
      */
-    public function getDiscussions($tag, $limit, $offset, $op = 'or') {
-        $discussionModel = new DiscussionModel();
-        $this->setTagSql($discussionModel->SQL, $tag, $limit, $offset, $op);
-        $result = $discussionModel->get($offset, $limit, ['Announce' => 'all']);
+    public function getDiscussions($tag, $limit, $offset) {
+        if (!is_array($tag)) {
+            $tags = array_map('trim', explode(',', $tag));
+        }
 
-        return $result;
+        $taggedDiscussionIDs = $this->SQL
+            ->select('td.DiscussionID')
+            ->from('TagDiscussion td')
+            ->join('Tag t', 't.TagID = td.TagID')
+            ->whereIn('t.Name', $tags)
+            ->limit($limit, $offset)
+            ->get()->resultArray();
+
+        $taggedDiscussionIDs = array_column($taggedDiscussionIDs, 'DiscussionID');
+
+        $discussionModel = new DiscussionModel();
+        $discussions = $discussionModel->get(
+            0,
+            '',
+            [
+                'Announce' => 'all',
+                'd.DiscussionID' => $taggedDiscussionIDs,
+            ]
+        );
+
+        return $discussions;
     }
 
     /**
-     *
+     * @deprecated
      *
      * @param Gdn_SQLDriver $sql
      */
     public function setTagSql($sql, $tag, &$limit, &$offset = 0, $op = 'or') {
+        deprecated('TagModel->setTagSql()', 'TagModel->getDiscussions()', '2018-06-19');
         $sortField = 'd.DateLastComment';
         $sortDirection = 'desc';
-
         $tagSql = clone Gdn::sql();
-
         if ($dateFrom = Gdn::request()->get('DateFrom')) {
             // Find the discussion ID of the first discussion created on or after the date from.
             $discussionIDFrom = $tagSql->getWhere('Discussion', ['DateInserted >= ' => $dateFrom], 'DiscussionID', 'asc', 1)->value('DiscussionID');
             $sortField = 'd.DiscussionID';
         }
-
         if (!is_array($tag)) {
             $tags = array_map('trim', explode(',', $tag));
         }
@@ -552,9 +570,7 @@ class TagModel extends Gdn_Model {
             ->from('Tag')
             ->whereIn('Name', $tags)
             ->get()->resultArray();
-
         $tagIDs = array_column($tagIDs, 'TagID');
-
         if ($op == 'and' && count($tags) > 1) {
             $discussionIDs = $tagSql
                 ->select('DiscussionID')
@@ -568,9 +584,7 @@ class TagModel extends Gdn_Model {
                 ->get()->resultArray();
             $limit = '';
             $offset = 0;
-
             $discussionIDs = array_column($discussionIDs, 'DiscussionID');
-
             $sql->whereIn('d.DiscussionID', $discussionIDs);
             $sortField = 'd.DiscussionID';
         } else {
@@ -578,17 +592,15 @@ class TagModel extends Gdn_Model {
                 ->join('TagDiscussion td', 'd.DiscussionID = td.DiscussionID')
                 ->limit($limit, $offset)
                 ->whereIn('td.TagID', $tagIDs);
-
             if ($op == 'and') {
                 $sortField = 'd.DiscussionID';
             }
         }
-
         // Set up the sort field and direction.
         saveToConfig(
             [
-            'Vanilla.Discussions.SortField' => $sortField,
-            'Vanilla.Discussions.SortDirection' => $sortDirection],
+                'Vanilla.Discussions.SortField' => $sortField,
+                'Vanilla.Discussions.SortDirection' => $sortDirection],
             '',
             false
         );

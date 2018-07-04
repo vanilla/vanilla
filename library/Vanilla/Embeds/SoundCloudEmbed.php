@@ -65,7 +65,11 @@ HTML;
 
     /**
      * Parses the oembed repsonse html for permalink and other data.
-     *
+     * SoundCloud embed types that are supports include tracks, sets and users.
+     * example urls:
+     * https://soundcloud.com/thisforbaby/lil-baby-ft-drake-yes-indeed
+     * https://soundcloud.com/uiceheidd
+     * https://soundcloud.com/liluzivert/sets/luv-is-rage-2-1
      * @param string $html The html snippet send from the oembed call.
      * @return array $data
      */

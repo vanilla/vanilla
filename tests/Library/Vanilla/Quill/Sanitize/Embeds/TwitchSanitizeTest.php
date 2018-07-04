@@ -4,7 +4,7 @@
  * @license GPL-2.0
  */
 
-namespace VanillaTests\Library\Vanilla\Quill\Sanitize\ExternalEmbed;
+namespace VanillaTests\Library\Vanilla\Quill\Sanitize\Embeds;
 
 use VanillaTests\Library\Vanilla\Quill\Sanitize\SanitizeTest;
 

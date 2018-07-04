@@ -4,11 +4,11 @@
  * @license GPL-2.0
  */
 
-namespace VanillaTests\Library\Vanilla\Quill\Sanitize\ExternalEmbed;
+namespace VanillaTests\Library\Vanilla\Quill\Sanitize\Embeds;
 
 use VanillaTests\Library\Vanilla\Quill\Sanitize\SanitizeTest;
 
-class WistiaSanitizeTest extends SanitizeTest {
+class YouTubeSanitizeTest extends SanitizeTest {
 
     /**
      * @inheritdoc
@@ -19,12 +19,12 @@ class WistiaSanitizeTest extends SanitizeTest {
                 "insert" => [
                     "embed-external" => [
                         "url" => $content,
-                        "type" => "wistia",
+                        "type" => "youtube",
                         "name" => $content,
-                        "body" => null,
+                        "body" => $content,
                         "photoUrl" => $content,
-                        "height" => $content,
-                        "width" => $content,
+                        "height" => null,
+                        "width" => null,
                         "attributes" => [
                             "thumbnail_width" => $content,
                             "thumbnail_height" => $content,
@@ -34,7 +34,7 @@ class WistiaSanitizeTest extends SanitizeTest {
                     ]
                 ]
             ],
-            ["insert" => "\n\n"]
+            ["insert" => "\n"]
         ];
 
         return $operations;

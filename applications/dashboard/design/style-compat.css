@@ -1731,6 +1731,7 @@ body.isMobile .FormWrapper {
   display: inline-flex;
   margin: auto;
   max-width: 100%;
+  width: 640px;
   position: relative;
   -webkit-box-pack: center;
   -webkit-justify-content: center;
@@ -2242,12 +2243,9 @@ body.isMobile .FormWrapper {
   margin: auto;
 }
 
-.embedGetty .embedExternal-content {
-  width: auto;
-}
-
 .embedGetty .getty {
-  display: block;
+  display: block !important;
+  background-color: white;
 }
 
 .embedGiphy {

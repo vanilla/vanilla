@@ -26,14 +26,33 @@ class RendererTest extends SharedBootstrapTestCase {
             ->doSortHtmlAttributes()
             ->doRemoveOmittedHtmlTags(false)
         ;
-
-//        $this->minifier->doOptimizeViaHtmlDomParser(false);
     }
 
     /**
+     * Render a given set of operations.
+     *
+     * @param array $ops The operations to render.
+     *
+     * @throws \Garden\Container\ContainerException
+     * @throws \Garden\Container\NotFoundException
+     */
+    protected function render(array $ops): string {
+        $renderer = \Gdn::getContainer()->get(Renderer::class);
+        $parser = \Gdn::getContainer()->get(Parser::class);
+
+        return $renderer->render($parser->parse($ops));
+    }
+
+    /**
+     * Full E2E tests for the Quill rendering.
+     *
+     * @param string $dirname The directory name to get fixtures from.
+     *
+     * @throws \Garden\Container\ContainerException
+     * @throws \Garden\Container\NotFoundException
      * @dataProvider dataProvider
      */
-    public function testRender($dirname) {
+    public function testRender(string $dirname) {
         $fixturePath = realpath(__DIR__."/../../../fixtures/editor-rendering/".$dirname);
 
         $input = file_get_contents($fixturePath."/input.json");
@@ -41,15 +60,11 @@ class RendererTest extends SharedBootstrapTestCase {
 
         $json = \json_decode($input, true);
 
-        $parser = new Parser();
-        $renderer = new Renderer($parser);
-
-        $output = $renderer->render($json);
+        $output = $this->render($json);
         $this->assertHtmlStringEqualsHtmlString($expectedOutput, $output);
     }
 
     public function dataProvider() {
-
         return [
             ["inline-formatting"],
             ["paragraphs"],

@@ -9,6 +9,7 @@ namespace Vanilla\Embeds;
 use Exception;
 use Gdn_Cache;
 use InvalidArgumentException;
+use Vanilla\PageScraper;
 
 /**
  * Manage scraping embed data and generating markup.
@@ -67,6 +68,28 @@ class EmbedManager {
             return $valB['priority'] <=> $valA['priority'];
         });
         return $this;
+    }
+
+    /**
+     * Add all of the built in embeds and defaults. This is primarily used for simpler bootstrapping.
+     *
+     * @throws \Garden\Container\ContainerException
+     * @throws \Garden\Container\NotFoundException
+     */
+    public function addCoreEmbeds() {
+        $pageScraper = \Gdn::getContainer()->get(PageScraper::class);
+        $this->setDefaultEmbed(new LinkEmbed($pageScraper))
+            ->addEmbed(new TwitterEmbed)
+            ->addEmbed(new YouTubeEmbed)
+            ->addEmbed(new VimeoEmbed)
+            ->addEmbed(new InstagramEmbed)
+            ->addEmbed(new SoundCloudEmbed)
+            ->addEmbed(new ImgurEmbed)
+            ->addEmbed(new TwitchEmbed)
+            ->addEmbed(new GettyEmbed)
+            ->addEmbed(new GiphyEmbed)
+            ->addEmbed(new WistiaEmbed)
+            ->addEmbed(new ImageEmbed, self::PRIORITY_LOW);
     }
 
     /**

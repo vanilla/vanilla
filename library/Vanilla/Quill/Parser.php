@@ -44,6 +44,23 @@ class Parser {
         return $this;
     }
 
+    public function addCoreBlotsAndFormats() {
+        $this->addBlot(Blots\Embeds\ExternalBlot::class)
+            ->addBlot(Blots\CodeBlockBlot::class)
+            ->addBlot(Blots\SpoilerLineBlot::class)
+            ->addBlot(Blots\BlockquoteLineBlot::class)
+            ->addBlot(Blots\HeadingBlot::class)
+            ->addBlot(Blots\BulletedListBlot::class)
+            ->addBlot(Blots\OrderedListBlot::class)
+            ->addBlot(Blots\Embeds\MentionBlot::class)
+            ->addBlot(Blots\Embeds\EmojiBlot::class)
+            ->addFormat(Formats\Link::class)
+            ->addFormat(Formats\Bold::class)
+            ->addFormat(Formats\Italic::class)
+            ->addFormat(Formats\Code::class)
+            ->addFormat(Formats\Strike::class);
+    }
+
     /**
      * Add a new embed type.
      *

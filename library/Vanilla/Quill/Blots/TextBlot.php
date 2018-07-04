@@ -31,9 +31,10 @@ class TextBlot extends AbstractBlot {
         parent::__construct($currentOperation, $previousOperation, $nextOperation);
         $this->parseFormats($this->currentOperation, $this->previousOperation, $this->nextOperation);
 
-        $insert = val("insert", $this->currentOperation, "");
-        $this->content = htmlentities($insert, \ENT_QUOTES);
+        $this->content = $this->currentOperation["insert"] ?? "";
 
+        // If we still have a trailing newline it signifies the end of the group, even if we don't want to render it.
+        // Strip off the newline character place a break marker.
         if (preg_match("/\\n$/", $this->content)) {
             $this->currentOperation[BlotGroup::BREAK_MARKER] = true;
             $this->content = rtrim($this->content, "\n");
@@ -44,11 +45,8 @@ class TextBlot extends AbstractBlot {
      * @inheritDoc
      */
     public function render(): string {
-        $result = "";
-        $result .= $this->renderOpeningFormatTags();
-        $result .= $this->createLineBreaks($this->content);
-        $result .= $this->renderClosingFormatTags();
-        return $result;
+        $sanitizedContent = $this->content === "" ? "<br>" : htmlspecialchars($this->content);
+        return $this->renderOpeningFormatTags().$sanitizedContent.$this->renderClosingFormatTags();
     }
 
     /**

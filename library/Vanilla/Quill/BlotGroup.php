@@ -15,7 +15,10 @@ use Vanilla\Quill\Blots\HeadingBlot;
 use Vanilla\Quill\Blots\TextBlot;
 
 /**
- * Class to represent a group of a quill blots. One Group can contain multiple inline type blots.
+ * Class to represent a group of a quill blots. One group can contain:
+ *
+ * - Multiple inline blots in a single paragraph.
+ * - Multiple line blots if it is a line type grouping (eg. abstra)
  *
  * @package Vanilla\Quill
  */
@@ -68,7 +71,7 @@ class BlotGroup {
     /**
      * Check if the group's last matches the passed Blot class.
      *
-     * @param $blotClass - The class constructor of a Blot.
+     * @param string $blotClass - The class constructor of a Blot.
      * @param bool $needsExactMatch - If true, the class must match exactly, no child classes are allowed.
      *
      * @return bool
@@ -176,8 +179,8 @@ class BlotGroup {
     public function getIndexForBlotOfType(string $blotType): int {
         $index = -1;
 
-        foreach($this->blots as $blotIndex => $blot) {
-            if($blot instanceof $blotType) {
+        foreach ($this->blots as $blotIndex => $blot) {
+            if ($blot instanceof $blotType) {
                 $index = $blotIndex;
                 break;
             }
@@ -194,7 +197,7 @@ class BlotGroup {
     public function getBlotForSurroundingTags(): AbstractBlot {
         $blot = $this->blots[0];
 
-        foreach($this->overridingBlots as $overridingBlot) {
+        foreach ($this->overridingBlots as $overridingBlot) {
             $index = $this->getIndexForBlotOfType($overridingBlot);
             if ($index >= 0) {
                 $blot = $this->blots[$index];

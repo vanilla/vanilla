@@ -12,7 +12,7 @@ use Vanilla\Quill\Blots\AbstractBlot;
 use Vanilla\Quill\Formats\AbstractFormat;
 
 /**
- * Class for rendering parsing Quill Deltas into BlotGroups.
+ * Class for parsing Quill Deltas into BlotGroups.
  *
  * @see https://github.com/quilljs/delta Information on quill deltas.
  */
@@ -20,15 +20,11 @@ class Parser {
 
     const DEFAULT_BLOT = Blots\TextBlot::class;
 
+    /** @var string[] The registered blot classes */
     private $blotClasses = [];
 
+    /** @var string[] The registered formats classes */
     private $formatClasses = [];
-
-    /** @var BlotGroup[] */
-    private $groups = [];
-
-    /** @var BlotGroup */
-    private $currentGroup;
 
     /**
      * Add a new embed type.
@@ -44,6 +40,9 @@ class Parser {
         return $this;
     }
 
+    /**
+     * Register all of the built in blots and formats to parse. Primarily for use in bootstrapping.
+     */
     public function addCoreBlotsAndFormats() {
         $this->addBlot(Blots\Embeds\ExternalBlot::class)
             ->addBlot(Blots\CodeBlockBlot::class)

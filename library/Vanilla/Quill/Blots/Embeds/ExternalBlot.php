@@ -7,8 +7,6 @@
 namespace Vanilla\Quill\Blots\Embeds;
 
 use Gdn;
-use Gdn_Controller;
-use HeadModule;
 use Vanilla\Embeds\EmbedManager;
 
 class ExternalBlot extends AbstractBlockEmbedBlot {

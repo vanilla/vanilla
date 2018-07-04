@@ -87,7 +87,7 @@ HTML;
         if (preg_match('/src="(?<url>https:\/\/codepen.io\/.*)\?/i', $html, $url)) {
             $data['embedUrl'] = $url['url'];
             //set the default theme
-            $data['embedUrl'] .='?theme-id=0';
+            $data['embedUrl'] .= '?theme-id=0';
         }
 
         if (preg_match('/style="(?<style>.*?)"/i', $html, $style)) {

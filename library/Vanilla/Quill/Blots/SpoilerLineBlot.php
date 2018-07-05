@@ -12,16 +12,16 @@ class SpoilerLineBlot extends AbstractLineBlot {
     /**
      * @inheritDoc
      */
-    protected static function getLineType(): string {
-        return "spoiler";
+    public static function matches(array $operations): bool {
+        return static::operationsContainKeyWithValue($operations, "spoiler-line");
     }
 
     /**
      * @inheritDoc
      */
     public function getGroupOpeningTag(): string {
-        $wrapperClass = static::getLineType();
-        $contentClass = static::getLineType() . "-content";
+        $wrapperClass = "spoiler";
+        $contentClass = "spoiler-content";
 
         $button = $this->getToggleButton();
 
@@ -33,6 +33,15 @@ class SpoilerLineBlot extends AbstractLineBlot {
      */
     public function getGroupClosingTag(): string {
         return "</div></div>";
+    }
+
+
+    public function renderLineStart(): string {
+        return '<p class="spoiler-line">';
+    }
+
+    public function renderLineEnd(): string {
+        return '</p>';
     }
 
     /**

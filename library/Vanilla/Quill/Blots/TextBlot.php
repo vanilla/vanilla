@@ -17,6 +17,10 @@ class TextBlot extends AbstractBlot {
 
     use FormattableTextTrait;
 
+    public function isOwnGroup(): bool {
+        return false;
+    }
+
     /**
      * @inheritDoc
      */
@@ -41,6 +45,12 @@ class TextBlot extends AbstractBlot {
             $this->currentOperation[BlotGroup::BREAK_MARKER] = true;
             $this->content = rtrim($this->content, "\n");
         }
+
+        if(stringBeginsWith($this->content, "\n")) {
+            $this->currentOperation[BlotGroup::BREAK_MARKER] = true;
+            $this->content = \ltrim($this->content, "\n");
+
+        }
     }
 
     /**
@@ -51,17 +61,36 @@ class TextBlot extends AbstractBlot {
         return $this->renderOpeningFormatTags().$sanitizedContent.$this->renderClosingFormatTags();
     }
 
+    protected static function operationsContainKeyWithValue(array $operations, string $lookupKey, $expectedValue = true) {
+        $found = false;
+
+        foreach ($operations as $op) {
+            $value = valr("attributes.$lookupKey", $op);
+
+            if (
+                (is_array($expectedValue) && in_array($value, $expectedValue))
+                || $value === $expectedValue
+            ) {
+                $found = true;
+                break;
+            }
+        }
+
+        return $found;
+    }
+
     /**
      * @inheritDoc
      */
     public function shouldClearCurrentGroup(BlotGroup $group): bool {
-        return array_key_exists(BlotGroup::BREAK_MARKER, $this->currentOperation);
+        return $this->isOwnGroup() || array_key_exists(BlotGroup::BREAK_MARKER, $this->currentOperation);
     }
 
     /**
      * @inheritDoc
      */
     public function hasConsumedNextOp(): bool {
-        return false;
+//        return false;
+        return $this::matches([$this->nextOperation]) && !$this::matches([$this->currentOperation]);
     }
 }

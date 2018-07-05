@@ -14,12 +14,7 @@ use Vanilla\Quill\Formats\AbstractFormat;
  * All blots extend AbstractBlot. Even formats. Blots map lightly to quill blots.
  *
  * This is pretty bare-bones so you likely want to extend TextBlot or AbstractFormat instead.
- *
- * @see TextBlot
- * @see AbstractFormat
- * @see https://github.com/quilljs/parchment#blots Explanation of the JS implementation of quill (parchment) blots.
- *
- * @package Vanilla\Quill\Blot
+ * See https://github.com/quilljs/parchment#blots for an explanation of the JS implementation of quill (parchment) blots.
  */
 abstract class AbstractBlot {
 
@@ -34,6 +29,8 @@ abstract class AbstractBlot {
 
     /** @var array  */
     protected $nextOperation = [];
+
+    protected $newLineWasStripped = false;
 
     /**
      * Determine if the operations match this Blot type.
@@ -52,20 +49,13 @@ abstract class AbstractBlot {
     abstract public function render(): string;
 
     /**
-     * Determine whether or not this Blot should clear the current Group.
-     *
-     * @param BlotGroup $group
-     *
-     * @return bool
-     */
-    abstract public function shouldClearCurrentGroup(BlotGroup $group): bool;
-
-    /**
      * Determine whether or not this blot uses both current and next operation.
      *
      * @return bool
      */
     abstract public function hasConsumedNextOp(): bool;
+
+    abstract public function isOwnGroup(): bool;
 
     /**
      * Get the HTML to represent the opening tag of the Group this is contained in.
@@ -83,6 +73,27 @@ abstract class AbstractBlot {
      */
     public function getGroupClosingTag(): string {
         return "</p>";
+    }
+
+    /**
+     * Determine whether or not this Blot should clear the current Group.
+     *
+     * @param BlotGroup $group
+     *
+     * @return bool
+     */
+    public function shouldClearCurrentGroup(BlotGroup $group): bool {
+        if ($this->isOwnGroup()) {
+            return true;
+        } elseif (stringBeginsWith($this->content, "\n")) {
+            $this->content = \ltrim($this->content, "\n");
+
+            return true;
+        } elseif (array_key_exists(BlotGroup::BREAK_MARKER, $this->currentOperation)) {
+            return true;
+        } else {
+            return false;
+        }
     }
 
     /**

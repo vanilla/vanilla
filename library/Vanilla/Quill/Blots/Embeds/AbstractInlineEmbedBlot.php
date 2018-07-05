@@ -49,6 +49,10 @@ abstract class AbstractInlineEmbedBlot extends AbstractBlot {
         $this->content = is_string($potentialContent) ? $potentialContent : "";
     }
 
+    public function isOwnGroup(): bool {
+        return false;
+    }
+
     /**
      * @inheritDoc
      */

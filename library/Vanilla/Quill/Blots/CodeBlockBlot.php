@@ -7,19 +7,13 @@
 
 namespace Vanilla\Quill\Blots;
 
-class CodeBlockBlot extends AbstractBlockBlot {
-    /**
-     * @inheritDoc
-     */
-    public function isOwnGroup(): bool {
-        return false;
+class CodeBlockBlot extends TextBlot {
+    public static function matches(array $operations): bool {
+        return static::operationsContainKeyWithValue($operations, "code-block");
     }
 
-    /**
-     * @inheritDoc
-     */
-    protected static function getAttributeKey(): string {
-        return "code-block";
+    public function hasConsumedNextOp(): bool {
+        return true;
     }
 
     /**
@@ -30,8 +24,8 @@ class CodeBlockBlot extends AbstractBlockBlot {
 
         // Add newlines which live in the next operation.
         if ($this->nextOperation) {
-            $sanizizedNextInsert = htmlspecialchars($this->nextOperation["insert"]);
-            $result .= $sanizizedNextInsert;
+            $sanitizedNewlines = htmlspecialchars($this->nextOperation["insert"]);
+            $result .= $sanitizedNewlines;
         }
 
         return $result;

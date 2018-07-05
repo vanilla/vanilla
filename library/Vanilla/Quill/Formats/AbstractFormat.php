@@ -64,6 +64,11 @@ abstract class AbstractFormat extends AbstractBlot {
         return $result;
     }
 
+    public function isOwnGroup(): bool {
+        return false;
+    }
+
+
     /**
      * @inheritDoc
      */

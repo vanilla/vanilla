@@ -7,7 +7,7 @@
 
 namespace Vanilla\Quill\Blots;
 
-class HeadingBlot extends AbstractBlockBlot {
+class HeadingBlot extends TextBlot {
 
     /** @var array Valid heading levels. */
     private static $validLevels = [1, 2, 3, 4, 5, 6];
@@ -15,15 +15,8 @@ class HeadingBlot extends AbstractBlockBlot {
     /**
      * @inheritDoc
      */
-    protected static function getAttributeKey(): string {
-        return "header";
-    }
-
-    /**
-     * @inheritDoc
-     */
-    protected static function getMatchingAttributeValue() {
-        return self::$validLevels;
+    public static function matches(array $operations): bool {
+        return static::operationsContainKeyWithValue($operations, "header", static::$validLevels);
     }
 
     /**
@@ -44,6 +37,10 @@ class HeadingBlot extends AbstractBlockBlot {
      * @inheritDoc
      */
     public function isOwnGroup(): bool {
+        return true;
+    }
+
+    public function hasConsumedNextOp(): bool {
         return true;
     }
 

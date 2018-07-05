@@ -135,7 +135,7 @@ class BlotGroup {
      *
      * @return string
      */
-    private function renderLineGroup(AbstractLineBlot $firstLineBlot): string {
+    public function renderLineGroup(AbstractLineBlot $firstLineBlot): string {
         $result = "";
 
         $result .= $firstLineBlot->renderLineStart();
@@ -152,7 +152,13 @@ class BlotGroup {
                 $result .= $blot->renderNewLines();
 
                 if ($index < count($this->blots) - 1) {
-                    $result .= $blot->renderLineStart();
+                    // TODO: This is kind of fragile and needs tests.
+                    $nextLine = $this->blots[$index + 1] ?? null;
+                    if ($nextLine instanceof AbstractLineBlot) {
+                        $result .= $nextLine->renderLineStart();
+                    } else {
+                        $result .= $blot->renderLineStart();
+                    }
                 }
             }
         }
@@ -192,9 +198,12 @@ class BlotGroup {
     /**
      * Determine which blot should create the surrounding HTML tags of the group.
      *
-     * @return AbstractBlot
+     * @return AbstractBlot|null
      */
-    public function getBlotForSurroundingTags(): AbstractBlot {
+    public function getBlotForSurroundingTags() {
+        if (count($this->blots) === 0) {
+            return null;
+        }
         $blot = $this->blots[0];
 
         foreach ($this->overridingBlots as $overridingBlot) {

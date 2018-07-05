@@ -19,6 +19,10 @@ abstract class AbstractBlockEmbedBlot extends AbstractBlot {
      */
     abstract protected static function getInsertKey(): string;
 
+    public function isOwnGroup(): bool {
+        return true;
+    }
+
     /**
      * Render the content of the blot. You should implement this instead of overriding render().
      *

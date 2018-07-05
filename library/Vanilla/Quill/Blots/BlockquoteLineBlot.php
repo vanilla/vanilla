@@ -12,16 +12,16 @@ class BlockquoteLineBlot extends AbstractLineBlot {
     /**
      * @inheritDoc
      */
-    protected static function getLineType(): string {
-        return "blockquote";
+    public static function matches(array $operations): bool {
+        return static::operationsContainKeyWithValue($operations, "blockquote-line");
     }
 
     /**
      * @inheritDoc
      */
     public function getGroupOpeningTag(): string {
-        $wrapperClass = static::getLineType();
-        $contentClass = static::getLineType() . "-content";
+        $wrapperClass = "blockquote";
+        $contentClass = "blockquote-content";
 
         return "<div class=\"$wrapperClass\"><div class=\"$contentClass\">";
     }
@@ -31,5 +31,13 @@ class BlockquoteLineBlot extends AbstractLineBlot {
      */
     public function getGroupClosingTag(): string {
         return "</div></div>";
+    }
+
+    public function renderLineStart(): string {
+        return '<p class="blockquote-line">';
+    }
+
+    public function renderLineEnd(): string {
+        return '</p>';
     }
 }

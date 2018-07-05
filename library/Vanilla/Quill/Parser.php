@@ -49,8 +49,7 @@ class Parser {
             ->addBlot(Blots\SpoilerLineBlot::class)
             ->addBlot(Blots\BlockquoteLineBlot::class)
             ->addBlot(Blots\HeadingBlot::class)
-            ->addBlot(Blots\BulletedListBlot::class)
-            ->addBlot(Blots\OrderedListBlot::class)
+            ->addBlot(Blots\ListLineBlot::class)
             ->addBlot(Blots\TextBlot::class)
             ->addBlot(Blots\Embeds\MentionBlot::class)
             ->addBlot(Blots\Embeds\EmojiBlot::class)
@@ -166,7 +165,7 @@ class Parser {
             $group->pushBlot($blotInstance);
 
             // Some block type blots get a group all to themselves.
-            if ($blotInstance instanceof Blots\AbstractBlockBlot && $blotInstance->isOwnGroup()  && !$group->isEmpty()) {
+            if ($blotInstance->isOwnGroup()  && !$group->isEmpty()) {
                 $groups[] = $group;
                 $group = new BlotGroup();
             }

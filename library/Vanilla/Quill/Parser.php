@@ -9,7 +9,7 @@ namespace Vanilla\Quill;
 
 use Vanilla\Quill\Blots;
 use Vanilla\Quill\Blots\AbstractBlot;
-use Vanilla\Quill\Formats\AbstractFormat;
+use Vanilla\Quill\Blots\Formats;
 
 /**
  * Class for parsing Quill Deltas into BlotGroups.

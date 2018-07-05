@@ -5,32 +5,38 @@
  * @license https://opensource.org/licenses/GPL-2.0 GPL-2.0
  */
 
-namespace Vanilla\Quill\Formats;
+namespace Vanilla\Quill\Blots\Formats;
 
-class Italic extends AbstractFormat {
+class Code extends AbstractFormat {
 
     /**
      * @inheritDoc
      */
     protected static function getAttributeLookupKey(): string {
-        return "italic";
+        return "code-inline";
     }
 
     /**
      * @inheritDoc
      */
     protected function getBlackListedNestedFormats(): array {
-        return [
-            Bold::class,
-            Link::class,
-            Code::class,
-        ];
+        return [];
     }
 
     /**
      * @inheritDoc
      */
     protected function getTagName(): string {
-        return "em";
+        return "code";
+    }
+
+    /**
+     * Get an attributes array for the blot's tag.
+     */
+    protected function getAttributes(): array {
+        return [
+            "class" => "code-inline code isInline",
+            "spellcheck" => "false",
+        ];
     }
 }

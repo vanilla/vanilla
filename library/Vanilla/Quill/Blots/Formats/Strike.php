@@ -5,15 +5,15 @@
  * @license https://opensource.org/licenses/GPL-2.0 GPL-2.0
  */
 
-namespace Vanilla\Quill\Formats;
+namespace Vanilla\Quill\Blots\Formats;
 
-class Link extends AbstractFormat {
+class Strike extends AbstractFormat {
 
     /**
      * @inheritDoc
      */
     protected static function getAttributeLookupKey(): string {
-        return "link";
+        return "strike";
     }
 
     /**
@@ -21,24 +21,16 @@ class Link extends AbstractFormat {
      */
     protected function getBlackListedNestedFormats(): array {
         return [
+            Link::class,
             Code::class,
+            Italic::class,
+            Bold::class,
         ];
     }
-
     /**
      * @inheritDoc
      */
     protected function getTagName(): string {
-        return "a";
-    }
-
-    /**
-     * Get an attributes array for the blot's tag.
-     */
-    protected function getAttributes(): array {
-        return [
-            "href" => htmlspecialchars($this->currentOperation["attributes"]["link"]),
-            "rel" => "nofollow",
-        ];
+        return "s";
     }
 }

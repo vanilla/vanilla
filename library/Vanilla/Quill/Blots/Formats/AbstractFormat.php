@@ -5,7 +5,7 @@
  * @license https://opensource.org/licenses/GPL-2.0 GPL-2.0
  */
 
-namespace Vanilla\Quill\Formats;
+namespace Vanilla\Quill\Blots\Formats;
 
 use Vanilla\Quill\BlotGroup;
 use Vanilla\Quill\Blots\AbstractBlot;

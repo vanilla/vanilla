@@ -9,16 +9,12 @@ namespace Vanilla\Quill;
 
 use Vanilla\Quill\Blots;
 use Vanilla\Quill\Blots\AbstractBlot;
-use Vanilla\Quill\Blots\Formats;
-
 /**
  * Class for parsing Quill Deltas into BlotGroups.
  *
  * @see https://github.com/quilljs/delta Information on quill deltas.
  */
 class Parser {
-
-    const DEFAULT_BLOT = Blots\NullBlot::class;
 
     /** @var string[] The registered blot classes */
     private $blotClasses = [];
@@ -44,20 +40,21 @@ class Parser {
      * Register all of the built in blots and formats to parse. Primarily for use in bootstrapping.
      */
     public function addCoreBlotsAndFormats() {
-        $this->addBlot(Blots\Embeds\ExternalBlot::class)
-            ->addBlot(Blots\CodeBlockBlot::class)
-            ->addBlot(Blots\SpoilerLineBlot::class)
-            ->addBlot(Blots\BlockquoteLineBlot::class)
-            ->addBlot(Blots\HeadingBlot::class)
-            ->addBlot(Blots\ListLineBlot::class)
-            ->addBlot(Blots\TextBlot::class)
+        $this
+            ->addBlot(Blots\Lines\SpoilerLineBlot::class)
+            ->addBlot(Blots\Lines\BlockquoteLineBlot::class)
+            ->addBlot(Blots\Lines\ListLineBlot::class)
+            ->addBlot(Blots\Embeds\ExternalBlot::class)
             ->addBlot(Blots\Embeds\MentionBlot::class)
             ->addBlot(Blots\Embeds\EmojiBlot::class)
-            ->addFormat(Formats\Link::class)
-            ->addFormat(Formats\Bold::class)
-            ->addFormat(Formats\Italic::class)
-            ->addFormat(Formats\Code::class)
-            ->addFormat(Formats\Strike::class)
+            ->addBlot(Blots\CodeBlockBlot::class)
+            ->addBlot(Blots\HeadingBlot::class)
+            ->addBlot(Blots\TextBlot::class) // This needs to be the last one!!!
+            ->addFormat(Blots\Formats\Link::class)
+            ->addFormat(Blots\Formats\Bold::class)
+            ->addFormat(Blots\Formats\Italic::class)
+            ->addFormat(Blots\Formats\Code::class)
+            ->addFormat(Blots\Formats\Strike::class)
         ;
     }
 
@@ -186,7 +183,8 @@ class Parser {
      * Get the matching blot for a sequence of operations. Returns the default if no match is found.
      */
     public function getBlotForOperations($currentOp, $previousOp, $nextOp): AbstractBlot {
-        $blotClass = self::DEFAULT_BLOT;
+        // Fallback to a textblot if possible. Otherwise we fallback to rendering nothing at all.
+        $blotClass = Blots\TextBlot::matches([$currentOp]) ? Blots\TextBlot::class : Blots\NullBlot::class;
         foreach ($this->blotClasses as $blot) {
             // Find the matching blot type for the current, last, and next operation.
             if ($blot::matches([$currentOp, $nextOp])) {
@@ -207,7 +205,7 @@ class Parser {
         $formats = [];
         foreach ($this->formatClasses as $format) {
             if ($format::matches([$currentOp])) {
-                /** @var Formats\AbstractFormat $formatInstance */
+                /** @var Blots\Formats\AbstractFormat $formatInstance */
                 $formats[] = new $format($currentOp, $previousOp, $nextOp);
             }
         }

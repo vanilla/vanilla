@@ -8,9 +8,9 @@
 namespace VanillaTests\Library\Vanilla\Quill;
 
 use VanillaTests\SharedBootstrapTestCase;
-use Vanilla\Quill\Formats\Bold;
-use Vanilla\Quill\Formats\Italic;
-use Vanilla\Quill\Formats\Link;
+use Vanilla\Quill\Blots\Formats\Bold;
+use Vanilla\Quill\Blots\Formats\Italic;
+use Vanilla\Quill\Blots\Formats\Link;
 
 class FormatTest extends SharedBootstrapTestCase {
 

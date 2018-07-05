@@ -8,8 +8,7 @@
 namespace Vanilla\Quill;
 
 use Vanilla\Quill\Blots\AbstractBlot;
-use Vanilla\Quill\Blots\AbstractLineBlot;
-use Vanilla\Quill\Blots\AbstractListBlot;
+use Vanilla\Quill\Blots\Lines\AbstractLineBlot;
 use Vanilla\Quill\Blots\CodeBlockBlot;
 use Vanilla\Quill\Blots\HeadingBlot;
 use Vanilla\Quill\Blots\TextBlot;
@@ -37,7 +36,6 @@ class BlotGroup {
     private $overridingBlots = [
         HeadingBlot::class,
         CodeBlockBlot::class,
-        AbstractListBlot::class,
         AbstractLineBlot::class,
     ];
 

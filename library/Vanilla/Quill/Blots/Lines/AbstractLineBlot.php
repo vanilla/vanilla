@@ -5,7 +5,9 @@
  * @license https://opensource.org/licenses/GPL-2.0 GPL-2.0
  */
 
-namespace Vanilla\Quill\Blots;
+namespace Vanilla\Quill\Blots\Lines;
+
+use Vanilla\Quill\Blots\TextBlot;
 
 abstract class AbstractLineBlot extends TextBlot {
     /**

@@ -44,11 +44,11 @@ class Renderer {
                         $skip = true;
                     }
                 }
-
-                // Skip the last line break unless the previous group was a block embed.
-                if ($isLastPosition && !$previousGroupEndsWithBlockEmbed) {
-                    $skip = true;
-                }
+//
+//                // Skip the last line break unless the previous group was a block embed.
+//                if ($isLastPosition && !$previousGroupEndsWithBlockEmbed) {
+//                    $skip = true;
+//                }
             }
 
             // Update previous group values.

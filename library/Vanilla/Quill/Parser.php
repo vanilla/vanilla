@@ -58,7 +58,8 @@ class Parser {
             ->addFormat(Formats\Bold::class)
             ->addFormat(Formats\Italic::class)
             ->addFormat(Formats\Code::class)
-            ->addFormat(Formats\Strike::class);
+            ->addFormat(Formats\Strike::class)
+        ;
     }
 
     /**
@@ -146,19 +147,27 @@ class Parser {
             $previousOp = $operations[$i - 1] ?? [];
             $currentOp = $operations[$i];
             $nextOp = $operations[$i + 1] ?? [];
+            $isFirst = $i === 0;
+            $isLast = $i === $operationLength - 1;
+
+            // Skip the last newline (unless its the only one).
+            if (!$isFirst && $isLast && array_key_exists(BlotGroup::BREAK_MARKER, $currentOp)) {
+                continue;
+            }
+
             $blotInstance = $this->getBlotForOperations($currentOp, $previousOp, $nextOp);
 
             // Ask the blot if it should close the current group.
-            if ($blotInstance->shouldClearCurrentGroup($group)) {
-                $groups [] = $group;
+            if ($blotInstance->shouldClearCurrentGroup($group) && !$group->isEmpty()) {
+                $groups[] = $group;
                 $group = new BlotGroup();
             }
 
             $group->pushBlot($blotInstance);
 
             // Some block type blots get a group all to themselves.
-            if ($blotInstance instanceof Blots\AbstractBlockBlot && $blotInstance->isOwnGroup()) {
-                $groups [] = $group;
+            if ($blotInstance instanceof Blots\AbstractBlockBlot && $blotInstance->isOwnGroup()  && !$group->isEmpty()) {
+                $groups[] = $group;
                 $group = new BlotGroup();
             }
 
@@ -167,7 +176,9 @@ class Parser {
                 $i++;
             }
         }
-        $groups [] = $group;
+        if (!$group->isEmpty()) {
+            $groups[] = $group;
+        }
 
         return $groups;
     }
@@ -203,5 +214,20 @@ class Parser {
         }
 
         return $formats;
+    }
+
+    /**
+     * Call parse and then simplify each blotGroup into test data.
+     *
+     * @param array $ops The ops to parse
+     */
+    public function parseIntoTestData(array $ops): array {
+        $parseData = $this->parse($ops);
+        $groupData = [];
+        foreach ($parseData as $blotGroup) {
+            $groupData[] = $blotGroup->getTestData();
+        }
+
+        return $groupData;
     }
 }

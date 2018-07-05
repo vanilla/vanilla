@@ -90,6 +90,10 @@ class BlotGroup {
         return $lastBlot instanceof $blotClass;
     }
 
+    public function isEmpty(): bool {
+        return count($this->blots) === 0;
+    }
+
     /**
      * Render the block.
      *
@@ -97,10 +101,6 @@ class BlotGroup {
      */
     public function render(): string {
         // Don't render empty groups.
-        if (count($this->blots) === 0) {
-            return "";
-        }
-
         $surroundTagBlot = $this->getBlotForSurroundingTags();
         $result = $surroundTagBlot->getGroupOpeningTag();
 
@@ -206,5 +206,21 @@ class BlotGroup {
         }
 
         return $blot;
+    }
+
+    /**
+     * Simplify the blot group into an array of the classnames of its blots.
+     *
+     * @return string[]
+     */
+    public function getTestData(): array {
+        $blots = [];
+        foreach ($this->blots as $blot) {
+            $blots[] = [
+                "class" => get_class($blot),
+                "content" => $blot->getContent(),
+            ];
+        }
+        return $blots;
     }
 }

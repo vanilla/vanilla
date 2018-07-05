@@ -8,7 +8,6 @@
 namespace Vanilla\Quill\Blots;
 
 use Vanilla\Quill\BlotGroup;
-use Vanilla\Quill\Formats\AbstractFormat;
 
 /**
  * All blots extend AbstractBlot. Even formats. Blots map lightly to quill blots.

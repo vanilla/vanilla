@@ -5,9 +5,10 @@
  * @license https://opensource.org/licenses/GPL-2.0 GPL-2.0
  */
 
-namespace Vanilla\Quill;
+namespace Vanilla\Quill\Blots;
 
-use Vanilla\Quill\Formats\AbstractFormat;
+use Vanilla\Quill\Blots\Formats\AbstractFormat;
+use Vanilla\Quill\Parser;
 
 trait FormattableTextTrait {
 

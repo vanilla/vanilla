@@ -7,8 +7,6 @@
 
 namespace VanillaTests\Library\Vanilla\Quill;
 
-use SebastianBergmann\CodeCoverage\Report\Text;
-use Vanilla\Quill\Blots\BlockquoteLineBlot;
 use Vanilla\Quill\Blots\Embeds\ExternalBlot;
 use Vanilla\Quill\Blots\TextBlot;
 use VanillaTests\SharedBootstrapTestCase;

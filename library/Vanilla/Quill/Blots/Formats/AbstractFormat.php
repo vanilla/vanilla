@@ -15,8 +15,6 @@ use Vanilla\Quill\Blots\TextBlot;
  * An different type of blot that can contain nested blots inside. Multiple of these can be active at the same time.
  *
  * @see TextBlot Usage of these blots can be found in the TextBlot class.
- *
- * @package Vanilla\Quill\Formats
  */
 abstract class AbstractFormat extends AbstractBlot {
 

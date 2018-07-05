@@ -7,11 +7,7 @@
 
 namespace Vanilla\Quill\Blots;
 
-use Vanilla\Quill\Blots\Embeds\EmojiBlot;
-use Vanilla\Quill\Formats;
 use Vanilla\Quill\BlotGroup;
-use Vanilla\Quill\FormattableTextTrait;
-use Vanilla\Quill\Renderer;
 
 /**
  * A blot for non-matching operations. This is to prevent crashes when bad input is introduced. It renders nothing
@@ -24,6 +20,10 @@ class NullBlot extends AbstractBlot {
      */
     public static function matches(array $operations): bool {
         return true;
+    }
+
+    public function isOwnGroup(): bool {
+        return false;
     }
 
     /**

@@ -220,14 +220,62 @@ class EmbedManagerTest extends SharedBootstrapTestCase {
                     "attributes" => [
                         "visual" => "true",
                         "showArtwork" => "true",
-                        "track" => "2F174656930",
-                        "url" => "https://w.soundcloud.com/player/?url=https://api.soundcloud.com/tracks/"
+                        "postID" => "2F174656930",
+                        "embedUrl" => "https://w.soundcloud.com/player/?url=https://api.soundcloud.com/tracks/"
                     ],
                 ],
 '<div class="embedExternal embedSoundCloud">
     <div class="embedExternal-content">
         <iframe width="100%" scrolling="no" frameborder="no"
             src="https://w.soundcloud.com/player/?url=https://api.soundcloud.com/tracks/2F174656930&amp;show_artwork=true&amp;visual=true">
+        </iframe>
+    </div>
+</div>'
+            ],
+            [
+                [
+                    "url" => "https://soundcloud.com/uiceheidd",
+                    "type" => "soundcloud",
+                    "name" => null,
+                    "body" => null,
+                    "photoUrl" => null,
+                    "height" => 300,
+                    "width" => null,
+                    "attributes" => [
+                        "visual" => "true",
+                        "showArtwork" => "true",
+                        "postID" => "330864225",
+                        "embedUrl" => "https://w.soundcloud.com/player/?url=https://api.soundcloud.com/users/"
+                    ],
+                ],
+                '<div class="embedExternal embedSoundCloud">
+    <div class="embedExternal-content">
+        <iframe width="100%" scrolling="no" frameborder="no"
+            src="https://w.soundcloud.com/player/?url=https://api.soundcloud.com/users/330864225&amp;show_artwork=true&amp;visual=true">
+        </iframe>
+    </div>
+</div>'
+            ],
+            [
+                [
+                    "url" => "https://soundcloud.com/uiceheidd/sets/juicewrld-the-mixtape",
+                    "type" => "soundcloud",
+                    "name" => null,
+                    "body" => null,
+                    "photoUrl" => null,
+                    "height" => 300,
+                    "width" => null,
+                    "attributes" => [
+                        "visual" => "true",
+                        "showArtwork" => "true",
+                        "postID" => "23ff550",
+                        "embedUrl" => "https://w.soundcloud.com/player/?url=https://api.soundcloud.com/playlists/"
+                    ],
+                ],
+                '<div class="embedExternal embedSoundCloud">
+    <div class="embedExternal-content">
+        <iframe width="100%" scrolling="no" frameborder="no"
+            src="https://w.soundcloud.com/player/?url=https://api.soundcloud.com/playlists/23ff550&amp;show_artwork=true&amp;visual=true">
         </iframe>
     </div>
 </div>'

@@ -61,7 +61,7 @@ class RendererTest extends SharedBootstrapTestCase {
         $json = \json_decode($input, true);
 
         $output = $this->render($json);
-        $this->assertHtmlStringEqualsHtmlString($expectedOutput, $output);
+        $this->assertHtmlStringEqualsHtmlString($expectedOutput, $output, "Expected html outputs for fixture $dirname did not match.");
     }
 
     public function dataProvider() {
@@ -98,10 +98,10 @@ class RendererTest extends SharedBootstrapTestCase {
     /**
      * Assert that two strings of HTML are roughly similar. This doesn't work for code blocks.
      */
-    private function assertHtmlStringEqualsHtmlString($expected, $actual) {
+    private function assertHtmlStringEqualsHtmlString($expected, $actual, $message = null) {
         $expected = $this->normalizeHtml($expected);
         $actual = $this->normalizeHtml($actual);
-        $this->assertEquals($expected, $actual);
+        $this->assertEquals($expected, $actual, $message);
     }
 
     /**

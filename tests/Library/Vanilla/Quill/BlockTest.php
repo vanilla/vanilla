@@ -13,11 +13,6 @@ use Vanilla\Quill\Blots\HeadingBlot;
 use Vanilla\Quill\Blots\TextBlot;
 
 class BlockTest extends SharedBootstrapTestCase {
-    public function testMakeEmptyBlock() {
-        $block = BlotGroup::makeEmptyGroup();
-
-        $this->assertEquals("<p><br></p>", $block->render(), "The empty block renders as a line break.");
-    }
 
     public function testGetIndexForBlockType() {
         $block = new BlotGroup();

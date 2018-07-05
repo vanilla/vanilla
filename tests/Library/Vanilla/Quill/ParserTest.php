@@ -8,6 +8,7 @@
 namespace VanillaTests\Library\Vanilla\Quill;
 
 use Vanilla\Quill\Blots\Embeds\ExternalBlot;
+use Vanilla\Quill\Blots\Lines\BlockquoteLineBlot;
 use Vanilla\Quill\Blots\TextBlot;
 use VanillaTests\SharedBootstrapTestCase;
 use Vanilla\Quill\Parser;
@@ -23,6 +24,7 @@ class ParserTest extends SharedBootstrapTestCase {
         $actual = $parser->parseIntoTestData($ops);
         $this->assertSame($expected, $actual);
     }
+
     public function dataProvider() {
         return [
             [
@@ -46,9 +48,7 @@ class ParserTest extends SharedBootstrapTestCase {
             ],
             [
                 [["insert" => "\n"]],
-                [
-                    [["class" => TextBlot::class, "content" => ""]],
-                ],
+                [], // A plain newline is an empty editor.
             ],
             [
                 [["insert" => "SomeText\n"]],
@@ -60,27 +60,73 @@ class ParserTest extends SharedBootstrapTestCase {
                 [["insert" => "Sometext\n\n\nAfter3lines\n\n"]],
                 [
                     [["class" => TextBlot::class, "content" => "Sometext"]],
-                    [["class" => TextBlot::class, "content" => ""]],
-                    [["class" => TextBlot::class, "content" => ""]],
+                    [["class" => TextBlot::class, "content" => "\n"]],
+                    [["class" => TextBlot::class, "content" => "\n"]],
                     [["class" => TextBlot::class, "content" => "After3lines"]],
-                    [["class" => TextBlot::class, "content" => ""]],
-                ]
+                    [["class" => TextBlot::class, "content" => "\n"]],
+                ],
             ],
             [
                 [
-                    [ "insert" => "Line 1" ],
-                    [ "attributes" => [ "blockquote-line" => true ], "insert" => "\n\n" ],
-                    [ "insert" => "Line 3" ],
-                    [ "attributes" => [ "blockquote-line" => true ], "insert" => "\n\n\n\n" ],
-                    [ "insert" => "Line 7" ],
-                    [ "attributes" => [ "blockquote-line" => true ], "insert" => "\n" ]
+                    ["insert" => "Line 1"],
+                    ["attributes" => ["blockquote-line" => true], "insert" => "\n\n"],
+                    ["insert" => "Line 3"],
+                    ["attributes" => ["blockquote-line" => true], "insert" => "\n\n\n\n"],
+                    ["insert" => "Line 7"],
+                    ["attributes" => ["blockquote-line" => true], "insert" => "\n"],
+                    ["insert" => "Normal Text\nSome other text"],
                 ],
                 [
-                    [["class" => BlockquoteLineBlot::class, "content" => "Line 1"]],
-                    [["class" => BlockquoteLineBlot::class, "content" => "Line 3"]],
-                    [["class" => BlockquoteLineBlot::class, "content" => "Line 7"]],
-                ]
-            ]
+                    [
+                        ["class" => BlockquoteLineBlot::class, "content" => "Line 1"],
+                        ["class" => BlockquoteLineBlot::class, "content" => "Line 3"],
+                        ["class" => BlockquoteLineBlot::class, "content" => "Line 7"],
+                    ],
+                    [["class" => TextBlot::class, "content" => "Normal Text"]],
+                    [["class" => TextBlot::class, "content" => "Some other text"]],
+                ],
+            ],
+            [
+                [
+                    ["insert" => "Line 1"],
+                    ["attributes" => ["blockquote-line" => true], "insert" => "\n\n"],
+                    ["insert" => "Line 3"],
+                    ["attributes" => ["blockquote-line" => true], "insert" => "\n\n\n\n"],
+                    ["insert" => "Line 7"],
+                    ["attributes" => ["blockquote-line" => true], "insert" => "\n"],
+                    ["insert" => "Normal Text\n"],
+                ],
+                [
+                    [
+                        ["class" => BlockquoteLineBlot::class, "content" => "Line 1"],
+                        ["class" => BlockquoteLineBlot::class, "content" => "Line 3"],
+                        ["class" => BlockquoteLineBlot::class, "content" => "Line 7"],
+                    ],
+                    [["class" => TextBlot::class, "content" => "Normal Text"]],
+                ],
+            ],
+            [
+                [
+                    ["attributes" => ["link" => "https =>//google.com"], "insert" => "ogl"],
+                    ["insert" => "\n\nText after line breaks."],
+                    ["attributes" => ["strike" => true], "insert" => "strike"],
+                    ["insert" => "\n\n\n\n"],
+                    ["attributes" => ["strike" => true], "insert" => "Mutliple more breaks."],
+                    ["insert" => "\n"],
+                ],
+                [
+                    [["class" => TextBlot::class, "content" => "ogl"]],
+                    [["class" => TextBlot::class, "content" => "\n"]],
+                    [
+                        ["class" => TextBlot::class, "content" => "Text after line breaks."],
+                        ["class" => TextBlot::class, "content" => "strike"],
+                    ],
+                    [["class" => TextBlot::class, "content" => "\n"]],
+                    [["class" => TextBlot::class, "content" => "\n"]],
+                    [["class" => TextBlot::class, "content" => "\n"]],
+                    [["class" => TextBlot::class, "content" => "Mutliple more breaks."]],
+                ],
+            ],
         ];
     }
 }

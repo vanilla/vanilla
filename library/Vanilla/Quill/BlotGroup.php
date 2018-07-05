@@ -16,15 +16,10 @@ use Vanilla\Quill\Blots\TextBlot;
 /**
  * Class to represent a group of a quill blots. One group can contain:
  *
- * - Multiple inline blots in a single paragraph.
- * - Multiple line blots if it is a line type grouping (eg. abstra)
- *
- * @package Vanilla\Quill
+ * - Multiple Text formats in a single paragraph (as well as inline embeds).
+ * - Multiple line blots if it is a line type grouping
  */
 class BlotGroup {
-
-    const BREAK_MARKER = "group-break-marker";
-
     /** @var AbstractBlot[] */
     private $blots = [];
 
@@ -38,19 +33,6 @@ class BlotGroup {
         CodeBlockBlot::class,
         AbstractLineBlot::class,
     ];
-
-    /**
-     * Create any empty group. When rendered it will output <p><br></p>
-     *
-     * @return BlotGroup
-     */
-    public static function makeEmptyGroup(): BlotGroup {
-        $group = new BlotGroup();
-        $blot = new TextBlot(["insert" => ""], [], []);
-        $blot->setContent("");
-        $group->pushBlot($blot);
-        return $group;
-    }
 
     /**
      * Determine if this group is made up only of a break.
@@ -88,6 +70,11 @@ class BlotGroup {
         return $lastBlot instanceof $blotClass;
     }
 
+    /**
+     * Determine if the group is empty.
+     *
+     * @return bool
+     */
     public function isEmpty(): bool {
         return count($this->blots) === 0;
     }
@@ -107,12 +94,6 @@ class BlotGroup {
             $result .= $this->renderLineGroup($surroundTagBlot);
         } else {
             foreach ($this->blots as $blot) {
-                // Don't render breaks unless the group is just a break.
-                $blotIsBreak = get_class($blot) === TextBlot::class && $blot->getContent() === "";
-                if (!$this->isBreakOnlyGroup() && $blotIsBreak) {
-                    continue;
-                }
-
                 $result .= $blot->render();
             }
         }
@@ -176,15 +157,15 @@ class BlotGroup {
     /**
      * Get the position in the blots array of the first blot of the given type. Defaults to -1.
      *
-     * @param string $blotType
+     * @param string $blotClass The class string of the blot to check for.
      *
      * @return int
      */
-    public function getIndexForBlotOfType(string $blotType): int {
+    public function getIndexForBlotOfType(string $blotClass): int {
         $index = -1;
 
         foreach ($this->blots as $blotIndex => $blot) {
-            if ($blot instanceof $blotType) {
+            if ($blot instanceof $blotClass) {
                 $index = $blotIndex;
                 break;
             }

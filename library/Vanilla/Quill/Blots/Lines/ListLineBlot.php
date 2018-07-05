@@ -9,6 +9,9 @@ namespace Vanilla\Quill\Blots\Lines;
 
 use Vanilla\Quill\BlotGroup;
 
+/**
+ * Blot for Lists of all kinds. All supported types are constants on this class.
+ */
 class ListLineBlot extends AbstractLineBlot {
 
     const LIST_TYPE_BULLET = "bullet";
@@ -16,15 +19,16 @@ class ListLineBlot extends AbstractLineBlot {
     const LIST_TYPE_UNRECOGNIZED = "unrecognized list value";
     const LIST_TYPES = [self::LIST_TYPE_BULLET, self::LIST_TYPE_ORDERED];
 
+    /**
+     * @inheritdoc
+     */
     public static function matches(array $operations): bool {
-        return static::operationsContainKeyWithValue($operations, "list", static::LIST_TYPES);
+        return static::opAttrsContainKeyWithValue($operations, "list", static::LIST_TYPES);
     }
 
-    public function getListType() {
-        $listType = $this->nextOperation["attributes"]["list"] ?? static::LIST_TYPE_UNRECOGNIZED;
-        return !in_array($listType, static::LIST_TYPES) ? static::LIST_TYPE_UNRECOGNIZED : $listType;
-    }
-
+    /**
+     * @inheritdoc
+     */
     public function shouldClearCurrentGroup(BlotGroup $group): bool {
         $surroundingBlot = $group->getBlotForSurroundingTags();
         if ($surroundingBlot instanceof ListLineBlot) {
@@ -34,7 +38,9 @@ class ListLineBlot extends AbstractLineBlot {
             return parent::shouldClearCurrentGroup($group);
         }
     }
-
+    /**
+     * @inheritdoc
+     */
     public function renderLineStart(): string {
         $classString = "";
         $indentLevel = $this->currentOperation["attributes"]["indent"]
@@ -47,6 +53,9 @@ class ListLineBlot extends AbstractLineBlot {
         return "<li$classString>";
     }
 
+    /**
+     * @inheritdoc
+     */
     public function renderLineEnd(): string {
         return "</li>";
     }
@@ -77,5 +86,15 @@ class ListLineBlot extends AbstractLineBlot {
             default:
                 return "";
         }
+    }
+
+    /**
+     * Determine which type of list we are in.
+     *
+     * @return string
+     */
+    private function getListType() {
+        $listType = $this->nextOperation["attributes"]["list"] ?? static::LIST_TYPE_UNRECOGNIZED;
+        return !in_array($listType, static::LIST_TYPES) ? static::LIST_TYPE_UNRECOGNIZED : $listType;
     }
 }

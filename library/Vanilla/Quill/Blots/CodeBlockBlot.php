@@ -7,13 +7,19 @@
 
 namespace Vanilla\Quill\Blots;
 
+/**
+ * Blot for handling code blocks.
+ *
+ * Newlines are handled slightly differently here than for regular text because of the `whitespace: pre` that is applied
+ * to code blocks. We do not want the newlines to be transformed into breaks.
+ */
 class CodeBlockBlot extends TextBlot {
-    public static function matches(array $operations): bool {
-        return static::operationsContainKeyWithValue($operations, "code-block");
-    }
 
-    public function hasConsumedNextOp(): bool {
-        return true;
+    /**
+     * @inheritdoc
+     */
+    public static function matches(array $operations): bool {
+        return static::opAttrsContainKeyWithValue($operations, "code-block");
     }
 
     /**

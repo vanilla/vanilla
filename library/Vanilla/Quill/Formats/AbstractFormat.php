@@ -5,10 +5,8 @@
  * @license https://opensource.org/licenses/GPL-2.0 GPL-2.0
  */
 
-namespace Vanilla\Quill\Blots\Formats;
+namespace Vanilla\Quill\Formats;
 
-use Vanilla\Quill\BlotGroup;
-use Vanilla\Quill\Blots\AbstractBlot;
 use Vanilla\Quill\Blots\TextBlot;
 
 /**
@@ -16,7 +14,35 @@ use Vanilla\Quill\Blots\TextBlot;
  *
  * @see TextBlot Usage of these blots can be found in the TextBlot class.
  */
-abstract class AbstractFormat extends AbstractBlot {
+abstract class AbstractFormat {
+
+    /**
+     * @var array The primary operation of the Format. Used to determine the primary tags.
+     */
+    protected $currentOperation = [];
+
+    /**
+     * @var array The previous operation. Used to optimize opening tags.
+     */
+    protected $previousOperation = [];
+
+    /**
+     * @var array The next operation from the currentOperation. Used to optimize closing tags.
+     */
+    protected $nextOperation = [];
+
+    /**
+     * Create a blot.
+     *
+     * @param array $currentOperation The current operation.
+     * @param array $previousOperation The next operation.
+     * @param array $nextOperation The previous operation.
+     */
+    public function __construct(array $currentOperation, array $previousOperation = [], array $nextOperation = []) {
+        $this->previousOperation = $previousOperation;
+        $this->currentOperation = $currentOperation;
+        $this->nextOperation = $nextOperation;
+    }
 
     /**
      * Get the string of the attribute key in the insert that determines if the blot applies or not. This key should lead to a boolean value in the attributes array of the insert.
@@ -62,30 +88,11 @@ abstract class AbstractFormat extends AbstractBlot {
         return $result;
     }
 
-    public function isOwnGroup(): bool {
-        return false;
-    }
-
-
     /**
-     * @inheritDoc
-     */
-    public function hasConsumedNextOp(): bool {
-        return false;
-    }
-
-    /**
-     * @inheritDoc
+     * Formats never actually render any content. They should only be providing starting/ending tags.
      */
     public function render(): string {
         return "";
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public function shouldClearCurrentGroup(BlotGroup $group): bool {
-        return false;
     }
 
     /**

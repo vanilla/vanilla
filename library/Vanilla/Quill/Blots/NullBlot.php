@@ -16,17 +16,15 @@ use Vanilla\Quill\BlotGroup;
 class NullBlot extends AbstractBlot {
 
     /**
+     * The NullBlot is the ultimate fallback blot. It matches anything so always return true.
      * @inheritDoc
      */
     public static function matches(array $operations): bool {
         return true;
     }
 
-    public function isOwnGroup(): bool {
-        return false;
-    }
-
     /**
+     * The null blot always has empty content.
      * @inheritDoc
      */
     public function __construct(array $currentOperation, array $previousOperation, array $nextOperation) {
@@ -38,10 +36,11 @@ class NullBlot extends AbstractBlot {
      * @inheritDoc
      */
     public function render(): string {
-        return "";
+        return $this->content;
     }
 
     /**
+     * A null blot should not have any affect on anything around it.
      * @inheritDoc
      */
     public function shouldClearCurrentGroup(BlotGroup $group): bool {
@@ -49,6 +48,7 @@ class NullBlot extends AbstractBlot {
     }
 
     /**
+     * The null blot only ever consumes it's own non-matching operation.
      * @inheritDoc
      */
     public function hasConsumedNextOp(): bool {

@@ -5,15 +5,15 @@
  * @license https://opensource.org/licenses/GPL-2.0 GPL-2.0
  */
 
-namespace Vanilla\Quill\Blots\Formats;
+namespace Vanilla\Quill\Formats;
 
-class Italic extends AbstractFormat {
+class Bold extends AbstractFormat {
 
     /**
      * @inheritDoc
      */
     protected static function getAttributeLookupKey(): string {
-        return "italic";
+        return "bold";
     }
 
     /**
@@ -21,7 +21,6 @@ class Italic extends AbstractFormat {
      */
     protected function getBlackListedNestedFormats(): array {
         return [
-            Bold::class,
             Link::class,
             Code::class,
         ];
@@ -31,6 +30,6 @@ class Italic extends AbstractFormat {
      * @inheritDoc
      */
     protected function getTagName(): string {
-        return "em";
+        return "strong";
     }
 }

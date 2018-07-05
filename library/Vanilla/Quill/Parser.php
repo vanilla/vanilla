@@ -8,7 +8,9 @@
 namespace Vanilla\Quill;
 
 use Vanilla\Quill\Blots;
+use Vanilla\Quill\Formats;
 use Vanilla\Quill\Blots\AbstractBlot;
+
 /**
  * Class for parsing Quill Deltas into BlotGroups.
  *
@@ -16,11 +18,25 @@ use Vanilla\Quill\Blots\AbstractBlot;
  */
 class Parser {
 
+    const BREAK_BLOT = [
+        "breakpoint" => true,
+    ];
+
+    const LINE_BLOTS = [
+        Blots\Lines\BlockquoteLineBlot::class,
+        Blots\Lines\ListLineBlot::class,
+        Blots\Lines\SpoilerLineBlot::class,
+    ];
+
     /** @var string[] The registered blot classes */
     private $blotClasses = [];
 
     /** @var string[] The registered formats classes */
     private $formatClasses = [];
+
+    private $operations = [];
+
+    private $groupSplitIndexes = [];
 
     /**
      * Add a new embed type.
@@ -49,12 +65,12 @@ class Parser {
             ->addBlot(Blots\Embeds\EmojiBlot::class)
             ->addBlot(Blots\CodeBlockBlot::class)
             ->addBlot(Blots\HeadingBlot::class)
-            ->addBlot(Blots\TextBlot::class) // This needs to be the last one!!!
-            ->addFormat(Blots\Formats\Link::class)
-            ->addFormat(Blots\Formats\Bold::class)
-            ->addFormat(Blots\Formats\Italic::class)
-            ->addFormat(Blots\Formats\Code::class)
-            ->addFormat(Blots\Formats\Strike::class)
+            ->addBlot(Blots\TextBlot::class)// This needs to be the last one!!!
+            ->addFormat(Formats\Link::class)
+            ->addFormat(Formats\Bold::class)
+            ->addFormat(Formats\Italic::class)
+            ->addFormat(Formats\Code::class)
+            ->addFormat(Formats\Strike::class)
         ;
     }
 
@@ -72,58 +88,79 @@ class Parser {
         return $this;
     }
 
+    public function isOperationBareInsert(array $op) {
+        return !array_key_exists("attributes", $op)
+            && array_key_exists("insert", $op)
+            && is_string($op["insert"]);
+    }
+
+    public function isOpALineBlotTerminator(array $operation): bool {
+        $validLineBlotClasses = array_intersect(static::LINE_BLOTS, $this->blotClasses);
+        foreach ($validLineBlotClasses as $blotClass) {
+            if ($blotClass::matches([$operation])) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
     /**
      * Split operations with newlines inside of them into their own operations.
      */
     public function splitPlainTextNewlines($operations) {
         $newOperations = [];
-
         foreach ($operations as $opIndex => $op) {
-            // Determine if this is a plain text insert with no attributes.
-            $isBareInsertOperation =
-                !array_key_exists("attributes", $op)
-                && array_key_exists("insert", $op)
-                && is_string($op["insert"]);
-
             // Other types of inserts should not get split, they need special handling inside of their blot.
             // Just skip over them.
-            if (!$isBareInsertOperation) {
+            if (!$this->isOperationBareInsert($op)) {
                 $newOperations[] = $op;
                 continue;
             }
 
-            // A newline on its own needs special handling. We don't want to break it into 2 newlines.
-            if ($op["insert"] === "\n") {
-                $op[BlotGroup::BREAK_MARKER] = true;
-                $op["insert"] = "";
+            // Split up into an array of newlines (individual) and groups of all other characters.
+            preg_match_all("/(\\n)|([^\\n]+)/", $op["insert"], $matches);
+            $subInserts = $matches[0];
+            if (count($subInserts) <= 1) {
                 $newOperations[] = $op;
                 continue;
             }
 
-            // Explode on newlines into new operations. Every new operation,
-            // and the next old operation should get a BREAK_MARKER.
-            $pieces = \explode("\n", $op["insert"]);
-            if (count($pieces) > 1) {
-                // Create a new insert from the exploded piece.
-                foreach ($pieces as $index => $piece) {
-                    $insert = ["insert" => $piece];
-                    $insert[BlotGroup::BREAK_MARKER] = true;
-                    $newOperations[] = $insert;
-                }
+            // If we are going from a non-bare insert to a bare on and we have a newline we need to add an empty break.
+            $prevOp = $operations[$opIndex - 1] ?? [];
+            $needsExtraBreak = $this->isOperationBareInsert($op) && $this->isOpALineBlotTerminator($prevOp) && $subInserts[0] !== "\n";
+            if ($needsExtraBreak) {
+                $newOperations[] = static::BREAK_BLOT;
+            }
 
-                $isNotLastOperation = $opIndex < count($operations) - 1;
-                $isNewLineOnly = $newOperations[count($newOperations) - 1]["insert"] === "";
-
-                // Set a marker on the next blot if the last piece is a newline.
-                if ($isNotLastOperation && $isNewLineOnly) {
-                    $operations[$opIndex + 1][BlotGroup::BREAK_MARKER] = true;
-                }
-            } else {
-                $newOperations[] = $op;
+            // Make an operation for each sub insert.
+            foreach ($subInserts as $subInsert) {
+                $newOperations[] = ["insert" => $subInsert];
             }
         }
 
         return $newOperations;
+    }
+
+    /**
+     * Replace certain newline characters with a constant the does nothing except for break groups up.
+     * This is used later on in parsing.
+     *
+     * @param array $operations The array of operations to look through.
+     */
+    public function insertBreakPoints(array &$operations) {
+        $lastOpEndsInNewline = false;
+        foreach ($operations as $opIndex => $op) {
+            $isBareInsert = $this->isOperationBareInsert($op);
+            $opIsPlainTextNewline = $isBareInsert && $op["insert"] === "\n";
+            $opEndsInNewline = is_string($op["insert"] ?? null) && preg_match("/\\n$/", $op["insert"]);
+
+            if ($opIsPlainTextNewline && !$lastOpEndsInNewline) {
+                $operations[$opIndex] = static::BREAK_BLOT;
+            }
+
+            $lastOpEndsInNewline = $opEndsInNewline;
+        }
     }
 
     /**
@@ -132,29 +169,31 @@ class Parser {
      * @return BlotGroup[]
      */
     public function parse(array $operations): array {
-
         $operations = $this->splitPlainTextNewlines($operations);
+        $this->insertBreakPoints($operations);
 
         $groups = [];
         $operationLength = count($operations);
         $group = new BlotGroup();
 
         for ($i = 0; $i < $operationLength; $i++) {
-            $previousOp = $operations[$i - 1] ?? [];
             $currentOp = $operations[$i];
-            $nextOp = $operations[$i + 1] ?? [];
-            $isFirst = $i === 0;
-            $isLast = $i === $operationLength - 1;
 
-            // Skip the last newline (unless its the only one).
-            if (!$isFirst && $isLast && array_key_exists(BlotGroup::BREAK_MARKER, $currentOp)) {
+            // In event of break blots we want to clear the group if applicable and the skip to the next item.
+            if ($currentOp === self::BREAK_BLOT) {
+                if (!$group->isEmpty()) {
+                    $groups[] = $group;
+                    $group = new BlotGroup();
+                }
                 continue;
             }
 
+            $previousOp = $operations[$i - 1] ?? [];
+            $nextOp = $operations[$i + 1] ?? [];
             $blotInstance = $this->getBlotForOperations($currentOp, $previousOp, $nextOp);
 
             // Ask the blot if it should close the current group.
-            if ($blotInstance->shouldClearCurrentGroup($group) && !$group->isEmpty()) {
+            if (($blotInstance->shouldClearCurrentGroup($group)) && !$group->isEmpty()) {
                 $groups[] = $group;
                 $group = new BlotGroup();
             }
@@ -162,7 +201,7 @@ class Parser {
             $group->pushBlot($blotInstance);
 
             // Some block type blots get a group all to themselves.
-            if ($blotInstance->isOwnGroup()  && !$group->isEmpty()) {
+            if ($blotInstance->isOwnGroup() && !$group->isEmpty()) {
                 $groups[] = $group;
                 $group = new BlotGroup();
             }
@@ -179,11 +218,18 @@ class Parser {
         return $groups;
     }
 
+
     /**
      * Get the matching blot for a sequence of operations. Returns the default if no match is found.
+     *
+     * @param array $currentOp The current operation.
+     * @param array $previousOp The next operation.
+     * @param array $nextOp The previous operation.
+     *
+     * @return AbstractBlot
      */
-    public function getBlotForOperations($currentOp, $previousOp, $nextOp): AbstractBlot {
-        // Fallback to a textblot if possible. Otherwise we fallback to rendering nothing at all.
+    public function getBlotForOperations(array $currentOp, array $previousOp = [], array $nextOp = []): AbstractBlot {
+        // Fallback to a TextBlot if possible. Otherwise we fallback to rendering nothing at all.
         $blotClass = Blots\TextBlot::matches([$currentOp]) ? Blots\TextBlot::class : Blots\NullBlot::class;
         foreach ($this->blotClasses as $blot) {
             // Find the matching blot type for the current, last, and next operation.
@@ -199,13 +245,17 @@ class Parser {
     /**
      * Get the matching format for a sequence of operations if applicable.
      *
-     * @returns AbstractFormat[] The formats matching the given operations.
+     * @param array $currentOp The current operation.
+     * @param array $previousOp The next operation.
+     * @param array $nextOp The previous operation.
+     *
+     * @return AbstractForm[] The formats matching the given operations.
      */
-    public function getFormatsForOperations($currentOp, $previousOp, $nextOp): array {
+    public function getFormatsForOperations(array $currentOp, array $previousOp = [], array $nextOp = []) {
         $formats = [];
         foreach ($this->formatClasses as $format) {
             if ($format::matches([$currentOp])) {
-                /** @var Blots\Formats\AbstractFormat $formatInstance */
+                /** @var Formats\AbstractFormat $formatInstance */
                 $formats[] = new $format($currentOp, $previousOp, $nextOp);
             }
         }

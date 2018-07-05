@@ -5,15 +5,15 @@
  * @license https://opensource.org/licenses/GPL-2.0 GPL-2.0
  */
 
-namespace Vanilla\Quill\Blots\Formats;
+namespace Vanilla\Quill\Formats;
 
-class Bold extends AbstractFormat {
+class Strike extends AbstractFormat {
 
     /**
      * @inheritDoc
      */
     protected static function getAttributeLookupKey(): string {
-        return "bold";
+        return "strike";
     }
 
     /**
@@ -23,13 +23,14 @@ class Bold extends AbstractFormat {
         return [
             Link::class,
             Code::class,
+            Italic::class,
+            Bold::class,
         ];
     }
-
     /**
      * @inheritDoc
      */
     protected function getTagName(): string {
-        return "strong";
+        return "s";
     }
 }

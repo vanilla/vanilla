@@ -5,31 +5,29 @@
  * @license https://opensource.org/licenses/GPL-2.0 GPL-2.0
  */
 
-namespace Vanilla\Quill\Blots\Formats;
+namespace Vanilla\Quill\Formats;
 
-class Link extends AbstractFormat {
+class Code extends AbstractFormat {
 
     /**
      * @inheritDoc
      */
     protected static function getAttributeLookupKey(): string {
-        return "link";
+        return "code-inline";
     }
 
     /**
      * @inheritDoc
      */
     protected function getBlackListedNestedFormats(): array {
-        return [
-            Code::class,
-        ];
+        return [];
     }
 
     /**
      * @inheritDoc
      */
     protected function getTagName(): string {
-        return "a";
+        return "code";
     }
 
     /**
@@ -37,8 +35,8 @@ class Link extends AbstractFormat {
      */
     protected function getAttributes(): array {
         return [
-            "href" => htmlspecialchars($this->currentOperation["attributes"]["link"]),
-            "rel" => "nofollow",
+            "class" => "code-inline code isInline",
+            "spellcheck" => "false",
         ];
     }
 }

@@ -13,11 +13,9 @@ class TextBlot extends AbstractBlot {
 
     use FormattableTextTrait;
 
-    public function isOwnGroup(): bool {
-        return false;
-    }
-
     /**
+     * The TextBlot can only match on operations that are a plain string insert.
+     *
      * @inheritDoc
      */
     public static function matches(array $operations): bool {
@@ -25,68 +23,74 @@ class TextBlot extends AbstractBlot {
     }
 
     /**
+     * Parse out text formats, and get main initial content.
+     *
      * @inheritDoc
      */
-    public function __construct(array $currentOperation, array $previousOperation, array $nextOperation) {
+    public function __construct(array $currentOperation, array $previousOperation = [], array $nextOperation = []) {
         parent::__construct($currentOperation, $previousOperation, $nextOperation);
         $this->parseFormats($this->currentOperation, $this->previousOperation, $this->nextOperation);
 
+        // Grab the insert text for the content.
         $this->content = $this->currentOperation["insert"] ?? "";
         // Sanitize
         $this->content = htmlspecialchars($this->content);
-
-        // If we still have a trailing newline it signifies the end of the group, even if we don't want to render it.
-        // Strip off the newline character place a break marker.
-        if (preg_match("/\\n$/", $this->content)) {
-            $this->currentOperation[BlotGroup::BREAK_MARKER] = true;
-            $this->content = rtrim($this->content, "\n");
-        }
-
-        if(stringBeginsWith($this->content, "\n")) {
-            $this->currentOperation[BlotGroup::BREAK_MARKER] = true;
-            $this->content = \ltrim($this->content, "\n");
-
-        }
     }
 
     /**
      * @inheritDoc
      */
     public function render(): string {
-        $sanitizedContent = $this->content === "" ? "<br>" : htmlentities($this->content, ENT_QUOTES);
+        $sanitizedContent = $this->content === "\n" ? "<br>" : htmlentities($this->content, ENT_QUOTES);
+
         return $this->renderOpeningFormatTags().$sanitizedContent.$this->renderClosingFormatTags();
     }
 
-    protected static function operationsContainKeyWithValue(array $operations, string $lookupKey, $expectedValue = true) {
-        $found = false;
-
-        foreach ($operations as $op) {
-            $value = valr("attributes.$lookupKey", $op);
-
-            if (
-                (is_array($expectedValue) && in_array($value, $expectedValue))
-                || $value === $expectedValue
-            ) {
-                $found = true;
-                break;
-            }
-        }
-
-        return $found;
+    /**
+     * When a text blot is just a newline, it renders alone - <p><br></p>.
+     */
+    public function isOwnGroup(): bool {
+        return $this->isPlainTextNewLine();
     }
 
     /**
      * @inheritDoc
      */
     public function shouldClearCurrentGroup(BlotGroup $group): bool {
-        return $this->isOwnGroup() || array_key_exists(BlotGroup::BREAK_MARKER, $this->currentOperation);
+        return $this->isOwnGroup() || $this->isPlainTextNewLine();
     }
 
     /**
-     * @inheritDoc
+     * Utility function for determining if a group of operations contains a blot with particular attribute.
+     *
+     * @param array $operations The operations to check.
+     * @param string $attrLookupKey The attribute key to lookup.
+     * @param mixed $expectedValue A value or array of possible values that the key should be matched against.
+     *
+     * @return bool
      */
-    public function hasConsumedNextOp(): bool {
-//        return false;
-        return $this::matches([$this->nextOperation]) && !$this::matches([$this->currentOperation]);
+    protected static function opAttrsContainKeyWithValue(
+        array $operations,
+        string $attrLookupKey,
+        $expectedValue = true
+    ) {
+        foreach ($operations as $op) {
+            $value = valr("attributes.$attrLookupKey", $op);
+
+            if ((is_array($expectedValue) && in_array($value, $expectedValue)) || $value === $expectedValue) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * Determine whether or not the blot is a TextBlot directory (not a subclass) and it's content is a newline.
+     *
+     * @return bool
+     */
+    private function isPlainTextNewLine(): bool {
+        return get_class($this) === TextBlot::class && $this->content === "\n";
     }
 }

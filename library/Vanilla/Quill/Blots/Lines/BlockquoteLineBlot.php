@@ -7,13 +7,16 @@
 
 namespace Vanilla\Quill\Blots\Lines;
 
+/**
+ * Class for handling blockquote operations.
+ */
 class BlockquoteLineBlot extends AbstractLineBlot {
 
     /**
      * @inheritDoc
      */
     public static function matches(array $operations): bool {
-        return static::operationsContainKeyWithValue($operations, "blockquote-line");
+        return static::opAttrsContainKeyWithValue($operations, "blockquote-line");
     }
 
     /**
@@ -33,10 +36,16 @@ class BlockquoteLineBlot extends AbstractLineBlot {
         return "</div></div>";
     }
 
+    /**
+     * @inheritdoc
+     */
     public function renderLineStart(): string {
         return '<p class="blockquote-line">';
     }
 
+    /**
+     * @inheritdoc
+     */
     public function renderLineEnd(): string {
         return '</p>';
     }

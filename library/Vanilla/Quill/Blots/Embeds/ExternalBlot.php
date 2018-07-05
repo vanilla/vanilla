@@ -8,14 +8,27 @@ namespace Vanilla\Quill\Blots\Embeds;
 
 use Gdn;
 use Vanilla\Embeds\EmbedManager;
+use Vanilla\Quill\Blots\AbstractBlot;
 
-class ExternalBlot extends AbstractBlockEmbedBlot {
+/**
+ * Blot for rendering embeds with the embed manager.
+ */
+class ExternalBlot extends AbstractBlot {
 
     /** @var EmbedManager */
     private $embedManager;
 
     /**
+     * @inheritDoc
+     */
+    public static function matches(array $operations): bool {
+        return (boolean) valr("insert.embed-external", $operations[0]);
+    }
+
+    /**
      * @inheritdoc
+     * @throws \Garden\Container\ContainerException
+     * @throws \Garden\Container\NotFoundException
      */
     public function __construct(array $currentOperation, array $previousOperation, array $nextOperation) {
         parent::__construct($currentOperation, $previousOperation, $nextOperation);
@@ -25,24 +38,40 @@ class ExternalBlot extends AbstractBlockEmbedBlot {
     }
 
     /**
+     * Render out the content of the blot using the EmbedManager.
+     * @see EmbedManager
      * @inheritDoc
      */
-    protected static function getInsertKey(): string {
-        return "insert.embed-external";
+    public function render(): string {
+        $value = $this->currentOperation["insert"]["embed-external"] ?? [];
+        $data = $value['data'] ?? $value;
+        try {
+            return $this->embedManager->renderData($data);
+        } catch (\Exception $e) {
+            // TODO: Add better error handling here.
+            return '';
+        }
+    }
+
+    /**
+     * Block embeds are always their own group.
+     * @inheritDoc
+     */
+    public function isOwnGroup(): bool {
+        return true;
     }
 
     /**
      * @inheritDoc
      */
-    protected function renderContent(array $value): string {
-        $data = $value['data'] ?? $value;
-        $type = $data['type'] ?? '';
-        try {
-            $rendered = "<div class='js-embed embedResponsive'>".$this->embedManager->renderData($data)."</div>";
-        } catch (\Exception $e) {
-            $rendered = ''; // Silently fail.
-        }
+    public function getGroupOpeningTag(): string {
+        return "<div class='js-embed embedResponsive'>";
+    }
 
-        return $rendered;
+    /**
+     * @inheritDoc
+     */
+    public function getGroupClosingTag(): string {
+        return "</div>";
     }
 }

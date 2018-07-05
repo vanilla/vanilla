@@ -9,6 +9,10 @@ namespace Vanilla\Quill\Blots\Lines;
 
 use Vanilla\Quill\Blots\TextBlot;
 
+/**
+ * Base blot for items that share a single outer group.
+ * Some operations require a different approach to newline rendering than what is found in the Parser.
+ */
 abstract class AbstractLineBlot extends TextBlot {
     /**
      * Render additional newlines inside of the line.

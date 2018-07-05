@@ -7,7 +7,7 @@
     "settingsUrl": "/settings/vanillaconnect",
     "usePopupSettings": false,
     "settingsPermission": "Garden.Settings.Manage",
-    "hidden": true,
+    "hidden": false,
     "authors": [
         {
             "name": "Alexandre (DaazKu) Chouinard",

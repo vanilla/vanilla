@@ -24,7 +24,7 @@ class AccessTokenModelTest extends SharedBootstrapTestCase {
         $model = new AccessTokenModel('sss');
 
         $token = $model->randomSignedToken();
-        $this->assertTrue($model->verifyTokenSignature($token));
+        $this->assertTrue($model->verifyTokenSignature($token, 'access token'));
     }
 
     /**
@@ -37,7 +37,7 @@ class AccessTokenModelTest extends SharedBootstrapTestCase {
         $model = new AccessTokenModel('sss');
 
         $token = $model->randomSignedToken('last month');
-        $this->assertFalse($model->verifyTokenSignature($token));
+        $this->assertFalse($model->verifyTokenSignature($token, 'access token'));
         $this->assertFalse($model->verifyTokenSignature($token, true));
     }
 
@@ -51,7 +51,7 @@ class AccessTokenModelTest extends SharedBootstrapTestCase {
         $model = new AccessTokenModel('sss');
 
         $token = $model->randomSignedToken().'!';
-        $this->assertFalse($model->verifyTokenSignature($token));
+        $this->assertFalse($model->verifyTokenSignature($token, 'access token'));
         $this->assertFalse($model->verifyTokenSignature($token, true));
     }
 
@@ -64,7 +64,7 @@ class AccessTokenModelTest extends SharedBootstrapTestCase {
         $model = new AccessTokenModel('sss');
 
         $token = 'a.b.c';
-        $this->assertFalse($model->verifyTokenSignature($token));
+        $this->assertFalse($model->verifyTokenSignature($token, 'access token'));
         $this->assertFalse($model->verifyTokenSignature($token, true));
     }
 

@@ -23,6 +23,7 @@ import IState from "@rich-editor/state/IState";
 import { actions } from "@rich-editor/state/instance/instanceActions";
 import uniqueId from "lodash/uniqueId";
 import { Sources } from "quill/core";
+import { getIDForQuill } from "@rich-editor/quill/utility";
 
 interface IProps {
     editorID: string;
@@ -52,7 +53,7 @@ export default class Editor extends React.Component<IProps> {
         this.quill = new Quill(this.quillMountRef!.current!, options);
         bodybox.style.display = "none";
 
-        this.editorID = uniqueId("richEditor");
+        this.editorID = getIDForQuill(this.quill);
 
         // Setup syncing
         this.setupBodyBoxSync();

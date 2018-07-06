@@ -164,7 +164,7 @@ class AddonsTest extends AbstractAPIv2Test {
      *
      * @expectedException \Exception
      * @expectedExceptionCode 409
-     * @expectedExceptionMessage Advanced Editor conflicts with: Button Bar.
+     * @expectedExceptionMessage Validation Failed
      */
     public function testConflictingAddons() {
         $this->api()->patch('/addons/buttonbar', ['enabled' => true]);

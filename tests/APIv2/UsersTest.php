@@ -154,8 +154,7 @@ class UsersTest extends AbstractResourceTest {
      * Test confirm email fails.
      *
      * @expectedException \Exception
-     * @expectedExceptionMessage We couldn't confirm your email.
-     * Check the link in the email we sent you or try sending another confirmation email.
+     * @expectedExceptionMessage Validation Failed
      */
     public function testConfirmEmailFail() {
         /** @var \UserModel $userModel */

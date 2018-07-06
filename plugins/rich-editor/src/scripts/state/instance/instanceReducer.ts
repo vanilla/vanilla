@@ -8,8 +8,8 @@ import { IEditorInstanceState, IEditorInstance } from "@rich-editor/state/IState
 import * as instanceActions from "./instanceActions";
 import uniqueId from "lodash/uniqueId";
 
-const initialState: IEditorInstanceState = {};
-const defaultInstance: IEditorInstance = {
+export const initialState: IEditorInstanceState = {};
+export const defaultInstance: IEditorInstance = {
     currentSelection: null,
     lastGoodSelection: null,
 };
@@ -17,8 +17,13 @@ const defaultInstance: IEditorInstance = {
 /**
  * Validate that an particular editor ID has been created before certain actions are taken on it.
  */
-function validateID(state: IEditorInstanceState, action: instanceActions.ActionTypes) {
-    if (action.type !== instanceActions.CREATE_INSTANCE && !state[action.payload.editorID]) {
+function validateIDExistance(state: IEditorInstanceState, action: instanceActions.ActionTypes) {
+    const idExists = state[action.payload.editorID];
+    if (action.type === instanceActions.CREATE_INSTANCE && idExists) {
+        throw new Error(`Failed to create editor instance with id ${action.payload.editorID}. Id already exists`);
+    }
+
+    if (action.type !== instanceActions.CREATE_INSTANCE && !idExists) {
         throw new Error(
             `Could not perform an action for editor ID ${
                 action.payload.editorID
@@ -33,13 +38,14 @@ export default function instanceReducer(
 ): IEditorInstanceState {
     switch (action.type) {
         case instanceActions.CREATE_INSTANCE: {
+            validateIDExistance(state, action);
             return {
                 ...state,
                 [action.payload.editorID]: defaultInstance,
             };
         }
         case instanceActions.SET_SELECTION: {
-            validateID(state, action);
+            validateIDExistance(state, action);
             const { selection, editorID } = action.payload;
             const instanceState = state[editorID];
             const { lastGoodSelection } = instanceState;

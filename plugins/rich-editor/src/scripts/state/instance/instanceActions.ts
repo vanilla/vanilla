@@ -12,7 +12,7 @@ export const SET_SELECTION = "[instance] set selection";
 
 export const actions = {
     createInstance: (editorID: string | number) => createAction(CREATE_INSTANCE, { editorID }),
-    setSelection: (editorID: string | number, selection: RangeStatic) =>
+    setSelection: (editorID: string | number, selection: RangeStatic | null) =>
         createAction(SET_SELECTION, { editorID, selection }),
 };
 

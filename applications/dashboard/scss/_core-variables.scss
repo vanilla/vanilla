@@ -32,7 +32,6 @@ $global-color_unresolved                             : mix($global-color_warning
 
 $global-body_bg                                      : $global-color_bg !default; // Derived - color outside main content in margins
 
-
 $global-border_color                                  : mix($global-color_warning, $global-color_fg, 50%) !default; // Note it's off by default due to the border width
 $global-border-width                                  : 0;
 $global-border_radius                                 : 2px !default;
@@ -88,6 +87,10 @@ $global-heading_fontWeight                             : $global-bold_fontWeight
 
 $global-body_fontFamily                                : "Open Sans", "Segoe UI", "Helvetica Neue", Helvetica, Raleway, Arial, sans-serif !default;
 $global-body_fontWeight                                : $global-normal_fontWeight !default; // Derived
+
+$link_default-color                                    : $global-color_primary;
+$link_default_hover-color                              : $global-color_secondary;
+$link_default_focus-color                              : $global-color_secondary;
 
 /* -------------------------------------------------------------- *\
     Animation
@@ -216,19 +219,20 @@ $widget-footer_gap                                   : $global-widgetSection-gap
     Form Elements
 \* -------------------------------------------------------------- */
 
-$global-formElement_height                           : $utility-baseUnit * 6 !default; // Derived
-$global-formElement_borderWidth                      : 1px !default;
-$global-formElement_giantInput_height                : 81px !default;
-$global-formElement_giantInput_fontSize              : $utility-baseUnit * 4 !default; // Derived
-$global-formElement_halfHeight                       : $global-formElement_height / 2 !default; // Derived
-$global-formElement_borderColor                     : mix($global-color_fg, $global-color_bg, 24%) !default; // Derived
-$global-formElement_border_widthFull                 : $global-formElement_borderWidth * 2; // Derived
-$global-formElement_horizontalPadding                : $utility-baseUnit * 2 !default; // Derived
-$global-formElement_paddingVertical                  : $utility-baseUnit !default; // Derived
-$global-formElement_placeholderColor                 : mix($global-color_fg, $global-color_bg, 50%) !default; // Derived
-$global-formElement_maxWidth                         : 528px !default;
-$global-formElement_fg                               : mix($global-color_fg, $global-color_bg, 80%) !default; // Derived
-$global-formElement_bg                               : $global-color_bg !default; // Derived
+$formElement_height                                  : $utility-baseUnit * 6 !default; // Derived
+$formElement_borderWidth                             : 1px !default;
+$formElement_borderColor                             : mix($global-color_fg, $global-color_bg, 24%) !default; // Derived
+$formElement_borderRadius                            : $global-border_radius !default;
+$formElement_giantInput_height                       : 51px !default;
+$formElement_giantInput_fontSize                     : $utility-baseUnit * 4 !default; // Derived
+$formElement_halfHeight                              : $formElement_height / 2 !default; // Derived
+$formElement-border_widthFull                        : $formElement_borderWidth * 2; // Derived
+$formElement_horizontalPadding                       : $utility-baseUnit * 2 !default; // Derived
+$formElement_paddingVertical                         : $utility-baseUnit !default; // Derived
+$formElement_placeholderColor                        : mix($global-color_fg, $global-color_bg, 50%) !default; // Derived
+$formElement_maxWidth                                : 528px !default;
+$formElement_fg                                      : mix($global-color_fg, $global-color_bg, 80%) !default; // Derived
+$formElement_bg                                      : $global-color_bg !default; // Derived
 $global-formNote_fg                                  : mix($global-color_fg, $global-color_bg, 72%) !default; // Derived
 $global-formNoteLink_fg                              : $global-color_primary !default; // Derived
 

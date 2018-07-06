@@ -166,12 +166,7 @@ class UsersTest extends AbstractResourceTest {
         $user = $this->testPost();
         $userModel->saveAttribute($user['userID'], 'EmailKey', '123Test');
 
-        try {
-            $this->api()->post("{$this->baseUrl}/{$user['userID']}/confirm-email", $emailKey);
-        } catch (ClientException $ex) {
-            $data = $ex->jsonSerialize();
-            throw new \Exception($data['errors'][0]['message'], $ex->getCode());
-        }
+        $this->api()->post("{$this->baseUrl}/{$user['userID']}/confirm-email", $emailKey);
     }
 
     /**

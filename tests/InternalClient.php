@@ -103,7 +103,13 @@ class InternalClient extends HttpClient {
         if ($this->val('throw', $options, $this->throwExceptions)) {
             $body = $response->getBody();
             if (is_array($body)) {
-                $message = $this->val('message', $body, $response->getReasonPhrase());
+                if (!empty($body['errors'])) {
+                    // Concatenate all errors together.
+                    $messages = array_column($body['errors'], 'message');
+                    $message = implode(' ', $messages);
+                } else {
+                    $message = $this->val('message', $body, $response->getReasonPhrase());
+                }
             } else {
                 $message = $response->getReasonPhrase();
             }

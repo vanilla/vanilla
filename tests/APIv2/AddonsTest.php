@@ -170,12 +170,7 @@ class AddonsTest extends AbstractAPIv2Test {
      */
     public function testConflictingAddons() {
         $this->api()->patch('/addons/buttonbar', ['enabled' => true]);
-        try {
-            $this->api()->patch('/addons/editor', ['enabled' => true]);
-        } catch (ClientException $ex) {
-            $data = $ex->jsonSerialize();
-            throw new \Exception($data['errors'][0]['message'], $ex->getCode());
-        }
+        $this->api()->patch('/addons/editor', ['enabled' => true]);
     }
 
     /**

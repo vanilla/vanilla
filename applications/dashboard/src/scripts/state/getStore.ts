@@ -40,6 +40,6 @@ reducerRegistry.setChangeListener(reducers => {
     store.dispatch({ type: "RESET" });
 });
 
-export default function getStore<S = IState>() {
+export default function getStore<S extends IState = IState>() {
     return store as Store<S>;
 }

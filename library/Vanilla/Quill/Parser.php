@@ -18,7 +18,7 @@ use Vanilla\Quill\Blots\AbstractBlot;
  */
 class Parser {
 
-    const BREAK_BLOT = [
+    const BREAK_OPERATION = [
         "breakpoint" => true,
     ];
 
@@ -33,10 +33,6 @@ class Parser {
 
     /** @var string[] The registered formats classes */
     private $formatClasses = [];
-
-    private $operations = [];
-
-    private $groupSplitIndexes = [];
 
     /**
      * Add a new embed type.
@@ -88,81 +84,6 @@ class Parser {
         return $this;
     }
 
-    public function isOperationBareInsert(array $op) {
-        return !array_key_exists("attributes", $op)
-            && array_key_exists("insert", $op)
-            && is_string($op["insert"]);
-    }
-
-    public function isOpALineBlotTerminator(array $operation): bool {
-        $validLineBlotClasses = array_intersect(static::LINE_BLOTS, $this->blotClasses);
-        foreach ($validLineBlotClasses as $blotClass) {
-            if ($blotClass::matches([$operation])) {
-                return true;
-            }
-        }
-
-        return false;
-    }
-
-    /**
-     * Split operations with newlines inside of them into their own operations.
-     */
-    public function splitPlainTextNewlines($operations) {
-        $newOperations = [];
-        foreach ($operations as $opIndex => $op) {
-            // Other types of inserts should not get split, they need special handling inside of their blot.
-            // Just skip over them.
-            if (!$this->isOperationBareInsert($op)) {
-                $newOperations[] = $op;
-                continue;
-            }
-
-            // Split up into an array of newlines (individual) and groups of all other characters.
-            preg_match_all("/(\\n)|([^\\n]+)/", $op["insert"], $matches);
-            $subInserts = $matches[0];
-            if (count($subInserts) <= 1) {
-                $newOperations[] = $op;
-                continue;
-            }
-
-            // If we are going from a non-bare insert to a bare on and we have a newline we need to add an empty break.
-            $prevOp = $operations[$opIndex - 1] ?? [];
-            $needsExtraBreak = $this->isOperationBareInsert($op) && $this->isOpALineBlotTerminator($prevOp) && $subInserts[0] !== "\n";
-            if ($needsExtraBreak) {
-                $newOperations[] = static::BREAK_BLOT;
-            }
-
-            // Make an operation for each sub insert.
-            foreach ($subInserts as $subInsert) {
-                $newOperations[] = ["insert" => $subInsert];
-            }
-        }
-
-        return $newOperations;
-    }
-
-    /**
-     * Replace certain newline characters with a constant the does nothing except for break groups up.
-     * This is used later on in parsing.
-     *
-     * @param array $operations The array of operations to look through.
-     */
-    public function insertBreakPoints(array &$operations) {
-        $lastOpEndsInNewline = false;
-        foreach ($operations as $opIndex => $op) {
-            $isBareInsert = $this->isOperationBareInsert($op);
-            $opIsPlainTextNewline = $isBareInsert && $op["insert"] === "\n";
-            $opEndsInNewline = is_string($op["insert"] ?? null) && preg_match("/\\n$/", $op["insert"]);
-
-            if ($opIsPlainTextNewline && !$lastOpEndsInNewline) {
-                $operations[$opIndex] = static::BREAK_BLOT;
-            }
-
-            $lastOpEndsInNewline = $opEndsInNewline;
-        }
-    }
-
     /**
      * Parse the operations into an array of Groups.
      *
@@ -171,51 +92,7 @@ class Parser {
     public function parse(array $operations): array {
         $operations = $this->splitPlainTextNewlines($operations);
         $this->insertBreakPoints($operations);
-
-        $groups = [];
-        $operationLength = count($operations);
-        $group = new BlotGroup();
-
-        for ($i = 0; $i < $operationLength; $i++) {
-            $currentOp = $operations[$i];
-
-            // In event of break blots we want to clear the group if applicable and the skip to the next item.
-            if ($currentOp === self::BREAK_BLOT) {
-                if (!$group->isEmpty()) {
-                    $groups[] = $group;
-                    $group = new BlotGroup();
-                }
-                continue;
-            }
-
-            $previousOp = $operations[$i - 1] ?? [];
-            $nextOp = $operations[$i + 1] ?? [];
-            $blotInstance = $this->getBlotForOperations($currentOp, $previousOp, $nextOp);
-
-            // Ask the blot if it should close the current group.
-            if (($blotInstance->shouldClearCurrentGroup($group)) && !$group->isEmpty()) {
-                $groups[] = $group;
-                $group = new BlotGroup();
-            }
-
-            $group->pushBlot($blotInstance);
-
-            // Some block type blots get a group all to themselves.
-            if ($blotInstance->isOwnGroup() && !$group->isEmpty()) {
-                $groups[] = $group;
-                $group = new BlotGroup();
-            }
-
-            // Check with the blot if absorbed the next operation. If it did we don't want to iterate over it.
-            if ($blotInstance->hasConsumedNextOp()) {
-                $i++;
-            }
-        }
-        if (!$group->isEmpty()) {
-            $groups[] = $group;
-        }
-
-        return $groups;
+        return $this->createBlotGroups($operations);
     }
 
 
@@ -276,5 +153,150 @@ class Parser {
         }
 
         return $groupData;
+    }
+
+    /**
+     * Create blot groups out of an array of operations.
+     *
+     * @param array $operations The pre-parsed operations
+     *
+     * @return BlotGroup[]
+     */
+    private function createBlotGroups(array $operations): array {
+        $groups = [];
+        $operationLength = count($operations);
+        $group = new BlotGroup();
+
+        for ($i = 0; $i < $operationLength; $i++) {
+            $currentOp = $operations[$i];
+
+            // In event of break blots we want to clear the group if applicable and the skip to the next item.
+            if ($currentOp === self::BREAK_OPERATION) {
+                if (!$group->isEmpty()) {
+                    $groups[] = $group;
+                    $group = new BlotGroup();
+                }
+                continue;
+            }
+
+            $previousOp = $operations[$i - 1] ?? [];
+            $nextOp = $operations[$i + 1] ?? [];
+            $blotInstance = $this->getBlotForOperations($currentOp, $previousOp, $nextOp);
+
+            // Ask the blot if it should close the current group.
+            if (($blotInstance->shouldClearCurrentGroup($group)) && !$group->isEmpty()) {
+                $groups[] = $group;
+                $group = new BlotGroup();
+            }
+
+            $group->pushBlot($blotInstance);
+
+            // Some block type blots get a group all to themselves.
+            if ($blotInstance->isOwnGroup() && !$group->isEmpty()) {
+                $groups[] = $group;
+                $group = new BlotGroup();
+            }
+
+            // Check with the blot if absorbed the next operation. If it did we don't want to iterate over it.
+            if ($blotInstance->hasConsumedNextOp()) {
+                $i++;
+            }
+        }
+        if (!$group->isEmpty()) {
+            $groups[] = $group;
+        }
+
+        return $groups;
+    }
+
+    /**
+     * Determine if an operation is a text insert with no attributes.
+     *
+     * @param array $op The operation
+     *
+     * @return bool
+     */
+    private function isOperationBareInsert(array $op) {
+        return !array_key_exists("attributes", $op)
+            && array_key_exists("insert", $op)
+            && is_string($op["insert"]);
+    }
+
+    /**
+     * Determine if an operation represents the terminating operation ("eg, nextBlot") of an LineBlot).
+     *
+     * @param array $operation The operation
+     *
+     * @return bool
+     */
+    private function isOpALineBlotTerminator(array $operation): bool {
+        $validLineBlotClasses = array_intersect(static::LINE_BLOTS, $this->blotClasses);
+        foreach ($validLineBlotClasses as $blotClass) {
+            if ($blotClass::matches([$operation])) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * Split normal text operations with newlines inside of them into their own operations.
+     *
+     * @param $operations The operations in questions.
+     */
+    private function splitPlainTextNewlines($operations) {
+        $newOperations = [];
+        foreach ($operations as $opIndex => $op) {
+            // Other types of inserts should not get split, they need special handling inside of their blot.
+            // Just skip over them.
+            if (!$this->isOperationBareInsert($op)) {
+                $newOperations[] = $op;
+                continue;
+            }
+
+            // Split up into an array of newlines (individual) and groups of all other characters.
+            preg_match_all("/(\\n)|([^\\n]+)/", $op["insert"], $matches);
+            $subInserts = $matches[0];
+            if (count($subInserts) <= 1) {
+                $newOperations[] = $op;
+                continue;
+            }
+
+            // If we are going from a non-bare insert to a bare on and we have a newline we need to add an empty break.
+            $prevOp = $operations[$opIndex - 1] ?? [];
+            $needsExtraBreak = $this->isOperationBareInsert($op) && $this->isOpALineBlotTerminator($prevOp) && $subInserts[0] !== "\n";
+            if ($needsExtraBreak) {
+                $newOperations[] = static::BREAK_OPERATION;
+            }
+
+            // Make an operation for each sub insert.
+            foreach ($subInserts as $subInsert) {
+                $newOperations[] = ["insert" => $subInsert];
+            }
+        }
+
+        return $newOperations;
+    }
+
+    /**
+     * Replace certain newline characters with a constant the does nothing except for break groups up.
+     * This is used later on in parsing.
+     *
+     * @param array $operations The array of operations to look through.
+     */
+    private function insertBreakPoints(array &$operations) {
+        $lastOpEndsInNewline = false;
+        foreach ($operations as $opIndex => $op) {
+            $isBareInsert = $this->isOperationBareInsert($op);
+            $opIsPlainTextNewline = $isBareInsert && $op["insert"] === "\n";
+            $opEndsInNewline = is_string($op["insert"] ?? null) && preg_match("/\\n$/", $op["insert"]);
+
+            if ($opIsPlainTextNewline && !$lastOpEndsInNewline) {
+                $operations[$opIndex] = static::BREAK_OPERATION;
+            }
+
+            $lastOpEndsInNewline = $opEndsInNewline;
+        }
     }
 }

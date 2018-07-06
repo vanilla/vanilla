@@ -12,7 +12,7 @@ use Vanilla\Quill\BlotGroup;
 use Vanilla\Quill\Blots\HeadingBlot;
 use Vanilla\Quill\Blots\TextBlot;
 
-class BlockTest extends SharedBootstrapTestCase {
+class BlotGroupTest extends SharedBootstrapTestCase {
 
     public function testGetIndexForBlockType() {
         $block = new BlotGroup();

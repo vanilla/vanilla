@@ -11,12 +11,12 @@ import debounce from "lodash/debounce";
 import Keyboard from "quill/modules/keyboard";
 import { withEditor, IEditorContextProps } from "@rich-editor/components/context";
 import MentionSuggestionList from "./pieces/MentionSuggestionList";
-import { thunks as mentionThunks, actions as mentionActions } from "@rich-editor/state/mentionActions";
+import { thunks as mentionThunks, actions as mentionActions } from "@rich-editor/state/mention/mentionActions";
 import MentionAutoCompleteBlot from "@rich-editor/quill/blots/embeds/MentionAutoCompleteBlot";
 import { getBlotAtIndex, getMentionRange } from "@rich-editor/quill/utility";
 import { Dispatch } from "redux";
 import IStoreState from "@rich-editor/state/IState";
-import { IMentionValue } from "@rich-editor/state/MentionTrie";
+import { IMentionValue } from "@rich-editor/state/mention/MentionTrie";
 import { connect } from "react-redux";
 import { IMentionSuggestionData, IMentionProps } from "@rich-editor/components/toolbars/pieces/MentionSuggestion";
 

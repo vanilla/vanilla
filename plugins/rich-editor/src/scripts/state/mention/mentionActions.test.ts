@@ -5,7 +5,7 @@
  */
 
 import { IMentionSuggestionData } from "@rich-editor/components/toolbars/pieces/MentionSuggestion";
-import { filterSuggestions } from "@rich-editor/state/mentionActions";
+import { filterSuggestions } from "@rich-editor/state/mention/mentionActions";
 import { expect } from "chai";
 
 function makeMentionSuggestion(username: string): IMentionSuggestionData {

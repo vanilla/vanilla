@@ -16,7 +16,6 @@ export const LOAD_USERS_FAILURE = "[mentions] load users failure";
 export const LOAD_USERS_SUCCESS = "[mentions] load users success";
 
 // The number of characters that we will lookup to try and invalidate a lookup early.
-const REASONABLE_INVALIDATION_SIZE = 5;
 const USER_LIMIT = 50;
 
 /**

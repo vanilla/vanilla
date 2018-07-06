@@ -12,15 +12,16 @@ import { getBlotAtIndex } from "../../utility";
 
 describe("FocusableEmbedBlot", () => {
     let quill: Quill;
+    let button: HTMLElement;
 
     before(() => {
         Quill.register("formats/embed-focusable", FocusableEmbedBlot, true);
     });
 
     beforeEach(() => {
-        document.body.innerHTML = `<div><div id="quill"></div></div>`;
-
+        document.body.innerHTML = `<div><div id="quill"></div><button id="button"></button></div>`;
         quill = new Quill("#quill");
+        button = document.getElementById("button")!;
     });
 
     const embedDelta = { insert: { [FocusableEmbedBlot.blotName]: true } };
@@ -37,32 +38,20 @@ describe("FocusableEmbedBlot", () => {
             expect(quill.getContents().ops).deep.equals(expectedContent);
         });
 
-        it("places the selection at the same position if it will be text", () => {
-            const initialContent = [
-                { insert: "\n" },
-                {
-                    insert: {
-                        [FocusableEmbedBlot.blotName]: {},
-                    },
-                },
-                { insert: "test\n" },
-            ];
-
-            const expectedContent = [
-                {
-                    insert: "\ntest\n",
-                },
-            ];
+        it("places the selection at the same position if it will be text if it was focused", () => {
+            const initialContent = [newLineDelta, embedDelta, { insert: "test\n" }];
+            const expectedContent = [{ insert: "\ntest\n" }];
 
             quill.setContents(initialContent);
 
             const embed = getBlotAtIndex(quill, 1, FocusableEmbedBlot) as FocusableEmbedBlot;
+            embed.focus();
             embed.remove();
             expect(quill.getContents().ops).deep.equals(expectedContent);
             expect(quill.getSelection().index).eq(1);
         });
 
-        it("places the focuses an embed blot if it will be in the original position", () => {
+        it("places the focuses an embed blot if it will be in the original position if it was focused", () => {
             const initialContent = [newLineDelta, embedDelta, embedDelta];
             const expectedContent = [newLineDelta, embedDelta, newLineDelta];
 
@@ -70,10 +59,20 @@ describe("FocusableEmbedBlot", () => {
 
             const embed = getBlotAtIndex(quill, 1, FocusableEmbedBlot) as FocusableEmbedBlot;
             const embed2 = getBlotAtIndex(quill, 2, FocusableEmbedBlot) as FocusableEmbedBlot;
+            embed.focus();
             embed.remove();
             expect(quill.getContents().ops).deep.equals(expectedContent);
             expect(quill.getSelection().index).eq(1);
             expect(embed2.domNode).eq(document.activeElement);
+        });
+
+        it("doesn't change selection if it was not focused", () => {
+            const initialContent = [newLineDelta, embedDelta, { insert: "testas;ldkfjas;ldkfjas;\n" }];
+            quill.setContents(initialContent);
+            const embed = getBlotAtIndex(quill, 1, FocusableEmbedBlot) as FocusableEmbedBlot;
+            quill.setSelection(4, 0);
+            embed.remove();
+            expect(quill.getSelection().index).eq(4);
         });
     });
 

@@ -66,13 +66,13 @@ describe("FocusableEmbedBlot", () => {
             expect(embed2.domNode).eq(document.activeElement);
         });
 
-        it("doesn't change selection if it was not focused", () => {
+        it("doesn't change selection or refocus if it was not focused", () => {
             const initialContent = [newLineDelta, embedDelta, { insert: "testas;ldkfjas;ldkfjas;\n" }];
             quill.setContents(initialContent);
             const embed = getBlotAtIndex(quill, 1, FocusableEmbedBlot) as FocusableEmbedBlot;
             quill.setSelection(4, 0);
             embed.remove();
-            expect(quill.getSelection().index).eq(4);
+            expect(quill.getSelection().index).eq(3); // down by 1 because of the deletion.
         });
     });
 

@@ -289,8 +289,8 @@ $embedOperations = '[
                     "height": 345,
                     "width": 498,
                     "attributes": {
-                        "id": "yWNq9kdoT4JKdflMolsxPA",
-                        "sig": "yJxnZRDVdZ5UfTK-mE8Qlk-DDPpI-SklyztO21KQSpk=",
+                        "id": "VPkxdgtCQFx-rEo96WtR_g",
+                        "sig": "Mb27fqjaYbaPPFANi1BffcYTEvCcNHg0My7qzCNDSHo=",
                         "items": "810147408",
                         "isCaptioned": "false",
                         "is360": "false",
@@ -388,16 +388,25 @@ $embedOperations = '[
         "insert": {
             "embed-external": {
                 "data": {
-                    "url": "https://soundcloud.com/nymano/solitude",
+                    "url": "https://soundcloud.com/uiceheidd/sets/juicewrld-the-mixtape",
                     "type": "soundcloud",
                     "name": null,
                     "body": null,
                     "photoUrl": null,
-                    "height": 400,
+                    "height": 450,
                     "width": null,
-                    "attributes": { "visual": "true", "showArtwork": "true", "track": "227042825" }
+                    "attributes": {
+                        "visual": "true",
+                        "showArtwork": "true",
+                        "postID": "330864225",
+                        "embedUrl": "https://w.soundcloud.com/player/?url=https://api.soundcloud.com/playlists/"
+                    }
                 },
-                "loaderData": { "type": "link", "link": "https://soundcloud.com/nymano/solitude", "loaded": true }
+                "loaderData": {
+                    "type": "link",
+                    "link": "https://soundcloud.com/uiceheidd/sets/juicewrld-the-mixtape",
+                    "loaded": true
+                }
             }
         }
     },

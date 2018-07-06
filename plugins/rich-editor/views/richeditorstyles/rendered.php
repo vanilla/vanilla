@@ -84,7 +84,7 @@ $inlineOperations = '[
         }
     },
     {
-        "insert": ".\nSome text with emojis "
+        "insert": ".\nSome text with emojis"
     },
     {
         "insert": {
@@ -180,7 +180,32 @@ $blockOperations = '[
     { "attributes": { "blockquote-line": true }, "insert": "\n" },
     { "attributes": { "strike": true }, "insert": "More blockquote content" },
     { "attributes": { "blockquote-line": true }, "insert": "\n" },
-    { "insert": "\n\n" }
+    { "insert": "\n\n" },
+    { "insert": "Unordered List\nLine 1" },
+    { "attributes": { "list": "bullet" }, "insert": "\n" },
+    { "insert": "Line 2 (2 empty list items after this)" },
+    { "attributes": { "list": "bullet" }, "insert": "\n\n\n" },
+    { "insert": "Line 5 item with " },
+    { "attributes": { "bold": true }, "insert": "bold and a " },
+    { "attributes": { "bold": true, "link": "https://vanillaforums.com" }, "insert": "link" },
+    { "attributes": { "bold": true }, "insert": "." },
+    { "attributes": { "list": "bullet" }, "insert": "\n" },
+    { "insert": "Line 6 item with an emoji" },
+    { "insert": { "emoji": { "emojiChar": "😉" } } },
+    { "insert": "." },
+    { "attributes": { "list": "bullet" }, "insert": "\n" },
+    { "insert": "Ordered List\nNumber 1" },
+    { "attributes": { "list": "ordered" }, "insert": "\n" },
+    { "insert": "Number 2" },
+    { "attributes": { "list": "ordered" }, "insert": "\n" },
+    { "insert": "Number 3 (Empty line below)" },
+    { "attributes": { "list": "ordered" }, "insert": "\n\n" },
+    { "insert": "Number 5 with " },
+    { "attributes": { "bold": true }, "insert": "bold and a " },
+    { "attributes": { "bold": true, "link": "https://vanillaforums.com/" }, "insert": "link" },
+    { "attributes": { "bold": true }, "insert": "." },
+    { "attributes": { "list": "ordered" }, "insert": "\n" },
+    { "insert": "\n" }
 ]'
 ;
 

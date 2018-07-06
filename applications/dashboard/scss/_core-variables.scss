@@ -7,7 +7,7 @@
 $utility-baseUnit                                    : 6px;
 $utility-baseUnitHalf                                : $utility-baseUnit / 2; // Derived
 $utility-baseUnitDouble                              : $utility-baseUnit * 2; // Derived
-$utility-third                                       : #{100% / 3};
+$utility-percentage_third                            : (100% / 3);
 $utility-SVGEncoding                                 : "data:image/svg+xml,";
 
 /* -------------------------------------------------------------- *\
@@ -32,7 +32,10 @@ $global-color_unresolved                             : mix($global-color_warning
 
 $global-body_bg                                      : $global-color_bg !default; // Derived - color outside main content in margins
 
-$global_borderRadius                                 : 2px !default;
+
+$global-border_color                                  : mix($global-color_warning, $global-color_fg, 50%) !default; // Note it's off by default due to the border width
+$global-border-width                                  : 0;
+$global-border_radius                                 : 2px !default;
 
 /* -------------------------------------------------------------- *\
     Password Strength Colors
@@ -76,7 +79,7 @@ $global-small_fontSize                                 : 12px !default;
 $global-normal_fontWeight                              : 400 !default;
 $global-bold_fontWeight                                : 600 !default;
 
-$global-heading_offset                                 : .32em !default; // Offset font to make top of capital letters flush with top of container
+$global-lineHeight_offset                              : .32em !default; // Offset font to make top of capital letters flush with top of container
 
 $global-base_lineHeight                                : (20/14) !default;
 
@@ -105,18 +108,30 @@ $icon-large_size                                     : 32px !default;
     Layout
 \* -------------------------------------------------------------- */
 
-$global-gutter_size                                  : 40px;
+$global-gutter_size                                  : $utility-baseUnit * 4;
+$global-gutter_halfSize                              : $global-gutter_size / 2;
+$global-gutter_quarterSize                           : $global-gutter_size / 4;
 $global-main_width                                   : 1124px !default;
 $global-main_paddedWidth                             : $global-main_width + 2 * $global-gutter_size !default;  // Derived
+$global-panel_width                                  : 226px;
+$global-panelGutter_width                            : 36px;
+
+$global-twoColumn_breakpoint                         : 900; // Generic breakpoint for 2 columns
+
+$panelAndNav-twoColumn_breakpoint                    : $global-main_paddedWidth;
+$panelAndNav-oneColumn_breakpoint                    : $global-twoColumn_breakpoint;
+
+// Hard coded columns
+$evenColumns_breakpoint                              : $global-twoColumn_breakpoint;
+
+// Uses CSS Columns
+$flexColumns-twoColumns_breakToOne                   : $global-twoColumn_breakpoint;
+$flexColumns-threeColumns_breakToTwo                 : $global-twoColumn_breakpoint;
+$flexColumns-threeColumns_breakToOne                 : 500px;
 
 /* -------------------------------------------------------------- *\
     Components
 \* -------------------------------------------------------------- */
-
-$component-spacing                                   : $utility-baseUnit * 3 !default; // Derived
-$component-spacing_half                              : $component-spacing / 2;  // Derived
-$component-spacing_quarter                           : $component-spacing / 4;  // Derived
-
 
 $component_bg                                        : mix($global-color_bg, $global-color_fg, 97%) !default;
 $component-titleBar_bg                               : mix($global-color_bg, $global-color_fg, 93%) !default;
@@ -135,6 +150,69 @@ $component-titleBar_viewMoreColor                    : mix($global-color_bg, $gl
 
 
 /* -------------------------------------------------------------- *\
+    Widgets
+\* -------------------------------------------------------------- */
+
+// Global
+$global-widget_outerPadding                          : $global-gutter_quarterSize;
+$global-widget_innerPadding                          : $global-gutter_quarterSize;
+$global-widgetSection-gap                            : 0; // Between widget sections
+$global-widget_gap                                   : $global-gutter_size; // Between widgets
+$global-widget_bg                                    : transparent;
+$global-widget_fg                                    : $global-color_fg;
+
+$global-widgetBorder_color                           : $global-border_color;
+$global-widgetBorder_width                           : $global-border-width;
+$global-widgetBorder_radius                          : $global-border-radius;
+
+$global-widgetTitle_size                             : $global-subTitle_fontSize;
+$global-widgetSubTitle_size                          : $global-large_fontSize;
+$global-widgetText_size                              : $global-medium_fontSize;
+
+
+// Outer Widget Wrap
+$widget-top_padding                                  : $global-widget_outerPadding;
+$widget-bottom_padding                               : $global-widget_outerPadding;
+$widget-left_padding                                 : $global-widget_outerPadding;
+$widget-right_padding                                : $global-widget_outerPadding;
+
+// Inner section
+$widget-section_topPadding                           : $global-widget_innerPadding;
+$widget-section_bottomPadding                        : $global-widget_innerPadding;
+$widget-section_leftPadding                          : $global-widget_innerPadding;
+$widget-section_rightPadding                         : $global-widget_innerPadding;
+
+// Widget Contents - no padding on this guy, comes from wrapper or sub sections
+$widget-contents_bg                                  : $global-widget_bg;
+
+// Widget Head
+$widget-head_topPadding                              : $widget-section_topPadding;
+$widget-head_rightPadding                            : $widget-section_rightPadding;
+$widget-head_bottomPadding                           : $widget-section_bottomPadding;
+$widget-head_leftPadding                             : $widget-section_leftPadding;
+$widget-head_bg                                      : $global-widget_bg;
+$widget-head_fg                                      : $global-widget_fg;
+$widget-head_gap                                     : $global-widgetSection-gap;  // Bottom Margin
+
+// Widget Body
+$widget-body_topPadding                              : $widget-section_topPadding;
+$widget-body_bottomPadding                           : $widget-section_bottomPadding;
+$widget-body_leftPadding                             : $widget-section_leftPadding;
+$widget-body_rightPadding                            : $widget-section_rightPadding;
+$widget-body_bg                                      : transparent;
+$widget-body_fg                                      : $global-widget_fg;
+
+// Widget Footer
+$widget-footer_topPadding                            : $widget-section_topPadding;
+$widget-footer_bottomPadding                         : $widget-section_bottomPadding;
+$widget-footer_leftPadding                           : $widget-section_leftPadding;
+$widget-footer_rightPadding                          : $widget-section_rightPadding;
+$widget-footer_bg                                    : transparent;
+$widget-footer_fg                                    : $global-widget_fg;
+$widget-footer_gap                                   : $global-widgetSection-gap; // Top Margin
+
+
+/* -------------------------------------------------------------- *\
     Form Elements
 \* -------------------------------------------------------------- */
 
@@ -143,7 +221,7 @@ $global-formElement_borderWidth                      : 1px !default;
 $global-formElement_giantInput_height                : 81px !default;
 $global-formElement_giantInput_fontSize              : $utility-baseUnit * 4 !default; // Derived
 $global-formElement_halfHeight                       : $global-formElement_height / 2 !default; // Derived
-$global-formElement_border_color                     : mix($global-color_fg, $global-color_bg, 24%) !default; // Derived
+$global-formElement_borderColor                     : mix($global-color_fg, $global-color_bg, 24%) !default; // Derived
 $global-formElement_border_widthFull                 : $global-formElement_borderWidth * 2; // Derived
 $global-formElement_horizontalPadding                : $utility-baseUnit * 2 !default; // Derived
 $global-formElement_paddingVertical                  : $utility-baseUnit !default; // Derived
@@ -164,6 +242,7 @@ $global-fileUpload_fg                                : $global-color_white;
 $global-fileUpload_hover_bg                          : mix($global-color_primary, $global-color_fg, 20%);
 
 
+
 /* -------------------------------------------------------------- *\
     Buttons
 \* -------------------------------------------------------------- */
@@ -174,6 +253,7 @@ $global-button_paddingTop                            : 2px !default;
 $global-button_paddingBottom                         : 3px !default;
 $global-button_paddingSide                           : $utility-baseUnit !default;
 $global-button_minWidth                              : 16 * $utility-baseUnit !default; // Derived
+$global-button_radius                                : $global-border_radius;
 
 $buttonBar_margin                                    : $utility-baseUnit * 2; // Derived
 
@@ -241,6 +321,11 @@ $buttonBranded: (
         border-color: $button-primary_focus_border
     )
 );
+
+/* -------------------------------------------------------------- *\
+
+\* -------------------------------------------------------------- */
+
 
 
 ///* -------------------------------------------------------------- *\

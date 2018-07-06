@@ -6,7 +6,6 @@
 
 namespace VanillaTests\APIv2;
 
-use Garden\Web\Exception\ClientException;
 use VanillaTests\Fixtures\Uploader;
 
 /**

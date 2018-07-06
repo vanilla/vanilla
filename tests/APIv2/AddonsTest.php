@@ -2,12 +2,10 @@
 /**
  * @author Todd Burry <todd@vanillaforums.com>
  * @copyright 2009-2018 Vanilla Forums Inc.
- * @license Proprietary
+ * @license GPLv2
  */
 
 namespace VanillaTests\APIv2;
-use Garden\Web\Exception\ClientException;
-use Garden\Web\Exception\HttpException;
 
 /**
  * Tests for the /addons endpoints

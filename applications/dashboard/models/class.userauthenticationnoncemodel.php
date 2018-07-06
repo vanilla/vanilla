@@ -16,11 +16,15 @@ class UserAuthenticationNonceModel extends Gdn_Model {
     protected static $tokenIdentifier = "nonce";
     /**
      * Class constructor. Defines the related database table name.
+     *
+     * @param string $secret The secret used to sign access tokens for the client.
      */
-    public function __construct() {
+    public function __construct($secret = '') {
         parent::__construct('UserAuthenticationNonce');
         $this->setPruneField('Timestamp');
         $this->setPruneAfter('45 minutes');
+        $this->secret = $secret ?: c('Garden.Cookie.Salt');
+        $this->PrimaryKey = 'Nonce';
     }
 
     /**
@@ -32,14 +36,11 @@ class UserAuthenticationNonceModel extends Gdn_Model {
         if (!isset($fields['Timestamp'])) {
             $fields['Timestamp'] = date(MYSQL_DATE_FORMAT);
         }
-        if (empty($fields['Token'])) {
-            $fields['Token'] = $this->randomToken();
-        }
 
         $this->encodeRow($fields);
         parent::insert($fields);
         if (!empty($this->Database->LastInfo['RowCount'])) {
-            $result = $fields['Token'];
+            $result = $fields['Nonce'];
         } else {
             $result = false;
         }
@@ -51,7 +52,8 @@ class UserAuthenticationNonceModel extends Gdn_Model {
      */
     public function update($fields, $where = false, $limit = false) {
         $this->encodeRow($fields);
-        return parent::update($fields, $where, $limit);
+        $result = parent::update($fields, $where, $limit);
+        return $result;
     }
 
     /**
@@ -81,8 +83,16 @@ class UserAuthenticationNonceModel extends Gdn_Model {
             $expireDate = Gdn_Format::toDateTime($this->toTimestamp($expires));
         }
 
+        $token = $this->randomToken();
+        $nonce = $this->signToken($token, $expireDate);
+
+        if (!$nonce) {
+            throw new \Exception("Unable to generate Nonce", 500);
+        }
+
         $token = $this->insert([
-            'Type' => $type,
+            'Nonce' => $nonce,
+            'Token' => $type,
             'Timestamp' => $expireDate,
         ]);
 
@@ -90,9 +100,8 @@ class UserAuthenticationNonceModel extends Gdn_Model {
             throw new Gdn_UserException($this->Validation->resultsText(), 400);
         }
 
-        $Nonce = $this->signToken($token, $expireDate);
 
-        return $Nonce;
+        return $nonce;
     }
 
     /**
@@ -102,9 +111,8 @@ class UserAuthenticationNonceModel extends Gdn_Model {
         $row = $this->getNonce($nonce);
         if ($row) {
             $this->update(
-                ['Timestamp' => '0000-00-00 00:00:00'],
-                ['Nonce' => $nonce],
-                1
+                ['Timestamp' => Gdn_Format::toDateTime($this->toTimestamp('1971-12-31 01:01:01'))],
+                ['Nonce' => $nonce]
             );
         }
     }
@@ -122,9 +130,7 @@ class UserAuthenticationNonceModel extends Gdn_Model {
             return false;
         }
 
-        $token = $this->trim($nonce);
-
-        $row = $this->getToken($token);
+        $row = $this->getNonce($nonce);
 
         if (!$row) {
             return $this->tokenError('The nonce was not found in the database.', 401, $throw);
@@ -142,7 +148,22 @@ class UserAuthenticationNonceModel extends Gdn_Model {
             $this->consume($nonce);
         }
 
-        return $row;
-
+        return true;
     }
+
+
+    /**
+     * Trim the expiry date and signature off of a token.
+     *
+     * @param string $accessToken The access token to trim.
+     */
+    public function trim($accessToken) {
+        if (strpos($accessToken, '.') !== false) {
+            list($_, $token) = explode('.', $accessToken);
+            return $token;
+        }
+        return $accessToken;
+    }
+
+
 }

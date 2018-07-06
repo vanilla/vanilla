@@ -15,7 +15,7 @@ namespace Vanilla;
  */
 trait TokenSigningTrait {
 
-    private $secret;
+    public $secret;
     //protected static $tokenIdentifier = "token";
     /**
      * Get the secret.
@@ -161,6 +161,45 @@ trait TokenSigningTrait {
         }
     }
 
+    /**
+     * Force a value into a timestamp.
+     *
+     * @param mixed $dt A timestamp or date string.
+     * @return false|int
+     */
+    private function toTimestamp($dt) {
+        if (is_numeric($dt)) {
+            return (int)$dt;
+        } elseif ($ts = strtotime($dt)) {
+            return $ts;
+        }
+        return null;
+    }
 
+    /**
+     * Base 64 encode a date.
+     *
+     * @param mixed $dt A timestamp or date string.
+     * @return string Returns the encoded date.
+     */
+    private function encodeDate($dt) {
+        $timestamp = $this->toTimestamp($dt);
+        $result = self::base64urlEncode(pack('I', $timestamp));
+        return $result;
+    }
+
+    /**
+     * Base 64 decode a date.
+     *
+     * @param string $str An encoded date.
+     * @return int Returns a timestamp.
+     */
+    private function decodeDate($str) {
+        $arr = unpack('I*', self::base64urlDecode($str));
+        if (empty($arr[1]) || !is_int($arr[1])) {
+            return null;
+        }
+        return $arr[1];
+    }
 
 }

@@ -248,21 +248,6 @@ class AccessTokenModel extends Gdn_Model {
     }
 
     /**
-     * Force a value into a timestamp.
-     *
-     * @param mixed $dt A timestamp or date string.
-     * @return false|int
-     */
-    private function toTimestamp($dt) {
-        if (is_numeric($dt)) {
-            return (int)$dt;
-        } elseif ($ts = strtotime($dt)) {
-            return $ts;
-        }
-        return null;
-    }
-
-    /**
      * Trim the expiry date and signature off of a token.
      *
      * @param string $accessToken The access token to trim.

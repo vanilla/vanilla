@@ -10,6 +10,7 @@ namespace VanillaTests\Models;
 use VanillaTests\SharedBootstrapTestCase;
 use AccessTokenModel;
 use VanillaTests\SiteTestTrait;
+use Vanilla\TokenSigningTrait;
 
 /**
  * Test the {@link AccessTokenModel}.
@@ -37,8 +38,8 @@ class AccessTokenModelTest extends SharedBootstrapTestCase {
         $model = new AccessTokenModel('sss');
 
         $token = $model->randomSignedToken('last month');
-        $this->assertFalse($model->verifyTokenSignature($token, 'access token'));
-        $this->assertFalse($model->verifyTokenSignature($token, true));
+        $this->assertFalse($model->verifyTokenSignature($token, 'access token', true));
+        $this->assertFalse($model->verifyTokenSignature($token, 'access token', true));
     }
 
     /**
@@ -51,8 +52,8 @@ class AccessTokenModelTest extends SharedBootstrapTestCase {
         $model = new AccessTokenModel('sss');
 
         $token = $model->randomSignedToken().'!';
-        $this->assertFalse($model->verifyTokenSignature($token, 'access token'));
-        $this->assertFalse($model->verifyTokenSignature($token, true));
+        $this->assertFalse($model->verifyTokenSignature($token,'access token', true));
+        $this->assertFalse($model->verifyTokenSignature($token,'access token', true));
     }
 
     /**
@@ -64,8 +65,8 @@ class AccessTokenModelTest extends SharedBootstrapTestCase {
         $model = new AccessTokenModel('sss');
 
         $token = 'a.b.c';
-        $this->assertFalse($model->verifyTokenSignature($token, 'access token'));
-        $this->assertFalse($model->verifyTokenSignature($token, true));
+        $this->assertFalse($model->verifyTokenSignature($token,'access token', true));
+        $this->assertFalse($model->verifyTokenSignature($token,'access token', true));
     }
 
     /**

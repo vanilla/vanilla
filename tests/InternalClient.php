@@ -10,6 +10,7 @@ namespace VanillaTests;
 use Garden\Container\Container;
 use Garden\Http\HttpClient;
 use Garden\Http\HttpResponse;
+use Garden\Web\Exception\HttpException;
 
 class InternalClient extends HttpClient {
 
@@ -116,7 +117,7 @@ class InternalClient extends HttpClient {
                 $message .= "\n".$dataMeta['errorTrace'];
             }
 
-            throw new \Exception($message, $response->getStatusCode());
+            throw HttpException::createFromStatus($response->getStatusCode(), $message, $body);
         }
     }
 

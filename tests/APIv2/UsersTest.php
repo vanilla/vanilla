@@ -6,6 +6,7 @@
 
 namespace VanillaTests\APIv2;
 
+use Garden\Web\Exception\ClientException;
 use VanillaTests\Fixtures\Uploader;
 
 /**
@@ -154,7 +155,8 @@ class UsersTest extends AbstractResourceTest {
      * Test confirm email fails.
      *
      * @expectedException \Exception
-     * @expectedExceptionMessage Validation Failed
+     * @expectedExceptionMessage We couldn't confirm your email.
+     * Check the link in the email we sent you or try sending another confirmation email.
      */
     public function testConfirmEmailFail() {
         /** @var \UserModel $userModel */
@@ -164,7 +166,12 @@ class UsersTest extends AbstractResourceTest {
         $user = $this->testPost();
         $userModel->saveAttribute($user['userID'], 'EmailKey', '123Test');
 
-        $this->api()->post("{$this->baseUrl}/{$user['userID']}/confirm-email", $emailKey);
+        try {
+            $this->api()->post("{$this->baseUrl}/{$user['userID']}/confirm-email", $emailKey);
+        } catch (ClientException $ex) {
+            $data = $ex->jsonSerialize();
+            throw new \Exception($data['errors'][0]['message'], $ex->getCode());
+        }
     }
 
     /**

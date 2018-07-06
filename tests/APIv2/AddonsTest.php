@@ -6,6 +6,8 @@
  */
 
 namespace VanillaTests\APIv2;
+use Garden\Web\Exception\ClientException;
+use Garden\Web\Exception\HttpException;
 
 /**
  * Tests for the /addons endpoints
@@ -164,11 +166,16 @@ class AddonsTest extends AbstractAPIv2Test {
      *
      * @expectedException \Exception
      * @expectedExceptionCode 409
-     * @expectedExceptionMessage Validation Failed
+     * @expectedExceptionMessage Advanced Editor conflicts with: Button Bar.
      */
     public function testConflictingAddons() {
         $this->api()->patch('/addons/buttonbar', ['enabled' => true]);
-        $this->api()->patch('/addons/editor', ['enabled' => true]);
+        try {
+            $this->api()->patch('/addons/editor', ['enabled' => true]);
+        } catch (ClientException $ex) {
+            $data = $ex->jsonSerialize();
+            throw new \Exception($data['errors'][0]['message'], $ex->getCode());
+        }
     }
 
     /**

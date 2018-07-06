@@ -78,7 +78,7 @@ class EmbedManager {
      */
     public function addCoreEmbeds() {
         $dic = \Gdn::getContainer();
-        $this->setDefaultEmbed( $dic->get(LinkEmbed::class))
+        $this->setDefaultEmbed($dic->get(LinkEmbed::class))
             ->addEmbed($dic->get(TwitterEmbed::class))
             ->addEmbed($dic->get(YouTubeEmbed::class))
             ->addEmbed($dic->get(VimeoEmbed::class))

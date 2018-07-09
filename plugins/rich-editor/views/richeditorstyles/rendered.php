@@ -84,7 +84,7 @@ $inlineOperations = '[
         }
     },
     {
-        "insert": ".\nSome text with emojis "
+        "insert": ".\nSome text with emojis"
     },
     {
         "insert": {
@@ -180,7 +180,32 @@ $blockOperations = '[
     { "attributes": { "blockquote-line": true }, "insert": "\n" },
     { "attributes": { "strike": true }, "insert": "More blockquote content" },
     { "attributes": { "blockquote-line": true }, "insert": "\n" },
-    { "insert": "\n\n" }
+    { "insert": "\n\n" },
+    { "insert": "Unordered List\nLine 1" },
+    { "attributes": { "list": "bullet" }, "insert": "\n" },
+    { "insert": "Line 2 (2 empty list items after this)" },
+    { "attributes": { "list": "bullet" }, "insert": "\n\n\n" },
+    { "insert": "Line 5 item with " },
+    { "attributes": { "bold": true }, "insert": "bold and a " },
+    { "attributes": { "bold": true, "link": "https://vanillaforums.com" }, "insert": "link" },
+    { "attributes": { "bold": true }, "insert": "." },
+    { "attributes": { "list": "bullet" }, "insert": "\n" },
+    { "insert": "Line 6 item with an emoji" },
+    { "insert": { "emoji": { "emojiChar": "😉" } } },
+    { "insert": "." },
+    { "attributes": { "list": "bullet" }, "insert": "\n" },
+    { "insert": "Ordered List\nNumber 1" },
+    { "attributes": { "list": "ordered" }, "insert": "\n" },
+    { "insert": "Number 2" },
+    { "attributes": { "list": "ordered" }, "insert": "\n" },
+    { "insert": "Number 3 (Empty line below)" },
+    { "attributes": { "list": "ordered" }, "insert": "\n\n" },
+    { "insert": "Number 5 with " },
+    { "attributes": { "bold": true }, "insert": "bold and a " },
+    { "attributes": { "bold": true, "link": "https://vanillaforums.com/" }, "insert": "link" },
+    { "attributes": { "bold": true }, "insert": "." },
+    { "attributes": { "list": "ordered" }, "insert": "\n" },
+    { "insert": "\n" }
 ]'
 ;
 
@@ -264,8 +289,8 @@ $embedOperations = '[
                     "height": 345,
                     "width": 498,
                     "attributes": {
-                        "id": "yWNq9kdoT4JKdflMolsxPA",
-                        "sig": "yJxnZRDVdZ5UfTK-mE8Qlk-DDPpI-SklyztO21KQSpk=",
+                        "id": "VPkxdgtCQFx-rEo96WtR_g",
+                        "sig": "Mb27fqjaYbaPPFANi1BffcYTEvCcNHg0My7qzCNDSHo=",
                         "items": "810147408",
                         "isCaptioned": "false",
                         "is360": "false",
@@ -363,16 +388,25 @@ $embedOperations = '[
         "insert": {
             "embed-external": {
                 "data": {
-                    "url": "https://soundcloud.com/nymano/solitude",
+                    "url": "https://soundcloud.com/uiceheidd/sets/juicewrld-the-mixtape",
                     "type": "soundcloud",
                     "name": null,
                     "body": null,
                     "photoUrl": null,
-                    "height": 400,
+                    "height": 450,
                     "width": null,
-                    "attributes": { "visual": "true", "showArtwork": "true", "track": "227042825" }
+                    "attributes": {
+                        "visual": "true",
+                        "showArtwork": "true",
+                        "postID": "330864225",
+                        "embedUrl": "https://w.soundcloud.com/player/?url=https://api.soundcloud.com/playlists/"
+                    }
                 },
-                "loaderData": { "type": "link", "link": "https://soundcloud.com/nymano/solitude", "loaded": true }
+                "loaderData": {
+                    "type": "link",
+                    "link": "https://soundcloud.com/uiceheidd/sets/juicewrld-the-mixtape",
+                    "loaded": true
+                }
             }
         }
     },

@@ -48,12 +48,14 @@ class CodePenEmbed extends Embed {
      * @inheritdoc
      */
     public function renderData(array $data): string {
-       $overflowValues = ['visible', 'hidden', 'scroll', 'auto', 'initial', 'inherit'];
+        $overflowValues = ['visible', 'hidden', 'scroll', 'auto', 'initial', 'inherit'];
         $height = $data['height'] ?? "";
         $embedUrl = $data['attributes']['embedUrl'] ?? "";
-        $width = is_numeric($data['attributes']['style']['width']) ? $data['attributes']['style']['width'] : "";
+        $width = $data['attributes']['style']['width'] ?? "";
+        $width = is_numeric($width) ? $width : "";
         $validWidth = ($width >= 1 && $width <= 100) ? $width : 100;
-        $overflow = in_array($data['attributes']['style']['overflow'], $overflowValues) ? $data['attributes']['style']['overflow'] : "";
+        $overflow = $data['attributes']['style']['overflow'] ?? "";
+        $overflow = in_array($overflow, $overflowValues) ? $overflow : "";
         $style = "width: ".$validWidth."%; overflow: ". $overflow.";";
         $id = $data['attributes']['id'];
 

@@ -17,8 +17,7 @@ trait TokenSigningTrait {
      * @var string $secret The secret used to sign the token.
      */
     public $secret;
-
-
+    
     /**
      * Get the secret.
      *

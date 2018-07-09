@@ -12,7 +12,7 @@ import ErrorBlot from "./ErrorBlot";
 import { t } from "@dashboard/application";
 import { logError, capitalizeFirstLetter } from "@dashboard/utility";
 import LoadingBlot from "@rich-editor/quill/blots/embeds/LoadingBlot";
-import { Blot } from "quill/core";
+import Editor from "@rich-editor/components/editor/Editor";
 
 const DATA_KEY = "__embed-data__";
 
@@ -105,7 +105,7 @@ export default class ExternalEmbedBlot extends FocusableEmbedBlot {
     /**
      * Create a successful embed element.
      */
-    public static createEmbedFromData(data: IEmbedData, loaderElement: Element | null): Element {
+    public static createEmbedFromData(data: IEmbedData, loaderElement: Element | null, callback?: () => {}): Element {
         const jsEmbed = FocusableEmbedBlot.create(data);
         jsEmbed.classList.add("js-embed");
         jsEmbed.classList.add("embedResponsive");
@@ -136,9 +136,11 @@ export default class ExternalEmbedBlot extends FocusableEmbedBlot {
         setImmediate(() => {
             void renderEmbed({ root: embedExternal, content: embedExternalContent }, data)
                 .then(() => {
+                    Editor.forceSelectionUpdate();
                     loaderElement && loaderElement.remove();
                 })
                 .catch(e => {
+                    Editor.forceSelectionUpdate();
                     logError(e);
                     const warning = ExternalEmbedBlot.createEmbedWarningFallback(data.url);
                     embedExternal.remove();

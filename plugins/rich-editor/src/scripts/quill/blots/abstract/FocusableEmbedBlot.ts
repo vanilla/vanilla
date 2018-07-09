@@ -117,7 +117,7 @@ export default class FocusableEmbedBlot extends BlockEmbed {
      *
      * This will _NOT_ work before attach() is called.
      */
-    private get quill(): Quill | null {
+    protected get quill(): Quill | null {
         if (!this.scroll || !this.scroll.domNode.parentNode) {
             return null;
         }

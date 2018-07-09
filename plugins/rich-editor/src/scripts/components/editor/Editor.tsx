@@ -21,8 +21,6 @@ import EditorDescriptions from "@rich-editor/components/editor/pieces/EditorDesc
 import { Provider as ReduxProvider } from "react-redux";
 import IState from "@rich-editor/state/IState";
 import { actions } from "@rich-editor/state/instance/instanceActions";
-import uniqueId from "lodash/uniqueId";
-import { Sources } from "quill/core";
 import { getIDForQuill } from "@rich-editor/quill/utility";
 
 interface IProps {
@@ -34,6 +32,15 @@ interface IProps {
 const store = getStore<IState>();
 
 export default class Editor extends React.Component<IProps> {
+    /**
+     * Force a selection update on all quill editors.
+     */
+    public static forceSelectionUpdate() {
+        document.dispatchEvent(new CustomEvent(this.SELECTION_UPDATE));
+    }
+
+    private static SELECTION_UPDATE = "[editor] force selection update";
+
     private hasUploadPermission: boolean;
     private quillMountRef: React.RefObject<HTMLDivElement> = React.createRef();
     private allowPasteListener = true;
@@ -59,7 +66,10 @@ export default class Editor extends React.Component<IProps> {
         this.setupBodyBoxSync();
         this.setupDebugPasteListener();
         store.dispatch(actions.createInstance(this.editorID));
-        this.quill.on(Quill.events.EDITOR_CHANGE, this.onEditorChange);
+        this.quill.on(Quill.events.EDITOR_CHANGE, this.onQuillUpdate);
+
+        // Add a listener for a force selection update.
+        document.addEventListener(Editor.SELECTION_UPDATE, this.onQuillUpdate);
 
         // Once we've created our quill instance we need to force an update to allow all of the quill dependent
         // Modules to render.
@@ -124,8 +134,8 @@ export default class Editor extends React.Component<IProps> {
         );
     }
 
-    private onEditorChange = (type, newDeltaOrSelection, oldDeltaOrSelection, source: Sources) => {
-        if (source !== Quill.sources.SILENT) {
+    private onQuillUpdate = () => {
+        if (this.quill.hasFocus()) {
             store.dispatch(actions.setSelection(this.editorID, this.quill.getSelection()));
         }
     };

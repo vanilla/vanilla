@@ -40,7 +40,7 @@ export default class LoadingBlot extends FocusableEmbedBlot {
     }
 
     /**
-     * Get the value out of a domNode. Also change "loaded" to false.
+     * Get the value out of a domNode.
      */
     public static value(element: Element): IEmbedValue {
         const storedValue = getData(element, LOADER_DATA_KEY, null);

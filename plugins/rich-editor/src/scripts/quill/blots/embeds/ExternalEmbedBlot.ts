@@ -19,7 +19,6 @@ const DATA_KEY = "__embed-data__";
 interface ILoaderData {
     type: "image" | "link";
     link?: string;
-    loaded?: boolean;
 }
 
 interface IEmbedUnloadedValue {
@@ -163,7 +162,6 @@ export default class ExternalEmbedBlot extends FocusableEmbedBlot {
     constructor(domNode, value: IEmbedValue, needsSetup = true) {
         super(domNode);
         if (needsSetup) {
-            value.loaderData.loaded = false;
             void this.replaceLoaderWithFinalForm(value);
         }
     }
@@ -181,10 +179,7 @@ export default class ExternalEmbedBlot extends FocusableEmbedBlot {
             .then(data => {
                 const newValue: IEmbedValue = {
                     data,
-                    loaderData: {
-                        ...value.loaderData,
-                        loaded: true,
-                    },
+                    loaderData: value.loaderData,
                 };
 
                 const loader = this.domNode.querySelector(".embedLinkLoader");
@@ -199,7 +194,10 @@ export default class ExternalEmbedBlot extends FocusableEmbedBlot {
             });
     }
 
-    private resolveDataFromValue(value: IEmbedValue) {
+    /**
+     * Normalize data and dataPromise into Promise<data>
+     */
+    private resolveDataFromValue(value: IEmbedValue): Promise<IEmbedData> {
         if ("data" in value) {
             return Promise.resolve(value.data);
         } else {

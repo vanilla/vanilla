@@ -346,6 +346,13 @@ export function createEditorFlyoutEscapeListener(
 
 const quillIDMap: Map<Quill, string> = new Map();
 
+/**
+ * Generate a unique ID for a quill instance and store it in a Map with that instance.
+ *
+ * This is useful for generating a string key for a given quill instance.
+ *
+ * @param quill The quill instance.
+ */
 export function getIDForQuill(quill: Quill) {
     if (quillIDMap.has(quill)) {
         return quillIDMap.get(quill);

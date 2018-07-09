@@ -105,7 +105,7 @@ export default class ExternalEmbedBlot extends FocusableEmbedBlot {
     /**
      * Create a successful embed element.
      */
-    public static createEmbedFromData(data: IEmbedData, loaderElement: Element | null, callback?: () => {}): Element {
+    public static createEmbedFromData(data: IEmbedData, loaderElement: Element | null): Element {
         const jsEmbed = FocusableEmbedBlot.create(data);
         jsEmbed.classList.add("js-embed");
         jsEmbed.classList.add("embedResponsive");
@@ -153,8 +153,6 @@ export default class ExternalEmbedBlot extends FocusableEmbedBlot {
         return jsEmbed;
     }
 
-    private loadCallback?: () => void;
-
     /**
      * This should only ever be called internally (or through Parchment.create())
      *
@@ -186,10 +184,6 @@ export default class ExternalEmbedBlot extends FocusableEmbedBlot {
             } catch (e) {
                 logError(e);
                 this.replaceWith(new ErrorBlot(ErrorBlot.create(e)));
-                if (this.loadCallback) {
-                    this.loadCallback();
-                    this.loadCallback = undefined;
-                }
                 return;
             }
         }
@@ -207,16 +201,5 @@ export default class ExternalEmbedBlot extends FocusableEmbedBlot {
         setData(embedElement, DATA_KEY, newValue);
         finalBlot = new ExternalEmbedBlot(embedElement, newValue, false);
         this.replaceWith(finalBlot);
-        if (this.loadCallback) {
-            this.loadCallback();
-            this.loadCallback = undefined;
-        }
-    }
-
-    /**
-     * Register a callback for when the blot has been finalized.
-     */
-    public registerLoadCallback(callback: () => void) {
-        this.loadCallback = callback;
     }
 }

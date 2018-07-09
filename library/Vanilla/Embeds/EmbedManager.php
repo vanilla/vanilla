@@ -89,6 +89,7 @@ class EmbedManager {
             ->addEmbed($dic->get(GettyEmbed::class))
             ->addEmbed($dic->get(GiphyEmbed::class))
             ->addEmbed($dic->get(WistiaEmbed::class))
+            ->addEmbed($dic->get(CodePenEmbed::class))
             ->addEmbed($dic->get(ImageEmbed::class), self::PRIORITY_LOW);
     }
 

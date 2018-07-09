@@ -34,7 +34,7 @@ $global-body_bg                                      : $global-color_bg !default
 
 $global-border_color                                  : mix($global-color_warning, $global-color_fg, 50%) !default; // Note it's off by default due to the border width
 $global-border-width                                  : 0;
-$global-border_radius                                 : 2px !default;
+$global_borderRadius                                 : 2px !default;
 
 /* -------------------------------------------------------------- *\
     Password Strength Colors
@@ -126,6 +126,7 @@ $panelAndNav-oneColumn_breakpoint                    : $global-twoColumn_breakpo
 
 // Hard coded columns
 $evenColumns_breakpoint                              : $global-twoColumn_breakpoint;
+$evenColumns-threeColumns-breakToOne                 : $evenColumns_breakpoint;
 
 // Uses CSS Columns
 $flexColumns-twoColumns_breakToOne                   : $global-twoColumn_breakpoint;
@@ -166,7 +167,7 @@ $global-widget_fg                                    : $global-color_fg;
 
 $global-widgetBorder_color                           : $global-border_color;
 $global-widgetBorder_width                           : $global-border-width;
-$global-widgetBorder_radius                          : $global-border-radius;
+$global-widgetBorder_radius                          : $global_borderRadius;
 
 $global-widgetTitle_size                             : $global-subTitle_fontSize;
 $global-widgetSubTitle_size                          : $global-large_fontSize;
@@ -174,6 +175,10 @@ $global-widgetText_size                              : $global-medium_fontSize;
 
 
 // Outer Widget Wrap
+$widget_borderColor                                  : $global-widgetBorder_color;
+$widget_borderWidth                                  : 0;
+$widget_borderRadius                                 : $global-widgetBorder_radius;
+
 $widget-top_padding                                  : $global-widget_outerPadding;
 $widget-bottom_padding                               : $global-widget_outerPadding;
 $widget-left_padding                                 : $global-widget_outerPadding;
@@ -196,6 +201,18 @@ $widget-head_leftPadding                             : $widget-section_leftPaddi
 $widget-head_bg                                      : $global-widget_bg;
 $widget-head_fg                                      : $global-widget_fg;
 $widget-head_gap                                     : $global-widgetSection-gap;  // Bottom Margin
+$widget-head_borderColor                             : $global-widgetBorder_color;
+$widget-head_borderWidth                             : 0;
+$widget-head_borderRadius                            : $global-widgetBorder_radius;
+
+
+// "Main" (body and footer)
+$widget-main_bg                                      : transparent;
+$widget-main_fg                                      : transparent;
+$widget-main_borderColor                             : $global-widgetBorder_color;
+$widget-main_borderWidth                             : 0;
+$widget-main_borderRadius                            : $global-widgetBorder_radius;
+
 
 // Widget Body
 $widget-body_topPadding                              : $widget-section_topPadding;
@@ -204,6 +221,9 @@ $widget-body_leftPadding                             : $widget-section_leftPaddi
 $widget-body_rightPadding                            : $widget-section_rightPadding;
 $widget-body_bg                                      : transparent;
 $widget-body_fg                                      : $global-widget_fg;
+$widget-body_borderColor                             : $global-widgetBorder_color;
+$widget-body_borderWidth                             : 0;
+$widget-body_borderRadius                            : $global-widgetBorder_radius;
 
 // Widget Footer
 $widget-footer_topPadding                            : $widget-section_topPadding;
@@ -213,7 +233,9 @@ $widget-footer_rightPadding                          : $widget-section_rightPadd
 $widget-footer_bg                                    : transparent;
 $widget-footer_fg                                    : $global-widget_fg;
 $widget-footer_gap                                   : $global-widgetSection-gap; // Top Margin
-
+$widget-footer_borderColor                           : $global-widgetBorder_color;
+$widget-footer_borderWidth                           : 0;
+$widget-footer_borderRadius                          : $global-widgetBorder_radius;
 
 /* -------------------------------------------------------------- *\
     Form Elements
@@ -222,7 +244,7 @@ $widget-footer_gap                                   : $global-widgetSection-gap
 $formElement_height                                  : $utility-baseUnit * 6 !default; // Derived
 $formElement_borderWidth                             : 1px !default;
 $formElement_borderColor                             : mix($global-color_fg, $global-color_bg, 24%) !default; // Derived
-$formElement_borderRadius                            : $global-border_radius !default;
+$formElement_borderRadius                            : $global_borderRadius !default;
 $formElement_giantInput_height                       : 51px !default;
 $formElement_giantInput_fontSize                     : $utility-baseUnit * 4 !default; // Derived
 $formElement_halfHeight                              : $formElement_height / 2 !default; // Derived
@@ -257,7 +279,7 @@ $global-button_paddingTop                            : 2px !default;
 $global-button_paddingBottom                         : 3px !default;
 $global-button_paddingSide                           : $utility-baseUnit !default;
 $global-button_minWidth                              : 16 * $utility-baseUnit !default; // Derived
-$global-button_radius                                : $global-border_radius;
+$global-button_radius                                : $global_borderRadius;
 
 $buttonBar_margin                                    : $utility-baseUnit * 2; // Derived
 

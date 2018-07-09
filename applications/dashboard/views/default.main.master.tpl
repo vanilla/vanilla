@@ -1,7 +1,7 @@
 {extends file="default.master.tpl"}
 {block name="_body"}
     <div id="Body">
-        <div class="_container">
+        <div class="_container _container-breadcrumb">
             <div class="breadcrumbsWrapper">{breadcrumbs}</div>
         </div>
         <div class="_pageContents">

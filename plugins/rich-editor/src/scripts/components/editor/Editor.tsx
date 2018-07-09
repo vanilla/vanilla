@@ -21,7 +21,7 @@ import EditorDescriptions from "@rich-editor/components/editor/pieces/EditorDesc
 import { Provider as ReduxProvider } from "react-redux";
 import IState from "@rich-editor/state/IState";
 import { actions } from "@rich-editor/state/instance/instanceActions";
-import { getIDForQuill, isEmbedSelected } from "@rich-editor/quill/utility";
+import { getIDForQuill, isEmbedSelected, SELECTION_UPDATE } from "@rich-editor/quill/utility";
 import { FOCUS_CLASS } from "@dashboard/embeds";
 
 interface IProps {
@@ -33,15 +33,6 @@ interface IProps {
 const store = getStore<IState>();
 
 export default class Editor extends React.Component<IProps> {
-    /**
-     * Force a selection update on all quill editors.
-     */
-    public static forceSelectionUpdate() {
-        document.dispatchEvent(new CustomEvent(this.SELECTION_UPDATE));
-    }
-
-    private static SELECTION_UPDATE = "[editor] force selection update";
-
     private hasUploadPermission: boolean;
     private quillMountRef: React.RefObject<HTMLDivElement> = React.createRef();
     private allowPasteListener = true;
@@ -70,7 +61,7 @@ export default class Editor extends React.Component<IProps> {
         this.quill.on(Quill.events.EDITOR_CHANGE, this.onQuillUpdate);
 
         // Add a listener for a force selection update.
-        document.addEventListener(Editor.SELECTION_UPDATE, this.onQuillUpdate);
+        document.addEventListener(SELECTION_UPDATE, this.onQuillUpdate);
 
         // Once we've created our quill instance we need to force an update to allow all of the quill dependent
         // Modules to render.

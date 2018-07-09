@@ -395,3 +395,12 @@ export function isEmbedSelected(quill: Quill, selection?: RangeStatic | null) {
     const potentialEmbedBlot = getBlotAtIndex(quill, selection.index, FocusableEmbedBlot);
     return !!potentialEmbedBlot;
 }
+
+/**
+ * Force a selection update on all quill editors.
+ */
+export function forceSelectionUpdate() {
+    document.dispatchEvent(new CustomEvent(this.SELECTION_UPDATE));
+}
+
+export const SELECTION_UPDATE = "[editor] force selection update";

@@ -5,7 +5,7 @@
  */
 
 import * as utility from "./utility";
-import Quill from "../quill";
+import Quill from "@rich-editor/quill";
 import { expect } from "chai";
 import { getIDForQuill, insertBlockBlotAt } from "./utility";
 import Parchment from "parchment";

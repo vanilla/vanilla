@@ -210,7 +210,8 @@ $blockOperations = '[
 ;
 
 $embedOperations = '[
-    { "insert": "### Imgur: \n\n\n" },
+    { "insert": "Imgur:" },
+    { "attributes": { "header": 2 }, "insert": "\n" },
     {
         "insert": {
             "embed-external": {
@@ -228,7 +229,8 @@ $embedOperations = '[
             }
         }
     },
-    { "insert": "\n\n### Image:\n\n\n" },
+    { "insert": "Image:" },
+    { "attributes": { "header": 2 }, "insert": "\n" },
     {
         "insert": {
             "embed-external": {
@@ -253,7 +255,8 @@ $embedOperations = '[
             }
         }
     },
-    { "insert": "\n\n### Twitter:\n\n\n" },
+    { "insert": "Twitter:" },
+    { "attributes": { "header": 2 }, "insert": "\n" },
     {
         "insert": {
             "embed-external": {
@@ -275,7 +278,8 @@ $embedOperations = '[
             }
         }
     },
-    { "insert": "\n\n### Getty:\n\n\n" },
+    { "insert": "Getty:" },
+    { "attributes": { "header": 2 }, "insert": "\n" },
     {
         "insert": {
             "embed-external": {
@@ -307,7 +311,8 @@ $embedOperations = '[
             }
         }
     },
-    { "insert": "\n\n### Vimeo:\n\n" },
+    { "insert": "Vimeo:" },
+    { "attributes": { "header": 2 }, "insert": "\n" },
     {
         "insert": {
             "embed-external": {
@@ -329,7 +334,8 @@ $embedOperations = '[
             }
         }
     },
-    { "insert": "\n\n### Youtube:\n\n" },
+    { "insert": "Youtube:" },
+    { "attributes": { "header": 2 }, "insert": "\n" },
     {
         "insert": {
             "embed-external": {
@@ -357,7 +363,8 @@ $embedOperations = '[
             }
         }
     },
-    { "insert": "\n\n### Instagram:\n\n" },
+    { "insert": "Instagram:" },
+    { "attributes": { "header": 2 }, "insert": "\n" },
     {
         "insert": {
             "embed-external": {
@@ -383,7 +390,8 @@ $embedOperations = '[
             }
         }
     },
-    { "insert": "\n\n### Soundcloud:\n\n" },
+    { "insert": "Soundcloud:" },
+    { "attributes": { "header": 2 }, "insert": "\n" },
     {
         "insert": {
             "embed-external": {
@@ -410,7 +418,8 @@ $embedOperations = '[
             }
         }
     },
-    { "insert": "\n\n### Giphy:\n\n" },
+    { "insert": "Giphy:" },
+    { "attributes": { "header": 2 }, "insert": "\n" },
     {
         "insert": {
             "embed-external": {
@@ -432,7 +441,8 @@ $embedOperations = '[
             }
         }
     },
-    { "insert": "\n\n### Twitch:\n\n" },
+    { "insert": "Twitch:" },
+    { "attributes": { "header": 2 }, "insert": "\n" },
     {
         "insert": {
             "embed-external": {
@@ -451,7 +461,8 @@ $embedOperations = '[
             }
         }
     },
-    { "insert": "\n\n### Regular Image Embed:\n\n" },
+    { "insert": "External No Image" },
+    { "attributes": { "header": 2 }, "insert": "\n" },
     {
         "insert": {
             "embed-external": {
@@ -473,7 +484,8 @@ $embedOperations = '[
             }
         }
     },
-    { "insert": "\n ( no image)\n\n\n" },
+    { "insert": "Exernal With Image" },
+    { "attributes": { "header": 2 }, "insert": "\n" },
     {
         "insert": {
             "embed-external": {
@@ -492,7 +504,8 @@ $embedOperations = '[
             }
         }
     },
-    { "insert": "\n \n(with image)\n\n### Wistia:\n\n" },
+    { "insert": "Wistia:" },
+    { "attributes": { "header": 2 }, "insert": "\n" },
     {
         "insert": {
             "embed-external": {
@@ -516,7 +529,7 @@ $embedOperations = '[
             }
         }
     },
-    { "insert": "\n\n\n" },
+    { "insert": "" },
     {
         "insert": {
             "embed-external": {
@@ -544,7 +557,7 @@ $embedOperations = '[
             }
         }
     },
-    { "insert": "\n\n\n\n\n\n\n\n\n\n\n" }
+    { "insert": "\n" }
 ]';
 
 echo "<div class='Item-Body'><div class='Message userContent'>";

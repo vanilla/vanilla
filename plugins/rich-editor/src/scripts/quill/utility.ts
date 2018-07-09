@@ -11,6 +11,7 @@ import Delta from "quill-delta";
 import Parchment from "parchment";
 import { matchAtMention } from "@dashboard/utility";
 import uniqueId from "lodash/uniqueId";
+import FocusableEmbedBlot from "@rich-editor/quill/blots/abstract/FocusableEmbedBlot";
 
 interface IBoundary {
     start: number;
@@ -382,4 +383,15 @@ export function insertBlockBlotAt(quill: Quill, index: number, blot: Blot) {
     const lineOffset = line.offset(quill.scroll);
     const ref = line.split(index - lineOffset);
     line.parent.insertBefore(blot, ref || undefined);
+}
+
+/**
+ * Determine if and Embed inside of this class is focused.
+ */
+export function isEmbedSelected(quill: Quill, selection?: RangeStatic | null) {
+    if (!selection) {
+        return false;
+    }
+    const potentialEmbedBlot = getBlotAtIndex(quill, selection.index, FocusableEmbedBlot);
+    return !!potentialEmbedBlot;
 }

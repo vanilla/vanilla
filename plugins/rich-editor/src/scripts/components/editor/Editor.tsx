@@ -21,7 +21,7 @@ import EditorDescriptions from "@rich-editor/components/editor/pieces/EditorDesc
 import { Provider as ReduxProvider } from "react-redux";
 import IState from "@rich-editor/state/IState";
 import { actions } from "@rich-editor/state/instance/instanceActions";
-import { getIDForQuill } from "@rich-editor/quill/utility";
+import { getIDForQuill, isEmbedSelected } from "@rich-editor/quill/utility";
 import { FOCUS_CLASS } from "@dashboard/embeds";
 
 interface IProps {
@@ -136,19 +136,8 @@ export default class Editor extends React.Component<IProps> {
     }
 
     private onQuillUpdate = () => {
-        if (this.quill.hasFocus() || this.isEmbedFocused) {
-            store.dispatch(actions.setSelection(this.editorID, this.quill.getSelection()));
-        }
+        store.dispatch(actions.setSelection(this.editorID, this.quill.getSelection()));
     };
-
-    /**
-     * Determine if and Embed inside of this class is focused.
-     */
-    private get isEmbedFocused() {
-        return (
-            document.activeElement.classList.contains(FOCUS_CLASS) && this.quill.root.contains(document.activeElement)
-        );
-    }
 
     /**
      * Synchronization from quill's contents to the bodybox for legacy contexts.

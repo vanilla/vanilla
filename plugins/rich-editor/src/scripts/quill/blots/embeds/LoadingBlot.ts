@@ -49,13 +49,7 @@ export default class LoadingBlot extends FocusableEmbedBlot {
             throw new Error("A loading blot should have data set");
         }
 
-        return {
-            ...storedValue,
-            loaderData: {
-                ...storedValue.loaderData,
-                loaded: false,
-            },
-        };
+        return storedValue;
     }
 
     /**

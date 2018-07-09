@@ -163,43 +163,47 @@ export default class ExternalEmbedBlot extends FocusableEmbedBlot {
     constructor(domNode, value: IEmbedValue, needsSetup = true) {
         super(domNode);
         if (needsSetup) {
+            value.loaderData.loaded = false;
             void this.replaceLoaderWithFinalForm(value);
         }
     }
+
     /**
      * Replace the embed's loader with it's final state. This could take the form of a registered embed,
      * or an error state.
      *
      * @see @dashboard/embeds
      */
-    public async replaceLoaderWithFinalForm(value: IEmbedValue) {
+    public replaceLoaderWithFinalForm(value: IEmbedValue) {
         let finalBlot: ExternalEmbedBlot | ErrorBlot;
 
-        let data: IEmbedData | null = null;
-        if ("data" in value) {
-            data = value.data;
-        } else {
-            try {
-                data = await value.dataPromise;
-            } catch (e) {
+        this.resolveDataFromValue(value)
+            .then(data => {
+                const newValue: IEmbedValue = {
+                    data,
+                    loaderData: {
+                        ...value.loaderData,
+                        loaded: true,
+                    },
+                };
+
+                const loader = this.domNode.querySelector(".embedLinkLoader");
+                const embedElement = ExternalEmbedBlot.createEmbedFromData(data, loader);
+                setData(embedElement, DATA_KEY, newValue);
+                finalBlot = new ExternalEmbedBlot(embedElement, newValue, false);
+                this.replaceWith(finalBlot);
+            })
+            .catch(e => {
                 logError(e);
                 this.replaceWith(new ErrorBlot(ErrorBlot.create(e)));
-                return;
-            }
+            });
+    }
+
+    private resolveDataFromValue(value: IEmbedValue) {
+        if ("data" in value) {
+            return Promise.resolve(value.data);
+        } else {
+            return value.dataPromise;
         }
-
-        const newValue: IEmbedValue = {
-            data,
-            loaderData: {
-                ...value.loaderData,
-                loaded: true,
-            },
-        };
-
-        const loader = this.domNode.querySelector(".embedLinkLoader");
-        const embedElement = ExternalEmbedBlot.createEmbedFromData(data, loader);
-        setData(embedElement, DATA_KEY, newValue);
-        finalBlot = new ExternalEmbedBlot(embedElement, newValue, false);
-        this.replaceWith(finalBlot);
     }
 }

@@ -99,8 +99,14 @@ export function rangeContainsBlot(quill: Quill, blotConstructor: any, range: Ran
     if (!range) {
         return false;
     }
-    const blots = quill.scroll.descendants(blotConstructor, range.index, range.length);
-    return blots.length > 0;
+
+    if (range.length > 0) {
+        const blots = quill.scroll.descendants(blotConstructor, range.index, range.length);
+        return blots.length > 0;
+    } else {
+        const blot = quill.scroll.descendant(blotConstructor, range.index);
+        return !!blot;
+    }
 }
 
 /**

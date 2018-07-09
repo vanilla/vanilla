@@ -7,6 +7,11 @@
 import ClipboardBase from "quill/modules/clipboard";
 import Delta from "quill-delta";
 import Quill, { DeltaStatic } from "quill/core";
+import { rangeContainsBlot, getIDForQuill } from "@rich-editor/quill/utility";
+import CodeBlockBlot from "@rich-editor/quill/blots/blocks/CodeBlockBlot";
+import CodeBlot from "@rich-editor/quill/blots/inline/CodeBlot";
+import IState from "@rich-editor/state/IState";
+import getStore from "@dashboard/state/getStore";
 
 export default class ClipboardModule extends ClipboardBase {
     /**
@@ -83,21 +88,26 @@ export default class ClipboardModule extends ClipboardBase {
     /**
      * A matcher to turn a pasted links into real links.
      */
-    private linkMatcher = (node: Node, delta: DeltaStatic) => {
-        if (node.nodeType !== Node.TEXT_NODE) {
-            return;
-        }
-
+    public linkMatcher = (node: Node, delta: DeltaStatic) => {
         const { textContent } = node;
-        if (textContent == null) {
-            return;
-        }
-
-        const splitOps = ClipboardModule.splitLinkOperationsOutOfText(textContent);
-        if (splitOps) {
-            delta.ops = splitOps;
+        if (node.nodeType === Node.TEXT_NODE && textContent != null && !this.inCodeFormat) {
+            const splitOps = ClipboardModule.splitLinkOperationsOutOfText(textContent);
+            if (splitOps) {
+                delta.ops = splitOps;
+            }
         }
 
         return delta;
     };
+
+    /**
+     * Determine if we are in a code formatted item or not.
+     */
+    private get inCodeFormat() {
+        const selection = getStore<IState>().getState().editor.instances[getIDForQuill(this.quill)].lastGoodSelection;
+        return (
+            rangeContainsBlot(this.quill, CodeBlockBlot, selection) ||
+            rangeContainsBlot(this.quill, CodeBlot, selection)
+        );
+    }
 }

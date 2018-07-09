@@ -6,12 +6,16 @@
 
 import { IEditorInstanceState, IEditorInstance } from "@rich-editor/state/IState";
 import * as instanceActions from "./instanceActions";
-import uniqueId from "lodash/uniqueId";
+
+const defaultSelection = {
+    index: 0,
+    length: 0,
+};
 
 export const initialState: IEditorInstanceState = {};
 export const defaultInstance: IEditorInstance = {
-    currentSelection: null,
-    lastGoodSelection: null,
+    currentSelection: defaultSelection,
+    lastGoodSelection: defaultSelection,
 };
 
 /**

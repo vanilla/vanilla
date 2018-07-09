@@ -162,6 +162,31 @@ trait TokenSigningTrait {
     }
 
     /**
+     * Unserialize a row from the database for API consumption.
+     *
+     * @param array &$row The row to decode.
+     */
+    protected function decodeRow(&$row) {
+        $isObject = false;
+        if (is_object($row) && !$row instanceof ArrayAccess) {
+            $isObject = true;
+            $row = (array)$row;
+        }
+
+        $row['InsertIPAddress'] = ipDecode($row['InsertIPAddress']);
+
+        foreach (['Scope', 'Attributes'] as $field) {
+            if (isset($row[$field]) && is_string($row[$field])) {
+                $row[$field] = json_decode($row[$field], true);
+            }
+        }
+
+        if ($isObject) {
+            $row = (object)$row;
+        }
+    }
+
+    /**
      * Force a value into a timestamp.
      *
      * @param mixed $dt A timestamp or date string.
@@ -201,5 +226,29 @@ trait TokenSigningTrait {
         }
         return $arr[1];
     }
+
+    /**
+     * Generate and sign a token.
+     *
+     * @param string $expires When the token expires.
+     * @return string
+     */
+    public function randomSignedToken($expires = '2 months') {
+        return $this->signToken($this->randomToken(), $expires);
+    }
+
+    /**
+     * Trim the expiry date and signature off of a token.
+     *
+     * @param string $accessToken The access token to trim.
+     */
+    public function trim($accessToken) {
+        if (strpos($accessToken, '.') !== false) {
+            list($_, $token) = explode('.', $accessToken);
+            return $token;
+        }
+        return $accessToken;
+    }
+
 
 }

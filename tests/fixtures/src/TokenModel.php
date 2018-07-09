@@ -13,8 +13,12 @@ use Vanilla\TokenSigningTrait;
 class TokenModel {
 
     use TokenSigningTrait;
-    private $token = "va.7yE_QzDEbXDqcFkjohNor9ZnB9qgnv8a.Kbw_Ww.JbenMOl";
+    public $token = "va.7yE_QzDEbXDqcFkjohNor9ZnB9qgnv8a.Kbw_Ww.JbenMOl";
     public $tokenIdentifier;
+    public $secret;
 
+    public function __construct($secret = '') {
+        $this->secret = 'sss';
+    }
 
 }

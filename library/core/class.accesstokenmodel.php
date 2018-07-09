@@ -112,31 +112,6 @@ class AccessTokenModel extends Gdn_Model {
     }
 
     /**
-     * Unserialize a row from the database for API consumption.
-     *
-     * @param array &$row The row to decode.
-     */
-    protected function decodeRow(&$row) {
-        $isObject = false;
-        if (is_object($row) && !$row instanceof ArrayAccess) {
-            $isObject = true;
-            $row = (array)$row;
-        }
-
-        $row['InsertIPAddress'] = ipDecode($row['InsertIPAddress']);
-
-        foreach (['Scope', 'Attributes'] as $field) {
-            if (isset($row[$field]) && is_string($row[$field])) {
-                $row[$field] = json_decode($row[$field], true);
-            }
-        }
-
-        if ($isObject) {
-            $row = (object)$row;
-        }
-    }
-
-    /**
      * {@inheritdoc}
      */
     public function insert($fields) {
@@ -173,16 +148,6 @@ class AccessTokenModel extends Gdn_Model {
         }
         $this->encodeRow($property);
         parent::setField($rowID, $property);
-    }
-
-    /**
-     * Generate and sign a token.
-     *
-     * @param string $expires When the token expires.
-     * @return string
-     */
-    public function randomSignedToken($expires = '2 months') {
-        return $this->signToken($this->randomToken(), $expires);
     }
 
     /**
@@ -235,30 +200,6 @@ class AccessTokenModel extends Gdn_Model {
         return $row;
     }
 
-    /**
-     * Base 64 encode a date.
-     *
-     * @param mixed $dt A timestamp or date string.
-     * @return string Returns the encoded date.
-     */
-    private function encodeDate($dt) {
-        $timestamp = $this->toTimestamp($dt);
-        $result = self::base64urlEncode(pack('I', $timestamp));
-        return $result;
-    }
-
-    /**
-     * Trim the expiry date and signature off of a token.
-     *
-     * @param string $accessToken The access token to trim.
-     */
-    public function trim($accessToken) {
-        if (strpos($accessToken, '.') !== false) {
-            list($_, $token) = explode('.', $accessToken);
-            return $token;
-        }
-        return $accessToken;
-    }
 
     /**
      * {@inheritdoc}
@@ -269,22 +210,6 @@ class AccessTokenModel extends Gdn_Model {
 
         return $result;
     }
-
-    /**
-     * Base 64 decode a date.
-     *
-     * @param string $str An encoded date.
-     * @return int Returns a timestamp.
-     */
-    private function decodeDate($str) {
-        $arr = unpack('I*', self::base64urlDecode($str));
-        if (empty($arr[1]) || !is_int($arr[1])) {
-            return null;
-        }
-        return $arr[1];
-    }
-
-
 
     /**
      * Save an attribute on an access token row.

@@ -17,57 +17,6 @@ use VanillaTests\SiteTestTrait;
 class UserAuthenticationNonceModelTest extends SharedBootstrapTestCase {
     use SiteTestTrait;
 
-//    /**
-//     * A newly issued token should verify.
-//     */
-//    public function testVerifyRandomTokenSignature() {
-//        $model = new AccessTokenModel('sss');
-//
-//        $token = $model->randomSignedToken();
-//        $this->assertTrue($model->verifyTokenSignature($token, 'access token'));
-//    }
-//
-//    /**
-//     * An expired token shouldn't verify.
-//     *
-//     * @expectedException \Exception
-//     * @expectedExceptionMessage Your access token has expired.
-//     */
-//    public function testExpiryDate() {
-//        $model = new AccessTokenModel('sss');
-//
-//        $token = $model->randomSignedToken('last month');
-//        $this->assertFalse($model->verifyTokenSignature($token, 'access token', true));
-//        $this->assertFalse($model->verifyTokenSignature($token, 'access token', true));
-//    }
-//
-//    /**
-//     * An altered token signature shouldn't verify.
-//     *
-//     * @expectedException \Exception
-//     * $expectedExceptionMessage Invalid signature.
-//     */
-//    public function testBadSignature() {
-//        $model = new AccessTokenModel('sss');
-//
-//        $token = $model->randomSignedToken().'!';
-//        $this->assertFalse($model->verifyTokenSignature($token,'access token', true));
-//        $this->assertFalse($model->verifyTokenSignature($token,'access token', true));
-//    }
-//
-//    /**
-//     * A nonsense token shouldn't verify.
-//     *
-//     * @expectedException \Exception
-//     */
-//    public function testBadToken() {
-//        $model = new AccessTokenModel('sss');
-//
-//        $token = 'a.b.c';
-//        $this->assertFalse($model->verifyTokenSignature($token,'access token', true));
-//        $this->assertFalse($model->verifyTokenSignature($token,'access token', true));
-//    }
-
     /**
      * Test nonce is issued and verified
      */
@@ -84,7 +33,7 @@ class UserAuthenticationNonceModelTest extends SharedBootstrapTestCase {
         $model->consume($issuedNonce);
         $consumedNonce = $model->getNonce($issuedNonce);
 
-        $this->assertEquals("1971-12-31 01:01:01", $consumedNonce['Timestamp']);
+        $this->assertEquals("1971-01-01 00:00:01", $consumedNonce['Timestamp']);
     }
 
 

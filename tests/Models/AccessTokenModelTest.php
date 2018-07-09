@@ -10,64 +10,12 @@ namespace VanillaTests\Models;
 use VanillaTests\SharedBootstrapTestCase;
 use AccessTokenModel;
 use VanillaTests\SiteTestTrait;
-use Vanilla\TokenSigningTrait;
 
 /**
  * Test the {@link AccessTokenModel}.
  */
 class AccessTokenModelTest extends SharedBootstrapTestCase {
     use SiteTestTrait;
-
-    /**
-     * A newly issued token should verify.
-     */
-    public function testVerifyRandomTokenSignature() {
-        $model = new AccessTokenModel('sss');
-
-        $token = $model->randomSignedToken();
-        $this->assertTrue($model->verifyTokenSignature($token, 'access token'));
-    }
-
-    /**
-     * An expired token shouldn't verify.
-     *
-     * @expectedException \Exception
-     * @expectedExceptionMessage Your access token has expired.
-     */
-    public function testExpiryDate() {
-        $model = new AccessTokenModel('sss');
-
-        $token = $model->randomSignedToken('last month');
-        $this->assertFalse($model->verifyTokenSignature($token, 'access token', true));
-        $this->assertFalse($model->verifyTokenSignature($token, 'access token', true));
-    }
-
-    /**
-     * An altered token signature shouldn't verify.
-     *
-     * @expectedException \Exception
-     * $expectedExceptionMessage Invalid signature.
-     */
-    public function testBadSignature() {
-        $model = new AccessTokenModel('sss');
-
-        $token = $model->randomSignedToken().'!';
-        $this->assertFalse($model->verifyTokenSignature($token,'access token', true));
-        $this->assertFalse($model->verifyTokenSignature($token,'access token', true));
-    }
-
-    /**
-     * A nonsense token shouldn't verify.
-     *
-     * @expectedException \Exception
-     */
-    public function testBadToken() {
-        $model = new AccessTokenModel('sss');
-
-        $token = 'a.b.c';
-        $this->assertFalse($model->verifyTokenSignature($token,'access token', true));
-        $this->assertFalse($model->verifyTokenSignature($token,'access token', true));
-    }
 
     /**
      * An access token should verify after being issued.

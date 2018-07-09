@@ -85,7 +85,6 @@ class UserAuthenticationNonceModel extends Gdn_Model {
 
         $token = $this->randomToken();
         $nonce = $this->signToken($token, $expireDate);
-
         if (!$nonce) {
             throw new \Exception("Unable to generate Nonce", 500);
         }
@@ -100,7 +99,6 @@ class UserAuthenticationNonceModel extends Gdn_Model {
             throw new Gdn_UserException($this->Validation->resultsText(), 400);
         }
 
-
         return $nonce;
     }
 
@@ -111,7 +109,7 @@ class UserAuthenticationNonceModel extends Gdn_Model {
         $row = $this->getNonce($nonce);
         if ($row) {
             $this->update(
-                ['Timestamp' => Gdn_Format::toDateTime($this->toTimestamp('1971-12-31 01:01:01'))],
+                ['Timestamp' => Gdn_Format::toDateTime($this->toTimestamp('1971-01-01 00:00:01'))],
                 ['Nonce' => $nonce]
             );
         }
@@ -124,21 +122,20 @@ class UserAuthenticationNonceModel extends Gdn_Model {
      * @return bool
      * @throws Exception
      */
-    public function verify(string $nonce = '', bool $consume = true, bool $throw = false) {
+    public function verify(string $nonce = '', bool $consume = true, bool $throw = false): bool {
         // First verify the token without going to the database.
         if (!$this->verifyTokenSignature($nonce, self::$tokenIdentifier, $throw)) {
             return false;
         }
 
         $row = $this->getNonce($nonce);
-
         if (!$row) {
             return $this->tokenError('The nonce was not found in the database.', 401, $throw);
         }
 
         // Check the expiry date from the database.
         $dbExpires = $this->toTimestamp($row['Timestamp']);
-        if ($dbExpires === '0000-00-00 00:00:00') {
+        if ($dbExpires === '1971-01-01 00:00:01') {
             return $this->tokenError('Nonce was already used.', 401, $throw);
         } elseif ($dbExpires < time()) {
             return $this->tokenError('Nonce has expired.', 401, $throw);
@@ -150,20 +147,5 @@ class UserAuthenticationNonceModel extends Gdn_Model {
 
         return true;
     }
-
-
-    /**
-     * Trim the expiry date and signature off of a token.
-     *
-     * @param string $accessToken The access token to trim.
-     */
-    public function trim($accessToken) {
-        if (strpos($accessToken, '.') !== false) {
-            list($_, $token) = explode('.', $accessToken);
-            return $token;
-        }
-        return $accessToken;
-    }
-
 
 }

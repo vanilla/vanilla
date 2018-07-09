@@ -338,7 +338,8 @@ export default class KeyboardBindings {
         }
 
         // Bail out if the blot contents are not plian text.
-        if ((line as BlockBlot).children.length > 1 || (line as any).children.head.statics.blotName !== "text") {
+        const firstBlotName = (line as any).children.head.statics.blotName;
+        if ((line as BlockBlot).children.length > 1 || !["text", "link"].includes(firstBlotName)) {
             return true;
         }
 

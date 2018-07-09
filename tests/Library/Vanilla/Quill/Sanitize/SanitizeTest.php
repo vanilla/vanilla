@@ -9,32 +9,28 @@ namespace VanillaTests\Library\Vanilla\Quill\Sanitize;
 use Exception;
 use Gdn;
 use PHPUnit\Framework\TestCase;
+use Vanilla\Quill\Parser;
 use Vanilla\Quill\Renderer;
 use VanillaTests\BootstrapTrait;
 
 abstract class SanitizeTest extends TestCase {
     use BootstrapTrait;
 
-    /**
-     * @param string $content
-     * @return array
-     */
     abstract protected function insertContentOperations(string $content): array;
 
     /**
-     * Get the shared renderer instance.
+     * Render a given set of operations.
      *
-     * @return Renderer
-     * @throws Exception if unable to retrieve an instance of the renderer.
+     * @param array $ops The operations to render.
+     *
+     * @throws \Garden\Container\ContainerException
+     * @throws \Garden\Container\NotFoundException
      */
-    protected function getRenderer(): Renderer {
-        $class = Renderer::class;
-        try {
-            $renderer = Gdn::getContainer()->get($class);
-        } catch (Exception $e) {
-            throw new Exception("Unable to retrieve an instance of {$class}");
-        }
-        return $renderer;
+    protected function render(array $ops): string {
+        $renderer = Gdn::getContainer()->get(Renderer::class);
+        $parser = Gdn::getContainer()->get(Parser::class);
+
+        return $renderer->render($parser->parse($ops));
     }
 
     /**
@@ -55,8 +51,6 @@ abstract class SanitizeTest extends TestCase {
     /**
      * Test sanitizing the content of a blot.
      *
-     * @param string $badContents
-     * @throws Exception if unable to retrieve an instance of the renderer.
      * @dataProvider provideBadContent
      */
     public function testSanitizeBadContent(string $badContents) {
@@ -66,14 +60,15 @@ abstract class SanitizeTest extends TestCase {
     }
 
     /**
-     * @param array $operations
-     * @param string $badValue
-     * @throws Exception if unable to retrieve an instance of the renderer.
+     * Assert that a the contents of certain operations will be properly sanitized.
+     *
+     * @param array $operations The operations to render.
+     * @param string $badValue The value that should not appear in the rendered output.
+     *
+     * @throws Exception If the parser or render could not be instantiated.
      */
     protected function assertSanitized(array $operations, string $badValue) {
-        /** @var Renderer $renderer */
-        $renderer = $this->getRenderer();
-        $result = $renderer->render($operations);
+        $result = $this->render($operations);
 
         // The contents should've been removed or encoded.
         $this->assertNotContains($badValue, $result);

@@ -49,7 +49,8 @@
         "vanilla/vanilla-connect": "~0.0"
     },
     "require-dev": {
-        "phpunit/phpunit": "~6.0"
+        "phpunit/phpunit": "~6.0",
+        "voku/html-min": "~3.0"
     },
     "provide": {
         "ext-gd": "*"

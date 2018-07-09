@@ -7,31 +7,15 @@
 
 namespace Vanilla\Quill\Blots;
 
-use Vanilla\Quill\Blots\Embeds\EmojiBlot;
-use Vanilla\Quill\Formats;
 use Vanilla\Quill\BlotGroup;
-use Vanilla\Quill\Renderer;
 
 class TextBlot extends AbstractBlot {
 
-    /** @var array[] */
-    private $openingTags = [];
-
-    /** @var array[] */
-    private $closingTags = [];
+    use FormattableTextTrait;
 
     /**
-     * The inline formats to use.
-     */
-    private $formatClasses = [
-        Formats\Link::class,
-        Formats\Bold::class,
-        Formats\Italic::class,
-        Formats\Code::class,
-        Formats\Strike::class,
-    ];
-
-    /**
+     * The TextBlot can only match on operations that are a plain string insert.
+     *
      * @inheritDoc
      */
     public static function matches(array $operations): bool {
@@ -39,123 +23,74 @@ class TextBlot extends AbstractBlot {
     }
 
     /**
+     * Parse out text formats, and get main initial content.
+     *
      * @inheritDoc
      */
-    public function __construct(array $currentOperation, array $previousOperation, array $nextOperation) {
+    public function __construct(array $currentOperation, array $previousOperation = [], array $nextOperation = []) {
         parent::__construct($currentOperation, $previousOperation, $nextOperation);
+        $this->parseFormats($this->currentOperation, $this->previousOperation, $this->nextOperation);
 
-        $insert = val("insert", $this->currentOperation, "");
-        $this->content = htmlentities($insert, \ENT_QUOTES);
-
-        if (preg_match("/\\n$/", $this->content)) {
-            $this->currentOperation[BlotGroup::BREAK_MARKER] = true;
-            $this->content = rtrim($this->content, "\n");
-        }
+        // Grab the insert text for the content.
+        $this->content = $this->currentOperation["insert"] ?? "";
+        // Sanitize
+        $this->content = htmlspecialchars($this->content);
     }
 
     /**
      * @inheritDoc
      */
     public function render(): string {
-        foreach($this->formatClasses as $format) {
-            if ($format::matches([$this->currentOperation])) {
-                /** @var Formats\AbstractFormat $formatInstance */
-                $formatInstance = new $format($this->currentOperation, $this->previousOperation, $this->nextOperation);
-                $this->openingTags[] = $formatInstance->getOpeningTag();
-                $this->closingTags[] = $formatInstance->getClosingTag();
-            }
-        }
+        $sanitizedContent = $this->content === "\n" ? "<br>" : htmlentities($this->content, ENT_QUOTES);
 
-        $this->closingTags = array_reverse($this->closingTags);
+        return $this->renderOpeningFormatTags().$sanitizedContent.$this->renderClosingFormatTags();
+    }
 
-        $result = "";
-        foreach($this->openingTags as $tag) {
-            $result .= $this->renderOpeningTag($tag);
-        }
-
-        $result .= $this->createLineBreaks($this->content);
-        foreach($this->closingTags as $tag) {
-            $result .= $this->renderClosingTag($tag);
-        }
-
-        return $result;
+    /**
+     * When a text blot is just a newline, it renders alone - <p><br></p>.
+     */
+    public function isOwnGroup(): bool {
+        return $this->isPlainTextNewLine();
     }
 
     /**
      * @inheritDoc
      */
     public function shouldClearCurrentGroup(BlotGroup $group): bool {
-        return array_key_exists(BlotGroup::BREAK_MARKER, $this->currentOperation);
+        return $this->isOwnGroup() || $this->isPlainTextNewLine();
     }
 
     /**
-     * Render the opening tags for the current blot.
+     * Utility function for determining if a group of operations contains a blot with particular attribute.
      *
-     * @param array $tag - The tag to render.
-     * - string $tag
-     * - array $attributes
+     * @param array $operations The operations to check.
+     * @param string $attrLookupKey The attribute key to lookup.
+     * @param mixed $expectedValue A value or array of possible values that the key should be matched against.
      *
-     * @return string;
+     * @return bool
      */
-    private function renderOpeningTag(array $tag): string {
-        $tagName = val("tag", $tag);
+    protected static function opAttrsContainKeyWithValue(
+        array $operations,
+        string $attrLookupKey,
+        $expectedValue = true
+    ) {
+        foreach ($operations as $op) {
+            $value = valr("attributes.$attrLookupKey", $op);
 
-        if (!$tagName) {
-            return "";
-        }
-
-        $result = "<".$tagName;
-
-        /** @var array $attributes */
-        $attributes = val("attributes", $tag);
-        if ($attributes) {
-            foreach ($attributes as $attrKey => $attr) {
-                $result .= " $attrKey=\"$attr\"";
+            if ((is_array($expectedValue) && in_array($value, $expectedValue)) || $value === $expectedValue) {
+                return true;
             }
         }
 
-        $result .= ">";
-        return $result;
-    }
-
-    /**
-     * Render the closing tags for the current blot.
-     *
-     * @param array $tag - The tag to render.
-     * - string $tag
-     * - array $attributes
-     *
-     * @return string;
-     */
-    private function renderClosingTag(array $tag): string {
-        $closingTag = val("tag", $tag);
-
-        if (!$closingTag) {
-            return "";
-        }
-
-        return "</".$closingTag.">";
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public function hasConsumedNextOp(): bool {
         return false;
     }
 
     /**
-     * @inheritDoc
+     * Determine whether or not the blot is a TextBlot directory (not a subclass) and it's content is a newline.
+     *
+     * @return bool
      */
-    protected function createLineBreaks(string $input): string {
-        if ($this->content === "") {
-            return "<br>";
-        }
-
-        if (preg_match("/^\\n.+/", $this->content)) {
-            return preg_replace("/^\\n/", "<br></p><p>", $input);
-        } else {
-            return $input;
-        }
+    private function isPlainTextNewLine(): bool {
+        return get_class($this) === TextBlot::class && $this->content === "\n";
     }
 }

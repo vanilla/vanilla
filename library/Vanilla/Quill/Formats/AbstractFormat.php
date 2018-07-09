@@ -7,18 +7,42 @@
 
 namespace Vanilla\Quill\Formats;
 
-use Vanilla\Quill\BlotGroup;
-use Vanilla\Quill\Blots\AbstractBlot;
 use Vanilla\Quill\Blots\TextBlot;
 
 /**
  * An different type of blot that can contain nested blots inside. Multiple of these can be active at the same time.
  *
  * @see TextBlot Usage of these blots can be found in the TextBlot class.
- *
- * @package Vanilla\Quill\Formats
  */
-abstract class AbstractFormat extends AbstractBlot {
+abstract class AbstractFormat {
+
+    /**
+     * @var array The primary operation of the Format. Used to determine the primary tags.
+     */
+    protected $currentOperation = [];
+
+    /**
+     * @var array The previous operation. Used to optimize opening tags.
+     */
+    protected $previousOperation = [];
+
+    /**
+     * @var array The next operation from the currentOperation. Used to optimize closing tags.
+     */
+    protected $nextOperation = [];
+
+    /**
+     * Create a blot.
+     *
+     * @param array $currentOperation The current operation.
+     * @param array $previousOperation The next operation.
+     * @param array $nextOperation The previous operation.
+     */
+    public function __construct(array $currentOperation, array $previousOperation = [], array $nextOperation = []) {
+        $this->previousOperation = $previousOperation;
+        $this->currentOperation = $currentOperation;
+        $this->nextOperation = $nextOperation;
+    }
 
     /**
      * Get the string of the attribute key in the insert that determines if the blot applies or not. This key should lead to a boolean value in the attributes array of the insert.
@@ -65,24 +89,10 @@ abstract class AbstractFormat extends AbstractBlot {
     }
 
     /**
-     * @inheritDoc
-     */
-    public function hasConsumedNextOp(): bool {
-        return false;
-    }
-
-    /**
-     * @inheritDoc
+     * Formats never actually render any content. They should only be providing starting/ending tags.
      */
     public function render(): string {
         return "";
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public function shouldClearCurrentGroup(BlotGroup $group): bool {
-        return false;
     }
 
     /**
@@ -95,7 +105,7 @@ abstract class AbstractFormat extends AbstractBlot {
     /**
      * @inheritDoc
      */
-    public function getOpeningTag(): array {
+    private function shouldRenderOpeningTag(): bool {
         $selfMatchesPrevious = static::matches([$this->previousOperation]);
         $matchesBlackListedFormat = false;
         foreach(static::getBlackListedNestedFormats() as $blackListedFormat) {
@@ -105,20 +115,35 @@ abstract class AbstractFormat extends AbstractBlot {
             }
         }
 
-        if (!$selfMatchesPrevious || $matchesBlackListedFormat) {
-            return [
-                "tag" => static::getTagName(),
-                "attributes" => $this->getAttributes(),
-            ];
+        return !$selfMatchesPrevious || $matchesBlackListedFormat;
+    }
+
+    /**
+     * Render the opening tags for the current blot.
+     */
+    public function renderOpeningTag(): string {
+        if (!$this->shouldRenderOpeningTag()) {
+            return "";
         }
 
-        return [];
+        $tagName = static::getTagName();
+        $attributes =  $this->getAttributes();
+
+        $result = "<".$tagName;
+        if ($attributes) {
+            foreach ($attributes as $attrKey => $attr) {
+                $result .= " $attrKey=\"$attr\"";
+            }
+        }
+
+        $result .= ">";
+        return $result;
     }
 
     /**
      * @inheritDoc
      */
-    public function getClosingTag(): array {
+    private function shouldRenderClosingTag(): bool {
         $selfMatchesNext = static::matches([$this->nextOperation]);
         $matchesBlackListedFormat = false;
         foreach(static::getBlackListedNestedFormats() as $blackListedFormat) {
@@ -127,12 +152,17 @@ abstract class AbstractFormat extends AbstractBlot {
                 break;
             }
         }
-        if (!$selfMatchesNext || $matchesBlackListedFormat) {
-            return [
-                "tag" => static::getTagName(),
-            ];
+        return !$selfMatchesNext || $matchesBlackListedFormat;
+    }
+
+    /**
+     * Render the closing tags for the current blot.
+     */
+    public function renderClosingTag(): string {
+        if (!$this->shouldRenderClosingTag()) {
+            return "";
         }
 
-        return [];
+        return "</".static::getTagName().">";
     }
 }

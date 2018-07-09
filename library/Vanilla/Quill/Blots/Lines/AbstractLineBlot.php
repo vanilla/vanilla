@@ -5,31 +5,15 @@
  * @license https://opensource.org/licenses/GPL-2.0 GPL-2.0
  */
 
-namespace Vanilla\Quill\Blots;
+namespace Vanilla\Quill\Blots\Lines;
 
-abstract class AbstractLineBlot extends AbstractBlockBlot {
+use Vanilla\Quill\Blots\TextBlot;
 
-    /**
-     * Get the main part of the line name.
-     *
-     * @return string
-     */
-    abstract protected static function getLineType(): string;
-
-    /**
-     * @inheritDoc
-     */
-    protected static function getAttributeKey(): string {
-        return static::getLineType() . "-line";
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public function isOwnGroup(): bool {
-        return false;
-    }
-
+/**
+ * Base blot for items that share a single outer group.
+ * Some operations require a different approach to newline rendering than what is found in the Parser.
+ */
+abstract class AbstractLineBlot extends TextBlot {
     /**
      * Render additional newlines inside of the line.
      *
@@ -42,12 +26,11 @@ abstract class AbstractLineBlot extends AbstractBlockBlot {
      * @return string
      */
     public function renderNewLines(): string {
-        $class = static::getAttributeKey();
         $result = "";
         if ($this->nextOperation) {
             $extraNewLines = substr_count($this->nextOperation["insert"], "\n") - 1;
             for ($i = 0; $i < $extraNewLines; $i++) {
-                $result .= "<p class=\"$class\"><br></p>";
+                $result .= $this->renderLineStart()."<br>".$this->renderLineEnd();
             }
         }
 
@@ -61,10 +44,7 @@ abstract class AbstractLineBlot extends AbstractBlockBlot {
      *
      * @return string
      */
-    public function renderLineStart(): string {
-        $class = static::getAttributeKey();
-        return "<p class=\"$class\">";
-    }
+    abstract public function renderLineStart(): string;
 
     /**
      * Render the HTML for the end of a line.
@@ -73,7 +53,5 @@ abstract class AbstractLineBlot extends AbstractBlockBlot {
      *
      * @return string
      */
-    public function renderLineEnd(): string {
-        return "</p>";
-    }
+    abstract public function renderLineEnd(): string;
 }

@@ -1318,6 +1318,10 @@ label.checkbox input.checkbox-input {
   line-height: 1.5;
 }
 
+.userContent code {
+  text-overflow: initial;
+}
+
 .emoji {
   width: 20px;
   height: 20px;

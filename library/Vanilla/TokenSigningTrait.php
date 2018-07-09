@@ -1,6 +1,6 @@
 <?php
 /**
- * @author Alexandre (DaazKu) Chouinard <alexandre.c@vanillaforums.com>
+ * @author Chris Chabilall chris.c@vanillaforums.com
  * @copyright 2009-2018 Vanilla Forums Inc.
  * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
  */
@@ -8,15 +8,17 @@
 namespace Vanilla;
 
 /**
- * Class ArrayAccessTrait.
- * Implementation of the ArrayAccess functions.
+ * Trait TokenSigningTrait.
  *
- * When using this object as an array its properties are referenced.
+ * Methods to be used for token generation and signing.
  */
 trait TokenSigningTrait {
-
+    /**
+     * @var string $secret The secret used to sign the token.
+     */
     public $secret;
-    //protected static $tokenIdentifier = "token";
+
+
     /**
      * Get the secret.
      *
@@ -145,48 +147,6 @@ trait TokenSigningTrait {
     }
 
     /**
-     * Serialize a token entry for direct insertion to the database.
-     *
-     * @param array &$row The row to encode.
-     */
-    protected function encodeRow(&$row) {
-        if (is_object($row) && !$row instanceof ArrayAccess) {
-            $row = (array)$row;
-        }
-
-        foreach (['Scope', 'Attributes'] as $field) {
-            if (isset($row[$field]) && is_array($row[$field])) {
-                $row[$field] = empty($row[$field]) ? null : json_encode($row[$field], JSON_UNESCAPED_SLASHES);
-            }
-        }
-    }
-
-    /**
-     * Unserialize a row from the database for API consumption.
-     *
-     * @param array &$row The row to decode.
-     */
-    protected function decodeRow(&$row) {
-        $isObject = false;
-        if (is_object($row) && !$row instanceof ArrayAccess) {
-            $isObject = true;
-            $row = (array)$row;
-        }
-
-        $row['InsertIPAddress'] = ipDecode($row['InsertIPAddress']);
-
-        foreach (['Scope', 'Attributes'] as $field) {
-            if (isset($row[$field]) && is_string($row[$field])) {
-                $row[$field] = json_decode($row[$field], true);
-            }
-        }
-
-        if ($isObject) {
-            $row = (object)$row;
-        }
-    }
-
-    /**
      * Force a value into a timestamp.
      *
      * @param mixed $dt A timestamp or date string.
@@ -236,19 +196,5 @@ trait TokenSigningTrait {
     public function randomSignedToken($expires = '2 months') {
         return $this->signToken($this->randomToken(), $expires);
     }
-
-    /**
-     * Trim the expiry date and signature off of a token.
-     *
-     * @param string $accessToken The access token to trim.
-     */
-    public function trim($accessToken) {
-        if (strpos($accessToken, '.') !== false) {
-            list($_, $token) = explode('.', $accessToken);
-            return $token;
-        }
-        return $accessToken;
-    }
-
 
 }

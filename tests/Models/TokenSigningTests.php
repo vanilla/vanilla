@@ -1,8 +1,8 @@
 <?php
 /**
- * @author Todd Burry <todd@vanillaforums.com>
+ * @author Chris Chabilall <chris.c@vanillaforums.com>
  * @copyright 2009-2018 Vanilla Forums Inc.
- * @license GPLv2
+ * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
  */
 
 namespace VanillaTests\Models;
@@ -13,16 +13,19 @@ use VanillaTests\Fixtures\TokenModel;
 
 /**
  * Test the {@link TokenModel}.
+ * Used to test the token generation and signing utility methods.
  */
 class TokenSigningTests extends SharedBootstrapTestCase {
     use SiteTestTrait;
 
+    /**
+     * Tests random token generation and signing.
+     */
     public function testVerifyRandomTokenSignature() {
         $model = new TokenModel();
         $model->tokenIdentifier ='nonce';
         $token = $model->randomSignedToken();
-
-        $this->assertEquals(true, $model->verifyTokenSignature($token, $model->tokenIdentifier));
+        $this->assertEquals(true, $model->verifyTokenSignature($token, $model->tokenIdentifier, true));
     }
 
     /**
@@ -35,8 +38,7 @@ class TokenSigningTests extends SharedBootstrapTestCase {
         $model = new TokenModel();
         $model->tokenIdentifier ='nonce';
         $token = $model->randomSignedToken('last month');
-
-        $model->verifyTokenSignature($token, $model->tokenIdentifier, true);
+        $this->assertEquals(false, $model->verifyTokenSignature($token, $model->tokenIdentifier, true));
     }
 
     /**
@@ -48,9 +50,8 @@ class TokenSigningTests extends SharedBootstrapTestCase {
     public function testBadSignature() {
         $model = new TokenModel();
         $model->tokenIdentifier ='nonce';
-
         $token = $model->randomSignedToken().'!';
-        $model->verifyTokenSignature($token, $model->tokenIdentifier, true);
+        $this->assertEquals(false, $model->verifyTokenSignature($token, $model->tokenIdentifier, true));
     }
 
     /**
@@ -61,10 +62,8 @@ class TokenSigningTests extends SharedBootstrapTestCase {
     public function testBadToken() {
         $model = new TokenModel();
         $model->tokenIdentifier = 'nonce';
-
         $token = 'a.b.c';
-        $model->verifyTokenSignature($token, $model->tokenIdentifier, true);
+        $this->assertEquals(false, $model->verifyTokenSignature($token, $model->tokenIdentifier, true));
     }
-
 
 }

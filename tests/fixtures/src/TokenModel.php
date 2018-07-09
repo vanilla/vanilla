@@ -1,8 +1,8 @@
 <?php
 /**
- * @author Todd Burry <todd@vanillaforums.com>
+ * @author Chris Chabilall <chris.c@vanillaforums.com>
  * @copyright 2009-2018 Vanilla Forums Inc.
- * @license Proprietary
+ * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
  */
 
 namespace VanillaTests\Fixtures;
@@ -10,10 +10,13 @@ namespace VanillaTests\Fixtures;
 
 use Vanilla\TokenSigningTrait;
 
+/**
+ * Class TokenModel
+ *
+ */
 class TokenModel {
 
     use TokenSigningTrait;
-    public $token = "va.7yE_QzDEbXDqcFkjohNor9ZnB9qgnv8a.Kbw_Ww.JbenMOl";
     public $tokenIdentifier;
     public $secret;
 

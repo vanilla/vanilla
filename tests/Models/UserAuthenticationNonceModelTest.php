@@ -27,6 +27,11 @@ class UserAuthenticationNonceModelTest extends SharedBootstrapTestCase {
         $this->assertEquals(true,  $model->verify($nonce));
     }
 
+    /**
+     * That a nonce can be consumed.
+     *
+     * @throws \Gdn_UserException
+     */
     public function testConsume() {
         $model = new UserAuthenticationNonceModel('hhh');
         $issuedNonce = $model->issue();

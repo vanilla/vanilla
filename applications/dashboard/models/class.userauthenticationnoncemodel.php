@@ -1,19 +1,23 @@
 <?php
 /**
- * UserAuthenticationNonce model.
- *
+ * @author Chris Chabilall chris.c@vanillaforums.com
  * @copyright 2009-2018 Vanilla Forums Inc.
  * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
  */
 
 /**
- * Handles user data.
+ * UserAuthenticationNonce model.
+ * Handles user data and issuing and consuming nonce's.
  */
 class UserAuthenticationNonceModel extends Gdn_Model {
 
     use \Vanilla\PrunableTrait, \Vanilla\TokenSigningTrait;
 
+    /**
+     * @var string $tokenIdentifier Used to deteremine what type of token is generated.
+     */
     protected static $tokenIdentifier = "nonce";
+
     /**
      * Class constructor. Defines the related database table name.
      *
@@ -33,11 +37,6 @@ class UserAuthenticationNonceModel extends Gdn_Model {
     public function insert($fields) {
         $this->prune();
 
-        if (!isset($fields['Timestamp'])) {
-            $fields['Timestamp'] = date(MYSQL_DATE_FORMAT);
-        }
-
-        $this->encodeRow($fields);
         parent::insert($fields);
         if (!empty($this->Database->LastInfo['RowCount'])) {
             $result = $fields['Nonce'];
@@ -51,32 +50,32 @@ class UserAuthenticationNonceModel extends Gdn_Model {
      * {@inheritdoc}
      */
     public function update($fields, $where = false, $limit = false) {
-        $this->encodeRow($fields);
         $result = parent::update($fields, $where, $limit);
         return $result;
     }
 
     /**
-     * Get an access token by its numeric ID.
+     * Get a matching nonce from the UserAuthenticationNonce table.
      *
-     * @param int $nonce
-     * @param string $datasetType
-     * @param array $options
+     * @param int $nonce The nonce to be looked up.
+     * @param string $datasetType The datatype returned from the query.
      * @return array|bool
      */
-    public function getNonce($nonce, $datasetType = DATASET_TYPE_ARRAY, $options = []) {
+    public function getNonce($nonce, $datasetType = DATASET_TYPE_ARRAY) {
         $row = $this->getWhere(['Nonce' => $nonce])->firstRow($datasetType);
         return $row;
     }
 
 
     /**
-     * @param string $expires
-     * @param string $type
-     * @return string
-     * @throws Gdn_UserException
+     * Issue a signed Nonce.
+     *
+     * @param string $expires The expiration time of the nonce.
+     * @param string $type The type of the of token.
+     * @return string $nonce the signed nonce.
+     * @throws Gdn_UserException Unable to generate a signed nonce.
      */
-    public function issue($expires = '5 minutes', $type = 'system') {
+    public function issue($expires = '5 minutes', $type = 'system') : String {
         if ($expires instanceof  DateTimeInterface) {
             $expireDate = $expires->format(MYSQL_DATE_FORMAT);
         } else {
@@ -89,13 +88,13 @@ class UserAuthenticationNonceModel extends Gdn_Model {
             throw new \Exception("Unable to generate Nonce", 500);
         }
 
-        $token = $this->insert([
+        $result = $this->insert([
             'Nonce' => $nonce,
             'Token' => $type,
             'Timestamp' => $expireDate,
         ]);
 
-        if (!$token) {
+        if (!$result) {
             throw new Gdn_UserException($this->Validation->resultsText(), 400);
         }
 
@@ -103,7 +102,12 @@ class UserAuthenticationNonceModel extends Gdn_Model {
     }
 
     /**
-     * @param $nonce
+     * Consumes the nonce and invalidates the timestamp so it can't be used again.
+     * The timestampo column is not nullable and the zero dates aren't allowed, so the date
+     * is set to the Unix epoch time.
+     *
+     * @param string $nonce The nonce to be consumed.
+     * @throws Exception Unable to find nonce.
      */
     public function consume(string $nonce) {
         $row = $this->getNonce($nonce);
@@ -112,15 +116,18 @@ class UserAuthenticationNonceModel extends Gdn_Model {
                 ['Timestamp' => Gdn_Format::toDateTime($this->toTimestamp('1971-01-01 00:00:01'))],
                 ['Nonce' => $nonce]
             );
+        } else {
+            throw new \Exception("Unable to find Nonce", 500);
         }
     }
 
     /**
-     * @param string $nonce
-     * @param bool $consume
-     * @param bool $throw
-     * @return bool
-     * @throws Exception
+     * Verifies a nonce can be consumed and consumes it if the flag is true.
+     *
+     * @param string $nonce The nonce to verify.
+     * @param bool $consume Flag to determine if the nonce is to be consumed.
+     * @param bool $throw Whether or not to throw an exception on a verification error.
+     * @return bool If the nonce is verified it returns true, false if otherwise.
      */
     public function verify(string $nonce = '', bool $consume = true, bool $throw = false): bool {
         // First verify the token without going to the database.
@@ -147,5 +154,4 @@ class UserAuthenticationNonceModel extends Gdn_Model {
 
         return true;
     }
-
 }

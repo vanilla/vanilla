@@ -83,6 +83,7 @@ $global-lineHeight_offset                              : .32em !default; // Offs
 
 $global-base_lineHeight                                : (20/14) !default;
 
+
 $global-heading_fontFamily                             : "Open Sans", HelveticaNeue-Light, "Segoe UI", "Helvetica Neue", Helvetica, Raleway, Arial, sans-serif !default;
 $global-heading_fontWeight                             : $global-bold_fontWeight !default; // Derived
 
@@ -92,6 +93,18 @@ $global-body_fontWeight                                : $global-normal_fontWeig
 $link_default-color                                    : $global-color_primary !default;
 $link_default_hover-color                              : $global-color_secondary !default;
 $link_default_focus-color                              : $global-color_secondary !default;
+
+/* -------------------------------------------------------------- *\
+    Headings
+\* -------------------------------------------------------------- */
+
+// Heading font sizes
+$userContent_fontSizeStep                                   : ($global-title_fontSize - $global-large_fontSize) / 5;
+$userContent_fontSizeH2                                     : $global-title_fontSize - $userContent-fontSizeStep;
+$userContent_fontSizeH3                                     : $global-title_fontSize - $userContent-fontSizeStep * 2;
+$userContent_fontSizeH4                                     : $global-title_fontSize - $userContent-fontSizeStep * 3;
+$userContent_fontSizeH5                                     : $global-title_fontSize - $userContent-fontSizeStep * 4;
+
 
 /* -------------------------------------------------------------- *\
     Animation

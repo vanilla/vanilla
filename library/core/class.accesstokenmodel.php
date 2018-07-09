@@ -14,8 +14,7 @@
  */
 class AccessTokenModel extends Gdn_Model {
     use \Vanilla\PrunableTrait , \Vanilla\TokenSigningTrait;
-
-    private $secret;
+    
     protected static $tokenIdentifier = "access token";
 
     /**

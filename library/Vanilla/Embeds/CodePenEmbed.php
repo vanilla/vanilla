@@ -48,9 +48,11 @@ class CodePenEmbed extends Embed {
      * @inheritdoc
      */
     public function renderData(array $data): string {
-        $height = $data['height'] ?? '';
-        $embedUrl = $data['attributes']['embedUrl'] ?? '';
-        $style = $data['attributes']['style'] ?? '';
+        $height = $data['height'] ?? "";
+        $embedUrl = $data['attributes']['embedUrl'] ?? "";
+        $width = $data['attributes']['style']['width'] ?? "";
+        $overflow = $data['attributes']['style']['overflow'] ?? "";
+        $style = "width: ".$width."%; overflow: ". $overflow.";";
         $id = $data['attributes']['id'];
 
         $encodedHeight = htmlspecialchars($height);
@@ -61,7 +63,7 @@ class CodePenEmbed extends Embed {
         $result = <<<HTML
 <div class="embedExternal embedCodePen">
     <div class="embedExternal-content">
-        <iframe class="cp_embed_iframe" scrolling="no" id="{$encodedId}" height="{$encodedHeight}" src="{$encodedEmbedUrl}" style="{$encodedStyle}"></iframe>
+        <iframe scrolling="no" id="{$encodedId}" height="{$encodedHeight}" src="{$encodedEmbedUrl}" style="{$encodedStyle}"></iframe>
     </div>
 </div>
 HTML;
@@ -87,8 +89,9 @@ HTML;
             $data['embedUrl'] .= '?theme-id=0';
         }
 
-        if (preg_match('/style="(?<style>.*?)"/i', $html, $style)) {
-            $data['style'] = $style['style'];
+        if (preg_match('/style="width:(?<width> [0-9]+%); overflow: (?<overflow>hidden);"/i', $html, $style)) {
+            $data['style']['width'] = $style['width'] ?? '';
+            $data['style']['overflow'] = $style['overflow'] ?? '';
         }
 
         return $data;

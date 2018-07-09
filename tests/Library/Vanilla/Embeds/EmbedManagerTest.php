@@ -82,12 +82,15 @@ class EmbedManagerTest extends SharedBootstrapTestCase {
                     "attributes" => [
                         "id" => "cp_embed_qYrgVx",
                         "embedUrl" => "https://codepen.io/slafleche/embed/preview/qYrgVx?theme-id=0",
-                        "style" => "width: 100%; overflow: hidden;",
+                        "style" => [
+                            "width" => "100",
+                            "overflow" => "hidden",
+                        ],
                     ]
                 ],
 '<div class="embedExternal embedCodePen">
     <div class="embedExternal-content">
-        <iframe class="cp_embed_iframe" scrolling="no" id="cp_embed_qYrgVx" height="300" src="https://codepen.io/slafleche/embed/preview/qYrgVx?theme-id=0" style="width: 100%; overflow: hidden;"></iframe>
+        <iframe scrolling="no" id="cp_embed_qYrgVx" height="300" src="https://codepen.io/slafleche/embed/preview/qYrgVx?theme-id=0" style="width: 100%; overflow: hidden;"></iframe>
     </div>
 </div>',
             ],

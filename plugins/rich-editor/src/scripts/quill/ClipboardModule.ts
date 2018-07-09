@@ -6,10 +6,42 @@
 
 import ClipboardBase from "quill/modules/clipboard";
 import Delta from "quill-delta";
-import Quill from "quill/core";
+import Quill, { DeltaStatic } from "quill/core";
 
 export default class ClipboardModule extends ClipboardBase {
+    /**
+     * Split a string into multiple operations, with each link being turned into a full proper link.
+     *
+     * @param inputText - The text to split up.
+     *
+     * @returns An array of operations or a null if there were no links.
+     */
+    public static splitLinkOperationsOutOfText(inputText: string): any[] | null {
+        const urlRegex = /https?:\/\/[^\s]+/g;
+
+        const matches = inputText.match(urlRegex);
+        if (matches && matches.length > 0) {
+            const ops: any[] = [];
+            matches.forEach(match => {
+                const split = (inputText as string).split(match);
+                const beforeLink = split.shift();
+                ops.push({ insert: beforeLink });
+                ops.push({ insert: match, attributes: { link: match } });
+                inputText = split.join(match);
+            });
+            ops.push({ insert: inputText });
+            return ops;
+        } else {
+            return null;
+        }
+    }
+
     public container: HTMLElement;
+
+    constructor(quill, options) {
+        super(quill, options);
+        this.addMatcher(Node.TEXT_NODE, this.linkMatcher);
+    }
 
     /**
      * Override the paste event to not jump around on paste in a cross-browser manor.
@@ -41,4 +73,25 @@ export default class ClipboardModule extends ClipboardBase {
             this.quill.focus();
         });
     }
+
+    /**
+     * A matcher to turn a pasted links into real links.
+     */
+    private linkMatcher = (node: Node, delta: DeltaStatic) => {
+        if (node.nodeType !== Node.TEXT_NODE) {
+            return;
+        }
+
+        const { textContent } = node;
+        if (textContent == null) {
+            return;
+        }
+
+        const splitOps = ClipboardModule.splitLinkOperationsOutOfText(textContent);
+        if (splitOps) {
+            delta.ops = splitOps;
+        }
+
+        return delta;
+    };
 }

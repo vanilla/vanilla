@@ -25,11 +25,17 @@ export default class ClipboardModule extends ClipboardBase {
             matches.forEach(match => {
                 const split = (inputText as string).split(match);
                 const beforeLink = split.shift();
-                ops.push({ insert: beforeLink });
+                // We don't want to insert empty ops.
+                if (beforeLink !== "") {
+                    ops.push({ insert: beforeLink });
+                }
                 ops.push({ insert: match, attributes: { link: match } });
                 inputText = split.join(match);
             });
-            ops.push({ insert: inputText });
+            // We don't want to insert empty ops.
+            if (inputText !== "") {
+                ops.push({ insert: inputText });
+            }
             return ops;
         } else {
             return null;

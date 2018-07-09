@@ -13,10 +13,11 @@ import * as Icons from "@rich-editor/components/icons";
 import { withEditor, IEditorContextProps } from "@rich-editor/components/context";
 import { IMenuItemData } from "./pieces/MenuItem";
 import { watchFocusInDomTree } from "@dashboard/dom";
-import { createEditorFlyoutEscapeListener, getIDForQuill } from "@rich-editor/quill/utility";
+import { createEditorFlyoutEscapeListener, getIDForQuill, getBlotAtIndex } from "@rich-editor/quill/utility";
 import { connect } from "react-redux";
 import IStoreState from "@rich-editor/state/IState";
 import { FOCUS_CLASS } from "@dashboard/embeds";
+import FocusableEmbedBlot from "@rich-editor/quill/blots/abstract/FocusableEmbedBlot";
 
 const PARAGRAPH_ITEMS = {
     header: {
@@ -49,7 +50,7 @@ interface IState {
     hasFocus: boolean;
 }
 
-export class ParagraphToolbar extends React.PureComponent<IProps, IState> {
+export class ParagraphToolbar extends React.Component<IProps, IState> {
     private quill: Quill;
     private toolbarNode: HTMLElement;
     private ID: string;
@@ -98,7 +99,7 @@ export class ParagraphToolbar extends React.PureComponent<IProps, IState> {
     public render() {
         let pilcrowClasses = "richEditor-button richEditorParagraphMenu-handle";
 
-        if (!this.isPilcrowVisible || this.isEmbedFocused) {
+        if (!this.isPilcrowVisible || this.isEmbedSelected) {
             pilcrowClasses += " isHidden";
         }
 
@@ -241,6 +242,10 @@ export class ParagraphToolbar extends React.PureComponent<IProps, IState> {
             return false;
         }
 
+        if (this.isEmbedSelected) {
+            return false;
+        }
+
         const numLines = this.quill.getLines(lastGoodSelection.index || 0, lastGoodSelection.length || 0).length;
         return numLines <= 1;
     }
@@ -256,10 +261,13 @@ export class ParagraphToolbar extends React.PureComponent<IProps, IState> {
     /**
      * Determine if and Embed inside of this class is focused.
      */
-    private get isEmbedFocused() {
-        return (
-            document.activeElement.classList.contains(FOCUS_CLASS) && this.quill.root.contains(document.activeElement)
-        );
+    private get isEmbedSelected() {
+        const { lastGoodSelection } = this.props;
+        if (!lastGoodSelection) {
+            return false;
+        }
+        const potentialEmbedBlot = getBlotAtIndex(this.quill, lastGoodSelection.index, FocusableEmbedBlot);
+        return !!potentialEmbedBlot;
     }
 
     /**
@@ -307,7 +315,7 @@ export class ParagraphToolbar extends React.PureComponent<IProps, IState> {
      * This could likely be replaced by a CSS class in the future.
      */
     private get toolbarStyles(): React.CSSProperties {
-        if (this.isMenuVisible && !this.isEmbedFocused) {
+        if (this.isMenuVisible && !this.isEmbedSelected) {
             return {};
         } else {
             // We hide the toolbar when its not visible.

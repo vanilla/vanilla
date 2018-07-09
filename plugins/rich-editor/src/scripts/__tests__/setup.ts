@@ -7,8 +7,11 @@
 import Enzyme from "enzyme";
 import Adapter from "enzyme-adapter-react-16";
 import { importAll } from "@testroot/utility";
+import reducerRegistry from "@dashboard/state/reducerRegistry";
+import editorReducer from "@rich-editor/state/editorReducer";
 
 // Setup enzyme
 Enzyme.configure({ adapter: new Adapter() });
+reducerRegistry.register("editor", editorReducer);
 
 importAll((require as any).context("..", true, /.test.(ts|tsx)$/));

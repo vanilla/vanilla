@@ -90,10 +90,12 @@ export default class ClipboardModule extends ClipboardBase {
      */
     public linkMatcher = (node: Node, delta: DeltaStatic) => {
         const { textContent } = node;
-        if (node.nodeType === Node.TEXT_NODE && textContent != null && !this.inCodeFormat) {
-            const splitOps = ClipboardModule.splitLinkOperationsOutOfText(textContent);
-            if (splitOps) {
-                delta.ops = splitOps;
+        if (node.nodeType === Node.TEXT_NODE && textContent != null) {
+            if (!this.inCodeFormat) {
+                const splitOps = ClipboardModule.splitLinkOperationsOutOfText(textContent);
+                if (splitOps) {
+                    delta.ops = splitOps;
+                }
             }
         }
 
@@ -104,10 +106,13 @@ export default class ClipboardModule extends ClipboardBase {
      * Determine if we are in a code formatted item or not.
      */
     private get inCodeFormat() {
-        const selection = getStore<IState>().getState().editor.instances[getIDForQuill(this.quill)].lastGoodSelection;
+        const instance = getStore<IState>().getState().editor.instances[getIDForQuill(this.quill)];
+        if (!instance || !instance.lastGoodSelection) {
+            return false;
+        }
         return (
-            rangeContainsBlot(this.quill, CodeBlockBlot, selection) ||
-            rangeContainsBlot(this.quill, CodeBlot, selection)
+            rangeContainsBlot(this.quill, CodeBlockBlot, instance.lastGoodSelection) ||
+            rangeContainsBlot(this.quill, CodeBlot, instance.lastGoodSelection)
         );
     }
 }

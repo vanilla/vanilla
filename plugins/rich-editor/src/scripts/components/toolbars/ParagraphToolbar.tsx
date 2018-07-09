@@ -107,7 +107,7 @@ export class ParagraphToolbar extends React.PureComponent<IProps, IState> {
         return (
             <div
                 id={this.componentID}
-                style={this.getPilcrowStyles()}
+                style={this.pilcrowStyles}
                 className="richEditor-menu richEditorParagraphMenu"
                 ref={this.selfRef}
             >
@@ -128,8 +128,8 @@ export class ParagraphToolbar extends React.PureComponent<IProps, IState> {
                 </button>
                 <div
                     id={this.menuID}
-                    className={this.getToolbarClasses()}
-                    style={this.getToolbarStyles()}
+                    className={this.toolbarClasses}
+                    style={this.toolbarStyles}
                     ref={ref => (this.toolbarNode = ref!)}
                     role="menu"
                 >
@@ -265,7 +265,7 @@ export class ParagraphToolbar extends React.PureComponent<IProps, IState> {
     /**
      * Get the inline styles for the pilcrow. This is mostly just positioning it on the Y access currently.
      */
-    private getPilcrowStyles(): React.CSSProperties {
+    private get pilcrowStyles(): React.CSSProperties {
         const { lastGoodSelection } = this.props;
 
         if (!lastGoodSelection) {
@@ -284,7 +284,7 @@ export class ParagraphToolbar extends React.PureComponent<IProps, IState> {
     /**
      * Get the classes for the toolbar.
      */
-    private getToolbarClasses(): string {
+    private get toolbarClasses(): string {
         const { lastGoodSelection } = this.props;
 
         if (!lastGoodSelection) {
@@ -306,7 +306,7 @@ export class ParagraphToolbar extends React.PureComponent<IProps, IState> {
      * Get the inline styles for the toolbar. This just a matter of hiding it.
      * This could likely be replaced by a CSS class in the future.
      */
-    private getToolbarStyles(): React.CSSProperties {
+    private get toolbarStyles(): React.CSSProperties {
         if (this.isMenuVisible && !this.isEmbedFocused) {
             return {};
         } else {
@@ -337,7 +337,7 @@ export class ParagraphToolbar extends React.PureComponent<IProps, IState> {
     /**
      * Get element containing menu items
      */
-    private getMenuContainer = () => {
+    private get menuContainer() {
         const parentElement = document.getElementById(this.menuID);
         if (parentElement) {
             const menu = parentElement.querySelector(".richEditor-menuItems");
@@ -346,7 +346,7 @@ export class ParagraphToolbar extends React.PureComponent<IProps, IState> {
             }
         }
         return false;
-    };
+    }
 
     /**
      * Handle key presses
@@ -357,7 +357,7 @@ export class ParagraphToolbar extends React.PureComponent<IProps, IState> {
                 event.preventDefault();
                 this.setState({ hasFocus: true }, () => {
                     setImmediate(() => {
-                        const menu = this.getMenuContainer();
+                        const menu = this.menuContainer;
                         if (menu instanceof HTMLElement && menu.firstChild instanceof HTMLElement) {
                             menu.firstChild.focus();
                         }
@@ -368,7 +368,7 @@ export class ParagraphToolbar extends React.PureComponent<IProps, IState> {
                 event.preventDefault();
                 this.setState({ hasFocus: true }, () => {
                     setImmediate(() => {
-                        const menu = this.getMenuContainer();
+                        const menu = this.menuContainer;
                         if (menu instanceof HTMLElement && menu.lastChild instanceof HTMLElement) {
                             menu.lastChild.focus();
                         }

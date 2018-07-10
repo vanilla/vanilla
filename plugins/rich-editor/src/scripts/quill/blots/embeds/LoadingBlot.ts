@@ -40,7 +40,7 @@ export default class LoadingBlot extends FocusableEmbedBlot {
     }
 
     /**
-     * Get the value out of a domNode. Also change "loaded" to false.
+     * Get the value out of a domNode.
      */
     public static value(element: Element): IEmbedValue {
         const storedValue = getData(element, LOADER_DATA_KEY, null);
@@ -49,13 +49,7 @@ export default class LoadingBlot extends FocusableEmbedBlot {
             throw new Error("A loading blot should have data set");
         }
 
-        return {
-            ...storedValue,
-            loaderData: {
-                ...storedValue.loaderData,
-                loaded: false,
-            },
-        };
+        return storedValue;
     }
 
     /**

@@ -19,7 +19,6 @@ const DATA_KEY = "__embed-data__";
 interface ILoaderData {
     type: "image" | "link";
     link?: string;
-    loaded?: boolean;
 }
 
 interface IEmbedUnloadedValue {
@@ -166,40 +165,43 @@ export default class ExternalEmbedBlot extends FocusableEmbedBlot {
             void this.replaceLoaderWithFinalForm(value);
         }
     }
+
     /**
      * Replace the embed's loader with it's final state. This could take the form of a registered embed,
      * or an error state.
      *
      * @see @dashboard/embeds
      */
-    public async replaceLoaderWithFinalForm(value: IEmbedValue) {
+    public replaceLoaderWithFinalForm(value: IEmbedValue) {
         let finalBlot: ExternalEmbedBlot | ErrorBlot;
 
-        let data: IEmbedData | null = null;
-        if ("data" in value) {
-            data = value.data;
-        } else {
-            try {
-                data = await value.dataPromise;
-            } catch (e) {
+        this.resolveDataFromValue(value)
+            .then(data => {
+                const newValue: IEmbedValue = {
+                    data,
+                    loaderData: value.loaderData,
+                };
+
+                const loader = this.domNode.querySelector(".embedLinkLoader");
+                const embedElement = ExternalEmbedBlot.createEmbedFromData(data, loader);
+                setData(embedElement, DATA_KEY, newValue);
+                finalBlot = new ExternalEmbedBlot(embedElement, newValue, false);
+                this.replaceWith(finalBlot);
+            })
+            .catch(e => {
                 logError(e);
                 this.replaceWith(new ErrorBlot(ErrorBlot.create(e)));
-                return;
-            }
+            });
+    }
+
+    /**
+     * Normalize data and dataPromise into Promise<data>
+     */
+    private resolveDataFromValue(value: IEmbedValue): Promise<IEmbedData> {
+        if ("data" in value) {
+            return Promise.resolve(value.data);
+        } else {
+            return value.dataPromise;
         }
-
-        const newValue: IEmbedValue = {
-            data,
-            loaderData: {
-                ...value.loaderData,
-                loaded: true,
-            },
-        };
-
-        const loader = this.domNode.querySelector(".embedLinkLoader");
-        const embedElement = ExternalEmbedBlot.createEmbedFromData(data, loader);
-        setData(embedElement, DATA_KEY, newValue);
-        finalBlot = new ExternalEmbedBlot(embedElement, newValue, false);
-        this.replaceWith(finalBlot);
     }
 }

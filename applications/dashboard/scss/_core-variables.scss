@@ -256,8 +256,10 @@ $widget-footer_borderRadius                          : $global-widgetBorder_radi
     Form Elements
 \* -------------------------------------------------------------- */
 
-$formElement_height                                  : $utility-baseUnit * 6 !default; // Derived
 $formElement_borderWidth                             : 1px !default;
+$formElement_fullBorderWidth                         : $formElement_borderWidth * 2;
+$formElement_height                                  : $utility-baseUnit * 6; // Derived
+$formElement_heightWithBorder                        : $formElement_height + 2 * $formElement_borderWidth; // Derived
 $formElement_borderColor                             : mix($global-color_fg, $global-color_bg, 24%) !default; // Derived
 $formElement_borderRadius                            : $global_borderRadius !default;
 $formElement_giantInput_height                       : 51px !default;

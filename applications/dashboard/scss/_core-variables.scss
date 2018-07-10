@@ -95,7 +95,7 @@ $link_default_hover-color                              : $global-color_secondary
 $link_default_focus-color                              : $global-color_secondary !default;
 
 /* -------------------------------------------------------------- *\
-    Headings
+    User Content
 \* -------------------------------------------------------------- */
 
 // Heading font sizes
@@ -104,6 +104,9 @@ $userContent_fontSizeH2                                     : $global-title_font
 $userContent_fontSizeH3                                     : $global-title_fontSize - $userContent-fontSizeStep * 2;
 $userContent_fontSizeH4                                     : $global-title_fontSize - $userContent-fontSizeStep * 3;
 $userContent_fontSizeH5                                     : $global-title_fontSize - $userContent-fontSizeStep * 4;
+
+$userContent-list_margin                                    : 2em;
+$userContent-listDecoration_minWidth                        : 2em;
 
 
 /* -------------------------------------------------------------- *\
@@ -360,9 +363,20 @@ $buttonBranded: (
 ) !default;
 
 /* -------------------------------------------------------------- *\
-
+      Meta
 \* -------------------------------------------------------------- */
 
+$metaText_fontSize                                   : $global-small_fontSize;
+$metaText_color                                      : mix($global-color_fg, $global-color_bg, 90%) !default;
+$metaText_margin                                     : mix($global-color_fg, $global-color_bg, 70%) !default;
+
+
+/* -------------------------------------------------------------- *\
+      Thumbnails
+\* -------------------------------------------------------------- */
+
+$thumbnail-border_color: mix($global-color_fg, $global-color_bg, 50%) !default; // Derived
+$thumbnail-border_width: 0;
 
 
 ///* -------------------------------------------------------------- *\

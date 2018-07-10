@@ -8,6 +8,7 @@ $utility-baseUnit                                    : 6px;
 $utility-baseUnitHalf                                : $utility-baseUnit / 2; // Derived
 $utility-baseUnitDouble                              : $utility-baseUnit * 2; // Derived
 $utility-percentage_third                            : (100% / 3);
+$utility-percentage_nineSixteenths                   : (9% / 16);
 $utility-SVGEncoding                                 : "data:image/svg+xml,";
 
 /* -------------------------------------------------------------- *\
@@ -377,6 +378,14 @@ $metaText_margin                                     : mix($global-color_fg, $gl
 
 $thumbnail-border_color: mix($global-color_fg, $global-color_bg, 50%) !default; // Derived
 $thumbnail-border_width: 0;
+
+/* -------------------------------------------------------------- *\
+    Separators
+\* -------------------------------------------------------------- */
+
+$global-separator_color                             : mix($global-color_fg, $global-color_bg, 30%) !default;
+$global-separator_width                             : 1px;
+
 
 
 ///* -------------------------------------------------------------- *\

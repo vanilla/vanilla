@@ -7,20 +7,21 @@
 
 namespace VanillaTests\Fixtures;
 
-
 use Vanilla\TokenSigningTrait;
 
 /**
- * Class TokenModel
- *
+ * Class TokenModel.
+ * Used for TokenSigningTraitTest.
  */
 class TokenModel {
 
     use TokenSigningTrait;
-    public $tokenIdentifier;
 
+    /**
+     * TokenModel constructor.
+     */
     public function __construct() {
-        $this->secret = $this->setSecret('sss');
-        $this->tokenIdentifier = 'nonce';
+        $this->setSecret('sss');
+        $this->tokenIdentifier ='nonce';
     }
 }

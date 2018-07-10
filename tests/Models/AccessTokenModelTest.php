@@ -22,7 +22,6 @@ class AccessTokenModelTest extends SharedBootstrapTestCase {
      */
     public function testIssueAndVerify() {
         $model = new AccessTokenModel('sss');
-
         $token = $model->issue(1);
         $this->assertEquals(1, $model->verify($token)['UserID']);
 

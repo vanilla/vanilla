@@ -1,6 +1,6 @@
 <?php
 /**
- * @author Todd Burry <todd@vanillaforums.com>
+ * @author Chris Chabilall <chris.c@vanillaforums.com>
  * @copyright 2009-2018 Vanilla Forums Inc.
  * @license GPLv2
  */
@@ -22,7 +22,6 @@ class UserAuthenticationNonceModelTest extends SharedBootstrapTestCase {
      */
     public function testIssueAndVerify() {
         $model = new UserAuthenticationNonceModel('hhh');
-
         $nonce = $model->issue();
         $this->assertEquals(true,  $model->verify($nonce));
     }
@@ -37,9 +36,7 @@ class UserAuthenticationNonceModelTest extends SharedBootstrapTestCase {
         $model = new UserAuthenticationNonceModel('hhh');
         $issuedNonce = $model->issue();
         $model->consume($issuedNonce);
-        $consumedNonce = $model->getNonce($issuedNonce);
+        $consumedNonce = $model->getID($issuedNonce, DATASET_TYPE_ARRAY);
         $model->verify($consumedNonce['Nonce'], true, true);
     }
-
-
 }

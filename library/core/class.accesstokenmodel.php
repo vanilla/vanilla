@@ -12,12 +12,8 @@
  * methods most of the time.
  */
 class AccessTokenModel extends Gdn_Model {
-    use \Vanilla\PrunableTrait , \Vanilla\TokenSigningTrait;
-
-    /**
-     * @var string $tokenIdentifier Used to deteremine what type of token is generated.
-     */
-    protected static $tokenIdentifier = "access token";
+    use \Vanilla\PrunableTrait;
+    use \Vanilla\TokenSigningTrait;
 
     /**
      * Construct an {@link AccessToken} object.
@@ -28,6 +24,7 @@ class AccessTokenModel extends Gdn_Model {
         parent::__construct('AccessToken');
         $this->PrimaryKey = 'AccessTokenID';
         $this->secret = $secret ?: c('Garden.Cookie.Salt');
+        $this->tokenIdentifier ='access token';
 
         $this->setPruneAfter('1 day')
             ->setPruneField('DateExpires');
@@ -174,7 +171,7 @@ class AccessTokenModel extends Gdn_Model {
      */
     public function verify($accessToken, $throw = false) {
         // First verify the token without going to the database.
-        if (!$this->verifyTokenSignature($accessToken, self::$tokenIdentifier, $throw)) {
+        if (!$this->verifyTokenSignature($accessToken, $throw)) {
             return false;
         }
 

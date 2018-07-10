@@ -23,9 +23,8 @@ class TokenSigningTraitTest extends SharedBootstrapTestCase {
      */
     public function testVerifyRandomTokenSignature() {
         $model = new TokenModel();
-        $model->setSecret('ppp');
         $token = $model->randomSignedToken();
-        $this->assertEquals(true, $model->verifyTokenSignature($token, $model->tokenIdentifier, true));
+        $this->assertEquals(true, $model->verifyTokenSignature($token, true));
     }
 
     /**
@@ -36,9 +35,8 @@ class TokenSigningTraitTest extends SharedBootstrapTestCase {
      */
     public function testExpiryDate() {
         $model = new TokenModel();
-        $model->setSecret('ggg');
         $token = $model->randomSignedToken('last month');
-        $this->assertEquals(false, $model->verifyTokenSignature($token, $model->tokenIdentifier, true));
+        $this->assertEquals(false, $model->verifyTokenSignature($token, true));
     }
 
     /**
@@ -50,7 +48,7 @@ class TokenSigningTraitTest extends SharedBootstrapTestCase {
     public function testBadSignature() {
         $model = new TokenModel();
         $token = $model->randomSignedToken().'!';
-        $this->assertEquals(false, $model->verifyTokenSignature($token, $model->tokenIdentifier, true));
+        $this->assertEquals(false, $model->verifyTokenSignature($token,true));
     }
 
     /**
@@ -61,7 +59,6 @@ class TokenSigningTraitTest extends SharedBootstrapTestCase {
     public function testBadToken() {
         $model = new TokenModel();
         $token = 'a.b.c';
-        $this->assertEquals(false, $model->verifyTokenSignature($token, $model->tokenIdentifier, true));
+        $this->assertEquals(false, $model->verifyTokenSignature($token, true));
     }
-
 }

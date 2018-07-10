@@ -13,10 +13,11 @@ namespace Vanilla;
  * Methods to be used for token generation and signing.
  */
 trait TokenSigningTrait {
-    /**
-     * @var string $secret The secret used to sign the token.
-     */
+    /** @var string $secret The secret used to sign the token. */
     private $secret;
+
+    /** @var string Used to determine what type of token is generated. */
+    protected $tokenIdentifier;
 
     /**
      * Get the secret.
@@ -34,6 +35,7 @@ trait TokenSigningTrait {
      */
     public function setSecret($secret) {
         $this->secret = $secret;
+        return $this;
     }
 
     /**
@@ -77,29 +79,29 @@ trait TokenSigningTrait {
      * @return bool Returns **true** if the token's expiry date and signature is valid or **false** otherwise.
      * @throws \Exception Throws an exception if the token is invalid and {@link $throw} is **true**.
      */
-    public function verifyTokenSignature($accessToken, $tokenIdentifier, $throw = false) {
+    public function verifyTokenSignature($accessToken, $throw = false) {
         $parts = explode('.', $accessToken);
 
         if (empty($accessToken)) {
-            return $this->tokenError('Missing'. $tokenIdentifier, 401, $throw);
+            return $this->tokenError('Missing'.$this->tokenIdentifier, 401, $throw);
         }
 
         if (count($parts) !== 4) {
-            return $this->tokenError($tokenIdentifier.' missing parts.', 401, $throw);
+            return $this->tokenError($this->tokenIdentifier.' missing parts.', 401, $throw);
         }
 
         list($version, $token, $expireStr, $sig) = $parts;
 
         $expires = $this->decodeDate($expireStr);
         if ($expires === null) {
-            return $this->tokenError('Your '.$tokenIdentifier.' has an invalid expiry date.', 401, $throw);
+            return $this->tokenError('Your '.$this->tokenIdentifier.' has an invalid expiry date.', 401, $throw);
         } elseif ($expires < time()) {
-            return $this->tokenError('Your '.$tokenIdentifier.' has expired.', 401, $throw);
+            return $this->tokenError('Your '.$this->tokenIdentifier.' has expired.', 401, $throw);
         }
 
         $checkToken = $this->signToken($token, $expires);
         if (!hash_equals($checkToken, $accessToken)) {
-            return $this->tokenError('Your '.$tokenIdentifier.' has an invalid signature.', 401, $throw);
+            return $this->tokenError('Your '.$this->tokenIdentifier.' has an invalid signature.', 401, $throw);
         }
 
         return true;

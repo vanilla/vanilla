@@ -10,11 +10,8 @@
  */
 class UserAuthenticationNonceModel extends Gdn_Model {
 
-    use \Vanilla\PrunableTrait, \Vanilla\TokenSigningTrait;
-
-    /** @var string Used to deteremine what type of token is generated. */
-    protected static $tokenIdentifier = "nonce";
-
+    use \Vanilla\PrunableTrait;
+    use \Vanilla\TokenSigningTrait;
     const CONSUMED_TIMESTAMP = "1971-01-01 00:00:01";
 
     /**
@@ -28,7 +25,9 @@ class UserAuthenticationNonceModel extends Gdn_Model {
         $this->setPruneAfter('45 minutes');
         $this->setSecret($secret);
         $this->PrimaryKey = 'Nonce';
+        $this->tokenIdentifier ='nonce';
     }
+
     /**
      * @inheritdoc
      */
@@ -38,26 +37,13 @@ class UserAuthenticationNonceModel extends Gdn_Model {
         if (!isset($fields['Timestamp'])) {
             $fields['Timestamp'] = date(MYSQL_DATE_FORMAT);
         }
-        $result = parent::insert($fields);
+        parent::insert($fields);
         if (!empty($this->Database->LastInfo['RowCount'])) {
             $result = true;
         } else {
             $result = false;
         }
-
         return $result;
-    }
-
-    /**
-     * Get a matching nonce from the UserAuthenticationNonce table.
-     *
-     * @param string $nonce The nonce to be looked up.
-     * @param string $datasetType The datatype returned from the query.
-     * @return array|bool
-     */
-    public function getNonce($nonce, $datasetType = DATASET_TYPE_ARRAY) {
-        $row = $this->getWhere(['Nonce' => $nonce])->firstRow($datasetType);
-        return $row;
     }
 
     /**
@@ -69,13 +55,9 @@ class UserAuthenticationNonceModel extends Gdn_Model {
      * @throws Gdn_UserException Unable to generate a signed nonce.
      */
     public function issue($expires = '5 minutes', $type = 'system'): string {
-
-        $expireDate = Gdn_Format::toDateTime($this->toTimestamp($expires));
         $token = $this->randomToken();
         $nonce = $this->signToken($token, $expires);
-        if (!$nonce) {
-            throw new \Exception("Unable to generate Nonce", 500);
-        }
+        $expireDate = Gdn_Format::toDateTime($this->toTimestamp($expires));
 
         $result = $this->insert([
             'Nonce' => $nonce,
@@ -86,7 +68,6 @@ class UserAuthenticationNonceModel extends Gdn_Model {
         if (!$result) {
             throw new Gdn_UserException($this->Validation->resultsText(), 400);
         }
-
         return $nonce;
     }
 
@@ -97,7 +78,7 @@ class UserAuthenticationNonceModel extends Gdn_Model {
      * @throws Exception Unable to find nonce.
      */
     public function consume(string $nonce) {
-        $row = parent::getID($nonce, DATASET_TYPE_ARRAY);
+        $row = $this->getID($nonce, DATASET_TYPE_ARRAY);
         if ($row) {
             // The timestampo column is not nullable and the zero dates aren't allowed, so the date
             // is set to the Unix epoch time.
@@ -120,11 +101,11 @@ class UserAuthenticationNonceModel extends Gdn_Model {
      */
     public function verify(string $nonce = '', bool $consume = true, bool $throw = false): bool {
         // First verify the token without going to the database.
-        if (!$this->verifyTokenSignature($nonce, self::$tokenIdentifier, $throw)) {
+        if (!$this->verifyTokenSignature($nonce, $throw)) {
             return false;
         }
 
-        $row = parent::getID($nonce, DATASET_TYPE_ARRAY);
+        $row = $this->getID($nonce, DATASET_TYPE_ARRAY);
         if (!$row) {
             return $this->tokenError('The nonce was not found in the database.', 401, $throw);
         }
@@ -140,7 +121,6 @@ class UserAuthenticationNonceModel extends Gdn_Model {
         if ($consume) {
             $this->consume($nonce);
         }
-
         return true;
     }
 }

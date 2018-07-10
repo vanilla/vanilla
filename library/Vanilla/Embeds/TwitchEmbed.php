@@ -21,7 +21,7 @@ class TwitchEmbed extends VideoEmbed {
     protected $domains = ['www.twitch.tv', 'clips.twitch.tv'];
 
     /** @var string */
-    private $urlType;
+    public $urlType;
 
     public function __construct()
     {
@@ -136,7 +136,7 @@ class TwitchEmbed extends VideoEmbed {
      *
      * @return string $embedUrl The url used to generate the embed.
      */
-    private function getEmbedUrl($videoID, $queryInfo = null): string {
+    public function getEmbedUrl($videoID, $queryInfo = null): string {
         $embedURL = '';
         $t ='';
         $autoplay ='';

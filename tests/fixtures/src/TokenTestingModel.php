@@ -9,7 +9,6 @@ namespace VanillaTests\Fixtures;
 
 use Vanilla\TokenSigningTrait;
 
-
 class TokenTestingModel {
 
     use TokenSigningTrait;

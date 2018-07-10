@@ -104,7 +104,7 @@ export function rangeContainsBlot(quill: Quill, blotConstructor: any, range: Ran
         const blots = quill.scroll.descendants(blotConstructor, range.index, range.length);
         return blots.length > 0;
     } else {
-        const blot = quill.scroll.descendant(blotConstructor, range.index);
+        const blot = quill.scroll.descendant(blotConstructor, range.index)[0];
         return !!blot;
     }
 }
@@ -408,5 +408,5 @@ export const SELECTION_UPDATE = "[editor] force selection update";
  * Force a selection update on all quill editors.
  */
 export function forceSelectionUpdate() {
-    document.dispatchEvent(new CustomEvent(this.SELECTION_UPDATE));
+    document.dispatchEvent(new CustomEvent(SELECTION_UPDATE));
 }

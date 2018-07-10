@@ -337,8 +337,9 @@ export default class KeyboardBindings {
             return true;
         }
 
-        // Bail out if the blot contents are not plian text.
-        if ((line as BlockBlot).children.length > 1 || (line as any).children.head.statics.blotName !== "text") {
+        // Bail out if the blot contents are not plain text or a link.
+        const firstBlotName = (line as any).children.head.statics.blotName;
+        if ((line as BlockBlot).children.length > 1 || !["text", "link"].includes(firstBlotName)) {
             return true;
         }
 

@@ -16,16 +16,16 @@ class InstagramEmbedTest extends SharedBootstrapTestCase {
      *
      * @param array $data Html from Instagrams oembed response.
      * @param array $expected The parsed results expected.
-     * @dataProvider urlProvider
+     * @dataProvider htmlProvider
      */
-    public function parseResponseHtmlTest($data, $expected) {
+    public function testParseResponseHtml($data, $expected) {
         $instaGramEmbed = new InstagramEmbed();
-        $parsedHtml = $instaGramEmbed->parseResponseHtml($data);
+        $parsedHtml = $instaGramEmbed->parseResponseHtml($data['sampleHTML']);
         $this->assertEquals($expected, $parsedHtml);
     }
 
     /**
-     * Data Provider for parseResponseHtmltest.
+     * Data Provider for testParseResponseHtml.
      *
      * @return array $data
      */
@@ -39,7 +39,19 @@ class InstagramEmbedTest extends SharedBootstrapTestCase {
                     'attributes' => [
                         'permaLink' => 'https://www.instagram.com/p/BlA5FivjLw6',
                         'isCaptioned' => true,
-                        'version' => '8',
+                        'versionNumber' => '8',
+                    ],
+                ],
+            ],
+            [
+                [
+                    'sampleHTML' => '<blockquote class="instagram-media" data-instgrm-captioned data-instgrm-permalink="https://www.instagram.com/p/BlBgZY7Ayto/" data-instgrm-version="8"',
+                ],
+                [
+                    'attributes' => [
+                        'permaLink' => 'https://www.instagram.com/p/BlBgZY7Ayto',
+                        'isCaptioned' => true,
+                        'versionNumber' => '8',
                     ],
                 ],
             ],

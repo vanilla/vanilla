@@ -14,7 +14,7 @@ class UserAuthenticationNonceModel extends Gdn_Model {
     use \Vanilla\TokenSigningTrait;
 
     /**
-     * Timestamp a consumed nonce will set to.
+     * The timestamp of a consumed nonce.
      */
     const CONSUMED_TIMESTAMP = "1971-01-01 00:00:01";
 

@@ -402,11 +402,11 @@ export function isEmbedSelected(quill: Quill, selection?: RangeStatic | null) {
     return !!potentialEmbedBlot;
 }
 
+export const SELECTION_UPDATE = "[editor] force selection update";
+
 /**
  * Force a selection update on all quill editors.
  */
 export function forceSelectionUpdate() {
     document.dispatchEvent(new CustomEvent(this.SELECTION_UPDATE));
 }
-
-export const SELECTION_UPDATE = "[editor] force selection update";

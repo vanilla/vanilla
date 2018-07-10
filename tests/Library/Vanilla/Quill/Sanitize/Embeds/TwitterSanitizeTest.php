@@ -4,11 +4,11 @@
  * @license GPL-2.0
  */
 
-namespace VanillaTests\Library\Vanilla\Quill\Sanitize\ExternalEmbed;
+namespace VanillaTests\Library\Vanilla\Quill\Sanitize\Embeds;
 
 use VanillaTests\Library\Vanilla\Quill\Sanitize\SanitizeTest;
 
-class GiphySanitizeTest extends SanitizeTest {
+class TwitterSanitizeTest extends SanitizeTest {
 
     /**
      * @inheritdoc
@@ -18,14 +18,14 @@ class GiphySanitizeTest extends SanitizeTest {
             [
                 "insert" => [
                     "embed-external" => [
-                        "url" => null,
-                        "type" => "giphy",
-                        "name" => null,
-                        "body" => null,
-                        "photoUrl" => null,
-                        "height" => $content,
-                        "width" => $content,
-                        "attributes" => ["postID" => $content]
+                        "url" => $content,
+                        "type" => "twitter",
+                        "name" => $content,
+                        "body" => $content,
+                        "photoUrl" => $content,
+                        "height" => null,
+                        "width" => null,
+                        "attributes" => ["statusID" => $content]
                     ]
                 ]
             ],

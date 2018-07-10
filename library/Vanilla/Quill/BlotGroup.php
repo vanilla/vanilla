@@ -8,21 +8,18 @@
 namespace Vanilla\Quill;
 
 use Vanilla\Quill\Blots\AbstractBlot;
-use Vanilla\Quill\Blots\AbstractLineBlot;
-use Vanilla\Quill\Blots\AbstractListBlot;
+use Vanilla\Quill\Blots\Lines\AbstractLineBlot;
 use Vanilla\Quill\Blots\CodeBlockBlot;
 use Vanilla\Quill\Blots\HeadingBlot;
 use Vanilla\Quill\Blots\TextBlot;
 
 /**
- * Class to represent a group of a quill blots. One Group can contain multiple inline type blots.
+ * Class to represent a group of a quill blots. One group can contain:
  *
- * @package Vanilla\Quill
+ * - Multiple Text formats in a single paragraph (as well as inline embeds).
+ * - Multiple line blots if it is a line type grouping
  */
 class BlotGroup {
-
-    const BREAK_MARKER = "group-break-marker";
-
     /** @var AbstractBlot[] */
     private $blots = [];
 
@@ -34,22 +31,8 @@ class BlotGroup {
     private $overridingBlots = [
         HeadingBlot::class,
         CodeBlockBlot::class,
-        AbstractListBlot::class,
         AbstractLineBlot::class,
     ];
-
-    /**
-     * Create any empty group. When rendered it will output <p><br></p>
-     *
-     * @return BlotGroup
-     */
-    public static function makeEmptyGroup(): BlotGroup {
-        $group = new BlotGroup();
-        $blot = new TextBlot(["insert" => ""], [], []);
-        $blot->setContent("<br>");
-        $group->pushBlot($blot);
-        return $group;
-    }
 
     /**
      * Determine if this group is made up only of a break.
@@ -68,7 +51,7 @@ class BlotGroup {
     /**
      * Check if the group's last matches the passed Blot class.
      *
-     * @param $blotClass - The class constructor of a Blot.
+     * @param string $blotClass - The class constructor of a Blot.
      * @param bool $needsExactMatch - If true, the class must match exactly, no child classes are allowed.
      *
      * @return bool
@@ -88,16 +71,21 @@ class BlotGroup {
     }
 
     /**
+     * Determine if the group is empty.
+     *
+     * @return bool
+     */
+    public function isEmpty(): bool {
+        return count($this->blots) === 0;
+    }
+
+    /**
      * Render the block.
      *
      * @return string
      */
     public function render(): string {
         // Don't render empty groups.
-        if (count($this->blots) === 0) {
-            return "";
-        }
-
         $surroundTagBlot = $this->getBlotForSurroundingTags();
         $result = $surroundTagBlot->getGroupOpeningTag();
 
@@ -106,12 +94,6 @@ class BlotGroup {
             $result .= $this->renderLineGroup($surroundTagBlot);
         } else {
             foreach ($this->blots as $blot) {
-                // Don't render breaks unless the group is just a break.
-                $blotIsBreak = get_class($blot) === TextBlot::class && $blot->getContent() === "";
-                if (!$this->isBreakOnlyGroup() && $blotIsBreak) {
-                    continue;
-                }
-
                 $result .= $blot->render();
             }
         }
@@ -132,7 +114,7 @@ class BlotGroup {
      *
      * @return string
      */
-    private function renderLineGroup(AbstractLineBlot $firstLineBlot): string {
+    public function renderLineGroup(AbstractLineBlot $firstLineBlot): string {
         $result = "";
 
         $result .= $firstLineBlot->renderLineStart();
@@ -149,7 +131,13 @@ class BlotGroup {
                 $result .= $blot->renderNewLines();
 
                 if ($index < count($this->blots) - 1) {
-                    $result .= $blot->renderLineStart();
+                    // TODO: This is kind of fragile and needs tests.
+                    $nextLine = $this->blots[$index + 1] ?? null;
+                    if ($nextLine instanceof AbstractLineBlot) {
+                        $result .= $nextLine->renderLineStart();
+                    } else {
+                        $result .= $blot->renderLineStart();
+                    }
                 }
             }
         }
@@ -169,15 +157,15 @@ class BlotGroup {
     /**
      * Get the position in the blots array of the first blot of the given type. Defaults to -1.
      *
-     * @param string $blotType
+     * @param string $blotClass The class string of the blot to check for.
      *
      * @return int
      */
-    public function getIndexForBlotOfType(string $blotType): int {
+    public function getIndexForBlotOfType(string $blotClass): int {
         $index = -1;
 
-        foreach($this->blots as $blotIndex => $blot) {
-            if($blot instanceof $blotType) {
+        foreach ($this->blots as $blotIndex => $blot) {
+            if ($blot instanceof $blotClass) {
                 $index = $blotIndex;
                 break;
             }
@@ -189,12 +177,15 @@ class BlotGroup {
     /**
      * Determine which blot should create the surrounding HTML tags of the group.
      *
-     * @return AbstractBlot
+     * @return AbstractBlot|null
      */
-    private function getBlotForSurroundingTags(): AbstractBlot {
+    public function getBlotForSurroundingTags() {
+        if (count($this->blots) === 0) {
+            return null;
+        }
         $blot = $this->blots[0];
 
-        foreach($this->overridingBlots as $overridingBlot) {
+        foreach ($this->overridingBlots as $overridingBlot) {
             $index = $this->getIndexForBlotOfType($overridingBlot);
             if ($index >= 0) {
                 $blot = $this->blots[$index];
@@ -203,5 +194,21 @@ class BlotGroup {
         }
 
         return $blot;
+    }
+
+    /**
+     * Simplify the blot group into an array of the classnames of its blots.
+     *
+     * @return string[]
+     */
+    public function getTestData(): array {
+        $blots = [];
+        foreach ($this->blots as $blot) {
+            $blots[] = [
+                "class" => get_class($blot),
+                "content" => $blot->getContent(),
+            ];
+        }
+        return $blots;
     }
 }

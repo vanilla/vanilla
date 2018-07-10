@@ -17,7 +17,7 @@ export async function soundCloudRenderer(elements: IEmbedElements, data: IEmbedD
     const visual = data.attributes.visual ? data.attributes.visual : "false";
 
     // Ensure this is a track.
-    if (data.attributes.track == null) {
+    if (data.attributes.postID == null) {
         throw new Error("Soundcloud embed fail, the track could not be found");
     }
 
@@ -28,12 +28,7 @@ export async function soundCloudRenderer(elements: IEmbedElements, data: IEmbedD
     iframe.setAttribute("frameborder", "no");
     iframe.setAttribute(
         "src",
-        "https://w.soundcloud.com/player/?url=https://api.soundcloud.com/tracks/" +
-            data.attributes.track +
-            "&visual=" +
-            showArtwork +
-            "&show_artwork=" +
-            visual,
+        data.attributes.embedUrl + data.attributes.postID + "&visual=" + showArtwork + "&show_artwork=" + visual,
     );
     contentElement.appendChild(iframe);
 }

@@ -4,11 +4,11 @@
  * @license GPL-2.0
  */
 
-namespace VanillaTests\Library\Vanilla\Quill\Sanitize\ExternalEmbed;
+namespace VanillaTests\Library\Vanilla\Quill\Sanitize\Embeds;
 
 use VanillaTests\Library\Vanilla\Quill\Sanitize\SanitizeTest;
 
-class ImgurSanitizeTest extends SanitizeTest {
+class GiphySanitizeTest extends SanitizeTest {
 
     /**
      * @inheritdoc
@@ -19,13 +19,13 @@ class ImgurSanitizeTest extends SanitizeTest {
                 "insert" => [
                     "embed-external" => [
                         "url" => null,
-                        "type" => "imgur",
+                        "type" => "giphy",
                         "name" => null,
                         "body" => null,
                         "photoUrl" => null,
-                        "height" => null,
-                        "width" => null,
-                        "attributes" => ["postID" => $content, "isAlbum" => $content]
+                        "height" => $content,
+                        "width" => $content,
+                        "attributes" => ["postID" => $content]
                     ]
                 ]
             ],

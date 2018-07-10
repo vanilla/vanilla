@@ -1318,6 +1318,10 @@ label.checkbox input.checkbox-input {
   line-height: 1.5;
 }
 
+.userContent code {
+  text-overflow: initial;
+}
+
 .emoji {
   width: 20px;
   height: 20px;
@@ -1445,6 +1449,9 @@ label.checkbox input.checkbox-input {
 .atMention {
   color: inherit;
   font-weight: 600;
+}
+
+.richEditor .atMention {
   -webkit-user-select: all;
      -moz-user-select: all;
       -ms-user-select: all;

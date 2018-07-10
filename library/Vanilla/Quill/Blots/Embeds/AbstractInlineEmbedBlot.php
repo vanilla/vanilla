@@ -7,9 +7,11 @@
 
 namespace Vanilla\Quill\Blots\Embeds;
 
-use Vanilla\Quill\BlotGroup;
 use Vanilla\Quill\Blots\AbstractBlot;
 
+/**
+ * Base class for creating inline content a value that goes beyond a simple string.
+ */
 abstract class AbstractInlineEmbedBlot extends AbstractBlot {
 
     const ZERO_WIDTH_WHITESPACE = "&#65279;";
@@ -19,7 +21,7 @@ abstract class AbstractInlineEmbedBlot extends AbstractBlot {
      *
      * @return string
      */
-    abstract protected static function getContainerHTMLTag(): string;
+    abstract protected function getContainerHTMLTag(): string;
 
     /**
      * Get the key to pull the main content out of the currentBlot.
@@ -37,17 +39,16 @@ abstract class AbstractInlineEmbedBlot extends AbstractBlot {
 
     /**
      * Get the class for the wrapping HTML tag. This will generally not be a
-     *
-     * @return string
      */
     abstract protected function getContainerHMTLAttributes(): array;
 
     /**
      * @inheritDoc
      */
-    public function __construct(array $currentOperation, array $previousOperation, array $nextOperation) {
+    public function __construct(array $currentOperation, array $previousOperation = [], array $nextOperation = []) {
         parent::__construct($currentOperation, $previousOperation, $nextOperation);
-        $this->content = valr(static::getInsertKey(), $this->currentOperation);
+        $potentialContent = valr(static::getInsertKey(), $this->currentOperation);
+        $this->content = is_string($potentialContent) ? htmlspecialchars($potentialContent) : "";
     }
 
     /**
@@ -60,38 +61,11 @@ abstract class AbstractInlineEmbedBlot extends AbstractBlot {
         foreach ($attributes as $attrKey => $attr) {
             $result .= " $attrKey=\"$attr\"";
         }
+
         $result .= ">";
-        $result .= "<span contenteditable=\"false\">" . $this->content . "</span>";
+        $result .= $this->content;
         $result .= "</" . static::getContainerHTMLTag() . ">";
 
         return $result;
-    }
-
-    /**
-     * Render the content area of the blot. Try overriding this before overriding render().
-     *
-     * @see AbstractInlineEmbedBlot::render()
-     *
-     * @return string
-     */
-    protected function renderContent(): string {
-        $result = "<span contenteditable=\"false\">";
-        $result .= $this->content;
-        $result .= "</span>";
-        return $result;
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public function shouldClearCurrentGroup(BlotGroup $group): bool {
-        return false;
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public function hasConsumedNextOp(): bool {
-        return false;
     }
 }

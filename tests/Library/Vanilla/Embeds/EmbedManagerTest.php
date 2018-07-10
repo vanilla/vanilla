@@ -8,6 +8,7 @@ namespace VanillaTests\Library\Vanilla\Embeds;
 
 use Exception;
 use Garden\Http\HttpRequest;
+use Vanilla\Embeds\CodePenEmbed;
 use Vanilla\Embeds\GettyEmbed;
 use Vanilla\Embeds\GiphyEmbed;
 use Vanilla\Embeds\ImgurEmbed;
@@ -56,6 +57,7 @@ class EmbedManagerTest extends SharedBootstrapTestCase {
             ->addEmbed(new GettyEmbed())
             ->addEmbed(new GiphyEmbed())
             ->addEmbed(new WistiaEmbed())
+            ->addEmbed(new CodePenEmbed())
             ->addEmbed(new ImageEmbed(), EmbedManager::PRIORITY_LOW)
             ->setNetworkEnabled(false);
         return $embedManager;
@@ -68,6 +70,30 @@ class EmbedManagerTest extends SharedBootstrapTestCase {
      */
     public function provideRenderedData() {
         $data = [
+            [
+                [
+                    "url" => "https://codepen.io/slafleche/pen/qYrgVx",
+                    "type" => "codepen",
+                    "name" => null,
+                    "body" => null,
+                    "photoUrl" => null,
+                    "height" => 300,
+                    "width" => null,
+                    "attributes" => [
+                        "id" => "cp_embed_qYrgVx",
+                        "embedUrl" => "https://codepen.io/slafleche/embed/preview/qYrgVx?theme-id=0",
+                        "style" => [
+                            "width" => "100",
+                            "overflow" => "hidden",
+                        ],
+                    ]
+                ],
+'<div class="embedExternal embedCodePen">
+    <div class="embedExternal-content">
+        <iframe scrolling="no" id="cp_embed_qYrgVx" height="300" src="https://codepen.io/slafleche/embed/preview/qYrgVx?theme-id=0" style="width: 100%; overflow: hidden;"></iframe>
+    </div>
+</div>',
+            ],
             [
                 [
                     "url" => "https://vanillaforums.com/images/metaIcons/vanillaForums.png",
@@ -220,14 +246,62 @@ class EmbedManagerTest extends SharedBootstrapTestCase {
                     "attributes" => [
                         "visual" => "true",
                         "showArtwork" => "true",
-                        "track" => "2F174656930",
-                        "url" => "https://w.soundcloud.com/player/?url=https://api.soundcloud.com/tracks/"
+                        "postID" => "2F174656930",
+                        "embedUrl" => "https://w.soundcloud.com/player/?url=https://api.soundcloud.com/tracks/"
                     ],
                 ],
 '<div class="embedExternal embedSoundCloud">
     <div class="embedExternal-content">
         <iframe width="100%" scrolling="no" frameborder="no"
             src="https://w.soundcloud.com/player/?url=https://api.soundcloud.com/tracks/2F174656930&amp;show_artwork=true&amp;visual=true">
+        </iframe>
+    </div>
+</div>'
+            ],
+            [
+                [
+                    "url" => "https://soundcloud.com/uiceheidd",
+                    "type" => "soundcloud",
+                    "name" => null,
+                    "body" => null,
+                    "photoUrl" => null,
+                    "height" => 300,
+                    "width" => null,
+                    "attributes" => [
+                        "visual" => "true",
+                        "showArtwork" => "true",
+                        "postID" => "330864225",
+                        "embedUrl" => "https://w.soundcloud.com/player/?url=https://api.soundcloud.com/users/"
+                    ],
+                ],
+                '<div class="embedExternal embedSoundCloud">
+    <div class="embedExternal-content">
+        <iframe width="100%" scrolling="no" frameborder="no"
+            src="https://w.soundcloud.com/player/?url=https://api.soundcloud.com/users/330864225&amp;show_artwork=true&amp;visual=true">
+        </iframe>
+    </div>
+</div>'
+            ],
+            [
+                [
+                    "url" => "https://soundcloud.com/uiceheidd/sets/juicewrld-the-mixtape",
+                    "type" => "soundcloud",
+                    "name" => null,
+                    "body" => null,
+                    "photoUrl" => null,
+                    "height" => 300,
+                    "width" => null,
+                    "attributes" => [
+                        "visual" => "true",
+                        "showArtwork" => "true",
+                        "postID" => "23ff550",
+                        "embedUrl" => "https://w.soundcloud.com/player/?url=https://api.soundcloud.com/playlists/"
+                    ],
+                ],
+                '<div class="embedExternal embedSoundCloud">
+    <div class="embedExternal-content">
+        <iframe width="100%" scrolling="no" frameborder="no"
+            src="https://w.soundcloud.com/player/?url=https://api.soundcloud.com/playlists/23ff550&amp;show_artwork=true&amp;visual=true">
         </iframe>
     </div>
 </div>'

@@ -5,8 +5,11 @@
  */
 
 import * as utility from "./utility";
-import Quill from "../quill";
+import Quill from "@rich-editor/quill";
 import { expect } from "chai";
+import { getIDForQuill, insertBlockBlotAt } from "./utility";
+import Parchment from "parchment";
+import FocusableEmbedBlot from "@rich-editor/quill/blots/abstract/FocusableEmbedBlot";
 
 const prettyNewline = (contents: string) => contents.replace(/\n/g, "↵ ");
 
@@ -134,5 +137,55 @@ describe("getMentionRange", () => {
                 expect(utility.getMentionRange(quill, index)).deep.equals({ index: 6, length: index - 6 });
             });
         });
+    });
+});
+
+describe("getIDForQuill()", () => {
+    it("can generate an ID", () => {
+        const quill = new Quill(document.createElement("div"));
+        expect(getIDForQuill(quill)).to.be.a("string");
+    });
+
+    it("generates uniqueIds", () => {
+        const quill1 = new Quill(document.createElement("div"));
+        const quill2 = new Quill(document.createElement("div"));
+        const id1 = getIDForQuill(quill1);
+        const id2 = getIDForQuill(quill2);
+        expect(id1).not.to.equal(id2);
+    });
+
+    it("generates id's consistently", () => {
+        const quill1 = new Quill(document.createElement("div"));
+        const id1 = getIDForQuill(quill1);
+        const id2 = getIDForQuill(quill1);
+        expect(id1).to.equal(id2);
+    });
+});
+
+describe("insertBlockBlotAt()", () => {
+    it("can split a line in the middle", () => {
+        const content = [{ insert: "\n\n\n1234567890\n" }];
+        const expected = [
+            {
+                insert: "\n\n\n12345\n",
+            },
+            {
+                insert: {
+                    "embed-focusable": true,
+                },
+            },
+            {
+                insert: "67890\n",
+            },
+        ];
+
+        const newBlot = new FocusableEmbedBlot(FocusableEmbedBlot.create());
+        const quill = new Quill(document.body);
+        quill.setContents(content);
+
+        insertBlockBlotAt(quill, 8, newBlot);
+        quill.update();
+
+        expect(quill.getContents().ops).deep.equals(expected);
     });
 });

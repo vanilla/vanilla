@@ -5,7 +5,7 @@
  */
 
 import * as mentionActions from "./mentionActions";
-import MentionTrie from "@rich-editor/state/MentionTrie";
+import MentionTrie from "@rich-editor/state/mention/MentionTrie";
 import { IMentionSuggestionData } from "@rich-editor/components/toolbars/pieces/MentionSuggestion";
 import { IMentionState } from "@rich-editor/state/IState";
 

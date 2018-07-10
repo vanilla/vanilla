@@ -11,7 +11,13 @@ import Module from "quill/core/module";
 import { RangeStatic } from "quill/core";
 import { delegateEvent, getNextTabbableElement } from "@dashboard/dom";
 import FocusableEmbedBlot from "./blots/abstract/FocusableEmbedBlot";
-import { insertNewLineAtEndOfScroll, insertNewLineAtStartOfScroll, getBlotAtIndex, rangeContainsBlot } from "./utility";
+import {
+    insertNewLineAtEndOfScroll,
+    insertNewLineAtStartOfScroll,
+    getBlotAtIndex,
+    rangeContainsBlot,
+    forceSelectionUpdate,
+} from "./utility";
 import MentionAutoCompleteBlot from "./blots/embeds/MentionAutoCompleteBlot";
 
 /**
@@ -434,6 +440,7 @@ export default class EmbedFocusModule extends Module {
                 event.preventDefault();
                 event.stopPropagation();
                 blotForActiveElement.remove();
+                forceSelectionUpdate();
 
                 // Otherwise if we're just in quill normally, we special handling in case the previous item is an embed blot.
             } else if (this.quill.hasFocus()) {

@@ -10,6 +10,8 @@ import KeyboardModule from "quill/modules/keyboard";
 import Delta from "quill-delta";
 import Parchment from "parchment";
 import { matchAtMention } from "@dashboard/utility";
+import uniqueId from "lodash/uniqueId";
+import FocusableEmbedBlot from "@rich-editor/quill/blots/abstract/FocusableEmbedBlot";
 
 interface IBoundary {
     start: number;
@@ -342,3 +344,63 @@ export function createEditorFlyoutEscapeListener(
         }
     });
 }
+
+const quillIDMap: Map<Quill, string> = new Map();
+
+/**
+ * Generate a unique ID for a quill instance and store it in a Map with that instance.
+ *
+ * This is useful for generating a string key for a given quill instance.
+ *
+ * @param quill The quill instance.
+ */
+export function getIDForQuill(quill: Quill) {
+    if (quillIDMap.has(quill)) {
+        return quillIDMap.get(quill);
+    } else {
+        quillIDMap.set(quill, uniqueId("editorInstance"));
+        return getIDForQuill(quill);
+    }
+}
+
+/**
+ * Insert a blot into a quill instance at a given index.
+ *
+ * Why does this need to exist?
+ * - The built in `blot.insertAt` method doesn't let you insert a premade blot.
+ * - We need to calculate this offset anyways.
+ * - Our scope is narrower because we are inserting only at the top level, where a blot is always a block.
+ *
+ * @param quill - A Quill instance.
+ * @param index - The index to insert at.
+ * @param blot - A blot already created.
+ */
+export function insertBlockBlotAt(quill: Quill, index: number, blot: Blot) {
+    const line = quill.getLine(index)[0] as Blot;
+
+    // Splitting lines is relative to the line start, the scroll start, so we need to calculate the
+    // index within the blot to split at.
+    const lineOffset = line.offset(quill.scroll);
+    const ref = line.split(index - lineOffset);
+    line.parent.insertBefore(blot, ref || undefined);
+}
+
+/**
+ * Determine if and Embed inside of this class is focused.
+ */
+export function isEmbedSelected(quill: Quill, selection?: RangeStatic | null) {
+    if (!selection) {
+        return false;
+    }
+    const potentialEmbedBlot = getBlotAtIndex(quill, selection.index, FocusableEmbedBlot);
+    return !!potentialEmbedBlot;
+}
+
+/**
+ * Force a selection update on all quill editors.
+ */
+export function forceSelectionUpdate() {
+    document.dispatchEvent(new CustomEvent(this.SELECTION_UPDATE));
+}
+
+export const SELECTION_UPDATE = "[editor] force selection update";

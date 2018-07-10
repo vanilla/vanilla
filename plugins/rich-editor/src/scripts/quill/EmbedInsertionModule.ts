@@ -6,22 +6,29 @@
 
 import Module from "quill/core/module";
 import Parchment from "parchment";
-import Quill, { RangeStatic, Sources } from "quill/core";
+import Quill, { RangeStatic } from "quill/core";
 import api, { uploadImage } from "@dashboard/apiv2";
 import { getPastedImage, getDraggedImage } from "@dashboard/dom";
 import ExternalEmbedBlot, { IEmbedValue } from "./blots/embeds/ExternalEmbedBlot";
+import getStore from "@dashboard/state/getStore";
+import IState from "@rich-editor/state/IState";
+import { getIDForQuill, insertBlockBlotAt } from "@rich-editor/quill/utility";
+
+const store = getStore<IState>();
 
 /**
  * A Quill module for managing insertion of embeds/loading/error states.
  */
 export default class EmbedInsertionModule extends Module {
-    private lastSelection: RangeStatic = { index: 0, length: 0 };
-
-    constructor(public quill: Quill, options = {}) {
+    constructor(public quill: Quill, options = {}, editorID) {
         super(quill, options);
         this.quill = quill;
         this.setupImageUploads();
-        this.setupSelectionListener();
+    }
+
+    private get state() {
+        const id = getIDForQuill(this.quill);
+        return store.getState().editor.instances[id];
     }
 
     /**
@@ -46,48 +53,12 @@ export default class EmbedInsertionModule extends Module {
     /**
      * Create an async embed. The embed will be responsible for handling it's loading state and error states.
      */
-    public createEmbed = (embedValue: IEmbedValue, callback?: () => void) => {
+    public createEmbed = (embedValue: IEmbedValue) => {
         const externalEmbed = Parchment.create("embed-external", embedValue) as ExternalEmbedBlot;
-        const [currentLine] = this.quill.getLine(this.lastSelection.index);
-        const referenceBlot = currentLine.split(this.lastSelection.index);
-        this.quill.update(Quill.sources.SILENT);
-        const newSelection = {
-            index: this.lastSelection.index + 2,
-            length: 0,
-        };
+        const selection = this.state.lastGoodSelection || { index: this.quill.scroll.length(), length: 0 };
+        insertBlockBlotAt(this.quill, selection.index, externalEmbed);
         this.quill.update(Quill.sources.USER);
-        externalEmbed.insertInto(this.quill.scroll, referenceBlot);
-        this.quill.update(Quill.sources.USER);
-        this.quill.setSelection(newSelection, Quill.sources.USER);
-    };
-
-    /**
-     * Setup a selection listener for quill.
-     */
-    private setupSelectionListener() {
-        this.quill.on(Quill.events.EDITOR_CHANGE, this.handleEditorChange);
-    }
-
-    /**
-     * Handle changes from the editor.
-     *
-     * @param type - The event type. See {quill/core/emitter}
-     * @param range - The new range.
-     */
-    private handleEditorChange = (type: string, range: RangeStatic, oldRange: RangeStatic, source: Sources) => {
-        if (
-            range &&
-            (type === Quill.events.SELECTION_CHANGE || type === Quill.events.TEXT_CHANGE) &&
-            source !== Quill.sources.SILENT
-        ) {
-            if (typeof range.index !== "number") {
-                range = this.quill.getSelection();
-            }
-
-            if (range != null) {
-                this.lastSelection = range;
-            }
-        }
+        externalEmbed.focus();
     };
 
     private pasteHandler = (event: ClipboardEvent) => {

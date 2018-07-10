@@ -61,4 +61,4 @@ export class EditorUploadButton extends React.Component<IProps, {}> {
     };
 }
 
-export default withEditor<IProps>(EditorUploadButton);
+export default withEditor(EditorUploadButton);

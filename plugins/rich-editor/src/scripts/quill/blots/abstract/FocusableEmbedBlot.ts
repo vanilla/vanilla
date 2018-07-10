@@ -47,16 +47,20 @@ export default class FocusableEmbedBlot extends BlockEmbed {
             return logWarning("Attempted to focus a an embed blot that has not been mounted yet.");
         }
 
+        const hadFocus = this.focusableElement === document.activeElement;
         const offset = this.offset(this.quill.scroll);
         super.remove();
         this.quill.update(Quill.sources.USER);
 
-        const potentialNewEmbedToFocus = getBlotAtIndex(this.quill, offset, FocusableEmbedBlot);
-
-        if (potentialNewEmbedToFocus) {
-            potentialNewEmbedToFocus.focus();
-        } else {
-            this.quill.setSelection(offset, 0, Quill.sources.USER);
+        // If the blot had focus before the removal we need to place the focus either on quill and set the selection
+        // To the blot that will take this ones place, or focus another FocusableBlot coming in.
+        if (hadFocus) {
+            const potentialNewEmbedToFocus = getBlotAtIndex(this.quill, offset, FocusableEmbedBlot);
+            if (potentialNewEmbedToFocus) {
+                potentialNewEmbedToFocus.focus();
+            } else {
+                this.quill.setSelection(offset, 0, Quill.sources.USER);
+            }
         }
     }
 
@@ -113,7 +117,7 @@ export default class FocusableEmbedBlot extends BlockEmbed {
      *
      * This will _NOT_ work before attach() is called.
      */
-    private get quill(): Quill | null {
+    protected get quill(): Quill | null {
         if (!this.scroll || !this.scroll.domNode.parentNode) {
             return null;
         }

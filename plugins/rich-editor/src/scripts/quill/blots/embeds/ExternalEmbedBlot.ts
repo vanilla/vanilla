@@ -12,7 +12,7 @@ import ErrorBlot from "./ErrorBlot";
 import { t } from "@dashboard/application";
 import { logError, capitalizeFirstLetter } from "@dashboard/utility";
 import LoadingBlot from "@rich-editor/quill/blots/embeds/LoadingBlot";
-import { Blot } from "quill/core";
+import { forceSelectionUpdate } from "@rich-editor/quill/utility";
 
 const DATA_KEY = "__embed-data__";
 
@@ -136,9 +136,11 @@ export default class ExternalEmbedBlot extends FocusableEmbedBlot {
         setImmediate(() => {
             void renderEmbed({ root: embedExternal, content: embedExternalContent }, data)
                 .then(() => {
+                    forceSelectionUpdate();
                     loaderElement && loaderElement.remove();
                 })
                 .catch(e => {
+                    forceSelectionUpdate();
                     logError(e);
                     const warning = ExternalEmbedBlot.createEmbedWarningFallback(data.url);
                     embedExternal.remove();
@@ -150,8 +152,6 @@ export default class ExternalEmbedBlot extends FocusableEmbedBlot {
 
         return jsEmbed;
     }
-
-    private loadCallback?: () => void;
 
     /**
      * This should only ever be called internally (or through Parchment.create())
@@ -184,10 +184,6 @@ export default class ExternalEmbedBlot extends FocusableEmbedBlot {
             } catch (e) {
                 logError(e);
                 this.replaceWith(new ErrorBlot(ErrorBlot.create(e)));
-                if (this.loadCallback) {
-                    this.loadCallback();
-                    this.loadCallback = undefined;
-                }
                 return;
             }
         }
@@ -205,16 +201,5 @@ export default class ExternalEmbedBlot extends FocusableEmbedBlot {
         setData(embedElement, DATA_KEY, newValue);
         finalBlot = new ExternalEmbedBlot(embedElement, newValue, false);
         this.replaceWith(finalBlot);
-        if (this.loadCallback) {
-            this.loadCallback();
-            this.loadCallback = undefined;
-        }
-    }
-
-    /**
-     * Register a callback for when the blot has been finalized.
-     */
-    public registerLoadCallback(callback: () => void) {
-        this.loadCallback = callback;
     }
 }

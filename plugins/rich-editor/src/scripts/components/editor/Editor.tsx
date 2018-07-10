@@ -16,9 +16,13 @@ import MentionToolbar from "@rich-editor/components/toolbars/MentionToolbar";
 import ParagraphToolbar from "@rich-editor/components/toolbars/ParagraphToolbar";
 import InlineToolbar from "@rich-editor/components/toolbars/InlineToolbar";
 import UploadButton from "@rich-editor/components/editor/pieces/EditorUploadButton";
-import { Provider as EditorProvider } from "@rich-editor/components/context";
+import { EditorProvider } from "@rich-editor/components/context";
 import EditorDescriptions from "@rich-editor/components/editor/pieces/EditorDescriptions";
 import { Provider as ReduxProvider } from "react-redux";
+import IState from "@rich-editor/state/IState";
+import { actions } from "@rich-editor/state/instance/instanceActions";
+import { getIDForQuill, isEmbedSelected, SELECTION_UPDATE } from "@rich-editor/quill/utility";
+import { FOCUS_CLASS } from "@dashboard/embeds";
 
 interface IProps {
     editorID: string;
@@ -26,13 +30,14 @@ interface IProps {
     bodybox: HTMLInputElement;
 }
 
-interface IState {}
+const store = getStore<IState>();
 
-export default class Editor extends React.Component<IProps, IState> {
+export default class Editor extends React.Component<IProps> {
     private hasUploadPermission: boolean;
-    private quill: Quill;
     private quillMountRef: React.RefObject<HTMLDivElement> = React.createRef();
     private allowPasteListener = true;
+    private editorID: string;
+    private quill: Quill;
 
     constructor(props) {
         super(props);
@@ -47,9 +52,16 @@ export default class Editor extends React.Component<IProps, IState> {
         this.quill = new Quill(this.quillMountRef!.current!, options);
         bodybox.style.display = "none";
 
+        this.editorID = getIDForQuill(this.quill);
+
         // Setup syncing
         this.setupBodyBoxSync();
         this.setupDebugPasteListener();
+        store.dispatch(actions.createInstance(this.editorID));
+        this.quill.on(Quill.events.EDITOR_CHANGE, this.onQuillUpdate);
+
+        // Add a listener for a force selection update.
+        document.addEventListener(SELECTION_UPDATE, this.onQuillUpdate);
 
         // Once we've created our quill instance we need to force an update to allow all of the quill dependent
         // Modules to render.
@@ -86,7 +98,7 @@ export default class Editor extends React.Component<IProps, IState> {
 
         return (
             <ReduxProvider store={getStore()}>
-                <EditorProvider quill={this.quill}>
+                <EditorProvider value={{ quill: this.quill, editorID: this.editorID }}>
                     <div
                         className="richEditor"
                         aria-label={t("Type your message")}
@@ -113,6 +125,10 @@ export default class Editor extends React.Component<IProps, IState> {
             </ReduxProvider>
         );
     }
+
+    private onQuillUpdate = () => {
+        store.dispatch(actions.setSelection(this.editorID, this.quill.getSelection()));
+    };
 
     /**
      * Synchronization from quill's contents to the bodybox for legacy contexts.

@@ -12,7 +12,7 @@ use UserAuthenticationNonceModel;
 use VanillaTests\SiteTestTrait;
 
 /**
- * Test the {@link AccessTokenModel}.
+ * Test the {@link UserAuthenticationNonceModel}.
  */
 class UserAuthenticationNonceModelTest extends SharedBootstrapTestCase {
     use SiteTestTrait;
@@ -30,15 +30,15 @@ class UserAuthenticationNonceModelTest extends SharedBootstrapTestCase {
     /**
      * That a nonce can be consumed.
      *
-     * @throws \Gdn_UserException
+     * @expectedException \Exception
+     * @expectedExceptionMessage Nonce has expired.
      */
     public function testConsume() {
         $model = new UserAuthenticationNonceModel('hhh');
         $issuedNonce = $model->issue();
         $model->consume($issuedNonce);
         $consumedNonce = $model->getNonce($issuedNonce);
-
-        $this->assertEquals("1971-01-01 00:00:01", $consumedNonce['Timestamp']);
+        $model->verify($consumedNonce['Nonce'], true, true);
     }
 
 

@@ -12,10 +12,10 @@ use VanillaTests\SiteTestTrait;
 use VanillaTests\Fixtures\TokenModel;
 
 /**
- * Test the {@link TokenModel}.
+ * Test the {@link TokenSigningTrait}.
  * Used to test the token generation and signing utility methods.
  */
-class TokenSigningTests extends SharedBootstrapTestCase {
+class TokenSigningTraitTest extends SharedBootstrapTestCase {
     use SiteTestTrait;
 
     /**
@@ -23,7 +23,6 @@ class TokenSigningTests extends SharedBootstrapTestCase {
      */
     public function testVerifyRandomTokenSignature() {
         $model = new TokenModel();
-        $model->tokenIdentifier ='nonce';
         $token = $model->randomSignedToken();
         $this->assertEquals(true, $model->verifyTokenSignature($token, $model->tokenIdentifier, true));
     }
@@ -36,7 +35,6 @@ class TokenSigningTests extends SharedBootstrapTestCase {
      */
     public function testExpiryDate() {
         $model = new TokenModel();
-        $model->tokenIdentifier ='nonce';
         $token = $model->randomSignedToken('last month');
         $this->assertEquals(false, $model->verifyTokenSignature($token, $model->tokenIdentifier, true));
     }
@@ -49,7 +47,6 @@ class TokenSigningTests extends SharedBootstrapTestCase {
      */
     public function testBadSignature() {
         $model = new TokenModel();
-        $model->tokenIdentifier ='nonce';
         $token = $model->randomSignedToken().'!';
         $this->assertEquals(false, $model->verifyTokenSignature($token, $model->tokenIdentifier, true));
     }
@@ -61,7 +58,6 @@ class TokenSigningTests extends SharedBootstrapTestCase {
      */
     public function testBadToken() {
         $model = new TokenModel();
-        $model->tokenIdentifier = 'nonce';
         $token = 'a.b.c';
         $this->assertEquals(false, $model->verifyTokenSignature($token, $model->tokenIdentifier, true));
     }

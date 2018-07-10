@@ -20,8 +20,8 @@ class TokenModel {
     public $tokenIdentifier;
     public $secret;
 
-    public function __construct($secret = '') {
-        $this->secret = 'sss';
+    public function __construct() {
+        $this->secret = $this->setSecret('sss');
+        $this->tokenIdentifier = 'nonce';
     }
-
 }

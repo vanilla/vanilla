@@ -16,8 +16,8 @@ trait TokenSigningTrait {
     /**
      * @var string $secret The secret used to sign the token.
      */
-    public $secret;
-    
+    private $secret;
+
     /**
      * Get the secret.
      *
@@ -44,7 +44,7 @@ trait TokenSigningTrait {
      * @param string $str The string to encode.
      * @return string The encoded string.
      */
-    protected static function base64urlEncode($str) {
+    private static function base64urlEncode($str) {
         return trim(strtr(base64_encode($str), '+/', '-_'), '=');
     }
 
@@ -54,7 +54,7 @@ trait TokenSigningTrait {
      * @param string $str The encoded string.
      * @return string The decoded string.
      */
-    protected static function base64urlDecode($str) {
+    private static function base64urlDecode($str) {
         return base64_decode(strtr($str, '-_', '+/'));
     }
 
@@ -74,7 +74,7 @@ trait TokenSigningTrait {
      * Verify a token's signature.
      *
      * @param string $accessToken The full access token.
-     * @oaran string $tokenIdentifier the model that is calling verify signature.
+     * @paran string $tokenIdentifier the model that is calling verify signature.
      * @param bool $throw Whether or not to throw an exception on a verification error.
      * @return bool Returns **true** if the token's expiry date and signature is valid or **false** otherwise.
      * @throws \Exception Throws an exception if the token is invalid and {@link $throw} is **true**.
@@ -195,5 +195,4 @@ trait TokenSigningTrait {
     public function randomSignedToken($expires = '2 months') {
         return $this->signToken($this->randomToken(), $expires);
     }
-
 }

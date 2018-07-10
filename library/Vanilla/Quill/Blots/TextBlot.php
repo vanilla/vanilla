@@ -33,8 +33,6 @@ class TextBlot extends AbstractBlot {
 
         // Grab the insert text for the content.
         $this->content = $this->currentOperation["insert"] ?? "";
-        // Sanitize
-        $this->content = htmlspecialchars($this->content);
     }
 
     /**

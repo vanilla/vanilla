@@ -26,7 +26,7 @@ class CodeBlockBlot extends TextBlot {
      * @inheritDoc
      */
     public function render(): string {
-        $result = $this->content;
+        $result = htmlspecialchars($this->content);
 
         // Add newlines which live in the next operation.
         if ($this->nextOperation) {

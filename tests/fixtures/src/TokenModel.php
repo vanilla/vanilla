@@ -18,7 +18,6 @@ class TokenModel {
 
     use TokenSigningTrait;
     public $tokenIdentifier;
-    public $secret;
 
     public function __construct() {
         $this->secret = $this->setSecret('sss');

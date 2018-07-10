@@ -31,11 +31,9 @@ trait TokenSigningTrait {
      * Set the secret.
      *
      * @param mixed $secret
-     * @return $this
      */
     public function setSecret($secret) {
         $this->secret = $secret;
-        return $this;
     }
 
     /**

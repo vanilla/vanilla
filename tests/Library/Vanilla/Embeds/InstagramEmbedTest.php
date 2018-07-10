@@ -12,7 +12,7 @@ use Vanilla\Embeds\InstagramEmbed;
 class InstagramEmbedTest extends SharedBootstrapTestCase {
 
     /**
-     * Test the parseResponseHtmlTest method.
+     * Test the parseResponseHtml method.
      *
      * @param array $data Html from Instagrams oembed response.
      * @param array $expected The parsed results expected.

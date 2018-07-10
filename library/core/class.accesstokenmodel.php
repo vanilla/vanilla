@@ -24,7 +24,7 @@ class AccessTokenModel extends Gdn_Model {
         parent::__construct('AccessToken');
         $this->PrimaryKey = 'AccessTokenID';
         $this->secret = $secret ?: c('Garden.Cookie.Salt');
-        $this->tokenIdentifier ='access token';
+        $this->tokenIdentifier = 'access token';
 
         $this->setPruneAfter('1 day')
             ->setPruneField('DateExpires');
@@ -285,5 +285,15 @@ class AccessTokenModel extends Gdn_Model {
             return $token;
         }
         return $accessToken;
+    }
+
+    /**
+     * Generate and sign a token.
+     *
+     * @param string $expires When the token expires.
+     * @return string
+     */
+    public function randomSignedToken($expires = '2 months') {
+        return $this->signToken($this->randomToken(), $expires);
     }
 }

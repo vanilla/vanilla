@@ -12,6 +12,10 @@ class UserAuthenticationNonceModel extends Gdn_Model {
 
     use \Vanilla\PrunableTrait;
     use \Vanilla\TokenSigningTrait;
+
+    /**
+     * Timestamp a consumed nonce will set to.
+     */
     const CONSUMED_TIMESTAMP = "1971-01-01 00:00:01";
 
     /**
@@ -19,7 +23,7 @@ class UserAuthenticationNonceModel extends Gdn_Model {
      *
      * @param string $secret The secret used to sign access tokens for the client.
      */
-    public function __construct($secret = '') {
+    public function __construct($secret = null) {
         parent::__construct('UserAuthenticationNonce');
         $this->setPruneField('Timestamp');
         $this->setPruneAfter('45 minutes');
@@ -37,12 +41,8 @@ class UserAuthenticationNonceModel extends Gdn_Model {
         if (!isset($fields['Timestamp'])) {
             $fields['Timestamp'] = date(MYSQL_DATE_FORMAT);
         }
-        parent::insert($fields);
-        if (!empty($this->Database->LastInfo['RowCount'])) {
-            $result = true;
-        } else {
-            $result = false;
-        }
+        $result = parent::insert($fields);
+
         return $result;
     }
 
@@ -50,7 +50,7 @@ class UserAuthenticationNonceModel extends Gdn_Model {
      * Issue a signed Nonce.
      *
      * @param string $expires The expiration time of the nonce.
-     * @param string $type The type of the of token.
+     * @param string $type The type of nonce.
      * @return string $nonce The signed nonce.
      * @throws Gdn_UserException Unable to generate a signed nonce.
      */
@@ -65,7 +65,7 @@ class UserAuthenticationNonceModel extends Gdn_Model {
             'Timestamp' => $expireDate,
         ]);
 
-        if (!$result) {
+        if ($result === false) {
             throw new Gdn_UserException($this->Validation->resultsText(), 400);
         }
         return $nonce;
@@ -75,13 +75,12 @@ class UserAuthenticationNonceModel extends Gdn_Model {
      * Consumes the nonce and invalidates the timestamp so it can't be used again.
      *
      * @param string $nonce The nonce to be consumed.
-     * @throws Exception Unable to find nonce.
+     * @throws Exception if unable to find nonce.
      */
     public function consume(string $nonce) {
         $row = $this->getID($nonce, DATASET_TYPE_ARRAY);
         if ($row) {
-            // The timestampo column is not nullable and the zero dates aren't allowed, so the date
-            // is set to the Unix epoch time.
+            // Timestamp cannot be null or zero. Use a constant date for consumed nonces.
             parent::update(
                 ['Timestamp' => self::CONSUMED_TIMESTAMP],
                 ['Nonce' => $nonce]
@@ -112,7 +111,7 @@ class UserAuthenticationNonceModel extends Gdn_Model {
 
         // Check the expiry date from the database.
         $dbExpires = $this->toTimestamp($row['Timestamp']);
-        if ($dbExpires === self::CONSUMED_TIMESTAMP) {
+        if ($dbExpires === $this->toTimestamp(self::CONSUMED_TIMESTAMP)) {
             return $this->tokenError('Nonce was already used.', 401, $throw);
         } elseif ($dbExpires < time()) {
             return $this->tokenError('Nonce has expired.', 401, $throw);

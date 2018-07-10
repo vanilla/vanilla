@@ -9,7 +9,7 @@ namespace VanillaTests\Models;
 
 use VanillaTests\SharedBootstrapTestCase;
 use VanillaTests\SiteTestTrait;
-use VanillaTests\Fixtures\TokenModel;
+use VanillaTests\Fixtures\TokenTestingModel;
 
 /**
  * Test the {@link TokenSigningTrait}.
@@ -22,8 +22,8 @@ class TokenSigningTraitTest extends SharedBootstrapTestCase {
      * Tests random token generation and signing.
      */
     public function testVerifyRandomTokenSignature() {
-        $model = new TokenModel();
-        $token = $model->randomSignedToken();
+        $model = new TokenTestingModel();
+        $token = $model->signToken($model->randomToken(), '2 months');
         $this->assertEquals(true, $model->verifyTokenSignature($token, true));
     }
 
@@ -34,8 +34,8 @@ class TokenSigningTraitTest extends SharedBootstrapTestCase {
      * @expectedExceptionMessage Your nonce has expired.
      */
     public function testExpiryDate() {
-        $model = new TokenModel();
-        $token = $model->randomSignedToken('last month');
+        $model = new TokenTestingModel();
+        $token = $model->signToken($model->randomToken(), 'last year');
         $this->assertEquals(false, $model->verifyTokenSignature($token, true));
     }
 
@@ -43,11 +43,11 @@ class TokenSigningTraitTest extends SharedBootstrapTestCase {
      * An altered token signature shouldn't verify.
      *
      * @expectedException \Exception
-     * $expectedExceptionMessage Invalid signature.
+     * @expectedExceptionMessage Your nonce has an invalid signature.
      */
     public function testBadSignature() {
-        $model = new TokenModel();
-        $token = $model->randomSignedToken().'!';
+        $model = new TokenTestingModel();
+        $token = $model->signToken($model->randomToken(), '2 months').'!';
         $this->assertEquals(false, $model->verifyTokenSignature($token,true));
     }
 
@@ -55,9 +55,10 @@ class TokenSigningTraitTest extends SharedBootstrapTestCase {
      * A nonsense token shouldn't verify.
      *
      * @expectedException \Exception
+     * @expectedExceptionMessage nonce missing parts.
      */
     public function testBadToken() {
-        $model = new TokenModel();
+        $model = new TokenTestingModel();
         $token = 'a.b.c';
         $this->assertEquals(false, $model->verifyTokenSignature($token, true));
     }

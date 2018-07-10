@@ -8,8 +8,6 @@
 namespace Vanilla;
 
 /**
- * Trait TokenSigningTrait.
- *
  * Methods to be used for token generation and signing.
  */
 trait TokenSigningTrait {
@@ -74,7 +72,6 @@ trait TokenSigningTrait {
      * Verify a token's signature.
      *
      * @param string $accessToken The full access token.
-     * @paran string $tokenIdentifier the model that is calling verify signature.
      * @param bool $throw Whether or not to throw an exception on a verification error.
      * @return bool Returns **true** if the token's expiry date and signature is valid or **false** otherwise.
      * @throws \Exception Throws an exception if the token is invalid and {@link $throw} is **true**.
@@ -83,7 +80,7 @@ trait TokenSigningTrait {
         $parts = explode('.', $accessToken);
 
         if (empty($accessToken)) {
-            return $this->tokenError('Missing'.$this->tokenIdentifier, 401, $throw);
+            return $this->tokenError('Missing '.$this->tokenIdentifier, 401, $throw);
         }
 
         if (count($parts) !== 4) {
@@ -186,13 +183,4 @@ trait TokenSigningTrait {
         return $arr[1];
     }
 
-    /**
-     * Generate and sign a token.
-     *
-     * @param string $expires When the token expires.
-     * @return string
-     */
-    public function randomSignedToken($expires = '2 months') {
-        return $this->signToken($this->randomToken(), $expires);
-    }
 }

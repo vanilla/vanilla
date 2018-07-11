@@ -23,7 +23,7 @@ class UserAuthenticationNonceModelTest extends SharedBootstrapTestCase {
     public function testIssueAndVerify() {
         $model = new UserAuthenticationNonceModel('hhh');
         $nonce = $model->issue();
-        $this->assertEquals(true,  $model->verify($nonce));
+        $this->assertEquals(true, $model->verify($nonce));
     }
 
     /**

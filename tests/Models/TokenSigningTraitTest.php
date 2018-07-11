@@ -55,11 +55,11 @@ class TokenSigningTraitTest extends SharedBootstrapTestCase {
      * A nonsense token shouldn't verify.
      *
      * @expectedException \Exception
-     * @expectedExceptionMessage nonce missing parts.
+     * @expectedExceptionMessage Your nonce missing parts.
      */
     public function testBadToken() {
         $model = new TokenTestingModel();
-        $token = 'a.b.c';
+        $token = 'hr.df.ee';
         $model->verifyTokenSignature($token, true);
     }
 }

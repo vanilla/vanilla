@@ -23,9 +23,9 @@ class AccessTokenModel extends Gdn_Model {
     public function __construct($secret = '') {
         parent::__construct('AccessToken');
         $this->PrimaryKey = 'AccessTokenID';
-        $this->secret = $secret ?: c('Garden.Cookie.Salt');
+        $secret = $secret ?: c('Garden.Cookie.Salt');
+        $this->setSecret($secret);
         $this->tokenIdentifier = 'access token';
-
         $this->setPruneAfter('1 day')
             ->setPruneField('DateExpires');
     }

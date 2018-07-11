@@ -81,6 +81,8 @@ $global-normal_fontWeight                              : 400 !default;
 $global-bold_fontWeight                                : 600 !default;
 
 $global-lineHeight_offset                              : .32em !default; // Offset font to make top of capital letters flush with top of container
+$global-headinglineHeight_offset                       : $global-lineHeight_offset !default; // Different if heading has different font than body
+$global-bodylineHeight_offset                          : $global-lineHeight_offset !default; // Different if heading has different font than body
 
 $global-base_lineHeight                                : (20/14) !default;
 

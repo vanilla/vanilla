@@ -182,5 +182,4 @@ trait TokenSigningTrait {
         }
         return $arr[1];
     }
-
 }

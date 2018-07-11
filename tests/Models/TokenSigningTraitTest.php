@@ -48,7 +48,7 @@ class TokenSigningTraitTest extends SharedBootstrapTestCase {
     public function testBadSignature() {
         $model = new TokenTestingModel();
         $token = $model->signToken($model->randomToken(), '2 months').'!';
-        $model->verifyTokenSignature($token,true);
+        $model->verifyTokenSignature($token, true);
     }
 
     /**

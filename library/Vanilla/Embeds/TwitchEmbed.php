@@ -202,7 +202,7 @@ class TwitchEmbed extends VideoEmbed {
      *
      * @return string $param A filter parameter.
      */
-    public function filtersBooleanString($param): string {
+    private function filtersBooleanString($param): string {
         $param = ($param === "true") ? $param : "false";
         return $param;
     }

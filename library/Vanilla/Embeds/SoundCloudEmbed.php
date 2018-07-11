@@ -73,7 +73,7 @@ HTML;
      * @param string $html The html snippet send from the oembed call.
      * @return array $data
      */
-    private function parseResponseHtml(string $html): array {
+    public function parseResponseHtml(string $html): array {
         $data = [];
         preg_match('/(visual=(?<visual>true))/i', $html, $showVisual);
         if ($showVisual) {

@@ -386,6 +386,7 @@ class MediaTest extends AbstractAPIv2Test {
             ['https://gph.is/2sTbvh0', 'giphy'],
             ['https://media.giphy.com/media/2vqIyGV2S3HTGafbKo/giphy.gif', 'giphy'],
             ['https://vanillaforums-1.wistia.com/medias/vjidqnyg0a', 'wistia'],
+            ['https://codepen.io/cchabilall83/pen/gKymEp', 'codepen'],
         ];
 
         return $urls;

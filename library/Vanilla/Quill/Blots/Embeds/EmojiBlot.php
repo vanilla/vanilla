@@ -7,6 +7,9 @@
 
 namespace Vanilla\Quill\Blots\Embeds;
 
+/**
+ * Blot for rendering out safe browser-compatible emoijs.
+ */
 class EmojiBlot extends AbstractInlineEmbedBlot {
 
     /**
@@ -19,7 +22,7 @@ class EmojiBlot extends AbstractInlineEmbedBlot {
     /**
      * @inheritDoc
      */
-    protected static function getContainerHTMLTag(): string {
+    protected function getContainerHTMLTag(): string {
         return "span";
     }
 

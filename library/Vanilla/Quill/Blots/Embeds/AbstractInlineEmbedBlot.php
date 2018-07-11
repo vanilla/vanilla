@@ -7,9 +7,11 @@
 
 namespace Vanilla\Quill\Blots\Embeds;
 
-use Vanilla\Quill\BlotGroup;
 use Vanilla\Quill\Blots\AbstractBlot;
 
+/**
+ * Base class for creating inline content a value that goes beyond a simple string.
+ */
 abstract class AbstractInlineEmbedBlot extends AbstractBlot {
 
     const ZERO_WIDTH_WHITESPACE = "&#65279;";
@@ -19,7 +21,7 @@ abstract class AbstractInlineEmbedBlot extends AbstractBlot {
      *
      * @return string
      */
-    abstract protected static function getContainerHTMLTag(): string;
+    abstract protected function getContainerHTMLTag(): string;
 
     /**
      * Get the key to pull the main content out of the currentBlot.
@@ -43,9 +45,10 @@ abstract class AbstractInlineEmbedBlot extends AbstractBlot {
     /**
      * @inheritDoc
      */
-    public function __construct(array $currentOperation, array $previousOperation, array $nextOperation) {
+    public function __construct(array $currentOperation, array $previousOperation = [], array $nextOperation = []) {
         parent::__construct($currentOperation, $previousOperation, $nextOperation);
-        $this->content = valr(static::getInsertKey(), $this->currentOperation);
+        $potentialContent = valr(static::getInsertKey(), $this->currentOperation);
+        $this->content = is_string($potentialContent) ? htmlspecialchars($potentialContent) : "";
     }
 
     /**
@@ -59,25 +62,10 @@ abstract class AbstractInlineEmbedBlot extends AbstractBlot {
             $result .= " $attrKey=\"$attr\"";
         }
 
-        $sanitizedContent = htmlspecialchars($this->content);
         $result .= ">";
-        $result .= "<span contenteditable=\"false\">" . $sanitizedContent . "</span>";
+        $result .= $this->content;
         $result .= "</" . static::getContainerHTMLTag() . ">";
 
         return $result;
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public function shouldClearCurrentGroup(BlotGroup $group): bool {
-        return false;
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public function hasConsumedNextOp(): bool {
-        return false;
     }
 }

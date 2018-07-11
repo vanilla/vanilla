@@ -30,7 +30,7 @@ class MentionBlot extends AbstractInlineEmbedBlot {
     /**
      * @inheritDoc
      */
-    protected static function getContainerHTMLTag(): string {
+    protected function getContainerHTMLTag(): string {
         return "a";
     }
 

@@ -2455,9 +2455,11 @@ EOT;
             throw new Exception("JSON decoding of rich post content has failed.");
         }
 
-        /** @var \Vanilla\Quill\Renderer $renderer */
+        $parser = Gdn::getContainer()->get(Vanilla\Quill\Parser::class);
         $renderer = Gdn::getContainer()->get(\Vanilla\Quill\Renderer::class);
-        return $renderer->render($operations);
+
+        $blotGroups = $parser->parse($operations);
+        return $renderer->render($blotGroups);
     }
 
     /**

@@ -573,6 +573,10 @@
         text-overflow: ellipsis;
         line-height: $richEditor-lineHeight;
     }
+
+    code {
+        text-overflow: initial;
+    }
 }
 
 .emoji { // old emoji support

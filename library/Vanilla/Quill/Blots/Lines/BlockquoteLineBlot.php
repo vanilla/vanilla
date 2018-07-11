@@ -5,23 +5,26 @@
  * @license https://opensource.org/licenses/GPL-2.0 GPL-2.0
  */
 
-namespace Vanilla\Quill\Blots;
+namespace Vanilla\Quill\Blots\Lines;
 
+/**
+ * Class for handling blockquote operations.
+ */
 class BlockquoteLineBlot extends AbstractLineBlot {
 
     /**
      * @inheritDoc
      */
-    protected static function getLineType(): string {
-        return "blockquote";
+    public static function matches(array $operations): bool {
+        return static::opAttrsContainKeyWithValue($operations, "blockquote-line");
     }
 
     /**
      * @inheritDoc
      */
     public function getGroupOpeningTag(): string {
-        $wrapperClass = static::getLineType();
-        $contentClass = static::getLineType() . "-content";
+        $wrapperClass = "blockquote";
+        $contentClass = "blockquote-content";
 
         return "<div class=\"$wrapperClass\"><div class=\"$contentClass\">";
     }
@@ -31,5 +34,19 @@ class BlockquoteLineBlot extends AbstractLineBlot {
      */
     public function getGroupClosingTag(): string {
         return "</div></div>";
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function renderLineStart(): string {
+        return '<p class="blockquote-line">';
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function renderLineEnd(): string {
+        return '</p>';
     }
 }

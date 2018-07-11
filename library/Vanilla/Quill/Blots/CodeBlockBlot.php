@@ -7,30 +7,31 @@
 
 namespace Vanilla\Quill\Blots;
 
-class CodeBlockBlot extends AbstractBlockBlot {
-    /**
-     * @inheritDoc
-     */
-    public function isOwnGroup(): bool {
-        return false;
-    }
+/**
+ * Blot for handling code blocks.
+ *
+ * Newlines are handled slightly differently here than for regular text because of the `whitespace: pre` that is applied
+ * to code blocks. We do not want the newlines to be transformed into breaks.
+ */
+class CodeBlockBlot extends TextBlot {
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
-    protected static function getAttributeKey(): string {
-        return "code-block";
+    public static function matches(array $operations): bool {
+        return static::opAttrsContainKeyWithValue($operations, "code-block");
     }
 
     /**
      * @inheritDoc
      */
     public function render(): string {
-        $result = $this->content;
+        $result = htmlspecialchars($this->content);
 
         // Add newlines which live in the next operation.
         if ($this->nextOperation) {
-            $result .= $this->nextOperation["insert"];
+            $sanitizedNewlines = htmlspecialchars($this->nextOperation["insert"]);
+            $result .= $sanitizedNewlines;
         }
 
         return $result;

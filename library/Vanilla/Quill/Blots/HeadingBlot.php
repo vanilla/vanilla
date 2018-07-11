@@ -7,34 +7,34 @@
 
 namespace Vanilla\Quill\Blots;
 
-class HeadingBlot extends AbstractBlockBlot {
+/**
+ * Blot to represent headings.
+ *
+ * Currently only 2 levels are allowed.
+ */
+class HeadingBlot extends TextBlot {
 
     /** @var array Valid heading levels. */
-    private static $validLevels = [1, 2, 3, 4, 5, 6];
+    private static $validLevels = [1, 2];
 
     /**
      * @inheritDoc
      */
-    protected static function getAttributeKey(): string {
-        return "header";
+    public static function matches(array $operations): bool {
+        return static::opAttrsContainKeyWithValue($operations, "header", static::$validLevels);
     }
 
     /**
-     * @inheritDoc
-     */
-    protected static function getMatchingAttributeValue() {
-        return self::$validLevels;
-    }
-
-    /**
-     * @inheritDoc
+     * @inheritdoc
+     * @throws \Exception
      */
     public function getGroupOpeningTag(): string {
         return "<h" . $this->getHeadingLevel() . ">";
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
+     * @throws \Exception
      */
     public function getGroupClosingTag(): string {
         return "</h" . $this->getHeadingLevel() . ">";
@@ -54,8 +54,8 @@ class HeadingBlot extends AbstractBlockBlot {
      * @throws \Exception if the level is not a valid integer.
      */
     private function getHeadingLevel(): int {
-        $level = valr("attributes.header", $this->currentOperation)
-            ?: valr("attributes.header", $this->nextOperation);
+        // Heading attributes live in the next operation.
+        $level = $this->nextOperation["attributes"]["header"] ?? null;
         if (!in_array($level, self::$validLevels)) {
             throw new \Exception("Invalid heading level");
         }

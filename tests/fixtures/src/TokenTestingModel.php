@@ -18,6 +18,6 @@ class TokenTestingModel {
      */
     public function __construct() {
         $this->setSecret('sss');
-        $this->tokenIdentifier ='nonce';
+        $this->tokenIdentifier = 'nonce';
     }
 }

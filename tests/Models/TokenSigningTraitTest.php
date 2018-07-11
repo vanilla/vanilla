@@ -36,7 +36,7 @@ class TokenSigningTraitTest extends SharedBootstrapTestCase {
     public function testExpiryDate() {
         $model = new TokenTestingModel();
         $token = $model->signToken($model->randomToken(), 'last year');
-        $this->assertEquals(false, $model->verifyTokenSignature($token, true));
+        $model->verifyTokenSignature($token, true);
     }
 
     /**
@@ -48,7 +48,7 @@ class TokenSigningTraitTest extends SharedBootstrapTestCase {
     public function testBadSignature() {
         $model = new TokenTestingModel();
         $token = $model->signToken($model->randomToken(), '2 months').'!';
-        $this->assertEquals(false, $model->verifyTokenSignature($token,true));
+        $model->verifyTokenSignature($token,true);
     }
 
     /**
@@ -60,6 +60,6 @@ class TokenSigningTraitTest extends SharedBootstrapTestCase {
     public function testBadToken() {
         $model = new TokenTestingModel();
         $token = 'a.b.c';
-        $this->assertEquals(false, $model->verifyTokenSignature($token, true));
+        $model->verifyTokenSignature($token, true);
     }
 }

@@ -27,6 +27,7 @@ class UserAuthenticationNonceModel extends Gdn_Model {
         parent::__construct('UserAuthenticationNonce');
         $this->setPruneField('Timestamp');
         $this->setPruneAfter('45 minutes');
+        $secret = $secret ?: c('Garden.Cookie.Salt');
         $this->setSecret($secret);
         $this->PrimaryKey = 'Nonce';
         $this->tokenIdentifier ='nonce';
@@ -81,12 +82,12 @@ class UserAuthenticationNonceModel extends Gdn_Model {
         $row = $this->getID($nonce, DATASET_TYPE_ARRAY);
         if ($row) {
             // Timestamp cannot be null or zero. Use a constant date for consumed nonces.
-            parent::update(
+            $this->update(
                 ['Timestamp' => self::CONSUMED_TIMESTAMP],
                 ['Nonce' => $nonce]
             );
         } else {
-            throw new \Exception("Unable to find Nonce", 500);
+            throw new \Exception("Unable to find nonce", 500);
         }
     }
 

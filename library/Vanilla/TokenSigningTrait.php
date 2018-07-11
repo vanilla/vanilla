@@ -11,7 +11,7 @@ namespace Vanilla;
  * Methods to be used for token generation and signing.
  */
 trait TokenSigningTrait {
-    /** @var string $secret The secret used to sign the token. */
+    /** @var string The secret used to sign the token. */
     private $secret;
 
     /** @var string Used to determine what type of token is generated. */
@@ -84,7 +84,7 @@ trait TokenSigningTrait {
         }
 
         if (count($parts) !== 4) {
-            return $this->tokenError($this->tokenIdentifier.' missing parts.', 401, $throw);
+            return $this->tokenError('Your '.$this->tokenIdentifier.' missing parts.', 401, $throw);
         }
 
         list($version, $token, $expireStr, $sig) = $parts;

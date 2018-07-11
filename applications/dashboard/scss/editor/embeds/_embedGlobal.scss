@@ -11,6 +11,7 @@
     justify-content: center;
     align-items: center;
     user-select: none;
+    box-sizing: border-box;
 }
 
 .embedExternal-content {
@@ -20,9 +21,11 @@
     width: $embed_width;
     max-width: 100%;
     text-align: center;
+    box-sizing: border-box;
 
     iframe {
         display: block;
+        box-sizing: border-box !important;
     }
 
     > * {
@@ -35,6 +38,7 @@
     display: block;
     margin: 0;
     width: 100%;
+    box-sizing: border-box;
     padding: {
         left: 0;
         right: 0;

@@ -19,6 +19,7 @@ use Interop\Container\ContainerInterface;
 use Vanilla\Addon;
 use Vanilla\AddonManager;
 use Gdn;
+use Gdn_Pluggable;
 
 /**
  * Plugin Manager.
@@ -26,7 +27,7 @@ use Gdn;
  * A singleton class used to identify extensions, register them in a central
  * location, and instantiate/call them when necessary.
  */
-class PluginManager extends \Gdn_Pluggable implements ContainerInterface {
+class PluginManager extends Gdn_Pluggable implements ContainerInterface {
 
     const ACTION_ENABLE = 1;
 

@@ -5,11 +5,11 @@
  * @license https://opensource.org/licenses/GPL-2.0 GPL-2.0
  */
 
-namespace VanillaTests\Library\Vanilla\Quill;
+namespace VanillaTests\Library\Vanilla\Formatting\Quill;
 
 use VanillaTests\SharedBootstrapTestCase;
-use Vanilla\Quill\Parser;
-use Vanilla\Quill\Renderer;
+use Vanilla\Formatting\Quill\Parser;
+use Vanilla\Formatting\Quill\Renderer;
 use voku\helper\HtmlMin;
 
 class RendererTest extends SharedBootstrapTestCase {

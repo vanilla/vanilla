@@ -4,7 +4,7 @@
  * @license GPL-2.0
  */
 
-namespace VanillaTests\Library\Vanilla\Quill\Sanitize;
+namespace VanillaTests\Library\Vanilla\Formatting\Quill\Sanitize;
 
 class BlockQuoteSanitizeTest extends SanitizeTest {
 

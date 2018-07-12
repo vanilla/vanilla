@@ -4,13 +4,13 @@
  * @license GPLv2
  */
 
-namespace VanillaTests\Library\Vanilla\Quill\Sanitize;
+namespace VanillaTests\Library\Vanilla\Formatting\Quill\Sanitize;
 
 use Exception;
 use Gdn;
 use PHPUnit\Framework\TestCase;
-use Vanilla\Quill\Parser;
-use Vanilla\Quill\Renderer;
+use Vanilla\Formatting\Quill\Parser;
+use Vanilla\Formatting\Quill\Renderer;
 use VanillaTests\BootstrapTrait;
 
 abstract class SanitizeTest extends TestCase {

@@ -4,10 +4,10 @@
  * @license GPL-2.0
  */
 
-namespace VanillaTests\Library\Vanilla\Quill\Sanitize\ExternalEmbed;
+namespace VanillaTests\Library\Vanilla\Formatting\Quill\Sanitize\ExternalEmbed;
 
-use VanillaTests\Library\Vanilla\Quill\Sanitize\SanitizeTest;
-use VanillaTests\Library\Vanilla\Quill\Sanitize\CSSInjectionTrait;
+use VanillaTests\Library\Vanilla\Formatting\Quill\Sanitize\SanitizeTest;
+use VanillaTests\Library\Vanilla\Formatting\Quill\Sanitize\CSSInjectionTrait;
 
 class CodePenSanitizeTest extends SanitizeTest {
 

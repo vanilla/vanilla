@@ -7,7 +7,7 @@
 use Garden\Schema\Schema;
 use Garden\Web\Exception\NotFoundException;
 use Vanilla\ApiUtils;
-use Vanilla\Embeds\EmbedManager;
+use Vanilla\Formatting\Embeds\EmbedManager;
 use Vanilla\ImageResizer;
 use Vanilla\UploadedFile;
 use Vanilla\UploadedFileSchema;

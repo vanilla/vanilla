@@ -5,12 +5,12 @@
  * @license GPLv2
  */
 
-namespace VanillaTests\Library\Vanilla\Quill;
+namespace VanillaTests\Library\Vanilla\Formatting\Quill;
 
 use VanillaTests\SharedBootstrapTestCase;
-use Vanilla\Quill\Formats\Bold;
-use Vanilla\Quill\Formats\Italic;
-use Vanilla\Quill\Formats\Link;
+use Vanilla\Formatting\Quill\Formats\Bold;
+use Vanilla\Formatting\Quill\Formats\Italic;
+use Vanilla\Formatting\Quill\Formats\Link;
 
 class FormatTest extends SharedBootstrapTestCase {
 

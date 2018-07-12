@@ -4,10 +4,10 @@
  * @license https://opensource.org/licenses/GPL-2.0 GPL-2.0
  */
 
-namespace VanillaTests\Library\Vanilla\Embeds;
+namespace VanillaTests\Library\Vanilla\Formatting\Embeds;
 
 use VanillaTests\SharedBootstrapTestCase;
-use Vanilla\Embeds\TwitchEmbed;
+use Vanilla\Formatting\Embeds\TwitchEmbed;
 
 class TwitchEmbedTest extends SharedBootstrapTestCase {
     /**

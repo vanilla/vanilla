@@ -706,6 +706,14 @@
     user-select: all;
 }
 
+// Hide Preview
+
+body.hasRichEditor {
+    #Form_Preview {
+        display: none;
+    }
+}
+
 // Handle gutter for paragraph menu
 @include mediaQuery-richEditor_notMobile {
     body.hasRichEditor {

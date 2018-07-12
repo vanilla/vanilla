@@ -9,6 +9,9 @@
  * @package Core
  * @since 2.0
  */
+
+namespace Vanilla\Web;
+use Gdn;
 use Garden\Web\RequestInterface;
 use Vanilla\UploadedFile;
 
@@ -24,7 +27,7 @@ use Vanilla\UploadedFile;
  * @method string requestAddress($ip = null) Get/Set the Request IP address (first existing of HTTP_X_ORIGINALLY_FORWARDED_FOR,
  *                HTTP_X_CLUSTER_CLIENT_IP, HTTP_CLIENT_IP, HTTP_X_FORWARDED_FOR, REMOTE_ADDR).
  */
-class Gdn_Request implements RequestInterface {
+class Request implements RequestInterface {
 
     /** Superglobal source. */
     const INPUT_CUSTOM = "custom";
@@ -121,7 +124,7 @@ class Gdn_Request implements RequestInterface {
      * @return Gdn_Request
      */
     public static function create() {
-        return new Gdn_Request();
+        return new Request();
     }
 
     /**

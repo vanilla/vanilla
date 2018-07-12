@@ -10,10 +10,15 @@
  * @package Core
  * @since 2.0
  */
+
+
+namespace Vanilla\Legacy;
+
 use Garden\EventManager;
 use Interop\Container\ContainerInterface;
 use Vanilla\Addon;
 use Vanilla\AddonManager;
+use Gdn;
 
 /**
  * Plugin Manager.
@@ -21,7 +26,7 @@ use Vanilla\AddonManager;
  * A singleton class used to identify extensions, register them in a central
  * location, and instantiate/call them when necessary.
  */
-class Gdn_PluginManager extends Gdn_Pluggable implements ContainerInterface {
+class PluginManager extends \Gdn_Pluggable implements ContainerInterface {
 
     const ACTION_ENABLE = 1;
 

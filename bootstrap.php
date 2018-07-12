@@ -68,9 +68,10 @@ $dic->setInstance('Garden\Container\Container', $dic)
     ->addAlias('Cookie')
 
     // PluginManager
-    ->rule('Gdn_PluginManager')
+    ->rule(\Vanilla\Legacy\PluginManager::class)
     ->setShared(true)
     ->addAlias('PluginManager')
+    ->addAlias('Gdn_PluginManager')
 
     ->rule(SsoUtils::class)
     ->setShared(true)

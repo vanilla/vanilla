@@ -1,6 +1,6 @@
 <?php
 /**
- * Gdn_Pluggable
+ * Pluggable
  *
  * @author Mark O'Sullivan <markm@vanillaforums.com>
  * @copyright 2009-2018 Vanilla Forums Inc.
@@ -8,6 +8,12 @@
  * @package Core
  * @since 2.0
  */
+
+namespace Vanilla;
+use Gdn;
+use ArgumentCountError;
+use Exception;
+use Logger;
 
 /**
  * Event Framework: Pluggable
@@ -19,7 +25,7 @@
  *
  * @abstract
  */
-abstract class Gdn_Pluggable {
+abstract class Pluggable {
 
     /**
      * @var string The name of the class that has been instantiated. Typically this will be
@@ -94,6 +100,8 @@ abstract class Gdn_Pluggable {
      * Fire the next event off a custom parent class
      *
      * @param mixed $options Either the parent class, or an option array
+     *
+     * @return $this For fluent method chaining.
      */
     public function fireAs($options) {
         if (!is_array($options)) {
@@ -114,11 +122,17 @@ abstract class Gdn_Pluggable {
      *  public function senderClassName_EventName_Handler($Sender) {}
      *
      * @param string $eventName The name of the event being fired.
+     * @param array $arguments An array of arguments for the event.
+     *
+     * @throws Exception when Pluggable::__construct has not been called.
+     * @throws ArgumentCountError When the incorrect number or arguments was passed to the event handler.
+     *
+     * @return bool Returns **true** if an event was executed.
      */
     public function fireEvent($eventName, $arguments = null) {
         if (!$this->ClassName) {
             $realClassName = get_class($this);
-            throw new Exception("Event fired from pluggable class '{$realClassName}', but Gdn_Pluggable::__construct() was never called.");
+            throw new Exception("Event fired from pluggable class '{$realClassName}', but Pluggable::__construct() was never called.");
         }
 
         $fireClass = !is_null($this->FireAs) ? $this->FireAs : $this->ClassName;
@@ -161,6 +175,9 @@ abstract class Gdn_Pluggable {
      * @param string $methodName
      * @param array $arguments
      * @return mixed
+     *
+     * @throws Exception when Pluggable::__construct has not been called.
+     * @throws ArgumentCountError When the incorrect number or arguments was passed to the event handler.
      *
      */
     public function __call($methodName, $arguments) {

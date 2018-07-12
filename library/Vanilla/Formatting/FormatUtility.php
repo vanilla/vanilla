@@ -11,15 +11,16 @@
  * @since 2.0
  */
 
+
+namespace Vanilla\Formatting;
 use Garden\EventManager;
-use Vanilla\Renderer;
 
 /**
  * Output formatter.
  *
  * Utility class that helps to format strings, objects, and arrays.
  */
-class Gdn_Format {
+class FormatUtility {
 
     /**
      * @var bool Flag which allows plugins to decide if the output should include rel="nofollow" on any <a> links.
@@ -1841,7 +1842,7 @@ EOT;
         }
 
         // Emoji.
-        $html = Emoji::instance()->translateToHtml($html);
+        $html = EmojiInterpretter::instance()->translateToHtml($html);
 
         // Old Spoiler plugin markup handling.
         $html = Gdn_Format::legacySpoilers($html);

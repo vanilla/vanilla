@@ -10,10 +10,13 @@
  * @since 2.2
  */
 
+namespace Vanilla\Formatting;
+use Gdn;
+
 /**
  * Interpreting Emoji emoticons.
  */
-class Emoji {
+class EmojiInterpreter {
 
     /**
      * The emoji aliases are an array where each key is an alias and each value is the name of an emoji.
@@ -83,7 +86,7 @@ class Emoji {
      */
     protected $format = '<img class="emoji" src="%1$s" title="%2$s" alt="%2$s" height="20" />';
 
-    /** @var Emoji The singleton instance of this class. */
+    /** @var EmojiInterpretter The singleton instance of this class. */
     public static $instance;
 
     /** @var string left-side delimiter surrounding emoji, typically a full-colon. */
@@ -339,7 +342,7 @@ class Emoji {
      * Set the emoji archive.
      *
      * @param array $archive
-     * @return Emoji Returns $this for fluent calls.
+     * @return EmojiInterpretter Returns $this for fluent calls.
      */
     public function setArchive($archive) {
         $this->archive = $archive;
@@ -431,7 +434,7 @@ class Emoji {
      * Set the list of emoji that can be used by the editor.
      *
      * @param array $value The new editor list.
-     * @return Emoji Returns $this for fluent calls.
+     * @return EmojiInterpretter Returns $this for fluent calls.
      */
     public function setEditorList($value) {
         // Convert the editor list to the proper format.
@@ -463,7 +466,7 @@ class Emoji {
      * Sets the emoji format used in {@link Emoji::img()}.
      *
      * @param string $format
-     * @return Emoji Returns $this for fluent calls.
+     * @return EmojiInterpretter Returns $this for fluent calls.
      */
     public function setFormat($format) {
         $this->format = $format;
@@ -499,7 +502,7 @@ class Emoji {
      * Set the aliases array.
      *
      * @param array $aliases The new aliases array.
-     * @return Emoji Returns $this for fluent calls.
+     * @return EmojiInterpretter Returns $this for fluent calls.
      */
     public function setAliases($aliases) {
         $this->aliases = $aliases;
@@ -590,7 +593,7 @@ class Emoji {
             $emojiFilePath = $this->getEmojiPath($emojiCanonical);
 
             if (strpos($text, htmlentities($emojiAlias)) !== false) {
-                $text = Gdn_Format::replaceButProtectCodeBlocks(
+                $text = FormatUtility::replaceButProtectCodeBlocks(
                     '`(?<=[>\s]|(&nbsp;))'.preg_quote(htmlentities($emojiAlias), '`').'(?=\W)`m',
                     $this->img($emojiFilePath, $emojiAlias),
                     $text
@@ -603,7 +606,7 @@ class Emoji {
         $rdelim = preg_quote($this->rdelim, '`');
         $emoji = $this;
 
-        $text = Gdn_Format::replaceButProtectCodeBlocks("`({$ldelim}\S+?{$rdelim})`i", function ($m) use ($emoji) {
+        $text = FormatUtility::replaceButProtectCodeBlocks("`({$ldelim}\S+?{$rdelim})`i", function ($m) use ($emoji) {
             $emoji_name = trim($m[1], ':');
             $emoji_path = $emoji->getEmojiPath($emoji_name);
             if ($emoji_path) {
@@ -618,13 +621,14 @@ class Emoji {
 
     /**
      * Get the singleton instance of this class.
-     * @return Emoji
+     *
+     * @return EmojiInterpretter
      */
     public static function instance() {
-        if (Emoji::$instance === null) {
-            Emoji::$instance = new Emoji();
+        if (EmojiInterpretter::$instance === null) {
+            EmojiInterpretter::$instance = new EmojiInterpretter();
         }
 
-        return Emoji::$instance;
+        return EmojiInterpretter::$instance;
     }
 }

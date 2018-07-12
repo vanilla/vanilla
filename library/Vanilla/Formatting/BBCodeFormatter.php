@@ -1,7 +1,14 @@
 <?php
-use Nbbc\BBCode as Nbbc;
 
-class BBCode extends Gdn_Pluggable {
+namespace Vanilla\Formatting;
+
+use Vanilla\Pluggable;
+use Nbbc\BBCode as Nbbc;
+use Gdn_Upload;
+use Gdn_DataSet;
+use Gdn;
+
+class BBCodeFormatter extends Pluggable {
 
     /**
      * @var array A list of records from the Media table, indexed by MediaID.
@@ -236,7 +243,7 @@ class BBCode extends Gdn_Pluggable {
      * @return string Formatted value.
      */
     function doVideo($bbcode, $action, $name, $default, $params, $content) {
-        list($width, $height) = Gdn_Format::getEmbedSize();
+        list($width, $height) = FormatUtility::getEmbedSize();
         list($type, $code) = explode(';', $default);
         switch ($type) {
             case 'youtube':

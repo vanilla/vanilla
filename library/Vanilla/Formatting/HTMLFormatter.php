@@ -4,12 +4,12 @@
  * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
  */
 
-use \Garden\EventManager;
+namespace Vanilla\Formatting;
 
 /**
  * Class VanillaHtmlFormatter
  */
-class VanillaHtmlFormatter {
+class HTMLFormatter {
 
     /** @var array Classes users may have in their content. */
     protected $allowedClasses = [
@@ -178,14 +178,14 @@ class VanillaHtmlFormatter {
         }
 
         // Turn embedded videos into simple links (legacy workaround)
-        $html = Gdn_Format::unembedContent($html);
+        $html = FormatUtility::unembedContent($html);
 
-        // We check the flag within Gdn_Format to see
+        // We check the flag within FormatUtility to see
         // if htmLawed should place rel="nofollow" links
         // within output or not.
         // A plugin can set this flag (for example).
         // The default is to show rel="nofollow" on all links.
-        if (Gdn_Format::$DisplayNoFollow) {
+        if (FormatUtility::$DisplayNoFollow) {
             // display rel="nofollow" on all links.
             $config['anti_link_spam'] = ['`.`', ''];
         } else {

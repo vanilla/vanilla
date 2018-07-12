@@ -66,4 +66,4 @@ if (function_exists('mb_internal_encoding')) {
 if (!include_once PATH_ROOT.'/vendor/autoload.php') {
     die("Could not find the autoloader. Did you forget to run 'composer install' in '".PATH_ROOT."' ?\n");
 }
-spl_autoload_register([Vanilla\Legacy\Aliases::class, 'autoload']);
+spl_autoload_register([Vanilla\Legacy\AliasAutoloader::class, 'autoload']);

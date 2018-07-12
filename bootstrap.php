@@ -68,10 +68,9 @@ $dic->setInstance('Garden\Container\Container', $dic)
     ->addAlias('Cookie')
 
     // PluginManager
-    ->rule(\Vanilla\Legacy\PluginManager::class)
+    ->rule('Gdn_PluginManager')
     ->setShared(true)
     ->addAlias('PluginManager')
-    ->addAlias('Gdn_PluginManager')
 
     ->rule(SsoUtils::class)
     ->setShared(true)
@@ -211,13 +210,14 @@ $dic->setInstance('Garden\Container\Container', $dic)
     ->rule('Gdn_Regarding')
     ->setShared(true)
 
-    ->rule('BBCodeFormatter')
-    ->setClass('BBCode')
+    ->rule(\Vanilla\Formatting\BBCodeFormatter::class)
+    ->addAlias('BBCodeFormatter')
+    ->addAlias('BBCode')
     ->setShared(true)
 
-    ->rule('HtmlFormatter')
-    ->setClass(VanillaHtmlFormatter::class)
-    ->addAlias(VanillaHtmlFormatter::class)
+    ->rule(\Vanilla\Formatting\HTMLFormatter::class)
+    ->addAlias('HtmlFormatter')
+    ->addAlias('HtmlFormatter')
     ->setShared(true)
 
     ->rule(\Vanilla\Formatting\Quill\Renderer::class)

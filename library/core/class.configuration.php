@@ -9,12 +9,14 @@
  * @since 2.0
  */
 
+use Vanilla\Formatting\FormatUtility;
+
 /**
  * The Configuration class can be used to load configuration arrays from files,
  * retrieve settings from the arrays, assign new values to the arrays, and save
  * the arrays back to the files.
  */
-class Gdn_Configuration extends Gdn_Pluggable {
+class Gdn_Configuration extends \Vanilla\Pluggable {
 
     /** Cache key format. */
     const CONFIG_FILE_CACHE_KEY = 'garden.config.%s';
@@ -305,7 +307,7 @@ class Gdn_Configuration extends Gdn_Pluggable {
             $session = Gdn::session();
             $user = $session->UserID > 0 && is_object($session->User) ? $session->User->Name : 'Unknown';
             $lines[] = '';
-            $lines[] = '// Last edited by '.$user.' ('.remoteIp().')'.Gdn_Format::toDateTime();
+            $lines[] = '// Last edited by '.$user.' ('.remoteIp().')'.FormatUtility::toDateTime();
         }
 
         $result = implode(PHP_EOL, $lines);
@@ -350,7 +352,7 @@ class Gdn_Configuration extends Gdn_Pluggable {
         }
 
         if (is_string($value)) {
-            $result = Gdn_Format::unserialize($value);
+            $result = FormatUtility::unserialize($value);
         } else {
             $result = $value;
         }
@@ -1338,7 +1340,7 @@ class Gdn_ConfigurationSource extends Gdn_Pluggable {
         }
 
         if (is_string($value)) {
-            $result = Gdn_Format::unserialize($value);
+            $result = FormatUtility::unserialize($value);
         } else {
             $result = $value;
         }

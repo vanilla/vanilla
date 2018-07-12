@@ -216,7 +216,7 @@ $dic->setInstance('Garden\Container\Container', $dic)
     ->setShared(true)
 
     ->rule(\Vanilla\Formatting\HTMLFormatter::class)
-    ->addAlias('HtmlFormatter')
+    ->addAlias('VanillaHtmlFormatter')
     ->addAlias('HtmlFormatter')
     ->setShared(true)
 

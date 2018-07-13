@@ -7,31 +7,34 @@
  * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
  */
 
-type ChangeEmitter = (
-    reducers: {
-        [key: string]: any;
-    },
-) => void;
+import { logError } from "@dashboard/utility";
+import { Reducer, ReducersMapObject } from "redux";
 
-export class ReducerRegistry {
-    private emitChange?: ChangeEmitter;
-    private reducers = {};
+let haveGot = false;
+const reducers = {};
 
-    public getReducers() {
-        return { ...this.reducers };
-    }
-
-    public register(name, reducer) {
-        this.reducers = { ...this.reducers, [name]: reducer };
-        if (this.emitChange) {
-            this.emitChange(this.getReducers());
-        }
-    }
-
-    public setChangeListener(listener: ChangeEmitter) {
-        this.emitChange = listener;
+export function registerReducer(name: string, reducer: Reducer) {
+    if (haveGot) {
+        logError("Cannot register reducer %s after reducers applied to the store.", name);
+    } else {
+        reducers[name] = reducer;
     }
 }
 
-const reducerRegistry = new ReducerRegistry();
+export function getReducers(): ReducersMapObject<any, any> {
+    haveGot = true;
+
+    return {
+        ...reducers,
+    };
+}
+
+/**
+ * @deprecated
+ */
+const reducerRegistry = {
+    register: registerReducer,
+    getReducers,
+};
+
 export default reducerRegistry;

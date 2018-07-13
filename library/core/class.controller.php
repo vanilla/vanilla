@@ -20,6 +20,8 @@
  * @method void render($view = '', $controllerName = false, $applicationFolder = false, $assetName = 'Content') Render the controller's view.
  */
 class Gdn_Controller extends Gdn_Pluggable {
+    use \Garden\MetaTrait, \Vanilla\Browser\ReduxTrait;
+
 
     /** Seconds before reauthentication is required for protected operations. */
     const REAUTH_TIMEOUT = 1200; // 20 minutes
@@ -639,8 +641,10 @@ class Gdn_Controller extends Gdn_Pluggable {
 
         // Output a JavaScript object with all the definitions.
         $result = 'gdn=window.gdn||{};'.
-            'gdn.meta='.json_encode($this->_Definitions).';'.
-            'gdn.permissions='.json_encode(Gdn::session()->getPermissions()).';';
+            'gdn.meta='.json_encode($this->_Definitions).";\n".
+            'gdn.permissions='.json_encode(Gdn::session()->getPermissions()).";\n".
+            $this->renderClientState()
+            ;
 
         if ($wrap) {
             $result = "<script>$result</script>";

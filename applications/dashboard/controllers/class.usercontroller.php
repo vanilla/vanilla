@@ -202,8 +202,9 @@ class UserController extends DashboardController {
                     } else {
                         $password = $this->Form->getValue('Password', '');
                     }
-
-                    $userModel->sendWelcomeEmail($newUserID, $password, 'Add');
+                    if ($this->Form->getFormValue('Email', false)) {
+                        $userModel->sendWelcomeEmail($newUserID, $password, 'Add');
+                    }
                     $this->informMessage(t('The user has been created successfully'));
                     $this->setRedirectTo('dashboard/user');
                 } elseif ($noPassword) {

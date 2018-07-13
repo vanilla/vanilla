@@ -1768,8 +1768,7 @@ if (!function_exists('getRecord')) {
                 if (!$discussionModel->canView($row)) {
                     throw permissionException();
                 }
-                $row['Url'] = discussionUrl($row);
-                $row['ShareUrl'] = $row->Url;
+                $row['ShareUrl'] = $row['Url'] = discussionUrl($row);
                 break;
             case 'comment':
                 /** @var CommentModel $commentModel */

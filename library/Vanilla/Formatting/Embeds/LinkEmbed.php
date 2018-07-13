@@ -64,7 +64,7 @@ class LinkEmbed extends Embed {
         $photoUrl = $data['photoUrl'] ?? null;
 
         if ($photoUrl) {
-            $photoUrlEncoded = htmlspecialchars(Gdn_Format::cssSpecialChars($photoUrl));
+            $photoUrlEncoded = htmlspecialchars(urlencode($photoUrl));
         $image = <<<HTML
 <div class="embedLink-image" aria-hidden="true" style="background-image: url('{$photoUrlEncoded}');"></div>
 HTML;
@@ -72,7 +72,7 @@ HTML;
             $image = '';
         }
 
-        $urlEncoded = htmlspecialchars($url);
+        $urlEncoded = urlencode($url);
         $nameEncoded = htmlentities($name);
         $bodyEncoded = htmlentities($body);
 

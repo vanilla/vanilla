@@ -9,24 +9,13 @@ import thunk from "redux-thunk";
 import IState from "@dashboard/state/IState";
 import {log} from "@dashboard/utility";
 
-// there may be an initial state to import
-const initialState = window.__STATE__ || {};
-const initialActions = window.__ACTIONS__ || {};
+// There may be an initial state to import.
+const initialState = {};
+const initialActions = window.__ACTIONS__ || [];
 
 const middleware = [thunk];
 
-// Preserve initial state for not-yet-loaded reducers
-const combine = reducers => {
-    const reducerNames = Object.keys(reducers);
-    Object.keys(initialState).forEach(stateItem => {
-        if (reducerNames.indexOf(stateItem) === -1) {
-            reducers[stateItem] = (state = null) => state;
-        }
-    });
-    return combineReducers(reducers);
-};
-
-// browser may have redux dev tools installed, if so integrate with it
+// Browser may have redux dev tools installed, if so integrate with it.
 const composeEnhancers = window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ || compose;
 const enhancer = composeEnhancers(applyMiddleware(...middleware));
 

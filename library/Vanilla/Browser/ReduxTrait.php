@@ -15,31 +15,6 @@ use Vanilla\Attributes;
  */
 trait ReduxTrait {
     /**
-     * Add a client state property.
-     *
-     * @param string $name The name of the property.
-     * @param mixed $value The value of the state property.
-     * @return $this
-     */
-    public function addClientState(string $name, $value) {
-        $this->addMeta('clientState', $name, $value);
-        return $this;
-    }
-
-    /**
-     * Merge a client state array.
-     *
-     * This method is useful for setting the entire client state.
-     *
-     * @param array $state The state to set.
-     * @return $this
-     */
-    public function mergeClientState(array $state) {
-        $this->mergeMetaArray(['clientState' => $state]);
-        return $this;
-    }
-
-    /**
      * Add a client action.
      *
      * Sometimes it is easier to send actions instead of state to the client so that more complex reducer code can stay
@@ -47,16 +22,13 @@ trait ReduxTrait {
      *
      * @param string $type The action type.
      * @param mixed $payload The action payload.
+     * @param array $ext Extra information to add to the action.
      * @return $this
      */
-    public function addClientAction(string $type, $payload, array $meta = []) {
-        $action = ['type' => $type, 'payload' => $payload];
+    public function addClientAction(string $type, $payload, array $ext = []) {
+        $action = ['type' => $type, 'payload' => $payload] + $ext;
 
-        if (!empty($meta)) {
-            $action['meta'] = $meta;
-        }
-
-        $this->addMeta('clientActions',  $action);
+        $this->addMeta('clientActions', $action);
         return $this;
     }
 
@@ -70,15 +42,17 @@ trait ReduxTrait {
      * @return $this
      */
     public function addClientApiAction(string $type, Data $data) {
-        $meta = [];
+        $payload = ['data' => $data->getData()];
+
         if ($data->getStatus() !== 200) {
-            $meta['status'] = $data->getStatus();
+            $payload['status'] = $data->getStatus();
         }
-        $this->addClientAction($type, [
-            'data' => $data->getData(),
-            'status' => $data->getStatus(),
-            'headers' => $data->getHeaders()
-        ]);
+
+        if (!empty($data->getHeaders())) {
+            $payload['headers'] = $data->getHeaders();
+        }
+
+        $this->addClientAction($type, $payload);
 
         return $this;
     }
@@ -91,8 +65,7 @@ trait ReduxTrait {
      * @return string Returns a the javascript string.
      */
     public function renderClientState(): string {
-        return 'window.__STATE__='.json_encode($this->getMeta('clientState', (object)[])).";\n".
-            'window.__ACTIONS__='.json_encode($this->getMeta('clientActions', [])).";\n";
+        return 'window.__ACTIONS__='.json_encode($this->getMeta('clientActions', [])).";\n";
     }
 
     /**
@@ -118,12 +91,4 @@ trait ReduxTrait {
      * @return $this
      */
     abstract public function addMeta($name, ...$value);
-
-    /**
-     * Merge another meta array with this one.
-     *
-     * @param array $meta The meta array to merge.
-     * @return $this
-     */
-    abstract public function mergeMetaArray(array $meta);
 }

@@ -53,7 +53,7 @@ class RendererTest extends SharedBootstrapTestCase {
      * @dataProvider dataProvider
      */
     public function testRender(string $dirname) {
-        $fixturePath = realpath(__DIR__."/../../../fixtures/editor-rendering/".$dirname);
+        $fixturePath = realpath(__DIR__."/../../../../fixtures/editor-rendering/".$dirname);
 
         $input = file_get_contents($fixturePath."/input.json");
         $expectedOutput = trim(file_get_contents($fixturePath."/output.html"));

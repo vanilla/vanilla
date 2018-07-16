@@ -2185,7 +2185,6 @@ class UserModel extends Gdn_Model {
             $username = val('Name', $fields);
             $email = val('Email', $fields);
 
-
             // Only fields that are present in the schema
             $fields = $this->Validation->schemaValidationFields();
 

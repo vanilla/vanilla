@@ -1439,7 +1439,7 @@ class DiscussionModel extends Gdn_Model {
     }
 
     public function fetchPageInfo($url, $throwError = false) {
-        $pageInfo = fetchPageInfo($url, 3, $throwError);
+        $pageInfo = fetchPageInfo($url, 3);
 
         $title = val('Title', $pageInfo, '');
         if ($title == '') {

@@ -3,15 +3,13 @@
  * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
  */
 
-import {Action} from "redux";
-import {
-    IAuthenticationState,
-    ISigninAuthenticatorState,
-    LoadStatus
-} from "./IAuthenticationState";
+import { Action } from "redux";
+import { ISigninAuthenticatorState } from "./IAuthenticateState";
 import * as actions from "./authenticatorActions";
+import { SigninAuthenticatorAction } from "./authenticatorActions";
+import { LoadStatus } from "@dashboard/state/IState";
 
-export function signinReducer(state?: ISigninAuthenticatorState, action?: Action) {
+export function signinReducer(state?: ISigninAuthenticatorState, action?: SigninAuthenticatorAction) {
     if (state === undefined) {
         return {
             status: LoadStatus.PENDING,

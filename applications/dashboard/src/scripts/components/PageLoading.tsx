@@ -1,5 +1,7 @@
 import * as React from "react";
-import { ILoadable, LoadStatus } from "@dashboard/state/authentication/IAuthenticationState";
+import { ILoadable } from "@dashboard/state/IState";
+import { LoadStatus } from "@dashboard/state/IState";
+import { t } from "@dashboard/application";
 
 export default class PageLoading extends React.PureComponent<ILoadable, {}> {
     public static defaultProps: Partial<ILoadable> = {
@@ -12,7 +14,7 @@ export default class PageLoading extends React.PureComponent<ILoadable, {}> {
             case LoadStatus.SUCCESS:
                 return null;
             case LoadStatus.LOADING:
-                return <div>Loading...</div>
+                return <div>{t("Loading...")}</div>;
             case LoadStatus.ERROR:
                 return this.props.error ? <div>{this.props.error}</div> : null;
         }

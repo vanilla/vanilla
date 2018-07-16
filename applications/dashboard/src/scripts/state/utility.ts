@@ -30,7 +30,7 @@ export function createAction<T extends string, P>(type: T, payload?: P) {
 export function actionCreator<T extends string>(type: T): IActionCreator<T>;
 export function actionCreator<T extends string, P>(type: T): IActionWithPayloadCreator<T, P>;
 export function actionCreator<T extends string, P>(type: T) {
-    return (payload?: P) => createAction(type, payload)
+    return (payload?: P) => createAction(type, payload);
 }
 
 type FunctionType = (...args: any[]) => any;

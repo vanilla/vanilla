@@ -27,10 +27,10 @@ import "./user-content/embeds/soundcloud";
 import "./user-content/embeds/getty";
 import "./user-content/embeds/giphy";
 import "./user-content/embeds/codepen";
-import {registerReducer} from "@dashboard/state/reducerRegistry";
-import authenticationReducer from "@dashboard/state/authentication/authenticationReducer";
+import { registerReducer } from "@dashboard/state/reducerRegistry";
+import authenticateReducer from "@dashboard/state/authenticate/authenticateReducer";
 
-registerReducer('authentication', authenticationReducer);
+registerReducer("authenticate", authenticateReducer);
 
 addComponent("App", Router);
 

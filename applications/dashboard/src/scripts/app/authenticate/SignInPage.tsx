@@ -11,19 +11,15 @@ import PasswordForm from "./components/PasswordForm";
 import SSOMethods from "./components/SSOMethods";
 import { getRequiredID, IRequiredComponentID } from "@dashboard/componentIDs";
 import Or from "@dashboard/components/forms/Or";
-import {
-    ILoadable,
-    ISigninAuthenticatorState,
-    IState,
-    LoadStatus
-} from "@dashboard/state/authentication/IAuthenticationState";
+import { ISigninAuthenticatorState, IState } from "@dashboard/state/authenticate/IAuthenticateState";
 import { Dispatch } from "redux";
-import { getSigninAuthenticators } from "@dashboard/state/authentication/authenticatorActions";
+import { getSigninAuthenticators } from "@dashboard/state/authenticate/authenticatorActions";
 import PageLoading from "@dashboard/components/PageLoading";
+import { ILoadable, LoadStatus } from "@dashboard/state/IState";
 
 interface IProps {
-    authenticators: ISigninAuthenticatorState,
-    loadAuthenticators: typeof getSigninAuthenticators,
+    authenticators: ISigninAuthenticatorState;
+    loadAuthenticators: typeof getSigninAuthenticators;
 }
 
 export class SignInPage extends React.Component<IProps, IRequiredComponentID> {
@@ -50,46 +46,52 @@ export class SignInPage extends React.Component<IProps, IRequiredComponentID> {
         const { authenticators } = this.props;
 
         if (authenticators.status !== LoadStatus.SUCCESS) {
-            return <div id={this.state.id} className="authenticateUserCol">
+            return (
+                <div id={this.state.id} className="authenticateUserCol">
                     <PageLoading {...authenticators} />
-            </div>;
+                </div>
+            );
         }
 
         let showPassword = false;
-        const ssoMethods = authenticators.data.filter((a) => {
-            if (a.type === 'password') {
+        const ssoMethods = authenticators.data.filter(a => {
+            if (a.type === "password") {
                 showPassword = true;
                 return false;
             }
             return true;
         });
 
-        return <div id={this.state.id} className="authenticateUserCol">
-            <DocumentTitle title={t("Sign In")}>
-                <h1 id={this.titleID} className="isCentered">
-                    {t("Sign In")}
-                </h1>
-            </DocumentTitle>
-            <SSOMethods ssoMethods={ssoMethods} />
-            <Or visible={showPassword && ssoMethods.length > 0} />
-            {showPassword && <PasswordForm />}
-        </div>;
+        return (
+            <div id={this.state.id} className="authenticateUserCol">
+                <DocumentTitle title={t("Sign In")}>
+                    <h1 id={this.titleID} className="isCentered">
+                        {t("Sign In")}
+                    </h1>
+                </DocumentTitle>
+                <SSOMethods ssoMethods={ssoMethods} />
+                <Or visible={showPassword && ssoMethods.length > 0} />
+                {showPassword && <PasswordForm />}
+            </div>
+        );
     }
 }
 
-function mapStateToProps({ authentication }: IState) {
+function mapStateToProps({ authenticate }: IState) {
     return {
-        authenticators: authentication.signin,
-    }
+        authenticators: authenticate.signin,
+    };
 }
 
 function mapDispatchToProps(dispatch: Dispatch) {
     return {
         loadAuthenticators: () => {
             dispatch(getSigninAuthenticators());
-        }
-    }
-
+        },
+    };
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(SignInPage);
+export default connect(
+    mapStateToProps,
+    mapDispatchToProps,
+)(SignInPage);

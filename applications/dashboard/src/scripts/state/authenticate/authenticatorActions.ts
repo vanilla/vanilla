@@ -1,17 +1,21 @@
-import { Action, Dispatch } from "redux";
+import { Dispatch } from "redux";
 import { actionCreator, ActionsUnion, createAction } from "@dashboard/state/utility";
-import { ISigninAuthenticatorState, IState, LoadStatus } from "./IAuthenticationState";
+import { ISigninAuthenticatorState } from "./IAuthenticateState";
 import api from "@dashboard/apiv2";
+import IState, { LoadStatus } from "@dashboard/state/IState";
 
 // export const GET_SIGNIN_AUTHENTICATORS = 'GET_SIGNIN_AUTHENTICATORS';
-export const GET_SIGNIN_AUTHENTICATORS_REQUEST = 'GET_SIGNIN_AUTHENTICATORS_REQUEST';
-export const GET_SIGNIN_AUTHENTICATORS_ERROR = 'GET_SIGNIN_AUTHENTICATORS_ERROR';
-export const GET_SIGNIN_AUTHENTICATORS_SUCCESS = 'GET_SIGNIN_AUTHENTICATORS_SUCCESS';
+export const GET_SIGNIN_AUTHENTICATORS_REQUEST = "GET_SIGNIN_AUTHENTICATORS_REQUEST";
+export const GET_SIGNIN_AUTHENTICATORS_ERROR = "GET_SIGNIN_AUTHENTICATORS_ERROR";
+export const GET_SIGNIN_AUTHENTICATORS_SUCCESS = "GET_SIGNIN_AUTHENTICATORS_SUCCESS";
 
 export interface IGetSigninAuthenticatorsError {
     error: string;
 }
-export type AuthenticatorAction = IGetSigninAuthenticatorsRequest | IGetSigninAuthenticatorsSuccess | IGetSigninAuthenticatorsError;
+export type SigninAuthenticatorAction =
+    | IGetSigninAuthenticatorsRequest
+    | IGetSigninAuthenticatorsSuccess
+    | IGetSigninAuthenticatorsError;
 
 export const actions = {
     getSigninAuthenticatorsRequest: actionCreator<string>(GET_SIGNIN_AUTHENTICATORS_REQUEST),
@@ -21,8 +25,8 @@ export const actions = {
 
 export function getSigninAuthenticators() {
     return (dispatch: Dispatch<any>, getState: () => IState) => {
-        const {authentication} = getState();
-        if (authentication.signin.status === LoadStatus.LOADING) {
+        const { authenticate } = getState();
+        if (authenticate.signin.status === LoadStatus.LOADING) {
             return;
         }
 
@@ -34,9 +38,9 @@ export function getSigninAuthenticators() {
                 dispatch(actions.getSigninAuthenticatorsSuccess(response));
             })
             .catch(error => {
-                dispatch(actions.getSigninAuthenticatorsError({error: error.response.data.message}))
+                dispatch(actions.getSigninAuthenticatorsError({ error: error.response.data.message }));
             });
-    }
+    };
 }
 
 export type ActionTypes = ActionsUnion<typeof actions>;

@@ -112,7 +112,7 @@ class Bootstrap {
             ->addAlias('ApplicationManager')
 
             // PluginManager
-            ->rule('Gdn_PluginManager')
+            ->rule(\Gdn_PluginManager::class)
             ->setShared(true)
             ->addAlias('PluginManager')
 

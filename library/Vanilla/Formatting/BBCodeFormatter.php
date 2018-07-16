@@ -2,13 +2,12 @@
 
 namespace Vanilla\Formatting;
 
-use Vanilla\Pluggable;
 use Nbbc\BBCode as Nbbc;
 use Gdn_Upload;
 use Gdn_DataSet;
 use Gdn;
 
-class BBCodeFormatter extends Pluggable {
+class BBCodeFormatter extends \Vanilla\Pluggable {
 
     /**
      * @var array A list of records from the Media table, indexed by MediaID.

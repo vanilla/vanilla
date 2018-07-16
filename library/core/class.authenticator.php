@@ -141,7 +141,7 @@ abstract class Gdn_Authenticator extends \Vanilla\Pluggable {
         // Figure out what the authenticator alias is
         $this->_AuthenticationSchemeAlias = $this->getAuthenticationSchemeAlias();
 
-        // Initialize gdn_pluggable
+        // Initialize the Pluggable
         parent::__construct();
     }
 

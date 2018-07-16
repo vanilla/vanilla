@@ -190,7 +190,7 @@ abstract class Pluggable {
         $sliceProviderMethods = ['enableSlicing', 'slice', 'addSliceAsset', 'renderSliceConfig'];
 
         if (in_array($methodName, $sliceProviderMethods)) {
-            $message = 'Slicing has been removed from Gdn_Pluggable.';
+            $message = 'Slicing has been removed from '.self::class;
             $message .= ' Try using the functionality provided by "js-form" instead.';
             throw new Exception($message);
         }

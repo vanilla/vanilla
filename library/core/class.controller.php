@@ -565,9 +565,9 @@ class Gdn_Controller extends \Vanilla\Pluggable {
 
         if (!array_key_exists('ResolvedArgs', $this->_Definitions)) {
             if (sizeof($this->ReflectArgs) && (
-                    (isset($this->ReflectArgs[0]) && $this->ReflectArgs[0] instanceof Gdn_Pluggable) ||
-                    (isset($this->ReflectArgs['Sender']) && $this->ReflectArgs['Sender'] instanceof Gdn_Pluggable) ||
-                    (isset($this->ReflectArgs['sender']) && $this->ReflectArgs['sender'] instanceof Gdn_Pluggable)
+                    (isset($this->ReflectArgs[0]) && $this->ReflectArgs[0] instanceof \Vanilla\Pluggable) ||
+                    (isset($this->ReflectArgs['Sender']) && $this->ReflectArgs['Sender'] instanceof \Vanilla\Pluggable) ||
+                    (isset($this->ReflectArgs['sender']) && $this->ReflectArgs['sender'] instanceof \Vanilla\Pluggable)
                 )
             ) {
                 $reflectArgs = array_slice($this->ReflectArgs, 1);

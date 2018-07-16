@@ -398,4 +398,22 @@ class Data implements \JsonSerializable, \ArrayAccess, \Countable, \IteratorAggr
     public function getIterator() {
         return new \ArrayIterator($this->data);
     }
+
+    /**
+     * Box a value into a data object.
+     *
+     * If the argument is already a data object then it will simply be returned, otherwise a new data object is created and returned with the argument as its data.
+     *
+     * @param Data|array $data The data to box.
+     * @return Data Returns the boxed data.
+     */
+    public static function box($data): Data {
+        if ($data instanceof Data) {
+            return $data;
+        } elseif (is_array($data)) {
+            return new Data($data);
+        } else {
+            throw new \InvalidArgumentException("Data:box() expects an instance of Data or an array.", 500);
+        }
+    }
 }

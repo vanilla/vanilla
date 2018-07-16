@@ -18,7 +18,7 @@ trait MetaTrait {
     /**
      * @var array
      */
-    private $meta;
+    private $meta = [];
 
     /**
      * Get a single item from the meta array.

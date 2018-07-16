@@ -4,42 +4,35 @@
  */
 
 import { createStore, compose, applyMiddleware, combineReducers, Store } from "redux";
-import reducerRegistry from "./reducerRegistry";
+import { getReducers } from "./reducerRegistry";
 import thunk from "redux-thunk";
 import IState from "@dashboard/state/IState";
+import {log} from "@dashboard/utility";
 
-// there may be an initial state to import
-const initialState = window.__INITIAL_STATE__ || {};
+// There may be an initial state to import.
+const initialState = {};
+const initialActions = window.__ACTIONS__ || [];
 
 const middleware = [thunk];
 
-// Preserve initial state for not-yet-loaded reducers
-const combine = reducers => {
-    const reducerNames = Object.keys(reducers);
-    Object.keys(initialState).forEach(stateItem => {
-        if (reducerNames.indexOf(stateItem) === -1) {
-            reducers[stateItem] = (state = null) => state;
-        }
-    });
-    return combineReducers(reducers);
-};
-
-// browser may have redux dev tools installed, if so integrate with it
+// Browser may have redux dev tools installed, if so integrate with it.
 const composeEnhancers = window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ || compose;
 const enhancer = composeEnhancers(applyMiddleware(...middleware));
 
-// Get our reducers.
-const reducer = combineReducers(reducerRegistry.getReducers());
-
-// build the store, add devtools extension support if it's available
-const store = createStore(reducer, initialState, enhancer);
-
-// Replace the store's reducer whenever a new reducer is registered.
-reducerRegistry.setChangeListener(reducers => {
-    store.replaceReducer(combineReducers(reducers));
-    store.dispatch({ type: "RESET" });
-});
+// Build the store, add devtools extension support if it's available.
+let store: Store<IState> | undefined;
 
 export default function getStore<S extends IState = IState>() {
-    return store as Store<S>;
+    if (store === undefined) {
+        // Get our reducers.
+        const reducer = combineReducers(getReducers());
+
+        log("createStore()");
+        store = createStore(reducer, initialState, enhancer);
+
+        // Dispatch initial actions returned from the server.
+        initialActions.forEach(store.dispatch);
+    }
+
+    return store;
 }

@@ -2185,8 +2185,14 @@ class UserModel extends Gdn_Model {
             $username = val('Name', $fields);
             $email = val('Email', $fields);
 
+
             // Only fields that are present in the schema
             $fields = $this->Validation->schemaValidationFields();
+
+            // Prevent an empty string insertion in an integer column.
+            if (empty($fields['RankID'])) {
+                unset($fields->RankID);
+            }
 
             // Remove the primary key from the fields collection before saving.
             unset($fields[$this->PrimaryKey]);

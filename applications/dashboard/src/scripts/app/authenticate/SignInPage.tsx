@@ -83,7 +83,7 @@ function mapStateToProps({ authenticate }: IState) {
     };
 }
 
-function mapDispatchToProps(dispatch: Dispatch) {
+function mapDispatchToProps(dispatch) {
     return {
         loadAuthenticators: () => {
             dispatch(getSigninAuthenticators());

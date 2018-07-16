@@ -20,9 +20,9 @@ const composeEnhancers = window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ || compose;
 const enhancer = composeEnhancers(applyMiddleware(...middleware));
 
 // Build the store, add devtools extension support if it's available.
-let store: Store<IState> | undefined;
+let store;
 
-export default function getStore<S extends IState = IState>() {
+export default function getStore<S extends IState = IState>(): Store<S> {
     if (store === undefined) {
         // Get our reducers.
         const reducer = combineReducers(getReducers());

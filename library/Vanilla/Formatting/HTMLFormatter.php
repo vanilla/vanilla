@@ -222,7 +222,7 @@ class HTMLFormatter {
             $spec = array_merge_recursive($spec, $specOverrides);
         }
 
-        return Htmlawed::filter($html, $config, $spec);
+        return \Htmlawed::filter($html, $config, $spec);
     }
 
     /**

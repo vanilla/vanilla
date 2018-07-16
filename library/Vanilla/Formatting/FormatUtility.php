@@ -220,14 +220,14 @@ class FormatUtility {
      * array of $array[Property] => Value sets.
      *
      * @param array $array An array to be converted to object.
-     * @return stdClass
+     * @return \stdClass
      */
     public static function arrayAsObject($array) {
         if (!is_array($array)) {
             return $array;
         }
 
-        $return = new stdClass();
+        $return = new \stdClass();
         foreach ($array as $property => $value) {
             $return->$property = $value;
         }
@@ -360,7 +360,7 @@ class FormatUtility {
 
                 return $sanitized;
 
-            } catch (Exception $ex) {
+            } catch (\Exception $ex) {
                 return self::display($mixed);
             }
         }
@@ -519,7 +519,7 @@ class FormatUtility {
             $timestamp = self::toTimestamp($timestamp);
         }
 
-        if (function_exists('FormatDateCustom') && (!$format || strcasecmp($format, 'html') == 0)) {
+        if (function_exists('formatDateCustom') && (!$format || strcasecmp($format, 'html') == 0)) {
             if (!$timestamp) {
                 $timestamp = time();
             }
@@ -592,6 +592,8 @@ class FormatUtility {
      *
      * @param int $timestamp
      * @param string $format
+     *
+     * @return string
      * @since 2.1
      */
     public static function dateFull($timestamp, $format = '') {
@@ -974,7 +976,7 @@ class FormatUtility {
      */
     protected static function replaceSpoilers($html, $replaceWith = '(Spoiler)') {
         if (preg_match('/class="(User)?Spoiler"/i', $html)) {
-            $htmlDom = pQuery::parseStr($html);
+            $htmlDom = \pQuery::parseStr($html);
 
             foreach($htmlDom->query('.Spoiler') as $spoilerBlock) {
                 $spoilerBlock->html(t($replaceWith));
@@ -998,7 +1000,7 @@ class FormatUtility {
     protected static function replaceQuotes($html, $replaceWith = '(Quote)') {
         // This regex can't have an end quote because BBCode formats with both Quote and UserQuote classes.
         if (preg_match('/class="(User)?Quote/i', $html)) {
-            $htmlDom = pQuery::parseStr($html);
+            $htmlDom = \pQuery::parseStr($html);
 
             foreach($htmlDom->query('.UserQuote, .Quote') as $quoteBlock) {
                 $quoteBlock->html(t($replaceWith));
@@ -1356,7 +1358,7 @@ class FormatUtility {
      * it doesn't effectively block YouTube iframes or objects.
      *
      * @param mixed $mixed
-     * @return HTML string
+     * @return string
      */
     public static function unembedContent($mixed) {
         if (!is_string($mixed)) {
@@ -2060,7 +2062,7 @@ EOT;
      * array of $Array[Property] => Value sets.
      *
      * @param object $object The object to be converted to an array.
-     * @return unknown
+     * @return array
      * @todo could be just "return (array) $object;"?
      */
     public static function objectAsArray($object) {
@@ -2446,14 +2448,14 @@ EOT;
      *
      * @param string $delta A JSON encoded array of Quill deltas.
      *
-     * @throws Exception - When the deltas could not be JSON decoded.
+     * @throws \Exception - When the deltas could not be JSON decoded.
      * @return string - The rendered HTML output.
      */
     public static function rich(string $deltas): string {
         $operations = json_decode($deltas, true);
 
         if (json_last_error() !== JSON_ERROR_NONE) {
-            throw new Exception("JSON decoding of rich post content has failed.");
+            throw new \Exception("JSON decoding of rich post content has failed.");
         }
 
         $parser = Gdn::getContainer()->get(Quill\Parser::class);

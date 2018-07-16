@@ -5,6 +5,7 @@
  * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
  */
 
+use Garden\Web\Data;
 use Garden\Web\RequestInterface;
 use Vanilla\Models\AuthenticatorModel;
 use Vanilla\Models\SSOModel;
@@ -160,6 +161,11 @@ class AuthenticateController extends Gdn_Controller {
                 return;
             }
         }
+
+        $this->addClientApiAction(
+            'GET_SIGNIN_AUTHENTICATORS_SUCCESS',
+            Data::box($this->authenticateApiController->index_authenticators())
+        );
 
         $this->renderReact();
     }

@@ -350,7 +350,7 @@ class AuthenticateApiController extends AbstractApiController {
      * @param array $query
      * @return Authenticator
      */
-    public function index_authenticators(array $query) {
+    public function index_authenticators(array $query = []) {
         $this->permission();
 
         $in = $this->schema([

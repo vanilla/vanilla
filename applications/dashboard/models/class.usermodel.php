@@ -2190,7 +2190,7 @@ class UserModel extends Gdn_Model {
 
             // Prevent an empty string insertion in an integer column.
             if (empty($fields['RankID'])) {
-                unset($fields->RankID);
+                $fields['RankID'] = null;
             }
 
             // Remove the primary key from the fields collection before saving.

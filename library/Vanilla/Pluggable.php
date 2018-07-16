@@ -58,7 +58,7 @@ abstract class Pluggable {
 
 
     /**
-     * @var enumerator An enumerator indicating what type of handler the method being called is.
+     * @var string An enumerator indicating what type of handler the method being called is.
      * Options are:
      *  HANDLER_TYPE_NORMAL: Standard call to a method on the object (DEFAULT).
      *  HANDLER_TYPE_OVERRIDE: Call to a method override.
@@ -86,11 +86,12 @@ abstract class Pluggable {
     }
 
     /**
+     * Get the return values from a an event listener.
      *
+     * @param string $pluginName The plugin the handled the event.
+     * @param string $handlerName The name of the of the event handler.
      *
-     * @param string $pluginName
-     * @param string $handlerName
-     * @return
+     * @return mixed
      */
     public function getReturn($pluginName, $handlerName) {
         return $this->Returns[strtolower($handlerName)][strtolower($pluginName)];
@@ -100,7 +101,7 @@ abstract class Pluggable {
      * Fire the next event off a custom parent class
      *
      * @param mixed $options Either the parent class, or an option array
-     *
+     * s
      * @return $this For fluent method chaining.
      */
     public function fireAs($options) {

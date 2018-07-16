@@ -16,7 +16,7 @@ use Vanilla\AddonManager;
 /**
  * Manages available themes, enabling and disabling them.
  */
-class Gdn_ThemeManager extends Gdn_Pluggable {
+class Gdn_ThemeManager extends \Vanilla\Pluggable {
 
     const ACTION_ENABLE = 1;
 

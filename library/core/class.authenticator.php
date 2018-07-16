@@ -12,7 +12,7 @@
 /**
  * Class Gdn_Authenticator
  */
-abstract class Gdn_Authenticator extends Gdn_Pluggable {
+abstract class Gdn_Authenticator extends \Vanilla\Pluggable {
 
     const DATA_NONE = 'data none';
     const DATA_FORM = 'data form';

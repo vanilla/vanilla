@@ -12,7 +12,7 @@
 /**
  * Used by any given database driver to build, modify, and create tables and views.
  */
-abstract class Gdn_DatabaseStructure extends Gdn_Pluggable {
+abstract class Gdn_DatabaseStructure extends \Vanilla\Pluggable {
     /**
      * @var int The maximum number of rows allowed for an alter table.
      */

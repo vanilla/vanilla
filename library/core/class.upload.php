@@ -13,7 +13,7 @@
 /**
  * Handles file uploads.
  */
-class Gdn_Upload extends Gdn_Pluggable {
+class Gdn_Upload extends \Vanilla\Pluggable {
 
     /** @var array */
     protected $_AllowedFileExtensions;
@@ -388,7 +388,7 @@ class Gdn_Upload extends Gdn_Pluggable {
 
     /**
      * Check to see whether the user has selected a file for uploading.
-     * 
+     *
      * @param $inputName The input name of the file.
      * @return bool Whether a file has been selected for the fiels.
      */

@@ -86,7 +86,7 @@ class EmojiInterpreter {
      */
     protected $format = '<img class="emoji" src="%1$s" title="%2$s" alt="%2$s" height="20" />';
 
-    /** @var EmojiInterpretter The singleton instance of this class. */
+    /** @var EmojiInterpreter The singleton instance of this class. */
     public static $instance;
 
     /** @var string left-side delimiter surrounding emoji, typically a full-colon. */
@@ -342,7 +342,7 @@ class EmojiInterpreter {
      * Set the emoji archive.
      *
      * @param array $archive
-     * @return EmojiInterpretter Returns $this for fluent calls.
+     * @return EmojiInterpreter Returns $this for fluent calls.
      */
     public function setArchive($archive) {
         $this->archive = $archive;
@@ -434,7 +434,7 @@ class EmojiInterpreter {
      * Set the list of emoji that can be used by the editor.
      *
      * @param array $value The new editor list.
-     * @return EmojiInterpretter Returns $this for fluent calls.
+     * @return EmojiInterpreter Returns $this for fluent calls.
      */
     public function setEditorList($value) {
         // Convert the editor list to the proper format.
@@ -466,7 +466,7 @@ class EmojiInterpreter {
      * Sets the emoji format used in {@link Emoji::img()}.
      *
      * @param string $format
-     * @return EmojiInterpretter Returns $this for fluent calls.
+     * @return EmojiInterpreter Returns $this for fluent calls.
      */
     public function setFormat($format) {
         $this->format = $format;
@@ -502,7 +502,7 @@ class EmojiInterpreter {
      * Set the aliases array.
      *
      * @param array $aliases The new aliases array.
-     * @return EmojiInterpretter Returns $this for fluent calls.
+     * @return EmojiInterpreter Returns $this for fluent calls.
      */
     public function setAliases($aliases) {
         $this->aliases = $aliases;
@@ -622,13 +622,13 @@ class EmojiInterpreter {
     /**
      * Get the singleton instance of this class.
      *
-     * @return EmojiInterpretter
+     * @return EmojiInterpreter
      */
     public static function instance() {
-        if (EmojiInterpretter::$instance === null) {
-            EmojiInterpretter::$instance = new EmojiInterpretter();
+        if (EmojiInterpreter::$instance === null) {
+            EmojiInterpreter::$instance = new EmojiInterpreter();
         }
 
-        return EmojiInterpretter::$instance;
+        return EmojiInterpreter::$instance;
     }
 }

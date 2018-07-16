@@ -13,7 +13,7 @@
  * @package Core
  * @since 2.2
  */
-class EmailTemplate extends Gdn_Pluggable implements Gdn_IEmailTemplate {
+class EmailTemplate extends \Vanilla\Pluggable implements Gdn_IEmailTemplate {
 
     /** Delimiter for plaintext email. */
     const PLAINTEXT_START = '<!-- //TEXT VERSION FOLLOWS//';

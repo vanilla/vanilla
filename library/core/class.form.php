@@ -10,12 +10,14 @@
  * @since 2.0
  */
 
+use Vanilla\Formatting\FormatUtility;
+
 /**
  * Form validation layer
  *
  * Helps with the rendering of form controls that link directly to a data model.
  */
-class Gdn_Form extends Gdn_Pluggable {
+class Gdn_Form extends \Vanilla\Pluggable {
     /**
      * @var array
      */
@@ -271,7 +273,7 @@ class Gdn_Form extends Gdn_Pluggable {
         touchValue('class', $attributes, '');
         $attributes['class'] .= ' '.$this->getStyle('bodybox');
 
-        $this->setValue('Format', val('Format', $attributes, $this->getValue('Format', Gdn_Format::defaultFormat())));
+        $this->setValue('Format', val('Format', $attributes, $this->getValue('Format', FormatUtility::defaultFormat())));
 
         $result = '<div class="bodybox-wrap">';
 
@@ -1990,8 +1992,8 @@ PASSWORDMETER;
                     if (in_array($key, $exclude)) {
                         continue;
                     }
-                    $key = Gdn_Format::form($key);
-                    $value = Gdn_Format::form($value);
+                    $key = FormatUtility::form($key);
+                    $value = FormatUtility::form($value);
                     $hiddens .= "\n<input type=\"hidden\" name=\"$key\" value=\"$value\" />";
                 }
             }
@@ -2430,7 +2432,7 @@ PASSWORDMETER;
             $iD = substr($iD, 0, -2);
         }
 
-        $iD = $this->IDPrefix.Gdn_Format::alphaNumeric(str_replace('.', '-dot-', $iD));
+        $iD = $this->IDPrefix.FormatUtility::alphaNumeric(str_replace('.', '-dot-', $iD));
         $tmp = $iD;
         $i = 1;
         if ($forceUniqueID === true) {
@@ -2842,7 +2844,7 @@ PASSWORDMETER;
 
             } else {
                 // Otherwise assume it is an object representation of a data row.
-                $this->_DataArray = Gdn_Format::objectAsArray($data);
+                $this->_DataArray = FormatUtility::objectAsArray($data);
             }
         } elseif (is_array($data)) {
             $this->_DataArray = $data;
@@ -3199,6 +3201,6 @@ PASSWORDMETER;
      */
     protected function _valueAttribute($fieldName, $attributes) {
         // Value from $Attributes overrides the datasource and the postback.
-        return ' value="'.Gdn_Format::form(arrayValueI('value', $attributes, $this->getValue($fieldName))).'"';
+        return ' value="'.FormatUtility::form(arrayValueI('value', $attributes, $this->getValue($fieldName))).'"';
     }
 }

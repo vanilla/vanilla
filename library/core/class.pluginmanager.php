@@ -21,7 +21,7 @@ use Vanilla\AddonManager;
  * A singleton class used to identify extensions, register them in a central
  * location, and instantiate/call them when necessary.
  */
-class Gdn_PluginManager extends Gdn_Pluggable implements ContainerInterface {
+class Gdn_PluginManager extends \Vanilla\Pluggable implements ContainerInterface {
 
     const ACTION_ENABLE = 1;
 

@@ -15,7 +15,7 @@
  *
  * Provides basic functionality when extended by real modules.
  */
-class Gdn_Module extends Gdn_Pluggable implements Gdn_IModule {
+class Gdn_Module extends \Vanilla\Pluggable implements Gdn_IModule {
 
     /** @var string The name of the current asset that is being rendered. */
     public $AssetName = '';

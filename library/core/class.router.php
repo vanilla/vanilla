@@ -13,7 +13,7 @@
  * Allows paths within the application to redirect, either internally or via
  * http, to other locations.
  */
-class Gdn_Router extends Gdn_Pluggable {
+class Gdn_Router extends \Vanilla\Pluggable {
 
     /** @var array */
     public $Routes;

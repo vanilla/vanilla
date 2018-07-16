@@ -31,13 +31,13 @@ final class AliasAutoloader {
     /**
      * An autoload function for use with spl_autoload_register.
      *
-     * @param string $className the class name to try and load.
+     * @param string $aliasName the class name to try and load.
      */
-    public static function autoload($className) {
-        if (isset(self::ALIASES[$className])) {
-            $orig = self::ALIASES[$className];
-            trigger_error("$className is deprecated. Use $orig instead", E_USER_DEPRECATED);
-            class_alias($orig, $className, true);
+    public static function autoload($aliasName) {
+        if (isset(self::ALIASES[$aliasName])) {
+            $newName = self::ALIASES[$aliasName];
+            trigger_error("The className $aliasName has been renamed. Use $newName instead", E_USER_DEPRECATED);
+            class_alias($newName, $aliasName, true);
         }
     }
 }

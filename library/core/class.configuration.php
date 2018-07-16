@@ -920,7 +920,7 @@ function &arrayMergeRecursiveDistinct(array &$array1, &$array2 = null) {
 /**
  * Class Gdn_ConfigurationSource
  */
-class Gdn_ConfigurationSource extends Gdn_Pluggable {
+class Gdn_ConfigurationSource extends \Vanilla\Pluggable {
 
     /** @var Gdn_Configuration Top level configuration object to reference. */
     protected $Configuration;

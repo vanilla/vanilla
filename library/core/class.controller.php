@@ -19,9 +19,8 @@
  *
  * @method void render($view = '', $controllerName = false, $applicationFolder = false, $assetName = 'Content') Render the controller's view.
  */
-class Gdn_Controller extends Gdn_Pluggable {
+class Gdn_Controller extends \Vanilla\Pluggable {
     use \Garden\MetaTrait, \Vanilla\Browser\ReduxTrait;
-
 
     /** Seconds before reauthentication is required for protected operations. */
     const REAUTH_TIMEOUT = 1200; // 20 minutes

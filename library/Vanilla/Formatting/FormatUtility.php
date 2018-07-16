@@ -1789,7 +1789,7 @@ EOT;
         if (!is_string($mixed)) {
             return self::to($mixed, 'Markdown');
         } else {
-            $markdown = new MarkdownVanilla();
+            $markdown = new MarkdownFormatter();
 
             /**
              * By default, code blocks have their contents run through htmlspecialchars. self::htmlFilter
@@ -1842,7 +1842,7 @@ EOT;
         }
 
         // Emoji.
-        $html = EmojiInterpretter::instance()->translateToHtml($html);
+        $html = EmojiInterpreter::instance()->translateToHtml($html);
 
         // Old Spoiler plugin markup handling.
         $html = self::legacySpoilers($html);

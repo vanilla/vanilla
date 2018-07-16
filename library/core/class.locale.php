@@ -14,7 +14,7 @@ use Vanilla\AddonManager;
  * The Locale class is used to load, define, change, and render translations
  * for different locales. It is a singleton class.
  */
-class Gdn_Locale extends Gdn_Pluggable {
+class Gdn_Locale extends \Vanilla\Pluggable {
 
     /**  @var string The name of the currently loaded Locale. */
     public $Locale = '';

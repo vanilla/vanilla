@@ -14,7 +14,7 @@ use Vanilla\Addon;
  * Gdn_IPlugin, this class provides some convenience methods to make plugin development
  * easier and faster.
  */
-abstract class Gdn_Plugin extends Gdn_Pluggable implements Gdn_IPlugin {
+abstract class Gdn_Plugin extends \Vanilla\Pluggable implements Gdn_IPlugin {
 
     /** @var object */
     protected $Sender;

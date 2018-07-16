@@ -4,9 +4,9 @@
  * @license https://opensource.org/licenses/GPL-2.0 GPL-2.0
  */
 
-namespace VanillaTests\Library\Vanilla\Embeds;
+namespace VanillaTests\Library\Vanilla\Formatting\Embeds;
 
-use Vanilla\Embeds\SoundCloudEmbed;
+use Vanilla\Formatting\Embeds\SoundCloudEmbed;
 use VanillaTests\SharedBootstrapTestCase;
 
 

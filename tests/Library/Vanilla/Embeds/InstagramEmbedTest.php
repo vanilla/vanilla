@@ -4,10 +4,10 @@
  * @license https://opensource.org/licenses/GPL-2.0 GPL-2.0
  */
 
-namespace VanillaTests\Library\Vanilla\Embeds;
+namespace VanillaTests\Library\Vanilla\Formatting\Embeds;
 
 use VanillaTests\SharedBootstrapTestCase;
-use Vanilla\Embeds\InstagramEmbed;
+use Vanilla\Formatting\Embeds\InstagramEmbed;
 
 class InstagramEmbedTest extends SharedBootstrapTestCase {
 

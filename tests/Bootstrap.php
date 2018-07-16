@@ -227,7 +227,7 @@ class Bootstrap {
             ->setClass(\Vanilla\Web\WebLinking::class)
             ->setShared(true)
 
-            ->rule(\Vanilla\Embeds\EmbedManager::class)
+            ->rule(\Vanilla\Formatting\Embeds\EmbedManager::class)
             ->addCall('addCoreEmbeds')
             ->addCall('setNetworkEnabled', [false])
             ->setShared(true)
@@ -237,11 +237,11 @@ class Bootstrap {
             ->addCall('registerMetadataParser', [new Reference(\Vanilla\Metadata\Parser\JsonLDParser::class)])
             ->setShared(true)
 
-            ->rule(\Vanilla\Quill\Parser::class)
+            ->rule(\Vanilla\Formatting\Quill\Parser::class)
             ->addCall('addCoreBlotsAndFormats')
             ->setShared(true)
 
-            ->rule(\Vanilla\Quill\Renderer::class)
+            ->rule(\Vanilla\Formatting\Quill\Renderer::class)
             ->setShared(true)
         ;
     }

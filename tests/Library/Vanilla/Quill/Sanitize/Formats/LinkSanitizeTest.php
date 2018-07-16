@@ -4,10 +4,10 @@
  * @license GPL-2.0
  */
 
-namespace VanillaTests\Library\Vanilla\Quill\Sanitize\Formats;
+namespace VanillaTests\Library\Vanilla\Formatting\Quill\Sanitize\Formats;
 
-use VanillaTests\Library\Vanilla\Quill\Sanitize\SanitizeTest;
-use VanillaTests\Library\Vanilla\Quill\Sanitize\TestAttributesTrait;
+use VanillaTests\Library\Vanilla\Formatting\Quill\Sanitize\SanitizeTest;
+use VanillaTests\Library\Vanilla\Formatting\Quill\Sanitize\TestAttributesTrait;
 
 class LinkSanitizeTest extends SanitizeTest {
 

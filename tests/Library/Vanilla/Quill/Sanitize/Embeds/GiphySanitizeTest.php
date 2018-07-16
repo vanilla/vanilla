@@ -4,9 +4,9 @@
  * @license GPL-2.0
  */
 
-namespace VanillaTests\Library\Vanilla\Quill\Sanitize\Embeds;
+namespace VanillaTests\Library\Vanilla\Formatting\Quill\Sanitize\Embeds;
 
-use VanillaTests\Library\Vanilla\Quill\Sanitize\SanitizeTest;
+use VanillaTests\Library\Vanilla\Formatting\Quill\Sanitize\SanitizeTest;
 
 class GiphySanitizeTest extends SanitizeTest {
 

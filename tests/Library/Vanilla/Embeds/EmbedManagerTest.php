@@ -4,25 +4,25 @@
  * @license GPLv2
  */
 
-namespace VanillaTests\Library\Vanilla\Embeds;
+namespace VanillaTests\Library\Vanilla\Formatting\Embeds;
 
 use Exception;
 use Garden\Http\HttpRequest;
-use Vanilla\Embeds\CodePenEmbed;
-use Vanilla\Embeds\GettyEmbed;
-use Vanilla\Embeds\GiphyEmbed;
-use Vanilla\Embeds\ImgurEmbed;
-use Vanilla\Embeds\SoundCloudEmbed;
-use Vanilla\Embeds\WistiaEmbed;
-use Vanilla\Embeds\TwitchEmbed;
+use Vanilla\Formatting\Embeds\CodePenEmbed;
+use Vanilla\Formatting\Embeds\GettyEmbed;
+use Vanilla\Formatting\Embeds\GiphyEmbed;
+use Vanilla\Formatting\Embeds\ImgurEmbed;
+use Vanilla\Formatting\Embeds\SoundCloudEmbed;
+use Vanilla\Formatting\Embeds\WistiaEmbed;
+use Vanilla\Formatting\Embeds\TwitchEmbed;
 use VanillaTests\SharedBootstrapTestCase;
-use Vanilla\Embeds\EmbedManager;
-use Vanilla\Embeds\InstagramEmbed;
-use Vanilla\Embeds\LinkEmbed;
-use Vanilla\Embeds\ImageEmbed;
-use Vanilla\Embeds\TwitterEmbed;
-use Vanilla\Embeds\YouTubeEmbed;
-use Vanilla\Embeds\VimeoEmbed;
+use Vanilla\Formatting\Embeds\EmbedManager;
+use Vanilla\Formatting\Embeds\InstagramEmbed;
+use Vanilla\Formatting\Embeds\LinkEmbed;
+use Vanilla\Formatting\Embeds\ImageEmbed;
+use Vanilla\Formatting\Embeds\TwitterEmbed;
+use Vanilla\Formatting\Embeds\YouTubeEmbed;
+use Vanilla\Formatting\Embeds\VimeoEmbed;
 use VanillaTests\Fixtures\PageScraper;
 use VanillaTests\Fixtures\NullCache;
 

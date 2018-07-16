@@ -2455,8 +2455,8 @@ EOT;
             throw new Exception("JSON decoding of rich post content has failed.");
         }
 
-        $parser = Gdn::getContainer()->get(Vanilla\Quill\Parser::class);
-        $renderer = Gdn::getContainer()->get(\Vanilla\Quill\Renderer::class);
+        $parser = Gdn::getContainer()->get(Vanilla\Formatting\Quill\Parser::class);
+        $renderer = Gdn::getContainer()->get(\Vanilla\Formatting\Quill\Renderer::class);
 
         $blotGroups = $parser->parse($operations);
         return $renderer->render($blotGroups);

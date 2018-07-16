@@ -4,7 +4,7 @@
  * @license GPLv2
  */
 
-namespace VanillaTests\Library\Vanilla\Quill\Sanitize;
+namespace VanillaTests\Library\Vanilla\Formatting\Quill\Sanitize;
 
 trait TestAttributesTrait {
 

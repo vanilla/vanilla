@@ -5,13 +5,13 @@
  * @license https://opensource.org/licenses/GPL-2.0 GPL-2.0
  */
 
-namespace VanillaTests\Library\Vanilla\Quill;
+namespace VanillaTests\Library\Vanilla\Formatting\Quill;
 
-use Vanilla\Quill\Blots\Embeds\ExternalBlot;
-use Vanilla\Quill\Blots\Lines\BlockquoteLineBlot;
-use Vanilla\Quill\Blots\TextBlot;
+use Vanilla\Formatting\Quill\Blots\Embeds\ExternalBlot;
+use Vanilla\Formatting\Quill\Blots\Lines\BlockquoteLineBlot;
+use Vanilla\Formatting\Quill\Blots\TextBlot;
 use VanillaTests\SharedBootstrapTestCase;
-use Vanilla\Quill\Parser;
+use Vanilla\Formatting\Quill\Parser;
 
 class ParserTest extends SharedBootstrapTestCase {
     /**

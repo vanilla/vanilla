@@ -601,6 +601,9 @@ class UtilityController extends DashboardController {
      * @param int $updateMode
      */
     public function maintenance($updateMode = 0) {
+        if (!$this->Form->authenticatedPostBack(true)) {
+            throw forbiddenException('GET');
+        }
         $this->permission('Garden.Settings.Manage');
         $currentMode = c('Garden.UpdateMode');
 

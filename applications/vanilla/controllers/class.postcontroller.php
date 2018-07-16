@@ -176,6 +176,9 @@ class PostController extends VanillaController {
                 $this->setData('Type', 'Discussion');
             }
         } else {
+            // New discussion? Make sure a discussion ID didn't sneak in.
+            $this->Form->removeFormValue('DiscussionID');
+
             // Permission to add.
             if ($this->Category) {
                 $this->categoryPermission($this->Category, 'Vanilla.Discussions.Add');

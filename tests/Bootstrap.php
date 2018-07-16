@@ -20,9 +20,8 @@ use Vanilla\Authenticator\PasswordAuthenticator;
 use Vanilla\InjectableInterface;
 use Vanilla\Models\AuthenticatorModel;
 use Vanilla\Models\SSOModel;
-use Vanilla\Quill\Renderer;
-use VanillaTests\Fixtures\MockAuthenticator;
-use VanillaTests\Fixtures\MockSSOAuthenticator;
+use VanillaTests\Fixtures\Authenticator\MockAuthenticator;
+use VanillaTests\Fixtures\Authenticator\MockSSOAuthenticator;
 use VanillaTests\Fixtures\NullCache;
 
 /**
@@ -40,7 +39,7 @@ class Bootstrap {
      *
      * @param string $baseUrl The base URL of the installation.
      */
-    public function __construct($baseUrl = 'http://vanilla.test') {
+    public function __construct($baseUrl) {
         $this->baseUrl = str_replace('\\', '/', $baseUrl);
     }
 
@@ -228,12 +227,8 @@ class Bootstrap {
             ->setClass(\Vanilla\Web\WebLinking::class)
             ->setShared(true)
 
-            ->rule(\Vanilla\Embeds\EmbedManager::class)
-            ->addCall('setDefaultEmbed', [new Reference(\Vanilla\Embeds\LinkEmbed::class)])
-            ->addCall('addEmbed', [new Reference(\Vanilla\Embeds\TwitterEmbed::class)])
-            ->addCall('addEmbed', [new Reference(\Vanilla\Embeds\YouTubeEmbed::class)])
-            ->addCall('addEmbed', [new Reference(\Vanilla\Embeds\VimeoEmbed::class)])
-            ->addCall('addEmbed', [new Reference(\Vanilla\Embeds\ImageEmbed::class), \Vanilla\Embeds\EmbedManager::PRIORITY_LOW])
+            ->rule(\Vanilla\Formatting\Embeds\EmbedManager::class)
+            ->addCall('addCoreEmbeds')
             ->addCall('setNetworkEnabled', [false])
             ->setShared(true)
 
@@ -242,11 +237,11 @@ class Bootstrap {
             ->addCall('registerMetadataParser', [new Reference(\Vanilla\Metadata\Parser\JsonLDParser::class)])
             ->setShared(true)
 
-            ->rule(\Vanilla\Quill\Parser::class)
+            ->rule(\Vanilla\Formatting\Quill\Parser::class)
+            ->addCall('addCoreBlotsAndFormats')
             ->setShared(true)
 
-            ->rule(\Vanilla\Quill\Renderer::class)
-            ->setConstructorArgs([new Reference(\Vanilla\Quill\Parser::class)])
+            ->rule(\Vanilla\Formatting\Quill\Renderer::class)
             ->setShared(true)
         ;
     }
@@ -346,13 +341,25 @@ class Bootstrap {
      * Clean up a container and remove its global references.
      *
      * @param Container $container The container to clean up.
+     *
+     * @throws \Garden\Container\ContainerException
+     * @throws \Garden\Container\NotFoundException
      */
     public static function cleanup(Container $container) {
-        if (class_exists(\CategoryModel::class)) {
-            \CategoryModel::$Categories = null;
-        }
+        self::cleanUpContainer($container);
+        self::cleanUpGlobals();
+    }
 
-        if ($container->hasInstance(AddonManager::class)) {
+    /**
+     * Clean up container.
+     *
+     * @param \Garden\Container\Container $container
+     *
+     * @throws \Garden\Container\ContainerException
+     * @throws \Garden\Container\NotFoundException
+     */
+    public static function cleanUpContainer(Container $container) {
+       if ($container->hasInstance(AddonManager::class)) {
             /* @var AddonManager $addonManager */
 
             $addonManager = $container->get(AddonManager::class);
@@ -360,13 +367,18 @@ class Bootstrap {
         }
 
         $container->clearInstances();
+    }
 
-        if ($GLOBALS['dic'] === $container) {
-            unset($GLOBALS['dic']);
+    /**
+     * Clean up global variables.
+     */
+    public static function cleanUpGlobals() {
+        if (class_exists(\CategoryModel::class)) {
+            \CategoryModel::$Categories = null;
         }
-        if (Gdn::getContainer() === $container) {
-            Gdn::setContainer(null);
-        }
+
+        unset($GLOBALS['dic']);
+        Gdn::setContainer(new NullContainer());
     }
 
     /**

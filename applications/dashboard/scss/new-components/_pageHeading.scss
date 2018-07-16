@@ -26,3 +26,27 @@
     max-width: 100%;
 }
 
+
+// Gets height of header as a placeholder while sticky header can switch between absolute and relative
+// Not necessary if theme already has placeholder. May require JS to adjust if height is dynamic based on width
+.stickyHeaderWrap {
+    position: relative;
+    display: block;
+    width: 100%;
+}
+
+.stickyHeader {
+    position: relative;
+    width: 100%;
+    left: 0;
+    display: block;
+    z-index: 100;
+
+    &.isAtTop {
+        position: relative;
+    }
+
+    &.isScrollingDown {
+        position: absolute;
+    }
+}

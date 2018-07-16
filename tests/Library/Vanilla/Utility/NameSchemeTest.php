@@ -7,14 +7,14 @@
 
 namespace VanillaTests\Library\Vanilla\Utility;
 
-use PHPUnit\Framework\TestCase;
+use VanillaTests\SharedBootstrapTestCase;
 use Vanilla\Utility\CamelCaseScheme;
 use Vanilla\Utility\DelimitedScheme;
 
 /**
  * Tests for Vanilla\Utility\NameScheme classes.
  */
-class NameSchemeTest extends TestCase {
+class NameSchemeTest extends SharedBootstrapTestCase {
     /**
      * Test some camel case scheme cases.
      *

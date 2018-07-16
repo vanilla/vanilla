@@ -440,8 +440,43 @@ abstract class Gdn_SQLDriver {
      *   The reference should be in the form of alias.column.
      * @return string Returns the escaped string.
      */
-    protected function escapeIdentifier($refExpr) {
+    public function escapeIdentifier($refExpr) {
         trigger_error(errorMessage('The selected database engine does not perform the requested task.', $this->ClassName, 'EscapeSql'), E_USER_ERROR);
+    }
+
+    /**
+     * Escape the identifiers in a field reference expression.
+     *
+     * @param string $refExpr The field reference expression.
+     * @paran bool $check Check to see if the field is already quoted.
+     * @return string Returns an escaped expression.
+     */
+    protected function escapeFieldReference(string $refExpr, bool $check = true): string {
+        if ($check && preg_match('/^`[^`]+`$/', $refExpr)) {
+            return $refExpr;
+        }
+
+        return implode('.', array_map(function ($part) {
+            if ($part === '*') {
+                return $part;
+            }
+            return $this->escapeIdentifier($part);
+        }, explode('.', $refExpr, 2)));
+    }
+
+    /**
+     * Escape the keys of an array.
+     *
+     * @param callable $callback The escape function.
+     * @param array $arr The array to escape.
+     * @return array
+     */
+    protected function escapeKeys(callable $callback, array $arr) {
+        $result = [];
+        foreach ($arr as $key => $value) {
+            $result[$callback($key)] = $value;
+        }
+        return $result;
     }
 
     /**
@@ -450,6 +485,7 @@ abstract class Gdn_SQLDriver {
      *
      * @param mixed $string The string (or array of strings) of SQL to be escaped.
      * @param boolean $firstWordOnly A boolean value indicating if the first word should be escaped only.
+     * @deprecated
      */
     protected function escapeSql($string, $firstWordOnly = false) {
         trigger_error(errorMessage('The selected database engine does not perform the requested task.', $this->ClassName, 'EscapeSql'), E_USER_ERROR);
@@ -556,18 +592,17 @@ abstract class Gdn_SQLDriver {
      *    user
      *    user, user u2, role
      *    array("user u", "user u2", "role")
+     * @param boolean $escape Whether or not the from query should be escaped.
      *
      * @return Gdn_SQLDriver $this
      **/
-    public function from($from) {
+    public function from($from, $escape = true) {
         if (!is_array($from)) {
             $from = [$from];
         }
 
-        $count = count($from);
-        $i = 0;
-        for ($i = 0; $i < $count; ++$i) {
-            $this->_Froms[] = $this->escapeIdentifier($this->mapAliases($from[$i]));
+        foreach ($from as $part) {
+            $this->_Froms[] = $this->mapAliases($part, $escape);
         }
 
         return $this;
@@ -764,9 +799,6 @@ abstract class Gdn_SQLDriver {
             $function = $expr['Function'];
             $alias = $expr['Alias'];
             $caseOptions = val('CaseOptions', $expr);
-            if ($field != '*' && !is_numeric($field)) {
-                $field = $this->escapeIdentifier($field);
-            }
 
             if ($alias == '' && $function != '') {
                 $alias = $field;
@@ -786,7 +818,7 @@ abstract class Gdn_SQLDriver {
             }
 
             if ($alias != '') {
-                $field .= ' as '.$this->quoteIdentifier($alias);
+                $field .= ' as '.$this->escapeIdentifier($alias);
             }
 
             if ($field != '') {
@@ -969,7 +1001,7 @@ abstract class Gdn_SQLDriver {
             $field = trim($field);
 
             if ($field != '') {
-                $this->_GroupBys[] = $this->escapeIdentifier($field);
+                $this->_GroupBys[] = $this->escapeFieldReference($field);
             }
         }
         return $this;
@@ -1112,6 +1144,8 @@ abstract class Gdn_SQLDriver {
      * If a row is not found then one is inserted and the items in this array are merged with $set.
      */
     public function replace($table = '', $set = null, $where, $checkExisting = false) {
+        $set = $this->escapeKeys([$this, 'escapeFieldReference'], $set);
+
         if (count($this->_Sets) > 0) {
             foreach ($this->_Sets as $key => $value) {
                 if (array_key_exists($value, $this->_NamedParameters)) {
@@ -1133,7 +1167,7 @@ abstract class Gdn_SQLDriver {
                 $update = true;
                 foreach ($set as $key => $value) {
                     unset($set[$key]);
-                    $key = trim($key, '`');
+                    $key = $this->unescapeIdentifier($key);
 
                     if (!$this->CaptureModifications && !array_key_exists($key, $row)) {
                         continue;
@@ -1147,14 +1181,14 @@ abstract class Gdn_SQLDriver {
                     // We are assuming here that if the existing record doesn't contain the column then it's just been added.
                     if (preg_match('/^`(.+)`$/', $value, $matches)) {
                         if (!array_key_exists($key, $row) || $row[$key] != $row[$matches[1]]) {
-                            $this->set('`'.$key.'`', $value, false);
+                            $this->set($this->escapeIdentifier($key), $value, false);
                         }
                     } elseif (!array_key_exists($key, $row) || $row[$key] != $value) {
-                        $this->set('`'.$key.'`', $value);
+                        $this->set($this->escapeIdentifier($key), $value);
                     }
 
                 }
-                if (count($this->_Sets) == 0) {
+                if (count($this->_Sets) === 0) {
                     $this->reset();
                     return;
                 }
@@ -1169,7 +1203,7 @@ abstract class Gdn_SQLDriver {
             $this->put($table, $set, $where);
         } else {
             // Insert the table.
-            $set = array_merge($set, $where);
+            $set = array_merge($set, $this->escapeKeys([$this, 'escapeFieldReference'], $where));
             $this->insert($table, $set);
         }
     }
@@ -1195,16 +1229,8 @@ abstract class Gdn_SQLDriver {
         // echo '<div>'.$TableName.' ---> '.$this->escapeSql($this->Database->DatabasePrefix.$TableName, TRUE).'</div>';
         if ($this->Database->DatabasePrefix && $tableName[0] !== '(') {
             $tableName = $this->mapAliases($tableName);
-
-            //$Aliases = array_keys($this->_AliasMap);
-            //$Regex = '';
-            //foreach ($Aliases as $Alias) {
-            //   $Regex .= '(?<! '.$Alias.')';
-            //}
-            //$Regex = '/(\w+'.$Regex.'\.)/';
-            //$On = preg_replace($Regex, $this->Database->DatabasePrefix.'$1', ' '.$On);
         }
-        $joinClause = ltrim($join.' join ').$this->escapeIdentifier($tableName, true).' on '.$on;
+        $joinClause = ltrim($join.' join ')."$tableName on $on";
         $this->_Joins[] = $joinClause;
 
         return $this;
@@ -1287,32 +1313,23 @@ abstract class Gdn_SQLDriver {
      * provided, placing them in an alias mapping array. Returns the table
      * specification with any table prefix prepended.
      *
-     * @param string $tableString The string specification of the table. ie.
-     * "tbl_User as u" or "user u".
+     * @param string $tableString The string specification of the table. ie. "tbl_User as u" or "user u".
+     * @param boolean $escape Whether or not to escape the tables and aliases.
      * @return string
      */
-    public function mapAliases($tableString) {
-        // Make sure all tables have an alias.
-        if (strpos($tableString, ' ') === false) {
-            $tableString .= " `$tableString`";
+    public function mapAliases($tableString, $escape = true) {
+        if (preg_match('`^([^\s]+?)(?:\s+(?:as\s+)?([a-z_][a-z0-9_]*))?$`i', trim($tableString), $m)) {
+            $tableName = $m[1];
+            $alias = $m[2] ?? $tableName;
+
+            $fullTableName = $this->Database->DatabasePrefix.$tableName;
+            $escapedTableName = $escape ? $this->escapeIdentifier($fullTableName) : $fullTableName;
+            $escapedAlias = $escape ? $this->escapeIdentifier($alias) : $alias;
+
+            return $escapedTableName.' '.$escapedAlias;
+        } else {
+            throw new \InvalidArgumentException("Unknown table expression: $tableString", 500);
         }
-
-        // Map the alias to the alias mapping array
-        $tableString = trim(preg_replace('/\s+as\s+/i', ' ', $tableString));
-        $alias = strrchr($tableString, " ");
-        $tableName = substr($tableString, 0, strlen($tableString) - strlen($alias));
-
-        // If no alias was specified then it will be set to the tablename.
-        $alias = trim($alias);
-        if (strlen($alias) == 0) {
-            $alias = $tableName;
-            $tableString .= " `$alias`";
-        }
-
-        //$this->_AliasMap[$Alias] = $TableName;
-
-        // Return the string with the database table prefix prepended
-        return $this->Database->DatabasePrefix.$tableString;
     }
 
     /**
@@ -1422,13 +1439,19 @@ abstract class Gdn_SQLDriver {
             return $this;
         }
 
-        if ($direction && strtolower($direction) != 'asc') {
-            $direction = 'desc';
-        } else {
-            $direction = 'asc';
+        $fields = explode(',', "$fields $direction");
+
+        foreach ($fields as $parts) {
+            if (preg_match('`^([^\s]+?)(?:\s+?(asc|desc))?$`i', trim($parts), $m)) {
+                $field = $m[1];
+                $direction = $m[2] ?? 'asc';
+
+                $this->_OrderBys[] = $this->escapeFieldReference($field).' '.$direction;
+            } else {
+                trigger_error("Invalid order by expression: $parts");
+            }
         }
 
-        $this->_OrderBys[] = $this->escapeIdentifier($fields, true).' '.$direction;
         return $this;
     }
 
@@ -1565,7 +1588,7 @@ abstract class Gdn_SQLDriver {
         } else {
             // This is a column reference.
             if (is_null($name)) {
-                $result = $this->escapeIdentifier($expr);
+                $result = $this->escapeFieldReference($expr);
             } else {
                 // This is a named parameter.
 
@@ -1716,8 +1739,28 @@ abstract class Gdn_SQLDriver {
         return $result;
     }
 
+    /**
+     * Quote an identifier such as a table or column name.
+     *
+     * @param string $string The identifier to quote.
+     * @return string Returns a quoted string.
+     * @deprecated
+     */
     public function quoteIdentifier($string) {
-        return '`'.$string.'`';
+        deprecated('Gdn_SQLDriver::quoteIdentifier()', 'Gdn_SQLDriver::escapeIdentifier()');
+        return $this->escapeIdentifier($string);
+    }
+
+    /**
+     * Unquote an already quoted identifier.
+     *
+     * @param string $string The quoted identifier.
+     * @return string Returns the unquoted identifer.
+     */
+    public function unescapeIdentifier(string $string): string {
+        return preg_replace_callback('/(`+)/', function ($m) {
+            return str_repeat('`', intdiv(strlen($m[1]), 2));
+        }, $string);
     }
 
     /**
@@ -1788,7 +1831,6 @@ abstract class Gdn_SQLDriver {
         }
         $count = count($select);
 
-        $i = 0;
         for ($i = 0; $i < $count; $i++) {
             $field = trim($select[$i]);
 
@@ -1803,7 +1845,7 @@ abstract class Gdn_SQLDriver {
                     $alias = trim(strstr($field, '.'), ' .`');
                 }
                 // Make sure we aren't selecting * as an alias.
-                if ($alias == '*') {
+                if ($alias === '*') {
                     $alias = '';
                 }
             }
@@ -1876,20 +1918,22 @@ abstract class Gdn_SQLDriver {
             if (is_array($v) || is_object($v)) {
                 throw new Exception('Invalid value type ('.gettype($v).') in INSERT/UPDATE statement.', 500);
             } else {
+                $escapedName = $this->escapeFieldReference($f, true);
                 if (in_array(substr($f, -1),  ['+', '-'], true)) {
                     // This is an increment/decrement.
                     $op = substr($f, -1);
                     $f = substr($f, 0, -1);
+                    $escapedName = $this->escapeFieldReference($f, true);
 
                     $parameter = $this->namedParameter($f, $createNewNamedParameter);
                     $this->_NamedParameters[$parameter] = $v;
-                    $this->_Sets[$this->escapeIdentifier($f)] = $this->escapeIdentifier($f)." $op ".$parameter;
+                    $this->_Sets[$escapedName] = "$escapedName $op $parameter";
                 } elseif ($escapeString) {
                     $namedParameter = $this->namedParameter($f, $createNewNamedParameter);
                     $this->_NamedParameters[$namedParameter] = $v;
-                    $this->_Sets[$this->escapeIdentifier($f)] = $namedParameter;
+                    $this->_Sets[$escapedName] = $namedParameter;
                 } else {
-                    $this->_Sets[$this->escapeIdentifier($f)] = $v;
+                    $this->_Sets[$escapedName] = $v;
                 }
             }
         }

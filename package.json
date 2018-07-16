@@ -14,14 +14,13 @@
         "promise-polyfill": "6.1.0",
         "prop-types": "15.6.1",
         "qs": "6.5.2",
-        "react": "16.4.0",
-        "react-dom": "16.4.0",
+        "react": "16.4.1",
+        "react-dom": "16.4.1",
         "react-redux": "5.0.7",
-        "react-router-dom": "4.2.2",
+        "react-router-dom": "4.3.1",
         "react-virtualized": "9.19.1",
-        "redux": "3.7.2",
-        "redux-observable": "0.18.0",
-        "rxjs": "5.5.11",
+        "redux": "4.0.0",
+        "redux-thunk": "2.3.0",
         "setasap": "2.0.1",
         "shave": "2.1.3",
         "sprintf-js": "1.1.1",
@@ -75,12 +74,13 @@
         "ts-node": "6.0.5",
         "tslint": "5.10.0",
         "typescript": "2.8.3",
-        "webpack": "4.9.1"
+        "webpack": "4.10.2"
     },
     "scripts": {
         "test": "karma start ./tests/javascript/karma.conf.js --single-run",
         "test:watch": "karma start ./tests/javascript/karma.conf.js",
-        "lint:ts": "tslint -c ./.tslint.js -e './**/node_modules/**' -e './**/src/**/*.{js,jsx}' -p ./tsconfig.json -t stylish",
-        "lint:ts:fix": "tslint -c ./.tslint.js -e './**/node_modules/**' -e './**/src/**/*.{js,jsx}' -p ./tsconfig.json -t stylish --fix"
+        "test:debug": "karma start ./tests/javascript/karma.conf.js --browsers ChromeDebug",
+        "lint:ts": "tslint -c ./tslint.json -e './**/node_modules/**' -e './**/src/**/*.{js,jsx}' -p ./tsconfig.json -t stylish",
+        "lint:ts:fix": "tslint -c ./tslint.json -e './**/node_modules/**' -e './**/src/**/*.{js,jsx}' -p ./tsconfig.json -t stylish --fix"
     }
 }

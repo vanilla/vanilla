@@ -613,7 +613,7 @@ if (!function_exists('writeEmbedCommentForm')) :
                 $returnUrl = $controller->data('ForeignSource.vanilla_url', Gdn::request()->pathAndQuery());
 
                 if ($session->isValid()) {
-                    $authenticationUrl = Gdn::authenticator()->signOutUrl($returnUrl);
+                    $authenticationUrl = url(signOutUrl($returnUrl), true);
                     echo wrap(
                         sprintf(
                             t('Commenting as %1$s (%2$s)', 'Commenting as %1$s <span class="SignOutWrap">(%2$s)</span>'),

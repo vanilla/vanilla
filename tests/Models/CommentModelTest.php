@@ -6,7 +6,7 @@
 
 namespace VanillaTests\Models;
 
-use PHPUnit\Framework\TestCase;
+use VanillaTests\SharedBootstrapTestCase;
 use CommentModel;
 use DiscussionModel;
 use VanillaTests\SiteTestTrait;
@@ -14,7 +14,7 @@ use VanillaTests\SiteTestTrait;
 /**
  * Test {@link CommentModel}.
  */
-class CommentModelTest extends TestCase {
+class CommentModelTest extends SharedBootstrapTestCase {
     use SiteTestTrait {
         setupBeforeClass as baseSetupBeforeClass;
     }

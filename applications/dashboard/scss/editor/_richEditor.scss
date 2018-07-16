@@ -571,19 +571,11 @@
         word-break: break-all;
         word-break: break-word;
         text-overflow: ellipsis;
-        line-height: 1.5;
+        line-height: $richEditor-lineHeight;
     }
 
-    iframe,
-    .embedImage-img {
-        display: block;
-        position: relative;
-        margin: {
-            left: auto;
-            right: auto;
-        }
-        max-width: 100%;
-        max-height: 80vh;
+    code {
+        text-overflow: initial;
     }
 }
 
@@ -707,7 +699,19 @@
 .atMention  {
     color: inherit;
     font-weight: $richEditor-atMentionLink_weight;
+}
+
+// Only allow selection of the entire mention at once in the editor.
+.richEditor .atMention {
     user-select: all;
+}
+
+// Hide Preview
+
+body.hasRichEditor {
+    #Form_Preview {
+        display: none;
+    }
 }
 
 // Handle gutter for paragraph menu
@@ -744,6 +748,17 @@
                     padding-left: 0;
                 }
             }
+
+
+            .richEditor {
+                padding: {
+                    left: $richEditor-pilcrow_gutter;
+                }
+
+                .richEditor {
+                    padding-left: 0;
+                }
+            }
         }
 
         // Activity
@@ -771,10 +786,6 @@
     }
 }
 
-
-.u-visibleOnFullScreenEditor {
-    display: none;
-}
 
 // Mobile
 body.isMobile {

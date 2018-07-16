@@ -2183,7 +2183,7 @@ class UserModel extends Gdn_Model {
             $fields = $this->Validation->validationFields();
             $roleIDs = val('RoleID', $fields, 0);
             $username = val('Name', $fields);
-            $email = val('Email', $fields);
+            $email = val('Email', $fields, '');
 
             // Only fields that are present in the schema
             $fields = $this->Validation->schemaValidationFields();

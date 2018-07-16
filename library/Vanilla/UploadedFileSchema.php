@@ -146,10 +146,16 @@ class UploadedFileSchema extends Schema {
             if (in_array($ext, $this->getAllowedExtensions())) {
                 $result = true;
             }
+        } else {
+            $ext = null;
         }
 
         if ($result !== true) {
-            $field->addError('invalid', ['messageCode' => '{field} is not an allowed upload type.']);
+            if ($ext === null) {
+                $field->addError('invalid', ['messageCode' => '{field} does not contain a file extension.']);
+            } else {
+                $field->addError('invalid', ['messageCode' => '{field} contains an invalid file extension: {ext}.', 'ext' => $ext]);
+            }
         }
 
         return $upload;

@@ -424,7 +424,7 @@ if (!function_exists('categoryFilters')) {
         $transientKey = Gdn::session()->transientKey();
         $filters = [
             [
-                'name' => 'Following',
+                'name' => t('Following'),
                 'param' => 'followed',
                 'extra' => ['save' => 1, 'TransientKey' => $transientKey]
             ]
@@ -726,7 +726,7 @@ if (!function_exists('discussionFilters')) {
         $transientKey = Gdn::session()->transientKey();
         $filters = [
             [
-                'name' => 'Following',
+                'name' => t('Following'),
                 'param' => 'followed',
                 'extra' => ['save' => 1, 'TransientKey' => $transientKey]
             ]
@@ -813,12 +813,15 @@ if (!function_exists('filtersDropDown')) {
      *     ** 'param': URL parameter associated with the filter.
      *     ** 'value': A value for the URL parameter.
      * @param string $extraClasses any extra classes you add to the drop down
-     * @param string $default The default label for when no filter is active.
+     * @param string|null $default The default label for when no filter is active. If `null`, the default label is "All".
      * @param string|null $defaultURL URL override to return to the default, unfiltered state.
      * @param string $label Text for the label to attach to the cont
      * @return string
      */
-    function filtersDropDown($baseUrl, array $filters = [], $extraClasses = '', $default = 'All', $defaultUrl = null, $label = 'View') {
+    function filtersDropDown($baseUrl, array $filters = [], $extraClasses = '', $default = null, $defaultUrl = null, $label = 'View') {
+        if ($default === null) {
+            $default = t('All');
+        }
         $output = '';
 
         if (c('Vanilla.EnableCategoryFollowing')) {

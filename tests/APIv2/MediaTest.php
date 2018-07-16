@@ -9,7 +9,7 @@ namespace VanillaTests\APIv2;
 
 use Gdn_Upload;
 use Garden\Http\HttpResponse;
-use Vanilla\Embeds\EmbedManager;
+use Vanilla\Formatting\Embeds\EmbedManager;
 use Vanilla\UploadedFile;
 use VanillaTests\Fixtures\Uploader;
 
@@ -356,7 +356,7 @@ class MediaTest extends AbstractAPIv2Test {
                         'embedUrl' => 'https://www.youtube.com/embed/9bZkp7q19f0?feature=oembed&autoplay=1&start=182',
                     ],
                 ]
-            ]
+            ],
         ];
 
         return $urls;
@@ -371,7 +371,22 @@ class MediaTest extends AbstractAPIv2Test {
         $urls = [
             ['https://vimeo.com/251083506', 'vimeo'],
             ['https://youtube.com/watch?v=example', 'youtube'],
-            ['https://youtube.ca/watch?v=example', 'youtube']
+            ['https://youtube.ca/watch?v=example', 'youtube'],
+            ['https://www.instagram.com/p/BizC-PPFK1m', 'instagram'],
+            ['https://soundcloud.com/syrebralvibes/the-eden-project-circles', 'soundcloud'],
+            ['https://www.twitch.tv/videos/276279462', 'twitch'],
+            ['https://clips.twitch.tv/SarcasticDependableCormorantBudStar', 'twitch'],
+            ['https://clips.twitch.tv/SarcasticDependableCormorantBudStar', 'twitch'],
+            ['https://imgur.com/gallery/10HROiq', 'imgur'],
+            ['https://www.gettyimages.ca/license/905559076', 'getty'],
+            ['https://www.gettyimages.ca/event/denmark-v-australia-group-c-2018-fifa-world-cup-russia-775137961#denmarks-forward-pione-sisto-controls-the-ball-during-the-russia-2018-picture-id980320266', 'getty'],
+            ['https://www.gettyimages.com/license/460707851', 'getty'],
+            ['http://gty.im/460707851', 'getty'],
+            ['https://giphy.com/gifs/super-smash-bros-ultimate-jwSlQZnsymUW49NC3R', 'giphy'],
+            ['https://gph.is/2sTbvh0', 'giphy'],
+            ['https://media.giphy.com/media/2vqIyGV2S3HTGafbKo/giphy.gif', 'giphy'],
+            ['https://vanillaforums-1.wistia.com/medias/vjidqnyg0a', 'wistia'],
+            ['https://codepen.io/cchabilall83/pen/gKymEp', 'codepen'],
         ];
 
         return $urls;

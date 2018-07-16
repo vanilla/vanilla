@@ -13,6 +13,7 @@ import {
     getFormData,
     getNextTabbableElement,
     watchFocusInDomTree,
+    stickyHeader,
 } from "@dashboard/dom";
 import { expect } from "chai";
 import sinon from "sinon";
@@ -156,7 +157,7 @@ describe("getFormData()", () => {
         `;
     });
 
-    it("can get get data out of a form", () => {
+    it("can get data out of a form", () => {
         const form = document.querySelector("form");
         expect(getFormData(form)).deep.equals({ foo: "foo" });
     });
@@ -404,6 +405,7 @@ describe("watchFocusInDomTree()", () => {
             <div tabindex="0" id="root1">
                 <button id="item1"></button>
                 <button id="item2"></button>
+                <span id="notfocusable"></span>
             </div>
             <button id="item3"></button>
         </div>`;
@@ -462,6 +464,58 @@ describe("watchFocusInDomTree()", () => {
         item1.focus();
         spy.resetHistory();
         item2.focus();
+        expect(spy.calledOnceWith(false));
+    });
+
+    it("does not notify about focus going to the 'body'", () => {
+        const spy = sinon.spy();
+        const root1 = document.getElementById("root1")!;
+        const item1 = document.getElementById("item1")!;
+
+        watchFocusInDomTree(root1, spy);
+
+        item1.focus();
+        document.body.focus();
+        expect(spy.notCalled).eq(true);
+    });
+
+    it("does not notify when an item inside of the root is clicked", () => {
+        const spy = sinon.spy();
+        const root1 = document.getElementById("root1")!;
+        const item1 = document.getElementById("item1")!;
+        const item2 = document.getElementById("item2")!;
+        const notfocusable = document.getElementById("notfocusable")!;
+
+        watchFocusInDomTree(root1, spy);
+
+        root1.focus();
+        spy.resetHistory();
+        item2.click();
+        expect(spy.notCalled).eq(true);
+
+        item1.focus();
+        spy.resetHistory();
+        notfocusable.click();
+        expect(spy.notCalled).eq(true);
+    });
+
+    it("notifies false when items outside are clicked", () => {
+        const spy = sinon.spy();
+        const root1 = document.getElementById("root1")!;
+        const item1 = document.getElementById("item1")!;
+        const item2 = document.getElementById("item2")!;
+        const item3 = document.getElementById("item3")!;
+
+        watchFocusInDomTree(root1, spy);
+
+        root1.focus();
+        spy.resetHistory();
+        item3.click();
+        expect(spy.calledOnceWith(false));
+
+        item1.focus();
+        spy.resetHistory();
+        item3.click();
         expect(spy.calledOnceWith(false));
     });
 });

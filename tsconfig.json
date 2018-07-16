@@ -17,10 +17,11 @@
         "paths": {
             "@vanilla/*": ["./applications/vanilla/src/scripts/*"],
             "@dashboard/*": ["./applications/dashboard/src/scripts/*"],
+            "@rich-editor/*": ["./plugins/rich-editor/src/scripts/*"],
             "@testroot/*": ["./tests/javascript/*"],
             "*": [
-                "./node_modules",
-                "./plugins/rich-editor/node_modules/*",
+                "./node_modules/*",
+                "./plugins/rich-editor/node_modules/*"
             ]
         },
         "typeRoots": [
@@ -28,7 +29,8 @@
             "./node_modules/@types"
         ],
         "skipLibCheck": true,
-        "sourceMap": true
+        "sourceMap": true,
+        "inlineSourceMap": false,
     },
     "include": [
         "**/*.ts",

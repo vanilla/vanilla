@@ -6,7 +6,7 @@
  * @license https://opensource.org/licenses/GPL-2.0 GPL-2.0
  */
 
-import { logError } from "@dashboard/utility";
+import { capitalizeFirstLetter, logError } from "@dashboard/utility";
 
 export const FOCUS_CLASS = "embed-focusableElement";
 
@@ -23,7 +23,12 @@ export interface IEmbedData {
     };
 }
 
-export type EmbedRenderer = (element: HTMLElement, data: IEmbedData, inEditor: boolean) => Promise<void>;
+export interface IEmbedElements {
+    root: HTMLElement;
+    content: HTMLElement;
+}
+
+export type EmbedRenderer = (elements: IEmbedElements, data: IEmbedData, inEditor: boolean) => Promise<void>;
 
 const embedRenderers: {
     [type: string]: EmbedRenderer;
@@ -46,20 +51,16 @@ export function registerEmbed(type: string, renderer: EmbedRenderer) {
 /**
  * Render an embed into a DOM node based on it's type.
  */
-export function renderEmbed(element: HTMLElement, data: IEmbedData, inEditor = true): undefined | Promise<void> {
-    element.classList.add("embed-" + data.type);
-
+export function renderEmbed(elements: IEmbedElements, data: IEmbedData, inEditor = true): Promise<void> {
     if (!data.type) {
-        logError("The embed type was not provided.");
-        return;
+        throw new Error("The embed type was not provided.");
     }
 
     const render = data.type && embedRenderers[data.type];
 
     if (render) {
-        return render(element, data, inEditor);
+        return render(elements, data, inEditor);
     } else {
-        logError("Could not find a renderer for the embed type - " + data.type);
-        return;
+        throw new Error("Could not find a renderer for the embed type - " + data.type);
     }
 }

@@ -45,10 +45,12 @@
         "vanilla/htmlawed": "~2.0",
         "vanilla/legacy-oauth": "~1.0",
         "vanilla/legacy-passwords": "~1.0",
-        "vanilla/nbbc": "~2.1"
+        "vanilla/nbbc": "~2.1",
+        "vanilla/vanilla-connect": "~0.0"
     },
     "require-dev": {
-        "phpunit/phpunit": "~6.0"
+        "phpunit/phpunit": "~6.0",
+        "voku/html-min": "~3.0"
     },
     "provide": {
         "ext-gd": "*"

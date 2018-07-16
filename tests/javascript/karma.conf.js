@@ -17,10 +17,12 @@ TEST_FILE_ROOTS.forEach(fileRoot => {
     const { normalize, join } = path;
     const tsPath = normalize(join(fileRoot, "src/scripts/**/*.test.ts"));
     const tsxPath = normalize(join(fileRoot, "src/scripts/**/*.test.tsx"));
+    const setupPath = normalize(join(fileRoot, "src/scripts/__tests__/setup.ts"));
 
-    files.push(tsPath, tsxPath);
+    files.push(setupPath);
     preprocessors[tsPath] = ["webpack", "sourcemap"];
     preprocessors[tsxPath] = ["webpack", "sourcemap"];
+    preprocessors[setupPath] = ["webpack", "sourcemap"];
 });
 
 module.exports = config => {
@@ -31,6 +33,11 @@ module.exports = config => {
         basePath: VANILLA_ROOT,
         frameworks: ["mocha", "chai"],
         reporters: ["mocha"],
+        // reporter options
+        mochaReporter: {
+            output: "minimal",
+            showDiff: true,
+        },
         logLevel: config.LOG_INFO,
         port: 9876, // karma web server port
         colors: true,
@@ -52,6 +59,10 @@ module.exports = config => {
             ChromeHeadlessNoSandbox: {
                 base: "ChromeHeadless",
                 flags: ["--no-sandbox"],
+            },
+            ChromeDebug: {
+                base: "Chrome",
+                flags: ["--remote-debugging-port=9333"],
             },
         },
     });

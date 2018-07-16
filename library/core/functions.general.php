@@ -57,6 +57,31 @@ if (!function_exists('absoluteSource')) {
     }
 }
 
+if (!function_exists('anonymizeIP')) {
+    /**
+     * Anonymize an IPv4 or IPv6 address.
+     *
+     * @param string $ip An IPv4 or IPv6 address.
+     * @return bool|string Anonymized IP address on success. False on failure.
+     */
+    function anonymizeIP(string $ip) {
+        $result = false;
+
+        if (filter_var($ip, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4 & FILTER_FLAG_IPV6)) {
+            // Need a packed version for bitwise operations.
+            $packed = inet_pton($ip);
+            if ($packed !== false) {
+                // Remove the last octet of an IPv4 address or the last 80 bits of an IPv6 address.
+                // IP v4 addresses are 32 bits (4 bytes). IP v6 addresses are 128 bits (16 bytes).
+                $mask = strlen($packed) == 4 ? inet_pton('255.255.255.0') : inet_pton('ffff:ffff:ffff::');
+                $result = inet_ntop($packed & $mask);
+            }
+        }
+
+        return $result;
+    }
+}
+
 if (!function_exists('arrayCombine')) {
     /**
      * PHP's array_combine has a limitation that doesn't allow array_combine to work if either of the arrays are empty.
@@ -129,6 +154,43 @@ if (!function_exists('arrayKeyExistsI')) {
             }
         }
         return false;
+    }
+}
+
+if (!function_exists('arrayPathExists')) {
+    /**
+     * Whether a sequence of keys (path) exists or not in an array.
+     *
+     * This function should only be used if isset($array[$key1][$key2]) cannot be used because the value could be null.
+     *
+     * @param array $keys The sequence of keys (path) to test against the array.
+     * @param array $array The array to search.
+     * @param mixed $value The path value.
+     *
+     * @return bool Returns true if the path exists in the array or false otherwise.
+     */
+    function arrayPathExists(array $keys, array $array, &$value = null) {
+        if (!count($keys) || !count($array)) {
+            return false;
+        }
+
+        $target = $array;
+        do {
+            $key = array_shift($keys);
+
+            if (array_key_exists($key, $target)) {
+                $target = $target[$key];
+            } else {
+                return false;
+            }
+        } while (($countKeys = count($keys)) && is_array($target));
+
+        $found = $countKeys === 0;
+        if ($found) {
+            $value = $target;
+        }
+
+        return $found;
     }
 }
 
@@ -588,19 +650,58 @@ if (!function_exists('flattenArray')) {
     function flattenArray($sep, $array) {
         $result = [];
 
-        $fn = function ($array, $px = '') use ($sep, &$fn, &$result) {
+        $fn = function ($array, $previousLevel = null) use ($sep, &$fn, &$result) {
             foreach ($array as $key => $value) {
-                $px = $px ? "{$px}{$sep}{$key}" : $key;
+                $currentLevel = $previousLevel ? "{$previousLevel}{$sep}{$key}" : $key;
 
                 if (is_array($value)) {
-                    $fn($value, $px);
+                    $fn($value, $currentLevel);
                 } else {
-                    $result[$px] = $value;
+                    $result[$currentLevel] = $value;
                 }
             }
         };
 
         $fn($array);
+
+        return $result;
+    }
+}
+
+if (!function_exists('unflattenArray')) {
+
+    /**
+     * Convert a flattened array into a multi dimensional array.
+     *
+     * See {@link flattenArray}
+     *
+     * @param string $sep The string used to separate keys.
+     * @param array $array The array to flatten.
+     * @return array|bool Returns the flattened array or false.
+     */
+    function unflattenArray($sep, $array) {
+        $result = [];
+
+        try {
+            foreach ($array as $flattenedKey => $value) {
+                $keys = explode($sep, $flattenedKey);
+
+                $target = &$result;
+                while (count($keys) > 1) {
+                    $key = array_shift($keys);
+                    if (!array_key_exists($key, $target)) {
+                        $target[$key] = [];
+                    }
+                    $target = &$target[$key];
+                }
+
+                $key = array_shift($keys);
+                $target[$key] = $value;
+                unset($target);
+            }
+        } catch (\Throwable $t) {
+            $result = false;
+        }
 
         return $result;
     }
@@ -1667,8 +1768,7 @@ if (!function_exists('getRecord')) {
                 if (!$discussionModel->canView($row)) {
                     throw permissionException();
                 }
-                $row['Url'] = discussionUrl($row);
-                $row['ShareUrl'] = $row->Url;
+                $row['ShareUrl'] = $row['Url'] = discussionUrl($row);
                 break;
             case 'comment':
                 /** @var CommentModel $commentModel */
@@ -1693,7 +1793,7 @@ if (!function_exists('getRecord')) {
                 break;
             case 'activity':
                 /** @var ActivityModel $activityModel */
-                $activityModel = $container->get(CommentModel::class);
+                $activityModel = $container->get(ActivityModel::class);
                 $row = $activityModel->getID($id, DATASET_TYPE_ARRAY);
                 if (!$activityModel->canView($row)) {
                     throw permissionException();
@@ -3516,7 +3616,7 @@ if (!function_exists('safeURL')) {
      *
      * "Safe" means that the domain of the URL is trusted.
      *
-     * @param $destination Destination URL or path.
+     * @param string $destination Destination URL or path.
      * @return string The destination if safe, /home/leaving?Target=$destination if not.
      */
     function safeURL($destination) {

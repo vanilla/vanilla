@@ -7,7 +7,7 @@
 
 namespace VanillaTests\Library\Core;
 
-use PHPUnit\Framework\TestCase;
+use VanillaTests\SharedBootstrapTestCase;
 use Garden\EventManager;
 use Vanilla\Addon;
 use Vanilla\AddonManager;
@@ -17,7 +17,7 @@ use VanillaTests\Fixtures\Container;
 /**
  * Tests for the {@link EventManager} class.
  */
-class EventManagerTest extends TestCase {
+class EventManagerTest extends SharedBootstrapTestCase {
 
     /**
      * Creates an {@link AddonManager} against Vanilla.

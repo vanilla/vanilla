@@ -7,7 +7,7 @@
 use Garden\Schema\Schema;
 use Garden\Web\Exception\NotFoundException;
 use Vanilla\ApiUtils;
-use Vanilla\Embeds\EmbedManager;
+use Vanilla\Formatting\Embeds\EmbedManager;
 use Vanilla\ImageResizer;
 use Vanilla\UploadedFile;
 use Vanilla\UploadedFileSchema;
@@ -293,7 +293,7 @@ class MediaApiController extends AbstractApiController {
         $this->permission('Garden.Uploads.Add');
 
         $uploadSchema = new UploadedFileSchema([
-            'allowedExtensions' => array_values(ImageResizer::getTypeExt())
+            'allowedExtensions' => array_keys(ImageResizer::getExtType())
         ]);
 
         $in = $this->schema([

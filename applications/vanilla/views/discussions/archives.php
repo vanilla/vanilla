@@ -31,7 +31,7 @@ if (c('Vanilla.Discussions.Layout') == 'table'):
             <tbody>
             <?php
             foreach ($this->DiscussionData->result() as $Discussion) {
-                writeDiscussionRow($Discussion, $this, Gdn::session(), false);
+                writeDiscussionRow($Discussion, $this, Gdn::session());
             }
             ?>
             </tbody>

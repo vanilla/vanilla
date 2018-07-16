@@ -8,7 +8,8 @@
 import * as utility from "@dashboard/utility";
 import twemoji from "twemoji";
 import tabbable from "tabbable";
-import { logError } from "@dashboard/utility";
+import { logError, log } from "@dashboard/utility";
+import debounce from "lodash/debounce";
 
 /**
  * Use the browser's built-in functionality to quickly and safely escape a string.
@@ -81,12 +82,12 @@ export function getFormData(formElement) {
         return {};
     }
 
-    const data = new FormData(formElement);
+    const data = new FormData(formElement) as any;
     const result = {};
 
-    for (const [key, value] of data.entries()) {
+    data.forEach((key, value) => {
         result[key] = value;
-    }
+    });
 
     return result;
 }
@@ -286,13 +287,17 @@ export function convertToSafeEmojiCharacters(stringOrNode: string | Node) {
 
 // A weakmap so we can store multiple load callbacks per script.
 const loadEventCallbacks: WeakMap<Node, Array<(event) => void>> = new WeakMap();
+const rejectionCache: Map<string, Error> = new Map();
 
 /**
  * Dynamically load a javascript file.
  */
 export function ensureScript(scriptUrl: string) {
-    return new Promise(resolve => {
+    return new Promise((resolve, reject) => {
         const existingScript: HTMLScriptElement | null = document.querySelector(`script[src='${scriptUrl}']`);
+        if (rejectionCache.has(scriptUrl)) {
+            reject(rejectionCache.get(scriptUrl));
+        }
         if (existingScript) {
             if (loadEventCallbacks.has(existingScript)) {
                 // Add another resolveCallback into the weakmap.
@@ -308,10 +313,22 @@ export function ensureScript(scriptUrl: string) {
             const script = document.createElement("script");
             script.type = "text/javascript";
             script.src = scriptUrl;
+            script.onerror = (event: ErrorEvent) => {
+                const error = new Error("Failed to load a required embed script");
+                rejectionCache.set(scriptUrl, error);
+                reject(error);
+            };
+
+            const timeout = setTimeout(() => {
+                const error = new Error(`Loading of the script ${scriptUrl} has timed out.`);
+                rejectionCache.set(scriptUrl, error);
+                reject(error);
+            }, 10000);
 
             loadEventCallbacks.set(script, [resolve]);
 
             script.onload = event => {
+                clearTimeout(timeout);
                 const callbacks = loadEventCallbacks.get(script);
                 callbacks && callbacks.forEach(callback => callback(event));
                 loadEventCallbacks.delete(script);
@@ -406,6 +423,10 @@ export function getNextTabbableElement(options?: Partial<ITabbableOptions>): HTM
     return tabbables[targetIndex] || null;
 }
 
+function checkDomTreeWasClicked(rootNode: Element | null, clickedElement: Element) {
+    return rootNode && clickedElement && (rootNode.contains(clickedElement as Element) || rootNode === clickedElement);
+}
+
 /**
  * Determine if the currently focused element is somewhere inside of (or the same as)
  * a given Element.
@@ -414,14 +435,28 @@ export function getNextTabbableElement(options?: Partial<ITabbableOptions>): HTM
  */
 function checkDomTreeHasFocus(rootNode: Element | null, event: FocusEvent, callback: (hasFocus: boolean) => void) {
     setTimeout(() => {
-        const activeElement =
-            (event.relatedTarget as Element) || // Chrome (The actual standard)
-            (event as any).explicitOriginalTarget || // Firefox + Safari
-            document.activeElement; // IE11
+        const possibleTargets = [
+            // NEEDS TO COME FIRST, because safari will populate relatedTarget on focusin, and its not what we're looking for.
+            document.activeElement, // IE11, Safari.
+            event.relatedTarget as Element, // Chrome (The actual standard)
+            (event as any).explicitOriginalTarget, // Firefox
+        ];
 
-        const hasFocus = rootNode && (activeElement === rootNode || rootNode.contains(activeElement));
+        let activeElement = null;
+        for (const target of possibleTargets) {
+            if (target && target !== document.body) {
+                activeElement = target;
+                break;
+            }
+        }
 
-        callback(!!hasFocus);
+        if (activeElement !== null) {
+            const hasFocus =
+                rootNode && activeElement && (activeElement === rootNode || rootNode.contains(activeElement));
+
+            // We will only invalidate based on something actually getting focus.
+            callback(!!hasFocus);
+        }
     }, 0);
 }
 
@@ -438,12 +473,10 @@ function checkDomTreeHasFocus(rootNode: Element | null, event: FocusEvent, callb
  */
 export function watchFocusInDomTree(rootNode: Element, callback: (hasFocus: boolean) => void) {
     rootNode.addEventListener(
-        "blur",
+        "focusout",
         (event: FocusEvent) => {
             checkDomTreeHasFocus(rootNode, event, hasFocus => {
-                if (!hasFocus) {
-                    callback(false);
-                }
+                !hasFocus && callback(false);
             });
         },
         true,
@@ -453,11 +486,123 @@ export function watchFocusInDomTree(rootNode: Element, callback: (hasFocus: bool
         "focusin",
         (event: FocusEvent) => {
             checkDomTreeHasFocus(rootNode, event, hasFocus => {
-                if (hasFocus) {
-                    callback(true);
-                }
+                hasFocus && callback(true);
             });
         },
         true,
     );
+
+    document.addEventListener("click", event => {
+        const triggeringElement = event.target as Element;
+        const wasClicked = checkDomTreeWasClicked(rootNode, triggeringElement);
+        if (!wasClicked) {
+            callback(false);
+        }
+    });
+}
+
+/**
+ * Sticky header handling
+ */
+function handleStickyHeaderState(element, data) {
+    const goingDown = data.lastScrollPos < data.currentScrollPos;
+    const isAtTopOfPage = data.currentScrollPos === 0;
+    const elementHeight = element.offsetHeight;
+    const isPastHeader =
+        element.style.position !== "fixed" && element.offsetTop + elementHeight <= data.currentScrollPos;
+    const elementTop = element.style.top !== "" ? parseInt(element.style.top, 10) : false;
+
+    element.classList.toggle("isScrollingDown", goingDown);
+    element.classList.toggle("isScrollingUp", !goingDown);
+    element.classList.toggle("isAtTop", isAtTopOfPage);
+
+    if (goingDown) {
+        element.style.position = "";
+        if (isPastHeader) {
+            element.style.top = `${data.currentScrollPos - elementHeight}px`;
+        } else {
+            if (!elementTop) {
+                element.style.top = `${data.currentScrollPos}px`;
+            }
+        }
+    } else {
+        // going UP
+        if (data.currentScrollPos <= elementTop) {
+            element.style.top = "";
+            element.style.position = "fixed";
+        }
+    }
+}
+
+/**
+ * Vanilla's default way to handle sticky headers
+ */
+export function stickyHeader() {
+    const header = document.querySelector(".stickyHeader");
+    if (header !== null) {
+        let currentScrollPos = Math.max(window.scrollY, 0);
+        let lastScrollPos = -1;
+
+        handleStickyHeaderState(header, {
+            currentScrollPos,
+            lastScrollPos,
+        });
+
+        window.addEventListener("scroll", e => {
+            debounce(
+                () => {
+                    window.requestAnimationFrame(data => {
+                        lastScrollPos = currentScrollPos;
+                        currentScrollPos = Math.max(window.scrollY, 0);
+                        handleStickyHeaderState(header, {
+                            currentScrollPos,
+                            lastScrollPos,
+                        });
+                    });
+                },
+                100,
+                {
+                    leading: true,
+                },
+            )();
+        });
+    } else {
+        utility.log("No sticky header found");
+    }
+}
+
+/**
+ * Handler for an file being dragged and dropped.
+ *
+ * @param event - https://developer.mozilla.org/en-US/docs/Web/API/DragEvent
+ */
+export function getDraggedImage(event: DragEvent): File | undefined {
+    if (event.dataTransfer && event.dataTransfer.files && event.dataTransfer.files.length) {
+        event.preventDefault();
+        const files = Array.from(event.dataTransfer.files);
+
+        // Currently only 1 file is supported.
+        const mainFile = files[0];
+        return mainFile;
+    }
+}
+
+/**
+ * Handler for an file being pasted.
+ *
+ * @param event - https://developer.mozilla.org/en-US/docs/Web/API/DragEvent
+ */
+export function getPastedImage(event: ClipboardEvent): File | undefined | null {
+    if (event.clipboardData && event.clipboardData.items && event.clipboardData.items.length) {
+        const files = Array.from(event.clipboardData.items)
+            .map(item => (item.getAsFile ? item.getAsFile() : null))
+            .filter(Boolean);
+
+        if (files.length > 0) {
+            event.preventDefault();
+            // Currently only 1 file is supported.
+            const mainFile = files[0];
+            return mainFile;
+        }
+    }
 }

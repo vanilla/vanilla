@@ -7,7 +7,7 @@
 
 namespace VanillaTests\Models\SSOModel;
 
-use PHPUnit\Framework\TestCase;
+use VanillaTests\SharedBootstrapTestCase;
 use Vanilla\Models\SSOModel;
 use VanillaTests\SiteTestTrait;
 use VanillaTests\InvokeMethodTrait;
@@ -15,7 +15,7 @@ use VanillaTests\InvokeMethodTrait;
 /**
  * Class SSOModelLinkUserFromCredentials.
  */
-class GetUserByTest extends TestCase {
+class GetUserByTest extends SharedBootstrapTestCase {
     use SiteTestTrait {
         SiteTestTrait::setUpBeforeClass as siteSetUpBeforeClass;
     }

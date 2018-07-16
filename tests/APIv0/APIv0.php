@@ -559,7 +559,7 @@ class APIv0 extends HttpClient {
      * Bootstrap some of the internal objects with this connection.
      */
     public function bootstrap() {
-        $bootstrap = new \VanillaTests\Bootstrap();
+        $bootstrap = new \VanillaTests\Bootstrap('http://vanilla.test');
         $dic = new Container();
         $bootstrap->run($dic);
 

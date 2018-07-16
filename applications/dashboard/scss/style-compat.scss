@@ -1,5 +1,6 @@
 // This CSS file should always be added after style.css and not be overridden.
 // Variables
+@import "core-variables";
 @import "social/socialMedia";
 
 // Compatibility
@@ -26,5 +27,5 @@
 @import "editor/richEditor";
 @import "editor/accessibility";
 @import "editor/spoiler";
-@import "editor/embed";
+@import "editor/embeds/embeds";
 @import "editor/emoji";

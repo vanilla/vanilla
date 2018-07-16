@@ -513,7 +513,7 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
 
         if ($this->methodExists($controller, $first)) {
             array_shift($pathArgs);
-            return [$first, $pathArgs];
+            return [lcfirst($first), $pathArgs];
         } elseif ($this->methodExists($controller, "x$first")) {
             array_shift($pathArgs);
             deprecated(get_class($controller)."->x$first", get_class($controller)."->$first");

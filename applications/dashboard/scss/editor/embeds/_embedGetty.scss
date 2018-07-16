@@ -1,0 +1,11 @@
+.embedGetty {
+    position: relative;
+    display: block;
+    max-width: 100%;
+    margin: auto;
+
+    .getty {
+        display: block !important;
+        background-color: white;
+    }
+}

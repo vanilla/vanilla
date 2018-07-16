@@ -431,10 +431,7 @@ class PromotedContentModule extends Gdn_Module {
             $minScore = val('Score', $parameters, null);
         }
 
-        if (!is_integer($minScore)) {
-            $minScore = false;
-        }
-
+        $minScore = filter_var($minScore, FILTER_VALIDATE_INT);
         // Check cache
         $selectorScoreCacheKey = "modules.promotedcontent.score.{$minScore}";
         $content = Gdn::cache()->get($selectorScoreCacheKey);

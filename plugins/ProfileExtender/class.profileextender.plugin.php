@@ -31,7 +31,7 @@ class ProfileExtenderPlugin extends Gdn_Plugin {
     }
 
     /** @var array */
-    public $MagicLabels = ['Twitter', 'Google', 'Facebook', 'LinkedIn', 'GitHub', 'Website', 'Real Name'];
+    public $MagicLabels = ['Twitter', 'Google', 'Facebook', 'LinkedIn', 'GitHub', 'Instagram', 'Website', 'Real Name'];
 
     /**
      * Available form field types in format Gdn_Type => DisplayName.
@@ -145,6 +145,9 @@ class ProfileExtenderPlugin extends Gdn_Plugin {
                     break;
                 case 'Google':
                     $fields['Google'] = anchor('Google+', $value, '', ['rel' => 'me']);
+                    break;
+                case 'Instagram':
+                    $fields['Instagram'] = '@'.anchor($value, 'http://instagram.com/'.$value);
                     break;
                 case 'Website':
                     $linkValue = (isUrl($value)) ? $value : 'http://'.$value;

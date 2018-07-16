@@ -8,7 +8,7 @@ import { BrowserRouter, Route, RouteProps, Switch } from "react-router-dom";
 import { Provider } from "react-redux";
 import { getRoutes, getMeta } from "@dashboard/application";
 import NotFoundPage from "@dashboard/components/NotFoundPage";
-import { getStore } from "../app/state/store";
+import getStore from "../state/getStore";
 
 /**
  * The root application component.

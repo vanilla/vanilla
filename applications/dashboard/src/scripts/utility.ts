@@ -138,6 +138,27 @@ export function hashString(str: string): number {
     return str.split("").reduce(hashReduce, 0);
 }
 
+/**
+ * Split a string in multiple pieces similar to String.prototype.split but ignore most acccent characters.
+ *
+ * This will still return pieces with accents.
+ *
+ * @param toSplit The string to split.
+ * @param splitWith The string to split with.
+ */
+export function splitStringLoosely(toSplit: string, splitWith: string): string[] {
+    const normalizedName = toSplit.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+    const normalizedSplitTerm = splitWith.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+    const normalizedPieces = normalizedName.split(new RegExp(`(${normalizedSplitTerm})`, "i"));
+
+    let charactersUsed = 0;
+    return normalizedPieces.map(piece => {
+        const start = charactersUsed;
+        charactersUsed += piece.length;
+        return toSplit.substring(start, charactersUsed);
+    });
+}
+
 interface IClass {
     new (): any;
 }
@@ -181,7 +202,11 @@ interface IMentionMatch {
  * @param shouldStartWithSpace - Should the pattern include a test for a whitespace prefix?
  * @returns Matching string if successful.  Null on failure to match.
  */
-export function matchAtMention(subtext: string, shouldStartWithSpace: boolean = false): IMentionMatch | null {
+export function matchAtMention(
+    subtext: string,
+    shouldStartWithSpace: boolean = false,
+    requireQuotesForWhitespace: boolean = true,
+): IMentionMatch | null {
     // Split the string at the lines to allow for a simpler regex.
     const lines = subtext.split("\n");
     const lastLine = lines[lines.length - 1];
@@ -212,14 +237,14 @@ export function matchAtMention(subtext: string, shouldStartWithSpace: boolean = 
     let regexStr =
         "@" + // @ Symbol triggers the match
         "(" +
-        // One or more non-greedy characters that aren't excluded. White is allowed, but a starting quote is required.
+        // One or more non-greedy characters that aren't excluded. Whitespace is allowed, but a starting quote is required.
         '"(' +
         nonExcludedCharacters(false) +
         '+?)"?' +
         "|" + // Or
-        // One or more non-greedy characters that aren't exluded. Whitespace is excluded.
+        // One or more non-greedy characters that aren't exluded. Whitespace may be excluded.
         "(" +
-        nonExcludedCharacters(true) +
+        nonExcludedCharacters(requireQuotesForWhitespace) +
         '+?)"?' +
         ")" +
         "(?:\\n|$)"; // Newline terminates.
@@ -240,7 +265,30 @@ export function matchAtMention(subtext: string, shouldStartWithSpace: boolean = 
     // No match
     return null;
 }
+
+/** This should mirror extensions allowed in Vanilla\ImageResizer.php */
+const IMAGE_REGEX = /^image\/(gif|jpe?g|png)/i;
+
 /**
- * Re-exported from sprintf-js https://www.npmjs.com/package/sprintf-js
+ * A filter for use with [].filter
+ *
+ * Matches only image image type files.
+ * @private
+ *
+ * @param file - A File object.
+ * @see https://developer.mozilla.org/en-US/docs/Web/API/File
+ *
+ * @returns Whether or not the file is an acceptable image
  */
-// export const sprintf = sprintfJs.sprintf;
+export function isFileImage(file: File): boolean {
+    if (IMAGE_REGEX.test(file.type)) {
+        return true;
+    }
+
+    log("Filtered out non-image file: ", file.name);
+    return false;
+}
+
+export function capitalizeFirstLetter(str: string): string {
+    return str.charAt(0).toUpperCase() + str.slice(1);
+}

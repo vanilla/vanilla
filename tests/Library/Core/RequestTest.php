@@ -6,13 +6,13 @@
 
 namespace VanillaTests\Library\Core;
 
-use PHPUnit\Framework\TestCase;
+use VanillaTests\SharedBootstrapTestCase;
 use Gdn_Request;
 
 /**
  * Test the {@link Gdn_Request} class.
  */
-class RequestTest extends TestCase {
+class RequestTest extends SharedBootstrapTestCase {
 
     public function provideUrls() {
         return [

@@ -1157,7 +1157,7 @@ EOT;
                 } else {
                     if (val('active', $link)) {
                         $output .= '<li class="selectBox-item isActive" role="presentation">';
-                        $output .= '  <a href="'.val('url', $link).'" role="menuitem" class="dropdown-menu-link selectBox-link" tabindex="0" aria-current="location">';
+                        $output .= '  <a href="'.htmlspecialchars(val('url', $link)).'" role="menuitem" class="dropdown-menu-link selectBox-link" tabindex="0" aria-current="location">';
                         $output .= '    <svg class="vanillaIcon selectBox-selectedIcon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 18 18">';
                         $output .= '      <title>✓</title>';
                         $output .= '      <polygon fill="currentColor" points="1.938,8.7 0.538,10.1 5.938,15.5 17.337,3.9 15.938,2.5 5.938,12.8"></polygon>';
@@ -1169,7 +1169,7 @@ EOT;
                         $output .= '</li>';
                     } else {
                         $output .= '<li class="selectBox-item" role="presentation">';
-                        $output .= '  <a href="'.val('url', $link).'" role="menuitem" class="dropdown-menu-link selectBox-link" tabindex="0" href="#">';
+                        $output .= '  <a href="'.htmlspecialchars(val('url', $link)).'" role="menuitem" class="dropdown-menu-link selectBox-link" tabindex="0" href="#">';
                         $output .=      val('name', $link);
                         $output .= '  </a>';
                         $output .= '</li>';

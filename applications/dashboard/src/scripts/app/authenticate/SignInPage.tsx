@@ -11,11 +11,11 @@ import PasswordForm from "./components/PasswordForm";
 import SSOMethods from "./components/SSOMethods";
 import { getRequiredID, IRequiredComponentID } from "@dashboard/componentIDs";
 import Or from "@dashboard/components/forms/Or";
-import { ISigninAuthenticatorState, IState } from "@dashboard/state/authenticate/IAuthenticateState";
+import { ISigninAuthenticatorState } from "@dashboard/state/authenticate/IAuthenticateState";
 import { Dispatch } from "redux";
 import { getSigninAuthenticators } from "@dashboard/state/authenticate/authenticatorActions";
 import PageLoading from "@dashboard/components/PageLoading";
-import { ILoadable, LoadStatus } from "@dashboard/state/IState";
+import { ILoadable, default as IState, LoadStatus } from "@dashboard/state/IState";
 
 interface IProps {
     authenticators: ISigninAuthenticatorState;

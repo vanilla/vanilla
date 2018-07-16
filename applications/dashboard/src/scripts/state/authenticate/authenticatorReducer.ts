@@ -6,11 +6,10 @@
 import { Action } from "redux";
 import { ISigninAuthenticatorState } from "./IAuthenticateState";
 import * as actions from "./authenticatorActions";
-import { SigninAuthenticatorAction } from "./authenticatorActions";
 import { LoadStatus } from "@dashboard/state/IState";
 
-export function signinReducer(state?: ISigninAuthenticatorState, action?: SigninAuthenticatorAction) {
-    if (state === undefined) {
+export function signinReducer(state?: ISigninAuthenticatorState, action?: actions.ActionTypes) {
+    if (state === undefined || action === undefined) {
         return {
             status: LoadStatus.PENDING,
             data: [],

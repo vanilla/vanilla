@@ -3,8 +3,8 @@ import { ILoadable } from "@dashboard/state/IState";
 import { LoadStatus } from "@dashboard/state/IState";
 import { t } from "@dashboard/application";
 
-export default class PageLoading extends React.PureComponent<ILoadable, {}> {
-    public static defaultProps: Partial<ILoadable> = {
+export default class PageLoading extends React.PureComponent<ILoadable<any>, {}> {
+    public static defaultProps: Partial<ILoadable<any>> = {
         status: LoadStatus.PENDING,
     };
 

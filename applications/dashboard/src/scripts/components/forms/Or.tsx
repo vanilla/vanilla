@@ -15,7 +15,7 @@ export default class Or extends React.PureComponent<IProps, {}> {
         visible: true,
     };
 
-    public render(): JSX.Element {
+    public render() {
         return this.props.visible ? (
             <div className="inputBlock-labelText authenticateUser-divider">{t("or")}</div>
         ) : null;

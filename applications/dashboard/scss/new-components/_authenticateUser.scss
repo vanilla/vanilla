@@ -194,3 +194,12 @@ $authenticateMethod-button_horizontalMargin: 12px !default;
 .ssoMethods {
     margin-bottom: $authenticateUser-spacer;
 }
+
+.authenticateUser-paragraph {
+    @include breakWord;
+
+    &.isError {
+        color: #ff3933;
+    }
+}
+

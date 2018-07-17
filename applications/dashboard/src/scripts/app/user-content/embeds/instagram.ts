@@ -15,13 +15,16 @@ registerEmbed("instagram", renderInstagram);
  * Renders posted instagram embeds.
  */
 async function convertInstagramEmbeds() {
-    await ensureScript("//platform.instagram.com/en_US/embeds.js");
+    const instagramEmbeds = document.querySelectorAll(".instagram-media");
+    if (instagramEmbeds.length > 0) {
+        await ensureScript("//platform.instagram.com/en_US/embeds.js");
 
-    if (!window.instgrm) {
-        throw new Error("The Instagram post failed to load");
+        if (!window.instgrm) {
+            throw new Error("The Instagram post failed to load");
+        }
+
+        window.instgrm.Embeds.process();
     }
-
-    window.instgrm.Embeds.process();
 }
 
 /**

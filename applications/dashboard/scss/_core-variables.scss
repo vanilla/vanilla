@@ -21,7 +21,7 @@ $global-color_transparent                            : transparent;
 $global-color_fg                                     : #555a62 !default;
 $global-color_bg                                     : #fff !default;
 $global-color_primary                                : #0291db !default;
-$global-color_primarySubtle                          : rgba($global-color_primary, .02) !default; // Derived
+$global-color_active_primaryBg                       : rgba($global-color_primary, .1) !default; // Derived
 $global-color_secondary                              : darken($global-color_primary, 10%) !default; // Derived
 $global-color_warning                                : #ffce00 !default;
 
@@ -261,19 +261,22 @@ $widget-footer_borderRadius                          : $global-widgetBorder_radi
 $formElement_borderWidth                             : 1px !default;
 $formElement_fullBorderWidth                         : $formElement_borderWidth * 2;
 $formElement_height                                  : $utility-baseUnit * 6; // Derived
+$formElement_margin                                  : $utility-baseUnit * 4; // Derived
 $formElement_heightWithBorder                        : $formElement_height + 2 * $formElement_borderWidth; // Derived
 $formElement_borderColor                             : mix($global-color_fg, $global-color_bg, 24%) !default; // Derived
+$formElement_borderStyle                             : solid;
 $formElement_borderRadius                            : $global_borderRadius !default;
 $formElement_giantInput_height                       : 51px !default;
 $formElement_giantInput_fontSize                     : $utility-baseUnit * 4 !default; // Derived
 $formElement_halfHeight                              : $formElement_height / 2 !default; // Derived
-$formElement-border_widthFull                        : $formElement_borderWidth * 2 !default; // Derived
+$formElement-borderWidthFull                        : $formElement_borderWidth * 2 !default; // Derived
 $formElement_horizontalPadding                       : $utility-baseUnit * 2 !default; // Derived
 $formElement_paddingVertical                         : $utility-baseUnit !default; // Derived
 $formElement_placeholderColor                        : mix($global-color_fg, $global-color_bg, 50%) !default; // Derived
 $formElement_maxWidth                                : 528px !default;
 $formElement_fg                                      : mix($global-color_fg, $global-color_bg, 80%) !default; // Derived
-$formElement_bg                                      : $global-color_bg !default; // Derived
+$formElement_bg                                      : $global-color_bg !default;
+$formElement_miniInput_width                         : 100px !default;
 $global-formNote_fg                                  : mix($global-color_fg, $global-color_bg, 72%) !default; // Derived
 $global-formNoteLink_fg                              : $global-color_primary !default; // Derived
 
@@ -349,7 +352,7 @@ $button-primary_focus_fg                             : $global-color_white !defa
 $button-primary_focus_bg                             : $global-color_secondary !default;
 $button-primary_focus_border                         : $global-color_secondary !default;
 
-$buttonBranded: (
+$buttonPrimary: (
     default: (
         color: $button-primary_fg,
         background-color: $button-primary_bg,

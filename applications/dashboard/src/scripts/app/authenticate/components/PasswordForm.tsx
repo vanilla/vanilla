@@ -16,7 +16,6 @@ import get from "lodash/get";
 import { IRequiredComponentID, getRequiredID } from "@dashboard/componentIDs";
 
 interface IProps {
-    location?: any;
     password: string;
     username: string;
     globalError?: string;
@@ -25,40 +24,25 @@ interface IProps {
 }
 
 interface IState extends IRequiredComponentID {
-    editable: boolean;
-    usernameRef?: InputTextBlock;
+    allowEdit: boolean;
     usernameErrors: string[];
-    passwordRef?: InputTextBlock;
     passwordErrors: string[];
-    redirectTo?: string | null;
     globalError?: string | null;
-    submitEnabled: boolean;
+    allowSubmit: boolean;
     rememberMe: boolean;
 }
 
 class PasswordForm extends React.Component<IProps, IState> {
-    public static getDerivedStateFromProps(nextProps, prevState) {
-        prevState.usernameErrors = nextProps.usernameErrors;
-        prevState.passwordErrors = nextProps.passwordErrors;
-        prevState.globalError = nextProps.globalError;
-        return prevState;
-    }
-
-    private username: InputTextBlock;
-    private password: InputTextBlock;
+    private usernameInput: InputTextBlock;
+    private passwordInput: InputTextBlock;
 
     constructor(props) {
         super(props);
-        this.handleSubmit = this.handleSubmit.bind(this);
-        this.handleTextChange = this.handleTextChange.bind(this);
-        this.handleCheckBoxChange = this.handleCheckBoxChange.bind(this);
-        this.handleErrors = this.handleErrors.bind(this);
 
         this.state = {
             id: getRequiredID(props, "passwordForm"),
-            editable: true,
-            redirectTo: null,
-            submitEnabled: false,
+            allowEdit: true,
+            allowSubmit: false,
             rememberMe: true,
             usernameErrors: props.usernameErrors || [],
             passwordErrors: props.passwordErrors || [],
@@ -126,7 +110,7 @@ class PasswordForm extends React.Component<IProps, IState> {
     public setErrors(globalError, passwordErrors: string[], usernameErrors: string[]) {
         this.setState(
             {
-                editable: true,
+                allowEdit: true,
                 passwordErrors,
                 usernameErrors,
                 globalError,
@@ -137,11 +121,11 @@ class PasswordForm extends React.Component<IProps, IState> {
                 const hasUsernameError = this.state.usernameErrors.length > 0;
 
                 if (hasGlobalError && !hasPasswordError && !hasUsernameError) {
-                    this.username.select();
+                    this.usernameInput.select();
                 } else if (hasUsernameError) {
-                    this.username.select();
+                    this.usernameInput.select();
                 } else if (hasPasswordError) {
-                    this.password.select();
+                    this.passwordInput.select();
                 }
             },
         );
@@ -151,13 +135,13 @@ class PasswordForm extends React.Component<IProps, IState> {
         event.preventDefault();
 
         this.setState({
-            editable: false,
+            allowEdit: false,
         });
 
         apiv2
             .post("/authenticate/password", {
-                username: this.username.value,
-                password: this.password.value,
+                username: this.usernameInput.value,
+                password: this.passwordInput.value,
                 persist: this.state.rememberMe,
             })
             .then(r => {
@@ -175,71 +159,63 @@ class PasswordForm extends React.Component<IProps, IState> {
     }
 
     public render() {
-        if (this.state.redirectTo) {
-            return (
-                <BrowserRouter>
-                    <Route path={this.state.redirectTo} component={PasswordForm} />
-                </BrowserRouter>
-            );
-        } else {
-            let formDescribedBy;
-            if (this.state.globalError) {
-                formDescribedBy = this.formDescriptionID;
-            }
-
-            return (
-                <form
-                    id={this.state.id}
-                    aria-describedby={formDescribedBy}
-                    className="passwordForm"
-                    method="post"
-                    onSubmit={this.handleSubmit}
-                    noValidate
-                >
-                    <Paragraph
-                        id={this.formDescriptionID}
-                        className="authenticateUser-paragraph"
-                        content={this.state.globalError}
-                        isError={true}
-                    />
-                    <InputTextBlock
-                        label={t("Email/Username")}
-                        required={true}
-                        disabled={!this.state.editable}
-                        errors={this.state.usernameErrors}
-                        defaultValue={this.props.username}
-                        onChange={this.handleTextChange}
-                        ref={username => (this.username = username as InputTextBlock)}
-                    />
-                    <InputTextBlock
-                        label={t("Password")}
-                        required={true}
-                        disabled={!this.state.editable}
-                        errors={this.state.passwordErrors}
-                        defaultValue={this.props.password}
-                        onChange={this.handleTextChange}
-                        type="password"
-                        ref={password => (this.password = password as InputTextBlock)}
-                    />
-                    <div className="inputBlock inputBlock-tighter">
-                        <div className="rememberMeAndForgot">
-                            <span className="rememberMeAndForgot-rememberMe">
-                                <Checkbox
-                                    label={t("Keep me signed in")}
-                                    onChange={this.handleCheckBoxChange}
-                                    checked={this.state.rememberMe}
-                                />
-                            </span>
-                            <span className="rememberMeAndForgot-forgot">
-                                <Link to="/authenticate/recoverpassword">{t("Forgot your password?")}</Link>
-                            </span>
-                        </div>
-                    </div>
-                    <ButtonSubmit disabled={!this.state.editable} content={t("Sign In")} />
-                    {/*<p className="authenticateUser-paragraph isCentered">{t('Not registered?')} <Link to="/entry/signup">{t('Create an Account')}</Link></p>*/}
-                </form>
-            );
+        let formDescribedBy;
+        if (this.state.globalError) {
+            formDescribedBy = this.formDescriptionID;
         }
+
+        return (
+            <form
+                id={this.state.id}
+                aria-describedby={formDescribedBy}
+                className="passwordForm"
+                method="post"
+                onSubmit={this.handleSubmit}
+                noValidate
+            >
+                <Paragraph
+                    id={this.formDescriptionID}
+                    className="authenticateUser-paragraph"
+                    content={this.state.globalError}
+                    isError={true}
+                />
+                <InputTextBlock
+                    label={t("Email/Username")}
+                    required={true}
+                    disabled={!this.state.allowEdit}
+                    errors={this.state.usernameErrors}
+                    defaultValue={this.props.username}
+                    onChange={this.handleTextChange}
+                    ref={username => (this.usernameInput = username as InputTextBlock)}
+                />
+                <InputTextBlock
+                    label={t("Password")}
+                    required={true}
+                    disabled={!this.state.allowEdit}
+                    errors={this.state.passwordErrors}
+                    defaultValue={this.props.password}
+                    onChange={this.handleTextChange}
+                    type="password"
+                    ref={password => (this.passwordInput = password as InputTextBlock)}
+                />
+                <div className="inputBlock inputBlock-tighter">
+                    <div className="rememberMeAndForgot">
+                        <span className="rememberMeAndForgot-rememberMe">
+                            <Checkbox
+                                label={t("Keep me signed in")}
+                                onChange={this.handleCheckBoxChange}
+                                checked={this.state.rememberMe}
+                            />
+                        </span>
+                        <span className="rememberMeAndForgot-forgot">
+                            <Link to="/authenticate/recoverpassword">{t("Forgot your password?")}</Link>
+                        </span>
+                    </div>
+                </div>
+                <ButtonSubmit disabled={!this.state.allowEdit} content={t("Sign In")} />
+                {/*<p className="authenticateUser-paragraph isCentered">{t('Not registered?')} <Link to="/entry/signup">{t('Create an Account')}</Link></p>*/}
+            </form>
+        );
     }
 }
 

@@ -13,9 +13,10 @@ import { getRequiredID, IRequiredComponentID } from "@dashboard/componentIDs";
 import Or from "@dashboard/components/forms/Or";
 import { ISigninAuthenticatorState } from "@dashboard/state/authenticate/IAuthenticateState";
 import { Dispatch } from "redux";
-import { getSigninAuthenticators } from "@dashboard/state/authenticate/authenticatorActions";
+import { getSigninAuthenticators } from "@dashboard/state/authenticate/authenticatorsActions";
 import PageLoading from "@dashboard/components/PageLoading";
-import { ILoadable, default as IState, LoadStatus } from "@dashboard/state/IState";
+import IState from "@dashboard/state/IState";
+import { LoadStatus } from "@dashboard/apiv2";
 
 interface IProps {
     authenticators: ISigninAuthenticatorState;

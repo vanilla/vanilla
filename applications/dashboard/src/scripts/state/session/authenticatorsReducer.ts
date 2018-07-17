@@ -3,20 +3,21 @@
  * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
  */
 
-import { ISigninAuthenticatorState } from "./IAuthenticateState";
-import * as actions from "./authenticatorActions";
-import { LoadStatus } from "@dashboard/state/IState";
+import * as actions from "@dashboard/state/session/authenticatorsActions";
+import { IAuthenticatorState } from "@dashboard/types/state";
+import { LoadStatus } from "@dashboard/types/api";
 
-const initialState: ISigninAuthenticatorState = {
+const initialState: IAuthenticatorState = {
     status: LoadStatus.PENDING,
-    data: [],
 };
 
-export function signinReducer(state: ISigninAuthenticatorState = initialState, action: actions.ActionTypes) {
+export default function authenticatorsReducer(
+    state: IAuthenticatorState = initialState,
+    action: actions.ActionTypes,
+): IAuthenticatorState {
     switch (action.type) {
         case actions.GET_SIGNIN_AUTHENTICATORS_REQUEST:
             return {
-                ...state,
                 status: LoadStatus.LOADING,
             };
         case actions.GET_SIGNIN_AUTHENTICATORS_SUCCESS:
@@ -30,7 +31,7 @@ export function signinReducer(state: ISigninAuthenticatorState = initialState, a
             return {
                 ...state,
                 status: LoadStatus.ERROR,
-                error: action.payload.errors,
+                error: action.payload,
             };
         default:
             return state;

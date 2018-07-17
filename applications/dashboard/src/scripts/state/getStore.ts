@@ -4,10 +4,10 @@
  */
 
 import { createStore, compose, applyMiddleware, combineReducers, Store } from "redux";
-import { getReducers } from "./reducerRegistry";
+import { getReducers } from "@dashboard/state/reducerRegistry";
 import thunk from "redux-thunk";
-import IState from "@dashboard/state/IState";
 import { log } from "@dashboard/utility";
+import { IStoreState } from "@dashboard/types/state";
 
 // There may be an initial state to import.
 const initialState = {};
@@ -22,7 +22,7 @@ const enhancer = composeEnhancers(applyMiddleware(...middleware));
 // Build the store, add devtools extension support if it's available.
 let store;
 
-export default function getStore<S extends IState = IState>(): Store<S> {
+export default function getStore<S extends IStoreState = IStoreState>(): Store<S> {
     if (store === undefined) {
         // Get our reducers.
         const reducer = combineReducers(getReducers());

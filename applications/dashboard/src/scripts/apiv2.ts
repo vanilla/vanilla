@@ -11,42 +11,6 @@ import axios from "axios";
 import qs from "qs";
 import { IEmbedData } from "@dashboard/embeds";
 
-export const enum LoadStatus {
-    LOADING = "LOADING",
-    ERROR = "ERROR",
-    SUCCESS = "SUCCESS",
-}
-
-interface ILoaded {
-    loadStatus: LoadStatus.LOADING;
-}
-
-export interface ILoadable<T> {
-    loadStatus: LoadStatus;
-    data: T;
-    error?: IApiError;
-}
-
-export interface IApiResponse<DataType = any> {
-    data: DataType;
-    status: number;
-    headers: any;
-}
-
-export interface IFieldError {
-    message: string; // translated message
-    code: string; // translation code
-    status: number; // HTTP status
-    field: string;
-    timestamp: number;
-}
-
-export interface IApiError {
-    message: string;
-    status: number;
-    errors?: IFieldError[];
-}
-
 const api = axios.create({
     baseURL: formatUrl("/api/v2/"),
     headers: {
@@ -80,34 +44,4 @@ export async function uploadImage(image: File): Promise<IEmbedData> {
     const result = await api.post("/media", data);
     result.data.type = "image";
     return result.data;
-}
-
-export interface IMentionUser {
-    userID: number;
-    name: string;
-    photoUrl: string;
-    dateLastActive: string | null;
-}
-
-export interface IUser extends IMentionUser {
-    email: string;
-    emailConfirmed: boolean;
-    showEmail: boolean;
-    bypassSpam: boolean;
-    banned: number;
-    dateInserted: string;
-    dateUpdated: string | null;
-    roles: [
-        {
-            roleID: number;
-            name: string;
-        }
-    ];
-    hidden: boolean;
-    rankID?: number | null;
-    rank?: {
-        rankID: number;
-        name: string;
-        userTitle: string;
-    };
 }

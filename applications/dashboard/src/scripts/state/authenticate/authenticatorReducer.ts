@@ -3,7 +3,6 @@
  * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
  */
 
-import { Action } from "redux";
 import { ISigninAuthenticatorState } from "./IAuthenticateState";
 import * as actions from "./authenticatorActions";
 import { LoadStatus } from "@dashboard/state/IState";
@@ -33,7 +32,7 @@ export function signinReducer(state?: ISigninAuthenticatorState, action?: action
             return {
                 ...state,
                 status: LoadStatus.ERROR,
-                error: action.payload.error,
+                error: action.payload.errors,
             };
         default:
             return state;

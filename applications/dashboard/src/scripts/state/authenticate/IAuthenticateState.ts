@@ -1,12 +1,9 @@
+/**
+ * @copyright 2009-2018 Vanilla Forums Inc.
+ * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
+ */
+
 import { ILoadable } from "@dashboard/state/IState";
-
-export type ISigninAuthenticatorState = ILoadable<[IAuthenticator]>;
-export type IProfileAuthenticatorState = ILoadable<[IAuthenticator]>;
-
-export interface IAuthenticateState {
-    signin: ISigninAuthenticatorState;
-    profile: IProfileAuthenticatorState;
-}
 
 export interface IAuthenticator {
     authenticatorID: string;
@@ -21,4 +18,12 @@ export interface IAuthenticator {
         foregroundColor: string | null;
     };
     isUserLinked?: boolean;
+}
+
+export type ISigninAuthenticatorState = ILoadable<[IAuthenticator]>;
+export type IProfileAuthenticatorState = ILoadable<[IAuthenticator]>;
+
+export interface IAuthenticateState {
+    signin: ISigninAuthenticatorState;
+    profile: IProfileAuthenticatorState;
 }

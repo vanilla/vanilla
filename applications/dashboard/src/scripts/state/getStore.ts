@@ -26,8 +26,6 @@ export default function getStore<S extends IState = IState>(): Store<S> {
     if (store === undefined) {
         // Get our reducers.
         const reducer = combineReducers(getReducers());
-
-        log("createStore()");
         store = createStore(reducer, initialState, enhancer);
 
         // Dispatch initial actions returned from the server.

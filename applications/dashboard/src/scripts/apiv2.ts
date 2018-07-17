@@ -11,6 +11,28 @@ import axios from "axios";
 import qs from "qs";
 import { IEmbedData } from "@dashboard/embeds";
 
+export interface IApiResponse<DataType = any> {
+    data: DataType;
+    status: number;
+    headers: any;
+}
+
+export interface IFieldError {
+    message: string; // translated message
+    code: string; // translation code
+    status: number; // HTTP status
+    field: string;
+}
+
+export interface IApiError {
+    message: string;
+    status: number;
+    headers: any;
+    errors: {
+        [key: string]: IFieldError[];
+    };
+}
+
 const api = axios.create({
     baseURL: formatUrl("/api/v2/"),
     headers: {

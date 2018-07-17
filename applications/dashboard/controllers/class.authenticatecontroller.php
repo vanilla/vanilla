@@ -108,6 +108,9 @@ class AuthenticateController extends Gdn_Controller {
      * @throws Exception Connect user feature is not implemented.
      */
     public function index($authenticatorType = '', $authenticatorID = '') {
+        if ($authenticatorType === '') {
+            redirectTo('authenticate/signin');
+        }
         $persist = $this->request->getBody()['persist'] ?? ($this->request->getQuery()['persist'] ?? false);
 
         $response = $this->authenticateApiController->post([

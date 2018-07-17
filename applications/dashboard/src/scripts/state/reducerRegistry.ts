@@ -30,7 +30,7 @@ export function registerReducer(name: string, reducer: Reducer) {
 export function getReducers(): ReducersMapObject<any, any> {
     haveGot = true;
 
-    if (wasReadyCalled) {
+    if (!wasReadyCalled) {
         logError("getReducers() was called before onReady");
     }
 

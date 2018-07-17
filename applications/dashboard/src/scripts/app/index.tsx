@@ -32,7 +32,6 @@ import authenticateReducer from "@dashboard/state/authenticate/authenticateReduc
 
 onReady(() => {
     registerReducer("authenticate", authenticateReducer);
-
     addComponent("App", Router);
 
     addRoutes([

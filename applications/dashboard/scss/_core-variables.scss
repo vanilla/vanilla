@@ -21,7 +21,7 @@ $global-color_transparent                            : transparent;
 $global-color_fg                                     : #555a62 !default;
 $global-color_bg                                     : #fff !default;
 $global-color_primary                                : #0291db !default;
-$global-color_active_primaryBg                       : rgba($global-color_primary, .1) !default; // Derived
+$global-color_active_primaryBg                       : rgba($global-color_primary, .05) !default; // Derived
 $global-color_secondary                              : darken($global-color_primary, 10%) !default; // Derived
 $global-color_warning                                : #ffce00 !default;
 
@@ -288,6 +288,10 @@ $global-textArea_padding                             : $utility-baseUnit !defaul
 $global-fileUpload_bg                                : $global-color_primary !default;
 $global-fileUpload_fg                                : $global-color_white !default;
 $global-fileUpload_hover_bg                          : mix($global-color_primary, $global-color_fg, 20%) !default;
+
+$formElement-panel_shadowColor                       : rgba($global-color_fg, .2) !default;
+$formElement-panel_boxShadow                         : 0 1px 3px 0 $formElement-panel_shadowColor !default;
+
 
 
 

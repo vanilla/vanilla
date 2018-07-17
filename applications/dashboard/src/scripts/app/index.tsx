@@ -5,7 +5,7 @@
  * @license https://opensource.org/licenses/GPL-2.0 GPL-2.0
  */
 
-import { addRoutes, addComponent } from "@dashboard/application";
+import { addRoutes, addComponent, onReady } from "@dashboard/application";
 import React from "react";
 import { Route } from "react-router-dom";
 import SignInPage from "./authenticate/SignInPage";
@@ -30,14 +30,16 @@ import "./user-content/embeds/codepen";
 import { registerReducer } from "@dashboard/state/reducerRegistry";
 import authenticateReducer from "@dashboard/state/authenticate/authenticateReducer";
 
-registerReducer("authenticate", authenticateReducer);
+onReady(() => {
+    registerReducer("authenticate", authenticateReducer);
 
-addComponent("App", Router);
+    addComponent("App", Router);
 
-addRoutes([
-    <Route exact path="/authenticate/signin" component={SignInPage} />,
-    <Route exact path="/authenticate/password" component={PasswordPage} />,
-    <Route exact path="/authenticate/recoverpassword" component={RecoverPasswordPage} />,
-]);
+    addRoutes([
+        <Route exact path="/authenticate/signin" component={SignInPage} />,
+        <Route exact path="/authenticate/password" component={PasswordPage} />,
+        <Route exact path="/authenticate/recoverpassword" component={RecoverPasswordPage} />,
+    ]);
 
-stickyHeader();
+    stickyHeader();
+});

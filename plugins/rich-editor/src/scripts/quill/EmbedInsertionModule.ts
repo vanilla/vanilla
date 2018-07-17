@@ -14,12 +14,12 @@ import getStore from "@dashboard/state/getStore";
 import IState from "@rich-editor/state/IState";
 import { getIDForQuill, insertBlockBlotAt } from "@rich-editor/quill/utility";
 
-const store = getStore<IState>();
-
 /**
  * A Quill module for managing insertion of embeds/loading/error states.
  */
 export default class EmbedInsertionModule extends Module {
+    private store = getStore<IState>();
+
     constructor(public quill: Quill, options = {}, editorID) {
         super(quill, options);
         this.quill = quill;
@@ -28,7 +28,7 @@ export default class EmbedInsertionModule extends Module {
 
     private get state() {
         const id = getIDForQuill(this.quill);
-        return store.getState().editor.instances[id];
+        return this.store.getState().editor.instances[id];
     }
 
     /**

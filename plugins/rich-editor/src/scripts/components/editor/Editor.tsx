@@ -30,11 +30,10 @@ interface IProps {
     bodybox: HTMLInputElement;
 }
 
-const store = getStore<IState>();
-
 export default class Editor extends React.Component<IProps> {
     private hasUploadPermission: boolean;
     private quillMountRef: React.RefObject<HTMLDivElement> = React.createRef();
+    private store = getStore<IState>();
     private allowPasteListener = true;
     private editorID: string;
     private quill: Quill;
@@ -57,7 +56,7 @@ export default class Editor extends React.Component<IProps> {
         // Setup syncing
         this.setupBodyBoxSync();
         this.setupDebugPasteListener();
-        store.dispatch(actions.createInstance(this.editorID));
+        this.store.dispatch(actions.createInstance(this.editorID));
         this.quill.on(Quill.events.EDITOR_CHANGE, this.onQuillUpdate);
 
         // Add a listener for a force selection update.
@@ -97,7 +96,7 @@ export default class Editor extends React.Component<IProps> {
         );
 
         return (
-            <ReduxProvider store={getStore()}>
+            <ReduxProvider store={this.store}>
                 <EditorProvider value={{ quill: this.quill, editorID: this.editorID }}>
                     <div
                         className="richEditor"
@@ -127,7 +126,7 @@ export default class Editor extends React.Component<IProps> {
     }
 
     private onQuillUpdate = () => {
-        store.dispatch(actions.setSelection(this.editorID, this.quill.getSelection()));
+        this.store.dispatch(actions.setSelection(this.editorID, this.quill.getSelection()));
     };
 
     /**

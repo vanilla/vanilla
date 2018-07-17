@@ -4,13 +4,16 @@
  * @license https://opensource.org/licenses/GPL-2.0 GPL-2.0
  */
 
-import reducerRegistry from "@dashboard/state/reducerRegistry";
+import { registerReducer } from "@dashboard/state/reducerRegistry";
 import editorReducer from "@rich-editor/state/editorReducer";
 import mountEditor from "@rich-editor/mountEditor";
+import { onReady } from "@dashboard/application";
 
-reducerRegistry.register("editor", editorReducer);
-setupEditor();
-setupCommentEditForm();
+onReady(() => {
+    registerReducer("editor", editorReducer);
+    setupEditor();
+    setupCommentEditForm();
+});
 
 /**
  * Set up the new discussion form if it exists.

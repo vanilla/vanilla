@@ -1,6 +1,10 @@
+/**
+ * @copyright 2009-2018 Vanilla Forums Inc.
+ * @license https://opensource.org/licenses/GPL-2.0 GPL-2.0
+ */
+
 import { Dispatch } from "redux";
 import { actionCreator, ActionsUnion, createAction } from "@dashboard/state/utility";
-import { ISigninAuthenticatorState } from "./IAuthenticateState";
 import api from "@dashboard/apiv2";
 import IState, { LoadStatus } from "@dashboard/state/IState";
 import { IAuthenticator } from "@dashboard/state/authenticate/IAuthenticateState";

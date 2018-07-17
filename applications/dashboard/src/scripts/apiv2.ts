@@ -11,6 +11,22 @@ import axios from "axios";
 import qs from "qs";
 import { IEmbedData } from "@dashboard/embeds";
 
+export const enum LoadStatus {
+    LOADING = "LOADING",
+    ERROR = "ERROR",
+    SUCCESS = "SUCCESS",
+}
+
+interface ILoaded {
+    loadStatus: LoadStatus.LOADING;
+}
+
+export interface ILoadable<T> {
+    loadStatus: LoadStatus;
+    data: T;
+    error?: IApiError;
+}
+
 export interface IApiResponse<DataType = any> {
     data: DataType;
     status: number;
@@ -22,15 +38,13 @@ export interface IFieldError {
     code: string; // translation code
     status: number; // HTTP status
     field: string;
+    timestamp: number;
 }
 
 export interface IApiError {
     message: string;
     status: number;
-    headers: any;
-    errors: {
-        [key: string]: IFieldError[];
-    };
+    errors?: IFieldError[];
 }
 
 const api = axios.create({

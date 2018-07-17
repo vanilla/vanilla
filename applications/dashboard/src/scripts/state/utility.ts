@@ -60,6 +60,7 @@ export function generateApiActionCreators<
     SuccessActionType extends string,
     ErrorActionType extends string,
     ResponseDataType,
+    ErrorDataType,
     Meta = undefined
 >(
     requestType: RequestActionType,

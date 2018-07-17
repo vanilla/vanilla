@@ -5,8 +5,8 @@
 
 import { Dispatch } from "redux";
 import { generateApiActionCreators, ActionsUnion, createAction } from "@dashboard/state/utility";
-import api from "@dashboard/apiv2";
-import IState, { LoadStatus } from "@dashboard/state/IState";
+import api, { LoadStatus } from "@dashboard/apiv2";
+import IState from "@dashboard/state/IState";
 import { IAuthenticator } from "@dashboard/state/authenticate/IAuthenticateState";
 import { AxiosResponse } from "axios";
 
@@ -15,15 +15,7 @@ export const GET_SIGNIN_AUTHENTICATORS_REQUEST = "GET_SIGNIN_AUTHENTICATORS_REQU
 export const GET_SIGNIN_AUTHENTICATORS_ERROR = "GET_SIGNIN_AUTHENTICATORS_ERROR";
 export const GET_SIGNIN_AUTHENTICATORS_SUCCESS = "GET_SIGNIN_AUTHENTICATORS_SUCCESS";
 
-export interface IGetSigninAuthenticatorsSuccess {
-    data: IAuthenticator[];
-}
-
-export interface IGetSigninAuthenticatorsError {
-    error: string;
-}
-
-const getSigninAuthenticatorsActions = generateApiActionCreators(
+const getAuthenticatorsActions = generateApiActionCreators(
     GET_SIGNIN_AUTHENTICATORS_REQUEST,
     GET_SIGNIN_AUTHENTICATORS_SUCCESS,
     GET_SIGNIN_AUTHENTICATORS_ERROR,
@@ -31,31 +23,24 @@ const getSigninAuthenticatorsActions = generateApiActionCreators(
     [] as IAuthenticator[],
 );
 
-const getSigninAuthenticatorsActions = generateApiActionCreators<
-    typeof GET_SIGNIN_AUTHENTICATORS_REQUEST,
-    typeof GET_SIGNIN_AUTHENTICATORS_SUCCESS,
-    typeof GET_SIGNIN_AUTHENTICATORS_ERROR,
-    IAuthenticator[]
->(GET_SIGNIN_AUTHENTICATORS_REQUEST, GET_SIGNIN_AUTHENTICATORS_SUCCESS, GET_SIGNIN_AUTHENTICATORS_ERROR);
-
-export function getSigninAuthenticators() {
+export function getAuthenticators() {
     return (dispatch: Dispatch<any>, getState: () => IState) => {
         const { authenticate } = getState();
         if (authenticate.signin.status === LoadStatus.LOADING) {
             return;
         }
 
-        dispatch(getSigninAuthenticatorsActions.request());
+        dispatch(getAuthenticatorsActions.request());
 
         return api
             .get("/authenticate/authenticators")
             .then((response: AxiosResponse<IAuthenticator[]>) => {
-                dispatch(getSigninAuthenticatorsActions.success(response));
+                dispatch(getAuthenticatorsActions.success(response));
             })
             .catch(error => {
-                dispatch(getSigninAuthenticatorsActions.error({ error: error.response.data.message }));
+                dispatch(getAuthenticatorsActions.error(error));
             });
     };
 }
 
-export type ActionTypes = ActionsUnion<typeof getSigninAuthenticatorsActions>;
+export type ActionTypes = ActionsUnion<typeof getAuthenticatorsActions>;

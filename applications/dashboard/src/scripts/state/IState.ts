@@ -10,19 +10,3 @@ import { IAuthenticateState } from "@dashboard/state/authenticate/IAuthenticateS
 export default interface IState {
     authenticate: IAuthenticateState;
 }
-
-export const enum LoadStatus {
-    PENDING = "PENDING",
-    LOADING = "LOADING",
-    ERROR = "ERROR",
-    SUCCESS = "SUCCESS",
-}
-
-export interface ILoadable<T> {
-    status: LoadStatus;
-    error?: IError;
-    data: T;
-}
-
-// TODO: Make this have more stuff.
-export type IError = string;

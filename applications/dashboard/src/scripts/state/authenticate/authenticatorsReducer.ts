@@ -7,14 +7,12 @@ import { ISigninAuthenticatorState } from "./IAuthenticateState";
 import * as actions from "./authenticatorActions";
 import { LoadStatus } from "@dashboard/state/IState";
 
-export function signinReducer(state?: ISigninAuthenticatorState, action?: actions.ActionTypes) {
-    if (state === undefined || action === undefined) {
-        return {
-            status: LoadStatus.PENDING,
-            data: [],
-        };
-    }
+const initialState: ISigninAuthenticatorState = {
+    status: LoadStatus.PENDING,
+    data: [],
+};
 
+export function signinReducer(state: ISigninAuthenticatorState = initialState, action: actions.ActionTypes) {
     switch (action.type) {
         case actions.GET_SIGNIN_AUTHENTICATORS_REQUEST:
             return {

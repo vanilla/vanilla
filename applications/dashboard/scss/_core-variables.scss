@@ -222,15 +222,6 @@ $widget-head_borderColor                             : $global-widgetBorder_colo
 $widget-head_borderWidth                             : 0 !default;
 $widget-head_borderRadius                            : $global-widgetBorder_radius !default;
 
-
-// "Main" (body and footer)
-$widget-main_bg                                      : transparent !default;
-$widget-main_fg                                      : transparent !default;
-$widget-main_borderColor                             : $global-widgetBorder_color !default;
-$widget-main_borderWidth                             : 0 !default;
-$widget-main_borderRadius                            : $global-widgetBorder_radius !default;
-
-
 // Widget Body
 $widget-body_topPadding                              : $widget-section_topPadding !default;
 $widget-body_bottomPadding                           : $widget-section_bottomPadding !default;

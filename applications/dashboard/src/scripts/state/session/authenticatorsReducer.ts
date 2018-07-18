@@ -16,18 +16,18 @@ export default function authenticatorsReducer(
     action: actions.ActionTypes,
 ): IAuthenticatorState {
     switch (action.type) {
-        case actions.GET_SIGNIN_AUTHENTICATORS_REQUEST:
+        case actions.GET_USER_AUTHENTICATORS_REQUEST:
             return {
                 status: LoadStatus.LOADING,
             };
-        case actions.GET_SIGNIN_AUTHENTICATORS_SUCCESS:
+        case actions.GET_USER_AUTHENTICATORS_SUCCESS:
             return {
                 ...state,
                 status: LoadStatus.SUCCESS,
                 data: action.payload.data,
                 error: undefined,
             };
-        case actions.GET_SIGNIN_AUTHENTICATORS_ERROR:
+        case actions.GET_USER_AUTHENTICATORS_ERROR:
             return {
                 ...state,
                 status: LoadStatus.ERROR,

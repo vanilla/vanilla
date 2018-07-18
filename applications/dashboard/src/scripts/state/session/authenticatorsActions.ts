@@ -4,37 +4,48 @@
  */
 
 import { Dispatch } from "redux";
-import { generateApiActionCreators, ActionsUnion, createAction } from "@dashboard/state/utility";
+import { generateApiActionCreators, ActionsUnion, createAction, apiThunk } from "@dashboard/state/utility";
 import api from "@dashboard/apiv2";
 import { AxiosResponse } from "axios";
-import { LoadStatus, IUserAuthenticator } from "@dashboard/@types/api";
+import {
+    IUserAuthenticator,
+    IAuthenticatePasswordParams,
+    IAuthenticatePasswordResponseData,
+} from "@dashboard/@types/api";
 import { IStoreState } from "@dashboard/@types/state";
+import apiv2 from "@dashboard/apiv2";
+import { formatUrl } from "@dashboard/application";
 
-export const GET_SIGNIN_AUTHENTICATORS_REQUEST = "GET_SIGNIN_AUTHENTICATORS_REQUEST";
-export const GET_SIGNIN_AUTHENTICATORS_ERROR = "GET_SIGNIN_AUTHENTICATORS_ERROR";
-export const GET_SIGNIN_AUTHENTICATORS_SUCCESS = "GET_SIGNIN_AUTHENTICATORS_SUCCESS";
+export const GET_USER_AUTHENTICATORS_REQUEST = "GET_USER_AUTHENTICATORS_REQUEST";
+export const GET_USER_AUTHENTICATORS_ERROR = "GET_USER_AUTHENTICATORS_ERROR";
+export const GET_USER_AUTHENTICATORS_SUCCESS = "GET_USER_AUTHENTICATORS_SUCCESS";
 
 const getAuthenticatorsActions = generateApiActionCreators(
-    GET_SIGNIN_AUTHENTICATORS_REQUEST,
-    GET_SIGNIN_AUTHENTICATORS_SUCCESS,
-    GET_SIGNIN_AUTHENTICATORS_ERROR,
+    GET_USER_AUTHENTICATORS_REQUEST,
+    GET_USER_AUTHENTICATORS_SUCCESS,
+    GET_USER_AUTHENTICATORS_ERROR,
     // https://github.com/Microsoft/TypeScript/issues/10571#issuecomment-345402872
-    [] as IUserAuthenticator[],
+    {} as IUserAuthenticator[],
 );
 
-export function getUserAuthenticators() {
-    return (dispatch: Dispatch<any>, getState: () => IStoreState) => {
-        dispatch(getAuthenticatorsActions.request());
+export const getUserAuthenticators = () =>
+    apiThunk("get", "authenticate/authenticators", getAuthenticatorsActions, undefined);
 
-        return api
-            .get("/authenticate/authenticators")
-            .then((response: AxiosResponse<IUserAuthenticator[]>) => {
-                dispatch(getAuthenticatorsActions.success(response));
-            })
-            .catch(error => {
-                dispatch(getAuthenticatorsActions.error(error));
-            });
-    };
-}
+// Authenticating user /authenticate/password
+export const POST_AUTHENTICATE_PASSWORD_REQUEST = "POST_AUTHENTICATE_PASSWORD_REQUEST";
+export const POST_AUTHENTICATE_PASSWORD_ERROR = "POST_AUTHENTICATE_PASSWORD_ERROR";
+export const POST_AUTHENTICATE_PASSWORD_SUCCESS = "POST_AUTHENTICATE_PASSWORD_SUCCESS";
+
+const authenticatePasswordActions = generateApiActionCreators(
+    POST_AUTHENTICATE_PASSWORD_REQUEST,
+    POST_AUTHENTICATE_PASSWORD_SUCCESS,
+    POST_AUTHENTICATE_PASSWORD_ERROR,
+    // https://github.com/Microsoft/TypeScript/issues/10571#issuecomment-345402872
+    {} as IAuthenticatePasswordResponseData,
+    {} as IAuthenticatePasswordParams,
+);
+
+export const postAuthenticatePassword = (params: IAuthenticatePasswordParams) =>
+    apiThunk("post", "/authenticate/password", authenticatePasswordActions, params);
 
 export type ActionTypes = ActionsUnion<typeof getAuthenticatorsActions>;

@@ -6,6 +6,8 @@
  */
 
 import { IApiResponse, IApiError } from "@dashboard/@types/api";
+import apiv2 from "@dashboard/apiv2";
+import { AxiosResponse } from "axios";
 
 // Utility to pull a group of action types out of an actions object
 export type ActionsUnion<A extends IActionCreatorsMapObject> = ReturnType<A[keyof A]>;
@@ -60,7 +62,6 @@ export function generateApiActionCreators<
     SuccessActionType extends string,
     ErrorActionType extends string,
     ResponseDataType,
-    ErrorDataType,
     Meta = undefined
 >(
     requestType: RequestActionType,
@@ -68,19 +69,47 @@ export function generateApiActionCreators<
     errorType: ErrorActionType,
     dummyResponseType?: ResponseDataType,
     dummyMetaType?: Meta,
-): {
+): IGeneratedActionCreators<RequestActionType, SuccessActionType, ErrorActionType, ResponseDataType, Meta> {
+    return {
+        request: (meta: Meta) => createApiRequestAction(requestType, meta),
+        success: (response: IApiResponse<ResponseDataType>, meta: Meta) =>
+            createApiSuccessAction(successType, meta, response),
+        error: (error: IApiError, meta: Meta) => createApiErrorAction(errorType, meta, error),
+    };
+}
+
+interface IGeneratedActionCreators<
+    RequestActionType extends string,
+    SuccessActionType extends string,
+    ErrorActionType extends string,
+    ResponseDataType,
+    Meta = undefined
+> extends IActionCreatorsMapObject {
     request: (meta?: Meta) => IApiAction<RequestActionType, Meta>;
     success: (
         payload: IApiResponse<ResponseDataType>,
         meta?: Meta,
     ) => IApiSuccessAction<SuccessActionType, Meta, ResponseDataType>;
     error: (error: IApiError, meta?: Meta) => IApiErrorAction<ErrorActionType, Meta>;
-} {
-    return {
-        request: (meta: Meta) => createApiRequestAction(requestType, meta),
-        success: (response: IApiResponse<ResponseDataType>, meta: Meta) =>
-            createApiSuccessAction(successType, meta, response),
-        error: (error: IApiError, meta: Meta) => createApiErrorAction(errorType, meta, error),
+}
+
+// Thunk types
+type RequestType = "get" | "post" | "put" | "delete" | "patch";
+export function apiThunk(
+    requestType: RequestType,
+    endpoint: string,
+    actionCreators: IGeneratedActionCreators<any, any, any, any, any>,
+    params: any,
+) {
+    return dispatch => {
+        dispatch(actionCreators.request(params));
+        apiv2[requestType as any](endpoint, params)
+            .then((response: AxiosResponse) => {
+                dispatch(actionCreators.success(response, params));
+            })
+            .catch(error => {
+                dispatch(actionCreators.error(error));
+            });
     };
 }
 

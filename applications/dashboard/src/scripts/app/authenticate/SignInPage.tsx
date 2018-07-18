@@ -12,7 +12,7 @@ import SSOMethods from "./components/SSOMethods";
 import { getRequiredID, IRequiredComponentID } from "@dashboard/componentIDs";
 import Or from "@dashboard/components/forms/Or";
 import PageLoading from "@dashboard/components/PageLoading";
-import { IUserAuthenticator, LoadStatus } from "@dashboard/@types/api";
+import { LoadStatus } from "@dashboard/@types/api";
 import { IStoreState, IAuthenticatorState } from "@dashboard/@types/state";
 import { getUserAuthenticators } from "@dashboard/state/session/authenticatorsActions";
 

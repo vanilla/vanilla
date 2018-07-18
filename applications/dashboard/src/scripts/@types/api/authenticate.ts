@@ -33,4 +33,10 @@ export interface IAuthenticateResponse {
     targetUrl?: string;
 }
 
-export interface IAuthenticatePasswordResponse extends IUserFragment {}
+export interface IAuthenticatePasswordParams {
+    username: string;
+    password: string;
+    persist?: boolean;
+}
+
+export interface IAuthenticatePasswordResponseData extends IUserFragment {}

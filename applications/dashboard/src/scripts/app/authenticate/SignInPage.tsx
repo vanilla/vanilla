@@ -11,16 +11,14 @@ import PasswordForm from "./components/PasswordForm";
 import SSOMethods from "./components/SSOMethods";
 import { getRequiredID, IRequiredComponentID } from "@dashboard/componentIDs";
 import Or from "@dashboard/components/forms/Or";
-import { ISigninAuthenticatorState } from "@dashboard/state/authenticate/IAuthenticateState";
-import { Dispatch } from "redux";
-import { getSigninAuthenticators } from "@dashboard/state/authenticate/authenticatorsActions";
 import PageLoading from "@dashboard/components/PageLoading";
-import IState from "@dashboard/state/IState";
-import { LoadStatus } from "@dashboard/apiv2";
+import { IUserAuthenticator, LoadStatus } from "@dashboard/@types/api";
+import { IStoreState, IAuthenticatorState } from "@dashboard/@types/state";
+import { getUserAuthenticators } from "@dashboard/state/session/authenticatorsActions";
 
 interface IProps {
-    authenticators: ISigninAuthenticatorState;
-    loadAuthenticators: typeof getSigninAuthenticators;
+    authenticatorState: IAuthenticatorState;
+    loadAuthenticators: typeof getUserAuthenticators;
 }
 
 export class SignInPage extends React.Component<IProps, IRequiredComponentID> {
@@ -38,24 +36,24 @@ export class SignInPage extends React.Component<IProps, IRequiredComponentID> {
     }
 
     public componentDidMount() {
-        if (this.props.authenticators.status === LoadStatus.PENDING) {
+        if (this.props.authenticatorState.status === LoadStatus.PENDING) {
             this.props.loadAuthenticators();
         }
     }
 
     public render() {
-        const { authenticators } = this.props;
+        const { authenticatorState } = this.props;
 
-        if (authenticators.status !== LoadStatus.SUCCESS) {
+        if (authenticatorState.status !== LoadStatus.SUCCESS) {
             return (
                 <div id={this.state.id} className="authenticateUserCol">
-                    <PageLoading {...authenticators} />
+                    <PageLoading {...authenticatorState} />
                 </div>
             );
         }
 
         let showPassword = false;
-        const ssoMethods = authenticators.data.filter(a => {
+        const ssoMethods = authenticatorState.data.filter(a => {
             if (a.type === "password") {
                 showPassword = true;
                 return false;
@@ -78,16 +76,16 @@ export class SignInPage extends React.Component<IProps, IRequiredComponentID> {
     }
 }
 
-function mapStateToProps({ authenticate }: IState) {
+function mapStateToProps({ session }: IStoreState) {
     return {
-        authenticators: authenticate.signin,
+        authenticatorState: session.authenticators,
     };
 }
 
 function mapDispatchToProps(dispatch) {
     return {
         loadAuthenticators: () => {
-            dispatch(getSigninAuthenticators());
+            dispatch(getUserAuthenticators());
         },
     };
 }

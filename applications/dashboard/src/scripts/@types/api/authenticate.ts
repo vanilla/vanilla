@@ -1,9 +1,9 @@
-import { IUserFragment } from "@dashboard/types/api";
-
 /**
  * @copyright 2009-2018 Vanilla Forums Inc.
  * @license https://opensource.org/licenses/GPL-2.0 GPL-2.0
  */
+
+import { IUserFragment } from "@dashboard/@types/api";
 
 export interface IUserAuthenticator {
     authenticatorID: string;

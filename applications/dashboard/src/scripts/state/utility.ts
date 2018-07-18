@@ -5,7 +5,7 @@
  * @license https://opensource.org/licenses/GPL-2.0 GPL-2.0
  */
 
-import { IApiResponse, IApiError } from "@dashboard/types/api";
+import { IApiResponse, IApiError } from "@dashboard/@types/api";
 
 // Utility to pull a group of action types out of an actions object
 export type ActionsUnion<A extends IActionCreatorsMapObject> = ReturnType<A[keyof A]>;

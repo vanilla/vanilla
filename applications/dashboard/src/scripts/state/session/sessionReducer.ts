@@ -8,7 +8,7 @@ import { combineReducers } from "redux";
 import authenticatorsReducer from "@dashboard/state/session/authenticatorsReducer";
 
 const sessionReducer = combineReducers({
-    authenticator: authenticatorsReducer,
+    authenticators: authenticatorsReducer,
 });
 
 export default sessionReducer;

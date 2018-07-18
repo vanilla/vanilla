@@ -15,10 +15,10 @@ import { thunks as mentionThunks, actions as mentionActions } from "@rich-editor
 import MentionAutoCompleteBlot from "@rich-editor/quill/blots/embeds/MentionAutoCompleteBlot";
 import { getBlotAtIndex, getMentionRange } from "@rich-editor/quill/utility";
 import { Dispatch } from "redux";
-import IStoreState from "@rich-editor/state/IState";
 import { IMentionValue } from "@rich-editor/state/mention/MentionTrie";
 import { connect } from "react-redux";
 import { IMentionSuggestionData, IMentionProps } from "@rich-editor/components/toolbars/pieces/MentionSuggestion";
+import { IStoreState } from "@rich-editor/@types/store";
 
 interface IProps extends IEditorContextProps {
     lookupMentions: (username: string) => void;

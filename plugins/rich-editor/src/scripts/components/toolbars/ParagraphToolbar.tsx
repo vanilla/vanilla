@@ -20,9 +20,9 @@ import {
     isEmbedSelected,
 } from "@rich-editor/quill/utility";
 import { connect } from "react-redux";
-import IStoreState from "@rich-editor/state/IState";
 import { FOCUS_CLASS } from "@dashboard/embeds";
 import FocusableEmbedBlot from "@rich-editor/quill/blots/abstract/FocusableEmbedBlot";
+import { IStoreState } from "@rich-editor/@types/store";
 
 const PARAGRAPH_ITEMS = {
     header: {

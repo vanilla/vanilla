@@ -7,10 +7,10 @@
 import React from "react";
 import classNames from "classnames";
 import { t } from "@dashboard/application";
-import { IMentionUser } from "@dashboard/apiv2";
 import { splitStringLoosely } from "@dashboard/utility";
+import { IUserFragment } from "@dashboard/@types/api";
 
-export interface IMentionSuggestionData extends IMentionUser {
+export interface IMentionSuggestionData extends IUserFragment {
     domID: string;
 }
 

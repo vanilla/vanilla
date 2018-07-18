@@ -224,7 +224,7 @@ class DiscussionsApiController extends AbstractApiController {
 
         $query = $in->validate($query);
 
-        $this->getEventManager()->fireFilter('discussionsApiController_indexFilters', $this, $id, $query);
+        $this->getEventManager()->fireFilter('discussionsApiController_getFilters', $this, $id, $query);
 
         $row = $this->discussionByID($id);
         if (!$row) {

@@ -310,7 +310,10 @@ export function indexArrayByKey<T extends object>(
     const object = {};
     for (const item of array) {
         if (key in item) {
-            object[item[key]] = item;
+            if (!(item[key] in object)) {
+                object[item[key]] = [];
+            }
+            object[item[key]].push(item);
         }
     }
     return object;

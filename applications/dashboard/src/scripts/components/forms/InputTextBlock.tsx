@@ -3,13 +3,12 @@
  * @license https://opensource.org/licenses/GPL-2.0 GPL-2.0
  */
 
-import { t } from "@dashboard/application";
 import React from "react";
 import classNames from "classnames";
 import ErrorMessages from "./ErrorMessages";
-import { log, logError, debug } from "@dashboard/utility";
 import Paragraph from "./Paragraph";
-import { uniqueIDFromPrefix, getRequiredID, IOptionalComponentID } from "@dashboard/componentIDs";
+import { getRequiredID, IOptionalComponentID } from "@dashboard/componentIDs";
+import { IFieldError } from "@dashboard/@types/api";
 
 export interface IInputTextProps extends IOptionalComponentID {
     className?: string;
@@ -24,9 +23,9 @@ export interface IInputTextProps extends IOptionalComponentID {
     valid?: boolean;
     descriptionID?: string;
     required?: boolean;
-    errors?: string | string[];
+    errors?: IFieldError[];
     disabled?: boolean;
-    onChange?: any;
+    onChange?: React.ChangeEventHandler<any>;
 }
 
 interface IState {
@@ -47,7 +46,6 @@ export default class InputTextBlock extends React.Component<IInputTextProps, ISt
         this.state = {
             id: getRequiredID(props, "inputText") as string,
         };
-        this.handleInputChange = this.handleInputChange.bind(this);
     }
 
     public render() {
@@ -82,11 +80,11 @@ export default class InputTextBlock extends React.Component<IInputTextProps, ISt
                         aria-invalid={hasErrors}
                         aria-describedby={describedBy}
                         aria-labelledby={this.labelID}
-                        onChange={this.handleInputChange}
+                        onChange={this.props.onChange}
                         ref={inputDom => (this.inputDom = inputDom as HTMLInputElement)}
                     />
                 </span>
-                <ErrorMessages id={this.errorID} errors={this.props.errors as string | string[]} />
+                <ErrorMessages id={this.errorID} errors={this.props.errors} />
             </label>
         );
     }
@@ -109,10 +107,6 @@ export default class InputTextBlock extends React.Component<IInputTextProps, ISt
 
     public select() {
         this.inputDom.select();
-    }
-
-    private handleInputChange(e) {
-        this.props.onChange(e);
     }
 
     private get labelID(): string {

@@ -14,150 +14,40 @@ import get from "lodash/get";
 import ButtonSubmit from "@dashboard/components/forms/ButtonSubmit";
 import Paragraph from "@dashboard/components/forms/Paragraph";
 import { IRequiredComponentID, getRequiredID } from "@dashboard/componentIDs";
+import { IStoreState, IPasswordState } from "@dashboard/@types/state";
+import { postAuthenticatePassword } from "@dashboard/state/authenticate/passwordActions";
+import { IAuthenticatePasswordParams, LoadStatus, IFieldError } from "@dashboard/@types/api";
+import { connect } from "react-redux";
 
 interface IProps {
     password: string;
     username: string;
-    globalError?: string;
-    passwordErrors?: string[];
-    usernameErrors?: string[];
+    passwordState: IPasswordState;
+    authenticate: typeof postAuthenticatePassword;
 }
 
 interface IState extends IRequiredComponentID {
-    allowEdit: boolean;
-    usernameErrors: string[];
-    passwordErrors: string[];
-    globalError?: string | null;
     allowSubmit: boolean;
     rememberMe: boolean;
 }
 
 class PasswordForm extends React.Component<IProps, IState> {
-    private usernameInput: InputTextBlock;
-    private passwordInput: InputTextBlock;
+    private usernameInput: React.RefObject<InputTextBlock> = React.createRef();
+    private passwordInput: React.RefObject<InputTextBlock> = React.createRef();
 
     constructor(props) {
         super(props);
 
         this.state = {
             id: getRequiredID(props, "passwordForm"),
-            allowEdit: true,
             allowSubmit: false,
             rememberMe: true,
-            usernameErrors: props.usernameErrors || [],
-            passwordErrors: props.passwordErrors || [],
-            globalError: props.globalError,
         };
-    }
-
-    public handleTextChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-        const { type } = event.target;
-
-        if (type === "password") {
-            this.setState({
-                globalError: null,
-                passwordErrors: [],
-            });
-        }
-        if (type === "text") {
-            this.setState({
-                globalError: null,
-                usernameErrors: [],
-            });
-        }
-    };
-
-    public handleCheckBoxChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-        this.setState({ rememberMe: event.target.checked || false });
-    };
-
-    public handleErrors = e => {
-        const catchAllErrorMessage = t("An error has occurred, please try again.");
-        let globalError = get(e, "response.data.message", false);
-        const errors = get(e, "response.data.errors", []);
-        const hasFieldSpecificErrors = errors.length > 0;
-        let passwordErrors: string[] = [];
-        let usernameErrors: string[] = [];
-
-        if (globalError || hasFieldSpecificErrors) {
-            if (hasFieldSpecificErrors) {
-                globalError = ""; // Only show global error if all fields are error free
-                logError("PasswordForm Errors", errors);
-                errors.forEach((error, index) => {
-                    error.timestamp = new Date().getTime(); // Timestamp to make sure state changes, even if the message is the same
-                    if (error.field === "password") {
-                        passwordErrors = [...passwordErrors, error];
-                    } else if (error.field === "username") {
-                        usernameErrors = [...usernameErrors, error];
-                    } else {
-                        // Unhandled error
-                        globalError = catchAllErrorMessage;
-                        logError("PasswordForm - Unhandled error field", error);
-                    }
-                });
-            }
-        } else {
-            // Something went really wrong. Add default message to tell the user there's a problem.
-            logError("PasswordForm - Failure to handle errors from response -", e);
-            globalError = catchAllErrorMessage;
-        }
-        this.setErrors(globalError, passwordErrors, usernameErrors);
-    };
-
-    public setErrors(globalError, passwordErrors: string[], usernameErrors: string[]) {
-        this.setState(
-            {
-                allowEdit: true,
-                passwordErrors,
-                usernameErrors,
-                globalError,
-            },
-            () => {
-                const hasGlobalError = !!this.state.globalError;
-                const hasPasswordError = this.state.passwordErrors.length > 0;
-                const hasUsernameError = this.state.usernameErrors.length > 0;
-
-                if (hasGlobalError && !hasPasswordError && !hasUsernameError) {
-                    this.usernameInput.select();
-                } else if (hasUsernameError) {
-                    this.usernameInput.select();
-                } else if (hasPasswordError) {
-                    this.passwordInput.select();
-                }
-            },
-        );
-    }
-
-    public handleSubmit = event => {
-        event.preventDefault();
-
-        this.setState({
-            allowEdit: false,
-        });
-
-        apiv2
-            .post("/authenticate/password", {
-                username: this.usernameInput.value,
-                password: this.passwordInput.value,
-                persist: this.state.rememberMe,
-            })
-            .then(r => {
-                const search = get(this, "props.location.search", "/");
-                const params = new URLSearchParams(search);
-                window.location.href = formatUrl(params.get("target") || "/");
-            })
-            .catch(e => {
-                this.handleErrors(e);
-            });
-    };
-
-    public get formDescriptionID() {
-        return this.state.id + "-description";
     }
 
     public render() {
         let formDescribedBy;
-        if (this.state.globalError) {
+        if (this.globalErrorMessage) {
             formDescribedBy = this.formDescriptionID;
         }
 
@@ -173,27 +63,25 @@ class PasswordForm extends React.Component<IProps, IState> {
                 <Paragraph
                     id={this.formDescriptionID}
                     className="authenticateUser-paragraph"
-                    content={this.state.globalError}
+                    content={this.globalErrorMessage}
                     isError={true}
                 />
                 <InputTextBlock
                     label={t("Email/Username")}
                     required={true}
-                    disabled={!this.state.allowEdit}
-                    errors={this.state.usernameErrors}
+                    disabled={!this.allowEdit}
+                    errors={this.getFieldErrors("username")}
                     defaultValue={this.props.username}
-                    onChange={this.handleTextChange}
-                    ref={username => (this.usernameInput = username as InputTextBlock)}
+                    ref={this.usernameInput}
                 />
                 <InputTextBlock
                     label={t("Password")}
                     required={true}
-                    disabled={!this.state.allowEdit}
-                    errors={this.state.passwordErrors}
+                    disabled={!this.allowEdit}
+                    errors={this.getFieldErrors("password")}
                     defaultValue={this.props.password}
-                    onChange={this.handleTextChange}
                     type="password"
-                    ref={password => (this.passwordInput = password as InputTextBlock)}
+                    ref={this.passwordInput}
                 />
                 <div className="inputBlock inputBlock-tighter">
                     <div className="rememberMeAndForgot">
@@ -209,11 +97,117 @@ class PasswordForm extends React.Component<IProps, IState> {
                         </span>
                     </div>
                 </div>
-                <ButtonSubmit disabled={!this.state.allowEdit} content={t("Sign In")} />
-                {/*<p className="authenticateUser-paragraph isCentered">{t('Not registered?')} <Link to="/entry/signup">{t('Create an Account')}</Link></p>*/}
+                <ButtonSubmit disabled={!this.allowEdit} content={t("Sign In")} />
             </form>
         );
     }
+
+    public componentDidUpdate(prevProps: IProps) {
+        if (this.getFieldErrors("username")) {
+            this.usernameInput.current!.select();
+        } else if (this.getFieldErrors("password")) {
+            this.passwordInput.current!.select();
+        } else {
+            this.usernameInput.current!.select();
+        }
+    }
+
+    private getFieldErrors(field: string): IFieldError[] | undefined {
+        const { passwordState } = this.props;
+        if (
+            passwordState.status === LoadStatus.ERROR &&
+            passwordState.error.errors &&
+            passwordState.error.errors[field]
+        ) {
+            return passwordState.error.errors[field];
+        }
+    }
+
+    private get allowEdit() {
+        return this.props.passwordState.status !== LoadStatus.LOADING;
+    }
+
+    /**
+     * The global error message only should show if there are no field specific error messages.
+     */
+    private get globalErrorMessage(): string {
+        const { passwordState } = this.props;
+        if (passwordState.status !== LoadStatus.ERROR) {
+            return "";
+        }
+
+        const fields = ["username", "password"];
+        for (const field of fields) {
+            if (this.getFieldErrors(field)) {
+                return "";
+            }
+        }
+
+        return passwordState.error.message || t("An error has occurred, please try again.");
+    }
+
+    private handleCheckBoxChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+        this.setState({ rememberMe: event.target.checked || false });
+    };
+
+    // public setErrors(globalError, passwordErrors: string[], usernameErrors: string[]) {
+    //     this.setState(
+    //         {
+    //             allowEdit: true,
+    //             passwordErrors,
+    //             usernameErrors,
+    //             globalError,
+    //         },
+    //         () => {
+    //             const hasGlobalError = !!this.state.globalError;
+    //             const hasPasswordError = this.state.passwordErrors.length > 0;
+    //             const hasUsernameError = this.state.usernameErrors.length > 0;
+
+    //             if (hasGlobalError && !hasPasswordError && !hasUsernameError) {
+    //                 this.usernameInput.select();
+    //             } else if (hasUsernameError) {
+    //                 this.usernameInput.select();
+    //             } else if (hasPasswordError) {
+    //                 this.passwordInput.select();
+    //             }
+    //         },
+    //     );
+    // }
+
+    private handleSubmit = event => {
+        event.preventDefault();
+        if (!this.usernameInput.current || !this.passwordInput.current) {
+            return;
+        }
+
+        this.props.authenticate({
+            username: this.usernameInput.current.value,
+            password: this.passwordInput.current.value,
+            persist: this.state.rememberMe,
+        });
+    };
+
+    private get formDescriptionID() {
+        return this.state.id + "-description";
+    }
 }
 
-export default withRouter(PasswordForm);
+function mapStateToProps({ authenticate }: IStoreState) {
+    return {
+        passwordState: authenticate.password,
+    };
+}
+
+function mapDispatchToProps(dispatch) {
+    return {
+        authenticate: (params: IAuthenticatePasswordParams) => {
+            dispatch(postAuthenticatePassword(params));
+        },
+    };
+}
+
+const withRedux = connect(
+    mapStateToProps,
+    mapDispatchToProps,
+);
+export default withRedux(withRouter(PasswordForm));

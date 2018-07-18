@@ -12,13 +12,9 @@ import qs from "qs";
 import { IEmbedData } from "@dashboard/embeds";
 
 function fieldErrorTransformer(responseData) {
-    console.log("Response before", responseData, responseData.errors);
     if (responseData.status >= 400 && responseData.errors && responseData.errors.length > 0) {
-        console.log("Transfroming");
         responseData.errors = indexArrayByKey(responseData.errors, "field");
     }
-
-    console.log("Response after", responseData);
 
     return responseData;
 }

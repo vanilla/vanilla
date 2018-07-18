@@ -7,7 +7,7 @@
 
 import { IApiResponse, IApiError } from "@dashboard/@types/api";
 import apiv2 from "@dashboard/apiv2";
-import { AxiosResponse } from "axios";
+import { AxiosResponse, AxiosError } from "axios";
 
 // Utility to pull a group of action types out of an actions object
 export type ActionsUnion<A extends IActionCreatorsMapObject> = ReturnType<A[keyof A]>;
@@ -101,7 +101,8 @@ export function apiThunk(
             .then((response: AxiosResponse) => {
                 dispatch(actionCreators.success(response, params));
             })
-            .catch(error => {
+            .catch((axiosError: AxiosError) => {
+                const error = axiosError.response ? axiosError.response.data : (axiosError as any);
                 dispatch(actionCreators.error(error));
             });
     };

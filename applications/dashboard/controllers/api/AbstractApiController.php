@@ -10,6 +10,9 @@ use Garden\Schema\Schema;
 abstract class AbstractApiController extends \Vanilla\Web\Controller {
 
     /** @var Schema */
+    private $categoryFragmentSchema;
+
+    /** @var Schema */
     private $userFragmentSchema;
 
     /** @var Schema */
@@ -43,6 +46,22 @@ abstract class AbstractApiController extends \Vanilla\Web\Controller {
         if (array_key_exists($field, $row)) {
             $row[$field] = Gdn_Format::to($row[$field], $format) ?: '<!-- empty -->';
         }
+    }
+
+    /**
+     * Get the schema for categories joined to records.
+     *
+     * @return Schema Returns a schema.
+     */
+    public function getCategoryFragmentSchema() {
+        if ($this->categoryFragmentSchema === null) {
+            $this->categoryFragmentSchema = $this->schema([
+                'categoryID:i' => 'The ID of the category.',
+                'name:s' => 'The name of the category.',
+                'url:s' => 'Full URL to the category.',
+            ], 'CategoryFragment');
+        }
+        return $this->categoryFragmentSchema;
     }
 
     /**

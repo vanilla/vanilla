@@ -351,7 +351,7 @@ export class MentionToolbar extends React.Component<IProps, IMentionState> {
     };
 }
 
-function mapDispatchToProps(dispatch: Dispatch<any>) {
+function mapDispatchToProps(dispatch) {
     const mentionLookupFn = username => dispatch(mentionThunks.loadUsers(username));
 
     return {

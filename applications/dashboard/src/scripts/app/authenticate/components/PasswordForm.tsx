@@ -6,13 +6,13 @@
 import apiv2 from "@dashboard/apiv2";
 import { formatUrl, t } from "@dashboard/application";
 import React from "react";
-import { withRouter, BrowserRouter, Route, Link } from "react-router-dom";
-import { log, logError, debug } from "@dashboard/utility";
+import { withRouter, Link } from "react-router-dom";
+import { logError } from "@dashboard/utility";
 import InputTextBlock from "@dashboard/components/forms/InputTextBlock";
 import Checkbox from "@dashboard/components/forms/Checkbox";
+import get from "lodash/get";
 import ButtonSubmit from "@dashboard/components/forms/ButtonSubmit";
 import Paragraph from "@dashboard/components/forms/Paragraph";
-import get from "lodash/get";
 import { IRequiredComponentID, getRequiredID } from "@dashboard/componentIDs";
 
 interface IProps {
@@ -50,8 +50,8 @@ class PasswordForm extends React.Component<IProps, IState> {
         };
     }
 
-    public handleTextChange = event => {
-        const type: string = get(event, "target.type", "");
+    public handleTextChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+        const { type } = event.target;
 
         if (type === "password") {
             this.setState({
@@ -67,11 +67,8 @@ class PasswordForm extends React.Component<IProps, IState> {
         }
     };
 
-    public handleCheckBoxChange = event => {
-        const value: boolean = get(event, "target.checked", false);
-        this.setState({
-            rememberMe: value,
-        });
+    public handleCheckBoxChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+        this.setState({ rememberMe: event.target.checked || false });
     };
 
     public handleErrors = e => {

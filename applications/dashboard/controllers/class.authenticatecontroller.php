@@ -166,7 +166,7 @@ class AuthenticateController extends Gdn_Controller {
         }
 
         $this->addClientApiAction(
-            'GET_SIGNIN_AUTHENTICATORS_SUCCESS',
+            'GET_USER_AUTHENTICATORS_SUCCESS',
             Data::box($this->authenticateApiController->index_authenticators())
         );
 

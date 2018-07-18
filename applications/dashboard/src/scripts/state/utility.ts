@@ -62,14 +62,21 @@ export function generateApiActionCreators<
     SuccessActionType extends string,
     ErrorActionType extends string,
     ResponseDataType,
-    Meta = undefined
+    Meta = any
 >(
     requestType: RequestActionType,
     successType: SuccessActionType,
     errorType: ErrorActionType,
     dummyResponseType?: ResponseDataType,
     dummyMetaType?: Meta,
-): IGeneratedActionCreators<RequestActionType, SuccessActionType, ErrorActionType, ResponseDataType, Meta> {
+): {
+    request: (meta?: Meta) => IApiAction<RequestActionType, Meta>;
+    success: (
+        payload: IApiResponse<ResponseDataType>,
+        meta?: Meta,
+    ) => IApiSuccessAction<SuccessActionType, Meta, ResponseDataType>;
+    error: (error: IApiError, meta?: Meta) => IApiErrorAction<ErrorActionType, Meta>;
+} {
     return {
         request: (meta: Meta) => createApiRequestAction(requestType, meta),
         success: (response: IApiResponse<ResponseDataType>, meta: Meta) =>
@@ -78,27 +85,14 @@ export function generateApiActionCreators<
     };
 }
 
-interface IGeneratedActionCreators<
-    RequestActionType extends string,
-    SuccessActionType extends string,
-    ErrorActionType extends string,
-    ResponseDataType,
-    Meta = undefined
-> extends IActionCreatorsMapObject {
-    request: (meta?: Meta) => IApiAction<RequestActionType, Meta>;
-    success: (
-        payload: IApiResponse<ResponseDataType>,
-        meta?: Meta,
-    ) => IApiSuccessAction<SuccessActionType, Meta, ResponseDataType>;
-    error: (error: IApiError, meta?: Meta) => IApiErrorAction<ErrorActionType, Meta>;
-}
+type GeneratedActionCreators = ReturnType<typeof generateApiActionCreators>;
 
 // Thunk types
 type RequestType = "get" | "post" | "put" | "delete" | "patch";
 export function apiThunk(
     requestType: RequestType,
     endpoint: string,
-    actionCreators: IGeneratedActionCreators<any, any, any, any, any>,
+    actionCreators: GeneratedActionCreators,
     params: any,
 ) {
     return dispatch => {

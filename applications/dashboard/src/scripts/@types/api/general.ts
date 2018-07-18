@@ -45,11 +45,12 @@ export interface IFieldError {
     code: string; // translation code
     status: number; // HTTP status
     field: string;
-    timestamp: number;
 }
 
 export interface IApiError {
     message: string;
     status: number;
-    errors?: IFieldError[];
+    errors?: {
+        [key: string]: IFieldError[];
+    };
 }

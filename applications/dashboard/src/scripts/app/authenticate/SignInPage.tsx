@@ -14,7 +14,7 @@ import Or from "@dashboard/components/forms/Or";
 import PageLoading from "@dashboard/components/PageLoading";
 import { LoadStatus } from "@dashboard/@types/api";
 import { IStoreState, IAuthenticatorState } from "@dashboard/@types/state";
-import { getUserAuthenticators } from "@dashboard/state/session/authenticatorsActions";
+import { getUserAuthenticators } from "@dashboard/state/authenticate/authenticatorsActions";
 
 interface IProps {
     authenticatorState: IAuthenticatorState;
@@ -76,9 +76,9 @@ export class SignInPage extends React.Component<IProps, IRequiredComponentID> {
     }
 }
 
-function mapStateToProps({ session }: IStoreState) {
+function mapStateToProps({ authenticate }: IStoreState) {
     return {
-        authenticatorState: session.authenticators,
+        authenticatorState: authenticate.authenticators,
     };
 }
 

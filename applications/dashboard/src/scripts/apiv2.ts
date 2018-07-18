@@ -6,10 +6,22 @@
  */
 
 import { formatUrl } from "@dashboard/application";
-import { isFileImage } from "@dashboard/utility";
-import axios from "axios";
+import { isFileImage, indexArrayByKey } from "@dashboard/utility";
+import axios, { AxiosResponse } from "axios";
 import qs from "qs";
 import { IEmbedData } from "@dashboard/embeds";
+
+function fieldErrorTransformer(responseData) {
+    console.log("Response before", responseData, responseData.errors);
+    if (responseData.status >= 400 && responseData.errors && responseData.errors.length > 0) {
+        console.log("Transfroming");
+        responseData.errors = indexArrayByKey(responseData.errors, "field");
+    }
+
+    console.log("Response after", responseData);
+
+    return responseData;
+}
 
 const api = axios.create({
     baseURL: formatUrl("/api/v2/"),
@@ -18,6 +30,7 @@ const api = axios.create({
             "X-Requested-With": "vanilla",
         },
     },
+    transformResponse: [...axios.defaults.transformResponse, fieldErrorTransformer],
     paramsSerializer: params => qs.stringify(params, { indices: false }),
 });
 

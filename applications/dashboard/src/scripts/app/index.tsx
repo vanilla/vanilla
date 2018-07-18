@@ -28,17 +28,16 @@ import "@dashboard/app/user-content/embeds/getty";
 import "@dashboard/app/user-content/embeds/giphy";
 import "@dashboard/app/user-content/embeds/codepen";
 import { registerReducer } from "@dashboard/state/reducerRegistry";
-import sessionReducer from "@dashboard/state/session/sessionReducer";
+import authenticateReducer from "@dashboard/state/authenticate/authenticateReducer";
+
+registerReducer("authenticate", authenticateReducer);
+addComponent("App", Router);
+addRoutes([
+    <Route exact path="/authenticate/signin" component={SignInPage} />,
+    <Route exact path="/authenticate/password" component={PasswordPage} />,
+    <Route exact path="/authenticate/recoverpassword" component={RecoverPasswordPage} />,
+]);
 
 onReady(() => {
-    registerReducer("session", sessionReducer);
-    addComponent("App", Router);
-
-    addRoutes([
-        <Route exact path="/authenticate/signin" component={SignInPage} />,
-        <Route exact path="/authenticate/password" component={PasswordPage} />,
-        <Route exact path="/authenticate/recoverpassword" component={RecoverPasswordPage} />,
-    ]);
-
     stickyHeader();
 });

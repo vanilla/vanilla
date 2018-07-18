@@ -7,7 +7,7 @@ import { createStore, compose, applyMiddleware, combineReducers, Store } from "r
 import { getReducers } from "./reducerRegistry";
 import thunk from "redux-thunk";
 import IState from "@dashboard/state/IState";
-import {log} from "@dashboard/utility";
+import { log } from "@dashboard/utility";
 
 // There may be an initial state to import.
 const initialState = {};

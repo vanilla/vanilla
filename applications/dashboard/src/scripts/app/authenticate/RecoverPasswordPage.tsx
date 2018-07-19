@@ -75,7 +75,7 @@ export class RecoverPasswordPage extends React.Component<IProps, IState> {
                             isError={true}
                         />
                         <InputTextBlock
-                            label={t("Email/Username")}
+                            label={t("Email")}
                             required={true}
                             disabled={!this.allowEdit}
                             errors={getFieldErrors(this.props.requestPasswordState, "email")}

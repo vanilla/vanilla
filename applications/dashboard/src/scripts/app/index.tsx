@@ -29,8 +29,10 @@ import "@dashboard/app/user-content/embeds/giphy";
 import "@dashboard/app/user-content/embeds/codepen";
 import { registerReducer } from "@dashboard/state/reducerRegistry";
 import authenticateReducer from "@dashboard/state/authenticate/authenticateReducer";
+import usersReducer from "@dashboard/state/users/usersReducer";
 
 registerReducer("authenticate", authenticateReducer);
+registerReducer("users", usersReducer);
 addComponent("App", Router);
 addRoutes([
     <Route exact path="/authenticate/signin" component={SignInPage} />,

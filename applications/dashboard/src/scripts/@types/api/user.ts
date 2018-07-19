@@ -32,3 +32,7 @@ export interface IUser extends IUserFragment {
         userTitle: string;
     };
 }
+
+export interface IRequestPasswordOptions {
+    email: string;
+}

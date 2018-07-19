@@ -5,11 +5,12 @@
  * @license https://opensource.org/licenses/GPL-2.0 GPL-2.0
  */
 
-import { formatUrl } from "@dashboard/application";
+import { formatUrl, t } from "@dashboard/application";
 import { isFileImage, indexArrayByKey } from "@dashboard/utility";
-import axios, { AxiosResponse } from "axios";
+import axios from "axios";
 import qs from "qs";
 import { IEmbedData } from "@dashboard/embeds";
+import { IFieldError, LoadStatus, ILoadable } from "@dashboard/@types/api";
 
 function fieldErrorTransformer(responseData) {
     if (responseData.status >= 400 && responseData.errors && responseData.errors.length > 0) {
@@ -53,4 +54,40 @@ export async function uploadImage(image: File): Promise<IEmbedData> {
     const result = await api.post("/media", data);
     result.data.type = "image";
     return result.data;
+}
+
+/**
+ * Extract a field specific error from an ILoadable if applicable.
+ *
+ * @param loadable - The loadable to extract from.
+ * @param field - The field to extract.
+ *
+ * @returns an array of IFieldErrors if found or undefined.
+ */
+export function getFieldErrors(loadable: ILoadable<any>, field: string): IFieldError[] | undefined {
+    if (loadable.status === LoadStatus.ERROR && loadable.error.errors && loadable.error.errors[field]) {
+        return loadable.error.errors[field];
+    }
+}
+
+/**
+ * Extract a global error message out of an ILoadable if applicable.
+ *
+ * @param loadable - The loadable to extract from.
+ * @param validFields - Field to check for overriding fields errors from. A global error only shows if there are no valid field errors.
+ *
+ * @returns A global error message or an undefined.
+ */
+export function getGlobalErrorMessage(loadable: ILoadable<any>, validFields: string[]): string | undefined {
+    if (loadable.status !== LoadStatus.ERROR) {
+        return;
+    }
+
+    for (const field of validFields) {
+        if (getFieldErrors(loadable, field)) {
+            return;
+        }
+    }
+
+    return loadable.error.message || t("An error has occurred, please try again.");
 }

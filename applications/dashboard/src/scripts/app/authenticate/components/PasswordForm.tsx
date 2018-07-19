@@ -3,20 +3,18 @@
  * @license https://opensource.org/licenses/GPL-2.0 GPL-2.0
  */
 
-import apiv2 from "@dashboard/apiv2";
-import { formatUrl, t } from "@dashboard/application";
+import { getFieldErrors, getGlobalErrorMessage } from "@dashboard/apiv2";
+import { t } from "@dashboard/application";
 import React from "react";
 import { withRouter, Link } from "react-router-dom";
-import { logError } from "@dashboard/utility";
 import InputTextBlock from "@dashboard/components/forms/InputTextBlock";
 import Checkbox from "@dashboard/components/forms/Checkbox";
-import get from "lodash/get";
 import ButtonSubmit from "@dashboard/components/forms/ButtonSubmit";
 import Paragraph from "@dashboard/components/forms/Paragraph";
 import { IRequiredComponentID, getRequiredID } from "@dashboard/componentIDs";
 import { IStoreState, IPasswordState } from "@dashboard/@types/state";
 import { postAuthenticatePassword } from "@dashboard/state/authenticate/passwordActions";
-import { IAuthenticatePasswordParams, LoadStatus, IFieldError } from "@dashboard/@types/api";
+import { IAuthenticatePasswordParams, LoadStatus } from "@dashboard/@types/api";
 import { connect } from "react-redux";
 
 interface IProps {
@@ -27,7 +25,6 @@ interface IProps {
 }
 
 interface IState extends IRequiredComponentID {
-    allowSubmit: boolean;
     rememberMe: boolean;
 }
 
@@ -40,14 +37,14 @@ class PasswordForm extends React.Component<IProps, IState> {
 
         this.state = {
             id: getRequiredID(props, "passwordForm"),
-            allowSubmit: false,
             rememberMe: true,
         };
     }
 
     public render() {
         let formDescribedBy;
-        if (this.globalErrorMessage) {
+        const globalErrorMessage = getGlobalErrorMessage(this.props.passwordState, ["username", "password"]);
+        if (globalErrorMessage) {
             formDescribedBy = this.formDescriptionID;
         }
 
@@ -63,14 +60,14 @@ class PasswordForm extends React.Component<IProps, IState> {
                 <Paragraph
                     id={this.formDescriptionID}
                     className="authenticateUser-paragraph"
-                    content={this.globalErrorMessage}
+                    content={globalErrorMessage}
                     isError={true}
                 />
                 <InputTextBlock
                     label={t("Email/Username")}
                     required={true}
                     disabled={!this.allowEdit}
-                    errors={this.getFieldErrors("username")}
+                    errors={getFieldErrors(this.props.passwordState, "username")}
                     defaultValue={this.props.username}
                     ref={this.usernameInput}
                 />
@@ -78,7 +75,7 @@ class PasswordForm extends React.Component<IProps, IState> {
                     label={t("Password")}
                     required={true}
                     disabled={!this.allowEdit}
-                    errors={this.getFieldErrors("password")}
+                    errors={getFieldErrors(this.props.passwordState, "password")}
                     defaultValue={this.props.password}
                     type="password"
                     ref={this.passwordInput}
@@ -103,23 +100,12 @@ class PasswordForm extends React.Component<IProps, IState> {
     }
 
     public componentDidUpdate(prevProps: IProps) {
-        if (this.getFieldErrors("username")) {
+        if (getFieldErrors(this.props.passwordState, "username")) {
             this.usernameInput.current!.select();
-        } else if (this.getFieldErrors("password")) {
+        } else if (getFieldErrors(this.props.passwordState, "password")) {
             this.passwordInput.current!.select();
         } else {
             this.usernameInput.current!.select();
-        }
-    }
-
-    private getFieldErrors(field: string): IFieldError[] | undefined {
-        const { passwordState } = this.props;
-        if (
-            passwordState.status === LoadStatus.ERROR &&
-            passwordState.error.errors &&
-            passwordState.error.errors[field]
-        ) {
-            return passwordState.error.errors[field];
         }
     }
 
@@ -127,52 +113,9 @@ class PasswordForm extends React.Component<IProps, IState> {
         return this.props.passwordState.status !== LoadStatus.LOADING;
     }
 
-    /**
-     * The global error message only should show if there are no field specific error messages.
-     */
-    private get globalErrorMessage(): string {
-        const { passwordState } = this.props;
-        if (passwordState.status !== LoadStatus.ERROR) {
-            return "";
-        }
-
-        const fields = ["username", "password"];
-        for (const field of fields) {
-            if (this.getFieldErrors(field)) {
-                return "";
-            }
-        }
-
-        return passwordState.error.message || t("An error has occurred, please try again.");
-    }
-
     private handleCheckBoxChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         this.setState({ rememberMe: event.target.checked || false });
     };
-
-    // public setErrors(globalError, passwordErrors: string[], usernameErrors: string[]) {
-    //     this.setState(
-    //         {
-    //             allowEdit: true,
-    //             passwordErrors,
-    //             usernameErrors,
-    //             globalError,
-    //         },
-    //         () => {
-    //             const hasGlobalError = !!this.state.globalError;
-    //             const hasPasswordError = this.state.passwordErrors.length > 0;
-    //             const hasUsernameError = this.state.usernameErrors.length > 0;
-
-    //             if (hasGlobalError && !hasPasswordError && !hasUsernameError) {
-    //                 this.usernameInput.select();
-    //             } else if (hasUsernameError) {
-    //                 this.usernameInput.select();
-    //             } else if (hasPasswordError) {
-    //                 this.passwordInput.select();
-    //             }
-    //         },
-    //     );
-    // }
 
     private handleSubmit = event => {
         event.preventDefault();

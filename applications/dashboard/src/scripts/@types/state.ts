@@ -16,6 +16,13 @@ export interface IAuthenticateState {
     password: ILoadable<IUserFragment>;
 }
 
+export type IRequestPasswordState = ILoadable<{}>;
+
+export interface IUsersState {
+    requestPassword: IRequestPasswordState;
+}
+
 export interface IStoreState {
     authenticate: IAuthenticateState;
+    users: IUsersState;
 }

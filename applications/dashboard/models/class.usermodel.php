@@ -4530,7 +4530,7 @@ class UserModel extends Gdn_Model {
         $this->fireEvent('BeforePasswordRequest');
 
         if (count($users) == 0) {
-            $this->Validation->addValidationResult('', "Couldn't find an account associated with that email/username.");
+            $this->Validation->addValidationResult('email', "Couldn't find an account associated with that email/username.");
             if ($log) {
                 Logger::event(
                     'password_reset_failure',

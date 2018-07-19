@@ -65,8 +65,10 @@ export async function uploadImage(image: File): Promise<IEmbedData> {
  * @returns an array of IFieldErrors if found or undefined.
  */
 export function getFieldErrors(loadable: ILoadable<any>, field: string): IFieldError[] | undefined {
-    if (loadable.status === LoadStatus.ERROR && loadable.error.errors && loadable.error.errors[field]) {
-        return loadable.error.errors[field];
+    if (loadable.status === LoadStatus.ERROR || loadable.status === LoadStatus.LOADING) {
+        if (loadable.error && loadable.error.errors && loadable.error.errors[field]) {
+            return loadable.error.errors[field];
+        }
     }
 }
 
@@ -79,15 +81,15 @@ export function getFieldErrors(loadable: ILoadable<any>, field: string): IFieldE
  * @returns A global error message or an undefined.
  */
 export function getGlobalErrorMessage(loadable: ILoadable<any>, validFields: string[]): string | undefined {
-    if (loadable.status !== LoadStatus.ERROR) {
-        return;
-    }
+    if (loadable.status === LoadStatus.ERROR || loadable.status === LoadStatus.LOADING) {
+        for (const field of validFields) {
+            if (getFieldErrors(loadable, field)) {
+                return;
+            }
+        }
 
-    for (const field of validFields) {
-        if (getFieldErrors(loadable, field)) {
-            return;
+        if (loadable.error) {
+            return loadable.error.message || t("An error has occurred, please try again.");
         }
     }
-
-    return loadable.error.message || t("An error has occurred, please try again.");
 }

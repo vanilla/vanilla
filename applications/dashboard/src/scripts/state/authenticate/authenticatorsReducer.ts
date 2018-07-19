@@ -18,6 +18,7 @@ export default function authenticatorsReducer(
     switch (action.type) {
         case actions.GET_USER_AUTHENTICATORS_REQUEST:
             return {
+                ...state,
                 status: LoadStatus.LOADING,
             };
         case actions.GET_USER_AUTHENTICATORS_SUCCESS:

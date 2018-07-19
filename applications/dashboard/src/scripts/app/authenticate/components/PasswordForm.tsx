@@ -28,6 +28,9 @@ interface IState extends IRequiredComponentID {
     rememberMe: boolean;
 }
 
+/**
+ * Username + password from for signins.
+ */
 class PasswordForm extends React.Component<IProps, IState> {
     private usernameInput: React.RefObject<InputTextBlock> = React.createRef();
     private passwordInput: React.RefObject<InputTextBlock> = React.createRef();
@@ -99,7 +102,14 @@ class PasswordForm extends React.Component<IProps, IState> {
         );
     }
 
+    /**
+     * Whenever the component gets new form state, we check for errors and focus the relavent errored inputs.
+     */
     public componentDidUpdate(prevProps: IProps) {
+        if (this.props.passwordState === prevProps.passwordState) {
+            return;
+        }
+
         if (getFieldErrors(this.props.passwordState, "username")) {
             this.usernameInput.current!.select();
         } else if (getFieldErrors(this.props.passwordState, "password")) {

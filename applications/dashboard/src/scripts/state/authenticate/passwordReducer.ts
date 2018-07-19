@@ -18,6 +18,7 @@ export default function passwordReducer(
     switch (action.type) {
         case actions.POST_AUTHENTICATE_PASSWORD_REQUEST:
             return {
+                ...state,
                 status: LoadStatus.LOADING,
             };
         case actions.POST_AUTHENTICATE_PASSWORD_SUCCESS:

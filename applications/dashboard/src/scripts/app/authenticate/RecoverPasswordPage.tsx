@@ -94,23 +94,38 @@ export class RecoverPasswordPage extends React.Component<IProps, IState> {
         }
     }
 
+    /**
+     * Whenever the component gets new form state, we check for errors and focus the relavent errored inputs.
+     */
     public componentDidUpdate(prevProps: IProps) {
+        if (this.props.requestPasswordState === prevProps.requestPasswordState) {
+            return;
+        }
         if (this.props.requestPasswordState.status === LoadStatus.ERROR) {
             this.emainInput.current!.select();
         }
     }
 
+    /**
+     * Change handler for the email input.
+     */
     private handleEmailChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         const value = event.target.value;
         this.setState({ email: value });
     };
 
+    /**
+     * Submit handler for the form.
+     */
     private handleSubmit = event => {
         event.preventDefault();
         const { email } = this.state;
         this.props.postRequestPassword({ email });
     };
 
+    /**
+     * Whether or not the user can edit elements in the form.
+     */
     private get allowEdit() {
         return this.props.requestPasswordState.status !== LoadStatus.LOADING;
     }

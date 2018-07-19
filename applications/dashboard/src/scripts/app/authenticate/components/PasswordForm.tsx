@@ -119,14 +119,23 @@ class PasswordForm extends React.Component<IProps, IState> {
         }
     }
 
+    /**
+     * Whether or not inputs in the form can be edited.
+     */
     private get allowEdit() {
         return this.props.passwordState.status !== LoadStatus.LOADING;
     }
 
+    /**
+     * Handler for the remember me checkbox.
+     */
     private handleCheckBoxChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         this.setState({ rememberMe: event.target.checked || false });
     };
 
+    /**
+     * Submit handler for the form.
+     */
     private handleSubmit = event => {
         event.preventDefault();
         if (!this.usernameInput.current || !this.passwordInput.current) {
@@ -140,6 +149,9 @@ class PasswordForm extends React.Component<IProps, IState> {
         });
     };
 
+    /**
+     * Get the description ID for the form.
+     */
     private get formDescriptionID() {
         return this.state.id + "-description";
     }

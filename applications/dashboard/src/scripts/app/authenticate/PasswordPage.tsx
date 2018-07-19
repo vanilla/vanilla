@@ -9,31 +9,11 @@ import DocumentTitle from "@dashboard/components/DocumentTitle";
 import PasswordForm from "./components/PasswordForm";
 import { uniqueIDFromPrefix } from "@dashboard/componentIDs";
 
-interface IState {
-    loginFormActive: boolean;
-    errors?: string[];
-    redirectTo?: string;
-    passwordAuthenticator?: any;
-    genericError?: string;
-    id: string;
-}
-
-export default class SignInPage extends React.Component<{}, IState> {
-    public static defaultProps = {
-        id: false,
-    };
-
-    constructor(props) {
-        super(props);
-        this.state = {
-            id: uniqueIDFromPrefix("PasswordPage"),
-            loginFormActive: false,
-            errors: [],
-        };
-    }
+export default class SignInPage extends React.Component {
+    private id = uniqueIDFromPrefix("PasswordPage");
 
     get titleID(): string {
-        return this.state.id + "-pageTitle";
+        return this.id + "-pageTitle";
     }
 
     public render() {

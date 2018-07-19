@@ -84,18 +84,12 @@ class AuthenticateController extends Gdn_Controller {
         $this->Head = new HeadModule($this);
 
         $this->addJsFile('jquery.js');
-        $this->addJsFile('jquery.form.js');
         $this->addJsFile('jquery.popup.js');
         $this->addJsFile('jquery.popin.js');
-        $this->addJsFile('jquery.gardenhandleajaxform.js');
-        $this->addJsFile('jquery.atwho.js');
         $this->addJsFile('global.js');
-
-        $this->addJsFile('authenticate.js');
 
         $this->addCssFile('style.css');
         $this->addCssFile('vanillicon.css', 'static');
-        $this->addCssFile('authenticate.css');
 
         parent::initialize();
     }

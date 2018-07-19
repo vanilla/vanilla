@@ -23,7 +23,7 @@ interface IState {
 
 interface IProps {
     requestPasswordState: IRequestPasswordState;
-    requestPassword: typeof postRequestPassword;
+    postRequestPassword: typeof postRequestPassword;
 }
 
 export class RecoverPasswordPage extends React.Component<IProps, IState> {
@@ -94,6 +94,12 @@ export class RecoverPasswordPage extends React.Component<IProps, IState> {
         }
     }
 
+    public componentDidUpdate(prevProps: IProps) {
+        if (this.props.requestPasswordState.status === LoadStatus.ERROR) {
+            this.emainInput.current!.select();
+        }
+    }
+
     private handleEmailChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         const value = event.target.value;
         this.setState({ email: value });
@@ -102,7 +108,7 @@ export class RecoverPasswordPage extends React.Component<IProps, IState> {
     private handleSubmit = event => {
         event.preventDefault();
         const { email } = this.state;
-        this.props.requestPassword({ email });
+        this.props.postRequestPassword({ email });
     };
 
     private get allowEdit() {
@@ -118,7 +124,7 @@ function mapStateToProps({ users }: IStoreState) {
 
 function mapDispatchToProps(dispatch) {
     return {
-        requestPassword: (params: IRequestPasswordOptions) => {
+        postRequestPassword: (params: IRequestPasswordOptions) => {
             dispatch(postRequestPassword(params));
         },
     };
@@ -128,4 +134,5 @@ const withRedux = connect(
     mapStateToProps,
     mapDispatchToProps,
 );
+
 export default withRedux(RecoverPasswordPage);

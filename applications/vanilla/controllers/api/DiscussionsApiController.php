@@ -17,6 +17,9 @@ use Vanilla\ApiUtils;
  */
 class DiscussionsApiController extends AbstractApiController {
 
+    /** @var CategoryModel */
+    private $categoryModel;
+
     /** @var DiscussionModel */
     private $discussionModel;
 
@@ -37,11 +40,14 @@ class DiscussionsApiController extends AbstractApiController {
      *
      * @param DiscussionModel $discussionModel
      * @param UserModel $userModel
+     * @param CategoryModel $categoryModel
      */
     public function __construct(
         DiscussionModel $discussionModel,
-        UserModel $userModel
+        UserModel $userModel,
+        CategoryModel $categoryModel
     ) {
+        $this->categoryModel = $categoryModel;
         $this->discussionModel = $discussionModel;
         $this->userModel = $userModel;
     }
@@ -184,6 +190,7 @@ class DiscussionsApiController extends AbstractApiController {
             'name:s' => 'The title of the discussion.',
             'body:s' => 'The body of the discussion.',
             'categoryID:i' => 'The category the discussion is in.',
+            'category?' => $this->getCategoryFragmentSchema(),
             'dateInserted:dt' => 'When the discussion was created.',
             'dateUpdated:dt|n' => 'When the discussion was last updated.',
             'insertUserID:i' => 'The user that created the discussion.',
@@ -283,6 +290,11 @@ class DiscussionsApiController extends AbstractApiController {
             }
 
             $dbRecord['lastPost'] = $lastPost;
+        }
+
+        // The Category key will hold a category fragment in API responses. Ditch the default string.
+        if (array_key_exists('Category', $dbRecord) && !is_array($dbRecord['Category'])) {
+            unset($dbRecord['Category']);
         }
 
         $schemaRecord = ApiUtils::convertOutputKeys($dbRecord);
@@ -411,7 +423,7 @@ class DiscussionsApiController extends AbstractApiController {
                     'field' => 'd.InsertUserID',
                 ],
             ],
-            'expand?' => ApiUtils::getExpandDefinition(['insertUser', 'lastUser', 'lastPost'])
+            'expand?' => ApiUtils::getExpandDefinition(['category', 'insertUser', 'lastUser', 'lastPost'])
         ], ['DiscussionIndex', 'in'])->setDescription('List discussions.');
         $out = $this->schema([':a' => $this->discussionSchema()], 'out');
 
@@ -456,6 +468,9 @@ class DiscussionsApiController extends AbstractApiController {
             $this->resolveExpandFields($query, ['insertUser' => 'InsertUserID', 'lastUser' => 'LastUserID']),
             ['expand' => $query['expand']]
         );
+        if ($this->isExpandField('category', $query['expand'])) {
+            $this->categoryModel->expandCategories($rows);
+        }
 
         foreach ($rows as &$currentRow) {
             $currentRow = $this->normalizeOutput($currentRow, $query['expand']);

@@ -110,7 +110,7 @@ export class RecoverPasswordPage extends React.Component<IProps, IState> {
      * Change handler for the email input.
      */
     private handleEmailChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-        const value = event.target.value;
+        const { value } = event.target;
         this.setState({ email: value });
     };
 

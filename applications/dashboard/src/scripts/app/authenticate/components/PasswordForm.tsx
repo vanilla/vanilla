@@ -26,6 +26,9 @@ interface IProps {
 
 interface IState extends IRequiredComponentID {
     rememberMe: boolean;
+    username: string;
+    password: string;
+    id: string;
 }
 
 /**
@@ -41,6 +44,8 @@ class PasswordForm extends React.Component<IProps, IState> {
         this.state = {
             id: getRequiredID(props, "passwordForm"),
             rememberMe: true,
+            username: "",
+            password: "",
         };
     }
 
@@ -73,6 +78,8 @@ class PasswordForm extends React.Component<IProps, IState> {
                     errors={getFieldErrors(this.props.passwordState, "username")}
                     defaultValue={this.props.username}
                     ref={this.usernameInput}
+                    onChange={this.handleUsernameChange}
+                    value={this.state.username}
                 />
                 <InputTextBlock
                     label={t("Password")}
@@ -82,6 +89,8 @@ class PasswordForm extends React.Component<IProps, IState> {
                     defaultValue={this.props.password}
                     type="password"
                     ref={this.passwordInput}
+                    onChange={this.handlePasswordChange}
+                    value={this.state.password}
                 />
                 <div className="inputBlock inputBlock-tighter">
                     <div className="rememberMeAndForgot">
@@ -97,7 +106,7 @@ class PasswordForm extends React.Component<IProps, IState> {
                         </span>
                     </div>
                 </div>
-                <ButtonSubmit disabled={!this.allowEdit} content={t("Sign In")} />
+                <ButtonSubmit disabled={!this.allowSubmit} content={t("Sign In")} />
             </form>
         );
     }
@@ -126,6 +135,11 @@ class PasswordForm extends React.Component<IProps, IState> {
         return this.props.passwordState.status !== LoadStatus.LOADING;
     }
 
+    private get allowSubmit() {
+        const { username, password } = this.state;
+        return username.length > 0 && password.length > 0;
+    }
+
     /**
      * Handler for the remember me checkbox.
      */
@@ -134,18 +148,32 @@ class PasswordForm extends React.Component<IProps, IState> {
     };
 
     /**
+     * Change handler for the email input.
+     */
+    private handleUsernameChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+        const { value } = event.target;
+        this.setState({ username: value });
+    };
+
+    /**
+     * Change handler for the email input.
+     */
+    private handlePasswordChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+        const { value } = event.target;
+        this.setState({ password: value });
+    };
+
+    /**
      * Submit handler for the form.
      */
-    private handleSubmit = event => {
+    private handleSubmit = (event: React.SyntheticEvent<any>) => {
         event.preventDefault();
-        if (!this.usernameInput.current || !this.passwordInput.current) {
-            return;
-        }
+        const { username, password, rememberMe } = this.state;
 
         this.props.authenticate({
-            username: this.usernameInput.current.value,
-            password: this.passwordInput.current.value,
-            persist: this.state.rememberMe,
+            username,
+            password,
+            persist: rememberMe,
         });
     };
 

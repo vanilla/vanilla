@@ -13,11 +13,12 @@ import { IFieldError } from "@dashboard/@types/api";
 export interface IInputTextProps extends IOptionalComponentID {
     className?: string;
     label: string;
+    value: string;
+    onChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
     labelNote?: string;
     inputClassNames?: string;
     type?: string;
     labelID?: string;
-    value?: string;
     defaultValue?: string;
     placeholder?: string;
     valid?: boolean;
@@ -25,7 +26,6 @@ export interface IInputTextProps extends IOptionalComponentID {
     required?: boolean;
     errors?: IFieldError[];
     disabled?: boolean;
-    onChange?: React.ChangeEventHandler<any>;
 }
 
 interface IState {
@@ -39,7 +39,7 @@ export default class InputTextBlock extends React.Component<IInputTextProps, ISt
         errors: [],
     };
 
-    private inputDom: HTMLInputElement;
+    private inputRef: React.RefObject<HTMLInputElement> = React.createRef();
 
     public constructor(props) {
         super(props);
@@ -50,9 +50,7 @@ export default class InputTextBlock extends React.Component<IInputTextProps, ISt
 
     public render() {
         const componentClasses = classNames("inputBlock", this.props.className);
-
         const inputClasses = classNames("inputBlock-inputText", "InputBox", "inputText", this.props.inputClassNames);
-
         const hasErrors = !!this.props.errors && this.props.errors.length > 0;
 
         let describedBy;
@@ -80,8 +78,8 @@ export default class InputTextBlock extends React.Component<IInputTextProps, ISt
                         aria-invalid={hasErrors}
                         aria-describedby={describedBy}
                         aria-labelledby={this.labelID}
-                        onChange={this.props.onChange}
-                        ref={inputDom => (this.inputDom = inputDom as HTMLInputElement)}
+                        onChange={this.onChange}
+                        ref={this.inputRef}
                     />
                 </span>
                 <ErrorMessages id={this.errorID} errors={this.props.errors} />
@@ -89,25 +87,45 @@ export default class InputTextBlock extends React.Component<IInputTextProps, ISt
         );
     }
 
+    /**
+     * Use a native change event instead of React's because of https://github.com/facebook/react/issues/1159
+     */
+    public componentDidMount() {
+        this.inputRef.current!.addEventListener("change", this.onChange);
+    }
+
+    /**
+     * Use a native change event instead of React's because of https://github.com/facebook/react/issues/1159
+     */
+    public componentWillUnount() {
+        this.inputRef.current!.removeEventListener("change", this.onChange);
+    }
+
     public get value(): any {
-        return this.inputDom ? this.inputDom.value : "";
+        return this.inputRef.current ? this.inputRef.current.value : "";
     }
 
     public set value(value) {
-        if (this.inputDom) {
-            this.inputDom.value = value;
+        if (this.inputRef.current) {
+            this.inputRef.current.value = value;
         } else {
             throw new Error("inputDom does not exist");
         }
     }
 
     public focus() {
-        this.inputDom.focus();
+        this.inputRef.current!.focus();
     }
 
     public select() {
-        this.inputDom.select();
+        this.inputRef.current!.select();
     }
+
+    private onChange = event => {
+        if (this.props.onChange) {
+            this.props.onChange(event);
+        }
+    };
 
     private get labelID(): string {
         return this.state.id + "-label";

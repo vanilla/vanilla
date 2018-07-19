@@ -7,7 +7,6 @@
 
 namespace VanillaTests\APIv2;
 
-
 abstract class AbstractResourceTest extends AbstractAPIv2Test {
 
     /**
@@ -243,9 +242,8 @@ abstract class AbstractResourceTest extends AbstractAPIv2Test {
     public function testDelete() {
         $row = $this->testPost();
 
-        $r = $this->api()->delete(
-            "{$this->baseUrl}/{$row[$this->pk]}"
-        );
+        // GardenHTTP does not allow a call to its delete method with a body. This long form is required for delete requests with a body.
+        $r = $this->api()->request(\Garden\Http\HttpRequest::METHOD_DELETE, "{$this->baseUrl}/{$row[$this->pk]}", []);
 
         $this->assertEquals(204, $r->getStatusCode());
 

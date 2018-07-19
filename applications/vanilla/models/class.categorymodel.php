@@ -830,6 +830,39 @@ class CategoryModel extends Gdn_Model {
     }
 
     /**
+     * Add multi-dimensional category data to an array.
+     *
+     * @param array $rows Results we need to associate category data with.
+     */
+    public function expandCategories(array &$rows) {
+        if (count($rows) === 0) {
+            // Nothing to do here.
+            return;
+        }
+
+        reset($rows);
+        $single = is_string(key($rows));
+
+        $populate = function(array &$row) {
+            if (array_key_exists('CategoryID', $row)) {
+                $category = self::categories($row['CategoryID']);
+                if ($category) {
+                    setValue('Category', $row, $category);
+                }
+            }
+        };
+
+        // Inject those categories.
+        if ($single) {
+            $populate($rows);
+        } else {
+            foreach ($rows as &$row) {
+                $populate($row);
+            }
+        }
+    }
+
+    /**
      * Remove categories that a user does not have permission to view.
      *
      * @param array $categoryIDs An array of categories to filter.

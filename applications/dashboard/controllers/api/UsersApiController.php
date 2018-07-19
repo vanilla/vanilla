@@ -57,16 +57,26 @@ class UsersApiController extends AbstractApiController {
      * Delete a user.
      *
      * @param int $id The ID of the user.
+     * @param array $body The request body.
      * @throws NotFoundException if the user could not be found.
      */
-    public function delete($id) {
+    public function delete($id, array $body) {
         $this->permission('Garden.Users.Delete');
+        
+        $this->idParamSchema()->setDescription('Delete a user.');
 
-        $in = $this->idParamSchema()->setDescription('Delete a user.');
+        $in = $this->schema([
+            'deleteMethod:s?' => [
+                'description' => 'The deletion method / strategy.',
+                'enum' => ['keep', 'wipe', 'delete'],
+                'default' => 'delete',
+            ]
+        ], 'in');
         $out = $this->schema([], 'out');
+        $body = $in->validate($body);
 
         $this->userByID($id);
-        $this->userModel->deleteID($id);
+        $this->userModel->deleteID($id, ['DeleteMethod' => $body['deleteMethod']]);
     }
 
     /**
@@ -108,7 +118,10 @@ class UsersApiController extends AbstractApiController {
             'name:s' => 'Name of the user.',
             'password:s' => 'Password of the user.',
             'hashMethod:s' => 'Hash method for the password.',
-            'email:s' => 'Email address of the user.',
+            'email:s' => [
+                'Email address of the user.',
+                'minLength' => 0,
+            ],
             'photo:s|n' => [
                 'minLength' => 0,
                 'description' => 'Raw photo field value from the user record.'
@@ -503,8 +516,10 @@ class UsersApiController extends AbstractApiController {
 
         $userData = ApiUtils::convertInputKeys($body);
 
+        $email = c('Garden.Registration.NoEmail', false) ? 'email:s?' : 'email:s';
+
         $inputProperties = [
-            'email:s' => 'An email address for this user.',
+            $email => 'An email address for this user.',
             'name:s' => 'The username.',
             'password:s' => 'A password for this user.',
             'discoveryText:s?' => 'Why does the user wish to join? Only used when the registration is flagged as SPAM (response code: 202).'
@@ -767,10 +782,10 @@ class UsersApiController extends AbstractApiController {
      */
     public function userPostSchema() {
         static $schema;
-
+        $email = c('Garden.Registration.NoEmail', false) ? 'email:s?' : 'email:s';
         if ($schema === null) {
             $schema = $this->schema(Schema::parse([
-                'name', 'email', 'photo?', 'password',
+                'name', $email, 'photo?', 'password',
                 'emailConfirmed' => ['default' => true], 'bypassSpam' => ['default' => false],
                 'roleID?' => [
                     'type' => 'array',

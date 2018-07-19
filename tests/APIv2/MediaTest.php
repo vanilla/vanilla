@@ -9,7 +9,7 @@ namespace VanillaTests\APIv2;
 
 use Gdn_Upload;
 use Garden\Http\HttpResponse;
-use Vanilla\Embeds\EmbedManager;
+use Vanilla\Formatting\Embeds\EmbedManager;
 use Vanilla\UploadedFile;
 use VanillaTests\Fixtures\Uploader;
 

@@ -19,11 +19,15 @@ function smarty_block_container($params, $content, &$smarty, &$repeat) {
     if (!$repeat){
         $class = trim('_container '.trim(val('class', $params, '')));
         $selfPadded = val('selfPadded', $params, false);
+        $id = val('id', $params, false);
+        $idString = $id ? "id=\"$id\"" : "";
+
         if ($selfPadded) {
             $class .= " _hasPaddedContent";
         }
+
         return <<<EOT
-        <div class="$class">
+        <div $idString class="$class">
             $content
         </div>
 EOT;

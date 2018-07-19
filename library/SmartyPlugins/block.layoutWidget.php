@@ -20,7 +20,9 @@ function smarty_block_layoutWidget($params, $content, &$smarty, &$repeat) {
         $class = '_layoutWidget '.trim(val('class', $params, ''));
         return <<<EOT
         <div class="$class">
-            $content
+            <div class="_layoutWidget-widget">
+                $content
+            </div>
         </div>
 EOT;
     }

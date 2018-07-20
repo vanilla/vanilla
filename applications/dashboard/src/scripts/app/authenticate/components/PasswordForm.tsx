@@ -18,10 +18,9 @@ import { IAuthenticatePasswordParams, LoadStatus } from "@dashboard/@types/api";
 import { connect } from "react-redux";
 
 interface IProps {
-    password: string;
-    username: string;
     passwordState: IPasswordState;
     authenticate: typeof postAuthenticatePassword;
+    defaultUsername?: string;
 }
 
 interface IState extends IRequiredComponentID {
@@ -34,7 +33,7 @@ interface IState extends IRequiredComponentID {
 /**
  * Username + password from for signins.
  */
-class PasswordForm extends React.Component<IProps, IState> {
+export class PasswordForm extends React.Component<IProps, IState> {
     private usernameInput: React.RefObject<InputTextBlock> = React.createRef();
     private passwordInput: React.RefObject<InputTextBlock> = React.createRef();
 
@@ -76,7 +75,7 @@ class PasswordForm extends React.Component<IProps, IState> {
                     required={true}
                     disabled={!this.allowEdit}
                     errors={getFieldErrors(this.props.passwordState, "username")}
-                    defaultValue={this.props.username}
+                    defaultValue={this.props.defaultUsername || ""}
                     ref={this.usernameInput}
                     onChange={this.handleUsernameChange}
                     value={this.state.username}
@@ -86,7 +85,6 @@ class PasswordForm extends React.Component<IProps, IState> {
                     required={true}
                     disabled={!this.allowEdit}
                     errors={getFieldErrors(this.props.passwordState, "password")}
-                    defaultValue={this.props.password}
                     type="password"
                     ref={this.passwordInput}
                     onChange={this.handlePasswordChange}

@@ -13,7 +13,7 @@ export type IPasswordState = ILoadable<IUserFragment>;
 
 export interface IAuthenticateState {
     authenticators: IAuthenticatorState;
-    password: ILoadable<IUserFragment>;
+    password: IPasswordState;
 }
 
 export type IRequestPasswordState = ILoadable<{}>;

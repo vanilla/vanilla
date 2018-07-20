@@ -43,8 +43,8 @@ export interface IApiResponse<DataType = any> {
 export interface IFieldError {
     message: string; // translated message
     code: string; // translation code
-    status: number; // HTTP status
     field: string;
+    status?: number; // HTTP status
 }
 
 export interface IApiError {

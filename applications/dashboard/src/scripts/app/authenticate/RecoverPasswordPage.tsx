@@ -14,7 +14,10 @@ import RememberPasswordLink from "./components/RememberPasswordLink";
 import uniqueId from "lodash/uniqueId";
 import { IStoreState, IRequestPasswordState } from "@dashboard/@types/state";
 import { IRequestPasswordOptions, LoadStatus } from "@dashboard/@types/api";
-import { postRequestPassword } from "@dashboard/state/users/requestPasswordActions";
+import {
+    postRequestPassword,
+    afterRequestPasswordSuccessNavigate,
+} from "@dashboard/state/users/requestPasswordActions";
 import { connect } from "react-redux";
 
 interface IState {
@@ -24,6 +27,7 @@ interface IState {
 interface IProps {
     requestPasswordState: IRequestPasswordState;
     postRequestPassword: typeof postRequestPassword;
+    onNavigateAway: () => void;
 }
 
 export class RecoverPasswordPage extends React.Component<IProps, IState> {
@@ -57,7 +61,7 @@ export class RecoverPasswordPage extends React.Component<IProps, IState> {
                         content={t("A message has been sent to your email address with password reset instructions.")}
                         className="authenticateUser-paragraph"
                     />
-                    <RememberPasswordLink />
+                    <RememberPasswordLink onClick={this.props.onNavigateAway} />
                 </div>
             );
         } else {
@@ -141,6 +145,9 @@ function mapDispatchToProps(dispatch) {
     return {
         postRequestPassword: (params: IRequestPasswordOptions) => {
             dispatch(postRequestPassword(params));
+        },
+        onNavigateAway: () => {
+            dispatch(afterRequestPasswordSuccessNavigate());
         },
     };
 }

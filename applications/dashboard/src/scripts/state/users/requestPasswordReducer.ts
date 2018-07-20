@@ -33,6 +33,8 @@ export default function passwordReducer(
                 status: LoadStatus.ERROR,
                 error: action.payload,
             };
+        case actions.AFTER_REQUEST_PASSWORD_SUCCESS_NAVIGATE:
+            return initialState;
         default:
             return state;
     }

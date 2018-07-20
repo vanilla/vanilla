@@ -7,11 +7,18 @@ import { t } from "@dashboard/application";
 import React from "react";
 import { Link } from "react-router-dom";
 
-export default class RememberPasswordLink extends React.Component {
+interface IProps {
+    onClick?: () => void;
+}
+
+export default class RememberPasswordLink extends React.Component<IProps> {
     public render() {
         return (
             <p className="authenticateUser-paragraph isCentered">
-                {t("Remember your password?")} <Link to="/authenticate/signin">{t("Sign In")}</Link>
+                {t("Remember your password?")}{" "}
+                <Link onClick={this.props.onClick} to="/authenticate/signin">
+                    {t("Sign In")}
+                </Link>
             </p>
         );
     }

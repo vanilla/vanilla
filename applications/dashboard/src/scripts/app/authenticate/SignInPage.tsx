@@ -45,11 +45,8 @@ export class SignInPage extends React.Component<IProps, IRequiredComponentID> {
         const { authenticatorState } = this.props;
 
         if (authenticatorState.status !== LoadStatus.SUCCESS) {
-            return (
-                <div id={this.state.id} className="authenticateUserCol">
-                    <PageLoading {...authenticatorState} />
-                </div>
-            );
+            // TODO: Use a generic fallback component for the other states.
+            return null;
         }
 
         let showPassword = false;

@@ -19,10 +19,10 @@ import UploadButton from "@rich-editor/components/editor/pieces/EditorUploadButt
 import { EditorProvider } from "@rich-editor/components/context";
 import EditorDescriptions from "@rich-editor/components/editor/pieces/EditorDescriptions";
 import { Provider as ReduxProvider } from "react-redux";
-import IState from "@rich-editor/state/IState";
 import { actions } from "@rich-editor/state/instance/instanceActions";
 import { getIDForQuill, isEmbedSelected, SELECTION_UPDATE } from "@rich-editor/quill/utility";
 import { FOCUS_CLASS } from "@dashboard/embeds";
+import { IStoreState } from "@rich-editor/@types/store";
 
 interface IProps {
     editorID: string;
@@ -30,11 +30,10 @@ interface IProps {
     bodybox: HTMLInputElement;
 }
 
-const store = getStore<IState>();
-
 export default class Editor extends React.Component<IProps> {
     private hasUploadPermission: boolean;
     private quillMountRef: React.RefObject<HTMLDivElement> = React.createRef();
+    private store = getStore<IStoreState>();
     private allowPasteListener = true;
     private editorID: string;
     private quill: Quill;
@@ -57,7 +56,7 @@ export default class Editor extends React.Component<IProps> {
         // Setup syncing
         this.setupBodyBoxSync();
         this.setupDebugPasteListener();
-        store.dispatch(actions.createInstance(this.editorID));
+        this.store.dispatch(actions.createInstance(this.editorID));
         this.quill.on(Quill.events.EDITOR_CHANGE, this.onQuillUpdate);
 
         // Add a listener for a force selection update.
@@ -97,7 +96,7 @@ export default class Editor extends React.Component<IProps> {
         );
 
         return (
-            <ReduxProvider store={getStore()}>
+            <ReduxProvider store={this.store}>
                 <EditorProvider value={{ quill: this.quill, editorID: this.editorID }}>
                     <div
                         className="richEditor"
@@ -127,7 +126,7 @@ export default class Editor extends React.Component<IProps> {
     }
 
     private onQuillUpdate = () => {
-        store.dispatch(actions.setSelection(this.editorID, this.quill.getSelection()));
+        this.store.dispatch(actions.setSelection(this.editorID, this.quill.getSelection()));
     };
 
     /**

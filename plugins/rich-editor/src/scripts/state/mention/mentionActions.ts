@@ -7,8 +7,8 @@
 import { Dispatch } from "redux";
 import { ActionsUnion, createAction } from "@dashboard/state/utility";
 import api from "@dashboard/apiv2";
-import IState from "@rich-editor/state/IState";
 import { IMentionSuggestionData } from "@rich-editor/components/toolbars/pieces/MentionSuggestion";
+import { IStoreState } from "@rich-editor/@types/store";
 
 export const SET_ACTIVE_SUGGESTION = "[mentions] set active suggestion";
 export const LOAD_USERS_REQUEST = "[mentions] load users request";
@@ -47,7 +47,7 @@ export function filterSuggestions(users: IMentionSuggestionData[], searchName: s
  * Make an API request for mention suggestions. These results are cached by the lookup username.
  */
 function loadUsers(username: string) {
-    return (dispatch: Dispatch<any>, getState: () => IState) => {
+    return (dispatch: Dispatch<any>, getState: () => IStoreState) => {
         const { usersTrie } = getState().editor.mentions;
 
         // Attempt an exact lookup first.

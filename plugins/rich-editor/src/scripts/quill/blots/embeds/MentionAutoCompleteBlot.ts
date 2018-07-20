@@ -7,8 +7,7 @@
 import Quill from "quill/core";
 import Inline from "quill/blots/inline";
 import { t } from "@dashboard/application";
-import { IMentionSuggestionData } from "@rich-editor/components/toolbars/pieces/MentionSuggestion";
-import { IMentionUser } from "@dashboard/apiv2";
+import { IUserFragment } from "@dashboard/@types/api/user";
 
 /**
  * A Blot to represent text that is being matched for an autocomplete.
@@ -76,7 +75,7 @@ export default class MentionAutoCompleteBlot extends Inline {
      *
      * @param result The new MentionBlot
      */
-    public finalize(result: IMentionUser) {
+    public finalize(result: IUserFragment) {
         this.replaceWith("mention", result);
         this.quill && this.quill.update(Quill.sources.API);
     }

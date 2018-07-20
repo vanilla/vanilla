@@ -5,7 +5,7 @@
  * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
  */
 
-import IBaseState from "@dashboard/state/IState";
+import { IStoreState as IBaseStoreState } from "@dashboard/@types/state";
 import MentionTrie from "@rich-editor/state/mention/MentionTrie";
 import { RangeStatic } from "quill/core";
 
@@ -27,7 +27,7 @@ export interface IEditorInstanceState {
     [key: string]: IEditorInstance;
 }
 
-export default interface IState extends IBaseState {
+export interface IStoreState extends IBaseStoreState {
     editor: {
         instances: IEditorInstanceState;
         mentions: IMentionState;

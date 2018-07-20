@@ -4,8 +4,8 @@
  * @license https://opensource.org/licenses/GPL-2.0 GPL-2.0
  */
 
-import { IEditorInstanceState, IEditorInstance } from "@rich-editor/state/IState";
 import * as instanceActions from "./instanceActions";
+import { IEditorInstanceState, IEditorInstance } from "@rich-editor/@types/store";
 
 const defaultSelection = {
     index: 0,

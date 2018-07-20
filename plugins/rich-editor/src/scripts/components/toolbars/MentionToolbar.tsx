@@ -14,7 +14,6 @@ import MentionSuggestionList from "./pieces/MentionSuggestionList";
 import { thunks as mentionThunks, actions as mentionActions } from "@rich-editor/state/mention/mentionActions";
 import MentionAutoCompleteBlot from "@rich-editor/quill/blots/embeds/MentionAutoCompleteBlot";
 import { getBlotAtIndex, getMentionRange } from "@rich-editor/quill/utility";
-import { Dispatch } from "redux";
 import { IMentionValue } from "@rich-editor/state/mention/MentionTrie";
 import { connect } from "react-redux";
 import { IMentionSuggestionData, IMentionProps } from "@rich-editor/components/toolbars/pieces/MentionSuggestion";
@@ -352,10 +351,10 @@ export class MentionToolbar extends React.Component<IProps, IMentionState> {
 }
 
 function mapDispatchToProps(dispatch) {
-    const mentionLookupFn = username => dispatch(mentionThunks.loadUsers(username));
+    const mentionLookupFn = (username: string) => dispatch(mentionThunks.loadUsers(username));
 
     return {
-        lookupMentions: debounce(mentionLookupFn, 50),
+        lookupMentions: debounce(mentionLookupFn, 50) as any,
         setActiveItem: (itemID: string, itemIndex: number) =>
             dispatch(mentionActions.setActiveSuggestion(itemID, itemIndex)),
     };

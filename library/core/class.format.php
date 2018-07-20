@@ -2452,22 +2452,13 @@ EOT;
         $operations = json_decode($deltas, true);
         $title = t("There was an error rendering this rich post");
 
-//        $warningIcon = <<<HTML
-//<svg class="embedLinkLoader-failIcon" title="{$title}" aria-label="{$title}" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16">
-//    <title>{$title}</title>
-//    <circle cx="8" cy="8" r="8" style="fill: #f5af15"/>
-//    <circle cx="8" cy="8" r="7.5" style="fill: none;stroke: #000;stroke-opacity: 0.122"/>
-//    <path d="M11,10.4V8h2v2.4L12.8,13H11.3Zm0,4h2v2H11Z" transform="translate(-4 -4)" style="fill: #fff"/>
-//</svg>
-//HTML;
-
         if (json_last_error() !== JSON_ERROR_NONE) {
             $link = "https://docs.vanillaforums.com/help/addons/rich-editor/#why-is-my-published-post-replaced-with-there-was-an-error-rendering-this-rich-post";
-            return "<p class='userContent-error'>".$title." <a href='$link' class='icon icon-warning-sign'></a></p>";
+            return "<p class='userContent-error'>".$title." <a href='$link' rel='nofollow' title='$title' class='icon icon-warning-sign'></a></p>";
         }
 
         $parser = Gdn::getContainer()->get(Vanilla\Formatting\Quill\Parser::class);
-        $renderer = Gdn::getContainer()->get(\Vanilla\Formatting\Quill\Renderer::class);
+        $renderer = Gdn::getContainer()->get(Vanilla\Formatting\Quill\Renderer::class);
 
         $blotGroups = $parser->parse($operations);
         return $renderer->render($blotGroups);

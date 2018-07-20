@@ -12,7 +12,7 @@
 /**
  * Class Gdn_Authenticator
  */
-abstract class Gdn_Authenticator extends Gdn_Pluggable {
+abstract class Gdn_Authenticator extends \Vanilla\Pluggable {
 
     const DATA_NONE = 'data none';
     const DATA_FORM = 'data form';
@@ -141,7 +141,7 @@ abstract class Gdn_Authenticator extends Gdn_Pluggable {
         // Figure out what the authenticator alias is
         $this->_AuthenticationSchemeAlias = $this->getAuthenticationSchemeAlias();
 
-        // Initialize gdn_pluggable
+        // Initialize the Pluggable
         parent::__construct();
     }
 

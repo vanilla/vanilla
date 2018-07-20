@@ -14,7 +14,7 @@
  * @package Core
  * @since 2.2
  */
-class RawEmailTemplate extends Gdn_Pluggable implements Gdn_IEmailTemplate {
+class RawEmailTemplate extends \Vanilla\Pluggable implements Gdn_IEmailTemplate {
 
     /**
      * Delimiter for plaintext email.

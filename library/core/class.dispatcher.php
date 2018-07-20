@@ -18,7 +18,7 @@ use Vanilla\AddonManager;
 /**
  * Handles all requests and routing.
  */
-class Gdn_Dispatcher extends Gdn_Pluggable {
+class Gdn_Dispatcher extends \Vanilla\Pluggable {
 
     /** Can never be blocked. */
     const BLOCK_NEVER = 0;

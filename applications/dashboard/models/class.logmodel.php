@@ -13,7 +13,7 @@ use Vanilla\PrunableTrait;
 /**
  * Handles additional logging.
  */
-class LogModel extends Gdn_Pluggable {
+class LogModel extends \Vanilla\Pluggable {
 
     use PrunableTrait;
 

@@ -1,6 +1,6 @@
 <?php
 /**
- * Gdn_Pluggable
+ * Pluggable
  *
  * @author Mark O'Sullivan <markm@vanillaforums.com>
  * @copyright 2009-2018 Vanilla Forums Inc.
@@ -8,6 +8,12 @@
  * @package Core
  * @since 2.0
  */
+
+namespace Vanilla;
+use Gdn;
+use ArgumentCountError;
+use Exception;
+use Logger;
 
 /**
  * Event Framework: Pluggable
@@ -19,7 +25,7 @@
  *
  * @abstract
  */
-abstract class Gdn_Pluggable {
+abstract class Pluggable {
 
     /**
      * @var string The name of the class that has been instantiated. Typically this will be
@@ -52,7 +58,7 @@ abstract class Gdn_Pluggable {
 
 
     /**
-     * @var enumerator An enumerator indicating what type of handler the method being called is.
+     * @var string An enumerator indicating what type of handler the method being called is.
      * Options are:
      *  HANDLER_TYPE_NORMAL: Standard call to a method on the object (DEFAULT).
      *  HANDLER_TYPE_OVERRIDE: Call to a method override.
@@ -80,11 +86,12 @@ abstract class Gdn_Pluggable {
     }
 
     /**
+     * Get the return values from a an event listener.
      *
+     * @param string $pluginName The plugin the handled the event.
+     * @param string $handlerName The name of the of the event handler.
      *
-     * @param string $pluginName
-     * @param string $handlerName
-     * @return
+     * @return mixed
      */
     public function getReturn($pluginName, $handlerName) {
         return $this->Returns[strtolower($handlerName)][strtolower($pluginName)];
@@ -94,6 +101,8 @@ abstract class Gdn_Pluggable {
      * Fire the next event off a custom parent class
      *
      * @param mixed $options Either the parent class, or an option array
+     * s
+     * @return $this For fluent method chaining.
      */
     public function fireAs($options) {
         if (!is_array($options)) {
@@ -114,11 +123,17 @@ abstract class Gdn_Pluggable {
      *  public function senderClassName_EventName_Handler($Sender) {}
      *
      * @param string $eventName The name of the event being fired.
+     * @param array $arguments An array of arguments for the event.
+     *
+     * @throws Exception when Pluggable::__construct has not been called.
+     * @throws ArgumentCountError When the incorrect number or arguments was passed to the event handler.
+     *
+     * @return bool Returns **true** if an event was executed.
      */
     public function fireEvent($eventName, $arguments = null) {
         if (!$this->ClassName) {
             $realClassName = get_class($this);
-            throw new Exception("Event fired from pluggable class '{$realClassName}', but Gdn_Pluggable::__construct() was never called.");
+            throw new Exception("Event fired from pluggable class '{$realClassName}', but Pluggable::__construct() was never called.");
         }
 
         $fireClass = !is_null($this->FireAs) ? $this->FireAs : $this->ClassName;
@@ -162,6 +177,9 @@ abstract class Gdn_Pluggable {
      * @param array $arguments
      * @return mixed
      *
+     * @throws Exception when Pluggable::__construct has not been called.
+     * @throws ArgumentCountError When the incorrect number or arguments was passed to the event handler.
+     *
      */
     public function __call($methodName, $arguments) {
         // Define a return variable.
@@ -172,7 +190,7 @@ abstract class Gdn_Pluggable {
         $sliceProviderMethods = ['enableSlicing', 'slice', 'addSliceAsset', 'renderSliceConfig'];
 
         if (in_array($methodName, $sliceProviderMethods)) {
-            $message = 'Slicing has been removed from Gdn_Pluggable.';
+            $message = 'Slicing has been removed from '.self::class;
             $message .= ' Try using the functionality provided by "js-form" instead.';
             throw new Exception($message);
         }

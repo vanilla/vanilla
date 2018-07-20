@@ -14,7 +14,7 @@
  * @package Core
  * @since 2.0
  */
-class Gdn_Email extends Gdn_Pluggable {
+class Gdn_Email extends \Vanilla\Pluggable {
 
     /** Error: The email was not attempted to be sent.. */
     const ERR_SKIPPED = 1;

@@ -5,6 +5,8 @@
  * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
  */
 
+namespace Vanilla\Formatting;
+
 /**
  * Vanilla Markdown Override
  *
@@ -15,7 +17,7 @@
  * @package core
  * @since 2.2
  */
-class MarkdownVanilla extends \Michelf\MarkdownExtra {
+class MarkdownFormatter extends \Michelf\MarkdownExtra {
 
     /**
      * Add all Vanilla customizations to markdown parsing
@@ -113,7 +115,7 @@ class MarkdownVanilla extends \Michelf\MarkdownExtra {
         $bq = preg_replace_callback('{(\s*<pre>.+?</pre>)}sx',
             [&$this, '_doSpoilers_callback2'], $bq);
 
-        return "\n". $this->hashBlock(Gdn_Format::spoilerHtml($bq))."\n\n";
+        return "\n". $this->hashBlock(FormatUtility::spoilerHtml($bq))."\n\n";
     }
     protected function _doSpoilers_callback2($matches) {
         $pre = $matches[1];

@@ -11,7 +11,7 @@
 /**
  * Handles spam data.
  */
-class SpamModel extends Gdn_Pluggable {
+class SpamModel extends \Vanilla\Pluggable {
 
     /** @var SpamModel */
     protected static $_Instance;

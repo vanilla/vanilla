@@ -12,7 +12,7 @@
 /**
  * Handles relating external actions to comments and discussions. Flagging, Praising, Reporting, etc.
  */
-class Gdn_RegardingEntity extends Gdn_Pluggable {
+class Gdn_RegardingEntity extends \Vanilla\Pluggable {
 
     private $Type = null;
 

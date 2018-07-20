@@ -12,7 +12,7 @@
 /**
  * Manages the authentication system for vanilla, including all authentication modules.
  */
-class Gdn_Auth extends Gdn_Pluggable {
+class Gdn_Auth extends \Vanilla\Pluggable {
 
     /** @var array  */
     protected $_AuthenticationSchemes = [];

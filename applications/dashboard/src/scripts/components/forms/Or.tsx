@@ -6,8 +6,18 @@
 import React from "react";
 import { t } from "@dashboard/application";
 
-export default class Or extends React.Component {
+interface IProps {
+    visible: boolean;
+}
+
+export default class Or extends React.PureComponent<IProps, {}> {
+    public static defaultProps: IProps = {
+        visible: true,
+    };
+
     public render() {
-        return <div className="inputBlock-labelText authenticateUser-divider">{t("or")}</div>;
+        return this.props.visible ? (
+            <div className="inputBlock-labelText authenticateUser-divider">{t("or")}</div>
+        ) : null;
     }
 }

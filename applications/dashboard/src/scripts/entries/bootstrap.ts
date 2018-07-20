@@ -21,15 +21,14 @@ debug(getMeta("debug", false));
 // Export the API to the global object.
 gdn.apiv2 = apiv2;
 
-// Mount all data-react components.
-onContent(e => {
-    _mountComponents(e.target);
-});
-
 log("Bootstrapping");
 _executeReady()
     .then(() => {
         log("Bootstrapping complete.");
+        // Mount all data-react components.
+        onContent(e => {
+            _mountComponents(e.target);
+        });
 
         const contentEvent = new CustomEvent("X-DOMContentReady", { bubbles: true, cancelable: false });
         document.dispatchEvent(contentEvent);

@@ -8,7 +8,7 @@
  */
 
 import { onContent, onReady } from "@dashboard/application";
-import { initializeAtComplete } from "./atwho";
+import { initializeAtComplete } from "@dashboard/legacy/atwho";
 
 // Initialize legacy @mentions for all BodyBox elements.
 if ($.fn.atwho) {

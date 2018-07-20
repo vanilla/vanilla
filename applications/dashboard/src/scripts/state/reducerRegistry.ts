@@ -9,9 +9,15 @@
 
 import { logError } from "@dashboard/utility";
 import { Reducer, ReducersMapObject } from "redux";
+import { onReady } from "@dashboard/application";
 
 let haveGot = false;
+let wasReadyCalled = false;
 const reducers = {};
+
+onReady(() => {
+    wasReadyCalled = true;
+});
 
 export function registerReducer(name: string, reducer: Reducer) {
     if (haveGot) {
@@ -23,6 +29,10 @@ export function registerReducer(name: string, reducer: Reducer) {
 
 export function getReducers(): ReducersMapObject<any, any> {
     haveGot = true;
+
+    if (!wasReadyCalled) {
+        logError("getReducers() was called before onReady");
+    }
 
     return {
         ...reducers,

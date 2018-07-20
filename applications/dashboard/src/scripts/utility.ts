@@ -292,3 +292,29 @@ export function isFileImage(file: File): boolean {
 export function capitalizeFirstLetter(str: string): string {
     return str.charAt(0).toUpperCase() + str.slice(1);
 }
+
+/**
+ * Transform an array of objects and an map of objets with a given key.
+ *
+ * Objects that do not contain the given key are dropped.
+ *
+ * @param array The array to go through.
+ * @param key The key to lookup.
+ */
+export function indexArrayByKey<T extends object>(
+    array: T[],
+    key: string,
+): {
+    [key: string]: T;
+} {
+    const object = {};
+    for (const item of array) {
+        if (key in item) {
+            if (!(item[key] in object)) {
+                object[item[key]] = [];
+            }
+            object[item[key]].push(item);
+        }
+    }
+    return object;
+}

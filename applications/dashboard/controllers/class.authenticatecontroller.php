@@ -5,6 +5,7 @@
  * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
  */
 
+use Garden\Web\Data;
 use Garden\Web\RequestInterface;
 use Vanilla\Models\AuthenticatorModel;
 use Vanilla\Models\SSOModel;
@@ -83,18 +84,12 @@ class AuthenticateController extends Gdn_Controller {
         $this->Head = new HeadModule($this);
 
         $this->addJsFile('jquery.js');
-        $this->addJsFile('jquery.form.js');
         $this->addJsFile('jquery.popup.js');
         $this->addJsFile('jquery.popin.js');
-        $this->addJsFile('jquery.gardenhandleajaxform.js');
-        $this->addJsFile('jquery.atwho.js');
         $this->addJsFile('global.js');
-
-        $this->addJsFile('authenticate.js');
 
         $this->addCssFile('style.css');
         $this->addCssFile('vanillicon.css', 'static');
-        $this->addCssFile('authenticate.css');
 
         parent::initialize();
     }
@@ -107,6 +102,9 @@ class AuthenticateController extends Gdn_Controller {
      * @throws Exception Connect user feature is not implemented.
      */
     public function index($authenticatorType = '', $authenticatorID = '') {
+        if ($authenticatorType === '') {
+            redirectTo('authenticate/signin');
+        }
         $persist = $this->request->getBody()['persist'] ?? ($this->request->getQuery()['persist'] ?? false);
 
         $response = $this->authenticateApiController->post([
@@ -160,6 +158,11 @@ class AuthenticateController extends Gdn_Controller {
                 return;
             }
         }
+
+        $this->addClientApiAction(
+            'GET_USER_AUTHENTICATORS_SUCCESS',
+            Data::box($this->authenticateApiController->index_authenticators())
+        );
 
         $this->renderReact();
     }

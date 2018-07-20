@@ -11,7 +11,7 @@ import {
     isInstanceOfOneOf,
     cssSpecialChars,
     splitStringLoosely,
-} from "./utility";
+} from "@dashboard/utility";
 import chai, { expect } from "chai";
 import asPromised from "chai-as-promised";
 chai.use(asPromised);

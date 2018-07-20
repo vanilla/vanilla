@@ -5,11 +5,20 @@
  * @license https://opensource.org/licenses/GPL-2.0 GPL-2.0
  */
 
-import { formatUrl } from "@dashboard/application";
-import { isFileImage } from "@dashboard/utility";
+import { formatUrl, t } from "@dashboard/application";
+import { isFileImage, indexArrayByKey } from "@dashboard/utility";
 import axios from "axios";
 import qs from "qs";
 import { IEmbedData } from "@dashboard/embeds";
+import { IFieldError, LoadStatus, ILoadable } from "@dashboard/@types/api";
+
+function fieldErrorTransformer(responseData) {
+    if (responseData.status >= 400 && responseData.errors && responseData.errors.length > 0) {
+        responseData.errors = indexArrayByKey(responseData.errors, "field");
+    }
+
+    return responseData;
+}
 
 const api = axios.create({
     baseURL: formatUrl("/api/v2/"),
@@ -18,6 +27,7 @@ const api = axios.create({
             "X-Requested-With": "vanilla",
         },
     },
+    transformResponse: [...axios.defaults.transformResponse, fieldErrorTransformer],
     paramsSerializer: params => qs.stringify(params, { indices: false }),
 });
 
@@ -46,32 +56,40 @@ export async function uploadImage(image: File): Promise<IEmbedData> {
     return result.data;
 }
 
-export interface IMentionUser {
-    userID: number;
-    name: string;
-    photoUrl: string;
-    dateLastActive: string | null;
+/**
+ * Extract a field specific error from an ILoadable if applicable.
+ *
+ * @param loadable - The loadable to extract from.
+ * @param field - The field to extract.
+ *
+ * @returns an array of IFieldErrors if found or undefined.
+ */
+export function getFieldErrors(loadable: ILoadable<any>, field: string): IFieldError[] | undefined {
+    if (loadable.status === LoadStatus.ERROR || loadable.status === LoadStatus.LOADING) {
+        if (loadable.error && loadable.error.errors && loadable.error.errors[field]) {
+            return loadable.error.errors[field];
+        }
+    }
 }
 
-export interface IUser extends IMentionUser {
-    email: string;
-    emailConfirmed: boolean;
-    showEmail: boolean;
-    bypassSpam: boolean;
-    banned: number;
-    dateInserted: string;
-    dateUpdated: string | null;
-    roles: [
-        {
-            roleID: number;
-            name: string;
+/**
+ * Extract a global error message out of an ILoadable if applicable.
+ *
+ * @param loadable - The loadable to extract from.
+ * @param validFields - Field to check for overriding fields errors from. A global error only shows if there are no valid field errors.
+ *
+ * @returns A global error message or an undefined.
+ */
+export function getGlobalErrorMessage(loadable: ILoadable<any>, validFields: string[]): string | undefined {
+    if (loadable.status === LoadStatus.ERROR || loadable.status === LoadStatus.LOADING) {
+        for (const field of validFields) {
+            if (getFieldErrors(loadable, field)) {
+                return;
+            }
         }
-    ];
-    hidden: boolean;
-    rankID?: number | null;
-    rank?: {
-        rankID: number;
-        name: string;
-        userTitle: string;
-    };
+
+        if (loadable.error) {
+            return loadable.error.message || t("An error has occurred, please try again.");
+        }
+    }
 }

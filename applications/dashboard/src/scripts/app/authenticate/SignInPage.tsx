@@ -4,33 +4,30 @@
  */
 
 import * as React from "react";
+import { connect } from "react-redux";
 import { t } from "@dashboard/application";
-import { log, logError } from "@dashboard/utility";
 import DocumentTitle from "@dashboard/components/DocumentTitle";
 import PasswordForm from "./components/PasswordForm";
 import SSOMethods from "./components/SSOMethods";
-import apiv2 from "@dashboard/apiv2";
 import { getRequiredID, IRequiredComponentID } from "@dashboard/componentIDs";
 import Or from "@dashboard/components/forms/Or";
+import PageLoading from "@dashboard/components/PageLoading";
+import { LoadStatus } from "@dashboard/@types/api";
+import { IStoreState, IAuthenticatorState } from "@dashboard/@types/state";
+import { getUserAuthenticators } from "@dashboard/state/authenticate/authenticatorsActions";
 
-interface IState extends IRequiredComponentID {
-    loginFormActive: boolean;
-    errors?: string[];
-    redirectTo?: string;
-    ssoMethods: any[];
-    passwordAuthenticator?: any;
+interface IProps {
+    authenticatorState: IAuthenticatorState;
+    loadAuthenticators: typeof getUserAuthenticators;
 }
 
-export default class SignInPage extends React.Component<{}, IState> {
+export class SignInPage extends React.Component<IProps, IRequiredComponentID> {
     public pageTitleID: string;
 
     constructor(props) {
         super(props);
         this.state = {
             id: getRequiredID(props, "SignInPage"),
-            loginFormActive: false,
-            errors: [],
-            ssoMethods: [],
         };
     }
 
@@ -39,29 +36,28 @@ export default class SignInPage extends React.Component<{}, IState> {
     }
 
     public componentDidMount() {
-        apiv2
-            .get("/authenticate/authenticators")
-            .then(response => {
-                log("SignIn Page - authenticators response: ", response);
-                if (response.data) {
-                    response.data.map((method, index) => {
-                        if (method.authenticatorID !== "password") {
-                            this.setState(prevState => ({
-                                ssoMethods: [...(prevState.ssoMethods as any[]), method],
-                            }));
-                        }
-                    });
-                } else {
-                    logError("Error in RecoverPasswordPage - no response.data");
-                }
-            })
-            .catch(error => {
-                logError("Error in RecoverPasswordPage - authenticators response: ", error);
-            });
+        if (this.props.authenticatorState.status === LoadStatus.PENDING) {
+            this.props.loadAuthenticators();
+        }
     }
 
     public render() {
-        const or = this.state.ssoMethods.length > 0 ? <Or /> : null;
+        const { authenticatorState } = this.props;
+
+        if (authenticatorState.status !== LoadStatus.SUCCESS) {
+            // TODO: Use a generic fallback component for the other states.
+            return null;
+        }
+
+        let showPassword = false;
+        const ssoMethods = authenticatorState.data.filter(a => {
+            if (a.type === "password") {
+                showPassword = true;
+                return false;
+            }
+            return true;
+        });
+
         return (
             <div id={this.state.id} className="authenticateUserCol">
                 <DocumentTitle title={t("Sign In")}>
@@ -69,10 +65,29 @@ export default class SignInPage extends React.Component<{}, IState> {
                         {t("Sign In")}
                     </h1>
                 </DocumentTitle>
-                <SSOMethods ssoMethods={this.state.ssoMethods} />
-                {or}
-                <PasswordForm />
+                <SSOMethods ssoMethods={ssoMethods} />
+                <Or visible={showPassword && ssoMethods.length > 0} />
+                {showPassword && <PasswordForm />}
             </div>
         );
     }
 }
+
+function mapStateToProps({ authenticate }: IStoreState) {
+    return {
+        authenticatorState: authenticate.authenticators,
+    };
+}
+
+function mapDispatchToProps(dispatch) {
+    return {
+        loadAuthenticators: () => {
+            dispatch(getUserAuthenticators());
+        },
+    };
+}
+
+export default connect(
+    mapStateToProps,
+    mapDispatchToProps,
+)(SignInPage);

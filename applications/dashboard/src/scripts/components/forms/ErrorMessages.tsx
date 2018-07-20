@@ -6,10 +6,11 @@
 import React, { ReactNode } from "react";
 import classNames from "classnames";
 import { uniqueIDFromPrefix, getRequiredID, IRequiredComponentID } from "@dashboard/componentIDs";
+import { IFieldError } from "@dashboard/@types/api";
 
 interface IProps extends IRequiredComponentID {
     className?: string;
-    errors: string | string[];
+    errors?: IFieldError[];
 }
 
 interface IState {
@@ -17,10 +18,6 @@ interface IState {
 }
 
 export default class ErrorMessages extends React.Component<IProps, IState> {
-    public static defaultProps = {
-        errors: [],
-    };
-
     constructor(props) {
         super(props);
         this.state = {
@@ -29,12 +26,9 @@ export default class ErrorMessages extends React.Component<IProps, IState> {
     }
 
     public render() {
-        let errors = this.props.errors;
-        if (typeof this.props.errors === "string") {
-            errors = [this.props.errors];
-        }
+        const { errors } = this.props;
 
-        if (errors.length > 0) {
+        if (errors && errors.length > 0) {
             const componentClasses = classNames("inputBlock-errors", this.props.className);
 
             const errorList = (errors as any).map((error: any, index) => {

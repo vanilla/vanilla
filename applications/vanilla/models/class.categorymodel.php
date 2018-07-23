@@ -3049,7 +3049,9 @@ class CategoryModel extends Gdn_Model {
             // Force the user permissions to refresh.
             Gdn::userModel()->clearPermissions();
 
-            // $this->rebuildTree();
+            // Let the world know we succeeded in our mission.
+            $this->EventArguments['CategoryID'] = $CategoryID;
+            $this->fireEvent('AfterSaveCategory');
         } else {
             $CategoryID = false;
         }

@@ -19,7 +19,7 @@ function smarty_function_searchbox($params, &$smarty) {
     /* @var Gdn_Form $form */
     $result =
         $form->open(['action' => url('/search'), 'method' => 'get']).
-        $form->textBox('Search', ['placeholder' => $placeholder, 'accesskey' => '/', 'aria-label' => t('Enter your search term.'), 'title' => t('Enter your search term.'), 'role' => 'searchbox']).
+        $form->textBox('Search', ['placeholder' => $placeholder, 'accesskey' => '/', 'aria-label' => t('Enter your search term.'), 'title' => t('Enter your search term.'), 'role' => 'searchbox', 'class' => 'js-search']).
         $form->button('Go', ['Name' => '', 'aria-label' => t('Search')]).
         $form->close();
 

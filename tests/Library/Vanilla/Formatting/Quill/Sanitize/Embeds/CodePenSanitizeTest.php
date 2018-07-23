@@ -52,13 +52,13 @@ class CodePenSanitizeTest extends SanitizeTest {
             [
                 "insert" => [
                     "embed-external" => [
-                        "url" => null,
+                        "url" => $content,
                         "type" => "codepen",
-                        "name" => null,
-                        "body" => null,
-                        "photoUrl" => null,
+                        "name" => $content,
+                        "body" => $content,
+                        "photoUrl" => $content,
                         "height" => $content,
-                        "width" => null,
+                        "width" => $content,
                         "attributes" => [
                             'id' => $content,
                             'embedUrl' => $content,
@@ -70,7 +70,7 @@ class CodePenSanitizeTest extends SanitizeTest {
                     ]
                 ]
             ],
-            ["insert" => "\n"]
+            ["insert" => $content]
         ];
 
         return $operations;

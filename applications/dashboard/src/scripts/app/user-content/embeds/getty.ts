@@ -3,14 +3,32 @@
  * @license https://opensource.org/licenses/GPL-2.0 GPL-2.0
  */
 
-import { registerEmbed, IEmbedData, IEmbedElements } from "@dashboard/embeds";
+import { IEmbedData, IEmbedElements, registerEmbedRenderer } from "@dashboard/embeds";
 import { ensureScript } from "@dashboard/dom";
 import { onContent, onReady } from "@dashboard/application";
 
-// Setup getty embeds
-onReady(convertGettyEmbeds);
-onContent(convertGettyEmbeds);
-registerEmbed("getty", renderGetty);
+export function initGettyEmbeds() {
+    registerEmbedRenderer("getty", renderGetty);
+    onReady(convertGettyEmbeds);
+    onContent(convertGettyEmbeds);
+}
+
+/**
+ * Render a single getty embed.
+ */
+export async function renderGetty(elements: IEmbedElements, data: IEmbedData) {
+    const contentElement = elements.content;
+    const url = data.attributes.post;
+    const newLink = document.createElement("a");
+    newLink.classList.add("gie-single");
+    newLink.setAttribute("href", "http://www.gettyimages.ca/detail/" + url);
+    newLink.setAttribute("id", data.attributes.id);
+    contentElement.style.width = `${data.width}px`;
+    contentElement.appendChild(newLink);
+    setImmediate(() => {
+        void loadGettyImages(data);
+    });
+}
 
 /**
  * Renders posted getty embeds.
@@ -39,23 +57,6 @@ async function convertGettyEmbeds() {
             post.classList.remove("js-gettyEmbed");
         }
     }
-}
-
-/**
- * Render a single getty embed.
- */
-export async function renderGetty(elements: IEmbedElements, data: IEmbedData) {
-    const contentElement = elements.content;
-    const url = data.attributes.post;
-    const newLink = document.createElement("a");
-    newLink.classList.add("gie-single");
-    newLink.setAttribute("href", "http://www.gettyimages.ca/detail/" + url);
-    newLink.setAttribute("id", data.attributes.id);
-    contentElement.style.width = `${data.width}px`;
-    contentElement.appendChild(newLink);
-    setImmediate(() => {
-        void loadGettyImages(data);
-    });
 }
 
 /**

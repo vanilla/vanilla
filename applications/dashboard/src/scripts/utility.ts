@@ -318,3 +318,24 @@ export function indexArrayByKey<T extends object>(
     }
     return object;
 }
+
+const SAFE_PROTOCOL_REGEX = /^(http:\/\/|https:\/\/|tel:|mailto:\/\/)/;
+
+/**
+ * Sanitize a URL to ensure that it matches a whitelist of approved url schemes. If the url does not match one of these schemes, prepend `unsafe:` before it.
+ *
+ * Allowed protocols
+ * - "http://",
+ * - "https://",
+ * - "tel:",
+ * - "mailto://",
+ *
+ * @param url The url to sanitize.
+ */
+export function sanitizeUrl(url: string) {
+    if (url.match(SAFE_PROTOCOL_REGEX)) {
+        return url;
+    } else {
+        return "unsafe:" + url;
+    }
+}

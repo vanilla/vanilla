@@ -31,6 +31,10 @@
 \* -------------------------------------------------------------- */
 /* -------------------------------------------------------------- *    Separators
 \* -------------------------------------------------------------- */
+/* -------------------------------------------------------------- *    Header
+\* -------------------------------------------------------------- */
+/* -------------------------------------------------------------- *    Footer
+\* -------------------------------------------------------------- */
 /* ------------------------------- *    Third Party Colors
 \* ------------------------------- */
 em {
@@ -292,6 +296,15 @@ button.Close {
   margin-bottom: 18px;
 }
 
+.authenticateUser-paragraph {
+  word-break: break-all;
+  word-break: break-word;
+}
+
+.authenticateUser-paragraph.isError {
+  color: #ff3933;
+}
+
 .followButton {
   white-space: nowrap;
   font-size: 10px;
@@ -514,13 +527,13 @@ body.Categories.isMobile .PageControls.Top {
 }
 
 .inputBlock-error {
+  word-break: break-all;
+  word-break: break-word;
   display: block;
   color: #ff3933;
   line-height: 1.428571429;
   font-size: 12px;
   margin-top: 3px;
-  word-break: break-all;
-  word-break: break-word;
 }
 
 .inputBlock-error:first-letter {
@@ -544,15 +557,6 @@ body.Categories.isMobile .PageControls.Top {
 
 .inputBlock-labelNote + .inputBlock-inputWrap {
   margin-top: 6px;
-}
-
-.authenticateUser-paragraph {
-  word-break: break-all;
-  word-break: break-word;
-}
-
-.authenticateUser-paragraph.isError {
-  color: #ff3933;
 }
 
 .inputBlock-inputText {
@@ -1901,13 +1905,32 @@ body.isMobile .FormWrapper {
           transform: scale(1);
 }
 
-.embedVideo-iframe {
+.embedVideo-iframe,
+.embedVideo-thumbnail {
   position: absolute;
   display: block;
   top: 0;
   left: 0;
   height: 100%;
   width: 100%;
+}
+
+.embedVideo-thumbnail {
+  object-fit: cover;
+  object-position: center;
+}
+
+.embedVideo-scrim {
+  content: "";
+  display: block;
+  position: absolute;
+  display: block;
+  top: 0;
+  left: 0;
+  height: 100%;
+  width: 100%;
+  background: -webkit-linear-gradient(top, rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.4));
+  background: linear-gradient(to bottom, rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.4));
 }
 
 .embedVideo-ratio {
@@ -1944,24 +1967,8 @@ body.isMobile .FormWrapper {
   left: 0;
   height: 100%;
   width: 100%;
-  background-size: cover;
-  background-repeat: no-repeat;
-  background-position: center;
   cursor: pointer;
   overflow: hidden;
-}
-
-.embedVideo-playButton::before {
-  content: "";
-  display: block;
-  position: absolute;
-  display: block;
-  top: 0;
-  left: 0;
-  height: 100%;
-  width: 100%;
-  background: -webkit-linear-gradient(top, rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.4));
-  background: linear-gradient(to bottom, rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.4));
 }
 
 .embedVideo-playIcon {

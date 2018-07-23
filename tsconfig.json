@@ -26,6 +26,7 @@
         },
         "typeRoots": [
             "@types",
+            "applications/*/src/scripts/@types",
             "./node_modules/@types"
         ],
         "skipLibCheck": true,

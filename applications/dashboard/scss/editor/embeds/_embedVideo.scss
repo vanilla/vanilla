@@ -31,8 +31,22 @@ $embedVideo_width: $embed_width;
     }
 }
 
-.embedVideo-iframe {
+.embedVideo-iframe,
+.embedVideo-thumbnail {
     @include absolute-fullSizeOfParent;
+}
+
+.embedVideo-thumbnail {
+    object-fit: cover;
+    object-position: center;
+}
+
+.embedVideo-scrim {
+    $bg: rgba(#000, 0.4);
+    content: "";
+    display: block;
+    @include absolute-fullSizeOfParent;
+    background: linear-gradient(to bottom, $bg, $bg);
 }
 
 .embedVideo-ratio {
@@ -66,22 +80,9 @@ $embedVideo_width: $embed_width;
 
 .embedVideo-playButton {
     @include absolute-fullSizeOfParent;
-    background-size: cover;
-    background-repeat: no-repeat;
-    background-position: center;
     cursor: pointer;
     overflow: hidden;
-
-    &::before {
-        $bg: rgba(#000, 0.4);
-        content: "";
-        display: block;
-        @include absolute-fullSizeOfParent;
-        background: linear-gradient(to bottom, $bg, $bg);
-    }
 }
-
-
 
 .embedVideo-playIcon {
     position: absolute;

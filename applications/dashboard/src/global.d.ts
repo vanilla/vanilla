@@ -25,9 +25,13 @@ declare interface AnyObject {
     [key: string]: any;
 }
 
-declare namespace React {
-    interface IframeHTMLAttributes<T> extends HTMLAttributes<T> {
+declare namespace JSX {
+    interface ExtendIFrameAttributes extends React.IframeHTMLAttributes<HTMLIFrameElement> {
         allow: string;
+    }
+
+    interface IntrinsicElements {
+        iframe: React.DetailedHTMLProps<ExtendIFrameAttributes, HTMLIFrameElement>;
     }
 }
 

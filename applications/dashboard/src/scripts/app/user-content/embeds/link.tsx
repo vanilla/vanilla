@@ -4,26 +4,73 @@
  */
 
 import React from "react";
-import ReactDOM from "react-dom";
-import { registerEmbed, IEmbedData, IEmbedElements } from "@dashboard/embeds";
-import { getData, setData } from "@dashboard/dom";
+import BaseEmbed from "@dashboard/app/user-content/embeds/BaseEmbed";
 import { cssSpecialChars } from "@dashboard/utility";
+import { getData, setData } from "@dashboard/dom";
 import debounce from "lodash/debounce";
 import shave from "shave";
-import LinkEmbed from "@dashboard/app/user-content/embeds/LinkEmbed";
+import { registerEmbedComponent } from "@dashboard/embeds";
 
-// Setup link embeds.
-registerEmbed("link", renderLinkEmbed);
-truncateEmbedLinks();
+export function initLinkEmbeds() {
+    registerEmbedComponent("link", LinkEmbed);
+    truncateEmbedLinks();
 
-// Retruncate links when the window resizes.
-window.addEventListener("resize", () => debounce(truncateEmbedLinks, 200)());
+    // Retruncate links when the window resizes.
+    window.addEventListener("resize", () => debounce(truncateEmbedLinks, 200)());
+}
 
-/**
- * Render a a link embed.
- */
-export async function renderLinkEmbed(elements: IEmbedElements, data: IEmbedData) {
-    ReactDOM.render(<LinkEmbed {...data} />, elements.content);
+export class LinkEmbed extends BaseEmbed {
+    public render() {
+        const { name, attributes, url, photoUrl, body } = this.props.data;
+        const title = name ? <h3 className="embedLink-title">{name}</h3> : null;
+        const userPhoto =
+            attributes.userPhoto && attributes.userName ? (
+                <span className="embedLink-userPhoto PhotoWrap">
+                    <img
+                        src={attributes.userPhoto}
+                        alt={attributes.userName}
+                        className="ProfilePhoto ProfilePhotoMedium"
+                        tabIndex={-1}
+                    />
+                </span>
+            ) : null;
+
+        const source = <span className="embedLink-source meta">{url}</span>;
+
+        let linkImage: JSX.Element | null = null;
+        if (photoUrl) {
+            const imageStyle: React.CSSProperties = {
+                backgroundImage: `url('${cssSpecialChars(photoUrl)}')`,
+            };
+            linkImage = <div className="embedLink-image" aria-hidden="true" style={imageStyle} />;
+        }
+
+        const userName = attributes.userName ? <span className="embedLink-userName">{attributes.userName}</span> : null;
+        const dateTime =
+            attributes.timestamp && attributes.humanTime ? (
+                <time className="embedLink-dateTime meta" dateTime={attributes.timestamp}>
+                    {attributes.humanTime}
+                </time>
+            ) : null;
+
+        return (
+            <a href={url} rel="noreferrer">
+                <article className="embedLink-body">
+                    {linkImage}
+                    <div className="embedLink-main">
+                        <div className="embedLink-header">
+                            {title}
+                            {userPhoto}
+                            {userName}
+                            {dateTime}
+                            {source}
+                        </div>
+                        <div className="embedLink-excerpt">{body}</div>
+                    </div>
+                </article>
+            </a>
+        );
+    }
 }
 
 /**
@@ -31,7 +78,7 @@ export async function renderLinkEmbed(elements: IEmbedElements, data: IEmbedData
  *
  * @param container - Element containing embeds to truncate
  */
-export function truncateEmbedLinks(container = document.body) {
+function truncateEmbedLinks(container = document.body) {
     const embeds = container.querySelectorAll(".embedLink-excerpt");
     embeds.forEach(el => {
         let untruncatedText = getData(el, "untruncatedText");
@@ -51,7 +98,7 @@ export function truncateEmbedLinks(container = document.body) {
  *
  * @param excerpt - The excerpt to truncate.
  */
-export function truncateTextBasedOnMaxHeight(excerpt: Element) {
+function truncateTextBasedOnMaxHeight(excerpt: Element) {
     const maxHeight = parseInt(getComputedStyle(excerpt)["max-height"], 10);
     if (maxHeight && maxHeight > 0) {
         shave(excerpt, maxHeight);

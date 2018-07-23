@@ -13,20 +13,6 @@
 let _debug = false;
 
 /**
- * Encode CSS special characters as a hex escape sequence.
- *
- * @param {string} str Dirty CSS value.
- * @returns {string} Sanitized CSS value.
- */
-export function cssSpecialChars(str: string) {
-    return str.replace(/[\\!"#\$%&'\(\)\*\+,-.\/:;<=>\?@\[\]\^`{\|}~]/g, (char: string) => {
-        const hexCode = char.charCodeAt(0).toString(16);
-        const padded = "000000" + hexCode;
-        return "\\" + padded.substr(-6);
-    });
-}
-
-/**
  * Get or set the debug flag.
  *
  * @param newValue - The new value of debug.

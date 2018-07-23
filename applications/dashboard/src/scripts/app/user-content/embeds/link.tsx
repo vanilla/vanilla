@@ -5,7 +5,7 @@
 
 import React from "react";
 import BaseEmbed from "@dashboard/app/user-content/embeds/BaseEmbed";
-import { cssSpecialChars, sanitizeUrl } from "@dashboard/utility";
+import { sanitizeUrl } from "@dashboard/utility";
 import { getData, setData } from "@dashboard/dom";
 import debounce from "lodash/debounce";
 import shave from "shave";
@@ -40,10 +40,7 @@ export class LinkEmbed extends BaseEmbed {
 
         let linkImage: JSX.Element | null = null;
         if (photoUrl) {
-            const imageStyle: React.CSSProperties = {
-                backgroundImage: `url('${cssSpecialChars(photoUrl)}')`,
-            };
-            linkImage = <div className="embedLink-image" aria-hidden="true" style={imageStyle} />;
+            linkImage = <img src={photoUrl} className="embedLink-image" aria-hidden="true" />;
         }
 
         const userName = attributes.userName ? <span className="embedLink-userName">{attributes.userName}</span> : null;

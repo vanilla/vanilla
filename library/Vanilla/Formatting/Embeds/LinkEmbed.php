@@ -65,7 +65,7 @@ class LinkEmbed extends Embed {
 
         if ($photoUrl) {
             $photoUrlEncoded = htmlspecialchars($photoUrl);
-            $image = "<img src='$photoUrlEncoded' class='embedLink-image' aria-hidden='true'>";
+            $image = "<img src='$photoUrlEncoded' class='embedLink-image' aria-hidden='true' crossorigin='anonymous'>";
         } else {
             $image = '';
         }

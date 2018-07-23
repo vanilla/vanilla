@@ -89,9 +89,9 @@ function VideoIframe(props: { url: string }) {
         <iframe
             frameBorder="0"
             allow="autoplay; encrypted-media"
-            class="embedVideo-iframe"
+            className="embedVideo-iframe"
             src={props.url}
-            allowfullscreen
+            allowFullScreen={true}
         />
     );
 }

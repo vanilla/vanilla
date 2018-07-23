@@ -107,9 +107,11 @@ class EmbedManagerTest extends SharedBootstrapTestCase {
                 ],
 '<div class="embedExternal embedImage">
     <div class="embedExternal-content">
-        <img class="embedImage-img" src="https://vanillaforums.com/images/metaIcons/vanillaForums.png">
+        <a className="embedImage-link" href="https://vanillaforums.com/images/metaIcons/vanillaForums.png" rel="nofollow noopener" target="_blank">
+            <img class="embedImage-img" src="https://vanillaforums.com/images/metaIcons/vanillaForums.png">
+        </a>
     </div>
-</div>',
+</div>'
             ],
             [
                 [
@@ -160,7 +162,7 @@ class EmbedManagerTest extends SharedBootstrapTestCase {
 '<a class="embedExternal embedLink" href="https://vanillaforums.com" rel="noopener noreferrer">
     <div class="embedExternal-content">
         <article class="embedLink-body">
-            <div class="embedLink-image" aria-hidden="true" style="background-image: url(\'https\00003a\00002f\00002fvanillaforums\00002ecom\00002fimages\00002fmetaIcons\00002fvanillaForums\00002epng\');"></div>
+            <img src=\'https://vanillaforums.com/images/metaIcons/vanillaForums.png\' class=\'embedLink-image\' aria-hidden=\'true\'>
             <div class="embedLink-main">
                 <div class="embedLink-header">
                     <h3 class="embedLink-title">Online Community Software and Customer Forum Software by Vanilla Forums</h3>
@@ -323,7 +325,9 @@ class EmbedManagerTest extends SharedBootstrapTestCase {
                 '<div class="embedExternal embedVideo">
     <div class="embedExternal-content">
         <div class="embedVideo-ratio" style="padding-top: 56.2%;">
-            <button type="button" data-url="https://player.twitch.tv/?video=v276279462" aria-label="20k Fortnite Friday Duos with @hysteria | 2 MINUTE STREAM DELAY" class="embedVideo-playButton iconButton js-playVideo" style="background-image: url(https://static-cdn.jtvnw.net/s3_vods/8a24223c5b12ff7427a8_ninja_29190875424_893099877/thumb/thumb0-640x360.jpg);" title="20k Fortnite Friday Duos with @hysteria | 2 MINUTE STREAM DELAY">
+            <button type="button" data-url="https://player.twitch.tv/?video=v276279462" aria-label="20k Fortnite Friday Duos with @hysteria | 2 MINUTE STREAM DELAY" class="embedVideo-playButton iconButton js-playVideo" title="20k Fortnite Friday Duos with @hysteria | 2 MINUTE STREAM DELAY">
+                <img class="embedVideo-thumbnail" src="https://static-cdn.jtvnw.net/s3_vods/8a24223c5b12ff7427a8_ninja_29190875424_893099877/thumb/thumb0-640x360.jpg" role="presentation" alt="A thumnail preview of a video"/>
+                <span class="videoEmbed-scrim"/>
                 '.$this->playButtonSVG.'
             </button>
         </div>
@@ -388,7 +392,9 @@ class EmbedManagerTest extends SharedBootstrapTestCase {
 '<div class="embedExternal embedVideo">
     <div class="embedExternal-content">
         <div class="embedVideo-ratio is16by9" style="">
-            <button type="button" data-url="https://www.youtube.com/embed/9bZkp7q19f0?feature=oembed&amp;autoplay=1" aria-label="YouTube" class="embedVideo-playButton iconButton js-playVideo" style="background-image: url(https://img.youtube.com/vi/9bZkp7q19f0/0.jpg);" title="YouTube">
+            <button type="button" data-url="https://www.youtube.com/embed/9bZkp7q19f0?feature=oembed&amp;autoplay=1" aria-label="YouTube" class="embedVideo-playButton iconButton js-playVideo" title="YouTube">
+                <img class="embedVideo-thumbnail" src="https://img.youtube.com/vi/9bZkp7q19f0/0.jpg" role="presentation" alt="A thumnail preview of a video"/>
+                <span class="videoEmbed-scrim"/>
                 '.$this->playButtonSVG.'
             </button>
         </div>
@@ -414,7 +420,9 @@ class EmbedManagerTest extends SharedBootstrapTestCase {
 '<div class="embedExternal embedVideo">
     <div class="embedExternal-content">
         <div class="embedVideo-ratio" style="padding-top: 42.5%;">
-            <button type="button" data-url="https://player.vimeo.com/video/264197456?autoplay=1" aria-label="Vimeo" class="embedVideo-playButton iconButton js-playVideo" style="background-image: url(https://i.vimeocdn.com/video/694532899_640.jpg);" title="Vimeo">
+            <button type="button" data-url="https://player.vimeo.com/video/264197456?autoplay=1" aria-label="Vimeo" class="embedVideo-playButton iconButton js-playVideo" title="Vimeo">
+                <img class="embedVideo-thumbnail" src="https://i.vimeocdn.com/video/694532899_640.jpg" role="presentation" alt="A thumnail preview of a video"/>
+                <span class="videoEmbed-scrim"/>
                 '.$this->playButtonSVG.'
             </button>
         </div>
@@ -440,7 +448,9 @@ class EmbedManagerTest extends SharedBootstrapTestCase {
 '<div class="embedExternal embedVideo">
     <div class="embedExternal-content">
         <div class="embedVideo-ratio is16by9" style="">
-            <button type="button" data-url="https://fast.wistia.net/embed/iframe/0k5h1g1chs" aria-label="Lenny Delivers a Video - oEmbed" class="embedVideo-playButton iconButton js-playVideo" style="background-image: url(https://embed-ssl.wistia.com/deliveries/99f3aefb8d55eef2d16583886f610ebedd1c6734.jpg?image_crop_resized=960x540);" title="Lenny Delivers a Video - oEmbed">
+            <button type="button" data-url="https://fast.wistia.net/embed/iframe/0k5h1g1chs" aria-label="Lenny Delivers a Video - oEmbed" class="embedVideo-playButton iconButton js-playVideo" title="Lenny Delivers a Video - oEmbed">
+                <img class="embedVideo-thumbnail" src="https://embed-ssl.wistia.com/deliveries/99f3aefb8d55eef2d16583886f610ebedd1c6734.jpg?image_crop_resized=960x540" role="presentation" alt="A thumnail preview of a video"/>
+                <span class="videoEmbed-scrim"/>
                 '.$this->playButtonSVG.'
             </button>
         </div>

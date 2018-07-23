@@ -2029,9 +2029,8 @@ body.isMobile .FormWrapper {
   position: absolute;
   top: 0;
   left: 0;
-  background-size: cover;
-  background-repeat: no-repeat;
-  background-position: 50% 50%;
+  object-fit: cover;
+  object-position: center;
   width: 225px;
   height: 100%;
 }

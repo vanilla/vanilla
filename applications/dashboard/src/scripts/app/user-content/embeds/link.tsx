@@ -5,7 +5,7 @@
 
 import React from "react";
 import BaseEmbed from "@dashboard/app/user-content/embeds/BaseEmbed";
-import { cssSpecialChars } from "@dashboard/utility";
+import { cssSpecialChars, sanitizeUrl } from "@dashboard/utility";
 import { getData, setData } from "@dashboard/dom";
 import debounce from "lodash/debounce";
 import shave from "shave";
@@ -23,6 +23,7 @@ export class LinkEmbed extends BaseEmbed {
     public render() {
         const { name, attributes, url, photoUrl, body } = this.props.data;
         const title = name ? <h3 className="embedLink-title">{name}</h3> : null;
+
         const userPhoto =
             attributes.userPhoto && attributes.userName ? (
                 <span className="embedLink-userPhoto PhotoWrap">
@@ -53,8 +54,9 @@ export class LinkEmbed extends BaseEmbed {
                 </time>
             ) : null;
 
+        const sanitizedUrl = sanitizeUrl(url);
         return (
-            <a href={url} rel="noreferrer">
+            <a href={sanitizedUrl} rel="noreferrer">
                 <article className="embedLink-body">
                     {linkImage}
                     <div className="embedLink-main">

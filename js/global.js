@@ -1703,13 +1703,17 @@ jQuery(window).load(function() {
         }
     }(jQuery));
 
-    jQuery('div.Message img').not(jQuery('div.Message a > img')).each(function(i, img) {
-        img = jQuery(img);
-        var container = img.closest('div.Message');
-        if (img.naturalWidth() > container.width() && container.width() > 0) {
-            img.wrap('<a href="' + jQuery(img).attr('src') + '" target="_blank"></a>');
-        }
-    });
+    jQuery('div.Message img')
+        .not(jQuery('div.Message a > img'))
+        .not(jQuery('.js-embed img'))
+        .not(jQuery('.embedImage-img'))
+        .each(function (i, img){
+            img = jQuery(img);
+            var container = img.closest('div.Message');
+            if (img.naturalWidth() > container.width() && container.width() > 0) {
+                img.wrap('<a href="' + jQuery(img).attr('src') + '" target="_blank" rel="nofollow noopener"></a>');
+            }
+        });
 
     // Let the world know we're done here
     jQuery(window).trigger('ImagesResized');

@@ -31,6 +31,10 @@
 \* -------------------------------------------------------------- */
 /* -------------------------------------------------------------- *    Separators
 \* -------------------------------------------------------------- */
+/* -------------------------------------------------------------- *    Header
+\* -------------------------------------------------------------- */
+/* -------------------------------------------------------------- *    Footer
+\* -------------------------------------------------------------- */
 /* ------------------------------- *    Third Party Colors
 \* ------------------------------- */
 em {
@@ -91,6 +95,24 @@ button.Close {
 
 .categoryList-heading + .DataTableWrap > .categoryList-genericHeading {
   display: none;
+}
+
+.Title-Icon {
+  display: inline-block;
+  margin-left: .15em;
+  margin-right: .15em;
+}
+
+.Title-PrivateIcon {
+  height: 1em;
+  width: .7em;
+  vertical-align: -.11em;
+}
+
+.Title-SecretIcon {
+  height: 1em;
+  width: 1.2em;
+  vertical-align: -.2em;
 }
 
 .authenticateUserCol {
@@ -290,6 +312,15 @@ button.Close {
 
 .ssoMethods {
   margin-bottom: 18px;
+}
+
+.authenticateUser-paragraph {
+  word-break: break-all;
+  word-break: break-word;
+}
+
+.authenticateUser-paragraph.isError {
+  color: #ff3933;
 }
 
 .followButton {
@@ -514,13 +545,13 @@ body.Categories.isMobile .PageControls.Top {
 }
 
 .inputBlock-error {
+  word-break: break-all;
+  word-break: break-word;
   display: block;
   color: #ff3933;
   line-height: 1.428571429;
   font-size: 12px;
   margin-top: 3px;
-  word-break: break-all;
-  word-break: break-word;
 }
 
 .inputBlock-error:first-letter {
@@ -544,15 +575,6 @@ body.Categories.isMobile .PageControls.Top {
 
 .inputBlock-labelNote + .inputBlock-inputWrap {
   margin-top: 6px;
-}
-
-.authenticateUser-paragraph {
-  word-break: break-all;
-  word-break: break-word;
-}
-
-.authenticateUser-paragraph.isError {
-  color: #ff3933;
 }
 
 .inputBlock-inputText {

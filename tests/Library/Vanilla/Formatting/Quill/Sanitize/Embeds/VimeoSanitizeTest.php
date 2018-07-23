@@ -21,20 +21,20 @@ class VimeoSanitizeTest extends SanitizeTest {
                         "url" => $content,
                         "type" => "vimeo",
                         "name" => $content,
-                        "body" => null,
+                        "body" => $content,
                         "photoUrl" => $content,
-                        "height" => null,
-                        "width" => null,
+                        "height" => $content,
+                        "width" => $content,
                         "attributes" => [
                             "thumbnail_width" => $content,
                             "thumbnail_height" => $content,
                             "videoID" => $content,
-                            "embedUrl" => $content
-                        ]
-                    ]
-                ]
+                            "embedUrl" => $content,
+                        ],
+                    ],
+                ],
             ],
-            ["insert" => "\n\n"]
+            ["insert" => "\n$content\n"],
         ];
 
         return $operations;

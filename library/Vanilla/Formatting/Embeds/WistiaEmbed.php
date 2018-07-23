@@ -65,10 +65,8 @@ class WistiaEmbed extends VideoEmbed {
     public function renderData(array $data): string {
         $attributes = $data['attributes'] ?? [];
         $embedUrl = $attributes['embedUrl'] ?? '';
-        $convertedHeight = (int)$data['height'];
-        $convertedWidth = (int)$data['width'];
-        $height = $convertedHeight ?? self::DEFAULT_HEIGHT;
-        $width = $convertedWidth ?? self::DEFAULT_WIDTH;
+        $height = filter_var($data['height'], FILTER_VALIDATE_INT) ? $data['height'] : self::DEFAULT_HEIGHT;
+        $width = filter_var($data['width'], FILTER_VALIDATE_INT) ? $data['width'] : self::DEFAULT_WIDTH;
         $name = $data['name'] ?? '';
         $photoURL = $data['photoUrl'] ?? '';
 

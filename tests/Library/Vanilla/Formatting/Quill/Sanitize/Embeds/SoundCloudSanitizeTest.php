@@ -18,22 +18,22 @@ class SoundCloudSanitizeTest extends SanitizeTest {
             [
                 "insert" => [
                     "embed-external" => [
-                        "url" => null,
+                        "url" => $content,
                         "type" => "soundcloud",
-                        "name" => null,
-                        "body" => null,
-                        "photoUrl" => null,
+                        "name" => $content,
+                        "body" => $content,
+                        "photoUrl" => $content,
                         "height" => $content,
-                        "width" => null,
+                        "width" => $content,
                         "attributes" => [
                             "visual" => $content,
                             "showArtwork" => $content,
                             "track" => $content,
-                            ]
-                    ]
-                ]
+                        ],
+                    ],
+                ],
             ],
-            ["insert" => "\n"]
+            ["insert" => "\n"],
         ];
 
         return $operations;

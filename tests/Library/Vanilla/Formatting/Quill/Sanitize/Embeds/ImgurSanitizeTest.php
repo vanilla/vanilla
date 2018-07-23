@@ -18,18 +18,18 @@ class ImgurSanitizeTest extends SanitizeTest {
             [
                 "insert" => [
                     "embed-external" => [
-                        "url" => null,
+                        "url" => $content,
                         "type" => "imgur",
-                        "name" => null,
-                        "body" => null,
-                        "photoUrl" => null,
-                        "height" => null,
-                        "width" => null,
-                        "attributes" => ["postID" => $content, "isAlbum" => $content]
-                    ]
-                ]
+                        "name" => $content,
+                        "body" => $content,
+                        "photoUrl" => $content,
+                        "height" => $content,
+                        "width" => $content,
+                        "attributes" => ["postID" => $content, "isAlbum" => $content],
+                    ],
+                ],
             ],
-            ["insert" => "\n"]
+            ["insert" => "\n"],
         ];
 
         return $operations;

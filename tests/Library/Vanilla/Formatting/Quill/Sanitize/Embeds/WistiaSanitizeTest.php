@@ -21,7 +21,7 @@ class WistiaSanitizeTest extends SanitizeTest {
                         "url" => $content,
                         "type" => "wistia",
                         "name" => $content,
-                        "body" => null,
+                        "body" => $content,
                         "photoUrl" => $content,
                         "height" => $content,
                         "width" => $content,
@@ -29,12 +29,12 @@ class WistiaSanitizeTest extends SanitizeTest {
                             "thumbnail_width" => $content,
                             "thumbnail_height" => $content,
                             "videoID" => $content,
-                            "embedUrl" => $content
-                        ]
-                    ]
-                ]
+                            "embedUrl" => $content,
+                        ],
+                    ],
+                ],
             ],
-            ["insert" => "\n\n"]
+            ["insert" => "\n\n"],
         ];
 
         return $operations;

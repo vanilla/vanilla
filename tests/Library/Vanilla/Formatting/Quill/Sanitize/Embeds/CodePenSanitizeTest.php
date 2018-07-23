@@ -36,11 +36,12 @@ class CodePenSanitizeTest extends SanitizeTest {
                                 'overflow' => $string,
                             ],
                         ],
-                    ]
-                ]
+                    ],
+                ],
             ],
-            ["insert" => "\n"]
+            ["insert" => "\n"],
         ];
+
         return $operations;
     }
 
@@ -67,10 +68,10 @@ class CodePenSanitizeTest extends SanitizeTest {
                                 'overflow' => $content,
                             ],
                         ],
-                    ]
-                ]
+                    ],
+                ],
             ],
-            ["insert" => $content]
+            ["insert" => $content],
         ];
 
         return $operations;

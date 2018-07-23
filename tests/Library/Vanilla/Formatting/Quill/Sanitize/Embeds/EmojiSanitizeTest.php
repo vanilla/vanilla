@@ -21,7 +21,7 @@ class EmojiSanitizeTest extends SanitizeTest {
             ["insert" => ["emoji" => [
                 "emojiChar" => $content,
             ]]],
-            ["insert" => "\n"],
+            ["insert" => $content],
         ];
 
         return $operations;

@@ -21,18 +21,18 @@ class TwitchSanitizeTest extends SanitizeTest {
                         "url" => $content,
                         "type" => "twitch",
                         "name" => $content,
-                        "body" => null,
+                        "body" => $content,
                         "photoUrl" => $content,
                         "height" => $content,
                         "width" => $content,
                         "attributes" => [
                             "videoID" => $content,
-                            "embedUrl" => $content
-                        ]
-                    ]
-                ]
+                            "embedUrl" => $content,
+                        ],
+                    ],
+                ],
             ],
-            ["insert" => "\n\n"]
+            ["insert" => "\n\n"],
         ];
 
         return $operations;

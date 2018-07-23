@@ -53,7 +53,7 @@
     { "attributes": { "strike": true }, "insert": "strike" },
     { "attributes": { "spoiler-line": true }, "insert": "\n\n\n" },
     { "insert": "Newlines above " },
-    { "attributes": { "link": "test link" }, "insert": "Link" },
+    { "attributes": { "link": "http://testlink.com" }, "insert": "Link" },
     { "attributes": { "spoiler-line": true }, "insert": "\n" },
     { "insert": "Another line" },
     { "attributes": { "spoiler-line": true }, "insert": "\n" },

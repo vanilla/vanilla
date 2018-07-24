@@ -26,7 +26,6 @@
         },
         "typeRoots": [
             "@types",
-            "applications/dashboard/src/scripts/@types",
             "./node_modules/@types"
         ],
         "skipLibCheck": true,

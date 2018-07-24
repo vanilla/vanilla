@@ -2454,7 +2454,7 @@ EOT;
 
         if (json_last_error() !== JSON_ERROR_NONE) {
             $link = "https://docs.vanillaforums.com/help/addons/rich-editor/#why-is-my-published-post-replaced-with-there-was-an-error-rendering-this-rich-post";
-            return "<p class='userContent-error'>".$title." <a href='$link' rel='nofollow' title='$title' class='icon icon-warning-sign'></a></p>";
+            return "<div class='DismissMessage Warning userContent-error'>$title <a href='$link' rel='nofollow' title='$title'><span class='icon icon-warning-sign userContent-errorIcon'></span></a></div>";
         }
 
         $parser = Gdn::getContainer()->get(Vanilla\Formatting\Quill\Parser::class);

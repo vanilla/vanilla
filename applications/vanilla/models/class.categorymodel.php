@@ -1945,6 +1945,10 @@ class CategoryModel extends Gdn_Model {
         if ($recursionLevel === 0) {
             $this->rebuildTree();
         }
+
+        // Let the world know we completed our mission.
+        $this->EventArguments['CategoryID'] = $category->CategoryID;
+        $this->fireEvent('AfterDeleteCategory');
     }
 
     /**

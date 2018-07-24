@@ -317,18 +317,23 @@ $embedOperations = '[
         "insert": {
             "embed-external": {
                 "data": {
-                    "url": "https://vimeo.com/ondemand/nature365/113009024",
+                    "url": "https://vimeo.com/264197456",
                     "type": "vimeo",
-                    "name": "Nature 365 - Monthly collections",
+                    "name": "Vimeo",
                     "body": null,
-                    "photoUrl": "https://i.vimeocdn.com/video/498185229_295x166.jpg",
-                    "height": 270,
-                    "width": 480,
-                    "attributes": { "thumbnail_width": 295, "thumbnail_height": 166 }
+                    "photoUrl": "https://i.vimeocdn.com/video/694532899_640.jpg",
+                    "height": 272,
+                    "width": 640,
+                    "attributes": {
+                        "thumbnail_width": 640,
+                        "thumbnail_height": 272,
+                        "videoID": "264197456",
+                        "embedUrl": "https://player.vimeo.com/video/264197456?autoplay=1"
+                    }
                 },
                 "loaderData": {
                     "type": "link",
-                    "link": "https://vimeo.com/ondemand/nature365/113009024",
+                    "link": "https://vimeo.com/264197456",
                     "loaded": true
                 }
             }

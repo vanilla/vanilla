@@ -366,6 +366,117 @@ class SmokeTest extends BaseTest {
     }
 
     /**
+     * Test posting a Draft.
+     *
+     * @depends testRegisterBasic
+     * @large
+     */
+    public function testPostDraft() {
+        $api = $this->api();
+        $api->setUser($this->getTestUser());
+
+        $draft = [
+            'CategoryID'=> 1,
+            'Name' => 'Draft Test',
+            'Body' => 'Test posting a new draft',
+            'Save Draft' => 'Save Draft'
+        ];
+
+        $r = $api->post(
+            '/post/discussion.json',
+            $draft
+        );
+        $statusCode = $r->getStatusCode();
+        $this->assertEquals(200, $statusCode);
+
+        $draftModel = new \DraftModel();
+        $postedDraft = $draftModel->getID(1, DATASET_TYPE_ARRAY);
+
+        $this->assertEquals($postedDraft['Name'], $draft['Name']);
+        $this->assertEquals($postedDraft['Body'], $draft['Body']);
+        $this->assertEquals($postedDraft['CategoryID'], $draft['CategoryID']);
+    }
+
+    /**
+     * Test posting a Discussion from a Draft.
+     *
+     * @depends testRegisterBasic
+     * @large
+     */
+    public function testPostDiscussionFromDraft() {
+        $api = $this->api();
+        $api->setUser($this->getTestUser());
+
+        $draft = [
+            'CategoryID'=> 1,
+            'Name' => 'Draft Test',
+            'Body' => 'Test posting a new draft',
+            'Save Draft' => 'Save Draft',
+        ];
+
+        $r1 = $api->post(
+            '/post/discussion.json',
+            $draft
+        );
+
+        $statusCode = $r1->getStatusCode();
+        $this->assertEquals(200, $statusCode);
+
+        $draftModel = new \DraftModel();
+        $postedDraft = $draftModel->getID(1, DATASET_TYPE_ARRAY);
+
+        $discussion = [
+            'DraftID' => $postedDraft['DraftID'],
+            'CategoryID' => $postedDraft['CategoryID'],
+            'Name' => $postedDraft['Name'],
+            'Body' => $postedDraft['Body'],
+        ];
+
+        $r2 = $api->post(
+            "/post/editdiscussion/0/{$postedDraft['DraftID']}.json",
+            $discussion
+        );
+        $statusCode = $r2->getStatusCode();
+        $this->assertEquals(200, $statusCode);
+
+        $postedDiscussion = $r2->getBody();
+        $postedDiscussion = $postedDiscussion['Discussion'];
+        $this->assertEquals($discussion['Name'], $postedDiscussion['Name']);
+        $this->assertEquals($discussion['Body'], $postedDiscussion['Body']);
+    }
+
+    /**
+     * Delete a Draft.
+     *
+     * @depends testRegisterBasic
+     * @large
+     */
+    public function testDeleteDraft() {
+
+        $api = $this->api();
+        $api->setUser($this->getTestUser());
+        $user = $api->getUser();
+
+        $draft = [
+            'CategoryID'=> 1,
+            'Name' => 'Draft Test',
+            'Body' => 'Test posting a new draft',
+            'Save Draft' => 'Save Draft',
+        ];
+
+        $r1 = $api->post(
+            '/post/discussion.json',
+            $draft
+        );
+
+        $statusCode = $r1->getStatusCode();
+        $this->assertEquals(200, $statusCode);
+
+        $r2 = $api->get("drafts/delete/1/{$user['tk']}");
+
+    }
+
+    /**
      * Test viewing a restricted category.
      *
      * @depends testCreateRestrictedCategory

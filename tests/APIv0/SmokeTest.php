@@ -366,12 +366,12 @@ class SmokeTest extends BaseTest {
     }
 
     /**
-     * Test posting a Draft.
+     * Test saving a draft.
      *
      * @depends testRegisterBasic
      * @large
      */
-    public function testPostDraft() {
+    public function testSaveDraft() {
         $api = $this->api();
         $api->setUser($this->getTestUser());
 
@@ -395,6 +395,8 @@ class SmokeTest extends BaseTest {
         $this->assertEquals($postedDraft['Name'], $draft['Name']);
         $this->assertEquals($postedDraft['Body'], $draft['Body']);
         $this->assertEquals($postedDraft['CategoryID'], $draft['CategoryID']);
+
+        return $postedDraft;
     }
 
     /**
@@ -406,21 +408,6 @@ class SmokeTest extends BaseTest {
     public function testPostDiscussionFromDraft() {
         $api = $this->api();
         $api->setUser($this->getTestUser());
-
-        $draft = [
-            'CategoryID'=> 1,
-            'Name' => 'Draft Test',
-            'Body' => 'Test posting a new draft',
-            'Save Draft' => 'Save Draft',
-        ];
-
-        $r1 = $api->post(
-            '/post/discussion.json',
-            $draft
-        );
-
-        $statusCode = $r1->getStatusCode();
-        $this->assertEquals(200, $statusCode);
 
         $draftModel = new \DraftModel();
         $postedDraft = $draftModel->getID(1, DATASET_TYPE_ARRAY);
@@ -472,8 +459,9 @@ class SmokeTest extends BaseTest {
         $statusCode = $r1->getStatusCode();
         $this->assertEquals(200, $statusCode);
 
-        $r2 = $api->get("drafts/delete/1/{$user['tk']}");
-
+        $r2 = $api->get("drafts/delete/2/{$user['tk']}");
+        $statusCode2 = $r2->getStatusCode();
+        $this->assertEquals(200, $statusCode2);
     }
 
     /**

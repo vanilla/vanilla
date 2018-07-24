@@ -47,8 +47,7 @@ $fontSize-small: 12px !default;
 }
 
 .inputBlock-error {
-    word-break: break-all;
-    word-break: break-word;
+    @include breakWord;
     display: block;
     color: #ff3933;
     line-height: $lineHeight-base;

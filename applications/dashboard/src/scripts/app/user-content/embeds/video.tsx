@@ -54,7 +54,6 @@ export class VideoEmbed extends BaseEmbed<IEmbedProps, IState> {
                         src={photoUrl || undefined}
                         role="presentation"
                         className="embedVideo-thumbnail"
-                        crossOrigin="anonymous"
                     />
                     <span className="embedVideo-scrim" />
                     <PlayIcon />

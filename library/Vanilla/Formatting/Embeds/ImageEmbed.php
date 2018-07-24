@@ -103,7 +103,7 @@ class ImageEmbed extends Embed {
 <div class="embedExternal embedImage">
     <div class="embedExternal-content">
         <a className="embedImage-link" href="{$sanitizedHref}" rel="nofollow noopener" target="_blank">
-            <img class="embedImage-img" src="{$sourceEncoded}" crossorigin="anonymous">
+            <img class="embedImage-img" src="{$sourceEncoded}">
         </a>
     </div>
 </div>

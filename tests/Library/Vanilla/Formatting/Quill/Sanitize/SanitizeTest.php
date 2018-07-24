@@ -57,7 +57,7 @@ abstract class SanitizeTest extends TestCase {
         $operations = $this->insertContentOperations($badContents);
         // The contents should've been removed or encoded.
         $this->assertSanitized($operations, $badContents);
-        $this->assertSanitizedLinks($operations);
+        $this->assertSanitizedLinks();
     }
 
     /**
@@ -75,7 +75,7 @@ abstract class SanitizeTest extends TestCase {
         $this->assertNotContains($badValue, $result);
     }
 
-    protected function assertSanitizedLinks(array $operations) {
+    protected function assertSanitizedLinks() {
         $jsUrl = "javascript:alert(1)";
 
         $linkResult = $this->render($this->insertContentOperations($jsUrl));

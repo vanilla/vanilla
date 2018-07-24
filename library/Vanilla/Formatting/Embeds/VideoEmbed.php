@@ -96,7 +96,7 @@ SVG;
     <div class="embedExternal-content">
         <div class="{$containerAttr['class']}" style="{$containerAttr['style']}">
             <button type="button" data-url="{$attr['url']}" aria-label="{$attr['name']}" class="embedVideo-playButton iconButton js-playVideo" title="{$attr['name']}">
-                <img class="embedVideo-thumbnail" src="{$attr['photoUrl']}" role="presentation" alt="{$imgAlt}" crossorigin="anonymous"/>
+                <img class="embedVideo-thumbnail" src="{$attr['photoUrl']}" role="presentation" alt="{$imgAlt}"/>
                 <span class="videoEmbed-scrim"/>
                 {$playButtonSVG}
             </button>

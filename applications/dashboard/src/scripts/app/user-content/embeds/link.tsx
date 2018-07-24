@@ -40,7 +40,7 @@ export class LinkEmbed extends BaseEmbed {
 
         let linkImage: JSX.Element | null = null;
         if (photoUrl) {
-            linkImage = <img src={photoUrl} className="embedLink-image" aria-hidden="true" crossOrigin="anonymous" />;
+            linkImage = <img src={photoUrl} className="embedLink-image" aria-hidden="true" />;
         }
 
         const userName = attributes.userName ? <span className="embedLink-userName">{attributes.userName}</span> : null;

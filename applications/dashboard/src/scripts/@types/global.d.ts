@@ -31,6 +31,16 @@ declare namespace React {
     }
 }
 
+declare namespace JSX {
+    interface ExtendIFrameAttributes extends React.IframeHTMLAttributes<HTMLIFrameElement> {
+        allow: string;
+    }
+
+    interface IntrinsicElements {
+        iframe: React.DetailedHTMLProps<ExtendIFrameAttributes, HTMLIFrameElement>;
+    }
+}
+
 declare module "*.json";
 declare module "*.html";
 declare module "twemoji";

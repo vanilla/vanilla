@@ -1846,105 +1846,109 @@ class CategoryModel extends Gdn_Model {
             || $category->CategoryID <= 0
         ) {
             throw new \InvalidArgumentException(t('Invalid category for deletion.'), 400);
-        } else {
-            // Remove permissions related to category
-            $permissionModel = Gdn::permissionModel();
-            $permissionModel->delete(null, 'Category', 'CategoryID', $category->CategoryID);
+        }
 
-            // If there is a replacement category...
-            if ($newCategoryID > 0) {
-                // Update children categories
-                $this->SQL
-                    ->update('Category')
-                    ->set('ParentCategoryID', $newCategoryID)
-                    ->where('ParentCategoryID', $category->CategoryID)
-                    ->put();
+        // Remove permissions related to category
+        $permissionModel = Gdn::permissionModel();
+        $permissionModel->delete(null, 'Category', 'CategoryID', $category->CategoryID);
 
-                // Update permission categories.
-                $this->SQL
-                    ->update('Category')
-                    ->set('PermissionCategoryID', $newCategoryID)
-                    ->where('PermissionCategoryID', $category->CategoryID)
-                    ->where('CategoryID <>', $category->CategoryID)
-                    ->put();
+        // If there is a replacement category...
+        if ($newCategoryID > 0) {
+            // Update children categories
+            $this->SQL
+                ->update('Category')
+                ->set('ParentCategoryID', $newCategoryID)
+                ->where('ParentCategoryID', $category->CategoryID)
+                ->put();
 
-                // Update discussions
-                $this->SQL
-                    ->update('Discussion')
-                    ->set('CategoryID', $newCategoryID)
-                    ->where('CategoryID', $category->CategoryID)
-                    ->put();
+            // Update permission categories.
+            $this->SQL
+                ->update('Category')
+                ->set('PermissionCategoryID', $newCategoryID)
+                ->where('PermissionCategoryID', $category->CategoryID)
+                ->where('CategoryID <>', $category->CategoryID)
+                ->put();
 
-                // Update the discussion count
-                $count = $this->SQL
-                    ->select('DiscussionID', 'count', 'DiscussionCount')
-                    ->from('Discussion')
-                    ->where('CategoryID', $newCategoryID)
-                    ->get()
-                    ->firstRow()
-                    ->DiscussionCount;
+            // Update discussions
+            $this->SQL
+                ->update('Discussion')
+                ->set('CategoryID', $newCategoryID)
+                ->where('CategoryID', $category->CategoryID)
+                ->put();
 
-                if (!is_numeric($count)) {
-                    $count = 0;
-                }
+            // Update the discussion count
+            $count = $this->SQL
+                ->select('DiscussionID', 'count', 'DiscussionCount')
+                ->from('Discussion')
+                ->where('CategoryID', $newCategoryID)
+                ->get()
+                ->firstRow()
+                ->DiscussionCount;
 
-                $this->SQL
-                    ->update('Category')->set('CountDiscussions', $count)
-                    ->where('CategoryID', $newCategoryID)
-                    ->put();
-
-                // Update tags
-                $this->SQL
-                    ->update('Tag')
-                    ->set('CategoryID', $newCategoryID)
-                    ->where('CategoryID', $category->CategoryID)
-                    ->put();
-
-                $this->SQL
-                    ->update('TagDiscussion')
-                    ->set('CategoryID', $newCategoryID)
-                    ->where('CategoryID', $category->CategoryID)
-                    ->put();
-            } else {
-                // Delete comments in this category
-                $this->SQL
-                    ->from('Comment c')
-                    ->join('Discussion d', 'c.DiscussionID = d.DiscussionID')
-                    ->where('d.CategoryID', $category->CategoryID)
-                    ->delete();
-
-                // Delete discussions in this category
-                $this->SQL->delete('Discussion', ['CategoryID' => $category->CategoryID]);
-
-                // Make inherited permission local permission
-                $this->SQL
-                    ->update('Category')
-                    ->set('PermissionCategoryID', 0)
-                    ->where('PermissionCategoryID', $category->CategoryID)
-                    ->where('CategoryID <>', $category->CategoryID)
-                    ->put();
-
-                // Delete tags
-                $this->SQL->delete('Tag', ['CategoryID' => $category->CategoryID]);
-                $this->SQL->delete('TagDiscussion', ['CategoryID' => $category->CategoryID]);
-
-                // Recursively delete child categories and their content.
-                $children = self::flattenTree($this->collection->getTree($category->CategoryID));
-                $recursionLevel++;
-                foreach ($children as $child) {
-                    self::deleteAndReplace($child, 0);
-                }
-                $recursionLevel--;
+            if (!is_numeric($count)) {
+                $count = 0;
             }
 
-            // Delete the category
-            $this->SQL->delete('Category', ['CategoryID' => $category->CategoryID]);
+            $this->SQL
+                ->update('Category')->set('CountDiscussions', $count)
+                ->where('CategoryID', $newCategoryID)
+                ->put();
+
+            // Update tags
+            $this->SQL
+                ->update('Tag')
+                ->set('CategoryID', $newCategoryID)
+                ->where('CategoryID', $category->CategoryID)
+                ->put();
+
+            $this->SQL
+                ->update('TagDiscussion')
+                ->set('CategoryID', $newCategoryID)
+                ->where('CategoryID', $category->CategoryID)
+                ->put();
+        } else {
+            // Delete comments in this category
+            $this->SQL
+                ->from('Comment c')
+                ->join('Discussion d', 'c.DiscussionID = d.DiscussionID')
+                ->where('d.CategoryID', $category->CategoryID)
+                ->delete();
+
+            // Delete discussions in this category
+            $this->SQL->delete('Discussion', ['CategoryID' => $category->CategoryID]);
+
+            // Make inherited permission local permission
+            $this->SQL
+                ->update('Category')
+                ->set('PermissionCategoryID', 0)
+                ->where('PermissionCategoryID', $category->CategoryID)
+                ->where('CategoryID <>', $category->CategoryID)
+                ->put();
+
+            // Delete tags
+            $this->SQL->delete('Tag', ['CategoryID' => $category->CategoryID]);
+            $this->SQL->delete('TagDiscussion', ['CategoryID' => $category->CategoryID]);
+
+            // Recursively delete child categories and their content.
+            $children = self::flattenTree($this->collection->getTree($category->CategoryID));
+            $recursionLevel++;
+            foreach ($children as $child) {
+                self::deleteAndReplace($child, 0);
+            }
+            $recursionLevel--;
         }
+
+        // Delete the category
+        $this->SQL->delete('Category', ['CategoryID' => $category->CategoryID]);
 
         // Make sure to reorganize the categories after deletes
         if ($recursionLevel === 0) {
             $this->rebuildTree();
         }
+
+        // Let the world know we completed our mission.
+        $this->EventArguments['CategoryID'] = $category->CategoryID;
+        $this->fireEvent('AfterDeleteCategory');
     }
 
     /**
@@ -3049,7 +3053,9 @@ class CategoryModel extends Gdn_Model {
             // Force the user permissions to refresh.
             Gdn::userModel()->clearPermissions();
 
-            // $this->rebuildTree();
+            // Let the world know we succeeded in our mission.
+            $this->EventArguments['CategoryID'] = $CategoryID;
+            $this->fireEvent('AfterSaveCategory');
         } else {
             $CategoryID = false;
         }

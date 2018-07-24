@@ -2188,7 +2188,11 @@ class DiscussionModel extends Gdn_Model {
                     }
 
                     // Notify all of the users that were mentioned in the discussion.
-                    $usernames = getMentions($discussionName.' '.$story);
+                    if ($fields['Format'] === "Rich") {
+                        $usernames = Gdn_Format::getRichMentionUsernames($fields['Body']);
+                    } else {
+                        $usernames = getMentions($discussionName.' '.$story);
+                    }
 
                     // Use our generic Activity for events, not mentions
                     $this->EventArguments['Activity'] = $activity;

@@ -2465,6 +2465,27 @@ EOT;
     }
 
     /**
+     * Get the usernames mention in a rich post.
+     *
+     * @param string $body The contents of a post body.
+     *
+     * @return string[]
+     * @throws \Garden\Container\ContainerException
+     * @throws \Garden\Container\NotFoundException
+     */
+    public static function getRichMentionUsernames(string $body): array {
+        /** @var \Vanilla\Formatting\Quill\Parser $parser */
+        $parser = Gdn::getContainer()->get(\Vanilla\Formatting\Quill\Parser::class);
+        $operations = json_decode($body, true);
+
+        if (json_last_error() === JSON_ERROR_NONE) {
+            return $parser->parseMentionUsernames($operations);
+        } else {
+            return [];
+        }
+    }
+
+    /**
      * Encode special CSS characters as hex.
      *
      * @param string $string

@@ -50,15 +50,18 @@ class Parser {
 
     /**
      * Register all of the built in blots and formats to parse. Primarily for use in bootstrapping.
+     *
+     * The embeds NEED to be first here, otherwise something like a blockquote with only a mention in it will
+     * match only as a blockquote instead of as a mention.
      */
     public function addCoreBlotsAndFormats() {
         $this
-            ->addBlot(Blots\Lines\SpoilerLineBlot::class)
-            ->addBlot(Blots\Lines\BlockquoteLineBlot::class)
-            ->addBlot(Blots\Lines\ListLineBlot::class)
             ->addBlot(Blots\Embeds\ExternalBlot::class)
             ->addBlot(Blots\Embeds\MentionBlot::class)
             ->addBlot(Blots\Embeds\EmojiBlot::class)
+            ->addBlot(Blots\Lines\SpoilerLineBlot::class)
+            ->addBlot(Blots\Lines\BlockquoteLineBlot::class)
+            ->addBlot(Blots\Lines\ListLineBlot::class)
             ->addBlot(Blots\CodeBlockBlot::class)
             ->addBlot(Blots\HeadingBlot::class)
             ->addBlot(Blots\TextBlot::class)// This needs to be the last one!!!
@@ -95,6 +98,25 @@ class Parser {
         return $this->createBlotGroups($operations);
     }
 
+    /**
+     * Parse out the usernames of everyone mentioned in a post.
+     *
+     * @param array $operations
+     * @return string[]
+     */
+    public function parseMentionUsernames(array $operations): array {
+        if (!in_array(Blots\Embeds\MentionBlot::class, $this->blotClasses)) {
+            return [];
+        }
+
+        $blotGroups = $this->parse($operations);
+        $mentionUsernames = [];
+        foreach ($blotGroups as $blotGroup) {
+            $mentionUsernames = array_merge($mentionUsernames, $blotGroup->getMentionUsernames());
+        }
+
+        return $mentionUsernames;
+    }
 
     /**
      * Get the matching blot for a sequence of operations. Returns the default if no match is found.

@@ -146,6 +146,29 @@ class BlotGroup {
     }
 
     /**
+     * Get all of the mention blots in the group.
+     *
+     * Mentions that are inside of Blockquote's are excluded. We don't want to be sending notifications when big quote
+     * replies build up.
+     *
+     * @return string[]
+     */
+    public function getMentionUsernames() {
+        if ($this->getBlotForSurroundingTags() instanceof Blots\Lines\BlockquoteLineBlot) {
+            return [];
+        }
+
+        $names = [];
+        foreach ($this->blots as $blot) {
+            if ($blot instanceof Blots\Embeds\MentionBlot) {
+                $names[] = $blot->getUsername();
+            }
+        }
+
+        return $names;
+    }
+
+    /**
      * Add a blot to this block.
      *
      * @param AbstractBlot $blot

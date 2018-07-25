@@ -155,7 +155,9 @@ class ValidationTest extends TestCase {
             ['date', '2018-01-01'],
             ['datetime', '2018-02-01 13:44'],
 
+            ['time', '9:00'],
             ['time', '13:14'],
+            ['time', '23:59:59'],
             ['timestamp', '2018-10-01'],
 
             ['year', 2018],

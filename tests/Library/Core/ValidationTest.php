@@ -15,6 +15,43 @@ use Vanilla\Invalid;
  * Tests for the **Gdn_Validation** object.
  */
 class ValidationTest extends TestCase {
+
+    /**
+     * Test the ability to validate a post body's formatting.
+     *
+     * @param array $row Post row.
+     * @param bool $isValid Does this post row have a valid body?
+     * @dataProvider provideBodyFormatRows
+     */
+    public function testBodyFormat(array $row, bool $isValid) {
+        $validation = new Gdn_Validation([
+            'Body' => (object)['AllowNull' => false, 'Default' => '', 'Type' => 'string'],
+            'Format' => (object)['AllowNull' => false, 'Default' => '', 'Type' => 'string'],
+        ], true);
+        $validation->addRule('BodyFormat', new \Vanilla\BodyFormatValidator());
+
+        $result = $validation->validate($row);
+        $this->assertSame($isValid, $result);
+    }
+
+    /**
+     * Provide post rows for validating formatting.
+     *
+     * @return array
+     */
+    public function provideBodyFormatRows() {
+        return [
+            [
+                ['Body' => '{"insert":"This is a valid rich post."}', 'Format' => 'Rich'],
+                true
+            ],
+            [
+                ['Body' => 'This is not a valid rich post.', 'Format' => 'Rich'],
+                false
+            ],
+        ];
+    }
+
     /**
      * Test some basic valid types.
      *

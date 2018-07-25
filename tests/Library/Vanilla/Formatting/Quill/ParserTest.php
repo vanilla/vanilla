@@ -129,4 +129,39 @@ class ParserTest extends SharedBootstrapTestCase {
             ],
         ];
     }
+
+    /**
+     * @throws \Garden\Container\ContainerException
+     * @throws \Garden\Container\NotFoundException
+     */
+    public function testParseMentions() {
+        $ops = [
+            ["insert" => "\n\n@totoallyNotAMention asdf @notAMention"],
+            $this->makeMention("realMention"),
+            $this->makeMention("Some Other meénetioön 🙃"),
+            $this->makeMention("realMention$$.asdf Number 2"),
+            ["insert" => "\n"],
+            $this->makeMention("@mentionInABlockquote"),
+            ["attributes" => ["blockquote-line" => true], "insert" => "\n"],
+        ];
+
+        $expectedUsernames = [
+            "realMention",
+            "Some Other meénetioön 🙃",
+            "realMention$$.asdf Number 2",
+        ];
+
+        /** @var Parser $parser */
+        $parser = \Gdn::getContainer()->get(Parser::class);
+        $actualUsernames = $parser->parseMentionUsernames($ops);
+        $this->assertSame($expectedUsernames, $actualUsernames);
+    }
+
+    private function makeMention(string $name) {
+        return ["insert" => [
+            "mention" => [
+                "name" => $name,
+            ],
+        ]];
+    }
 }

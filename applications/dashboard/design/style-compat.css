@@ -104,15 +104,17 @@ button.Close {
 }
 
 .Title-PrivateIcon {
-  height: 1em;
-  width: .7em;
-  vertical-align: -.11em;
+  height: 0.8em;
+  width: .8em;
+  vertical-align: -.05;
+  opacity: 0.4;
 }
 
 .Title-SecretIcon {
-  height: 1em;
-  width: 1.2em;
-  vertical-align: -.2em;
+  height: 0.8em;
+  width: 1.1em;
+  vertical-align: -.1em;
+  opacity: 0.4;
 }
 
 .authenticateUserCol {

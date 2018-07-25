@@ -2483,13 +2483,8 @@ EOT;
      * @return string
      */
     public static function sanitizeUrl(string $url): string {
-        $isSafe = false;
-
-        foreach (self::SAFE_PROTOCOLS as $protocol) {
-            if (strpos($url, $protocol) === 0) {
-                $isSafe = true;
-            }
-        }
+        $protocol = parse_url($url, PHP_URL_SCHEME) || "";
+        $isSafe = in_array($protocol, self::SAFE_PROTOCOLS);
 
         if ($isSafe) {
             return $url;

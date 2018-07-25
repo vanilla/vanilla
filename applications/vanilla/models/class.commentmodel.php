@@ -46,11 +46,10 @@ class CommentModel extends Gdn_Model {
     /**
      * Class constructor. Defines the related database table name.
      *
-     * @since 2.0.0
-     * @access public
+     * @param Gdn_Validation $validation The validation dependency.
      */
-    public function __construct() {
-        parent::__construct('Comment');
+    public function __construct(Gdn_Validation $validation = null) {
+        parent::__construct('Comment', $validation);
         $this->floodGate = FloodControlHelper::configure($this, 'Vanilla', 'Comment');
         $this->pageCache = Gdn::cache()->activeEnabled() && c('Properties.CommentModel.pageCache', false);
         $this->fireEvent('AfterConstruct');

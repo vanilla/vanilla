@@ -101,11 +101,10 @@ class DiscussionModel extends Gdn_Model {
     /**
      * Class constructor. Defines the related database table name.
      *
-     * @since 2.0.0
-     * @access public
+     * @param Gdn_Validation $validation The validation dependency.
      */
-    public function __construct() {
-        parent::__construct('Discussion');
+    public function __construct(Gdn_Validation $validation = null) {
+        parent::__construct('Discussion', $validation);
         $this->floodGate = FloodControlHelper::configure($this, 'Vanilla', 'Discussion');
     }
 

@@ -61,9 +61,11 @@ class ActivityModel extends Gdn_Model {
 
     /**
      * Defines the related database table name.
+     *
+     * @param Gdn_Validation $validation The validation dependency.
      */
-    public function __construct() {
-        parent::__construct('Activity');
+    public function __construct(Gdn_Validation $validation = null) {
+        parent::__construct('Activity', $validation);
         try {
             $this->setPruneAfter(c('Garden.PruneActivityAfter', '2 months'));
         } catch (Exception $ex) {

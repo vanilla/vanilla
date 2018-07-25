@@ -466,7 +466,7 @@ if (!function_exists('validateTime')) {
                 return sprintf('%d:%02d:%02d', $h, $m, $s);
             }
         }
-            return \Vanilla\Invalid::emptyMessage();
+        return \Vanilla\Invalid::emptyMessage();
     }
 }
 

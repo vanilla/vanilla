@@ -2463,27 +2463,27 @@ EOT;
     }
 
     const SAFE_PROTOCOLS = [
-        "http://",
-        "https://",
-        "tel:",
-        "mailto:",
+        "http",
+        "https",
+        "tel",
+        "mailto",
     ];
 
     /**
      * Sanitize a URL to ensure that it matches a whitelist of approved url schemes. If the url does not match one of these schemes, prepend `unsafe:` before it.
      *
      * Allowed protocols
-     * - "http://",
-     * - "https://",
+     * - "http:",
+     * - "https:",
      * - "tel:",
-     * - "mailto://",
+     * - "mailto:",
      *
      * @param string $url The url to sanitize.
      *
      * @return string
      */
     public static function sanitizeUrl(string $url): string {
-        $protocol = parse_url($url, PHP_URL_SCHEME);
+        $protocol = parse_url($url, PHP_URL_SCHEME) ?: "";
         $isSafe = in_array($protocol, self::SAFE_PROTOCOLS, true);
 
         if ($isSafe) {

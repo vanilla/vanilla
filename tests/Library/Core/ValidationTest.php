@@ -8,13 +8,13 @@
 namespace VanillaTests\Library\Core;
 
 use Gdn_Validation;
-use PHPUnit\Framework\TestCase;
+use VanillaTests\SharedBootstrapTestCase;
 use Vanilla\Invalid;
 
 /**
  * Tests for the **Gdn_Validation** object.
  */
-class ValidationTest extends TestCase {
+class ValidationTest extends SharedBootstrapTestCase {
 
     /**
      * Test the ability to validate a post body's formatting.

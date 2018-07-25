@@ -2464,7 +2464,15 @@ EOT;
         return $renderer->render($blotGroups);
     }
 
+    const SAFE_PROTOCOLS = [
+        "http",
+        "https",
+        "tel",
+        "mailto",
+    ];
+
     /**
+     * Sanitize a URL to ensure that it matches a whitelist of approved url schemes. If the url does not match one of these schemes, prepend `unsafe:` before it.
      * Get the usernames mention in a rich post.
      *
      * @param string $body The contents of a post body.
@@ -2488,21 +2496,24 @@ EOT;
     /**
      * Encode special CSS characters as hex.
      *
-     * @param string $string
-     * @return mixed
+     * Allowed protocols
+     * - "http:",
+     * - "https:",
+     * - "tel:",
+     * - "mailto:",
+     *
+     * @param string $url The url to sanitize.
+     *
+     * @return string
      */
-    public static function cssSpecialChars(string $string) {
-        static $specialChars = [
-            "\\" => "\\00005c", "!" => "\\000021", "\"" => "\\000022", "#" => "\\000023", "$" => "\\000024",
-            "%" => "\\000025", "&" => "\\000026", "'" => "\\000027", "(" => "\\000028", ")" => "\\000029",
-            "*" => "\\00002a", "+" => "\\00002b", "," => "\\00002c", "-" => "\\00002d", "." => "\\00002e",
-            "/" => "\\00002f", ":" => "\\00003a", ";" => "\\00003b", "<" => "\\00003c", "=" => "\\00003d",
-            ">" => "\\00003e", "?" => "\\00003f", "@" => "\\000040", "[" => "\\00005b", "]" => "\\00005d",
-            "^" => "\\00005e", "`" => "\\000060", "{" => "\\00007b", "|" => "\\00007c", "}" => "\\00007d",
-            "~" => "\\00007e",
-        ];
+    public static function sanitizeUrl(string $url): string {
+        $protocol = parse_url($url, PHP_URL_SCHEME) ?: "";
+        $isSafe = in_array($protocol, self::SAFE_PROTOCOLS, true);
 
-        $result = str_replace(array_keys($specialChars), array_values($specialChars), $string);
-        return $result;
+        if ($isSafe) {
+            return $url;
+        } else {
+            return "unsafe:".$url;
+        }
     }
 }

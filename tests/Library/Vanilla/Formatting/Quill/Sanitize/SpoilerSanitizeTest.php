@@ -16,7 +16,7 @@ class SpoilerSanitizeTest extends SanitizeTest {
             ["insert" => $content],
             [
                 "attributes" => ["spoiler-line" => true],
-                "insert" => "\n"
+                "insert" => "$content"
             ]
         ];
         return $operations;

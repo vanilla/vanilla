@@ -57,6 +57,7 @@ abstract class SanitizeTest extends TestCase {
         $operations = $this->insertContentOperations($badContents);
         // The contents should've been removed or encoded.
         $this->assertSanitized($operations, $badContents);
+        $this->assertSanitizedLinks();
     }
 
     /**
@@ -72,5 +73,22 @@ abstract class SanitizeTest extends TestCase {
 
         // The contents should've been removed or encoded.
         $this->assertNotContains($badValue, $result);
+    }
+
+    protected function assertSanitizedLinks() {
+        $jsUrl = "javascript:alert(1)";
+
+        $linkResult = $this->render($this->insertContentOperations($jsUrl));
+        $badLinks = [
+            'href="'.$jsUrl.'"',
+            'href="'.htmlspecialchars($jsUrl).'"',
+            'href="'.htmlentities($jsUrl).'"',
+            "href='".$jsUrl."'",
+            "href='".htmlspecialchars($jsUrl)."'",
+            "href='".htmlentities($jsUrl)."'",
+        ];
+        foreach ($badLinks as $badLink) {
+            $this->assertNotContains($badLink, $linkResult);
+        }
     }
 }

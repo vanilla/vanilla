@@ -16,7 +16,7 @@ class BlockQuoteSanitizeTest extends SanitizeTest {
             ["insert" => $content],
             [
                 "attributes" => ["blockquote-line" => true],
-                "insert" => "\n"
+                "insert" => "$content"
             ]
         ];
         return $operations;

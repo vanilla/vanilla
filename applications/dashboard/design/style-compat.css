@@ -1923,13 +1923,32 @@ body.isMobile .FormWrapper {
           transform: scale(1);
 }
 
-.embedVideo-iframe {
+.embedVideo-iframe,
+.embedVideo-thumbnail {
   position: absolute;
   display: block;
   top: 0;
   left: 0;
   height: 100%;
   width: 100%;
+}
+
+.embedVideo-thumbnail {
+  object-fit: cover;
+  object-position: center;
+}
+
+.embedVideo-scrim {
+  content: "";
+  display: block;
+  position: absolute;
+  display: block;
+  top: 0;
+  left: 0;
+  height: 100%;
+  width: 100%;
+  background: -webkit-linear-gradient(top, rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.4));
+  background: linear-gradient(to bottom, rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.4));
 }
 
 .embedVideo-ratio {
@@ -1966,24 +1985,8 @@ body.isMobile .FormWrapper {
   left: 0;
   height: 100%;
   width: 100%;
-  background-size: cover;
-  background-repeat: no-repeat;
-  background-position: center;
   cursor: pointer;
   overflow: hidden;
-}
-
-.embedVideo-playButton::before {
-  content: "";
-  display: block;
-  position: absolute;
-  display: block;
-  top: 0;
-  left: 0;
-  height: 100%;
-  width: 100%;
-  background: -webkit-linear-gradient(top, rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.4));
-  background: linear-gradient(to bottom, rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.4));
 }
 
 .embedVideo-playIcon {
@@ -2044,9 +2047,8 @@ body.isMobile .FormWrapper {
   position: absolute;
   top: 0;
   left: 0;
-  background-size: cover;
-  background-repeat: no-repeat;
-  background-position: 50% 50%;
+  object-fit: cover;
+  object-position: center;
   width: 225px;
   height: 100%;
 }

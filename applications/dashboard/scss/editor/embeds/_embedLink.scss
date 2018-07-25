@@ -39,9 +39,8 @@ $embedLink-linkImage_bg: #ffffff !default;
     position: absolute;
     top: 0;
     left: 0;
-    background-size: cover;
-    background-repeat: no-repeat;
-    background-position: 50% 50%;
+    object-fit: cover;
+    object-position: center;
     width: $embedLink-linkImage_width;
     height: 100%;
 

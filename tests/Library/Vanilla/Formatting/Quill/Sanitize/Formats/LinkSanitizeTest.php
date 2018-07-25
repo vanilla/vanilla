@@ -35,7 +35,7 @@ class LinkSanitizeTest extends SanitizeTest {
         $operations = [
             [
                 "insert" => $content,
-                "attributes" => ["link" => "https://vanillaforums.com"]
+                "attributes" => ["link" => $content]
             ]
         ];
         return $operations;

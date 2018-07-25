@@ -89,11 +89,15 @@ abstract class VideoEmbed extends Embed {
 </svg>
 SVG;
 
+        $imgAlt = t("A thumnail preview of a video");
+
         $result = <<<HTML
 <div class="embedExternal embedVideo">
     <div class="embedExternal-content">
         <div class="{$containerAttr['class']}" style="{$containerAttr['style']}">
-            <button type="button" data-url="{$attr['url']}" aria-label="{$attr['name']}" class="embedVideo-playButton iconButton js-playVideo" style="background-image: url({$attr['photoUrl']});" title="{$attr['name']}">
+            <button type="button" data-url="{$attr['url']}" aria-label="{$attr['name']}" class="embedVideo-playButton iconButton js-playVideo" title="{$attr['name']}">
+                <img class="embedVideo-thumbnail" src="{$attr['photoUrl']}" role="presentation" alt="{$imgAlt}"/>
+                <span class="videoEmbed-scrim"/>
                 {$playButtonSVG}
             </button>
         </div>

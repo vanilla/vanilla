@@ -23,18 +23,18 @@ class YouTubeSanitizeTest extends SanitizeTest {
                         "name" => $content,
                         "body" => $content,
                         "photoUrl" => $content,
-                        "height" => null,
-                        "width" => null,
+                        "height" => $content,
+                        "width" => $content,
                         "attributes" => [
                             "thumbnail_width" => $content,
                             "thumbnail_height" => $content,
                             "videoID" => $content,
-                            "embedUrl" => $content
-                        ]
-                    ]
-                ]
+                            "embedUrl" => $content,
+                        ],
+                    ],
+                ],
             ],
-            ["insert" => "\n"]
+            ["insert" => "\n"],
         ];
 
         return $operations;

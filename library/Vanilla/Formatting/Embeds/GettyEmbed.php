@@ -79,19 +79,21 @@ class GettyEmbed extends Embed {
 
         $result = <<<HTML
 <div class="embedExternal embedGetty">
-    <a
-        class="embedExternal-content gie-single js-gettyEmbed"
-        href="{$encodedURL}"
-        id="{$encodeID}"
-        data-height="{$encodedHeight}"
-        data-width="{$encodedWidth}"
-        data-sig="{$encodedSig}"
-        data-items="{$encodedItems}"
-        data-capt="{$encodedCapt}"
-        data-tld="{$encodedTld}"
-        data-i360="{$encodedI360}">
-        $originalUrl
-    </a>
+    <div class="embedExternal-content">
+        <a
+            class="embedExternal-content gie-single js-gettyEmbed"
+            href="{$encodedURL}"
+            id="{$encodeID}"
+            data-height="{$encodedHeight}"
+            data-width="{$encodedWidth}"
+            data-sig="{$encodedSig}"
+            data-items="{$encodedItems}"
+            data-capt="{$encodedCapt}"
+            data-tld="{$encodedTld}"
+            data-i360="{$encodedI360}">
+            $originalUrl
+        </a>
+    </div>
 </div>
 HTML;
        return $result;

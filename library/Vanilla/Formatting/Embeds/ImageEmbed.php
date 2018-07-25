@@ -96,11 +96,15 @@ class ImageEmbed extends Embed {
     public function renderData(array $data): string {
         $source = $data['url'] ?? null;
         $sourceEncoded = htmlspecialchars($source);
+        $sanitizedHref = \Gdn_Format::sanitizeUrl($sourceEncoded);
 
+        // Yes we actually want target blank on these, even if we don't want it on normal links.
         $result = <<<HTML
 <div class="embedExternal embedImage">
     <div class="embedExternal-content">
-        <img class="embedImage-img" src="{$sourceEncoded}">
+        <a className="embedImage-link" href="{$sanitizedHref}" rel="nofollow noopener" target="_blank">
+            <img class="embedImage-img" src="{$sourceEncoded}">
+        </a>
     </div>
 </div>
 HTML;

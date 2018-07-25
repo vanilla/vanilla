@@ -13,20 +13,6 @@
 let _debug = false;
 
 /**
- * Encode CSS special characters as a hex escape sequence.
- *
- * @param {string} str Dirty CSS value.
- * @returns {string} Sanitized CSS value.
- */
-export function cssSpecialChars(str: string) {
-    return str.replace(/[\\!"#\$%&'\(\)\*\+,-.\/:;<=>\?@\[\]\^`{\|}~]/g, (char: string) => {
-        const hexCode = char.charCodeAt(0).toString(16);
-        const padded = "000000" + hexCode;
-        return "\\" + padded.substr(-6);
-    });
-}
-
-/**
  * Get or set the debug flag.
  *
  * @param newValue - The new value of debug.
@@ -317,4 +303,25 @@ export function indexArrayByKey<T extends object>(
         }
     }
     return object;
+}
+
+const SAFE_PROTOCOL_REGEX = /^(http:\/\/|https:\/\/|tel:|mailto:\/\/)/;
+
+/**
+ * Sanitize a URL to ensure that it matches a whitelist of approved url schemes. If the url does not match one of these schemes, prepend `unsafe:` before it.
+ *
+ * Allowed protocols
+ * - "http://",
+ * - "https://",
+ * - "tel:",
+ * - "mailto://",
+ *
+ * @param url The url to sanitize.
+ */
+export function sanitizeUrl(url: string) {
+    if (url.match(SAFE_PROTOCOL_REGEX)) {
+        return url;
+    } else {
+        return "unsafe:" + url;
+    }
 }

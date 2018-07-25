@@ -53,7 +53,7 @@ class TwitterEmbed extends Embed {
         $url = $data['url'] ?? '';
 
         $encodedStatusID = htmlspecialchars($statusID);
-        $encodedUrl = htmlspecialchars($url);
+        $encodedUrl = \Gdn_Format::sanitizeUrl(htmlspecialchars($url));
 
         $result = <<<HTML
 <div class="embedExternal embedTwitter">

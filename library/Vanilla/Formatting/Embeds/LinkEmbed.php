@@ -64,17 +64,15 @@ class LinkEmbed extends Embed {
         $photoUrl = $data['photoUrl'] ?? null;
 
         if ($photoUrl) {
-            $photoUrlEncoded = htmlspecialchars(Gdn_Format::cssSpecialChars($photoUrl));
-        $image = <<<HTML
-<div class="embedLink-image" aria-hidden="true" style="background-image: url('{$photoUrlEncoded}');"></div>
-HTML;
+            $photoUrlEncoded = htmlspecialchars($photoUrl);
+            $image = "<img src='$photoUrlEncoded' class='embedLink-image' aria-hidden='true'>";
         } else {
             $image = '';
         }
 
-        $urlEncoded = htmlspecialchars($url);
-        $nameEncoded = htmlentities($name);
-        $bodyEncoded = htmlentities($body);
+        $urlEncoded = htmlspecialchars(\Gdn_Format::sanitizeUrl($url));
+        $nameEncoded = htmlspecialchars($name);
+        $bodyEncoded = htmlspecialchars($body);
 
         $result = <<<HTML
 <a class="embedExternal embedLink" href="{$urlEncoded}" rel="noopener noreferrer">

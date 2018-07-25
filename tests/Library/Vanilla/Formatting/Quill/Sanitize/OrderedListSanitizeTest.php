@@ -37,7 +37,7 @@ class OrderedListSanitizeTest extends SanitizeTest {
             ["insert" => $content],
             [
                 "attributes" => ["list" => "ordered"],
-                "insert" => "\n"
+                "insert" => "$content"
             ]
         ];
         return $operations;

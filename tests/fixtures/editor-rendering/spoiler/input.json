@@ -1,6 +1,6 @@
 [
     { "insert": "Test First Spoiler " },
-    { "attributes": { "link": "link" }, "insert": "Linkhere" },
+    { "attributes": { "link": "http://link.com" }, "insert": "Linkhere" },
     { "attributes": { "spoiler-line": true }, "insert": "\n" },
     { "attributes": { "bold": true }, "insert": "bold" },
     { "insert": " Second Line" },

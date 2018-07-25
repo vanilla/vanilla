@@ -34,7 +34,7 @@ class HeadingSanitizeTest extends SanitizeTest {
             ["insert" => $content],
             [
                 "attributes" => ["header" => 1],
-                "insert" => "\n"
+                "insert" => "$content"
             ]
         ];
         return $operations;

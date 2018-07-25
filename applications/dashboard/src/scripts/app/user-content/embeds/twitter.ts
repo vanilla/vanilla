@@ -4,48 +4,13 @@
  */
 
 import { ensureScript } from "@dashboard/dom";
-import { onContent, onReady } from "@dashboard/application";
-import { registerEmbed, IEmbedData, IEmbedElements } from "@dashboard/embeds";
-import { logError } from "@dashboard/utility";
+import { onContent } from "@dashboard/application";
+import { IEmbedData, IEmbedElements, registerEmbedRenderer } from "@dashboard/embeds";
 
-// Setup twitter embeds
-onContent(convertTwitterEmbeds);
-registerEmbed("twitter", renderTweet);
-
-// Because the handling of this has absolutely no effect on anything else, the promise can be floating.
-// We don't care when it completes.
-// tslint:disable-next-line:no-floating-promises
-convertTwitterEmbeds().then();
-
-/**
- * Convert all of the twitter embeds in the page. This is for transforming twitter embeds that were
- * server rendered.
- *
- * @see library/Vanilla/Embeds/EmbedManager.php
- */
-async function convertTwitterEmbeds() {
-    const tweets = Array.from(document.querySelectorAll(".js-twitterCard"));
-    if (tweets.length > 0) {
-        await ensureScript("//platform.twitter.com/widgets.js");
-        if (window.twttr) {
-            const promises = tweets.map(contentElement => {
-                // Get embed data out of the data attributes.
-                const statusID = contentElement.getAttribute("data-tweetid");
-                const url = contentElement.getAttribute("data-tweeturl") || "";
-
-                const renderData: IEmbedData = {
-                    type: "twitter",
-                    url,
-                    attributes: { statusID },
-                };
-
-                return renderTweet({ content: contentElement as HTMLElement, root: null as any }, renderData);
-            });
-
-            // Render all the pages twitter embeds at the same time.
-            await Promise.all(promises);
-        }
-    }
+export function initTwitterEmbeds() {
+    registerEmbedRenderer("twitter", renderTweet);
+    onContent(convertTwitterEmbeds);
+    void convertTwitterEmbeds().then();
 }
 
 /**
@@ -83,5 +48,36 @@ export async function renderTweet(elements: IEmbedElements, data: IEmbedData) {
 
         // Fade it in.
         contentElement.classList.add("js-twitterCardLoaded");
+    }
+}
+
+/**
+ * Convert all of the twitter embeds in the page. This is for transforming twitter embeds that were
+ * server rendered.
+ *
+ * @see library/Vanilla/Embeds/EmbedManager.php
+ */
+async function convertTwitterEmbeds() {
+    const tweets = Array.from(document.querySelectorAll(".js-twitterCard"));
+    if (tweets.length > 0) {
+        await ensureScript("//platform.twitter.com/widgets.js");
+        if (window.twttr) {
+            const promises = tweets.map(contentElement => {
+                // Get embed data out of the data attributes.
+                const statusID = contentElement.getAttribute("data-tweetid");
+                const url = contentElement.getAttribute("data-tweeturl") || "";
+
+                const renderData: IEmbedData = {
+                    type: "twitter",
+                    url,
+                    attributes: { statusID },
+                };
+
+                return renderTweet({ content: contentElement as HTMLElement, root: null as any }, renderData);
+            });
+
+            // Render all the pages twitter embeds at the same time.
+            await Promise.all(promises);
+        }
     }
 }

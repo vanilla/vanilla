@@ -6,10 +6,8 @@
 import { onReady, onContent } from "@dashboard/application";
 import { convertToSafeEmojiCharacters } from "@dashboard/dom";
 
-// Emoji
-onReady(initEmojiFallback);
-onContent(initEmojiFallback);
-
-function initEmojiFallback() {
-    convertToSafeEmojiCharacters(document.body);
+export function initEmojiSupport() {
+    // Emoji
+    onReady(() => convertToSafeEmojiCharacters(document.body));
+    onContent(() => convertToSafeEmojiCharacters(document.body));
 }

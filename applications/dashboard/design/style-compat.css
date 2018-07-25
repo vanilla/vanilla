@@ -97,6 +97,24 @@ button.Close {
   display: none;
 }
 
+.Title-Icon {
+  display: inline-block;
+  margin-left: .15em;
+  margin-right: .15em;
+}
+
+.Title-PrivateIcon {
+  height: 1em;
+  width: .7em;
+  vertical-align: -.11em;
+}
+
+.Title-SecretIcon {
+  height: 1em;
+  width: 1.2em;
+  vertical-align: -.2em;
+}
+
 .authenticateUserCol {
   padding: 0 26px;
   margin: auto;

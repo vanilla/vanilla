@@ -1,0 +1,22 @@
+$title-icon_height: 1em;
+
+.Title-Icon {
+    display: inline-block;
+    margin: {
+        left: .15em;
+        right: .15em;
+    }
+}
+
+.Title-PrivateIcon {
+    height: $title-icon_height;
+    width: .7em;
+    vertical-align: -.11em;
+}
+
+
+.Title-SecretIcon {
+    height: $title-icon_height;
+    width: 1.2em;
+    vertical-align: -.2em;
+}

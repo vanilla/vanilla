@@ -106,10 +106,15 @@
     max-width: 100%;
 }
 
-@mixin longWordEllipsis {
+@mixin breakWord {
     word-break: break-all;
     word-break: break-word;
+}
+
+@mixin longWordEllipsis {
+    @include breakWord;
     text-overflow: ellipsis;
     overflow-x: hidden;
     max-width: 100%;
 }
+

@@ -2443,20 +2443,22 @@ EOT;
     /**
      * Format text from Rich editor input.
      *
-     * @param string $delta A JSON encoded array of Quill deltas.
+     * @param string $deltas A JSON encoded array of Quill deltas.
      *
      * @throws Exception - When the deltas could not be JSON decoded.
      * @return string - The rendered HTML output.
      */
     public static function rich(string $deltas): string {
         $operations = json_decode($deltas, true);
+        $title = t("There was an error rendering this rich post");
 
         if (json_last_error() !== JSON_ERROR_NONE) {
-            throw new Exception("JSON decoding of rich post content has failed.");
+            $link = "https://docs.vanillaforums.com/help/addons/rich-editor/#why-is-my-published-post-replaced-with-there-was-an-error-rendering-this-rich-post";
+            return "<div class='DismissMessage Warning userContent-error'>$title <a href='$link' rel='nofollow' title='$title'><span class='icon icon-warning-sign userContent-errorIcon'></span></a></div>";
         }
 
         $parser = Gdn::getContainer()->get(Vanilla\Formatting\Quill\Parser::class);
-        $renderer = Gdn::getContainer()->get(\Vanilla\Formatting\Quill\Renderer::class);
+        $renderer = Gdn::getContainer()->get(Vanilla\Formatting\Quill\Renderer::class);
 
         $blotGroups = $parser->parse($operations);
         return $renderer->render($blotGroups);
@@ -2471,6 +2473,28 @@ EOT;
 
     /**
      * Sanitize a URL to ensure that it matches a whitelist of approved url schemes. If the url does not match one of these schemes, prepend `unsafe:` before it.
+     * Get the usernames mention in a rich post.
+     *
+     * @param string $body The contents of a post body.
+     *
+     * @return string[]
+     * @throws \Garden\Container\ContainerException
+     * @throws \Garden\Container\NotFoundException
+     */
+    public static function getRichMentionUsernames(string $body): array {
+        /** @var \Vanilla\Formatting\Quill\Parser $parser */
+        $parser = Gdn::getContainer()->get(\Vanilla\Formatting\Quill\Parser::class);
+        $operations = json_decode($body, true);
+
+        if (json_last_error() === JSON_ERROR_NONE) {
+            return $parser->parseMentionUsernames($operations);
+        } else {
+            return [];
+        }
+    }
+
+    /**
+     * Encode special CSS characters as hex.
      *
      * Allowed protocols
      * - "http:",

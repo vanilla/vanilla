@@ -151,7 +151,9 @@ class DiscussionsController extends VanillaController {
 
         // Check for individual categories.
         $categoryIDs = $this->getCategoryIDs();
-        $where = [];
+        // Fix to segregate announcement conditions until announcement caching has been reworked.
+        // See https://github.com/vanilla/vanilla/issues/7241
+        $where = $announcementsWhere = [];
         if ($this->data('Followed')) {
             $followedCategories = array_keys($categoryModel->getFollowed(Gdn::session()->UserID));
             $visibleCategoriesResult = CategoryModel::instance()->getVisibleCategoryIDs(['filterHideDiscussions' => true]);
@@ -162,7 +164,7 @@ class DiscussionsController extends VanillaController {
             }
             $where['d.CategoryID'] = $visibleFollowedCategories;
         } elseif ($categoryIDs) {
-            $where['d.CategoryID'] = CategoryModel::filterCategoryPermissions($categoryIDs);
+            $where['d.CategoryID'] = $announcementsWhere['d.CategoryID'] = CategoryModel::filterCategoryPermissions($categoryIDs);
         } else {
             $visibleCategoriesResult = CategoryModel::instance()->getVisibleCategoryIDs(['filterHideDiscussions' => true]);
             if ($visibleCategoriesResult !== true) {
@@ -182,7 +184,7 @@ class DiscussionsController extends VanillaController {
         $this->setData('CountDiscussions', $CountDiscussions);
 
         // Get Announcements
-        $this->AnnounceData = $Offset == 0 ? $DiscussionModel->getAnnouncements($where) : false;
+        $this->AnnounceData = $Offset == 0 ? $DiscussionModel->getAnnouncements($announcementsWhere) : false;
         $this->setData('Announcements', $this->AnnounceData !== false ? $this->AnnounceData : [], true);
 
         // Get Discussions

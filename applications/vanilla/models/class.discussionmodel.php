@@ -334,7 +334,7 @@ class DiscussionModel extends Gdn_Model {
      */
     public function discussionSummaryQuery($additionalFields = [], $join = true) {
         // Verify permissions (restricting by category if necessary)
-        $perms = self::categoryPermissions();
+        $perms = CategoryModel::instance()->getVisibleCategoryIDs(['filterHideDiscussions' => true]);
 
         if ($perms !== true) {
             $this->SQL->whereIn('d.CategoryID', $perms);

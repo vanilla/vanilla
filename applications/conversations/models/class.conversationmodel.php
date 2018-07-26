@@ -344,7 +344,12 @@ class ConversationModel extends ConversationsModel {
             ->limit($limit)
             ->get();
 
-        Gdn::userModel()->joinUsers($data->result(), ['UserID']);
+        $options = ['Join'  => ['Name', 'Photo']];
+        if (Gdn::session()->checkPermission(['Garden.PersonalInfo.View', 'Garden.Users.Edit'], false)) {
+            $options['Join'][] = 'Email';
+        }
+
+        Gdn::userModel()->joinUsers($data->result(), ['UserID'], $options);
         return $data;
     }
 

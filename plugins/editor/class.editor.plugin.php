@@ -1487,7 +1487,7 @@ class EditorPlugin extends Gdn_Plugin {
         $model = new MediaModel();
         $media = $model->getID($mediaID, DATASET_TYPE_ARRAY);
 
-        if (!$media) {
+        if (!$media || val('InsertUserID', $media) != Gdn::session()->UserID) {
             throw notFoundException('File');
         }
 

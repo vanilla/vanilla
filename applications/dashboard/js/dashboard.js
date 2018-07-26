@@ -858,26 +858,26 @@ $(document).on('contentLoad', function(e) {
      * @param element - The scope of the function.
      */
     function navbarHeightInit(element) {
-        var $navbar = $('.js-navbar', element);
+        // var $navbar = $('.js-navbar', element);
 
-        $navbar.addClass('navbar-short');
-        var navShortHeight = $navbar.outerHeight(true);
-        $navbar.removeClass('navbar-short');
-        var navHeight = $navbar.outerHeight(true);
-        var navOffset = navHeight - navShortHeight;
+        // $navbar.addClass('navbar-short');
+        // var navShortHeight = $navbar.outerHeight(true);
+        // $navbar.removeClass('navbar-short');
+        // var navHeight = $navbar.outerHeight(true);
+        // var navOffset = navHeight - navShortHeight;
 
         // If we load in the middle of the page, we should have a short navbar.
-        if ($(window).scrollTop() > navOffset) {
-            $navbar.addClass('navbar-short');
-        }
+        // if ($(window).scrollTop() > navOffset) {
+        //     $navbar.addClass('navbar-short');
+        // }
 
-        $(window).on('scroll', function() {
-            if ($(window).scrollTop() > navOffset) {
-                $navbar.addClass('navbar-short');
-            } else {
-                $navbar.removeClass('navbar-short');
-            }
-        });
+        // $(window).on('scroll', function() {
+        //     if ($(window).scrollTop() > navOffset) {
+        //         $navbar.addClass('navbar-short');
+        //     } else {
+        //         $navbar.removeClass('navbar-short');
+        //     }
+        // });
     }
 
     /**

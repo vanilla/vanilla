@@ -26,7 +26,6 @@
 
 .help {
   margin-bottom: $spacer * 2;
-  font-weight: 200;
   color: $grey-dark;
 
   .help-title {
@@ -36,7 +35,6 @@
     border-bottom: $border-width dotted $grey-dark-border;
     letter-spacing: to-rem(1);
     font-size: $font-size-base;
-    font-weight: $font-weight-helvetica-medium;
     text-transform: uppercase;
   }
 

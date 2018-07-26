@@ -127,8 +127,6 @@ pre {
   @include full-border(flex);
   justify-content: space-between;
   align-items: center;
-  padding-top: $spacer / 2;
-  padding-bottom: $spacer / 2;
   min-height: $header-block-height;
 
   h1 {

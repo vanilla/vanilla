@@ -175,7 +175,7 @@ form {
 
 label,
 .label {
-  font-weight: 500;
+  font-weight: 600;
   margin-bottom: 0;
 }
 
@@ -439,7 +439,7 @@ label,
   position: relative;
   display: inline-block;
   width: 100%;
-  font-weight: 400;
+  font-weight: normal;
   cursor: pointer;
 
   input {
@@ -460,7 +460,7 @@ label,
   right: 0;
   left: 0;
   padding: $control-padding-y $spacer * 3 / 4;
-  color: $grey;
+  color: $input-color;
   border: $input-btn-border-width solid $input-border-color;
   border-radius: $border-radius;
 }
@@ -642,7 +642,7 @@ select + select {
 
   .title {
     text-align: center;
-    font-weight: 500;
+    font-weight: 600;
 
     a {
       @include reverse-link();

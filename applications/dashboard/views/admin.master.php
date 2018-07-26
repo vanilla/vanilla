@@ -73,12 +73,9 @@ Gdn_Theme::assetEnd();
         <nav class="nav nav-pills">
             <?php
             foreach ($dashboardNav->getSectionsInfo() as $section) { ?>
-                <div class="nav-item">
-                    <a class="nav-link js-save-pref-dashboard-landing-page <?php echo val('active', $section); ?>" href="<?php echo url(val('url', $section)); ?>" data-section="<?php echo val('section', $section) ?>">
-                        <div class="nav-link-heading"><?php echo val('title', $section); ?></div>
-                        <div class="nav-link-description"><?php echo val('description', $section, '&nbsp;'); ?></div>
-                    </a>
-                </div>
+                <a class="nav-item nav-link js-save-pref-dashboard-landing-page <?php echo val('active', $section); ?>" href="<?php echo url(val('url', $section)); ?>" data-section="<?php echo val('section', $section) ?>">
+                    <div class="nav-link-label"><?php echo val('title', $section); ?></div>
+                </a>
             <?php } ?>
         </nav>
         <div class="navbar-memenu">
@@ -99,7 +96,6 @@ Gdn_Theme::assetEnd();
         <div class="panel panel-left js-drawer">
             <div class="panel-nav panel-content-wrapper">
                 <div class="js-fluid-fixed panel-content">
-                    <?php echo anchor($title.' '.dashboardSymbol('external-link', 'icon-16'), '/', 'title'); ?>
                     <div id="panel-nav" class="js-panel-nav">
                         <?php echo $dashboardNav; ?>
                     </div>

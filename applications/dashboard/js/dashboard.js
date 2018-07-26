@@ -853,6 +853,34 @@ $(document).on('contentLoad', function(e) {
     }
 
     /**
+     * Add a CSS class to the navbar based on it scroll position.
+     *
+     * @param element - The scope of the function.
+     */
+    function navbarHeightInit(element) {
+        var $navbar = $('.js-navbar', element);
+
+        $navbar.addClass('navbar-short');
+        var navShortHeight = $navbar.outerHeight(true);
+        $navbar.removeClass('navbar-short');
+        var navHeight = $navbar.outerHeight(true);
+        var navOffset = navHeight - navShortHeight;
+
+        // If we load in the middle of the page, we should have a short navbar.
+        if ($(window).scrollTop() > navOffset) {
+            $navbar.addClass('navbar-short');
+        }
+
+        $(window).on('scroll', function() {
+            if ($(window).scrollTop() > navOffset) {
+                $navbar.addClass('navbar-short');
+            } else {
+                $navbar.removeClass('navbar-short');
+            }
+        });
+    }
+
+    /**
      * Start fluidfixed on the dashboard panel navigation.
      *
      * @param element - The scope of the function.
@@ -1155,6 +1183,7 @@ $(document).on('contentLoad', function(e) {
         prettyPrintInit(e.target); // prettifies <pre> blocks
         aceInit(e.target); // code editor
         collapseInit(e.target); // panel nav collapsing
+        navbarHeightInit(e.target); // navbar height settings
         fluidFixedInit(e.target); // panel and scroll settings
         dropInit(e.target); // navbar 'me' dropdown
         modalInit(); // modals (aka popups)

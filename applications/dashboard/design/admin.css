@@ -5893,7 +5893,7 @@ fieldset[disabled] a.Button {
 }
 
 .card .list-group-item {
-  font-weight: 500;
+  font-weight: 600;
   background-color: #f4f6fb;
 }
 
@@ -5910,6 +5910,10 @@ fieldset[disabled] a.Button {
 .card svg {
   position: relative;
   width: 0.875rem;
+}
+
+.card .media-title {
+  font-weight: 600;
 }
 
 .card .media-sm .media-image-wrap {
@@ -6010,7 +6014,7 @@ fieldset[disabled] a.Button {
 .Section-Analytics .c3-axis-y text,
 .Section-DashboardHome .c3-axis-y text {
   font-size: 0.875rem;
-  font-weight: 500;
+  font-weight: 600;
   color: #555a62;
 }
 
@@ -6365,7 +6369,7 @@ select.nav-stats-users:focus,
 .popover-analytics {
   background-color: #fff;
   padding: 0.5625rem;
-  font-weight: 500;
+  font-weight: 600;
   border-radius: 0.25rem;
   box-shadow: 0 0 5px rgba(0, 0, 0, 0.15);
 }
@@ -8450,7 +8454,7 @@ button.close {
 
 .nav-adventure .nav-item-title {
   line-height: 1;
-  font-weight: 500;
+  font-weight: 600;
   margin-bottom: 0.375rem;
 }
 
@@ -9084,7 +9088,7 @@ button.close {
   margin-bottom: 0.5625rem;
   font-size: 1rem;
   line-height: 1.5;
-  font-weight: 500;
+  font-weight: 600;
   color: #555a62;
   border-bottom: 1px dotted #ededed;
 }
@@ -9092,7 +9096,7 @@ button.close {
 .control-panel .control-panel-subheading {
   margin-top: 0.5625rem;
   margin-bottom: 0.28125rem;
-  font-weight: 500;
+  font-weight: 600;
 }
 
 .control-panel .control-panel-footer {
@@ -9443,7 +9447,7 @@ button.close {
   border-top: 0.0625rem solid #ddd;
   border-bottom: 0.0625rem solid #f4f6fb;
   text-transform: uppercase;
-  font-weight: 500;
+  font-weight: 600;
   font-size: 0.75rem;
   line-height: 1.3333333333;
 }
@@ -9506,7 +9510,7 @@ button.close {
 
 .tj-meta .table-meta-item-label,
 .table-meta .table-meta-item-label {
-  font-weight: 500;
+  font-weight: 600;
 }
 
 .tj-meta .table-meta-item-label a,
@@ -9564,7 +9568,7 @@ button.close {
   border: 1px solid #eee;
   border-top: 1px solid #ddd;
   text-transform: uppercase;
-  font-weight: 500;
+  font-weight: 600;
   font-size: 0.75rem;
   line-height: 1.3333333333;
   vertical-align: middle;
@@ -9671,7 +9675,7 @@ button.close {
   width: 60%;
   padding: 0.5625rem 0.75rem;
   text-transform: uppercase;
-  font-weight: 500;
+  font-weight: 600;
   font-size: 0.75rem;
   line-height: 1.3333333333;
   border-bottom: 0.0625rem solid #ddd;
@@ -9685,7 +9689,7 @@ button.close {
 
 .table-summary-title {
   font-size: 1rem;
-  font-weight: 500;
+  font-weight: 600;
 }
 
 .toaster, .InformMessages .InformMessage {
@@ -9804,7 +9808,7 @@ button.close {
 
 .pager-count {
   line-height: 1;
-  font-weight: 500;
+  font-weight: 600;
   padding-right: 0.5625rem;
   white-space: nowrap;
 }
@@ -9839,7 +9843,7 @@ button.close {
   padding-right: 1.125rem;
   border-bottom: 0.0625rem solid #e7e8e9;
   padding: 1.125rem 0;
-  font-weight: 500;
+  font-weight: 600;
 }
 
 .Section-Tutorials .label-selector {
@@ -9856,7 +9860,7 @@ button.close {
 
 .Section-Tutorials .tagline {
   font-size: 0.75rem;
-  font-weight: 500;
+  font-weight: 600;
 }
 
 .Section-Tutorials .vanilla-logo {
@@ -10153,7 +10157,7 @@ pre {
   margin-bottom: 0;
   font-size: 1rem;
   line-height: 1.5;
-  font-weight: 500;
+  font-weight: 600;
   border-top: 0.0625rem solid #e7e8e9;
 }
 
@@ -10175,7 +10179,7 @@ pre {
   margin-bottom: 0;
   font-size: 1rem;
   line-height: 1.5;
-  font-weight: 500;
+  font-weight: 600;
 }
 
 .flag {
@@ -10310,7 +10314,7 @@ pre {
 
 strong,
 .strong {
-  font-weight: 500;
+  font-weight: 600;
 }
 
 .Info,

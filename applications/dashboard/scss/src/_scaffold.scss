@@ -30,14 +30,6 @@
   width: 100%;
   height: $navbar-height;
   z-index: 1010;
-
-  &.navbar-short {
-    height: $navbar-short-height;
-  }
-
-  @include media-breakpoint-down(md) {
-    height: $navbar-short-height;
-  }
 }
 
 .main-row {
@@ -48,7 +40,6 @@
   @include media-breakpoint-down(md) {
     display: block;
     width: 100%;
-    margin-top: $navbar-short-height;
   }
 }
 
@@ -173,6 +164,6 @@
     display: block;
     width: $drawer-width;
     height: 100%;
-    padding-top: $spacer * 4 + $navbar-short-height;
+    padding-top: $spacer * 4 + $navbar-height;
   }
 }

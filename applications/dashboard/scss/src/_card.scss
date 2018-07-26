@@ -111,7 +111,7 @@
 
   // list-group uses twbs's scss.
   .list-group-item {
-    font-weight: 500;
+    font-weight: 600;
     background-color: $grey-lighter;
 
     &:hover {
@@ -128,6 +128,10 @@
   svg {
     position: relative;
     width: $font-size-base;
+  }
+
+  .media-title {
+      font-weight: 600;
   }
 
   .media-sm {

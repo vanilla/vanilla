@@ -11,12 +11,10 @@
   padding: 0;
   color: $white;
   background-color: $brand-primary;
-  font-weight: 100;
-  letter-spacing: .0375rem;
   border: 1px solid $navbar-border-color;
 
   .vanilla-logo {
-    width: 5rem;
+    width: 65px;
   }
 
   .title {
@@ -44,12 +42,19 @@
     }
   }
 
+    .nav {
+        height: 100%;
+    }
+
   .nav-link {
     position: relative;
-    min-width: to-rem(180);
-    padding: ($navbar-height - (($font-size-xs * $line-height-lg) + ($font-size-base * $line-height-lg))) / 2;
+    min-width: 180px;
     color: $white;
     border-radius: 0;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 
     &.active {
       &,
@@ -62,39 +67,8 @@
       }
     }
 
-    &.hover,
     &:hover {
       background-color: $navbar-active-link-active-bg;
-    }
-  }
-
-  .nav-link-description {
-    font-size: $font-size-xs;
-    line-height: $line-height-lg;
-    color: $navbar-link-color;
-  }
-
-  .nav-link-heading {
-    line-height: $line-height-lg;
-    color: $navbar-link-color;
-  }
-
-  &.navbar-short {
-
-    .nav-link {
-      padding: ($navbar-short-height - ($font-size-base * $line-height-lg)) / 2 - $border-width;
-
-      @include media-breakpoint-down(md) {
-        padding: (($navbar-short-height - ($font-size-sm * $line-height-lg)) / 2) 0;
-      }
-    }
-
-    .nav-link-description {
-      display: none;
-    }
-
-    img {
-      height: $spacer * 2;
     }
   }
 
@@ -123,7 +97,6 @@
       min-width: inherit;
       width: 100%;
       font-size: $font-size-sm;
-      padding: (($navbar-short-height - ($font-size-sm * $line-height-lg)) / 2) 0;
     }
 
     .nav-link-description {
@@ -182,13 +155,6 @@
   svg {
     display: block;
     height: (($font-size-xs * $line-height-lg) + ($font-size-base * $line-height-lg)) - (2 * $border-width);
-  }
-
-  .navbar-short & {
-    .nav-link {
-      padding-top: (($navbar-short-height - (($font-size-xs * $line-height-lg) + ($font-size-base * $line-height-lg))) / 2);
-      padding-bottom: (($navbar-short-height - (($font-size-xs * $line-height-lg) + ($font-size-base * $line-height-lg))) / 2);
-    }
   }
 
   .nav-link {

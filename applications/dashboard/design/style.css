@@ -5885,7 +5885,7 @@ Styleguide Item
 .item-attachment .item-heading {
   margin-bottom: 0 !important;
   /* Hack */
-  font-weight: 500;
+  font-weight: 600;
 }
 
 .item-attachment .item-body {

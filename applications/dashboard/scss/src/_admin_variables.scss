@@ -1,0 +1,275 @@
+// Variables
+//
+// Here are the dashboard variables.
+//
+// No styleguide reference.
+
+$enable-flex:                true;
+
+// Pixel value used to responsively scale all typography. Applied to the `<html>` element.
+$rem-base:                   16;
+
+
+@function to-rem($px) {
+  @return ($px / $rem-base * 1rem);
+}
+
+// Colors
+
+$white:                     #fff;
+$black:                     #000;
+
+// Override the grays
+$gray-dark:                 #555a62;
+$gray:                      lighten(#555a62, 25%);
+$gray-light:                #f6f9fb;
+$gray-lighter:              #f4f6fb;
+$gray-lightest:             #fbfcfc;
+
+// Map our grEys
+$grey-dark:                 $gray-dark;
+$grey:                      $gray;
+$grey-light:                $gray-light;
+$grey-lighter:              $gray-lighter;
+$grey-lightest:             $gray-lightest;
+
+$grey-dark-border:          #ededed; // belongs between grey and grey-light.
+$grey-light-text:           #727d83; // belongs between grey and grey-dark.
+
+$brand-primary:             #0291db;
+$brand-secondary:           #f5296d;
+$brand-success:             #6bc573;
+$brand-info:                #a1b8c6;
+$brand-warning:             #faae42;
+$brand-danger:              #fa2e1f;
+
+
+$semantic-colors: (
+  primary:                  $brand-primary,
+  secondary:                $brand-secondary,
+  success:                  $brand-success,
+  info:                     $brand-info,
+  warning:                  $brand-warning,
+  danger:                   $brand-danger
+);
+
+$link-color:                $brand-primary;
+
+// Grid columns
+//
+// Set the number of columns and specify the width of the gutters.
+
+$grid-columns:               24;
+$grid-gutter-width:          36 / 16 * 1rem;
+
+// Typography
+//
+// Font, line-height, and color for body text, headings, and more.
+
+$font-family-sans-serif:     "Open Sans", "Helvetica Neue", Helvetica, Arial, sans-serif !default;
+$font-family-serif:          Georgia, "Times New Roman", Times, serif !default;
+$font-family-monospace:      Menlo, Monaco, Consolas, "Courier New", monospace !default;
+$font-family-base:           $font-family-sans-serif !default;
+
+$font-size-root:             $rem-base * 1px;
+
+$font-size-base:             to-rem(14);
+$font-size-lg:               to-rem(18);
+$font-size-md:               to-rem(13);
+$font-size-sm:               to-rem(12);
+$font-size-xs:               to-rem(11);
+
+$font-size-h1:               to-rem(32);
+$font-size-h2:               to-rem(18);
+$font-size-h3:               1rem;
+$font-size-h4:               1rem;
+$font-size-h5:               to-rem(14);
+$font-size-h6:               to-rem(14);
+
+$line-height:                1.5;
+
+$headings-font-weight:       600;
+
+$font-weight-helvetica-medium: 500;
+
+$header-block-height:        to-rem(48);
+
+// Spacing
+//
+// Control the default styling of most Bootstrap elements by modifying these
+// variables. Mostly focused on spacing.
+
+$spacer:                     to-rem(18);
+$spacer-x:                   $spacer;
+$spacer-y:                   to-rem(12);
+
+$border-width:               to-rem(1);
+
+// Body
+//
+// Settings for the `<body>` element.
+$body-bg:                    $grey-light;
+$body-color:                 $gray-dark !default;
+
+// Components
+//
+// Define common padding and border radius sizes and more.
+
+$line-height-lg:         (4 / 3);
+$line-height-sm:         1.5;
+
+$border-radius:          to-rem(2);
+$border-radius-lg:       to-rem(4);
+$border-radius-sm:       to-rem(1);
+
+$caret-width:            .375em !default;
+$caret-width-lg:         $caret-width !default;
+
+// Buttons
+//
+// For each of Bootstrap's buttons, define text, background and border color.
+
+$control-height:                 36;
+$control-height-rem:             ($control-height / $rem-base * 1rem);
+$control-padding-y:              ($control-height-rem - ($border-width * 2) - ($font-size-base * $line-height)) / 2;
+
+$btn-min-width:                  $spacer * 6.75;
+$btn-padding-x:                  1rem !default;
+$btn-padding-y:                  $control-padding-y;
+$btn-font-weight:                normal !default;
+$btn-line-height:                1;
+
+$btn-min-width:                  to-rem(96);
+
+$btn-primary-color:              $brand-primary;
+$btn-primary-bg:                 $white;
+$btn-primary-border:             $btn-primary-color !default;
+
+$btn-secondary-color:            $gray-dark !default;
+$btn-secondary-bg:               #fff !default;
+$btn-secondary-border:           #ccc !default;
+
+$btn-link-disabled-color:        $grey-dark-border;
+
+$btn-padding-x-sm:               .75rem;
+$btn-padding-y-sm:               .125rem;
+
+$btn-padding-x-lg:               1.25rem !default;
+$btn-padding-y-lg:               .75rem !default;
+
+$btn-border-radius-navbar:       to-rem(10);
+
+// Navs
+
+$nav-link-padding:                          5px 1em;
+$nav-pills-link-hover-bg:                   #e8ecf2;
+$nav-pills-panel-border-radius:             $border-radius 0 0 $border-radius;
+
+$navbar-height:                             $header-block-height;
+$navbar-active-link-active-bg:              lighten($brand-primary, 7%);
+$navbar-link-color:                         lighten($navbar-active-link-active-bg, 40%);
+$navbar-border-color:                       rgba(0,0,0,.125);
+
+// Footer
+$footer-height:                             to-rem(60);
+
+// Checkbox toggles
+$toggle-border-width:                       $border-width;
+$toggle-height:                             $control-height-rem;
+$toggle-padding:                            to-rem(2);
+
+$toggle-height-sm: to-rem(24);
+$toggle-padding-sm: to-rem(1);
+
+// Padding
+$padding-row:                               $grid-gutter-width / 2;
+$border-color:                              #e7e8e9;
+
+$font-size-tables:                          to-rem(13);
+
+// Cards
+$card-spacer-x:            1.25rem !default;
+$card-spacer-y:            .75rem !default;
+$card-border-width:        1px !default;
+$card-border-radius:       $border-radius !default;
+$card-border-color:        $border-color;
+$card-border-radius-inner: $card-border-radius !default;
+$card-cap-bg:              $white;
+$card-bg:                  #fff !default;
+
+$card-link-hover-color:    #fff !default;
+
+// Grid breakpoints
+//
+// Define the minimum and maximum dimensions at which your layout will change,
+// adapting to different screen sizes, for use in media queries.
+
+$grid-breakpoints: (
+  // Extra small screen / phone
+  xs: 0,
+  // Small screen / phone
+  sm: 544px,
+  // Medium screen / tablet
+  md: 768px,
+  // Large screen / desktop
+  lg: 992px,
+  // Extra large screen / wide desktop
+  xl: 1200px
+) !default;
+
+
+$icon-sizes: (
+  9: 9,
+  10: 10,
+  11: 11,
+  12: 12,
+  16: 16,
+  24: 24,
+  30: 30,
+  48: 48
+);
+
+// Dropdowns
+$dropdown-font-size:             1rem;
+$dropdown-min-width:             to-rem(180);
+$dropdown-padding-y:             to-rem(6);
+$dropdown-margin-top:            to-rem(2);
+$dropdown-color:                 $body-color;
+$dropdown-bg:                    $white;
+$dropdown-divider-bg:            $border-color;
+$dropdown-box-shadow:            0 to-rem(1) to-rem(3) rgba(0,0,0,.3);
+$dropdown-link-color:            $body-color;
+$dropdown-link-hover-bg:         $grey-light;
+$dropdown-item-padding-x:        12px;
+$dropdown-header-font-size:      12px;
+$dropdown-header-color:          #a3a3a3;
+
+// Forms
+$input-color: $gray-dark;
+
+// Form states and alerts
+//
+// Define colors for form feedback states and, by default, alerts.
+
+$state-success-text:             $white;
+$state-success-bg:               $brand-success;
+$state-success-border:           $brand-success;
+
+$state-info-text:                $white;
+$state-info-bg:                  $brand-info;
+$state-info-border:              $brand-info;
+
+$state-warning-text:             $white;
+$state-warning-bg:               $brand-warning;
+$state-warning-border:           $brand-warning;
+
+$state-danger-text:              $white;
+$state-danger-bg:                $brand-danger;
+$state-danger-border:            $brand-danger;
+
+$alert-border-radius:            0;
+
+// Drawer
+
+$drawer-width:                   222px;
+$modal-inner-padding:            to-rem(18);

@@ -201,7 +201,7 @@
     border-bottom: $table-border-width solid $table-border-color;
 
     text-transform: uppercase;
-    font-weight: 500;
+    font-weight: 600;
     font-size: $font-size-sm;
     line-height: $line-height-lg;
 
@@ -269,7 +269,7 @@
   }
 
   .table-meta-item-label {
-    font-weight: 500;
+    font-weight: 600;
 
     // "Disable" any links in labels.
     a {
@@ -364,7 +364,7 @@
       border: 1px solid #eee;
       border-top: 1px solid #ddd;
       text-transform: uppercase;
-      font-weight: 500;
+      font-weight: 600;
       font-size: $font-size-sm;
       line-height: $line-height-lg;
       vertical-align: middle;
@@ -576,7 +576,7 @@
       width: 60%;
       padding: ($spacer / 2) to-rem(12);
       text-transform: uppercase;
-      font-weight: 500;
+      font-weight: 600;
       font-size: $font-size-sm;
       line-height: $line-height-lg;
       border-bottom: $table-border-width solid #ddd;
@@ -591,5 +591,5 @@
 
 .table-summary-title {
   font-size: 1rem;
-  font-weight: 500;
+  font-weight: 600;
 }

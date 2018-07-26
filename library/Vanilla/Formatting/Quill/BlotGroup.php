@@ -207,16 +207,20 @@ class BlotGroup {
             return null;
         }
         $blot = $this->blots[0];
+        $overridingBlot = $this->getOverridingBlot();
 
+        return $overridingBlot ?? $blot;
+    }
+
+    public function getOverridingBlot() {
         foreach ($this->overridingBlots as $overridingBlot) {
             $index = $this->getIndexForBlotOfType($overridingBlot);
             if ($index >= 0) {
-                $blot = $this->blots[$index];
-                break;
+                return $this->blots[$index];
             }
         }
 
-        return $blot;
+        return null;
     }
 
     /**

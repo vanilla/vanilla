@@ -207,12 +207,17 @@ class BlotGroup {
             return null;
         }
         $blot = $this->blots[0];
-        $overridingBlot = $this->getOverridingBlot();
+        $overridingBlot = $this->getPrimaryBlot();
 
         return $overridingBlot ?? $blot;
     }
 
-    public function getOverridingBlot() {
+    /**
+     * Get the primary blot for the group.
+     *
+     * @return null|AbstractBlot
+     */
+    public function getPrimaryBlot() {
         foreach ($this->overridingBlots as $overridingBlot) {
             $index = $this->getIndexForBlotOfType($overridingBlot);
             if ($index >= 0) {

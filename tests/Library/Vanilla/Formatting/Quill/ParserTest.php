@@ -8,6 +8,7 @@
 namespace VanillaTests\Library\Vanilla\Formatting\Quill;
 
 use Vanilla\Formatting\Quill\Blots\Embeds\ExternalBlot;
+use Vanilla\Formatting\Quill\Blots\HeadingBlot;
 use Vanilla\Formatting\Quill\Blots\Lines\BlockquoteLineBlot;
 use Vanilla\Formatting\Quill\Blots\Lines\ListLineBlot;
 use Vanilla\Formatting\Quill\Blots\TextBlot;
@@ -150,6 +151,14 @@ class ParserTest extends SharedBootstrapTestCase {
                     ],
                 ],
             ],
+            [
+                [
+                    ["attributes" => ["header" => 2], "content" => "\n"]
+                ],
+                [
+                    [["class" => HeadingBlot::class, "content" => ""]]
+                ]
+            ]
         ];
     }
 

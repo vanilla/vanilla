@@ -9,6 +9,7 @@ namespace VanillaTests\Library\Vanilla\Formatting\Quill;
 
 use Vanilla\Formatting\Quill\Blots\Embeds\ExternalBlot;
 use Vanilla\Formatting\Quill\Blots\Lines\BlockquoteLineBlot;
+use Vanilla\Formatting\Quill\Blots\Lines\ListLineBlot;
 use Vanilla\Formatting\Quill\Blots\TextBlot;
 use VanillaTests\SharedBootstrapTestCase;
 use Vanilla\Formatting\Quill\Parser;
@@ -125,6 +126,28 @@ class ParserTest extends SharedBootstrapTestCase {
                     [["class" => TextBlot::class, "content" => "\n"]],
                     [["class" => TextBlot::class, "content" => "\n"]],
                     [["class" => TextBlot::class, "content" => "Mutliple more breaks."]],
+                ],
+            ],
+            [
+                [
+                    ["insert" => "Quote"],
+                    ["attributes" => ["blockquote-line" => true], "insert" => "\n"],
+                    ["insert" => "Quote"],
+                    ["attributes" => ["blockquote-line" => true], "insert" => "\n"],
+                    ["insert" => "List"],
+                    ["attributes" => ["list" => "bullet"], "insert" => "\n"],
+                    ["insert" => "List"],
+                    ["attributes" => ["list" => "bullet"], "insert" => "\n"],
+                ],
+                [
+                    [
+                        ["class" => BlockquoteLineBlot::class, "content" => "Quote"],
+                        ["class" => BlockquoteLineBlot::class, "content" => "Quote"],
+                    ],
+                    [
+                        ["class" => ListLineBlot::class, "content" => "List"],
+                        ["class" => ListLineBlot::class, "content" => "List"],
+                    ],
                 ],
             ],
         ];

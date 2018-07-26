@@ -8029,7 +8029,7 @@ label[id^=iCheck] {
 
 .media-addon .media-title,
 .media-callout .media-title {
-  font-weight: 500;
+  font-weight: 600;
   margin-bottom: 0.28125rem;
   margin-top: 0;
 }
@@ -8789,16 +8789,6 @@ button.close {
   -webkit-justify-content: center;
       -ms-flex-pack: center;
           justify-content: center;
-}
-
-.navbar .nav-link.active, .navbar .file-upload input:focus ~ .nav-link.file-upload-choose, .file-upload .navbar input:focus ~ .nav-link.file-upload-choose, .navbar
-.file-upload input:focus ~ .nav-link.file-upload-browse,
-.file-upload .navbar input:focus ~ .nav-link.file-upload-browse, .navbar
-.file-upload input:hover ~ .nav-link.file-upload-choose,
-.file-upload .navbar input:hover ~ .nav-link.file-upload-choose, .navbar
-.file-upload input:hover ~ .nav-link.file-upload-browse,
-.file-upload .navbar input:hover ~ .nav-link.file-upload-browse, .navbar select.nav-link:focus, .navbar .nav-link.drop-enabled {
-  border-bottom: solid 4px #04a8fd;
 }
 
 .navbar .nav-link.active, .navbar .file-upload input:focus ~ .nav-link.file-upload-choose, .file-upload .navbar input:focus ~ .nav-link.file-upload-choose, .navbar

@@ -57,8 +57,6 @@
     justify-content: center;
 
     &.active {
-      border-bottom: solid 4px $navbar-active-link-active-bg;
-
       &,
       &:hover {
         background-color: $navbar-active-link-active-bg;
@@ -69,7 +67,6 @@
       }
     }
 
-    //&.hover,
     &:hover {
       background-color: $navbar-active-link-active-bg;
     }

@@ -103,6 +103,10 @@ class ResourceRouteTest extends SharedBootstrapTestCase {
             'bad index' => ['GET', '/discussions/index', null],
             'bad get' => ['GET', '/discussions/get/123', null],
             'bad post' => ['PATCH', '/discussions/post', null],
+
+            // File extensions.
+            'foo.js' => ['GET', '/discussions/123/foo.js', [$dc, 'get_foo_js'], ['id' => '123']],
+            'foos.js' => ['GET', '/discussions/foos.js', [$dc, 'index_foos_js'], []],
         ];
 
         return $r;

@@ -404,6 +404,8 @@ if (!function_exists('val')) {
      * @param mixed $collection The array or object to search.
      * @param mixed $default The value to return if the key does not exist.
      * @return mixed The value from the array or object.
+     *
+     * @deprecated Please, avoid to use this function. You can use: isset(), property_exists(), ??, :? etc
      */
     function val($key, $collection, $default = false) {
         if (is_array($collection)) {

@@ -103,8 +103,8 @@ class ParserTest extends SharedBootstrapTestCase {
         $this->assertCorrectLineBlotParsing("list", "ordered", ListLineBlot::class);
         $this->assertCorrectLineBlotParsing("spoiler-line", true, SpoilerLineBlot::class);
         $this->assertCorrectLineBlotParsing("blockquote-line", true, BlockquoteLineBlot::class);
-        $this->assertCorrectNonLineBlockBlockParsing("header", 1, HeadingBlot::class);
         $this->assertCorrectNonLineBlockBlockParsing("header", 2, HeadingBlot::class);
+        $this->assertCorrectNonLineBlockBlockParsing("header", 3, HeadingBlot::class);
     }
 
     /**

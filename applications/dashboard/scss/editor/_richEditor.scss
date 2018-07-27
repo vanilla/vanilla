@@ -533,23 +533,27 @@
     background: none;
     padding: 12px;
     font-size: $richEditor-pilcrow_fontSize;
-    background-color: $richEditor-pilcrow_bg;
-
+    background-color: $richEditor-code_bg;
 }
 
-
 .userContent {
-    > *:not(:last-child) {
-        margin-bottom: .6em;
+    > * {
+        &:not(:last-child) {
+            margin-bottom: .6em;
 
-        + h1,
-        + h2,
-        + h3,
-        + h4,
-        + h5,
-        + h6
-        {
-            margin-top: #{$richEditor-font_size * .6};
+            + h1,
+            + h2,
+            + h3,
+            + h4,
+            + h5,
+            + h6
+            {
+                margin-top: #{$richEditor-font_size * .6};
+            }
+        }
+
+        &:first-child {
+            margin-top: 0 !important;
         }
     }
 

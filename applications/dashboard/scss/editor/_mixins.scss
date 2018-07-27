@@ -115,6 +115,10 @@ $spinnerOffset: 73deg;
         padding-left: $richEditor-mobile_spacing;
         padding-right: $richEditor-mobile_spacing;
     }
+
+    .richEditorParagraphMenu {
+        display: none !important;
+    }
 }
 
 

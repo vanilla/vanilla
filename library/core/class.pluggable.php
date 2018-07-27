@@ -99,7 +99,7 @@ abstract class Gdn_Pluggable {
         if (!is_array($options)) {
             $options = ['FireClass' => $options];
         }
-        $this->FireAs = $options['FireClass']??$this->FireAs;
+        $this->FireAs = $options['FireClass'] ?? $this->FireAs;
 
         return $this;
     }

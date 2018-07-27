@@ -29,7 +29,7 @@ class HeadingBlot extends TextBlot {
      * @throws \Exception
      */
     public function getGroupOpeningTag(): string {
-        return "<h" . $this->getHeadingLevel() . ">";
+        return "<h".$this->getHeadingLevel().">";
     }
 
     /**
@@ -37,7 +37,7 @@ class HeadingBlot extends TextBlot {
      * @throws \Exception
      */
     public function getGroupClosingTag(): string {
-        return "</h" . $this->getHeadingLevel() . ">";
+        return "</h".$this->getHeadingLevel().">";
     }
 
     /**
@@ -54,11 +54,11 @@ class HeadingBlot extends TextBlot {
      * @throws \Exception if the level is not a valid integer.
      */
     private function getHeadingLevel(): int {
-        // Heading attributes live in the next operation.
-        $level = $this->nextOperation["attributes"]["header"] ?? null;
-        if (!in_array($level, self::$validLevels)) {
-            throw new \Exception("Invalid heading level");
-        }
-        return $level;
+        $defaultLevel = 2;
+        // Heading attributes generally live in the next operation.
+        // For empty headings there is only one operation, so it could be in the current op.
+        return $this->hasConsumedNextOp()
+                ? $this->nextOperation["attributes"]["header"] ?? $defaultLevel
+                : $this->currentOperation["attributes"]["header"] ?? $defaultLevel;
     }
 }

@@ -7,6 +7,7 @@
 
 namespace Vanilla\Formatting\Quill\Blots\Lines;
 
+use Vanilla\Formatting\Quill\BlotGroup;
 use Vanilla\Formatting\Quill\Blots\TextBlot;
 
 /**
@@ -35,6 +36,21 @@ abstract class AbstractLineBlot extends TextBlot {
         }
 
         return $result;
+    }
+
+    /**
+     * If the group already has an overriding blot and it is not the same type as this blot, we start a new group.
+     *
+     * @param BlotGroup $group The group to check.
+     * @return bool
+     */
+    public function shouldClearCurrentGroup(BlotGroup $group): bool {
+        $overridingBlot = $group->getPrimaryBlot();
+        if ($overridingBlot) {
+            return get_class($overridingBlot) !== get_class($this);
+        } else {
+            return parent::shouldClearCurrentGroup($group);
+        }
     }
 
     /**

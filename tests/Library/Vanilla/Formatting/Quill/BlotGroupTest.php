@@ -17,9 +17,9 @@ class BlotGroupTest extends SharedBootstrapTestCase {
     public function testGetIndexForBlockType() {
         $block = new BlotGroup();
         $emptyBlot = new TextBlot([], [], []);
-        $headingBlot = new HeadingBlot(["insert" => "H1",], [], [
+        $headingBlot = new HeadingBlot(["insert" => "H2",], [], [
             "attributes" => [
-            "header" => 1,
+            "header" => 2,
         ]]);
 
         $block->pushBlot($emptyBlot);

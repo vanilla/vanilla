@@ -101,6 +101,7 @@ class PageScraper {
         }
 
         $this->httpRequest->setMethod(HttpRequest::METHOD_GET);
+        $this->httpRequest->setHeader('User-Agent', $this->userAgent());
         $this->httpRequest->setUrl($url);
         $result = $this->httpRequest->send();
         return $result;
@@ -178,5 +179,15 @@ class PageScraper {
     public function registerMetadataParser(Parser $parser) {
         $this->metadataParsers[] = $parser;
         return $this->metadataParsers;
+    }
+
+    /**
+     * User agent to identify the client to remote services.
+     *
+     * @return string
+     */
+    private function userAgent() {
+        $version = defined('APPLICATION_VERSION') ? APPLICATION_VERSION : '0.0';
+        return "Vanilla/{$version}";
     }
 }

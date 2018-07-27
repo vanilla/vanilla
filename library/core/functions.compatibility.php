@@ -405,7 +405,7 @@ if (!function_exists('val')) {
      * @param mixed $default The value to return if the key does not exist.
      * @return mixed The value from the array or object.
      *
-     * @deprecated Please, avoid to use this function. You can use: isset(), property_exists(), ??, :? etc
+     * @deprecated After 5000+ uses, it's time to say goodbye to our dear friend because we suspect it's wasting memory. We'll miss you, `val()`. Alternatives: `isset()`, `property_exists()`, `??`, and `:?`.
      */
     function val($key, $collection, $default = false) {
         if (is_array($collection)) {

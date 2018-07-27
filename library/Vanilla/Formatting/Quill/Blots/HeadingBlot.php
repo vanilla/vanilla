@@ -15,7 +15,7 @@ namespace Vanilla\Formatting\Quill\Blots;
 class HeadingBlot extends TextBlot {
 
     /** @var array Valid heading levels. */
-    private static $validLevels = [1, 2];
+    private static $validLevels = [2, 3];
 
     /**
      * @inheritDoc

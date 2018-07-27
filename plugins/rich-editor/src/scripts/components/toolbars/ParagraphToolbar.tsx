@@ -26,10 +26,10 @@ import { IStoreState } from "@rich-editor/@types/store";
 
 const PARAGRAPH_ITEMS = {
     header: {
-        1: {
+        2: {
             name: "title",
         },
-        2: {
+        3: {
             name: "subtitle",
         },
     },

@@ -26,11 +26,11 @@ import { IStoreState } from "@rich-editor/@types/store";
 
 const PARAGRAPH_ITEMS = {
     header: {
-        1: {
-            name: "title",
-        },
         2: {
-            name: "subtitle",
+            name: "heading2",
+        },
+        3: {
+            name: "heading3",
         },
     },
     "blockquote-line": {

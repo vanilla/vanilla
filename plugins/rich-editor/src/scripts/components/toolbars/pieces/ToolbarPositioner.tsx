@@ -6,7 +6,7 @@
 
 import React from "react";
 import debounce from "lodash/debounce";
-import Quill, { RangeStatic, DeltaStatic, Sources, BoundsStatic } from "quill/core";
+import Quill, { RangeStatic, BoundsStatic } from "quill/core";
 import { withEditor, IWithEditorProps } from "@rich-editor/components/context";
 
 interface IXCoordinates {
@@ -37,7 +37,6 @@ interface IProps extends IWithEditorProps {
     horizontalAlignment?: HorizontalAlignment;
     verticalAlignment?: VerticalAlignment;
     isActive: boolean;
-    selection?: RangeStatic | null;
     selectionIndex: number | null;
     selectionLength: number | null;
 }
@@ -112,7 +111,7 @@ class ToolbarPositioner extends React.PureComponent<IProps, IState> {
         const numLines = this.quill.getLines(selectionIndex, selectionLength);
         let bounds;
 
-        if (numLines.length === 1) {
+        if (numLines.length <= 1) {
             bounds = this.quill.getBounds(selectionIndex, selectionLength);
         } else {
             // If multi-line we want to position at the center of the last line's selection.

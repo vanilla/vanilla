@@ -5,40 +5,49 @@
  */
 
 import Quill from "./index";
+import LinkBlot from "quill/formats/link";
+import BoldBlot from "quill/formats/bold";
+import ItalicBlot from "quill/formats/italic";
+import StrikeBlot from "quill/formats/strike";
 import getStore from "@dashboard/state/getStore";
 import { IStoreState } from "@rich-editor/@types/store";
-import { getIDForQuill } from "@rich-editor/quill/utility";
+import { getIDForQuill, rangeContainsBlot, disableAllBlotsInRange } from "@rich-editor/quill/utility";
+import CodeBlot from "@rich-editor/quill/blots/inline/CodeBlot";
 
 export default class Formatter {
     private store = getStore<IStoreState>();
     constructor(private quill: Quill) {}
 
-    public get formats() {
+    private get instanceState() {
         const id = getIDForQuill(this.quill);
-        const selection = this.store.getState().editor.instances[id].lastGoodSelection;
+        return this.store.getState().editor.instances[id];
+    }
+
+    public get formats() {
+        const selection = this.instanceState.lastGoodSelection;
         return selection ? this.quill.getFormat(selection) : {};
     }
 
     public bold = () => {
-        this.handleBooleanFormat("bold");
+        this.handleBooleanFormat(BoldBlot.blotName);
     };
 
     public italic = () => {
-        this.handleBooleanFormat("italic");
+        this.handleBooleanFormat(ItalicBlot.blotName);
     };
 
     public strike = () => {
-        this.handleBooleanFormat("strike");
+        this.handleBooleanFormat(StrikeBlot.blotName);
     };
     public codeInline = () => {
-        this.handleBooleanFormat("code-inline");
+        this.handleBooleanFormat(CodeBlot.blotName);
     };
     public link = (linkValue?: string) => {
-        const isEnabled = typeof this.formats.link === "string";
+        const isEnabled = rangeContainsBlot(this.quill, LinkBlot, this.instanceState.lastGoodSelection);
         if (isEnabled) {
-            this.quill.format("link", false, Quill.sources.USER);
+            disableAllBlotsInRange(this.quill, LinkBlot, this.instanceState.lastGoodSelection);
         } else {
-            this.quill.format("link", linkValue, Quill.sources.USER);
+            this.quill.format(LinkBlot.blotName, linkValue, Quill.sources.USER);
         }
     };
     public paragraph = () => {};

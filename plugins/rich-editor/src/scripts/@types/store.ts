@@ -19,7 +19,7 @@ export interface IMentionState {
 
 export interface IEditorInstance {
     currentSelection: RangeStatic | null;
-    lastGoodSelection: RangeStatic | null;
+    lastGoodSelection: RangeStatic;
 }
 
 export interface IEditorInstanceState {

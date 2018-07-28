@@ -16,12 +16,12 @@ import { IFormats } from "quill/core";
 interface IProps {
     formatter: Formatter;
     activeFormats: IFormats;
-    linkValue: string;
+    onLinkClick: (event: React.MouseEvent<HTMLButtonElement>) => void;
 }
 
 export default class InlineToolbarMenuItems extends React.Component<IProps> {
     public render() {
-        const { formatter, activeFormats } = this.props;
+        const { formatter, activeFormats, onLinkClick } = this.props;
 
         return (
             <MenuItems>
@@ -57,13 +57,11 @@ export default class InlineToolbarMenuItems extends React.Component<IProps> {
                             label={t("Format as Link")}
                             icon={icons.link()}
                             isActive={typeof activeFormats.link === "string"}
-                            onClick={this.formatLink}
+                            onClick={onLinkClick}
                         />
                     </React.Fragment>
                 )}
             </MenuItems>
         );
     }
-
-    private formatLink = () => this.props.formatter.link(this.props.linkValue);
 }

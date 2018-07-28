@@ -10,7 +10,7 @@ import { withEditor, IWithEditorProps } from "@rich-editor/components/context";
 import ToolbarPositioner from "./ToolbarPositioner";
 
 interface IProps extends IWithEditorProps {
-    selection: RangeStatic | null;
+    selection: RangeStatic;
     isVisible: boolean;
 }
 
@@ -43,13 +43,11 @@ export class ToolbarContainer extends React.Component<IProps, IState> {
 
     public render() {
         const { isVisible, selection } = this.props;
-        const selectionIndex = selection ? selection.index : null;
-        const selectionLength = selection ? selection.length : null;
         return (
             <ToolbarPositioner
                 {...this.state}
-                selectionIndex={selectionIndex}
-                selectionLength={selectionLength}
+                selectionIndex={selection.index}
+                selectionLength={selection.length}
                 isActive={isVisible}
             >
                 {({ x, y }) => {

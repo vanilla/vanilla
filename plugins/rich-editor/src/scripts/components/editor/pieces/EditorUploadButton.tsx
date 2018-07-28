@@ -7,11 +7,11 @@
 import React, { MouseEvent, ChangeEvent } from "react";
 import * as Icons from "@rich-editor/components/icons";
 import EmbedInsertionModule from "@rich-editor/quill/EmbedInsertionModule";
-import { withEditor, IEditorContextProps } from "@rich-editor/components/context";
+import { withEditor, IWithEditorProps } from "@rich-editor/components/context";
 import { uploadImage } from "@dashboard/apiv2";
 import { isFileImage } from "@dashboard/utility";
 
-interface IProps extends IEditorContextProps {}
+interface IProps extends IWithEditorProps {}
 
 export class EditorUploadButton extends React.Component<IProps, {}> {
     private inputRef: React.RefObject<HTMLInputElement> = React.createRef();
@@ -61,4 +61,4 @@ export class EditorUploadButton extends React.Component<IProps, {}> {
     };
 }
 
-export default withEditor(EditorUploadButton);
+export default withEditor<IProps>(EditorUploadButton);

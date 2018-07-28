@@ -6,10 +6,10 @@
 
 import React from "react";
 import Quill, { RangeStatic } from "quill/core";
-import { withEditor, IEditorContextProps } from "@rich-editor/components/context";
+import { withEditor, IWithEditorProps } from "@rich-editor/components/context";
 import ToolbarPositioner from "./ToolbarPositioner";
 
-interface IProps extends IEditorContextProps {
+interface IProps extends IWithEditorProps {
     selection: RangeStatic | null;
     isVisible: boolean;
 }

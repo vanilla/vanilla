@@ -26,12 +26,13 @@ declare module "quill/core" {
         shortKey?: boolean;
     }
 
-    export interface StringMap {
-        [key: string]: any;
-    }
-
+    export interface StringMap extends IFormats {}
     export interface OptionalAttributes {
         attributes?: StringMap;
+    }
+
+    export interface IFormats {
+        [formatName: string]: any;
     }
 
     export interface KeyboardStatic {

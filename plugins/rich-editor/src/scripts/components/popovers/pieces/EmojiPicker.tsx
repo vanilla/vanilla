@@ -11,7 +11,7 @@ import { t } from "@dashboard/application";
 import * as Icons from "@rich-editor/components/icons";
 import Popover from "./Popover";
 import { IPopoverControllerChildParameters } from "./PopoverController";
-import { withEditor, IEditorContextProps } from "@rich-editor/components/context";
+import { withEditor, IWithEditorProps } from "@rich-editor/components/context";
 import { EMOJI_GROUPS, EMOJIS } from "./emojiData";
 import EmojiButton from "./EmojiButton";
 
@@ -34,7 +34,7 @@ EMOJIS.forEach((data, key) => {
 
 const emojiGroupLength = Object.values(EMOJI_GROUPS).length;
 
-interface IProps extends IEditorContextProps, IPopoverControllerChildParameters {
+interface IProps extends IWithEditorProps, IPopoverControllerChildParameters {
     contentID: string;
 }
 

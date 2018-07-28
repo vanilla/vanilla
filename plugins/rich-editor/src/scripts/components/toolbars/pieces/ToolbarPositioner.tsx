@@ -7,7 +7,7 @@
 import React from "react";
 import debounce from "lodash/debounce";
 import Quill, { RangeStatic, DeltaStatic, Sources, BoundsStatic } from "quill/core";
-import { withEditor, IEditorContextProps } from "@rich-editor/components/context";
+import { withEditor, IWithEditorProps } from "@rich-editor/components/context";
 
 interface IXCoordinates {
     position: number;
@@ -28,7 +28,7 @@ interface IParameters {
 type HorizontalAlignment = "center" | "start";
 type VerticalAlignment = "above" | "below";
 
-interface IProps extends IEditorContextProps {
+interface IProps extends IWithEditorProps {
     children: (params: IParameters) => JSX.Element;
     selectionTransformer?: (selection: RangeStatic) => RangeStatic | null;
     flyoutHeight: number | null;

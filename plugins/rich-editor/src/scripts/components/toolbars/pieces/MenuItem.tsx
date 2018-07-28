@@ -12,15 +12,14 @@ import * as Icons from "@rich-editor/components/icons";
 type FormatterCallback = (IMenuItemData) => void;
 
 export interface IMenuItemData {
-    active: boolean;
-    label?: string;
-    formatName?: string;
-    formatter?: FormatterCallback;
-    enableValue?: object;
+    icon: JSX.Element;
+    label: string;
+    formatter: () => void;
+    isEnabled: () => boolean;
     isFallback?: boolean;
 }
 
-interface IProps {
+interface IOldProps {
     propertyName: string;
     label: string;
     isActive: boolean;
@@ -32,10 +31,42 @@ interface IProps {
     disabled: boolean;
 }
 
+interface IProps {
+    label: string;
+    isActive: boolean;
+    disabled: boolean;
+    icon: JSX.Element;
+    onClick: (event: React.MouseEvent<HTMLButtonElement>) => void;
+    onBlur?: (event: React.FocusEvent<any>) => void;
+}
+
+export default function MenuItem(props: IProps) {
+    const { label, disabled, isActive, onClick, onBlur, icon } = props;
+    const buttonClasses = classnames("richEditor-button", "richEditor-formatButton", "richEditor-menuItem", {
+        isActive,
+    });
+
+    return (
+        <button
+            className={buttonClasses}
+            type="button"
+            role="menuitem"
+            aria-label={label}
+            aria-pressed={isActive}
+            onClick={onClick}
+            onBlur={onBlur}
+            disabled={disabled}
+        >
+            {icon}
+        </button>
+    );
+}
+
+// Role = menuitem
 /**
  * Component for a single item in a EditorToolbar.
  */
-export default class MenuItem extends React.Component<IProps> {
+export class OldMenuItem extends React.Component<IOldProps> {
     private onBlur: (event?: React.FocusEvent<any>) => void;
     private domButton: HTMLElement;
 

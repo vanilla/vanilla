@@ -5,30 +5,22 @@
  */
 
 import React from "react";
-import MenuItem, { IMenuItemData } from "@rich-editor/components/toolbars/pieces/MenuItem";
+import MenuItem from "@rich-editor/components/toolbars/pieces/MenuItem";
 
 interface IProps {
-    itemData: IMenuItemData[];
+    children: (firstItemRef: React.RefObject<MenuItem>, lastItemRef: React.RefObject<MenuItem>) => JSX.Element;
 }
 
 export default class MenuItems extends React.Component<IProps, {}> {
-    public render() {
-        const items = this.props.itemData.map((item, key) => {
-            return (
-                <MenuItem
-                    key={key}
-                    label={item.label}
-                    icon={item.icon}
-                    isActive={item.isEnabled()}
-                    disabled={false}
-                    onClick={item.formatter}
-                />
-            );
-        });
+    private firstItemRef: React.RefObject<MenuItem> = React.createRef();
+    private lastItemRef: React.RefObject<MenuItem> = React.createRef();
 
+    public render() {
         return (
             <div className="richEditor-menu" role="menu">
-                <div className="richEditor-menuItems MenuItems">{items}</div>
+                <div className="richEditor-menuItems MenuItems">
+                    {this.props.children(this.firstItemRef, this.lastItemRef)}
+                </div>
             </div>
         );
     }

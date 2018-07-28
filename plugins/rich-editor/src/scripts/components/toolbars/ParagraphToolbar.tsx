@@ -5,16 +5,14 @@
  */
 
 import React from "react";
-import Quill, { Blot } from "quill/core";
-import { RangeStatic, Sources } from "quill";
+import Quill from "quill/core";
 import { t } from "@dashboard/application";
 import * as Icons from "@rich-editor/components/icons";
 import { withEditor, IWithEditorProps } from "@rich-editor/components/context";
-import { IMenuItemData } from "./pieces/MenuItem";
 import { watchFocusInDomTree } from "@dashboard/dom";
 import { createEditorFlyoutEscapeListener, isEmbedSelected } from "@rich-editor/quill/utility";
 import Formatter from "@rich-editor/quill/Formatter";
-import MenuItems from "@rich-editor/components/toolbars/pieces/MenuItems";
+import ParagraphToolbarMenuItems from "@rich-editor/components/toolbars/pieces/ParagraphToolbarMenuItems";
 
 const PARAGRAPH_ITEMS = {
     header: {
@@ -124,7 +122,7 @@ export class ParagraphToolbar extends React.PureComponent<IProps, IState> {
                     ref={ref => (this.toolbarNode = ref!)}
                     role="menu"
                 >
-                    <MenuItems itemData={this.menuItems} />
+                    <ParagraphToolbarMenuItems formatter={this.formatter} activeFormats={this.props.activeFormats} />
                     <div role="presentation" className="richEditor-nubPosition">
                         <div className="richEditor-nub" />
                     </div>
@@ -132,71 +130,6 @@ export class ParagraphToolbar extends React.PureComponent<IProps, IState> {
             </div>
         );
     }
-
-    private get menuItems(): IMenuItemData[] {
-        return [
-            {
-                icon: Icons.pilcrow(),
-                label: t("Format as Paragraph"),
-                formatter: this.formatter.paragraph,
-                isEnabled: () => false,
-                // isFallback: true,
-            },
-            {
-                icon: Icons.title(),
-                label: t("Format as Title"),
-                formatter: this.formatter.h2,
-                isEnabled: () => this.props.activeFormats.header === 2,
-            },
-            {
-                icon: Icons.subtitle(),
-                label: t("Format as Subtitle"),
-                formatter: this.formatter.h3,
-                isEnabled: () => this.props.activeFormats.header === 3,
-            },
-            {
-                icon: Icons.blockquote(),
-                label: t("Format as blockquote"),
-                formatter: this.formatter.blockquote,
-                isEnabled: () => this.props.activeFormats["blockquote-line"] === true,
-            },
-            {
-                icon: Icons.codeBlock(),
-                label: t("Format as code block"),
-                formatter: this.formatter.codeBlock,
-                isEnabled: () => this.props.activeFormats.codeBlock === true,
-            },
-            {
-                icon: Icons.spoiler(),
-                label: t("Format as spoiler"),
-                formatter: this.formatter.spoiler,
-                isEnabled: () => this.props.activeFormats["spoiler-line"] === true,
-            },
-        ];
-    }
-
-    /**
-     * Grab the current line directly and format it as a paragraph.
-     */
-    private paragraphFormatter = () => {
-        if (!this.props.instanceState.lastGoodSelection) {
-            return;
-        }
-        const blot: Blot = this.quill.getLine(this.props.instanceState.lastGoodSelection.index)[0];
-        blot.replaceWith("block");
-        this.quill.update(Quill.sources.USER);
-        this.quill.setSelection(this.props.instanceState.lastGoodSelection, Quill.sources.USER);
-    };
-
-    /**
-     * Be sure to strip out all other formats before formatting as code.
-     */
-    private codeFormatter = () => {
-        const selection = this.quill.getSelection(true);
-        const [line] = this.quill.getLine(selection.index);
-        this.quill.removeFormat(line.offset(), line.length(), Quill.sources.API);
-        this.quill.formatLine(line.offset(), line.length(), "code-block", Quill.sources.USER);
-    };
 
     /**
      * Get the active format for the current line.

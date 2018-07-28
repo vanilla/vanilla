@@ -20,9 +20,10 @@ import CodeBlockBlot from "@rich-editor/quill/blots/blocks/CodeBlockBlot";
 import Formatter from "@rich-editor/quill/Formatter";
 import * as icons from "../icons";
 import MenuItems from "@rich-editor/components/toolbars/pieces/MenuItems";
-import { IMenuItemData } from "@rich-editor/components/toolbars/pieces/MenuItem";
+import MenuItem from "@rich-editor/components/toolbars/pieces/MenuItem";
+import InlineToolbarMenuItems from "@rich-editor/components/toolbars/pieces/InlineToolbarMenuItems";
 
-interface IProps extends IWithEditorProps { }
+interface IProps extends IWithEditorProps {}
 
 interface IState {
     cachedRange: RangeStatic | null;
@@ -62,6 +63,8 @@ export class InlineToolbar extends React.Component<IProps, IState> {
     }
 
     public render() {
+        const { activeFormats } = this.props;
+        const { inputValue } = this.state;
         const alertMessage = this.state.showFormatMenu ? (
             <span aria-live="assertive" role="alert" className="sr-only">
                 {t("Inline Menu Available")}
@@ -74,8 +77,11 @@ export class InlineToolbar extends React.Component<IProps, IState> {
             <div ref={this.selfRef}>
                 <ToolbarContainer selection={this.state.cachedRange} isVisible={this.state.showFormatMenu && hasFocus}>
                     {alertMessage}
-                    <MenuItems itemData={this.menuItems} />
-                    {/* <InlineToolbarItems currentSelection={this.state.cachedRange} linkFormatter={this.linkFormatter} /> */}
+                    <InlineToolbarMenuItems
+                        formatter={this.formatter}
+                        linkValue={inputValue}
+                        activeFormats={activeFormats}
+                    />
                 </ToolbarContainer>
                 <ToolbarContainer selection={this.state.cachedRange} isVisible={this.state.showLinkMenu && hasFocus}>
                     <InlineToolbarLinkInput
@@ -118,46 +124,7 @@ export class InlineToolbar extends React.Component<IProps, IState> {
         document.removeEventListener("keydown", this.escFunction, false);
     }
 
-    private get menuItems(): IMenuItemData[] {
-        const { inputValue } = this.state;
-        const { activeFormats } = this.props;
-        return [
-            {
-                label: t("Format as Bold"),
-                icon: icons.bold(),
-                isEnabled: this.createBasicFormatEnabledFunction("bold"),
-                formatter: this.formatter.bold,
-            },
-            {
-                label: t("Format as Italic"),
-                icon: icons.italic(),
-                isEnabled: this.createBasicFormatEnabledFunction("italic"),
-                formatter: this.formatter.italic,
-            },
-            {
-                label: t("Format as Strikethrough"),
-                icon: icons.strike(),
-                isEnabled: this.createBasicFormatEnabledFunction("strike"),
-                formatter: this.formatter.strike,
-            },
-            {
-                label: t("Format as Inline Code"),
-                icon: icons.code(),
-                isEnabled: this.createBasicFormatEnabledFunction("code"),
-                formatter: this.formatter.codeInline,
-            },
-            {
-                label: t("Format as Link"),
-                icon: icons.bold(),
-                isEnabled: () => typeof activeFormats.link === "string",
-                formatter: () => {
-                    this.formatter.link(inputValue);
-                },
-            },
-        ];
-    }
-
-    private createBasicFormatEnabledFunction = formatName => () => this.props.activeFormats[formatName] === true;
+    private isBooleanFormatEnabled = formatName => this.props.activeFormats[formatName] === true;
 
     private handleFocusChange = hasFocus => {
         if (this.state.hasFocus && !hasFocus) {
@@ -257,37 +224,6 @@ export class InlineToolbar extends React.Component<IProps, IState> {
             this.reset();
         }
     };
-
-    // /**
-    //  * Special formatting for the link blot.
-    //  *
-    //  * @param menuItemData - The current state of the menu item.
-    //  */
-    // private linkFormatter = (menuItemData: IMenuItemData) => {
-    //     if (menuItemData.active) {
-    //         disableAllBlotsInRange(this.quill, LinkBlot);
-    //         this.clearLinkInput();
-    //     } else {
-    //         this.focusLinkInput();
-    //     }
-    // };
-
-    /**
-     * Be sure to strip out all other formats before formatting as code.
-     */
-    // private codeFormatter(menuItemData: IMenuItemData) {
-    //     if (!this.state.cachedRange) {
-    //         return;
-    //     }
-    //     this.quill.removeFormat(this.state.cachedRange.index, this.state.cachedRange.length, Quill.sources.API);
-    //     this.quill.formatText(
-    //         this.state.cachedRange.index,
-    //         this.state.cachedRange.length,
-    //         "code-inline",
-    //         !menuItemData.active,
-    //         Quill.sources.USER,
-    //     );
-    // }
 
     /**
      * Apply focus to the link input.

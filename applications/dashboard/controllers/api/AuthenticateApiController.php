@@ -24,6 +24,9 @@ use Vanilla\Models\SSOModel;
  */
 class AuthenticateApiController extends AbstractApiController {
 
+    // The feature flag behind which all this functionality is kept.
+    const FEATURE_FLAG = 'AuthenticationAPI';
+
     const SESSION_ID_EXPIRATION = 1200; // 20 minutes
 
     /** @var AuthenticatorsApiController */
@@ -62,6 +65,7 @@ class AuthenticateApiController extends AbstractApiController {
         SSOModel $ssoModel,
         UserModel $userModel
     ) {
+        \Vanilla\FeatureFlagHelper::throwIfNotEnabled(self::FEATURE_FLAG);
         $this->authenticatorApiController = $authenticatorApiController;
         $this->config = $config;
         $this->request = $request;

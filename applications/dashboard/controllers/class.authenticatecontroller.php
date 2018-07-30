@@ -54,6 +54,7 @@ class AuthenticateController extends Gdn_Controller {
         SSOModel $ssoModel,
         UserModel $userModel
     ) {
+        \Vanilla\FeatureFlagHelper::throwIfNotEnabled(AuthenticateApiController::FEATURE_FLAG);
         parent::__construct();
 
         $this->authenticateApiController = $authenticateApiController;

@@ -59,7 +59,7 @@ echo $form->errors();
         <li class="form-group">
             <?php
             $mobileFormatterNote1 = t('MobileInputFormatter.Notes1', 'Specify an editing format for mobile devices.');
-            $mobileFormatterNote2 =t('MobileInputFormatter.Notes', 'If mobile devices should have the same experience,
+            $mobileFormatterNote2 =t('MobileInputFormatter.Notes2', 'If mobile devices should have the same experience,
 specify the same one as above. If users report issues with mobile editing, this is a good option to change.');
             $label = '<p class="info">'.$mobileFormatterNote1.'</p><p class="info"><strong>'.t('Note:').' </strong>'.$mobileFormatterNote2.'</p>';
             ?>

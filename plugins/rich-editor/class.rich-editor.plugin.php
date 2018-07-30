@@ -7,6 +7,8 @@
 
 class RichEditorPlugin extends Gdn_Plugin {
 
+    const FORMAT_NAME = "Rich";
+
     /** @var integer */
     private static $editorID = 0;
 
@@ -26,8 +28,8 @@ class RichEditorPlugin extends Gdn_Plugin {
     }
 
     public function structure() {
-        saveToConfig('Garden.InputFormatter', 'Rich');
-        saveToConfig('Garden.MobileInputFormatter', 'Rich');
+        saveToConfig('Garden.InputFormatter', self::FORMAT_NAME);
+        saveToConfig('Garden.MobileInputFormatter', self::FORMAT_NAME);
     }
 
     /**
@@ -44,7 +46,17 @@ class RichEditorPlugin extends Gdn_Plugin {
     public function isRichFormat($sender):bool {
         $form = val('Form', $sender, $sender); // May already be "Form" object
         $data = $form->formData();
-        return strcmp(val('Format', $data, "Rich"), "Rich") === 0;
+        return strcmp(val('Format', $data, self::FORMAT_NAME), self::FORMAT_NAME) === 0;
+    }
+
+    /**
+     * Add the rich editor format to the posting page.
+     *
+     * @param VanillaSettingsController $sender
+     * @param $args
+     */
+    public function vanillaSettingsController_getFormats_handler($sender, $args) {
+        $args['formats'] []= self::FORMAT_NAME;
     }
 
     /**

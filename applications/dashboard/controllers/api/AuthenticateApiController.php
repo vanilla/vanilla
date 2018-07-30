@@ -225,6 +225,22 @@ class AuthenticateApiController extends AbstractApiController {
      * @return Schema
      */
     public function getAuthenticatorPublicSchema() {
+        $ssoSchema = Schema::parse([
+            'sso:o?' => [
+                'canSignIn' => [
+                    'type' => 'boolean',
+                    'description' => 'Whether or not the authenticator can be used to sign in.',
+                    'default' => true,
+                    'x-instance-configurable' => true,
+                ],
+                'canAutoLinkUser:b' => [
+                    'description' => 'Whether or not the authenticator can automatically link the incoming user information to an existing user account by using email address.',
+                    'default' => false,
+                    'x-instance-configurable' => true,
+                ],
+            ]
+        ]);
+
         $schema = Schema::parse([
             'authenticatorID' => null,
             'type' => null,
@@ -235,12 +251,7 @@ class AuthenticateApiController extends AbstractApiController {
         ])
             ->add(SSOAuthenticator::getAuthenticatorSchema())
             ->merge(
-                Schema::parse([
-                    'sso?' => [
-                        'canSignIn' => null,
-                        'canAutoLinkUser' => null,
-                    ]
-                ])->add(SSOAuthenticator::getAuthenticatorSchema()->getField('properties.sso'))
+                $ssoSchema
             )
         ;
 
@@ -291,7 +302,7 @@ class AuthenticateApiController extends AbstractApiController {
         $this->permission();
 
         $this->schema(
-            Schema::parse(['authenticatorID'])->merge($this->getAuthenticatorPublicSchema()),
+            Schema::parse(['authenticatorID' => $this->getAuthenticatorPublicSchema()->getField('properties.authenticatorID')]),
             'in'
         )->setDescription('Get an active authenticator.');
         $out = $this->schema($this->getAuthenticatorPublicSchema(), 'out');

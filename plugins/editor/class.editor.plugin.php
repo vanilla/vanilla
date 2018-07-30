@@ -61,6 +61,10 @@ class EditorPlugin extends Gdn_Plugin {
         $this->AssetPath = asset('/plugins/editor');
         $this->pluginInfo = Gdn::pluginManager()->getPluginInfo('editor', Gdn_PluginManager::ACCESS_PLUGINNAME);
         $this->ForceWysiwyg = c('Plugins.editor.ForceWysiwyg', false);
+
+        // Check for additional formats that render with the Advanced Editor.
+        $this->EventArguments['formats'] = &$this->Formats;
+        $this->fireEvent('GetFormats');
     }
 
     /**

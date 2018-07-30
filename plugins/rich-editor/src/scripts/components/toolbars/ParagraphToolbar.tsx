@@ -122,7 +122,11 @@ export class ParagraphToolbar extends React.PureComponent<IProps, IState> {
                     ref={ref => (this.toolbarNode = ref!)}
                     role="menu"
                 >
-                    <ParagraphToolbarMenuItems formatter={this.formatter} activeFormats={this.props.activeFormats} />
+                    <ParagraphToolbarMenuItems
+                        formatter={this.formatter}
+                        activeFormats={this.props.activeFormats}
+                        lastGoodSelection={this.props.instanceState.lastGoodSelection}
+                    />
                     <div role="presentation" className="richEditor-nubPosition">
                         <div className="richEditor-nub" />
                     </div>

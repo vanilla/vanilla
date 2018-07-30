@@ -10,59 +10,86 @@ import MenuItem from "@rich-editor/components/toolbars/pieces/MenuItem";
 import { t } from "@dashboard/application";
 import * as icons from "../../icons";
 import Formatter from "@rich-editor/quill/Formatter";
-import { IFormats } from "quill/core";
+import { IFormats, RangeStatic } from "quill/core";
 
 interface IProps {
     formatter: Formatter;
     activeFormats: IFormats;
+    lastGoodSelection: RangeStatic;
 }
 
-export default function ParagraphToolbarMenuItems(props: IProps) {
-    const { formatter, activeFormats } = props;
-    return (
-        <MenuItems>
-            {(firstItemRef, lastItemRef) => (
-                <React.Fragment>
-                    <MenuItem
-                        ref={firstItemRef}
-                        icon={icons.pilcrow()}
-                        label={t("Format as Paragraph")}
-                        onClick={formatter.paragraph}
-                        isActive={false}
-                    />
-                    <MenuItem
-                        icon={icons.title()}
-                        label={t("Format as Title")}
-                        onClick={formatter.h2}
-                        isActive={activeFormats.header === 2}
-                    />
-                    <MenuItem
-                        icon={icons.subtitle()}
-                        label={t("Format as Subtitle")}
-                        onClick={formatter.h3}
-                        isActive={activeFormats.header === 3}
-                    />
-                    <MenuItem
-                        icon={icons.blockquote()}
-                        label={t("Format as blockquote")}
-                        onClick={formatter.blockquote}
-                        isActive={activeFormats["blockquote-line"] === true}
-                    />
-                    <MenuItem
-                        icon={icons.codeBlock()}
-                        label={t("Format as code block")}
-                        onClick={formatter.codeBlock}
-                        isActive={activeFormats.codeBlock === true}
-                    />
-                    <MenuItem
-                        ref={lastItemRef}
-                        icon={icons.spoiler()}
-                        label={t("Format as spoiler")}
-                        onClick={formatter.spoiler}
-                        isActive={activeFormats["spoiler-line"] === true}
-                    />
-                </React.Fragment>
-            )}
-        </MenuItems>
-    );
+export default class ParagraphToolbarMenuItems extends React.Component<IProps> {
+    public render() {
+        const { formatter, activeFormats } = this.props;
+        return (
+            <MenuItems>
+                {(firstItemRef, lastItemRef) => (
+                    <React.Fragment>
+                        <MenuItem
+                            ref={firstItemRef}
+                            icon={icons.pilcrow()}
+                            label={t("Format as Paragraph")}
+                            onClick={this.formatParagraph}
+                            isActive={false}
+                        />
+                        <MenuItem
+                            icon={icons.title()}
+                            label={t("Format as Title")}
+                            onClick={this.formatH2}
+                            isActive={activeFormats.header === 2}
+                        />
+                        <MenuItem
+                            icon={icons.subtitle()}
+                            label={t("Format as Subtitle")}
+                            onClick={this.formatH3}
+                            isActive={activeFormats.header === 3}
+                        />
+                        <MenuItem
+                            icon={icons.blockquote()}
+                            label={t("Format as blockquote")}
+                            onClick={this.formatBlockquote}
+                            isActive={activeFormats["blockquote-line"] === true}
+                        />
+                        <MenuItem
+                            icon={icons.codeBlock()}
+                            label={t("Format as code block")}
+                            onClick={this.formatCodeBlock}
+                            isActive={activeFormats.codeBlock === true}
+                        />
+                        <MenuItem
+                            ref={lastItemRef}
+                            icon={icons.spoiler()}
+                            label={t("Format as spoiler")}
+                            onClick={this.formatSpoiler}
+                            isActive={activeFormats["spoiler-line"] === true}
+                        />
+                    </React.Fragment>
+                )}
+            </MenuItems>
+        );
+    }
+
+    //
+    // These are implicitly written out for performance reasons.
+    // Lambas or binding in the render method slows down renders significantly.
+    //
+
+    private formatParagraph = () => {
+        this.props.formatter.paragraph(this.props.lastGoodSelection);
+    };
+    private formatH2 = () => {
+        this.props.formatter.h2(this.props.lastGoodSelection);
+    };
+    private formatH3 = () => {
+        this.props.formatter.h3(this.props.lastGoodSelection);
+    };
+    private formatBlockquote = () => {
+        this.props.formatter.blockquote(this.props.lastGoodSelection);
+    };
+    private formatCodeBlock = () => {
+        this.props.formatter.codeBlock(this.props.lastGoodSelection);
+    };
+    private formatSpoiler = () => {
+        this.props.formatter.spoiler(this.props.lastGoodSelection);
+    };
 }

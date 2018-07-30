@@ -5,7 +5,7 @@
  */
 
 import React from "react";
-import Quill, { RangeStatic, Sources } from "quill/core";
+import Quill from "quill/core";
 import Emitter from "quill/core/emitter";
 import Keyboard from "quill/modules/keyboard";
 import LinkBlot from "quill/formats/link";
@@ -14,7 +14,7 @@ import ToolbarContainer from "./pieces/ToolbarContainer";
 import { withEditor, IWithEditorProps } from "@rich-editor/components/context";
 import InlineToolbarLinkInput from "./pieces/InlineToolbarLinkInput";
 import { watchFocusInDomTree } from "@dashboard/dom";
-import { rangeContainsBlot, disableAllBlotsInRange } from "@rich-editor/quill/utility";
+import { rangeContainsBlot } from "@rich-editor/quill/utility";
 import CodeBlot from "@rich-editor/quill/blots/inline/CodeBlot";
 import CodeBlockBlot from "@rich-editor/quill/blots/blocks/CodeBlockBlot";
 import Formatter from "@rich-editor/quill/Formatter";
@@ -62,7 +62,6 @@ export class InlineToolbar extends React.Component<IProps, IState> {
 
     public render() {
         const { activeFormats, instanceState } = this.props;
-        const { inputValue } = this.state;
         const alertMessage = this.isFormatMenuVisible ? (
             <span aria-live="assertive" role="alert" className="sr-only">
                 {t("Inline Menu Available")}
@@ -77,6 +76,7 @@ export class InlineToolbar extends React.Component<IProps, IState> {
                         formatter={this.formatter}
                         onLinkClick={this.openLinkMenu}
                         activeFormats={activeFormats}
+                        lastGoodSelection={instanceState.lastGoodSelection}
                     />
                 </ToolbarContainer>
                 <ToolbarContainer selection={instanceState.lastGoodSelection} isVisible={this.isLinkMenuVisible}>
@@ -149,7 +149,7 @@ export class InlineToolbar extends React.Component<IProps, IState> {
             !rangeContainsBlot(this.quill, CodeBlockBlot)
         ) {
             if (rangeContainsBlot(this.quill, LinkBlot, lastGoodSelection)) {
-                this.formatter.link();
+                this.formatter.link(lastGoodSelection);
                 this.reset();
             } else {
                 const currentText = this.quill.getText(lastGoodSelection.index, lastGoodSelection.length);
@@ -167,7 +167,7 @@ export class InlineToolbar extends React.Component<IProps, IState> {
     private openLinkMenu = () => {
         if (typeof this.props.activeFormats.link === "string") {
             this.setState({ isLinkMenuOpen: false });
-            this.formatter.link();
+            this.formatter.link(this.props.instanceState.lastGoodSelection);
         } else {
             this.setState({ isLinkMenuOpen: true }, () => {
                 this.linkInput.current!.focus();
@@ -232,7 +232,7 @@ export class InlineToolbar extends React.Component<IProps, IState> {
     private onInputKeyDown = (event: React.KeyboardEvent<any>) => {
         if (Keyboard.match(event.nativeEvent, "enter")) {
             event.preventDefault();
-            this.quill.format("link", this.state.inputValue, Emitter.sources.USER);
+            this.formatter.link(this.props.instanceState.lastGoodSelection, this.state.inputValue);
             this.clearLinkInput();
         }
     };

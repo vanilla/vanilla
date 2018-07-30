@@ -1,3 +1,67 @@
+$richEditor-font_size: $global-large_fontSize !default;
+$richEditor-icon_size: $icon-default_size !default;
+$richEditor-lineHeight: $global-base_lineHeight !default;
+$richEditor-menuButton_size: 39px !default;
+$richEditor-bg_color: $global-color_bg !default;
+$richEditor_leftPadding: 36px !default;
+$richEditor_minHeight: 200px !default;
+$richEditor_verticalPadding: 9px !default;
+$richEditor_padding: $richEditor_verticalPadding 12px !default;
+$richEditor-embedMenu_padding: 0 !default;
+$richEditor-embedMenuWideButton_padding: 9px;
+$richEditor-embedMenuWideButton_fontSize: .9em;
+$richEditor-icon_opacity: .7 !default;
+$richEditor-atMention_width: 200px !default;
+$richEditor-atMentionAvatar_width: 30px !default;
+$richEditor-atMentionAvatar_margin: 10px !default;
+$richEditor-atMentionMark_weight: 600 !default;
+$richEditor-atMentionLink_weight: 600 !default;
+$richEditor-atMentionUser_paddingHorizontal: 6px !default;
+$richEditor-atMentionUser_paddingVertical: 3px !default;
+$richEditor-atMentionSelected_bg: #f4f3f5;
+$richEditor-insertLink_width: 387px !default;
+$richEditor-insertPopover_paddingVertical: 12px !default;
+$richEditor-insertPopover_paddingHorizontal: 12px !default;
+$richEditor-insertPopover_maxHeight: 100vh !default;
+$richEditor-insertPopover_height: $richEditor-menuButton_size * 7.5 !default;
+$richEditor-emoji_width: 7 * $richEditor-menuButton_size + 2 * $richEditor-insertPopover_paddingHorizontal;
+$richEditor-nub_width: 12px !default;
+$richEditor-menu_borderWidth: 1px !default;
+$richEditor-menu_offset: $richEditor-nub_width !default;
+$richEditor-pilcrow_offset: 9px!default;
+$richEditor-pilcrow_fontSize: 14px;
+$richEditor-pilcrow_gutter: 36px;
+$richEditor-pilcrowAnimation_duration: 0.3s;
+$richEditor-emojiCategory_color: #737982;
+$richEditor-emojiCategory_hoverColor: #212327;
+$richEditor-emojiGroup_paddingLeft: 3px;
+$richEditor-mobileEmbedMenu_borderColor: $global-color_primary;
+$richEditor-mobileEmbedMenu_transitionDuration: .15s;
+$richEditor-mobileEmbedMenu_transitionTiming: ease-out;
+$richEditor-selected_bg: rgba(174, 228, 254, 0.2);
+$richEditor-border_width: 1px;
+$richEditor-outline_width: 1px;
+$richEditor-emojiOutline_offset: -#{$richEditor-outline_width + 2};
+$richEditor-embedButton_offset: - $richEditor-outline_width;
+$richEditor-paragraphMenuButton_offset: - $richEditor-outline_width + 1;
+$richEditor-text_offset: 0;
+
+
+
+$richEditor-outline_color: rgba(2, 145, 219, 0.6);
+
+$richEditor-videoPlayIcon_width: 80px;
+$richEditor-videoPlayIcon_hoverColor: #0291db;
+
+$embedImage_width: 640px;
+$embedded-quote_fg: #A3A3A3 !default;
+
+// Break Points
+$richEditor-mobile_spacing: 18px !default;
+$richEditor-mobileBreakPoint: 700px !default;
+$richEditor-mobileEmbedBreakPoint: 550px !default;
+
+
 .richEditor {
     position: relative;
     display: block;
@@ -497,44 +561,9 @@
     color: $embedded-quote_fg;
 }
 
-// Code
-.userContent code,
-.code {
-    display: inline-block;
-    font-size: $richEditor-code_fontSize;
-    vertical-align: middle;
-    line-height: 1em;
-    box-sizing: border-box;
-    font-family: monospace;
-    background: transparent;
-    margin: 0;
-    border: {
-        radius: $richEditor-inlineCode_borderRadius;
-        width: 1px;
-        style: solid;
-        color: $richEditor-inlineCode_borderColor;
-    }
-    padding: {
-        top: $richEditor-inlineCode_verticalPadding;
-        bottom: $richEditor-inlineCode_verticalPadding;
-        left: $richEditor-inlineCode_horizontalPadding;
-        right: $richEditor-inlineCode_horizontalPadding;
-    }
-}
 
-.code.isBlock {
-    display: block;
-    overflow-x: auto;
-    border: 0;
-    word-wrap: normal;
-    line-height: 1.4;
-    white-space: pre;
-    border-radius: 0;
-    background: none;
-    padding: 12px;
-    font-size: $richEditor-pilcrow_fontSize;
-    background-color: $richEditor-code_bg;
-}
+
+
 
 .userContent {
     > * {
@@ -568,18 +597,12 @@
     div,
     td,
     th,
-    code,
     a,
     p
     {
         word-break: break-all;
         word-break: break-word;
         text-overflow: ellipsis;
-        line-height: $richEditor-lineHeight;
-    }
-
-    code {
-        text-overflow: initial;
     }
 }
 

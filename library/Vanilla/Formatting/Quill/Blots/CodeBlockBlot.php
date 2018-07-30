@@ -41,7 +41,7 @@ class CodeBlockBlot extends TextBlot {
      * @inheritDoc
      */
     public function getGroupOpeningTag(): string {
-        return '<code class="code-block code isBlock" spellcheck="false">';
+        return '<code class="code codeBlock" spellcheck="false">';
     }
 
     /**

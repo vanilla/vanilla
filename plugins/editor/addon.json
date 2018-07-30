@@ -6,8 +6,6 @@
     "registerPermissions": {
         "Plugins.Attachments.Upload.Allow": "Garden.Profiles.Edit"
     },
-    "settingsUrl": "/settings/editor",
-    "settingsPermission": "Garden.Settings.Manage",
     "icon": "advanced-editor.png",
     "key": "editor",
     "type": "addon",

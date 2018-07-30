@@ -55,9 +55,10 @@ class VanillaSettingsController extends Gdn_Controller {
         $validation = new Gdn_Validation();
         $configurationModel = new Gdn_ConfigurationModel($validation);
         $configurationModel->setField([
+            'Vanilla.Categories.MaxDisplayDepth',
             'Garden.InputFormatter',
             'Garden.MobileInputFormatter',
-            'Vanilla.Categories.MaxDisplayDepth',
+            'Plugins.editor.ForceWysiwyg',
             'Vanilla.Discussions.PerPage',
             'Vanilla.Comments.PerPage',
             'Garden.Html.AllowedElements',

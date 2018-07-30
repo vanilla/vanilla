@@ -122,4 +122,12 @@ class DiscussionsController {
     public function index_idsub($id) {
 
     }
+
+    public function get_foo_js($id) {
+
+    }
+
+    public function index_foos_js() {
+
+    }
 }

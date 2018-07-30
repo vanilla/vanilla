@@ -34,11 +34,11 @@ class LocalesApiController extends Controller {
      * @param array $query Query string parameters.
      * @return Data Returns the translations.
      */
-    public function get_translations($locale, array $query = []) {
+    public function index_translations(string $locale, array $query = []) {
         $this->permission();
 
         $in = $this->schema([
-            'js:b?' => 'Whether or not to serve as javascript.'
+            'etag:s?' => 'Whether or not output is cached.'
         ], 'in');
         $out = $this->schema([':o'], 'out');
 
@@ -49,19 +49,32 @@ class LocalesApiController extends Controller {
         // Don't bother validating the translations since they are a free-form array.
         $translations = (array)$this->locale->getDefinitions();
 
-        if (!empty($query['js'])) {
-            return $this->dumpJavascript($translations);
-        }
-
         if (empty($translations)) {
             $translations = (object)[];
         }
-        return new Data($translations);
+        $r = new Data($translations);
+        if (!empty($query['etag'])) {
+            $r->setHeader('Cache-Control', 'public, max-age=604800');
+        }
+
+        return $r;
     }
 
-    private function dumpJavascript(array $translations) {
+    /**
+     * Get the translations for a locale in javascript.
+     *
+     * @param string $locale The locale slug.
+     * @param array $query Query string parameters.
+     * @return Data Returns the translations javascript.
+     */
+    public function index_translations_js(string $locale, array $query = []) {
+        $translations = $this->index_translations($locale, $query);
+
         $js = 'gdn.translations = '.json_encode($translations, JSON_UNESCAPED_SLASHES | JSON_PARTIAL_OUTPUT_ON_ERROR | JSON_UNESCAPED_UNICODE).';';
-        $r = new Data($js, ['CONTENT_TYPE' => 'application/javascript; charset=utf-8']);
-        return $r;
+        $translations
+            ->setData($js)
+            ->setHeader('Content-Type', 'application/javascript; charset=utf-8');
+
+        return $translations;
     }
 }

@@ -114,10 +114,16 @@ class ResourceRoute extends Route {
      * Convert a dash-cased name into capital case.
      *
      * @param string $name The name to convert.
+     * @param bool $ext Whether or not to look for a file extension.
      * @return string Returns the filtered name.
      */
-    private function filterName($name) {
+    private function filterName($name, bool $ext = false) {
         $result = implode('', array_map('ucfirst', explode('-', $name)));
+
+        // Get the extension too.
+        if ($ext && $pos = strrpos($result, '.')) {
+            $result[$pos] = '_';
+        }
         return $result;
     }
 
@@ -379,7 +385,7 @@ class ResourceRoute extends Route {
         $result = [];
 
         if (isset($pathArgs[0])) {
-            $name = lcfirst($this->filterName($pathArgs[0]));
+            $name = lcfirst($this->filterName($pathArgs[0], count($pathArgs) === 1));
             $result[] = ["{$method}_{$name}", 0];
 
             if ($method === 'get') {
@@ -387,7 +393,7 @@ class ResourceRoute extends Route {
             }
         }
         if (isset($pathArgs[1])) {
-            $name = lcfirst($this->filterName($pathArgs[1]));
+            $name = lcfirst($this->filterName($pathArgs[1], count($pathArgs) === 2));
             $result[] = ["{$method}_{$name}", 1];
 
             if ($method === 'get') {

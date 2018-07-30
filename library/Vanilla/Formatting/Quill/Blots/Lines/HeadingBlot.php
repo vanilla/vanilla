@@ -5,14 +5,15 @@
  * @license https://opensource.org/licenses/GPL-2.0 GPL-2.0
  */
 
-namespace Vanilla\Formatting\Quill\Blots;
+namespace Vanilla\Formatting\Quill\Blots\Lines;
+use Vanilla\Formatting\Quill\BlotGroup;
 
 /**
  * Blot to represent headings.
  *
  * Currently only 2 levels are allowed.
  */
-class HeadingBlot extends TextBlot {
+class HeadingBlot extends AbstractLineBlot {
 
     /** @var array Valid heading levels. */
     private static $validLevels = [2, 3];
@@ -40,11 +41,27 @@ class HeadingBlot extends TextBlot {
         return "</h".$this->getHeadingLevel().">";
     }
 
-    /**
-     * @inheritDoc
-     */
+    public function renderLineStart(): string {
+        return "";
+    }
+
+    public function renderLineEnd(): string {
+        return "";
+    }
+
     public function isOwnGroup(): bool {
         return true;
+    }
+
+    /**
+     * The heading blot can be the ONLY overriding blot in a group. Even other headings.
+     *
+     * @param BlotGroup $group
+     * @return bool
+     */
+    public function shouldClearCurrentGroup(BlotGroup $group): bool {
+        $overridingBlot = $group->getPrimaryBlot();
+        return !!$overridingBlot;
     }
 
     /**

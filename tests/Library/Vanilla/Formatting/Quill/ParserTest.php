@@ -7,9 +7,8 @@
 
 namespace VanillaTests\Library\Vanilla\Formatting\Quill;
 
-use SebastianBergmann\CodeCoverage\Report\Text;
 use Vanilla\Formatting\Quill\Blots\Embeds\ExternalBlot;
-use Vanilla\Formatting\Quill\Blots\HeadingBlot;
+use Vanilla\Formatting\Quill\Blots\Lines\HeadingBlot;
 use Vanilla\Formatting\Quill\Blots\Lines\BlockquoteLineBlot;
 use Vanilla\Formatting\Quill\Blots\Lines\ListLineBlot;
 use Vanilla\Formatting\Quill\Blots\Lines\SpoilerLineBlot;
@@ -234,6 +233,23 @@ class ParserTest extends SharedBootstrapTestCase {
 
         $ops = [["attributes" => ["header" => 5], "content" => "\n"]];
         $result = [[["class" => NullBlot::class, "content" => ""]]];
+        $this->assertParseResults($ops, $result);
+    }
+
+    public function testInlineFormattedHeadings() {
+        $ops = [
+            [ "attributes" => [ "bold" => true ], "insert" => "bold " ],
+            [ "attributes" => [ "italic" => true, "bold" => true ], "insert" => "italic " ],
+            [ "attributes" => [ "strike" => true ], "insert" => "strike" ],
+            [ "attributes" => [ "header" => 2 ], "insert" => "\n" ]
+        ];
+
+        $result = [[
+            ["class" => TextBlot::class, "content" => "bold "],
+            ["class" => TextBlot::class, "content" => "italic "],
+            ["class" => HeadingBlot::class, "content" => "strike"],
+        ]];
+
         $this->assertParseResults($ops, $result);
     }
 

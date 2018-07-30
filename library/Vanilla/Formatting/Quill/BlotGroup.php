@@ -10,7 +10,6 @@ namespace Vanilla\Formatting\Quill;
 use Vanilla\Formatting\Quill\Blots\AbstractBlot;
 use Vanilla\Formatting\Quill\Blots\Lines\AbstractLineBlot;
 use Vanilla\Formatting\Quill\Blots\CodeBlockBlot;
-use Vanilla\Formatting\Quill\Blots\HeadingBlot;
 use Vanilla\Formatting\Quill\Blots\TextBlot;
 
 /**
@@ -29,7 +28,6 @@ class BlotGroup {
      * Blots that can determine the surrounding tag over the other blot types.
      */
     private $overridingBlots = [
-        HeadingBlot::class,
         CodeBlockBlot::class,
         AbstractLineBlot::class,
     ];

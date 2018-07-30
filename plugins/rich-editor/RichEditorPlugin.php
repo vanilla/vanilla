@@ -57,7 +57,7 @@ class RichEditorPlugin extends Gdn_Plugin {
      * Add the rich editor format to the posting page.
      *
      * @param VanillaSettingsController $sender
-     * @param $args
+     * @param array $args
      */
     public function vanillaSettingsController_getFormats_handler(VanillaSettingsController $sender, array $args) {
         $args['formats'][] = self::FORMAT_NAME;

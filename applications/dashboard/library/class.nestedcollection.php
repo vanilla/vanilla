@@ -427,10 +427,10 @@ trait NestedCollection {
      */
     private function addItem($type, $item) {
         $this->touchKey($item);
-        if (!is_array(val('key', $item))) {
-            $item['key'] = explode('.', val('key', $item));
+        if (!is_array( $key = $item['key'] ?? false)) {
+            $item['key'] = explode('.', $key);
         } else {
-            $item['key'] = array_values(val('key', $item));
+            $item['key'] = array_values($key);
         }
 
         $item = (array)$item;
@@ -440,14 +440,14 @@ trait NestedCollection {
 
         // Walk into the items list to set the item.
         $items =& $this->items;
-        foreach (val('key', $item) as $i => $key_part) {
+        foreach ( $item['key'] as $i => $key_part) {
 
-            if ($i === count(val('key', $item)) - 1) {
+            if ($i === count($item['key'] ?? false) - 1) {
                 // Add the item here.
                 if (array_key_exists($key_part, $items)) {
                     // The item is already here so merge this one on top of it.
                     if ($items[$key_part]['type'] !== $type)
-                        throw new \Exception(val('key', $item)." of type $type does not match existing type {$items[$key_part]['type']}.", 500);
+                        throw new \Exception($item['key'] ?? ''." of type $type does not match existing type {$items[$key_part]['type']}.", 500);
 
                     $items[$key_part] = array_merge($items[$key_part], $item);
                 } else {

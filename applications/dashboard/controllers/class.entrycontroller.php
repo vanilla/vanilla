@@ -45,6 +45,7 @@ class EntryController extends Gdn_Controller {
         if (Gdn::request()->get('display') === 'popup') {
             $this->MasterView = 'popup';
         }
+        $this->setHeader('Cache-Control', \Vanilla\Web\CacheControlMiddleware::NO_CACHE);
     }
 
     /**

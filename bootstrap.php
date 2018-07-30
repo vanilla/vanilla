@@ -152,6 +152,7 @@ $dic->setInstance('Garden\Container\Container', $dic)
     })])
     ->addCall('setAllowedOrigins', ['isTrustedDomain'])
     ->addCall('addMiddleware', [new Reference('@smart-id-middleware')])
+    ->addCall('addMiddleware', [new Reference(\Vanilla\Web\CacheControlMiddleware::class)])
 
     ->rule('@smart-id-middleware')
     ->setClass(\Vanilla\Web\SmartIDMiddleware::class)

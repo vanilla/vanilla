@@ -61,10 +61,6 @@ class EditorPlugin extends Gdn_Plugin {
         $this->AssetPath = asset('/plugins/editor');
         $this->pluginInfo = Gdn::pluginManager()->getPluginInfo('editor', Gdn_PluginManager::ACCESS_PLUGINNAME);
         $this->ForceWysiwyg = c('Plugins.editor.ForceWysiwyg', false);
-
-        // Check for additional formats
-        $this->EventArguments['formats'] = &$this->Formats;
-        $this->fireEvent('GetFormats');
     }
 
     /**
@@ -1400,25 +1396,20 @@ class EditorPlugin extends Gdn_Plugin {
     }
 
     /**
+     * Add the advanced editor formats to th posting page.
      *
-     * @param SettingsController $sender
-     * @param array $args
+     * @param VanillaSettingsController $sender
+     * @param $args
      */
-    public function settingsController_editor_create($sender, $args) {
-        $sender->permission('Garden.Settings.Manage');
-        $cf = new ConfigurationModule($sender);
+    public function vanillaSettingsController_getFormats_handler($sender, $args) {
+        $args['formats'] = array_merge($args['formats'], $this->Formats);
+    }
 
-        $formats = array_combine($this->Formats, $this->Formats);
-
-        $cf->initialize([
-            'Garden.InputFormatter' => ['LabelCode' => 'Post Format', 'Control' => 'DropDown', 'Description' => '<p>Select the default format of the editor for posts in the community.</p><p><strong>Note:</strong> the editor will auto-detect the format of old posts when editing them and load their original formatting rules. Aside from this exception, the selected post format below will take precedence.</p>', 'Items' => $formats],
-            'Plugins.editor.ForceWysiwyg' => ['LabelCode' => 'Reinterpret All Posts As Wysiwyg', 'Control' => 'Checkbox', 'Description' => '<p class="info">Check the below option to tell the editor to reinterpret all old posts as Wysiwyg.</p> <p class="info"><strong>Note:</strong> This setting will only take effect if Wysiwyg was chosen as the Post Format above. The purpose of this option is to normalize the editor format. If older posts edited with another format, such as markdown or BBCode, are loaded, this option will force Wysiwyg.</p>'],
-            'Garden.MobileInputFormatter' => ['LabelCode' => 'Mobile Format', 'Control' => 'DropDown', 'Description' => '<p>Specify an editing format for mobile devices. If mobile devices should have the same experience, specify the same one as above. If users report issues with mobile editing, this is a good option to change.</p>', 'Items' => $formats, 'DefaultValue' => c('Garden.MobileInputFormatter')]
-        ]);
-
-
-        $sender->setData('Title', t('Advanced Editor Settings'));
-        $cf->renderAll();
+    /**
+     * This settings from this page have been moved into vanilla core.
+     */
+    public function settingsController_editor_create() {
+        redirectTo('/vanilla/settings/posting', 301);
     }
 
     /**

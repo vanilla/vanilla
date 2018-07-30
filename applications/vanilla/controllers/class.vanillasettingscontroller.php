@@ -40,10 +40,23 @@ class VanillaSettingsController extends Gdn_Controller {
         // Check permission
         $this->permission('Garden.Settings.Manage');
 
+        $formats = ['Text']; // Check for additional formats
+        $this->EventArguments['formats'] = &$formats;
+
+        $this->fireEvent('GetFormats');
+        // This was moved from the editor plugin. In order to maintain compatibility with existing event hooks
+        // We will need to fire this as EditorPlugin.
+        $this->EventArguments['formats'] = &$formats;
+        $this->fireAs('EditorPlugin');
+        $this->fireEvent('GetFormats');
+        $this->setData('formats', $formats);
+
         // Load up config options we'll be setting
         $validation = new Gdn_Validation();
         $configurationModel = new Gdn_ConfigurationModel($validation);
         $configurationModel->setField([
+            'Garden.InputFormatter',
+            'Garden.MobileInputFormatter',
             'Vanilla.Categories.MaxDisplayDepth',
             'Vanilla.Discussions.PerPage',
             'Vanilla.Comments.PerPage',
@@ -70,7 +83,8 @@ class VanillaSettingsController extends Gdn_Controller {
             $this->Form->setFormValue('Garden.Format.DisableUrlEmbeds', !$disableUrlEmbeds);
 
             // Define some validation rules for the fields being saved
-            $configurationModel->Validation->applyRule('Vanilla.Categories.MaxDisplayDepth', 'Required');
+            $configurationModel->Validation->applyRule('Garden.InputFormatter', 'Required');
+            $configurationModel->Validation->applyRule('Garden.MobileInputFormatter', 'Required');
             $configurationModel->Validation->applyRule('Vanilla.Categories.MaxDisplayDepth', 'Integer');
             $configurationModel->Validation->applyRule('Vanilla.Discussions.PerPage', 'Required');
             $configurationModel->Validation->applyRule('Vanilla.Discussions.PerPage', 'Integer');

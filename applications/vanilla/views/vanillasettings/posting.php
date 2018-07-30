@@ -2,9 +2,15 @@
 helpAsset(t('Need More Help?'), anchor(t("Video tutorial on advanced settings"), 'settings/tutorials/category-management-and-advanced-settings'));
 ?>
 <h1><?php echo t('Posting Settings'); ?></h1>
+
 <?php
 /** @var Gdn_Form $form */
 $form = $this->Form;
+$formats = $this->data('formats');
+$formatOptions = [];
+foreach ($formats as $formatName) {
+    $formatOptions[$formatName] = $formatName;
+}
 echo $form->open();
 echo $form->errors();
 ?>
@@ -23,6 +29,52 @@ echo $form->errors();
             echo $form->toggle('Garden.Format.DisableUrlEmbeds', $embedsLabel, [], $embedsDesc, true);
             ?>
         </li>
+
+        <li class="form-group">
+            <?php
+            $formatDesc = '<p>Select the default format of the editor for posts in the community.</p><p><strong>Note:</strong> the editor will auto-detect the format of old posts when editing them and load their original formatting rules. Aside from this exception, the selected post format below will take precedence.</p>';
+            ?>
+            <div class="label-wrap">
+                <?php
+                echo $form->label('Post Format', 'Garden.InputFormatter');
+                echo wrap(
+                    $formatDesc,
+                    'div',
+                    ['class' => 'info']
+                );
+                ?>
+            </div>
+            <div class="input-wrap">
+                <?php echo $form->dropDown('Garden.InputFormatter', $formatOptions); ?>
+            </div>
+        </li>
+        <li class="form-group">
+            <?php
+            $forceWysiwygLabel = 'Reinterpret All Posts As Wysiwyg';
+            $forceWysiwygDesc = '<p class="info">Check the below option to tell the editor to reinterpret all old posts as Wysiwyg.</p> <p class="info"><strong>Note:</strong> This setting will only take effect if Wysiwyg was chosen as the Post Format above. The purpose of this option is to normalize the editor format. If older posts edited with another format, such as markdown or BBCode, are loaded, this option will force Wysiwyg.</p>';
+            echo $form->toggle('Plugins.editor.ForceWysiwyg', $forceWysiwygLabel, [], $forceWysiwygDesc);
+            ?>
+        </li>
+        <li class="form-group">
+            <?php
+            $mobileFormatDesc = '<p>Specify an editing format for mobile devices. If mobile devices should have the same experience, specify the same one as above. If users report issues with mobile editing, this is a good option to change.</p>';
+            ?>
+            <div class="label-wrap">
+                <?php
+                echo $form->label('Mobile Format', 'Garden.MobileInputFormatter');
+                echo wrap(
+                    $mobileFormatDesc,
+                    'div',
+                    ['class' => 'info']
+                );
+                ?>
+            </div>
+            <div class="input-wrap">
+                <?php echo $form->dropDown('Garden.MobileInputFormatter', $formatOptions); ?>
+            </div>
+        </li>
+
+
         <li class="form-group">
             <?php
             $Options = ['1' => '1', '2' => '2', '3' => '3', '4' => '4', '5' => '5', '0' => 'No limit'];

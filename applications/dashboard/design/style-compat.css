@@ -2055,25 +2055,26 @@ body.isMobile .richEditorParagraphMenu {
   object-position: center;
   width: 225px;
   height: 100%;
-  border-right-style: solid;
-  border-right-width: 1px;
-  border-right-color: rgba(85, 90, 98, 0.3);
 }
 
 .embedLink .embedLink-image + .embedLink-main {
   margin-left: auto;
   width: -webkit-calc(100% - 225px);
   width: calc(100% - 225px);
+  border-left-style: solid;
+  border-left-width: 1px;
+  border-left-color: rgba(85, 90, 98, 0.1);
 }
 
 @media (max-width: 550px) {
   .embedLink .embedLink-image {
     position: relative;
     width: 100%;
-    padding-top: 52.5%;
+    padding-top: 0;
   }
   .embedLink .embedLink-image + .embedLink-main {
     width: 100%;
+    border-right: none;
   }
 }
 
@@ -2125,6 +2126,14 @@ body.isMobile .richEditorParagraphMenu {
   text-overflow: ellipsis;
 }
 
+@media (max-width: 550px) {
+  .embedLink .embedLink-title {
+    word-break: break-all;
+    word-break: break-word;
+    white-space: normal;
+  }
+}
+
 .embedLink .embedLink-source {
   font-size: 12.04px;
   color: rgba(85, 90, 98, 0.72);
@@ -2132,6 +2141,14 @@ body.isMobile .richEditorParagraphMenu {
   overflow: hidden;
   text-overflow: ellipsis;
   margin: 0;
+}
+
+@media (max-width: 550px) {
+  .embedLink .embedLink-source {
+    word-break: break-all;
+    word-break: break-word;
+    white-space: normal;
+  }
 }
 
 .embedLink .embedLink-excerpt {

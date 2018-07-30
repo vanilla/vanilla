@@ -1,9 +1,9 @@
 $embedLink-linkTitle_fontSize: $global-medium_fontSize !default;
 $embedLink-linkTitle_lineHeight: $global-base_lineHeight !default;
 $embedLink-linkImage_width: 225px !default;
-$embedLink-linkImage_mobileHeight: 52.5% !default;
 $embedLink-linkImage_mobileWidth: 100px !default;
 $embedLink-linkImage_boxShadowColor: rgba($global-color_fg, .3) !default;
+$embedLink-image_separatorColor: rgba($global-color_fg, .1) !default;
 $embedLink-linkImage_boxShadow: 0 1px 3px 0 $embedLink-linkImage_boxShadowColor !default;
 $embedLink-linkImage_bg: #ffffff !default;
 
@@ -43,29 +43,30 @@ $embedLink-linkImage_bg: #ffffff !default;
         object-position: center;
         width: $embedLink-linkImage_width;
         height: 100%;
-        border-right: {
-            style: solid;
-            width: 1px;
-            color: $embedLink-linkImage_boxShadowColor;
-        }
 
         + .embedLink-main {
             margin-left: auto;
             width: calc(100% - #{$embedLink-linkImage_width});
+
+            border-left: {
+                style: solid;
+                width: 1px;
+                color: $embedLink-image_separatorColor;
+            }
         }
 
         @include mediaQuery-richEditor_embed {
             position: relative;
             width: 100%;
-            padding-top: $embedLink-linkImage_mobileHeight;
+            padding-top: 0;
 
 
             + .embedLink-main {
                 width: 100%;
+                border-right: none;
             }
         }
     }
-
 
     .embedLink-header {
         display: flex;
@@ -102,6 +103,11 @@ $embedLink-linkImage_bg: #ffffff !default;
         white-space: nowrap;
         overflow: hidden;
         text-overflow: ellipsis;
+
+        @include mediaQuery-richEditor_embed {
+            @include breakWord;
+            white-space: normal;
+        }
     }
 
     .embedLink-source {
@@ -111,6 +117,11 @@ $embedLink-linkImage_bg: #ffffff !default;
         overflow: hidden;
         text-overflow: ellipsis;
         margin: 0;
+
+        @include mediaQuery-richEditor_embed {
+            @include breakWord;
+            white-space: normal;
+        }
     }
 
     .embedLink-excerpt {

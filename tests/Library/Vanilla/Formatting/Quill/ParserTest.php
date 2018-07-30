@@ -236,6 +236,9 @@ class ParserTest extends SharedBootstrapTestCase {
         $this->assertParseResults($ops, $result);
     }
 
+    /**
+     * Ensure that a single heading can properly render when it contains multiple inline formats.
+     */
     public function testInlineFormattedHeadings() {
         $ops = [
             [ "attributes" => [ "bold" => true ], "insert" => "bold " ],

@@ -41,10 +41,20 @@ class HeadingBlot extends AbstractLineBlot {
         return "</h".$this->getHeadingLevel().">";
     }
 
+    /**
+     * Since headings are always one line, they don't need special line starts or ends.
+     *
+     * The group tags are enough.
+     */
     public function renderLineStart(): string {
         return "";
     }
 
+    /**
+     * Since headings are always one line, they don't need special line starts or ends.
+     *
+     * The group tags are enough.
+     */
     public function renderLineEnd(): string {
         return "";
     }

@@ -41,12 +41,16 @@ class RichEditorPlugin extends Gdn_Plugin {
 
     /**
      * Check to see if we should be using the Rich Editor
-     * @param Gdn_Controller $sender
+     *
+     * @param Gdn_Form $form - A form instance.
+     *
+     * @return bool
      */
-    public function isRichFormat($sender):bool {
-        $form = val('Form', $sender, $sender); // May already be "Form" object
+    public function isRichFormat(Gdn_Form $form): bool {
         $data = $form->formData();
-        return strcmp(val('Format', $data, self::FORMAT_NAME), self::FORMAT_NAME) === 0;
+        $format = $data['Format'] ?? 'Rich';
+
+        return $format === self::FORMAT_NAME;
     }
 
     /**
@@ -55,27 +59,29 @@ class RichEditorPlugin extends Gdn_Plugin {
      * @param VanillaSettingsController $sender
      * @param $args
      */
-    public function vanillaSettingsController_getFormats_handler($sender, $args) {
-        $args['formats'] []= self::FORMAT_NAME;
+    public function vanillaSettingsController_getFormats_handler(VanillaSettingsController $sender, array $args) {
+        $args['formats'][] = self::FORMAT_NAME;
     }
 
     /**
+     * Add a rich editor CSS class.
      *
      * @param Gdn_Controller $sender
      */
-    public function base_beforeCommentForm_handler($sender) {
-        if ($this->isRichFormat($sender)) {
+    public function base_beforeCommentForm_handler(Gdn_Controller $sender) {
+        $form = $sender->Form ?? null;
+        if ($form ? $this->isRichFormat($form) : false) {
             $sender->CssClass .= ' hasRichEditor';
         }
     }
 
     /**
      *
-     * @param Gdn_Controller $sender
+     * @param PostController $sender
      * @throws Exception
      */
-    public function postController_render_before($sender) {
-        if ($this->isRichFormat($sender)) {
+    public function postController_render_before(PostController $sender) {
+        if ($this->isRichFormat($sender->Form)) {
             $sender->CssClass .= ' hasRichEditor';
         }
     }
@@ -86,9 +92,10 @@ class RichEditorPlugin extends Gdn_Plugin {
      *
      * It is not being used for editing a posted reply, so find another event to hook into.
      *
-     * @param Gdn_Form $sender
+     * @param Gdn_Form $sender The Form Object
+     * @param array $args Arguments from the event.
      */
-    public function gdn_form_beforeBodyBox_handler($sender, $args) {
+    public function gdn_form_beforeBodyBox_handler(Gdn_Form $sender, array $args) {
         if ($this->isRichFormat($sender)) {
             /** @var Gdn_Controller $controller */
             $controller = Gdn::controller();

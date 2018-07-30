@@ -107,7 +107,7 @@ class EmbedManagerTest extends SharedBootstrapTestCase {
                 ],
 '<div class="embedExternal embedImage">
     <div class="embedExternal-content">
-        <a className="embedImage-link" href="https://vanillaforums.com/images/metaIcons/vanillaForums.png" rel="nofollow noopener" target="_blank">
+        <a class="embedImage-link" href="https://vanillaforums.com/images/metaIcons/vanillaForums.png" rel="nofollow noopener" target="_blank">
             <img class="embedImage-img" src="https://vanillaforums.com/images/metaIcons/vanillaForums.png">
         </a>
     </div>
@@ -154,20 +154,170 @@ class EmbedManagerTest extends SharedBootstrapTestCase {
                 [
                     "url" => "https://vanillaforums.com",
                     "type" => "link",
-                    "name" => "Online Community Software and Customer Forum Software by Vanilla Forums",
+                    "name" => "Online Community Software and Customer Forum Software by Vanilla Forums - Embed Link 1",
                     "body" => "Engage your customers with a vibrant and modern online customer community forum. A customer community helps to increases loyalty, reduce support costs and deliver feedback.",
                     "photoUrl" => "https://vanillaforums.com/images/metaIcons/vanillaForums.png",
                     "height" => null,
                     "width" => null,
                     "attributes" => []
                 ],
-'<a class="embedExternal embedLink" href="https://vanillaforums.com" rel="noopener noreferrer">
+                '<a class="embedExternal embedLink" href="https://vanillaforums.com" rel="noopener noreferrer">
     <div class="embedExternal-content">
         <article class="embedLink-body">
             <img src=\'https://vanillaforums.com/images/metaIcons/vanillaForums.png\' class=\'embedLink-image\' aria-hidden=\'true\'>
             <div class="embedLink-main">
                 <div class="embedLink-header">
-                    <h3 class="embedLink-title">Online Community Software and Customer Forum Software by Vanilla Forums</h3>
+                    <h3 class="embedLink-title">Online Community Software and Customer Forum Software by Vanilla Forums - Embed Link 1</h3>
+                    
+                    
+                    
+                    <span class="embedLink-source meta">https://vanillaforums.com</span>
+                </div>
+                <div class="embedLink-excerpt">Engage your customers with a vibrant and modern online customer community forum. A customer community helps to increases loyalty, reduce support costs and deliver feedback.</div>
+            </div>
+        </article>
+    </div>
+</a>',
+            ],
+            [
+                [
+                    "url" => "https://vanillaforums.com",
+                    "type" => "link",
+                    "name" => "Online Community Software and Customer Forum Software by Vanilla Forums - Embed Link 2",
+                    "body" => "Engage your customers with a vibrant and modern online customer community forum. A customer community helps to increases loyalty, reduce support costs and deliver feedback.",
+                    "height" => null,
+                    "width" => null,
+                    "attributes" => []
+                ],
+                '<a class="embedExternal embedLink" href="https://vanillaforums.com" rel="noopener noreferrer">
+    <div class="embedExternal-content">
+        <article class="embedLink-body">
+            
+            <div class="embedLink-main">
+                <div class="embedLink-header">
+                    <h3 class="embedLink-title">Online Community Software and Customer Forum Software by Vanilla Forums - Embed Link 2</h3>
+                    
+                    
+                    
+                    <span class="embedLink-source meta">https://vanillaforums.com</span>
+                </div>
+                <div class="embedLink-excerpt">Engage your customers with a vibrant and modern online customer community forum. A customer community helps to increases loyalty, reduce support costs and deliver feedback.</div>
+            </div>
+        </article>
+    </div>
+</a>',
+            ],
+            [
+                [
+                    "url" => "https://vanillaforums.com",
+                    "type" => "link",
+                    "name" => "Online Community Software and Customer Forum Software by Vanilla Forums - Embed Link 3",
+                    "body" => "Engage your customers with a vibrant and modern online customer community forum. A customer community helps to increases loyalty, reduce support costs and deliver feedback.",
+                    "photoUrl" => "https://vanillaforums.com/images/metaIcons/vanillaForums.png",
+                    "userPhoto" => "https://secure.gravatar.com/avatar/b0420af06d6fecc16fc88a88cbea8218/?default=https%3A%2F%2Fvanillicon.com%2Fb0420af06d6fecc16fc88a88cbea8218_100.png&rating=g&size=100",
+                    "userName" => "Linc",
+                    "height" => null,
+                    "width" => null,
+                    "attributes" => []
+                ],
+                '<a class="embedExternal embedLink" href="https://vanillaforums.com" rel="noopener noreferrer">
+    <div class="embedExternal-content">
+        <article class="embedLink-body">
+            <img src=\'https://vanillaforums.com/images/metaIcons/vanillaForums.png\' class=\'embedLink-image\' aria-hidden=\'true\'>
+            <div class="embedLink-main">
+                <div class="embedLink-header">
+                    <h3 class="embedLink-title">Online Community Software and Customer Forum Software by Vanilla Forums - Embed Link 3</h3>
+                    <span class="embedLink-userPhoto PhotoWrap"><img src="https://secure.gravatar.com/avatar/b0420af06d6fecc16fc88a88cbea8218/?default=https%3A%2F%2Fvanillicon.com%2Fb0420af06d6fecc16fc88a88cbea8218_100.png&amp;rating=g&amp;size=100" alt="Linc" class="ProfilePhoto ProfilePhotoMedium" /></span>
+                    <span class="embedLink-userName">Linc</span>
+                    
+                    <span class="embedLink-source meta">https://vanillaforums.com</span>
+                </div>
+                <div class="embedLink-excerpt">Engage your customers with a vibrant and modern online customer community forum. A customer community helps to increases loyalty, reduce support costs and deliver feedback.</div>
+            </div>
+        </article>
+    </div>
+</a>',
+            ],
+            [
+                [
+                    "url" => "https://vanillaforums.com",
+                    "type" => "link",
+                    "name" => "Online Community Software and Customer Forum Software by Vanilla Forums - Embed Link 4",
+                    "body" => "Engage your customers with a vibrant and modern online customer community forum. A customer community helps to increases loyalty, reduce support costs and deliver feedback.",
+                    "photoUrl" => "https://vanillaforums.com/images/metaIcons/vanillaForums.png",
+                    "timestamp" => "2018-07-30",
+                    "humanTime" => "July 30th 2018",
+                    "height" => null,
+                    "width" => null,
+                    "attributes" => []
+                ],
+                '<a class="embedExternal embedLink" href="https://vanillaforums.com" rel="noopener noreferrer">
+    <div class="embedExternal-content">
+        <article class="embedLink-body">
+            <img src=\'https://vanillaforums.com/images/metaIcons/vanillaForums.png\' class=\'embedLink-image\' aria-hidden=\'true\'>
+            <div class="embedLink-main">
+                <div class="embedLink-header">
+                    <h3 class="embedLink-title">Online Community Software and Customer Forum Software by Vanilla Forums - Embed Link 4</h3>
+                    
+                    
+                    <time class="embedLink-dateTime meta" dateTime="2018-07-30">July 30th 2018</time>
+                    <span class="embedLink-source meta">https://vanillaforums.com</span>
+                </div>
+                <div class="embedLink-excerpt">Engage your customers with a vibrant and modern online customer community forum. A customer community helps to increases loyalty, reduce support costs and deliver feedback.</div>
+            </div>
+        </article>
+    </div>
+</a>',
+            ],
+            [
+                [
+                    "url" => "https://vanillaforums.com",
+                    "type" => "link",
+                    "name" => "Online Community Software and Customer Forum Software by Vanilla Forums - Embed Link 5",
+                    "body" => "Engage your customers with a vibrant and modern online customer community forum. A customer community helps to increases loyalty, reduce support costs and deliver feedback.",
+                    "photoUrl" => "https://vanillaforums.com/images/metaIcons/vanillaForums.png",
+                    "timestamp" => "2018-07-30",
+                    "humanTime" => "July 30th 2018",
+                    "height" => null,
+                    "width" => null,
+                    "attributes" => []
+                ],
+                '<a class="embedExternal embedLink" href="https://vanillaforums.com" rel="noopener noreferrer">
+    <div class="embedExternal-content">
+        <article class="embedLink-body">
+            <img src=\'https://vanillaforums.com/images/metaIcons/vanillaForums.png\' class=\'embedLink-image\' aria-hidden=\'true\'>
+            <div class="embedLink-main">
+                <div class="embedLink-header">
+                    <h3 class="embedLink-title">Online Community Software and Customer Forum Software by Vanilla Forums - Embed Link 5</h3>
+                    
+                    
+                    <time class="embedLink-dateTime meta" dateTime="2018-07-30">July 30th 2018</time>
+                    <span class="embedLink-source meta">https://vanillaforums.com</span>
+                </div>
+                <div class="embedLink-excerpt">Engage your customers with a vibrant and modern online customer community forum. A customer community helps to increases loyalty, reduce support costs and deliver feedback.</div>
+            </div>
+        </article>
+    </div>
+</a>',
+            ],
+            [
+                [
+                    "url" => "https://vanillaforums.com",
+                    "type" => "link",
+                    "name" => "Online Community Software and Customer Forum Software by Vanilla Forums - Embed Link 6",
+                    "body" => "Engage your customers with a vibrant and modern online customer community forum. A customer community helps to increases loyalty, reduce support costs and deliver feedback.",
+                    "height" => null,
+                    "width" => null,
+                    "attributes" => []
+                ],
+                '<a class="embedExternal embedLink" href="https://vanillaforums.com" rel="noopener noreferrer">
+    <div class="embedExternal-content">
+        <article class="embedLink-body">
+            
+            <div class="embedLink-main">
+                <div class="embedLink-header">
+                    <h3 class="embedLink-title">Online Community Software and Customer Forum Software by Vanilla Forums - Embed Link 6</h3>
+                    <span class="embedLink-source meta">https://vanillaforums.com</span>
                 </div>
                 <div class="embedLink-excerpt">Engage your customers with a vibrant and modern online customer community forum. A customer community helps to increases loyalty, reduce support costs and deliver feedback.</div>
             </div>

@@ -102,7 +102,7 @@ class ImageEmbed extends Embed {
         $result = <<<HTML
 <div class="embedExternal embedImage">
     <div class="embedExternal-content">
-        <a className="embedImage-link" href="{$sanitizedHref}" rel="nofollow noopener" target="_blank">
+        <a class="embedImage-link" href="{$sanitizedHref}" rel="nofollow noopener" target="_blank">
             <img class="embedImage-img" src="{$sourceEncoded}">
         </a>
     </div>

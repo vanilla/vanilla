@@ -62,15 +62,41 @@ class LinkEmbed extends Embed {
         $name = $data['name'] ?? null;
         $body = $data['body'] ?? null;
         $photoUrl = $data['photoUrl'] ?? null;
+        $userPhoto = $data['userPhoto'] ?? null;
+        $userName = $data['userName'] ?? null;
+        $timestamp = $data['timestamp'] ?? null;
+        $humanTime = $data['humanTime'] ?? null;
 
         if ($photoUrl) {
             $photoUrlEncoded = htmlspecialchars($photoUrl);
             $image = "<img src='$photoUrlEncoded' class='embedLink-image' aria-hidden='true'>";
         } else {
-            $image = '';
+            $image = "";
+        }
+
+
+
+        if ($userPhoto && $userName) {
+            $userPhotoEncoded = htmlspecialchars($userPhoto);
+            $userPhotoAsMeta = "<span class=\"embedLink-userPhoto PhotoWrap\"><img src=\"$userPhotoEncoded\" alt=\"$userName\" class=\"ProfilePhoto ProfilePhotoMedium\" /></span>";
+        } else {
+            $userPhotoAsMeta = "";
+        }
+
+        if ($userName) {
+            $userName = "<span class=\"embedLink-userName\">$userName</span>";
+        } else {
+            $userName = "";
+        }
+
+        if ($timestamp && $humanTime) {
+            $timestampAsMeta = "<time class=\"embedLink-dateTime meta\" dateTime=\"$timestamp\">$humanTime</time>";
+        } else {
+            $timestampAsMeta = "";
         }
 
         $urlEncoded = htmlspecialchars(\Gdn_Format::sanitizeUrl($url));
+        $urlAsMeta = "<span class=\"embedLink-source meta\">$urlEncoded</span>";
         $nameEncoded = htmlspecialchars($name);
         $bodyEncoded = htmlspecialchars($body);
 
@@ -82,6 +108,10 @@ class LinkEmbed extends Embed {
             <div class="embedLink-main">
                 <div class="embedLink-header">
                     <h3 class="embedLink-title">{$nameEncoded}</h3>
+                    {$userPhotoAsMeta}
+                    {$userName}
+                    {$timestampAsMeta}
+                    {$urlAsMeta}
                 </div>
                 <div class="embedLink-excerpt">{$bodyEncoded}</div>
             </div>

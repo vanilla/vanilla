@@ -70,7 +70,7 @@ class AbstractApiControllerTest extends TestCase {
 
 
     /**
-     * Test **resolveExpandFields()**
+     * Test **resolveExpandFields()**.
      *
      * @param bool|string[] $expand The expand argument.
      * @param array $expected The expected result of **resolveExpandFields()**.
@@ -79,9 +79,6 @@ class AbstractApiControllerTest extends TestCase {
     public function testResolveExpandedFields($expand, array $expected) {
         $map = ['foo' => 'fooID', 'bar' => 'barID'];
         $request = ['expand' => $expand];
-
-        $arr = get_class_methods($this->controller);
-//        throw new \Exception(implode(", ", $arr));
 
         $actual = $this->controller->resolveExpandFieldsPublic($request, $map);
         $this->assertEquals($expected, $actual);
@@ -94,7 +91,8 @@ class AbstractApiControllerTest extends TestCase {
      */
     public function provideResolveExpandFieldsData() {
         $r = [
-            'true' => [true, ['fooID', 'barID']]
+            'true' => [true, ['fooID', 'barID']],
+            'all' => [['all'], ['fooID', 'barID']],
         ];
 
         return $r;

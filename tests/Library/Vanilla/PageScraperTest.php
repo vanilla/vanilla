@@ -98,8 +98,38 @@ class PageScraperTest extends SharedBootstrapTestCase {
     public function testFetch(string $file, array $expected) {
         $pageScraper = $this->pageScraper();
         $url = 'file://'.self::HTML_DIR."/{$file}";
-        $expected['Url'] = $url;
         $result = $pageScraper->pageInfo($url);
+        $expected['Url'] = $url;
         $this->assertEquals($expected, $result);
+    }
+
+    /**
+     * Scrape a file and return its result.
+     *
+     * @param string $file The file to scrape.
+     * @return array Returns page info.
+     * @throws Exception Throws an exception if there was a non-recoverable error scraping.
+     */
+    protected function scrapeFile(string $file) {
+        $scraper = $this->pageScraper();
+        $url = 'file://'.self::HTML_DIR."/{$file}";
+        $result = $scraper->pageInfo($url);
+
+        return $result;
+
+    }
+
+    /**
+     * Test page fetching with unicode characters.
+     */
+    public function testUnicodeFetch() {
+        $files = ['unicode.htm', 'unicode-xml.htm'];
+
+        foreach ($files as $file) {
+            $result = $this->scrapeFile($file);
+
+            $this->assertEquals('Test · Hello World', $result['Title']);
+            $this->assertEquals('😀😄😘<>', $result['Description']);
+        }
     }
 }

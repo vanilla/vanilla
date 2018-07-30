@@ -51,7 +51,17 @@ class PageScraper {
 
         $document = new DOMDocument();
         $rawBody = $response->getRawBody();
+
+        // Add charset information for HTML 5 pages.
+        // https://stackoverflow.com/questions/39148170/utf-8-with-php-domdocument-loadhtml#39148511
+        if (!preg_match('`\s*<?xml`', $rawBody)) {
+            $encoding = mb_detect_encoding($rawBody);
+            $rawBody = "<?xml version=\"1.0\" encoding=\"$encoding\"?>$rawBody";
+        }
+
+        $err = libxml_use_internal_errors(true);
         $loadResult = $document->loadHTML($rawBody);
+        libxml_use_internal_errors($err);
         if ($loadResult === false) {
             throw new Exception('Failed to load document for parsing.');
         }

@@ -168,8 +168,8 @@ class EmbedManagerTest extends SharedBootstrapTestCase {
             <div class="embedLink-main">
                 <div class="embedLink-header">
                     <h3 class="embedLink-title">Online Community Software and Customer Forum Software by Vanilla Forums</h3>
-                    <div class="embedLink-excerpt">Engage your customers with a vibrant and modern online customer community forum. A customer community helps to increases loyalty, reduce support costs and deliver feedback.</div>
                 </div>
+                <div class="embedLink-excerpt">Engage your customers with a vibrant and modern online customer community forum. A customer community helps to increases loyalty, reduce support costs and deliver feedback.</div>
             </div>
         </article>
     </div>

@@ -82,8 +82,8 @@ class LinkEmbed extends Embed {
             <div class="embedLink-main">
                 <div class="embedLink-header">
                     <h3 class="embedLink-title">{$nameEncoded}</h3>
-                    <div class="embedLink-excerpt">{$bodyEncoded}</div>
                 </div>
+                <div class="embedLink-excerpt">{$bodyEncoded}</div>
             </div>
         </article>
     </div>

@@ -36,6 +36,9 @@ class LinkUserTest extends AbstractAPIv2Test {
     public static function setupBeforeClass() {
         parent::setupBeforeClass();
         self::container()->rule(MockSSOAuthenticator::class);
+        /** @var \Gdn_Configuration $config */
+        $config = static::container()->get(\Gdn_Configuration::class);
+        $config->set('Feature.'.\AuthenticateApiController::FEATURE_FLAG, true, true, false);
     }
 
     /**

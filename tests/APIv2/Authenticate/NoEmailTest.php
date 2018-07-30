@@ -41,7 +41,9 @@ class NoEmailTest extends AbstractAPIv2Test {
         parent::setupBeforeClass();
         self::container()->rule(MockSSOAuthenticator::class);
 
-        self::$config = self::container()->get('Config');
+        /** @var \Gdn_Configuration $config */
+        self::$config = static::container()->get(\Gdn_Configuration::class);
+        self::$config->set('Feature.'.\AuthenticateApiController::FEATURE_FLAG, true, true, false);
     }
 
     /**

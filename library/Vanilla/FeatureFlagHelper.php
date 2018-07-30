@@ -20,11 +20,8 @@ class FeatureFlagHelper {
      * @throws \Garden\Container\ContainerException If unable to get the config class instance from the container.
      */
     public static function featureEnabled(string $feature): bool {
-        /** @var Gdn_Configuration $config */
-        $config = Gdn::getContainer()->get(Gdn_Configuration::class);
-
         // We're going to enforce the root "Feature" namespace.
-        $configValue = $config->get("Feature.{$feature}");
+        $configValue = Gdn::getContainer()->get(\Gdn_Configuration::class)->get("Feature.{$feature}");
         // Force a true boolean.
         $result = filter_var($configValue, FILTER_VALIDATE_BOOLEAN);
         return $result;

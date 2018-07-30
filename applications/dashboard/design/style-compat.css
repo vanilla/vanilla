@@ -117,6 +117,37 @@ button.Close {
   opacity: 0.4;
 }
 
+.userContent .code {
+  display: inline-block;
+  font-size: 0.86em;
+  vertical-align: middle;
+  line-height: 1em;
+  box-sizing: border-box;
+  font-family: monospace;
+  max-width: 100%;
+  margin: 0;
+  padding-top: 0.07em;
+  padding-bottom: 0.07em;
+  padding-left: 0.5em;
+  padding-right: 0.5em;
+}
+
+.userContent .codeInline {
+  display: inline-block;
+}
+
+.userContent .codeBlock {
+  display: block;
+  overflow-x: auto;
+  border: 0;
+  word-wrap: normal;
+  line-height: 1.4;
+  white-space: pre;
+  border-radius: 0;
+  background: none;
+  padding: 12px;
+}
+
 .authenticateUserCol {
   padding: 0 26px;
   margin: auto;
@@ -1285,40 +1316,6 @@ label.checkbox input.checkbox-input {
   color: #A3A3A3;
 }
 
-.userContent code,
-.code {
-  display: inline-block;
-  font-size: 0.86em;
-  vertical-align: middle;
-  line-height: 1em;
-  box-sizing: border-box;
-  font-family: monospace;
-  background: transparent;
-  margin: 0;
-  border-radius: 2;
-  border-width: 1px;
-  border-style: solid;
-  border-color: #a3a3a3;
-  padding-top: 0.07em;
-  padding-bottom: 0.07em;
-  padding-left: 0.5em;
-  padding-right: 0.5em;
-}
-
-.code.isBlock {
-  display: block;
-  overflow-x: auto;
-  border: 0;
-  word-wrap: normal;
-  line-height: 1.4;
-  white-space: pre;
-  border-radius: 0;
-  background: none;
-  padding: 12px;
-  font-size: 14px;
-  background-color: #f7f7f7;
-}
-
 .userContent > *:not(:last-child) {
   margin-bottom: .6em;
 }
@@ -1347,17 +1344,11 @@ label.checkbox input.checkbox-input {
 .userContent div,
 .userContent td,
 .userContent th,
-.userContent code,
 .userContent a,
 .userContent p {
   word-break: break-all;
   word-break: break-word;
   text-overflow: ellipsis;
-  line-height: 1.4285714286;
-}
-
-.userContent code {
-  text-overflow: initial;
 }
 
 .emoji {
@@ -2036,7 +2027,7 @@ body.isMobile .richEditorParagraphMenu {
 .embedLink .embedExternal-content {
   display: block;
   background: #ffffff;
-  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.3);
+  box-shadow: 0 1px 3px 0 rgba(85, 90, 98, 0.3);
 }
 
 .embedLink .embedExternal-content, .embedLink .embedExternal-content:hover, .embedLink .embedExternal-content:focus {
@@ -2044,19 +2035,19 @@ body.isMobile .richEditorParagraphMenu {
   text-decoration: none !important;
 }
 
-.embedLink-body {
+.embedLink .embedLink-body {
   display: block;
   position: relative;
   overflow: hidden;
   text-align: left;
 }
 
-.embedLink-main {
+.embedLink .embedLink-main {
   padding: 18px;
   box-sizing: border-box;
 }
 
-.embedLink-image {
+.embedLink .embedLink-image {
   position: absolute;
   top: 0;
   left: 0;
@@ -2064,26 +2055,29 @@ body.isMobile .richEditorParagraphMenu {
   object-position: center;
   width: 225px;
   height: 100%;
+  border-right-style: solid;
+  border-right-width: 1px;
+  border-right-color: rgba(85, 90, 98, 0.3);
 }
 
-.embedLink-image + .embedLink-main {
+.embedLink .embedLink-image + .embedLink-main {
   margin-left: auto;
   width: -webkit-calc(100% - 225px);
   width: calc(100% - 225px);
 }
 
 @media (max-width: 550px) {
-  .embedLink-image {
+  .embedLink .embedLink-image {
     position: relative;
     width: 100%;
     padding-top: 52.5%;
   }
-  .embedLink-image + .embedLink-main {
+  .embedLink .embedLink-image + .embedLink-main {
     width: 100%;
   }
 }
 
-.embedLink-header {
+.embedLink .embedLink-header {
   display: -webkit-box;
   display: -webkit-flex;
   display: -ms-flexbox;
@@ -2104,21 +2098,21 @@ body.isMobile .richEditorParagraphMenu {
   margin-bottom: 6px;
 }
 
-.embedLink-userName {
+.embedLink .embedLink-userName {
   margin: 0 0 0 12px;
   padding: 0;
   color: #555A62;
   font-weight: 600;
 }
 
-.embedLink-dateTime {
+.embedLink .embedLink-dateTime {
   font-size: .8em;
   margin: 0 0 0 12px;
   padding: 0;
   color: #737373;
 }
 
-.embedLink-title {
+.embedLink .embedLink-title {
   display: block;
   width: 100%;
   margin: 0;
@@ -2131,7 +2125,7 @@ body.isMobile .richEditorParagraphMenu {
   text-overflow: ellipsis;
 }
 
-.embedLink-source {
+.embedLink .embedLink-source {
   font-size: 12.04px;
   color: rgba(85, 90, 98, 0.72);
   white-space: nowrap;
@@ -2140,7 +2134,7 @@ body.isMobile .richEditorParagraphMenu {
   margin: 0;
 }
 
-.embedLink-excerpt {
+.embedLink .embedLink-excerpt {
   font-size: 14px;
   color: #555A62;
   overflow: hidden;
@@ -2149,6 +2143,7 @@ body.isMobile .richEditorParagraphMenu {
   max-width: 100%;
   line-height: 1.4285714286;
   max-height: 60px;
+  white-space: normal;
 }
 
 .embedLoader-icon {

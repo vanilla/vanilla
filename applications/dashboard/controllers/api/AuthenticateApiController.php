@@ -233,9 +233,8 @@ class AuthenticateApiController extends AbstractApiController {
                     'default' => true,
                     'x-instance-configurable' => true,
                 ],
-                'canLinkSession'=> [
-                    'type' => 'boolean',
-                    'description' => 'Whether or not, using the authenticator, the user can link his account from the profile page.',
+                'canAutoLinkUser:b' => [
+                    'description' => 'Whether or not the authenticator can automatically link the incoming user information to an existing user account by using email address.',
                     'default' => false,
                     'x-instance-configurable' => true,
                 ],

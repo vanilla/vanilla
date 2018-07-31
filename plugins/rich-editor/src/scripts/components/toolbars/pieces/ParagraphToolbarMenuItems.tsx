@@ -33,13 +33,13 @@ export default class ParagraphToolbarMenuItems extends React.Component<IProps> {
                             isActive={false}
                         />
                         <MenuItem
-                            icon={icons.title()}
+                            icon={icons.heading2()}
                             label={t("Format as Title")}
                             onClick={this.formatH2}
                             isActive={activeFormats.header === 2}
                         />
                         <MenuItem
-                            icon={icons.subtitle()}
+                            icon={icons.heading3()}
                             label={t("Format as Subtitle")}
                             onClick={this.formatH3}
                             isActive={activeFormats.header === 3}
@@ -54,7 +54,7 @@ export default class ParagraphToolbarMenuItems extends React.Component<IProps> {
                             icon={icons.codeBlock()}
                             label={t("Format as code block")}
                             onClick={this.formatCodeBlock}
-                            isActive={activeFormats.codeBlock === true}
+                            isActive={activeFormats["code-block"] === true}
                         />
                         <MenuItem
                             ref={lastItemRef}

@@ -23,10 +23,9 @@ export default class ParagraphToolbarMenuItems extends React.Component<IProps> {
         const { formatter, activeFormats } = this.props;
         return (
             <MenuItems>
-                {(firstItemRef, lastItemRef) => (
+                {menuItemRefs => (
                     <React.Fragment>
                         <MenuItem
-                            ref={firstItemRef}
                             icon={icons.pilcrow()}
                             label={t("Format as Paragraph")}
                             onClick={this.formatParagraph}
@@ -57,7 +56,6 @@ export default class ParagraphToolbarMenuItems extends React.Component<IProps> {
                             isActive={activeFormats["code-block"] === true}
                         />
                         <MenuItem
-                            ref={lastItemRef}
                             icon={icons.spoiler()}
                             label={t("Format as spoiler")}
                             onClick={this.formatSpoiler}
@@ -67,6 +65,48 @@ export default class ParagraphToolbarMenuItems extends React.Component<IProps> {
                 )}
             </MenuItems>
         );
+    }
+
+    private get menuItemData() {
+        const { formatter, activeFormats } = this.props;
+        return [
+            {
+                icon: icons.pilcrow(),
+                label: t("Format as Paragraph"),
+                onClick: this.formatParagraph,
+                isActive: false,
+            },
+            {
+                icon: icons.heading2(),
+                label: t("Format as Title"),
+                onClick: this.formatH2,
+                isActive: activeFormats.header === 2,
+            },
+            {
+                icon: icons.heading3(),
+                label: t("Format as Subtitle"),
+                onClick: this.formatH3,
+                isActive: activeFormats.header === 3,
+            },
+            {
+                icon: icons.blockquote(),
+                label: t("Format as blockquote"),
+                onClick: this.formatBlockquote,
+                isActive: activeFormats["blockquote-line"] === true,
+            },
+            {
+                icon: icons.codeBlock(),
+                label: t("Format as code block"),
+                onClick: this.formatCodeBlock,
+                isActive: activeFormats["code-block"] === true,
+            },
+            {
+                icon: icons.spoiler(),
+                label: t("Format as spoiler"),
+                onClick: this.formatSpoiler,
+                isActive: activeFormats["spoiler-line"] === true,
+            },
+        ];
     }
 
     //

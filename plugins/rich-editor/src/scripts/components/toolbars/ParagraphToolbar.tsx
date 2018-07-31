@@ -26,7 +26,6 @@ interface IState {
 
 export class ParagraphToolbar extends React.PureComponent<IProps, IState> {
     private quill: Quill;
-    private toolbarNode: HTMLElement;
     private ID: string;
     private componentID: string;
     private menuID: string;
@@ -35,11 +34,7 @@ export class ParagraphToolbar extends React.PureComponent<IProps, IState> {
     private buttonRef: React.RefObject<HTMLButtonElement> = React.createRef();
     private formatter: Formatter;
 
-    /**
-     * @inheritDoc
-     */
-
-    constructor(props) {
+    constructor(props: IProps) {
         super(props);
 
         // Quill can directly on the class as it won't ever change in a single instance.
@@ -97,13 +92,7 @@ export class ParagraphToolbar extends React.PureComponent<IProps, IState> {
                 >
                     {this.activeFormatIcon}
                 </button>
-                <div
-                    id={this.menuID}
-                    className={this.toolbarClasses}
-                    style={this.toolbarStyles}
-                    ref={ref => (this.toolbarNode = ref!)}
-                    role="menu"
-                >
+                <div id={this.menuID} className={this.toolbarClasses} style={this.toolbarStyles} role="menu">
                     <ParagraphToolbarMenuItems
                         formatter={this.formatter}
                         activeFormats={this.props.activeFormats}
@@ -230,7 +219,6 @@ export class ParagraphToolbar extends React.PureComponent<IProps, IState> {
      * Click handler for the Pilcrow
      */
     private pilcrowClickHandler = (event: React.MouseEvent<any>) => {
-        event.preventDefault();
         this.setState({ hasFocus: true });
         const menu = document.getElementById(this.menuID);
         const firstButton = menu ? menu.querySelector(".richEditor-button") : false;

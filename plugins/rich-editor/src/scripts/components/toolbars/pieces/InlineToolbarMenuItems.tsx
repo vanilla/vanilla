@@ -6,7 +6,7 @@
 
 import React from "react";
 import MenuItems from "@rich-editor/components/toolbars/pieces/MenuItems";
-import MenuItem from "@rich-editor/components/toolbars/pieces/MenuItem";
+import MenuItem, { IMenuItemData } from "@rich-editor/components/toolbars/pieces/MenuItem";
 import { t } from "@dashboard/application";
 import * as icons from "../../icons";
 
@@ -22,48 +22,44 @@ interface IProps {
 
 export default class InlineToolbarMenuItems extends React.Component<IProps> {
     public render() {
-        const { formatter, activeFormats, onLinkClick } = this.props;
+        return <MenuItems menuItemData={this.menuItemData} />;
+    }
 
-        return (
-            <MenuItems>
-                {(firstItemRef, lastItemRef) => (
-                    <React.Fragment>
-                        <MenuItem
-                            ref={firstItemRef}
-                            label={t("Format as Bold")}
-                            icon={icons.bold()}
-                            isActive={activeFormats.bold === true}
-                            onClick={this.formatBold}
-                        />
-                        <MenuItem
-                            label={t("Format as Italic")}
-                            icon={icons.italic()}
-                            isActive={activeFormats.italic === true}
-                            onClick={this.formatItalic}
-                        />
-                        <MenuItem
-                            label={t("Format as Strikethrough")}
-                            icon={icons.strike()}
-                            isActive={activeFormats.strike === true}
-                            onClick={this.formatStrike}
-                        />
-                        <MenuItem
-                            label={t("Format as Inline Code")}
-                            icon={icons.code()}
-                            isActive={activeFormats["code-inline"] === true}
-                            onClick={this.formatCode}
-                        />
-                        <MenuItem
-                            ref={lastItemRef}
-                            label={t("Format as Link")}
-                            icon={icons.link()}
-                            isActive={typeof activeFormats.link === "string"}
-                            onClick={onLinkClick}
-                        />
-                    </React.Fragment>
-                )}
-            </MenuItems>
-        );
+    private get menuItemData(): IMenuItemData[] {
+        const { activeFormats, onLinkClick } = this.props;
+
+        return [
+            {
+                label: t("Format as Bold"),
+                icon: icons.bold(),
+                isActive: activeFormats.bold === true,
+                onClick: this.formatBold,
+            },
+            {
+                label: t("Format as Italic"),
+                icon: icons.italic(),
+                isActive: activeFormats.italic === true,
+                onClick: this.formatItalic,
+            },
+            {
+                label: t("Format as Strikethrough"),
+                icon: icons.strike(),
+                isActive: activeFormats.strike === true,
+                onClick: this.formatStrike,
+            },
+            {
+                label: t("Format as Inline Code"),
+                icon: icons.code(),
+                isActive: activeFormats["code-inline"] === true,
+                onClick: this.formatCode,
+            },
+            {
+                label: t("Format as Link"),
+                icon: icons.link(),
+                isActive: typeof activeFormats.link === "string",
+                onClick: onLinkClick,
+            },
+        ];
     }
 
     //

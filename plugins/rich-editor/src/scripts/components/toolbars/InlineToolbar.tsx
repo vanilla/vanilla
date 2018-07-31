@@ -25,7 +25,7 @@ interface IProps extends IWithEditorProps {}
 interface IState {
     inputValue: string;
     isLinkMenuOpen: boolean;
-    hasFocus: boolean;
+    menuHasFocus: boolean;
 }
 
 export class InlineToolbar extends React.Component<IProps, IState> {
@@ -47,7 +47,7 @@ export class InlineToolbar extends React.Component<IProps, IState> {
         this.state = {
             inputValue: "",
             isLinkMenuOpen: false,
-            hasFocus: false,
+            menuHasFocus: false,
         };
     }
 
@@ -93,16 +93,22 @@ export class InlineToolbar extends React.Component<IProps, IState> {
     }
 
     private get isLinkMenuVisible(): boolean {
-        return this.state.isLinkMenuOpen && this.hasSelectionOrFocus;
+        return this.state.isLinkMenuOpen && this.hasFocus && this.isOneLineOrLess;
     }
 
     private get isFormatMenuVisible(): boolean {
-        return !this.isLinkMenuVisible && this.hasSelectionOrFocus;
+        const selectionHasLength = this.props.instanceState.lastGoodSelection.length > 0;
+        return !this.isLinkMenuVisible && this.hasFocus && selectionHasLength && this.isOneLineOrLess;
     }
 
-    private get hasSelectionOrFocus() {
-        const { currentSelection } = this.props.instanceState;
-        return this.state.hasFocus || (!!currentSelection && currentSelection.length > 0);
+    private get isOneLineOrLess(): boolean {
+        const { lastGoodSelection } = this.props.instanceState;
+        const numLines = this.quill.getLines(lastGoodSelection.index || 0, lastGoodSelection.length || 0).length;
+        return numLines <= 1;
+    }
+
+    private get hasFocus() {
+        return this.state.menuHasFocus || this.quill.hasFocus();
     }
 
     /**
@@ -132,7 +138,7 @@ export class InlineToolbar extends React.Component<IProps, IState> {
     }
 
     private handleFocusChange = hasFocus => {
-        this.setState({ hasFocus });
+        this.setState({ menuHasFocus: hasFocus });
     };
 
     /**
@@ -142,8 +148,7 @@ export class InlineToolbar extends React.Component<IProps, IState> {
         const { lastGoodSelection } = this.props.instanceState;
 
         if (
-            lastGoodSelection &&
-            lastGoodSelection.length &&
+            this.isOneLineOrLess &&
             !this.isLinkMenuVisible &&
             !rangeContainsBlot(this.quill, CodeBlot) &&
             !rangeContainsBlot(this.quill, CodeBlockBlot)
@@ -191,6 +196,7 @@ export class InlineToolbar extends React.Component<IProps, IState> {
     };
 
     private clearLinkInput() {
+        this.quill.setSelection(this.props.instanceState.lastGoodSelection);
         this.setState({ isLinkMenuOpen: false, inputValue: "" });
     }
 

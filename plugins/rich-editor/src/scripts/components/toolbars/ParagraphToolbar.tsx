@@ -7,7 +7,7 @@
 import React from "react";
 import Quill from "quill/core";
 import { t } from "@dashboard/application";
-import * as Icons from "@rich-editor/components/icons";
+import * as icons from "@rich-editor/components/icons";
 import { withEditor, IWithEditorProps } from "@rich-editor/components/context";
 import { watchFocusInDomTree } from "@dashboard/dom";
 import { createEditorFlyoutEscapeListener, isEmbedSelected } from "@rich-editor/quill/utility";
@@ -17,6 +17,7 @@ import CodeBlockBlot from "@rich-editor/quill/blots/blocks/CodeBlockBlot";
 import BlockquoteLineBlot from "@rich-editor/quill/blots/blocks/BlockquoteBlot";
 import SpoilerLineBlot from "@rich-editor/quill/blots/blocks/SpoilerBlot";
 import HeadingBlot from "quill/formats/header";
+import MenuItems from "@rich-editor/components/toolbars/pieces/MenuItems";
 
 interface IProps extends IWithEditorProps {}
 
@@ -32,6 +33,7 @@ export class ParagraphToolbar extends React.PureComponent<IProps, IState> {
     private buttonID: string;
     private selfRef: React.RefObject<HTMLDivElement> = React.createRef();
     private buttonRef: React.RefObject<HTMLButtonElement> = React.createRef();
+    private menuRef: React.RefObject<MenuItems> = React.createRef();
     private formatter: Formatter;
 
     constructor(props: IProps) {
@@ -94,6 +96,7 @@ export class ParagraphToolbar extends React.PureComponent<IProps, IState> {
                 </button>
                 <div id={this.menuID} className={this.toolbarClasses} style={this.toolbarStyles} role="menu">
                     <ParagraphToolbarMenuItems
+                        menuRef={this.menuRef}
                         formatter={this.formatter}
                         activeFormats={this.props.activeFormats}
                         lastGoodSelection={this.props.instanceState.lastGoodSelection}
@@ -112,23 +115,23 @@ export class ParagraphToolbar extends React.PureComponent<IProps, IState> {
     private get activeFormatIcon(): JSX.Element {
         const { activeFormats } = this.props;
         if (activeFormats[HeadingBlot.blotName] === 2) {
-            return Icons.heading2();
+            return icons.heading2();
         }
         if (activeFormats[HeadingBlot.blotName] === 3) {
-            return Icons.heading3();
+            return icons.heading3();
         }
         if (activeFormats[BlockquoteLineBlot.blotName] === true) {
-            return Icons.blockquote();
+            return icons.blockquote();
         }
         if (activeFormats[CodeBlockBlot.blotName] === true) {
-            return Icons.codeBlock();
+            return icons.codeBlock();
         }
         if (activeFormats[SpoilerLineBlot.blotName] === true) {
-            return Icons.spoiler();
+            return icons.spoiler();
         }
 
         // Fallback to paragraph formatting.
-        return Icons.pilcrow();
+        return icons.pilcrow();
     }
 
     /**
@@ -140,8 +143,7 @@ export class ParagraphToolbar extends React.PureComponent<IProps, IState> {
             return false;
         }
 
-        const numLines = this.quill.getLines(currentSelection.index || 0, currentSelection.length || 0).length;
-        return numLines <= 1;
+        return true;
     }
 
     /**
@@ -219,6 +221,7 @@ export class ParagraphToolbar extends React.PureComponent<IProps, IState> {
      * Click handler for the Pilcrow
      */
     private pilcrowClickHandler = (event: React.MouseEvent<any>) => {
+        event.preventDefault();
         this.setState({ hasFocus: true });
         const menu = document.getElementById(this.menuID);
         const firstButton = menu ? menu.querySelector(".richEditor-button") : false;
@@ -230,44 +233,22 @@ export class ParagraphToolbar extends React.PureComponent<IProps, IState> {
     };
 
     /**
-     * Get element containing menu items
-     */
-    private get menuContainer() {
-        const parentElement = document.getElementById(this.menuID);
-        if (parentElement) {
-            const menu = parentElement.querySelector(".richEditor-menuItems");
-            if (menu) {
-                return menu;
-            }
-        }
-        return false;
-    }
-
-    /**
-     * Handle key presses
+     * Implement opening/closing keyboard shortcuts in accordance with the WAI-ARIA best practices for menuitems.
+     *
+     * @see https://www.w3.org/TR/wai-aria-practices/examples/menubar/menubar-2/menubar-2.html
      */
     private handleKeyPress = (event: React.KeyboardEvent<any>) => {
         switch (event.key) {
             case "ArrowUp":
                 event.preventDefault();
                 this.setState({ hasFocus: true }, () => {
-                    setImmediate(() => {
-                        const menu = this.menuContainer;
-                        if (menu instanceof HTMLElement && menu.firstChild instanceof HTMLElement) {
-                            menu.firstChild.focus();
-                        }
-                    });
+                    this.menuRef.current!.focusFirstItem();
                 });
                 break;
             case "ArrowDown":
                 event.preventDefault();
                 this.setState({ hasFocus: true }, () => {
-                    setImmediate(() => {
-                        const menu = this.menuContainer;
-                        if (menu instanceof HTMLElement && menu.lastChild instanceof HTMLElement) {
-                            menu.lastChild.focus();
-                        }
-                    });
+                    this.menuRef.current!.focusLastItem();
                 });
                 break;
         }

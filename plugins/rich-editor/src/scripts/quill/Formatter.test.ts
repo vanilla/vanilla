@@ -9,7 +9,33 @@ import Formatter from "@rich-editor/quill/Formatter";
 import { RangeStatic } from "quill/core";
 import { expect } from "chai";
 import OpUtils from "@rich-editor/__tests__/opUtils";
-
+// Block testing utilties
+const inlineFormatOps = [
+    {
+        op: OpUtils.op(),
+        name: "plainText",
+    },
+    {
+        op: OpUtils.bold(),
+        name: "bold",
+    },
+    {
+        op: OpUtils.italic(),
+        name: "italic",
+    },
+    {
+        op: OpUtils.strike(),
+        name: "strike",
+    },
+    {
+        op: OpUtils.link(),
+        name: "link",
+    },
+    {
+        op: OpUtils.codeInline(),
+        name: "codeInline",
+    },
+];
 describe("Formatter", () => {
     let quill: Quill;
     let formatter: Formatter;
@@ -65,21 +91,31 @@ describe("Formatter", () => {
     describe("h2()", () => {
         const formattingFunction = () => formatter.h2(getFullRange());
         testLineFormatInlinePreservation("h2", formattingFunction, OpUtils.heading(2));
+        testLineFormatExclusivity("h2", formattingFunction, OpUtils.heading(2));
     });
 
     describe("h3()", () => {
         const formattingFunction = () => formatter.h3(getFullRange());
         testLineFormatInlinePreservation("h3", formattingFunction, OpUtils.heading(3));
+        testLineFormatExclusivity("h3", formattingFunction, OpUtils.heading(3));
     });
 
     describe("blockquote()", () => {
         const formattingFunction = () => formatter.blockquote(getFullRange());
-        testLineFormatInlinePreservation("h2", formattingFunction, OpUtils.quoteLine());
+        testLineFormatInlinePreservation("blockquote", formattingFunction, OpUtils.quoteLine());
+        testLineFormatExclusivity("blockquote", formattingFunction, OpUtils.quoteLine());
     });
 
     describe("spoiler()", () => {
         const formattingFunction = () => formatter.spoiler(getFullRange());
         testLineFormatInlinePreservation("spoiler", formattingFunction, OpUtils.spoilerLine());
+        testLineFormatExclusivity("spoiler", formattingFunction, OpUtils.spoilerLine());
+    });
+
+    describe("codeBlock()", () => {
+        const formattingFunction = () => formatter.codeBlock(getFullRange());
+        testNoLineFormatInlinePreservation("codeBlock", formattingFunction, OpUtils.codeBlock());
+        testLineFormatExclusivity("codeBlock", formattingFunction, OpUtils.codeBlock(), true);
     });
 
     // Inline testing utilities
@@ -167,40 +203,72 @@ describe("Formatter", () => {
         });
     }
 
-    // Block testing utilties
-
     function testLineFormatInlinePreservation(lineFormatName: string, formatterFunction: () => void, lineOp: any) {
         describe(`${lineFormatName} inline format preservation`, () => {
-            const inlineFormatOps = [
-                {
-                    op: OpUtils.op(),
-                    name: "plainText",
-                },
-                {
-                    op: OpUtils.bold(),
-                    name: "bold",
-                },
-                {
-                    op: OpUtils.italic(),
-                    name: "italic",
-                },
-                {
-                    op: OpUtils.strike(),
-                    name: "strike",
-                },
-                {
-                    op: OpUtils.link(),
-                    name: "link",
-                },
-                {
-                    op: OpUtils.codeInline(),
-                    name: "codeInline",
-                },
-            ];
             inlineFormatOps.forEach(({ op, name }) => {
                 it(`preserves the ${name} format when added`, () => {
                     const initial = [op];
                     const expected = [op, lineOp];
+                    quill.setContents(initial, Quill.sources.USER);
+                    formatterFunction();
+                    const result = quill.getContents().ops;
+                    expect(result).deep.equals(expected);
+                });
+            });
+        });
+    }
+
+    function testNoLineFormatInlinePreservation(lineFormatName: string, formatterFunction: () => void, lineOp: any) {
+        describe(`${lineFormatName} inline format preservation`, () => {
+            inlineFormatOps.forEach(({ op, name }) => {
+                it(`it removes the ${name} format when added`, () => {
+                    const initial = [op];
+                    const expected = [OpUtils.op(), lineOp, OpUtils.newline()];
+                    quill.setContents(initial, Quill.sources.USER);
+                    formatterFunction();
+                    const result = quill.getContents().ops;
+                    expect(result).deep.equals(expected);
+                });
+            });
+        });
+    }
+
+    function testLineFormatExclusivity(
+        lineFormatName: string,
+        formatterFunction: () => void,
+        lineOp: any,
+        needsExtraNewLine: boolean = false,
+    ) {
+        const blockFormatOps = [
+            {
+                op: OpUtils.heading(2),
+                name: "h2",
+            },
+            {
+                op: OpUtils.heading(3),
+                name: "h3",
+            },
+            {
+                op: OpUtils.quoteLine(),
+                name: "blockquote",
+            },
+            {
+                op: OpUtils.spoilerLine(),
+                name: "spoiler",
+            },
+            {
+                op: OpUtils.codeBlock(),
+                name: "codeBlock",
+            },
+        ];
+        describe(`${lineFormatName} line format exclusivity`, () => {
+            blockFormatOps.forEach(({ op, name }) => {
+                it(`it removes the ${name} format`, () => {
+                    const initial = [OpUtils.op(), op];
+                    const expected = [OpUtils.op(), lineOp];
+                    if (needsExtraNewLine) {
+                        expected.push(OpUtils.newline());
+                    }
                     quill.setContents(initial, Quill.sources.USER);
                     formatterFunction();
                     const result = quill.getContents().ops;

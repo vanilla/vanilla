@@ -2567,7 +2567,7 @@ form.Thumbnail .Warning {
 }
 
 .CommentForm .FormWrapper {
-  padding: 10px 10px 10px 60px;
+  padding: 10px 30px;
 }
 
 .EditCommentForm textarea.TextBox,

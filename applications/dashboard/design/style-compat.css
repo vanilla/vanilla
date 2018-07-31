@@ -119,17 +119,12 @@ button.Close {
 
 .userContent .code {
   display: inline-block;
-  font-size: 0.86em;
   vertical-align: middle;
   line-height: 1em;
   box-sizing: border-box;
-  font-family: monospace;
+  font-family: Menlo, Monaco, Consolas, "Courier New", monospace;
   max-width: 100%;
   margin: 0;
-  padding-top: 0.07em;
-  padding-bottom: 0.07em;
-  padding-left: 0.5em;
-  padding-right: 0.5em;
 }
 
 .userContent .codeInline {
@@ -139,13 +134,9 @@ button.Close {
 .userContent .codeBlock {
   display: block;
   overflow-x: auto;
-  border: 0;
   word-wrap: normal;
   line-height: 1.4;
   white-space: pre;
-  border-radius: 0;
-  background: none;
-  padding: 12px;
 }
 
 .authenticateUserCol {

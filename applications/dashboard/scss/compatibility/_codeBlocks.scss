@@ -15,26 +15,12 @@ $richEditor-code_fg: #000000 !default;
 .userContent {
     .code {
         display: inline-block;
-        font-size: $richEditor-code_fontSize;
         vertical-align: middle;
         line-height: 1em;
         box-sizing: border-box;
-        font-family: monospace;
-        //background: transparent;
+        font-family: Menlo, Monaco, Consolas, "Courier New", monospace;
         max-width: 100%;
         margin: 0;
-        //border: {
-        //    radius: $richEditor-inlineCode_borderRadius;
-        //    width: $richEditor-inlineCode_borderWidth;
-        //    style: solid;
-        //    color: $richEditor-inlineCode_borderColor;
-        //}
-        padding: {
-            top: $richEditor-inlineCode_verticalPadding;
-            bottom: $richEditor-inlineCode_verticalPadding;
-            left: $richEditor-inlineCode_horizontalPadding;
-            right: $richEditor-inlineCode_horizontalPadding;
-        }
     }
 
     .codeInline {
@@ -44,13 +30,8 @@ $richEditor-code_fg: #000000 !default;
     .codeBlock {
         display: block;
         overflow-x: auto;
-        border: 0;
         word-wrap: normal;
         line-height: 1.4;
         white-space: pre;
-        border-radius: 0;
-        background: none;
-        padding: 12px;
-        //background-color: $richEditor-code_bg;
     }
 }

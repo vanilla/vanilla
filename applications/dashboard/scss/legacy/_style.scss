@@ -2233,7 +2233,7 @@ img.LeftAlign {
   clear: both;
 }
 
-.code,
+.codeBlock,
 code, pre {
   border-radius: 2px;
   background: $yellow-8;
@@ -2255,7 +2255,6 @@ pre {
   white-space: pre;
 }
 
-.code,
 pre code {
   border: none;
   padding: 0;

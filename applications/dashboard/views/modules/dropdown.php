@@ -22,7 +22,7 @@ $trigger = $dropdown->getTrigger();
     <ul class="Flyout MenuItems list-reset <?php echo $dropdown->getListCssClass(); ?>" role="menu" aria-labelledby="<?php echo $dropdown->getTriggerId(); ?>">
         <?php foreach($dropdown->getItems() as $item) {
             if (($item['type'] ?? '') == 'group') { ?>
-                <li role="presentation" class="dropdown-header <?php $item['cssClass'] ?? ''; ?>">
+                <li role="presentation" class="dropdown-header <?php echo $item['cssClass'] ?? ''; ?>">
                     <?php if ($iIcon = ($item['icon'] ?? false)) {
                         echo icon($iIcon);
                     }
@@ -38,7 +38,7 @@ $trigger = $dropdown->getTrigger();
                        ?>class="<?php
                         echo trim($ilistItemCssClass.(empty($item['icon']) ? ' no-icon' : '')); ?>"<?php
                     } ?>>
-                    <a role="menuitem" class="dropdown-menu-link <?php echo val('cssClass', $item); ?>" tabindex="-1" href="<?php url($item['url'] ?? ''); ?>" <?phpattribute($item['attributes'] ?? []) ?>><?php
+                    <a role="menuitem" class="dropdown-menu-link <?php  $item['cssClass'] ?? ''; ?>" tabindex="-1" href="<?php echo url($item['url'] ?? ''); ?>" <?php echo attribute($item['attributes'] ?? []) ?>><?php
                         if ($iIcon = ($item['icon'] ?? false)) {
                             echo icon($iIcon);
                         }
@@ -50,7 +50,7 @@ $trigger = $dropdown->getTrigger();
                 </li>
             <?php }
             if (($item['type'] ?? '') == 'divider') { ?>
-                <li role="presentation" <?php if ($iCssClass = ($item['cssClass'] ?? false)) { ?> class="<?php $iCssClass; ?>"<?php } ?>>
+                <li role="presentation" <?php if ($iCssClass = ($item['cssClass'] ?? false)) { ?> class="<?php echo $iCssClass; ?>"<?php } ?>>
                     <hr />
                 </li>
             <?php }

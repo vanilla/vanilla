@@ -8,34 +8,8 @@ import Quill from "./index";
 import Formatter from "@rich-editor/quill/Formatter";
 import { RangeStatic } from "quill/core";
 import { expect } from "chai";
-import OpUtils from "@rich-editor/__tests__/opUtils";
-// Block testing utilties
-const inlineFormatOps = [
-    {
-        op: OpUtils.op(),
-        name: "plainText",
-    },
-    {
-        op: OpUtils.bold(),
-        name: "bold",
-    },
-    {
-        op: OpUtils.italic(),
-        name: "italic",
-    },
-    {
-        op: OpUtils.strike(),
-        name: "strike",
-    },
-    {
-        op: OpUtils.link(),
-        name: "link",
-    },
-    {
-        op: OpUtils.codeInline(),
-        name: "codeInline",
-    },
-];
+import OpUtils, { inlineFormatOps, blockFormatOps } from "@rich-editor/__tests__/opUtils";
+
 describe("Formatter", () => {
     let quill: Quill;
     let formatter: Formatter;
@@ -239,28 +213,6 @@ describe("Formatter", () => {
         lineOp: any,
         needsExtraNewLine: boolean = false,
     ) {
-        const blockFormatOps = [
-            {
-                op: OpUtils.heading(2),
-                name: "h2",
-            },
-            {
-                op: OpUtils.heading(3),
-                name: "h3",
-            },
-            {
-                op: OpUtils.quoteLine(),
-                name: "blockquote",
-            },
-            {
-                op: OpUtils.spoilerLine(),
-                name: "spoiler",
-            },
-            {
-                op: OpUtils.codeBlock(),
-                name: "codeBlock",
-            },
-        ];
         describe(`${lineFormatName} line format exclusivity`, () => {
             blockFormatOps.forEach(({ op, name }) => {
                 it(`it removes the ${name} format`, () => {

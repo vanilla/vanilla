@@ -65,3 +65,52 @@ export default class OpUtils {
         return OpUtils.op(lineContent, { [ListBlot.blotName]: listType });
     }
 }
+
+export const inlineFormatOps = [
+    {
+        op: OpUtils.op(),
+        name: "plainText",
+    },
+    {
+        op: OpUtils.bold(),
+        name: "bold",
+    },
+    {
+        op: OpUtils.italic(),
+        name: "italic",
+    },
+    {
+        op: OpUtils.strike(),
+        name: "strike",
+    },
+    {
+        op: OpUtils.link(),
+        name: "link",
+    },
+    {
+        op: OpUtils.codeInline(),
+        name: "codeInline",
+    },
+];
+export const blockFormatOps = [
+    {
+        op: OpUtils.heading(2),
+        name: "h2",
+    },
+    {
+        op: OpUtils.heading(3),
+        name: "h3",
+    },
+    {
+        op: OpUtils.quoteLine(),
+        name: "blockquote",
+    },
+    {
+        op: OpUtils.spoilerLine(),
+        name: "spoiler",
+    },
+    {
+        op: OpUtils.codeBlock(),
+        name: "codeBlock",
+    },
+];

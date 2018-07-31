@@ -26,7 +26,7 @@ import BlockBlot from "quill/blots/block";
 import CodeBlot from "./blots/inline/CodeBlot";
 
 export default class KeyboardBindings {
-    private static MULTI_LINE_BLOTS = ["spoiler-line", "blockquote-line", "code-block"];
+    private static MULTI_LINE_BLOTS = ["spoiler-line", "blockquote-line", "codeBlock"];
     public bindings: any = {};
 
     constructor(private quill: Quill) {
@@ -155,14 +155,14 @@ export default class KeyboardBindings {
             return true;
         }
 
-        const delta = new Delta().retain(range.index).retain(1, { "code-block": false });
+        const delta = new Delta().retain(range.index).retain(1, { codeBlock: false });
         this.quill.updateContents(delta, Emitter.sources.USER);
 
         return false;
     }
 
     /**
-     * Strips the formatting from the first Blot if it is a block-quote, code-block, or spoiler.
+     * Strips the formatting from the first Blot if it is a block-quote, codeBlock, or spoiler.
      *
      * @param range - The range that was altered.
      *
@@ -258,8 +258,8 @@ export default class KeyboardBindings {
     private resetDefaultBindings() {
         // Nullify the tab key.
         (this.bindings as any).tab = false;
-        this.bindings["indent code-block"] = false;
-        this.bindings["outdent code-block"] = false;
+        this.bindings["indent codeBlock"] = false;
+        this.bindings["outdent codeBlock"] = false;
         this.bindings["remove tab"] = false;
         this.bindings["code exit"] = false;
     }
@@ -316,7 +316,7 @@ export default class KeyboardBindings {
         this.bindings["CodeBlock Enter"] = {
             key: KeyboardModule.keys.ENTER,
             collapsed: true,
-            format: ["code-block"],
+            format: ["codeBlock"],
             handler: this.handleCodeBlockEnter,
         };
     }
@@ -369,7 +369,7 @@ export default class KeyboardBindings {
 
     /**
      * Create a keyboard shortcut to enable/disable a format. These differ from Quill's built in
-     * keyboard shortcuts because they do not work if the selection contains a code-block or inline-code.
+     * keyboard shortcuts because they do not work if the selection contains a codeBlock or inline-code.
      */
     private makeFormatHandler(format) {
         return {
@@ -416,7 +416,7 @@ export default class KeyboardBindings {
         this.bindings["CodeBlock Backspace"] = {
             key: KeyboardModule.keys.BACKSPACE,
             collapsed: true,
-            format: ["code-block"],
+            format: ["codeBlock"],
             handler: this.handleCodeBlockBackspace,
         };
     }

@@ -36,7 +36,7 @@ const PARAGRAPH_ITEMS = {
     "blockquote-line": {
         name: "blockquote",
     },
-    "code-block": {
+    codeBlock: {
         name: "codeBlock",
     },
     "spoiler-line": {
@@ -168,7 +168,7 @@ export class ParagraphToolbar extends React.PureComponent<IProps, IState> {
                     active: false,
                 };
 
-                if (formatName === "code-block") {
+                if (formatName === "codeBlock") {
                     initialToolbarItems[(contents as any).name].formatter = this.codeFormatter;
                 }
             }
@@ -208,7 +208,7 @@ export class ParagraphToolbar extends React.PureComponent<IProps, IState> {
         const selection = this.quill.getSelection(true);
         const [line] = this.quill.getLine(selection.index);
         this.quill.removeFormat(line.offset(), line.length(), Quill.sources.API);
-        this.quill.formatLine(line.offset(), line.length(), "code-block", Quill.sources.USER);
+        this.quill.formatLine(line.offset(), line.length(), "codeBlock", Quill.sources.USER);
     };
 
     /**

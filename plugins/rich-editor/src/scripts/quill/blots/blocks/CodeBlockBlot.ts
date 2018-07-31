@@ -19,8 +19,7 @@ export default class CodeBlockBlot extends CodeBlock {
         const domNode = super.create(value) as HTMLElement;
         domNode.setAttribute("spellcheck", false);
         domNode.classList.add("code");
-        domNode.classList.add("isBlock");
-        domNode.classList.add("code-block");
+        domNode.classList.add("codeBlock");
         return domNode;
     }
 }

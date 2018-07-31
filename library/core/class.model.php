@@ -101,7 +101,7 @@ class Gdn_Model extends Gdn_Pluggable {
         $this->Database = Gdn::database();
         $this->SQL = $this->Database->sql();
         if ($validation === null) {
-            $validation = new Gdn_Validation();
+            $validation = Gdn::getContainer()->get(Gdn_Validation::class);
         }
         $this->Validation = $validation;
         $this->Name = $name;

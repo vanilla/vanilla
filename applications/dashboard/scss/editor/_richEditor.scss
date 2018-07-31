@@ -67,13 +67,22 @@ $richEditor-mobileEmbedBreakPoint: 550px !default;
     display: block;
     padding-left: $richEditor_leftPadding;
     font-size: $richEditor-font_size;
+
+    &.isDisabled {
+        &,
+        .richEditor-button {
+            cursor: progress !important;
+        }
+    }
 }
 
-.richEditor-frame.InputBox {
-    position: relative;
-    background: $richEditor-bg_color;
-    height: auto;
-    padding: 0;
+.richEditor-frame {
+    &.InputBox {
+        position: relative;
+        background: $richEditor-bg_color;
+        height: auto;
+        padding: 0;
+    }
 }
 
 .richEditor-menu {

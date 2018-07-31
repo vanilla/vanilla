@@ -738,6 +738,11 @@ label.checkbox input.checkbox-input {
   font-size: 16px;
 }
 
+.richEditor.isDisabled,
+.richEditor.isDisabled .richEditor-button {
+  cursor: progress !important;
+}
+
 .richEditor-frame.InputBox {
   position: relative;
   background: #fff;

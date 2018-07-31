@@ -10,7 +10,7 @@ import KeyboardBindings from "./KeyboardBindings";
 import { expect } from "chai";
 const LINE_FORMATS = ["blockquote-line", "spoiler-line"];
 
-const MULTI_LINE_FORMATS = [...LINE_FORMATS, "code-block"];
+const MULTI_LINE_FORMATS = [...LINE_FORMATS, "codeBlock"];
 
 describe("KeyboardBindings", () => {
     let quill: Quill;
@@ -69,7 +69,7 @@ describe("KeyboardBindings", () => {
 
     it("handleCodeBlockEnter", () => {
         const delta = new Delta().insert("line\n\n\n", {
-            "code-block": true,
+            codeBlock: true,
         });
         quill.setContents(delta);
 
@@ -85,7 +85,7 @@ describe("KeyboardBindings", () => {
             {
                 insert: "\n",
                 attributes: {
-                    ["code-block"]: true,
+                    ["codeBlock"]: true,
                 },
             },
             {
@@ -180,7 +180,7 @@ describe("KeyboardBindings", () => {
             length: 0,
         };
 
-        if (blotName === "code-block") {
+        if (blotName === "codeBlock") {
             keyboardBindings.handleCodeBlockBackspace(selection);
         } else {
             keyboardBindings.handleMultiLineBackspace(selection);

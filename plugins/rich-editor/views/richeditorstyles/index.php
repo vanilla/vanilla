@@ -443,7 +443,7 @@
     </p>
 
     <h2>Code Block - Paragraph</h2>
-    <code class="code isBlock">/**
+    <code class="code codeBlock">/**
  * Adds locale data to the view, and adds a respond button to the discussion page.
  */
 class MyThemeNameThemeHooks extends Gdn_Plugin {
@@ -472,7 +472,7 @@ class MyThemeNameThemeHooks extends Gdn_Plugin {
         <div class="blockquote-main">
             <p>
                 <strong>Can we use jsConnect without providing an email address?</strong><br/>
-                No. You absolutely must send an email, which is the only method for mapping users. If you are importing forum users without email addresses and need a way to map them over SSO, we recommend using dummy email addresses that follow a formula like <code>uniqueID</code> <a href="#">@yoursite.com</a>.
+                No. You absolutely must send an email, which is the only method for mapping users. If you are importing forum users without email addresses and need a way to map them over SSO, we recommend using dummy email addresses that follow a formula like <code class="code codeInline">uniqueID</code> <a href="#">@yoursite.com</a>.
             </p>
         </div>
     </blockquote>

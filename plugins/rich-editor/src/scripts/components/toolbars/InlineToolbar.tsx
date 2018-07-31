@@ -237,7 +237,7 @@ export class InlineToolbar extends React.Component<IProps, IState> {
         this.quill.formatText(
             this.state.cachedRange.index,
             this.state.cachedRange.length,
-            "code-inline",
+            "codeInline",
             !menuItemData.active,
             Quill.sources.USER,
         );

@@ -33,7 +33,7 @@ export class InlineToolbarItems extends React.Component<IProps, {}> {
                 active: false,
             },
             code: {
-                formatName: "code-inline",
+                formatName: "codeInline",
                 active: false,
                 formatter: this.codeFormatter,
             },
@@ -87,7 +87,7 @@ export class InlineToolbarItems extends React.Component<IProps, {}> {
         this.quill.formatText(
             this.props.currentSelection.index,
             this.props.currentSelection.length,
-            "code-inline",
+            "codeInline",
             !menuItemData.active,
             Quill.sources.USER,
         );

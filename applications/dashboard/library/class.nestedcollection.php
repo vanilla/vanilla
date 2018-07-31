@@ -448,7 +448,7 @@ trait NestedCollection {
                 if (array_key_exists($key_part, $items)) {
                     // The item is already here so merge this one on top of it.
                     if ($items[$key_part]['type'] !== $type)
-                        throw new \Exception($item['key'] ?? ''." of type $type does not match existing type {$items[$key_part]['type']}.", 500);
+                        throw new \Exception(($item['key'] ?? '')." of type $type does not match existing type {$items[$key_part]['type']}.", 500);
 
                     $items[$key_part] = array_merge($items[$key_part], $item);
                 } else {

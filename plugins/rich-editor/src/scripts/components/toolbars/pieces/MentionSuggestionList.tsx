@@ -94,7 +94,7 @@ class MentionSuggestionList extends React.PureComponent<IProps, IState> {
                         };
                     }
 
-                    const items = mentionProps.map(mentionProp => {
+                    const items = mentionProps.slice(0, 5).map(mentionProp => {
                         if (mentionProp.mentionData == null) {
                             return null;
                         }

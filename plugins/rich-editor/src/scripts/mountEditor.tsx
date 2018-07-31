@@ -32,6 +32,7 @@ export default function mountEditor(containerSelector: string | Element) {
             <Editor editorID={editorID} editorDescriptionID={descriptionID} bodybox={bodybox as HTMLInputElement} />,
             container,
         );
+        container.classList.remove("isDisabled");
     } else {
         throw new Error(`Unsupported initial editor format ${initialFormat}`);
     }

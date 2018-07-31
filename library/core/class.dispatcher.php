@@ -474,7 +474,7 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
      */
     private function findController(array $parts) {
         // Look for the old-school application name as the first part of the path.
-        if (in_array( $parts[0] ?? false, $this->getEnabledApplicationFolders())) {
+        if (in_array(($parts[0] ?? false), $this->getEnabledApplicationFolders())) {
             $application = array_shift($parts);
         } else {
             $application = '';

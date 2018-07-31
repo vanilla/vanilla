@@ -13,7 +13,7 @@ class Code extends AbstractFormat {
      * @inheritDoc
      */
     protected static function getAttributeLookupKey(): string {
-        return "code-inline";
+        return "codeInline";
     }
 
     /**

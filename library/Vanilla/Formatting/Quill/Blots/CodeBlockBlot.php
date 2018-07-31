@@ -19,7 +19,7 @@ class CodeBlockBlot extends TextBlot {
      * @inheritdoc
      */
     public static function matches(array $operations): bool {
-        return static::opAttrsContainKeyWithValue($operations, "code-block");
+        return static::opAttrsContainKeyWithValue($operations, "codeBlock");
     }
 
     /**

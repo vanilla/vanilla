@@ -1,8 +1,0 @@
-[
-    { "insert": "Line 1" },
-    { "attributes": { "code-block": true }, "insert": "\n\n" },
-    { "insert": "Line 3" },
-    { "attributes": { "code-block": true }, "insert": "\n\n\n\n" },
-    { "insert": "Line 7" },
-    { "attributes": { "code-block": true }, "insert": "\n" }
-]

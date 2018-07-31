@@ -13,6 +13,7 @@ import CodeBlockBlot from "@rich-editor/quill/blots/blocks/CodeBlockBlot";
 import BlockquoteLineBlot from "@rich-editor/quill/blots/blocks/BlockquoteBlot";
 import SpoilerLineBlot from "@rich-editor/quill/blots/blocks/SpoilerBlot";
 import HeadingBlot from "quill/formats/header";
+import ListBlot from "quill/formats/list";
 import { StringMap } from "quill/core";
 
 export default class OpUtils {
@@ -45,13 +46,13 @@ export default class OpUtils {
     public static codeInline(content: string = "TEST") {
         return OpUtils.op(content, { [CodeBlot.blotName]: true });
     }
-    public static link(content: string = "TEST", href: string = OpUtils.DEFAULT_LINK) {
-        return OpUtils.op(content, { [LinkBlot.blotName]: OpUtils.DEFAULT_LINK });
+    public static link(href: string = OpUtils.DEFAULT_LINK, content: string = "TEST") {
+        return OpUtils.op(content, { [LinkBlot.blotName]: href });
     }
     public static codeBlock(lineContent: string = "\n") {
         return OpUtils.op(lineContent, { [CodeBlockBlot.blotName]: true });
     }
-    public static heading(lineContent: string = "\n", level: number = 2) {
+    public static heading(level: number = 2, lineContent: string = "\n") {
         return OpUtils.op(lineContent, { [HeadingBlot.blotName]: level });
     }
     public static quoteLine(lineContent: string = "\n") {
@@ -59,5 +60,8 @@ export default class OpUtils {
     }
     public static spoilerLine(lineContent: string = "\n") {
         return OpUtils.op(lineContent, { [SpoilerLineBlot.blotName]: true });
+    }
+    public static list(listType: "ordered" | "bullet" = "ordered", lineContent: string = "\n") {
+        return OpUtils.op(lineContent, { [ListBlot.blotName]: listType });
     }
 }

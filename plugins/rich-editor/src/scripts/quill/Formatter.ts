@@ -59,15 +59,15 @@ export default class Formatter {
     };
     public paragraph = (range: RangeStatic) => {
         Formatter.BLOCK_FORMAT_NAMES.forEach(name => {
-            this.quill.formatText(range.index, range.length, name, false, Quill.sources.API);
+            this.quill.formatLine(range.index, range.length, name, false, Quill.sources.API);
         });
         this.quill.update(Quill.sources.USER);
     };
     public h2 = (range: RangeStatic) => {
-        this.quill.formatText(range.index, range.length, HeadingBlot.blotName, 2, Quill.sources.USER);
+        this.quill.formatLine(range.index, range.length, HeadingBlot.blotName, 2, Quill.sources.USER);
     };
     public h3 = (range: RangeStatic) => {
-        this.quill.formatText(range.index, range.length, HeadingBlot.blotName, 3, Quill.sources.USER);
+        this.quill.formatLine(range.index, range.length, HeadingBlot.blotName, 3, Quill.sources.USER);
     };
     public codeBlock = (range: RangeStatic) => {
         const line = this.quill.getLine(range.index)[0] as Blot;
@@ -76,13 +76,13 @@ export default class Formatter {
 
         // Code cannot have any inline formattings inside of it.
         this.quill.removeFormat(index, length, Quill.sources.API);
-        this.quill.formatText(range.index, range.length, CodeBlockBlot.blotName, true, Quill.sources.USER);
+        this.quill.formatLine(range.index, range.length, CodeBlockBlot.blotName, true, Quill.sources.USER);
     };
     public blockquote = (range: RangeStatic) => {
-        this.quill.formatText(range.index, range.length, BlockquoteLineBlot.blotName, true, Quill.sources.USER);
+        this.quill.formatLine(range.index, range.length, BlockquoteLineBlot.blotName, true, Quill.sources.USER);
     };
     public spoiler = (range: RangeStatic) => {
-        this.quill.formatText(range.index, range.length, SpoilerLineBlot.blotName, true, Quill.sources.USER);
+        this.quill.formatLine(range.index, range.length, SpoilerLineBlot.blotName, true, Quill.sources.USER);
     };
 
     private handleBooleanFormat(range: RangeStatic, formatKey: string) {

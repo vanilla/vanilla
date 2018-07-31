@@ -73,7 +73,7 @@ class RendererTest extends SharedBootstrapTestCase {
             ["emoji"],
             ["blockquote"],
             ["spoiler"],
-            ["code-block"],
+            ["codeBlock"],
             ["all"],
             ["all-blocks"],
         ];

@@ -376,7 +376,7 @@ trait NestedCollection {
         $this->touchKey($link);
         $link['cssClass'] = $cssClass.' '.$this->buildCssClass($this->linkCssClassPrefix, $link);
 
-        $listItemCssClasses = val('listItemCssClasses', $modifiers, []);
+        $listItemCssClasses = $modifiers['listItemCssClasses'] ?? [];
         if ($disabled) {
             $listItemCssClasses[] = 'disabled';
         }
@@ -425,9 +425,10 @@ trait NestedCollection {
      * @param array $item The item to add to the array.
      * @throws Exception
      */
-    private function addItem($type, $item) {
+    private function addItem($type, Array $item) {
         $this->touchKey($item);
-        if (!is_array( $key = $item['key'] ?? false)) {
+        $key = $item['key'] ?? false;
+        if (!is_array($key)) {
             $item['key'] = explode('.', $key);
         } else {
             $item['key'] = array_values($key);
@@ -440,7 +441,7 @@ trait NestedCollection {
 
         // Walk into the items list to set the item.
         $items =& $this->items;
-        foreach ( $item['key'] as $i => $key_part) {
+        foreach ($item['key'] as $i => $key_part) {
 
             if ($i === count($item['key'] ?? false) - 1) {
                 // Add the item here.
@@ -533,7 +534,10 @@ trait NestedCollection {
         } else {
             $highlightRoute = url($this->highlightRoute);
         }
-        return (val('url', $item) && (trim(url(val('url', $item)), '/') == trim($highlightRoute, '/')));
+        if ($ret = ($url = $item['url'] ? true : false)) {
+            $ret = trim(url($url), '/') == trim($highlightRoute, '/');
+        }
+        return $ret;
     }
 
     /**

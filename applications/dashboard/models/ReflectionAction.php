@@ -322,7 +322,7 @@ class ReflectionAction {
                     }
 
                     if (isset($param['description'])) {
-                        $param['description'] = \Gdn_Format::to($param['description'], 'markdown');
+                        $param['description'] = $param['description'];
                     }
 
                     if (isset($allInArr['required']) && in_array($name, $allInArr['required'])) {

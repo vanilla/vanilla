@@ -1,7 +1,7 @@
 $richEditor-font_size: $global-large_fontSize !default;
 $richEditor-icon_size: $icon-default_size !default;
 $richEditor-lineHeight: $global-base_lineHeight !default;
-$richEditor-menuButton_size: 39px !default;
+$richEditor-menuButton_size: 36px !default;
 $richEditor-bg_color: $global-color_bg !default;
 $richEditor_leftPadding: 36px !default;
 $richEditor_minHeight: 200px !default;
@@ -46,7 +46,8 @@ $richEditor-emojiGroup_paddingLeft: 3px;
 $richEditor-mobileEmbedMenu_borderColor: $global-color_primary;
 $richEditor-mobileEmbedMenu_transitionDuration: .15s;
 $richEditor-mobileEmbedMenu_transitionTiming: ease-out;
-$richEditor-selected_bg: rgba(174, 228, 254, 0.2);
+$richEditor-hover_bg: rgba(174, 228, 255, 0.2);
+$richEditor-focus_bg: rgba(174, 228, 255, 0.4);
 $richEditor-border_width: 1px;
 $richEditor-outline_width: 1px;
 
@@ -58,6 +59,7 @@ $richEditor-text_offset: 0;
 
 
 $richEditor-outline_color: rgba(2, 145, 219, 0.6);
+$richEditor-selected_color: #0075f5;
 
 $richEditor-videoPlayIcon_width: 80px;
 $richEditor-videoPlayIcon_hoverColor: #0291db;

@@ -9,7 +9,7 @@ namespace VanillaTests\Library\Vanilla\Formatting\Quill;
 
 use VanillaTests\SharedBootstrapTestCase;
 use Vanilla\Formatting\Quill\BlotGroup;
-use Vanilla\Formatting\Quill\Blots\HeadingBlot;
+use Vanilla\Formatting\Quill\Blots\Lines\HeadingBlot;
 use Vanilla\Formatting\Quill\Blots\TextBlot;
 
 class BlotGroupTest extends SharedBootstrapTestCase {

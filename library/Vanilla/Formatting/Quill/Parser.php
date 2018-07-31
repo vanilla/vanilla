@@ -62,8 +62,8 @@ class Parser {
             ->addBlot(Blots\Lines\SpoilerLineBlot::class)
             ->addBlot(Blots\Lines\BlockquoteLineBlot::class)
             ->addBlot(Blots\Lines\ListLineBlot::class)
+            ->addBlot(Blots\Lines\HeadingBlot::class)
             ->addBlot(Blots\CodeBlockBlot::class)
-            ->addBlot(Blots\HeadingBlot::class)
             ->addBlot(Blots\TextBlot::class)// This needs to be the last one!!!
             ->addFormat(Formats\Link::class)
             ->addFormat(Formats\Bold::class)

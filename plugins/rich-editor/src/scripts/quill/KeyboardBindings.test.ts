@@ -69,7 +69,7 @@ describe("KeyboardBindings", () => {
 
     it("handleCodeBlockEnter", () => {
         const delta = new Delta().insert("line\n\n\n", {
-            "codeBlock": true,
+            codeBlock: true,
         });
         quill.setContents(delta);
 

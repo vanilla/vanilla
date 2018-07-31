@@ -13,26 +13,10 @@ import { watchFocusInDomTree } from "@dashboard/dom";
 import { createEditorFlyoutEscapeListener, isEmbedSelected } from "@rich-editor/quill/utility";
 import Formatter from "@rich-editor/quill/Formatter";
 import ParagraphToolbarMenuItems from "@rich-editor/components/toolbars/pieces/ParagraphToolbarMenuItems";
-
-const PARAGRAPH_ITEMS = {
-    header: {
-        2: {
-            name: "heading2",
-        },
-        3: {
-            name: "heading3",
-        },
-    },
-    "blockquote-line": {
-        name: "blockquote",
-    },
-    "code-block": {
-        name: "codeBlock",
-    },
-    "spoiler-line": {
-        name: "spoiler",
-    },
-};
+import CodeBlockBlot from "@rich-editor/quill/blots/blocks/CodeBlockBlot";
+import BlockquoteLineBlot from "@rich-editor/quill/blots/blocks/BlockquoteBlot";
+import SpoilerLineBlot from "@rich-editor/quill/blots/blocks/SpoilerBlot";
+import HeadingBlot from "quill/formats/header";
 
 interface IProps extends IWithEditorProps {}
 
@@ -91,8 +75,6 @@ export class ParagraphToolbar extends React.PureComponent<IProps, IState> {
             pilcrowClasses += " isHidden";
         }
 
-        const Icon = Icons[this.activeFormatKey];
-
         return (
             <div
                 id={this.componentID}
@@ -113,7 +95,7 @@ export class ParagraphToolbar extends React.PureComponent<IProps, IState> {
                     onClick={this.pilcrowClickHandler}
                     onKeyDown={this.handleKeyPress}
                 >
-                    <Icon />
+                    {this.activeFormatIcon}
                 </button>
                 <div
                     id={this.menuID}
@@ -138,28 +120,26 @@ export class ParagraphToolbar extends React.PureComponent<IProps, IState> {
     /**
      * Get the active format for the current line.
      */
-    private get activeFormatKey() {
-        const { instanceState } = this.props;
-        const DEFAULT_FORMAT_KEY = "pilcrow";
-        if (!instanceState.lastGoodSelection) {
-            return DEFAULT_FORMAT_KEY;
+    private get activeFormatIcon(): JSX.Element {
+        const { activeFormats } = this.props;
+        if (activeFormats[HeadingBlot.blotName] === 2) {
+            return Icons.heading2();
         }
-        // Check which paragraph formatting items are ready.
-        const activeFormats = this.quill.getFormat(instanceState.lastGoodSelection);
-        for (const [formatName, formatValue] of Object.entries(activeFormats)) {
-            if (formatName in PARAGRAPH_ITEMS) {
-                let item = PARAGRAPH_ITEMS[formatName];
-
-                // In case its a heading
-                if (formatName === "header" && (formatValue as string) in item) {
-                    item = item[formatValue as string];
-                }
-
-                return item.name;
-            }
+        if (activeFormats[HeadingBlot.blotName] === 3) {
+            return Icons.heading3();
+        }
+        if (activeFormats[BlockquoteLineBlot.blotName] === true) {
+            return Icons.blockquote();
+        }
+        if (activeFormats[CodeBlockBlot.blotName] === true) {
+            return Icons.codeBlock();
+        }
+        if (activeFormats[SpoilerLineBlot.blotName] === true) {
+            return Icons.spoiler();
         }
 
-        return DEFAULT_FORMAT_KEY;
+        // Fallback to paragraph formatting.
+        return Icons.pilcrow();
     }
 
     /**

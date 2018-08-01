@@ -3,6 +3,8 @@
 \* -------------------------------------------------------------- */
 /* -------------------------------------------------------------- *    Globals
 \* -------------------------------------------------------------- */
+/* -------------------------------------------------------------- *    States Colors
+\* -------------------------------------------------------------- */
 /* -------------------------------------------------------------- *    Password Strength Colors
 \* -------------------------------------------------------------- */
 /* -------------------------------------------------------------- *    Third Party Colors
@@ -871,7 +873,6 @@ label.checkbox input.checkbox-input {
 }
 
 .richEditor-nextInput,
-.atMentionList-suggestion,
 .iconButton,
 .richEditor-button {
   white-space: nowrap;
@@ -1280,22 +1281,6 @@ label.checkbox input.checkbox-input {
           transform: translateY(1px);
 }
 
-.blockquote {
-  display: block;
-  margin: 0;
-  padding-top: 0;
-  padding-left: 18px;
-  padding-right: 0;
-  padding-bottom: 0;
-  padding: 3px 3px 3px 18px;
-  border-left: solid #D8D8D8 6px;
-  box-sizing: border-box;
-  width: 100%;
-  vertical-align: middle;
-  border-left: solid #D8D8D8 6px;
-  color: #A3A3A3;
-}
-
 .userContent > *:not(:last-child) {
   margin-bottom: .6em;
 }
@@ -1378,92 +1363,6 @@ label.checkbox input.checkbox-input {
   padding: 0;
   width: 24px;
   size: 24px;
-}
-
-.atMentionList {
-  position: absolute;
-  width: 200px;
-}
-
-.atMentionList-items.MenuItems {
-  display: block;
-  padding: 3px 0;
-}
-
-.atMentionList-items.isHidden {
-  display: none;
-}
-
-.atMentionList-item.isActive .atMentionList-suggestion {
-  background-color: #e1f2fb;
-}
-
-.atMentionList-suggestion {
-  width: 100%;
-  cursor: pointer;
-}
-
-.atMentionList-user,
-.atMentionList-noResults {
-  display: -webkit-box;
-  display: -webkit-flex;
-  display: -ms-flexbox;
-  display: flex;
-  -webkit-box-align: center;
-  -webkit-align-items: center;
-      -ms-flex-align: center;
-          align-items: center;
-  width: 100%;
-  box-sizing: border-box;
-  overflow: hidden;
-  line-height: 30px;
-  padding-top: 3px;
-  padding-right: 6px;
-  padding-bottom: 3px;
-  padding-left: 6px;
-}
-
-.atMentionList-photoWrap {
-  margin-right: 10px;
-}
-
-.atMentionList-photo {
-  width: 30px;
-  height: 30px;
-}
-
-.atMentionList-userName {
-  display: block;
-  -webkit-box-flex: 1;
-  -webkit-flex-grow: 1;
-      -ms-flex-positive: 1;
-          flex-grow: 1;
-  overflow: hidden;
-  white-space: nowrap;
-  text-overflow: ellipsis;
-  max-width: -webkit-calc(100% - 40px);
-  max-width: calc(100% - 40px);
-}
-
-.atMentionList-mark {
-  padding: 0;
-  font-weight: 600;
-}
-
-.atMentionList-photo {
-  display: block;
-}
-
-.atMention {
-  color: inherit;
-  font-weight: 600;
-}
-
-.richEditor .atMention {
-  -webkit-user-select: all;
-     -moz-user-select: all;
-      -ms-user-select: all;
-          user-select: all;
 }
 
 body.hasRichEditor #Form_Preview {
@@ -1571,6 +1470,128 @@ body.isMobile .richEditorParagraphMenu {
   .richEditorParagraphMenu {
     display: none !important;
   }
+}
+
+.atMentionList {
+  position: absolute;
+  width: 200px;
+}
+
+.atMentionList-suggestion {
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  overflow-x: hidden;
+  max-width: 100%;
+  position: relative;
+  -webkit-appearance: none;
+     -moz-appearance: none;
+          appearance: none;
+  border: 0;
+  padding: 0;
+  background: none;
+  width: 100%;
+  text-align: left;
+}
+
+.atMentionList-items.MenuItems {
+  display: block;
+  padding: 3px 0;
+}
+
+.atMentionList-items.isHidden {
+  display: none;
+}
+
+.atMentionList-item.isActive .atMentionList-suggestion {
+  background-color: #e1f2fb;
+}
+
+.atMentionList-suggestion {
+  width: 100%;
+  cursor: pointer;
+}
+
+.atMentionList-user,
+.atMentionList-noResults {
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-align: center;
+  -webkit-align-items: center;
+      -ms-flex-align: center;
+          align-items: center;
+  width: 100%;
+  box-sizing: border-box;
+  overflow: hidden;
+  line-height: 30px;
+  padding-top: 3px;
+  padding-right: 6px;
+  padding-bottom: 3px;
+  padding-left: 6px;
+}
+
+.atMentionList-photoWrap {
+  margin-right: 10px;
+}
+
+.atMentionList-photo {
+  width: 30px;
+  height: 30px;
+}
+
+.atMentionList-userName {
+  display: block;
+  -webkit-box-flex: 1;
+  -webkit-flex-grow: 1;
+      -ms-flex-positive: 1;
+          flex-grow: 1;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  max-width: -webkit-calc(100% - 40px);
+  max-width: calc(100% - 40px);
+}
+
+.atMentionList-mark {
+  padding: 0;
+  font-weight: 600;
+}
+
+.atMentionList-photo {
+  display: block;
+}
+
+.atMention {
+  color: inherit;
+  font-weight: 600;
+  -webkit-user-select: all;
+     -moz-user-select: all;
+      -ms-user-select: all;
+          user-select: all;
+}
+
+.blockquote {
+  display: block;
+  margin: 0;
+  padding-top: 0;
+  padding-left: 18px;
+  padding-right: 0;
+  padding-bottom: 0;
+  padding: 3px 3px 3px 18px;
+  border-left: solid #d8d9db 6px;
+  box-sizing: border-box;
+  width: 100%;
+  vertical-align: middle;
+  color: #a2a4a9;
+}
+
+.blockquote-content > *:first-child {
+  margin-top: 0;
+}
+
+.blockquote-content > *:first-child:last-child {
+  margin-bottom: 0;
 }
 
 .accessibility-jumpTo {

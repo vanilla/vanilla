@@ -123,12 +123,12 @@ $spinnerOffset: 73deg;
 
 
 @mixin editorButtonFocusStyles($offset: - $formElement_borderWidth) {
-    background: $richEditor-button_focus_bg;
+    background: $state-color_focus;
     outline: none;
 }
 
 @mixin editorButtonActiveStyles() {
-    background-color: $richEditor-button_selected_bg;
+    background-color: $state-color_selected;
 }
 
 @mixin ieHack {

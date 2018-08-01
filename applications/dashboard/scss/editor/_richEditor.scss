@@ -1,70 +1,56 @@
-$richEditor-menuButton_size: 36px !default;
+$richEditor-menuButton_size                       : 36px !default;
 
-$richEditor_bg: $global-color_bg !default;
-$richEditor_leftPadding: 30px !default;
-$richEditor_minHeight: 200px !default;
-$richEditor_verticalPadding: 9px !default;
-$richEditor_padding: $richEditor_verticalPadding 12px !default;
-$richEditor-outline_color: rgba($global-color_primary, 0.6) !default; // TODO drerrive
+$richEditor_bg                                    : $global-color_bg !default;
+$richEditor_leftPadding                           : 30px !default;
+$richEditor_minHeight                             : 200px !default;
+$richEditor_verticalPadding                       : 9px !default;
+$richEditor_padding                               : $richEditor_verticalPadding 12px !default;
+$richEditor-outline_color                         : rgba($global-color_primary, 0.6) !default; // TODO drerrive
 
-$richEditor-embedMenu_padding: 0 !default;
-$richEditor-icon_opacity: .7 !default;
+$richEditor-embedMenu_padding                     : 0 !default;
+$richEditor-icon_opacity                          : .7 !default;
 
-$richEditor-atMention_width: 200px !default;
-$richEditor-atMentionAvatar_width: 30px !default;
-$richEditor-atMentionAvatar_margin: 10px !default;
-$richEditor-atMentionMark_weight: 600 !default;
-$richEditor-atMentionLink_weight: 600 !default;
-$richEditor-atMentionUser_paddingHorizontal: 6px !default;
-$richEditor-atMentionUser_paddingVertical: 3px !default;
-$richEditor-atMentionSelected_bg: #f4f3f5 !default; // TODO - derrive
+$richEditor-insertLink_width                      : 387px !default;
 
-$richEditor-insertLink_width: 387px !default;
+$richEditor-insertPopover_paddingVertical         : 12px !default;
+$richEditor-insertPopover_paddingHorizontal       : 12px !default;
+$richEditor-insertPopover_maxHeight               : 100vh !default;
+$richEditor-insertPopover_height                  : $richEditor-menuButton_size * 7.5 !default;
 
-$richEditor-insertPopover_paddingVertical: 12px !default;
-$richEditor-insertPopover_paddingHorizontal: 12px !default;
-$richEditor-insertPopover_maxHeight: 100vh !default;
-$richEditor-insertPopover_height: $richEditor-menuButton_size * 7.5 !default;
+//$richEditor-emoji_width: 7 * $richEditor-menuButton_size + 2 * $richEditor-insertPopover_paddingHorizontal;
 
-$richEditor-emoji_width: 7 * $richEditor-menuButton_size + 2 * $richEditor-insertPopover_paddingHorizontal;
+$richEditor-nub_width                             : 12px !default;
 
-$richEditor-nub_width: 12px !default;
+$richEditor-menu_borderWidth                      : 1px !default;
+$richEditor-menu_offset                           : $richEditor-nub_width !default;
 
-$richEditor-menu_borderWidth: 1px !default;
-$richEditor-menu_offset: $richEditor-nub_width !default;
+$richEditor-pilcrow_offset                        : 9px!default;
+$richEditor-pilcrow_fontSize                      : 14px !default;
+$richEditor-pilcrow_gutter                        : 36px !default; //TODO - tweak size
+$richEditor-pilcrowAnimation_duration             : 0.3s;
 
-$richEditor-pilcrow_offset: 9px!default;
-$richEditor-pilcrow_fontSize: 14px !default;
-$richEditor-pilcrow_gutter: 36px !default; //TODO - tweak size
-$richEditor-pilcrowAnimation_duration: 0.3s;
+$richEditor-emojiCategory_color                   : #737982 !default; // TODO derrive
+$richEditor-emojiCategory_hoverColor              : #212327 !default; // TODO drrive
+$richEditor-emojiGroup_paddingLeft                : 3px !default;
+$richEditor-emojiOutline_offset                   : -#{$formElement_borderWidth + 2} !default;
 
-$richEditor-emojiCategory_color: #737982 !default; // TODO derrive
-$richEditor-emojiCategory_hoverColor: #212327 !default; // TODO drrive
-$richEditor-emojiGroup_paddingLeft: 3px !default;
-$richEditor-emojiOutline_offset: -#{$formElement_borderWidth + 2} !default;
-
-$richEditor-mobileEmbedMenu_borderColor: $global-color_primary !default;
-$richEditor-mobileEmbedMenu_transitionDuration: .15s !default;
-$richEditor-mobileEmbedMenu_transitionTiming: ease-out !default;
-
-// New values
-$richEditor-button_hover_bg: mix($global-color_primary, $global-color_bg, 5.5%) !default; // rgba(174, 228, 255, 0.2);
-$richEditor-button_focus_bg: mix($global-color_primary, $global-color_bg, 12%) !default; // rgba(174, 228, 255, 0.4);
-$richEditor-button_selected_bg: mix($global-color_primary, $global-color_fg, 95%) !default; // #0075f5
-
-$richEditor-embedButton_offset: - $formElement_borderWidth !default;
-$richEditor-paragraphMenuButton_offset: - $formElement_borderWidth + 1 !default;
-$richEditor-text_offset: 0 !default;
+$richEditor-mobileEmbedMenu_borderColor           : $global-color_primary !default;
+$richEditor-mobileEmbedMenu_transitionDuration    : .15s !default;
+$richEditor-mobileEmbedMenu_transitionTiming      : ease-out !default;
 
 
+$richEditor-embedButton_offset                    : -$formElement_borderWidth !default;
+$richEditor-paragraphMenuButton_offset            : -$formElement_borderWidth + 1 !default;
+$richEditor-text_offset                           : 0 !default;
 
-$embedImage_width: 640px !default;
-$embedded-quote_fg: #A3A3A3 !default; // TODO Derrive
+$embedImage_width                                 : 640px !default;
+
+
 
 // Break Points
-$richEditor-mobile_spacing: 18px !default;
-$richEditor-mobileBreakPoint: 700px !default;
-$richEditor-mobileEmbedBreakPoint: 550px !default;
+$richEditor-mobile_spacing                        : 18px !default;
+$richEditor-mobileBreakPoint                      : 700px !default;
+$richEditor-mobileEmbedBreakPoint                 : 550px !default;
 
 
 .richEditor {
@@ -186,7 +172,6 @@ $richEditor-mobileEmbedBreakPoint: 550px !default;
 
 // button reset
 .richEditor-nextInput,
-.atMentionList-suggestion,
 .iconButton,
 .richEditor-button {
     @include singleLineEllipsis;
@@ -225,7 +210,7 @@ $richEditor-mobileEmbedBreakPoint: 550px !default;
     }
 
     &:hover {
-        background: $richEditor-button_hover_bg;
+        background: $state-color_hover;
     }
 
     &:focus {
@@ -546,25 +531,6 @@ $richEditor-mobileEmbedBreakPoint: 550px !default;
     }
 }
 
-.blockquote {
-    display: block;
-    margin: 0;
-    padding: {
-        top: 0;
-        left: 18px;
-        right: 0;
-        bottom: 0;
-    };
-    padding: 3px 3px 3px 18px;
-    border-left: solid #D8D8D8 6px;
-    box-sizing: border-box;
-    width: 100%;
-    vertical-align: middle;
-    border-left: solid #D8D8D8 6px;
-    color: $embedded-quote_fg;
-}
-
-
 
 
 
@@ -649,92 +615,6 @@ $richEditor-mobileEmbedBreakPoint: 550px !default;
     width: $icon-default_size;
     size: $icon-default_size;
 }
-
-
-// @mentions
-.atMentionList {
-    position: absolute;
-    width: $richEditor-atMention_width;
-}
-
-.atMentionList-items {
-    &.MenuItems {
-        display: block;
-        padding: $richEditor-atMentionUser_paddingVertical 0;
-    }
-
-    &.isHidden {
-        display: none;
-    }
-}
-
-.atMentionList-item {
-    &.isActive {
-        .atMentionList-suggestion {
-            background-color: $richEditor-button_focus_bg;
-        }
-    }
-}
-
-.atMentionList-suggestion {
-    width: 100%;
-    cursor: pointer;
-}
-
-.atMentionList-user,
-.atMentionList-noResults {
-    display: flex;
-    align-items: center;
-    width: 100%;
-    box-sizing: border-box;
-    overflow: hidden;
-    line-height: $richEditor-atMentionAvatar_width;
-    padding: {
-        top: $richEditor-atMentionUser_paddingVertical;
-        right: $richEditor-atMentionUser_paddingHorizontal;
-        bottom: $richEditor-atMentionUser_paddingVertical;
-        left: $richEditor-atMentionUser_paddingHorizontal;
-    }
-}
-
-.atMentionList-photoWrap {
-    margin-right: $richEditor-atMentionAvatar_margin;
-}
-
-.atMentionList-photo {
-    width: $richEditor-atMentionAvatar_width;
-    height: $richEditor-atMentionAvatar_width;
-}
-
-.atMentionList-userName {
-    display: block;
-    flex-grow: 1;
-    overflow: hidden;
-    white-space: nowrap;
-    text-overflow: ellipsis;
-    max-width: calc(100% - #{$richEditor-atMentionAvatar_margin + $richEditor-atMentionAvatar_width});
-}
-
-.atMentionList-mark {
-    padding: 0;
-    font-weight: $richEditor-atMentionMark_weight;
-}
-
-.atMentionList-photo {
-    display: block;
-}
-
-// Rendered link
-.atMention  {
-    color: inherit;
-    font-weight: $richEditor-atMentionLink_weight;
-}
-
-// Only allow selection of the entire mention at once in the editor.
-.richEditor .atMention {
-    user-select: all;
-}
-
 
 body.hasRichEditor {
     // Hide Preview

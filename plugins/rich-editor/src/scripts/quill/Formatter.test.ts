@@ -66,12 +66,14 @@ describe("Formatter", () => {
         const formattingFunction = (range = getFullRange()) => formatter.h2(range);
         testLineFormatInlinePreservation("h2", formattingFunction, OpUtils.heading(2));
         testLineFormatExclusivity("h2", formattingFunction, OpUtils.heading(2));
+        testMultiLineFormatting("h2", formattingFunction, OpUtils.heading(2));
     });
 
     describe("h3()", () => {
         const formattingFunction = (range = getFullRange()) => formatter.h3(range);
         testLineFormatInlinePreservation("h3", formattingFunction, OpUtils.heading(3));
         testLineFormatExclusivity("h3", formattingFunction, OpUtils.heading(3));
+        testMultiLineFormatting("h3", formattingFunction, OpUtils.heading(3));
     });
 
     describe("blockquote()", () => {
@@ -85,12 +87,14 @@ describe("Formatter", () => {
         const formattingFunction = (range = getFullRange()) => formatter.spoiler(range);
         testLineFormatInlinePreservation("spoiler", formattingFunction, OpUtils.spoilerLine());
         testLineFormatExclusivity("spoiler", formattingFunction, OpUtils.spoilerLine());
+        testMultiLineFormatting("spoiler-line", formattingFunction, OpUtils.spoilerLine());
     });
 
     describe("codeBlock()", () => {
         const formattingFunction = (range = getFullRange()) => formatter.codeBlock(range);
         testNoLineFormatInlinePreservation("codeBlock", formattingFunction, OpUtils.codeBlock());
         testLineFormatExclusivity("codeBlock", formattingFunction, OpUtils.codeBlock(), true);
+        // testMultiLineFormatting("codeBlock", formattingFunction, OpUtils.codeBlock());
     });
 
     function assertQuillInputOutput(input: any[], expectedOutput: any[], formattingFunction: () => void) {
@@ -235,16 +239,34 @@ describe("Formatter", () => {
 
         describe(`can apply the ${lineFormatName} format to single line of all other multiline blots`, () => {
             blockFormatOps.forEach(({ op, name }) => {
-                const initial = [OpUtils.op(), op, OpUtils.op(), op, OpUtils.op(), op];
+                const one = OpUtils.op("1");
+                const two = OpUtils.op("2");
+                const three = OpUtils.op("3");
+                const initial = [one, op, two, op, three, op];
 
-                it(`can apply the ${lineFormatName} format to the first line of 3 lines of the ${name} format`, () => {
-                    const expected = [OpUtils.op(), lineOp, OpUtils.op(), op, OpUtils.op(), op];
-                    const range: RangeStatic = { index: 0, length: 4 };
+                it(`can apply the ${lineFormatName} format to the 1st line of 3 lines of the ${name} format`, () => {
+                    const expected = [one, lineOp, two, op, three, op];
+                    const range: RangeStatic = { index: 0, length: 0 };
+                    const formatterFunction = () => format(range);
+                    assertQuillInputOutput(initial, expected, formatterFunction);
+                });
+
+                it(`can apply the ${lineFormatName} format to the 2nd line of 3 lines of the ${name} format`, () => {
+                    const expected = [one, op, two, lineOp, three, op];
+                    const range: RangeStatic = { index: 2, length: 0 };
+                    const formatterFunction = () => format(range);
+                    assertQuillInputOutput(initial, expected, formatterFunction);
+                });
+
+                it(`can apply the ${lineFormatName} format to the 3rd line of 3 lines of the ${name} format`, () => {
+                    const expected = [one, op, two, op, three, lineOp];
+                    const range: RangeStatic = { index: 4, length: 0 };
                     const formatterFunction = () => format(range);
                     assertQuillInputOutput(initial, expected, formatterFunction);
                 });
             });
         });
+
         // Check formatting over multiple lines (splitting things properly as well).
     }
 });

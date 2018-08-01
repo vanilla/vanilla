@@ -21,7 +21,6 @@ interface IState {
 }
 
 export class ToolbarContainer extends React.PureComponent<IProps, IState> {
-    private quill: Quill;
     private flyoutRef: React.RefObject<any> = React.createRef();
     private nubRef: React.RefObject<any> = React.createRef();
 

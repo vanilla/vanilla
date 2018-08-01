@@ -26,9 +26,13 @@ interface IState {
     inputValue: string;
     isLinkMenuOpen: boolean;
     menuHasFocus: boolean;
+    quillHasFocus: boolean;
 }
 
-export class InlineToolbar extends React.PureComponent<IProps, IState> {
+/**
+ * This __cannot__ be a pure component because it needs to re-render when quill emits, even if the selection is the same.
+ */
+export class InlineToolbar extends React.Component<IProps, IState> {
     private quill: Quill;
     private formatter: Formatter;
     private linkInput: React.RefObject<HTMLInputElement> = React.createRef();
@@ -48,6 +52,7 @@ export class InlineToolbar extends React.PureComponent<IProps, IState> {
             inputValue: "",
             isLinkMenuOpen: false,
             menuHasFocus: false,
+            quillHasFocus: false,
         };
     }
 
@@ -133,6 +138,11 @@ export class InlineToolbar extends React.PureComponent<IProps, IState> {
     public componentDidMount() {
         document.addEventListener("keydown", this.escFunction, false);
         watchFocusInDomTree(this.selfRef.current!, this.handleFocusChange);
+        // this.quill.root.addEventListener("focusin", () => this.forceUpdate());
+        // this.quill.root.addEventListener("focusin", () => this.forceUpdate());
+        // this.quill.on("selection-change", () =>
+        // this.setState({ quillHasFocus: this.quill.root === document.activeElement }),
+        // );
 
         // Add a key binding for the link popup.
         const keyboard: Keyboard = this.quill.getModule("keyboard");

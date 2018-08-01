@@ -8,7 +8,7 @@ import Quill from "./index";
 import Formatter from "@rich-editor/quill/Formatter";
 import { RangeStatic } from "quill/core";
 import { expect } from "chai";
-import OpUtils, { inlineFormatOps, blockFormatOps } from "@rich-editor/__tests__/opUtils";
+import OpUtils, { inlineFormatOps, blockFormatOps } from "@rich-editor/__tests__/OpUtils";
 
 describe("Formatter", () => {
     let quill: Quill;

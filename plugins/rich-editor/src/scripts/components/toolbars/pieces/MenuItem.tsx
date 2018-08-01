@@ -29,18 +29,27 @@ export interface IProps extends IMenuItemData {
 export default class MenuItem extends React.PureComponent<IProps> {
     private buttonRef: React.RefObject<HTMLButtonElement> = React.createRef();
     public render() {
-        const { label, isDisabled, isActive, onClick, icon } = this.props;
+        const { label, isDisabled, isActive, onClick, icon, role } = this.props;
         const buttonClasses = classnames("richEditor-button", "richEditor-formatButton", "richEditor-menuItem", {
             isActive,
         });
 
+        const ariaAttributes = {
+            role,
+            "aria-label": label,
+        };
+
+        if (role === "menuitem") {
+            ariaAttributes["aria-pressed"] = isActive;
+        } else {
+            ariaAttributes["aria-checked"] = isActive;
+        }
+
         return (
             <button
+                {...ariaAttributes}
                 className={buttonClasses}
                 type="button"
-                role="menuitem"
-                aria-label={label}
-                aria-pressed={isActive}
                 onClick={onClick}
                 disabled={isDisabled}
                 onKeyDown={this.handleKeyPress}

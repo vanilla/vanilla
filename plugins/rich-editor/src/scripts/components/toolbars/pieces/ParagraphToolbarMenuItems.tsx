@@ -25,12 +25,18 @@ export default class ParagraphToolbarMenuItems extends React.PureComponent<IProp
 
     private get menuItemData() {
         const { activeFormats } = this.props;
+        let isParagraphEnabled = true;
+        ["header", "blockquote-line", "codeBlock", "spoiler-line"].forEach(item => {
+            if (item in activeFormats) {
+                isParagraphEnabled = false;
+            }
+        });
         return [
             {
                 icon: icons.pilcrow(),
                 label: t("Format as Paragraph"),
                 onClick: this.formatParagraph,
-                isActive: false,
+                isActive: isParagraphEnabled,
             },
             {
                 icon: icons.heading2(),
@@ -54,7 +60,7 @@ export default class ParagraphToolbarMenuItems extends React.PureComponent<IProp
                 icon: icons.codeBlock(),
                 label: t("Format as code block"),
                 onClick: this.formatCodeBlock,
-                isActive: activeFormats["code-block"] === true,
+                isActive: activeFormats.codeBlock === true,
             },
             {
                 icon: icons.spoiler(),

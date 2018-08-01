@@ -75,7 +75,9 @@ export default class Formatter {
         const length = index + line.length();
 
         // Code cannot have any inline formattings inside of it.
-        this.quill.removeFormat(index, length, Quill.sources.API);
+        for (const inlineFormatName of Formatter.INLINE_FORMAT_NAMES) {
+            this.quill.formatText(range.index, range.length, inlineFormatName, false, Quill.sources.API);
+        }
         this.quill.formatLine(range.index, range.length, CodeBlockBlot.blotName, true, Quill.sources.USER);
     };
     public blockquote = (range: RangeStatic) => {

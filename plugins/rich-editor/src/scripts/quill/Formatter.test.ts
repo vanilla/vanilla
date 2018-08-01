@@ -93,7 +93,7 @@ describe("Formatter", () => {
     describe("codeBlock()", () => {
         const formattingFunction = (range = getFullRange()) => formatter.codeBlock(range);
         testNoLineFormatInlinePreservation("codeBlock", formattingFunction, OpUtils.codeBlock());
-        testLineFormatExclusivity("codeBlock", formattingFunction, OpUtils.codeBlock(), true);
+        testLineFormatExclusivity("codeBlock", formattingFunction, OpUtils.codeBlock());
         // testMultiLineFormatting("codeBlock", formattingFunction, OpUtils.codeBlock());
     });
 
@@ -195,34 +195,31 @@ describe("Formatter", () => {
             inlineFormatOps.forEach(({ op, name }) => {
                 it(`it removes the ${name} format when added`, () => {
                     const initial = [op];
-                    const expected = [OpUtils.op(), lineOp, OpUtils.newline()];
+                    const expected = [OpUtils.op(), lineOp];
                     assertQuillInputOutput(initial, expected, formatterFunction);
                 });
             });
         });
     }
 
-    function testLineFormatExclusivity(
-        lineFormatName: string,
-        formatterFunction: () => void,
-        lineOp: any,
-        needsExtraNewLine: boolean = false,
-    ) {
+    function testLineFormatExclusivity(lineFormatName: string, formatterFunction: () => void, lineOp: any) {
         describe(`${lineFormatName} line format exclusivity`, () => {
             blockFormatOps.forEach(({ op, name }) => {
                 it(`it removes the ${name} format`, () => {
                     const initial = [OpUtils.op(), op];
                     const expected = [OpUtils.op(), lineOp];
-                    if (needsExtraNewLine) {
-                        expected.push(OpUtils.newline());
-                    }
                     assertQuillInputOutput(initial, expected, formatterFunction);
                 });
             });
         });
     }
 
-    function testMultiLineFormatting(lineFormatName: string, format: (range: RangeStatic) => void, lineOp: any) {
+    function testMultiLineFormatting(
+        lineFormatName: string,
+        format: (range: RangeStatic) => void,
+        lineOp: any,
+        needsExtraNewLine: boolean = false,
+    ) {
         it(`can apply the ${lineFormatName} format to multiple lines`, () => {
             const initial = [
                 OpUtils.op(),
@@ -238,7 +235,7 @@ describe("Formatter", () => {
         });
 
         describe(`can apply the ${lineFormatName} format to single line of all other multiline blots`, () => {
-            blockFormatOps.forEach(({ op, name }) => {
+            blockFormatOps.filter(({ name }) => name !== lineFormatName).forEach(({ op, name }) => {
                 const one = OpUtils.op("1");
                 const two = OpUtils.op("2");
                 const three = OpUtils.op("3");

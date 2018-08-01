@@ -425,7 +425,7 @@ trait NestedCollection {
      * @param array $item The item to add to the array.
      * @throws Exception
      */
-    private function addItem($type, Array $item) {
+    private function addItem($type, array $item) {
         $this->touchKey($item);
         $key = $item['key'] ?? false;
         if (!is_array($key)) {

@@ -734,7 +734,7 @@ label.checkbox input.checkbox-input {
 .richEditor {
   position: relative;
   display: block;
-  padding-left: 36px;
+  padding-left: 30px;
   font-size: 16px;
 }
 
@@ -844,8 +844,6 @@ label.checkbox input.checkbox-input {
           flex-wrap: nowrap;
   list-style: none;
   padding: 0;
-  width: -webkit-calc(100% - 2px);
-  width: calc(100% - 2px);
   margin-top: 0;
   margin-right: 0;
   margin-left: -1px;
@@ -859,9 +857,9 @@ label.checkbox input.checkbox-input {
 }
 
 .richEditor-menuItems .richEditor-menuItem .richEditor-button, .richEditor-menuItems .richEditor-menuItem.richEditor-button {
-  width: 39px;
-  font-size: 24px;
-  line-height: 39px;
+  width: 36px;
+  font-size: 22.1538461538px;
+  line-height: 36px;
 }
 
 .richEditor-menuItems .richEditor-menuItem .richEditor-button.emojiChar-🇺🇳, .richEditor-menuItems .richEditor-menuItem.richEditor-button.emojiChar-🇺🇳 {
@@ -903,7 +901,7 @@ label.checkbox input.checkbox-input {
 }
 
 .richEditor-button.richEditor-formatButton, .richEditor-button.richEditor-embedButton {
-  height: 39px;
+  height: 36px;
   color: inherit;
 }
 
@@ -916,12 +914,14 @@ label.checkbox input.checkbox-input {
   cursor: pointer;
 }
 
+.richEditor-button:hover {
+  background: rgba(2, 145, 219, 0.2);
+}
+
 .richEditor-button:focus {
   z-index: 2;
-  outline-width: 1px;
-  outline-offset: -1px;
-  outline-color: rgba(2, 145, 219, 0.6);
-  outline-style: solid;
+  background: rgba(2, 145, 219, 0.4);
+  outline: none;
 }
 
 .richEditor-button:hover .Close-x,
@@ -931,21 +931,17 @@ label.checkbox input.checkbox-input {
 }
 
 .richEditor-button.isActive {
-  background-color: rgba(174, 228, 254, 0.2);
+  background-color: rgba(2, 145, 219, 0.4);
 }
 
 .richEditor-button.richEditor-embedButton:focus {
-  outline-width: 1px;
-  outline-offset: -1px;
-  outline-color: rgba(2, 145, 219, 0.6);
-  outline-style: solid;
+  background: rgba(2, 145, 219, 0.4);
+  outline: none;
 }
 
 .richEditor-button.richEditor-formatButton:focus {
-  outline-width: 1px;
-  outline-offset: 0px;
-  outline-color: rgba(2, 145, 219, 0.6);
-  outline-style: solid;
+  background: rgba(2, 145, 219, 0.4);
+  outline: none;
 }
 
 .richEditor-menuWideItem,
@@ -958,9 +954,9 @@ label.checkbox input.checkbox-input {
 .richEditor-menuWideItem .richEditor-button, .richEditor-menuWideItem.richEditor-button,
 .richEditor-menuItem .richEditor-button,
 .richEditor-menuItem.richEditor-button {
-  width: 39px;
-  font-size: 24px;
-  line-height: 39px;
+  width: 36px;
+  font-size: 22.1538461538px;
+  line-height: 36px;
 }
 
 .richEditor-menuWideItem .richEditor-button.emojiChar-🇺🇳, .richEditor-menuWideItem.richEditor-button.emojiChar-🇺🇳,
@@ -972,15 +968,6 @@ label.checkbox input.checkbox-input {
 .richEditor-menuWideItem.isRightAligned,
 .richEditor-menuItem.isRightAligned {
   margin-left: auto;
-}
-
-.richEditor-nextInput {
-  height: 39px;
-  line-height: 39px;
-  font-size: 0.9em;
-  color: inherit;
-  padding-left: 9px;
-  padding-right: 9px;
 }
 
 .richEditor-upload {
@@ -1027,9 +1014,9 @@ label.checkbox input.checkbox-input {
 .richEditor-close.Close {
   position: relative;
   display: block;
-  width: 39px;
-  height: 39px;
-  line-height: 39px;
+  width: 36px;
+  height: 36px;
+  line-height: 36px;
   top: auto;
   right: auto;
   text-align: center;
@@ -1042,10 +1029,8 @@ label.checkbox input.checkbox-input {
 }
 
 .richEditor-close.Close:focus {
-  outline-width: 1px;
-  outline-offset: -1px;
-  outline-color: rgba(2, 145, 219, 0.6);
-  outline-style: solid;
+  background: rgba(2, 145, 219, 0.4);
+  outline: none;
 }
 
 .insertLink-input.InputBox {
@@ -1055,8 +1040,8 @@ label.checkbox input.checkbox-input {
   -webkit-flex-grow: 1;
       -ms-flex-positive: 1;
           flex-grow: 1;
-  max-width: -webkit-calc(100% - 39px);
-  max-width: calc(100% - 39px);
+  max-width: -webkit-calc(100% - 36px);
+  max-width: calc(100% - 36px);
 }
 
 .insertPopover {
@@ -1103,9 +1088,9 @@ label.checkbox input.checkbox-input {
   overflow-x: hidden;
   max-width: 100%;
   margin: 0;
-  max-width: -webkit-calc(100% - 39px);
-  max-width: calc(100% - 39px);
-  min-height: 27px;
+  max-width: -webkit-calc(100% - 36px);
+  max-width: calc(100% - 36px);
+  min-height: 24px;
 }
 
 .popover-title:focus {
@@ -1147,7 +1132,7 @@ label.checkbox input.checkbox-input {
 
 .insertEmoji-body {
   max-height: 100vh;
-  height: 292.5px;
+  height: 270px;
 }
 
 .content-wrapper {
@@ -1169,8 +1154,8 @@ label.checkbox input.checkbox-input {
 }
 
 .richEditor-insertEmoji {
-  width: 39px;
-  height: 39px;
+  width: 36px;
+  height: 36px;
   font-size: 24px;
   text-align: center;
   overflow: hidden;
@@ -1322,7 +1307,7 @@ label.checkbox input.checkbox-input {
 .userContent > *:not(:last-child) + h4,
 .userContent > *:not(:last-child) + h5,
 .userContent > *:not(:last-child) + h6 {
-  margin-top: 9.6px;
+  margin-top: .6em;
 }
 
 .userContent > *:first-child {
@@ -1380,7 +1365,7 @@ label.checkbox input.checkbox-input {
 }
 
 .emojiGroup.isSelected {
-  background-color: rgba(174, 228, 254, 0.2);
+  background-color: rgba(2, 145, 219, 0.4);
 }
 
 .emojiGroup + .emojiGroup {
@@ -1411,7 +1396,7 @@ label.checkbox input.checkbox-input {
 }
 
 .atMentionList-item.isActive .atMentionList-suggestion {
-  background-color: #f4f3f5;
+  background-color: rgba(2, 145, 219, 0.4);
 }
 
 .atMentionList-suggestion {
@@ -1492,6 +1477,7 @@ body.hasRichEditor #Form_Preview {
   }
   body.hasRichEditor.Section-PostDiscussion #DiscussionForm .FormWrapper {
     padding-left: 36px;
+    padding-right: 30px;
   }
   body.hasRichEditor.Section-PostDiscussion #DiscussionForm .FormWrapper .richEditor {
     padding-left: 0;
@@ -1504,6 +1490,7 @@ body.hasRichEditor #Form_Preview {
   }
   body.hasRichEditor .CommentForm .richEditor {
     padding-left: 36px;
+    padding-right: 30px;
   }
   body.hasRichEditor .CommentForm .richEditor .richEditor {
     padding-left: 0;
@@ -1511,14 +1498,18 @@ body.hasRichEditor #Form_Preview {
   body.hasRichEditor .DataListWrap .FormWrapper.FormWrapper-Condensed {
     padding-left: 0;
   }
+  body.hasRichEditor #GroupForm .Form-HeaderWrap,
   body.hasRichEditor #MessageForm .Form-HeaderWrap,
   body.hasRichEditor #ConversationForm .Form-HeaderWrap {
     display: none;
   }
+  body.hasRichEditor #GroupForm .FormWrapper,
   body.hasRichEditor #MessageForm .FormWrapper,
   body.hasRichEditor #ConversationForm .FormWrapper {
     padding-left: 36px;
+    padding-right: 30px;
   }
+  body.hasRichEditor #GroupForm .FormWrapper .richEditor,
   body.hasRichEditor #MessageForm .FormWrapper .richEditor,
   body.hasRichEditor #ConversationForm .FormWrapper .richEditor {
     padding-left: 0;
@@ -1539,8 +1530,8 @@ body.isMobile .richEditor {
 
 body.isMobile .richEditor-menu.insertPopover {
   left: 0;
-  width: -webkit-calc(100% + 4px);
-  width: calc(100% + 4px);
+  width: -webkit-calc(100% + 0);
+  width: calc(100% + 0);
 }
 
 body.isMobile .richEditor-embedBarMobileBorder {
@@ -1568,8 +1559,8 @@ body.isMobile .richEditorParagraphMenu {
   }
   .richEditor-menu.insertPopover {
     left: 0;
-    width: -webkit-calc(100% + 4px);
-    width: calc(100% + 4px);
+    width: -webkit-calc(100% + 0);
+    width: calc(100% + 0);
   }
   .richEditor-embedBarMobileBorder {
     display: block;
@@ -1599,10 +1590,8 @@ body.isMobile .richEditorParagraphMenu {
 }
 
 .accessibility-jumpTo:focus {
-  outline-width: 1px;
-  outline-offset: -1px;
-  outline-color: rgba(2, 145, 219, 0.6);
-  outline-style: solid;
+  background: rgba(2, 145, 219, 0.4);
+  outline: none;
   position: absolute;
   top: 50px;
   left: 0;
@@ -1623,7 +1612,7 @@ body.isMobile .richEditorParagraphMenu {
 }
 
 .accessibility-jumpTo:hover {
-  background-color: rgba(174, 228, 254, 0.2);
+  background-color: rgba(2, 145, 219, 0.4);
 }
 
 .spoiler {
@@ -2009,6 +1998,12 @@ body.isMobile .richEditorParagraphMenu {
   max-width: 640px;
 }
 
+@media screen and (-ms-high-contrast: active), screen and (-ms-high-contrast: none) {
+  .embedImage .embedExternal-content {
+    width: 100%;
+  }
+}
+
 .Message img .embedImage-img,
 .embedImage-img {
   display: block;
@@ -2016,7 +2011,6 @@ body.isMobile .richEditorParagraphMenu {
   margin-left: auto;
   margin-right: auto;
   max-width: 100%;
-  max-height: 80vh;
 }
 
 .embedLink .embedExternal-content {

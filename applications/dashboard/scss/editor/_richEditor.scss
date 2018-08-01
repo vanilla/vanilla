@@ -1,16 +1,15 @@
-$richEditor-font_size: $global-large_fontSize !default;
-$richEditor-icon_size: $icon-default_size !default;
-$richEditor-lineHeight: $global-base_lineHeight !default;
-$richEditor-menuButton_size: 39px !default;
-$richEditor-bg_color: $global-color_bg !default;
-$richEditor_leftPadding: 36px !default;
+$richEditor-menuButton_size: 36px !default;
+
+$richEditor_bg: $global-color_bg !default;
+$richEditor_leftPadding: 30px !default;
 $richEditor_minHeight: 200px !default;
 $richEditor_verticalPadding: 9px !default;
 $richEditor_padding: $richEditor_verticalPadding 12px !default;
+$richEditor-outline_color: rgba($global-color_primary, 0.6);
+
 $richEditor-embedMenu_padding: 0 !default;
-$richEditor-embedMenuWideButton_padding: 9px;
-$richEditor-embedMenuWideButton_fontSize: .9em;
 $richEditor-icon_opacity: .7 !default;
+
 $richEditor-atMention_width: 200px !default;
 $richEditor-atMentionAvatar_width: 30px !default;
 $richEditor-atMentionAvatar_margin: 10px !default;
@@ -19,39 +18,50 @@ $richEditor-atMentionLink_weight: 600 !default;
 $richEditor-atMentionUser_paddingHorizontal: 6px !default;
 $richEditor-atMentionUser_paddingVertical: 3px !default;
 $richEditor-atMentionSelected_bg: #f4f3f5;
+
 $richEditor-insertLink_width: 387px !default;
+
 $richEditor-insertPopover_paddingVertical: 12px !default;
 $richEditor-insertPopover_paddingHorizontal: 12px !default;
 $richEditor-insertPopover_maxHeight: 100vh !default;
 $richEditor-insertPopover_height: $richEditor-menuButton_size * 7.5 !default;
+
 $richEditor-emoji_width: 7 * $richEditor-menuButton_size + 2 * $richEditor-insertPopover_paddingHorizontal;
+
 $richEditor-nub_width: 12px !default;
+
 $richEditor-menu_borderWidth: 1px !default;
 $richEditor-menu_offset: $richEditor-nub_width !default;
+
 $richEditor-pilcrow_offset: 9px!default;
 $richEditor-pilcrow_fontSize: 14px;
 $richEditor-pilcrow_gutter: 36px;
 $richEditor-pilcrowAnimation_duration: 0.3s;
+
 $richEditor-emojiCategory_color: #737982;
 $richEditor-emojiCategory_hoverColor: #212327;
 $richEditor-emojiGroup_paddingLeft: 3px;
+$richEditor-emojiOutline_offset: -#{$formElement_borderWidth + 2};
+
 $richEditor-mobileEmbedMenu_borderColor: $global-color_primary;
 $richEditor-mobileEmbedMenu_transitionDuration: .15s;
 $richEditor-mobileEmbedMenu_transitionTiming: ease-out;
-$richEditor-selected_bg: rgba(174, 228, 254, 0.2);
-$richEditor-border_width: 1px;
-$richEditor-outline_width: 1px;
-$richEditor-emojiOutline_offset: -#{$richEditor-outline_width + 2};
-$richEditor-embedButton_offset: - $richEditor-outline_width;
-$richEditor-paragraphMenuButton_offset: - $richEditor-outline_width + 1;
+
+// New values
+$richEditor-button_hover_bg: rgba($global-color_primary, 0.2);
+$richEditor-button_focus_bg: rgba($global-color_primary, 0.4);
+$richEditor-button_selected_bg: rgba($global-color_primary, 0.4);
+
+
+
+$richEditor-embedButton_offset: - $formElement_borderWidth;
+$richEditor-paragraphMenuButton_offset: - $formElement_borderWidth + 1;
 $richEditor-text_offset: 0;
 
 
 
-$richEditor-outline_color: rgba(2, 145, 219, 0.6);
-
 $richEditor-videoPlayIcon_width: 80px;
-$richEditor-videoPlayIcon_hoverColor: #0291db;
+$richEditor-videoPlayIcon_hoverColor: $global-color_primary;
 
 $embedImage_width: 640px;
 $embedded-quote_fg: #A3A3A3 !default;
@@ -66,7 +76,7 @@ $richEditor-mobileEmbedBreakPoint: 550px !default;
     position: relative;
     display: block;
     padding-left: $richEditor_leftPadding;
-    font-size: $richEditor-font_size;
+    font-size: $global-large_fontSize;
 
     &.isDisabled {
         &,
@@ -79,7 +89,7 @@ $richEditor-mobileEmbedBreakPoint: 550px !default;
 .richEditor-frame {
     &.InputBox {
         position: relative;
-        background: $richEditor-bg_color;
+        background: $richEditor_bg;
         height: auto;
         padding: 0;
     }
@@ -114,8 +124,8 @@ $richEditor-mobileEmbedBreakPoint: 550px !default;
     top: $richEditor-pilcrow_offset;
     left: -6px;
     transform: translateX(-100%);
-    height: $richEditor-icon_size;
-    width: $richEditor-icon_size;
+    height: $icon-default_size;
+    width: $icon-default_size;
     z-index: 1;
     animation: fadein $richEditor-pilcrowAnimation_duration ease;
     animation-iteration-count: 1;
@@ -132,7 +142,7 @@ $richEditor-mobileEmbedBreakPoint: 550px !default;
         outline: {
             offset: $richEditor-text_offset;
             style: solid;
-            width: $richEditor-outline_width;
+            width: $formElement_borderWidth;
             color: $richEditor-outline_color;
         }
     }
@@ -150,12 +160,11 @@ $richEditor-mobileEmbedBreakPoint: 550px !default;
     flex-wrap: nowrap;
     list-style: none;
     padding: 0;
-    width: calc(100% - #{2 * $richEditor-border_width});
     margin: {
         top: 0;
         right: 0;
-        left: -$richEditor-border_width;
-        bottom: -$richEditor-border_width;
+        left: -$formElement_borderWidth;
+        bottom: -$formElement_borderWidth;
     }
 
     .richEditor-menuItem {
@@ -199,8 +208,8 @@ $richEditor-mobileEmbedBreakPoint: 550px !default;
 
 .richEditor-button {
     display: block;
-    height: $richEditor-icon_size;
-    width: $richEditor-icon_size;
+    height: $icon-default_size;
+    width: $icon-default_size;
     user-select: none;
     cursor: pointer;
 
@@ -212,12 +221,16 @@ $richEditor-mobileEmbedBreakPoint: 550px !default;
     }
 
     &.emojiGroup {
-        width: $richEditor-icon_size;
-        height: $richEditor-icon_size;
+        width: $icon-default_size;
+        height: $icon-default_size;
     }
 
     &:not(:disabled) {
         cursor: pointer;
+    }
+
+    &:hover {
+        background: $richEditor-button_hover_bg;
     }
 
     &:focus {
@@ -273,17 +286,6 @@ $richEditor-mobileEmbedBreakPoint: 550px !default;
     }
 }
 
-.richEditor-nextInput {
-    height: $richEditor-menuButton_size;
-    line-height: $richEditor-menuButton_size;
-    font-size: $richEditor-embedMenuWideButton_fontSize;
-    color: inherit;
-    padding: {
-        left: $richEditor-embedMenuWideButton_padding;
-        right: $richEditor-embedMenuWideButton_padding;
-    }
-}
-
 .richEditor-upload {
     display: none !important;
 }
@@ -297,8 +299,8 @@ $richEditor-mobileEmbedBreakPoint: 550px !default;
 .richEditorButton-icon {
     display: block;
     margin: auto;
-    height: $richEditor-icon_size;
-    width: $richEditor-icon_size;
+    height: $icon-default_size;
+    width: $icon-default_size;
     opacity: $richEditor-icon_opacity;
 }
 
@@ -449,7 +451,7 @@ $richEditor-mobileEmbedBreakPoint: 550px !default;
 .richEditor-insertEmoji {
     width: $richEditor-menuButton_size;
     height: $richEditor-menuButton_size;
-    font-size: $richEditor-icon_size;
+    font-size: $icon-default_size;
     text-align: center;
     overflow: hidden;
 
@@ -490,7 +492,7 @@ $richEditor-mobileEmbedBreakPoint: 550px !default;
     }
     box-shadow: 0 0 5px 1px #eee;
     box-shadow: 0 0 5px 1px rgba(0, 0, 0, 0.2);
-    background: $richEditor-bg_color;
+    background: $richEditor_bg;
 }
 
 // Orientation specific styles
@@ -586,7 +588,7 @@ $richEditor-mobileEmbedBreakPoint: 550px !default;
             + h5,
             + h6
             {
-                margin-top: #{$richEditor-font_size * .6};
+                margin-top: .6em;
             }
         }
 
@@ -652,8 +654,8 @@ $richEditor-mobileEmbedBreakPoint: 550px !default;
     position: relative;
     margin: 0;
     padding: 0;
-    width: $richEditor-icon_size;
-    size: $richEditor-icon_size;
+    width: $icon-default_size;
+    size: $icon-default_size;
 }
 
 
@@ -677,7 +679,7 @@ $richEditor-mobileEmbedBreakPoint: 550px !default;
 .atMentionList-item {
     &.isActive {
         .atMentionList-suggestion {
-            background-color: $richEditor-atMentionSelected_bg;
+            background-color: $richEditor-button_focus_bg;
         }
     }
 }
@@ -741,9 +743,9 @@ $richEditor-mobileEmbedBreakPoint: 550px !default;
     user-select: all;
 }
 
-// Hide Preview
 
 body.hasRichEditor {
+    // Hide Preview
     #Form_Preview {
         display: none;
     }
@@ -762,6 +764,7 @@ body.hasRichEditor {
                 .FormWrapper {
                     padding: {
                         left: $richEditor-pilcrow_gutter;
+                        right: $richEditor_leftPadding;
                     }
 
                     .richEditor {
@@ -770,7 +773,6 @@ body.hasRichEditor {
                 }
             }
         }
-
 
         // Comment
         .CommentForm {
@@ -788,6 +790,8 @@ body.hasRichEditor {
             .richEditor {
                 padding: {
                     left: $richEditor-pilcrow_gutter;
+                    right: $richEditor_leftPadding;
+
                 }
 
                 .richEditor {
@@ -804,6 +808,7 @@ body.hasRichEditor {
         }
 
         // New Message
+        #GroupForm,
         #MessageForm,
         #ConversationForm {
             .Form-HeaderWrap {
@@ -811,7 +816,10 @@ body.hasRichEditor {
             }
 
             .FormWrapper {
-                padding-left: $richEditor-pilcrow_gutter;
+                padding: {
+                    left: $richEditor-pilcrow_gutter;
+                    right: $richEditor_leftPadding;
+                }
 
                 .richEditor {
                     padding-left: 0;

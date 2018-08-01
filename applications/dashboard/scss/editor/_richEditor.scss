@@ -5,7 +5,7 @@ $richEditor_leftPadding: 30px !default;
 $richEditor_minHeight: 200px !default;
 $richEditor_verticalPadding: 9px !default;
 $richEditor_padding: $richEditor_verticalPadding 12px !default;
-$richEditor-outline_color: rgba($global-color_primary, 0.6);
+$richEditor-outline_color: rgba($global-color_primary, 0.6) !default; // TODO drerrive
 
 $richEditor-embedMenu_padding: 0 !default;
 $richEditor-icon_opacity: .7 !default;
@@ -17,7 +17,7 @@ $richEditor-atMentionMark_weight: 600 !default;
 $richEditor-atMentionLink_weight: 600 !default;
 $richEditor-atMentionUser_paddingHorizontal: 6px !default;
 $richEditor-atMentionUser_paddingVertical: 3px !default;
-$richEditor-atMentionSelected_bg: #f4f3f5;
+$richEditor-atMentionSelected_bg: #f4f3f5 !default; // TODO - derrive
 
 $richEditor-insertLink_width: 387px !default;
 
@@ -34,37 +34,32 @@ $richEditor-menu_borderWidth: 1px !default;
 $richEditor-menu_offset: $richEditor-nub_width !default;
 
 $richEditor-pilcrow_offset: 9px!default;
-$richEditor-pilcrow_fontSize: 14px;
-$richEditor-pilcrow_gutter: 36px;
+$richEditor-pilcrow_fontSize: 14px !default;
+$richEditor-pilcrow_gutter: 36px !default; //TODO - tweak size
 $richEditor-pilcrowAnimation_duration: 0.3s;
 
-$richEditor-emojiCategory_color: #737982;
-$richEditor-emojiCategory_hoverColor: #212327;
-$richEditor-emojiGroup_paddingLeft: 3px;
-$richEditor-emojiOutline_offset: -#{$formElement_borderWidth + 2};
+$richEditor-emojiCategory_color: #737982 !default; // TODO derrive
+$richEditor-emojiCategory_hoverColor: #212327 !default; // TODO drrive
+$richEditor-emojiGroup_paddingLeft: 3px !default;
+$richEditor-emojiOutline_offset: -#{$formElement_borderWidth + 2} !default;
 
-$richEditor-mobileEmbedMenu_borderColor: $global-color_primary;
-$richEditor-mobileEmbedMenu_transitionDuration: .15s;
-$richEditor-mobileEmbedMenu_transitionTiming: ease-out;
+$richEditor-mobileEmbedMenu_borderColor: $global-color_primary !default;
+$richEditor-mobileEmbedMenu_transitionDuration: .15s !default;
+$richEditor-mobileEmbedMenu_transitionTiming: ease-out !default;
 
 // New values
-$richEditor-button_hover_bg: rgba($global-color_primary, 0.2);
-$richEditor-button_focus_bg: rgba($global-color_primary, 0.4);
-$richEditor-button_selected_bg: rgba($global-color_primary, 0.4);
+$richEditor-button_hover_bg: mix($global-color_primary, $global-color_bg, 5.5%) !default; // rgba(174, 228, 255, 0.2);
+$richEditor-button_focus_bg: mix($global-color_primary, $global-color_bg, 12%) !default; // rgba(174, 228, 255, 0.4);
+$richEditor-button_selected_bg: mix($global-color_primary, $global-color_fg, 95%) !default; // #0075f5
+
+$richEditor-embedButton_offset: - $formElement_borderWidth !default;
+$richEditor-paragraphMenuButton_offset: - $formElement_borderWidth + 1 !default;
+$richEditor-text_offset: 0 !default;
 
 
 
-$richEditor-embedButton_offset: - $formElement_borderWidth;
-$richEditor-paragraphMenuButton_offset: - $formElement_borderWidth + 1;
-$richEditor-text_offset: 0;
-
-
-
-$richEditor-videoPlayIcon_width: 80px;
-$richEditor-videoPlayIcon_hoverColor: $global-color_primary;
-
-$embedImage_width: 640px;
-$embedded-quote_fg: #A3A3A3 !default;
+$embedImage_width: 640px !default;
+$embedded-quote_fg: #A3A3A3 !default; // TODO Derrive
 
 // Break Points
 $richEditor-mobile_spacing: 18px !default;
@@ -234,12 +229,9 @@ $richEditor-mobileEmbedBreakPoint: 550px !default;
     }
 
     &:focus {
-        z-index: 2;
         @include editorButtonFocusStyles;
-    }
+        z-index: 2;
 
-    &:hover,
-    &:focus {
         .Close-x,
         .richEditorButton-icon {
             opacity: 1;

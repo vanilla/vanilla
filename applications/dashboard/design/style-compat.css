@@ -915,32 +915,31 @@ label.checkbox input.checkbox-input {
 }
 
 .richEditor-button:hover {
-  background: rgba(2, 145, 219, 0.2);
+  background: #f1f9fd;
 }
 
 .richEditor-button:focus {
-  z-index: 2;
-  background: rgba(2, 145, 219, 0.4);
+  background: #e1f2fb;
   outline: none;
+  z-index: 2;
 }
 
-.richEditor-button:hover .Close-x,
-.richEditor-button:hover .richEditorButton-icon, .richEditor-button:focus .Close-x,
+.richEditor-button:focus .Close-x,
 .richEditor-button:focus .richEditorButton-icon {
   opacity: 1;
 }
 
 .richEditor-button.isActive {
-  background-color: rgba(2, 145, 219, 0.4);
+  background-color: #068ed5;
 }
 
 .richEditor-button.richEditor-embedButton:focus {
-  background: rgba(2, 145, 219, 0.4);
+  background: #e1f2fb;
   outline: none;
 }
 
 .richEditor-button.richEditor-formatButton:focus {
-  background: rgba(2, 145, 219, 0.4);
+  background: #e1f2fb;
   outline: none;
 }
 
@@ -1029,7 +1028,7 @@ label.checkbox input.checkbox-input {
 }
 
 .richEditor-close.Close:focus {
-  background: rgba(2, 145, 219, 0.4);
+  background: #e1f2fb;
   outline: none;
 }
 
@@ -1365,7 +1364,7 @@ label.checkbox input.checkbox-input {
 }
 
 .emojiGroup.isSelected {
-  background-color: rgba(2, 145, 219, 0.4);
+  background-color: #068ed5;
 }
 
 .emojiGroup + .emojiGroup {
@@ -1396,7 +1395,7 @@ label.checkbox input.checkbox-input {
 }
 
 .atMentionList-item.isActive .atMentionList-suggestion {
-  background-color: rgba(2, 145, 219, 0.4);
+  background-color: #e1f2fb;
 }
 
 .atMentionList-suggestion {
@@ -1590,7 +1589,7 @@ body.isMobile .richEditorParagraphMenu {
 }
 
 .accessibility-jumpTo:focus {
-  background: rgba(2, 145, 219, 0.4);
+  background: #e1f2fb;
   outline: none;
   position: absolute;
   top: 50px;
@@ -1612,7 +1611,7 @@ body.isMobile .richEditorParagraphMenu {
 }
 
 .accessibility-jumpTo:hover {
-  background-color: rgba(2, 145, 219, 0.4);
+  background-color: #068ed5;
 }
 
 .spoiler {
@@ -1922,8 +1921,23 @@ body.isMobile .richEditorParagraphMenu {
 }
 
 .embedVideo-thumbnail {
-  object-fit: cover;
-  object-position: center;
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  margin: auto;
+  height: auto;
+  width: 100%;
+  background-color: black;
+}
+
+@supports (object-fit: cover) {
+  .embedVideo-thumbnail {
+    object-fit: cover;
+    object-position: center;
+    height: 100%;
+  }
 }
 
 .embedVideo-scrim {

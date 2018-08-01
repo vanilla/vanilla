@@ -137,3 +137,19 @@ $spinnerOffset: 73deg;
         @content;
     }
 }
+
+@mixin objectFitWithFallback() {
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    margin: auto;
+    height: auto;
+    width: 100%;
+    @supports (object-fit: cover) {
+        object-fit: cover;
+        object-position: center;
+        height: 100%;
+    }
+}

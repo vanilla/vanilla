@@ -58,8 +58,6 @@ export default class MenuItems extends React.Component<IProps, {}> {
         );
     }
 
-    // TODO focus handling
-
     /**
      * Focus the first menu item.
      */

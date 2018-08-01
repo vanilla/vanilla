@@ -8,22 +8,27 @@ import React from "react";
 import { shallow } from "enzyme";
 import sinon from "sinon";
 import MenuItem from "./MenuItem";
+import { bold } from "@rich-editor/components/icons";
+
+const noop = () => {
+    return;
+};
 
 describe("MenuItem", () => {
     it("has a working click handler", () => {
-        // const spy = sinon.spy();
-        // const item = shallow(
-        //     <MenuItem
-        //         onClick={spy}
-        //         propertyName="bold"
-        //         label="Bold"
-        //         isActive={true}
-        //         isFirst={false}
-        //         isLast={false}
-        //         disabled={false}
-        //     />,
-        // );
-        // item.find(".richEditor-button").simulate("click");
-        // sinon.assert.calledOnce(spy);
+        const spy = sinon.spy();
+        const item = shallow(
+            <MenuItem
+                onClick={spy}
+                label="Bold"
+                role="menuitem"
+                icon={bold()}
+                focusNextItem={noop}
+                focusPrevItem={noop}
+                isActive={true}
+            />,
+        );
+        item.find(".richEditor-button").simulate("click");
+        sinon.assert.calledOnce(spy);
     });
 });

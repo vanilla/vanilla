@@ -609,7 +609,7 @@ $richEditor-mobileEmbedBreakPoint: 550px !default;
     a,
     p
     {
-        @include breakWord;
+        word-break: break-word;
         text-overflow: ellipsis;
     }
 }

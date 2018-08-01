@@ -1342,7 +1342,6 @@ label.checkbox input.checkbox-input {
 .userContent th,
 .userContent a,
 .userContent p {
-  word-break: break-all;
   word-break: break-word;
   text-overflow: ellipsis;
 }

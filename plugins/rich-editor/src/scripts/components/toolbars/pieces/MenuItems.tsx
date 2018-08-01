@@ -10,6 +10,7 @@ import MenuItem, { IMenuItemData } from "@rich-editor/components/toolbars/pieces
 interface IProps {
     menuItemData: IMenuItemData[];
     itemRole?: "menuitem" | "menuitemradio";
+    orientation?: "horizontal" | "vertical";
 }
 
 /**
@@ -20,6 +21,7 @@ interface IProps {
 export default class MenuItems extends React.Component<IProps, {}> {
     public static defaultProps: Partial<IProps> = {
         itemRole: "menuitem",
+        orientation: "horizontal",
     };
 
     private menuItemRefs: Array<MenuItem | null> = [];
@@ -29,7 +31,7 @@ export default class MenuItems extends React.Component<IProps, {}> {
         const firstIndex = 0;
         const lastIndex = menuItemData.length - 1;
         return (
-            <div className="richEditor-menu" role="menu">
+            <div className="richEditor-menu" role="menu" aria-orientation={this.props.orientation!}>
                 <div className="richEditor-menuItems MenuItems">
                     {this.props.menuItemData.map((itemData, index) => {
                         const prevIndex = index === firstIndex ? lastIndex : index - 1;

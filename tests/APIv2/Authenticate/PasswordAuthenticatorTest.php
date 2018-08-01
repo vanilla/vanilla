@@ -75,7 +75,7 @@ class PasswordAuthenticatorTest extends AbstractAPIv2Test {
         parent::setupBeforeClass();
         /** @var \Gdn_Configuration $config */
         $config = static::container()->get(\Gdn_Configuration::class);
-        $config->set('Feature.'.\AuthenticateApiController::FEATURE_FLAG, true, true, false);
+        $config->set('Feature.'.\AuthenticateApiController::FEATURE_FLAG.'.Enabled', true, true, false);
     }
 
     /**

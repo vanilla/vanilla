@@ -43,7 +43,7 @@ class AutoConnectTest extends AbstractAPIv2Test {
 
         /** @var \Gdn_Configuration $config */
         self::$config = static::container()->get(\Gdn_Configuration::class);
-        self::$config->set('Feature.'.\AuthenticateApiController::FEATURE_FLAG, true, true, false);
+        self::$config->set('Feature.'.\AuthenticateApiController::FEATURE_FLAG.'.Enabled', true, true, false);
     }
 
     /**

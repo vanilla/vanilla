@@ -28,7 +28,7 @@ interface IState {
     menuHasFocus: boolean;
 }
 
-export class InlineToolbar extends React.Component<IProps, IState> {
+export class InlineToolbar extends React.PureComponent<IProps, IState> {
     private quill: Quill;
     private formatter: Formatter;
     private linkInput: React.RefObject<HTMLInputElement> = React.createRef();

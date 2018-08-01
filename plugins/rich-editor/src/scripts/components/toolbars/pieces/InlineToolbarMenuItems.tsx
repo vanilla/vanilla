@@ -20,7 +20,7 @@ interface IProps {
     onLinkClick: (event: React.MouseEvent<HTMLButtonElement>) => void;
 }
 
-export default class InlineToolbarMenuItems extends React.Component<IProps> {
+export default class InlineToolbarMenuItems extends React.PureComponent<IProps> {
     public render() {
         return <MenuItems menuItemData={this.menuItemData} />;
     }

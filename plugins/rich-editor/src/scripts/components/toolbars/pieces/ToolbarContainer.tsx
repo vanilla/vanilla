@@ -20,7 +20,7 @@ interface IState {
     nubHeight: number | null;
 }
 
-export class ToolbarContainer extends React.Component<IProps, IState> {
+export class ToolbarContainer extends React.PureComponent<IProps, IState> {
     private quill: Quill;
     private flyoutRef: React.RefObject<any> = React.createRef();
     private nubRef: React.RefObject<any> = React.createRef();

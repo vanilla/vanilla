@@ -64,30 +64,6 @@ class RichEditorPlugin extends Gdn_Plugin {
     }
 
     /**
-     * Add a rich editor CSS class.
-     *
-     * @param Gdn_Controller $sender
-     */
-    public function base_beforeCommentForm_handler(Gdn_Controller $sender) {
-        $form = $sender->Form ?? null;
-        if ($form ? $this->isRichFormat($form) : false) {
-            $sender->CssClass .= ' hasRichEditor';
-        }
-    }
-
-    /**
-     *
-     * @param PostController $sender
-     * @throws Exception
-     */
-    public function postController_render_before(PostController $sender) {
-        if ($this->isRichFormat($sender->Form)) {
-            $sender->CssClass .= ' hasRichEditor';
-        }
-    }
-
-
-    /**
      * Attach editor anywhere 'BodyBox' is used.
      *
      * It is not being used for editing a posted reply, so find another event to hook into.
@@ -99,6 +75,7 @@ class RichEditorPlugin extends Gdn_Plugin {
         if ($this->isRichFormat($sender)) {
             /** @var Gdn_Controller $controller */
             $controller = Gdn::controller();
+            $controller->CssClass .= ' hasRichEditor';
             $editorID = $this->getEditorID();
             $controller->setData('editorData', [
                 'editorID' => $editorID,

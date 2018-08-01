@@ -50,7 +50,7 @@ export default class InlineToolbarMenuItems extends React.PureComponent<IProps> 
             {
                 label: t("Format as Inline Code"),
                 icon: icons.code(),
-                isActive: activeFormats["code-inline"] === true,
+                isActive: activeFormats.codeInline === true,
                 onClick: this.formatCode,
             },
             {

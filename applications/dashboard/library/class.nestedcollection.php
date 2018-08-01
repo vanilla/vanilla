@@ -534,10 +534,13 @@ trait NestedCollection {
         } else {
             $highlightRoute = url($this->highlightRoute);
         }
-        if ($ret = ($url = $item['url'] ? true : false)) {
-            $ret = trim(url($url), '/') == trim($highlightRoute, '/');
+        $url = $item['url'] ?? false;
+        if ($url) {
+            $result = trim(url($url), '/') == trim($highlightRoute, '/');
+        } else {
+            $result = false;
         }
-        return $ret;
+        return $result;
     }
 
     /**

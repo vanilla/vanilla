@@ -17,6 +17,16 @@ class InvalidAuthenticatorTest extends AbstractAPIv2Test {
 
     private $baseUrl = '/authenticate';
 
+    /**
+     * @inheritdoc
+     */
+    public static function setupBeforeClass() {
+        parent::setupBeforeClass();
+        /** @var \Gdn_Configuration $config */
+        $config = static::container()->get(\Gdn_Configuration::class);
+        $config->set('Feature.'.\AuthenticateApiController::FEATURE_FLAG.'.Enabled', true, true, false);
+    }
+
     public function setUp() {
         $this->startSessionOnSetup(false);
         parent::setUp();

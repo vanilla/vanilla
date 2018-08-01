@@ -30,9 +30,6 @@ export class ToolbarContainer extends React.PureComponent<IProps, IState> {
     constructor(props) {
         super(props);
 
-        // Quill can directly on the class as it won't ever change in a single instance.
-        this.quill = props.quill;
-
         this.state = {
             flyoutHeight: null,
             flyoutWidth: null,

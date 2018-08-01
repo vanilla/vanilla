@@ -16,12 +16,10 @@ class FeatureFlagHelper {
      *
      * @param string $feature The config-friendly name of the feature.
      * @return bool
-     * @throws \Garden\Container\NotFoundException If unable to find the config class in the container.
-     * @throws \Garden\Container\ContainerException If unable to get the config class instance from the container.
      */
     public static function featureEnabled(string $feature): bool {
         // We're going to enforce the root "Feature" namespace.
-        $configValue = Gdn::getContainer()->get(\Gdn_Configuration::class)->get("Feature.{$feature}");
+        $configValue = c("Feature.{$feature}.Enabled");
         // Force a true boolean.
         $result = filter_var($configValue, FILTER_VALIDATE_BOOLEAN);
         return $result;

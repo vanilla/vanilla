@@ -2052,12 +2052,21 @@ body.isMobile .richEditorParagraphMenu {
 
 .embedLink .embedLink-image {
   position: absolute;
+  display: block;
   top: 0;
   left: 0;
-  object-fit: cover;
-  object-position: center;
+  bottom: 0;
+  margin-top: auto;
+  margin-bottom: auto;
   width: 225px;
-  height: 100%;
+}
+
+@supports (object-fit: cover) {
+  .embedLink .embedLink-image {
+    height: 100%;
+    object-fit: cover;
+    object-position: center;
+  }
 }
 
 .embedLink .embedLink-image + .embedLink-main {

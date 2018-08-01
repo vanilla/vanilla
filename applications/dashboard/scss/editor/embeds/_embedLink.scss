@@ -37,12 +37,22 @@ $embedLink-linkImage_bg: #ffffff !default;
 
     .embedLink-image {
         position: absolute;
+        display: block;
         top: 0;
         left: 0;
-        object-fit: cover;
-        object-position: center;
+        bottom: 0;
+        margin: {
+            top: auto;
+            bottom: auto;
+        }
         width: $embedLink-linkImage_width;
-        height: 100%;
+
+
+        @supports (object-fit: cover) {
+            height: 100%;
+            object-fit: cover;
+            object-position: center;
+        }
 
         + .embedLink-main {
             margin-left: auto;

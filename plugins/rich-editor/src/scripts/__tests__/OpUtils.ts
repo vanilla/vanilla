@@ -16,6 +16,9 @@ import HeadingBlot from "quill/formats/header";
 import ListBlot from "quill/formats/list";
 import { StringMap } from "quill/core";
 
+/**
+ * Operation generation utilities for testing.
+ */
 export default class OpUtils {
     public static DEFAULT_LINK = "http://link.com";
 

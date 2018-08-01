@@ -58,8 +58,8 @@ describe("Formatter", () => {
     describe("codeInline()", () => {
         const formattingFunction = () => formatter.codeInline(getFullRange());
         testBasicInlineFormatting(formattingFunction, OpUtils.codeInline);
-        testStackedInlineFormatting("code-inline", formattingFunction, ["bold", "italic", "strike", "link"]);
-        testInlineAgainstLineFormatting("code-inline", formattingFunction);
+        testStackedInlineFormatting("codeInline", formattingFunction, ["bold", "italic", "strike", "link"]);
+        testInlineAgainstLineFormatting("codeInline", formattingFunction);
     });
 
     describe("h2()", () => {
@@ -231,6 +231,19 @@ describe("Formatter", () => {
             const expected = [OpUtils.op(), lineOp, OpUtils.op(), lineOp, OpUtils.op(), lineOp];
             const formatterFunction = () => format(getFullRange());
             assertQuillInputOutput(initial, expected, formatterFunction);
+        });
+
+        describe(`can apply the ${lineFormatName} format to single line of all other multiline blots`, () => {
+            blockFormatOps.forEach(({ op, name }) => {
+                const initial = [OpUtils.op(), op, OpUtils.op(), op, OpUtils.op(), op];
+
+                it(`can apply the ${lineFormatName} format to the first line of 3 lines of the ${name} format`, () => {
+                    const expected = [OpUtils.op(), lineOp, OpUtils.op(), op, OpUtils.op(), op];
+                    const range: RangeStatic = { index: 0, length: 4 };
+                    const formatterFunction = () => format(range);
+                    assertQuillInputOutput(initial, expected, formatterFunction);
+                });
+            });
         });
         // Check formatting over multiple lines (splitting things properly as well).
     }

@@ -51,11 +51,13 @@ export class InlineToolbar extends React.PureComponent<IProps, IState> {
         };
     }
 
+    /**
+     * Reset the link menu state when the selection changes.
+     */
     public componentDidUpdate(prevProps: IProps) {
-        if (
-            prevProps.instanceState.lastGoodSelection.index !== this.props.instanceState.lastGoodSelection.index ||
-            prevProps.instanceState.lastGoodSelection.length !== this.props.instanceState.lastGoodSelection.length
-        ) {
+        const selection = this.props.instanceState.lastGoodSelection;
+        const prevSelection = prevProps.instanceState.lastGoodSelection;
+        if (prevSelection.index !== selection.index || prevSelection.length !== selection.length) {
             this.setState({ isLinkMenuOpen: false });
         }
     }
@@ -74,7 +76,7 @@ export class InlineToolbar extends React.PureComponent<IProps, IState> {
                     {alertMessage}
                     <InlineToolbarMenuItems
                         formatter={this.formatter}
-                        onLinkClick={this.openLinkMenu}
+                        onLinkClick={this.toggleLinkMenu}
                         activeFormats={activeFormats}
                         lastGoodSelection={instanceState.lastGoodSelection}
                     />
@@ -92,23 +94,35 @@ export class InlineToolbar extends React.PureComponent<IProps, IState> {
         );
     }
 
+    /**
+     * Determine visibility of the link menu.
+     */
     private get isLinkMenuVisible(): boolean {
         const inCodeBlock = rangeContainsBlot(this.quill, CodeBlockBlot, this.props.instanceState.lastGoodSelection);
         return this.state.isLinkMenuOpen && this.hasFocus && this.isOneLineOrLess && !inCodeBlock;
     }
 
+    /**
+     * Determine visibility of the formatting menu.
+     */
     private get isFormatMenuVisible(): boolean {
         const selectionHasLength = this.props.instanceState.lastGoodSelection.length > 0;
         const inCodeBlock = rangeContainsBlot(this.quill, CodeBlockBlot, this.props.instanceState.lastGoodSelection);
         return !this.isLinkMenuVisible && this.hasFocus && selectionHasLength && this.isOneLineOrLess && !inCodeBlock;
     }
 
+    /**
+     * Determine if our selection spreads over multiple lines or not.
+     */
     private get isOneLineOrLess(): boolean {
         const { lastGoodSelection } = this.props.instanceState;
         const numLines = this.quill.getLines(lastGoodSelection.index || 0, lastGoodSelection.length || 0).length;
         return numLines <= 1;
     }
 
+    /**
+     * Determine if the inline menu or the quill content editable has focus.
+     */
     private get hasFocus() {
         return this.state.menuHasFocus || this.quill.hasFocus();
     }
@@ -139,6 +153,9 @@ export class InlineToolbar extends React.PureComponent<IProps, IState> {
         document.removeEventListener("keydown", this.escFunction, false);
     }
 
+    /**
+     * Track the menu's focus state.
+     */
     private handleFocusChange = hasFocus => {
         this.setState({ menuHasFocus: hasFocus });
     };
@@ -148,30 +165,34 @@ export class InlineToolbar extends React.PureComponent<IProps, IState> {
      */
     private commandKHandler = () => {
         const { lastGoodSelection } = this.props.instanceState;
+        const inCodeBlock = rangeContainsBlot(this.quill, CodeBlockBlot, lastGoodSelection);
 
-        if (
-            this.isOneLineOrLess &&
-            !this.isLinkMenuVisible &&
-            !rangeContainsBlot(this.quill, CodeBlot) &&
-            !rangeContainsBlot(this.quill, CodeBlockBlot)
-        ) {
-            if (rangeContainsBlot(this.quill, LinkBlot, lastGoodSelection)) {
-                this.formatter.link(lastGoodSelection);
-                this.reset();
-            } else {
-                const currentText = this.quill.getText(lastGoodSelection.index, lastGoodSelection.length);
-                this.setState({ isLinkMenuOpen: true });
+        if (!this.isOneLineOrLess || this.isLinkMenuVisible || inCodeBlock) {
+            return;
+        }
 
-                if (isAllowedUrl(currentText)) {
-                    this.setState({
-                        inputValue: currentText,
-                    });
-                }
+        const inLinkBlot = rangeContainsBlot(this.quill, LinkBlot, lastGoodSelection);
+
+        if (inLinkBlot) {
+            this.formatter.link(lastGoodSelection);
+            this.reset();
+        } else {
+            const currentText = this.quill.getText(lastGoodSelection.index, lastGoodSelection.length);
+            if (isAllowedUrl(currentText)) {
+                this.setState({
+                    inputValue: currentText,
+                });
             }
+            this.toggleLinkMenu();
         }
     };
 
-    private openLinkMenu = () => {
+    /**
+     * Open up the link menu.
+     *
+     * Opens the menu if there is no current link formatting.
+     */
+    private toggleLinkMenu = () => {
         if (typeof this.props.activeFormats.link === "string") {
             this.setState({ isLinkMenuOpen: false });
             this.formatter.link(this.props.instanceState.lastGoodSelection);

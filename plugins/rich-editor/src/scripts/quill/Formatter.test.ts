@@ -63,34 +63,42 @@ describe("Formatter", () => {
     });
 
     describe("h2()", () => {
-        const formattingFunction = () => formatter.h2(getFullRange());
+        const formattingFunction = (range = getFullRange()) => formatter.h2(range);
         testLineFormatInlinePreservation("h2", formattingFunction, OpUtils.heading(2));
         testLineFormatExclusivity("h2", formattingFunction, OpUtils.heading(2));
     });
 
     describe("h3()", () => {
-        const formattingFunction = () => formatter.h3(getFullRange());
+        const formattingFunction = (range = getFullRange()) => formatter.h3(range);
         testLineFormatInlinePreservation("h3", formattingFunction, OpUtils.heading(3));
         testLineFormatExclusivity("h3", formattingFunction, OpUtils.heading(3));
     });
 
     describe("blockquote()", () => {
-        const formattingFunction = () => formatter.blockquote(getFullRange());
+        const formattingFunction = (range = getFullRange()) => formatter.blockquote(range);
         testLineFormatInlinePreservation("blockquote", formattingFunction, OpUtils.quoteLine());
         testLineFormatExclusivity("blockquote", formattingFunction, OpUtils.quoteLine());
+        testMultiLineFormatting("blockquote-line", formattingFunction, OpUtils.quoteLine());
     });
 
     describe("spoiler()", () => {
-        const formattingFunction = () => formatter.spoiler(getFullRange());
+        const formattingFunction = (range = getFullRange()) => formatter.spoiler(range);
         testLineFormatInlinePreservation("spoiler", formattingFunction, OpUtils.spoilerLine());
         testLineFormatExclusivity("spoiler", formattingFunction, OpUtils.spoilerLine());
     });
 
     describe("codeBlock()", () => {
-        const formattingFunction = () => formatter.codeBlock(getFullRange());
+        const formattingFunction = (range = getFullRange()) => formatter.codeBlock(range);
         testNoLineFormatInlinePreservation("codeBlock", formattingFunction, OpUtils.codeBlock());
         testLineFormatExclusivity("codeBlock", formattingFunction, OpUtils.codeBlock(), true);
     });
+
+    function assertQuillInputOutput(input: any[], expectedOutput: any[], formattingFunction: () => void) {
+        quill.setContents(input, Quill.sources.USER);
+        formattingFunction();
+        const result = quill.getContents().ops;
+        expect(result).deep.equals(expectedOutput);
+    }
 
     // Inline testing utilities
 
@@ -115,10 +123,7 @@ describe("Formatter", () => {
                     const finalOp = opMethod();
                     finalOp.attributes[formatToTest] = enableValue;
                     const expected = [finalOp, OpUtils.newline()];
-                    quill.setContents(initial, Quill.sources.USER);
-                    formatterFunction();
-                    const result = quill.getContents().ops;
-                    expect(result).deep.equals(expected);
+                    assertQuillInputOutput(initial, expected, formatterFunction);
                 });
             });
         });
@@ -149,31 +154,23 @@ describe("Formatter", () => {
                         [formatToTest]: enableValue,
                     };
                     const expected = [finalOp, op];
-                    quill.setContents(initial, Quill.sources.USER);
-                    formatterFunction();
-                    const result = quill.getContents().ops;
-                    expect(result).deep.equals(expected);
+                    assertQuillInputOutput(initial, expected, formatterFunction);
                 });
             });
 
             it("Does nothing to Code Blocks", () => {
                 const initial = [OpUtils.op(), OpUtils.codeBlock()];
                 const expected = [OpUtils.op(), OpUtils.codeBlock()];
-                quill.setContents(initial, Quill.sources.USER);
-                formatterFunction();
-                const result = quill.getContents().ops;
-                expect(result).deep.equals(expected);
+                assertQuillInputOutput(initial, expected, formatterFunction);
             });
         });
     }
 
     function testBasicInlineFormatting(formattingFunction: () => void, finalOpCreator: () => any) {
         it("Can format plainText", () => {
-            const ops = [OpUtils.op()];
-            quill.setContents(ops, Quill.sources.USER);
-            formattingFunction();
-            const result = quill.getContents().ops;
-            expect(result).deep.equals([finalOpCreator(), OpUtils.newline()]);
+            const initial = [OpUtils.op()];
+            const expected = [finalOpCreator(), OpUtils.newline()];
+            assertQuillInputOutput(initial, expected, formattingFunction);
         });
     }
 
@@ -183,10 +180,7 @@ describe("Formatter", () => {
                 it(`preserves the ${name} format when added`, () => {
                     const initial = [op];
                     const expected = [op, lineOp];
-                    quill.setContents(initial, Quill.sources.USER);
-                    formatterFunction();
-                    const result = quill.getContents().ops;
-                    expect(result).deep.equals(expected);
+                    assertQuillInputOutput(initial, expected, formatterFunction);
                 });
             });
         });
@@ -198,10 +192,7 @@ describe("Formatter", () => {
                 it(`it removes the ${name} format when added`, () => {
                     const initial = [op];
                     const expected = [OpUtils.op(), lineOp, OpUtils.newline()];
-                    quill.setContents(initial, Quill.sources.USER);
-                    formatterFunction();
-                    const result = quill.getContents().ops;
-                    expect(result).deep.equals(expected);
+                    assertQuillInputOutput(initial, expected, formatterFunction);
                 });
             });
         });
@@ -221,12 +212,26 @@ describe("Formatter", () => {
                     if (needsExtraNewLine) {
                         expected.push(OpUtils.newline());
                     }
-                    quill.setContents(initial, Quill.sources.USER);
-                    formatterFunction();
-                    const result = quill.getContents().ops;
-                    expect(result).deep.equals(expected);
+                    assertQuillInputOutput(initial, expected, formatterFunction);
                 });
             });
         });
+    }
+
+    function testMultiLineFormatting(lineFormatName: string, format: (range: RangeStatic) => void, lineOp: any) {
+        it(`can apply the ${lineFormatName} format to multiple lines`, () => {
+            const initial = [
+                OpUtils.op(),
+                OpUtils.newline(),
+                OpUtils.op(),
+                OpUtils.newline(),
+                OpUtils.op(),
+                OpUtils.newline(),
+            ];
+            const expected = [OpUtils.op(), lineOp, OpUtils.op(), lineOp, OpUtils.op(), lineOp];
+            const formatterFunction = () => format(getFullRange());
+            assertQuillInputOutput(initial, expected, formatterFunction);
+        });
+        // Check formatting over multiple lines (splitting things properly as well).
     }
 });

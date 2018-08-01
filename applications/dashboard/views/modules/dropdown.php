@@ -38,7 +38,7 @@ $trigger = $dropdown->getTrigger();
                        ?>class="<?php
                         echo trim($ilistItemCssClass.(empty($item['icon']) ? ' no-icon' : '')); ?>"<?php
                     } ?>>
-                    <a role="menuitem" class="dropdown-menu-link <?php  $item['cssClass'] ?? ''; ?>" tabindex="-1" href="<?php echo url($item['url'] ?? ''); ?>" <?php echo attribute($item['attributes'] ?? []) ?>><?php
+                    <a role="menuitem" class="dropdown-menu-link <?php echo  $item['cssClass'] ?? ''; ?>" tabindex="-1" href="<?php echo url($item['url'] ?? ''); ?>" <?php echo attribute($item['attributes'] ?? []) ?>><?php
                         if ($iIcon = ($item['icon'] ?? false)) {
                             echo icon($iIcon);
                         }

@@ -49,7 +49,7 @@ Quill.register(
         "formats/spoiler/line": SpoilerLineBlot,
         "formats/spoiler/content": SpoilerContentBlot,
         "formats/spoiler/wrapper": SpoilerWrapperBlot,
-        "formats/code-block": CodeBlockBlot,
+        "formats/codeBlock": CodeBlockBlot,
         "formats/header": Header,
         "formats/list": List,
         "formats/list/item": ListItem,
@@ -62,7 +62,7 @@ Quill.register(
 
         // Inline formats
         "formats/bold": Bold,
-        "formats/code-inline": CodeInlineBlot,
+        "formats/codeInline": CodeInlineBlot,
         "formats/italic": Italic,
         "formats/link": Link,
         "formats/strike": Strike,

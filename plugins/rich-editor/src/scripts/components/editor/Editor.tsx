@@ -98,27 +98,18 @@ export default class Editor extends React.Component<IProps> {
         return (
             <ReduxProvider store={this.store}>
                 <EditorProvider value={{ quill: this.quill, editorID: this.editorID }}>
-                    <div
-                        className="richEditor"
-                        aria-label={t("Type your message")}
-                        data-id={this.props.editorID}
-                        aria-describedby={editorDescriptionID}
-                        role="textbox"
-                        aria-multiline="true"
-                    >
-                        <EditorDescriptions id={editorDescriptionID} />
-                        <div className="richEditor-frame InputBox">
-                            <div className="richEditor-textWrap" ref={this.quillMountRef}>
-                                <div
-                                    className="ql-editor richEditor-text userContent"
-                                    data-gramm="false"
-                                    contentEditable={true}
-                                    data-placeholder="Create a new post..."
-                                    tabIndex={0}
-                                />
-                            </div>
-                            {quillDependantItems}
+                    <EditorDescriptions id={editorDescriptionID} />
+                    <div className="richEditor-frame InputBox">
+                        <div className="richEditor-textWrap" ref={this.quillMountRef}>
+                            <div
+                                className="ql-editor richEditor-text userContent"
+                                data-gramm="false"
+                                contentEditable={true}
+                                data-placeholder="Create a new post..."
+                                tabIndex={0}
+                            />
                         </div>
+                        {quillDependantItems}
                     </div>
                 </EditorProvider>
             </ReduxProvider>

@@ -10,17 +10,16 @@ import Break from "quill/blots/break";
 import Cursor from "quill/blots/cursor";
 
 export default class CodeBlockBlot extends CodeBlock {
-    public static blotName = "code-block";
+    public static blotName = "codeBlock";
     public static tagName = "code";
-    public static className = "code-block";
+    public static className = "codeBlock";
     public static allowedChildren = [Text, Break, Cursor];
 
     public static create(value) {
         const domNode = super.create(value) as HTMLElement;
         domNode.setAttribute("spellcheck", false);
         domNode.classList.add("code");
-        domNode.classList.add("isBlock");
-        domNode.classList.add("code-block");
+        domNode.classList.add("codeBlock");
         return domNode;
     }
 }

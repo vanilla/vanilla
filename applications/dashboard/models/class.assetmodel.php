@@ -202,7 +202,9 @@ class AssetModel extends Gdn_Model {
      * @return string
      */
     public function getInlinePolyfillJSContent(): string {
-        $polyfillFileUrl = asset("/js/polyfills/core-polyfills.js?h=".$this->cacheBuster(), false);
+        $dashboardAddon = $this->addonManager->lookupAddon("dashboard");
+        $polyfillFileUrl = $dashboardAddon->path("/js/polyfills/dashboard-polyfills.min.js?h="
+            .$this->cacheBuster(), Addon::TYPE_ADDON);
 
         $debug = c("Debug", false);
         $logAdding = $debug ? "console.log('Older browser detected. Initiating polyfills.');" : "";

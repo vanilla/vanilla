@@ -221,14 +221,11 @@ export class ParagraphToolbar extends React.PureComponent<IProps, IState> {
      */
     private pilcrowClickHandler = (event: React.MouseEvent<any>) => {
         event.preventDefault();
-        this.setState({ hasFocus: true });
-        const menu = document.getElementById(this.menuID);
-        const firstButton = menu ? menu.querySelector(".richEditor-button") : false;
-        if (firstButton instanceof HTMLElement) {
-            setImmediate(() => {
-                firstButton.focus();
-            });
-        }
+        this.setState({ hasFocus: !this.state.hasFocus }, () => {
+            if (this.state.hasFocus) {
+                this.menuRef.current!.focusFirstItem();
+            }
+        });
     };
 
     /**
@@ -253,7 +250,6 @@ export class ParagraphToolbar extends React.PureComponent<IProps, IState> {
             event.preventDefault();
             this.close();
             this.setState({ hasFocus: false });
-            this.buttonRef.current!.focus();
         }
     };
 

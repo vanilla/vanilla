@@ -40,15 +40,16 @@ class VanillaSettingsController extends Gdn_Controller {
         // Check permission
         $this->permission('Garden.Settings.Manage');
 
-        $formats = ['Text']; // Check for additional formats
-        $this->EventArguments['formats'] = &$formats;
+        /** @var \Garden\EventManager $eventManager */
+        $eventManager = Gdn::getContainer()->get(\Garden\EventManager::class);
 
-        $this->fireEvent('GetFormats');
+        $initialFormats = ['Text']; // Check for additional formats
+        $formats = $eventManager->fireFilter("getPostFormats", $initialFormats);
+
         // This was moved from the editor plugin. In order to maintain compatibility with existing event hooks
         // We will need to fire this as EditorPlugin.
-        $this->EventArguments['formats'] = &$formats;
-        $this->fireAs('EditorPlugin');
-        $this->fireEvent('GetFormats');
+        $eventManager->fireDeprecated("editorPlugin_getFormats", null, ['Formats' => &$formats]);
+
         $this->setData('formats', $formats);
 
         // Load up config options we'll be setting

@@ -136,7 +136,7 @@ $richEditor-mobileEmbedBreakPoint                 : 550px !default;
         top: $formElement-borderWidth;
         right: 0;
         bottom: 0;
-        left: 0; 
+        left: 0;
     }
 
     .richEditor-menuItem {
@@ -226,6 +226,13 @@ $richEditor-mobileEmbedBreakPoint                 : 550px !default;
     }
 
     &.richEditor-formatButton {
+
+        &.isActive {
+            &:hover {
+                cursor: default;
+            }
+        }
+
         &:focus {
             @include editorButtonFocusStyles($richEditor-paragraphMenuButton_offset);
         }
@@ -488,7 +495,7 @@ $richEditor-mobileEmbedBreakPoint                 : 550px !default;
         .richEditor-nubPosition {
             align-items: flex-end;
             transform: translateY(-50%) translateX(-50%);
-            margin-top: $richEditor-menu_borderWidth;
+            margin-top: $richEditor-menu_borderWidth * 2;
         }
         .richEditor-nub {
             transform: translateY(50%) rotate(-45deg);

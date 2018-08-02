@@ -941,6 +941,10 @@ label.checkbox input.checkbox-input {
   outline: none;
 }
 
+.richEditor-button.richEditor-formatButton.isActive:hover {
+  cursor: default;
+}
+
 .richEditor-button.richEditor-formatButton:focus {
   background: #e1f2fb;
   outline: none;
@@ -1244,7 +1248,7 @@ label.checkbox input.checkbox-input {
   -webkit-transform: translateY(-50%) translateX(-50%);
       -ms-transform: translateY(-50%) translateX(-50%);
           transform: translateY(-50%) translateX(-50%);
-  margin-top: 1px;
+  margin-top: 2px;
 }
 
 .richEditor-toolbarContainer.isDown .richEditor-nub {

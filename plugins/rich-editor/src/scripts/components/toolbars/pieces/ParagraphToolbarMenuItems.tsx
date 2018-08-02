@@ -38,36 +38,42 @@ export default class ParagraphToolbarMenuItems extends React.PureComponent<IProp
                 label: t("Format as Paragraph"),
                 onClick: this.formatParagraph,
                 isActive: isParagraphEnabled,
+                isDisabled: isParagraphEnabled,
             },
             {
                 icon: icons.heading2(),
                 label: t("Format as Title"),
                 onClick: this.formatH2,
                 isActive: activeFormats.header === 2,
+                isDisabled: activeFormats.header === 2,
             },
             {
                 icon: icons.heading3(),
                 label: t("Format as Subtitle"),
                 onClick: this.formatH3,
                 isActive: activeFormats.header === 3,
+                isDisabled: activeFormats.header === 3,
             },
             {
                 icon: icons.blockquote(),
                 label: t("Format as blockquote"),
                 onClick: this.formatBlockquote,
                 isActive: activeFormats["blockquote-line"] === true,
+                isDisabled: activeFormats["blockquote-line"] === true,
             },
             {
                 icon: icons.codeBlock(),
                 label: t("Format as code block"),
                 onClick: this.formatCodeBlock,
                 isActive: activeFormats.codeBlock === true,
+                isDisabled: activeFormats.codeBlock === true,
             },
             {
                 icon: icons.spoiler(),
                 label: t("Format as spoiler"),
                 onClick: this.formatSpoiler,
                 isActive: activeFormats["spoiler-line"] === true,
+                isDisabled: activeFormats["spoiler-line"] === true,
             },
         ];
     }

@@ -90,4 +90,55 @@ class RichEditorPlugin extends Gdn_Plugin {
         }
     }
 
+    /**
+     * Add 'Quote' option to discussion via the reactions row after each post.
+     *
+     * @param Gdn_Controller $sender
+     * @param array $args
+     */
+    public function base_afterFlag_handler($sender, $args) {
+        $this->addQuoteButton($sender, $args);
+    }
+
+    /**
+     * Output Quote link.
+     *
+     * @param Gdn_Controller $sender
+     * @param array $args
+     */
+    protected function addQuoteButton($sender, $args) {
+        // There are some case were Discussion is not set as an event argument so we use the sender data instead.
+        $discussion = $sender->data('Discussion');
+        if (!$discussion) {
+            return;
+        }
+
+        if (!Gdn::session()->UserID) {
+            return;
+        }
+
+        if (!Gdn::session()->checkPermission('Vanilla.Comments.Add', false, 'Category', $discussion->PermissionCategoryID)) {
+            return;
+        }
+
+        if (isset($args['Comment'])) {
+            $object = $args['Comment'];
+            $resourceType = 'comment';
+            $resourceID = $object->CommentID;
+        } elseif ($discussion) {
+            $object = $discussion;
+            $resourceType = 'discussion';
+            $resourceID = $object->DiscussionID;
+        } else {
+            return;
+        }
+
+        $icon = sprite('ReactQuote', 'ReactSprite');
+        $linkText = $icon.' '.t('Quote');
+        $classes = 'ReactButton Quote Visible js-quoteButton';
+
+        echo Gdn_Theme::bulletItem('Flags');
+        echo "<a href='#' data-resource-type='$resourceType' data-resource-id='$resourceID' role='button' class='$classes'>$linkText</a>";
+        echo ' ';
+    }
 }

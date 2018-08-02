@@ -133,10 +133,10 @@ $richEditor-mobileEmbedBreakPoint                 : 550px !default;
     list-style: none;
     padding: 0;
     margin: {
-        top: 0;
+        top: $formElement-borderWidth;
         right: 0;
-        left: -$formElement_borderWidth;
-        bottom: -$formElement_borderWidth;
+        bottom: 0;
+        left: 0; 
     }
 
     .richEditor-menuItem {

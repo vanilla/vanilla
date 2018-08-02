@@ -852,6 +852,7 @@ label.checkbox input.checkbox-input {
           flex-wrap: nowrap;
   list-style: none;
   padding: 0;
+  -ms-overflow-style: -ms-autohiding-scrollbar;
   margin-top: 1px;
   margin-right: 0;
   margin-bottom: 0;
@@ -913,8 +914,20 @@ label.checkbox input.checkbox-input {
 }
 
 .richEditor-button.emojiGroup {
-  width: 24px;
-  height: 24px;
+  display: block;
+  color: #737982;
+  width: 36px;
+  height: 36px;
+  text-align: center;
+}
+
+.richEditor-button.emojiGroup.isSelected {
+  color: #0f97dd;
+}
+
+.richEditor-button.emojiGroup.isSelected .Close-x,
+.richEditor-button.emojiGroup.isSelected .richEditorButton-icon {
+  opacity: 1;
 }
 
 .richEditor-button:not(:disabled) {
@@ -1160,7 +1173,6 @@ label.checkbox input.checkbox-input {
 }
 
 .insertPopover-body {
-  margin-bottom: 12px;
   padding-left: 12px;
   padding-right: 12px;
 }
@@ -1182,6 +1194,7 @@ label.checkbox input.checkbox-input {
   position: absolute;
   bottom: 100%;
   left: 0;
+  width: 276px;
 }
 
 .popover-title {
@@ -1189,8 +1202,6 @@ label.checkbox input.checkbox-input {
 }
 
 .richEditor-insertEmoji {
-  width: 36px;
-  height: 36px;
   font-size: 24px;
   text-align: center;
   overflow: hidden;
@@ -1359,34 +1370,16 @@ label.checkbox input.checkbox-input {
   -webkit-flex-wrap: nowrap;
       -ms-flex-wrap: nowrap;
           flex-wrap: nowrap;
-  -webkit-box-pack: justify;
-  -webkit-justify-content: space-between;
-      -ms-flex-pack: justify;
-          justify-content: space-between;
-  padding-left: 3px;
-}
-
-.emojiGroup {
-  color: #737982;
-}
-
-.emojiGroup.isSelected {
-  color: #0f97dd;
-}
-
-.emojiGroup.isSelected .Close-x,
-.emojiGroup.isSelected .richEditorButton-icon {
-  opacity: 1;
-}
-
-.emojiGroup + .emojiGroup {
-  margin-left: 10px;
+  -webkit-box-pack: center;
+  -webkit-justify-content: center;
+      -ms-flex-pack: center;
+          justify-content: center;
 }
 
 .emojiGroup-icon {
   display: block;
   position: relative;
-  margin: 0;
+  margin: auto;
   padding: 0;
   width: 24px;
   size: 24px;
@@ -2452,8 +2445,12 @@ body.isMobile .richEditorParagraphMenu {
 }
 
 .safeEmoji {
-  display: inline;
+  display: inline-block;
   font-family: "Segoe UI Emoji", sans-serif;
+  vertical-align: middle;
+  text-align: center;
+  height: 1em;
+  line-height: 1em;
 }
 
 .nativeEmoji {

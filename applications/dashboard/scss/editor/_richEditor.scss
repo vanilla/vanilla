@@ -142,6 +142,7 @@ $richEditor-mobileEmbedBreakPoint                 : 550px !default;
     flex-wrap: nowrap;
     list-style: none;
     padding: 0;
+    -ms-overflow-style: -ms-autohiding-scrollbar;
     margin: {
         top: $formElement-borderWidth;
         right: 0;
@@ -202,8 +203,15 @@ $richEditor-mobileEmbedBreakPoint                 : 550px !default;
     }
 
     &.emojiGroup {
-        width: $icon-default_size;
-        height: $icon-default_size;
+        display: block;
+        color: $richEditor-emojiCategory_color;
+        width: $richEditor-menuButton_size;
+        height: $richEditor-menuButton_size;
+        text-align: center;
+
+        &.isSelected {
+            @include editorButtonActiveStyles;
+        }
     }
 
     &:not(:disabled) {
@@ -397,7 +405,6 @@ $richEditor-mobileEmbedBreakPoint                 : 550px !default;
 }
 
 .insertPopover-body {
-    margin-bottom: $richEditor-insertPopover_paddingHorizontal;
     padding: {
         left: $richEditor-insertPopover_paddingHorizontal;
         right: $richEditor-insertPopover_paddingHorizontal;
@@ -421,6 +428,7 @@ $richEditor-mobileEmbedBreakPoint                 : 550px !default;
     position: absolute;
     bottom: 100%;
     left: 0;
+    width: #{$richEditor-insertPopover_paddingHorizontal * 2 + 7 * $richEditor-menuButton_size};
 }
 
 .popover-title {
@@ -428,8 +436,11 @@ $richEditor-mobileEmbedBreakPoint                 : 550px !default;
 }
 
 .richEditor-insertEmoji {
-    width: $richEditor-menuButton_size;
-    height: $richEditor-menuButton_size;
+    //display: flex;
+    //align-items: center;
+    //justify-content: center;
+    //width: $richEditor-menuButton_size;
+    //height: $richEditor-menuButton_size;
     font-size: $icon-default_size;
     text-align: center;
     overflow: hidden;
@@ -574,26 +585,13 @@ $richEditor-mobileEmbedBreakPoint                 : 550px !default;
 .emojiGroups {
     display: flex;
     flex-wrap: nowrap;
-    justify-content: space-between;
-    padding-left: $richEditor-emojiGroup_paddingLeft;
-}
-
-.emojiGroup {
-    color: $richEditor-emojiCategory_color;
-
-    &.isSelected {
-        @include editorButtonActiveStyles;
-    }
-
-    + .emojiGroup {
-        margin-left: 10px;
-    }
+    justify-content: center;
 }
 
 .emojiGroup-icon {
     display: block;
     position: relative;
-    margin: 0;
+    margin: auto;
     padding: 0;
     width: $icon-default_size;
     size: $icon-default_size;

@@ -3,6 +3,8 @@
 \* -------------------------------------------------------------- */
 /* -------------------------------------------------------------- *    Globals
 \* -------------------------------------------------------------- */
+/* -------------------------------------------------------------- *    States Colors
+\* -------------------------------------------------------------- */
 /* -------------------------------------------------------------- *    Password Strength Colors
 \* -------------------------------------------------------------- */
 /* -------------------------------------------------------------- *    Third Party Colors
@@ -731,11 +733,28 @@ label.checkbox input.checkbox-input {
   }
 }
 
+@-webkit-keyframes fadein {
+  0% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+@keyframes fadein {
+  0% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
 .richEditor {
   position: relative;
   display: block;
-  padding-left: 36px;
-  font-size: 16px;
+  padding-left: 30px;
 }
 
 .richEditor.isDisabled,
@@ -765,24 +784,6 @@ label.checkbox input.checkbox-input {
   float: none;
 }
 
-@-webkit-keyframes fadein {
-  0% {
-    opacity: 0;
-  }
-  100% {
-    opacity: 1;
-  }
-}
-
-@keyframes fadein {
-  0% {
-    opacity: 0;
-  }
-  100% {
-    opacity: 1;
-  }
-}
-
 .richEditorParagraphMenu {
   position: absolute;
   top: 9px;
@@ -802,7 +803,10 @@ label.checkbox input.checkbox-input {
 .richEditor-text {
   position: relative;
   min-height: 200px;
-  padding: 9px 12px;
+  padding-top: 9px;
+  padding-right: 12px;
+  padding-bottom: 9px;
+  padding-left: 12px;
   outline-color: transparent;
   white-space: pre-wrap !important;
 }
@@ -844,12 +848,10 @@ label.checkbox input.checkbox-input {
           flex-wrap: nowrap;
   list-style: none;
   padding: 0;
-  width: -webkit-calc(100% - 2px);
-  width: calc(100% - 2px);
-  margin-top: 0;
+  margin-top: 1px;
   margin-right: 0;
-  margin-left: -1px;
-  margin-bottom: -1px;
+  margin-bottom: 0;
+  margin-left: 0;
 }
 
 .richEditor-menuItems .richEditor-menuItem {
@@ -859,9 +861,9 @@ label.checkbox input.checkbox-input {
 }
 
 .richEditor-menuItems .richEditor-menuItem .richEditor-button, .richEditor-menuItems .richEditor-menuItem.richEditor-button {
-  width: 39px;
-  font-size: 24px;
-  line-height: 39px;
+  width: 36px;
+  font-size: 22.1538461538px;
+  line-height: 36px;
 }
 
 .richEditor-menuItems .richEditor-menuItem .richEditor-button.emojiChar-🇺🇳, .richEditor-menuItems .richEditor-menuItem.richEditor-button.emojiChar-🇺🇳 {
@@ -873,7 +875,6 @@ label.checkbox input.checkbox-input {
 }
 
 .richEditor-nextInput,
-.atMentionList-suggestion,
 .iconButton,
 .richEditor-button {
   white-space: nowrap;
@@ -903,7 +904,7 @@ label.checkbox input.checkbox-input {
 }
 
 .richEditor-button.richEditor-formatButton, .richEditor-button.richEditor-embedButton {
-  height: 39px;
+  height: 36px;
   color: inherit;
 }
 
@@ -916,36 +917,37 @@ label.checkbox input.checkbox-input {
   cursor: pointer;
 }
 
-.richEditor-button:focus {
-  z-index: 2;
-  outline-width: 1px;
-  outline-offset: -1px;
-  outline-color: rgba(2, 145, 219, 0.6);
-  outline-style: solid;
+.richEditor-button:hover {
+  background: #f1f9fd;
 }
 
-.richEditor-button:hover .Close-x,
-.richEditor-button:hover .richEditorButton-icon, .richEditor-button:focus .Close-x,
+.richEditor-button:focus {
+  background: #e1f2fb;
+  outline: none;
+  z-index: 2;
+}
+
+.richEditor-button:focus .Close-x,
 .richEditor-button:focus .richEditorButton-icon {
   opacity: 1;
 }
 
 .richEditor-button.isActive {
-  background-color: rgba(174, 228, 254, 0.2);
+  color: #0f97dd;
 }
 
 .richEditor-button.richEditor-embedButton:focus {
-  outline-width: 1px;
-  outline-offset: -1px;
-  outline-color: rgba(2, 145, 219, 0.6);
-  outline-style: solid;
+  background: #e1f2fb;
+  outline: none;
+}
+
+.richEditor-button.richEditor-formatButton.isActive:hover {
+  cursor: default;
 }
 
 .richEditor-button.richEditor-formatButton:focus {
-  outline-width: 1px;
-  outline-offset: 0px;
-  outline-color: rgba(2, 145, 219, 0.6);
-  outline-style: solid;
+  background: #e1f2fb;
+  outline: none;
 }
 
 .richEditor-menuWideItem,
@@ -958,9 +960,9 @@ label.checkbox input.checkbox-input {
 .richEditor-menuWideItem .richEditor-button, .richEditor-menuWideItem.richEditor-button,
 .richEditor-menuItem .richEditor-button,
 .richEditor-menuItem.richEditor-button {
-  width: 39px;
-  font-size: 24px;
-  line-height: 39px;
+  width: 36px;
+  font-size: 22.1538461538px;
+  line-height: 36px;
 }
 
 .richEditor-menuWideItem .richEditor-button.emojiChar-🇺🇳, .richEditor-menuWideItem.richEditor-button.emojiChar-🇺🇳,
@@ -972,15 +974,6 @@ label.checkbox input.checkbox-input {
 .richEditor-menuWideItem.isRightAligned,
 .richEditor-menuItem.isRightAligned {
   margin-left: auto;
-}
-
-.richEditor-nextInput {
-  height: 39px;
-  line-height: 39px;
-  font-size: 0.9em;
-  color: inherit;
-  padding-left: 9px;
-  padding-right: 9px;
 }
 
 .richEditor-upload {
@@ -1027,9 +1020,9 @@ label.checkbox input.checkbox-input {
 .richEditor-close.Close {
   position: relative;
   display: block;
-  width: 39px;
-  height: 39px;
-  line-height: 39px;
+  width: 36px;
+  height: 36px;
+  line-height: 36px;
   top: auto;
   right: auto;
   text-align: center;
@@ -1042,10 +1035,8 @@ label.checkbox input.checkbox-input {
 }
 
 .richEditor-close.Close:focus {
-  outline-width: 1px;
-  outline-offset: -1px;
-  outline-color: rgba(2, 145, 219, 0.6);
-  outline-style: solid;
+  background: #e1f2fb;
+  outline: none;
 }
 
 .insertLink-input.InputBox {
@@ -1055,8 +1046,8 @@ label.checkbox input.checkbox-input {
   -webkit-flex-grow: 1;
       -ms-flex-positive: 1;
           flex-grow: 1;
-  max-width: -webkit-calc(100% - 39px);
-  max-width: calc(100% - 39px);
+  max-width: -webkit-calc(100% - 36px);
+  max-width: calc(100% - 36px);
 }
 
 .insertPopover {
@@ -1103,9 +1094,9 @@ label.checkbox input.checkbox-input {
   overflow-x: hidden;
   max-width: 100%;
   margin: 0;
-  max-width: -webkit-calc(100% - 39px);
-  max-width: calc(100% - 39px);
-  min-height: 27px;
+  max-width: -webkit-calc(100% - 36px);
+  max-width: calc(100% - 36px);
+  min-height: 24px;
 }
 
 .popover-title:focus {
@@ -1147,7 +1138,7 @@ label.checkbox input.checkbox-input {
 
 .insertEmoji-body {
   max-height: 100vh;
-  height: 292.5px;
+  height: 270px;
 }
 
 .content-wrapper {
@@ -1169,8 +1160,8 @@ label.checkbox input.checkbox-input {
 }
 
 .richEditor-insertEmoji {
-  width: 39px;
-  height: 39px;
+  width: 36px;
+  height: 36px;
   font-size: 24px;
   text-align: center;
   overflow: hidden;
@@ -1257,7 +1248,7 @@ label.checkbox input.checkbox-input {
   -webkit-transform: translateY(-50%) translateX(-50%);
       -ms-transform: translateY(-50%) translateX(-50%);
           transform: translateY(-50%) translateX(-50%);
-  margin-top: 1px;
+  margin-top: 2px;
 }
 
 .richEditor-toolbarContainer.isDown .richEditor-nub {
@@ -1296,22 +1287,6 @@ label.checkbox input.checkbox-input {
           transform: translateY(1px);
 }
 
-.blockquote {
-  display: block;
-  margin: 0;
-  padding-top: 0;
-  padding-left: 18px;
-  padding-right: 0;
-  padding-bottom: 0;
-  padding: 3px 3px 3px 18px;
-  border-left: solid #D8D8D8 6px;
-  box-sizing: border-box;
-  width: 100%;
-  vertical-align: middle;
-  border-left: solid #D8D8D8 6px;
-  color: #A3A3A3;
-}
-
 .userContent > *:not(:last-child) {
   margin-bottom: .6em;
 }
@@ -1322,7 +1297,7 @@ label.checkbox input.checkbox-input {
 .userContent > *:not(:last-child) + h4,
 .userContent > *:not(:last-child) + h5,
 .userContent > *:not(:last-child) + h6 {
-  margin-top: 9.6px;
+  margin-top: .6em;
 }
 
 .userContent > *:first-child {
@@ -1342,7 +1317,6 @@ label.checkbox input.checkbox-input {
 .userContent th,
 .userContent a,
 .userContent p {
-  word-break: break-all;
   word-break: break-word;
   text-overflow: ellipsis;
 }
@@ -1381,7 +1355,7 @@ label.checkbox input.checkbox-input {
 }
 
 .emojiGroup.isSelected {
-  background-color: rgba(174, 228, 254, 0.2);
+  color: #0f97dd;
 }
 
 .emojiGroup + .emojiGroup {
@@ -1397,9 +1371,132 @@ label.checkbox input.checkbox-input {
   size: 24px;
 }
 
+body.hasRichEditor #Form_Preview {
+  display: none;
+}
+
+@media (min-width: 700px) {
+  body.hasRichEditor.Section-PostDiscussion #DiscussionForm select {
+    max-width: 100%;
+  }
+  body.hasRichEditor.Section-PostDiscussion #DiscussionForm .FormWrapper {
+    padding-left: 36px;
+    padding-right: 30px;
+  }
+  body.hasRichEditor.Section-PostDiscussion #DiscussionForm .FormWrapper .richEditor {
+    padding-left: 0;
+  }
+  body.hasRichEditor .CommentForm .CommentFormWrap .Form-HeaderWrap {
+    display: none;
+  }
+  body.hasRichEditor .CommentForm .CommentFormWrap .FormWrapper {
+    padding-left: 0;
+  }
+  body.hasRichEditor .CommentForm .richEditor {
+    padding-left: 36px;
+    padding-right: 30px;
+  }
+  body.hasRichEditor .CommentForm .richEditor .richEditor {
+    padding-left: 0;
+  }
+  body.hasRichEditor .DataListWrap .FormWrapper.FormWrapper-Condensed {
+    padding-left: 0;
+  }
+  body.hasRichEditor #GroupForm .Form-HeaderWrap,
+  body.hasRichEditor #MessageForm .Form-HeaderWrap,
+  body.hasRichEditor #ConversationForm .Form-HeaderWrap {
+    display: none;
+  }
+  body.hasRichEditor #GroupForm .FormWrapper,
+  body.hasRichEditor #MessageForm .FormWrapper,
+  body.hasRichEditor #ConversationForm .FormWrapper {
+    padding-left: 36px;
+    padding-right: 30px;
+  }
+  body.hasRichEditor #GroupForm .FormWrapper .richEditor,
+  body.hasRichEditor #MessageForm .FormWrapper .richEditor,
+  body.hasRichEditor #ConversationForm .FormWrapper .richEditor {
+    padding-left: 0;
+  }
+}
+
+body.isMobile .embedDialogue {
+  position: static;
+}
+
+body.isMobile .u-richEditorHiddenOnMobile {
+  display: none !important;
+}
+
+body.isMobile .richEditor {
+  padding-left: 0;
+}
+
+body.isMobile .richEditor-menu.insertPopover {
+  left: 0;
+  width: -webkit-calc(100% + 0);
+  width: calc(100% + 0);
+}
+
+body.isMobile .richEditor-embedBarMobileBorder {
+  display: block;
+}
+
+body.isMobile .FormWrapper {
+  padding-left: 18px;
+  padding-right: 18px;
+}
+
+body.isMobile .richEditorParagraphMenu {
+  display: none !important;
+}
+
+@media (max-width: 700px) {
+  .embedDialogue {
+    position: static;
+  }
+  .u-richEditorHiddenOnMobile {
+    display: none !important;
+  }
+  .richEditor {
+    padding-left: 0;
+  }
+  .richEditor-menu.insertPopover {
+    left: 0;
+    width: -webkit-calc(100% + 0);
+    width: calc(100% + 0);
+  }
+  .richEditor-embedBarMobileBorder {
+    display: block;
+  }
+  .FormWrapper {
+    padding-left: 18px;
+    padding-right: 18px;
+  }
+  .richEditorParagraphMenu {
+    display: none !important;
+  }
+}
+
 .atMentionList {
   position: absolute;
   width: 200px;
+}
+
+.atMentionList-suggestion {
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  overflow-x: hidden;
+  max-width: 100%;
+  position: relative;
+  -webkit-appearance: none;
+     -moz-appearance: none;
+          appearance: none;
+  border: 0;
+  padding: 0;
+  background: none;
+  width: 100%;
+  text-align: left;
 }
 
 .atMentionList-items.MenuItems {
@@ -1412,7 +1509,7 @@ label.checkbox input.checkbox-input {
 }
 
 .atMentionList-item.isActive .atMentionList-suggestion {
-  background-color: #f4f3f5;
+  background-color: #e1f2fb;
 }
 
 .atMentionList-suggestion {
@@ -1474,114 +1571,33 @@ label.checkbox input.checkbox-input {
 .atMention {
   color: inherit;
   font-weight: 600;
-}
-
-.richEditor .atMention {
   -webkit-user-select: all;
      -moz-user-select: all;
       -ms-user-select: all;
           user-select: all;
 }
 
-body.hasRichEditor #Form_Preview {
-  display: none;
-}
-
-@media (min-width: 700px) {
-  body.hasRichEditor.Section-PostDiscussion #DiscussionForm select {
-    max-width: 100%;
-  }
-  body.hasRichEditor.Section-PostDiscussion #DiscussionForm .FormWrapper {
-    padding-left: 36px;
-  }
-  body.hasRichEditor.Section-PostDiscussion #DiscussionForm .FormWrapper .richEditor {
-    padding-left: 0;
-  }
-  body.hasRichEditor .CommentForm .CommentFormWrap .Form-HeaderWrap {
-    display: none;
-  }
-  body.hasRichEditor .CommentForm .CommentFormWrap .FormWrapper {
-    padding-left: 0;
-  }
-  body.hasRichEditor .CommentForm .richEditor {
-    padding-left: 36px;
-  }
-  body.hasRichEditor .CommentForm .richEditor .richEditor {
-    padding-left: 0;
-  }
-  body.hasRichEditor .DataListWrap .FormWrapper.FormWrapper-Condensed {
-    padding-left: 0;
-  }
-  body.hasRichEditor #MessageForm .Form-HeaderWrap,
-  body.hasRichEditor #ConversationForm .Form-HeaderWrap {
-    display: none;
-  }
-  body.hasRichEditor #MessageForm .FormWrapper,
-  body.hasRichEditor #ConversationForm .FormWrapper {
-    padding-left: 36px;
-  }
-  body.hasRichEditor #MessageForm .FormWrapper .richEditor,
-  body.hasRichEditor #ConversationForm .FormWrapper .richEditor {
-    padding-left: 0;
-  }
-}
-
-body.isMobile .embedDialogue {
-  position: static;
-}
-
-body.isMobile .u-richEditorHiddenOnMobile {
-  display: none !important;
-}
-
-body.isMobile .richEditor {
-  padding-left: 0;
-}
-
-body.isMobile .richEditor-menu.insertPopover {
-  left: 0;
-  width: -webkit-calc(100% + 4px);
-  width: calc(100% + 4px);
-}
-
-body.isMobile .richEditor-embedBarMobileBorder {
+.blockquote {
   display: block;
-}
-
-body.isMobile .FormWrapper {
+  margin: 0;
+  padding-top: 0;
   padding-left: 18px;
-  padding-right: 18px;
+  padding-right: 0;
+  padding-bottom: 0;
+  padding: 3px 3px 3px 18px;
+  border-left: solid #d8d9db 6px;
+  box-sizing: border-box;
+  width: 100%;
+  vertical-align: middle;
+  color: #a2a4a9;
 }
 
-body.isMobile .richEditorParagraphMenu {
-  display: none !important;
+.blockquote-content > *:first-child {
+  margin-top: 0;
 }
 
-@media (max-width: 700px) {
-  .embedDialogue {
-    position: static;
-  }
-  .u-richEditorHiddenOnMobile {
-    display: none !important;
-  }
-  .richEditor {
-    padding-left: 0;
-  }
-  .richEditor-menu.insertPopover {
-    left: 0;
-    width: -webkit-calc(100% + 4px);
-    width: calc(100% + 4px);
-  }
-  .richEditor-embedBarMobileBorder {
-    display: block;
-  }
-  .FormWrapper {
-    padding-left: 18px;
-    padding-right: 18px;
-  }
-  .richEditorParagraphMenu {
-    display: none !important;
-  }
+.blockquote-content > *:first-child:last-child {
+  margin-bottom: 0;
 }
 
 .accessibility-jumpTo {
@@ -1600,10 +1616,8 @@ body.isMobile .richEditorParagraphMenu {
 }
 
 .accessibility-jumpTo:focus {
-  outline-width: 1px;
-  outline-offset: -1px;
-  outline-color: rgba(2, 145, 219, 0.6);
-  outline-style: solid;
+  background: #e1f2fb;
+  outline: none;
   position: absolute;
   top: 50px;
   left: 0;
@@ -1624,7 +1638,7 @@ body.isMobile .richEditorParagraphMenu {
 }
 
 .accessibility-jumpTo:hover {
-  background-color: rgba(174, 228, 254, 0.2);
+  color: #0f97dd;
 }
 
 .spoiler {
@@ -1934,8 +1948,23 @@ body.isMobile .richEditorParagraphMenu {
 }
 
 .embedVideo-thumbnail {
-  object-fit: cover;
-  object-position: center;
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  margin: auto;
+  height: auto;
+  width: 100%;
+  background-color: black;
+}
+
+@supports (object-fit: cover) {
+  .embedVideo-thumbnail {
+    object-fit: cover;
+    object-position: center;
+    height: 100%;
+  }
 }
 
 .embedVideo-scrim {
@@ -2010,6 +2039,12 @@ body.isMobile .richEditorParagraphMenu {
   max-width: 640px;
 }
 
+@media screen and (-ms-high-contrast: active), screen and (-ms-high-contrast: none) {
+  .embedImage .embedExternal-content {
+    width: 100%;
+  }
+}
+
 .Message img .embedImage-img,
 .embedImage-img {
   display: block;
@@ -2017,7 +2052,6 @@ body.isMobile .richEditorParagraphMenu {
   margin-left: auto;
   margin-right: auto;
   max-width: 100%;
-  max-height: 80vh;
 }
 
 .embedLink .embedExternal-content {
@@ -2045,12 +2079,21 @@ body.isMobile .richEditorParagraphMenu {
 
 .embedLink .embedLink-image {
   position: absolute;
+  display: block;
   top: 0;
   left: 0;
-  object-fit: cover;
-  object-position: center;
+  bottom: 0;
+  margin-top: auto;
+  margin-bottom: auto;
   width: 225px;
-  height: 100%;
+}
+
+@supports (object-fit: cover) {
+  .embedLink .embedLink-image {
+    height: 100%;
+    object-fit: cover;
+    object-position: center;
+  }
 }
 
 .embedLink .embedLink-image + .embedLink-main {

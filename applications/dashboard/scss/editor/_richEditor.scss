@@ -1,74 +1,60 @@
-$richEditor-font_size: $global-large_fontSize !default;
-$richEditor-icon_size: $icon-default_size !default;
-$richEditor-lineHeight: $global-base_lineHeight !default;
-$richEditor-menuButton_size: 39px !default;
-$richEditor-bg_color: $global-color_bg !default;
-$richEditor_leftPadding: 36px !default;
-$richEditor_minHeight: 200px !default;
-$richEditor_verticalPadding: 9px !default;
-$richEditor_padding: $richEditor_verticalPadding 12px !default;
-$richEditor-embedMenu_padding: 0 !default;
-$richEditor-embedMenuWideButton_padding: 9px;
-$richEditor-embedMenuWideButton_fontSize: .9em;
-$richEditor-icon_opacity: .7 !default;
-$richEditor-atMention_width: 200px !default;
-$richEditor-atMentionAvatar_width: 30px !default;
-$richEditor-atMentionAvatar_margin: 10px !default;
-$richEditor-atMentionMark_weight: 600 !default;
-$richEditor-atMentionLink_weight: 600 !default;
-$richEditor-atMentionUser_paddingHorizontal: 6px !default;
-$richEditor-atMentionUser_paddingVertical: 3px !default;
-$richEditor-atMentionSelected_bg: #f4f3f5;
-$richEditor-insertLink_width: 387px !default;
-$richEditor-insertPopover_paddingVertical: 12px !default;
-$richEditor-insertPopover_paddingHorizontal: 12px !default;
-$richEditor-insertPopover_maxHeight: 100vh !default;
-$richEditor-insertPopover_height: $richEditor-menuButton_size * 7.5 !default;
-$richEditor-emoji_width: 7 * $richEditor-menuButton_size + 2 * $richEditor-insertPopover_paddingHorizontal;
-$richEditor-nub_width: 12px !default;
-$richEditor-menu_borderWidth: 1px !default;
-$richEditor-menu_offset: $richEditor-nub_width !default;
-$richEditor-pilcrow_offset: 9px!default;
-$richEditor-pilcrow_fontSize: 14px;
-$richEditor-pilcrow_gutter: 36px;
-$richEditor-pilcrowAnimation_duration: 0.3s;
-$richEditor-emojiCategory_color: #737982;
-$richEditor-emojiCategory_hoverColor: #212327;
-$richEditor-emojiGroup_paddingLeft: 3px;
-$richEditor-mobileEmbedMenu_borderColor: $global-color_primary;
-$richEditor-mobileEmbedMenu_transitionDuration: .15s;
-$richEditor-mobileEmbedMenu_transitionTiming: ease-out;
-$richEditor-selected_bg: rgba(174, 228, 254, 0.2);
-$richEditor-border_width: 1px;
-$richEditor-outline_width: 1px;
-$richEditor-emojiOutline_offset: -#{$richEditor-outline_width + 2};
-$richEditor-embedButton_offset: - $richEditor-outline_width;
-$richEditor-paragraphMenuButton_offset: - $richEditor-outline_width + 1;
-$richEditor-text_offset: 0;
+$richEditor-menuButton_size                       : 36px !default;
 
+$richEditor_bg                                    : $global-color_bg !default;
+$richEditor_leftPadding                           : 30px !default;
+$richEditor_minHeight                             : 200px !default;
+$richEditor_verticalPadding                       : 9px !default;
+$richEditor_horizontalPadding                     : 12px !default;
+$richEditor-outline_color                         : rgba($global-color_primary, 0.6) !default; // TODO drerrive
 
+$richEditor-embedMenu_padding                     : 0 !default;
+$richEditor-icon_opacity                          : .7 !default;
 
-$richEditor-outline_color: rgba(2, 145, 219, 0.6);
+$richEditor-insertLink_width                      : 387px !default;
 
-$richEditor-videoPlayIcon_width: 80px;
-$richEditor-videoPlayIcon_hoverColor: #0291db;
+$richEditor-insertPopover_paddingVertical         : 12px !default;
+$richEditor-insertPopover_paddingHorizontal       : 12px !default;
+$richEditor-insertPopover_maxHeight               : 100vh !default;
+$richEditor-insertPopover_height                  : $richEditor-menuButton_size * 7.5 !default;
 
-$embedImage_width: 640px;
-$embedded-quote_fg: #A3A3A3 !default;
+$richEditor-nub_width                             : 12px !default;
+
+$richEditor-menu_borderWidth                      : 1px !default;
+$richEditor-menu_offset                           : $richEditor-nub_width !default;
+
+$richEditor-pilcrow_offset                        : 9px!default;
+$richEditor-pilcrow_fontSize                      : 14px !default;
+$richEditor-pilcrow_gutter                        : 36px !default; //TODO - tweak size
+$richEditor-pilcrowAnimation_duration             : 0.3s;
+
+$richEditor-emojiCategory_color                   : #737982 !default; // TODO derrive
+$richEditor-emojiCategory_hoverColor              : #212327 !default; // TODO drrive
+$richEditor-emojiGroup_paddingLeft                : 3px !default;
+$richEditor-emojiOutline_offset                   : -#{$formElement_borderWidth + 2} !default;
+
+$richEditor-mobileEmbedMenu_borderColor           : $global-color_primary !default;
+$richEditor-mobileEmbedMenu_transitionDuration    : .15s !default;
+$richEditor-mobileEmbedMenu_transitionTiming      : ease-out !default;
+
+$richEditor-embedButton_offset                    : -$formElement_borderWidth !default;
+$richEditor-paragraphMenuButton_offset            : -$formElement_borderWidth + 1 !default;
+$richEditor-text_offset                           : 0 !default;
+
+$embedImage_width                                 : 640px !default;
 
 // Break Points
-$richEditor-mobile_spacing: 18px !default;
-$richEditor-mobileBreakPoint: 700px !default;
-$richEditor-mobileEmbedBreakPoint: 550px !default;
+$richEditor-mobile_spacing                        : 18px !default;
+$richEditor-mobileBreakPoint                      : 700px !default;
+$richEditor-mobileEmbedBreakPoint                 : 550px !default;
 
 
 .richEditor {
     position: relative;
     display: block;
     padding-left: $richEditor_leftPadding;
-    font-size: $richEditor-font_size;
+    //font-size: $global-large_fontSize;
 
-    &.isDisabled {
+    &.isDisabled { // Before React has replaced initial HTML
         &,
         .richEditor-button {
             cursor: progress !important;
@@ -79,7 +65,7 @@ $richEditor-mobileEmbedBreakPoint: 550px !default;
 .richEditor-frame {
     &.InputBox {
         position: relative;
-        background: $richEditor-bg_color;
+        background: $richEditor_bg;
         height: auto;
         padding: 0;
     }
@@ -100,22 +86,13 @@ $richEditor-mobileEmbedBreakPoint: 550px !default;
     }
 }
 
-@keyframes fadein {
-    0% {
-        opacity: 0;
-    }
-    100% {
-        opacity: 1;
-    }
-}
-
 .richEditorParagraphMenu {
     position: absolute;
     top: $richEditor-pilcrow_offset;
     left: -6px;
     transform: translateX(-100%);
-    height: $richEditor-icon_size;
-    width: $richEditor-icon_size;
+    height: $icon-default_size;
+    width: $icon-default_size;
     z-index: 1;
     animation: fadein $richEditor-pilcrowAnimation_duration ease;
     animation-iteration-count: 1;
@@ -124,7 +101,12 @@ $richEditor-mobileEmbedBreakPoint: 550px !default;
 .richEditor-text {
     position: relative;
     min-height: $richEditor_minHeight;
-    padding: $richEditor_padding;
+    padding: {
+        top: $richEditor_verticalPadding;
+        right: $richEditor_horizontalPadding;
+        bottom: $richEditor_verticalPadding;
+        left: $richEditor_horizontalPadding;
+    }
     outline-color: transparent;
     white-space: pre-wrap !important; // Needed for spaces around embed blots to work properly!
 
@@ -132,7 +114,7 @@ $richEditor-mobileEmbedBreakPoint: 550px !default;
         outline: {
             offset: $richEditor-text_offset;
             style: solid;
-            width: $richEditor-outline_width;
+            width: $formElement_borderWidth;
             color: $richEditor-outline_color;
         }
     }
@@ -150,12 +132,11 @@ $richEditor-mobileEmbedBreakPoint: 550px !default;
     flex-wrap: nowrap;
     list-style: none;
     padding: 0;
-    width: calc(100% - #{2 * $richEditor-border_width});
     margin: {
-        top: 0;
+        top: $formElement-borderWidth;
         right: 0;
-        left: -$richEditor-border_width;
-        bottom: -$richEditor-border_width;
+        bottom: 0;
+        left: 0;
     }
 
     .richEditor-menuItem {
@@ -182,7 +163,6 @@ $richEditor-mobileEmbedBreakPoint: 550px !default;
 
 // button reset
 .richEditor-nextInput,
-.atMentionList-suggestion,
 .iconButton,
 .richEditor-button {
     @include singleLineEllipsis;
@@ -199,8 +179,8 @@ $richEditor-mobileEmbedBreakPoint: 550px !default;
 
 .richEditor-button {
     display: block;
-    height: $richEditor-icon_size;
-    width: $richEditor-icon_size;
+    height: $icon-default_size;
+    width: $icon-default_size;
     user-select: none;
     cursor: pointer;
 
@@ -212,21 +192,22 @@ $richEditor-mobileEmbedBreakPoint: 550px !default;
     }
 
     &.emojiGroup {
-        width: $richEditor-icon_size;
-        height: $richEditor-icon_size;
+        width: $icon-default_size;
+        height: $icon-default_size;
     }
 
     &:not(:disabled) {
         cursor: pointer;
     }
 
-    &:focus {
-        z-index: 2;
-        @include editorButtonFocusStyles;
+    &:hover {
+        background: $state-color_hover;
     }
 
-    &:hover,
     &:focus {
+        @include editorButtonFocusStyles;
+        z-index: 2;
+
         .Close-x,
         .richEditorButton-icon {
             opacity: 1;
@@ -245,6 +226,13 @@ $richEditor-mobileEmbedBreakPoint: 550px !default;
     }
 
     &.richEditor-formatButton {
+
+        &.isActive {
+            &:hover {
+                cursor: default;
+            }
+        }
+
         &:focus {
             @include editorButtonFocusStyles($richEditor-paragraphMenuButton_offset);
         }
@@ -273,17 +261,6 @@ $richEditor-mobileEmbedBreakPoint: 550px !default;
     }
 }
 
-.richEditor-nextInput {
-    height: $richEditor-menuButton_size;
-    line-height: $richEditor-menuButton_size;
-    font-size: $richEditor-embedMenuWideButton_fontSize;
-    color: inherit;
-    padding: {
-        left: $richEditor-embedMenuWideButton_padding;
-        right: $richEditor-embedMenuWideButton_padding;
-    }
-}
-
 .richEditor-upload {
     display: none !important;
 }
@@ -297,8 +274,8 @@ $richEditor-mobileEmbedBreakPoint: 550px !default;
 .richEditorButton-icon {
     display: block;
     margin: auto;
-    height: $richEditor-icon_size;
-    width: $richEditor-icon_size;
+    height: $icon-default_size;
+    width: $icon-default_size;
     opacity: $richEditor-icon_opacity;
 }
 
@@ -449,7 +426,7 @@ $richEditor-mobileEmbedBreakPoint: 550px !default;
 .richEditor-insertEmoji {
     width: $richEditor-menuButton_size;
     height: $richEditor-menuButton_size;
-    font-size: $richEditor-icon_size;
+    font-size: $icon-default_size;
     text-align: center;
     overflow: hidden;
 
@@ -490,7 +467,7 @@ $richEditor-mobileEmbedBreakPoint: 550px !default;
     }
     box-shadow: 0 0 5px 1px #eee;
     box-shadow: 0 0 5px 1px rgba(0, 0, 0, 0.2);
-    background: $richEditor-bg_color;
+    background: $richEditor_bg;
 }
 
 // Orientation specific styles
@@ -518,7 +495,7 @@ $richEditor-mobileEmbedBreakPoint: 550px !default;
         .richEditor-nubPosition {
             align-items: flex-end;
             transform: translateY(-50%) translateX(-50%);
-            margin-top: $richEditor-menu_borderWidth;
+            margin-top: $richEditor-menu_borderWidth * 2;
         }
         .richEditor-nub {
             transform: translateY(50%) rotate(-45deg);
@@ -552,25 +529,6 @@ $richEditor-mobileEmbedBreakPoint: 550px !default;
     }
 }
 
-.blockquote {
-    display: block;
-    margin: 0;
-    padding: {
-        top: 0;
-        left: 18px;
-        right: 0;
-        bottom: 0;
-    };
-    padding: 3px 3px 3px 18px;
-    border-left: solid #D8D8D8 6px;
-    box-sizing: border-box;
-    width: 100%;
-    vertical-align: middle;
-    border-left: solid #D8D8D8 6px;
-    color: $embedded-quote_fg;
-}
-
-
 
 
 
@@ -586,7 +544,7 @@ $richEditor-mobileEmbedBreakPoint: 550px !default;
             + h5,
             + h6
             {
-                margin-top: #{$richEditor-font_size * .6};
+                margin-top: .6em;
             }
         }
 
@@ -609,7 +567,7 @@ $richEditor-mobileEmbedBreakPoint: 550px !default;
     a,
     p
     {
-        @include breakWord;
+        word-break: break-word;
         text-overflow: ellipsis;
     }
 }
@@ -652,98 +610,12 @@ $richEditor-mobileEmbedBreakPoint: 550px !default;
     position: relative;
     margin: 0;
     padding: 0;
-    width: $richEditor-icon_size;
-    size: $richEditor-icon_size;
+    width: $icon-default_size;
+    size: $icon-default_size;
 }
-
-
-// @mentions
-.atMentionList {
-    position: absolute;
-    width: $richEditor-atMention_width;
-}
-
-.atMentionList-items {
-    &.MenuItems {
-        display: block;
-        padding: $richEditor-atMentionUser_paddingVertical 0;
-    }
-
-    &.isHidden {
-        display: none;
-    }
-}
-
-.atMentionList-item {
-    &.isActive {
-        .atMentionList-suggestion {
-            background-color: $richEditor-atMentionSelected_bg;
-        }
-    }
-}
-
-.atMentionList-suggestion {
-    width: 100%;
-    cursor: pointer;
-}
-
-.atMentionList-user,
-.atMentionList-noResults {
-    display: flex;
-    align-items: center;
-    width: 100%;
-    box-sizing: border-box;
-    overflow: hidden;
-    line-height: $richEditor-atMentionAvatar_width;
-    padding: {
-        top: $richEditor-atMentionUser_paddingVertical;
-        right: $richEditor-atMentionUser_paddingHorizontal;
-        bottom: $richEditor-atMentionUser_paddingVertical;
-        left: $richEditor-atMentionUser_paddingHorizontal;
-    }
-}
-
-.atMentionList-photoWrap {
-    margin-right: $richEditor-atMentionAvatar_margin;
-}
-
-.atMentionList-photo {
-    width: $richEditor-atMentionAvatar_width;
-    height: $richEditor-atMentionAvatar_width;
-}
-
-.atMentionList-userName {
-    display: block;
-    flex-grow: 1;
-    overflow: hidden;
-    white-space: nowrap;
-    text-overflow: ellipsis;
-    max-width: calc(100% - #{$richEditor-atMentionAvatar_margin + $richEditor-atMentionAvatar_width});
-}
-
-.atMentionList-mark {
-    padding: 0;
-    font-weight: $richEditor-atMentionMark_weight;
-}
-
-.atMentionList-photo {
-    display: block;
-}
-
-// Rendered link
-.atMention  {
-    color: inherit;
-    font-weight: $richEditor-atMentionLink_weight;
-}
-
-// Only allow selection of the entire mention at once in the editor.
-.richEditor .atMention {
-    user-select: all;
-}
-
-// Hide Preview
 
 body.hasRichEditor {
+    // Hide Preview
     #Form_Preview {
         display: none;
     }
@@ -762,6 +634,7 @@ body.hasRichEditor {
                 .FormWrapper {
                     padding: {
                         left: $richEditor-pilcrow_gutter;
+                        right: $richEditor_leftPadding;
                     }
 
                     .richEditor {
@@ -770,7 +643,6 @@ body.hasRichEditor {
                 }
             }
         }
-
 
         // Comment
         .CommentForm {
@@ -788,6 +660,8 @@ body.hasRichEditor {
             .richEditor {
                 padding: {
                     left: $richEditor-pilcrow_gutter;
+                    right: $richEditor_leftPadding;
+
                 }
 
                 .richEditor {
@@ -804,6 +678,7 @@ body.hasRichEditor {
         }
 
         // New Message
+        #GroupForm,
         #MessageForm,
         #ConversationForm {
             .Form-HeaderWrap {
@@ -811,7 +686,10 @@ body.hasRichEditor {
             }
 
             .FormWrapper {
-                padding-left: $richEditor-pilcrow_gutter;
+                padding: {
+                    left: $richEditor-pilcrow_gutter;
+                    right: $richEditor_leftPadding;
+                }
 
                 .richEditor {
                     padding-left: 0;

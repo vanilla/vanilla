@@ -1,3 +1,4 @@
+$richEditor-videoPlayIcon_width: 80px !default;
 $embedVideo_width: $embed_width;
 
 // Video
@@ -37,8 +38,8 @@ $embedVideo_width: $embed_width;
 }
 
 .embedVideo-thumbnail {
-    object-fit: cover;
-    object-position: center;
+    @include objectFitWithFallback;
+    background-color: black;
 }
 
 .embedVideo-scrim {

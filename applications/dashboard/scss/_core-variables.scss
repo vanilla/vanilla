@@ -39,6 +39,15 @@ $global-border-style                                 : solid;
 $global_borderRadius                                 : 2px !default;
 
 /* -------------------------------------------------------------- *\
+    States Colors
+\* -------------------------------------------------------------- */
+
+$state-color_hover                                   : mix($global-color_primary, $global-color_bg, 5.5%) !default; // rgba(174, 228, 255, 0.2);
+$state-color_focus                                   : mix($global-color_primary, $global-color_bg, 12%) !default; // rgba(174, 228, 255, 0.4);
+$state-color_selected                                : mix($global-color_primary, $global-color_bg, 95%) !default; // #0075f5
+
+
+/* -------------------------------------------------------------- *\
     Password Strength Colors
 \* -------------------------------------------------------------- */
 
@@ -271,8 +280,6 @@ $global-fileUpload_hover_bg                          : mix($global-color_primary
 
 $formElement-panel_shadowColor                       : rgba($global-color_fg, .2) !default;
 $formElement-panel_boxShadow                         : 0 1px 3px 0 $formElement-panel_shadowColor !default;
-
-
 
 
 /* -------------------------------------------------------------- *\

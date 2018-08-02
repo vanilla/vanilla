@@ -15,6 +15,7 @@ interface IProps {
     formatter: Formatter;
     activeFormats: IFormats;
     lastGoodSelection: RangeStatic;
+    afterClickHandler: () => void;
     menuRef?: React.RefObject<MenuItems>;
 }
 
@@ -78,20 +79,26 @@ export default class ParagraphToolbarMenuItems extends React.PureComponent<IProp
 
     private formatParagraph = () => {
         this.props.formatter.paragraph(this.props.lastGoodSelection);
+        this.props.afterClickHandler();
     };
     private formatH2 = () => {
         this.props.formatter.h2(this.props.lastGoodSelection);
+        this.props.afterClickHandler();
     };
     private formatH3 = () => {
         this.props.formatter.h3(this.props.lastGoodSelection);
+        this.props.afterClickHandler();
     };
     private formatBlockquote = () => {
         this.props.formatter.blockquote(this.props.lastGoodSelection);
+        this.props.afterClickHandler();
     };
     private formatCodeBlock = () => {
         this.props.formatter.codeBlock(this.props.lastGoodSelection);
+        this.props.afterClickHandler();
     };
     private formatSpoiler = () => {
         this.props.formatter.spoiler(this.props.lastGoodSelection);
+        this.props.afterClickHandler();
     };
 }

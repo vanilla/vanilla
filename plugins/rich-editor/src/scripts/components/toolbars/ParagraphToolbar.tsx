@@ -60,9 +60,7 @@ export class ParagraphToolbar extends React.PureComponent<IProps, IState> {
                 this.setState({ hasFocus: false });
             }
         });
-        createEditorFlyoutEscapeListener(this.selfRef.current!, this.buttonRef.current!, () => {
-            this.setState({ hasFocus: false });
-        });
+        this.selfRef.current!.addEventListener("keydown", this.handleDocumentKeyDown);
     }
 
     public render() {
@@ -90,7 +88,7 @@ export class ParagraphToolbar extends React.PureComponent<IProps, IState> {
                     className={pilcrowClasses}
                     aria-haspopup="menu"
                     onClick={this.pilcrowClickHandler}
-                    onKeyDown={this.handleKeyPress}
+                    onKeyDown={this.handlePilcrowKeyDown}
                 >
                     {this.activeFormatIcon}
                 </button>
@@ -98,6 +96,7 @@ export class ParagraphToolbar extends React.PureComponent<IProps, IState> {
                     <ParagraphToolbarMenuItems
                         menuRef={this.menuRef}
                         formatter={this.formatter}
+                        afterClickHandler={this.close}
                         activeFormats={this.props.activeFormats}
                         lastGoodSelection={this.props.instanceState.lastGoodSelection}
                     />
@@ -233,11 +232,37 @@ export class ParagraphToolbar extends React.PureComponent<IProps, IState> {
     };
 
     /**
+     * Close the paragraph menu and place the selection at the end of the current selection if there is one.
+     */
+    private close = () => {
+        const { lastGoodSelection } = this.props.instanceState;
+        const newSelection = {
+            index: lastGoodSelection.index + lastGoodSelection.length,
+            length: 0,
+        };
+        this.quill.setSelection(newSelection);
+    };
+
+    /**
+     * Handle the escape key. when the toolbar is open. Note that focus still goes back to the main button,
+     * but the selection is set to a 0 length selection at the end of the current selection before the
+     * focus is moved.
+     */
+    private handleDocumentKeyDown = (event: KeyboardEvent) => {
+        if (event.keyCode === 27 && this.state.hasFocus) {
+            event.preventDefault();
+            this.close();
+            this.setState({ hasFocus: false });
+            this.buttonRef.current!.focus();
+        }
+    };
+
+    /**
      * Implement opening/closing keyboard shortcuts in accordance with the WAI-ARIA best practices for menuitems.
      *
      * @see https://www.w3.org/TR/wai-aria-practices/examples/menubar/menubar-2/menubar-2.html
      */
-    private handleKeyPress = (event: React.KeyboardEvent<any>) => {
+    private handlePilcrowKeyDown = (event: React.KeyboardEvent<any>) => {
         switch (event.key) {
             case "ArrowUp":
                 event.preventDefault();

@@ -157,11 +157,6 @@ export class InlineToolbar extends React.Component<IProps, IState> {
     public componentDidMount() {
         document.addEventListener("keydown", this.escFunction, false);
         watchFocusInDomTree(this.selfRef.current!, this.handleFocusChange);
-        // this.quill.root.addEventListener("focusin", () => this.forceUpdate());
-        // this.quill.root.addEventListener("focusin", () => this.forceUpdate());
-        // this.quill.on("selection-change", () =>
-        // this.setState({ quillHasFocus: this.quill.root === document.activeElement }),
-        // );
 
         // Add a key binding for the link popup.
         const keyboard: Keyboard = this.quill.getModule("keyboard");

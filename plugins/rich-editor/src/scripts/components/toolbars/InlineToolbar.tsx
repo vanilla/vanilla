@@ -104,7 +104,13 @@ export class InlineToolbar extends React.Component<IProps, IState> {
      */
     private get isLinkMenuVisible(): boolean {
         const inCodeBlock = rangeContainsBlot(this.quill, CodeBlockBlot, this.props.instanceState.lastGoodSelection);
-        return this.state.isLinkMenuOpen && this.hasFocus && this.isOneLineOrLess && !inCodeBlock;
+        return (
+            this.state.isLinkMenuOpen &&
+            this.hasFocus &&
+            this.isOneLineOrLess &&
+            !inCodeBlock &&
+            this.selectionHasContent
+        );
     }
 
     /**
@@ -113,7 +119,20 @@ export class InlineToolbar extends React.Component<IProps, IState> {
     private get isFormatMenuVisible(): boolean {
         const selectionHasLength = this.props.instanceState.lastGoodSelection.length > 0;
         const inCodeBlock = rangeContainsBlot(this.quill, CodeBlockBlot, this.props.instanceState.lastGoodSelection);
-        return !this.isLinkMenuVisible && this.hasFocus && selectionHasLength && this.isOneLineOrLess && !inCodeBlock;
+        return (
+            !this.isLinkMenuVisible &&
+            this.hasFocus &&
+            selectionHasLength &&
+            this.isOneLineOrLess &&
+            !inCodeBlock &&
+            this.selectionHasContent
+        );
+    }
+
+    private get selectionHasContent(): boolean {
+        const { lastGoodSelection } = this.props.instanceState;
+        const text = this.quill.getText(lastGoodSelection.index, lastGoodSelection.length);
+        return !!text && text !== "\n";
     }
 
     /**

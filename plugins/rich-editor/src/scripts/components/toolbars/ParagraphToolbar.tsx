@@ -18,6 +18,7 @@ import BlockquoteLineBlot from "@rich-editor/quill/blots/blocks/BlockquoteBlot";
 import SpoilerLineBlot from "@rich-editor/quill/blots/blocks/SpoilerBlot";
 import HeadingBlot from "quill/formats/header";
 import MenuItems from "@rich-editor/components/toolbars/pieces/MenuItems";
+import classNames from "classnames";
 
 interface IProps extends IWithEditorProps {}
 
@@ -64,7 +65,11 @@ export class ParagraphToolbar extends React.PureComponent<IProps, IState> {
     }
 
     public render() {
-        let pilcrowClasses = "richEditor-button richEditorParagraphMenu-handle";
+        let pilcrowClasses = classNames(
+            { isOpen: this.isMenuVisible },
+            "richEditor-button",
+            "richEditorParagraphMenu-handle",
+        );
 
         if (!this.isPilcrowVisible || isEmbedSelected(this.quill, this.props.instanceState.lastGoodSelection)) {
             pilcrowClasses += " isHidden";
@@ -100,9 +105,6 @@ export class ParagraphToolbar extends React.PureComponent<IProps, IState> {
                         activeFormats={this.props.activeFormats}
                         lastGoodSelection={this.props.instanceState.lastGoodSelection}
                     />
-                    <div role="presentation" className="richEditor-nubPosition">
-                        <div className="richEditor-nub" />
-                    </div>
                 </div>
             </div>
         );

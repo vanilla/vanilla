@@ -47,12 +47,10 @@ $richEditor-mobile_spacing                        : 18px !default;
 $richEditor-mobileBreakPoint                      : 700px !default;
 $richEditor-mobileEmbedBreakPoint                 : 550px !default;
 
-
 .richEditor {
     position: relative;
     display: block;
     padding-left: $richEditor_leftPadding;
-    //font-size: $global-large_fontSize;
 
     &.isDisabled { // Before React has replaced initial HTML
         &,
@@ -75,27 +73,39 @@ $richEditor-mobileEmbedBreakPoint                 : 550px !default;
     display: inline-block;
     position: relative;
 
-    &.FlyoutMenu { // Temporary
-        position: relative;
-        top: auto;
-        left: auto;
-        right: auto;
-        bottom: auto;
-        display: block;
-        float: none;
-    }
+    //&.FlyoutMenu { // Temporary
+    //    position: relative;
+    //    top: auto;
+    //    left: auto;
+    //    right: auto;
+    //    bottom: auto;
+    //    display: block;
+    //    float: none;
+    //}
 }
 
 .richEditorParagraphMenu {
     position: absolute;
     top: $richEditor-pilcrow_offset;
-    left: -6px;
+    left: -7px;
     transform: translateX(-100%);
     height: $icon-default_size;
     width: $icon-default_size;
     z-index: 1;
     animation: fadein $richEditor-pilcrowAnimation_duration ease;
     animation-iteration-count: 1;
+}
+
+.richEditorParagraphMenu-handle {
+    &.isOpen {
+        @include editorButtonActiveStyles;
+        opacity: $richEditor-icon_opacity;
+
+        &:hover,
+        &:focus {
+            opacity: 1;
+        }
+    }
 }
 
 .richEditor-text {
@@ -201,19 +211,13 @@ $richEditor-mobileEmbedBreakPoint                 : 550px !default;
     }
 
     &:hover {
-        background: $state-color_hover;
+        @include editorButtonHoverStyles;
     }
 
     &:focus {
         @include editorButtonFocusStyles;
         z-index: 2;
-
-        .Close-x,
-        .richEditorButton-icon {
-            opacity: 1;
-        }
     }
-
 
     &.isActive {
         @include editorButtonActiveStyles;
@@ -448,12 +452,10 @@ $richEditor-mobileEmbedBreakPoint                 : 550px !default;
     overflow: hidden;
     width: $richEditor-nub_width * 2;
     height: $richEditor-nub_width * 2;
-    -webkit-user-select: none;
-    -moz-user-select: none;
-    -ms-user-select: none;
     user-select: none;
     transform: translateX(-50%);
     margin-top: -$richEditor-menu_borderWidth;
+    pointer-events: none;
 }
 
 .richEditor-nub {
@@ -462,17 +464,16 @@ $richEditor-mobileEmbedBreakPoint                 : 550px !default;
     width: $richEditor-nub_width;
     height: $richEditor-nub_width;
     border: {
-        top: $richEditor-menu_borderWidth solid #999;
-        right: $richEditor-menu_borderWidth solid #999;
+        top: $richEditor-menu_borderWidth solid #999;   // TODO make derrived
+        right: $richEditor-menu_borderWidth solid #999; // TODO make derrived
     }
-    box-shadow: 0 0 5px 1px #eee;
-    box-shadow: 0 0 5px 1px rgba(0, 0, 0, 0.2);
+    box-shadow: 0 0 5px 1px #eee;                       // TODO make derrived
+    box-shadow: 0 0 5px 1px rgba(0, 0, 0, 0.2);         // TODO make derrived
     background: $richEditor_bg;
 }
 
 // Orientation specific styles
-
-.richEditor-toolbarContainer {
+.richEditor-inlineToolbarContainer {
     &.isUp {
         transform: translateY(-$richEditor-menu_offset);
 
@@ -505,32 +506,16 @@ $richEditor-mobileEmbedBreakPoint                 : 550px !default;
 
 .richEditor-paragraphToolbarContainer {
     position: absolute;
-
-    .richEditor-nubPosition {
-        left: 2px;
-    }
+    left: calc(50% - #{$richEditor-pilcrow_gutter / 2});
 
     &.isUp {
-        bottom: 100%;
-
-        .richEditor-nubPosition {
-            top: 100%;
-            transform: none;
-        }
+        bottom: calc(50% + #{$richEditor-pilcrow_gutter / 2 - $formElement-borderWidth});
     }
 
     &.isDown {
-        top: 100%;
-
-        .richEditor-nubPosition {
-            bottom: 100%;
-            transform: translateY($richEditor-menu_borderWidth);
-        }
+        top: calc(50% + #{$richEditor-pilcrow_gutter / 2 - $formElement-borderWidth});
     }
 }
-
-
-
 
 .userContent {
     > * {

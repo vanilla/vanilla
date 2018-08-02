@@ -774,20 +774,10 @@ label.checkbox input.checkbox-input {
   position: relative;
 }
 
-.richEditor-menu.FlyoutMenu {
-  position: relative;
-  top: auto;
-  left: auto;
-  right: auto;
-  bottom: auto;
-  display: block;
-  float: none;
-}
-
 .richEditorParagraphMenu {
   position: absolute;
   top: 9px;
-  left: -6px;
+  left: -7px;
   -webkit-transform: translateX(-100%);
       -ms-transform: translateX(-100%);
           transform: translateX(-100%);
@@ -798,6 +788,20 @@ label.checkbox input.checkbox-input {
           animation: fadein 0.3s ease;
   -webkit-animation-iteration-count: 1;
           animation-iteration-count: 1;
+}
+
+.richEditorParagraphMenu-handle.isOpen {
+  color: #0f97dd;
+  opacity: 0.7;
+}
+
+.richEditorParagraphMenu-handle.isOpen .Close-x,
+.richEditorParagraphMenu-handle.isOpen .richEditorButton-icon {
+  opacity: 1;
+}
+
+.richEditorParagraphMenu-handle.isOpen:hover, .richEditorParagraphMenu-handle.isOpen:focus {
+  opacity: 1;
 }
 
 .richEditor-text {
@@ -921,6 +925,11 @@ label.checkbox input.checkbox-input {
   background: #f1f9fd;
 }
 
+.richEditor-button:hover .Close-x,
+.richEditor-button:hover .richEditorButton-icon {
+  opacity: 1;
+}
+
 .richEditor-button:focus {
   background: #e1f2fb;
   outline: none;
@@ -936,9 +945,19 @@ label.checkbox input.checkbox-input {
   color: #0f97dd;
 }
 
+.richEditor-button.isActive .Close-x,
+.richEditor-button.isActive .richEditorButton-icon {
+  opacity: 1;
+}
+
 .richEditor-button.richEditor-embedButton:focus {
   background: #e1f2fb;
   outline: none;
+}
+
+.richEditor-button.richEditor-embedButton:focus .Close-x,
+.richEditor-button.richEditor-embedButton:focus .richEditorButton-icon {
+  opacity: 1;
 }
 
 .richEditor-button.richEditor-formatButton.isActive:hover {
@@ -948,6 +967,11 @@ label.checkbox input.checkbox-input {
 .richEditor-button.richEditor-formatButton:focus {
   background: #e1f2fb;
   outline: none;
+}
+
+.richEditor-button.richEditor-formatButton:focus .Close-x,
+.richEditor-button.richEditor-formatButton:focus .richEditorButton-icon {
+  opacity: 1;
 }
 
 .richEditor-menuWideItem,
@@ -1037,6 +1061,11 @@ label.checkbox input.checkbox-input {
 .richEditor-close.Close:focus {
   background: #e1f2fb;
   outline: none;
+}
+
+.richEditor-close.Close:focus .Close-x,
+.richEditor-close.Close:focus .richEditorButton-icon {
+  opacity: 1;
 }
 
 .insertLink-input.InputBox {
@@ -1193,13 +1222,14 @@ label.checkbox input.checkbox-input {
   width: 24px;
   height: 24px;
   -webkit-user-select: none;
-  -moz-user-select: none;
-  -ms-user-select: none;
-  user-select: none;
+     -moz-user-select: none;
+      -ms-user-select: none;
+          user-select: none;
   -webkit-transform: translateX(-50%);
       -ms-transform: translateX(-50%);
           transform: translateX(-50%);
   margin-top: -1px;
+  pointer-events: none;
 }
 
 .richEditor-nub {
@@ -1214,33 +1244,33 @@ label.checkbox input.checkbox-input {
   background: #fff;
 }
 
-.richEditor-toolbarContainer.isUp {
+.richEditor-inlineToolbarContainer.isUp {
   -webkit-transform: translateY(-12px);
       -ms-transform: translateY(-12px);
           transform: translateY(-12px);
 }
 
-.richEditor-toolbarContainer.isUp .richEditor-nubPosition {
+.richEditor-inlineToolbarContainer.isUp .richEditor-nubPosition {
   top: 100%;
 }
 
-.richEditor-toolbarContainer.isUp .richEditor-nub {
+.richEditor-inlineToolbarContainer.isUp .richEditor-nub {
   -webkit-transform: translateY(-50%) rotate(135deg);
       -ms-transform: translateY(-50%) rotate(135deg);
           transform: translateY(-50%) rotate(135deg);
 }
 
-.richEditor-toolbarContainer.isDown {
+.richEditor-inlineToolbarContainer.isDown {
   -webkit-transform: translateY(12px);
       -ms-transform: translateY(12px);
           transform: translateY(12px);
 }
 
-.richEditor-toolbarContainer.isDown .richEditor-nubPosition {
+.richEditor-inlineToolbarContainer.isDown .richEditor-nubPosition {
   bottom: 100%;
 }
 
-.richEditor-toolbarContainer.isDown .richEditor-nubPosition {
+.richEditor-inlineToolbarContainer.isDown .richEditor-nubPosition {
   -webkit-box-align: end;
   -webkit-align-items: flex-end;
       -ms-flex-align: end;
@@ -1251,7 +1281,7 @@ label.checkbox input.checkbox-input {
   margin-top: 2px;
 }
 
-.richEditor-toolbarContainer.isDown .richEditor-nub {
+.richEditor-inlineToolbarContainer.isDown .richEditor-nub {
   -webkit-transform: translateY(50%) rotate(-45deg);
       -ms-transform: translateY(50%) rotate(-45deg);
           transform: translateY(50%) rotate(-45deg);
@@ -1259,32 +1289,18 @@ label.checkbox input.checkbox-input {
 
 .richEditor-paragraphToolbarContainer {
   position: absolute;
-}
-
-.richEditor-paragraphToolbarContainer .richEditor-nubPosition {
-  left: 2px;
+  left: -webkit-calc(50% - 18px);
+  left: calc(50% - 18px);
 }
 
 .richEditor-paragraphToolbarContainer.isUp {
-  bottom: 100%;
-}
-
-.richEditor-paragraphToolbarContainer.isUp .richEditor-nubPosition {
-  top: 100%;
-  -webkit-transform: none;
-      -ms-transform: none;
-          transform: none;
+  bottom: -webkit-calc(50% + 17px);
+  bottom: calc(50% + 17px);
 }
 
 .richEditor-paragraphToolbarContainer.isDown {
-  top: 100%;
-}
-
-.richEditor-paragraphToolbarContainer.isDown .richEditor-nubPosition {
-  bottom: 100%;
-  -webkit-transform: translateY(1px);
-      -ms-transform: translateY(1px);
-          transform: translateY(1px);
+  top: -webkit-calc(50% + 17px);
+  top: calc(50% + 17px);
 }
 
 .userContent > *:not(:last-child) {
@@ -1356,6 +1372,11 @@ label.checkbox input.checkbox-input {
 
 .emojiGroup.isSelected {
   color: #0f97dd;
+}
+
+.emojiGroup.isSelected .Close-x,
+.emojiGroup.isSelected .richEditorButton-icon {
+  opacity: 1;
 }
 
 .emojiGroup + .emojiGroup {
@@ -1637,8 +1658,18 @@ body.isMobile .richEditorParagraphMenu {
           transform: translateY(-100%);
 }
 
+.accessibility-jumpTo:focus .Close-x,
+.accessibility-jumpTo:focus .richEditorButton-icon {
+  opacity: 1;
+}
+
 .accessibility-jumpTo:hover {
   color: #0f97dd;
+}
+
+.accessibility-jumpTo:hover .Close-x,
+.accessibility-jumpTo:hover .richEditorButton-icon {
+  opacity: 1;
 }
 
 .spoiler {

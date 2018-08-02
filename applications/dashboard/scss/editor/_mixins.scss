@@ -122,13 +122,32 @@ $spinnerOffset: 73deg;
 }
 
 
+@mixin editorButtonHoverStyles($offset: - $formElement_borderWidth) {
+    background: $state-color_hover;
+
+    .Close-x,
+    .richEditorButton-icon {
+        opacity: 1;
+    }
+}
+
 @mixin editorButtonFocusStyles($offset: - $formElement_borderWidth) {
     background: $state-color_focus;
     outline: none;
+
+    .Close-x,
+    .richEditorButton-icon {
+        opacity: 1;
+    }
 }
 
 @mixin editorButtonActiveStyles() {
     color: $state-color_selected;
+
+    .Close-x,
+    .richEditorButton-icon {
+        opacity: 1;
+    }
 }
 
 @mixin ieHack {

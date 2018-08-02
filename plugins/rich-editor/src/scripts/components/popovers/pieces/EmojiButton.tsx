@@ -8,9 +8,9 @@ import React from "react";
 import Quill from "quill/core";
 import classNames from "classnames";
 import { convertToSafeEmojiCharacters } from "@dashboard/dom";
-import { withEditor, IEditorContextProps } from "@rich-editor/components/context";
+import { withEditor, IWithEditorProps } from "@rich-editor/components/context";
 
-interface IProps extends IEditorContextProps {
+interface IProps extends IWithEditorProps {
     emojiData: {
         emoji: string;
     };

@@ -91,7 +91,11 @@ export default function withWrapper(blotConstructor: typeof Container) {
             const immediateWrapper = this.parent;
 
             immediateWrapper.children.forEach(child => {
-                (child as any).replaceWithIntoScroll(name, value, topLevelWrapper);
+                if (child === this) {
+                    (child as any).replaceWithIntoScroll(name, value, topLevelWrapper);
+                } else {
+                    child.insertInto(this.scroll, topLevelWrapper);
+                }
             });
             topLevelWrapper.remove();
         }

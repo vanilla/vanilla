@@ -6,7 +6,7 @@
 
 import React from "react";
 import classNames from "classnames";
-import { withEditor, IEditorContextProps } from "@rich-editor/components/context";
+import { withEditor, IWithEditorProps } from "@rich-editor/components/context";
 import MentionSuggestion, {
     IMentionProps,
     MentionSuggestionLoading,
@@ -17,7 +17,7 @@ import { getMentionRange } from "@rich-editor/quill/utility";
 import ToolbarPositioner from "./ToolbarPositioner";
 import Quill, { RangeStatic, DeltaStatic, Sources } from "quill/core";
 
-interface IProps extends IEditorContextProps {
+interface IProps extends IWithEditorProps {
     mentionProps: Array<Partial<IMentionProps>>;
     matchedString: string;
     id: string;

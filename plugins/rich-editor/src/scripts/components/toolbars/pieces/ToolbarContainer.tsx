@@ -6,11 +6,11 @@
 
 import React from "react";
 import Quill, { RangeStatic } from "quill/core";
-import { withEditor, IEditorContextProps } from "@rich-editor/components/context";
+import { withEditor, IWithEditorProps } from "@rich-editor/components/context";
 import ToolbarPositioner from "./ToolbarPositioner";
 
-interface IProps extends IEditorContextProps {
-    selection: RangeStatic | null;
+interface IProps extends IWithEditorProps {
+    selection: RangeStatic;
     isVisible: boolean;
 }
 
@@ -20,8 +20,7 @@ interface IState {
     nubHeight: number | null;
 }
 
-export class ToolbarContainer extends React.Component<IProps, IState> {
-    private quill: Quill;
+export class ToolbarContainer extends React.PureComponent<IProps, IState> {
     private flyoutRef: React.RefObject<any> = React.createRef();
     private nubRef: React.RefObject<any> = React.createRef();
 
@@ -30,9 +29,6 @@ export class ToolbarContainer extends React.Component<IProps, IState> {
      */
     constructor(props) {
         super(props);
-
-        // Quill can directly on the class as it won't ever change in a single instance.
-        this.quill = props.quill;
 
         this.state = {
             flyoutHeight: null,
@@ -43,13 +39,11 @@ export class ToolbarContainer extends React.Component<IProps, IState> {
 
     public render() {
         const { isVisible, selection } = this.props;
-        const selectionIndex = selection ? selection.index : null;
-        const selectionLength = selection ? selection.length : null;
         return (
             <ToolbarPositioner
                 {...this.state}
-                selectionIndex={selectionIndex}
-                selectionLength={selectionLength}
+                selectionIndex={selection.index}
+                selectionLength={selection.length}
                 isActive={isVisible}
             >
                 {({ x, y }) => {

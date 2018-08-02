@@ -7,7 +7,7 @@
 
 import { IStoreState as IBaseStoreState } from "@dashboard/@types/state";
 import MentionTrie from "@rich-editor/state/mention/MentionTrie";
-import { RangeStatic } from "quill/core";
+import { RangeStatic, IFormats } from "quill/core";
 
 export interface IMentionState {
     lastSuccessfulUsername: string | null;
@@ -19,7 +19,7 @@ export interface IMentionState {
 
 export interface IEditorInstance {
     currentSelection: RangeStatic | null;
-    lastGoodSelection: RangeStatic | null;
+    lastGoodSelection: RangeStatic;
 }
 
 export interface IEditorInstanceState {

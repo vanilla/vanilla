@@ -5,7 +5,7 @@
  */
 
 import React from "react";
-import { withEditor, IEditorContextProps } from "@rich-editor/components/context";
+import { withEditor, IWithEditorProps } from "@rich-editor/components/context";
 import { getRequiredID } from "@dashboard/componentIDs";
 import { watchFocusInDomTree } from "@dashboard/dom";
 import { createEditorFlyoutEscapeListener } from "@rich-editor/quill/utility";
@@ -17,7 +17,7 @@ export interface IPopoverControllerChildParameters {
     closeMenuHandler(event?: React.SyntheticEvent<any>);
 }
 
-interface IProps extends IEditorContextProps {
+interface IProps {
     id: string;
     classNameRoot: string;
     icon: JSX.Element;

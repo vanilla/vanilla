@@ -5,51 +5,21 @@
  */
 
 import React from "react";
-import Quill, { Blot } from "quill/core";
-import { RangeStatic, Sources } from "quill";
+import Quill from "quill/core";
 import { t } from "@dashboard/application";
-import MenuItems from "./pieces/MenuItems";
-import * as Icons from "@rich-editor/components/icons";
-import { withEditor, IEditorContextProps } from "@rich-editor/components/context";
-import { IMenuItemData } from "./pieces/MenuItem";
+import * as icons from "@rich-editor/components/icons";
+import { withEditor, IWithEditorProps } from "@rich-editor/components/context";
 import { watchFocusInDomTree } from "@dashboard/dom";
-import {
-    createEditorFlyoutEscapeListener,
-    getIDForQuill,
-    getBlotAtIndex,
-    isEmbedSelected,
-} from "@rich-editor/quill/utility";
-import { connect } from "react-redux";
-import { FOCUS_CLASS } from "@dashboard/embeds";
-import FocusableEmbedBlot from "@rich-editor/quill/blots/abstract/FocusableEmbedBlot";
-import { IStoreState } from "@rich-editor/@types/store";
+import { createEditorFlyoutEscapeListener, isEmbedSelected } from "@rich-editor/quill/utility";
+import Formatter from "@rich-editor/quill/Formatter";
+import ParagraphToolbarMenuItems from "@rich-editor/components/toolbars/pieces/ParagraphToolbarMenuItems";
+import CodeBlockBlot from "@rich-editor/quill/blots/blocks/CodeBlockBlot";
+import BlockquoteLineBlot from "@rich-editor/quill/blots/blocks/BlockquoteBlot";
+import SpoilerLineBlot from "@rich-editor/quill/blots/blocks/SpoilerBlot";
+import HeadingBlot from "quill/formats/header";
+import MenuItems from "@rich-editor/components/toolbars/pieces/MenuItems";
 
-const PARAGRAPH_ITEMS = {
-    header: {
-        2: {
-            name: "heading2",
-        },
-        3: {
-            name: "heading3",
-        },
-    },
-    "blockquote-line": {
-        name: "blockquote",
-    },
-    codeBlock: {
-        name: "codeBlock",
-    },
-    "spoiler-line": {
-        name: "spoiler",
-    },
-};
-
-interface IOwnProps extends IEditorContextProps {}
-
-interface IProps extends IOwnProps {
-    lastGoodSelection?: RangeStatic | null;
-    currentSelection?: RangeStatic | null;
-}
+interface IProps extends IWithEditorProps {}
 
 interface IState {
     hasFocus: boolean;
@@ -57,26 +27,21 @@ interface IState {
 
 export class ParagraphToolbar extends React.PureComponent<IProps, IState> {
     private quill: Quill;
-    private toolbarNode: HTMLElement;
     private ID: string;
     private componentID: string;
     private menuID: string;
     private buttonID: string;
     private selfRef: React.RefObject<HTMLDivElement> = React.createRef();
     private buttonRef: React.RefObject<HTMLButtonElement> = React.createRef();
-    private toolbarItems: {
-        [key: string]: IMenuItemData;
-    };
+    private menuRef: React.RefObject<MenuItems> = React.createRef();
+    private formatter: Formatter;
 
-    /**
-     * @inheritDoc
-     */
-
-    constructor(props) {
+    constructor(props: IProps) {
         super(props);
 
         // Quill can directly on the class as it won't ever change in a single instance.
         this.quill = props.quill;
+        this.formatter = new Formatter(this.quill);
         this.ID = this.props.editorID + "paragraphMenu";
         this.componentID = this.ID + "-component";
         this.menuID = this.ID + "-menu";
@@ -84,7 +49,6 @@ export class ParagraphToolbar extends React.PureComponent<IProps, IState> {
         this.state = {
             hasFocus: false,
         };
-        this.initializeToolbarValues();
     }
 
     /**
@@ -96,19 +60,15 @@ export class ParagraphToolbar extends React.PureComponent<IProps, IState> {
                 this.setState({ hasFocus: false });
             }
         });
-        createEditorFlyoutEscapeListener(this.selfRef.current!, this.buttonRef.current!, () => {
-            this.setState({ hasFocus: false });
-        });
+        this.selfRef.current!.addEventListener("keydown", this.handleDocumentKeyDown);
     }
 
     public render() {
         let pilcrowClasses = "richEditor-button richEditorParagraphMenu-handle";
 
-        if (!this.isPilcrowVisible || isEmbedSelected(this.quill, this.props.lastGoodSelection)) {
+        if (!this.isPilcrowVisible || isEmbedSelected(this.quill, this.props.instanceState.lastGoodSelection)) {
             pilcrowClasses += " isHidden";
         }
-
-        const Icon = Icons[this.activeFormatKey];
 
         return (
             <div
@@ -128,18 +88,18 @@ export class ParagraphToolbar extends React.PureComponent<IProps, IState> {
                     className={pilcrowClasses}
                     aria-haspopup="menu"
                     onClick={this.pilcrowClickHandler}
-                    onKeyDown={this.handleKeyPress}
+                    onKeyDown={this.handlePilcrowKeyDown}
                 >
-                    <Icon />
+                    {this.activeFormatIcon}
                 </button>
-                <div
-                    id={this.menuID}
-                    className={this.toolbarClasses}
-                    style={this.toolbarStyles}
-                    ref={ref => (this.toolbarNode = ref!)}
-                    role="menu"
-                >
-                    <MenuItems menuItems={this.toolbarItems} isHidden={!this.isMenuVisible} itemRole="menuitem" />
+                <div id={this.menuID} className={this.toolbarClasses} style={this.toolbarStyles} role="menu">
+                    <ParagraphToolbarMenuItems
+                        menuRef={this.menuRef}
+                        formatter={this.formatter}
+                        afterClickHandler={this.close}
+                        activeFormats={this.props.activeFormats}
+                        lastGoodSelection={this.props.instanceState.lastGoodSelection}
+                    />
                     <div role="presentation" className="richEditor-nubPosition">
                         <div className="richEditor-nub" />
                     </div>
@@ -148,127 +108,64 @@ export class ParagraphToolbar extends React.PureComponent<IProps, IState> {
         );
     }
 
-    private initializeToolbarValues() {
-        const initialToolbarItems: any = {};
-
-        // Parse our items that we use for detecting the active state into a format the toolbar can represent.
-        for (const [formatName, contents] of Object.entries(PARAGRAPH_ITEMS)) {
-            if (formatName === "header") {
-                for (const [enableValue, headerContents] of Object.entries(contents)) {
-                    initialToolbarItems[headerContents.name] = {
-                        formatName,
-                        enableValue: parseInt(enableValue, 10),
-                        active: false,
-                    };
-                }
-            } else {
-                initialToolbarItems[(contents as any).name] = {
-                    formatName,
-                    enableValue: true,
-                    active: false,
-                };
-
-                if (formatName === "codeBlock") {
-                    initialToolbarItems[(contents as any).name].formatter = this.codeFormatter;
-                }
-            }
-        }
-
-        const pilcrow = {
-            formatName: "pilcrow",
-            active: true,
-            enableValue: null,
-            isFallback: true,
-            formatter: this.paragraphFormatter,
-        };
-
-        this.toolbarItems = {
-            pilcrow,
-            ...initialToolbarItems,
-        };
-    }
-
-    /**
-     * Grab the current line directly and format it as a paragraph.
-     */
-    private paragraphFormatter = () => {
-        if (!this.props.lastGoodSelection) {
-            return;
-        }
-        const blot: Blot = this.quill.getLine(this.props.lastGoodSelection.index)[0];
-        blot.replaceWith("block");
-        this.quill.update(Quill.sources.USER);
-        this.quill.setSelection(this.props.lastGoodSelection, Quill.sources.USER);
-    };
-
-    /**
-     * Be sure to strip out all other formats before formatting as code.
-     */
-    private codeFormatter = () => {
-        const selection = this.quill.getSelection(true);
-        const [line] = this.quill.getLine(selection.index);
-        this.quill.removeFormat(line.offset(), line.length(), Quill.sources.API);
-        this.quill.formatLine(line.offset(), line.length(), "codeBlock", Quill.sources.USER);
-    };
-
     /**
      * Get the active format for the current line.
      */
-    private get activeFormatKey() {
-        const { lastGoodSelection } = this.props;
-        const DEFAULT_FORMAT_KEY = "pilcrow";
-        if (!lastGoodSelection) {
-            return DEFAULT_FORMAT_KEY;
+    private get activeFormatIcon(): JSX.Element {
+        const { activeFormats } = this.props;
+        if (activeFormats[HeadingBlot.blotName] === 2) {
+            return icons.heading2();
         }
-        // Check which paragraph formatting items are ready.
-        const activeFormats = this.quill.getFormat(lastGoodSelection);
-        for (const [formatName, formatValue] of Object.entries(activeFormats)) {
-            if (formatName in PARAGRAPH_ITEMS) {
-                let item = PARAGRAPH_ITEMS[formatName];
-
-                // In case its a heading
-                if (formatName === "header" && (formatValue as string) in item) {
-                    item = item[formatValue as string];
-                }
-
-                return item.name;
-            }
+        if (activeFormats[HeadingBlot.blotName] === 3) {
+            return icons.heading3();
+        }
+        if (activeFormats[BlockquoteLineBlot.blotName] === true) {
+            return icons.blockquote();
+        }
+        if (activeFormats[CodeBlockBlot.blotName] === true) {
+            return icons.codeBlock();
+        }
+        if (activeFormats[SpoilerLineBlot.blotName] === true) {
+            return icons.spoiler();
         }
 
-        return DEFAULT_FORMAT_KEY;
+        // Fallback to paragraph formatting.
+        return icons.pilcrow();
     }
 
     /**
      * Determine whether or not we should show pilcrow at all.
      */
     private get isPilcrowVisible() {
-        const { currentSelection } = this.props;
+        const { currentSelection } = this.props.instanceState;
         if (!currentSelection) {
             return false;
         }
 
-        const numLines = this.quill.getLines(currentSelection.index || 0, currentSelection.length || 0).length;
-        return numLines <= 1;
+        return true;
     }
 
     /**
      * Show the menu if we have a valid selection, and a valid focus.
      */
     private get isMenuVisible() {
-        const { lastGoodSelection } = this.props;
-        return !!lastGoodSelection && this.state.hasFocus;
+        const { instanceState } = this.props;
+        return !!instanceState.lastGoodSelection && this.state.hasFocus;
     }
 
     /**
      * Get the inline styles for the pilcrow. This is mostly just positioning it on the Y access currently.
      */
     private get pilcrowStyles(): React.CSSProperties {
-        const { lastGoodSelection } = this.props;
+        const { instanceState } = this.props;
 
-        if (!lastGoodSelection) {
+        if (!instanceState.lastGoodSelection) {
             return {};
         }
-        const bounds = this.quill.getBounds(lastGoodSelection.index, lastGoodSelection.length);
+        const bounds = this.quill.getBounds(
+            instanceState.lastGoodSelection.index,
+            instanceState.lastGoodSelection.length,
+        );
 
         // This is the pixel offset from the top needed to make things align correctly.
         const offset = 9 + 2;
@@ -282,12 +179,15 @@ export class ParagraphToolbar extends React.PureComponent<IProps, IState> {
      * Get the classes for the toolbar.
      */
     private get toolbarClasses(): string {
-        const { lastGoodSelection } = this.props;
+        const { instanceState } = this.props;
 
-        if (!lastGoodSelection) {
+        if (!instanceState.lastGoodSelection) {
             return "";
         }
-        const bounds = this.quill.getBounds(lastGoodSelection.index, lastGoodSelection.length);
+        const bounds = this.quill.getBounds(
+            instanceState.lastGoodSelection.index,
+            instanceState.lastGoodSelection.length,
+        );
         let classes = "richEditor-toolbarContainer richEditor-paragraphToolbarContainer";
 
         if (bounds.top > 30) {
@@ -304,7 +204,7 @@ export class ParagraphToolbar extends React.PureComponent<IProps, IState> {
      * This could likely be replaced by a CSS class in the future.
      */
     private get toolbarStyles(): React.CSSProperties {
-        if (this.isMenuVisible && !isEmbedSelected(this.quill, this.props.lastGoodSelection)) {
+        if (this.isMenuVisible && !isEmbedSelected(this.quill, this.props.instanceState.lastGoodSelection)) {
             return {};
         } else {
             // We hide the toolbar when its not visible.
@@ -321,74 +221,59 @@ export class ParagraphToolbar extends React.PureComponent<IProps, IState> {
      */
     private pilcrowClickHandler = (event: React.MouseEvent<any>) => {
         event.preventDefault();
-        this.setState({ hasFocus: true });
-        const menu = document.getElementById(this.menuID);
-        const firstButton = menu ? menu.querySelector(".richEditor-button") : false;
-        if (firstButton instanceof HTMLElement) {
-            setImmediate(() => {
-                firstButton.focus();
-            });
+        this.setState({ hasFocus: !this.state.hasFocus }, () => {
+            if (this.state.hasFocus) {
+                this.menuRef.current!.focusFirstItem();
+            }
+        });
+    };
+
+    /**
+     * Close the paragraph menu and place the selection at the end of the current selection if there is one.
+     */
+    private close = () => {
+        const { lastGoodSelection } = this.props.instanceState;
+        const newSelection = {
+            index: lastGoodSelection.index + lastGoodSelection.length,
+            length: 0,
+        };
+        this.quill.setSelection(newSelection);
+    };
+
+    /**
+     * Handle the escape key. when the toolbar is open. Note that focus still goes back to the main button,
+     * but the selection is set to a 0 length selection at the end of the current selection before the
+     * focus is moved.
+     */
+    private handleDocumentKeyDown = (event: KeyboardEvent) => {
+        if (event.keyCode === 27 && this.state.hasFocus) {
+            event.preventDefault();
+            this.close();
+            this.setState({ hasFocus: false });
         }
     };
 
     /**
-     * Get element containing menu items
+     * Implement opening/closing keyboard shortcuts in accordance with the WAI-ARIA best practices for menuitems.
+     *
+     * @see https://www.w3.org/TR/wai-aria-practices/examples/menubar/menubar-2/menubar-2.html
      */
-    private get menuContainer() {
-        const parentElement = document.getElementById(this.menuID);
-        if (parentElement) {
-            const menu = parentElement.querySelector(".richEditor-menuItems");
-            if (menu) {
-                return menu;
-            }
-        }
-        return false;
-    }
-
-    /**
-     * Handle key presses
-     */
-    private handleKeyPress = (event: React.KeyboardEvent<any>) => {
+    private handlePilcrowKeyDown = (event: React.KeyboardEvent<any>) => {
         switch (event.key) {
             case "ArrowUp":
                 event.preventDefault();
                 this.setState({ hasFocus: true }, () => {
-                    setImmediate(() => {
-                        const menu = this.menuContainer;
-                        if (menu instanceof HTMLElement && menu.firstChild instanceof HTMLElement) {
-                            menu.firstChild.focus();
-                        }
-                    });
+                    this.menuRef.current!.focusFirstItem();
                 });
                 break;
             case "ArrowDown":
                 event.preventDefault();
                 this.setState({ hasFocus: true }, () => {
-                    setImmediate(() => {
-                        const menu = this.menuContainer;
-                        if (menu instanceof HTMLElement && menu.lastChild instanceof HTMLElement) {
-                            menu.lastChild.focus();
-                        }
-                    });
+                    this.menuRef.current!.focusLastItem();
                 });
                 break;
         }
     };
 }
 
-/**
- * Map in the instance state of the current editor.
- */
-function mapStateToProps(state: IStoreState, ownProps: IOwnProps) {
-    const { quill } = ownProps;
-    if (!quill) {
-        return {};
-    }
-
-    const id = getIDForQuill(quill);
-    const instanceState = state.editor.instances[id];
-    return instanceState;
-}
-
-const withRedux = connect(mapStateToProps);
-export default withEditor(withRedux(ParagraphToolbar));
+export default withEditor<IProps>(ParagraphToolbar);

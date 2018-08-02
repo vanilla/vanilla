@@ -7,14 +7,14 @@
 import React from "react";
 import KeyboardModule from "quill/modules/keyboard";
 import { t, isAllowedUrl } from "@dashboard/application";
-import { withEditor, IEditorContextProps } from "@rich-editor/components/context";
+import { withEditor, IWithEditorProps } from "@rich-editor/components/context";
 import Popover from "./pieces/Popover";
 import PopoverController, { IPopoverControllerChildParameters } from "./pieces/PopoverController";
 import * as Icons from "@rich-editor/components/icons";
 import { getRequiredID, IRequiredComponentID } from "@dashboard/componentIDs";
 import EmbedInsertionModule from "@rich-editor/quill/EmbedInsertionModule";
 
-interface IProps extends IEditorContextProps {}
+interface IProps extends IWithEditorProps {}
 
 interface IState extends IRequiredComponentID {
     id: string;
@@ -151,4 +151,4 @@ export class EmbedPopover extends React.PureComponent<IProps, IState> {
     }
 }
 
-export default withEditor(EmbedPopover);
+export default withEditor<IProps>(EmbedPopover);

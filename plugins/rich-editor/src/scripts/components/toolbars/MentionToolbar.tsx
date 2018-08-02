@@ -9,7 +9,7 @@ import Quill, { RangeStatic, Sources, DeltaStatic } from "quill/core";
 import uniqueId from "lodash/uniqueId";
 import debounce from "lodash/debounce";
 import Keyboard from "quill/modules/keyboard";
-import { withEditor, IEditorContextProps } from "@rich-editor/components/context";
+import { withEditor, IWithEditorProps } from "@rich-editor/components/context";
 import MentionSuggestionList from "./pieces/MentionSuggestionList";
 import { thunks as mentionThunks, actions as mentionActions } from "@rich-editor/state/mention/mentionActions";
 import MentionAutoCompleteBlot from "@rich-editor/quill/blots/embeds/MentionAutoCompleteBlot";
@@ -19,7 +19,7 @@ import { connect } from "react-redux";
 import { IMentionSuggestionData, IMentionProps } from "@rich-editor/components/toolbars/pieces/MentionSuggestion";
 import { IStoreState } from "@rich-editor/@types/store";
 
-interface IProps extends IEditorContextProps {
+interface IProps extends IWithEditorProps {
     lookupMentions: (username: string) => void;
     setActiveItem: (itemID: string, itemIndex: number) => void;
     suggestions: IMentionValue | null;

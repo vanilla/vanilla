@@ -5,36 +5,38 @@
  */
 
 import React from "react";
-import Quill, { RangeStatic, Sources } from "quill/core";
+import Quill from "quill/core";
 import Emitter from "quill/core/emitter";
 import Keyboard from "quill/modules/keyboard";
 import LinkBlot from "quill/formats/link";
 import { t, isAllowedUrl } from "@dashboard/application";
 import ToolbarContainer from "./pieces/ToolbarContainer";
-import { withEditor, IEditorContextProps } from "@rich-editor/components/context";
-import { IMenuItemData } from "./pieces/MenuItem";
-import InlineToolbarItems from "./pieces/InlineToolbarItems";
+import { withEditor, IWithEditorProps } from "@rich-editor/components/context";
 import InlineToolbarLinkInput from "./pieces/InlineToolbarLinkInput";
 import { watchFocusInDomTree } from "@dashboard/dom";
-import { rangeContainsBlot, disableAllBlotsInRange } from "@rich-editor/quill/utility";
+import { rangeContainsBlot } from "@rich-editor/quill/utility";
 import CodeBlot from "@rich-editor/quill/blots/inline/CodeBlot";
 import CodeBlockBlot from "@rich-editor/quill/blots/blocks/CodeBlockBlot";
+import Formatter from "@rich-editor/quill/Formatter";
+import InlineToolbarMenuItems from "@rich-editor/components/toolbars/pieces/InlineToolbarMenuItems";
 
-interface IProps extends IEditorContextProps {}
+interface IProps extends IWithEditorProps {}
 
 interface IState {
-    cachedRange: RangeStatic | null;
     inputValue: string;
-    showFormatMenu: boolean;
-    showLinkMenu: boolean;
-    hasFocus: boolean;
+    isLinkMenuOpen: boolean;
+    menuHasFocus: boolean;
+    quillHasFocus: boolean;
 }
 
+/**
+ * This __cannot__ be a pure component because it needs to re-render when quill emits, even if the selection is the same.
+ */
 export class InlineToolbar extends React.Component<IProps, IState> {
     private quill: Quill;
+    private formatter: Formatter;
     private linkInput: React.RefObject<HTMLInputElement> = React.createRef();
     private selfRef: React.RefObject<HTMLDivElement> = React.createRef();
-    private ignoreSelectionChange = false;
 
     /**
      * @inheritDoc
@@ -44,35 +46,47 @@ export class InlineToolbar extends React.Component<IProps, IState> {
 
         // Quill can directly on the class as it won't ever change in a single instance.
         this.quill = props.quill;
+        this.formatter = new Formatter(this.quill);
 
         this.state = {
             inputValue: "",
-            cachedRange: {
-                index: 0,
-                length: 0,
-            },
-            hasFocus: false,
-            showFormatMenu: false,
-            showLinkMenu: false,
+            isLinkMenuOpen: false,
+            menuHasFocus: false,
+            quillHasFocus: false,
         };
     }
 
+    /**
+     * Reset the link menu state when the selection changes.
+     */
+    public componentDidUpdate(prevProps: IProps) {
+        const selection = this.props.instanceState.lastGoodSelection;
+        const prevSelection = prevProps.instanceState.lastGoodSelection;
+        if (prevSelection.index !== selection.index || prevSelection.length !== selection.length) {
+            this.setState({ isLinkMenuOpen: false });
+        }
+    }
+
     public render() {
-        const alertMessage = this.state.showFormatMenu ? (
+        const { activeFormats, instanceState } = this.props;
+        const alertMessage = this.isFormatMenuVisible ? (
             <span aria-live="assertive" role="alert" className="sr-only">
                 {t("Inline Menu Available")}
             </span>
         ) : null;
 
-        const hasFocus = !!(this.state.hasFocus || (this.state.cachedRange && this.quill.hasFocus()));
-
         return (
             <div ref={this.selfRef}>
-                <ToolbarContainer selection={this.state.cachedRange} isVisible={this.state.showFormatMenu && hasFocus}>
+                <ToolbarContainer selection={instanceState.lastGoodSelection} isVisible={this.isFormatMenuVisible}>
                     {alertMessage}
-                    <InlineToolbarItems currentSelection={this.state.cachedRange} linkFormatter={this.linkFormatter} />
+                    <InlineToolbarMenuItems
+                        formatter={this.formatter}
+                        onLinkClick={this.toggleLinkMenu}
+                        activeFormats={activeFormats}
+                        lastGoodSelection={instanceState.lastGoodSelection}
+                    />
                 </ToolbarContainer>
-                <ToolbarContainer selection={this.state.cachedRange} isVisible={this.state.showLinkMenu && hasFocus}>
+                <ToolbarContainer selection={instanceState.lastGoodSelection} isVisible={this.isLinkMenuVisible}>
                     <InlineToolbarLinkInput
                         inputRef={this.linkInput}
                         inputValue={this.state.inputValue}
@@ -86,11 +100,62 @@ export class InlineToolbar extends React.Component<IProps, IState> {
     }
 
     /**
+     * Determine visibility of the link menu.
+     */
+    private get isLinkMenuVisible(): boolean {
+        const inCodeBlock = rangeContainsBlot(this.quill, CodeBlockBlot, this.props.instanceState.lastGoodSelection);
+        return (
+            this.state.isLinkMenuOpen &&
+            this.hasFocus &&
+            this.isOneLineOrLess &&
+            !inCodeBlock &&
+            this.selectionHasContent
+        );
+    }
+
+    /**
+     * Determine visibility of the formatting menu.
+     */
+    private get isFormatMenuVisible(): boolean {
+        const selectionHasLength = this.props.instanceState.lastGoodSelection.length > 0;
+        const inCodeBlock = rangeContainsBlot(this.quill, CodeBlockBlot, this.props.instanceState.lastGoodSelection);
+        return (
+            !this.isLinkMenuVisible &&
+            this.hasFocus &&
+            selectionHasLength &&
+            this.isOneLineOrLess &&
+            !inCodeBlock &&
+            this.selectionHasContent
+        );
+    }
+
+    private get selectionHasContent(): boolean {
+        const { lastGoodSelection } = this.props.instanceState;
+        const text = this.quill.getText(lastGoodSelection.index, lastGoodSelection.length);
+        return !!text && text !== "\n";
+    }
+
+    /**
+     * Determine if our selection spreads over multiple lines or not.
+     */
+    private get isOneLineOrLess(): boolean {
+        const { lastGoodSelection } = this.props.instanceState;
+        const numLines = this.quill.getLines(lastGoodSelection.index || 0, lastGoodSelection.length || 0).length;
+        return numLines <= 1;
+    }
+
+    /**
+     * Determine if the inline menu or the quill content editable has focus.
+     */
+    private get hasFocus() {
+        return this.state.menuHasFocus || this.quill.hasFocus();
+    }
+
+    /**
      * Mount quill listeners.
      */
     public componentDidMount() {
         document.addEventListener("keydown", this.escFunction, false);
-        this.quill.on(Quill.events.EDITOR_CHANGE, this.handleEditorChange);
         watchFocusInDomTree(this.selfRef.current!, this.handleFocusChange);
 
         // Add a key binding for the link popup.
@@ -109,46 +174,56 @@ export class InlineToolbar extends React.Component<IProps, IState> {
      * Be sure to remove the listeners when the component unmounts.
      */
     public componentWillUnmount() {
-        this.quill.off(Quill.events.EDITOR_CHANGE, this.handleEditorChange);
         document.removeEventListener("keydown", this.escFunction, false);
     }
 
+    /**
+     * Track the menu's focus state.
+     */
     private handleFocusChange = hasFocus => {
-        if (this.state.hasFocus && !hasFocus) {
-            this.reset();
-        } else if (hasFocus) {
-            this.setState({ hasFocus });
-        } else {
-            this.forceUpdate();
-        }
+        this.setState({ menuHasFocus: hasFocus });
     };
 
     /**
      * Handle create-link keyboard shortcut.
      */
     private commandKHandler = () => {
-        const { cachedRange, showFormatMenu, showLinkMenu } = this.state;
-        if (
-            cachedRange &&
-            cachedRange.length &&
-            !showLinkMenu &&
-            !rangeContainsBlot(this.quill, CodeBlot) &&
-            !rangeContainsBlot(this.quill, CodeBlockBlot)
-        ) {
-            if (rangeContainsBlot(this.quill, LinkBlot, cachedRange)) {
-                disableAllBlotsInRange(this.quill, LinkBlot, cachedRange);
-                this.clearLinkInput();
-                this.quill.update(Quill.sources.USER);
-            } else {
-                const currentText = this.quill.getText(cachedRange.index, cachedRange.length);
-                this.focusLinkInput();
+        const { lastGoodSelection } = this.props.instanceState;
+        const inCodeBlock = rangeContainsBlot(this.quill, CodeBlockBlot, lastGoodSelection);
 
-                if (isAllowedUrl(currentText)) {
-                    this.setState({
-                        inputValue: currentText,
-                    });
-                }
+        if (!this.isOneLineOrLess || this.isLinkMenuVisible || inCodeBlock) {
+            return;
+        }
+
+        const inLinkBlot = rangeContainsBlot(this.quill, LinkBlot, lastGoodSelection);
+
+        if (inLinkBlot) {
+            this.formatter.link(lastGoodSelection);
+            this.reset();
+        } else {
+            const currentText = this.quill.getText(lastGoodSelection.index, lastGoodSelection.length);
+            if (isAllowedUrl(currentText)) {
+                this.setState({
+                    inputValue: currentText,
+                });
             }
+            this.toggleLinkMenu();
+        }
+    };
+
+    /**
+     * Open up the link menu.
+     *
+     * Opens the menu if there is no current link formatting.
+     */
+    private toggleLinkMenu = () => {
+        if (typeof this.props.activeFormats.link === "string") {
+            this.setState({ isLinkMenuOpen: false });
+            this.formatter.link(this.props.instanceState.lastGoodSelection);
+        } else {
+            this.setState({ isLinkMenuOpen: true }, () => {
+                this.linkInput.current!.focus();
+            });
         }
     };
 
@@ -157,33 +232,20 @@ export class InlineToolbar extends React.Component<IProps, IState> {
      */
     private escFunction = (event: KeyboardEvent) => {
         if (event.keyCode === 27) {
-            if (this.state.showLinkMenu) {
+            if (this.isLinkMenuVisible) {
                 event.preventDefault();
                 this.clearLinkInput();
-            } else if (this.state.showFormatMenu) {
+            } else if (this.isFormatMenuVisible) {
                 event.preventDefault();
-                this.reset(true);
+                this.cancel();
             }
         }
     };
 
-    private reset = (clearSelection: boolean = false) => {
-        if (clearSelection && this.state.cachedRange) {
-            this.quill.setSelection(
-                this.state.cachedRange.length + this.state.cachedRange.index,
-                0,
-                Emitter.sources.USER,
-            );
-        }
-
-        this.setState({
-            inputValue: "",
-            showLinkMenu: false,
-            showFormatMenu: false,
-            cachedRange: null,
-            hasFocus: false,
-        });
-    };
+    private clearLinkInput() {
+        this.quill.setSelection(this.props.instanceState.lastGoodSelection);
+        this.setState({ isLinkMenuOpen: false, inputValue: "" });
+    }
 
     /**
      * Handle clicks on the link menu's close button.
@@ -194,86 +256,27 @@ export class InlineToolbar extends React.Component<IProps, IState> {
     };
 
     /**
-     * Handle changes from the editor.
-     */
-    private handleEditorChange = (type: string, range: RangeStatic, oldRange: RangeStatic, source: Sources) => {
-        const isTextOrSelectionChange = type === Quill.events.SELECTION_CHANGE || type === Quill.events.TEXT_CHANGE;
-        if (source === Quill.sources.SILENT || !isTextOrSelectionChange || this.ignoreSelectionChange) {
-            return;
-        }
-
-        if (range && range.length > 0 && source === Emitter.sources.USER) {
-            this.setState({
-                cachedRange: range,
-                showFormatMenu: !rangeContainsBlot(this.quill, CodeBlockBlot),
-            });
-        } else if (!this.state.hasFocus) {
-            this.reset();
-        }
-    };
-
-    /**
-     * Special formatting for the link blot.
-     *
-     * @param menuItemData - The current state of the menu item.
-     */
-    private linkFormatter = (menuItemData: IMenuItemData) => {
-        if (menuItemData.active) {
-            disableAllBlotsInRange(this.quill, LinkBlot);
-            this.clearLinkInput();
-        } else {
-            this.focusLinkInput();
-        }
-    };
-
-    /**
-     * Be sure to strip out all other formats before formatting as code.
-     */
-    private codeFormatter(menuItemData: IMenuItemData) {
-        if (!this.state.cachedRange) {
-            return;
-        }
-        this.quill.removeFormat(this.state.cachedRange.index, this.state.cachedRange.length, Quill.sources.API);
-        this.quill.formatText(
-            this.state.cachedRange.index,
-            this.state.cachedRange.length,
-            "codeInline",
-            !menuItemData.active,
-            Quill.sources.USER,
-        );
-    }
-
-    /**
-     * Apply focus to the link input.
-     *
-     * We need to temporarily stop ignore selection changes for the link menu (it will lose selection).
-     */
-    private focusLinkInput() {
-        this.ignoreSelectionChange = true;
-        this.setState(
-            {
-                showLinkMenu: true,
-                showFormatMenu: false,
-            },
-            () => {
-                this.linkInput.current && this.linkInput.current.focus();
-                setTimeout(() => {
-                    this.ignoreSelectionChange = false;
-                }, 100);
-            },
-        );
-    }
-
-    /**
      * Clear the link menu's input content and hide the link menu.
      */
-    private clearLinkInput = () => {
-        this.state.cachedRange && this.quill.setSelection(this.state.cachedRange, Emitter.sources.USER);
+    private reset = () => {
+        this.props.instanceState.lastGoodSelection &&
+            this.quill.setSelection(this.props.instanceState.lastGoodSelection, Emitter.sources.USER);
 
         this.setState({
             inputValue: "",
-            showLinkMenu: false,
         });
+    };
+
+    private cancel = () => {
+        const { lastGoodSelection } = this.props.instanceState;
+        const newSelection = {
+            index: lastGoodSelection.index + lastGoodSelection.length,
+            length: 0,
+        };
+        this.setState({
+            inputValue: "",
+        });
+        this.quill.setSelection(newSelection);
     };
 
     /**
@@ -282,7 +285,7 @@ export class InlineToolbar extends React.Component<IProps, IState> {
     private onInputKeyDown = (event: React.KeyboardEvent<any>) => {
         if (Keyboard.match(event.nativeEvent, "enter")) {
             event.preventDefault();
-            this.quill.format("link", this.state.inputValue, Emitter.sources.USER);
+            this.formatter.link(this.props.instanceState.lastGoodSelection, this.state.inputValue);
             this.clearLinkInput();
         }
     };

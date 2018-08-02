@@ -6,73 +6,78 @@
 
 import React from "react";
 import classnames from "classnames";
-import { t } from "@dashboard/application";
-import * as Icons from "@rich-editor/components/icons";
-
-type FormatterCallback = (IMenuItemData) => void;
 
 export interface IMenuItemData {
-    active: boolean;
-    label?: string;
-    formatName?: string;
-    formatter?: FormatterCallback;
-    enableValue?: object;
-    isFallback?: boolean;
-}
-
-interface IProps {
-    propertyName: string;
+    icon: JSX.Element;
     label: string;
     isActive: boolean;
-    isFirst: boolean;
-    isLast: boolean;
-    onClick: (event: React.MouseEvent<any>) => void;
-    onBlur?: (event?: React.FocusEvent<any>) => void;
-    role?: string;
-    disabled: boolean;
+    isDisabled?: boolean;
+    onClick: (event: React.MouseEvent<HTMLButtonElement>) => void;
+}
+
+export interface IProps extends IMenuItemData {
+    role: "menuitem" | "menuitemradio";
+    focusNextItem: () => void;
+    focusPrevItem: () => void;
 }
 
 /**
- * Component for a single item in a EditorToolbar.
+ * A component that when used with MenuItems provides an accessible WCAG compliant Menu implementation.
+ *
+ * @see https://www.w3.org/TR/wai-aria-practices-1.1/#menu
  */
-export default class MenuItem extends React.Component<IProps> {
-    private onBlur: (event?: React.FocusEvent<any>) => void;
-    private domButton: HTMLElement;
-
-    constructor(props) {
-        super(props);
-        this.onBlur = props.isLast && props.onBlur ? props.onBlur : () => undefined;
-    }
-
+export default class MenuItem extends React.PureComponent<IProps> {
+    private buttonRef: React.RefObject<HTMLButtonElement> = React.createRef();
     public render() {
-        const { propertyName, isActive, onClick } = this.props;
-        const Icon = Icons[propertyName];
+        const { label, isDisabled, isActive, onClick, icon, role } = this.props;
         const buttonClasses = classnames("richEditor-button", "richEditor-formatButton", "richEditor-menuItem", {
             isActive,
         });
 
+        const ariaAttributes = {
+            role,
+            "aria-label": label,
+        };
+
+        if (role === "menuitem") {
+            ariaAttributes["aria-pressed"] = isActive;
+        } else {
+            ariaAttributes["aria-checked"] = isActive;
+        }
+
         return (
             <button
-                ref={(ref: HTMLButtonElement) => {
-                    this.domButton = ref;
-                }}
+                {...ariaAttributes}
                 className={buttonClasses}
                 type="button"
-                aria-label={t("richEditor.menu." + this.props.propertyName)}
-                role={this.props.role}
-                aria-pressed={this.props.isActive}
-                onClick={onClick}
-                onBlur={this.onBlur}
+                onClick={this.onClick}
                 onKeyDown={this.handleKeyPress}
-                disabled={this.props.disabled}
+                ref={this.buttonRef}
             >
-                <Icon />
+                {icon}
             </button>
         );
     }
 
     /**
-     * Handle key presses
+     * Focus the button inside of this MenuItem.
+     */
+    public focus() {
+        this.buttonRef.current && this.buttonRef.current.focus();
+    }
+
+    private onClick = (event: React.MouseEvent<HTMLButtonElement>) => {
+        if (this.props.isDisabled) {
+            event.preventDefault();
+        } else {
+            this.props.onClick(event);
+        }
+    };
+
+    /**
+     * Implement arrow keyboard shortcuts in accordance with the WAI-ARIA best practices for menuitems.
+     *
+     * @see https://www.w3.org/TR/wai-aria-practices/examples/menubar/menubar-2/menubar-2.html
      */
     private handleKeyPress = (event: React.KeyboardEvent<any>) => {
         switch (event.key) {
@@ -80,33 +85,13 @@ export default class MenuItem extends React.Component<IProps> {
             case "ArrowDown":
                 event.stopPropagation();
                 event.preventDefault();
-                if (this.props.isLast) {
-                    const firstSibling = this.domButton.parentElement!.firstChild;
-                    if (firstSibling instanceof HTMLElement) {
-                        firstSibling.focus();
-                    }
-                } else {
-                    const nextSibling = this.domButton.nextSibling;
-                    if (nextSibling instanceof HTMLElement) {
-                        nextSibling.focus();
-                    }
-                }
+                this.props.focusNextItem();
                 break;
             case "ArrowUp":
             case "ArrowLeft":
                 event.stopPropagation();
                 event.preventDefault();
-                if (this.props.isFirst) {
-                    const lastSibling = this.domButton.parentElement!.lastChild;
-                    if (lastSibling instanceof HTMLElement) {
-                        lastSibling.focus();
-                    }
-                } else {
-                    const previousSibling = this.domButton.previousSibling;
-                    if (previousSibling instanceof HTMLElement) {
-                        previousSibling.focus();
-                    }
-                }
+                this.props.focusPrevItem();
                 break;
         }
     };

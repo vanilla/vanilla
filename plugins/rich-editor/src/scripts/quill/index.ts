@@ -79,6 +79,22 @@ Quill.register(
     true,
 );
 
+// Ensure the InlineCodeBlock is the outermost when formats are nested.
+const inlineFormatBlots = [
+    "blots/inline",
+    "formats/bold",
+    "formats/italic",
+    "formats/strike",
+    "formats/link",
+    "formats/codeInline",
+];
+
+inlineFormatBlots.forEach(blotLookup => {
+    const BlotClass = Quill.import(blotLookup);
+    BlotClass.order = [...BlotClass.order, CodeInlineBlot.blotName];
+});
+
+// The inline blot needs its order changed
 const blotsAllowingMentionComboBox = [
     "blots/block",
     "formats/header",

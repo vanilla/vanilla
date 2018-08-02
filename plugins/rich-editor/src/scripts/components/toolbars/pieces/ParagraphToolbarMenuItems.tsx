@@ -83,27 +83,33 @@ export default class ParagraphToolbarMenuItems extends React.PureComponent<IProp
     // Lambas or binding in the render method slows down renders significantly.
     //
 
-    private formatParagraph = () => {
+    private formatParagraph = (event: React.MouseEvent<HTMLButtonElement>) => {
+        event.preventDefault();
         this.props.formatter.paragraph(this.props.lastGoodSelection);
         this.props.afterClickHandler();
     };
-    private formatH2 = () => {
+    private formatH2 = (event: React.MouseEvent<HTMLButtonElement>) => {
+        event.preventDefault();
         this.props.formatter.h2(this.props.lastGoodSelection);
         this.props.afterClickHandler();
     };
-    private formatH3 = () => {
+    private formatH3 = (event: React.MouseEvent<HTMLButtonElement>) => {
+        event.preventDefault();
         this.props.formatter.h3(this.props.lastGoodSelection);
         this.props.afterClickHandler();
     };
-    private formatBlockquote = () => {
+    private formatBlockquote = (event: React.MouseEvent<HTMLButtonElement>) => {
+        event.preventDefault();
         this.props.formatter.blockquote(this.props.lastGoodSelection);
         this.props.afterClickHandler();
     };
-    private formatCodeBlock = () => {
+    private formatCodeBlock = (event: React.MouseEvent<HTMLButtonElement>) => {
+        event.preventDefault();
         this.props.formatter.codeBlock(this.props.lastGoodSelection);
         this.props.afterClickHandler();
     };
-    private formatSpoiler = () => {
+    private formatSpoiler = (event: React.MouseEvent<HTMLButtonElement>) => {
+        event.preventDefault();
         this.props.formatter.spoiler(this.props.lastGoodSelection);
         this.props.afterClickHandler();
     };

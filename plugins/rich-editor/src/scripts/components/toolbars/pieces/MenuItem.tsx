@@ -12,7 +12,7 @@ export interface IMenuItemData {
     label: string;
     isActive: boolean;
     isDisabled?: boolean;
-    onClick: (event?: React.MouseEvent<HTMLButtonElement>) => void;
+    onClick: (event: React.MouseEvent<HTMLButtonElement>) => void;
 }
 
 export interface IProps extends IMenuItemData {
@@ -50,8 +50,7 @@ export default class MenuItem extends React.PureComponent<IProps> {
                 {...ariaAttributes}
                 className={buttonClasses}
                 type="button"
-                onClick={onClick}
-                disabled={isDisabled}
+                onClick={this.onClick}
                 onKeyDown={this.handleKeyPress}
                 ref={this.buttonRef}
             >
@@ -66,6 +65,14 @@ export default class MenuItem extends React.PureComponent<IProps> {
     public focus() {
         this.buttonRef.current && this.buttonRef.current.focus();
     }
+
+    private onClick = (event: React.MouseEvent<HTMLButtonElement>) => {
+        if (this.props.isDisabled) {
+            event.preventDefault();
+        } else {
+            this.props.onClick(event);
+        }
+    };
 
     /**
      * Implement arrow keyboard shortcuts in accordance with the WAI-ARIA best practices for menuitems.

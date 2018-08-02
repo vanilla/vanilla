@@ -67,16 +67,20 @@ export default class InlineToolbarMenuItems extends React.PureComponent<IProps> 
     // Lambas or binding in the render method slows down renders significantly.
     //
 
-    private formatBold = () => {
+    private formatBold = (event: React.MouseEvent<HTMLButtonElement>) => {
+        event.preventDefault();
         this.props.formatter.bold(this.props.lastGoodSelection);
     };
-    private formatItalic = () => {
+    private formatItalic = (event: React.MouseEvent<HTMLButtonElement>) => {
+        event.preventDefault();
         this.props.formatter.italic(this.props.lastGoodSelection);
     };
-    private formatStrike = () => {
+    private formatStrike = (event: React.MouseEvent<HTMLButtonElement>) => {
+        event.preventDefault();
         this.props.formatter.strike(this.props.lastGoodSelection);
     };
-    private formatCode = () => {
+    private formatCode = (event: React.MouseEvent<HTMLButtonElement>) => {
+        event.preventDefault();
         this.props.formatter.codeInline(this.props.lastGoodSelection);
     };
 }

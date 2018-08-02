@@ -232,6 +232,7 @@ export class ParagraphToolbar extends React.PureComponent<IProps, IState> {
      * Close the paragraph menu and place the selection at the end of the current selection if there is one.
      */
     private close = () => {
+        this.setState({ hasFocus: false });
         const { lastGoodSelection } = this.props.instanceState;
         const newSelection = {
             index: lastGoodSelection.index + lastGoodSelection.length,
@@ -249,7 +250,6 @@ export class ParagraphToolbar extends React.PureComponent<IProps, IState> {
         if (event.keyCode === 27 && this.state.hasFocus) {
             event.preventDefault();
             this.close();
-            this.setState({ hasFocus: false });
         }
     };
 

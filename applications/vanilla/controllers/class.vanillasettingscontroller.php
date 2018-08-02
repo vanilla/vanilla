@@ -55,11 +55,11 @@ class VanillaSettingsController extends Gdn_Controller {
         // Load up config options we'll be setting
         $validation = new Gdn_Validation();
         $configurationModel = new Gdn_ConfigurationModel($validation);
+
         $configurationModel->setField([
             'Vanilla.Categories.MaxDisplayDepth',
             'Garden.InputFormatter',
             'Garden.MobileInputFormatter',
-            'Plugins.editor.ForceWysiwyg',
             'Vanilla.Discussions.PerPage',
             'Vanilla.Comments.PerPage',
             'Garden.Html.AllowedElements',
@@ -102,6 +102,8 @@ class VanillaSettingsController extends Gdn_Controller {
                 $this->informMessage(t("Your changes have been saved."));
             }
         }
+
+        $eventManager->fire('vanillaSettingsController_postingConfigModel', $configurationModel);
 
         $this->setHighlightRoute('vanilla/settings/posting');
         $this->addJsFile('settings.js');

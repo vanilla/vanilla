@@ -96,6 +96,7 @@ Gdn_Theme::assetEnd();
         <div class="panel panel-left js-drawer">
             <div class="panel-nav panel-content-wrapper">
                 <div class="js-fluid-fixed panel-content">
+                    <?php echo anchor($title.' '.dashboardSymbol('external-link', 'icon-16'), '/', 'title'); ?>
                     <div id="panel-nav" class="js-panel-nav">
                         <?php echo $dashboardNav; ?>
                     </div>

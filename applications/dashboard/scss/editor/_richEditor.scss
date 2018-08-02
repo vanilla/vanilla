@@ -4,7 +4,7 @@ $richEditor_bg                                    : $global-color_bg !default;
 $richEditor_leftPadding                           : 30px !default;
 $richEditor_minHeight                             : 200px !default;
 $richEditor_verticalPadding                       : 9px !default;
-$richEditor_padding                               : $richEditor_verticalPadding 12px !default;
+$richEditor_horizontalPadding                     : 12px !default;
 $richEditor-outline_color                         : rgba($global-color_primary, 0.6) !default; // TODO drerrive
 
 $richEditor-embedMenu_padding                     : 0 !default;
@@ -16,8 +16,6 @@ $richEditor-insertPopover_paddingVertical         : 12px !default;
 $richEditor-insertPopover_paddingHorizontal       : 12px !default;
 $richEditor-insertPopover_maxHeight               : 100vh !default;
 $richEditor-insertPopover_height                  : $richEditor-menuButton_size * 7.5 !default;
-
-//$richEditor-emoji_width: 7 * $richEditor-menuButton_size + 2 * $richEditor-insertPopover_paddingHorizontal;
 
 $richEditor-nub_width                             : 12px !default;
 
@@ -38,14 +36,11 @@ $richEditor-mobileEmbedMenu_borderColor           : $global-color_primary !defau
 $richEditor-mobileEmbedMenu_transitionDuration    : .15s !default;
 $richEditor-mobileEmbedMenu_transitionTiming      : ease-out !default;
 
-
 $richEditor-embedButton_offset                    : -$formElement_borderWidth !default;
 $richEditor-paragraphMenuButton_offset            : -$formElement_borderWidth + 1 !default;
 $richEditor-text_offset                           : 0 !default;
 
 $embedImage_width                                 : 640px !default;
-
-
 
 // Break Points
 $richEditor-mobile_spacing                        : 18px !default;
@@ -57,9 +52,9 @@ $richEditor-mobileEmbedBreakPoint                 : 550px !default;
     position: relative;
     display: block;
     padding-left: $richEditor_leftPadding;
-    font-size: $global-large_fontSize;
+    //font-size: $global-large_fontSize;
 
-    &.isDisabled {
+    &.isDisabled { // Before React has replaced initial HTML
         &,
         .richEditor-button {
             cursor: progress !important;
@@ -91,15 +86,6 @@ $richEditor-mobileEmbedBreakPoint                 : 550px !default;
     }
 }
 
-@keyframes fadein {
-    0% {
-        opacity: 0;
-    }
-    100% {
-        opacity: 1;
-    }
-}
-
 .richEditorParagraphMenu {
     position: absolute;
     top: $richEditor-pilcrow_offset;
@@ -115,7 +101,12 @@ $richEditor-mobileEmbedBreakPoint                 : 550px !default;
 .richEditor-text {
     position: relative;
     min-height: $richEditor_minHeight;
-    padding: $richEditor_padding;
+    padding: {
+        top: $richEditor_verticalPadding;
+        right: $richEditor_horizontalPadding;
+        bottom: $richEditor_verticalPadding;
+        left: $richEditor_horizontalPadding;
+    }
     outline-color: transparent;
     white-space: pre-wrap !important; // Needed for spaces around embed blots to work properly!
 

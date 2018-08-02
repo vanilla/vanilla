@@ -44,7 +44,7 @@ $global_borderRadius                                 : 2px !default;
 
 $state-color_hover                                   : mix($global-color_primary, $global-color_bg, 5.5%) !default; // rgba(174, 228, 255, 0.2);
 $state-color_focus                                   : mix($global-color_primary, $global-color_bg, 12%) !default; // rgba(174, 228, 255, 0.4);
-$state-color_selected                                : mix($global-color_primary, $global-color_fg, 95%) !default; // #0075f5
+$state-color_selected                                : mix($global-color_primary, $global-color_bg, 95%) !default; // #0075f5
 
 
 /* -------------------------------------------------------------- *\

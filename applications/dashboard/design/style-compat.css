@@ -733,11 +733,28 @@ label.checkbox input.checkbox-input {
   }
 }
 
+@-webkit-keyframes fadein {
+  0% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+@keyframes fadein {
+  0% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
 .richEditor {
   position: relative;
   display: block;
   padding-left: 30px;
-  font-size: 16px;
 }
 
 .richEditor.isDisabled,
@@ -767,24 +784,6 @@ label.checkbox input.checkbox-input {
   float: none;
 }
 
-@-webkit-keyframes fadein {
-  0% {
-    opacity: 0;
-  }
-  100% {
-    opacity: 1;
-  }
-}
-
-@keyframes fadein {
-  0% {
-    opacity: 0;
-  }
-  100% {
-    opacity: 1;
-  }
-}
-
 .richEditorParagraphMenu {
   position: absolute;
   top: 9px;
@@ -804,7 +803,10 @@ label.checkbox input.checkbox-input {
 .richEditor-text {
   position: relative;
   min-height: 200px;
-  padding: 9px 12px;
+  padding-top: 9px;
+  padding-right: 12px;
+  padding-bottom: 9px;
+  padding-left: 12px;
   outline-color: transparent;
   white-space: pre-wrap !important;
 }
@@ -931,7 +933,7 @@ label.checkbox input.checkbox-input {
 }
 
 .richEditor-button.isActive {
-  background-color: #068ed5;
+  color: #0f97dd;
 }
 
 .richEditor-button.richEditor-embedButton:focus {
@@ -1349,7 +1351,7 @@ label.checkbox input.checkbox-input {
 }
 
 .emojiGroup.isSelected {
-  background-color: #068ed5;
+  color: #0f97dd;
 }
 
 .emojiGroup + .emojiGroup {
@@ -1632,7 +1634,7 @@ body.isMobile .richEditorParagraphMenu {
 }
 
 .accessibility-jumpTo:hover {
-  background-color: #068ed5;
+  color: #0f97dd;
 }
 
 .spoiler {

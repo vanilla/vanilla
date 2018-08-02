@@ -128,7 +128,7 @@ $spinnerOffset: 73deg;
 }
 
 @mixin editorButtonActiveStyles() {
-    background-color: $state-color_selected;
+    color: $state-color_selected;
 }
 
 @mixin ieHack {

@@ -2,9 +2,17 @@
 helpAsset(t('Need More Help?'), anchor(t("Video tutorial on advanced settings"), 'settings/tutorials/category-management-and-advanced-settings'));
 ?>
 <h1><?php echo t('Posting Settings'); ?></h1>
+
 <?php
 /** @var Gdn_Form $form */
 $form = $this->Form;
+/** @var \Garden\EventManager $eventManager */
+$eventManager = Gdn::getContainer()->get(\Garden\EventManager::class);
+$formats = $this->data('formats');
+$formatOptions = [];
+foreach ($formats as $formatName) {
+    $formatOptions[$formatName] = $formatName;
+}
 echo $form->open();
 echo $form->errors();
 ?>
@@ -23,6 +31,46 @@ echo $form->errors();
             echo $form->toggle('Garden.Format.DisableUrlEmbeds', $embedsLabel, [], $embedsDesc, true);
             ?>
         </li>
+
+        <li class="form-group">
+            <?php
+            $formatNotes1 = t('InputFormatter.Notes1', 'Select the default format of the editor for posts in the community.');
+            $formatNotes2 = t('InputFormatter.Notes2', 'The editor will auto-detect the format of old posts when editing them and load their 
+            original formatting rules. Aside from this exception, the selected post format below will take precedence.');
+            $label = '<p class="info">'.$formatNotes1.'</p><p class="info"><strong>'.t('Note:').' </strong>'.$formatNotes2.'</p>';
+            ?>
+            <div class="label-wrap">
+                <?php
+                echo $form->label('Post Format', 'Garden.InputFormatter');
+                echo $label;
+                ?>
+            </div>
+            <div class="input-wrap">
+                <?php echo $form->dropDown('Garden.InputFormatter', $formatOptions); ?>
+            </div>
+        </li>
+
+        <?php echo $this->data('extraFormatFormHTML') ?>
+
+        <li class="form-group">
+            <?php
+            $mobileFormatterNote1 = t('MobileInputFormatter.Notes1', 'Specify an editing format for mobile devices.');
+            $mobileFormatterNote2 =t('MobileInputFormatter.Notes2', 'If mobile devices should have the same experience,
+specify the same one as above. If users report issues with mobile editing, this is a good option to change.');
+            $label = '<p class="info">'.$mobileFormatterNote1.'</p><p class="info"><strong>'.t('Note:').' </strong>'.$mobileFormatterNote2.'</p>';
+            ?>
+            <div class="label-wrap">
+                <?php
+                echo $form->label('Mobile Format', 'Garden.MobileInputFormatter');
+                echo '<p class="info">'.$label.'</p>';
+                ?>
+            </div>
+            <div class="input-wrap">
+                <?php echo $form->dropDown('Garden.MobileInputFormatter', $formatOptions); ?>
+            </div>
+        </li>
+
+
         <li class="form-group">
             <?php
             $Options = ['1' => '1', '2' => '2', '3' => '3', '4' => '4', '5' => '5', '0' => 'No limit'];

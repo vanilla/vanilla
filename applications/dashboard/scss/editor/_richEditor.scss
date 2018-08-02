@@ -445,6 +445,11 @@ $richEditor-mobileEmbedBreakPoint                 : 550px !default;
     text-align: center;
     overflow: hidden;
 
+    .fallBackEmoji {
+        display: block;
+        margin: auto;
+    }
+
     &:focus {
         outline-offset: $richEditor-emojiOutline_offset;
     }

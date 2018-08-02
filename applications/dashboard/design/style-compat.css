@@ -1207,6 +1207,11 @@ label.checkbox input.checkbox-input {
   overflow: hidden;
 }
 
+.richEditor-insertEmoji .fallBackEmoji {
+  display: block;
+  margin: auto;
+}
+
 .richEditor-insertEmoji:focus {
   outline-offset: -3px;
 }
@@ -2450,6 +2455,7 @@ body.isMobile .richEditorParagraphMenu {
   vertical-align: middle;
   text-align: center;
   height: 1em;
+  width: 1em;
   line-height: 1em;
 }
 

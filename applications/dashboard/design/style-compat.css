@@ -1502,6 +1502,9 @@ body.isMobile .richEditorParagraphMenu {
 .atMentionList {
   position: absolute;
   width: 200px;
+  -webkit-transform: translateY(6px);
+      -ms-transform: translateY(6px);
+          transform: translateY(6px);
 }
 
 .atMentionList-suggestion {
@@ -1523,6 +1526,8 @@ body.isMobile .richEditorParagraphMenu {
 .atMentionList-items.MenuItems {
   display: block;
   padding: 3px 0;
+  overflow: auto;
+  max-height: 270px;
 }
 
 .atMentionList-items.isHidden {

@@ -103,7 +103,12 @@ class VanillaSettingsController extends Gdn_Controller {
             }
         }
 
-        $eventManager->fire('vanillaSettingsController_postingConfigModel', $configurationModel);
+        // Fire an filter event gather extra form HTML for specific format items.
+        // The form is added so the form can be enhanced and the config model needs to passed to add extra fields.
+        $extraFormatFormHTML = $eventManager->fireFilter('postingSettings_formatSpecificFormItems', "",
+            $this->Form,
+            $configurationModel);
+        $this->setData('extraFormatFormHTML', $extraFormatFormHTML);
 
         $this->setHighlightRoute('vanilla/settings/posting');
         $this->addJsFile('settings.js');

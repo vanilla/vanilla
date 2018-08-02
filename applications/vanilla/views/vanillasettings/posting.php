@@ -49,9 +49,9 @@ echo $form->errors();
                 <?php echo $form->dropDown('Garden.InputFormatter', $formatOptions); ?>
             </div>
         </li>
-        <?php
-        echo $eventManager->fireFilter('vanillaSettingsController_postingFormatSpecificFormItems', "", $form);
-        ?>
+
+        <?php echo $this->data('extraFormatFormHTML') ?>
+
         <li class="form-group">
             <?php
             $mobileFormatterNote1 = t('MobileInputFormatter.Notes1', 'Specify an editing format for mobile devices.');

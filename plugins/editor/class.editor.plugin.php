@@ -1425,11 +1425,14 @@ class EditorPlugin extends Gdn_Plugin {
      *
      * @param string $additionalFormItemHTML
      * @param Gdn_Form $form The Form instance from the page.
+     * @param Gdn_ConfigurationModel $configModel The config model used for the Form.
+     *
      * @return string The built up form html
      */
-    public function vanillaSettingsController_postingFormatSpecificFormItems_handler(
+    public function postingSettings_formatSpecificFormItems_handler(
         string $additionalFormItemHTML,
-        Gdn_Form $form
+        Gdn_Form $form,
+        Gdn_ConfigurationModel $configModel
     ): string {
         $forceWysiwygLabel = 'Reinterpret All Posts As Wysiwyg';
         $forceWysiwygNote1 =  t('ForceWysiwyg.Notes1', 'Check the below option to tell the editor to reinterpret all old posts as Wysiwyg.');
@@ -1437,21 +1440,10 @@ class EditorPlugin extends Gdn_Plugin {
         $label = '<p class="info">'.$forceWysiwygNote1.'</p><p class="info"><strong>'.t('Note:').' </strong>'.$forceWysiwygNote2.'</p>';
         $formToggle = $form->toggle('Plugins.editor.ForceWysiwyg', $forceWysiwygLabel, [], $label);
 
+        $configModel->setField('Plugins.editor.ForceWysiwyg');
         $additionalFormItemHTML .= "<li class='form-group'>$formToggle</li>";
         return $additionalFormItemHTML;
     }
-
-    /**
-     * Add the ForceWysiwyg setting to the form field.
-     *
-     * @param Gdn_ConfigurationModel $configurationModel
-     */
-    public function vanillaSettingsController_postingConfigModel_handler(
-        Gdn_ConfigurationModel $configurationModel
-    ) {
-        $configurationModel->setField('Plugins.editor.ForceWysiwyg');
-    }
-
 
     /**
      * This settings from this page have been moved into vanilla core.

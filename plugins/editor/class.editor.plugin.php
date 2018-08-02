@@ -1400,16 +1400,6 @@ class EditorPlugin extends Gdn_Plugin {
     }
 
     /**
-     * Add the advanced editor formats to th posting page.
-     *
-     * @param VanillaSettingsController $sender
-     * @param $args
-     */
-    public function getAdditionPostFormats_handler($add, $args) {
-        $args['formats'] = array_merge($args['formats'], $this->Formats);
-    }
-
-    /**
      * Add the rich editor format to the posting page.
      *
      * @param string[] $postFormats Existing post formats.

@@ -9,6 +9,7 @@ import { withEditor, IWithEditorProps } from "@rich-editor/components/context";
 import { getRequiredID } from "@dashboard/componentIDs";
 import { watchFocusInDomTree } from "@dashboard/dom";
 import { createEditorFlyoutEscapeListener } from "@rich-editor/quill/utility";
+import classNames from "classnames";
 
 export interface IPopoverControllerChildParameters {
     id: string;
@@ -52,12 +53,16 @@ export default class PopoverController extends React.PureComponent<IProps, IStat
     }
 
     public render() {
+        const buttonClasses = classNames("richEditor-button", "richEditor-embedButton", {
+            isOpen: this.state.isVisible,
+        });
+
         return (
             <div className={this.props.classNameRoot} ref={this.controllerRef}>
                 <button
                     id={this.state.id}
                     onClick={this.togglePopover}
-                    className="richEditor-button richEditor-embedButton"
+                    className={buttonClasses}
                     type="button"
                     aria-controls={this.componentID}
                     aria-expanded={this.state.isVisible}

@@ -15,7 +15,7 @@ import { withEditor, IWithEditorProps } from "@rich-editor/components/context";
 import { EMOJI_GROUPS, EMOJIS } from "./emojiData";
 import EmojiButton from "./EmojiButton";
 
-const buttonSize = 39;
+const buttonSize = 36;
 const colSize = 7;
 const rowSize = 7;
 const rowIndexesByGroupId = {};
@@ -48,6 +48,7 @@ interface IState {
     selectedGroup: number;
     lastRowIndex: number;
     alertMessage?: string;
+    title: string;
 }
 
 export class EmojiPicker extends React.PureComponent<IProps, IState> {
@@ -64,6 +65,7 @@ export class EmojiPicker extends React.PureComponent<IProps, IState> {
             rowStartIndex: 0,
             selectedGroup: 0,
             lastRowIndex: 0,
+            title: t("Emojis"),
         };
 
         this.categoryPickerID = "emojiPicker-categories-" + props.editorID;
@@ -77,7 +79,6 @@ export class EmojiPicker extends React.PureComponent<IProps, IState> {
     }
 
     public render() {
-        const title = t("Smileys & Faces");
         const description = [
             t("Insert an emoji in your message."),
             t(
@@ -150,7 +151,7 @@ export class EmojiPicker extends React.PureComponent<IProps, IState> {
                 id={this.state.id}
                 descriptionID={this.descriptionID}
                 titleID={this.titleID}
-                title={title}
+                title={this.state.title}
                 titleRef={this.props.initialFocusRef}
                 accessibleDescription={description}
                 alertMessage={this.state.alertMessage}

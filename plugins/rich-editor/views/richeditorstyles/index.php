@@ -305,9 +305,9 @@
 <hr/>
 
 <h2>Insert Media</h2>
-<div class="richEditor-menu FlyoutMenu insertMedia insertPopover" style="position: relative;" role="dialog" aria-labelledby="tempId-insertMediaMenu-title" aria-describedby="tempId-insertMediaMenu-p">
-    <div class="insertPopover-header">
-        <h2 id="tempId-insertMediaMenu-title" class="H popover-title">
+<div class="richEditor-menu FlyoutMenu insertMedia richEditorFlyout" style="position: relative;" role="dialog" aria-labelledby="tempId-insertMediaMenu-title" aria-describedby="tempId-insertMediaMenu-p">
+    <div class="richEditorFlyout-header">
+        <h2 id="tempId-insertMediaMenu-title" class="H richEditorFlyout">
             <?php echo t('Insert Media'); ?>
         </h2>
         <a href="#" aria-label="<?php echo t('Close'); ?>" class="Close richEditor-close">
@@ -315,7 +315,7 @@
         </a>
     </div>
 
-    <div class="insertPopover-body">
+    <div class="richEditorFlyout-body">
         <p id="tempId-insertMediaMenu-p" class="insertMedia-description">
             <?php echo t('Paste the URL of the media you want.'); ?>
         </p>
@@ -333,16 +333,16 @@
 
 <h2>Emoji List</h2>
 
-<div class="richEditor-menu FlyoutMenu insertEmoji insertPopover" style="position: relative; overflow: hidden" role="dialog" aria-labelledby="tempId-insertEmoji-title">
-    <div class="insertPopover-header">
-        <h2 id="tempId-insertMediaMenu-title" class="H popover-title">
+<div class="richEditor-menu FlyoutMenu insertEmoji richEditorFlyout" style="position: relative; overflow: hidden" role="dialog" aria-labelledby="tempId-insertEmoji-title">
+    <div class="richEditorFlyout-header">
+        <h2 id="tempId-insertMediaMenu-title" class="H richEditorFlyout">
             <?php echo t('Smileys & Faces'); ?>
         </h2>
         <a href="#" aria-label="<?php echo t('Close'); ?>" class="Close richEditor-close">
             <span>×</span>
         </a>
     </div>
-    <div class="insertPopover-body insertEmoji-body">
+    <div class="richEditorFlyout-body insertEmoji-body">
         <div class="richEditor-emojis">
             <button class="richEditor-button richEditor-insertEmoji" data-emoji="😀">😀</button>
             <button class="richEditor-button richEditor-insertEmoji" data-emoji="😁">😁</button>

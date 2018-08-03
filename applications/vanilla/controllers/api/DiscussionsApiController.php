@@ -175,6 +175,20 @@ class DiscussionsApiController extends AbstractApiController {
         return $this->schema($this->discussionSchema, $type);
     }
 
+    public function embedSchema() {
+        return Schema::parse([
+            'discussionID:i' => 'The ID of the discussion.',
+            'name:s' => 'The title of the discussion',
+            'body:s' => 'The rendered embed body of the discussion.',
+            'dateInserted:dt' => 'When the discussion was created.',
+            'dateUpdated:dt|n' => 'When the discussion was last updated.',
+            'insertUser' => $this->getUserFragmentSchema(),
+            'url:s' => 'The full URL to the discussion.',
+            'format:s' => 'The original format of the discussion',
+            'bodyRaw:s' => 'The raw body of the the discussion',
+        ]);
+    }
+
     /**
      * Get a schema instance comprised of all available discussion fields.
      *
@@ -304,6 +318,34 @@ class DiscussionsApiController extends AbstractApiController {
         $options = ['expand' => $expand];
         $result = $this->getEventManager()->fireFilter('discussionsApiController_normalizeOutput', $schemaRecord, $this, $options);
 
+        return $result;
+    }
+
+    /**
+     * Get a comments embed data.
+     *
+     * @param int $id The ID of the comment.
+     * @return array
+     */
+    public function get_embed($id) {
+        $this->permission();
+
+        $this->idParamSchema();
+        $in = $this->schema([], ['in'])->setDescription('Get a discussions embed data.');
+        $out = $this->schema($this->embedSchema(), 'out');
+
+        $discussion = $this->discussionByID($id);
+        $discussion['Url'] = discussionUrl($discussion);
+
+        if ($discussion['InsertUserID'] !== $this->getSession()->UserID) {
+            $this->discussionModel->categoryPermission('Vanilla.Discussions.Edit', $discussion['CategoryID']);
+        }
+
+        $discussion['bodyRaw'] = $discussion['Body'];
+        $discussion['Body'] = Gdn_Format::quoteEmbed($discussion['bodyRaw'], $discussion['Format']);
+
+        $this->userModel->expandUsers($discussion, ['InsertUserID'], ['expand' => true]);
+        $result = $out->validate($discussion);
         return $result;
     }
 

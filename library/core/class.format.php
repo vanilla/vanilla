@@ -2464,6 +2464,35 @@ EOT;
         return $renderer->render($blotGroups);
     }
 
+    public static function quoteEmbed(string $body, string $format): string {
+        if ($format === "Rich") {
+            return self::richQuote($body);
+        } else {
+            return self::plainText($body, $format);
+        }
+    }
+
+    public static function richQuote(string $deltas): string {
+        $operations = json_decode($deltas, true);
+        $title = t("There was an error rendering this rich post");
+
+        if (json_last_error() !== JSON_ERROR_NONE) {
+            $link = "https://docs.vanillaforums.com/help/addons/rich-editor/#why-is-my-published-post-replaced-with-there-was-an-error-rendering-this-rich-post";
+            return "<div class='DismissMessage Warning userContent-error'>$title <a href='$link' rel='nofollow' title='$title'><span class='icon icon-warning-sign userContent-errorIcon'></span></a></div>";
+        }
+
+        $parser = new \Vanilla\Formatting\Quill\Parser();
+        $parser->addQuoteBlotsAndFormats();
+        $renderer = Gdn::getContainer()->get(Vanilla\Formatting\Quill\Renderer::class);
+
+        $blotGroups = $parser->parse($operations);
+        $rendered = $renderer->render($blotGroups);
+        $result = str_replace("<p>", "", $rendered);
+        $result =  str_replace("<br>", "", $result);
+        $result =  str_replace("</p>", "", $result);
+        return $result;
+    }
+
     const SAFE_PROTOCOLS = [
         "http",
         "https",

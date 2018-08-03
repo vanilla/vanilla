@@ -99,6 +99,19 @@ class CommentsApiController extends AbstractApiController {
         return $this->schema($this->commentSchema, $type);
     }
 
+    public function embedSchema() {
+        return Schema::parse([
+            'commentID:i' => 'The ID of the comment.',
+            'body:s' => 'The rendered embed body of the comment.',
+            'dateInserted:dt' => 'When the comment was created.',
+            'dateUpdated:dt|n' => 'When the comment was last updated.',
+            'insertUser' => $this->getUserFragmentSchema(),
+            'url:s' => 'The full URL to the comment.',
+            'format:s' => 'The original format of the comment',
+            'bodyRaw:s' => 'The raw body of the ',
+        ]);
+    }
+
     /**
      * Delete a comment.
      *
@@ -181,6 +194,34 @@ class CommentsApiController extends AbstractApiController {
         // Allow addons to modify the result.
         $result = $this->getEventManager()->fireFilter('commentsApiController_getOutput', $result, $this, $in, $query, $comment);
 
+        return $result;
+    }
+
+    /**
+     * Get a comments embed data.
+     *
+     * @param int $id The ID of the comment.
+     * @return array
+     */
+    public function get_embed($id) {
+        $this->permission();
+
+        $this->idParamSchema();
+        $in = $this->schema([], ['in'])->setDescription('Get a comments embed data.');
+        $out = $this->schema($this->embedSchema(), 'out');
+
+        $comment = $this->commentByID($id);
+        if ($comment['InsertUserID'] !== $this->getSession()->UserID) {
+            $discussion = $this->discussionByID($comment['DiscussionID']);
+            $this->discussionModel->categoryPermission('Vanilla.Discussions.View', $discussion['CategoryID']);
+        }
+
+        $comment['Url'] = commentUrl($comment);
+        $comment['bodyRaw'] = $comment['Body'];
+        $comment['Body'] = Gdn_Format::quoteEmbed($comment['bodyRaw'], $comment['Format']);
+
+        $this->userModel->expandUsers($comment, ['InsertUserID'], ['expand' => true]);
+        $result = $out->validate($comment);
         return $result;
     }
 

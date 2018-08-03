@@ -9,19 +9,30 @@ import { sanitizeUrl } from "@dashboard/utility";
 import { getData, setData } from "@dashboard/dom";
 import debounce from "lodash/debounce";
 import shave from "shave";
-import { registerEmbedComponent } from "@dashboard/embeds";
+import { registerEmbedComponent, IEmbedProps } from "@dashboard/embeds";
+import api from "@dashboard/apiv2";
 
 export function initLinkEmbeds() {
     registerEmbedComponent("link", LinkEmbed);
+    registerEmbedComponent("quote", LinkEmbed);
     truncateEmbedLinks();
 
     // Retruncate links when the window resizes.
     window.addEventListener("resize", () => debounce(truncateEmbedLinks, 200)());
 }
 
-export class LinkEmbed extends BaseEmbed {
+interface IState {
+    renderBody: string | null;
+}
+
+export class LinkEmbed extends React.Component<IEmbedProps, IState> {
+    public state = {
+        renderBody: null,
+    };
+
     public render() {
         const { name, attributes, url, photoUrl, body } = this.props.data;
+        const { renderBody } = this.state;
         const title = name ? <h3 className="embedLink-title">{name}</h3> : null;
 
         const userPhoto =
@@ -30,13 +41,13 @@ export class LinkEmbed extends BaseEmbed {
                     <img
                         src={attributes.userPhoto}
                         alt={attributes.userName}
-                        className="ProfilePhoto ProfilePhotoMedium"
+                        className="ProfilePhoto ProfilePhotoSmall"
                         tabIndex={-1}
                     />
                 </span>
             ) : null;
 
-        const source = <span className="embedLink-source meta">{url}</span>;
+        // const source = <span className="embedLink-source meta">{url}</span>;
 
         let linkImage: JSX.Element | null = null;
         if (photoUrl) {
@@ -44,12 +55,18 @@ export class LinkEmbed extends BaseEmbed {
         }
 
         const userName = attributes.userName ? <span className="embedLink-userName">{attributes.userName}</span> : null;
-        const dateTime =
-            attributes.timestamp && attributes.humanTime ? (
-                <time className="embedLink-dateTime meta" dateTime={attributes.timestamp}>
-                    {attributes.humanTime}
-                </time>
-            ) : null;
+
+        const dateTime = attributes.timestamp ? (
+            <time className="embedLink-dateTime meta" dateTime={attributes.timestamp}>
+                {this.humanTime}
+            </time>
+        ) : null;
+
+        const excerpt = renderBody ? (
+            <div className="embedLink-excerpt" dangerouslySetInnerHTML={{ __html: renderBody }} />
+        ) : (
+            <div className="embedLink-excerpt">{body}</div>
+        );
 
         const sanitizedUrl = sanitizeUrl(url);
         return (
@@ -62,13 +79,34 @@ export class LinkEmbed extends BaseEmbed {
                             {userPhoto}
                             {userName}
                             {dateTime}
-                            {source}
+                            {/* {source} */}
                         </div>
-                        <div className="embedLink-excerpt">{body}</div>
+                        {excerpt}
                     </div>
                 </article>
             </a>
         );
+    }
+
+    public componentDidMount() {
+        const { subDelta } = this.props.data.attributes;
+        if (subDelta) {
+            api.post("/utility/render", { content: JSON.stringify(subDelta) }).then(response => {
+                this.setState({ renderBody: response.data.body });
+            });
+        } else {
+            this.props.onRenderComplete();
+        }
+    }
+
+    private get humanTime(): string | null {
+        const { timestamp } = this.props.data.attributes;
+        if (!timestamp) {
+            return null;
+        }
+
+        const date = new Date(timestamp);
+        return date.toLocaleString();
     }
 }
 

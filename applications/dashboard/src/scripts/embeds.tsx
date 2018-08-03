@@ -8,21 +8,12 @@
 
 import React from "react";
 import ReactDOM from "react-dom";
+import { IDiscussionEmbed, ICommentEmbed, IScrapeData } from "@dashboard/@types/api";
 
 export const FOCUS_CLASS = "embed-focusableElement";
 
-export interface IEmbedData {
-    type: string;
-    url: string;
-    name?: string | null;
-    body?: string | null;
-    photoUrl?: string | null;
-    height?: number | null;
-    width?: number | null;
-    attributes: {
-        [key: string]: any;
-    };
-}
+export type IQuoteEmbedData = IDiscussionEmbed | ICommentEmbed;
+export type IEmbedData = IScrapeData | IQuoteEmbedData;
 
 export interface IEmbedElements {
     root: HTMLElement;
@@ -72,6 +63,10 @@ export function renderEmbed(elements: IEmbedElements, data: IEmbedData, inEditor
     return new Promise((resolve, reject) => {
         if (!data.type) {
             throw new Error("The embed type was not provided.");
+        }
+
+        if (data.type === "quote") {
+            elements.root.classList.add("embedLink");
         }
 
         const renderer = data.type && embedRenderers[data.type];

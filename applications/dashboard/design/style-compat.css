@@ -802,6 +802,10 @@ label.checkbox input.checkbox-input {
           animation-iteration-count: 1;
 }
 
+.richEditorParagraphMenu .richEditor-button.isActive:hover {
+  cursor: default;
+}
+
 .richEditorParagraphMenu-handle {
   width: 28px;
   max-width: 28px;
@@ -924,7 +928,6 @@ label.checkbox input.checkbox-input {
 
 .richEditor-button.emojiGroup {
   display: block;
-  color: #555a62;
   width: 36px;
   height: 36px;
   text-align: center;
@@ -985,10 +988,6 @@ label.checkbox input.checkbox-input {
 .richEditor-button.isOpen:hover .richEditorButton-icon, .richEditor-button.isOpen:focus .Close-x,
 .richEditor-button.isOpen:focus .richEditorButton-icon {
   opacity: 1;
-}
-
-.richEditor-button.richEditor-formatButton.isActive:hover {
-  cursor: default;
 }
 
 .richEditor-button.richEditor-formatButton:focus {

@@ -85,6 +85,14 @@ $richEditor-mobileEmbedBreakPoint                 : 550px !default;
     z-index: 1;
     animation: fadein $richEditor-pilcrowAnimation_duration ease;
     animation-iteration-count: 1;
+
+    .richEditor-button {
+        &.isActive {
+            &:hover {
+                cursor: default;
+            }
+        }
+    }
 }
 
 .richEditorParagraphMenu-handle {
@@ -194,7 +202,6 @@ $richEditor-mobileEmbedBreakPoint                 : 550px !default;
 
     &.emojiGroup {
         display: block;
-        color: $richEditor-emojiCategory_color;
         width: $richEditor-menuButton_size;
         height: $richEditor-menuButton_size;
         text-align: center;
@@ -226,13 +233,6 @@ $richEditor-mobileEmbedBreakPoint                 : 550px !default;
     }
 
     &.richEditor-formatButton {
-
-        &.isActive {
-            &:hover {
-                cursor: default;
-            }
-        }
-
         &:focus {
             @include editorButtonFocusStyles($richEditor-paragraphMenuButton_offset);
         }

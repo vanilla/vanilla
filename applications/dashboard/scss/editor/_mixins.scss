@@ -150,6 +150,21 @@ $spinnerOffset: 73deg;
     }
 }
 
+@mixin editorButtonOpenStyles() {
+    color: $state-color_selected;
+    opacity: $richEditor-icon_opacity;
+
+    &:hover,
+    &:focus {
+        opacity: 1;
+
+        .Close-x,
+        .richEditorButton-icon {
+            opacity: 1;
+        }
+    }
+}
+
 @mixin ieHack {
     // IE 10 and 11 only
     @media screen and (-ms-high-contrast: active), screen and (-ms-high-contrast: none) {

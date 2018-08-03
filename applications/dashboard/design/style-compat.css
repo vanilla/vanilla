@@ -754,7 +754,7 @@ label.checkbox input.checkbox-input {
 .richEditor {
   position: relative;
   display: block;
-  padding-left: 30px;
+  padding-left: 36px;
 }
 
 .richEditor.isDisabled,
@@ -776,13 +776,25 @@ label.checkbox input.checkbox-input {
 
 .richEditorParagraphMenu {
   position: absolute;
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-align: center;
+  -webkit-align-items: center;
+      -ms-flex-align: center;
+          align-items: center;
+  -webkit-box-pack: center;
+  -webkit-justify-content: center;
+      -ms-flex-pack: center;
+          justify-content: center;
   top: 9px;
-  left: -7px;
+  left: 0;
   -webkit-transform: translateX(-100%);
       -ms-transform: translateX(-100%);
           transform: translateX(-100%);
-  height: 24px;
-  width: 24px;
+  height: 28px;
+  width: 36px;
   z-index: 1;
   -webkit-animation: fadein 0.3s ease;
           animation: fadein 0.3s ease;
@@ -790,18 +802,11 @@ label.checkbox input.checkbox-input {
           animation-iteration-count: 1;
 }
 
-.richEditorParagraphMenu-handle.isOpen {
-  color: #0f97dd;
-  opacity: 0.7;
-}
-
-.richEditorParagraphMenu-handle.isOpen .Close-x,
-.richEditorParagraphMenu-handle.isOpen .richEditorButton-icon {
-  opacity: 1;
-}
-
-.richEditorParagraphMenu-handle.isOpen:hover, .richEditorParagraphMenu-handle.isOpen:focus {
-  opacity: 1;
+.richEditorParagraphMenu-handle {
+  width: 28px;
+  max-width: 28px;
+  min-width: 28px;
+  height: 28px;
 }
 
 .richEditor-text {
@@ -893,14 +898,11 @@ label.checkbox input.checkbox-input {
   border: 0;
   padding: 0;
   background: none;
-  width: 100%;
   text-align: left;
 }
 
 .richEditor-button {
   display: block;
-  height: 24px;
-  width: 24px;
   -webkit-user-select: none;
      -moz-user-select: none;
       -ms-user-select: none;
@@ -963,13 +965,18 @@ label.checkbox input.checkbox-input {
   opacity: 1;
 }
 
-.richEditor-button.richEditor-embedButton:focus {
-  background: #e1f2fb;
-  outline: none;
+.richEditor-button.isOpen {
+  color: #0f97dd;
+  opacity: 0.8;
 }
 
-.richEditor-button.richEditor-embedButton:focus .Close-x,
-.richEditor-button.richEditor-embedButton:focus .richEditorButton-icon {
+.richEditor-button.isOpen:hover, .richEditor-button.isOpen:focus {
+  opacity: 1;
+}
+
+.richEditor-button.isOpen:hover .Close-x,
+.richEditor-button.isOpen:hover .richEditorButton-icon, .richEditor-button.isOpen:focus .Close-x,
+.richEditor-button.isOpen:focus .richEditorButton-icon {
   opacity: 1;
 }
 
@@ -1028,12 +1035,12 @@ label.checkbox input.checkbox-input {
   margin: auto;
   height: 24px;
   width: 24px;
-  opacity: 0.7;
+  opacity: 0.8;
 }
 
 .Close-x {
   display: block;
-  opacity: 0.7;
+  opacity: 0.8;
   cursor: pointer;
 }
 
@@ -1401,7 +1408,7 @@ body.hasRichEditor #Form_Preview {
   }
   body.hasRichEditor.Section-PostDiscussion #DiscussionForm .FormWrapper {
     padding-left: 36px;
-    padding-right: 30px;
+    padding-right: 36px;
   }
   body.hasRichEditor.Section-PostDiscussion #DiscussionForm .FormWrapper .richEditor {
     padding-left: 0;
@@ -1414,7 +1421,7 @@ body.hasRichEditor #Form_Preview {
   }
   body.hasRichEditor .CommentForm .richEditor {
     padding-left: 36px;
-    padding-right: 30px;
+    padding-right: 36px;
   }
   body.hasRichEditor .CommentForm .richEditor .richEditor {
     padding-left: 0;
@@ -1431,7 +1438,7 @@ body.hasRichEditor #Form_Preview {
   body.hasRichEditor #MessageForm .FormWrapper,
   body.hasRichEditor #ConversationForm .FormWrapper {
     padding-left: 36px;
-    padding-right: 30px;
+    padding-right: 36px;
   }
   body.hasRichEditor #GroupForm .FormWrapper .richEditor,
   body.hasRichEditor #MessageForm .FormWrapper .richEditor,

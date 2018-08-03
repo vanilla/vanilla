@@ -1,21 +1,22 @@
-$richEditor-menuButton_size                       : 36px !default;
-
 $richEditor_bg                                    : $global-color_bg !default;
-$richEditor_leftPadding                           : 30px !default;
+$richEditor_leftPadding                           : 36px !default;
 $richEditor_minHeight                             : 200px !default;
 $richEditor_verticalPadding                       : 9px !default;
 $richEditor_horizontalPadding                     : 12px !default;
 $richEditor-outline_color                         : rgba($global-color_primary, 0.6) !default; // TODO drerrive
 
+$richEditor-menuButton_size                       : 36px !default;
+$richEditor-floatingButton_size                   : 28px !default;
+
 $richEditor-embedMenu_padding                     : 0 !default;
-$richEditor-icon_opacity                          : .7 !default;
+$richEditor-icon_opacity                          : .8 !default;
 
 $richEditor-insertLink_width                      : 387px !default;
 
-$richEditor-flyout_paddingVertical         : 12px !default;
-$richEditor-flyout_paddingHorizontal       : 12px !default;
-$richEditor-flyout_maxHeight               : 100vh !default;
-$richEditor-flyout_height                  : $richEditor-menuButton_size * 7.5 !default;
+$richEditor-flyout_paddingVertical                : 12px !default;
+$richEditor-flyout_paddingHorizontal              : 12px !default;
+$richEditor-flyout_maxHeight                      : 100vh !default;
+$richEditor-flyout_height                         : $richEditor-menuButton_size * 7.5 !default;
 
 $richEditor-nub_width                             : 12px !default;
 
@@ -24,7 +25,6 @@ $richEditor-menu_offset                           : $richEditor-nub_width !defau
 
 $richEditor-pilcrow_offset                        : 9px!default;
 $richEditor-pilcrow_fontSize                      : 14px !default;
-$richEditor-pilcrow_gutter                        : 36px !default; //TODO - tweak size
 $richEditor-pilcrowAnimation_duration             : 0.3s;
 
 $richEditor-emojiCategory_color                   : #737982 !default; // TODO derrive
@@ -72,40 +72,28 @@ $richEditor-mobileEmbedBreakPoint                 : 550px !default;
 .richEditor-menu {
     display: inline-block;
     position: relative;
-
-    //&.FlyoutMenu { // Temporary
-    //    position: relative;
-    //    top: auto;
-    //    left: auto;
-    //    right: auto;
-    //    bottom: auto;
-    //    display: block;
-    //    float: none;
-    //}
 }
 
 .richEditorParagraphMenu {
     position: absolute;
+    display: flex;
+    align-items: center;
+    justify-content: center;
     top: $richEditor-pilcrow_offset;
-    left: -7px;
+    left: 0;
     transform: translateX(-100%);
-    height: $icon-default_size;
-    width: $icon-default_size;
+    height: $richEditor-floatingButton_size;
+    width: $richEditor_leftPadding;
     z-index: 1;
     animation: fadein $richEditor-pilcrowAnimation_duration ease;
     animation-iteration-count: 1;
 }
 
 .richEditorParagraphMenu-handle {
-    &.isOpen {
-        @include editorButtonActiveStyles;
-        opacity: $richEditor-icon_opacity;
-
-        &:hover,
-        &:focus {
-            opacity: 1;
-        }
-    }
+    width: $richEditor-floatingButton_size;
+    max-width: $richEditor-floatingButton_size;
+    min-width: $richEditor-floatingButton_size;
+    height: $richEditor-floatingButton_size;
 }
 
 .richEditor-text {
@@ -182,7 +170,6 @@ $richEditor-mobileEmbedBreakPoint                 : 550px !default;
     border: 0;
     padding: 0;
     background: none;
-    width: 100%;
     text-align: left;
 }
 
@@ -190,8 +177,6 @@ $richEditor-mobileEmbedBreakPoint                 : 550px !default;
 
 .richEditor-button {
     display: block;
-    height: $icon-default_size;
-    width: $icon-default_size;
     user-select: none;
     cursor: pointer;
 
@@ -231,10 +216,8 @@ $richEditor-mobileEmbedBreakPoint                 : 550px !default;
         @include editorButtonActiveStyles;
     }
 
-    &.richEditor-embedButton {
-        &:focus {
-            @include editorButtonFocusStyles($richEditor-embedButton_offset);
-        }
+    &.isOpen {
+        @include editorButtonOpenStyles;
     }
 
     &.richEditor-formatButton {
@@ -523,14 +506,14 @@ $richEditor-mobileEmbedBreakPoint                 : 550px !default;
 
 .richEditor-paragraphToolbarContainer {
     position: absolute;
-    left: calc(50% - #{$richEditor-pilcrow_gutter / 2});
+    left: calc(50% - #{$richEditor_leftPadding / 2});
 
     &.isUp {
-        bottom: calc(50% + #{$richEditor-pilcrow_gutter / 2 - $formElement-borderWidth});
+        bottom: calc(50% + #{$richEditor_leftPadding / 2 - $formElement-borderWidth});
     }
 
     &.isDown {
-        top: calc(50% + #{$richEditor-pilcrow_gutter / 2 - $formElement-borderWidth});
+        top: calc(50% + #{$richEditor_leftPadding / 2 - $formElement-borderWidth});
     }
 }
 
@@ -583,7 +566,6 @@ $richEditor-mobileEmbedBreakPoint                 : 550px !default;
 .richEditor-button {
     user-select: none;
     cursor: pointer;
-
 }
 
 // Emoji Groups
@@ -622,7 +604,7 @@ body.hasRichEditor {
 
                 .FormWrapper {
                     padding: {
-                        left: $richEditor-pilcrow_gutter;
+                        left: $richEditor_leftPadding;
                         right: $richEditor_leftPadding;
                     }
 
@@ -648,7 +630,7 @@ body.hasRichEditor {
 
             .richEditor {
                 padding: {
-                    left: $richEditor-pilcrow_gutter;
+                    left: $richEditor_leftPadding;
                     right: $richEditor_leftPadding;
 
                 }
@@ -676,7 +658,7 @@ body.hasRichEditor {
 
             .FormWrapper {
                 padding: {
-                    left: $richEditor-pilcrow_gutter;
+                    left: $richEditor_leftPadding;
                     right: $richEditor_leftPadding;
                 }
 

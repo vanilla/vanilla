@@ -315,6 +315,7 @@ $richEditor-mobileEmbedBreakPoint                 : 550px !default;
     width: $richEditor-menuButton_size;
     height: $richEditor-menuButton_size;
     line-height: $richEditor-menuButton_size;
+    vertical-align: bottom;
     top: auto;
     right: auto;
     text-align: center;
@@ -358,10 +359,10 @@ $richEditor-mobileEmbedBreakPoint                 : 550px !default;
 
 .richEditorFlyout-header {
     padding: {
-        top: $richEditor-flyout_paddingVertical;
-        bottom: $richEditor-flyout_paddingVertical;
-        left: $richEditor-flyout_paddingHorizontal;
+        top: $richEditor-flyout_paddingHorizontal / 2;
         right: $richEditor-flyout_paddingHorizontal;
+        bottom: $richEditor-flyout_paddingHorizontal / 2;
+        left: $richEditor-flyout_paddingHorizontal;
     }
 }
 
@@ -373,7 +374,7 @@ $richEditor-mobileEmbedBreakPoint                 : 550px !default;
     }
 }
 
-.popover-title {
+.richEditorFlyout-title {
     @include longWordEllipsis;
     margin: 0;
     max-width: calc(100% - #{$richEditor-menuButton_size});
@@ -431,7 +432,7 @@ $richEditor-mobileEmbedBreakPoint                 : 550px !default;
     width: #{$richEditor-flyout_paddingHorizontal * 2 + 7 * $richEditor-menuButton_size};
 }
 
-.popover-title {
+.richEditorFlyout-title {
     font-size: 100%;
 }
 

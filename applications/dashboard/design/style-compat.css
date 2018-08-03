@@ -888,7 +888,7 @@ label.checkbox input.checkbox-input {
 }
 
 .richEditor-menuItems .richEditor-menuItem .richEditor-button.emojiChar-🇺🇳, .richEditor-menuItems .richEditor-menuItem.richEditor-button.emojiChar-🇺🇳 {
-  font-size: 14px;
+  font-size: 10px;
 }
 
 .richEditor-menuItems .richEditor-menuItem.isRightAligned {
@@ -2466,7 +2466,7 @@ body.isMobile .richEditorParagraphMenu {
   vertical-align: middle;
   text-align: center;
   height: 1em;
-  width: 1em;
+  max-width: 100%;
   line-height: 1em;
 }
 

@@ -192,6 +192,7 @@ export class EmojiPicker extends React.PureComponent<IProps, IState> {
             lastRowIndex,
             selectedGroup,
             alertMessage: t("In emoji category: ") + t(EMOJI_GROUPS[selectedGroup]),
+            title: t(EMOJI_GROUPS[selectedGroup]),
         });
     };
 

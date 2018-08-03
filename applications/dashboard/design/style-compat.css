@@ -754,7 +754,7 @@ label.checkbox input.checkbox-input {
 .richEditor {
   position: relative;
   display: block;
-  padding-left: 30px;
+  padding-left: 36px;
 }
 
 .richEditor.isDisabled,
@@ -774,30 +774,43 @@ label.checkbox input.checkbox-input {
   position: relative;
 }
 
-.richEditor-menu.FlyoutMenu {
-  position: relative;
-  top: auto;
-  left: auto;
-  right: auto;
-  bottom: auto;
-  display: block;
-  float: none;
-}
-
 .richEditorParagraphMenu {
   position: absolute;
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-align: center;
+  -webkit-align-items: center;
+      -ms-flex-align: center;
+          align-items: center;
+  -webkit-box-pack: center;
+  -webkit-justify-content: center;
+      -ms-flex-pack: center;
+          justify-content: center;
   top: 9px;
-  left: -6px;
+  left: 0;
   -webkit-transform: translateX(-100%);
       -ms-transform: translateX(-100%);
           transform: translateX(-100%);
-  height: 24px;
-  width: 24px;
+  height: 28px;
+  width: 36px;
   z-index: 1;
   -webkit-animation: fadein 0.3s ease;
           animation: fadein 0.3s ease;
   -webkit-animation-iteration-count: 1;
           animation-iteration-count: 1;
+}
+
+.richEditorParagraphMenu .richEditor-button.isActive:hover {
+  cursor: default;
+}
+
+.richEditorParagraphMenu-handle {
+  width: 28px;
+  max-width: 28px;
+  min-width: 28px;
+  height: 28px;
 }
 
 .richEditor-text {
@@ -848,10 +861,18 @@ label.checkbox input.checkbox-input {
           flex-wrap: nowrap;
   list-style: none;
   padding: 0;
+  -ms-overflow-style: -ms-autohiding-scrollbar;
   margin-top: 1px;
   margin-right: 0;
   margin-bottom: 0;
   margin-left: 0;
+}
+
+.richEditor-menuItems.MenuItems {
+  border: 1px solid #d6d7d9;
+  box-shadow: 0 5px 10px rgba(85, 90, 98, 0.2);
+  background: #fff;
+  border-radius: 2px;
 }
 
 .richEditor-menuItems .richEditor-menuItem {
@@ -888,14 +909,11 @@ label.checkbox input.checkbox-input {
   border: 0;
   padding: 0;
   background: none;
-  width: 100%;
   text-align: left;
 }
 
 .richEditor-button {
   display: block;
-  height: 24px;
-  width: 24px;
   -webkit-user-select: none;
      -moz-user-select: none;
       -ms-user-select: none;
@@ -909,8 +927,19 @@ label.checkbox input.checkbox-input {
 }
 
 .richEditor-button.emojiGroup {
-  width: 24px;
-  height: 24px;
+  display: block;
+  width: 36px;
+  height: 36px;
+  text-align: center;
+}
+
+.richEditor-button.emojiGroup.isSelected {
+  color: #0f97dd;
+}
+
+.richEditor-button.emojiGroup.isSelected .Close-x,
+.richEditor-button.emojiGroup.isSelected .richEditorButton-icon {
+  opacity: 1;
 }
 
 .richEditor-button:not(:disabled) {
@@ -919,6 +948,11 @@ label.checkbox input.checkbox-input {
 
 .richEditor-button:hover {
   background: #f1f9fd;
+}
+
+.richEditor-button:hover .Close-x,
+.richEditor-button:hover .richEditorButton-icon {
+  opacity: 1;
 }
 
 .richEditor-button:focus {
@@ -936,13 +970,24 @@ label.checkbox input.checkbox-input {
   color: #0f97dd;
 }
 
-.richEditor-button.richEditor-embedButton:focus {
-  background: #e1f2fb;
-  outline: none;
+.richEditor-button.isActive .Close-x,
+.richEditor-button.isActive .richEditorButton-icon {
+  opacity: 1;
 }
 
-.richEditor-button.richEditor-formatButton.isActive:hover {
-  cursor: default;
+.richEditor-button.isOpen {
+  color: #0f97dd;
+  opacity: 0.8;
+}
+
+.richEditor-button.isOpen:hover, .richEditor-button.isOpen:focus {
+  opacity: 1;
+}
+
+.richEditor-button.isOpen:hover .Close-x,
+.richEditor-button.isOpen:hover .richEditorButton-icon, .richEditor-button.isOpen:focus .Close-x,
+.richEditor-button.isOpen:focus .richEditorButton-icon {
+  opacity: 1;
 }
 
 .richEditor-button.richEditor-formatButton:focus {
@@ -950,28 +995,27 @@ label.checkbox input.checkbox-input {
   outline: none;
 }
 
-.richEditor-menuWideItem,
+.richEditor-button.richEditor-formatButton:focus .Close-x,
+.richEditor-button.richEditor-formatButton:focus .richEditorButton-icon {
+  opacity: 1;
+}
+
 .richEditor-menuItem {
   display: block;
   padding: 0;
   margin: 0;
 }
 
-.richEditor-menuWideItem .richEditor-button, .richEditor-menuWideItem.richEditor-button,
-.richEditor-menuItem .richEditor-button,
-.richEditor-menuItem.richEditor-button {
+.richEditor-menuItem .richEditor-button, .richEditor-menuItem.richEditor-button {
   width: 36px;
   font-size: 22.1538461538px;
   line-height: 36px;
 }
 
-.richEditor-menuWideItem .richEditor-button.emojiChar-🇺🇳, .richEditor-menuWideItem.richEditor-button.emojiChar-🇺🇳,
-.richEditor-menuItem .richEditor-button.emojiChar-🇺🇳,
-.richEditor-menuItem.richEditor-button.emojiChar-🇺🇳 {
+.richEditor-menuItem .richEditor-button.emojiChar-🇺🇳, .richEditor-menuItem.richEditor-button.emojiChar-🇺🇳 {
   font-size: 14px;
 }
 
-.richEditor-menuWideItem.isRightAligned,
 .richEditor-menuItem.isRightAligned {
   margin-left: auto;
 }
@@ -991,12 +1035,12 @@ label.checkbox input.checkbox-input {
   margin: auto;
   height: 24px;
   width: 24px;
-  opacity: 0.7;
+  opacity: 0.8;
 }
 
 .Close-x {
   display: block;
-  opacity: 0.7;
+  opacity: 0.8;
   cursor: pointer;
 }
 
@@ -1023,6 +1067,7 @@ label.checkbox input.checkbox-input {
   width: 36px;
   height: 36px;
   line-height: 36px;
+  vertical-align: bottom;
   top: auto;
   right: auto;
   text-align: center;
@@ -1039,6 +1084,11 @@ label.checkbox input.checkbox-input {
   outline: none;
 }
 
+.richEditor-close.Close:focus .Close-x,
+.richEditor-close.Close:focus .richEditorButton-icon {
+  opacity: 1;
+}
+
 .insertLink-input.InputBox {
   border: 0 !important;
   margin-bottom: 0 !important;
@@ -1050,44 +1100,44 @@ label.checkbox input.checkbox-input {
   max-width: calc(100% - 36px);
 }
 
-.insertPopover {
+.richEditorFlyout {
   position: relative;
   overflow: hidden;
   z-index: 6;
 }
 
-.insertPopover .InputBox {
+.richEditorFlyout .InputBox {
   width: 100%;
   box-sizing: border-box;
 }
 
-.insertPopover .richEditor-close {
+.richEditorFlyout .richEditor-close {
   position: absolute;
   top: 0;
   right: 0;
 }
 
-.insertPopover .Footer {
+.richEditorFlyout .Footer {
   display: -webkit-box;
   display: -webkit-flex;
   display: -ms-flexbox;
   display: flex;
 }
 
-.insertPopover-header {
-  padding-top: 12px;
+.richEditorFlyout-header {
+  padding-top: 6px;
+  padding-right: 12px;
+  padding-bottom: 6px;
+  padding-left: 12px;
+}
+
+.richEditorFlyout-footer {
   padding-bottom: 12px;
   padding-left: 12px;
   padding-right: 12px;
 }
 
-.insertPopover-footer {
-  padding-bottom: 12px;
-  padding-left: 12px;
-  padding-right: 12px;
-}
-
-.popover-title {
+.richEditorFlyout-title {
   word-break: break-all;
   word-break: break-word;
   text-overflow: ellipsis;
@@ -1099,7 +1149,7 @@ label.checkbox input.checkbox-input {
   min-height: 24px;
 }
 
-.popover-title:focus {
+.richEditorFlyout-title:focus {
   outline: 0;
 }
 
@@ -1130,8 +1180,7 @@ label.checkbox input.checkbox-input {
   margin-bottom: 3px;
 }
 
-.insertPopover-body {
-  margin-bottom: 12px;
+.richEditorFlyout-body {
   padding-left: 12px;
   padding-right: 12px;
 }
@@ -1149,22 +1198,30 @@ label.checkbox input.checkbox-input {
   position: relative;
 }
 
-.richEditor-menu.insertPopover {
+.richEditor-menu.richEditorFlyout {
   position: absolute;
   bottom: 100%;
   left: 0;
+  width: 276px;
 }
 
-.popover-title {
+.richEditor-menu.richEditorFlyout.insertEmoji {
+  margin-left: -1px;
+}
+
+.richEditorFlyout-title {
   font-size: 100%;
 }
 
 .richEditor-insertEmoji {
-  width: 36px;
-  height: 36px;
   font-size: 24px;
   text-align: center;
   overflow: hidden;
+}
+
+.richEditor-insertEmoji .fallBackEmoji {
+  display: block;
+  margin: auto;
 }
 
 .richEditor-insertEmoji:focus {
@@ -1193,13 +1250,14 @@ label.checkbox input.checkbox-input {
   width: 24px;
   height: 24px;
   -webkit-user-select: none;
-  -moz-user-select: none;
-  -ms-user-select: none;
-  user-select: none;
+     -moz-user-select: none;
+      -ms-user-select: none;
+          user-select: none;
   -webkit-transform: translateX(-50%);
       -ms-transform: translateX(-50%);
           transform: translateX(-50%);
   margin-top: -1px;
+  pointer-events: none;
 }
 
 .richEditor-nub {
@@ -1207,40 +1265,39 @@ label.checkbox input.checkbox-input {
   display: block;
   width: 12px;
   height: 12px;
-  border-top: 1px solid #999;
-  border-right: 1px solid #999;
-  box-shadow: 0 0 5px 1px #eee;
-  box-shadow: 0 0 5px 1px rgba(0, 0, 0, 0.2);
+  border-top: 1px solid #d6d7d9;
+  border-right: 1px solid #d6d7d9;
+  box-shadow: 0 0 5px 1px rgba(85, 90, 98, 0.2);
   background: #fff;
 }
 
-.richEditor-toolbarContainer.isUp {
+.richEditor-inlineToolbarContainer.isUp {
   -webkit-transform: translateY(-12px);
       -ms-transform: translateY(-12px);
           transform: translateY(-12px);
 }
 
-.richEditor-toolbarContainer.isUp .richEditor-nubPosition {
+.richEditor-inlineToolbarContainer.isUp .richEditor-nubPosition {
   top: 100%;
 }
 
-.richEditor-toolbarContainer.isUp .richEditor-nub {
+.richEditor-inlineToolbarContainer.isUp .richEditor-nub {
   -webkit-transform: translateY(-50%) rotate(135deg);
       -ms-transform: translateY(-50%) rotate(135deg);
           transform: translateY(-50%) rotate(135deg);
 }
 
-.richEditor-toolbarContainer.isDown {
+.richEditor-inlineToolbarContainer.isDown {
   -webkit-transform: translateY(12px);
       -ms-transform: translateY(12px);
           transform: translateY(12px);
 }
 
-.richEditor-toolbarContainer.isDown .richEditor-nubPosition {
+.richEditor-inlineToolbarContainer.isDown .richEditor-nubPosition {
   bottom: 100%;
 }
 
-.richEditor-toolbarContainer.isDown .richEditor-nubPosition {
+.richEditor-inlineToolbarContainer.isDown .richEditor-nubPosition {
   -webkit-box-align: end;
   -webkit-align-items: flex-end;
       -ms-flex-align: end;
@@ -1251,7 +1308,7 @@ label.checkbox input.checkbox-input {
   margin-top: 2px;
 }
 
-.richEditor-toolbarContainer.isDown .richEditor-nub {
+.richEditor-inlineToolbarContainer.isDown .richEditor-nub {
   -webkit-transform: translateY(50%) rotate(-45deg);
       -ms-transform: translateY(50%) rotate(-45deg);
           transform: translateY(50%) rotate(-45deg);
@@ -1259,32 +1316,18 @@ label.checkbox input.checkbox-input {
 
 .richEditor-paragraphToolbarContainer {
   position: absolute;
-}
-
-.richEditor-paragraphToolbarContainer .richEditor-nubPosition {
-  left: 2px;
+  left: -webkit-calc(50% - 18px);
+  left: calc(50% - 18px);
 }
 
 .richEditor-paragraphToolbarContainer.isUp {
-  bottom: 100%;
-}
-
-.richEditor-paragraphToolbarContainer.isUp .richEditor-nubPosition {
-  top: 100%;
-  -webkit-transform: none;
-      -ms-transform: none;
-          transform: none;
+  bottom: -webkit-calc(50% + 17px);
+  bottom: calc(50% + 17px);
 }
 
 .richEditor-paragraphToolbarContainer.isDown {
-  top: 100%;
-}
-
-.richEditor-paragraphToolbarContainer.isDown .richEditor-nubPosition {
-  bottom: 100%;
-  -webkit-transform: translateY(1px);
-      -ms-transform: translateY(1px);
-          transform: translateY(1px);
+  top: -webkit-calc(50% + 17px);
+  top: calc(50% + 17px);
 }
 
 .userContent > *:not(:last-child) {
@@ -1343,29 +1386,16 @@ label.checkbox input.checkbox-input {
   -webkit-flex-wrap: nowrap;
       -ms-flex-wrap: nowrap;
           flex-wrap: nowrap;
-  -webkit-box-pack: justify;
-  -webkit-justify-content: space-between;
-      -ms-flex-pack: justify;
-          justify-content: space-between;
-  padding-left: 3px;
-}
-
-.emojiGroup {
-  color: #737982;
-}
-
-.emojiGroup.isSelected {
-  color: #0f97dd;
-}
-
-.emojiGroup + .emojiGroup {
-  margin-left: 10px;
+  -webkit-box-pack: center;
+  -webkit-justify-content: center;
+      -ms-flex-pack: center;
+          justify-content: center;
 }
 
 .emojiGroup-icon {
   display: block;
   position: relative;
-  margin: 0;
+  margin: auto;
   padding: 0;
   width: 24px;
   size: 24px;
@@ -1381,7 +1411,7 @@ body.hasRichEditor #Form_Preview {
   }
   body.hasRichEditor.Section-PostDiscussion #DiscussionForm .FormWrapper {
     padding-left: 36px;
-    padding-right: 30px;
+    padding-right: 36px;
   }
   body.hasRichEditor.Section-PostDiscussion #DiscussionForm .FormWrapper .richEditor {
     padding-left: 0;
@@ -1394,7 +1424,7 @@ body.hasRichEditor #Form_Preview {
   }
   body.hasRichEditor .CommentForm .richEditor {
     padding-left: 36px;
-    padding-right: 30px;
+    padding-right: 36px;
   }
   body.hasRichEditor .CommentForm .richEditor .richEditor {
     padding-left: 0;
@@ -1411,7 +1441,7 @@ body.hasRichEditor #Form_Preview {
   body.hasRichEditor #MessageForm .FormWrapper,
   body.hasRichEditor #ConversationForm .FormWrapper {
     padding-left: 36px;
-    padding-right: 30px;
+    padding-right: 36px;
   }
   body.hasRichEditor #GroupForm .FormWrapper .richEditor,
   body.hasRichEditor #MessageForm .FormWrapper .richEditor,
@@ -1432,7 +1462,7 @@ body.isMobile .richEditor {
   padding-left: 0;
 }
 
-body.isMobile .richEditor-menu.insertPopover {
+body.isMobile .richEditor-menu.richEditorFlyout {
   left: 0;
   width: -webkit-calc(100% + 0);
   width: calc(100% + 0);
@@ -1461,7 +1491,7 @@ body.isMobile .richEditorParagraphMenu {
   .richEditor {
     padding-left: 0;
   }
-  .richEditor-menu.insertPopover {
+  .richEditor-menu.richEditorFlyout {
     left: 0;
     width: -webkit-calc(100% + 0);
     width: calc(100% + 0);
@@ -1481,6 +1511,9 @@ body.isMobile .richEditorParagraphMenu {
 .atMentionList {
   position: absolute;
   width: 200px;
+  -webkit-transform: translateY(6px);
+      -ms-transform: translateY(6px);
+          transform: translateY(6px);
 }
 
 .atMentionList-suggestion {
@@ -1502,6 +1535,8 @@ body.isMobile .richEditorParagraphMenu {
 .atMentionList-items.MenuItems {
   display: block;
   padding: 3px 0;
+  overflow: auto;
+  max-height: 270px;
 }
 
 .atMentionList-items.isHidden {
@@ -1637,8 +1672,18 @@ body.isMobile .richEditorParagraphMenu {
           transform: translateY(-100%);
 }
 
+.accessibility-jumpTo:focus .Close-x,
+.accessibility-jumpTo:focus .richEditorButton-icon {
+  opacity: 1;
+}
+
 .accessibility-jumpTo:hover {
   color: #0f97dd;
+}
+
+.accessibility-jumpTo:hover .Close-x,
+.accessibility-jumpTo:hover .richEditorButton-icon {
+  opacity: 1;
 }
 
 .spoiler {
@@ -2416,8 +2461,13 @@ body.isMobile .richEditorParagraphMenu {
 }
 
 .safeEmoji {
-  display: inline;
+  display: inline-block;
   font-family: "Segoe UI Emoji", sans-serif;
+  vertical-align: middle;
+  text-align: center;
+  height: 1em;
+  width: 1em;
+  line-height: 1em;
 }
 
 .nativeEmoji {

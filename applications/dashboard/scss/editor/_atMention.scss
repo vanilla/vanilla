@@ -12,9 +12,12 @@ $atMention-user_paddingVertical      : 3px !default;
 
 $atMention-selected_bg               : $global-color_bg !default;
 
+$atMention_maxHeight                 : ($atMention-avatar_width + $atMention-user_paddingVertical * 2) * 7.5;
+
 .atMentionList {
     position: absolute;
     width: $atMention_width;
+    transform: translateY($baseUnit); // offset
 }
 
 .atMentionList-suggestion {
@@ -32,6 +35,8 @@ $atMention-selected_bg               : $global-color_bg !default;
     &.MenuItems { // For overwriting old themes
         display: block;
         padding: $atMention-user_paddingVertical 0;
+        overflow: auto;
+        max-height: $atMention_maxHeight;
     }
 
     &.isHidden {

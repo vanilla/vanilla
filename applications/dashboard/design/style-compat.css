@@ -1205,6 +1205,10 @@ label.checkbox input.checkbox-input {
   width: 276px;
 }
 
+.richEditor-menu.richEditorFlyout.insertEmoji {
+  margin-left: -1px;
+}
+
 .richEditorFlyout-title {
   font-size: 100%;
 }

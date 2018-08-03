@@ -417,6 +417,10 @@ $richEditor-mobileEmbedBreakPoint                 : 550px !default;
     bottom: 100%;
     left: 0;
     width: #{$richEditor-flyout_paddingHorizontal * 2 + 7 * $richEditor-menuButton_size};
+
+    &.insertEmoji {
+        margin-left: -$richEditor-menu_borderWidth;
+    }
 }
 
 .richEditorFlyout-title {
@@ -424,11 +428,6 @@ $richEditor-mobileEmbedBreakPoint                 : 550px !default;
 }
 
 .richEditor-insertEmoji {
-    //display: flex;
-    //align-items: center;
-    //justify-content: center;
-    //width: $richEditor-menuButton_size;
-    //height: $richEditor-menuButton_size;
     font-size: $icon-default_size;
     text-align: center;
     overflow: hidden;

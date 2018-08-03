@@ -8,7 +8,7 @@ import React from "react";
 import { t } from "@dashboard/application";
 import getStore from "@dashboard/state/getStore";
 import { hasPermission } from "@dashboard/permissions";
-import { log, debug } from "@dashboard/utility";
+import { log, debug, sanitizeUrl } from "@dashboard/utility";
 import Quill from "@rich-editor/quill";
 import EmbedPopover from "@rich-editor/components/popovers/EmbedPopover";
 import EmojiPopover from "@rich-editor/components/popovers/EmojiPopover";
@@ -165,9 +165,10 @@ export default class Editor extends React.Component<IProps> {
         const embedInserter: EmbedInsertionModule = this.quill.getModule("embed/insertion");
         const resourceType = triggeringElement.getAttribute("data-resource-type");
         const id = Number.parseInt(triggeringElement.getAttribute("data-resource-id") || "", 10);
+        const url = triggeringElement.getAttribute("data-url") || "";
 
         if (resourceType === "discussion" || resourceType === "comment") {
-            embedInserter.insertQuoteEmbed(resourceType, id);
+            embedInserter.insertQuoteEmbed(resourceType, id, url);
         }
     };
 

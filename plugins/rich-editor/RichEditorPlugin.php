@@ -5,6 +5,8 @@
  * @license https://opensource.org/licenses/GPL-2.0 GPL-2.0
  */
 
+use Garden\Schema\Schema;
+
 class RichEditorPlugin extends Gdn_Plugin {
 
     const FORMAT_NAME = "Rich";
@@ -125,10 +127,12 @@ class RichEditorPlugin extends Gdn_Plugin {
             $object = $args['Comment'];
             $resourceType = 'comment';
             $resourceID = $object->CommentID;
+            $url = commentUrl($object);
         } elseif ($discussion) {
             $object = $discussion;
             $resourceType = 'discussion';
             $resourceID = $object->DiscussionID;
+            $url = discussionUrl($object);
         } else {
             return;
         }
@@ -138,7 +142,9 @@ class RichEditorPlugin extends Gdn_Plugin {
         $classes = 'ReactButton Quote Visible js-quoteButton';
 
         echo Gdn_Theme::bulletItem('Flags');
-        echo "<a href='#' data-resource-type='$resourceType' data-resource-id='$resourceID' role='button' class='$classes'>$linkText</a>";
+        echo "<a href='#' data-resource-type='$resourceType' data-resource-id='$resourceID' data-url='$url'
+ role='button' 
+class='$classes'>$linkText</a>";
         echo ' ';
     }
 }

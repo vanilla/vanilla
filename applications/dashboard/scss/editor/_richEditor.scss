@@ -3,7 +3,7 @@ $richEditor_leftPadding                           : 36px !default;
 $richEditor_minHeight                             : 200px !default;
 $richEditor_verticalPadding                       : 9px !default;
 $richEditor_horizontalPadding                     : 12px !default;
-$richEditor-outline_color                         : rgba($global-color_primary, 0.6) !default; // TODO drerrive
+$richEditor-outline_color                         : rgba($global-color_primary, 0.6) !default;
 
 $richEditor-menuButton_size                       : 36px !default;
 $richEditor-floatingButton_size                   : 28px !default;
@@ -27,8 +27,6 @@ $richEditor-pilcrow_offset                        : 9px!default;
 $richEditor-pilcrow_fontSize                      : 14px !default;
 $richEditor-pilcrowAnimation_duration             : 0.3s;
 
-$richEditor-emojiCategory_color                   : #737982 !default; // TODO derrive
-$richEditor-emojiCategory_hoverColor              : #212327 !default; // TODO drrive
 $richEditor-emojiGroup_paddingLeft                : 3px !default;
 $richEditor-emojiOutline_offset                   : -#{$formElement_borderWidth + 2} !default;
 
@@ -138,6 +136,13 @@ $richEditor-mobileEmbedBreakPoint                 : 550px !default;
         left: 0;
     }
 
+    &.MenuItems {
+        border: $formElement-borderWidth $formElement-borderStyle $formElement_borderColor;
+        box-shadow: $menu-dropShadow;
+        background: $global-color_bg;
+        border-radius: $global-borderRadius;
+    }
+
     .richEditor-menuItem {
         display: block;
         padding: 0;
@@ -234,7 +239,6 @@ $richEditor-mobileEmbedBreakPoint                 : 550px !default;
     }
 }
 
-.richEditor-menuWideItem,
 .richEditor-menuItem {
     display: block;
     padding: 0;
@@ -464,11 +468,10 @@ $richEditor-mobileEmbedBreakPoint                 : 550px !default;
     width: $richEditor-nub_width;
     height: $richEditor-nub_width;
     border: {
-        top: $richEditor-menu_borderWidth solid #999;   // TODO make derrived
-        right: $richEditor-menu_borderWidth solid #999; // TODO make derrived
+        top: $richEditor-menu_borderWidth solid $global-border_color;
+        right: $richEditor-menu_borderWidth solid $global-border_color;
     }
-    box-shadow: 0 0 5px 1px #eee;                       // TODO make derrived
-    box-shadow: 0 0 5px 1px rgba(0, 0, 0, 0.2);         // TODO make derrived
+    box-shadow: 0 0 5px 1px $menu-dropShadow_color;
     background: $richEditor_bg;
 }
 

@@ -864,6 +864,13 @@ label.checkbox input.checkbox-input {
   margin-left: 0;
 }
 
+.richEditor-menuItems.MenuItems {
+  border: 1px solid #d6d7d9;
+  box-shadow: 0 5px 10px rgba(85, 90, 98, 0.2);
+  background: #fff;
+  border-radius: 2px;
+}
+
 .richEditor-menuItems .richEditor-menuItem {
   display: block;
   padding: 0;
@@ -917,7 +924,7 @@ label.checkbox input.checkbox-input {
 
 .richEditor-button.emojiGroup {
   display: block;
-  color: #737982;
+  color: #555a62;
   width: 36px;
   height: 36px;
   text-align: center;
@@ -994,28 +1001,22 @@ label.checkbox input.checkbox-input {
   opacity: 1;
 }
 
-.richEditor-menuWideItem,
 .richEditor-menuItem {
   display: block;
   padding: 0;
   margin: 0;
 }
 
-.richEditor-menuWideItem .richEditor-button, .richEditor-menuWideItem.richEditor-button,
-.richEditor-menuItem .richEditor-button,
-.richEditor-menuItem.richEditor-button {
+.richEditor-menuItem .richEditor-button, .richEditor-menuItem.richEditor-button {
   width: 36px;
   font-size: 22.1538461538px;
   line-height: 36px;
 }
 
-.richEditor-menuWideItem .richEditor-button.emojiChar-🇺🇳, .richEditor-menuWideItem.richEditor-button.emojiChar-🇺🇳,
-.richEditor-menuItem .richEditor-button.emojiChar-🇺🇳,
-.richEditor-menuItem.richEditor-button.emojiChar-🇺🇳 {
+.richEditor-menuItem .richEditor-button.emojiChar-🇺🇳, .richEditor-menuItem.richEditor-button.emojiChar-🇺🇳 {
   font-size: 14px;
 }
 
-.richEditor-menuWideItem.isRightAligned,
 .richEditor-menuItem.isRightAligned {
   margin-left: auto;
 }
@@ -1261,10 +1262,9 @@ label.checkbox input.checkbox-input {
   display: block;
   width: 12px;
   height: 12px;
-  border-top: 1px solid #999;
-  border-right: 1px solid #999;
-  box-shadow: 0 0 5px 1px #eee;
-  box-shadow: 0 0 5px 1px rgba(0, 0, 0, 0.2);
+  border-top: 1px solid #d6d7d9;
+  border-right: 1px solid #d6d7d9;
+  box-shadow: 0 0 5px 1px rgba(85, 90, 98, 0.2);
   background: #fff;
 }
 

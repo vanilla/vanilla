@@ -102,7 +102,7 @@ $spinnerOffset: 73deg;
         padding-left: 0;
     }
 
-    .richEditor-menu.insertPopover {
+    .richEditor-menu.richEditorFlyout {
         left: 0;
         width: calc(100% + #{$global-border-width * 4});
     }

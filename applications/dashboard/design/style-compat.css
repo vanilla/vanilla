@@ -1092,38 +1092,38 @@ label.checkbox input.checkbox-input {
   max-width: calc(100% - 36px);
 }
 
-.insertPopover {
+.richEditorFlyout {
   position: relative;
   overflow: hidden;
   z-index: 6;
 }
 
-.insertPopover .InputBox {
+.richEditorFlyout .InputBox {
   width: 100%;
   box-sizing: border-box;
 }
 
-.insertPopover .richEditor-close {
+.richEditorFlyout .richEditor-close {
   position: absolute;
   top: 0;
   right: 0;
 }
 
-.insertPopover .Footer {
+.richEditorFlyout .Footer {
   display: -webkit-box;
   display: -webkit-flex;
   display: -ms-flexbox;
   display: flex;
 }
 
-.insertPopover-header {
+.richEditorFlyout-header {
   padding-top: 12px;
   padding-bottom: 12px;
   padding-left: 12px;
   padding-right: 12px;
 }
 
-.insertPopover-footer {
+.richEditorFlyout-footer {
   padding-bottom: 12px;
   padding-left: 12px;
   padding-right: 12px;
@@ -1172,7 +1172,7 @@ label.checkbox input.checkbox-input {
   margin-bottom: 3px;
 }
 
-.insertPopover-body {
+.richEditorFlyout-body {
   padding-left: 12px;
   padding-right: 12px;
 }
@@ -1190,7 +1190,7 @@ label.checkbox input.checkbox-input {
   position: relative;
 }
 
-.richEditor-menu.insertPopover {
+.richEditor-menu.richEditorFlyout {
   position: absolute;
   bottom: 100%;
   left: 0;
@@ -1451,7 +1451,7 @@ body.isMobile .richEditor {
   padding-left: 0;
 }
 
-body.isMobile .richEditor-menu.insertPopover {
+body.isMobile .richEditor-menu.richEditorFlyout {
   left: 0;
   width: -webkit-calc(100% + 0);
   width: calc(100% + 0);
@@ -1480,7 +1480,7 @@ body.isMobile .richEditorParagraphMenu {
   .richEditor {
     padding-left: 0;
   }
-  .richEditor-menu.insertPopover {
+  .richEditor-menu.richEditorFlyout {
     left: 0;
     width: -webkit-calc(100% + 0);
     width: calc(100% + 0);

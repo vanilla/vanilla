@@ -12,10 +12,10 @@ $richEditor-icon_opacity                          : .7 !default;
 
 $richEditor-insertLink_width                      : 387px !default;
 
-$richEditor-insertPopover_paddingVertical         : 12px !default;
-$richEditor-insertPopover_paddingHorizontal       : 12px !default;
-$richEditor-insertPopover_maxHeight               : 100vh !default;
-$richEditor-insertPopover_height                  : $richEditor-menuButton_size * 7.5 !default;
+$richEditor-flyout_paddingVertical         : 12px !default;
+$richEditor-flyout_paddingHorizontal       : 12px !default;
+$richEditor-flyout_maxHeight               : 100vh !default;
+$richEditor-flyout_height                  : $richEditor-menuButton_size * 7.5 !default;
 
 $richEditor-nub_width                             : 12px !default;
 
@@ -335,7 +335,7 @@ $richEditor-mobileEmbedBreakPoint                 : 550px !default;
 }
 
 // Insert Media
-.insertPopover {
+.richEditorFlyout {
     position: relative;
     overflow: hidden;
     z-index: 6;
@@ -356,20 +356,20 @@ $richEditor-mobileEmbedBreakPoint                 : 550px !default;
     }
 }
 
-.insertPopover-header {
+.richEditorFlyout-header {
     padding: {
-        top: $richEditor-insertPopover_paddingVertical;
-        bottom: $richEditor-insertPopover_paddingVertical;
-        left: $richEditor-insertPopover_paddingHorizontal;
-        right: $richEditor-insertPopover_paddingHorizontal;
+        top: $richEditor-flyout_paddingVertical;
+        bottom: $richEditor-flyout_paddingVertical;
+        left: $richEditor-flyout_paddingHorizontal;
+        right: $richEditor-flyout_paddingHorizontal;
     }
 }
 
-.insertPopover-footer {
+.richEditorFlyout-footer {
     padding: {
-        bottom: $richEditor-insertPopover_paddingVertical;
-        left: $richEditor-insertPopover_paddingHorizontal;
-        right: $richEditor-insertPopover_paddingHorizontal;
+        bottom: $richEditor-flyout_paddingVertical;
+        left: $richEditor-flyout_paddingHorizontal;
+        right: $richEditor-flyout_paddingHorizontal;
     }
 }
 
@@ -377,7 +377,7 @@ $richEditor-mobileEmbedBreakPoint                 : 550px !default;
     @include longWordEllipsis;
     margin: 0;
     max-width: calc(100% - #{$richEditor-menuButton_size});
-    min-height: #{$richEditor-menuButton_size - $richEditor-insertPopover_paddingVertical};
+    min-height: #{$richEditor-menuButton_size - $richEditor-flyout_paddingVertical};
 
     &:focus {
         outline: 0;
@@ -389,9 +389,9 @@ $richEditor-mobileEmbedBreakPoint                 : 550px !default;
     align-items: center;
     justify-content: flex-end;
     padding: {
-        left: $richEditor-insertPopover_paddingHorizontal;
-        right: $richEditor-insertPopover_paddingHorizontal;
-        bottom: $richEditor-insertPopover_paddingVertical;
+        left: $richEditor-flyout_paddingHorizontal;
+        right: $richEditor-flyout_paddingHorizontal;
+        bottom: $richEditor-flyout_paddingVertical;
     }
 }
 
@@ -404,16 +404,16 @@ $richEditor-mobileEmbedBreakPoint                 : 550px !default;
     margin-bottom: 3px;
 }
 
-.insertPopover-body {
+.richEditorFlyout-body {
     padding: {
-        left: $richEditor-insertPopover_paddingHorizontal;
-        right: $richEditor-insertPopover_paddingHorizontal;
+        left: $richEditor-flyout_paddingHorizontal;
+        right: $richEditor-flyout_paddingHorizontal;
     }
 }
 
 .insertEmoji-body {
-    max-height: $richEditor-insertPopover_maxHeight;
-    height: $richEditor-insertPopover_height;
+    max-height: $richEditor-flyout_maxHeight;
+    height: $richEditor-flyout_height;
 }
 
 .content-wrapper {
@@ -424,11 +424,11 @@ $richEditor-mobileEmbedBreakPoint                 : 550px !default;
     position: relative;
 }
 
-.richEditor-menu.insertPopover {
+.richEditor-menu.richEditorFlyout {
     position: absolute;
     bottom: 100%;
     left: 0;
-    width: #{$richEditor-insertPopover_paddingHorizontal * 2 + 7 * $richEditor-menuButton_size};
+    width: #{$richEditor-flyout_paddingHorizontal * 2 + 7 * $richEditor-menuButton_size};
 }
 
 .popover-title {

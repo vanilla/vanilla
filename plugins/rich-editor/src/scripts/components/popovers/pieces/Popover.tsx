@@ -44,22 +44,22 @@ export default class Popover extends React.Component<IProps, IState> {
     public render() {
         const { additionalClassRoot } = this.props;
 
-        let classes = classNames("richEditor-menu", "FlyoutMenu", "insertPopover", {
+        let classes = classNames("richEditor-menu", "FlyoutMenu", "richEditorFlyout", {
             [additionalClassRoot as any]: !!additionalClassRoot,
             isHidden: !this.props.isVisible,
         });
 
         classes += this.props.className ? ` ${this.props.className}` : "";
 
-        const headerClasses = classNames("insertPopover-header", {
+        const headerClasses = classNames("richEditorFlyout-header", {
             [additionalClassRoot + "-header"]: !!additionalClassRoot,
         });
 
-        const bodyClasses = classNames("insertPopover-body", {
+        const bodyClasses = classNames("richEditorFlyout-body", {
             [additionalClassRoot + "-body"]: !!additionalClassRoot,
         });
 
-        const footerClasses = classNames("insertPopover-footer", {
+        const footerClasses = classNames("richEditorFlyout-selfPaddedFooter", {
             [additionalClassRoot + "-footer"]: !!additionalClassRoot,
         });
 
@@ -86,7 +86,12 @@ export default class Popover extends React.Component<IProps, IState> {
             >
                 {alertMessage}
                 <div className={headerClasses}>
-                    <h2 id={this.props.titleID} tabIndex={-1} className="H popover-title" ref={this.props.titleRef}>
+                    <h2
+                        id={this.props.titleID}
+                        tabIndex={-1}
+                        className="H richEditorFlyout-title"
+                        ref={this.props.titleRef}
+                    >
                         {this.props.title}
                     </h2>
                     {screenReaderDescription}

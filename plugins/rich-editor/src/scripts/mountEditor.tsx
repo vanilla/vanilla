@@ -29,7 +29,12 @@ export default function mountEditor(containerSelector: string | Element) {
 
     if (initialFormat === "Rich") {
         ReactDOM.render(
-            <Editor editorID={editorID} editorDescriptionID={descriptionID} bodybox={bodybox as HTMLInputElement} />,
+            <Editor
+                editorID={editorID}
+                editorDescriptionID={descriptionID}
+                bodybox={bodybox as HTMLInputElement}
+                isPrimaryEditor={true}
+            />,
             container,
         );
         container.classList.remove("isDisabled");

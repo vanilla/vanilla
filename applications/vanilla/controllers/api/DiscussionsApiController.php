@@ -175,20 +175,6 @@ class DiscussionsApiController extends AbstractApiController {
         return $this->schema($this->discussionSchema, $type);
     }
 
-    public function embedSchema() {
-        return Schema::parse([
-            'discussionID:i' => 'The ID of the discussion.',
-            'name:s' => 'The title of the discussion',
-            'body:s' => 'The rendered embed body of the discussion.',
-            'dateInserted:dt' => 'When the discussion was created.',
-            'dateUpdated:dt|n' => 'When the discussion was last updated.',
-            'insertUser' => $this->getUserFragmentSchema(),
-            'url:s' => 'The full URL to the discussion.',
-            'format:s' => 'The original format of the discussion',
-            'bodyRaw:s' => 'The raw body of the the discussion',
-        ]);
-    }
-
     /**
      * Get a schema instance comprised of all available discussion fields.
      *
@@ -322,17 +308,23 @@ class DiscussionsApiController extends AbstractApiController {
     }
 
     /**
-     * Get a comments embed data.
+     * Get a discussion's quote data.
      *
-     * @param int $id The ID of the comment.
-     * @return array
+     * @param int $id The ID of the discussion.
+     *
+     * @return array The discussion quote data.
+     *
+     * @throws NotFoundException If the record with the given ID can't be found.
+     * @throws \Exception if no session is available.
+     * @throws \Vanilla\Exception\PermissionException if the user does not have the specified permission(s).
+     * @throws \Garden\Schema\ValidationException If the output schema is configured incorrectly.
      */
-    public function get_embed($id) {
+    public function get_quote($id) {
         $this->permission();
 
         $this->idParamSchema();
         $in = $this->schema([], ['in'])->setDescription('Get a discussions embed data.');
-        $out = $this->schema($this->embedSchema(), 'out');
+        $out = $this->schema($this->quoteSchema(), 'out');
 
         $discussion = $this->discussionByID($id);
         $discussion['Url'] = discussionUrl($discussion);
@@ -341,12 +333,32 @@ class DiscussionsApiController extends AbstractApiController {
             $this->discussionModel->categoryPermission('Vanilla.Discussions.Edit', $discussion['CategoryID']);
         }
 
-        $discussion['bodyRaw'] = $discussion['Body'];
+        $isRich = $discussion['Format'] === 'Rich';
+        $discussion['bodyRaw'] = $isRich ? json_decode($discussion['Body'], true) : $discussion['Body'];
         $discussion['Body'] = Gdn_Format::quoteEmbed($discussion['bodyRaw'], $discussion['Format']);
 
         $this->userModel->expandUsers($discussion, ['InsertUserID'], ['expand' => true]);
         $result = $out->validate($discussion);
         return $result;
+    }
+
+    /**
+     * Get the schema for discussion quote data.
+     *
+     * @return Schema
+     */
+    private function quoteSchema(): Schema {
+        return Schema::parse([
+            'discussionID:i' => 'The ID of the discussion.',
+            'name:s' => 'The title of the discussion',
+            'body:s' => 'The rendered embed body of the discussion.',
+            'dateInserted:dt' => 'When the discussion was created.',
+            'dateUpdated:dt|n' => 'When the discussion was last updated.',
+            'insertUser' => $this->getUserFragmentSchema(),
+            'url:s' => 'The full URL to the discussion.',
+            'format:s' => 'The original format of the discussion',
+            'bodyRaw:s' => 'The raw body of the the discussion',
+        ]);
     }
 
     /**

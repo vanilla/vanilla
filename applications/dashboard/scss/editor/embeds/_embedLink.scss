@@ -89,7 +89,7 @@ $embedLink-linkImage_bg: #ffffff !default;
     }
 
     .embedLink-userName {
-        margin: 0 0 0 12px;
+        margin: 0 0 0 6px;
         padding: 0;
         color: #555A62;
         font-weight: $global-bold_fontWeight;
@@ -147,3 +147,39 @@ $embedLink-linkImage_bg: #ffffff !default;
     }
 }
 
+.embedQuote {
+    width: 100%;
+
+    .embedExternal-content {
+        width: 100%;
+        border-left: 6px solid $quote-border_color;
+    }
+
+    .embedLink-excerpt {
+        color: $quote-fg;
+        max-height: initial;
+
+        h1, h2, h3, h4, h5, h6 {
+            color: $quote-fg;
+        }
+
+        a {
+            color: $quote-fg;
+            text-decoration: underline;
+        }
+    }
+
+    .embedLink-header {
+        position: relative;
+        padding-right: 40px;
+    }
+
+    .embedLink-collapseButton {
+        margin-left: 12px;
+        appearance: none;
+        position: absolute;
+        right: 0;
+        top: 50%;
+        transform: translateY(-50%);
+    }
+}

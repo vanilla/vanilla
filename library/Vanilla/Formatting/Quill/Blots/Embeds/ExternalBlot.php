@@ -46,11 +46,23 @@ class ExternalBlot extends AbstractBlot {
         $value = $this->currentOperation["insert"]["embed-external"] ?? [];
         $data = $value['data'] ?? $value;
         try {
-            return $this->embedManager->renderData($data);
+            return "<div class='js-embed embedResponsive'>".$this->embedManager->renderData($data)."</div>";
         } catch (\Exception $e) {
             // TODO: Add better error handling here.
             return '';
         }
+    }
+
+    public function renderQuote(): string {
+        $value = $this->currentOperation["insert"]["embed-external"] ?? [];
+        $data = $value['data'] ?? $value;
+
+        $url = $data['url'] ?? "";
+        if ($url) {
+            $sanitizedUrl = \Gdn_Format::sanitizeUrl($url);
+            return "<p></p><a href=\"$sanitizedUrl\">$url</a></p>";
+        }
+        return "";
     }
 
     /**
@@ -65,13 +77,13 @@ class ExternalBlot extends AbstractBlot {
      * @inheritDoc
      */
     public function getGroupOpeningTag(): string {
-        return "<div class='js-embed embedResponsive'>";
+        return "";
     }
 
     /**
      * @inheritDoc
      */
     public function getGroupClosingTag(): string {
-        return "</div>";
+        return "";
     }
 }

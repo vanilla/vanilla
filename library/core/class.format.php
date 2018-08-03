@@ -2464,32 +2464,26 @@ EOT;
         return $renderer->render($blotGroups);
     }
 
-    public static function quoteEmbed(string $body, string $format): string {
+    public static function quoteEmbed($body, string $format): string {
         if ($format === "Rich") {
             return self::richQuote($body);
         } else {
-            return self::plainText($body, $format);
+            $previousLinksValue = c('Garden.Format.Links');
+            saveToConfig('Garden.Format.Links', false, ['Save' => false]);
+            $value = self::to($body, $format);
+            saveToConfig('Garden.Format.Links', $previousLinksValue, ['Save' => false]);
+            return $value;
         }
     }
 
-    public static function richQuote(string $deltas): string {
-        $operations = json_decode($deltas, true);
-        $title = t("There was an error rendering this rich post");
-
-        if (json_last_error() !== JSON_ERROR_NONE) {
-            $link = "https://docs.vanillaforums.com/help/addons/rich-editor/#why-is-my-published-post-replaced-with-there-was-an-error-rendering-this-rich-post";
-            return "<div class='DismissMessage Warning userContent-error'>$title <a href='$link' rel='nofollow' title='$title'><span class='icon icon-warning-sign userContent-errorIcon'></span></a></div>";
-        }
-
-        $parser = new \Vanilla\Formatting\Quill\Parser();
-        $parser->addQuoteBlotsAndFormats();
+    public static function richQuote(array $operations): string {
+        $parser = Gdn::getContainer()->get(Vanilla\Formatting\Quill\Parser::class);
         $renderer = Gdn::getContainer()->get(Vanilla\Formatting\Quill\Renderer::class);
 
         $blotGroups = $parser->parse($operations);
-        $rendered = $renderer->render($blotGroups);
-        $result = str_replace("<p>", "", $rendered);
-        $result =  str_replace("<br>", "", $result);
-        $result =  str_replace("</p>", "", $result);
+        $rendered = $renderer->renderQuote($blotGroups);
+        $result = str_replace("<p><br></p>", "", $rendered);
+        $result = str_replace("<p></p>", "", $result);
         return $result;
     }
 

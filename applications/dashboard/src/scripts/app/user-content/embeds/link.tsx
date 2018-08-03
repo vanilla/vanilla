@@ -14,7 +14,6 @@ import api from "@dashboard/apiv2";
 
 export function initLinkEmbeds() {
     registerEmbedComponent("link", LinkEmbed);
-    registerEmbedComponent("quote", LinkEmbed);
     truncateEmbedLinks();
 
     // Retruncate links when the window resizes.

@@ -73,18 +73,6 @@ class Parser {
         ;
     }
 
-    public function addQuoteBlotsAndFormats() {
-        $this
-            ->addBlot(Blots\Embeds\MentionBlot::class)
-            ->addBlot(Blots\Embeds\EmojiBlot::class)
-            ->addBlot(Blots\TextBlot::class)// This needs to be the last one!!!
-            ->addFormat(Formats\Link::class)
-            ->addFormat(Formats\Bold::class)
-            ->addFormat(Formats\Italic::class)
-            ->addFormat(Formats\Code::class)
-            ->addFormat(Formats\Strike::class);
-    }
-
     /**
      * Add a new embed type.
      *

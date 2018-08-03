@@ -22,8 +22,8 @@ export interface IEmbedElements {
 
 export type EmbedRenderer = (elements: IEmbedElements, data: IEmbedData, inEditor: boolean) => Promise<void>;
 
-export interface IEmbedProps {
-    data: IEmbedData;
+export interface IEmbedProps<T = IScrapeData> {
+    data: T;
     inEditor: boolean;
     onRenderComplete: () => void;
 }
@@ -75,7 +75,10 @@ export function renderEmbed(elements: IEmbedElements, data: IEmbedData, inEditor
         if (renderer) {
             return renderer(elements, data, inEditor);
         } else if (Component) {
-            ReactDOM.render(<Component data={data} inEditor={inEditor} onRenderComplete={resolve} />, elements.content);
+            ReactDOM.render(
+                <Component data={data as IScrapeData} inEditor={inEditor} onRenderComplete={resolve} />,
+                elements.content,
+            );
         } else {
             throw new Error("Could not find a renderer for the embed type - " + data.type);
         }

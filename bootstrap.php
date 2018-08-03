@@ -229,11 +229,6 @@ $dic->setInstance('Garden\Container\Container', $dic)
     ->addCall('addCoreBlotsAndFormats')
     ->setShared(true)
 
-    ->rule(QuillQuoteParser)
-    ->setClass(\Vanilla\Formatting\Quill\Parser::class)
-    ->addCall('addCoreBlotsAndFormats')
-    ->setShared(true)
-
     ->rule('Smarty')
     ->setShared(true)
 

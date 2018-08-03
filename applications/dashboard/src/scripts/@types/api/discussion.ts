@@ -32,6 +32,7 @@ export interface IDiscussionEdit {
 
 export interface IDiscussionEmbed {
     discussionID: number;
+    type: "quote";
     name: string;
     body: string;
     dateInserted: string;

@@ -99,19 +99,6 @@ class CommentsApiController extends AbstractApiController {
         return $this->schema($this->commentSchema, $type);
     }
 
-    public function embedSchema() {
-        return Schema::parse([
-            'commentID:i' => 'The ID of the comment.',
-            'body:s' => 'The rendered embed body of the comment.',
-            'dateInserted:dt' => 'When the comment was created.',
-            'dateUpdated:dt|n' => 'When the comment was last updated.',
-            'insertUser' => $this->getUserFragmentSchema(),
-            'url:s' => 'The full URL to the comment.',
-            'format:s' => 'The original format of the comment',
-            'bodyRaw:s' => 'The raw body of the ',
-        ]);
-    }
-
     /**
      * Delete a comment.
      *
@@ -198,17 +185,23 @@ class CommentsApiController extends AbstractApiController {
     }
 
     /**
-     * Get a comments embed data.
+     * Get a comments quote data.
      *
      * @param int $id The ID of the comment.
-     * @return array
+     *
+     * @return array The comment quote data.
+     *
+     * @throws NotFoundException If the record with the given ID can't be found.
+     * @throws \Exception if no session is available.
+     * @throws \Vanilla\Exception\PermissionException if the user does not have the specified permission(s).
+     * @throws \Garden\Schema\ValidationException If the output schema is configured incorrectly.
      */
-    public function get_embed($id) {
+    public function get_quote($id) {
         $this->permission();
 
         $this->idParamSchema();
         $in = $this->schema([], ['in'])->setDescription('Get a comments embed data.');
-        $out = $this->schema($this->embedSchema(), 'out');
+        $out = $this->schema($this->quoteSchema(), 'out');
 
         $comment = $this->commentByID($id);
         if ($comment['InsertUserID'] !== $this->getSession()->UserID) {
@@ -217,12 +210,31 @@ class CommentsApiController extends AbstractApiController {
         }
 
         $comment['Url'] = commentUrl($comment);
-        $comment['bodyRaw'] = $comment['Body'];
+        $isRich = $comment['Format'] === 'Rich';
+        $comment['bodyRaw'] = $isRich ? json_decode($comment['Body'], true) : $comment['Body'];
         $comment['Body'] = Gdn_Format::quoteEmbed($comment['bodyRaw'], $comment['Format']);
 
         $this->userModel->expandUsers($comment, ['InsertUserID'], ['expand' => true]);
         $result = $out->validate($comment);
         return $result;
+    }
+
+    /**
+     * Get the schema for comment quote data.
+     *
+     * @return Schema
+     */
+    private function quoteSchema(): Schema {
+        return Schema::parse([
+            'commentID:i' => 'The ID of the comment.',
+            'body:s' => 'The rendered embed body of the comment.',
+            'dateInserted:dt' => 'When the comment was created.',
+            'dateUpdated:dt|n' => 'When the comment was last updated.',
+            'insertUser' => $this->getUserFragmentSchema(),
+            'url:s' => 'The full URL to the comment.',
+            'format:s' => 'The original format of the comment',
+            'bodyRaw:s|a' => 'The raw body of the ',
+        ]);
     }
 
     /**

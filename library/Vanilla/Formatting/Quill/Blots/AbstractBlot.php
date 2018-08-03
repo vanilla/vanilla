@@ -65,6 +65,15 @@ abstract class AbstractBlot {
     abstract public function render(): string;
 
     /**
+     * Render this blot like a quote format.
+     *
+     * @return string
+     */
+    public function renderQuote(): string {
+        return $this->render();
+    }
+
+    /**
      * Determine whether or not this blot uses both current and next operation.
      *
      * If the next operation matched, but not the current one, this is usually the case.

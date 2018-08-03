@@ -101,23 +101,25 @@ class LinkEmbed extends Embed {
         $bodyEncoded = htmlspecialchars($body);
 
         $result = <<<HTML
-<a class="embedExternal embedLink" href="{$urlEncoded}" rel="noopener noreferrer">
+<div class="embedExternal embedLink">
     <div class="embedExternal-content">
-        <article class="embedLink-body">
-            {$image}
-            <div class="embedLink-main">
-                <div class="embedLink-header">
-                    <h3 class="embedLink-title">{$nameEncoded}</h3>
-                    {$userPhotoAsMeta}
-                    {$userName}
-                    {$timestampAsMeta}
-                    {$urlAsMeta}
+        <a href="{$urlEncoded}" rel="noopener noreferrer">
+            <article class="embedLink-body">
+                {$image}
+                <div class="embedLink-main">
+                    <div class="embedLink-header">
+                        <h3 class="embedLink-title">{$nameEncoded}</h3>
+                        {$userPhotoAsMeta}
+                        {$userName}
+                        {$timestampAsMeta}
+                        {$urlAsMeta}
+                    </div>
+                    <div class="embedLink-excerpt">{$bodyEncoded}</div>
                 </div>
-                <div class="embedLink-excerpt">{$bodyEncoded}</div>
-            </div>
-        </article>
+            </article>
+        </a>
     </div>
-</a>
+</div>
 HTML;
 
         return $result;

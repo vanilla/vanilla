@@ -31,8 +31,8 @@ EMOJIS.forEach((data, key) => {
         cellIndexesByGroupId[groupID] = key;
     }
 });
-
 const emojiGroupLength = Object.values(EMOJI_GROUPS).length;
+const numberOfRows = Math.ceil(EMOJIS.length / rowSize);
 
 interface IProps extends IWithEditorProps, IPopoverControllerChildParameters {
     contentID: string;
@@ -42,7 +42,7 @@ interface IState {
     id: string;
     contentID: string;
     scrollTarget: number;
-    firstEmojiOfGroup: number;
+    emojiToFocusPosition: number;
     overscanRowCount: number;
     rowStartIndex: number;
     selectedGroup: number;
@@ -60,7 +60,7 @@ export class EmojiPicker extends React.PureComponent<IProps, IState> {
             id: props.id,
             contentID: props.contentID,
             scrollTarget: 0,
-            firstEmojiOfGroup: 0,
+            emojiToFocusPosition: 0,
             overscanRowCount: 20,
             rowStartIndex: 0,
             selectedGroup: 0,
@@ -201,7 +201,7 @@ export class EmojiPicker extends React.PureComponent<IProps, IState> {
     private handleEmojiScroll = () => {
         this.setState({
             scrollTarget: -1,
-            firstEmojiOfGroup: -1,
+            emojiToFocusPosition: -1,
         });
     };
 
@@ -216,7 +216,7 @@ export class EmojiPicker extends React.PureComponent<IProps, IState> {
     private scrollToCategory = (categoryID: number) => {
         this.setState({
             scrollTarget: rowIndexesByGroupId[categoryID],
-            firstEmojiOfGroup: cellIndexesByGroupId[categoryID],
+            emojiToFocusPosition: cellIndexesByGroupId[categoryID],
             selectedGroup: categoryID,
             alertMessage: t("Jumped to emoji category: ") + t(EMOJI_GROUPS[categoryID]),
         });
@@ -229,7 +229,8 @@ export class EmojiPicker extends React.PureComponent<IProps, IState> {
         const pos = rowIndex * rowSize + columnIndex;
         const emojiData = EMOJIS[pos];
         let result: JSX.Element | null = null;
-        const isSelectedButton = this.state.firstEmojiOfGroup >= 0 && this.state.firstEmojiOfGroup === pos;
+        const isSelectedButton = this.state.emojiToFocusPosition >= 0 && this.state.emojiToFocusPosition === pos;
+
         if (emojiData) {
             result = (
                 <EmojiButton
@@ -243,6 +244,13 @@ export class EmojiPicker extends React.PureComponent<IProps, IState> {
                 />
             );
         }
+
+        if (isSelectedButton) {
+            this.setState({
+                emojiToFocusPosition: -1,
+            });
+        }
+
         return result;
     };
 
@@ -273,17 +281,20 @@ export class EmojiPicker extends React.PureComponent<IProps, IState> {
      * @param isNext - Are we jumping to the next group
      */
 
-    private jumpToAdjacentCategory(isNext = true) {
-        const offset = isNext ? 1 : -1;
-        const groupLength = emojiGroupLength - 1;
-        let targetGroupID = this.state.selectedGroup ? this.state.selectedGroup + offset : offset;
+    private jumpRows(isForward = true) {
+        const offset = isForward ? rowSize : rowSize * -1;
+        let scrollTarget = this.state.rowStartIndex + offset;
 
-        if (targetGroupID > groupLength) {
-            targetGroupID = 0;
-        } else if (targetGroupID < 0) {
-            targetGroupID = groupLength;
+        if (scrollTarget < 0) {
+            scrollTarget = 0;
+        } else if (scrollTarget > numberOfRows) {
+            scrollTarget = numberOfRows;
         }
-        this.scrollToCategory(targetGroupID);
+
+        this.setState({
+            scrollTarget,
+            emojiToFocusPosition: scrollTarget * rowSize,
+        });
     }
 
     /**
@@ -296,11 +307,11 @@ export class EmojiPicker extends React.PureComponent<IProps, IState> {
             switch (event.code) {
                 case "PageUp":
                     event.preventDefault();
-                    this.jumpToAdjacentCategory(false);
+                    this.jumpRows(false);
                     break;
                 case "PageDown":
                     event.preventDefault();
-                    this.jumpToAdjacentCategory(true);
+                    this.jumpRows(true);
                     break;
             }
         }

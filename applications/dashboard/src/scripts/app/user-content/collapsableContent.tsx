@@ -13,6 +13,7 @@ export function initCollapsableUserContent() {
 }
 
 function mountAllCollapsables() {
+    console.log("Mount");
     const toggleClass = "js-toggleCollapsableContent";
     const toggles = document.querySelectorAll("." + toggleClass);
     toggles.forEach(toggle => {
@@ -56,6 +57,7 @@ export default class CollapsableUserContent extends React.PureComponent<IProps> 
         const style: React.CSSProperties = this.state.isCollapsed
             ? { maxHeight: this.maxHeight, overflow: "hidden" }
             : { maxHeight: this.maxHeight };
+
         return (
             <div
                 className="collapsableContent"
@@ -71,15 +73,14 @@ export default class CollapsableUserContent extends React.PureComponent<IProps> 
         if (this.selfRef.current!.children.length <= 1) {
             this.props.toggleButton.style.display = "none";
         }
-        window.addEventListener("resize", () => debounce(this.forceUpdate, 200)());
+        window.addEventListener("resize", () => debounce(() => this.forceUpdate(), 200)());
 
         this.props.toggleButton.addEventListener("click", () => {
-            console.log("Button clicked");
             this.setState({ isCollapsed: !this.state.isCollapsed });
         });
     }
 
-    private get maxHeight() {
+    private get maxHeight(): number | string {
         const self = this.selfRef.current;
         if (!self) {
             return "100%";
@@ -98,9 +99,10 @@ export default class CollapsableUserContent extends React.PureComponent<IProps> 
 
     private getElementHeight(element: Element): number {
         const height = element.getBoundingClientRect().height;
-        const style = window.getComputedStyle(element);
-        return ["top", "bottom"]
-            .map(side => parseInt(style["margin-" + side], 10))
-            .reduce((total, side) => total + side, height);
+        const { marginTop, marginBottom } = window.getComputedStyle(element);
+
+        const topHeight = marginTop ? parseInt(marginTop, 10) : 0;
+        const bottomHeight = marginBottom ? parseInt(marginBottom, 10) : 0;
+        return height + topHeight + bottomHeight;
     }
 }

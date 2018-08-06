@@ -980,11 +980,23 @@ class ActivityModel extends Gdn_Model {
      *
      *
      * @param $activity
-     * @param bool $noDelete
+     * @param array $options Options to modify the behavior of the emailing.
+     *
+     * - **NoDelete**: Don't delete an email-only activity once the email is sent.
+     * - **EmailSubject**: A custom subject for the email.
      * @return bool
      * @throws Exception
      */
-    public function email(&$activity, $noDelete = false) {
+    public function email(&$activity,  $options = []) {
+        // The $options parameter used to be $noDelete bool, this is the backwards compat.
+        if (is_bool($options)) {
+            $options = ['NoDelete' => $options];
+        }
+        $options += [
+            'NoDelete' => false,
+            'EmailSubject' => '',
+        ];
+
         if (is_numeric($activity)) {
             $activityID = $activity;
             $activity = $this->getID($activityID);
@@ -1024,16 +1036,22 @@ class ActivityModel extends Gdn_Model {
             $activity['Headline'] = Gdn_Format::activityHeadline($activity, '', $user['UserID']);
         }
 
+        $subject = $options['EmailSubject'] ?: Gdn_Format::plainText($activity['Headline']);
+
         // Build the email to send.
         $email = new Gdn_Email();
-        $email->subject(sprintf(t('[%1$s] %2$s'), c('Garden.Title'), Gdn_Format::plainText($activity['Headline'])));
+        $email->subject(sprintf(
+            t('[%1$s] %2$s'),
+            c('Garden.Title'),
+            $subject
+        ));
         $email->to($user);
 
         $url = externalUrl(val('Route', $activity) == '' ? '/' : val('Route', $activity));
 
         $emailTemplate = $email->getEmailTemplate()
             ->setButton($url, val('ActionText', $activity, t('Check it out')))
-            ->setTitle(Gdn_Format::plainText(val('Headline', $activity)));
+            ->setTitle($subject);
 
         if ($message = $this->getEmailMessage($activity)) {
             $emailTemplate->setMessage($message, true);
@@ -1057,7 +1075,7 @@ class ActivityModel extends Gdn_Model {
             }
 
             // Delete the activity now that it has been emailed.
-            if (!$noDelete && !$activity['Notified']) {
+            if (!$options['NoDelete'] && !$activity['Notified']) {
                 if (val('ActivityID', $activity)) {
                     $this->delete($activity['ActivityID']);
                 } else {
@@ -1504,7 +1522,7 @@ class ActivityModel extends Gdn_Model {
 
         $delete = false;
         if ($activity['Emailed'] == self::SENT_PENDING) {
-            $this->email($activity);
+            $this->email($activity, $options);
             $delete = val('_Delete', $activity);
         }
 

@@ -141,8 +141,7 @@ abstract class ConversationsModel extends Gdn_Model {
      * @param array $notifyUserIDs
      * @param array $options
      */
-    protected function notifyUsers($conversation, $message, $notifyUserIDs, $options = [])
-    {
+    protected function notifyUsers($conversation, $message, $notifyUserIDs, $options = []) {
         $conversation = (array)$conversation;
         $message = (array)$message;
 
@@ -153,22 +152,19 @@ abstract class ConversationsModel extends Gdn_Model {
             'RecordType' => 'Conversation',
             'RecordID' => $conversation['ConversationID'],
             'Story' => $message['Body'],
-            'ActionText' => t('Reply'),
+            'ActionText' => $options['ActionText'] ?? t('Reply'),
             'Format' => val('Format', $message, c('Garden.InputFormatter')),
-            'Route' => "/messages/{$conversation['ConversationID']}#Message_{$message['MessageID']}"
+            'Route' => $options['Url'] ?? "/messages/{$conversation['ConversationID']}#Message_{$message['MessageID']}"
         ];
 
-        if (isset($options['Url']) && !empty($options['Url'])) {
-            $activity['Route'] = $options['Url'];
-        }
-
-        if (isset($options['ActionText']) && !empty($options['ActionText'])) {
-            $activity['ActionText'] = t($options['ActionText']);
-        }
-
-        $subject = val('subject', $conversation);
+        $subject = $conversation['Subject'] ?? '';
         if ($subject) {
-            $activity['Story'] = sprintf(t('Re: %s'), $subject).'<br>'.$body;
+            if (empty($options['FirstMessage'])) {
+                $subject = sprintf(t('Re: %s'), $subject);
+            }
+            $options['EmailSubject'] = $subject;
+        } else {
+            $options = [];
         }
 
         $activityModel = new ActivityModel();
@@ -178,7 +174,7 @@ abstract class ConversationsModel extends Gdn_Model {
             }
 
             $activity['NotifyUserID'] = $userID;
-            $activityModel->queue($activity, 'ConversationMessage');
+            $activityModel->queue($activity, 'ConversationMessage', $options);
         }
         $activityModel->saveQueue();
     }

@@ -7,6 +7,7 @@ import React from "react";
 import ReactDOM from "react-dom";
 import debounce from "lodash/debounce";
 import { onContent } from "@dashboard/application";
+import { getElementHeight } from "@dashboard/dom";
 
 export function initCollapsableUserContent() {
     onContent(mountAllCollapsables);
@@ -98,7 +99,7 @@ export default class CollapsableUserContent extends React.PureComponent<IProps> 
                     return;
                 }
 
-                const { height, bottomMargin } = this.getElementHeight(child, lastBottomMargin);
+                const { height, bottomMargin } = getElementHeight(child, lastBottomMargin);
                 lastBottomMargin = bottomMargin;
                 finalMaxHeight += height;
             });
@@ -106,28 +107,5 @@ export default class CollapsableUserContent extends React.PureComponent<IProps> 
         } else {
             return self.scrollHeight;
         }
-    }
-
-    private getElementHeight(
-        element: Element,
-        previousBottomMargin: number,
-    ): {
-        height: number;
-        bottomMargin: number;
-    } {
-        const height = element.getBoundingClientRect().height;
-        const { marginTop, marginBottom } = window.getComputedStyle(element);
-
-        let topHeight = marginTop ? parseInt(marginTop, 10) : 0;
-        // Simulate a margin-collapsed height.
-        topHeight = Math.max(topHeight - previousBottomMargin, 0);
-
-        const bottomHeight = marginBottom ? parseInt(marginBottom, 10) : 0;
-        const finalHeight = height + topHeight + bottomHeight;
-
-        return {
-            height: finalHeight,
-            bottomMargin: bottomHeight,
-        };
     }
 }

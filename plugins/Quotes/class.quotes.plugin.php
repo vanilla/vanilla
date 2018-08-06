@@ -23,6 +23,8 @@
  */
 class QuotesPlugin extends Gdn_Plugin {
 
+    private $formats = ['Wysiwyg', 'Html', 'Markdown', 'BBCode', 'Text', 'Text', 'TextEx'];
+
     /** @var bool */
     public $HandleRenderQuotes = true;
 
@@ -40,6 +42,18 @@ class QuotesPlugin extends Gdn_Plugin {
 
         // Whether to handle drawing quotes or leave it up to some other plugin
         $this->HandleRenderQuotes = c('Plugins.Quotes.RenderQuotes', true);
+    }
+
+    /**
+     * Is the given format supported by this addon?
+     *
+     * @param string $format The input format to test.
+     * @return bool
+     */
+    private function isSupportedFormat(string $format): bool {
+        // Many comparisons in this addon are case-sensitive. Do not normalize casing.
+        $result = in_array($format, $this->formats);
+        return $result;
     }
 
     /**
@@ -219,7 +233,9 @@ class QuotesPlugin extends Gdn_Plugin {
      * @param array $args
      */
     public function base_afterFlag_handler($sender, $args) {
-        $this->addQuoteButton($sender, $args);
+        if ($this->isSupportedFormat(c('Garden.InputFormatter'))) {
+            $this->addQuoteButton($sender, $args);
+        }
     }
 
     /**

@@ -33,7 +33,10 @@ export class QuoteEmbed extends React.Component<IEmbedProps<IQuoteEmbedData>> {
                             {this.humanTime}
                         </time>
                     </div>
-                    <div className="embedLink-excerpt embedQuote-excerpt" dangerouslySetInnerHTML={{ __html: body }} />
+                    <div
+                        className="embedLink-excerpt embedQuote-excerpt userContent"
+                        dangerouslySetInnerHTML={{ __html: body }}
+                    />
                 </div>
             </article>
         );

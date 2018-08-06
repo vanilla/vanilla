@@ -357,7 +357,7 @@ class DiscussionsApiController extends AbstractApiController {
             'insertUser' => $this->getUserFragmentSchema(),
             'url:s' => 'The full URL to the discussion.',
             'format:s' => 'The original format of the discussion',
-            'bodyRaw:s' => 'The raw body of the the discussion',
+            'bodyRaw:s|a' => 'The raw body of the post or an array of operations for a rich post.',
         ]);
     }
 

@@ -80,7 +80,8 @@ class QuoteEmbed extends Embed {
                     <button class="js-toggleCollapsableContent embedLink-collapseButton" 
                     aria-controls="$contentId">[ - ]</button>
                 </div>
-                <div class="embedLink-excerpt embedQuote-excerpt js-collapsableExcerpt" data-id="$contentId">$renderedBody</div>
+                <div class="embedLink-excerpt embedQuote-excerpt js-collapsableExcerpt userContent" 
+                data-id="$contentId">$renderedBody</div>
             </div>
         </article>
     </div>

@@ -233,7 +233,7 @@ class CommentsApiController extends AbstractApiController {
             'insertUser' => $this->getUserFragmentSchema(),
             'url:s' => 'The full URL to the comment.',
             'format:s' => 'The original format of the comment',
-            'bodyRaw:s|a' => 'The raw body of the ',
+            'bodyRaw:s|a' => 'The raw body of the post or an array of operations for a rich post.',
         ]);
     }
 

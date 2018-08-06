@@ -508,10 +508,14 @@ class ConversationModel extends ConversationsModel {
      *
      * @param array $formPostValues Values submitted via form.
      * @param array $settings
+     * @param array $options
      *   - ConversationOnly If set, no message will be created.
      * @return int Unique ID of conversation created or updated.
      */
-    public function save($formPostValues, $settings = []) {
+    public function save($formPostValues, $settings = [], $options = []) {
+        if (!is_array($options)) {
+            $options = [];
+        }
         $deprecated = $settings instanceof ConversationMessageModel;
         $createMessage =  $deprecated || empty($settings['ConversationOnly']);
 
@@ -663,7 +667,7 @@ class ConversationModel extends ConversationsModel {
 
                 $notifyUserIDs = array_column($unreadData, 'UserID');
 
-                $this->notifyUsers($conversation, $message, $notifyUserIDs);
+                $this->notifyUsers($conversation, $message, $notifyUserIDs, $options + ['FirstMessage' => true]);
             }
 
         } else if ($createMessage) {

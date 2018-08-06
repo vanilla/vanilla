@@ -1,6 +1,11 @@
 .safeEmoji { // All emoji
-    display: inline;
+    display: inline-block;
     font-family: "Segoe UI Emoji", sans-serif;
+    vertical-align: middle;
+    text-align: center;
+    height: 1em;
+    width: 1em;
+    line-height: 1em;
 }
 
 .nativeEmoji { // Real Emojis

@@ -548,7 +548,7 @@ if (!function_exists('cssClass')) {
         if (array_key_exists('UrlCode', $row)) {
             $cssClass .= ' Category-'.Gdn_Format::alphaNumeric($row['UrlCode']);
         }
-        if (val('CssClass', $row)) {
+        if ($row['CssClass'] ?? false) {
             $cssClass .= ' Item-'.$row['CssClass'];
         }
 
@@ -562,18 +562,18 @@ if (!function_exists('cssClass')) {
 
         // Discussion list classes.
         if ($inList) {
-            $cssClass .= val('Bookmarked', $row) == '1' ? ' Bookmarked' : '';
+            $cssClass .= ($row['Bookmarked'] ?? '') == '1' ? ' Bookmarked' : '';
 
-            $announce = val('Announce', $row);
+            $announce = $row['Announce'];
             if ($announce == 2) {
                 $cssClass .= ' Announcement Announcement-Category';
             } elseif ($announce) {
                 $cssClass .= ' Announcement Announcement-Everywhere';
             }
 
-            $cssClass .= val('Closed', $row) == '1' ? ' Closed' : '';
-            $cssClass .= val('InsertUserID', $row) == $session->UserID ? ' Mine' : '';
-            $cssClass .= val('Participated', $row) == '1' ? ' Participated' : '';
+            $cssClass .= ($row['Closed'] ?? '') == '1' ? ' Closed' : '';
+            $cssClass .= ($row['InsertUserID'] ?? false ) == $session->UserID ? ' Mine' : '';
+            $cssClass .= ($row['Participated'] ?? '') == '1' ? ' Participated' : '';
             if (array_key_exists('CountUnreadComments', $row) && $session->isValid()) {
                 $countUnreadComments = $row['CountUnreadComments'];
                 if ($countUnreadComments === true) {
@@ -583,7 +583,7 @@ if (!function_exists('cssClass')) {
                 } else {
                     $cssClass .= ' Unread';
                 }
-            } elseif (($isRead = val('Read', $row, null)) !== null) {
+            } elseif (($isRead = ($row['Read'])) !== null) {
                 // Category list
                 $cssClass .= $isRead ? ' Read' : ' Unread';
             }
@@ -600,14 +600,14 @@ if (!function_exists('cssClass')) {
             $cssClass .= isMeAction($row) ? ' MeAction' : '';
         }
 
-        if ($_CssClss = val('_CssClass', $row)) {
+        if ($_CssClss = ($row['_CssClass'] ?? false)) {
             $cssClass .= ' '.$_CssClss;
         }
 
         // Insert User classes.
-        if ($userID = val('InsertUserID', $row)) {
-            $user = Gdn::userModel()->getID($userID);
-            if ($_CssClss = val('_CssClass', $user)) {
+        if ($userID = ($row['InsertUserID'] ?? false)) {
+            $user = Gdn::userModel()->getID($userID, DATASET_TYPE_ARRAY);
+            if ($_CssClss = ($user['_CssClass'] ?? false)) {
                 $cssClass .= ' '.$_CssClss;
             }
         }

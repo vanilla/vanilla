@@ -56,7 +56,7 @@ class RichEditorPlugin extends Gdn_Plugin {
     }
 
     public function isInputFormatterRich(): bool {
-        return c('Garden.InputFormatter') === "Rich";
+        return Gdn_Format::defaultFormat() === "Rich";
     }
 
     /**
@@ -103,7 +103,9 @@ class RichEditorPlugin extends Gdn_Plugin {
      * @param array $args
      */
     public function base_afterFlag_handler($sender, $args) {
-        $this->addQuoteButton($sender, $args);
+        if ($this->isInputFormatterRich()) {
+            $this->addQuoteButton($sender, $args);
+        }
     }
 
     /**

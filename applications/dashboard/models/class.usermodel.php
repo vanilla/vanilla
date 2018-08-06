@@ -1485,7 +1485,6 @@ class UserModel extends Gdn_Model {
 
         // Check page cache, then memcached
         $user = $this->getUserFromCache($iD, 'userid');
-
         // If not, query DB
         if ($user === Gdn_Cache::CACHEOP_FAILURE) {
             $user = parent::getID($iD, DATASET_TYPE_ARRAY);
@@ -1500,12 +1499,12 @@ class UserModel extends Gdn_Model {
             return false;
         }
 
-        // Apply calculated fields
-        $this->setCalculatedFields($user);
-
         // Allow FALSE returns
         if ($user === false || is_null($user)) {
             return false;
+        } else {
+            // Apply calculated fields
+            $this->setCalculatedFields($user);
         }
 
         if (is_array($user) && $datasetType == DATASET_TYPE_OBJECT) {

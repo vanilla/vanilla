@@ -4068,17 +4068,17 @@ class UserModel extends Gdn_Model {
         if (is_object($user)) {
             $this->setCalculatedFieldsObject($user);
         } else {
-            if (is_string($v = $user['Attributes'] ?? false)) {
+            if (is_string($v = ($user['Attributes'] ?? false))) {
                 $user['Attributes'] = dbdecode($v);
             }
-            if (is_string($v = $user['Permissions'] ?? false)) {
+            if (is_string($v = ($user['Permissions'] ?? false))) {
                 $user['Permissions'] = dbdecode($v);
             }
-            if (is_string($v = $user['Preferences'] ?? false)) {
+            if (is_string($v = ($user['Preferences'] ?? false))) {
                 $user['Preferences'] = dbdecode($v);
             }
 
-            if ($v = $user['Photo'] ?? false) {
+            if ($v = ($user['Photo'] ?? false)) {
                 if (!isUrl($v)) {
                     $photoUrl = Gdn_Upload::url(changeBasename($v, 'n%s'));
                 } else {

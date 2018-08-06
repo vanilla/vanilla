@@ -4087,11 +4087,11 @@ class UserModel extends Gdn_Model {
                 $user['PhotoUrl'] = $photoUrl;
             }
 
-            $confirmed = $user['Confirmed'];
+            $confirmed = ($user['Confirmed'] ?? null);
             if ($confirmed !== null) {
                 $user['EmailConfirmed'] = $confirmed;
             }
-            $verified = $user['Verified'];
+            $verified = ($user['Verified'] ?? null);
             if ($verified !== null) {
                 $user['BypassSpam'] = $verified;
             }

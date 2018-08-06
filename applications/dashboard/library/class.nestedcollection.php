@@ -552,7 +552,7 @@ trait NestedCollection {
         $i = 0;
         foreach ($items as &$item) {
             $item += ['_sort' => $i++];
-            if (val('items', $item)) {
+            if ($item['items'] ?? false) {
                 $this->sortItems($item['items']);
             }
         }

@@ -48,11 +48,15 @@ class RichEditorPlugin extends Gdn_Plugin {
      *
      * @return bool
      */
-    public function isRichFormat(Gdn_Form $form): bool {
+    public function isFormRich(Gdn_Form $form): bool {
         $data = $form->formData();
         $format = $data['Format'] ?? 'Rich';
 
         return $format === self::FORMAT_NAME;
+    }
+
+    public function isInputFormatterRich(): bool {
+        return c('Garden.InputFormatter') === "Rich";
     }
 
     /**
@@ -76,7 +80,7 @@ class RichEditorPlugin extends Gdn_Plugin {
      * @param array $args Arguments from the event.
      */
     public function gdn_form_beforeBodyBox_handler(Gdn_Form $sender, array $args) {
-        if ($this->isRichFormat($sender)) {
+        if ($this->isFormRich($sender)) {
             /** @var Gdn_Controller $controller */
             $controller = Gdn::controller();
             $controller->CssClass .= ' hasRichEditor';

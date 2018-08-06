@@ -160,7 +160,6 @@ export default class Editor extends React.Component<IProps> {
     }
 
     private quoteButtonClickHandler = (event: MouseEvent, triggeringElement: Element) => {
-        console.log("Quote clicked");
         event.preventDefault();
         const embedInserter: EmbedInsertionModule = this.quill.getModule("embed/insertion");
         const resourceType = triggeringElement.getAttribute("data-resource-type");
@@ -168,7 +167,7 @@ export default class Editor extends React.Component<IProps> {
         const url = triggeringElement.getAttribute("data-url") || "";
 
         if (resourceType === "discussion" || resourceType === "comment") {
-            embedInserter.insertQuoteEmbed(resourceType, id, url);
+            void embedInserter.insertQuoteEmbed(resourceType, id, url);
         }
     };
 

@@ -162,13 +162,8 @@ export default class Editor extends React.Component<IProps> {
     private quoteButtonClickHandler = (event: MouseEvent, triggeringElement: Element) => {
         event.preventDefault();
         const embedInserter: EmbedInsertionModule = this.quill.getModule("embed/insertion");
-        const resourceType = triggeringElement.getAttribute("data-resource-type");
-        const id = Number.parseInt(triggeringElement.getAttribute("data-resource-id") || "", 10);
-        const url = triggeringElement.getAttribute("data-url") || "";
-
-        if (resourceType === "discussion" || resourceType === "comment") {
-            void embedInserter.insertQuoteEmbed(resourceType, id, url);
-        }
+        const url = triggeringElement.getAttribute("data-scrape-url") || "";
+        void embedInserter.scrapeMedia(url);
     };
 
     private addQuoteHandler() {

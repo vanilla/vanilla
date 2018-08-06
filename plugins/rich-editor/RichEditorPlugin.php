@@ -130,15 +130,9 @@ class RichEditorPlugin extends Gdn_Plugin {
         }
 
         if (isset($args['Comment'])) {
-            $object = $args['Comment'];
-            $resourceType = 'comment';
-            $resourceID = $object->CommentID;
-            $url = commentUrl($object);
+            $url = commentUrl($args['Comment']);
         } elseif ($discussion) {
-            $object = $discussion;
-            $resourceType = 'discussion';
-            $resourceID = $object->DiscussionID;
-            $url = discussionUrl($object);
+            $url = discussionUrl($discussion);
         } else {
             return;
         }
@@ -148,9 +142,7 @@ class RichEditorPlugin extends Gdn_Plugin {
         $classes = 'ReactButton Quote Visible js-quoteButton';
 
         echo Gdn_Theme::bulletItem('Flags');
-        echo "<a href='#' data-resource-type='$resourceType' data-resource-id='$resourceID' data-url='$url'
- role='button' 
-class='$classes'>$linkText</a>";
+        echo "<a href='#' data-scrape-url='$url' role='button' class='$classes'>$linkText</a>";
         echo ' ';
     }
 }

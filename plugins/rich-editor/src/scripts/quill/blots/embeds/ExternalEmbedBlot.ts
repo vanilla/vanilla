@@ -28,7 +28,7 @@ interface IEmbedUnloadedValue {
 
 interface IEmbedLoadedValue {
     loaderData: ILoaderData;
-    data: IEmbedData | IQuoteEmbedData;
+    data: IEmbedData;
 }
 
 const WARNING_HTML = title => `

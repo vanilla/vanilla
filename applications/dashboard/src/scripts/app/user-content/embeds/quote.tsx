@@ -12,15 +12,18 @@ export function initQuoteEmbeds() {
 
 export class QuoteEmbed extends React.Component<IEmbedProps<IQuoteEmbedData>> {
     public render() {
-        const { url, body, insertUser } = this.props.data;
+        const { body, insertUser } = this.props.data;
 
-        const title = "name" in this.props.data ? <h3 className="embedLink-title">{this.props.data.name}</h3> : null;
+        const title =
+            "name" in this.props.data ? (
+                <h3 className="embedText-title embedQuote-title">{this.props.data.name}</h3>
+            ) : null;
         return (
-            <article className="embedLink-body">
-                <div className="embedLink-main">
-                    <div className="embedLink-header">
+            <article className="embedText-body embedQuote-body">
+                <div className="embedText-main embedQuote-main">
+                    <div className="embedText-header embedQuote-header">
                         {title}
-                        <span className="embedLink-userPhoto PhotoWrap">
+                        <span className="embedQuote-userPhoto PhotoWrap">
                             <img
                                 src={insertUser.photoUrl}
                                 alt={insertUser.name}
@@ -28,15 +31,16 @@ export class QuoteEmbed extends React.Component<IEmbedProps<IQuoteEmbedData>> {
                                 tabIndex={-1}
                             />
                         </span>
-                        <span className="embedLink-userName">{insertUser.name}</span>
-                        <time className="embedLink-dateTime meta" dateTime={this.dateTime} title={this.titleTime}>
+                        <span className="embedQuote-userName">{insertUser.name}</span>
+                        <time
+                            className="embedText-dateTime embedQuote-dateTime meta"
+                            dateTime={this.dateTime}
+                            title={this.titleTime}
+                        >
                             {this.humanTime}
                         </time>
                     </div>
-                    <div
-                        className="embedLink-excerpt embedQuote-excerpt userContent"
-                        dangerouslySetInnerHTML={{ __html: body }}
-                    />
+                    <div className="embedQuote-excerpt userContent" dangerouslySetInnerHTML={{ __html: body }} />
                 </div>
             </article>
         );

@@ -60,7 +60,7 @@ export default class CollapsableUserContent extends React.PureComponent<IProps> 
 
         return (
             <div
-                className="collapsableContent"
+                className="collapsableContent userContent"
                 style={style}
                 ref={this.selfRef}
                 dangerouslySetInnerHTML={this.props.dangerouslySetInnerHTML}
@@ -91,18 +91,43 @@ export default class CollapsableUserContent extends React.PureComponent<IProps> 
         }
 
         if (this.state.isCollapsed) {
-            return this.getElementHeight(self.children[0]) + this.getElementHeight(self.children[1]);
+            let finalMaxHeight = 0;
+            let lastBottomMargin = 0;
+            Array.from(self.children).forEach((child, index) => {
+                if (finalMaxHeight > 100) {
+                    return;
+                }
+
+                const { height, bottomMargin } = this.getElementHeight(child, lastBottomMargin);
+                lastBottomMargin = bottomMargin;
+                finalMaxHeight += height;
+            });
+            return finalMaxHeight;
         } else {
             return self.scrollHeight;
         }
     }
 
-    private getElementHeight(element: Element): number {
+    private getElementHeight(
+        element: Element,
+        previousBottomMargin: number,
+    ): {
+        height: number;
+        bottomMargin: number;
+    } {
         const height = element.getBoundingClientRect().height;
         const { marginTop, marginBottom } = window.getComputedStyle(element);
 
-        const topHeight = marginTop ? parseInt(marginTop, 10) : 0;
+        let topHeight = marginTop ? parseInt(marginTop, 10) : 0;
+        // Simulate a margin-collapsed height.
+        topHeight = Math.max(topHeight - previousBottomMargin, 0);
+
         const bottomHeight = marginBottom ? parseInt(marginBottom, 10) : 0;
-        return height + topHeight + bottomHeight;
+        const finalHeight = height + topHeight + bottomHeight;
+
+        return {
+            height: finalHeight,
+            bottomMargin: bottomHeight,
+        };
     }
 }

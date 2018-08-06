@@ -9,8 +9,4 @@
 
 .collapsableContent {
     transition: max-height 0.2s ease;
-
-    // Disable margin collapsing so we can properly calculate height here.
-    display: flex;
-    flex-direction: column;
 }

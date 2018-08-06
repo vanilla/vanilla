@@ -62,8 +62,6 @@ class LinkEmbed extends Embed {
         $name = $data['name'] ?? null;
         $body = $data['body'] ?? null;
         $photoUrl = $data['photoUrl'] ?? null;
-        $userPhoto = $data['userPhoto'] ?? null;
-        $userName = $data['userName'] ?? null;
         $timestamp = $data['timestamp'] ?? null;
         $humanTime = $data['humanTime'] ?? null;
 
@@ -72,21 +70,6 @@ class LinkEmbed extends Embed {
             $image = "<img src='$photoUrlEncoded' class='embedLink-image' aria-hidden='true'>";
         } else {
             $image = "";
-        }
-
-
-
-        if ($userPhoto && $userName) {
-            $userPhotoEncoded = htmlspecialchars($userPhoto);
-            $userPhotoAsMeta = "<span class=\"embedLink-userPhoto PhotoWrap\"><img src=\"$userPhotoEncoded\" alt=\"$userName\" class=\"ProfilePhoto ProfilePhotoMedium\" /></span>";
-        } else {
-            $userPhotoAsMeta = "";
-        }
-
-        if ($userName) {
-            $userName = "<span class=\"embedLink-userName\">$userName</span>";
-        } else {
-            $userName = "";
         }
 
         if ($timestamp && $humanTime) {
@@ -101,16 +84,14 @@ class LinkEmbed extends Embed {
         $bodyEncoded = htmlspecialchars($body);
 
         $result = <<<HTML
-<div class="embedExternal embedLink">
+<div class="embedExternal embedText embedLink">
     <div class="embedExternal-content">
         <a href="{$urlEncoded}" rel="noopener noreferrer">
-            <article class="embedLink-body">
+            <article class="embedText-body">
                 {$image}
-                <div class="embedLink-main">
-                    <div class="embedLink-header">
-                        <h3 class="embedLink-title">{$nameEncoded}</h3>
-                        {$userPhotoAsMeta}
-                        {$userName}
+                <div class="embedText-main">
+                    <div class="embedText-header">
+                        <h3 class="embedText-title">{$nameEncoded}</h3>
                         {$timestampAsMeta}
                         {$urlAsMeta}
                     </div>

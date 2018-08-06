@@ -53,17 +53,17 @@ class QuoteEmbed extends Embed {
 
         $userUrl = userUrl(['Name' => $username]);
 
-        $title = $name ? "<h3 class=\"embedLink-title\">$nameEncoded</h3>" : null;
+        $title = $name ? "<h3 class=\"embedText-title\">$nameEncoded</h3>" : null;
         $contentId = uniqid("collapsedContentToggle-");
 
         $result = <<<HTML
-<div class="embedExternal embedLink embedQuote">
+<div class="embedExternal embedText embedQuote">
     <div class="embedExternal-content">
-        <article class="embedLink-body">
-            <div class="embedLink-main">
-                <div class="embedLink-header">
+        <article class="embedText-body">
+            <div class="embedText-main">
+                <div class="embedText-header">
                     {$title}
-                    <a href="$userUrl" class="embedLink-userPhoto PhotoWrap">
+                    <a href="$userUrl" class="embedQuote-userPhoto PhotoWrap">
                         <img
                             src="{$userPhotoUrlEncoded}"
                             alt="{$userNameEncoded}"
@@ -71,16 +71,17 @@ class QuoteEmbed extends Embed {
                             tabIndex="-1"
                         />
                     </a>
-                    <a href="$userUrl"><span class="embedLink-userName">{$userNameEncoded}</span></a>
+                    <a href="$userUrl"><span class="embedQuote-userName">{$userNameEncoded}</span></a>
                     <a href="$sanitizedUrl">
-                        <time class="embedLink-dateTime meta" dateTime="{$timeStampEncoded}" title="{$humanTimeEncoded}">
+                        <time class="embedText-dateTime meta" dateTime="{$timeStampEncoded}" 
+                        title="{$humanTimeEncoded}">
                             {$humanTimeEncoded}
                         </time>
                     </a>
-                    <button class="js-toggleCollapsableContent embedLink-collapseButton" 
+                    <button class="js-toggleCollapsableContent embedQuote-collapseButton" 
                     aria-controls="$contentId">[ - ]</button>
                 </div>
-                <div class="embedLink-excerpt embedQuote-excerpt js-collapsableExcerpt userContent" 
+                <div class="embedQuote-excerpt js-collapsableExcerpt userContent" 
                 data-id="$contentId">$renderedBody</div>
             </div>
         </article>

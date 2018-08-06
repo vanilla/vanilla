@@ -4103,7 +4103,7 @@ class UserModel extends Gdn_Model {
             ];
 
             $user['_CssClass'] = '';
-            if ($user['Banned']) {
+            if ($user['Banned'] ?? false) {
                 $user['_CssClass'] = 'Banned';
             }
 

@@ -1008,6 +1008,8 @@ label.checkbox input.checkbox-input {
 
 .richEditor-menuItem .richEditor-button, .richEditor-menuItem.richEditor-button {
   width: 36px;
+  height: 36px;
+  max-width: 36px;
   font-size: 22.1538461538px;
   line-height: 36px;
 }

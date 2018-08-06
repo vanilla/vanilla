@@ -65,8 +65,8 @@ export function renderEmbed(elements: IEmbedElements, data: IEmbedData, inEditor
             throw new Error("The embed type was not provided.");
         }
 
-        if (data.type === "quote") {
-            elements.root.classList.add("embedLink");
+        if (data.type === "quote" || data.type === "link") {
+            elements.root.classList.add("embedText");
         }
 
         const renderer = data.type && embedRenderers[data.type];

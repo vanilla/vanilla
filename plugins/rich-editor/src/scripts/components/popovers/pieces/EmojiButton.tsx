@@ -103,7 +103,7 @@ export class EmojiButton extends React.Component<IProps> {
             case "ArrowUp":
                 event.stopPropagation();
                 event.preventDefault();
-                this.props.onKeyUp(1);
+                this.props.onKeyUp(-1);
                 break;
             case "ArrowRight":
                 event.stopPropagation();

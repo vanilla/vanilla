@@ -14,6 +14,7 @@ import { IPopoverControllerChildParameters } from "./PopoverController";
 import { withEditor, IWithEditorProps } from "@rich-editor/components/context";
 import { EMOJI_GROUPS, EMOJIS } from "./emojiData";
 import EmojiButton from "./EmojiButton";
+import { isEmbedSelected } from "../../../quill/utility";
 
 const buttonSize = 36;
 const colSize = 7;
@@ -31,8 +32,10 @@ EMOJIS.forEach((data, key) => {
         cellIndexesByGroupId[groupID] = key;
     }
 });
+
 const emojiGroupLength = Object.values(EMOJI_GROUPS).length;
 const numberOfRows = Math.ceil(EMOJIS.length / rowSize);
+const elementsOnLastRow = EMOJIS.length % rowSize;
 
 interface IProps extends IWithEditorProps, IPopoverControllerChildParameters {
     contentID: string;
@@ -53,6 +56,7 @@ interface IState {
 
 export class EmojiPicker extends React.PureComponent<IProps, IState> {
     private categoryPickerID: string;
+    private gridEl: Grid;
 
     constructor(props) {
         super(props);
@@ -141,6 +145,9 @@ export class EmojiPicker extends React.PureComponent<IProps, IState> {
                         role={""}
                         onScroll={this.handleEmojiScroll}
                         onSectionRendered={this.handleOnSectionRendered}
+                        ref={gridEl => {
+                            this.gridEl = gridEl as Grid;
+                        }}
                     />
                 )}
             </AutoSizer>
@@ -230,7 +237,13 @@ export class EmojiPicker extends React.PureComponent<IProps, IState> {
         const pos = rowIndex * rowSize + columnIndex;
         const emojiData = EMOJIS[pos];
         let result: JSX.Element | null = null;
-        const isSelectedButton = this.state.emojiToFocusPosition >= 0 && this.state.emojiToFocusPosition === pos;
+        const isSelectedButton = this.state.emojiToFocusPosition === pos;
+
+        if (isSelectedButton) {
+            window.console.log("");
+            window.console.log("isSelectedButton with: ", pos);
+            window.console.log("");
+        }
 
         if (emojiData) {
             result = (
@@ -242,14 +255,11 @@ export class EmojiPicker extends React.PureComponent<IProps, IState> {
                     emojiData={emojiData}
                     index={pos}
                     rowIndex={rowIndex}
+                    colIndex={columnIndex}
+                    onKeyUp={this.jumpRows}
+                    onKeyDown={this.jumpRows}
                 />
             );
-        }
-
-        if (isSelectedButton) {
-            this.setState({
-                emojiToFocusPosition: -1,
-            });
         }
 
         return result;
@@ -279,24 +289,70 @@ export class EmojiPicker extends React.PureComponent<IProps, IState> {
     /**
      * Jump to adjacent category
      *
-     * @param isNext - Are we jumping to the next group
+     * @param offset - How many rows to jump
      */
 
-    private jumpRows(isForward = true) {
-        const offset = isForward ? rowSize : rowSize * -1;
-        let scrollTarget = this.state.rowStartIndex + offset;
+    private jumpRows = (offset: number) => {
+        if (offset !== 0) {
+            const activeElement: HTMLElement = document.activeElement as HTMLElement;
+            let targetScrollRow = this.state.rowStartIndex;
 
-        if (scrollTarget < 0) {
-            scrollTarget = 0;
-        } else if (scrollTarget > numberOfRows) {
-            scrollTarget = numberOfRows;
+            let targetFocusRow = targetScrollRow;
+            let targetFocusColumn = 0;
+            let forceUpdate = false;
+
+            if (
+                activeElement &&
+                activeElement.classList.contains("richEditor-insertEmoji") &&
+                "index" in activeElement.dataset
+            ) {
+                // From arrow keys
+                const index = parseInt(activeElement.dataset.index as "string", 10);
+                window.console.log("index :", index);
+                // Current position
+                targetFocusColumn = index % colSize;
+                targetFocusRow = this.targetRowBounds(Math.ceil(index / colSize) + offset); // offset focus
+
+                // Check if target row contains less elements
+                const targetColumnColumnSize = targetScrollRow % colSize;
+                if (this.isEmojiIndexOnLastRow(index) && targetFocusColumn > targetColumnColumnSize) {
+                    targetFocusColumn = targetColumnColumnSize;
+                }
+
+                // const scrollAndFocusOffset = Math.abs(targetScrollRow - targetFocusRow);
+                // Only offset if we're about to go off the page
+                if (targetFocusRow < targetScrollRow) {
+                    targetScrollRow = targetFocusRow;
+                    forceUpdate = true;
+                } else if (targetFocusRow > targetScrollRow + rowSize) {
+                    targetScrollRow = targetScrollRow + rowSize;
+                    forceUpdate = true;
+                }
+            } else {
+                targetScrollRow = this.targetRowBounds(this.state.rowStartIndex + offset);
+            }
+
+            const emojiFocusPosition = targetFocusRow * rowSize + targetFocusColumn;
+
+            window.console.log("");
+            window.console.log("emojiFocusPosition: ", emojiFocusPosition);
+            window.console.log("targetFocusColumn :", targetFocusColumn);
+            window.console.log("target focus row: ", targetFocusRow);
+            window.console.log("");
+
+            this.setState(
+                {
+                    scrollTarget: targetScrollRow,
+                    emojiToFocusPosition: emojiFocusPosition,
+                },
+                () => {
+                    if (forceUpdate) {
+                        this.gridEl.forceUpdate();
+                    }
+                },
+            );
         }
-
-        this.setState({
-            scrollTarget,
-            emojiToFocusPosition: scrollTarget * rowSize,
-        });
-    }
+    };
 
     /**
      * Handle key press.
@@ -308,15 +364,40 @@ export class EmojiPicker extends React.PureComponent<IProps, IState> {
             switch (event.code) {
                 case "PageUp":
                     event.preventDefault();
-                    this.jumpRows(false);
+                    this.jumpRows(-rowSize);
                     break;
                 case "PageDown":
                     event.preventDefault();
-                    this.jumpRows(true);
+                    this.jumpRows(rowSize);
                     break;
             }
         }
     };
+
+    /**
+     * Make sure target row is within bounds
+     *
+     * @param targetRow
+     */
+    private targetRowBounds(targetRow: number) {
+        if (targetRow < 0) {
+            return 0;
+        } else if (targetRow > numberOfRows) {
+            return numberOfRows;
+        } else {
+            return targetRow;
+        }
+    }
+
+    /**
+     * Check if emoji index is on last row
+     *
+     * @param index - Emoji index
+     */
+    private isEmojiIndexOnLastRow(index: number) {
+        const indexOfElementOnLastFullRow = EMOJIS.length - elementsOnLastRow;
+        return index > indexOfElementOnLastFullRow;
+    }
 }
 
 export default withEditor<IProps>(EmojiPicker);

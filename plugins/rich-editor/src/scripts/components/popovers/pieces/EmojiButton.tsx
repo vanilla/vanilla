@@ -17,7 +17,10 @@ interface IProps extends IWithEditorProps {
     style: React.CSSProperties;
     index: number;
     rowIndex: number;
+    colIndex: number;
     isSelectedButton: boolean;
+    onKeyUp: (rows: number) => void;
+    onKeyDown: (rows: number) => void;
     closeMenuHandler(event: React.SyntheticEvent<any>);
 }
 
@@ -65,7 +68,7 @@ export class EmojiButton extends React.Component<IProps> {
      * Check to see if element should get focus
      */
     public componentDidUpdate(prevProps) {
-        if (this.domButton && prevProps.isSelectedButton) {
+        if (this.domButton && this.props.isSelectedButton) {
             this.domButton.focus();
         }
     }
@@ -92,8 +95,17 @@ export class EmojiButton extends React.Component<IProps> {
      */
     private handleKeyPress = (event: React.KeyboardEvent<any>) => {
         switch (event.key) {
-            case "ArrowRight":
             case "ArrowDown":
+                event.stopPropagation();
+                event.preventDefault();
+                this.props.onKeyDown(1);
+                break;
+            case "ArrowUp":
+                event.stopPropagation();
+                event.preventDefault();
+                this.props.onKeyUp(1);
+                break;
+            case "ArrowRight":
                 event.stopPropagation();
                 event.preventDefault();
                 const nextSibling = this.domButton.nextSibling;
@@ -101,7 +113,6 @@ export class EmojiButton extends React.Component<IProps> {
                     nextSibling.focus();
                 }
                 break;
-            case "ArrowUp":
             case "ArrowLeft":
                 event.stopPropagation();
                 event.preventDefault();

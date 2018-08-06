@@ -1965,6 +1965,7 @@ body.isMobile .richEditorParagraphMenu {
   left: 0;
   width: 100%;
   height: 100%;
+  pointer-events: none;
 }
 
 .richEditor .embedExternal-content:hover::after {
@@ -2124,6 +2125,7 @@ body.isMobile .richEditorParagraphMenu {
   position: relative;
   overflow: hidden;
   text-align: left;
+  pointer-events: initial !important;
 }
 
 .embedText .embedText-main {
@@ -2284,16 +2286,32 @@ body.isMobile .richEditorParagraphMenu {
 }
 
 .embedQuote .embedQuote-collapseButton {
-  margin-left: 12px;
+  margin: 0;
+  padding: 12px;
   -webkit-appearance: none;
      -moz-appearance: none;
           appearance: none;
+  cursor: pointer;
   position: absolute;
   right: 0;
   top: 50%;
   -webkit-transform: translateY(-50%);
       -ms-transform: translateY(-50%);
           transform: translateY(-50%);
+}
+
+.embedQuote .embedQuote-collapseButton > * {
+  display: none;
+}
+
+.embedQuote .embedQuote-collapseButton ::before {
+  display: block;
+}
+
+.embedQuote-body.isCollapsed .embedQuote-collapseButton {
+  -webkit-transform: translateY(-50%) rotate(180deg);
+      -ms-transform: translateY(-50%) rotate(180deg);
+          transform: translateY(-50%) rotate(180deg);
 }
 
 .embedLoader-icon {

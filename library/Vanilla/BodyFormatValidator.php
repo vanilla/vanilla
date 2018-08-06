@@ -58,10 +58,40 @@ class BodyFormatValidator {
             $value = new Invalid("%s is not valid rich text.");
         } else {
             // Re-encode the value to escape unicode values.
+            $this->stripUselessEmbedData($value);
             $value = json_encode($value);
         }
 
         return $value;
+    }
+
+    private function stripUselessEmbedData(array &$operations) {
+        foreach($operations as $key => $op) {
+            // If a dataPromise is still stored on the embed, that means it never loaded properly on the client.
+            $dataPromise = $op['insert']['embed-external']['dataPromise'] ?? null;
+            if ($dataPromise !== null) {
+                unset($operations[$key]);
+            }
+
+            // We need to remove the render HTML body.
+            $body = $op['insert']['embed-external']['data']['body'] ?? null;
+            if ($body !== null) {
+                unset($operations[$key]['insert']['embed-external']['data']['body']);
+            }
+
+            $format = $op['insert']['embed-external']['data']['format'] ?? null;
+            if ($format === 'Rich') {
+                $bodyRaw = $op['insert']['embed-external']['data']['bodyRaw'] ?? null;
+                if (is_array($bodyRaw)) {
+                    foreach ($bodyRaw as $subInsertIndex => &$subInsertOp) {
+                        $externalEmbed = $operations[$key]['insert']['embed-external']['data']['bodyRaw'][$subInsertIndex]['insert']['embed-external'] ?? null;
+                        if ($externalEmbed !== null)  {
+                            unset($operations[$key]['insert']['embed-external']['data']['bodyRaw'][$subInsertIndex]['insert']['embed-external']['data']);
+                        }
+                    }
+                }
+            }
+        }
     }
 
     /**

@@ -26,6 +26,7 @@ $embedLink-linkImage_bg: #ffffff !default;
         position: relative;
         overflow: hidden;
         text-align: left;
+        pointer-events: initial !important;
     }
 
     .embedText-main {
@@ -174,11 +175,28 @@ $embedLink-linkImage_bg: #ffffff !default;
     }
 
     .embedQuote-collapseButton {
-        margin-left: 12px;
+        margin: 0;
+        padding: 12px;
         appearance: none;
+        cursor: pointer;
         position: absolute;
         right: 0;
         top: 50%;
         transform: translateY(-50%);
+
+        // Stupid ICheckBoxes showing up.
+        > * {
+            display: none;
+        }
+
+        ::before {
+            display: block;
+        }
+    }
+}
+
+.embedQuote-body.isCollapsed {
+    .embedQuote-collapseButton {
+        transform: translateY(-50%) rotate(180deg);
     }
 }

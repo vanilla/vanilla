@@ -9,58 +9,25 @@ import debounce from "lodash/debounce";
 import { onContent } from "@dashboard/application";
 import { getElementHeight } from "@dashboard/dom";
 
-export function initCollapsableUserContent() {
-    onContent(mountAllCollapsables);
-}
-
-function mountAllCollapsables() {
-    console.log("Mount");
-    const toggleClass = "js-toggleCollapsableContent";
-    const toggles = document.querySelectorAll("." + toggleClass);
-    toggles.forEach(toggle => {
-        const id = toggle.getAttribute("aria-controls");
-        if (id) {
-            const content = document.querySelector(`[data-id="${id}"]`)!;
-            const serverRenderedUserContent = content.innerHTML;
-            ReactDOM.render(
-                <CollapsableUserContent
-                    id={id}
-                    dangerouslySetInnerHTML={{ __html: serverRenderedUserContent }}
-                    toggleButton={toggle as HTMLButtonElement}
-                />,
-                content,
-            );
-            toggle.classList.remove(toggleClass);
-        }
-    });
-}
-
 interface IProps {
-    toggleButton: HTMLButtonElement;
     id: string;
+    isCollapsed: boolean;
     dangerouslySetInnerHTML: {
         __html: string;
     };
 }
 
-interface IState {
-    isCollapsed: boolean;
-}
-
 export default class CollapsableUserContent extends React.PureComponent<IProps> {
-    public state: IState = {
-        isCollapsed: true,
-    };
-
     private selfRef: React.RefObject<HTMLDivElement> = React.createRef();
 
     public render() {
-        const style: React.CSSProperties = this.state.isCollapsed
+        const style: React.CSSProperties = this.props.isCollapsed
             ? { maxHeight: this.maxHeight, overflow: "hidden" }
             : { maxHeight: this.maxHeight };
 
         return (
             <div
+                id={this.props.id}
                 className="collapsableContent userContent"
                 style={style}
                 ref={this.selfRef}
@@ -71,14 +38,7 @@ export default class CollapsableUserContent extends React.PureComponent<IProps> 
 
     public componentDidMount() {
         this.forceUpdate();
-        if (this.selfRef.current!.children.length <= 1) {
-            this.props.toggleButton.style.display = "none";
-        }
         window.addEventListener("resize", () => debounce(() => this.forceUpdate(), 200)());
-
-        this.props.toggleButton.addEventListener("click", () => {
-            this.setState({ isCollapsed: !this.state.isCollapsed });
-        });
     }
 
     private get maxHeight(): number | string {
@@ -91,7 +51,7 @@ export default class CollapsableUserContent extends React.PureComponent<IProps> 
             return "100%";
         }
 
-        if (this.state.isCollapsed) {
+        if (this.props.isCollapsed) {
             let finalMaxHeight = 0;
             let lastBottomMargin = 0;
             Array.from(self.children).forEach((child, index) => {

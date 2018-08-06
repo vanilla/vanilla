@@ -4,22 +4,58 @@
  */
 
 import React from "react";
-import { registerEmbedComponent, IEmbedProps, IQuoteEmbedData } from "@dashboard/embeds";
+import ReactDOM from "react-dom";
+import { registerEmbedComponent, IEmbedProps, IEmbedData, IQuoteEmbedData } from "@dashboard/embeds";
+import { onContent, t } from "@dashboard/application";
+import CollapsableUserContent from "@dashboard/app/user-content/collapsableContent";
+import uniqueId from "lodash/uniqueId";
+import classnames from "classnames";
 
 export function initQuoteEmbeds() {
     registerEmbedComponent("quote", QuoteEmbed as any);
+    onContent(mountQuoteEmbeds);
 }
 
-export class QuoteEmbed extends React.Component<IEmbedProps<IQuoteEmbedData>> {
+export function mountQuoteEmbeds() {
+    const embeds = document.querySelectorAll(".js-quoteEmbed");
+    for (const embed of embeds) {
+        const data = embed.getAttribute("data-json");
+        if (data) {
+            const quoteData = JSON.parse(data) as IEmbedData;
+            const onRenderComplete = () => {
+                embed.removeAttribute("data-json");
+            };
+            ReactDOM.render(
+                <QuoteEmbed data={quoteData} inEditor={false} onRenderComplete={onRenderComplete} />,
+                embed,
+            );
+        }
+    }
+}
+
+interface IState {
+    isCollapsed: boolean;
+}
+
+export class QuoteEmbed extends React.Component<IEmbedProps<IEmbedData>> {
+    public state: IState = {
+        isCollapsed: true,
+    };
+
     public render() {
-        const { body, insertUser } = this.props.data;
+        const { body, insertUser } = this.quoteData;
+        const id = uniqueId("collapsableContent-");
 
         const title =
             "name" in this.props.data ? (
                 <h3 className="embedText-title embedQuote-title">{this.props.data.name}</h3>
             ) : null;
+
+        const bodyClasses = classnames("embedText-body", "embedQuote-body", { isCollapsed: this.state.isCollapsed });
+        const collapseIconClasses = classnames("icon", "embedQuote-collapseButton", "icon-chevron-up");
+
         return (
-            <article className="embedText-body embedQuote-body">
+            <article className={bodyClasses}>
                 <div className="embedText-main embedQuote-main">
                     <div className="embedText-header embedQuote-header">
                         {title}
@@ -39,8 +75,23 @@ export class QuoteEmbed extends React.Component<IEmbedProps<IQuoteEmbedData>> {
                         >
                             {this.humanTime}
                         </time>
+                        <label className={collapseIconClasses}>
+                            <span className="sr-only">{t("Collapse this quote")}</span>
+                            <input
+                                type="checkbox"
+                                className="sr-only"
+                                onChange={this.handleButtonClick}
+                                checked={this.state.isCollapsed}
+                            />
+                        </label>
                     </div>
-                    <div className="embedQuote-excerpt userContent" dangerouslySetInnerHTML={{ __html: body }} />
+                    <div className="embedQuote-excerpt userContent">
+                        <CollapsableUserContent
+                            isCollapsed={this.state.isCollapsed}
+                            id={id}
+                            dangerouslySetInnerHTML={{ __html: body }}
+                        />
+                    </div>
                 </div>
             </article>
         );
@@ -50,8 +101,18 @@ export class QuoteEmbed extends React.Component<IEmbedProps<IQuoteEmbedData>> {
         this.props.onRenderComplete();
     }
 
+    private handleButtonClick = (event: React.ChangeEvent<HTMLInputElement>) => {
+        const target = event.target;
+        const value = target.type === "checkbox" ? target.checked : target.value;
+        this.setState({ isCollapsed: value });
+    };
+
+    private get quoteData(): IQuoteEmbedData {
+        return this.props.data.attributes as IQuoteEmbedData;
+    }
+
     private get dateTime(): string {
-        return this.props.data.dateUpdated || this.props.data.dateInserted;
+        return this.quoteData.dateUpdated || this.quoteData.dateInserted;
     }
 
     private get titleTime(): string {

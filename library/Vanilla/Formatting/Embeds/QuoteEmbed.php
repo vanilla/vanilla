@@ -6,28 +6,65 @@
 
 namespace Vanilla\Formatting\Embeds;
 
-use Gdn_Format;
-use Vanilla\PageScraper;
+use Garden\Web\Exception\NotFoundException;
 
 /**
  * Generic link embed.
  */
 class QuoteEmbed extends Embed {
 
-    /** @var PageScraper */
-    private $pageScraper;
+    protected $domains;
 
-    /**
-     * LinkEmbed constructor.
-     *
-     * @param PageScraper $pageScraper
-     */
-    public function __construct(PageScraper $pageScraper) {
-        $this->pageScraper = $pageScraper;
+    /** @var \DiscussionsApiController */
+    private $discussionsApiController;
+
+    /** @var \CommentsApiController */
+    private $commentsApiController;
+
+    public function __construct(\DiscussionsApiController $discussionsApiController,
+        \CommentsApiController $commentsApiController) {
         parent::__construct('quote', 'link');
+        $this->domains = [parse_url(\Gdn::request()->domain())['host']];
+        $this->discussionsApiController = $discussionsApiController;
+        $this->commentsApiController = $commentsApiController;
     }
 
+    /**
+     * @param string $url
+     * @return array|boolean
+     * @throws \Garden\Schema\ValidationException
+     * @throws \Vanilla\Exception\PermissionException
+     */
     function matchUrl(string $url) {
+        $path = parse_url($url)['path'];
+        $path = str_replace("/".\Gdn::request()->webRoot(), "", $path);
+
+        $idRegex = '/(^\/discussion\/(?<discussionID>\d+)|(\/discussion\/comment\/(?<commentID>\d+)))/i';
+        preg_match($idRegex, $path, $matches);
+
+        $commentID = $matches['commentID'] ? (int) $matches['commentID'] : null;
+        $discussionID = $matches['discussionID'] ? (int) $matches['discussionID'] : null;
+
+        try {
+            if ($commentID !== null) {
+                $data = $this->commentsApiController->get_quote($commentID);
+                return [
+                    "url" => $url,
+                    "type" => "quote",
+                    "attributes" => $data,
+                ];
+            } else if ($discussionID !== null) {
+                $data = $this->discussionsApiController->get_quote($discussionID);
+                return [
+                    "url" => $url,
+                    "type" => "quote",
+                    "attributes" => $data,
+                ];
+            }
+        } catch (NotFoundException $e) {
+            return false;
+        }
+
         return false;
     }
 
@@ -35,56 +72,18 @@ class QuoteEmbed extends Embed {
      * @inheritdoc
      */
     public function renderData(array $data): string {
-        $url = $data['url'] ?? null;
-        $name = $data['name'] ?? null;
-        $bodyRaw = $data['bodyRaw'] ?? null;
-        $format = $data['format'] ?? null;
-        $username = $data['insertUser']['name'] ?? null;
-        $userPhoto = $data['insertUser']['photoUrl'] ?? null;
-        $timestamp = $data['dateUpdated'] ?? $data['dateInserted'] ?? null;
-
-        $userNameEncoded = htmlspecialchars($username);
-        $userPhotoUrlEncoded = htmlspecialchars($userPhoto);
-        $humanTimeEncoded = htmlspecialchars(Gdn_Format::date($timestamp));
+        $attributes = $data['attributes'] ?? null;
+        $url = $attributes['url'] ?? null;
+        $bodyRaw = $attributes['bodyRaw'] ?? null;
+        $format = $attributes['format'] ?? null;
         $sanitizedUrl = htmlspecialchars(\Gdn_Format::sanitizeUrl($url));
-        $nameEncoded = htmlspecialchars($name);
-        $timeStampEncoded = htmlspecialchars($timestamp);
-        $renderedBody = Gdn_Format::quoteEmbed($bodyRaw, $format);
-
-        $userUrl = userUrl(['Name' => $username]);
-
-        $title = $name ? "<h3 class=\"embedText-title\">$nameEncoded</h3>" : null;
-        $contentId = uniqid("collapsedContentToggle-");
-
+        $attributes['body'] = \Gdn_Format::quoteEmbed($bodyRaw, $format);
+        unset($data['attributes']['bodyRaw']);
+        $jsonData = json_encode($data);
         $result = <<<HTML
 <div class="embedExternal embedText embedQuote">
     <div class="embedExternal-content">
-        <article class="embedText-body">
-            <div class="embedText-main">
-                <div class="embedText-header">
-                    {$title}
-                    <a href="$userUrl" class="embedQuote-userPhoto PhotoWrap">
-                        <img
-                            src="{$userPhotoUrlEncoded}"
-                            alt="{$userNameEncoded}"
-                            class="ProfilePhoto ProfilePhotoSmall"
-                            tabIndex="-1"
-                        />
-                    </a>
-                    <a href="$userUrl"><span class="embedQuote-userName">{$userNameEncoded}</span></a>
-                    <a href="$sanitizedUrl">
-                        <time class="embedText-dateTime meta" dateTime="{$timeStampEncoded}" 
-                        title="{$humanTimeEncoded}">
-                            {$humanTimeEncoded}
-                        </time>
-                    </a>
-                    <button class="js-toggleCollapsableContent embedQuote-collapseButton" 
-                    aria-controls="$contentId">[ - ]</button>
-                </div>
-                <div class="embedQuote-excerpt js-collapsableExcerpt userContent" 
-                data-id="$contentId">$renderedBody</div>
-            </div>
-        </article>
+        <div class="js-quoteEmbed" data-json='$jsonData'><a href="$sanitizedUrl">$sanitizedUrl</a></div>
     </div>
 </div>
 HTML;

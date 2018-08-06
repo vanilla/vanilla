@@ -13,7 +13,7 @@ import { IDiscussionEmbed, ICommentEmbed, IScrapeData } from "@dashboard/@types/
 export const FOCUS_CLASS = "embed-focusableElement";
 
 export type IQuoteEmbedData = IDiscussionEmbed | ICommentEmbed;
-export type IEmbedData = IScrapeData | IQuoteEmbedData;
+export type IEmbedData = IScrapeData;
 
 export interface IEmbedElements {
     root: HTMLElement;

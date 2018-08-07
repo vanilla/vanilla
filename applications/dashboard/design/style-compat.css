@@ -122,7 +122,8 @@ button.Close {
 .userContent .code {
   display: inline-block;
   vertical-align: middle;
-  line-height: 1em;
+  line-height: inherit;
+  font-size: .9em;
   box-sizing: border-box;
   font-family: Menlo, Monaco, Consolas, "Courier New", monospace;
   max-width: 100%;

@@ -11,16 +11,35 @@ use Garden\Web\Data;
 use Garden\Web\RequestInterface;
 use Gdn_Session as SessionInterface;
 
+/**
+ * Dispatcher middleware for handling caching headers.
+ */
 class CacheControlMiddleware {
+
+    /** @var string Standard Cache-Control header string for public, cacheable content. */
     const PUBLIC_CACHE = 'public, max-age=120';
+
+    /** @var string Standard Cache-Control header for content that should not be cached. */
     const NO_CACHE = 'private, no-cache, max-age=0, must-revalidate';
 
+    /** @var SessionInterface An instance of the current user session. */
     private $session;
 
+    /**
+     * CacheControlMiddleware constructor.
+     *
+     * @param SessionInterface $session
+     */
     public function __construct(SessionInterface $session) {
         $this->session = $session;
     }
 
+    /**
+     * Translate a Cache-Control header into HTTP/1.0 Expires and Pragma headers.
+     *
+     * @param string $cacheControl A valid Cache-Control header value.
+     * @return array
+     */
     public static function getHttp10Headers(string $cacheControl): array {
         $result = [];
 

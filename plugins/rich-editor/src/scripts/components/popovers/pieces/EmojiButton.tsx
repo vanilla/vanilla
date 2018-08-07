@@ -53,6 +53,7 @@ export class EmojiButton extends React.Component<IProps> {
                 style={this.props.style}
                 className={componentClasses}
                 data-index={this.props.index}
+                data-row={this.props.rowIndex}
                 type="button"
                 onClick={this.insertEmojiBlot}
             >

@@ -21,13 +21,15 @@ const rowSize = 7;
 const rowIndexesByGroupId = {};
 const cellIndexesByGroupId = {};
 
+// window.console.log("EMOJIS: ", EMOJIS.length);
+
 /**
  * Get row from Index
  *
  * @param index - Emoji index
  */
 const getEmojiRowFromIndex = (index: number) => {
-    return Math.ceil(index / colSize);
+    return Math.floor(index / colSize);
 };
 
 /**
@@ -61,7 +63,7 @@ interface IProps extends IWithEditorProps, IPopoverControllerChildParameters {
 interface IState {
     id: string;
     contentID: string;
-    scrollTarget: number;
+    scrollToRow: number;
     emojiToFocusPosition: number;
     overscanRowCount: number;
     rowStartIndex: number;
@@ -79,7 +81,7 @@ export class EmojiPicker extends React.PureComponent<IProps, IState> {
         this.state = {
             id: props.id,
             contentID: props.contentID,
-            scrollTarget: 0,
+            scrollToRow: 0,
             emojiToFocusPosition: 0,
             overscanRowCount: 20,
             rowStartIndex: 0,
@@ -154,7 +156,7 @@ export class EmojiPicker extends React.PureComponent<IProps, IState> {
                         overscanRowCount={this.state.overscanRowCount}
                         tabIndex={-1}
                         scrollToAlignment="start"
-                        scrollToRow={this.state.scrollTarget}
+                        scrollToRow={this.state.scrollToRow}
                         aria-readonly={undefined}
                         aria-label={""}
                         role={""}
@@ -221,7 +223,7 @@ export class EmojiPicker extends React.PureComponent<IProps, IState> {
      */
     private handleEmojiScroll = () => {
         this.setState({
-            scrollTarget: -1,
+            scrollToRow: -1,
             emojiToFocusPosition: -1,
         });
     };
@@ -236,7 +238,7 @@ export class EmojiPicker extends React.PureComponent<IProps, IState> {
      */
     private scrollToCategory = (categoryID: number) => {
         this.setState({
-            scrollTarget: rowIndexesByGroupId[categoryID],
+            scrollToRow: rowIndexesByGroupId[categoryID],
             emojiToFocusPosition: cellIndexesByGroupId[categoryID],
             selectedGroup: categoryID,
             alertMessage: t("Jumped to emoji category: ") + t(EMOJI_GROUPS[categoryID]),
@@ -303,7 +305,8 @@ export class EmojiPicker extends React.PureComponent<IProps, IState> {
         if (offset !== 0) {
             const activeElement: HTMLElement = document.activeElement as HTMLElement;
             let currentFocusPosition = this.state.rowStartIndex;
-            let scrollTarget = this.state.rowStartIndex;
+            let scrollToRow = this.state.rowStartIndex;
+            let forceUpdate = false;
 
             if (
                 activeElement &&
@@ -323,23 +326,25 @@ export class EmojiPicker extends React.PureComponent<IProps, IState> {
             }
 
             // TODO - Handle scroll position
-            // const targetRowPosition = getEmojiColumnFromIndex(targetFocusPosition);
-            // // Check scroll position
-            // if (targetRowPosition < this.state.rowStartIndex) {
-            //     scrollTarget = targetRowPosition;
-            // } else if (targetRowPosition > this.state.rowStartIndex + rowSize) {
-            //     scrollTarget = targetRowPosition - rowSize;
-            // } else if (targetRowPosition > rowSize) {
-            //     scrollTarget = rowSize;
-            // }
+            const targetRowPosition = getEmojiRowFromIndex(targetFocusPosition);
+
+            if (targetRowPosition >= this.state.rowStartIndex + rowSize) {
+                scrollToRow = this.keepRowInBounds(targetRowPosition - rowSize + 1);
+            } else if (targetRowPosition < this.state.rowStartIndex) {
+                scrollToRow = targetRowPosition;
+            } else {
+                forceUpdate = true;
+            }
 
             this.setState(
                 {
-                    scrollTarget,
+                    scrollToRow,
                     emojiToFocusPosition: targetFocusPosition,
                 },
                 () => {
-                    this.gridEl.forceUpdate();
+                    if (forceUpdate) {
+                        this.gridEl.forceUpdate();
+                    }
                 },
             );
         }

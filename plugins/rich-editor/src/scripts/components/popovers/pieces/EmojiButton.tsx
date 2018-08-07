@@ -104,7 +104,6 @@ export class EmojiButton extends React.Component<IProps> {
      * Handle key presses
      */
     private handleKeyPress = (event: React.KeyboardEvent<any>) => {
-        console.log(event);
         switch (event.key) {
             case "ArrowDown":
                 event.stopPropagation();

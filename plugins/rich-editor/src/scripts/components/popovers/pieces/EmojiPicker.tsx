@@ -21,8 +21,6 @@ const ROW_SIZE = 7;
 const rowIndexesByGroupId = {};
 const cellIndexesByGroupId = {};
 
-// window.console.log("EMOJIS: ", EMOJIS.length);
-
 /**
  * Get start positions for each category
  */
@@ -33,9 +31,6 @@ EMOJIS.forEach((data, key) => {
         cellIndexesByGroupId[groupID] = key;
     }
 });
-
-// window.console.log("rowIndexesByGroupId: ", rowIndexesByGroupId);
-// window.console.log("cellIndexesByGroupId: ", cellIndexesByGroupId);
 
 const emojiGroupLength = Object.values(EMOJI_GROUPS).length;
 const lastEmojiIndex = EMOJIS.length - 1;
@@ -215,7 +210,6 @@ export class EmojiPicker extends React.PureComponent<IProps, IState> {
      * Scroll to category
      */
     private scrollToCategory = (categoryID: number) => {
-        window.console.log("categoryID: ", categoryID, cellIndexesByGroupId[categoryID]);
         const newIndex = cellIndexesByGroupId[categoryID];
         this.setState({
             activeIndex: newIndex,

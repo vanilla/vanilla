@@ -57,7 +57,6 @@ EMOJIS.forEach((data, key) => {
 
 const emojiGroupLength = Object.values(EMOJI_GROUPS).length;
 const numberOfRows = getEmojiRowFromIndex(EMOJIS.length - 1);
-const elementsOnLastRow = EMOJIS.length % rowSize;
 
 interface IProps extends IWithEditorProps, IPopoverControllerChildParameters {
     contentID: string;
@@ -330,6 +329,9 @@ export class EmojiPicker extends React.PureComponent<IProps, IState> {
             } else {
                 forceUpdate = true;
             }
+
+            const maxBottomRow = numberOfRows - colSize - 1;
+            scrollToRow = Math.min(scrollToRow, maxBottomRow);
 
             this.setState(
                 {

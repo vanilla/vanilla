@@ -5,8 +5,6 @@
  * @license https://opensource.org/licenses/GPL-2.0 GPL-2.0
  */
 
-use Garden\Schema\Schema;
-
 class RichEditorPlugin extends Gdn_Plugin {
 
     const FORMAT_NAME = "Rich";
@@ -26,12 +24,10 @@ class RichEditorPlugin extends Gdn_Plugin {
      * {@inheritDoc}
      */
     public function setup() {
-        $this->structure();
-    }
-
-    public function structure() {
         saveToConfig('Garden.InputFormatter', self::FORMAT_NAME);
         saveToConfig('Garden.MobileInputFormatter', self::FORMAT_NAME);
+        saveToConfig('RichEditor.Quotes.Enable', true);
+        saveToConfig('EnabledPlugins.Quotes', false);
     }
 
     /**
@@ -144,5 +140,29 @@ class RichEditorPlugin extends Gdn_Plugin {
         echo Gdn_Theme::bulletItem('Flags');
         echo "<a href='#' data-scrape-url='$url' role='button' class='$classes'>$linkText</a>";
         echo ' ';
+    }
+
+    /**
+     * Add additional WYSIWYG specific form item to the dashboard posting page.
+     *
+     * @param string $additionalFormItemHTML
+     * @param Gdn_Form $form The Form instance from the page.
+     * @param Gdn_ConfigurationModel $configModel The config model used for the Form.
+     *
+     * @return string The built up form html
+     */
+    public function postingSettings_formatSpecificFormItems_handler(
+        string $additionalFormItemHTML,
+        Gdn_Form $form,
+        Gdn_ConfigurationModel $configModel
+    ): string {
+        $enableRichQuotes = t('Enable Rich Quotes');
+        $richEditorQuotesNotes =  t('RichEditor.QuoteEnable.Notes1', 'Use the following option to enable quotes for the Rich Editor');
+        $label = '<p class="info">'.$richEditorQuotesNotes.'</p><p class="info">';
+        $formToggle = $form->toggle('RichEditor.Quotes.Enablsse', $enableRichQuotes, [], $label);
+
+        $configModel->setField('RichEditor.Quotes.Enablsse');
+        $additionalFormItemHTML .= "<li class='form-group js-richFormGroup Hidden' data-formatter-type='Rich'>$formToggle</li>";
+        return $additionalFormItemHTML;
     }
 }

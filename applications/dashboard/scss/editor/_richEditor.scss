@@ -16,7 +16,7 @@ $richEditor-insertLink_width                      : 387px !default;
 $richEditor-flyout_paddingVertical                : 12px !default;
 $richEditor-flyout_paddingHorizontal              : 12px !default;
 $richEditor-flyout_maxHeight                      : 100vh !default;
-$richEditor-flyout_height                         : $richEditor-menuButton_size * 7.5 !default;
+$richEditor-flyout_height                         : $richEditor-menuButton_size * 7 !default;
 
 $richEditor-nub_width                             : 12px !default;
 
@@ -163,7 +163,7 @@ $richEditor-mobileEmbedBreakPoint                 : 550px !default;
             line-height: $richEditor-menuButton_size;
 
             &.emojiChar-🇺🇳 {
-                font-size: 14px;
+                font-size: 10px;
             }
         }
 
@@ -247,6 +247,8 @@ $richEditor-mobileEmbedBreakPoint                 : 550px !default;
     .richEditor-button,
     &.richEditor-button {
         width: $richEditor-menuButton_size;
+        height: $richEditor-menuButton_size;
+        max-width: $richEditor-menuButton_size;
         font-size: #{$richEditor-menuButton_size * 24 / 39};
         line-height: $richEditor-menuButton_size;
 

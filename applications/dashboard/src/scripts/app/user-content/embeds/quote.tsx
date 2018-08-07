@@ -86,7 +86,6 @@ export class QuoteEmbed extends React.Component<IEmbedProps<IEmbedData>, IState>
                                 <input
                                     type="checkbox"
                                     className="sr-only"
-                                    onClick={this.stopClickPropogation}
                                     onChange={this.toggleCollapseState}
                                     checked={this.state.isCollapsed}
                                 />
@@ -110,8 +109,10 @@ export class QuoteEmbed extends React.Component<IEmbedProps<IEmbedData>, IState>
         if (this.quoteData.body) {
             this.props.onRenderComplete();
         } else {
+            const body =
+                this.quoteData.format === "Rich" ? JSON.stringify(this.quoteData.bodyRaw) : this.quoteData.bodyRaw;
             api.post("/rich/quote", {
-                body: JSON.stringify(this.quoteData.bodyRaw),
+                body,
                 format: this.quoteData.format,
             }).then(response => {
                 this.setState({ renderedBody: response.data.quote });
@@ -121,12 +122,7 @@ export class QuoteEmbed extends React.Component<IEmbedProps<IEmbedData>, IState>
     }
 
     private setNeedsCollapser = needsCollapser => {
-        console.log("Setting collapser to", needsCollapser);
         this.setState({ needsCollapseButton: needsCollapser });
-    };
-
-    private stopClickPropogation = (event: React.MouseEvent<any>) => {
-        event.stopPropagation();
     };
 
     private toggleCollapseState = (event: React.ChangeEvent<HTMLInputElement>) => {

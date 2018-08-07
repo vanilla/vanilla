@@ -2274,6 +2274,7 @@ body.isMobile .richEditorParagraphMenu {
 
 .embedQuote .embedQuote-excerpt {
   color: #a2a4a9;
+  white-space: normal;
 }
 
 .embedQuote .embedQuote-excerpt h1, .embedQuote .embedQuote-excerpt h2, .embedQuote .embedQuote-excerpt h3, .embedQuote .embedQuote-excerpt h4, .embedQuote .embedQuote-excerpt h5, .embedQuote .embedQuote-excerpt h6 {

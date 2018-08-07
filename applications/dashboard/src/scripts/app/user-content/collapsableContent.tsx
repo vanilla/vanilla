@@ -18,13 +18,20 @@ interface IProps {
     };
 }
 
+interface IState {
+    maxHeight: number | string;
+}
+
 export default class CollapsableUserContent extends React.PureComponent<IProps> {
+    public state = {
+        maxHeight: "100%",
+    };
     private selfRef: React.RefObject<HTMLDivElement> = React.createRef();
 
     public render() {
         const style: React.CSSProperties = this.props.isCollapsed
-            ? { maxHeight: this.maxHeight, overflow: "hidden" }
-            : { maxHeight: this.maxHeight };
+            ? { maxHeight: this.state.maxHeight, overflow: "hidden" }
+            : { maxHeight: this.state.maxHeight };
 
         return (
             <div
@@ -38,46 +45,57 @@ export default class CollapsableUserContent extends React.PureComponent<IProps> 
     }
 
     public componentDidMount() {
-        this.forceUpdate();
-        this.props.setNeedsCollapser && this.props.setNeedsCollapser(this.needsCollapser());
+        this.calcMaxHeight();
         window.addEventListener("resize", () =>
             debounce(() => {
-                this.forceUpdate();
-                this.props.setNeedsCollapser && this.props.setNeedsCollapser(this.needsCollapser());
+                this.calcMaxHeight();
             }, 200)(),
         );
     }
 
-    private needsCollapser(): boolean {
-        console.log("Needs collapse", this.props.isCollapsed && (this.maxHeight === "100%" || this.maxHeight <= 100));
-        return this.props.isCollapsed && (this.maxHeight !== "100%" || parseInt(this.maxHeight, 10) > 100);
+    public componentDidUpdate(prevProps: IProps) {
+        if (
+            prevProps.dangerouslySetInnerHTML.__html !== this.props.dangerouslySetInnerHTML.__html ||
+            prevProps.isCollapsed !== this.props.isCollapsed
+        ) {
+            this.calcMaxHeight();
+        }
     }
 
-    private get maxHeight(): number | string {
+    private needsCollapser(maxHeight: number | null): boolean {
         const self = this.selfRef.current;
+        return self !== null && self.childElementCount >= 1 && maxHeight !== null && maxHeight >= 100;
+    }
+
+    private getNumberMaxHeight(): number | null {
+        const self = this.selfRef.current;
+
         if (!self) {
-            return "100%";
+            return null;
         }
 
-        if (self.childElementCount <= 1) {
-            return "100%";
-        }
+        let finalMaxHeight = 0;
+        let lastBottomMargin = 0;
+        Array.from(self.children).forEach(child => {
+            if (finalMaxHeight > 100) {
+                return;
+            }
 
-        if (this.props.isCollapsed) {
-            let finalMaxHeight = 0;
-            let lastBottomMargin = 0;
-            Array.from(self.children).forEach((child, index) => {
-                if (finalMaxHeight > 100) {
-                    return;
-                }
+            const { height, bottomMargin } = getElementHeight(child, lastBottomMargin);
+            lastBottomMargin = bottomMargin;
+            finalMaxHeight += height;
+        });
+        return finalMaxHeight;
+    }
 
-                const { height, bottomMargin } = getElementHeight(child, lastBottomMargin);
-                lastBottomMargin = bottomMargin;
-                finalMaxHeight += height;
-            });
-            return finalMaxHeight;
+    private calcMaxHeight() {
+        const maxHeight = this.getNumberMaxHeight();
+        if (this.needsCollapser(maxHeight) && this.props.isCollapsed) {
+            this.setState({ maxHeight: maxHeight! });
         } else {
-            return self.scrollHeight;
+            this.setState({ maxHeight: "100%" });
         }
+
+        this.props.setNeedsCollapser && this.props.setNeedsCollapser(this.needsCollapser(maxHeight));
     }
 }

@@ -111,13 +111,15 @@ export class QuoteEmbed extends React.Component<IEmbedProps<IEmbedData>, IState>
         } else {
             const body =
                 this.quoteData.format === "Rich" ? JSON.stringify(this.quoteData.bodyRaw) : this.quoteData.bodyRaw;
-            api.post("/rich/quote", {
-                body,
-                format: this.quoteData.format,
-            }).then(response => {
-                this.setState({ renderedBody: response.data.quote });
-                this.props.onRenderComplete();
-            });
+            void api
+                .post("/rich/quote", {
+                    body,
+                    format: this.quoteData.format,
+                })
+                .then(response => {
+                    this.setState({ renderedBody: response.data.quote });
+                    this.props.onRenderComplete();
+                });
         }
     }
 

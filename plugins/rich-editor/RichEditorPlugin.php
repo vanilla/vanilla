@@ -158,10 +158,13 @@ class RichEditorPlugin extends Gdn_Plugin {
     ): string {
         $enableRichQuotes = t('Enable Rich Quotes');
         $richEditorQuotesNotes =  t('RichEditor.QuoteEnable.Notes1', 'Use the following option to enable quotes for the Rich Editor');
-        $label = '<p class="info">'.$richEditorQuotesNotes.'</p><p class="info">';
-        $formToggle = $form->toggle('RichEditor.Quotes.Enablsse', $enableRichQuotes, [], $label);
+        $label = '<p class="info">'.$richEditorQuotesNotes.'</p>';
+        $configModel->setField('RichEditor.Quotes.Enable');
 
-        $configModel->setField('RichEditor.Quotes.Enablsse');
+        // Why the heck do I need to do this!!
+        $form->setValue('RichEditor.Quotes.Enable', c('RichEditor.Quotes.Enable'));
+        $formToggle = $form->toggle('RichEditor.Quotes.Enable', $enableRichQuotes, [], $label);
+
         $additionalFormItemHTML .= "<li class='form-group js-richFormGroup Hidden' data-formatter-type='Rich'>$formToggle</li>";
         return $additionalFormItemHTML;
     }

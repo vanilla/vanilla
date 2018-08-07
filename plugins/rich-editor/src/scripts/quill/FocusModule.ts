@@ -66,8 +66,8 @@ export default class EmbedFocusModule extends Module {
                 this.editorRoot.classList.toggle("isFocused", true);
             }
         });
-        // this.setupEmbedClickHandler();
-        // this.setupMobileHandler();
+        this.setupEmbedClickHandler();
+        this.setupMobileHandler();
 
         this.quill.root.addEventListener("keydown", this.keyDownListener);
         this.formWrapper.addEventListener("keydown", this.tabListener);
@@ -366,7 +366,6 @@ export default class EmbedFocusModule extends Module {
             "click",
             ".js-embed",
             (event, clickedElement) => {
-                console.log("focusing");
                 const embed = Parchment.find(clickedElement);
                 if (embed instanceof FocusableEmbedBlot) {
                     embed.focus();

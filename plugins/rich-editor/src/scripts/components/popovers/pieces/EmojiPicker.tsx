@@ -56,7 +56,8 @@ EMOJIS.forEach((data, key) => {
 // window.console.log("cellIndexesByGroupId: ", cellIndexesByGroupId);
 
 const emojiGroupLength = Object.values(EMOJI_GROUPS).length;
-const numberOfRows = getEmojiRowFromIndex(EMOJIS.length + 1); // zero indexed
+const lastRowIndex = getEmojiRowFromIndex(EMOJIS.length + 1);
+const lastEmojiIndex = EMOJIS.length - 1;
 
 interface IProps extends IWithEditorProps, IPopoverControllerChildParameters {
     contentID: string;
@@ -151,7 +152,7 @@ export class EmojiPicker extends React.PureComponent<IProps, IState> {
                         cellRenderer={this.cellRenderer}
                         columnCount={colSize}
                         columnWidth={buttonSize}
-                        rowCount={numberOfRows + 1}
+                        rowCount={lastRowIndex + 1}
                         rowHeight={buttonSize}
                         height={height}
                         width={width}
@@ -162,7 +163,7 @@ export class EmojiPicker extends React.PureComponent<IProps, IState> {
                         aria-readonly={undefined}
                         aria-label={""}
                         role={""}
-                        onScroll={this.handleEmojiScroll}
+                        // onScroll={this.handleEmojiScroll}
                         onSectionRendered={this.handleOnSectionRendered}
                         ref={gridEl => {
                             this.gridEl = gridEl as Grid;
@@ -223,11 +224,12 @@ export class EmojiPicker extends React.PureComponent<IProps, IState> {
     /**
      * Handle Emoji Scroll
      */
-    private handleEmojiScroll = () => {
-        this.setState({
-            scrollToRow: -1,
-        });
-    };
+    // private handleEmojiScroll = () => {
+    //     this.setState({
+    //         scrollToRow: -1,
+    //     });
+    // };
+
     private handleCategoryClick(event: React.MouseEvent<any>, categoryID: number) {
         event.preventDefault();
         event.stopPropagation();
@@ -319,19 +321,21 @@ export class EmojiPicker extends React.PureComponent<IProps, IState> {
                 currentFocusPosition = parseInt(activeElement.dataset.index as "string", 10);
             }
 
-            const targetFocusPosition = this.keepEmojiIndexInBounds(currentFocusPosition + offset * colSize);
+            const offsetCol = offset * colSize;
+            const targetFocusPosition = this.keepEmojiIndexInBounds(currentFocusPosition + offsetCol);
             const targetRowPosition = getEmojiRowFromIndex(targetFocusPosition);
 
             if (targetRowPosition >= this.state.rowStartIndex + rowSize) {
-                scrollToRow = this.keepRowInBounds(targetRowPosition - rowSize + 1);
+                scrollToRow = this.keepRowIndexInBounds(targetRowPosition - rowSize + 1);
+                // const maxBottomRow = lastRowIndex - colSize + 1;
+                // scrollToRow = Math.min(scrollToRow, maxBottomRow);
+                forceUpdate = true;
             } else if (targetRowPosition < this.state.rowStartIndex) {
-                scrollToRow = targetRowPosition;
+                scrollToRow = this.keepRowIndexInBounds(this.state.rowStartIndex - 1);
+                forceUpdate = true;
             } else {
                 forceUpdate = true;
             }
-
-            const maxBottomRow = numberOfRows - colSize + 1;
-            scrollToRow = Math.min(scrollToRow, maxBottomRow);
 
             this.setState(
                 {
@@ -381,11 +385,11 @@ export class EmojiPicker extends React.PureComponent<IProps, IState> {
      *
      * @param targetRow
      */
-    private keepRowInBounds(targetRow: number) {
+    private keepRowIndexInBounds(targetRow: number) {
         if (targetRow < 0) {
             return 0;
-        } else if (targetRow > numberOfRows) {
-            return numberOfRows;
+        } else if (targetRow > lastRowIndex) {
+            return lastRowIndex;
         } else {
             return targetRow;
         }
@@ -399,8 +403,8 @@ export class EmojiPicker extends React.PureComponent<IProps, IState> {
     private keepEmojiIndexInBounds(targetIndex: number) {
         if (targetIndex < 0) {
             return 0;
-        } else if (targetIndex > numberOfRows) {
-            return EMOJIS.length;
+        } else if (targetIndex > lastEmojiIndex) {
+            return lastEmojiIndex;
         } else {
             return targetIndex;
         }

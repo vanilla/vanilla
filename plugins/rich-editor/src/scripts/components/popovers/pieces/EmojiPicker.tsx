@@ -353,6 +353,16 @@ export class EmojiPicker extends React.PureComponent<IProps, IState> {
                     event.stopPropagation();
                     this.jumpIndex(ROW_SIZE * COL_SIZE);
                     break;
+                case "Home":
+                    event.preventDefault();
+                    event.stopPropagation();
+                    this.jumpIndex(-lastEmojiIndex);
+                    break;
+                case "End":
+                    event.preventDefault();
+                    event.stopPropagation();
+                    this.jumpIndex(lastEmojiIndex);
+                    break;
             }
         }
     };

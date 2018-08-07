@@ -19,6 +19,8 @@ interface IProps extends IWithEditorProps {
     activeIndex: number;
     onKeyUp: () => void;
     onKeyDown: () => void;
+    onKeyRight: () => void;
+    onKeyLeft: () => void;
     closeMenuHandler(event: React.SyntheticEvent<any>);
 }
 
@@ -64,8 +66,18 @@ export class EmojiButton extends React.Component<IProps> {
     /**
      * Check to see if element should get focus
      */
-    public componentDidUpdate(prevProps) {
-        console.log("Updating with props", this.props);
+    public componentDidUpdate() {
+        this.checkFocus();
+    }
+
+    /**
+     * Check to see if element should get focus
+     */
+    public componentDidMount() {
+        this.checkFocus();
+    }
+
+    private checkFocus() {
         if (this.domButton && this.props.activeIndex === this.props.index) {
             this.domButton.focus();
         }
@@ -92,6 +104,7 @@ export class EmojiButton extends React.Component<IProps> {
      * Handle key presses
      */
     private handleKeyPress = (event: React.KeyboardEvent<any>) => {
+        console.log(event);
         switch (event.key) {
             case "ArrowDown":
                 event.stopPropagation();
@@ -106,18 +119,12 @@ export class EmojiButton extends React.Component<IProps> {
             case "ArrowRight":
                 event.stopPropagation();
                 event.preventDefault();
-                const nextSibling = this.domButton.nextSibling;
-                if (nextSibling instanceof HTMLElement) {
-                    nextSibling.focus();
-                }
+                this.props.onKeyRight();
                 break;
             case "ArrowLeft":
                 event.stopPropagation();
                 event.preventDefault();
-                const previousSibling = this.domButton.previousSibling;
-                if (previousSibling instanceof HTMLElement) {
-                    previousSibling.focus();
-                }
+                this.props.onKeyLeft();
                 break;
         }
     };

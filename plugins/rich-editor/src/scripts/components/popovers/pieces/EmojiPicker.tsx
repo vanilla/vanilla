@@ -48,6 +48,9 @@ interface IState {
     id: string;
     contentID: string;
     activeIndex: number;
+    rowStartIndex: number;
+    scrollToRow: number;
+    selectedGroupIndex: number;
     alertMessage?: string;
     title: string;
 }
@@ -55,7 +58,7 @@ interface IState {
 export class EmojiPicker extends React.PureComponent<IProps, IState> {
     private categoryPickerID: string;
     private gridEl: Grid;
-    private rowCount = this.getRowFromIndex(EMOJIS.length) + 1;
+    private lastRowIndex = this.getRowFromIndex(EMOJIS.length);
 
     constructor(props) {
         super(props);
@@ -64,6 +67,9 @@ export class EmojiPicker extends React.PureComponent<IProps, IState> {
             contentID: props.contentID,
             activeIndex: 0,
             title: t("Emojis"),
+            scrollToRow: 0,
+            rowStartIndex: 0,
+            selectedGroupIndex: 0,
         };
 
         this.categoryPickerID = "emojiPicker-categories-" + props.editorID;
@@ -95,7 +101,7 @@ export class EmojiPicker extends React.PureComponent<IProps, IState> {
         const footer = (
             <div id={this.categoryPickerID} className="emojiGroups" aria-label={t("Emoji Categories")} tabIndex={-1}>
                 {Object.values(EMOJI_GROUPS).map((groupName: string, groupKey) => {
-                    const isSelected = this.activeCategoryIndex === groupKey;
+                    const isSelected = this.state.selectedGroupIndex === groupKey;
                     const buttonClasses = classNames("richEditor-button", "emojiGroup", { isSelected });
 
                     const onClick = event => this.handleCategoryClick(event, groupKey);
@@ -126,14 +132,14 @@ export class EmojiPicker extends React.PureComponent<IProps, IState> {
                         cellRenderer={this.cellRenderer}
                         columnCount={COL_SIZE}
                         columnWidth={BUTTON_SIZE}
-                        rowCount={this.rowCount}
+                        rowCount={this.lastRowIndex + 1}
                         rowHeight={BUTTON_SIZE}
                         height={height}
                         width={width}
                         overscanRowCount={20}
                         tabIndex={-1}
                         scrollToAlignment="start"
-                        scrollToRow={this.activeRow}
+                        scrollToRow={this.state.scrollToRow}
                         aria-readonly={undefined}
                         aria-label={""}
                         role={""}
@@ -178,34 +184,24 @@ export class EmojiPicker extends React.PureComponent<IProps, IState> {
         return Math.floor(index / COL_SIZE);
     }
 
-    private get activeRow(): number {
-        return this.getRowFromIndex(this.state.activeIndex);
-    }
-
-    private get activeColumn(): number {
-        return this.state.activeIndex % COL_SIZE;
-    }
-
-    private get activeCategoryIndex(): number {
-        return 0;
-    }
-
     /**
      * Handler when new rows are rendered. We use this to figure out what category is current
      */
     private handleOnSectionRendered = event => {
         const newRowIndex = event.rowStartIndex;
-        let selectedGroup = 0;
+        let selectedGroupIndex = 0;
 
         Object.values(rowIndexesByGroupId).map((groupRow, groupKey) => {
             if (newRowIndex >= groupRow) {
-                selectedGroup = groupKey;
+                selectedGroupIndex = groupKey;
             }
         });
 
         this.setState({
-            alertMessage: t("In emoji category: ") + t(EMOJI_GROUPS[selectedGroup]),
-            title: t(EMOJI_GROUPS[selectedGroup]),
+            rowStartIndex: event.rowStartIndex,
+            selectedGroupIndex,
+            alertMessage: t("In emoji category: ") + t(EMOJI_GROUPS[selectedGroupIndex]),
+            title: t(EMOJI_GROUPS[selectedGroupIndex]),
         });
     };
 
@@ -219,9 +215,11 @@ export class EmojiPicker extends React.PureComponent<IProps, IState> {
      * Scroll to category
      */
     private scrollToCategory = (categoryID: number) => {
-        window.console.log("categoryID: ", categoryID);
+        window.console.log("categoryID: ", categoryID, cellIndexesByGroupId[categoryID]);
+        const newIndex = cellIndexesByGroupId[categoryID];
         this.setState({
-            activeIndex: cellIndexesByGroupId[categoryID],
+            activeIndex: newIndex,
+            scrollToRow: this.getRowFromIndex(newIndex),
             alertMessage: t("Jumped to emoji category: ") + t(EMOJI_GROUPS[categoryID]),
         });
     };
@@ -243,6 +241,8 @@ export class EmojiPicker extends React.PureComponent<IProps, IState> {
                 index={pos}
                 onKeyUp={this.jumpRowUp}
                 onKeyDown={this.jumpRowDown}
+                onKeyLeft={this.jumpIndexLeft}
+                onKeyRight={this.jumpIndexRight}
             />
         ) : null;
     };
@@ -274,20 +274,66 @@ export class EmojiPicker extends React.PureComponent<IProps, IState> {
      * @param offset - How many rows to jump
      */
 
-    private jumpRows = (offset: number) => {
-        let newIndex = this.state.activeIndex + offset;
-        newIndex = Math.min(newIndex, EMOJIS.length - 1);
-        newIndex = Math.max(newIndex, 0);
-        console.log("Jumping to new index!");
-        this.setState({ activeIndex: newIndex });
+    private jumpIndex = (offset: number) => {
+        const targetFocusPosition = this.keepEmojiIndexInBounds(this.state.activeIndex + offset);
+        const targetRowPosition = this.getRowFromIndex(targetFocusPosition);
+        console.log("Target focus position", targetFocusPosition);
+
+        let scrollToRow;
+        if (targetRowPosition >= this.state.rowStartIndex + ROW_SIZE) {
+            scrollToRow = this.keepRowIndexInBounds(targetRowPosition - ROW_SIZE + 1);
+        } else if (targetRowPosition < this.state.rowStartIndex) {
+            scrollToRow = this.keepRowIndexInBounds(this.state.rowStartIndex - 1);
+        }
+        this.setState({ activeIndex: targetFocusPosition, scrollToRow }, () => {
+            this.gridEl.forceUpdate();
+        });
     };
 
+    /**
+     * Make sure target row is within bounds
+     *
+     * @param targetRow
+     */
+    private keepRowIndexInBounds(targetRow: number) {
+        if (targetRow < 0) {
+            return 0;
+        } else if (targetRow > this.lastRowIndex - 1) {
+            return this.lastRowIndex - 1;
+        } else {
+            return targetRow;
+        }
+    }
+
+    /**
+     * Make sure target index is within bounds
+     *
+     * @param targetIndex
+     */
+    private keepEmojiIndexInBounds(targetIndex: number) {
+        if (targetIndex < 0) {
+            return 0;
+        } else if (targetIndex > lastEmojiIndex) {
+            return lastEmojiIndex;
+        } else {
+            return targetIndex;
+        }
+    }
+
     private jumpRowDown = () => {
-        this.jumpRows(ROW_SIZE);
+        this.jumpIndex(COL_SIZE);
     };
 
     private jumpRowUp = () => {
-        this.jumpRows(-ROW_SIZE);
+        this.jumpIndex(-COL_SIZE);
+    };
+
+    private jumpIndexRight = () => {
+        this.jumpIndex(1);
+    };
+
+    private jumpIndexLeft = () => {
+        this.jumpIndex(-1);
     };
 
     /**
@@ -297,16 +343,17 @@ export class EmojiPicker extends React.PureComponent<IProps, IState> {
      */
     private handleKeyDown = (event: KeyboardEvent) => {
         if (this.props.isVisible) {
+            console.log("Keydown", event);
             switch (event.code) {
                 case "PageUp":
                     event.preventDefault();
                     event.stopPropagation();
-                    this.jumpRows(-ROW_SIZE);
+                    this.jumpIndex(-ROW_SIZE * COL_SIZE);
                     break;
                 case "PageDown":
                     event.preventDefault();
                     event.stopPropagation();
-                    this.jumpRows(ROW_SIZE);
+                    this.jumpIndex(ROW_SIZE * COL_SIZE);
                     break;
             }
         }

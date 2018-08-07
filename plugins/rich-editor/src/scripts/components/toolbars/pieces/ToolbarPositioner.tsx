@@ -45,7 +45,7 @@ interface IState {
     quillWidth: number;
 }
 
-class ToolbarPositioner extends React.PureComponent<IProps, IState> {
+class ToolbarPositioner extends React.Component<IProps, IState> {
     private quill: Quill;
 
     constructor(props) {
@@ -57,6 +57,39 @@ class ToolbarPositioner extends React.PureComponent<IProps, IState> {
         this.state = {
             quillWidth: this.quill.root.offsetWidth,
         };
+    }
+
+    /**
+     * This component is particularly performance sensitive (the calculations for a re-render are very expensive).
+     *
+     * This implementation should behave like PureComponent.prototype.shouldComponentUpdate() except
+     * - It will not recognize changes in selection index when the component is not active.
+     */
+    public shouldComponentUpdate(nextProps: IProps, nextState) {
+        const splitProps = this.extractValuesFromProps(this.props);
+        const splitNextProps = this.extractValuesFromProps(nextProps);
+
+        let shouldUpdate = false;
+
+        if (nextProps.isActive && splitProps.selectionIndex !== splitNextProps.selectionIndex) {
+            shouldUpdate = true;
+        }
+
+        if (nextProps.isActive && splitProps.selectionLength !== splitNextProps.selectionLength) {
+            shouldUpdate = true;
+        }
+
+        for (const key of Object.keys(splitProps.otherProps)) {
+            if (splitProps.otherProps[key] !== splitNextProps.otherProps[key]) {
+                shouldUpdate = true;
+            }
+        }
+
+        if (this.state.quillWidth !== nextState.quillWidth) {
+            shouldUpdate = true;
+        }
+
+        return shouldUpdate;
     }
 
     public render() {
@@ -85,6 +118,15 @@ class ToolbarPositioner extends React.PureComponent<IProps, IState> {
      */
     public componentWillUnmount() {
         window.removeEventListener("resize", this.windowResizeListener);
+    }
+
+    private extractValuesFromProps(props: IProps) {
+        const { selectionIndex, selectionLength, ...otherProps } = props;
+        return {
+            selectionIndex,
+            selectionLength,
+            otherProps,
+        };
     }
 
     /**

@@ -1,0 +1,73 @@
+$embedLink-linkImage_width: 225px !default;
+$embedLink-linkImage_mobileWidth: 100px !default;
+$embedLink-image_separatorColor: rgba($global-color_fg, .1) !default;
+$embedLink-source_fontSize: $global-medium_fontSize !default;
+$embedLink-excerpt_fontSize: $global-medium_fontSize !default;
+$embedLink-excerpt_lineHeight: $global-base_lineHeight !default;
+
+.embedLink-image {
+    position: absolute;
+    display: block;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    margin: {
+        top: auto;
+        bottom: auto;
+    }
+    width: $embedLink-linkImage_width;
+
+    @supports (object-fit: cover) {
+        height: 100%;
+        object-fit: cover;
+        object-position: center;
+    }
+
+    + .embedText-main {
+        margin-left: auto;
+        width: calc(100% - #{$embedLink-linkImage_width});
+
+        border-left: {
+            style: solid;
+            width: 1px;
+            color: $embedLink-image_separatorColor;
+        }
+    }
+
+    @include mediaQuery-richEditor_embed {
+        position: relative;
+        width: 100%;
+        padding-top: 0;
+
+        + .embedText-main {
+            width: 100%;
+            border-right: none;
+        }
+    }
+}
+
+.embedLink-source {
+    font-size: #{$embedLink-source_fontSize * .86};
+    color: rgba(85,90,98,0.72);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    margin: 0;
+
+    @include mediaQuery-richEditor_embed {
+        @include breakWord;
+        white-space: normal;
+    }
+}
+
+.embedLink-excerpt {
+    font-size: $embedLink-excerpt_fontSize;
+    color: #555A62;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    word-break: break-word;
+    max-width: 100%;
+    line-height: $embedLink-excerpt_lineHeight;
+    max-height: #{$embedLink-excerpt_lineHeight * $embedLink-excerpt_fontSize * 3};
+    white-space: normal;
+}

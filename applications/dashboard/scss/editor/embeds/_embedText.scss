@@ -1,203 +1,67 @@
-$embedLink-linkTitle_fontSize: $global-medium_fontSize !default;
-$embedLink-linkTitle_lineHeight: $global-base_lineHeight !default;
-$embedLink-linkImage_width: 225px !default;
-$embedLink-linkImage_mobileWidth: 100px !default;
-$embedLink-linkImage_boxShadowColor: rgba($global-color_fg, .3) !default;
-$embedLink-image_separatorColor: rgba($global-color_fg, .1) !default;
-$embedLink-linkImage_boxShadow: 0 1px 3px 0 $embedLink-linkImage_boxShadowColor !default;
-$embedLink-linkImage_bg: #ffffff !default;
+$embedText-header_fontSize: $global-medium_fontSize !default;
+$embedText-header-lineHeight: $global-base_lineHeight !default;
+$embedText-title_fontWeight: $global-bold_fontWeight !default;
+$embedText-content_boxShadowColor: rgba($global-color_fg, .3) !default;
+$embedText-content_bg: #ffffff !default;
+$embedText-content_boxShadow: 0 1px 3px 0 $embedText-content_boxShadowColor !default;
 
-.embedText {
-    .embedExternal-content {
-        display: block;
-        background: $embedLink-linkImage_bg;
-        box-shadow: $embedLink-linkImage_boxShadow;
+.embedExternal-content {
+    display: block;
+    background: $embedText-content_bg;
+    box-shadow: $embedText-content_boxShadow;
 
-        &,
-        &:hover,
-        &:focus {
-            color: inherit;
-            text-decoration: none !important;
-        }
-    }
-
-    .embedText-body {
-        display: block;
-        position: relative;
-        overflow: hidden;
-        text-align: left;
-        pointer-events: initial !important;
-    }
-
-    .embedText-main {
-        padding: 18px;
-        box-sizing: border-box;
-    }
-
-    .embedText-header {
-        display: flex;
-        flex-wrap: wrap;
-        align-items: center;
-        justify-content: flex-start;
-        font-size: $embedLink-linkTitle_fontSize;
-        line-height: $embedLink-linkTitle_lineHeight;
-        margin-bottom: $utility-baseUnit;
-    }
-
-    .embedText-dateTime {
-        font-size: .8em;
-        margin: 0 0 0 12px;
-        padding: 0;
-        color: #737373;
-    }
-
-    .embedText-title {
-        display: block;
-        width: 100%;
-        margin: 0;
-        padding: 0;
-        font-size: $embedLink-linkTitle_fontSize;
-        line-height: $embedLink-linkTitle_lineHeight;
-        font-weight: $global-bold_fontWeight;
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
-
-        @include mediaQuery-richEditor_embed {
-            @include breakWord;
-            white-space: normal;
-        }
+    &,
+    &:hover,
+    &:focus {
+        color: inherit;
+        text-decoration: none !important;
     }
 }
 
-.embedLink {
-
-    .embedLink-image {
-        position: absolute;
-        display: block;
-        top: 0;
-        left: 0;
-        bottom: 0;
-        margin: {
-            top: auto;
-            bottom: auto;
-        }
-        width: $embedLink-linkImage_width;
-
-
-        @supports (object-fit: cover) {
-            height: 100%;
-            object-fit: cover;
-            object-position: center;
-        }
-
-        + .embedText-main {
-            margin-left: auto;
-            width: calc(100% - #{$embedLink-linkImage_width});
-
-            border-left: {
-                style: solid;
-                width: 1px;
-                color: $embedLink-image_separatorColor;
-            }
-        }
-
-        @include mediaQuery-richEditor_embed {
-            position: relative;
-            width: 100%;
-            padding-top: 0;
-
-            + .embedText-main {
-                width: 100%;
-                border-right: none;
-            }
-        }
-    }
-
-    .embedLink-source {
-        font-size: #{$embedLink-linkTitle_fontSize * .86};
-        color: rgba(85,90,98,0.72);
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
-        margin: 0;
-
-        @include mediaQuery-richEditor_embed {
-            @include breakWord;
-            white-space: normal;
-        }
-    }
-
-    .embedLink-excerpt {
-        font-size: $embedLink-linkTitle_fontSize;
-        color: #555A62;
-        overflow: hidden;
-        text-overflow: ellipsis;
-        word-break: break-word;
-        max-width: 100%;
-        line-height: $embedLink-linkTitle_lineHeight;
-        max-height: #{$embedLink-linkTitle_lineHeight * $embedLink-linkTitle_fontSize * 3};
-        white-space: normal;
-    }
+.embedText-body {
+    display: block;
+    position: relative;
+    overflow: hidden;
+    text-align: left;
+    pointer-events: initial !important;
 }
 
-.embedQuote {
+.embedText-main {
+    padding: 18px;
+    box-sizing: border-box;
+}
+
+.embedText-header {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: flex-start;
+    font-size: $embedText-header_fontSize;
+    line-height: $embedText-header-lineHeight;
+    margin-bottom: $utility-baseUnit;
+}
+
+.embedText-dateTime {
+    font-size: .8em;
+    margin: 0 0 0 12px;
+    padding: 0;
+    color: #737373;
+}
+
+.embedText-title {
+    display: block;
     width: 100%;
+    margin: 0;
+    padding: 0;
+    font-size: $embedText-header_fontSize;
+    line-height: $embedText-header-lineHeight;
+    font-weight: $embedText-title_fontWeight;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 
-    .embedExternal-content {
-        width: 100%;
-        border-left: 6px solid $quote-border_color;
-    }
-
-    .embedText-header {
-        position: relative;
-        padding-right: 40px;
-    }
-
-    .embedQuote-userName {
-        margin: 0 0 0 6px;
-        padding: 0;
-        color: #555A62;
-        font-weight: $global-bold_fontWeight;
-    }
-
-    .embedQuote-excerpt {
-        color: $quote-fg;
+    @include mediaQuery-richEditor_embed {
+        @include breakWord;
         white-space: normal;
-
-        h1, h2, h3, h4, h5, h6 {
-            color: $quote-fg;
-        }
-
-        a {
-            color: $quote-fg;
-            text-decoration: underline;
-        }
-    }
-
-    .embedQuote-collapseButton {
-        margin: 0;
-        padding: 12px;
-        appearance: none;
-        cursor: pointer;
-        position: absolute;
-        right: 0;
-        top: 50%;
-        transform: translateY(-50%);
-
-        // Stupid ICheckBoxes showing up.
-        > * {
-            display: none;
-        }
-
-        ::before {
-            display: block;
-        }
-    }
-}
-
-.embedQuote-body.isCollapsed {
-    .embedQuote-collapseButton {
-        transform: translateY(-50%) rotate(180deg);
     }
 }

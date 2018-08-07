@@ -2112,18 +2112,18 @@ body.isMobile .richEditorParagraphMenu {
   max-width: 100%;
 }
 
-.embedText .embedExternal-content {
+.embedExternal-content {
   display: block;
   background: #ffffff;
   box-shadow: 0 1px 3px 0 rgba(85, 90, 98, 0.3);
 }
 
-.embedText .embedExternal-content, .embedText .embedExternal-content:hover, .embedText .embedExternal-content:focus {
+.embedExternal-content, .embedExternal-content:hover, .embedExternal-content:focus {
   color: inherit;
   text-decoration: none !important;
 }
 
-.embedText .embedText-body {
+.embedText-body {
   display: block;
   position: relative;
   overflow: hidden;
@@ -2131,12 +2131,12 @@ body.isMobile .richEditorParagraphMenu {
   pointer-events: initial !important;
 }
 
-.embedText .embedText-main {
+.embedText-main {
   padding: 18px;
   box-sizing: border-box;
 }
 
-.embedText .embedText-header {
+.embedText-header {
   display: -webkit-box;
   display: -webkit-flex;
   display: -ms-flexbox;
@@ -2157,14 +2157,14 @@ body.isMobile .richEditorParagraphMenu {
   margin-bottom: 6px;
 }
 
-.embedText .embedText-dateTime {
+.embedText-dateTime {
   font-size: .8em;
   margin: 0 0 0 12px;
   padding: 0;
   color: #737373;
 }
 
-.embedText .embedText-title {
+.embedText-title {
   display: block;
   width: 100%;
   margin: 0;
@@ -2178,14 +2178,14 @@ body.isMobile .richEditorParagraphMenu {
 }
 
 @media (max-width: 550px) {
-  .embedText .embedText-title {
+  .embedText-title {
     word-break: break-all;
     word-break: break-word;
     white-space: normal;
   }
 }
 
-.embedLink .embedLink-image {
+.embedLink-image {
   position: absolute;
   display: block;
   top: 0;
@@ -2197,14 +2197,14 @@ body.isMobile .richEditorParagraphMenu {
 }
 
 @supports (object-fit: cover) {
-  .embedLink .embedLink-image {
+  .embedLink-image {
     height: 100%;
     object-fit: cover;
     object-position: center;
   }
 }
 
-.embedLink .embedLink-image + .embedText-main {
+.embedLink-image + .embedText-main {
   margin-left: auto;
   width: -webkit-calc(100% - 225px);
   width: calc(100% - 225px);
@@ -2214,18 +2214,18 @@ body.isMobile .richEditorParagraphMenu {
 }
 
 @media (max-width: 550px) {
-  .embedLink .embedLink-image {
+  .embedLink-image {
     position: relative;
     width: 100%;
     padding-top: 0;
   }
-  .embedLink .embedLink-image + .embedText-main {
+  .embedLink-image + .embedText-main {
     width: 100%;
     border-right: none;
   }
 }
 
-.embedLink .embedLink-source {
+.embedLink-source {
   font-size: 12.04px;
   color: rgba(85, 90, 98, 0.72);
   white-space: nowrap;
@@ -2235,14 +2235,14 @@ body.isMobile .richEditorParagraphMenu {
 }
 
 @media (max-width: 550px) {
-  .embedLink .embedLink-source {
+  .embedLink-source {
     word-break: break-all;
     word-break: break-word;
     white-space: normal;
   }
 }
 
-.embedLink .embedLink-excerpt {
+.embedLink-excerpt {
   font-size: 14px;
   color: #555A62;
   overflow: hidden;
@@ -2258,38 +2258,38 @@ body.isMobile .richEditorParagraphMenu {
   width: 100%;
 }
 
-.embedQuote .embedExternal-content {
+.embedQuote-content {
   width: 100%;
   border-left: 6px solid #d8d9db;
 }
 
-.embedQuote .embedText-header {
+.embedQuote-header {
   position: relative;
   padding-right: 40px;
 }
 
-.embedQuote .embedQuote-userName {
+.embedQuote-userName {
   margin: 0 0 0 6px;
   padding: 0;
   color: #555A62;
   font-weight: 600;
 }
 
-.embedQuote .embedQuote-excerpt {
+.embedQuote-excerpt {
   color: #a2a4a9;
   white-space: normal;
 }
 
-.embedQuote .embedQuote-excerpt h1, .embedQuote .embedQuote-excerpt h2, .embedQuote .embedQuote-excerpt h3, .embedQuote .embedQuote-excerpt h4, .embedQuote .embedQuote-excerpt h5, .embedQuote .embedQuote-excerpt h6 {
+.embedQuote-excerpt h1, .embedQuote-excerpt h2, .embedQuote-excerpt h3, .embedQuote-excerpt h4, .embedQuote-excerpt h5, .embedQuote-excerpt h6 {
   color: #a2a4a9;
 }
 
-.embedQuote .embedQuote-excerpt a {
+.embedQuote-excerpt a {
   color: #a2a4a9;
   text-decoration: underline;
 }
 
-.embedQuote .embedQuote-collapseButton {
+.embedQuote-collapseButton {
   margin: 0;
   padding: 12px;
   -webkit-appearance: none;
@@ -2304,12 +2304,8 @@ body.isMobile .richEditorParagraphMenu {
           transform: translateY(-50%);
 }
 
-.embedQuote .embedQuote-collapseButton > * {
-  display: none;
-}
-
-.embedQuote .embedQuote-collapseButton ::before {
-  display: block;
+.embedQuote-collapseButton .icheckbox {
+  display: none !important;
 }
 
 .embedQuote-body.isCollapsed .embedQuote-collapseButton {

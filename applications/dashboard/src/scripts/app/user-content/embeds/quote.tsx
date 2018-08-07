@@ -63,10 +63,9 @@ export class QuoteEmbed extends React.Component<IEmbedProps<IEmbedData>, IState>
         const { body, insertUser } = this.quoteData;
         const id = uniqueId("collapsableContent-");
 
-        const title =
-            "name" in this.props.data ? (
-                <h3 className="embedText-title embedQuote-title">{this.props.data.name}</h3>
-            ) : null;
+        const title = this.props.data.name ? (
+            <h3 className="embedText-title embedQuote-title">{this.props.data.name}</h3>
+        ) : null;
 
         const bodyClasses = classnames("embedText-body", "embedQuote-body", { isCollapsed: this.state.isCollapsed });
         const collapseIconClasses = classnames("icon", "embedQuote-collapseButton", "icon-chevron-down");

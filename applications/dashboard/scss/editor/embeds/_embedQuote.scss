@@ -1,0 +1,60 @@
+$embedQuote-text_color: $quote-fg !default;
+$embedQuote-border_color: $quote-border_color !default;
+$embedQuote-userName_fontWeight: $global-bold_fontWeight !default;
+
+.embedQuote {
+    width: 100%;
+}
+
+.embedQuote-content {
+    width: 100%;
+    border-left: 6px solid $embedQuote-border_color;
+}
+
+.embedQuote-header {
+    position: relative;
+    padding-right: 40px;
+}
+
+.embedQuote-userName {
+    margin: 0 0 0 6px;
+    padding: 0;
+    color: #555A62;
+    font-weight: $embedQuote-userName_fontWeight;
+}
+
+.embedQuote-excerpt {
+    color: $embedQuote-text_color;
+    white-space: normal;
+
+    h1, h2, h3, h4, h5, h6 {
+        color: $embedQuote-text_color;
+    }
+
+    a {
+        color: $embedQuote-text_color;
+        text-decoration: underline;
+    }
+}
+
+.embedQuote-collapseButton {
+    margin: 0;
+    padding: 12px;
+    appearance: none;
+    cursor: pointer;
+    position: absolute;
+    right: 0;
+    top: 50%;
+    transform: translateY(-50%);
+
+    // Stupid ICheckBoxes showing up.
+    .icheckbox {
+        display: none !important;
+    }
+}
+
+.embedQuote-body.isCollapsed {
+    .embedQuote-collapseButton {
+        transform: translateY(-50%) rotate(180deg);
+    }
+}

@@ -16,8 +16,11 @@ interface IProps extends IWithEditorProps {
     };
     style: React.CSSProperties;
     index: number;
-    rowIndex: number;
-    isSelectedButton: boolean;
+    activeIndex: number;
+    onKeyUp: () => void;
+    onKeyDown: () => void;
+    onKeyRight: () => void;
+    onKeyLeft: () => void;
     closeMenuHandler(event: React.SyntheticEvent<any>);
 }
 
@@ -49,7 +52,6 @@ export class EmojiButton extends React.Component<IProps> {
                 onKeyDown={this.handleKeyPress}
                 style={this.props.style}
                 className={componentClasses}
-                data-index={this.props.index}
                 type="button"
                 onClick={this.insertEmojiBlot}
             >
@@ -64,8 +66,19 @@ export class EmojiButton extends React.Component<IProps> {
     /**
      * Check to see if element should get focus
      */
-    public componentDidUpdate(prevProps) {
-        if (this.domButton && prevProps.isSelectedButton) {
+    public componentDidUpdate() {
+        this.checkFocus();
+    }
+
+    /**
+     * Check to see if element should get focus
+     */
+    public componentDidMount() {
+        this.checkFocus();
+    }
+
+    private checkFocus() {
+        if (this.domButton && this.props.activeIndex === this.props.index) {
             this.domButton.focus();
         }
     }
@@ -92,23 +105,25 @@ export class EmojiButton extends React.Component<IProps> {
      */
     private handleKeyPress = (event: React.KeyboardEvent<any>) => {
         switch (event.key) {
-            case "ArrowRight":
             case "ArrowDown":
                 event.stopPropagation();
                 event.preventDefault();
-                const nextSibling = this.domButton.nextSibling;
-                if (nextSibling instanceof HTMLElement) {
-                    nextSibling.focus();
-                }
+                this.props.onKeyDown();
                 break;
             case "ArrowUp":
+                event.stopPropagation();
+                event.preventDefault();
+                this.props.onKeyUp();
+                break;
+            case "ArrowRight":
+                event.stopPropagation();
+                event.preventDefault();
+                this.props.onKeyRight();
+                break;
             case "ArrowLeft":
                 event.stopPropagation();
                 event.preventDefault();
-                const previousSibling = this.domButton.previousSibling;
-                if (previousSibling instanceof HTMLElement) {
-                    previousSibling.focus();
-                }
+                this.props.onKeyLeft();
                 break;
         }
     };

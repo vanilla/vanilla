@@ -1972,7 +1972,7 @@ body.isMobile .richEditorParagraphMenu {
 }
 
 .richEditor .embedExternal-content:hover::after {
-  background-color: rgba(0, 0, 0, 0.05);
+  background-color: rgba(85, 90, 98, 0.05);
 }
 
 .embedVideo .embedExternal-content {

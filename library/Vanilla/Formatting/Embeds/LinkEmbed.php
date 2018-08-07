@@ -85,8 +85,8 @@ class LinkEmbed extends Embed {
 
         $result = <<<HTML
 <div class="embedExternal embedText embedLink">
-    <div class="embedExternal-content">
-        <a href="{$urlEncoded}" rel="noopener noreferrer">
+    <div class="embedExternal-content embedLink-content">
+        <a class="embedLink-link" href="{$urlEncoded}" rel="noopener noreferrer">
             <article class="embedText-body">
                 {$image}
                 <div class="embedText-main">

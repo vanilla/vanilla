@@ -162,8 +162,8 @@ class EmbedManagerTest extends SharedBootstrapTestCase {
                     "attributes" => []
                 ],
                 '<div class="embedExternal embedText embedLink">
-    <div class="embedExternal-content">
-        <a href="https://vanillaforums.com" rel="noopener noreferrer">
+    <div class="embedExternal-content embedLink-content">
+        <a class="embedLink-link" href="https://vanillaforums.com" rel="noopener noreferrer">
             <article class="embedText-body">
                 <img src=\'https://vanillaforums.com/images/metaIcons/vanillaForums.png\' class=\'embedLink-image\' aria-hidden=\'true\'>
                 <div class="embedText-main">
@@ -190,8 +190,8 @@ class EmbedManagerTest extends SharedBootstrapTestCase {
                     "attributes" => []
                 ],
                 '<div class="embedExternal embedText embedLink">
-    <div class="embedExternal-content">
-        <a href="https://vanillaforums.com" rel="noopener noreferrer">
+    <div class="embedExternal-content embedLink-content">
+        <a class="embedLink-link" href="https://vanillaforums.com" rel="noopener noreferrer">
             <article class="embedText-body">
                 
                 <div class="embedText-main">
@@ -221,8 +221,8 @@ class EmbedManagerTest extends SharedBootstrapTestCase {
                     "attributes" => []
                 ],
                 '<div class="embedExternal embedText embedLink">
-    <div class="embedExternal-content">
-        <a href="https://vanillaforums.com" rel="noopener noreferrer">
+    <div class="embedExternal-content embedLink-content">
+        <a class="embedLink-link" href="https://vanillaforums.com" rel="noopener noreferrer">
             <article class="embedText-body">
                 <img src=\'https://vanillaforums.com/images/metaIcons/vanillaForums.png\' class=\'embedLink-image\' aria-hidden=\'true\'>
                 <div class="embedText-main">
@@ -252,8 +252,8 @@ class EmbedManagerTest extends SharedBootstrapTestCase {
                     "attributes" => []
                 ],
                 '<div class="embedExternal embedText embedLink">
-    <div class="embedExternal-content">
-        <a href="https://vanillaforums.com" rel="noopener noreferrer">
+    <div class="embedExternal-content embedLink-content">
+        <a class="embedLink-link" href="https://vanillaforums.com" rel="noopener noreferrer">
             <article class="embedText-body">
                 <img src=\'https://vanillaforums.com/images/metaIcons/vanillaForums.png\' class=\'embedLink-image\' aria-hidden=\'true\'>
                 <div class="embedText-main">
@@ -283,8 +283,8 @@ class EmbedManagerTest extends SharedBootstrapTestCase {
                     "attributes" => []
                 ],
                 '<div class="embedExternal embedText embedLink">
-    <div class="embedExternal-content">
-        <a href="https://vanillaforums.com" rel="noopener noreferrer">
+    <div class="embedExternal-content embedLink-content">
+        <a class="embedLink-link" href="https://vanillaforums.com" rel="noopener noreferrer">
             <article class="embedText-body">
                 <img src=\'https://vanillaforums.com/images/metaIcons/vanillaForums.png\' class=\'embedLink-image\' aria-hidden=\'true\'>
                 <div class="embedText-main">
@@ -311,8 +311,8 @@ class EmbedManagerTest extends SharedBootstrapTestCase {
                     "attributes" => []
                 ],
                 '<div class="embedExternal embedText embedLink">
-    <div class="embedExternal-content">
-        <a href="https://vanillaforums.com" rel="noopener noreferrer">
+    <div class="embedExternal-content embedLink-content">
+        <a class="embedLink-link" href="https://vanillaforums.com" rel="noopener noreferrer">
             <article class="embedText-body">
                 
                 <div class="embedText-main">

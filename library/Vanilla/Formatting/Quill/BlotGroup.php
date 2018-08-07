@@ -22,9 +22,6 @@ class BlotGroup {
     /** @var AbstractBlot[] */
     private $blots = [];
 
-    const RENDER_MODE_NORMAL = "normal";
-    const RENDER_MODE_QUOTE = "quote";
-
     /**
      * @var AbstractBlot[]
      *
@@ -81,27 +78,23 @@ class BlotGroup {
         return count($this->blots) === 0;
     }
 
-    public function renderQuote(): string {
-        return $this->render(self::RENDER_MODE_QUOTE);
-    }
 
     /**
      * Render the block.
      *
      * @return string
      */
-    public function render(string $renderMode = self::RENDER_MODE_NORMAL): string {
-        $isQuote = $renderMode === self::RENDER_MODE_QUOTE;
+    public function render(): string {
         // Don't render empty groups.
         $surroundTagBlot = $this->getBlotForSurroundingTags();
         $result = $surroundTagBlot->getGroupOpeningTag();
 
         // Line blots have special rendering.
         if ($surroundTagBlot instanceof AbstractLineBlot) {
-            $result .= $this->renderLineGroup($surroundTagBlot, $renderMode);
+            $result .= $this->renderLineGroup($surroundTagBlot);
         } else {
             foreach ($this->blots as $blot) {
-                $result .= $isQuote ? $blot->renderQuote() : $blot->render();
+                $result .= $blot->render();
             }
         }
 
@@ -122,7 +115,7 @@ class BlotGroup {
      *
      * @return string
      */
-    public function renderLineGroup(AbstractLineBlot $firstLineBlot, string $renderMode = self::RENDER_MODE_NORMAL):
+    public function renderLineGroup(AbstractLineBlot $firstLineBlot):
     string {
         $result = "";
 
@@ -133,7 +126,7 @@ class BlotGroup {
             if ($index === 0 && $blot->getContent() === "") {
                 continue;
             }
-            $result .= $renderMode === self::RENDER_MODE_QUOTE ? $blot->renderQuote() : $blot->render();
+            $result .= $blot->render();
 
             if ($blot instanceof AbstractLineBlot) {
                 $result .= $blot->renderLineEnd();

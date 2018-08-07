@@ -18,6 +18,9 @@ use Vanilla\Formatting\Quill\BlotGroup;
 abstract class AbstractBlot {
 
     /** @var string */
+    protected $parseMode;
+
+    /** @var string */
     protected $content = "";
 
     /**
@@ -137,10 +140,17 @@ abstract class AbstractBlot {
      * @param array $currentOperation The current operation.
      * @param array $previousOperation The next operation.
      * @param array $nextOperation The previous operation.
+     * @param string $parseMode The parse mode to create the blot with.
      */
-    public function __construct(array $currentOperation, array $previousOperation = [], array $nextOperation = []) {
+    public function __construct(
+        array $currentOperation,
+        array $previousOperation = [],
+        array $nextOperation = [],
+        string $parseMode
+    ) {
         $this->previousOperation = $previousOperation;
         $this->currentOperation = $currentOperation;
         $this->nextOperation = $nextOperation;
+        $this->parseMode = $parseMode;
     }
 }

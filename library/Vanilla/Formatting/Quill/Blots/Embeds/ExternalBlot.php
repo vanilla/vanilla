@@ -9,6 +9,7 @@ namespace Vanilla\Formatting\Quill\Blots\Embeds;
 use Gdn;
 use Vanilla\Formatting\Embeds\EmbedManager;
 use Vanilla\Formatting\Quill\Blots\AbstractBlot;
+use Vanilla\Formatting\Quill\Parser;
 
 /**
  * Blot for rendering embeds with the embed manager.
@@ -30,8 +31,13 @@ class ExternalBlot extends AbstractBlot {
      * @throws \Garden\Container\ContainerException
      * @throws \Garden\Container\NotFoundException
      */
-    public function __construct(array $currentOperation, array $previousOperation, array $nextOperation) {
-        parent::__construct($currentOperation, $previousOperation, $nextOperation);
+    public function __construct(
+        array $currentOperation,
+        array $previousOperation,
+        array $nextOperation,
+        string $parseMode
+    ) {
+        parent::__construct($currentOperation, $previousOperation, $nextOperation, $parseMode);
 
         /** @var EmbedManager embedManager */
         $this->embedManager = Gdn::getContainer()->get(EmbedManager::class);
@@ -43,6 +49,10 @@ class ExternalBlot extends AbstractBlot {
      * @inheritDoc
      */
     public function render(): string {
+        if ($this->parseMode === Parser::PARSE_MODE_QUOTE) {
+            return $this->renderQuote();
+        }
+
         $value = $this->currentOperation["insert"]["embed-external"] ?? [];
         $data = $value['data'] ?? $value;
         try {

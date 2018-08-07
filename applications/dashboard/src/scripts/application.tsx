@@ -264,3 +264,11 @@ export function _executeReady(): Promise<any[]> {
 export function onContent(callback) {
     document.addEventListener("X-DOMContentReady", callback);
 }
+
+/**
+ * Make a URL to a user's profile.
+ */
+export function makeProfileUrl(username: string) {
+    const userPath = `/profile/${encodeURIComponent(username)}`;
+    return formatUrl(userPath);
+}

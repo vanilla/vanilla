@@ -6,7 +6,7 @@
 import React from "react";
 import ReactDOM from "react-dom";
 import { registerEmbedComponent, IEmbedProps, IEmbedData, IQuoteEmbedData } from "@dashboard/embeds";
-import { onContent, t } from "@dashboard/application";
+import { onContent, t, formatUrl, makeProfileUrl } from "@dashboard/application";
 import CollapsableUserContent from "@dashboard/app/user-content/CollapsableContent";
 import uniqueId from "lodash/uniqueId";
 import classnames from "classnames";
@@ -68,22 +68,25 @@ export class QuoteEmbed extends React.Component<IEmbedProps<IEmbedData>, IState>
         ) : null;
 
         const bodyClasses = classnames("embedText-body", "embedQuote-body", { isCollapsed: this.state.isCollapsed });
-        const collapseIconClasses = classnames("icon", "embedQuote-collapseButton", "icon-chevron-down");
+        const collapseIconClasses = classnames("icon", "embedQuote-collapseButton", "icon-chevron-up");
+        const userUrl = makeProfileUrl(insertUser.name);
 
         return (
             <article className={bodyClasses}>
                 <div className="embedText-main embedQuote-main">
                     <div className="embedText-header embedQuote-header">
                         {title}
-                        <span className="embedQuote-userPhoto PhotoWrap">
-                            <img
-                                src={insertUser.photoUrl}
-                                alt={insertUser.name}
-                                className="ProfilePhoto ProfilePhotoSmall"
-                                tabIndex={-1}
-                            />
-                        </span>
-                        <span className="embedQuote-userName">{insertUser.name}</span>
+                        <a href={userUrl} className="embedQuote-userLink">
+                            <span className="embedQuote-userPhoto PhotoWrap">
+                                <img
+                                    src={insertUser.photoUrl}
+                                    alt={insertUser.name}
+                                    className="ProfilePhoto ProfilePhotoSmall"
+                                    tabIndex={-1}
+                                />
+                            </span>
+                            <span className="embedQuote-userName">{insertUser.name}</span>
+                        </a>
                         <time
                             className="embedText-dateTime embedQuote-dateTime meta"
                             dateTime={this.dateTime}

@@ -2159,7 +2159,7 @@ body.isMobile .richEditorParagraphMenu {
 
 .embedText-dateTime {
   font-size: .8em;
-  margin: 0 0 0 12px;
+  margin: 0 0 0 9px;
   padding: 0;
   color: #737373;
 }
@@ -2268,8 +2268,19 @@ body.isMobile .richEditorParagraphMenu {
   padding-right: 40px;
 }
 
+.embedQuote-userLink {
+  display: -webkit-inline-box;
+  display: -webkit-inline-flex;
+  display: -ms-inline-flexbox;
+  display: inline-flex;
+  -webkit-box-align: center;
+  -webkit-align-items: center;
+      -ms-flex-align: center;
+          align-items: center;
+}
+
 .embedQuote-userName {
-  margin: 0 0 0 6px;
+  margin: 0 0 0 9px;
   padding: 0;
   color: #555A62;
   font-weight: 600;

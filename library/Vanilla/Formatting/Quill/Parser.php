@@ -18,7 +18,8 @@ use Vanilla\Formatting\Quill\Blots\AbstractBlot;
  */
 class Parser {
 
-    const QUOTE_PARSER_NAME = "QuillQuoteParser";
+    const PARSE_MODE_NORMAL = "normal";
+    const PARSE_MODE_QUOTE = "quote";
 
     const BREAK_OPERATION = [
         "breakpoint" => true,
@@ -76,29 +77,6 @@ class Parser {
     }
 
     /**
-     * Register all of the built in blots and formats to parse for quote embed. Primarily for use in bootstrapping.
-     *
-     * The embeds NEED to be first here, otherwise something like a blockquote with only a mention in it will
-     * match only as a blockquote instead of as a mention.
-     */
-    public function addQuoteBlotsAndFormats() {
-        $this
-            ->addBlot(Blots\Embeds\ExternalBlot::class)
-            ->addBlot(Blots\Embeds\MentionBlot::class)
-            ->addBlot(Blots\Embeds\EmojiBlot::class)
-            ->addBlot(Blots\Lines\ListLineBlot::class)
-            ->addBlot(Blots\Lines\HeadingBlot::class)
-            ->addBlot(Blots\CodeBlockBlot::class)
-            ->addBlot(Blots\TextBlot::class)// This needs to be the last one!!!
-            ->addFormat(Formats\Link::class)
-            ->addFormat(Formats\Bold::class)
-            ->addFormat(Formats\Italic::class)
-            ->addFormat(Formats\Code::class)
-            ->addFormat(Formats\Strike::class)
-        ;
-    }
-
-    /**
      * Add a new embed type.
      *
      * @param string $formatClass The Format class to register.
@@ -117,11 +95,11 @@ class Parser {
      *
      * @return BlotGroup[]
      */
-    public function parse(array $operations): array {
+    public function parse(array $operations, string $parseMode = self::PARSE_MODE_NORMAL): array {
         $operations = $this->splitPlainTextNewlines($operations);
         $this->insertBreakPoints($operations);
 
-        return $this->createBlotGroups($operations);
+        return $this->createBlotGroups($operations, $parseMode);
     }
 
     /**
@@ -150,10 +128,11 @@ class Parser {
      * @param array $currentOp The current operation.
      * @param array $previousOp The next operation.
      * @param array $nextOp The previous operation.
+     * @param string $parseMode The parse mode to create the blot with.
      *
      * @return AbstractBlot
      */
-    public function getBlotForOperations(array $currentOp, array $previousOp = [], array $nextOp = []): AbstractBlot {
+    public function getBlotForOperations(array $currentOp, array $previousOp = [], array $nextOp = [], string $parseMode): AbstractBlot {
         // Fallback to a TextBlot if possible. Otherwise we fallback to rendering nothing at all.
         $blotClass = Blots\TextBlot::matches([$currentOp]) ? Blots\TextBlot::class : Blots\NullBlot::class;
         foreach ($this->blotClasses as $blot) {
@@ -164,7 +143,7 @@ class Parser {
             }
         }
 
-        return new $blotClass($currentOp, $previousOp, $nextOp);
+        return new $blotClass($currentOp, $previousOp, $nextOp, $parseMode);
     }
 
     /**
@@ -207,10 +186,11 @@ class Parser {
      * Create blot groups out of an array of operations.
      *
      * @param array $operations The pre-parsed operations
+     * @param string $parseMode The parse mode to create blots with.
      *
      * @return BlotGroup[]
      */
-    private function createBlotGroups(array $operations): array {
+    private function createBlotGroups(array $operations, string $parseMode): array {
         $groups = [];
         $operationLength = count($operations);
         $group = new BlotGroup();
@@ -229,7 +209,7 @@ class Parser {
 
             $previousOp = $operations[$i - 1] ?? [];
             $nextOp = $operations[$i + 1] ?? [];
-            $blotInstance = $this->getBlotForOperations($currentOp, $previousOp, $nextOp);
+            $blotInstance = $this->getBlotForOperations($currentOp, $previousOp, $nextOp, $parseMode);
 
             // Ask the blot if it should close the current group.
             if (($blotInstance->shouldClearCurrentGroup($group)) && !$group->isEmpty()) {

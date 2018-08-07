@@ -21,6 +21,8 @@ interface IState {
     maxHeight: number | string;
 }
 
+interface IHeightInfo {}
+
 /**
  * A class for dynamic collapsable user content.
  */
@@ -69,50 +71,67 @@ export default class CollapsableUserContent extends React.PureComponent<IProps, 
     }
 
     /**
-     * Determine if we need to display the collapsing toggle or not.
-     *
-     * If we are always at 100% height it doesn't make sense to show a toggle.
-     */
-    private needsCollapser(maxHeight: number | null): boolean {
-        const self = this.selfRef.current;
-        return self !== null && self.childElementCount >= 1 && maxHeight !== null && maxHeight >= 100;
-    }
-
-    /**
      * Calculate the exact pixel max height of the content around the threshold of preferredMaxHeight.
      */
-    private getNumberMaxHeight(): number | null {
+    private getHeightInfo(): {
+        height: number | null;
+        needsCollapser: boolean;
+    } {
         const self = this.selfRef.current;
 
-        if (!self) {
-            return null;
+        if (self === null) {
+            return {
+                height: null,
+                needsCollapser: false,
+            };
+        }
+
+        if (self.childElementCount <= 1) {
+            return {
+                height: null,
+                needsCollapser: false,
+            };
         }
 
         let finalMaxHeight = 0;
         let lastBottomMargin = 0;
-        Array.from(self.children).forEach(child => {
-            if (finalMaxHeight > 100) {
-                return;
+        for (const child of Array.from(self.children)) {
+            if (finalMaxHeight > this.props.preferredMaxHeight) {
+                return {
+                    height: finalMaxHeight,
+                    needsCollapser: true,
+                };
             }
 
             const { height, bottomMargin } = getElementHeight(child, lastBottomMargin);
+            if (finalMaxHeight > 0 && height > this.props.preferredMaxHeight) {
+                return {
+                    height: finalMaxHeight,
+                    needsCollapser: true,
+                };
+            }
             lastBottomMargin = bottomMargin;
+
             finalMaxHeight += height;
-        });
-        return finalMaxHeight;
+        }
+
+        return {
+            height: finalMaxHeight,
+            needsCollapser: true,
+        };
     }
 
     /**
      * Calculate the CSS max height that we want to apply to the container div.
      */
     private calcMaxHeight() {
-        const maxHeight = this.getNumberMaxHeight();
-        if (this.needsCollapser(maxHeight) && this.props.isCollapsed) {
-            this.setState({ maxHeight: maxHeight! });
+        const { height, needsCollapser } = this.getHeightInfo();
+        if (needsCollapser && this.props.isCollapsed) {
+            this.setState({ maxHeight: height! });
         } else {
             this.setState({ maxHeight: this.selfRef.current!.scrollHeight });
         }
 
-        this.props.setNeedsCollapser && this.props.setNeedsCollapser(this.needsCollapser(maxHeight));
+        this.props.setNeedsCollapser && this.props.setNeedsCollapser(needsCollapser);
     }
 }

@@ -27,20 +27,4 @@ class Renderer {
 
         return $result;
     }
-
-    /**
-     * Render operations into HTML.
-     *
-     * @param BlotGroup[] $blotGroups The blots to render.
-     *
-     * @return string
-     */
-    public function renderQuote(array $blotGroups): string {
-        $result = "";
-        foreach ($blotGroups as $index => $group) {
-            $result .= $group->renderQuote();
-        }
-
-        return $result;
-    }
 }

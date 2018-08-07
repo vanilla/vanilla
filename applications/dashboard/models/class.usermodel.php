@@ -4066,54 +4066,55 @@ class UserModel extends Gdn_Model {
     public function setCalculatedFields(&$user) {
         if (is_object($user)) {
             $this->setCalculatedFieldsObject($user);
-        } else {
-            if (is_string($v = ($user['Attributes'] ?? false))) {
-                $user['Attributes'] = dbdecode($v);
-            }
-            if (is_string($v = ($user['Permissions'] ?? false))) {
-                $user['Permissions'] = dbdecode($v);
-            }
-            if (is_string($v = ($user['Preferences'] ?? false))) {
-                $user['Preferences'] = dbdecode($v);
-            }
-
-            if ($v = ($user['Photo'] ?? false)) {
-                if (!isUrl($v)) {
-                    $photoUrl = Gdn_Upload::url(changeBasename($v, 'n%s'));
-                } else {
-                    $photoUrl = $v;
-                }
-                $user['PhotoUrl'] = $photoUrl;
-            }
-
-            $confirmed = ($user['Confirmed'] ?? null);
-            if ($confirmed !== null) {
-                $user['EmailConfirmed'] = $confirmed;
-            }
-            $verified = ($user['Verified'] ?? null);
-            if ($verified !== null) {
-                $user['BypassSpam'] = $verified;
-            }
-
-            // We store IPs in the UserIP table. To avoid unnecessary queries, the full list is not built here. Shim for BC.
-            $user['AllIPAddresses'] = [
-                $user['InsertIPAddress'] ?? false,
-                $user['LastIPAddress'] ?? false
-            ];
-
-            $user['_CssClass'] = '';
-            if ($user['Banned'] ?? false) {
-                $user['_CssClass'] = 'Banned';
-            }
-
-            $this->EventArguments['User'] = &$user;
-            $this->fireEvent('SetCalculatedFields');
+            return;
+        }
+        if (is_string($v = ($user['Attributes'] ?? false))) {
+            $user['Attributes'] = dbdecode($v);
+        }
+        if (is_string($v = ($user['Permissions'] ?? false))) {
+            $user['Permissions'] = dbdecode($v);
+        }
+        if (is_string($v = ($user['Preferences'] ?? false))) {
+            $user['Preferences'] = dbdecode($v);
         }
 
+        if ($v = ($user['Photo'] ?? false)) {
+            if (!isUrl($v)) {
+                $photoUrl = Gdn_Upload::url(changeBasename($v, 'n%s'));
+            } else {
+                $photoUrl = $v;
+            }
+            $user['PhotoUrl'] = $photoUrl;
+        }
+
+        $confirmed = ($user['Confirmed'] ?? null);
+        if ($confirmed !== null) {
+            $user['EmailConfirmed'] = $confirmed;
+        }
+        $verified = ($user['Verified'] ?? null);
+        if ($verified !== null) {
+            $user['BypassSpam'] = $verified;
+        }
+
+        // We store IPs in the UserIP table. To avoid unnecessary queries, the full list is not built here. Shim for BC.
+        $user['AllIPAddresses'] = [
+            $user['InsertIPAddress'] ?? false,
+            $user['LastIPAddress'] ?? false
+        ];
+
+        $user['_CssClass'] = '';
+        if ($user['Banned'] ?? false) {
+            $user['_CssClass'] = 'Banned';
+        }
+
+        $this->EventArguments['User'] = &$user;
+        $this->fireEvent('SetCalculatedFields');
     }
 
-    /*
-     * @deprecated IMHO This function should never be called vs object
+    /**
+     * Duplicates `setCalculatedFields()` for objects.
+     *
+     * @deprecated Call `setCalculatedFields()` with an array instead.
      */
     public function setCalculatedFieldsObject( &$user) {
         deprected(__FILE__.'setCalculatedFieldsObject( &$user)');

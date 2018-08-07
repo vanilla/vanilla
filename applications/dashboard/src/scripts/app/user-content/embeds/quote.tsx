@@ -45,6 +45,8 @@ export class QuoteEmbed extends React.Component<IEmbedProps<IEmbedData>> {
         renderedBody: "",
     };
 
+    private collapserRef: React.RefObject<CollapsableUserContent> = React.createRef();
+
     public render() {
         const { body, insertUser } = this.quoteData;
         const id = uniqueId("collapsableContent-");
@@ -56,6 +58,7 @@ export class QuoteEmbed extends React.Component<IEmbedProps<IEmbedData>> {
 
         const bodyClasses = classnames("embedText-body", "embedQuote-body", { isCollapsed: this.state.isCollapsed });
         const collapseIconClasses = classnames("icon", "embedQuote-collapseButton", "icon-chevron-up");
+        const showCollapser = this.collapserRef.current && this.collapserRef.current.needsCollapser;
 
         return (
             <article className={bodyClasses}>
@@ -78,15 +81,17 @@ export class QuoteEmbed extends React.Component<IEmbedProps<IEmbedData>> {
                         >
                             {this.humanTime}
                         </time>
-                        <label className={collapseIconClasses}>
-                            <span className="sr-only">{t("Collapse this quote")}</span>
-                            <input
-                                type="checkbox"
-                                className="sr-only"
-                                onChange={this.handleButtonClick}
-                                checked={this.state.isCollapsed}
-                            />
-                        </label>
+                        {showCollapser && (
+                            <label className={collapseIconClasses}>
+                                <span className="sr-only">{t("Collapse this quote")}</span>
+                                <input
+                                    type="checkbox"
+                                    className="sr-only"
+                                    onChange={this.handleButtonClick}
+                                    checked={this.state.isCollapsed}
+                                />
+                            </label>
+                        )}
                     </div>
                     <div className="embedQuote-excerpt userContent">
                         <CollapsableUserContent
@@ -101,11 +106,13 @@ export class QuoteEmbed extends React.Component<IEmbedProps<IEmbedData>> {
     }
 
     public componentDidMount() {
-        console.log(this.props);
         if (this.quoteData.body) {
             this.props.onRenderComplete();
         } else {
-            api.post("/rich/quote", { body: this.quoteData.bodyRaw, format: this.quoteData.format }).then(response => {
+            api.post("/rich/quote", {
+                body: JSON.stringify(this.quoteData.bodyRaw),
+                format: this.quoteData.format,
+            }).then(response => {
                 this.setState({ renderedBody: response.data.quote });
                 this.props.onRenderComplete();
             });

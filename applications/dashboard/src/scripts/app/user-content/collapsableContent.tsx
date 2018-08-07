@@ -41,6 +41,10 @@ export default class CollapsableUserContent extends React.PureComponent<IProps> 
         window.addEventListener("resize", () => debounce(() => this.forceUpdate(), 200)());
     }
 
+    public needsCollapser(): boolean {
+        return this.props.isCollapsed && (this.maxHeight === "100%" || this.maxHeight <= 100);
+    }
+
     private get maxHeight(): number | string {
         const self = this.selfRef.current;
         if (!self) {

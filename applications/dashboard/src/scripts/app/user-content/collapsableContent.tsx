@@ -12,6 +12,7 @@ import { getElementHeight } from "@dashboard/dom";
 interface IProps {
     id: string;
     isCollapsed: boolean;
+    setNeedsCollapser?: (needsCollapser: boolean) => void;
     dangerouslySetInnerHTML: {
         __html: string;
     };
@@ -38,11 +39,18 @@ export default class CollapsableUserContent extends React.PureComponent<IProps> 
 
     public componentDidMount() {
         this.forceUpdate();
-        window.addEventListener("resize", () => debounce(() => this.forceUpdate(), 200)());
+        this.props.setNeedsCollapser && this.props.setNeedsCollapser(this.needsCollapser());
+        window.addEventListener("resize", () =>
+            debounce(() => {
+                this.forceUpdate();
+                this.props.setNeedsCollapser && this.props.setNeedsCollapser(this.needsCollapser());
+            }, 200)(),
+        );
     }
 
-    public needsCollapser(): boolean {
-        return this.props.isCollapsed && (this.maxHeight === "100%" || this.maxHeight <= 100);
+    private needsCollapser(): boolean {
+        console.log("Needs collapse", this.props.isCollapsed && (this.maxHeight === "100%" || this.maxHeight <= 100));
+        return this.props.isCollapsed && (this.maxHeight !== "100%" || parseInt(this.maxHeight, 10) > 100);
     }
 
     private get maxHeight(): number | string {

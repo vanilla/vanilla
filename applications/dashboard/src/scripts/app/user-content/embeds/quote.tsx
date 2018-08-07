@@ -36,16 +36,16 @@ export function mountQuoteEmbeds() {
 
 interface IState {
     isCollapsed: boolean;
+    needsCollapseButton: boolean;
     renderedBody: string;
 }
 
-export class QuoteEmbed extends React.Component<IEmbedProps<IEmbedData>> {
+export class QuoteEmbed extends React.Component<IEmbedProps<IEmbedData>, IState> {
     public state: IState = {
         isCollapsed: true,
         renderedBody: "",
+        needsCollapseButton: false,
     };
-
-    private collapserRef: React.RefObject<CollapsableUserContent> = React.createRef();
 
     public render() {
         const { body, insertUser } = this.quoteData;
@@ -57,8 +57,7 @@ export class QuoteEmbed extends React.Component<IEmbedProps<IEmbedData>> {
             ) : null;
 
         const bodyClasses = classnames("embedText-body", "embedQuote-body", { isCollapsed: this.state.isCollapsed });
-        const collapseIconClasses = classnames("icon", "embedQuote-collapseButton", "icon-chevron-up");
-        const showCollapser = this.collapserRef.current && this.collapserRef.current.needsCollapser;
+        const collapseIconClasses = classnames("icon", "embedQuote-collapseButton", "icon-chevron-down");
 
         return (
             <article className={bodyClasses}>
@@ -81,13 +80,14 @@ export class QuoteEmbed extends React.Component<IEmbedProps<IEmbedData>> {
                         >
                             {this.humanTime}
                         </time>
-                        {showCollapser && (
+                        {this.state.needsCollapseButton && (
                             <label className={collapseIconClasses}>
                                 <span className="sr-only">{t("Collapse this quote")}</span>
                                 <input
                                     type="checkbox"
                                     className="sr-only"
-                                    onChange={this.handleButtonClick}
+                                    onClick={this.stopClickPropogation}
+                                    onChange={this.toggleCollapseState}
                                     checked={this.state.isCollapsed}
                                 />
                             </label>
@@ -95,6 +95,7 @@ export class QuoteEmbed extends React.Component<IEmbedProps<IEmbedData>> {
                     </div>
                     <div className="embedQuote-excerpt userContent">
                         <CollapsableUserContent
+                            setNeedsCollapser={this.setNeedsCollapser}
                             isCollapsed={this.state.isCollapsed}
                             id={id}
                             dangerouslySetInnerHTML={{ __html: body ? body : this.state.renderedBody }}
@@ -119,10 +120,19 @@ export class QuoteEmbed extends React.Component<IEmbedProps<IEmbedData>> {
         }
     }
 
-    private handleButtonClick = (event: React.ChangeEvent<HTMLInputElement>) => {
+    private setNeedsCollapser = needsCollapser => {
+        console.log("Setting collapser to", needsCollapser);
+        this.setState({ needsCollapseButton: needsCollapser });
+    };
+
+    private stopClickPropogation = (event: React.MouseEvent<any>) => {
+        event.stopPropagation();
+    };
+
+    private toggleCollapseState = (event: React.ChangeEvent<HTMLInputElement>) => {
         const target = event.target;
         const value = target.type === "checkbox" ? target.checked : target.value;
-        this.setState({ isCollapsed: value });
+        this.setState({ isCollapsed: !!value });
     };
 
     private get quoteData(): IQuoteEmbedData {

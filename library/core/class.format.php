@@ -2466,6 +2466,9 @@ EOT;
 
     public static function quoteEmbed($body, string $format): string {
         if ($format === "Rich") {
+            if (is_string($body)) {
+                $body = json_decode($body, true);
+            }
             return self::richQuote($body);
         } else {
             $previousLinksValue = c('Garden.Format.Links');

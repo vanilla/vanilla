@@ -52,8 +52,11 @@ EMOJIS.forEach((data, key) => {
     }
 });
 
+// window.console.log("rowIndexesByGroupId: ", rowIndexesByGroupId);
+// window.console.log("cellIndexesByGroupId: ", cellIndexesByGroupId);
+
 const emojiGroupLength = Object.values(EMOJI_GROUPS).length;
-const numberOfRows = getEmojiRowFromIndex(EMOJIS.length);
+const numberOfRows = getEmojiRowFromIndex(EMOJIS.length - 1);
 const elementsOnLastRow = EMOJIS.length % rowSize;
 
 interface IProps extends IWithEditorProps, IPopoverControllerChildParameters {
@@ -64,7 +67,7 @@ interface IState {
     id: string;
     contentID: string;
     scrollToRow: number;
-    emojiToFocusPosition: number;
+    focusIndex: number;
     overscanRowCount: number;
     rowStartIndex: number;
     selectedGroup: number;
@@ -82,7 +85,7 @@ export class EmojiPicker extends React.PureComponent<IProps, IState> {
             id: props.id,
             contentID: props.contentID,
             scrollToRow: 0,
-            emojiToFocusPosition: 0,
+            focusIndex: 0,
             overscanRowCount: 20,
             rowStartIndex: 0,
             selectedGroup: 0,
@@ -227,9 +230,9 @@ export class EmojiPicker extends React.PureComponent<IProps, IState> {
             emojiToFocusPosition: -1,
         });
     };
-
     private handleCategoryClick(event: React.MouseEvent<any>, categoryID: number) {
         event.preventDefault();
+        event.stopPropagation();
         this.scrollToCategory(categoryID);
     }
 
@@ -237,9 +240,10 @@ export class EmojiPicker extends React.PureComponent<IProps, IState> {
      * Scroll to category
      */
     private scrollToCategory = (categoryID: number) => {
+        window.console.log("categoryID: ", categoryID);
         this.setState({
             scrollToRow: rowIndexesByGroupId[categoryID],
-            emojiToFocusPosition: cellIndexesByGroupId[categoryID],
+            focusIndex: cellIndexesByGroupId[categoryID],
             selectedGroup: categoryID,
             alertMessage: t("Jumped to emoji category: ") + t(EMOJI_GROUPS[categoryID]),
         });
@@ -252,7 +256,7 @@ export class EmojiPicker extends React.PureComponent<IProps, IState> {
         const pos = rowIndex * rowSize + columnIndex;
         const emojiData = EMOJIS[pos];
         let result: JSX.Element | null = null;
-        const isSelectedButton = this.state.emojiToFocusPosition === pos;
+        const isSelectedButton = this.state.focusIndex === pos;
 
         if (emojiData) {
             result = (
@@ -304,8 +308,9 @@ export class EmojiPicker extends React.PureComponent<IProps, IState> {
     private jumpRows = (offset: number) => {
         if (offset !== 0) {
             const activeElement: HTMLElement = document.activeElement as HTMLElement;
-            let currentFocusPosition = this.state.rowStartIndex;
+            let currentFocusPosition = this.state.rowStartIndex * rowSize;
             let scrollToRow = this.state.rowStartIndex;
+            const goingUp = offset < 0;
             let forceUpdate = false;
 
             if (
@@ -313,19 +318,10 @@ export class EmojiPicker extends React.PureComponent<IProps, IState> {
                 activeElement.classList.contains("richEditor-insertEmoji") &&
                 "index" in activeElement.dataset
             ) {
-                const index = parseInt(activeElement.dataset.index as "string", 10);
-                currentFocusPosition = index;
+                currentFocusPosition = parseInt(activeElement.dataset.index as "string", 10);
             }
 
-            // Check min max values
-            let targetFocusPosition = currentFocusPosition + offset * colSize;
-            if (targetFocusPosition < 0) {
-                targetFocusPosition = 0;
-            } else if (targetFocusPosition > EMOJIS.length) {
-                targetFocusPosition = EMOJIS.length;
-            }
-
-            // TODO - Handle scroll position
+            const targetFocusPosition = this.keepEmojiIndexInBounds(currentFocusPosition + offset * colSize);
             const targetRowPosition = getEmojiRowFromIndex(targetFocusPosition);
 
             if (targetRowPosition >= this.state.rowStartIndex + rowSize) {
@@ -339,10 +335,17 @@ export class EmojiPicker extends React.PureComponent<IProps, IState> {
             this.setState(
                 {
                     scrollToRow,
-                    emojiToFocusPosition: targetFocusPosition,
+                    focusIndex: targetFocusPosition,
                 },
                 () => {
+                    window.console.log("");
+                    window.console.log("start index: ", currentFocusPosition);
+                    window.console.log("start row: ", getEmojiRowFromIndex(currentFocusPosition));
+                    window.console.log("target index: ", targetFocusPosition);
+                    window.console.log("targer row: ", getEmojiRowFromIndex(scrollToRow));
+                    window.console.log("---------------");
                     if (forceUpdate) {
+                        window.console.log("force update target: ", this.state.focusIndex);
                         this.gridEl.forceUpdate();
                     }
                 },
@@ -360,10 +363,12 @@ export class EmojiPicker extends React.PureComponent<IProps, IState> {
             switch (event.code) {
                 case "PageUp":
                     event.preventDefault();
+                    event.stopPropagation();
                     this.jumpRows(-rowSize);
                     break;
                 case "PageDown":
                     event.preventDefault();
+                    event.stopPropagation();
                     this.jumpRows(rowSize);
                     break;
             }

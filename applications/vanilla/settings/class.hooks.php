@@ -17,11 +17,6 @@ use Vanilla\Formatting\Embeds\EmbedManager;
  */
 class VanillaHooks implements Gdn_IPlugin {
 
-    public function container_init(Container $dic) {
-        $dic->rule(EmbedManager::class)
-            ->addCall('addEmbed', [new Reference(QuoteEmbed::class)]);
-    }
-
     /**
      * Counter rebuilding.
      *

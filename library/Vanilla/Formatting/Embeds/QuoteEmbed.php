@@ -4,12 +4,14 @@
  * @license GPL-2.0
  */
 
+namespace Vanilla\Formatting\Embeds;
+
 use Garden\Web\Exception\NotFoundException;
 
 /**
  * Generic link embed.
  */
-class QuoteEmbed extends Vanilla\Formatting\Embeds\Embed {
+class QuoteEmbed extends Embed {
 
     protected $domains;
 
@@ -83,7 +85,7 @@ class QuoteEmbed extends Vanilla\Formatting\Embeds\Embed {
         $jsonData = json_encode($data);
         $result = <<<HTML
 <div class="embedExternal embedText embedQuote">
-    <div class="embedExternal-content">
+    <div class="embedExternal-content embedQuote-content">
         <div class="js-quoteEmbed" data-json='$jsonData'><a href="$sanitizedUrl">$sanitizedUrl</a></div>
     </div>
 </div>

@@ -163,7 +163,7 @@ class RichEditorPlugin extends Gdn_Plugin {
         Gdn_ConfigurationModel $configModel
     ): string {
         $enableRichQuotes = t('Enable Rich Quotes');
-        $richEditorQuotesNotes =  t('RichEditor.QuoteEnable.Notes1', 'Use the following option to enable quotes for the Rich Editor');
+        $richEditorQuotesNotes =  t('RichEditor.QuoteEnable.Notes1', 'Use the following option to enable quotes for the Rich Editor. This will only apply if the default formatter is "Rich".');
         $label = '<p class="info">'.$richEditorQuotesNotes.'</p>';
         $configModel->setField(self::QUOTE_CONFIG_ENABLE);
 

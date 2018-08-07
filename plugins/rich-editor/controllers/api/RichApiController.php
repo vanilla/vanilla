@@ -31,7 +31,7 @@ class RichApiController extends AbstractApiController {
         $body = $in->validate($body);
 
         $quote = [
-            'quote' => Gdn_Format::quoteEenablenambed($body['body'], $body['format'])
+            'quote' => Gdn_Format::quoteEmbed($body['body'], $body['format'])
         ];
         $result = $out->validate($quote);
         return $result;

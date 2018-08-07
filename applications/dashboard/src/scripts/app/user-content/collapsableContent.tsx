@@ -12,6 +12,7 @@ import { getElementHeight } from "@dashboard/dom";
 interface IProps {
     id: string;
     isCollapsed: boolean;
+    preferredMaxHeight: number; // The actual max height could exceed this, but once we pass it stop adding elements.
     setNeedsCollapser?: (needsCollapser: boolean) => void;
     dangerouslySetInnerHTML: {
         __html: string;
@@ -22,7 +23,10 @@ interface IState {
     maxHeight: number | string;
 }
 
-export default class CollapsableUserContent extends React.PureComponent<IProps> {
+/**
+ * A class for dynamic collapsable user content.
+ */
+export default class CollapsableUserContent extends React.PureComponent<IProps, IState> {
     public state = {
         maxHeight: "100%",
     };
@@ -44,6 +48,9 @@ export default class CollapsableUserContent extends React.PureComponent<IProps> 
         );
     }
 
+    /**
+     * Do the initial height calculation and recalcuate if the window dimensions change.
+     */
     public componentDidMount() {
         this.calcMaxHeight();
         window.addEventListener("resize", () =>
@@ -53,6 +60,9 @@ export default class CollapsableUserContent extends React.PureComponent<IProps> 
         );
     }
 
+    /**
+     * If certain primary props change we need to recalculate the content height.
+     */
     public componentDidUpdate(prevProps: IProps) {
         if (
             prevProps.dangerouslySetInnerHTML.__html !== this.props.dangerouslySetInnerHTML.__html ||
@@ -62,11 +72,19 @@ export default class CollapsableUserContent extends React.PureComponent<IProps> 
         }
     }
 
+    /**
+     * Determine if we need to display the collapsing toggle or not.
+     *
+     * If we are always at 100% height it doesn't make sense to show a toggle.
+     */
     private needsCollapser(maxHeight: number | null): boolean {
         const self = this.selfRef.current;
         return self !== null && self.childElementCount >= 1 && maxHeight !== null && maxHeight >= 100;
     }
 
+    /**
+     * Calculate the exact pixel max height of the content around the threshold of preferredMaxHeight.
+     */
     private getNumberMaxHeight(): number | null {
         const self = this.selfRef.current;
 
@@ -88,6 +106,9 @@ export default class CollapsableUserContent extends React.PureComponent<IProps> 
         return finalMaxHeight;
     }
 
+    /**
+     * Calculate the CSS max height that we want to apply to the container div.
+     */
     private calcMaxHeight() {
         const maxHeight = this.getNumberMaxHeight();
         if (this.needsCollapser(maxHeight) && this.props.isCollapsed) {

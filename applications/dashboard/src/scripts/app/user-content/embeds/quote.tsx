@@ -7,7 +7,7 @@ import React from "react";
 import ReactDOM from "react-dom";
 import { registerEmbedComponent, IEmbedProps, IEmbedData, IQuoteEmbedData } from "@dashboard/embeds";
 import { onContent, t } from "@dashboard/application";
-import CollapsableUserContent from "@dashboard/app/user-content/collapsableContent";
+import CollapsableUserContent from "@dashboard/app/user-content/CollapsableContent";
 import uniqueId from "lodash/uniqueId";
 import classnames from "classnames";
 import api from "@dashboard/apiv2";
@@ -17,6 +17,11 @@ export function initQuoteEmbeds() {
     onContent(mountQuoteEmbeds);
 }
 
+/**
+ * Mount all of the existing quote embeds in the page.
+ *
+ * Data (including server rendered HTML content should be coming down in JSON encoded attribute data-json).
+ */
 export function mountQuoteEmbeds() {
     const embeds = document.querySelectorAll(".js-quoteEmbed");
     for (const embed of embeds) {
@@ -40,6 +45,13 @@ interface IState {
     renderedBody: string;
 }
 
+/**
+ * An embed class for quoted user content on the same site.
+ *
+ * This is not an editable quote. Instead it an expandable/collapsable snapshot of the quoted/embedded comment/discussion.
+ *
+ * This can either recieve the post format and body (when created directly in the editor) or be given the fully rendered content (when mounting on top of existing server rendered DOM stuff).
+ */
 export class QuoteEmbed extends React.Component<IEmbedProps<IEmbedData>, IState> {
     public state: IState = {
         isCollapsed: true,
@@ -97,6 +109,7 @@ export class QuoteEmbed extends React.Component<IEmbedProps<IEmbedData>, IState>
                             setNeedsCollapser={this.setNeedsCollapser}
                             isCollapsed={this.state.isCollapsed}
                             id={id}
+                            preferredMaxHeight={100}
                             dangerouslySetInnerHTML={{ __html: body ? body : this.state.renderedBody }}
                         />
                     </div>
@@ -105,6 +118,11 @@ export class QuoteEmbed extends React.Component<IEmbedProps<IEmbedData>, IState>
         );
     }
 
+    /**
+     * When the component mounts we need to ensure we have rendered post content.
+     *
+     * Either we were passed the content, or we need to make an API call to render it.
+     */
     public componentDidMount() {
         if (this.quoteData.body) {
             this.props.onRenderComplete();
@@ -117,8 +135,7 @@ export class QuoteEmbed extends React.Component<IEmbedProps<IEmbedData>, IState>
                     format: this.quoteData.format,
                 })
                 .then(response => {
-                    this.setState({ renderedBody: response.data.quote });
-                    this.props.onRenderComplete();
+                    this.setState({ renderedBody: response.data.quote }, this.props.onRenderComplete);
                 });
         }
     }

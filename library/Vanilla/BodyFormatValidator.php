@@ -65,6 +65,14 @@ class BodyFormatValidator {
         return $value;
     }
 
+    /**
+     * There is certain embed data from the rich editor that we want to strip out. This includes
+     *
+     * - Malformed partially formed operations (dataPromise).
+     * - Nested embed data.
+     *
+     * @param array[] $operations The quill operations to loop through.
+     */
     private function stripUselessEmbedData(array &$operations) {
         foreach($operations as $key => $op) {
             // If a dataPromise is still stored on the embed, that means it never loaded properly on the client.

@@ -303,7 +303,3 @@ body.Profile .PanelInfo .Active,
     color: #aaa;
 }
 
-body.hasRichEditor .CommentFormWrap .Buttons,
-body.hasRichEditor .FormWrapper:not(.FormWrapper-Condensed) .Buttons {
-    padding-right: 35px;
-}

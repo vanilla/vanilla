@@ -869,13 +869,6 @@ label.checkbox input.checkbox-input {
   margin-left: 0;
 }
 
-.richEditor-menuItems.MenuItems {
-  border: 1px solid #d6d7d9;
-  box-shadow: 0 5px 10px rgba(85, 90, 98, 0.2);
-  background: #fff;
-  border-radius: 2px;
-}
-
 .richEditor-menuItems .richEditor-menuItem {
   display: block;
   padding: 0;
@@ -890,6 +883,10 @@ label.checkbox input.checkbox-input {
 
 .richEditor-menuItems .richEditor-menuItem .richEditor-button.emojiChar-🇺🇳, .richEditor-menuItems .richEditor-menuItem.richEditor-button.emojiChar-🇺🇳 {
   font-size: 10px;
+}
+
+.richEditor-menuItems .richEditor-menuItem:first-child .richEditor-embedButton {
+  border-bottom-left-radius: 2px;
 }
 
 .richEditor-menuItems .richEditor-menuItem.isRightAligned {
@@ -1047,7 +1044,7 @@ label.checkbox input.checkbox-input {
   cursor: pointer;
 }
 
-.insertLink.FlyoutMenu {
+.insertLink {
   display: -webkit-box;
   display: -webkit-flex;
   display: -ms-flexbox;
@@ -1106,6 +1103,12 @@ label.checkbox input.checkbox-input {
 .richEditorFlyout {
   position: relative;
   overflow: hidden;
+  background-color: #fff;
+  border-radius: 2px;
+  border-color: #d6d7d9;
+  border-style: solid;
+  border-width: 1px;
+  box-shadow: 0 5px 10px rgba(85, 90, 98, 0.2);
   z-index: 6;
 }
 
@@ -1125,12 +1128,6 @@ label.checkbox input.checkbox-input {
   display: -webkit-flex;
   display: -ms-flexbox;
   display: flex;
-}
-
-.richEditorFlyout.FlyoutMenu {
-  top: auto !important;
-  padding-top: 0;
-  padding-bottom: 0;
 }
 
 .richEditorFlyout-header {
@@ -1163,6 +1160,7 @@ label.checkbox input.checkbox-input {
   min-height: 24px;
   font-size: 100%;
   line-height: inherit;
+  color: #555a62;
 }
 
 .richEditorFlyout-title:focus {
@@ -1196,6 +1194,17 @@ label.checkbox input.checkbox-input {
   margin-bottom: 3px;
 }
 
+.richEditorFlyout {
+  position: absolute;
+  bottom: 100%;
+  left: 0;
+  width: 276px;
+  border: 1px solid #d6d7d9;
+  box-shadow: 0 5px 10px rgba(85, 90, 98, 0.2);
+  background: #fff;
+  border-radius: 2px;
+}
+
 .richEditorFlyout-body {
   padding-left: 12px;
   padding-right: 12px;
@@ -1212,17 +1221,6 @@ label.checkbox input.checkbox-input {
 
 .embedDialogue {
   position: relative;
-}
-
-.richEditor-menu.richEditorFlyout {
-  position: absolute;
-  bottom: 100%;
-  left: 0;
-  width: 276px;
-}
-
-.richEditor-menu.richEditorFlyout.insertEmoji {
-  margin-left: -1px;
 }
 
 .richEditor-insertEmoji {
@@ -1328,6 +1326,12 @@ label.checkbox input.checkbox-input {
 
 .richEditor-paragraphToolbarContainer {
   position: absolute;
+  background-color: #fff;
+  border-radius: 2px;
+  border-color: #d6d7d9;
+  border-style: solid;
+  border-width: 1px;
+  box-shadow: 0 5px 10px rgba(85, 90, 98, 0.2);
   left: -webkit-calc(50% - 18px);
   left: calc(50% - 18px);
 }
@@ -1427,11 +1431,13 @@ body.hasRichEditor #Form_Preview {
   }
   body.hasRichEditor.Section-PostDiscussion #DiscussionForm .FormWrapper .richEditor {
     padding-left: 0;
+    padding-right: 0;
   }
   body.hasRichEditor .CommentForm .CommentFormWrap .Form-HeaderWrap {
     display: none;
   }
   body.hasRichEditor .CommentForm .CommentFormWrap .FormWrapper {
+    padding-right: 0;
     padding-left: 0;
   }
   body.hasRichEditor .CommentForm .richEditor {
@@ -1440,9 +1446,10 @@ body.hasRichEditor #Form_Preview {
   }
   body.hasRichEditor .CommentForm .richEditor .richEditor {
     padding-left: 0;
+    padding-right: 0;
   }
-  body.hasRichEditor .DataListWrap .FormWrapper.FormWrapper-Condensed {
-    padding-left: 0;
+  body.hasRichEditor .CommentForm .Buttons {
+    padding-right: 36px;
   }
   body.hasRichEditor #GroupForm .Form-HeaderWrap,
   body.hasRichEditor #MessageForm .Form-HeaderWrap,
@@ -1461,6 +1468,15 @@ body.hasRichEditor #Form_Preview {
     padding-right: 0;
     padding-left: 0;
   }
+  body.hasRichEditor.Profile .FormWrapper.FormWrapper-Condensed {
+    padding-right: 36px;
+  }
+  body.hasRichEditor.Profile .FormWrapper.FormWrapper-Condensed .Activity .Buttons {
+    padding-left: 36px;
+  }
+  body.hasRichEditor.Section-Conversation .CommentForm .Buttons {
+    padding-right: 0;
+  }
 }
 
 body.isMobile .embedDialogue {
@@ -1477,8 +1493,8 @@ body.isMobile .richEditor {
 
 body.isMobile .richEditor-menu.richEditorFlyout {
   left: 0;
-  width: -webkit-calc(100% + 0);
-  width: calc(100% + 0);
+  width: -webkit-calc(100% + 4px);
+  width: calc(100% + 4px);
 }
 
 body.isMobile .richEditor-embedBarMobileBorder {
@@ -1506,8 +1522,8 @@ body.isMobile .richEditorParagraphMenu {
   }
   .richEditor-menu.richEditorFlyout {
     left: 0;
-    width: -webkit-calc(100% + 0);
-    width: calc(100% + 0);
+    width: -webkit-calc(100% + 4px);
+    width: calc(100% + 4px);
   }
   .richEditor-embedBarMobileBorder {
     display: block;

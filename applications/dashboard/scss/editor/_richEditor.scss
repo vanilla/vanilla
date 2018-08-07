@@ -1,8 +1,8 @@
 $richEditor_bg                                    : $global-color_bg !default;
-$richEditor_leftPadding                           : 36px !default;
+$richEditor_horizontalPadding                           : 36px !default;
 $richEditor_minHeight                             : 200px !default;
 $richEditor_verticalPadding                       : 9px !default;
-$richEditor_horizontalPadding                     : 12px !default;
+$richEditor_innerPadding                          : 12px !default;
 $richEditor-outline_color                         : rgba($global-color_primary, 0.6) !default;
 
 $richEditor-menuButton_size                       : 36px !default;
@@ -48,7 +48,7 @@ $richEditor-mobileEmbedBreakPoint                 : 550px !default;
 .richEditor {
     position: relative;
     display: block;
-    padding-left: $richEditor_leftPadding;
+    padding-left: $richEditor_horizontalPadding;
 
     &.isDisabled { // Before React has replaced initial HTML
         &,
@@ -81,7 +81,7 @@ $richEditor-mobileEmbedBreakPoint                 : 550px !default;
     left: 0;
     transform: translateX(-100%);
     height: $richEditor-floatingButton_size;
-    width: $richEditor_leftPadding;
+    width: $richEditor_horizontalPadding;
     z-index: 1;
     animation: fadein $richEditor-pilcrowAnimation_duration ease;
     animation-iteration-count: 1;
@@ -107,9 +107,9 @@ $richEditor-mobileEmbedBreakPoint                 : 550px !default;
     min-height: $richEditor_minHeight;
     padding: {
         top: $richEditor_verticalPadding;
-        right: $richEditor_horizontalPadding;
+        right: $richEditor_innerPadding;
         bottom: $richEditor_verticalPadding;
-        left: $richEditor_horizontalPadding;
+        left: $richEditor_innerPadding;
     }
     outline-color: transparent;
     white-space: pre-wrap !important; // Needed for spaces around embed blots to work properly!
@@ -144,13 +144,6 @@ $richEditor-mobileEmbedBreakPoint                 : 550px !default;
         left: 0;
     }
 
-    &.MenuItems {
-        border: $formElement-borderWidth $formElement-borderStyle $formElement_borderColor;
-        box-shadow: $menu-dropShadow;
-        background: $global-color_bg;
-        border-radius: $global-borderRadius;
-    }
-
     .richEditor-menuItem {
         display: block;
         padding: 0;
@@ -167,11 +160,19 @@ $richEditor-mobileEmbedBreakPoint                 : 550px !default;
             }
         }
 
+        &:first-child {
+            .richEditor-embedButton {
+                border-bottom-left-radius: $global-borderRadius;
+            }
+        }
+
         &.isRightAligned {
             margin-left: auto;
         }
     }
 }
+
+
 
 // button reset
 .richEditor-nextInput,
@@ -287,7 +288,7 @@ $richEditor-mobileEmbedBreakPoint                 : 550px !default;
 }
 
 // Link Menu
-.insertLink.FlyoutMenu {
+.insertLink {
     display: flex;
     flex-wrap: nowrap;
     align-items: center;
@@ -328,6 +329,14 @@ $richEditor-mobileEmbedBreakPoint                 : 550px !default;
 .richEditorFlyout {
     position: relative;
     overflow: hidden;
+    background-color: $global-color_bg;
+    border: {
+        radius: $global-borderRadius;
+        color: $global-border_color;
+        style: $global-border_style;
+        width: $global-border_width;
+    }
+    box-shadow: $menu-dropShadow;
     z-index: 6;
 
     .InputBox {
@@ -343,14 +352,6 @@ $richEditor-mobileEmbedBreakPoint                 : 550px !default;
 
     .Footer {
         display: flex;
-    }
-
-    &.FlyoutMenu {
-        top: auto !important;
-        padding: {
-            top: 0;
-            bottom: 0;
-        }
     }
 }
 
@@ -383,6 +384,7 @@ $richEditor-mobileEmbedBreakPoint                 : 550px !default;
     min-height: #{$richEditor-menuButton_size - $richEditor-flyout_paddingVertical};
     font-size: 100%;
     line-height: inherit;
+    color: $global-color_fg;
 
     &:focus {
         outline: 0;
@@ -409,6 +411,17 @@ $richEditor-mobileEmbedBreakPoint                 : 550px !default;
     margin-bottom: 3px;
 }
 
+.richEditorFlyout {
+    position: absolute;
+    bottom: 100%;
+    left: 0;
+    width: #{$richEditor-flyout_paddingHorizontal * 2 + 7 * $richEditor-menuButton_size};
+    border: $formElement-borderWidth $formElement-borderStyle $formElement_borderColor;
+    box-shadow: $menu-dropShadow;
+    background: $global-color_bg;
+    border-radius: $global-borderRadius;
+}
+
 .richEditorFlyout-body {
     padding: {
         left: $richEditor-flyout_paddingHorizontal;
@@ -427,17 +440,6 @@ $richEditor-mobileEmbedBreakPoint                 : 550px !default;
 
 .embedDialogue {
     position: relative;
-}
-
-.richEditor-menu.richEditorFlyout {
-    position: absolute;
-    bottom: 100%;
-    left: 0;
-    width: #{$richEditor-flyout_paddingHorizontal * 2 + 7 * $richEditor-menuButton_size};
-
-    &.insertEmoji {
-        margin-left: -$richEditor-menu_borderWidth;
-    }
 }
 
 .richEditor-insertEmoji {
@@ -521,14 +523,23 @@ $richEditor-mobileEmbedBreakPoint                 : 550px !default;
 
 .richEditor-paragraphToolbarContainer {
     position: absolute;
-    left: calc(50% - #{$richEditor_leftPadding / 2});
+    background-color: $global-color_bg;
+    border: {
+        radius: $global-borderRadius;
+        color: $global-border_color;
+        style: $global-border_style;
+        width: $global-border_width;
+    }
+    box-shadow: $menu-dropShadow;
+    left: calc(50% - #{$richEditor_horizontalPadding / 2});
+
 
     &.isUp {
-        bottom: calc(50% + #{$richEditor_leftPadding / 2 - $formElement-borderWidth});
+        bottom: calc(50% + #{$richEditor_horizontalPadding / 2 - $formElement-borderWidth});
     }
 
     &.isDown {
-        top: calc(50% + #{$richEditor_leftPadding / 2 - $formElement-borderWidth});
+        top: calc(50% + #{$richEditor_horizontalPadding / 2 - $formElement-borderWidth});
     }
 }
 
@@ -619,12 +630,13 @@ body.hasRichEditor {
 
                 .FormWrapper {
                     padding: {
-                        left: $richEditor_leftPadding;
-                        right: $richEditor_leftPadding;
+                        left: $richEditor_horizontalPadding;
+                        right: $richEditor_horizontalPadding;
                     }
 
                     .richEditor {
                         padding-left: 0;
+                        padding-right: 0;
                     }
                 }
             }
@@ -638,28 +650,32 @@ body.hasRichEditor {
                 }
 
                 .FormWrapper {
+                    padding-right: 0;
                     padding-left: 0;
                 }
             }
 
-
             .richEditor {
                 padding: {
-                    left: $richEditor_leftPadding;
-                    right: $richEditor_leftPadding;
+                    left: $richEditor_horizontalPadding;
+                    right: $richEditor_horizontalPadding;
 
                 }
 
                 .richEditor {
                     padding-left: 0;
+                    padding-right: 0;
                 }
+            }
+
+            .Buttons {
+                padding-right: $richEditor_horizontalPadding;
             }
         }
 
-        // Activity
         .DataListWrap {
             .FormWrapper.FormWrapper-Condensed {
-                padding-left: 0;
+
             }
         }
 
@@ -673,13 +689,33 @@ body.hasRichEditor {
 
             .FormWrapper {
                 padding: {
-                    left: $richEditor_leftPadding;
-                    right: $richEditor_leftPadding;
+                    left: $richEditor_horizontalPadding;
+                    right: $richEditor_horizontalPadding;
                 }
 
                 .richEditor {
                     padding-right: 0;
                     padding-left: 0;
+                }
+            }
+        }
+
+        &.Profile {
+            .FormWrapper.FormWrapper-Condensed {
+                padding-right: $richEditor_horizontalPadding;
+
+                .Activity {
+                    .Buttons {
+                        padding-left: $richEditor_horizontalPadding
+                    }
+                }
+            }
+        }
+
+        &.Section-Conversation {
+            .CommentForm {
+                .Buttons {
+                    padding-right: 0;
                 }
             }
         }

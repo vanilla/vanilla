@@ -34,7 +34,7 @@ $global-color_unresolved                             : mix($global-color_warning
 $global-body_bg                                      : $global-color_bg !default; // Derived - color outside main content in margins
 
 $global-border_color                                 : mix($global-color_fg, $global-color_bg, 24%) !default; // Note it's off by default due to the border width
-$global-border-width                                 : 0;
+$global-border-width                                 : 1px;
 $global-border-style                                 : solid;
 $global_borderRadius                                 : 2px !default;
 

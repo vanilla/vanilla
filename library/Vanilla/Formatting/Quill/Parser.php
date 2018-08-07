@@ -18,6 +18,8 @@ use Vanilla\Formatting\Quill\Blots\AbstractBlot;
  */
 class Parser {
 
+    const QUOTE_PARSER_NAME = "QuillQuoteParser";
+
     const BREAK_OPERATION = [
         "breakpoint" => true,
     ];
@@ -61,6 +63,29 @@ class Parser {
             ->addBlot(Blots\Embeds\EmojiBlot::class)
             ->addBlot(Blots\Lines\SpoilerLineBlot::class)
             ->addBlot(Blots\Lines\BlockquoteLineBlot::class)
+            ->addBlot(Blots\Lines\ListLineBlot::class)
+            ->addBlot(Blots\Lines\HeadingBlot::class)
+            ->addBlot(Blots\CodeBlockBlot::class)
+            ->addBlot(Blots\TextBlot::class)// This needs to be the last one!!!
+            ->addFormat(Formats\Link::class)
+            ->addFormat(Formats\Bold::class)
+            ->addFormat(Formats\Italic::class)
+            ->addFormat(Formats\Code::class)
+            ->addFormat(Formats\Strike::class)
+        ;
+    }
+
+    /**
+     * Register all of the built in blots and formats to parse for quote embed. Primarily for use in bootstrapping.
+     *
+     * The embeds NEED to be first here, otherwise something like a blockquote with only a mention in it will
+     * match only as a blockquote instead of as a mention.
+     */
+    public function addQuoteBlotsAndFormats() {
+        $this
+            ->addBlot(Blots\Embeds\ExternalBlot::class)
+            ->addBlot(Blots\Embeds\MentionBlot::class)
+            ->addBlot(Blots\Embeds\EmojiBlot::class)
             ->addBlot(Blots\Lines\ListLineBlot::class)
             ->addBlot(Blots\Lines\HeadingBlot::class)
             ->addBlot(Blots\CodeBlockBlot::class)

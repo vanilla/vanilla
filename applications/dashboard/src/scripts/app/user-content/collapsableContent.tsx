@@ -4,9 +4,7 @@
  */
 
 import React from "react";
-import ReactDOM from "react-dom";
 import debounce from "lodash/debounce";
-import { onContent } from "@dashboard/application";
 import { getElementHeight } from "@dashboard/dom";
 
 interface IProps {
@@ -33,9 +31,7 @@ export default class CollapsableUserContent extends React.PureComponent<IProps, 
     private selfRef: React.RefObject<HTMLDivElement> = React.createRef();
 
     public render() {
-        const style: React.CSSProperties = this.props.isCollapsed
-            ? { maxHeight: this.state.maxHeight, overflow: "hidden" }
-            : { maxHeight: this.state.maxHeight };
+        const style: React.CSSProperties = { overflow: "hidden", maxHeight: this.state.maxHeight };
 
         return (
             <div
@@ -114,7 +110,7 @@ export default class CollapsableUserContent extends React.PureComponent<IProps, 
         if (this.needsCollapser(maxHeight) && this.props.isCollapsed) {
             this.setState({ maxHeight: maxHeight! });
         } else {
-            this.setState({ maxHeight: "100%" });
+            this.setState({ maxHeight: this.selfRef.current!.scrollHeight });
         }
 
         this.props.setNeedsCollapser && this.props.setNeedsCollapser(this.needsCollapser(maxHeight));

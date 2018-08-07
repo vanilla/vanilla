@@ -140,24 +140,39 @@ export class QuoteEmbed extends React.Component<IEmbedProps<IEmbedData>, IState>
         }
     }
 
+    /**
+     * Callback for the collapser to determine if we need to show the collapse toggle or not.
+     */
     private setNeedsCollapser = needsCollapser => {
         this.setState({ needsCollapseButton: needsCollapser });
     };
 
+    /**
+     * Toggle the state of whether or not we are collapsed.
+     */
     private toggleCollapseState = (event: React.ChangeEvent<HTMLInputElement>) => {
         const target = event.target;
         const value = target.type === "checkbox" ? target.checked : target.value;
         this.setState({ isCollapsed: !!value });
     };
 
+    /**
+     * Get the quote embed data out of the scrape data.
+     */
     private get quoteData(): IQuoteEmbedData {
         return this.props.data.attributes as IQuoteEmbedData;
     }
 
+    /**
+     * Get the timestamp to display.
+     */
     private get dateTime(): string {
         return this.quoteData.dateUpdated || this.quoteData.dateInserted;
     }
 
+    /**
+     * Get the title of the time tag (long extended date)
+     */
     private get titleTime(): string {
         const date = new Date(this.dateTime);
         return date.toLocaleString(
@@ -166,6 +181,9 @@ export class QuoteEmbed extends React.Component<IEmbedProps<IEmbedData>, IState>
         );
     }
 
+    /**
+     * Get a shorter human readable time for the time tag.
+     */
     private get humanTime(): string {
         const date = new Date(this.dateTime);
         return date.toLocaleString(

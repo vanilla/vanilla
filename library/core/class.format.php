@@ -2480,7 +2480,7 @@ EOT;
     }
 
     public static function richQuote(array $operations): string {
-        $parser = Gdn::getContainer()->get(Vanilla\Formatting\Quill\Parser::class);
+        $parser = Gdn::getContainer()->get(Vanilla\Formatting\Quill\Parser::QUOTE_PARSER_NAME);
         $renderer = Gdn::getContainer()->get(Vanilla\Formatting\Quill\Renderer::class);
 
         $blotGroups = $parser->parse($operations);

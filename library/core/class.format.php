@@ -2464,6 +2464,15 @@ EOT;
         return $renderer->render($blotGroups);
     }
 
+    /**
+     * Generate a quote to embed in a Rich quote for all existing formats.
+     *
+     * @param string|array $body The string or array body content of the post.
+     * @param string $format The initial format of the post.
+     * @return string
+     * @throws \Garden\Container\ContainerException
+     * @throws \Garden\Container\NotFoundException
+     */
     public static function quoteEmbed($body, string $format): string {
         if ($format === "Rich") {
             if (is_string($body)) {
@@ -2487,8 +2496,7 @@ EOT;
      * Render a rich quote of Rich post.
      *
      * Use a slightly different parser and render configuration. Namely:
-     * - No nested embeds
-     * - Quotes, spoilers turned into plain text.
+     * - Quotes, spoilers, embeds have different rendering methods.
      *
      * @param array $operations
      * @return string

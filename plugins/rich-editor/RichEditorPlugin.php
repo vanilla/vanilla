@@ -8,6 +8,7 @@
 class RichEditorPlugin extends Gdn_Plugin {
 
     const FORMAT_NAME = "Rich";
+    const QUOTE_CONFIG_ENABLE = "RichEditor.Quote.Enable";
 
     /** @var integer */
     private static $editorID = 0;
@@ -28,6 +29,11 @@ class RichEditorPlugin extends Gdn_Plugin {
         saveToConfig('Garden.MobileInputFormatter', self::FORMAT_NAME);
         saveToConfig('RichEditor.Quotes.Enable', true);
         saveToConfig('EnabledPlugins.Quotes', false);
+    }
+
+    public function onDisable() {
+        removeFromConfig('Garden.InputFormatter');
+        removeFromConfig('Garden.MobileInputFormatter');
     }
 
     /**
@@ -99,7 +105,7 @@ class RichEditorPlugin extends Gdn_Plugin {
      * @param array $args
      */
     public function base_afterFlag_handler($sender, $args) {
-        if ($this->isInputFormatterRich()) {
+        if ($this->isInputFormatterRich() && c(self::QUOTE_CONFIG_ENABLE, true)) {
             $this->addQuoteButton($sender, $args);
         }
     }
@@ -159,11 +165,11 @@ class RichEditorPlugin extends Gdn_Plugin {
         $enableRichQuotes = t('Enable Rich Quotes');
         $richEditorQuotesNotes =  t('RichEditor.QuoteEnable.Notes1', 'Use the following option to enable quotes for the Rich Editor');
         $label = '<p class="info">'.$richEditorQuotesNotes.'</p>';
-        $configModel->setField('RichEditor.Quotes.Enable');
+        $configModel->setField(self::QUOTE_CONFIG_ENABLE);
 
         // Why the heck do I need to do this!!
-        $form->setValue('RichEditor.Quotes.Enable', c('RichEditor.Quotes.Enable'));
-        $formToggle = $form->toggle('RichEditor.Quotes.Enable', $enableRichQuotes, [], $label);
+        $form->setValue(self::QUOTE_CONFIG_ENABLE, c(self::QUOTE_CONFIG_ENABLE));
+        $formToggle = $form->toggle(self::QUOTE_CONFIG_ENABLE, $enableRichQuotes, [], $label);
 
         $additionalFormItemHTML .= "<li class='form-group js-richFormGroup Hidden' data-formatter-type='Rich'>$formToggle</li>";
         return $additionalFormItemHTML;

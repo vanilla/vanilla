@@ -186,7 +186,7 @@ export function spoiler() {
     );
 }
 
-export function emojiGroup_smileysPeople(group = "smileys_people") {
+export function emojiGroup_smileysPeople(group = "smileys-people") {
     return (
         <svg className="emojiGroup-icon" viewBox="0 0 24 24">
             <title>{t(group)}</title>

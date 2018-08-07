@@ -117,7 +117,7 @@ export default class CollapsableUserContent extends React.PureComponent<IProps, 
 
         return {
             height: finalMaxHeight,
-            needsCollapser: true,
+            needsCollapser: finalMaxHeight > this.props.preferredMaxHeight,
         };
     }
 

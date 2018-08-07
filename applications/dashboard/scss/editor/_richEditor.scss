@@ -344,6 +344,14 @@ $richEditor-mobileEmbedBreakPoint                 : 550px !default;
     .Footer {
         display: flex;
     }
+
+    &.FlyoutMenu {
+        top: auto !important;
+        padding: {
+            top: 0;
+            bottom: 0;
+        }
+    }
 }
 
 .richEditorFlyout-header {
@@ -357,9 +365,14 @@ $richEditor-mobileEmbedBreakPoint                 : 550px !default;
 
 .richEditorFlyout-footer {
     padding: {
+        top: $richEditor-flyout_paddingVertical;
         bottom: $richEditor-flyout_paddingVertical;
         left: $richEditor-flyout_paddingHorizontal;
         right: $richEditor-flyout_paddingHorizontal;
+    }
+
+    &.insertEmoji-footer {
+        padding: 0;
     }
 }
 
@@ -368,6 +381,8 @@ $richEditor-mobileEmbedBreakPoint                 : 550px !default;
     margin: 0;
     max-width: calc(100% - #{$richEditor-menuButton_size});
     min-height: #{$richEditor-menuButton_size - $richEditor-flyout_paddingVertical};
+    font-size: 100%;
+    line-height: inherit;
 
     &:focus {
         outline: 0;
@@ -423,10 +438,6 @@ $richEditor-mobileEmbedBreakPoint                 : 550px !default;
     &.insertEmoji {
         margin-left: -$richEditor-menu_borderWidth;
     }
-}
-
-.richEditorFlyout-title {
-    font-size: 100%;
 }
 
 .richEditor-insertEmoji {
@@ -667,6 +678,7 @@ body.hasRichEditor {
                 }
 
                 .richEditor {
+                    padding-right: 0;
                     padding-left: 0;
                 }
             }
@@ -683,3 +695,6 @@ body.isMobile {
 @include mediaQuery-richEditor_mobile {
     @include richEditorMobileStyles();
 }
+
+
+

@@ -1127,6 +1127,12 @@ label.checkbox input.checkbox-input {
   display: flex;
 }
 
+.richEditorFlyout.FlyoutMenu {
+  top: auto !important;
+  padding-top: 0;
+  padding-bottom: 0;
+}
+
 .richEditorFlyout-header {
   padding-top: 6px;
   padding-right: 12px;
@@ -1135,9 +1141,14 @@ label.checkbox input.checkbox-input {
 }
 
 .richEditorFlyout-footer {
+  padding-top: 12px;
   padding-bottom: 12px;
   padding-left: 12px;
   padding-right: 12px;
+}
+
+.richEditorFlyout-footer.insertEmoji-footer {
+  padding: 0;
 }
 
 .richEditorFlyout-title {
@@ -1150,6 +1161,8 @@ label.checkbox input.checkbox-input {
   max-width: -webkit-calc(100% - 36px);
   max-width: calc(100% - 36px);
   min-height: 24px;
+  font-size: 100%;
+  line-height: inherit;
 }
 
 .richEditorFlyout-title:focus {
@@ -1210,10 +1223,6 @@ label.checkbox input.checkbox-input {
 
 .richEditor-menu.richEditorFlyout.insertEmoji {
   margin-left: -1px;
-}
-
-.richEditorFlyout-title {
-  font-size: 100%;
 }
 
 .richEditor-insertEmoji {
@@ -1449,6 +1458,7 @@ body.hasRichEditor #Form_Preview {
   body.hasRichEditor #GroupForm .FormWrapper .richEditor,
   body.hasRichEditor #MessageForm .FormWrapper .richEditor,
   body.hasRichEditor #ConversationForm .FormWrapper .richEditor {
+    padding-right: 0;
     padding-left: 0;
   }
 }

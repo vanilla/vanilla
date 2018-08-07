@@ -227,7 +227,6 @@ export class EmojiPicker extends React.PureComponent<IProps, IState> {
     private handleEmojiScroll = () => {
         this.setState({
             scrollToRow: -1,
-            emojiToFocusPosition: -1,
         });
     };
     private handleCategoryClick(event: React.MouseEvent<any>, categoryID: number) {

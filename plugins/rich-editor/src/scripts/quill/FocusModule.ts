@@ -369,8 +369,6 @@ export default class EmbedFocusModule extends Module {
                 const embed = Parchment.find(clickedElement);
                 if (embed instanceof FocusableEmbedBlot) {
                     embed.focus();
-                    event.preventDefault();
-                    event.stopPropagation();
                 }
             },
             this.quill.container,

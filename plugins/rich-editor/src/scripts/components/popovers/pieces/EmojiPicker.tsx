@@ -277,13 +277,12 @@ export class EmojiPicker extends React.PureComponent<IProps, IState> {
     private jumpIndex = (offset: number) => {
         const targetFocusPosition = this.keepEmojiIndexInBounds(this.state.activeIndex + offset);
         const targetRowPosition = this.getRowFromIndex(targetFocusPosition);
-        console.log("Target focus position", targetFocusPosition);
 
         let scrollToRow;
         if (targetRowPosition >= this.state.rowStartIndex + ROW_SIZE) {
             scrollToRow = this.keepRowIndexInBounds(targetRowPosition - ROW_SIZE + 1);
         } else if (targetRowPosition < this.state.rowStartIndex) {
-            scrollToRow = this.keepRowIndexInBounds(this.state.rowStartIndex - 1);
+            scrollToRow = targetRowPosition;
         }
         this.setState({ activeIndex: targetFocusPosition, scrollToRow }, () => {
             this.gridEl.forceUpdate();
@@ -343,7 +342,6 @@ export class EmojiPicker extends React.PureComponent<IProps, IState> {
      */
     private handleKeyDown = (event: KeyboardEvent) => {
         if (this.props.isVisible) {
-            console.log("Keydown", event);
             switch (event.code) {
                 case "PageUp":
                     event.preventDefault();

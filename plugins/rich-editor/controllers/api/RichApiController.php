@@ -21,7 +21,7 @@ class RichApiController extends AbstractApiController {
         $this->permission('Garden.SignIn.Allow');
 
         $in = $this->schema([
-            'body:s|a' => 'Raw post text to render as a rich post quote.',
+            'body:s' => 'Raw post text to render as a rich post quote.',
             'format:s' => 'The format to be used for rendering the text.',
         ], 'in')->setDescription('Create a rich-compatible HTML representation of a string for quoting.');
         $out = $this->schema([

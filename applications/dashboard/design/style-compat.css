@@ -2399,7 +2399,7 @@ body.isMobile .richEditorParagraphMenu {
   margin: 0;
   box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.3);
   padding: 15px;
-  background: rgba(255, 57, 52, 0.12);
+  background: #ffebeb;
   -webkit-transition: 0.2s ease box-shadow;
           transition: 0.2s ease box-shadow;
   cursor: pointer;

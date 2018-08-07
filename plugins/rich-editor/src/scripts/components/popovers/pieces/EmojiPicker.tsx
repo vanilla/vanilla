@@ -56,7 +56,7 @@ EMOJIS.forEach((data, key) => {
 // window.console.log("cellIndexesByGroupId: ", cellIndexesByGroupId);
 
 const emojiGroupLength = Object.values(EMOJI_GROUPS).length;
-const numberOfRows = getEmojiRowFromIndex(EMOJIS.length - 1);
+const numberOfRows = getEmojiRowFromIndex(EMOJIS.length + 1); // zero indexed
 
 interface IProps extends IWithEditorProps, IPopoverControllerChildParameters {
     contentID: string;
@@ -151,7 +151,7 @@ export class EmojiPicker extends React.PureComponent<IProps, IState> {
                         cellRenderer={this.cellRenderer}
                         columnCount={colSize}
                         columnWidth={buttonSize}
-                        rowCount={numberOfRows}
+                        rowCount={numberOfRows + 1}
                         rowHeight={buttonSize}
                         height={height}
                         width={width}
@@ -330,7 +330,7 @@ export class EmojiPicker extends React.PureComponent<IProps, IState> {
                 forceUpdate = true;
             }
 
-            const maxBottomRow = numberOfRows - colSize - 1;
+            const maxBottomRow = numberOfRows - colSize + 1;
             scrollToRow = Math.min(scrollToRow, maxBottomRow);
 
             this.setState(

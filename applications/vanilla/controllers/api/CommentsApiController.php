@@ -212,7 +212,6 @@ class CommentsApiController extends AbstractApiController {
         $comment['Url'] = commentUrl($comment);
         $isRich = $comment['Format'] === 'Rich';
         $comment['bodyRaw'] = $isRich ? json_decode($comment['Body'], true) : $comment['Body'];
-        $comment['Body'] = Gdn_Format::quoteEmbed($comment['bodyRaw'], $comment['Format']);
 
         $this->userModel->expandUsers($comment, ['InsertUserID'], ['expand' => true]);
         $result = $out->validate($comment);
@@ -227,13 +226,12 @@ class CommentsApiController extends AbstractApiController {
     private function quoteSchema(): Schema {
         return Schema::parse([
             'commentID:i' => 'The ID of the comment.',
-            'body:s' => 'The rendered embed body of the comment.',
+            'bodyRaw:s|a' => 'The raw body of the comment. This can be an array of rich operations or a string for other formats',
             'dateInserted:dt' => 'When the comment was created.',
             'dateUpdated:dt|n' => 'When the comment was last updated.',
             'insertUser' => $this->getUserFragmentSchema(),
             'url:s' => 'The full URL to the comment.',
             'format:s' => 'The original format of the comment',
-            'bodyRaw:s|a' => 'The raw body of the post or an array of operations for a rich post.',
         ]);
     }
 

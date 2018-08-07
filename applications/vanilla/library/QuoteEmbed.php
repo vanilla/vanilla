@@ -4,14 +4,12 @@
  * @license GPL-2.0
  */
 
-namespace Vanilla\Formatting\Embeds;
-
 use Garden\Web\Exception\NotFoundException;
 
 /**
  * Generic link embed.
  */
-class QuoteEmbed extends Embed {
+class QuoteEmbed extends Vanilla\Formatting\Embeds\Embed {
 
     protected $domains;
 
@@ -37,7 +35,10 @@ class QuoteEmbed extends Embed {
      */
     function matchUrl(string $url) {
         $path = parse_url($url)['path'];
-        $path = str_replace("/".\Gdn::request()->webRoot(), "", $path);
+        $webRoot = \Gdn::request()->webRoot();
+        if ($webRoot !== "") {
+            $path = str_replace("/$webRoot", "", $path);
+        }
 
         $idRegex = '/(^\/discussion\/(?<discussionID>\d+)|(\/discussion\/comment\/(?<commentID>\d+)))/i';
         preg_match($idRegex, $path, $matches);
@@ -77,7 +78,7 @@ class QuoteEmbed extends Embed {
         $bodyRaw = $attributes['bodyRaw'] ?? null;
         $format = $attributes['format'] ?? null;
         $sanitizedUrl = htmlspecialchars(\Gdn_Format::sanitizeUrl($url));
-        $attributes['body'] = \Gdn_Format::quoteEmbed($bodyRaw, $format);
+        $data['attributes']['body'] = \Gdn_Format::quoteEmbed($bodyRaw, $format);
         unset($data['attributes']['bodyRaw']);
         $jsonData = json_encode($data);
         $result = <<<HTML

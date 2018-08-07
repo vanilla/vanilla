@@ -10,6 +10,7 @@ import { onContent, t } from "@dashboard/application";
 import CollapsableUserContent from "@dashboard/app/user-content/collapsableContent";
 import uniqueId from "lodash/uniqueId";
 import classnames from "classnames";
+import api from "@dashboard/apiv2";
 
 export function initQuoteEmbeds() {
     registerEmbedComponent("quote", QuoteEmbed as any);
@@ -35,11 +36,13 @@ export function mountQuoteEmbeds() {
 
 interface IState {
     isCollapsed: boolean;
+    renderedBody: string;
 }
 
 export class QuoteEmbed extends React.Component<IEmbedProps<IEmbedData>> {
     public state: IState = {
         isCollapsed: true,
+        renderedBody: "",
     };
 
     public render() {
@@ -89,7 +92,7 @@ export class QuoteEmbed extends React.Component<IEmbedProps<IEmbedData>> {
                         <CollapsableUserContent
                             isCollapsed={this.state.isCollapsed}
                             id={id}
-                            dangerouslySetInnerHTML={{ __html: body }}
+                            dangerouslySetInnerHTML={{ __html: body ? body : this.state.renderedBody }}
                         />
                     </div>
                 </div>
@@ -98,7 +101,15 @@ export class QuoteEmbed extends React.Component<IEmbedProps<IEmbedData>> {
     }
 
     public componentDidMount() {
-        this.props.onRenderComplete();
+        console.log(this.props);
+        if (this.quoteData.body) {
+            this.props.onRenderComplete();
+        } else {
+            api.post("/rich/quote", { body: this.quoteData.bodyRaw, format: this.quoteData.format }).then(response => {
+                this.setState({ renderedBody: response.data.quote });
+                this.props.onRenderComplete();
+            });
+        }
     }
 
     private handleButtonClick = (event: React.ChangeEvent<HTMLInputElement>) => {

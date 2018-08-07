@@ -23,11 +23,11 @@ export interface ICommentEdit {
 export interface ICommentEmbed {
     commentID: number;
     type: "quote";
-    body: string;
     dateInserted: string;
     dateUpdated: string | null;
     insertUser: IUserFragment;
     url: string;
     format: string;
+    body?: string;
     bodyRaw: string;
 }

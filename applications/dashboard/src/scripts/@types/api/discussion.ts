@@ -34,11 +34,11 @@ export interface IDiscussionEmbed {
     discussionID: number;
     type: "quote";
     name: string;
-    body: string;
     dateInserted: string;
     dateUpdated: string | null;
     insertUser: IUserFragment;
     url: string;
     format: string;
+    body?: string;
     bodyRaw: string;
 }

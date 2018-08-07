@@ -335,7 +335,6 @@ class DiscussionsApiController extends AbstractApiController {
 
         $isRich = $discussion['Format'] === 'Rich';
         $discussion['bodyRaw'] = $isRich ? json_decode($discussion['Body'], true) : $discussion['Body'];
-        $discussion['Body'] = Gdn_Format::quoteEmbed($discussion['bodyRaw'], $discussion['Format']);
 
         $this->userModel->expandUsers($discussion, ['InsertUserID'], ['expand' => true]);
         $result = $out->validate($discussion);
@@ -351,13 +350,12 @@ class DiscussionsApiController extends AbstractApiController {
         return Schema::parse([
             'discussionID:i' => 'The ID of the discussion.',
             'name:s' => 'The title of the discussion',
-            'body:s' => 'The rendered embed body of the discussion.',
+            'bodyRaw:s|a' => 'The raw body of the discussion. This can be an array of rich operations or a string for other formats',
             'dateInserted:dt' => 'When the discussion was created.',
             'dateUpdated:dt|n' => 'When the discussion was last updated.',
             'insertUser' => $this->getUserFragmentSchema(),
             'url:s' => 'The full URL to the discussion.',
             'format:s' => 'The original format of the discussion',
-            'bodyRaw:s|a' => 'The raw body of the post or an array of operations for a rich post.',
         ]);
     }
 

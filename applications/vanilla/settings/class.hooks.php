@@ -8,10 +8,19 @@
  * @package Vanilla
  */
 
+use Garden\Container\Container;
+use Garden\Container\Reference;
+use Vanilla\Formatting\Embeds\EmbedManager;
+
 /**
  * Vanilla's event handlers.
  */
 class VanillaHooks implements Gdn_IPlugin {
+
+    public function container_init(Container $dic) {
+        $dic->rule(EmbedManager::class)
+            ->addCall('addEmbed', [new Reference(QuoteEmbed::class)]);
+    }
 
     /**
      * Counter rebuilding.

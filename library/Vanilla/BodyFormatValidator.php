@@ -73,12 +73,8 @@ class BodyFormatValidator {
                 unset($operations[$key]);
             }
 
-            // We need to remove the render HTML body.
-            $body = $op['insert']['embed-external']['data']['body'] ?? null;
-            if ($body !== null) {
-                unset($operations[$key]['insert']['embed-external']['data']['body']);
-            }
-
+            // Remove nested external embed data. We don't want it rendered and this will prevent it from being
+            // searched.
             $format = $op['insert']['embed-external']['data']['format'] ?? null;
             if ($format === 'Rich') {
                 $bodyRaw = $op['insert']['embed-external']['data']['bodyRaw'] ?? null;

@@ -122,7 +122,8 @@ button.Close {
 .userContent .code {
   display: inline-block;
   vertical-align: middle;
-  line-height: 1em;
+  line-height: inherit;
+  font-size: .9em;
   box-sizing: border-box;
   font-family: Menlo, Monaco, Consolas, "Courier New", monospace;
   max-width: 100%;
@@ -893,7 +894,7 @@ label.checkbox input.checkbox-input {
 }
 
 .richEditor-menuItems .richEditor-menuItem .richEditor-button.emojiChar-🇺🇳, .richEditor-menuItems .richEditor-menuItem.richEditor-button.emojiChar-🇺🇳 {
-  font-size: 14px;
+  font-size: 10px;
 }
 
 .richEditor-menuItems .richEditor-menuItem.isRightAligned {
@@ -1013,6 +1014,8 @@ label.checkbox input.checkbox-input {
 
 .richEditor-menuItem .richEditor-button, .richEditor-menuItem.richEditor-button {
   width: 36px;
+  height: 36px;
+  max-width: 36px;
   font-size: 22.1538461538px;
   line-height: 36px;
 }
@@ -1192,7 +1195,7 @@ label.checkbox input.checkbox-input {
 
 .insertEmoji-body {
   max-height: 100vh;
-  height: 270px;
+  height: 252px;
 }
 
 .content-wrapper {
@@ -2534,7 +2537,7 @@ body.isMobile .richEditorParagraphMenu {
   vertical-align: middle;
   text-align: center;
   height: 1em;
-  width: 1em;
+  max-width: 100%;
   line-height: 1em;
 }
 

@@ -8,6 +8,7 @@
 namespace Vanilla\Formatting\Quill\Blots;
 
 use Vanilla\Formatting\Quill\BlotGroup;
+use Vanilla\Formatting\Quill\Parser;
 
 /**
  * All blots extend AbstractBlot. Even formats. Blots map lightly to quill blots.
@@ -146,7 +147,7 @@ abstract class AbstractBlot {
         array $currentOperation,
         array $previousOperation = [],
         array $nextOperation = [],
-        string $parseMode
+        string $parseMode = Parser::PARSE_MODE_NORMAL
     ) {
         $this->previousOperation = $previousOperation;
         $this->currentOperation = $currentOperation;

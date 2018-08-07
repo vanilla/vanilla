@@ -8,6 +8,7 @@
 namespace Vanilla\Formatting\Quill\Blots;
 
 use Vanilla\Formatting\Quill\BlotGroup;
+use Vanilla\Formatting\Quill\Parser;
 
 class TextBlot extends AbstractBlot {
 
@@ -31,7 +32,7 @@ class TextBlot extends AbstractBlot {
         array $currentOperation,
         array $previousOperation,
         array $nextOperation,
-        string $parseMode
+        string $parseMode = Parser::PARSE_MODE_NORMAL
     ) {
         parent::__construct($currentOperation, $previousOperation, $nextOperation, $parseMode);
         $this->parseFormats($this->currentOperation, $this->previousOperation, $this->nextOperation);

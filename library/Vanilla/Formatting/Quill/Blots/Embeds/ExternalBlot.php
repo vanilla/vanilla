@@ -35,7 +35,7 @@ class ExternalBlot extends AbstractBlot {
         array $currentOperation,
         array $previousOperation,
         array $nextOperation,
-        string $parseMode
+        string $parseMode = Parser::PARSE_MODE_NORMAL
     ) {
         parent::__construct($currentOperation, $previousOperation, $nextOperation, $parseMode);
 

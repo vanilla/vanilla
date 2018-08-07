@@ -15,18 +15,9 @@ class QuoteEmbed extends Embed {
 
     protected $domains;
 
-    /** @var \DiscussionsApiController */
-    private $discussionsApiController;
-
-    /** @var \CommentsApiController */
-    private $commentsApiController;
-
-    public function __construct(\DiscussionsApiController $discussionsApiController,
-        \CommentsApiController $commentsApiController) {
+    public function __construct() {
         parent::__construct('quote', 'link');
         $this->domains = [parse_url(\Gdn::request()->domain())['host']];
-        $this->discussionsApiController = $discussionsApiController;
-        $this->commentsApiController = $commentsApiController;
     }
 
     /**
@@ -48,24 +39,29 @@ class QuoteEmbed extends Embed {
         $commentID = $matches['commentID'] ? (int) $matches['commentID'] : null;
         $discussionID = $matches['discussionID'] ? (int) $matches['discussionID'] : null;
 
-        try {
-            if ($commentID !== null) {
-                $data = $this->commentsApiController->get_quote($commentID);
-                return [
-                    "url" => $url,
-                    "type" => "quote",
-                    "attributes" => $data,
-                ];
-            } else if ($discussionID !== null) {
-                $data = $this->discussionsApiController->get_quote($discussionID);
-                return [
-                    "url" => $url,
-                    "type" => "quote",
-                    "attributes" => $data,
-                ];
+        if ($this->isNetworkEnabled()) {
+            $discussionsApiController = \Gdn::getContainer()->get(\DiscussionsApiController::class);
+            $commentsApiController = \Gdn::getContainer()->get(\CommentsApiController::class);
+
+            try {
+                if ($commentID !== null) {
+                    $data = $commentsApiController->get_quote($commentID);
+                    return [
+                        "url" => $url,
+                        "type" => "quote",
+                        "attributes" => $data,
+                    ];
+                } else if ($discussionID !== null) {
+                    $data = $discussionsApiController->get_quote($discussionID);
+                    return [
+                        "url" => $url,
+                        "type" => "quote",
+                        "attributes" => $data,
+                    ];
+                }
+            } catch (NotFoundException $e) {
+                return false;
             }
-        } catch (NotFoundException $e) {
-            return false;
         }
 
         return false;

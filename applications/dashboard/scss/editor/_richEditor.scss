@@ -157,12 +157,7 @@ $richEditor-mobileEmbedBreakPoint                 : 550px !default;
     list-style: none;
     padding: 0;
     -ms-overflow-style: -ms-autohiding-scrollbar;
-    margin: {
-        top: $formElement-borderWidth;
-        right: 0;
-        bottom: 0;
-        left: 0;
-    }
+    margin: 0;
 
     .richEditor-menuItem {
         display: block;
@@ -534,7 +529,7 @@ $richEditor-mobileEmbedBreakPoint                 : 550px !default;
         .richEditor-nubPosition {
             align-items: flex-end;
             transform: translateY(-50%) translateX(-50%);
-            margin-top: $richEditor-menu_borderWidth * 2;
+            margin-top: $richEditor-menu_borderWidth;
         }
         .richEditor-nub {
             transform: translateY(50%) rotate(-45deg);
@@ -716,6 +711,7 @@ body.hasRichEditor {
         &.Profile {
             .FormWrapper.FormWrapper-Condensed {
                 padding-right: $richEditor_horizontalPadding;
+                padding-left: 0;
 
                 .Activity {
                     .Buttons {

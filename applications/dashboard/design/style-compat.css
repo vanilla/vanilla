@@ -880,10 +880,7 @@ label.checkbox input.checkbox-input {
   list-style: none;
   padding: 0;
   -ms-overflow-style: -ms-autohiding-scrollbar;
-  margin-top: 1px;
-  margin-right: 0;
-  margin-bottom: 0;
-  margin-left: 0;
+  margin: 0;
 }
 
 .richEditor-menuItems .richEditor-menuItem {
@@ -1332,7 +1329,7 @@ label.checkbox input.checkbox-input {
   -webkit-transform: translateY(-50%) translateX(-50%);
       -ms-transform: translateY(-50%) translateX(-50%);
           transform: translateY(-50%) translateX(-50%);
-  margin-top: 2px;
+  margin-top: 1px;
 }
 
 .richEditor-inlineToolbarContainer.isDown .richEditor-nub {
@@ -1481,6 +1478,7 @@ body.hasRichEditor #Form_Preview {
   }
   body.hasRichEditor.Profile .FormWrapper.FormWrapper-Condensed {
     padding-right: 36px;
+    padding-left: 0;
   }
   body.hasRichEditor.Profile .FormWrapper.FormWrapper-Condensed .Activity .Buttons {
     padding-left: 36px;
@@ -1839,6 +1837,7 @@ body.isMobile .richEditorParagraphMenu {
 
 .spoiler-warningAfter,
 .spoiler-warningBefore {
+  line-height: 24px;
   margin: 0;
   padding: 0;
 }

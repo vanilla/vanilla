@@ -3,7 +3,6 @@ $spoiler-borderRadius: 2px !default;
 $spoiler-bg: #fff8d9 !default;
 $spoiler-fontSize: 16px !default;
 $spoiler-horizontalPadding: 18px !default;
-$spoiler-icon_size: 24px !default;
 $buttonSpoiler-fg: #555a62 !default;
 $buttonSpoiler-bg: transparent !default;
 $buttonSpoiler-hover_fg: #f52c6e !default;
@@ -76,7 +75,7 @@ $buttonSpoiler: (
     width: 100%;
     max-width: 100%;
     font-size: $spoiler-fontSize;
-    min-height: $spoiler-icon_size * 2;
+    min-height: $icon_default_size * 2;
     padding: 0 $spoiler-horizontalPadding;
     outline: 0;
     cursor: pointer;
@@ -89,15 +88,15 @@ $buttonSpoiler: (
     display: flex;
     box-sizing: border-box;
     justify-content: center;
-    padding: 0 $spoiler-icon_size;
+    padding: 0 $icon_default_size;
     width: 100%;
     line-height: 1;
 }
 
 .spoiler-icon {
     position: relative;
-    width: $spoiler-icon_size;
-    height: $spoiler-icon_size;
+    width: $icon_default_size;
+    height: $icon_default_size;
     margin-right: 12px;
 }
 
@@ -106,8 +105,8 @@ $buttonSpoiler: (
     top: 0;
     right: 0;
     bottom: 0;
-    width: $spoiler-icon_size * 1.5;
-    height: $spoiler-icon_size * 2;
+    width: $icon_default_size * 1.5;
+    height: $icon_default_size * 2;
     display: flex;
     align-items: center;
 }
@@ -115,6 +114,7 @@ $buttonSpoiler: (
 .spoiler-warningAfter,
 .spoiler-warningBefore
 {
+    line-height: $icon_default_size;
     margin: 0;
     padding: 0;
 }

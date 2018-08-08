@@ -37,6 +37,14 @@ class UtilityController extends DashboardController {
     ];
 
     /**
+     * UtilityController constructor.
+     */
+    public function __construct() {
+        parent::__construct();
+        $this->setHeader('Cache-Control', \Vanilla\Web\CacheControlMiddleware::NO_CACHE);
+    }
+
+    /**
      * Runs before every call to this controller.
      */
     public function initialize() {

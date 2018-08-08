@@ -64,6 +64,8 @@ class AuthenticateController extends Gdn_Controller {
         $this->sessionModel = $sessionModel;
         $this->ssoModel = $ssoModel;
         $this->userModel = $userModel;
+
+        $this->setHeader('Cache-Control', \Vanilla\Web\CacheControlMiddleware::NO_CACHE);
     }
 
     /**

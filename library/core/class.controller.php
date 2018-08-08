@@ -255,11 +255,13 @@ class Gdn_Controller extends Gdn_Pluggable {
 //         'Last-Modified' => gmdate('D, d M Y H:i:s') . ' GMT', // PREVENT PAGE CACHING: always modified (this can be overridden by specific controllers)
         ];
 
-        if (Gdn::session()->isValid()) {
+        if (Gdn::session()->isValid() || Gdn::request()->getMethod() !== 'GET') {
             $this->_Headers = array_merge($this->_Headers, [
-                'Cache-Control' => 'private, no-cache, max-age=0, must-revalidate', // PREVENT PAGE CACHING: HTTP/1.1
-                'Expires' => 'Sat, 01 Jan 2000 00:00:00 GMT', // Make sure the client always checks at the server before using it's cached copy.
-                'Pragma' => 'no-cache', // PREVENT PAGE CACHING: HTTP/1.0
+                'Cache-Control' => \Vanilla\Web\CacheControlMiddleware::NO_CACHE, // PREVENT PAGE CACHING: HTTP/1.1
+            ]);
+        } else {
+            $this->_Headers = array_merge($this->_Headers, [
+                'Cache-Control' => \Vanilla\Web\CacheControlMiddleware::PUBLIC_CACHE,
             ]);
         }
 
@@ -2010,13 +2012,19 @@ class Gdn_Controller extends Gdn_Pluggable {
     public function sendHeaders() {
         // TODO: ALWAYS RENDER OR REDIRECT FROM THE CONTROLLER OR HEADERS WILL NOT BE SENT!! PUT THIS IN DOCS!!!
         foreach ($this->_Headers as $name => $value) {
-            if ($name != 'Status') {
-                safeHeader($name.': '.$value, true);
+            if ($name !== 'Status') {
+                safeHeader("$name: $value", true);
             } else {
                 $code = array_shift($shift = explode(' ', $value));
-                safeHeader($name.': '.$value, true, $code);
+                safeHeader("$name: $value", true, $code);
             }
         }
+        if (!empty($this->_Headers['Cache-Control'])) {
+            foreach (\Vanilla\Web\CacheControlMiddleware::getHttp10Headers($this->_Headers['Cache-Control']) as $key => $value) {
+                safeHeader("$key: $value", true);
+            }
+        }
+
         // Empty the collection after sending
         $this->_Headers = [];
     }

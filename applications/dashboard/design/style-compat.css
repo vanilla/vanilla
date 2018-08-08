@@ -132,6 +132,7 @@ button.Close {
 
 .userContent .codeInline {
   display: inline-block;
+  white-space: normal;
 }
 
 .userContent .codeBlock {

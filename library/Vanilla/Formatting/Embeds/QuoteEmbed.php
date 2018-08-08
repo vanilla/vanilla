@@ -15,9 +15,27 @@ class QuoteEmbed extends Embed {
 
     protected $domains;
 
+    private $commentDiscussionIDRegex = '/(^\/discussion\/(?<discussionID>\d+)|(\/discussion\/comment\/(?<commentID>\d+)))/i';
+
     public function __construct() {
         parent::__construct('quote', 'link');
         $this->domains = [parse_url(\Gdn::request()->domain())['host']];
+    }
+
+    /**
+     * We only want to handle URLs that match our regex.
+     *
+     * @inheritdoc
+     */
+    public function canHandle(string $domain, string $url = null): bool {
+        $parentHandles = parent::canHandle($domain, $url);
+        if (!$parentHandles) {
+            return false;
+        }
+
+        $path = parse_url($url)['path'];
+        preg_match($this->commentDiscussionIDRegex, $path, $matches);
+        return (bool) $matches;
     }
 
     /**
@@ -33,8 +51,7 @@ class QuoteEmbed extends Embed {
             $path = str_replace("/$webRoot", "", $path);
         }
 
-        $idRegex = '/(^\/discussion\/(?<discussionID>\d+)|(\/discussion\/comment\/(?<commentID>\d+)))/i';
-        preg_match($idRegex, $path, $matches);
+        preg_match($this->commentDiscussionIDRegex, $path, $matches);
 
         $commentID = $matches['commentID'] ?? null ? (int) $matches['commentID'] : null;
         $discussionID = $matches['discussionID'] ?? null ? (int) $matches['discussionID'] : null;

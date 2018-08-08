@@ -1,4 +1,13 @@
 <?php
+/**
+ * @copyright 2009-2018 Vanilla Forums Inc.
+ * @license https://opensource.org/licenses/GPL-2.0 GPL-2.0
+ */
+
+// Dashboard
+$Definition['Enable Rich Quotes'] = 'Enable Rich Quotes';
+$Definition['RichEditor.QuoteEnable.Notes'] = 'Use the following option to enable quotes for the Rich Editor. This will only apply if the default formatter is "Rich".';
+
 // Long Descriptions
 $Definition['richEditor.description.title'] = 'Rich Text Editor.';
 $Definition['richEditor.description.paragraphMenu'] = 'To edit a paragraph\'s style, hit tab to get to the paragraph menu. From there you will be able to pick one style. Nothing defaults to paragraph.';

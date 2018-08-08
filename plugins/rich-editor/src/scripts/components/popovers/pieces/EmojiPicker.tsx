@@ -138,7 +138,6 @@ export class EmojiPicker extends React.PureComponent<IProps, IState> {
                         aria-readonly={undefined}
                         aria-label={""}
                         role={""}
-                        // onScroll={this.handleEmojiScroll}
                         onSectionRendered={this.handleOnSectionRendered}
                         ref={gridEl => {
                             this.gridEl = gridEl as Grid;

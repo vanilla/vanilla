@@ -125,7 +125,7 @@ export class QuoteEmbed extends React.Component<IEmbedProps<IEmbedData>, IState>
                                 onClick={this.toggleCollapseState}
                                 aria-pressed={this.state.isCollapsed}
                             >
-                                {this.state.isCollapsed ? <ChevronUpIcon /> : <ChevronDownIcon />}
+                                {this.state.isCollapsed ? <ChevronDownIcon /> : <ChevronUpIcon />}
                             </button>
                         )}
                     </div>

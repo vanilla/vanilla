@@ -98,10 +98,10 @@ export class QuoteEmbed extends React.Component<IEmbedProps<IEmbedData>, IState>
                             <label className={collapseIconClasses}>
                                 <span className="sr-only">{t("Collapse this quote")}</span>
                                 <input
-                                    type="checkbox"
+                                    type="button"
                                     className="sr-only"
-                                    onChange={this.toggleCollapseState}
-                                    checked={this.state.isCollapsed}
+                                    onClick={this.toggleCollapseState}
+                                    aria-pressed={this.state.isCollapsed}
                                 />
                             </label>
                         )}
@@ -152,10 +152,9 @@ export class QuoteEmbed extends React.Component<IEmbedProps<IEmbedData>, IState>
     /**
      * Toggle the state of whether or not we are collapsed.
      */
-    private toggleCollapseState = (event: React.ChangeEvent<HTMLInputElement>) => {
-        const target = event.target;
-        const value = target.type === "checkbox" ? target.checked : target.value;
-        this.setState({ isCollapsed: !!value });
+    private toggleCollapseState = (event: React.ChangeEvent<any>) => {
+        event.preventDefault();
+        this.setState({ isCollapsed: !this.state.isCollapsed });
     };
 
     /**

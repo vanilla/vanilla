@@ -291,6 +291,7 @@ $richEditor-mobileEmbedBreakPoint                 : 550px !default;
     display: block;
     width: 100%;
     padding: $richEditor-embedMenu_padding;
+    margin-top: $formElement-borderWidth;
 }
 
 .richEditorButton-icon {

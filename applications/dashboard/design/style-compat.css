@@ -1053,6 +1053,7 @@ label.checkbox input.checkbox-input {
   display: block;
   width: 100%;
   padding: 0;
+  margin-top: 1px;
 }
 
 .richEditorButton-icon {

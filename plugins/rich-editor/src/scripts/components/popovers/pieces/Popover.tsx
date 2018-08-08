@@ -44,7 +44,7 @@ export default class Popover extends React.Component<IProps, IState> {
     public render() {
         const { additionalClassRoot } = this.props;
 
-        let classes = classNames("richEditor-menu", "FlyoutMenu", "richEditorFlyout", {
+        let classes = classNames("richEditor-menu", "richEditorFlyout", {
             [additionalClassRoot as any]: !!additionalClassRoot,
             isHidden: !this.props.isVisible,
         });
@@ -59,7 +59,7 @@ export default class Popover extends React.Component<IProps, IState> {
             [additionalClassRoot + "-body"]: !!additionalClassRoot,
         });
 
-        const footerClasses = classNames("richEditorFlyout-selfPaddedFooter", {
+        const footerClasses = classNames("richEditorFlyout-footer", {
             [additionalClassRoot + "-footer"]: !!additionalClassRoot,
         });
 
@@ -89,7 +89,7 @@ export default class Popover extends React.Component<IProps, IState> {
                     <h2
                         id={this.props.titleID}
                         tabIndex={-1}
-                        className="H richEditorFlyout-title"
+                        className="richEditorFlyout-title"
                         ref={this.props.titleRef}
                     >
                         {this.props.title}

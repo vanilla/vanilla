@@ -9,7 +9,7 @@
         <div class="richEditor-textWrap">
             <div class="ql-editor richEditor-text userContent isDisabled" data-gramm="false" contenteditable="false" disabled="disabled" data-placeholder="Create a new post..." tabindex="0"></div>
         </div>
-        <div class="richEditor-menu richEditor-embedBar">
+        <div class="richEditor-embedBar">
             <ul class="richEditor-menuItems" role="menubar" aria-label="{t c="Inline Level Formatting Menu"}">
                 <li class="richEditor-menuItem u-richEditorHiddenOnMobile" role="menuitem">
                     <button class="richEditor-button richEditor-embedButton" type="button" aria-pressed="false" disabled="disabled">

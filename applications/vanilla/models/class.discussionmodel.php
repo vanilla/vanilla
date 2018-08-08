@@ -101,11 +101,10 @@ class DiscussionModel extends Gdn_Model {
     /**
      * Class constructor. Defines the related database table name.
      *
-     * @since 2.0.0
-     * @access public
+     * @param Gdn_Validation $validation The validation dependency.
      */
-    public function __construct() {
-        parent::__construct('Discussion');
+    public function __construct(Gdn_Validation $validation = null) {
+        parent::__construct('Discussion', $validation);
         $this->floodGate = FloodControlHelper::configure($this, 'Vanilla', 'Discussion');
     }
 
@@ -2188,7 +2187,11 @@ class DiscussionModel extends Gdn_Model {
                     }
 
                     // Notify all of the users that were mentioned in the discussion.
-                    $usernames = getMentions($discussionName.' '.$story);
+                    if ($fields['Format'] === "Rich") {
+                        $usernames = Gdn_Format::getRichMentionUsernames($fields['Body']);
+                    } else {
+                        $usernames = getMentions($discussionName.' '.$story);
+                    }
 
                     // Use our generic Activity for events, not mentions
                     $this->EventArguments['Activity'] = $activity;

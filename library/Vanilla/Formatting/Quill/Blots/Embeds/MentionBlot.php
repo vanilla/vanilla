@@ -12,12 +12,25 @@ namespace Vanilla\Formatting\Quill\Blots\Embeds;
  */
 class MentionBlot extends AbstractInlineEmbedBlot {
 
+    /** @var string */
+    private $username;
+
     /**
      * Prepend an @ onto the text content of the blot.
      */
     public function __construct(array $currentOperation, array $previousOperation, array $nextOperation) {
         parent::__construct($currentOperation, $previousOperation, $nextOperation);
-        $this->content = "@".$this->content;
+        $this->username = $this->content;
+        $this->content = "@".$this->username;
+    }
+
+    /**
+     * Return the username for the mention.
+     *
+     * @return string
+     */
+    public function getUsername(): string {
+        return $this->username;
     }
 
     /**

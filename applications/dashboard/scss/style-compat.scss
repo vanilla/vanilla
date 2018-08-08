@@ -10,6 +10,9 @@
 @import "compatibility/image-cropper";
 @import "compatibility/buttons";
 @import "compatibility/categories";
+@import "compatibility/groups";
+@import "compatibility/codeBlocks";
+
 
 // This should always be added after style.css and not be overridden.
 @import "new-components/authenticateUser";
@@ -22,9 +25,11 @@
 @import "new-components/pageHeading";
 
 // Editor
-@import "editor/variables";
 @import "editor/mixins";
+@import "editor/animations";
 @import "editor/richEditor";
+@import "editor/atMention";
+@import "editor/blockquote";
 @import "editor/accessibility";
 @import "editor/spoiler";
 @import "editor/embeds/embeds";

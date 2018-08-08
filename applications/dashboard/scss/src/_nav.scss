@@ -51,7 +51,7 @@
 
   .nav-item-title {
     line-height: 1;
-    font-weight: 500;
+    font-weight: 600;
     margin-bottom: to-rem(6);
   }
 
@@ -64,7 +64,8 @@
     display: flex;
     justify-items: flex-start;
     align-items: center;
-    padding: $spacer $padding-row;
+    padding: 3px $padding-row;
+    line-height: 20px;
     color: $grey-dark;
     transition: background-color .1s;
 
@@ -172,7 +173,7 @@
     padding-left: .75rem;
     border-bottom: 1px dotted rgba(0,0,0,.0875);
     font-size: $font-size-sm;
-    font-weight: 500;
+    font-weight: 600;
     text-transform: uppercase;
     text-decoration: none;
 
@@ -243,11 +244,9 @@
     padding: 2px 4px;
     border-radius: 3px;
     vertical-align: middle;
-    font-weight: normal;
   }
 
   .nav-link {
-    font-weight: 300;
 
     &.active {
       border-radius: $nav-pills-panel-border-radius;

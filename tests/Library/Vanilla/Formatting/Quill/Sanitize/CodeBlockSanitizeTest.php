@@ -15,12 +15,12 @@ class CodeBlockSanitizeTest extends SanitizeTest {
         $operations = [
             ["insert" => $content],
             [
-                "attributes" => ["code-block" => true],
+                "attributes" => ["codeBlock" => true],
                 "insert" => "\n"
             ],
             ["insert" => $content],
             [
-                "attributes" => ["code-block" => true],
+                "attributes" => ["codeBlock" => true],
                 "insert" => "$content"
             ]
         ];

@@ -58,7 +58,6 @@
 
   .info {
     font-size: $font-size-tables;
-    font-weight: 300;
   }
 
   .flag {
@@ -71,7 +70,6 @@
   }
 
   .media-description {
-    font-weight: 300;
   }
 
   .media-image {
@@ -116,7 +114,7 @@
   padding: $spacer $padding-row;
 
   .media-title {
-    font-weight: 500;
+    font-weight: 600;
     margin-bottom: $spacer / 4;
     margin-top: 0;
   }

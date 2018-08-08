@@ -18,12 +18,11 @@ class GettySanitizeTest extends SanitizeTest {
             [
                 "insert" => [
                     "embed-external" => [
-                        $content => "bad stuff",
-                        "url" => null,
+                        "url" => $content,
                         "type" => "getty",
-                        "name" => null,
-                        "body" => null,
-                        "photoUrl" => null,
+                        "name" => $content,
+                        "body" => $content,
+                        "photoUrl" => $content,
                         "height" => $content,
                         "width" => $content,
                         "attributes" => [
@@ -32,13 +31,13 @@ class GettySanitizeTest extends SanitizeTest {
                             'items' => $content,
                             'isCaptioned' => $content,
                             'is360' => $content,
-                            'tld'=> $content,
+                            'tld' => $content,
                             'postID' => $content,
                         ],
-                    ]
-                ]
+                    ],
+                ],
             ],
-            ["insert" => "\n"]
+            ["insert" => "\n"],
         ];
 
         return $operations;

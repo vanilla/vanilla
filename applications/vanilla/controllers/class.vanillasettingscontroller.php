@@ -40,11 +40,26 @@ class VanillaSettingsController extends Gdn_Controller {
         // Check permission
         $this->permission('Garden.Settings.Manage');
 
+        /** @var \Garden\EventManager $eventManager */
+        $eventManager = Gdn::getContainer()->get(\Garden\EventManager::class);
+
+        $initialFormats = ['Text']; // Check for additional formats
+        $formats = $eventManager->fireFilter("getPostFormats", $initialFormats);
+
+        // This was moved from the editor plugin. In order to maintain compatibility with existing event hooks
+        // We will need to fire this as EditorPlugin.
+        $eventManager->fireDeprecated("editorPlugin_getFormats", null, ['Formats' => &$formats]);
+
+        $this->setData('formats', $formats);
+
         // Load up config options we'll be setting
         $validation = new Gdn_Validation();
         $configurationModel = new Gdn_ConfigurationModel($validation);
+
         $configurationModel->setField([
             'Vanilla.Categories.MaxDisplayDepth',
+            'Garden.InputFormatter',
+            'Garden.MobileInputFormatter',
             'Vanilla.Discussions.PerPage',
             'Vanilla.Comments.PerPage',
             'Garden.Html.AllowedElements',
@@ -70,7 +85,8 @@ class VanillaSettingsController extends Gdn_Controller {
             $this->Form->setFormValue('Garden.Format.DisableUrlEmbeds', !$disableUrlEmbeds);
 
             // Define some validation rules for the fields being saved
-            $configurationModel->Validation->applyRule('Vanilla.Categories.MaxDisplayDepth', 'Required');
+            $configurationModel->Validation->applyRule('Garden.InputFormatter', 'Required');
+            $configurationModel->Validation->applyRule('Garden.MobileInputFormatter', 'Required');
             $configurationModel->Validation->applyRule('Vanilla.Categories.MaxDisplayDepth', 'Integer');
             $configurationModel->Validation->applyRule('Vanilla.Discussions.PerPage', 'Required');
             $configurationModel->Validation->applyRule('Vanilla.Discussions.PerPage', 'Integer');
@@ -86,6 +102,13 @@ class VanillaSettingsController extends Gdn_Controller {
                 $this->informMessage(t("Your changes have been saved."));
             }
         }
+
+        // Fire an filter event gather extra form HTML for specific format items.
+        // The form is added so the form can be enhanced and the config model needs to passed to add extra fields.
+        $extraFormatFormHTML = $eventManager->fireFilter('postingSettings_formatSpecificFormItems', "",
+            $this->Form,
+            $configurationModel);
+        $this->setData('extraFormatFormHTML', $extraFormatFormHTML);
 
         $this->setHighlightRoute('vanilla/settings/posting');
         $this->addJsFile('settings.js');

@@ -107,9 +107,11 @@ class EmbedManagerTest extends SharedBootstrapTestCase {
                 ],
 '<div class="embedExternal embedImage">
     <div class="embedExternal-content">
-        <img class="embedImage-img" src="https://vanillaforums.com/images/metaIcons/vanillaForums.png">
+        <a class="embedImage-link" href="https://vanillaforums.com/images/metaIcons/vanillaForums.png" rel="nofollow noopener" target="_blank">
+            <img class="embedImage-img" src="https://vanillaforums.com/images/metaIcons/vanillaForums.png">
+        </a>
     </div>
-</div>',
+</div>'
             ],
             [
                 [
@@ -131,41 +133,196 @@ class EmbedManagerTest extends SharedBootstrapTestCase {
                     ]
                 ],
 '<div class="embedExternal embedGetty">
-    <a
-        class="embedExternal-content gie-single js-gettyEmbed"
-        href="//www.gettyimages.com/detail/460707851"
-        id="CdkwD1KlQeN8rV9xoKzSAg"
-        data-height="337"
-        data-width="508"
-        data-sig="OSznWQvhySQdibOA7WcaeKbc1T3SnuazaIvfwlTLyq0="
-        data-items="460707851"
-        data-capt=""
-        data-tld="com"
-        data-i360="">
-        https://www.gettyimages.ca/license/460707851
-    </a>
+    <div class="embedExternal-content">
+        <a
+            class="embedExternal-content gie-single js-gettyEmbed"
+            href="//www.gettyimages.com/detail/460707851"
+            id="CdkwD1KlQeN8rV9xoKzSAg"
+            data-height="337"
+            data-width="508"
+            data-sig="OSznWQvhySQdibOA7WcaeKbc1T3SnuazaIvfwlTLyq0="
+            data-items="460707851"
+            data-capt=""
+            data-tld="com"
+            data-i360="">
+            https://www.gettyimages.ca/license/460707851
+        </a>
+    </div>
 </div>',
             ],
             [
                 [
                     "url" => "https://vanillaforums.com",
                     "type" => "link",
-                    "name" => "Online Community Software and Customer Forum Software by Vanilla Forums",
+                    "name" => "Online Community Software and Customer Forum Software by Vanilla Forums - Embed Link 1",
                     "body" => "Engage your customers with a vibrant and modern online customer community forum. A customer community helps to increases loyalty, reduce support costs and deliver feedback.",
                     "photoUrl" => "https://vanillaforums.com/images/metaIcons/vanillaForums.png",
                     "height" => null,
                     "width" => null,
                     "attributes" => []
                 ],
-'<a class="embedExternal embedLink" href="https://vanillaforums.com" rel="noopener noreferrer">
+                '<a class="embedExternal embedLink" href="https://vanillaforums.com" rel="noopener noreferrer">
     <div class="embedExternal-content">
         <article class="embedLink-body">
-            <div class="embedLink-image" aria-hidden="true" style="background-image: url(\'https\00003a\00002f\00002fvanillaforums\00002ecom\00002fimages\00002fmetaIcons\00002fvanillaForums\00002epng\');"></div>
+            <img src=\'https://vanillaforums.com/images/metaIcons/vanillaForums.png\' class=\'embedLink-image\' aria-hidden=\'true\'>
             <div class="embedLink-main">
                 <div class="embedLink-header">
-                    <h3 class="embedLink-title">Online Community Software and Customer Forum Software by Vanilla Forums</h3>
-                    <div class="embedLink-excerpt">Engage your customers with a vibrant and modern online customer community forum. A customer community helps to increases loyalty, reduce support costs and deliver feedback.</div>
+                    <h3 class="embedLink-title">Online Community Software and Customer Forum Software by Vanilla Forums - Embed Link 1</h3>
+                    
+                    
+                    
+                    <span class="embedLink-source meta">https://vanillaforums.com</span>
                 </div>
+                <div class="embedLink-excerpt">Engage your customers with a vibrant and modern online customer community forum. A customer community helps to increases loyalty, reduce support costs and deliver feedback.</div>
+            </div>
+        </article>
+    </div>
+</a>',
+            ],
+            [
+                [
+                    "url" => "https://vanillaforums.com",
+                    "type" => "link",
+                    "name" => "Online Community Software and Customer Forum Software by Vanilla Forums - Embed Link 2",
+                    "body" => "Engage your customers with a vibrant and modern online customer community forum. A customer community helps to increases loyalty, reduce support costs and deliver feedback.",
+                    "height" => null,
+                    "width" => null,
+                    "attributes" => []
+                ],
+                '<a class="embedExternal embedLink" href="https://vanillaforums.com" rel="noopener noreferrer">
+    <div class="embedExternal-content">
+        <article class="embedLink-body">
+            
+            <div class="embedLink-main">
+                <div class="embedLink-header">
+                    <h3 class="embedLink-title">Online Community Software and Customer Forum Software by Vanilla Forums - Embed Link 2</h3>
+                    
+                    
+                    
+                    <span class="embedLink-source meta">https://vanillaforums.com</span>
+                </div>
+                <div class="embedLink-excerpt">Engage your customers with a vibrant and modern online customer community forum. A customer community helps to increases loyalty, reduce support costs and deliver feedback.</div>
+            </div>
+        </article>
+    </div>
+</a>',
+            ],
+            [
+                [
+                    "url" => "https://vanillaforums.com",
+                    "type" => "link",
+                    "name" => "Online Community Software and Customer Forum Software by Vanilla Forums - Embed Link 3",
+                    "body" => "Engage your customers with a vibrant and modern online customer community forum. A customer community helps to increases loyalty, reduce support costs and deliver feedback.",
+                    "photoUrl" => "https://vanillaforums.com/images/metaIcons/vanillaForums.png",
+                    "userPhoto" => "https://secure.gravatar.com/avatar/b0420af06d6fecc16fc88a88cbea8218/?default=https%3A%2F%2Fvanillicon.com%2Fb0420af06d6fecc16fc88a88cbea8218_100.png&rating=g&size=100",
+                    "userName" => "Linc",
+                    "height" => null,
+                    "width" => null,
+                    "attributes" => []
+                ],
+                '<a class="embedExternal embedLink" href="https://vanillaforums.com" rel="noopener noreferrer">
+    <div class="embedExternal-content">
+        <article class="embedLink-body">
+            <img src=\'https://vanillaforums.com/images/metaIcons/vanillaForums.png\' class=\'embedLink-image\' aria-hidden=\'true\'>
+            <div class="embedLink-main">
+                <div class="embedLink-header">
+                    <h3 class="embedLink-title">Online Community Software and Customer Forum Software by Vanilla Forums - Embed Link 3</h3>
+                    <span class="embedLink-userPhoto PhotoWrap"><img src="https://secure.gravatar.com/avatar/b0420af06d6fecc16fc88a88cbea8218/?default=https%3A%2F%2Fvanillicon.com%2Fb0420af06d6fecc16fc88a88cbea8218_100.png&amp;rating=g&amp;size=100" alt="Linc" class="ProfilePhoto ProfilePhotoMedium" /></span>
+                    <span class="embedLink-userName">Linc</span>
+                    
+                    <span class="embedLink-source meta">https://vanillaforums.com</span>
+                </div>
+                <div class="embedLink-excerpt">Engage your customers with a vibrant and modern online customer community forum. A customer community helps to increases loyalty, reduce support costs and deliver feedback.</div>
+            </div>
+        </article>
+    </div>
+</a>',
+            ],
+            [
+                [
+                    "url" => "https://vanillaforums.com",
+                    "type" => "link",
+                    "name" => "Online Community Software and Customer Forum Software by Vanilla Forums - Embed Link 4",
+                    "body" => "Engage your customers with a vibrant and modern online customer community forum. A customer community helps to increases loyalty, reduce support costs and deliver feedback.",
+                    "photoUrl" => "https://vanillaforums.com/images/metaIcons/vanillaForums.png",
+                    "timestamp" => "2018-07-30",
+                    "humanTime" => "July 30th 2018",
+                    "height" => null,
+                    "width" => null,
+                    "attributes" => []
+                ],
+                '<a class="embedExternal embedLink" href="https://vanillaforums.com" rel="noopener noreferrer">
+    <div class="embedExternal-content">
+        <article class="embedLink-body">
+            <img src=\'https://vanillaforums.com/images/metaIcons/vanillaForums.png\' class=\'embedLink-image\' aria-hidden=\'true\'>
+            <div class="embedLink-main">
+                <div class="embedLink-header">
+                    <h3 class="embedLink-title">Online Community Software and Customer Forum Software by Vanilla Forums - Embed Link 4</h3>
+                    
+                    
+                    <time class="embedLink-dateTime meta" dateTime="2018-07-30">July 30th 2018</time>
+                    <span class="embedLink-source meta">https://vanillaforums.com</span>
+                </div>
+                <div class="embedLink-excerpt">Engage your customers with a vibrant and modern online customer community forum. A customer community helps to increases loyalty, reduce support costs and deliver feedback.</div>
+            </div>
+        </article>
+    </div>
+</a>',
+            ],
+            [
+                [
+                    "url" => "https://vanillaforums.com",
+                    "type" => "link",
+                    "name" => "Online Community Software and Customer Forum Software by Vanilla Forums - Embed Link 5",
+                    "body" => "Engage your customers with a vibrant and modern online customer community forum. A customer community helps to increases loyalty, reduce support costs and deliver feedback.",
+                    "photoUrl" => "https://vanillaforums.com/images/metaIcons/vanillaForums.png",
+                    "timestamp" => "2018-07-30",
+                    "humanTime" => "July 30th 2018",
+                    "height" => null,
+                    "width" => null,
+                    "attributes" => []
+                ],
+                '<a class="embedExternal embedLink" href="https://vanillaforums.com" rel="noopener noreferrer">
+    <div class="embedExternal-content">
+        <article class="embedLink-body">
+            <img src=\'https://vanillaforums.com/images/metaIcons/vanillaForums.png\' class=\'embedLink-image\' aria-hidden=\'true\'>
+            <div class="embedLink-main">
+                <div class="embedLink-header">
+                    <h3 class="embedLink-title">Online Community Software and Customer Forum Software by Vanilla Forums - Embed Link 5</h3>
+                    
+                    
+                    <time class="embedLink-dateTime meta" dateTime="2018-07-30">July 30th 2018</time>
+                    <span class="embedLink-source meta">https://vanillaforums.com</span>
+                </div>
+                <div class="embedLink-excerpt">Engage your customers with a vibrant and modern online customer community forum. A customer community helps to increases loyalty, reduce support costs and deliver feedback.</div>
+            </div>
+        </article>
+    </div>
+</a>',
+            ],
+            [
+                [
+                    "url" => "https://vanillaforums.com",
+                    "type" => "link",
+                    "name" => "Online Community Software and Customer Forum Software by Vanilla Forums - Embed Link 6",
+                    "body" => "Engage your customers with a vibrant and modern online customer community forum. A customer community helps to increases loyalty, reduce support costs and deliver feedback.",
+                    "height" => null,
+                    "width" => null,
+                    "attributes" => []
+                ],
+                '<a class="embedExternal embedLink" href="https://vanillaforums.com" rel="noopener noreferrer">
+    <div class="embedExternal-content">
+        <article class="embedLink-body">
+            
+            <div class="embedLink-main">
+                <div class="embedLink-header">
+                    <h3 class="embedLink-title">Online Community Software and Customer Forum Software by Vanilla Forums - Embed Link 6</h3>
+                    
+                    
+                    
+                    <span class="embedLink-source meta">https://vanillaforums.com</span>
+                </div>
+                <div class="embedLink-excerpt">Engage your customers with a vibrant and modern online customer community forum. A customer community helps to increases loyalty, reduce support costs and deliver feedback.</div>
             </div>
         </article>
     </div>
@@ -323,7 +480,9 @@ class EmbedManagerTest extends SharedBootstrapTestCase {
                 '<div class="embedExternal embedVideo">
     <div class="embedExternal-content">
         <div class="embedVideo-ratio" style="padding-top: 56.2%;">
-            <button type="button" data-url="https://player.twitch.tv/?video=v276279462" aria-label="20k Fortnite Friday Duos with @hysteria | 2 MINUTE STREAM DELAY" class="embedVideo-playButton iconButton js-playVideo" style="background-image: url(https://static-cdn.jtvnw.net/s3_vods/8a24223c5b12ff7427a8_ninja_29190875424_893099877/thumb/thumb0-640x360.jpg);" title="20k Fortnite Friday Duos with @hysteria | 2 MINUTE STREAM DELAY">
+            <button type="button" data-url="https://player.twitch.tv/?video=v276279462" aria-label="20k Fortnite Friday Duos with @hysteria | 2 MINUTE STREAM DELAY" class="embedVideo-playButton iconButton js-playVideo" title="20k Fortnite Friday Duos with @hysteria | 2 MINUTE STREAM DELAY">
+                <img class="embedVideo-thumbnail" src="https://static-cdn.jtvnw.net/s3_vods/8a24223c5b12ff7427a8_ninja_29190875424_893099877/thumb/thumb0-640x360.jpg" role="presentation" alt="A thumnail preview of a video"/>
+                <span class="videoEmbed-scrim"/>
                 '.$this->playButtonSVG.'
             </button>
         </div>
@@ -388,7 +547,9 @@ class EmbedManagerTest extends SharedBootstrapTestCase {
 '<div class="embedExternal embedVideo">
     <div class="embedExternal-content">
         <div class="embedVideo-ratio is16by9" style="">
-            <button type="button" data-url="https://www.youtube.com/embed/9bZkp7q19f0?feature=oembed&amp;autoplay=1" aria-label="YouTube" class="embedVideo-playButton iconButton js-playVideo" style="background-image: url(https://img.youtube.com/vi/9bZkp7q19f0/0.jpg);" title="YouTube">
+            <button type="button" data-url="https://www.youtube.com/embed/9bZkp7q19f0?feature=oembed&amp;autoplay=1" aria-label="YouTube" class="embedVideo-playButton iconButton js-playVideo" title="YouTube">
+                <img class="embedVideo-thumbnail" src="https://img.youtube.com/vi/9bZkp7q19f0/0.jpg" role="presentation" alt="A thumnail preview of a video"/>
+                <span class="videoEmbed-scrim"/>
                 '.$this->playButtonSVG.'
             </button>
         </div>
@@ -414,7 +575,9 @@ class EmbedManagerTest extends SharedBootstrapTestCase {
 '<div class="embedExternal embedVideo">
     <div class="embedExternal-content">
         <div class="embedVideo-ratio" style="padding-top: 42.5%;">
-            <button type="button" data-url="https://player.vimeo.com/video/264197456?autoplay=1" aria-label="Vimeo" class="embedVideo-playButton iconButton js-playVideo" style="background-image: url(https://i.vimeocdn.com/video/694532899_640.jpg);" title="Vimeo">
+            <button type="button" data-url="https://player.vimeo.com/video/264197456?autoplay=1" aria-label="Vimeo" class="embedVideo-playButton iconButton js-playVideo" title="Vimeo">
+                <img class="embedVideo-thumbnail" src="https://i.vimeocdn.com/video/694532899_640.jpg" role="presentation" alt="A thumnail preview of a video"/>
+                <span class="videoEmbed-scrim"/>
                 '.$this->playButtonSVG.'
             </button>
         </div>
@@ -440,7 +603,9 @@ class EmbedManagerTest extends SharedBootstrapTestCase {
 '<div class="embedExternal embedVideo">
     <div class="embedExternal-content">
         <div class="embedVideo-ratio is16by9" style="">
-            <button type="button" data-url="https://fast.wistia.net/embed/iframe/0k5h1g1chs" aria-label="Lenny Delivers a Video - oEmbed" class="embedVideo-playButton iconButton js-playVideo" style="background-image: url(https://embed-ssl.wistia.com/deliveries/99f3aefb8d55eef2d16583886f610ebedd1c6734.jpg?image_crop_resized=960x540);" title="Lenny Delivers a Video - oEmbed">
+            <button type="button" data-url="https://fast.wistia.net/embed/iframe/0k5h1g1chs" aria-label="Lenny Delivers a Video - oEmbed" class="embedVideo-playButton iconButton js-playVideo" title="Lenny Delivers a Video - oEmbed">
+                <img class="embedVideo-thumbnail" src="https://embed-ssl.wistia.com/deliveries/99f3aefb8d55eef2d16583886f610ebedd1c6734.jpg?image_crop_resized=960x540" role="presentation" alt="A thumnail preview of a video"/>
+                <span class="videoEmbed-scrim"/>
                 '.$this->playButtonSVG.'
             </button>
         </div>

@@ -3,6 +3,6 @@
     { "attributes": { "bold": true }, "insert": "bold " },
     { "attributes": { "italic": true, "bold": true }, "insert": "italic-bold " },
     { "attributes": { "strike": true }, "insert": "strike" },
-    { "attributes": { "code-inline": true }, "insert": "code inline" },
+    { "attributes": { "codeInline": true }, "insert": "code inline" },
     { "insert": "\n" }
 ]

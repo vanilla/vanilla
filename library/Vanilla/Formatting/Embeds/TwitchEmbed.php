@@ -64,14 +64,10 @@ class TwitchEmbed extends VideoEmbed {
      * @inheritdoc
      */
     public function renderData(array $data): string {
-
-        $convertedHeight = (int)$data['height'];
-        $convertedWidth  = (int)$data['width'];
-
         $attributes = $data['attributes'] ?? [];
         $embedUrl = $attributes['embedUrl'] ?? '';
-        $height = ($convertedHeight) ? $convertedHeight : self::DEFAULT_HEIGHT;
-        $width = ($convertedWidth) ? $convertedWidth : self::DEFAULT_WIDTH;
+        $height = filter_var($data['height'], FILTER_VALIDATE_INT) ? $data['height'] : self::DEFAULT_HEIGHT;
+        $width = filter_var($data['width'], FILTER_VALIDATE_INT) ? $data['width'] : self::DEFAULT_WIDTH;
         $name = $data['name'] ?? '';
         $photoURL = $data['photoUrl'] ?? '';
 

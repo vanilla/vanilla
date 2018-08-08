@@ -26,7 +26,6 @@
 
 .help {
   margin-bottom: $spacer * 2;
-  font-weight: 200;
   color: $grey-dark;
 
   .help-title {
@@ -36,7 +35,6 @@
     border-bottom: $border-width dotted $grey-dark-border;
     letter-spacing: to-rem(1);
     font-size: $font-size-base;
-    font-weight: $font-weight-helvetica-medium;
     text-transform: uppercase;
   }
 
@@ -140,7 +138,7 @@
     margin-bottom: $spacer / 2;
     font-size: to-rem(16);
     line-height: 1.5;
-    font-weight: 500;
+    font-weight: 600;
     color: $grey-dark;
     border-bottom: 1px dotted $grey-dark-border;
   }
@@ -148,7 +146,7 @@
   .control-panel-subheading {
     margin-top: $spacer / 2;
     margin-bottom: $spacer / 4;
-    font-weight: 500;
+    font-weight: 600;
   }
 
   .control-panel-footer {

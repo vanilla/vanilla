@@ -1,0 +1,25 @@
+$title-icon_height: .8em;
+$title-icon_opacity: .4;
+
+.Title-Icon {
+    display: inline-block;
+    margin: {
+        left: .15em;
+        right: .15em;
+    }
+}
+
+.Title-PrivateIcon {
+    height: $title-icon_height;
+    width: .8em;
+    vertical-align: -.05;
+    opacity: $title-icon_opacity;
+}
+
+
+.Title-SecretIcon {
+    height: $title-icon_height;
+    width: 1.1em;
+    vertical-align: -.1em;
+    opacity: $title-icon_opacity;
+}

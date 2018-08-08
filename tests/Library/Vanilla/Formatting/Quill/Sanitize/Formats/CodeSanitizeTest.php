@@ -17,7 +17,7 @@ class CodeSanitizeTest extends SanitizeTest {
         $operations = [
             [
                 "insert" => $content,
-                "attributes" => [ "code-inline" => true ]
+                "attributes" => [ "codeBlock" => true ]
             ]
         ];
         return $operations;

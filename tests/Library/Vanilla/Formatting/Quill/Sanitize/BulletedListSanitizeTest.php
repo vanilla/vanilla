@@ -37,7 +37,7 @@ class BulletedListSanitizeTest extends SanitizeTest {
             ["insert" => $content],
             [
                 "attributes" => ["list" => "bullet"],
-                "insert" => "\n"
+                "insert" => "$content"
             ]
         ];
         return $operations;

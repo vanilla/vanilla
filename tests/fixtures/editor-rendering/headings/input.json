@@ -1,19 +1,19 @@
 [
     {
-        "insert": "h1"
-    },
-    {
-        "attributes": {
-            "header": 1
-        },
-        "insert": "\n"
-    },
-    {
         "insert": "h2"
     },
     {
         "attributes": {
             "header": 2
+        },
+        "insert": "\n"
+    },
+    {
+        "insert": "h3"
+    },
+    {
+        "attributes": {
+            "header": 3
         },
         "insert": "\n"
     },

@@ -62,7 +62,7 @@ class UsersApiController extends AbstractApiController {
      */
     public function delete($id, array $body) {
         $this->permission('Garden.Users.Delete');
-        
+
         $this->idParamSchema()->setDescription('Delete a user.');
 
         $in = $this->schema([
@@ -119,7 +119,7 @@ class UsersApiController extends AbstractApiController {
             'password:s' => 'Password of the user.',
             'hashMethod:s' => 'Hash method for the password.',
             'email:s' => [
-                'Email address of the user.',
+                'description' => 'Email address of the user.',
                 'minLength' => 0,
             ],
             'photo:s|n' => [
@@ -533,7 +533,10 @@ class UsersApiController extends AbstractApiController {
         }
 
         $in = $this->schema($inputProperties, 'in')->setDescription('Submit a new user registration.');
-        $out = $this->schema(['userID', 'name', 'email'], 'out')->add($this->fullSchema());
+        $out = $this->schema(
+            Schema::parse(['userID', 'name', 'email'])->add($this->fullSchema()),
+            'out'
+        );
 
         $in->validate($body);
 

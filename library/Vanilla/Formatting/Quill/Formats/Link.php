@@ -36,8 +36,9 @@ class Link extends AbstractFormat {
      * Get an attributes array for the blot's tag.
      */
     protected function getAttributes(): array {
+        $sanitizedLink = \Gdn_Format::sanitizeUrl(htmlspecialchars($this->currentOperation["attributes"]["link"]));
         return [
-            "href" => htmlspecialchars($this->currentOperation["attributes"]["link"]),
+            "href" => $sanitizedLink,
             "rel" => "nofollow",
         ];
     }

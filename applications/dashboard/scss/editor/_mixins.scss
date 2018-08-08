@@ -102,9 +102,9 @@ $spinnerOffset: 73deg;
         padding-left: 0;
     }
 
-    .richEditor-menu.insertPopover {
+    .richEditor-menu.richEditorFlyout {
         left: 0;
-        width: calc(100% + #{$richEditor-border_width * 4});
+        width: calc(100% + #{$global-border-width * 4});
     }
 
     .richEditor-embedBarMobileBorder {
@@ -115,18 +115,76 @@ $spinnerOffset: 73deg;
         padding-left: $richEditor-mobile_spacing;
         padding-right: $richEditor-mobile_spacing;
     }
+
+    .richEditorParagraphMenu {
+        display: none !important;
+    }
 }
 
 
-@mixin editorButtonFocusStyles($offset: -$richEditor-outline_width) {
-    outline: {
-        width: $richEditor-outline_width;
-        offset: #{$offset};
-        color: $richEditor-outline_color;
-        style: solid;
+@mixin editorButtonHoverStyles($offset: - $formElement_borderWidth) {
+    background: $state-color_hover;
+
+    .Close-x,
+    .richEditorButton-icon {
+        opacity: 1;
+    }
+}
+
+@mixin editorButtonFocusStyles($offset: - $formElement_borderWidth) {
+    background: $state-color_focus;
+    outline: none;
+
+    .Close-x,
+    .richEditorButton-icon {
+        opacity: 1;
     }
 }
 
 @mixin editorButtonActiveStyles() {
-    background-color: $richEditor-selected_bg;
+    color: $state-color_selected;
+
+    .Close-x,
+    .richEditorButton-icon {
+        opacity: 1;
+    }
+}
+
+@mixin editorButtonOpenStyles() {
+    color: $state-color_selected;
+    opacity: $richEditor-icon_opacity;
+
+    &:hover,
+    &:focus {
+        opacity: 1;
+
+        .Close-x,
+        .richEditorButton-icon {
+            opacity: 1;
+        }
+    }
+}
+
+@mixin ieHack {
+    // IE 10 and 11 only
+    @media screen and (-ms-high-contrast: active), screen and (-ms-high-contrast: none) {
+        @content;
+    }
+}
+
+
+@mixin objectFitWithFallback() {
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    margin: auto;
+    height: auto;
+    width: 100%;
+    @supports (object-fit: cover) {
+        object-fit: cover;
+        object-position: center;
+        height: 100%;
+    }
 }

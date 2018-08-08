@@ -10,17 +10,26 @@
  * @since 2.0
  */
 
+use Vanilla\Invalid;
+
 /**
- * Manages data integrity validation rules. Can automatically define a set of
- * validation rules based on a @@Schema with $this->generateBySchema($Schema);
+ * Manages data integrity validation rules.
+ *
+ * Can automatically define a set of validation rules based on a schema with `$this->generateBySchema($Schema)`.
  */
 class Gdn_Validation {
 
     /**
-     * @var array The collection of validation rules in the format of $RuleName => $Rule.
-     * This list can be added to with $this->addRule($RuleName, $Rule).
+     * @var array The old collection of rules.
+     * @deprecated
      */
-    protected $_Rules;
+    protected $_Rules = [];
+
+    /**
+     * @var array The collection of validation rules in the format of `$ruleName => [$rule, $filter]`.
+     * This list can be added to with $this->addRule($name, $rule, $filter).
+     */
+    private $rules = [];
 
     /**
      * @var array An associative array of fieldname => value pairs that are being validated.
@@ -54,22 +63,21 @@ class Gdn_Validation {
     protected $_ResetOnValidate = false;
 
     /** @var array An array of FieldName.RuleName => "Custom Error Message"s. See $this->ApplyRule. */
-    private $_CustomErrors = [];
+    private $customErrors = [];
 
     /**
      * Class constructor. Optionally takes a schema definition to generate validation rules for.
      *
      * @param Gdn_Schema|array $schema A schema object to generate validation rules for.
-     * @param bool Whether or not to reset the validation results on {@link validate()}.
+     * @param bool $resetOnValidate Whether or not to reset the validation results on {@link validate()}.
      */
-    public function __construct($schema = false, $resetOnValidate = false) {
+    public function __construct($schema = null, $resetOnValidate = false) {
         if (is_object($schema) || is_array($schema)) {
             $this->setSchema($schema);
         }
         $this->setResetOnValidate($resetOnValidate);
 
-        // Define the default validation functions
-        $this->_Rules = [];
+        // Define the default validation functions.
         $this->addRule('Required', 'function:ValidateRequired');
         $this->addRule('RequiredArray', 'function:ValidateRequiredArray');
         $this->addRule('Email', 'function:ValidateEmail');
@@ -82,7 +90,7 @@ class Gdn_Validation {
         $this->addRule('Boolean', 'function:ValidateBoolean');
         $this->addRule('Decimal', 'function:ValidateDecimal');
         $this->addRule('String', 'function:ValidateString');
-        $this->addRule('Time', 'function:ValidateTime');
+        $this->addRule('Time', 'function:ValidateTime', true);
         $this->addRule('Timestamp', 'function:ValidateDate');
         $this->addRule('Length', 'function:ValidateLength');
         $this->addRule('Enum', 'function:ValidateEnum');
@@ -177,6 +185,7 @@ class Gdn_Validation {
 
                 case 'date':
                 case 'datetime':
+                case 'timestamp':
                     $ruleNames[] = 'Date';
                     break;
                 case 'time':
@@ -184,9 +193,6 @@ class Gdn_Validation {
                     break;
                 case 'year':
                     $ruleNames[] = 'Year';
-                    break;
-                case 'timestamp':
-                    $ruleNames[] = 'Timestamp';
                     break;
 
                 case 'char':
@@ -204,7 +210,7 @@ class Gdn_Validation {
                     if (!in_array($field, ['Attributes', 'Data', 'Preferences', 'Permissions'])) {
                         $ruleNames[] = 'String';
                     }
-                    if ($properties->Length != '') {
+                    if (!empty($properties->Length)) {
                         $ruleNames[] = 'Length';
                     }
                     break;
@@ -215,8 +221,12 @@ class Gdn_Validation {
                     break;
             }
 
-            if ($field == 'Format') {
+            if ($field === 'Format') {
                 $ruleNames[] = 'Format';
+            }
+
+            if ($field === 'Body' && isset($this->_Schema['Format']) && $this->ruleExists('BodyFormat')) {
+                $ruleNames[] = 'BodyFormat';
             }
 
             // Assign the rules to the field.
@@ -248,24 +258,24 @@ class Gdn_Validation {
     /**
      * Apply a rule to the given rules array.
      *
-     * @param array $array The rules array to apply the rule to.
+     * @param array &$array The rules array to apply the rule to.
      * This should be either `$this->_FieldRules` or `$this->_SchemaRules`.
      * @param string $fieldName The name of the field that the rule applies to.
-     * @param string $ruleName The name of the rule.
+     * @param string|array $ruleName The name of the rule.
      * @param string $customError A custom error string when the rule is broken.
      */
     protected function applyRuleTo(&$array, $fieldName, $ruleName, $customError = '') {
         $array = (array)$array;
 
         if (!is_array($ruleName)) {
-            if ($customError != '') {
-                $this->_CustomErrors[$fieldName.'.'.$ruleName] = $customError;
+            if (!empty($customError)) {
+                $this->customErrors[$fieldName.'.'.$ruleName] = $customError;
             }
 
             $ruleName = [$ruleName];
         }
 
-        $existingRules = val($fieldName, $array, []);
+        $existingRules = $array[$fieldName] ?? [];
 
         // Merge the new rules with the existing ones (array_merge) and make
         // sure there is only one of each rule applied (array_unique).
@@ -405,41 +415,64 @@ class Gdn_Validation {
     /**
      * Adds to the rules collection ($this->_Rules).
      *
-     * If $ruleName already
-     * exists, this method will overwrite the existing rule. There are some
-     * special cases:
-     *  1. If the $rule begins with "function:", when the rule is evaluated
-     * on a field, it will strip the "function:" from the $rule and execute
-     * the remaining string name as a function with the field value passed as
-     * the first parameter and the related field properties as the second
-     * parameter. ie. "function:MySpecialValidation" will evaluate as
-     * mySpecialValidation($FieldValue, $FieldProperties). Any function defined
-     * in this way is expected to return boolean TRUE or FALSE.
-     *  2. If $rule begins with "regex:", when the rule is evaluated on a
-     * field, it will strip the "regex:" from $rule and use the remaining
-     * string as a regular expression rule. If a match between the regex rule
-     * and the field value is made, it will validate as TRUE.
-     *  3. Predefined $ruleNames are:
-     *  RuleName   Rule
-     *  ========================================================================
-     *  Required   Will not accept a null or empty value.
-     *  Email      Will validate against an email regex.
-     *  Date       Will only accept valid date values in a variety of formats.
-     *  Integer    Will only accept an integer.
-     *  Boolean    Will only accept 1 or 0.
-     *  Decimal    Will only accept a decimal.
-     *  Time       Will only accept a time in HH:MM:SS or HH:MM format.
-     *  Timestamp  Will only accept a valid timestamp.
-     *  Length     Will not accept a value longer than $Schema[$Field]->Length.
-     *  Enum       Will only accept one of the values in the $Schema[$Field]->Enum array.
+     * If $ruleName already exists, this method will overwrite the existing rule. There are some special cases:
      *
-     * @param string $ruleName The name of the rule to be added.
-     * @param string $rule The rule to be added. These are in the format of "function:FunctionName"
-     * or "regex:/regex/". Any function defined here must be included before
-     * the rule is enforced or the application will cause a fatal error.
+     * 1. If the $rule begins with "function:", when the rule is evaluated on a field, it will strip the "function:"
+     * from the $rule and execute the remaining string name as a function with the field value passed as the first
+     * parameter and the related field properties as the second parameter. ie. "function:MySpecialValidation" will
+     * evaluate as mySpecialValidation($FieldValue, $FieldProperties). Any function defined in this way is expected to
+     * return boolean **true** or **flase**.
+     *
+     * 2. If $rule begins with "regex:", when the rule is evaluated on a field, it will strip the "regex:" from $rule
+     * and use the remaining string as a regular expression rule. If a match between the regex rule and the field value
+     * is made, it will validate as **true**.
+     *
+     * 3. If the rule is callable then it will be invoked to validate the value.
+     *
+     * When adding a callback it must have the following signature:
+     *
+     * ```
+     * function validator(mixed $value, object $fieldInfo, array $row): mixed|Invalid
+     * ```
+     *
+     * Predefined rule names are:
+     *
+     * RuleName     | Rule
+     * ------------ | ----
+     *  Required    | Will not accept a null or empty value.
+     *  Email       | Will validate against an email regex.
+     *  Date        | Will only accept valid date values in a variety of formats.
+     *  Integer     | Will only accept an integer.
+     *  Boolean     | Will only accept 1 or 0, true or false.
+     *  Decimal     | Will only accept a decimal.
+     *  Time        | Will only accept a time in HH:MM:SS or HH:MM format.
+     *  Timestamp   | Will only accept a valid timestamp.
+     *  Length      | Will not accept a value longer than $Schema[$Field]->Length.
+     *  Enum        | Will only accept one of the values in the $Schema[$Field]->Enum array.
+     *
+     * @param string $name The name of the rule to be added.
+     * @param string|callable $rule The rule to be added.
+     * @param bool $filter Whether or not the rule filters the value. This is ignored when the rule is a callback.
      */
-    public function addRule($ruleName, $rule) {
-        $this->_Rules[$ruleName] = $rule;
+    public function addRule(string $name, $rule, bool $filter = null) {
+        // Callback rules are always filtered.
+        if (!is_string($rule) && is_callable($rule)) {
+            $filter = true;
+        }
+
+        $this->_Rules[$name] = $rule;
+
+        $this->rules[$name] = [$rule, (bool)$filter];
+    }
+
+    /**
+     * Determine whether or not a rule exists.
+     *
+     * @param string $name The name of the rule.
+     * @return bool Returns **true** if the rule exists or **false** otherwise.
+     */
+    public function ruleExists(string $name) {
+        return !empty($this->rules[$name]);
     }
 
     /**
@@ -466,8 +499,7 @@ class Gdn_Validation {
      * Adds a fieldname to the $this->_ValidationFields collection.
      *
      * @param string $fieldName The name of the field to add to the $this->_ValidationFields collection.
-     * @param array $postedFields The associative array collection of field names to examine for the value
-     *  of $fieldName.
+     * @param array $postedFields The associative array collection of field names to examine for the value of $fieldName.
      */
     protected function addValidationField($fieldName, $postedFields) {
         if (!is_array($this->_ValidationFields)) {
@@ -519,11 +551,17 @@ class Gdn_Validation {
      *    - Name: The name of the function used to validate.
      *    - Args: An argument to pass to the function after the value.
      * @param string $customError A custom error message.
-     * @return bool|string One of the following
-     *  - TRUE: The value passed validation.
+     * @return bool|string One of the following:
+     *
+     *  - **true**: The value passed validation.
      *  - string: The error message associated with the error.
+     * @deprecated
      */
     public static function validateRule($value, $fieldName, $rule, $customError = false) {
+        if (!is_string($rule) && is_callable($rule)) {
+            return static::validateRuleCallback($value, $fieldName, $rule, $customError);
+        }
+
         // Figure out the type of rule.
         if (is_string($rule)) {
             if (stringBeginsWith($rule, 'regex:', true)) {
@@ -556,6 +594,32 @@ class Gdn_Validation {
             }
         } else {
             return sprintf('Validation does not exist: %s.', $ruleName);
+        }
+    }
+
+    /**
+     * Validate a single callback rule.
+     *
+     * This method is just here for feature parity during refactoring and should be considered deprecated.
+     *
+     * @param mixed $value The value to validate.
+     * @param string $fieldName The name of the field to validate.
+     * @param callable $callback The validation callback.
+     * @param bool|string $customError The error to return if validation fails.
+     * @return bool|string Returns **true** on success and **false** or an error string on failure.
+     * @deprecated
+     */
+    private static function validateRuleCallback($value, $fieldName, callable $callback, $customError = false) {
+        $field = new ArrayObject([
+            'Name' => $fieldName,
+        ], ArrayObject::ARRAY_AS_PROPS);
+
+        $valid = call_user_func($callback, $value, $field, [$fieldName => $value]);
+
+        if ($valid instanceof Invalid) {
+            return $customError;
+        } else {
+            return $valid;
         }
     }
 
@@ -610,7 +674,9 @@ class Gdn_Validation {
         $honeypotName = c('Garden.Forms.HoneypotName', '');
         $honeypotContents = getPostValue($honeypotName, '');
         if ($honeypotContents != '') {
-            $this->addValidationResult($honeypotName, "You've filled our honeypot! We use honeypots to help prevent spam. If you're not a spammer or a bot, you should contact the application administrator for help.");
+            $this->addValidationResult(
+                $honeypotName,
+                "You've filled our honeypot! We use honeypots to help prevent spam. If you're not a spammer or a bot, you should contact the application administrator for help.");
         }
 
         $fieldRules = $this->defineValidationRules($postedFields, $insert);
@@ -618,50 +684,9 @@ class Gdn_Validation {
 
         // Loop through the fields that should be validated
         foreach ($fields as $fieldName => $fieldValue) {
-            // If this field has rules to be enforced...
-            if (array_key_exists($fieldName, $fieldRules) && is_array($fieldRules[$fieldName])) {
-                // Enforce them.
-                $rules = $fieldRules[$fieldName];
-
-                // Get the field info for the field.
-                $fieldInfo = ['Name' => $fieldName];
-                if (is_array($this->_Schema) && array_key_exists($fieldName, $this->_Schema)) {
-                    $fieldInfo = array_merge($fieldInfo, (array)$this->_Schema[$fieldName]);
-                }
-                $fieldInfo = (object)$fieldInfo;
-
-                foreach ($rules as $ruleName) {
-                    if (array_key_exists($ruleName, $this->_Rules)) {
-                        $rule = $this->_Rules[$ruleName];
-                        // echo '<div>FieldName: '.$FieldName.'; Rule: '.$Rule.'</div>';
-                        if (substr($rule, 0, 9) == 'function:') {
-                            $function = substr($rule, 9);
-                            if (!function_exists($function)) {
-                                trigger_error(errorMessage('Specified validation function could not be found.', 'Validation', 'Validate', $function), E_USER_ERROR);
-                            }
-
-                            $validationResult = $function($fieldValue, $fieldInfo, $postedFields);
-                            if ($validationResult !== true) {
-                                // If $ValidationResult is not FALSE, assume it is an error message
-                                $errorCode = $validationResult === false ? $function : $validationResult;
-                                // If there is a custom error, use it above all else
-                                $errorCode = val($fieldName.'.'.$ruleName, $this->_CustomErrors, $errorCode);
-                                // Add the result
-                                $this->addValidationResult($fieldName, $errorCode);
-                                // Only add one error per field
-                            }
-                        } elseif (substr($rule, 0, 6) == 'regex:') {
-                            $regex = substr($rule, 6);
-                            if (validateRegex($fieldValue, $regex) !== true) {
-                                $errorCode = 'Regex';
-                                // If there is a custom error, use it above all else
-                                $errorCode = val($fieldName.'.'.$ruleName, $this->_CustomErrors, $errorCode);
-                                // Add the result
-                                $this->addValidationResult($fieldName, $errorCode);
-                            }
-                        }
-                    }
-                }
+            $valid = $this->validateField($fieldValue, $fieldName, $postedFields, $fieldRules);
+            if (!$valid instanceof Invalid) {
+                $fields[$fieldName] = $valid;
             }
         }
         $this->_ValidationFields = $fields;
@@ -700,8 +725,9 @@ class Gdn_Validation {
     }
 
     /**
-     * Returns the $this->_ValidationResults array. You must use this method
-     * because the array is read-only outside this object.
+     * Returns the $this->_ValidationResults array.
+     *
+     * You must use this method because the array is read-only outside this object.
      *
      * @param bool $reset Whether or not to clear the validation results.
      * @return array Returns an array of validation results (errors).
@@ -743,5 +769,99 @@ class Gdn_Validation {
 
         $result = implode(' ', $errors);
         return $result;
+    }
+
+    /**
+     * Validate a single field value.
+     *
+     * @param mixed $fieldValue The value of the field.
+     * @param string $fieldName The name of the field.
+     * @param array $row The entire row of data.
+     * @param array $allRules The full array of rules.
+     * @return mixed|Invalid Returns the valid value, piossibly filtered or an instance of **Invalid** if validation fails.
+     */
+    private function validateField($fieldValue, string $fieldName, $row, array $allRules) {
+        if (!isset($allRules[$fieldName]) || !is_array($allRules[$fieldName])) {
+            return $fieldValue;
+        }
+
+        $rules = $allRules[$fieldName];
+
+        // Get the field info for the field.
+        $fieldInfo = ['Name' => $fieldName];
+        if (is_array($this->_Schema) && array_key_exists($fieldName, $this->_Schema)) {
+            $fieldInfo = array_replace($fieldInfo, (array)$this->_Schema[$fieldName]);
+        }
+        $fieldInfo = new ArrayObject($fieldInfo, ArrayObject::ARRAY_AS_PROPS);
+
+        foreach ($rules as $ruleName) {
+            if (!array_key_exists($ruleName, $this->rules)) {
+                continue;
+            }
+            list($rule, $filter) = $this->rules[$ruleName];
+            $valid = $fieldValue;
+
+            if (is_string($rule)) {
+                list($ruleType, $ruleValue) = explode(':', $rule, 2) + ['', ''];
+
+                switch ($ruleType) {
+                    case 'function':
+                        $function = $ruleValue;
+                        if (!function_exists($function)) {
+                            throw new \Exception("Specified validation function could not be found: $function", 500);
+                        }
+
+                        $valid = call_user_func($function, $fieldValue, $fieldInfo, $row);
+                        if (($filter && $valid instanceof Invalid) || (!$filter && $valid !== true)) {
+                            $errorCode = $this->customErrors["$fieldName.$ruleName"] ?? $this->defaultErrorCode($valid, $function);
+                            $this->addValidationResult($fieldName, $errorCode);
+                            $valid = new Invalid($errorCode);
+                            if ($ruleName === 'Required') {
+                                // If a required validation failed then skip other rules.
+                                break 2;
+                            }
+                        }
+                        break;
+                    case 'regex':
+                        $regex = $ruleValue;
+                        if (validateRegex($fieldValue, $regex) !== true) {
+                            $errorCode = $this->customErrors["$fieldName.$ruleName"] ?? 'Regex';
+                            $this->addValidationResult($fieldName, $errorCode);
+                            $valid = new Invalid($errorCode);
+                        }
+                        break;
+                    default:
+                        trigger_error("Unknown rule type: $ruleType.", E_USER_NOTICE);
+                }
+            } elseif (is_callable($rule)) {
+                $valid = call_user_func($rule, $fieldValue, $fieldInfo, $row);
+                if ($valid instanceof Invalid) {
+                    $errorCode = $this->customErrors["$fieldName.$ruleName"] ?? ($valid->getMessageCode() ?: $ruleName);
+                    $this->addValidationResult($fieldName, $errorCode);
+                }
+            } else {
+                trigger_error("Unknown validator format for rule: $ruleName.", E_USER_NOTICE);
+                $valid = $fieldValue;
+            }
+
+            if ($filter && !$valid instanceof Invalid) {
+                $fieldValue = $valid;
+            }
+        }
+        return $fieldValue;
+    }
+
+    /**
+     * Determine the default error code for a validation failure.
+     *
+     * @param mixed|Invalid $invalid The invalid result.
+     * @param string $default The default error code.
+     * @return string Returns the default error code.
+     */
+    private function defaultErrorCode($invalid, $default) {
+        if ($invalid instanceof Invalid && !empty($invalid->getMessageCode())) {
+            return $invalid->getMessageCode();
+        }
+        return $default;
     }
 }

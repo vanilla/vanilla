@@ -25,11 +25,11 @@ class TwitterSanitizeTest extends SanitizeTest {
                         "photoUrl" => $content,
                         "height" => null,
                         "width" => null,
-                        "attributes" => ["statusID" => $content]
-                    ]
-                ]
+                        "attributes" => ["statusID" => $content],
+                    ],
+                ],
             ],
-            ["insert" => "\n"]
+            ["insert" => "\n"],
         ];
 
         return $operations;

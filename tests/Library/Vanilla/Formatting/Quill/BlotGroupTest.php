@@ -9,7 +9,7 @@ namespace VanillaTests\Library\Vanilla\Formatting\Quill;
 
 use VanillaTests\SharedBootstrapTestCase;
 use Vanilla\Formatting\Quill\BlotGroup;
-use Vanilla\Formatting\Quill\Blots\HeadingBlot;
+use Vanilla\Formatting\Quill\Blots\Lines\HeadingBlot;
 use Vanilla\Formatting\Quill\Blots\TextBlot;
 
 class BlotGroupTest extends SharedBootstrapTestCase {
@@ -17,9 +17,9 @@ class BlotGroupTest extends SharedBootstrapTestCase {
     public function testGetIndexForBlockType() {
         $block = new BlotGroup();
         $emptyBlot = new TextBlot([], [], []);
-        $headingBlot = new HeadingBlot(["insert" => "H1",], [], [
+        $headingBlot = new HeadingBlot(["insert" => "H2",], [], [
             "attributes" => [
-            "header" => 1,
+            "header" => 2,
         ]]);
 
         $block->pushBlot($emptyBlot);

@@ -127,8 +127,6 @@ pre {
   @include full-border(flex);
   justify-content: space-between;
   align-items: center;
-  padding-top: $spacer / 2;
-  padding-bottom: $spacer / 2;
   min-height: $header-block-height;
 
   h1 {
@@ -263,7 +261,7 @@ pre {
   margin-bottom: 0;
   font-size: to-rem(16);
   line-height: $line-height;
-  font-weight: 500;
+  font-weight: 600;
   border-top: $border-width solid #e7e8e9;
 }
 
@@ -296,7 +294,7 @@ pre {
     margin-bottom: 0;
     font-size: to-rem(16);
     line-height: 1.5;
-    font-weight: 500;
+    font-weight: 600;
   }
 }
 
@@ -447,7 +445,7 @@ pre {
 // Add some font styling to a block of text.
 //
 // .italic - Sets the text font-style to italic.
-// .strong - Adds a font-weight of 500 to the text.
+// .strong - Adds a font-weight of 600 to the text.
 // .info - Makes the text smaller and muted, good for adding meta info to an item.
 //
 // Markup:
@@ -461,7 +459,7 @@ pre {
 
 strong,
 .strong {
-  font-weight: 500;
+  font-weight: 600;
 }
 
 .Info,

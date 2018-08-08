@@ -391,7 +391,7 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
         if ($controllerName) {
             // The controller was found based on the path.
             $result['controller'] = $controllerName;
-        } elseif (Gdn::pluginManager()->hasNewMethod('RootController', val(0, $parts))) {
+        } elseif (Gdn::pluginManager()->hasNewMethod('RootController', $parts[0] ?? false)) {
             // There is a plugin defining a new root method.
             $result['controller'] = 'RootController';
         } else {
@@ -472,9 +472,9 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
      * @return array Returns an array in the form `[$controllerName, $parts]` where `$parts` is the remaining path parts.
      * If a controller cannot be found then an array in the form of `['', $parts]` is returned.
      */
-    private function findController($parts) {
+    private function findController(array $parts) {
         // Look for the old-school application name as the first part of the path.
-        if (in_array(val(0, $parts), $this->getEnabledApplicationFolders())) {
+        if (in_array(($parts[0] ?? false), $this->getEnabledApplicationFolders())) {
             $application = array_shift($parts);
         } else {
             $application = '';

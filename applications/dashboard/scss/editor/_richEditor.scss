@@ -1,57 +1,116 @@
+$richEditor_bg                                    : $global-color_bg !default;
+$richEditor_leftPadding                           : 36px !default;
+$richEditor_minHeight                             : 200px !default;
+$richEditor_verticalPadding                       : 9px !default;
+$richEditor_horizontalPadding                     : 12px !default;
+$richEditor-outline_color                         : rgba($global-color_primary, 0.6) !default;
+
+$richEditor-menuButton_size                       : 36px !default;
+$richEditor-floatingButton_size                   : 28px !default;
+
+$richEditor-embedMenu_padding                     : 0 !default;
+$richEditor-icon_opacity                          : .8 !default;
+
+$richEditor-insertLink_width                      : 387px !default;
+
+$richEditor-flyout_paddingVertical                : 12px !default;
+$richEditor-flyout_paddingHorizontal              : 12px !default;
+$richEditor-flyout_maxHeight                      : 100vh !default;
+$richEditor-flyout_height                         : $richEditor-menuButton_size * 7 !default;
+
+$richEditor-nub_width                             : 12px !default;
+
+$richEditor-menu_borderWidth                      : 1px !default;
+$richEditor-menu_offset                           : $richEditor-nub_width !default;
+
+$richEditor-pilcrow_offset                        : 9px!default;
+$richEditor-pilcrow_fontSize                      : 14px !default;
+$richEditor-pilcrowAnimation_duration             : 0.3s;
+
+$richEditor-emojiGroup_paddingLeft                : 3px !default;
+$richEditor-emojiOutline_offset                   : -#{$formElement_borderWidth + 2} !default;
+
+$richEditor-mobileEmbedMenu_borderColor           : $global-color_primary !default;
+$richEditor-mobileEmbedMenu_transitionDuration    : .15s !default;
+$richEditor-mobileEmbedMenu_transitionTiming      : ease-out !default;
+
+$richEditor-embedButton_offset                    : -$formElement_borderWidth !default;
+$richEditor-paragraphMenuButton_offset            : -$formElement_borderWidth + 1 !default;
+$richEditor-text_offset                           : 0 !default;
+
+$embedImage_width                                 : 640px !default;
+
+// Break Points
+$richEditor-mobile_spacing                        : 18px !default;
+$richEditor-mobileBreakPoint                      : 700px !default;
+$richEditor-mobileEmbedBreakPoint                 : 550px !default;
+
 .richEditor {
     position: relative;
     display: block;
     padding-left: $richEditor_leftPadding;
-    font-size: $richEditor-font_size;
+
+    &.isDisabled { // Before React has replaced initial HTML
+        &,
+        .richEditor-button {
+            cursor: progress !important;
+        }
+    }
 }
 
-.richEditor-frame.InputBox {
-    position: relative;
-    background: $richEditor-bg_color;
-    height: auto;
-    padding: 0;
+.richEditor-frame {
+    &.InputBox {
+        position: relative;
+        background: $richEditor_bg;
+        height: auto;
+        padding: 0;
+    }
 }
 
 .richEditor-menu {
     display: inline-block;
     position: relative;
-
-    &.FlyoutMenu { // Temporary
-        position: relative;
-        top: auto;
-        left: auto;
-        right: auto;
-        bottom: auto;
-        display: block;
-        float: none;
-    }
-}
-
-@keyframes fadein {
-    0% {
-        opacity: 0;
-    }
-    100% {
-        opacity: 1;
-    }
 }
 
 .richEditorParagraphMenu {
     position: absolute;
+    display: flex;
+    align-items: center;
+    justify-content: center;
     top: $richEditor-pilcrow_offset;
-    left: -6px;
+    left: 0;
     transform: translateX(-100%);
-    height: $richEditor-icon_size;
-    width: $richEditor-icon_size;
+    height: $richEditor-floatingButton_size;
+    width: $richEditor_leftPadding;
     z-index: 1;
     animation: fadein $richEditor-pilcrowAnimation_duration ease;
     animation-iteration-count: 1;
+
+    .richEditor-button {
+        &.isActive {
+            &:hover {
+                cursor: default;
+            }
+        }
+    }
+}
+
+.richEditorParagraphMenu-handle {
+    width: $richEditor-floatingButton_size;
+    max-width: $richEditor-floatingButton_size;
+    min-width: $richEditor-floatingButton_size;
+    height: $richEditor-floatingButton_size;
 }
 
 .richEditor-text {
     position: relative;
     min-height: $richEditor_minHeight;
-    padding: $richEditor_padding;
+    padding: {
+        top: $richEditor_verticalPadding;
+        right: $richEditor_horizontalPadding;
+        bottom: $richEditor_verticalPadding;
+        left: $richEditor_horizontalPadding;
+    }
     outline-color: transparent;
     white-space: pre-wrap !important; // Needed for spaces around embed blots to work properly!
 
@@ -59,7 +118,7 @@
         outline: {
             offset: $richEditor-text_offset;
             style: solid;
-            width: $richEditor-outline_width;
+            width: $formElement_borderWidth;
             color: $richEditor-outline_color;
         }
     }
@@ -77,12 +136,19 @@
     flex-wrap: nowrap;
     list-style: none;
     padding: 0;
-    width: calc(100% - #{2 * $richEditor-border_width});
+    -ms-overflow-style: -ms-autohiding-scrollbar;
     margin: {
-        top: 0;
+        top: $formElement-borderWidth;
         right: 0;
-        left: -$richEditor-border_width;
-        bottom: -$richEditor-border_width;
+        bottom: 0;
+        left: 0;
+    }
+
+    &.MenuItems {
+        border: $formElement-borderWidth $formElement-borderStyle $formElement_borderColor;
+        box-shadow: $menu-dropShadow;
+        background: $global-color_bg;
+        border-radius: $global-borderRadius;
     }
 
     .richEditor-menuItem {
@@ -97,7 +163,7 @@
             line-height: $richEditor-menuButton_size;
 
             &.emojiChar-🇺🇳 {
-                font-size: 14px;
+                font-size: 10px;
             }
         }
 
@@ -109,7 +175,6 @@
 
 // button reset
 .richEditor-nextInput,
-.atMentionList-suggestion,
 .iconButton,
 .richEditor-button {
     @include singleLineEllipsis;
@@ -118,7 +183,6 @@
     border: 0;
     padding: 0;
     background: none;
-    width: 100%;
     text-align: left;
 }
 
@@ -126,8 +190,6 @@
 
 .richEditor-button {
     display: block;
-    height: $richEditor-icon_size;
-    width: $richEditor-icon_size;
     user-select: none;
     cursor: pointer;
 
@@ -139,36 +201,35 @@
     }
 
     &.emojiGroup {
-        width: $richEditor-icon_size;
-        height: $richEditor-icon_size;
+        display: block;
+        width: $richEditor-menuButton_size;
+        height: $richEditor-menuButton_size;
+        text-align: center;
+
+        &.isSelected {
+            @include editorButtonActiveStyles;
+        }
     }
 
     &:not(:disabled) {
         cursor: pointer;
     }
 
+    &:hover {
+        @include editorButtonHoverStyles;
+    }
+
     &:focus {
-        z-index: 2;
         @include editorButtonFocusStyles;
+        z-index: 2;
     }
-
-    &:hover,
-    &:focus {
-        .Close-x,
-        .richEditorButton-icon {
-            opacity: 1;
-        }
-    }
-
 
     &.isActive {
         @include editorButtonActiveStyles;
     }
 
-    &.richEditor-embedButton {
-        &:focus {
-            @include editorButtonFocusStyles($richEditor-embedButton_offset);
-        }
+    &.isOpen {
+        @include editorButtonOpenStyles;
     }
 
     &.richEditor-formatButton {
@@ -178,7 +239,6 @@
     }
 }
 
-.richEditor-menuWideItem,
 .richEditor-menuItem {
     display: block;
     padding: 0;
@@ -187,6 +247,8 @@
     .richEditor-button,
     &.richEditor-button {
         width: $richEditor-menuButton_size;
+        height: $richEditor-menuButton_size;
+        max-width: $richEditor-menuButton_size;
         font-size: #{$richEditor-menuButton_size * 24 / 39};
         line-height: $richEditor-menuButton_size;
 
@@ -197,17 +259,6 @@
 
     &.isRightAligned {
         margin-left: auto;
-    }
-}
-
-.richEditor-nextInput {
-    height: $richEditor-menuButton_size;
-    line-height: $richEditor-menuButton_size;
-    font-size: $richEditor-embedMenuWideButton_fontSize;
-    color: inherit;
-    padding: {
-        left: $richEditor-embedMenuWideButton_padding;
-        right: $richEditor-embedMenuWideButton_padding;
     }
 }
 
@@ -224,8 +275,8 @@
 .richEditorButton-icon {
     display: block;
     margin: auto;
-    height: $richEditor-icon_size;
-    width: $richEditor-icon_size;
+    height: $icon-default_size;
+    width: $icon-default_size;
     opacity: $richEditor-icon_opacity;
 }
 
@@ -253,6 +304,7 @@
     width: $richEditor-menuButton_size;
     height: $richEditor-menuButton_size;
     line-height: $richEditor-menuButton_size;
+    vertical-align: bottom;
     top: auto;
     right: auto;
     text-align: center;
@@ -273,7 +325,7 @@
 }
 
 // Insert Media
-.insertPopover {
+.richEditorFlyout {
     position: relative;
     overflow: hidden;
     z-index: 6;
@@ -294,28 +346,28 @@
     }
 }
 
-.insertPopover-header {
+.richEditorFlyout-header {
     padding: {
-        top: $richEditor-insertPopover_paddingVertical;
-        bottom: $richEditor-insertPopover_paddingVertical;
-        left: $richEditor-insertPopover_paddingHorizontal;
-        right: $richEditor-insertPopover_paddingHorizontal;
+        top: $richEditor-flyout_paddingHorizontal / 2;
+        right: $richEditor-flyout_paddingHorizontal;
+        bottom: $richEditor-flyout_paddingHorizontal / 2;
+        left: $richEditor-flyout_paddingHorizontal;
     }
 }
 
-.insertPopover-footer {
+.richEditorFlyout-footer {
     padding: {
-        bottom: $richEditor-insertPopover_paddingVertical;
-        left: $richEditor-insertPopover_paddingHorizontal;
-        right: $richEditor-insertPopover_paddingHorizontal;
+        bottom: $richEditor-flyout_paddingVertical;
+        left: $richEditor-flyout_paddingHorizontal;
+        right: $richEditor-flyout_paddingHorizontal;
     }
 }
 
-.popover-title {
+.richEditorFlyout-title {
     @include longWordEllipsis;
     margin: 0;
     max-width: calc(100% - #{$richEditor-menuButton_size});
-    min-height: #{$richEditor-menuButton_size - $richEditor-insertPopover_paddingVertical};
+    min-height: #{$richEditor-menuButton_size - $richEditor-flyout_paddingVertical};
 
     &:focus {
         outline: 0;
@@ -327,9 +379,9 @@
     align-items: center;
     justify-content: flex-end;
     padding: {
-        left: $richEditor-insertPopover_paddingHorizontal;
-        right: $richEditor-insertPopover_paddingHorizontal;
-        bottom: $richEditor-insertPopover_paddingVertical;
+        left: $richEditor-flyout_paddingHorizontal;
+        right: $richEditor-flyout_paddingHorizontal;
+        bottom: $richEditor-flyout_paddingVertical;
     }
 }
 
@@ -342,17 +394,16 @@
     margin-bottom: 3px;
 }
 
-.insertPopover-body {
-    margin-bottom: $richEditor-insertPopover_paddingHorizontal;
+.richEditorFlyout-body {
     padding: {
-        left: $richEditor-insertPopover_paddingHorizontal;
-        right: $richEditor-insertPopover_paddingHorizontal;
+        left: $richEditor-flyout_paddingHorizontal;
+        right: $richEditor-flyout_paddingHorizontal;
     }
 }
 
 .insertEmoji-body {
-    max-height: $richEditor-insertPopover_maxHeight;
-    height: $richEditor-insertPopover_height;
+    max-height: $richEditor-flyout_maxHeight;
+    height: $richEditor-flyout_height;
 }
 
 .content-wrapper {
@@ -363,22 +414,30 @@
     position: relative;
 }
 
-.richEditor-menu.insertPopover {
+.richEditor-menu.richEditorFlyout {
     position: absolute;
     bottom: 100%;
     left: 0;
+    width: #{$richEditor-flyout_paddingHorizontal * 2 + 7 * $richEditor-menuButton_size};
+
+    &.insertEmoji {
+        margin-left: -$richEditor-menu_borderWidth;
+    }
 }
 
-.popover-title {
+.richEditorFlyout-title {
     font-size: 100%;
 }
 
 .richEditor-insertEmoji {
-    width: $richEditor-menuButton_size;
-    height: $richEditor-menuButton_size;
-    font-size: $richEditor-icon_size;
+    font-size: $icon-default_size;
     text-align: center;
     overflow: hidden;
+
+    .fallBackEmoji {
+        display: block;
+        margin: auto;
+    }
 
     &:focus {
         outline-offset: $richEditor-emojiOutline_offset;
@@ -398,12 +457,10 @@
     overflow: hidden;
     width: $richEditor-nub_width * 2;
     height: $richEditor-nub_width * 2;
-    -webkit-user-select: none;
-    -moz-user-select: none;
-    -ms-user-select: none;
     user-select: none;
     transform: translateX(-50%);
     margin-top: -$richEditor-menu_borderWidth;
+    pointer-events: none;
 }
 
 .richEditor-nub {
@@ -412,17 +469,15 @@
     width: $richEditor-nub_width;
     height: $richEditor-nub_width;
     border: {
-        top: $richEditor-menu_borderWidth solid #999;
-        right: $richEditor-menu_borderWidth solid #999;
+        top: $richEditor-menu_borderWidth solid $global-border_color;
+        right: $richEditor-menu_borderWidth solid $global-border_color;
     }
-    box-shadow: 0 0 5px 1px #eee;
-    box-shadow: 0 0 5px 1px rgba(0, 0, 0, 0.2);
-    background: $richEditor-bg_color;
+    box-shadow: 0 0 5px 1px $menu-dropShadow_color;
+    background: $richEditor_bg;
 }
 
 // Orientation specific styles
-
-.richEditor-toolbarContainer {
+.richEditor-inlineToolbarContainer {
     &.isUp {
         transform: translateY(-$richEditor-menu_offset);
 
@@ -445,7 +500,7 @@
         .richEditor-nubPosition {
             align-items: flex-end;
             transform: translateY(-50%) translateX(-50%);
-            margin-top: $richEditor-menu_borderWidth;
+            margin-top: $richEditor-menu_borderWidth * 2;
         }
         .richEditor-nub {
             transform: translateY(50%) rotate(-45deg);
@@ -455,101 +510,35 @@
 
 .richEditor-paragraphToolbarContainer {
     position: absolute;
-
-    .richEditor-nubPosition {
-        left: 2px;
-    }
+    left: calc(50% - #{$richEditor_leftPadding / 2});
 
     &.isUp {
-        bottom: 100%;
-
-        .richEditor-nubPosition {
-            top: 100%;
-            transform: none;
-        }
+        bottom: calc(50% + #{$richEditor_leftPadding / 2 - $formElement-borderWidth});
     }
 
     &.isDown {
-        top: 100%;
-
-        .richEditor-nubPosition {
-            bottom: 100%;
-            transform: translateY($richEditor-menu_borderWidth);
-        }
+        top: calc(50% + #{$richEditor_leftPadding / 2 - $formElement-borderWidth});
     }
 }
-
-.blockquote {
-    display: block;
-    margin: 0;
-    padding: {
-        top: 0;
-        left: 18px;
-        right: 0;
-        bottom: 0;
-    };
-    padding: 3px 3px 3px 18px;
-    border-left: solid #D8D8D8 6px;
-    box-sizing: border-box;
-    width: 100%;
-    vertical-align: middle;
-    border-left: solid #D8D8D8 6px;
-    color: $embedded-quote_fg;
-}
-
-// Code
-.userContent code,
-.code {
-    display: inline-block;
-    font-size: $richEditor-code_fontSize;
-    vertical-align: middle;
-    line-height: 1em;
-    box-sizing: border-box;
-    font-family: monospace;
-    background: transparent;
-    margin: 0;
-    border: {
-        radius: $richEditor-inlineCode_borderRadius;
-        width: 1px;
-        style: solid;
-        color: $richEditor-inlineCode_borderColor;
-    }
-    padding: {
-        top: $richEditor-inlineCode_verticalPadding;
-        bottom: $richEditor-inlineCode_verticalPadding;
-        left: $richEditor-inlineCode_horizontalPadding;
-        right: $richEditor-inlineCode_horizontalPadding;
-    }
-}
-
-.code.isBlock {
-    display: block;
-    overflow-x: auto;
-    border: 0;
-    word-wrap: normal;
-    line-height: 1.4;
-    white-space: pre;
-    border-radius: 0;
-    background: none;
-    padding: 12px;
-    font-size: $richEditor-pilcrow_fontSize;
-    background-color: $richEditor-pilcrow_bg;
-
-}
-
 
 .userContent {
-    > *:not(:last-child) {
-        margin-bottom: .6em;
+    > * {
+        &:not(:last-child) {
+            margin-bottom: .6em;
 
-        + h1,
-        + h2,
-        + h3,
-        + h4,
-        + h5,
-        + h6
-        {
-            margin-top: #{$richEditor-font_size * .6};
+            + h1,
+            + h2,
+            + h3,
+            + h4,
+            + h5,
+            + h6
+            {
+                margin-top: .6em;
+            }
+        }
+
+        &:first-child {
+            margin-top: 0 !important;
         }
     }
 
@@ -564,18 +553,11 @@
     div,
     td,
     th,
-    code,
     a,
     p
     {
-        word-break: break-all;
         word-break: break-word;
         text-overflow: ellipsis;
-        line-height: $richEditor-lineHeight;
-    }
-
-    code {
-        text-overflow: initial;
     }
 }
 
@@ -588,7 +570,6 @@
 .richEditor-button {
     user-select: none;
     cursor: pointer;
-
 }
 
 // Emoji Groups
@@ -596,119 +577,20 @@
 .emojiGroups {
     display: flex;
     flex-wrap: nowrap;
-    justify-content: space-between;
-    padding-left: $richEditor-emojiGroup_paddingLeft;
-}
-
-.emojiGroup {
-    color: $richEditor-emojiCategory_color;
-
-    &.isSelected {
-        @include editorButtonActiveStyles;
-    }
-
-    + .emojiGroup {
-        margin-left: 10px;
-    }
+    justify-content: center;
 }
 
 .emojiGroup-icon {
     display: block;
     position: relative;
-    margin: 0;
+    margin: auto;
     padding: 0;
-    width: $richEditor-icon_size;
-    size: $richEditor-icon_size;
+    width: $icon-default_size;
+    size: $icon-default_size;
 }
-
-
-// @mentions
-.atMentionList {
-    position: absolute;
-    width: $richEditor-atMention_width;
-}
-
-.atMentionList-items {
-    &.MenuItems {
-        display: block;
-        padding: $richEditor-atMentionUser_paddingVertical 0;
-    }
-
-    &.isHidden {
-        display: none;
-    }
-}
-
-.atMentionList-item {
-    &.isActive {
-        .atMentionList-suggestion {
-            background-color: $richEditor-atMentionSelected_bg;
-        }
-    }
-}
-
-.atMentionList-suggestion {
-    width: 100%;
-    cursor: pointer;
-}
-
-.atMentionList-user,
-.atMentionList-noResults {
-    display: flex;
-    align-items: center;
-    width: 100%;
-    box-sizing: border-box;
-    overflow: hidden;
-    line-height: $richEditor-atMentionAvatar_width;
-    padding: {
-        top: $richEditor-atMentionUser_paddingVertical;
-        right: $richEditor-atMentionUser_paddingHorizontal;
-        bottom: $richEditor-atMentionUser_paddingVertical;
-        left: $richEditor-atMentionUser_paddingHorizontal;
-    }
-}
-
-.atMentionList-photoWrap {
-    margin-right: $richEditor-atMentionAvatar_margin;
-}
-
-.atMentionList-photo {
-    width: $richEditor-atMentionAvatar_width;
-    height: $richEditor-atMentionAvatar_width;
-}
-
-.atMentionList-userName {
-    display: block;
-    flex-grow: 1;
-    overflow: hidden;
-    white-space: nowrap;
-    text-overflow: ellipsis;
-    max-width: calc(100% - #{$richEditor-atMentionAvatar_margin + $richEditor-atMentionAvatar_width});
-}
-
-.atMentionList-mark {
-    padding: 0;
-    font-weight: $richEditor-atMentionMark_weight;
-}
-
-.atMentionList-photo {
-    display: block;
-}
-
-// Rendered link
-.atMention  {
-    color: inherit;
-    font-weight: $richEditor-atMentionLink_weight;
-}
-
-// Only allow selection of the entire mention at once in the editor.
-.richEditor .atMention {
-    user-select: all;
-}
-
-// Hide Preview
 
 body.hasRichEditor {
+    // Hide Preview
     #Form_Preview {
         display: none;
     }
@@ -726,7 +608,8 @@ body.hasRichEditor {
 
                 .FormWrapper {
                     padding: {
-                        left: $richEditor-pilcrow_gutter;
+                        left: $richEditor_leftPadding;
+                        right: $richEditor_leftPadding;
                     }
 
                     .richEditor {
@@ -735,7 +618,6 @@ body.hasRichEditor {
                 }
             }
         }
-
 
         // Comment
         .CommentForm {
@@ -752,7 +634,9 @@ body.hasRichEditor {
 
             .richEditor {
                 padding: {
-                    left: $richEditor-pilcrow_gutter;
+                    left: $richEditor_leftPadding;
+                    right: $richEditor_leftPadding;
+
                 }
 
                 .richEditor {
@@ -769,6 +653,7 @@ body.hasRichEditor {
         }
 
         // New Message
+        #GroupForm,
         #MessageForm,
         #ConversationForm {
             .Form-HeaderWrap {
@@ -776,7 +661,10 @@ body.hasRichEditor {
             }
 
             .FormWrapper {
-                padding-left: $richEditor-pilcrow_gutter;
+                padding: {
+                    left: $richEditor_leftPadding;
+                    right: $richEditor_leftPadding;
+                }
 
                 .richEditor {
                     padding-left: 0;

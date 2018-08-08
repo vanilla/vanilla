@@ -7,36 +7,9 @@
 namespace VanillaTests\Library\Vanilla\Formatting\Quill\Sanitize\Embeds;
 
 use VanillaTests\Library\Vanilla\Formatting\Quill\Sanitize\SanitizeTest;
-use VanillaTests\Library\Vanilla\Formatting\Quill\Sanitize\CSSInjectionTrait;
+use VanillaTests\Library\Vanilla\Formatting\Quill\Sanitize\LinkSanitizeTrait;
 
 class LinkSanitizeTest extends SanitizeTest {
-
-    use CSSInjectionTrait;
-
-    /**
-     * @inheritdoc
-     */
-    protected function cssOperations(string $string): array {
-        $result = [
-            [
-                "insert" => [
-                    "embed-external" => [
-                        "url" => "http://example.com",
-                        "type" => "link",
-                        "name" => "Example.com",
-                        "body" => "Hello world.",
-                        "photoUrl" => $string,
-                        "height" => null,
-                        "width" => null,
-                        "attributes" => []
-                    ],
-                ]
-            ],
-            ["insert" => "\n"]
-        ];
-        return $result;
-    }
-
     /**
      * @inheritdoc
      */
@@ -44,18 +17,21 @@ class LinkSanitizeTest extends SanitizeTest {
         $operations = [
             [
                 "insert" => [
-                    "embed-external" => ["url" => $content],
-                    "type" => "link",
-                    "name" => $content,
-                    "body" => $content,
-                    "photoUrl" => $content,
-                    "height" => $content,
-                    "width" => $content,
-                    "attributes" => []
-                ]
+                    "embed-external" => [
+                        "url" => $content,
+                        "type" => "link",
+                        "name" => $content,
+                        "body" => $content,
+                        "photoUrl" => $content,
+                        "height" => $content,
+                        "width" => $content,
+                        "attributes" => [],
+                    ],
+                ],
             ],
-            ["insert" => "\n"]
+            ["insert" => "\n"],
         ];
+
         return $operations;
     }
 }

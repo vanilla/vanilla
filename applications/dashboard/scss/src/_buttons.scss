@@ -48,11 +48,11 @@ button::-moz-focus-inner {
   font-weight: $btn-font-weight;
   text-align: center;
   white-space: nowrap;
-  vertical-align: middle;
+  vertical-align: top;
   cursor: pointer;
   user-select: none;
   border: $border-width solid transparent;
-  @include button-size($btn-padding-y, $btn-padding-x, $font-size-base, $line-height, $btn-border-radius);
+  @include button-size(5px, $btn-padding-x, $font-size-base, 24px, $btn-border-radius);
   @include transition(all .2s ease-in-out);
 
   &,
@@ -84,6 +84,10 @@ button::-moz-focus-inner {
       color: $btn-link-disabled-color;
       border-color: $btn-link-disabled-color;
     }
+  }
+
+  .header-block & {
+    padding: 2px 1em;
   }
 }
 
@@ -174,7 +178,7 @@ fieldset[disabled] a.btn {
   margin: 0;
   margin-left: 1rem;
   font-size: $font-size-sm;
-  line-height: 1;
+  line-height: 24px;
   border-width: 0;
   color: $grey-dark;
 
@@ -185,6 +189,7 @@ fieldset[disabled] a.btn {
   svg {
     height: to-rem(24);
     width: to-rem(24);
+    vertical-align: top;
   }
 
   &:hover {
@@ -204,25 +209,18 @@ fieldset[disabled] a.btn {
   }
 }
 
-a.btn-icon,
-button.btn-icon {
-  opacity: .7;
-}
-
-
 .btn-icon-border {
-  @include button-variant($btn-secondary-color, $btn-secondary-bg, $btn-secondary-border, $btn-secondary-color, lighten($brand-primary, 50%), $btn-secondary-border);
+  @include button-variant($link-color, $btn-secondary-bg, $btn-secondary-border, $btn-secondary-color, lighten($brand-primary, 50%), $btn-secondary-border);
 
-  $btn-icon-height: 28;
-  $btn-icon-padding-v: (to-rem($control-height) - to-rem($btn-icon-height) - ($border-width * 2)) / 2;
+  $btn-icon-height: 24px;
+  $btn-icon-padding-v: 5px; //(to-rem($control-height) - to-rem($btn-icon-height) - ($border-width * 2)) / 2;
   padding: $btn-icon-padding-v $btn-icon-padding-v * 2;
   margin: 0 0 0 .5rem;
-  color: $grey-dark;
-  opacity: .7;
 
   svg {
-    height: to-rem($btn-icon-height);
-    width: to-rem($btn-icon-height);
+    height: $btn-icon-height;
+    width: $btn-icon-height;
+    vertical-align: top;
   }
 
   &:first-child {
@@ -309,7 +307,6 @@ button.btn-icon {
 @mixin button-sm-rounded {
   display: inline-block;
   vertical-align: middle;
-  font-weight: 300;
   text-transform: uppercase;
 
   svg {
@@ -351,4 +348,9 @@ button.btn-icon {
 .btn-navbar {
   @include button-sm-rounded();
   @include button-variant($navbar-link-color, $brand-primary, $navbar-link-color, $navbar-link-color, lighten($brand-primary, 12%), $navbar-link-color);
+}
+
+.btn-container {
+  display: flex;
+  align-items: center;
 }

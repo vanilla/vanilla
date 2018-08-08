@@ -18,18 +18,18 @@ class GiphySanitizeTest extends SanitizeTest {
             [
                 "insert" => [
                     "embed-external" => [
-                        "url" => null,
+                        "url" => $content,
                         "type" => "giphy",
-                        "name" => null,
-                        "body" => null,
-                        "photoUrl" => null,
+                        "name" => $content,
+                        "body" => $content,
+                        "photoUrl" => $content,
                         "height" => $content,
                         "width" => $content,
-                        "attributes" => ["postID" => $content]
-                    ]
-                ]
+                        "attributes" => ["postID" => $content],
+                    ],
+                ],
             ],
-            ["insert" => "\n"]
+            ["insert" => "\n"],
         ];
 
         return $operations;

@@ -10,7 +10,6 @@ namespace Vanilla\Formatting\Quill;
 use Vanilla\Formatting\Quill\Blots\AbstractBlot;
 use Vanilla\Formatting\Quill\Blots\Lines\AbstractLineBlot;
 use Vanilla\Formatting\Quill\Blots\CodeBlockBlot;
-use Vanilla\Formatting\Quill\Blots\HeadingBlot;
 use Vanilla\Formatting\Quill\Blots\TextBlot;
 
 /**
@@ -29,7 +28,6 @@ class BlotGroup {
      * Blots that can determine the surrounding tag over the other blot types.
      */
     private $overridingBlots = [
-        HeadingBlot::class,
         CodeBlockBlot::class,
         AbstractLineBlot::class,
     ];
@@ -146,6 +144,29 @@ class BlotGroup {
     }
 
     /**
+     * Get all of the mention blots in the group.
+     *
+     * Mentions that are inside of Blockquote's are excluded. We don't want to be sending notifications when big quote
+     * replies build up.
+     *
+     * @return string[]
+     */
+    public function getMentionUsernames() {
+        if ($this->getBlotForSurroundingTags() instanceof Blots\Lines\BlockquoteLineBlot) {
+            return [];
+        }
+
+        $names = [];
+        foreach ($this->blots as $blot) {
+            if ($blot instanceof Blots\Embeds\MentionBlot) {
+                $names[] = $blot->getUsername();
+            }
+        }
+
+        return $names;
+    }
+
+    /**
      * Add a blot to this block.
      *
      * @param AbstractBlot $blot
@@ -184,16 +205,25 @@ class BlotGroup {
             return null;
         }
         $blot = $this->blots[0];
+        $overridingBlot = $this->getPrimaryBlot();
 
+        return $overridingBlot ?? $blot;
+    }
+
+    /**
+     * Get the primary blot for the group.
+     *
+     * @return null|AbstractBlot
+     */
+    public function getPrimaryBlot() {
         foreach ($this->overridingBlots as $overridingBlot) {
             $index = $this->getIndexForBlotOfType($overridingBlot);
             if ($index >= 0) {
-                $blot = $this->blots[$index];
-                break;
+                return $this->blots[$index];
             }
         }
 
-        return $blot;
+        return null;
     }
 
     /**

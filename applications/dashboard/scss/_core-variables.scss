@@ -33,10 +33,19 @@ $global-color_unresolved                             : mix($global-color_warning
 
 $global-body_bg                                      : $global-color_bg !default; // Derived - color outside main content in margins
 
-$global-border_color                                 : mix($global-color_warning, $global-color_fg, 50%) !default; // Note it's off by default due to the border width
+$global-border_color                                 : mix($global-color_fg, $global-color_bg, 24%) !default; // Note it's off by default due to the border width
 $global-border-width                                 : 0;
 $global-border-style                                 : solid;
 $global_borderRadius                                 : 2px !default;
+
+/* -------------------------------------------------------------- *\
+    States Colors
+\* -------------------------------------------------------------- */
+
+$state-color_hover                                   : mix($global-color_primary, $global-color_bg, 5.5%) !default; // rgba(174, 228, 255, 0.2);
+$state-color_focus                                   : mix($global-color_primary, $global-color_bg, 12%) !default; // rgba(174, 228, 255, 0.4);
+$state-color_selected                                : mix($global-color_primary, $global-color_bg, 95%) !default; // #0075f5
+
 
 /* -------------------------------------------------------------- *\
     Password Strength Colors
@@ -243,7 +252,7 @@ $formElement_fullBorderWidth                         : $formElement_borderWidth 
 $formElement_height                                  : $utility-baseUnit * 6; // Derived
 $formElement_margin                                  : $utility-baseUnit * 4; // Derived
 $formElement_heightWithBorder                        : $formElement_height + 2 * $formElement_borderWidth; // Derived
-$formElement_borderColor                             : mix($global-color_fg, $global-color_bg, 24%) !default; // Derived
+$formElement_borderColor                             : $global-border_color !default; // Derived
 $formElement_borderStyle                             : solid;
 $formElement_borderRadius                            : $global_borderRadius !default;
 $formElement_giantInput_height                       : 51px !default;
@@ -272,8 +281,8 @@ $global-fileUpload_hover_bg                          : mix($global-color_primary
 $formElement-panel_shadowColor                       : rgba($global-color_fg, .2) !default;
 $formElement-panel_boxShadow                         : 0 1px 3px 0 $formElement-panel_shadowColor !default;
 
-
-
+$menu-dropShadow_color                               : rgba($global-color_fg, .2);
+$menu-dropShadow                                     : 0 5px 10px $menu-dropShadow_color;
 
 /* -------------------------------------------------------------- *\
     Buttons

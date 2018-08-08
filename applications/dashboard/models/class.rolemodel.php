@@ -401,7 +401,7 @@ class RoleModel extends Gdn_Model {
                 ->from('UserRole ur')
                 ->join('UserRole urs', 'ur.UserID = urs.UserID')
                 ->groupBy('urs.UserID')
-                ->having('count(urs.RoleID) =', '1', true, false)
+                ->having('count(urs.RoleID) =', '1', false, false)
                 ->where('ur.RoleID', $roleID)
                 ->get()
                 ->firstRow();
@@ -742,7 +742,7 @@ class RoleModel extends Gdn_Model {
                 ->update('UserRole')
                 ->join('UserRole urs', 'UserRole.UserID = urs.UserID')
                 ->groupBy('urs.UserID')
-                ->having('count(urs.RoleID) =', '1', true, false)
+                ->having('count(urs.RoleID) =', '1', false, false)
                 ->set('UserRole.RoleID', $newRoleID)
                 ->where(['UserRole.RoleID' => $roleID])
                 ->put();

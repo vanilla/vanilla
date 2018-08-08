@@ -88,17 +88,22 @@ class Gdn_Model extends Gdn_Pluggable {
     /**
      * Class constructor. Defines the related database table name.
      *
-     * @param string $name An optional parameter that allows you to explicitly define the name of
-     * the table that this model represents. You can also explicitly set this value with $this->Name.
+     * @param string $name Optionally define the name of the table that this model represents.
+     * You can also explicitly set this value with $this->Name.
+     * @param Gdn_Validation $validation The validation dependency.
+     * If a validation object is not passed in the constructor then one will be created.
      */
-    public function __construct($name = '') {
+    public function __construct($name = '', Gdn_Validation $validation = null) {
         if ($name == '') {
             $name = get_class($this);
         }
 
         $this->Database = Gdn::database();
         $this->SQL = $this->Database->sql();
-        $this->Validation = new Gdn_Validation();
+        if ($validation === null) {
+            $validation = Gdn::getContainer()->get(Gdn_Validation::class);
+        }
+        $this->Validation = $validation;
         $this->Name = $name;
         $this->PrimaryKey = $name.'ID';
         $this->filterFields = [
@@ -139,6 +144,26 @@ class Gdn_Model extends Gdn_Pluggable {
      * A overridable function called before the various get queries.
      */
     protected function _beforeGet() {
+    }
+
+    /**
+     * Get the validation object used to validate data upon saving.
+     *
+     * @return Gdn_Validation Returns the validation object.
+     */
+    public function getValidation(): Gdn_Validation {
+        return $this->Validation;
+    }
+
+    /**
+     * Set the validation object used to validate data upon saving.
+     *
+     * @param Gdn_Validation $Validation The new validation object.
+     * @return $this
+     */
+    public function setValidation(Gdn_Validation $Validation) {
+        $this->Validation = $Validation;
+        return $this;
     }
 
     /**

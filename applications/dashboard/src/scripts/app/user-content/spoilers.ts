@@ -5,8 +5,10 @@
 
 import { delegateEvent } from "@dashboard/dom";
 
-// Setup
-delegateEvent("click", ".js-toggleSpoiler", handleToggleSpoiler);
+export function initSpoilers() {
+    // Setup
+    delegateEvent("click", ".js-toggleSpoiler", handleToggleSpoiler);
+}
 
 /**
  * Toggle a spoiler open and closed.

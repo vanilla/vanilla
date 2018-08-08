@@ -3,50 +3,54 @@
 $dropdown = $this;
 $trigger = $dropdown->getTrigger();
 ?><span class="ToggleFlyout <?php echo $dropdown->getCssClass(); ?>"><?php
-    if (val('type', $trigger) === 'button') :
+    if (($trigger['type'] ?? '') === 'button') :
     ?><span class="Button-Options">
         <span class="OptionsTitle" title="<?php echo t('Options'); ?>">
-            <?php echo val('text', $trigger); ?>
+            <?php echo $trigger['text']; ?>
         </span>
         <?php echo sprite('SpFlyoutHandle', 'Arrow'); ?>
     </span>
     <?php else :
-        $text = val('text', $trigger);
-        $url = val('url', $trigger);
-        $icon = val('icon', $trigger);
-        $cssClass = val('cssClass', $trigger);
-        $attributes = val('attributes', $trigger);
+        $text = $trigger['text'] ?? false;
+        $url = $trigger['url'] ?? false;
+        $icon = $trigger['icon'] ?? false;
+        $cssClass = $trigger['cssClass'] ?? false;
+        $attributes = $trigger['attributes'] ?? false;
         $alert = !empty($dropdown->data('DashboardCount', '')) ? wrap($dropdown->data('DashboardCount', ''), 'span', ['class' => 'Alert']) : '';
         echo anchor($icon.$text.$alert, $url, $cssClass, $attributes);
     endif; ?>
     <ul class="Flyout MenuItems list-reset <?php echo $dropdown->getListCssClass(); ?>" role="menu" aria-labelledby="<?php echo $dropdown->getTriggerId(); ?>">
         <?php foreach($dropdown->getItems() as $item) {
-            if (val('type', $item) == 'group') { ?>
-                <li role="presentation" class="dropdown-header <?php echo val('cssClass', $item); ?>">
-                    <?php if (val('icon', $item)) {
-                        echo icon(val('icon', $item));
+            if (($item['type'] ?? '') == 'group') { ?>
+                <li role="presentation" class="dropdown-header <?php echo $item['cssClass'] ?? ''; ?>">
+                    <?php if ($iIcon = ($item['icon'] ?? false)) {
+                        echo icon($iIcon);
                     }
-                    echo val('text', $item);
-                    if (val('badge', $item)) {
-                        echo badge(val('badge', $item));
+                    echo $item['text'] ?? '';
+                    if ($iBadge = ($item['badge'] ?? false)) {
+                        echo badge($iBadge);
                     } ?>
                 </li>
             <?php } ?>
-            <?php  if (val('type', $item) == 'link') { ?>
-                <li role="presentation" <?php if (val('listItemCssClass', $item) || empty($item['icon'])) { ?>class="<?php echo trim(val('listItemCssClass', $item).(empty($item['icon']) ? ' no-icon' : '')); ?>"<?php } ?>>
-                    <a role="menuitem" class="dropdown-menu-link <?php echo val('cssClass', $item); ?>" tabindex="-1" href="<?php echo url(val('url', $item)); ?>" <?php echo attribute(val('attributes', $item, [])) ?>><?php
-                        if (val('icon', $item)) {
-                            echo icon(val('icon', $item));
+            <?php  if (($item['type'] ?? '') == 'link') { ?>
+                <li role="presentation" <?php
+                    if ($ilistItemCssClass = ($item['listItemCssClass'] ?? false) || empty($item['icon'])) {
+                       ?>class="<?php
+                        echo trim($ilistItemCssClass.(empty($item['icon']) ? ' no-icon' : '')); ?>"<?php
+                    } ?>>
+                    <a role="menuitem" class="dropdown-menu-link <?php echo  $item['cssClass'] ?? ''; ?>" tabindex="-1" href="<?php echo url($item['url'] ?? ''); ?>" <?php echo attribute($item['attributes'] ?? []) ?>><?php
+                        if ($iIcon = ($item['icon'] ?? false)) {
+                            echo icon($iIcon);
                         }
-                        echo val('text', $item);
-                        if (val('badge', $item)) {
-                            echo ' '.wrap(val('badge', $item), 'span', ['class' => 'Alert']);
+                        echo $item['text'] ?? '';
+                        if ($iBadge = ($item['badge'] ?? false)) {
+                            echo ' '.wrap($iBadge, 'span', ['class' => 'Alert']);
                         }
                         ?></a>
                 </li>
             <?php }
-            if (val('type', $item) == 'divider') { ?>
-                <li role="presentation" <?php if (val('cssClass', $item)) { ?> class="<?php echo val('cssClass', $item); ?>"<?php } ?>>
+            if (($item['type'] ?? '') == 'divider') { ?>
+                <li role="presentation" <?php if ($iCssClass = ($item['cssClass'] ?? false)) { ?> class="<?php echo $iCssClass; ?>"<?php } ?>>
                     <hr />
                 </li>
             <?php }

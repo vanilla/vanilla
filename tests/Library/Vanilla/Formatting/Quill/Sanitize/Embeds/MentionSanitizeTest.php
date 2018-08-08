@@ -22,7 +22,7 @@ class MentionSanitizeTest extends SanitizeTest {
                 "name" => $content,
                 "userID" => $content,
             ]]],
-            ["insert" => "\n"],
+            ["insert" => $content],
         ];
 
         return $operations;

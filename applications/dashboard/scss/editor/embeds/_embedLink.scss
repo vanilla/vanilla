@@ -1,9 +1,10 @@
 $embedLink-linkTitle_fontSize: $global-medium_fontSize !default;
 $embedLink-linkTitle_lineHeight: $global-base_lineHeight !default;
 $embedLink-linkImage_width: 225px !default;
-$embedLink-linkImage_mobileHeight: 52.5% !default;
 $embedLink-linkImage_mobileWidth: 100px !default;
-$embedLink-linkImage_boxShadow: 0 1px 3px 0 rgba(0,0,0,0.3) !default;
+$embedLink-linkImage_boxShadowColor: rgba($global-color_fg, .3) !default;
+$embedLink-image_separatorColor: rgba($global-color_fg, .1) !default;
+$embedLink-linkImage_boxShadow: 0 1px 3px 0 $embedLink-linkImage_boxShadowColor !default;
 $embedLink-linkImage_bg: #ffffff !default;
 
 .embedLink {
@@ -20,102 +21,129 @@ $embedLink-linkImage_bg: #ffffff !default;
             text-decoration: none !important;
         }
     }
-}
 
-.embedLink-body {
-    display: block;
-    position: relative;
-    overflow: hidden;
-    text-align: left;
-}
-
-.embedLink-main {
-    padding: 18px;
-    box-sizing: border-box;
-
-}
-
-.embedLink-image {
-    position: absolute;
-    top: 0;
-    left: 0;
-    background-size: cover;
-    background-repeat: no-repeat;
-    background-position: 50% 50%;
-    width: $embedLink-linkImage_width;
-    height: 100%;
-
-    + .embedLink-main {
-        margin-left: auto;
-        width: calc(100% - #{$embedLink-linkImage_width});
+    .embedLink-body {
+        display: block;
+        position: relative;
+        overflow: hidden;
+        text-align: left;
     }
 
-    @include mediaQuery-richEditor_embed {
-        position: relative;
-        width: 100%;
-        padding-top: $embedLink-linkImage_mobileHeight;
+    .embedLink-main {
+        padding: 18px;
+        box-sizing: border-box;
 
+    }
+
+    .embedLink-image {
+        position: absolute;
+        display: block;
+        top: 0;
+        left: 0;
+        bottom: 0;
+        margin: {
+            top: auto;
+            bottom: auto;
+        }
+        width: $embedLink-linkImage_width;
+
+
+        @supports (object-fit: cover) {
+            height: 100%;
+            object-fit: cover;
+            object-position: center;
+        }
 
         + .embedLink-main {
-            width: 100%;
+            margin-left: auto;
+            width: calc(100% - #{$embedLink-linkImage_width});
+
+            border-left: {
+                style: solid;
+                width: 1px;
+                color: $embedLink-image_separatorColor;
+            }
         }
+
+        @include mediaQuery-richEditor_embed {
+            position: relative;
+            width: 100%;
+            padding-top: 0;
+
+
+            + .embedLink-main {
+                width: 100%;
+                border-right: none;
+            }
+        }
+    }
+
+    .embedLink-header {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        justify-content: flex-start;
+        font-size: $embedLink-linkTitle_fontSize;
+        line-height: $embedLink-linkTitle_lineHeight;
+        margin-bottom: $utility-baseUnit;
+    }
+
+    .embedLink-userName {
+        margin: 0 0 0 12px;
+        padding: 0;
+        color: #555A62;
+        font-weight: $global-bold_fontWeight;
+    }
+
+    .embedLink-dateTime {
+        font-size: .8em;
+        margin: 0 0 0 12px;
+        padding: 0;
+        color: #737373;
+    }
+
+    .embedLink-title {
+        display: block;
+        width: 100%;
+        margin: 0;
+        padding: 0;
+        font-size: $embedLink-linkTitle_fontSize;
+        line-height: $embedLink-linkTitle_lineHeight;
+        font-weight: $global-bold_fontWeight;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+
+        @include mediaQuery-richEditor_embed {
+            @include breakWord;
+            white-space: normal;
+        }
+    }
+
+    .embedLink-source {
+        font-size: #{$embedLink-linkTitle_fontSize * .86};
+        color: rgba(85,90,98,0.72);
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        margin: 0;
+
+        @include mediaQuery-richEditor_embed {
+            @include breakWord;
+            white-space: normal;
+        }
+    }
+
+    .embedLink-excerpt {
+        font-size: $embedLink-linkTitle_fontSize;
+        color: #555A62;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        word-break: break-word;
+        max-width: 100%;
+        line-height: $embedLink-linkTitle_lineHeight;
+        max-height: #{$embedLink-linkTitle_lineHeight * $embedLink-linkTitle_fontSize * 3};
+        white-space: normal;
     }
 }
 
-
-.embedLink-header {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    justify-content: flex-start;
-    font-size: $embedLink-linkTitle_fontSize;
-    line-height: $embedLink-linkTitle_lineHeight;
-    margin-bottom: $utility-baseUnit;
-}
-
-.embedLink-userName {
-    margin: 0 0 0 12px;
-    padding: 0;
-    color: #555A62;
-    font-weight: $global-bold_fontWeight;
-}
-
-.embedLink-dateTime {
-    font-size: .8em;
-    margin: 0 0 0 12px;
-    padding: 0;
-    color: #737373;
-}
-
-.embedLink-title {
-    display: block;
-    width: 100%;
-    margin: 0;
-    padding: 0;
-    font-size: $embedLink-linkTitle_fontSize;
-    line-height: $embedLink-linkTitle_lineHeight;
-    font-weight: $global-bold_fontWeight;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-}
-
-.embedLink-source {
-    font-size: #{$embedLink-linkTitle_fontSize * .86};
-    color: rgba(85,90,98,0.72);
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    margin: 0;
-}
-
-.embedLink-excerpt {
-    font-size: $embedLink-linkTitle_fontSize;
-    color: #555A62;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    word-break: break-word;
-    max-width: 100%;
-    line-height: $embedLink-linkTitle_lineHeight;
-    max-height: #{$embedLink-linkTitle_lineHeight * $embedLink-linkTitle_fontSize * 3};
-}

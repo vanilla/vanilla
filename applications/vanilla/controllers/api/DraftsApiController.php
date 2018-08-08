@@ -141,11 +141,10 @@ class DraftsApiController extends AbstractApiController {
         $this->permission('Garden.SignIn.Allow');
 
         $in = $this->idParamSchema('in')->setDescription('Get a draft for editing.');
-        $out = $this->schema([
-            'draftID',
-            'parentRecordID',
-            'attributes',
-        ], 'out')->add($this->fullSchema());
+        $out = $this->schema(
+            Schema::parse(['draftID', 'parentRecordID', 'attributes',])->add($this->fullSchema()),
+            'out'
+        );
 
         $row = $this->draftByID($id);
         if ($row['InsertUserID'] !== $this->getSession()->UserID) {
@@ -260,7 +259,10 @@ class DraftsApiController extends AbstractApiController {
 
         $this->idParamSchema();
         $in = $this->draftPostSchema('in')->setDescription('Update a draft.');
-        $out = $this->schema(['draftID', 'parentRecordID', 'attributes'], 'out')->add($this->fullSchema());
+        $out = $this->schema(
+            Schema::parse(['draftID', 'parentRecordID', 'attributes'])->add($this->fullSchema()),
+            'out'
+        );
 
         $row = $this->draftByID($id);
         if ($row['InsertUserID'] !== $this->getSession()->UserID) {

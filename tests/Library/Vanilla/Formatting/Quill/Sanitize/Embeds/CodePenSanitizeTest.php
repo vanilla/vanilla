@@ -4,14 +4,14 @@
  * @license GPL-2.0
  */
 
-namespace VanillaTests\Library\Vanilla\Formatting\Quill\Sanitize\ExternalEmbed;
+namespace VanillaTests\Library\Vanilla\Formatting\Quill\Sanitize\Embeds;
 
 use VanillaTests\Library\Vanilla\Formatting\Quill\Sanitize\SanitizeTest;
-use VanillaTests\Library\Vanilla\Formatting\Quill\Sanitize\CSSInjectionTrait;
+use VanillaTests\Library\Vanilla\Formatting\Quill\Sanitize\LinkSanitizeTrait;
 
 class CodePenSanitizeTest extends SanitizeTest {
 
-    use CSSInjectionTrait;
+//    use LinkSanitizeTrait;
 
     /**
      * @inheritdoc
@@ -36,11 +36,12 @@ class CodePenSanitizeTest extends SanitizeTest {
                                 'overflow' => $string,
                             ],
                         ],
-                    ]
-                ]
+                    ],
+                ],
             ],
-            ["insert" => "\n"]
+            ["insert" => "\n"],
         ];
+
         return $operations;
     }
 
@@ -52,13 +53,13 @@ class CodePenSanitizeTest extends SanitizeTest {
             [
                 "insert" => [
                     "embed-external" => [
-                        "url" => null,
+                        "url" => $content,
                         "type" => "codepen",
-                        "name" => null,
-                        "body" => null,
-                        "photoUrl" => null,
+                        "name" => $content,
+                        "body" => $content,
+                        "photoUrl" => $content,
                         "height" => $content,
-                        "width" => null,
+                        "width" => $content,
                         "attributes" => [
                             'id' => $content,
                             'embedUrl' => $content,
@@ -67,10 +68,10 @@ class CodePenSanitizeTest extends SanitizeTest {
                                 'overflow' => $content,
                             ],
                         ],
-                    ]
-                ]
+                    ],
+                ],
             ],
-            ["insert" => "\n"]
+            ["insert" => $content],
         ];
 
         return $operations;

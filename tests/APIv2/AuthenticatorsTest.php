@@ -28,6 +28,10 @@ class AuthenticatorsTest extends AbstractAPIv2Test {
         /** @var AuthenticatorModel $authenticatorModel */
         $authenticatorModel = self::container()->get(AuthenticatorModel::class);
         self::$authenticators = $authenticatorModel->getAuthenticators();
+
+        /** @var \Gdn_Configuration $config */
+        $config = static::container()->get(\Gdn_Configuration::class);
+        $config->set('Feature.'.\AuthenticateApiController::FEATURE_FLAG.'.Enabled', true, true, false);
     }
 
     /**
@@ -35,7 +39,6 @@ class AuthenticatorsTest extends AbstractAPIv2Test {
      */
     public function setUp() {
         parent::setUp();
-
         if (!self::$authenticators) {
             $this->markTestSkipped('No Authenticator found.');
         }

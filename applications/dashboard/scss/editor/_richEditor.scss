@@ -56,6 +56,18 @@ $richEditor-mobileEmbedBreakPoint                 : 550px !default;
             cursor: progress !important;
         }
     }
+
+    color: $global-color_fg;
+
+    h1,
+    h2,
+    h3,
+    h4,
+    h5,
+    h6,
+    p {
+        color: $global-color_fg;
+    }
 }
 
 .richEditor-frame {

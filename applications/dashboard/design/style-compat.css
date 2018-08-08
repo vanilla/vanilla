@@ -756,11 +756,22 @@ label.checkbox input.checkbox-input {
   position: relative;
   display: block;
   padding-left: 36px;
+  color: #555a62;
 }
 
 .richEditor.isDisabled,
 .richEditor.isDisabled .richEditor-button {
   cursor: progress !important;
+}
+
+.richEditor h1,
+.richEditor h2,
+.richEditor h3,
+.richEditor h4,
+.richEditor h5,
+.richEditor h6,
+.richEditor p {
+  color: #555a62;
 }
 
 .richEditor-frame.InputBox {

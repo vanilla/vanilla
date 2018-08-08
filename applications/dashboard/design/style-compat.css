@@ -773,6 +773,12 @@ label.checkbox input.checkbox-input {
 .richEditor-menu {
   display: inline-block;
   position: relative;
+  background-color: #fff;
+  border-radius: 2px;
+  border-color: #d6d7d9;
+  border-style: solid;
+  border-width: 1px;
+  box-shadow: 0 5px 10px rgba(85, 90, 98, 0.2);
 }
 
 .richEditorParagraphMenu {
@@ -1326,12 +1332,6 @@ label.checkbox input.checkbox-input {
 
 .richEditor-paragraphToolbarContainer {
   position: absolute;
-  background-color: #fff;
-  border-radius: 2px;
-  border-color: #d6d7d9;
-  border-style: solid;
-  border-width: 1px;
-  box-shadow: 0 5px 10px rgba(85, 90, 98, 0.2);
   left: -webkit-calc(50% - 18px);
   left: calc(50% - 18px);
 }

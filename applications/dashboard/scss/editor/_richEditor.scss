@@ -70,6 +70,14 @@ $richEditor-mobileEmbedBreakPoint                 : 550px !default;
 .richEditor-menu {
     display: inline-block;
     position: relative;
+    background-color: $global-color_bg;
+    border: {
+        radius: $global-borderRadius;
+        color: $global-border_color;
+        style: $global-border_style;
+        width: $global-border_width;
+    }
+    box-shadow: $menu-dropShadow;
 }
 
 .richEditorParagraphMenu {
@@ -489,6 +497,7 @@ $richEditor-mobileEmbedBreakPoint                 : 550px !default;
     background: $richEditor_bg;
 }
 
+
 // Orientation specific styles
 .richEditor-inlineToolbarContainer {
     &.isUp {
@@ -523,14 +532,6 @@ $richEditor-mobileEmbedBreakPoint                 : 550px !default;
 
 .richEditor-paragraphToolbarContainer {
     position: absolute;
-    background-color: $global-color_bg;
-    border: {
-        radius: $global-borderRadius;
-        color: $global-border_color;
-        style: $global-border_style;
-        width: $global-border_width;
-    }
-    box-shadow: $menu-dropShadow;
     left: calc(50% - #{$richEditor_horizontalPadding / 2});
 
 

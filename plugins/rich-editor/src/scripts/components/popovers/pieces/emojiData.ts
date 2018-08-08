@@ -13,7 +13,16 @@
  * @license https://opensource.org/licenses/GPL-2.0 GPL-2.0
  */
 
-import {emojiGroup_smileysPeople, emojiGroup_animalsNature, emojiGroup_foodDrink, emojiGroup_travelPlaces, emojiGroup_activities, emojiGroup_objects, emojiGroup_symbols, emojiGroup_flags} from "@rich-editor/components/icons";
+import {
+    emojiGroup_smileysPeople,
+    emojiGroup_animalsNature,
+    emojiGroup_foodDrink,
+    emojiGroup_travelPlaces,
+    emojiGroup_activities,
+    emojiGroup_objects,
+    emojiGroup_symbols,
+    emojiGroup_flags,
+} from "@rich-editor/components/icons";
 
 export const EMOJI_GROUPS = [
     {

@@ -77,7 +77,7 @@ export default class Editor extends React.Component<IProps> {
                 <InlineToolbar />
                 <ParagraphToolbar />
                 <MentionToolbar />
-                <div className="richEditor-menu richEditor-embedBar">
+                <div className="richEditor-embedBar">
                     <ul
                         className="richEditor-menuItems richEditor-inlineMenuItems"
                         role="menubar"

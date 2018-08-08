@@ -170,7 +170,7 @@ export class ParagraphToolbar extends React.PureComponent<IProps, IState> {
         );
 
         // This is the pixel offset from the top needed to make things align correctly.
-        const offset = 9 + 2;
+        const offset = 14;
 
         return {
             top: (bounds.top + bounds.bottom) / 2 - offset,

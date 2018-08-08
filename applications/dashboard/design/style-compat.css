@@ -1960,7 +1960,10 @@ body.isMobile .richEditorParagraphMenu {
 .richEditor .embedExternal-content > *,
 .richEditor .embedLinkLoader-link > * {
   pointer-events: none;
-  cursor: default;
+}
+
+.embed-focusableElement {
+  cursor: pointer;
 }
 
 .richEditor .embedExternal-content::after {
@@ -2291,6 +2294,7 @@ body.isMobile .richEditorParagraphMenu {
 }
 
 .embedQuote-userPhoto {
+  display: block;
   width: 24px;
   height: 24px;
   border-radius: 2px;

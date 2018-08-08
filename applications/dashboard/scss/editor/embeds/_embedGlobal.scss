@@ -96,9 +96,12 @@
 
         > * {
             pointer-events: none; // In edit mode, we never allow clicking into elements.
-            cursor: default;
         }
     }
+}
+
+.embed-focusableElement {
+    cursor: pointer;
 }
 
 // Edit Mode changes

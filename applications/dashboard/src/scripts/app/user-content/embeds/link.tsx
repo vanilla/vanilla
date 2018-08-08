@@ -39,7 +39,7 @@ export class LinkEmbed extends BaseEmbed {
 
         const sanitizedUrl = sanitizeUrl(url);
         return (
-            <a href={sanitizedUrl} rel="noreferrer">
+            <a className="embedLink-link" href={sanitizedUrl} rel="noreferrer">
                 <article className="embedText-body embedLink-body">
                     {linkImage}
                     <div className="embedText-main embedLink-main">

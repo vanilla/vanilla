@@ -430,6 +430,7 @@ class SmokeTest extends BaseTest {
         $postedDiscussion = $postedDiscussion['Discussion'];
         $this->assertEquals($discussion['Name'], $postedDiscussion['Name']);
         $this->assertEquals($discussion['Body'], $postedDiscussion['Body']);
+        $this->assertEquals($discussion['CategoryID'], $postedDiscussion['CategoryID']);
     }
 
     /**

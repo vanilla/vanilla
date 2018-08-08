@@ -68,6 +68,11 @@ $richEditor-mobileEmbedBreakPoint                 : 550px !default;
     p {
         color: $global-color_fg;
     }
+
+    blockquote {
+        display: block;
+        margin: 0;
+    }
 }
 
 .richEditor-frame {

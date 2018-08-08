@@ -368,8 +368,8 @@ $buttonPrimary: (
 \* -------------------------------------------------------------- */
 
 $metaText_fontSize                                   : $global-small_fontSize;
-$metaText_color                                      : mix($global-color_fg, $global-color_bg, 90%) !default;
-$metaText_margin                                     : mix($global-color_fg, $global-color_bg, 70%) !default;
+$metaText_color                                      : mix($global-color_fg, $global-color_bg, 80%) !default;
+$metaText_margin                                     : $utility-baseUnit !default;
 
 
 /* -------------------------------------------------------------- *\
@@ -400,17 +400,9 @@ $global-header_height: 50px !default;
 $global-footer_height: 50px !default;
 
 ///* -------------------------------------------------------------- *\
-//    Convert to CSS Variables
+//    Embedded content
 //\* -------------------------------------------------------------- */
-//
-//:root {
-//    // Basic Colors
-//    @include sassToCss("$global-color_fg", $global-color_fg);
-//    @include sassToCss("$global-color_bg", $global-color_bg);
-//    @include sassToCss("$global-color_secondary", $global-color_secondary);
-//    @include sassToCss("$global-color_primarySubtle", $global-color_primarySubtle);
-//    @include sassToCss("$global-heading_fontFamily", $global-heading_fontFamily);
-//    @include sassToCss("$global-body_fontFamily", $global-body_fontFamily);
-//}
-//
+
+$embeddedText-padding: 18px;
+
 

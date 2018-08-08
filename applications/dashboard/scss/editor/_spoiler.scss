@@ -2,7 +2,6 @@ $spoiler-borderColor: #aaadb1 !default;
 $spoiler-borderRadius: 2px !default;
 $spoiler-bg: #fff8d9 !default;
 $spoiler-fontSize: 16px !default;
-$spoiler-horizontalPadding: 18px !default;
 $buttonSpoiler-fg: #555a62 !default;
 $buttonSpoiler-bg: transparent !default;
 $buttonSpoiler-hover_fg: #f52c6e !default;
@@ -76,7 +75,7 @@ $buttonSpoiler: (
     max-width: 100%;
     font-size: $spoiler-fontSize;
     min-height: $icon_default_size * 2;
-    padding: 0 $spoiler-horizontalPadding;
+    padding: 0 $embeddedText-padding;
     outline: 0;
     cursor: pointer;
     text-align: center;
@@ -124,7 +123,7 @@ $buttonSpoiler: (
 }
 
 .spoiler-content {
-    padding: 0 $spoiler-horizontalPadding $spoiler-horizontalPadding $spoiler-horizontalPadding;
+    padding: 0 $embeddedText-padding $embeddedText-padding $embeddedText-padding;
 }
 
 .spoiler-buttonContainer {

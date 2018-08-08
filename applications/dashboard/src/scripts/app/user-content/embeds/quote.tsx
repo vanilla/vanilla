@@ -96,39 +96,41 @@ export class QuoteEmbed extends React.Component<IEmbedProps<IEmbedData>, IState>
         const userUrl = makeProfileUrl(insertUser.name);
 
         return (
-            <article className={bodyClasses}>
-                <div className="embedText-main embedQuote-main">
-                    <div className="embedText-header embedQuote-header">
-                        {title}
-                        <a href={userUrl} className="embedQuote-userLink">
-                            <span className="embedQuote-userPhotoWrap">
-                                <img
-                                    src={insertUser.photoUrl}
-                                    alt={insertUser.name}
-                                    className="embedQuote-userPhoto"
-                                    tabIndex={-1}
-                                />
-                            </span>
-                            <span className="embedQuote-userName">{insertUser.name}</span>
-                        </a>
-                        <time
-                            className="embedText-dateTime embedQuote-dateTime meta"
-                            dateTime={this.dateTime}
-                            title={this.titleTime}
+            <blockquote className={bodyClasses}>
+                <div className="embedQuote-header">
+                    {title}
+                    <a href={userUrl} className="embedQuote-userLink">
+                        <span className="embedQuote-userPhotoWrap">
+                            <img
+                                src={insertUser.photoUrl}
+                                alt={insertUser.name}
+                                className="embedQuote-userPhoto"
+                                tabIndex={-1}
+                            />
+                        </span>
+                        <span className="embedQuote-userName">{insertUser.name}</span>
+                    </a>
+                    <time
+                        className="embedText-dateTime embedQuote-dateTime meta"
+                        dateTime={this.dateTime}
+                        title={this.titleTime}
+                    >
+                        {this.humanTime}
+                    </time>
+
+                    {this.state.needsCollapseButton && (
+                        <button
+                            type="button"
+                            className="embedQuote-collapseButton"
+                            aria-label={t("Toggle Full Quote")}
+                            onClick={this.toggleCollapseState}
+                            aria-pressed={this.state.isCollapsed}
                         >
-                            {this.humanTime}
-                        </time>
-                        {this.state.needsCollapseButton && (
-                            <button
-                                type="button"
-                                className="embedQuote-collapseButton"
-                                onClick={this.toggleCollapseState}
-                                aria-pressed={this.state.isCollapsed}
-                            >
-                                {this.state.isCollapsed ? <ChevronDownIcon /> : <ChevronUpIcon />}
-                            </button>
-                        )}
-                    </div>
+                            {this.state.isCollapsed ? <ChevronDownIcon /> : <ChevronUpIcon />}
+                        </button>
+                    )}
+                </div>
+                <div className="embedText-main embedQuote-main">
                     <div className="embedQuote-excerpt userContent">
                         <CollapsableUserContent
                             setNeedsCollapser={this.setNeedsCollapser}
@@ -139,7 +141,7 @@ export class QuoteEmbed extends React.Component<IEmbedProps<IEmbedData>, IState>
                         />
                     </div>
                 </div>
-            </article>
+            </blockquote>
         );
     }
 

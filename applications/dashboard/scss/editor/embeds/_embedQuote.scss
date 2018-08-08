@@ -1,8 +1,6 @@
-$embedQuote-text_color: $quote-fg !default;
-$embedQuote-border_color: $quote-border_color !default;
-$embedQuote-userName_fontWeight: $global-bold_fontWeight !default;
-$embedQuote-userPhoto_size: 24px !default;
-$embedQuote-userPhoto_borderRadius: $global-borderRadius !default;
+$embedQuote-text_color            : $quote-fg !default;
+$embedQuote-userPhoto_size        : 24px !default;
+$embedQuote-toggleButton_padding  : 12px !default;
 
 .embedQuote {
     width: 100%;
@@ -10,7 +8,7 @@ $embedQuote-userPhoto_borderRadius: $global-borderRadius !default;
 
 .embedQuote-content {
     width: 100%;
-    border-left: 6px solid $embedQuote-border_color;
+    border-left: 6px solid $quote-border_color;
 }
 
 .embedQuote-header {
@@ -24,17 +22,18 @@ $embedQuote-userPhoto_borderRadius: $global-borderRadius !default;
 }
 
 .embedQuote-userName {
-    margin: 0 0 0 9px;
+    margin: 0 0 0 $metaText_margin;
     padding: 0;
-    color: #555A62;
-    font-weight: $embedQuote-userName_fontWeight;
+    color: $metaText_color;
+    font-weight: $global-bold_fontWeight;
+    font-size: $metaText_fontSize;
 }
 
 .embedQuote-userPhoto {
     display: block;
     width: $embedQuote-userPhoto_size;
     height: $embedQuote-userPhoto_size;
-    border-radius: $embedQuote-userPhoto_borderRadius;
+    border-radius: $global-borderRadius;
 }
 
 .embedQuote-excerpt {
@@ -52,22 +51,26 @@ $embedQuote-userPhoto_borderRadius: $global-borderRadius !default;
 }
 
 .embedQuote-collapseButton {
-    $paddingInset: 12px;
-    margin: {
-        left: 0;
-        right: -$paddingInset;
-        bottom: 0;
-        top: 0;
-    }
-    padding: 0 $paddingInset;
     appearance: none;
     background: none;
     border: none;
     cursor: pointer;
-    position: absolute;
-    right: 0;
-    top: 50%;
-    transform: translateY(-50%);
+    margin-left: auto;
+    height: $richEditor-menuButton_size;
+    width: auto;
+    padding: 0 $embedQuote-toggleButton_padding;
+
+    &:hover {
+        @include editorButtonHoverStyles;
+    }
+
+    &:focus {
+        @include editorButtonFocusStyles;
+    }
+
+    &:active {
+        @include editorButtonActiveStyles;
+    }
 }
 
 .embedQuote-chevronUp,
@@ -76,4 +79,27 @@ $embedQuote-userPhoto_borderRadius: $global-borderRadius !default;
     height: 4px;
     display: inline-block;
     vertical-align: .2em;
+}
+
+.embedQuote-dateTime {
+    font-size: $metaText_fontSize;
+    color: $metaText_color;
+    margin-left: $metaText_margin * 2;
+}
+
+.embedQuote-header {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    padding: {
+        top: #{$embeddedText-padding - ($richEditor-menuButton_size - $embedQuote-userPhoto_size)/2};
+        left: $embeddedText-padding;
+        right: #{$embeddedText-padding - $embedQuote-toggleButton_padding};
+        bottom: 0;
+    }
+}
+
+.embedQuote-body {
+    display: block;
+    margin: 0;
 }

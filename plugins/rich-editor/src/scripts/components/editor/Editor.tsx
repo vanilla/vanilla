@@ -60,7 +60,7 @@ export default class Editor extends React.Component<IProps> {
         this.quill.on(Quill.events.EDITOR_CHANGE, this.onQuillUpdate);
 
         // Add a listener for a force selection update.
-        document.addEventListener(SELECTION_UPDATE, this.onQuillUpdate);
+        document.addEventListener(SELECTION_UPDATE, () => this.onQuillUpdate(null, null, null, Quill.sources.USER));
 
         // Once we've created our quill instance we need to force an update to allow all of the quill dependent
         // Modules to render.
@@ -116,8 +116,12 @@ export default class Editor extends React.Component<IProps> {
         );
     }
 
-    private onQuillUpdate = () => {
-        this.store.dispatch(actions.setSelection(this.editorID, this.quill.getSelection()));
+    private onQuillUpdate = (type, newValue, oldValue, source) => {
+        if (source !== Quill.sources.SILENT) {
+            window.requestAnimationFrame(() => {
+                this.store.dispatch(actions.setSelection(this.editorID, this.quill.getSelection()));
+            });
+        }
     };
 
     /**

@@ -78,7 +78,10 @@ class QuoteEmbed extends Embed {
         $sanitizedUrl = htmlspecialchars(\Gdn_Format::sanitizeUrl($url));
         $data['attributes']['body'] = \Gdn_Format::quoteEmbed($bodyRaw, $format);
         unset($data['attributes']['bodyRaw']);
-        $jsonData = json_encode($data);
+
+        // JSON and HTML encode the data so that the react component can mount on this.
+        $jsonData = htmlspecialchars(json_encode($data), ENT_QUOTES, 'UTF-8');
+
         $result = <<<HTML
 <div class="embedExternal embedText embedQuote">
     <div class="embedExternal-content embedQuote-content">

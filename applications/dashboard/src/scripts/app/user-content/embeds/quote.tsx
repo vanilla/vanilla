@@ -122,7 +122,7 @@ export class QuoteEmbed extends React.Component<IEmbedProps<IEmbedData>, IState>
                         <button
                             type="button"
                             className="embedQuote-collapseButton"
-                            aria-label={t("Toggle Full Quote")}
+                            aria-label={t("Toggle Quote")}
                             onClick={this.toggleCollapseState}
                             aria-pressed={this.state.isCollapsed}
                         >

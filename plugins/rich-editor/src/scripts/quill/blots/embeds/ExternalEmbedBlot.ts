@@ -6,7 +6,7 @@
 
 import { setData, getData, escapeHTML } from "@dashboard/dom";
 import uniqueId from "lodash/uniqueId";
-import { IEmbedData, renderEmbed, FOCUS_CLASS } from "@dashboard/embeds";
+import { IEmbedData, renderEmbed, FOCUS_CLASS, IQuoteEmbedData } from "@dashboard/embeds";
 import FocusableEmbedBlot from "../abstract/FocusableEmbedBlot";
 import ErrorBlot from "./ErrorBlot";
 import { t } from "@dashboard/application";

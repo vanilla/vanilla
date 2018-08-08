@@ -8,7 +8,7 @@ import React from "react";
 import { t } from "@dashboard/application";
 import getStore from "@dashboard/state/getStore";
 import { hasPermission } from "@dashboard/permissions";
-import { log, debug } from "@dashboard/utility";
+import { log, debug, sanitizeUrl } from "@dashboard/utility";
 import Quill from "@rich-editor/quill";
 import EmbedPopover from "@rich-editor/components/popovers/EmbedPopover";
 import EmojiPopover from "@rich-editor/components/popovers/EmojiPopover";
@@ -21,13 +21,15 @@ import EditorDescriptions from "@rich-editor/components/editor/pieces/EditorDesc
 import { Provider as ReduxProvider } from "react-redux";
 import { actions } from "@rich-editor/state/instance/instanceActions";
 import { getIDForQuill, isEmbedSelected, SELECTION_UPDATE } from "@rich-editor/quill/utility";
-import { FOCUS_CLASS } from "@dashboard/embeds";
 import { IStoreState } from "@rich-editor/@types/store";
+import { delegateEvent, removeDelegatedEvent } from "@dashboard/dom";
+import EmbedInsertionModule from "@rich-editor/quill/EmbedInsertionModule";
 
 interface IProps {
     editorID: string;
     editorDescriptionID: string;
     bodybox: HTMLInputElement;
+    isPrimaryEditor: boolean;
 }
 
 export default class Editor extends React.Component<IProps> {
@@ -37,6 +39,7 @@ export default class Editor extends React.Component<IProps> {
     private allowPasteListener = true;
     private editorID: string;
     private quill: Quill;
+    private delegatedHandlerHash: string;
 
     constructor(props) {
         super(props);
@@ -62,9 +65,15 @@ export default class Editor extends React.Component<IProps> {
         // Add a listener for a force selection update.
         document.addEventListener(SELECTION_UPDATE, () => this.onQuillUpdate(null, null, null, Quill.sources.USER));
 
+        this.addQuoteHandler();
+
         // Once we've created our quill instance we need to force an update to allow all of the quill dependent
         // Modules to render.
         this.forceUpdate();
+    }
+
+    public componentWillUnmount() {
+        removeDelegatedEvent(this.delegatedHandlerHash);
     }
 
     public render() {
@@ -152,6 +161,17 @@ export default class Editor extends React.Component<IProps> {
                 this.allowPasteListener = true;
             });
         }
+    }
+
+    private quoteButtonClickHandler = (event: MouseEvent, triggeringElement: Element) => {
+        event.preventDefault();
+        const embedInserter: EmbedInsertionModule = this.quill.getModule("embed/insertion");
+        const url = triggeringElement.getAttribute("data-scrape-url") || "";
+        void embedInserter.scrapeMedia(url);
+    };
+
+    private addQuoteHandler() {
+        this.delegatedHandlerHash = delegateEvent("click", ".js-quoteButton", this.quoteButtonClickHandler)!;
     }
 
     /**

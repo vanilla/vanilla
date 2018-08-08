@@ -25,7 +25,8 @@
     "build": {
         "process": "core",
         "entries": {
-            "app": "./src/scripts/entries/app"
+            "app": "./src/scripts/entries/app",
+            "admin": "./src/scripts/entries/admin"
         }
     }
 }

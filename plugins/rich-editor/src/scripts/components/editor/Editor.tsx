@@ -130,9 +130,7 @@ export default class Editor extends React.Component<IProps> {
     }
 
     private onQuillUpdate = (type, newValue, oldValue, source) => {
-        if (source !== Quill.sources.SILENT) {
-            this.store.dispatch(actions.setSelection(this.editorID, this.quill.getSelection()));
-        }
+        this.store.dispatch(actions.setSelection(this.editorID, this.quill.getSelection()));
     };
 
     /**

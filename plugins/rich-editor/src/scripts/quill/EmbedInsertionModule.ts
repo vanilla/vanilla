@@ -6,7 +6,7 @@
 
 import Module from "quill/core/module";
 import Parchment from "parchment";
-import Quill, { RangeStatic } from "quill/core";
+import Quill from "quill/core";
 import api, { uploadImage } from "@dashboard/apiv2";
 import { getPastedImage, getDraggedImage } from "@dashboard/dom";
 import ExternalEmbedBlot, { IEmbedValue } from "./blots/embeds/ExternalEmbedBlot";

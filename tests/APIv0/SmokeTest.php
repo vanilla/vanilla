@@ -276,13 +276,15 @@ class SmokeTest extends BaseTest {
     /**
      * Test posting a discussion.
      *
+     * @param array $user The user used to post the discussion.
      * @depends testRegisterBasic
      * @large
      * @return array Single discussion.
      */
-    public function testPostDiscussion() {
+    public function testPostDiscussion($user = null) {
         $api = $this->api();
-        $api->setUser($this->getTestUser());
+        $user = $user ? $user : $this->getTestUser();
+        $api->setUser($user);
 
         $discussion = [
             'CategoryID' => 1,
@@ -395,8 +397,6 @@ class SmokeTest extends BaseTest {
         $this->assertEquals($postedDraft['Name'], $draft['Name']);
         $this->assertEquals($postedDraft['Body'], $draft['Body']);
         $this->assertEquals($postedDraft['CategoryID'], $draft['CategoryID']);
-
-        return $postedDraft;
     }
 
     /**
@@ -499,7 +499,6 @@ class SmokeTest extends BaseTest {
 
         $discussion = $this->testPostDiscussion();
         $discussionID = val('DiscussionID', $discussion);
-
         $r = $api->post("/discussion/bookmark/{$discussionID}/{$user['tk']}");
         $statusCode = $r->getStatusCode();
         $this->assertEquals(200, $statusCode);
@@ -518,10 +517,12 @@ class SmokeTest extends BaseTest {
      */
     public function testRemoveDiscussionBookMark() {
         $api = $this->api();
-        $api->setUser($this->getTestUser());
+        $admin =  $this->api()->queryUserKey('Admin', true);
+        //use admin user so flood control isn't triggered
+        $api->setUser($admin);
         $user = $api->getUser();
 
-        $discussion = $this->testPostDiscussion();
+        $discussion = $this->testPostDiscussion($user);
         $discussionID = val('DiscussionID', $discussion);
 
         $r = $api->post("/discussion/bookmark/{$discussionID}/{$user['tk']}");

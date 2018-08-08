@@ -1,6 +1,8 @@
 $embedQuote-text_color: $quote-fg !default;
 $embedQuote-border_color: $quote-border_color !default;
 $embedQuote-userName_fontWeight: $global-bold_fontWeight !default;
+$embedQuote-userPhoto_size: 24px !default;
+$embedQuote-userPhoto_borderRadius: $global-borderRadius !default;
 
 .embedQuote {
     width: 100%;
@@ -28,6 +30,12 @@ $embedQuote-userName_fontWeight: $global-bold_fontWeight !default;
     font-weight: $embedQuote-userName_fontWeight;
 }
 
+.embedQuote-userPhoto {
+    width: $embedQuote-userPhoto_size;
+    height: $embedQuote-userPhoto_size;
+    border-radius: $embedQuote-userPhoto_borderRadius;
+}
+
 .embedQuote-excerpt {
     color: $embedQuote-text_color;
     white-space: normal;
@@ -43,23 +51,28 @@ $embedQuote-userName_fontWeight: $global-bold_fontWeight !default;
 }
 
 .embedQuote-collapseButton {
-    margin: 0;
-    padding: 12px;
+    $paddingInset: 12px;
+    margin: {
+        left: 0;
+        right: -$paddingInset;
+        bottom: 0;
+        top: 0;
+    }
+    padding: 0 $paddingInset;
     appearance: none;
+    background: none;
+    border: none;
     cursor: pointer;
     position: absolute;
     right: 0;
     top: 50%;
     transform: translateY(-50%);
-
-    // Stupid ICheckBoxes showing up.
-    .icheckbox {
-        display: none !important;
-    }
 }
 
-.embedQuote-body.isCollapsed {
-    .embedQuote-collapseButton {
-        transform: translateY(-50%) rotate(180deg);
-    }
+.embedQuote-chevronUp,
+.embedQuote-chevronDown {
+    width: 8px;
+    height: 4px;
+    display: inline-block;
+    vertical-align: .2em;
 }

@@ -85,7 +85,7 @@ class QuoteEmbed extends Embed {
         $result = <<<HTML
 <div class="embedExternal embedText embedQuote">
     <div class="embedExternal-content embedText-content embedQuote-content">
-        <div class="js-quoteEmbed" data-json='$jsonData'><a href="$sanitizedUrl">$sanitizedUrl</a></div>
+        <div class="js-quoteEmbed embedResponsive-initialLink" data-json='$jsonData'><a href="$sanitizedUrl">$sanitizedUrl</a></div>
     </div>
 </div>
 HTML;

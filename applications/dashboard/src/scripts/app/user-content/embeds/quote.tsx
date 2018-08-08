@@ -45,6 +45,31 @@ interface IState {
     renderedBody: string;
 }
 
+function ChevronUpIcon() {
+    return (
+        <svg className="icon embedQuote-chevronUp">
+            <title>{t("▲")}</title>
+            <path
+                fill="currentColor"
+                d="M0,3.6c0-0.1,0-0.2,0.1-0.3l3.5-3.1C3.7,0,3.9,0,4,0c0.1,0,0.3,0,0.4,0.1l3.5,3.1C8,3.3,8,3.4,8,3.6s0,0.2-0.1,0.3C7.8,4,7.6,4,7.5,4h-7C0.4,4,0.2,4,0.1,3.9C0,3.8,0,3.7,0,3.6z"
+            />
+        </svg>
+    );
+}
+
+function ChevronDownIcon() {
+    return (
+        <svg className="icon embedQuote-chevronDown">
+            <title>{t("▼")}</title>
+            <path
+                fill="currentColor"
+                d="M8,3.55555556 C8,3.43518519 7.95052083,3.33101852 7.8515625,3.24305556 L4.3515625,0.131944444 C4.25260417,0.0439814815 4.13541667,0 4,0 C3.86458333,0 3.74739583,0.0439814815 3.6484375,0.131944444 L0.1484375,3.24305556 C0.0494791667,3.33101852 -4.4408921e-16,3.43518519 -4.4408921e-16,3.55555556 C-4.4408921e-16,3.67592593 0.0494791667,3.78009259 0.1484375,3.86805556 C0.247395833,3.95601852 0.364583333,4 0.5,4 L7.5,4 C7.63541667,4 7.75260417,3.95601852 7.8515625,3.86805556 C7.95052083,3.78009259 8,3.67592593 8,3.55555556 Z"
+                transform="matrix(1 0 0 -1 0 4)"
+            />
+        </svg>
+    );
+}
+
 /**
  * An embed class for quoted user content on the same site.
  *
@@ -68,7 +93,6 @@ export class QuoteEmbed extends React.Component<IEmbedProps<IEmbedData>, IState>
         ) : null;
 
         const bodyClasses = classnames("embedText-body", "embedQuote-body", { isCollapsed: this.state.isCollapsed });
-        const collapseIconClasses = classnames("icon", "embedQuote-collapseButton", "icon-chevron-up");
         const userUrl = makeProfileUrl(insertUser.name);
 
         return (
@@ -77,11 +101,11 @@ export class QuoteEmbed extends React.Component<IEmbedProps<IEmbedData>, IState>
                     <div className="embedText-header embedQuote-header">
                         {title}
                         <a href={userUrl} className="embedQuote-userLink">
-                            <span className="embedQuote-userPhoto PhotoWrap">
+                            <span className="embedQuote-userPhotoWrap">
                                 <img
                                     src={insertUser.photoUrl}
                                     alt={insertUser.name}
-                                    className="ProfilePhoto ProfilePhotoSmall"
+                                    className="embedQuote-userPhoto"
                                     tabIndex={-1}
                                 />
                             </span>
@@ -95,15 +119,14 @@ export class QuoteEmbed extends React.Component<IEmbedProps<IEmbedData>, IState>
                             {this.humanTime}
                         </time>
                         {this.state.needsCollapseButton && (
-                            <label className={collapseIconClasses}>
-                                <span className="sr-only">{t("Collapse this quote")}</span>
-                                <input
-                                    type="button"
-                                    className="sr-only"
-                                    onClick={this.toggleCollapseState}
-                                    aria-pressed={this.state.isCollapsed}
-                                />
-                            </label>
+                            <button
+                                type="button"
+                                className="embedQuote-collapseButton"
+                                onClick={this.toggleCollapseState}
+                                aria-pressed={this.state.isCollapsed}
+                            >
+                                {this.state.isCollapsed ? <ChevronUpIcon /> : <ChevronDownIcon />}
+                            </button>
                         )}
                     </div>
                     <div className="embedQuote-excerpt userContent">

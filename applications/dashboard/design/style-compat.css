@@ -1831,6 +1831,10 @@ body.isMobile .richEditorParagraphMenu {
   text-align: center;
 }
 
+.embedResponsive-initialLink {
+  text-align: start;
+}
+
 .embedExternal {
   display: -webkit-inline-box;
   display: -webkit-inline-flex;
@@ -2112,13 +2116,13 @@ body.isMobile .richEditorParagraphMenu {
   max-width: 100%;
 }
 
-.embedExternal-content {
+.embedText-content {
   display: block;
   background: #ffffff;
   box-shadow: 0 1px 3px 0 rgba(85, 90, 98, 0.3);
 }
 
-.embedExternal-content, .embedExternal-content:hover, .embedExternal-content:focus {
+.embedText-content, .embedText-content:hover, .embedText-content:focus {
   color: inherit;
   text-decoration: none !important;
 }
@@ -2286,6 +2290,12 @@ body.isMobile .richEditorParagraphMenu {
   font-weight: 600;
 }
 
+.embedQuote-userPhoto {
+  width: 24px;
+  height: 24px;
+  border-radius: 2px;
+}
+
 .embedQuote-excerpt {
   color: #a2a4a9;
   white-space: normal;
@@ -2301,11 +2311,16 @@ body.isMobile .richEditorParagraphMenu {
 }
 
 .embedQuote-collapseButton {
-  margin: 0;
-  padding: 12px;
+  margin-left: 0;
+  margin-right: -12px;
+  margin-bottom: 0;
+  margin-top: 0;
+  padding: 0 12px;
   -webkit-appearance: none;
      -moz-appearance: none;
           appearance: none;
+  background: none;
+  border: none;
   cursor: pointer;
   position: absolute;
   right: 0;
@@ -2315,14 +2330,12 @@ body.isMobile .richEditorParagraphMenu {
           transform: translateY(-50%);
 }
 
-.embedQuote-collapseButton .icheckbox {
-  display: none !important;
-}
-
-.embedQuote-body.isCollapsed .embedQuote-collapseButton {
-  -webkit-transform: translateY(-50%) rotate(180deg);
-      -ms-transform: translateY(-50%) rotate(180deg);
-          transform: translateY(-50%) rotate(180deg);
+.embedQuote-chevronUp,
+.embedQuote-chevronDown {
+  width: 8px;
+  height: 4px;
+  display: inline-block;
+  vertical-align: .2em;
 }
 
 .embedLoader-icon {

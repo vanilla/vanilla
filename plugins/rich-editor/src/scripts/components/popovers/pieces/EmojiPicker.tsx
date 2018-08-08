@@ -32,6 +32,8 @@ EMOJIS.forEach((data, key) => {
     }
 });
 
+console.log(rowIndexesByGroupId);
+
 const lastEmojiIndex = EMOJIS.length - 1;
 
 interface IProps extends IWithEditorProps, IPopoverControllerChildParameters {
@@ -95,7 +97,7 @@ export class EmojiPicker extends React.PureComponent<IProps, IState> {
         const footer = (
             <div id={this.categoryPickerID} className="emojiGroups" aria-label={t("Emoji Categories")} tabIndex={-1}>
                 {Object.values(EMOJI_GROUPS).map((group, groupIndex) => {
-                    const { name, icon } = group;
+                    const { name, icon, groupKey } = group;
                     const isSelected = this.state.selectedGroupIndex === groupIndex;
                     const buttonClasses = classNames("richEditor-button", "emojiGroup", { isSelected });
 
@@ -138,7 +140,6 @@ export class EmojiPicker extends React.PureComponent<IProps, IState> {
                         aria-readonly={undefined}
                         aria-label={""}
                         role={""}
-                        // onScroll={this.handleEmojiScroll}
                         onSectionRendered={this.handleOnSectionRendered}
                         ref={gridEl => {
                             this.gridEl = gridEl as Grid;
@@ -192,6 +193,7 @@ export class EmojiPicker extends React.PureComponent<IProps, IState> {
             }
         });
 
+        console.log(selectedGroupIndex);
         this.setState({
             rowStartIndex: event.rowStartIndex,
             selectedGroupIndex,
@@ -210,6 +212,7 @@ export class EmojiPicker extends React.PureComponent<IProps, IState> {
      * Scroll to category
      */
     private scrollToCategory = (categoryID: number) => {
+        console.log(categoryID);
         const newIndex = cellIndexesByGroupId[categoryID];
         this.setState({
             activeIndex: newIndex,

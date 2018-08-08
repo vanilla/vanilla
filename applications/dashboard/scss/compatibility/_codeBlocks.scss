@@ -26,6 +26,7 @@ $richEditor-code_fg: #000000 !default;
 
     .codeInline {
         display: inline-block;
+        white-space: normal;
     }
 
     .codeBlock {

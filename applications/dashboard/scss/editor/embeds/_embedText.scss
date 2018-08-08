@@ -27,7 +27,7 @@ $embedText-content_boxShadow: 0 1px 3px 0 $embedText-content_boxShadowColor !def
 }
 
 .embedText-main {
-    padding: 18px;
+    padding: $embeddedText-padding;
     box-sizing: border-box;
 }
 
@@ -41,27 +41,28 @@ $embedText-content_boxShadow: 0 1px 3px 0 $embedText-content_boxShadowColor !def
     margin-bottom: $utility-baseUnit;
 }
 
-.embedText-dateTime {
-    font-size: .8em;
-    margin: 0 0 0 9px;
-    padding: 0;
-    color: #737373;
-}
 
-.embedText-title {
-    display: block;
-    width: 100%;
-    margin: 0;
-    padding: 0;
-    font-size: $embedText-header_fontSize;
-    line-height: $embedText-header-lineHeight;
-    font-weight: $embedText-title_fontWeight;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
+.userContent { // for compatibility
+    .embedText-title {
+        display: block;
+        width: 100%;
+        margin: {
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: $utility-baseUnit;
+        };
+        padding: 0;
+        font-size: $embedText-header_fontSize;
+        line-height: $embedText-header-lineHeight;
+        font-weight: $embedText-title_fontWeight;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
 
-    @include mediaQuery-richEditor_embed {
-        @include breakWord;
-        white-space: normal;
+        @include mediaQuery-richEditor_embed {
+            @include breakWord;
+            white-space: normal;
+        }
     }
 }

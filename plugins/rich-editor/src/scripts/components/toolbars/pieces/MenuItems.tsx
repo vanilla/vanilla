@@ -32,7 +32,7 @@ export default class MenuItems extends React.Component<IProps, {}> {
         const lastIndex = menuItemData.length - 1;
         return (
             <div className="richEditor-menu" role="menu" aria-orientation={this.props.orientation!}>
-                <div className="richEditor-menuItems MenuItems">
+                <div className="richEditor-menuItems">
                     {this.props.menuItemData.map((itemData, index) => {
                         const prevIndex = index === firstIndex ? lastIndex : index - 1;
                         const nextIndex = index === lastIndex ? firstIndex : index + 1;

@@ -198,7 +198,7 @@
 <h2>Paragraph Level Formatting Menu</h2>
 
 <div class="richEditor-menu" role="menu" aria-label="<?php echo t('Paragraph Level Formatting Menu') ?>">
-    <ul class="richEditor-menuItems MenuItems" role="radiogroup">
+    <ul class="richEditor-menuItems" role="radiogroup">
         <li class="richEditor-menuItem" role="presentation">
             <button class="richEditor-button" type="button" role="radio" aria-checked="false">
                 <svg class="richEditorButton-icon" viewBox="0 0 24 24">
@@ -249,7 +249,7 @@
 <h2>Inline Level Formatting Menu</h2>
 
 <div class="richEditor-menu richEditorInlineMenu" role="dialog" aria-label="<?php echo t('Inline Level Formatting Menu') ?>">
-    <ul class="richEditor-menuItems MenuItems" role="menubar" aria-label="<?php echo t('Inline Level Formatting Menu'); ?>">
+    <ul class="richEditor-menuItems" role="menubar" aria-label="<?php echo t('Inline Level Formatting Menu'); ?>">
         <li class="richEditor-menuItem" role="menuitem">
             <button class="richEditor-button" type="button">
                 <svg class="richEditorButton-icon" viewBox="0 0 24 24">
@@ -296,7 +296,7 @@
 <hr/>
 
 <h2>Link Menu</h2>
-<div class="richEditor-menu FlyoutMenu insertLink" role="dialog" aria-label="<?php echo 'Insert Url'; ?>">
+<div class="richEditor-menu insertLink" role="dialog" aria-label="<?php echo 'Insert Url'; ?>">
     <input class="InputBox insertLink-input" placeholder="Paste or type a link…">
     <a href="#" aria-label="<?php echo t('Close'); ?>" class="Close richEditor-close" role="button">
         <span>×</span>
@@ -305,7 +305,7 @@
 <hr/>
 
 <h2>Insert Media</h2>
-<div class="richEditor-menu FlyoutMenu insertMedia richEditorFlyout" style="position: relative;" role="dialog" aria-labelledby="tempId-insertMediaMenu-title" aria-describedby="tempId-insertMediaMenu-p">
+<div class="richEditor-menu insertMedia richEditorFlyout" style="position: relative;" role="dialog" aria-labelledby="tempId-insertMediaMenu-title" aria-describedby="tempId-insertMediaMenu-p">
     <div class="richEditorFlyout-header">
         <h2 id="tempId-insertMediaMenu-title" class="H richEditorFlyout">
             <?php echo t('Insert Media'); ?>
@@ -333,7 +333,7 @@
 
 <h2>Emoji List</h2>
 
-<div class="richEditor-menu FlyoutMenu insertEmoji richEditorFlyout" style="position: relative; overflow: hidden" role="dialog" aria-labelledby="tempId-insertEmoji-title">
+<div class="richEditor-menu insertEmoji richEditorFlyout" style="position: relative; overflow: hidden" role="dialog" aria-labelledby="tempId-insertEmoji-title">
     <div class="richEditorFlyout-header">
         <h2 id="tempId-insertMediaMenu-title" class="H richEditorFlyout">
             <?php echo t('Smileys & Faces'); ?>

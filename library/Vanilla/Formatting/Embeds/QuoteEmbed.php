@@ -36,8 +36,8 @@ class QuoteEmbed extends Embed {
         $idRegex = '/(^\/discussion\/(?<discussionID>\d+)|(\/discussion\/comment\/(?<commentID>\d+)))/i';
         preg_match($idRegex, $path, $matches);
 
-        $commentID = $matches['commentID'] ? (int) $matches['commentID'] : null;
-        $discussionID = $matches['discussionID'] ? (int) $matches['discussionID'] : null;
+        $commentID = $matches['commentID'] ?? null ? (int) $matches['commentID'] : null;
+        $discussionID = $matches['discussionID'] ?? null ? (int) $matches['discussionID'] : null;
 
         if ($this->isNetworkEnabled()) {
             $discussionsApiController = \Gdn::getContainer()->get(\DiscussionsApiController::class);

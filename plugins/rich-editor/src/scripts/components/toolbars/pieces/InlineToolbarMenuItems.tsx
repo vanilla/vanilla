@@ -22,7 +22,7 @@ interface IProps {
 
 export default class InlineToolbarMenuItems extends React.PureComponent<IProps> {
     public render() {
-        return <MenuItems menuItemData={this.menuItemData} />;
+        return <MenuItems menuItemData={this.menuItemData} menuItemsClass="richEditor-inlineToolbarContainer" />;
     }
 
     private get menuItemData(): IMenuItemData[] {

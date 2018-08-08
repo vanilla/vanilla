@@ -79,7 +79,7 @@ export class ParagraphToolbar extends React.PureComponent<IProps, IState> {
             <div
                 id={this.componentID}
                 style={this.pilcrowStyles}
-                className="richEditor-menu richEditorParagraphMenu"
+                className="richEditorParagraphMenu"
                 ref={this.selfRef}
             >
                 <button

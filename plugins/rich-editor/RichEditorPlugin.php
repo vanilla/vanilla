@@ -167,7 +167,6 @@ class RichEditorPlugin extends Gdn_Plugin {
         $label = '<p class="info">'.$richEditorQuotesNotes.'</p>';
         $configModel->setField(self::QUOTE_CONFIG_ENABLE);
 
-        // Why the heck do I need to do this!!
         $form->setValue(self::QUOTE_CONFIG_ENABLE, c(self::QUOTE_CONFIG_ENABLE));
         $formToggle = $form->toggle(self::QUOTE_CONFIG_ENABLE, $enableRichQuotes, [], $label);
 

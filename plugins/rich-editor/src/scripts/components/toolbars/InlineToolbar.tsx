@@ -39,6 +39,12 @@ export class InlineToolbar extends React.Component<IProps, IState> {
     private selfRef: React.RefObject<HTMLDivElement> = React.createRef();
 
     /**
+     * Temporaly remove the focus requirement on the toolbar so we can focus it.
+     * @see https://github.com/vanilla/rich-editor/pull/107
+     */
+    private ignoreLinkToolbarFocusRequirement: boolean = false;
+
+    /**
      * @inheritDoc
      */
     constructor(props) {
@@ -106,7 +112,7 @@ export class InlineToolbar extends React.Component<IProps, IState> {
         const inCodeBlock = rangeContainsBlot(this.quill, CodeBlockBlot, this.props.instanceState.lastGoodSelection);
         return (
             this.state.isLinkMenuOpen &&
-            this.hasFocus &&
+            (this.hasFocus || this.ignoreLinkToolbarFocusRequirement) &&
             this.isOneLineOrLess &&
             !inCodeBlock &&
             this.selectionHasContent
@@ -216,13 +222,16 @@ export class InlineToolbar extends React.Component<IProps, IState> {
      *
      * Opens the menu if there is no current link formatting.
      */
-    private toggleLinkMenu = () => {
+    private toggleLinkMenu = (event?: React.MouseEvent<any>) => {
+        event && event.preventDefault();
         if (typeof this.props.activeFormats.link === "string") {
             this.setState({ isLinkMenuOpen: false });
             this.formatter.link(this.props.instanceState.lastGoodSelection);
         } else {
+            this.ignoreLinkToolbarFocusRequirement = true;
             this.setState({ isLinkMenuOpen: true }, () => {
                 this.linkInput.current!.focus();
+                this.ignoreLinkToolbarFocusRequirement = false;
             });
         }
     };

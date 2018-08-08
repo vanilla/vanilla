@@ -6,6 +6,7 @@
 import { IEmbedData, IEmbedElements, registerEmbedRenderer } from "@dashboard/embeds";
 import { ensureScript } from "@dashboard/dom";
 import { onContent, onReady } from "@dashboard/application";
+import { IScrapeData } from "@dashboard/@types/api";
 
 export function initGettyEmbeds() {
     registerEmbedRenderer("getty", renderGetty);
@@ -16,7 +17,7 @@ export function initGettyEmbeds() {
 /**
  * Render a single getty embed.
  */
-export async function renderGetty(elements: IEmbedElements, data: IEmbedData) {
+export async function renderGetty(elements: IEmbedElements, data: IScrapeData) {
     const contentElement = elements.content;
     const url = data.attributes.post;
     const newLink = document.createElement("a");

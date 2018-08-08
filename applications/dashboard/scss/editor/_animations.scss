@@ -6,3 +6,7 @@
         opacity: 1;
     }
 }
+
+.collapsableContent {
+    transition: max-height 0.2s ease;
+}

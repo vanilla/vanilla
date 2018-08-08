@@ -6,3 +6,6 @@
 export * from "@dashboard/@types/api/general";
 export * from "@dashboard/@types/api/user";
 export * from "@dashboard/@types/api/authenticate";
+export * from "@dashboard/@types/api/comment";
+export * from "@dashboard/@types/api/discussion";
+export * from "@dashboard/@types/api/media";

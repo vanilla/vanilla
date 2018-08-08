@@ -8,6 +8,10 @@
  * @package Vanilla
  */
 
+use Garden\Container\Container;
+use Garden\Container\Reference;
+use Vanilla\Formatting\Embeds\EmbedManager;
+
 /**
  * Vanilla's event handlers.
  */

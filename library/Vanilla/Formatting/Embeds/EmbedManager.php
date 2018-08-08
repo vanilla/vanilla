@@ -9,7 +9,6 @@ namespace Vanilla\Formatting\Embeds;
 use Exception;
 use Gdn_Cache;
 use InvalidArgumentException;
-use Vanilla\PageScraper;
 
 /**
  * Manage scraping embed data and generating markup.
@@ -79,6 +78,7 @@ class EmbedManager {
     public function addCoreEmbeds() {
         $dic = \Gdn::getContainer();
         $this->setDefaultEmbed($dic->get(LinkEmbed::class))
+            ->addEmbed($dic->get(QuoteEmbed::class))
             ->addEmbed($dic->get(TwitterEmbed::class))
             ->addEmbed($dic->get(YouTubeEmbed::class))
             ->addEmbed($dic->get(VimeoEmbed::class))

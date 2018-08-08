@@ -8,6 +8,7 @@
 namespace Vanilla\Formatting\Quill\Blots;
 
 use Vanilla\Formatting\Quill\BlotGroup;
+use Vanilla\Formatting\Quill\Parser;
 
 class TextBlot extends AbstractBlot {
 
@@ -27,8 +28,13 @@ class TextBlot extends AbstractBlot {
      *
      * @inheritDoc
      */
-    public function __construct(array $currentOperation, array $previousOperation = [], array $nextOperation = []) {
-        parent::__construct($currentOperation, $previousOperation, $nextOperation);
+    public function __construct(
+        array $currentOperation,
+        array $previousOperation,
+        array $nextOperation,
+        string $parseMode = Parser::PARSE_MODE_NORMAL
+    ) {
+        parent::__construct($currentOperation, $previousOperation, $nextOperation, $parseMode);
         $this->parseFormats($this->currentOperation, $this->previousOperation, $this->nextOperation);
 
         // Grab the insert text for the content.

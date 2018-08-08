@@ -6,6 +6,7 @@
 import { ensureScript } from "@dashboard/dom";
 import { onContent } from "@dashboard/application";
 import { IEmbedData, IEmbedElements, registerEmbedRenderer } from "@dashboard/embeds";
+import { IScrapeData } from "@dashboard/@types/api";
 
 export function initTwitterEmbeds() {
     registerEmbedRenderer("twitter", renderTweet);
@@ -16,7 +17,7 @@ export function initTwitterEmbeds() {
 /**
  * Render a single twitter embed.
  */
-export async function renderTweet(elements: IEmbedElements, data: IEmbedData) {
+export async function renderTweet(elements: IEmbedElements, data: IScrapeData) {
     const contentElement = elements.content;
     // Ensure the twitter library is loaded.
     await ensureScript("//platform.twitter.com/widgets.js");

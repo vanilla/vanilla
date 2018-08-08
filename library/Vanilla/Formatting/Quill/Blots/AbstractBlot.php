@@ -8,6 +8,7 @@
 namespace Vanilla\Formatting\Quill\Blots;
 
 use Vanilla\Formatting\Quill\BlotGroup;
+use Vanilla\Formatting\Quill\Parser;
 
 /**
  * All blots extend AbstractBlot. Even formats. Blots map lightly to quill blots.
@@ -16,6 +17,9 @@ use Vanilla\Formatting\Quill\BlotGroup;
  * See https://github.com/quilljs/parchment#blots for an explanation of the JS implementation of quill (parchment) blots.
  */
 abstract class AbstractBlot {
+
+    /** @var string */
+    protected $parseMode;
 
     /** @var string */
     protected $content = "";
@@ -63,6 +67,15 @@ abstract class AbstractBlot {
      * @return string
      */
     abstract public function render(): string;
+
+    /**
+     * Render this blot like a quote format.
+     *
+     * @return string
+     */
+    public function renderQuote(): string {
+        return $this->render();
+    }
 
     /**
      * Determine whether or not this blot uses both current and next operation.
@@ -128,10 +141,17 @@ abstract class AbstractBlot {
      * @param array $currentOperation The current operation.
      * @param array $previousOperation The next operation.
      * @param array $nextOperation The previous operation.
+     * @param string $parseMode The parse mode to create the blot with.
      */
-    public function __construct(array $currentOperation, array $previousOperation = [], array $nextOperation = []) {
+    public function __construct(
+        array $currentOperation,
+        array $previousOperation = [],
+        array $nextOperation = [],
+        string $parseMode = Parser::PARSE_MODE_NORMAL
+    ) {
         $this->previousOperation = $previousOperation;
         $this->currentOperation = $currentOperation;
         $this->nextOperation = $nextOperation;
+        $this->parseMode = $parseMode;
     }
 }

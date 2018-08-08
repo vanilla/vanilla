@@ -2,6 +2,10 @@
     text-align: center;
 }
 
+.embedResponsive-initialLink {
+    text-align: start;
+}
+
 .embedExternal {
     display: inline-flex;
     margin: auto;
@@ -10,14 +14,12 @@
     position: relative;
     justify-content: center;
     align-items: center;
-    user-select: none;
     box-sizing: border-box;
 }
 
 .embedExternal-content {
     position: relative;
     margin: auto;
-    user-select: none;
     width: $embed_width;
     max-width: 100%;
     text-align: center;
@@ -75,6 +77,10 @@
 // Edit mode only
 
 .richEditor {
+    .embedExternal {
+        user-select: none;
+    }
+
     .embedExternal-content,
     .embedLinkLoader-link {
         transition: 0.2s ease box-shadow;
@@ -90,23 +96,29 @@
 
         > * {
             pointer-events: none; // In edit mode, we never allow clicking into elements.
-            cursor: default;
         }
     }
 }
 
+.embed-focusableElement {
+    cursor: pointer;
+}
 
 // Edit Mode changes
 .richEditor { // Only in edit mode
     .embedExternal-content {
+        &::after {
+            transition: 0.2s ease background-color;
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+        }
         &:hover {
             &::after {
-                content: "";
-                position: absolute;
-                top: 0;
-                left: 0;
-                width: 100%;
-                height: 100%;
                 background-color: $embed-overlay_hover_color;
             }
         }

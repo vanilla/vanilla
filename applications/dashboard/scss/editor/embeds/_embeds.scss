@@ -5,7 +5,9 @@
 // Generic
 @import "embedVideo";
 @import "embedImage";
+@import "embedText";
 @import "embedLink";
+@import "embedQuote";
 @import "embedLoader";
 
 // Specific
@@ -16,5 +18,3 @@
 @import "embedTwitter";
 @import "embedSoundCloud";
 @import "embedInstagram";
-
-

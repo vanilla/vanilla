@@ -1,5 +1,5 @@
 $quote_fg             : mix($global-color_fg, $global-color_bg, 55%) !default; // target: #A3A3A3
-$quote-border_color   :  mix($global-color_fg, $global-color_bg, 23%) !default; // target: #D8D8D8
+$quote-border_color   : mix($global-color_fg, $global-color_bg, 23%) !default; // target: #D8D8D8
 
 .blockquote {
     display: block;

@@ -699,7 +699,7 @@ if (!function_exists('commentUrl')) {
     /**
      * Return a URL for a comment. This function is in here and not functions.general so that plugins can override.
      *
-     * @param object $comment
+     * @param object|array $comment
      * @param bool $withDomain
      * @return string
      */
@@ -758,7 +758,7 @@ if (!function_exists('discussionUrl')) {
     /**
      * Return a URL for a discussion. This function is in here and not functions.general so that plugins can override.
      *
-     * @param object $discussion
+     * @param object|array $discussion
      * @param int|string $page
      * @param bool $withDomain
      * @return string

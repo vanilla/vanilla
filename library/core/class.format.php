@@ -2464,6 +2464,56 @@ EOT;
         return $renderer->render($blotGroups);
     }
 
+    /**
+     * Generate a quote to embed in a Rich quote for all existing formats.
+     *
+     * @param string|array $body The string or array body content of the post.
+     * @param string $format The initial format of the post.
+     * @return string
+     * @throws \Garden\Container\ContainerException
+     * @throws \Garden\Container\NotFoundException
+     */
+    public static function quoteEmbed($body, string $format): string {
+        if ($format === "Rich") {
+            if (is_string($body)) {
+                $body = json_decode($body, true);
+            }
+            return self::richQuote($body);
+        } else {
+            $previousLinksValue = c('Garden.Format.Links');
+            saveToConfig('Garden.Format.Links', false, ['Save' => false]);
+            $value = self::to($body, $format);
+
+            // These breaks make the collapsing behaviour much more difficult in a rich quote.
+            // Replace them with starting and closing p tags.
+            $value = str_replace("<br>", "</p><p>", $value);
+            saveToConfig('Garden.Format.Links', $previousLinksValue, ['Save' => false]);
+            return $value;
+        }
+    }
+
+    /**
+     * Render a rich quote of Rich post.
+     *
+     * Use a slightly different parser and render configuration. Namely:
+     * - Quotes, spoilers, embeds have different rendering methods.
+     *
+     * @param array $operations
+     * @return string
+     * @throws \Garden\Container\ContainerException
+     * @throws \Garden\Container\NotFoundException
+     */
+    public static function richQuote(array $operations): string {
+        $parser = Gdn::getContainer()->get(Vanilla\Formatting\Quill\Parser::class);
+        $renderer = Gdn::getContainer()->get(Vanilla\Formatting\Quill\Renderer::class);
+
+        $blotGroups = $parser->parse($operations, \Vanilla\Formatting\Quill\Parser::PARSE_MODE_QUOTE);
+        $rendered = $renderer->render($blotGroups);
+        $result = str_replace("<p><br></p>", "", $rendered);
+        $result = str_replace("<p></p>", "", $result);
+        return $result;
+    }
+
     const SAFE_PROTOCOLS = [
         "http",
         "https",

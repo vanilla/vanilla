@@ -606,3 +606,41 @@ export function getPastedImage(event: ClipboardEvent): File | undefined | null {
         }
     }
 }
+
+/**
+ * Calculate the height of element with simulated margin collapse.
+ *
+ * This is ideal for getting the calculate height of a fixed number of items. (not the entire parent).
+ *
+ * It considers:
+ * - Element height
+ * - Padding
+ * - Borders
+ * - Margins
+ * - Margin collapsing.
+ *
+ * @param element - The element to measure
+ * @param previousBottomMargin - The bottom margin of the previous element. You can use the returned bottom margin from this function to get this.
+ */
+export function getElementHeight(
+    element: Element,
+    previousBottomMargin: number = 0,
+): {
+    height: number;
+    bottomMargin: number;
+} {
+    const height = element.getBoundingClientRect().height;
+    const { marginTop, marginBottom } = window.getComputedStyle(element);
+
+    let topHeight = marginTop ? parseInt(marginTop, 10) : 0;
+    // Simulate a margin-collapsed height.
+    topHeight = Math.max(topHeight - previousBottomMargin, 0);
+
+    const bottomHeight = marginBottom ? parseInt(marginBottom, 10) : 0;
+    const finalHeight = height + topHeight + bottomHeight;
+
+    return {
+        height: finalHeight,
+        bottomMargin: bottomHeight,
+    };
+}

@@ -86,7 +86,7 @@ export class ParagraphToolbar extends React.PureComponent<IProps, IState> {
                     type="button"
                     id={this.buttonID}
                     ref={this.buttonRef}
-                    aria-label={t("richEditor.menu.paragraph")}
+                    aria-label={t("Line Level Formatting Menu")}
                     aria-controls={this.menuID}
                     aria-expanded={this.isMenuVisible}
                     disabled={!this.isPilcrowVisible}

@@ -32,7 +32,6 @@ EMOJIS.forEach((data, key) => {
     }
 });
 
-const emojiGroupLength = Object.values(EMOJI_GROUPS).length;
 const lastEmojiIndex = EMOJIS.length - 1;
 
 interface IProps extends IWithEditorProps, IPopoverControllerChildParameters {
@@ -95,24 +94,25 @@ export class EmojiPicker extends React.PureComponent<IProps, IState> {
 
         const footer = (
             <div id={this.categoryPickerID} className="emojiGroups" aria-label={t("Emoji Categories")} tabIndex={-1}>
-                {Object.values(EMOJI_GROUPS).map((groupName: string, groupKey) => {
-                    const isSelected = this.state.selectedGroupIndex === groupKey;
+                {Object.values(EMOJI_GROUPS).map((group, groupIndex) => {
+                    const { name, icon } = group;
+                    const isSelected = this.state.selectedGroupIndex === groupIndex;
                     const buttonClasses = classNames("richEditor-button", "emojiGroup", { isSelected });
 
-                    const onClick = event => this.handleCategoryClick(event, groupKey);
+                    const onClick = event => this.handleCategoryClick(event, groupIndex);
 
                     return (
                         <button
                             type="button"
                             onClick={onClick}
                             aria-current={isSelected}
-                            aria-label={t("Jump to emoji category: ") + t(groupName)}
-                            key={"emojiGroup-" + groupName}
-                            title={t(groupName)}
+                            aria-label={t("Jump to emoji category: ") + t(name)}
+                            key={"emojiGroup-" + name}
+                            title={t(name)}
                             className={buttonClasses}
                         >
-                            {this.getGroupSVGPath(groupName)}
-                            <span className="sr-only">{t("Jump to Category: ") + t(groupName)}</span>
+                            {icon}
+                            <span className="sr-only">{t("Jump to emoji category: ") + t(name)}</span>
                         </button>
                     );
                 })}
@@ -195,8 +195,8 @@ export class EmojiPicker extends React.PureComponent<IProps, IState> {
         this.setState({
             rowStartIndex: event.rowStartIndex,
             selectedGroupIndex,
-            alertMessage: t("In emoji category: ") + t(EMOJI_GROUPS[selectedGroupIndex]),
-            title: t(EMOJI_GROUPS[selectedGroupIndex]),
+            alertMessage: t("In emoji category: ") + t(EMOJI_GROUPS[selectedGroupIndex].name),
+            title: t(EMOJI_GROUPS[selectedGroupIndex].name),
         });
     };
 
@@ -214,7 +214,7 @@ export class EmojiPicker extends React.PureComponent<IProps, IState> {
         this.setState({
             activeIndex: newIndex,
             scrollToRow: this.getRowFromIndex(newIndex),
-            alertMessage: t("Jumped to emoji category: ") + t(EMOJI_GROUPS[categoryID]),
+            alertMessage: t("Jumped to emoji category: ") + t(EMOJI_GROUPS[categoryID].name),
         });
     };
 
@@ -239,14 +239,6 @@ export class EmojiPicker extends React.PureComponent<IProps, IState> {
                 onKeyRight={this.jumpIndexRight}
             />
         ) : null;
-    };
-
-    /**
-     * Get Group SVG Path
-     */
-    private getGroupSVGPath = (groupName: string) => {
-        const functionSuffix = groupName.replace(/-([a-z])/g, g => g[1].toUpperCase());
-        return Icons["emojiGroup_" + functionSuffix]();
     };
 
     /**

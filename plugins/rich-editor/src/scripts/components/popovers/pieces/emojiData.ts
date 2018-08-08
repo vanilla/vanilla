@@ -13,15 +13,38 @@
  * @license https://opensource.org/licenses/GPL-2.0 GPL-2.0
  */
 
+import { t } from "@dashboard/application";
+import {emojiGroup_animalsNature, emojiGroup_foodDrink, emojiGroup_travelPlaces, emojiGroup_activities, emojiGroup_objects, emojiGroup_symbols, emojiGroup_flags} from "@rich-editor/components/icons";
+
 export const EMOJI_GROUPS = [
-    "smileys-people",
-    "animals-nature",
-    "food-drink",
-    "travel-places",
-    "activities",
-    "objects",
-    "symbols",
-    "flags",
+    {
+        name: "Smileys & People",
+        icon: emojiGroup_animalsNature(),
+    },
+    {
+        name: "Food & Drink",
+        icon: emojiGroup_foodDrink(),
+    },
+    {
+        name: "Travel & Places",
+        icon: emojiGroup_animalsNature(),
+    },
+    {
+        name: "Activities",
+        icon: emojiGroup_activities(),
+    },
+    {
+        name: "Objects",
+        icon: emojiGroup_objects(),
+    },
+    {
+        name: "Symbols",
+        icon: emojiGroup_symbols(),
+    },
+    {
+        name: "Flags",
+        icon: emojiGroup_flags(),
+    },
 ];
 
 export const EMOJIS = [

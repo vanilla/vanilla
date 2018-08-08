@@ -111,7 +111,7 @@ export function close() {
 export function pilcrow() {
     return (
         <svg className="richEditorButton-icon" viewBox="0 0 24 24">
-            <title>{t("richEditor.menu.pilcrow")}</title>
+            <title>{t("Paragraph")}</title>
             <path
                 fill="currentColor"
                 fillRule="evenodd"
@@ -186,7 +186,7 @@ export function spoiler() {
     );
 }
 
-export function emojiGroup_smileysPeople(group = "smileys-people") {
+export function emojiGroup_smileysPeople(group = "Smileys & People") {
     return (
         <svg className="emojiGroup-icon" viewBox="0 0 24 24">
             <title>{t(group)}</title>
@@ -198,7 +198,7 @@ export function emojiGroup_smileysPeople(group = "smileys-people") {
     );
 }
 
-export function emojiGroup_animalsNature(group = "animals-nature") {
+export function emojiGroup_animalsNature(group = "Animals & Nature") {
     return (
         <svg className="emojiGroup-icon" viewBox="0 0 24 24">
             <title>{t(group)}</title>
@@ -210,7 +210,7 @@ export function emojiGroup_animalsNature(group = "animals-nature") {
     );
 }
 
-export function emojiGroup_foodDrink(group = "food-drink") {
+export function emojiGroup_foodDrink(group = "Food & Drink") {
     return (
         <svg className="emojiGroup-icon" viewBox="0 0 24 24">
             <title>{t(group)}</title>
@@ -222,7 +222,7 @@ export function emojiGroup_foodDrink(group = "food-drink") {
     );
 }
 
-export function emojiGroup_travelPlaces(group = "travel-places") {
+export function emojiGroup_travelPlaces(group = "Travel & Places") {
     return (
         <svg className="emojiGroup-icon" viewBox="0 0 24 24">
             <title>{t(group)}</title>
@@ -234,7 +234,7 @@ export function emojiGroup_travelPlaces(group = "travel-places") {
     );
 }
 
-export function emojiGroup_activities(group = "activities") {
+export function emojiGroup_activities(group = "Activities") {
     return (
         <svg className="emojiGroup-icon" viewBox="0 0 24 24">
             <title>{t(group)}</title>
@@ -246,7 +246,7 @@ export function emojiGroup_activities(group = "activities") {
     );
 }
 
-export function emojiGroup_objects(group = "objects") {
+export function emojiGroup_objects(group = "Objects") {
     return (
         <svg className="emojiGroup-icon" viewBox="0 0 24 24">
             <title>{t(group)}</title>
@@ -259,7 +259,7 @@ export function emojiGroup_objects(group = "objects") {
     );
 }
 
-export function emojiGroup_symbols(group = "symbols") {
+export function emojiGroup_symbols(group = "Symbols") {
     return (
         <svg className="emojiGroup-icon" viewBox="0 0 24 24">
             <title>{t(group)}</title>
@@ -271,7 +271,7 @@ export function emojiGroup_symbols(group = "symbols") {
     );
 }
 
-export function emojiGroup_flags(group = "flags") {
+export function emojiGroup_flags(group = "Flags") {
     return (
         <svg className="emojiGroup-icon" viewBox="0 0 24 24">
             <title>{t(group)}</title>

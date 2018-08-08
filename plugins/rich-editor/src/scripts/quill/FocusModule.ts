@@ -66,6 +66,7 @@ export default class EmbedFocusModule extends Module {
                 this.editorRoot.classList.toggle("isFocused", true);
             }
         });
+
         this.setupEmbedClickHandler();
         this.setupMobileHandler();
 
@@ -362,6 +363,16 @@ export default class EmbedFocusModule extends Module {
      * Setup a click handler to focus embeds.
      */
     private setupEmbedClickHandler() {
+        delegateEvent(
+            "click",
+            "a",
+            (event, clickedElement) => {
+                event.preventDefault();
+                event.stopPropagation();
+            },
+            this.quill.container,
+        );
+
         delegateEvent(
             "click",
             ".js-embed",

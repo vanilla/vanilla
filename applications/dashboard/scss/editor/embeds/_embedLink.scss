@@ -1,149 +1,73 @@
-$embedLink-linkTitle_fontSize: $global-medium_fontSize !default;
-$embedLink-linkTitle_lineHeight: $global-base_lineHeight !default;
 $embedLink-linkImage_width: 225px !default;
 $embedLink-linkImage_mobileWidth: 100px !default;
-$embedLink-linkImage_boxShadowColor: rgba($global-color_fg, .3) !default;
 $embedLink-image_separatorColor: rgba($global-color_fg, .1) !default;
-$embedLink-linkImage_boxShadow: 0 1px 3px 0 $embedLink-linkImage_boxShadowColor !default;
-$embedLink-linkImage_bg: #ffffff !default;
+$embedLink-source_fontSize: $global-medium_fontSize !default;
+$embedLink-excerpt_fontSize: $global-medium_fontSize !default;
+$embedLink-excerpt_lineHeight: $global-base_lineHeight !default;
 
-.embedLink {
-    .embedExternal-content {
-        display: block;
-        background: $embedLink-linkImage_bg;
-        box-shadow: $embedLink-linkImage_boxShadow;
+.embedLink-image {
+    position: absolute;
+    display: block;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    margin: {
+        top: auto;
+        bottom: auto;
+    }
+    width: $embedLink-linkImage_width;
 
-        &,
-        &:hover,
-        &:focus
-        {
-            color: inherit;
-            text-decoration: none !important;
+    @supports (object-fit: cover) {
+        height: 100%;
+        object-fit: cover;
+        object-position: center;
+    }
+
+    + .embedText-main {
+        margin-left: auto;
+        width: calc(100% - #{$embedLink-linkImage_width});
+
+        border-left: {
+            style: solid;
+            width: 1px;
+            color: $embedLink-image_separatorColor;
         }
     }
 
-    .embedLink-body {
-        display: block;
+    @include mediaQuery-richEditor_embed {
         position: relative;
-        overflow: hidden;
-        text-align: left;
-    }
-
-    .embedLink-main {
-        padding: 18px;
-        box-sizing: border-box;
-
-    }
-
-    .embedLink-image {
-        position: absolute;
-        display: block;
-        top: 0;
-        left: 0;
-        bottom: 0;
-        margin: {
-            top: auto;
-            bottom: auto;
-        }
-        width: $embedLink-linkImage_width;
-
-
-        @supports (object-fit: cover) {
-            height: 100%;
-            object-fit: cover;
-            object-position: center;
-        }
-
-        + .embedLink-main {
-            margin-left: auto;
-            width: calc(100% - #{$embedLink-linkImage_width});
-
-            border-left: {
-                style: solid;
-                width: 1px;
-                color: $embedLink-image_separatorColor;
-            }
-        }
-
-        @include mediaQuery-richEditor_embed {
-            position: relative;
-            width: 100%;
-            padding-top: 0;
-
-
-            + .embedLink-main {
-                width: 100%;
-                border-right: none;
-            }
-        }
-    }
-
-    .embedLink-header {
-        display: flex;
-        flex-wrap: wrap;
-        align-items: center;
-        justify-content: flex-start;
-        font-size: $embedLink-linkTitle_fontSize;
-        line-height: $embedLink-linkTitle_lineHeight;
-        margin-bottom: $utility-baseUnit;
-    }
-
-    .embedLink-userName {
-        margin: 0 0 0 12px;
-        padding: 0;
-        color: #555A62;
-        font-weight: $global-bold_fontWeight;
-    }
-
-    .embedLink-dateTime {
-        font-size: .8em;
-        margin: 0 0 0 12px;
-        padding: 0;
-        color: #737373;
-    }
-
-    .embedLink-title {
-        display: block;
         width: 100%;
-        margin: 0;
-        padding: 0;
-        font-size: $embedLink-linkTitle_fontSize;
-        line-height: $embedLink-linkTitle_lineHeight;
-        font-weight: $global-bold_fontWeight;
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
+        padding-top: 0;
 
-        @include mediaQuery-richEditor_embed {
-            @include breakWord;
-            white-space: normal;
+        + .embedText-main {
+            width: 100%;
+            border-right: none;
         }
     }
+}
 
-    .embedLink-source {
-        font-size: #{$embedLink-linkTitle_fontSize * .86};
-        color: rgba(85,90,98,0.72);
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
-        margin: 0;
+.embedLink-source {
+    font-size: #{$embedLink-source_fontSize * .86};
+    color: rgba(85,90,98,0.72);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    margin: 0;
 
-        @include mediaQuery-richEditor_embed {
-            @include breakWord;
-            white-space: normal;
-        }
-    }
-
-    .embedLink-excerpt {
-        font-size: $embedLink-linkTitle_fontSize;
-        color: #555A62;
-        overflow: hidden;
-        text-overflow: ellipsis;
-        word-break: break-word;
-        max-width: 100%;
-        line-height: $embedLink-linkTitle_lineHeight;
-        max-height: #{$embedLink-linkTitle_lineHeight * $embedLink-linkTitle_fontSize * 3};
+    @include mediaQuery-richEditor_embed {
+        @include breakWord;
         white-space: normal;
     }
 }
 
+.embedLink-excerpt {
+    font-size: $embedLink-excerpt_fontSize;
+    color: #555A62;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    word-break: break-word;
+    max-width: 100%;
+    line-height: $embedLink-excerpt_lineHeight;
+    max-height: #{$embedLink-excerpt_lineHeight * $embedLink-excerpt_fontSize * 3};
+    white-space: normal;
+}

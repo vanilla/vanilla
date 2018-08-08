@@ -43,6 +43,7 @@ class BlotGroup {
         }
 
         $blot = $this->blots[0];
+
         return get_class($blot) === TextBlot::class && $this->blots[0]->getContent() === "";
     }
 
@@ -77,6 +78,7 @@ class BlotGroup {
         return count($this->blots) === 0;
     }
 
+
     /**
      * Render the block.
      *
@@ -97,6 +99,7 @@ class BlotGroup {
         }
 
         $result .= $surroundTagBlot->getGroupClosingTag();
+
         return $result;
     }
 
@@ -112,7 +115,8 @@ class BlotGroup {
      *
      * @return string
      */
-    public function renderLineGroup(AbstractLineBlot $firstLineBlot): string {
+    public function renderLineGroup(AbstractLineBlot $firstLineBlot):
+    string {
         $result = "";
 
         $result .= $firstLineBlot->renderLineStart();
@@ -239,6 +243,7 @@ class BlotGroup {
                 "content" => $blot->getContent(),
             ];
         }
+
         return $blots;
     }
 }

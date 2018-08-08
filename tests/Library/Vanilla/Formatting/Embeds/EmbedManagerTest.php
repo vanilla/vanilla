@@ -161,23 +161,23 @@ class EmbedManagerTest extends SharedBootstrapTestCase {
                     "width" => null,
                     "attributes" => []
                 ],
-                '<a class="embedExternal embedLink" href="https://vanillaforums.com" rel="noopener noreferrer">
-    <div class="embedExternal-content">
-        <article class="embedLink-body">
-            <img src=\'https://vanillaforums.com/images/metaIcons/vanillaForums.png\' class=\'embedLink-image\' aria-hidden=\'true\'>
-            <div class="embedLink-main">
-                <div class="embedLink-header">
-                    <h3 class="embedLink-title">Online Community Software and Customer Forum Software by Vanilla Forums - Embed Link 1</h3>
-                    
-                    
-                    
-                    <span class="embedLink-source meta">https://vanillaforums.com</span>
+                '<div class="embedExternal embedText embedLink">
+    <div class="embedExternal-content embedText-content embedLink-content">
+        <a class="embedLink-link" href="https://vanillaforums.com" rel="noopener noreferrer">
+            <article class="embedText-body">
+                <img src=\'https://vanillaforums.com/images/metaIcons/vanillaForums.png\' class=\'embedLink-image\' aria-hidden=\'true\'>
+                <div class="embedText-main">
+                    <div class="embedText-header">
+                        <h3 class="embedText-title">Online Community Software and Customer Forum Software by Vanilla Forums - Embed Link 1</h3>
+                        
+                        <span class="embedLink-source meta">https://vanillaforums.com</span>
+                    </div>
+                    <div class="embedLink-excerpt">Engage your customers with a vibrant and modern online customer community forum. A customer community helps to increases loyalty, reduce support costs and deliver feedback.</div>
                 </div>
-                <div class="embedLink-excerpt">Engage your customers with a vibrant and modern online customer community forum. A customer community helps to increases loyalty, reduce support costs and deliver feedback.</div>
-            </div>
-        </article>
+            </article>
+        </a>
     </div>
-</a>',
+</div>',
             ],
             [
                 [
@@ -189,23 +189,23 @@ class EmbedManagerTest extends SharedBootstrapTestCase {
                     "width" => null,
                     "attributes" => []
                 ],
-                '<a class="embedExternal embedLink" href="https://vanillaforums.com" rel="noopener noreferrer">
-    <div class="embedExternal-content">
-        <article class="embedLink-body">
-            
-            <div class="embedLink-main">
-                <div class="embedLink-header">
-                    <h3 class="embedLink-title">Online Community Software and Customer Forum Software by Vanilla Forums - Embed Link 2</h3>
-                    
-                    
-                    
-                    <span class="embedLink-source meta">https://vanillaforums.com</span>
+                '<div class="embedExternal embedText embedLink">
+    <div class="embedExternal-content embedText-content embedLink-content">
+        <a class="embedLink-link" href="https://vanillaforums.com" rel="noopener noreferrer">
+            <article class="embedText-body">
+                
+                <div class="embedText-main">
+                    <div class="embedText-header">
+                        <h3 class="embedText-title">Online Community Software and Customer Forum Software by Vanilla Forums - Embed Link 2</h3>
+                        
+                        <span class="embedLink-source meta">https://vanillaforums.com</span>
+                    </div>
+                    <div class="embedLink-excerpt">Engage your customers with a vibrant and modern online customer community forum. A customer community helps to increases loyalty, reduce support costs and deliver feedback.</div>
                 </div>
-                <div class="embedLink-excerpt">Engage your customers with a vibrant and modern online customer community forum. A customer community helps to increases loyalty, reduce support costs and deliver feedback.</div>
-            </div>
-        </article>
+            </article>
+        </a>
     </div>
-</a>',
+</div>',
             ],
             [
                 [
@@ -220,23 +220,23 @@ class EmbedManagerTest extends SharedBootstrapTestCase {
                     "width" => null,
                     "attributes" => []
                 ],
-                '<a class="embedExternal embedLink" href="https://vanillaforums.com" rel="noopener noreferrer">
-    <div class="embedExternal-content">
-        <article class="embedLink-body">
-            <img src=\'https://vanillaforums.com/images/metaIcons/vanillaForums.png\' class=\'embedLink-image\' aria-hidden=\'true\'>
-            <div class="embedLink-main">
-                <div class="embedLink-header">
-                    <h3 class="embedLink-title">Online Community Software and Customer Forum Software by Vanilla Forums - Embed Link 3</h3>
-                    <span class="embedLink-userPhoto PhotoWrap"><img src="https://secure.gravatar.com/avatar/b0420af06d6fecc16fc88a88cbea8218/?default=https%3A%2F%2Fvanillicon.com%2Fb0420af06d6fecc16fc88a88cbea8218_100.png&amp;rating=g&amp;size=100" alt="Linc" class="ProfilePhoto ProfilePhotoMedium" /></span>
-                    <span class="embedLink-userName">Linc</span>
-                    
-                    <span class="embedLink-source meta">https://vanillaforums.com</span>
+                '<div class="embedExternal embedText embedLink">
+    <div class="embedExternal-content embedText-content embedLink-content">
+        <a class="embedLink-link" href="https://vanillaforums.com" rel="noopener noreferrer">
+            <article class="embedText-body">
+                <img src=\'https://vanillaforums.com/images/metaIcons/vanillaForums.png\' class=\'embedLink-image\' aria-hidden=\'true\'>
+                <div class="embedText-main">
+                    <div class="embedText-header">
+                        <h3 class="embedText-title">Online Community Software and Customer Forum Software by Vanilla Forums - Embed Link 3</h3>
+                        
+                        <span class="embedLink-source meta">https://vanillaforums.com</span>
+                    </div>
+                    <div class="embedLink-excerpt">Engage your customers with a vibrant and modern online customer community forum. A customer community helps to increases loyalty, reduce support costs and deliver feedback.</div>
                 </div>
-                <div class="embedLink-excerpt">Engage your customers with a vibrant and modern online customer community forum. A customer community helps to increases loyalty, reduce support costs and deliver feedback.</div>
-            </div>
-        </article>
+            </article>
+        </a>
     </div>
-</a>',
+</div>',
             ],
             [
                 [
@@ -251,23 +251,23 @@ class EmbedManagerTest extends SharedBootstrapTestCase {
                     "width" => null,
                     "attributes" => []
                 ],
-                '<a class="embedExternal embedLink" href="https://vanillaforums.com" rel="noopener noreferrer">
-    <div class="embedExternal-content">
-        <article class="embedLink-body">
-            <img src=\'https://vanillaforums.com/images/metaIcons/vanillaForums.png\' class=\'embedLink-image\' aria-hidden=\'true\'>
-            <div class="embedLink-main">
-                <div class="embedLink-header">
-                    <h3 class="embedLink-title">Online Community Software and Customer Forum Software by Vanilla Forums - Embed Link 4</h3>
-                    
-                    
-                    <time class="embedLink-dateTime meta" dateTime="2018-07-30">July 30th 2018</time>
-                    <span class="embedLink-source meta">https://vanillaforums.com</span>
+                '<div class="embedExternal embedText embedLink">
+    <div class="embedExternal-content embedText-content embedLink-content">
+        <a class="embedLink-link" href="https://vanillaforums.com" rel="noopener noreferrer">
+            <article class="embedText-body">
+                <img src=\'https://vanillaforums.com/images/metaIcons/vanillaForums.png\' class=\'embedLink-image\' aria-hidden=\'true\'>
+                <div class="embedText-main">
+                    <div class="embedText-header">
+                        <h3 class="embedText-title">Online Community Software and Customer Forum Software by Vanilla Forums - Embed Link 4</h3>
+                        <time class="embedLink-dateTime meta" dateTime="2018-07-30">July 30th 2018</time>
+                        <span class="embedLink-source meta">https://vanillaforums.com</span>
+                    </div>
+                    <div class="embedLink-excerpt">Engage your customers with a vibrant and modern online customer community forum. A customer community helps to increases loyalty, reduce support costs and deliver feedback.</div>
                 </div>
-                <div class="embedLink-excerpt">Engage your customers with a vibrant and modern online customer community forum. A customer community helps to increases loyalty, reduce support costs and deliver feedback.</div>
-            </div>
-        </article>
+            </article>
+        </a>
     </div>
-</a>',
+</div>',
             ],
             [
                 [
@@ -282,23 +282,23 @@ class EmbedManagerTest extends SharedBootstrapTestCase {
                     "width" => null,
                     "attributes" => []
                 ],
-                '<a class="embedExternal embedLink" href="https://vanillaforums.com" rel="noopener noreferrer">
-    <div class="embedExternal-content">
-        <article class="embedLink-body">
-            <img src=\'https://vanillaforums.com/images/metaIcons/vanillaForums.png\' class=\'embedLink-image\' aria-hidden=\'true\'>
-            <div class="embedLink-main">
-                <div class="embedLink-header">
-                    <h3 class="embedLink-title">Online Community Software and Customer Forum Software by Vanilla Forums - Embed Link 5</h3>
-                    
-                    
-                    <time class="embedLink-dateTime meta" dateTime="2018-07-30">July 30th 2018</time>
-                    <span class="embedLink-source meta">https://vanillaforums.com</span>
+                '<div class="embedExternal embedText embedLink">
+    <div class="embedExternal-content embedText-content embedLink-content">
+        <a class="embedLink-link" href="https://vanillaforums.com" rel="noopener noreferrer">
+            <article class="embedText-body">
+                <img src=\'https://vanillaforums.com/images/metaIcons/vanillaForums.png\' class=\'embedLink-image\' aria-hidden=\'true\'>
+                <div class="embedText-main">
+                    <div class="embedText-header">
+                        <h3 class="embedText-title">Online Community Software and Customer Forum Software by Vanilla Forums - Embed Link 5</h3>
+                        <time class="embedLink-dateTime meta" dateTime="2018-07-30">July 30th 2018</time>
+                        <span class="embedLink-source meta">https://vanillaforums.com</span>
+                    </div>
+                    <div class="embedLink-excerpt">Engage your customers with a vibrant and modern online customer community forum. A customer community helps to increases loyalty, reduce support costs and deliver feedback.</div>
                 </div>
-                <div class="embedLink-excerpt">Engage your customers with a vibrant and modern online customer community forum. A customer community helps to increases loyalty, reduce support costs and deliver feedback.</div>
-            </div>
-        </article>
+            </article>
+        </a>
     </div>
-</a>',
+</div>',
             ],
             [
                 [
@@ -310,23 +310,23 @@ class EmbedManagerTest extends SharedBootstrapTestCase {
                     "width" => null,
                     "attributes" => []
                 ],
-                '<a class="embedExternal embedLink" href="https://vanillaforums.com" rel="noopener noreferrer">
-    <div class="embedExternal-content">
-        <article class="embedLink-body">
-            
-            <div class="embedLink-main">
-                <div class="embedLink-header">
-                    <h3 class="embedLink-title">Online Community Software and Customer Forum Software by Vanilla Forums - Embed Link 6</h3>
-                    
-                    
-                    
-                    <span class="embedLink-source meta">https://vanillaforums.com</span>
+                '<div class="embedExternal embedText embedLink">
+    <div class="embedExternal-content embedText-content embedLink-content">
+        <a class="embedLink-link" href="https://vanillaforums.com" rel="noopener noreferrer">
+            <article class="embedText-body">
+                
+                <div class="embedText-main">
+                    <div class="embedText-header">
+                        <h3 class="embedText-title">Online Community Software and Customer Forum Software by Vanilla Forums - Embed Link 6</h3>
+                        
+                        <span class="embedLink-source meta">https://vanillaforums.com</span>
+                    </div>
+                    <div class="embedLink-excerpt">Engage your customers with a vibrant and modern online customer community forum. A customer community helps to increases loyalty, reduce support costs and deliver feedback.</div>
                 </div>
-                <div class="embedLink-excerpt">Engage your customers with a vibrant and modern online customer community forum. A customer community helps to increases loyalty, reduce support costs and deliver feedback.</div>
-            </div>
-        </article>
+            </article>
+        </a>
     </div>
-</a>',
+</div>',
             ],
             [
                 [

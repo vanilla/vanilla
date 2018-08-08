@@ -7,6 +7,8 @@
 
 namespace Vanilla\Formatting\Quill\Blots\Lines;
 
+use Vanilla\Formatting\Quill\Parser;
+
 /**
  * Class for handling blockquote operations.
  */
@@ -26,21 +28,21 @@ class BlockquoteLineBlot extends AbstractLineBlot {
         $wrapperClass = "blockquote";
         $contentClass = "blockquote-content";
 
-        return "<div class=\"$wrapperClass\"><div class=\"$contentClass\">";
+        return $this->parseMode === Parser::PARSE_MODE_QUOTE ? "" : "<div class=\"$wrapperClass\"><div class=\"$contentClass\">";
     }
 
     /**
      * @inheritDoc
      */
     public function getGroupClosingTag(): string {
-        return "</div></div>";
+        return $this->parseMode === Parser::PARSE_MODE_QUOTE ? "" : "</div></div>";
     }
 
     /**
      * @inheritdoc
      */
     public function renderLineStart(): string {
-        return '<p class="blockquote-line">';
+        return $this->parseMode === Parser::PARSE_MODE_QUOTE ? "<p>" : '<p class="blockquote-line">';
     }
 
     /**

@@ -28,6 +28,7 @@ import { initTwitterEmbeds } from "@dashboard/app/user-content/embeds/twitter";
 import { initVideoEmbeds } from "@dashboard/app/user-content/embeds/video";
 import { initEmojiSupport } from "@dashboard/app/user-content/emoji";
 import { initSpoilers } from "@dashboard/app/user-content/spoilers";
+import { initQuoteEmbeds } from "@dashboard/app/user-content/embeds/quote";
 
 // User content
 initEmojiSupport();
@@ -42,6 +43,7 @@ initLinkEmbeds();
 initSoundcloudEmbeds();
 initTwitterEmbeds();
 initVideoEmbeds();
+initQuoteEmbeds();
 
 // Redux
 registerReducer("authenticate", authenticateReducer);

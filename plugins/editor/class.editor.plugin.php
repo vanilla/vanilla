@@ -1428,9 +1428,10 @@ class EditorPlugin extends Gdn_Plugin {
         $forceWysiwygNote1 =  t('ForceWysiwyg.Notes1', 'Check the below option to tell the editor to reinterpret all old posts as Wysiwyg.');
         $forceWysiwygNote2 = t('ForceWysiwyg.Notes2', 'This setting will only take effect if Wysiwyg was chosen as the Post Format above. The purpose of this option is to normalize the editor format. If older posts edited with another format, such as markdown or BBCode, are loaded, this option will force Wysiwyg.');
         $label = '<p class="info">'.$forceWysiwygNote1.'</p><p class="info"><strong>'.t('Note:').' </strong>'.$forceWysiwygNote2.'</p>';
+        $configModel->setField('Plugins.editor.ForceWysiwyg');
+        $form->setValue('Plugins.editor.ForceWysiwyg', c('Plugins.editor.ForceWysiwyg'));
         $formToggle = $form->toggle('Plugins.editor.ForceWysiwyg', $forceWysiwygLabel, [], $label);
 
-        $configModel->setField('Plugins.editor.ForceWysiwyg');
         $additionalFormItemHTML .= "<li class='form-group'>$formToggle</li>";
         return $additionalFormItemHTML;
     }

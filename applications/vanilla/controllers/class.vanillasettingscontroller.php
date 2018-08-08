@@ -68,7 +68,15 @@ class VanillaSettingsController extends Gdn_Controller {
             'Vanilla.Comment.MaxLength',
             'Vanilla.Comment.MinLength',
             'Garden.Format.DisableUrlEmbeds',
+            'Plugins.editor.ForceWysiwyg',
         ]);
+
+        // Fire an filter event gather extra form HTML for specific format items.
+        // The form is added so the form can be enhanced and the config model needs to passed to add extra fields.
+        $extraFormatFormHTML = $eventManager->fireFilter('postingSettings_formatSpecificFormItems', "",
+            $this->Form,
+            $configurationModel);
+        $this->setData('extraFormatFormHTML', $extraFormatFormHTML);
 
         // Set the model on the form.
         $this->Form->setModel($configurationModel);
@@ -102,13 +110,6 @@ class VanillaSettingsController extends Gdn_Controller {
                 $this->informMessage(t("Your changes have been saved."));
             }
         }
-
-        // Fire an filter event gather extra form HTML for specific format items.
-        // The form is added so the form can be enhanced and the config model needs to passed to add extra fields.
-        $extraFormatFormHTML = $eventManager->fireFilter('postingSettings_formatSpecificFormItems', "",
-            $this->Form,
-            $configurationModel);
-        $this->setData('extraFormatFormHTML', $extraFormatFormHTML);
 
         $this->setHighlightRoute('vanilla/settings/posting');
         $this->addJsFile('settings.js');

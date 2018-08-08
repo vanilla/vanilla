@@ -22,19 +22,7 @@ export function initLinkEmbeds() {
 export class LinkEmbed extends BaseEmbed {
     public render() {
         const { name, attributes, url, photoUrl, body } = this.props.data;
-        const title = name ? <h3 className="embedLink-title">{name}</h3> : null;
-
-        const userPhoto =
-            attributes.userPhoto && attributes.userName ? (
-                <span className="embedLink-userPhoto PhotoWrap">
-                    <img
-                        src={attributes.userPhoto}
-                        alt={attributes.userName}
-                        className="ProfilePhoto ProfilePhotoMedium"
-                        tabIndex={-1}
-                    />
-                </span>
-            ) : null;
+        const title = name ? <h3 className="embedText-title embedLink-title">{name}</h3> : null;
 
         const source = <span className="embedLink-source meta">{url}</span>;
 
@@ -42,8 +30,6 @@ export class LinkEmbed extends BaseEmbed {
         if (photoUrl) {
             linkImage = <img src={photoUrl} className="embedLink-image" aria-hidden="true" />;
         }
-
-        const userName = attributes.userName ? <span className="embedLink-userName">{attributes.userName}</span> : null;
         const dateTime =
             attributes.timestamp && attributes.humanTime ? (
                 <time className="embedLink-dateTime meta" dateTime={attributes.timestamp}>
@@ -53,14 +39,12 @@ export class LinkEmbed extends BaseEmbed {
 
         const sanitizedUrl = sanitizeUrl(url);
         return (
-            <a href={sanitizedUrl} rel="noreferrer">
-                <article className="embedLink-body">
+            <a className="embedLink-link" href={sanitizedUrl} rel="noreferrer">
+                <article className="embedText-body embedLink-body">
                     {linkImage}
-                    <div className="embedLink-main">
-                        <div className="embedLink-header">
+                    <div className="embedText-main embedLink-main">
+                        <div className="embedText-header embedLink-header">
                             {title}
-                            {userPhoto}
-                            {userName}
                             {dateTime}
                             {source}
                         </div>

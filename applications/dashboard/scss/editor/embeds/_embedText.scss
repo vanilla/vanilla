@@ -1,0 +1,67 @@
+$embedText-header_fontSize: $global-medium_fontSize !default;
+$embedText-header-lineHeight: $global-base_lineHeight !default;
+$embedText-title_fontWeight: $global-bold_fontWeight !default;
+$embedText-content_boxShadowColor: rgba($global-color_fg, .3) !default;
+$embedText-content_bg: #ffffff !default;
+$embedText-content_boxShadow: 0 1px 3px 0 $embedText-content_boxShadowColor !default;
+
+.embedText-content {
+    display: block;
+    background: $embedText-content_bg;
+    box-shadow: $embedText-content_boxShadow;
+
+    &,
+    &:hover,
+    &:focus {
+        color: inherit;
+        text-decoration: none !important;
+    }
+}
+
+.embedText-body {
+    display: block;
+    position: relative;
+    overflow: hidden;
+    text-align: left;
+    pointer-events: initial !important;
+}
+
+.embedText-main {
+    padding: 18px;
+    box-sizing: border-box;
+}
+
+.embedText-header {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: flex-start;
+    font-size: $embedText-header_fontSize;
+    line-height: $embedText-header-lineHeight;
+    margin-bottom: $utility-baseUnit;
+}
+
+.embedText-dateTime {
+    font-size: .8em;
+    margin: 0 0 0 9px;
+    padding: 0;
+    color: #737373;
+}
+
+.embedText-title {
+    display: block;
+    width: 100%;
+    margin: 0;
+    padding: 0;
+    font-size: $embedText-header_fontSize;
+    line-height: $embedText-header-lineHeight;
+    font-weight: $embedText-title_fontWeight;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+
+    @include mediaQuery-richEditor_embed {
+        @include breakWord;
+        white-space: normal;
+    }
+}

@@ -8,21 +8,12 @@
 
 import React from "react";
 import ReactDOM from "react-dom";
+import { IDiscussionEmbed, ICommentEmbed, IScrapeData } from "@dashboard/@types/api";
 
 export const FOCUS_CLASS = "embed-focusableElement";
 
-export interface IEmbedData {
-    type: string;
-    url: string;
-    name?: string | null;
-    body?: string | null;
-    photoUrl?: string | null;
-    height?: number | null;
-    width?: number | null;
-    attributes: {
-        [key: string]: any;
-    };
-}
+export type IQuoteEmbedData = IDiscussionEmbed | ICommentEmbed;
+export type IEmbedData = IScrapeData;
 
 export interface IEmbedElements {
     root: HTMLElement;
@@ -31,8 +22,8 @@ export interface IEmbedElements {
 
 export type EmbedRenderer = (elements: IEmbedElements, data: IEmbedData, inEditor: boolean) => Promise<void>;
 
-export interface IEmbedProps {
-    data: IEmbedData;
+export interface IEmbedProps<T = IScrapeData> {
+    data: T;
     inEditor: boolean;
     onRenderComplete: () => void;
 }
@@ -74,13 +65,28 @@ export function renderEmbed(elements: IEmbedElements, data: IEmbedData, inEditor
             throw new Error("The embed type was not provided.");
         }
 
+        if (data.type === "link") {
+            elements.root.classList.add("embedText");
+            elements.content.classList.add("embedText-content");
+            elements.content.classList.add("embedLink-content");
+        }
+
+        if (data.type === "quote") {
+            elements.root.classList.add("embedText");
+            elements.content.classList.add("embedText-content");
+            elements.content.classList.add("embedQuote-content");
+        }
+
         const renderer = data.type && embedRenderers[data.type];
         const Component = data.type && embedComponents[data.type];
 
         if (renderer) {
             return renderer(elements, data, inEditor);
         } else if (Component) {
-            ReactDOM.render(<Component data={data} inEditor={inEditor} onRenderComplete={resolve} />, elements.content);
+            ReactDOM.render(
+                <Component data={data as IScrapeData} inEditor={inEditor} onRenderComplete={resolve} />,
+                elements.content,
+            );
         } else {
             throw new Error("Could not find a renderer for the embed type - " + data.type);
         }

@@ -40,7 +40,7 @@ class VanillaStatsPlugin extends Gdn_Plugin {
      * VanillaStatsPlugin constructor.
      */
     public function __construct() {
-        $this->AnalyticsServer = c('Garden.Analytics.Remote', 'analytics.vanillaforums.com');
+        $this->AnalyticsServer = c('Garden.Analytics.Remote', 'https://analytics.vanillaforums.com');
         $this->VanillaID = Gdn::installationID();
 
         $isVanillaAnalyticEnabled = Gdn::addonManager()->isEnabled('vanillaanalytics', Vanilla\Addon::TYPE_ADDON);

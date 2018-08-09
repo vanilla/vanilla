@@ -67,6 +67,19 @@ class DateFilterSchema extends Schema {
     }
 
     /**
+     * Serialize the date filter as structure that Open API understands.
+     *
+     * @return array Returns the schema array.
+     */
+    public function jsonSerialize() {
+        return [
+            "type" => "string",
+            "format" => "date-filter",
+            "description" => $this->getDescription()
+        ];
+    }
+
+    /**
      * Parse an interval-notation date range into an array representation.
      *
      * @param string $dates

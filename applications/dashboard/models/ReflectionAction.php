@@ -253,6 +253,8 @@ class ReflectionAction {
 
         // Set up an event handler that will capture the schemas.
         $fn  = function ($controller, Schema $schema, $type) use (&$in, &$out, &$allIn) {
+            $this->massageSchema($schema);
+
             switch ($type) {
                 case 'in':
                     if (empty($this->bodyParam)) {
@@ -338,6 +340,12 @@ class ReflectionAction {
         foreach ($this->params as $name => &$param) {
             if ($param['in'] === 'path') {
                 $param += ['type' => $name === $this->idParam ? 'integer' : 'string'];
+                $param['required'] = true;
+            }
+
+            if (array_key_exists('default', $param) && $param['default'] === null) {
+                $param['x-default'] = null;
+                unset($param['default']);
             }
         }
 
@@ -415,5 +423,72 @@ class ReflectionAction {
      */
     public function getSubpath() {
         return $this->subpath;
+    }
+
+    /**
+     * Massage a schema for documentation display.
+     *
+     * @param Schema $schema The schema to massage.
+     */
+    private function massageSchema(Schema $schema) {
+        $arr = $schema->getSchemaArray();
+        $this->walkSchemas($arr, function (&$sch, $key, $parent) {
+            if (is_array($sch['type'])) {
+                // Check for a null type.
+                if (count($sch['type']) === 2 && in_array('null', $sch['type'])) {
+                    $sch['x-nullable'] = true;
+                    $sch['type'] = array_pop(array_filter($sch['type'], function ($v) {
+                        return $v !== 'null';
+                    }));
+                }
+
+                // Remove the boolean type from expand.
+                if ($key === 'expand' && count($sch['type']) === 2 && in_array('boolean', $sch['type'])) {
+                    $sch['type'] = 'array';
+                    if (isset($sch['items']['enum'])) {
+                        $sch['items']['enum'][] = 'all';
+                    }
+                    if (isset($sch['default'])) {
+                        if ($sch['default'] === false) {
+                            unset($sch['default']);
+                        } elseif ($sch['default'] === 'true') {
+                            $sch['default'] = ['all'];
+                        }
+                    }
+                }
+            }
+
+            if ($sch['style'] ?? '' === 'form') {
+                $sch['collectionFormat'] = 'csv';
+                unset($sch['style']);
+            }
+        });
+
+        $schema->setField([], $arr);
+    }
+
+    /**
+     * Walk schemas recursively in a schema array.
+     *
+     * @param array &$array The schema array.
+     * @param callable $callback The callback to execute on each schema array.
+     * @param int $depth The current depth.
+     */
+    private function walkSchemas(array &$array, callable $callback, $depth = 0) {
+        foreach ($array as $key => &$value) {
+            if (is_array($value)) {
+                if (isset($value['type']) && $key !== 'properties') {
+                    $callback($value, $key, $array);
+                }
+                $this->walkSchemas($value, $callback, $depth + 1);
+            } elseif ($value instanceof Schema) {
+                $arr = $value->getSchemaArray();
+                if (isset($value['type']) && $key !== 'properties') {
+                    $callback($arr, $key, $array);
+                }
+                $this->walkSchemas($arr, $callback, $depth + 1);
+                $value->setField([], $arr);
+            }
+        }
     }
 }

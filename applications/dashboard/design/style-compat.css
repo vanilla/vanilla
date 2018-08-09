@@ -2650,7 +2650,7 @@ body.isMobile .richEditorParagraphMenu {
 
 .safeEmoji {
   display: inline-block;
-  font-family: "Segoe UI Emoji", sans-serif;
+  font-family: "Segoe UI Emoji", sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
   vertical-align: middle;
   text-align: center;
   height: 1em;

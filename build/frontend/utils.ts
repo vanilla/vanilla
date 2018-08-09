@@ -1,9 +1,10 @@
 import { promisify } from "util";
 import * as fs from "fs";
 import * as path from "path";
-import { VANILLA_APPS, VANILLA_PLUGINS, VANILLA_THEMES } from "./vanillaPaths";
+import { VANILLA_APPS, VANILLA_ROOT, VANILLA_THEMES } from "./vanillaPaths";
 const realPath = promisify(fs.realpath);
 const readDir = promisify(fs.readdir);
+const fileExists = promisify(fs.exists);
 
 const enum BuildMode {
     TEST = "test",
@@ -27,69 +28,75 @@ export async function lookupAddonPaths(): Promise<string[]> {
         cachedAddonPaths = addonPaths;
     } else {
         // Be consistent about being async here.
-        addonPaths = await cachedAddonPaths;
+        addonPaths = await Promise.resolve(cachedAddonPaths);
     }
 
     return addonPaths;
 }
 
 async function lookupAddonType(rootDir: string): Promise<string[]> {
-    const dirList = await readDir(path.resolve(rootDir));
-    const fullPaths = dirList.map(appPath => path.resolve(rootDir, appPath));
-    const paths = await Promise.all(fullPaths.map(fullPath => realPath(fullPath)));
-    return paths;
+    const addonKeyList = await readDir(path.resolve(rootDir));
+    const finalPaths: string[] = [];
+    for (const addonKey of addonKeyList) {
+        const addonPath = path.resolve(rootDir, addonKey);
+        const hasForum = await addonHasEntry(addonPath, "forum");
+        if (hasForum) {
+            const finalPath = await realPath(addonPath);
+            finalPaths.push(finalPath);
+        }
+    }
+    return finalPaths;
 }
 
-export async function getAddonAliasMapping(
-    options: IBuildOptions,
-): Promise<{
+interface IStringMap {
     [key: string]: string;
-}> {
+}
+
+export async function getAddonAliasMapping(): Promise<IStringMap> {
     const addonPaths = await lookupAddonPaths();
-    const result = {};
+    const result: IStringMap = {};
     for (const addonPath of addonPaths) {
-        const key = path.basename(addonPath);
-        result[key] = addonPath;
+        const key = "@" + path.basename(addonPath);
+        result[key] = path.resolve(addonPath, "src/scripts");
     }
     return result;
 }
 
-/**
- * Generate aliases for any required addons.
- *
- * Aliases will always be generated for core, applications/vanilla, and applications/dashboard
- *
- * @param options
- * @param forceAll - Force the function to make aliases for every single addon.
- */
-export function getAliasesForRequirements(options: ICliOptions, forceAll = false) {
-    const { vanillaDirectory, requiredDirectories, rootDirectories } = options;
-    const allDirectories = [...requiredDirectories, ...rootDirectories];
+export async function getScriptSourceFiles(): Promise<string[]> {
+    const addonPaths = await lookupAddonPaths();
+    return addonPaths.map(addonPath => path.resolve(addonPath, "src/scripts"));
+}
 
-    const allowedKeys = allDirectories.map(dir => {
-        return path.basename(dir);
-    });
+type EntryType = "ts" | "tsx" | null;
 
-    allowedKeys.push("vanilla", "dashboard");
-
-    const result: any = {};
-    ["applications", "addons", "plugins", "themes"].forEach(topDirectory => {
-        const fullTopDirectory = path.join(vanillaDirectory, topDirectory);
-
-        if (fs.existsSync(fullTopDirectory)) {
-            const subdirs = fs.readdirSync(fullTopDirectory);
-            subdirs.forEach(addonKey => {
-                const key = `@${addonKey}`;
-
-                const shouldAddResult = !result[key] && (forceAll || allowedKeys.includes(addonKey));
-                if (shouldAddResult) {
-                    result[key] = path.join(vanillaDirectory, topDirectory, addonKey, "src/scripts");
-                }
-            });
+async function addonHasEntry(addonPath: string, entry: "forum" | "dashboard" | "knowledge"): Promise<EntryType> {
+    const tsPath = path.resolve(addonPath, `src/scripts/entries/${entry}.ts`);
+    const tsPathExists = await fileExists(tsPath);
+    if (tsPathExists) {
+        return "ts";
+    } else {
+        const tsxPath = path.resolve(addonPath, `src/scripts/entries/${entry}.tsx`);
+        const tsxPathExists = await fileExists(tsxPath);
+        if (tsxPathExists) {
+            return "tsx";
         }
-    });
+    }
 
-    const outputString = Object.keys(result).join(chalk.white(", "));
-    printVerbose(`Using aliases: ${chalk.yellow(outputString)}`);
-    return result;
+    return null;
+}
+
+export async function getForumEntries(): Promise<IStringMap> {
+    const addonPaths = await lookupAddonPaths();
+    const appEntries: IStringMap = {};
+
+    for (const addonPath of addonPaths) {
+        const entryType = await addonHasEntry(addonPath, "forum");
+
+        const relativePath = addonPath.replace(VANILLA_ROOT, "") + "/js/webpack/forum";
+        if (entryType !== null) {
+            appEntries[relativePath] = path.resolve(addonPath, `src/scripts/entries/forum.${entryType}`);
+        }
+    }
+
+    return appEntries;
 }

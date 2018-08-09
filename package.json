@@ -36,6 +36,7 @@
         "@types/jquery": "3.3.2",
         "@types/lodash": "4.14.112",
         "@types/mocha": "5.2.0",
+        "@types/node": "10.5.7",
         "@types/prop-types": "15.5.3",
         "@types/react": "16.3.14",
         "@types/react-dom": "16.0.5",
@@ -45,10 +46,11 @@
         "@types/sinon": "5.0.0",
         "@types/sprintf-js": "1.1.0",
         "@types/validator": "9.4.1",
+        "@types/webpack": "4.4.9",
         "@vanillaforums/babel-preset": "1.0.5",
         "@vanillaforums/prettier-config": "1.0.0",
         "@vanillaforums/tslint-config": "1.1.8",
-        "awesome-typescript-loader": "5.0.0",
+        "awesome-typescript-loader": "5.2.0",
         "babel-core": "6.26.3",
         "babel-loader": "7.1.4",
         "chai": "4.1.2",
@@ -57,7 +59,9 @@
         "enzyme": "3.3.0",
         "enzyme-adapter-react-16": "1.1.1",
         "eslint": "4.17.0",
+        "fork-ts-checker-webpack-plugin": "0.4.6",
         "glob": "7.1.2",
+        "happypack": "5.0.0",
         "html-loader": "0.5.5",
         "karma": "2.0.2",
         "karma-chai": "0.1.0",
@@ -74,16 +78,17 @@
         "raw-loader": "0.5.1",
         "sinon": "5.0.10",
         "ts-loader": "4.4.2",
-        "ts-node": "6.0.5",
+        "ts-node": "7.0.0",
         "tslint": "5.10.0",
         "typescript": "3.0.1",
-        "webpack": "4.10.2"
+        "webpack": "4.16.5"
     },
     "scripts": {
         "test": "karma start ./tests/javascript/karma.conf.js --single-run",
         "test:watch": "karma start ./tests/javascript/karma.conf.js",
         "test:debug": "karma start ./tests/javascript/karma.conf.js --browsers ChromeDebug",
         "lint:ts": "tslint -c ./tslint.json -e './**/node_modules/**' -e './**/src/**/*.{js,jsx}' -p ./tsconfig.json -t stylish",
-        "lint:ts:fix": "tslint -c ./tslint.json -e './**/node_modules/**' -e './**/src/**/*.{js,jsx}' -p ./tsconfig.json -t stylish --fix"
+        "lint:ts:fix": "tslint -c ./tslint.json -e './**/node_modules/**' -e './**/src/**/*.{js,jsx}' -p ./tsconfig.json -t stylish --fix",
+        "build": "ts-node --node-cache -P build/frontend/tsconfig.json build/frontend/buildProd.ts"
     }
 }

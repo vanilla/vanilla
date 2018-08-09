@@ -5,20 +5,36 @@
  */
 
 import * as path from "path";
-import { VANILLA_ROOT } from "./vanillaPaths";
+import { VANILLA_ROOT, TS_CONFIG_FILE, TS_LINT_FILE } from "./vanillaPaths";
+import { getAddonAliasMapping, getScriptSourceFiles, lookupAddonPaths } from "./utils";
+import HappyPack from "happypack";
+import ForkTsCheckerWebpackPlugin from "fork-ts-checker-webpack-plugin";
 
-export function makeBaseConfig(addonPaths: string[]) {
-    const resolvePaths = ["node_modules", ...addonPaths.map(dir => path.resolve(dir, "node_modules"))];
+export async function makeBaseConfig() {
+    const happyThreadPool = HappyPack.ThreadPool({ size: 4, id: "scripts" });
+    const addonPaths = await lookupAddonPaths();
+
+    const modulePaths = [
+        "node_modules",
+        path.join(VANILLA_ROOT, "node_modules"),
+        ...addonPaths.map(dir => path.resolve(dir, "node_modules")),
+    ];
+    const moduleAliases = await getAddonAliasMapping();
 
     return {
         context: VANILLA_ROOT,
+        optimization: {
+            splitChunks: {
+                // include all types of chunks
+                chunks: "all",
+            },
+        },
         module: {
             rules: [
                 {
                     test: /\.jsx?$/,
                     exclude: ["node_modules"],
                     include: [
-                        /\/src\/scripts/,
                         // We need to transpile quill's ES6 because we are building from source.
                         /\/node_modules\/quill/,
                     ],
@@ -35,20 +51,10 @@ export function makeBaseConfig(addonPaths: string[]) {
                 {
                     test: /\.tsx?$/,
                     exclude: ["node_modules"],
-                    include: [/\/src\/scripts/, /tests\/javascript/],
+                    include: await getScriptSourceFiles(),
                     use: [
                         {
-                            loader: "awesome-typescript-loader",
-                            options: {
-                                useBabel: true,
-                                useCache: true,
-                                configFileName: path.resolve(VANILLA_ROOT, "tsconfig.json"),
-                                forceIsolatedModules: true,
-                                babelOptions: {
-                                    babelrc: false,
-                                    presets: ["@vanillaforums/babel-preset"],
-                                },
-                            },
+                            loader: "happypack/loader?id=ts",
                         },
                     ],
                 },
@@ -69,18 +75,31 @@ export function makeBaseConfig(addonPaths: string[]) {
                 },
             ],
         },
+        plugins: [
+            new HappyPack({
+                id: "ts",
+                // verbose: options.verbose,
+                threadPool: happyThreadPool,
+                loaders: [
+                    {
+                        path: "ts-loader",
+                        query: {
+                            happyPackMode: true,
+                            configFile: TS_CONFIG_FILE,
+                        },
+                    },
+                ],
+            }),
+            new ForkTsCheckerWebpackPlugin({
+                tsconfig: TS_CONFIG_FILE,
+                // tslint: false,
+                checkSyntacticErrors: true,
+                async: true,
+            }),
+        ],
         resolve: {
-            modules: [
-                path.join(VANILLA_ROOT, "node_modules"),
-                path.join(VANILLA_ROOT, "plugins/rich-editor/node_modules"),
-                path.join(VANILLA_ROOT, "tests/node_modules"),
-            ],
-            alias: {
-                "@dashboard": path.resolve(VANILLA_ROOT, "applications/dashboard/src/scripts/"),
-                "@vanilla": path.resolve(VANILLA_ROOT, "applications/vanilla/src/scripts/"),
-                "@rich-editor": path.resolve(VANILLA_ROOT, "plugins/rich-editor/src/scripts/"),
-                "@testroot": path.resolve(VANILLA_ROOT, "tests/javascript/"),
-            },
+            modules: modulePaths,
+            alias: moduleAliases,
             extensions: [".ts", ".tsx", ".js", ".jsx"],
         },
         /**
@@ -93,5 +112,3 @@ export function makeBaseConfig(addonPaths: string[]) {
         },
     };
 }
-
-module.exports = () => {};

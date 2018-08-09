@@ -8,7 +8,10 @@
         "skipLibCheck": true,
         "sourceMap": true,
         "lib": ["es2017"],
-        "types": ["node"]
+        "baseUrl": ".",
+        "paths": {
+            "happypack": ["@types/happypack"]
+          }
     },
-    "include": ["**/*.ts"]
+    "include": ["**/*.ts"],
 }

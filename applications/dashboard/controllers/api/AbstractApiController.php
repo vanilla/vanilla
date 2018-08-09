@@ -116,7 +116,7 @@ abstract class AbstractApiController extends \Vanilla\Web\Controller {
             // A boolean true allows everything.
             $result = true;
         } elseif (is_array($expand)) {
-            $result = in_array($field, $expand);
+            $result = !empty(array_intersect(['all', 'true', '1', $field], $expand));
         }
         return $result;
     }
@@ -131,7 +131,7 @@ abstract class AbstractApiController extends \Vanilla\Web\Controller {
      * @param array $request An array representing request data.
      * @param array $map An array of short-to-full field names (e.g. insertUser => InsertUserID).
      * @param string $field The name of the field where the expand fields can be found.
-     * @return array
+     * @return array Returns an array of field names that were expanded from the `$map` argument.
      */
     protected function resolveExpandFields(array $request, array $map, $field = 'expand') {
         $result = [];

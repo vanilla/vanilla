@@ -24,6 +24,7 @@ import { getIDForQuill, isEmbedSelected, SELECTION_UPDATE } from "@rich-editor/q
 import { IStoreState } from "@rich-editor/@types/store";
 import { delegateEvent, removeDelegatedEvent } from "@dashboard/dom";
 import EmbedInsertionModule from "@rich-editor/quill/EmbedInsertionModule";
+import { Sources } from "quill/core";
 
 interface IProps {
     editorID: string;
@@ -63,7 +64,9 @@ export default class Editor extends React.Component<IProps> {
         this.quill.on(Quill.events.EDITOR_CHANGE, this.onQuillUpdate);
 
         // Add a listener for a force selection update.
-        document.addEventListener(SELECTION_UPDATE, () => this.onQuillUpdate(null, null, null, Quill.sources.USER));
+        document.addEventListener(SELECTION_UPDATE, () =>
+            this.onQuillUpdate(Quill.events.SELECTION_CHANGE, null, null, Quill.sources.USER),
+        );
 
         this.addQuoteHandler();
 
@@ -129,8 +132,22 @@ export default class Editor extends React.Component<IProps> {
         );
     }
 
-    private onQuillUpdate = (type, newValue, oldValue, source) => {
-        if (source !== Quill.sources.SILENT) {
+    /**
+     * Quill dispatches a lot of unnecessary updates. We need to filter out only the ones we want.
+     *
+     * We need
+     * - Every non-silent event.
+     * - Every selection change event (even the "silent" ones).
+     */
+    private onQuillUpdate = (type: string, newValue, oldValue, source: Sources) => {
+        let shouldDispatch = false;
+        if (type === Quill.events.SELECTION_CHANGE) {
+            shouldDispatch = true;
+        } else if (source !== Quill.sources.SILENT) {
+            shouldDispatch = true;
+        }
+
+        if (shouldDispatch) {
             this.store.dispatch(actions.setSelection(this.editorID, this.quill.getSelection()));
         }
     };

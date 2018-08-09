@@ -3,6 +3,7 @@
 !/applications/dashboard/
 !/applications/vanilla/
 /build/*
+!/build/frontend
 !/build/.htaccess
 !/build/build.xml
 !/build/package-include.txt

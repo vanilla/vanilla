@@ -58,6 +58,7 @@
         "enzyme-adapter-react-16": "1.1.1",
         "eslint": "4.17.0",
         "glob": "7.1.2",
+        "html-loader": "0.5.5",
         "karma": "2.0.2",
         "karma-chai": "0.1.0",
         "karma-chrome-launcher": "2.2.0",
@@ -72,10 +73,10 @@
         "prettier": "1.13.0",
         "raw-loader": "0.5.1",
         "sinon": "5.0.10",
-        "ts-loader": "4.3.0",
+        "ts-loader": "4.4.2",
         "ts-node": "6.0.5",
         "tslint": "5.10.0",
-        "typescript": "2.8.3",
+        "typescript": "3.0.1",
         "webpack": "4.10.2"
     },
     "scripts": {

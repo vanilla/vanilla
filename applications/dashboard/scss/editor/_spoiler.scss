@@ -75,7 +75,7 @@ $buttonSpoiler: (
     max-width: 100%;
     font-size: $spoiler-fontSize;
     min-height: $icon_default_size * 2;
-    padding: 0 $embeddedText-padding;
+    padding: 0 $embeddedText_padding;
     outline: 0;
     cursor: pointer;
     text-align: center;
@@ -123,7 +123,7 @@ $buttonSpoiler: (
 }
 
 .spoiler-content {
-    padding: 0 $embeddedText-padding $embeddedText-padding $embeddedText-padding;
+    padding: 0 $embeddedText_padding $embeddedText_padding $embeddedText_padding;
 }
 
 .spoiler-buttonContainer {

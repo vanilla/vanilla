@@ -108,7 +108,7 @@
 .richEditor { // Only in edit mode
     .embedExternal-content {
         &::after {
-            transition: 0.2s ease background-color;
+            transition: .2s ease background-color;
             content: "";
             position: absolute;
             top: 0;
@@ -117,8 +117,9 @@
             height: 100%;
             pointer-events: none;
         }
-        &:hover {
+        &:active {
             &::after {
+                transition-duration: 0s;
                 background-color: $embed-overlay_hover_color;
             }
         }

@@ -2010,8 +2010,8 @@ body.isMobile .richEditorParagraphMenu {
 }
 
 .richEditor .embedExternal-content::after {
-  -webkit-transition: 0.2s ease background-color;
-          transition: 0.2s ease background-color;
+  -webkit-transition: .2s ease background-color;
+          transition: .2s ease background-color;
   content: "";
   position: absolute;
   top: 0;
@@ -2021,8 +2021,10 @@ body.isMobile .richEditorParagraphMenu {
   pointer-events: none;
 }
 
-.richEditor .embedExternal-content:hover::after {
-  background-color: rgba(85, 90, 98, 0.05);
+.richEditor .embedExternal-content:active::after {
+  -webkit-transition-duration: 0s;
+          transition-duration: 0s;
+  background-color: rgba(255, 255, 255, 0.5);
 }
 
 .embedVideo .embedExternal-content {
@@ -2203,7 +2205,7 @@ body.isMobile .richEditorParagraphMenu {
       -ms-flex-pack: start;
           justify-content: flex-start;
   font-size: 14px;
-  line-height: 1.4285714286;
+  line-height: 1.5;
   margin-bottom: 6px;
 }
 
@@ -2216,7 +2218,7 @@ body.isMobile .richEditorParagraphMenu {
   margin-bottom: 6px;
   padding: 0;
   font-size: 14px;
-  line-height: 1.4285714286;
+  line-height: 1.5;
   font-weight: 600;
   white-space: nowrap;
   overflow: hidden;
@@ -2295,8 +2297,8 @@ body.isMobile .richEditorParagraphMenu {
   text-overflow: ellipsis;
   word-break: break-word;
   max-width: 100%;
-  line-height: 1.4285714286;
-  max-height: 60px;
+  line-height: 1.5;
+  max-height: 63px;
   white-space: normal;
 }
 

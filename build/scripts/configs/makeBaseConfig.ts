@@ -5,12 +5,12 @@
  */
 
 import * as path from "path";
-import { VANILLA_ROOT, TS_CONFIG_FILE, TS_LINT_FILE, PRETTIER_FILE } from "./env";
-import { getAddonAliasMapping, getScriptSourceFiles, lookupAddonPaths } from "./addonUtils";
+import { VANILLA_ROOT, TS_CONFIG_FILE, TS_LINT_FILE, PRETTIER_FILE } from "../env";
+import { getAddonAliasMapping, getScriptSourceFiles, lookupAddonPaths } from "../utility/addonUtils";
 import PrettierPlugin from "prettier-webpack-plugin";
 import HappyPack from "happypack";
 import ForkTsCheckerWebpackPlugin from "fork-ts-checker-webpack-plugin";
-import { getOptions } from "./options";
+import { getOptions } from "../options";
 import chalk from "chalk";
 
 export async function makeBaseConfig(section: string) {

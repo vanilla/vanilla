@@ -7,8 +7,8 @@
 import { promisify } from "util";
 import * as fs from "fs";
 import * as path from "path";
-import { VANILLA_APPS, VANILLA_ROOT, VANILLA_PLUGINS, PUBLIC_PATH_SOURCE_FILE, BOOTSTRAP_SOURCE_FILE } from "./env";
-import { getOptions, BuildMode } from "./options";
+import { VANILLA_APPS, VANILLA_ROOT, VANILLA_PLUGINS, PUBLIC_PATH_SOURCE_FILE, BOOTSTRAP_SOURCE_FILE } from "../env";
+import { getOptions, BuildMode } from "../options";
 import { spawn } from "child_process";
 const realPath = promisify(fs.realpath);
 const readDir = promisify(fs.readdir);

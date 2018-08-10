@@ -5,12 +5,13 @@
  */
 
 import webpack, { Stats } from "webpack";
-import { makeProdConfig } from "./makeProdConfig";
-import { makeDevConfig } from "./makeDevConfig";
+import { makeProdConfig } from "./configs/makeProdConfig";
+import { makeDevConfig } from "./configs/makeDevConfig";
 import serve, { Result, InitializedKoa, Options } from "webpack-serve";
 import { getOptions, BuildMode } from "./options";
 import chalk from "chalk";
-import { installNodeModules } from "./moduleUtils";
+import { installNodeModules } from "./utility/moduleUtils";
+import { makePolyfillConfig } from "./configs/makePolyfillConfig";
 
 void Promise.all([installNodeModules("forum"), installNodeModules("admin")]).then(run);
 
@@ -21,6 +22,8 @@ async function run() {
             return await runProd();
         case BuildMode.DEVELOPMENT:
             return await runDev();
+        case BuildMode.POLYFILLS:
+            return await runPolyfill();
     }
 }
 
@@ -34,6 +37,19 @@ const statOptions = {
 
 async function runProd() {
     const config = [await makeProdConfig("forum"), await makeProdConfig("admin")];
+    const compiler = webpack(config);
+    const logger = console;
+    compiler.run((err: Error, stats: Stats) => {
+        if (err) {
+            logger.error("The build encountered an error:" + err);
+        }
+
+        logger.log(stats.toString(statOptions));
+    });
+}
+
+async function runPolyfill() {
+    const config = await makePolyfillConfig();
     const compiler = webpack(config);
     const logger = console;
     compiler.run((err: Error, stats: Stats) => {

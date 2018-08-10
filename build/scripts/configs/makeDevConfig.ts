@@ -5,7 +5,7 @@
  */
 
 import { Configuration } from "webpack";
-import { getHotEntries } from "./addonUtils";
+import { getHotEntries } from "../utility/addonUtils";
 import { makeBaseConfig } from "./makeBaseConfig";
 
 export async function makeDevConfig(section: string) {

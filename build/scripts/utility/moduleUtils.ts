@@ -1,4 +1,4 @@
-import { getOptions } from "./options";
+import { getOptions } from "../options";
 import { print, fail } from "./utils";
 import { lookupAddonPaths } from "./addonUtils";
 import chalk from "chalk";

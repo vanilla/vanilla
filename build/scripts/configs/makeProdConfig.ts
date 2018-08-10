@@ -5,9 +5,9 @@
  */
 
 import { Configuration } from "webpack";
-import { VANILLA_ROOT } from "./env";
-import { getEntries } from "./addonUtils";
-import { getOptions, BuildMode } from "./options";
+import { VANILLA_ROOT } from "../env";
+import { getEntries } from "../utility/addonUtils";
+import { getOptions, BuildMode } from "../options";
 import { makeBaseConfig } from "./makeBaseConfig";
 import { BundleAnalyzerPlugin } from "webpack-bundle-analyzer";
 import UglifyJsPlugin from "uglifyjs-webpack-plugin";

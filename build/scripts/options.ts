@@ -1,5 +1,5 @@
 import yargs from "yargs";
-import { getVanillaConfig } from "./configUtils";
+import { getVanillaConfig } from "./utility/configUtils";
 
 yargs
     .option("verbose", {

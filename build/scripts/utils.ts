@@ -25,7 +25,9 @@ interface IBuildOptions {
     mode: BuildMode;
 }
 
-let cachedAddonPaths: string[] | null = null;
+const cachedAddonPaths: {
+    [section: string]: string[];
+} = {};
 
 export function getOptions(): IBuildOptions {
     return {
@@ -33,29 +35,33 @@ export function getOptions(): IBuildOptions {
     };
 }
 
-export async function lookupAddonPaths(): Promise<string[]> {
+export async function lookupAddonPaths(section: string): Promise<string[]> {
     let addonPaths;
-    if (cachedAddonPaths === null) {
-        const addonPathsByDir = await Promise.all([lookupAddonType(VANILLA_APPS), lookupAddonType(VANILLA_PLUGINS)]);
+    if (!(section in cachedAddonPaths)) {
+        const addonPathsByDir = await Promise.all([
+            lookupAddonType(VANILLA_APPS, section),
+            lookupAddonType(VANILLA_PLUGINS, section),
+        ]);
 
         // Merge the arrays together.
         addonPaths = [].concat.apply([], addonPathsByDir);
-        cachedAddonPaths = addonPaths;
+        cachedAddonPaths[section] = addonPaths;
     } else {
         // Be consistent about being async here.
-        addonPaths = await Promise.resolve(cachedAddonPaths);
+        addonPaths = await Promise.resolve(cachedAddonPaths[section]);
     }
 
     return addonPaths;
 }
 
-async function lookupAddonType(rootDir: string): Promise<string[]> {
+async function lookupAddonType(rootDir: string, section: string): Promise<string[]> {
     const addonKeyList = await readDir(path.resolve(rootDir));
     const finalPaths: string[] = [];
     for (const addonKey of addonKeyList) {
         const addonPath = path.resolve(rootDir, addonKey);
-        const hasForum = await addonHasEntry(addonPath, "forum");
-        if (hasForum) {
+        const hasSection = await addonHasEntry(addonPath, section);
+        const hasBoostrap = await addonHasEntry(addonPath, "bootstrap");
+        if (hasSection || hasBoostrap) {
             const finalPath = await realPath(addonPath);
             finalPaths.push(finalPath);
         }
@@ -67,8 +73,8 @@ interface IStringMap {
     [key: string]: string;
 }
 
-export async function getAddonAliasMapping(): Promise<IStringMap> {
-    const addonPaths = await lookupAddonPaths();
+export async function getAddonAliasMapping(section: string): Promise<IStringMap> {
+    const addonPaths = await lookupAddonPaths(section);
     const result: IStringMap = {};
     for (const addonPath of addonPaths) {
         const key = "@" + path.basename(addonPath);
@@ -77,14 +83,14 @@ export async function getAddonAliasMapping(): Promise<IStringMap> {
     return result;
 }
 
-export async function getScriptSourceFiles(): Promise<string[]> {
-    const addonPaths = await lookupAddonPaths();
+export async function getScriptSourceFiles(section: string): Promise<string[]> {
+    const addonPaths = await lookupAddonPaths(section);
     return addonPaths.map(addonPath => path.resolve(addonPath, "src/scripts"));
 }
 
 type EntryType = "ts" | "tsx" | null;
 
-async function addonHasEntry(addonPath: string, entry: "forum" | "dashboard" | "knowledge"): Promise<EntryType> {
+async function addonHasEntry(addonPath: string, entry: string): Promise<EntryType> {
     const tsPath = path.resolve(addonPath, `src/scripts/entries/${entry}.ts`);
     const tsPathExists = await fileExists(tsPath);
     if (tsPathExists) {
@@ -105,42 +111,42 @@ function makeEntryPaths(entries: string[]): string[] {
     return entries;
 }
 
-function getCommonEntries() {
+function getCommonEntries(section: string) {
     return {
-        "/js/webpack/bootstrap": makeEntryPaths([BOOTSTRAP_SOURCE_FILE]),
+        [`/js/webpack/bootstrap-${section}`]: makeEntryPaths([BOOTSTRAP_SOURCE_FILE]),
     };
 }
 
-export async function getForumEntries(): Promise<any> {
-    const addonPaths = await lookupAddonPaths();
+export async function getEntries(section: string): Promise<any> {
+    const addonPaths = await lookupAddonPaths(section);
     const appEntries: any = {};
 
     for (const addonPath of addonPaths) {
-        const entryType = await addonHasEntry(addonPath, "forum");
+        const entryType = await addonHasEntry(addonPath, section);
 
         // Strip out the vanilla root to create an "absolute" looking path, from the root of the project.
-        const relativePath = addonPath.replace(VANILLA_ROOT, "") + "/js/webpack/forum";
+        const relativePath = addonPath.replace(VANILLA_ROOT, "") + `/js/webpack/${section}`;
         if (entryType !== null) {
-            const entryPath = path.resolve(addonPath, `src/scripts/entries/forum.${entryType}`);
+            const entryPath = path.resolve(addonPath, `src/scripts/entries/${section}.${entryType}`);
             appEntries[relativePath] = makeEntryPaths([entryPath]);
         }
     }
 
     return {
         ...appEntries,
-        ...getCommonEntries(),
+        ...getCommonEntries(section),
     };
 }
 
-export async function getForumHotEntries(): Promise<any> {
-    const addonPaths = await lookupAddonPaths();
+export async function getHotEntries(section: string): Promise<any> {
+    const addonPaths = await lookupAddonPaths(section);
     const appEntries: string[] = [];
 
     for (const addonPath of addonPaths) {
-        const entryType = await addonHasEntry(addonPath, "forum");
+        const entryType = await addonHasEntry(addonPath, section);
 
         if (entryType !== null) {
-            const entryPath = path.resolve(addonPath, `src/scripts/entries/forum.${entryType}`);
+            const entryPath = path.resolve(addonPath, `src/scripts/entries/${section}.${entryType}`);
             appEntries.push(entryPath);
         }
     }

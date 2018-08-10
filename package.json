@@ -45,6 +45,7 @@
         "@types/react-virtualized": "9.18.3",
         "@types/sinon": "5.0.0",
         "@types/sprintf-js": "1.1.0",
+        "@types/uglifyjs-webpack-plugin": "1.1.0",
         "@types/validator": "9.4.1",
         "@types/webpack": "4.4.9",
         "@types/webpack-bundle-analyzer": "2.9.2",

@@ -5,12 +5,12 @@
  */
 
 import { Configuration } from "webpack";
-import { getForumHotEntries } from "./utils";
+import { getHotEntries } from "./utils";
 import { makeBaseConfig } from "./makeBaseConfig";
 
-export async function makeDevConfig() {
-    const baseConfig: Configuration = (await makeBaseConfig()) as any;
-    const forumEntries = await getForumHotEntries();
+export async function makeDevConfig(section: string) {
+    const baseConfig: Configuration = (await makeBaseConfig(section)) as any;
+    const forumEntries = await getHotEntries(section);
     baseConfig.mode = "development";
     baseConfig.entry = forumEntries;
     baseConfig.output = {

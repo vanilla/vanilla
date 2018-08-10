@@ -21,9 +21,7 @@ function setupEditor() {
     const discussionFormContainer = document.querySelectorAll(".richEditor");
     if (discussionFormContainer.length > 0) {
         import(/* webpackChunkName: "plugins/rich-editor/js/chunks/mountEditor" */ "@rich-editor/mountEditor").then(
-            mountEditor => {
-                discussionFormContainer.forEach(mountEditor.default);
-            },
+            mountEditor => discussionFormContainer.forEach(mountEditor.default),
         );
     }
 }
@@ -42,9 +40,7 @@ function setupCommentEditForm() {
         const richEditor = container.querySelector(".richEditor");
         if (richEditor) {
             import(/* webpackChunkName: "plugins/rich-editor/js/chunks/mountEditor" */ "@rich-editor/mountEditor").then(
-                mountEditor => {
-                    mountEditor.default(richEditor);
-                },
+                mountEditor => mountEditor.default(richEditor),
             );
         }
     });

@@ -6,14 +6,14 @@
 
 import { Configuration } from "webpack";
 import { VANILLA_ROOT } from "./env";
-import { getForumEntries, getOptions, BuildMode } from "./utils";
+import { getEntries, getOptions, BuildMode } from "./utils";
 import { makeBaseConfig } from "./makeBaseConfig";
 import { BundleAnalyzerPlugin } from "webpack-bundle-analyzer";
 import UglifyJsPlugin from "uglifyjs-webpack-plugin";
 
-export async function makeProdConfig() {
-    const baseConfig: Configuration = (await makeBaseConfig()) as any;
-    const forumEntries = await getForumEntries();
+export async function makeProdConfig(section: string) {
+    const baseConfig: Configuration = (await makeBaseConfig(section)) as any;
+    const forumEntries = await getEntries(section);
 
     baseConfig.mode = "production";
     baseConfig.entry = forumEntries;
@@ -26,19 +26,19 @@ export async function makeProdConfig() {
     baseConfig.devtool = "source-map";
     baseConfig.optimization = {
         runtimeChunk: {
-            name: "js/webpack/runtime",
+            name: `js/webpack/runtime-${section}`,
         },
         splitChunks: {
             chunks: "initial",
             cacheGroups: {
                 commons: {
                     test: /[\\/]node_modules[\\/]/,
-                    name: "js/webpack/vendors",
+                    name: `js/webpack/vendors-${section}`,
                     chunks: "initial",
                 },
                 library: {
                     test: /[\\/]applications[\\/]dashboard[\\/]src[\\/]scripts[\\/]/,
-                    name: "js/webpack/library",
+                    name: `applications/dashboard/js/webpack/library-${section}`,
                     chunks: "all",
                     minChunks: 2,
                 },

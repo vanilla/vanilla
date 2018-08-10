@@ -22,7 +22,7 @@ async function run() {
 }
 
 async function runProd() {
-    const config = await makeProdConfig();
+    const config = [await makeProdConfig("forum"), await makeProdConfig("admin")];
     const compiler = webpack(config);
     const logger = console;
     compiler.run((err: Error, stats: Stats) => {
@@ -34,6 +34,8 @@ async function runProd() {
             stats.toString({
                 chunks: false, // Makes the build much quieter
                 modules: false,
+                entrypoints: false,
+                warnings: false,
                 colors: true, // Shows colors in the console
             }),
         );
@@ -41,8 +43,8 @@ async function runProd() {
 }
 
 async function runDev() {
-    const config = await makeDevConfig();
-    const compiler = webpack(config);
+    const config = [await makeDevConfig("forum"), await makeDevConfig("admin")];
+    const compiler = webpack(config) as any;
     const argv = {};
     const enhancer = (app: InitializedKoa) => {
         app.use(async (context, next) => {

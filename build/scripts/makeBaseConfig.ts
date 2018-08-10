@@ -10,16 +10,17 @@ import { getAddonAliasMapping, getScriptSourceFiles, lookupAddonPaths } from "./
 import HappyPack from "happypack";
 import ForkTsCheckerWebpackPlugin from "fork-ts-checker-webpack-plugin";
 
-export async function makeBaseConfig() {
-    const happyThreadPool = HappyPack.ThreadPool({ size: 4, id: "scripts" });
-    const addonPaths = await lookupAddonPaths();
+export async function makeBaseConfig(section: string) {
+    const happyThreadPool = HappyPack.ThreadPool({ size: 4, id: "ts" });
+    const addonPaths = await lookupAddonPaths(section);
 
     const modulePaths = [
         "node_modules",
         path.join(VANILLA_ROOT, "node_modules"),
         ...addonPaths.map(dir => path.resolve(dir, "node_modules")),
     ];
-    const moduleAliases = await getAddonAliasMapping();
+    const moduleAliases = await getAddonAliasMapping(section);
+    const tsSourceIncludes = await getScriptSourceFiles(section);
 
     return {
         context: VANILLA_ROOT,
@@ -51,7 +52,7 @@ export async function makeBaseConfig() {
                 {
                     test: /\.tsx?$/,
                     exclude: ["node_modules"],
-                    include: await getScriptSourceFiles(),
+                    include: tsSourceIncludes,
                     use: [
                         {
                             loader: "happypack/loader?id=ts",

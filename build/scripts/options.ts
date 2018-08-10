@@ -22,7 +22,6 @@ yargs
     });
 
 export const enum BuildMode {
-    TEST = "test",
     DEVELOPMENT = "development",
     PRODUCTION = "production",
     ANALYZE = "analyze",

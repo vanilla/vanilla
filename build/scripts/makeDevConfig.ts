@@ -4,24 +4,13 @@
  * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
  */
 
-import webpack, { Configuration } from "webpack";
-import { VANILLA_ROOT } from "./env";
-import { getOptions, BuildMode, getForumHotEntries } from "./utils";
+import { Configuration } from "webpack";
+import { getForumHotEntries } from "./utils";
 import { makeBaseConfig } from "./makeBaseConfig";
 
 export async function makeDevConfig() {
     const baseConfig: Configuration = (await makeBaseConfig()) as any;
     const forumEntries = await getForumHotEntries();
-
-    console.log(forumEntries);
-
-    // const middleWareEntry =;
-    // require.resolve("webpack-hot-middleware/client") +
-    // "?dynamicPublicPath=true" +
-    // "&path=__webpack_hmr" +
-    // "&reload=true";
-    // const entry = [middleWareEntry, ...forumEntries];
-
     baseConfig.mode = "development";
     baseConfig.entry = forumEntries;
     baseConfig.output = {

@@ -204,7 +204,7 @@ class PageScraper {
 
         $document = $this->loadDocument($html);
 
-        if (!$document->encoding) {
+        if (!$document->encoding && !in_array($encoding, ['ASCII'], true)) {
             $document = $this->fixDocumentEncoding($document, $html);
         }
 

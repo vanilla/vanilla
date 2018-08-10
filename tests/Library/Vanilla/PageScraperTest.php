@@ -41,7 +41,7 @@ class PageScraperTest extends SharedBootstrapTestCase {
             [
                 'jsonld.htm',
                 [
-                    'Title' => 'I am a standard title.',
+                    'Title' => 'I am a ständard title.',
                     'Description' => 'I am a standard description.',
                     'Images' => [],
                     'Attributes' => [
@@ -138,7 +138,7 @@ class PageScraperTest extends SharedBootstrapTestCase {
      * @return array Returns a data provider.
      */
     public function provideUnicodeFiles() {
-        $r = [['unicode.htm'], ['unicode-xml.htm'], ['unicode-xml-comment.htm'], ['unicode-http-equiv.htm']];
+        $r = [['unicode.htm'], ['unicode-xml.htm'], ['unicode-no-hint.htm'], ['unicode-xml-comment.htm'], ['unicode-http-equiv.htm']];
 
         return array_column($r, null, 0);
     }

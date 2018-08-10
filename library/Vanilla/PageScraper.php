@@ -49,22 +49,9 @@ class PageScraper {
             throw new Exception('Unable to get URL contents.');
         }
 
-        $document = new DOMDocument();
         $rawBody = $response->getRawBody();
 
-        // Add charset information for HTML 5 pages.
-        // https://stackoverflow.com/questions/39148170/utf-8-with-php-domdocument-loadhtml#39148511
-        if (!preg_match('`\s*<?xml`', $rawBody)) {
-            $encoding = mb_detect_encoding($rawBody);
-            $rawBody = "<?xml version=\"1.0\" encoding=\"$encoding\"?>$rawBody";
-        }
-
-        $err = libxml_use_internal_errors(true);
-        $loadResult = $document->loadHTML($rawBody);
-        libxml_use_internal_errors($err);
-        if ($loadResult === false) {
-            throw new Exception('Failed to load document for parsing.');
-        }
+        $document = $this->createDom($rawBody);
 
         $metaData = $this->parseMetaData($document);
         $info = array_merge([
@@ -199,5 +186,108 @@ class PageScraper {
     private function userAgent() {
         $version = defined('APPLICATION_VERSION') ? APPLICATION_VERSION : '0.0';
         return "Vanilla/{$version}";
+    }
+
+    /**
+     * Create the DOM from an HTML string.
+     *
+     * @param string $html The HTML to create the body from.
+     * @return DOMDocument Returns the document.
+     * @throws Exception Throws an exception if the HTML is so malformed that it couldn't be parsed.
+     */
+    private function createDom(string $html): DOMDocument {
+        // Add charset information for HTML 5 pages.
+        // https://stackoverflow.com/questions/39148170/utf-8-with-php-domdocument-loadhtml#39148511
+        if (!preg_match('`^\s*<?xml`', $html) && $encoding = mb_detect_encoding($html)) {
+            $html = "<?xml version=\"1.0\" encoding=\"$encoding\"?>$html";
+        }
+
+        $document = $this->loadDocument($html);
+
+        if (!$document->encoding) {
+            $document = $this->fixDocumentEncoding($document, $html);
+        }
+
+        return $document;
+    }
+
+    /**
+     * Attempt to fix the document encoding of an incorrect document.
+     *
+     * @param DOMDocument $document The document to fix.
+     * @param string $raw The raw HTML the document was originally created with.
+     * @return DOMDocument Returns a newly loaded document or the same one if the encoding could not be fixed.
+     * @throws Exception
+     */
+    private function fixDocumentEncoding(DOMDocument $document, string $raw): DOMDocument {
+        $encoding = $this->determineDocumentEncoding($document);
+
+        if ($encoding) {
+            $raw = mb_convert_encoding($raw, 'UTF-8', $encoding);
+            $result = $this->loadDocument($raw);
+        } else {
+            $result = $document;
+        }
+        return $result;
+    }
+
+    /**
+     * Load an HTML document from a string with some error checking.
+     *
+     * @param string $html The HTML string to load.
+     * @return DOMDocument Returns the loaded document.
+     * @throws Exception Throws an exception if libxml can't load the document.
+     */
+    private function loadDocument(string $html) {
+        $document = new DOMDocument();
+
+        $err = libxml_use_internal_errors(true);
+        libxml_clear_errors();
+        $loadResult = $document->loadHTML($html);
+        libxml_use_internal_errors($err);
+
+        if ($loadResult === false) {
+            throw new Exception('Failed to load document for parsing.', 400);
+        }
+
+        return $document;
+    }
+
+    /**
+     * Try and determine a document's encoding from its content.
+     *
+     * @param DOMDocument $document The document to check.
+     * @return string Returns the encoding or an empty string if it can't be determined.
+     */
+    private function determineDocumentEncoding(DOMDocument $document): string {
+        $encoding = '';
+
+        // Look in an XML declaration.
+        foreach ($document->childNodes as $node) {
+            if ($node instanceof \DOMProcessingInstruction) {
+                if (preg_match('`encoding=[\'"]?([a-z0-9#-]+)`i', $node->textContent, $m)) {
+                    $encoding = $m[1];
+                }
+                break;
+            }
+        }
+
+
+        if (!$encoding) {
+            // Look in a meta tag.
+            foreach ($document->getElementsByTagName('meta') as $node) {
+                /* @var DOMElement $node */
+                if ($attr = $node->getAttribute('charset')) {
+                    $encoding = $attr;
+                    break;
+                }
+            }
+        }
+
+        if ($encoding && false !== mb_encoding_aliases($encoding)) {
+            return $encoding;
+        }
+
+        return '';
     }
 }

@@ -386,4 +386,4 @@ const withRedux = connect(
     mapDispatchToProps,
 );
 
-export default withRedux(withEditor<IProps>(MentionToolbar));
+export default withRedux(withEditor<IProps>(MentionToolbar) as any);

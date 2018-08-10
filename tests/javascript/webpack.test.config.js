@@ -48,7 +48,7 @@ module.exports = {
                     {
                         loader: "ts-loader",
                         options: {
-                            configFile: TS_CONFIG_FILE,
+                            configFile: path.resolve(VANILLA_ROOT, "tsconfig.json"),
                         },
                     },
                 ],

@@ -30,8 +30,7 @@ class Gdn_Statistics extends Gdn_Pluggable {
     public function __construct() {
         parent::__construct();
 
-        $analyticsServer = c('Garden.Analytics.Remote', 'analytics.vanillaforums.com');
-        $analyticsServer = str_replace(['http://', 'https://'], '', $analyticsServer);
+        $analyticsServer = c('Garden.Analytics.Remote', 'https://analytics.vanillaforums.com');
         $this->AnalyticsServer = $analyticsServer;
 
         $this->TickExtra = [];
@@ -57,7 +56,7 @@ class Gdn_Statistics extends Gdn_Pluggable {
         $apiController = strtolower($apiController);
         $apiMethod = stringEndsWith(strtolower($apiMethod), '.json', true, true).'.json';
 
-        $finalURL = 'http://'.combinePaths([
+        $finalURL = combinePaths([
                 $this->AnalyticsServer,
                 $apiController,
                 $apiMethod

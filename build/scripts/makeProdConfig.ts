@@ -10,7 +10,6 @@ import { getForumEntries, getOptions, BuildMode } from "./utils";
 import { makeBaseConfig } from "./makeBaseConfig";
 import { BundleAnalyzerPlugin } from "webpack-bundle-analyzer";
 import UglifyJsPlugin from "uglifyjs-webpack-plugin";
-import OptimizeCSSAssetsPlugin from "optimize-css-assets-webpack-plugin";
 
 export async function makeProdConfig() {
     const baseConfig: Configuration = (await makeBaseConfig()) as any;
@@ -51,7 +50,6 @@ export async function makeProdConfig() {
                 parallel: true,
                 sourceMap: true, // set to true if you want JS source maps
             }),
-            new OptimizeCSSAssetsPlugin({}),
         ],
     };
 

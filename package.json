@@ -86,6 +86,7 @@
         "ts-node": "7.0.0",
         "tslint": "5.10.0",
         "typescript": "3.0.1",
+        "uglifyjs-webpack-plugin": "1.2.7",
         "webpack": "4.16.5",
         "webpack-bundle-analyzer": "2.13.1",
         "webpack-serve": "2.0.2",

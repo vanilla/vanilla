@@ -372,12 +372,13 @@ class PagerModule extends Gdn_Module {
         $pager = '';
         $previousText = t($this->LessCode);
         $nextText = t($this->MoreCode);
+        $linkCount = $pagesToDisplay + 2;
 
         // Previous
         if ($currentPage == 1) {
-            $pager = '<span class="Previous">'.$previousText.'</span>';
+            $pager = '<span class="Previous Pager-nav">'.$previousText.'</span>';
         } else {
-            $pager .= anchor($previousText, $this->pageUrl($currentPage - 1), 'Previous', ['rel' => 'prev']);
+            $pager .= anchor($previousText, $this->pageUrl($currentPage - 1), 'Previous Pager-nav', ['rel' => 'prev']);
         }
 
         // Build Pager based on number of pages (Examples assume $Range = 3)
@@ -399,6 +400,7 @@ class PagerModule extends Gdn_Module {
 
             $pager .= '<span class="Ellipsis">'.$separator.'</span>';
             $pager .= anchor($pageCount, $this->pageUrl($pageCount), $this->_GetCssClass($pageCount, $currentPage));
+            $linkCount = $linkCount + 2;
 
         } elseif ($currentPage + $range >= $pageCount - 1) { // -1 prevents 80 ... 81
             // We're on a page that is after the last elipsis (ex: 1 ... 75 76 77 78 79 80 81)
@@ -409,6 +411,7 @@ class PagerModule extends Gdn_Module {
                 $pageParam = 'p'.$i;
                 $pager .= anchor($i, $this->pageUrl($i), $this->_GetCssClass($i, $currentPage), ['rel' => self::rel($i, $currentPage)]);
             }
+            $linkCount = $linkCount + 2;
 
         } else {
             // We're between the two elipsises (ex: 1 ... 4 5 6 7 8 9 10 ... 81)
@@ -422,14 +425,15 @@ class PagerModule extends Gdn_Module {
 
             $pager .= '<span class="Ellipsis">'.$separator.'</span>';
             $pager .= anchor($pageCount, $this->pageUrl($pageCount), $this->_GetCssClass($pageCount, $currentPage));
+            $linkCount = $linkCount + 4;
         }
 
         // Next
         if ($currentPage == $pageCount) {
-            $pager .= '<span class="Next">'.$nextText.'</span>';
+            $pager .= '<span class="Next Pager-nav">'.$nextText.'</span>';
         } else {
             $pageParam = 'p'.($currentPage + 1);
-            $pager .= anchor($nextText, $this->pageUrl($currentPage + 1), 'Next', ['rel' => 'next']); // extra sprintf parameter in case old url style is set
+            $pager .= anchor($nextText, $this->pageUrl($currentPage + 1), 'Next Pager-nav', ['rel' => 'next']); // extra sprintf parameter in case old url style is set
         }
         if ($pageCount <= 1) {
             $pager = '';
@@ -447,7 +451,7 @@ class PagerModule extends Gdn_Module {
             }
         }
 
-        return $pager == '' ? '' : sprintf($this->Wrapper, attribute(['id' => $clientID, 'class' => concatSep(' ', $this->CssClass, static::NUMBERED_CLASS)]), $pager);
+        return $pager == '' ? '' : sprintf($this->Wrapper, attribute(['id' => $clientID, 'class' => concatSep(' ', $this->CssClass, 'PagerLinkCount-' . $linkCount, static::NUMBERED_CLASS)]), $pager);
     }
 
     /**
@@ -574,7 +578,7 @@ class PagerModule extends Gdn_Module {
     private function _GetCssClass($thisPage, $highlightPage) {
         $result = $thisPage == $highlightPage ? 'Highlight' : '';
 
-        $result .= " p-$thisPage";
+        $result .= " Pager-p p-$thisPage";
         if ($thisPage == 1) {
             $result .= ' FirstPage';
         } elseif ($thisPage == $this->_PageCount)

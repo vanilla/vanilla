@@ -372,6 +372,7 @@ class PagerModule extends Gdn_Module {
         $pager = '';
         $previousText = t($this->LessCode);
         $nextText = t($this->MoreCode);
+        $linkCount = $pagesToDisplay + 2;
 
         // Previous
         if ($currentPage == 1) {
@@ -399,6 +400,7 @@ class PagerModule extends Gdn_Module {
 
             $pager .= '<span class="Ellipsis">'.$separator.'</span>';
             $pager .= anchor($pageCount, $this->pageUrl($pageCount), $this->_GetCssClass($pageCount, $currentPage));
+            $linkCount = $linkCount + 2;
 
         } elseif ($currentPage + $range >= $pageCount - 1) { // -1 prevents 80 ... 81
             // We're on a page that is after the last elipsis (ex: 1 ... 75 76 77 78 79 80 81)
@@ -409,6 +411,7 @@ class PagerModule extends Gdn_Module {
                 $pageParam = 'p'.$i;
                 $pager .= anchor($i, $this->pageUrl($i), $this->_GetCssClass($i, $currentPage), ['rel' => self::rel($i, $currentPage)]);
             }
+            $linkCount = $linkCount + 2;
 
         } else {
             // We're between the two elipsises (ex: 1 ... 4 5 6 7 8 9 10 ... 81)
@@ -422,6 +425,7 @@ class PagerModule extends Gdn_Module {
 
             $pager .= '<span class="Ellipsis">'.$separator.'</span>';
             $pager .= anchor($pageCount, $this->pageUrl($pageCount), $this->_GetCssClass($pageCount, $currentPage));
+            $linkCount = $linkCount + 4;
         }
 
         // Next
@@ -447,7 +451,7 @@ class PagerModule extends Gdn_Module {
             }
         }
 
-        return $pager == '' ? '' : sprintf($this->Wrapper, attribute(['id' => $clientID, 'class' => concatSep(' ', $this->CssClass, static::NUMBERED_CLASS)]), $pager);
+        return $pager == '' ? '' : sprintf($this->Wrapper, attribute(['id' => $clientID, 'class' => concatSep(' ', $this->CssClass, 'PagerLinkCount-' . $linkCount, static::NUMBERED_CLASS)]), $pager);
     }
 
     /**

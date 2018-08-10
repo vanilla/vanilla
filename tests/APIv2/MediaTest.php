@@ -9,6 +9,7 @@ namespace VanillaTests\APIv2;
 
 use Gdn_Upload;
 use Garden\Http\HttpResponse;
+use Vanilla\Attributes;
 use Vanilla\Formatting\Embeds\EmbedManager;
 use Vanilla\UploadedFile;
 use VanillaTests\Fixtures\Uploader;
@@ -169,6 +170,7 @@ class MediaTest extends AbstractAPIv2Test {
      * @return array
      */
     public function provideScrapeUrls() {
+        $empty = new Attributes();
         $testBaseUrl = getenv('TEST_BASEURL');
         $urls = [
             [
@@ -180,7 +182,7 @@ class MediaTest extends AbstractAPIv2Test {
                     'photoUrl' => 'https://vanillaforums.com/images/metaIcons/vanillaForums.png',
                     'height' => null,
                     'width' => null,
-                    'attributes' => []
+                    'attributes' => $empty,
                 ],
                 true
             ],
@@ -193,7 +195,7 @@ class MediaTest extends AbstractAPIv2Test {
                     'photoUrl' => 'https://example.com/image.bmp',
                     'height' => null,
                     'width' => null,
-                    'attributes' => [],
+                    'attributes' => $empty,
                 ]
             ],
             [
@@ -205,7 +207,7 @@ class MediaTest extends AbstractAPIv2Test {
                     'photoUrl' => 'https://example.com/image.gif',
                     'height' => null,
                     'width' => null,
-                    'attributes' => [],
+                    'attributes' => $empty,
                 ]
             ],
             [
@@ -217,7 +219,7 @@ class MediaTest extends AbstractAPIv2Test {
                     'photoUrl' => 'https://example.com/image.jpg',
                     'height' => null,
                     'width' => null,
-                    'attributes' => [],
+                    'attributes' => $empty,
                 ]
             ],
             [
@@ -229,7 +231,7 @@ class MediaTest extends AbstractAPIv2Test {
                     'photoUrl' => 'https://example.com/image.jpeg',
                     'height' => null,
                     'width' => null,
-                    'attributes' => [],
+                    'attributes' => $empty,
                 ]
             ],
             [
@@ -241,7 +243,7 @@ class MediaTest extends AbstractAPIv2Test {
                     'photoUrl' => 'https://example.com/image.png',
                     'height' => null,
                     'width' => null,
-                    'attributes' => [],
+                    'attributes' => $empty,
                 ]
             ],
             [
@@ -253,7 +255,7 @@ class MediaTest extends AbstractAPIv2Test {
                     'photoUrl' => 'https://example.com/image.svg',
                     'height' => null,
                     'width' => null,
-                    'attributes' => [],
+                    'attributes' => $empty,
                 ]
             ],
             [
@@ -265,7 +267,7 @@ class MediaTest extends AbstractAPIv2Test {
                     'photoUrl' => 'https://example.com/image.tif',
                     'height' => null,
                     'width' => null,
-                    'attributes' => [],
+                    'attributes' => $empty,
                 ]
             ],
             [
@@ -277,7 +279,7 @@ class MediaTest extends AbstractAPIv2Test {
                     'photoUrl' => 'https://example.com/image.tiff',
                     'height' => null,
                     'width' => null,
-                    'attributes' => [],
+                    'attributes' => $empty,
                 ]
             ],
             [
@@ -431,7 +433,7 @@ class MediaTest extends AbstractAPIv2Test {
         unset($body['url'], $body['type']);
         $this->assertCount(count($info), $body);
         foreach ($body as $key => $value) {
-            $this->assertEquals($info[$key], $value);
+            $this->assertEquals(json_encode($info[$key]), json_encode($value));
         }
     }
 

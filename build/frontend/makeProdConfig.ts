@@ -14,6 +14,7 @@ export async function makeProdConfig() {
     baseConfig.output = {
         filename: "[name].min.js",
         chunkFilename: "[name].min.js",
+        publicPath: "/",
         path: VANILLA_ROOT,
     };
     baseConfig.optimization = {
@@ -30,7 +31,7 @@ export async function makeProdConfig() {
                 },
                 library: {
                     test: /[\\/]applications[\\/]dashboard[\\/]src[\\/]scripts[\\/]/,
-                    name: "applications/dashboard/js/webpack/library",
+                    name: "js/webpack/library",
                     chunks: "all",
                     minChunks: 2,
                 },

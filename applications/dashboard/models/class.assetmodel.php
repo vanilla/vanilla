@@ -169,8 +169,11 @@ class AssetModel extends Gdn_Model {
         }
 
         // Add the lib.
-        $libs = [];
-        $addons = [];
+        $result = [
+            "/js/webpack/runtime.min.js",
+            "/js/webpack/vendors.min.js",
+            "/js/webpack/library.min.js",
+        ];
 
         // Loop through the enabled addons and get their javascript.
         foreach ($this->addonManager->getEnabled() as $addon) {
@@ -179,20 +182,14 @@ class AssetModel extends Gdn_Model {
                 continue;
             }
 
-            $build = $addon->getInfoValue('build', []);
-            if (valr("exports.$basename", $build, null) !== null) {
-                $libs[] = $addon->path("/js/$basename/lib-".$addon->getKey()."-$basename.min.js", Addon::PATH_ADDON);
-            }
-            if (valr("entries.$basename", $build, null) !== null) {
-                $addons[] = $addon->path("/js/$basename/".$addon->getKey()."-$basename.min.js", Addon::PATH_ADDON);
+            $localPath = $addon->path("/js/webpack/forum.min.js", Addon::PATH_REAL);
+            if (file_exists($localPath)) {
+                $result[] = $localPath = $addon->path("/js/webpack/forum.min.js", Addon::PATH_ADDON);
             }
         }
 
         // Add the bootstrap after everything else.
-        $dashboardAddon = $this->addonManager->lookupAddon("dashboard");
-        $addons[] = $dashboardAddon->path("/js/$basename/dashboard-bootstrap-$basename.min.js", Addon::PATH_ADDON);
-        $result = array_merge($libs, $addons);
-
+        $result[] = "/js/webpack/bootstrap.min.js";
         return $result;
     }
 

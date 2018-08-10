@@ -106,5 +106,7 @@ export async function getForumEntries(): Promise<IStringMap> {
         }
     }
 
+    appEntries["/js/webpack/bootstrap"] = path.resolve(VANILLA_APPS, "dashboard/src/scripts/entries/bootstrap.ts");
+
     return appEntries;
 }

@@ -6,7 +6,6 @@
 
 import { registerReducer } from "@dashboard/state/reducerRegistry";
 import editorReducer from "@rich-editor/state/editorReducer";
-import mountEditor from "@rich-editor/mountEditor";
 import { onReady } from "@dashboard/application";
 
 onReady(() => {
@@ -21,7 +20,11 @@ onReady(() => {
 function setupEditor() {
     const discussionFormContainer = document.querySelectorAll(".richEditor");
     if (discussionFormContainer.length > 0) {
-        discussionFormContainer.forEach(mountEditor);
+        import(/* webpackChunkName: "plugins/rich-editor/js/chunks/mountEditor" */ "@rich-editor/mountEditor").then(
+            mountEditor => {
+                discussionFormContainer.forEach(mountEditor.default);
+            },
+        );
     }
 }
 
@@ -34,10 +37,15 @@ function setupCommentEditForm() {
         if (!(container instanceof Element)) {
             return;
         }
+        const thing = true;
 
         const richEditor = container.querySelector(".richEditor");
         if (richEditor) {
-            mountEditor(richEditor);
+            import(/* webpackChunkName: "plugins/rich-editor/js/chunks/mountEditor" */ "@rich-editor/mountEditor").then(
+                mountEditor => {
+                    mountEditor.default(richEditor);
+                },
+            );
         }
     });
 }

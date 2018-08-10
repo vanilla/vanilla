@@ -1,15 +1,17 @@
 import { promisify } from "util";
 import * as fs from "fs";
 import * as path from "path";
-import { VANILLA_APPS, VANILLA_ROOT, VANILLA_THEMES } from "./vanillaPaths";
+import { VANILLA_APPS, VANILLA_ROOT, VANILLA_PLUGINS } from "./vanillaPaths";
+import { argv } from "yargs";
 const realPath = promisify(fs.realpath);
 const readDir = promisify(fs.readdir);
 const fileExists = promisify(fs.exists);
 
-const enum BuildMode {
+export const enum BuildMode {
     TEST = "test",
     DEVELOPMENT = "development",
     PRODUCTION = "production",
+    ANALYZE = "analyze",
 }
 
 interface IBuildOptions {
@@ -18,10 +20,16 @@ interface IBuildOptions {
 
 let cachedAddonPaths: string[] | null = null;
 
+export function getOptions(): IBuildOptions {
+    return {
+        mode: argv.mode || BuildMode.PRODUCTION,
+    };
+}
+
 export async function lookupAddonPaths(): Promise<string[]> {
     let addonPaths;
     if (cachedAddonPaths === null) {
-        const addonPathsByDir = await Promise.all([lookupAddonType(VANILLA_APPS), lookupAddonType(VANILLA_THEMES)]);
+        const addonPathsByDir = await Promise.all([lookupAddonType(VANILLA_APPS), lookupAddonType(VANILLA_PLUGINS)]);
 
         // Merge the arrays together.
         addonPaths = [].concat.apply([], addonPathsByDir);

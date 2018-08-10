@@ -10,7 +10,8 @@
         "lib": ["es2017"],
         "baseUrl": ".",
         "paths": {
-            "happypack": ["scripts/@types/happypack"]
+            "happypack": ["scripts/@types/happypack"],
+            "prettier-webpack-plugin": ["scripts/@types/prettier-webpack-plugin"],
           }
     },
     "include": ["scripts/**/*.ts"],

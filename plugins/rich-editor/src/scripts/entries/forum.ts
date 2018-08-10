@@ -10,38 +10,35 @@ import { onReady } from "@dashboard/application";
 
 onReady(() => {
     registerReducer("editor", editorReducer);
-    setupEditor();
-    setupCommentEditForm();
+    void setupEditor();
+    void setupCommentEditForm();
 });
 
 /**
  * Set up the new discussion form if it exists.
  */
-function setupEditor() {
+async function setupEditor() {
     const discussionFormContainer = document.querySelectorAll(".richEditor");
     if (discussionFormContainer.length > 0) {
-        import(/* webpackChunkName: "plugins/rich-editor/js/chunks/mountEditor" */ "@rich-editor/mountEditor").then(
-            mountEditor => discussionFormContainer.forEach(mountEditor.default),
-        );
+        const mountEditor = await import(/* webpackChunkName: "plugins/rich-editor/js/chunks/mountEditor" */ "@rich-editor/mountEditor");
+        discussionFormContainer.forEach(mountEditor.default);
     }
 }
 
 /**
  * Set up the editor if the someone clicks edit on a form.
  */
-function setupCommentEditForm() {
-    document.addEventListener("X-EditCommentFormLoaded", event => {
+async function setupCommentEditForm() {
+    document.addEventListener("X-EditCommentFormLoaded", async event => {
         const container = event.target;
         if (!(container instanceof Element)) {
             return;
         }
-        const thing = true;
 
         const richEditor = container.querySelector(".richEditor");
         if (richEditor) {
-            import(/* webpackChunkName: "plugins/rich-editor/js/chunks/mountEditor" */ "@rich-editor/mountEditor").then(
-                mountEditor => mountEditor.default(richEditor),
-            );
+            const mountEditor = await import(/* webpackChunkName: "plugins/rich-editor/js/chunks/mountEditor" */ "@rich-editor/mountEditor");
+            mountEditor.default(richEditor);
         }
     });
 }

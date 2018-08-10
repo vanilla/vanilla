@@ -7,19 +7,30 @@
 import webpack, { Stats } from "webpack";
 import { makeProdConfig } from "./makeProdConfig";
 import { makeDevConfig } from "./makeDevConfig";
-import serve, { Result, InitializedKoa } from "webpack-serve";
-import { getOptions, BuildMode } from "./utils";
+import serve, { Result, InitializedKoa, Options } from "webpack-serve";
+import { getOptions, BuildMode } from "./options";
+import chalk from "chalk";
+import { installNodeModules } from "./moduleUtils";
 
-void run();
+void Promise.all([installNodeModules("forum"), installNodeModules("admin")]).then(run);
 
 async function run() {
-    switch (getOptions().mode) {
+    const options = await getOptions();
+    switch (options.mode) {
         case BuildMode.PRODUCTION:
             return await runProd();
         case BuildMode.DEVELOPMENT:
             return await runDev();
     }
 }
+
+const statOptions = {
+    chunks: false, // Makes the build much quieter
+    modules: false,
+    entrypoints: false,
+    warnings: false,
+    colors: true, // Shows colors in the console
+};
 
 async function runProd() {
     const config = [await makeProdConfig("forum"), await makeProdConfig("admin")];
@@ -30,19 +41,22 @@ async function runProd() {
             logger.error("The build encountered an error:" + err);
         }
 
-        logger.log(
-            stats.toString({
-                chunks: false, // Makes the build much quieter
-                modules: false,
-                entrypoints: false,
-                warnings: false,
-                colors: true, // Shows colors in the console
-            }),
-        );
+        logger.log(stats.toString(statOptions));
     });
 }
 
 async function runDev() {
+    const buildOptions = await getOptions();
+    const hotReloadConfigSet = buildOptions.phpConfig.HotReload && buildOptions.phpConfig.HotReload.Enabled;
+    if (buildOptions.mode === BuildMode.DEVELOPMENT && !hotReloadConfigSet) {
+        const message = chalk.red(`
+You've enabled a development build without enabling hot reload. Add the following to your config.
+${chalk.yellowBright("$Configuration['HotReload']['Enabled'] = false;")}`);
+        // tslint:disable-next-line
+        console.error(message);
+        process.exit(1);
+    }
+
     const config = [await makeDevConfig("forum"), await makeDevConfig("admin")];
     const compiler = webpack(config) as any;
     const argv = {};
@@ -55,9 +69,16 @@ async function runDev() {
         });
     };
 
-    serve(argv, { compiler, port: 3030, add: enhancer, devMiddleware: { publicPath: "http://localhost:3030/" } }).then(
-        (result: Result) => {
-            console.log("Started dev server");
+    const options: Options = {
+        compiler,
+        port: 3030,
+        add: enhancer,
+        clipboard: false,
+        devMiddleware: {
+            publicPath: "http://localhost:3030/",
+            stats: statOptions,
         },
-    );
+    };
+
+    void serve(argv, options);
 }

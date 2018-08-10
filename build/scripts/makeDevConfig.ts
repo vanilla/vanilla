@@ -5,7 +5,7 @@
  */
 
 import { Configuration } from "webpack";
-import { getHotEntries } from "./utils";
+import { getHotEntries } from "./addonUtils";
 import { makeBaseConfig } from "./makeBaseConfig";
 
 export async function makeDevConfig(section: string) {
@@ -18,7 +18,9 @@ export async function makeDevConfig(section: string) {
         chunkFilename: "[name].chunk.js",
         publicPath: `http://localhost:3030/`,
     };
-    baseConfig.optimization!.splitChunks = false;
+    baseConfig.optimization = {
+        splitChunks: false,
+    };
 
     return baseConfig;
 }

@@ -6,7 +6,8 @@
 
 import { Configuration } from "webpack";
 import { VANILLA_ROOT } from "./env";
-import { getEntries, getOptions, BuildMode } from "./utils";
+import { getEntries } from "./addonUtils";
+import { getOptions, BuildMode } from "./options";
 import { makeBaseConfig } from "./makeBaseConfig";
 import { BundleAnalyzerPlugin } from "webpack-bundle-analyzer";
 import UglifyJsPlugin from "uglifyjs-webpack-plugin";
@@ -14,6 +15,7 @@ import UglifyJsPlugin from "uglifyjs-webpack-plugin";
 export async function makeProdConfig(section: string) {
     const baseConfig: Configuration = (await makeBaseConfig(section)) as any;
     const forumEntries = await getEntries(section);
+    const options = await getOptions();
 
     baseConfig.mode = "production";
     baseConfig.entry = forumEntries;
@@ -53,7 +55,7 @@ export async function makeProdConfig(section: string) {
         ],
     };
 
-    if (getOptions().mode === BuildMode.ANALYZE) {
+    if (options.mode === BuildMode.ANALYZE) {
         baseConfig.plugins!.push(new BundleAnalyzerPlugin());
     }
 

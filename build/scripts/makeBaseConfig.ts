@@ -5,14 +5,18 @@
  */
 
 import * as path from "path";
-import { VANILLA_ROOT, TS_CONFIG_FILE, TS_LINT_FILE } from "./env";
-import { getAddonAliasMapping, getScriptSourceFiles, lookupAddonPaths } from "./utils";
+import { VANILLA_ROOT, TS_CONFIG_FILE, TS_LINT_FILE, PRETTIER_FILE } from "./env";
+import { getAddonAliasMapping, getScriptSourceFiles, lookupAddonPaths } from "./addonUtils";
+import PrettierPlugin from "prettier-webpack-plugin";
 import HappyPack from "happypack";
 import ForkTsCheckerWebpackPlugin from "fork-ts-checker-webpack-plugin";
+import { getOptions } from "./options";
+import chalk from "chalk";
 
 export async function makeBaseConfig(section: string) {
     const happyThreadPool = HappyPack.ThreadPool({ size: 4, id: "ts" });
     const addonPaths = await lookupAddonPaths(section);
+    const options = await getOptions();
 
     const modulePaths = [
         "node_modules",
@@ -20,16 +24,19 @@ export async function makeBaseConfig(section: string) {
         ...addonPaths.map(dir => path.resolve(dir, "node_modules")),
     ];
     const moduleAliases = await getAddonAliasMapping(section);
+
+    if (options.verbose) {
+        const aliases = Object.keys(moduleAliases).join(", ");
+        const message = `Building section ${chalk.yellowBright(section)} with the following aliases
+${chalk.green(aliases)}`;
+        // tslint:disable-next-line
+        console.log(message);
+    }
+
     const tsSourceIncludes = await getScriptSourceFiles(section);
 
-    return {
+    const config = {
         context: VANILLA_ROOT,
-        optimization: {
-            splitChunks: {
-                // include all types of chunks
-                chunks: "all",
-            },
-        },
         module: {
             rules: [
                 {
@@ -79,7 +86,7 @@ export async function makeBaseConfig(section: string) {
         plugins: [
             new HappyPack({
                 id: "ts",
-                // verbose: options.verbose,
+                verbose: options.verbose,
                 threadPool: happyThreadPool,
                 loaders: [
                     {
@@ -100,7 +107,7 @@ export async function makeBaseConfig(section: string) {
             }),
             new ForkTsCheckerWebpackPlugin({
                 tsconfig: TS_CONFIG_FILE,
-                // tslint: false,
+                tslint: TS_LINT_FILE,
                 checkSyntacticErrors: true,
                 async: true,
             }),
@@ -119,4 +126,19 @@ export async function makeBaseConfig(section: string) {
             modules: [path.join(VANILLA_ROOT, "node_modules")],
         },
     };
+
+    if (options.fix) {
+        config.plugins.unshift(getPrettierPlugin());
+    }
+
+    return config;
+}
+
+function getPrettierPlugin() {
+    const prettierConfig = require(PRETTIER_FILE);
+    return new PrettierPlugin({
+        ...prettierConfig,
+        parser: "typescript",
+        extensions: [".ts", ".tsx"],
+    });
 }

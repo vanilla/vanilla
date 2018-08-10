@@ -153,26 +153,37 @@ class AssetModel extends Gdn_Model {
         return $paths;
     }
 
-    public function getAddonJsFiles($themeType, $basename, $eTag) {
-        $basename = $basename === 'style' ? 'app' : $basename;
-
+    /**
+     * Get files built from webpack using the in-repo build process.
+     *
+     * These follow a pretty strict pattern of:
+     *
+     * - webpack runtime
+     * - vendor chunks
+     * - library chunks
+     * - entry chunks
+     * - bootstrap
+     *
+     * @param string $basename - The section of the theme to lookup.
+     * @return array
+     */
+    public function getWebpackJsFiles(string $section) {
         if (c("HotReload.Enabled", false)) {
             $ip = c("HotReload.IP", "127.0.0.1");
             return [
-                "http://$ip:3030/forum-hot-bundle.js"
+                "http://$ip:3030/$section-hot-bundle.js"
             ];
         }
 
-        if (!in_array($basename, ['app', 'admin'], true)) {
-            trigger_error("Unknown core js basename: $basename");
+        if (!in_array($section, ['forum', 'admin'], true)) {
+            trigger_error("Unknown core js basename: $section");
             return [];
         }
 
         // Add the lib.
         $result = [
-            "/js/webpack/runtime.min.js",
-            "/js/webpack/vendors.min.js",
-            "/js/webpack/library.min.js",
+            "/js/webpack/runtime-$section.min.js",
+            "/js/webpack/vendors-$section.min.js",
         ];
 
         // Loop through the enabled addons and get their javascript.
@@ -182,14 +193,22 @@ class AssetModel extends Gdn_Model {
                 continue;
             }
 
-            $localPath = $addon->path("/js/webpack/forum.min.js", Addon::PATH_REAL);
+            $subLibraryPath = "/js/webpack/library-$section.min.js";
+
+            $localPath = $addon->path($subLibraryPath, Addon::PATH_REAL);
             if (file_exists($localPath)) {
-                $result[] = $localPath = $addon->path("/js/webpack/forum.min.js", Addon::PATH_ADDON);
+                $result[] = $localPath = $addon->path($subLibraryPath, Addon::PATH_ADDON);
+            }
+
+            $subPath = "/js/webpack/$section.min.js";
+            $localPath = $addon->path($subPath, Addon::PATH_REAL);
+            if (file_exists($localPath)) {
+                $result[] = $localPath = $addon->path($subPath, Addon::PATH_ADDON);
             }
         }
 
         // Add the bootstrap after everything else.
-        $result[] = "/js/webpack/bootstrap.min.js";
+        $result[] = "/js/webpack/bootstrap-$section.min.js";
         return $result;
     }
 

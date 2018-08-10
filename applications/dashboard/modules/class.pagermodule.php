@@ -376,9 +376,9 @@ class PagerModule extends Gdn_Module {
 
         // Previous
         if ($currentPage == 1) {
-            $pager = '<span class="Previous">'.$previousText.'</span>';
+            $pager = '<span class="Previous Pager-nav">'.$previousText.'</span>';
         } else {
-            $pager .= anchor($previousText, $this->pageUrl($currentPage - 1), 'Previous', ['rel' => 'prev']);
+            $pager .= anchor($previousText, $this->pageUrl($currentPage - 1), 'Previous Pager-nav', ['rel' => 'prev']);
         }
 
         // Build Pager based on number of pages (Examples assume $Range = 3)
@@ -430,10 +430,10 @@ class PagerModule extends Gdn_Module {
 
         // Next
         if ($currentPage == $pageCount) {
-            $pager .= '<span class="Next">'.$nextText.'</span>';
+            $pager .= '<span class="Next Pager-nav">'.$nextText.'</span>';
         } else {
             $pageParam = 'p'.($currentPage + 1);
-            $pager .= anchor($nextText, $this->pageUrl($currentPage + 1), 'Next', ['rel' => 'next']); // extra sprintf parameter in case old url style is set
+            $pager .= anchor($nextText, $this->pageUrl($currentPage + 1), 'Next Pager-nav', ['rel' => 'next']); // extra sprintf parameter in case old url style is set
         }
         if ($pageCount <= 1) {
             $pager = '';
@@ -578,7 +578,7 @@ class PagerModule extends Gdn_Module {
     private function _GetCssClass($thisPage, $highlightPage) {
         $result = $thisPage == $highlightPage ? 'Highlight' : '';
 
-        $result .= " p-$thisPage";
+        $result .= " Pager-p p-$thisPage";
         if ($thisPage == 1) {
             $result .= ' FirstPage';
         } elseif ($thisPage == $this->_PageCount)

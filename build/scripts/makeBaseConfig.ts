@@ -5,7 +5,7 @@
  */
 
 import * as path from "path";
-import { VANILLA_ROOT, TS_CONFIG_FILE, TS_LINT_FILE } from "./vanillaPaths";
+import { VANILLA_ROOT, TS_CONFIG_FILE, TS_LINT_FILE } from "./env";
 import { getAddonAliasMapping, getScriptSourceFiles, lookupAddonPaths } from "./utils";
 import HappyPack from "happypack";
 import ForkTsCheckerWebpackPlugin from "fork-ts-checker-webpack-plugin";

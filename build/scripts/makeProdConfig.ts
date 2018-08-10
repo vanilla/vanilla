@@ -1,7 +1,12 @@
-import * as path from "path";
-import webpack, { Configuration, Module } from "webpack";
-import { VANILLA_ROOT } from "./vanillaPaths";
-import { getAddonAliasMapping, getScriptSourceFiles, getForumEntries, getOptions, BuildMode } from "./utils";
+/**
+ * @author Adam Charron <adam.c@vanillaforums.com>
+ * @copyright 2009-2018 Vanilla Forums Inc.
+ * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
+ */
+
+import { Configuration } from "webpack";
+import { VANILLA_ROOT } from "./env";
+import { getForumEntries, getOptions, BuildMode } from "./utils";
 import { makeBaseConfig } from "./makeBaseConfig";
 import { BundleAnalyzerPlugin } from "webpack-bundle-analyzer";
 

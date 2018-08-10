@@ -10,8 +10,8 @@
         "lib": ["es2017"],
         "baseUrl": ".",
         "paths": {
-            "happypack": ["@types/happypack"]
+            "happypack": ["scripts/@types/happypack"]
           }
     },
-    "include": ["**/*.ts"],
+    "include": ["scripts/**/*.ts"],
 }

@@ -1,7 +1,13 @@
+/**
+ * @author Adam Charron <adam.c@vanillaforums.com>
+ * @copyright 2009-2018 Vanilla Forums Inc.
+ * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
+ */
+
 import { promisify } from "util";
 import * as fs from "fs";
 import * as path from "path";
-import { VANILLA_APPS, VANILLA_ROOT, VANILLA_PLUGINS } from "./vanillaPaths";
+import { VANILLA_APPS, VANILLA_ROOT, VANILLA_PLUGINS, PUBLIC_PATH_SOURCE_FILE } from "./env";
 import { argv } from "yargs";
 const realPath = promisify(fs.realpath);
 const readDir = promisify(fs.readdir);
@@ -12,6 +18,7 @@ export const enum BuildMode {
     DEVELOPMENT = "development",
     PRODUCTION = "production",
     ANALYZE = "analyze",
+    POLYFILLS = "polyfills",
 }
 
 interface IBuildOptions {
@@ -94,8 +101,15 @@ async function addonHasEntry(addonPath: string, entry: "forum" | "dashboard" | "
 }
 
 function makeEntryPaths(entries: string[]): string[] {
-    entries.unshift(path.resolve(VANILLA_APPS, "dashboard/src/scripts/entries/public-path.ts"));
+    entries.unshift(PUBLIC_PATH_SOURCE_FILE);
     return entries;
+}
+
+function getCommonEntries() {
+    const dashboardBootstrap = path.resolve(VANILLA_APPS, "dashboard/src/scripts/entries/bootstrap.ts");
+    return {
+        "/js/webpack/bootstrap": makeEntryPaths([dashboardBootstrap]),
+    };
 }
 
 export async function getForumEntries(): Promise<any> {
@@ -105,17 +119,16 @@ export async function getForumEntries(): Promise<any> {
     for (const addonPath of addonPaths) {
         const entryType = await addonHasEntry(addonPath, "forum");
 
+        // Strip out the vanilla root to create an "absolute" looking path, from the root of the project.
         const relativePath = addonPath.replace(VANILLA_ROOT, "") + "/js/webpack/forum";
         if (entryType !== null) {
-            appEntries[relativePath] = makeEntryPaths([
-                path.resolve(addonPath, `src/scripts/entries/forum.${entryType}`),
-            ]);
+            const entryPath = path.resolve(addonPath, `src/scripts/entries/forum.${entryType}`);
+            appEntries[relativePath] = makeEntryPaths([entryPath]);
         }
     }
 
-    appEntries["/js/webpack/bootstrap"] = makeEntryPaths([
-        path.resolve(VANILLA_APPS, "dashboard/src/scripts/entries/bootstrap.ts"),
-    ]);
-
-    return appEntries;
+    return {
+        ...appEntries,
+        ...getCommonEntries(),
+    };
 }

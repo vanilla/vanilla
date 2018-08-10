@@ -93,7 +93,9 @@
         "test:debug": "karma start ./tests/javascript/karma.conf.js --browsers ChromeDebug",
         "lint:ts": "tslint -c ./tslint.json -e './**/node_modules/**' -e './**/src/**/*.{js,jsx}' -p ./tsconfig.json -t stylish",
         "lint:ts:fix": "tslint -c ./tslint.json -e './**/node_modules/**' -e './**/src/**/*.{js,jsx}' -p ./tsconfig.json -t stylish --fix",
-        "build:prod": "ts-node -P build/frontend/tsconfig.json build/frontend/build.ts --mode=production",
-        "build:analyze": "ts-node -P build/frontend/tsconfig.json build/frontend/build.ts --mode=analyze"
+        "build": "ts-node -P build/tsconfig.json build/scripts/build.ts",
+        "build:polyfills": "yarn run build --mode=polyfills",
+        "build:dev": "yarn run build --mode=development",
+        "build:analyze": "yarn run build --mode=analyze"
     }
 }

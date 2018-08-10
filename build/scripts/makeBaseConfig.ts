@@ -82,8 +82,15 @@ export async function makeBaseConfig() {
                 threadPool: happyThreadPool,
                 loaders: [
                     {
-                        path: "ts-loader",
-                        query: {
+                        loader: "babel-loader",
+                        options: {
+                            babelrc: false,
+                            plugins: ["react-hot-loader/babel", "syntax-dynamic-import"],
+                        },
+                    },
+                    {
+                        loader: "ts-loader",
+                        options: {
                             happyPackMode: true,
                             configFile: TS_CONFIG_FILE,
                         },

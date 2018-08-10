@@ -7,7 +7,7 @@
 import { promisify } from "util";
 import * as fs from "fs";
 import * as path from "path";
-import { VANILLA_APPS, VANILLA_ROOT, VANILLA_PLUGINS, PUBLIC_PATH_SOURCE_FILE } from "./env";
+import { VANILLA_APPS, VANILLA_ROOT, VANILLA_PLUGINS, PUBLIC_PATH_SOURCE_FILE, BOOTSTRAP_SOURCE_FILE } from "./env";
 import { argv } from "yargs";
 const realPath = promisify(fs.realpath);
 const readDir = promisify(fs.readdir);
@@ -106,9 +106,8 @@ function makeEntryPaths(entries: string[]): string[] {
 }
 
 function getCommonEntries() {
-    const dashboardBootstrap = path.resolve(VANILLA_APPS, "dashboard/src/scripts/entries/bootstrap.ts");
     return {
-        "/js/webpack/bootstrap": makeEntryPaths([dashboardBootstrap]),
+        "/js/webpack/bootstrap": makeEntryPaths([BOOTSTRAP_SOURCE_FILE]),
     };
 }
 
@@ -131,4 +130,20 @@ export async function getForumEntries(): Promise<any> {
         ...appEntries,
         ...getCommonEntries(),
     };
+}
+
+export async function getForumHotEntries(): Promise<any> {
+    const addonPaths = await lookupAddonPaths();
+    const appEntries: string[] = [];
+
+    for (const addonPath of addonPaths) {
+        const entryType = await addonHasEntry(addonPath, "forum");
+
+        if (entryType !== null) {
+            const entryPath = path.resolve(addonPath, `src/scripts/entries/forum.${entryType}`);
+            appEntries.push(entryPath);
+        }
+    }
+
+    return [...appEntries, BOOTSTRAP_SOURCE_FILE];
 }

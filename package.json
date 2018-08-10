@@ -48,6 +48,7 @@
         "@types/validator": "9.4.1",
         "@types/webpack": "4.4.9",
         "@types/webpack-bundle-analyzer": "2.9.2",
+        "@types/webpack-serve": "2.0.0",
         "@types/yargs": "11.1.1",
         "@vanillaforums/babel-preset": "1.0.5",
         "@vanillaforums/prettier-config": "1.0.0",
@@ -55,6 +56,7 @@
         "awesome-typescript-loader": "5.2.0",
         "babel-core": "6.26.3",
         "babel-loader": "7.1.4",
+        "babel-plugin-syntax-dynamic-import": "6.18.0",
         "chai": "4.1.2",
         "chai-as-promised": "7.1.1",
         "cross-env": "5.1.6",
@@ -78,6 +80,7 @@
         "mutationobserver-shim": "0.3.2",
         "prettier": "1.13.0",
         "raw-loader": "0.5.1",
+        "react-hot-loader": "4.3.4",
         "sinon": "5.0.10",
         "ts-loader": "4.4.2",
         "ts-node": "7.0.0",
@@ -85,6 +88,7 @@
         "typescript": "3.0.1",
         "webpack": "4.16.5",
         "webpack-bundle-analyzer": "2.13.1",
+        "webpack-serve": "2.0.2",
         "yargs": "12.0.1"
     },
     "scripts": {

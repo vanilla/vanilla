@@ -25,6 +25,7 @@ import { IStoreState } from "@rich-editor/@types/store";
 import { delegateEvent, removeDelegatedEvent } from "@dashboard/dom";
 import EmbedInsertionModule from "@rich-editor/quill/EmbedInsertionModule";
 import { Sources } from "quill/core";
+import { hot } from "react-hot-loader";
 
 interface IProps {
     editorID: string;
@@ -33,7 +34,7 @@ interface IProps {
     isPrimaryEditor: boolean;
 }
 
-export default class Editor extends React.Component<IProps> {
+export class Editor extends React.Component<IProps> {
     private hasUploadPermission: boolean;
     private quillMountRef: React.RefObject<HTMLDivElement> = React.createRef();
     private store = getStore<IStoreState>();
@@ -217,3 +218,5 @@ export default class Editor extends React.Component<IProps> {
         }
     }
 }
+
+export default hot(module)(Editor);

@@ -186,14 +186,14 @@ if (!function_exists('discussionOptionsToDropdown')):
      * @param DropdownModule|null $dropdown
      * @return DropdownModule
      */
-    function discussionOptionsToDropdown($options, $dropdown = null) {
+    function discussionOptionsToDropdown(array $options, $dropdown = null) {
         if (is_null($dropdown)) {
             $dropdown = new DropdownModule('dropdown', '', 'OptionsMenu');
         }
 
         if (!empty($options)) {
             foreach ($options as $option) {
-                $dropdown->addLink(val('Label', $option), val('Url', $option), NavModule::textToKey(val('Label', $option)), val('Class', $option));
+                $dropdown->addLink(($option['Label'] ?? ''), ($option['Url'] ?? ''), NavModule::textToKey(($option['Label'] ?? '')), ($option['Class'] ?? false));
             }
         }
 

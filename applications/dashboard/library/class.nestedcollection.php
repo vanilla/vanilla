@@ -552,7 +552,7 @@ trait NestedCollection {
         $i = 0;
         foreach ($items as &$item) {
             $item += ['_sort' => $i++];
-            if (val('items', $item)) {
+            if ($item['items'] ?? false) {
                 $this->sortItems($item['items']);
             }
         }
@@ -706,7 +706,7 @@ trait NestedCollection {
      * @param array $items The item list to flatten.
      * @return array The flattened items list.
      */
-    private function flattenArray($items) {
+    private function flattenArray(array $items) {
         $newItems = [];
         $itemslength = sizeof($items);
         $index = 0;
@@ -714,16 +714,16 @@ trait NestedCollection {
             $subItems = [];
 
             // Group item
-            if (val('type', $item) == 'group') {
-                if (val('items', $item)) {
+            if (($item['type'] ?? '') == 'group') {
+                if (($item['items'] ?? false)) {
                     $subItems = $item['items'];
                     unset($item['items']);
-                    if (val('text', $item)) {
+                    if (($item['text'] ?? false)) {
                         $newItems[] = $item;
                     }
                 }
             }
-            if ((val('type', $item) != 'group')) {
+            if (($item['type'] ?? '') != 'group') {
                 $newItems[] = $item;
             }
             if ($subItems) {

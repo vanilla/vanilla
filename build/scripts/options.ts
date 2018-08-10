@@ -39,8 +39,7 @@ interface IBuildOptions {
 }
 
 /**
- *
- * @param config
+ * Parse enabled addons keys out a vanilla config.
  */
 function parseEnabledAddons(config: any) {
     const addonKeys: string[] = [];

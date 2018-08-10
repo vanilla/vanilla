@@ -15,6 +15,9 @@ import { makePolyfillConfig } from "./configs/makePolyfillConfig";
 
 void Promise.all([installNodeModules("forum"), installNodeModules("admin")]).then(run);
 
+/**
+ * Run the requested build type.
+ */
 async function run() {
     const options = await getOptions();
     switch (options.mode) {

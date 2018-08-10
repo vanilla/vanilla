@@ -8,6 +8,9 @@ import { Configuration } from "webpack";
 import { makeBaseConfig } from "./makeBaseConfig";
 import { POLYFILL_SOURCE_FILE, TS_CONFIG_FILE, VANILLA_ROOT } from "../env";
 
+/**
+ * Create a config for building the polyfills file. This should be built entirely on its own.
+ */
 export async function makePolyfillConfig() {
     const baseConfig: Configuration = (await makeBaseConfig("")) as any;
     baseConfig.mode = "production";

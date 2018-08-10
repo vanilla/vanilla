@@ -9,7 +9,6 @@ import * as fs from "fs";
 import * as path from "path";
 import { VANILLA_APPS, VANILLA_ROOT, VANILLA_PLUGINS, PUBLIC_PATH_SOURCE_FILE, BOOTSTRAP_SOURCE_FILE } from "../env";
 import { getOptions, BuildMode } from "../options";
-import { spawn } from "child_process";
 const realPath = promisify(fs.realpath);
 const readDir = promisify(fs.readdir);
 const fileExists = promisify(fs.exists);
@@ -18,6 +17,11 @@ const cachedAddonPaths: {
     [section: string]: string[];
 } = {};
 
+/**
+ * Lookup all of the addon paths that need to be built for a given section. These are cached heavily.
+ *
+ * @param section - The section of the product being built. Eg. forum / admin / knowledge.
+ */
 export async function lookupAddonPaths(section: string): Promise<string[]> {
     let addonPaths: string[];
     if (!(section in cachedAddonPaths)) {
@@ -53,6 +57,12 @@ export async function lookupAddonPaths(section: string): Promise<string[]> {
     return addonPaths;
 }
 
+/**
+ * Get all addons of a certain type.
+ *
+ * @param rootDir - The root directory to for addons in. Eg. applications, plugins, themes.
+ * @param section - The section of the product being built. Eg. forum / admin / knowledge.
+ */
 async function lookupAddonType(rootDir: string, section: string): Promise<string[]> {
     const addonKeyList = await readDir(path.resolve(rootDir));
     const finalPaths: string[] = [];
@@ -72,6 +82,11 @@ interface IStringMap {
     [key: string]: string;
 }
 
+/**
+ * Generate aliases for the build.
+ *
+ * @param section - The section of the product being built. Eg. forum / admin / knowledge.
+ */
 export async function getAddonAliasMapping(section: string): Promise<IStringMap> {
     const addonPaths = await lookupAddonPaths(section);
     const result: IStringMap = {};
@@ -82,20 +97,31 @@ export async function getAddonAliasMapping(section: string): Promise<IStringMap>
     return result;
 }
 
-export async function getScriptSourceFiles(section: string): Promise<string[]> {
+/**
+ * Get the source file locations for the build.
+ *
+ * @param section - The section of the product being built. Eg. forum / admin / knowledge.
+ */
+export async function getScriptSourceDirectories(section: string): Promise<string[]> {
     const addonPaths = await lookupAddonPaths(section);
     return addonPaths.map(addonPath => path.resolve(addonPath, "src/scripts"));
 }
 
 type EntryType = "ts" | "tsx" | null;
 
-async function addonHasEntry(addonPath: string, entry: string): Promise<EntryType> {
-    const tsPath = path.resolve(addonPath, `src/scripts/entries/${entry}.ts`);
+/**
+ * Determine if an addon has an entry of a particular type. Return that type if applicable.
+ *
+ * @param addonPath - The path of the addon to look in.
+ * @param section - The section of the product being built. Eg. forum / admin / knowledge.
+ */
+async function addonHasEntry(addonPath: string, section: string): Promise<EntryType> {
+    const tsPath = path.resolve(addonPath, `src/scripts/entries/${section}.ts`);
     const tsPathExists = await fileExists(tsPath);
     if (tsPathExists) {
         return "ts";
     } else {
-        const tsxPath = path.resolve(addonPath, `src/scripts/entries/${entry}.tsx`);
+        const tsxPath = path.resolve(addonPath, `src/scripts/entries/${section}.tsx`);
         const tsxPathExists = await fileExists(tsxPath);
         if (tsxPathExists) {
             return "tsx";
@@ -105,17 +131,32 @@ async function addonHasEntry(addonPath: string, entry: string): Promise<EntryTyp
     return null;
 }
 
+/**
+ * Push the critical source path entry into each entry. This is needed for dynamic imports to work.
+ *
+ * @param entries - The entries you want to decorate.
+ */
 function makeEntryPaths(entries: string[]): string[] {
     entries.unshift(PUBLIC_PATH_SOURCE_FILE);
     return entries;
 }
 
+/**
+ * Get common entrypoints. These are addon independant.
+ *
+ * @param section - The section of the product being built. Eg. forum / admin / knowledge.
+ */
 function getCommonEntries(section: string) {
     return {
         [`/js/webpack/bootstrap-${section}`]: makeEntryPaths([BOOTSTRAP_SOURCE_FILE]),
     };
 }
 
+/**
+ * Get all of the webpack entries for a production build.
+ *
+ * @param section - The section of the product being built. Eg. forum / admin / knowledge.
+ */
 export async function getEntries(section: string): Promise<any> {
     const addonPaths = await lookupAddonPaths(section);
     const appEntries: any = {};
@@ -137,6 +178,11 @@ export async function getEntries(section: string): Promise<any> {
     };
 }
 
+/**
+ * Get the webpack entries for a hot build.
+ *
+ * @param section - The section of the product being built. Eg. forum / admin / knowledge.
+ */
 export async function getHotEntries(section: string): Promise<any> {
     const addonPaths = await lookupAddonPaths(section);
     const appEntries: string[] = [];

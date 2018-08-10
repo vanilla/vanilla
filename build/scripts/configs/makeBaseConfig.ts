@@ -6,13 +6,20 @@
 
 import * as path from "path";
 import { VANILLA_ROOT, TS_CONFIG_FILE, TS_LINT_FILE, PRETTIER_FILE } from "../env";
-import { getAddonAliasMapping, getScriptSourceFiles, lookupAddonPaths } from "../utility/addonUtils";
+import { getAddonAliasMapping, getScriptSourceDirectories, lookupAddonPaths } from "../utility/addonUtils";
 import PrettierPlugin from "prettier-webpack-plugin";
 import HappyPack from "happypack";
 import ForkTsCheckerWebpackPlugin from "fork-ts-checker-webpack-plugin";
 import { getOptions } from "../options";
 import chalk from "chalk";
+import { print } from "util";
+import { printVerbose } from "../utility/utils";
 
+/**
+ * Create the core webpack config.
+ *
+ * @param section - The section of the app to build. Eg. forum | admin | knowledge.
+ */
 export async function makeBaseConfig(section: string) {
     const happyThreadPool = HappyPack.ThreadPool({ size: 4, id: "ts" });
     const addonPaths = await lookupAddonPaths(section);
@@ -25,15 +32,12 @@ export async function makeBaseConfig(section: string) {
     ];
     const moduleAliases = await getAddonAliasMapping(section);
 
-    if (options.verbose) {
-        const aliases = Object.keys(moduleAliases).join(", ");
-        const message = `Building section ${chalk.yellowBright(section)} with the following aliases
+    const aliases = Object.keys(moduleAliases).join(", ");
+    const message = `Building section ${chalk.yellowBright(section)} with the following aliases
 ${chalk.green(aliases)}`;
-        // tslint:disable-next-line
-        console.log(message);
-    }
+    printVerbose(message);
 
-    const tsSourceIncludes = await getScriptSourceFiles(section);
+    const tsSourceIncludes = await getScriptSourceDirectories(section);
 
     const config = {
         context: VANILLA_ROOT,
@@ -134,6 +138,9 @@ ${chalk.green(aliases)}`;
     return config;
 }
 
+/**
+ * Get a prettier plugin instance. This will autoformat source code as its built.
+ */
 function getPrettierPlugin() {
     const prettierConfig = require(PRETTIER_FILE);
     return new PrettierPlugin({

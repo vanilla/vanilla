@@ -8,6 +8,11 @@ import { Configuration } from "webpack";
 import { getHotEntries } from "../utility/addonUtils";
 import { makeBaseConfig } from "./makeBaseConfig";
 
+/**
+ * Create the development config. Eg. Hot build.
+ *
+ * @param section - The section of the app to build. Eg. forum | admin | knowledge.
+ */
 export async function makeDevConfig(section: string) {
     const baseConfig: Configuration = (await makeBaseConfig(section)) as any;
     const forumEntries = await getHotEntries(section);

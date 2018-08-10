@@ -93,20 +93,29 @@ async function addonHasEntry(addonPath: string, entry: "forum" | "dashboard" | "
     return null;
 }
 
-export async function getForumEntries(): Promise<IStringMap> {
+function makeEntryPaths(entries: string[]): string[] {
+    entries.unshift(path.resolve(VANILLA_APPS, "dashboard/src/scripts/entries/public-path.ts"));
+    return entries;
+}
+
+export async function getForumEntries(): Promise<any> {
     const addonPaths = await lookupAddonPaths();
-    const appEntries: IStringMap = {};
+    const appEntries: any = {};
 
     for (const addonPath of addonPaths) {
         const entryType = await addonHasEntry(addonPath, "forum");
 
         const relativePath = addonPath.replace(VANILLA_ROOT, "") + "/js/webpack/forum";
         if (entryType !== null) {
-            appEntries[relativePath] = path.resolve(addonPath, `src/scripts/entries/forum.${entryType}`);
+            appEntries[relativePath] = makeEntryPaths([
+                path.resolve(addonPath, `src/scripts/entries/forum.${entryType}`),
+            ]);
         }
     }
 
-    appEntries["/js/webpack/bootstrap"] = path.resolve(VANILLA_APPS, "dashboard/src/scripts/entries/bootstrap.ts");
+    appEntries["/js/webpack/bootstrap"] = makeEntryPaths([
+        path.resolve(VANILLA_APPS, "dashboard/src/scripts/entries/bootstrap.ts"),
+    ]);
 
     return appEntries;
 }

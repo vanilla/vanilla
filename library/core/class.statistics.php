@@ -30,9 +30,14 @@ class Gdn_Statistics extends Gdn_Pluggable {
     public function __construct() {
         parent::__construct();
 
-        $analyticsServer = c('Garden.Analytics.Remote', 'analytics.vanillaforums.com');
-        $analyticsServer = str_replace(['http://', 'https://'], '', $analyticsServer);
+        $analyticsServer = c('Garden.Analytics.Remote', 'https://analytics.vanillaforums.com');
         $this->AnalyticsServer = $analyticsServer;
+
+        $scheme = parse_url($this->AnalyticsServer, PHP_URL_SCHEME); // Will give you the protocol (http, https) or null/false on error.
+
+        if ($scheme === null) {
+            $this->AnalyticsServer = 'https://'.$this->AnalyticsServer();
+        }
 
         $this->TickExtra = [];
     }
@@ -57,7 +62,7 @@ class Gdn_Statistics extends Gdn_Pluggable {
         $apiController = strtolower($apiController);
         $apiMethod = stringEndsWith(strtolower($apiMethod), '.json', true, true).'.json';
 
-        $finalURL = 'http://'.combinePaths([
+        $finalURL = combinePaths([
                 $this->AnalyticsServer,
                 $apiController,
                 $apiMethod

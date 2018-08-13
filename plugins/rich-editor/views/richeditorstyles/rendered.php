@@ -6,7 +6,7 @@ $inlineOperations = '[
     },
     {
         "attributes": {
-            "codeBlock": true
+            "codeInline": true
         },
         "insert": "Code Inline"
     },

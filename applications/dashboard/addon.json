@@ -16,35 +16,5 @@
             "email": "support@vanillaforums.com",
             "homepage": "https://open.vanillaforums.com"
         }
-    ],
-    "build": {
-        "process": "core",
-        "entries": {
-            "app": "./src/scripts/app/index",
-            "polyfills": "./src/scripts/entries/polyfills",
-            "bootstrap-app": "./src/scripts/entries/bootstrap",
-            "bootstrap-admin": "./src/scripts/entries/bootstrap"
-        },
-        "exports": {
-            "*": [
-                "./src/scripts/*.ts",
-                "./src/scripts/*.tsx",
-                "./src/scripts/components/**/*.ts",
-                "./src/scripts/components/**/*.tsx",
-                "axios",
-                "classnames",
-                "prop-types",
-                "react",
-                "react-dom",
-                "react-redux",
-                "react-router-dom",
-                "redux",
-                "redux-thunk",
-                "sprintf-js",
-                "tabbable"
-            ],
-            "app": [],
-            "admin": []
-        }
-    }
+    ]
 }

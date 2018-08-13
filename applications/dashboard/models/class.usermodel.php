@@ -4067,6 +4067,8 @@ class UserModel extends Gdn_Model {
         if (is_object($user)) {
             $this->setCalculatedFieldsObject($user);
             return;
+        } elseif (empty($user)){
+            return;
         }
         if (is_string($v = ($user['Attributes'] ?? false))) {
             $user['Attributes'] = dbdecode($v);
@@ -4117,7 +4119,7 @@ class UserModel extends Gdn_Model {
      * @deprecated Call `setCalculatedFields()` with an array instead.
      */
     public function setCalculatedFieldsObject( &$user) {
-        deprected(__FILE__.'setCalculatedFieldsObject( &$user)');
+        deprecated(__METHOD__);
         if ($v = val('Attributes', $user)) {
             if (is_string($v)) {
                 setValue('Attributes', $user, dbdecode($v));

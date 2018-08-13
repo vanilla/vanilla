@@ -51,7 +51,6 @@
         "@vanillaforums/babel-preset": "1.0.5",
         "@vanillaforums/prettier-config": "1.0.0",
         "@vanillaforums/tslint-config": "1.1.8",
-        "awesome-typescript-loader": "5.2.0",
         "babel-core": "6.26.3",
         "babel-loader": "7.1.5",
         "babel-plugin-syntax-dynamic-import": "6.18.0",

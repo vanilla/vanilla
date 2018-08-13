@@ -12,6 +12,7 @@ import { getOptions, BuildMode } from "./options";
 import chalk from "chalk";
 import { installNodeModules } from "./utility/moduleUtils";
 import { makePolyfillConfig } from "./configs/makePolyfillConfig";
+import { printError, print, fail } from "./utility/utils";
 
 void Promise.all([installNodeModules("forum"), installNodeModules("admin")]).then(run);
 
@@ -41,26 +42,24 @@ const statOptions = {
 async function runProd() {
     const config = [await makeProdConfig("forum"), await makeProdConfig("admin")];
     const compiler = webpack(config);
-    const logger = console;
     compiler.run((err: Error, stats: Stats) => {
         if (err) {
-            logger.error("The build encountered an error:" + err);
+            printError("The build encountered an error:" + err);
         }
 
-        logger.log(stats.toString(statOptions));
+        print(stats.toString(statOptions));
     });
 }
 
 async function runPolyfill() {
     const config = await makePolyfillConfig();
     const compiler = webpack(config);
-    const logger = console;
     compiler.run((err: Error, stats: Stats) => {
         if (err) {
-            logger.error("The build encountered an error:" + err);
+            printError("The build encountered an error:" + err);
         }
 
-        logger.log(stats.toString(statOptions));
+        print(stats.toString(statOptions));
     });
 }
 
@@ -71,9 +70,7 @@ async function runDev() {
         const message = chalk.red(`
 You've enabled a development build without enabling hot reload. Add the following to your config.
 ${chalk.yellowBright("$Configuration['HotReload']['Enabled'] = false;")}`);
-        // tslint:disable-next-line
-        console.error(message);
-        process.exit(1);
+        fail(message);
     }
 
     const config = [await makeDevConfig("forum"), await makeDevConfig("admin")];
@@ -99,5 +96,5 @@ ${chalk.yellowBright("$Configuration['HotReload']['Enabled'] = false;")}`);
         },
     };
 
-    void serve(argv, options);
+    await serve(argv, options);
 }

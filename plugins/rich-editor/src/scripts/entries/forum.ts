@@ -20,7 +20,7 @@ onReady(() => {
 async function setupEditor() {
     const discussionFormContainer = document.querySelectorAll(".richEditor");
     if (discussionFormContainer.length > 0) {
-        const mountEditor = await import(/* webpackChunkName: "plugins/rich-editor/js/chunks/mountEditor" */ "@rich-editor/mountEditor");
+        const mountEditor = await import(/* webpackChunkName: "plugins/rich-editor/js/webpack/chunks/mountEditor" */ "@rich-editor/mountEditor");
         discussionFormContainer.forEach(mountEditor.default);
     }
 }
@@ -37,7 +37,7 @@ async function setupCommentEditForm() {
 
         const richEditor = container.querySelector(".richEditor");
         if (richEditor) {
-            const mountEditor = await import(/* webpackChunkName: "plugins/rich-editor/js/chunks/mountEditor" */ "@rich-editor/mountEditor");
+            const mountEditor = await import(/* webpackChunkName: "plugins/rich-editor/js/webpack/chunks/mountEditor" */ "@rich-editor/mountEditor");
             mountEditor.default(richEditor);
         }
     });

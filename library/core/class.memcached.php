@@ -28,15 +28,28 @@ class Gdn_Memcached extends Gdn_Cache {
     /** @var Memcached  */
     private $memcache;
 
+    /**
+     * @var bool Whether or not the cache was injected.
+     */
+    private $injected = false;
+
     /** @var array */
     protected $weightedContainers;
 
     /**
      * Setup our Memcached configuration.
+     *
+     * @param Memcached $cache An optional cache driver. If this isn't supplied then one is created.
      */
-    public function __construct() {
+    public function __construct($cache = null) {
         parent::__construct();
         $this->cacheType = Gdn_Cache::CACHE_TYPE_MEMORY;
+
+        if ($cache !== null) {
+            $this->memcache = $cache;
+            $this->injected = true;
+            return;
+        }
 
         // Allow persistent connections
 
@@ -106,6 +119,10 @@ class Gdn_Memcached extends Gdn_Cache {
      * config file.
      */
     public function autorun() {
+        if ($this->injected) {
+            return;
+        }
+
         $servers = Gdn_Cache::activeStore('memcached');
         if (!is_array($servers)) {
             $servers = explode(',', $servers);

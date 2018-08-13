@@ -1,16 +1,15 @@
 <?php
 /**
- * Cache layer base class
- *
- * All cache objects should extend this to ensure a consistent public api for
- * caching.
- *
  * @author Tim Gunter <tim@vanillaforums.com>
  * @copyright 2009-2019 Vanilla Forums Inc.
  * @license GPL-2.0-only
- * @package Core
  * @since 2.0.10
- * @abstract
+ */
+
+/**
+ * The cache layer base class.
+ *
+ * All cache objects should extend this to ensure a consistent public api for caching.
  */
 abstract class Gdn_Cache {
 
@@ -159,7 +158,7 @@ abstract class Gdn_Cache {
             $cacheObject = new $activeCacheClass();
         }
 
-        // Null caches should not acount as enabled.
+        // Null caches should not count as enabled.
         if (!$forceEnable && $cacheObject->type() === Gdn_Cache::CACHE_TYPE_NULL) {
             saveToConfig('Cache.Enabled', false, false);
         }

@@ -49,6 +49,7 @@ $dic->setInstance('Garden\Container\Container', $dic)
     ->rule('Gdn_Cache')
     ->setShared(true)
     ->setFactory(['Gdn_Cache', 'initialize'])
+    ->setInherit(false)
     ->addAlias('Cache')
 
     // Configuration
@@ -337,12 +338,11 @@ $dic->setInstance('Garden\Container\Container', $dic)
 
 // Run through the bootstrap with dependencies.
 $dic->call(function (
-    Container $dic,
     Gdn_Configuration $config,
     \Vanilla\AddonManager $addonManager,
     \Garden\EventManager $eventManager,
     Gdn_Request $request // remove later
-) {
+) use ($dic) {
 
     // Load default baseline Garden configurations.
     $config->load(PATH_CONF.'/config-defaults.php');

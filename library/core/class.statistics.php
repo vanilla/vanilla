@@ -33,6 +33,12 @@ class Gdn_Statistics extends Gdn_Pluggable {
         $analyticsServer = c('Garden.Analytics.Remote', 'https://analytics.vanillaforums.com');
         $this->AnalyticsServer = $analyticsServer;
 
+        $scheme = parse_url($this->AnalyticsServer, PHP_URL_SCHEME); // Will give you the protocol (http, https) or null/false on error.
+
+        if(is_null($scheme)) {
+            $this->AnalyticsServer = 'https://'.$this->AnalyticsServer();
+        }
+
         $this->TickExtra = [];
     }
 

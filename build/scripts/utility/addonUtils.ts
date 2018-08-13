@@ -71,8 +71,8 @@ async function lookupAddonType(rootDir: string, section: string): Promise<string
         const hasSection = await addonHasEntry(addonPath, section);
         const hasBoostrap = await addonHasEntry(addonPath, "bootstrap");
         if (hasSection || hasBoostrap) {
-            const finalPath = await realPath(addonPath);
-            finalPaths.push(finalPath);
+            // const finalPath = await realPath(addonPath);
+            finalPaths.push(addonPath);
         }
     }
     return finalPaths;

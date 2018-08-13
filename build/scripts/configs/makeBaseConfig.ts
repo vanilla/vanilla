@@ -54,7 +54,7 @@ ${chalk.green(aliases)}`;
                         {
                             loader: "babel-loader",
                             options: {
-                                presets: ["@vanillaforums/babel-preset"],
+                                presets: [require.resolve("@vanillaforums/babel-preset")],
                                 cacheDirectory: true,
                             },
                         },
@@ -97,7 +97,10 @@ ${chalk.green(aliases)}`;
                         loader: "babel-loader",
                         options: {
                             babelrc: false,
-                            plugins: ["react-hot-loader/babel", "syntax-dynamic-import"],
+                            plugins: [
+                                require.resolve("react-hot-loader/babel"),
+                                require.resolve("babel-plugin-syntax-dynamic-import"),
+                            ],
                         },
                     },
                     {
@@ -120,6 +123,7 @@ ${chalk.green(aliases)}`;
             modules: modulePaths,
             alias: moduleAliases,
             extensions: [".ts", ".tsx", ".js", ".jsx"],
+            symlinks: false,
         },
         /**
          * We need to manually tell webpack where to resolve our loaders.

@@ -22,8 +22,8 @@ class ExternalBlot extends AbstractBlot {
     /**
      * @inheritDoc
      */
-    public static function matches(array $operations): bool {
-        return (boolean) valr("insert.embed-external", $operations[0]);
+    public static function matches(array $operation): bool {
+        return (boolean) valr("insert.embed-external", $operation);
     }
 
     /**

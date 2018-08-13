@@ -8,6 +8,7 @@
 namespace Vanilla\Formatting\Quill\Blots\Lines;
 
 use Vanilla\Formatting\Quill\BlotGroup;
+use Vanilla\Formatting\Quill\Blots\AbstractBlot;
 use Vanilla\Formatting\Quill\Blots\TextBlot;
 
 /**
@@ -15,6 +16,7 @@ use Vanilla\Formatting\Quill\Blots\TextBlot;
  * Some operations require a different approach to newline rendering than what is found in the Parser.
  */
 abstract class AbstractLineBlot extends TextBlot {
+
     /**
      * Render additional newlines inside of the line.
      *
@@ -26,13 +28,11 @@ abstract class AbstractLineBlot extends TextBlot {
      *
      * @return string
      */
-    public function renderNewLines(): string {
+    public function render(): string {
         $result = "";
-        if ($this->nextOperation) {
-            $extraNewLines = substr_count($this->nextOperation["insert"], "\n") - 1;
-            for ($i = 0; $i < $extraNewLines; $i++) {
-                $result .= $this->renderLineStart()."<br>".$this->renderLineEnd();
-            }
+        $extraNewLines = substr_count($this->currentOperation["insert"], "\n") - 1;
+        for ($i = 0; $i < $extraNewLines; $i++) {
+            $result .= $this->renderLineStart()."<br>".$this->renderLineEnd();
         }
 
         return $result;

@@ -33,8 +33,8 @@ abstract class AbstractInlineEmbedBlot extends AbstractBlot {
     /**
      * @inheritDoc
      */
-    public static function matches(array $operations): bool {
-        return valr(static::getInsertKey(), $operations[0]);
+    public static function matches(array $operation): bool {
+        return valr(static::getInsertKey(), $operation);
     }
 
     /**

@@ -22,8 +22,8 @@ class ListLineBlot extends AbstractLineBlot {
     /**
      * @inheritdoc
      */
-    public static function matches(array $operations): bool {
-        return static::opAttrsContainKeyWithValue($operations, "list", static::LIST_TYPES);
+    public static function matches(array $operation): bool {
+        return static::opAttrsContainKeyWithValue($operation, "list", static::LIST_TYPES);
     }
 
     /**
@@ -43,9 +43,7 @@ class ListLineBlot extends AbstractLineBlot {
      */
     public function renderLineStart(): string {
         $classString = "";
-        $indentLevel = $this->currentOperation["attributes"]["indent"]
-            ?? $this->nextOperation["attributes"]["indent"]
-            ?? null;
+        $indentLevel = $this->currentOperation["attributes"]["indent"] ?? null;
         if ($indentLevel && filter_var($indentLevel, FILTER_VALIDATE_INT) !== false) {
             $classString = " class=\"ql-indent-$indentLevel\"";
         }
@@ -94,7 +92,7 @@ class ListLineBlot extends AbstractLineBlot {
      * @return string
      */
     private function getListType() {
-        $listType = $this->nextOperation["attributes"]["list"] ?? static::LIST_TYPE_UNRECOGNIZED;
+        $listType = $this->currentOperation["attributes"]["list"] ?? static::LIST_TYPE_UNRECOGNIZED;
         return !in_array($listType, static::LIST_TYPES) ? static::LIST_TYPE_UNRECOGNIZED : $listType;
     }
 }

@@ -17,8 +17,8 @@ class BlockquoteLineBlot extends AbstractLineBlot {
     /**
      * @inheritDoc
      */
-    public static function matches(array $operations): bool {
-        return static::opAttrsContainKeyWithValue($operations, "blockquote-line");
+    public static function matches(array $operation): bool {
+        return static::opAttrsContainKeyWithValue($operation, "blockquote-line");
     }
 
     /**

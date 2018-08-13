@@ -9,7 +9,8 @@ namespace Vanilla\Formatting\Quill;
 
 use Vanilla\Formatting\Quill\Blots\AbstractBlot;
 use Vanilla\Formatting\Quill\Blots\Lines\AbstractLineBlot;
-use Vanilla\Formatting\Quill\Blots\CodeBlockBlot;
+use Vanilla\Formatting\Quill\Blots\CodeLineBlot;
+use Vanilla\Formatting\Quill\Blots\Lines\TextLineBlot;
 use Vanilla\Formatting\Quill\Blots\TextBlot;
 
 /**
@@ -28,7 +29,7 @@ class BlotGroup {
      * Blots that can determine the surrounding tag over the other blot types.
      */
     private $overridingBlots = [
-        CodeBlockBlot::class,
+        CodeLineBlot::class,
         AbstractLineBlot::class,
     ];
 
@@ -85,13 +86,18 @@ class BlotGroup {
      * @return string
      */
     public function render(): string {
+        if (count($this->blots) === 1 && $this->blots[0] instanceof TextLineBlot && $this->blots[0]->getContent() ===
+        "\n") {
+            return "<p><br></p>";
+        }
+
         // Don't render empty groups.
         $surroundTagBlot = $this->getBlotForSurroundingTags();
         $result = $surroundTagBlot->getGroupOpeningTag();
 
         // Line blots have special rendering.
         if ($surroundTagBlot instanceof AbstractLineBlot) {
-            $result .= $this->renderLineGroup($surroundTagBlot);
+            $result .= $this->renderLineGroup();
         } else {
             foreach ($this->blots as $blot) {
                 $result .= $blot->render();
@@ -115,36 +121,43 @@ class BlotGroup {
      *
      * @return string
      */
-    public function renderLineGroup(AbstractLineBlot $firstLineBlot):
+    public function renderLineGroup():
     string {
         $result = "";
 
-        $result .= $firstLineBlot->renderLineStart();
+        $terminatorIndex = 0;
+        $terminators = $this->getLineTerminators();
+
+        $terminator = $terminators[$terminatorIndex];
+        $result .= $terminator->renderLineStart();
 
         foreach ($this->blots as $index => $blot) {
-            // Ignore starting newlines.
-            if ($index === 0 && $blot->getContent() === "") {
-                continue;
-            }
-            $result .= $blot->render();
-
             if ($blot instanceof AbstractLineBlot) {
-                $result .= $blot->renderLineEnd();
-                $result .= $blot->renderNewLines();
+                $result .= $terminator->render();
+                $result .= $terminator->renderLineEnd();
 
-                if ($index < count($this->blots) - 1) {
-                    // TODO: This is kind of fragile and needs tests.
-                    $nextLine = $this->blots[$index + 1] ?? null;
-                    if ($nextLine instanceof AbstractLineBlot) {
-                        $result .= $nextLine->renderLineStart();
-                    } else {
-                        $result .= $blot->renderLineStart();
-                    }
+                // Start the next line.
+                $terminatorIndex++;
+                $terminator = $terminators[$terminatorIndex] ?? null;
+                if ($terminator !== null) {
+                    $result .= $terminator->renderLineStart();
                 }
+            } else {
+                $result .= $blot->render();
             }
         }
 
         return $result;
+    }
+
+    private function getLineTerminators(): array {
+        $terminators = [];
+        foreach ($this->blots as $blot) {
+            if ($blot instanceof AbstractLineBlot) {
+                $terminators[] = $blot;
+            }
+        }
+        return $terminators;
     }
 
     /**
@@ -173,10 +186,12 @@ class BlotGroup {
     /**
      * Add a blot to this block.
      *
-     * @param AbstractBlot $blot
+     * @param AbstractBlot[] $blots
      */
-    public function pushBlot(AbstractBlot $blot) {
-        $this->blots[] = $blot;
+    public function pushBlots(array $blots) {
+        foreach ($blots as $blot) {
+            $this->blots[] = $blot;
+        }
     }
 
     /**

@@ -65,5 +65,5 @@
     { "attributes": { "blockquote-line": true }, "insert": "\n" },
     { "attributes": { "strike": true }, "insert": "More blockquote content" },
     { "attributes": { "blockquote-line": true }, "insert": "\n" },
-    { "insert": "\n\n" }
+    { "insert": "\n" }
 ]

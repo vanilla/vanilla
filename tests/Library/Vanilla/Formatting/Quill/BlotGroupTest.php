@@ -22,10 +22,10 @@ class BlotGroupTest extends SharedBootstrapTestCase {
             "header" => 2,
         ]]);
 
-        $block->pushBlot($emptyBlot);
-        $block->pushBlot($emptyBlot);
-        $block->pushBlot($headingBlot);
-        $block->pushBlot($headingBlot);
+        $block->pushBlots([$emptyBlot]);
+        $block->pushBlots([$emptyBlot]);
+        $block->pushBlots([$headingBlot]);
+        $block->pushBlots([$headingBlot]);
 
         $this->assertTrue($block->getIndexForBlotOfType(HeadingBlot::class) === 2);
     }

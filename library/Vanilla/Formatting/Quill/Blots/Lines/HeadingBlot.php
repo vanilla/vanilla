@@ -21,8 +21,8 @@ class HeadingBlot extends AbstractLineBlot {
     /**
      * @inheritDoc
      */
-    public static function matches(array $operations): bool {
-        return static::opAttrsContainKeyWithValue($operations, "header", static::$validLevels);
+    public static function matches(array $operation): bool {
+        return static::opAttrsContainKeyWithValue($operation, "header", static::$validLevels);
     }
 
     /**
@@ -84,8 +84,6 @@ class HeadingBlot extends AbstractLineBlot {
         $defaultLevel = 2;
         // Heading attributes generally live in the next operation.
         // For empty headings there is only one operation, so it could be in the current op.
-        return $this->hasConsumedNextOp()
-                ? $this->nextOperation["attributes"]["header"] ?? $defaultLevel
-                : $this->currentOperation["attributes"]["header"] ?? $defaultLevel;
+        return $this->currentOperation["attributes"]["header"] ?? $defaultLevel;
     }
 }

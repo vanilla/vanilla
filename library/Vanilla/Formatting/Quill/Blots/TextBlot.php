@@ -19,8 +19,9 @@ class TextBlot extends AbstractBlot {
      *
      * @inheritDoc
      */
-    public static function matches(array $operations): bool {
-        return is_string(val("insert", $operations[0]));
+    public static function matches(array $operation): bool {
+        $insert = $operation["insert"] ?? null;
+        return is_string($insert);
     }
 
     /**
@@ -67,23 +68,21 @@ class TextBlot extends AbstractBlot {
     /**
      * Utility function for determining if a group of operations contains a blot with particular attribute.
      *
-     * @param array $operations The operations to check.
+     * @param array $operation The operations to check.
      * @param string $attrLookupKey The attribute key to lookup.
      * @param mixed $expectedValue A value or array of possible values that the key should be matched against.
      *
      * @return bool
      */
     protected static function opAttrsContainKeyWithValue(
-        array $operations,
+        array $operation,
         string $attrLookupKey,
         $expectedValue = true
     ) {
-        foreach ($operations as $op) {
-            $value = valr("attributes.$attrLookupKey", $op);
+        $value = valr("attributes.$attrLookupKey", $operation);
 
-            if ((is_array($expectedValue) && in_array($value, $expectedValue)) || $value === $expectedValue) {
-                return true;
-            }
+        if ((is_array($expectedValue) && in_array($value, $expectedValue)) || $value === $expectedValue) {
+            return true;
         }
 
         return false;

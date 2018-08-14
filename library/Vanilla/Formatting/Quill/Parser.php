@@ -26,10 +26,10 @@ class Parser {
     ];
 
     const LINE_BLOTS = [
-        Blots\Lines\BlockquoteLineBlot::class,
-        Blots\Lines\ListLineBlot::class,
-        Blots\Lines\SpoilerLineBlot::class,
-        Blots\Lines\HeadingBlot::class,
+        Blots\Lines\BlockquoteLineTerminatorBlot::class,
+        Blots\Lines\ListLineTerminatorBlot::class,
+        Blots\Lines\SpoilerLineTerminatorBlot::class,
+        Blots\Lines\HeadingTerminatorBlot::class,
     ];
 
     /** @var string[] The registered blot classes */
@@ -63,12 +63,12 @@ class Parser {
             ->addBlot(Blots\Embeds\ExternalBlot::class)
             ->addBlot(Blots\Embeds\MentionBlot::class)
             ->addBlot(Blots\Embeds\EmojiBlot::class)
-            ->addBlot(Blots\Lines\SpoilerLineBlot::class)
-            ->addBlot(Blots\Lines\BlockquoteLineBlot::class)
-            ->addBlot(Blots\Lines\ListLineBlot::class)
-            ->addBlot(Blots\Lines\HeadingBlot::class)
-            ->addBlot(Blots\Lines\TextLineBlot::class)
-            ->addBlot(Blots\Lines\CodeLineBlot::class)
+            ->addBlot(Blots\Lines\SpoilerLineTerminatorBlot::class)
+            ->addBlot(Blots\Lines\BlockquoteLineTerminatorBlot::class)
+            ->addBlot(Blots\Lines\ListLineTerminatorBlot::class)
+            ->addBlot(Blots\Lines\HeadingTerminatorBlot::class)
+            ->addBlot(Blots\Lines\ParagraphLineTerminatorBlot::class)
+            ->addBlot(Blots\Lines\CodeLineTerminatorBlot::class)
             ->addBlot(Blots\TextBlot::class)// This needs to be the last one!!!
             ->addFormat(Formats\Link::class)
             ->addFormat(Formats\Bold::class)
@@ -95,14 +95,17 @@ class Parser {
     /**
      * Parse the operations into an array of Groups.
      *
-     * @return BlotGroup[]
+     * @param array $operations The operations to parse.
+     * @param string $parseMode One of the supported parse modes.
+     *
+     * @see Parser::PARSE_MODE_NORMAL
+     * @see Parser::PARSE_MODE_QUOTE
+     *
+     * @return BlotGroupCollection
      */
-    public function parse(array $operations, string $parseMode = self::PARSE_MODE_NORMAL): array {
+    public function parse(array $operations, string $parseMode = self::PARSE_MODE_NORMAL): BlotGroupCollection {
         $operations = $this->splitPlainTextNewlines($operations);
-        $this->insertBreakPoints($operations);
-
-        $groupFactory = new BlotGroupFactory($operations, $this->blotClasses);
-        return $groupFactory->getGroups();
+        return new BlotGroupCollection($operations, $this->blotClasses, $parseMode);
     }
 
     /**
@@ -132,10 +135,11 @@ class Parser {
      * @param array $previousOp The next operation.
      * @param array $nextOp The previous operation.
      *
-     * @return AbstractForm[] The formats matching the given operations.
+     * @return Formats\AbstractFormat[] The formats matching the given operations.
      */
     public function getFormatsForOperations(array $currentOp, array $previousOp = [], array $nextOp = []) {
         $formats = [];
+        /** @var Formats\AbstractFormat $format */
         foreach ($this->formatClasses as $format) {
             if ($format::matches([$currentOp])) {
                 /** @var Formats\AbstractFormat $formatInstance */
@@ -150,6 +154,8 @@ class Parser {
      * Call parse and then simplify each blotGroup into test data.
      *
      * @param array $ops The ops to parse
+     *
+     * @return array
      */
     public function parseIntoTestData(array $ops): array {
         $parseData = $this->parse($ops);
@@ -168,7 +174,7 @@ class Parser {
      *
      * @return bool
      */
-    private function isOperationBareInsert(array $op) {
+    private function isOperationBareInsert(array $op): bool {
         return !array_key_exists("attributes", $op)
             && array_key_exists("insert", $op)
             && is_string($op["insert"]);
@@ -183,6 +189,7 @@ class Parser {
      */
     private function isOpALineBlotTerminator(array $operation): bool {
         $validLineBlotClasses = array_intersect(static::LINE_BLOTS, $this->blotClasses);
+        /** @var AbstractBlot $blotClass */
         foreach ($validLineBlotClasses as $blotClass) {
             if ($blotClass::matches([$operation])) {
                 return true;
@@ -195,9 +202,11 @@ class Parser {
     /**
      * Split normal text operations with newlines inside of them into their own operations.
      *
-     * @param $operations The operations in questions.
+     * @param array $operations The operations in questions.
+     *
+     * @return array The new operations
      */
-    private function splitPlainTextNewlines($operations) {
+    private function splitPlainTextNewlines(array $operations): array {
         $newOperations = [];
         foreach ($operations as $opIndex => $op) {
             // Other types of inserts should not get split, they need special handling inside of their blot.
@@ -229,26 +238,5 @@ class Parser {
         }
 
         return $newOperations;
-    }
-
-    /**
-     * Replace certain newline characters with a constant the does nothing except for break groups up.
-     * This is used later on in parsing.
-     *
-     * @param array $operations The array of operations to look through.
-     */
-    private function insertBreakPoints(array &$operations) {
-        $lastOpEndsInNewline = false;
-        foreach ($operations as $opIndex => $op) {
-            $isBareInsert = $this->isOperationBareInsert($op);
-            $opIsPlainTextNewline = $isBareInsert && $op["insert"] === "\n";
-            $opEndsInNewline = is_string($op["insert"] ?? null) && preg_match("/\\n$/", $op["insert"]);
-
-            if ($opIsPlainTextNewline && !$lastOpEndsInNewline) {
-//                $operations[$opIndex] = static::BREAK_OPERATION;
-            }
-
-            $lastOpEndsInNewline = $opEndsInNewline;
-        }
     }
 }

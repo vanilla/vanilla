@@ -10,9 +10,9 @@ namespace Vanilla\Formatting\Quill\Blots\Lines;
 use Vanilla\Formatting\Quill\BlotGroup;
 
 /**
- * Blot for Lists of all kinds. All supported types are constants on this class.
+ * A blot to represent a list line terminator.
  */
-class ListLineBlot extends AbstractLineBlot {
+class ListLineTerminatorBlot extends AbstractLineTerminatorBlot {
 
     const LIST_TYPE_BULLET = "bullet";
     const LIST_TYPE_ORDERED = "ordered";
@@ -31,7 +31,7 @@ class ListLineBlot extends AbstractLineBlot {
      */
     public function shouldClearCurrentGroup(BlotGroup $group): bool {
         $surroundingBlot = $group->getBlotForSurroundingTags();
-        if ($surroundingBlot instanceof ListLineBlot) {
+        if ($surroundingBlot instanceof ListLineTerminatorBlot) {
             // If the list types are different we need to clear the block.
             return $surroundingBlot->getListType() !== $this->getListType();
         } else {

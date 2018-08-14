@@ -12,10 +12,9 @@ use Vanilla\Formatting\Quill\Blots\AbstractBlot;
 use Vanilla\Formatting\Quill\Blots\TextBlot;
 
 /**
- * Base blot for items that share a single outer group.
- * Some operations require a different approach to newline rendering than what is found in the Parser.
+ * Base blot for line terminators. A line terminator should not have any text content. Only newlines and breaks.
  */
-abstract class AbstractLineBlot extends TextBlot {
+abstract class AbstractLineTerminatorBlot extends TextBlot {
 
     /**
      * Render additional newlines inside of the line.

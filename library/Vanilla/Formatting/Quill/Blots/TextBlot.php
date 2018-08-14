@@ -10,6 +10,9 @@ namespace Vanilla\Formatting\Quill\Blots;
 use Vanilla\Formatting\Quill\BlotGroup;
 use Vanilla\Formatting\Quill\Parser;
 
+/**
+ * A class for handling formattable text.
+ */
 class TextBlot extends AbstractBlot {
 
     use FormattableTextTrait;

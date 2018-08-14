@@ -10,9 +10,9 @@ namespace Vanilla\Formatting\Quill\Blots\Lines;
 use Vanilla\Formatting\Quill\Parser;
 
 /**
- * Blot for handling spoiler content.
+ * A blot to represent a spoiler line terminator.
  */
-class SpoilerLineBlot extends AbstractLineBlot {
+class SpoilerLineTerminatorBlot extends AbstractLineTerminatorBlot {
 
     /**
      * @inheritDoc

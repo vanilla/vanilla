@@ -8,11 +8,11 @@
 namespace VanillaTests\Library\Vanilla\Formatting\Quill;
 
 use Vanilla\Formatting\Quill\Blots\Embeds\ExternalBlot;
-use Vanilla\Formatting\Quill\Blots\Lines\HeadingBlot;
-use Vanilla\Formatting\Quill\Blots\Lines\BlockquoteLineBlot;
-use Vanilla\Formatting\Quill\Blots\Lines\ListLineBlot;
-use Vanilla\Formatting\Quill\Blots\Lines\SpoilerLineBlot;
-use Vanilla\Formatting\Quill\Blots\Lines\TextLineBlot;
+use Vanilla\Formatting\Quill\Blots\Lines\HeadingTerminatorBlot;
+use Vanilla\Formatting\Quill\Blots\Lines\BlockquoteLineTerminatorBlot;
+use Vanilla\Formatting\Quill\Blots\Lines\ListLineTerminatorBlot;
+use Vanilla\Formatting\Quill\Blots\Lines\SpoilerLineTerminatorBlot;
+use Vanilla\Formatting\Quill\Blots\Lines\ParagraphLineTerminatorBlot;
 use Vanilla\Formatting\Quill\Blots\NullBlot;
 use Vanilla\Formatting\Quill\Blots\TextBlot;
 use VanillaTests\SharedBootstrapTestCase;
@@ -22,7 +22,7 @@ class ParserTest extends SharedBootstrapTestCase {
 
     private function makeParagraphLine(int $count = 1) {
         $content = str_repeat("\n", $count);
-        return ["class" => TextLineBlot::class, "content" => $content];
+        return ["class" => ParagraphLineTerminatorBlot::class, "content" => $content];
     }
 
     /**
@@ -73,7 +73,7 @@ class ParserTest extends SharedBootstrapTestCase {
     public function testSingleNewline() {
         $ops = [["insert" => "\n"]];
         $result = [[[
-            'class' => 'Vanilla\Formatting\Quill\Blots\Lines\TextLineBlot',
+            'class' => 'Vanilla\Formatting\Quill\Blots\Lines\ParagraphLineTerminatorBlot',
             'content' => "\n",
         ]]];
         $this->assertParseResults($ops, $result);
@@ -113,12 +113,12 @@ class ParserTest extends SharedBootstrapTestCase {
      * Test the parsing of block level blots. Lines, headings, etc.
      */
     public function testBlockBlotNewlines() {
-        $this->assertCorrectLineBlotParsing("list", "bullet", ListLineBlot::class);
-        $this->assertCorrectLineBlotParsing("list", "ordered", ListLineBlot::class);
-        $this->assertCorrectLineBlotParsing("spoiler-line", true, SpoilerLineBlot::class);
-        $this->assertCorrectLineBlotParsing("blockquote-line", true, BlockquoteLineBlot::class);
-        $this->assertCorrectNonLineBlockBlockParsing("header", 2, HeadingBlot::class);
-        $this->assertCorrectNonLineBlockBlockParsing("header", 3, HeadingBlot::class);
+        $this->assertCorrectLineBlotParsing("list", "bullet", ListLineTerminatorBlot::class);
+        $this->assertCorrectLineBlotParsing("list", "ordered", ListLineTerminatorBlot::class);
+        $this->assertCorrectLineBlotParsing("spoiler-line", true, SpoilerLineTerminatorBlot::class);
+        $this->assertCorrectLineBlotParsing("blockquote-line", true, BlockquoteLineTerminatorBlot::class);
+        $this->assertCorrectNonLineBlockBlockParsing("header", 2, HeadingTerminatorBlot::class);
+        $this->assertCorrectNonLineBlockBlockParsing("header", 3, HeadingTerminatorBlot::class);
     }
 
     /**
@@ -273,15 +273,15 @@ class ParserTest extends SharedBootstrapTestCase {
         $result = [
             [
                 ["class" => TextBlot::class, "content" => "Quote"],
-                ["class" => BlockquoteLineBlot::class, "content" => "\n"],
+                ["class" => BlockquoteLineTerminatorBlot::class, "content" => "\n"],
                 ["class" => TextBlot::class, "content" => "Quote"],
-                ["class" => BlockquoteLineBlot::class, "content" => "\n"],
+                ["class" => BlockquoteLineTerminatorBlot::class, "content" => "\n"],
             ],
             [
                 ["class" => TextBlot::class, "content" => "List"],
-                ["class" => ListLineBlot::class, "content" => "\n"],
+                ["class" => ListLineTerminatorBlot::class, "content" => "\n"],
                 ["class" => TextBlot::class, "content" => "List"],
-                ["class" => ListLineBlot::class, "content" => "\n"],
+                ["class" => ListLineTerminatorBlot::class, "content" => "\n"],
             ],
         ];
 
@@ -294,7 +294,7 @@ class ParserTest extends SharedBootstrapTestCase {
      */
     public function testEmptyHeadingBlots() {
         $ops = [["attributes" => ["header" => 2], "content" => "\n"]];
-        $result = [[["class" => HeadingBlot::class, "content" => ""]]];
+        $result = [[["class" => HeadingTerminatorBlot::class, "content" => ""]]];
         $this->assertParseResults($ops, $result);
 
         $ops = [["attributes" => ["header" => 5], "content" => "\n"]];
@@ -317,7 +317,7 @@ class ParserTest extends SharedBootstrapTestCase {
             ["class" => TextBlot::class, "content" => "bold "],
             ["class" => TextBlot::class, "content" => "italic "],
             ["class" => TextBlot::class, "content" => "strike"],
-            ["class" => HeadingBlot::class, "content" => "\n"],
+            ["class" => HeadingTerminatorBlot::class, "content" => "\n"],
         ]];
 
         $this->assertParseResults($ops, $result);

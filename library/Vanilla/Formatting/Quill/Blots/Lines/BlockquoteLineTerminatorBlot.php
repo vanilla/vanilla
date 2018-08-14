@@ -10,9 +10,9 @@ namespace Vanilla\Formatting\Quill\Blots\Lines;
 use Vanilla\Formatting\Quill\Parser;
 
 /**
- * Class for handling blockquote operations.
+ * Blot for handling blockquote line terminators.
  */
-class BlockquoteLineBlot extends AbstractLineBlot {
+class BlockquoteLineTerminatorBlot extends AbstractLineTerminatorBlot {
 
     /**
      * @inheritDoc

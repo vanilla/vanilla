@@ -9,11 +9,11 @@ namespace Vanilla\Formatting\Quill\Blots\Lines;
 use Vanilla\Formatting\Quill\BlotGroup;
 
 /**
- * Blot to represent headings.
+ * Blot to represent heading line terminators.
  *
  * Currently only 2 levels are allowed.
  */
-class HeadingBlot extends AbstractLineBlot {
+class HeadingTerminatorBlot extends AbstractLineTerminatorBlot {
 
     /** @var array Valid heading levels. */
     private static $validLevels = [2, 3];

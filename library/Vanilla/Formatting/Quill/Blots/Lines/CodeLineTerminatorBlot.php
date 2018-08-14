@@ -8,12 +8,12 @@
 namespace Vanilla\Formatting\Quill\Blots\Lines;
 
 /**
- * Blot for handling code blocks.
+ * Blot for handling code line terminators.
  *
  * Newlines are handled slightly differently here than for regular text because of the `whitespace: pre` that is applied
  * to code blocks. We do not want the newlines to be transformed into breaks.
  */
-class CodeLineBlot extends AbstractLineBlot {
+class CodeLineTerminatorBlot extends AbstractLineTerminatorBlot {
 
     protected $lineBreakText = "\n";
 

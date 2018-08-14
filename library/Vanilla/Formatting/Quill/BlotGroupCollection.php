@@ -8,56 +8,92 @@
 namespace Vanilla\Formatting\Quill;
 
 use Vanilla\Formatting\Quill\Blots\AbstractBlot;
-use Vanilla\Formatting\Quill\Blots\Lines\AbstractLineBlot;
+use Vanilla\Formatting\Quill\Blots\Lines\AbstractLineTerminatorBlot;
 
-class BlotGroupFactory {
+/**
+ * Class for sorting operations into blots and groups.
+ */
+class BlotGroupCollection implements \Iterator {
 
-    /** @var array[] */
+    /** @var array[] The operations to parse. */
     private $operations;
-    /** @var string[]  */
+
+    /** @var string[] The blots that we are allowed to parse out. */
     private $allowedBlotClasses;
-    /** @var string */
+
+    /** @var string The parsing mode to be passed through to blots when they are created. */
     private $parseMode = Parser::PARSE_MODE_NORMAL;
-    /** @var AbstractBlot */
-    private $inProgressBlot;
-    /** @var BlotGroup */
-    private $inProgressGroup;
-    /** @var array[] */
-    private $inProgressLine;
-    /** @var BlotGroup[] */
+
+    /** @var BlotGroup[] The array of groups being built up. */
     private $groups;
 
+    /** @var AbstractBlot The blot being build up in the iteration */
+    private $inProgressBlot;
+
+    /** @var BlotGroup the group being built up in the iteration. */
+    private $inProgressGroup;
+
+    /** @var array[] the line being built up in the iteration. */
+    private $inProgressLine;
+
+    /** @var array The primary operation being iterated. */
     private $currentOp;
+
+    /** @var array The next operation being iterated. */
     private $nextOp;
+
+    /** @var array The previous operation being iterated. */
     private $prevOp;
 
-    /**
-     * @return BlotGroup[]
-     */
-    public function getGroups(): array {
-        return $this->groups;
+    // ITERABLE IMPLEMENTATION
+    public function current() {
+        return current($this->groups);
     }
+
+    public function next() {
+        return next($this->groups);
+    }
+
+    public function key() {
+        return key($this->groups);
+    }
+
+    public function valid() {
+        return key($this->groups) !== null;
+    }
+
+    public function rewind() {
+        return reset($this->groups);
+    }
+
+    // PRIVATE IMPLEMENTATION DETAILS
 
     /**
      * BlotGroupFactory constructor.
      *
-     * @param array[] $operations
-     * @param string[] $allowedBlotClasses
+     * @param array[] $operations The operations to generate groups for.
+     * @param string[] $allowedBlotClasses The class names of the blots we are allowed to create in the groups.
+     * @param string $parseMode The parsing mode to create the blots with.
      */
-    public function __construct(array $operations, array $allowedBlotClasses) {
+    public function __construct(array $operations, array $allowedBlotClasses, string $parseMode) {
         $this->operations = $operations;
         $this->allowedBlotClasses = $allowedBlotClasses;
-        $this->inProgressGroup = new BlotGroup();
-        $this->inProgressLine = [];
-        $this->groups = [];
+        $this->parseMode = $parseMode;
         $this->createBlotGroups();
     }
 
+    /**
+     * Push the current line into the group and reset the line.
+     */
     private function clearLine() {
         $this->inProgressGroup->pushBlots($this->inProgressLine);
         $this->inProgressLine = [];
     }
 
+    /**
+     * Push the group into our groups array and start a new one.
+     * Do not push an empty group.
+     */
     private function clearBlotGroup() {
         if (!$this->inProgressGroup->isEmpty()) {
             $this->groups[] = $this->inProgressGroup;
@@ -65,24 +101,19 @@ class BlotGroupFactory {
         }
     }
 
-
     /**
-     * Create blot groups out of an array of operations.
-     *
-     * @param array $operations The pre-parsed operations
-     * @param string $parseMode The parse mode to create blots with.
-     *
-     * @return BlotGroup[]
+     * Create Blots and their groups.
      */
     private function createBlotGroups() {
-        $operationLength = count($this->operations);
+        $this->inProgressGroup = new BlotGroup();
+        $this->inProgressLine = [];
+        $this->groups = [];
 
-        for ($i = 0; $i < $operationLength; $i++) {
+        for ($i = 0; $i < count($this->operations); $i++) {
             $this->currentOp = $this->operations[$i];
             $this->prevOp = $this->operations[$i - 1] ?? [];
             $this->nextOp = $this->operations[$i + 1] ?? [];
             $this->inProgressBlot = $this->getCurrentBlot();
-
 
             // In event of break blots we want to clear the group if applicable and the skip to the next item.
             if ($this->currentOp === Parser::BREAK_OPERATION) {
@@ -92,25 +123,31 @@ class BlotGroupFactory {
             }
 
             // Ask the blot if it should close the current group.
-            if ($this->inProgressBlot instanceof AbstractLineBlot) {
+            if ($this->inProgressBlot instanceof AbstractLineTerminatorBlot) {
                 if (($this->inProgressBlot->shouldClearCurrentGroup($this->inProgressGroup))) {
                     $this->clearBlotGroup();
                 }
+
+                // Clear the line because we we had line terminator.
                 $this->clearLine();
             }
 
+            // Push the blot into our current line.
             $this->inProgressLine[] = $this->inProgressBlot;
 
-            if ($this->inProgressBlot instanceof AbstractLineBlot) {
+            // Clear the line because we have a line terminator.
+            if ($this->inProgressBlot instanceof AbstractLineTerminatorBlot) {
                 $this->clearLine();
             }
 
-            // Some block type blots get a group all to themselves.
-            if ( $this->inProgressBlot->isOwnGroup()) {
+            // Some block type blots get a group (and line) all to themselves.
+            if ($this->inProgressBlot->isOwnGroup()) {
                 $this->clearLine();
                 $this->clearBlotGroup();
             }
         }
+
+        // Iteration is done so we need to clear the line then the group.
         $this->clearLine();
         if (!$this->inProgressGroup->isEmpty()) {
             $this->groups[] = $this->inProgressGroup;

@@ -530,6 +530,7 @@ if (!function_exists('cssClass')) {
      * Used by category, discussion, and comment lists.
      *
      * @param array|object $row
+     * @param bool $inList Whether or not we are in a discussion list.
      * @return string The CSS classes to be inserted into the row.
      */
     function cssClass($row, $inList = true) {
@@ -572,21 +573,22 @@ if (!function_exists('cssClass')) {
             }
 
             $cssClass .= ($row['Closed'] ?? '') == '1' ? ' Closed' : '';
-            $cssClass .= ($row['InsertUserID'] ?? false ) == $session->UserID ? ' Mine' : '';
             $cssClass .= ($row['Participated'] ?? '') == '1' ? ' Participated' : '';
-            if (array_key_exists('CountUnreadComments', $row) && $session->isValid()) {
-                $countUnreadComments = $row['CountUnreadComments'];
-                if ($countUnreadComments === true) {
-                    $cssClass .= ' New';
-                } elseif ($countUnreadComments == 0) {
-                    $cssClass .= ' Read';
-                } else {
-                    $cssClass .= ' Unread';
-                }
-            } elseif (($isRead = ($row['Read'])) !== null) {
-                // Category list
-                $cssClass .= $isRead ? ' Read' : ' Unread';
+        }
+
+        $cssClass .= ($row['InsertUserID'] ?? false ) == $session->UserID ? ' Mine' : '';
+        if (array_key_exists('CountUnreadComments', $row) && $session->isValid()) {
+            $countUnreadComments = $row['CountUnreadComments'];
+            if ($countUnreadComments === true) {
+                $cssClass .= ' New';
+            } elseif ($countUnreadComments == 0) {
+                $cssClass .= ' Read';
+            } else {
+                $cssClass .= ' Unread';
             }
+        } elseif (($isRead = ($row['Read'] ?? null)) !== null) {
+            // Category list
+            $cssClass .= $isRead ? ' Read' : ' Unread';
         }
 
         // Comment list classes

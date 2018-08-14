@@ -77,7 +77,7 @@ if (!function_exists('writeComment')) :
             $sender->CanEditComments = $session->checkPermission('Vanilla.Comments.Edit', true, 'Category', 'any') && c('Vanilla.AdminCheckboxes.Use');
         }
         // Prep event args
-        $cssClass = cssClass($comment, $currentOffset);
+        $cssClass = cssClass($comment, false);
         $sender->EventArguments['Comment'] = &$comment;
         $sender->EventArguments['Author'] = &$author;
         $sender->EventArguments['CssClass'] = &$cssClass;

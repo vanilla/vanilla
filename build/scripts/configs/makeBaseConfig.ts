@@ -14,7 +14,6 @@ import HappyPack from "happypack";
 import ForkTsCheckerWebpackPlugin from "fork-ts-checker-webpack-plugin";
 import { getOptions } from "../options";
 import chalk from "chalk";
-import { print } from "util";
 import { printVerbose } from "../utility/utils";
 const realPath = promisify(realpath);
 
@@ -40,12 +39,7 @@ export async function makeBaseConfig(section: string) {
 ${chalk.green(aliases)}`;
     printVerbose(message);
 
-    let tsSourceIncludes = await getScriptSourceDirectories(section);
-    tsSourceIncludes = await Promise.all(
-        tsSourceIncludes.map(file => {
-            return realPath(file);
-        }),
-    );
+    const tsSourceIncludes = await getScriptSourceDirectories(section);
 
     const config = {
         context: VANILLA_ROOT,

@@ -92,7 +92,9 @@ class QuotesPlugin extends Gdn_Plugin {
         if ($sender->User->UserID != $viewingUserID) {
             $sender->permission('Garden.Users.Edit');
             $userID = $sender->User->UserID;
-            $sender->setData('ForceEditing', $sender->User->Name);
+            $userName = $sender->User->Name;
+            $userName = htmlspecialchars($userName);
+            $sender->setData('ForceEditing', $userName);
         } else {
             $sender->setData('ForceEditing', false);
         }

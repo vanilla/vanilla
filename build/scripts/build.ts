@@ -23,6 +23,7 @@ async function run() {
     const options = await getOptions();
     switch (options.mode) {
         case BuildMode.PRODUCTION:
+        case BuildMode.ANALYZE:
             return await runProd();
         case BuildMode.DEVELOPMENT:
             return await runDev();

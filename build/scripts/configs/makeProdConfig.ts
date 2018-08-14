@@ -12,6 +12,8 @@ import { makeBaseConfig } from "./makeBaseConfig";
 import { BundleAnalyzerPlugin } from "webpack-bundle-analyzer";
 import UglifyJsPlugin from "uglifyjs-webpack-plugin";
 
+let analyzePort = 8888;
+
 /**
  * Create the production config.
  *
@@ -69,7 +71,12 @@ export async function makeProdConfig(section: string) {
 
     // Spawn a bundle size analyzer. This is super usefull if you find a bundle has jumped up in size.
     if (options.mode === BuildMode.ANALYZE) {
-        baseConfig.plugins!.push(new BundleAnalyzerPlugin());
+        baseConfig.plugins!.push(
+            new BundleAnalyzerPlugin({
+                analyzerPort: analyzePort,
+            }),
+        );
+        analyzePort++;
     }
 
     return baseConfig;

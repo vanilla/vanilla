@@ -5,8 +5,6 @@
  */
 
 import * as path from "path";
-import { realpath } from "fs";
-import { promisify } from "util";
 import { VANILLA_ROOT, TS_CONFIG_FILE, TS_LINT_FILE, PRETTIER_FILE } from "../env";
 import { getAddonAliasMapping, getScriptSourceDirectories, lookupAddonPaths } from "../utility/addonUtils";
 import PrettierPlugin from "prettier-webpack-plugin";
@@ -15,7 +13,6 @@ import ForkTsCheckerWebpackPlugin from "fork-ts-checker-webpack-plugin";
 import { getOptions } from "../options";
 import chalk from "chalk";
 import { printVerbose } from "../utility/utils";
-const realPath = promisify(realpath);
 
 /**
  * Create the core webpack config.

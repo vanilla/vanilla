@@ -5,7 +5,7 @@
  */
 
 import Delta from "quill-delta";
-import Quill from "@rich-editor/quill";
+import Quill from "quill/core";
 import KeyboardBindings from "./KeyboardBindings";
 import { expect } from "chai";
 const LINE_FORMATS = ["blockquote-line", "spoiler-line"];

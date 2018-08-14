@@ -9,7 +9,6 @@ import { t } from "@dashboard/application";
 import getStore from "@dashboard/state/getStore";
 import { hasPermission } from "@dashboard/permissions";
 import { log, debug, sanitizeUrl } from "@dashboard/utility";
-import Quill from "@rich-editor/quill";
 import EmbedPopover from "@rich-editor/components/popovers/EmbedPopover";
 import EmojiPopover from "@rich-editor/components/popovers/EmojiPopover";
 import MentionToolbar from "@rich-editor/components/toolbars/MentionToolbar";
@@ -20,11 +19,13 @@ import { EditorProvider } from "@rich-editor/components/context";
 import EditorDescriptions from "@rich-editor/components/editor/pieces/EditorDescriptions";
 import { Provider as ReduxProvider } from "react-redux";
 import { actions } from "@rich-editor/state/instance/instanceActions";
-import { getIDForQuill, isEmbedSelected, SELECTION_UPDATE } from "@rich-editor/quill/utility";
+import { getIDForQuill, SELECTION_UPDATE } from "@rich-editor/quill/utility";
 import { IStoreState } from "@rich-editor/@types/store";
 import { delegateEvent, removeDelegatedEvent } from "@dashboard/dom";
 import EmbedInsertionModule from "@rich-editor/quill/EmbedInsertionModule";
-import { Sources } from "quill/core";
+import Quill, { Sources } from "quill/core";
+import { hot } from "react-hot-loader";
+import registerQuill from "@rich-editor/quill/registerQuill";
 
 interface IProps {
     editorID: string;
@@ -33,7 +34,7 @@ interface IProps {
     isPrimaryEditor: boolean;
 }
 
-export default class Editor extends React.Component<IProps> {
+export class Editor extends React.Component<IProps> {
     private hasUploadPermission: boolean;
     private quillMountRef: React.RefObject<HTMLDivElement> = React.createRef();
     private store = getStore<IStoreState>();
@@ -51,6 +52,7 @@ export default class Editor extends React.Component<IProps> {
     public componentDidMount() {
         // Setup quill
         const { bodybox } = this.props;
+        registerQuill();
         const options = { theme: "vanilla" };
         this.quill = new Quill(this.quillMountRef!.current!, options);
         bodybox.style.display = "none";
@@ -217,3 +219,5 @@ export default class Editor extends React.Component<IProps> {
         }
     }
 }
+
+export default hot(module)(Editor);

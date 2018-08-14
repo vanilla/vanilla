@@ -5,10 +5,9 @@
  */
 
 import * as utility from "./utility";
-import Quill from "@rich-editor/quill";
+import Quill from "quill/core";
 import { expect } from "chai";
 import { getIDForQuill, insertBlockBlotAt } from "./utility";
-import Parchment from "parchment";
 import FocusableEmbedBlot from "@rich-editor/quill/blots/abstract/FocusableEmbedBlot";
 
 const prettyNewline = (contents: string) => contents.replace(/\n/g, "↵ ");

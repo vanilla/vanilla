@@ -1885,9 +1885,9 @@ class Gdn_Controller extends Gdn_Pluggable {
                 $polyfillContent = $AssetModel->getInlinePolyfillJSContent();
                 $this->Head->addScript(null, null, false, ["content" => $polyfillContent]);
 
-                // Add the built addon javascript files.
-                $addonJs = $AssetModel->getAddonJsFiles($ThemeType, $this->MasterView === 'admin' ? 'admin' : 'app', $ETag);
-                foreach ($addonJs as $path) {
+                // Add the built webpack javascript files.
+                $webpackJs = $AssetModel->getWebpackJsFiles($this->MasterView === 'admin' ? 'admin' : 'forum');
+                foreach ($webpackJs as $path) {
                     $this->Head->addScript($path."?h=$busta", 'text/javascript', false, ['defer' => 'true']);
                 }
 

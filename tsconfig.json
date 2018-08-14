@@ -19,10 +19,6 @@
             "@dashboard/*": ["./applications/dashboard/src/scripts/*"],
             "@rich-editor/*": ["./plugins/rich-editor/src/scripts/*"],
             "@testroot/*": ["./tests/javascript/*"],
-            "*": [
-                "./node_modules/*",
-                "./plugins/rich-editor/node_modules/*"
-            ]
         },
         "typeRoots": [
             "@types",

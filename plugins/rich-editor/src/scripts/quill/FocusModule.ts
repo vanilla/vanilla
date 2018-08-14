@@ -337,6 +337,9 @@ export default class EmbedFocusModule extends Module {
      * @param keyCode The keycode that was pressed.
      */
     private getNextBlotFromArrowKey(currentBlot: Blot, keyCode: number) {
+        if (!currentBlot) {
+            return null;
+        }
         switch (keyCode) {
             case KeyboardModule.keys.DOWN:
                 return currentBlot.next as Blot;

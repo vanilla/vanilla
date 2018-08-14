@@ -88,16 +88,15 @@ export class QuoteEmbed extends React.Component<IEmbedProps<IEmbedData>, IState>
         const { body, insertUser } = this.quoteData;
         const id = uniqueId("collapsableContent-");
 
-        const title = this.props.data.name ? (
-            <h3 className="embedText-title embedQuote-title">{this.props.data.name}</h3>
-        ) : null;
+        const name = (this.quoteData as any).name;
+        const title = name ? <h3 className="embedText-title embedQuote-title">{name}</h3> : null;
 
         const bodyClasses = classnames("embedText-body", "embedQuote-body", { isCollapsed: this.state.isCollapsed });
         const userUrl = makeProfileUrl(insertUser.name);
 
         return (
             <blockquote className={bodyClasses}>
-                <div className="embedQuote-header">
+                <div className="embedText-header embedQuote-header">
                     {title}
                     <a href={userUrl} className="embedQuote-userLink">
                         <span className="embedQuote-userPhotoWrap">

@@ -595,7 +595,7 @@ export function getDraggedImage(event: DragEvent): File | undefined {
 export function getPastedImage(event: ClipboardEvent): File | undefined | null {
     if (event.clipboardData && event.clipboardData.items && event.clipboardData.items.length) {
         const files = Array.from(event.clipboardData.items)
-            .map(item => (item.getAsFile ? item.getAsFile() : null))
+            .map((item: any) => (item.getAsFile ? item.getAsFile() : null))
             .filter(Boolean);
 
         if (files.length > 0) {

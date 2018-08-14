@@ -41,7 +41,7 @@ class PageScraperTest extends SharedBootstrapTestCase {
             [
                 'jsonld.htm',
                 [
-                    'Title' => 'I am a standard title.',
+                    'Title' => 'I am a ständard title.',
                     'Description' => 'I am a standard description.',
                     'Images' => [],
                     'Attributes' => [
@@ -98,8 +98,70 @@ class PageScraperTest extends SharedBootstrapTestCase {
     public function testFetch(string $file, array $expected) {
         $pageScraper = $this->pageScraper();
         $url = 'file://'.self::HTML_DIR."/{$file}";
-        $expected['Url'] = $url;
         $result = $pageScraper->pageInfo($url);
+        $expected['Url'] = $url;
         $this->assertEquals($expected, $result);
+    }
+
+    /**
+     * Scrape a file and return its result.
+     *
+     * @param string $file The file to scrape.
+     * @return array Returns page info.
+     * @throws Exception Throws an exception if there was a non-recoverable error scraping.
+     */
+    protected function scrapeFile(string $file) {
+        $scraper = $this->pageScraper();
+        $url = 'file://'.self::HTML_DIR."/{$file}";
+        $result = $scraper->pageInfo($url);
+
+        return $result;
+
+    }
+
+    /**
+     * Test page fetching with unicode characters.
+     *
+     * @param string $file The file to test.
+     * @dataProvider provideUnicodeFiles
+     */
+    public function testUnicodeFetch(string $file) {
+        $result = $this->scrapeFile($file);
+
+        $this->assertEquals('Test · Hello World', $result['Title']);
+        $this->assertEquals('😀😄😘<>', $result['Description']);
+    }
+
+    /**
+     * Provide some unicode test files.
+     *
+     * @return array Returns a data provider.
+     */
+    public function provideUnicodeFiles() {
+        $r = [['unicode.htm'], ['unicode-xml.htm'], ['unicode-no-hint.htm'], ['unicode-xml-comment.htm'], ['unicode-http-equiv.htm']];
+
+        return array_column($r, null, 0);
+    }
+
+    /**
+     * Test scraping a file that isn't in unicode to make sure it doesn't bork.
+     *
+     * @param string $file The name of the file to test.
+     * @dataProvider provideKOI8RFiles
+     */
+    public function testKoi8(string $file) {
+        $result = $this->scrapeFile($file);
+
+        $this->assertEquals('ЧАСНЫЕ ОБЪЯВЛЕНИЯ', $result['Title']);
+    }
+
+    /**
+     * Provide some KOI8-R test files.
+     *
+     * @return array Returns a data provider.
+     */
+    public function provideKOI8RFiles() {
+        $r = [['koi8-1.htm'], ['koi8-2.htm'], ['koi8-3.htm']];
+        return array_column($r, null, 0);
     }
 }

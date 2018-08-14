@@ -153,24 +153,38 @@ class AssetModel extends Gdn_Model {
         return $paths;
     }
 
-    public function getAddonJsFiles($themeType, $basename, $eTag) {
-        $basename = $basename === 'style' ? 'app' : $basename;
-
+    /**
+     * Get files built from webpack using the in-repo build process.
+     *
+     * These follow a pretty strict pattern of:
+     *
+     * - webpack runtime
+     * - vendor chunks
+     * - library chunks
+     * - entry chunks
+     * - bootstrap
+     *
+     * @param string $basename - The section of the theme to lookup.
+     * @return array
+     */
+    public function getWebpackJsFiles(string $section) {
         if (c("HotReload.Enabled", false)) {
             $ip = c("HotReload.IP", "127.0.0.1");
             return [
-                "http://$ip:3030/$basename-hot-bundle.js"
+                "http://$ip:3030/$section-hot-bundle.js"
             ];
         }
 
-        if (!in_array($basename, ['app', 'admin'], true)) {
-            trigger_error("Unknown core js basename: $basename");
+        if (!in_array($section, ['forum', 'admin'], true)) {
+            trigger_error("Unknown core js basename: $section");
             return [];
         }
 
         // Add the lib.
-        $libs = [];
-        $addons = [];
+        $result = [
+            "/js/webpack/runtime-$section.min.js",
+            "/js/webpack/vendors-$section.min.js",
+        ];
 
         // Loop through the enabled addons and get their javascript.
         foreach ($this->addonManager->getEnabled() as $addon) {
@@ -179,20 +193,22 @@ class AssetModel extends Gdn_Model {
                 continue;
             }
 
-            $build = $addon->getInfoValue('build', []);
-            if (valr("exports.$basename", $build, null) !== null) {
-                $libs[] = $addon->path("/js/$basename/lib-".$addon->getKey()."-$basename.min.js", Addon::PATH_ADDON);
+            $subLibraryPath = "/js/webpack/library-$section.min.js";
+
+            $localPath = $addon->path($subLibraryPath, Addon::PATH_REAL);
+            if (file_exists($localPath)) {
+                $result[] = $localPath = $addon->path($subLibraryPath, Addon::PATH_ADDON);
             }
-            if (valr("entries.$basename", $build, null) !== null) {
-                $addons[] = $addon->path("/js/$basename/".$addon->getKey()."-$basename.min.js", Addon::PATH_ADDON);
+
+            $subPath = "/js/webpack/$section.min.js";
+            $localPath = $addon->path($subPath, Addon::PATH_REAL);
+            if (file_exists($localPath)) {
+                $result[] = $localPath = $addon->path($subPath, Addon::PATH_ADDON);
             }
         }
 
         // Add the bootstrap after everything else.
-        $dashboardAddon = $this->addonManager->lookupAddon("dashboard");
-        $addons[] = $dashboardAddon->path("/js/$basename/dashboard-bootstrap-$basename.min.js", Addon::PATH_ADDON);
-        $result = array_merge($libs, $addons);
-
+        $result[] = "/js/webpack/bootstrap-$section.min.js";
         return $result;
     }
 
@@ -202,9 +218,7 @@ class AssetModel extends Gdn_Model {
      * @return string
      */
     public function getInlinePolyfillJSContent(): string {
-        $dashboardAddon = $this->addonManager->lookupAddon("dashboard");
-        $polyfillFileUrl = $dashboardAddon->path("/js/polyfills/dashboard-polyfills.min.js?h="
-            .$this->cacheBuster(), Addon::TYPE_ADDON);
+        $polyfillFileUrl = asset("/js/webpack/polyfills.min.js?h=".$this->cacheBuster());
 
         $debug = c("Debug", false);
         $logAdding = $debug ? "console.log('Older browser detected. Initiating polyfills.');" : "";

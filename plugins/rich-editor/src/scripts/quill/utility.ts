@@ -8,10 +8,10 @@ import Emitter from "quill/core/emitter";
 import Quill, { RangeStatic, Blot } from "quill/core";
 import KeyboardModule from "quill/modules/keyboard";
 import Delta from "quill-delta";
-import Parchment from "parchment";
 import { matchAtMention } from "@dashboard/utility";
 import uniqueId from "lodash/uniqueId";
 import FocusableEmbedBlot from "@rich-editor/quill/blots/abstract/FocusableEmbedBlot";
+import BlockBlot from "@rich-editor/quill/blots/blocks/BlockBlot";
 
 interface IBoundary {
     start: number;
@@ -220,7 +220,7 @@ export function normalizeBlotIntoBlock(blot: Blot): Blot {
 export function insertNewLineAfterBlotAndTrim(quill, range: RangeStatic, deleteAmount = 1) {
     const [line, offset] = quill.getLine(range.index);
 
-    const newBlot = Parchment.create("block", "");
+    const newBlot = new BlockBlot(BlockBlot.create(""));
     const thisBlot = line;
 
     const nextBlot = thisBlot.next;
@@ -239,7 +239,7 @@ export function insertNewLineAfterBlotAndTrim(quill, range: RangeStatic, deleteA
  * @param quill - The quill instance.
  */
 export function insertNewLineAtEndOfScroll(quill: Quill) {
-    const newLineBlot = Parchment.create("block");
+    const newLineBlot = new BlockBlot(BlockBlot.create(""));
     quill.scroll.appendChild(newLineBlot);
     quill.update(Quill.sources.USER);
     quill.setSelection(quill.scroll.length(), 0);
@@ -251,7 +251,7 @@ export function insertNewLineAtEndOfScroll(quill: Quill) {
  * @param quill - The quill instance.
  */
 export function insertNewLineAtStartOfScroll(quill: Quill) {
-    const newLineBlot = Parchment.create("block");
+    const newLineBlot = new BlockBlot(BlockBlot.create(""));
     quill.scroll.insertBefore(newLineBlot, quill.scroll.children.head);
     quill.update(Quill.sources.USER);
     quill.setSelection(0, 0);

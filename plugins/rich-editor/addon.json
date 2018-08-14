@@ -1,7 +1,7 @@
 {
-    "name": "Rich Editor (WIP)",
+    "name": "Rich Editor (Beta)",
     "description": "The new WYSIWYG editor for Vanilla. Easy to use, with support for rich content embedding. Also supports a more minimal text mode, Markdown, and BBCode.",
-    "version": "0.1",
+    "version": "0.9",
     "mobileFriendly": true,
     "hasLocale": true,
     "icon": "rich_editor.png",
@@ -17,16 +17,5 @@
     "require": {
         "vanilla": ">=2.5",
         "dashboard": ">= 2.6"
-    },
-    "conflict": {
-        "Quotes": "*",
-        "editor": "*"
-    },
-    "build": {
-        "process": "core",
-        "entries": {
-            "app": "./src/scripts/entries/app",
-            "admin": "./src/scripts/entries/admin"
-        }
     }
 }

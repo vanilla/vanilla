@@ -5,10 +5,7 @@
  */
 
 const path = require("path");
-const fs = require("fs");
 const webpack = require("webpack");
-const chalk = require("chalk");
-const glob = require("glob");
 
 const VANILLA_ROOT = path.resolve(path.join(__dirname, "../../"));
 
@@ -42,16 +39,16 @@ module.exports = {
                 include: [/\/src\/scripts/, /tests\/javascript/],
                 use: [
                     {
-                        loader: "awesome-typescript-loader",
+                        loader: "babel-loader",
                         options: {
-                            useBabel: true,
-                            useCache: true,
-                            configFileName: path.resolve(VANILLA_ROOT, "tsconfig.json"),
-                            forceIsolatedModules: true,
-                            babelOptions: {
-                                babelrc: false,
-                                presets: ["@vanillaforums/babel-preset"],
-                            },
+                            presets: ["@vanillaforums/babel-preset"],
+                            cacheDirectory: true,
+                        },
+                    },
+                    {
+                        loader: "ts-loader",
+                        options: {
+                            configFile: path.resolve(VANILLA_ROOT, "tsconfig.json"),
                         },
                     },
                 ],

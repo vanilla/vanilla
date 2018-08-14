@@ -4,7 +4,7 @@
  * @license https://opensource.org/licenses/GPL-2.0 GPL-2.0
  */
 
-import Quill from "./index";
+import Quill from "quill/core";
 import LinkBlot from "quill/formats/link";
 import BoldBlot from "quill/formats/bold";
 import ItalicBlot from "quill/formats/italic";

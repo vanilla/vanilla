@@ -3,6 +3,9 @@
 !/applications/dashboard/
 !/applications/vanilla/
 /build/*
+!/build/entries
+!/build/scripts
+!/build/tsconfig.json
 !/build/.htaccess
 !/build/build.xml
 !/build/package-include.txt

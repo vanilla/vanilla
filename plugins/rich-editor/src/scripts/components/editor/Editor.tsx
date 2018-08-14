@@ -9,7 +9,6 @@ import { t } from "@dashboard/application";
 import getStore from "@dashboard/state/getStore";
 import { hasPermission } from "@dashboard/permissions";
 import { log, debug, sanitizeUrl } from "@dashboard/utility";
-import Quill from "@rich-editor/quill";
 import EmbedPopover from "@rich-editor/components/popovers/EmbedPopover";
 import EmojiPopover from "@rich-editor/components/popovers/EmojiPopover";
 import MentionToolbar from "@rich-editor/components/toolbars/MentionToolbar";
@@ -24,8 +23,9 @@ import { getIDForQuill, isEmbedSelected, SELECTION_UPDATE } from "@rich-editor/q
 import { IStoreState } from "@rich-editor/@types/store";
 import { delegateEvent, removeDelegatedEvent } from "@dashboard/dom";
 import EmbedInsertionModule from "@rich-editor/quill/EmbedInsertionModule";
-import { Sources } from "quill/core";
+import Quill, { Sources } from "quill/core";
 import { hot } from "react-hot-loader";
+import registerQuill from "@rich-editor/quill/registerQuill";
 
 interface IProps {
     editorID: string;
@@ -52,6 +52,7 @@ export class Editor extends React.Component<IProps> {
     public componentDidMount() {
         // Setup quill
         const { bodybox } = this.props;
+        registerQuill();
         const options = { theme: "vanilla" };
         this.quill = new Quill(this.quillMountRef!.current!, options);
         bodybox.style.display = "none";

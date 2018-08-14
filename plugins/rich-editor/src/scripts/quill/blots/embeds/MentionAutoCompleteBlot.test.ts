@@ -8,11 +8,9 @@ import Quill from "quill/core";
 import MentionAutoCompleteBlot from "./MentionAutoCompleteBlot";
 import { expect } from "chai";
 import { IMentionSuggestionData } from "@rich-editor/components/toolbars/pieces/MentionSuggestion";
-import registerQuill from "@rich-editor/quill/registerQuill";
 
 describe("[MentionAutoCompleteBlot]", () => {
     it("can be finalized.", () => {
-        registerQuill();
         const quill = new Quill(document.body);
 
         const data: IMentionSuggestionData = {

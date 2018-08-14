@@ -19,7 +19,7 @@ import { EditorProvider } from "@rich-editor/components/context";
 import EditorDescriptions from "@rich-editor/components/editor/pieces/EditorDescriptions";
 import { Provider as ReduxProvider } from "react-redux";
 import { actions } from "@rich-editor/state/instance/instanceActions";
-import { getIDForQuill, isEmbedSelected, SELECTION_UPDATE } from "@rich-editor/quill/utility";
+import { getIDForQuill, SELECTION_UPDATE } from "@rich-editor/quill/utility";
 import { IStoreState } from "@rich-editor/@types/store";
 import { delegateEvent, removeDelegatedEvent } from "@dashboard/dom";
 import EmbedInsertionModule from "@rich-editor/quill/EmbedInsertionModule";

@@ -4060,7 +4060,7 @@ class UserModel extends Gdn_Model {
     /**
      * Set fields that need additional manipulation after retrieval.
      *
-     * @param array|object &$usera
+     * @param array|object &$user
      * @throws Exception
      */
     public function setCalculatedFields(&$user) {

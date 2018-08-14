@@ -5,6 +5,8 @@
  */
 
 import * as path from "path";
+import { realpath } from "fs";
+import { promisify } from "util";
 import { VANILLA_ROOT, TS_CONFIG_FILE, TS_LINT_FILE, PRETTIER_FILE } from "../env";
 import { getAddonAliasMapping, getScriptSourceDirectories, lookupAddonPaths } from "../utility/addonUtils";
 import PrettierPlugin from "prettier-webpack-plugin";
@@ -14,6 +16,7 @@ import { getOptions } from "../options";
 import chalk from "chalk";
 import { print } from "util";
 import { printVerbose } from "../utility/utils";
+const realPath = promisify(realpath);
 
 /**
  * Create the core webpack config.
@@ -37,7 +40,12 @@ export async function makeBaseConfig(section: string) {
 ${chalk.green(aliases)}`;
     printVerbose(message);
 
-    const tsSourceIncludes = await getScriptSourceDirectories(section);
+    let tsSourceIncludes = await getScriptSourceDirectories(section);
+    tsSourceIncludes = await Promise.all(
+        tsSourceIncludes.map(file => {
+            return realPath(file);
+        }),
+    );
 
     const config = {
         context: VANILLA_ROOT,
@@ -123,7 +131,12 @@ ${chalk.green(aliases)}`;
             modules: modulePaths,
             alias: moduleAliases,
             extensions: [".ts", ".tsx", ".js", ".jsx"],
-            symlinks: false,
+            // This needs to be true so that the same copy of a node_module gets shared.
+            // Ex. If quill has parchment as a dep and imports and we use parchment too, there will be two paths
+            // - node_modules/quill/node_modules/parchment
+            // - node_modules/parchment
+            // The quill one is a symlinked one so we need webpack to resolve these to the same filepath.
+            symlinks: true,
         },
         /**
          * We need to manually tell webpack where to resolve our loaders.

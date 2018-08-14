@@ -162,7 +162,7 @@ describe("FocusModule", () => {
 
         it("will place focus on a FocusableEmbedBlot if it is the first element in the editor", async () => {
             const embed = Parchment.create("embed-loading", stubEmbedData) as LoadingBlot;
-            quill.scroll.insertBefore(embed, quill.scroll.children.tail);
+            quill.scroll.insertBefore(embed, quill.scroll.children.tail!);
             const test = quill.insertText(quill.scroll.length(), "test");
 
             embedFocusModule.focusFirstLine();
@@ -183,14 +183,14 @@ describe("FocusModule", () => {
         [KeyboardModule.keys.UP, KeyboardModule.keys.LEFT].forEach(key => {
             it("can insert a newline at the beginning of the scroll", async () => {
                 embedFocusModule.handleArrowKeyFromEmbed(key, embed);
-                expect(quill.scroll.children.head.domNode.textContent).eq("");
+                expect(quill.scroll.children.head!.domNode.textContent).eq("");
             });
         });
 
         [KeyboardModule.keys.RIGHT, KeyboardModule.keys.DOWN].forEach(key => {
             it("can insert a newline at the end of the scroll", async () => {
                 embedFocusModule.handleArrowKeyFromEmbed(key, embed);
-                expect(quill.scroll.children.tail.domNode.textContent).eq("");
+                expect(quill.scroll.children.tail!.domNode.textContent).eq("");
             });
         });
     });

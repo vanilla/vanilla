@@ -127,10 +127,10 @@ export function disableAllBlotsInRange<T extends Blot>(
     range: RangeStatic | null = null,
 ) {
     if (range === null) {
-        range = quill.getSelection();
+        range = quill.getSelection() as RangeStatic;
     }
 
-    const currentBlots: Blot[] = quill.scroll.descendants(blotConstructor as any, range.index, range.length);
+    const currentBlots = quill.scroll.descendants(blotConstructor as any, range.index, range.length) as Blot[];
     const firstBlot = currentBlots[0];
     const lastBlot = currentBlots[currentBlots.length - 1];
 
@@ -252,7 +252,7 @@ export function insertNewLineAtEndOfScroll(quill: Quill) {
  */
 export function insertNewLineAtStartOfScroll(quill: Quill) {
     const newLineBlot = new BlockBlot(BlockBlot.create(""));
-    quill.scroll.insertBefore(newLineBlot, quill.scroll.children.head);
+    quill.scroll.insertBefore(newLineBlot, quill.scroll.children.head!);
     quill.update(Quill.sources.USER);
     quill.setSelection(0, 0);
 }

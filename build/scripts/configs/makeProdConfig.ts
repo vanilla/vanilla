@@ -36,6 +36,8 @@ export async function makeProdConfig(section: string) {
     };
     baseConfig.devtool = "source-map";
     baseConfig.optimization = {
+        namedModules: false,
+        namedChunks: false,
         // Create a single runtime chunk per section.
         runtimeChunk: {
             name: `js/webpack/runtime-${section}`,

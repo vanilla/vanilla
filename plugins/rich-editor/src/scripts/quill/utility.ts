@@ -127,7 +127,7 @@ export function disableAllBlotsInRange<T extends Blot>(
     range: RangeStatic | null = null,
 ) {
     if (range === null) {
-        range = quill.getSelection() as RangeStatic;
+        range = quill.getSelection()!;
     }
 
     const currentBlots = quill.scroll.descendants(blotConstructor as any, range.index, range.length) as Blot[];

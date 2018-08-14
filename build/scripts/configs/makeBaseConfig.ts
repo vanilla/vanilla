@@ -10,7 +10,7 @@ import { getAddonAliasMapping, getScriptSourceDirectories, lookupAddonPaths } fr
 import PrettierPlugin from "prettier-webpack-plugin";
 import HappyPack from "happypack";
 import ForkTsCheckerWebpackPlugin from "fork-ts-checker-webpack-plugin";
-import { getOptions } from "../options";
+import { getOptions, BuildMode } from "../options";
 import chalk from "chalk";
 import { printVerbose } from "../utility/utils";
 
@@ -37,6 +37,22 @@ ${chalk.green(aliases)}`;
     printVerbose(message);
 
     const tsSourceIncludes = await getScriptSourceDirectories(section);
+
+    const extraTsLoaders =
+        options.mode === BuildMode.DEVELOPMENT
+            ? [
+                  {
+                      loader: "babel-loader",
+                      options: {
+                          babelrc: false,
+                          plugins: [
+                              require.resolve("react-hot-loader/babel"),
+                              require.resolve("babel-plugin-syntax-dynamic-import"),
+                          ],
+                      },
+                  },
+              ]
+            : [];
 
     const config = {
         context: VANILLA_ROOT,
@@ -92,16 +108,7 @@ ${chalk.green(aliases)}`;
                 verbose: options.verbose,
                 threadPool: happyThreadPool,
                 loaders: [
-                    {
-                        loader: "babel-loader",
-                        options: {
-                            babelrc: false,
-                            plugins: [
-                                require.resolve("react-hot-loader/babel"),
-                                require.resolve("babel-plugin-syntax-dynamic-import"),
-                            ],
-                        },
-                    },
+                    ...extraTsLoaders,
                     {
                         loader: "ts-loader",
                         options: {

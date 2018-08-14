@@ -16,14 +16,24 @@ The `TextBlot` is a blot containing user inputted text. It as well as all its de
 
 These formats are bold, italic, strike-through, link, and inline code. The `TextBlot` is responsible for rendering these tags in the correct nesting order.
 
-The following Blots all extend `TextBlot` and can handle formatting withing them formats.
+### LineTerminatorBlots
 
-- `AbstractBlotBlot` and its descendants - `AbstractLineBlot` (Blockquote, CodeBlock), `AbstractListBlot` (lists), and `HeadingBlot` (titles).
-- `TextBlot` can be used directly and take formats. The surrounding tag is `<p>`;
+A text blot is an "inline" type of blot. Multiple can `TextBlots` and `InlineEmbedBlots` can be contained in a single
+ line. In a delta a line is generally delineated by an insert with and insert of `\n` or multiple `\n\n\n` characters
+ . A line blot terminator provides the wrapping tag for the line such as `<p>` `<li>` `<blockquote>` etc. If an 
+ additional wrapping tag is need this should be provided by the group.
+ 
+ A few implementations of `AbstractLineTerminatorBlot` include
+ 
+ - `BlockquoteLineTerminatorBlot`
+ - `ParagraphLineTerminatorBlot`
+ - `ListLineTerminatorBlot` 
 
 ### Embed Blots
 
-Embed blots contain user contain, but are not directly editable text content. There are two types of embed `AbstractBlockEmbedBlot` and `AbstractInlineEmbedBlot`. Block embeds take up a full group and inline embeds do not.
+Embed blots contain user contain, but are not directly editable text content. There are two types of embed 
+`ExternalBlot` and `AbstractInlineEmbedBlot`. The external blot uses the EmbedManager to render some external content
+ in an embedded context.
 
 These generally contain deeply nested and complex HTML structures. The inputs are nested JSON structures, none of which is currently validated on insert to the database, so be sure to carefully sanitize any information coming in here.
 

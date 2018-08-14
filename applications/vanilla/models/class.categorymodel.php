@@ -597,18 +597,18 @@ class CategoryModel extends Gdn_Model {
      *
      * @param array &$category The category to calculate.
      */
-    private static function calculate(&$category) {
+    private static function calculate(array &$category) {
         $category['Url'] = self::categoryUrl($category, false, '/');
 
-        if (val('Photo', $category)) {
-            $category['PhotoUrl'] = Gdn_Upload::url($category['Photo']);
+        if ($photo = ($category['Photo'] ?? false)) {
+            $category['PhotoUrl'] = Gdn_Upload::url($photo);
         } else {
             $category['PhotoUrl'] = '';
         }
 
         self::calculateDisplayAs($category);
 
-        if (!val('CssClass', $category)) {
+        if (!($category['CssClass'] ?? false)) {
             $category['CssClass'] = 'Category-'.$category['UrlCode'];
         }
 

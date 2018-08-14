@@ -49,7 +49,9 @@
         "vanilla/vanilla-connect": "~0.0"
     },
     "require-dev": {
+        "exussum12/coverage-checker": "~0.10",
         "phpunit/phpunit": "~6.0",
+        "vanilla/standards": "~1.0",
         "voku/html-min": "~3.0"
     },
     "provide": {

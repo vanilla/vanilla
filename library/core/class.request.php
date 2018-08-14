@@ -1570,7 +1570,7 @@ class Gdn_Request implements RequestInterface {
      */
     public function url($path = '', $withDomain = false, $ssl = null) {
         static $allowSSL = null;
-        $staticKey = ($withDomain?'1-':'0-').($ssl?'1-':'0-').json_encode($path);
+        $staticKey = ($withDomain ? '1-' : '0-').($ssl ? '1-' : '0-').json_encode($path);
         if ($r = (self::$urls[$staticKey] ?? false)) {
             return $r;
         }

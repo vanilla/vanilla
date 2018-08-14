@@ -861,6 +861,9 @@ class Gdn_Validation {
     private function defaultErrorCode($invalid, $default) {
         if ($invalid instanceof Invalid && !empty($invalid->getMessageCode())) {
             return $invalid->getMessageCode();
+        } elseif (is_string($invalid)) {
+            // Backwards-compatible way for validation functions to return custom error messages.
+            return $invalid;
         }
         return $default;
     }

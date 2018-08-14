@@ -13,7 +13,7 @@ use Vanilla\Formatting\Quill\Blots\Lines\AbstractLineTerminatorBlot;
 /**
  * Class for sorting operations into blots and groups.
  */
-class BlotGroupCollection implements \Iterator {
+class BlotGroupCollection implements \IteratorAggregate {
 
     /** @var array[] The operations to parse. */
     private $operations;
@@ -46,24 +46,8 @@ class BlotGroupCollection implements \Iterator {
     private $prevOp;
 
     // ITERABLE IMPLEMENTATION
-    public function current() {
-        return current($this->groups);
-    }
-
-    public function next() {
-        return next($this->groups);
-    }
-
-    public function key() {
-        return key($this->groups);
-    }
-
-    public function valid() {
-        return key($this->groups) !== null;
-    }
-
-    public function rewind() {
-        return reset($this->groups);
+    public function getIterator() {
+        return new \ArrayIterator($this->groups);
     }
 
     // PRIVATE IMPLEMENTATION DETAILS

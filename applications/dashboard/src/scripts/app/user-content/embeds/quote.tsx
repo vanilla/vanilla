@@ -200,10 +200,14 @@ export class QuoteEmbed extends React.Component<IEmbedProps<IEmbedData>, IState>
      */
     private get titleTime(): string {
         const date = new Date(this.dateTime);
-        return date.toLocaleString(
-            undefined,
-            { year: "numeric", month: "long", day: "numeric", weekday: "long", hour: "numeric", minute: "numeric" },
-        );
+        return date.toLocaleString(undefined, {
+            year: "numeric",
+            month: "long",
+            day: "numeric",
+            weekday: "long",
+            hour: "numeric",
+            minute: "numeric",
+        });
     }
 
     /**
@@ -211,9 +215,6 @@ export class QuoteEmbed extends React.Component<IEmbedProps<IEmbedData>, IState>
      */
     private get humanTime(): string {
         const date = new Date(this.dateTime);
-        return date.toLocaleString(
-            undefined,
-            { year: "numeric", month: "short", day: "numeric" },
-        );
+        return date.toLocaleString(undefined, { year: "numeric", month: "short", day: "numeric" });
     }
 }

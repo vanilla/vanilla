@@ -7,7 +7,7 @@
 
 namespace Vanilla\Formatting\Quill\Blots;
 
-use Vanilla\Formatting\Quill\Blots\Formats\AbstractFormat;
+use Vanilla\Formatting\Quill\Formats\AbstractFormat;
 use Vanilla\Formatting\Quill\Parser;
 
 /**
@@ -54,6 +54,7 @@ trait FormattableTextTrait {
      */
     public function renderClosingFormatTags(): string {
         $result = "";
+        /** @var AbstractFormat $format */
         foreach (array_reverse($this->formats, true) as $format) {
             $result .= $format->renderClosingTag();
         }

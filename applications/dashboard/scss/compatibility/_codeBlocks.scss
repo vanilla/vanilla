@@ -9,7 +9,7 @@ $richEditor-inlineCode_borderRadius: 0;
 //$richEditor-inlineCode_horizontalPadding: .5em !default;
 //$richEditor-codeBlock_padding: 16px !default;
 $richEditor-code_bg: mix($global-color_fg, $global-color_bg, 5%); // target rgba(127, 127, 127, .15);
-$richEditor-code_fg: $global-color_fg !default;
+$richEditor-code_fg: darken($global-color_fg, 20%) !default;
 
 // Code
 .userContent {

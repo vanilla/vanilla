@@ -128,7 +128,7 @@ button.Close {
   font-family: Menlo, Monaco, Consolas, "Courier New", monospace;
   max-width: 100%;
   margin: 0;
-  color: #555a62;
+  color: #26282b;
   background-color: #f7f7f7;
   border-radius: 0;
 }
@@ -848,9 +848,9 @@ label.checkbox input.checkbox-input {
 .richEditor-text {
   position: relative;
   min-height: 200px;
-  padding-top: 9px;
+  padding-top: 12px;
   padding-right: 12px;
-  padding-bottom: 9px;
+  padding-bottom: 12px;
   padding-left: 12px;
   outline-color: transparent;
   white-space: pre-wrap !important;
@@ -1370,7 +1370,7 @@ label.checkbox input.checkbox-input {
 }
 
 .userContent > *:not(:last-child) {
-  margin-bottom: .6em;
+  margin-bottom: 1.5em;
 }
 
 .userContent > *:not(:last-child) + h1,

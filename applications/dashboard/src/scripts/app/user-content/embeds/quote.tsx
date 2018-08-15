@@ -47,7 +47,7 @@ interface IState {
 
 function ChevronUpIcon() {
     return (
-        <svg className="icon embedQuote-chevronUp">
+        <svg className="icon embedQuote-chevronUp" viewBox="0 0 8 4">
             <title>{t("▲")}</title>
             <path
                 fill="currentColor"
@@ -59,7 +59,7 @@ function ChevronUpIcon() {
 
 function ChevronDownIcon() {
     return (
-        <svg className="icon embedQuote-chevronDown">
+        <svg className="icon embedQuote-chevronDown" viewBox="0 0 8 4">
             <title>{t("▼")}</title>
             <path
                 fill="currentColor"

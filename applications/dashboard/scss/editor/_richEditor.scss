@@ -1,7 +1,7 @@
 $richEditor_bg                                    : $global-color_bg !default;
 $richEditor_horizontalPadding                           : 36px !default;
 $richEditor_minHeight                             : 200px !default;
-$richEditor_verticalPadding                       : 9px !default;
+$richEditor_verticalPadding                       : 12px !default;
 $richEditor_innerPadding                          : 12px !default;
 $richEditor-outline_color                         : rgba($global-color_primary, 0.6) !default;
 
@@ -560,7 +560,7 @@ $richEditor-mobileEmbedBreakPoint                 : 550px !default;
 .userContent {
     > * {
         &:not(:last-child) {
-            margin-bottom: .6em;
+            margin-bottom: 1.5em;
 
             + h1,
             + h2,

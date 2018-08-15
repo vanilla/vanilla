@@ -62,6 +62,17 @@ class SmokeTest extends BaseTest {
     }
 
     /**
+     * Set the post spam count.
+     *
+     * @param int $count The number of posts allowed in a specified time.
+     */
+    public function setSpamCount($count) {
+        $this->api()->saveToConfig([
+            'Vanilla.Discussion.SpamCount' => $count,
+        ]);
+    }
+
+    /**
      * Test registering a user with the basic method.
      *
      * @large
@@ -276,15 +287,13 @@ class SmokeTest extends BaseTest {
     /**
      * Test posting a discussion.
      *
-     * @param array $user The user used to post the discussion.
      * @depends testRegisterBasic
      * @large
      * @return array Single discussion.
      */
-    public function testPostDiscussion($user = null) {
+    public function testPostDiscussion() {
         $api = $this->api();
-        $user = $user ? $user : $this->getTestUser();
-        $api->setUser($user);
+        $api->setUser($this->getTestUser());
 
         $discussion = [
             'CategoryID' => 1,
@@ -378,7 +387,7 @@ class SmokeTest extends BaseTest {
         $api->setUser($this->getTestUser());
 
         $draft = [
-            'CategoryID'=> 1,
+            'CategoryID' => 1,
             'Name' => 'Draft Test',
             'Body' => 'Test posting a new draft',
             'Save Draft' => 'Save Draft'
@@ -392,7 +401,7 @@ class SmokeTest extends BaseTest {
         $this->assertEquals(200, $statusCode);
 
         $draftModel = new \DraftModel();
-        $postedDraft = $draftModel->getID(1, DATASET_TYPE_ARRAY);
+        $postedDraft = $draftModel->getWhere(['Name' => $draft['Name']])->firstRow(DATASET_TYPE_ARRAY);
 
         $this->assertEquals($postedDraft['Name'], $draft['Name']);
         $this->assertEquals($postedDraft['Body'], $draft['Body']);
@@ -409,8 +418,22 @@ class SmokeTest extends BaseTest {
         $api = $this->api();
         $api->setUser($this->getTestUser());
 
+        $draft = [
+            'CategoryID' => 1,
+            'Name' => 'testPostDiscussionFromDraft',
+            'Body' => 'Test posting a new draft',
+            'Save Draft' => 'Save Draft'
+        ];
+
+        $r = $api->post(
+            '/post/discussion.json',
+            $draft
+        );
+        $statusCode = $r->getStatusCode();
+        $this->assertEquals(200, $statusCode);
+
         $draftModel = new \DraftModel();
-        $postedDraft = $draftModel->getID(1, DATASET_TYPE_ARRAY);
+        $postedDraft = $draftModel->getWhere(['Name' => $draft['Name']])->firstRow(DATASET_TYPE_ARRAY);
 
         $discussion = [
             'DraftID' => $postedDraft['DraftID'],
@@ -460,7 +483,10 @@ class SmokeTest extends BaseTest {
         $statusCode = $r1->getStatusCode();
         $this->assertEquals(200, $statusCode);
 
-        $r2 = $api->get("drafts/delete/2/{$user['tk']}");
+        $draftModel = new \DraftModel();
+        $postedDraft = $draftModel->getWhere(['Name' => $draft['Name']])->firstRow(DATASET_TYPE_ARRAY);
+
+        $r2 = $api->get("drafts/delete/{$postedDraft['DraftID']}/{$user['tk']}");
         $statusCode2 = $r2->getStatusCode();
         $this->assertEquals(200, $statusCode2);
     }
@@ -517,13 +543,14 @@ class SmokeTest extends BaseTest {
      * @large
      */
     public function testRemoveDiscussionBookMark() {
+        $this->setSpamCount(10);
+
         $api = $this->api();
-        $admin =  $this->api()->queryUserKey('Admin', true);
-        //use admin user so flood control isn't triggered
-        $api->setUser($admin);
+        $api->setUser($this->getTestUser());
         $user = $api->getUser();
 
-        $discussion = $this->testPostDiscussion($user);
+
+        $discussion = $this->testPostDiscussion();
         $discussionID = val('DiscussionID', $discussion);
 
         $r = $api->post("/discussion/bookmark/{$discussionID}/{$user['tk']}");

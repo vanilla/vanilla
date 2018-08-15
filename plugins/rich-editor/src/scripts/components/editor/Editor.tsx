@@ -65,17 +65,6 @@ export class Editor extends React.Component<IProps> {
         this.store.dispatch(actions.createInstance(this.editorID));
         this.quill.on(Quill.events.EDITOR_CHANGE, this.onQuillUpdate);
 
-        /**
-         * Fire an event asynchonously to push out a selection update if quill has been blurred.
-         *
-         * This CANNOT be synchonous otherwise click events in items conditional on focus will not work.
-         */
-        // this.quill.root.addEventListener("blur", () => {
-        //     window.requestAnimationFrame(() => {
-        //         this.onQuillUpdate(Quill.events.SELECTION_CHANGE, {}, {}, Quill.sources.USER);
-        //     });
-        // });
-
         // Add a listener for a force selection update.
         document.addEventListener(SELECTION_UPDATE, () =>
             window.requestAnimationFrame(() => {

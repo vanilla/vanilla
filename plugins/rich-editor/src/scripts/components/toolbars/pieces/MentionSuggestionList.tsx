@@ -14,6 +14,8 @@ import MentionSuggestion, {
 } from "./MentionSuggestion";
 import { t } from "@dashboard/application";
 import ToolbarPositioner from "./ToolbarPositioner";
+import { rangeContainsBlot } from "@rich-editor/quill/utility";
+import CodeBlockBlot from "@rich-editor/quill/blots/blocks/CodeBlockBlot";
 
 interface IProps extends IWithEditorProps {
     mentionProps: Array<Partial<IMentionProps>>;
@@ -50,8 +52,9 @@ class MentionSuggestionList extends React.PureComponent<IProps, IState> {
         const { mentionSelection } = this.props.instanceState;
 
         const hasResults = mentionProps.length > 0 || showLoader;
+        const inCodeBlock = rangeContainsBlot(this.props.quill!, CodeBlockBlot, mentionSelection);
         const classes = classNames("atMentionList-items", "MenuItems");
-        const isVisible = hasResults && (!!mentionSelection || this.hasFocusedElement);
+        const isVisible = hasResults && (!!mentionSelection || this.hasFocusedElement) && !inCodeBlock;
 
         return (
             <ToolbarPositioner

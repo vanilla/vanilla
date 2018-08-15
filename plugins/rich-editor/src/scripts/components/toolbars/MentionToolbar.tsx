@@ -71,11 +71,11 @@ export class MentionToolbar extends React.Component<IProps, IMentionState> {
         const { mentionSelection } = this.props.instanceState;
         const prevMentionSelection = prevProps.instanceState.mentionSelection;
 
-        if (mentionSelection === null && prevMentionSelection !== null) {
+        if (mentionSelection === null && prevMentionSelection !== null && !this.isConvertingMention) {
             return this.cancelActiveMention();
         }
 
-        if (!isEqual(mentionSelection, prevMentionSelection)) {
+        if (!isEqual(mentionSelection, prevMentionSelection) && !this.isConvertingMention) {
             const autoCompleteBlot = this.getAutoCompleteBlot();
             if (autoCompleteBlot) {
                 this.props.lookupMentions(autoCompleteBlot.username);
@@ -255,15 +255,22 @@ export class MentionToolbar extends React.Component<IProps, IMentionState> {
      * @param clearComboBox - Whether or not to clear the current combobox. An situation where you would not want to do this is if it is already deleted or it has already been detached from quill.
      */
     private cancelActiveMention() {
-        if (this.state.autoCompleteBlot) {
-            // this.isConvertingMention = true;
-            // const selection = this.quill.getSelection();
+        const selection = this.quill.getSelection();
+        if (this.state.autoCompleteBlot && !this.isConvertingMention) {
+            this.isConvertingMention = true;
             this.state.autoCompleteBlot.cancel();
-            // this.quill.setSelection(selection, Quill.sources.SILENT);
         }
-        this.setState({
-            autoCompleteBlot: null,
-        });
+        this.isConvertingMention = false;
+        this.setState(
+            {
+                autoCompleteBlot: null,
+            },
+            () => {
+                if (selection && selection.length > 0) {
+                    this.quill.setSelection(selection);
+                }
+            },
+        );
     }
 
     /**
@@ -274,7 +281,7 @@ export class MentionToolbar extends React.Component<IProps, IMentionState> {
         const { suggestions, activeSuggestionIndex } = this.props;
         if (
             !(autoCompleteBlot instanceof MentionAutoCompleteBlot) ||
-            // this.isConvertingMention ||
+            this.isConvertingMention ||
             !suggestions ||
             suggestions.status !== "SUCCESSFUL"
         ) {

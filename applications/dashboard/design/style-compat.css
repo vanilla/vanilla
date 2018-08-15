@@ -1471,17 +1471,20 @@ body.hasRichEditor #Form_Preview {
   body.hasRichEditor .CommentForm .Buttons {
     padding-right: 36px;
   }
+  body.hasRichEditor #EventAddEditForm .Form-HeaderWrap,
   body.hasRichEditor #GroupForm .Form-HeaderWrap,
   body.hasRichEditor #MessageForm .Form-HeaderWrap,
   body.hasRichEditor #ConversationForm .Form-HeaderWrap {
     display: none;
   }
+  body.hasRichEditor #EventAddEditForm .FormWrapper,
   body.hasRichEditor #GroupForm .FormWrapper,
   body.hasRichEditor #MessageForm .FormWrapper,
   body.hasRichEditor #ConversationForm .FormWrapper {
     padding-left: 36px;
     padding-right: 36px;
   }
+  body.hasRichEditor #EventAddEditForm .FormWrapper .richEditor,
   body.hasRichEditor #GroupForm .FormWrapper .richEditor,
   body.hasRichEditor #MessageForm .FormWrapper .richEditor,
   body.hasRichEditor #ConversationForm .FormWrapper .richEditor {

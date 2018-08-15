@@ -26,6 +26,10 @@ abstract class BaseTest extends SharedBootstrapTestCase {
         $api->install(get_called_class());
         self::$api = $api;
 
+        self::$api->saveToConfig([
+            'Vanilla.Discussion.SpamCount' => 100,
+        ]);
+
         $r = $api->get('/discussions.json');
         $data = $r->getBody();
         if (empty($data['Discussions'])) {

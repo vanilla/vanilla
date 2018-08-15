@@ -266,9 +266,9 @@ export class MentionToolbar extends React.Component<IProps, IMentionState> {
                 autoCompleteBlot: null,
             },
             () => {
-                if (selection && selection.length > 0) {
-                    this.quill.setSelection(selection);
-                }
+                // if (selection && selection.length > 0) {
+                //     this.quill.setSelection(selection);
+                // }
             },
         );
     }

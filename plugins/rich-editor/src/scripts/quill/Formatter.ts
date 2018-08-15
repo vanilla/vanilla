@@ -16,6 +16,7 @@ import BlockquoteLineBlot from "@rich-editor/quill/blots/blocks/BlockquoteBlot";
 import SpoilerLineBlot from "@rich-editor/quill/blots/blocks/SpoilerBlot";
 import HeadingBlot from "quill/formats/header";
 import { Blot, RangeStatic } from "quill/core";
+import Parchment from "parchment";
 
 export default class Formatter {
     public static INLINE_FORMAT_NAMES = [
@@ -70,15 +71,29 @@ export default class Formatter {
         this.quill.formatLine(range.index, range.length, HeadingBlot.blotName, 3, Quill.sources.USER);
     };
     public codeBlock = (range: RangeStatic) => {
-        const line = this.quill.getLine(range.index)[0] as Blot;
-        const index = line.offset(this.quill.scroll);
-        const length = index + line.length();
-
-        // Code cannot have any inline formattings inside of it.
-        for (const inlineFormatName of Formatter.INLINE_FORMAT_NAMES) {
-            this.quill.formatText(range.index, range.length, inlineFormatName, false, Quill.sources.API);
+        let lines = this.quill.getLines(range.index, range.length) as Blot[];
+        if (lines.length === 0) {
+            lines = [this.quill.getLine(range.index)[0] as Blot];
         }
-        this.quill.formatLine(range.index, range.length, CodeBlockBlot.blotName, true, Quill.sources.USER);
+        const firstLine = lines[0];
+        const lastLine = lines[lines.length - 1];
+
+        lines.forEach(line => {
+            if (line) {
+                const text = (line.domNode as HTMLElement).innerText || "";
+                (line as any).children.forEach(child => {
+                    child.remove();
+                });
+                this.quill.update(Quill.sources.USER);
+                line.insertAt(0, text);
+                this.quill.update(Quill.sources.USER);
+                const start = line.offset(this.quill.scroll);
+                const length = lastLine.length();
+                this.quill.formatLine(start, length, CodeBlockBlot.blotName, true, Quill.sources.USER);
+            }
+        });
+
+        // this.quill.formatLine(start, length, CodeBlockBlot.blotName, true, Quill.sources.USER);
     };
     public blockquote = (range: RangeStatic) => {
         this.quill.formatLine(range.index, range.length, BlockquoteLineBlot.blotName, true, Quill.sources.USER);

@@ -191,12 +191,12 @@ class CategoryModel extends Gdn_Model {
      * @param array &$category The category to calculate.
      * @param bool|null $addUserCategory
      */
-    private function calculateUser(&$category, $addUserCategory = null) {
+    private function calculateUser(array &$category, $addUserCategory = null) {
         // Kludge to make sure that the url is absolute when reaching the user's screen (or API).
         $category['Url'] = self::categoryUrl($category, '', true);
 
         if (!isset($category['PhotoUrl'])) {
-            if ($photo = val('Photo', $category)) {
+            if ($photo = ($category['Photo'] ?? false)) {
                 $category['PhotoUrl'] = Gdn_Upload::url($photo);
             }
         }
@@ -217,8 +217,8 @@ class CategoryModel extends Gdn_Model {
         if ($addUserCategory || ($addUserCategory === null && $this->joinUserCategory())) {
             $userCategories = $this->getUserCategories();
 
-            $dateMarkedRead = val('DateMarkedRead', $category);
-            $userData = val($category['CategoryID'], $userCategories);
+            $dateMarkedRead = ($category['DateMarkedRead'] ?? false );
+            $userData = ($userCategories[$category['CategoryID']] ?? false);
             if ($userData) {
                 $userDateMarkedRead = $userData['DateMarkedRead'];
 
@@ -235,7 +235,7 @@ class CategoryModel extends Gdn_Model {
             }
 
             // Calculate the following field.
-            $following = !((bool)val('Archived', $category) || (bool)val('Unfollow', $userData, false));
+            $following = !((bool)($category['Archived'] ?? false) || (bool)($userData['Unfollow'] ?? false));
             $category['Following'] = $following;
 
             $category['Followed'] = boolval($userData['Followed']);
@@ -244,8 +244,8 @@ class CategoryModel extends Gdn_Model {
             if (strcasecmp($category['DisplayAs'], 'heading') === 0) {
                 $category['Read'] = false;
             } elseif ($dateMarkedRead) {
-                if (val('LastDateInserted', $category)) {
-                    $category['Read'] = Gdn_Format::toTimestamp($dateMarkedRead) >= Gdn_Format::toTimestamp($category['LastDateInserted']);
+                if ($lastDateInserted = ($category['LastDateInserted'] ?? false)) {
+                    $category['Read'] = Gdn_Format::toTimestamp($dateMarkedRead) >= Gdn_Format::toTimestamp($lastDateInserted);
                 } else {
                     $category['Read'] = true;
                 }

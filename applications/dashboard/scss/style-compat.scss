@@ -32,5 +32,7 @@
 @import "editor/blockquote";
 @import "editor/accessibility";
 @import "editor/spoiler";
-@import "editor/embeds/embeds";
 @import "editor/emoji";
+
+// Embeds
+@import "embeds/embeds";

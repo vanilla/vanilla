@@ -2248,7 +2248,6 @@ img.LeftAlign {
 
 .codeBlock,
 code, pre {
-  border-radius: 2px;
   background: #ff9;
   padding: 4px 8px;
   font-family: monospace;

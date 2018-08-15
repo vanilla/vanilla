@@ -128,10 +128,13 @@ button.Close {
   font-family: Menlo, Monaco, Consolas, "Courier New", monospace;
   max-width: 100%;
   margin: 0;
+  color: #555a62;
+  background-color: #e6e6e7;
+  border-radius: 0;
 }
 
 .userContent .codeInline {
-  display: inline-block;
+  display: inline;
   white-space: normal;
 }
 
@@ -1873,6 +1876,32 @@ body.isMobile .richEditorParagraphMenu {
           user-select: none;
 }
 
+.safeEmoji {
+  display: inline-block;
+  font-family: "Segoe UI Emoji", sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+  vertical-align: middle;
+  text-align: center;
+  height: 1em;
+  max-width: 100%;
+  line-height: 1em;
+}
+
+.nativeEmoji {
+  font-family: "Segoe UI Emoji", sans-serif;
+}
+
+.fallBackEmoji {
+  display: inline-block;
+  height: 1em;
+  width: 1em;
+  margin: 0 .05em 0 .1em;
+  vertical-align: -0.1em;
+  -webkit-user-select: none;
+     -moz-user-select: none;
+      -ms-user-select: none;
+          user-select: none;
+}
+
 .embedResponsive {
   text-align: center;
 }
@@ -2649,31 +2678,5 @@ body.isMobile .richEditorParagraphMenu {
 .instagram-media {
   margin-bottom: 0 !important;
   width: 100% !important;
-}
-
-.safeEmoji {
-  display: inline-block;
-  font-family: "Segoe UI Emoji", sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
-  vertical-align: middle;
-  text-align: center;
-  height: 1em;
-  max-width: 100%;
-  line-height: 1em;
-}
-
-.nativeEmoji {
-  font-family: "Segoe UI Emoji", sans-serif;
-}
-
-.fallBackEmoji {
-  display: inline-block;
-  height: 1em;
-  width: 1em;
-  margin: 0 .05em 0 .1em;
-  vertical-align: -0.1em;
-  -webkit-user-select: none;
-     -moz-user-select: none;
-      -ms-user-select: none;
-          user-select: none;
 }
 /*# sourceMappingURL=style-compat.css.map */

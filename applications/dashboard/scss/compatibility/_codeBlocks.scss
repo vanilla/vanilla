@@ -2,14 +2,14 @@
 // However, we're using some of the same variables for future compatibility.
 
 $richEditor-code_fontSize: .86em !default;
-$richEditor-inlineCode_borderColor: #a3a3a3;
-$richEditor-inlineCode_borderRadius: $global-borderRadius;
-$richEditor-inlineCode_borderWidth: 1px;
-$richEditor-inlineCode_verticalPadding: .07em !default;
-$richEditor-inlineCode_horizontalPadding: .5em !default;
-$richEditor-codeBlock_padding: 16px !default;
-$richEditor-code_bg: mix($global-color_fg, $global-color_bg, 5%);
-$richEditor-code_fg: #000000 !default;
+$richEditor-inlineCode_borderColor: mix($global-color_fg, $global-color_bg, 50%); // target #a3a3a3
+$richEditor-inlineCode_borderRadius: 0;
+//$richEditor-inlineCode_borderWidth: 1px;
+//$richEditor-inlineCode_verticalPadding: .07em !default;
+//$richEditor-inlineCode_horizontalPadding: .5em !default;
+//$richEditor-codeBlock_padding: 16px !default;
+$richEditor-code_bg: mix($global-color_fg, $global-color_bg, 15%); // target rgba(127, 127, 127, .15);
+$richEditor-code_fg: $global-color_fg !default;
 
 // Code
 .userContent {
@@ -22,10 +22,15 @@ $richEditor-code_fg: #000000 !default;
         font-family: Menlo, Monaco, Consolas, "Courier New", monospace;
         max-width: 100%;
         margin: 0;
+        color: $richEditor-code_fg;
+        background-color: $richEditor-code_bg;
+        border:  {
+            radius: $richEditor-inlineCode_borderRadius;
+        }
     }
 
     .codeInline {
-        display: inline-block;
+        display: inline;
         white-space: normal;
     }
 

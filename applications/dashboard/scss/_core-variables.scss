@@ -94,6 +94,7 @@ $global-headinglineHeight_offset                       : $global-lineHeight_offs
 $global-bodylineHeight_offset                          : $global-lineHeight_offset !default; // Different if heading has different font than body
 
 $global-base_lineHeight                                : 1.5 !default;
+$global-condensed_lineHeight                           : 1.25 !default;
 
 $global-heading_fontFamily                             : "Open Sans", HelveticaNeue-Light, "Segoe UI", "Helvetica Neue", Helvetica, Raleway, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol" !default;
 $global-heading_fontWeight                             : $global-bold_fontWeight !default; // Derived

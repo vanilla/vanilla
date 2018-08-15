@@ -830,22 +830,29 @@ class EntryController extends Gdn_Controller {
 
             if (isset($user) && $user) {
                 // Make sure the user authenticates.
-                if (!$user['UserID'] == Gdn::session()->UserID && $allowConnect) {
-                    $hasPassword = $this->Form->validateRule('ConnectPassword', 'ValidateRequired', sprintf(t('ValidateRequired'), t('Password')));
-                    if ($hasPassword) {
-                        // Validate their password.
-                        try {
-                            $password = $this->Form->getFormValue('ConnectPassword');
-                            $name = $this->Form->getFormValue('ConnectName');
-                            if (!$passwordHash->checkPassword($password, $user['Password'], $user['HashMethod'], $name)) {
-                                if ($connectNameEntered) {
-                                    $this->addCredentialErrorToForm('The username you entered has already been taken.');
-                                } else {
-                                    $this->addCredentialErrorToForm('The password you entered is incorrect.');
+                if ($allowConnect) {
+                    // If the user is connecting to their current account, make sure it was intentional.
+                    if (intval($user['UserID']) === intval(Gdn::session()->UserID)) {
+                        if (!Gdn::session()->validateTransientKey($this->Form->getFormValue('TransientKey'))) {
+                            throw permissionException();
+                        }
+                    } else {
+                        $hasPassword = $this->Form->validateRule('ConnectPassword', 'ValidateRequired', sprintf(t('ValidateRequired'), t('Password')));
+                        if ($hasPassword) {
+                            // Validate their password.
+                            try {
+                                $password = $this->Form->getFormValue('ConnectPassword');
+                                $name = $this->Form->getFormValue('ConnectName');
+                                if (!$passwordHash->checkPassword($password, $user['Password'], $user['HashMethod'], $name)) {
+                                    if ($connectNameEntered) {
+                                        $this->addCredentialErrorToForm('The username you entered has already been taken.');
+                                    } else {
+                                        $this->addCredentialErrorToForm('The password you entered is incorrect.');
+                                    }
                                 }
+                            } catch (Gdn_UserException $ex) {
+                                $this->Form->addError($ex);
                             }
-                        } catch (Gdn_UserException $ex) {
-                            $this->Form->addError($ex);
                         }
                     }
                 }

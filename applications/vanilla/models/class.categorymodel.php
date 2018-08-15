@@ -1747,8 +1747,8 @@ class CategoryModel extends Gdn_Model {
             foreach ($iDs as $iD) {
                 $category = $categories[$iD];
 
-                $dateMarkedRead = val('DateMarkedRead', $category);
-                $row = val($iD, $userData);
+                $dateMarkedRead = ($category['DateMarkedRead'] ?? false);
+                $row = ($userData[$iD] ?? false);
                 if ($row) {
                     $userDateMarkedRead = $row['DateMarkedRead'];
 
@@ -1763,7 +1763,7 @@ class CategoryModel extends Gdn_Model {
                 }
 
                 // Calculate the following field.
-                $following = !((bool)val('Archived', $category) || (bool)val('Unfollow', $row, false));
+                $following = !((bool)($category['Archived'] ?? false) || (bool)($row['Unfollow'] ?? false));
                 $categories[$iD]['Following'] = $following;
 
                 $categories[$iD]['Followed'] = boolval($row['Followed']);
@@ -1772,8 +1772,8 @@ class CategoryModel extends Gdn_Model {
                 if ($category['DisplayAs'] == 'Heading') {
                     $categories[$iD]['Read'] = false;
                 } elseif ($dateMarkedRead) {
-                    if (val('LastDateInserted', $category)) {
-                        $categories[$iD]['Read'] = Gdn_Format::toTimestamp($dateMarkedRead) >= Gdn_Format::toTimestamp($category['LastDateInserted']);
+                    if ($lastDateInserted = ($category['LastDateInserted'] ?? false)) {
+                        $categories[$iD]['Read'] = Gdn_Format::toTimestamp($dateMarkedRead) >= Gdn_Format::toTimestamp($lastDateInserted);
                     } else {
                         $categories[$iD]['Read'] = true;
                     }

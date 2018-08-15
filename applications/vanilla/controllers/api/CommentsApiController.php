@@ -212,7 +212,6 @@ class CommentsApiController extends AbstractApiController {
         $comment['Url'] = commentUrl($comment);
         $isRich = $comment['Format'] === 'Rich';
         $comment['bodyRaw'] = $isRich ? json_decode($comment['Body'], true) : $comment['Body'];
-        $comment['source'] = "internal";
 
         $this->userModel->expandUsers($comment, ['InsertUserID'], ['expand' => true]);
         $result = $out->validate($comment);
@@ -232,7 +231,6 @@ class CommentsApiController extends AbstractApiController {
             'dateUpdated:dt|n' => 'When the comment was last updated.',
             'insertUser' => $this->getUserFragmentSchema(),
             'url:s' => 'The full URL to the comment.',
-            'source:s' => 'Is it an internal url or an external one.',
             'format:s' => 'The original format of the comment',
         ]);
     }

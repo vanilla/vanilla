@@ -335,7 +335,6 @@ class DiscussionsApiController extends AbstractApiController {
 
         $isRich = $discussion['Format'] === 'Rich';
         $discussion['bodyRaw'] = $isRich ? json_decode($discussion['Body'], true) : $discussion['Body'];
-        $discussion['source'] = "internal";
 
         $this->userModel->expandUsers($discussion, ['InsertUserID'], ['expand' => true]);
         $result = $out->validate($discussion);
@@ -356,7 +355,6 @@ class DiscussionsApiController extends AbstractApiController {
             'dateUpdated:dt|n' => 'When the discussion was last updated.',
             'insertUser' => $this->getUserFragmentSchema(),
             'url:s' => 'The full URL to the discussion.',
-            'source:s' => 'Is it an internal url or an external one.',
             'format:s' => 'The original format of the discussion',
         ]);
     }

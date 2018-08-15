@@ -13,7 +13,6 @@ import { t } from "@dashboard/application";
 import { logError, capitalizeFirstLetter } from "@dashboard/utility";
 import LoadingBlot from "@rich-editor/quill/blots/embeds/LoadingBlot";
 import { forceSelectionUpdate } from "@rich-editor/quill/utility";
-import get from "lodash/get";
 
 const DATA_KEY = "__embed-data__";
 
@@ -117,13 +116,7 @@ export default class ExternalEmbedBlot extends FocusableEmbedBlot {
         descriptionNode.id = uniqueId("richEditor-embed-description-");
 
         const embedExternal = document.createElement("div");
-
-        if (get(data, "attributes.source", false) === "internal") {
-            embedExternal.classList.add("embedInternal");
-        } else {
-            embedExternal.classList.add("embedExternal");
-        }
-
+        embedExternal.classList.add("embedExternal");
         embedExternal.classList.add("embed" + capitalizeFirstLetter(data.type));
 
         const embedExternalContent = document.createElement("div");

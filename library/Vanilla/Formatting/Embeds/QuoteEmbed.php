@@ -100,8 +100,8 @@ class QuoteEmbed extends Embed {
         $jsonData = htmlspecialchars(json_encode($data), ENT_QUOTES, 'UTF-8');
 
         $result = <<<HTML
-<div class="embedInternal embedText embedQuote">
-    <div class="embedInternal-content embedText-content embedQuote-content">
+<div class="embedExternal embedText embedQuote">
+    <div class="embedExternal-content embedText-content embedQuote-content">
         <div class="js-quoteEmbed embedResponsive-initialLink" data-json='$jsonData'><a href="$sanitizedUrl">$sanitizedUrl</a></div>
     </div>
 </div>

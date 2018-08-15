@@ -36,7 +36,7 @@ class Gdn_Statistics extends Gdn_Pluggable {
         $scheme = parse_url($this->AnalyticsServer, PHP_URL_SCHEME); // Will give you the protocol (http, https) or null/false on error.
 
         if ($scheme === null) {
-            $this->AnalyticsServer = 'https://'.$this->AnalyticsServer();
+            $this->AnalyticsServer = 'https://'.$this->AnalyticsServer;
         }
 
         $this->TickExtra = [];

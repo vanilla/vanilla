@@ -212,6 +212,7 @@ class CommentsApiController extends AbstractApiController {
         $comment['Url'] = commentUrl($comment);
         $isRich = $comment['Format'] === 'Rich';
         $comment['bodyRaw'] = $isRich ? json_decode($comment['Body'], true) : $comment['Body'];
+        $comment['source'] = "internal";
 
         $this->userModel->expandUsers($comment, ['InsertUserID'], ['expand' => true]);
         $result = $out->validate($comment);

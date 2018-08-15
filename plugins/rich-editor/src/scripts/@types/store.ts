@@ -20,6 +20,7 @@ export interface IMentionState {
 export interface IEditorInstance {
     currentSelection: RangeStatic | null;
     lastGoodSelection: RangeStatic;
+    mentionSelection: RangeStatic | null;
 }
 
 export interface IEditorInstanceState {

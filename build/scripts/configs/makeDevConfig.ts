@@ -18,6 +18,7 @@ export async function makeDevConfig(section: string) {
     const forumEntries = await getHotEntries(section);
     baseConfig.mode = "development";
     baseConfig.entry = forumEntries;
+    baseConfig.devtool = "cheap-module-eval-source-map";
     baseConfig.output = {
         filename: `forum-hot-bundle.js`,
         chunkFilename: "[name].chunk.js",

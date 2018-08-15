@@ -8,12 +8,13 @@ import React from "react";
 import Quill, { RangeStatic, Sources, DeltaStatic } from "quill/core";
 import uniqueId from "lodash/uniqueId";
 import debounce from "lodash/debounce";
+import isEqual from "lodash/isEqual";
 import Keyboard from "quill/modules/keyboard";
 import { withEditor, IWithEditorProps } from "@rich-editor/components/context";
 import MentionSuggestionList from "./pieces/MentionSuggestionList";
 import { thunks as mentionThunks, actions as mentionActions } from "@rich-editor/state/mention/mentionActions";
 import MentionAutoCompleteBlot from "@rich-editor/quill/blots/embeds/MentionAutoCompleteBlot";
-import { getBlotAtIndex, getMentionRange } from "@rich-editor/quill/utility";
+import { getBlotAtIndex } from "@rich-editor/quill/utility";
 import { IMentionValue } from "@rich-editor/state/mention/MentionTrie";
 import { connect } from "react-redux";
 import { IMentionSuggestionData, IMentionProps } from "@rich-editor/components/toolbars/pieces/MentionSuggestion";
@@ -27,10 +28,10 @@ interface IProps extends IWithEditorProps {
     activeSuggestionID: string;
     activeSuggestionIndex: number;
     showLoader: boolean;
+    inActiveMention: boolean;
 }
 
 interface IMentionState {
-    inActiveMention: boolean;
     autoCompleteBlot: MentionAutoCompleteBlot | null;
 }
 
@@ -38,6 +39,7 @@ interface IMentionState {
  * Module for inserting, removing, and editing at-mentions.
  */
 export class MentionToolbar extends React.Component<IProps, IMentionState> {
+    private static SUGGESTION_LIMIT = 5;
     private quill: Quill;
     private ID = uniqueId("mentionList-");
     private loaderID = uniqueId("mentionList-noResults-");
@@ -49,7 +51,6 @@ export class MentionToolbar extends React.Component<IProps, IMentionState> {
         super(props);
         this.quill = props.quill!;
         this.state = {
-            inActiveMention: false,
             autoCompleteBlot: null,
         };
     }
@@ -58,23 +59,34 @@ export class MentionToolbar extends React.Component<IProps, IMentionState> {
         document.addEventListener("keydown", this.keyDownListener, true);
         document.addEventListener("click", this.onDocumentClick, false);
         this.quill.on("text-change", this.onTextChange);
-        this.quill.on("selection-change", this.onSelectionChange);
     }
 
     public componentWillUnmount() {
         document.removeEventListener("keydown", this.keyDownListener, true);
         document.removeEventListener("click", this.onDocumentClick, false);
         this.quill.off("text-change", this.onTextChange);
-        this.quill.off("selection-change", this.onSelectionChange);
     }
 
-    public componentDidUpdate() {
-        this.injectComboBoxAccessibility();
+    public componentDidUpdate(prevProps: IProps) {
+        const { mentionSelection } = this.props.instanceState;
+        const prevMentionSelection = prevProps.instanceState.mentionSelection;
+
+        if (mentionSelection === null && prevMentionSelection !== null) {
+            return this.cancelActiveMention();
+        }
+
+        if (!isEqual(mentionSelection, prevMentionSelection)) {
+            const autoCompleteBlot = this.getAutoCompleteBlot();
+            if (autoCompleteBlot) {
+                this.props.lookupMentions(autoCompleteBlot.username);
+            }
+            this.setState({ autoCompleteBlot });
+            this.injectComboBoxAccessibility();
+        }
     }
 
     public render() {
         const { suggestions, lastSuccessfulUsername, showLoader, activeSuggestionID } = this.props;
-        const isActive = suggestions && suggestions.status === "SUCCESSFUL";
         const data = suggestions && suggestions.status === "SUCCESSFUL" ? suggestions.users : [];
 
         return (
@@ -83,12 +95,37 @@ export class MentionToolbar extends React.Component<IProps, IMentionState> {
                 mentionProps={this.createMentionProps(data)}
                 matchedString={lastSuccessfulUsername}
                 activeItemId={activeSuggestionID}
-                isVisible={!!isActive || showLoader}
                 id={this.ID}
                 loaderID={this.loaderID}
                 showLoader={showLoader}
             />
         );
+    }
+
+    private getAutoCompleteBlot(): MentionAutoCompleteBlot | null {
+        const { mentionSelection, currentSelection } = this.props.instanceState;
+        if (!currentSelection || !mentionSelection) {
+            return null;
+        }
+
+        let autoCompleteBlot = getBlotAtIndex(this.quill, currentSelection.index, MentionAutoCompleteBlot);
+
+        // Create a autoCompleteBlot if it doesn't already exist.
+        if (!autoCompleteBlot) {
+            this.quill.formatText(
+                mentionSelection.index,
+                mentionSelection.length,
+                "mention-autocomplete",
+                true,
+                Quill.sources.API,
+            );
+            this.quill.setSelection(currentSelection.index, 0, Quill.sources.API);
+
+            // Get the autoCompleteBlot
+            autoCompleteBlot = getBlotAtIndex(this.quill, currentSelection.index - 1, MentionAutoCompleteBlot)!;
+        }
+
+        return autoCompleteBlot;
     }
 
     /**
@@ -111,8 +148,9 @@ export class MentionToolbar extends React.Component<IProps, IMentionState> {
      * Keydown listener for ARIA compliance with
      */
     private keyDownListener = (event: KeyboardEvent) => {
-        const { inActiveMention } = this.state;
         const { suggestions, activeSuggestionIndex, activeSuggestionID, showLoader } = this.props;
+        const { mentionSelection } = this.props.instanceState;
+        const inActiveMention = mentionSelection !== null;
 
         if (!suggestions || suggestions.status !== "SUCCESSFUL") {
             return;
@@ -129,7 +167,8 @@ export class MentionToolbar extends React.Component<IProps, IMentionState> {
             const firstIndex = 0;
             const nextIndex = activeSuggestionIndex + 1;
             const prevIndex = activeSuggestionIndex - 1;
-            const lastIndex = showLoader ? suggestions.users.length : suggestions.users.length - 1;
+            const userLength = Math.min(MentionToolbar.SUGGESTION_LIMIT, suggestions.users.length);
+            const lastIndex = showLoader ? userLength : userLength - 1;
             const currentItemIsLoader = activeSuggestionID === this.loaderID;
 
             const getIDFromIndex = (newIndex: number) => {
@@ -198,7 +237,7 @@ export class MentionToolbar extends React.Component<IProps, IMentionState> {
     };
 
     private createMentionProps(suggestions: IMentionSuggestionData[]): Array<Partial<IMentionProps>> {
-        return suggestions.map((data, index) => {
+        return suggestions.slice(0, MentionToolbar.SUGGESTION_LIMIT).map((data, index) => {
             const onMouseEnter = () => {
                 this.props.setActiveItem(data.domID, index);
             };
@@ -215,18 +254,16 @@ export class MentionToolbar extends React.Component<IProps, IMentionState> {
      *
      * @param clearComboBox - Whether or not to clear the current combobox. An situation where you would not want to do this is if it is already deleted or it has already been detached from quill.
      */
-    private cancelActiveMention(clearComboBox = true) {
-        if (this.state.autoCompleteBlot && clearComboBox && !this.isConvertingMention) {
-            this.isConvertingMention = true;
-            const selection = this.quill.getSelection();
+    private cancelActiveMention() {
+        if (this.state.autoCompleteBlot) {
+            // this.isConvertingMention = true;
+            // const selection = this.quill.getSelection();
             this.state.autoCompleteBlot.cancel();
-            this.quill.setSelection(selection, Quill.sources.SILENT);
+            // this.quill.setSelection(selection, Quill.sources.SILENT);
         }
         this.setState({
-            inActiveMention: false,
             autoCompleteBlot: null,
         });
-        this.isConvertingMention = false;
     }
 
     /**
@@ -237,7 +274,7 @@ export class MentionToolbar extends React.Component<IProps, IMentionState> {
         const { suggestions, activeSuggestionIndex } = this.props;
         if (
             !(autoCompleteBlot instanceof MentionAutoCompleteBlot) ||
-            this.isConvertingMention ||
+            // this.isConvertingMention ||
             !suggestions ||
             suggestions.status !== "SUCCESSFUL"
         ) {
@@ -261,27 +298,6 @@ export class MentionToolbar extends React.Component<IProps, IMentionState> {
     };
 
     /**
-     * Watch for selection change events in quill. We need to clear the mention list if we have text selected or their is no selection.
-     */
-    private onSelectionChange = (range: RangeStatic, oldRange: RangeStatic, sources) => {
-        if (sources !== Quill.sources.USER || !this.state.inActiveMention || !this.hasApiResponse) {
-            return;
-        }
-
-        if (!range || range.length > 0) {
-            return this.cancelActiveMention();
-        }
-
-        // The range is updated before the text content, so we need to step back one character sometimes.
-        const autoCompleteBlot = getBlotAtIndex(this.quill, range.index, MentionAutoCompleteBlot);
-        const mentionRange = getMentionRange(this.quill, range.index, true);
-
-        if (!autoCompleteBlot && !mentionRange) {
-            return this.cancelActiveMention();
-        }
-    };
-
-    /**
      * A quill text change event listener.
      *
      * - Clears mention state if we no longer match a mention.
@@ -292,34 +308,6 @@ export class MentionToolbar extends React.Component<IProps, IMentionState> {
         // Ignore non-user changes.
         if (source !== Quill.sources.USER) {
             return;
-        }
-
-        // Clear the mention if there is no selection.
-        const selection = this.quill.getSelection();
-        if (selection == null || selection.index == null) {
-            return this.cancelActiveMention(false);
-        }
-
-        let autoCompleteBlot = getBlotAtIndex(this.quill, selection.index, MentionAutoCompleteBlot);
-        const mentionRange = getMentionRange(this.quill);
-
-        if (!mentionRange) {
-            return this.cancelActiveMention();
-        }
-
-        // Create a autoCompleteBlot if it doesn't already exist.
-        if (!autoCompleteBlot) {
-            this.quill.formatText(
-                mentionRange.index,
-                mentionRange.length,
-                "mention-autocomplete",
-                true,
-                Quill.sources.API,
-            );
-            this.quill.setSelection(selection.index, 0, Quill.sources.API);
-
-            // Get the autoCompleteBlot
-            autoCompleteBlot = getBlotAtIndex(this.quill, selection.index - 1, MentionAutoCompleteBlot)!;
         }
 
         const lastOperation = delta.ops && delta.ops.length > 0 ? delta.ops[delta.ops.length - 1] : null;
@@ -335,18 +323,12 @@ export class MentionToolbar extends React.Component<IProps, IMentionState> {
             // Autocomplete the mention if certain conditions occur.
 
             if (isASingleExactMatch) {
-                setImmediate(() => {
+                window.requestAnimationFrame(() => {
                     this.confirmActiveMention(lastOperation.insert);
                 });
                 return;
             }
         }
-
-        this.setState({
-            autoCompleteBlot,
-            inActiveMention: true,
-        });
-        this.props.lookupMentions(autoCompleteBlot.username);
     };
 }
 

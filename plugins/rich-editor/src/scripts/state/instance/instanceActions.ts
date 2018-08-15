@@ -5,15 +5,15 @@
  */
 
 import { ActionsUnion, createAction } from "@dashboard/state/utility";
-import { RangeStatic } from "quill/core";
+import Quill, { RangeStatic } from "quill/core";
 
 export const CREATE_INSTANCE = "[instance] create";
 export const SET_SELECTION = "[instance] set selection";
 
 export const actions = {
     createInstance: (editorID: string | number) => createAction(CREATE_INSTANCE, { editorID }),
-    setSelection: (editorID: string | number, selection: RangeStatic | null) =>
-        createAction(SET_SELECTION, { editorID, selection }),
+    setSelection: (editorID: string | number, selection: RangeStatic | null, quill: Quill) =>
+        createAction(SET_SELECTION, { editorID, selection, quill }),
 };
 
 export type ActionTypes = ActionsUnion<typeof actions>;

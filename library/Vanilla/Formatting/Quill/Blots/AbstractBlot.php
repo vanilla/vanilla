@@ -53,13 +53,13 @@ abstract class AbstractBlot {
     protected $nextOperation = [];
 
     /**
-     * Determine if the operations match this Blot type.
+     * Determine if the operation matches this Blot type.
      *
-     * @param array[] $operations An array of operations to check.
+     * @param array $operation An operation to check.
      *
      * @return bool
      */
-    abstract public static function matches(array $operations): bool;
+    abstract public static function matches(array $operation): bool;
 
     /**
      * Render the blot into an HTML string.

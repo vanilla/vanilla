@@ -10,15 +10,15 @@ namespace Vanilla\Formatting\Quill\Blots\Lines;
 use Vanilla\Formatting\Quill\Parser;
 
 /**
- * Class for handling blockquote operations.
+ * Blot for handling blockquote line terminators.
  */
-class BlockquoteLineBlot extends AbstractLineBlot {
+class BlockquoteLineTerminatorBlot extends AbstractLineTerminatorBlot {
 
     /**
      * @inheritDoc
      */
-    public static function matches(array $operations): bool {
-        return static::opAttrsContainKeyWithValue($operations, "blockquote-line");
+    public static function matches(array $operation): bool {
+        return static::opAttrsContainKeyWithValue($operation, "blockquote-line");
     }
 
     /**

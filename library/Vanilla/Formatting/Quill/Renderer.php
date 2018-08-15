@@ -15,11 +15,11 @@ class Renderer {
     /**
      * Render operations into HTML.
      *
-     * @param BlotGroup[] $blotGroups The blots to render.
+     * @param BlotGroupCollection $blotGroups The blot groups to render.
      *
      * @return string
      */
-    public function render(array $blotGroups): string {
+    public function render(BlotGroupCollection $blotGroups): string {
         $result = "";
         foreach ($blotGroups as $index => $group) {
             $result .= $group->render();

@@ -98,13 +98,19 @@ export async function getAddonAliasMapping(section: string): Promise<IStringMap>
 }
 
 /**
- * Get the source file locations for the build.
+ * Get the source file locations for the build. This will resolve symlinks.
  *
  * @param section - The section of the product being built. Eg. forum / admin / knowledge.
  */
 export async function getScriptSourceDirectories(section: string): Promise<string[]> {
-    const addonPaths = await lookupAddonPaths(section);
-    return addonPaths.map(addonPath => path.resolve(addonPath, "src/scripts"));
+    let addonPaths = await lookupAddonPaths(section);
+    addonPaths = addonPaths.map(addonPath => path.resolve(addonPath, "src/scripts"));
+
+    return await Promise.all(
+        addonPaths.map(file => {
+            return realPath(file);
+        }),
+    );
 }
 
 type EntryType = "ts" | "tsx" | null;

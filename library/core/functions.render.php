@@ -445,7 +445,7 @@ if (!function_exists('categoryFilters')) {
             $baseUrl,
             $filters,
             $extraClasses,
-            'All',
+            t('All'),
             $defaultUrl,
             'View'
         );
@@ -749,7 +749,7 @@ if (!function_exists('discussionFilters')) {
             $baseUrl,
             $filters,
             $extraClasses,
-            'All',
+            t('All'),
             $defaultUrl,
             'View'
         );

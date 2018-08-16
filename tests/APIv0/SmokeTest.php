@@ -503,6 +503,179 @@ class SmokeTest extends BaseTest {
     }
 
     /**
+     * Test modifying a category of a draft.
+     *
+     * @depends testRegisterBasic
+     * @large
+     */
+    public function testModifyDraftCategory() {
+        $api = $this->api();
+        $api->setUser($this->getTestUser());
+        $category = $this->createCategory();
+
+        $draft = [
+            'DiscussionID' => '',
+            'DraftD' => 0,
+            'CategoryID' => 1,
+            'Name' => 'testModifyDraftCategory',
+            'Format' => 'Markdown',
+            'Body' => 'Test posting a new draft',
+            'DeliveryType' => 'VIEW',
+            'DeliveryMethod' => 'JSON',
+            'Save Draft' => 'Save Draft',
+
+        ];
+
+        $r = $api->post(
+            '/post/discussion.json',
+            $draft
+        );
+        $responseBody = $r->getBody();
+
+        $draftModel = new \DraftModel();
+        $postedDraft = $draftModel->getWhere(['DraftID' => $responseBody['DraftID']])->firstRow(DATASET_TYPE_ARRAY);
+
+        $draftUpdate = [
+            'CategoryID' =>  $postedDraft['CategoryID'],
+            'DiscussionID' => $postedDraft['DiscussionID'],
+            'DraftID' => $postedDraft['DraftID'],
+            'CategoryID' => $category['Category']['CategoryID'],
+            'Name' => $postedDraft['Name'],
+            'Format' => 'Markdown',
+            'Body' => $postedDraft['Body'],
+            'DeliveryType' => 'VIEW',
+            'DeliveryMethod' => 'JSON',
+            'Save Draft' => 'Save Draft',
+        ];
+
+        $r2 = $api->post("/post/editdiscussion/0/{$postedDraft['DraftID']}.json", $draftUpdate);
+        $responseBody2 = $r2->getBody();
+        $modifiedDraft = $draftModel->getWhere(['DraftID' => $responseBody2['DraftID']])->firstRow(DATASET_TYPE_ARRAY);
+
+        $this->assertEquals($category['Category']['CategoryID'], $modifiedDraft['CategoryID']);
+    }
+
+    /**
+     * Test saving a comment draft
+     *
+     * @depends testRegisterBasic
+     * @large
+     */
+    public function testSavingCommentDraft() {
+        $api = $this->api();
+        $api->setUser($this->getTestUser());
+
+        $discussion = $this->testPostDiscussion();
+        $discussionID = $discussion['DiscussionID'];
+
+        $comment = [
+            'DiscussionID' => $discussion['DiscussionID'],
+            'CommentID' => '',
+            'DraftID' => '',
+            'Format' => 'Markdown',
+            'Body' => 'Test comment draft',
+            'DeliveryType' => 'VIEW',
+            'DeliveryMethod' => 'JSON',
+            'Type' => 'Draft',
+            'LastCommentID' => 0,
+        ];
+
+        $r = $api->post("/post/comment/?discussionid={$discussionID}.json", $comment);
+        $responseCode = $r->getStatusCode();
+        $this->assertEquals(200, $responseCode);
+        $responseBody = $r->getBody();
+
+        $draftModel = new \DraftModel();
+        $postedDraft = $draftModel->getWhere(['DraftID' => $responseBody['DraftID']])->firstRow(DATASET_TYPE_ARRAY);
+        $this->assertEquals($postedDraft['DiscussionID'], $comment['DiscussionID']);
+        $this->assertEquals($postedDraft['Body'], $comment['Body']);
+    }
+
+    /**
+     * Test posting a comment draft
+     *
+     * @depends testRegisterBasic
+     * @large
+     */
+    public function testPostCommentFromDraft() {
+        $api = $this->api();
+        $api->setUser($this->getTestUser());
+
+        $discussion = $this->testPostDiscussion();
+        $discussionID = $discussion['DiscussionID'];
+
+        $comment = [
+            'DiscussionID' => $discussionID,
+            'CommentID' => '',
+            'DraftID' => '',
+            'Format' => 'Markdown',
+            'Body' => 'Test comment draft',
+            'DeliveryType' => 'VIEW',
+            'DeliveryMethod' => 'JSON',
+            'Type' => 'Draft',
+            'LastCommentID' => 0,
+        ];
+
+        $r = $api->post("/post/comment/?discussionid={$discussionID}.json", $comment);
+        $responseCode = $r->getStatusCode();
+        $this->assertEquals(200, $responseCode);
+        $responseBody = $r->getBody();
+
+        $draftModel = new \DraftModel();
+        $postedDraft = $draftModel->getWhere(['DraftID' => $responseBody['DraftID']])->firstRow(DATASET_TYPE_ARRAY);
+
+        $postComment = [
+            'DiscussionID' => $discussionID,
+            'CommentID' => '',
+            'DraftID' => $postedDraft['DraftID'],
+            'Format' => 'Markdown',
+            'Body' => 'Test comment draft',
+            'DeliveryType' => 'VIEW',
+            'DeliveryMethod' => 'JSON',
+            'Type' => 'Post',
+            'LastCommentID' => 0,
+        ];
+
+        $r2 = $api->post("/post/comment/?discussionid={$discussionID}.json", $postComment);
+        $responseCode2 = $r->getStatusCode();
+        $this->assertEquals(200, $responseCode2);
+        $responseBody2 = $r2->getBody();
+
+        $commentID = $responseBody2['CommentID'];
+        $r3 = $api->post("/post/comment2.json?commentid={$commentID}&inserted=1");
+        $responseCode3 = $r3->getStatusCode();
+        $this->assertEquals(200, $responseCode3);
+
+        $commentModel = new \CommentModel();
+        $dbComment = $commentModel->getWhere(['CommentID' => $commentID ])->firstRow(DATASET_TYPE_ARRAY);
+        $this->assertEquals($dbComment['DiscussionID'], $discussionID);
+        $this->assertEquals($dbComment['Body'], $postComment['Body']);
+    }
+
+    /**
+     * Test that a category with restricted permissions can be created.
+     *
+     * @return array $body
+     * @large
+     */
+    private function createCategory() {
+        $api = $this->api();
+        $admin = $api->querySystemUser(true);
+        $api->setUser($admin);
+
+
+        $r = $this->api()->post('/vanilla/settings/addcategory.json', [
+            'Name' => 'Test Category ',
+            'UrlCode' => 'test',
+            'DisplayAs' => 'Discussions',
+        ]);
+
+        $category = $r->getBody();
+        return $category;
+    }
+
+
+    /**
      * Test viewing a restricted category.
      *
      * @depends testCreateRestrictedCategory

@@ -53,7 +53,6 @@ export default class HistoryModule extends BaseHistoryModule {
         if (this.actionIsEmbedCompletion(undoDelta, changeDelta)) {
             return;
         }
-        console.log(JSON.stringify(this.stack));
         super.record(changeDelta, oldDelta);
     }
 

@@ -16,6 +16,7 @@ import { t } from "@dashboard/application";
 import ToolbarPositioner from "./ToolbarPositioner";
 import { rangeContainsBlot } from "@rich-editor/quill/utility";
 import CodeBlockBlot from "@rich-editor/quill/blots/blocks/CodeBlockBlot";
+import { RangeStatic } from "quill/core";
 
 interface IProps extends IWithEditorProps {
     mentionProps: Array<Partial<IMentionProps>>;
@@ -25,21 +26,18 @@ interface IProps extends IWithEditorProps {
     activeItemId: string | null;
     onItemClick: React.MouseEventHandler<any>;
     showLoader: boolean;
+    mentionSelection: RangeStatic | null;
 }
 
 interface IState {
     flyoutWidth?: number | null;
     flyoutHeight?: number | null;
-    selectionIndex: number | null;
-    selectionLength: number | null;
 }
 
 class MentionSuggestionList extends React.PureComponent<IProps, IState> {
     public state = {
         flyoutWidth: null,
         flyoutHeight: null,
-        selectionIndex: null,
-        selectionLength: null,
     };
     private flyoutRef: React.RefObject<HTMLSpanElement> = React.createRef();
 
@@ -49,7 +47,7 @@ class MentionSuggestionList extends React.PureComponent<IProps, IState> {
 
     public render() {
         const { activeItemId, id, onItemClick, matchedString, mentionProps, showLoader } = this.props;
-        const { mentionSelection } = this.props.instanceState;
+        const { mentionSelection } = this.props;
 
         const hasResults = mentionProps.length > 0 || showLoader;
         const inCodeBlock = rangeContainsBlot(this.props.quill!, CodeBlockBlot, mentionSelection);

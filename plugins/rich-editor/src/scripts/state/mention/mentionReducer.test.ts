@@ -94,7 +94,7 @@ describe("mentionReducer", () => {
         let state = mentionReducer(undefined, mentionActions.loadUsersRequest("test"));
 
         const error = new Error("Failure!");
-        state = mentionReducer(state, mentionActions.loadUsersFailure("test", error));
+        state = mentionReducer(state, mentionActions.loadUsersFailure("test", error as any));
 
         expect(state.usersTrie.getValue("test")).deep.equals({
             status: "FAILED",

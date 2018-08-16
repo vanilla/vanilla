@@ -15,12 +15,12 @@ import { makeBaseConfig } from "./makeBaseConfig";
  */
 export async function makeDevConfig(section: string) {
     const baseConfig: Configuration = (await makeBaseConfig(section)) as any;
-    const forumEntries = await getHotEntries(section);
+    const sectionEntries = await getHotEntries(section);
     baseConfig.mode = "development";
-    baseConfig.entry = forumEntries;
+    baseConfig.entry = sectionEntries;
     baseConfig.devtool = "cheap-module-eval-source-map";
     baseConfig.output = {
-        filename: `forum-hot-bundle.js`,
+        filename: `${section}-hot-bundle.js`,
         chunkFilename: "[name].chunk.js",
         publicPath: `http://localhost:3030/`,
     };

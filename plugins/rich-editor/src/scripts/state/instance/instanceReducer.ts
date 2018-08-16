@@ -6,8 +6,6 @@
 
 import * as instanceActions from "./instanceActions";
 import { IEditorInstanceState, IEditorInstance } from "@rich-editor/@types/store";
-import Quill, { RangeStatic } from "quill/core";
-import { getMentionRange } from "@rich-editor/quill/utility";
 
 const defaultSelection = {
     index: 0,
@@ -18,7 +16,6 @@ export const initialState: IEditorInstanceState = {};
 export const defaultInstance: IEditorInstance = {
     currentSelection: defaultSelection,
     lastGoodSelection: defaultSelection,
-    mentionSelection: null,
 };
 
 /**
@@ -37,23 +34,6 @@ function validateIDExistance(state: IEditorInstanceState, action: instanceAction
             } that doesn't exist. Be sure to create an instance first.`,
         );
     }
-}
-
-function getMentionSelection(currentSelection: RangeStatic | null, quill: Quill): RangeStatic | null {
-    if (!quill.hasFocus() && !document.activeElement.classList.contains("atMentionList-suggestion")) {
-        return null;
-    }
-
-    if (!currentSelection) {
-        return null;
-    }
-
-    if (currentSelection.length > 0) {
-        return null;
-    }
-
-    const mentionSelection = getMentionRange(quill);
-    return mentionSelection;
 }
 
 export default function instanceReducer(
@@ -78,7 +58,6 @@ export default function instanceReducer(
                 ...state,
                 [editorID]: {
                     ...instanceState,
-                    mentionSelection: getMentionSelection(selection, quill),
                     currentSelection: selection,
                     lastGoodSelection: selection !== null ? selection : lastGoodSelection,
                 },

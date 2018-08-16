@@ -14,21 +14,23 @@ import { withEditor, IWithEditorProps } from "@rich-editor/components/context";
 import MentionSuggestionList from "./pieces/MentionSuggestionList";
 import { thunks as mentionThunks, actions as mentionActions } from "@rich-editor/state/mention/mentionActions";
 import MentionAutoCompleteBlot from "@rich-editor/quill/blots/embeds/MentionAutoCompleteBlot";
-import { getBlotAtIndex } from "@rich-editor/quill/utility";
+import { getBlotAtIndex, getMentionRange } from "@rich-editor/quill/utility";
 import { IMentionValue } from "@rich-editor/state/mention/MentionTrie";
 import { connect } from "react-redux";
 import { IMentionSuggestionData, IMentionProps } from "@rich-editor/components/toolbars/pieces/MentionSuggestion";
 import { IStoreState } from "@rich-editor/@types/store";
+import { LoadStatus } from "@dashboard/@types/api";
 
 interface IProps extends IWithEditorProps {
     lookupMentions: (username: string) => void;
     setActiveItem: (itemID: string, itemIndex: number) => void;
-    suggestions: IMentionValue | null;
+    suggestions: IMentionValue;
     lastSuccessfulUsername: string;
     activeSuggestionID: string;
     activeSuggestionIndex: number;
     showLoader: boolean;
     inActiveMention: boolean;
+    mentionSelection: RangeStatic | null;
 }
 
 interface IMentionState {
@@ -67,12 +69,22 @@ export class MentionToolbar extends React.Component<IProps, IMentionState> {
         this.quill.off("text-change", this.onTextChange);
     }
 
+    /**
+     * When this component updates we need to see if the selection state has changed and trigger a lookup.
+     */
     public componentDidUpdate(prevProps: IProps) {
-        const { mentionSelection } = this.props.instanceState;
-        const prevMentionSelection = prevProps.instanceState.mentionSelection;
+        const { mentionSelection } = this.props;
+        const prevMentionSelection = prevProps.mentionSelection;
 
         if (mentionSelection === null && prevMentionSelection !== null && !this.isConvertingMention) {
-            return this.cancelActiveMention();
+            const selection = this.quill!.getSelection();
+            this.cancelActiveMention();
+
+            // We need to restore back the selection we had if the editor is still focused because
+            // the cancelation might have messed up our position.
+            if (this.quill.hasFocus()) {
+                this.quill!.setSelection(selection);
+            }
         }
 
         if (!isEqual(mentionSelection, prevMentionSelection) && !this.isConvertingMention) {
@@ -87,7 +99,7 @@ export class MentionToolbar extends React.Component<IProps, IMentionState> {
 
     public render() {
         const { suggestions, lastSuccessfulUsername, showLoader, activeSuggestionID } = this.props;
-        const data = suggestions && suggestions.status === "SUCCESSFUL" ? suggestions.users : [];
+        const data = suggestions && suggestions.status === LoadStatus.SUCCESS ? suggestions.data : [];
 
         return (
             <MentionSuggestionList
@@ -98,12 +110,17 @@ export class MentionToolbar extends React.Component<IProps, IMentionState> {
                 id={this.ID}
                 loaderID={this.loaderID}
                 showLoader={showLoader}
+                mentionSelection={this.props.mentionSelection}
             />
         );
     }
 
+    /**
+     * Get an autocomplete blot. Creates a new one if we haven't made one yet.
+     */
     private getAutoCompleteBlot(): MentionAutoCompleteBlot | null {
-        const { mentionSelection, currentSelection } = this.props.instanceState;
+        const { currentSelection } = this.props.instanceState;
+        const { mentionSelection } = this.props;
         if (!currentSelection || !mentionSelection) {
             return null;
         }
@@ -133,7 +150,7 @@ export class MentionToolbar extends React.Component<IProps, IMentionState> {
      */
     private get hasApiResponse() {
         const { suggestions } = this.props;
-        return suggestions && suggestions.status === "SUCCESSFUL";
+        return suggestions && suggestions.status === LoadStatus.SUCCESS;
     }
 
     /**
@@ -149,10 +166,10 @@ export class MentionToolbar extends React.Component<IProps, IMentionState> {
      */
     private keyDownListener = (event: KeyboardEvent) => {
         const { suggestions, activeSuggestionIndex, activeSuggestionID, showLoader } = this.props;
-        const { mentionSelection } = this.props.instanceState;
+        const { mentionSelection } = this.props;
         const inActiveMention = mentionSelection !== null;
 
-        if (!suggestions || suggestions.status !== "SUCCESSFUL") {
+        if (!suggestions || suggestions.status !== LoadStatus.SUCCESS) {
             return;
         }
 
@@ -167,12 +184,12 @@ export class MentionToolbar extends React.Component<IProps, IMentionState> {
             const firstIndex = 0;
             const nextIndex = activeSuggestionIndex + 1;
             const prevIndex = activeSuggestionIndex - 1;
-            const userLength = Math.min(MentionToolbar.SUGGESTION_LIMIT, suggestions.users.length);
+            const userLength = Math.min(MentionToolbar.SUGGESTION_LIMIT, suggestions.data.length);
             const lastIndex = showLoader ? userLength : userLength - 1;
             const currentItemIsLoader = activeSuggestionID === this.loaderID;
 
             const getIDFromIndex = (newIndex: number) => {
-                return showLoader && newIndex === lastIndex ? this.loaderID : suggestions.users[newIndex].domID;
+                return showLoader && newIndex === lastIndex ? this.loaderID : suggestions.data[newIndex].domID;
             };
 
             switch (true) {
@@ -193,7 +210,7 @@ export class MentionToolbar extends React.Component<IProps, IMentionState> {
                     break;
                 }
                 case Keyboard.match(event, Keyboard.keys.ENTER): {
-                    if (suggestions.users.length > 0 && !currentItemIsLoader) {
+                    if (suggestions.data.length > 0 && !currentItemIsLoader) {
                         this.confirmActiveMention();
                         event.preventDefault();
                         event.stopPropagation();
@@ -255,22 +272,14 @@ export class MentionToolbar extends React.Component<IProps, IMentionState> {
      * @param clearComboBox - Whether or not to clear the current combobox. An situation where you would not want to do this is if it is already deleted or it has already been detached from quill.
      */
     private cancelActiveMention() {
-        const selection = this.quill.getSelection();
         if (this.state.autoCompleteBlot && !this.isConvertingMention) {
             this.isConvertingMention = true;
             this.state.autoCompleteBlot.cancel();
         }
         this.isConvertingMention = false;
-        this.setState(
-            {
-                autoCompleteBlot: null,
-            },
-            () => {
-                // if (selection && selection.length > 0) {
-                //     this.quill.setSelection(selection);
-                // }
-            },
-        );
+        this.setState({
+            autoCompleteBlot: null,
+        });
     }
 
     /**
@@ -283,13 +292,13 @@ export class MentionToolbar extends React.Component<IProps, IMentionState> {
             !(autoCompleteBlot instanceof MentionAutoCompleteBlot) ||
             this.isConvertingMention ||
             !suggestions ||
-            suggestions.status !== "SUCCESSFUL"
+            suggestions.status !== LoadStatus.SUCCESS
         ) {
             return;
         }
 
         this.isConvertingMention = true;
-        const activeSuggestion = suggestions.users[activeSuggestionIndex];
+        const activeSuggestion = suggestions.data[activeSuggestionIndex];
         const start = autoCompleteBlot.offset(this.quill.scroll);
 
         autoCompleteBlot.finalize(activeSuggestion);
@@ -324,7 +333,7 @@ export class MentionToolbar extends React.Component<IProps, IMentionState> {
             this.MENTION_COMPLETION_CHARACTERS.includes(lastOperation.insert)
         ) {
             const { suggestions } = this.props;
-            const users = suggestions && suggestions.status === "SUCCESSFUL" ? suggestions.users : [];
+            const users = suggestions && suggestions.status === LoadStatus.SUCCESS ? suggestions.data : [];
 
             const isASingleExactMatch = users.length === 1 && this.props.lastSuccessfulUsername === users[0].name;
             // Autocomplete the mention if certain conditions occur.
@@ -349,7 +358,35 @@ function mapDispatchToProps(dispatch) {
     };
 }
 
-function mapStateToProps(state: IStoreState) {
+/**
+ * Calculate the current mention selection.
+ */
+function calculateMentionSelection(
+    currentSelection: RangeStatic | null,
+    quill: Quill,
+    mentionSuggestions: IMentionValue | null,
+): RangeStatic | null {
+    if (!quill.hasFocus() && !document.activeElement.classList.contains("atMentionList-suggestion")) {
+        return null;
+    }
+
+    if (!currentSelection) {
+        return null;
+    }
+
+    if (mentionSuggestions && mentionSuggestions.status === LoadStatus.ERROR) {
+        return null;
+    }
+
+    if (currentSelection.length > 0) {
+        return null;
+    }
+
+    const mentionSelection = getMentionRange(quill);
+    return mentionSelection;
+}
+
+function mapStateToProps(state: IStoreState, ownProps: IWithEditorProps) {
     const {
         lastSuccessfulUsername,
         currentUsername,
@@ -360,13 +397,19 @@ function mapStateToProps(state: IStoreState) {
 
     const currentNode = currentUsername && usersTrie.getValue(currentUsername);
     const showLoader = currentNode && currentNode.status === "PENDING";
+    const suggestions = lastSuccessfulUsername ? usersTrie.getValue(lastSuccessfulUsername) : null;
 
     return {
-        suggestions: lastSuccessfulUsername ? usersTrie.getValue(lastSuccessfulUsername) : null,
+        suggestions,
         lastSuccessfulUsername,
         activeSuggestionID,
         activeSuggestionIndex,
         showLoader,
+        mentionSelection: calculateMentionSelection(
+            ownProps.instanceState.currentSelection,
+            ownProps.quill,
+            suggestions,
+        ),
     };
 }
 
@@ -375,4 +418,4 @@ const withRedux = connect(
     mapDispatchToProps,
 );
 
-export default withRedux(withEditor<IProps>(MentionToolbar) as any);
+export default withEditor<any>(withRedux(MentionToolbar as any));

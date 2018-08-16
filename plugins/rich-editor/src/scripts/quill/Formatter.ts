@@ -17,6 +17,9 @@ import SpoilerLineBlot from "@rich-editor/quill/blots/blocks/SpoilerBlot";
 import HeadingBlot from "quill/formats/header";
 import { Blot, RangeStatic } from "quill/core";
 import Parchment from "parchment";
+import Embed from "quill/blots/embed";
+import ExternalEmbedBlot from "@rich-editor/quill/blots/embeds/ExternalEmbedBlot";
+import HistoryModule from "@rich-editor/quill/HistoryModule";
 
 export default class Formatter {
     public static INLINE_FORMAT_NAMES = [
@@ -33,8 +36,11 @@ export default class Formatter {
         SpoilerLineBlot.blotName,
         HeadingBlot.blotName,
     ];
+    private historyModule: HistoryModule;
 
-    constructor(private quill: Quill) {}
+    constructor(private quill: Quill) {
+        this.historyModule = quill.getModule("history");
+    }
 
     public bold = (range: RangeStatic) => {
         this.handleBooleanFormat(range, BoldBlot.blotName);
@@ -77,23 +83,18 @@ export default class Formatter {
         }
         const firstLine = lines[0];
         const lastLine = lines[lines.length - 1];
-
-        lines.forEach(line => {
-            if (line) {
-                const text = (line.domNode as HTMLElement).innerText || "";
-                (line as any).children.forEach(child => {
-                    child.remove();
-                });
-                this.quill.update(Quill.sources.USER);
-                line.insertAt(0, text);
-                this.quill.update(Quill.sources.USER);
-                const start = line.offset(this.quill.scroll);
-                const length = lastLine.length();
-                this.quill.formatLine(start, length, CodeBlockBlot.blotName, true, Quill.sources.USER);
-            }
-        });
-
-        // this.quill.formatLine(start, length, CodeBlockBlot.blotName, true, Quill.sources.USER);
+        const start = firstLine.offset(this.quill.scroll);
+        const length = lastLine.offset(this.quill.scroll) + lastLine.length() - start;
+        const fullRange = {
+            index: start,
+            length,
+        };
+        const difference = this.replaceInlineEmbeds(fullRange);
+        // setImmediate(() => {
+        // const;
+        // this.historyModule.cutoff();
+        this.quill.formatLine(start, length + difference, CodeBlockBlot.blotName, true, Quill.sources.USER);
+        // });
     };
     public blockquote = (range: RangeStatic) => {
         this.quill.formatLine(range.index, range.length, BlockquoteLineBlot.blotName, true, Quill.sources.USER);
@@ -107,5 +108,17 @@ export default class Formatter {
         const isEnabled = formats[formatKey] === true;
         this.quill.formatText(range.index, range.length, formatKey, !isEnabled, Quill.sources.USER);
         this.quill.update(Quill.sources.USER);
+    }
+
+    private replaceInlineEmbeds(range: RangeStatic): number {
+        const embeds = this.quill.scroll.descendants(Embed as any, range.index, range.length);
+        let lengthDifference = 0;
+        embeds.forEach(embed => {
+            const text = (embed.domNode as HTMLElement).innerText || "";
+            lengthDifference += text.length - 1;
+            embed.replaceWith("text", text);
+            this.quill.update(Quill.sources.USER);
+        });
+        return lengthDifference;
     }
 }

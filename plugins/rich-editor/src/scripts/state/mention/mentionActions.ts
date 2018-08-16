@@ -9,6 +9,7 @@ import { ActionsUnion, createAction } from "@dashboard/state/utility";
 import api from "@dashboard/apiv2";
 import { IMentionSuggestionData } from "@rich-editor/components/toolbars/pieces/MentionSuggestion";
 import { IStoreState } from "@rich-editor/@types/store";
+import { IApiError, LoadStatus } from "@dashboard/@types/api";
 
 export const SET_ACTIVE_SUGGESTION = "[mentions] set active suggestion";
 export const LOAD_USERS_REQUEST = "[mentions] load users request";
@@ -50,16 +51,17 @@ function loadUsers(username: string) {
     return (dispatch: Dispatch<any>, getState: () => IStoreState) => {
         const { usersTrie } = getState().editor.mentions;
 
+        const thing = true;
+
         // Attempt an exact lookup first.
         const exactLookup = usersTrie.getValue(username);
         if (exactLookup != null) {
             switch (exactLookup.status) {
-                case "SUCCESSFUL":
-                    return dispatch(actions.loadUsersSuccess(username, exactLookup.users));
-                case "PENDING":
-                    // Already working on it.
+                case LoadStatus.SUCCESS:
+                case LoadStatus.LOADING:
+                    // Already handled
                     return;
-                case "FAILED":
+                case LoadStatus.ERROR:
                     // Previously failed.
                     return dispatch(actions.loadUsersFailure(username, exactLookup.error));
             }
@@ -69,18 +71,18 @@ function loadUsers(username: string) {
         const partialLookup = usersTrie.getValueFromPartialsOfWord(username);
         if (partialLookup != null) {
             switch (partialLookup.status) {
-                case "SUCCESSFUL": {
-                    if (partialLookup.users.length < USER_LIMIT) {
+                case LoadStatus.SUCCESS: {
+                    if (partialLookup.data.length < USER_LIMIT) {
                         // The previous match already found the maximum amount of users that the server had
                         // Return the previous results.
                         return dispatch(
-                            actions.loadUsersSuccess(username, filterSuggestions(partialLookup.users, username)),
+                            actions.loadUsersSuccess(username, filterSuggestions(partialLookup.data, username)),
                         );
                     }
                 }
-                case "FAILED":
+                case LoadStatus.ERROR:
                 // Previously failed. We still want to proceed to a real lookup so do nothing.
-                case "PENDING":
+                case LoadStatus.PENDING:
                 // We still want to proceed to a real lookup so do nothing.
             }
         }
@@ -115,7 +117,7 @@ function loadUsers(username: string) {
 
 export const actions = {
     loadUsersRequest: (username: string) => createAction(LOAD_USERS_REQUEST, { username }),
-    loadUsersFailure: (username: string, error: Error) => createAction(LOAD_USERS_FAILURE, { username, error }),
+    loadUsersFailure: (username: string, error: IApiError) => createAction(LOAD_USERS_FAILURE, { username, error }),
     loadUsersSuccess: (username: string, users: IMentionSuggestionData[]) =>
         createAction(LOAD_USERS_SUCCESS, { username, users }),
     setActiveSuggestion: (suggestionID: string, suggestionIndex: number) =>

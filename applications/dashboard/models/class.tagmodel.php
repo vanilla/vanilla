@@ -530,6 +530,7 @@ class TagModel extends Gdn_Model {
             ->join('Tag t', 't.TagID = td.TagID')
             ->whereIn('t.Name', $tags)
             ->limit($limit, $offset)
+            ->orderBy('td.DiscussionID', 'desc')
             ->get()->resultArray();
 
         $taggedDiscussionIDs = array_column($taggedDiscussionIDs, 'DiscussionID');

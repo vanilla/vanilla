@@ -121,17 +121,29 @@ export function formatUrl(path: string): string {
         return path;
     } // this is an absolute path.
 
-    const urlFormat = getMeta("UrlFormat", "/{Path}");
+    const urlFormat = getMeta("context.basePath", "/");
 
-    if (path.substr(0, 1) === "/") {
-        path = path.substr(1);
+    if (path.substr(0, 1) !== "/") {
+        path = `/${path}`;
     }
 
-    if (urlFormat.indexOf("?") >= 0) {
-        path = path.replace("?", "&");
-    }
+    return urlFormat + path;
+}
 
-    return urlFormat.replace("{Path}", path);
+/**
+ * Format a URL in the format passed from the controller.
+ *
+ * @param path - The path to format.
+ *
+ * @returns Returns a URL that can be used in the APP.
+ */
+export function assetUrl(path: string): string {
+    if (path.indexOf("//") >= 0) {
+        return path;
+    } // this is an absolute path.
+
+    const urlFormat = getMeta("context.assetPath", "/");
+    return urlFormat + path;
 }
 
 /**

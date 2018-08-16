@@ -34,7 +34,7 @@ if [ -z "$GIT_DIFF" ]; then
     echo "No PHP file changes detected."
 
     [ -n "$TRAVIS" ] && echo "travis_fold:end:coding_standards"
-    exit
+    exit 0
 fi
 echo "Exporting branch diff of $DIFF_BRANCH to $GIT_DIFF_FILENAME..."
 rm -f $GIT_DIFF_FILENAME

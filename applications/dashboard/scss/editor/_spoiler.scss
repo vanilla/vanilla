@@ -78,7 +78,7 @@ $buttonSpoiler: (
     }
 
     &:hover {
-        background-color: map-get($buttonSpoiler, "background-color");
+        background-color: $buttonSpoiler-bg;
         .spoiler-warningMain {
             opacity: 1;
         }

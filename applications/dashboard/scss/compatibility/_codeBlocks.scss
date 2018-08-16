@@ -1,21 +1,22 @@
 // Compatibility with older themes. These are not styles we plan on carrying over to future projects.
 // However, we're using some of the same variables for future compatibility.
 
-$code_fontSize: .86em !default;
+$code_fontSize: .8em !default;
 $code_borderRadius: 0 !default;
 $code_bg: mix($global-color_fg, $global-color_bg, 5%) !default; // target rgba(127, 127, 127, .15);
 $code_fg: darken($global-color_fg, 20%) !default;
-$code_padding: .2em .4em !default;
 
 $code-inline_borderColor: mix($global-color_fg, $global-color_bg, 50%) !default;; // target #a3a3a3
 $code-inline_borderRadius: $code_borderRadius !default;
+$code-inline_padding: .2em .4em !default;
 
 $code-block_borderRadius: $code_borderRadius !default;
+$code-block_padding: 1em 1em !default;
 
 // Code
 .userContent {
     .code {
-        display: inline-block;
+        display: inline;
         vertical-align: middle;
         line-height: inherit;
         font-size: .9em;
@@ -24,14 +25,13 @@ $code-block_borderRadius: $code_borderRadius !default;
         max-width: 100%;
         margin: 0;
         color: $code_fg;
-        padding: $code_padding;
         background-color: $code_bg;
-
     }
 
     .codeInline {
         display: inline;
         white-space: normal;
+        padding: $code-inline_padding;
         border:  {
             radius: $code-inline_borderRadius;
         }
@@ -41,8 +41,9 @@ $code-block_borderRadius: $code_borderRadius !default;
         display: block;
         overflow-x: auto;
         word-wrap: normal;
-        line-height: 1.4;
+        line-height: 1.45;
         white-space: pre;
+        padding: $code-block_padding;
         border:  {
             radius: $code-block_borderRadius;
         }

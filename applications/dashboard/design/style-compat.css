@@ -120,7 +120,7 @@ button.Close {
 }
 
 .userContent .code {
-  display: inline-block;
+  display: inline;
   vertical-align: middle;
   line-height: inherit;
   font-size: .9em;
@@ -129,13 +129,13 @@ button.Close {
   max-width: 100%;
   margin: 0;
   color: #26282b;
-  padding: 0.2em 0.4em;
   background-color: #f7f7f7;
 }
 
 .userContent .codeInline {
   display: inline;
   white-space: normal;
+  padding: 0.2em 0.4em;
   border-radius: 0;
 }
 
@@ -143,8 +143,9 @@ button.Close {
   display: block;
   overflow-x: auto;
   word-wrap: normal;
-  line-height: 1.4;
+  line-height: 1.45;
   white-space: pre;
+  padding: 1em 1em;
   border-radius: 0;
 }
 
@@ -1802,6 +1803,10 @@ body.isMobile .Popup.hasRichEditor .Border {
   opacity: 1;
 }
 
+.button-spoiler:hover {
+  background-color: transparent;
+}
+
 .button-spoiler:hover .spoiler-warningMain {
   opacity: 1;
 }
@@ -1902,7 +1907,6 @@ body.isMobile .Popup.hasRichEditor .Border {
 
 .embedResponsive-initialLink {
   text-align: start;
-  padding: .5em .7em;
 }
 
 .embedExternal {
@@ -2371,6 +2375,9 @@ body.isMobile .Popup.hasRichEditor .Border {
 }
 
 .embedQuote-collapseButton {
+  position: absolute;
+  top: 0;
+  right: 0;
   -webkit-appearance: none;
      -moz-appearance: none;
           appearance: none;
@@ -2380,16 +2387,25 @@ body.isMobile .Popup.hasRichEditor .Border {
   margin-left: auto;
   height: 36px;
   width: auto;
-  padding: 0 12px;
+  padding: 0 18px;
+  opacity: 0.6;
+}
+
+.embedQuote-collapseButton:active {
+  background-color: #e1f2fb;
+  outline: none;
+  opacity: 1;
 }
 
 .embedQuote-collapseButton:focus {
   background-color: #e1f2fb;
   outline: none;
+  opacity: 1;
 }
 
-.embedQuote-collapseButton:active {
-  color: #0f97dd;
+.embedQuote-collapseButton:hover {
+  opacity: 1;
+  background-color: transparent;
 }
 
 .embedQuote-chevronUp,

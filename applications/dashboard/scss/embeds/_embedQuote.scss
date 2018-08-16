@@ -41,6 +41,7 @@ $embedQuote-toggleButton_padding  : 12px !default;
 }
 
 .embedQuote-collapseButton {
+    @include absolute-topRight;
     appearance: none;
     background: none;
     border: none;
@@ -48,18 +49,22 @@ $embedQuote-toggleButton_padding  : 12px !default;
     margin-left: auto;
     height: $richEditor-menuButton_size;
     width: auto;
-    padding: 0 $embedQuote-toggleButton_padding;
+    padding: 0 $embeddedText_padding;
+    opacity: $state-icon_opacity;
 
-    &:hover {
-        @include iconButtonHoverState;
+    &:active {
+        @include buttonFocusStateStyles;
+        opacity: 1;
     }
 
     &:focus {
         @include buttonFocusStateStyles;
+        opacity: 1;
     }
 
-    &:active {
-        @include iconButtonActiveState;
+    &:hover {
+        opacity: 1;
+        background-color: transparent;
     }
 }
 

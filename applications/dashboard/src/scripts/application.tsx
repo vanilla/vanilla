@@ -122,11 +122,6 @@ export function formatUrl(path: string): string {
     } // this is an absolute path.
 
     const urlFormat = getMeta("context.basePath", "/");
-
-    if (path.substr(0, 1) !== "/") {
-        path = `/${path}`;
-    }
-
     return urlFormat + path;
 }
 

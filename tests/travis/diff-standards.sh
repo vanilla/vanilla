@@ -33,7 +33,7 @@ GIT_DIFF=$(git diff $DIFF_BRANCH '*.php')
 if [ -z "$GIT_DIFF" ]; then
     echo "No PHP file changes detected."
 
-    [ $TRAVIS ] &&  echo "travis_fold:end:coding_standards"
+    [ $TRAVIS ] && echo "travis_fold:end:coding_standards"
     exit 0
 fi
 echo "Exporting branch diff of $DIFF_BRANCH to $GIT_DIFF_FILENAME..."

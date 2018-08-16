@@ -8,8 +8,7 @@
  * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
  */
 
-const potentialPublicPath = window.gdn && window.gdn.meta && window.gdn.meta.WebRoot;
-const finalPublicPath = potentialPublicPath != null ? potentialPublicPath : "/";
+import { assetUrl } from "@dashboard/application";
 
 /**
  * This needs to be a free variable.
@@ -22,4 +21,4 @@ const finalPublicPath = potentialPublicPath != null ? potentialPublicPath : "/";
  * @see https://github.com/webpack/webpack/issues/2776#issuecomment-233208623
  */
 // @ts-ignore: Cannot find variable warning. See comment aboe.
-__webpack_public_path__ = finalPublicPath;
+__webpack_public_path__ = assetUrl("/");

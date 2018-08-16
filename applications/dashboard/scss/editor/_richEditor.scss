@@ -9,7 +9,6 @@ $richEditor-menuButton_size                       : 36px !default;
 $richEditor-floatingButton_size                   : 28px !default;
 
 $richEditor-embedMenu_padding                     : 0 !default;
-$richEditor-icon_opacity                          : .8 !default;
 
 $richEditor-insertLink_width                      : 387px !default;
 
@@ -214,6 +213,11 @@ $richEditor-mobileEmbedBreakPoint                 : 550px !default;
     user-select: none;
     cursor: pointer;
 
+    //.Close-x,
+    //.richEditorButton-icon {
+    //    opacity: $state-icon_opacity;
+    //}
+
 
     &.richEditor-formatButton,
     &.richEditor-embedButton {
@@ -228,7 +232,7 @@ $richEditor-mobileEmbedBreakPoint                 : 550px !default;
         text-align: center;
 
         &.isSelected {
-            @include editorButtonActiveStyles;
+            @include iconButtonActiveState;
         }
     }
 
@@ -237,25 +241,37 @@ $richEditor-mobileEmbedBreakPoint                 : 550px !default;
     }
 
     &:hover {
-        @include editorButtonHoverStyles;
+        @include iconButtonHoverState;
+        .Close-x,
+        .richEditorButton-icon {
+            opacity: 1;
+        }
     }
 
     &:focus {
-        @include editorButtonFocusStyles;
+        @include buttonFocusStateStyles;
         z-index: 2;
+        .Close-x,
+        .richEditorButton-icon {
+            opacity: 1;
+        }
     }
 
     &.isActive {
-        @include editorButtonActiveStyles;
+        @include iconButtonActiveState;
+        .Close-x,
+        .richEditorButton-icon {
+            opacity: 1;
+        }
     }
 
     &.isOpen {
-        @include editorButtonOpenStyles;
+        @include iconButtonActiveState;
     }
 
     &.richEditor-formatButton {
         &:focus {
-            @include editorButtonFocusStyles($richEditor-paragraphMenuButton_offset);
+            @include buttonFocusStateStyles($richEditor-paragraphMenuButton_offset);
         }
     }
 }
@@ -299,12 +315,12 @@ $richEditor-mobileEmbedBreakPoint                 : 550px !default;
     margin: auto;
     height: $icon-default_size;
     width: $icon-default_size;
-    opacity: $richEditor-icon_opacity;
+    opacity: $state-icon_opacity;
 }
 
 .Close-x {
     display: block;
-    opacity: $richEditor-icon_opacity;
+    opacity: $state-icon_opacity;
     cursor: pointer;
 }
 
@@ -335,7 +351,7 @@ $richEditor-mobileEmbedBreakPoint                 : 550px !default;
     cursor: pointer;
 
     &:focus {
-        @include editorButtonFocusStyles;
+        @include buttonFocusStateStyles;
     }
 }
 
@@ -733,6 +749,33 @@ body.hasRichEditor {
                 .Buttons {
                     padding-right: 0;
                 }
+            }
+        }
+
+        .Popup.hasRichEditor {
+            .Border {
+                width: 100%;
+                box-sizing: border-box;
+            }
+
+            .Content {
+                margin-top: 10px;
+                > h1 {
+                    padding-left: $richEditor_horizontalPadding;
+                }
+            }
+
+            .FormWrapper {
+                background: none;
+                padding: {
+                    top: 3px;
+                    left: $richEditor_horizontalPadding;
+                    right: $richEditor_horizontalPadding;
+                }
+            }
+
+            .richEditor {
+                padding-left: 0;
             }
         }
     }

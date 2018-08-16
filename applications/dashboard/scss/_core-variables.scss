@@ -39,12 +39,22 @@ $global-border-style                                 : solid;
 $global_borderRadius                                 : 2px !default;
 
 /* -------------------------------------------------------------- *\
-    States Colors
+    States
 \* -------------------------------------------------------------- */
 
-$state-color_hover                                   : mix($global-color_primary, $global-color_bg, 5.5%) !default; // rgba(174, 228, 255, 0.2);
-$state-color_focus                                   : mix($global-color_primary, $global-color_bg, 12%) !default; // rgba(174, 228, 255, 0.4);
-$state-color_selected                                : mix($global-color_primary, $global-color_bg, 95%) !default; // #0075f5
+$state-icon_opacity                                  : .6;
+$state-text_opacity                                  : .8;
+
+$state-hover_color                                   : mix($global-color_primary, $global-color_bg, 5.5%) !default; // rgba(174, 228, 255, 0.2);
+$state-hover_opacity                                 : 1 !default;
+
+$state-focus_color                                   : mix($global-color_primary, $global-color_bg, 12%) !default; // rgba(174, 228, 255, 0.4);
+$state-focus_opacity                                 : 1 !default;
+$state-focus_outline                                 : none !default;
+
+$state-active_color                                  : mix($global-color_primary, $global-color_bg, 95%) !default; // #0075f5
+$state-active_opacity                                : 1 !default;
+
 
 
 /* -------------------------------------------------------------- *\

@@ -11,7 +11,7 @@
     width: 1px;
 
     &:focus {
-        @include editorButtonFocusStyles;
+        @include buttonFocusStateStyles;
         position: absolute;
         top: 50px;
         left: 0;
@@ -30,6 +30,6 @@
     }
 
     &:hover {
-        @include editorButtonActiveStyles;
+        @include iconButtonActiveState;
     }
 }

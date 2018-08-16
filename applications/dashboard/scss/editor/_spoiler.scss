@@ -1,13 +1,10 @@
-$spoiler-borderColor: #aaadb1 !default;
-$spoiler-borderRadius: 2px !default;
-$spoiler-bg: #fff8d9 !default;
+$spoiler-borderColor: $global-border_color !default;
+$spoiler-borderRadius: $global_borderRadius !default;
+$spoiler-bg: mix($global-body_bg, $global-color_fg, 95%) !default;
 $spoiler-fontSize: 16px !default;
-$buttonSpoiler-fg: #555a62 !default;
+$buttonSpoiler-fg: $global-color_fg !default; // target #555a62
 $buttonSpoiler-bg: transparent !default;
-$buttonSpoiler-hover_fg: #f52c6e !default;
-$buttonSpoiler-hover_bg: transparent !default;
-$buttonSpoiler-focus_fg: #f52c6e !default;
-$buttonSpoiler-focus_bg: transparent !default;
+
 
 $buttonSpoiler: (
     default: (
@@ -16,14 +13,6 @@ $buttonSpoiler: (
         color: $buttonSpoiler-fg,
         background-color: $buttonSpoiler-bg,
         text-align: left
-    ),
-    hover: (
-        color: $buttonSpoiler-hover_fg,
-        background-color: $buttonSpoiler-hover_bg,
-    ),
-    focus: (
-        color: $buttonSpoiler-focus_fg,
-        background-color: $buttonSpoiler-focus_bg
     )
 ) !default;
 
@@ -79,7 +68,21 @@ $buttonSpoiler: (
     outline: 0;
     cursor: pointer;
     text-align: center;
-    opacity: 1;
+
+    &:focus {
+        @include buttonFocusStateStyles;
+        opacity: 1;
+        .spoiler-warningMain {
+            opacity: 1;
+        }
+    }
+
+    &:hover {
+        background-color: map-get($buttonSpoiler, "background-color");
+        .spoiler-warningMain {
+            opacity: 1;
+        }
+    }
 }
 
 .spoiler-warningMain {
@@ -90,6 +93,7 @@ $buttonSpoiler: (
     padding: 0 $icon_default_size;
     width: 100%;
     line-height: 1;
+    opacity: $state-text_opacity;
 }
 
 .spoiler-icon {

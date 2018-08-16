@@ -1,15 +1,16 @@
 // Compatibility with older themes. These are not styles we plan on carrying over to future projects.
 // However, we're using some of the same variables for future compatibility.
 
-$richEditor-code_fontSize: .86em !default;
-$richEditor-inlineCode_borderColor: mix($global-color_fg, $global-color_bg, 50%); // target #a3a3a3
-$richEditor-inlineCode_borderRadius: 0;
-//$richEditor-inlineCode_borderWidth: 1px;
-//$richEditor-inlineCode_verticalPadding: .07em !default;
-//$richEditor-inlineCode_horizontalPadding: .5em !default;
-//$richEditor-codeBlock_padding: 16px !default;
-$richEditor-code_bg: mix($global-color_fg, $global-color_bg, 5%); // target rgba(127, 127, 127, .15);
-$richEditor-code_fg: darken($global-color_fg, 20%) !default;
+$code_fontSize: .86em !default;
+$code_borderRadius: 0 !default;
+$code_bg: mix($global-color_fg, $global-color_bg, 5%) !default; // target rgba(127, 127, 127, .15);
+$code_fg: darken($global-color_fg, 20%) !default;
+$code_padding: .2em .4em !default;
+
+$code-inline_borderColor: mix($global-color_fg, $global-color_bg, 50%) !default;; // target #a3a3a3
+$code-inline_borderRadius: $code_borderRadius !default;
+
+$code-block_borderRadius: $code_borderRadius !default;
 
 // Code
 .userContent {
@@ -22,16 +23,18 @@ $richEditor-code_fg: darken($global-color_fg, 20%) !default;
         font-family: Menlo, Monaco, Consolas, "Courier New", monospace;
         max-width: 100%;
         margin: 0;
-        color: $richEditor-code_fg;
-        background-color: $richEditor-code_bg;
-        border:  {
-            radius: $richEditor-inlineCode_borderRadius;
-        }
+        color: $code_fg;
+        padding: $code_padding;
+        background-color: $code_bg;
+
     }
 
     .codeInline {
         display: inline;
         white-space: normal;
+        border:  {
+            radius: $code-inline_borderRadius;
+        }
     }
 
     .codeBlock {
@@ -40,5 +43,8 @@ $richEditor-code_fg: darken($global-color_fg, 20%) !default;
         word-wrap: normal;
         line-height: 1.4;
         white-space: pre;
+        border:  {
+            radius: $code-block_borderRadius;
+        }
     }
 }

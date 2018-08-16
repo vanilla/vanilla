@@ -20,7 +20,7 @@ PHPCS_DIFF_FILENAME=$BUILD_DIR/phpcs-diff.json
 cd $BUILD_DIR
 
 # Begin folding in Travis.
-[ -n "$TRAVIS" ] && echo "travis_fold:start:coding_standards"
+[ $TRAVIS ] && echo "travis_fold:start:coding_standards"
 
 echo "Verify changed code against coding standards."
 
@@ -33,7 +33,7 @@ GIT_DIFF=$(git diff $DIFF_BRANCH '*.php')
 if [ -z "$GIT_DIFF" ]; then
     echo "No PHP file changes detected."
 
-    [ -n "$TRAVIS" ] && echo "travis_fold:end:coding_standards"
+    [ $TRAVIS ] &&  echo "travis_fold:end:coding_standards"
     exit 0
 fi
 echo "Exporting branch diff of $DIFF_BRANCH to $GIT_DIFF_FILENAME..."
@@ -49,4 +49,4 @@ echo ""
 ./vendor/bin/diffFilter --phpcs $GIT_DIFF_FILENAME $PHPCS_DIFF_FILENAME
 
 # End folding in Travis.
-[ -n "$TRAVIS" ] && echo "travis_fold:end:coding_standards"
+[ $TRAVIS ] && echo "travis_fold:end:coding_standards"

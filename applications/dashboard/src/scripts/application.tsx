@@ -121,17 +121,24 @@ export function formatUrl(path: string): string {
         return path;
     } // this is an absolute path.
 
-    const urlFormat = getMeta("UrlFormat", "/{Path}");
+    const urlFormat = getMeta("context.basePath", "/");
+    return urlFormat + path;
+}
 
-    if (path.substr(0, 1) === "/") {
-        path = path.substr(1);
-    }
+/**
+ * Create the URL of an asset of the site.
+ *
+ * @param path - The path to format.
+ *
+ * @returns Returns a URL that can be used for a static asset.
+ */
+export function assetUrl(path: string): string {
+    if (path.indexOf("//") >= 0) {
+        return path;
+    } // this is an absolute path.
 
-    if (urlFormat.indexOf("?") >= 0) {
-        path = path.replace("?", "&");
-    }
-
-    return urlFormat.replace("{Path}", path);
+    const urlFormat = getMeta("context.assetPath", "/");
+    return urlFormat + path;
 }
 
 /**

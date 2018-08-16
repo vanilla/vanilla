@@ -76,7 +76,8 @@
     },
     "scripts": {
         "pre-install-cmd": "Vanilla\\Setup\\ComposerHelper::preUpdate",
-        "pre-update-cmd": "Vanilla\\Setup\\ComposerHelper::preUpdate"
+        "pre-update-cmd": "Vanilla\\Setup\\ComposerHelper::preUpdate",
+        "lint-diff": "./tests/travis/diff-standards.sh"
     },
     "autoload-dev": {
         "psr-4": {

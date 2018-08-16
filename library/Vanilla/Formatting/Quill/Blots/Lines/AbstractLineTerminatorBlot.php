@@ -8,13 +8,14 @@
 namespace Vanilla\Formatting\Quill\Blots\Lines;
 
 use Vanilla\Formatting\Quill\BlotGroup;
+use Vanilla\Formatting\Quill\Blots\AbstractBlot;
 use Vanilla\Formatting\Quill\Blots\TextBlot;
 
 /**
- * Base blot for items that share a single outer group.
- * Some operations require a different approach to newline rendering than what is found in the Parser.
+ * Base blot for line terminators. A line terminator should not have any text content. Only newlines and breaks.
  */
-abstract class AbstractLineBlot extends TextBlot {
+abstract class AbstractLineTerminatorBlot extends TextBlot {
+
     /**
      * Render additional newlines inside of the line.
      *
@@ -26,13 +27,11 @@ abstract class AbstractLineBlot extends TextBlot {
      *
      * @return string
      */
-    public function renderNewLines(): string {
+    public function render(): string {
         $result = "";
-        if ($this->nextOperation) {
-            $extraNewLines = substr_count($this->nextOperation["insert"], "\n") - 1;
-            for ($i = 0; $i < $extraNewLines; $i++) {
-                $result .= $this->renderLineStart()."<br>".$this->renderLineEnd();
-            }
+        $extraNewLines = substr_count($this->currentOperation["insert"], "\n") - 1;
+        for ($i = 0; $i < $extraNewLines; $i++) {
+            $result .= $this->renderLineStart()."<br>".$this->renderLineEnd();
         }
 
         return $result;

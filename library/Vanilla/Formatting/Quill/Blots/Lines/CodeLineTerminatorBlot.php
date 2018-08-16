@@ -5,36 +5,36 @@
  * @license https://opensource.org/licenses/GPL-2.0 GPL-2.0
  */
 
-namespace Vanilla\Formatting\Quill\Blots;
+namespace Vanilla\Formatting\Quill\Blots\Lines;
 
 /**
- * Blot for handling code blocks.
+ * Blot for handling code line terminators.
  *
  * Newlines are handled slightly differently here than for regular text because of the `whitespace: pre` that is applied
  * to code blocks. We do not want the newlines to be transformed into breaks.
  */
-class CodeBlockBlot extends TextBlot {
+class CodeLineTerminatorBlot extends AbstractLineTerminatorBlot {
+
+    protected $lineBreakText = "\n";
+
+    public function render(): string {
+        $extraNewLines = substr_count($this->currentOperation["insert"], "\n");
+        return str_repeat("\n", $extraNewLines);
+    }
 
     /**
      * @inheritdoc
      */
-    public static function matches(array $operations): bool {
-        return static::opAttrsContainKeyWithValue($operations, "codeBlock");
+    public static function matches(array $operation): bool {
+        return static::opAttrsContainKeyWithValue($operation, "codeBlock");
     }
 
-    /**
-     * @inheritDoc
-     */
-    public function render(): string {
-        $result = htmlspecialchars($this->content);
+    public function renderLineStart(): string {
+        return "";
+    }
 
-        // Add newlines which live in the next operation.
-        if ($this->nextOperation) {
-            $sanitizedNewlines = htmlspecialchars($this->nextOperation["insert"]);
-            $result .= $sanitizedNewlines;
-        }
-
-        return $result;
+    public function renderLineEnd(): string {
+        return "";
     }
 
     /**

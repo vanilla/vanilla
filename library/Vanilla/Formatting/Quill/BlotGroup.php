@@ -8,8 +8,10 @@
 namespace Vanilla\Formatting\Quill;
 
 use Vanilla\Formatting\Quill\Blots\AbstractBlot;
-use Vanilla\Formatting\Quill\Blots\Lines\AbstractLineBlot;
-use Vanilla\Formatting\Quill\Blots\CodeBlockBlot;
+use Vanilla\Formatting\Quill\Blots\Lines\AbstractLineTerminatorBlot;
+use Vanilla\Formatting\Quill\Blots\CodeLineBlot;
+use Vanilla\Formatting\Quill\Blots\Lines\CodeLineTerminatorBlot;
+use Vanilla\Formatting\Quill\Blots\Lines\ParagraphLineTerminatorBlot;
 use Vanilla\Formatting\Quill\Blots\TextBlot;
 
 /**
@@ -28,8 +30,8 @@ class BlotGroup {
      * Blots that can determine the surrounding tag over the other blot types.
      */
     private $overridingBlots = [
-        CodeBlockBlot::class,
-        AbstractLineBlot::class,
+        CodeLineTerminatorBlot::class,
+        AbstractLineTerminatorBlot::class,
     ];
 
     /**
@@ -85,13 +87,25 @@ class BlotGroup {
      * @return string
      */
     public function render(): string {
+        // We need a special exception for empty paragraph only blots.
+        // This because the ParagraphLineTerminatorBlot does not render a break if there is other group content
+        // But does render a break if it is alone. This is mostly to make styling easier.
+        // We do not want to need make the paragraph terminator aware of its group.
+        if (
+            count($this->blots) === 1 &&
+            $this->blots[0] instanceof ParagraphLineTerminatorBlot &&
+            $this->blots[0]->getContent() === "\n"
+        ) {
+            return "<p><br></p>";
+        }
+
         // Don't render empty groups.
         $surroundTagBlot = $this->getBlotForSurroundingTags();
         $result = $surroundTagBlot->getGroupOpeningTag();
 
         // Line blots have special rendering.
-        if ($surroundTagBlot instanceof AbstractLineBlot) {
-            $result .= $this->renderLineGroup($surroundTagBlot);
+        if ($surroundTagBlot instanceof AbstractLineTerminatorBlot) {
+            $result .= $this->renderLineGroup();
         } else {
             foreach ($this->blots as $blot) {
                 $result .= $blot->render();
@@ -99,52 +113,64 @@ class BlotGroup {
         }
 
         $result .= $surroundTagBlot->getGroupClosingTag();
+        return $result;
+    }
+
+    /**
+     * Render out a group with line terminators.
+     *
+     * We need to render potentially multiple inline blots than a line terminator, but the line terminator also
+     * is responsible for the opening tag of the line and each line can have its special attributes even if
+     * they are the same blot (eg. list indentation).
+     *
+     * @return string
+     */
+    public function renderLineGroup(): string {
+        $result = "";
+
+        // Look ahead and get all of the line terminators.
+        $terminatorIndex = 0;
+        $terminators = $this->getLineTerminators();
+        $terminator = $terminators[$terminatorIndex];
+
+        // Grab the first line terminator and start the line.
+        $result .= $terminator->renderLineStart();
+
+        foreach ($this->blots as $index => $blot) {
+            if ($blot instanceof AbstractLineTerminatorBlot) {
+                // Render out the content of the line terminator (maybe nothing, maybe extra newlines).
+                $result .= $terminator->render();
+                // End the line.
+                $result .= $terminator->renderLineEnd();
+
+                // Start the next line.
+                $terminatorIndex++;
+                $terminator = $terminators[$terminatorIndex] ?? null;
+                if ($terminator !== null) {
+                    $result .= $terminator->renderLineStart();
+                }
+            } else {
+                // Render out inline blots.
+                $result .= $blot->render();
+            }
+        }
 
         return $result;
     }
 
     /**
-     * Render out a line group. These need special handling just like they do on the frontend.
+     * Get all of the line terminators in the group.
      *
-     * Formats (or anything needed to be rendered the the TextBlots render) like bold and italic are not LineBlots even
-     * if they need to be contained in the line, so we determined what type of line wrapper we need, render the start
-     * of the line, and don't render the close until we get to another line blot.
-     *
-     * @param AbstractLineBlot $firstLineBlot - The first line blot found in the group. This is not necessarily the
-     * first blot in the group.
-     *
-     * @return string
+     * @return array
      */
-    public function renderLineGroup(AbstractLineBlot $firstLineBlot):
-    string {
-        $result = "";
-
-        $result .= $firstLineBlot->renderLineStart();
-
-        foreach ($this->blots as $index => $blot) {
-            // Ignore starting newlines.
-            if ($index === 0 && $blot->getContent() === "") {
-                continue;
-            }
-            $result .= $blot->render();
-
-            if ($blot instanceof AbstractLineBlot) {
-                $result .= $blot->renderLineEnd();
-                $result .= $blot->renderNewLines();
-
-                if ($index < count($this->blots) - 1) {
-                    // TODO: This is kind of fragile and needs tests.
-                    $nextLine = $this->blots[$index + 1] ?? null;
-                    if ($nextLine instanceof AbstractLineBlot) {
-                        $result .= $nextLine->renderLineStart();
-                    } else {
-                        $result .= $blot->renderLineStart();
-                    }
-                }
+    private function getLineTerminators(): array {
+        $terminators = [];
+        foreach ($this->blots as $blot) {
+            if ($blot instanceof AbstractLineTerminatorBlot) {
+                $terminators[] = $blot;
             }
         }
-
-        return $result;
+        return $terminators;
     }
 
     /**
@@ -156,7 +182,7 @@ class BlotGroup {
      * @return string[]
      */
     public function getMentionUsernames() {
-        if ($this->getBlotForSurroundingTags() instanceof Blots\Lines\BlockquoteLineBlot) {
+        if ($this->getBlotForSurroundingTags() instanceof Blots\Lines\BlockquoteLineTerminatorBlot) {
             return [];
         }
 
@@ -173,10 +199,12 @@ class BlotGroup {
     /**
      * Add a blot to this block.
      *
-     * @param AbstractBlot $blot
+     * @param AbstractBlot[] $blots
      */
-    public function pushBlot(AbstractBlot $blot) {
-        $this->blots[] = $blot;
+    public function pushBlots(array $blots) {
+        foreach ($blots as $blot) {
+            $this->blots[] = $blot;
+        }
     }
 
     /**

@@ -26,3 +26,10 @@ else
     echo "Skipping code coverage..."
     ./vendor/bin/phpunit -c phpunit.xml.dist --exclude-group=ignore
 fi
+
+# Run standards check on pull requests.
+if [ "$TRAVIS_PULL_REQUEST" != "false" ]; then
+    ./tests/travis/diff-standards.sh $TRAVIS_BRANCH $TRAVIS_BUILD_DIR
+else
+    echo "Skipping coding standards check..."
+fi

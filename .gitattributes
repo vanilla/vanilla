@@ -10,10 +10,7 @@
 # Mark built files as binary
 *.map binary
 composer.lock binary
-/js/admin/** binary
-/js/app/** binary
-/js/bootstrap-admin/** binary
-/js/bootstrap-app/** binary
+*.min.js binary
 
 # Skip files on archive
 .editorconfig export-ignore

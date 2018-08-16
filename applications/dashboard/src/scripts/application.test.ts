@@ -64,7 +64,7 @@ describe("formatUrl", () => {
     });
 
     it("follows the given format", () => {
-        application.setMeta("UrlFormat", "/test/{Path}");
+        application.setMeta("context.basePath", "/test");
 
         expect(application.formatUrl("/discussions")).eq("/test/discussions");
     });

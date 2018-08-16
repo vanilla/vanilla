@@ -483,14 +483,16 @@ $richEditor-mobileEmbedBreakPoint                 : 550px !default;
     font-size: $icon-default_size;
     text-align: center;
     overflow: hidden;
+    opacity: $state-text_opacity;
 
     .fallBackEmoji {
         display: block;
         margin: auto;
     }
 
+    &:hover,
     &:focus {
-        outline-offset: $richEditor-emojiOutline_offset;
+        opacity: 1;
     }
 }
 

@@ -41,28 +41,44 @@ $embedText-content_boxShadow: 0 1px 3px 0 $embedText-content_boxShadowColor !def
     margin-bottom: $utility-baseUnit;
 }
 
+.embedText-titleLink,
+.embedText-title {
+    display: block;
+    width: 100%;
+    padding: 0;
+    font-size: $embedText-header_fontSize;
+    line-height: $embedText-header-lineHeight;
+    font-weight: $embedText-title_fontWeight;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 
-.userContent { // for compatibility
+    @include mediaQuery-richEditor_embed {
+        @include breakWord;
+        white-space: normal;
+    }
+}
+
+.embedText-titleLink {
+    margin: 0;
+    color: inherit;
+}
+
+.embedText { // for compatibility
     .embedText-title {
-        display: block;
-        width: 100%;
         margin: {
             top: 0;
             left: 0;
             right: 0;
             bottom: $utility-baseUnit;
         };
-        padding: 0;
-        font-size: $embedText-header_fontSize;
-        line-height: $embedText-header-lineHeight;
-        font-weight: $embedText-title_fontWeight;
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
+    }
+}
 
-        @include mediaQuery-richEditor_embed {
-            @include breakWord;
-            white-space: normal;
-        }
+// Edit Mode
+
+.richEditor {
+    .embedText-titleLink {
+        pointer-events: none;
     }
 }

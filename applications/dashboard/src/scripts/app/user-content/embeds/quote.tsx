@@ -89,7 +89,16 @@ export class QuoteEmbed extends React.Component<IEmbedProps<IEmbedData>, IState>
         const id = uniqueId("collapsableContent-");
 
         const name = (this.quoteData as any).name;
-        const title = name ? <h3 className="embedText-title embedQuote-title">{name}</h3> : null;
+
+        window.console.log(this.quoteData);
+
+        const title = name ? (
+            <h2 className="embedText-title embedQuote-title">
+                <a href={this.quoteData.url} className="embedText-titleLink">
+                    {name}
+                </a>
+            </h2>
+        ) : null;
 
         const bodyClasses = classnames("embedText-body", "embedQuote-body", { isCollapsed: this.state.isCollapsed });
         const userUrl = makeProfileUrl(insertUser.name);
@@ -109,13 +118,15 @@ export class QuoteEmbed extends React.Component<IEmbedProps<IEmbedData>, IState>
                         </span>
                         <span className="embedQuote-userName">{insertUser.name}</span>
                     </a>
-                    <time
-                        className="embedText-dateTime embedQuote-dateTime meta"
-                        dateTime={this.dateTime}
-                        title={this.titleTime}
-                    >
-                        {this.humanTime}
-                    </time>
+                    <a href={this.quoteData.url} className="embedQuote-metaLink">
+                        <time
+                            className="embedText-dateTime embedQuote-dateTime meta"
+                            dateTime={this.dateTime}
+                            title={this.titleTime}
+                        >
+                            {this.humanTime}
+                        </time>
+                    </a>
 
                     {this.state.needsCollapseButton && (
                         <button

@@ -42,20 +42,37 @@ export default class Formatter {
         this.historyModule = quill.getModule("history");
     }
 
+    /**
+     * Apply the bold format to a range.
+     */
     public bold = (range: RangeStatic) => {
         this.handleBooleanFormat(range, BoldBlot.blotName);
     };
 
+    /**
+     * Apply the italic format to a range.
+     */
     public italic = (range: RangeStatic) => {
         this.handleBooleanFormat(range, ItalicBlot.blotName);
     };
 
+    /**
+     * Apply the strike format to a range.
+     */
     public strike = (range: RangeStatic) => {
         this.handleBooleanFormat(range, StrikeBlot.blotName);
     };
+
+    /**
+     * Apply the codeInline format to a range.
+     */
     public codeInline = (range: RangeStatic) => {
         this.handleBooleanFormat(range, CodeBlot.blotName);
     };
+
+    /**
+     * Apply the link format to a range.
+     */
     public link = (range: RangeStatic, linkValue?: string) => {
         const isEnabled = rangeContainsBlot(this.quill, LinkBlot, range);
         if (isEnabled) {
@@ -90,11 +107,10 @@ export default class Formatter {
             length,
         };
         const difference = this.replaceInlineEmbeds(fullRange);
-        // setImmediate(() => {
-        // const;
-        // this.historyModule.cutoff();
+        Formatter.INLINE_FORMAT_NAMES.forEach(name => {
+            this.quill.formatText(start, length, name, false, Quill.sources.API);
+        });
         this.quill.formatLine(start, length + difference, CodeBlockBlot.blotName, true, Quill.sources.USER);
-        // });
     };
     public blockquote = (range: RangeStatic) => {
         this.quill.formatLine(range.index, range.length, BlockquoteLineBlot.blotName, true, Quill.sources.USER);

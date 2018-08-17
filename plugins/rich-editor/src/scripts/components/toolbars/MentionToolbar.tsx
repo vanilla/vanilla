@@ -356,7 +356,7 @@ function mapDispatchToProps(dispatch) {
     };
 }
 
-function mapStateToProps(state: IStoreState, ownProps: IWithEditorProps) {
+function mapStateToProps(state: IStoreState) {
     const {
         lastSuccessfulUsername,
         currentUsername,

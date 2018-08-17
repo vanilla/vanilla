@@ -87,12 +87,12 @@ class Gdn_Request implements RequestInterface {
     protected $_RequestArguments;
 
     /**
-    /*  Holds domain plus port as a string to avoid multiple calculations
+     *  Holds domain plus port as a string to avoid multiple calculations
      * https://github.com/vanilla/vanilla/issues/7617
      *
      * @var string ex: vanilla.local:8080
      */
-    public static $host = false;
+    protected static $hostEndPoint;
 
     /**
     /*  Holds url() results to avoid recalls vs same path
@@ -1630,15 +1630,15 @@ class Gdn_Request implements RequestInterface {
         // Having en empty string in here will prepend a / in front of the URL on implode.
         $parts = [''];
         if ($withDomain !== '/') {
-            if (!empty(self::$host)) {
-                $host = self::$host;
+            if (self::$hostEndPoint !== null) {
+                $host = self::$hostEndPoint;
             } else {
                 $port = $this->port();
                 $host = $this->host();
                 if (!in_array($port, [80, 443]) && (strpos($host, ':'.$port) === false)) {
                     $host .= ':'.$port;
                 }
-                self::$host = $host;
+                self::$hostEndPoint = $host;
             }
 
             if ($withDomain === '//') {

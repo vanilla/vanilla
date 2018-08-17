@@ -1611,7 +1611,7 @@ class Gdn_Request implements RequestInterface {
         }
 
         if (substr($path, 0, 2) == '//' || in_array(strpos($path, '://'), [4, 5])) { // Accounts for http:// and https:// - some querystring params may have "://", and this would cause things to break.
-            self::$urls[$staticKey] = ''.$path;
+            self::$urls[$staticKey] = $path;
             return $path;
         }
 

@@ -578,7 +578,6 @@ class SmokeTest extends BaseTest {
      * @param string $name Category name.
      * @param  string $url Category url.
      * @return array $category
-     * @large
      */
     private function createCategory($name = null, $url = null) {
         $api = $this->api();

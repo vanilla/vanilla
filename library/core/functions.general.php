@@ -3773,7 +3773,7 @@ if (!function_exists('url')) {
      * @return string Returns the resulting URL.
      */
     function url($path = '', $withDomain = false) {
-        $result = Gdn::request()->url($path, $withDomain);
+        $result = Gdn::request()->url(strval($path), $withDomain);
         return $result;
     }
 }

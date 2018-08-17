@@ -98,7 +98,8 @@ class VanillaHtmlFormatter {
         'SpoilerText',
         'SpoilerTitle',
         'UserQuote',
-        'UserSpoiler'
+        'UserSpoiler',
+        "js-twitterCard",
     ];
 
     /** @var array HTML elements allowed to have classes in user generated content. */

@@ -369,6 +369,7 @@ class SmokeTest extends BaseTest {
      * Test saving a draft.
      *
      * @depends testRegisterBasic
+     * @return array $postedDraft
      * @large
      */
     public function testSaveDraft() {
@@ -403,6 +404,8 @@ class SmokeTest extends BaseTest {
         $this->assertEquals($postedDraft['Name'], $draft['Name']);
         $this->assertEquals($postedDraft['Body'], $draft['Body']);
         $this->assertEquals($postedDraft['CategoryID'], $draft['CategoryID']);
+
+        return $postedDraft;
     }
 
     /**
@@ -415,40 +418,17 @@ class SmokeTest extends BaseTest {
         $api = $this->api();
         $api->setUser($this->getTestUser());
 
-        $draft = [
-            'DiscussionID' => '',
-            'DraftD' => 0,
-            'CategoryID' => 1,
-            'Name' => 'testPostDiscussionFromDraft',
-            'Format' => 'Markdown',
-            'Body' => 'Test posting a new draft',
-            'DeliveryType' => 'VIEW',
-            'DeliveryMethod' => 'JSON',
-            'Save Draft' => 'Save Draft',
-
-        ];
-
-        $r = $api->post(
-            '/post/discussion.json',
-            $draft
-        );
-
-        $responseBody = $r->getBody();
-        $statusCode = $r->getStatusCode();
-        $this->assertEquals(200, $statusCode);
-
-        $draftModel = new \DraftModel();
-        $postedDraft = $draftModel->getWhere(['DraftID' => $responseBody['DraftID']])->firstRow(DATASET_TYPE_ARRAY);
+        $draft = $this->testSaveDraft();
 
         $discussion = [
-            'DraftID' => $postedDraft['DraftID'],
-            'CategoryID' => $postedDraft['CategoryID'],
-            'Name' => $postedDraft['Name'],
-            'Body' => $postedDraft['Body'],
+            'DraftID' => $draft['DraftID'],
+            'CategoryID' => $draft['CategoryID'],
+            'Name' => $draft['Name'],
+            'Body' => $draft['Body'],
         ];
 
         $r2 = $api->post(
-            "/post/editdiscussion/0/{$postedDraft['DraftID']}.json",
+            "/post/editdiscussion/0/{$draft['DraftID']}.json",
             $discussion
         );
         $statusCode = $r2->getStatusCode();
@@ -468,39 +448,152 @@ class SmokeTest extends BaseTest {
      * @large
      */
     public function testDeleteDraft() {
-
         $api = $this->api();
         $api->setUser($this->getTestUser());
         $user = $api->getUser();
 
-        $draft = [
-            'DiscussionID' => '',
-            'DraftD' => 0,
-            'CategoryID' => 1,
-            'Name' => 'testDeleteDraft',
+        $draft = $this->testSaveDraft();
+
+        $r2 = $api->get("drafts/delete/{$draft['DraftID']}/{$user['tk']}");
+        $statusCode2 = $r2->getStatusCode();
+        $this->assertEquals(200, $statusCode2);
+    }
+
+    /**
+     * Test modifying a category of a draft.
+     *
+     * @depends testRegisterBasic
+     * @large
+     */
+    public function testModifyDraftCategory() {
+        $api = $this->api();
+        $api->setUser($this->getTestUser());
+        $category = $this->createCategory('Modify Draft', 'modifydraft');
+
+        $draft =  $this->testSaveDraft();
+
+        $draftUpdate = [
+            'CategoryID' =>  $draft['CategoryID'],
+            'DiscussionID' => $draft['DiscussionID'],
+            'DraftID' => $draft['DraftID'],
+            'CategoryID' => $category['Category']['CategoryID'],
+            'Name' => $draft['Name'],
             'Format' => 'Markdown',
-            'Body' => 'Test posting a new draft',
+            'Body' => $draft['Body'],
             'DeliveryType' => 'VIEW',
             'DeliveryMethod' => 'JSON',
             'Save Draft' => 'Save Draft',
         ];
 
-        $r1 = $api->post(
-            '/post/discussion.json',
-            $draft
-        );
+        $draftModel = new \DraftModel();
+        $r = $api->post("/post/editdiscussion/0/{$draft['DraftID']}.json", $draftUpdate);
+        $responseBody = $r->getBody();
+        $modifiedDraft = $draftModel->getWhere(['DraftID' => $responseBody['DraftID']])->firstRow(DATASET_TYPE_ARRAY);
 
-        $responseBody = $r1->getBody();
-        $statusCode = $r1->getStatusCode();
-        $this->assertEquals(200, $statusCode);
+        $this->assertEquals($category['Category']['CategoryID'], $modifiedDraft['CategoryID']);
+    }
+
+    /**
+     * Test saving a comment draft
+     *
+     * @depends testRegisterBasic
+     * @return array $postedComment
+     * @large
+     */
+    public function testSavingCommentDraft() {
+        $api = $this->api();
+        $api->setUser($this->getTestUser());
+
+        $discussion = $this->testPostDiscussion();
+        $discussionID = $discussion['DiscussionID'];
+
+        $comment = [
+            'DiscussionID' => $discussion['DiscussionID'],
+            'CommentID' => '',
+            'DraftID' => '',
+            'Format' => 'Markdown',
+            'Body' => 'Test comment draft',
+            'DeliveryType' => 'VIEW',
+            'DeliveryMethod' => 'JSON',
+            'Type' => 'Draft',
+            'LastCommentID' => 0,
+        ];
+
+        $r = $api->post("/post/comment/?discussionid={$discussionID}.json", $comment);
+        $responseCode = $r->getStatusCode();
+        $this->assertEquals(200, $responseCode);
+        $responseBody = $r->getBody();
 
         $draftModel = new \DraftModel();
-        $postedDraft = $draftModel->getWhere(['DraftID' => $responseBody['DraftID']])->firstRow(DATASET_TYPE_ARRAY);
+        $postedComment = $draftModel->getWhere(['DraftID' => $responseBody['DraftID']])->firstRow(DATASET_TYPE_ARRAY);
+        $this->assertEquals($postedComment['DiscussionID'], $comment['DiscussionID']);
+        $this->assertEquals($postedComment['Body'], $comment['Body']);
 
-        $r2 = $api->get("drafts/delete/{$postedDraft['DraftID']}/{$user['tk']}");
-        $statusCode2 = $r2->getStatusCode();
-        $this->assertEquals(200, $statusCode2);
+        return $postedComment;
     }
+
+    /**
+     * Test posting a comment draft
+     *
+     * @depends testRegisterBasic
+     * @large
+     */
+    public function testPostCommentFromDraft() {
+        $api = $this->api();
+        $api->setUser($this->getTestUser());
+
+        $draft = $this->testSavingCommentDraft();
+
+        $postComment = [
+            'DiscussionID' => $draft['DiscussionID'],
+            'CommentID' => '',
+            'DraftID' => $draft['DraftID'],
+            'Format' => 'Markdown',
+            'Body' => 'Test comment draft',
+            'DeliveryType' => 'VIEW',
+            'DeliveryMethod' => 'JSON',
+            'Type' => 'Post',
+            'LastCommentID' => 0,
+        ];
+
+        $r1 = $api->post("/post/comment/?discussionid={$draft['DiscussionID']}.json", $postComment);
+        $responseCode1 = $r1->getStatusCode();
+        $this->assertEquals(200, $responseCode1);
+        $responseBody1 = $r1->getBody();
+
+        $commentID = $responseBody1['CommentID'];
+        $r2 = $api->post("/post/comment2.json?commentid={$commentID}&inserted=1");
+        $responseCode2 = $r2->getStatusCode();
+        $this->assertEquals(200, $responseCode2);
+
+        $commentModel = new \CommentModel();
+        $dbComment = $commentModel->getWhere(['CommentID' => $commentID ])->firstRow(DATASET_TYPE_ARRAY);
+        $this->assertEquals($dbComment['DiscussionID'], $postComment['DiscussionID']);
+        $this->assertEquals($dbComment['Body'], $postComment['Body']);
+    }
+
+    /**
+     * Create a category for testing.
+     *
+     * @param string $name Category name.
+     * @param  string $url Category url.
+     * @return array $category
+     */
+    private function createCategory($name = null, $url = null) {
+        $api = $this->api();
+        $admin = $api->querySystemUser(true);
+        $api->setUser($admin);
+
+        $r = $this->api()->post('/vanilla/settings/addcategory.json', [
+            'Name' => 'Test Category '.$name,
+            'UrlCode' => 'test'.$url,
+            'DisplayAs' => 'Discussions',
+        ]);
+
+        $category = $r->getBody();
+        return $category;
+    }
+
 
     /**
      * Test viewing a restricted category.

@@ -41,16 +41,19 @@ $embedQuote-toggleButton_padding  : 12px !default;
 }
 
 .embedQuote-collapseButton {
-    @include absolute-topRight;
+    @include absolute-topRight(0, #{$global-medium_fontSize - ($buttonIcon_size - $icon-default_size)/2});
+    display: flex;
+    align-items: center;
+    justify-content: center;
     appearance: none;
     background: none;
     border: none;
     cursor: pointer;
     margin-left: auto;
-    height: $richEditor-menuButton_size;
-    width: auto;
-    padding: 0 $embeddedText_padding;
+    height: $buttonIcon_size;
+    width: $buttonIcon_size;
     opacity: $state-icon_opacity;
+    padding: 0;
 
     &:active {
         @include buttonFocusStateStyles;
@@ -66,6 +69,10 @@ $embedQuote-toggleButton_padding  : 12px !default;
         opacity: 1;
         background-color: transparent;
     }
+}
+
+.embedQuote-title {
+    max-width: calc(100% - #{$buttonIcon_size - $global-medium_fontSize});
 }
 
 .embedQuote-chevronUp,

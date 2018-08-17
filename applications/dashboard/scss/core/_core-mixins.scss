@@ -18,25 +18,16 @@
 
 // Icon Buttons
 
-@mixin iconButtonHoverState($includeBgStyles: false) {
-    @if $includeBgStyles == true {
-        background-color: $state-hover_color;
-    }
+@mixin iconButtonHoverState() {
+    opacity: 1;
 }
 
 @mixin buttonFocusStateStyles($includeBgStyles: true) {
-    @if $includeBgStyles == true {
-        background-color: $state-focus_color;
-    }
+    opacity: 1;
     outline: $state-focus_outline;
 }
 
 @mixin iconButtonActiveState($includeBgStyles: false, $includeFgStyles: true) {
-    @if $includeBgStyles == true {
-        background-color: $state-active_color;
-    }
-    @if $includeFgStyles == true {
-        color: $state-active_color;
-    }
+    opacity: 1;
     @content; // Optional extra styles
 }

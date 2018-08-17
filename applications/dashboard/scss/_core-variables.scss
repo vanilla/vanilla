@@ -117,22 +117,6 @@ $link_default_hover-color                              : $global-color_secondary
 $link_default_focus-color                              : $global-color_secondary !default;
 
 
-
-/* -------------------------------------------------------------- *\
-    User Content
-\* -------------------------------------------------------------- */
-
-// Heading font sizes
-$userContent_fontSizeStep                                   : ($global-title_fontSize - $global-large_fontSize) / 5;
-$userContent_fontSizeH2                                     : $global-title_fontSize - $userContent-fontSizeStep;
-$userContent_fontSizeH3                                     : $global-title_fontSize - $userContent-fontSizeStep * 2;
-$userContent_fontSizeH4                                     : $global-title_fontSize - $userContent-fontSizeStep * 3;
-$userContent_fontSizeH5                                     : $global-title_fontSize - $userContent-fontSizeStep * 4;
-
-$userContent-list_margin                                    : 2em;
-$userContent-listDecoration_minWidth                        : 2em;
-
-
 /* -------------------------------------------------------------- *\
     Animation
 \* -------------------------------------------------------------- */
@@ -299,6 +283,10 @@ $menu-dropShadow                                     : 0 5px 10px $menu-dropShad
 /* -------------------------------------------------------------- *\
     Buttons
 \* -------------------------------------------------------------- */
+
+// Icon Button Size
+
+$buttonIcon_size                                     : 36px !default;
 
 // Global Button options
 

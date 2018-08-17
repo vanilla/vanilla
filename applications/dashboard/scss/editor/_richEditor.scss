@@ -1,11 +1,11 @@
 $richEditor_bg                                    : $global-color_bg !default;
-$richEditor_horizontalPadding                           : 36px !default;
+$richEditor_horizontalPadding                     : 36px !default;
 $richEditor_minHeight                             : 200px !default;
 $richEditor_verticalPadding                       : 12px !default;
 $richEditor_innerPadding                          : 12px !default;
 $richEditor-outline_color                         : rgba($global-color_primary, 0.6) !default;
 
-$richEditor-menuButton_size                       : 36px !default;
+$richEditor-menuButton_size                       : $buttonIcon_size !default;
 $richEditor-floatingButton_size                   : 28px !default;
 
 $richEditor-embedMenu_padding                     : 0 !default;
@@ -578,6 +578,10 @@ $richEditor-mobileEmbedBreakPoint                 : 550px !default;
 .userContent {
     line-height: $global-base_lineHeight;
 
+    &.Message {
+        margin-top: $global-medium_fontSize;
+    }
+
     h1,
     h2,
     h3,
@@ -586,6 +590,10 @@ $richEditor-mobileEmbedBreakPoint                 : 550px !default;
     h6 {
         margin-top: $global-heading_topMargin;
         line-height: $global-condensed_lineHeight;
+
+        &:first-child {
+            margin-top: #{(1 - $global-condensed_lineHeight) * .5em} !important;
+        }
     }
 
     > * {
@@ -594,7 +602,7 @@ $richEditor-mobileEmbedBreakPoint                 : 550px !default;
         }
 
         &:first-child {
-            margin-top: 0 !important;
+            margin-top: #{(1 - $global-base_lineHeight) * .5em} !important;
         }
     }
 
@@ -621,10 +629,11 @@ $richEditor-mobileEmbedBreakPoint                 : 550px !default;
     }
 
     li {
+        &,
         *:first-child {
             margin-top: 0;
         }
-
+        &,
         *:last-child {
             margin-bottom: 0;
         }

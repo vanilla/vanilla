@@ -65,7 +65,12 @@ $embedText-content_boxShadow: 0 1px 3px 0 $embedText-content_boxShadowColor !def
 
 .embedText { // for compatibility
     .embedText-title {
-        margin: 0;
+        margin: {
+            top: 0;
+            right: 0;
+            bottom: #{$global-medium_fontSize / 2.2};
+            left: 0;
+        }
     }
 }
 

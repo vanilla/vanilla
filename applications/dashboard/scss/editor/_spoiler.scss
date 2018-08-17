@@ -66,15 +66,21 @@ $buttonSpoiler: (
     cursor: pointer;
     text-align: center;
 
+    &:active {
+        .spoiler-chevron {
+            @include iconButtonActiveState;
+        }
+    }
+
     &:focus {
-        @include buttonFocusStateStyles;
-        opacity: 1;
+        .spoiler-chevron {
+            @include iconButtonFocusState;
+        }
     }
 
     &:hover {
-        background-color: $buttonSpoiler-bg;
-        .spoiler-warningMain {
-            opacity: 1;
+        .spoiler-chevron {
+            @include iconButtonHoverState;
         }
     }
 }
@@ -105,6 +111,7 @@ $buttonSpoiler: (
     height: $icon_default_size * 2;
     display: flex;
     align-items: center;
+    opacity: $state-icon_opacity;
 }
 
 .spoiler-warningAfter,

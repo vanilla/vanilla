@@ -20,9 +20,10 @@
 
 @mixin iconButtonHoverState() {
     opacity: 1;
+    cursor: pointer;
 }
 
-@mixin buttonFocusStateStyles($includeBgStyles: true) {
+@mixin iconButtonFocusState($includeBgStyles: true) {
     opacity: 1;
     outline: $state-focus_outline;
 }

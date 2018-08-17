@@ -975,6 +975,7 @@ label.checkbox input.checkbox-input {
 
 .richEditor-button:hover {
   opacity: 1;
+  cursor: pointer;
 }
 
 .richEditor-button:hover .Close-x,
@@ -1091,11 +1092,21 @@ label.checkbox input.checkbox-input {
           user-select: none;
   background: transparent;
   cursor: pointer;
+  opacity: 0.6;
+}
+
+.richEditor-close.Close:hover {
+  opacity: 1;
+  cursor: pointer;
 }
 
 .richEditor-close.Close:focus {
   opacity: 1;
   outline: none;
+}
+
+.richEditor-close.Close:active {
+  opacity: 1;
 }
 
 .insertLink-input.InputBox {
@@ -1236,7 +1247,7 @@ label.checkbox input.checkbox-input {
   font-size: 24px;
   text-align: center;
   overflow: hidden;
-  opacity: 0.8;
+  opacity: 0.75;
 }
 
 .richEditor-insertEmoji .fallBackEmoji {
@@ -1820,18 +1831,18 @@ body.isMobile .Popup.hasRichEditor .Border {
   text-align: left;
 }
 
-.button-spoiler:focus {
+.button-spoiler:active .spoiler-chevron {
+  opacity: 1;
+}
+
+.button-spoiler:focus .spoiler-chevron {
   opacity: 1;
   outline: none;
-  opacity: 1;
 }
 
-.button-spoiler:hover {
-  background-color: transparent;
-}
-
-.button-spoiler:hover .spoiler-warningMain {
+.button-spoiler:hover .spoiler-chevron {
   opacity: 1;
+  cursor: pointer;
 }
 
 .spoiler-warningMain {
@@ -1872,6 +1883,7 @@ body.isMobile .Popup.hasRichEditor .Border {
   -webkit-align-items: center;
       -ms-flex-align: center;
           align-items: center;
+  opacity: 0.6;
 }
 
 .spoiler-warningAfter,
@@ -1929,6 +1941,10 @@ body.isMobile .Popup.hasRichEditor .Border {
      -moz-user-select: none;
       -ms-user-select: none;
           user-select: none;
+}
+
+.emojiGroup {
+  opacity: 0.6;
 }
 
 .embedResponsive {
@@ -2431,19 +2447,16 @@ body.isMobile .Popup.hasRichEditor .Border {
 
 .embedQuote-collapseButton:active {
   opacity: 1;
-  outline: none;
-  opacity: 1;
 }
 
 .embedQuote-collapseButton:focus {
   opacity: 1;
   outline: none;
-  opacity: 1;
 }
 
 .embedQuote-collapseButton:hover {
   opacity: 1;
-  background-color: transparent;
+  cursor: pointer;
 }
 
 .embedQuote-title {

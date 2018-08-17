@@ -243,7 +243,7 @@ $richEditor-mobileEmbedBreakPoint                 : 550px !default;
     }
 
     &:focus {
-        @include buttonFocusStateStyles;
+        @include iconButtonFocusState;
         z-index: 2;
         .Close-x,
         .richEditorButton-icon {
@@ -265,7 +265,7 @@ $richEditor-mobileEmbedBreakPoint                 : 550px !default;
 
     &.richEditor-formatButton {
         &:focus {
-            @include buttonFocusStateStyles($richEditor-paragraphMenuButton_offset);
+            @include iconButtonFocusState($richEditor-paragraphMenuButton_offset);
         }
     }
 }
@@ -343,9 +343,16 @@ $richEditor-mobileEmbedBreakPoint                 : 550px !default;
     user-select: none;
     background: transparent;
     cursor: pointer;
+    opacity: $state-icon_opacity;
 
+    &:hover {
+        @include iconButtonHoverState;
+    }
     &:focus {
-        @include buttonFocusStateStyles;
+        @include iconButtonFocusState;
+    }
+    &:active {
+        @include iconButtonActiveState;
     }
 }
 

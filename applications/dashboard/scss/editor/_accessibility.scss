@@ -11,7 +11,7 @@
     width: 1px;
 
     &:focus {
-        @include buttonFocusStateStyles;
+        @include iconButtonFocusState;
         position: absolute;
         top: 50px;
         left: 0;

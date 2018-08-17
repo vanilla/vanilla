@@ -43,7 +43,7 @@ $global_borderRadius                                 : 2px !default;
 \* -------------------------------------------------------------- */
 
 $state-icon_opacity                                  : .6;
-$state-text_opacity                                  : .8;
+$state-text_opacity                                  : .75;
 
 $state-hover_color                                   : mix($global-color_primary, $global-color_bg, 5.5%) !default; // rgba(174, 228, 255, 0.2);
 $state-hover_opacity                                 : 1 !default;

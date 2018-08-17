@@ -55,18 +55,15 @@ $embedQuote-toggleButton_padding  : 12px !default;
     padding: 0;
 
     &:active {
-        @include buttonFocusStateStyles;
-        opacity: 1;
+        @include iconButtonActiveState;
     }
 
     &:focus {
-        @include buttonFocusStateStyles;
-        opacity: 1;
+        @include iconButtonFocusState;
     }
 
     &:hover {
-        opacity: 1;
-        background-color: transparent;
+        @include iconButtonHoverState;
     }
 }
 

@@ -47,8 +47,8 @@ $embedLink-excerpt_lineHeight: $global-base_lineHeight !default;
 }
 
 .embedLink-source {
-    font-size: #{$embedLink-source_fontSize * .86};
-    color: rgba(85,90,98,0.72);
+    font-size: $metaText_fontSize;
+    color: $metaText_color;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;

@@ -96,12 +96,12 @@ $global-large_fontSize                                 : 16px !default;
 $global-medium_fontSize                                : 14px !default;
 $global-small_fontSize                                 : 12px !default;
 
+$global-heading_topMargin                              : 1.5 * $global-medium_fontSize;
+
 $global-normal_fontWeight                              : 400 !default;
 $global-bold_fontWeight                                : 600 !default;
 
-$global-lineHeight_offset                              : .32em !default; // Offset font to make top of capital letters flush with top of container
-$global-headinglineHeight_offset                       : $global-lineHeight_offset !default; // Different if heading has different font than body
-$global-bodylineHeight_offset                          : $global-lineHeight_offset !default; // Different if heading has different font than body
+$global-block_margin                                   : $global-medium_fontSize !default;
 
 $global-base_lineHeight                                : 1.5 !default;
 $global-condensed_lineHeight                           : 1.25 !default;
@@ -115,6 +115,8 @@ $global-body_fontWeight                                : $global-normal_fontWeig
 $link_default-color                                    : $global-color_primary !default;
 $link_default_hover-color                              : $global-color_secondary !default;
 $link_default_focus-color                              : $global-color_secondary !default;
+
+
 
 /* -------------------------------------------------------------- *\
     User Content
@@ -413,6 +415,6 @@ $global-footer_height: 50px !default;
 //    Embedded content
 //\* -------------------------------------------------------------- */
 
-$embeddedText_padding: 18px;
+$embeddedText_padding: $global-medium_fontSize;
 
 

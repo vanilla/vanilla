@@ -18,9 +18,6 @@ $buttonSpoiler: (
 
 .spoiler {
     border: {
-        style: solid;
-        color: $spoiler-borderColor;
-        width: 1px;
         radius: $spoiler-borderRadius;
     }
     background-color: $spoiler-bg;
@@ -50,8 +47,8 @@ $buttonSpoiler: (
 
 .spoiler-chevronUp,
 .spoiler-chevronDown {
-    width: 8px;
-    height: 4px;
+    width: $icon-default_size;
+    height: $icon-default_size;
     display: inline-block;
     margin-left: 6px;
     vertical-align: .2em;
@@ -72,9 +69,6 @@ $buttonSpoiler: (
     &:focus {
         @include buttonFocusStateStyles;
         opacity: 1;
-        .spoiler-warningMain {
-            opacity: 1;
-        }
     }
 
     &:hover {
@@ -93,7 +87,6 @@ $buttonSpoiler: (
     padding: 0 $icon_default_size;
     width: 100%;
     line-height: 1;
-    opacity: $state-text_opacity;
 }
 
 .spoiler-icon {
@@ -128,6 +121,14 @@ $buttonSpoiler: (
 
 .spoiler-content {
     padding: 0 $embeddedText_padding $embeddedText_padding $embeddedText_padding;
+
+    *:first-child {
+        margin-top: 0;
+    }
+
+    *:last-child {
+        margin-bottom: 0;
+    }
 }
 
 .spoiler-buttonContainer {

@@ -1,5 +1,4 @@
 $embedText-header_fontSize: $global-medium_fontSize !default;
-$embedText-header-lineHeight: $global-base_lineHeight !default;
 $embedText-title_fontWeight: $global-bold_fontWeight !default;
 $embedText-content_boxShadowColor: rgba($global-color_fg, .3) !default;
 $embedText-content_bg: #ffffff !default;
@@ -37,8 +36,8 @@ $embedText-content_boxShadow: 0 1px 3px 0 $embedText-content_boxShadowColor !def
     align-items: center;
     justify-content: flex-start;
     font-size: $embedText-header_fontSize;
-    line-height: $embedText-header-lineHeight;
-    margin-bottom: $utility-baseUnit;
+    line-height: $global-condensed_lineHeight;
+    //margin-bottom: $utility-baseUnit;
 }
 
 .embedText-titleLink,
@@ -47,7 +46,7 @@ $embedText-content_boxShadow: 0 1px 3px 0 $embedText-content_boxShadowColor !def
     width: 100%;
     padding: 0;
     font-size: $embedText-header_fontSize;
-    line-height: $embedText-header-lineHeight;
+    line-height: $global-condensed_lineHeight;
     font-weight: $embedText-title_fontWeight;
     white-space: nowrap;
     overflow: hidden;
@@ -66,12 +65,7 @@ $embedText-content_boxShadow: 0 1px 3px 0 $embedText-content_boxShadowColor !def
 
 .embedText { // for compatibility
     .embedText-title {
-        margin: {
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: $utility-baseUnit;
-        };
+        margin: 0;
     }
 }
 

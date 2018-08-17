@@ -576,19 +576,21 @@ $richEditor-mobileEmbedBreakPoint                 : 550px !default;
 }
 
 .userContent {
+    line-height: $global-base_lineHeight;
+
+    h1,
+    h2,
+    h3,
+    h4,
+    h5,
+    h6 {
+        margin-top: $global-heading_topMargin;
+        line-height: $global-condensed_lineHeight;
+    }
+
     > * {
         &:not(:last-child) {
-            margin-bottom: 1.5em;
-
-            + h1,
-            + h2,
-            + h3,
-            + h4,
-            + h5,
-            + h6
-            {
-                margin-top: .6em;
-            }
+            margin-bottom: $global-block_margin;
         }
 
         &:first-child {
@@ -612,6 +614,20 @@ $richEditor-mobileEmbedBreakPoint                 : 550px !default;
     {
         word-break: break-word;
         text-overflow: ellipsis;
+    }
+
+    .CommentHeader {
+        margin-bottom: $global-medium_fontSize;
+    }
+
+    li {
+        *:first-child {
+            margin-top: 0;
+        }
+
+        *:last-child {
+            margin-bottom: 0;
+        }
     }
 }
 

@@ -7,8 +7,8 @@
 }
 
 .embedExternal {
-    display: inline-flex;
-    margin: auto;
+    display: block;
+    margin: 0 auto;
     max-width: 100%;
     width: $embed_width;
     position: relative;

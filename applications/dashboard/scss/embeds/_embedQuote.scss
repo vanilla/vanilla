@@ -70,8 +70,8 @@ $embedQuote-toggleButton_padding  : 12px !default;
 
 .embedQuote-chevronUp,
 .embedQuote-chevronDown {
-    width: 8px;
-    height: 4px;
+    width: $icon-default_size;
+    height: $icon-default_size;
     display: inline-block;
     vertical-align: .2em;
 }

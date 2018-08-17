@@ -123,13 +123,14 @@ button.Close {
   display: inline;
   vertical-align: middle;
   line-height: inherit;
-  font-size: .9em;
+  font-size: 0.85em;
   box-sizing: border-box;
   font-family: Menlo, Monaco, Consolas, "Courier New", monospace;
   max-width: 100%;
   margin: 0;
   color: #26282b;
   background-color: #f7f7f7;
+  border: 0;
 }
 
 .userContent .codeInline {
@@ -145,7 +146,7 @@ button.Close {
   word-wrap: normal;
   line-height: 1.45;
   white-space: pre;
-  padding: 1em 1em;
+  padding: 14px;
   border-radius: 0;
 }
 
@@ -764,6 +765,10 @@ label.checkbox input.checkbox-input {
           transition: max-height 0.2s ease;
 }
 
+.collapsableContent *:last-child {
+  margin-bottom: 0;
+}
+
 .richEditor {
   position: relative;
   display: block;
@@ -1342,17 +1347,22 @@ label.checkbox input.checkbox-input {
   top: calc(50% + 17px);
 }
 
-.userContent > *:not(:last-child) {
-  margin-bottom: 1.5em;
+.userContent {
+  line-height: 1.5;
 }
 
-.userContent > *:not(:last-child) + h1,
-.userContent > *:not(:last-child) + h2,
-.userContent > *:not(:last-child) + h3,
-.userContent > *:not(:last-child) + h4,
-.userContent > *:not(:last-child) + h5,
-.userContent > *:not(:last-child) + h6 {
-  margin-top: .6em;
+.userContent h1,
+.userContent h2,
+.userContent h3,
+.userContent h4,
+.userContent h5,
+.userContent h6 {
+  margin-top: 21px;
+  line-height: 1.25;
+}
+
+.userContent > *:not(:last-child) {
+  margin-bottom: 14px;
 }
 
 .userContent > *:first-child {
@@ -1374,6 +1384,18 @@ label.checkbox input.checkbox-input {
 .userContent p {
   word-break: break-word;
   text-overflow: ellipsis;
+}
+
+.userContent .CommentHeader {
+  margin-bottom: 14px;
+}
+
+.userContent li *:first-child {
+  margin-top: 0;
+}
+
+.userContent li *:last-child {
+  margin-bottom: 0;
 }
 
 .emoji {
@@ -1734,9 +1756,6 @@ body.isMobile .Popup.hasRichEditor .Border {
 }
 
 .spoiler {
-  border-style: solid;
-  border-color: #d6d7d9;
-  border-width: 1px;
   border-radius: 2px;
   background-color: #f7f7f7;
 }
@@ -1763,8 +1782,8 @@ body.isMobile .Popup.hasRichEditor .Border {
 
 .spoiler-chevronUp,
 .spoiler-chevronDown {
-  width: 8px;
-  height: 4px;
+  width: 24px;
+  height: 24px;
   display: inline-block;
   margin-left: 6px;
   vertical-align: .2em;
@@ -1779,7 +1798,7 @@ body.isMobile .Popup.hasRichEditor .Border {
   max-width: 100%;
   font-size: 16px;
   min-height: 48px;
-  padding: 0 18px;
+  padding: 0 14px;
   outline: 0;
   cursor: pointer;
   text-align: center;
@@ -1796,10 +1815,6 @@ body.isMobile .Popup.hasRichEditor .Border {
 .button-spoiler:focus {
   background-color: #e1f2fb;
   outline: none;
-  opacity: 1;
-}
-
-.button-spoiler:focus .spoiler-warningMain {
   opacity: 1;
 }
 
@@ -1825,7 +1840,6 @@ body.isMobile .Popup.hasRichEditor .Border {
   padding: 0 24px;
   width: 100%;
   line-height: 1;
-  opacity: 0.8;
 }
 
 .spoiler-icon {
@@ -1864,7 +1878,15 @@ body.isMobile .Popup.hasRichEditor .Border {
 }
 
 .spoiler-content {
-  padding: 0 18px 18px 18px;
+  padding: 0 14px 14px 14px;
+}
+
+.spoiler-content *:first-child {
+  margin-top: 0;
+}
+
+.spoiler-content *:last-child {
+  margin-bottom: 0;
 }
 
 .spoiler-buttonContainer {
@@ -1910,11 +1932,8 @@ body.isMobile .Popup.hasRichEditor .Border {
 }
 
 .embedExternal {
-  display: -webkit-inline-box;
-  display: -webkit-inline-flex;
-  display: -ms-inline-flexbox;
-  display: inline-flex;
-  margin: auto;
+  display: block;
+  margin: 0 auto;
   max-width: 100%;
   width: 640px;
   position: relative;
@@ -2197,7 +2216,7 @@ body.isMobile .Popup.hasRichEditor .Border {
 }
 
 .embedText-main {
-  padding: 18px;
+  padding: 14px;
   box-sizing: border-box;
 }
 
@@ -2218,8 +2237,7 @@ body.isMobile .Popup.hasRichEditor .Border {
       -ms-flex-pack: start;
           justify-content: flex-start;
   font-size: 14px;
-  line-height: 1.5;
-  margin-bottom: 6px;
+  line-height: 1.25;
 }
 
 .embedText-titleLink,
@@ -2228,7 +2246,7 @@ body.isMobile .Popup.hasRichEditor .Border {
   width: 100%;
   padding: 0;
   font-size: 14px;
-  line-height: 1.5;
+  line-height: 1.25;
   font-weight: 600;
   white-space: nowrap;
   overflow: hidden;
@@ -2250,10 +2268,7 @@ body.isMobile .Popup.hasRichEditor .Border {
 }
 
 .embedText .embedText-title {
-  margin-top: 0;
-  margin-left: 0;
-  margin-right: 0;
-  margin-bottom: 6px;
+  margin: 0;
 }
 
 .richEditor .embedText-titleLink {
@@ -2301,8 +2316,8 @@ body.isMobile .Popup.hasRichEditor .Border {
 }
 
 .embedLink-source {
-  font-size: 12.04px;
-  color: rgba(85, 90, 98, 0.72);
+  font-size: 12px;
+  color: #777b81;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -2387,7 +2402,7 @@ body.isMobile .Popup.hasRichEditor .Border {
   margin-left: auto;
   height: 36px;
   width: auto;
-  padding: 0 18px;
+  padding: 0 14px;
   opacity: 0.6;
 }
 
@@ -2410,8 +2425,8 @@ body.isMobile .Popup.hasRichEditor .Border {
 
 .embedQuote-chevronUp,
 .embedQuote-chevronDown {
-  width: 8px;
-  height: 4px;
+  width: 24px;
+  height: 24px;
   display: inline-block;
   vertical-align: .2em;
 }
@@ -2435,9 +2450,9 @@ body.isMobile .Popup.hasRichEditor .Border {
   -webkit-justify-content: flex-start;
       -ms-flex-pack: start;
           justify-content: flex-start;
-  padding-top: 12px;
-  padding-left: 18px;
-  padding-right: 18px;
+  padding-top: 8px;
+  padding-left: 14px;
+  padding-right: 14px;
   padding-bottom: 0;
 }
 

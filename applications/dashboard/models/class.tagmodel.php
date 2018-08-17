@@ -516,6 +516,8 @@ class TagModel extends Gdn_Model {
      * @param string|array $tag tag name(s)
      * @param int $limit limit number of result
      * @param int $offset start result at this offset
+     * @param string $sortField column to sort results by
+     * @param string $sortDirection the direction to sort the discussions
      * @return Gdn_DataSet
      * @throws Exception
      */

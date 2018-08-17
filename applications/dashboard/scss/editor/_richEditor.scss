@@ -213,12 +213,6 @@ $richEditor-mobileEmbedBreakPoint                 : 550px !default;
     user-select: none;
     cursor: pointer;
 
-    //.Close-x,
-    //.richEditorButton-icon {
-    //    opacity: $state-icon_opacity;
-    //}
-
-
     &.richEditor-formatButton,
     &.richEditor-embedButton {
         height: $richEditor-menuButton_size;

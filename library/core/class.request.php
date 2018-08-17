@@ -100,7 +100,7 @@ class Gdn_Request implements RequestInterface {
      *
      * @var array
      */
-    public static $urls = [];
+    protected static $urls = [];
 
     /**
      * Instantiate a new instance of the {@link Gdn_Request} class.

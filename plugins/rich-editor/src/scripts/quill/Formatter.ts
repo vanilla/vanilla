@@ -118,7 +118,7 @@ export default class Formatter {
             length,
         };
         Formatter.INLINE_FORMAT_NAMES.forEach(name => {
-            this.quill.formatText(start, length, name, false, Quill.sources.API);
+            this.quill.formatText(start, length, name, false, Quill.sources.SILENT);
         });
         const difference = this.replaceInlineEmbeds(fullRange);
         this.quill.formatLine(start, length + difference, CodeBlockBlot.blotName, true, Quill.sources.USER);

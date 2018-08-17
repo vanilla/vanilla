@@ -75,24 +75,33 @@ export class MentionToolbar extends React.Component<IProps, IMentionState> {
         const { mentionSelection } = this.props.instanceState;
         const prevMentionSelection = prevProps.instanceState.mentionSelection;
 
-        if (mentionSelection === null && prevMentionSelection !== null && !this.isConvertingMention) {
-            const selection = this.quill!.getSelection();
-            this.cancelActiveMention();
-
-            // We need to restore back the selection we had if the editor is still focused because
-            // the cancelation might have messed up our position.
-            if (this.quill.hasFocus()) {
-                this.quill!.setSelection(selection);
-            }
+        if (!isEqual(mentionSelection, prevMentionSelection) && mentionSelection) {
+            const text = this.quill.getText(mentionSelection.index, mentionSelection.length).replace("@", "");
+            this.props.lookupMentions(text, this.props.editorID);
         }
 
-        if (!isEqual(mentionSelection, prevMentionSelection)) {
-            const autoCompleteBlot = this.getAutoCompleteBlot();
-            if (autoCompleteBlot) {
-                this.props.lookupMentions(autoCompleteBlot.username, this.props.editorID);
+        const suggestions = this.props.suggestions;
+
+        if (suggestions && this.props.lastSuccessfulUsername !== prevProps.lastSuccessfulUsername) {
+            const isLoading = suggestions && suggestions.status === LoadStatus.LOADING;
+            const isSuccess = suggestions && suggestions.status === LoadStatus.SUCCESS && suggestions.data.length > 0;
+
+            if (mentionSelection && (isLoading || isSuccess)) {
+                if (!this.state.autoCompleteBlot) {
+                    const autoCompleteBlot = this.createAutoCompleteBlot();
+                    this.setState({ autoCompleteBlot });
+                }
+                this.injectComboBoxAccessibility();
+            } else if (this.state.autoCompleteBlot) {
+                const selection = this.quill!.getSelection();
+                this.cancelActiveMention();
+
+                // We need to restore back the selection we had if the editor is still focused because
+                // the cancelation might have messed up our position.
+                if (this.quill.hasFocus()) {
+                    this.quill!.setSelection(selection);
+                }
             }
-            this.setState({ autoCompleteBlot });
-            this.injectComboBoxAccessibility();
         }
     }
 
@@ -117,28 +126,23 @@ export class MentionToolbar extends React.Component<IProps, IMentionState> {
     /**
      * Get an autocomplete blot. Creates a new one if we haven't made one yet.
      */
-    private getAutoCompleteBlot(): MentionAutoCompleteBlot | null {
+    private createAutoCompleteBlot(): MentionAutoCompleteBlot | null {
         const { currentSelection, mentionSelection } = this.props.instanceState;
         if (!currentSelection || !mentionSelection) {
             return null;
         }
 
-        let autoCompleteBlot = getBlotAtIndex(this.quill, currentSelection.index, MentionAutoCompleteBlot);
+        this.quill.formatText(
+            mentionSelection.index,
+            mentionSelection.length,
+            "mention-autocomplete",
+            true,
+            Quill.sources.API,
+        );
+        this.quill.setSelection(currentSelection.index, 0, Quill.sources.API);
 
-        // Create a autoCompleteBlot if it doesn't already exist.
-        if (!autoCompleteBlot) {
-            this.quill.formatText(
-                mentionSelection.index,
-                mentionSelection.length,
-                "mention-autocomplete",
-                true,
-                Quill.sources.API,
-            );
-            this.quill.setSelection(currentSelection.index, 0, Quill.sources.API);
-
-            // Get the autoCompleteBlot
-            autoCompleteBlot = getBlotAtIndex(this.quill, currentSelection.index - 1, MentionAutoCompleteBlot)!;
-        }
+        // Get the autoCompleteBlot
+        const autoCompleteBlot = getBlotAtIndex(this.quill, currentSelection.index - 1, MentionAutoCompleteBlot)!;
 
         return autoCompleteBlot;
     }
@@ -163,13 +167,7 @@ export class MentionToolbar extends React.Component<IProps, IMentionState> {
      * Keydown listener for ARIA compliance with
      */
     private keyDownListener = (event: KeyboardEvent) => {
-        const {
-            suggestions,
-            activeSuggestionIndex,
-            activeSuggestionID,
-            showLoader,
-            lastSuccessfulUsername,
-        } = this.props;
+        const { suggestions, activeSuggestionIndex, activeSuggestionID, showLoader } = this.props;
         const { mentionSelection } = this.props.instanceState;
         const inActiveMention = mentionSelection !== null;
 

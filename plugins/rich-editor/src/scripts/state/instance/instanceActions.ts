@@ -15,7 +15,6 @@ export const actions = {
     createInstance: (editorID: string | number) => createAction(CREATE_INSTANCE, { editorID }),
     setSelection: (editorID: string | number, selection: RangeStatic | null, quill: Quill) =>
         createAction(SET_SELECTION, { editorID, selection, quill }),
-    clearMentionSelection: (editorID: string | number) => createAction(CLEAR_MENTION_SELECTION, { editorID }),
 };
 
 export type ActionTypes = ActionsUnion<typeof actions>;

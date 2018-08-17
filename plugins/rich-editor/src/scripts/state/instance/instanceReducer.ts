@@ -87,18 +87,6 @@ export default function instanceReducer(
                 },
             };
         }
-        case instanceActions.CLEAR_MENTION_SELECTION: {
-            validateIDExistance(state, action);
-            const { editorID } = action.payload;
-            const instanceState = state[editorID];
-            return {
-                ...state,
-                [editorID]: {
-                    ...instanceState,
-                    mentionSelection: null,
-                },
-            };
-        }
         default: {
             return state;
         }

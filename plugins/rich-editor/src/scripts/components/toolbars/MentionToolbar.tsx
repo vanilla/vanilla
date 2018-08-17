@@ -163,7 +163,13 @@ export class MentionToolbar extends React.Component<IProps, IMentionState> {
      * Keydown listener for ARIA compliance with
      */
     private keyDownListener = (event: KeyboardEvent) => {
-        const { suggestions, activeSuggestionIndex, activeSuggestionID, showLoader } = this.props;
+        const {
+            suggestions,
+            activeSuggestionIndex,
+            activeSuggestionID,
+            showLoader,
+            lastSuccessfulUsername,
+        } = this.props;
         const { mentionSelection } = this.props.instanceState;
         const inActiveMention = mentionSelection !== null;
 

@@ -64,7 +64,7 @@ function loadUsers(username: string, editorID: string) {
                     return;
                 case LoadStatus.ERROR:
                     // Previously failed.
-                    dispatch(instanceActions.clearMentionSelection(editorID));
+                    // dispatch(instanceActions.clearMentionSelection(editorID));
                     dispatch(actions.loadUsersFailure(username, exactLookup.error));
                     return;
             }
@@ -76,11 +76,14 @@ function loadUsers(username: string, editorID: string) {
             switch (partialLookup.status) {
                 case LoadStatus.SUCCESS: {
                     if (partialLookup.data.length < USER_LIMIT) {
-                        // The previous match already found the maximum amount of users that the server had
-                        // Return the previous results.
-                        return dispatch(
-                            actions.loadUsersSuccess(username, filterSuggestions(partialLookup.data, username)),
-                        );
+                        const suggestions = filterSuggestions(partialLookup.data, username);
+                        if (suggestions.length > 0) {
+                            // The previous match already found the maximum amount of users that the server had
+                            // Return the previous results.
+                            return dispatch(actions.loadUsersSuccess(username, suggestions));
+                        } else {
+                            return dispatch(actions.loadUsersFailure(username, new Error("No matches found") as any));
+                        }
                     }
                 }
                 case LoadStatus.ERROR:
@@ -111,8 +114,12 @@ function loadUsers(username: string, editorID: string) {
                     return data;
                 });
 
-                // Result is good. Lets GO!
-                dispatch(actions.loadUsersSuccess(username, users));
+                if (users.length > 0) {
+                    // Result is good. Lets GO!
+                    dispatch(actions.loadUsersSuccess(username, users));
+                } else {
+                    dispatch(actions.loadUsersFailure(username, new Error("No users found") as any));
+                }
             })
             .catch(error => {
                 dispatch(instanceActions.clearMentionSelection(editorID));

@@ -1681,7 +1681,7 @@ class Gdn_Request implements RequestInterface {
             $result .= $hash;
         }
 
-        self::$urls[$staticKey] = ''.$result;
+        self::$urls[$staticKey] = $result;
         return $result;
     }
 

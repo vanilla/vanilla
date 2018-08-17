@@ -1568,9 +1568,9 @@ class Gdn_Request implements RequestInterface {
      *    2.1   Added the // option to $WithDomain.
      *    2.2   Added the / option to $WithDomain.
      */
-    public function url($path = '', $withDomain = false, $ssl = null) {
+    public function url(string $path = '', $withDomain = false, $ssl = null) {
         static $allowSSL = null;
-        $staticKey = ($withDomain ? '1-' : '0-').($ssl ? '1-' : '0-').json_encode($path);
+        $staticKey = ($withDomain ? '1-' : '0-').($ssl ? '1-' : '0-').$path;
         if ($r = (self::$urls[$staticKey] ?? false)) {
             return $r;
         }

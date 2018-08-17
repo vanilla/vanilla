@@ -1557,7 +1557,9 @@ EOT;
 
             case 'Twitter':
                 return <<<EOT
-<div class="twitter-card" data-tweeturl="{$matches[0]}" data-tweetid="{$matches[1]}"><a href="{$matches[0]}" class="tweet-url" rel="nofollow">{$matches[0]}</a></div>
+<div class="twitter-card js-twitterCard" data-tweeturl="{$matches[0]}" data-tweetid="{$matches[1]}"><a 
+href="{$matches[0]}" 
+class="tweet-url" rel="nofollow">{$matches[0]}</a></div>
 EOT;
                 break;
 

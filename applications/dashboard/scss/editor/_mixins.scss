@@ -119,48 +119,11 @@ $spinnerOffset: 73deg;
     .richEditorParagraphMenu {
         display: none !important;
     }
-}
 
-
-@mixin editorButtonHoverStyles($offset: - $formElement_borderWidth) {
-    background: $state-color_hover;
-
-    .Close-x,
-    .richEditorButton-icon {
-        opacity: 1;
-    }
-}
-
-@mixin editorButtonFocusStyles($offset: - $formElement_borderWidth) {
-    background: $state-color_focus;
-    outline: none;
-
-    .Close-x,
-    .richEditorButton-icon {
-        opacity: 1;
-    }
-}
-
-@mixin editorButtonActiveStyles() {
-    color: $state-color_selected;
-
-    .Close-x,
-    .richEditorButton-icon {
-        opacity: 1;
-    }
-}
-
-@mixin editorButtonOpenStyles() {
-    color: $state-color_selected;
-    opacity: $richEditor-icon_opacity;
-
-    &:hover,
-    &:focus {
-        opacity: 1;
-
-        .Close-x,
-        .richEditorButton-icon {
-            opacity: 1;
+    .Popup.hasRichEditor {
+        .Border {
+            width: 100%;
+            box-sizing: border-box;
         }
     }
 }

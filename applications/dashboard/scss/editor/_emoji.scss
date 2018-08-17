@@ -1,6 +1,6 @@
 .safeEmoji { // All emoji
     display: inline-block;
-    font-family: "Segoe UI Emoji", sans-serif;
+    font-family: "Segoe UI Emoji", sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
     vertical-align: middle;
     text-align: center;
     height: 1em;
@@ -19,4 +19,8 @@
     margin: 0 .05em 0 .1em;
     vertical-align: -0.1em;
     user-select: none;
+}
+
+.emojiGroup {
+    opacity: $state-icon_opacity;
 }

@@ -1,13 +1,10 @@
-$spoiler-borderColor: #aaadb1 !default;
-$spoiler-borderRadius: 2px !default;
-$spoiler-bg: #fff8d9 !default;
+$spoiler-borderColor: $global-border_color !default;
+$spoiler-borderRadius: $global_borderRadius !default;
+$spoiler-bg: mix($global-body_bg, $global-color_fg, 95%) !default;
 $spoiler-fontSize: 16px !default;
-$buttonSpoiler-fg: #555a62 !default;
+$buttonSpoiler-fg: $global-color_fg !default; // target #555a62
 $buttonSpoiler-bg: transparent !default;
-$buttonSpoiler-hover_fg: #f52c6e !default;
-$buttonSpoiler-hover_bg: transparent !default;
-$buttonSpoiler-focus_fg: #f52c6e !default;
-$buttonSpoiler-focus_bg: transparent !default;
+
 
 $buttonSpoiler: (
     default: (
@@ -16,22 +13,11 @@ $buttonSpoiler: (
         color: $buttonSpoiler-fg,
         background-color: $buttonSpoiler-bg,
         text-align: left
-    ),
-    hover: (
-        color: $buttonSpoiler-hover_fg,
-        background-color: $buttonSpoiler-hover_bg,
-    ),
-    focus: (
-        color: $buttonSpoiler-focus_fg,
-        background-color: $buttonSpoiler-focus_bg
     )
 ) !default;
 
 .spoiler {
     border: {
-        style: solid;
-        color: $spoiler-borderColor;
-        width: 1px;
         radius: $spoiler-borderRadius;
     }
     background-color: $spoiler-bg;
@@ -61,8 +47,8 @@ $buttonSpoiler: (
 
 .spoiler-chevronUp,
 .spoiler-chevronDown {
-    width: 8px;
-    height: 4px;
+    width: $icon-default_size;
+    height: $icon-default_size;
     display: inline-block;
     margin-left: 6px;
     vertical-align: .2em;
@@ -75,11 +61,28 @@ $buttonSpoiler: (
     max-width: 100%;
     font-size: $spoiler-fontSize;
     min-height: $icon_default_size * 2;
-    padding: 0 $embeddedText-padding;
+    padding: 0 $embeddedText_padding;
     outline: 0;
     cursor: pointer;
     text-align: center;
-    opacity: 1;
+
+    &:active {
+        .spoiler-chevron {
+            @include iconButtonActiveState;
+        }
+    }
+
+    &:focus {
+        .spoiler-chevron {
+            @include iconButtonFocusState;
+        }
+    }
+
+    &:hover {
+        .spoiler-chevron {
+            @include iconButtonHoverState;
+        }
+    }
 }
 
 .spoiler-warningMain {
@@ -108,6 +111,7 @@ $buttonSpoiler: (
     height: $icon_default_size * 2;
     display: flex;
     align-items: center;
+    opacity: $state-icon_opacity;
 }
 
 .spoiler-warningAfter,
@@ -123,7 +127,15 @@ $buttonSpoiler: (
 }
 
 .spoiler-content {
-    padding: 0 $embeddedText-padding $embeddedText-padding $embeddedText-padding;
+    padding: 0 $embeddedText_padding $embeddedText_padding $embeddedText_padding;
+
+    *:first-child {
+        margin-top: 0;
+    }
+
+    *:last-child {
+        margin-bottom: 0;
+    }
 }
 
 .spoiler-buttonContainer {

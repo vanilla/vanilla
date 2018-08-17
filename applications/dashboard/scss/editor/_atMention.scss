@@ -47,7 +47,7 @@ $atMention_maxHeight                 : ($atMention-avatar_width + $atMention-use
 .atMentionList-item {
     &.isActive {
         .atMentionList-suggestion {
-            background-color: $state-color_focus;
+            background-color: $state-focus_color;
         }
     }
 }

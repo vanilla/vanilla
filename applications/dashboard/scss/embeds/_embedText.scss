@@ -1,5 +1,4 @@
 $embedText-header_fontSize: $global-medium_fontSize !default;
-$embedText-header-lineHeight: $global-base_lineHeight !default;
 $embedText-title_fontWeight: $global-bold_fontWeight !default;
 $embedText-content_boxShadowColor: rgba($global-color_fg, .3) !default;
 $embedText-content_bg: #ffffff !default;
@@ -27,7 +26,7 @@ $embedText-content_boxShadow: 0 1px 3px 0 $embedText-content_boxShadowColor !def
 }
 
 .embedText-main {
-    padding: $embeddedText-padding;
+    padding: $embeddedText_padding;
     box-sizing: border-box;
 }
 
@@ -37,32 +36,48 @@ $embedText-content_boxShadow: 0 1px 3px 0 $embedText-content_boxShadowColor !def
     align-items: center;
     justify-content: flex-start;
     font-size: $embedText-header_fontSize;
-    line-height: $embedText-header-lineHeight;
-    margin-bottom: $utility-baseUnit;
+    line-height: $global-condensed_lineHeight;
+    //margin-bottom: $utility-baseUnit;
 }
 
+.embedText-titleLink,
+.embedText-title {
+    display: block;
+    width: 100%;
+    padding: 0;
+    font-size: $embedText-header_fontSize;
+    line-height: $global-condensed_lineHeight;
+    font-weight: $embedText-title_fontWeight;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 
-.userContent { // for compatibility
+    @include mediaQuery-richEditor_embed {
+        @include breakWord;
+        white-space: normal;
+    }
+}
+
+.embedText-titleLink {
+    margin: 0;
+    color: inherit;
+}
+
+.embedText { // for compatibility
     .embedText-title {
-        display: block;
-        width: 100%;
         margin: {
-            top: 0;
-            left: 0;
+            top: #{(1 - $global-condensed_lineHeight) * .5em} !important;
             right: 0;
-            bottom: $utility-baseUnit;
-        };
-        padding: 0;
-        font-size: $embedText-header_fontSize;
-        line-height: $embedText-header-lineHeight;
-        font-weight: $embedText-title_fontWeight;
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
-
-        @include mediaQuery-richEditor_embed {
-            @include breakWord;
-            white-space: normal;
+            bottom: #{$global-medium_fontSize / 2.2};
+            left: 0;
         }
+    }
+}
+
+// Edit Mode
+
+.richEditor {
+    .embedText-titleLink {
+        pointer-events: none;
     }
 }

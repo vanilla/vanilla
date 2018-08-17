@@ -1,19 +1,18 @@
-$embedQuote-text_color            : $quote-fg !default;
 $embedQuote-userPhoto_size        : 24px !default;
 $embedQuote-toggleButton_padding  : 12px !default;
 
 .embedQuote {
+    display: block;
     width: 100%;
 }
 
 .embedQuote-content {
+    display: block;
     width: 100%;
-    border-left: 6px solid $quote-border_color;
 }
 
 .embedQuote-header {
     position: relative;
-    padding-right: 40px;
 }
 
 .embedQuote-userLink {
@@ -37,46 +36,45 @@ $embedQuote-toggleButton_padding  : 12px !default;
 }
 
 .embedQuote-excerpt {
-    color: $embedQuote-text_color;
     white-space: normal;
-
-    h1, h2, h3, h4, h5, h6 {
-        color: $embedQuote-text_color;
-    }
-
-    a {
-        color: $embedQuote-text_color;
-        text-decoration: underline;
-    }
 }
 
 .embedQuote-collapseButton {
+    @include absolute-topRight(0, #{$global-medium_fontSize - ($buttonIcon_size - $icon-default_size)/2});
+    display: flex;
+    align-items: center;
+    justify-content: center;
     appearance: none;
     background: none;
     border: none;
     cursor: pointer;
     margin-left: auto;
-    height: $richEditor-menuButton_size;
-    width: auto;
-    padding: 0 $embedQuote-toggleButton_padding;
+    height: $buttonIcon_size;
+    width: $buttonIcon_size;
+    opacity: $state-icon_opacity;
+    padding: 0;
 
-    &:hover {
-        @include editorButtonHoverStyles;
+    &:active {
+        @include iconButtonActiveState;
     }
 
     &:focus {
-        @include editorButtonFocusStyles;
+        @include iconButtonFocusState;
     }
 
-    &:active {
-        @include editorButtonActiveStyles;
+    &:hover {
+        @include iconButtonHoverState;
     }
+}
+
+.embedQuote-title {
+    max-width: calc(100% - #{$buttonIcon_size});
 }
 
 .embedQuote-chevronUp,
 .embedQuote-chevronDown {
-    width: 8px;
-    height: 4px;
+    width: $icon-default_size;
+    height: $icon-default_size;
     display: inline-block;
     vertical-align: .2em;
 }
@@ -92,9 +90,9 @@ $embedQuote-toggleButton_padding  : 12px !default;
     align-items: center;
     justify-content: flex-start;
     padding: {
-        top: #{$embeddedText-padding - ($richEditor-menuButton_size - $embedQuote-userPhoto_size)/2};
-        left: $embeddedText-padding;
-        right: #{$embeddedText-padding - $embedQuote-toggleButton_padding};
+        top: $embeddedText_padding;
+        left: $embeddedText_padding;
+        right: $embeddedText_padding;
         bottom: 0;
     }
 }
@@ -102,4 +100,8 @@ $embedQuote-toggleButton_padding  : 12px !default;
 .embedQuote-body {
     display: block;
     margin: 0;
+}
+
+.embedQuote-metaLink {
+    display: inline-flex;
 }

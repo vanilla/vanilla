@@ -1,15 +1,14 @@
 $richEditor_bg                                    : $global-color_bg !default;
-$richEditor_horizontalPadding                           : 36px !default;
+$richEditor_horizontalPadding                     : 36px !default;
 $richEditor_minHeight                             : 200px !default;
-$richEditor_verticalPadding                       : 9px !default;
+$richEditor_verticalPadding                       : 12px !default;
 $richEditor_innerPadding                          : 12px !default;
 $richEditor-outline_color                         : rgba($global-color_primary, 0.6) !default;
 
-$richEditor-menuButton_size                       : 36px !default;
+$richEditor-menuButton_size                       : $buttonIcon_size !default;
 $richEditor-floatingButton_size                   : 28px !default;
 
 $richEditor-embedMenu_padding                     : 0 !default;
-$richEditor-icon_opacity                          : .8 !default;
 
 $richEditor-insertLink_width                      : 387px !default;
 
@@ -214,7 +213,6 @@ $richEditor-mobileEmbedBreakPoint                 : 550px !default;
     user-select: none;
     cursor: pointer;
 
-
     &.richEditor-formatButton,
     &.richEditor-embedButton {
         height: $richEditor-menuButton_size;
@@ -228,7 +226,7 @@ $richEditor-mobileEmbedBreakPoint                 : 550px !default;
         text-align: center;
 
         &.isSelected {
-            @include editorButtonActiveStyles;
+            @include iconButtonActiveState;
         }
     }
 
@@ -237,25 +235,37 @@ $richEditor-mobileEmbedBreakPoint                 : 550px !default;
     }
 
     &:hover {
-        @include editorButtonHoverStyles;
+        @include iconButtonHoverState;
+        .Close-x,
+        .richEditorButton-icon {
+            opacity: 1;
+        }
     }
 
     &:focus {
-        @include editorButtonFocusStyles;
+        @include iconButtonFocusState;
         z-index: 2;
+        .Close-x,
+        .richEditorButton-icon {
+            opacity: 1;
+        }
     }
 
     &.isActive {
-        @include editorButtonActiveStyles;
+        @include iconButtonActiveState;
+        .Close-x,
+        .richEditorButton-icon {
+            opacity: 1;
+        }
     }
 
     &.isOpen {
-        @include editorButtonOpenStyles;
+        @include iconButtonActiveState;
     }
 
     &.richEditor-formatButton {
         &:focus {
-            @include editorButtonFocusStyles($richEditor-paragraphMenuButton_offset);
+            @include iconButtonFocusState($richEditor-paragraphMenuButton_offset);
         }
     }
 }
@@ -299,12 +309,12 @@ $richEditor-mobileEmbedBreakPoint                 : 550px !default;
     margin: auto;
     height: $icon-default_size;
     width: $icon-default_size;
-    opacity: $richEditor-icon_opacity;
+    opacity: $state-icon_opacity;
 }
 
 .Close-x {
     display: block;
-    opacity: $richEditor-icon_opacity;
+    opacity: $state-icon_opacity;
     cursor: pointer;
 }
 
@@ -333,9 +343,16 @@ $richEditor-mobileEmbedBreakPoint                 : 550px !default;
     user-select: none;
     background: transparent;
     cursor: pointer;
+    opacity: $state-icon_opacity;
 
+    &:hover {
+        @include iconButtonHoverState;
+    }
     &:focus {
-        @include editorButtonFocusStyles;
+        @include iconButtonFocusState;
+    }
+    &:active {
+        @include iconButtonActiveState;
     }
 }
 
@@ -467,14 +484,16 @@ $richEditor-mobileEmbedBreakPoint                 : 550px !default;
     font-size: $icon-default_size;
     text-align: center;
     overflow: hidden;
+    opacity: $state-text_opacity;
 
     .fallBackEmoji {
         display: block;
         margin: auto;
     }
 
+    &:hover,
     &:focus {
-        outline-offset: $richEditor-emojiOutline_offset;
+        opacity: 1;
     }
 }
 
@@ -558,23 +577,28 @@ $richEditor-mobileEmbedBreakPoint                 : 550px !default;
 }
 
 .userContent {
+    line-height: $global-base_lineHeight;
+
+    &.Message {
+        margin-top: $global-medium_fontSize;
+    }
+
+    h1,
+    h2,
+    h3,
+    h4,
+    h5,
+    h6 {
+        line-height: $global-condensed_lineHeight;
+    }
+
     > * {
         &:not(:last-child) {
-            margin-bottom: .6em;
-
-            + h1,
-            + h2,
-            + h3,
-            + h4,
-            + h5,
-            + h6
-            {
-                margin-top: .6em;
-            }
+            margin-bottom: $global-block_margin;
         }
 
         &:first-child {
-            margin-top: 0 !important;
+            margin-top: #{(1 - $global-base_lineHeight) * .5em} !important;
         }
     }
 
@@ -594,6 +618,21 @@ $richEditor-mobileEmbedBreakPoint                 : 550px !default;
     {
         word-break: break-word;
         text-overflow: ellipsis;
+    }
+
+    .CommentHeader {
+        margin-bottom: $global-medium_fontSize;
+    }
+
+    li {
+        &,
+        *:first-child {
+            margin-top: 0;
+        }
+        &,
+        *:last-child {
+            margin-bottom: 0;
+        }
     }
 }
 
@@ -694,6 +733,7 @@ body.hasRichEditor {
         }
 
         // New Message
+        #EventAddEditForm,
         #GroupForm,
         #MessageForm,
         #ConversationForm {
@@ -732,6 +772,33 @@ body.hasRichEditor {
                 .Buttons {
                     padding-right: 0;
                 }
+            }
+        }
+
+        .Popup.hasRichEditor {
+            .Border {
+                width: 100%;
+                box-sizing: border-box;
+            }
+
+            .Content {
+                margin-top: 10px;
+                > h1 {
+                    padding-left: $richEditor_horizontalPadding;
+                }
+            }
+
+            .FormWrapper {
+                background: none;
+                padding: {
+                    top: 3px;
+                    left: $richEditor_horizontalPadding;
+                    right: $richEditor_horizontalPadding;
+                }
+            }
+
+            .richEditor {
+                padding-left: 0;
             }
         }
     }

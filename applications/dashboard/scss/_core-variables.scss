@@ -39,12 +39,22 @@ $global-border-style                                 : solid;
 $global_borderRadius                                 : 2px !default;
 
 /* -------------------------------------------------------------- *\
-    States Colors
+    States
 \* -------------------------------------------------------------- */
 
-$state-color_hover                                   : mix($global-color_primary, $global-color_bg, 5.5%) !default; // rgba(174, 228, 255, 0.2);
-$state-color_focus                                   : mix($global-color_primary, $global-color_bg, 12%) !default; // rgba(174, 228, 255, 0.4);
-$state-color_selected                                : mix($global-color_primary, $global-color_bg, 95%) !default; // #0075f5
+$state-icon_opacity                                  : .6;
+$state-text_opacity                                  : .75;
+
+$state-hover_color                                   : mix($global-color_primary, $global-color_bg, 5.5%) !default; // rgba(174, 228, 255, 0.2);
+$state-hover_opacity                                 : 1 !default;
+
+$state-focus_color                                   : mix($global-color_primary, $global-color_bg, 12%) !default; // rgba(174, 228, 255, 0.4);
+$state-focus_opacity                                 : 1 !default;
+$state-focus_outline                                 : none !default;
+
+$state-active_color                                  : mix($global-color_primary, $global-color_bg, 95%) !default; // #0075f5
+$state-active_opacity                                : 1 !default;
+
 
 
 /* -------------------------------------------------------------- *\
@@ -86,17 +96,17 @@ $global-large_fontSize                                 : 16px !default;
 $global-medium_fontSize                                : 14px !default;
 $global-small_fontSize                                 : 12px !default;
 
+$global-heading_topMargin                              : 1.5 * $global-medium_fontSize;
+
 $global-normal_fontWeight                              : 400 !default;
 $global-bold_fontWeight                                : 600 !default;
 
-$global-lineHeight_offset                              : .32em !default; // Offset font to make top of capital letters flush with top of container
-$global-headinglineHeight_offset                       : $global-lineHeight_offset !default; // Different if heading has different font than body
-$global-bodylineHeight_offset                          : $global-lineHeight_offset !default; // Different if heading has different font than body
+$global-block_margin                                   : $global-medium_fontSize !default;
 
-$global-base_lineHeight                                : (20/14) !default;
+$global-base_lineHeight                                : 1.5 !default;
+$global-condensed_lineHeight                           : 1.25 !default;
 
-
-$global-heading_fontFamily                             : "Open Sans", HelveticaNeue-Light, "Segoe UI", "Helvetica Neue", Helvetica, Raleway, Arial, sans-serif !default;
+$global-heading_fontFamily                             : "Open Sans", HelveticaNeue-Light, "Segoe UI", "Helvetica Neue", Helvetica, Raleway, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol" !default;
 $global-heading_fontWeight                             : $global-bold_fontWeight !default; // Derived
 
 $global-body_fontFamily                                : "Open Sans", "Segoe UI", "Helvetica Neue", Helvetica, Raleway, Arial, sans-serif !default;
@@ -105,20 +115,6 @@ $global-body_fontWeight                                : $global-normal_fontWeig
 $link_default-color                                    : $global-color_primary !default;
 $link_default_hover-color                              : $global-color_secondary !default;
 $link_default_focus-color                              : $global-color_secondary !default;
-
-/* -------------------------------------------------------------- *\
-    User Content
-\* -------------------------------------------------------------- */
-
-// Heading font sizes
-$userContent_fontSizeStep                                   : ($global-title_fontSize - $global-large_fontSize) / 5;
-$userContent_fontSizeH2                                     : $global-title_fontSize - $userContent-fontSizeStep;
-$userContent_fontSizeH3                                     : $global-title_fontSize - $userContent-fontSizeStep * 2;
-$userContent_fontSizeH4                                     : $global-title_fontSize - $userContent-fontSizeStep * 3;
-$userContent_fontSizeH5                                     : $global-title_fontSize - $userContent-fontSizeStep * 4;
-
-$userContent-list_margin                                    : 2em;
-$userContent-listDecoration_minWidth                        : 2em;
 
 
 /* -------------------------------------------------------------- *\
@@ -288,6 +284,10 @@ $menu-dropShadow                                     : 0 5px 10px $menu-dropShad
     Buttons
 \* -------------------------------------------------------------- */
 
+// Icon Button Size
+
+$buttonIcon_size                                     : 36px !default;
+
 // Global Button options
 
 $global-button_paddingTop                            : 2px !default;
@@ -403,6 +403,6 @@ $global-footer_height: 50px !default;
 //    Embedded content
 //\* -------------------------------------------------------------- */
 
-$embeddedText-padding: 18px;
+$embeddedText_padding: $global-medium_fontSize;
 
 

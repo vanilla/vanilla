@@ -563,32 +563,35 @@ if (!function_exists('cssClass')) {
 
         // Discussion list classes.
         if ($inList) {
-            $cssClass .= ($row['Bookmarked'] ?? '') == '1' ? ' Bookmarked' : '';
+            if (array_key_exists('Bookmarked', $row)) {
+                $cssClass .= ($row['Bookmarked'] ?? '') == '1' ? ' Bookmarked' : '';
 
-            $announce = $row['Announce'];
-            if ($announce == 2) {
-                $cssClass .= ' Announcement Announcement-Category';
-            } elseif ($announce) {
-                $cssClass .= ' Announcement Announcement-Everywhere';
+                $announce = $row['Announce'];
+                if ($announce == 2) {
+                    $cssClass .= ' Announcement Announcement-Category';
+                } elseif ($announce) {
+                    $cssClass .= ' Announcement Announcement-Everywhere';
+                }
+
+                $cssClass .= ($row['Closed'] ?? '') == '1' ? ' Closed' : '';
+                $cssClass .= ($row['Participated'] ?? '') == '1' ? ' Participated' : '';
             }
 
-            $cssClass .= ($row['Closed'] ?? '') == '1' ? ' Closed' : '';
-            $cssClass .= ($row['Participated'] ?? '') == '1' ? ' Participated' : '';
-        }
+            $cssClass .= ($row['InsertUserID'] ?? false ) == $session->UserID ? ' Mine' : '';
 
-        $cssClass .= ($row['InsertUserID'] ?? false ) == $session->UserID ? ' Mine' : '';
-        if (array_key_exists('CountUnreadComments', $row) && $session->isValid()) {
-            $countUnreadComments = $row['CountUnreadComments'];
-            if ($countUnreadComments === true) {
-                $cssClass .= ' New';
-            } elseif ($countUnreadComments == 0) {
-                $cssClass .= ' Read';
-            } else {
-                $cssClass .= ' Unread';
+            if (array_key_exists('CountUnreadComments', $row) && $session->isValid()) {
+                $countUnreadComments = $row['CountUnreadComments'];
+                if ($countUnreadComments === true) {
+                    $cssClass .= ' New';
+                } elseif ($countUnreadComments == 0) {
+                    $cssClass .= ' Read';
+                } else {
+                    $cssClass .= ' Unread';
+                }
+            } elseif (($isRead = ($row['Read'] ?? null)) !== null) {
+                // Category list
+                $cssClass .= $isRead ? ' Read' : ' Unread';
             }
-        } elseif (($isRead = ($row['Read'] ?? null)) !== null) {
-            // Category list
-            $cssClass .= $isRead ? ' Read' : ' Unread';
         }
 
         // Comment list classes

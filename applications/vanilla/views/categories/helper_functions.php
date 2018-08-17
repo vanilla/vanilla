@@ -143,7 +143,7 @@ if (!function_exists('writeListItem')):
     function writeListItem($category, $depth) {
         $children = $category['Children'];
         $categoryID = val('CategoryID', $category);
-        $cssClass = cssClass($category, false);
+        $cssClass = cssClass($category, true);
         $writeChildren = getWriteChildrenMethod($category, $depth);
         $rssIcon = '';
         $headingLevel = $depth + 2;
@@ -259,7 +259,7 @@ if (!function_exists('WriteTableRow')):
         $h = 'h'.($depth + 1);
         $level = 3;
         ?>
-        <tr class="<?php echo cssClass($row); ?>">
+        <tr class="<?php echo cssClass($row, true); ?>">
             <td class="CategoryName">
                 <div class="Wrap">
                     <?php

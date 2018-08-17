@@ -2570,8 +2570,8 @@ class UserModel extends Gdn_Model {
         }
         $keywords = trim($keywords);
 
-        // Check for an IP address.
-        if (preg_match('`\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}`', $keywords)) {
+        // Check for an IPV4/IPV6 address.
+        if (filter_var($keywords, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4|FILTER_FLAG_IPV6)) {
             $ipAddress = $keywords;
             $this->addIpFilters($ipAddress, ['LastIPAddress']);
         } elseif (strtolower($keywords) == 'banned') {

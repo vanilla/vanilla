@@ -915,7 +915,7 @@ if (!function_exists('formatIP')) {
         if (filter_var($iP, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4)) {
             $result = $html ? htmlspecialchars($iP) : $iP;
         } elseif (filter_var($iP, FILTER_VALIDATE_IP, FILTER_FLAG_IPV6)) {
-            $result = $html ? wrap(t('IPv6'), 'span', ['title' => $iP]) : $iP;
+            $result = $html ? "<span title='$iP'>".t('IPv6')."</span>" : $iP;
         }
 
         return $result;

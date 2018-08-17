@@ -22,7 +22,7 @@ import { IStoreState } from "@rich-editor/@types/store";
 import { LoadStatus } from "@dashboard/@types/api";
 
 interface IProps extends IWithEditorProps {
-    lookupMentions: (username: string) => void;
+    lookupMentions: (username: string, editorID: string) => void;
     setActiveItem: (itemID: string, itemIndex: number) => void;
     suggestions: IMentionValue;
     lastSuccessfulUsername: string;
@@ -86,10 +86,10 @@ export class MentionToolbar extends React.Component<IProps, IMentionState> {
             }
         }
 
-        if (!isEqual(mentionSelection, prevMentionSelection) && !this.isConvertingMention) {
+        if (!isEqual(mentionSelection, prevMentionSelection)) {
             const autoCompleteBlot = this.getAutoCompleteBlot();
             if (autoCompleteBlot) {
-                this.props.lookupMentions(autoCompleteBlot.username);
+                this.props.lookupMentions(autoCompleteBlot.username, this.props.editorID);
             }
             this.setState({ autoCompleteBlot });
             this.injectComboBoxAccessibility();
@@ -347,7 +347,8 @@ export class MentionToolbar extends React.Component<IProps, IMentionState> {
 }
 
 function mapDispatchToProps(dispatch) {
-    const mentionLookupFn = (username: string) => dispatch(mentionThunks.loadUsers(username));
+    const mentionLookupFn = (username: string, editorID: string) =>
+        dispatch(mentionThunks.loadUsers(username, editorID));
 
     return {
         lookupMentions: debounce(mentionLookupFn, 50) as any,

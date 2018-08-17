@@ -9,6 +9,7 @@ import mentionReducer, { initialState, sortSuggestions } from "./mentionReducer"
 import { actions as mentionActions } from "./mentionActions";
 // import sinon, { SinonSandbox } from "sinon";
 import { IMentionSuggestionData } from "@rich-editor/components/toolbars/pieces/MentionSuggestion";
+import { LoadStatus } from "@dashboard/@types/api";
 
 type SortProviderTuple = [string[], string, string[]];
 interface ISortTestData {
@@ -63,12 +64,11 @@ describe("mentionReducer", () => {
     });
 
     describe("LOAD_USERS_REQUEST", () => {
-        it("can set the current value to pending", () => {
-            // const response = "";
-            // sandbox.stub(api, "get");
-
+        it("can set the current value to loading", () => {
             const action = mentionActions.loadUsersRequest("test");
-            expect(mentionReducer(undefined, action).usersTrie.getValue("test")).deep.equals({ status: "PENDING" });
+            expect(mentionReducer(undefined, action).usersTrie.getValue("test")).deep.equals({
+                status: LoadStatus.LOADING,
+            });
         });
 
         it("invalidates the previous successful username", () => {
@@ -97,8 +97,8 @@ describe("mentionReducer", () => {
         state = mentionReducer(state, mentionActions.loadUsersFailure("test", error as any));
 
         expect(state.usersTrie.getValue("test")).deep.equals({
-            status: "FAILED",
-            users: null,
+            status: LoadStatus.ERROR,
+            data: undefined,
             error,
         });
     });
@@ -127,8 +127,8 @@ describe("mentionReducer", () => {
 
         it("Can save the user data", () => {
             const trieValue = state.usersTrie.getValue("test");
-            expect(trieValue.status).deep.equals("SUCCESSFUL");
-            expect(trieValue.users!).deep.equals(users);
+            expect(trieValue.status).deep.equals(LoadStatus.SUCCESS);
+            expect(trieValue.data!).deep.equals(users);
         });
 
         it("can sets the last and current useranmes", () => {

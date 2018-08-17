@@ -16,10 +16,7 @@ import BlockquoteLineBlot from "@rich-editor/quill/blots/blocks/BlockquoteBlot";
 import SpoilerLineBlot from "@rich-editor/quill/blots/blocks/SpoilerBlot";
 import HeadingBlot from "quill/formats/header";
 import { Blot, RangeStatic } from "quill/core";
-import Parchment from "parchment";
 import Embed from "quill/blots/embed";
-import ExternalEmbedBlot from "@rich-editor/quill/blots/embeds/ExternalEmbedBlot";
-import HistoryModule from "@rich-editor/quill/HistoryModule";
 
 export default class Formatter {
     public static INLINE_FORMAT_NAMES = [
@@ -36,38 +33,35 @@ export default class Formatter {
         SpoilerLineBlot.blotName,
         HeadingBlot.blotName,
     ];
-    private historyModule: HistoryModule;
 
-    constructor(private quill: Quill) {
-        this.historyModule = quill.getModule("history");
-    }
+    constructor(private quill: Quill) {}
 
     /**
      * Apply the bold format to a range.
      */
     public bold = (range: RangeStatic) => {
-        this.handleBooleanFormat(range, BoldBlot.blotName);
+        this.handleInlineFormat(range, BoldBlot.blotName);
     };
 
     /**
      * Apply the italic format to a range.
      */
     public italic = (range: RangeStatic) => {
-        this.handleBooleanFormat(range, ItalicBlot.blotName);
+        this.handleInlineFormat(range, ItalicBlot.blotName);
     };
 
     /**
      * Apply the strike format to a range.
      */
     public strike = (range: RangeStatic) => {
-        this.handleBooleanFormat(range, StrikeBlot.blotName);
+        this.handleInlineFormat(range, StrikeBlot.blotName);
     };
 
     /**
      * Apply the codeInline format to a range.
      */
     public codeInline = (range: RangeStatic) => {
-        this.handleBooleanFormat(range, CodeBlot.blotName);
+        this.handleInlineFormat(range, CodeBlot.blotName);
     };
 
     /**
@@ -81,18 +75,35 @@ export default class Formatter {
             this.quill.formatText(range.index, range.length, LinkBlot.blotName, linkValue, Quill.sources.USER);
         }
     };
+
+    /**
+     * Apply the paragraph line format to all lines in the range.
+     */
     public paragraph = (range: RangeStatic) => {
         Formatter.BLOCK_FORMAT_NAMES.forEach(name => {
             this.quill.formatLine(range.index, range.length, name, false, Quill.sources.API);
         });
         this.quill.update(Quill.sources.USER);
     };
+
+    /**
+     * Apply the h2 line format to all lines in the range.
+     */
     public h2 = (range: RangeStatic) => {
         this.quill.formatLine(range.index, range.length, HeadingBlot.blotName, 2, Quill.sources.USER);
     };
+
+    /**
+     * Apply the h3 line format to all lines in the range.
+     */
     public h3 = (range: RangeStatic) => {
         this.quill.formatLine(range.index, range.length, HeadingBlot.blotName, 3, Quill.sources.USER);
     };
+
+    /**
+     * Apply codeBlock line format to all lines in the range. This will strip all other formats.
+     * Additionally it will convert inline embeds into text.
+     */
     public codeBlock = (range: RangeStatic) => {
         let lines = this.quill.getLines(range.index, range.length) as Blot[];
         if (lines.length === 0) {
@@ -106,31 +117,51 @@ export default class Formatter {
             index: start,
             length,
         };
-        const difference = this.replaceInlineEmbeds(fullRange);
         Formatter.INLINE_FORMAT_NAMES.forEach(name => {
             this.quill.formatText(start, length, name, false, Quill.sources.API);
         });
+        const difference = this.replaceInlineEmbeds(fullRange);
         this.quill.formatLine(start, length + difference, CodeBlockBlot.blotName, true, Quill.sources.USER);
     };
+
+    /**
+     * Apply the blockquote line format to all lines in the range.
+     */
     public blockquote = (range: RangeStatic) => {
         this.quill.formatLine(range.index, range.length, BlockquoteLineBlot.blotName, true, Quill.sources.USER);
     };
+
+    /**
+     * Apply the spoiler line format to all lines in the range.
+     */
     public spoiler = (range: RangeStatic) => {
         this.quill.formatLine(range.index, range.length, SpoilerLineBlot.blotName, true, Quill.sources.USER);
     };
 
-    private handleBooleanFormat(range: RangeStatic, formatKey: string) {
+    /**
+     * Apply an inline format with a true/false enable value.
+     *
+     * @param range - The Range to apply the format to.
+     * @param formatKey - The key of the format. This is generally the blotName of a blot.
+     */
+    private handleInlineFormat(range: RangeStatic, formatKey: string) {
         const formats = this.quill.getFormat(range);
         const isEnabled = formats[formatKey] === true;
         this.quill.formatText(range.index, range.length, formatKey, !isEnabled, Quill.sources.USER);
         this.quill.update(Quill.sources.USER);
     }
 
+    /**
+     * Replace all inline embeds within a blot with their plaintext equivalent.
+     */
     private replaceInlineEmbeds(range: RangeStatic): number {
         const embeds = this.quill.scroll.descendants(Embed as any, range.index, range.length);
         let lengthDifference = 0;
         embeds.forEach(embed => {
-            const text = (embed.domNode as HTMLElement).innerText || "";
+            let text = (embed.domNode as HTMLElement).innerText || "";
+            // Strip 0-width whitespace.
+            text = text.replace(/[\u200B-\u200D\uFEFF]/g, "");
+
             lengthDifference += text.length - 1;
             embed.replaceWith("text", text);
             this.quill.update(Quill.sources.USER);

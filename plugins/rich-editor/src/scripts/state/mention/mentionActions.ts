@@ -10,6 +10,8 @@ import api from "@dashboard/apiv2";
 import { IMentionSuggestionData } from "@rich-editor/components/toolbars/pieces/MentionSuggestion";
 import { IStoreState } from "@rich-editor/@types/store";
 import { IApiError, LoadStatus } from "@dashboard/@types/api";
+import { actions as instanceActions } from "@rich-editor/state/instance/instanceActions";
+import Quill from "quill/core";
 
 export const SET_ACTIVE_SUGGESTION = "[mentions] set active suggestion";
 export const LOAD_USERS_REQUEST = "[mentions] load users request";
@@ -47,23 +49,24 @@ export function filterSuggestions(users: IMentionSuggestionData[], searchName: s
 /**
  * Make an API request for mention suggestions. These results are cached by the lookup username.
  */
-function loadUsers(username: string) {
+function loadUsers(username: string, editorID: string) {
     return (dispatch: Dispatch<any>, getState: () => IStoreState) => {
         const { usersTrie } = getState().editor.mentions;
-
-        const thing = true;
 
         // Attempt an exact lookup first.
         const exactLookup = usersTrie.getValue(username);
         if (exactLookup != null) {
             switch (exactLookup.status) {
                 case LoadStatus.SUCCESS:
+                    return dispatch(actions.loadUsersSuccess(username, exactLookup.data));
                 case LoadStatus.LOADING:
                     // Already handled
                     return;
                 case LoadStatus.ERROR:
                     // Previously failed.
-                    return dispatch(actions.loadUsersFailure(username, exactLookup.error));
+                    dispatch(instanceActions.clearMentionSelection(editorID));
+                    dispatch(actions.loadUsersFailure(username, exactLookup.error));
+                    return;
             }
         }
 
@@ -111,7 +114,10 @@ function loadUsers(username: string) {
                 // Result is good. Lets GO!
                 dispatch(actions.loadUsersSuccess(username, users));
             })
-            .catch(error => dispatch(actions.loadUsersFailure(username, error)));
+            .catch(error => {
+                dispatch(instanceActions.clearMentionSelection(editorID));
+                dispatch(actions.loadUsersFailure(username, error));
+            });
     };
 }
 

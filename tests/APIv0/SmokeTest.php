@@ -468,7 +468,7 @@ class SmokeTest extends BaseTest {
     public function testModifyDraftCategory() {
         $api = $this->api();
         $api->setUser($this->getTestUser());
-        $category = $this->createCategory();
+        $category = $this->createCategory('Modify Draft', 'modifydraft');
 
         $draft =  $this->testSaveDraft();
 
@@ -573,19 +573,21 @@ class SmokeTest extends BaseTest {
     }
 
     /**
-     * Test that a category with restricted permissions can be created.
+     * Create a category for testing.
      *
-     * @return array $body
+     * @param string $name Category name.
+     * @param  string $url Category url.
+     * @return array $category
      * @large
      */
-    private function createCategory() {
+    private function createCategory($name = null, $url = null) {
         $api = $this->api();
         $admin = $api->querySystemUser(true);
         $api->setUser($admin);
 
         $r = $this->api()->post('/vanilla/settings/addcategory.json', [
-            'Name' => 'Test Category ',
-            'UrlCode' => 'test',
+            'Name' => 'Test Category '.$name,
+            'UrlCode' => 'test'.$url,
             'DisplayAs' => 'Discussions',
         ]);
 

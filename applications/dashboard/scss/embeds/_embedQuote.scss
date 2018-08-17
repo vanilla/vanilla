@@ -13,7 +13,6 @@ $embedQuote-toggleButton_padding  : 12px !default;
 
 .embedQuote-header {
     position: relative;
-    padding-right: 40px;
 }
 
 .embedQuote-userLink {
@@ -72,7 +71,7 @@ $embedQuote-toggleButton_padding  : 12px !default;
 }
 
 .embedQuote-title {
-    max-width: calc(100% - #{$buttonIcon_size - $global-medium_fontSize});
+    max-width: calc(100% - #{$buttonIcon_size});
 }
 
 .embedQuote-chevronUp,
@@ -94,9 +93,9 @@ $embedQuote-toggleButton_padding  : 12px !default;
     align-items: center;
     justify-content: flex-start;
     padding: {
-        top: #{$embeddedText_padding - ($richEditor-menuButton_size - $embedQuote-userPhoto_size)/2};
+        top: $embeddedText_padding;
         left: $embeddedText_padding;
-        right: #{$embeddedText_padding};
+        right: $embeddedText_padding;
         bottom: 0;
     }
 }

@@ -30,6 +30,7 @@ export function mountQuoteEmbeds() {
             const quoteData = JSON.parse(data) as IEmbedData;
             const onRenderComplete = () => {
                 embed.removeAttribute("data-json");
+                embed.classList.remove('embedResponsive-initialLink');
             };
             ReactDOM.render(
                 <QuoteEmbed data={quoteData} inEditor={false} onRenderComplete={onRenderComplete} />,
@@ -95,8 +96,6 @@ export class QuoteEmbed extends React.Component<IEmbedProps<IEmbedData>, IState>
 
         const name = (this.quoteData as any).name;
 
-        window.console.log(this.quoteData);
-
         const title = name ? (
             <h2 className="embedText-title embedQuote-title">
                 <a href={this.quoteData.url} className="embedText-titleLink">
@@ -146,7 +145,7 @@ export class QuoteEmbed extends React.Component<IEmbedProps<IEmbedData>, IState>
                     )}
                 </div>
                 <div className="embedText-main embedQuote-main">
-                    <div className="embedQuote-excerpt userContent">
+                    <div className="embedQuote-excerpt">
                         <CollapsableUserContent
                             setNeedsCollapser={this.setNeedsCollapser}
                             isCollapsed={this.state.isCollapsed}

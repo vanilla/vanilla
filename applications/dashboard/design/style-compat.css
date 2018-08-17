@@ -1364,17 +1364,7 @@ label.checkbox input.checkbox-input {
 .userContent h4,
 .userContent h5,
 .userContent h6 {
-  margin-top: 21px;
   line-height: 1.25;
-}
-
-.userContent h1:first-child,
-.userContent h2:first-child,
-.userContent h3:first-child,
-.userContent h4:first-child,
-.userContent h5:first-child,
-.userContent h6:first-child {
-  margin-top: -0.125em !important;
 }
 
 .userContent > *:not(:last-child) {
@@ -1947,6 +1937,7 @@ body.isMobile .Popup.hasRichEditor .Border {
 
 .embedResponsive-initialLink {
   text-align: start;
+  padding: 14px;
 }
 
 .embedExternal {
@@ -2286,7 +2277,7 @@ body.isMobile .Popup.hasRichEditor .Border {
 }
 
 .embedText .embedText-title {
-  margin-top: 0;
+  margin-top: -0.125em !important;
   margin-right: 0;
   margin-bottom: 6.3636363636px;
   margin-left: 0;
@@ -2377,7 +2368,6 @@ body.isMobile .Popup.hasRichEditor .Border {
 
 .embedQuote-header {
   position: relative;
-  padding-right: 40px;
 }
 
 .embedQuote-userLink {
@@ -2457,8 +2447,8 @@ body.isMobile .Popup.hasRichEditor .Border {
 }
 
 .embedQuote-title {
-  max-width: -webkit-calc(100% - 22px);
-  max-width: calc(100% - 22px);
+  max-width: -webkit-calc(100% - 36px);
+  max-width: calc(100% - 36px);
 }
 
 .embedQuote-chevronUp,
@@ -2488,7 +2478,7 @@ body.isMobile .Popup.hasRichEditor .Border {
   -webkit-justify-content: flex-start;
       -ms-flex-pack: start;
           justify-content: flex-start;
-  padding-top: 8px;
+  padding-top: 14px;
   padding-left: 14px;
   padding-right: 14px;
   padding-bottom: 0;

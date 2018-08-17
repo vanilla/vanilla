@@ -582,12 +582,7 @@ $richEditor-mobileEmbedBreakPoint                 : 550px !default;
     h4,
     h5,
     h6 {
-        margin-top: $global-heading_topMargin;
         line-height: $global-condensed_lineHeight;
-
-        &:first-child {
-            margin-top: #{(1 - $global-condensed_lineHeight) * .5em} !important;
-        }
     }
 
     > * {

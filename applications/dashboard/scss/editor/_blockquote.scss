@@ -21,10 +21,8 @@ $quote-border_color   : mix($global-color_fg, $global-color_bg, 23%) !default; /
 .blockquote-content {
     > *:first-child {
         margin-top: 0;
-
-        &:last-child {
-            margin-bottom: 0;
-        }
+    }
+    > *:last-child {
+        margin-bottom: 0;
     }
 }
-

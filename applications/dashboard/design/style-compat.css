@@ -1729,7 +1729,7 @@ body.isMobile .Popup.hasRichEditor .Border {
   margin-top: 0;
 }
 
-.blockquote-content > *:first-child:last-child {
+.blockquote-content > *:last-child {
   margin-bottom: 0;
 }
 

@@ -889,15 +889,12 @@ class CategoryModel extends Gdn_Model {
      * @return bool Returns **true** if the current user has the permission or **false** otherwise.
      */
     public static function checkPermission($category, $permission, $fullMatch = true) {
-        if (!is_array($category)) {
-            if (is_numeric($category)) {
-                $category = static::categories($category);
-                $permissionCategoryID = ($category['PermissionCategoryID'] ?? -1);
-                $categoryID = ($category['CategoryID'] ?? false);
-            } else {
-                $permissionCategoryID = ($category->PermissionCategoryID ?? -1);
-                $categoryID = ($category->CategoryID ?? false);
-            }
+        if (is_numeric($category)) {
+            $category = static::categories($category);
+        }
+        if (is_object($category)) {
+            $permissionCategoryID = ($category->PermissionCategoryID ?? -1);
+            $categoryID = ($category->CategoryID ?? false);
         } else {
             $permissionCategoryID = ($category['PermissionCategoryID'] ?? -1);
             $categoryID = ($category['CategoryID'] ?? false);

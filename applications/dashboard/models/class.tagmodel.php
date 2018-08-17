@@ -519,7 +519,7 @@ class TagModel extends Gdn_Model {
      * @return Gdn_DataSet
      * @throws Exception
      */
-    public function getDiscussions($tag, $limit, $offset) {
+    public function getDiscussions($tag, $limit, $offset, $sortField = 'DiscussionID', $sortDirection = 'desc') {
         if (!is_array($tag)) {
             $tags = array_map('trim', explode(',', $tag));
         }
@@ -530,7 +530,7 @@ class TagModel extends Gdn_Model {
             ->join('Tag t', 't.TagID = td.TagID')
             ->whereIn('t.Name', $tags)
             ->limit($limit, $offset)
-            ->orderBy('td.DiscussionID', 'desc')
+            ->orderBy($sortField, $sortDirection)
             ->get()->resultArray();
 
         $taggedDiscussionIDs = array_column($taggedDiscussionIDs, 'DiscussionID');

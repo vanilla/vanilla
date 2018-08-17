@@ -538,13 +538,16 @@ class TagModel extends Gdn_Model {
         $taggedDiscussionIDs = array_column($taggedDiscussionIDs, 'DiscussionID');
 
         $discussionModel = new DiscussionModel();
-        $discussions = $discussionModel->get(
-            0,
-            '',
+        $discussions = $discussionModel->getWhere(
             [
                 'Announce' => 'all',
                 'd.DiscussionID' => $taggedDiscussionIDs,
-            ]
+            ],
+            $sortField,
+            $sortDirection,
+            '',
+            0
+
         );
 
         return $discussions;

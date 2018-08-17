@@ -5,7 +5,7 @@
  */
 
 import React from "react";
-import Quill, { RangeStatic, Sources, DeltaStatic } from "quill/core";
+import Quill, { Sources, DeltaStatic } from "quill/core";
 import uniqueId from "lodash/uniqueId";
 import debounce from "lodash/debounce";
 import isEqual from "lodash/isEqual";
@@ -14,7 +14,7 @@ import { withEditor, IWithEditorProps } from "@rich-editor/components/context";
 import MentionSuggestionList from "./pieces/MentionSuggestionList";
 import { thunks as mentionThunks, actions as mentionActions } from "@rich-editor/state/mention/mentionActions";
 import MentionAutoCompleteBlot from "@rich-editor/quill/blots/embeds/MentionAutoCompleteBlot";
-import { getBlotAtIndex, getMentionRange } from "@rich-editor/quill/utility";
+import { getBlotAtIndex } from "@rich-editor/quill/utility";
 import { IMentionValue } from "@rich-editor/state/mention/MentionTrie";
 import { connect } from "react-redux";
 import { IMentionSuggestionData, IMentionProps } from "@rich-editor/components/toolbars/pieces/MentionSuggestion";
@@ -30,7 +30,6 @@ interface IProps extends IWithEditorProps {
     activeSuggestionIndex: number;
     showLoader: boolean;
     inActiveMention: boolean;
-    mentionSelection: RangeStatic | null;
 }
 
 interface IMentionState {
@@ -73,8 +72,8 @@ export class MentionToolbar extends React.Component<IProps, IMentionState> {
      * When this component updates we need to see if the selection state has changed and trigger a lookup.
      */
     public componentDidUpdate(prevProps: IProps) {
-        const { mentionSelection } = this.props;
-        const prevMentionSelection = prevProps.mentionSelection;
+        const { mentionSelection } = this.props.instanceState;
+        const prevMentionSelection = prevProps.instanceState.mentionSelection;
 
         if (mentionSelection === null && prevMentionSelection !== null && !this.isConvertingMention) {
             const selection = this.quill!.getSelection();
@@ -110,7 +109,7 @@ export class MentionToolbar extends React.Component<IProps, IMentionState> {
                 id={this.ID}
                 loaderID={this.loaderID}
                 showLoader={showLoader}
-                mentionSelection={this.props.mentionSelection}
+                mentionSelection={this.props.instanceState.mentionSelection}
             />
         );
     }
@@ -119,8 +118,7 @@ export class MentionToolbar extends React.Component<IProps, IMentionState> {
      * Get an autocomplete blot. Creates a new one if we haven't made one yet.
      */
     private getAutoCompleteBlot(): MentionAutoCompleteBlot | null {
-        const { currentSelection } = this.props.instanceState;
-        const { mentionSelection } = this.props;
+        const { currentSelection, mentionSelection } = this.props.instanceState;
         if (!currentSelection || !mentionSelection) {
             return null;
         }
@@ -166,7 +164,7 @@ export class MentionToolbar extends React.Component<IProps, IMentionState> {
      */
     private keyDownListener = (event: KeyboardEvent) => {
         const { suggestions, activeSuggestionIndex, activeSuggestionID, showLoader } = this.props;
-        const { mentionSelection } = this.props;
+        const { mentionSelection } = this.props.instanceState;
         const inActiveMention = mentionSelection !== null;
 
         if (!suggestions || suggestions.status !== LoadStatus.SUCCESS) {
@@ -358,34 +356,6 @@ function mapDispatchToProps(dispatch) {
     };
 }
 
-/**
- * Calculate the current mention selection.
- */
-function calculateMentionSelection(
-    currentSelection: RangeStatic | null,
-    quill: Quill,
-    mentionSuggestions: IMentionValue | null,
-): RangeStatic | null {
-    if (!quill.hasFocus() && !document.activeElement.classList.contains("atMentionList-suggestion")) {
-        return null;
-    }
-
-    if (!currentSelection) {
-        return null;
-    }
-
-    if (mentionSuggestions && mentionSuggestions.status === LoadStatus.ERROR) {
-        return null;
-    }
-
-    if (currentSelection.length > 0) {
-        return null;
-    }
-
-    const mentionSelection = getMentionRange(quill);
-    return mentionSelection;
-}
-
 function mapStateToProps(state: IStoreState, ownProps: IWithEditorProps) {
     const {
         lastSuccessfulUsername,
@@ -405,11 +375,6 @@ function mapStateToProps(state: IStoreState, ownProps: IWithEditorProps) {
         activeSuggestionID,
         activeSuggestionIndex,
         showLoader,
-        mentionSelection: calculateMentionSelection(
-            ownProps.instanceState.currentSelection,
-            ownProps.quill,
-            suggestions,
-        ),
     };
 }
 
@@ -418,4 +383,4 @@ const withRedux = connect(
     mapDispatchToProps,
 );
 
-export default withEditor<any>(withRedux(MentionToolbar as any));
+export default withRedux(withEditor<any>(MentionToolbar as any));

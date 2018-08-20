@@ -532,7 +532,6 @@ class TagModel extends Gdn_Model {
             ->join('Tag t', 't.TagID = td.TagID')
             ->whereIn('t.Name', $tags)
             ->limit($limit, $offset)
-            ->orderBy($sortField, $sortDirection)
             ->get()->resultArray();
 
         $taggedDiscussionIDs = array_column($taggedDiscussionIDs, 'DiscussionID');
@@ -544,10 +543,7 @@ class TagModel extends Gdn_Model {
                 'd.DiscussionID' => $taggedDiscussionIDs,
             ],
             $sortField,
-            $sortDirection,
-            '',
-            0
-
+            $sortDirection
         );
 
         return $discussions;

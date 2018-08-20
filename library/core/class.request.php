@@ -790,7 +790,6 @@ class Gdn_Request implements RequestInterface {
             }
         }
 
-        $ip = forceIPv4($ip);
         $this->_environmentElement('ADDRESS', $ip);
 
         // Request Scheme

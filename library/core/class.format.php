@@ -1434,13 +1434,10 @@ class Gdn_Format {
                 'regex' => ['/https?:\/\/embed.gettyimages\.com\/([\w=?&;+-_]*)\/([\d]*)\/([\d]*)/i']
             ],
             'Twitch' => [
-                'regex' => ['/https?:\/\/(?:www\.)?twitch\.tv\/([\w]+)/i']
+                'regex' => ['/https?:\/\/(?:www\.)?twitch\.tv\/([\w]+)$/i']
             ],
             'TwitchRecorded' => [
                 'regex' => ['/https?:\/\/(?:www\.)?twitch\.tv\/videos\/(\w+)$/i']
-            ],
-            'Twitch' => [
-                'regex' => ['/https?:\/\/(?:www\.)?twitch\.tv\/([\w]+)$/i']
             ],
             'Soundcloud' => [
                 'regex' => ['/https?:(?:www\.)?\/\/soundcloud\.com\/([\w=?&;+-_]*)\/([\w=?&;+-_]*)/i']

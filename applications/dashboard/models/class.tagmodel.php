@@ -516,10 +516,12 @@ class TagModel extends Gdn_Model {
      * @param string|array $tag tag name(s)
      * @param int $limit limit number of result
      * @param int $offset start result at this offset
+     * @param string $sortField column to sort results by
+     * @param string $sortDirection the direction to sort the discussions
      * @return Gdn_DataSet
      * @throws Exception
      */
-    public function getDiscussions($tag, $limit, $offset) {
+    public function getDiscussions($tag, $limit, $offset, $sortField = 'DiscussionID', $sortDirection = 'desc') {
         if (!is_array($tag)) {
             $tags = array_map('trim', explode(',', $tag));
         }
@@ -535,13 +537,13 @@ class TagModel extends Gdn_Model {
         $taggedDiscussionIDs = array_column($taggedDiscussionIDs, 'DiscussionID');
 
         $discussionModel = new DiscussionModel();
-        $discussions = $discussionModel->get(
-            0,
-            '',
+        $discussions = $discussionModel->getWhere(
             [
                 'Announce' => 'all',
                 'd.DiscussionID' => $taggedDiscussionIDs,
-            ]
+            ],
+            $sortField,
+            $sortDirection
         );
 
         return $discussions;

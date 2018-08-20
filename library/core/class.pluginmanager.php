@@ -784,15 +784,16 @@ class Gdn_PluginManager extends Gdn_Pluggable implements ContainerInterface {
      * @return mixed Returns whatever the event handler returns or **false** of there is not event handler.
      */
     public function callEventHandler($sender, $className, $eventName, $handlerType = 'handler') {
-        $eventKey = strtolower("{$className}_{$eventName}");
-        $handlerType = strtolower($handlerType);
+        $eventKey = "{$className}_{$eventName}";
         $originalEventKey = $eventKey.'_'.$handlerType;
 
         switch ($handlerType) {
             case 'handler':
+            case 'Handler':
                 // Do nothing.
                 break;
             case 'create':
+            case 'Create':
                 $eventKey = $originalEventKey.'_method';
                 break;
             default:

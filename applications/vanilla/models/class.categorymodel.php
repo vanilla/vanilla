@@ -892,12 +892,12 @@ class CategoryModel extends Gdn_Model {
         if (is_numeric($category)) {
             $category = static::categories($category);
         }
-        if (is_object($category)) {
-            $permissionCategoryID = ($category->PermissionCategoryID ?? -1);
-            $categoryID = ($category->CategoryID ?? false);
-        } else {
+        if (is_array($category)) {
             $permissionCategoryID = ($category['PermissionCategoryID'] ?? -1);
             $categoryID = ($category['CategoryID'] ?? false);
+        } else {
+            $permissionCategoryID = ($category->PermissionCategoryID ?? -1);
+            $categoryID = ($category->CategoryID ?? false);
         }
 
         $result = Gdn::session()->checkPermission($permission, $fullMatch, 'Category', $permissionCategoryID)

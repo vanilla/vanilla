@@ -161,6 +161,16 @@ if (!function_exists('writeListItem')):
                 </div>
             </li>
         <?php else: ?>
+            <?php
+                $cssClass .= ' Item-Category';
+                if (isset($category['TreeRight'])) {
+                    $nextCategoryID = $category['TreeRight'];
+                    $nextCategoryDisplay = 'Heading'; // should be dynamic
+                    if ($nextCategoryDisplay === 'Heading') {
+                        $cssClass .= ' BeforeCategoryHeading';
+                    }
+                }
+            ?>
             <li id="Category_<?php echo $categoryID; ?>" class="<?php echo $cssClass; ?>">
                 <?php
                 Gdn::controller()->EventArguments['ChildCategories'] = &$children;

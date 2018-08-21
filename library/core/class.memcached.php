@@ -440,7 +440,7 @@ class Gdn_Memcached extends Gdn_Cache {
         $expiry = (int)val(Gdn_Cache::FEATURE_EXPIRY, $finalOptions, 0);
         $useLocal = (bool)$finalOptions[Gdn_Cache::FEATURE_LOCAL];
 
-        $realKey = $this->makeKey($key, $finalOptions);
+        $realKey = $this->makeKey($key, $finalOptions ?? []);
 
         // Should auto sharding be enabled?
         $keySize = strlen(serialize($value));

@@ -1428,8 +1428,9 @@ class Gdn_Controller extends Gdn_Pluggable {
             } elseif ($this->_DeliveryType == DELIVERY_TYPE_ALL) {
 
                 // Render through home page if it exists.
-                if ($this->data('isHomepage') === true && isset($this->Assets['Content']['Content'])) {
-//                    $this->Assets['Content']['Content'] = $this->render('default.home.tpl', $this);
+                if ($this->data('isHomepage') === true) {
+                    //$homeContent = $this->fetchView('default.home.tpl', $controllerName, $applicationFolder);
+                    //$this->Assets['Content']['Content'] = $homeContent;
                 }
 
                 // Render

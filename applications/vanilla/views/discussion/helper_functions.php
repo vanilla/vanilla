@@ -347,15 +347,16 @@ if (!function_exists('getDiscussionOptionsDropdown')):
             $timeLeft = ' ('.Gdn_Format::seconds($timeLeft).')';
         }
 
-        $dropdown->addLinkIf($canDismiss, t('Dismiss'), "vanilla/discussion/dismissannouncement?discussionid={$discussionID}", 'dismiss', 'DismissAnnouncement Hijack')
-            ->addLinkIf($canEdit, t('Edit').$timeLeft, '/post/editdiscussion/'.$discussionID, 'edit')
-            ->addLinkIf($canAnnounce, t('Announce'), '/discussion/announce?discussionid='.$discussionID, 'announce', 'AnnounceDiscussion Popup')
-            ->addLinkIf($canSink, t($discussion->Sink ? 'Unsink' : 'Sink'), '/discussion/sink?discussionid='.$discussionID.'&sink='.(int)!$discussion->Sink, 'sink', 'SinkDiscussion Hijack')
-            ->addLinkIf($canClose, t($discussion->Closed ? 'Reopen' : 'Close'), '/discussion/close?discussionid='.$discussionID.'&close='.(int)!$discussion->Closed, 'close', 'CloseDiscussion Hijack')
-            ->addLinkIf($canRefetch, t('Refetch Page'), '/discussion/refetchpageinfo.json?discussionid='.$discussionID, 'refetch', 'RefetchPage Hijack')
-            ->addLinkIf($canMove, t('Move'), '/moderation/confirmdiscussionmoves?discussionid='.$discussionID, 'move', 'MoveDiscussion Popup')
-            ->addLinkIf($canTag, t('Tag'), '/discussion/tag?discussionid='.$discussionID, 'tag', 'TagDiscussion Popup')
-            ->addLinkIf($canDelete, t('Delete Discussion'), '/discussion/delete?discussionid='.$discussionID.'&target='.$categoryUrl, 'delete', 'DeleteDiscussion Popup');
+        $t = DropdownModule::tAll();
+        $dropdown->addLinkIf($canDismiss, $t['Dismiss'], "vanilla/discussion/dismissannouncement?discussionid={$discussionID}", 'dismiss', 'DismissAnnouncement Hijack')
+            ->addLinkIf($canEdit, $t['Edit'].$timeLeft, '/post/editdiscussion/'.$discussionID, 'edit')
+            ->addLinkIf($canAnnounce, $t['Announce'], '/discussion/announce?discussionid='.$discussionID, 'announce', 'AnnounceDiscussion Popup')
+            ->addLinkIf($canSink, $t[($discussion->Sink ? 'Unsink' : 'Sink')], '/discussion/sink?discussionid='.$discussionID.'&sink='.(int)!$discussion->Sink, 'sink', 'SinkDiscussion Hijack')
+            ->addLinkIf($canClose, $t[($discussion->Closed ? 'Reopen' : 'Close')], '/discussion/close?discussionid='.$discussionID.'&close='.(int)!$discussion->Closed, 'close', 'CloseDiscussion Hijack')
+            ->addLinkIf($canRefetch, $t['Refetch Page'], '/discussion/refetchpageinfo.json?discussionid='.$discussionID, 'refetch', 'RefetchPage Hijack')
+            ->addLinkIf($canMove, $t['Move'], '/moderation/confirmdiscussionmoves?discussionid='.$discussionID, 'move', 'MoveDiscussion Popup')
+            ->addLinkIf($canTag, $t['Tag'], '/discussion/tag?discussionid='.$discussionID, 'tag', 'TagDiscussion Popup')
+            ->addLinkIf($canDelete, $t['Delete Discussion'], '/discussion/delete?discussionid='.$discussionID.'&target='.$categoryUrl, 'delete', 'DeleteDiscussion Popup');
 
         // DEPRECATED
         $options = [];

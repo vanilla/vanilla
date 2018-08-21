@@ -71,6 +71,7 @@
 class DropdownModule extends Gdn_Module {
 
     use NestedCollection;
+    use \Garden\Translation;
 
     /**
      * @var string The id value of the trigger.
@@ -231,5 +232,25 @@ class DropdownModule extends Gdn_Module {
         $this->trigger['attributes'] = $attributes;
         $this->trigger['url'] = $url;
         return $this;
+    }
+    /**
+     * Returns array of translations for dropdown menu
+     *
+     * @return array
+     */
+    protected static function tInit() {
+        return [
+            'Dismiss' => Gdn::translate('Dismiss'),
+            'Edit' => Gdn::translate('Edit'),
+            'Announce' => Gdn::translate('Announce'),
+            'Unsink' => Gdn::translate('Unsink'),
+            'Sink' =>  Gdn::translate('Sink'),
+            'Reopen' => Gdn::translate('Reopen'),
+            'Close' => Gdn::translate('Close'),
+            'Refetch Page' => Gdn::translate('Refetch Page'),
+            'Move' => Gdn::translate('Move'),
+            'Tag' => Gdn::translate('Tag'),
+            'Delete Discussion' => Gdn::translate('Delete Discussion')
+        ];
     }
 }

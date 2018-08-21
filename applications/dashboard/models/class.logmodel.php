@@ -866,7 +866,7 @@ class LogModel extends Gdn_Pluggable {
             $tableName = $log['RecordType'];
         }
 
-        $data = $log['Data'];
+        $data = ipEncode($log['Data']);
 
         if (isset($data['Attributes'])) {
             $attr = 'Attributes';

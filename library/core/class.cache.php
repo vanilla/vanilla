@@ -589,7 +589,7 @@ abstract class Gdn_Cache {
             }
 
             if ($configPrefix === false) {
-                $configPrefix = c('Cache.Prefix', false);
+                $configPrefix = Gdn::config('Cache.Prefix', false);
             }
         }
 

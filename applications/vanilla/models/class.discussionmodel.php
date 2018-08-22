@@ -17,6 +17,7 @@ class DiscussionModel extends Gdn_Model {
 
     use StaticInitializer;
     use \Vanilla\FloodControlTrait;
+    use \Garden\Translation;
 
     /** Cache key. */
     const CACHE_DISCUSSIONVIEWS = 'discussion.%s.countviews';
@@ -3235,5 +3236,18 @@ class DiscussionModel extends Gdn_Model {
             }
         }
         return $result;
+    }
+    /**
+     * Returns array of translations for writeDiscussion widget
+     *
+     * @return array
+     */
+    protected static function tInit() {
+        return [
+            '%s view' => Gdn::translate('%s view'),
+            '%s views' => Gdn::translate('%s views'),
+            '%s comment' => Gdn::translate('%s comment'),
+            '%s comments' => Gdn::translate('%s comments')
+        ];
     }
 }

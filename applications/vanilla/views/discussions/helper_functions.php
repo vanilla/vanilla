@@ -117,6 +117,7 @@ if (!function_exists('WriteDiscussion')) :
      * @param $session
      */
     function writeDiscussion($discussion, $sender, $session) {
+        $t = DiscussionModel::tAll();
         $cssClass = cssClass($discussion);
         $discussionUrl = $discussion->Url;
         $category = CategoryModel::categories($discussion->CategoryID);
@@ -178,12 +179,12 @@ if (!function_exists('WriteDiscussion')) :
                     ?>
                     <span class="MItem MCount ViewCount"><?php
                         printf(pluralTranslate($discussion->CountViews,
-                            '%s view html', '%s views html', t('%s view'), t('%s views')),
+                            '%s view html', '%s views html', $t['%s view'], $t['%s views']),
                             bigPlural($discussion->CountViews, '%s view'));
                         ?></span>
          <span class="MItem MCount CommentCount"><?php
              printf(pluralTranslate($discussion->CountComments,
-                 '%s comment html', '%s comments html', t('%s comment'), t('%s comments')),
+                 '%s comment html', '%s comments html', $t['%s comment'], $t['%s comments']),
                  bigPlural($discussion->CountComments, '%s comment'));
              ?></span>
          <span class="MItem MCount DiscussionScore Hidden"><?php

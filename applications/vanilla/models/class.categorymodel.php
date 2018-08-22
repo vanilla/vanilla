@@ -455,7 +455,7 @@ class CategoryModel extends Gdn_Model {
         $filterHideDiscussions = $options['filterHideDiscussions'] ?? false;
 
         foreach ($categories as $categoryID => $category) {
-            if ($filterHideDiscussions && val('HideAllDiscussions', $category)) {
+            if ($filterHideDiscussions && ($category['HideAllDiscussions'] ?? false)) {
                 $unfiltered = false;
                 continue;
             }

@@ -67,7 +67,7 @@ if (!function_exists('anonymizeIP')) {
     function anonymizeIP(string $ip) {
         $result = false;
 
-        if (filter_var($ip, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4 & FILTER_FLAG_IPV6)) {
+        if (filter_var($ip, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4 | FILTER_FLAG_IPV6)) {
             // Need a packed version for bitwise operations.
             $packed = inet_pton($ip);
             if ($packed !== false) {

@@ -2701,6 +2701,10 @@ body.isMobile .Popup.hasRichEditor .Border {
 .embedTwitter .embedExternal-content {
   border-radius: 4px;
   width: auto;
+  display: -webkit-inline-box;
+  display: -webkit-inline-flex;
+  display: -ms-inline-flexbox;
+  display: inline-flex;
 }
 
 .twitter-tweet {

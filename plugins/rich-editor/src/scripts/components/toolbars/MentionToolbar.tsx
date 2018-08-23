@@ -81,8 +81,7 @@ export class MentionToolbar extends React.Component<IProps, IMentionState> {
         }
 
         const suggestions = this.props.suggestions;
-
-        if (suggestions && this.props.lastSuccessfulUsername !== prevProps.lastSuccessfulUsername) {
+        if (suggestions) {
             const isLoading = suggestions && suggestions.status === LoadStatus.LOADING;
             const isSuccess = suggestions && suggestions.status === LoadStatus.SUCCESS && suggestions.data.length > 0;
 
@@ -92,15 +91,18 @@ export class MentionToolbar extends React.Component<IProps, IMentionState> {
                     this.setState({ autoCompleteBlot });
                 }
                 this.injectComboBoxAccessibility();
-            } else if (this.state.autoCompleteBlot) {
-                const selection = this.quill!.getSelection();
-                this.cancelActiveMention();
+                return;
+            }
+        }
 
-                // We need to restore back the selection we had if the editor is still focused because
-                // the cancelation might have messed up our position.
-                if (this.quill.hasFocus()) {
-                    this.quill!.setSelection(selection);
-                }
+        if (this.state.autoCompleteBlot) {
+            const selection = this.quill!.getSelection();
+            this.cancelActiveMention();
+
+            // We need to restore back the selection we had if the editor is still focused because
+            // the cancelation might have messed up our position.
+            if (this.quill.hasFocus()) {
+                this.quill!.setSelection(selection);
             }
         }
     }

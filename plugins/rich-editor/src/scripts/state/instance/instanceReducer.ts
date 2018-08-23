@@ -7,7 +7,8 @@
 import * as instanceActions from "./instanceActions";
 import { IEditorInstanceState, IEditorInstance } from "@rich-editor/@types/store";
 import Quill, { RangeStatic } from "quill/core";
-import { getMentionRange } from "@rich-editor/quill/utility";
+import { getMentionRange, rangeContainsBlot } from "@rich-editor/quill/utility";
+import CodeBlockBlot from "@rich-editor/quill/blots/blocks/CodeBlockBlot";
 
 const defaultSelection = {
     index: 0,
@@ -20,26 +21,6 @@ export const defaultInstance: IEditorInstance = {
     lastGoodSelection: defaultSelection,
     mentionSelection: null,
 };
-
-/**
- * Calculate the current mention selection.
- */
-function calculateMentionSelection(currentSelection: RangeStatic | null, quill: Quill): RangeStatic | null {
-    if (!quill.hasFocus() && !document.activeElement.classList.contains("atMentionList-suggestion")) {
-        return null;
-    }
-
-    if (!currentSelection) {
-        return null;
-    }
-
-    if (currentSelection.length > 0) {
-        return null;
-    }
-
-    const mentionSelection = getMentionRange(quill);
-    return mentionSelection;
-}
 
 /**
  * Validate that an particular editor ID has been created before certain actions are taken on it.
@@ -83,7 +64,7 @@ export default function instanceReducer(
                     ...instanceState,
                     currentSelection: selection,
                     lastGoodSelection: selection !== null ? selection : lastGoodSelection,
-                    mentionSelection: calculateMentionSelection(selection, quill),
+                    mentionSelection: getMentionRange(quill, selection),
                 },
             };
         }

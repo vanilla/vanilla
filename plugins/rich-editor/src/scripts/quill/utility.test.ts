@@ -9,6 +9,8 @@ import Quill from "quill/core";
 import { expect } from "chai";
 import { getIDForQuill, insertBlockBlotAt } from "./utility";
 import FocusableEmbedBlot from "@rich-editor/quill/blots/abstract/FocusableEmbedBlot";
+import CodeBlockBlot from "@rich-editor/quill/blots/blocks/CodeBlockBlot";
+import OpUtils from "@rich-editor/__tests__/OpUtils";
 
 const prettyNewline = (contents: string) => contents.replace(/\n/g, "↵ ");
 
@@ -72,70 +74,117 @@ describe("getMentionRange", () => {
     };
 
     const newline = { insert: "\n" };
+    let quill: Quill;
+    let button: HTMLButtonElement;
+    beforeEach(() => {
+        document.body.innerHTML = `
+            <div id="quill"></div>
+            <button id="button"></button>
+        `;
+        quill = new Quill(document.getElementById("quill")!);
+        button = document.getElementById("button") as HTMLButtonElement;
+        quill.focus();
+    });
 
     describe("gets a mention range in the first position", () => {
-        const quill = new Quill(document.body);
-        quill.setContents([
-            {
-                insert: "@Somebody",
-            },
-        ]);
-
-        const description = quill.getText() + "- Index: ";
+        const description = "@Somebody - Index: ";
         const validIndexes = [2, 3, 4, 5, 6, 7, 8];
 
-        const expected = {
-            index: 0,
-            length: 5,
-        };
+        beforeEach(() => {
+            quill.setContents([
+                {
+                    insert: "@Somebody",
+                },
+            ]);
+        });
 
         validIndexes.forEach(index => {
             it(prettyNewline(description) + index, () => {
-                expect(utility.getMentionRange(quill, index)).deep.equals({ index: 0, length: index });
+                expect(utility.getMentionRange(quill, { index, length: 0 })).deep.equals({ index: 0, length: index });
             });
         });
     });
 
     describe("gets a mention range after an existing mention", () => {
-        const quill = new Quill(document.body);
-        quill.setContents([
-            mentionInsert,
-            {
-                insert: " @Some",
-            },
-        ]);
-        const description = quill.getText() + "- Index: ";
-
+        const description = "@some - Index: ";
         const validIndexes = [4, 5, 6, 7];
+
+        beforeEach(() => {
+            quill.setContents([
+                mentionInsert,
+                {
+                    insert: " @Some",
+                },
+            ]);
+        });
 
         validIndexes.forEach(index => {
             it(prettyNewline(description) + index, () => {
-                expect(utility.getMentionRange(quill, index)).deep.equals({ index: 2, length: index - 2 });
+                expect(utility.getMentionRange(quill, { index, length: 0 })).deep.equals({
+                    index: 2,
+                    length: index - 2,
+                });
             });
         });
     });
 
     describe("gets a mention range on the third line", () => {
-        const quill = new Quill(document.body);
-        quill.setContents([
-            mentionInsert,
-            newline,
-            mentionInsert,
-            newline,
-            {
-                insert: "\n @Some\nOther inserts",
-            },
-        ]);
-
-        const description = quill.getText() + "- Index: ";
-
+        const description = "@adam\n@adam\n\n @Some\nOther inserts - Index: ";
         const validIndexes = [8, 9, 10];
+
+        beforeEach(() => {
+            quill.setContents([
+                mentionInsert,
+                newline,
+                mentionInsert,
+                newline,
+                {
+                    insert: "\n @Some\nOther inserts",
+                },
+            ]);
+        });
 
         validIndexes.forEach(index => {
             it(prettyNewline(description) + index, () => {
-                expect(utility.getMentionRange(quill, index)).deep.equals({ index: 6, length: index - 6 });
+                expect(utility.getMentionRange(quill, { index, length: 0 })).deep.equals({
+                    index: 6,
+                    length: index - 6,
+                });
             });
         });
+    });
+
+    it("Returns null when quill is not focused.", () => {
+        // Sanity check that this would otherwise be a valid mention.
+        quill.setContents([{ insert: "@Somebody" }]);
+        const selection = { index: 3, length: 0 };
+        quill.setSelection(selection);
+        expect(utility.getMentionRange(quill, selection)).not.to.eq(null);
+
+        // Actual check.
+        button.focus();
+        expect(utility.getMentionRange(quill, selection)).to.eq(null);
+    });
+
+    it("Returns null when the selection length is greater than 0", () => {
+        // Sanity check that this would otherwise be a valid mention.
+        quill.setContents([{ insert: "@Somebody" }]);
+        let selection = { index: 3, length: 0 };
+        quill.setSelection(selection);
+        expect(utility.getMentionRange(quill, selection)).not.to.eq(null);
+
+        // Actual check.
+        button.focus();
+        selection = { index: 3, length: 1 };
+        quill.setSelection(selection);
+        expect(utility.getMentionRange(quill, selection)).to.eq(null);
+    });
+
+    it("Returns null if we are inside of a codeblock", () => {
+        quill.setContents([{ insert: "@Somebody" }, OpUtils.codeBlock()]);
+        const selection = { index: 3, length: 0 };
+        quill.setSelection(selection);
+        expect(utility.getMentionRange(quill, selection)).to.eq(null);
     });
 });
 

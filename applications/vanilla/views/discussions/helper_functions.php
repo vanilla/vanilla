@@ -117,7 +117,6 @@ if (!function_exists('WriteDiscussion')) :
      * @param $session
      */
     function writeDiscussion($discussion, $sender, $session) {
-        $t = DiscussionModel::tAll();
         $cssClass = cssClass($discussion);
         $discussionUrl = $discussion->Url;
         $category = CategoryModel::categories($discussion->CategoryID);
@@ -179,20 +178,20 @@ if (!function_exists('WriteDiscussion')) :
                     ?>
                     <span class="MItem MCount ViewCount"><?php
                         printf(pluralTranslate($discussion->CountViews,
-                            '%s view html', '%s views html', $t['%s view'], $t['%s views']),
-                            bigPlural($discussion->CountViews, '%s view'));
+                            '%s view html', '%s views html', DiscussionModel::t('%s view'), DiscussionModel::t('%s views')),
+                            DiscussionModel::bigPluralHtmlSpan($discussion->CountViews, '%s view'));
                         ?></span>
          <span class="MItem MCount CommentCount"><?php
              printf(pluralTranslate($discussion->CountComments,
-                 '%s comment html', '%s comments html', $t['%s comment'], $t['%s comments']),
-                 bigPlural($discussion->CountComments, '%s comment'));
+                 '%s comment html', '%s comments html', DiscussionModel::t('%s comment'), DiscussionModel::t('%s comments')),
+                 DiscussionModel::bigPluralHtmlSpan($discussion->CountComments, '%s comment'));
              ?></span>
          <span class="MItem MCount DiscussionScore Hidden"><?php
              $score = $discussion->Score;
              if ($score == '') $score = 0;
              printf(plural($score,
                  '%s point', '%s points',
-                 bigPlural($score, '%s point')));
+                 DiscussionModel::bigPluralHtmlSpan($score, '%s point')));
              ?></span>
                     <?php
                     echo newComments($discussion);
@@ -200,13 +199,13 @@ if (!function_exists('WriteDiscussion')) :
                     $sender->fireEvent('AfterCountMeta');
 
                     if ($discussion->LastCommentID != '') {
-                        echo ' <span class="MItem LastCommentBy">'.sprintf(t('Most recent by %1$s'), userAnchor($last)).'</span> ';
+                        echo ' <span class="MItem LastCommentBy">'.sprintf(DiscussionModel::t('Most recent by %1$s'), userAnchor($last)).'</span> ';
                         echo ' <span class="MItem LastCommentDate">'.Gdn_Format::date($discussion->LastDate, 'html').'</span>';
                     } else {
-                        echo ' <span class="MItem LastCommentBy">'.sprintf(t('Started by %1$s'), userAnchor($first)).'</span> ';
+                        echo ' <span class="MItem LastCommentBy">'.sprintf(DiscussionModel::t('Started by %1$s'), userAnchor($first)).'</span> ';
                         echo ' <span class="MItem LastCommentDate">'.Gdn_Format::date($discussion->FirstDate, 'html');
                         if ($source = val('Source', $discussion)) {
-                            echo ' '.sprintf(t('via %s'), t($source.' Source', $source));
+                            echo ' '.sprintf(DiscussionModel::t('via %s'), t($source.' Source', $source));
                         }
                         echo '</span> ';
                     }
